@@ -285,9 +285,9 @@ fn a_step_dies_when_its_supervisor_is_killed() {
     assert!(!survived, "the step outlived its supervisor");
 }
 
-/// `fgos internal attempt-step <step> --run-dir <dir>` as the host runs it; the exit code is the answer.
-fn attempt_step_exit(step: &str, dir: &Path) -> i32 {
-    std::process::Command::new(support::supervisor::internal_harness())
+/// `fgos internal attempt-step <step> --run-dir <dir>` as the host runs it: the exit code and the result line.
+fn attempt_step(step: &str, dir: &Path) -> (i32, Value) {
+    let out = std::process::Command::new(support::supervisor::internal_harness())
         .args([
             "internal",
             "attempt-step",
@@ -299,40 +299,51 @@ fn attempt_step_exit(step: &str, dir: &Path) -> i32 {
         .arg(dir)
         .env_clear()
         .output()
-        .unwrap()
-        .status
-        .code()
-        .unwrap()
+        .unwrap();
+    let line = serde_json::from_slice(&out.stdout).unwrap_or(Value::Null);
+    (out.status.code().unwrap(), line)
 }
 
 #[test]
-fn the_attempt_step_route_refuses_what_the_entry_no_longer_rechecks() {
+fn the_attempt_step_route_hands_only_a_step_of_a_verified_envelope_to_the_step_runner() {
     let root = std::env::temp_dir().join(format!("fgos-steps-route-{}", std::process::id()));
     let _ = fs::remove_dir_all(&root);
     fs::create_dir_all(&root).unwrap();
     let fixture = support::adopt_fixture::attempt_in(&root, "route", &["settle-attempt"]);
 
-    // The envelope names a payload that has no step entry.
+    // A listed step of a verified envelope reaches the runner; the harness composes none and says so.
+    let (exit, line) = attempt_step("settle-attempt", &fixture.dir);
     assert_eq!(
-        attempt_step_exit("settle-attempt", &fixture.dir),
-        66,
-        "payload without the entry"
+        (exit, line["code"].as_str()),
+        (70, Some("steps-not-composed")),
+        "{line}"
     );
     // A step the envelope does not list.
+    let (exit, line) = attempt_step("no-such-step", &fixture.dir);
     assert_eq!(
-        attempt_step_exit("no-such-step", &fixture.dir),
-        65,
-        "unknown step"
+        (exit, line["code"].as_str()),
+        (65, Some("envelope-invalid")),
+        "unknown step: {line}"
+    );
+    // An envelope that names another host binary.
+    let foreign = support::adopt_fixture::attempt_in(&root, "foreign", &["settle-attempt"]);
+    foreign.bind_release(Path::new("/bin/true"));
+    let (exit, line) = attempt_step("settle-attempt", &foreign.dir);
+    assert_eq!(
+        (exit, line["code"].as_str()),
+        (3, Some("host-version-mismatch")),
+        "foreign host: {line}"
     );
     // An envelope whose digest no longer matches its content.
     let path = fixture.dir.join("envelope.json");
     let mut value: Value = serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
     value["unitRunId"] = json!("tampered");
     fs::write(&path, serde_json::to_vec(&value).unwrap()).unwrap();
+    let (exit, line) = attempt_step("settle-attempt", &fixture.dir);
     assert_eq!(
-        attempt_step_exit("settle-attempt", &fixture.dir),
-        65,
-        "digest mismatch"
+        (exit, line["code"].as_str()),
+        (65, Some("envelope-invalid")),
+        "digest mismatch: {line}"
     );
     let _ = fs::remove_dir_all(&root);
 }

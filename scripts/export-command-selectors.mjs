@@ -220,6 +220,18 @@ function nativeDeclaration(cmd) {
   return [...native].sort();
 }
 
+// The platforms (Node's `process.platform` names) on which a native verb is still handed to the legacy payload.
+const LEGACY_PLATFORMS = ['win32', 'darwin', 'linux'];
+function legacyOnDeclaration(cmd, native) {
+  const { name: selector, legacyOn } = cmd;
+  if (legacyOn === undefined) return undefined;
+  if (native !== true) throw new Error(`legacyOn on selector "${selector}" needs native: true`);
+  if (!Array.isArray(legacyOn) || legacyOn.length === 0 || !legacyOn.every((p) => LEGACY_PLATFORMS.includes(p))) {
+    throw new Error(`legacyOn on selector "${selector}" must be a non-empty list of ${LEGACY_PLATFORMS.join(', ')}`);
+  }
+  return [...legacyOn].sort();
+}
+
 // A store declaration is `true` or a non-empty list of invocation shapes the host can match; the data goes out verbatim.
 function storeDeclaration(cmd, field) {
   const value = cmd[field];
@@ -293,6 +305,7 @@ export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations
     const ann = annotationsMap.get(selector);
 
     const native = nativeDeclaration(cmd);
+    const legacyOn = legacyOnDeclaration(cmd, native);
     const mutatesStore = storeDeclaration(cmd, 'mutatesStore');
     const landsWork = storeDeclaration(cmd, 'landsWork');
     const eventStoreChild = storeDeclaration(cmd, 'eventStoreChild');
@@ -332,6 +345,8 @@ export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations
       // A legacy-cli selector may name first positionals the host serves natively before the composition root; every
       // other one still reaches the legacy payload.
       ...(Array.isArray(native) ? { native_subcommands: native } : {}),
+      // A native verb the host still hands to the legacy payload on these platforms.
+      ...(legacyOn ? { legacy_on: legacyOn } : {}),
       // The Rust host validates a native verb's flags itself (the legacy-node
       // payload does it for every other verb), from this projection of the
       // registry: one list of valid flags, two enforcement points.

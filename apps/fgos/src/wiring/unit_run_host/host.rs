@@ -77,6 +77,13 @@ fn bind_session_of(session: &Value) -> BindSession {
 /// An assignment runner refusal as the `run-unit` error the caller rethrows.
 fn execute_error(error: ExecuteError) -> RunUnitError {
     match error {
+        // A herdr round's refusal is Node's `DispatchError`: its code is its class.
+        ExecuteError::Config(e) if e.facts.get("name") == Some(&json!("DispatchError")) => {
+            let mut out = RunUnitError::other(e.code.as_deref().unwrap_or("error"), e.message);
+            out.code = e.code;
+            out.fields = *e.facts;
+            out
+        }
         ExecuteError::Config(e) => {
             let mut out = RunUnitError::config(e.message, e.code.as_deref(), e.phase.as_deref());
             for (key, value) in e.facts.iter() {
@@ -115,7 +122,8 @@ impl Drop for CancelHold {
 }
 
 /// `holdCancelOnSignal(options)` (`src/runner/execution/run.mjs:259`): a process that asked for it
-/// (`enable_cancel_on_signal`) has Ctrl-C and SIGTERM cancel every attempt it delivered; one handler serves all its
+/// (`enable_cancel_on_signal`) has Ctrl-C and SIGTERM (Ctrl-Break on a Windows console) cancel every attempt it
+/// delivered; one handler serves all its
 /// units, installed with the first with the project's `dispatch.cancelWaitMs` and removed with the last.
 pub fn hold_cancel_on_signal(options: &Value) -> Result<CancelHold, RunUnitError> {
     if !cancel::cancel_on_signal_enabled() {
@@ -139,14 +147,7 @@ pub fn hold_cancel_on_signal(options: &Value) -> Result<CancelHold, RunUnitError
             });
         let wait_ms = read_cancel_wait_ms(project_root.as_deref())
             .map_err(|e| RunUnitError::config(e.to_string(), None, None))?;
-        #[cfg(unix)]
-        {
-            held.1 = Some(Box::new(cancel::install_cancel_on_signal(wait_ms)));
-        }
-        // No crate installs a console Ctrl-C/Ctrl-Break handler yet (the run supervisor's gate only sends
-        // CTRL_BREAK): on Windows a cancel waits for the route's Windows decision.
-        #[cfg(not(unix))]
-        let _ = wait_ms;
+        held.1 = Some(Box::new(cancel::install_cancel_on_signal(wait_ms)));
     }
     held.0 += 1;
     Ok(CancelHold(true))
@@ -520,5 +521,31 @@ impl<A: CaseAdmission + Sync> UnitRunHost for HostUnitRun<A> {
     }
     fn publish_unit_summary(&self, unit_dir: &Path) -> Result<(), String> {
         records::publish_unit_summary(unit_dir, &machine::shipped_catalog())
+    }
+}
+
+#[cfg(test)]
+mod refusal_class {
+    use fgos_execution_engine::assignment_runner::execute::ExecuteError;
+    use fgos_execution_engine::unit_run::run_unit_contract::ErrorTag;
+    use fgos_run_supervisor::controller::error::DispatchError;
+    use serde_json::json;
+
+    /// Node's herdr round threw a `DispatchError` when a terminal attempt's pane could not be prepared, and a
+    /// caller reads its code as the class (`errorClass || 'error'`) and exits as a dispatch failure: the seat port's
+    /// coded runner error reaches the caller as that class again, details kept.
+    #[test]
+    fn a_pane_preparation_refusal_reaches_the_caller_as_the_dispatch_error_it_was() {
+        let refused = super::super::terminal::dispatch_refusal(
+            DispatchError::new("worker-spawn-fail", "the pane could not be split")
+                .with("reason", json!("pane_split_failed")),
+        );
+        let error = super::execute_error(ExecuteError::Config(Box::new(refused)));
+        assert_eq!(error.tag, ErrorTag::Error);
+        assert_eq!(error.error_class, "worker-spawn-fail");
+        assert_eq!(error.code.as_deref(), Some("worker-spawn-fail"));
+        assert_eq!(error.message, "the pane could not be split");
+        assert_eq!(error.fields["name"], "DispatchError");
+        assert_eq!(error.fields["reason"], "pane_split_failed");
     }
 }

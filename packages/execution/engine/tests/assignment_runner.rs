@@ -1045,6 +1045,9 @@ impl ExecutePorts for RefusalPorts {
     ) -> Result<fgos_run_supervisor::controller::launch::LaunchSettings, RunnerConfigError> {
         unreachable!("a refused run reads no launch settings")
     }
+    fn retain_failed_pane_ms(&self, _: &Path) -> Value {
+        Value::Null
+    }
     fn fgos_dir_of_root(&self, root: &Path) -> PathBuf {
         root.join(".fgos")
     }
@@ -1345,6 +1348,9 @@ mod end_to_end {
         }
         fn step_env(&self) -> Map<String, Value> {
             Map::new()
+        }
+        fn retain_failed_pane_ms(&self, _: &Path) -> Value {
+            Value::Null
         }
         fn launch_settings(&self, _: &Path) -> Result<LaunchSettings, RunnerConfigError> {
             Ok(LaunchSettings {

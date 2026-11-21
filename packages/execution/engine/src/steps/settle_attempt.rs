@@ -732,7 +732,7 @@ pub fn settle_attempt(run_dir: &Path, envelope: &Value, ports: &StepPorts<'_>) -
             .get("executorRedirected")
             .and_then(Value::as_bool)
             .unwrap_or(false),
-        reasoning_effort: context.get("reasoningEffort").and_then(Value::as_str),
+        reasoning_effort: context.get("reasoningEffort"),
         model_warnings: &model_warnings,
         provider_capacity_selection: context.get("providerCapacitySelection"),
         provider_capacity_evidence: context.get("providerCapacityEvidence"),

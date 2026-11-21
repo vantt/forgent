@@ -268,26 +268,15 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
     )
 }
 
-/// What the envelope binds an attempt's steps to that no longer exists: the host binary, and the Node
-/// payload's step entry. The steps run only from those paths (never the active release), so adopt cannot
-/// close the attempt until they are back. Empty when the envelope is absent or unreadable: adopt judges that itself.
+/// What the envelope binds an attempt's steps to that no longer exists: the host binary, which runs every step.
+/// The steps run only from that path (never the active release), so adopt cannot close the attempt until it is
+/// back. Empty when the envelope is absent or unreadable: adopt judges that itself.
 fn release_gone(envelope: Option<&Value>) -> Vec<String> {
-    let Some(envelope) = envelope else {
-        return Vec::new();
-    };
-    let mut gone = Vec::new();
-    if let Some(host) = envelope["hostBin"].as_str().filter(|p| !p.is_empty()) {
-        if !Path::new(host).exists() {
-            gone.push(host.to_string());
-        }
-    }
-    if let Some(root) = envelope["payloadRoot"].as_str().filter(|p| !p.is_empty()) {
-        let entry = Path::new(root).join(crate::attempt_step::ENTRY);
-        if !entry.exists() {
-            gone.push(entry.to_string_lossy().into_owned());
-        }
-    }
-    gone
+    envelope
+        .and_then(|envelope| envelope["hostBin"].as_str())
+        .filter(|host| !host.is_empty() && !Path::new(host).exists())
+        .map(|host| vec![host.to_string()])
+        .unwrap_or_default()
 }
 
 /// The attempt lock is held: an adopter's `adopting.json` tells it from the supervisor.

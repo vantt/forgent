@@ -169,6 +169,8 @@ pub trait ExecutePorts: SeatPorts {
     fn attempt_host(&self) -> Result<AttemptHost, RunnerConfigError>;
     fn step_env(&self) -> Map<String, Value>;
     fn launch_settings(&self, root: &Path) -> Result<LaunchSettings, RunnerConfigError>;
+    /// `retainFailedPaneMsOf(root)`: how long a terminal attempt's failed pane is kept, `null` until a person closes it.
+    fn retain_failed_pane_ms(&self, root: &Path) -> Value;
     fn fgos_dir_of_root(&self, root: &Path) -> PathBuf;
     fn clock(&self) -> BuildClock<'_>;
     /// How deep in nested dispatches this controller runs (the machine's own answer unless a port knows better).
@@ -212,9 +214,10 @@ fn absolute(path: &Path) -> PathBuf {
 }
 
 /// Why a mutating attempt cannot launch from this route on this platform. On Windows a lock does not pass to a
-/// child with its handle: Node holds the cwd lease in a lock-hold helper and names it to the supervisor
-/// (`cwdLeaseOwner`), and the Rust controller has no such holder endpoint yet, so the supervisor would try to take a
-/// lease the controller still holds. Windows mutating launches stay on the Node route until that design exists.
+/// child with its handle: the controller keeps the cwd lease and serves its request channel to the supervisor
+/// (`cwdLeaseOwner`, [`super::launch::serving_lease_owner`]), but a writing unit run is not yet proven end to end on
+/// native Windows (the Git door takes no borrowed custody there), so Windows mutating launches stay on the Node
+/// route until it is.
 pub fn mutating_launch_refusal(windows: bool) -> Option<DispatchError> {
     windows.then(|| {
         DispatchError::new(
@@ -1119,9 +1122,12 @@ fn run_admitted(
         mutating: mutating && !opts.force_shared_cwd,
         case_context: case,
         session: None,
+        opening: None,
+        display: None,
+        beside: None,
         ceiling_ms: None,
         request_socket: None,
-        retain_failed_pane_ms: None,
+        retain_failed_pane_ms: attempt.terminal.then(|| ports.retain_failed_pane_ms(root)),
         depth: depth as u64,
     };
     let contract_for_hook = contract_input.clone();
@@ -1179,6 +1185,8 @@ fn run_admitted(
             on_chunk,
             stop_screen,
             custody: opts.custody,
+            // The supervisor of a terminal attempt dials the herdr endpoint its pane was opened through.
+            extra_env: &seated.endpoint_env,
         },
     )?;
     Ok(settled)

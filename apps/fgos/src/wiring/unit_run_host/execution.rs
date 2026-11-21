@@ -49,7 +49,6 @@ use fgos_execution_engine::credentials::{
     refresh_ahead, AccountsProbe, BundledSqlite, RefreshOptions, RefreshRequest,
 };
 use fgos_execution_engine::settlement::{GitDoor, SettlementGit};
-use fgos_execution_engine::transport::worker_session::Env;
 use fgos_execution_engine::transport_round::executor_command::{
     resolve_executor_command, CommandRequest,
 };
@@ -60,7 +59,7 @@ use serde_json::{json, Map, Value};
 
 use super::dispatch_plan::{compile_assignment_plan, PlanAsk};
 use super::settlement::TargetAccountLocks;
-use super::terminal::{HerdrRoute, PaneMachine};
+use super::terminal::HerdrRoute;
 use crate::wiring::dispatch_decide::HostWorkspace;
 use crate::wiring::seat_binding::HostMachine;
 
@@ -542,6 +541,10 @@ impl ExecutePorts for HostExecution {
     fn fgos_dir_of_root(&self, root: &Path) -> PathBuf {
         super::machine::fgos_dir(root)
     }
+    /// `retainFailedPaneMsOf(root)` (`src/terminal-control/config.mjs:98`), as the assignment runner reads it.
+    fn retain_failed_pane_ms(&self, root: &Path) -> Value {
+        crate::wiring::doctor::terminal::project_retain_failed_pane_ms(root)
+    }
     /// `createCredentialRenewal()` (`src/runner/execution/run.mjs:1012`).
     fn renewal(&self) -> Option<&dyn CredentialRenewal> {
         Some(&HostRenewal)
@@ -647,20 +650,8 @@ impl SeatPorts for HostExecution {
         attempt: &mut Attempt,
         ask: &PaneAsk<'_>,
     ) -> Result<PaneSeat, RunnerConfigError> {
-        let env: Env = std::env::vars().collect();
         let route = Arc::new(HerdrRoute::of_project(ask.seat.root));
-        let state_root = fgos_holder_lock::state_root::state_root().0;
-        super::terminal::prepare_pane(
-            attempt,
-            ask,
-            route,
-            &PaneMachine {
-                env: &env,
-                state_root: &state_root,
-                tmp_dir: std::env::temp_dir(),
-                host: &self.host,
-            },
-        )
+        super::terminal::prepare_pane_here(attempt, ask, route, &self.host)
     }
 
     fn controller_writer_id(&self) -> Option<String> {

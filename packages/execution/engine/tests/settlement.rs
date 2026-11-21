@@ -411,7 +411,7 @@ fn run_settle(
         resolved_executor_id: text("resolvedExecutorId"),
         effective_policy: args.get("effectivePolicy"),
         executor_redirected: args["executorRedirected"].as_bool().unwrap_or(false),
-        reasoning_effort: text("reasoningEffort"),
+        reasoning_effort: args.get("reasoningEffort"),
         model_warnings: &model_warnings,
         provider_capacity_selection: None,
         provider_capacity_evidence: None,
@@ -470,6 +470,20 @@ fn every_settlement_scenario_writes_the_files_node_wrote() {
             "{name}: files written"
         );
     }
+}
+
+#[test]
+fn a_run_of_no_work_item_settles_a_result_with_no_work_id() {
+    let mut case = vector("settle.json")["settle"][0].clone();
+    case["runMeta"].as_object_mut().unwrap().remove("workId");
+    case["assignment"].as_object_mut().unwrap().remove("workId");
+    let (run_dir, outcome, _, _) = run_settle(&case);
+    assert!(outcome.is_ok(), "{outcome:?}");
+    let result: Value =
+        serde_json::from_str(&std::fs::read_to_string(run_dir.join("result.json")).unwrap())
+            .unwrap();
+    assert!(result.get("runId").is_some());
+    assert!(result.get("workId").is_none(), "{result}");
 }
 
 #[test]

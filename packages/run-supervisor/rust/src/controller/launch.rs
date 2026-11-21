@@ -731,8 +731,9 @@ pub fn acquire_attempt_locks(request: AttemptLockRequest) -> Result<AttemptLocks
         .join(attempt_str)
         .join("attempt.lock");
     if let Some(parent) = attempt_path.parent() {
-        fs::create_dir_all(parent)
-            .map_err(|e| DispatchError::new("lock-driver-unavailable", format!("attempt: {e}")))?;
+        fs::create_dir_all(parent).map_err(|e| {
+            DispatchError::holder_lock("lock-driver-unavailable", format!("attempt: {e}"))
+        })?;
     }
     let attempt = match acquire(
         &Resource::new("attempt", &attempt_path),
@@ -753,7 +754,7 @@ pub fn acquire_attempt_locks(request: AttemptLockRequest) -> Result<AttemptLocks
             .with("attemptStr", json!(attempt_str)));
         }
         Acquire::Unavailable { reason, detail } => {
-            return Err(DispatchError::new(
+            return Err(DispatchError::holder_lock(
                 "lock-driver-unavailable",
                 format!("attempt: {detail}"),
             )
@@ -768,8 +769,8 @@ pub fn acquire_attempt_locks(request: AttemptLockRequest) -> Result<AttemptLocks
         let admitted = {
             // The order check (attempt before dispatch-cwd) runs against a scope that holds the attempt lock.
             let scope = LockScope::seeded(vec![BorrowedHandle::new(&attempt)
-                .map_err(|e| DispatchError::new("lock-handle-invalid", e.to_string()))?])
-            .map_err(|e| DispatchError::new("lock-registry-invalid", e.to_string()))?;
+                .map_err(|e| DispatchError::holder_lock("lock-handle-invalid", e))?])
+            .map_err(|e| DispatchError::holder_lock("lock-registry-invalid", e))?;
             admit_successor(&scope, fgos_dir, cwd)
         };
         cwd_lease = Some(admitted?);
@@ -795,7 +796,7 @@ fn lend_custody(custody: &Handle) -> Result<Option<fs::File>, DispatchError> {
     custody
         .lend()
         .map(Some)
-        .map_err(|e| DispatchError::new("lock-handle-invalid", format!("custody: {e}")))
+        .map_err(|e| DispatchError::holder_lock("lock-handle-invalid", format!("custody: {e}")))
 }
 
 /// The supervisor started for an envelope.

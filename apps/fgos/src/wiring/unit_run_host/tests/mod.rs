@@ -11,6 +11,7 @@ use super::{accounts, checks, execution, handoff, machine, persona, records, set
 use fgos_execution_engine::steps::{AttemptHomeFinalizer, HomeState, PaneScreen};
 
 mod run_unit;
+mod session_attempt;
 mod terminal;
 
 static SERIAL: AtomicU64 = AtomicU64::new(0);

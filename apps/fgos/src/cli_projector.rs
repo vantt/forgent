@@ -194,6 +194,10 @@ pub fn project_cli_invocation(
                 args,
             )),
         ),
+        crate::wiring::run::OPERATION_ID => (
+            ContractRef::from_static("run.unit.request", "1.0.0"),
+            Box::new(crate::wiring::run::project_run_request(args)),
+        ),
         crate::wiring::agents::OPERATION_ID => (
             ContractRef::from_static("agents.list.request", "1.0.0"),
             Box::new(crate::wiring::agents::project_agents_request(args)),

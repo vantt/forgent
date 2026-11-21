@@ -168,6 +168,7 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::dispatch_decide::DECIDE_DESCRIPTOR,
     wiring::dispatch_decide::EXPLAIN_DESCRIPTOR,
     wiring::agents::DESCRIPTOR,
+    wiring::run::DESCRIPTOR,
     wiring::worktree::CREATE_DESCRIPTOR,
     wiring::worktree::REMOVE_DESCRIPTOR,
     wiring::worktree::RESYNC_DESCRIPTOR,
@@ -251,15 +252,21 @@ fn main() {
                 .collect();
             std::process::exit(wiring::execution_routes::main(&rest));
         }
-        // The run supervisor's routes: supervise, gate, adopt, attempt-step.
+        // The run supervisor's routes: supervise, gate, adopt, attempt-step, head-request.
         let rest: Vec<String> = args[2..]
             .iter()
             .map(|a| a.to_string_lossy().into_owned())
             .collect();
         // A head's `session write` is published through the paths land, handed to the supervisor route as its port.
         let publisher = wiring::session_write_publish::publisher();
+        // A post-receipt step runs from the Execution engine, handed to the supervisor route as its step runner.
         if let Some(route) = rest.first() {
-            if let Some(code) = fgos_run_supervisor::route::main(route, &rest[1..], &publisher) {
+            if let Some(code) = fgos_run_supervisor::route::main(
+                route,
+                &rest[1..],
+                &publisher,
+                &wiring::attempt_step::run_step,
+            ) {
                 std::process::exit(code);
             }
         }
@@ -325,7 +332,9 @@ fn main() {
     // doors they have.
     #[cfg(unix)]
     if wiring::supervision::is_confined() {
-        if let Some(confined) = routing::confined_head_call(cli_args) {
+        let head_socket =
+            std::env::var_os(wiring::supervision::HEAD_SOCKET_ENV).is_some_and(|v| !v.is_empty());
+        if let Some(confined) = routing::confined_head_call(cli_args, head_socket) {
             std::process::exit(wiring::supervision::send_confined(confined));
         }
     }
@@ -476,11 +485,13 @@ fn main() {
     service.register_provider(Arc::new(wiring::agents::AgentsProvider::new(
         active_payload_root,
     )));
+    service.register_provider(Arc::new(wiring::run::RunProvider::new()));
     let tracker = service.tracker();
 
     match lane {
         Lane::HookProtocol(_) => unreachable!("a hook kind ends the process above"),
-        Lane::Legacy if route.route_kind == "legacy-cli" => {
+        // A native verb the registry still hands to the payload on this platform takes the same lane.
+        Lane::Legacy if route.route_kind == "legacy-cli" || routing::handed_to_legacy(route) => {
             // Check recursion guard immediately. Fails closed if already set.
             if let Err(err) = legacy_exec::check_recursion_guard() {
                 eprintln!("fgos: error: {}", err);

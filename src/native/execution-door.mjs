@@ -7,7 +7,8 @@
 // `packages/execution/contracts/admission-peer/admission-peer.v1.json`), and the rethrow of a native `run-unit`
 // error result (`packages/execution/contracts/unit-run/run-unit.v1.json`), and the calls of the host's Execution
 // operations (`fgos internal execution <op> --protocol 1`, `packages/execution/contracts/execution-routes/
-// execution-routes.v1.json`): `executionOp` and `runUnitInHost`, one host process per call, spawned asynchronously.
+// execution-routes.v1.json`): `executionOp`, `runUnitInHost` and `launchSessionInHost`, one host process per call,
+// spawned asynchronously.
 // Besides Node built-ins it imports only the tier-0 host lookup (`src/util/host-bin-path.mjs`).
 import { spawn } from 'node:child_process';
 import readline from 'node:readline';
@@ -156,9 +157,9 @@ const CLASSLESS_IN_NODE = new Set([
 
 /**
  * The error a native `run-unit` error result stands for, as the Node unit run threw it: an instance of the class its
- * tag names (`CaseAdmissionRefusedError`, `RunnerConfigError`, else `Error`) with that class's fields. Neither named
- * class carries an `errorClass`; any other error carries the result's class (`custody-predecessor-unknown` and the
- * other run supervisor classes) unless it is one Node threw without one.
+ * tag names (`CaseAdmissionRefusedError`, `RunnerConfigError`, `HolderLockError`, else `Error`) with that class's
+ * fields. No named class carries an `errorClass`; any other error carries the result's class
+ * (`custody-predecessor-unknown` and the other run supervisor classes) unless it is one Node threw without one.
  */
 export function runUnitErrorOf(result) {
   const error = result?.error ?? {};
@@ -172,6 +173,13 @@ export function runUnitErrorOf(result) {
       ...(error.code !== undefined ? { code: error.code } : {}),
       ...(error.phase !== undefined ? { phase: error.phase } : {}),
     });
+  } else if (error.tag === 'HolderLockError') {
+    // A holder-lock driver failure: the shape of src/holder-lock/protocol.mjs's HolderLockError, which this lower
+    // layer cannot import; its `precondition` category is what the CLI exits by.
+    thrown = new Error(error.message);
+    thrown.name = 'HolderLockError';
+    thrown.code = error.code;
+    thrown.category = 'precondition';
   } else {
     thrown = new Error(error.message ?? 'run-unit failed');
     if (error.code !== undefined) thrown.code = error.code;
@@ -326,4 +334,24 @@ export async function runUnitInHost(request, { caseAdmission, onUnitRunCreated, 
   }
   if (called.result?.ok === false) throw runUnitErrorOf(called.result);
   return called.result?.result;
+}
+
+/**
+ * `launchSessionAttempt(request)` run by the host's engine (`launch-session`): the same request (plain data) and the
+ * same result, `{ placement: { host: 'terminal', key }, runDir, attemptId }`, once the supervisor bound the session.
+ * A launch refusal is rethrown as the error Node's launch threw: `name` SessionLaunchError, its `code` and `message`,
+ * and its extra fields (`refusal` of a refused lease, `launchState` of an unbound supervisor).
+ */
+export async function launchSessionInHost(request) {
+  const cwd = typeof request?.projectRoot === 'string' ? request.projectRoot : process.cwd();
+  const result = await executionOp('launch-session', request, { cwd });
+  if (result?.refused) {
+    const { code, message, ...extra } = result.refused;
+    const thrown = new Error(message);
+    thrown.name = 'SessionLaunchError';
+    thrown.code = code;
+    Object.assign(thrown, extra);
+    throw thrown;
+  }
+  return result;
 }

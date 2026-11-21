@@ -110,6 +110,12 @@ pub struct SeatInput<'a> {
     pub case_context: Option<(&'a str, &'a str)>,
     /// A head session: the role, verbs and writes it holds; typed verbatim as its opening.
     pub session: Option<&'a Value>,
+    /// What a session's pane is typed verbatim instead of the brief rendered around `prompt`.
+    pub opening: Option<&'a str>,
+    /// How a session's pane is named (`{ id, title }`).
+    pub display: Option<&'a Value>,
+    /// The live key of the session whose tab a session's pane opens next to.
+    pub beside: Option<&'a str>,
     pub ceiling_ms: Option<u64>,
     pub request_socket: Option<&'a str>,
     pub retain_failed_pane_ms: Option<Value>,
@@ -123,6 +129,8 @@ pub struct Seated {
     pub resolved_cmd: Value,
     pub launch: Launch,
     pub provider_capacity_evidence: Option<Value>,
+    /// The herdr endpoint a terminal attempt's pane was opened through, for its supervisor; empty otherwise.
+    pub endpoint_env: Map<String, Value>,
 }
 
 /// Runs after Authority resolution with the prepared launch and the provider-capacity evidence.
@@ -396,6 +404,10 @@ pub fn prepare_attempt_seat(
     } else {
         json!(command_cli(&attempt_launch.command))
     };
+    let endpoint_env = pane
+        .as_ref()
+        .map(|pane| pane.endpoint_env.clone())
+        .unwrap_or_default();
     let terminal = pane.as_ref().map(|pane| TerminalInput {
         brief_path: pane.brief_path.clone(),
         outbox_dir: Some(pane.outbox_dir.clone()),
@@ -429,6 +441,13 @@ pub fn prepare_attempt_seat(
         .and_then(|locks| locks.cwd_lease_file())
         .map(|lease| lease.to_string_lossy().into_owned())
         .filter(|_| seat.mutating);
+    // A lock is held only by the process that took it on Windows: the supervisor declares its domain on the
+    // controller's lease through the channel the controller serves while it hands the attempt over.
+    let cwd_lease_owner = cwd_lease_file.as_ref().filter(|_| cfg!(windows)).map(|_| {
+        super::launch::cwd_lease_owner_dir(&attempt_run_dir)
+            .to_string_lossy()
+            .into_owned()
+    });
     let extra_steps: Vec<String> = if attempt.terminal {
         vec!["cleanup-trust".into()]
     } else {
@@ -459,7 +478,7 @@ pub fn prepare_attempt_seat(
         gate_kill_grace_ms: seat.settings.gate_kill_grace_ms,
         kill_wait_ms: seat.settings.kill_wait_ms,
         cwd_lease_file: cwd_lease_file.as_deref(),
-        cwd_lease_owner: None,
+        cwd_lease_owner: cwd_lease_owner.as_deref(),
         identity: Some(&identity),
         terminal: terminal.as_ref(),
         extra_steps: &extra_steps,
@@ -497,5 +516,6 @@ pub fn prepare_attempt_seat(
         resolved_cmd: resolved,
         launch: prepared,
         provider_capacity_evidence: evidence,
+        endpoint_env,
     })
 }

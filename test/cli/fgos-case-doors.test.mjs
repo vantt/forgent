@@ -9,13 +9,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import os from 'node:os';
-import { spawn, spawnSync, execFileSync } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 
 import { createPendingBinding, commitBinding } from '../../src/workflow/case-bindings.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { readProjectConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { appendAll, openCase, settle, verifyReceipt } from '../helpers/workflow-case-fixture.mjs';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -27,7 +28,7 @@ function repo(t) {
   execFileSync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '--allow-empty', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
   return tmp;
 }
-const fgos = (tmp, ...args) => spawnSync(process.execPath, [FGOS, ...args, '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
+const fgos = (tmp, ...args) => spawnFgos(FGOS, [...args, '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
 
 test('fgos run: the case flags go together, and an unknown or foreign case is refused by name before anything runs', (t) => {
   const tmp = repo(t);

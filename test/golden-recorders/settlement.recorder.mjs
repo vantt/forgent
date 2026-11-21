@@ -219,6 +219,8 @@ const settleCases = [
   ['with-policy-and-digests', { assignment: producer, files: { 'worker-output/outbox/result-1.json': CLAIM_DONE }, args: { dirtyAfter: ['src/a.mjs'], effectivePolicy: policy, executorRedirected: true, reasoningEffort: 'high', modelWarnings: [{ code: 'model-drift', requested: 'a', ran: 'b' }], inputDigests: [{ path: 'brief.md', sha256: 'abc' }], resolvedExecutorId: 'codex-cli' } }],
   ['herdr-adapter', { assignment: reader, files: { 'worker-output/outbox/result-1.json': CLAIM_DONE, 'worker-output/outbox/report-1.md': REPORT }, args: { adapter: 'herdr-spawn' } }],
   ['prepared-confinement-backend', { assignment: producer, files: { 'worker-output/outbox/result-1.json': CLAIM_DONE, 'protected/prepared-invocation/attempt-1.json': { backend: { type: 'bwrap' }, workerInvocation: { command: '/usr/bin/codex', args: ['exec'], env: { HOME: '/h' }, cwd: '/w' } } }, args: { dirtyAfter: ['src/a.mjs'] } }],
+  // A launch records the effort it rendered as the CLI's control (`{command, flag, native}`), kept whole under launch.
+  ['rendered-effort-control', { assignment: producer, files: { 'worker-output/outbox/result-1.json': CLAIM_DONE }, args: { dirtyAfter: ['src/a.mjs'], effectivePolicy: policy, reasoningEffort: { command: 'codex', flag: '-c', native: 'high' } } }],
 ];
 
 const buildRunDir = ({ assignment, files }) => {

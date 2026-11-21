@@ -2,11 +2,15 @@
 //! dispatches to the routes this crate owns, exactly as `fgos` does, so a
 //! test can run the supervisor, its gate and its steps without the whole host.
 //! It composes no paths land: a head's `session write` here refuses before
-//! writing (`write-catch-up-refused`), naming this harness.
+//! writing (`write-catch-up-refused`), naming this harness. It composes no
+//! Execution engine either: a step that passes the route's envelope checks is
+//! answered `steps-not-composed` (exit 70).
 
 use std::sync::Arc;
 
-use fgos_run_supervisor::route::{CatchUpRefusal, PublishRefusal, WritePublisher};
+use fgos_run_supervisor::route::{
+    report, CatchUpRefusal, PublishRefusal, WritePublisher, EXIT_INTERNAL,
+};
 
 fn no_land() -> PublishRefusal {
     PublishRefusal {
@@ -25,7 +29,14 @@ fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let code = match (args.first().map(String::as_str), args.get(1)) {
         (Some("internal"), Some(route)) => {
-            fgos_run_supervisor::route::main(route, &args[2..], &publisher)
+            fgos_run_supervisor::route::main(route, &args[2..], &publisher, &|_, _| {
+                report(
+                    "attempt-step",
+                    "steps-not-composed",
+                    "the supervisor test harness composes no Execution engine",
+                );
+                EXIT_INTERNAL
+            })
         }
         _ => None,
     };

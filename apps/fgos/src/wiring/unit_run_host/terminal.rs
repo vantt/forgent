@@ -290,12 +290,37 @@ fn env_of(value: Option<&Value>) -> Env {
         .collect()
 }
 
-fn dispatch_refusal(error: DispatchError) -> RunnerConfigError {
-    let mut out = RunnerConfigError::coded(error.message, &error.code);
-    for (key, value) in error.detail {
+/// A refusal of the herdr round as the runner error the seat port returns, still named the `DispatchError` Node's
+/// round threw, so the unit run reports it as that class.
+pub(super) fn dispatch_refusal(error: DispatchError) -> RunnerConfigError {
+    let mut out =
+        RunnerConfigError::coded(error.message, &error.code).with("name", json!("DispatchError"));
+    for (key, value) in *error.detail {
         out = out.with(&key, value);
     }
     out
+}
+
+/// [`prepare_pane`] over this machine: its environment, its state root and its temporary directory.
+pub fn prepare_pane_here(
+    attempt: &mut Attempt,
+    ask: &PaneAsk<'_>,
+    route: Arc<dyn PaneRoute>,
+    host: &dyn Host,
+) -> Result<PaneSeat, RunnerConfigError> {
+    let env: Env = std::env::vars().collect();
+    let state_root = fgos_holder_lock::state_root::state_root().0;
+    prepare_pane(
+        attempt,
+        ask,
+        route,
+        &PaneMachine {
+            env: &env,
+            state_root: &state_root,
+            tmp_dir: std::env::temp_dir(),
+            host,
+        },
+    )
 }
 
 /// Prepare the pane of a terminal attempt (`prepareTerminalAttempt` with the context `executeAssignment` gives it):
@@ -389,7 +414,8 @@ pub fn prepare_pane(
         run_dir: &run_dir,
         cwd: &cwd,
         repo_root: Some(seat.root),
-        prompt: seat.prompt,
+        // A session types its opening; a worker gets the brief rendered around its prompt.
+        prompt: seat.opening.unwrap_or(seat.prompt),
         work_id: Some(seat.executor_id),
         tier: text(seat.effective_policy, "/tier"),
         model: text(seat.effective_policy, "/model"),
@@ -404,15 +430,15 @@ pub fn prepare_pane(
         dispatch_batch_size: seat.dispatch_batch_size,
         anchor_pane_id: anchor.as_deref(),
         work_label: seat.work_label,
-        display: None,
+        display: seat.display.cloned(),
         effective_contract: ask.effective_contract,
         // A session's opening is typed as it is, with no result claim or outbox words around it.
-        opening: if seat.session.is_some_and(|s| !s.is_null()) {
+        opening: if seat.opening.is_some() {
             "verbatim"
         } else {
             "brief"
         },
-        beside: None,
+        beside: seat.beside,
         controls_delivered: ControlsDelivered {
             root_workspace_allowed: controls.root_workspace_allowed,
             backend_delivers: controls.backend_delivers,

@@ -19,6 +19,7 @@ use crate::port::{BorrowedCheck, Mode, Wait, DEFAULT_KILL_WAIT_MS};
 use crate::port::{NotBorrowerReason, BORROW_SLOT, LOCK_FD_ENV};
 
 mod hold;
+pub use hold::serve_requests;
 
 /// The protocol the lock routes speak (`lock-fd`, `lock-hold`,
 /// `lock-borrow-vectors`). Protocol 1 was the first

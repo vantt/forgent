@@ -1,19 +1,22 @@
-// test/cli/run-verb.test.mjs — Integration tests for fgos run CLI verb
+// test/cli/run-verb.test.mjs -- the one wiring proof of `fgos run` end to end: a prompt reaches the host's unit run,
+// which binds the stub executor, runs it confined through the run supervisor and prints the envelope of its result.
+// What the flags build is owned by the run request vectors (fgos-execution), the run's outcomes by engine `unit_run`
+// and the host's unit run tests, the call's wiring by the `fgos run` cases of apps/fgos/tests/cli_tests.rs.
 
 import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 
 seedFileLocalBwrapRegistry();
 // bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
-import { capabilityServedBy, machineHome, writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
+import { capabilityServedBy, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
@@ -83,300 +86,16 @@ function setupTestRepo() {
   return tmp;
 }
 
-test('fgos run executes read-only unit from file', () => {
+test('fgos run "<prompt>" builds a read-only unit from the prompt, runs it and prints the envelope of its result', () => {
   const tmp = setupTestRepo();
-  const unitFile = path.join(tmp, 'my-unit.yaml');
-  fs.writeFileSync(unitFile, 'id: u-cli-1\nobjective: Test objective\ncapability: docs:write\nwrites: []\n');
-
-  const stdout = execFileSync(
-    process.execPath,
-    [BIN_FGOS, 'run', '--unit', unitFile, '--pattern', 'solo', '--dir', tmp],
-    { cwd: tmp, encoding: 'utf8' },
-  );
-
-  assert.ok(stdout.includes('unit-run-'));
-  assert.ok(stdout.includes('"outcome": "pass"'));
-});
-
-// `fgos run "<prompt>"`: the CLI builds the unit itself and runs it through the same door.
-const runCli = (args, cwd) => execFileSync(process.execPath, [BIN_FGOS, 'run', ...args], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
-const failCli = (args, cwd) => {
-  try {
-    runCli(args, cwd);
-  } catch (err) {
-    return err.stderr + err.stdout;
-  }
-  assert.fail(`fgos run ${args.join(' ')} should have failed`);
-};
-const unitRunsOf = (tmp) => {
-  const dir = path.join(tmp, '.fgos', 'assignments');
-  return fs.existsSync(dir) ? fs.readdirSync(dir).filter((name) => name.startsWith('unit-run-')) : [];
-};
-const unitRecordOf = (tmp, stdout) => {
-  const unitRunId = /"unitRunId": "([^"]+)"/.exec(stdout)[1];
-  return JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
-};
-
-test('fgos run --resume hands the unit run id to the Execution Core, which refuses one that has no record', () => {
-  const tmp = setupTestRepo();
-  assert.match(failCli(['--resume', 'unit-run-no-such', '--dir', tmp], tmp), /cannot resume unit run "unit-run-no-such": unit\.json not found/);
-});
-
-test('fgos run --case --activity hands the case to the Workflow port, which refuses a case that does not exist', () => {
-  const tmp = setupTestRepo();
-  const out = failCli(['Check it', '--capability', 'docs:write', '--case', 'wf-missing', '--activity', 'review', '--dir', tmp], tmp);
-  assert.match(out, /case wf-missing, which does not exist/);
-  assert.deepEqual(unitRunsOf(tmp), []);
-});
-
-test('fgos run "<prompt>" builds a read-only unit from the prompt and runs it', () => {
-  const tmp = setupTestRepo();
-  const stdout = runCli(['Write the release notes', '--capability', 'docs:write', '--dir', tmp], tmp);
-  assert.ok(stdout.includes('"outcome": "pass"'), stdout);
-  const { unit } = unitRecordOf(tmp, stdout);
+  const run = spawnFgos(BIN_FGOS, ['run', 'Write the release notes', '--capability', 'docs:write', '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
+  assert.equal(run.status, 0, run.stderr);
+  const { data } = JSON.parse(run.stdout);
+  assert.equal(data.outcome, 'pass');
+  assert.equal(data.results.at(-1).runResult.agentClaim.summary, 'Done');
+  const { unit } = JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', data.unitRunId, 'unit.json'), 'utf8'));
   assert.match(unit.id, /^adhoc-write-the-release-notes-[0-9a-f]{4}$/);
   assert.equal(unit.objective, 'Write the release notes');
   assert.equal(unit.capability, 'docs:write');
   assert.deepEqual(unit.writes, []);
-  assert.equal(unit.prefer, undefined);
-});
-
-test('fgos run "<prompt>" turns --provider, --persona and --rigor into the unit', () => {
-  const tmp = setupTestRepo();
-  fs.mkdirSync(path.join(tmp, 'fgos', 'agents'), { recursive: true });
-  fs.writeFileSync(path.join(tmp, 'fgos', 'agents', 'test-voice.yaml'), 'name: test-voice\ndescription: A test voice\n');
-  const stdout = runCli(['Check it', '--capability', 'docs:write', '--provider', 'test-node', '--persona', 'test-voice', '--rigor', 'high', '--dir', tmp], tmp);
-  const record = unitRecordOf(tmp, stdout);
-  assert.deepEqual(record.unit.prefer, ['test-node']);
-  assert.equal(record.unit.persona, 'test-voice');
-  assert.equal(record.unit.rigor, 'high');
-  const binding = record.bindings['producer/1'][0].binding;
-  assert.equal(binding.provenance.executor.source, 'unit-prefer');
-  assert.deepEqual(binding.provenance.persona, { value: 'test-voice', source: 'unit' });
-});
-
-test('fgos run "<prompt>" --writes from a linked worktree records the write scope', () => {
-  const tmp = setupTestRepo();
-  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: tmp, stdio: 'ignore' });
-  const wt = makeFixtureDir('fgos-cli-run-wt-');
-  fs.rmSync(wt, { recursive: true, force: true });
-  execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', wt], { cwd: tmp, stdio: 'ignore' });
-  let stdout;
-  try {
-    stdout = runCli(['Write notes', '--capability', 'docs:write', '--writes', 'notes.md,docs/a.md', '--dir', tmp], wt);
-  } catch (err) {
-    stdout = err.stdout;
-  }
-  const record = unitRecordOf(tmp, stdout);
-  assert.deepEqual(record.unit.writes, ['notes.md', 'docs/a.md']);
-  assert.equal(record.worktree, fs.realpathSync(wt));
-});
-
-test('fgos run "<prompt>" --effort reaches the override bind() reads', () => {
-  const tmp = setupTestRepo();
-  // The fixture's executor has no reasoning-effort flag, so the launch refuses the level; the
-  // override the unit run recorded is what this checks.
-  failCli(['Check it', '--capability', 'docs:write', '--effort', 'high', '--dir', tmp], tmp);
-  const [unitRunId] = unitRunsOf(tmp);
-  const record = JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
-  assert.deepEqual(record.overrides, [{ reasoningEffort: 'high' }], 'the door names no origin that claims a person typed it');
-  assert.equal(record.unit.objective, 'Check it');
-});
-
-test('fgos run "<prompt>" --timeout gives the run its own time, kept in unit.json and handed to the dispatch', () => {
-  const tmp = setupTestRepo();
-  const stdout = runCli(['Port the parser', '--capability', 'docs:write', '--timeout', '90m', '--dir', tmp], tmp);
-  assert.ok(stdout.includes('"outcome": "pass"'), stdout);
-  const unitRunId = /"unitRunId": "([^"]+)"/.exec(stdout)[1];
-  const record = unitRecordOf(tmp, stdout);
-  assert.deepEqual(record.overrides, [{ timeoutMs: 5400000 }]);
-  const binding = record.bindings['producer/1'][0].binding;
-  assert.equal(binding.timeoutMs, 5400000);
-  assert.deepEqual(binding.provenance.timeoutMs, { value: 5400000, source: 'override' });
-  const runJsons = [];
-  const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (e.name === 'run.json') runJsons.push(p); } };
-  walk(path.join(tmp, '.fgos', 'assignments', unitRunId));
-  assert.ok(runJsons.length > 0);
-  for (const p of runJsons) assert.equal(JSON.parse(fs.readFileSync(p, 'utf8')).timeoutMs, 5400000, p);
-});
-
-test('fgos run --override with a timeoutMs below the minimum is refused before any unit run exists', () => {
-  const tmp = setupTestRepo();
-  assert.match(failCli(['Check it', '--capability', 'docs:write', '--override', '{"timeoutMs":5}', '--dir', tmp], tmp), /timeout/);
-  assert.deepEqual(unitRunsOf(tmp), []);
-});
-
-test('fgos run "<prompt>" with both --provider and an --override executor: the override pins', () => {
-  const tmp = setupTestRepo();
-  const stdout = runCli(['Check it', '--capability', 'docs:write', '--provider', 'test-node', '--override', '{"executor":"test-node"}', '--dir', tmp], tmp);
-  const record = unitRecordOf(tmp, stdout);
-  assert.deepEqual(record.unit.prefer, ['test-node']);
-  assert.equal(record.bindings['producer/1'][0].binding.provenance.executor.source, 'override');
-});
-
-// `--account <pool/account>` pins the account through the same override field `--override` carries.
-// The fixture's executor has no account list, so a pin on it is refused before any unit run exists.
-// The machine home the fixture's executors were written to: it holds no account list.
-const accountHome = () => machineHome();
-const failCliHome = (args, cwd, home) => {
-  try {
-    execFileSync(process.execPath, [BIN_FGOS, 'run', ...args], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, HOME: home } });
-  } catch (err) {
-    return err.stderr + err.stdout;
-  }
-  assert.fail(`fgos run ${args.join(' ')} should have failed`);
-};
-
-test('fgos run "<prompt>" --account on an executor without an account list is refused before any unit run exists', () => {
-  const tmp = setupTestRepo();
-  const out = failCliHome(['Check it', '--capability', 'docs:write', '--account', 'node/acct1', '--dir', tmp], tmp, accountHome());
-  assert.match(out, /account "node\/acct1" cannot be pinned: pool "node" has no account list/);
-  assert.deepEqual(unitRunsOf(tmp), []);
-});
-
-test('fgos run --override with an "account" key is checked the same way', () => {
-  const tmp = setupTestRepo();
-  const out = failCliHome(['Check it', '--capability', 'docs:write', '--override', '{"account":"node/acct1"}', '--dir', tmp], tmp, accountHome());
-  assert.match(out, /has no account list/);
-  assert.deepEqual(unitRunsOf(tmp), []);
-});
-
-test('fgos run --sync <ref> without a prompt makes a sync-only unit that passes without a worker when the ref is already merged', () => {
-  const tmp = setupTestRepo();
-  execFileSync('git', ['commit', '-q', '-m', 'init'], { cwd: tmp, stdio: 'ignore' });
-  const wt = makeFixtureDir('fgos-cli-run-sync-wt-');
-  fs.rmSync(wt, { recursive: true, force: true });
-  execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', wt], { cwd: tmp, stdio: 'ignore' });
-  // main is already in the branch: a sync-only unit is up to date and passes without a worker.
-  const stdout = runCli(['--sync', 'main', '--capability', 'docs:write', '--writes', 'docs', '--dir', tmp], wt);
-  const record = unitRecordOf(tmp, stdout);
-  assert.equal(record.unit.syncBase, 'main');
-  assert.equal(record.unit.syncOnly, true);
-  assert.equal(record.sync.status, 'up-to-date');
-  assert.equal(record.settlement.outcome, 'pass');
-});
-
-// The raise doors: no door of this release can attest a person, so `fgos run` raises nothing. A tier above the
-// one a seat resolves to, and an accepted dependence, are refused by name before any unit run exists; at or below the resolved tier everything works.
-const setRunnerConfig = (tmp, patch) => {
-  const file = path.join(tmp, '.fgos', 'config.json');
-  const cfg = readProjectConfig(tmp);
-  writeProjectConfig(tmp, { ...cfg, runner: patch(cfg.runner) });
-};
-
-test('fgos run --override with a tier above the resolved tier is refused by name, and no unit run is left behind', () => {
-  const tmp = setupTestRepo();
-  const out = failCli(['Check it', '--capability', 'docs:write', '--override', '{"tier":"frontier"}', '--dir', tmp], tmp);
-  assert.match(out, /tier-escalation-unauthorized/);
-  assert.match(out, /frontier/);
-  assert.deepEqual(unitRunsOf(tmp), []);
-});
-
-test('fgos run on a machine with no agent CLI is refused by name with the fix, and no unit run is left behind', () => {
-  const tmp = setupTestRepo();
-  // Every executor of the project and of the shipped standard starts a program this PATH does not hold.
-  setRunnerConfig(tmp, (runner) => {
-    const absent = '/no/such/agent-cli';
-    const { command: _command, ...executor } = runner.executors['test-node'];
-    return { ...runner, executors: { 'test-node': { ...executor,  invocations: [{ ...executor.invocations[0], command: absent }] } } };
-  });
-  const bin = makeFixtureDir('fgos-cli-run-bin-');
-  fs.symlinkSync(execFileSync('sh', ['-c', 'command -v git'], { encoding: 'utf8' }).trim(), path.join(bin, 'git'));
-  const result = spawnSync(process.execPath, [BIN_FGOS, 'run', 'Check it', '--capability', 'docs:write', '--dir', tmp], { cwd: tmp, encoding: 'utf8', env: { ...process.env, PATH: bin } });
-  assert.equal(result.status, 4, result.stderr);
-  assert.match(result.stderr, /agent-cli-missing: no agent CLI is installed on this machine .*install one of .*fgos doctor/);
-  assert.deepEqual(unitRunsOf(tmp), []);
-});
-
-test('fgos run --override with a tier at or below the resolved tier still runs, at that tier', () => {
-  const tmp = setupTestRepo();
-  const stdout = runCli(['Check it', '--capability', 'docs:write', '--override', '{"tier":"nano"}', '--dir', tmp], tmp);
-  assert.ok(stdout.includes('"outcome": "pass"'), stdout);
-  const record = unitRecordOf(tmp, stdout);
-  assert.equal(record.bindings['producer/1'][0].binding.tier, 'nano');
-  assert.equal(record.bindings['producer/1'][0].binding.provenance.tier.source, 'override');
-});
-
-test('fgos run --capability and --persona are the unit\'s own declarations: a committed tier above the default binds, as in a unit file', () => {
-  const tmp = setupTestRepo();
-  fs.mkdirSync(path.join(tmp, 'fgos', 'agents'), { recursive: true });
-  fs.writeFileSync(path.join(tmp, 'fgos', 'agents', 'test-voice.yaml'), 'name: test-voice\ndescription: A test voice\n');
-  setRunnerConfig(tmp, (runner) => ({
-    ...runner,
-    capabilities: { ...runner.capabilities, 'docs:write': { ...runner.capabilities['docs:write'], tier: 'flagship' } },
-    personas: { 'test-voice': { tier: 'frontier' } },
-  }));
-  const byCapability = unitRecordOf(tmp, runCli(['Check it', '--capability', 'docs:write', '--dir', tmp], tmp)).bindings['producer/1'][0].binding;
-  assert.equal(byCapability.tier, 'flagship');
-  assert.match(byCapability.provenance.tier.source, /docs:write/);
-  const byPersona = unitRecordOf(tmp, runCli(['Check it', '--capability', 'docs:write', '--persona', 'test-voice', '--dir', tmp], tmp)).bindings['producer/1'][0].binding;
-  assert.equal(byPersona.tier, 'frontier');
-});
-
-test('fgos run --override that accepts a dependence is refused at the door, whatever origin it names', () => {
-  const tmp = setupTestRepo();
-  for (const origin of ['human-cli', 'agent']) {
-    const out = failCli(['Check it', '--capability', 'docs:write', '--override', JSON.stringify({ origin, acceptDependence: true }), '--dir', tmp], tmp);
-    assert.match(out, /dependence-acceptance-unauthorized/, origin);
-  }
-  assert.deepEqual(unitRunsOf(tmp), []);
-});
-
-test('fgos run keeps --timeout: it raises no tier', () => {
-  const tmp = setupTestRepo();
-  const stdout = runCli(['Check it', '--capability', 'docs:write', '--timeout', '5m', '--dir', tmp], tmp);
-  assert.ok(stdout.includes('"outcome": "pass"'), stdout);
-  const binding = unitRecordOf(tmp, stdout).bindings['producer/1'][0].binding;
-  assert.equal(binding.timeoutMs, 300000);
-  assert.equal(binding.tier, 'standard');
-});
-
-
-
-test('--json hands the user each attempt\'s binding with the provenance Seat Binding recorded, unchanged', () => {
-  const tmp = setupTestRepo();
-  const out = JSON.parse(runCli(['Port the parser', '--capability', 'docs:write', '--json', '--dir', tmp], tmp));
-  const results = out.data.results;
-  assert.ok(results.length > 0);
-  const recorded = unitRecordOf(tmp, JSON.stringify(out.data, null, 2)).bindings['producer/1'].map((attempt) => attempt.binding);
-  assert.deepEqual(results.map((r) => r.binding.provenance), recorded.map((b) => b.provenance));
-});
-
-test('a run records tier and model with the source Seat Binding gave them, never the dispatch door\'s override label', () => {
-  const tmp = setupTestRepo();
-  const stdout = runCli(['Port the parser', '--capability', 'docs:write', '--timeout', '90m', '--dir', tmp], tmp);
-  assert.ok(stdout.includes('"outcome": "pass"'), stdout);
-  const unitRunId = /"unitRunId": "([^"]+)"/.exec(stdout)[1];
-  const plans = [];
-  const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (e.name === 'dispatch-plan.json') plans.push(p); } };
-  walk(path.join(tmp, '.fgos', 'assignments'));
-  assert.ok(plans.length > 0);
-  const bound = unitRecordOf(tmp, stdout).bindings['producer/1'][0].binding;
-  const recorded = plans.map((p) => JSON.parse(fs.readFileSync(p, 'utf8')).policy?.provenance).filter(Boolean);
-  assert.ok(recorded.length > 0, 'the run recorded a dispatch policy');
-  for (const provenance of recorded) {
-    assert.deepEqual(provenance.tier.source, { scope: 'seat-binding', id: bound.provenance.tier.source });
-    assert.deepEqual(provenance.model.source, { scope: 'seat-binding', id: bound.provenance.model.source });
-  }
-});
-
-// One wiring proof: the verify facts a run measured reach the result, unit.json and unit-summary.json as one object.
-// What each verdict means (pass, findings with its exit, timeout) is owned by test/runner/execution/custody-door.test.mjs.
-test('fgos run --verify keeps the facts of a failing verify in the result, unit.json and unit-summary.json', () => {
-  const tmp = setupTestRepo();
-  const args = ['Write the release notes', '--capability', 'docs:write', '--pattern', 'solo', '--verify', 'exit 3', '--json', '--dir', tmp];
-  let stdout;
-  try {
-    stdout = runCli(args, tmp);
-  } catch (err) {
-    stdout = err.stdout; // a run whose verify found problems settles as findings and exits non-zero, still printing its result
-  }
-  const { unitRunId, verify: reported } = JSON.parse(stdout).data;
-  const unitDir = path.join(tmp, '.fgos', 'assignments', unitRunId);
-  const recorded = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8')).settlement.verify;
-  const summarized = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit-summary.json'), 'utf8')).verify;
-  assert.deepEqual({ ran: recorded.ran, command: recorded.command, passed: recorded.passed, outcome: recorded.outcome, exit: recorded.exit }, { ran: true, command: 'exit 3', passed: false, outcome: 'findings', exit: 3 });
-  assert.match(recorded.outputDigest, /^sha256:[0-9a-f]{64}$/);
-  assert.deepEqual(summarized, recorded);
-  assert.deepEqual(reported, recorded);
 });

@@ -33,15 +33,42 @@ pub fn cwd_dev_ino(cwd: &Path) -> Option<String> {
     Some(format!("{}-{}-{birth}", meta.dev(), meta.ino()))
 }
 
-#[cfg(not(unix))]
-pub fn cwd_dev_ino(_cwd: &Path) -> Option<String> {
-    None
+/// On Windows the same three facts Node's `fs.statSync` reports: the volume serial number, the file index and the
+/// creation time in nanoseconds since the epoch, so a Node and a Rust controller contend for one lock file.
+#[cfg(windows)]
+pub fn cwd_dev_ino(cwd: &Path) -> Option<String> {
+    use std::os::windows::fs::OpenOptionsExt;
+    use std::os::windows::io::AsRawHandle;
+    use windows_sys::Win32::Storage::FileSystem::{
+        GetFileInformationByHandle, BY_HANDLE_FILE_INFORMATION, FILE_FLAG_BACKUP_SEMANTICS,
+    };
+    let dir = fs::canonicalize(cwd).ok()?;
+    // A directory opens only with backup semantics; it is opened for its attributes alone.
+    let handle = fs::OpenOptions::new()
+        .access_mode(0)
+        .custom_flags(FILE_FLAG_BACKUP_SEMANTICS)
+        .open(&dir)
+        .ok()?;
+    // SAFETY: a zeroed out-struct filled for a handle this function owns.
+    let info = unsafe {
+        let mut info: BY_HANDLE_FILE_INFORMATION = std::mem::zeroed();
+        if GetFileInformationByHandle(handle.as_raw_handle() as _, &mut info) == 0 {
+            return None;
+        }
+        info
+    };
+    let index = (u64::from(info.nFileIndexHigh) << 32) | u64::from(info.nFileIndexLow);
+    let created = (u64::from(info.ftCreationTime.dwHighDateTime) << 32)
+        | u64::from(info.ftCreationTime.dwLowDateTime);
+    // FILETIME counts 100 ns from 1601; Node's `birthtimeNs` counts ns from 1970.
+    let birth = (i128::from(created) - 116_444_736_000_000_000) * 100;
+    Some(format!("{}-{index}-{birth}", info.dwVolumeSerialNumber))
 }
 
 /// The lock file of `cwd` under `fgos_dir`; an error naming the missing key when `cwd` does not exist.
 pub fn lock_path(fgos_dir: &Path, cwd: &Path) -> Result<PathBuf, DispatchError> {
     let key = cwd_dev_ino(cwd).ok_or_else(|| {
-        DispatchError::new(
+        DispatchError::holder_lock(
             "lock-path-param-missing",
             format!("lock {LOCK_NAME} needs cwdDevIno to resolve <fgosDir>/locks/dispatch-cwd--<cwdDevIno>.lock"),
         )
@@ -71,7 +98,7 @@ fn holder_pid_of(lock: &Path) -> Option<u32> {
 /// the holder when another dispatch has it, `worker-spawn-fail` when `cwd` does not exist.
 pub fn acquire_dispatch_cwd_lock(fgos_dir: &Path, cwd: &Path) -> Result<Handle, DispatchError> {
     let scope = LockScope::seeded(Vec::new())
-        .map_err(|e| DispatchError::new("lock-registry-invalid", e.to_string()))?;
+        .map_err(|e| DispatchError::holder_lock("lock-registry-invalid", e))?;
     acquire_dispatch_cwd_lock_in(&scope, fgos_dir, cwd, &[])
 }
 
@@ -115,18 +142,18 @@ pub fn acquire_dispatch_cwd_lock_in(
     }
     scope
         .assert_can_acquire(LOCK_NAME)
-        .map_err(|e| DispatchError::new("lock-order-violation", e.to_string()))?;
+        .map_err(|e| DispatchError::holder_lock("lock-order-violation", e))?;
     let lock = lock_path(fgos_dir, cwd)?;
     if let Some(parent) = lock.parent() {
         fs::create_dir_all(parent).map_err(|e| {
-            DispatchError::new("lock-driver-unavailable", format!("{LOCK_NAME}: {e}"))
+            DispatchError::holder_lock("lock-driver-unavailable", format!("{LOCK_NAME}: {e}"))
         })?;
     }
     let mut resource = Resource::new(LOCK_NAME, lock.clone());
     resource.predecessor_kinds = predecessor_kinds.to_vec();
     match acquire(&resource, Mode::Ex, Wait::Try, DEFAULT_KILL_WAIT_MS) {
         Acquire::Acquired(handle) => Ok(handle),
-        Acquire::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain } => Err(DispatchError::new(
+        Acquire::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain } => Err(DispatchError::holder_lock(
             "lock-predecessor-domain-not-empty",
             format!(
                 "{LOCK_NAME}: the previous holder's domain is still not empty after the kill wait ({})",
@@ -138,7 +165,7 @@ pub fn acquire_dispatch_cwd_lock_in(
             Err(dispatch_in_flight_error(cwd, holder_pid_of(&lock), &lock))
         }
         Acquire::Unavailable { reason, detail } => {
-            Err(DispatchError::new("lock-driver-unavailable", format!("{LOCK_NAME}: {detail}"))
+            Err(DispatchError::holder_lock("lock-driver-unavailable", format!("{LOCK_NAME}: {detail}"))
                 .with("reason", json!(reason.as_str())))
         }
     }

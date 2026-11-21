@@ -16,6 +16,7 @@ use fgos_holder_lock::{Handle, LockScope};
 use fgos_run_supervisor::controller::cwd_lock::{
     admit_successor, dispatch_cwd_holder, dispatch_in_flight_error,
 };
+use fgos_run_supervisor::controller::error::DispatchError;
 use serde_json::{json, Map, Value};
 use sha2::{Digest, Sha256};
 
@@ -475,8 +476,9 @@ pub struct Started {
 }
 
 fn custody_of(base: &StartBase<'_>, worktree: &Path) -> Result<Handle, RunUnitError> {
-    let scope = LockScope::seeded(Vec::new())
-        .map_err(|e| RunUnitError::other("lock-registry-invalid", e.to_string()))?;
+    let scope = LockScope::seeded(Vec::new()).map_err(|e| {
+        RunUnitError::dispatch(&DispatchError::holder_lock("lock-registry-invalid", e))
+    })?;
     admit_successor(&scope, &base.fgos_dir, worktree).map_err(|e| RunUnitError::dispatch(&e))
 }
 

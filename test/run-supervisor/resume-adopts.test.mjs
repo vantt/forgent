@@ -8,6 +8,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
+import { fgosProcess } from '../helpers/cli-entry.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { bindingPids } from './helpers/envelope-fixture.mjs';
 import { signalPids, waitGone } from './helpers/kill-on-file.mjs';
@@ -35,7 +36,8 @@ const writingUnit = (project, id) => project.unitFile(id, { writes: ['out.txt'] 
 
 /** `fgos run --resume <unitRunId>` as a real child process. */
 function startResume(project, unitRunId, { cwd = project.repoDir, args = [] } = {}) {
-  const child = spawn(process.execPath, [BIN_FGOS, 'run', '--resume', unitRunId, '--dir', project.repoDir, ...args], { cwd, env: project.env, stdio: ['ignore', 'pipe', 'pipe'] });
+  const call = fgosProcess(BIN_FGOS, ['run', '--resume', unitRunId, '--dir', project.repoDir, ...args], project.env);
+  const child = spawn(call.command, call.args, { cwd, env: call.env, stdio: ['ignore', 'pipe', 'pipe'] });
   let stdout = '';
   let stderr = '';
   child.stdout.on('data', (chunk) => { stdout += chunk; });

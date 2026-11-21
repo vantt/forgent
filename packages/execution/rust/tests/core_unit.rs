@@ -209,7 +209,7 @@ impl RunRequestHost for FlagsOnlyHost {
     fn process_cwd(&self) -> String {
         unreachable!()
     }
-    fn git_roots(&self, _dir: &str) -> Result<GitRoots, String> {
+    fn git_roots(&self, _dir: &str) -> Result<GitRoots, Refusal> {
         unreachable!()
     }
     fn confined_write_refusal(&self, _main_root: &str, _case_id: Option<&str>) -> Option<String> {
@@ -309,9 +309,10 @@ impl RunRequestHost for VectorRunHost<'_> {
     fn process_cwd(&self) -> String {
         "/process-cwd".to_string()
     }
-    fn git_roots(&self, dir: &str) -> Result<GitRoots, String> {
+    fn git_roots(&self, dir: &str) -> Result<GitRoots, Refusal> {
+        // The recorded `gitRoots` threw a plain `Error`, which the request passed on.
         if self.roots.get("gitFails") == Some(&json!(true)) {
-            return Err("not a git repository".to_string());
+            return Err(Refusal::host("not a git repository"));
         }
         let linked_at = self.roots["linkedAt"].as_str().unwrap();
         Ok(GitRoots {

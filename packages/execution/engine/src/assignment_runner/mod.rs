@@ -28,9 +28,10 @@
 //! cwd lease are lent to the supervisor as descriptors 3 and 4 (`Handle::lend`); the controller keeps both handles
 //! (the attempt copy until the binding, the cwd lease until the attempt is closed) and closing a lent handle never
 //! waits on the child. A lock does not pass to a child with its handle on Windows: the controller releases its
-//! attempt copy right after the spawn and the supervisor takes the attempt lock itself, as Node does; a mutating
-//! attempt is refused there by name (`windows-cwd-lease-holder-missing`), since the Rust controller has no cwd
-//! lease holder endpoint to name to the supervisor, and stays on the Node launch route. Nothing here writes a
+//! attempt copy right after the spawn and the supervisor takes the attempt lock itself, as Node does; the cwd lease
+//! stays with the controller, which serves its request channel to the supervisor (`cwdLeaseOwner`) until the
+//! binding. A mutating attempt is still refused there by name (`windows-cwd-lease-holder-missing`) and stays on the
+//! Node launch route until a writing unit run is proven on native Windows. Nothing here writes a
 //! script and then executes it; a caller that does, in a host with other threads, opens it close-on-exec and closes
 //! it before the exec (the tests take one lock around such a pair).
 //!

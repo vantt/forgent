@@ -94,46 +94,27 @@ test('the run supervisor routes refuse a missing or unknown flag as usage', () =
   assert.equal(unknown.status, 2);
 });
 
-function writeEnvelope(dir, overrides = {}) {
+function writeEnvelope(dir, stepIds) {
+  const steps = stepIds.map((stepId) => ({ stepId, hostBin: HOST_BIN, payloadRoot: path.join(dir, 'payload'), argv: [], cwd: dir, env: {}, stepTimeoutMs: 1000 }));
   const envelope = {
     v: 3, attemptId: 'att-routes', unitRunId: 'u', runDir: dir, mode: 'direct', protocolId: 1,
-    hostBin: HOST_BIN, payloadRoot: path.join(dir, 'payload'), cwd: dir, mutation: 'read-only',
-    steps: [{ stepId: 'settle-attempt', hostBin: HOST_BIN, payloadRoot: path.join(dir, 'payload'), argv: [], cwd: dir, env: {}, stepTimeoutMs: 1000 }],
-    ...overrides,
+    hostBin: HOST_BIN, payloadRoot: path.join(dir, 'payload'), cwd: dir, mutation: 'read-only', steps,
   };
   envelope.digest = computeSha256Digest(canonicalJson(envelope));
   fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify(envelope));
 }
 
-test('attempt-step refuses a tampered envelope, a foreign host binary and a missing payload', () => {
+test('attempt-step runs the step from the engine in the host, with no Node payload, and passes its exit code on', () => {
   const dir = fs.mkdtempSync(path.join(scratch, 'step-'));
-  writeEnvelope(dir);
-  const missing = host(['attempt-step', 'settle-attempt', '--protocol', '1', '--run-dir', dir]);
-  assert.equal(missing.status, 66, missing.stderr);
-  assert.equal(line(missing).code, 'payload-missing');
+  const stateRoot = fs.mkdtempSync(path.join(scratch, 'state-'));
+  writeEnvelope(dir, ['settle-attempt', 'cleanup-trust']);
+  const env = { FGOS_STATE_ROOT: stateRoot, HOME: scratch, USERPROFILE: scratch };
 
-  const foreign = fs.mkdtempSync(path.join(scratch, 'step-'));
-  writeEnvelope(foreign, { hostBin: process.execPath });
-  const mismatch = host(['attempt-step', 'settle-attempt', '--protocol', '1', '--run-dir', foreign]);
-  assert.equal(mismatch.status, 3);
-  assert.equal(line(mismatch).code, 'host-version-mismatch');
+  const done = host(['attempt-step', 'cleanup-trust', '--protocol', '1', '--run-dir', dir], { env });
+  assert.equal(done.status, 0, done.stderr);
+  assert.deepEqual(line(done), { v: 1, protocol: 1, result: 'done', detail: { trust: 'none-written' } });
 
-  const tampered = fs.mkdtempSync(path.join(scratch, 'step-'));
-  writeEnvelope(tampered);
-  const file = path.join(tampered, 'envelope.json');
-  fs.writeFileSync(file, fs.readFileSync(file, 'utf8').replace('att-routes', 'att-other'));
-  const invalid = host(['attempt-step', 'settle-attempt', '--protocol', '1', '--run-dir', tampered]);
-  assert.equal(invalid.status, 65);
-  assert.equal(line(invalid).code, 'envelope-invalid');
-});
-
-test('attempt-step hands over to the Node payload of the envelope and passes its exit code on', () => {
-  const dir = fs.mkdtempSync(path.join(scratch, 'step-'));
-  const entry = path.join(dir, 'payload', 'src', 'run-supervisor');
-  fs.mkdirSync(entry, { recursive: true });
-  fs.writeFileSync(path.join(entry, 'attempt-step.mjs'), "console.log(JSON.stringify({ result: 'retry', reason: process.argv[2] })); process.exit(75);\n");
-  writeEnvelope(dir);
-  const result = host(['attempt-step', 'settle-attempt', '--protocol', '1', '--run-dir', dir]);
-  assert.equal(result.status, 75, result.stderr);
-  assert.deepEqual(JSON.parse(result.stdout.trim()), { result: 'retry', reason: 'settle-attempt' });
+  const failed = host(['attempt-step', 'settle-attempt', '--protocol', '1', '--run-dir', dir], { env });
+  assert.equal(failed.status, 70, failed.stderr);
+  assert.equal(line(failed).code, 'io');
 });

@@ -5321,3 +5321,520 @@ fn the_execution_route_run_unit_op_refuses_an_option_outside_the_contract_and_an
         .contains("objective"));
     let _ = fs::remove_dir_all(manifest.parent().unwrap());
 }
+
+#[test]
+fn the_execution_route_launch_session_op_refuses_an_incomplete_request_and_answers_a_refused_launch(
+) {
+    let scratch = ExecutionScratch::new("launch-session");
+    let manifest = ensure_dev_manifest();
+    let root = repo_root();
+    let env = [
+        ("HOME", scratch.0.as_path()),
+        ("FGOS_ACTIVE_RELEASE_PATH", root.as_path()),
+        ("FGOS_ACTIVE_MANIFEST_PATH", manifest.as_path()),
+    ];
+    let mut request = serde_json::json!({
+        "binding": { "executor": "stub" }, "runnerConfig": {}, "key": "head-planner-p-1", "role": "head:planner-p",
+        "grant": { "verbs": [], "writes": [] }, "opening": "hello", "ceilingMs": 60000, "projectRoot": scratch.0,
+    });
+    request.as_object_mut().unwrap().remove("key");
+    let (code, line) = execution_route(
+        &["launch-session", "--protocol", "1"],
+        &request,
+        &env,
+        &no_peer,
+    );
+    assert_eq!(code, Some(65), "{line}");
+    assert!(line["error"]["message"].as_str().unwrap().contains("key"));
+
+    // A head key is used once: a key whose attempt directory already holds an attempt is refused before anything is
+    // taken, and the refusal is the op's answer, carrying the code the door rethrows.
+    request["key"] = serde_json::json!("head-planner-p-1");
+    let used = scratch.0.join(".fgos/assignments/head-planner-p-1/runs/01");
+    fs::create_dir_all(&used).unwrap();
+    fs::write(used.join("envelope.json"), "{}").unwrap();
+    let (code, line) = execution_route(
+        &["launch-session", "--protocol", "1"],
+        &request,
+        &env,
+        &no_peer,
+    );
+    assert_eq!(code, Some(0), "{line}");
+    assert_eq!(line["result"]["refused"]["code"], "head-key-used", "{line}");
+    assert!(line["result"].get("placement").is_none());
+    let _ = fs::remove_dir_all(manifest.parent().unwrap());
+}
+
+// ---- `fgos run`: how a call reaches the unit run and the Workflow's admission port. What a run does is owned by
+// engine `unit_run` and the host's unit run tests; the run parity table compares whole runs with the base release.
+
+/// A project with a stub executor serving `docs:write`, a linked worktree of it, and a `node` the case chooses on a
+/// `PATH` that holds no real agent CLI.
+#[cfg(unix)]
+struct RunWorld {
+    world: ExecutionWorld,
+    worktree: PathBuf,
+}
+
+#[cfg(unix)]
+impl RunWorld {
+    /// `node`: the body of the `node` the run finds, which logs its start to the world's node log first.
+    fn new(prefix: &str, node: &str) -> Self {
+        let mut world = ExecutionWorld::new(prefix);
+        let (node_dir, _) = scripted_node(
+            &format!("{prefix}_run_node"),
+            &format!("echo started >> '{}'\n{node}", world.node_log.display()),
+        );
+        let agent_free = std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default())
+            .filter(|dir| {
+                !["claude", "codex", "gemini", "pi", "agy", "omp"]
+                    .iter()
+                    .any(|cli| dir.join(cli).exists())
+            })
+            .map(|dir| dir.display().to_string())
+            .collect::<Vec<_>>()
+            .join(":");
+        world.path = format!("{}:{agent_free}", node_dir.display());
+        fs::write(
+            world.home.join(".fgos/config.yaml"),
+            "runner:\n  executors:\n    stub:\n      kind: agent\n      providerModel: stub\n      allowCrossProvider: true\n      invocations:\n        - id: stub-cli\n          via: cli\n          adapter: cli-spawn\n          command: /bin/true\n          args: [\"{prompt}\"]\n",
+        )
+        .unwrap();
+        world.project_config("runner:\n  defaults:\n    tier: standard\n  modelPolicies:\n    stub:\n      standard: stub-model\n  capabilities:\n    docs:write:\n      prefer:\n        - executor: stub\n      tier: standard\n");
+        let worktree = world.project.with_file_name(format!(
+            "{}_wt",
+            world.project.file_name().unwrap().to_string_lossy()
+        ));
+        assert!(Command::new("git")
+            .args(["worktree", "add", "-q", "-b", "wt"])
+            .arg(&worktree)
+            .current_dir(&world.project)
+            .status()
+            .unwrap()
+            .success());
+        RunWorld { world, worktree }
+    }
+
+    fn run(&self, args: &[&str], env: &[(&str, &str)]) -> std::process::Output {
+        let mut command = self.world.command(&[&["run"], args].concat());
+        command.env_remove("FGOS_DISPATCH_DEPTH");
+        for (key, value) in env {
+            command.env(key, value);
+        }
+        command.output().expect("failed to execute fgos")
+    }
+
+    fn node_starts(&self) -> usize {
+        fs::read_to_string(&self.world.node_log)
+            .unwrap_or_default()
+            .lines()
+            .count()
+    }
+
+    fn real_node() -> String {
+        let found = Command::new("sh")
+            .args(["-c", "command -v node"])
+            .output()
+            .unwrap();
+        format!(
+            "exec '{}' \"$@\"",
+            String::from_utf8_lossy(&found.stdout).trim()
+        )
+    }
+}
+
+#[cfg(unix)]
+fn stderr_of(output: &std::process::Output) -> String {
+    String::from_utf8_lossy(&output.stderr).into_owned()
+}
+
+#[cfg(unix)]
+#[test]
+fn run_builds_the_unit_a_prompt_or_a_unit_file_stands_for_and_starts_no_node_for_a_read_only_run() {
+    let world = RunWorld::new("fgos_run_read", "exit 1");
+    let raise = r#"{"tier":"frontier"}"#;
+    let prompt = world.run(
+        &[
+            "Check it",
+            "--capability",
+            "docs:write",
+            "--override",
+            raise,
+        ],
+        &[],
+    );
+    assert_eq!(prompt.status.code(), Some(4), "{}", stderr_of(&prompt));
+    assert!(
+        stderr_of(&prompt).starts_with("fgos: tier-escalation-unauthorized: adhoc-check-it-"),
+        "{}",
+        stderr_of(&prompt)
+    );
+    assert!(prompt.stdout.is_empty());
+    let unit = world.world.project.join("unit.yaml");
+    fs::write(
+        &unit,
+        "id: u-cli\nobjective: Look\ncapability: docs:write\nwrites: []\n",
+    )
+    .unwrap();
+    let from_file = world.run(
+        &["--unit", unit.to_str().unwrap(), "--override", raise],
+        &[],
+    );
+    assert_eq!(
+        from_file.status.code(),
+        Some(4),
+        "{}",
+        stderr_of(&from_file)
+    );
+    assert!(
+        stderr_of(&from_file).starts_with("fgos: tier-escalation-unauthorized: u-cli/producer"),
+        "{}",
+        stderr_of(&from_file)
+    );
+    assert_eq!(world.node_starts(), 0, "a read-only run started node");
+    assert!(!world.world.project.join(".fgos/assignments").exists());
+}
+
+#[cfg(unix)]
+#[test]
+fn a_writing_run_starts_the_admission_peer_and_fails_closed_when_it_cannot_answer() {
+    // A peer that reads the run's first question and ends without an answer.
+    let world = RunWorld::new("fgos_run_writes", "read -r line\nexit 1");
+    let wt = world.worktree.to_str().unwrap();
+    let writing = world.run(
+        &[
+            "Write notes",
+            "--capability",
+            "docs:write",
+            "--writes",
+            "notes.md",
+            "--worktree",
+            wt,
+        ],
+        &[],
+    );
+    assert_eq!(writing.status.code(), Some(1), "{}", stderr_of(&writing));
+    assert!(
+        stderr_of(&writing)
+            .starts_with("fgos: admission peer closed the channel during resolveBinding"),
+        "{}",
+        stderr_of(&writing)
+    );
+    assert_eq!(world.node_starts(), 1, "one peer for the run");
+}
+
+#[cfg(unix)]
+#[test]
+fn a_case_run_reaches_the_workflow_port_through_the_peer() {
+    let world = RunWorld::new("fgos_run_case", &RunWorld::real_node());
+    let refused = world.run(
+        &[
+            "Check it",
+            "--capability",
+            "docs:write",
+            "--case",
+            "wf-missing",
+            "--activity",
+            "review",
+        ],
+        &[],
+    );
+    assert_eq!(refused.status.code(), Some(4), "{}", stderr_of(&refused));
+    assert_eq!(
+        stderr_of(&refused),
+        "fgos: case admission refused authority-context-invalid: the call names case wf-missing, which does not exist\n"
+    );
+    assert_eq!(
+        world.node_starts(),
+        1,
+        "one peer for the request and the run"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn a_dispatched_writing_run_is_refused_by_the_port_before_any_unit_run_exists_and_a_read_only_one_goes_on(
+) {
+    let world = RunWorld::new("fgos_run_confined", &RunWorld::real_node());
+    let wt = world.worktree.to_str().unwrap();
+    let refused = world.run(
+        &["Write notes", "--writes", "notes.md", "--worktree", wt],
+        &[("FGOS_DISPATCH_DEPTH", "1")],
+    );
+    assert_eq!(refused.status.code(), Some(4), "{}", stderr_of(&refused));
+    assert!(
+        stderr_of(&refused).starts_with(
+            "fgos: nested-write-from-confined-worker: a writing dispatch from inside a confined worker is refused: "
+        ),
+        "{}",
+        stderr_of(&refused)
+    );
+    assert_eq!(world.node_starts(), 1);
+    assert!(!world.world.project.join(".fgos/assignments").exists());
+    // A read-only run at the same depth is not the port's business: it goes on past the request (here to the
+    // refusal of its tier raise) without asking it.
+    let read_only = world.run(
+        &[
+            "Look",
+            "--capability",
+            "docs:write",
+            "--override",
+            r#"{"tier":"frontier"}"#,
+        ],
+        &[("FGOS_DISPATCH_DEPTH", "1")],
+    );
+    assert!(
+        stderr_of(&read_only).starts_with("fgos: tier-escalation-unauthorized: "),
+        "{}",
+        stderr_of(&read_only)
+    );
+    assert_eq!(
+        world.node_starts(),
+        1,
+        "the read-only run asked the port nothing"
+    );
+}
+
+/// `fgos run` exits as Node's CLI exited for the class of the error it ends in: a `RunnerConfigError` (here the
+/// directory Git cannot answer for) is `validation`, while a class with no category (a config check of another class,
+/// a unit file that cannot be read) is unexpected, whether the request or the run raised it.
+#[cfg(unix)]
+#[test]
+fn run_exits_with_the_status_of_the_class_its_refusal_was_raised_as() {
+    let world = RunWorld::new("fgos_run_classes", "exit 1");
+    let outside = fresh_dir("fgos_run_classes_outside");
+    let no_repository = world
+        .world
+        .command(&["run", "Check it"])
+        .current_dir(&outside)
+        .env_remove("FGOS_DISPATCH_DEPTH")
+        .output()
+        .unwrap();
+    assert_eq!(
+        no_repository.status.code(),
+        Some(4),
+        "{}",
+        stderr_of(&no_repository)
+    );
+    assert!(
+        stderr_of(&no_repository)
+            .starts_with("fgos: fgos run must run inside a git repository (cwd: "),
+        "{}",
+        stderr_of(&no_repository)
+    );
+
+    let unit = world.world.project.join("no-such-unit.yaml");
+    let unreadable = world.run(&["--unit", unit.to_str().unwrap()], &[]);
+    assert_eq!(
+        unreadable.status.code(),
+        Some(1),
+        "{}",
+        stderr_of(&unreadable)
+    );
+    assert_eq!(
+        stderr_of(&unreadable),
+        format!(
+            "fgos: ENOENT: no such file or directory, open '{}'\n",
+            unit.display()
+        )
+    );
+
+    // A project config may not define the machine's confinement backends: the check raises a
+    // `ConfinementBackendRegistryError`, both where `--provider` reads the config for the request and where the run
+    // first reads it.
+    world.world.project_config("runner:\n  confinementBackends:\n    bwrap:\n      type: bwrap\n  capabilities:\n    docs:write:\n      prefer:\n        - executor: stub\n");
+    for args in [
+        &[
+            "Check it",
+            "--capability",
+            "docs:write",
+            "--provider",
+            "stub",
+        ][..],
+        &["Check it", "--capability", "docs:write"],
+    ] {
+        let forbidden = world.run(args, &[]);
+        assert_eq!(
+            forbidden.status.code(),
+            Some(1),
+            "{args:?}: {}",
+            stderr_of(&forbidden)
+        );
+        assert!(
+            stderr_of(&forbidden).contains("(confinement-backend-registry-forbidden)"),
+            "{args:?}: {}",
+            stderr_of(&forbidden)
+        );
+    }
+    assert!(!world.world.project.join(".fgos/assignments").exists());
+}
+
+/// A holder-lock driver failure on the custody path (here a lock file the driver cannot open) is a `HolderLockError`
+/// in Node, `precondition`: the writing run exits 2.
+#[cfg(unix)]
+#[test]
+fn a_writing_run_whose_custody_lock_cannot_be_taken_exits_with_the_precondition_status() {
+    let world = RunWorld::new("fgos_run_custody_lock", &RunWorld::real_node());
+    // A directory where the worktree's dispatch-cwd lock file goes.
+    let lock = fgos_run_supervisor::controller::cwd_lock::lock_path(
+        &world.world.project.join(".fgos"),
+        &world.worktree,
+    )
+    .unwrap();
+    fs::create_dir_all(&lock).unwrap();
+    // The marked case bindings directory, so the port answers the worktree unbound.
+    let bindings = world.world.project.join(".fgos/workflow-runs/.bindings");
+    fs::create_dir_all(&bindings).unwrap();
+    fs::write(bindings.join(".root"), "fgos workflow case bindings\n").unwrap();
+    let wt = world.worktree.to_str().unwrap();
+    let refused = world.run(
+        &[
+            "Write notes",
+            "--capability",
+            "docs:write",
+            "--writes",
+            "notes.md",
+            "--worktree",
+            wt,
+        ],
+        &[],
+    );
+    assert_eq!(refused.status.code(), Some(2), "{}", stderr_of(&refused));
+    assert!(
+        stderr_of(&refused)
+            .starts_with("fgos: holder-lock (lock-driver-unavailable): dispatch-cwd: "),
+        "{}",
+        stderr_of(&refused)
+    );
+}
+
+/// The refusals a run gives before any unit run exists reach the caller as one `fgos:` line and exit 4, leaving no
+/// unit run behind: an account pin no seat of the unit can take, and a machine with no agent CLI.
+#[cfg(unix)]
+#[test]
+fn run_refuses_an_account_pin_and_a_machine_without_an_agent_cli_before_any_unit_run_exists() {
+    let world = RunWorld::new("fgos_run_refused", "exit 1");
+    let pinned = world.run(
+        &[
+            "Check it",
+            "--capability",
+            "docs:write",
+            "--account",
+            "stub/acct1",
+        ],
+        &[],
+    );
+    assert_eq!(pinned.status.code(), Some(4), "{}", stderr_of(&pinned));
+    assert!(
+        stderr_of(&pinned).starts_with("fgos: the pinned account applies to no seat of this unit"),
+        "{}",
+        stderr_of(&pinned)
+    );
+    assert!(pinned.stdout.is_empty());
+
+    // Every executor of the machine and of the shipped standard starts a program this PATH does not hold.
+    fs::write(
+        world.world.home.join(".fgos/config.yaml"),
+        "runner:\n  executors:\n    stub:\n      kind: agent\n      providerModel: stub\n      allowCrossProvider: true\n      invocations:\n        - id: stub-cli\n          via: cli\n          adapter: cli-spawn\n          command: /no/such/agent-cli\n          args: [\"{prompt}\"]\n",
+    )
+    .unwrap();
+    let missing = world.run(&["Check it", "--capability", "docs:write"], &[]);
+    assert_eq!(missing.status.code(), Some(4), "{}", stderr_of(&missing));
+    assert!(
+        stderr_of(&missing).starts_with(
+            "fgos: agent-cli-missing: no agent CLI is installed on this machine (looked for "
+        ),
+        "{}",
+        stderr_of(&missing)
+    );
+    assert!(stderr_of(&missing).contains("fgos doctor"));
+    assert!(!world.world.project.join(".fgos/assignments").exists());
+}
+
+/// The unit flags of a prompt (`--provider`, `--persona`, `--rigor`) reach the unit the run records, and the
+/// override flags (`--effort`, an `--override` executor pin) its overrides, folded into one; the answer is the
+/// envelope of the run's data. Which binding they give is Seat Binding's (the bind vectors).
+#[cfg(unix)]
+#[test]
+fn run_records_the_unit_flags_and_overrides_of_a_prompt_and_answers_the_run_envelope() {
+    let world = RunWorld::new("fgos_run_flags", "exit 1");
+    let agents = world.world.project.join("fgos/agents");
+    fs::create_dir_all(&agents).unwrap();
+    fs::write(
+        agents.join("test-voice.yaml"),
+        "name: test-voice\ndescription: A test voice\n",
+    )
+    .unwrap();
+    let output = world.run(
+        &[
+            "Check it",
+            "--capability",
+            "docs:write",
+            "--provider",
+            "stub",
+            "--persona",
+            "test-voice",
+            "--rigor",
+            "high",
+            "--effort",
+            "high",
+            "--override",
+            r#"{"executor":"stub"}"#,
+            "--json",
+        ],
+        &[],
+    );
+    // The stub's only invocation cannot carry a read-only seat: the run settles policy-refusal.
+    assert_eq!(output.status.code(), Some(4), "{}", stderr_of(&output));
+    let envelope: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let data = &envelope["data"];
+    assert_eq!(data["outcome"], "policy-refusal", "{data}");
+    assert_eq!(data["results"][0]["seat"], "producer", "{data}");
+    let unit_run_id = data["unitRunId"].as_str().unwrap();
+    let record: serde_json::Value = serde_json::from_str(
+        &fs::read_to_string(
+            world
+                .world
+                .project
+                .join(".fgos/assignments")
+                .join(unit_run_id)
+                .join("unit.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(record["unit"]["prefer"], serde_json::json!(["stub"]));
+    assert_eq!(record["unit"]["persona"], "test-voice");
+    assert_eq!(record["unit"]["rigor"], "high");
+    assert_eq!(
+        record["overrides"],
+        serde_json::json!([{ "executor": "stub", "reasoningEffort": "high" }])
+    );
+    assert_eq!(record["settlement"]["outcome"], data["outcome"]);
+}
+
+/// On Windows the host hands `fgos run` to the legacy payload whole, as it execs every legacy-cli verb: the
+/// invocation is the legacy lane's, never the host's unit run. Proven on native Windows CI only.
+#[cfg(windows)]
+#[test]
+fn on_windows_run_is_handed_to_the_legacy_payload() {
+    let manifest_path = ensure_dev_manifest();
+    let record_file = fresh_dir("fgos_run_windows_record").join("record.jsonl");
+    let output = host_command()
+        .args(["run", "--resume", "unit-run-no-such"])
+        .current_dir(fresh_dir("fgos_run_windows"))
+        .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .env("FGOS_INVOCATION_RECORD_PATH", &record_file)
+        .output()
+        .expect("failed to execute fgos");
+    let content = fs::read_to_string(&record_file).unwrap_or_else(|_| {
+        panic!(
+            "no invocation record: {}",
+            String::from_utf8_lossy(&output.stderr)
+        )
+    });
+    let record: serde_json::Value = serde_json::from_str(content.lines().next().unwrap()).unwrap();
+    assert_eq!(record["operation_id"], "cli.legacy.run");
+    assert_eq!(record["provider_id"], "legacy-node");
+}

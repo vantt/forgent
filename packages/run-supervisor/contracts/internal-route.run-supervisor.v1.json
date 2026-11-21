@@ -69,7 +69,7 @@
         "outcome": "receipt outcome when known",
         "pendingStep": "stepId the adopter could not finish (state open)",
         "reason": "string or absent",
-        "adoptable": "probe-only needs-adopt lines only: false when the envelope binds the steps to a host binary or payload step entry that no longer exists",
+        "adoptable": "probe-only needs-adopt lines only: false when the envelope binds the steps to a host binary that no longer exists",
         "gone": "probe-only, with adoptable false: the missing paths"
       },
       "stateMeaning": {
@@ -86,14 +86,14 @@
     },
     "attempt-step": {
       "argv": "fgos internal attempt-step <stepId> --protocol 1 --run-dir <attemptDir>",
-      "execution": "the host execs the Node payload of envelope.payloadRoot (resolved like apps/fgos/src/legacy_exec.rs, never PATH) with entry src/run-supervisor/attempt-step.mjs, passing stepId and the attemptDir",
+      "execution": "the host verifies the envelope (digest, hostBin is this binary, the step is listed) and runs the step in-process through the step runner the host composes from the Execution engine (fgos_execution_engine::steps::run_attempt_step); no Node payload is involved",
       "stdout": "step-receipt.v1.json stepProcess.stdout",
-      "exitCodes": { "0": "done", "65": "envelope-invalid", "66": "payload-missing", "70": "error", "75": "retry (EX_TEMPFAIL): no receipt, adopt runs the step again later" }
+      "exitCodes": { "0": "done", "3": "host-version-mismatch", "65": "envelope-invalid", "70": "error", "75": "retry (EX_TEMPFAIL): no receipt, adopt runs the step again later" }
     },
     "head-request": {
       "argv": "fgos internal head-request --protocol 1 --run-dir <attemptDir>",
       "stdin": "the request object of head-request.v1.json ({id, verb, args}), at most 65536 bytes",
-      "execution": "the same hand-over as attempt-step (one helper): verify the envelope, refuse unless it carries session.requestSocketPath, exec the Node payload of envelope.payloadRoot with entry src/session-host/head-request.mjs and --run-dir; stdin, stdout and stderr pass through. Unix hosts only",
+      "execution": "verify the envelope as attempt-step does (one helper), refuse unless it carries session.requestSocketPath, exec the Node payload of envelope.payloadRoot with entry src/session-host/head-request.mjs and --run-dir; stdin, stdout and stderr pass through. Unix hosts only",
       "stdout": "one JSON line: {\"result\":\"done\",\"data\":{...}} or {\"result\":\"error\",\"code\",\"message\"}",
       "exitCodes": { "0": "done", "65": "envelope-invalid", "66": "payload-missing", "70": "error" },
       "caller": "only the run supervisor of the attempt, for a request that passed the checks of head-request.v1.json"

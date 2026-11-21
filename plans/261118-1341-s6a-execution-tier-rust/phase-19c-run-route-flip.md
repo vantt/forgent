@@ -49,8 +49,6 @@ This phase serves the verb from engine `unit_run`. Node callers of `runUnit` (Wo
 
 - Carried in from 19b (landed bbf64a66d): call `HostUnitRun::run_unit` (installs signal handlers with dispatch.cancelWaitMs), not the engine's run_unit directly; Windows cancel-on-signal has no console handler in any crate yet (part of the Windows decision); pane-preparation errors come back as a coded runner-config error — map to Node's dispatch error class if a caller reads it; the 19b e2e tests are Linux-only.
 
-- Deferred to plan 261119-1731 (supervision powers doors; supervisor 2026-11-21): before editing `src/cli/command-registry.mjs`, re-add it to this phase's footprint (plan.md frontmatter and row) and rebase onto what 1731 has landed in it.
-
 ## Footprint
 
 As the plan table row 19c (evidence: branches `s6/p19c-2`, `s6/p19c-run`, `s6/p19c-run-flip`, `s6/p19c-win`):
@@ -119,3 +117,16 @@ Decision: **Rust lease-holder endpoint** (`cwdLeaseOwner`), not custody recordin
   Windows mutating attempt by name (`windows-cwd-lease-holder-missing`), and Windows `fgos run` stays on the Node route
   (this pass does not flip the route). Cancel on Ctrl-C/Ctrl-Break on Windows needs a console handler, which no crate
   installs yet; it lands with the endpoint.
+
+Result (2026-11-21): the endpoint and the console handler are built and proven on native Windows CI (run 44849384600,
+job "windows cwd lease owner": the controller serves cwdLeaseOwner, the real supervisor declares its job domain on the
+held lease, a stub agent writes, the lease outlives the supervisor; Ctrl-Break gives exit 130 and a cancel request). The
+refusals stay: a writing unit run cannot commit on Windows until the Git door takes custody there (holder-lock
+`BorrowedHandle` is Unix-only). `fgos run` is native on Unix and handed to the Node arm on Windows (`legacyOn`).
+Preconditions for lifting engine `mutating_launch_refusal` (`windows-cwd-lease-holder-missing`), both required:
+(a) the Git-lane Windows custody item above (the Git door takes custody on Windows); (b) the lease channel answers
+for the attempt's whole life, not only until the binding: engine `assignment_runner/launch.rs` `serving_lease_owner`
+wraps only the supervisor start and `wait_for_binding`, so the thread stops once the binding is known, and a
+supervisor that declares its domain again later (one adopted, or restarted after a crash) gets no answer on
+`cwdLeaseOwner`. Unreachable today, because the refusal holds every Windows mutating attempt; it must be fixed and
+proven on native Windows CI (an adopted supervisor re-declares on the held lease) before the refusal is lifted.

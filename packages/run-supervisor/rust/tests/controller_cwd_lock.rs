@@ -121,3 +121,40 @@ fn a_custody_successor_takes_a_free_lease_and_a_held_one_is_in_flight() {
     drop(held);
     let _ = std::fs::remove_dir_all(&fgos);
 }
+
+#[test]
+fn a_lock_driver_failure_on_the_custody_path_is_marked_a_holder_lock_failure_not_a_refusal() {
+    let (fgos, cwd) = scratch("order");
+    let other = fgos.join("other");
+    std::fs::create_dir_all(&other).unwrap();
+    // A scope already holding a dispatch-cwd lease may not take a second one: the lock order refuses it.
+    let held = acquire_dispatch_cwd_lock(&fgos, &other).unwrap();
+    let scope =
+        LockScope::seeded(vec![fgos_holder_lock::BorrowedHandle::new(&held).unwrap()]).unwrap();
+    let error = admit_successor(&scope, &fgos, &cwd).unwrap_err();
+    assert_eq!(error.code, "lock-order-violation");
+    assert!(error.holder_lock, "{error:?}");
+    assert!(
+        error
+            .message
+            .starts_with("holder-lock (lock-order-violation): "),
+        "{}",
+        error.message
+    );
+    drop(scope);
+    drop(held);
+    // A lock directory that cannot be made is a driver failure too; the controller's own refusals are not.
+    let blocked = fgos.join("blocked");
+    std::fs::write(&blocked, "").unwrap();
+    let error = acquire_dispatch_cwd_lock(&blocked, &cwd).unwrap_err();
+    assert_eq!(error.code, "lock-driver-unavailable");
+    assert!(error.holder_lock, "{error:?}");
+    let first = acquire_dispatch_cwd_lock(&fgos, &cwd).unwrap();
+    assert!(
+        !acquire_dispatch_cwd_lock(&fgos, &cwd)
+            .unwrap_err()
+            .holder_lock
+    );
+    drop(first);
+    let _ = std::fs::remove_dir_all(&fgos);
+}

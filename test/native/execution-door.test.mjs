@@ -150,6 +150,13 @@ test('a native run-unit error result is rethrown as the Node class its tag names
   assert.ok(!(custody instanceof RunnerConfigError));
   assert.equal(custody.errorClass, 'custody-predecessor-unknown', 'Workflow retries a writing unit on this class');
 
+  // A holder-lock driver failure keeps the class and category Node's HolderLockError had: the CLI exits 2 for it.
+  const lock = byName['holder-lock driver failure'];
+  assert.deepEqual(
+    [lock.name, lock.code, lock.category, lock.reason, lock.errorClass],
+    ['HolderLockError', 'lock-driver-unavailable', 'precondition', 'no-driver', undefined],
+  );
+
   // A failed Git or port call was a classless error in Node: the fanout batch reads `errorClass || 'error'`.
   for (const errorClass of ['git-error', 'case-admission-port-failed']) {
     const rethrown = runUnitErrorOf({ ok: false, error: { tag: 'Error', errorClass, message: 'failed' } });

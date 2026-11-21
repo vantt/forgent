@@ -392,7 +392,7 @@ pub struct SettleInput<'a> {
     pub resolved_executor_id: Option<&'a str>,
     pub effective_policy: Option<&'a Value>,
     pub executor_redirected: bool,
-    pub reasoning_effort: Option<&'a str>,
+    pub reasoning_effort: Option<&'a Value>,
     pub model_warnings: &'a [Value],
     pub provider_capacity_selection: Option<&'a Value>,
     pub provider_capacity_evidence: Option<&'a Value>,
@@ -720,13 +720,14 @@ pub fn settle_run_outcome(ports: &SettlementPorts<'_>, input: &SettleInput<'_>) 
         "assignmentId",
         run_meta.get("assignmentId").cloned().unwrap_or(Value::Null),
     );
-    let work_id = run_meta
+    // `runMeta.workId || assignment.workId`: a run of no Work item has no `workId` at all, not a null one.
+    if let Some(work_id) = run_meta
         .get("workId")
         .filter(|v| !v.is_null() && *v != &json!(""))
         .or_else(|| input.assignment.get("workId"))
-        .cloned()
-        .unwrap_or(Value::Null);
-    put("workId", work_id);
+    {
+        put("workId", work_id.clone());
+    }
     put("controlEpoch", json!(input.control_epoch));
     put("controlToken", json!(input.control_token));
     let executor = input

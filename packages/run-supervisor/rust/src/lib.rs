@@ -46,7 +46,7 @@ pub mod publish;
 #[cfg(feature = "supervise")]
 pub mod route;
 
-/// The `fgos internal attempt-step` route: hands a step to the Node payload.
+/// The `fgos internal attempt-step` route: verifies the envelope and hands the step to the composed step runner.
 #[cfg(feature = "supervise")]
 pub mod attempt_step;
 

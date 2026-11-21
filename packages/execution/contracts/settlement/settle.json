@@ -1589,6 +1589,77 @@
       }
     },
     {
+      "name": "rendered-effort-control",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        }
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [
+          "src/a.mjs"
+        ],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "effectivePolicy": {
+          "persona": "code-reviewer",
+          "seat": "doer"
+        },
+        "reasoningEffort": {
+          "command": "codex",
+          "flag": "-c",
+          "native": "high"
+        },
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [\n    \"src/a.mjs\"\n  ],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [\n    \"src/a.mjs\"\n  ],\n  \"changedFileReasons\": {\n    \"src/a.mjs\": \"new-dirty-after-run\"\n  },\n  \"attribution\": [\n    {\n      \"path\": \"src/a.mjs\",\n      \"firstObserved\": \"post-run\",\n      \"level\": \"correlated\",\n      \"basis\": [\n        \"pre-post-git-snapshot\"\n      ],\n      \"coverageMatched\": true\n    }\n  ],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"executorRedirected\": false,\n  \"policy\": {\n    \"persona\": \"code-reviewer\",\n    \"seat\": \"doer\",\n    \"launch\": {\n      \"effortRendered\": {\n        \"command\": \"codex\",\n        \"flag\": \"-c\",\n        \"native\": \"high\"\n      }\n    }\n  },\n  \"promptEnvelope\": {\n    \"persona\": {\n      \"ref\": \"code-reviewer\",\n      \"delivery\": \"section\",\n      \"applied\": true,\n      \"source\": null\n    }\n  },\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"pass\"\n    },\n    \"confidence\": {\n      \"level\": \"verified\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\",\n        \"workspace-git-diff\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"ok\",\n      \"reason\": \"completed-pass\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [\n      \"src/a.mjs\"\n    ],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [\n      {\n        \"path\": \"src/a.mjs\",\n        \"firstObserved\": \"post-run\",\n        \"level\": \"correlated\",\n        \"basis\": [\n          \"pre-post-git-snapshot\"\n        ],\n        \"coverageMatched\": true\n      }\n    ],\n    \"artifacts\": [\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
       "name": "recover-after-control-settled",
       "assignment": {
         "assignmentId": "asgn_a",

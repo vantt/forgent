@@ -25,13 +25,13 @@ use super::Scratch;
 
 /// What the fake driver saw, each call with the herdr endpoint it was reached through.
 #[derive(Default)]
-struct Seen {
-    allocated: Vec<(Env, AllocateRequest)>,
-    released: Vec<(Env, String)>,
-    sessions: Vec<Env>,
+pub(super) struct Seen {
+    pub(super) allocated: Vec<(Env, AllocateRequest)>,
+    pub(super) released: Vec<(Env, String)>,
+    pub(super) sessions: Vec<Env>,
 }
 
-struct FakeRoute(Arc<Mutex<Seen>>);
+pub(super) struct FakeRoute(pub(super) Arc<Mutex<Seen>>);
 
 struct FakePanes {
     endpoint: Env,
@@ -197,6 +197,9 @@ fn a_terminal_attempts_pane_opens_in_its_worker_session_is_named_by_the_intent_f
         mutating: false,
         case_context: None,
         session: None,
+        opening: None,
+        display: None,
+        beside: None,
         ceiling_ms: None,
         request_socket: None,
         retain_failed_pane_ms: None,
