@@ -30,6 +30,7 @@ import {
   pathWithGcLeakingGit,
   processesUnder,
   removeTree, removeStateHome,
+  restampRelease, releaseWithFailingTail,
 } from './fgctl-init-fixture.mjs';
 
 const FGOS_BIN = releaseBinaryPath(releaseOutputDir(), 'fgos');
@@ -75,41 +76,6 @@ function hashDirectory(dirPath) {
   return hashes;
 }
 
-/**
- * A copy of the release at `fromDir` whose manifest `edit(manifest, dir)` changed, published
- * under the digest of the edited manifest, as the build computes it. Returns its dir and digest.
- */
-function restampRelease(fromDir, prefix, edit) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
-  fs.cpSync(fromDir, dir, { recursive: true });
-  const manifestPath = path.join(dir, 'manifest.json');
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  edit(manifest, dir);
-  delete manifest.artifactDigest;
-  manifest.artifactDigest = computeArtifactDigest(manifest);
-  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
-  return { dir, digest: manifest.artifactDigest };
-}
-
-/**
- * A copy of `fromDir` whose payload's Node rows bridge exits 42 while SIMULATE_TAIL_FAILURE=1: `init`, the first tail
- * step, is native and asks that bridge only for its Work store, so it fails there (with status 1).
- */
-function releaseWithFailingTail(fromDir, prefix, label) {
-  return restampRelease(fromDir, prefix, (manifest, dir) => {
-    const bridgePath = path.join(dir, 'libexec', 'legacy-node', 'src', 'setup', 'doctor-bridge.mjs');
-    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1') {\n  console.error('simulated ${label} init failure in tail');\n  process.exit(42);\n}\n`;
-    fs.writeFileSync(bridgePath, failInjection + fs.readFileSync(bridgePath, 'utf8'));
-    const newHash = 'sha256:' + hashFile(bridgePath);
-    const newSize = fs.statSync(bridgePath).size;
-    for (const f of manifest.files) {
-      if (f.path === 'libexec/legacy-node/src/setup/doctor-bridge.mjs') {
-        f.digest = newHash;
-        f.size = newSize;
-      }
-    }
-  });
-}
 
 before(() => {
   assert.ok(fs.existsSync(FGCTL_BIN), `fgctl binary must exist at ${FGCTL_BIN}`);
