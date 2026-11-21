@@ -1049,14 +1049,13 @@ fn worktree_admin_held(fgos_dir: &Path, wait: Wait) -> OperationError {
     })));
     error
 }
-/// Identity of a file or directory that a removal and re-creation cannot reuse: the volume (`dev` on Unix, the
-/// volume serial on Windows), the file index (`ino`; on Windows the 128-bit file id folded to 64 bits, exact on NTFS
-/// where the high half is zero) and, where the filesystem reports it, the birth time in nanoseconds on Unix or
-/// 100 ns units since 1601 on Windows.
+/// Identity of an open file or directory (native-lock identity, binding, worktree admin): the volume (`dev` on Unix,
+/// the volume serial on Windows) and the file index (`ino`; on Windows the 128-bit file id folded to 64 bits, exact
+/// on NTFS where the high half is zero). It is never the dispatch-cwd lock key, which carries a birth time and
+/// which `fgos_holder_lock::cwd_dev_ino` owns.
 pub(crate) struct FileKey {
     pub(crate) device: u64,
     pub(crate) index: u64,
-    pub(crate) birth: Option<u128>,
 }
 pub(crate) fn file_key(path: &Path) -> Result<FileKey> {
     #[cfg(unix)]
@@ -1081,11 +1080,6 @@ fn file_key_of_metadata(m: &fs::Metadata) -> Result<FileKey> {
     Ok(FileKey {
         device: m.dev(),
         index: m.ino(),
-        birth: m
-            .created()
-            .ok()
-            .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
-            .map(|d| d.as_nanos()),
     })
 }
 /// The key of an open file.
@@ -1098,10 +1092,10 @@ pub(crate) fn file_key_of(file: &fs::File) -> Result<FileKey> {
     {
         use std::os::windows::io::AsRawHandle;
         use windows_sys::Win32::Storage::FileSystem::{
-            FileBasicInfo, FileIdInfo, GetFileInformationByHandleEx, FILE_BASIC_INFO, FILE_ID_INFO,
+            FileIdInfo, GetFileInformationByHandleEx, FILE_ID_INFO,
         };
         let handle = file.as_raw_handle();
-        // SAFETY: both structs are plain data and the sizes passed match them.
+        // SAFETY: the struct is plain data and the size passed matches it.
         unsafe {
             let mut id: FILE_ID_INFO = std::mem::zeroed();
             if GetFileInformationByHandleEx(
@@ -1113,37 +1107,23 @@ pub(crate) fn file_key_of(file: &fs::File) -> Result<FileKey> {
             {
                 return Err(failure(std::io::Error::last_os_error()));
             }
-            let mut basic: FILE_BASIC_INFO = std::mem::zeroed();
-            if GetFileInformationByHandleEx(
-                handle,
-                FileBasicInfo,
-                (&mut basic as *mut FILE_BASIC_INFO).cast(),
-                std::mem::size_of::<FILE_BASIC_INFO>() as u32,
-            ) == 0
-            {
-                return Err(failure(std::io::Error::last_os_error()));
-            }
             let wide = u128::from_le_bytes(id.FileId.Identifier);
             Ok(FileKey {
                 device: id.VolumeSerialNumber,
                 index: (wide as u64) ^ ((wide >> 64) as u64),
-                birth: u128::try_from(basic.CreationTime).ok(),
             })
         }
     }
 }
-/// The `dispatch-cwd` lease file of a checkout, keyed exactly as the lock registry's
-/// `<cwdDevIno>` (`src/holder-lock/registry.mjs`): `<dev>-<ino>-<birth>` of the
-/// directory after realpath. A different key would probe a lease nobody holds.
+/// The `dispatch-cwd` lease file of a checkout, keyed exactly as the controller and the lock registry key it
+/// (`dispatch-cwd--<cwdDevIno>.lock`): the key comes from the one door, `fgos_holder_lock::cwd_dev_ino` of the
+/// canonical root. A different key would probe a lease nobody holds.
 pub(crate) fn custody_lock_path(repo: &RepoHandle, root: &Path) -> Result<PathBuf> {
-    let key = file_key(&fs::canonicalize(root).map_err(failure)?)?;
-    let birth = key
-        .birth
+    let key = fgos_holder_lock::cwd_dev_ino(root)
         .ok_or_else(|| failure("checkout-custody-birth-unavailable"))?;
-    Ok(repo.trusted_main_root().join(format!(
-        ".fgos/locks/dispatch-cwd--{}-{}-{}.lock",
-        key.device, key.index, birth
-    )))
+    Ok(repo
+        .trusted_main_root()
+        .join(format!(".fgos/locks/dispatch-cwd--{key}.lock")))
 }
 /// A linked checkout's custody lease, taken once and never waited for: a checkout a live writer holds answers
 /// `checkout-custody-busy`. The one door for a caller that must hold the lease while it acts on `root` (recovery of a
@@ -1302,5 +1282,45 @@ impl GitDriver {
             &terminal,
         )?;
         Ok(outcome)
+    }
+}
+
+#[cfg(test)]
+mod custody_key_tests {
+    use super::*;
+    use crate::{GitDriver, ResolveRepo};
+    use std::collections::BTreeMap;
+    use std::process::Command;
+
+    /// The custody lease Git probes is the very file the controller takes for the same directory: the registry's
+    /// `dispatch-cwd` path filled with the one-door key, under the trusted main root's `.fgos`.
+    #[test]
+    fn custody_lock_path_is_the_dispatch_cwd_registry_path_of_the_directory() {
+        let root = std::env::temp_dir().join(format!("fgos-custody-key-{}", std::process::id()));
+        fs::create_dir_all(&root).unwrap();
+        let root = fs::canonicalize(&root).unwrap();
+        let status = Command::new("git")
+            .arg("-C")
+            .arg(&root)
+            .args(["init", "-q"])
+            .status()
+            .unwrap();
+        assert!(status.success());
+        let driver = GitDriver::new(&root).unwrap();
+        let repo = match driver.resolve_repo(&root, &root).unwrap() {
+            ResolveRepo::Repository(r) => r,
+            _ => panic!("fixture is a repository"),
+        };
+        let key = fgos_holder_lock::cwd_dev_ino(&root).unwrap();
+        let params = BTreeMap::from([
+            (
+                "fgosDir".to_owned(),
+                root.join(".fgos").display().to_string(),
+            ),
+            ("cwdDevIno".to_owned(), key),
+        ]);
+        let registry = fgos_holder_lock::lock_path("dispatch-cwd", &params).unwrap();
+        assert_eq!(custody_lock_path(&repo, &root).unwrap(), registry);
+        fs::remove_dir_all(root).unwrap();
     }
 }

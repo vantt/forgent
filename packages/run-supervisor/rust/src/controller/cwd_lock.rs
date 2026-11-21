@@ -5,6 +5,7 @@
 //! dies releases it at once. Port of `cwd-lock.mjs`.
 
 use super::error::DispatchError;
+pub use fgos_holder_lock::cwd_dev_ino;
 use fgos_holder_lock::{
     acquire, holders, probe, Acquire, Handle, HeldReason, HoldersList, LockScope, Mode, Probe,
     Resource, Wait, DEFAULT_KILL_WAIT_MS,
@@ -14,56 +15,6 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 const LOCK_NAME: &str = "dispatch-cwd";
-
-/// `<dev>-<ino>-<birthtimeNs>` of the directory `cwd` names after realpath: one key for every spelling of the
-/// same directory. A directory that does not exist has no key (the registry's `<cwdDevIno>`).
-#[cfg(unix)]
-pub fn cwd_dev_ino(cwd: &Path) -> Option<String> {
-    use std::os::unix::fs::MetadataExt;
-    let meta = fs::metadata(fs::canonicalize(cwd).ok()?).ok()?;
-    let birth = meta
-        .created()
-        .ok()
-        .and_then(|time| time.duration_since(std::time::UNIX_EPOCH).ok())
-        .map(|elapsed| elapsed.as_nanos())
-        .unwrap_or_else(|| {
-            u128::try_from(meta.ctime()).unwrap_or(0) * 1_000_000_000
-                + u128::try_from(meta.ctime_nsec()).unwrap_or(0)
-        });
-    Some(format!("{}-{}-{birth}", meta.dev(), meta.ino()))
-}
-
-/// On Windows the same three facts Node's `fs.statSync` reports: the volume serial number, the file index and the
-/// creation time in nanoseconds since the epoch, so a Node and a Rust controller contend for one lock file.
-#[cfg(windows)]
-pub fn cwd_dev_ino(cwd: &Path) -> Option<String> {
-    use std::os::windows::fs::OpenOptionsExt;
-    use std::os::windows::io::AsRawHandle;
-    use windows_sys::Win32::Storage::FileSystem::{
-        GetFileInformationByHandle, BY_HANDLE_FILE_INFORMATION, FILE_FLAG_BACKUP_SEMANTICS,
-    };
-    let dir = fs::canonicalize(cwd).ok()?;
-    // A directory opens only with backup semantics; it is opened for its attributes alone.
-    let handle = fs::OpenOptions::new()
-        .access_mode(0)
-        .custom_flags(FILE_FLAG_BACKUP_SEMANTICS)
-        .open(&dir)
-        .ok()?;
-    // SAFETY: a zeroed out-struct filled for a handle this function owns.
-    let info = unsafe {
-        let mut info: BY_HANDLE_FILE_INFORMATION = std::mem::zeroed();
-        if GetFileInformationByHandle(handle.as_raw_handle() as _, &mut info) == 0 {
-            return None;
-        }
-        info
-    };
-    let index = (u64::from(info.nFileIndexHigh) << 32) | u64::from(info.nFileIndexLow);
-    let created = (u64::from(info.ftCreationTime.dwHighDateTime) << 32)
-        | u64::from(info.ftCreationTime.dwLowDateTime);
-    // FILETIME counts 100 ns from 1601; Node's `birthtimeNs` counts ns from 1970.
-    let birth = (i128::from(created) - 116_444_736_000_000_000) * 100;
-    Some(format!("{}-{index}-{birth}", info.dwVolumeSerialNumber))
-}
 
 /// The lock file of `cwd` under `fgos_dir`; an error naming the missing key when `cwd` does not exist.
 pub fn lock_path(fgos_dir: &Path, cwd: &Path) -> Result<PathBuf, DispatchError> {
@@ -239,4 +190,24 @@ pub fn record_custody_handoff(custody: Option<&Handle>) -> Option<Value> {
         .clear_domain()
         .err()
         .map(|error| json!({ "code": "custody-handoff-not-recorded", "detail": error.to_string() }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::BTreeMap;
+
+    /// The controller's lock file is the registry's `dispatch-cwd` path filled with the one-door key, the same file
+    /// Git's custody probe names for the directory.
+    #[test]
+    fn lock_path_is_the_dispatch_cwd_registry_path_of_the_directory() {
+        let cwd = fs::canonicalize(std::env::temp_dir()).unwrap();
+        let fgos_dir = cwd.join(".fgos");
+        let params = BTreeMap::from([
+            ("fgosDir".to_owned(), fgos_dir.display().to_string()),
+            ("cwdDevIno".to_owned(), cwd_dev_ino(&cwd).unwrap()),
+        ]);
+        let registry = fgos_holder_lock::lock_path(LOCK_NAME, &params).unwrap();
+        assert_eq!(lock_path(&fgos_dir, &cwd).unwrap(), registry);
+    }
 }
