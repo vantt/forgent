@@ -49,6 +49,8 @@ This phase serves the verb from engine `unit_run`. Node callers of `runUnit` (Wo
 
 - Carried in from 19b (landed bbf64a66d): call `HostUnitRun::run_unit` (installs signal handlers with dispatch.cancelWaitMs), not the engine's run_unit directly; Windows cancel-on-signal has no console handler in any crate yet (part of the Windows decision); pane-preparation errors come back as a coded runner-config error — map to Node's dispatch error class if a caller reads it; the 19b e2e tests are Linux-only.
 
+- Deferred to plan 261119-1731 (supervision powers doors; supervisor 2026-11-21): before editing `src/cli/command-registry.mjs`, re-add it to this phase's footprint (plan.md frontmatter and row) and rebase onto what 1731 has landed in it.
+
 ## Footprint
 
 As the plan table row 19c (evidence: branches `s6/p19c-2`, `s6/p19c-run`, `s6/p19c-run-flip`, `s6/p19c-win`):
@@ -61,7 +63,7 @@ As the plan table row 19c (evidence: branches `s6/p19c-2`, `s6/p19c-run`, `s6/p1
 `packages/execution/rust/src/{bind.rs,patterns/**,run_request/**}`, `packages/holder-lock/rust/src/route.rs` and
 `route/hold.rs`, `packages/process/rust/{Cargo.toml,src/lib.rs,src/interrupt.rs}`, `packages/git/contracts/mutation-census.v1.json`,
 `.github/workflows/release-assets-check.yml`, `docs/architecture-manifest.json`, `docs/platform/run-supervisor/spec.md`,
-`src/cli/command-registry.mjs`, `bin/fgos.mjs`, `src/native/execution-door.mjs`, `test/cli/{run-verb,dir-differs-from-cwd,
+`bin/fgos.mjs`, `src/native/execution-door.mjs`, `test/cli/{run-verb,dir-differs-from-cwd,
 execution-outcome-exit-codes,fgos-case-doors}.test.mjs`, `test/helpers/cli-entry.mjs`, `test/run-supervisor/{cancel-registry,
 crash-matrix-adopt-resume,resume-adopts}.test.mjs`, `test/run-supervisor/support/**`, `test/runner/dispatch-execute-effort.test.mjs`,
 `test/rust-host/**`, `test/workflow/{confined-nested-write,workflow-runner-cli}.test.mjs`.

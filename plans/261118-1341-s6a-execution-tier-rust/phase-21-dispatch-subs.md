@@ -78,6 +78,8 @@ transitively, e.g. `assignment-runner.mjs:10,13,44,46,47,69,92-96`, `plan.mjs:19
 
 - Deferred to plan 261120-1547 (session start task binding, lead:BIND; supervisor 2026-11-21): before editing `src/session-host/head-start.mjs`, re-add it to this phase's footprint (plan.md frontmatter and row) and rebase onto BIND's landed change.
 
+- Deferred to plan 261119-1731 (supervision powers doors; supervisor 2026-11-21): before editing `src/cli/command-registry.mjs`, re-add it to this phase's footprint (plan.md frontmatter and row) and rebase onto what 1731 has landed in it.
+
 ## Footprint
 
 As the plan table row 21, which holds `src/runner/execution/**`, `src/run-supervisor/**`, `test/run-supervisor/**` and
