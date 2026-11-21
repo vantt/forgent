@@ -4,7 +4,7 @@ Branch `docos/doc-checks` (worktree `/home/vantt/projects/.doc-work/docos-doc-ch
 
 ## Outcome
 
-The commit gate and the rules are built and the corpus passes. One spec point is not met to the letter: classify still runs once per document that needs it, not once for all staged paths, because `convention classify` accepts exactly one path. Changing that changes the Convention contract, so it waits for an owner decision (open question 1).
+The commit gate and the rules are built and the corpus passes. Following the lead's decision (option B), `convention classify` now takes many paths and answers one shape, so the gate classifies every document it needs in one host call.
 
 ## Commits
 
@@ -16,6 +16,7 @@ The commit gate and the rules are built and the corpus passes. One spec point is
 | `df4a104dc` | `doc-provisional-aged` parses `updatedAt`, 30-day cutoff, reported as a warning; `docRegistry.topicMaxDocs` in the config standard and schema |
 | `e3eaed78f` | doc-checks spec (Implementation line, section 12, section 15), area spec, Convention spec, CHANGELOG |
 | `177b04ce4` | the verb rule asks the host for `fgos --help --json` instead of reading the manifest file (the help door row allows only the host to read it) |
+| `4bc5e1b46` | feat(convention): `classify -- <path>...` answers `{classifications: [...]}` (an `unknown-kind` entry per unmatched path, `invalid-path` refuses the call); query schema, registry entry, generated manifest and routes, two golden cases, Convention spec 4.4 and history; doc-health collects the documents it needs in a first pass and classifies them in one call |
 
 ## What was built
 
@@ -77,10 +78,20 @@ Full `npm test` was not run here, as the brief asked.
 
 While I probed which verbs exist, running the worktree host with unknown verbs (`setup`, `coordination` and others) appended invocation-fault lines to the main checkout's `.fgos/logs/invocation-faults.jsonl`, because the host records faults at the main state root. I did not edit, revert or commit anything there.
 
+## Many-path classify verification
+
+- `cargo test -p fgos-convention` green (golden runner covers the many-path answer and its refusal; the schema test checks both entry shapes); `cargo test -p fgos --bin fgos convention` green; clippy clean for the crate; rustfmt clean.
+- `node scripts/export-command-selectors.mjs --check` exit 0; census regenerated, 0 undeclared sites.
+- doc-health 11/11 (the live case ran against a host rebuilt with the change), hook 14/14, architecture, command-registry, fgos-manifest, census and convention-client green.
+- Not caused by this branch: `test/scripts/convention-conformance.test.mjs` "no blocking convention violation" fails on `plans/backlog/STR*.md` naming (`check --all`, which this change does not touch); `test/cli/subcommand-flag-drift.test.mjs` fails on `migrate`; `test/rust-host/help-routes.test.mjs` needs a release build of the addon (`target/release/libfgos_node_addon.so`) that this worktree does not have.
+
+## Decisions recorded
+
+- Many-path classify: option B, decided by the lead 2026-11-22.
+- Runner rules retitled instead of cited: accepted by the lead; recorded in doc-checks section 10.
+- Verb listing from the activated host: accepted for now; recorded as a known limit in doc-checks 6.2.
+
 ## Open questions
 
-1. **One-call classify (sent to the lead with options).** Recommendation B: `convention classify -- <path>...` always answers an array; doc-health, its only caller, moves in the same change. Alternative A keeps the single-object answer for one path. Alternative C is what is built now: per-document classify, memoised and lazy, so a clean commit makes zero classify calls.
-2. **Runner rules retitled instead of cited.** Does the owner accept this?
-3. **Onboarding as the door for document identity's starter set and model fetch.** Is `fgctl init` the door the owner intends?
-4. **Verb listing source.** The verb rule asks the activated host, as spec section 9 says. A commit that adds a verb and documents it in the same change is refused until the activated host carries the verb. Is that acceptable? The alternative needs a change to the help door row in `docs/architecture-manifest.json`.
-5. **Host timeout under load.** During the workspace cargo build, one host call hit the 5 s timeout in `invokeHost`, so on a loaded machine the gate can refuse a commit with "host timed out". This matches the owner's posture (a host error refuses), but it may be noisy on the owner's QLC disk.
+1. **Onboarding as the door for document identity's starter set and model fetch.** Is `fgctl init` the door the owner intends? (left for the owner)
+2. **Host timeout under load.** During the workspace cargo build, one host call hit the 5 s timeout in `invokeHost`, so on a loaded machine the gate can refuse a commit with "host timed out". This matches the owner's posture (a host error refuses), but it may be noisy on the owner's QLC disk.

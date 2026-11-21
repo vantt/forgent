@@ -5,7 +5,7 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Map the Knowledge and Documentation Engine (horizon H2): which subcomponent owns which part of writing, locating, admitting and checking maintained documentation, how a write flows through them, and in which order they are built
 Design status: Draft. On 2026-11-12 the owner split the area into subcomponents; this spec became the map and its detailed sections moved to the subcomponent specs. Not signed.
-Implementation: doc-checks is built except one-call classify (2026-11-22, see its section 12); the other new subcomponents follow their own specs; the registry, Convention placement rules, doc-health and the decision index they extend are implemented
+Implementation: doc-checks is built (2026-11-22, see its section 12); the other new subcomponents follow their own specs; the registry, Convention placement rules, doc-health and the decision index they extend are implemented
 Canonical: No (becomes canonical when signed)
 Provenance: First committed 2026-11-06 by the DOCOS lead from the H2 scout report plans/reports/scout-261106-1430-docos-h2-knowledge-documentation-engine-facts.md and the proposal docs/platform/proposals/documentation-system-unification.md; reduced to a map on 2026-11-12
 Writer type: Agent draft writer
