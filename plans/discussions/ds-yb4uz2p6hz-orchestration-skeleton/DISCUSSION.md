@@ -1,7 +1,7 @@
 ---
 id: ds-yb4uz2p6hz
 title: "Orchestration skeleton: domain-agnostic primitives, one frame language, and driving harness"
-status: open
+status: settled
 source:
   - p-7nja6ilwkr
   - p-7pjiqfoj7v
@@ -13,7 +13,24 @@ source:
 created: 2026-11-20
 ---
 
-discussion: open
+discussion: settled
+
+## Hand-off to the planner
+
+- **Outcome:** một khung xương điều phối giữ nhịp toàn hệ thống mà không cần người canh: chỉ timer và tín hiệu ngoài khởi động; mọi lối vào thành event qua một cửa raise; giữ nhịp bằng code (lớn lên từ `packages/supervision/rust/src/wake.rs`) đọc bản ghi lập lịch do domain chiếu ra, ép cap, khởi hoặc đánh thức người chơi qua cửa có sẵn, và chỉ gọi LLM khi cần phán đoán. Hình dạng ở §6; các task ở §7 (T1, T7.1 tới T7.7).
+- **Constraints:** skeleton chỉ sở hữu actor và thời gian, không bao giờ trạng thái domain (SR-D8). Không cửa thực thi thứ hai, không cửa hỏi người thứ hai, không referee thứ hai: mở rộng qua cửa có sẵn (L10, RUL104; OS-D8, OS-D14, OS-D15, OS-D16). Mọi thành phần và cửa mới khai báo qua `component-authority` (`locate`, `declare`) trước khi viết code. Plan chỉ tuân contract tổng quát, ánh xạ vào guide và pattern lúc thực thi (OS-D21). Một harness: lead không chạy phase ngoài ca. Key config mới vào `core/config-standard` (`watcher.reviewIntervalSec`, mặc định `maxLeads`, ngưỡng sleep của OS-D18).
+- **Non-goals:** session placement port cho UI ngoài (để sau, OS-D20 port 4); adapter của một nguồn webhook cụ thể (nguồn đầu tiên chọn sau, OS-D8); gộp Questions với Workflow gate về code (thuộc `component-authority`); rút Work step FSM (plan cutover coding, N12); architecture panel T0 (hoãn, `q-kjat6xjwfv`).
+- **Acceptance criteria:** (1) admission và cap được ép bằng code, mỗi quyết định có mã lý do (T1); (2) một ca có hai bước song song cho ra hai bản ghi lập lịch và hai người chơi, quá `until` sinh đúng một event, bản ghi mồ côi sinh "cần phán đoán" (T7.1); (3) một plan nhiều phase chạy hết qua ca guide, không còn `fgos run` của lead ngoài ca, plan ngoài sai contract bị từ chối có mã (T7.2); (4) một câu hỏi tới `party` ngoài nhận câu trả lời có ký qua cửa raise, chữ ký sai bị từ chối (T7.3); (5) một tool có invocation job chạy và settle qua `fgos run` (T7.5); (6) `review-due` khởi một Unit chỉ đọc, phát hiện thành event (T7.6); `npm test` và `cargo test --workspace` xanh.
+- **Open points that block only some parts:**
+  - OS-D12 (một bản ghi lập lịch cho mỗi bước đang mở, khoá `item`, `step`) là tạm chốt: chặn phần contract bản ghi và projector của T7.1; T1 và T7.2 tới T7.6 không bị chặn.
+  - OS-D19 (handoff là đóng bản ghi này, mở bản ghi kia) là tạm chốt: chặn phần handoff của T7.1 và việc gộp ba đường handoff; phần còn lại của T7.1 không bị chặn.
+  - Con số ngưỡng sleep của OS-D18 (head nói chuyện với người ngồi yên tối đa bao lâu) chưa chốt: chặn phần sleep và wake của T7.1; chốt lúc plan, giá trị đặt trong `core/config-standard`.
+  - `wave` trong plan-v1 (tính được từ phụ thuộc cộng footprint, xét bỏ khỏi phần bắt buộc của contract plan tổng quát): chặn phần contract plan của T7.2; ánh xạ lúc thực thi và một harness không bị chặn.
+  - Khung trong code (`src/workflow/propose-frame.mjs`) mới có bộ đếm, thiếu kết quả dự định và non-goal mà `docs/platform/workflow/spec.md` §2.2 kể: chặn phần khung được duyệt của T7.2; phần còn lại không bị chặn.
+  - Thứ tự giữa T7.2, T7.3, T7.5 do planner và Miu quyết theo thứ tự ưu tiên sản phẩm; không chặn task nào.
+- **Source ids:** `p-7pjiqfoj7v` (discussion này), `p-radq263tbx` (T1), `p-f367pplkhu` (T7.2), `p-r3qqgwtcai`, `p-sdwybf7yre`, `p-lkzx3oygy4`, `p-2wb2lfgky3` (T2 tới T5 kế thừa); SR-D6 tới SR-D10 (`supervisor-review`), OS-D1 tới OS-D21; discussion `component-authority` (CA-D1 tới CA-D3), `workflow-engine`, `work-data-model`.
+
+discussion: settled
 
 # Orchestration skeleton: domain-agnostic primitives, one frame language, and driving harness
 
@@ -21,7 +38,7 @@ discussion: open
 
 2026-11-20: Thảo luận được mở từ backlog row `p-7pjiqfoj7v` (nguồn `docs/discussions/supervisor-review/DISCUSSION.md` §7 `#task-orchestration-skeleton`, owner duyệt 2026-11-19 round 19). Đã kế thừa các quyết định cốt lõi SR-D6..SR-D10, bài học Work FSM (G14), nguyên lý harness (G15, G16) và phác thảo 6 ports của Multica (plan `261118-1117-external-ui-integration-multica`).
 - Đã nhận câu trả lời chủ dự án cho `q-kjat6xjwfv`: Shaping is parked by owner decision 2026-11-21 until four orchestration fixes land (đóng băng việc điều phối mới để ưu tiên ổn định hệ thống; Architecture Advisory Panel tạm hoãn, thảo luận không đóng).
-- Trạng thái thảo luận: **Tạm dừng (`discussion: paused`)**, thảo luận vẫn mở (not settled, not closed), được đậu lại (parked) chờ 4 bản sửa lỗi điều phối hạ cánh. Không có câu hỏi nào đang mở.
+- **2026-11-21 23:36 (round 42): chủ dự án duyệt §6 ("ok, tiếp tục") -> `discussion: settled`.** Khối bàn giao cho planner ở đầu file (chèn 2026-11-22 00:20 từ bản dự phòng `.fgos/runtime/tmp/orchestration-skeleton-handoff-block.md` do supervisor chép lại). Còn mở, mỗi điểm chỉ chặn một phần plan: OS-D12 và OS-D19 (tạm chốt), con số ngưỡng sleep của OS-D18, `wave` của plan-v1, khung trong code thiếu kết quả dự định và non-goal. Architecture panel (T0) vẫn hoãn. Không có câu hỏi mở.
 - 2026-11-21 16:20: đã ghi bảng tham chiếu các backlog row, plan và discussion liên quan tại §7 `#related` để theo dõi.
 - 2026-11-21 16:35: đã xác định 4 bản sửa của OS-D1 (nguồn: memory `orchestration-stabilize-first-decision` của secretary Miu và tin supervisor gửi Miu sáng 2026-11-21: "1547 first, then the idle-lead nudge, then the names, then the reaper"): `p-l22vozecxg`, `p-waxzxz5mio`, `p-mhwe24fttr`, `p-yqanenewb4`. **Cả 4 đã `done`** (xem §7 `#related`). Điều kiện đậu theo chữ của OS-D1 đã thỏa, nhưng release hold ("no new work until the release hold is lifted", handoff secretary 14:45) vẫn còn hiệu lực. Discussion vẫn `paused` cho tới khi chủ dự án cho mở lại.
 - **2026-11-21 16:16: chủ dự án cho mở lại (OS-D2).** Trạng thái `discussion: open`. Architecture panel (T0) vẫn hoãn. Release hold không bị ảnh hưởng vì discussion không sinh code.
@@ -493,6 +510,7 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 - 2026-11-21 22:45 round 40: Chủ dự án: "đồng ý, ghi lại và đóng hàng 5." Mint OS-D21. Mọi hàng §3 rõ.
 - 2026-11-21 22:55 round 41: Chủ dự án: "làm nhé". Viết lại toàn bộ §6 (sơ đồ mới) và §7 (T7.1 tới T7.7 thay T7.1 tới T7.3 cũ).
 - 2026-11-21 22:27 round 37: Chủ dự án: "cần làm rõ, khung trong giải thích trên là gì (là guide?)". Không: khung là giới hạn của riêng một ca; đọc `src/workflow/propose-frame.mjs`; ghi ở §3 4p.
+- 2026-11-21 23:36 round 42: Chủ dự án: "ok, tiếp tục" (duyệt §6). Đặt `discussion: settled`, chèn khối bàn giao cho planner ở đầu file; giữ năm điểm mở (OS-D12, OS-D19, ngưỡng sleep của OS-D18, `wave` của plan-v1, khung thiếu kết quả dự định và non-goal), mỗi điểm ghi phần plan nó chặn. Chủ dự án đi ngủ; supervisor chuyển lời và nhờ chèn khối (2026-11-22 00:20).
 
 ## 6. Thiết kế đã chốt {#design}
 
