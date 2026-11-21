@@ -1430,7 +1430,11 @@ fn run_land(root: &Path, command: &LandCommand) -> Result<Value, CategorisedRefu
         .map_err(|e| refused("land-root-unreadable", e.cause))?
         .ok_or_else(|| refused("land-root-not-a-repository", root.display()))?;
     let (state, _) = fgos_holder_lock::state_root();
-    let driver = GitDriver::new(&state).map_err(|e| refused("land-git-unavailable", e.cause))?;
+    let helper = fgos_holder_lock::HelperExe::current()
+        .map_err(|e| refused("land-git-unavailable", e.to_string()))?;
+    let driver = GitDriver::new(&state)
+        .map_err(|e| refused("land-git-unavailable", e.cause))?
+        .with_helper(helper);
     let repo = match driver
         .resolve_repo(&main, &main)
         .map_err(|e| refused("land-git-unavailable", e.cause))?

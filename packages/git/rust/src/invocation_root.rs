@@ -406,8 +406,25 @@ mod tests {
             Self { base, table, state }
         }
 
+        /// The table spells paths with `/`; join them per component so the result carries one spelling.
         fn at(&self, relative: &str) -> PathBuf {
-            self.base.join(relative)
+            relative
+                .split('/')
+                .fold(self.base.clone(), |path, part| path.join(part))
+        }
+
+        /// A table message with `{base}` expanded and the path it opens spelled as the platform spells it.
+        fn expand(&self, message: &str) -> String {
+            let Some((head, tail)) = message.split_once("{base}") else {
+                return message.to_string();
+            };
+            let (path, rest) = tail.split_once('"').unwrap_or((tail, ""));
+            let path = path
+                .split('/')
+                .filter(|part| !part.is_empty())
+                .fold(self.base.clone(), |path, part| path.join(part));
+            let quote = if tail.contains('"') { "\"" } else { "" };
+            format!("{head}{}{quote}{rest}", path.display())
         }
 
         fn home(&self) -> PathBuf {
@@ -514,7 +531,7 @@ mod tests {
             if let Some(message) = row["refusal"].as_str() {
                 let refusal = got.expect_err(name);
                 assert_eq!(refusal.fault_class, DIR_INVALID, "{name}");
-                let expected = message.replace("{base}", tree.base.to_str().unwrap());
+                let expected = tree.expand(message);
                 assert!(
                     refusal.message.contains(&expected),
                     "{name}: {:?} lacks {expected:?}",

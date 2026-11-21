@@ -1,3 +1,4 @@
+// Linux only: it kills children at exact syscalls with ptrace and forks fixture processes, and its children run through a borrowed lock that a library test harness cannot serve on Windows.
 #![cfg(target_os = "linux")]
 include!("support/land.rs");
 use std::io::{Read, Write};

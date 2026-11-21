@@ -1,3 +1,5 @@
+// Unix only: its shared fixture sets Unix permissions, and its Git children run through a borrowed lock, which on Windows needs
+// a helper executable that a library test harness is not; the Windows proof of the config write is apps/fgos/tests/windows_git_custody.rs.
 #![cfg(unix)]
 include!("support/land.rs");
 use fgos_git::wal::{FileSystem, Outcome, Wal};

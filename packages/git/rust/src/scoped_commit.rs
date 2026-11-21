@@ -285,7 +285,6 @@ pub(crate) fn root(repo: &RepoHandle) -> Result<&Path> {
         .ok_or_else(|| failure("checkout-required"))
 }
 pub(crate) fn scope<'a>(repo: &RepoHandle, held: Vec<BorrowedHandle<'a>>) -> Result<LockScope<'a>> {
-    require_lock_scope_platform()?;
     let mut scope = LockScope::seeded(held).map_err(failure)?;
     if scope
         .holding()
@@ -326,9 +325,6 @@ pub(crate) fn scope<'a>(repo: &RepoHandle, held: Vec<BorrowedHandle<'a>>) -> Res
         let lease = scope
             .handle("dispatch-cwd")
             .ok_or_else(|| failure("checkout-custody-required"))?;
-        #[cfg(not(unix))]
-        let _ = lease;
-        #[cfg(unix)]
         if lease.path() != crate::refs::custody_lock_path(repo, root(repo)?)? {
             return Err(failure("checkout-custody-stale"));
         }
@@ -346,25 +342,13 @@ pub(crate) fn handle<'a>(scope: &'a LockScope<'_>, repo: &RepoHandle) -> Result<
         .ok_or_else(|| failure("checkout-authority-required"))
 }
 pub(crate) fn binding(handle: &Handle) -> Result<String> {
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::MetadataExt;
-        let m = fs::metadata(handle.path()).map_err(failure)?;
-        Ok(format!("{}:{}", m.dev(), m.ino()))
-    }
-    #[cfg(not(unix))]
-    {
-        let _ = handle;
-        Err(failure("git-lockscope-unavailable-windows"))
-    }
+    let key = crate::refs::file_key(handle.path())?;
+    Ok(format!("{}:{}", key.device, key.index))
 }
 /// New chains bind the directory identity used by custody; legacy chains keep
 /// their path-only resource and are accepted only under their original lease.
 pub(crate) fn checkout_resources(repo: &RepoHandle) -> Result<Vec<String>> {
-    #[cfg(unix)]
     let custody = crate::refs::custody_lock_path(repo, root(repo)?)?;
-    #[cfg(not(unix))]
-    let custody = std::path::PathBuf::new();
     Ok(vec![format!(
         "worktree:{}:custody:{}",
         root(repo)?.display(),
@@ -1992,8 +1976,44 @@ mod saved_permissions {
         }
         #[cfg(not(unix))]
         {
-            let _ = d;
-            Err(serde::de::Error::custom("snapshot-platform-unsupported"))
+            permissions_from_readonly(bool::deserialize(d)?).map_err(serde::de::Error::custom)
+        }
+    }
+    /// Permissions carrying `readonly`: std offers no constructor off Unix, so take an existing
+    /// directory's permissions and set the one bit the snapshot records.
+    #[cfg(any(not(unix), test))]
+    pub(super) fn permissions_from_readonly(readonly: bool) -> std::io::Result<fs::Permissions> {
+        let mut permissions = fs::metadata(std::env::temp_dir())?.permissions();
+        permissions.set_readonly(readonly);
+        Ok(permissions)
+    }
+}
+
+#[cfg(test)]
+mod saved_permissions_tests {
+    use super::saved_permissions::permissions_from_readonly;
+
+    #[test]
+    fn the_readonly_bit_a_snapshot_records_is_what_it_reads_back() {
+        assert!(permissions_from_readonly(true).unwrap().readonly());
+        assert!(!permissions_from_readonly(false).unwrap().readonly());
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn a_saved_file_written_on_windows_reads_back_with_its_readonly_bit() {
+        for readonly in [false, true] {
+            let saved = super::SavedPath::File(
+                b"bytes".to_vec(),
+                permissions_from_readonly(readonly).unwrap(),
+            );
+            let text = serde_json::to_string(&saved).unwrap();
+            let back: super::SavedPath = serde_json::from_str(&text).unwrap();
+            let super::SavedPath::File(bytes, permissions) = back else {
+                panic!("a file reads back as a file");
+            };
+            assert_eq!(bytes, b"bytes");
+            assert_eq!(permissions.readonly(), readonly);
         }
     }
 }

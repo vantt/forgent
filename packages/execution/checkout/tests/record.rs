@@ -59,7 +59,9 @@ fn an_inode_above_two_to_the_53_is_written_as_the_digits_a_js_number_prints() {
 
 #[test]
 fn a_record_written_here_has_the_bytes_node_wrote_for_the_same_layout() {
-    let node = include_str!("fixtures/node-provisioned-record.json");
+    // A Windows checkout may convert the fixture's line endings; Node wrote LF.
+    let node = include_str!("fixtures/node-provisioned-record.json").replace("\r\n", "\n");
+    let node = node.as_str();
     let parsed = Record::from_text(node).expect("the node record parses");
     assert_eq!(parsed.worktree, "/tmp/fx-0mM5vV/wt");
     assert_eq!((parsed.dev, parsed.ino), (147, 496));

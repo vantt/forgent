@@ -1,3 +1,4 @@
+// Linux only: its Git children run through a borrowed lock, which on Windows needs a helper executable that a library test harness is not; the Windows proof of this port runs from apps/fgos/tests/windows_git_custody.rs, and its fixture sets Unix permissions.
 #![cfg(target_os = "linux")]
 include!("support/land.rs");
 include!("support/signing.rs");

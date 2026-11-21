@@ -13,6 +13,8 @@ mod inspect;
 pub mod invocation_root;
 mod objects;
 mod refs;
+#[cfg(windows)]
+mod windows_fs;
 pub use refs::{acquire_checkout_custody, acquire_worktree_admin};
 mod worktree;
 pub use worktree::{
@@ -644,14 +646,6 @@ pub fn contract_versions() -> serde_json::Value {
 }
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
-
-/// Lock-taking Git ports stay dormant until the Windows handoff exists (Q6).
-pub fn require_lock_scope_platform() -> Result<()> {
-    if cfg!(target_os = "windows") {
-        return Err(failure("git-lockscope-unavailable-windows"));
-    }
-    Ok(())
-}
 
 mod scoped_commit;
 pub use scoped_commit::{CommitBaseline, CommitRequest, CommitResult};

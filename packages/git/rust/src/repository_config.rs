@@ -143,7 +143,6 @@ impl GitDriver {
         hooks_request: Option<(&str, bool)>,
         filesystem: &F,
     ) -> Result<Receipt> {
-        require_lock_scope_platform()?;
         let allowed = if hooks_request.is_none() {
             granted_fetch_mappings(remote)?
         } else {
@@ -310,7 +309,7 @@ impl GitDriver {
                     failed(e)
                 }
             })?;
-        let cleanup = StagingFile::new(staging.clone(), file.metadata().map_err(failed)?);
+        let cleanup = StagingFile::new(staging.clone(), &file)?;
         let intent = Intent {
             kind: OperationKind::ConfigChange(Box::new(wal::ConfigChange {
                 config_sequence: Some(wal.next_config_sequence()?),
@@ -366,9 +365,9 @@ impl GitDriver {
             let _draft = Draft(draft_dir.clone());
             let draft = draft_dir.join("config");
             fs::write(&draft, &old_bytes).map_err(failed)?;
-            let staging_text = draft
-                .to_str()
-                .ok_or_else(|| failed("non-utf8-config-path"))?;
+            let staging_text =
+                crate::driver::text_path(&draft).map_err(|_| failed("non-utf8-config-path"))?;
+            let staging_text = staging_text.as_str();
             let key = format!("remote.{remote}.fetch");
             if let Some(hooks) = &hooks {
                 let out = if let Some(next) = &hooks.next {
@@ -454,9 +453,7 @@ impl GitDriver {
             }
             fs::rename(&staging, &config).map_err(failed)?;
             filesystem.checkpoint("config-replaced").map_err(failed)?;
-            File::open(repo.common_dir())
-                .and_then(|f| f.sync_all())
-                .map_err(failed)?;
+            fgos_durable_file::sync_directory(repo.common_dir()).map_err(failed)?;
             if !self.config_change_installed(
                 repo,
                 match &chain.intent().kind {
@@ -512,11 +509,14 @@ fn unproven_config_outcome() -> Outcome {
 /// is evidence for the operator, never permission to unlink another writer.
 struct StagingFile {
     path: std::path::PathBuf,
-    identity: fs::Metadata,
+    identity: crate::refs::FileKey,
 }
 impl StagingFile {
-    fn new(path: std::path::PathBuf, identity: fs::Metadata) -> Self {
-        Self { path, identity }
+    fn new(path: std::path::PathBuf, file: &File) -> Result<Self> {
+        Ok(Self {
+            path,
+            identity: crate::refs::file_key_of(file)?,
+        })
     }
     fn is_owned(&self) -> bool {
         #[cfg(unix)]
@@ -524,14 +524,22 @@ impl StagingFile {
             use std::os::unix::fs::MetadataExt;
             fs::symlink_metadata(&self.path).is_ok_and(|now| {
                 now.is_file()
-                    && now.dev() == self.identity.dev()
-                    && now.ino() == self.identity.ino()
+                    && now.dev() == self.identity.device
+                    && now.ino() == self.identity.index
             })
         }
-        #[cfg(not(unix))]
+        #[cfg(windows)]
         {
-            let _ = &self.identity;
-            false
+            // A reparse point is opened as itself, never followed, and is never ours.
+            crate::windows_fs::open_no_follow(&self.path)
+                .ok()
+                .is_some_and(|now| {
+                    now.metadata()
+                        .is_ok_and(|m| crate::windows_fs::is_plain_file(&m))
+                        && crate::refs::file_key_of(&now).is_ok_and(|k| {
+                            k.device == self.identity.device && k.index == self.identity.index
+                        })
+                })
         }
     }
 }
@@ -771,9 +779,9 @@ impl GitDriver {
         if !owned_path.is_absolute() {
             return Err(failure("invalid-hooks-path"));
         }
-        let path = owned_path
-            .to_str()
-            .ok_or_else(|| failure("invalid-hooks-path"))?;
+        let path =
+            crate::driver::text_path(owned_path).map_err(|_| failure("invalid-hooks-path"))?;
+        let path = path.as_str();
         let configured = self.hooks_value(repo)?;
         let provenance = if self.local_hooks_value(repo)?.as_deref() == Some(path) {
             self.hooks_provenance(repo, path)?
@@ -828,9 +836,9 @@ impl GitDriver {
         if before.status == "skippedExisting" {
             return Ok(before);
         }
-        let path = owned_path
-            .to_str()
-            .ok_or_else(|| failure("invalid-hooks-path"))?;
+        let path =
+            crate::driver::text_path(owned_path).map_err(|_| failure("invalid-hooks-path"))?;
+        let path = path.as_str();
         self.change_config(repo, "", &[], id, Some((path, false)), filesystem)?;
         self.inspect_hooks(repo, owned_path)
     }
@@ -844,9 +852,9 @@ impl GitDriver {
         if before.status != "owned" {
             return Ok(before);
         }
-        let path = owned_path
-            .to_str()
-            .ok_or_else(|| failure("invalid-hooks-path"))?;
+        let path =
+            crate::driver::text_path(owned_path).map_err(|_| failure("invalid-hooks-path"))?;
+        let path = path.as_str();
         self.change_config(repo, "", &[], id, Some((path, true)), &wal::OsFileSystem)?;
         self.inspect_hooks(repo, owned_path)
     }
@@ -899,13 +907,18 @@ mod wired_tests {
 
     #[test]
     fn a_hooks_path_is_wired_only_when_it_resolves_to_the_owned_path() {
-        let owned = Path::new("/repo/.githooks");
-        assert!(hooks_path_wired(Some("/repo/.githooks"), owned));
-        assert!(hooks_path_wired(Some(".githooks"), owned));
-        assert!(hooks_path_wired(Some("./.githooks"), owned));
-        assert!(hooks_path_wired(Some("../repo/.githooks"), owned));
-        assert!(!hooks_path_wired(Some("/repo/other"), owned));
-        assert!(!hooks_path_wired(Some("/repo/.githooks/sub"), owned));
-        assert!(!hooks_path_wired(None, owned));
+        let root = Path::new(if cfg!(windows) { "C:\\repo" } else { "/repo" });
+        let owned = root.join(".githooks");
+        let spelled = |path: std::path::PathBuf| path.to_str().unwrap().to_string();
+        assert!(hooks_path_wired(Some(&spelled(owned.clone())), &owned));
+        assert!(hooks_path_wired(Some(".githooks"), &owned));
+        assert!(hooks_path_wired(Some("./.githooks"), &owned));
+        assert!(hooks_path_wired(Some("../repo/.githooks"), &owned));
+        assert!(!hooks_path_wired(
+            Some(&spelled(root.join("other"))),
+            &owned
+        ));
+        assert!(!hooks_path_wired(Some(&spelled(owned.join("sub"))), &owned));
+        assert!(!hooks_path_wired(None, &owned));
     }
 }

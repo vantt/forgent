@@ -22,6 +22,17 @@ use napi_derive::napi;
 use serde_json::{json, Value};
 use std::path::Path;
 
+/// The addon holds no custody lease across the Windows handover between processes; it refuses by name instead of
+/// guessing. The Git ports themselves take custody on Windows.
+fn refuse_handover_on_windows() -> Result<()> {
+    if cfg!(windows) {
+        return Err(error(
+            json!({"code": "refused", "cause": "git-lock-handover-unsupported", "retryable": false}),
+        ));
+    }
+    Ok(())
+}
+
 fn text<'a>(v: &'a Value, key: &str) -> Result<&'a str> {
     v.get(key)
         .and_then(Value::as_str)
@@ -51,7 +62,7 @@ impl GitPublication {
         helper_exe: Option<String>,
     ) -> Result<Self> {
         check()?;
-        require_lock_scope_platform().map_err(operation)?;
+        refuse_handover_on_windows()?;
         let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
         let repo = match driver
             .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))
@@ -347,7 +358,7 @@ pub fn ensure_git_fetch_mapping(
     operation_id: String,
 ) -> Result<Value> {
     check()?;
-    require_lock_scope_platform().map_err(operation)?;
+    refuse_handover_on_windows()?;
     let driver = GitDriver::new(Path::new(&state_root)).map_err(operation)?;
     match driver
         .resolve_repo(Path::new(&repo_path), Path::new(&trusted_main))

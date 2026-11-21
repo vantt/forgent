@@ -1,3 +1,4 @@
+// Linux only: its Git children run through a borrowed lock, which on Windows needs a helper executable that a library test harness is not; the Windows proof of this port runs from apps/fgos/tests/windows_git_custody.rs, and it kills children at exact syscalls with ptrace.
 #![cfg(all(target_os = "linux", target_arch = "x86_64"))]
 // Reuse Land/SafeRestore's real repository fixture. The syscall crash harness
 // follows land_crash_matrix/worktree: no production fault flag or synthetic WAL.
