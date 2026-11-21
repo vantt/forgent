@@ -228,8 +228,8 @@ runner:
       # @fgos:why [48a564e9-e77d-4749-9957-17015907b265] secretary head binds claude sonnet (p-sozeraj6zq)
       tier: standard
       # @fgos:doc Account pool every seat of this persona leases from, for every family it walks; a pool no tier cell names is reachable only through it.
-      # @fgos:why [f381c6d2-3f10-4128-aeac-d0f158513f83] owner 2026-11-21 14:54: temporary, the claude-miu login expired; the secretary runs on the claude pool until it is renewed
-      pool: claude
+      # @fgos:why [f381c6d2-3f10-4128-aeac-d0f158513f83] owner 2026-11-21 17:50: claude-miu/vantt login renewed, probe healthy; the secretary returns to its own pool
+      pool: claude-miu
     # @fgos:doc The tier, executors and account pool one persona prefers. Only a persona may name a pool; a role entry refuses the key by name.
     # @fgos:why [f381c6d2-3f10-4128-aeac-d0f158513f83] owner 2026-11-21: coordinating heads run Claude Opus (tier flagship on claude), temporary until a seat judge can swap to an equal-quality family
     supervisor:
