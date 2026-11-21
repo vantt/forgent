@@ -28,3 +28,4 @@ The friction attempted was that `git fetch` from this seat fails because `.git/F
 - session-idle `4f660b01…` ×2: this is the reviewer of git-windows-custody. It ended with Status DONE on phases 5 and 6 and is idle, which is expected. It names one non-blocking follow-up for the lead to place: the Git driver should take its helper as a parameter so that a Windows borrow made through the Node addon works.
 - session-idle `unknown`: there is no session to read.
 - 4 of 4 leads are still live, and no plan is admissible.
+- coordination-handoff `head:shaper-orchestration-skeleton`: the shaper is live (`claude-rif5`, Claude) and mid-turn. It has found the park condition ("four orchestration fixes land") and is checking it. The owner's order is to open the discussion now. Nothing needed typing; if the shaper stalls, the watcher raises an idle event.
