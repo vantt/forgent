@@ -65,7 +65,7 @@ const GRANTS = Object.freeze({
     peers: true,
   }),
   // A shaper writes one discussion file and parks owner questions; it neither answers them nor starts sessions. It lands too: a path land is limited to the grant's writes, and fgos-shaping commits the discussion every round.
-  shaper: Object.freeze({ ...frozen(['docs/discussions', 'plans/discussions'], [...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS]), mailbox: true }),
+  shaper: Object.freeze({ ...frozen(['docs/discussions'], [...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS]), mailbox: true }),
   planner: frozen(['plans', 'docs/discussions'], [...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS]),
   // `session write` replaces its read-only backlog file. It goes on site (`session read`, `session type` into a stuck
   // session), tunes the watcher, prunes settled evidence, and reaches sessions by mailbox and peers.

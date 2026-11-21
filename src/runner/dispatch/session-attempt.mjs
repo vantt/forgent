@@ -35,9 +35,13 @@ export class SessionLaunchError extends Error {
 
 const ATTEMPT_STR = '01';
 
-/** The sandbox paths of grant writes: `dir/*` becomes `dir`, identical entries once. */
+/**
+ * The sandbox paths of grant writes: `dir/*` becomes `dir` (a `/*` entry binds its whole directory), and an entry equal
+ * to or nested under another entry is dropped, in order of first appearance.
+ */
 function sandboxPathsOf(writes) {
-  return [...new Set(writes.map((entry) => (entry.endsWith('/*') ? entry.slice(0, -2) : entry)))];
+  const mapped = [...new Set(writes.map((entry) => (entry.endsWith('/*') ? entry.slice(0, -2) : entry)))];
+  return mapped.filter((entry) => !mapped.some((other) => other !== entry && entry.startsWith(`${other}/`)));
 }
 
 /**
