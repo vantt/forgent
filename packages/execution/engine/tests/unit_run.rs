@@ -591,6 +591,32 @@ fn every_error_vector_of_the_run_unit_contract_survives_the_round_trip() {
     );
 }
 
+#[test]
+fn a_holder_lock_failure_of_the_run_supervisor_keeps_its_class_and_a_refusal_stays_a_dispatch_error(
+) {
+    use fgos_run_supervisor::controller::error::DispatchError;
+    let lock = RunUnitError::dispatch(
+        &DispatchError::holder_lock("lock-driver-unavailable", "dispatch-cwd: no driver")
+            .with("reason", json!("no-driver")),
+    );
+    assert_eq!(lock.tag, ErrorTag::HolderLockError);
+    assert_eq!(lock.code.as_deref(), Some("lock-driver-unavailable"));
+    assert_eq!(
+        lock.message,
+        "holder-lock (lock-driver-unavailable): dispatch-cwd: no driver"
+    );
+    assert_eq!(
+        lock.fields,
+        json!({ "reason": "no-driver" })
+            .as_object()
+            .cloned()
+            .unwrap()
+    );
+    let refusal = RunUnitError::dispatch(&DispatchError::new("dispatch-in-flight", "held"));
+    assert_eq!(refusal.tag, ErrorTag::Error);
+    assert_eq!(refusal.fields["name"], json!("DispatchError"));
+}
+
 // ---- the Git-backed commit and sync, over a real repository and a linked worktree ----------------------------
 
 #[cfg(target_os = "linux")]

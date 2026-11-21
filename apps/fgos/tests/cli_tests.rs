@@ -5669,6 +5669,45 @@ fn run_exits_with_the_status_of_the_class_its_refusal_was_raised_as() {
     assert!(!world.world.project.join(".fgos/assignments").exists());
 }
 
+/// A holder-lock driver failure on the custody path (here a lock file the driver cannot open) is a `HolderLockError`
+/// in Node, `precondition`: the writing run exits 2.
+#[cfg(unix)]
+#[test]
+fn a_writing_run_whose_custody_lock_cannot_be_taken_exits_with_the_precondition_status() {
+    let world = RunWorld::new("fgos_run_custody_lock", &RunWorld::real_node());
+    // A directory where the worktree's dispatch-cwd lock file goes.
+    let lock = fgos_run_supervisor::controller::cwd_lock::lock_path(
+        &world.world.project.join(".fgos"),
+        &world.worktree,
+    )
+    .unwrap();
+    fs::create_dir_all(&lock).unwrap();
+    // The marked case bindings directory, so the port answers the worktree unbound.
+    let bindings = world.world.project.join(".fgos/workflow-runs/.bindings");
+    fs::create_dir_all(&bindings).unwrap();
+    fs::write(bindings.join(".root"), "fgos workflow case bindings\n").unwrap();
+    let wt = world.worktree.to_str().unwrap();
+    let refused = world.run(
+        &[
+            "Write notes",
+            "--capability",
+            "docs:write",
+            "--writes",
+            "notes.md",
+            "--worktree",
+            wt,
+        ],
+        &[],
+    );
+    assert_eq!(refused.status.code(), Some(2), "{}", stderr_of(&refused));
+    assert!(
+        stderr_of(&refused)
+            .starts_with("fgos: holder-lock (lock-driver-unavailable): dispatch-cwd: "),
+        "{}",
+        stderr_of(&refused)
+    );
+}
+
 /// The refusals a run gives before any unit run exists reach the caller as one `fgos:` line and exit 4, leaving no
 /// unit run behind: an account pin no seat of the unit can take, and a machine with no agent CLI.
 #[cfg(unix)]

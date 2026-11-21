@@ -157,9 +157,9 @@ const CLASSLESS_IN_NODE = new Set([
 
 /**
  * The error a native `run-unit` error result stands for, as the Node unit run threw it: an instance of the class its
- * tag names (`CaseAdmissionRefusedError`, `RunnerConfigError`, else `Error`) with that class's fields. Neither named
- * class carries an `errorClass`; any other error carries the result's class (`custody-predecessor-unknown` and the
- * other run supervisor classes) unless it is one Node threw without one.
+ * tag names (`CaseAdmissionRefusedError`, `RunnerConfigError`, `HolderLockError`, else `Error`) with that class's
+ * fields. No named class carries an `errorClass`; any other error carries the result's class
+ * (`custody-predecessor-unknown` and the other run supervisor classes) unless it is one Node threw without one.
  */
 export function runUnitErrorOf(result) {
   const error = result?.error ?? {};
@@ -173,6 +173,13 @@ export function runUnitErrorOf(result) {
       ...(error.code !== undefined ? { code: error.code } : {}),
       ...(error.phase !== undefined ? { phase: error.phase } : {}),
     });
+  } else if (error.tag === 'HolderLockError') {
+    // A holder-lock driver failure: the shape of src/holder-lock/protocol.mjs's HolderLockError, which this lower
+    // layer cannot import; its `precondition` category is what the CLI exits by.
+    thrown = new Error(error.message);
+    thrown.name = 'HolderLockError';
+    thrown.code = error.code;
+    thrown.category = 'precondition';
   } else {
     thrown = new Error(error.message ?? 'run-unit failed');
     if (error.code !== undefined) thrown.code = error.code;

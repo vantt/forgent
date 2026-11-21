@@ -47,6 +47,9 @@ pub const REQUEST_OPTIONS: [&str; 27] = [
 pub enum ErrorTag {
     CaseAdmissionRefusedError,
     RunnerConfigError,
+    /// A failure of the holder-lock driver (`src/holder-lock/protocol.mjs`): `code` is the facade's code
+    /// (`lock-driver-unavailable`, `lock-order-violation`, ...).
+    HolderLockError,
     /// Any other error: the caller reads `errorClass` and the message only.
     Error,
 }
@@ -56,6 +59,7 @@ impl ErrorTag {
         match self {
             Self::CaseAdmissionRefusedError => "CaseAdmissionRefusedError",
             Self::RunnerConfigError => "RunnerConfigError",
+            Self::HolderLockError => "HolderLockError",
             Self::Error => "Error",
         }
     }
@@ -64,6 +68,7 @@ impl ErrorTag {
         [
             Self::CaseAdmissionRefusedError,
             Self::RunnerConfigError,
+            Self::HolderLockError,
             Self::Error,
         ]
         .into_iter()
@@ -146,12 +151,17 @@ impl RunUnitError {
         self
     }
 
-    /// A `DispatchError` of the run supervisor: its code is its class, its details its fields.
+    /// A `DispatchError` of the run supervisor: its code is its class, its details its fields. A holder-lock
+    /// driver failure it carries keeps that class as its tag.
     pub fn dispatch(error: &fgos_run_supervisor::controller::error::DispatchError) -> Self {
         let mut out = Self::other(&error.code, error.message.clone());
         out.code = Some(error.code.clone());
         out.fields = error.detail.clone();
-        out.fields.insert("name".into(), json!("DispatchError"));
+        if error.holder_lock {
+            out.tag = ErrorTag::HolderLockError;
+        } else {
+            out.fields.insert("name".into(), json!("DispatchError"));
+        }
         out
     }
 

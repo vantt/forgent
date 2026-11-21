@@ -68,7 +68,7 @@ pub fn cwd_dev_ino(cwd: &Path) -> Option<String> {
 /// The lock file of `cwd` under `fgos_dir`; an error naming the missing key when `cwd` does not exist.
 pub fn lock_path(fgos_dir: &Path, cwd: &Path) -> Result<PathBuf, DispatchError> {
     let key = cwd_dev_ino(cwd).ok_or_else(|| {
-        DispatchError::new(
+        DispatchError::holder_lock(
             "lock-path-param-missing",
             format!("lock {LOCK_NAME} needs cwdDevIno to resolve <fgosDir>/locks/dispatch-cwd--<cwdDevIno>.lock"),
         )
@@ -98,7 +98,7 @@ fn holder_pid_of(lock: &Path) -> Option<u32> {
 /// the holder when another dispatch has it, `worker-spawn-fail` when `cwd` does not exist.
 pub fn acquire_dispatch_cwd_lock(fgos_dir: &Path, cwd: &Path) -> Result<Handle, DispatchError> {
     let scope = LockScope::seeded(Vec::new())
-        .map_err(|e| DispatchError::new("lock-registry-invalid", e.to_string()))?;
+        .map_err(|e| DispatchError::holder_lock("lock-registry-invalid", e))?;
     acquire_dispatch_cwd_lock_in(&scope, fgos_dir, cwd, &[])
 }
 
@@ -142,18 +142,18 @@ pub fn acquire_dispatch_cwd_lock_in(
     }
     scope
         .assert_can_acquire(LOCK_NAME)
-        .map_err(|e| DispatchError::new("lock-order-violation", e.to_string()))?;
+        .map_err(|e| DispatchError::holder_lock("lock-order-violation", e))?;
     let lock = lock_path(fgos_dir, cwd)?;
     if let Some(parent) = lock.parent() {
         fs::create_dir_all(parent).map_err(|e| {
-            DispatchError::new("lock-driver-unavailable", format!("{LOCK_NAME}: {e}"))
+            DispatchError::holder_lock("lock-driver-unavailable", format!("{LOCK_NAME}: {e}"))
         })?;
     }
     let mut resource = Resource::new(LOCK_NAME, lock.clone());
     resource.predecessor_kinds = predecessor_kinds.to_vec();
     match acquire(&resource, Mode::Ex, Wait::Try, DEFAULT_KILL_WAIT_MS) {
         Acquire::Acquired(handle) => Ok(handle),
-        Acquire::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain } => Err(DispatchError::new(
+        Acquire::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain } => Err(DispatchError::holder_lock(
             "lock-predecessor-domain-not-empty",
             format!(
                 "{LOCK_NAME}: the previous holder's domain is still not empty after the kill wait ({})",
@@ -165,7 +165,7 @@ pub fn acquire_dispatch_cwd_lock_in(
             Err(dispatch_in_flight_error(cwd, holder_pid_of(&lock), &lock))
         }
         Acquire::Unavailable { reason, detail } => {
-            Err(DispatchError::new("lock-driver-unavailable", format!("{LOCK_NAME}: {detail}"))
+            Err(DispatchError::holder_lock("lock-driver-unavailable", format!("{LOCK_NAME}: {detail}"))
                 .with("reason", json!(reason.as_str())))
         }
     }

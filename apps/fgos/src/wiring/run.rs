@@ -340,7 +340,8 @@ impl RunRequestHost for RunMachine<'_> {
 
 /// The refusal of an error of the Node class `class`, exiting as Node's CLI exited for it (`EXIT_CODES[categoryOf
 /// (err)]`, `bin/fgos.mjs`): `RunnerConfigError` and `CaseAdmissionRefusedError`, which extends it, carry the
-/// `validation` category. No other class `fgos run` can end in carries one (`RunRequestError`, `TypeError`,
+/// `validation` category; `HolderLockError`, a holder-lock driver failure on the custody path, carries
+/// `precondition`. No other class `fgos run` can end in carries one (`RunRequestError`, `TypeError`,
 /// `DispatchError`, `SeatResolutionError`, `SeatBindingError`, `YamlParseError`, the confinement errors, a file system
 /// error), so each exits as unexpected.
 fn refusal_of_class(class: &str, message: String) -> CategorisedRefusal {
@@ -348,6 +349,7 @@ fn refusal_of_class(class: &str, message: String) -> CategorisedRefusal {
         "RunnerConfigError" | "CaseAdmissionRefusedError" => {
             CategorisedRefusal::new("validation", message)
         }
+        "HolderLockError" => CategorisedRefusal::new("precondition", message),
         _ => CategorisedRefusal::unexpected(message),
     }
 }
