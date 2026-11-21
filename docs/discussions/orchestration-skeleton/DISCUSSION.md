@@ -11,6 +11,7 @@ discussion: open
 - 2026-11-21 16:35: đã xác định 4 bản sửa của OS-D1 (nguồn: memory `orchestration-stabilize-first-decision` của secretary Miu và tin supervisor gửi Miu sáng 2026-11-21: "1547 first, then the idle-lead nudge, then the names, then the reaper"): `p-l22vozecxg`, `p-waxzxz5mio`, `p-mhwe24fttr`, `p-yqanenewb4`. **Cả 4 đã `done`** (xem §7 `#related`). Điều kiện đậu theo chữ của OS-D1 đã thỏa, nhưng release hold ("no new work until the release hold is lifted", handoff secretary 14:45) vẫn còn hiệu lực. Discussion vẫn `paused` cho tới khi chủ dự án cho mở lại.
 - **2026-11-21 16:16: chủ dự án cho mở lại (OS-D2).** Trạng thái `discussion: open`. Architecture panel (T0) vẫn hoãn. Release hold không bị ảnh hưởng vì discussion không sinh code.
 - **2026-11-21 16:23 (round 6):** chủ dự án trả lời câu hỏi round 5 là "cả hai": mọi thành phần phải có authority, boundary và contract rõ, **và** hệ thống cần một cơ chế hoặc một vai làm nhạc trưởng nắm nhịp điều phối tổng. Câu hỏi mở thành §3 row 9: nhạc trưởng, hay mọi thứ chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan theo chuỗi watcher -> ghi signal -> phản ứng tiếp. Đang chạy 5 agent con (haiku, chỉ đọc) dò lại tier 0 tới 9 từ dưới lên; kết quả sẽ vào bảng §3 row 4b.
+- **2026-11-21 22:21 (round 35): chủ dự án hỏi guide khác plan thế nào và "khung" là gì.** Làm rõ ở §3 4o bằng thuật ngữ có sẵn của `docs/platform/workflow/spec.md` §2.2; chữ "khung" trong discussion này đã dùng lẫn hai nghĩa, đề xuất dùng đúng nghĩa của spec. Đang chờ chủ dự án xác nhận định nghĩa trước khi chọn A/B/C.
 - **2026-11-21 22:25 (round 34): chủ dự án đồng ý thứ tự surface port -> OS-D20; hàng 7 rõ.** OS-D19 (handoff) giữ, chủ dự án không phản đối. Bàn hàng 5 (ngôn ngữ khung) ở §3 4o. Đang hỏi: plan là khung hay là một ca chạy trong khung.
 - **2026-11-21 22:15 (round 33): bàn hàng 7 (surface port).** Sáu port của plan nháp multica soát lại với các quyết định mới ở §3 4n: còn bốn port, đề xuất thứ tự. Đang hỏi: thứ tự, và xác nhận OS-D19.
 - **2026-11-21 22:10 (round 32): chủ dự án chọn C -> OS-D18 (sleep); hàng 4 rõ.** Handoff "đóng phiếu này, mở phiếu kia" ghi OS-D19 tạm chốt (chủ dự án chưa nói riêng, chờ phản đối nếu có). Kế tiếp: hàng 7 (surface port), rồi hàng 5 (ngôn ngữ khung).
@@ -348,6 +349,19 @@ Nguồn: `plans/261118-1117-external-ui-integration-multica/plan.md` (nháp, sá
 
 *Nhận xét:* sau OS-D9 tới OS-D19, giữ nhịp không đọc ngôn ngữ khung nào; nó chỉ đọc bản ghi lập lịch (`item`, `step`, `waitingOn`, `needs`, `outcome`). Câu "một ngôn ngữ khung" (SR-D9) vì vậy là câu về harness và domain, không còn chặn skeleton.
 
+*Làm rõ thuật ngữ (round 35, theo `docs/platform/workflow/spec.md` §2.2, không đặt nghĩa mới):*
+
+| Thuật ngữ | Là gì | Ai viết, khi nào | Ví dụ |
+|---|---|---|---|
+| **Guide** | Cách làm **một loại việc** của một domain: milestone (mốc phải có bằng chứng, ai chấp nhận), activity (mỗi cái chỉ một pattern), decision point (MUST, SHOULD có lý do, MAY instead), guard MUST, `frameDefaults`. Không biết việc cụ thể nào. | Steward của domain, một lần, sửa qua vòng học (§7.7) | `coding/feature`, `marketing/content-publish` |
+| **Plan** | Mô tả **một việc cụ thể**: đích, phạm vi, phase kèm file đụng tới, phụ thuộc, tiêu chí xong, status. Spec gọi là "sản phẩm trung gian đầu vào, không cấp authority". Với portfolio, plan là sự thật về việc đã định và trạng thái của nó (`work-data-model`). | Planner, mỗi việc một lần | `plans/261120-0625-work-data-model/` |
+| **Khung được duyệt** (approved frame) | Phạm vi và ngân sách **của một ca**, đặt lúc chủ dự án duyệt: kết quả dự định, non-goal, hiệu ứng được phép và điểm consent, rigor floor, hạn mức đếm được (số dispatch, lượt ghi, lệch trước khi hỏi). `propose` tính nó từ `frameDefaults` của guide và các mảnh của plan. | Mã tính, chủ dự án duyệt, mỗi ca một lần | `--frame` của `workflow start` |
+| **Case** | Một lần chạy guide cho một plan, dưới khung được duyệt; ledger event append-only. | Harness | `.fgos/workflow-runs/wf-run-…` |
+
+Ví dụ quán phở: guide là quy trình nấu phở của quán; plan là đơn của bàn 5 (hai tô tái, một tô không hành); khung được duyệt là "tối đa 20 phút, nguyên liệu trong tủ, đổi món phải hỏi khách"; case là lần nấu đơn đó.
+
+*Chỗ discussion này dùng lẫn:* SR-D9 gọi "Frame" là "đường rộng + checkpoint", tức phần **guide** (đường đi và mốc); còn spec workflow và AGENTS.md ("tự quyết trong khung đã duyệt") dùng "khung" cho **khung được duyệt** (phạm vi + ngân sách của một ca). Đề xuất: từ đây "khung" chỉ mang nghĩa của spec; phần đường đi và mốc gọi là guide. Hệ quả cho hàng 5: "một ngôn ngữ khung" thực chất là một ngôn ngữ **guide**. plan-v1 không phải ngôn ngữ guide mà là định dạng mô tả việc; Work step FSM là đường cũ đang chờ rút (N12). Nên không có ba ngôn ngữ cạnh tranh, mà có một ngôn ngữ guide, một định dạng plan, và một đường cũ.
+
 *Câu còn mở: plan là gì so với guide.*
 - **(A) Guide là khung duy nhất; plan tan vào case.** Phase của plan thành step và unit trong file case; plan-v1 bỏ. Một hình dạng, nhưng đổi sự thật portfolio vừa chốt ở `work-data-model` và mọi người đọc plan.
 - **(B) Giữ hai ngôn ngữ, mỗi bên tự chiếu bản ghi lập lịch.** Rẻ, nhưng giữ hai harness (lead chạy phase bằng `fgos run`, case chạy bằng workflow), trái SR-D9.
@@ -422,6 +436,7 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 - 2026-11-21 22:10 round 32: Chủ dự án: "Đồng ý C". Mint OS-D18; ghi handoff thành OS-D19 tạm chốt vì câu trả lời không nói riêng về nó. Hàng 4 rõ.
 - 2026-11-21 22:15 round 33: Bàn hàng 7. Đọc lại plan nháp multica (sáu port); soát ở §3 4n.
 - 2026-11-21 22:25 round 34: Chủ dự án: "đồng ý". Mint OS-D20; OS-D19 giữ vì không bị phản đối. Bàn hàng 5: đọc discussion `workflow-engine` (mô hình hai tầng, D1), `work-data-model` (plan-v1 là sự thật portfolio), `docs/platform/workflow/spec.md` (N12, N16, §7.8 propose); phân tích ở §3 4o.
+- 2026-11-21 22:21 round 35: Chủ dự án: "cần làm rõ guide và plan khác nhau như nào, và khung theo em hiểu là gì (định nghĩa của em là gì)". Đọc `docs/platform/workflow/spec.md` §2.2, §7.8, `domains/coding/workflows/feature.yaml`, `bugfix.yaml`; ghi bảng thuật ngữ ở §3 4o và nhận lỗi dùng lẫn hai nghĩa của "khung".
 
 ## 6. Thiết kế đã chốt {#design}
 
