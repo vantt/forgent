@@ -12,6 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { isAssessmentRequired } from './agent-result-claim-contract.mjs';
 import { nativeDoor } from '../../native/door.mjs';
+import { withLegacyView } from '../../native/execution-door.mjs';
 
 /**
  * An extensible copy of a settled (frozen) result that keeps its accessors (`status`, `confidence`) and
@@ -636,27 +637,6 @@ export function normalizeRunResultV3({
   };
 
   return withLegacyView(finalRunResult);
-}
-
-/**
- * A version-3 record with the legacy `status` and `confidence` read from its classification; assigning either
- * replaces the reading with the assigned value.
- */
-function withLegacyView(record) {
-  const view = (name, read) => Object.defineProperty(record, name, {
-    get: read,
-    set(v) { Object.defineProperty(this, name, { value: v, writable: true, configurable: true, enumerable: true }); },
-    enumerable: false,
-    configurable: true,
-  });
-  view('status', function status() {
-    if (this.classification?.outcome?.category === 'ok') return 'done';
-    if (this.classification?.outcome?.category === 'blocked') return 'blocked';
-    if (this.classification?.confidence?.level === 'no-evidence') return 'no-evidence';
-    return 'failed';
-  });
-  view('confidence', function confidence() { return this.classification?.confidence?.level ?? null; });
-  return record;
 }
 
 /**

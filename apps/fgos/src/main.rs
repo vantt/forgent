@@ -492,8 +492,7 @@ fn main() {
 
     match lane {
         Lane::HookProtocol(_) => unreachable!("a hook kind ends the process above"),
-        // A native verb the registry still hands to the payload on this platform takes the same lane.
-        Lane::Legacy if route.route_kind == "legacy-cli" || routing::handed_to_legacy(route) => {
+        Lane::Legacy if route.route_kind == "legacy-cli" => {
             // Check recursion guard immediately. Fails closed if already set.
             if let Err(err) = legacy_exec::check_recursion_guard() {
                 eprintln!("fgos: error: {}", err);

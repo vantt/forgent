@@ -117,11 +117,10 @@ export function declared(field, positional = [], flags = {}) {
 
 /**
  * Whether the registry marks this invocation as served only by the native host (the whole verb, or its first
- * positional). A native verb whose `legacyOn` names this platform is still served here: the host hands it over.
+ * positional).
  */
-export function isNativeInvocation(entry, positional = [], platform = process.platform) {
-  if (entry?.native === true) return !(entry.legacyOn ?? []).includes(platform);
-  return Array.isArray(entry?.native) && entry.native.includes(positional[0]);
+export function isNativeInvocation(entry, positional = []) {
+  return entry?.native === true || (Array.isArray(entry?.native) && entry.native.includes(positional[0]));
 }
 
 export const COMMAND_REGISTRY = [
@@ -2035,9 +2034,6 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
     native: true,
-    // On Windows the Git door holds no custody yet, so a writing unit run cannot commit through the host: the host
-    // hands the whole verb to this payload there.
-    legacyOn: ['win32'],
     guide: {
       changes: 'Writes the run record under .fgos/assignments/<unitRunId>/ and runs an agent CLI headless, which spends that account\'s quota. Read-only for your files unless --writes: then it commits only those paths, in a linked worktree, after a passing round.',
       prerequisites: 'At least one supported agent CLI installed and signed in (`fgos doctor` shows which). An activated project (`fgctl init`). --writes needs a linked worktree.',

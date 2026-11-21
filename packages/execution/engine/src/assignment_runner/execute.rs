@@ -17,6 +17,7 @@ use std::path::{Path, PathBuf};
 use fgos_execution::bind::BindSession;
 use fgos_execution::decide::CheckoutFacts;
 use fgos_execution::dispatch_policy::launch_pin_of;
+use fgos_execution::executor_model::with_default_executor;
 use fgos_execution::handoff::sha256_hex;
 use fgos_execution::ports::Machine;
 use fgos_run_supervisor::controller::error::DispatchError;
@@ -211,20 +212,6 @@ fn text(value: &Value, key: &str) -> Option<String> {
 
 fn absolute(path: &Path) -> PathBuf {
     std::path::absolute(path).unwrap_or_else(|_| path.to_path_buf())
-}
-
-/// Why a mutating attempt cannot launch from this route on this platform. On Windows a lock does not pass to a
-/// child with its handle: the controller keeps the cwd lease and serves its request channel to the supervisor
-/// (`cwdLeaseOwner`, [`super::launch::serving_lease_owner`]), but a writing unit run is not yet proven end to end on
-/// native Windows (the Git door takes no borrowed custody there), so Windows mutating launches stay on the Node
-/// route until it is.
-pub fn mutating_launch_refusal(windows: bool) -> Option<DispatchError> {
-    windows.then(|| {
-        DispatchError::new(
-            "windows-cwd-lease-holder-missing",
-            "a mutating attempt cannot launch from the native route on Windows: the controller has no cwd lease holder endpoint to name to the supervisor (cwdLeaseOwner); Windows runs it through the Node launch route",
-        )
-    })
 }
 
 fn json_text(value: &Value) -> String {
@@ -422,10 +409,12 @@ pub fn execute_assignment(
                 .map_err(config_error)?,
         ),
     };
-    let cfg = match &opts.runner_config {
+    // The legacy default `runner.executor` layered onto the registry, as Node's executeAssignment does: the bound
+    // executor's launch fields come from it where it stands in for `claude` or its own command.
+    let cfg = with_default_executor(&match &opts.runner_config {
         Some(cfg) => cfg.clone(),
         None => ports.load_runner_config(&root)?,
-    };
+    });
 
     // Storage setup under .fgos/assignments/<assignmentId>/
     let fgos_dir = ports.fgos_dir_of_root(&root);
@@ -575,15 +564,6 @@ pub fn execute_assignment(
         .with("executorId", json!(resolved_executor_id))
         .with("capability", capability.clone())
         .into());
-    }
-    if effective_mutation == "mutating" {
-        if let Some(refusal) = mutating_launch_refusal(cfg!(windows)) {
-            return Err(refusal
-                .with("cwd", json!(cwd_text))
-                .with("executorId", json!(resolved_executor_id))
-                .with("capability", capability.clone())
-                .into());
-        }
     }
     let timeout_ms = opts
         .timeout_ms

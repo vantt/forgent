@@ -140,7 +140,8 @@ jobs:
 
   # A writing attempt on native Windows: the controller holds the cwd lease in its own process and serves its
   # request channel (cwdLeaseOwner); the real supervisor declares its job there before GO and a stub agent writes
-  # its file. Then a Ctrl-Break to a controller's process group cancels its attempts as SIGINT does on Unix.
+  # its file. Then a Ctrl-Break to a controller's process group cancels its attempts as SIGINT does on Unix, and
+  # `fgos run --writes` goes through the host, not a Node route.
   windows-cwd-lease-owner:
     name: windows cwd lease owner
     runs-on: windows-latest
@@ -159,6 +160,25 @@ jobs:
 
       - name: A Ctrl-Break cancels the controller's attempts
         run: cargo test --release -p fgos-run-supervisor --test windows_cancel_on_ctrl_break -- --nocapture
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure git identity for fixture repos
+        run: |
+          git config --global user.email "ci@example.com"
+          git config --global user.name "CI"
+
+      # `fgos run` is served by the host on Windows too; a writing run stops at the Config crate's Windows refusal
+      # (config-platform-unsupported) before any unit run and commits nothing.
+      - name: fgos run --writes is served by the host on Windows
+        shell: bash
+        run: node scripts/run-tests.mjs test/cli/run-verb.test.mjs
 
   # The Git door's custody on native Windows, one step per proof. The first step is measured evidence: how a
   # LockFileEx lock behaves when its handle is duplicated, used through the copy or inherited, which decides

@@ -19,7 +19,7 @@ import { executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityI
 import { workUnitFor } from './work-dispatch.mjs';
 import { isReadOnlyAssignment, validateAgentResultClaim } from './dispatch/assignment.mjs';
 import { isSubstantiveReportText, resolveRunWorkerArtifactPath } from './dispatch/assignment-runner.mjs';
-import { runUnit } from './execution/run.mjs';
+import { runUnitInHost } from '../native/execution-door.mjs';
 import { loadRunnerConfigForDir } from './dispatch/config.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { interpretRunResult, runOutcome } from './dispatch/run-result.mjs';
@@ -2324,7 +2324,7 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
         && !ref.includes('\\') && !ref.includes('\0') && !ref.split('/').includes('..'));
     const unitData = { ...built.unitData, inputs: [...new Set([...callerRefs, ...built.unitData.inputs])] };
 
-    const unitRun = await runUnit({
+    const unitRun = await runUnitInHost({
       unitData,
       // The one config of this step: the unit's capability and prefer came from it too.
       runnerConfig: cfg,
@@ -2333,11 +2333,12 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
       repoRoot: stateRoot,
       cwd: built.worktree,
       worktree: built.worktree,
-      caseAdmission: createCaseAdmissionPort({ repoRoot: stateRoot }),
       // An operation step chooses no persona, seat or capability and may raise nothing.
       raiseAuthorized: false,
       // A background step: no Lead to fall back on, and the worker runs as a direct spawn.
       session: { headless: true, herdrPresent: false },
+    }, {
+      caseAdmission: createCaseAdmissionPort({ repoRoot: stateRoot }),
       ...(opts.onUnitRunCreated ? { onUnitRunCreated: opts.onUnitRunCreated } : {}),
     });
     // The producer seat's own RunResult (the last attempt, after any fallback), never the

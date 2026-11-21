@@ -2406,12 +2406,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         return await runDispatchCli(rawArgv, { returnResult: true });
       }
       if (sub === 'probe-session') {
-        // Dispatch holds no execution door: the probe's seat runs through the same `runUnit` as `fgos run`, admitted
-        // the same way (the port is injected here, Execution never imports the Workflow).
+        // Dispatch holds no execution door: the probe's seat runs through the host's unit run as `fgos run` does,
+        // admitted the same way (the port is injected here, Execution never imports the Workflow).
         const { runDispatchCli } = await import('../src/runner/dispatch/cli.mjs');
-        const { runUnit } = await import('../src/runner/execution/run.mjs');
+        const { runUnitInHost } = await import('../src/native/execution-door.mjs');
         const { createCaseAdmissionPort } = await import('../src/workflow/case-admission-port.mjs');
-        const executionDoor = (options) => runUnit({ ...options, caseAdmission: createCaseAdmissionPort({ repoRoot: options.repoRoot }) });
+        const executionDoor = (options) => runUnitInHost(options, { caseAdmission: createCaseAdmissionPort({ repoRoot: options.repoRoot }) });
         return await runDispatchCli(rawArgv, { returnResult: true, executionDoor });
       }
       const repoRootForDispatch = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
@@ -2521,29 +2521,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         });
       }
     }
-    case 'run': {
-      const { runUnit, resolveGitRoots } = await import('../src/runner/execution/run.mjs');
-      const { buildRunRequest } = await import('../src/runner/execution/run-request.mjs');
-      const { createCaseAdmissionPort, activityUnitOf, confinedWriteRefusal } = await import('../src/workflow/case-admission-port.mjs');
-      // The Workflow's case port is injected so the Execution Core never imports the Workflow.
-      const request = buildRunRequest(flags, positional, {
-        cwd: process.cwd(),
-        gitRoots: resolveGitRoots,
-        caseAdmission: { createPort: createCaseAdmissionPort, activityUnitOf, confinedWriteRefusal },
-      });
-      const runWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
-      try {
-        return attachDirWarning(await runUnit(request), runWarning);
-      } catch (err) {
-        if (err instanceof RunnerConfigError && err.code && !err.message.includes(err.code)) {
-          err.message = `${err.code}: ${err.message}`;
-        }
-        throw err;
-      }
-    }
-
-
-
     case 'rebuild': {
       const { rebuildStoreUseCase } = await import('../src/verbs/events/rebuild.mjs');
       return rebuildStoreUseCase(eventStoreContext(dir));

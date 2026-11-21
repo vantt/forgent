@@ -18,6 +18,7 @@ import {
   CaseAdmissionRefusedError,
   RunnerConfigError,
   runUnitErrorOf,
+  DispatchError,
   serveAdmissionPeer,
 } from '../../src/native/execution-door.mjs';
 import { RunnerConfigError as DispatchRunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
@@ -164,7 +165,9 @@ test('a native run-unit error result is rethrown as the Node class its tag names
   }
 
   const dispatch = runUnitErrorOf({ ok: false, error: { tag: 'Error', errorClass: 'lease-conflict', code: 'lease-conflict', message: 'held', fields: { name: 'DispatchError', cwd: '/w' } } });
+  assert.ok(dispatch instanceof DispatchError, 'a DispatchError-tagged result is rethrown as the one DispatchError class');
   assert.deepEqual([dispatch.name, dispatch.errorClass, dispatch.code, dispatch.cwd], ['DispatchError', 'lease-conflict', 'lease-conflict', '/w']);
+  assert.deepEqual(dispatch.data, { cwd: '/w', code: 'lease-conflict' }, 'its details ride in data, as the constructor keeps them');
 });
 
 test('the peer entry the host starts serves the Workflow port of the main checkout over its stdin and stdout', async () => {

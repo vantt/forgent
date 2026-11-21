@@ -958,6 +958,10 @@ fn the_attempt_lock_is_lent_to_the_supervisor_and_the_controller_closes_its_copy
 struct RefusalPorts {
     plan: Value,
     checkout: FakeCheckout,
+    /// The project's runner config as the port loads it.
+    config: Value,
+    /// The config the loop handed the decision door.
+    decided_with: RefCell<Option<Value>>,
 }
 
 impl SeatPorts for RefusalPorts {
@@ -1008,14 +1012,15 @@ impl ExecutePorts for RefusalPorts {
         unreachable!("a refused run leases nothing")
     }
     fn load_runner_config(&self, _: &Path) -> Result<Value, RunnerConfigError> {
-        Ok(json!({ "executors": { "stub": { "kind": "agent", "command": "stub" } } }))
+        Ok(self.config.clone())
     }
     fn decided_dispatch_plan(
         &self,
-        _: &Value,
+        cfg: &Value,
         _: &Value,
         _: &ExecuteOptions,
     ) -> Result<Value, RunnerConfigError> {
+        *self.decided_with.borrow_mut() = Some(cfg.clone());
         Ok(self.plan.clone())
     }
     fn posture_requirement(&self, _: &Value, _: &Value) -> Value {
@@ -1063,15 +1068,25 @@ fn declared(mutation: &str) -> Value {
     })
 }
 
-fn refused(plan: Value, assignment: &Value, options: ExecuteOptions) -> (ExecuteError, PathBuf) {
-    let root = scratch("refused");
-    let ports = RefusalPorts {
+fn refusal_ports(plan: Value, config: Value, root: &Path) -> RefusalPorts {
+    RefusalPorts {
         plan,
         checkout: FakeCheckout {
             main: root.to_string_lossy().into(),
             root: Some(root.to_string_lossy().into()),
         },
-    };
+        config,
+        decided_with: RefCell::new(None),
+    }
+}
+
+fn refused(plan: Value, assignment: &Value, options: ExecuteOptions) -> (ExecuteError, PathBuf) {
+    let root = scratch("refused");
+    let ports = refusal_ports(
+        plan,
+        json!({ "executors": { "stub": { "kind": "agent", "command": "stub" } } }),
+        &root,
+    );
     let options = ExecuteOptions {
         cwd: Some(root.clone()),
         repo_root: Some(root.clone()),
@@ -1080,6 +1095,56 @@ fn refused(plan: Value, assignment: &Value, options: ExecuteOptions) -> (Execute
     let error = execute_assignment(assignment, &options, &ports, &mut |_, _| {})
         .expect_err("the run is refused");
     (error, root)
+}
+
+#[test]
+fn a_direct_run_launches_claude_with_the_legacy_default_executor_layered_onto_the_registry() {
+    // The project's legacy default `executor` runs the same program as the registry's `claude` entry, and the seat
+    // is bound to `claude`: the launch fields the loop hands its ports are the default's, layered over the entry.
+    let root = scratch("default-executor");
+    let ports = refusal_ports(
+        json!({ "mechanism": "unavailable", "blockedReason": "stop after the decision", "policy": {} }),
+        json!({
+            "executor": { "command": "claude", "args": ["--print", "--from-default"] },
+            "executors": { "claude": { "kind": "agent", "command": "claude", "args": ["--from-registry"] } },
+        }),
+        &root,
+    );
+    let assignment = json!({
+        "assignmentId": "a1", "role": "producer", "operation": "op", "mutation": "read-only",
+        "provenance": { "kind": "declared", "binding": { "executor": "claude" } },
+    });
+    let options = ExecuteOptions {
+        cwd: Some(root.clone()),
+        repo_root: Some(root.clone()),
+        ..ExecuteOptions::default()
+    };
+    let _ = execute_assignment(&assignment, &options, &ports, &mut |_, _| {})
+        .expect_err("the stub decision stops the run");
+    let cfg = ports
+        .decided_with
+        .borrow()
+        .clone()
+        .expect("the loop asked the decision door");
+    let claude = fgos_execution::executor_config::resolve_executor_config(
+        &cfg,
+        Some("claude"),
+        None,
+        None,
+        None,
+    )
+    .expect("claude resolves from the layered config");
+    assert_eq!(claude["command"], json!("claude"), "{claude}");
+    assert_eq!(
+        claude["args"],
+        json!(["--print", "--from-default"]),
+        "{claude}"
+    );
+    assert_eq!(
+        claude["kind"],
+        json!("agent"),
+        "the entry keeps its own other fields"
+    );
 }
 
 #[test]
@@ -1518,18 +1583,6 @@ mod end_to_end {
             fgos_holder_lock::probe(&lease).unwrap(),
             fgos_holder_lock::Probe::Free
         );
-    }
-
-    #[test]
-    fn a_mutating_launch_is_refused_by_name_where_no_cwd_lease_holder_can_be_named() {
-        let refusal = mutating_launch_refusal(true).expect("Windows refuses");
-        assert_eq!(refusal.code, "windows-cwd-lease-holder-missing");
-        assert!(
-            refusal.message.contains("Node launch route"),
-            "{}",
-            refusal.message
-        );
-        assert!(mutating_launch_refusal(false).is_none());
     }
 
     #[test]

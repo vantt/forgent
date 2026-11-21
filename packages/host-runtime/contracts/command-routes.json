@@ -1333,9 +1333,6 @@
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
-    "legacy_on": [
-      "win32"
-    ],
     "accepted_flags": [
       "dir",
       "json",
