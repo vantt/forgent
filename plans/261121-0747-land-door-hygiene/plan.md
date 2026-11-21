@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "A land leaves no candidate behind and a paths land never leaves main ahead"
-status: running
+status: done
 lead: lead:LANDDOOR
 base: ec34f897a3fce57fd986a92b0b2803f41d6253ab
 priority: P1
@@ -32,7 +32,7 @@ A successful `fgos land <branch>` releases its candidate worktree; a paths land 
 - A dead writer's pre-attempt chain blocks prepare by design (land-abandoned-writer-mismatch, tested); `fgos git recover` by another writer already clears it. Only the message is wrong.
 
 ## Prior art reused
-`acknowledge_land`, `release_dead_writer_land`, `fgos git recover`/`status` retainedLand, the branch land RemoteMoved retry. Missing: an undo of an own unpublished paths commit.
+`acknowledge_land`, `release_dead_writer_land`, `fgos git recover`/`status` retainedLand, the branch land RemoteMoved retry. SafeRestore was tried first and cannot go backward without discarding the main checkout's other local changes (restore-target-not-descendant). Added: `undo_unpublished_commit`, the one door that moves the main checkout's branch back.
 
 ## Non-goals
 No new verb, no change to the floor probe (a full disk only fails it when the record is stale after a release; described in the report).
@@ -46,11 +46,11 @@ No new verb, no change to the floor probe (a full disk only fails it when the re
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | Successful land releases its candidate | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, packages/git/rust/src/land.rs | 1 | running |
-| 2 | Paths land undoes its rejected commit and retries | 1 | packages/supervision/rust/src/land.rs, packages/git/rust/src/land.rs, tests, census, spec | 2 | draft |
+| 1 | Successful land releases its candidate | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs | 1 | done |
+| 2 | Paths land undoes its rejected commit and retries | 1 | packages/supervision/rust/src/land.rs, packages/git/rust/src/land.rs, tests, census, spec | 2 | done |
 
 ## Owner questions
-None open; the undo mechanism for phase 2 is asked of the supervisor.
+None open. The supervisor allowed the undo door when landing paths through the branch candidate proved large.
 
 ## Risks and rollback
 - Risk: acknowledging after publish fails on a held lock; it is non-fatal and recover mops up. Rollback: git revert.
