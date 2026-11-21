@@ -458,7 +458,10 @@ fn a_new_backlog_item_is_created_validated_and_indexed_in_one_commit(scene: &Sce
         index.contains("[p-abcdefghi2](backlog/p-abcdefghi2-first-item.md) | First item | proposed | P2"),
         "{index}"
     );
-    assert_eq!(git(&scene.project, &["status", "--porcelain"]), "");
+    assert_eq!(
+        git(&scene.project, &["status", "--porcelain", "--", "plans"]),
+        ""
+    );
 
     // A second item joins the same index; replacing the first keeps one row each.
     let second = "plans/backlog/p-bcdefghij2-second.md";
@@ -482,6 +485,42 @@ fn a_new_backlog_item_is_created_validated_and_indexed_in_one_commit(scene: &Sce
     let nested = scene.write("plans/backlog/sub/p-efghij2345-deep.md", "x\n");
     assert_eq!(nested["code"], "path-not-granted", "{nested}");
     assert_eq!(scene.remote_tip(), tip, "nothing was published");
+
+    // A refused new item leaves no file, so the same path retried with valid content is published.
+    assert!(!scene.project.join("plans/backlog/p-cdefghij23-broken.md").exists());
+    assert!(!scene.project.join("plans/backlog/wrong-name.md").exists());
+    let retry = scene.write(
+        "plans/backlog/p-cdefghij23-broken.md",
+        &item_text("p-cdefghij23", "Fixed"),
+    );
+    assert_eq!(retry["result"], "done", "{retry}");
+    assert!(retry["data"]["commit"].is_string(), "{retry}");
+
+    // A duplicate id is refused by the portfolio check and leaves no file behind.
+    let tip = scene.remote_tip();
+    let dup = scene.write(
+        "plans/backlog/p-cdefghij23-again.md",
+        &item_text("p-cdefghij23", "Again"),
+    );
+    assert_eq!(dup["data"]["publish"]["refusal"], "write-item-invalid", "{dup}");
+    assert!(!scene.project.join("plans/backlog/p-cdefghij23-again.md").exists());
+    assert_eq!(scene.remote_tip(), tip);
+
+    // An untracked stray item file never reaches the committed index.
+    fs::write(
+        scene.project.join("plans/backlog/p-stray23456-stray.md"),
+        item_text("p-stray23456", "Stray"),
+    )
+    .unwrap();
+    let last = scene.write(
+        "plans/backlog/p-fghij23456-last.md",
+        &item_text("p-fghij23456", "Last"),
+    );
+    assert_eq!(last["result"], "done", "{last}");
+    let commit = last["data"]["commit"].as_str().expect("published");
+    let committed = git(&scene.project, &["show", &format!("{commit}:plans/backlog.md")]);
+    assert!(committed.contains("p-fghij23456"), "{committed}");
+    assert!(!committed.contains("p-stray23456"), "{committed}");
 }
 
 /// A virtual clock: `sleep` advances it, so the retry schedule is proven without waiting.

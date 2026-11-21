@@ -344,11 +344,44 @@ fn backlog_item_name(path: &str) -> Option<&str> {
         .filter(|name| name.ends_with(".md") && !name.contains('/'))
 }
 
+/// The backlog item paths the index of the main checkout tracks, read through the Git door.
+fn tracked_item_paths(
+    checkout: &Checkout,
+) -> Result<std::collections::HashSet<String>, PublishRefusal> {
+    let mut tracked = std::collections::HashSet::new();
+    let mut cursor = None;
+    for _ in 0..MAX_STATUS_PAGES {
+        let page = checkout
+            .driver
+            .tracked_paths(&checkout.repo, cursor, STATUS_PAGE)
+            .map_err(|e| refusal("write-status-unreadable", e.cause))?;
+        tracked.extend(
+            page.entries
+                .iter()
+                .filter_map(|p| std::str::from_utf8(p).ok())
+                .filter(|p| backlog_item_name(p).is_some())
+                .map(str::to_owned),
+        );
+        if page.complete {
+            return Ok(tracked);
+        }
+        cursor = page.next_cursor;
+    }
+    Err(refusal(
+        "write-status-unreadable",
+        "the checkout tracks too many paths to read",
+    ))
+}
+
 /// Before a backlog item file is committed: it must hold the item frontmatter contract and sit at its convention path
-/// `plans/backlog/<id>-<slug>.md` (`write-item-invalid` otherwise, the file stays written and uncommitted). Then the
+/// `plans/backlog/<id>-<slug>.md` (`write-item-invalid` otherwise; the request takes back a file it created). Then the
 /// index `plans/backlog.md` is regenerated from the whole portfolio and written atomically, so one commit carries the
 /// item and its index. Returns the index path when its content changed.
-fn refresh_backlog_index(main: &Path, path: &str) -> Result<Option<String>, PublishRefusal> {
+fn refresh_backlog_index(
+    checkout: &Checkout,
+    path: &str,
+) -> Result<Option<String>, PublishRefusal> {
+    let main = checkout.main.as_path();
     let invalid = |detail: String| refusal("write-item-invalid", detail);
     let text = std::fs::read_to_string(main.join(path))
         .map_err(|e| refusal("write-path-unreadable", format!("{path}: {e}")))?;
@@ -373,8 +406,39 @@ fn refresh_backlog_index(main: &Path, path: &str) -> Result<Option<String>, Publ
         },
     )
     .map_err(|e| refusal("write-index-failed", e.to_string()))?;
-    let index =
-        portfolio::generate_backlog_index(&report.items, &report.discussions, &report.plans);
+    // The index lists the items Git tracks and the one being committed, never a stray file of the working tree.
+    let tracked = tracked_item_paths(checkout)?;
+    let counts = |rel: &Path| {
+        let rel = rel.to_string_lossy();
+        rel == path || tracked.contains(rel.as_ref())
+    };
+    let items: Vec<_> = report
+        .items
+        .iter()
+        .filter(|it| counts(&it.rel_path))
+        .cloned()
+        .collect();
+    // A report error about an item file the index leaves out is not this write's to refuse.
+    let mut errors: Vec<String> = report
+        .errors
+        .iter()
+        .filter(|e| {
+            !e.strip_prefix("plans/backlog/")
+                .and_then(|rest| rest.split_once(": "))
+                .is_some_and(|(name, _)| !counts(Path::new("plans/backlog").join(name).as_path()))
+        })
+        .cloned()
+        .collect();
+    let mut seen = std::collections::HashSet::new();
+    for it in &items {
+        if !seen.insert(it.id.as_str()) {
+            errors.push(format!("duplicate-id: backlog id '{}' is used twice", it.id));
+        }
+    }
+    if !errors.is_empty() {
+        return Err(invalid(errors.join("; ")));
+    }
+    let index = portfolio::generate_backlog_index(&items, &report.discussions, &report.plans);
     let index_path = main.join(BACKLOG_INDEX);
     if std::fs::read_to_string(&index_path).is_ok_and(|current| current == index) {
         return Ok(None);
@@ -406,7 +470,7 @@ fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, 
     };
     let mut paths = vec![path.to_owned()];
     if backlog_item_name(path).is_some() {
-        if let Some(index) = refresh_backlog_index(&checkout.main, path)? {
+        if let Some(index) = refresh_backlog_index(&checkout, path)? {
             paths.push(index);
         }
     }

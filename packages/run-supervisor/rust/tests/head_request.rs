@@ -1680,21 +1680,29 @@ fn head_write_under_a_directory_grant_refuses_a_nested_path_a_climbing_path_and_
 }
 
 #[test]
-fn head_write_creates_nothing_for_an_exact_grant_whose_file_is_missing() {
-    let served = serve(
-        "write-exact-missing",
-        DONE_LINE,
-        Ok(true),
-        &[WRITE_VERB],
-        Duration::from_secs(5),
-    );
-    write_project(&served.dir);
+fn head_write_refuses_a_base_for_a_file_that_does_not_exist_yet_and_takes_back_a_created_file_the_publisher_judged_invalid() {
+    let publish = Publish::default();
+    let served = write_served("write-create-base", &publish);
+    let path = "plans/backlog/p-based.md";
     let reply = write_request(
         &served.socket,
-        json!({"path": "docs/missing.md", "content": "x"}),
+        json!({"path": path, "content": "x\n", "base": stub_oid("old\n")}),
     );
-    assert_eq!(reply["code"], "not-a-file", "{reply}");
-    assert!(!served.dir.join("docs/missing.md").exists());
+    assert_eq!(reply["code"], "write-base-stale", "{reply}");
+    assert!(!served.dir.join(path).exists());
+    assert!(publish.calls.lock().unwrap().is_empty(), "nothing was asked of the publisher");
+
+    let invalid = Publish {
+        commit: Err(PublishRefusal {
+            code: "write-item-invalid".into(),
+            detail: "no frontmatter".into(),
+        }),
+        ..Publish::default()
+    };
+    let served = write_served("write-create-invalid", &invalid);
+    let reply = write_request(&served.socket, json!({"path": path, "content": "x\n"}));
+    assert_eq!(reply["data"]["publish"]["refusal"], "write-item-invalid", "{reply}");
+    assert!(!served.dir.join(path).exists(), "a refused new file is not left behind");
 }
 
 #[test]

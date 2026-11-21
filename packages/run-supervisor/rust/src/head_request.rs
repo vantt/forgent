@@ -846,7 +846,15 @@ fn write_and_publish(cfg: &Config, args: &Value) -> Outcome {
     // catch-up below may move.
     let read_oid = || (cfg.path_oid)(&cfg.cwd, rel);
     let expected = match (existed, base) {
-        (false, _) => None,
+        (false, Some(_)) => {
+            return Outcome::Refused {
+                code: "write-base-stale",
+                detail: Some(format!(
+                    "{rel} does not exist, so a write cannot be based on an earlier content; write it without a base"
+                )),
+            }
+        }
+        (false, None) => None,
         (true, Some(base)) => Some(base.to_owned()),
         (true, None) => match read_oid() {
             Ok(oid) => Some(oid),
@@ -923,9 +931,26 @@ fn write_and_publish(cfg: &Config, args: &Value) -> Outcome {
                 loggable(rel),
                 loggable(&why.code)
             ));
+            // A file this request created and the publisher refused before committing anything is taken back, so
+            // the path is free for a retry (it would otherwise be refused `write-path-dirty`).
+            if !existed && REFUSED_BEFORE_COMMIT.contains(&why.code.as_str()) {
+                remove_created(&cfg.cwd, rel);
+            }
             json!({"path": rel, "bytes": bytes, "publish": {"refusal": why.code, "detail": why.detail}})
         }
     })
+}
+
+/// The publish refusals raised before the publisher commits or lands anything: the content was judged invalid, nothing
+/// of it is in Git.
+const REFUSED_BEFORE_COMMIT: [&str; 2] = ["write-item-invalid", "write-index-failed"];
+
+/// Removes the file `rel` this request created, reached through the same no-symlink check as the write; a failure
+/// leaves it for the dirty-path refusal to report.
+fn remove_created(root: &Path, rel: &str) {
+    if open_granted(root, rel, false).is_ok() {
+        let _ = std::fs::remove_file(root.join(rel));
+    }
 }
 
 enum Outcome {
