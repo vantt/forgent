@@ -12,4 +12,4 @@ pub use operations::{
 pub use provider::{
     ConventionOperation, ConventionProvider, ConventionRequest, CONVENTION_DESCRIPTOR,
 };
-pub use rules::{packaged_rules, Cardinality, Posture, Rule, RuleError, RuleSet, RuleShape};
+pub use rules::{discussion_root, packaged_rules, Cardinality, Posture, Rule, RuleError, RuleSet, RuleShape};

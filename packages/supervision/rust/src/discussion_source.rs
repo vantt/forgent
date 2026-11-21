@@ -10,9 +10,8 @@
 //! shows the flips it brought in, at the merge, and a root commit is read like any other: a discussion first committed
 //! there goes from `none` to its state.
 //!
-//! A discussion is read under both roots it has had in history: `plans/discussions/ds-<id>-<topic>/` (its
-//! `status:` frontmatter, or the marker) and `docs/discussions/<topic>/`. Both name the same discussion by its topic,
-//! so the move between them is no flip.
+//! A discussion is read under the convention rule's root, `plans/discussions/ds-<id>-<topic>/` (its `status:`
+//! frontmatter, or the marker); the topic names it.
 //!
 //! Per discussion the state starts as `none`. A commit that changes the path and carries a readable marker whose value
 //! differs from the state emits one record and moves the state. A commit that leaves the marker alone, drops it, or
@@ -37,20 +36,6 @@ const ATTR_FROM: &str = "fgos.discussion.from";
 const ATTR_TO: &str = "fgos.discussion.to";
 const ATTR_PATH: &str = "fgos.discussion.path";
 const NONE_STATE: &str = "none";
-/// The root a discussion lived under before the portfolio data model. History keeps it for good.
-const LEGACY_DISCUSSION_ROOT: &str = "docs/discussions";
-
-/// The roots a discussion has lived under, current first: the convention rule's root, then the earlier one.
-fn discussion_roots() -> Vec<String> {
-    let current = fgos_convention::packaged_rules()
-        .by_kind("discussion")
-        .and_then(|rule| rule.roots.first())
-        .map(|root| root.trim_end_matches('/').to_owned());
-    current
-        .into_iter()
-        .chain([LEGACY_DISCUSSION_ROOT.to_owned()])
-        .collect()
-}
 const DISCUSSION_FILE: &str = "DISCUSSION.md";
 const MARKER_LINES: usize = 12;
 const WALK_COMMITS: usize = 1_000_000;
@@ -95,9 +80,7 @@ impl<H: DiscussionHistory> DiscussionSource<H> {
     /// is the state before it, so the window only filters what is returned.
     pub fn records(&self, window: &Window) -> Result<Vec<Record>, String> {
         let window = ParsedWindow::parse(window)?;
-        let mut prefixes = discussion_roots();
-        prefixes.push("plans/reports".to_owned());
-        let prefixes: Vec<&str> = prefixes.iter().map(String::as_str).collect();
+        let prefixes = [fgos_convention::discussion_root(), "plans/reports"];
         let commits = self.history.commits(&prefixes)?;
         let mut states: HashMap<String, String> = HashMap::new();
         let mut out = Vec::new();
@@ -195,13 +178,10 @@ fn topic_of_dir(name: &str) -> &str {
 /// The discussion a path belongs to: the topic of its directory under a discussion root, or the stem of a shaping
 /// report.
 fn subject_of(path: &str) -> Option<&str> {
-    for root in discussion_roots() {
-        let Some(rest) = path
-            .strip_prefix(root.as_str())
-            .and_then(|rest| rest.strip_prefix('/'))
-        else {
-            continue;
-        };
+    if let Some(rest) = path
+        .strip_prefix(fgos_convention::discussion_root())
+        .and_then(|rest| rest.strip_prefix('/'))
+    {
         let (dir, file) = rest.split_once('/')?;
         return (file == DISCUSSION_FILE && !dir.is_empty()).then(|| topic_of_dir(dir));
     }
@@ -421,10 +401,12 @@ mod tests {
 
     #[test]
     fn subject_is_the_discussion_dir_or_the_report_stem() {
-        assert_eq!(subject_of("docs/discussions/a/DISCUSSION.md"), Some("a"));
         assert_eq!(subject_of("plans/reports/shaping-x.md"), Some("shaping-x"));
-        assert_eq!(subject_of("docs/discussions/a/b/DISCUSSION.md"), None);
-        // The moved discussion keeps its topic, so the move between the two roots is one subject.
+        assert_eq!(
+            subject_of("plans/discussions/ds-abcdefghij-a/b/DISCUSSION.md"),
+            None
+        );
+        assert_eq!(subject_of("docs/discussions/a/DISCUSSION.md"), None);
         assert_eq!(
             subject_of("plans/discussions/ds-abcdefghij-a/DISCUSSION.md"),
             Some("a")

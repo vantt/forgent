@@ -711,7 +711,10 @@ fn test_classify_backlog_ref_reads_each_id_shape_once() {
         ("STR12", BacklogRef::Legacy),
         ("wf-some-flow", BacklogRef::Legacy),
         ("p-XYZ", BacklogRef::Invalid),
-        ("docs/discussions/x/DISCUSSION.md", BacklogRef::NotBacklog),
+        (
+            "plans/discussions/ds-aaaaaaaaaa-x/DISCUSSION.md",
+            BacklogRef::NotBacklog,
+        ),
     ] {
         assert_eq!(portfolio::classify_backlog_ref(src), want, "{src}");
     }

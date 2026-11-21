@@ -123,7 +123,10 @@ fn flips(records: &[Record]) -> Vec<(String, String, String)> {
         .collect()
 }
 
-const D1: &str = "docs/discussions/d1/DISCUSSION.md";
+const D1: &str = "plans/discussions/ds-aaaaaaaaaa-d1/DISCUSSION.md";
+const D2: &str = "plans/discussions/ds-bbbbbbbbbb-d2/DISCUSSION.md";
+const OLD: &str = "plans/discussions/ds-cccccccccc-old/DISCUSSION.md";
+const OLD_NOTES: &str = "plans/discussions/ds-cccccccccc-old/notes.md";
 
 #[test]
 fn draft_then_settled_gives_two_flips_from_none() {
@@ -330,19 +333,11 @@ fn a_rename_emits_nothing_and_carries_the_state_to_the_new_path() {
     let repo = f.init("repo");
     commit_file(
         &repo,
-        "docs/discussions/old/notes.md",
+        OLD_NOTES,
         &format!("discussion: settled\n{BODY}"),
         "2026-11-02T00:00:00Z",
     );
-    git(
-        &repo,
-        &[
-            "mv",
-            "docs/discussions/old/notes.md",
-            "docs/discussions/old/DISCUSSION.md",
-        ],
-        None,
-    );
+    git(&repo, &["mv", OLD_NOTES, OLD], None);
     git(
         &repo,
         &["commit", "-q", "-m", "rename"],
@@ -353,7 +348,7 @@ fn a_rename_emits_nothing_and_carries_the_state_to_the_new_path() {
     assert_eq!(flips(&records), []);
     commit_file(
         &repo,
-        "docs/discussions/old/DISCUSSION.md",
+        OLD,
         &format!("discussion: settled\n{BODY}more\n"),
         "2026-11-04T00:00:00Z",
     );
@@ -365,14 +360,14 @@ fn a_rename_emits_nothing_and_carries_the_state_to_the_new_path() {
 fn a_rename_that_edits_the_marker_emits_no_flip() {
     let f = Fixture::new("rename-edit");
     let repo = f.init("repo");
-    let (old, new) = (D1, "docs/discussions/d2/DISCUSSION.md");
+    let (old, new) = (D1, D2);
     commit_file(
         &repo,
         old,
         &format!("discussion: draft\n{BODY}"),
         "2026-11-02T00:00:00Z",
     );
-    fs::create_dir_all(repo.join("docs/discussions/d2")).unwrap();
+    fs::create_dir_all(repo.join("plans/discussions/ds-bbbbbbbbbb-d2")).unwrap();
     git(&repo, &["mv", old, new], None);
     fs::write(repo.join(new), format!("discussion: settled\n{BODY}")).unwrap();
     git(&repo, &["add", "."], None);

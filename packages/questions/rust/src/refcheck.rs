@@ -82,22 +82,6 @@ fn exists(root: &Path, relative: &str) -> bool {
     root.join(relative).exists()
 }
 
-/// Where discussions live: the portfolio root (`ds-<id>-<topic>/`), then the earlier root some checkouts still
-/// carry until their migration runs (`fgos migrate portfolio`). The earlier root goes when every checkout has moved.
-const LEGACY_DISCUSSION_ROOT: &str = "docs/discussions";
-
-/// The discussion roots, current first: the convention rule's root, then the earlier one.
-fn discussion_roots() -> Vec<String> {
-    let current = fgos_convention::packaged_rules()
-        .by_kind("discussion")
-        .and_then(|rule| rule.roots.first())
-        .map(|root| root.trim_end_matches('/').to_owned());
-    current
-        .into_iter()
-        .chain([LEGACY_DISCUSSION_ROOT.to_owned()])
-        .collect()
-}
-
 /// The topic of a discussion directory: the name after its `ds-<10 characters>-` id.
 fn topic_of_dir(name: &str) -> &str {
     match name.strip_prefix("ds-") {
@@ -106,16 +90,16 @@ fn topic_of_dir(name: &str) -> &str {
     }
 }
 
-/// A discussion exists when a directory of that topic is under one of the discussion roots, with or without its id.
+/// A discussion exists when a directory of that topic is under the convention rule's discussion root, with or
+/// without its id.
 fn discussion_exists(root: &Path, topic: &str) -> bool {
-    discussion_roots().iter().any(|dir| {
-        exists(root, &format!("{dir}/{topic}"))
-            || std::fs::read_dir(root.join(dir)).is_ok_and(|entries| {
-                entries
-                    .filter_map(Result::ok)
-                    .any(|entry| topic_of_dir(&entry.file_name().to_string_lossy()) == topic)
-            })
-    })
+    let dir = fgos_convention::discussion_root();
+    exists(root, &format!("{dir}/{topic}"))
+        || std::fs::read_dir(root.join(dir)).is_ok_and(|entries| {
+            entries
+                .filter_map(Result::ok)
+                .any(|entry| topic_of_dir(&entry.file_name().to_string_lossy()) == topic)
+        })
 }
 
 fn phase_file_exists(root: &Path, dir: &str, nn: &str) -> bool {
