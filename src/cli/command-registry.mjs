@@ -1778,7 +1778,7 @@ export const COMMAND_REGISTRY = [
       exitCodes: [
         '0 done, or nothing to change',
         '4 refused: unknown sub-command or option',
-        '1 failed',
+        '1 failed, or the run finished but the portfolio check still reports errors',
       ],
       next: 'fgos convention check --all.',
     },

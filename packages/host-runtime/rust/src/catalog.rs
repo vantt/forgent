@@ -528,7 +528,7 @@ mod tests {
     #[test]
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
-        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run the init run and the migrate portfolio run, the dispatch decide and explain, the unit run, the agents list, the supervision tick, supervisor read and write, land and slots, and the resource-check run.
+        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run, the init run, the migrate portfolio run, the dispatch decide and explain, the unit run, the agents list, the supervision tick, supervisor read and write, land and slots, and the resource-check run.
         assert_eq!(CATALOG.len(), 46);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
