@@ -6,7 +6,15 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { STATUSES, activeOverlaps, checkAll, checkPlanDir, main } from '../../scripts/plan-contract-check.mjs';
+import {
+  BACKLOG_SOURCE_REQUIRED_FROM,
+  STATUSES,
+  activeOverlaps,
+  checkAll,
+  checkPlanDir,
+  main,
+  resolveLegacyStatus,
+} from '../../scripts/plan-contract-check.mjs';
 
 const SCRIPT = fileURLToPath(new URL('../../scripts/plan-contract-check.mjs', import.meta.url));
 const SHA = 'a'.repeat(40);
@@ -48,22 +56,36 @@ test('a missing key and a missing section are each named', () => {
 
 test('a marked plan created on or after the cutoff requires a backlog source id; an older one is exempt', () => {
   const olderPlan = planText({ fm: { created: '2026-11-21', source: '["DISCUSSION.md"]' } });
-  const newPlanBad = planText({ fm: { created: '2026-11-22', source: '["DISCUSSION.md"]' } });
-  const newPlanGood = planText({ fm: { created: '2026-11-22', source: '["DISCUSSION.md", "p-abc1234567"]' } });
-  const r = root({ older: olderPlan, bad: newPlanBad, good: newPlanGood });
+  const newPlanBad = planText({ fm: { created: BACKLOG_SOURCE_REQUIRED_FROM, source: '["DISCUSSION.md"]' } });
+  const newPlanShort = planText({ fm: { created: BACKLOG_SOURCE_REQUIRED_FROM, source: '["DISCUSSION.md", "p-1"]' } });
+  const newPlanGood = planText({ fm: { created: BACKLOG_SOURCE_REQUIRED_FROM, source: '["DISCUSSION.md", "p-abcdef2345"]' } });
+  const r = root({ older: olderPlan, bad: newPlanBad, short: newPlanShort, good: newPlanGood });
 
   assert.deepEqual(checkPlanDir(path.join(r, 'older')).errors, []);
 
   const badErrors = checkPlanDir(path.join(r, 'bad')).errors;
   assert.ok(badErrors.some((e) => e.includes('source must cite at least one backlog id')));
 
+  const shortErrors = checkPlanDir(path.join(r, 'short')).errors;
+  assert.ok(shortErrors.some((e) => e.includes('source must cite at least one backlog id')));
+
   assert.deepEqual(checkPlanDir(path.join(r, 'good')).errors, []);
 });
 
+test('resolveLegacyStatus maps partial->draft and deferred->withdrawn and its first-word fallback', () => {
+  assert.equal(resolveLegacyStatus('partial'), 'draft');
+  assert.equal(resolveLegacyStatus('deferred'), 'withdrawn');
+  assert.equal(resolveLegacyStatus('partial (phase 1)'), 'draft');
+  assert.equal(resolveLegacyStatus('deferred until later'), 'withdrawn');
+  assert.equal(resolveLegacyStatus('constructor'), undefined);
+});
+
 test('a legacy status is refused with the contract value to write', () => {
-  const r = root({ bad: planText({ fm: { status: 'in-progress' } }) });
+  const r = root({ bad: planText({ fm: { status: 'in-progress' } }), ctor: planText({ fm: { status: 'constructor' } }) });
   const { errors } = checkPlanDir(path.join(r, 'bad'));
   assert.ok(errors.some((e) => e.includes('"in-progress"') && e.includes('write "running"')));
+  const { errors: ctorErrors } = checkPlanDir(path.join(r, 'ctor'));
+  assert.ok(ctorErrors.some((e) => e.includes('"constructor"') && !e.includes('write')));
 });
 
 test('footprint and base are required once a plan is ready', () => {

@@ -21,6 +21,8 @@ import { PLAN_SECTIONS, hasSection } from '../src/portfolio/plan-sections.mjs';
 ensureAddonForScript();
 
 export const CONTRACT_MARKER = 'plan-v1';
+// Plans already under the contract before this rule cite no backlog id; only plans created from this date on must.
+export const BACKLOG_SOURCE_REQUIRED_FROM = '2026-11-22';
 // The plan vocabulary has one source, shared with the Rust portfolio reader and the head-name resolver.
 const VOCABULARY = JSON.parse(fs.readFileSync(new URL('../packages/supervision/contracts/plan-vocabulary.v1.json', import.meta.url), 'utf8'));
 export const STATUSES = VOCABULARY.statuses;
@@ -34,15 +36,17 @@ export const LEGACY_STATUS = {
 export function resolveLegacyStatus(status) {
   if (typeof status !== 'string') return undefined;
   const s = status.trim();
-  if (LEGACY_STATUS[s]) return LEGACY_STATUS[s];
+  if (Object.hasOwn(LEGACY_STATUS, s)) return LEGACY_STATUS[s];
   const firstWord = s.split(/[\s(]/)[0];
-  return LEGACY_STATUS[firstWord];
+  return Object.hasOwn(LEGACY_STATUS, firstWord) ? LEGACY_STATUS[firstWord] : undefined;
 }
 const PRIORITIES = VOCABULARY.priorities;
 const TABLE_COLUMNS = VOCABULARY.tableColumns;
 
 // An Identity role: `<kind>:<name>`, e.g. `lead:S6A` or `head:lead-forgent-261119-1142-supervisor-l`.
 const LEAD_ROLE = /^[a-z]+:[A-Za-z0-9][A-Za-z0-9._-]*$/;
+// A backlog item id minted by Identity: `p-` plus 10 lowercase base32 characters.
+const BACKLOG_ID = /^p-[a-z2-7]{10}$/;
 
 const strings = (v) => Array.isArray(v) && v.every((s) => typeof s === 'string' && s.trim() !== '');
 
@@ -205,8 +209,8 @@ export function checkPlanDir(dir, { plansRoot = path.dirname(path.resolve(dir)) 
   else for (const b of meta.blockedBy) if (!fs.existsSync(path.join(plansRoot, b, 'plan.md'))) errors.push(`blockedBy names unknown plan ${b}`);
   if (!Array.isArray(meta.source) || !strings(meta.source)) {
     errors.push('source must be a list of paths or backlog ids');
-  } else if (typeof meta.created === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(meta.created) && meta.created >= '2026-11-22') {
-    const hasBacklogId = meta.source.some((s) => /^p-[a-z0-9]+$/.test(s));
+  } else if (typeof meta.created === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(meta.created) && meta.created >= BACKLOG_SOURCE_REQUIRED_FROM) {
+    const hasBacklogId = meta.source.some((s) => BACKLOG_ID.test(s));
     if (!hasBacklogId) {
       errors.push('source must cite at least one backlog id (p-...)');
     }
