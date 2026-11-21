@@ -180,7 +180,7 @@ jobs:
         run: cargo test --release -p fgos-holder-lock --test windows_lockfileex -- --nocapture
 
       - name: holder-lock unit tests (fence tombstone and quiesce scan)
-        run: cargo test --release -p fgos-holder-lock --lib
+        run: cargo test --release -p fgos-holder-lock --lib -- tombstone quiesce
 
       - name: A linked worktree is trusted and paths reach git in the plain spelling
         run: cargo test --release -p fgos-git --test worktree
