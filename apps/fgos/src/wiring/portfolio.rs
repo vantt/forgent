@@ -212,8 +212,9 @@ pub fn check_body_sections(body: &str) -> Vec<&'static str> {
 /// Parses a backlog item markdown file.
 pub fn parse_backlog_item(rel_path: &Path, text: &str) -> Result<BacklogItem, PortfolioRefusal> {
     let path_str = rel_path.to_string_lossy().to_string();
-    let (front, body) = split_frontmatter(text)
-        .ok_or_else(|| PortfolioRefusal::FrontmatterMissing(format!("{path_str}: no frontmatter")))?;
+    let (front, body) = split_frontmatter(text).ok_or_else(|| {
+        PortfolioRefusal::FrontmatterMissing(format!("{path_str}: no frontmatter"))
+    })?;
 
     let doc = parse(front.as_bytes(), Profile::Tool, &path_str)
         .map_err(|e| PortfolioRefusal::FrontmatterInvalid(format!("{path_str}: {e:?}")))?;
@@ -331,8 +332,9 @@ pub fn parse_backlog_item(rel_path: &Path, text: &str) -> Result<BacklogItem, Po
 /// Parses a discussion markdown file.
 pub fn parse_discussion(rel_path: &Path, text: &str) -> Result<Discussion, PortfolioRefusal> {
     let path_str = rel_path.to_string_lossy().to_string();
-    let (front, _) = split_frontmatter(text)
-        .ok_or_else(|| PortfolioRefusal::FrontmatterMissing(format!("{path_str}: no frontmatter")))?;
+    let (front, _) = split_frontmatter(text).ok_or_else(|| {
+        PortfolioRefusal::FrontmatterMissing(format!("{path_str}: no frontmatter"))
+    })?;
 
     let doc = parse(front.as_bytes(), Profile::Tool, &path_str)
         .map_err(|e| PortfolioRefusal::FrontmatterInvalid(format!("{path_str}: {e:?}")))?;
@@ -480,9 +482,21 @@ pub fn format_backlog_item(
     let yaml_str = String::from_utf8(bytes)
         .map_err(|e| PortfolioRefusal::FrontmatterInvalid(format!("{e:?}")))?;
 
-    let why_body = if why.trim().is_empty() { "..." } else { why.trim() };
-    let done_body = if done_when.trim().is_empty() { "..." } else { done_when.trim() };
-    let notes_body = if notes.trim().is_empty() { "..." } else { notes.trim() };
+    let why_body = if why.trim().is_empty() {
+        "..."
+    } else {
+        why.trim()
+    };
+    let done_body = if done_when.trim().is_empty() {
+        "..."
+    } else {
+        done_when.trim()
+    };
+    let notes_body = if notes.trim().is_empty() {
+        "..."
+    } else {
+        notes.trim()
+    };
 
     let formatted = format!(
         "---\n{}---\n\n# Why\n\n{}\n\n# Done when\n\n{}\n\n# Notes\n\n{}\n",
@@ -492,7 +506,10 @@ pub fn format_backlog_item(
 }
 
 /// Safely creates a new backlog item file.
-pub fn create_item(repo_root: &Path, req: &CreateItemRequest) -> Result<ItemResult, PortfolioRefusal> {
+pub fn create_item(
+    repo_root: &Path,
+    req: &CreateItemRequest,
+) -> Result<ItemResult, PortfolioRefusal> {
     let id = match &req.id {
         Some(id) => id.clone(),
         None => random(RandomKind::Backlog)?,
@@ -525,15 +542,7 @@ pub fn create_item(repo_root: &Path, req: &CreateItemRequest) -> Result<ItemResu
     let notes = req.notes.as_deref().unwrap_or("...");
 
     let content = format_backlog_item(
-        &id,
-        &req.title,
-        status,
-        priority,
-        area,
-        created,
-        why,
-        done_when,
-        notes,
+        &id, &req.title, status, priority, area, created, why, done_when, notes,
     )?;
 
     let tmp_path = full_dir.join(format!(".tmp-{id}-{}.tmp", std::process::id()));
@@ -569,9 +578,8 @@ pub fn edit_item(repo_root: &Path, req: &EditItemRequest) -> Result<ItemResult, 
         }
     }
 
-    let filename = target_file.ok_or_else(|| {
-        PortfolioRefusal::ItemNotFound(format!("item '{}' not found", req.id))
-    })?;
+    let filename = target_file
+        .ok_or_else(|| PortfolioRefusal::ItemNotFound(format!("item '{}' not found", req.id)))?;
 
     let full_path = backlog_dir.join(&filename);
     let rel_path = PathBuf::from("plans").join("backlog").join(&filename);
@@ -598,7 +606,11 @@ pub fn edit_item(repo_root: &Path, req: &EditItemRequest) -> Result<ItemResult, 
         notes,
     )?;
 
-    let tmp_path = backlog_dir.join(format!(".tmp-edit-{}-{}.tmp", parsed.id, std::process::id()));
+    let tmp_path = backlog_dir.join(format!(
+        ".tmp-edit-{}-{}.tmp",
+        parsed.id,
+        std::process::id()
+    ));
     fs::write(&tmp_path, &content)?;
     fs::rename(&tmp_path, &full_path)?;
 
@@ -772,7 +784,8 @@ pub fn check_portfolio(
                 let doc = parse(front.as_bytes(), Profile::Tool, &dir_name);
                 if let Ok(doc) = doc {
                     if let Value::Map(entries) = doc.value() {
-                        let get = |k: &str| entries.iter().find(|(key, _)| key == k).map(|(_, v)| v);
+                        let get =
+                            |k: &str| entries.iter().find(|(key, _)| key == k).map(|(_, v)| v);
                         let title = match get("title") {
                             Some(Value::Str(s)) => s.clone(),
                             _ => dir_name.clone(),
@@ -901,9 +914,12 @@ pub fn check_portfolio(
 
     // 7. Drift detection
     for it in &items {
-        let citing_plans: Vec<&PlanRef> = plans.iter().filter(|p| p.source.contains(&it.id)).collect();
-        let citing_discs: Vec<&Discussion> =
-            discussions.iter().filter(|d| d.source.contains(&it.id)).collect();
+        let citing_plans: Vec<&PlanRef> =
+            plans.iter().filter(|p| p.source.contains(&it.id)).collect();
+        let citing_discs: Vec<&Discussion> = discussions
+            .iter()
+            .filter(|d| d.source.contains(&it.id))
+            .collect();
 
         if it.status == "done" {
             for p in &citing_plans {

@@ -142,7 +142,11 @@ created: 2026-11-20
 # Discussion content
 "#;
 
-    let d = parse_discussion(Path::new("plans/discussions/ds-234567abcd-shaping/DISCUSSION.md"), text).unwrap();
+    let d = parse_discussion(
+        Path::new("plans/discussions/ds-234567abcd-shaping/DISCUSSION.md"),
+        text,
+    )
+    .unwrap();
     assert_eq!(d.id, "ds-234567abcd");
     assert_eq!(d.title, "Work data model");
     assert_eq!(d.status, "settled");
@@ -150,7 +154,10 @@ created: 2026-11-20
 
     let bad_status = text.replace("status: settled", "status: closed");
     let res_bad_status = parse_discussion(Path::new("bad.md"), &bad_status);
-    assert!(matches!(res_bad_status, Err(PortfolioRefusal::StatusUnknown(_))));
+    assert!(matches!(
+        res_bad_status,
+        Err(PortfolioRefusal::StatusUnknown(_))
+    ));
 
     let bad_id = text.replace("id: ds-234567abcd", "id: ds-bad_id!");
     let res_bad_id = parse_discussion(Path::new("bad.md"), &bad_id);
@@ -258,7 +265,9 @@ fn test_generate_backlog_index() {
     let pos_p1 = index.find("p-rw5iadsp2p").unwrap();
     assert!(pos_p0 < pos_p1, "P0 item must precede P1 item");
 
-    assert!(index.contains("[ds-234567abcd](discussions/ds-234567abcd-shaping/DISCUSSION.md) (open)"));
+    assert!(
+        index.contains("[ds-234567abcd](discussions/ds-234567abcd-shaping/DISCUSSION.md) (open)")
+    );
     assert!(index.contains("[261120-1200-plan](261120-1200-plan/plan.md) (running)"));
 }
 
@@ -266,7 +275,10 @@ fn test_generate_backlog_index() {
 fn test_check_portfolio_clean() {
     let dir = temp_dir("portfolio-check-clean");
     let backlog_dir = dir.join("plans").join("backlog");
-    let disc_dir = dir.join("plans").join("discussions").join("ds-234567abcd-disc");
+    let disc_dir = dir
+        .join("plans")
+        .join("discussions")
+        .join("ds-234567abcd-disc");
     let plan_dir = dir.join("plans").join("261120-0625-plan");
 
     fs::create_dir_all(&backlog_dir).unwrap();
@@ -358,7 +370,10 @@ Plan outcome
 #[test]
 fn test_check_portfolio_unknown_source() {
     let dir = temp_dir("portfolio-check-unknown-source");
-    let disc_dir = dir.join("plans").join("discussions").join("ds-234567abcd-disc");
+    let disc_dir = dir
+        .join("plans")
+        .join("discussions")
+        .join("ds-234567abcd-disc");
     fs::create_dir_all(&disc_dir).unwrap();
 
     let disc_text = r#"---
@@ -431,7 +446,10 @@ fn test_check_portfolio_in_flight_uncited() {
 #[test]
 fn test_check_portfolio_strict_missing_backlog_source() {
     let dir = temp_dir("portfolio-check-strict-missing-backlog");
-    let disc_dir = dir.join("plans").join("discussions").join("ds-234567abcd-disc");
+    let disc_dir = dir
+        .join("plans")
+        .join("discussions")
+        .join("ds-234567abcd-disc");
     fs::create_dir_all(&disc_dir).unwrap();
 
     let disc_text = r#"---
