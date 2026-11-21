@@ -531,8 +531,7 @@ fn today() -> String {
     let secs = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_or(0, |d| d.as_secs());
-    let (year, month, day) =
-        fgos_host_runtime::civil_time::civil_from_days((secs / 86_400) as i64);
+    let (year, month, day) = fgos_host_runtime::civil_time::civil_from_days((secs / 86_400) as i64);
     format!("{year:04}-{month:02}-{day:02}")
 }
 
