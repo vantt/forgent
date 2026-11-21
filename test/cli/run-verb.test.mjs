@@ -120,6 +120,7 @@ test('fgos run --writes commits the declared path through custody where the seat
   const run = spawnFgos(BIN_FGOS, ['run', 'Write the notes', '--capability', 'docs:write', '--writes', 'notes.md', '--worktree', worktree, '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
   if (process.platform === 'win32') {
     assert.equal(run.status, 4, run.stderr || run.stdout);
+    assert.ok(run.stdout, `no envelope; stderr: ${run.stderr}`);
     const { data } = JSON.parse(run.stdout);
     assert.equal(data.outcome, 'policy-refusal');
     assert.equal(data.results.at(-1).refused.reason, 'posture-unavailable');
