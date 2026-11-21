@@ -142,8 +142,29 @@ with `--workspace-only` identifies live fgOS payloads belonging to the activated
 The new controller retains `activation-v2.lock` and, until fenced, the old
 `activation.lock`. During first WAL-capable activation it atomically replaces
 the held old inode with the holder-lock `TOMBSTONE` directory (`by: fgos git`)
-and syncs it before publication. Placement currently requires Linux atomic
-exchange. Only Linux releases advertise `git-wal-v1` until C5 scan and fence admission exist on Windows. Windows activation without that claim remains supported; its lock-taking Git ports refuse `git-lockscope-unavailable-windows` (Q6). A claimed WAL capability on an unsupported platform refuses `git-wal-unsupported-platform`. WAL-open also checks the tombstone before writing records, so an activation published by an older controller cannot write until a new controller admits it. Old controllers meet `EISDIR`;
+and syncs it before publication. Linux places it with one atomic exchange. Win32
+has no atomic file-to-directory replace, so Windows places it in two steps that
+fail closed: the controller prepares the tombstone directory at a sibling name
+(record written and flushed), renames the held legacy file to a sibling aside
+name while still holding its lock (the lock file is opened with
+`FILE_SHARE_DELETE`, and the handle keeps its lock across the rename), then
+renames the prepared directory onto the legacy path without replace-existing.
+In the gap between the two renames an old contender either creates a file at the
+path, in which case the second rename fails and placement refuses with
+`legacy-fence-contended` (the contender won, nothing was published, the caller
+retries later, and the contender's file is never deleted), or it arrives after
+the second rename and finds a directory. A contender already blocked on the held
+file stands where it does on Linux after the exchange: it holds the moved file,
+and its relock-on-replace check finds a directory at the path. So an old
+controller can never open the WAL on either platform.
+`git-wal-v1` is admitted on Linux and Windows. On Windows the predecessor scan
+(`internal quiesce-scan`) reads each process's command line, working directory
+and user from the OS (an unreadable fact leaves the field empty, so the same
+unreadable rules apply as on Linux), compares paths in their plain drive
+spelling without regard to case, and treats `fgos.exe`, `node.exe` and the other
+runtimes by their program name without the `.exe`. A claimed WAL capability on a
+platform with neither (macOS) refuses `git-wal-unsupported-platform`. A
+Windows release that makes no claim stays activatable. WAL-open also checks the tombstone before writing records, so an activation published by an older controller cannot write until a new controller admits it. Old controllers meet `EISDIR` on Linux and a directory at the path on Windows;
 rollback goes through the new controller and never removes the fence or WAL.
 The original `.fgos/installation/activation.lock` tombstone remains intact.
 

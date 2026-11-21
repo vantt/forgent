@@ -214,10 +214,17 @@ fn verify_files(
     Ok(FilesVerified(()))
 }
 
-/// Phase-05 activation admission, independent of the installed target OS.
+/// Activation admission for the Git WAL capability, independent of the
+/// installed target OS. A linux-x64 release must carry the native addon with
+/// `git-wal-v1`; a windows-x64 release must too when it claims `git-wal-v1`
+/// (the claim is what makes the controller place the fence and open the WAL),
+/// and one that makes no claim stays activatable.
 pub fn require_git_addon(manifest: &ReleaseManifest) -> Result<(), VerificationError> {
-    if manifest.target.os == "linux"
-        && matches!(manifest.target.arch.as_str(), "x64" | "x86_64")
+    let os = manifest.target.os.as_str();
+    let claims_wal = manifest.capabilities.iter().any(|c| c == "git-wal-v1");
+    let required = matches!(manifest.target.arch.as_str(), "x64" | "x86_64")
+        && (os == "linux" || (os == "windows" && claims_wal));
+    if required
         && manifest
             .components
             .native_addon
@@ -225,10 +232,9 @@ pub fn require_git_addon(manifest: &ReleaseManifest) -> Result<(), VerificationE
             .is_none_or(|a| !a.capabilities.iter().any(|c| c == "git-wal-v1"))
     {
         return Err(VerificationError::Canonical(
-            CanonicalError::MalformedSegment(
-                "git-addon-missing: linux-x64 requires components.nativeAddon with git-wal-v1"
-                    .into(),
-            ),
+            CanonicalError::MalformedSegment(format!(
+                "git-addon-missing: {os}-x64 requires components.nativeAddon with git-wal-v1"
+            )),
         ));
     }
     Ok(())

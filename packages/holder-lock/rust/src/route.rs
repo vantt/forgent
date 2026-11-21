@@ -560,6 +560,27 @@ mod quiesce {
     }
     use fgos_process::facts::{scan as scan_processes, ProcView, Scan, ScanFilter};
 
+    /// Whether `path` lies inside `dir`. On Windows both are compared in
+    /// their plain drive spelling (a canonical path carries the `\\?\` prefix a
+    /// process's recorded directory does not) and without regard to case.
+    fn within(path: &Path, dir: &Path) -> bool {
+        #[cfg(windows)]
+        {
+            let plain = |p: &Path| {
+                PathBuf::from(
+                    fgos_process::path::plain_path(p)
+                        .to_string_lossy()
+                        .to_lowercase(),
+                )
+            };
+            plain(path).starts_with(plain(dir))
+        }
+        #[cfg(not(windows))]
+        {
+            path.starts_with(dir)
+        }
+    }
+
     /// A workspace root and the linked worktrees its caller listed.
     fn workspace_dirs(root: &Path, linked: &[PathBuf]) -> Vec<PathBuf> {
         let mut dirs = vec![root.canonicalize().unwrap_or_else(|_| root.to_path_buf())];
@@ -598,7 +619,7 @@ mod quiesce {
                 };
                 resolved
                     .map(|p| p.canonicalize().unwrap_or(p))
-                    .is_some_and(|p| dirs.iter().any(|d| p.starts_with(d)))
+                    .is_some_and(|p| dirs.iter().any(|d| within(&p, d)))
             })
         })
     }
@@ -618,6 +639,11 @@ mod quiesce {
             .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or("");
+        // A Windows program name carries its `.exe` and any letter case.
+        #[cfg(windows)]
+        let lowered = base.to_ascii_lowercase();
+        #[cfg(windows)]
+        let base = lowered.strip_suffix(".exe").unwrap_or(&lowered);
         crate::origin::is_script_runtime(base) || crate::origin::FGOS_BINARIES.contains(&base)
     }
 
@@ -637,7 +663,7 @@ mod quiesce {
         if !workspace_only && !could_be_fgos(cmdline) {
             return None;
         }
-        if cwd.is_some_and(|cwd| dirs.iter().any(|d| cwd.starts_with(d))) {
+        if cwd.is_some_and(|cwd| dirs.iter().any(|d| within(cwd, d))) {
             Some("cwd")
         } else if workspace_argument(cmdline.unwrap_or_default(), cwd, dirs) {
             Some("cmdline")
@@ -655,7 +681,14 @@ mod quiesce {
         view.effective_uid == Some(unsafe { libc::geteuid() })
     }
 
-    #[cfg(not(target_os = "linux"))]
+    /// On Windows `effective_uid` carries a digest of the token's user SID.
+    #[cfg(windows)]
+    fn same_user(view: &ProcView) -> bool {
+        view.effective_uid.is_some()
+            && view.effective_uid == fgos_process::facts::self_effective_uid()
+    }
+
+    #[cfg(not(any(target_os = "linux", windows)))]
     fn same_user(_view: &ProcView) -> bool {
         false
     }
@@ -666,16 +699,16 @@ mod quiesce {
         exclude: &[u32],
         workspace_only: bool,
     ) -> i32 {
-        if !cfg!(target_os = "linux") {
+        if !cfg!(any(target_os = "linux", windows)) {
             return emit(
                 Some("unavailable"),
-                json!({ "processes": [], "unreadable": 0, "detail": "process scan is only implemented on Linux; a person confirms no fgOS process is left" }),
+                json!({ "processes": [], "unreadable": 0, "detail": "process scan is only implemented on Linux and Windows; a person confirms no fgOS process is left" }),
                 EXIT_UNAVAILABLE,
             );
         }
         // Inside a PID namespace (a sandbox) every process outside it is
         // invisible: a scan from there could only ever look clean.
-        if !fgos_process::facts::pid_ns().is_initial {
+        if cfg!(target_os = "linux") && !fgos_process::facts::pid_ns().is_initial {
             return emit(
                 Some("unavailable"),
                 json!({ "processes": [], "unreadable": 0, "detail": "the scan runs inside a PID namespace that hides the host's processes; run it from the host" }),
@@ -755,8 +788,10 @@ mod quiesce {
     mod tests {
         use super::could_be_fgos;
         #[cfg(unix)]
-        use super::{workspace_argument, workspace_dirs, workspace_hit};
-        #[cfg(unix)]
+        use super::workspace_argument;
+        #[cfg(any(unix, windows))]
+        use super::{workspace_dirs, workspace_hit};
+        #[cfg(any(unix, windows))]
         use std::path::{Path, PathBuf};
 
         fn argv(parts: &[&str]) -> Vec<String> {
@@ -882,6 +917,65 @@ mod quiesce {
                 None,
                 "git is not fgOS outside workspace-only mode"
             );
+        }
+
+        #[cfg(windows)]
+        #[test]
+        fn a_recorded_windows_directory_matches_the_canonical_workspace_in_any_spelling() {
+            let base =
+                std::env::temp_dir().join(format!("fgos-quiesce-win-{}", std::process::id()));
+            let root = base.join("root");
+            std::fs::create_dir_all(root.join("sub")).unwrap();
+            let dirs = workspace_dirs(&root, &[]);
+            let plain = |p: &Path| fgos_process::path::plain_path(&p.canonicalize().unwrap());
+            let inside = plain(&root.join("sub"));
+            let shouting = PathBuf::from(inside.to_string_lossy().to_uppercase());
+            let outside = plain(&base);
+            for cwd in [&inside, &shouting] {
+                assert_eq!(
+                    workspace_hit(
+                        Some(&argv(&["C:\\tools\\FGOS.EXE", "run"])),
+                        Some(cwd),
+                        &dirs,
+                        false
+                    ),
+                    Some("cwd")
+                );
+                assert_eq!(
+                    workspace_hit(
+                        Some(&argv(&["node.exe", "bin\\fgos.mjs"])),
+                        Some(cwd),
+                        &dirs,
+                        false
+                    ),
+                    Some("cwd")
+                );
+                assert_eq!(
+                    workspace_hit(Some(&argv(&["cmd.exe"])), Some(cwd), &dirs, false),
+                    None,
+                    "an idle shell is not a writer"
+                );
+            }
+            assert_eq!(
+                workspace_hit(
+                    Some(&argv(&["fgos.exe", "run"])),
+                    Some(&outside),
+                    &dirs,
+                    false
+                ),
+                None
+            );
+            let dir_arg = inside.to_string_lossy().into_owned();
+            assert_eq!(
+                workspace_hit(
+                    Some(&argv(&["fgos.exe", "run", "--dir", &dir_arg])),
+                    Some(&outside),
+                    &dirs,
+                    false
+                ),
+                Some("cmdline")
+            );
+            std::fs::remove_dir_all(&base).unwrap();
         }
 
         #[test]

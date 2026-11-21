@@ -252,7 +252,17 @@ impl ActivationLockGuard {
                 "activation",
                 "fgos git",
                 &format_iso8601_utc(SystemTime::now()),
-            )?;
+            )
+            .map_err(|error| {
+                if error
+                    .to_string()
+                    .starts_with(fgos_holder_lock::tombstone::FENCE_CONTENDED)
+                {
+                    InitError::Custom(error.to_string())
+                } else {
+                    InitError::Io(error)
+                }
+            })?;
         }
         if !fgos_holder_lock::tombstone::is_tombstone(
             &workspace.join(".fgos/locks/activation.lock"),
