@@ -51,6 +51,13 @@ plan directory, then restart the lead (`fgos session start lead --name <headName
 table and `fgos request result`), park the plan with a reason in its phase table, or ask the owner. Only the supervisor
 stops a lead (`fgos session stop lead --name <headName> --reason "<why>"`); a lead never does.
 
+A live lead that makes no progress is replaced, never left alone. For `plan-no-progress` naming a plan with
+`leadLive: true`, the lead is alive but idle (a live idle lead raises no `lead-ended`, and `fgos session start` only
+fronts the live holder, so a bare start changes nothing): run `fgos session stop lead --name <headName> --reason "idle
+with unfinished phases"`, then `fgos session start lead --name <headName>`. The new lead resumes from the phase table.
+A plan whose phases are all `done` is closed instead (Done plans). `already-live`, from a wake or a start, is never the
+whole answer to `plan-no-progress`.
+
 ## Done plans
 
 Close a `done` plan with one board line (plan program board rules in AGENTS.md) and a backlog update, landed with
