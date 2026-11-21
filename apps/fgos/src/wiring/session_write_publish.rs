@@ -396,6 +396,14 @@ fn refresh_backlog_index(
             item.id
         )));
     }
+    let tracked = tracked_item_paths(checkout)?;
+    // A file Git does not track yet is a new item: it takes a minted id, never a pre-minting shape.
+    if !tracked.contains(path) && !portfolio::is_valid_backlog_id(&item.id) {
+        return Err(invalid(format!(
+            "{path}: a new item takes a minted id (fgos identity mint backlog), not '{}'",
+            item.id
+        )));
+    }
     let report = portfolio::check_portfolio(
         main,
         &portfolio::CheckOptions {
@@ -405,7 +413,6 @@ fn refresh_backlog_index(
     )
     .map_err(|e| refusal("write-index-failed", e.to_string()))?;
     // The index lists the items Git tracks and the one being committed, never a stray file of the working tree.
-    let tracked = tracked_item_paths(checkout)?;
     let counts = |rel: &Path| {
         let rel = rel.to_string_lossy();
         rel == path || tracked.contains(rel.as_ref())

@@ -514,6 +514,51 @@ created: 2026-11-20
 }
 
 #[test]
+fn a_new_item_takes_a_minted_id_and_a_malformed_plan_source_is_unknown() {
+    let dir = temp_dir("portfolio-new-id-and-source");
+    for id in ["STR999", "wf-x", "p-deadbeef"] {
+        let req = CreateItemRequest {
+            id: Some(id.to_string()),
+            slug: Some("x".to_string()),
+            title: "T".to_string(),
+            status: None,
+            priority: None,
+            area: None,
+            created: None,
+            why: None,
+            done_when: None,
+            notes: None,
+        };
+        assert!(
+            matches!(create_item(&dir, &req), Err(PortfolioRefusal::InvalidId(_))),
+            "{id} must not be accepted for a new item"
+        );
+    }
+
+    let plan_dir = dir.join("plans").join("some-plan");
+    fs::create_dir_all(&plan_dir).unwrap();
+    fs::write(
+        plan_dir.join("plan.md"),
+        "---\ncontract: plan-v1\ntitle: P\nstatus: draft\nsource:\n  - p-abc\n---\n",
+    )
+    .unwrap();
+    let report = check_portfolio(
+        &dir,
+        &CheckOptions {
+            check_index: false,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert!(
+        report.errors.iter().any(|e| e.contains("unknown-source")),
+        "{:?}",
+        report.errors
+    );
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
 fn test_check_portfolio_drift_detection() {
     let dir = temp_dir("portfolio-check-drift");
     let backlog_dir = dir.join("plans").join("backlog");
