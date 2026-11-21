@@ -39,6 +39,8 @@ footprint:
   - packages/distribution/rust/tests/**
   - scripts/build-rust-distribution.mjs
   - apps/fgctl/tests/git_wal_activation_gate.rs
+  - apps/fgctl/tests/fixtures/**
+  - apps/fgctl/Cargo.toml
   - test/distribution/native-addon.test.mjs
   - packages/execution/engine/src/assignment_runner/launch.rs
   - packages/execution/engine/src/accounts/state.rs
