@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Native Windows CI green on its two packaging reds: P7 tail-failure fixture and the windows-msvc addon digest"
-status: running
+status: done
 lead: lead:WINCI
 base: e61cfb050eeacd3a379fc459b1e08457cd04a5e9
 priority: P1
@@ -75,8 +75,8 @@ mechanism. The PE section diff is done once by the worker on the downloaded file
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [P7 tail-failure fixture the Windows tail reaches](phase-01-p7-tail-fixture.md) | - | test/rust-host/fgctl-upgrade.test.mjs, test/rust-host/fgctl-init-preflight-tail.test.mjs, test/rust-host/fgctl-init-fixture.mjs | 1 | done |
-| 2 | [Addon bytes on a digest mismatch, PE section named](phase-02-addon-mismatch-evidence.md) | - | .github/workflows/release-assets.yml | 1 | ready |
-| 3 | [Deterministic windows-msvc addon](phase-03-addon-determinism-fix.md) | 2 | .github/workflows/release-assets.yml, Cargo.toml, packages/git/node-addon/Cargo.toml, packages/git/node-addon/build.rs, scripts/build-rust-distribution.mjs, docs/platform/packaging-distribution/spec.md | 2 | ready |
+| 2 | [Addon bytes on a digest mismatch, PE section named](phase-02-addon-mismatch-evidence.md) | - | .github/workflows/release-assets.yml | 1 | done |
+| 3 | [Deterministic windows-msvc addon](phase-03-addon-determinism-fix.md) | 2 | .github/workflows/release-assets.yml, Cargo.toml, packages/git/node-addon/Cargo.toml, packages/git/node-addon/build.rs, scripts/build-rust-distribution.mjs, docs/platform/packaging-distribution/spec.md | 2 | done |
 
 Execution: one linked worktree per phase (`fgos worktree create`), with a worker started by
 `fgos run --writes <phase footprint> --worktree <wt>`. Windows proof comes from pushing the phase branch and running
@@ -111,3 +111,12 @@ second rebases.
   and 33) and on ubuntu-22.04 in the same run.
 - 2026-11-21 lead:WINCI: phase 2 upload is wired (artifacts present in CI 44883964974). Runs 44883929876,
   44883954870 and 44883964974 matched, with no mismatch yet; four more runs were dispatched.
+- 2026-11-21 lead:WINCI: phase 2 landed as 093ee99d9. The PE diff of a mismatch pair (076008a6 from image 20261103.629
+  against 2c7d015b from image 20261111.635) shows linker 14.51 against 14.52: the Rich header differs, the CRT startup
+  code near the entry point grew by 112 bytes, and .text, .rdata, .data, .pdata and .reloc differ only by the shifted
+  addresses. On one image the shipped and independent builds are byte-identical. Cause: the runner image rollout
+  changes the MSVC toolset, not the build.
+- 2026-11-21 lead:WINCI: phase 3 landed as a10f556e6 (commits up to 17f6f9cbf). Both Windows addon jobs pin MSVC
+  14.52.37025 and SDK 10.0.26100.0 through vcvarsall and set the cargo linker explicitly. Recorded in the
+  packaging-distribution spec. `compare addon digests` was green in CI 44899889311, 44899894693 and 44899899909, all
+  on one commit, and focused tests (windows-latest) was green in the first two. lead:OPC reviewed it (MERGE).
