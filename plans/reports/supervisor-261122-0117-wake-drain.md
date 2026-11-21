@@ -12,3 +12,6 @@
 
 ## Friction
 - `fgos convention path --kind discussion --slug <any>` fails `invalid-slug: slug is empty after normalization` for every slug tried in the activated release. The brief path was built by hand to match the shaping skill's `plans/discussions/<feature>/` rule. It could not be recorded through friction because of p-ndortdckid.
+
+## Idle alarms
+- `430ea3bdc8ee9990` and `32128ea8d77dc4cd` are session-idle alarms for ref `106fdda5-666f-4ff8-af79-73b3a15762ad`, raised 18:15Z and 18:16Z during this wake. The ref matches no head placement or assignment under `.fgos/runtime` or `.fgos/assignments`, and no plan names it. Marked handled with no action. They are more evidence for the false idle alarms the heads-stable plan must measure.
