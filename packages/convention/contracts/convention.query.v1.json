@@ -66,14 +66,39 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["kind", "cardinality", "scope", "canonical", "metadataExempt", "generated"],
+          "required": ["classifications"],
           "properties": {
-            "kind": {"type": "string"},
-            "cardinality": {"enum": ["singleton", "collection"]},
-            "scope": {"type": "array", "items": {"type": "string"}},
-            "canonical": {"type": "boolean"},
-            "metadataExempt": {"type": "boolean"},
-            "generated": {"type": "boolean"}
+            "classifications": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["path", "kind", "cardinality", "scope", "canonical", "metadataExempt", "generated"],
+                    "properties": {
+                      "path": {"type": "string"},
+                      "kind": {"type": "string"},
+                      "cardinality": {"enum": ["singleton", "collection"]},
+                      "scope": {"type": "array", "items": {"type": "string"}},
+                      "canonical": {"type": "boolean"},
+                      "metadataExempt": {"type": "boolean"},
+                      "generated": {"type": "boolean"}
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["path", "error", "message"],
+                    "properties": {
+                      "path": {"type": "string"},
+                      "error": {"enum": ["unknown-kind"]},
+                      "message": {"type": "string"}
+                    }
+                  }
+                ]
+              }
+            }
           }
         }
       ]

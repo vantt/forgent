@@ -320,17 +320,13 @@ function repoRelative(raw) {
 /**
  * Every rule over one source. `paths` null checks the whole platform population; a path list runs
  * the placement port on the paths that exist (deleted ones are not read) and the body rules on the
- * platform documents among them. `classify`, `isCommit`, `placement` and `verbs` (the command listing,
- * asked only when a document names a verb) are ports; a classification is asked at most once per document.
+ * platform documents among them. `classify(files)` answers a Map of file to classification for every
+ * document a rule needs, in one call; `isCommit`, `placement` and `verbs` (the command listing, asked only
+ * when a document names a verb) are the other ports.
  * Returns `{ counts, findings, warnings }`: findings are refusals, warnings are placement verdicts
  * without block posture.
  */
 export function checkDocuments({ source, paths = null, classify, isCommit, placement, verbs }) {
-  const answers = new Map();
-  const classifyOnce = (file) => {
-    if (!answers.has(file)) answers.set(file, classify(file));
-    return answers.get(file);
-  };
   const { readFile, exists } = source;
   const present = paths === null ? null : [...new Set(paths.map(repoRelative))].filter(exists).sort();
   const checked = present === null ? source.files.filter(isPlatformDoc) : present.filter(isPlatformDoc);
@@ -343,10 +339,22 @@ export function checkDocuments({ source, paths = null, classify, isCommit, place
   }
   const baseline = checked.length > 0 && exists(GOVERNANCE) ? governanceBaselineFields(readFile(GOVERNANCE)) : [];
   const links = checkPlatformLinks({ files: checked, readFile, exists });
-  const metadata = checkPlatformMetadata({ files: checked, readFile, baseline, classify: classifyOnce });
-  const dead = checkDeadReferences({ files: checked, readFile, exists, classify: classifyOnce, isCommit });
   let listing = null;
-  const verbRefs = checkVerbReferences({ files: checked, readFile, classify: classifyOnce, isCommit, verbs: () => (listing ??= verbs()) });
+  const classifiedRules = (lookup) => ({
+    metadata: checkPlatformMetadata({ files: checked, readFile, baseline, classify: lookup }),
+    dead: checkDeadReferences({ files: checked, readFile, exists, classify: lookup, isCommit }),
+    verbRefs: checkVerbReferences({ files: checked, readFile, classify: lookup, isCommit, verbs: () => (listing ??= verbs()) }),
+  });
+  // Each rule asks for a classification only for a document with a candidate finding, and which documents
+  // those are does not depend on the answer; so a first pass with a placeholder collects them, one host
+  // call classifies them all, and the second pass judges with the real answers.
+  const wanted = new Set();
+  classifiedRules((file) => { wanted.add(file); return { kind: 'spec', canonical: true, metadataExempt: false }; });
+  const answers = wanted.size > 0 ? classify([...wanted].sort()) : new Map();
+  const { metadata, dead, verbRefs } = classifiedRules((file) => {
+    if (!answers.has(file)) throw new Error(`classify gave no answer for ${file}`);
+    return answers.get(file);
+  });
   const claims = checkRuleClaims({ files: source.files, readFile, report: present === null ? null : new Set(checked) });
   findings.push(...links.findings, ...metadata.findings, ...dead.findings, ...verbRefs.findings, ...claims.findings);
   return {
@@ -355,9 +363,21 @@ export function checkDocuments({ source, paths = null, classify, isCommit, place
   };
 }
 
-/** The classify port over the native Convention host of `repoRoot`. */
+/**
+ * The classify port over the native Convention host of `repoRoot`: one `convention classify` call for every
+ * file asked. A file no placement rule matches has no classification to judge by, so it fails the check.
+ */
 export function hostClassify(repoRoot) {
-  return (file) => invokeHost(['convention', 'classify', '--json', '--', file], { dir: repoRoot });
+  return (files) => {
+    const { classifications } = invokeHost(['convention', 'classify', '--json', '--', ...files], { dir: repoRoot });
+    if (!Array.isArray(classifications)) throw new Error('convention classify gave no classifications; the Convention host predates many-path classify');
+    const answers = new Map();
+    for (const entry of classifications) {
+      if (entry.error) throw new Error(`convention classify ${entry.path}: ${entry.error} ${entry.message}`);
+      answers.set(entry.path, entry);
+    }
+    return answers;
+  };
 }
 
 /**

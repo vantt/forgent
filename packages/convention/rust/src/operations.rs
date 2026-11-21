@@ -59,6 +59,28 @@ pub struct ClassifyOutcome {
     pub generated: bool,
 }
 
+/// One path's answer inside a many-path classify: its classification, or the named reason it has none.
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+#[serde(untagged)]
+pub enum ClassifyEntry {
+    Classified {
+        path: String,
+        #[serde(flatten)]
+        outcome: ClassifyOutcome,
+    },
+    Unclassified {
+        path: String,
+        error: String,
+        message: String,
+    },
+}
+
+/// The answer of `classify` over one or more paths, in request order.
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+pub struct ClassifyAllOutcome {
+    pub classifications: Vec<ClassifyEntry>,
+}
+
 #[derive(Debug, Clone, thiserror::Error, PartialEq, Eq)]
 pub enum ConventionError {
     #[error("invalid-kind: unsupported convention kind '{0}'")]
@@ -345,6 +367,37 @@ pub fn classify_with_rules(
         metadata_exempt: rule.metadata_exempt,
         generated: rule.generated,
     })
+}
+
+/// Classifies every path in one call. A malformed path refuses the whole call (`invalid-path`), as `check`
+/// does; a well-formed path no placement rule matches is answered in its own entry as `unknown-kind`.
+pub fn classify_paths(paths: &[String]) -> Result<ClassifyAllOutcome, ConventionError> {
+    classify_paths_with_rules(packaged_rules(), paths)
+}
+
+pub fn classify_paths_with_rules(
+    rules: &RuleSet,
+    paths: &[String],
+) -> Result<ClassifyAllOutcome, ConventionError> {
+    if paths.iter().any(|path| !valid_repo_path(path)) {
+        return Err(ConventionError::InvalidPath);
+    }
+    let classifications = paths
+        .iter()
+        .map(|path| match classify_with_rules(rules, path) {
+            Ok(outcome) => Ok(ClassifyEntry::Classified {
+                path: path.clone(),
+                outcome,
+            }),
+            Err(ConventionError::UnknownKind) => Ok(ClassifyEntry::Unclassified {
+                path: path.clone(),
+                error: "unknown-kind".to_string(),
+                message: "path does not match a placement rule".to_string(),
+            }),
+            Err(other) => Err(other),
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(ClassifyAllOutcome { classifications })
 }
 
 fn placement_rule<'a>(rules: &'a RuleSet, path: &str) -> Option<&'a Rule> {

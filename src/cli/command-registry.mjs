@@ -493,14 +493,14 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos convention check --all', 'fgos convention check -- plans/261014-1400-two-doors-one-rununit/reports/review-261014-2115-lane-x.md'],
       },
       classify: {
-        description: 'Which placement rule (kind, cardinality, scope) one path falls under; a path no placement rule matches is refused (unknown-kind).',
+        description: 'Which placement rule (kind, cardinality, scope and the canonical, metadataExempt and generated flags) each path falls under, answered as {classifications: [...]} in request order; a path no placement rule matches is answered in its own entry as unknown-kind, a malformed path refuses the call (invalid-path).',
         parameters: {
           type: 'object',
-          properties: { path: { type: 'string', description: 'Positional after "--": the one path to classify.' } },
-          positional: ['path'],
-          required: ['path'],
+          properties: { paths: { type: 'array', items: { type: 'string' }, description: 'Positional after "--": one or more paths to classify.' } },
+          positional: ['paths'],
+          required: ['paths'],
         },
-        examples: ['fgos convention classify -- fixtures/demo/spec.md'],
+        examples: ['fgos convention classify -- fixtures/demo/spec.md', 'fgos convention classify -- docs/platform/README.md docs/platform/governance.md'],
       },
     },
     examples: [

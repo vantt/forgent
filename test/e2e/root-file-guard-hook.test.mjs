@@ -227,7 +227,7 @@ test('Documentation hook judges staged content: a modified document is checked, 
 const args = process.argv.slice(2);
 const paths = args.slice(args.indexOf('--') + 1);
 const data = args[1] === 'classify'
-  ? { kind: 'spec', cardinality: 'collection', scope: [], canonical: true, metadataExempt: true, generated: false }
+  ? { classifications: paths.map((path) => ({ path, kind: 'spec', cardinality: 'collection', scope: [], canonical: true, metadataExempt: true, generated: false })) }
   : { checked: paths.length, violations: [] };
 process.stdout.write(JSON.stringify({ contract: 'fgos.v1', data }));
 `, { mode: 0o755 });

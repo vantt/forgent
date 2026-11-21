@@ -818,8 +818,8 @@ fn project_convention_request(
         fgos_convention::ConventionOperation::Check if all != paths.is_empty() => {
             return Err("convention check requires exactly one of --all or explicit paths".into());
         }
-        fgos_convention::ConventionOperation::Classify if all || paths.len() != 1 => {
-            return Err("convention classify requires exactly one explicit path".into());
+        fgos_convention::ConventionOperation::Classify if all || paths.is_empty() => {
+            return Err("convention classify requires one or more explicit paths".into());
         }
         _ => {}
     }

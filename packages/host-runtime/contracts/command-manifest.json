@@ -945,24 +945,28 @@
           ]
         },
         "classify": {
-          "description": "Which placement rule (kind, cardinality, scope) one path falls under; a path no placement rule matches is refused (unknown-kind).",
+          "description": "Which placement rule (kind, cardinality, scope and the canonical, metadataExempt and generated flags) each path falls under, answered as {classifications: [...]} in request order; a path no placement rule matches is answered in its own entry as unknown-kind, a malformed path refuses the call (invalid-path).",
           "parameters": {
             "type": "object",
             "properties": {
-              "path": {
-                "type": "string",
-                "description": "Positional after \"--\": the one path to classify."
+              "paths": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Positional after \"--\": one or more paths to classify."
               }
             },
             "positional": [
-              "path"
+              "paths"
             ],
             "required": [
-              "path"
+              "paths"
             ]
           },
           "examples": [
-            "fgos convention classify -- fixtures/demo/spec.md"
+            "fgos convention classify -- fixtures/demo/spec.md",
+            "fgos convention classify -- docs/platform/README.md docs/platform/governance.md"
           ]
         }
       },

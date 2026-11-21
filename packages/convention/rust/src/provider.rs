@@ -1,5 +1,6 @@
 use crate::operations::{
-    check_all, check_paths, classify, convention_name, convention_path, ConventionError, NameInput,
+    check_all, check_paths, classify_paths, convention_name, convention_path, ConventionError,
+    NameInput,
 };
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome, OperationId,
@@ -142,11 +143,8 @@ pub fn dispatch(request: &ConventionRequest) -> Result<serde_json::Value, Conven
             };
             serde_json::to_value(outcome).map_err(|error| ConventionError::Io(error.to_string()))
         }
-        ConventionOperation::Classify => {
-            let path = request.paths.first().ok_or(ConventionError::UnknownKind)?;
-            serde_json::to_value(classify(path)?)
-                .map_err(|error| ConventionError::Io(error.to_string()))
-        }
+        ConventionOperation::Classify => serde_json::to_value(classify_paths(&request.paths)?)
+            .map_err(|error| ConventionError::Io(error.to_string())),
     }
 }
 

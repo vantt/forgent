@@ -179,22 +179,23 @@ test('rule-claim rule reports the same id and title defined in two holders, not 
 
 // Owns path input: only the named paths are checked, a deleted one is never read, placement runs
 // once over the paths that exist, and each document is classified at most once across rules.
-test('path input checks only the named paths, never reads a deleted one, asks placement once and classifies each document once', () => {
+test('path input checks only the named paths, never reads a deleted one, asks placement once and classifies every document that needs it in one call', () => {
   const docs = {
     'docs/platform/governance.md': 'Required baseline:\n```txt\nDocument type:\n```\n',
     'docs/platform/a/spec.md': '# A\n\n[gone](b.md) `src/gone.mjs` `fgos setup`\n',
     'docs/platform/c/spec.md': '# C\n\n[also broken](nope.md)\n',
+    'docs/platform/d/spec.md': '# D\n\n`src/also-gone.mjs`\n',
   };
   const read = [];
   const source = {
-    files: ['docs/platform/governance.md', 'docs/platform/a/spec.md', 'docs/platform/c/spec.md'],
+    files: ['docs/platform/governance.md', 'docs/platform/a/spec.md', 'docs/platform/c/spec.md', 'docs/platform/d/spec.md'],
     readFile: (f) => { read.push(f); if (!(f in docs)) throw new Error(`read a path that is not there: ${f}`); return docs[f]; },
     exists: (f) => f in docs,
   };
   const classified = [], placed = [];
   const result = checkDocuments({
-    source, paths: ['./docs/platform/a/spec.md', 'docs/platform/b.md', 'plans/reports/x.md'],
-    classify: (f) => { classified.push(f); return { canonical: true, kind: 'spec', metadataExempt: true }; },
+    source, paths: ['./docs/platform/a/spec.md', 'docs/platform/b.md', 'plans/reports/x.md', 'docs/platform/d/spec.md'],
+    classify: (files) => { classified.push(files); return new Map(files.map((f) => [f, { canonical: true, kind: 'spec', metadataExempt: true }])); },
     isCommit: () => false,
     verbs: () => new Set(['run']),
     placement: (paths) => { placed.push(paths); return { violations: [
@@ -202,17 +203,18 @@ test('path input checks only the named paths, never reads a deleted one, asks pl
       { path: 'docs/platform/a/spec.md', code: 'pattern-mismatch', message: 'only a warning' },
     ] }; },
   });
-  assert.deepEqual(placed, [['docs/platform/a/spec.md']]);
+  assert.deepEqual(placed, [['docs/platform/a/spec.md', 'docs/platform/d/spec.md']]);
   assert.deepEqual(result.findings.map((f) => [f.path, f.type]), [
     ['docs/platform/a/spec.md', 'convention-wrong-location'],
     ['docs/platform/a/spec.md', 'unresolved-link'],
     ['docs/platform/a/spec.md', 'dead-reference'],
+    ['docs/platform/d/spec.md', 'dead-reference'],
     ['docs/platform/a/spec.md', 'unknown-verb'],
   ]);
   assert.deepEqual(result.warnings.map((w) => w.type), ['convention-pattern-mismatch']);
-  assert.deepEqual(classified, ['docs/platform/a/spec.md']);
+  assert.deepEqual(classified, [['docs/platform/a/spec.md', 'docs/platform/d/spec.md']], 'one classify call, only for the documents with a candidate finding');
   assert.equal(read.includes('docs/platform/b.md'), false);
-  assert.equal(result.counts.files, 1);
+  assert.equal(result.counts.files, 2);
   assert.throws(() => checkDocuments({ source, paths: ['../outside.md'], classify: () => ({}), isCommit: () => false, placement: () => ({}) }), /not a repository-relative path/);
 });
 

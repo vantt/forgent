@@ -251,6 +251,22 @@
       "input": {"path":"elsewhere/item.md"},
       "expectedError": "unknown-kind: path does not match a placement rule"
     },
+    {
+      "name": "classify many paths answers each in request order, an unmatched one by name",
+      "operation": "classify",
+      "input": {"paths":["docs/platform/README.md","elsewhere/item.md","fixtures/demo/spec.md"]},
+      "expected": {"classifications":[
+        {"path":"docs/platform/README.md","kind":"platform-portal","cardinality":"singleton","scope":["docs/platform/README.md"],"canonical":true,"metadataExempt":false,"generated":false},
+        {"path":"elsewhere/item.md","error":"unknown-kind","message":"path does not match a placement rule"},
+        {"path":"fixtures/demo/spec.md","kind":"fixture-singleton","cardinality":"singleton","scope":["fixtures/**"],"canonical":false,"metadataExempt":true,"generated":false}
+      ]}
+    },
+    {
+      "name": "classify many paths refuses the whole call for a malformed path",
+      "operation": "classify",
+      "input": {"paths":["docs/platform/README.md","../outside.md"]},
+      "expectedError": "invalid-path: expected a repository-relative path without '..'"
+    },
     {"name":"invalid kind","operation":"name","input":{"kind":"missing","slug":"x","at":"2026-10-06T14:15:00Z"},"expectedError":"invalid-kind: unsupported convention kind 'missing'"},
     {"name":"invalid type","operation":"name","input":{"kind":"report","type":"---","slug":"x","at":"2026-10-06T14:15:00Z"},"expectedError":"invalid-type: report type is empty or malformed"},
     {"name":"invalid slug","operation":"name","input":{"kind":"journal","slug":"---","at":"2026-10-06T14:15:00Z"},"expectedError":"invalid-slug: slug is empty after normalization"},

@@ -166,10 +166,10 @@ Enforcement scope for the initial `report`, `plan`, and `journal` rules is delib
 ### 4.4 `classify`
 
 ```text
-fgos convention classify [--dir <root>] -- <path>
+fgos convention classify [--dir <root>] -- <path>...
 ```
 
-This operation classifies only `placement-glob` rules; `name-template` kinds are checked through `check` and never receive an invented cardinality. It does not read the filesystem or document body. A match returns `{kind, cardinality, scope, canonical, metadataExempt, generated}`; the three booleans are the matching rule's reserved document flags (false when the rule does not set them), so a caller such as doc-health learns the document's exemptions from the same one door. No placement match is `unknown-kind`. The packaged documentation kinds and the synthetic schema fixtures are both classified through the same path-only implementation.
+This operation classifies only `placement-glob` rules; `name-template` kinds are checked through `check` and never receive an invented cardinality. It does not read the filesystem or document body. It takes one or more paths and always answers `{classifications: [...]}`, one entry per path in request order. A match is `{path, kind, cardinality, scope, canonical, metadataExempt, generated}`; the three booleans are the matching rule's reserved document flags (false when the rule does not set them), so a caller such as doc-health learns the document's exemptions from the same one door, for every document it needs in one call. A path with no placement match is answered in its own entry as `{path, error: "unknown-kind", message}`; a malformed path refuses the whole call with `invalid-path`, as `check` does. The packaged documentation kinds and the synthetic schema fixtures are both classified through the same path-only implementation.
 
 ## 5. Time rule
 
@@ -193,7 +193,7 @@ Timestamp fields are calendar-validated, including month/day/leap-year and hour/
 | `invalid-timestamp` | A syntactically located timestamp is not a valid civil date/time. |
 | `wrong-location` | A recognized kind is outside an accepted location. |
 | `forbidden-placement` | A path matches a forbidden placement row; its native violation includes block/warn posture. |
-| `unknown-kind` | `classify` cannot map a path to any rule. |
+| `unknown-kind` | `classify` cannot map a path to any rule; in the many-path answer it is that path's entry, not a refusal of the call. |
 
 Messages are diagnostic text; consumers branch on code or process exit category, never message substrings.
 
@@ -333,6 +333,10 @@ The merge-by-rule-id semantic is reserved, but overlay location, setup merge, do
 | Always-loaded contributor guidance | `461e12d12` |
 | Status, caller notes, verification evidence, and changelog | `docs(convention): record implemented Convention contracts` |
 
+### 2026-11-22 — `classify` takes many paths and answers one shape
+
+`fgos convention classify -- <path>...` classifies every path in one call and always answers `{classifications: [...]}`, an entry per path; a path no rule matches is an `unknown-kind` entry, a malformed path still refuses the call. The single-object answer for one path is gone: its only caller, doc-health, moved in the same change, so the documentation gate makes one classify call for all staged documents that need it (doc-checks 6.5). The library function for one path stays the golden behaviour source; one golden case covers the many-path answer and one its refusal.
+
 ### 2026-11-22 — The pre-commit call moves into the documentation gate
 
 Following the owner's commit-gate answer of 2026-11-06 ([doc-checks 6.5](../documentation/subcomponents/doc-checks/spec.md#65-the-commit-gate)), the hook no longer calls Convention on its own: doc-health runs Convention check once over the staged documentation paths, now including modified ones, together with the body rules. Block posture still refuses and warn posture still warns; a host error in an activated workspace now refuses instead of pass-skipping.
@@ -384,4 +388,4 @@ post-implementation full-suite runs; no Convention path appears in its stack.
 
 ## Documentation body validation
 
-Convention owns path naming and placement. The doc-health body checker, `scripts/doc-health.mjs`, owns body health in three rules, all strict. Links: `--repo-root <tree>` checks every local link and anchor in platform Markdown, including Related and clickable historical-source references, with no status or history exemptions; code spans and fences remain literal; it reuses `list-doc-anchors.mjs`. Metadata: every platform Markdown file that `fgos convention classify` does not report as `metadataExempt` carries the governance baseline header directly under its H1 with every field. Dead references: in a document that classify reports as `canonical`, outside the kinds `history`, `decision` and `verification` that record past state, every backticked repo-root path exists at HEAD unless the same line pins a commit sha; fenced blocks, patterns and `<placeholders>` are not references. doc-health asks the native host for each classification, so path kind and exemption stay in this one rule file. It also runs the verb reference and rule-claim owner rules, takes a list of paths and runs Convention check on them ([doc-checks](../documentation/subcomponents/doc-checks/spec.md)). Its enforcing doors are the live repository self-check in `test/scripts/doc-health.test.mjs`, run by the normal test suite, and the pre-commit documentation gate, which runs it on the staged content of the staged documents. The synthetic cases in that file own the rules; the live case and one hook case are the wiring proofs. This checker adds no configuration key, environment variable, external tool or new doctor registry id.
+Convention owns path naming and placement. The doc-health body checker, `scripts/doc-health.mjs`, owns body health in three rules, all strict. Links: `--repo-root <tree>` checks every local link and anchor in platform Markdown, including Related and clickable historical-source references, with no status or history exemptions; code spans and fences remain literal; it reuses `list-doc-anchors.mjs`. Metadata: every platform Markdown file that `fgos convention classify` does not report as `metadataExempt` carries the governance baseline header directly under its H1 with every field. Dead references: in a document that classify reports as `canonical`, outside the kinds `history`, `decision` and `verification` that record past state, every backticked repo-root path exists at HEAD unless the same line pins a commit sha; fenced blocks, patterns and `<placeholders>` are not references. doc-health asks the native host for the classifications it needs in one call, so path kind and exemption stay in this one rule file. It also runs the verb reference and rule-claim owner rules, takes a list of paths and runs Convention check on them ([doc-checks](../documentation/subcomponents/doc-checks/spec.md)). Its enforcing doors are the live repository self-check in `test/scripts/doc-health.test.mjs`, run by the normal test suite, and the pre-commit documentation gate, which runs it on the staged content of the staged documents. The synthetic cases in that file own the rules; the live case and one hook case are the wiring proofs. This checker adds no configuration key, environment variable, external tool or new doctor registry id.

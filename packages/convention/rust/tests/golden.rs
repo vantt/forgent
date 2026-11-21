@@ -1,5 +1,6 @@
 use fgos_convention::operations::{
-    check_all, check_paths, classify, convention_name, convention_path, ConventionError, NameInput,
+    check_all, check_paths, classify, classify_paths, convention_name, convention_path,
+    ConventionError, NameInput,
 };
 use fgos_convention::provider::ConventionRequest;
 use fgos_convention::rules::{packaged_rules, parse_rules};
@@ -167,7 +168,9 @@ fn typed_request_uses_the_versioned_wire_keys_and_defaults() {
     );
 }
 // The outcome schema is the published contract; the classify golden outputs must
-// carry exactly the properties it declares, so the two cannot drift apart.
+// carry exactly the properties it declares, so the two cannot drift apart. A many-path
+// answer carries each entry with its path; a one-path library answer is that entry
+// without the path.
 #[test]
 fn classify_golden_outputs_match_the_published_outcome_schema() {
     let schema: Value =
@@ -176,46 +179,86 @@ fn classify_golden_outputs_match_the_published_outcome_schema() {
         .as_array()
         .unwrap()
         .iter()
-        .find(|branch| branch["properties"].get("cardinality").is_some())
+        .find(|branch| branch["properties"].get("classifications").is_some())
         .expect("classify branch of the outcome schema");
-    let mut declared: Vec<&str> = branch["properties"]
-        .as_object()
-        .unwrap()
-        .keys()
-        .map(String::as_str)
-        .collect();
-    declared.sort_unstable();
-    let mut required: Vec<&str> = branch["required"]
+    let entries = branch["properties"]["classifications"]["items"]["oneOf"]
         .as_array()
-        .unwrap()
+        .unwrap();
+    let keys_of = |value: &Value, field: &str| -> Vec<String> {
+        let mut keys: Vec<String> = match field {
+            "properties" => value["properties"]
+                .as_object()
+                .unwrap()
+                .keys()
+                .cloned()
+                .collect(),
+            _ => value["required"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|name| name.as_str().unwrap().to_owned())
+                .collect(),
+        };
+        keys.sort_unstable();
+        keys
+    };
+    for entry in entries {
+        assert_eq!(
+            keys_of(entry, "properties"),
+            keys_of(entry, "required"),
+            "the host always emits every declared field"
+        );
+    }
+    let classified = entries
         .iter()
-        .map(|name| name.as_str().unwrap())
-        .collect();
-    required.sort_unstable();
-    assert_eq!(
-        declared, required,
-        "the host always emits every declared field"
-    );
+        .find(|entry| entry["properties"].get("cardinality").is_some())
+        .map(|entry| keys_of(entry, "properties"))
+        .expect("classified entry");
+    let unclassified = entries
+        .iter()
+        .find(|entry| entry["properties"].get("error").is_some())
+        .map(|entry| keys_of(entry, "properties"))
+        .expect("unclassified entry");
+    let sorted_keys = |value: &Value| -> Vec<String> {
+        let mut keys: Vec<String> = value.as_object().unwrap().keys().cloned().collect();
+        keys.sort_unstable();
+        keys
+    };
     let fixture: GoldenFile = serde_json::from_str(GOLDEN).unwrap();
-    let mut checked = 0;
+    let (mut single, mut many) = (0, 0);
     for case in fixture
         .cases
         .iter()
         .filter(|case| case.operation == "classify")
     {
-        if let Some(expected) = &case.expected {
-            let mut keys: Vec<&str> = expected
-                .as_object()
-                .unwrap()
-                .keys()
-                .map(String::as_str)
-                .collect();
-            keys.sort_unstable();
-            assert_eq!(keys, declared, "{}", case.name);
-            checked += 1;
+        let Some(expected) = &case.expected else {
+            continue;
+        };
+        if let Some(list) = expected.get("classifications") {
+            assert_eq!(
+                sorted_keys(expected),
+                vec!["classifications"],
+                "{}",
+                case.name
+            );
+            for item in list.as_array().unwrap() {
+                let keys = sorted_keys(item);
+                assert!(
+                    keys == classified || keys == unclassified,
+                    "{}: {keys:?}",
+                    case.name
+                );
+            }
+            many += 1;
+        } else {
+            let mut with_path = sorted_keys(expected);
+            with_path.push("path".to_owned());
+            with_path.sort_unstable();
+            assert_eq!(with_path, classified, "{}", case.name);
+            single += 1;
         }
     }
-    assert!(checked > 0);
+    assert!(single > 0 && many > 0);
 }
 // Owns guard 2, replacing the reservation-only proof: document placement is
 // now installed. Guard 1's refusal cases live in golden_cases_are_the_behavior_source.
@@ -382,6 +425,16 @@ fn run_case(case: &GoldenCase) -> Result<Value, String> {
                 .map(|value| value.as_str().unwrap().to_owned())
                 .collect::<Vec<_>>();
             serde_json::to_value(check_paths(&paths).map_err(error_code)?)
+                .map_err(|error| error.to_string())
+        }
+        "classify" if case.input.get("paths").is_some() => {
+            let paths = case.input["paths"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|value| value.as_str().unwrap().to_owned())
+                .collect::<Vec<_>>();
+            serde_json::to_value(classify_paths(&paths).map_err(error_code)?)
                 .map_err(|error| error.to_string())
         }
         "classify" => serde_json::to_value(
