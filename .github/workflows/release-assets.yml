@@ -111,8 +111,10 @@ jobs:
               fi
             fi
           done
-          LINK="${VCToolsInstallDir//\\//}"
-          ("${LINK%/}/bin/Hostx64/x64/link.exe" /? 2>&1 || true) | head -n 1
+          LINK="${VCToolsInstallDir}bin\Hostx64\x64\link.exe"
+          echo "CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER=$LINK" >> "$GITHUB_ENV"
+          echo "$LINK"
+          ("$LINK" /? 2>&1 || true) | head -n 1
 
       - name: Deterministic Windows linker
         if: runner.os == 'Windows'
