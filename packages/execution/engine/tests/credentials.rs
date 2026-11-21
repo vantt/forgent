@@ -1257,7 +1257,7 @@ impl CredentialProbe for RenewsClaude {
 }
 
 #[test]
-fn a_login_that_cannot_outlive_the_seat_is_renewed_before_its_life_check_unless_a_running_seat_owns_its_renewal(
+fn a_login_that_cannot_outlive_the_seat_is_renewed_before_its_life_check_unless_a_running_seat_owns_its_renewal_or_no_token_could_cover_the_seat(
 ) {
     const SEAT: f64 = 90.0 * 60_000.0;
     let (source, runtime, seats) = (
@@ -1323,6 +1323,34 @@ fn a_login_that_cannot_outlive_the_seat_is_renewed_before_its_life_check_unless_
     );
     assert!(life(&shared)
         .is_some_and(|p| p.ends_with("; refresh-ahead: skipped live-seat-owns-renewal")));
+
+    // A seat longer than a whole Claude token's life: no renewal is spent, and the refusal says why.
+    const LONG_SEAT: f64 = 8.0 * HOUR;
+    let too_long = refresh_ahead(
+        &request,
+        &RefreshOptions {
+            seat_timeout_ms: Some(LONG_SEAT),
+            ..RefreshOptions::new(&Free, &probe, &NoSqlite, &now)
+        },
+    );
+    assert_eq!(
+        (too_long.status, too_long.reason.as_str()),
+        ("skipped", "seat-longer-than-token-lifetime")
+    );
+    assert!(
+        probe.0.borrow().is_empty(),
+        "no renewal is spent on a seat no token can cover"
+    );
+    assert!(login_life_problem(
+        &credential_source,
+        None,
+        Some(LONG_SEAT),
+        Some(&too_long),
+        NOW,
+        &NoSqlite,
+    )
+    .is_some_and(|p| p.starts_with("login-expires-before-seat-timeout")
+        && p.ends_with("; refresh-ahead: skipped seat-longer-than-token-lifetime")));
 
     // With the seat's timeout the login is renewed, and the seat is admitted.
     let renewed = refresh_ahead(
