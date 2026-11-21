@@ -181,15 +181,45 @@
       "id": "discussion",
       "kind": "discussion",
       "shape": "name-template",
-      "template": "{slug}/",
-      "roots": ["docs/discussions/"],
-      "scope": [],
+      "template": "{id}-{slug}/DISCUSSION.md",
+      "roots": ["plans/discussions/"],
+      "scope": ["plans/discussions/*/DISCUSSION.md"],
       "posture": "warn",
       "cutoff": "3faf81996",
       "compatibility": [],
       "canonical": false,
       "metadataExempt": true,
       "generated": false,
+      "requiredMetadataFields": []
+    },
+    {
+      "id": "backlog-item",
+      "kind": "backlog-item",
+      "shape": "name-template",
+      "template": "{id}-{slug}.md",
+      "roots": ["plans/backlog/"],
+      "scope": ["plans/backlog/*.md"],
+      "posture": "warn",
+      "cutoff": "3faf81996",
+      "compatibility": [],
+      "canonical": false,
+      "metadataExempt": true,
+      "generated": false,
+      "requiredMetadataFields": []
+    },
+    {
+      "id": "backlog-index",
+      "kind": "backlog-index",
+      "shape": "name-template",
+      "template": "backlog.md",
+      "roots": ["plans/"],
+      "scope": ["plans/backlog.md"],
+      "posture": "warn",
+      "cutoff": "3faf81996",
+      "compatibility": [],
+      "canonical": false,
+      "metadataExempt": true,
+      "generated": true,
       "requiredMetadataFields": []
     }
   ],
@@ -272,6 +302,14 @@
       "first": "abcdefghijklmnopqrstuvwxyz",
       "rest": "abcdefghijklmnopqrstuvwxyz234567-",
       "maxLength": 12,
+      "reserved": []
+    },
+    {
+      "id": "discussion-id",
+      "description": "A discussion id: `ds-<10 base32>` when minted by Identity (docs/platform/identity/spec.md, section 4a).",
+      "first": "abcdefghijklmnopqrstuvwxyz",
+      "rest": "abcdefghijklmnopqrstuvwxyz234567-",
+      "maxLength": 13,
       "reserved": []
     }
   ],

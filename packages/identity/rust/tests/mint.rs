@@ -85,6 +85,7 @@ fn a_random_id_is_its_prefix_and_ten_base32_characters_that_pass_the_convention_
     for (kind, prefix, rule) in [
         (RandomKind::Work, "tsk-", "work-item-id"),
         (RandomKind::Backlog, "p-", "backlog-id"),
+        (RandomKind::Discussion, "ds-", "discussion-id"),
     ] {
         let id = random(kind).unwrap();
         let tail = id
@@ -104,6 +105,14 @@ fn a_random_id_is_its_prefix_and_ten_base32_characters_that_pass_the_convention_
     assert_eq!(
         Kind::parse("question"),
         Some(Kind::Random(RandomKind::Question))
+    );
+    let discussion = random(RandomKind::Discussion).unwrap();
+    let tail = discussion.strip_prefix("ds-").expect("ds- prefix");
+    assert_eq!(tail.len(), RANDOM_CHARS);
+    assert!(tail.bytes().all(|b| matches!(b, b'a'..=b'z' | b'2'..=b'7')));
+    assert_eq!(
+        Kind::parse("discussion"),
+        Some(Kind::Random(RandomKind::Discussion))
     );
     let many: BTreeSet<String> = (0..2000)
         .map(|_| random(RandomKind::Work).unwrap())

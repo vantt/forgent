@@ -22,6 +22,7 @@ fn registering_the_current_session_names_it_by_its_own_handle() {
         std::env::set_var("HERDR_PANE_ID", "w9-p4");
         std::env::set_var("HERDR_TAB_ID", "w9-t2");
         std::env::remove_var("HERDR_WORKSPACE_ID");
+        std::env::remove_var("FGOS_SESSION_ID");
     };
     let pid = std::process::id();
 

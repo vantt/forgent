@@ -50,8 +50,38 @@
     {
       "name": "discussion path",
       "operation": "path",
-      "input": {"kind":"discussion","slug":"x"},
-      "expected": {"kind":"discussion","path":"docs/discussions/x/"}
+      "input": {"kind":"discussion","slug":"ds-4f2a7qzb3x-x"},
+      "expected": {"kind":"discussion","path":"plans/discussions/ds-4f2a7qzb3x-x/DISCUSSION.md"}
+    },
+    {
+      "name": "discussion name",
+      "operation": "name",
+      "input": {"kind":"discussion","slug":"ds-4f2a7qzb3x-x","at":"2026-10-06T14:15:00+07:00"},
+      "expected": {"kind":"discussion","name":"ds-4f2a7qzb3x-x/DISCUSSION.md","at":"2026-10-06T14:15:00.000+07:00","offset":"+07:00"}
+    },
+    {
+      "name": "backlog item path",
+      "operation": "path",
+      "input": {"kind":"backlog-item","slug":"p-4f2a7qzb3x-x"},
+      "expected": {"kind":"backlog-item","path":"plans/backlog/p-4f2a7qzb3x-x.md"}
+    },
+    {
+      "name": "backlog item name",
+      "operation": "name",
+      "input": {"kind":"backlog-item","slug":"p-4f2a7qzb3x-x","at":"2026-10-06T14:15:00+07:00"},
+      "expected": {"kind":"backlog-item","name":"p-4f2a7qzb3x-x.md","at":"2026-10-06T14:15:00.000+07:00","offset":"+07:00"}
+    },
+    {
+      "name": "backlog index path",
+      "operation": "path",
+      "input": {"kind":"backlog-index","slug":"x"},
+      "expected": {"kind":"backlog-index","path":"plans/backlog.md"}
+    },
+    {
+      "name": "backlog index name",
+      "operation": "name",
+      "input": {"kind":"backlog-index","slug":"x","at":"2026-10-06T14:15:00+07:00"},
+      "expected": {"kind":"backlog-index","name":"backlog.md","at":"2026-10-06T14:15:00.000+07:00","offset":"+07:00"}
     },
     {
       "name": "plan path",
@@ -74,8 +104,26 @@
     {
       "name": "valid initial paths and compatibility forms",
       "operation": "check",
-      "input": {"paths":["plans/reports/report-261006-1415-x.md","plans/reports/report-261006-1415-x-report.md","plans/reports/GH-123-261006-1415-x.md","plans/reports/foo-261399-2561-bar-261006-1415-x.md","plans/261006-1415-fgos-convention-component","plans/261006-1415-fgos-convention-component/plan.md","plans/261006-1415-fgos-convention-component/reports/report-261006-1415-x.md","plans/journals/2026-10-06-release-notes.md","plans/journals/journal-261006-1415-release-notes.md"]},
-      "expected": {"checked":9,"violations":[]}
+      "input": {"paths":["plans/reports/report-261006-1415-x.md","plans/reports/report-261006-1415-x-report.md","plans/reports/GH-123-261006-1415-x.md","plans/reports/foo-261399-2561-bar-261006-1415-x.md","plans/261006-1415-fgos-convention-component","plans/261006-1415-fgos-convention-component/plan.md","plans/261006-1415-fgos-convention-component/reports/report-261006-1415-x.md","plans/journals/2026-10-06-release-notes.md","plans/journals/journal-261006-1415-release-notes.md","plans/backlog/p-4f2a7qzb3x-x.md","plans/discussions/ds-4f2a7qzb3x-x/DISCUSSION.md","plans/backlog.md"]},
+      "expected": {"checked":12,"violations":[]}
+    },
+    {
+      "name": "invalid backlog item id",
+      "operation": "check",
+      "input": {"paths":["plans/backlog/bad-x.md"]},
+      "expected": {"checked":1,"violations":[{"path":"plans/backlog/bad-x.md","code":"pattern-mismatch","message":"name does not match an accepted template"}]}
+    },
+    {
+      "name": "invalid discussion id",
+      "operation": "check",
+      "input": {"paths":["plans/discussions/bad-x/DISCUSSION.md"]},
+      "expected": {"checked":1,"violations":[{"path":"plans/discussions/bad-x/DISCUSSION.md","code":"pattern-mismatch","message":"name does not match an accepted template"}]}
+    },
+    {
+      "name": "invalid discussion file name",
+      "operation": "check",
+      "input": {"paths":["plans/discussions/ds-4f2a7qzb3x-x/other.md"]},
+      "expected": {"checked":1,"violations":[{"path":"plans/discussions/ds-4f2a7qzb3x-x/other.md","code":"pattern-mismatch","message":"name does not match an accepted template"}]}
     },
     {
       "name": "wrong report order",
@@ -278,6 +326,9 @@
     {"rule": "backlog-id", "value": "p-4f2a7qzb3x", "expectedError": null},
     {"rule": "backlog-id", "value": "p-4f2a7qzb3xy", "expectedError": "invalid-identifier"},
     {"rule": "backlog-id", "value": "p-4f2a7qzb31", "expectedError": "invalid-identifier"},
+    {"rule": "discussion-id", "value": "ds-4f2a7qzb3x", "expectedError": null},
+    {"rule": "discussion-id", "value": "ds-4f2a7qzb3xy", "expectedError": "invalid-identifier"},
+    {"rule": "discussion-id", "value": "ds-4f2a7qzb31", "expectedError": "invalid-identifier"},
     {"rule": "lane-id", "value": "MAIL", "expectedError": null},
     {"rule": "lane-id", "value": "T1-P6", "expectedError": null},
     {"rule": "lane-id", "value": "ABCDEFGHIJKLMNOP", "expectedError": null},
