@@ -38,7 +38,7 @@ footprint:
   - packages/execution/engine/src/assignment_runner/launch.rs
   - apps/fgos/src/wiring/unit_run_host/verify.rs
   - apps/fgos/tests/windows_cwd_lease_owner.rs
-  - apps/fgos/tests/unit_run_host.rs
+  - apps/fgos/src/wiring/unit_run_host/tests/run_unit.rs
   - docs/platform/holder-lock/spec.md
   - docs/platform/git/spec.md
   - docs/platform/run-supervisor/spec.md
@@ -104,7 +104,7 @@ narrative goes into the Git spec's decision history.
 3. `focused tests (windows-latest)` is green with the distribution C5 cases: a Windows release that claims
    `git-wal-v1` activates with the fence placed, and a live predecessor writer refuses.
 4. A Windows unit-run-host test commits a writing Unit's declared paths under custody into the worktree branch
-   (`apps/fgos/tests/unit_run_host.rs`, run in `windows git custody`).
+   (`apps/fgos/src/wiring/unit_run_host/tests/run_unit.rs`, run in `windows git custody`).
 5. `rg -n "git-lockscope-unavailable-windows" packages apps` returns nothing; `BorrowedHandle::new` and
    `run_borrowed_io` have no Windows refusal.
 6. Linux gates stay green: `cargo test` for every touched crate, `cargo clippy -D warnings`, `cargo fmt --check`,
@@ -127,7 +127,7 @@ narrative goes into the Git spec's decision history.
 | 4 | [C5 fence and scan on Windows, git-wal-v1 advertised](phase-04-windows-c5.md) | 2 | packages/holder-lock/rust/src/tombstone.rs, packages/holder-lock/rust/src/route.rs, packages/process/rust/src/facts.rs, packages/process/rust/src/platform/windows.rs, packages/process/rust/tests/**, packages/distribution/rust/src/git_gate.rs, packages/distribution/rust/src/init.rs, packages/distribution/rust/src/verify.rs, packages/distribution/rust/tests/**, docs/platform/packaging-distribution/contracts/activation-binding.md, docs/platform/packaging-distribution/contracts/release-manifest.md, scripts/build-rust-distribution.mjs, apps/fgctl/tests/git_wal_activation_gate.rs, test/distribution/native-addon.test.mjs | 2 | ready |
 | 5 | [Git ports take custody on Windows](phase-05-git-ports-windows-custody.md) | 1, 2, 3 | packages/git/rust/src/lib.rs, packages/git/rust/src/scoped_commit.rs, packages/git/rust/src/sync.rs, packages/git/rust/src/land.rs, packages/git/rust/src/refs.rs, packages/git/rust/src/remote.rs, packages/git/rust/src/restore.rs, packages/git/rust/src/recovery.rs, packages/git/rust/src/repository_config.rs, packages/git/rust/src/native_lock.rs, packages/git/rust/src/publication.rs, packages/git/rust/tests/scoped_commit_sync.rs, packages/git/rust/tests/land.rs, packages/git/rust/tests/land_crash_matrix.rs, packages/git/rust/tests/land_push_catch_up.rs, packages/git/rust/tests/safe_restore.rs, packages/git/rust/tests/refs_remote.rs, packages/git/rust/tests/recovery_matrix.rs, packages/git/rust/tests/repository_config.rs, packages/git/rust/tests/borrow_deadline.rs, packages/git/rust/tests/support/**, packages/git/contracts/mutation-census.v1.json, packages/supervision/rust/tests/land.rs, packages/execution/checkout/tests/**, .github/workflows/release-assets-check.yml | 3 | ready |
 | 6 | [Lease channel for the attempt's whole life, verify under custody](phase-06-lease-whole-life-and-verify.md) | 3 | packages/execution/engine/src/assignment_runner/launch.rs, apps/fgos/src/wiring/unit_run_host/verify.rs, apps/fgos/tests/windows_cwd_lease_owner.rs | 3 | ready |
-| 7 | [Windows unit-run commit end to end, docs, integration](phase-07-e2e-docs-integration.md) | 4, 5, 6 | apps/fgos/tests/unit_run_host.rs, .github/workflows/release-assets-check.yml, docs/platform/holder-lock/spec.md, docs/platform/git/spec.md, docs/platform/run-supervisor/spec.md, CHANGELOG.md | 4 | ready |
+| 7 | [Windows unit-run commit end to end, docs, integration](phase-07-e2e-docs-integration.md) | 4, 5, 6 | apps/fgos/src/wiring/unit_run_host/tests/run_unit.rs, .github/workflows/release-assets-check.yml, docs/platform/holder-lock/spec.md, docs/platform/git/spec.md, docs/platform/run-supervisor/spec.md, CHANGELOG.md | 4 | ready |
 
 Reading check: every phase sits in a later wave than its dependencies; the only hot file,
 `.github/workflows/release-assets-check.yml`, has one writer per wave (1, 3, 5, 7); phases 1 and 2 share no path, nor
@@ -174,3 +174,10 @@ p-nk6xf5laob and p-w4cxqq2sbw are set done through the portfolio owner when phas
   `quiesce-scan`). Added to phase 4: the Windows arm of `facts::scan` (argv, cwd, same user) and of `quiesce-scan`.
 - 2026-11-21 lead:WINCUSTODY: phase 4 also writes the release build's per-target capability list, the fgctl activation
   gate test and its Node test.
+- 2026-11-21 lead:WINCUSTODY: measured on native windows-latest (CI 44875845772, asserted from 44878105727): closing a
+  DuplicateHandle copy leaves the owner's lock held; LockFileEx through the copy is WouldBlock; UnlockFileEx through the
+  copy frees the owner's lock; a live copy keeps the lock after the owner closes. So the Windows borrowed handle
+  duplicates and never unlocks, and lives no longer than its owner. Phase 3 started on that answer.
+- 2026-11-21 lead:WINCUSTODY: phases 1, 2, 3, 4 and 6 committed on branches wincustody/p1..p6 (each rebased on p1 with
+  its own step in `windows git custody`); phase 1's Windows code proof green in CI 44878105727 (topology 3/3,
+  windows_lockfileex 16/16). The unit-run-host tests live in the binary (`wiring::unit_run_host`); phase 7's path fixed.
