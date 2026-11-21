@@ -18,12 +18,12 @@
 #![allow(dead_code)]
 
 use fgos_convention::packaged_rules;
+use fgos_git::GitDriver;
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, OperationId, OperationProvider,
     OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle, ProviderOutcome,
     VerbAnswer,
 };
-use fgos_git::GitDriver;
 use fgos_identity::mint::{random, RandomKind};
 use serde_json::{json, Value};
 use std::borrow::Cow;
@@ -852,13 +852,21 @@ fn with_portfolio_frontmatter(
 
 // ---- reference rewrite ------------------------------------------------------------------------------------------
 
-/// The repo-relative paths of the files a rewrite may read: the tracked files when the project is a git checkout,
-/// else a walk of the tree that never enters a nested checkout (a directory with its own `.git`).
-fn candidate_files(root: &Path) -> Vec<String> {
-    if root.join(".git").exists() {
-        if let Some(paths) = tracked_files(root) {
-            return paths;
-        }
+/// The paths the index tracks when the project is a git checkout (it holds a `.git`); `None` for a project that
+/// is not one. A checkout whose tracked files cannot be listed is an error, never a walk that would reach
+/// untracked files.
+fn checkout_tracked_files(root: &Path) -> Result<Option<Vec<String>>, MigrateError> {
+    if !root.join(".git").exists() {
+        return Ok(None);
+    }
+    tracked_files(root).map(Some)
+}
+
+/// The repo-relative paths of the files a rewrite may read: the tracked files when given, else a walk of the
+/// tree that never enters a nested checkout (a directory with its own `.git`).
+fn candidate_files(root: &Path, tracked: Option<Vec<String>>) -> Vec<String> {
+    if let Some(paths) = tracked {
+        return paths;
     }
     let mut out = Vec::new();
     walk(root, root, &mut out);
@@ -866,21 +874,26 @@ fn candidate_files(root: &Path) -> Vec<String> {
     out
 }
 
-/// Every path the index tracks, through the git driver; `None` when the checkout cannot be read.
-/// `root` holds a `.git`, so it is the top level and driver paths are already relative to it.
-fn tracked_files(root: &Path) -> Option<Vec<String>> {
-    let (driver, repo) = GitDriver::open_at(root).ok().flatten()?;
+/// Every path the index tracks, through the git driver. `root` holds a `.git`, so it is the top level and
+/// driver paths are already relative to it.
+fn tracked_files(root: &Path) -> Result<Vec<String>, MigrateError> {
+    let git_error = |e: &dyn std::fmt::Display| MigrateError::Io(format!("git-driver: {e}"));
+    let (driver, repo) = GitDriver::open_at(root)
+        .map_err(|e| git_error(&e))?
+        .ok_or_else(|| MigrateError::Io("git-driver: checkout not opened".into()))?;
     let mut out = Vec::new();
     let mut cursor = None;
     loop {
-        let page = driver.tracked_paths(&repo, cursor, 4096).ok()?;
+        let page = driver
+            .tracked_paths(&repo, cursor, 4096)
+            .map_err(|e| git_error(&e))?;
         out.extend(
             page.entries
                 .iter()
                 .map(|name| String::from_utf8_lossy(name).into_owned()),
         );
         if page.complete {
-            return Some(out);
+            return Ok(out);
         }
         cursor = page.next_cursor;
     }
@@ -1061,6 +1074,8 @@ pub fn migrate_portfolio(request: &MigrateRequest) -> Result<MigrateReport, Migr
     let legacy_backlog = root.join(LEGACY_BACKLOG);
     let legacy_discussions = root.join(LEGACY_DISCUSSIONS);
     let apply = !request.dry_run;
+    // Read before any write, so a checkout the driver cannot list fails the run untouched.
+    let tracked = checkout_tracked_files(root)?;
     let created_fallback = today();
     let mut report = MigrateReport {
         dry_run: request.dry_run,
@@ -1204,7 +1219,7 @@ pub fn migrate_portfolio(request: &MigrateRequest) -> Result<MigrateReport, Migr
     }
 
     // 3. Active references: tracked prose only.
-    for rel in candidate_files(root) {
+    for rel in candidate_files(root, tracked) {
         if !rewritable(&rel, &roots) {
             continue;
         }
