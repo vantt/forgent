@@ -4,10 +4,10 @@ discussion: open
 
 ## 1. Trạng thái hiện tại
 
-2026-11-21 17:05: Mở từ discussion `orchestration-skeleton` (§3 row 11, round 14). Chủ dự án chọn mở discussion riêng (phương án A) vì authority, boundary và contract là yếu tố hạng nhất của **toàn hệ thống**, không riêng skeleton. Stub này do shaper `orchestration-skeleton` viết; chưa có shaper riêng. Đã gửi mailbox cho secretary Miu (17:05) xin tạo backlog row và mở shaper `component-authority`; lúc 17:27 Miu chưa lấy tin (2 tin chờ, chưa drain lần nào), **chưa có backlog row và chưa có shaper**.
+2026-11-21 17:35 round 1: Shaper riêng `component-authority` đã mở (head:shaper-component-authority); backlog row `p-esa3lau6kd`. Chủ dự án chọn mở discussion riêng (CA-D1) vì authority, boundary và contract là yếu tố hạng nhất của **toàn hệ thống**, không riêng skeleton.
 
-- Bước đầu tiên (§7 T0): điều tra backlog `p-7nja6ilwkr`, tìm nguyên nhân thật vì sao code thừa (cửa thứ hai, bản sao, twin Rust/Node) vẫn cứ sinh ra, trước khi thiết kế sổ authority.
-- Chưa có câu hỏi nào đang mở với chủ dự án.
+- Đang chạy §7 T0 bằng hai lượt điều tra chỉ đọc, song song: (a) pháp y commit: mỗi cửa thứ hai được sinh ở commit nào, vì sao, bị bắt ở đâu và trễ bao lâu (`plans/reports/research-261121-1728-surplus-code-commit-forensics.md`); (b) kiểm kê các guard hiện có, việc lập plan có hỏi "ai sở hữu quyết định này" không, độ lệch giữa ba sổ authority, và các nỗ lực trước (`plans/reports/research-261121-1728-surplus-code-guard-audit.md`).
+- Chưa có câu hỏi nào đang mở với chủ dự án; câu hỏi đầu tiên chờ kết quả T0.
 
 ## 2. Mục tiêu & đề bài
 
@@ -33,6 +33,7 @@ Chủ dự án (2026-11-21): "component authority/boundary và contracts là r�
 ## 5. Q&A log
 
 - 2026-11-21 17:05 round 0: Mở từ `orchestration-skeleton` §3 row 11. Mang sang: lời chủ dự án round 12 và 13, bảng ba nơi chứa authority, bằng chứng code thừa từ lượt dò tier 0-9, bảy giả thuyết nguyên nhân, đề xuất sổ authority và ba điểm kiểm. Friction: `fgos convention path --kind discussion --slug <x>` refuse mọi slug (`invalid-slug: slug is empty after normalization`), và rule `discussion` trong `packages/convention/contracts/convention.rules.v1.json` trỏ `plans/discussions/` trong khi mọi discussion nằm ở `docs/discussions/<slug>/` (rule `doc-discussion-scratchpad-1`); dùng `docs/discussions/component-authority/` theo rule thứ hai.
+- 2026-11-21 17:35 round 1: Shaper riêng bắt đầu. Không câu hỏi mở nào trong `fgos questions` thuộc topic này. Tách T0 thành hai lượt điều tra chỉ đọc (pháp y commit; kiểm kê guard và prior art) vì đã có prior art đáng kể: census one-door của Git, các plan one-door-debt, guard "one door per job" của verb manifest (180cd0662), audit `plans/reports/audit-261109-1736-harden-authority-layers.md`, handoff `plans/reports/planner-261006-1415-single-door-mechanisms-handoff.md`. Friction: `fgos convention path --kind report` cần `--type` nhưng lỗi chỉ báo `invalid-type: report type is empty or malformed`, không nói thiếu cờ nào.
 
 ## 6. Thiết kế đã chốt {#design}
 
