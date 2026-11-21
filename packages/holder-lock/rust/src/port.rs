@@ -1248,12 +1248,15 @@ fn borrowed_request(
 /// domain. On Windows the deadline ends the job at once (`Termination` is
 /// `KilledAfterGrace`: there is no cooperative signal to wait out).
 /// The spec's stdio is superseded by explicit input and captured output.
+/// `helper` is the job-keeper executable on Windows and unused on POSIX, as in
+/// [`run_borrowed`].
 pub fn run_borrowed_io(
     handle: &impl AsRef<Handle>,
     spec: &BorrowSpec,
     io: &BorrowIo,
+    helper: &HelperExe,
 ) -> Result<BorrowIoOutcome, BorrowError> {
-    run_borrowed_io_with(handle.as_ref(), spec, io, false)
+    run_borrowed_io_with(handle.as_ref(), spec, io, false, helper)
 }
 
 /// [`run_borrowed_io`] that also marks the child's environment with a per-run
@@ -1265,8 +1268,9 @@ pub fn run_borrowed_io_watched(
     handle: &impl AsRef<Handle>,
     spec: &BorrowSpec,
     io: &BorrowIo,
+    helper: &HelperExe,
 ) -> Result<BorrowIoOutcome, BorrowError> {
-    run_borrowed_io_with(handle.as_ref(), spec, io, true)
+    run_borrowed_io_with(handle.as_ref(), spec, io, true, helper)
 }
 
 fn run_borrowed_io_with(
@@ -1274,11 +1278,12 @@ fn run_borrowed_io_with(
     spec: &BorrowSpec,
     io: &BorrowIo,
     watch: bool,
+    helper: &HelperExe,
 ) -> Result<BorrowIoOutcome, BorrowError> {
     validate(handle)?;
     #[cfg(not(any(unix, windows)))]
     {
-        let _ = (handle, spec, io, watch);
+        let _ = (handle, spec, io, watch, helper);
         Err(BorrowError::IoUnsupported)
     }
     #[cfg(windows)]
@@ -1286,11 +1291,11 @@ fn run_borrowed_io_with(
         // The job holds every member, so a watched run has no escapee to
         // report: `escaped` stays empty either way.
         let _ = watch;
-        let helper = HelperExe::current().map_err(BorrowError::Spawn)?;
-        crate::borrow_windows::run_io(handle, spec, &helper, io)
+        crate::borrow_windows::run_io(handle, spec, helper, io)
     }
     #[cfg(unix)]
     {
+        let _ = helper;
         run_borrowed_io_posix(handle, spec, io, watch)
     }
 }

@@ -192,6 +192,7 @@ fn borrowed_handle_runs_through_the_existing_io_door_without_extra_inherited_cop
             stderr_limit: 4096,
             deadline: std::time::Instant::now() + std::time::Duration::from_secs(10),
         },
+        &fgos_holder_lock::HelperExe::current().unwrap(),
     )
     .unwrap();
     assert_eq!(result.outcome.exit, Some(0));

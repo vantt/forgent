@@ -10,13 +10,14 @@ mod windows_support;
 use std::fs;
 use std::path::Path;
 use std::process::{Command, Stdio};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use fgos_holder_lock::borrow_vectors::{self, git_env, init_repo};
 use fgos_holder_lock::predecessor::record_path;
 use fgos_holder_lock::{
-    acquire, probe, release, run_borrowed, Acquire, BorrowError, BorrowSpec, BorrowStdio,
-    HelperExe, Mode, Probe, Release, Resource, Wait,
+    acquire, probe, release, run_borrowed, run_borrowed_io, run_borrowed_io_watched, Acquire,
+    BorrowError, BorrowIo, BorrowSpec, BorrowStdio, BorrowedHandle, HelperExe, Mode, Probe,
+    Release, Resource, Wait,
 };
 use serde_json::Value;
 use std::os::windows::io::AsRawHandle;
@@ -430,5 +431,144 @@ fn a_handle_the_holder_owns_is_not_open_in_the_borrowed_child() {
     );
     assert_keeper_gone();
     assert!(matches!(release(handle), Release::Released { .. }));
+    let _ = fs::remove_dir_all(&dir);
+}
+
+fn shell_spec(script: &str, cwd: &Path) -> BorrowSpec {
+    BorrowSpec {
+        argv: ["sh", "-c", script].map(String::from).to_vec(),
+        cwd: Some(cwd.to_path_buf()),
+        env: Default::default(),
+        clear_env: false,
+        stdio: BorrowStdio::Null,
+    }
+}
+
+fn io_bounds(stdin: &[u8], stdout_limit: usize, deadline: Duration) -> BorrowIo {
+    BorrowIo {
+        stdin: stdin.to_vec(),
+        stdout_limit,
+        stderr_limit: 4096,
+        deadline: Instant::now() + deadline,
+    }
+}
+
+#[test]
+fn borrow_io_feeds_stdin_and_captures_stdout_and_stderr() {
+    let _serial = serial();
+    let dir = temp_dir("io-streams");
+    let resource = Resource::new("wb-io-streams", dir.join("io.lock"));
+    let handle = take(&resource);
+    let io = io_bounds(b"from-the-holder", 4096, Duration::from_secs(30));
+    let spec = shell_spec("cat; echo to-stderr >&2", &dir);
+
+    let done = run_borrowed_io(&handle, &spec, &io, &helper()).expect("run_borrowed_io");
+
+    assert_eq!(done.outcome.exit, Some(0));
+    assert_eq!(done.stdout, b"from-the-holder");
+    assert_eq!(String::from_utf8_lossy(&done.stderr).trim(), "to-stderr");
+    assert!(
+        !record_path(&resource.path).exists(),
+        "the predecessor record is removed"
+    );
+    assert_keeper_gone();
+    assert!(matches!(release(handle), Release::Released { .. }));
+    assert_eq!(probe(&resource).unwrap(), Probe::Free);
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn borrow_io_output_past_its_ceiling_is_refused_and_leaves_nothing() {
+    let _serial = serial();
+    let dir = temp_dir("io-ceiling");
+    let resource = Resource::new("wb-io-ceiling", dir.join("io.lock"));
+    let handle = take(&resource);
+    let io = io_bounds(b"", 64, Duration::from_secs(30));
+    let spec = shell_spec("yes | head -c 100000; sleep 30", &dir);
+
+    let error = run_borrowed_io(&handle, &spec, &io, &helper()).unwrap_err();
+
+    assert!(matches!(error, BorrowError::OutputLimit(_)), "{error:?}");
+    assert!(error.to_string().starts_with("borrow-output-limit"));
+    assert_keeper_gone();
+    assert!(matches!(release(handle), Release::Released { .. }));
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn borrow_io_deadline_ends_the_job_and_keeps_what_was_written() {
+    let _serial = serial();
+    let dir = temp_dir("io-deadline");
+    let resource = Resource::new("wb-io-deadline", dir.join("io.lock"));
+    let handle = take(&resource);
+    let io = io_bounds(b"", 4096, Duration::from_secs(2));
+    let spec = shell_spec("echo before-deadline; sleep 60", &dir);
+
+    let error = run_borrowed_io(&handle, &spec, &io, &helper()).unwrap_err();
+
+    assert!(
+        error.to_string().starts_with("borrow-deadline"),
+        "{error:?}"
+    );
+    let BorrowError::Deadline { stdout, .. } = error else {
+        panic!("expected the deadline outcome")
+    };
+    assert_eq!(String::from_utf8_lossy(&stdout).trim(), "before-deadline");
+    assert_keeper_gone();
+    assert!(matches!(release(handle), Release::Released { .. }));
+    assert_eq!(probe(&resource).unwrap(), Probe::Free);
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn borrow_io_watched_runs_and_reports_no_escapee() {
+    let _serial = serial();
+    let dir = temp_dir("io-watched");
+    let resource = Resource::new("wb-io-watched", dir.join("io.lock"));
+    let handle = take(&resource);
+    let io = io_bounds(b"", 4096, Duration::from_secs(30));
+
+    let done = run_borrowed_io_watched(&handle, &shell_spec("echo watched", &dir), &io, &helper())
+        .expect("run_borrowed_io_watched");
+
+    assert_eq!(done.outcome.exit, Some(0));
+    assert_eq!(String::from_utf8_lossy(&done.stdout).trim(), "watched");
+    assert!(done.escaped.is_empty(), "{:?}", done.escaped);
+    assert_keeper_gone();
+    assert!(matches!(release(handle), Release::Released { .. }));
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn a_borrowed_copy_dropped_after_borrow_io_leaves_the_owners_lock_held() {
+    let _serial = serial();
+    let dir = temp_dir("io-copy");
+    let resource = Resource::new("wb-io-copy", dir.join("io.lock"));
+    let owner = take(&resource);
+    let copy = BorrowedHandle::new(&owner).expect("a copy of the owner's handle");
+    let io = io_bounds(b"", 4096, Duration::from_secs(30));
+
+    let done = run_borrowed_io(
+        &copy,
+        &shell_spec("echo through-the-copy", &dir),
+        &io,
+        &helper(),
+    )
+    .expect("run_borrowed_io through the copy");
+    drop(copy);
+
+    assert_eq!(done.outcome.exit, Some(0));
+    assert_eq!(
+        String::from_utf8_lossy(&done.stdout).trim(),
+        "through-the-copy"
+    );
+    assert_keeper_gone();
+    assert_eq!(
+        probe(&resource).unwrap(),
+        Probe::Held,
+        "the owner still holds the lock after the copy is gone"
+    );
+    assert!(matches!(release(owner), Release::Released { .. }));
+    assert_eq!(probe(&resource).unwrap(), Probe::Free);
     let _ = fs::remove_dir_all(&dir);
 }
