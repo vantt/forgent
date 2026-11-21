@@ -101,6 +101,21 @@ A confined caller reaches every socket verb through one host rule: the host hand
 
 Personas and grants: shaper gains writes `docs/discussions` and verb `land`; secretary, planner, supervisor and lead gain `land`. Only a lead lands a branch; every other persona lands `--paths` only, and only inside its grant writes. The lead's grant also holds `worktree create`.
 
+### 4.1 Coordination powers of the secretary and the supervisor
+
+The owner's two hands (the secretary Miu and the supervisor) coordinate through the supervision queue, the portfolio files and a small set of request-socket verbs. Which persona holds which verb is `GRANTS` in `src/session-host/head-grants.mjs`, the only source (grant list: [agent-confinement/spec.md](../agent-confinement/spec.md) 13.5); the socket's arguments and refusals are `packages/run-supervisor/contracts/head-request.v1.json`. This section holds only what those cannot say.
+
+| Verb | What it is for | Rule worth keeping |
+|---|---|---|
+| `fgos supervisor raise --kind --ref --reason [--next]` | A caller puts one coordination event (`coordination-handoff`, `coordination-chore` or `coordination-help`) on the queue. | One raise path in `packages/supervision/rust/src/queue.rs` (`COORDINATION_KINDS`); the supervisor closes it with `supervisor handled`. Decisions stay in portfolio files; the event only points at them. |
+| `fgos supervisor wake` | Wake the supervisor after raising. | Served on the request socket too; no caller-role gate, it runs under the supervisor write operation. The watcher still wakes the supervisor by itself. |
+| `fgos session read <target> [--lines N]` | Look at the last lines of a session's screen before acting. | Read-only; the target resolves through Identity, never a raw pane id; the answer is capped, so a very control-heavy screen can still be refused `reply-too-large`. |
+| `fgos session type <target> --text` | Type into a stuck session's pane, once. | Refused `target-not-stuck` unless an open supervision event names the target; the one hands-on act, so it is recorded as coordination evidence. |
+| `fgos watcher tune [<definition>] [--arm\|--disarm] [--set key=value]` | Arm or disarm a detection definition and change its thresholds. | A new definition kind stays a code change; `enabled`, `definitions`, `defaultAction`, `actions` (except through `--arm\|--disarm`) and `notifyTo` are never tunable; values are held to the config schema, which for the session thresholds states a minimum only. |
+| `fgos run` by the supervisor | One urgent chore as one unit. | Same door and ceilings as the secretary's own run (`secretary.run.maxMinutes`, `secretary.run.tier` in `core/config-standard/secretary.yaml`; a request may ask for less, never more); read-only unless `--writes` names paths inside a linked worktree. |
+
+Trust: every verb above is granted per persona and checked again by the route child, which treats its arguments as coming from the sandbox. Reach is every Identity session of the project to observe, ask and help, but a stop (`session stop`) reaches heads only: a session that holds no head grant (a hand-started one) is refused `stop-target-not-head`, and goes to Miu, who asks the owner. When both act on the same thing the owner wins over a direct Miu order, which wins over the supervisor's own choice. A power is granted only once its proof passes from the sandbox: proof pending live audit for the powers added here (screen read and type, tune from a confined caller, the `--override` tier of a run, wake from inside a sandbox).
+
 ## 5. Flows
 
 **Tick to event to action.** Timer fires `watcher tick` (60 s while a `watcher-active` row exists, 900 s idle) -> take the `watcher` lock -> fetch the trunk -> run edge definitions over `lastTick - watcher.lookbackSec` and level definitions as current state -> record each raised event once (stable id) -> run the row's action: wake the supervisor, notify, or none. Pace definitions are read for pace and never raised.
@@ -168,6 +183,8 @@ Dated 2026-11-18, from [the plan](../../../plans/261118-1045-project-supervisor/
 - `run` through the request socket takes no `unit`: a unit file written by a sandboxed head cannot be bound by the supervisor, so only `--writes` runs are served.
 - The commit-time footprint check reads only the frontmatter footprint of the tree being committed, before the push.
 - The supervisor grant holds `session write` for its own backlog file, so a confined supervisor edits it through its supervisor and not through a shell.
+
+- Secretary and supervisor powers (shaped with the owner 2026-11-19, SP-D1..SP-D8 in [the discussion](../../discussions/secretary-supervisor-powers/DISCUSSION.md), which holds each ground, the rejected options and the owner's words): Miu orders and stops sessions and raises work on the queue (SP-D1, SP-D3); the supervisor carries on and goes on site only on a watcher signal, with the pane as the last of three means (SP-D5, SP-D6); coordination acts are State on the queue and their evidence is Log in Observe, pruned when settled (SP-D7); defaults, ceilings and the winner order are SP-D8. Section 4.1 holds the resulting verbs.
 
 - A lead writes `lead: <its role>` into the plan with `status: running` in one `land --paths` commit; `supervisor plans` reports `leadLive` from that role's live holder in this project, and holds a running plan with no `lead` (`leadUnnamed`, never restarted), because a non-head lead's role never matched the head name and the supervisor nearly started a second lead.
 
