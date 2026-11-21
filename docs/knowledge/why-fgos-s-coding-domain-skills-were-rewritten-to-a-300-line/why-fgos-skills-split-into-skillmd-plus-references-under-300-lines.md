@@ -31,7 +31,7 @@ scope stayed at splitting/shortening rather than merging fgOS's own set.
 > của artifact, không theo vị trí thư mục
 
 Process/build-time artifacts (`docs/history/`, `docs/decisions/`,
-`docs/backlog.md`, a work item's own `CONTEXT.md`, `docs/specs/`) keep
+`plans/backlog.md`, a work item's own `CONTEXT.md`, `docs/specs/`) keep
 `tsk-37i`'s citation rule unchanged — ADR/`RUL` ids need a gloss, a
 `D`-local id only cites inside its own home `CONTEXT.md`. Product/shippable
 artifacts — `.agents/skills/*/SKILL.md` (the real source) and its
@@ -99,7 +99,7 @@ D1 had just locked a *stricter* rule for (strip IDs entirely, no gloss) on
 `tsk-2sp` adding glosses this item would then have to delete again — wasted
 work and a likely literal merge conflict on the same lines. `tsk-2sp`'s own
 description was edited down to the 12 real non-skill files
-(`docs/specs/*` + `docs/backlog.md`); once split, the two items no longer
+(`docs/specs/*` + `plans/backlog.md`); once split, the two items no longer
 overlapped and could run in parallel with no dependency between them.
 
 ## Source

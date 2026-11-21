@@ -12,13 +12,13 @@ const COORDINATION = ['supervisor raise', 'supervisor wake', 'run', 'metrics rec
 
 const EXPECTED = {
   secretary: {
-    writes: ['plans', 'docs/backlog.md', 'docs/discussions', 'plans/backlog/*'],
+    writes: ['plans', 'plans/backlog/*'],
     verbs: ['session start', 'session stop', 'session write', ...HEAD, ...QUESTIONS, 'questions answer', ...LAND, ...PORTFOLIO_READ, ...COORDINATION],
     mailbox: true,
     peers: true,
   },
   supervisor: {
-    writes: ['plans', 'docs/backlog.md', 'plans/backlog/*'],
+    writes: ['plans', 'plans/backlog/*'],
     verbs: ['session start', 'session stop', 'session write', ...HEAD, ...QUESTIONS, ...LAND, ...PORTFOLIO_READ, 'supervisor handled', 'supervisor done', 'session read', 'session type', 'watcher tune', ...COORDINATION, 'metrics prune'],
     mailbox: true,
     peers: true,

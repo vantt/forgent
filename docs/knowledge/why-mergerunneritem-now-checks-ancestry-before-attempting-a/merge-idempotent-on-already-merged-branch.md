@@ -35,7 +35,7 @@ manual `fgos move` straight to `done`. The general lesson: *any* failure
 landing after the merge-commit but before the status-move completes leaves
 the item stuck on retry — not just the specific compound-learn gap that
 first surfaced it. This is tracked as backlog row `p-b91d487a`
-(`docs/backlog.md`).
+(`plans/backlog.md`).
 
 ## The fix
 

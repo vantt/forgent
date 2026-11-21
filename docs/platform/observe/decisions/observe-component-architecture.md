@@ -61,7 +61,7 @@ Phiên chốt `plans/reports/council-261024-1947-harden-t3a-arbitration.md` §2 
 
 ### 2026-11-18 — Đo vận hành: một contract ghi và truy vấn
 
-Plan `plans/261118-0936-ops-metrics`, discussion `docs/discussions/ops-metrics/DISCUSSION.md` (chủ dự án chốt ngày 2026-11-18; mỗi quyết định dưới đây có số và nhật ký hỏi đáp trong discussion đó). Facts hiện tại: [spec § Record contract v2](../spec.md#-record-contract-v2-đo-vận-hành) và § Friction.
+Plan `plans/261118-0936-ops-metrics`, discussion `plans/discussions/ds-gyd7rwqp4k-ops-metrics/DISCUSSION.md` (chủ dự án chốt ngày 2026-11-18; mỗi quyết định dưới đây có số và nhật ký hỏi đáp trong discussion đó). Facts hiện tại: [spec § Record contract v2](../spec.md#-record-contract-v2-đo-vận-hành) và § Friction.
 
 Vấn đề: người vận hành không trả lời được các câu về nhiều plan (token theo plan/phase/provider/account/model, thời gian theo phase, lead time, tỉ lệ hỏng, friction theo loại và chữ ký) vì năm store Observe mỗi cái một hình, `observe.observation.v1` chỉ là hình đọc nội bộ với subject đóng thời Work, run không mang khoá plan, và 0 trên 98 kết quả run có token.
 

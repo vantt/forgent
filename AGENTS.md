@@ -8,7 +8,7 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 - docs/platform/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)
 - docs/platform/system-overview/spec.md — area map, shared entities, cross-area flows
 - docs/reading-map.md — where every doc and source path in this repo lives
-- docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)
+- plans/backlog.md — product backlog (PBI rows: proposed / in-flight / done)
 - plans/261017-1313-fgos-platform-program-board/plan.md — platform program board (lanes, waits, shared-file collisions). Do not read it by default. Open it only when you start, finish, block or land a platform lane (lock/git/state/config/runner): read the "Các luồng" and "File chung dễ va" sections, update your own lane's row, and add one line at the top of its `log.md`. Never read `log.md` whole; grep it by lane ID, date or commit.
 - docs/platform/runner/contracts/routing-handoff.md — agent-to-agent handoff contract + trust boundary
 - docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in each area's spec.md "Lịch sử quyết định" section and in decisions/ where present; resolve renamed/split scopes through docs/platform/governance.md#decision-scope-to-holder-table
@@ -56,7 +56,7 @@ A stranger agent with no chat history should be able to answer, for any change:
 
 1. **What to read first?** `docs/reading-map.md`, then the relevant area spec.
 2. **What kind of work is this?** Check it against the area's spec and
-   `docs/backlog.md`; a new product area gets a spec before it gets code.
+   `plans/backlog.md`; a new product area gets a spec before it gets code.
 3. **What contract does it touch?** `docs/platform/runner/contracts/routing-handoff.md` for
    agent-to-agent boundaries; the area spec's Shared Entities table for
    in-process contracts.

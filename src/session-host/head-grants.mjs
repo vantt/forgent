@@ -58,19 +58,19 @@ const PORTFOLIO_READ_VERBS = Object.freeze(['supervisor plans', 'supervisor queu
 
 const GRANTS = Object.freeze({
   secretary: Object.freeze({
-    writes: Object.freeze(['plans', 'docs/backlog.md', 'docs/discussions', 'plans/backlog/*']),
+    writes: Object.freeze(['plans', 'plans/backlog/*']),
     // Miu orders and stops heads, raises work on the queue and wakes the supervisor; she never closes an event, types into a pane, reads a session or tunes the watcher. A path land is limited to her granted writes (portfolio files).
     verbs: Object.freeze(['session start', 'session stop', 'session write', ...HEAD_VERBS, ...QUESTION_VERBS, QUESTION_ANSWER_VERB, ...LAND_VERBS, ...PORTFOLIO_READ_VERBS, ...COORDINATION_VERBS]),
     mailbox: true,
     peers: true,
   }),
   // A shaper writes one discussion file and parks owner questions; it neither answers them nor starts sessions. It lands too: a path land is limited to the grant's writes, and fgos-shaping commits the discussion every round.
-  shaper: Object.freeze({ ...frozen(['docs/discussions'], [...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS]), mailbox: true }),
-  planner: frozen(['plans', 'docs/discussions'], [...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS]),
+  shaper: Object.freeze({ ...frozen(['plans/discussions'], [...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS]), mailbox: true }),
+  planner: frozen(['plans'], [...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS]),
   // `session write` replaces its read-only backlog file. It goes on site (`session read`, `session type` into a stuck
   // session), tunes the watcher, prunes settled evidence, and reaches sessions by mailbox and peers.
   supervisor: Object.freeze({
-    ...frozen(['plans', 'docs/backlog.md', 'plans/backlog/*'], ['session start', 'session stop', 'session write', ...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS, ...PORTFOLIO_READ_VERBS, 'supervisor handled', 'supervisor done', 'session read', 'session type', 'watcher tune', ...COORDINATION_VERBS, 'metrics prune']),
+    ...frozen(['plans', 'plans/backlog/*'], ['session start', 'session stop', 'session write', ...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS, ...PORTFOLIO_READ_VERBS, 'supervisor handled', 'supervisor done', 'session read', 'session type', 'watcher tune', ...COORDINATION_VERBS, 'metrics prune']),
     mailbox: true,
     peers: true,
   }),

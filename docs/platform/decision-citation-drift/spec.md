@@ -36,7 +36,7 @@ superseded, without also naming the decision that replaced it. Its purpose is
 to catch "dead framing" — a backlog row or spec line whose reasoning was
 overturned, but whose wording still reads as if the old decision were current,
 so a reader (human or agent) re-derives the outdated conclusion. Used by
-whoever maintains `docs/backlog.md` and the platform specs under `docs/platform/` (a human operator or
+whoever maintains `plans/backlog.md` and the platform specs under `docs/platform/` (a human operator or
 an agent doing grooming/scribing).
 
 ## Entry Points & Triggers
@@ -45,7 +45,7 @@ an agent doing grooming/scribing).
   root) — the only way to run the check today. Manual invocation only; there
   is no scheduled or CI trigger yet (see Open Gaps).
 - Optional flags override the default locations: `--decisions-dir <path>`
-  (default `docs/decisions`), `--backlog <path>` (default `docs/backlog.md`),
+  (default `docs/decisions`), `--backlog <path>` (default `plans/backlog.md`),
   `--specs-dir <path>` (default `docs/platform`, the root scanned for area specs and decision narratives).
 
 ## Data Dictionary
@@ -56,7 +56,7 @@ an agent doing grooming/scribing).
 | 2 | Superseded-by id | The id of the decision that replaced a given decision, read from that decision's own front matter | 4 digits | no (absent when a decision was never superseded) | — |
 | 3 | Cited id (in a scanned line) | A decision id referenced in a backlog row or spec line | written either as `ADR<4-digit>` or as a bare 4-digit number that matches a known decision id | — | — |
 | 4 | Finding | One flagged line | `{kind: "dead-framing", file, line, id, supersededBy, message}` | — | — |
-| 5 | Scan scope | Which files are scanned | the backlog file + the area `spec.md` files, decision narratives and `platform-foundations.md` under the specs root (history trees excluded) | — | `docs/backlog.md` + `docs/platform/**` read set |
+| 5 | Scan scope | Which files are scanned | the backlog file + the area `spec.md` files, decision narratives and `platform-foundations.md` under the specs root (history trees excluded) | — | `plans/backlog.md` + `docs/platform/**` read set |
 
 ## Behaviors & Operations
 
@@ -82,14 +82,14 @@ an agent doing grooming/scribing).
 
 ## Business Rules
 
-- **R1.** A line in `docs/backlog.md` or any scanned platform spec or decision narrative that cites
+- **R1.** A line in `plans/backlog.md` or any scanned platform spec or decision narrative that cites
   a decision id whose decision record carries a superseded-by value is a
   finding unless the same line also cites the superseding id (per `28f8d8f8`).
 - **R2.** A bare 4-digit number in a scanned line counts as a citation only
   when it matches a real, known decision id — an unrelated 4-digit number
   (a year, a count, an unrelated code) is never treated as a citation
   (per `28f8d8f8`).
-- **R3.** The scan scope is `docs/backlog.md` plus the `spec.md` files, decision narratives (`decisions/` folders) and `platform-foundations.md` under `docs/platform/`; `history/` folders are never scanned.
+- **R3.** The scan scope is `plans/backlog.md` plus the `spec.md` files, decision narratives (`decisions/` folders) and `platform-foundations.md` under `docs/platform/`; `history/` folders are never scanned.
   `docs/decisions/*.md` itself is out of scope for this check — a decision
   record's own internal backward-pointer consistency (does the superseding
   record point back to what it superseded) is a different check, not this one.
@@ -104,7 +104,7 @@ an agent doing grooming/scribing).
 - A bare digit sequence that does not match any known decision id is ignored,
   never counted as a citation.
 - Real dogfood run against this repo (2026-07-26) found exactly one finding:
-  `docs/backlog.md:88` (the STR53 row) cited ADR0002 (flat work-item model, one item kind, one FSM, "epic" is a plain item) without mentioning
+  `plans/backlog.md:88` (the STR53 row) cited ADR0002 (flat work-item model, one item kind, one FSM, "epic" is a plain item) without mentioning
   `0012`, its superseder — confirming the check catches a real, not
   hypothetical, instance of dead framing.
 

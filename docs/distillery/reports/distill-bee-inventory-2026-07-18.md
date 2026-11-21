@@ -44,7 +44,7 @@ All 16 files read successfully. `.agents/skills/bee-*` confirmed as byte-identic
   - Hard gate: "Batch independent questions into one message; serialize only dependent ones" — `AskUserQuestion` takes up to 4 (SKILL.md:19)
   - SEE mock exception: throwaway HTML mock under `.bee/spikes/<feature>/mocks/` is the **one** exception to "exploring never writes code" (SKILL.md:21, 59)
   - Flow: Scope → Domain (SEE/CALL/RUN/READ/ORGANIZE classification) → Gray Areas (2-4 unstated product decisions) → Socratic Locking → Context Assembly (SKILL.md:27-70)
-  - "Backlog flip (D11a)": matching feature flips `docs/backlog.md` row to `in-flight` (SKILL.md:31)
+  - "Backlog flip (D11a)": matching feature flips `plans/backlog.md` row to `in-flight` (SKILL.md:31)
   - "Materiality test (P20)": every candidate question must be material + grounded + answerable before being asked (SKILL.md:56)
   - "Gate-bypass refinement — information vs approval" (decisions 0010/dcf01d7b/a93994d3): splits questions into approval-type (skip, agent has confident answer) vs information-type (still ask) (SKILL.md:57)
   - "Blindspot pass — teach before asking" (P9, decision 0020): explain concepts before asking when user shows unfamiliarity (SKILL.md:58)
@@ -142,7 +142,7 @@ All 16 files read successfully. `.agents/skills/bee-*` confirmed as byte-identic
   - "One area = one file, forever" — never `-v2`/`-new`/date-suffixed spec files (SKILL.md:54)
   - Capture mode: settlement triggers ("chốt", "final", "ok ship it") → mandatory same-turn capture (decision 0003); lane-scaled cost — high-risk merges immediately, others append a capture-queue stub via `bee.mjs capture add` (decision 0017) (SKILL.md:31, 71-82)
   - "Scribing debt" signal (decision 0011): every capped `behavior_change` cell since last scribing run counted and surfaced mechanically (SKILL.md:75)
-  - Deferred requests → `docs/backlog.md` proposed rows (D8) (SKILL.md:90-92)
+  - Deferred requests → `plans/backlog.md` proposed rows (D8) (SKILL.md:90-92)
   - "Rebuild Self-Check": re-read spec with Pointers covered — "you'd have to look at the code" answer = a hole (SKILL.md:102-104)
 - Notable design: The tech-agnostic acceptance test ("rebuild bar") converts an abstract documentation-quality goal into a concrete, testable litmus (cover the Pointers section, ask if it's rebuildable) — a directly reusable technique for any spec-writing discipline.
 
@@ -257,7 +257,7 @@ All 16 files read successfully. `.agents/skills/bee-*` confirmed as byte-identic
 - **HANDOFF.json (pause vs planned-next)** — AGENTS.md, bee-hive, bee-swarming, bee-executing
 - **Decision log (D-IDs, decisions.jsonl, supersede)** — AGENTS.md, bee-exploring, bee-planning, bee-scribing, bee-compounding, bee-bypass-gate
 - **Scribing debt / capture queue / flush (decisions 0011, 0017)** — bee-hive, bee-scribing, bee-compounding
-- **Backlog (product docs/backlog.md vs machine .bee/backlog.jsonl)** — AGENTS.md, bee-exploring, bee-scribing, bee-compounding, bee-grooming
+- **Backlog (product plans/backlog.md vs machine .bee/backlog.jsonl)** — AGENTS.md, bee-exploring, bee-scribing, bee-compounding, bee-grooming
 - **Review candidates / unreviewed status tracking (decision 565e68d0)** — bee-hive, bee-compounding, bee-reviewing
 - **Verification evidence discipline ("proof not assertion", decision 0004)** — AGENTS.md, bee-validating, bee-executing, bee-reviewing
 - **Advisor Consult (worker-level, capped, attributed)** — bee-swarming, bee-executing

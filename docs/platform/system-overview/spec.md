@@ -169,7 +169,7 @@ quả đối chiếu, không phải chỉ lập kế hoạch.
    (`fgos-runner --once`) — phải cùng đạt: verify xanh, một commit thật trên
    nhánh riêng của item, và dọn worktree sạch sau khi xong. Một khác biệt
    giữa hai kết cục là một GAP THẬT, được ghi nhận thành một dòng `proposed`
-   mới trong `repo/docs/backlog.md`, không âm thầm bỏ qua.
+   mới trong `repo/plans/backlog.md`, không âm thầm bỏ qua.
 
 3. **Trục MVP2 bổ sung cho trục MVP1, không thay thế:** `0016` chứng minh
    vòng lõi CHẠY ĐƯỢC khi con người khởi động; `0018` chứng minh CHÍNH vòng
@@ -191,7 +191,7 @@ quả đối chiếu, không phải chỉ lập kế hoạch.
 - Bất kỳ khoảng cách nào giữa ca tương tác và ca headless được đối chiếu ra
   (kể cả trường hợp một trong hai đường không thể chạy an toàn với hạ tầng
   hiện có) là một phát hiện gap thật của chính mốc MVP2 này, được nạp vào
-  `repo/docs/backlog.md` như một dòng `proposed`, không phải điều kiện thất
+  `repo/plans/backlog.md` như một dòng `proposed`, không phải điều kiện thất
   bại của quyết định — quyết định vẫn đứng, gap trở thành việc kế tiếp.
 - **Không supersede `0016`** — `0018` mở rộng trục MVP đã chốt bằng vế
   headless, không đổi phát biểu MVP1 hay luật L1–L10.

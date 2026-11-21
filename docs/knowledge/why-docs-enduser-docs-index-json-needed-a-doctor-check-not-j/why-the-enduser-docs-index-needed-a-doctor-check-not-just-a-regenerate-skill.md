@@ -93,5 +93,5 @@ invariant instead.
 - Workshop plan tsk-1m0 (external source, no repository content commit) — full plan and locked decisions.
 - `src/report/enduser-index.mjs` — `buildEnduserIndex`, the pure function
   both the check and the real regenerate verb share.
-- `docs/discussions/compound-learn-artifact-registry/DISCUSSION.md` — the
+- `plans/discussions/ds-2uvyt2sey5-compound-learn-artifact-registry/DISCUSSION.md` — the
   wider discussion this finding fed evidence into.

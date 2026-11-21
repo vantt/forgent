@@ -134,7 +134,7 @@ id that is not an item (`src/state/dep-graph.mjs`), and a refusal there would hi
 
 | Limit | Value | Basis |
 |---|---|---|
-| Nodes | 20000 | Work walks every item regardless of status; 13 open items today, 270 table lines in `docs/backlog.md`; the largest plan table has 27 phases |
+| Nodes | 20000 | Work walks every item regardless of status; 13 open items today, 270 table lines in `plans/backlog.md`; the largest plan table has 27 phases |
 | Edges | 200000 | the largest phase `dependsOn` cell today lists a handful of ids |
 | Exclusion pairs | 100000 | equals the emitted-pairs cap of write-scope, the usual producer |
 | Id length | 256 bytes | plan phase ids are at most 3 characters; Work ids are short |

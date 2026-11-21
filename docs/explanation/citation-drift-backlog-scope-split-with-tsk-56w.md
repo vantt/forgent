@@ -12,7 +12,7 @@ calibration slice, across 73 files.
 ## Why the scope was narrowed mid-flight
 
 While planning, a live coordination surfaced with `tsk-56w`
-(`docs/discussions/skill-prose-cleanup/DISCUSSION.md` D1), which had locked a
+(`plans/discussions/ds-tk5ncy6ypy-skill-prose-cleanup/DISCUSSION.md` D1), which had locked a
 **stricter** rule for `.agents/skills/**/SKILL.md` and `plugins/fgOS/
 skills/**/SKILL.md`: remove every governance id (`ADR<n>`/`RUL<n>`/D-local)
 outright — never gloss, never footnote. The reason those 61 skill files
@@ -34,7 +34,7 @@ correct fix for that scope moved entirely to `tsk-56w`.
 ## The resulting split
 
 `tsk-2sp` narrowed to exactly the 12 non-skill baseline files (1019
-findings): `docs/specs/*.md` + `docs/backlog.md`, split three ways by file
+findings): `docs/specs/*.md` + `plans/backlog.md`, split three ways by file
 group:
 
 - `tsk-2sp-1` — `docs/specs/work-state.md` (301 `d-local-outside-home`

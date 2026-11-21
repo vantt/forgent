@@ -14,7 +14,7 @@ own coding-shape discussion, once the product owner named compound-learn
 as a strategically important area needing to serve more audiences over
 time — clearly bigger than `tsk-12m`'s narrow changelog ask, so split into
 its own `DISCUSSION.md` per `fgos-coding-shaping`'s one-feature-one-doc
-rule (`docs/discussions/compound-learn-artifact-registry/DISCUSSION.md`).
+rule (`plans/discussions/ds-2uvyt2sey5-compound-learn-artifact-registry/DISCUSSION.md`).
 
 ## The full spec lives elsewhere — this doc is the narrative, not a duplicate
 

@@ -29,7 +29,7 @@ below is shared and lives only here.
   constraints and its exits. When the domain is unknown, ask the person one
   line; never assume one.
 - Discussion path: `fgos convention path --kind discussion --slug <feature>`
-  answers the directory (`docs/discussions/<feature>/`). `<feature>` is a
+  answers the directory (`plans/discussions/<feature>/`). `<feature>` is a
   descriptive kebab-case name. Never hand-build the path.
 
 ## Hard rules

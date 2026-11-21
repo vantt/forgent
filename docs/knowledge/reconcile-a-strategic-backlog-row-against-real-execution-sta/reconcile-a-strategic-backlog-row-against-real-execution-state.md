@@ -6,7 +6,7 @@ mode: how-to
 
 ## When to use
 
-`docs/backlog.md`'s PBI rows (the strategic layer) and `.fgos/state.json`'s
+`plans/backlog.md`'s PBI rows (the strategic layer) and `.fgos/state.json`'s
 work items (the execution layer) are two separate records that nobody
 automatically keeps in sync. `tsk-3vv` found this drift was not theoretical:
 0 of 31 PBI rows read `done` while 223 fgOS items already were, and reading
@@ -15,7 +15,7 @@ made moot. One of the nine was labelled `[NGHIÊM TRỌNG — rủi ro mất d�
 thật]` (CRITICAL — real data-loss risk) — exactly the row a reader picking
 work by severity would grab first.
 
-Use this recipe whenever a new `proposed` row is added to `docs/backlog.md`,
+Use this recipe whenever a new `proposed` row is added to `plans/backlog.md`,
 or periodically to catch rows the execution layer has since made moot.
 
 ## The recipe
@@ -53,7 +53,7 @@ or periodically to catch rows the execution layer has since made moot.
    | `open` | Nothing in the execution layer addresses it | none — an honest "still proposed" |
    | `stale` | The mechanism the row complains about no longer exists | a `path:line` or a commit sha |
 
-4. **Never flip the PBI's own status.** `docs/backlog.md` is a generated
+4. **Never flip the PBI's own status.** `plans/backlog.md` is a generated
    file (`bee backlog render` from `.bee/backlog.jsonl`), and `.bee/` does
    not exist in this repo — so editing a row's status here is not merely
    out of scope, it is not possible from this checkout. Record the verdict
@@ -69,7 +69,7 @@ row's own Story cell carries a literal `|` inside its prose — shifting every
 column after it by one, silently hiding a row from the scan entirely. The
 fix reads the status column from the right (`cells[cells.length - 2]`),
 which stays correct no matter how many pipes the prose between the id and
-the status contains. Any table-row parser over `docs/backlog.md` should
+the status contains. Any table-row parser over `plans/backlog.md` should
 assume prose cells can contain `|` and index from whichever side is
 actually stable, not copy a fixed left-hand offset from a sample row that
 happened not to have one.

@@ -65,7 +65,7 @@ whole answer to `plan-no-progress`.
 ## Done plans
 
 Close a `done` plan with one board line (plan program board rules in AGENTS.md) and a backlog update, landed with
-`fgos land --paths` (write `docs/backlog.md` with `fgos session write docs/backlog.md < new`; it is a read-only file grant). `fgos session stop lead --name <headName> --reason "plan done"` if its lead is still live.
+`fgos land --paths` (write `plans/backlog.md` with `fgos session write plans/backlog.md < new`; it is a read-only file grant). `fgos session stop lead --name <headName> --reason "plan done"` if its lead is still live.
 
 ## Settled discussion
 

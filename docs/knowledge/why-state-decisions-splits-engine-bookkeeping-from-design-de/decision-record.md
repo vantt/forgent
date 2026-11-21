@@ -232,7 +232,7 @@ timing gap was noticed.
 **D2/D3 shipped as real code (`tsk-1lv-1`).** `fgos decision` now requires
 a `--relation` argument, and the write-time consistency sweep (D2: derive
 consistency at write time, never a stored parallel graph) widened its own
-scan scope from just `docs/backlog.md` + `docs/specs/*.md` to the full
+scan scope from just `plans/backlog.md` + `docs/specs/*.md` to the full
 `docs/**` + `src/**` + `plugins/**` tree, on the existing store (D3: no new
 decision-store, upgrade the one that already exists).
 
@@ -302,7 +302,7 @@ actually contradict.
 (`tsk-679`).** Running `fgos decision --relation supersedes:D8` on an
 item superseding its *own* locally-scoped `D8` decision returned a
 `danglingCitations` flood against many unrelated files across the repo —
-`docs/backlog.md`, several `docs/specs/*.md` files, some with multiple
+`plans/backlog.md`, several `docs/specs/*.md` files, some with multiple
 hits each. None of those lines actually cited the item's own `D8`; each
 cited some *other* document's own, differently-scoped `D8` label — a
 `D`-local id is short and common enough to collide constantly across

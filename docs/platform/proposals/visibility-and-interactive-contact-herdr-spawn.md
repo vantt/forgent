@@ -537,7 +537,7 @@ Setup: worktree `--detach` dùng một lần dưới `/var/tmp`, trust pre-seed,
 
 ## 13. Thay đổi conceptual cần cập nhật vào tài liệu
 
-- `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules` RUL40: **đã làm 2026-09-06** — decision "RUL40 re-scope" (scope `runner`, `supersedes:d3dbe7f5`) ghi qua `fgos decision`, RUL40 viết lại giữ phát biểu cũ làm lịch sử. Còn dangling citation ở `docs/backlog.md:84` (file generated, không sửa tay) và hai `docs/history/*/CONTEXT.md` (đã chú thích superseded).
+- `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules` RUL40: **đã làm 2026-09-06** — decision "RUL40 re-scope" (scope `runner`, `supersedes:d3dbe7f5`) ghi qua `fgos decision`, RUL40 viết lại giữ phát biểu cũ làm lịch sử. Còn dangling citation ở `plans/backlog.md:84` (file generated, không sửa tay) và hai `docs/history/*/CONTEXT.md` (đã chú thích superseded).
 - `visibility-and-herdr.md`: thêm Invariant "receipt is an artifact the receiver wrote"; thêm VisibilitySession, observer≠actor, pane forensics policy; sửa "Implementation: Partial" thành mô tả đúng (family A).
 - `dispatch-control-plane.md`: flow thêm `execution capability set` giữa mechanism và Run; Separation thêm `visibility: binds pane/session, never settles`.
 - `dispatch-control-plane-redesign.md` §12.2: xoá mô tả temp-script/sentinel (đã bị tsk-by0 xoá), thay bằng B.

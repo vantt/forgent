@@ -139,7 +139,7 @@ herdr **không bao giờ** là nguồn sự thật hay đường lái agent chí
 
 Bàn sâu với người dùng đã **đẩy kết luận đi xa hơn** phần "tmux vs herdr" thuần ở
 trên. Ghi lại phần chốt (record sản phẩm: `repo/docs/decisions/0014`, backlog
-`repo/docs/backlog.md` P46 + P48):
+`repo/plans/backlog.md` P46 + P48):
 
 **A. Câu hỏi thật không phải "multiplexer nào" mà "cửa chuẩn của fgOS là gì".**
 Chốt (mức interface): **contract = SCHEMA event-log + giao thức append/read/subscribe**
