@@ -255,6 +255,74 @@ test('a proposer killed while its Unit runs leaves the reservation in place; the
   assert.deepEqual(projectCase(after).liveReservations, []);
 });
 
+/** The pids of this process's own children that are run-unit hosts (`fgos internal execution run-unit`). */
+function runUnitHostsOfThisProcess() {
+  return execFileSync('ps', ['-axww', '-o', 'pid=,ppid=,args='], { encoding: 'utf8' }).split('\n')
+    .map((line) => /^\s*(\d+)\s+(\d+)\s+(.*)$/.exec(line))
+    .filter((m) => m && Number(m[2]) === process.pid && m[3].includes('internal execution run-unit'))
+    .map((m) => Number(m[1]));
+}
+
+/** Resolves with the pid of a run-unit host child of this process that is not in `known`. */
+async function newRunUnitHost(known = [], timeoutMs = 20000) {
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    const pid = runUnitHostsOfThisProcess().find((p) => !known.includes(p));
+    if (pid) return pid;
+    assert.ok(Date.now() < deadline, `no run-unit host started within ${timeoutMs} ms`);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+}
+
+test('a run-unit host killed after admit settles nothing: the advance ends with the reservation live, and a later resume completes on that reservation', async () => {
+  const tmp = setupRepo();
+  const workflow = validateWorkflow({ id: 'host-killed', steps: [{ id: 's', units: [unit('slow', 'SLEEP:6000')] }] });
+  const runsDir = path.join(tmp, '.fgos', 'workflow-runs');
+  const findRun = () => (fs.existsSync(runsDir) ? fs.readdirSync(runsDir).find((n) => n.startsWith('wf-run-')) : undefined);
+  const started = startWorkflow({ workflow, ...opts(tmp) });
+  const firstHost = await newRunUnitHost();
+  const deadline = Date.now() + 20000;
+  let id;
+  while (Date.now() < deadline) {
+    id = findRun();
+    if (id && eventsOf(tmp, id).some((e) => e.type === 'unit.started')) break;
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+  assert.ok(id && eventsOf(tmp, id).some((e) => e.type === 'unit.started'), 'the Unit run started');
+  process.kill(firstHost, 'SIGKILL');
+  const first = await started;
+  assert.equal(first.status, 'running', 'the advance ends; the run is not failed');
+  const mid = eventsOf(tmp, id);
+  const reservation = mid.find((e) => e.type === 'reservation');
+  assert.ok(reservation, 'admitted before it ran');
+  assert.equal(mid.some((e) => e.type === 'settle'), false, 'the host\'s death settles nothing');
+  assert.equal(mid.some((e) => e.type === 'unit.complete'), false, 'no unit end is recorded');
+  assert.equal(mid.find((e) => e.type === 'unit.host-exit')?.payload.signal, 'SIGKILL', 'the ledger names the host\'s exit');
+  assert.deepEqual(projectCase(mid).liveReservations.map((r) => r.reservationId), [reservation.payload.reservationId], 'the reservation is not released');
+
+  // Resumed while the unit run's supervisor still runs, and its host killed too: still nothing settled.
+  const resumed = resumeWorkflow(id, opts(tmp));
+  process.kill(await newRunUnitHost([firstHost]), 'SIGKILL');
+  assert.equal((await resumed).status, 'running');
+  const again = eventsOf(tmp, id);
+  assert.equal(again.some((e) => e.type === 'settle'), false, 'the resumed host\'s death settles nothing');
+  assert.deepEqual(projectCase(again).liveReservations.map((r) => r.reservationId), [reservation.payload.reservationId], 'the same reservation is still live');
+
+  await waitUntilNothingRunsIn(tmp); // the supervisor and worker that outlived both hosts finish on their own
+  const hostsDeadline = Date.now() + 30000;
+  while (runUnitHostsOfThisProcess().length > 0) {
+    assert.ok(Date.now() < hostsDeadline, 'a killed run-unit host is still listed');
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+  const state = await resumeWorkflow(id, opts(tmp));
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+  const after = eventsOf(tmp, id);
+  assert.equal(after.filter((e) => e.type === 'reservation').length, 1, 'the same dispatch, not a second one');
+  assert.equal(after.filter((e) => e.type === 'settle').length, 1);
+  assert.equal(after.find((e) => e.type === 'settle').payload.reservationId, reservation.payload.reservationId);
+  assert.deepEqual(projectCase(after).liveReservations, []);
+});
+
 test('a panel Unit is admitted under a ceiling of its planned seats times the fallback allowance, and settles the launches it used', async () => {
   const tmp = setupRepo();
   const workflow = validateWorkflow({

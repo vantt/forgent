@@ -50,6 +50,7 @@ function progressLine({ ts, type, payload }) {
   else if (type === 'step.complete') what = 'completed';
   else if (type === 'step.fail') what = `failed: ${payload.reason ?? payload.outcome}`;
   else if (type === 'gate.park') what = 'parked, waiting for an answer';
+  else if (type === 'unit.host-exit') what = `unit ${payload.unitId}: its host ended (${payload.signal ? `signal ${payload.signal}` : `exit ${payload.code}`}) before settling; the unit stays running`;
   else return null;
   return `[${ts}] step ${step} ${what}`.slice(0, PROGRESS_LINE_LIMIT);
 }
@@ -226,7 +227,7 @@ function refuseUnit(run, { step, u, error, attempt }) {
 /**
  * Run one unit of a step to its recorded end.
  *
- * @returns {Promise<'parked'|'failed'|undefined>} how the step ended, or undefined when the unit passed and the step goes on
+ * @returns {Promise<'parked'|'failed'|'unsettled'|undefined>} how the step ended, or undefined when the unit passed and the step goes on
  */
 async function runStepUnit(run, { step, u, state, uState }) {
   const { mainRoot, workflowRunId, workflow } = run;
@@ -276,12 +277,16 @@ async function runStepUnit(run, { step, u, state, uState }) {
       throw new RunnerConfigError(attempt.prep.error);
     }
     result = await runUnitWithRecovery(run, { step, u, unitData, state, base, attempt, recordScheduled });
-    // The host ended after admitting the unit and before settling it: nothing is settled here. The unit stays
-    // `running` with its reservation live, as when this controller itself dies, and the dead-reservation sweep of a
-    // later advance decides it from the custody and the unit run's record.
-    if (result?.unsettled) return 'unsettled';
   } catch (error) {
     if (error instanceof CaseAdmissionRefusedError) return refuseUnit(run, { step, u, error, attempt });
+    if (error?.code === 'execution-route-unsettled') {
+      // The host ended after its unit run began and before settling it: nothing is settled here. The unit stays
+      // `running` with its reservation live, as when this controller itself dies; the ledger names the exit, and a
+      // later advance resumes the unit run or its dead-reservation sweep decides it.
+      const { reservationId, unitRunId, code, signal, stderr } = error.unsettled;
+      run.emit('unit.host-exit', { stepId: step.id, unitId: u.id, unitRunId, reservationId, code, signal, ...(stderr ? { stderr } : {}) });
+      return 'unsettled';
+    }
     recordScheduled();
     result = { unitRunId: attempt.resumeUnitRunId ?? attempt.unitRunId, outcome: 'execution-failure', infrastructure: true, results: [], error: String(error?.message ?? error) };
   }

@@ -197,8 +197,10 @@ export function runUnitErrorOf(result) {
     thrown.code = error.code;
     thrown.category = 'precondition';
   } else if (fields.name === 'DispatchError') {
-    // A run supervisor DispatchError: its class is its code, its details its fields.
-    thrown = new DispatchError(error.errorClass ?? error.code ?? 'error', error.message ?? 'run-unit failed', { ...(error.code !== undefined ? { code: error.code } : {}) });
+    // A run supervisor DispatchError: its class is its code, its details its fields, all of them in `data` as the
+    // constructor called with those details holds them.
+    const details = Object.fromEntries(Object.entries(fields).filter(([key]) => !['name', 'message', 'stack'].includes(key)));
+    thrown = new DispatchError(error.errorClass ?? error.code ?? 'error', error.message ?? 'run-unit failed', { ...details, ...(error.code !== undefined ? { code: error.code } : {}) });
   } else {
     thrown = new Error(error.message ?? 'run-unit failed');
     if (error.code !== undefined) thrown.code = error.code;
@@ -333,15 +335,18 @@ export async function executionOp(op, payload, { cwd, caseAdmission } = {}) {
  * `runUnit(request)` run by the host's engine: the same options (plain data; `caseAdmission`, `onUnitRunCreated`
  * and `onCaseAdmitted` are passed beside it) and the same result. An error result is rethrown as the class its tag
  * names (`runUnitErrorOf`), so `instanceof RunnerConfigError` holds for a refusal and an admission refusal. A host
- * that ends without an answer settles nothing: when a reservation was admitted and not settled the call returns
- * `{ unsettled: { reservationId } }`, and the Workflow's dead-reservation sweep decides it; otherwise it throws
- * ExecutionRouteError `execution-route-no-answer`.
+ * that ends without an answer settles nothing. When a unit run may exist (a reservation was admitted and not settled,
+ * `resumeUnitRunId` was given, or `onUnitRunCreated` was called) it throws ExecutionRouteError
+ * `execution-route-unsettled` carrying `unsettled: { reservationId, unitRunId, code, signal, stderr }`: the unit run
+ * and its reservation are left as they stand for the next caller to resume or sweep. Otherwise it throws
+ * `execution-route-no-answer`.
  */
 export async function runUnitInHost(request, { caseAdmission, onUnitRunCreated, onCaseAdmitted } = {}) {
   const BESIDE = new Set(['caseAdmission', 'onUnitRunCreated', 'onCaseAdmitted']);
   const options = Object.fromEntries(Object.entries(request ?? {}).filter(([key, value]) => value !== undefined && !BESIDE.has(key)));
   let admitted = null;
   let settled = false;
+  let createdUnitRunId = null;
   const port = caseAdmission
     ? {
         ...Object.fromEntries(Object.keys(OPERATIONS).filter((op) => typeof caseAdmission[op] === 'function').map((op) => [op, caseAdmission[op].bind(caseAdmission)])),
@@ -357,7 +362,10 @@ export async function runUnitInHost(request, { caseAdmission, onUnitRunCreated, 
       }
     : {};
   const events = {
-    onUnitRunCreated: (unitRunId) => onUnitRunCreated?.(unitRunId),
+    onUnitRunCreated: (unitRunId) => {
+      createdUnitRunId = unitRunId;
+      onUnitRunCreated?.(unitRunId);
+    },
     onCaseAdmitted: async (caseId, reservationId) => {
       admitted = reservationId;
       await onCaseAdmitted?.({ caseId, reservationId });
@@ -369,9 +377,15 @@ export async function runUnitInHost(request, { caseAdmission, onUnitRunCreated, 
   };
   const called = await callHost('run-unit', payload, { cwd: typeof options.cwd === 'string' ? options.cwd : process.cwd(), port, events });
   if (called.ended) {
-    if (admitted !== null && !settled) return { unsettled: { reservationId: admitted } };
     const { code, signal, stderr } = called.ended;
-    throw new ExecutionRouteError('execution-route-no-answer', `fgos internal execution run-unit ended without an answer (${signal ? `signal ${signal}` : `exit ${code}`})${stderr ? `: ${stderr}` : ''}`);
+    const how = `${signal ? `signal ${signal}` : `exit ${code}`})${stderr ? `: ${stderr}` : ''}`;
+    const unitRunId = createdUnitRunId ?? (typeof options.resumeUnitRunId === 'string' ? options.resumeUnitRunId : null);
+    if ((admitted !== null && !settled) || unitRunId !== null) {
+      const thrown = new ExecutionRouteError('execution-route-unsettled', `fgos internal execution run-unit ended without an answer after its unit run began, nothing settled (${how}`);
+      thrown.unsettled = { reservationId: admitted, unitRunId, code, signal, stderr };
+      throw thrown;
+    }
+    throw new ExecutionRouteError('execution-route-no-answer', `fgos internal execution run-unit ended without an answer (${how}`);
   }
   if (called.result?.ok === false) throw runUnitErrorOf(called.result);
   const result = called.result?.result;
