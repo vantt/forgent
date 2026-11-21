@@ -8,6 +8,7 @@ pub mod eval;
 pub mod faults;
 pub mod harness;
 pub mod outcomes;
+pub mod prune;
 pub mod query;
 pub mod record;
 pub mod runs;
@@ -46,6 +47,7 @@ pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
     "entropy",
     "snapshot",
     "record",
+    "prune",
     "query",
 ];
 
@@ -62,11 +64,12 @@ pub(crate) fn parse_flags(
         .map_err(|error| format!("metrics {verb}: {error}"))
 }
 
-/// Whether the verb appends to an Observe store (case open/close, eval record, snapshot).
+/// Whether the verb changes an Observe store (case open/close, eval record, snapshot, `prune --apply`).
 pub fn writes(req: &ObserveRequest) -> bool {
     let action = req.args.first().map(String::as_str);
     match req.sub.as_str() {
         "snapshot" | "record" => true,
+        "prune" => req.args.iter().any(|arg| arg == "--apply"),
         "case" => matches!(action, Some("open" | "close")),
         "eval" => action == Some("record"),
         _ => false,
@@ -106,6 +109,7 @@ pub fn dispatch(
         "entropy" => entropy::dispatch_entropy(req, work_source),
         "snapshot" => snapshot::dispatch_snapshot(req, work_source),
         "record" => record::dispatch_record(req, record_environment),
+        "prune" => prune::dispatch_prune(req, record_environment),
         "query" => query::dispatch_query(req, record_environment),
         "--help" | "-h" | "help" => Ok(json!({
             "ok": true,

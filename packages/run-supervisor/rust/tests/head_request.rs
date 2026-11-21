@@ -668,6 +668,8 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
         verbs,
         [
             "land",
+            "metrics prune",
+            "metrics record",
             "questions ack",
             "questions answer",
             "questions ask",
@@ -677,16 +679,20 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "run",
             "session answered",
             "session bind session",
+            "session read",
             "session restore role",
             "session rotate",
             "session start",
             "session stop",
+            "session type",
             "session write",
             "slots",
             "supervisor done",
             "supervisor handled",
             "supervisor plans",
             "supervisor queue",
+            "supervisor raise",
+            "watcher tune",
             "worktree create"
         ]
     );

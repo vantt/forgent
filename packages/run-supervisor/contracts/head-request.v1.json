@@ -127,15 +127,17 @@
         "provider": "string, optional; must not start with '-'",
         "capability": "string, optional; must not start with '-'",
         "writes": "array of strings, optional: each must be contained in the lead's plan footprint by the repo's write-scope semantics (write-outside-footprint); `src/**` is not contained in `src/*`",
-        "worktree": "string, optional: a linked worktree; must not start with '-'"
+        "worktree": "string, optional: a linked worktree; must not start with '-'",
+        "maxMinutes": "integer, optional, secretary only: wall-clock minutes of the unit (--timeout), at most secretary.run.maxMinutes (default 15, the ceiling); the default is the ceiling",
+        "tier": "string, optional, secretary only: the unit's tier (--override), at most secretary.run.tier (default standard)"
       },
-      "does": "lead only. A `unit` key is bad-args (a unit file declares its own writes, which the footprint could not bound). Answers at once with a ticket as land does; the detached runner runs `fgos run --json` without FGOS_DISPATCH_DEPTH (a lead's phase run is a top-level seat and takes a lane) and the ticket keeps only the unitRunId, whose outcome stays in .fgos/assignments/<unitRunId>/",
+      "does": "a lead, or the secretary under the ceilings below. A lead: a `unit` key is bad-args (a unit file declares its own writes, which the footprint could not bound). Answers at once with a ticket as land does; the detached runner runs `fgos run --json` without FGOS_DISPATCH_DEPTH (a lead's phase run is a top-level seat and takes a lane) and the ticket keeps only the unitRunId, whose outcome stays in .fgos/assignments/<unitRunId>/ The secretary's run is one unit built from a prompt: no provider, capability, unit file or plan footprint of hers; read-only unless `writes` names plain project-relative paths and `worktree` is a linked worktree of this project (absolute, not the project checkout, its `.git` a file); it runs `fgos run <prompt> --timeout <maxMinutes>m --override {\"tier\":<tier>}` and a request may ask for less than `secretary.run.maxMinutes` and `secretary.run.tier`, never more. The ticket and `request result` work as a lead's.",
       "data": {
         "ticket": "the request id",
         "state": "running"
       },
       "identity": "held",
-      "rule": "refusals (verb-failed detail): bad-args, role-mismatch (not a lead), write-outside-footprint, ticket-used, plan-not-found, plan-ambiguous"
+      "rule": "refusals (verb-failed detail): bad-args, role-mismatch (not a lead), write-outside-footprint, ticket-used, plan-not-found, plan-ambiguous; the secretary also: run-one-unit (a unit or units key), run-ceiling-exceeded (maxMinutes or tier above secretary.run.*), writes-need-linked-worktree"
     },
     "request result": {
       "args": {
@@ -164,10 +166,10 @@
         "name": "string, required",
         "reason": "string, optional, at most 200 characters"
       },
-      "does": "stopHeadSession (src/session-host/head-stop.mjs): ends the live head the way a rotation ends the old head (writes retiredAt into the lineage's placement.json first, asks the head's own supervisor to stop it, waits for its attempt to close, then retires the pane through Session Host; a head that does not end is stop-not-ended and keeps its record), and retiredAt is what the head-state source reads as retired. Refused role-mismatch unless the persona-name is a lead or planner lineage of this project, the asker of an answered question, or the caller's own role",
+      "does": "stopHeadSession (src/session-host/head-stop.mjs): ends the live head the way a rotation ends the old head (writes retiredAt into the lineage's placement.json first, asks the head's own supervisor to stop it, waits for its attempt to close, then retires the pane through Session Host; a head that does not end is stop-not-ended and keeps its record), and retiredAt is what the head-state source reads as retired. Refused role-mismatch unless the persona-name is a lead or planner lineage of this project, the asker of an answered question, or the caller's own role The secretary and the supervisor may stop any head, and a target persona that holds no head grant is refused stop-target-not-head for them (a hand-started session is not stopped here).",
       "data": "{stopped: true} or {stopped: false, reason: not-live}",
       "identity": "held",
-      "rule": "refusals (verb-failed detail): role-mismatch, stop-not-ended, retire-refused, bad-persona, bad-name"
+      "rule": "refusals (verb-failed detail): role-mismatch, stop-not-ended, retire-refused, bad-persona, bad-name, stop-target-not-head"
     },
     "supervisor handled": {
       "args": {
@@ -205,6 +207,69 @@
       "data": "the host verb's JSON data, with stopping: true when the caller's own stop was started",
       "identity": "held",
       "rule": "refusals (verb-failed detail): the host verb's own code (events still unhandled)"
+    },
+    "supervisor raise": {
+      "args": {
+        "kind": "string, required: coordination-handoff, coordination-chore or coordination-help",
+        "ref": "string, required, one line of at most 200 characters: what the event is about (a plan, a portfolio file, a session)",
+        "reason": "string, required, one line of at most 500 characters",
+        "next": "string, optional, one line of at most 200 characters: the command the supervisor runs next"
+      },
+      "does": "as supervisor handled, running `fgos supervisor raise --kind <kind> --ref <ref> --reason <reason> [--next <next>] --json`: puts one coordination event on the supervision queue through the queue's one raise path (the id is derived from kind, ref and the instant) and records a `fgos.coordination.act` record. The supervisor closes it with `supervisor handled`",
+      "data": "the host verb's JSON data ({id, raised: true|false})",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): bad-args, bad-event (an unknown kind or an empty ref) and the host verb's own code"
+    },
+    "watcher tune": {
+      "args": {
+        "definition": "string, optional: a definition (row kind) name to arm or disarm, lowercase letters, digits and hyphens",
+        "arm": "boolean, optional: route the definition's rows to the supervisor",
+        "disarm": "boolean, optional: stop acting on the definition's rows",
+        "set": "array of strings, optional, at most 16: `key=value` entries with a whole number value, a watcher threshold or pace setting"
+      },
+      "does": "as supervisor handled, running `fgos watcher tune [<definition>] [--set key=value]... [--arm|--disarm] --json`: writes `watcher.actions.<definition>` (wake-supervisor when armed, none when disarmed) and `watcher.<key>` through the config door into the project's config, each inside the bounds of the config schema, and records a `fgos.coordination.act` record (act tune). A new definition kind stays a code change: only the settings the schema declares can be set, and `enabled`, `definitions`, `defaultAction`, `actions` and `notifyTo` never can",
+      "data": "the host verb's JSON data ({applied: [\"key=value\", ...]})",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): bad-args and the host verb's own code (a refused value names the key and the settings already applied)"
+    },
+    "session read": {
+      "args": {
+        "target": "string, required: a role (head:<persona>-<name>, lead:<LANE>), handle or slot key that Identity resolves to one live session; never a raw pane id",
+        "lines": "integer, optional, 1 to 1000: how many trailing lines (default 50)"
+      },
+      "does": "as supervisor queue, running `fgos session read <target> [--lines N] --json`: resolves the target through Identity, reads the trailing lines of the session's screen through the terminal-control port (`read_recent`, which refuses a driver without the capability and never answers an empty read), and answers the last 48 KiB of it at most. It changes nothing",
+      "data": "{session: <handle>, lines, truncated, text}",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): bad-args, session-not-found, ambiguous, session-has-no-pane, terminal-refused"
+    },
+    "session type": {
+      "args": {
+        "target": "string, required: as session read",
+        "text": "string, required, at most 4096 bytes, must not start with '-'"
+      },
+      "does": "as supervisor queue, running `fgos session type <target> --text <text> --json`: types the text into the session's pane through the terminal-control port (`type_text`) exactly once, and records a `fgos.coordination.act` record (act type). It is for a stuck session only: refused target-not-stuck unless an open supervision event names the target session (by id, handle, a role it holds or its slot key)",
+      "data": "{session: <handle>, typed: true}",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): bad-args, session-not-found, ambiguous, target-not-stuck, session-has-no-pane, terminal-refused"
+    },
+    "metrics record": {
+      "args": {
+        "records": "array of 1 to 10 record objects, required: observe.record.v2 objects whose `kind` is `fgos.coordination.*`; v, id, ts, basis and origin may be left out as for `fgos metrics record`. The request frame's own bounds (256 values, depth 8) apply to the whole array"
+      },
+      "does": "as supervisor handled, running `fgos metrics record --json -` with the records on stdin: the fail-open record door of Observe, limited to coordination evidence. Any record of another kind refuses the whole call, nothing written. From inside a confined head `fgos metrics record --json -` sends its stdin through this verb",
+      "data": "the host verb's JSON data ({written, duplicate, rejected, failed, outcomes})",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): bad-args, kind-not-allowed (a record's kind is not fgos.coordination.*)"
+    },
+    "metrics prune": {
+      "args": {
+        "apply": "boolean, optional: remove the eligible records; without it nothing changes",
+        "settled": "array of strings, optional, at most 50: `<kind>:<id>` subjects whose finding is settled"
+      },
+      "does": "as supervisor handled, running `fgos metrics prune [--settled <kind:id>]... [--apply] --json`: the Observe prune door. Only records of kinds declared prunable are eligible, those older than their retention or whose subject is settled; a dry run (the default) reports what would go",
+      "data": "the host verb's JSON data ({applied, scanned, prunableFound, pruned, ids})",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): bad-args and the host verb's own code"
     }
   },
   "questionsRoute": {

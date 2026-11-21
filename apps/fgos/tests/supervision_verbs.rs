@@ -600,6 +600,338 @@ fn a_confined_land_that_names_the_footprint_is_refused_before_the_socket() {
     assert_eq!(printed["code"], "bad-args", "{}", text(&out));
 }
 
+/// A live session of this project holding `role`, with a terminal pane in Identity; returns its handle.
+fn register_session(scene: &Scene, role: &str, value: &str) -> String {
+    let state = scene.root.join("state");
+    let info = fgos_identity::session_for(
+        &state,
+        &fgos_identity::resolve::WriterKey {
+            source: "CLAUDE_CODE_SESSION_ID",
+            value,
+        },
+        None,
+    )
+    .unwrap()
+    .info;
+    let mut entry = fgos_identity::directory::Entry::new(
+        info.id,
+        info.handle.clone(),
+        "claude".to_string(),
+        Some(PROJECT_ID.to_string()),
+        None,
+        vec![role.to_string()],
+        fgos_identity::current::os_record(std::process::id()),
+    );
+    entry.ids = Some(fgos_identity::directory::Ids {
+        terminal: Some(fgos_identity::directory::TerminalIds {
+            driver: "herdr".to_string(),
+            key: None,
+            pane_id: "p-test".to_string(),
+            tab_id: None,
+            workspace_id: None,
+        }),
+        ..Default::default()
+    });
+    fgos_identity::directory::register(&state, entry, false, &fgos_process::facts::judge_here)
+        .unwrap();
+    info.handle
+}
+
+#[test]
+fn a_raised_coordination_event_reaches_the_queue_and_leaves_it_when_handled() {
+    let scene = Scene::new("raise", WATCHER_CONFIG);
+    let raised = scene.data(&[
+        "supervisor",
+        "raise",
+        "--kind",
+        "coordination-handoff",
+        "--ref",
+        "plans/x",
+        "--reason",
+        "ready for a lead",
+        "--next",
+        "fgos supervisor plans",
+        "--json",
+    ]);
+    assert_eq!(raised["raised"], true, "{raised}");
+    let id = raised["id"].as_str().unwrap().to_owned();
+    let queue = scene.data(&["supervisor", "queue", "--json"]);
+    let event = &queue["events"][0];
+    assert_eq!(event["id"], id.as_str(), "{queue}");
+    assert_eq!(event["kind"], "coordination-handoff");
+    scene.data(&["supervisor", "handled", &id, "--json"]);
+    let queue = scene.data(&["supervisor", "queue", "--json"]);
+    assert_eq!(queue["events"].as_array().unwrap().len(), 0, "{queue}");
+
+    let unknown = scene.run(&[
+        "supervisor",
+        "raise",
+        "--kind",
+        "discussion-settled",
+        "--ref",
+        "x",
+        "--reason",
+        "y",
+        "--json",
+    ]);
+    assert_eq!(unknown.status.code(), Some(4), "{}", text(&unknown));
+    assert!(text(&unknown).contains("bad-event"), "{}", text(&unknown));
+}
+
+#[test]
+fn a_tuned_watcher_setting_lands_in_the_project_config_inside_the_schema_bounds() {
+    let scene = Scene::new("tune", WATCHER_CONFIG);
+    let tuned = scene.data(&[
+        "watcher",
+        "tune",
+        "session-idle",
+        "--set",
+        "sessionIdleLimit=3",
+        "--arm",
+        "--json",
+    ]);
+    assert_eq!(
+        tuned["applied"],
+        serde_json::json!(["actions.session-idle=wake-supervisor", "sessionIdleLimit=3"]),
+        "{tuned}"
+    );
+    let config = fs::read_to_string(scene.project().join(".fgos/config.yaml")).unwrap();
+    assert!(config.contains("session-idle: wake-supervisor"), "{config}");
+    assert!(config.contains("sessionIdleLimit: 3"), "{config}");
+
+    let below_minimum = scene.run(&["watcher", "tune", "--set", "sessionIdleLimit=-1", "--json"]);
+    assert_eq!(
+        below_minimum.status.code(),
+        Some(4),
+        "{}",
+        text(&below_minimum)
+    );
+    let untunable = scene.run(&["watcher", "tune", "--set", "enabled=1", "--json"]);
+    assert_eq!(untunable.status.code(), Some(4), "{}", text(&untunable));
+    let config = fs::read_to_string(scene.project().join(".fgos/config.yaml")).unwrap();
+    assert!(
+        config.contains("sessionIdleLimit: 3"),
+        "a refusal changes nothing: {config}"
+    );
+}
+
+#[test]
+fn session_read_resolves_its_target_through_identity_before_it_reaches_the_terminal() {
+    let scene = Scene::new("read", WATCHER_CONFIG);
+    let unknown = scene.run(&["session", "read", "lead:NOBODY", "--json"]);
+    assert_eq!(unknown.status.code(), Some(4), "{}", text(&unknown));
+    assert!(
+        text(&unknown).contains("session-not-found"),
+        "{}",
+        text(&unknown)
+    );
+    // The session resolves; the scene has no terminal host, so the terminal port is what refuses.
+    register_session(&scene, "lead:S6A", "read-target");
+    let read = scene.run(&["session", "read", "lead:S6A", "--lines", "20", "--json"]);
+    assert!(!read.status.success(), "{}", text(&read));
+    assert!(text(&read).contains("terminal-refused"), "{}", text(&read));
+    assert!(
+        scene.payload_calls().is_empty(),
+        "the host serves session read itself"
+    );
+}
+
+#[test]
+fn session_type_is_refused_until_an_open_event_names_the_target_session() {
+    let scene = Scene::new("type", WATCHER_CONFIG);
+    let handle = register_session(&scene, "lead:S6A", "type-target");
+    let args = [
+        "session", "type", "lead:S6A", "--text", "continue", "--json",
+    ];
+    let refused = scene.run(&args);
+    assert_eq!(refused.status.code(), Some(2), "{}", text(&refused));
+    assert!(
+        text(&refused).contains("target-not-stuck"),
+        "{}",
+        text(&refused)
+    );
+
+    let raised = scene.data(&[
+        "supervisor",
+        "raise",
+        "--kind",
+        "coordination-help",
+        "--ref",
+        &handle,
+        "--reason",
+        "stuck on a prompt",
+        "--json",
+    ]);
+    // With an event naming the session the gate opens; the scene has no terminal host, so the terminal port refuses.
+    let typed = scene.run(&args);
+    assert!(!typed.status.success(), "{}", text(&typed));
+    assert!(
+        text(&typed).contains("terminal-refused"),
+        "{}",
+        text(&typed)
+    );
+    assert!(
+        !text(&typed).contains("target-not-stuck"),
+        "{}",
+        text(&typed)
+    );
+    scene.data(&[
+        "supervisor",
+        "handled",
+        raised["id"].as_str().unwrap(),
+        "--json",
+    ]);
+    let closed = scene.run(&args);
+    assert!(
+        text(&closed).contains("target-not-stuck"),
+        "a handled event no longer opens it: {}",
+        text(&closed)
+    );
+}
+
+#[test]
+fn metrics_prune_reports_a_dry_run_unless_apply_is_given() {
+    let scene = Scene::new("prune", WATCHER_CONFIG);
+    let dry = scene.data(&["metrics", "prune", "--json"]);
+    assert_eq!(dry["applied"], false, "{dry}");
+    assert_eq!(dry["pruned"], 0, "{dry}");
+    let applied = scene.data(&[
+        "metrics",
+        "prune",
+        "--apply",
+        "--settled",
+        "session:none",
+        "--json",
+    ]);
+    assert_eq!(applied["applied"], true, "{applied}");
+    let bad = scene.run(&["metrics", "prune", "--settled", "nokind", "--json"]);
+    assert!(!bad.status.success(), "{}", text(&bad));
+}
+
+#[test]
+fn a_confined_head_sends_the_coordination_verbs_through_the_request_socket() {
+    let scene = Scene::new("confined-coordination", WATCHER_CONFIG);
+    let socket = scene.root.join("head.sock");
+    let ask = |args: &[&str], stdin: Option<&str>| {
+        let _ = std::fs::remove_file(&socket);
+        let server = fake_socket(
+            &socket,
+            serde_json::json!({"type": "REPLY", "result": "done", "data": {"ok": true}}),
+        );
+        let mut command = scene.command(args);
+        command
+            .env("FGOS_CONFINED", "1")
+            .env("FGOS_HEAD_REQUEST_SOCKET", &socket);
+        let out = match stdin {
+            None => command.output().unwrap(),
+            Some(input) => {
+                let mut child = command
+                    .stdin(Stdio::piped())
+                    .stdout(Stdio::piped())
+                    .stderr(Stdio::piped())
+                    .spawn()
+                    .unwrap();
+                child
+                    .stdin
+                    .take()
+                    .unwrap()
+                    .write_all(input.as_bytes())
+                    .unwrap();
+                child.wait_with_output().unwrap()
+            }
+        };
+        assert!(out.status.success(), "{args:?}: {}", text(&out));
+        server.join().unwrap()
+    };
+    let raise = ask(
+        &[
+            "supervisor",
+            "raise",
+            "--kind",
+            "coordination-help",
+            "--ref",
+            "r",
+            "--reason",
+            "why",
+            "--json",
+        ],
+        None,
+    );
+    assert_eq!(raise["verb"], "supervisor raise");
+    assert_eq!(
+        raise["args"],
+        serde_json::json!({"kind": "coordination-help", "ref": "r", "reason": "why"})
+    );
+    let tune = ask(
+        &[
+            "watcher",
+            "tune",
+            "session-idle",
+            "--set",
+            "sessionIdleLimit=2",
+            "--arm",
+            "--json",
+        ],
+        None,
+    );
+    assert_eq!(tune["verb"], "watcher tune");
+    assert_eq!(
+        tune["args"],
+        serde_json::json!({"definition": "session-idle", "arm": true, "set": ["sessionIdleLimit=2"]})
+    );
+    let read = ask(
+        &["session", "read", "head:lead-x", "--lines", "30", "--json"],
+        None,
+    );
+    assert_eq!(read["verb"], "session read");
+    assert_eq!(
+        read["args"],
+        serde_json::json!({"target": "head:lead-x", "lines": 30})
+    );
+    let typed = ask(
+        &[
+            "session",
+            "type",
+            "head:lead-x",
+            "--text",
+            "go on",
+            "--json",
+        ],
+        None,
+    );
+    assert_eq!(typed["verb"], "session type");
+    assert_eq!(
+        typed["args"],
+        serde_json::json!({"target": "head:lead-x", "text": "go on"})
+    );
+    let prune = ask(
+        &[
+            "metrics",
+            "prune",
+            "--apply",
+            "--settled",
+            "session:a",
+            "--json",
+        ],
+        None,
+    );
+    assert_eq!(prune["verb"], "metrics prune");
+    assert_eq!(
+        prune["args"],
+        serde_json::json!({"apply": true, "settled": ["session:a"]})
+    );
+    let record = ask(
+        &["metrics", "record", "--json", "-"],
+        Some(r#"{"kind":"fgos.coordination.act","subject":{"kind":"event","id":"e1"}}"#),
+    );
+    assert_eq!(record["verb"], "metrics record");
+    assert_eq!(
+        record["args"]["records"][0]["kind"],
+        "fgos.coordination.act"
+    );
+    assert!(scene.payload_calls().is_empty());
+}
+
 /// The doctor row `id` of a `doctor --json` run, with the engine's level and message.
 fn doctor_row(scene: &Scene, id: &str) -> Value {
     let out = scene.run(&["doctor", "--json"]);

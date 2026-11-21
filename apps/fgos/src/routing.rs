@@ -95,6 +95,7 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("questions", wiring::questions::AVAILABLE_SUBCOMMANDS),
     ("watcher", wiring::supervision::WATCHER_SUBCOMMANDS),
     ("supervisor", wiring::supervision::SUPERVISOR_SUBCOMMANDS),
+    ("session", wiring::supervision::SESSION_SUBCOMMANDS),
 ];
 
 /// The sub-command a verb runs when the call names none, by selector.
@@ -112,8 +113,10 @@ pub fn default_subcommand(selector: &str) -> Option<&'static str> {
 /// The operation a `legacy-cli` selector runs for the first positionals it serves natively. The route table gives
 /// one only to a verb that is native whole, so a verb served in part names its operation here: `dispatch` serves
 /// `decide` and `explain`, one operation each, told apart by the projector.
-const PARTIAL_VERB_OPERATIONS: &[(&str, &str)] =
-    &[("dispatch", wiring::dispatch_decide::DECIDE_OPERATION_ID)];
+const PARTIAL_VERB_OPERATIONS: &[(&str, &str)] = &[
+    ("dispatch", wiring::dispatch_decide::DECIDE_OPERATION_ID),
+    ("session", wiring::supervision::SUPERVISOR_READ_OPERATION_ID),
+];
 
 /// The `hook` kinds the host runs before the composition root.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -489,10 +492,15 @@ pub struct ConfinedCall {
     pub args: serde_json::Value,
 }
 
+fn head_socket_present() -> bool {
+    std::env::var_os(wiring::supervision::HEAD_SOCKET_ENV).is_some_and(|v| !v.is_empty())
+}
+
 /// The call as the head request contract reads it, or why the call cannot be one. `None`: the call is not of a
 /// verb the contract names, so it takes the route its selector has. This is the one confined rule of the host
 /// (PS-20): a confined caller reaches `land`, `run`, `worktree create`, `request result`, `session stop` and
-/// `supervisor handled|done` only through its supervisor's request socket. The marker and the socket are the
+/// `supervisor handled|raise|done`, `watcher tune`, `session read|type` and `metrics record|prune` only through its
+/// supervisor's request socket. The marker and the socket are the
 /// caller's to check; this reads the words only.
 ///
 /// Flags a confined caller must not choose (`land --footprint`, `--target`, `--squash`) are refused here with the
@@ -507,6 +515,13 @@ pub fn confined_head_call(cli_args: &[OsString]) -> Option<Result<ConfinedCall, 
         ("worktree", Some("create")) => "worktree create",
         ("request", Some("result")) => "request result",
         ("session", Some("stop")) => "session stop",
+        ("session", Some("read")) => "session read",
+        ("session", Some("type")) => "session type",
+        ("watcher", Some("tune")) => "watcher tune",
+        // A confined worker has no socket and keeps the local route of these two; only a head asks through its own.
+        ("metrics", Some("record")) if head_socket_present() => "metrics record",
+        ("metrics", Some("prune")) if head_socket_present() => "metrics prune",
+        ("supervisor", Some("raise")) => "supervisor raise",
         ("supervisor", Some("handled")) => "supervisor handled",
         ("supervisor", Some("done")) => "supervisor done",
         ("supervisor", Some("queue")) => "supervisor queue",
@@ -619,6 +634,67 @@ pub fn confined_head_call(cli_args: &[OsString]) -> Option<Result<ConfinedCall, 
                 args.insert("persona".to_owned(), json!(persona));
                 text(&mut args, "name", "name")?;
                 text(&mut args, "reason", "reason")?;
+            }
+            "supervisor raise" => {
+                if !words.is_empty() {
+                    return Err("bad-args: supervisor raise takes no arguments".to_owned());
+                }
+                text(&mut args, "kind", "kind")?;
+                text(&mut args, "ref", "ref")?;
+                text(&mut args, "reason", "reason")?;
+                text(&mut args, "next", "next")?;
+            }
+            "watcher tune" => {
+                match words.as_slice() {
+                    [] => {}
+                    [definition] => {
+                        args.insert("definition".to_owned(), json!(definition));
+                    }
+                    _ => {
+                        return Err("bad-args: watcher tune takes at most one definition".to_owned())
+                    }
+                }
+                for flag in ["arm", "disarm"] {
+                    if call.switch(flag)? {
+                        args.insert(flag.to_owned(), json!(true));
+                    }
+                }
+                if let Some(sets) = list("set")? {
+                    args.insert("set".to_owned(), json!(sets));
+                }
+            }
+            "session read" | "session type" => {
+                let [target] = words.as_slice() else {
+                    return Err(format!("bad-args: {verb} takes one target"));
+                };
+                args.insert("target".to_owned(), json!(target));
+                if verb == "session read" {
+                    if let Some(lines) = call.value("lines")? {
+                        let lines: u64 = lines.parse().map_err(|_| {
+                            format!("bad-args: --lines needs a number, got {lines}")
+                        })?;
+                        args.insert("lines".to_owned(), json!(lines));
+                    }
+                } else {
+                    text(&mut args, "text", "text")?;
+                }
+            }
+            "metrics prune" => {
+                if !words.is_empty() {
+                    return Err("bad-args: metrics prune takes no arguments".to_owned());
+                }
+                if call.switch("apply")? {
+                    args.insert("apply".to_owned(), json!(true));
+                }
+                if let Some(settled) = list("settled")? {
+                    args.insert("settled".to_owned(), json!(settled));
+                }
+            }
+            // The records themselves are read from stdin by the socket sender, which holds the stream.
+            "metrics record" => {
+                if !words.is_empty() {
+                    return Err("bad-args: metrics record sends its records on stdin".to_owned());
+                }
             }
             "supervisor handled" => {
                 if words.is_empty() {

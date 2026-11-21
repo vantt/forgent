@@ -984,6 +984,13 @@
         "json",
         "help"
       ],
+      "prune": [
+        "dir",
+        "json",
+        "help",
+        "apply",
+        "settled"
+      ],
       "query": [
         "dir",
         "json",
@@ -1326,6 +1333,27 @@
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
+    "subcommands": true,
+    "native_subcommands": [
+      "read",
+      "type"
+    ],
+    "subcommand_flags": {
+      "read": [
+        "dir",
+        "json",
+        "help",
+        "target",
+        "lines"
+      ],
+      "type": [
+        "dir",
+        "json",
+        "help",
+        "target",
+        "text"
+      ]
+    },
     "store": "none"
   },
   "show": {
@@ -1405,6 +1433,15 @@
         "json",
         "help"
       ],
+      "raise": [
+        "dir",
+        "json",
+        "help",
+        "kind",
+        "ref",
+        "reason",
+        "next"
+      ],
       "wake": [
         "dir",
         "json",
@@ -1414,7 +1451,8 @@
     "store": "open",
     "mutates_store": [
       "wake",
-      "handled"
+      "handled",
+      "raise"
     ]
   },
   "sync-root": {
@@ -1517,6 +1555,15 @@
         "dir",
         "json",
         "help"
+      ],
+      "tune": [
+        "dir",
+        "json",
+        "help",
+        "definition",
+        "arm",
+        "disarm",
+        "set"
       ]
     },
     "store": "open",

@@ -31,6 +31,7 @@
     {"verb":"watcher","argv":[],"mutates":false,"landsWork":false,"eventStoreChild":false},
     {"verb":"supervisor","argv":["wake"],"mutates":true,"landsWork":false,"eventStoreChild":false},
     {"verb":"supervisor","argv":["handled","ab12"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"supervisor","argv":["raise","--kind","coordination-help"],"mutates":true,"landsWork":false,"eventStoreChild":false},
     {"verb":"supervisor","argv":["queue"],"mutates":false,"landsWork":false,"eventStoreChild":false},
     {"verb":"supervisor","argv":["plans"],"mutates":false,"landsWork":false,"eventStoreChild":false},
     {"verb":"supervisor","argv":["done"],"mutates":false,"landsWork":false,"eventStoreChild":false},

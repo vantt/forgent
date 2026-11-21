@@ -661,9 +661,9 @@ test('the detached stop of the own session waits for the route to exit, then sto
   assert.equal(order.filter((x) => x === 'alive?').length, 2);
 });
 
-/** A supervisor head, a stoppable `lead-proj-p` lineage with a placement, and the stop ports that end it. */
-function stopCase(t) {
-  const c = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
+/** A head of `persona` (a planner unless named: neither coordinator may stop any head), a stoppable `lead-proj-p` lineage with a placement, and the stop ports that end it. */
+function stopCase(t, persona = 'planner') {
+  const c = headCase(t, { persona, name: 'proj', writes: [] });
   writeHeadPlacement(lineageDirOf(c.project, 'lead', 'proj-p'), { role: 'head:lead-proj-p', gen: 1, placement: { host: 'terminal', key: 'k1' }, runDir: '/r', persona: 'lead', startedAt: '2026-11-19T00:00:00Z' });
   const stop = { identity: () => ({ live: true }), host: { retireAsync: async () => ({ result: 'retired' }) }, end: () => true, closed: () => true, sleep: async () => {} };
   return { ...c, ports: { stop, plan: { handle: 'proj' }, askerAnswered: () => false } };
@@ -694,7 +694,7 @@ test('session stop by the asker of an answered question works in a project with 
 
 test('session stop of the caller own role is allowed', async (t) => {
   const { ask, ports } = stopCase(t);
-  assert.equal((await ask('session stop', { persona: 'supervisor', name: 'proj' }, 's5', ports)).line.data.stopped, false);
+  assert.equal((await ask('session stop', { persona: 'planner', name: 'proj' }, 's5', ports)).line.data.stopped, false);
 });
 
 test('session stop with a persona that is not a name is bad-persona', async (t) => {
@@ -732,4 +732,114 @@ test('session start passes forQuestion down to the opening, and the opening carr
   assert.match(text, /You continue question q-42: write its answer back to its origin, then `fgos questions ack q-42` \(or `cancel`\)\./);
   assert.doesNotMatch(openingText({ persona: 'planner', name: 'q', personaLines: ['P'] }), /You continue question/);
   await assert.rejects(startHead({ persona: 'planner', name: 'q', forQuestion: 'bad id!', projectRoot: project }, { env: {}, ports }), (err) => err.code === 'bad-question');
+});
+
+// ---- coordination verbs: raise, tune, read and type on site, evidence, the stop rule and the secretary run -------
+
+const hostEcho = (calls) => (call) => { calls.push(call); return { status: 0, stdout: `{"data":{"argv":${JSON.stringify(call.argv)}}}\n` }; };
+
+test('supervisor raise passes a coordination event to the host verb and refuses a multi-line or dash-led field', async (t) => {
+  const { ask } = headCase(t, { persona: 'secretary', name: 'miu', writes: [] });
+  const calls = [];
+  const done = await ask('supervisor raise', { kind: 'coordination-handoff', ref: 'plans/p', reason: 'ready for a lead', next: 'fgos supervisor plans' }, 'r1', { hostCall: hostEcho(calls) });
+  assert.deepEqual(done.line.data.argv, ['supervisor', 'raise', '--kind', 'coordination-handoff', '--ref', 'plans/p', '--reason', 'ready for a lead', '--next', 'fgos supervisor plans', '--json']);
+  for (const bad of [{ kind: 'handoff', ref: 'r', reason: 'x' }, { kind: 'coordination-help', ref: 'r', reason: 'two\nlines' }, { kind: 'coordination-help', ref: '-r', reason: 'x' }, { kind: 'coordination-help', ref: 'r' }]) {
+    assert.equal((await ask('supervisor raise', bad, 'r2', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
+  }
+  assert.equal(calls.length, 1, 'a refused request never reaches the host');
+});
+
+test('watcher tune sends a definition with arm or disarm and whole-number settings, and refuses anything else', async (t) => {
+  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
+  const calls = [];
+  const done = await ask('watcher tune', { definition: 'session-idle', arm: true, set: ['sessionIdleLimit=3', 'activeIntervalSec=30'] }, 'w1', { hostCall: hostEcho(calls) });
+  assert.deepEqual(done.line.data.argv, ['watcher', 'tune', 'session-idle', '--set', 'sessionIdleLimit=3', '--set', 'activeIntervalSec=30', '--arm', '--json']);
+  for (const bad of [{ definition: 'Bad Name' }, { set: ['limit=abc'] }, { set: ['a=1;rm'] }, { arm: 'yes' }, { other: 1 }]) {
+    assert.equal((await ask('watcher tune', bad, 'w2', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
+  }
+  assert.equal(calls.length, 1);
+});
+
+test('session read and session type name their target as given and refuse a text that reads as an option', async (t) => {
+  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
+  const calls = [];
+  const read = await ask('session read', { target: 'head:lead-proj-p', lines: 80 }, 'a1', { hostCall: hostEcho(calls) });
+  assert.deepEqual(read.line.data.argv, ['session', 'read', 'head:lead-proj-p', '--lines', '80', '--json']);
+  const typed = await ask('session type', { target: 'lead:S6A', text: 'continue please' }, 'a2', { hostCall: hostEcho(calls) });
+  assert.deepEqual(typed.line.data.argv, ['session', 'type', 'lead:S6A', '--text', 'continue please', '--json']);
+  assert.equal((await ask('session type', { target: 'lead:S6A', text: '--yes' }, 'a2b', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
+  assert.equal((await ask('session read', { target: '--evil' }, 'a3', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
+  assert.equal((await ask('session read', { target: 'x', lines: 5000 }, 'a4', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
+  assert.equal((await ask('session type', { target: 'x', text: '' }, 'a5', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
+  assert.equal(calls.length, 2);
+});
+
+test('the refusal of the host verb, target-not-stuck, comes back as the code of the reply', async (t) => {
+  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
+  const refused = await ask('session type', { target: 'lead:S6A', text: 'go' }, 'a6', { hostCall: () => ({ status: 2, stdout: '', stderr: 'fgos: no open supervision event names it [target-not-stuck]\n' }) });
+  assert.equal(refused.line.code, 'target-not-stuck');
+});
+
+test('metrics record writes coordination kinds only: the records go to the host verb on stdin and any other kind refuses the whole call', async (t) => {
+  const { ask } = headCase(t, { persona: 'secretary', name: 'miu', writes: [] });
+  const calls = [];
+  const records = [{ kind: 'fgos.coordination.act', subject: { kind: 'event', id: 'e1' }, attrs: { 'fgos.coordination.act': 'wake' } }];
+  const done = await ask('metrics record', { records }, 'm1', { hostCall: hostEcho(calls) });
+  assert.equal(done.exit, 0);
+  assert.deepEqual(calls[0].argv, ['metrics', 'record', '--json', '-']);
+  assert.deepEqual(JSON.parse(calls[0].input), records);
+  const refused = await ask('metrics record', { records: [...records, { kind: 'fgos.run.settled' }] }, 'm2', { hostCall: hostEcho(calls) });
+  assert.equal(refused.line.code, 'kind-not-allowed');
+  assert.equal((await ask('metrics record', { records: [] }, 'm3', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
+  assert.equal(calls.length, 1, 'a refused call writes nothing');
+});
+
+test('metrics prune is a dry run unless apply is set, and settled subjects are kind:id', async (t) => {
+  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
+  const calls = [];
+  assert.deepEqual((await ask('metrics prune', {}, 'p1', { hostCall: hostEcho(calls) })).line.data.argv, ['metrics', 'prune', '--json']);
+  assert.deepEqual((await ask('metrics prune', { apply: true, settled: ['session:abc'] }, 'p2', { hostCall: hostEcho(calls) })).line.data.argv, ['metrics', 'prune', '--settled', 'session:abc', '--apply', '--json']);
+  assert.equal((await ask('metrics prune', { settled: ['nokind'] }, 'p3', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
+});
+
+test('the coordinators stop any head but never a persona that holds no head grant', async (t) => {
+  for (const persona of ['supervisor', 'secretary']) {
+    const { ask, ports } = stopCase(t, persona);
+    assert.deepEqual((await ask('session stop', { persona: 'lead', name: 'other-p' }, 'c1', ports)).line.data, { stopped: false, reason: 'not-live' }, `${persona} may end a lead of any plan`);
+    assert.equal((await ask('session stop', { persona: 'forgent-1d', name: 'x' }, 'c2', ports)).line.code, 'stop-target-not-head', persona);
+  }
+  const { ask, ports } = stopCase(t, 'planner');
+  assert.equal((await ask('session stop', { persona: 'lead', name: 'other-p' }, 'c3', ports)).line.code, 'role-mismatch', 'another head keeps the plan-head rule');
+});
+
+/** A secretary head, a linked worktree (its checkout marker is a file) and the configured ceilings. */
+function secretaryRun(t) {
+  const worktree = scratch(t);
+  fs.writeFileSync(path.join(worktree, '.git'), 'gitdir: /somewhere\n');
+  const c = headCase(t, { persona: 'secretary', name: 'miu', writes: [] });
+  return { ...c, worktree, ports: { secretaryRun: () => ({ maxMinutes: 15, tier: 'standard' }) } };
+}
+
+const ticketArgv = (file) => JSON.parse(fs.readFileSync(file, 'utf8')).argv;
+
+test('a secretary run is one read-only unit under the secretary.run ceilings', async (t) => {
+  const { ask, ticketFile, ports } = secretaryRun(t);
+  assert.equal((await ask('run', { prompt: 'check the queue' }, 'u1', ports)).line.data.state, 'running');
+  assert.deepEqual(ticketArgv(ticketFile('u1')), ['run', 'check the queue', '--timeout', '15m', '--override', '{"tier":"standard"}', '--json']);
+  assert.equal((await ask('run', { prompt: 'x', maxMinutes: 5, tier: 'mini' }, 'u2', ports)).exit, 0);
+  assert.deepEqual(ticketArgv(ticketFile('u2')).slice(2, 6), ['--timeout', '5m', '--override', '{"tier":"mini"}']);
+  assert.equal((await ask('run', { prompt: 'x', maxMinutes: 16 }, 'u3', ports)).line.code, 'run-ceiling-exceeded');
+  assert.equal((await ask('run', { prompt: 'x', tier: 'advanced' }, 'u4', ports)).line.code, 'run-ceiling-exceeded');
+  assert.equal((await ask('run', { prompt: 'x', units: [{}, {}] }, 'u5', ports)).line.code, 'run-one-unit');
+  assert.equal((await ask('run', { prompt: 'x', unit: 'u.yaml' }, 'u6', ports)).line.code, 'run-one-unit');
+  assert.equal((await ask('run', { prompt: 'x', provider: 'p' }, 'u7', ports)).line.code, 'bad-args');
+});
+
+test('a secretary run that writes needs a linked worktree', async (t) => {
+  const { ask, ticketFile, worktree, ports } = secretaryRun(t);
+  assert.equal((await ask('run', { prompt: 'x', writes: ['docs/a.md'] }, 'v1', ports)).line.code, 'writes-need-linked-worktree');
+  assert.equal((await ask('run', { prompt: 'x', writes: ['docs/a.md'], worktree: '/not/a/worktree' }, 'v2', ports)).line.code, 'writes-need-linked-worktree');
+  assert.equal((await ask('run', { prompt: 'x', writes: ['../a.md'], worktree }, 'v3', ports)).line.code, 'bad-args');
+  assert.equal((await ask('run', { prompt: 'x', writes: ['docs/a.md'], worktree }, 'v4', ports)).exit, 0);
+  assert.deepEqual(ticketArgv(ticketFile('v4')).slice(-5), ['--writes', 'docs/a.md', '--worktree', worktree, '--json']);
 });

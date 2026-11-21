@@ -381,10 +381,26 @@ const NATIVE_SOURCES = {
       return src.slice(start, src.indexOf('fn project_events_request', start));
     },
   },
-  // watcher and supervisor -> apps/fgos/src/wiring/supervision.rs, each with its own sub-verb list; no sub-verb takes a flag
-  // of its own (`supervisor handled` takes its event ids as positionals), so the shared parser reads none.
-  watcher: { subs: RUST('apps/fgos/src/wiring/supervision.rs'), constant: 'WATCHER_SUBCOMMANDS', shared: () => '' },
-  supervisor: { subs: RUST('apps/fgos/src/wiring/supervision.rs'), constant: 'SUPERVISOR_SUBCOMMANDS', shared: () => '' },
+  // watcher and supervisor -> apps/fgos/src/wiring/supervision.rs, each with its own sub-verb list; only `watcher tune` and
+  // `supervisor raise` take flags (`supervisor handled` takes its event ids as positionals), read where each parses its call.
+  watcher: {
+    subs: RUST('apps/fgos/src/wiring/supervision.rs'),
+    constant: 'WATCHER_SUBCOMMANDS',
+    shared: () => {
+      const src = RUST('apps/fgos/src/wiring/supervision.rs');
+      const start = src.indexOf('fn tune_command');
+      return src.slice(start, src.indexOf('/// Lines `session read`', start));
+    },
+  },
+  supervisor: {
+    subs: RUST('apps/fgos/src/wiring/supervision.rs'),
+    constant: 'SUPERVISOR_SUBCOMMANDS',
+    shared: () => {
+      const src = RUST('apps/fgos/src/wiring/supervision.rs');
+      const start = src.indexOf('Some("raise") =>');
+      return src.slice(start, src.indexOf('Some("wake") =>', start));
+    },
+  },
   convention: {
     subs: RUST('packages/convention/rust/src/lib.rs'),
     shared: () => {
@@ -403,8 +419,8 @@ function rustSubcommands(src, constant = 'AVAILABLE_SUBCOMMANDS') {
 
 // A flag is named as a `"--x"` literal, or, where the shared parser's output is read, as `.flag("x")` or a read of it
 // by name (`value("x")`, `switch("x")`, `text("x")`, `has("x")`, `named("x", ...)`, `named_value(&call, "x", ...)`,
-// `truthy(&call, "x")`).
-const rustFlags = (text) => new Set([...text.matchAll(/"--([a-z][a-z-]*)"|\.flag\("([a-z][a-z-]*)"\)|\b(?:value|switch|text|named|has)\("([a-z][a-z-]*)"[,)]|\b(?:named_value|truthy)\(\s*&call,\s*"([a-z][a-z-]*)"[,)]/g)].map((m) => m[1] ?? m[2] ?? m[3] ?? m[4]).filter((n) => !GLOBAL.has(n)));
+// `truthy(&call, "x")`, `list_of(call, "x")`).
+const rustFlags = (text) => new Set([...text.matchAll(/"--([a-z][a-z-]*)"|\.flag\("([a-z][a-z-]*)"\)|\b(?:value|switch|text|named|has)\("([a-z][a-z-]*)"[,)]|\b(?:named_value|truthy)\(\s*&call,\s*"([a-z][a-z-]*)"[,)]|\blist_of\(\s*call,\s*"([a-z][a-z-]*)"[,)]/g)].map((m) => m[1] ?? m[2] ?? m[3] ?? m[4] ?? m[5]).filter((n) => !GLOBAL.has(n)));
 const schemaFlags = (spec) => Object.keys(spec.parameters.properties).filter((n) => !(spec.parameters.positional ?? []).includes(n));
 
 for (const entry of NATIVE) {
