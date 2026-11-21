@@ -7,7 +7,7 @@
   docs/platform/run-supervisor/spec.md (cwd lease).
 
 ## Files it may write
-apps/fgos/src/wiring/unit_run_host/tests/run_unit.rs, .github/workflows/release-assets-check.yml, docs/platform/holder-lock/spec.md,
+packages/holder-lock/rust/src/tombstone.rs, apps/fgos/src/wiring/unit_run_host/tests/run_unit.rs, .github/workflows/release-assets-check.yml, docs/platform/holder-lock/spec.md,
 docs/platform/git/spec.md, docs/platform/run-supervisor/spec.md, CHANGELOG.md
 
 ## Steps
@@ -18,6 +18,10 @@ docs/platform/git/spec.md, docs/platform/run-supervisor/spec.md, CHANGELOG.md
    the owner 2026-11-21 in the decision history, C5 Windows), run-supervisor spec (lease served for the custody's
    life). The lead reports backlog rows p-nk6xf5laob and p-w4cxqq2sbw done to the supervisor (docs/backlog.md is not in this footprint). CHANGELOG Unreleased line.
 3. Integration: on the combined tree run the Linux gates and one full `release-assets-check` run on main's tip.
+
+4. Fence leftovers (OPC nit): on FENCE_CONTENDED the aside file and the prepared directory stay behind; the next
+   placement in packages/holder-lock/rust/src/tombstone.rs sweeps the `.activation-fence-*` aside and temp siblings it
+   owns (only names this code creates, never the contender's file). Test on Windows and Linux.
 
 ## Verify
 - Linux: `cargo test -p fgos --test unit_run_host`, clippy -D warnings, fmt, msvc check.
