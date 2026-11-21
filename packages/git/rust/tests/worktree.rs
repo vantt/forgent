@@ -935,7 +935,7 @@ mod topology {
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
         fs::create_dir(&root).unwrap();
-        let root = fs::canonicalize(root).unwrap();
+        let root = fgos_process::path::plain_path(&fs::canonicalize(root).unwrap());
         git(&root, &["init", "-q", "--initial-branch=trunk", "repo"]);
         let main = root.join("repo");
         fs::write(main.join("file"), "x").unwrap();

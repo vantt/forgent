@@ -387,8 +387,12 @@ fn closing_a_duplicate_leaves_the_owners_lock_held_in_another_process() {
     assert_eq!(probe_other_process(&path), FREE_ELSEWHERE);
 }
 
+// Measured on windows-latest: a duplicate shares the owner's file object, so
+// a LockFileEx through it on the held range is refused (WouldBlock), an
+// UnlockFileEx through it frees the owner's lock for other processes, and the
+// lock stays held while only the copy is alive after the owner handle closed.
 #[test]
-fn a_duplicate_used_for_lock_and_unlock_is_measured() {
+fn a_duplicate_handle_shares_the_owners_lock_so_its_unlock_frees_it_and_its_lifetime_keeps_it() {
     let _serial = serial();
     let dir = temp_dir("wlfx-dup-use");
     let path = dir.join("dup-use.lock");
@@ -398,28 +402,17 @@ fn a_duplicate_used_for_lock_and_unlock_is_measured() {
         TryLock::Locked
     );
     let copy = owner.try_clone().expect("DuplicateHandle copy");
-    // A second LockFileEx through the copy: record the answer. The copy shares
-    // the owner's file object, so the owner's own range is the one asked for.
-    let relock = driver::current().try_lock(&copy, Mode::Ex);
-    println!("dup relock of an owned range: {relock:?}");
-    // UnlockFileEx through the copy: the measured answer decides whether a
-    // borrowed copy may ever call the owner's close-time unlock.
-    driver::current().before_close(&copy);
-    let after_copy_unlock = probe_other_process(&path);
-    println!(
-        "other process after unlock through the copy: {}",
-        if after_copy_unlock == HELD_ELSEWHERE {
-            "held"
-        } else {
-            "free"
-        }
+    assert_eq!(
+        driver::current().try_lock(&copy, Mode::Ex).unwrap(),
+        TryLock::WouldBlock
     );
-    // Whatever the copy's unlock did, the owner's close ends the lock.
+    assert_eq!(probe_other_process(&path), HELD_ELSEWHERE);
+    driver::current().before_close(&copy);
+    assert_eq!(probe_other_process(&path), FREE_ELSEWHERE);
     drop(copy);
     drop(owner);
     assert_eq!(probe_other_process(&path), FREE_ELSEWHERE);
-    // The owner closing while a copy lives: the lock outlives the owner handle
-    // only if the copy keeps the file object, which is also measured here.
+
     let owner = open_raw(&path);
     assert_eq!(
         driver::current().try_lock(&owner, Mode::Ex).unwrap(),
@@ -427,15 +420,7 @@ fn a_duplicate_used_for_lock_and_unlock_is_measured() {
     );
     let copy = owner.try_clone().expect("DuplicateHandle copy");
     drop(owner);
-    let with_copy_alone = probe_other_process(&path);
-    println!(
-        "other process while only the copy lives: {}",
-        if with_copy_alone == HELD_ELSEWHERE {
-            "held"
-        } else {
-            "free"
-        }
-    );
+    assert_eq!(probe_other_process(&path), HELD_ELSEWHERE);
     drop(copy);
     assert_eq!(probe_other_process(&path), FREE_ELSEWHERE);
 }

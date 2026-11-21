@@ -1275,6 +1275,10 @@ mod tests {
                     "user.name=Fixture",
                     "-c",
                     "user.email=fixture@example.test",
+                    // The checkout must keep the bytes the manifest digests; a Windows
+                    // runner's autocrlf would rewrite the linked worktree's line endings.
+                    "-c",
+                    "core.autocrlf=false",
                 ])
                 .args(args)
                 .current_dir(dir)
