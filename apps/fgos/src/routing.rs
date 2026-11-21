@@ -526,6 +526,7 @@ pub fn confined_head_call(cli_args: &[OsString]) -> Option<Result<ConfinedCall, 
         ("supervisor", Some("done")) => "supervisor done",
         ("supervisor", Some("queue")) => "supervisor queue",
         ("supervisor", Some("plans")) => "supervisor plans",
+        ("supervisor", Some("wake")) => "supervisor wake",
         ("slots", _) => "slots",
         ("questions", None | Some("list")) => "questions list",
         _ => return None,
@@ -704,7 +705,9 @@ pub fn confined_head_call(cli_args: &[OsString]) -> Option<Result<ConfinedCall, 
                 }
                 args.insert("events".to_owned(), json!(words));
             }
-            "supervisor queue" | "supervisor plans" | "slots" if !words.is_empty() => {
+            "supervisor queue" | "supervisor plans" | "supervisor wake" | "slots"
+                if !words.is_empty() =>
+            {
                 return Err(format!("bad-args: {verb} takes no arguments"));
             }
             "questions list" => {
@@ -1269,6 +1272,7 @@ mod confined_tests {
         for (words, verb) in [
             (&["supervisor", "queue", "--json"][..], "supervisor queue"),
             (&["supervisor", "plans", "--json"][..], "supervisor plans"),
+            (&["supervisor", "wake", "--json"][..], "supervisor wake"),
             (&["slots", "--json"][..], "slots"),
         ] {
             assert_eq!(
@@ -1308,6 +1312,6 @@ mod confined_tests {
         assert!(confined(&["worktree", "remove", "../w"]).is_none());
         assert!(confined(&["session", "start", "lead"]).is_none());
         assert!(confined(&["questions", "ask"]).is_none());
-        assert!(confined(&["supervisor", "wake"]).is_none());
+        assert!(confined(&["supervisor", "tick"]).is_none());
     }
 }

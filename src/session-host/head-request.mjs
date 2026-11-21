@@ -15,7 +15,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { CONFINED_MARKER_ENV, readConfig } from '../config/facade.mjs';
 import { HEAD_PERSONAS, HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
-import { HEAD_ANSWERED_VERB, HEAD_LAND_VERB, HEAD_METRICS_PRUNE_VERB, HEAD_METRICS_RECORD_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_QUESTIONS_LIST_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_SESSION_READ_VERB, HEAD_SESSION_TYPE_VERB, HEAD_START_VERB, HEAD_SLOTS_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_SUPERVISOR_HANDLED_VERB, HEAD_SUPERVISOR_PLANS_VERB, HEAD_SUPERVISOR_QUEUE_VERB, HEAD_SUPERVISOR_RAISE_VERB, HEAD_WATCHER_TUNE_VERB, HEAD_WORKTREE_CREATE_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
+import { HEAD_ANSWERED_VERB, HEAD_LAND_VERB, HEAD_METRICS_PRUNE_VERB, HEAD_METRICS_RECORD_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_QUESTIONS_LIST_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_SESSION_READ_VERB, HEAD_SESSION_TYPE_VERB, HEAD_START_VERB, HEAD_SLOTS_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_SUPERVISOR_HANDLED_VERB, HEAD_SUPERVISOR_PLANS_VERB, HEAD_SUPERVISOR_QUEUE_VERB, HEAD_SUPERVISOR_RAISE_VERB, HEAD_SUPERVISOR_WAKE_VERB, HEAD_WATCHER_TUNE_VERB, HEAD_WORKTREE_CREATE_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
 import { assertHeadArgs, headRoleOf, startHeadSession } from './head-start.mjs';
 import { HeadPlanError, isPlanHeadName, planOfHead } from './head-plan.mjs';
 import { stopHeadSession } from './head-stop.mjs';
@@ -305,6 +305,8 @@ async function landVerb({ args, envelope, projectRoot, id, ports }) {
   return startTicket({ id, verb: HEAD_LAND_VERB, argv, envelope, projectRoot, ports });
 }
 
+/** The two coordinators; they share the stop rule and the `secretary.run.*` ceilings of their own run. */
+const COORDINATORS = new Set(['secretary', 'supervisor']);
 const TIERS = Object.freeze(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']);
 const SECRETARY_RUN_DEFAULTS = Object.freeze({ maxMinutes: 15, tier: 'standard' });
 const ceilingErr = (message) => Object.assign(new Error(message), { code: 'run-ceiling-exceeded' });
@@ -358,11 +360,11 @@ function secretaryRunArgv({ args, projectRoot, ports }) {
 }
 
 async function runVerb({ args, envelope, projectRoot, id, ports }) {
-  if (personaOf(envelope) === 'secretary') {
+  if (COORDINATORS.has(personaOf(envelope))) {
     return startTicket({ id, verb: HEAD_RUN_VERB, argv: secretaryRunArgv({ args, projectRoot, ports }), envelope, projectRoot, ports });
   }
   exactKeys(args, ['prompt', 'provider', 'capability', 'writes', 'worktree']);
-  if (personaOf(envelope) !== 'lead') throw roleErr('only a lead or the secretary runs');
+  if (personaOf(envelope) !== 'lead') throw roleErr('only a lead, the secretary or the supervisor runs');
   if (args.prompt === undefined) throw badArgs('prompt is required');
   for (const key of ['prompt', 'provider', 'capability', 'worktree']) {
     if (args[key] !== undefined && (typeof args[key] !== 'string' || args[key] === '')) throw badArgs(`${key} must be a non-empty string`);
@@ -522,8 +524,6 @@ function askerAnswered({ envelope, projectRoot, role, ports }) {
   const list = Array.isArray(rows) ? rows : (rows.questions ?? []);
   return Array.isArray(list) && list.some((q) => Array.isArray(q?.asker?.roles) && q.asker.roles.includes(role));
 }
-
-const COORDINATORS = new Set(['secretary', 'supervisor']);
 
 async function stopVerb({ args, envelope, projectRoot, ports }) {
   exactKeys(args, ['persona', 'name', 'reason']);
@@ -738,6 +738,7 @@ export async function runHeadRequest({ runDir, request }, ports = {}) {
       case HEAD_SUPERVISOR_QUEUE_VERB:
       case HEAD_SUPERVISOR_PLANS_VERB:
       case HEAD_SLOTS_VERB:
+      case HEAD_SUPERVISOR_WAKE_VERB:
         exactKeys(args, []);
         data = hostCall({ envelope, projectRoot, argv: [...request.verb.split(' '), '--json'] }, ports);
         break;

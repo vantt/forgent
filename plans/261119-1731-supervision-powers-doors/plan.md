@@ -44,6 +44,7 @@ footprint:
   - core/config-standard/secretary.yaml
   - core/config-schema/secretary.schema.yaml
   - test/session-host/head-grants.test.mjs
+  - test/session-host/head-start.test.mjs
   - test/session-host/head-request.test.mjs
   - docs/platform/supervision/spec.md
   - docs/platform/observe/spec.md
@@ -99,7 +100,7 @@ readers. The work-management data model (its decision may change the backlog wri
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Verbs and socket entries](phase-01-verbs-and-socket.md) | - | apps/fgos/src/wiring/supervision.rs, apps/fgos/src/wiring/observe_declarations.rs, apps/fgos/tests/supervision_verbs.rs, packages/host-runtime/contracts/command-manifest.json, src/cli/command-registry.mjs, packages/run-supervisor/contracts/head-request.v1.json, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, test/session-host/head-request.test.mjs, core/config-standard/secretary.yaml, core/config-schema/secretary.schema.yaml | 1 | done |
-| 2 | [Grants, personas and skills](phase-02-grants-personas.md) | 1 | src/session-host/head-grants.mjs, test/session-host/head-grants.test.mjs, core/agents/secretary.yaml, core/agents/supervisor.yaml, .claude/agents/secretary.md, .claude/agents/supervisor.md, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/fgos-secretary/SKILL.md, .agents/skills/fgos-supervisor/SKILL.md, .claude/skills/fgos-secretary/SKILL.md, .claude/skills/fgos-supervisor/SKILL.md, plugins/fgOS/skills/fgos-secretary/SKILL.md, plugins/fgOS/skills/fgos-supervisor/SKILL.md | 2 | draft |
+| 2 | [Grants, personas and skills](phase-02-grants-personas.md) | 1 | src/session-host/head-grants.mjs, test/session-host/head-grants.test.mjs, core/agents/secretary.yaml, core/agents/supervisor.yaml, .claude/agents/secretary.md, .claude/agents/supervisor.md, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/fgos-secretary/SKILL.md, .agents/skills/fgos-supervisor/SKILL.md, .claude/skills/fgos-secretary/SKILL.md, .claude/skills/fgos-supervisor/SKILL.md, plugins/fgOS/skills/fgos-secretary/SKILL.md, plugins/fgOS/skills/fgos-supervisor/SKILL.md | 2 | done |
 | 3 | [Live grant audit and the settled facts](phase-03-audit-and-docs.md) | 2 | plans/261119-1731-supervision-powers-doors/**, docs/platform/supervision/spec.md, docs/platform/observe/spec.md, docs/platform/session-host/spec.md, docs/platform/agent-confinement/spec.md, CHANGELOG.md | 3 | draft |
 
 Phase 1 is the one writer of the hot files (registry, manifest, head-request contract) so the plan stays serial on them

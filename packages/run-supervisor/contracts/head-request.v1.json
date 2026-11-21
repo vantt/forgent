@@ -201,6 +201,13 @@
       "identity": "held",
       "rule": "refusals (verb-failed detail): the host verb's own code"
     },
+    "supervisor wake": {
+      "args": {},
+      "does": "as supervisor queue, running `fgos supervisor wake --json`: starts the supervisor head when an event is unhandled and none is live, and records the wake",
+      "data": "the host verb's JSON data ({outcome: <wake outcome>, code: <only when the start failed>})",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): the host verb's own code"
+    },
     "supervisor done": {
       "args": {},
       "does": "as supervisor handled, running `fgos supervisor done --json`; when the answer is {done: true} the route, after its line is written, starts a detached `session stop` of the caller's own role and adds stopping: true",

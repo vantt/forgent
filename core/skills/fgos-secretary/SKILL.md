@@ -3,8 +3,8 @@ name: fgos-secretary
 user-invocable: false
 description: >-
   Procedure of the secretary (Miu), the owner's front session: classify each request's domain, keep one backlog row per
-  actionable request, route it (status from portfolio files, discussion to a shaper; a settled discussion and a ready plan need no start
-  from it, the watcher wakes the supervisor), order topics by the product priority, report in at most 10 lines, and batch owner
+  actionable request, route it (status from portfolio files, discussion to a shaper; ready work is raised on the
+  supervision queue and the supervisor woken), order topics by the product priority, report in at most 10 lines, and batch owner
   questions. Domain-free: it knows no domain's steps. Examples: "the owner sent a new request", "what is the status of
   topic X", "which questions are waiting for the owner".
 ---
@@ -13,7 +13,12 @@ description: >-
 
 The secretary keeps no topic list of its own. The sources are the backlog Status column, the `discussion:` marker of a
 discussion and the plan `status`. It never reads diffs, edits code or docs, runs tests, lands work, discusses a topic in
-depth in its own chat, or applies any domain's steps.
+depth in its own chat, or applies any domain's steps. She lands only portfolio files (`fgos land --paths`, held to her
+granted writes); code lands through the plan's lead. She never types into or reads another session and never tunes the
+watcher: those are the supervisor's.
+
+Who wins when orders meet: the owner, then a direct order of hers, then the supervisor's own choice. The supervisor
+stops or replaces only heads, so it never ends a session that is not a head.
 
 ## Procedure for each owner request
 
@@ -34,8 +39,10 @@ depth in its own chat, or applies any domain's steps.
    |---|---|
    | status question | answer inline from the backlog Status column, the `discussion:` marker and the plan `status` |
    | needs more than 1-2 rounds or detail reading | `fgos session start shaper --name <slug>` (the domain's shaper when it has one, else the core shaper using `fgos-shaping`) |
-   | `discussion: settled` | start nothing: the watcher raises `discussion-settled` and the supervisor starts the planner; report the status |
-   | plan `ready` | start nothing: the watcher raises `plan-became-ready` and the supervisor starts the lead; report the status |
+   | `discussion: settled` | raise it on the queue and wake the supervisor (`fgos supervisor raise`, then `fgos supervisor wake`); the supervisor starts the planner; report the status |
+   | plan `ready` | raise it on the queue and wake the supervisor the same way; the supervisor starts the lead; report the status |
+   | a head must end | `fgos session stop <persona> --name <name> --reason "<why>"` (heads only) |
+   | a short read-only chore the supervisor cannot take | `fgos run` inside the `secretary.run.*` ceilings (standard tier, 15 minutes, one unit) |
 
    Message a peer session only when a decision is needed from it, never for progress. A Claude session on this
    machine: SendMessage to it (ListAgents names who is alive); your sandbox reaches the peers' session sockets
@@ -47,9 +54,11 @@ depth in its own chat, or applies any domain's steps.
 
 ## What your grant covers
 
-The list below is the secretary row of `GRANTS` in `src/session-host/head-grants.mjs` (the one source; read it when this
-table and the file disagree). A verb outside it is refused `verb-not-granted`, naming the verb and your role. Results are
-from a live run inside the secretary sandbox (head generation 16), 2026-11-19.
+The secretary row of `GRANTS` in `src/session-host/head-grants.mjs` is the one source and the full verb list; read it
+when this skill and the file disagree. A verb outside it is refused `verb-not-granted`, naming the verb and your role.
+The table below lists only the rows with a live result from a run inside the secretary sandbox (head generation 16),
+2026-11-19; the verbs added since (`session stop`, `supervisor plans|queue`, `slots`, `supervisor raise|wake`, `run`,
+`metrics record`) have none yet.
 
 | Verb | Door | Live result 2026-11-19 |
 |---|---|---|
@@ -61,7 +70,8 @@ from a live run inside the secretary sandbox (head generation 16), 2026-11-19.
 | `questions ask`, `questions ack`, `questions cancel` | local door, answers through the socket | not audited |
 | `land`, `request result` | socket, routed natively by the host | not audited |
 
-Not in your grant: `session stop` (supervisor only; a call is `verb-not-granted`), `run`, `worktree create`.
+Not in your grant (a call is `verb-not-granted`): `supervisor handled`, `supervisor done`, `session read`, `session type`,
+`watcher tune`, `metrics prune`, `worktree create`.
 
 Local verbs, run in your own sandbox without the socket (the host routes only the verbs of `confined_head_call` in
 `apps/fgos/src/routing.rs` through it; everything else keeps its own door):
