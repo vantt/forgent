@@ -24,6 +24,8 @@ footprint:
   - apps/fgos/tests/session_write_publish.rs
   - src/session-host/head-grants.mjs
   - test/session-host/head-grants.test.mjs
+  - packages/run-supervisor/rust/src/head_request.rs
+  - packages/run-supervisor/rust/tests/head_request.rs
   - plans/backlog/**
   - plans/discussions/**
   - plans/backlog.md
