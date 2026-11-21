@@ -8,7 +8,8 @@
 - packages/process/rust (Windows process listing already used elsewhere by the scan; reuse, never a second copy).
 
 ## Files it may write
-packages/holder-lock/rust/src/tombstone.rs,
+packages/holder-lock/rust/src/tombstone.rs, packages/holder-lock/rust/src/route.rs (quiesce-scan only),
+packages/process/rust/src/facts.rs, packages/process/rust/src/platform/windows.rs, packages/process/rust/tests/**,
 packages/distribution/rust/src/git_gate.rs, packages/distribution/rust/src/init.rs,
 packages/distribution/rust/src/verify.rs, packages/distribution/rust/tests/**,
 docs/platform/packaging-distribution/contracts/activation-binding.md,
@@ -31,8 +32,15 @@ docs/platform/packaging-distribution/contracts/release-manifest.md
    this reasoning in the doc comment and in activation-binding.md. Windows tests in tombstone/fence cases: placed,
    idempotent, lost race refuses (simulate by creating the path between (b) and (c) through a test seam that already
    exists or a `#[cfg(test)]` hook, no env switch).
-2. Windows workspace process scan through the process crate's existing Windows listing, scoped like Linux's
-   (activated workspace and its linked worktrees); unreadable candidates still fail closed.
+2. Windows workspace process scan: the Windows arm of `fgos_process::facts::scan` (`ProcView` per process from the
+   Toolhelp process snapshot already used in packages/process/rust/src/platform/windows_job.rs and holder-lock
+   route/hold.rs; reuse one helper, never a third copy): argv from the process command line
+   (`NtQueryInformationProcess` `ProcessCommandLineInformation` with `PROCESS_QUERY_LIMITED_INFORMATION`, split by
+   `CommandLineToArgvW` rules), cwd from the process parameters (`ReadProcessMemory` of the PEB's
+   `CurrentDirectory`, x64 layout, `PROCESS_VM_READ`), same user from the token SID; anything unreadable is `None`, so
+   the existing `could_be_fgos` / unreadable rules apply unchanged. Then lift the Linux-only refusal of `quiesce::scan`
+   in holder-lock route.rs for Windows (the PID-namespace check stays Linux). Windows tests: a child process started
+   in a temp workspace dir is found by cwd and by `--dir` argv; a process elsewhere is not.
 3. Allow `has_wal` on Windows in git_gate; require `git-wal-v1` for windows-x64 in verify.rs; update the two
    contracts' text. `git-wal-unsupported-platform` stays for platforms still without it (macOS).
 4. Tests: Windows cases for fence placed, live predecessor refusal, missing fence refusal; they run in the existing
