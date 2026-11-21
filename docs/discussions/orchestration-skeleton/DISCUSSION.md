@@ -11,6 +11,7 @@ discussion: open
 - 2026-11-21 16:35: đã xác định 4 bản sửa của OS-D1 (nguồn: memory `orchestration-stabilize-first-decision` của secretary Miu và tin supervisor gửi Miu sáng 2026-11-21: "1547 first, then the idle-lead nudge, then the names, then the reaper"): `p-l22vozecxg`, `p-waxzxz5mio`, `p-mhwe24fttr`, `p-yqanenewb4`. **Cả 4 đã `done`** (xem §7 `#related`). Điều kiện đậu theo chữ của OS-D1 đã thỏa, nhưng release hold ("no new work until the release hold is lifted", handoff secretary 14:45) vẫn còn hiệu lực. Discussion vẫn `paused` cho tới khi chủ dự án cho mở lại.
 - **2026-11-21 16:16: chủ dự án cho mở lại (OS-D2).** Trạng thái `discussion: open`. Architecture panel (T0) vẫn hoãn. Release hold không bị ảnh hưởng vì discussion không sinh code.
 - **2026-11-21 16:23 (round 6):** chủ dự án trả lời câu hỏi round 5 là "cả hai": mọi thành phần phải có authority, boundary và contract rõ, **và** hệ thống cần một cơ chế hoặc một vai làm nhạc trưởng nắm nhịp điều phối tổng. Câu hỏi mở thành §3 row 9: nhạc trưởng, hay mọi thứ chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan theo chuỗi watcher -> ghi signal -> phản ứng tiếp. Đang chạy 5 agent con (haiku, chỉ đọc) dò lại tier 0 tới 9 từ dưới lên; kết quả sẽ vào bảng §3 row 4b.
+- **2026-11-21 21:40 (round 31): bàn đóng hàng 4.** Soát bảng 4a với OS-D7 tới OS-D17 ở §3 4m: trigger, timer theo actor, wake, who-next, facet đã có lời giải; handoff đề xuất thành "đóng phiếu này, mở phiếu kia". Đang hỏi: sleep nghĩa là gì.
 - **2026-11-21 21:30 (round 30): chủ dự án chọn B -> OS-D17; hàng 10 rõ.** Rà soát định kỳ là một Unit chỉ đọc, độc lập, khởi qua `fgos run`; bốn ý mặc định của 4l giữ nguyên. Miu báo discussion component-authority đã settled (21:10): thành phần của skeleton khai báo qua cửa `declare` của nó, và rà soát định kỳ là chỗ đối chiếu mô hình cấu trúc với code.
 - **2026-11-21 21:15 (round 29): bàn hàng 10 (rà soát định kỳ của LLM).** Đề xuất ở §3 4l: ai rà soát, khi nào, brief gồm gì, kết quả đi đâu. Đang hỏi: ai rà soát.
 - **2026-11-21 21:07 (round 28): chủ dự án chọn A -> OS-D16.** Một cửa hỏi người (Questions) cho mọi người được hỏi; `waitingOn: person` trỏ tới một câu hỏi. Bản ghi lập lịch (hàng 6) đã rõ hết. Việc gộp Questions với Workflow gate chuyển sang discussion component-authority qua Miu. Kế tiếp: hàng 10 (rà soát định kỳ của LLM).
@@ -295,6 +296,25 @@ Không vướng gì: guide đã khai `capability` cho từng unit và gate ngư�
 **Đã chốt: (B), OS-D17.**
 - **(C) Miu rà soát.** Miu nhìn toàn cảnh portfolio, nhưng Miu là cửa của chủ dự án, không phải người canh nhịp; thêm việc định kỳ cho Miu làm nhoè vai.
 
+**4m. Soát lại bảng 4a sau OS-D7 tới OS-D17 (hàng 4, round 31, 2026-11-21 21:40)**
+
+| Primitive | Khoảng trống ghi ở 4a | Bây giờ |
+|---|---|---|
+| Trigger | domain chưa đăng ký được trigger | **Giải.** Domain không đăng ký trigger: nó đưa bản ghi lập lịch với `waitingOn: event | time` (OS-D9, OS-D10), tín hiệu ngoài vào qua cửa raise (OS-D8). Watcher definitions là luật riêng của giữ nhịp. |
+| Timer | không có timer theo actor | **Giải.** `waitingOn: time` và `until` trên từng bản ghi; giữ nhịp so trên mỗi tick. Độ chính xác bằng nhịp tick (60 s khi bận, 900 s khi rảnh), đủ cho hạn tính bằng giờ của domain. |
+| Wake | chỉ cho supervisor | **Giải.** Cửa wake lớn lên thành giữ nhịp (OS-D7), nhận `--trigger`, `--ref` (OS-D8), đánh thức bất kỳ người chơi nào qua `needs` (OS-D11): `actor` còn sống thì đưa event cho nó, chết thì start successor. |
+| Who acts next | admission chưa vào code | **Giải về hình dạng.** `needs` giải ở `bind()`, Session Host, Identity (OS-D11, OS-D15); T1 làm lát đầu. |
+| Scheduling facet | chưa chung | **Giải** (OS-D9 tới OS-D16). |
+| Cap | có đủ | Thêm: cap vòng lặp thuộc khung (OS-D13), tài nguyên nặng qua resource referee (OS-D14). |
+| Surface port | chưa xây | Hàng 7. |
+| Handoff | ba đường riêng | **Đề xuất:** handoff giữa các bước là **đóng phiếu này, mở phiếu kia**: người chơi xong thì bản ghi có `outcome: done`, domain mở bản ghi bước sau với `needs`, giữ nhịp khởi người chơi kế. Nội dung trao tay (payload, ranh giới tin cậy) vẫn theo `routing-handoff.md`. Ba đường hôm nay (`supervisor raise --kind coordination-handoff`, settled discussion -> planner, agent sang agent) đều thành hình dạng này; gộp code là việc của plan, khai báo qua `component-authority`. |
+| Sleep | thiếu hẳn | **Còn mở**, xem dưới. |
+
+*Sleep nghĩa là gì.* Khi một người chơi có bản ghi đang chờ (`waitingOn`), session của nó làm gì?
+- **(A) Ngủ là kết thúc session.** Bản ghi giữ trạng thái chờ; khi tới lượt, giữ nhịp start một session mới theo `needs` và trao tay theo `routing-handoff.md`. Không giữ pane, không giữ chỗ lane, không zombie ngồi không (`p-waxzxz5mio`), session mới luôn chạy release đang active (tránh lỗi `p-ycausep3zs`). Mất: nạp lại ngữ cảnh mỗi lần thức.
+- **(B) Ngủ là session ngồi yên trong pane**, thức bằng mailbox hoặc wake. Giữ ngữ cảnh, nhưng giữ chỗ, dễ thành zombie, và chạy release cũ.
+- **(C) Mặc định A; B chỉ cho head đang nói chuyện trực tiếp với một người** (Miu, shaper), vì ở đó ngữ cảnh hội thoại là thứ có giá trị; và kể cả khi đó, ngủ quá một ngưỡng thì về A.
+
 ## 4. Quyết định đã chốt
 
 Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
@@ -357,6 +377,7 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 - 2026-11-21 21:07 round 28: Chủ dự án: "đồng ý A". Mint OS-D16. Gửi Miu nhờ chuyển việc gộp Questions và Workflow gate sang discussion component-authority.
 - 2026-11-21 21:15 round 29: Bàn hàng 10. Đọc `core/watcher/definitions/*`, `core/watcher/pace/*` (điều kiện theo tuổi đã có). Đề xuất ở §3 4l.
 - 2026-11-21 21:30 round 30: Chủ dự án: "B". Mint OS-D17. Miu báo qua mailbox: component-authority settled 21:10, thành phần của skeleton (`p-7pjiqfoj7v`) khai báo qua cửa `declare` (`docs/discussions/component-authority/DISCUSSION.md` §6); brief rà soát ý (e) sửa theo vai "rà định kỳ" bên đó giao.
+- 2026-11-21 21:40 round 31: Chủ dự án: "ok 4 trước". Soát bảng 4a với OS-D7 tới OS-D17 ở §3 4m; còn hỏi sleep.
 
 ## 6. Thiết kế đã chốt {#design}
 
