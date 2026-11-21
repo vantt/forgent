@@ -13,10 +13,13 @@ fn hash(bytes: &[u8]) -> String {
     format!("sha256:{:x}", Sha256::digest(bytes))
 }
 const OS: &str = if cfg!(windows) { "windows" } else { "linux" };
-const HOST_ENTRY: &str = if cfg!(windows) {
-    "bin/fgos.exe"
+/// The manifest entry is the same on every platform; the workspace shim execs it.
+const HOST_ENTRY: &str = "bin/fgos";
+/// A Windows release also stages the same bytes as `bin/fgos.exe`, as the real build does.
+const HOST_ENTRIES: &[&str] = if cfg!(windows) {
+    &["bin/fgos", "bin/fgos.exe"]
 } else {
-    "bin/fgos"
+    &["bin/fgos"]
 };
 /// The addon target the release manifest invariant expects for this OS: its
 /// rule is private to the distribution crate (`windows` releases name `win32-x64`).
@@ -46,14 +49,16 @@ fn candidate(root: &Path, wal: bool) {
     let legacy = b"console.log('fixture');\n";
     fs::create_dir_all(root.join("bin")).unwrap();
     fs::create_dir_all(root.join("libexec/legacy-node/bin")).unwrap();
-    fs::write(root.join(HOST_ENTRY), host).unwrap();
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        fs::set_permissions(root.join(HOST_ENTRY), fs::Permissions::from_mode(0o755)).unwrap();
+    for entry in HOST_ENTRIES {
+        fs::write(root.join(entry), host).unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(root.join(entry), fs::Permissions::from_mode(0o755)).unwrap();
+        }
     }
     fs::write(root.join("libexec/legacy-node/bin/fgos.mjs"), legacy).unwrap();
-    let mut m = serde_json::json!({"schemaVersion":1,"entries":{"fgos":HOST_ENTRY},"capabilities":if wal { vec!["git-wal-v1"] } else { vec![] },"components":{"legacyNode":{"root":"libexec/legacy-node","entry":"bin/fgos.mjs","digest":hash(legacy)}},"requires":{},"stateSchemas":{"read":["1"],"write":["1"],"migrations":[]},"target":{"os":OS,"arch":"x64"},"files":[{"path":HOST_ENTRY,"kind":"file","digest":hash(host),"mode":"755","class":"immutable-entry"},{"path":"libexec/legacy-node/bin/fgos.mjs","kind":"file","digest":hash(legacy),"mode":"644","class":"immutable-runtime"}]});
+    let mut m = serde_json::json!({"schemaVersion":1,"entries":{"fgos":HOST_ENTRY},"capabilities":if wal { vec!["git-wal-v1"] } else { vec![] },"components":{"legacyNode":{"root":"libexec/legacy-node","entry":"bin/fgos.mjs","digest":hash(legacy)}},"requires":{},"stateSchemas":{"read":["1"],"write":["1"],"migrations":[]},"target":{"os":OS,"arch":"x64"},"files":HOST_ENTRIES.iter().map(|entry| serde_json::json!({"path":entry,"kind":"file","digest":hash(host),"mode":"755","class":"immutable-entry"})).chain([serde_json::json!({"path":"libexec/legacy-node/bin/fgos.mjs","kind":"file","digest":hash(legacy),"mode":"644","class":"immutable-runtime"})]).collect::<Vec<_>>()});
     let addon = b"fixture native addon";
     fs::create_dir_all(root.join("native")).unwrap();
     fs::write(root.join("native/fgos.node"), addon).unwrap();
