@@ -183,6 +183,12 @@ impl Layout {
         matches!(self, Layout::ClaudeConfig | Layout::ClaudeHome)
     }
 
+    /// The whole life a freshly issued access token of this layout has, when it is known. Claude Code's OAuth issues
+    /// tokens for 8 hours and its store keeps only `expiresAt`, no issue time, so the constant is all there is.
+    pub fn token_lifetime_ms(self) -> Option<f64> {
+        matches!(self, Layout::ClaudeConfig | Layout::ClaudeHome).then_some(8.0 * 3_600_000.0)
+    }
+
     fn claude_file(self) -> &'static str {
         self.files()[0]
     }

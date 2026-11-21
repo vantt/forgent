@@ -100,7 +100,9 @@ pub struct RefreshRequest<'a> {
 
 /// Renew the login of `credential_source` once, in an fgOS-held scratch copy, when it is closer to expiry than the
 /// window (the threshold, widened to the seat's timeout plus one call and a margin when a seat timeout is given);
-/// apply the renewed entry to the real store.
+/// apply the renewed entry to the real store. A seat that even a freshly issued token could not cover (that sum
+/// exceeds the layout's token lifetime) would keep the window open forever, so nothing is renewed for it
+/// (`seat-longer-than-token-lifetime`) and the life check refuses it once, naming that.
 pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>) -> RefreshOutcome {
     let source = request.credential_source;
     let (Some(layout), Some(home)) = (
@@ -122,12 +124,15 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
     let threshold = options
         .threshold_ms
         .unwrap_or_else(|| default_refresh_ahead_threshold_ms(options.probe_timeout_ms as f64));
-    let threshold = match options.seat_timeout_ms.filter(|t| t.is_finite()) {
-        Some(seat) => {
-            threshold.max(seat + options.probe_timeout_ms as f64 + SEAT_RENEWAL_MARGIN_MS)
-        }
-        None => threshold,
-    };
+    let seat_needs = options
+        .seat_timeout_ms
+        .filter(|t| t.is_finite())
+        .map(|seat| seat + options.probe_timeout_ms as f64 + SEAT_RENEWAL_MARGIN_MS);
+    let threshold = seat_needs.map_or(threshold, |needs| threshold.max(needs));
+    // A seat even a freshly issued token could not cover keeps the window open forever.
+    let seat_outlives_any_token = seat_needs
+        .zip(layout.token_lifetime_ms())
+        .is_some_and(|(needs, lifetime)| needs > lifetime);
     let lock_wait = options
         .lock_wait_ms
         .unwrap_or(options.probe_timeout_ms + LOCK_MARGIN_MS);
@@ -227,6 +232,10 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
         options.sqlite,
     ) {
         return outcome("skipped", "live-seat-owns-renewal");
+    }
+    // A renewal could not make this seat's life check pass, and every start would spend another one.
+    if seat_outlives_any_token {
+        return outcome("skipped", "seat-longer-than-token-lifetime");
     }
     if in_cooldown(&account_dir, options.cooldown_ms, now()) {
         return outcome("cooldown", "recent-failure");

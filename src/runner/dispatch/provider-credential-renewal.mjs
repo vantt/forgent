@@ -549,12 +549,16 @@ function ompAgentFilesCheck(home) {
 // the provider signs, so a login renewed inside a private home is staged and kept for the owner, never applied
 // (applyAgentCopies); a renewal fgOS makes itself in a scratch copy of the source is applied as for the other
 // layouts.
+const CLAUDE_TOKEN_LIFETIME_MS = 8 * 60 * MINUTE_MS;
 function claudeLayoutAt(name, file) {
   const layout = {
     name,
     files: [file],
     // A copy holds the source's own refresh token, so a seat that refreshed inside its home would spend it.
     seatMustNotRefresh: true,
+    // The whole life Claude Code's OAuth issues an access token for; the store keeps only `expiresAt`, no issue
+    // time, so a freshly issued token's life is this constant, not an observed pair.
+    tokenLifetimeMs: CLAUDE_TOKEN_LIFETIME_MS,
     identity: () => null,
     read(home, { agent } = {}) {
       const parsed = readJsonFile(path.join(home, file), { agent });
@@ -1335,7 +1339,10 @@ const SEAT_RENEWAL_MARGIN_MS = 10 * 60 * 1000;
 /**
  * Renew the login of `credentialSource` once, in an fgOS-held scratch copy, when it is closer to expiry
  * than the window: `thresholdMs`, widened for a seat that may run `seatTimeoutMs` to that timeout plus one call
- * and a margin, so a login that cannot outlive the seat is renewed before the seat's life check; apply the renewed entry to the real store. Never throws and never returns a value
+ * and a margin, so a login that cannot outlive the seat is renewed before the seat's life check; apply the renewed entry to the real store.
+ * A seat that even a freshly issued token could not cover (its timeout plus one call and the margin exceeds the
+ * layout's `tokenLifetimeMs`) would keep that window open forever, so nothing is renewed for it
+ * (`seat-longer-than-token-lifetime`) and the life check refuses it once, naming that. Never throws and never returns a value
  * of a credential: `{status: 'fresh'|'renewed'|'failed'|'cooldown'|'skipped', reason}`. `liveSeatHomes(target)`
  * names the private homes of seats still running on this store; the newest valid login one of them renewed is
  * taken first (takeLiveSeatLogin), so a store whose refresh token a running seat already spent is not renewed with it;
@@ -1368,7 +1375,9 @@ export async function refreshAhead({
 
     // Only the dispatched provider's entry counts, both for the window and for "was it renewed".
     const entryOf = (read) => selectProviderEntry(read.entries, provider);
-    const windowMs = Number.isFinite(seatTimeoutMs) ? Math.max(thresholdMs, seatTimeoutMs + probeTimeoutMs + SEAT_RENEWAL_MARGIN_MS) : thresholdMs;
+    const seatNeedsMs = Number.isFinite(seatTimeoutMs) ? seatTimeoutMs + probeTimeoutMs + SEAT_RENEWAL_MARGIN_MS : null;
+    const windowMs = seatNeedsMs === null ? thresholdMs : Math.max(thresholdMs, seatNeedsMs);
+    const seatOutlivesAnyToken = seatNeedsMs !== null && Number.isFinite(layout.tokenLifetimeMs) && seatNeedsMs > layout.tokenLifetimeMs;
     const inWindow = (entry) => entry.dueMs - now() < windowMs;
     const before = layout.read(home, { loadSqlite });
     if (!before.ok) return { status: 'skipped', reason: before.code };
@@ -1414,6 +1423,8 @@ export async function refreshAhead({
       if (liveSeatSharesRefresh({ layout, homes, key: entry.entry.key, refresh: entry.entry.refresh, loadSqlite })) {
         return { status: 'skipped', reason: 'live-seat-owns-renewal' };
       }
+      // A renewal could not make this seat's life check pass, and every start would spend another one.
+      if (seatOutlivesAnyToken) return { status: 'skipped', reason: 'seat-longer-than-token-lifetime' };
       if (inCooldown(accountDir, cooldownMs, now())) return { status: 'cooldown', reason: 'recent-failure' };
       return await renewInScratch({
         layout, layoutName, provider, credentialSource, home, accountDir, key: entry.entry.key, lock, probeTimeoutMs, spawnFn, env, loadSqlite, now,

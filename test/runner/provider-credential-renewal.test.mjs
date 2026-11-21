@@ -2444,7 +2444,7 @@ test('a running seat login near its own expiry is never probed: the probe would 
   } finally { w.cleanup(); }
 });
 
-test('a login that cannot outlive the seat is renewed before its life check, unless a running seat owns its renewal; a refusal names what refresh-ahead did', async () => {
+test('a login that cannot outlive the seat is renewed before its life check, unless a running seat owns its renewal or no token could cover the seat; a refusal names what refresh-ahead did', async () => {
   const w = workspace();
   const root = resolveConfinementTempRoot();
   const seatName = `seat-window-${process.pid}`;
@@ -2474,13 +2474,21 @@ test('a login that cannot outlive the seat is renewed before its life check, unl
     fs.rmSync(path.dirname(seat), { recursive: true, force: true });
     fs.rmSync(path.join(root, `run-${seatName}`), { recursive: true, force: true });
 
+    // A seat longer than a whole Claude token's life: no renewal is spent, and the refusal says why.
+    const longSeatMs = 8 * 60 * 60 * 1000;
+    const futile = fakeSpawn({ layoutName: 'claude' });
+    const tooLong = await lease(futile.spawnFn, longSeatMs);
+    assert.deepEqual(tooLong.refreshAhead, [{ cli: null, status: 'skipped', reason: 'seat-longer-than-token-lifetime' }]);
+    assert.equal(futile.starts.length, 0, 'no renewal is spent on a seat no token can cover');
+    assert.match(loginLifeProblem(claudeSource(w.home), { timeoutMs: longSeatMs, refreshAhead: tooLong.refreshAhead[0] }), /^login-expires-before-seat-timeout: .*; refresh-ahead: skipped seat-longer-than-token-lifetime$/);
+
     // The seat's timeout widens the window: the login is renewed, and the seat is admitted.
     const renewing = fakeSpawn({ layoutName: 'claude' });
     const renewed = await lease(renewing.spawnFn, seatMs);
     assert.deepEqual(renewed.refreshAhead, [{ cli: null, status: 'renewed', reason: 'applied' }]);
     assert.equal(renewing.starts.length, 1);
     assert.equal(life(renewed), null);
-    assert.equal(FAKE_FRAGMENTS.some((value) => JSON.stringify([owned, renewed].map((l) => l.refreshAhead)).includes(value)), false, 'no credential value in an outcome');
+    assert.equal(FAKE_FRAGMENTS.some((value) => JSON.stringify([owned, tooLong, renewed].map((l) => l.refreshAhead)).includes(value)), false, 'no credential value in an outcome');
   } finally {
     fs.rmSync(path.join(root, `disp_${seatName}`), { recursive: true, force: true });
     fs.rmSync(path.join(root, `run-${seatName}`), { recursive: true, force: true });
