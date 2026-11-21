@@ -16,6 +16,7 @@ import { bindHeadSeat } from '../../src/session-host/head-start.mjs';
 import { grantOf } from '../../src/session-host/head-grants.mjs';
 import { launchSessionAttempt, requirementOf } from '../../src/runner/dispatch/session-attempt.mjs';
 import { prepareSeat } from '../../src/runner/dispatch/herdr-round.mjs';
+import { validateWorkspacePaths, WORKSPACE_PATHS_RESOURCE } from '../../src/runner/dispatch/confinement/workspace-paths.mjs';
 import { controlDelivery } from '../../src/runner/dispatch/confinement/bypass-pairing.mjs';
 
 seedFileLocalBwrapRegistry();
@@ -106,4 +107,14 @@ test('the secretary head launches bypass in the main checkout it is granted, and
       delivery: controlDelivery({ launchKind: 'assignment', requirement: requirementOf(grantOf('head:secretary-miu')), backend: 'bwrap' }),
     }), (err) => err.reason === 'own-worktree-unavailable');
   } finally { fs.rmSync(workerRoot, { recursive: true, force: true }); }
+});
+
+test('a head grant of a one-level directory binds the directory itself, a path the sandbox validator accepts', () => {
+  for (const role of ['head:secretary-miu', 'head:supervisor']) {
+    const grant = requirementOf(grantOf(role)).policy.grants.find((g) => g.resource === WORKSPACE_PATHS_RESOURCE);
+    assert.ok(grant.paths.includes('plans/backlog'), `${role} binds plans/backlog`);
+    assert.equal(new Set(grant.paths).size, grant.paths.length, `${role} lists no path twice`);
+    assert.ok(grant.paths.every((p) => !p.includes('*')), `${role} has no glob in any path`);
+    validateWorkspacePaths(grant.paths, role);
+  }
 });
