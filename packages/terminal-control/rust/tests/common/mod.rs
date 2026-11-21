@@ -95,6 +95,8 @@ pub struct MemDriver {
     /// A pane that vanishes at the moment something first asks for its geometry (another process closed it).
     pub vanish_on_layout: RefCell<Option<String>>,
     pub vanish_on_process_info: RefCell<Option<String>>,
+    /// Process info answers given once each, in order, before the pane's own: a foreground that is only briefly odd.
+    pub transient_process_info: RefCell<std::collections::VecDeque<ProcessInfo>>,
     next: Cell<u32>,
 }
 
@@ -122,6 +124,7 @@ impl MemDriver {
             incarnation_pid: Cell::new(4242),
             vanish_on_layout: RefCell::new(None),
             vanish_on_process_info: RefCell::new(None),
+            transient_process_info: RefCell::new(Default::default()),
             next: Cell::new(1),
         }
     }
@@ -424,6 +427,9 @@ impl TerminalDriver for MemDriver {
         if self.vanish_on_process_info.borrow().as_deref() == Some(pane) {
             self.vanish_on_process_info.borrow_mut().take();
             self.kill_pane(pane);
+        }
+        if let Some(info) = self.transient_process_info.borrow_mut().pop_front() {
+            return Ok(info);
         }
         self.panes
             .borrow()

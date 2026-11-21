@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fixed: a rotation or head start no longer ends `no-answer` when the new CLI is caught while it is still starting: a pane send now re-reads the pane for the identify window when its foreground shows only a process with no command line yet, instead of refusing it as a bare shell, and a launch likewise waits out the probe's own child before it refuses `pane foreground is not the shell`, naming what the pane answered.
 - Changed: the secretary and the supervisor now rotate their session at 0.15 of the context window (about 150k tokens of 1M) instead of 0.4, set through `sessionRotation.personas`; every other persona keeps 0.4 and hard stays 0.7.
 - Fixed: a paths land (`fgos land --paths`, and a head's `session write`) whose push the remote rejects no longer leaves its commit on local main, which refused every later land `land-target-ahead`: it undoes its own unpublished commit (the bytes stay), starts over from a fresh sync up to three more times, then refuses `land-retries-exhausted`. A hook-changed commit and a footprint refusal are undone the same way.
 - Fixed: a successful `fgos land <branch>` now releases its candidate worktree (about 5G with its build output) instead of leaving it for `fgos git recover`; a land refused because a dead writer's earlier land is still pending now says to run `fgos git recover`.

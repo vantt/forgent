@@ -648,10 +648,23 @@ impl<'a> Core<'a> {
         if let Some(not_started) = self.wait_for_shell(&record.pane_id)? {
             return Ok(not_started);
         }
-        let info = self.driver.process_info(&record.pane_id)?;
+        // The shell has just run the probe: its foreground group can still list the probe's child or a
+        // prompt hook for a moment, so the pane gets the identify window to be the bare shell again.
+        let deadline =
+            Instant::now() + Duration::from_millis(self.config.launch_identify_timeout_ms);
+        let info = loop {
+            let info = self.driver.process_info(&record.pane_id)?;
+            if identity::is_bare_shell(&info) || Instant::now() >= deadline {
+                break info;
+            }
+            std::thread::sleep(IDENTIFY_POLL);
+        };
         if !identity::is_bare_shell(&info) {
             return Ok(LaunchOutcome::NotStarted {
-                reason: "pane foreground is not the shell".into(),
+                reason: format!(
+                    "pane foreground is not the shell ({})",
+                    identity::answer_of(&info)
+                ),
             });
         }
 
@@ -808,7 +821,7 @@ impl<'a> Core<'a> {
         self.need(capability)?;
         self.need("process.info")?;
         let record = self.live_record(&store, key)?;
-        let info = match self.driver.process_info(&record.pane_id) {
+        let info = match self.settled_process_info(&record.pane_id) {
             Ok(info) => info,
             Err(refusal) => {
                 return Ok(SendOutcome::ForegroundNotAgent {
@@ -835,6 +848,26 @@ impl<'a> Core<'a> {
                 .send_keys(&record.pane_id, keys.unwrap_or_default()),
         }
         .map(|()| SendOutcome::Sent)
+    }
+
+    /// The pane's process info, read again for up to the identify window while its foreground shows
+    /// only a process with no command line besides the shell. A program that is still starting (its
+    /// image being replaced) has no command line yet, and the pane then lists nothing but the shell.
+    fn settled_process_info(
+        &self,
+        pane: &str,
+    ) -> crate::driver::DriverResult<crate::driver::ProcessInfo> {
+        let deadline =
+            Instant::now() + Duration::from_millis(self.config.launch_identify_timeout_ms);
+        loop {
+            let info = self.driver.process_info(pane)?;
+            let starting = identity::is_bare_shell(&info)
+                && info.unlisted.iter().any(|pid| *pid != info.shell_pid);
+            if !starting || Instant::now() >= deadline {
+                return Ok(info);
+            }
+            std::thread::sleep(IDENTIFY_POLL);
+        }
     }
 
     pub fn read(
