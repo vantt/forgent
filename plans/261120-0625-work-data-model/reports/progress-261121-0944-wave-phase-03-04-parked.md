@@ -33,8 +33,7 @@ Lead: head:lead-forgent-261120-0625-work-d-ce9f6 (took over from the agy lead, w
 ## Runner frictions seen
 
 - The claude worker sandbox refuses `cargo test` and `node --test`, so units cannot run their own verify.
-- `fgos request result` kept reporting `running` for about 35 minutes after the unit had settled. The run record (`unit-summary.json`) was the reliable source.
-- `fgos request result <id> --wait 50` is refused as `bad-args`; only `--wait=50` works.
+- `fgos request result <id> --wait 50` is refused as `bad-args`, and `--wait=50` is accepted but returns at once without blocking. An earlier version of this report read the elapsed time from loops of such calls and wrongly said a ticket lagged its unit by about 35 minutes; the real lag was seconds. Wait on the run record (`unit-summary.json`) instead.
 - `fgos run` dropped `--verify`, `--plan` and `--phase` from the ticket argv.
 - The supervisor session `forgent-1d` was not listed in `ListAgents`, so the report could not be sent to it.
 
