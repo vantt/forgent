@@ -86,66 +86,25 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Packaging assets as $VERSION for ${{ matrix.target }}"
 
-      - name: Pin Windows MSVC toolset and Windows SDK
+      - &pin-msvc-toolset
+        name: Pin Windows MSVC toolset and Windows SDK
         if: runner.os == 'Windows'
         run: |
           set -euo pipefail
-          VSWHERE="vswhere.exe"
-          if ! command -v "$VSWHERE" >/dev/null 2>&1; then
-            for p in "C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe" "C:/Program Files/Microsoft Visual Studio/Installer/vswhere.exe"; do
-              if [ -f "$p" ]; then VSWHERE="$p"; break; fi
-            done
-          fi
-          VS_INSTALL=$("$VSWHERE" -latest -property installationPath | tr -d '\r')
-          if [ -z "$VS_INSTALL" ]; then
-            echo "::error::Visual Studio installation not found via vswhere"
+          VS_INSTALL=$("C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe" -latest -property installationPath | tr -d '\r')
+          echo "Installed toolsets:" $(ls "${VS_INSTALL//\\//}/VC/Tools/MSVC" 2>/dev/null)
+          echo "Installed SDKs:" $(ls "C:/Program Files (x86)/Windows Kits/10/Lib" 2>/dev/null || ls "C:/Program Files/Windows Kits/10/Lib" 2>/dev/null)
+          VC_ENV=$(MSYS2_ARG_CONV_EXCL="*" cmd.exe /c "call \"$VS_INSTALL\\VC\\Auxiliary\\Build\\vcvarsall.bat\" x64 $WINDOWS_SDK_VERSION -vcvars_ver=$MSVC_TOOLSET_VERSION && set" 2>&1) || {
+            echo "$VC_ENV"
+            echo "::error::Pinned MSVC ($MSVC_TOOLSET_VERSION) or SDK ($WINDOWS_SDK_VERSION) missing; change in workflow env"
             exit 1
-          fi
-          VS_DIR="${VS_INSTALL//\\//}"
-          MSVC_DIR="$VS_DIR/VC/Tools/MSVC"
-          SDK_LIB_DIR="C:/Program Files (x86)/Windows Kits/10/Lib"
-          if [ ! -d "$SDK_LIB_DIR" ]; then
-            SDK_LIB_DIR="C:/Program Files/Windows Kits/10/Lib"
-          fi
-
-          echo "Installed MSVC toolsets in $MSVC_DIR:"
-          ls -1 "$MSVC_DIR" 2>/dev/null || true
-          echo "Installed Windows SDKs in $SDK_LIB_DIR:"
-          ls -1 "$SDK_LIB_DIR" 2>/dev/null || true
-
-          if ! ls -1 "$MSVC_DIR" 2>/dev/null | grep -E "^${MSVC_TOOLSET_VERSION}(\.|$)" >/dev/null; then
-            echo "::error::Pinned MSVC toolset '$MSVC_TOOLSET_VERSION' is missing. Installed toolsets: $(ls -m "$MSVC_DIR" 2>/dev/null)"
-            exit 1
-          fi
-          if ! ls -1 "$SDK_LIB_DIR" 2>/dev/null | grep -E "^${WINDOWS_SDK_VERSION}(\.|$)" >/dev/null; then
-            echo "::error::Pinned Windows SDK '$WINDOWS_SDK_VERSION' is missing. Installed SDKs: $(ls -m "$SDK_LIB_DIR" 2>/dev/null)"
-            exit 1
-          fi
-
-          VCVARSALL="${VS_INSTALL}\\VC\\Auxiliary\\Build\\vcvarsall.bat"
-          ENV_OUT=$(mktemp)
-          if ! MSYS2_ARG_CONV_EXCL="*" cmd.exe /c "call \"$VCVARSALL\" x64 $WINDOWS_SDK_VERSION -vcvars_ver=$MSVC_TOOLSET_VERSION && set || exit /b 1" > "$ENV_OUT" 2>&1; then
-            echo "::error::vcvarsall.bat failed to initialize environment"
-            cat "$ENV_OUT"
-            exit 1
-          fi
-
-          TARGET_VARS=(PATH LIB LIBPATH INCLUDE VCINSTALLDIR VCToolsInstallDir VCToolsVersion WindowsSdkDir WindowsSDKVersion UCRTVersion VSCMD_ARG_TGT_ARCH)
-          for var in "${TARGET_VARS[@]}"; do
-            val=$(grep -m 1 -E "^${var}=" "$ENV_OUT" | cut -d= -f2- | tr -d '\r')
-            if [ -n "$val" ]; then
-              echo "$var=$val" >> "$GITHUB_ENV"
-              export "$var=$val"
-            fi
+          }
+          for var in PATH LIB LIBPATH INCLUDE VCINSTALLDIR VCToolsInstallDir VCToolsVersion WindowsSdkDir WindowsSDKVersion UCRTVersion VSCMD_ARG_TGT_ARCH; do
+            val=$(echo "$VC_ENV" | grep -m 1 -E "^${var}=" | cut -d= -f2- | tr -d '\r')
+            [ -n "$val" ] && echo "$var=$val" >> "$GITHUB_ENV" && [ "$var" = "VCToolsInstallDir" ] && VCToolsInstallDir="$val"
           done
-
-          echo "Selected link.exe version:"
-          LINK_EXE="${VCToolsInstallDir//\\//}/bin/Hostx64/x64/link.exe"
-          if [ -f "$LINK_EXE" ]; then
-            ("$LINK_EXE" /? 2>&1 || true) | sed -n '1,2p'
-          else
-            (link.exe /? 2>&1 || true) | sed -n '1,2p'
-          fi
+          LINK="${VCToolsInstallDir//\\//}"
+          ("${LINK%/}/bin/Hostx64/x64/link.exe" /? 2>&1 || true) | head -n 1
 
       - name: Deterministic Windows linker
         if: runner.os == 'Windows'
@@ -244,67 +203,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Pin Windows MSVC toolset and Windows SDK
-        if: runner.os == 'Windows'
-        run: |
-          set -euo pipefail
-          VSWHERE="vswhere.exe"
-          if ! command -v "$VSWHERE" >/dev/null 2>&1; then
-            for p in "C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe" "C:/Program Files/Microsoft Visual Studio/Installer/vswhere.exe"; do
-              if [ -f "$p" ]; then VSWHERE="$p"; break; fi
-            done
-          fi
-          VS_INSTALL=$("$VSWHERE" -latest -property installationPath | tr -d '\r')
-          if [ -z "$VS_INSTALL" ]; then
-            echo "::error::Visual Studio installation not found via vswhere"
-            exit 1
-          fi
-          VS_DIR="${VS_INSTALL//\\//}"
-          MSVC_DIR="$VS_DIR/VC/Tools/MSVC"
-          SDK_LIB_DIR="C:/Program Files (x86)/Windows Kits/10/Lib"
-          if [ ! -d "$SDK_LIB_DIR" ]; then
-            SDK_LIB_DIR="C:/Program Files/Windows Kits/10/Lib"
-          fi
-
-          echo "Installed MSVC toolsets in $MSVC_DIR:"
-          ls -1 "$MSVC_DIR" 2>/dev/null || true
-          echo "Installed Windows SDKs in $SDK_LIB_DIR:"
-          ls -1 "$SDK_LIB_DIR" 2>/dev/null || true
-
-          if ! ls -1 "$MSVC_DIR" 2>/dev/null | grep -E "^${MSVC_TOOLSET_VERSION}(\.|$)" >/dev/null; then
-            echo "::error::Pinned MSVC toolset '$MSVC_TOOLSET_VERSION' is missing. Installed toolsets: $(ls -m "$MSVC_DIR" 2>/dev/null)"
-            exit 1
-          fi
-          if ! ls -1 "$SDK_LIB_DIR" 2>/dev/null | grep -E "^${WINDOWS_SDK_VERSION}(\.|$)" >/dev/null; then
-            echo "::error::Pinned Windows SDK '$WINDOWS_SDK_VERSION' is missing. Installed SDKs: $(ls -m "$SDK_LIB_DIR" 2>/dev/null)"
-            exit 1
-          fi
-
-          VCVARSALL="${VS_INSTALL}\\VC\\Auxiliary\\Build\\vcvarsall.bat"
-          ENV_OUT=$(mktemp)
-          if ! MSYS2_ARG_CONV_EXCL="*" cmd.exe /c "call \"$VCVARSALL\" x64 $WINDOWS_SDK_VERSION -vcvars_ver=$MSVC_TOOLSET_VERSION && set || exit /b 1" > "$ENV_OUT" 2>&1; then
-            echo "::error::vcvarsall.bat failed to initialize environment"
-            cat "$ENV_OUT"
-            exit 1
-          fi
-
-          TARGET_VARS=(PATH LIB LIBPATH INCLUDE VCINSTALLDIR VCToolsInstallDir VCToolsVersion WindowsSdkDir WindowsSDKVersion UCRTVersion VSCMD_ARG_TGT_ARCH)
-          for var in "${TARGET_VARS[@]}"; do
-            val=$(grep -m 1 -E "^${var}=" "$ENV_OUT" | cut -d= -f2- | tr -d '\r')
-            if [ -n "$val" ]; then
-              echo "$var=$val" >> "$GITHUB_ENV"
-              export "$var=$val"
-            fi
-          done
-
-          echo "Selected link.exe version:"
-          LINK_EXE="${VCToolsInstallDir//\\//}/bin/Hostx64/x64/link.exe"
-          if [ -f "$LINK_EXE" ]; then
-            ("$LINK_EXE" /? 2>&1 || true) | sed -n '1,2p'
-          else
-            (link.exe /? 2>&1 || true) | sed -n '1,2p'
-          fi
-
+      - *pin-msvc-toolset
       - name: Deterministic Windows linker
         if: runner.os == 'Windows'
         run: echo 'RUSTFLAGS=-C link-arg=/Brepro' >> "$GITHUB_ENV"
