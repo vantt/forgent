@@ -1,8 +1,21 @@
-discussion: open
+discussion: settled
 
 # Workflow engine and domain task types
 
+## Hand-off to the planner
+
+- **Outcome:** a second coding guide, `coding/bugfix`, selected with `--guide coding/bugfix`, shorter than `coding/feature`. Specified in §7 `#task-bugfix-guide` (D3, D4).
+- **Constraints:** guide tier only, no Work lifecycle variant and `workflowFor` stays empty (D2). No new mechanism, no new plan format, no new activity or milestone names (D1, D3, D4). The three activities `propose` requires stay (`implement-item`, `validate-plan`, `judge-ambiguity`). Bug knowledge goes in `domains/coding/`, never in the shared layer. The new YAML must be recompiled into `compiled.json`.
+- **Non-goals:** the older Work-driver stage logic (`operation-choice.mjs`, kept until cutover); the supervisor and skeleton (paused discussion); a plan format; fixing foreign planners.
+- **Acceptance criteria:** `domains/coding/workflows/bugfix.yaml` exists and `fgos doctor` row `domain-registry-compiled` is green; `fgos workflow propose --guide coding/bugfix` on a one-slice bug plan returns no `guide-activity-missing`; `test/state/workflow-multiplicity.test.mjs` is extended to prove the second workflow (and the assertion at line 28 still holds, since `workflowFor` stays empty).
+- **Open points that block nothing here:** where "a team under a lead per task type" was settled; whether the `feature.yaml` comment "nothing reads this part until the coding cutover" is stale; whether `resource-check` or `fgos graph` report durations; whether scope later widens beyond coding bugfix. Separate finding for a planner: the takeover path (`fgos-cook`, `propose`) does not run the plan-contract check (§3).
+- **Source ids:** tsk-1pv; D-ADR0070, 0072, 0073, 0076, 0079.
+
+discussion: settled
+
 ## 1. Trạng thái hiện tại
+
+2026-11-21 13:06, SETTLED: the owner agreed to the bugfix guide draft and to no diagnose activity (D3, D4). The hand-off block is at the top; a planner takes it next. Open points that block nothing are listed there.
 
 2026-11-21: the shaper head `head:shaper-workflow-engine` took over from the secretary's opening. Domain is coding (the source item is a coding-domain workflow). Scouted the current wiring (see §3). The owner's answers on tsk-1pv are recorded in §3 as owner-stated, not yet minted as D-IDs (only one round so far). Nothing is settled.
 
@@ -77,7 +90,7 @@ Today a coding Work item always walks one workflow, `coding/feature` (discovery,
 | Does either tool report durations (Gantt)? | not verified | `resource-check` help lists layers and critical path only |
 | Intent (owner 12:00): fgOS injects the standard and verifies at the end; it does not fix foreign planners, whose plans adjust themselves | owner-stated | supersedes the earlier "injection into an external planner" question |
 | Audit: inject text and a verify script exist; the takeover path (`fgos-cook`, `propose`) does not call the contract check, and its refusals are not worded as contract feedback | verified by grep: `plan-sections.mjs` is read only by `scripts/plan-contract-check.mjs`; `propose.mjs` and the cook skill never reference the contract | finding for a planner, outside the bugfix slice |
-| Bugfix guide content | draft in §7 `#task-bugfix-guide`, awaiting owner review | differs from `feature` only in id, purpose and two decision points |
+| Bugfix guide content | settled, D3 and D4 | §7 `#task-bugfix-guide`; differs from `feature` only in id, purpose and two decision points |
 | Where is "a team under a lead per task type" settled? Today `lead` leads one plan | not found yet | `core/agents/lead.yaml`; `docs/platform/workflow/spec.md` §7.8 has a conductor case driven by `fgos-cook`; ask the owner for the earlier discussion if the scan cannot find it |
 | `feature.yaml` carries no `seats:` yet; spec §10.2 describes a guide part to be added at cutover | open | `grep seats` gives 0 in `domains/coding/workflows/feature.yaml` |
 | Title says "domain task types"; is more than bugfix in scope (other kinds, other domains)? | open | the item only covers coding bugfix |
@@ -88,6 +101,8 @@ Today a coding Work item always walks one workflow, `coding/feature` (discovery,
 |---|---|---|
 | D1 | Two tiers: the pattern is the low tier (the agent picks the reliable, high-quality way to do one piece of work); the workflow is the high tier (a chain of pieces of work toward a larger goal). The workflow is a broad frame distilled from core or organisation experience, not a narrow constraint; the persona gives the lead its qualities, skills give it intelligence, nothing is hardcoded. This was already settled by D-ADR0070, 0072, 0073 and 0076; this discussion reconfirms it and builds on it. | 2026-11-21 (owner, three rounds: 10:40, 11:00, 11:10) |
 | D2 | A bugfix is carried by the guide tier only: a second guide in the coding domain pack, with its own milestones and activities that each name a pattern. The Work lifecycle gets no bugfix variant, because Work is too rigid and has no supporting framework, which is why Work is deliberately delayed (D-ADR0076). No new mechanism is added. | 2026-11-21 (owner 11:10, "đúng rồi", after the 11:00 reframing) |
+| D3 | The `coding/bugfix` guide is a copy of `feature`'s guide part with only the file id, the purpose line and two decision points changed: at `decisions-locked` SHOULD validate-plan, MAY scout-blast-radius and shape-plan; at `plan-validated` SHOULD implement-item with the reason that the cause is shown first, and `fix-verify-red` stays a MAY. Milestones, the eleven activities, patterns, the five MUST guards and the closure are unchanged. | 2026-11-21 (owner 13:06, "đồng ý cả hai, chốt đi"; draft first shown 12:30) |
+| D4 | No new "diagnose" activity: cause-proof is carried by `fix-verify-red`'s collaboration rule and `scout-blast-radius`. Reversal trigger: add one only if those prove insufficient in use. | 2026-11-21 (owner 13:06, same answer) |
 
 ## 5. Q&A log
 
@@ -103,10 +118,11 @@ Today a coding Work item always walks one workflow, `coding/feature` (discovery,
 - 2026-11-21 12:00 (owner): fgOS injects and verifies, never fixes foreign planners. Shaper audited the inject, verify and takeover parts; one finding: the takeover path does not call the contract check (§1, §3).
 - 2026-11-21 12:10 (owner): the injected standard may hint at the parallelism tools. Shaper audited: the hint exists for `resource-check`; `fgos graph` is not named; durations unverified.
 - 2026-11-21 12:30 (owner): continue. Shaper wrote the bugfix guide difference table (§7) and a §6 diagram.
+- 2026-11-21 13:06 (owner): agreed to both the shortened decision points and no diagnose activity, and asked to lock. D3 and D4 minted on the owner's explicit lock; discussion set to settled with a hand-off block.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Settled so far (D1, D2): two tiers; a bugfix is a second coding guide, selected through `--guide`, derived from `feature.yaml`'s guide part, adding no mechanism and no plan format. The guide's own content is still a draft, in §7.
+Settled (D1-D4): two tiers; a bugfix is a second coding guide, selected through `--guide`, derived from `feature.yaml`'s guide part, adding no mechanism and no plan format. Its content is the difference table in §7: only the id, the purpose line and two decision points change, and there is no new diagnose activity.
 
 ```mermaid
 flowchart LR
@@ -120,7 +136,7 @@ flowchart LR
 
 ### Bugfix guide {#task-bugfix-guide}
 
-Status: draft, derived by reading `domains/coding/workflows/feature.yaml:126-177`; nothing is created. The aim is a small difference from the feature guide.
+Status: settled (D3, D4), derived by reading `domains/coding/workflows/feature.yaml:126-177`; nothing is created yet, a planner plans it. The aim is a small difference from the feature guide.
 
 | Part of the guide | In `feature` | Proposed for `bugfix` | Why |
 |---|---|---|---|
