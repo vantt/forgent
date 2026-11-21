@@ -2,6 +2,7 @@
 contract: plan-v1
 title: "A second coding workflow guide for bugfix"
 status: running
+lead: head:lead-forgent-261121-1314-coding-a3528
 priority: P1
 blockedBy: []
 footprint:
