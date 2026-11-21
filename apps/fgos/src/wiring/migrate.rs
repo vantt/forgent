@@ -23,6 +23,7 @@ use fgos_host_runtime::{
     OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle, ProviderOutcome,
     VerbAnswer,
 };
+use fgos_git::GitDriver;
 use fgos_identity::mint::{random, RandomKind};
 use serde_json::{json, Value};
 use std::borrow::Cow;
@@ -32,7 +33,6 @@ use std::fs;
 use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
-use std::process::Command;
 
 use super::portfolio::{
     check_portfolio, format_backlog_item, generate_backlog_index, is_legacy_backlog_id,
@@ -856,24 +856,34 @@ fn with_portfolio_frontmatter(
 /// else a walk of the tree that never enters a nested checkout (a directory with its own `.git`).
 fn candidate_files(root: &Path) -> Vec<String> {
     if root.join(".git").exists() {
-        let listed = Command::new("git")
-            .arg("-C")
-            .arg(root)
-            .args(["ls-files", "-z"])
-            .output();
-        if let Some(output) = listed.ok().filter(|o| o.status.success()) {
-            return output
-                .stdout
-                .split(|b| *b == 0)
-                .filter(|name| !name.is_empty())
-                .map(|name| String::from_utf8_lossy(name).into_owned())
-                .collect();
+        if let Some(paths) = tracked_files(root) {
+            return paths;
         }
     }
     let mut out = Vec::new();
     walk(root, root, &mut out);
     out.sort();
     out
+}
+
+/// Every path the index tracks, through the git driver; `None` when the checkout cannot be read.
+/// `root` holds a `.git`, so it is the top level and driver paths are already relative to it.
+fn tracked_files(root: &Path) -> Option<Vec<String>> {
+    let (driver, repo) = GitDriver::open_at(root).ok().flatten()?;
+    let mut out = Vec::new();
+    let mut cursor = None;
+    loop {
+        let page = driver.tracked_paths(&repo, cursor, 4096).ok()?;
+        out.extend(
+            page.entries
+                .iter()
+                .map(|name| String::from_utf8_lossy(name).into_owned()),
+        );
+        if page.complete {
+            return Some(out);
+        }
+        cursor = page.next_cursor;
+    }
 }
 
 fn walk(dir: &Path, root: &Path, out: &mut Vec<String>) {
