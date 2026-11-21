@@ -14,6 +14,8 @@ import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 const VOCABULARY = JSON.parse(fs.readFileSync(new URL('../../packages/supervision/contracts/plan-vocabulary.v1.json', import.meta.url), 'utf8'));
 const PROJECT_PREFIX = VOCABULARY.headName.projectPrefix;
+const NAME_MAX = VOCABULARY.headName.max;
+const HASH_CHARS = VOCABULARY.headName.hashChars;
 const ENDED = new Set(['done', 'withdrawn']);
 const PLAN_PERSONAS = new Set(['lead', 'planner']);
 const PLANS_DIR = 'plans';
@@ -47,6 +49,28 @@ export function projectHandleOf(projectRoot) {
 }
 
 const cut = (text, max) => [...text].slice(0, max).join('');
+
+/** The low `chars` hex digits of the FNV-1a 32-bit hash of `text`, the tag `portfolio.rs` `name_tag` writes. */
+export function nameTag(text, chars = HASH_CHARS) {
+  let hash = 0x811c9dc5;
+  for (const byte of Buffer.from(text, 'utf8')) hash = Math.imul(hash ^ byte, 0x01000193) >>> 0;
+  return hash.toString(16).padStart(8, '0').slice(-chars);
+}
+
+/** The head name of a plan directory, the rule `portfolio.rs` `head_name` writes: a directory that fits is kept whole, a longer one is cut to leave room for `-` and its tag. */
+export function headNameOf(handle, dir) {
+  const prefix = cut(handle, PROJECT_PREFIX).replace(/-+$/, '');
+  const room = Math.max(0, NAME_MAX - ([...prefix].length + 1));
+  if ([...dir].length <= room) return `${prefix}-${dir}`;
+  const tag = nameTag(dir);
+  return `${prefix}-${cut(dir, Math.max(0, room - (tag.length + 1))).replace(/-+$/, '')}-${tag}`;
+}
+
+/** The directory part of a head name that carries a tag (`<prefix>-<cut dir>-<tag>`), or null. */
+const taggedDirPrefixOf = (rest) => new RegExp(`^(.+)-[0-9a-f]{${HASH_CHARS}}$`).exec(rest)?.[1] ?? null;
+
+/** The readable subject of a head's tab: a plan directory without its leading date and time (`work-data-model`). */
+export const subjectOfDir = (dir) => dir.replace(/^\d{6}-\d{4}-/, '');
 
 // ---- default ports: the trunk tip through Git Inspect --------------------------------------------
 
@@ -111,14 +135,26 @@ export async function planOfHead(projectRoot, persona, name, ports = {}) {
   if (typeof name !== 'string' || !name.startsWith(`${prefix}-`) || name.length === prefix.length + 1) {
     throw new HeadPlanError('plan-not-found', `${JSON.stringify(name)} is not a head name of this project (${prefix}-<plan>)`);
   }
-  const dirPrefix = name.slice(prefix.length + 1);
+  const rest = name.slice(prefix.length + 1);
+  const handle = ports.handle ?? projectHandleOf(projectRoot);
   const listPlanDirs = ports.listPlanDirs ?? defaultListPlanDirs;
   const readPlan = ports.readPlan ?? defaultReadPlan;
-  const live = [];
-  for (const dir of (await listPlanDirs(projectRoot, dirPrefix)).filter((d) => d.startsWith(dirPrefix)).sort()) {
-    const text = await readPlan(projectRoot, dir);
-    if (text === null) continue;
-    if (!ENDED.has(String(readFrontmatter(text, `plans/${dir}/plan.md`).meta.status ?? ''))) live.push({ dir, text });
+  const liveOf = async (dirs) => {
+    const found = [];
+    for (const dir of dirs.sort()) {
+      const text = await readPlan(projectRoot, dir);
+      if (text === null) continue;
+      if (!ENDED.has(String(readFrontmatter(text, `plans/${dir}/plan.md`).meta.status ?? ''))) found.push({ dir, text });
+    }
+    return found;
+  };
+  // A name is a unique prefix of one live plan directory; a name that ends in a tag (a long directory was cut) is the exact name one directory writes.
+  let dirPrefix = rest;
+  let live = await liveOf((await listPlanDirs(projectRoot, rest)).filter((d) => d.startsWith(rest)));
+  const tagged = taggedDirPrefixOf(rest);
+  if (live.length === 0 && tagged !== null) {
+    dirPrefix = tagged;
+    live = await liveOf((await listPlanDirs(projectRoot, tagged)).filter((d) => d.startsWith(tagged) && headNameOf(handle, d) === name));
   }
   if (live.length === 0) throw new HeadPlanError('plan-not-found', `no plan that is not done or withdrawn starts with ${JSON.stringify(dirPrefix)} at the trunk tip`);
   if (live.length > 1) throw new HeadPlanError('plan-ambiguous', `${live.length} plans start with ${JSON.stringify(dirPrefix)}: ${live.map((p) => p.dir).join(', ')}`);

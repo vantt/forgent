@@ -94,7 +94,7 @@ test('the session launches with its role, its grant and the opening verbatim as 
   assert.deepEqual(request.grant, grantOf('head:planner-probe'));
   assert.deepEqual(request.grant.writes, ['plans', 'docs/discussions']);
   assert.equal(request.ceilingMs, HEAD_HARD_CEILING_MS);
-  assert.deepEqual(request.display, { id: 'probe', title: 'planner' });
+  assert.deepEqual(request.display, { role: 'planner', title: 'probe' });
   assert.deepEqual(request.binding, { executor: 'alpha', key: 'head-planner-probe-1' });
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });

@@ -2,7 +2,8 @@ use std::fs;
 use std::path::PathBuf;
 
 use fgos_supervision::portfolio::{
-    admissible, collisions, footprint_problem, head_name, order, read_plan, supervisor_name, Plan,
+    admissible, collisions, footprint_problem, head_name, name_tag, order, read_plan,
+    supervisor_name, Plan,
 };
 
 fn plan(
@@ -76,28 +77,47 @@ fn a_plan_whose_footprint_overlaps_a_running_plan_is_not_admissible() {
 }
 
 #[test]
-fn head_name_keeps_the_handle_prefix_and_fits_the_limit_and_a_colliding_pair_is_reported() {
+fn head_name_keeps_the_handle_prefix_and_fits_the_limit() {
     let long = "261118-0947-session-verb-for-agent-sessions";
     let name = head_name("forgent", long);
     assert_eq!(name.chars().count(), 32);
-    assert!(name.starts_with("forgent-"));
+    assert!(name.starts_with("forgent-261118-0947-sessio-"));
     assert_eq!(supervisor_name(&"p".repeat(50)).chars().count(), 32);
-
-    let twin = format!("{long}-2");
-    let plans = vec![
-        plan(long, "ready", "P1", "2026-11-18", &[], &[]),
-        plan(&twin, "draft", "P1", "2026-11-18", &[], &[]),
-        plan("261118-1000-other", "ready", "P1", "2026-11-18", &[], &[]),
-    ];
-    assert_eq!(collisions(&plans, "forgent"), [(long.to_string(), twin)]);
+    // A directory that fits is kept whole, with no tag.
+    assert_eq!(
+        head_name("forgent", "261121-0707-head-tab"),
+        "forgent-261121-0707-head-tab"
+    );
 }
 
 #[test]
-fn a_done_plan_never_collides() {
+fn head_names_of_plans_sharing_their_first_24_characters_differ_and_the_tag_is_pinned() {
     let long = "261118-0947-session-verb-for-agent-sessions";
+    let twin = format!("{long}-2");
+    assert_ne!(head_name("forgent", long), head_name("forgent", &twin));
+    // The Node resolver computes the same tag; test/session-host/head-name-labels.test.mjs pins the same values.
+    assert_eq!(name_tag(long, 5), "f24d0");
+    assert_eq!(name_tag(&twin, 5), "1062f");
     let plans = vec![
-        plan(long, "done", "P1", "2026-11-18", &[], &[]),
-        plan(&format!("{long}-2"), "ready", "P1", "2026-11-18", &[], &[]),
+        plan(long, "ready", "P1", "2026-11-18", &[], &[]),
+        plan(&twin, "draft", "P1", "2026-11-18", &[], &[]),
+    ];
+    assert!(collisions(&plans, "forgent").is_empty());
+}
+
+#[test]
+fn a_whole_name_that_starts_another_collides_unless_the_plan_is_done() {
+    let plans = vec![
+        plan("short", "ready", "P1", "2026-11-18", &[], &[]),
+        plan("short-2", "ready", "P1", "2026-11-18", &[], &[]),
+    ];
+    assert_eq!(
+        collisions(&plans, "forgent"),
+        [("short".to_string(), "short-2".to_string())]
+    );
+    let plans = vec![
+        plan("short", "done", "P1", "2026-11-18", &[], &[]),
+        plan("short-2", "ready", "P1", "2026-11-18", &[], &[]),
     ];
     assert!(collisions(&plans, "forgent").is_empty());
 }

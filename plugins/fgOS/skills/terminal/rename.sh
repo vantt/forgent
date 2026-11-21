@@ -79,7 +79,7 @@ command -v fgos >/dev/null 2>&1 || exit 0
 fg_ssid="${FGOS_SESSION_ID:-}"
 [ -n "$fg_ssid" ] || fg_ssid=$(fgos_writer_id "$project_root")
 
-# The label is `<short id> · <title> | fg.ssid:<first 8>`: the port builds it from
+# The label is `<short id>: <title> | fg.ssid:<first 8>`: the port builds it from
 # these fields, so shell and Node share one format and one truncation rule. The
 # coding agent's own session id is not shown; full ids stay in the record.
 display="{\"id\":$(fgos_json_str "$task_id")"

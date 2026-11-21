@@ -19,9 +19,9 @@
       "role": "optional string; a pane with a role is labelled `<role> · <model>`",
       "agent": "optional string; stands in for a missing model",
       "model": "optional string",
-      "session": "optional string; marks a person's own pane, labelled `<short id> · <title> | fg.ssid:<first 8>`"
+      "session": "optional string; marks a person's own pane, labelled `<short id>: <title> | fg.ssid:<first 8>`"
     },
-    "labels": "the core builds them from these fields: tab `<short id> · <title>` (the group key when both are missing; an overflow tab adds ` (n)`), worker pane `<role> · <model>`, own pane as above",
+    "labels": "the core builds them from these fields: tab `<short id>: <title>`, or `<role>: <title>` with the whole role when a display names a role and no id (the group key when all are missing; an overflow tab adds ` (n)`), worker pane `<role> · <model>`, own pane as above",
     "rule": "display is written to the terminal and the record only; no code reads it back to decide anything"
   },
   "operations": {

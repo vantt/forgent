@@ -164,21 +164,21 @@ fn display(id: Option<&str>, title: Option<&str>) -> Display {
 
 #[test]
 fn labels_are_built_from_short_ids_and_titles_of_at_most_24_characters_in_one_place() {
-    // Tab label: `<first 8 of the id> · <title cut at 24>`, one part alone when the other is missing, the group key when both are.
+    // Tab label: `<first 8 of the id>: <title cut at 24>`, one part alone when the other is missing, the group key when both are.
     let work = display(Some("tsk-1lvxq7m2h9"), Some("fix terminal layout"));
-    assert_eq!(work.tab_label("g"), "tsk-1lvx · fix terminal layout");
+    assert_eq!(work.tab_label("g"), "tsk-1lvx: fix terminal layout");
     let long = display(
         Some("tsk-1lvxq7m2h9"),
         Some("  a very long title\nthat runs past the limit "),
     );
-    assert_eq!(long.tab_label("g"), "tsk-1lvx · a very long title that r");
+    assert_eq!(long.tab_label("g"), "tsk-1lvx: a very long title that r");
     assert_eq!(
         display(
             Some("run-9f3a"),
             Some("tới lượt người dùng soạn thảo văn bản dài")
         )
         .tab_label("g"),
-        "run-9f3a · tới lượt người dùng soạn"
+        "run-9f3a: tới lượt người dùng soạn"
     );
     assert_eq!(
         display(Some("tsk-1lvxq7m2h9"), None).tab_label("g"),
@@ -189,6 +189,25 @@ fn labels_are_built_from_short_ids_and_titles_of_at_most_24_characters_in_one_pl
         "only a title"
     );
     assert_eq!(display(None, Some("   ")).tab_label("unit-g"), "unit-g");
+    // A head names a role and a subject and no id: the whole role leads, never cut like an id.
+    let head = |role: &str, subject: &str| Display {
+        role: Some(role.into()),
+        title: Some(subject.into()),
+        ..Display::default()
+    };
+    assert_eq!(head("secretary", "miu").tab_label("g"), "secretary: miu");
+    assert_eq!(
+        head("lead", "work-data-model").tab_label("g"),
+        "lead: work-data-model"
+    );
+    assert_eq!(
+        Display {
+            title: None,
+            ..head("supervisor", "")
+        }
+        .tab_label("g"),
+        "supervisor"
+    );
     // Worker pane: `<role> · <model>`, the agent when no model is known, the role alone, else the tab label.
     let worker = Display {
         role: Some("producer".into()),
@@ -214,7 +233,7 @@ fn labels_are_built_from_short_ids_and_titles_of_at_most_24_characters_in_one_pl
         .pane_label("g"),
         "producer"
     );
-    assert_eq!(work.pane_label("g"), "tsk-1lvx · fix terminal layout");
+    assert_eq!(work.pane_label("g"), "tsk-1lvx: fix terminal layout");
     // A person's own pane names its session by the first 8 characters, after the tab label.
     let own = Display {
         session: Some("0123456789abcdef".into()),
@@ -222,7 +241,7 @@ fn labels_are_built_from_short_ids_and_titles_of_at_most_24_characters_in_one_pl
     };
     assert_eq!(
         own.pane_label("g"),
-        "tsk-1lvx · fix terminal layout | fg.ssid:01234567"
+        "tsk-1lvx: fix terminal layout | fg.ssid:01234567"
     );
     assert_eq!(
         Display { title: None, ..own }.pane_label("g"),
@@ -254,8 +273,8 @@ fn the_tab_and_the_worker_pane_take_their_labels_from_the_display_and_an_overflo
     assert_eq!(
         tabs,
         vec![
-            "tsk-1lvx · fix terminal layout",
-            "tsk-1lvx · fix terminal layout (2)"
+            "tsk-1lvx: fix terminal layout",
+            "tsk-1lvx: fix terminal layout (2)"
         ]
     );
     let panes: Vec<_> = driver
