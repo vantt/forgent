@@ -133,8 +133,34 @@ impl DiscardedIgnored {
         Ok(())
     }
 }
-fn text(p: &Path) -> Result<&str> {
-    p.to_str().ok_or_else(|| failure("worktree-path-not-utf8"))
+/// The one spelling two paths are compared in: `.` and `..` folded away, forward slashes, plain drive prefix.
+fn spelling(path: &Path) -> String {
+    use std::path::Component;
+    let mut out = PathBuf::new();
+    for part in path.components() {
+        match part {
+            Component::CurDir => {}
+            Component::ParentDir if out.file_name().is_some() => {
+                out.pop();
+            }
+            other => out.push(other.as_os_str()),
+        }
+    }
+    let text = crate::driver::text_path(&out).unwrap_or_default();
+    if cfg!(windows) {
+        text.replace('\\', "/")
+    } else {
+        text
+    }
+}
+/// Whether a `gitdir` backlink (absolute, or relative to the admin directory) names `<checkout>/.git`.
+fn backlink_is(admin: &Path, backlink: &str, checkout: &Path) -> bool {
+    spelling(&crate::driver::backlink_target(admin, backlink.trim_end()))
+        == spelling(&checkout.join(".git"))
+}
+/// A path as git is given it and as it is recorded: the driver's plain spelling.
+fn text(p: &Path) -> Result<String> {
+    crate::driver::text_path(p).map_err(|_| failure("worktree-path-not-utf8"))
 }
 fn missing(p: &Path) -> Result<bool> {
     match fs::symlink_metadata(p) {
@@ -385,7 +411,7 @@ impl GitDriver {
         }
         let hashed = self.checked(
             target,
-            &["hash-object", "--no-filters", "--", text(file)?],
+            &["hash-object", "--no-filters", "--", &text(file)?],
             Policy::Inspect,
         )?;
         Ok(hashed.trim_ascii() == oid)
@@ -915,7 +941,8 @@ impl GitDriver {
             } else {
                 args.push("--detach");
             }
-            args.extend(["--", text(&path)?, checkout]);
+            let path_text = text(&path)?;
+            args.extend(["--", path_text.as_str(), checkout]);
             self.worktree_call(repo, scope, &args)?;
             // The worker index records intentionally absent state files. This
             // makes a stripped checkout clean without teaching cleanup to ignore
@@ -970,7 +997,8 @@ impl GitDriver {
             };
             if let Err(cause) = strip {
                 // Only Git may roll back registered effects, without force.
-                let _ = self.worktree_call(repo, scope, &["worktree", "remove", "--", text(path)?]);
+                let _ =
+                    self.worktree_call(repo, scope, &["worktree", "remove", "--", &text(path)?]);
                 return Err(failure(cause));
             }
         }
@@ -1155,7 +1183,7 @@ impl GitDriver {
         )?;
         self.worktree_custody(repo, &scope, &path)?;
         self.worktree_not_live(&path, &mut warned)?;
-        self.worktree_call(repo, &scope, &["worktree", "remove", "--", text(&path)?])
+        self.worktree_call(repo, &scope, &["worktree", "remove", "--", &text(&path)?])
             .map_err(|e| self.reconcile_worktree_error(repo, &scope, id, e))?;
         if !missing(&path)? || !missing(&handle.git_dir)? {
             return Err(pending(recovery("worktree-remove-incomplete"), id));
@@ -1294,8 +1322,8 @@ impl GitDriver {
                 "worktree",
                 "move",
                 "--",
-                text(&source)?,
-                text(&destination)?,
+                &text(&source)?,
+                &text(&destination)?,
             ],
         )
         .map_err(|e| self.reconcile_worktree_error(repo, &scope, id, e))?;
@@ -1346,7 +1374,7 @@ impl GitDriver {
                 .as_ref()
                 .ok()
                 .map(|s| {
-                    PathBuf::from(s.trim_end_matches('\n'))
+                    crate::driver::backlink_target(&admin, s.trim_end_matches('\n'))
                         .parent()
                         .unwrap_or(Path::new("/"))
                         .to_owned()
@@ -1506,7 +1534,7 @@ impl GitDriver {
                 next: Tip::Absent,
             },
         )?;
-        self.prune_owned_registration(&scope, &admin, text(&path)?, &identity)
+        self.prune_owned_registration(&scope, &admin, &text(&path)?, &identity)
             .map_err(|error| pending(error, id))?;
         self.finish_worktree(
             repo,
@@ -1549,7 +1577,7 @@ impl GitDriver {
             return Err(recovery("worktree-admin-identity-changed"));
         }
         match fs::read_to_string(admin.join("gitdir")) {
-            Ok(backlink) if backlink.trim_end() == format!("{removed_path}/.git") => (),
+            Ok(backlink) if backlink_is(admin, &backlink, Path::new(removed_path)) => (),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
             _ => return Err(recovery("worktree-admin-backlink-changed")),
         }
@@ -1634,10 +1662,11 @@ impl GitDriver {
         let handle = self.worktree_handle(repo, path)?;
         Ok(handle.git_dir == admin
             && Tip::Oid(handle.tip.as_str().into()) == chain.intent().expected
-            && fs::read_to_string(admin.join("gitdir"))
-                .map_err(failure)?
-                .trim_end()
-                == format!("{}/.git", text(path)?))
+            && backlink_is(
+                admin,
+                &fs::read_to_string(admin.join("gitdir")).map_err(failure)?,
+                path,
+            ))
     }
     /// Reconciliation never repeats a TargetAttempt's move/destroy/create.
     pub fn repair_worktree_registration(
@@ -1755,7 +1784,14 @@ impl GitDriver {
                 // Destination gitfile must already point to this operation's admin.
                 let gitfile =
                     fs::read_to_string(Path::new(&**destination).join(".git")).map_err(failure)?;
-                if gitfile.trim_end() != format!("gitdir: {}", text(&admin)?) {
+                let names_admin =
+                    gitfile
+                        .trim_end()
+                        .strip_prefix("gitdir: ")
+                        .is_some_and(|target| {
+                            spelling(&Path::new(&**destination).join(target)) == spelling(&admin)
+                        });
+                if !names_admin {
                     return Err(recovery("worktree-destination-identity-unknown"));
                 }
                 self.worktree_call(repo, scope, &["worktree", "repair", "--", destination])?;

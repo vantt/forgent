@@ -1265,8 +1265,6 @@ mod tests {
         counts(&row, 1, 0, 0);
     }
 
-    // Known Git-driver defect (backlog p-nk6xf5laob): a linked worktree is refused as untrusted-worktree on Windows.
-    #[cfg(unix)]
     #[test]
     fn a_linked_worktree_is_judged_by_the_activation_of_its_own_directory_only() {
         let f = Fixture::new();
