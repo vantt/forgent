@@ -1835,7 +1835,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // docs/enduser-docs-index.json). `--check` never writes: it reports
     // whether the on-disk file matches what a fresh regenerate would
     // produce, refusing (validation) when it does not -- the drift-mode
-    // half of the verify draft docs/discussions/canonical-decision-projection/DISCUSSION.md names.
+    // half of the verify draft plans/discussions/ds-gw33h3nzwg-canonical-decision-projection/DISCUSSION.md names.
     case 'decision-index': {
       const repoRoot = path.dirname(dir);
       if (flags.check) {
