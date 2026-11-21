@@ -191,7 +191,10 @@ fn roots() -> Result<Roots, MigrateError> {
     Ok(Roots {
         items: rule_root("backlog-item")?,
         discussions: rule_root("discussion")?,
-        index: format!("{index_root}/{}", template.as_deref().unwrap_or("backlog.md")),
+        index: format!(
+            "{index_root}/{}",
+            template.as_deref().unwrap_or("backlog.md")
+        ),
     })
 }
 
@@ -278,7 +281,14 @@ fn split_story(story: &str) -> (String, String) {
         .nth(100)
         .map_or(flat.len(), |(index, _)| index);
     let title = flat[..cut].trim().to_owned();
-    (if title.is_empty() { "item".to_owned() } else { title }, story.to_owned())
+    (
+        if title.is_empty() {
+            "item".to_owned()
+        } else {
+            title
+        },
+        story.to_owned(),
+    )
 }
 
 /// Maps the free-text status cell to the status vocabulary by the earliest keyword; anything else is proposed.
@@ -290,9 +300,20 @@ fn map_status(cell: &str) -> &'static str {
         ("done", &["done", "shipped", "landed", "complete", "closed"]),
         (
             "dropped",
-            &["drop", "withdrawn", "obsolete", "superseded", "rejected", "won't", "wontfix"],
+            &[
+                "drop",
+                "withdrawn",
+                "obsolete",
+                "superseded",
+                "rejected",
+                "won't",
+                "wontfix",
+            ],
         ),
-        ("parked", &["park", "defer", "hold", "blocked", "waiting", "paused"]),
+        (
+            "parked",
+            &["park", "defer", "hold", "blocked", "waiting", "paused"],
+        ),
         ("proposed", &["proposed", "open", "todo", "new", "backlog"]),
     ];
     FAMILIES
@@ -391,7 +412,11 @@ fn flatten_headings(text: &str) -> String {
 }
 
 /// The item file (name and content) of one row.
-fn item_of_row(row: &LegacyRow, id: &str, created_fallback: &str) -> Result<(String, String), MigrateError> {
+fn item_of_row(
+    row: &LegacyRow,
+    id: &str,
+    created_fallback: &str,
+) -> Result<(String, String), MigrateError> {
     let (title, why) = split_story(&row.story);
     let created = first_date(&row.story).unwrap_or_else(|| created_fallback.to_owned());
     let area = {
@@ -402,11 +427,18 @@ fn item_of_row(row: &LegacyRow, id: &str, created_fallback: &str) -> Result<(Str
             slug
         }
     };
-    let mut notes = vec![format!("Migrated from the legacy backlog table. Original status: {}.", row.status)];
+    let mut notes = vec![format!(
+        "Migrated from the legacy backlog table. Original status: {}.",
+        row.status
+    )];
     if id != row.id {
         notes.push(format!("Original id: {}.", row.id));
     }
-    let why = if why.trim().is_empty() { title.clone() } else { why };
+    let why = if why.trim().is_empty() {
+        title.clone()
+    } else {
+        why
+    };
     let content = format_backlog_item(&BacklogItemFields {
         id,
         title: &title,
@@ -440,9 +472,12 @@ fn existing_item_ids(dir: &Path) -> BTreeSet<String> {
 }
 
 fn has_item_file(existing: &BTreeSet<String>, id: &str) -> bool {
-    existing
-        .iter()
-        .any(|stem| stem == id || stem.strip_prefix(id).is_some_and(|rest| rest.starts_with('-')))
+    existing.iter().any(|stem| {
+        stem == id
+            || stem
+                .strip_prefix(id)
+                .is_some_and(|rest| rest.starts_with('-'))
+    })
 }
 
 // ---- discussions ------------------------------------------------------------------------------------------------
@@ -514,14 +549,24 @@ fn yaml_quote(value: &str) -> String {
     format!("\"{}\"", value.replace('\\', "\\\\").replace('"', "\\\""))
 }
 
-fn discussion_frontmatter(id: &str, title: &str, status: &str, source: &[String], created: &str) -> String {
+fn discussion_frontmatter(
+    id: &str,
+    title: &str,
+    status: &str,
+    source: &[String],
+    created: &str,
+) -> String {
     let fence = concat!("-", "-", "-");
     let source_line = if source.is_empty() {
         "source: []".to_owned()
     } else {
         format!(
             "source:\n{}",
-            source.iter().map(|s| format!("  - {s}")).collect::<Vec<_>>().join("\n")
+            source
+                .iter()
+                .map(|s| format!("  - {s}"))
+                .collect::<Vec<_>>()
+                .join("\n")
         )
     };
     format!(
@@ -533,17 +578,27 @@ fn discussion_frontmatter(id: &str, title: &str, status: &str, source: &[String]
 // ---- reference rewrite ------------------------------------------------------------------------------------------
 
 fn walk(dir: &Path, root: &Path, out: &mut Vec<PathBuf>) {
-    let Ok(entries) = fs::read_dir(dir) else { return };
+    let Ok(entries) = fs::read_dir(dir) else {
+        return;
+    };
     for entry in entries.flatten() {
         let path = entry.path();
         let name = entry.file_name().to_string_lossy().into_owned();
-        let Ok(kind) = entry.file_type() else { continue };
-        let rel = path.strip_prefix(root).unwrap_or(&path).to_string_lossy().replace('\\', "/");
+        let Ok(kind) = entry.file_type() else {
+            continue;
+        };
+        let rel = path
+            .strip_prefix(root)
+            .unwrap_or(&path)
+            .to_string_lossy()
+            .replace('\\', "/");
         if kind.is_dir() {
             let top_level_skip = dir == root && SKIP_DIRS.contains(&name.as_str());
             if top_level_skip
                 || matches!(name.as_str(), ".git" | "node_modules" | "target")
-                || SKIP_PREFIXES.iter().any(|p| format!("{rel}/").starts_with(p))
+                || SKIP_PREFIXES
+                    .iter()
+                    .any(|p| format!("{rel}/").starts_with(p))
             {
                 continue;
             }
@@ -573,7 +628,12 @@ fn replace_bounded(text: &str, from: &str, to: &str) -> String {
     out
 }
 
-fn rewrite_text(text: &str, mapping: &BTreeMap<String, String>, new_discussions: &str, new_index: &str) -> String {
+fn rewrite_text(
+    text: &str,
+    mapping: &BTreeMap<String, String>,
+    new_discussions: &str,
+    new_index: &str,
+) -> String {
     let mut text = text.to_owned();
     for (old, new) in mapping {
         text = replace_bounded(&text, old, new);
@@ -618,7 +678,9 @@ pub fn migrate_portfolio(request: &MigrateRequest) -> Result<MigrateReport, Migr
     // 1. Backlog rows to item files. Every file is built and checked before the first one is written.
     let mut pending: Vec<(String, String)> = Vec::new();
     let legacy_text = fs::read_to_string(&legacy_backlog).ok();
-    let pointer_present = legacy_text.as_deref().is_some_and(|t| t.contains(POINTER_MARKER));
+    let pointer_present = legacy_text
+        .as_deref()
+        .is_some_and(|t| t.contains(POINTER_MARKER));
     if let Some(text) = legacy_text.as_deref().filter(|_| !pointer_present) {
         let rows = parse_legacy_rows(text)?;
         report.rows_found = rows.len();
@@ -706,14 +768,20 @@ pub fn migrate_portfolio(request: &MigrateRequest) -> Result<MigrateReport, Migr
     walk(root, root, &mut files);
     files.sort();
     for path in files {
-        let rel = path.strip_prefix(root).unwrap_or(&path).to_string_lossy().replace('\\', "/");
+        let rel = path
+            .strip_prefix(root)
+            .unwrap_or(&path)
+            .to_string_lossy()
+            .replace('\\', "/");
         if rel == LEGACY_BACKLOG || rel == roots.index {
             continue;
         }
         if !fs::metadata(&path).is_ok_and(|m| m.len() <= MAX_REWRITE_BYTES) {
             continue;
         }
-        let Ok(text) = fs::read_to_string(&path) else { continue };
+        let Ok(text) = fs::read_to_string(&path) else {
+            continue;
+        };
         if !text.contains(LEGACY_DISCUSSIONS) && !text.contains(LEGACY_BACKLOG) {
             continue;
         }
@@ -728,8 +796,14 @@ pub fn migrate_portfolio(request: &MigrateRequest) -> Result<MigrateReport, Migr
 
     // 4. The generated index.
     if apply && (report.items_created > 0 || report.discussions_moved > 0 || items_dir.is_dir()) {
-        let checked = check_portfolio(root, &CheckOptions { check_index: false, ..CheckOptions::default() })
-            .map_err(|e| MigrateError::Io(e.to_string()))?;
+        let checked = check_portfolio(
+            root,
+            &CheckOptions {
+                check_index: false,
+                ..CheckOptions::default()
+            },
+        )
+        .map_err(|e| MigrateError::Io(e.to_string()))?;
         report.check_errors = checked.errors.clone();
         let index = generate_backlog_index(&checked.items, &checked.discussions, &checked.plans);
         let index_path = root.join(&roots.index);
@@ -750,7 +824,11 @@ pub fn migrate_portfolio(request: &MigrateRequest) -> Result<MigrateReport, Migr
 }
 
 /// The backlog ids of the item files: `p-<10>`, `p-<8>`, `STR27`, `wf-...` taken from the file names.
-fn known_item_ids(stems: &BTreeSet<String>, pending: &[(String, String)], dir: &Path) -> BTreeSet<String> {
+fn known_item_ids(
+    stems: &BTreeSet<String>,
+    pending: &[(String, String)],
+    dir: &Path,
+) -> BTreeSet<String> {
     let mut ids = BTreeSet::new();
     for stem in stems {
         ids.insert(id_of_stem(stem, dir));
@@ -780,7 +858,9 @@ pub struct MigrateProvider {
 
 impl MigrateProvider {
     pub fn new() -> Self {
-        Self { descriptor: DESCRIPTOR }
+        Self {
+            descriptor: DESCRIPTOR,
+        }
     }
 }
 
@@ -820,7 +900,11 @@ impl OperationProvider for MigrateProvider {
             };
             Ok(ProviderOutcome::completed(
                 DESCRIPTOR.outcome_contract.clone(),
-                Box::new(VerbAnswer { exit, text: None, data }),
+                Box::new(VerbAnswer {
+                    exit,
+                    text: None,
+                    data,
+                }),
             ))
         })
     }

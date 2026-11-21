@@ -58,7 +58,10 @@ Pre-plan detail.
     for (legacy, file) in [
         ("p-d2dc4f2e", "plans/backlog/p-d2dc4f2e-item.md"),
         ("STR27", "plans/backlog/STR27-item.md"),
-        ("wf-coding-cutover", "plans/backlog/wf-coding-cutover-item.md"),
+        (
+            "wf-coding-cutover",
+            "plans/backlog/wf-coding-cutover-item.md",
+        ),
     ] {
         let legacy_text = text.replace("p-rw5iadsp2p", legacy);
         let parsed = parse_backlog_item(Path::new(file), &legacy_text).unwrap();

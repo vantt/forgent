@@ -83,9 +83,9 @@ impl<H: DiscussionHistory> DiscussionSource<H> {
     /// is the state before it, so the window only filters what is returned.
     pub fn records(&self, window: &Window) -> Result<Vec<Record>, String> {
         let window = ParsedWindow::parse(window)?;
-        let commits = self
-            .history
-            .commits(&[DISCUSSION_ROOTS[0], DISCUSSION_ROOTS[1], "plans/reports"])?;
+        let commits =
+            self.history
+                .commits(&[DISCUSSION_ROOTS[0], DISCUSSION_ROOTS[1], "plans/reports"])?;
         let mut states: HashMap<String, String> = HashMap::new();
         let mut out = Vec::new();
         for commit in &commits {
@@ -416,7 +416,10 @@ mod tests {
             subject_of("plans/discussions/ds-abcdefghij-a/DISCUSSION.md"),
             Some("a")
         );
-        assert_eq!(subject_of("plans/discussions/ds-abcdefghij-a/QUESTIONS.md"), None);
+        assert_eq!(
+            subject_of("plans/discussions/ds-abcdefghij-a/QUESTIONS.md"),
+            None
+        );
         assert_eq!(subject_of("plans/discussionsx/a/DISCUSSION.md"), None);
         assert_eq!(
             frontmatter_status("---\nid: ds-abcdefghij\nstatus: settled\n---\n\nbody\n"),

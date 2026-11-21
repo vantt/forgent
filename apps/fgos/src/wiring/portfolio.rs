@@ -162,12 +162,13 @@ pub fn is_valid_backlog_id(id: &str) -> bool {
     let hex = id.len() == 10
         && id.starts_with("p-")
         && id[2..].chars().all(|c| matches!(c, '0'..='9' | 'a'..='f'));
-    let str_row = id.len() > 3
-        && id.starts_with("STR")
-        && id[3..].chars().all(|c| c.is_ascii_alphanumeric());
+    let str_row =
+        id.len() > 3 && id.starts_with("STR") && id[3..].chars().all(|c| c.is_ascii_alphanumeric());
     let wf_row = id.len() > 3
         && id.starts_with("wf-")
-        && id[3..].chars().all(|c| matches!(c, 'a'..='z' | '0'..='9' | '-'));
+        && id[3..]
+            .chars()
+            .all(|c| matches!(c, 'a'..='z' | '0'..='9' | '-'));
     minted || hex || str_row || wf_row
 }
 
