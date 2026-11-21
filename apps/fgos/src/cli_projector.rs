@@ -189,9 +189,7 @@ pub fn project_cli_invocation(
         ),
         crate::wiring::migrate::OPERATION_ID => (
             ContractRef::from_static("migrate.portfolio.request", "1.0.0"),
-            Box::new(crate::wiring::migrate::project_migrate_request(
-                args, root,
-            )?),
+            Box::new(crate::wiring::migrate::project_migrate_request(args, root)?),
         ),
         crate::wiring::dispatch_decide::DECIDE_OPERATION_ID
         | crate::wiring::dispatch_decide::EXPLAIN_OPERATION_ID => (
