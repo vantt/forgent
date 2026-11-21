@@ -23,6 +23,25 @@ use crate::runner_check::{
 use serde_json::{json, Map, Value};
 use std::fmt;
 
+/// The keys of the runner section whose values the loader asks the config door to attribute (file and line), so a
+/// refusal of one names where it was written.
+pub const ORIGIN_KEYS: [&str; 4] = [
+    "runner.modelPolicies",
+    "runner.rigorToTier",
+    "runner.patterns",
+    "runner.loops",
+];
+
+/// Whether an origin at the dotted `path` is one the loader keeps: one of [`ORIGIN_KEYS`] or a value under one.
+pub fn is_origin_path(path: &str) -> bool {
+    ORIGIN_KEYS.iter().any(|key| {
+        path == *key
+            || path
+                .strip_prefix(key)
+                .is_some_and(|rest| rest.starts_with(['.', '[']))
+    })
+}
+
 /// What the config door answered for a project.
 #[derive(Debug, Clone, PartialEq)]
 pub enum DoorRead {
