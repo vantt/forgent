@@ -3096,11 +3096,14 @@ mod tests {
             key["binary"][0].is_string(),
             "the binary identity is recorded"
         );
+        // The system config identity is whatever the selected Git names for this platform.
+        let system = String::from_utf8(git(&t.0, &["var", "GIT_CONFIG_SYSTEM"])).unwrap();
+        let system = PathBuf::from(system.lines().next().expect("a system config path"));
         assert!(key["configs"]
             .as_array()
             .unwrap()
             .iter()
-            .any(|c| c[0] == serde_json::json!("/etc/gitconfig")));
+            .any(|c| c[0] == serde_json::json!(system)));
     }
     #[test]
     fn include_directives_disable_persistent_floor_reuse_even_when_inactive() {
@@ -3160,6 +3163,7 @@ mod tests {
         log
     }
     /// (config listings, format reads) spawned so far.
+    #[cfg(unix)]
     fn fact_reads(log: &Path) -> (usize, usize) {
         let text = fs::read_to_string(log).unwrap_or_default();
         (
@@ -3210,6 +3214,8 @@ mod tests {
         );
     }
 
+    // Needs a fake `git` that is a `#!` shell script, which Windows cannot execute.
+    #[cfg(unix)]
     #[test]
     fn checkout_stamp_rechecks_external_config_writes_between_children() {
         let state = Temp::new();
@@ -3445,7 +3451,8 @@ mod tests {
     }
     #[test]
     fn a_path_reaches_a_child_git_only_through_the_plain_spelling() {
-        let source = include_str!("driver.rs");
+        // A checkout may carry CRLF line ends; the scan reads one spelling.
+        let source = include_str!("driver.rs").replace("\r\n", "\n");
         let start = source
             .find("pub(crate) fn invoke_input(")
             .expect("invoke_input");
@@ -3638,6 +3645,8 @@ mod tests {
     }
     // `git lfs install` writes filter commands into the operator's global
     // config; only the repository's own scopes are untrusted.
+    // Needs a fake `git` that is a `#!` shell script, which Windows cannot execute.
+    #[cfg(unix)]
     #[test]
     fn command_keys_from_the_operators_global_config_are_accepted() {
         let state = Temp::new();
@@ -3778,6 +3787,8 @@ mod tests {
             "alternate-object-unavailable",
         );
     }
+    // Needs a fake `git` that is a `#!` shell script, which Windows cannot execute.
+    #[cfg(unix)]
     #[test]
     fn a_tree_listing_asks_the_object_kind_only_after_a_read_missed() {
         let state = Temp::new();
@@ -3839,6 +3850,8 @@ mod tests {
         }
         assert_eq!(kinds(), 3, "only the missed reads ask for the kind");
     }
+    // Needs a fake `git` that is a `#!` shell script, which Windows cannot execute.
+    #[cfg(unix)]
     #[test]
     fn a_walk_reads_a_stop_it_reaches_in_the_batch_of_the_commit_naming_it() {
         let state = Temp::new();
@@ -3909,6 +3922,8 @@ mod tests {
             "one listing, one header read and one object read cover the tip and the stop"
         );
     }
+    // Needs a fake `git` that is a `#!` shell script, which Windows cannot execute.
+    #[cfg(unix)]
     #[test]
     fn a_commit_write_checks_its_tree_and_parents_in_one_header_read() {
         use crate::{CommitInput, Identity, Publication, TreeEntry};
@@ -3992,6 +4007,8 @@ mod tests {
             "commit-parent-missing"
         );
     }
+    // Needs a fake `git` that is a `#!` shell script, which Windows cannot execute.
+    #[cfg(unix)]
     #[test]
     fn a_main_checkout_lists_its_transport_policy_once_per_config_stamp() {
         let state = Temp::new();
@@ -4242,8 +4259,7 @@ mod tests {
             assert!(Scrubbed::new().0.keys().all(|k| !k.starts_with("GIT_")));
         }
     }
-    #[test]
-    fn every_policy_passes_the_c_locale_to_real_git_children() {
+    fn assert_c_locale(policies: &[Policy]) {
         let state = Temp::new();
         let repo_dir = Temp::new();
         git(&repo_dir.0, &["init", "-q"]);
@@ -4259,12 +4275,7 @@ mod tests {
             fgos_holder_lock::Acquire::Acquired(h) => h,
             other => panic!("{other:?}"),
         };
-        for policy in [
-            Policy::Inspect,
-            Policy::Remote,
-            Policy::HookContext,
-            Policy::Publication,
-        ] {
+        for &policy in policies {
             let loan = if policy == Policy::Publication {
                 Some(&handle as &dyn BorrowedSpawn)
             } else {
@@ -4289,6 +4300,21 @@ mod tests {
             assert!(out.success, "{:?}", out.stderr);
             assert_eq!(out.stdout, b"C/");
         }
+    }
+    #[test]
+    fn every_policy_that_needs_no_loan_passes_the_c_locale_to_real_git_children() {
+        assert_c_locale(&[Policy::Inspect, Policy::Remote, Policy::HookContext]);
+    }
+    // Needs the borrow helper role, which a library test harness does not serve on Windows.
+    #[cfg(unix)]
+    #[test]
+    fn every_policy_passes_the_c_locale_to_real_git_children() {
+        assert_c_locale(&[
+            Policy::Inspect,
+            Policy::Remote,
+            Policy::HookContext,
+            Policy::Publication,
+        ]);
     }
     #[test]
     fn floor_is_shared_across_concurrent_driver_instances() {

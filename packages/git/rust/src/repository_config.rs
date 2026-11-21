@@ -913,13 +913,18 @@ mod wired_tests {
 
     #[test]
     fn a_hooks_path_is_wired_only_when_it_resolves_to_the_owned_path() {
-        let owned = Path::new("/repo/.githooks");
-        assert!(hooks_path_wired(Some("/repo/.githooks"), owned));
-        assert!(hooks_path_wired(Some(".githooks"), owned));
-        assert!(hooks_path_wired(Some("./.githooks"), owned));
-        assert!(hooks_path_wired(Some("../repo/.githooks"), owned));
-        assert!(!hooks_path_wired(Some("/repo/other"), owned));
-        assert!(!hooks_path_wired(Some("/repo/.githooks/sub"), owned));
-        assert!(!hooks_path_wired(None, owned));
+        let root = Path::new(if cfg!(windows) { "C:\\repo" } else { "/repo" });
+        let owned = root.join(".githooks");
+        let spelled = |path: std::path::PathBuf| path.to_str().unwrap().to_string();
+        assert!(hooks_path_wired(Some(&spelled(owned.clone())), &owned));
+        assert!(hooks_path_wired(Some(".githooks"), &owned));
+        assert!(hooks_path_wired(Some("./.githooks"), &owned));
+        assert!(hooks_path_wired(Some("../repo/.githooks"), &owned));
+        assert!(!hooks_path_wired(
+            Some(&spelled(root.join("other"))),
+            &owned
+        ));
+        assert!(!hooks_path_wired(Some(&spelled(owned.join("sub"))), &owned));
+        assert!(!hooks_path_wired(None, &owned));
     }
 }
