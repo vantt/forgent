@@ -72,7 +72,7 @@ A second coding workflow guide, `coding/bugfix`, selected with `--guide coding/b
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Coding bugfix workflow guide and tests](phase-01-coding-bugfix-guide.md) | - | domains/coding/workflows/bugfix.yaml, domains/coding/compiled.json, test/state/workflow-multiplicity.test.mjs | 1 | ready |
+| 1 | [Coding bugfix workflow guide and tests](phase-01-coding-bugfix-guide.md) | - | domains/coding/workflows/bugfix.yaml, domains/coding/compiled.json, test/state/workflow-multiplicity.test.mjs | 1 | done |
 
 ## Owner questions
 None. (All open points resolved and locked in `docs/discussions/workflow-engine/DISCUSSION.md` decisions D1-D4; owner conditions via Miu incorporated).
