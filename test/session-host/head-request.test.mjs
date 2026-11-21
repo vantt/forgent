@@ -594,11 +594,13 @@ test('supervisor done on an empty queue answers stopping and starts the stop of 
 
 const echoArgv = { hostCall: (call) => ({ status: 0, stdout: `{"data":{"argv":${JSON.stringify(call.argv)}}}\n` }) };
 
-test('the confined reads supervisor queue, supervisor plans and slots run the host verb and return its JSON', async (t) => {
+test('the confined reads and the wake (supervisor queue, plans, wake and slots) run the host verb and return its JSON', async (t) => {
   const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
   assert.deepEqual((await ask('supervisor queue', {}, 'q1', echoArgv)).line.data.argv, ['supervisor', 'queue', '--json']);
   assert.deepEqual((await ask('supervisor plans', {}, 'q2', echoArgv)).line.data.argv, ['supervisor', 'plans', '--json']);
   assert.deepEqual((await ask('slots', {}, 'q3', echoArgv)).line.data.argv, ['slots', '--json']);
+  assert.deepEqual((await ask('supervisor wake', {}, 'q7', echoArgv)).line.data.argv, ['supervisor', 'wake', '--json']);
+  assert.equal((await ask('supervisor wake', { x: 1 }, 'q10', echoArgv)).line.code, 'bad-args');
   assert.equal((await ask('slots', { x: 1 }, 'q4', echoArgv)).line.code, 'bad-args');
 });
 
@@ -833,6 +835,20 @@ test('a secretary run is one read-only unit under the secretary.run ceilings', a
   assert.equal((await ask('run', { prompt: 'x', units: [{}, {}] }, 'u5', ports)).line.code, 'run-one-unit');
   assert.equal((await ask('run', { prompt: 'x', unit: 'u.yaml' }, 'u6', ports)).line.code, 'run-one-unit');
   assert.equal((await ask('run', { prompt: 'x', provider: 'p' }, 'u7', ports)).line.code, 'bad-args');
+});
+
+test('a supervisor run is the same one bounded unit as the secretary run, and a planner is still refused', async (t) => {
+  const worktree = scratch(t);
+  fs.writeFileSync(path.join(worktree, '.git'), 'gitdir: /somewhere\n');
+  const { ask, ticketFile } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
+  const ports = { secretaryRun: () => ({ maxMinutes: 15, tier: 'standard' }) };
+  assert.equal((await ask('run', { prompt: 'unstick it' }, 'w1', ports)).line.data.state, 'running');
+  assert.deepEqual(ticketArgv(ticketFile('w1')), ['run', 'unstick it', '--timeout', '15m', '--override', '{"tier":"standard"}', '--json']);
+  assert.equal((await ask('run', { prompt: 'x', maxMinutes: 16 }, 'w2', ports)).line.code, 'run-ceiling-exceeded');
+  assert.equal((await ask('run', { prompt: 'x', units: [{}] }, 'w3', ports)).line.code, 'run-one-unit');
+  assert.equal((await ask('run', { prompt: 'x', writes: ['docs/a.md'] }, 'w4', ports)).line.code, 'writes-need-linked-worktree');
+  const planner = headCase(t, { persona: 'planner', name: 'x', writes: [] });
+  assert.equal((await planner.ask('run', { prompt: 'x' }, 'w5', ports)).line.code, 'role-mismatch');
 });
 
 test('a secretary run that writes needs a linked worktree', async (t) => {

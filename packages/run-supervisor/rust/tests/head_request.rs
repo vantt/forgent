@@ -692,6 +692,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "supervisor plans",
             "supervisor queue",
             "supervisor raise",
+            "supervisor wake",
             "watcher tune",
             "worktree create"
         ]

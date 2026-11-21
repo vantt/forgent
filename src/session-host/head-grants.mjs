@@ -48,11 +48,11 @@ const frozen = (writes, verbs) => Object.freeze({ writes: Object.freeze(writes),
 /** The verbs that land a branch or paths and read a unit's result; every head that lands asks for results too. */
 const LAND_VERBS = Object.freeze(['land', 'request result']);
 /**
- * The two coordinators (secretary and supervisor) both raise coordination events, run one unit for an urgent chore
+ * The two coordinators (secretary and supervisor) both raise coordination events, wake the supervisor, run one unit for an urgent chore
  * (the secretary's is read-only unless it writes into a linked worktree, held to `secretary.run.*`) and record
  * coordination evidence (`fgos.coordination.*` kinds only).
  */
-const COORDINATION_VERBS = Object.freeze(['supervisor raise', 'run', 'metrics record']);
+const COORDINATION_VERBS = Object.freeze(['supervisor raise', 'supervisor wake', 'run', 'metrics record']);
 /** What the secretary reads of the supervision portfolio; the supervisor holds these too. */
 const PORTFOLIO_READ_VERBS = Object.freeze(['supervisor plans', 'supervisor queue', 'slots']);
 
@@ -60,7 +60,7 @@ const GRANTS = Object.freeze({
   secretary: Object.freeze({
     writes: Object.freeze(['plans', 'docs/backlog.md', 'docs/discussions']),
     // Miu orders and stops heads, raises work on the queue and wakes the supervisor; she never closes an event, types into a pane, reads a session or tunes the watcher. A path land is limited to her granted writes (portfolio files).
-    verbs: Object.freeze(['session start', 'session stop', 'session write', ...HEAD_VERBS, ...QUESTION_VERBS, QUESTION_ANSWER_VERB, ...LAND_VERBS, ...PORTFOLIO_READ_VERBS, 'supervisor wake', ...COORDINATION_VERBS]),
+    verbs: Object.freeze(['session start', 'session stop', 'session write', ...HEAD_VERBS, ...QUESTION_VERBS, QUESTION_ANSWER_VERB, ...LAND_VERBS, ...PORTFOLIO_READ_VERBS, ...COORDINATION_VERBS]),
     mailbox: true,
     peers: true,
   }),

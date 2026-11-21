@@ -8,12 +8,12 @@ const HEAD = ['session bind session', 'session rotate', 'session answered', 'ses
 const QUESTIONS = ['questions list', 'questions ask', 'questions ack', 'questions cancel'];
 const LAND = ['land', 'request result'];
 const PORTFOLIO_READ = ['supervisor plans', 'supervisor queue', 'slots'];
-const COORDINATION = ['supervisor raise', 'run', 'metrics record'];
+const COORDINATION = ['supervisor raise', 'supervisor wake', 'run', 'metrics record'];
 
 const EXPECTED = {
   secretary: {
     writes: ['plans', 'docs/backlog.md', 'docs/discussions'],
-    verbs: ['session start', 'session stop', 'session write', ...HEAD, ...QUESTIONS, 'questions answer', ...LAND, ...PORTFOLIO_READ, 'supervisor wake', ...COORDINATION],
+    verbs: ['session start', 'session stop', 'session write', ...HEAD, ...QUESTIONS, 'questions answer', ...LAND, ...PORTFOLIO_READ, ...COORDINATION],
     mailbox: true,
     peers: true,
   },
@@ -43,8 +43,6 @@ test('Miu never holds the supervisor-only verbs: handled, session type, session 
   }
 });
 
-test('the supervisor never answers an owner question and has no wake of its own', () => {
-  const { verbs } = grantOf('head:supervisor-x', 'supervisor');
-  assert.ok(!verbs.includes('questions answer'));
-  assert.ok(!verbs.includes('supervisor wake'));
+test('the supervisor never answers an owner question', () => {
+  assert.ok(!grantOf('head:supervisor-x', 'supervisor').verbs.includes('questions answer'));
 });

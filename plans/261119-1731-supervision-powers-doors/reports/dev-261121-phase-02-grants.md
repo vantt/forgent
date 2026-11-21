@@ -13,7 +13,7 @@ Branch `doors/p02`. Committed and pushed; not landed.
 ## Files outside the plan footprint
 - `test/session-host/head-start.test.mjs`: three old verb-list assertions removed (secretary list twice, supervisor list and its "never runs" line); the new file owns them.
 
-## Gaps found: grant has a verb the request socket does not serve (not invented)
+## Gaps found (both closed, see the next section): grant has a verb the request socket does not serve (not invented)
 - `supervisor wake` (Miu): no socket entry in `head-request.mjs` or `head-request.v1.json`; `routing.rs` test `confined(&["supervisor","wake"]).is_none()`. Today a call is granted then `unknown-verb`.
 - `run` for the supervisor: `runVerb` accepts only a lead or the secretary (`only a lead or the secretary runs`, `role-mismatch`); the supervisor has no ceilings or path. A one-line extension to `COORDINATORS` is possible, but the ceiling keys are `secretary.run.*`, a design choice left to the audit phase.
 - Both stay in the grant as the task specified; the live audit phase should prove or remove them. The skills tell Miu to call `supervisor wake` after raising; the watcher also wakes the supervisor on its own.
@@ -23,3 +23,10 @@ Branch `doors/p02`. Committed and pushed; not landed.
 - `node scripts/run-tests.mjs` on head-grants, head-start, head-request, project-agents, agent-definitions, agent-roster, packaged-definitions: 165 pass, 0 fail.
 - `git diff --stat` shows no unexpected deletions.
 - Head-start preflight per persona (p-2wb2lfgky3) not run here (needs a live host).
+
+## Gaps closed
+- `supervisor wake`: new socket verb, no args, host call `supervisor wake --json`, served in the same case as `supervisor plans` and `slots` (`head-request.mjs`), constant in `head-request-client.mjs`, entry in `head-request.v1.json`, confined mapping and arg check in `routing.rs` (the "unnamed verb" test now uses `supervisor tick`), verb list pinned in `packages/run-supervisor/rust/tests/head_request.rs`. The host verb has no caller-role gate: it runs under the `supervisor.write` operation like `supervisor raise` and `handled`, so both Miu and the supervisor pass. Both are now granted it (it moved into the shared coordination list); the grant test table follows.
+- Supervisor `run`: `runVerb` sends both coordinators (`COORDINATORS`, shared with the stop rule) through the one-unit read-only path under the `secretary.run.*` keys, which are not renamed. Test proves the supervisor run (argv, ceiling, one unit, writes need a linked worktree) and that a planner is still `role-mismatch`.
+- Not touched: `apps/fgos/tests/questions_head.rs` `SUPERVISOR_VERBS` is the granted set of a sandbox test, not an enumeration of socket verbs; a wake call there would start a real supervisor, so no wake case was added. Proof of wake inside a live sandbox stays with the live audit.
+- Verification: head-request, head-grants, head-start, command-routes node tests 132 pass; `cargo test -p fgos-run-supervisor --test head_request` 43, `-p fgos --bin fgos routing` 24, `--test supervision_verbs` 23 pass; fmt and `clippy -p fgos -p fgos-run-supervisor -D warnings` clean.
+- Files touched outside the footprint: none new (all are in the plan footprint; `head-start.test.mjs` as before).

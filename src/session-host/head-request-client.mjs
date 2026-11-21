@@ -36,6 +36,7 @@ export const HEAD_SUPERVISOR_DONE_VERB = 'supervisor done';
 export const HEAD_SUPERVISOR_QUEUE_VERB = 'supervisor queue';
 export const HEAD_SUPERVISOR_PLANS_VERB = 'supervisor plans';
 export const HEAD_SLOTS_VERB = 'slots';
+export const HEAD_SUPERVISOR_WAKE_VERB = 'supervisor wake';
 /** Coordination verbs: raise an event, read or type into a session, tune the drone, record and prune coordination evidence. */
 export const HEAD_SUPERVISOR_RAISE_VERB = 'supervisor raise';
 export const HEAD_SESSION_READ_VERB = 'session read';
