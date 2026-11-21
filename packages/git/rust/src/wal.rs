@@ -3281,7 +3281,12 @@ mod tests {
     struct Temp(PathBuf);
     impl Temp {
         fn new() -> Self {
-            let p = std::env::temp_dir().join(format!(
+            // A WAL opens only by its real path, so the scratch root is the
+            // canonical spelling of the temp directory (Windows may hand out an
+            // 8.3 short name such as RUNNER~1), written plainly.
+            let root =
+                fgos_process::path::plain_path(&std::env::temp_dir().canonicalize().unwrap());
+            let p = root.join(format!(
                 "fgos-wal-{}-{}",
                 std::process::id(),
                 SERIAL.fetch_add(1, Ordering::Relaxed)
