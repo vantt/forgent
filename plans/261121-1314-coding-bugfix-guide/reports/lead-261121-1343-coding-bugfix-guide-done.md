@@ -1,9 +1,11 @@
 # Lead report: coding bugfix guide, phase 1 done
 
-The `coding/bugfix` guide landed on main at `fc063f1b0`. It adds `domains/coding/workflows/bugfix.yaml`, regenerates `domains/coding/compiled.json`, and updates `test/state/workflow-multiplicity.test.mjs`. The phase row says `done`. The plan stays `draft`; see the process breach below.
+The `coding/bugfix` guide landed on main at `fc063f1b0`. It adds `domains/coding/workflows/bugfix.yaml`, regenerates `domains/coding/compiled.json`, and updates `test/state/workflow-multiplicity.test.mjs`. The phase row says `done`. The plan is `done`: the owner kept the land and approved the plan (q-rzyim2hm3b, see below).
 
 ## Process breach (escalated as q-rzyim2hm3b)
 At 13:26-13:27 the plan was set back to `draft` (`f2e142878`, `fd34767f0`) with an owner condition relayed through Miu: write the plan only, no implementation, and tsk-1pv stays on hold until the owner approves. The lead had taken the plan at 13:19 while it was `running`, and did not re-read plan.md before landing the code at 13:41. So the code is on main ahead of the owner's approval. The lead has not reverted it on its own: question `q-rzyim2hm3b` asks the owner to keep it (recommended: additive, guide only, no default behaviour changes) or revert it. Lesson: re-read the plan's status right before every land.
+
+**Resolution (2026-11-21 14:28):** the owner answered "Giữ và coi là duyệt". The code stays on main, the plan is approved and set `done`, and nothing is reverted.
 
 ## What ran
 - Unit `c-2277-1795241976644` (gemini, execute) wrote the guide, the compiled registry and the test. Commit `d44b2fb19`, outcome pass.

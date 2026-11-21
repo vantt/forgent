@@ -1,7 +1,8 @@
 ---
 contract: plan-v1
 title: "A second coding workflow guide for bugfix"
-status: draft
+status: done
+lead: head:lead-forgent-261121-1314-coding-a3528
 priority: P1
 blockedBy: []
 footprint:
@@ -75,7 +76,8 @@ A second coding workflow guide, `coding/bugfix`, selected with `--guide coding/b
 | 1 | [Coding bugfix workflow guide and tests](phase-01-coding-bugfix-guide.md) | - | domains/coding/workflows/bugfix.yaml, domains/coding/compiled.json, test/state/workflow-multiplicity.test.mjs | 1 | done |
 
 ## Owner questions
-None. (All open points resolved and locked in `docs/discussions/workflow-engine/DISCUSSION.md` decisions D1-D4; owner conditions via Miu incorporated).
+- `q-rzyim2hm3b` (answered 2026-11-21 by the owner via the secretary): phase 1 landed on main (`fc063f1b0`) after the plan had been set back to `draft` pending owner approval. The owner chose "Giữ và coi là duyệt": keep the landed code, treat this plan as approved, and set it `done`. tsk-1pv is thereby released from hold.
+- All other open points were resolved and locked in `docs/discussions/workflow-engine/DISCUSSION.md` decisions D1-D4.
 
 ## Risks and rollback
 - Risk: A YAML syntax error or schema violation in `bugfix.yaml` could break domain registry compilation or doctor checks. Proof point: `npm run build:domains -- --check` and `test/state/domain-registry-compiled.test.mjs` are run as immediate gate.
