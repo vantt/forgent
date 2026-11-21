@@ -4,7 +4,8 @@ id: coding/bugfix
 title: Bugfix workflow for coding domain
 
 # --- Workflow schema ---
-# Retained for compatibility with the Work lifecycle until cutover (D2).
+# The workflow loader requires steps for every workflow file; Work items keep walking
+# coding/feature, so nothing walks these steps until the coding cutover.
 steps:
   - id: discovery
     title: Discovery
