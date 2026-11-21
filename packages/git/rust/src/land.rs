@@ -1166,6 +1166,73 @@ impl GitDriver {
         pushed
     }
 
+    /// Undo the one commit a paths land made on the main checkout's checked-out branch and never
+    /// published: the branch returns to the commit's parent and the index to that parent, while
+    /// every worktree byte stays, so the named paths are modified again exactly as before the
+    /// commit. It takes worktree-admin 40 and the main-checkout lock and refuses (touching
+    /// nothing) unless the branch is the checked-out one, its tip is `commit`, `commit`'s only
+    /// parent is `parent`, and the index equals `commit`'s tree. A crash between its two effects
+    /// leaves the paths staged, which `git status` shows and a land commits as usual.
+    pub fn undo_unpublished_commit(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        branch: &RefName,
+        commit: &Oid,
+        parent: &Oid,
+    ) -> Result<()> {
+        require_lock_scope_platform()?;
+        let refused = |reason: &str| failure(format!("undo-commit-refused: {reason}"));
+        if !branch.as_str().starts_with("refs/heads/") {
+            return Err(failure("invalid-refs-request"));
+        }
+        if repo.work_tree.as_deref() != Some(repo.trusted_main_root()) {
+            return Err(failure("land-main-handle-required"));
+        }
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
+        let mut scope =
+            crate::refs::acquire_worktree_admin(repo, held, fgos_holder_lock::Wait::Ms(5000))?;
+        acquire_or_busy(
+            &mut scope,
+            "main-checkout",
+            &params(repo),
+            5000,
+            "main-checkout-busy",
+        )?;
+        if self.land_text(repo, &scope, &["symbolic-ref", "-q", "HEAD"], &[])? != branch.as_str() {
+            return Err(refused("main-head-changed"));
+        }
+        if crate::refs::direct(self, repo, branch)? != ExpectedTip::Oid(commit.clone()) {
+            return Err(refused("branch-moved"));
+        }
+        let parents = self.land_text(
+            repo,
+            &scope,
+            &["rev-list", "--parents", "-n", "1", commit.as_str()],
+            &[],
+        )?;
+        if parents != format!("{} {}", commit.as_str(), parent.as_str()) {
+            return Err(refused("not-a-single-child-of-parent"));
+        }
+        let staged = self.land_call(
+            repo,
+            &scope,
+            &["diff", "--cached", "--quiet", commit.as_str()],
+            &[],
+        )?;
+        if !staged.success {
+            return Err(refused("index-differs-from-commit"));
+        }
+        self.land_text(
+            repo,
+            &scope,
+            &["reset", "-q", "--mixed", parent.as_str()],
+            &[],
+        )?;
+        Ok(())
+    }
+
     /// Fast-forward the main checkout's checked-out trunk to a fetched remote-tracking tip.
     /// The only door that moves the main checkout's branch outside a Land; it takes
     /// worktree-admin 40 and the main-checkout lock, revalidates membership, does an exact-old

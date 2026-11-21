@@ -296,6 +296,24 @@ fn a_clean_merge_lands_pushes_and_local_main_equals_the_remote_tip() {
 }
 
 #[test]
+fn a_delivered_land_releases_its_candidate_checkout() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    let exclude = f.main.join(".git/info/exclude");
+    fs::create_dir_all(exclude.parent().unwrap()).unwrap();
+    fs::write(&exclude, "*.out\n").unwrap();
+    f.land(
+        &branch("topic"),
+        &config(vec![gate("echo built > build.out")]),
+    )
+    .unwrap();
+    let candidates = f.main.join(".fgos/runtime/git-candidates");
+    let left = fs::read_dir(&candidates).map(|d| d.count()).unwrap_or(0);
+    assert_eq!(left, 0, "a delivered land leaves no candidate checkout");
+    assert_eq!(git(&f.main, &["worktree", "list"]).lines().count(), 1);
+}
+
+#[test]
 fn a_conflicting_census_lands_regenerated() {
     let f = Fixture::new();
     f.topic(
@@ -744,8 +762,43 @@ fn a_paths_land_whose_hook_changes_the_commit_refuses_with_nothing_pushed() {
         .land(&paths(&["a"]), &config(vec![gate("true")]))
         .unwrap_err();
     assert_eq!(refusal.code, "land-commit-contract-violation");
-    assert!(refusal.detail.contains(&f.local_tip()), "{refusal}");
     assert_eq!(f.remote_tip(), before);
+    assert_eq!(f.local_tip(), before, "the unpublished commit was undone");
+    assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "landed\n");
+}
+
+#[test]
+fn a_paths_land_whose_push_is_rejected_undoes_its_commit_and_lands_on_the_retry() {
+    let f = Fixture::new();
+    fs::write(f.main.join("a"), "landed\n").unwrap();
+    let out = f
+        .land(&paths(&["a"]), &config(vec![gate(&mover(&f, true))]))
+        .unwrap();
+    assert_eq!(out.retries, 1);
+    assert_eq!(out.main_sha, f.remote_tip());
+    assert_eq!(f.local_tip(), f.remote_tip());
+    assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "landed\n");
+}
+
+#[test]
+fn a_paths_land_whose_push_is_rejected_every_time_leaves_local_main_not_ahead_and_the_bytes_in_place(
+) {
+    let f = Fixture::new();
+    fs::write(f.main.join("a"), "landed\n").unwrap();
+    let refusal = f
+        .land(&paths(&["a"]), &config(vec![gate(&mover(&f, false))]))
+        .unwrap_err();
+    assert_eq!(refusal.code, "land-retries-exhausted");
+    assert!(
+        git_ok(
+            &f.main,
+            &["merge-base", "--is-ancestor", "trunk", "origin/trunk"]
+        ),
+        "local main holds no commit the remote lacks"
+    );
+    assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "landed\n");
+    assert_eq!(git(&f.main, &["status", "--porcelain", "--", "a"]), "M a");
+    f.catch_up().unwrap();
 }
 
 #[test]
@@ -870,10 +923,13 @@ fn a_lead_paths_land_that_changes_the_footprint_of_its_plan_file_refuses_and_com
         "{refusal}"
     );
     assert_eq!(f.remote_tip(), tip);
-    // The local commit stays for inspection; the refusal names it and the reset.
-    assert_ne!(f.local_tip(), tip);
-    assert!(refusal.detail.contains(&f.local_tip()), "{refusal}");
-    assert!(refusal.detail.contains("git reset --keep"), "{refusal}");
+    // The commit was made to be judged and is undone: local main is where it was, the bytes stay.
+    assert_eq!(f.local_tip(), tip);
+    assert!(refusal.detail.contains("was undone"), "{refusal}");
+    assert_eq!(
+        fs::read_to_string(f.main.join(PLAN_PATH)).unwrap(),
+        plan_text(&["src/**", "docs/**"])
+    );
 }
 
 #[test]

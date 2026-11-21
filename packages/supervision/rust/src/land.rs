@@ -135,7 +135,7 @@ fn from_git(e: OperationError) -> LandRefusal {
     if !e.stderr.is_empty() {
         detail = format!("{detail}: {}", tail(&e.stderr));
     }
-    if e.cause == "land-recovery-required" {
+    if e.cause == "land-recovery-required" || e.cause == "land-abandoned-writer-mismatch" {
         detail = format!("{detail}; run `fgos git recover`");
     }
     LandRefusal {
@@ -810,6 +810,20 @@ impl Lander<'_> {
         Ok((session, id))
     }
 
+    /// Release the candidate worktree of a land that published. The land is delivered whatever this
+    /// returns: a cleanup that is deferred (a lock held, a checkout still reconciling) stays for
+    /// `fgos git recover`, which frees finished chains, so it never fails the land.
+    fn release_delivered(&self, session: fgos_git::LandSession, id: &str) {
+        drop(session);
+        let _ = self.ports.git.acknowledge_land(
+            self.ports.repo,
+            self.ports.writer,
+            id,
+            "supervision-land-delivered",
+            &wal::OsFileSystem,
+        );
+    }
+
     /// Drop a session that published nothing, settle its chain and release its candidate worktree
     /// and pins, so an abandoned attempt leaves no pending operation and keeps no target ref busy.
     fn abandon(&self, session: fgos_git::LandSession, id: &str) -> Result<(), LandRefusal> {
@@ -1049,7 +1063,9 @@ impl Lander<'_> {
         if let Err(e) = published {
             return Err(self.unsettled(live, at("publish")(e)));
         }
-        live.take();
+        if let Some((session, id)) = live.take() {
+            self.release_delivered(session, &id);
+        }
         let main = self.resolve(dest)?.ok_or_else(|| {
             refuse(
                 "land-target-unknown",
@@ -1231,11 +1247,42 @@ impl Lander<'_> {
             .git
             .acquire_merge_slot(p.repo, &ref_name(&dest)?, p.wait_ms)
             .map_err(at("merge slot"))?;
-        let held = || slot.lend().map_err(from_git);
-        self.sync_target(&target, &held)?;
+        let mut retries = 0;
+        loop {
+            let held = || slot.lend().map_err(from_git);
+            match self.paths_attempt(command, paths, (&target, &dest), &held, retries)? {
+                Some(outcome) => return Ok(outcome),
+                None if retries >= MAX_RETRIES => {
+                    return Err(refuse(
+                        "land-retries-exhausted",
+                        format!(
+                            "the remote moved on every one of {} attempts; local {target} is unchanged \
+                             and the named paths hold their bytes again",
+                            retries + 1
+                        ),
+                    ))
+                }
+                None => retries += 1,
+            }
+        }
+    }
+
+    /// One try of a paths land. `None`: the remote moved after the commit, the commit was undone and
+    /// the caller starts over from a fresh sync. Whenever this returns without a landed commit, local
+    /// target is where it was and the named paths hold the bytes they held on entry.
+    fn paths_attempt<'h>(
+        &self,
+        command: &LandCommand,
+        paths: &[String],
+        (target, dest): (&str, &str),
+        held: &dyn Fn() -> Held<'h>,
+        retries: u32,
+    ) -> Result<Option<LandOutcome>, LandRefusal> {
+        let p = self.ports;
+        self.sync_target(target, held)?;
         self.check_tests(p.repo.trusted_main_root(), &command.tests)?;
         let tip = self
-            .resolve(&dest)?
+            .resolve(dest)?
             .ok_or_else(|| refuse("land-target-unknown", format!("{dest} is absent")))?;
         let mut baseline = p
             .git
@@ -1278,51 +1325,87 @@ impl Lander<'_> {
                 "the named paths have no changes to land",
             ));
         };
+        let unpublished = |refusal: LandRefusal| -> LandRefusal {
+            match self.undo_commit(target, &commit, &tip, held) {
+                Ok(()) => refusal,
+                Err(e) => LandRefusal {
+                    detail: format!(
+                        "{}; undoing local commit {} failed: {}",
+                        refusal.detail,
+                        commit.as_str(),
+                        e.detail
+                    ),
+                    ..refusal
+                },
+            }
+        };
         // A hook changed the commit's tree, files or parents: it is not what was gated; push nothing.
         if result.status != ResultCode::Committed {
-            return Err(refuse(
+            return Err(unpublished(refuse(
                 "land-commit-contract-violation",
                 format!(
-                    "local commit {} ended {:?}, not a clean commit of the named paths; nothing pushed",
+                    "local commit {} ended {:?}, not a clean commit of the named paths; nothing pushed, \
+                     the commit was undone",
                     commit.as_str(),
                     result.status
                 ),
-            ));
+            )));
         }
         if command.footprint.is_some() {
             if let Err(refusal) = self.require_footprint_unchanged(&tip, &commit) {
-                return Err(refuse(
+                return Err(unpublished(refuse(
                     &refusal.code,
                     format!(
-                        "{}; local commit {} on {dest} was not pushed: inspect it, then reset local {target} to the \
-                         remote tip (`git reset --keep {remote}/{target}`) and land again",
+                        "{}; local commit {} was not pushed and was undone",
                         refusal.detail,
                         commit.as_str(),
-                        remote = p.remote.name,
                     ),
-                ));
+                )));
             }
         }
-        // With the slot held no Land of this target can move the remote; a rejection is an
-        // outside push, and the local commit stays for a human to inspect.
-        if !self.push_local(&target, held()?)? {
-            return Err(refuse(
+        // With the slot held no Land of this machine can move the remote; a rejection is another
+        // machine or an outside push. Nothing was published, so the commit is undone and the caller
+        // retries from a fresh sync.
+        // A push that failed without an answer may have reached the remote: that commit stays, named,
+        // for the next land's sync to find on origin or for a person.
+        if !self.push_local(target, held()?)? {
+            let refusal = refuse(
                 "land-paths-push-rejected",
                 format!(
-                    "local commit {} on {dest} was not pushed: the remote {target} moved outside fgos. \
-                     Inspect the commit, then reset local {target} to the remote tip \
-                     (`git fetch {remote} {target}` and `git reset --keep {remote}/{target}`) and land again",
-                    commit.as_str(),
-                    remote = p.remote.name,
+                    "local commit {} was not pushed: the remote {target} moved",
+                    commit.as_str()
                 ),
-            ));
+            );
+            return match self.undo_commit(target, &commit, &tip, held) {
+                Ok(()) => Ok(None),
+                Err(e) => Err(LandRefusal {
+                    detail: format!("{}; undoing it failed: {}", refusal.detail, e.detail),
+                    ..refusal
+                }),
+            };
         }
-        Ok(LandOutcome {
+        Ok(Some(LandOutcome {
             main_sha: commit.as_str().into(),
             landed_paths: result.files,
-            retries: 0,
+            retries,
             gates_run,
-        })
+        }))
+    }
+
+    /// Undo this land's own unpublished commit through the Git door: the branch and index return
+    /// to `tip` and every worktree byte stays, so the checkout is as it was before the land.
+    fn undo_commit<'h>(
+        &self,
+        branch: &str,
+        commit: &Oid,
+        tip: &Oid,
+        held: &dyn Fn() -> Held<'h>,
+    ) -> Result<(), LandRefusal> {
+        let p = self.ports;
+        let branch = ref_name(&format!("refs/heads/{branch}"))?;
+        p.git
+            .undo_unpublished_commit(p.repo, held()?, &branch, commit, tip)
+            .map_err(at("undo local commit"))
     }
 
     /// The target of a paths land: the branch the main checkout has checked out, since that is the
