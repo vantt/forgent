@@ -764,7 +764,8 @@
     ],
     "store": "require",
     "mutates_store": [
-      "attest"
+      "attest",
+      "handoff"
     ]
   },
   "land": {

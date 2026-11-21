@@ -38,6 +38,7 @@
     {"verb":"events","argv":["--opportunistic"],"mutates":false,"landsWork":false,"eventStoreChild":false},
     {"verb":"events","argv":["export","--opportunistic"],"mutates":false,"landsWork":false,"eventStoreChild":false},
     {"verb":"knowledge","argv":["attest"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"knowledge","argv":["handoff"],"mutates":true,"landsWork":false,"eventStoreChild":false},
     {"verb":"knowledge","argv":["status"],"mutates":false,"landsWork":false,"eventStoreChild":false},
     {"verb":"gateway","argv":["start"],"mutates":true,"landsWork":false,"eventStoreChild":false},
     {"verb":"gateway","argv":["stop"],"mutates":true,"landsWork":false,"eventStoreChild":false},
