@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "A second coding workflow guide for bugfix"
-status: ready
+status: draft
 priority: P1
 blockedBy: []
 footprint:
@@ -9,7 +9,7 @@ footprint:
   - domains/coding/workflows/bugfix.yaml
   - domains/coding/compiled.json
   - test/state/workflow-multiplicity.test.mjs
-base: 74ed0e94e54f0d32380d570f3ea0f156a8446438
+base: ea054b539a6e13823e86c2295fe0a485ebf9f5a4
 source:
   - docs/discussions/workflow-engine/DISCUSSION.md
   - tsk-1pv
