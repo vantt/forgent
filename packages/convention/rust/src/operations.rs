@@ -82,13 +82,17 @@ pub enum ConventionError {
 pub fn is_valid_backlog_id(id: &str) -> bool {
     id.len() == 12
         && id.starts_with("p-")
-        && id[2..].bytes().all(|b| matches!(b, b'a'..=b'z' | b'2'..=b'7'))
+        && id[2..]
+            .bytes()
+            .all(|b| matches!(b, b'a'..=b'z' | b'2'..=b'7'))
 }
 
 pub fn is_valid_discussion_id(id: &str) -> bool {
     id.len() == 13
         && id.starts_with("ds-")
-        && id[3..].bytes().all(|b| matches!(b, b'a'..=b'z' | b'2'..=b'7'))
+        && id[3..]
+            .bytes()
+            .all(|b| matches!(b, b'a'..=b'z' | b'2'..=b'7'))
 }
 
 pub fn convention_name(input: &NameInput<'_>) -> Result<NameOutcome, ConventionError> {
@@ -524,17 +528,13 @@ fn validate_scoped(rule: &Rule, root: &str, path: &str, file_name: &str) -> Opti
     if path[root.len()..].contains('/') {
         return None;
     }
-    let result = std::iter::once(match_template(
-        template,
-        file_name,
-        false,
-    ))
-    .chain(
-        rule.compatibility
-            .iter()
-            .map(|compatibility| match_compatibility(rule, compatibility, file_name)),
-    )
-    .max();
+    let result = std::iter::once(match_template(template, file_name, false))
+        .chain(
+            rule.compatibility
+                .iter()
+                .map(|compatibility| match_compatibility(rule, compatibility, file_name)),
+        )
+        .max();
     match result {
         Some(TemplateMatch::Valid) => None,
         Some(TemplateMatch::InvalidTimestamp) => Some(violation(
