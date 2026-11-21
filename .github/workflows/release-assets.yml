@@ -105,6 +105,21 @@ jobs:
           path: addon-digest.txt
           if-no-files-found: error
 
+      - name: Resolve staged addon path
+        if: matrix.target == 'x86_64-pc-windows-msvc'
+        id: staged-addon
+        run: |
+          echo "path=$(node -pe "const m=JSON.parse(require('fs').readFileSync('dist/tree/manifest.json')); 'dist/tree/' + m.components.nativeAddon.path")" >> "$GITHUB_OUTPUT"
+
+      - name: Upload windows-msvc staged addon file
+        if: matrix.target == 'x86_64-pc-windows-msvc'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-prefix }}-shipped-addon-file-${{ matrix.target }}
+          path: ${{ steps.staged-addon.outputs.path }}
+          if-no-files-found: error
+          retention-days: 3
+
       # The proof runs `fgos doctor` on a clean runner, so the runner is set up the way
       # docs/how-to/install-fgos-in-a-project-and-use-doctor.md section 4.4.1 tells a Linux user.
       - name: Set up bubblewrap like a supported Linux machine
@@ -177,6 +192,15 @@ jobs:
           path: addon-digest.txt
           if-no-files-found: error
 
+      - name: Upload windows-msvc independent addon file
+        if: matrix.target == 'x86_64-pc-windows-msvc'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-prefix }}-independent-addon-file-${{ matrix.target }}
+          path: target/release/fgos_node_addon.dll
+          if-no-files-found: error
+          retention-days: 3
+
   compare-addon:
     name: compare addon digests
     needs: [build, independent-addon]
@@ -193,5 +217,28 @@ jobs:
         run: |
           set -eu
           for triple in x86_64-unknown-linux-gnu x86_64-pc-windows-msvc; do
-            cmp "addon-digests/$PREFIX-shipped-addon-$triple/addon-digest.txt" "addon-digests/$PREFIX-independent-addon-$triple/addon-digest.txt"
+            shipped="addon-digests/$PREFIX-shipped-addon-$triple/addon-digest.txt"
+            independent="addon-digests/$PREFIX-independent-addon-$triple/addon-digest.txt"
+            if ! cmp "$shipped" "$independent"; then
+              echo "::error::Addon digest mismatch for $triple"
+              mismatch_dir="addon-mismatch-$triple"
+              mkdir -p "$mismatch_dir"
+              shipped_file=$(find "addon-digests/$PREFIX-shipped-addon-file-$triple" -type f 2>/dev/null | head -n 1 || true)
+              independent_file=$(find "addon-digests/$PREFIX-independent-addon-file-$triple" -type f 2>/dev/null | head -n 1 || true)
+              if [ -n "$shipped_file" ]; then
+                cp "$shipped_file" "$mismatch_dir/shipped-$(basename "$shipped_file")"
+              fi
+              if [ -n "$independent_file" ]; then
+                cp "$independent_file" "$mismatch_dir/independent-$(basename "$independent_file")"
+              fi
+              cmp "$shipped" "$independent"
+            fi
           done
+      - name: Upload addon mismatch evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-prefix }}-addon-mismatch-x86_64-pc-windows-msvc
+          path: addon-mismatch-x86_64-pc-windows-msvc/
+          if-no-files-found: ignore
+          retention-days: 14
