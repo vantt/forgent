@@ -191,6 +191,7 @@ pub(crate) trait BorrowedSpawn {
         spec: &fgos_holder_lock::BorrowSpec,
         io: &fgos_holder_lock::BorrowIo,
         watch: bool,
+        helper: &fgos_holder_lock::HelperExe,
     ) -> Result<fgos_holder_lock::BorrowIoOutcome>;
 }
 impl BorrowedSpawn for fgos_holder_lock::Handle {
@@ -199,15 +200,14 @@ impl BorrowedSpawn for fgos_holder_lock::Handle {
         spec: &fgos_holder_lock::BorrowSpec,
         io: &fgos_holder_lock::BorrowIo,
         watch: bool,
+        helper: &fgos_holder_lock::HelperExe,
     ) -> Result<fgos_holder_lock::BorrowIoOutcome> {
         let run = if watch {
             fgos_holder_lock::run_borrowed_io_watched
         } else {
             fgos_holder_lock::run_borrowed_io
         };
-        let helper = fgos_holder_lock::HelperExe::current()
-            .map_err(|e| borrow_failure(fgos_holder_lock::BorrowError::Spawn(e)))?;
-        run(self, spec, io, &helper).map_err(borrow_failure)
+        run(self, spec, io, helper).map_err(borrow_failure)
     }
 }
 
@@ -229,6 +229,10 @@ pub struct GitDriver {
     hooks: PathBuf,
     git: PathBuf,
     containment: Box<dyn ContainmentDriver>,
+    /// The executable that serves the holder-lock helper roles (the Windows borrow job keeper). `None` means this
+    /// process's own executable, resolved when a borrowed child is spawned; a caller whose own executable serves no
+    /// helper role (a test harness) names the binary that does.
+    helper: Option<fgos_holder_lock::HelperExe>,
 }
 impl GitDriver {
     pub(crate) fn state_root(&self) -> &Path {
@@ -312,7 +316,21 @@ impl GitDriver {
             git,
             containment: containment::select(&Default::default())
                 .map_err(|e| failure("git-containment-unavailable").with_diagnostic(e))?,
+            helper: None,
         })
+    }
+    /// This driver's borrowed children keep their job through `helper`, an executable that serves the holder-lock
+    /// helper roles. Production binaries pass `HelperExe::current()`.
+    pub fn with_helper(mut self, helper: fgos_holder_lock::HelperExe) -> Self {
+        self.helper = Some(helper);
+        self
+    }
+    fn borrow_helper(&self) -> Result<fgos_holder_lock::HelperExe> {
+        match &self.helper {
+            Some(helper) => Ok(helper.clone()),
+            None => fgos_holder_lock::HelperExe::current()
+                .map_err(|e| borrow_failure(fgos_holder_lock::BorrowError::Spawn(e))),
+        }
     }
 
     pub fn git_floor_verdict(&self) -> Result<&GitFloorVerdict> {
@@ -1329,6 +1347,7 @@ impl GitDriver {
                         .ok_or_else(|| failure("invalid-git-deadline"))?,
                 },
                 watch,
+                &self.borrow_helper()?,
             )?;
             // The effect stays recorded for recovery; a failed run already
             // reports failure, never plain success.

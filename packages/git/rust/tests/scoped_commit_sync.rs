@@ -1,3 +1,4 @@
+// Linux only: its Git children run through a borrowed lock, which on Windows needs a helper executable that a library test harness is not; the Windows proof of this port runs from apps/fgos/tests/windows_git_custody.rs, and its fixture reads Unix device and inode numbers.
 #![cfg(target_os = "linux")]
 use fgos_git::*;
 use fgos_holder_lock::{acquire, Acquire, BorrowedHandle, Handle, Mode, Resource, Wait};

@@ -134,6 +134,7 @@ impl DiscardedIgnored {
     }
 }
 /// The one spelling two paths are compared in: `.` and `..` folded away, forward slashes, plain drive prefix.
+/// The lexical `..` fold is correct only because admin directories contain no symlinks.
 fn spelling(path: &Path) -> String {
     use std::path::Component;
     let mut out = PathBuf::new();
@@ -349,14 +350,11 @@ impl GitDriver {
             HeadFact::Detached { commit } => (None, commit),
             _ => return Err(failure("worktree-unborn-refused")),
         };
-        #[cfg(unix)]
         let creation_identity = format!(
             "{}@{}",
             admin_identity(path)?,
             admin_identity(target.git_dir())?
         );
-        #[cfg(not(unix))]
-        let creation_identity = "unavailable-on-this-platform".into();
         Ok(WorktreeHandle {
             creation_identity,
             path: path.into(),
@@ -555,33 +553,22 @@ impl GitDriver {
         scope: &LockScope<'_>,
         path: &Path,
     ) -> Result<()> {
-        #[cfg(unix)]
-        {
-            let lock = crate::refs::custody_lock_path(repo, path)?;
-            if let Some(held) = scope.handle("dispatch-cwd") {
-                if held.path() == lock {
-                    scope.validate().map_err(failure)?;
-                    return Ok(());
-                }
+        let lock = crate::refs::custody_lock_path(repo, path)?;
+        if let Some(held) = scope.handle("dispatch-cwd") {
+            if held.path() == lock {
+                scope.validate().map_err(failure)?;
+                return Ok(());
             }
-            if !missing(&lock)? {
-                match fgos_holder_lock::probe(&fgos_holder_lock::Resource::new(
-                    "dispatch-cwd",
-                    lock,
-                ))
+        }
+        if !missing(&lock)? {
+            match fgos_holder_lock::probe(&fgos_holder_lock::Resource::new("dispatch-cwd", lock))
                 .map_err(failure)?
-                {
-                    fgos_holder_lock::Probe::Free => (),
-                    _ => return Err(failure("worktree-custody-held-or-unknown")),
-                }
+            {
+                fgos_holder_lock::Probe::Free => (),
+                _ => return Err(failure("worktree-custody-held-or-unknown")),
             }
-            Ok(())
         }
-        #[cfg(not(unix))]
-        {
-            let _ = (repo, scope, path);
-            Err(failure("git-lockscope-unavailable-windows"))
-        }
+        Ok(())
     }
     fn worktree_not_live(&self, path: &Path, warned: &mut BTreeSet<u32>) -> Result<()> {
         use fgos_process::facts::{scan, Scan, ScanFilter};
@@ -636,7 +623,6 @@ impl GitDriver {
             return Err(failure("writer-required"));
         }
         let resource_set = wal::worktree_resources(&kind)?;
-        #[cfg(unix)]
         let resource_set = {
             let mut resource_set = resource_set;
             let existing = match &kind {
@@ -745,42 +731,26 @@ impl GitDriver {
             return Err(failure("invalid-session-id"));
         }
         let parent = parent.canonicalize().map_err(failure)?;
-        #[cfg(unix)]
-        {
-            use std::os::unix::ffi::OsStrExt;
-            let template = parent.join(format!("{session_id}-XXXXXX"));
-            let mut bytes = std::ffi::CString::new(template.as_os_str().as_bytes())
-                .map_err(failure)?
-                .into_bytes_with_nul();
-            if unsafe { libc::mkdtemp(bytes.as_mut_ptr().cast()) }.is_null() {
-                return Err(failure(std::io::Error::last_os_error()));
+        let path = create_session_directory(&parent, session_id)?;
+        let input = WorktreeCreate {
+            path: path.clone(),
+            branch: None,
+            base: base.clone(),
+            session_id: Some(session_id.into()),
+        };
+        let result = self.create_worktree_locked(repo, &scope, &input, writer, id, true);
+        if result.is_err() {
+            // Never recursively remove: after Git registration every byte
+            // belongs to a potentially interrupted checkout.
+            let admin = repo
+                .common_dir()
+                .join("worktrees")
+                .join(path.file_name().expect("session directory name"));
+            if missing(&admin).unwrap_or(false) {
+                let _ = fs::remove_dir(&path);
             }
-            let path = byte_path(&bytes[..bytes.len() - 1])?;
-            let input = WorktreeCreate {
-                path: path.clone(),
-                branch: None,
-                base: base.clone(),
-                session_id: Some(session_id.into()),
-            };
-            let result = self.create_worktree_locked(repo, &scope, &input, writer, id, true);
-            if result.is_err() {
-                // Never recursively remove: after Git registration every byte
-                // belongs to a potentially interrupted checkout.
-                let admin = repo
-                    .common_dir()
-                    .join("worktrees")
-                    .join(path.file_name().expect("mkdtemp name"));
-                if missing(&admin).unwrap_or(false) {
-                    let _ = fs::remove_dir(&path);
-                }
-            }
-            result
         }
-        #[cfg(not(unix))]
-        {
-            let _ = (repo, scope, parent, base, writer, id);
-            Err(failure("git-lockscope-unavailable-windows"))
-        }
+        result
     }
     #[allow(clippy::too_many_arguments)]
     fn create_worktree_locked(
@@ -1347,16 +1317,7 @@ impl GitDriver {
         if missing(&directory)? {
             return Ok(issues);
         }
-        #[cfg(unix)]
         admin_identity(&directory)?;
-        #[cfg(not(unix))]
-        if fs::symlink_metadata(&directory)
-            .map_err(failure)?
-            .file_type()
-            .is_symlink()
-        {
-            return Err(recovery("worktree-admin-untrusted"));
-        }
         for entry in fs::read_dir(&directory).map_err(failure)? {
             let entry = entry.map_err(failure)?;
             let name = entry.file_name().to_string_lossy().into_owned();
@@ -1861,9 +1822,58 @@ fn admin_identity(path: &Path) -> Result<String> {
         }
         Ok(format!("{}:{}", m.dev(), m.ino()))
     }
+    #[cfg(windows)]
+    {
+        use std::os::windows::fs::MetadataExt;
+        // A junction is a directory reparse point that `is_symlink` does not name.
+        if m.file_attributes()
+            & windows_sys::Win32::Storage::FileSystem::FILE_ATTRIBUTE_REPARSE_POINT
+            != 0
+        {
+            return Err(recovery("worktree-admin-untrusted"));
+        }
+        let key = crate::refs::file_key(path)?;
+        Ok(format!("{}:{}", key.device, key.index))
+    }
+}
+/// A new empty directory `<session_id>-<six random characters>` under `parent`, created exclusively.
+fn create_session_directory(parent: &Path, session_id: &str) -> Result<PathBuf> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::ffi::OsStrExt;
+        let template = parent.join(format!("{session_id}-XXXXXX"));
+        let mut bytes = std::ffi::CString::new(template.as_os_str().as_bytes())
+            .map_err(failure)?
+            .into_bytes_with_nul();
+        if unsafe { libc::mkdtemp(bytes.as_mut_ptr().cast()) }.is_null() {
+            return Err(failure(std::io::Error::last_os_error()));
+        }
+        byte_path(&bytes[..bytes.len() - 1])
+    }
     #[cfg(not(unix))]
     {
-        Err(failure("git-lockscope-unavailable-windows"))
+        use std::hash::{BuildHasher, Hasher};
+        const ALPHABET: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789";
+        // `create_dir` fails on an existing name, so a collision retries and never reuses a directory.
+        for _ in 0..64 {
+            let mut hasher = std::collections::hash_map::RandomState::new().build_hasher();
+            hasher.write_u32(std::process::id());
+            let mut bits = hasher.finish();
+            let suffix: String = (0..6)
+                .map(|_| {
+                    let c = ALPHABET[(bits % ALPHABET.len() as u64) as usize] as char;
+                    bits /= ALPHABET.len() as u64;
+                    c
+                })
+                .collect();
+            let path = parent.join(format!("{session_id}-{suffix}"));
+            match fs::create_dir(&path) {
+                Ok(()) => return Ok(path),
+                Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => continue,
+                Err(e) => return Err(failure(e)),
+            }
+        }
+        Err(failure("session-directory-unavailable"))
     }
 }
 

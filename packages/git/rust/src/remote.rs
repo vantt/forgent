@@ -107,7 +107,6 @@ impl GitDriver {
         )
     }
     fn remote_scope<'a>(&self, held: Vec<BorrowedHandle<'a>>) -> Result<LockScope<'a>> {
-        require_lock_scope_platform()?;
         let scope = LockScope::seeded(held).map_err(failure)?;
         if scope
             .holding()

@@ -143,7 +143,6 @@ impl GitDriver {
         hooks_request: Option<(&str, bool)>,
         filesystem: &F,
     ) -> Result<Receipt> {
-        require_lock_scope_platform()?;
         let allowed = if hooks_request.is_none() {
             granted_fetch_mappings(remote)?
         } else {

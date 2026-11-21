@@ -91,8 +91,7 @@ impl<'a> HolderAuthority<'a> {
     ) -> Result<Self> {
         fgos_holder_lock::validate(handle)
             .map_err(|e| failure(format!("publication-borrow-unavailable: {e}")))?;
-        if !cfg!(target_os = "linux")
-            || handle.name() != "event-seal"
+        if handle.name() != "event-seal"
             || writer.is_empty()
             || !(own_ref(&reference) || (legacy && reference.as_str() == "refs/fgos/legacy"))
             || fs::canonicalize(resource_path)

@@ -253,12 +253,7 @@ fn scoped_commit_custody(
     if root == checkout.trusted_main_root() || !held.is_empty() {
         return Ok(None);
     }
-    #[cfg(unix)]
-    {
-        crate::refs::acquire_checkout_custody(checkout, root).map(Some)
-    }
-    #[cfg(not(unix))]
-    Ok(None)
+    crate::refs::acquire_checkout_custody(checkout, root).map(Some)
 }
 
 #[cfg(test)]

@@ -172,10 +172,46 @@ fn state(path: &Path) -> Result<(File, u64, u64, String)> {
         ))?;
         Ok((file, m.dev(), m.ino(), digest))
     }
-    #[cfg(not(unix))]
+    #[cfg(windows)]
     {
-        let _ = path;
-        Err(recovery("native-lock-identity-unavailable"))
+        use std::io::Read;
+        use std::os::windows::fs::{MetadataExt, OpenOptionsExt};
+        const FILE_ATTRIBUTE_REPARSE_POINT: u32 = 0x400;
+        const FILE_FLAG_OPEN_REPARSE_POINT: u32 = 0x0020_0000;
+        // A reparse point is opened as itself, never followed, and then refused.
+        let mut file = fs::OpenOptions::new()
+            .read(true)
+            .custom_flags(FILE_FLAG_OPEN_REPARSE_POINT)
+            .open(path)
+            .map_err(failure)?;
+        let m = file.metadata().map_err(failure)?;
+        if !m.is_file()
+            || m.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0
+            || m.len() > 16 * 1024 * 1024
+        {
+            return Err(recovery(
+                "native-lock-inspected-repair-required: unsupported artifact",
+            ));
+        }
+        let mut bytes = Vec::new();
+        file.by_ref()
+            .take(16 * 1024 * 1024 + 1)
+            .read_to_end(&mut bytes)
+            .map_err(failure)?;
+        if bytes.len() > 16 * 1024 * 1024 {
+            return Err(recovery(
+                "native-lock-inspected-repair-required: oversized artifact",
+            ));
+        }
+        let digest = wal::canonical_digest(&(
+            m.file_attributes(),
+            m.len(),
+            m.last_write_time(),
+            m.creation_time(),
+            bytes,
+        ))?;
+        let key = key_of(&file).map_err(failure)?;
+        Ok((file, key.0, key.1, digest))
     }
 }
 impl GitDriver {
@@ -257,6 +293,11 @@ impl GitDriver {
 }
 fn sync_dirs(dirs: &[&Path]) -> Result<()> {
     fgos_durable_file::sync_directories(dirs).map_err(failure)
+}
+/// `(device, inode)` of an open file, on every platform.
+fn key_of(file: &File) -> std::io::Result<(u64, u64)> {
+    let key = crate::refs::file_key_of(file).map_err(|e| std::io::Error::other(e.cause))?;
+    Ok((key.device, key.index))
 }
 fn parent_of(path: &Path) -> Result<&Path> {
     path.parent()
@@ -363,7 +404,7 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
             let guard_key = (device, inode);
             let empty_guard = |p: &Path| -> bool {
                 fs::symlink_metadata(p).is_ok_and(|m| m.is_dir() && !m.file_type().is_symlink())
-                    && File::open(p).and_then(|f| facts::file_key(&f)).ok() == Some(guard_key)
+                    && File::open(p).and_then(|f| key_of(&f)).ok() == Some(guard_key)
                     && fs::read_dir(p).is_ok_and(|mut entries| entries.next().is_none())
             };
             if empty_guard(path) {
@@ -474,7 +515,7 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
     let guard = {
         fs::create_dir(&quarantined).map_err(failure)?;
         let guard = File::open(&quarantined).map_err(failure)?;
-        let (device, inode) = facts::file_key(&guard).map_err(failure)?;
+        let (device, inode) = key_of(&guard).map_err(failure)?;
         let marker = destination.join(format!("guard-{device}-{inode}"));
         fs::OpenOptions::new()
             .write(true)
@@ -514,11 +555,11 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
     // The pathname may have been replaced after the final observation. Never
     // report a substituted inode as repaired, and restore it without overwrite.
     let moved = File::open(&quarantined).map_err(failure)?;
-    if facts::file_key(&moved).map_err(failure)? != (owned.device, owned.inode) {
+    if key_of(&moved).map_err(failure)? != (owned.device, owned.inode) {
         #[cfg(target_os = "linux")]
         if let Some(guard) = &guard {
-            if File::open(path).and_then(|f| facts::file_key(&f)).ok()
-                == Some(facts::file_key(guard).map_err(failure)?)
+            if File::open(path).and_then(|f| key_of(&f)).ok()
+                == Some(key_of(guard).map_err(failure)?)
                 && exchange(path, &quarantined).is_ok()
             {
                 fs::remove_dir(&quarantined).map_err(failure)?;
@@ -548,9 +589,7 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
         return Ok(report);
     }
     if let Some(guard) = &guard {
-        if File::open(path).and_then(|f| facts::file_key(&f)).ok()
-            != Some(facts::file_key(guard).map_err(failure)?)
-        {
+        if File::open(path).and_then(|f| key_of(&f)).ok() != Some(key_of(guard).map_err(failure)?) {
             report.quarantine_path = Some(quarantined.to_string_lossy().into());
             report.inspection =
                 "owned artifact quarantined; native path guard changed, preserved".into();
@@ -569,7 +608,7 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
 impl NativeLockArtifact {
     pub(crate) fn capture(path: &Path, owner: &facts::ProcTuple, file: &File) -> Result<Self> {
         let (_open, device, inode, digest) = state(path)?;
-        if facts::file_key(file).map_err(failure)? != (device, inode) {
+        if key_of(file).map_err(failure)? != (device, inode) {
             return Err(recovery("native-lock-owned-descriptor-mismatch"));
         }
         Ok(Self {

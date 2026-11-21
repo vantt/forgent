@@ -1,3 +1,4 @@
+// Linux only: its Git children run through a borrowed lock, which on Windows needs a helper executable that a library test harness is not; the Windows proof of this port runs from apps/fgos/tests/windows_git_custody.rs.
 #![cfg(target_os = "linux")]
 //! Land push from inside a live session, and the main-checkout catch-up door.
 include!("support/land.rs");

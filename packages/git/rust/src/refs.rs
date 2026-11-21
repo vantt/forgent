@@ -626,11 +626,9 @@ impl GitDriver {
         id: &str,
         filesystem: &F,
     ) -> Result<Receipt> {
-        require_lock_scope_platform()?;
         if !name.as_str().starts_with("refs/heads/") || writer.is_empty() || old == next {
             return Err(failure("invalid-refs-request"));
         }
-        #[cfg(unix)]
         let custody_path = held
             .iter()
             .find(|h| h.as_ref().name() == "dispatch-cwd")
@@ -659,16 +657,13 @@ impl GitDriver {
             if used[0].0.branch.as_ref() != Some(name) {
                 return Err(failure("branch-in-use"));
             }
-            #[cfg(unix)]
-            {
-                let root = target
-                    .work_tree
-                    .as_ref()
-                    .ok_or_else(|| failure("checkout-custody-required"))?;
-                let lock = custody_lock_path(repo, root)?;
-                if custody_path.as_ref() != Some(&lock) {
-                    return Err(failure("checkout-custody-required"));
-                }
+            let root = target
+                .work_tree
+                .as_ref()
+                .ok_or_else(|| failure("checkout-custody-required"))?;
+            let lock = custody_lock_path(repo, root)?;
+            if custody_path.as_ref() != Some(&lock) {
+                return Err(failure("checkout-custody-required"));
             }
             if !self
                 .status(
@@ -979,7 +974,6 @@ pub(crate) fn adopt_worktree_admin<'a>(
     repo: &RepoHandle,
     held: Vec<BorrowedHandle<'a>>,
 ) -> Result<LockScope<'a>> {
-    require_lock_scope_platform()?;
     let scope = LockScope::seeded(held).map_err(failure)?;
     if let Some(admin) = scope.handle("worktree-admin") {
         let expected = repo
@@ -1011,7 +1005,6 @@ pub fn acquire_worktree_admin<'a>(
     held: Vec<BorrowedHandle<'a>>,
     wait: Wait,
 ) -> Result<LockScope<'a>> {
-    require_lock_scope_platform()?;
     acquire_admin(repo, LockScope::seeded(held).map_err(failure)?, wait)
 }
 
@@ -1056,55 +1049,123 @@ fn worktree_admin_held(fgos_dir: &Path, wait: Wait) -> OperationError {
     })));
     error
 }
+/// Identity of a file or directory that a removal and re-creation cannot reuse: the volume (`dev` on Unix, the
+/// volume serial on Windows), the file index (`ino`; on Windows the 128-bit file id folded to 64 bits, exact on NTFS
+/// where the high half is zero) and, where the filesystem reports it, the birth time in nanoseconds on Unix or
+/// 100 ns units since 1601 on Windows.
+pub(crate) struct FileKey {
+    pub(crate) device: u64,
+    pub(crate) index: u64,
+    pub(crate) birth: Option<u128>,
+}
+pub(crate) fn file_key(path: &Path) -> Result<FileKey> {
+    #[cfg(unix)]
+    {
+        file_key_of_metadata(&fs::metadata(path).map_err(failure)?)
+    }
+    #[cfg(windows)]
+    {
+        use std::os::windows::fs::OpenOptionsExt;
+        // Backup semantics let the same open read a directory; the default share mode lets every other opener through.
+        let file = fs::OpenOptions::new()
+            .read(true)
+            .custom_flags(windows_sys::Win32::Storage::FileSystem::FILE_FLAG_BACKUP_SEMANTICS)
+            .open(path)
+            .map_err(failure)?;
+        file_key_of(&file)
+    }
+}
 #[cfg(unix)]
+fn file_key_of_metadata(m: &fs::Metadata) -> Result<FileKey> {
+    use std::os::unix::fs::MetadataExt;
+    Ok(FileKey {
+        device: m.dev(),
+        index: m.ino(),
+        birth: m
+            .created()
+            .ok()
+            .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+            .map(|d| d.as_nanos()),
+    })
+}
+/// The key of an open file.
+pub(crate) fn file_key_of(file: &fs::File) -> Result<FileKey> {
+    #[cfg(unix)]
+    {
+        file_key_of_metadata(&file.metadata().map_err(failure)?)
+    }
+    #[cfg(windows)]
+    {
+        use std::os::windows::io::AsRawHandle;
+        use windows_sys::Win32::Storage::FileSystem::{
+            FileBasicInfo, FileIdInfo, GetFileInformationByHandleEx, FILE_BASIC_INFO, FILE_ID_INFO,
+        };
+        let handle = file.as_raw_handle();
+        // SAFETY: both structs are plain data and the sizes passed match them.
+        unsafe {
+            let mut id: FILE_ID_INFO = std::mem::zeroed();
+            if GetFileInformationByHandleEx(
+                handle,
+                FileIdInfo,
+                (&mut id as *mut FILE_ID_INFO).cast(),
+                std::mem::size_of::<FILE_ID_INFO>() as u32,
+            ) == 0
+            {
+                return Err(failure(std::io::Error::last_os_error()));
+            }
+            let mut basic: FILE_BASIC_INFO = std::mem::zeroed();
+            if GetFileInformationByHandleEx(
+                handle,
+                FileBasicInfo,
+                (&mut basic as *mut FILE_BASIC_INFO).cast(),
+                std::mem::size_of::<FILE_BASIC_INFO>() as u32,
+            ) == 0
+            {
+                return Err(failure(std::io::Error::last_os_error()));
+            }
+            let wide = u128::from_le_bytes(id.FileId.Identifier);
+            Ok(FileKey {
+                device: id.VolumeSerialNumber,
+                index: (wide as u64) ^ ((wide >> 64) as u64),
+                birth: u128::try_from(basic.CreationTime).ok(),
+            })
+        }
+    }
+}
 /// The `dispatch-cwd` lease file of a checkout, keyed exactly as the lock registry's
-/// `<cwdDevIno>` (`src/holder-lock/registry.mjs`): `<dev>-<ino>-<birthtimeNs>` of the
+/// `<cwdDevIno>` (`src/holder-lock/registry.mjs`): `<dev>-<ino>-<birth>` of the
 /// directory after realpath. A different key would probe a lease nobody holds.
 pub(crate) fn custody_lock_path(repo: &RepoHandle, root: &Path) -> Result<PathBuf> {
-    use std::os::unix::fs::MetadataExt;
-    let m = fs::metadata(fs::canonicalize(root).map_err(failure)?).map_err(failure)?;
-    let birth = m
-        .created()
-        .map_err(failure)?
-        .duration_since(std::time::UNIX_EPOCH)
-        .map_err(failure)?
-        .as_nanos();
+    let key = file_key(&fs::canonicalize(root).map_err(failure)?)?;
+    let birth = key
+        .birth
+        .ok_or_else(|| failure("checkout-custody-birth-unavailable"))?;
     Ok(repo.trusted_main_root().join(format!(
         ".fgos/locks/dispatch-cwd--{}-{}-{}.lock",
-        m.dev(),
-        m.ino(),
-        birth
+        key.device, key.index, birth
     )))
 }
 /// A linked checkout's custody lease, taken once and never waited for: a checkout a live writer holds answers
 /// `checkout-custody-busy`. The one door for a caller that must hold the lease while it acts on `root` (recovery of a
-/// scoped commit; the removal of a session checkout). Off Unix there is no lease: `git-lockscope-unavailable-windows`.
+/// scoped commit; the removal of a session checkout).
 pub fn acquire_checkout_custody(
     repo: &RepoHandle,
     root: &Path,
 ) -> Result<fgos_holder_lock::Handle> {
-    #[cfg(unix)]
-    {
-        use fgos_holder_lock::{acquire, Acquire, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
-        let lock = custody_lock_path(repo, root)?;
-        if let Some(parent) = lock.parent() {
-            fs::create_dir_all(parent).map_err(failure)?;
-        }
-        match acquire(
-            &Resource::new("dispatch-cwd", lock),
-            Mode::Ex,
-            Wait::Try,
-            DEFAULT_KILL_WAIT_MS,
-        ) {
-            Acquire::Acquired(handle) => Ok(handle),
-            Acquire::Held { .. } => Err(failure("checkout-custody-busy")),
-            other => Err(failure(format!("checkout-custody-unavailable: {other:?}"))),
-        }
+    use fgos_holder_lock::{acquire, Acquire, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
+    let lock = custody_lock_path(repo, root)?;
+    if let Some(parent) = lock.parent() {
+        fs::create_dir_all(parent).map_err(failure)?;
     }
-    #[cfg(not(unix))]
-    {
-        let _ = (repo, root);
-        Err(failure("git-lockscope-unavailable-windows"))
+    match acquire(
+        &Resource::new("dispatch-cwd", lock),
+        Mode::Ex,
+        Wait::Try,
+        DEFAULT_KILL_WAIT_MS,
+    ) {
+        Acquire::Acquired(handle) => Ok(handle),
+        Acquire::Held { .. } => Err(failure("checkout-custody-busy")),
+        other => Err(failure(format!("checkout-custody-unavailable: {other:?}"))),
     }
 }
 pub(crate) fn branch_in_use(
@@ -1197,21 +1258,12 @@ impl GitDriver {
                     ResolveRepo::Repository(r) => r,
                     _ => return Err(recovery("ref-checkout-missing")),
                 };
-                // The dispatch-cwd lease is a unix lock file keyed by dev/ino/birthtime. Windows
-                // never reaches here (acquire_worktree_admin above refuses with
-                // `git-lockscope-unavailable-windows`, spec section 19 item 5); keep the refusal
-                // explicit so the custody check can never be skipped silently.
-                #[cfg(unix)]
-                {
-                    let custody = scope
-                        .handle("dispatch-cwd")
-                        .ok_or_else(|| failure("checkout-custody-required"))?;
-                    if custody.path() != custody_lock_path(repo, Path::new(path))? {
-                        return Err(failure("checkout-custody-mismatch"));
-                    }
+                let custody = scope
+                    .handle("dispatch-cwd")
+                    .ok_or_else(|| failure("checkout-custody-required"))?;
+                if custody.path() != custody_lock_path(repo, Path::new(path))? {
+                    return Err(failure("checkout-custody-mismatch"));
                 }
-                #[cfg(not(unix))]
-                require_lock_scope_platform()?;
                 if !self
                     .status(
                         &target,

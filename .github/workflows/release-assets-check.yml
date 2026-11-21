@@ -194,6 +194,15 @@ jobs:
       - name: The activation gate admits git-wal-v1 with the fence placed on Windows
         run: cargo test --release -p fgctl --test git_wal_activation_gate
 
+      - name: The Git ports take custody on Windows with the fgos binary as the borrow helper
+        run: cargo test --release -p fgos --test windows_git_custody
+
+      - name: The Git crate on Windows
+        run: cargo test --release -p fgos-git
+
+      - name: The checkout crate on Windows
+        run: cargo test --release -p fgos-checkout
+
   # Evidence only: measures how Win32 LockFileEx byte-range locks (byte 0, length 1, exclusive,
   # fail immediately, as the holder-lock windows driver takes them) behave across handle
   # inheritance and process death. Every answer is a line starting with "PROBE "; a "no" answer

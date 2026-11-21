@@ -25,7 +25,10 @@ fn real(path: &Path) -> PathBuf {
 
 /// The Git door over this machine's state root.
 fn driver() -> Result<GitDriver, String> {
-    GitDriver::new(&fgos_holder_lock::state_root::state_root().0).map_err(|e| e.cause)
+    let helper = fgos_holder_lock::HelperExe::current().map_err(|e| e.to_string())?;
+    GitDriver::new(&fgos_holder_lock::state_root::state_root().0)
+        .map(|driver| driver.with_helper(helper))
+        .map_err(|e| e.cause)
 }
 
 /// `resolveGitRoots` (`src/runner/execution/run.mjs:71`): the worktree and the trusted main checkout of `cwd`, read

@@ -394,7 +394,6 @@ impl GitDriver {
         filesystem: &F,
         wait_ms: u64,
     ) -> Result<LandSession> {
-        require_lock_scope_platform()?;
         let caller = LockScope::seeded(held_locks).map_err(failure)?;
         if caller
             .holding()
@@ -815,7 +814,6 @@ impl GitDriver {
         destination: &RefName,
         wait_ms: u64,
     ) -> Result<MergeSlot> {
-        require_lock_scope_platform()?;
         if !destination.as_str().starts_with("refs/heads/") {
             return Err(failure("invalid-refs-request"));
         }
@@ -1181,7 +1179,6 @@ impl GitDriver {
         commit: &Oid,
         parent: &Oid,
     ) -> Result<()> {
-        require_lock_scope_platform()?;
         let refused = |reason: &str| failure(format!("undo-commit-refused: {reason}"));
         if !branch.as_str().starts_with("refs/heads/") {
             return Err(failure("invalid-refs-request"));
@@ -1252,7 +1249,6 @@ impl GitDriver {
         id: &str,
         filesystem: &F,
     ) -> Result<Receipt> {
-        require_lock_scope_platform()?;
         let refused = |reason: &str| failure(format!("main-checkout-catch-up-refused: {reason}"));
         if !target.as_str().starts_with("refs/heads/")
             || !remote_tracking.as_str().starts_with("refs/remotes/")
@@ -1515,7 +1511,6 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<Outcome> {
-        require_lock_scope_platform()?;
         let main = match self.resolve_repo(repo.trusted_main_root(), repo.trusted_main_root())? {
             ResolveRepo::Repository(r) => r,
             ResolveRepo::NotARepository => return Err(failure("land-main-handle-required")),
@@ -1856,7 +1851,6 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<Receipt> {
-        require_lock_scope_platform()?;
         let caller = LockScope::seeded(held_locks).map_err(failure)?;
         if caller
             .holding()
