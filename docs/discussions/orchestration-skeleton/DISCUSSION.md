@@ -11,6 +11,7 @@ discussion: open
 - 2026-11-21 16:35: đã xác định 4 bản sửa của OS-D1 (nguồn: memory `orchestration-stabilize-first-decision` của secretary Miu và tin supervisor gửi Miu sáng 2026-11-21: "1547 first, then the idle-lead nudge, then the names, then the reaper"): `p-l22vozecxg`, `p-waxzxz5mio`, `p-mhwe24fttr`, `p-yqanenewb4`. **Cả 4 đã `done`** (xem §7 `#related`). Điều kiện đậu theo chữ của OS-D1 đã thỏa, nhưng release hold ("no new work until the release hold is lifted", handoff secretary 14:45) vẫn còn hiệu lực. Discussion vẫn `paused` cho tới khi chủ dự án cho mở lại.
 - **2026-11-21 16:16: chủ dự án cho mở lại (OS-D2).** Trạng thái `discussion: open`. Architecture panel (T0) vẫn hoãn. Release hold không bị ảnh hưởng vì discussion không sinh code.
 - **2026-11-21 16:23 (round 6):** chủ dự án trả lời câu hỏi round 5 là "cả hai": mọi thành phần phải có authority, boundary và contract rõ, **và** hệ thống cần một cơ chế hoặc một vai làm nhạc trưởng nắm nhịp điều phối tổng. Câu hỏi mở thành §3 row 9: nhạc trưởng, hay mọi thứ chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan theo chuỗi watcher -> ghi signal -> phản ứng tiếp. Đang chạy 5 agent con (haiku, chỉ đọc) dò lại tier 0 tới 9 từ dưới lên; kết quả sẽ vào bảng §3 row 4b.
+- **2026-11-21 16:44 (round 11): chủ dự án chấp nhận năm ý chống zombie và thêm nhịp rà soát định kỳ của LLM -> OS-D5.** Đối chiếu: mầm của cả sáu ý đã có trong watcher definitions (§3 4e). Tiếp theo: giữ nhịp đặt ở đâu (§3 row 9), chi tiết rà soát (row 10).
 - **2026-11-21 16:38 (round 10): chủ dự án xác nhận cách tách -> OS-D4.** Thêm yêu cầu: nhạc trưởng sống dai nhưng không là zombie vô hồn. Đề xuất năm thứ làm nó có hồn ở §3 4e; còn mở: có "nhịp rà soát" định kỳ gọi LLM dù không có event không.
 - **2026-11-21 16:32 (round 9):** chủ dự án yêu cầu debate nhạc trưởng code hay LLM, vai trò và năng lực của nhạc trưởng và người chơi. Tóm tắt ở §3 4d. Đề xuất: tách giữ nhịp (code) và diễn giải (LLM được hỏi ý); chờ chủ dự án phản hồi.
 - **2026-11-21 16:35 (round 8): chủ dự án xác nhận cái hiểu của shaper là đúng -> OS-D3, ghi thành kim chỉ nam ở §2.** Mọi round sau đo đề xuất theo §2. Tiếp theo: nhạc trưởng code đặt ở đâu (§3 row 9), rồi ba ngôn ngữ khung (row 5) và facet chung (row 6).
@@ -34,7 +35,8 @@ discussion: open
 | 5 | Ngôn ngữ khung hợp nhất (One Frame Language): Hợp nhất `plan-v1` (plan/wave/phase) và workflow guide YAML (steps/milestones/guards). Cú pháp, schema và runtime runner nào thi hành? | G16. Hiện fgOS có 2 ngôn ngữ khung riêng rẽ, plan không chạy trên workflow harness | **Chưa rõ: Mở khảo sát thiết kế** |
 | 6 | Universal work facets: Skeleton chỉ đọc các thuộc tính lịch trình phổ quát (actionable/runnable, waiting on what, finished) thay vì work states cụ thể | G14. Schema của facets này là gì để skeleton lập lịch được? | **Chưa rõ: Đề xuất schema 3 facets** |
 | 7 | Tích hợp Surface (Multica 6 ports): Portfolio read, Command, Wake door, Notifier, Session placement, Question port | `plans/261118-1117-external-ui-integration-multica`. G13 | **Chưa rõ: Thứ tự ưu tiên cổng & adapter** |
-| 9 | Nhạc trưởng vs chuỗi phản ứng: có một cơ chế hoặc vai nắm nhịp và điều phối tổng, hay mọi hoạt động chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan qua watcher -> ghi signal -> phản ứng tiếp? | Chủ dự án nêu round 6 (2026-11-21 16:23), "open for discuss". Bằng chứng ở 4c: chuỗi timer -> watcher -> event -> wake đã có trong code; nhạc trưởng thực tế là supervisor LLM, cap không bị code ép; chưa có lối vào signal ngoài | **Hướng đã chốt (OS-D3, OS-D4):** lối vào timer + signal; giữ nhịp là code, diễn giải là LLM được hỏi ý. Yêu cầu thêm round 10: sống dai nhưng không zombie (4e, chưa chốt). Còn mở: nhạc trưởng code đặt ở đâu và lấy phần nào từ `wake::decide`, T1; lối vào signal ngoài qua cửa nào |
+| 9 | Nhạc trưởng vs chuỗi phản ứng: có một cơ chế hoặc vai nắm nhịp và điều phối tổng, hay mọi hoạt động chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan qua watcher -> ghi signal -> phản ứng tiếp? | Chủ dự án nêu round 6 (2026-11-21 16:23), "open for discuss". Bằng chứng ở 4c: chuỗi timer -> watcher -> event -> wake đã có trong code; nhạc trưởng thực tế là supervisor LLM, cap không bị code ép; chưa có lối vào signal ngoài | **Hướng đã chốt (OS-D3, OS-D4):** lối vào timer + signal; giữ nhịp là code, diễn giải là LLM được hỏi ý. Không zombie: OS-D5 (4e). Còn mở: nhạc trưởng code đặt ở đâu và lấy phần nào từ `wake::decide`, T1; lối vào signal ngoài qua cửa nào |
+| 10 | Nhịp rà soát định kỳ của LLM: tần suất, nội dung brief, kết quả ghi ở đâu, có rà soát khi hệ thống rảnh không | OS-D5 ý 6; đề xuất biểu đạt bằng watcher definition `review-due` + action `wake-supervisor` (§3 4e) | **Đang bàn** |
 | 8 | Tổ chức Architecture Panel (`fgos-architecture-panel`): Khởi động panel độc lập gồm nhiều persona phản biện thiết kế skeleton trước khi chốt spec chi tiết | Khuyến nghị từ backlog row `p-7pjiqfoj7v` và `supervisor-review` §7 T7. Đã gửi câu hỏi `q-kjat6xjwfv`. **Câu trả lời chủ dự án:** Chưa làm bây giờ (`Not now`). Chủ dự án chọn đóng băng việc điều phối mới để ưu tiên ổn định hệ thống; Architecture Panel chờ 4 bản sửa lỗi hạ cánh. Đậu (park) thảo luận `orchestration-skeleton`, không đóng. | **Đã mở lại (OS-D2); panel vẫn hoãn** |
 
 
@@ -100,6 +102,18 @@ Chủ dự án: nhạc trưởng phải sống dai, nhưng không được là z
 3. **Tự canh mình.** Nhịp của chính nó cũng được canh (ai canh watcher); một nhịp không tạo quyết định nào trong thời gian dài là tín hiệu, không phải sự im lặng.
 4. **Giải thích mọi quyết định.** Mỗi quyết định mang mã lý do và bằng chứng, nên người và LLM đọc được nó đang nghĩ gì.
 5. **Được giám đốc nghệ thuật chỉnh lại.** Kết quả và friction được ghi lại; LLM diễn giải chỉnh ngưỡng và luật qua cửa có sẵn (`watcher tune`, khung tiến hóa từ friction). Hồn của nó đến từ vòng phản hồi với LLM, không phải từ LLM nằm trong vòng nhịp.
+6. **Nhịp rà soát định kỳ** (chủ dự án thêm round 11): thưa, LLM diễn giải nhìn toàn cảnh "dàn nhạc có đi đúng hướng không, có gì đáng lo mà chưa thành event không"; kết quả quay lại thành event.
+
+Chủ dự án chấp nhận cả sáu ở round 11 (OS-D5). Đối chiếu với thứ đã có (scout 2026-11-21 16:45), để mở rộng qua cửa sẵn có thay vì đắp cơ chế mới (L10, RUL104):
+
+| Ý | Mầm đã có | Còn thiếu |
+|---|---|---|
+| 1. Đo tiến độ | `core/attention/definitions/plan-no-progress.query.json` (plan đang chạy không có commit, board entry hay attempt trong cửa sổ) | Đo theo checkpoint của khung, không chỉ theo hoạt động |
+| 2. Biết giới hạn luật | `core/watcher/definitions/supervisor-stuck.query.json` (supervisor sống mà queue không giảm) | Luật chung "một luật chạy N lần không tạo tiến độ", "không luật nào khớp" -> raise "cần phán đoán" |
+| 3. Tự canh mình | `core/watcher/pace/watcher-overdue.query.json` (tick quá hạn), `supervisor-wake-failed` | Canh "lâu không ra quyết định nào" |
+| 4. Giải thích quyết định | Event có `reason` và `nextCommand` (các definition ở trên) | Mã lý do cho mọi quyết định của giữ nhịp, kể cả khi tự đóng event (`wake::decide`) |
+| 5. Được LLM chỉnh | `fgos watcher tune` (supervision spec §4.1) | Đường từ friction và kết quả sang đề xuất chỉnh luật |
+| 6. Rà soát định kỳ | Watcher definition + action `wake-supervisor` có thể biểu đạt "review-due" (lần rà soát cuối cũ hơn N giờ) | Definition `review-due`, brief rà soát, chỗ ghi kết quả |
 
 ## 4. Quyết định đã chốt
 
@@ -116,6 +130,7 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 | OS-D2 | Mở lại discussion ngay (2026-11-21 16:16). 4 bản sửa của OS-D1 đã xong; discussion không sinh code nên không đụng release hold. Architecture panel (T0) vẫn hoãn. | 2026-11-21 | Chủ dự án, trực tiếp trong session shaper |
 | OS-D3 | Kim chỉ nam (§2): hai mức cùng lúc — authority, boundary, contract rõ cho từng thành phần, và một thứ nắm nhịp toàn hệ thống. Lối vào chỉ là timer và signal ngoài, mọi thứ thành event; nhạc trưởng là code, LLM là người chơi chỉ được gọi để phán đoán. Nêu round 6, shaper diễn lại round 7, chủ dự án xác nhận round 8 ("cái hiểu của em là đúng") và yêu cầu ghi lại để không lạc nhịp. | 2026-11-21 | Chủ dự án, trực tiếp trong session shaper |
 | OS-D4 | Vai nhạc trưởng tách hai: **giữ nhịp** là code (luôn chạy; tổng phổ, cap, start/wake, đóng event vô ích, phát hiện rớt nhịp; tự thi hành), **diễn giải** là LLM được hỏi ý chỉ khi code raise "cần phán đoán" (hòa, chuyện lạ, đổi ưu tiên hoặc plan trong khung, có hỏi chủ dự án không); quyết định của LLM quay lại thành event để code thi hành. Phép thử: suy được từ trạng thái đã ghi + luật -> code; cần hiểu ý định hoặc tình huống mới -> LLM. LLM sửa tổng phổ, không cầm nhịp. Đề xuất round 9, chủ dự án xác nhận round 10 ("rất tốt, phân như vậy chính xác"). | 2026-11-21 | Chủ dự án, trực tiếp trong session shaper |
+| OS-D5 | Giữ nhịp sống dai nhưng không zombie: (1) biết mục tiêu, đo tiến độ chứ không chỉ đo sống; (2) biết giới hạn luật mình, raise "cần phán đoán" thay vì lặp; (3) tự canh nhịp của mình; (4) mọi quyết định có mã lý do và bằng chứng; (5) LLM diễn giải chỉnh luật và ngưỡng qua cửa có sẵn; (6) LLM có nhịp rà soát định kỳ, kết quả quay lại thành event. Đề xuất round 10, chủ dự án chấp nhận round 11 ("5 ý đều hay và anh nghĩ định kỳ llm nên có một bản rà soát"). Tần suất và nội dung rà soát còn mở (§3 row 10). | 2026-11-21 | Chủ dự án, trực tiếp trong session shaper |
 
 ## 5. Q&A log
 
@@ -130,10 +145,11 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 - 2026-11-21 16:35 round 8: Chủ dự án: "cái hiểu của em là đúng. để đừng lạc nhịp mong muốn của anh, em cần ghi nhận cái hiểu đó." Ý định đã giữ nguyên qua round 6, 7, 8 -> mint OS-D3, viết lại §2 thành kim chỉ nam, dựng lại §6.
 - 2026-11-21 16:32 round 9: Chủ dự án: "hãy debate đi, nhạc trưởng là code hay llm. vai trò của nhạc trưởng là gì, năng lực của nó là gì, điều gì làm nó quan trọng. người chơi nhạc làm gì, năng lực gì là quan trọng với nó, điều gì làm nó quan trọng." Shaper debate hai phía với bằng chứng repo (§3 4d), đề xuất tách giữ nhịp (code) và diễn giải (LLM được hỏi ý). Chưa chốt.
 - 2026-11-21 16:38 round 10: Chủ dự án: "rất tốt, phân như vậy chính xác. anh nhạc trưởng phải sống dai là đúng, nhưng không thể là zoombie vô hồn." Mint OS-D4 (tách giữ nhịp / diễn giải). Shaper đề xuất năm thứ chống zombie (§3 4e), cập nhật §6.
+- 2026-11-21 16:44 round 11: Chủ dự án: "5 ý đều hay và anh nghĩ định kỳ llm nên có một bản rà soát." Mint OS-D5. Scout `core/watcher/definitions`, `core/watcher/pace`, `core/attention/definitions`: mầm của cả sáu ý đã có; ghi bảng đối chiếu ở §3 4e. Mở §3 row 10 (chi tiết rà soát).
 
 ## 6. Thiết kế đã chốt {#design}
 
-Đây là hình dạng hiện tại cho người đọc lạ. Phần đã chốt dựa trên SR-D6 tới SR-D10, OS-D3 và OS-D4; phần ghi "còn mở" đang bàn ở §3.
+Đây là hình dạng hiện tại cho người đọc lạ. Phần đã chốt dựa trên SR-D6 tới SR-D10 và OS-D3 tới OS-D5; phần ghi "còn mở" đang bàn ở §3.
 
 ```mermaid
 flowchart TB
@@ -180,7 +196,7 @@ flowchart TB
 
 **Nhạc trưởng: hai vai (OS-D4).** *Giữ nhịp* là code: luôn chạy, đọc event và facet, áp cap (`maxLeads`, lane, attempt), admit plan, start hoặc wake người chơi, đóng event vô ích, phát hiện người rớt nhịp, và tự thi hành. Mầm hiện có là `wake::decide` (`packages/supervision/rust/src/wake.rs`); phần admission chuyển từ LLM sang code là T1. *Diễn giải* là LLM (supervisor) được hỏi ý chỉ khi code raise "cần phán đoán": hòa, chuyện lạ, đổi ưu tiên hoặc plan trong khung, có hỏi chủ dự án không. Quyết định của LLM quay lại thành event và code thi hành. Phép thử: suy được từ trạng thái đã ghi + luật thì code quyết; cần hiểu ý định hoặc tình huống mới thì gọi LLM. Khi LLM yếu, chết hay đang rotate, nhịp vẫn giữ; chỉ các câu cần phán đoán phải chờ.
 
-**Không zombie (yêu cầu round 10, đề xuất ở §3 4e, chưa chốt).** Giữ nhịp phải biết mục tiêu và đo tiến độ chứ không chỉ đo sống, biết khi luật của mình không còn khớp để raise "cần phán đoán", tự canh nhịp của chính mình, giải thích mọi quyết định bằng mã lý do, và được LLM diễn giải chỉnh luật và ngưỡng qua cửa có sẵn. Còn mở: vị trí và contract của giữ nhịp, hợp nhất vòng lặp thứ hai `fgos-runner --watch`.
+**Không zombie (OS-D5).** Giữ nhịp phải biết mục tiêu và đo tiến độ chứ không chỉ đo sống, biết khi luật của mình không còn khớp để raise "cần phán đoán", tự canh nhịp của chính mình, giải thích mọi quyết định bằng mã lý do, và được LLM diễn giải chỉnh luật và ngưỡng qua cửa có sẵn. LLM có thêm nhịp rà soát định kỳ, thưa, kết quả quay lại thành event. Mầm của cả sáu ý đã có dưới dạng watcher definition (§3 4e); phần còn thiếu được mở rộng qua cùng cửa, không đắp cơ chế mới. Còn mở: vị trí và contract của giữ nhịp, hợp nhất vòng lặp thứ hai `fgos-runner --watch`.
 
 **Người chơi.** Lead và worker lái trong khung và làm ra giá trị thật; năng lực quan trọng là suy luận, hiểu domain, thích nghi, báo cáo trung thực và báo friction khi khung sai. Quyết định và kết quả của họ quay lại hệ thống dưới dạng event qua cùng cửa raise, nên giữ nhịp luôn nhìn thấy.
 
