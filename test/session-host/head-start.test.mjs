@@ -18,11 +18,11 @@ seedFileLocalBwrapRegistry();
 seedStubAgentClis('alpha-bin');
 
 const PERSONA_TEXT = 'name: planner\ndescription: Plans the work in small verified steps.\npersona:\n  voice: calm\n';
-/** A project root whose docs/discussions holds the `probe` feature, the discussion the planner and shaper heads of these tests are bound to. */
+/** A project root whose plans/discussions holds the `probe` feature, the discussion the planner and shaper heads of these tests are bound to. */
 function scratch() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-head-start-'));
-  fs.mkdirSync(path.join(root, 'docs', 'discussions', 'probe'), { recursive: true });
-  fs.writeFileSync(path.join(root, 'docs', 'discussions', 'probe', 'DISCUSSION.md'), '# probe\n');
+  fs.mkdirSync(path.join(root, 'plans', 'discussions', 'ds-aaaaaaaaaa-probe'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'plans', 'discussions', 'ds-aaaaaaaaaa-probe', 'DISCUSSION.md'), '# probe\n');
   return root;
 }
 
@@ -290,8 +290,8 @@ test('a planner and a shaper head open with the path of their discussion and the
   await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, ports);
   await startHeadSession({ persona: 'shaper', name: 'probe', projectRoot }, ports);
   const [planner, shaper] = calls.launch.map((r) => r.opening);
-  assert.match(planner, /# Task\nYour task is docs\/discussions\/probe\/DISCUSSION\.md\.\nRead the discussion, write plans\/<dir>\/plan\.md .*plan-contract-check.* fgos land --paths\./);
-  assert.match(shaper, /# Task\nYour task is docs\/discussions\/probe\/DISCUSSION\.md\.\nRead domains\/<domain>\/AGENTS\.md/);
+  assert.match(planner, /# Task\nYour task is plans\/discussions\/ds-aaaaaaaaaa-probe\/DISCUSSION\.md\.\nRead the discussion, write plans\/<dir>\/plan\.md .*plan-contract-check.* fgos land --paths\./);
+  assert.match(shaper, /# Task\nYour task is plans\/discussions\/ds-aaaaaaaaaa-probe\/DISCUSSION\.md\.\nRead domains\/<domain>\/AGENTS\.md/);
   const planOfHead = () => ({ dir: '261118-1045-project-supervisor', footprint: [] });
   await startHeadSession({ persona: 'lead', name: 'sv-p09', projectRoot }, { ...ports, planOfHead });
   assert.match(calls.launch[2].opening, /# Task\nYour task is plans\/261118-1045-project-supervisor\/plan\.md\.\nRead the phase table, check which wave or phase is next/);

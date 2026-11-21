@@ -122,7 +122,7 @@ export function openingText({ persona, name, personaLines, handoff = null, forQu
     handoff
       ? `1. Read the latest handoff of this session first: ${handoff.path}. It describes state as it was; verify it against the repo before acting.`
       : '1. There is no earlier handoff for this session; start from the portfolio.',
-    '2. Read the portfolio: `fgos questions` for the owner questions still open, and docs/backlog.md for the work in flight.',
+    '2. Read the portfolio: `fgos questions` for the owner questions still open, and plans/backlog.md for the work in flight.',
     '3. Say in one line which pending question you resumed, or that none is pending, then continue; the ritual is not a finished turn.',
     ...(forQuestion ? ['', `You continue question ${forQuestion}: write its answer back to its origin, then \`fgos questions ack ${forQuestion}\` (or \`cancel\`).`] : []),
     ...(onWake ? ['', '# On wake', onWake] : []),

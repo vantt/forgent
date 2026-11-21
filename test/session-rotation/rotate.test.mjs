@@ -110,9 +110,9 @@ test('the old session is ended only after the successor answered and Identity na
 test('a manual rotation is recorded as manual and hands off the old session\'s final message and the persona\'s existing portfolio', async (t) => {
   const { root, dir } = project(t);
   const { ports, request } = fakes(root);
-  ports.config = () => ({ keep: 10, answerWaitMs: 5000, personas: { planner: { reload: ['docs/backlog.md', 'plans/board/plan.md', 'docs/discussions'] } } });
-  fs.mkdirSync(path.join(root, 'docs', 'discussions'), { recursive: true });
-  fs.writeFileSync(path.join(root, 'docs', 'backlog.md'), '# Backlog\n');
+  ports.config = () => ({ keep: 10, answerWaitMs: 5000, personas: { planner: { reload: ['plans/backlog.md', 'plans/board/plan.md', 'plans/discussions'] } } });
+  fs.mkdirSync(path.join(root, 'plans', 'discussions'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'plans', 'backlog.md'), '# Backlog\n');
   ports.sessionDir = (runDir, key) => { assert.deepEqual([runDir, key], ['/run/old', 'cmd_old']); return '/sessions/projects'; };
   // The turn that asked for the rotation is still going on the first read; its final message is the one handed over.
   const reads = [{ result: 'found', message: 'Rotating now.', turnEnded: false }, { result: 'found', message: 'Open questions:\n1. Which db?', turnEnded: true }];
@@ -123,7 +123,7 @@ test('a manual rotation is recorded as manual and hands off the old session\'s f
   const text = fs.readFileSync(path.join(dir, latest.file), 'utf8');
   assert.match(text, /^- rotation: manual$/m);
   assert.match(text, /## Last assistant message \(verbatim\)\n\n```text\nOpen questions:\n1\. Which db\?\n```\n/);
-  assert.match(text, /^- docs\/backlog\.md\n- docs\/discussions$/m, 'the persona\'s reload paths are the portfolio, and one the project does not have is left out');
+  assert.match(text, /^- plans\/backlog\.md\n- plans\/discussions$/m, 'the persona\'s reload paths are the portfolio, and one the project does not have is left out');
   assert.doesNotMatch(text, /plans\/board/);
   assert.deepEqual(reads, [], 'the reader is asked again until the old turn ended');
 });

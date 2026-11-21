@@ -7,7 +7,7 @@ import { fenced, readLatestHandoff, redactText, writeHandoff, VERIFY_LINE } from
 import { ROTATION_REASONS } from '../../src/session-rotation/rotate.mjs';
 
 const fgosDir = () => fs.mkdtempSync(path.join(os.tmpdir(), 'rot-store-'));
-const base = { persona: 'miu', name: 'main', sessionId: 'abcdef1234567', rotate: 'soft', portfolio: ['docs/backlog.md'], delta: 'did x' };
+const base = { persona: 'miu', name: 'main', sessionId: 'abcdef1234567', rotate: 'soft', portfolio: ['plans/backlog.md'], delta: 'did x' };
 const dirOf = (d) => path.join(d, 'runtime', 'session-rotation', 'miu-main');
 
 test('a handoff starts with the verify line, names its file by minute and session, and is read back as latest', () => {
@@ -16,7 +16,7 @@ test('a handoff starts with the verify line, names its file by minute and sessio
   assert.equal(r.file, '261117-1504-abcdef12.md');
   const latest = readLatestHandoff({ fgosDir: d, persona: 'miu', name: 'main' });
   assert.equal(latest.text.split('\n')[0], VERIFY_LINE);
-  assert.match(latest.text, /docs\/backlog\.md/);
+  assert.match(latest.text, /plans\/backlog\.md/);
   assert.doesNotMatch(latest.text, /Pending question/);
 });
 

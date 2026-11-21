@@ -1492,7 +1492,7 @@ export const COMMAND_REGISTRY = [
       positional: ['branch'],
       required: [],
     },
-    examples: ['fgos land plan-x', 'fgos land --paths docs/backlog.md --message "docs: backlog" --test test/x.test.mjs'],
+    examples: ['fgos land plan-x', 'fgos land --paths plans/backlog.md --message "docs: backlog" --test test/x.test.mjs'],
     touchesState: true,
     store: 'open',
     externalEffect: true,

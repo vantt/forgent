@@ -21,7 +21,7 @@ sessionRotation:
     secretary:
       soft: 0.15
       reload:
-        - docs/backlog.md
-        - docs/discussions
+        - plans/backlog.md
+        - plans/discussions
     supervisor:
       soft: 0.15

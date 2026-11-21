@@ -164,7 +164,7 @@ export async function planOfHead(projectRoot, persona, name, ports = {}) {
 // ---- the task of a head: a plan for a lead, a discussion for a planner or shaper ------------------------
 
 const DISCUSSION_PERSONAS = new Set(['planner', 'shaper']);
-const DISCUSSION_ROOTS = ['plans/discussions', 'docs/discussions'];
+const DISCUSSION_ROOT = 'plans/discussions';
 const DISCUSSION_FILE = 'DISCUSSION.md';
 const DISCUSSION_ID_PREFIX = /^ds-[a-z2-7]{10}-/;
 
@@ -193,18 +193,16 @@ export function discussionOfHead(projectRoot, persona, name, ports = {}) {
   const key = prefix !== null && typeof name === 'string' && name.startsWith(`${prefix}-`) && name.length > prefix.length + 1 ? name.slice(prefix.length + 1) : name;
   const list = ports.listDiscussionDirs ?? defaultListDiscussionDirs;
   const found = [];
-  for (const root of DISCUSSION_ROOTS) {
-    for (const dir of list(projectRoot, root)) {
-      if (typeof key !== 'string' || key === '') continue;
-      const topic = topicOfDiscussionDir(dir);
-      if (dir.startsWith(key) || topic.startsWith(key)) found.push({ dir, root, topic });
-    }
+  for (const dir of list(projectRoot, DISCUSSION_ROOT)) {
+    if (typeof key !== 'string' || key === '') continue;
+    const topic = topicOfDiscussionDir(dir);
+    if (dir.startsWith(key) || topic.startsWith(key)) found.push({ dir, topic });
   }
   const exact = found.filter((f) => f.dir === key || f.topic === key);
   const hits = exact.length > 0 ? exact : found;
-  if (hits.length === 0) throw new HeadPlanError('discussion-not-found', `no discussion directory starts with ${JSON.stringify(key)} under ${DISCUSSION_ROOTS.join(' or ')}`);
-  if (hits.length > 1) throw new HeadPlanError('task-ambiguous', `${hits.length} discussions start with ${JSON.stringify(key)}: ${hits.map((h) => `${h.root}/${h.dir}`).join(', ')}`);
-  return { kind: 'discussion', dir: hits[0].dir, path: `${hits[0].root}/${hits[0].dir}/${DISCUSSION_FILE}` };
+  if (hits.length === 0) throw new HeadPlanError('discussion-not-found', `no discussion directory starts with ${JSON.stringify(key)} under ${DISCUSSION_ROOT}`);
+  if (hits.length > 1) throw new HeadPlanError('task-ambiguous', `${hits.length} discussions start with ${JSON.stringify(key)}: ${hits.map((h) => `${DISCUSSION_ROOT}/${h.dir}`).join(', ')}`);
+  return { kind: 'discussion', dir: hits[0].dir, path: `${DISCUSSION_ROOT}/${hits[0].dir}/${DISCUSSION_FILE}` };
 }
 
 /**

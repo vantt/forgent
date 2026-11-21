@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// Asserts that every PBI row still marked `proposed` in docs/backlog.md has
-// been reconciled against the execution layer, with real evidence, in
+// Asserts that every backlog item still marked `proposed` under plans/backlog/
+// has been reconciled against the execution layer, with real evidence, in
 // docs/history/backlog-execution-reconciliation/RECONCILIATION.md.
 //
-// The `proposed` id set is re-derived from docs/backlog.md on every run
+// The `proposed` id set is re-derived from the item files on every run
 // rather than hard-coded: that is what makes this catch FUTURE drift. A
-// newly added `proposed` row starts failing here until someone reconciles
+// newly added `proposed` item starts failing here until someone reconciles
 // it, which is the whole point — a reconciliation nobody re-checks stops
 // being true, which is how the backlog got 0/31 done in the first place.
 
@@ -13,9 +13,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFrontmatter } from '../src/util/yaml.mjs';
+import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
+
+// The YAML door needs the native addon; a missing addon must fail loudly here,
+// never surface as swallowed parse errors that read as zero proposed items.
+ensureAddonForScript();
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const BACKLOG = path.join(repoRoot, 'docs/backlog.md');
 const DOC = path.join(repoRoot, 'docs/history/backlog-execution-reconciliation/RECONCILIATION.md');
 
 const VERDICTS = ['resolved', 'partial', 'open', 'stale'];
@@ -32,89 +36,60 @@ const SHA = /\b[0-9a-f]{7,40}\b/;
 const failures = [];
 const fail = (msg) => failures.push(msg);
 
-/**
- * Splits one markdown table row into cells.
- *
- * Deliberately does NOT trust a fixed left-hand index for the status column:
- * a Story cell containing a literal `|` shifts every column after it. Measured
- * on this repo's own backlog (2026-08-08): `cells[3]` finds 29 proposed rows
- * where the file really has 30, because STR70b's story carries a pipe. The
- * status column is the second from the right, which stays correct however many
- * pipes the prose in between contains.
- */
-function parseRow(line) {
-  const cells = line.split('|').slice(1, -1).map((c) => c.trim());
-  if (cells.length < 4) return null;
-  return { id: cells[0], status: cells[cells.length - 2] };
-}
-
-function proposedIdsFromBacklog(text) {
-  const ids = [];
-  for (const line of text.split('\n')) {
-    if (!line.startsWith('|') || line.startsWith('|--')) continue;
-    const row = parseRow(line);
-    if (row && row.status === 'proposed') ids.push(row.id);
-  }
-  return ids;
-}
-
-// A migrated project keeps one file per item under the backlog item root; the legacy table is then a pointer.
+// One file per backlog item lives under the backlog item root.
 const ITEMS_DIR = path.join(repoRoot, 'plans/backlog');
-const POINTER_MARKER = '<!-- migrated-portfolio-pointer -->';
 
-/** The ids of the item files whose frontmatter status is `proposed`, and the number of item files that say so. */
+/**
+ * The ids of the item files whose parsed frontmatter status is `proposed`, and,
+ * counted independently of the YAML door, the number of item files that have a
+ * `status: proposed` line anywhere (a whole-file line scan, no frontmatter reader).
+ */
 function proposedIdsFromItems(dir) {
   const ids = [];
   let scanned = 0;
   for (const name of fs.readdirSync(dir).filter((n) => n.endsWith('.md')).sort()) {
     const text = fs.readFileSync(path.join(dir, name), 'utf8');
+    if (/^status:\s*proposed\s*$/m.test(text)) scanned += 1;
     let meta = {};
     try {
       meta = readFrontmatter(text, name).meta;
     } catch {
       // an unparseable block carries no id or status
     }
-    if (meta.status === 'proposed') {
-      scanned += 1;
-      if (typeof meta.id === 'string' && meta.id) ids.push(meta.id);
-    }
+    if (meta.status === 'proposed' && typeof meta.id === 'string' && meta.id) ids.push(meta.id);
   }
   return { ids, scanned };
 }
 
-const legacyText = fs.existsSync(BACKLOG) ? fs.readFileSync(BACKLOG, 'utf8') : null;
-const migrated = legacyText === null || legacyText.includes(POINTER_MARKER);
-if (migrated && !fs.existsSync(ITEMS_DIR)) {
-  console.error(`FAIL: neither ${path.relative(repoRoot, BACKLOG)} nor ${path.relative(repoRoot, ITEMS_DIR)} exists.`);
+if (!fs.existsSync(ITEMS_DIR)) {
+  console.error(`FAIL: ${path.relative(repoRoot, ITEMS_DIR)} does not exist.`);
   process.exit(1);
 }
-const fromItems = migrated ? proposedIdsFromItems(ITEMS_DIR) : null;
-const backlog = legacyText ?? '';
-const proposed = fromItems ? fromItems.ids : proposedIdsFromBacklog(backlog);
+const { ids: proposed, scanned } = proposedIdsFromItems(ITEMS_DIR);
 
-// Self-consistency: the parser must agree with a whole-file scan. A parser
-// that disagrees with itself must never produce a passing run — that is
-// exactly the silent under-count this check exists to make impossible.
-const scanned = fromItems ? fromItems.scanned : (backlog.match(/\|\s*proposed\s*\|/g) ?? []).length;
+// Self-consistency: the id list must agree with the independent count of item
+// files whose status is proposed. An id list that disagrees with that count
+// must never produce a passing run — that is exactly the silent under-count
+// this check exists to make impossible.
 if (proposed.length !== scanned) {
   console.error(
-    `FAIL: parser disagrees with itself — classified ${proposed.length} proposed rows, ` +
-      `but a whole-file scan finds ${scanned}. The table format changed; fix the parser ` +
+    `FAIL: id list disagrees with the file count — read ${proposed.length} proposed ids, ` +
+      `but ${scanned} item files say proposed. An item lost its id or its frontmatter; fix it ` +
       `before trusting any verdict below it.`,
   );
   process.exit(1);
 }
 if (proposed.length === 0) {
   console.error(
-    'FAIL: extracted zero proposed rows from docs/backlog.md. Either the backlog is ' +
-      'genuinely empty of proposed work, or the table format changed and this check ' +
+    'FAIL: found zero proposed items under plans/backlog. Either the backlog is ' +
+      'genuinely empty of proposed work, or the item format changed and this check ' +
       'has quietly stopped checking anything. Confirm which before silencing this.',
   );
   process.exit(1);
 }
 
 const dupes = proposed.filter((id, i) => proposed.indexOf(id) !== i);
-if (dupes.length) fail(`docs/backlog.md lists duplicate proposed ids: ${[...new Set(dupes)].join(', ')}`);
+if (dupes.length) fail(`plans/backlog lists duplicate proposed ids: ${[...new Set(dupes)].join(', ')}`);
 
 if (!fs.existsSync(DOC)) {
   console.error(`FAIL: ${path.relative(repoRoot, DOC)} does not exist — nothing has been reconciled.`);
@@ -139,7 +114,7 @@ for (const [i, m] of heads.entries()) {
 for (const id of proposed) {
   const section = sections.get(id);
   if (!section) {
-    fail(`${id}: proposed in docs/backlog.md but has no section in RECONCILIATION.md`);
+    fail(`${id}: proposed under plans/backlog but has no section in RECONCILIATION.md`);
     continue;
   }
   const { verdict, body } = section;
@@ -158,7 +133,7 @@ for (const id of proposed) {
 
 for (const id of sections.keys()) {
   if (!proposed.includes(id)) {
-    fail(`${id}: reconciled in RECONCILIATION.md but is not a proposed row in docs/backlog.md`);
+    fail(`${id}: reconciled in RECONCILIATION.md but is not a proposed item under plans/backlog`);
   }
 }
 

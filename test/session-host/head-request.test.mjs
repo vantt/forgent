@@ -533,17 +533,17 @@ test('a lead branch land whose plan has no footprint is refused write-outside-fo
 });
 
 test('a branch land from a planner is refused land-branch-lead-only', async (t) => {
-  const planner = headCase(t, { persona: 'planner', name: 'proj-p', writes: ['docs/discussions'] });
+  const planner = headCase(t, { persona: 'planner', name: 'proj-p', writes: ['plans'] });
   assert.equal((await planner.ask('land', { branch: 'task/p-1' })).line.code, 'land-branch-lead-only');
 });
 
 test('a paths land from a planner inside its grant is accepted', async (t) => {
-  const planner = headCase(t, { persona: 'planner', name: 'proj-p', writes: ['docs/discussions'] });
-  assert.equal((await planner.ask('land', { paths: ['docs/discussions/a.md'], message: 'm' })).exit, 0);
+  const planner = headCase(t, { persona: 'planner', name: 'proj-p', writes: ['plans'] });
+  assert.equal((await planner.ask('land', { paths: ['plans/a.md'], message: 'm' })).exit, 0);
 });
 
 test('a run from a planner is refused role-mismatch', async (t) => {
-  const planner = headCase(t, { persona: 'planner', name: 'proj-p', writes: ['docs/discussions'] });
+  const planner = headCase(t, { persona: 'planner', name: 'proj-p', writes: ['plans'] });
   assert.equal((await planner.ask('run', { prompt: 'x' })).line.code, 'role-mismatch');
 });
 
@@ -723,7 +723,7 @@ test('session start passes forQuestion down to the opening, and the opening carr
   const project = scratch(t);
   const seen = [];
   const ports = {
-    taskOfHead: async () => ({ kind: 'discussion', dir: 'q', path: 'docs/discussions/q/DISCUSSION.md' }),
+    taskOfHead: async () => ({ kind: 'discussion', dir: 'ds-aaaaaaaaaa-q', path: 'plans/discussions/ds-aaaaaaaaaa-q/DISCUSSION.md' }),
     pin: async () => ({ name: 'planner', text: '' }), handoff: async () => null, runnerConfig: async () => ({}), bind: async () => ({ cli: 'x' }),
     opening: async (ask) => { seen.push(ask.forQuestion); return 'opening'; },
     launch: async () => ({ placement: { host: 'terminal', key: 'k' }, runDir: '/r' }), identity: () => ({ live: false }), host: {},

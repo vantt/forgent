@@ -163,8 +163,12 @@ test('id registry check passes on a clean registry and names each repeated id, t
     'docs/decisions/0001-one.md': '# one\n',
   });
   try {
-    const backlog = (ids) => ['| ID | Story |', '|----|-------|', ...ids.map((id) => `| ${id} | a story |`)].join('\n');
-    fs.writeFileSync(path.join(repo, 'docs/backlog.md'), backlog(['p-4f2a7qzb3x', 'STR27']));
+    const backlog = (ids) => {
+      fs.rmSync(path.join(repo, 'plans/backlog'), { recursive: true, force: true });
+      fs.mkdirSync(path.join(repo, 'plans/backlog'), { recursive: true });
+      ids.forEach((id, index) => fs.writeFileSync(path.join(repo, 'plans/backlog', `item-${index}.md`), `---\nid: ${id}\nstatus: proposed\n---\n# a story\n`));
+    };
+    backlog(['p-4f2a7qzb3x', 'STR27']);
     const clean = checkIdentityIdsUnique(repo);
     assert.deepEqual(clean, { passed: true, message: '2 backlog ids, 1 D-ADR numbers and 1 decision files, none repeated' });
 
@@ -173,7 +177,7 @@ test('id registry check passes on a clean registry and names each repeated id, t
     fs.writeFileSync(path.join(repo, 'docs/platform/area-a/history/old.md'), '### D-ADR0070 (an older title for the decision)\n');
     assert.deepEqual(checkIdentityIdsUnique(repo), clean);
 
-    fs.writeFileSync(path.join(repo, 'docs/backlog.md'), backlog(['p-4f2a7qzb3x', 'p-4f2a7qzb3x']));
+    backlog(['p-4f2a7qzb3x', 'p-4f2a7qzb3x']);
     fs.writeFileSync(path.join(repo, 'docs/platform/area-b/decisions/narrative.md'), '### D-ADR0070 (a different decision)\n');
     fs.writeFileSync(path.join(repo, 'docs/decisions/0001-two.md'), '# two\n');
     const broken = checkIdentityIdsUnique(repo);
