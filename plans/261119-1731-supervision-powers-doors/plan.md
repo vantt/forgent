@@ -3,7 +3,7 @@ contract: plan-v1
 title: "Supervision powers, part 2: verbs, request-socket entries, grants, personas and the live grant audit"
 status: running
 lead: lead:DOORS
-base: 595a7f0b1194ada7826d774edce61817dd41a8bc
+base: 926191975ab99f9e300d589ed32b302eaf25a834
 priority: P1
 blockedBy:
   - 261119-1730-supervision-powers-cores
@@ -11,6 +11,16 @@ blockedBy:
 footprint:
   - plans/261119-1731-supervision-powers-doors/**
   - apps/fgos/src/wiring/supervision.rs
+  - apps/fgos/src/routing.rs
+  - apps/fgos/src/cli_projector.rs
+  - packages/observe/rust/src/metrics_cli/**
+  - packages/host-runtime/contracts/command-route-annotations.json
+  - packages/host-runtime/contracts/command-routes.json
+  - packages/run-supervisor/rust/tests/head_request.rs
+  - packages/git/contracts/mutation-census.v1.json
+  - test/cli/subcommand-flag-drift.test.mjs
+  - test/rust-host/command-routes.test.mjs
+  - test/rust-host/fixtures/store-declaration-vectors.json
   - apps/fgos/src/wiring/observe_declarations.rs
   - apps/fgos/tests/supervision_verbs.rs
   - packages/host-runtime/contracts/command-manifest.json
@@ -88,7 +98,7 @@ readers. The work-management data model (its decision may change the backlog wri
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Verbs and socket entries](phase-01-verbs-and-socket.md) | - | apps/fgos/src/wiring/supervision.rs, apps/fgos/src/wiring/observe_declarations.rs, apps/fgos/tests/supervision_verbs.rs, packages/host-runtime/contracts/command-manifest.json, src/cli/command-registry.mjs, packages/run-supervisor/contracts/head-request.v1.json, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, test/session-host/head-request.test.mjs, core/config-standard/secretary.yaml, core/config-schema/secretary.schema.yaml | 1 | draft |
+| 1 | [Verbs and socket entries](phase-01-verbs-and-socket.md) | - | apps/fgos/src/wiring/supervision.rs, apps/fgos/src/wiring/observe_declarations.rs, apps/fgos/tests/supervision_verbs.rs, packages/host-runtime/contracts/command-manifest.json, src/cli/command-registry.mjs, packages/run-supervisor/contracts/head-request.v1.json, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, test/session-host/head-request.test.mjs, core/config-standard/secretary.yaml, core/config-schema/secretary.schema.yaml | 1 | done |
 | 2 | [Grants, personas and skills](phase-02-grants-personas.md) | 1 | src/session-host/head-grants.mjs, test/session-host/head-grants.test.mjs, core/agents/secretary.yaml, core/agents/supervisor.yaml, .claude/agents/secretary.md, .claude/agents/supervisor.md, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/fgos-secretary/SKILL.md, .agents/skills/fgos-supervisor/SKILL.md, .claude/skills/fgos-secretary/SKILL.md, .claude/skills/fgos-supervisor/SKILL.md, plugins/fgOS/skills/fgos-secretary/SKILL.md, plugins/fgOS/skills/fgos-supervisor/SKILL.md | 2 | draft |
 | 3 | [Live grant audit and the settled facts](phase-03-audit-and-docs.md) | 2 | plans/261119-1731-supervision-powers-doors/**, docs/platform/supervision/spec.md, docs/platform/observe/spec.md, docs/platform/session-host/spec.md, docs/platform/agent-confinement/spec.md, CHANGELOG.md | 3 | draft |
 
