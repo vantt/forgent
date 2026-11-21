@@ -12,6 +12,7 @@ footprint:
   - packages/holder-lock/rust/src/port.rs
   - packages/holder-lock/rust/src/borrow_windows.rs
   - packages/holder-lock/rust/src/driver/windows.rs
+  - packages/holder-lock/rust/src/tombstone.rs
   - packages/holder-lock/rust/tests/**
   - packages/git/rust/src/**
   - packages/git/rust/Cargo.toml
@@ -116,7 +117,7 @@ narrative goes into the Git spec's decision history.
 | 1 | [LockFileEx handle evidence, linked worktree trust and plain paths on Windows, CI job](phase-01-windows-worktree-and-ci-job.md) | - | packages/holder-lock/rust/tests/windows_lockfileex.rs, packages/git/rust/src/driver.rs, packages/git/rust/src/worktree.rs, packages/git/rust/tests/worktree.rs, packages/distribution/rust/src/release_rows.rs, packages/distribution/rust/src/workspace.rs, .github/workflows/release-assets-check.yml | 1 | ready |
 | 2 | [WAL opens on Windows](phase-02-windows-wal.md) | - | packages/git/rust/src/wal.rs, packages/git/rust/src/wal/**, packages/git/rust/Cargo.toml, Cargo.toml, Cargo.lock | 1 | ready |
 | 3 | [Borrowed handle and borrow I/O on Windows](phase-03-holder-lock-windows-borrow.md) | - | packages/holder-lock/rust/src/port.rs, packages/holder-lock/rust/src/borrow_windows.rs, packages/holder-lock/rust/src/driver/windows.rs, packages/holder-lock/rust/tests/**, .github/workflows/release-assets-check.yml | 2 | ready |
-| 4 | [C5 fence and scan on Windows, git-wal-v1 advertised](phase-04-windows-c5.md) | 2 | packages/distribution/rust/src/git_gate.rs, packages/distribution/rust/src/init.rs, packages/distribution/rust/src/verify.rs, packages/distribution/rust/tests/**, docs/platform/packaging-distribution/contracts/activation-binding.md, docs/platform/packaging-distribution/contracts/release-manifest.md | 2 | ready |
+| 4 | [C5 fence and scan on Windows, git-wal-v1 advertised](phase-04-windows-c5.md) | 2 | packages/holder-lock/rust/src/tombstone.rs, packages/distribution/rust/src/git_gate.rs, packages/distribution/rust/src/init.rs, packages/distribution/rust/src/verify.rs, packages/distribution/rust/tests/**, docs/platform/packaging-distribution/contracts/activation-binding.md, docs/platform/packaging-distribution/contracts/release-manifest.md | 2 | ready |
 | 5 | [Git ports take custody on Windows](phase-05-git-ports-windows-custody.md) | 1, 2, 3 | packages/git/rust/src/lib.rs, packages/git/rust/src/scoped_commit.rs, packages/git/rust/src/sync.rs, packages/git/rust/src/land.rs, packages/git/rust/src/refs.rs, packages/git/rust/src/remote.rs, packages/git/rust/src/restore.rs, packages/git/rust/src/recovery.rs, packages/git/rust/src/repository_config.rs, packages/git/rust/src/native_lock.rs, packages/git/rust/src/publication.rs, packages/git/rust/tests/scoped_commit_sync.rs, packages/git/rust/tests/land.rs, packages/git/rust/tests/land_crash_matrix.rs, packages/git/rust/tests/land_push_catch_up.rs, packages/git/rust/tests/safe_restore.rs, packages/git/rust/tests/refs_remote.rs, packages/git/rust/tests/recovery_matrix.rs, packages/git/rust/tests/repository_config.rs, packages/git/rust/tests/borrow_deadline.rs, packages/git/rust/tests/support/**, packages/git/contracts/mutation-census.v1.json, packages/supervision/rust/tests/land.rs, packages/execution/checkout/tests/**, .github/workflows/release-assets-check.yml | 3 | ready |
 | 6 | [Lease channel for the attempt's whole life, verify under custody](phase-06-lease-whole-life-and-verify.md) | 3 | packages/execution/engine/src/assignment_runner/launch.rs, apps/fgos/src/wiring/unit_run_host/verify.rs, apps/fgos/tests/windows_cwd_lease_owner.rs | 3 | ready |
 | 7 | [Windows unit-run commit end to end, docs, integration](phase-07-e2e-docs-integration.md) | 4, 5, 6 | apps/fgos/tests/unit_run_host.rs, .github/workflows/release-assets-check.yml, docs/platform/holder-lock/spec.md, docs/platform/git/spec.md, docs/platform/run-supervisor/spec.md, CHANGELOG.md | 4 | ready |
@@ -159,3 +160,6 @@ p-nk6xf5laob and p-w4cxqq2sbw are set done through the portfolio owner when phas
   the measured LockFileEx duplicated/inherited-handle test, which is phase 1's first step. Each land is reported to
   the supervisor.
 - 2026-11-21 lead:WINCUSTODY: phase 2 needs windows-sys in packages/git/rust/Cargo.toml; packages/git/rust/Cargo.toml, the root Cargo.toml (a windows-sys feature such as Win32_Security_Authorization, if the ACL read needs it) and Cargo.lock added to its footprint.
+- 2026-11-21 lead:WINCUSTODY: phase 4 worker found no atomic file-to-directory replace on Windows (the tombstone lives in
+  holder-lock tombstone.rs). Decided: two-step placement that fails closed (see phase 4 step 1); tombstone.rs added to
+  phase 4. Linux keeps the exchange.
