@@ -11,6 +11,7 @@ discussion: open
 - 2026-11-21 16:35: đã xác định 4 bản sửa của OS-D1 (nguồn: memory `orchestration-stabilize-first-decision` của secretary Miu và tin supervisor gửi Miu sáng 2026-11-21: "1547 first, then the idle-lead nudge, then the names, then the reaper"): `p-l22vozecxg`, `p-waxzxz5mio`, `p-mhwe24fttr`, `p-yqanenewb4`. **Cả 4 đã `done`** (xem §7 `#related`). Điều kiện đậu theo chữ của OS-D1 đã thỏa, nhưng release hold ("no new work until the release hold is lifted", handoff secretary 14:45) vẫn còn hiệu lực. Discussion vẫn `paused` cho tới khi chủ dự án cho mở lại.
 - **2026-11-21 16:16: chủ dự án cho mở lại (OS-D2).** Trạng thái `discussion: open`. Architecture panel (T0) vẫn hoãn. Release hold không bị ảnh hưởng vì discussion không sinh code.
 - **2026-11-21 16:23 (round 6):** chủ dự án trả lời câu hỏi round 5 là "cả hai": mọi thành phần phải có authority, boundary và contract rõ, **và** hệ thống cần một cơ chế hoặc một vai làm nhạc trưởng nắm nhịp điều phối tổng. Câu hỏi mở thành §3 row 9: nhạc trưởng, hay mọi thứ chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan theo chuỗi watcher -> ghi signal -> phản ứng tiếp. Đang chạy 5 agent con (haiku, chỉ đọc) dò lại tier 0 tới 9 từ dưới lên; kết quả sẽ vào bảng §3 row 4b.
+- **2026-11-21 21:15 (round 29): bàn hàng 10 (rà soát định kỳ của LLM).** Đề xuất ở §3 4l: ai rà soát, khi nào, brief gồm gì, kết quả đi đâu. Đang hỏi: ai rà soát.
 - **2026-11-21 21:07 (round 28): chủ dự án chọn A -> OS-D16.** Một cửa hỏi người (Questions) cho mọi người được hỏi; `waitingOn: person` trỏ tới một câu hỏi. Bản ghi lập lịch (hàng 6) đã rõ hết. Việc gộp Questions với Workflow gate chuyển sang discussion component-authority qua Miu. Kế tiếp: hàng 10 (rà soát định kỳ của LLM).
 - **2026-11-21 20:54 (round 27): bàn chỗ vướng 2 (`person` là người ngoài).** Phân tích và ba phương án ở §3 4k. Đang hỏi: ai giữ việc hỏi một người (chủ dự án, người duyệt, khách hàng).
 - **2026-11-21 20:43 (round 26): chủ dự án chọn B -> OS-D15.** Tool khai invocation dạng job thì làm người chơi qua chính cửa `fgos run`; không có cửa job thứ hai. Còn mở ở mục facet: `person` là người ngoài (§3 4i chỗ 2).
@@ -50,7 +51,7 @@ discussion: open
 | 6 | Universal work facets: Skeleton chỉ đọc các thuộc tính lịch trình phổ quát (actionable/runnable, waiting on what, finished) thay vì work states cụ thể | G14. Schema của facets này là gì để skeleton lập lịch được? | **Rõ (OS-D9 tới OS-D16):** bản ghi lập lịch `{ waitingOn?, outcome?, needs? }` gắn với từng bước đang mở, khoá (`item`, `step`). `waitingOn` có `until`; `person` trỏ tới một câu hỏi của Questions (OS-D16). `needs` có ba dạng, người chơi có thể là tool qua `fgos run` (OS-D15). Cap vòng lặp thuộc khung domain (OS-D13); tài nguyên nặng là cap (OS-D14). Thử ánh xạ ở 4h, 4i, 4j, 4k |
 | 7 | Tích hợp Surface (Multica 6 ports): Portfolio read, Command, Wake door, Notifier, Session placement, Question port | `plans/261118-1117-external-ui-integration-multica`. G13 | **Chưa rõ: Thứ tự ưu tiên cổng & adapter** |
 | 9 | Nhạc trưởng vs chuỗi phản ứng: có một cơ chế hoặc vai nắm nhịp và điều phối tổng, hay mọi hoạt động chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan qua watcher -> ghi signal -> phản ứng tiếp? | Chủ dự án nêu round 6 (2026-11-21 16:23), "open for discuss". Bằng chứng ở 4c: chuỗi timer -> watcher -> event -> wake đã có trong code; nhạc trưởng thực tế là supervisor LLM, cap không bị code ép; chưa có lối vào signal ngoài | **Hướng đã chốt (OS-D3, OS-D4):** lối vào timer + signal; giữ nhịp là code, diễn giải là LLM được hỏi ý. Không zombie: OS-D5 (4e). **Rõ:** chỗ đặt OS-D7, lối vào OS-D8. Mặc định tạm (đổi nếu chủ dự án phản đối hoặc adapter đầu tiên cần khác): id event của signal ngoài suy từ nguồn + id giao hàng của nguồn, không từ thời điểm, để webhook gửi lại không thành hai event; payload là dữ liệu không tin cậy, event chỉ trỏ tới nó, không bao giờ là lệnh |
-| 10 | Nhịp rà soát định kỳ của LLM: tần suất, nội dung brief, kết quả ghi ở đâu, có rà soát khi hệ thống rảnh không | OS-D5 ý 6; đề xuất biểu đạt bằng watcher definition `review-due` + action `wake-supervisor` (§3 4e) | **Đang bàn** |
+| 10 | Nhịp rà soát định kỳ của LLM: tần suất, nội dung brief, kết quả ghi ở đâu, có rà soát khi hệ thống rảnh không | OS-D5 ý 6; đề xuất biểu đạt bằng watcher definition `review-due` (§3 4e, 4l) | **Đang bàn:** đề xuất mặc định ở 4l; còn hỏi ai rà soát |
 | 11 | Chống code thừa: quản authority chắc **trên toàn hệ thống** (round 13). Vì sao code thừa (cửa thứ hai, bản sao, twin Rust/Node) vẫn cứ sinh ra, và hệ thống giữ authority bằng cách nào; topic này rộng hơn skeleton, đã tách sang discussion riêng `docs/discussions/component-authority/DISCUSSION.md` (CA-D1, round 14) | Chủ dự án nêu round 12. Bằng chứng ở §3 4f. Trùng với backlog `p-7nja6ilwkr` (G10, điều tra cửa thứ hai, chưa làm) | **Đã tách (OS-D6):** bàn ở `component-authority`; skeleton phụ thuộc kết quả |
 | 8 | Tổ chức Architecture Panel (`fgos-architecture-panel`): Khởi động panel độc lập gồm nhiều persona phản biện thiết kế skeleton trước khi chốt spec chi tiết | Khuyến nghị từ backlog row `p-7pjiqfoj7v` và `supervisor-review` §7 T7. Đã gửi câu hỏi `q-kjat6xjwfv`. **Câu trả lời chủ dự án:** Chưa làm bây giờ (`Not now`). Chủ dự án chọn đóng băng việc điều phối mới để ưu tiên ổn định hệ thống; Architecture Panel chờ 4 bản sửa lỗi hạ cánh. Đậu (park) thảo luận `orchestration-skeleton`, không đóng. | **Đã mở lại (OS-D2); panel vẫn hoãn** |
 
@@ -277,6 +278,21 @@ Không vướng gì: guide đã khai `capability` cho từng unit và gate ngư�
 
 **Đã chốt: (A), OS-D16.** *Ghi chú cho discussion component-authority:* hai cửa hỏi người (Questions và Workflow gate `fgos ask`) là một cặp trùng authority; phương án nào được chọn ở đây thì việc gộp thuộc bên đó.
 
+**4l. Rà soát định kỳ của LLM (hàng 10, round 29, 2026-11-21 21:15)**
+
+*Hôm nay có gì (đã đọc):* watcher definition đã biểu đạt được điều kiện theo tuổi: `core/watcher/pace/watcher-overdue.query.json` dùng `agg: age:ts` so với một ngưỡng lấy từ config (`params.configKey`). Supervisor đã có cửa wake, và đã có khoảng 120 báo cáo `plans/reports/supervisor-*` từ các lần wake, nhưng đó là xử lý event, không phải nhìn toàn cảnh.
+
+*Đề xuất mặc định (bốn ý con):*
+1. **Khi nào.** Definition `review-due`: tuổi của lần rà soát cuối (`fgos.review.done`) lớn hơn `watcher.reviewIntervalSec` (key mới trong `core/config-standard`, mặc định 24 giờ). Không cơ chế hẹn giờ mới: cùng timer, cùng tick.
+2. **Khi rảnh.** Bỏ qua khi không có gì mở **và** không có event nào kể từ lần rà soát trước. Còn việc mở mà im lặng thì vẫn rà soát: im lặng chính là chỗ zombie trốn.
+3. **Brief cố định, đọc dữ liệu chứ không đọc code:** (a) bản ghi lập lịch nào đứng lâu nhất so với khung của nó; (b) "cần phán đoán" nào còn treo; (c) sức khoẻ của chính giữ nhịp: tick trễ, luật nào bắn lặp mà không có tiến độ, phân bố mã lý do; (d) đề xuất chỉnh ngưỡng (`watcher tune`); (e) dấu hiệu lệch authority (thay đổi chạm cửa chưa có chủ, spec lạc hậu) để chuyển cho discussion component-authority.
+4. **Kết quả đi đâu.** Một báo cáo `plans/reports/review-…` (tên qua `fgos convention`), một record `fgos.review.done` đóng `review-due`, và mỗi phát hiện cần làm thành **một event** qua cửa raise với mã lý do, đi vào luồng thường (supervisor xử lý, hoặc thành câu hỏi gom cho chủ dự án). Người rà soát không tự sửa gì.
+
+*Câu còn mở: ai rà soát.*
+- **(A) Supervisor tự rà soát** khi bị wake bằng `review-due`. Không thêm gì; nhưng tự chấm bài của mình: supervisor chính là một phần thứ cần rà soát.
+- **(B) Một Unit chỉ đọc, độc lập**, giữ nhịp khởi qua `fgos run` (không `--writes`) với một capability rà soát, seat khác supervisor. Có cái nhìn không neo vào supervisor; chi phí một lần chạy mỗi chu kỳ; phát hiện về lại thành event nên supervisor vẫn là người hành động.
+- **(C) Miu rà soát.** Miu nhìn toàn cảnh portfolio, nhưng Miu là cửa của chủ dự án, không phải người canh nhịp; thêm việc định kỳ cho Miu làm nhoè vai.
+
 ## 4. Quyết định đã chốt
 
 Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
@@ -336,6 +352,7 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 - 2026-11-21 20:43 round 26: Chủ dự án: "đồng ý B". Mint OS-D15. Ghi chú: lần land round 25 thất bại `merge-slot-busy` mà shaper không thấy, file bẩn trên main chặn lead work-data-model phase 6 từ 20:00 tới 20:43 (q-2dwvrkgabm); land lại cùng round 26.
 - 2026-11-21 20:54 round 27: Chủ dự án: "đồng ý, bàn tiếp chỗ 2". Đọc hàng Questions của `component-boundary.md`, guide marketing (gate `approval`, `acceptedBy: owner`), plan nháp multica (notifier, question port), luật định danh của document-identity; phân tích ở §3 4k.
 - 2026-11-21 21:07 round 28: Chủ dự án: "đồng ý A". Mint OS-D16. Gửi Miu nhờ chuyển việc gộp Questions và Workflow gate sang discussion component-authority.
+- 2026-11-21 21:15 round 29: Bàn hàng 10. Đọc `core/watcher/definitions/*`, `core/watcher/pace/*` (điều kiện theo tuổi đã có). Đề xuất ở §3 4l.
 
 ## 6. Thiết kế đã chốt {#design}
 
