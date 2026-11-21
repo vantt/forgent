@@ -128,6 +128,8 @@ impl wal::PublicationAuthority for Authority {
 fn controller_publication_and_idempotent_paths_enforce_wal_and_keep_the_fence() {
     let root = std::env::temp_dir().join(format!("fgctl-git-c5-{}", std::process::id()));
     fs::create_dir_all(&root).unwrap();
+    // A WAL opens only by its real path; Windows may hand out an 8.3 short temp path.
+    let root = fgos_process::path::plain_path(&root.canonicalize().unwrap());
     owner_only(&root);
     let ws = root.join("ws");
     fs::create_dir(&ws).unwrap();
