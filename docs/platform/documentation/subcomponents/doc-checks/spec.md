@@ -5,14 +5,14 @@ Document type: BA-grade subcomponent specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Define the one command that checks maintained documentation, the body rules it runs, where it runs, and the commit gate that makes its refusal real
 Design status: Signed by the owner on 2026-11-12. A change is recorded as a new entry in section 15, decision history.
-Implementation: Partial. doc-health runs three body rules over the whole platform corpus; path input, the new rules, the staged-content read and the pre-commit wiring are not built
+Implementation: Partial. doc-health takes paths, runs Convention check and five body rules, and the pre-commit gate judges staged content and refuses on findings or a host error (2026-11-22); classify still runs once per document rather than once for all staged paths, the identity rules wait for the document identity phase, and the registry repairs that write state or delete a file wait for the owner
 Canonical: Yes
 Provenance: Sections 6.2 to 6.5, 10, 11.1, 12 and 13 of the documentation area spec as of 2026-11-07, moved here when the owner split the area into subcomponents on 2026-11-12
 Writer type: Agent draft writer
 Canonical for: The documentation check command, its rules and the documentation commit gate
 Use this when: Adding or changing a documentation body rule, wiring the check into a door or a hook, or reading a check finding
 Do not use this for: Placement rules (Convention), the axes and locate (document identity), or registry lifecycle (knowledge-registry contract)
-Last reviewed: 2026-11-12
+Last reviewed: 2026-11-22
 Related:
 - docs/platform/documentation/spec.md
 - docs/platform/documentation/subcomponents/document-identity/spec.md
@@ -25,7 +25,7 @@ Read with: [documentation area spec](../../spec.md) (the map), [document identit
 
 ## 1. Current Summary
 
-One command checks documentation: doc-health. Today it runs three body rules (links resolve, metadata header, dead backticked paths) over the whole platform corpus, in the test suite only. It reads the working tree, so a commit can pass on edits that are not staged, and the pre-commit hook does not run it.
+One command checks documentation: doc-health. It runs five body rules (links resolve, metadata header, dead backticked paths, verb reference, rule-claim owner) over the whole platform corpus in the test suite, and Convention check plus the same rules over a list of paths. The pre-commit hook runs it on the staged content of the staged documents and refuses the commit on any finding. Before 2026-11-22 it ran three rules over the working tree, in the test suite only.
 
 This subcomponent makes the check the one gate a documentation change passes, wherever the change is made:
 
@@ -96,8 +96,8 @@ The command is doc-health. Given a list of paths, it runs Convention check and e
 | Links resolve | exists | all documents |
 | Metadata header | exists | documents that are not metadata-exempt |
 | Dead backticked paths | exists | canonical documents |
-| Verb reference (6.2) | new | canonical documents |
-| Rule-claim owner (6.3) | new | all platform documents |
+| Verb reference (6.2) | exists | canonical documents |
+| Rule-claim owner (6.3) | exists | all platform documents |
 | Identity rules (6.4) | new, defined by document identity | as document identity says |
 
 ### 6.2. Verb reference rule
@@ -191,12 +191,12 @@ Known findings to sweep when the rules land:
 
 | Behavior | Status | Evidence | Next action |
 |---|---|---|---|
-| One check command over paths | partial | `scripts/doc-health.mjs` checks the whole corpus only | add path input and Convention check |
-| Verb reference rule | planned | DOCOS scout, section 3 | add rule and sweep |
-| Rule-claim owner rule | planned | DOCOS scout, section 7 | add rule and sweep |
-| Staged reads and pre-commit wiring | planned | the Convention spec states doc-health is not in pre-commit | item `p-cd2ejz7wa5` |
+| One check command over paths | done | `e87c4981e` (`scripts/doc-health.mjs`) | — |
+| Verb reference rule | done | `e87c4981e`; sweep `9a132efa9` | — |
+| Rule-claim owner rule | done | `e87c4981e`; sweep `9a132efa9` | — |
+| Staged reads and pre-commit wiring | partial | `9a2545183` (`.githooks/pre-commit`): ACMRD paths read from the index, findings and host errors refuse, placement is one host call | classify is one host call per document that needs it; one call for all staged paths needs `convention classify` to take several paths, a Convention contract change awaiting the owner |
 | Registry lints in `fgos knowledge status` | done | `a16fce064` | — |
-| Lint repairs | planned | panel outcome, section 2 | item `p-cd2ejz7wa5` |
+| Lint repairs | partial | `df4a104dc`: `doc-provisional-aged` parses `updatedAt`, 30-day cutoff, reported as a warning; `docRegistry.topicMaxDocs` in the config standard and schema | registering the 20 unregistered end-user docs and retiring the deleted one are registry writes; removing `.fgos/docs/enduser-docs-index.json` (no reader found) is a deletion; both wait for the owner |
 | Identity rules | planned | document identity 8.4 | document identity phase |
 
 ## 13. Verification
@@ -226,3 +226,4 @@ Done means: `npm test` and `cargo test --workspace` are green apart from tests t
 - 2026-11-12, owner: the documentation area is split into subcomponents; the checks become this spec, and their first phase comes first in the order.
 - 2026-11-12, owner: section 11 accepted: `doc-provisional-aged` reports after 30 days without refusing; the shell wrapper's `--dir` placement is fixed as its own item.
 - 2026-11-12, owner: spec signed.
+- 2026-11-22, implementation: path input, the verb reference and rule-claim owner rules, the staged pre-commit gate and the aging repair are built. The verb and dead-path rules share one exemption test (a pinned commit on the line; classify not canonical or past-state; a `Canonical: No` header), so the dead-path rule now also skips `Canonical: No` documents. The command listing is read from `packages/host-runtime/contracts/command-manifest.json` of the tree under check, the file the host embeds as its `fgos --help --json` answer, so a commit is judged against the verbs it ships. Sweep: retired verbs in canonical documents pin their removing commit or name the current door. Runner rules 1–3 and 5–8 carried the work-state titles over runner bodies that say something else, so they were retitled after their own bodies rather than replaced by citations; work-state keeps its definitions. The 6 documents with invalid YAML frontmatter were already quoted on 2026-11-14 (`51f39d252`); none remains.

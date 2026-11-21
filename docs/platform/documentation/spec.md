@@ -5,7 +5,7 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Map the Knowledge and Documentation Engine (horizon H2): which subcomponent owns which part of writing, locating, admitting and checking maintained documentation, how a write flows through them, and in which order they are built
 Design status: Draft. On 2026-11-12 the owner split the area into subcomponents; this spec became the map and its detailed sections moved to the subcomponent specs. Not signed.
-Implementation: Not started for the new subcomponents; the registry, Convention placement rules, doc-health and the decision index they extend are implemented
+Implementation: doc-checks is built except one-call classify (2026-11-22, see its section 12); the other new subcomponents follow their own specs; the registry, Convention placement rules, doc-health and the decision index they extend are implemented
 Canonical: No (becomes canonical when signed)
 Provenance: First committed 2026-11-06 by the DOCOS lead from the H2 scout report plans/reports/scout-261106-1430-docos-h2-knowledge-documentation-engine-facts.md and the proposal docs/platform/proposals/documentation-system-unification.md; reduced to a map on 2026-11-12
 Writer type: Agent draft writer
@@ -79,7 +79,7 @@ A writer never changes structure to get past a refusal; structure changes come o
 Each step is one phase that ships something checkable on its own. Revised on 2026-11-12 after the measurements: the largest source of new documents is the retrospective writer's one-document-per-item design, so it goes first.
 
 1. **Retrospective writer adds evidence to claim units** (stop 1 of document identity; item `p-ixrbglli5o`), with the cleanup gate accepting the evidence or the admission handoff. Cuts the main source without new technology.
-2. **doc-checks**: path input, the verb and rule-claim rules, staged reads and the pre-commit gate (item `p-cd2ejz7wa5`); the 6 documents with invalid YAML frontmatter.
+2. **doc-checks**: path input, the verb and rule-claim rules, staged reads and the pre-commit gate (item `p-cd2ejz7wa5`); the 6 documents with invalid YAML frontmatter (already quoted in `51f39d252`).
 3. **Locate through pkm**: link `pkm-core` (tag `v0.4.0`, search included since `v0.3.0`) into the `fgos` host behind a locate port, run pkm's index worker as a process and fetch its model at setup, the `fgos doc locate` door (translation, top 10, log), doctor rows for index freshness and the model, and the recall regression set as a repeatable measurement.
 4. **Admission**: effect checks at the doors, the reviewer run, the frame and its weekly ceiling, refusal texts.
 5. **Write door**: the skill, the pointer seed, live templates.

@@ -158,9 +158,9 @@ A basename that identifies a registered kind at a noncanonical location reports 
 
 Enforcement scope for the initial `report`, `plan`, and `journal` rules is deliberately narrow:
 
-- naming checks in pre-commit consider newly added/copied/renamed Markdown files directly under `plans/reports/` and `plans/journals/`; documentation placement checks consider new/copied/renamed paths under `docs/`;
+- in pre-commit, Convention check runs inside the documentation gate of [doc-checks](../documentation/subcomponents/doc-checks/spec.md#65-the-commit-gate): it receives every added, copied, modified or renamed path under `docs/` and every such Markdown file directly under `plans/reports/` and `plans/journals/`, in one host call;
 - nested evidence, per-plan `reports/` directories, fixed names such as `acceptance.md`, and non-Markdown files remain outside the plan/report naming scope; retired-root path refusal has no extension exemption;
-- report, plan and journal naming retain `posture: warn`; documentation placement refusals carry `posture: block` and block newly added/copied/renamed documentation paths in the existing hook;
+- report, plan and journal naming retain `posture: warn`; documentation placement refusals carry `posture: block` and refuse the commit of the staged documentation paths;
 - old files remain visible as counts/examples, while the per-rule cutoff distinguishes newly introduced violations.
 
 ### 4.4 `classify`
@@ -268,7 +268,7 @@ Conformance of this source repository is a repository test, not a doctor row: `t
 - Pre-cutoff `warn`-posture naming violations: `passed: true` with counts and at most three examples.
 - Any violation introduced after its rule's per-rule cutoff: `passed: false`, including for initial `warn` rules.
 - Missing/old host: `passed: true` with a pass-skip reason; never a guessed local implementation.
-- The pre-commit hook preserves naming warnings but refuses native documentation violations carrying block posture; old/missing-host pass-skip behavior remains explicit. Doctor fails for native block posture without applying the historical naming cutoff.
+- The pre-commit hook preserves naming warnings but refuses native documentation violations carrying block posture. A missing host skips the check with a warning; in an activated workspace a host error or an old host refuses the commit ([doc-checks 6.5](../documentation/subcomponents/doc-checks/spec.md#65-the-commit-gate)). Doctor fails for native block posture without applying the historical naming cutoff.
 - Phase 05 applies packaged internal rules only in the fgOS source repository. Overlay-aware project behavior is deferred with Q13 because Plan B does not load overlays.
 
 The release containing the native verb must be staged and activated before plain `fgos` can enforce it. Merging source alone does not refresh an activated release.
@@ -333,6 +333,10 @@ The merge-by-rule-id semantic is reserved, but overlay location, setup merge, do
 | Always-loaded contributor guidance | `461e12d12` |
 | Status, caller notes, verification evidence, and changelog | `docs(convention): record implemented Convention contracts` |
 
+### 2026-11-22 — The pre-commit call moves into the documentation gate
+
+Following the owner's commit-gate answer of 2026-11-06 ([doc-checks 6.5](../documentation/subcomponents/doc-checks/spec.md#65-the-commit-gate)), the hook no longer calls Convention on its own: doc-health runs Convention check once over the staged documentation paths, now including modified ones, together with the body rules. Block posture still refuses and warn posture still warns; a host error in an activated workspace now refuses instead of pass-skipping.
+
 ## 14. Caller migration
 
 - Keep `resolveRepoRoot`, `resolveMainCheckoutRoot`, `resolveFgosDir`,
@@ -380,4 +384,4 @@ post-implementation full-suite runs; no Convention path appears in its stack.
 
 ## Documentation body validation
 
-Convention owns path naming and placement. The doc-health body checker, `scripts/doc-health.mjs`, owns body health in three rules, all strict. Links: `--repo-root <tree>` checks every local link and anchor in platform Markdown, including Related and clickable historical-source references, with no status or history exemptions; code spans and fences remain literal; it reuses `list-doc-anchors.mjs`. Metadata: every platform Markdown file that `fgos convention classify` does not report as `metadataExempt` carries the governance baseline header directly under its H1 with every field. Dead references: in a document that classify reports as `canonical`, outside the kinds `history`, `decision` and `verification` that record past state, every backticked repo-root path exists at HEAD unless the same line pins a commit sha; fenced blocks, patterns and `<placeholders>` are not references. doc-health asks the native host for each classification, so path kind and exemption stay in this one rule file. Its enforcing door is the live repository self-check in `test/scripts/doc-health.test.mjs`, run by the normal test suite. The synthetic cases in that file own the link grammar, the metadata rule and the dead-reference rule; the live case is one wiring proof. It is not duplicated in pre-commit. This checker adds no configuration key, environment variable, external tool or new doctor registry id.
+Convention owns path naming and placement. The doc-health body checker, `scripts/doc-health.mjs`, owns body health in three rules, all strict. Links: `--repo-root <tree>` checks every local link and anchor in platform Markdown, including Related and clickable historical-source references, with no status or history exemptions; code spans and fences remain literal; it reuses `list-doc-anchors.mjs`. Metadata: every platform Markdown file that `fgos convention classify` does not report as `metadataExempt` carries the governance baseline header directly under its H1 with every field. Dead references: in a document that classify reports as `canonical`, outside the kinds `history`, `decision` and `verification` that record past state, every backticked repo-root path exists at HEAD unless the same line pins a commit sha; fenced blocks, patterns and `<placeholders>` are not references. doc-health asks the native host for each classification, so path kind and exemption stay in this one rule file. It also runs the verb reference and rule-claim owner rules, takes a list of paths and runs Convention check on them ([doc-checks](../documentation/subcomponents/doc-checks/spec.md)). Its enforcing doors are the live repository self-check in `test/scripts/doc-health.test.mjs`, run by the normal test suite, and the pre-commit documentation gate, which runs it on the staged content of the staged documents. The synthetic cases in that file own the rules; the live case and one hook case are the wiring proofs. This checker adds no configuration key, environment variable, external tool or new doctor registry id.
