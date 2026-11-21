@@ -153,11 +153,34 @@ pub struct ItemResult {
     pub content: String,
 }
 
-/// Validates whether an id matches `p-<10 base32>`.
+/// Validates a freshly minted backlog id: `p-<10 base32>`. New items and new files must carry this shape, which only
+/// the mint door produces.
 pub fn is_valid_backlog_id(id: &str) -> bool {
-    id.starts_with("p-")
-        && id.len() == 12
+    id.len() == 12
+        && id.starts_with("p-")
         && id[2..].chars().all(|c| matches!(c, 'a'..='z' | '2'..='7'))
+}
+
+/// A source entry that names a backlog item, well formed or not: anything starting `p-` (so a malformed `p-abc` is
+/// reported as an unknown source) or a pre-minting id shape.
+fn names_backlog_item(src: &str) -> bool {
+    src.starts_with("p-") || is_legacy_backlog_id(src)
+}
+
+/// Validates the id of an item that already exists: the minted shape, or one of the shapes rows carried before
+/// minting (`p-<8 hex>`, `STR<n>`, `wf-<words>`), which keep their ids. Accepted only when reading existing files.
+pub fn is_legacy_backlog_id(id: &str) -> bool {
+    let hex = id.len() == 10
+        && id.starts_with("p-")
+        && id[2..].chars().all(|c| matches!(c, '0'..='9' | 'a'..='f'));
+    let str_row =
+        id.len() > 3 && id.starts_with("STR") && id[3..].chars().all(|c| c.is_ascii_alphanumeric());
+    let wf_row = id.len() > 3
+        && id.starts_with("wf-")
+        && id[3..]
+            .chars()
+            .all(|c| matches!(c, 'a'..='z' | '0'..='9' | '-'));
+    is_valid_backlog_id(id) || hex || str_row || wf_row
 }
 
 /// Validates whether an id matches `ds-<10 base32>`.
@@ -237,7 +260,7 @@ pub fn parse_backlog_item(rel_path: &Path, text: &str) -> Result<BacklogItem, Po
     let id = scalar("id").ok_or_else(|| {
         PortfolioRefusal::KeyMissing(format!("{path_str}: missing required key 'id'"))
     })?;
-    if !is_valid_backlog_id(&id) {
+    if !is_legacy_backlog_id(&id) {
         return Err(PortfolioRefusal::InvalidId(format!(
             "{path_str}: invalid backlog id '{id}'"
         )));
@@ -465,7 +488,7 @@ pub fn format_backlog_item(item: &BacklogItemFields) -> Result<String, Portfolio
         done_when,
         notes,
     } = *item;
-    if !is_valid_backlog_id(id) {
+    if !is_legacy_backlog_id(id) {
         return Err(PortfolioRefusal::InvalidId(format!(
             "invalid backlog id '{id}'"
         )));
@@ -526,7 +549,12 @@ pub fn create_item(
     req: &CreateItemRequest,
 ) -> Result<ItemResult, PortfolioRefusal> {
     let id = match &req.id {
-        Some(id) => id.clone(),
+        Some(id) if is_valid_backlog_id(id) => id.clone(),
+        Some(id) => {
+            return Err(PortfolioRefusal::InvalidId(format!(
+            "invalid backlog id '{id}': a new item takes a minted id (fgos identity mint backlog)"
+        )))
+        }
         None => random(RandomKind::Backlog)?,
     };
 
@@ -852,7 +880,7 @@ pub fn check_portfolio(
 
     for d in &discussions {
         for src in &d.source {
-            if src.starts_with("p-") {
+            if names_backlog_item(src) {
                 if !item_ids.contains(src.as_str()) {
                     errors.push(format!(
                         "unknown-source: discussion {} cites non-existent backlog item '{}'",
@@ -870,7 +898,7 @@ pub fn check_portfolio(
 
     for p in &plans {
         for src in &p.source {
-            if src.starts_with("p-") {
+            if names_backlog_item(src) {
                 if !item_ids.contains(src.as_str()) {
                     errors.push(format!(
                         "unknown-source: plan {} cites non-existent backlog item '{}'",
@@ -902,7 +930,7 @@ pub fn check_portfolio(
 
     // 6. New discussion or plan must cite at least one backlog item
     for d in &discussions {
-        let has_backlog = d.source.iter().any(|s| s.starts_with("p-"));
+        let has_backlog = d.source.iter().any(|s| names_backlog_item(s));
         if !has_backlog {
             let is_new = options.strict || options.new_files.contains(&d.rel_path);
             let msg = format!(
@@ -918,7 +946,7 @@ pub fn check_portfolio(
     }
 
     for p in &plans {
-        let has_backlog = p.source.iter().any(|s| s.starts_with("p-"));
+        let has_backlog = p.source.iter().any(|s| names_backlog_item(s));
         if !has_backlog {
             let is_new = options.strict || options.new_files.contains(&p.rel_path);
             let msg = format!(

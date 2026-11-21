@@ -99,6 +99,15 @@ test('a planner and a shaper name resolve to the feature discussion, with or wit
   assert.throws(() => discussionOfHead(root, 'shaper', 'no-file', ports), { code: 'discussion-not-found' });
 });
 
+test('a migrated discussion directory resolves by its topic and keeps its id-named path', (t) => {
+  const root = discussionsIn(t, { 'plans/discussions/ds-abcdefghij-account-lease': true, 'plans/discussions/ds-klmnopqrst-execution-fanout': true });
+  const ports = { handle: 'proj' };
+  const want = { kind: 'discussion', dir: 'ds-abcdefghij-account-lease', path: 'plans/discussions/ds-abcdefghij-account-lease/DISCUSSION.md' };
+  assert.deepEqual(discussionOfHead(root, 'planner', 'proj-account-lease', ports), want);
+  assert.deepEqual(discussionOfHead(root, 'shaper', 'account', ports), want);
+  assert.deepEqual(discussionOfHead(root, 'shaper', 'ds-abcdefghij', ports), want);
+});
+
 test('an unbound discussion name is not found, a prefix of two is ambiguous, an exact name wins over longer ones', (t) => {
   const root = discussionsIn(t, { 'docs/discussions/dispatch-a': true, 'docs/discussions/dispatch-b': true, 'docs/discussions/fan': true, 'docs/discussions/fan-out': true });
   const ports = { handle: 'proj' };

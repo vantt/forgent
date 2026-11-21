@@ -164,8 +164,14 @@ export async function planOfHead(projectRoot, persona, name, ports = {}) {
 // ---- the task of a head: a plan for a lead, a discussion for a planner or shaper ------------------------
 
 const DISCUSSION_PERSONAS = new Set(['planner', 'shaper']);
-const DISCUSSION_ROOTS = ['docs/discussions', 'plans/discussions'];
+const DISCUSSION_ROOTS = ['plans/discussions', 'docs/discussions'];
 const DISCUSSION_FILE = 'DISCUSSION.md';
+const DISCUSSION_ID_PREFIX = /^ds-[a-z2-7]{10}-/;
+
+/** The topic of a discussion directory: its name without the `ds-<id>-` prefix a migrated discussion carries. */
+function topicOfDiscussionDir(dir) {
+  return dir.replace(DISCUSSION_ID_PREFIX, '');
+}
 
 /** The feature directories of `root` (a path relative to the project) that hold a DISCUSSION.md. */
 function defaultListDiscussionDirs(projectRoot, root) {
@@ -188,9 +194,13 @@ export function discussionOfHead(projectRoot, persona, name, ports = {}) {
   const list = ports.listDiscussionDirs ?? defaultListDiscussionDirs;
   const found = [];
   for (const root of DISCUSSION_ROOTS) {
-    for (const dir of list(projectRoot, root)) if (typeof key === 'string' && key !== '' && dir.startsWith(key)) found.push({ dir, root });
+    for (const dir of list(projectRoot, root)) {
+      if (typeof key !== 'string' || key === '') continue;
+      const topic = topicOfDiscussionDir(dir);
+      if (dir.startsWith(key) || topic.startsWith(key)) found.push({ dir, root, topic });
+    }
   }
-  const exact = found.filter((f) => f.dir === key);
+  const exact = found.filter((f) => f.dir === key || f.topic === key);
   const hits = exact.length > 0 ? exact : found;
   if (hits.length === 0) throw new HeadPlanError('discussion-not-found', `no discussion directory starts with ${JSON.stringify(key)} under ${DISCUSSION_ROOTS.join(' or ')}`);
   if (hits.length > 1) throw new HeadPlanError('task-ambiguous', `${hits.length} discussions start with ${JSON.stringify(key)}: ${hits.map((h) => `${h.root}/${h.dir}`).join(', ')}`);

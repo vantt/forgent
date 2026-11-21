@@ -43,9 +43,12 @@ pub mod mailbox_verbs;
 #[path = "mailbox_verbs_unsupported.rs"]
 pub mod mailbox_verbs;
 pub mod metrics_sources;
+pub mod migrate;
 pub mod observe_declarations;
 pub mod observe_query;
 pub mod observe_sources;
+#[allow(dead_code)]
+pub mod portfolio;
 pub mod questions;
 #[cfg(unix)]
 pub mod questions_hook;

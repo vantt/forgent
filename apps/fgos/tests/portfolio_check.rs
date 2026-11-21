@@ -53,6 +53,20 @@ Pre-plan detail.
     assert_eq!(item.why, "Need unified portfolio schema.");
     assert_eq!(item.done_when, "Check passes.");
     assert_eq!(item.notes, "Pre-plan detail.");
+
+    // Rows written before minting keep their ids (convention rule `backlog-id`).
+    for (legacy, file) in [
+        ("p-d2dc4f2e", "plans/backlog/p-d2dc4f2e-item.md"),
+        ("STR27", "plans/backlog/STR27-item.md"),
+        (
+            "wf-coding-cutover",
+            "plans/backlog/wf-coding-cutover-item.md",
+        ),
+    ] {
+        let legacy_text = text.replace("p-rw5iadsp2p", legacy);
+        let parsed = parse_backlog_item(Path::new(file), &legacy_text).unwrap();
+        assert_eq!(parsed.id, legacy);
+    }
 }
 
 #[test]
@@ -496,6 +510,51 @@ created: 2026-11-20
         .iter()
         .any(|w| w.contains("missing-backlog-source")));
 
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn a_new_item_takes_a_minted_id_and_a_malformed_plan_source_is_unknown() {
+    let dir = temp_dir("portfolio-new-id-and-source");
+    for id in ["STR999", "wf-x", "p-deadbeef"] {
+        let req = CreateItemRequest {
+            id: Some(id.to_string()),
+            slug: Some("x".to_string()),
+            title: "T".to_string(),
+            status: None,
+            priority: None,
+            area: None,
+            created: None,
+            why: None,
+            done_when: None,
+            notes: None,
+        };
+        assert!(
+            matches!(create_item(&dir, &req), Err(PortfolioRefusal::InvalidId(_))),
+            "{id} must not be accepted for a new item"
+        );
+    }
+
+    let plan_dir = dir.join("plans").join("some-plan");
+    fs::create_dir_all(&plan_dir).unwrap();
+    fs::write(
+        plan_dir.join("plan.md"),
+        "---\ncontract: plan-v1\ntitle: P\nstatus: draft\nsource:\n  - p-abc\n---\n",
+    )
+    .unwrap();
+    let report = check_portfolio(
+        &dir,
+        &CheckOptions {
+            check_index: false,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert!(
+        report.errors.iter().any(|e| e.contains("unknown-source")),
+        "{:?}",
+        report.errors
+    );
     let _ = fs::remove_dir_all(&dir);
 }
 

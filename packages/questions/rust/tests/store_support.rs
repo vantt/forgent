@@ -118,7 +118,7 @@ pub fn checkout() -> Checkout {
     for (path, text) in [
         ("plans/p/plan.md", "plan\n"),
         ("plans/p/phase-01-x.md", "phase\n"),
-        ("docs/discussions/d/QUESTIONS.md", "q\n"),
+        ("plans/discussions/ds-aaaaaaaaaa-d/QUESTIONS.md", "q\n"),
     ] {
         let file = root.join(path);
         std::fs::create_dir_all(file.parent().unwrap()).unwrap();
