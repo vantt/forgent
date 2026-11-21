@@ -612,7 +612,7 @@ Ba bản ghi, ba câu hỏi, không giẫm chân:
 |---|---|---|
 | `docs/platform/system-overview/spec.md` + area specs | hệ **LÀM GÌ** (BA-grade, tech-agnostic) | entity nghiệp vụ, luồng nghiệp vụ |
 | `docs/platform/architecture-map.md` (file này) | code **Ở ĐÂU** + ranh giới **KÝ GÌ** | tầng, tag, hai sổ đăng ký |
-| `docs/backlog.md` | **SẮP LÀM GÌ** | PBI — mọi row `planned` §6 phải trỏ về một PBI ở đây |
+| `plans/backlog.md` | **SẮP LÀM GÌ** | PBI — mọi row `planned` §6 phải trỏ về một PBI ở đây |
 | `docs/platform/documentation/history/id-systems-audit.md` (nguồn) / Phụ lục B (file này, bản tóm tắt) | mọi id/tên gọi **KÝ HIỆU GÌ** (prefix, hình dạng, hệ nào sống ở đâu) | sổ đăng ký 13 hệ id/naming (STR47) |
 
 Entity xuất hiện ở cả hai bản đồ cross-link qua contract: work item ↔ CTR002 ·
@@ -755,7 +755,7 @@ nghĩa/ranh giới/maturity của bất kỳ contract nào.
    câu hỏi mở), theo đúng nghi thức đổi bản đồ của chính nó (§9 luật 5: qua
    decision record + nâng version, không sửa ngầm) — nâng v0.4 → v0.5.
 4. **Mọi nơi khác cite `C1`-`C9`** (specs, `platform-foundations.md`,
-   `docs/decisions/0000-index.md` (deleted in 4722361ae), `docs/backlog.md`) đổi theo cùng quy ước,
+   `docs/decisions/0000-index.md` (deleted in 4722361ae), `plans/backlog.md`) đổi theo cùng quy ước,
    trừ các chỗ đã xác nhận không phải citation của registry này (ví dụ một
    bảng verdict nội bộ không liên quan dùng trùng ký hiệu `C1`/`C2`/`C3`) —
    những chỗ đó giữ nguyên, không đổi.
@@ -791,7 +791,7 @@ chạy song song, không thay thế bee cho tới ngưỡng-có-tên). Sáu hư�
 - STR57 — Story (đổi tên khỏi "PBI") `P<n>` → `STR<n>`
 - STR58 — script `next-doc-id` cho họ "next free integer thủ công"
 
-Cả sáu đều mang trạng thái `done` trong `docs/backlog.md`. Nhóm bee (#7-#10)
+Cả sáu đều mang trạng thái `done` trong `plans/backlog.md`. Nhóm bee (#7-#10)
 — D-hex/D-local shape collision, cell-id, feature slug — chưa từng được bàn
 tới điểm chốt trong bản DRAFT 2026-07-18. Record này đóng audit: khoá hướng
 cho #7-#10, sửa `id-systems-audit.md` khỏi các chỗ đã trôi khỏi thực tế
@@ -839,7 +839,7 @@ gốc của STR47 — giữ đa hệ có chủ đích hay hợp nhất.
 
 ###### Hệ quả
 
-- **STR47 đóng** (`docs/backlog.md`: `in-flight` → `done`) — không có
+- **STR47 đóng** (`plans/backlog.md`: `in-flight` → `done`) — không có
   migration mới nào mở ra từ record này; mọi migration mà audit từng đề
   xuất (#1, #3, #4, #5, #6) đã thi công xong trước record này qua
   STR53-STR58.

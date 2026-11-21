@@ -99,7 +99,7 @@ All verbs are planned. Flags, defaults and contracts live in `packages/supervisi
 
 A confined caller reaches every socket verb through one host rule: the host hands a confined (`FGOS_CONFINED=1`) call of a verb named in the head-request contract to the Node payload, whose one arm sends it through the head request (PS-20). Long verbs answer with a ticket because request verbs are bounded to 60 s and served one at a time.
 
-Personas and grants: shaper gains writes `docs/discussions` and verb `land`; secretary, planner, supervisor and lead gain `land`. Only a lead lands a branch; every other persona lands `--paths` only, and only inside its grant writes. The lead's grant also holds `worktree create`.
+Personas and grants: shaper gains writes `plans/discussions` and verb `land`; secretary, planner, supervisor and lead gain `land`. Only a lead lands a branch; every other persona lands `--paths` only, and only inside its grant writes. The lead's grant also holds `worktree create`.
 
 ### 4.1 Coordination powers of the secretary and the supervisor
 
@@ -168,7 +168,7 @@ Dated 2026-11-18, from [the plan](../../../plans/261118-1045-project-supervisor/
 - PS-11: head names stay within 32 characters by cutting handle and plan directory; limits live in one contract read by Rust and Node.
 - PS-12: lane count is held machine-scope lane locks taken by a top-level worker seat; a head and a nested dispatch take none; the Work-item slot count is retired (L10).
 - PS-13: the watcher timer fires at the active interval and a tick with no `watcher-active` row exits early until the idle interval passes; `watcher.enabled` is global-only.
-- PS-14: shaper gains writes `docs/discussions` and verb `land`; secretary, planner, supervisor and lead gain `land`; only a lead lands a branch.
+- PS-14: shaper gains writes `plans/discussions` and verb `land`; secretary, planner, supervisor and lead gain `land`; only a lead lands a branch.
 - PS-15: the discussion source reads the `discussion: <state>` marker from the trunk's git history and emits `fgos.discussion.status` on each flip.
 - PS-16: verb names follow the session-verb plan (`session start|stop|rotate`), not `head ...`.
 - PS-17: the lead's grant holds request verb `worktree create`, since `fgos run --writes` needs a linked worktree.
@@ -184,7 +184,7 @@ Dated 2026-11-18, from [the plan](../../../plans/261118-1045-project-supervisor/
 - The commit-time footprint check reads only the frontmatter footprint of the tree being committed, before the push.
 - The supervisor grant holds `session write` for its own backlog file, so a confined supervisor edits it through its supervisor and not through a shell.
 
-- Secretary and supervisor powers (shaped with the owner 2026-11-19, in [the discussion](../../discussions/secretary-supervisor-powers/DISCUSSION.md), which holds each ground, the rejected options and the owner's words): Miu orders and stops sessions and raises work on the queue; the supervisor carries on and goes on site only on a watcher signal, with the pane as the last of three means; coordination acts are State on the queue and their evidence is Log in Observe, pruned when settled; defaults, ceilings and the winner order are settled there too. Section 4.1 holds the resulting verbs.
+- Secretary and supervisor powers (shaped with the owner 2026-11-19, in [the discussion](../../../plans/discussions/ds-nmk2mz6vkk-secretary-supervisor-powers/DISCUSSION.md), which holds each ground, the rejected options and the owner's words): Miu orders and stops sessions and raises work on the queue; the supervisor carries on and goes on site only on a watcher signal, with the pane as the last of three means; coordination acts are State on the queue and their evidence is Log in Observe, pruned when settled; defaults, ceilings and the winner order are settled there too. Section 4.1 holds the resulting verbs.
 
 - A lead writes `lead: <its role>` into the plan with `status: running` in one `land --paths` commit; `supervisor plans` reports `leadLive` from that role's live holder in this project, and holds a running plan with no `lead` (`leadUnnamed`, never restarted), because a non-head lead's role never matched the head name and the supervisor nearly started a second lead.
 

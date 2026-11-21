@@ -142,7 +142,7 @@ có bằng chứng sống, không phải bị che giấu — flip khi phía kia 
 - `apps/fgos/src/wiring/init.rs` — bước `init` gọi detection.
 - `test/e2e/coexistence-canary.test.mjs` — canary pin known-gap + footprint +
   nhường-nhịn.
-- `docs/backlog.md` (STR10) — trạng thái backlog, trỏ tới hồ sơ xưởng.
+- `plans/backlog.md` (STR10) — trạng thái backlog, trỏ tới hồ sơ xưởng.
 
 
 ## Source Metadata

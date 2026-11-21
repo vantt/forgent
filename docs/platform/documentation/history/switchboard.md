@@ -66,7 +66,7 @@ second operative authority router. Source metadata remains historical provenance
 |---|---|---|---|
 | docs/platform/documentation/operations/portals/docs-portal.md | retained | maintained-authority | Top-level overview after coordinated reading-map merge. |
 | docs/platform/architecture-map.md | retained | maintained-authority | Full system map; the component-boundary file is its focused boundary entry. |
-| docs/backlog.md | non-authority | hand-maintained | Hand-maintained product backlog; no renderer exists, and its header does not establish an event projection. |
+| plans/backlog.md | non-authority | hand-maintained | Hand-maintained product backlog; no renderer exists, and its header does not establish an event projection. |
 | docs/platform/coexistence/spec.md | retained | maintained-authority | Non-interference doctrine, carried path. |
 | docs/platform/packaging-distribution/history/distribution-vision.md | non-authority | retained-source | Historical vision; current navigation through Packaging-Distribution portal. |
 | docs/platform/governance.md | retained | maintained-authority | Canonical types/authority/placement/lifecycle governance. |

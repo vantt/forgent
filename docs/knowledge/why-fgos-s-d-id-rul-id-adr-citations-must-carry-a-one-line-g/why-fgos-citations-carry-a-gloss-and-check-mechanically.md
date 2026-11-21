@@ -50,7 +50,7 @@ rather than the two items building the same thing twice.
 
 Two new finding types (a bare id with no gloss; a `D`-local id cited
 outside its own `CONTEXT.md`) were added to the script that already owned
-the exact scan surface this item needed (`docs/backlog.md` +
+the exact scan surface this item needed (`plans/backlog.md` +
 `docs/specs/*.md`, ADR/bare-id extraction), reusing its file-walk and
 id-extraction machinery. `check-decision-supersession.mjs` was
 deliberately left untouched — confirmed by reading both scripts directly,
@@ -132,8 +132,8 @@ A hand-verified audit (`tsk-3x8`) found the checker's baseline
 `check-decision-codes.mjs` it was supposed to follow. Inserting or
 deleting a single line anywhere earlier in a baselined file shifts every
 finding below it — each one then reads as "new," turning `npm test` red.
-Proven directly: one inserted comment line in `docs/backlog.md` flipped
-"0 new findings" to 64. `docs/backlog.md` alone is touched in 152 of 200
+Proven directly: one inserted comment line in `plans/backlog.md` flipped
+"0 new findings" to 64. `plans/backlog.md` alone is touched in 152 of 200
 recent commits — this was near-certain to trigger soon, not a remote edge
 case.
 
@@ -230,5 +230,5 @@ person, not bugs a code pass can resolve.
 .agents/skills/_shared/citation-format.md && grep -qE '<ID>.*one-line
 gloss' .agents/skills/_shared/citation-format.md && node
 scripts/check-decision-citation-drift.mjs --baseline <path>
---decisions-dir docs/decisions --backlog docs/backlog.md --specs-dir
+--decisions-dir docs/decisions --backlog plans/backlog.md --specs-dir
 docs/specs --skills-dir .agents/skills --skills-dir plugins/fgOS/skills`.

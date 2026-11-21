@@ -19,10 +19,10 @@ Supersedes: The mapped source location at atomic cutover
 Superseded by: None
 ```
 
-Tài liệu này trả lời `docs/backlog.md` STR47. Bảng inventory trích thẳng từ
+Tài liệu này trả lời `plans/backlog.md` STR47. Bảng inventory trích thẳng từ
 code/docs thật (file:line), không suy đoán. Mọi migration mà audit này chốt
 hướng (#1, #3, #4, #5, #6) đã thi công xong qua STR53/STR55/STR57/STR56/STR54
-(`docs/backlog.md`, mục Done/Declined). Các hệ còn lại của bee (#7-#10) chốt
+(`plans/backlog.md`, mục Done/Declined). Các hệ còn lại của bee (#7-#10) chốt
 hướng "giữ nguyên, chỉ tài liệu hoá ranh giới" — quyết định đầy đủ + bằng
 chứng ở `docs/decisions/0017-dong-audit-he-id-ten-goi.md`.
 
@@ -40,7 +40,7 @@ lúc thảo luận, gộp vào audit vì cùng loại vấn đề.
 **Khung xét trọng số (thảo luận 2026-07-18):** decision `0004`
 (`repo/docs/decisions/0004-pham-vi-va-non-goal.md`) đã khoá: fgOS chạy
 **song song, không thay thế** harness phát triển (bee) cho tới khi chạm
-"ngưỡng-có-tên". STR50 (`docs/backlog.md`) là chính bước mở ngưỡng đó — induct
+"ngưỡng-có-tên". STR50 (`plans/backlog.md`) là chính bước mở ngưỡng đó — induct
 skill-workflow của bee vào fgOS. Hệ quả: **hệ id của bee (#7-#10) là giàn
 giáo TẠM THỜI** — dùng trong giai đoạn xây fgOS, không cần đầu tư sâu; **hệ
 id của fgOS (#1-#6) là SẢN PHẨM VĨNH VIỄN**, và về sau chính fgOS (không cần
@@ -55,7 +55,7 @@ là căn cứ cho quyết định "giữ nguyên, chỉ tài liệu hoá" ở #7
 |---|---|---|---|---|
 | 1 | `work.id` (Task — chính danh work item) | **`tsk-<hash>`** (gốc, chữ thường + gạch nối), **`tsk-<hash>-<n>`** (con, đệ quy theo lineage `parent`) — không còn slug title trong id | STR53 — done | `repo/src/intake/classify.mjs:115-128` (`generateId`), `repo/src/state/work.mjs:22` (`ID_PATTERN`), `repo/src/intake/decompose.mjs:245` (sinh id con) |
 | 2 | `kind` work-item | enum tự do (bug/feature/chore/docs, mặc định `task`) | Không đổi | `repo/src/intake/classify.mjs:48-53,79-80` |
-| 3 | `P<n>` → **Story** `STR<n>` (đổi tên khỏi "PBI") | `STR<n>` (vd `STR47`) | STR57 — done | `.claude/skills/bee-scribing/references/scribing-reference.md:293`; cột "Story" — `repo/docs/backlog.md` |
+| 3 | `P<n>` → **Story** `STR<n>` (đổi tên khỏi "PBI") | `STR<n>` (vd `STR47`) | STR57 — done | `.claude/skills/bee-scribing/references/scribing-reference.md:293`; cột "Story" — `repo/plans/backlog.md` |
 | 4 | ADR `NNNN-slug.md` | tên file đầy đủ giữ nguyên; trích dẫn rút gọn = `ADR<n>` (vd `ADR0013`), không bare số | STR55 — done | `repo/docs/decisions/0000-index.md:12-16` |
 | 5 | `R#` business rule | `RUL<n>` (vd `RUL042`), không unique toàn cục — trích dẫn ngoài spec gốc kèm tên area (vd `RUL42 (runner)`) | STR56 — done (83 citation ở `runner.md`, 0 bare `R#` còn lại) | `repo/docs/specs/runner.md` |
 | 6 | `C1`-`C9` contract | `CTR<n>` 3-digit zero-pad (vd `CTR009`) | STR54 — done, decision `ADR0015` | `repo/docs/architecture-map.md` §7 |
@@ -178,7 +178,7 @@ Cả 5 câu hỏi mở của bản DRAFT 2026-07-18 đã chốt — xem `docs/de
 
 ---
 
-Nguồn: `repo/docs/backlog.md` STR47 (+ STR53-STR58) + thảo luận 2026-07-18 +
+Nguồn: `repo/plans/backlog.md` STR47 (+ STR53-STR58) + thảo luận 2026-07-18 +
 đóng audit 2026-07-27 (`docs/decisions/0017-dong-audit-he-id-ten-goi.md`). Bằng chứng đọc trực
 tiếp: `src/intake/classify.mjs`, `src/intake/decompose.mjs`,
 `src/state/work.mjs`, `src/state/store.mjs`, `.bee/bin/lib/cells.mjs`,

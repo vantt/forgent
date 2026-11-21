@@ -71,7 +71,7 @@ sweep and the children aren't dispatched yet in the same run.
 
 Both cases: verify green, one real commit on the item's own branch
 (`fgw/<id>`), worktree cleaned up after. A difference between the two cases
-is a real gap — file it as a new `proposed` row in `docs/backlog.md`, don't
+is a real gap — file it as a new `proposed` row in `plans/backlog.md`, don't
 silently absorb it.
 
 ## Cleanup after a replay

@@ -7,7 +7,7 @@ area-scoped-reset-per-file (`RUL<n>`, resets inside each
 `docs/history/<feature>/CONTEXT.md`). That 3-tier shape is correct and
 stays as-is — upstream project `beegog` independently converged on the
 identical structure, recorded in
-`docs/discussions/self-contained-id-references/DISCUSSION.md`. What was
+`plans/discussions/ds-edffrgemiq-self-contained-id-references/DISCUSSION.md`. What was
 missing was a single, canonical rule for how to CITE one of these ids
 from anywhere other than its own home file — this fragment is that rule
 (one rule, one home, learned from `beegog`'s own prompt-writing standard
@@ -93,7 +93,7 @@ companion tool, see
 design record) detects two finding kinds relevant to this rule —
 `bare-citation` (an `ADR`/`RUL` id with no qualifying gloss) and
 `d-local-outside-home` (a `D<n>` id in any file that is not its own
-`CONTEXT.md`) — across `docs/backlog.md`, recursive `docs/platform/**/spec.md` (including subcomponents), retained legacy specs when present, and any
+`CONTEXT.md`) — across `plans/backlog.md`, recursive `docs/platform/**/spec.md` (including subcomponents), retained legacy specs when present, and any
 `--skills-dir` root given to it. It ratchets against a checked-in
 baseline (`scripts/check-decision-citation-drift.baseline.json`): a
 citation already known at the time the baseline was generated stays

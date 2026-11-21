@@ -31,5 +31,5 @@ direct grep finds no such exclusion). A new test
 structurally rather than relying on manual inspection, so a future
 regression would be caught automatically rather than requiring another
 live dogfood discovery. Backlog row `p-4b7dd2ed` was closed through the
-real fgOS lifecycle (`docs/backlog.md` updated) rather than staying a
+real fgOS lifecycle (`plans/backlog.md` updated) rather than staying a
 static, untracked row.

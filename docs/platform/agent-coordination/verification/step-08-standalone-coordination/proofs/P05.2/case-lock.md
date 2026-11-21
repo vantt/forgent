@@ -21,7 +21,7 @@ project's own locked mission boundary (`AGENTS.md`'s D-ADR0035: fgOS
 exists to develop OTHER projects and run real business workflows, not to
 develop itself); (2) herdr-gateway's terminal-scrolling question —
 scouted and rejected because it turned out to be extensively
-pre-analyzed already (`docs/backlog.md` PBI-056/057/058/059/060, a
+pre-analyzed already (`plans/backlog.md` PBI-056/057/058/059/060, a
 dedicated plan at `plans/260811-1426-terminal-dom-renderer-swap/`, and a
 prior distillery-consult report), which would have made the case not
 genuinely "unobserved" and defeated R5's own bias-avoidance purpose.
@@ -127,7 +127,7 @@ synthesis, never silently accepted as if it satisfied the question.
 
 ### Confirmed absence of prior analysis
 
-`grep`-searched `docs/backlog.md`, `PRD.md`, `README.md`, and
+`grep`-searched `plans/backlog.md`, `PRD.md`, `README.md`, and
 `plans/` at the frozen commit for `editor`/`editable`/`edit mode`: no
 existing plan, backlog item, or design discussion addresses adding
 editing capability. This case is genuinely unobserved by prior work,

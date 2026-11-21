@@ -143,7 +143,7 @@ exploring` edge). Full mechanics: `references/verify-sync-and-gap.md`.
 A planner started on `discussion-settled` has no claimed item and no `docs/history/<feature>/CONTEXT.md`. Skip the
 item steps (bootstrap, `Mode:` lane, split specs, verify sync) and:
 
-1. Read the settled discussion (`docs/discussions/<dir>/`) or the shaping report its marker names.
+1. Read the settled discussion (`plans/discussions/<dir>/`) or the shaping report its marker names.
 2. Write `plans/<dir>/plan.md` and its phase files per `../../../core/skills/_shared/plan-contract.md`; take `<dir>`
    from `fgos convention path --kind plan`.
 3. Run `node scripts/plan-contract-check.mjs --plan plans/<dir>` and fix every error.

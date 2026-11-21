@@ -124,6 +124,6 @@ that future re-derive ships — but since the item that ships it doesn't
 exist yet, there's nothing to attach a dependency to today.
 
 Full decision record: `docs/history/tsk-3xd-decompose-child-directive-prose/CONTEXT.md`
-(D1-D4). Broader context: `docs/discussions/two-layer-dispatch/DISCUSSION.md`
+(D1-D4). Broader context: `plans/discussions/ds-gdw3t3usm5-two-layer-dispatch/DISCUSSION.md`
 (`tsk-2t6`), which names this item as a prerequisite before evaluating a
 separate exec-packet layer.

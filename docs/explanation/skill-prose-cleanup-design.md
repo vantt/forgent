@@ -42,7 +42,7 @@ must never appear at all) depends on **what role the artifact is
 produced for**, not which directory it happens to live in:
 
 - **Process/build-time artifacts** (`docs/history`, `docs/decisions`,
-  `docs/backlog.md`, a work item's own text/`CONTEXT.md`, `docs/specs`):
+  `plans/backlog.md`, a work item's own text/`CONTEXT.md`, `docs/specs`):
   keep the existing `tsk-37i` rule — `ADR`/`RUL` ids get a one-line gloss
   at the citing location, D-local ids never leave their home
   `CONTEXT.md`. See `docs/how-to/fix-bare-citation-findings.md` and

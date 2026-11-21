@@ -10,7 +10,7 @@ outside its own home file. Per decision 0017, a D-local id is **never**
 cited outside its home, gloss or not — this is a different, heavier fix
 than `bare-citation` (see `docs/how-to/fix-bare-citation-findings.md`),
 which only needs a gloss added. `tsk-2sp-1`/`tsk-2sp-2`/`tsk-2sp-5` fixed
-1019 of these across `docs/specs/*.md` and `docs/backlog.md`.
+1019 of these across `docs/specs/*.md` and `plans/backlog.md`.
 
 ## The fix, mechanically
 

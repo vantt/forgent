@@ -1118,7 +1118,7 @@ Plugin suite "validate-first agentic development" cho Claude Code + Codex. Chưn
 - **Seen:** e70602a
 
 ### product-root-repo-divorce
-- **What:** Từ 94b4a31 (prt-1): config `product_root` cho topology "repo-divorce" — `.bee/` ngồi TRÊN một product repo lồng bên trong; resolve tài liệu SẢN PHẨM (`docs/backlog.md`, `docs/specs/`) tách khỏi history/state của chính bee. Unset → mặc định bee root; set-mà-thiếu-path → cảnh báo to.
+- **What:** Từ 94b4a31 (prt-1): config `product_root` cho topology "repo-divorce" — `.bee/` ngồi TRÊN một product repo lồng bên trong; resolve tài liệu SẢN PHẨM (`plans/backlog.md`, `docs/specs/`) tách khỏi history/state của chính bee. Unset → mặc định bee root; set-mà-thiếu-path → cảnh báo to.
 - **Where:** `docs/config-reference.md` (product_root key), spec `docs/specs/onboarding.md` (product_root coverage)
 - **Notable:** đúng topology xưởng+repo-lồng của forgent (workshop root chứa `./repo` độc lập). Cho phép một cây bee điều phối một product repo nested mà không trộn hai lịch sử — áp thẳng vào chính cấu trúc forgent đang chạy.
 - **Keywords:** product_root, repo-divorce, nested repo, product docs separation
@@ -1131,7 +1131,7 @@ Plugin suite "validate-first agentic development" cho Claude Code + Codex. Chưn
 - **Seen:** 1.3.9
 
 ### docs-vs-machine-backlog-split
-- **What:** Two separate backlogs are never merged: `docs/backlog.md` (human-facing product PBI rows, owned by bee-scribing) versus `.bee/backlog.jsonl` (machine-facing friction/grooming items).
+- **What:** Two separate backlogs are never merged: `plans/backlog.md` (human-facing product PBI rows, owned by bee-scribing) versus `.bee/backlog.jsonl` (machine-facing friction/grooming items).
 - **Where:** `AGENTS.md`, `.claude/skills/bee-scribing/SKILL.md`, `.claude/skills/bee-grooming/SKILL.md`
 - **Keywords:** backlog split, product vs machine backlog
 - **Seen:** 1.3.9

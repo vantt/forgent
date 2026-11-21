@@ -4,7 +4,7 @@ user-invocable: false
 description: >-
   Hold an open-ended, multi-day-resumable design brainstorm for one or more
   related coding-domain work items, upstream of fgos-coding-exploring/fgos-coding-planning,
-  keeping one coherent docs/discussions/<feature>/DISCUSSION.md per feature
+  keeping one coherent plans/discussions/<feature>/DISCUSSION.md per feature
   instead of locking decisions Socratically round by round. Use when a
   request needs real back-and-forth exploration -- revisiting, comparing
   options, changing one's mind -- before anything should be locked, or when
@@ -87,7 +87,7 @@ each relevant item:
 1. Set `refs` to the item's own anchor, never the whole file:
 
    ```bash
-   fgos edit "<item-id>" --refs "docs/discussions/<feature>/DISCUSSION.md#task-<slug>"
+   fgos edit "<item-id>" --refs "plans/discussions/<feature>/DISCUSSION.md#task-<slug>"
    ```
 
 2. In this same session invoke `fgos-coding-exploring` for that item, then

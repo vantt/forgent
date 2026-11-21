@@ -13,7 +13,7 @@ mode: explanation
 (`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md`, "model 3:
 core-library + thin adapters") that had been locked but never built —
 `STR38`/`STR48` (human-UI listener, attention/push channel) sat
-`proposed` in `docs/backlog.md`, and the prerequisite core/lib split
+`proposed` in `plans/backlog.md`, and the prerequisite core/lib split
 (`p-09351985`) is also still `proposed`. Full design:
 `docs/history/fgos-interface-daemon/CONTEXT.md`.
 

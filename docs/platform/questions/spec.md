@@ -4,20 +4,20 @@
 Document type: BA-grade area specification
 Audience: Owner, maintainer, implementation agent
 Purpose: One authority for the questions a session sends to the owner: how one is asked, stored, answered, received and cancelled, and where the owner sees them all
-Design status: Settled in docs/discussions/owner-questions/DISCUSSION.md (OQ-D1..D7, 2026-11-18); planned in plans/261118-1159-owner-question-store (QP-1..QP-23)
+Design status: Settled in plans/discussions/ds-hme6khnird-owner-questions/DISCUSSION.md (OQ-D1..D7, 2026-11-18); planned in plans/261118-1159-owner-question-store (QP-1..QP-23)
 Implementation: Spec and contracts only (plan phase 1). No crate, verb, hook or route exists yet
 Canonical: Yes for the scope below, from the day the plan lands
 Owner: Questions component (proposed)
 Source (planned): packages/questions/rust (crate fgos-questions)
 Contracts: packages/questions/contracts/ and packages/questions/rust/observe-kinds.json
-Provenance: docs/discussions/owner-questions/DISCUSSION.md and plans/261118-1159-owner-question-store/plan.md at 4f8243230 (2026-11-18)
+Provenance: plans/discussions/ds-hme6khnird-owner-questions/DISCUSSION.md and plans/261118-1159-owner-question-store/plan.md at 4f8243230 (2026-11-18)
 Writer type: Agent draft writer
 Canonical for: The question entity, its states, its Event Store consumer, its verbs, who may answer, ack and cancel, its refusals, its events and its receipt hook
 Use this when: Asking, answering or listing owner questions, or changing how a session learns an answer
 Do not use this for: Workflow gates or `fgos ask` items (Work layer), waking an idle asker (supervisor plan), measuring owner wait (Observe)
 Last reviewed: 2026-11-18
 Related:
-- docs/discussions/owner-questions/DISCUSSION.md
+- plans/discussions/ds-hme6khnird-owner-questions/DISCUSSION.md
 - plans/261118-1159-owner-question-store/plan.md
 - docs/platform/event-store/spec.md
 - docs/platform/identity/spec.md
@@ -166,7 +166,7 @@ sync between machines.
 
 ## 11. Lịch sử quyết định
 
-Settled in [DISCUSSION.md](../../discussions/owner-questions/DISCUSSION.md) section 4; planned in
+Settled in [DISCUSSION.md](../../../plans/discussions/ds-hme6khnird-owner-questions/DISCUSSION.md) section 4; planned in
 [plan.md](../../../plans/261118-1159-owner-question-store/plan.md).
 
 | Id | Decision | Where it lands here |
