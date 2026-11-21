@@ -328,6 +328,134 @@ fn catch_up_once(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
     })
 }
 
+/// The item contract and the generated backlog index live in one module of this wiring directory.
+#[allow(dead_code)]
+#[path = "portfolio.rs"]
+mod portfolio;
+
+/// The index every backlog item write keeps current.
+const BACKLOG_INDEX: &str = "plans/backlog.md";
+/// The mode of the regenerated index when it is created: like a file a person writes.
+const INDEX_MODE: u32 = 0o644;
+
+/// The file name when `path` is a backlog item path, `plans/backlog/<name>.md`, one level beneath the directory.
+fn backlog_item_name(path: &str) -> Option<&str> {
+    path.strip_prefix("plans/backlog/")
+        .filter(|name| name.ends_with(".md") && !name.contains('/'))
+}
+
+/// The backlog item paths the index of the main checkout tracks, read through the Git door.
+fn tracked_item_paths(
+    checkout: &Checkout,
+) -> Result<std::collections::HashSet<String>, PublishRefusal> {
+    let mut tracked = std::collections::HashSet::new();
+    let mut cursor = None;
+    for _ in 0..MAX_STATUS_PAGES {
+        let page = checkout
+            .driver
+            .tracked_paths(&checkout.repo, cursor, STATUS_PAGE)
+            .map_err(|e| refusal("write-status-unreadable", e.cause))?;
+        tracked.extend(
+            page.entries
+                .iter()
+                .filter_map(|p| std::str::from_utf8(p).ok())
+                .filter(|p| backlog_item_name(p).is_some())
+                .map(str::to_owned),
+        );
+        if page.complete {
+            return Ok(tracked);
+        }
+        cursor = page.next_cursor;
+    }
+    Err(refusal(
+        "write-status-unreadable",
+        "the checkout tracks too many paths to read",
+    ))
+}
+
+/// Before a backlog item file is committed: it must hold the item frontmatter contract and sit at its convention path
+/// `plans/backlog/<id>-<slug>.md` (`write-item-invalid` otherwise; the request takes back a file it created). Then the
+/// index `plans/backlog.md` is regenerated from the whole portfolio and written atomically, so one commit carries the
+/// item and its index. Returns the index path when its content changed.
+fn refresh_backlog_index(
+    checkout: &Checkout,
+    path: &str,
+) -> Result<Option<String>, PublishRefusal> {
+    let main = checkout.main.as_path();
+    let invalid = |detail: String| refusal("write-item-invalid", detail);
+    let text = std::fs::read_to_string(main.join(path))
+        .map_err(|e| refusal("write-path-unreadable", format!("{path}: {e}")))?;
+    let item = portfolio::parse_backlog_item(Path::new(path), &text)
+        .map_err(|e| invalid(e.to_string()))?;
+    let slug = item
+        .filename
+        .strip_prefix(&format!("{}-", item.id))
+        .and_then(|rest| rest.strip_suffix(".md"))
+        .filter(|slug| !slug.is_empty());
+    if slug.is_none() {
+        return Err(invalid(format!(
+            "{path}: the file name must be {}-<slug>.md",
+            item.id
+        )));
+    }
+    let report = portfolio::check_portfolio(
+        main,
+        &portfolio::CheckOptions {
+            check_index: false,
+            ..portfolio::CheckOptions::default()
+        },
+    )
+    .map_err(|e| refusal("write-index-failed", e.to_string()))?;
+    // The index lists the items Git tracks and the one being committed, never a stray file of the working tree.
+    let tracked = tracked_item_paths(checkout)?;
+    let counts = |rel: &Path| {
+        let rel = rel.to_string_lossy();
+        rel == path || tracked.contains(rel.as_ref())
+    };
+    let items: Vec<_> = report
+        .items
+        .iter()
+        .filter(|it| counts(&it.rel_path))
+        .cloned()
+        .collect();
+    // A report error about an item file the index leaves out is not this write's to refuse.
+    let mut errors: Vec<String> = report
+        .errors
+        .iter()
+        .filter(|e| {
+            !e.strip_prefix("plans/backlog/")
+                .and_then(|rest| rest.split_once(": "))
+                .is_some_and(|(name, _)| !counts(Path::new("plans/backlog").join(name).as_path()))
+        })
+        .cloned()
+        .collect();
+    let mut seen = std::collections::HashSet::new();
+    for it in &items {
+        if !seen.insert(it.id.as_str()) {
+            errors.push(format!(
+                "duplicate-id: backlog id '{}' is used twice",
+                it.id
+            ));
+        }
+    }
+    if !errors.is_empty() {
+        return Err(invalid(errors.join("; ")));
+    }
+    let index = portfolio::generate_backlog_index(&items, &report.discussions, &report.plans);
+    let index_path = main.join(BACKLOG_INDEX);
+    if std::fs::read_to_string(&index_path).is_ok_and(|current| current == index) {
+        return Ok(None);
+    }
+    fgos_durable_file::replace_durably_with_mode(
+        &main.join("plans"),
+        "backlog.md",
+        index.as_bytes(),
+        INDEX_MODE,
+    )
+    .map_err(|e| refusal("write-index-failed", format!("{} at {}", e.source, e.step)))?;
+    Ok(Some(BACKLOG_INDEX.to_owned()))
+}
+
 /// Lands `path` from the main checkout of `root` for the head holding `role`, written as `writer`. Returns the commit.
 fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, PublishRefusal> {
     let checkout = open(root)?;
@@ -343,9 +471,15 @@ fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, 
         log_dir: &checkout.main.join(".fgos").join("runtime").join("land"),
         wait_ms: WAIT_MS,
     };
+    let mut paths = vec![path.to_owned()];
+    if backlog_item_name(path).is_some() {
+        if let Some(index) = refresh_backlog_index(&checkout, path)? {
+            paths.push(index);
+        }
+    }
     let command = LandCommand {
         target: Some(checked_out_branch(&checkout)?),
-        paths: Some(vec![path.to_owned()]),
+        paths: Some(paths),
         message: format!("docs({role}): write {path}"),
         ..LandCommand::default()
     };

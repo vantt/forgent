@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d4a836f48ed4e72ce9ae0d6d3f4b65f4e04665c1fb37169e16db02869d2638c4",
+  "payloadDigest": "c0ada9efe1c8844715e39827d1be8d7e277e51c0d75500d96293669407868d8c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -158,7 +158,7 @@
     "apps/fgos/src/wiring/seat_binding.rs": "9eb8ef8e81b7314cab1d579a3e7312aa413c268405271db2d3dc64f0cfe7b1b3",
     "apps/fgos/src/wiring/session_rotation_hook.rs": "20782a7a73725c725531adaf42ab15de1b7f0dcacfb6492567923df55ad72580",
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
-    "apps/fgos/src/wiring/session_write_publish.rs": "0b830327e6ef3925025c2ad0fe9c30a4c87a24dea4fe122371d92b90ba2b5907",
+    "apps/fgos/src/wiring/session_write_publish.rs": "0694eac1d030e0fb8b173b3d9cfab29368c75f3e0ce2551e08ec3463fc1eb19d",
     "apps/fgos/src/wiring/supervision.rs": "93ef2f5a918a9f932b33c7f93a3f7fb6e5942094261bd1c736014241ce801075",
     "apps/fgos/src/wiring/terminal_tabs.rs": "a519a4903b296a3f6bfd486f41ea93d1ceb1489c28a4e6dc6dcfe03223ce3130",
     "apps/fgos/src/wiring/uninstall.rs": "1fd8cdeef4360bb32ae0dd1452bdc6cb09c57427d95645c030105a24533dceff",
@@ -192,7 +192,7 @@
     "apps/fgos/tests/questions_head.rs": "351a1e52ae8ad3f5f0e0586ddf800314fa86464e4894d4187d59a0020a0e9080",
     "apps/fgos/tests/questions_hook.rs": "1c206c5633a8ec75345fdcc4debd1efe30f8aa996aa48e00e3963c426061f5a2",
     "apps/fgos/tests/questions_verb.rs": "b0ccc8a1c82bbf81b7ad84eecfdcf4a2e3c350eb297cf6749645b4ee1a3296dd",
-    "apps/fgos/tests/session_write_publish.rs": "1f2e511e01473684fd12a07905c4d1c040db025d51af22681e035a33fee81fc9",
+    "apps/fgos/tests/session_write_publish.rs": "17200b15b0a2a9b1862a24c2eeb28a45502c5984ed5ad0a710cace2e4fa8ff5d",
     "apps/fgos/tests/supervision_verbs.rs": "80a1e044ac7fd9b6d5bb1b89c91e319debb1241fa76f859c81dc5d57291193a1",
     "apps/fgos/tests/windows_borrow.rs": "4e77453a5386cf512a22db39e6a529e163c7dc930d8795c93ef05e60ba19c7b9",
     "apps/fgos/tests/windows_cwd_lease_owner.rs": "788c845e215e7afbc1b462b34b486155c024b0983d340c933d0f43ddbd1bc9ea",
@@ -1129,7 +1129,7 @@
     "packages/run-supervisor/rust/src/go_channel.rs": "fdd459ac110097c4e8774499be3ffb859e5a486e2a6bb422dc65b0a6146595d4",
     "packages/run-supervisor/rust/src/go_pipe.rs": "0994684b54f1765799e4198c6e39ea2c8d83660ae1336cdac447ea1acd3681b0",
     "packages/run-supervisor/rust/src/head_client.rs": "ee0ceac9b2af86e221fc8a692bfa9e5a48a20f54e4142dd2ef74b5d53c3da74b",
-    "packages/run-supervisor/rust/src/head_request.rs": "df6b391e36f42bcbfdf68e966fdf6bfd204b4be279df5eba4e000ad714abb8dc",
+    "packages/run-supervisor/rust/src/head_request.rs": "36bd10fa0f4cb0a3e8e3bd9ca8c4898ce58c1d0acb3c765de2cb2bfe80b99604",
     "packages/run-supervisor/rust/src/lanes.rs": "62a5b7bf690639f380813728b6a70053d86623ae35a4acb642235a3d4c004972",
     "packages/run-supervisor/rust/src/lib.rs": "44257e02d2e99620aecb25b1b45824106f481b267b9a328e82d08adab62de269",
     "packages/run-supervisor/rust/src/publish.rs": "008072f32aa305e4f2feabe554455d9f7c680a4cd4aa912514e55ac922257a62",
@@ -1160,7 +1160,7 @@
     "packages/run-supervisor/rust/tests/gate_pid1.rs": "73f2e89f16a3a4a76e95aa73c98a3f7fafef8c1d41e5748a87f538c2c82e8478",
     "packages/run-supervisor/rust/tests/gate_portable.rs": "1a97989cd9fbebc519506651eb3a79c7c577e0ffb199abb71bd07a0e133cc0db",
     "packages/run-supervisor/rust/tests/gate_terminal_socket.rs": "cba60e64b6f41309553c78216e66937d164b70bc2f1b37e49d657882daf2ce00",
-    "packages/run-supervisor/rust/tests/head_request.rs": "4298be34c2da78cd289665b63e341afd29a21a6a34e447687b2f760f4e5d6b37",
+    "packages/run-supervisor/rust/tests/head_request.rs": "863e2a0b0e4a8c974a3d87a61ad4e404ff05e61573d88d16f8f0d10b31e5e52a",
     "packages/run-supervisor/rust/tests/head_role_binding.rs": "86928b9c8303a3633b9865081bd195d949b6295c14839f277c1471eb33fab110",
     "packages/run-supervisor/rust/tests/lanes.rs": "982d01cd1ad9217eb89164c3a15286c123268908582fab81a0cd59dbc8926d95",
     "packages/run-supervisor/rust/tests/portable/mod.rs": "6153ea7719f18ef0cc293fde0d603101df1308a4b2980edcc8dff57ad6d37363",
@@ -1541,7 +1541,7 @@
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runner-config-error.mjs": "f1cf79e848936226739903b20c6cec2e8c2831c7f5bd95f85d5a850f58480490",
     "src/runner/dispatch/runtime-inspection.mjs": "3ce9f61a48afbc739c5c83b261ba09bc3864decd810c13c5d0345ebf467b1649",
-    "src/runner/dispatch/session-attempt.mjs": "fdc3057b98b4f964ac2e37804b583b72aa2669fb81484a5562554724f76bde1d",
+    "src/runner/dispatch/session-attempt.mjs": "f4fefce2f230d31cef8bcd0afada8f3c5b23330edd3349a9d82a3a9b5d180c78",
     "src/runner/dispatch/settlement.mjs": "d824e52e903c68c07e95506265df335e8bb4bf45e8cc2ed3bf245dd283e28d65",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
     "src/runner/dispatch/terminal-slot.mjs": "a0726de851c54cc06794c8260514664b9939d78c327773dcb89cb78bcc22150f",
@@ -1616,7 +1616,7 @@
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
     "src/seat-binding/client.mjs": "2927a6ac2263bbcbb15ccdcc11d6986b2e7f0da9608c9612f8a190ff614386f1",
     "src/session-host/client.mjs": "e49192345fa315a153ace4c3de0422351b0989bf20b663ae0a77b398767cd0eb",
-    "src/session-host/head-grants.mjs": "d4aaa71b316e43a05dbcc77002d841a8c707e944b3981b15fcf0fe0b87d58add",
+    "src/session-host/head-grants.mjs": "7bf3d6379002ef3c674e96926750be02fde0a6cbf50fd07fc021f17c73b931ba",
     "src/session-host/head-plan.mjs": "8ef62d00ffe5394d380cfc2049d9285b231a29b34fe8d66659505989493be099",
     "src/session-host/head-request-client.mjs": "eb600336e0f07fefcdec8499d366044b399dc74e3cfdda546954d884af67559d",
     "src/session-host/head-request.mjs": "cea2b7a0c493ebdbad7b410c636c1d0742f6b67ab28727a6643ad31920656fd4",
@@ -3891,14 +3891,14 @@
     {
       "path": "packages/run-supervisor/rust/src/head_request.rs",
       "line": 298,
-      "spawn": "Command::new <- packages/run-supervisor/rust/src/head_request.rs:1300",
+      "spawn": "Command::new <- packages/run-supervisor/rust/src/head_request.rs:1385",
       "binary": "(parsed configuration (text(&envelope[\"hostBin\"], \"hostBin\")))",
       "class": "configured-binary"
     },
     {
       "path": "packages/run-supervisor/rust/src/head_request.rs",
-      "line": 1300,
-      "spawn": "Command::new <- packages/run-supervisor/rust/src/head_request.rs:1300",
+      "line": 1385,
+      "spawn": "Command::new <- packages/run-supervisor/rust/src/head_request.rs:1385",
       "binary": "(deserialized configuration (Config.host_bin))",
       "class": "configured-binary"
     },
@@ -4498,7 +4498,7 @@
     },
     {
       "path": "src/runner/dispatch/session-attempt.mjs",
-      "line": 146,
+      "line": 156,
       "spawn": "startAndBind -> src/runner/dispatch/assignment-runner.mjs:1166",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

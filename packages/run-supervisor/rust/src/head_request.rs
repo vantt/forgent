@@ -67,8 +67,8 @@ pub const RESTORE_VERB: &str = "session restore role";
 /// [`ANSWERED_VERB`]: a successor binds before it holds the role.
 pub const BIND_VERB: &str = "session bind session";
 /// The verb that replaces a granted file of the head's role, answered by the supervisor itself (no route child): the
-/// path must be named exactly by `envelope.session.writes` and be a regular file reached without a symlink, and the
-/// new content is installed atomically through the durable-file door ([`install_granted`]), then published through [`WritePublisher`].
+/// path must be named by `envelope.session.writes` (exactly, or as a plain file directly beneath the directory of a
+/// `<dir>/*` entry, which may create it) and be a regular file reached without a symlink, and the new content is installed atomically through the durable-file door ([`install_granted`]), then published through [`WritePublisher`].
 pub const WRITE_VERB: &str = "session write";
 
 /// The role-gated verbs that only read, which a rotation successor may use before the role moves to it (its first turn
@@ -142,7 +142,7 @@ pub struct Config {
     /// `envelope.session.role` (`head:<persona>-<name>`): named in the refusal of a verb its grant lacks.
     pub role: String,
     /// Project-relative paths `envelope.session.writes` grants; [`WRITE_VERB`] writes only a regular file one names
-    /// exactly, beneath `cwd`.
+    /// exactly, or one directly beneath the directory of a `<dir>/*` entry, beneath `cwd`.
     pub writes: Vec<String>,
     pub verb_timeout: Duration,
     /// Does Identity give this session the envelope's role right now. An error is refused like a "no", and the
@@ -731,10 +731,30 @@ pub fn granted_write<'a>(
     if !plain_relative(rel) {
         return Err(write_refused("path-invalid", None));
     }
-    if !writes.iter().any(|granted| granted == rel) {
+    if !writes.iter().any(|granted| names_grant(granted, rel)) {
         return Err(write_refused("path-not-granted", None));
     }
     Ok((rel, content, base))
+}
+
+/// Whether the grant entry `granted` names `rel`: exactly, or, for an entry ending in `/*` over a plain directory, as a
+/// plain file directly beneath that directory (one level: the rest of `rel` is a single named component).
+fn names_grant(granted: &str, rel: &str) -> bool {
+    if granted == rel {
+        return true;
+    }
+    granted
+        .strip_suffix("/*")
+        .filter(|dir| plain_relative(dir))
+        .and_then(|dir| rel.strip_prefix(dir))
+        .and_then(|rest| rest.strip_prefix('/'))
+        .is_some_and(|name| !name.contains('/'))
+}
+
+/// Whether a write of `rel` may create the file: it is named by a `/*` grant and by no exact entry, so an exact grant
+/// keeps replacing an existing file only.
+fn may_create(writes: &[String], rel: &str) -> bool {
+    !writes.iter().any(|granted| granted == rel)
 }
 
 /// [`WRITE_VERB`], the write: replace the granted file `rel` beneath `root` with `content`. It must be an existing
@@ -742,18 +762,31 @@ pub fn granted_write<'a>(
 /// `not-a-file`). Its directory is opened once and the content is installed through that descriptor by the
 /// durable-file door (`Dir::replace`: temp file, the old file's exact mode, fsync, rename over the name, directory
 /// fsync), so nothing is resolved by path after the check; a failure there is `write-failed`. Returns the bytes
-/// written.
-pub fn install_granted(root: &Path, rel: &str, content: &str) -> Result<usize, WriteRefusal> {
-    let (dir, name, mode) = open_granted(root, rel)?;
+/// written. With `create`, a file that does not exist yet is created the same way with a fresh mode
+/// ([`NEW_FILE_MODE`]); its directory must exist and be reached without a symlink.
+pub fn install_granted(
+    root: &Path,
+    rel: &str,
+    content: &str,
+    create: bool,
+) -> Result<usize, WriteRefusal> {
+    let (dir, name, mode) = open_granted(root, rel, create)?;
     dir.replace(&name, content.as_bytes(), mode)
         .map_err(|e| write_refused("write-failed", format!("{} at {}", e.source, e.step)))?;
     Ok(content.len())
 }
 
+/// The mode of a file a `/*` grant creates: owner read-write, everyone else read, like a file a person writes.
+const NEW_FILE_MODE: u32 = 0o644;
+
 /// The granted file's directory (opened once, no-follow at every component), its name and its mode: the checks of
 /// [`install_granted`] without writing, so the request can refuse a symlink or a non-file with the contract's code
-/// before anything reads the file's content.
-fn open_granted(root: &Path, rel: &str) -> Result<(Dir, std::ffi::OsString, u32), WriteRefusal> {
+/// before anything reads the file's content. With `create`, a missing file is not refused: it gets [`NEW_FILE_MODE`].
+fn open_granted(
+    root: &Path,
+    rel: &str,
+    create: bool,
+) -> Result<(Dir, std::ffi::OsString, u32), WriteRefusal> {
     let beneath = |error: BeneathError| match error {
         BeneathError::Refused(BeneathRefusal::Symlink) => write_refused("path-symlink", None),
         BeneathError::Refused(BeneathRefusal::Escape) => write_refused("path-invalid", None),
@@ -773,7 +806,11 @@ fn open_granted(root: &Path, rel: &str) -> Result<(Dir, std::ffi::OsString, u32)
     }
     .map_err(beneath)?
     .ok_or_else(missing)?;
-    let mode = dir.file_mode(name).map_err(beneath)?.ok_or_else(missing)?;
+    let mode = match dir.file_mode(name).map_err(beneath)? {
+        Some(mode) => mode,
+        None if create => NEW_FILE_MODE,
+        None => return Err(missing()),
+    };
     Ok((dir, name.to_owned(), mode))
 }
 
@@ -794,16 +831,33 @@ fn write_and_publish(cfg: &Config, args: &Value) -> Outcome {
         code: "write-path-unreadable",
         detail: Some(format!("{}: {}", why.code, why.detail)),
     };
-    if let Err(why) = open_granted(&cfg.cwd, rel) {
-        return refuse_with(why);
-    }
+    let create = may_create(&cfg.writes, rel);
+    // A file a `/*` grant may create is checked again after the catch-up: one that appears meanwhile was not the
+    // writer's to replace blind.
+    let file_exists = || match open_granted(&cfg.cwd, rel, create) {
+        Ok((dir, name, _)) => Ok(dir.file_mode(&name).ok().flatten().is_some()),
+        Err(why) => Err(why),
+    };
+    let existed = match file_exists() {
+        Ok(existed) => existed,
+        Err(why) => return refuse_with(why),
+    };
     // The content the writer read: its own `base`, else what the file held when the request arrived, which the
     // catch-up below may move.
     let read_oid = || (cfg.path_oid)(&cfg.cwd, rel);
-    let expected = match base {
-        Some(base) => base.to_owned(),
-        None => match read_oid() {
-            Ok(oid) => oid,
+    let expected = match (existed, base) {
+        (false, Some(_)) => {
+            return Outcome::Refused {
+                code: "write-base-stale",
+                detail: Some(format!(
+                    "{rel} does not exist, so a write cannot be based on an earlier content; write it without a base"
+                )),
+            }
+        }
+        (false, None) => None,
+        (true, Some(base)) => Some(base.to_owned()),
+        (true, None) => match read_oid() {
+            Ok(oid) => Some(oid),
             Err(why) => return unreadable(why),
         },
     };
@@ -839,19 +893,33 @@ fn write_and_publish(cfg: &Config, args: &Value) -> Outcome {
             }
         }
     }
-    match read_oid() {
-        Ok(current) if current == expected => {}
-        Ok(current) => {
-            return Outcome::Refused {
-                code: "write-base-stale",
-                detail: Some(format!(
-                    "{rel} is now {current}, the write was based on {expected}; read it again and redo the edit"
-                )),
+    match expected {
+        Some(expected) => match read_oid() {
+            Ok(current) if current == expected => {}
+            Ok(current) => {
+                return Outcome::Refused {
+                    code: "write-base-stale",
+                    detail: Some(format!(
+                        "{rel} is now {current}, the write was based on {expected}; read it again and redo the edit"
+                    )),
+                }
             }
-        }
-        Err(why) => return unreadable(why),
+            Err(why) => return unreadable(why),
+        },
+        None => match file_exists() {
+            Ok(false) => {}
+            Ok(true) => {
+                return Outcome::Refused {
+                    code: "write-base-stale",
+                    detail: Some(format!(
+                        "{rel} appeared while the write waited; read it and redo the edit"
+                    )),
+                }
+            }
+            Err(why) => return refuse_with(why),
+        },
     }
-    let bytes = match install_granted(&cfg.cwd, rel, content) {
+    let bytes = match install_granted(&cfg.cwd, rel, content, create) {
         Ok(bytes) => bytes,
         Err(why) => return refuse_with(why),
     };
@@ -863,9 +931,26 @@ fn write_and_publish(cfg: &Config, args: &Value) -> Outcome {
                 loggable(rel),
                 loggable(&why.code)
             ));
+            // A file this request created and the publisher refused before committing anything is taken back, so
+            // the path is free for a retry (it would otherwise be refused `write-path-dirty`).
+            if !existed && REFUSED_BEFORE_COMMIT.contains(&why.code.as_str()) {
+                remove_created(&cfg.cwd, rel);
+            }
             json!({"path": rel, "bytes": bytes, "publish": {"refusal": why.code, "detail": why.detail}})
         }
     })
+}
+
+/// The publish refusals raised before the publisher commits or lands anything: the content was judged invalid, nothing
+/// of it is in Git.
+const REFUSED_BEFORE_COMMIT: [&str; 2] = ["write-item-invalid", "write-index-failed"];
+
+/// Removes the file `rel` this request created, reached through the same no-symlink check as the write; a failure
+/// leaves it for the dirty-path refusal to report.
+fn remove_created(root: &Path, rel: &str) {
+    if open_granted(root, rel, false).is_ok() {
+        let _ = std::fs::remove_file(root.join(rel));
+    }
 }
 
 enum Outcome {

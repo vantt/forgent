@@ -36,15 +36,25 @@ export class SessionLaunchError extends Error {
 const ATTEMPT_STR = '01';
 
 /**
+ * The sandbox paths of grant writes: `dir/*` becomes `dir` (a `/*` entry binds its whole directory), and an entry equal
+ * to or nested under another entry is dropped, in order of first appearance.
+ */
+function sandboxPathsOf(writes) {
+  const mapped = [...new Set(writes.map((entry) => (entry.endsWith('/*') ? entry.slice(0, -2) : entry)))];
+  return mapped.filter((entry) => !mapped.some((other) => other !== entry && entry.startsWith(`${other}/`)));
+}
+
+/**
  * The requirement of a head: the read-only posture plus the writable project paths its grant names, when its grant
  * says `mailbox`, the mailbox record, and when it says `peers`, the peer sessions (the host pid space and the session
  * sockets and registry of the machine, read-write, so the head's own Claude Code registers and listens beside its peers). Every grant is required (`optional: false`): a bind that cannot be
- * made refuses the launch by name, it never starts the head with less.
+ * made refuses the launch by name, it never starts the head with less. A grant entry ending in `/*` (the head request
+ * door's one-level rule) binds its directory, since a sandbox path never holds a glob.
  */
 export function requirementOf(grant) {
   const base = BUILTIN_POLICIES['host-write-denied'];
   const extra = [
-    ...(grant.writes.length === 0 ? [] : [{ resource: WORKSPACE_PATHS_RESOURCE, access: 'read-write', scope: 'dispatch', optional: false, paths: [...grant.writes] }]),
+    ...(grant.writes.length === 0 ? [] : [{ resource: WORKSPACE_PATHS_RESOURCE, access: 'read-write', scope: 'dispatch', optional: false, paths: sandboxPathsOf(grant.writes) }]),
     ...(grant.mailbox ? [{ resource: MAILBOX_RECORD_RESOURCE, access: 'read-write', scope: 'dispatch', optional: false }] : []),
     ...(grant.peers ? [{ resource: PEER_SESSIONS_RESOURCE, access: 'read-write', scope: 'dispatch', optional: false }] : []),
   ];
