@@ -128,8 +128,8 @@
         "capability": "string, optional; must not start with '-'",
         "writes": "array of strings, optional: each must be contained in the lead's plan footprint by the repo's write-scope semantics (write-outside-footprint); `src/**` is not contained in `src/*`",
         "worktree": "string, optional: a linked worktree; must not start with '-'",
-        "maxMinutes": "integer, optional, secretary only: wall-clock minutes of the unit (--timeout), at most secretary.run.maxMinutes (default 15, the ceiling); the default is the ceiling",
-        "tier": "string, optional, secretary only: the unit's tier (--override), at most secretary.run.tier (default standard)"
+        "maxMinutes": "integer, optional, the two coordinators only: wall-clock minutes of the unit (--timeout), at most secretary.run.maxMinutes (default 15, the ceiling); the default is the ceiling",
+        "tier": "string, optional, the two coordinators only: the unit's tier (--override), at most secretary.run.tier (default standard)"
       },
       "does": "a lead, or the secretary under the ceilings below. A lead: a `unit` key is bad-args (a unit file declares its own writes, which the footprint could not bound). Answers at once with a ticket as land does; the detached runner runs `fgos run --json` without FGOS_DISPATCH_DEPTH (a lead's phase run is a top-level seat and takes a lane) and the ticket keeps only the unitRunId, whose outcome stays in .fgos/assignments/<unitRunId>/ The secretary's run is one unit built from a prompt: no provider, capability, unit file or plan footprint of hers; read-only unless `writes` names plain project-relative paths and `worktree` is a linked worktree of this project (absolute, not the project checkout, its `.git` a file); it runs `fgos run <prompt> --timeout <maxMinutes>m --override {\"tier\":<tier>}` and a request may ask for less than `secretary.run.maxMinutes` and `secretary.run.tier`, never more. The ticket and `request result` work as a lead's.",
       "data": {

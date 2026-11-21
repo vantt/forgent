@@ -706,6 +706,19 @@ fn a_tuned_watcher_setting_lands_in_the_project_config_inside_the_schema_bounds(
         "{}",
         text(&below_minimum)
     );
+    let above_maximum = scene.run(&[
+        "watcher",
+        "tune",
+        "--set",
+        "idleIntervalSec=99999999",
+        "--json",
+    ]);
+    assert_eq!(
+        above_maximum.status.code(),
+        Some(4),
+        "{}",
+        text(&above_maximum)
+    );
     let untunable = scene.run(&["watcher", "tune", "--set", "enabled=1", "--json"]);
     assert_eq!(untunable.status.code(), Some(4), "{}", text(&untunable));
     let config = fs::read_to_string(scene.project().join(".fgos/config.yaml")).unwrap();
@@ -786,6 +799,24 @@ fn session_type_is_refused_until_an_open_event_names_the_target_session() {
         text(&closed).contains("target-not-stuck"),
         "a handled event no longer opens it: {}",
         text(&closed)
+    );
+    // A watcher event names a session by the agent CLI's own id, without the machine part.
+    scene.data(&[
+        "supervisor",
+        "raise",
+        "--kind",
+        "coordination-help",
+        "--ref",
+        "type-target",
+        "--reason",
+        "named by the CLI session id",
+        "--json",
+    ]);
+    let by_cli_id = scene.run(&args);
+    assert!(
+        !text(&by_cli_id).contains("target-not-stuck"),
+        "the CLI session id names the session: {}",
+        text(&by_cli_id)
     );
 }
 
