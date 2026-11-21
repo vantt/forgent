@@ -1,3 +1,4 @@
+- 2026-11-21 07:54 SUPERVISION: plan 261121-0745-head-rotation-trace DONE (source p-4r4h3jqtth landed 65ad518d5).
 - 2026-11-21 07:52 SUPERVISION: plan 261121-0722-idle-lead-replace DONE. Live idle lead is replaced (source p-waxzxz5mio landed 595a7f0b1).
 - 2026-11-21 07:52 SUPERVISION: plan 261119-1730-supervision-powers-cores DONE. Part 1 four Rust cores landed (ec34f897a); part 2 doors running.
 - 2026-11-21 07:47 SUPERVISION: plan 261121-0707-head-tab-labels DONE. Head tab labels read role: subject and head names unique by construction (source p-mhwe24fttr landed f6f88e8d6).
