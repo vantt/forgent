@@ -74,7 +74,7 @@ mechanism. The PE section diff is done once by the worker on the downloaded file
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [P7 tail-failure fixture the Windows tail reaches](phase-01-p7-tail-fixture.md) | - | test/rust-host/fgctl-upgrade.test.mjs, test/rust-host/fgctl-init-preflight-tail.test.mjs, test/rust-host/fgctl-init-fixture.mjs | 1 | ready |
+| 1 | [P7 tail-failure fixture the Windows tail reaches](phase-01-p7-tail-fixture.md) | - | test/rust-host/fgctl-upgrade.test.mjs, test/rust-host/fgctl-init-preflight-tail.test.mjs, test/rust-host/fgctl-init-fixture.mjs | 1 | done |
 | 2 | [Addon bytes on a digest mismatch, PE section named](phase-02-addon-mismatch-evidence.md) | - | .github/workflows/release-assets.yml | 1 | ready |
 | 3 | [Deterministic windows-msvc addon](phase-03-addon-determinism-fix.md) | 2 | .github/workflows/release-assets.yml, Cargo.toml, packages/git/node-addon/Cargo.toml, packages/git/node-addon/build.rs, scripts/build-rust-distribution.mjs, docs/platform/packaging-distribution/spec.md | 2 | ready |
 
@@ -105,3 +105,9 @@ second rebases.
 
 ## Log
 - 2026-11-21 lead:WINCI: plan written against origin/main e61cfb050. P7 cause found while writing it (see Facts).
+- 2026-11-21 lead:WINCI: phase 1 landed as 16f014918. The fixture now writes an invalid `machine-id` into the state
+  home, and `fgos init`'s first step, `mint_machine_id`, refuses it on every platform. The test calls this
+  explicitly, and the dead doctor-bridge injection is gone. Green on windows-latest in CI 44886931215 (P7 tests ok 32
+  and 33) and on ubuntu-22.04 in the same run.
+- 2026-11-21 lead:WINCI: phase 2 upload is wired (artifacts present in CI 44883964974). Runs 44883929876,
+  44883954870 and 44883964974 matched, with no mismatch yet; four more runs were dispatched.
