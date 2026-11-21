@@ -2,6 +2,7 @@
 
 ## Inputs
 - `docs/discussions/workflow-engine/DISCUSSION.md` section 7 anchor `#task-bugfix-guide`, decisions D1-D4.
+- Owner conditions via Miu (2026-11-21): write plan only, no implementation; tsk-1pv stays on hold until owner approval; guide-tier only with zero footprint in `src/state`.
 - `domains/coding/workflows/feature.yaml` (guide part lines 127-176).
 - `test/state/workflow-multiplicity.test.mjs`.
 
