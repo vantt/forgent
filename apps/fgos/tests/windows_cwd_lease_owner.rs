@@ -50,6 +50,22 @@ fn a_writing_attempt_declares_its_job_on_the_lease_the_controller_holds() {
     let attempt_id = format!("windows-lease-owner-{}", std::process::id());
     let scope = LockScope::seeded(Vec::new()).unwrap();
     let custody = admit_successor(&scope, &fgos_dir, &cwd).expect("custody of the worktree");
+    // The lease is the one a Node controller takes for this worktree: its key is Node's `cwdDevIno`.
+    let node = std::process::Command::new("node")
+        .args([
+            "-e",
+            "const fs=require('fs');const s=fs.statSync(fs.realpathSync(process.argv[1]),{bigint:true});process.stdout.write(`${s.dev}-${s.ino}-${s.birthtimeNs}`)",
+        ])
+        .arg(&cwd)
+        .output()
+        .expect("node runs");
+    assert_eq!(
+        custody.path().file_name().unwrap().to_string_lossy(),
+        format!(
+            "dispatch-cwd--{}.lock",
+            String::from_utf8_lossy(&node.stdout)
+        )
+    );
     let locks = acquire_attempt_locks(AttemptLockRequest {
         fgos_dir: &fgos_dir,
         assignment_dir: &assignment_dir,
