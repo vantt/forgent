@@ -115,7 +115,7 @@ fn git_deadline_removes_index_lock(namespaced: bool) {
             );
         }
     });
-    let error = run_borrowed_io(&handle, &spec, &io).unwrap_err();
+    let error = run_borrowed_io(&handle, &spec, &io, &HelperExe::current().unwrap()).unwrap_err();
     observer.join().unwrap();
     if namespaced {
         assert_eq!(
