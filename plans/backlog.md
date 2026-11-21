@@ -2,6 +2,7 @@
 
 | ID | Title | Status | Priority | Area | Citing |
 |---|---|---|---|---|---|
+| [p-vnsigyw6h7](backlog/p-vnsigyw6h7-two-tests-are-red-on-main-head-start-probe.md) | Two tests are red on main: head-start's role-launch case and guide-schema's workflow count (tests, priority high; source: lead:S6A, 2026-11-22 02:50) | proposed | P1 | tests | - |
 | [p-ti7prrwace](backlog/p-ti7prrwace-a-pane-seat-inherits-the-runner-s-environment.md) | A pane seat inherits the runner's environment, including `CLAUDE_CODE_MESSAGING_TOKEN`, against the worker env allowlist (Execution, priority high) | done | P1 | harden-t9-p28-e0efc3b62-workerbaseenv-is-an-allowlist-read-from-packages-run-supervisor-contracts-worker-env-allowlist-v1-json-canary-unit-proof-plus-pane-wiring-proof-left-drop-the-claude-code-force-session-persistence-workaround-from-the-claude-invocations-and-the-external-mode-gate-filtering-the-daemon-env-through-the-same-file-paseo | - |
 | [p-ffz65fjo6u](backlog/p-ffz65fjo6u-windows-runtime-support-windows-priority-high.md) | Windows runtime support (Windows, priority high, owner decision 2026-11-13: rc.7 ships Windows at the level "installs and activates") | proposed | P1 | windows | - |
 | [p-s7lnni5443](backlog/p-s7lnni5443-ci-rebuilds-rust-from-nothing-on-every-run-and.md) | CI rebuilds Rust from nothing on every run and every main push queues a full run (CI, priority high; owner 2026-11-13, scheduled 2026-11-15 right after the capability-reads plan) | done | P1 | platform-foundations | - |
