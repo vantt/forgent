@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "A live idle lead is replaced, never left idle behind already-live"
-status: running
+status: done
 lead: lead:NUDGE
 base: 508b63defbe53850364ebe14fb621d93921e11da
 priority: P1
@@ -39,7 +39,7 @@ No new mechanism, verb, watcher definition or Rust change; no `session type`.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | Replace rule in the supervisor skill, with its owning test | - | core/skills/fgos-supervisor/SKILL.md, test/skills/fgos-supervisor-idle-lead.test.mjs | 1 | running |
+| 1 | Replace rule in the supervisor skill, with its owning test | - | core/skills/fgos-supervisor/SKILL.md, test/skills/fgos-supervisor-idle-lead.test.mjs | 1 | done |
 
 ## Owner questions
 None.
