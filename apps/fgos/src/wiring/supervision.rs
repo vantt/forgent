@@ -1684,7 +1684,8 @@ fn read_session(root: &Path, target: &str, lines: u32) -> Result<Value, Categori
     Ok(json!({"session": session.handle, "lines": lines, "truncated": truncated, "text": text}))
 }
 
-/// Whether an open event names `session`: by its id, handle, a role it holds or its slot key.
+/// Whether an open event names `session`: by its id (whole, or the agent CLI's own id after the machine part, which is
+/// how a watcher event names it), handle, a role it holds or its slot key.
 fn names_session(subject: &str, session: &fgos_identity::directory::Listed) -> bool {
     let subject = subject.strip_prefix("session:").unwrap_or(subject);
     let key = session
@@ -1692,7 +1693,14 @@ fn names_session(subject: &str, session: &fgos_identity::directory::Listed) -> b
         .as_ref()
         .and_then(|ids| ids.terminal.as_ref())
         .and_then(|t| t.key.as_deref());
+    let cli_id = session
+        .ids
+        .as_ref()
+        .and_then(|ids| ids.cli_session.as_ref())
+        .map(|c| c.id.as_str());
     subject == session.id
+        || session.id.rsplit('/').next() == Some(subject)
+        || cli_id == Some(subject)
         || subject == session.handle
         || session.roles.iter().any(|r| r == subject)
         || key == Some(subject)

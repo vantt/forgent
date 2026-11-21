@@ -12,21 +12,25 @@ properties:
     description: Seconds between ticks while the project has live work. In seconds.
     type: integer
     minimum: 1
+    maximum: 3600
     x-fgos-scope: both
   idleIntervalSec:
     description: Seconds between ticks while the project is idle. In seconds.
     type: integer
     minimum: 1
+    maximum: 86400
     x-fgos-scope: both
   lookbackSec:
     description: How far before the last tick edge the definitions look. In seconds.
     type: integer
     minimum: 0
+    maximum: 604800
     x-fgos-scope: both
   overdueFactor:
     description: How many tick intervals may pass without a tick before the watcher counts as overdue. In ticks.
     type: integer
     minimum: 1
+    maximum: 100
     x-fgos-scope: both
   definitions:
     description: Files or directories of detection definitions, release- or repo-relative, each passed as one definition path; a project may add its own.
@@ -56,24 +60,29 @@ properties:
     description: Consecutive failed wakes before a supervisor-wake-failed row is raised. In wakes.
     type: integer
     minimum: 1
+    maximum: 100
     x-fgos-scope: both
   stuckWakeLimit:
     description: Consecutive already-live wakes with events still unhandled before a supervisor-stuck row is raised. In wakes.
     type: integer
     minimum: 1
+    maximum: 1000
     x-fgos-scope: both
   sessionGoneLimit:
     description: Consecutive gone states before a session-gone row is raised.
     type: integer
     minimum: 0
+    maximum: 1000
     x-fgos-scope: both
   sessionIdleLimit:
     description: Consecutive idle periods before a session-idle row is raised.
     type: integer
     minimum: 0
+    maximum: 1000
     x-fgos-scope: both
   sessionNoResultLimit:
     description: Consecutive runs without a result before a session-no-result row is raised.
     type: integer
     minimum: 0
+    maximum: 1000
     x-fgos-scope: both
