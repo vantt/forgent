@@ -31,7 +31,7 @@ Superseded by: None recorded
 
 The doctor/fix registry is the extension point for environment readiness: whether fgOS can run correctly on this machine and in this project (RUL109 of the spec). It is not an incident console and not a linter of the fgOS repository; section 3 says where those judgments live. Modules register checks and fixes instead of adding one-off repair logic. Config defaults are not registered: the standard (`core/config-standard`) holds every default and the schemas (`core/config-schema`) every shape rule, read through the config door.
 
-There is no `fgos setup` verb (retired, section 4). `fgctl init` is the one-command workspace onboarding orchestrator; after activation it invokes active local `fgos init`, `fgos doctor --fix`, and `fgos doctor --json`; the last result is the closing block on stdout: `Ready` and one runnable next step with exit 0 when `ok`, otherwise a numbered list of the failing checks with their fixes and exit 2, the table's `precondition` (the release stays activated). `fgos init` also gives the project and the machine their header-only `config.yaml`. `fgos init` also creates and trusts the repository's Git WAL (the call the `git-wal-dir` fix makes, so a fresh project's first doctor finds the journal ready) and then recovers interrupted Git operations as its last, fail-safe steps, through the function `fgos git recover` runs. Legacy shell/global integration remains compatibility behavior under the explicit deprecated fallback window: 30 calendar days after preview release publication, unless a later release decision replaces that policy.
+There is no `fgos setup` (12f8a187a) verb (retired, section 4). `fgctl init` is the one-command workspace onboarding orchestrator; after activation it invokes active local `fgos init`, `fgos doctor --fix`, and `fgos doctor --json`; the last result is the closing block on stdout: `Ready` and one runnable next step with exit 0 when `ok`, otherwise a numbered list of the failing checks with their fixes and exit 2, the table's `precondition` (the release stays activated). `fgos init` also gives the project and the machine their header-only `config.yaml`. `fgos init` also creates and trusts the repository's Git WAL (the call the `git-wal-dir` fix makes, so a fresh project's first doctor finds the journal ready) and then recovers interrupted Git operations as its last, fail-safe steps, through the function `fgos git recover` runs. Legacy shell/global integration remains compatibility behavior under the explicit deprecated fallback window: 30 calendar days after preview release publication, unless a later release decision replaces that policy.
 
 ## 2. Registry Types
 
@@ -134,9 +134,9 @@ skips without a pin or an activation. The pin moves at each official release
 - reports fix results;
 - then reports checks.
 
-## 4. Retired `fgos setup`
+## 4. Retired fgos setup
 
-`fgos setup` was retired on 2026-11-16 (program step S4): it answers "unknown verb" (exit 4) like any unknown verb, and `fgos setup --help` and `fgos setup --pretty` do too. The condition this section used to carry, the 30-day preview fallback window, ended on 2026-10-18. With the verb went the shell-rc source line it wrote, the retired runner-config conversion, its copy of the release's skills into a project, and the doctor row `shell-integration-sourced`. Onboard a project with `fgctl init`; repair it with `fgos doctor --fix`. Existing rc lines keep working (the integration script still ships) and `fgos uninstall` names them. History: packaging spec "Lịch sử quyết định", 2026-11-16.
+`fgos setup` (12f8a187a) was retired on 2026-11-16 (program step S4): it answers "unknown verb" (exit 4) like any unknown verb, and `fgos setup --help` and `fgos setup --pretty` do too. The condition this section used to carry, the 30-day preview fallback window, ended on 2026-10-18. With the verb went the shell-rc source line it wrote, the retired runner-config conversion, its copy of the release's skills into a project, and the doctor row `shell-integration-sourced`. Onboard a project with `fgctl init`; repair it with `fgos doctor --fix`. Existing rc lines keep working (the integration script still ships) and `fgos uninstall` names them. History: packaging spec "Lịch sử quyết định", 2026-11-16.
 
 ## 5. Config Merge Contract
 
@@ -217,14 +217,14 @@ Distribution rules and recorded decisions are retained below; the area specifica
 
 ##### Setup
 
-> **Retired 2026-11-16.** `fgos setup` no longer exists (section 4). The scenario below is kept as the history of what it did; the doctor's fixes and `fgctl init` now carry the parts that survive (lock directories, config files, hooks). The shell-rc source line, the skill copy into a project and the runner-config conversion ended with it.
+> **Retired 2026-11-16.** `fgos setup` (12f8a187a) no longer exists (section 4). The scenario below is kept as the history of what it did; the doctor's fixes and `fgctl init` now carry the parts that survive (lock directories, config files, hooks). The shell-rc source line, the skill copy into a project and the runner-config conversion ended with it.
 
-- **Blocked when:** never — running `fgos setup` always attempts its work;
+- **Blocked when:** never — running `fgos setup` (retired in 12f8a187a) always attempts its work;
   a shell profile that does not exist is simply skipped rather than
   refused.
 - **What changes:** for every shell profile the caller actually has (bash's
   and/or zsh's, whichever exist), the shell helper's source line is added
-  if not already present — never duplicated on a repeat run. Each of the local project config file and the global config file (`~/.fgos/config.yaml`, row 5b) is created as a header-only file when neither it nor a legacy `config.json` exists (`init` of the Config component); `fgos setup` writes no default into either, because the standard supplies every value, and a file that exists is left untouched. The lock directories of row 5g are created when missing:
+  if not already present — never duplicated on a repeat run. Each of the local project config file and the global config file (`~/.fgos/config.yaml`, row 5b) is created as a header-only file when neither it nor a legacy `config.json` exists (`init` of the Config component); `fgos setup` (12f8a187a) writes no default into either, because the standard supplies every value, and a file that exists is left untouched. The lock directories of row 5g are created when missing:
   `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);
   `<stateRoot>/terminal` is not set up here: the
   terminal allocation store creates it with mode 0700 on first use.

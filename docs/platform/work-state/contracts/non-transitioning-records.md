@@ -58,4 +58,4 @@ nào cho item nào (tương thích ngược, theo luật tiến hóa schema RUL1
 - **Blocked when:** thiếu id — `validation`.
 - **What changes:** một sự kiện outcome vào nhật ký cho MỖI nửa (hai sự kiện riêng biệt, cùng id, đến ở hai thời điểm khác nhau); bản chiếu gộp hai nửa theo id — nửa đến sau CỘNG THÊM vào nửa đã có, không bao giờ đè mất.
 - **Side effects:** không.
-- **Afterwards:** `fgos check` đọc được cả hai nửa cho item đó ngay khi chúng tồn tại; item chưa từng chạy hoàn toàn không xuất hiện trong `check`.
+- **Afterwards:** `fgos check` (đã gỡ trong c36f8d746) đọc được cả hai nửa cho item đó ngay khi chúng tồn tại; item chưa từng chạy hoàn toàn không xuất hiện trong `check`.

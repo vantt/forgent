@@ -155,7 +155,7 @@ Condition before it ships: a retrospective item whose knowledge fits no section 
 
 ## 11. Open Questions
 
-1. **Where the pointer line lives.** *Decided 2026-11-12:* one new instruction seed, a file named documentation-door.md under core/instructions, holding one sentence; the existing instruction registry renders it into every agent CLI's always-loaded file next to the four seeds already there, and `fgos setup` carries it to every project that uses fgOS. No new mechanism.
+1. **Where the pointer line lives.** *Decided 2026-11-12:* one new instruction seed, a file named documentation-door.md under core/instructions, holding one sentence; the existing instruction registry renders it into every agent CLI's always-loaded file next to the four seeds already there, and `fgos setup` (retired in 12f8a187a) carries it to every project that uses fgOS. No new mechanism.
 2. **The material-only completion path for item `p-ixrbglli5o`.** *Decided 2026-11-12:* the material goes into the admission request, and the cleanup gate accepts that request as evidence (section 6.4). Rejected: loosening the gate to accept a closing report (the gate excludes engine reports on purpose), and attesting the nearest section without growing it (false evidence).
 
 ## 12. Implementation Alignment

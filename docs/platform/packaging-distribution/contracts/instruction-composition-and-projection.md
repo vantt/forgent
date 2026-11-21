@@ -228,7 +228,7 @@ Before instruction composition becomes a release promise, `fgos doctor` and `fgo
 - host adapter projections that omit applicable semantic rules;
 - generated projections edited by hand when provenance says they are managed.
 
-`fgos doctor` remains read-only. `fgos doctor --fix` may regenerate projections through registered fixes. Current legacy `fgos setup` may consume the same fix path while it remains implemented, but new design should not depend on it.
+`fgos doctor` remains read-only. `fgos doctor --fix` may regenerate projections through registered fixes. Current legacy `fgos setup` (12f8a187a) may consume the same fix path while it remains implemented, but new design should not depend on it.
 
 ## 12. Projection Ledger Fit
 

@@ -29,7 +29,7 @@ Related:
 - docs/platform/packaging-distribution/spec.md
 ```
 
-Planned/live legend: every verb, key, lock, file and crate named below is **planned** until the plan's integration phase lands. The session-verb plan renamed `fgos head ...` to `fgos session start|rotate|write` (PS-16); `fgos session start` and `fgos session rotate` are live (Session Host), `fgos session stop` is planned.
+Planned/live legend: every verb, key, lock, file and crate named below is **planned** until the plan's integration phase lands. The session-verb plan renamed `fgos head ...` (dbd26eae6) to `fgos session start|rotate|write` (PS-16); `fgos session start` and `fgos session rotate` are live (Session Host), `fgos session stop` is planned.
 
 ## 1. Overview and boundaries
 

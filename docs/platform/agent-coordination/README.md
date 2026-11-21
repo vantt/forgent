@@ -49,7 +49,7 @@ The retired engine no longer defines this area's live runtime. Current material
 is narrower, but not empty: it retains the dispatch/result/recovery boundaries
 that have surviving executable owners, and four cognitive companions consumed
 by the registered architecture-advisory skill. No current CoordinationSession,
-FlowDefinition, CoordinationProtocol or `fgos coordination` contract is retained.
+FlowDefinition, CoordinationProtocol or `fgos coordination` (retired in 2180b4e72) contract is retained.
 
 | Reading need | Current document material |
 |---|---|

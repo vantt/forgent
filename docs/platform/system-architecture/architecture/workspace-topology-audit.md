@@ -95,7 +95,7 @@ Observed code:
   config with project config winning.
 - Some paths, including setup/doctor/dispatch variants, resolve to main checkout
   using `resolveMainCheckoutRoot`.
-- `fgos setup` was changed to avoid writing `.fgos/config.json` inside linked
+- `fgos setup` (retired in 12f8a187a) was changed to avoid writing `.fgos/config.json` inside linked
   worktrees.
 
 Status: not root-solved.

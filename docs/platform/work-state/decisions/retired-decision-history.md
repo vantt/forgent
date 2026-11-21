@@ -302,7 +302,7 @@ và bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách 
   biến 896219a7 ("đồ thị phi chu trình") đúng cho **toàn bộ** đồ thị hợp
   nhất, không chỉ nhánh `deps`.
 - **Dẫn xuất, không vật lý (derived-not-physical) — ba căn cứ:**
-  1. **RUL11 (tiến hóa schema)** (log bất khả xâm phạm, `work-state.md:703`): một trường
+  1. RUL11 (tiến hóa schema) của work-state (log bất khả xâm phạm, `work-state.md:703`): một trường
      `edges[]` lưu trữ mới sẽ đòi migration cho mọi event cũ; một
      read-projection thuần Domain thì không.
   2. **Học thuyết DT2 "add-through-không-alongside"**: mở rộng cửa ghi hiện

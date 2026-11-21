@@ -99,7 +99,7 @@ Settled by owner decision 79 (2026-11-09; target shapes in the [T8 arbitration](
 
 **Trust line.** Setup and render refuse what they cannot prove they wrote: a stamp, an owned name and a plain (non-link) path are the proofs.
 
-**Limit, not closed.** A foreign directory that carries fgOS's own generated marker is treated as fgOS's, ; `fgos setup`, the one door that copied into projects, is retired, and `fgos uninstall` reads the stamp through `skill_stamp.rs` (contract `packages/distribution/contracts/skill-stamp.v1.json`). The two link predicates that exist (`lstatPlain` here and the source collector of `scripts/build-rust-distribution.mjs`) are one decision held twice: the T9 (Packaging) owns merging them.
+**Limit, not closed.** A foreign directory that carries fgOS's own generated marker is treated as fgOS's, ; `fgos setup` (12f8a187a), the one door that copied into projects, is retired, and `fgos uninstall` reads the stamp through `skill_stamp.rs` (contract `packages/distribution/contracts/skill-stamp.v1.json`). The two link predicates that exist (`lstatPlain` here and the source collector of `scripts/build-rust-distribution.mjs`) are one decision held twice: the T9 (Packaging) owns merging them.
 
 ## 4. Source-Of-Truth Rule
 
@@ -228,7 +228,7 @@ Doctor rows that judge skills, after the hardening of 2026-11-09 (each judges mo
 | `executor-skills-installed` | every skill an executor declares in `supports.skills` is a non-empty `SKILL.md` in the project-level or user-level skill directory of each CLI the executor invokes (roots from `AGENT_SKILL_DIRS`); it judges the main checkout only, and a linked worktree gets foreign skills from provisioning (section 3.1) |
 | `domain-registry-compiled` | the same function as `npm run build:domains -- --check` (`checkCompiledDomains`): every `compiled.json` has a `registry.yaml`, equals its compile byte for byte, and no two workflow files share a key |
 
-`fgos doctor` remains read-only. `fgos doctor --fix` may regenerate generated projections through the registered fix path. `fgos setup` is retired.
+`fgos doctor` remains read-only. `fgos doctor --fix` may regenerate generated projections through the registered fix path. `fgos setup` (12f8a187a) is retired.
 
 ## 10. Projection Ledger Fit
 

@@ -758,7 +758,7 @@ provider thay đổi không invalidate backend proof không liên quan.
 Mỗi backend driver đăng ký check schema/capability và mỗi machine-registry
 instance được `fgos doctor` kiểm tra: binary hoặc runtime khả dụng, platform
 support, namespace/mount prerequisite, runDir writable, credential source
-readable và probe freshness. `fgos setup` tạo/fill missing backend instance
+readable và probe freshness. `fgos setup` (đã gỡ trong 12f8a187a) tạo/fill missing backend instance
 trong machine registry mà không ghi đè custom value; shared project/global
 config vẫn giữ precedence hiện hành. Doctor report phân biệt rõ `configured`,
 `disabled`, `unavailable` và `ready`.

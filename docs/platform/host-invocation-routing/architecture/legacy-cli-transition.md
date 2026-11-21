@@ -161,4 +161,4 @@ Carriage note: This retained detail comes from `docs/architect/host-invocation-r
 
 - [Host Invocation And Provider Routing](../spec.md) — kernel contract this document depends on.
 - [External Provider Protocol](external-provider-protocol.md)
-- [Runtime Identity And Activation](../../packaging-distribution/architecture/runtime-identity-and-activation.md) — owns the legacy payload's actual on-disk location, `fgctl` rollback mechanics, and the `fgos init` / `fgos doctor --fix` / `fgos doctor` tail that supersedes deprecated legacy `fgos setup` onboarding behavior.
+- [Runtime Identity And Activation](../../packaging-distribution/architecture/runtime-identity-and-activation.md) — owns the legacy payload's actual on-disk location, `fgctl` rollback mechanics, and the `fgos init` / `fgos doctor --fix` / `fgos doctor` tail that supersedes deprecated legacy `fgos setup` (12f8a187a) onboarding behavior.

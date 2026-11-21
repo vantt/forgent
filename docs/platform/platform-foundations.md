@@ -323,7 +323,7 @@ hai câu hỏi khác nhau. Header của L7 mượn cụm "chạy xong ≠ đã m
 nói tinh thần; L9 là chỗ ba mức đó thành khái niệm có tên cho vòng đời việc.
 
 **Nguồn.** Sống ngầm trong STR17 (PR lifecycle) và STR28 (github-adapter); trực tiếp
-liên quan hai nửa của `fgos check` (predicted/actual outcome) và cổng merge CTR005.
+liên quan hai nửa của `fgos check` (đã gỡ trong c36f8d746) (predicted/actual outcome) và cổng merge CTR005.
 D-ID sẽ gán khi một slice đầu tiên cần trích L9 làm ràng buộc thiết kế.
 
 **Hệ quả.** Đọc `proposed` là "xong" là lỗi phân tầng — mới run-complete. Một yêu
@@ -709,7 +709,7 @@ cho một trục khác.
 
 **Cơ chế: config khai báo một lần lúc setup, không hỏi per-decision.**
 Ranh giới được nhận diện bằng một config key `mission` khai báo MỘT LẦN
-lúc `fgos init`/`fgos setup` (đường chính deterministic), đăng ký qua
+lúc `fgos init`/`fgos setup` (đã gỡ trong 12f8a187a) (đường chính deterministic), đăng ký qua
 registry sẵn có của fgOS (`registerConfigDefault`/`registerCheck`,
 `src/setup/registrations.mjs`) — đúng cửa `AGENTS.md`'s "Install/setup/
 doctor gate" đã bắt buộc cho mọi config default mới. `fgos doctor` báo khi

@@ -117,6 +117,6 @@ The source document `docs/distribution-vision.md` (deleted in 97dd62aa7) recorde
 | Current behavior | `spec.md` |
 | Runtime design | `architecture/runtime-identity-and-activation.md` |
 | fgctl/local fgos boundary | `architecture/fgctl-and-local-fgos.md` |
-| Doctor/fix registry (`fgos setup` is retired) | `contracts/setup-doctor-registry.md` |
+| Doctor/fix registry (`fgos setup` (12f8a187a) is retired) | `contracts/setup-doctor-registry.md` |
 | Implementation status | `verification/implementation-alignment.md` |
 | Historical baseline | `history/distribution-baseline.md` |

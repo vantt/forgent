@@ -41,10 +41,10 @@ local fgos
   -> respect state-schema compatibility
 ```
 
-Target command vocabulary has no separate `fgos setup` verb. One-command
+Target command vocabulary has no separate `fgos setup` (retired in 12f8a187a) verb. One-command
 onboarding belongs to `fgctl init`; after activation the active local runtime
 tail is local `fgos init`, `fgos doctor --fix`, and `fgos doctor`. Current Node
-`fgos setup` is legacy compatibility until retired, not target architecture.
+`fgos setup` (12f8a187a) is legacy compatibility until retired, not target architecture.
 
 ## 2. Ownership Split
 

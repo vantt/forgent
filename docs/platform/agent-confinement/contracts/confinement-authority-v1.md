@@ -306,7 +306,7 @@ field boolean do người dùng tự khai.
 
 #### 6.2.1 Trust boundary của backend registry
 
-`confinementBackends` là machine state do `fgos setup`/`fgos doctor` quản lý,
+`confinementBackends` là machine state do `fgos setup` (đã gỡ trong 12f8a187a)/`fgos doctor` quản lý,
 không nằm trong project-over-global config merge. Project config được phép khai
 policy, executor và tham chiếu backend instance ID, nhưng không được định nghĩa
 hoặc ghi đè `type`, `executable`, runtime endpoint hay credential source của
