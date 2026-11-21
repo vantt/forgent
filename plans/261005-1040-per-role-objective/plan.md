@@ -1,6 +1,6 @@
 ---
 title: "Each role of a Unit run gets its own task"
-status: completed
+status: done
 priority: P1
 created: 2026-10-05
 ---

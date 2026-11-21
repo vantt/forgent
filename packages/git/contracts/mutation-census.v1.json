@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ad0236178b46355e6fab10379587d6a4b50b6e61145b015f2c79d65270575dd1",
+  "payloadDigest": "4fc4b2af5c772995c47d130d7072e50aadd309550bae7e51d90ff540648d9582",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1392,7 +1392,7 @@
     "scripts/measure-verify-cost.mjs": "97768198548908742f0687b069fbe77dfc35839a88e4906f3813afbdd5918abc",
     "scripts/merge-test-shards.mjs": "bd5868bb24fd51a042ddabca60d8a3d5bca12c33b4837e54fb19fbfe10001c77",
     "scripts/package-release-assets.mjs": "60efb629a7ebfe1143445557c55abfa4b3269286a0498754a28dddb662a70fd0",
-    "scripts/plan-contract-check.mjs": "57deccc9c30a8690c897e8779e851d6274e3143638af0d30cc3678ab76e0db52",
+    "scripts/plan-contract-check.mjs": "2de21ccf70f34f51104973be3df7d01d098d0b1947465658a526ea3a6dfb3a3b",
     "scripts/prepare-release.mjs": "0bd2e6e7514ba4de781ad480889a8f701729a1d4b9d80d5f5af7b2f1de1160aa",
     "scripts/previous-release-tag.mjs": "d79809904f630061da723099f65817f18367462d1d9d64982426c58eb05d6a0f",
     "scripts/probe-storytelling-material.mjs": "b2991c1c14879193953d901e9122a9e511136a91907949643b7f1af008590df4",

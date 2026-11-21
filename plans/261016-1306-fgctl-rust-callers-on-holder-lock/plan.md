@@ -1,7 +1,7 @@
 ---
 title: "4.4a Rust callers lên holder-lock: fgctl, install.lock, observe"
 description: "Chuyển activation lock, phép kiểm main checkout của fgctl, install.lock và observe store lock sang crate fgos-holder-lock của 4.2; xoá đường v1 cùng phase; nằm trên đường găng trước cutover main checkout của 4.3"
-status: pending
+status: draft
 priority: P1
 effort: 16h
 branch: worktree-agent-ae86665b911b82fc1

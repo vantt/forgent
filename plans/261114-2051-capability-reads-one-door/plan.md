@@ -1,7 +1,7 @@
 ---
 title: "Capability reads through one door (step 1 of the capability-rows decision)"
 description: "Every reader of runner.capabilities goes through bind() or one named read port next to it, enforced by an architecture test; config, bindings and reads stay identical."
-status: pending
+status: draft
 priority: P2
 effort: 24.5h
 branch: plan/capability-reads-one-door

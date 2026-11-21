@@ -1,7 +1,7 @@
 ---
 title: "Observe sees every run, and measures discussions"
 description: "One run definition and one lister per language for .fgos/assignments (nested unit-run ids), so Observe, show-run, inspection and the reconciler stop missing discussion runs; then the measurement discussion power needs: coverage subcommand, writer-owned unit summaries, stance/agreement sensor, eval store."
-status: completed
+status: done
 priority: P1
 effort: "~7d"
 tags: [observe, metrics, run-result, discussion, measurement, contract, doctor]

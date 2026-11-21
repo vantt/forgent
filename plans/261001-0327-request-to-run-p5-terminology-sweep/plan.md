@@ -1,7 +1,7 @@
 ---
 title: "P5 Quét thuật ngữ: một tên mỗi khái niệm trên toàn tài liệu"
 description: "Sau P4, code đã đổi tên; P5 quét docs/spec/doctrine còn dùng tên cũ (~800 lượt) và thêm guard chặn tái phát, cập nhật bản đồ component cuối."
-status: complete
+status: done
 priority: P2
 effort: "~2–3d"
 tags: [docs, terminology, guard]

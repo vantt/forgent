@@ -1,7 +1,7 @@
 ---
 title: "Mailbox V1: the pure core crate fgos-mailbox-core"
 description: "Build rung V1 of the Agent Mailbox ladder: the serde-only Rust crate fgos-mailbox-core (envelope, registry and generations, name resolution, state machine with lazy sweep, channel policies, effective wake, bounded counters, peer frame and body escape), proven by cargo test -p fgos-mailbox-core, on branch mailbox/v1-v3 only."
-status: completed
+status: done
 priority: P2
 effort: ~3.5d (8 phases, strictly sequential)
 branch: main (plan only); all code on branch mailbox/v1-v3 in linked worktree ../forgent-mailbox, never merged to main until feasibility is proven

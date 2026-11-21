@@ -1,7 +1,7 @@
 ---
 title: "Mailbox: sender-requested acknowledgement (--need-ack, --reply-by)"
 description: "A sender marks a message as needing an acknowledgement; the receiver is told to reply in one line; past reply-by the sender gets one notice and status lists it, same machine and across machines."
-status: pending
+status: draft
 priority: P2
 effort: 7d
 branch: main

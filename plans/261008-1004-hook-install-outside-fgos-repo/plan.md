@@ -1,7 +1,7 @@
 ---
 title: "Multi-agent hooks (Claude, Codex, AGY, OMP, Pi) chạy ngoài fgOS source repo"
 description: "Portable runtime door, installer và doctor kiểm tra/repair khả năng chạy thật cho Claude Code, Codex, AGY, OMP và Pi."
-status: completed
+status: done
 priority: P1
 created: 2026-10-08
 budget: "Đề xuất cập nhật 5 agents: production thêm ≤ 650 dòng; xoá miễn phí; test thêm ≤ 750 dòng; ≤ 3.5 ngày. Docs/plan không tính vào dòng code. Vượt khung phải hỏi theo mẫu quyết định."

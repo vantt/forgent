@@ -1,7 +1,7 @@
 ---
 title: "Mailbox V3: hook payload contract tests in crate fgos-mailbox"
 description: "Build rung V3 of the Agent Mailbox ladder: record real Stop and PostToolUse hook payloads from Claude Code, Codex and agy, redact them into fixtures, and prove the drain function against them (output shape each CLI accepted, fail-quiet, agent_id skip, generation registration, Stop-block bound) with cargo test -p fgos-mailbox, on branch mailbox/v1-v3 only."
-status: completed
+status: done
 priority: P2
 effort: ~3d (7 phases, strictly sequential)
 branch: main (plan only); all code on branch mailbox/v1-v3 in linked worktree /home/vantt/projects/forgent-mailbox, never merged to main until the owner says feasibility is proven

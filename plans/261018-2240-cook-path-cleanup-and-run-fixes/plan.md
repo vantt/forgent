@@ -1,6 +1,6 @@
 ---
 title: "COOK P1 (cut) + P3: clean stale facts, rename the old cook to deliver, fix the run path for cook"
-status: completed
+status: done
 priority: P1
 created: 2026-10-18
 source: plans/reports/roadmap-261016-2212-fgos-cook-and-git-component.md (P1, P3)

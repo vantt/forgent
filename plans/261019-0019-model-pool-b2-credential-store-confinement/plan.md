@@ -1,7 +1,7 @@
 ---
 title: "Đợt B2: invocation khai credentialStore {use, homeEnv, files}; confinement và driver bwrap cấp đúng store đó"
 description: "Invocation tự khai store nó đọc, biến env trỏ tới private home và các file cần chép; request của Confinement Authority mang credentialStore thay resourceBindings; driver bwrap chép theo danh sách của invocation và gắn homeEnv. Không đổi lease, quarantine, llmAccounts hay global config."
-status: pending
+status: draft
 priority: P1
 effort: 21h
 branch: plan/model-pool-b2-credential-store

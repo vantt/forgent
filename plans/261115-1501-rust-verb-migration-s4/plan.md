@@ -1,7 +1,7 @@
 ---
 title: "Rust verb migration S4 (packaging: retire setup; wire-agents, uninstall, init, doctor native)"
 description: "Retire fgos setup and move wire-agents, uninstall, init and doctor onto the Rust host with one doctor registry, one packaging layer in Rust and one bounded Node rows bridge for the layers S5-S7 still own."
-status: pending
+status: draft
 priority: P1
 effort: 27.5d
 branch: cook/s4-plan

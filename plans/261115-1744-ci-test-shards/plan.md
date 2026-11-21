@@ -1,7 +1,7 @@
 ---
 title: "CI test shards: split the npm test job into balanced parallel shards"
 description: "Run the full npm test suite in CI as 5 duration-balanced shards with an exact-set check and an aggregate job that keeps the name test (ubuntu-latest)."
-status: done (landed 2026-11-16: 04520dbf6)
+status: done
 priority: P2
 effort: 5h
 branch: mail/ci-test-shards-plan

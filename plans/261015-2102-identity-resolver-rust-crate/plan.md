@@ -1,3 +1,7 @@
+---
+status: done
+---
+
 # Plan 5.1: chuyển resolver writer identity sang crate Rust `fgos-session-identity`
 
 - Ngày: 2026-10-15. Lead: agent 5.1, worktree `.claude/worktrees/agent-ac970642d8c2e90a0`, nhánh `worktree-agent-ac970642d8c2e90a0`. Tiếp bản nháp của lead trước (bị dừng nhầm).

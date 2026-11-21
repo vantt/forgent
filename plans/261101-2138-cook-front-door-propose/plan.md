@@ -1,3 +1,7 @@
+---
+status: draft
+---
+
 # Thi công cửa vào của cook (`fgos workflow propose`)
 
 Thiết kế: [design.md](design.md). Owner đã duyệt cách B và bảng loại mảnh (hợp đồng và nền tảng = `high`) ngày 2026-11-03. Kế hoạch này chỉ là thứ tự làm; không mở thêm phạm vi.

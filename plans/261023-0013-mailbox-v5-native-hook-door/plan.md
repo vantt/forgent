@@ -1,7 +1,7 @@
 ---
 title: "Mailbox V5: the native `fgos hook mailbox` door, the hook install table, the real send and inbox verbs, and the hook cost in each CLI"
 description: "Build rung V5 of the Agent Mailbox ladder on branch mailbox/v1-v3: the host serves `fgos hook mailbox` natively and hands every other hook kind to legacy-node; `fgos mailbox send|inbox [--claim]` become native verbs; the record directory comes from the existing main-checkout resolver; the four hook install functions become one table with the mailbox rows and the doctor probe; the mailbox keys register into setup; V4's live suite re-runs through the real entry with benign content; and the no-mail hook p95 is measured inside Claude Code and Codex against 50 ms."
-status: pending
+status: draft
 priority: P1
 effort: ~4d (9 phases, strictly sequential)
 branch: main (plan only); all code on branch mailbox/v1-v3 in linked worktree /home/vantt/projects/forgent-mailbox, never merged to main by this rung

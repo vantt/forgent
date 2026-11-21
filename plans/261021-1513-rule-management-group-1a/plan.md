@@ -1,6 +1,6 @@
 ---
 title: Rule management group 1A — six small fixes to existing rules and rule checks
-status: proposed (frame awaiting owner approval)
+status: draft
 created: 2026-10-21 15:13 (Asia/Saigon)
 lane: INS
 source: plans/reports/handoff-261021-1446-rule-management-execution-and-decisions.md

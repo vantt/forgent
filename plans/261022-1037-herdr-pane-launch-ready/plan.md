@@ -1,7 +1,7 @@
 ---
 title: "Herdr pane launch survives shell and agent start screens"
 description: "Wait for a ready shell before typing the launcher, start panes with shell update prompts off, and dismiss an agent's start banner before the brief is typed."
-status: completed
+status: done
 priority: P1
 effort: 12.5h
 branch: main

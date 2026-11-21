@@ -1,6 +1,6 @@
 ---
 title: "Đo tác động RunResult classification và chốt producer friction tầng nền"
-status: pending
+status: draft
 priority: P1
 created: 2026-09-30
 blockedBy: []

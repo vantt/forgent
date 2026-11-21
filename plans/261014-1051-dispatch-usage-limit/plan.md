@@ -1,3 +1,7 @@
+---
+status: withdrawn
+---
+
 # Nhận diện hết hạn mức (usage limit) ở cửa dispatch
 
 Status: superseded by plans/261014-1400-two-doors-one-rununit — [plan mới](../261014-1400-two-doors-one-rununit/plan.md). Trạng thái cũ giữ bên dưới để tra cứu.

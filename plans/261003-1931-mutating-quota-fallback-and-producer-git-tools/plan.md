@@ -1,7 +1,7 @@
 ---
 title: "Fallback quota cho Unit ghi file + bỏ quyền git của producer"
 description: "Fallback provider-limit hiện chỉ chạy với vai read-only: cổng mutating tính lại bind() không biết candidate trước đã bị bỏ qua nên báo binding mismatch. Sửa để producer cũng fallback được; bỏ Bash(git add/commit) khỏi allowedTools vì runner đã tự commit."
-status: completed
+status: done
 priority: P1
 effort: "~0.5d"
 tags: [quota, fallback, bind, mutating-gate, allowedTools]

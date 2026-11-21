@@ -1,7 +1,7 @@
 ---
 title: "Hoàn thiện và đánh bóng đường chạy fgos run và fgos workflow start"
 description: "Kế thừa --timeout và --account cho workflow start, bổ sung doctor check kiểm tra posture readiness của executor, và chuẩn hóa bảng exit code cho các outcome không pass của run/workflow"
-status: completed
+status: done
 priority: P1
 effort: "~2d tổng công"
 branch: main

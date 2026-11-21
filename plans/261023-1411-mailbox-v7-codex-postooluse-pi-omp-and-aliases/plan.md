@@ -1,7 +1,7 @@
 ---
 title: "Mailbox V7: Codex Stop channel off, IDENT handles as addresses, Codex re-measured on PostToolUse, pi and omp as an experiment, wake probes, leftovers"
 description: "The rungs after V6 on branch mailbox/v1-v3, split into six independently shippable sub-rungs: V7a turns off Codex delivery at Stop (a user-role channel), V7b lets send take IDENT handles and lead:<LANE> and shows the handle in frames, V7d closes the spec's V7 leftovers, and the measured sub-rungs V7c (Codex on PostToolUse), V7e (pi and omp) and V7f (wake channel probes) wait for owner budgets."
-status: pending
+status: draft
 priority: P2
 effort: "build ~6-8 d (phases 1-5, 8, 11); live runs per sub-rung only after the owner's budget answer (section 9)"
 branch: main (plan only); all code on branch mailbox/v1-v3 in linked worktree /home/vantt/projects/forgent-mailbox, never merged to main

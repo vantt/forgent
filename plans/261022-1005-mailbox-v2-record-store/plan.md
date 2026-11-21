@@ -1,7 +1,7 @@
 ---
 title: "Mailbox V2: the record adapter in crate fgos-mailbox"
 description: "Build rung V2 of the Agent Mailbox ladder: the metadata snapshot under the holder-lock `mailbox` mutex written with durable-file, immutable body files with garbage collection, a kill matrix at every write step, two-process contention with the wait cap, the Q2 pruning of dead bindings, and the size ceiling and costs measured against S0, proven by cargo test -p fgos-mailbox on branch mailbox/v1-v3 only."
-status: completed
+status: done
 priority: P2
 effort: ~3.5d (8 phases, strictly sequential)
 branch: main (plan only); all code on branch mailbox/v1-v3 in linked worktree /home/vantt/projects/forgent-mailbox, never merged to main until the owner says feasibility is proven

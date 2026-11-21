@@ -1,7 +1,7 @@
 ---
 title: "Bảng chương trình: các plan nền tảng fgOS đang chạy và phụ thuộc giữa chúng"
 description: "Một chỗ để mọi agent, trên mọi máy, thấy plan nào đang chạy, plan nào chờ cái gì, file chung nào dễ va, quyết định nào đang treo"
-status: in-progress
+status: running
 priority: P1
 created: 2026-10-17
 ---

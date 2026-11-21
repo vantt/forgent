@@ -1,7 +1,7 @@
 ---
 title: "Human gates in two levels: one Rust gate door decides, Work only shows"
 description: "Move gate-bypass and gate-check to Rust, then build one gate door (decide, ask, grant, require) on the Event Store, decide risk from facts, and retire self-declared approvals and the risk-keyword gates."
-status: approved
+status: ready
 priority: P2
 effort: 12d
 branch: main

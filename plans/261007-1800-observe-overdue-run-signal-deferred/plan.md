@@ -1,7 +1,7 @@
 ---
 title: "Observe: overdue run signal (deferred until a real hung run exists)"
 description: "Design for flagging a run whose worker never settled, kept ready but not built: no run in the data has died this way, so it would fix no measured number."
-status: deferred
+status: withdrawn
 priority: P3
 branch: main
 tags: [observe, run-result, rust, measurement]

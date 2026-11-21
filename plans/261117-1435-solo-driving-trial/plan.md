@@ -1,7 +1,7 @@
 ---
 title: "Solo driving trial: drive 1-2 real items through the role model by hand"
 description: "Run shaper, planner, supervisor, leader, workers and watcher by hand on 1-2 small real backlog items, measure every step, land through HARDEN, and report the numbers and gaps to the portfolio-driving draft."
-status: completed
+status: done
 priority: P2
 effort: 6h
 branch: plan/solo-driving-trial

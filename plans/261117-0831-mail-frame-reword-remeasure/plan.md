@@ -1,7 +1,7 @@
 ---
 title: "Mailbox: reword the need-ack line, re-measure, land the zombie fix and the frozen-file door debt"
 description: "One branch: measure 2-3 rewordings of the frame's acknowledgement line against the current one, write the chosen one, re-freeze V7n's cells as a new addendum on the shipped frame, and retire the live harness's process-door debt with the zombie fix."
-status: pending
+status: draft
 priority: P2
 effort: 2d (plus two quiet windows, about 2.5 h and 1 h)
 branch: mail/frame-reword-remeasure

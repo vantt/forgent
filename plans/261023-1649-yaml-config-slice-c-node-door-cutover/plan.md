@@ -1,7 +1,7 @@
 ---
 title: "YAML Document + Config foundation, Slice C: native-door cutover (yaml and config namespaces, one Node facade, every reader and writer moved, js-yaml and src/config deleted)"
 description: "Three landings: A (yaml namespace, js-yaml deleted, RUL101 superseded), B (config namespace entries check/fix/accounts from Slice D phase 11 plus snapshot/explain/applyPatch/init, crate additions, Node facade), C (the cutover: ~100 Node reader sites, 5 writers, Rust readers, Node doctor rows and setup, account and token readers from Slice D phases 12 to 14, fixture helper flip, guards, then the live migration of this repository as its first committed step)."
-status: in-progress
+status: running
 priority: P1
 effort: 147h
 branch: cfg/slice-c-yaml (A), cfg/slice-c-door (B), cfg/slice-c (C): linked worktrees; never the shared main checkout
