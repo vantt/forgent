@@ -411,7 +411,7 @@ fn run_settle(
         resolved_executor_id: text("resolvedExecutorId"),
         effective_policy: args.get("effectivePolicy"),
         executor_redirected: args["executorRedirected"].as_bool().unwrap_or(false),
-        reasoning_effort: text("reasoningEffort"),
+        reasoning_effort: args.get("reasoningEffort"),
         model_warnings: &model_warnings,
         provider_capacity_selection: None,
         provider_capacity_evidence: None,

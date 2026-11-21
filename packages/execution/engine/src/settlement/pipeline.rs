@@ -392,7 +392,7 @@ pub struct SettleInput<'a> {
     pub resolved_executor_id: Option<&'a str>,
     pub effective_policy: Option<&'a Value>,
     pub executor_redirected: bool,
-    pub reasoning_effort: Option<&'a str>,
+    pub reasoning_effort: Option<&'a Value>,
     pub model_warnings: &'a [Value],
     pub provider_capacity_selection: Option<&'a Value>,
     pub provider_capacity_evidence: Option<&'a Value>,

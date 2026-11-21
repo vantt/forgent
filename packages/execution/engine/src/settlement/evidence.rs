@@ -7,7 +7,7 @@ use std::path::Path;
 use fgos_execution::handoff::sha256_hex;
 use serde_json::{json, Map, Value};
 
-use crate::confinement::driver::js::relative;
+use crate::confinement::driver::js::{relative, truthy};
 use crate::credentials::files::read_agent_file;
 use crate::run_result::claim::CLAIM_FRICTIONS_MAX;
 use crate::run_result::{is_verdict_seat, validate_agent_result_claim_contract, ClaimContext};
@@ -488,19 +488,20 @@ pub fn declared_scope_of(
 }
 
 /// The policy a receipt records, plus what the launch itself did with it, under `launch`: the effort level as the
-/// provider CLI's own flag and every place the model that ran differs from the one bound.
+/// provider CLI's own flag (the rendered control `{command, flag, native}` a launch records, kept whole) and every
+/// place the model that ran differs from the one bound.
 pub fn with_launch_facts(
     policy: &Value,
-    reasoning_effort: Option<&str>,
+    reasoning_effort: Option<&Value>,
     model_warnings: &[Value],
 ) -> Value {
-    let effort = reasoning_effort.filter(|e| !e.is_empty());
+    let effort = reasoning_effort.filter(|e| truthy(Some(e)));
     if effort.is_none() && model_warnings.is_empty() {
         return policy.clone();
     }
     let mut launch = Map::new();
     if let Some(effort) = effort {
-        launch.insert("effortRendered".into(), json!(effort));
+        launch.insert("effortRendered".into(), effort.clone());
     }
     if !model_warnings.is_empty() {
         launch.insert("modelDrift".into(), Value::Array(model_warnings.to_vec()));
