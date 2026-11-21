@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8794486967e4d2f13b1d04bd95af76c23feafbc287a2fae778b6115d3923ce3d",
+  "payloadDigest": "db62ac49a7741ca22d89abb7cf40367c37f76b4b0b276e61cb5137fda500335e",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -761,7 +761,7 @@
     "packages/git/rust/src/recovery.rs": "008ad88abfed485e41f7e2f3b0ff05fdb7235f78236ccfcf2d73b302f2691b89",
     "packages/git/rust/src/refs.rs": "74173432c0708ebfcb75800ce889e115200abbb729b61a0073b202edb76b536b",
     "packages/git/rust/src/remote.rs": "fc6209016dda580dd412c6e9da8b25d32276457a5a72f3bc4026dab2cfd3bbef",
-    "packages/git/rust/src/repository_config.rs": "06f9ff2a61c0cd58270aaf784a6cca86ee39a41c169ff956cda522ab0617208d",
+    "packages/git/rust/src/repository_config.rs": "40b2c93a042103e72db9a7da47c90c31576dbdb2047ac398e0034141fc36b41d",
     "packages/git/rust/src/repository_facts.rs": "86506a81d8de0771d0f3f8e08651088828238e6581bb041f3729ea28b4f19f10",
     "packages/git/rust/src/restore.rs": "1cedaf25ff25763d95b6895db5a1dd822bc37cef20c6501d4dc54faec6dbda04",
     "packages/git/rust/src/scoped_commit.rs": "59c28b3df46057ee409e8668b61349d03e3f2fd3aeeaa71f48fca394aefa5771",
