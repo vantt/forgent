@@ -323,6 +323,42 @@ test('a run-unit host killed after admit settles nothing: the advance ends with 
   assert.deepEqual(projectCase(after).liveReservations, []);
 });
 
+test('a unit whose host keeps ending before it settles fails its step by name after three exits in a row, and the ledger keeps one short stderr line', async () => {
+  const tmp = setupRepo();
+  const workflow = validateWorkflow({ id: 'host-crash-loop', steps: [{ id: 's', units: [unit('slow', 'SLEEP:20000')] }] });
+  const runsDir = path.join(tmp, '.fgos', 'workflow-runs');
+  const findRun = () => (fs.existsSync(runsDir) ? fs.readdirSync(runsDir).find((n) => n.startsWith('wf-run-')) : undefined);
+  const started = startWorkflow({ workflow, ...opts(tmp) });
+  const hosts = [await newRunUnitHost()];
+  const deadline = Date.now() + 20000;
+  let id;
+  while (Date.now() < deadline) {
+    id = findRun();
+    if (id && eventsOf(tmp, id).some((e) => e.type === 'unit.started')) break;
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+  assert.ok(id, 'the Unit run started');
+  process.kill(hosts[0], 'SIGKILL');
+  assert.equal((await started).status, 'running', 'the first exit leaves the unit running');
+  const second = resumeWorkflow(id, opts(tmp));
+  hosts.push(await newRunUnitHost(hosts));
+  process.kill(hosts[1], 'SIGKILL');
+  assert.equal((await second).status, 'running', 'the second exit leaves the unit running');
+  const third = resumeWorkflow(id, opts(tmp));
+  hosts.push(await newRunUnitHost(hosts));
+  process.kill(hosts[2], 'SIGKILL');
+  assert.equal((await third).status, 'failed', 'the third exit in a row fails the step');
+  const events = eventsOf(tmp, id);
+  const exits = events.filter((e) => e.type === 'unit.host-exit');
+  assert.equal(exits.length, 3);
+  assert.equal(new Set(exits.map((e) => e.payload.unitRunId)).size, 1, 'every exit is of the one unit run');
+  for (const exit of exits) {
+    assert.ok(!String(exit.payload.stderr ?? '').includes('\n') && String(exit.payload.stderr ?? '').length <= 200, 'the ledger keeps one short stderr line');
+  }
+  assert.equal(events.find((e) => e.type === 'step.fail')?.payload.outcome, 'execution-host-crash-loop');
+  await waitUntilNothingRunsIn(tmp);
+});
+
 test('a panel Unit is admitted under a ceiling of its planned seats times the fallback allowance, and settles the launches it used', async () => {
   const tmp = setupRepo();
   const workflow = validateWorkflow({
