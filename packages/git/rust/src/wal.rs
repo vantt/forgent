@@ -163,11 +163,11 @@ mod windows_trust {
     };
     use windows_sys::Win32::Security::{
         AclSizeInformation, CreateWellKnownSid, EqualSid, GetAce, GetAclInformation, GetLengthSid,
-        GetTokenInformation, TokenOwner, TokenUser, WinAuthenticatedUserSid,
-        WinBuiltinAdministratorsSid, WinBuiltinUsersSid, WinLocalSystemSid, WinWorldSid,
-        ACCESS_ALLOWED_ACE, ACE_HEADER, ACL, ACL_SIZE_INFORMATION, DACL_SECURITY_INFORMATION,
-        INHERIT_ONLY_ACE, OWNER_SECURITY_INFORMATION, PSECURITY_DESCRIPTOR, PSID,
-        SECURITY_MAX_SID_SIZE, TOKEN_QUERY, WELL_KNOWN_SID_TYPE,
+        GetTokenInformation, TokenOwner, TokenUser, WinAnonymousSid, WinAuthenticatedUserSid,
+        WinBuiltinAdministratorsSid, WinBuiltinGuestsSid, WinBuiltinUsersSid, WinInteractiveSid,
+        WinLocalSystemSid, WinWorldSid, ACE_HEADER, ACL, ACL_SIZE_INFORMATION,
+        DACL_SECURITY_INFORMATION, INHERIT_ONLY_ACE, OWNER_SECURITY_INFORMATION,
+        PSECURITY_DESCRIPTOR, PSID, SECURITY_MAX_SID_SIZE, TOKEN_QUERY, WELL_KNOWN_SID_TYPE,
     };
     use windows_sys::Win32::Storage::FileSystem::{
         GetFileInformationByHandle, GetFinalPathNameByHandleW, BY_HANDLE_FILE_INFORMATION, DELETE,
@@ -178,8 +178,18 @@ mod windows_trust {
     };
     use windows_sys::Win32::System::Threading::{GetCurrentProcess, OpenProcessToken};
 
-    /// `ACCESS_ALLOWED_ACE_TYPE`; windows-sys does not export the constant.
+    /// ACE type codes; windows-sys does not export them.
     const ACCESS_ALLOWED: u8 = 0;
+    const ACCESS_DENIED: u8 = 1;
+    const ACCESS_ALLOWED_OBJECT: u8 = 5;
+    const ACCESS_DENIED_OBJECT: u8 = 6;
+    const ACCESS_ALLOWED_CALLBACK: u8 = 9;
+    const ACCESS_DENIED_CALLBACK: u8 = 10;
+    const ACCESS_ALLOWED_CALLBACK_OBJECT: u8 = 11;
+    const ACCESS_DENIED_CALLBACK_OBJECT: u8 = 12;
+    /// Object ACE flag bits that say a GUID sits before the SID.
+    const ACE_OBJECT_TYPE_PRESENT: u32 = 0x1;
+    const ACE_INHERITED_OBJECT_TYPE_PRESENT: u32 = 0x2;
     /// Every right that lets a principal add to, change, delete from or take
     /// over a directory or record.
     const WRITE_RIGHTS: u32 = FILE_WRITE_DATA
@@ -284,37 +294,88 @@ mod windows_trust {
         {
             return Err("has an access list that cannot be read".into());
         }
-        let broad: Vec<(&str, Vec<u8>)> = [
-            ("Everyone", WinWorldSid),
-            ("Users", WinBuiltinUsersSid),
-            ("Authenticated Users", WinAuthenticatedUserSid),
-        ]
-        .into_iter()
-        .filter_map(|(name, kind)| Some((name, well_known(kind)?)))
-        .collect();
+        let broad = broad_sids();
         for index in 0..size.AceCount {
             let mut entry: *mut c_void = null_mut();
             if unsafe { GetAce(dacl, index, &mut entry) } == 0 || entry.is_null() {
                 return Err("has an access list entry that cannot be read".into());
             }
-            let header = unsafe { *(entry as *const ACE_HEADER) };
-            // Entries that only pass down to children, and denials, grant nothing here.
-            if header.AceType != ACCESS_ALLOWED || header.AceFlags & INHERIT_ONLY_ACE as u8 != 0 {
-                continue;
-            }
-            let ace = entry as *const ACCESS_ALLOWED_ACE;
-            let (mask, sid) = unsafe { ((*ace).Mask, &(*ace).SidStart as *const u32 as PSID) };
-            if mask & WRITE_RIGHTS == 0 {
-                continue;
-            }
-            if let Some((name, _)) = broad
-                .iter()
-                .find(|(_, wide)| unsafe { EqualSid(sid, wide.as_ptr() as PSID) } != 0)
-            {
-                return Err(format!("grants write access to {name}"));
-            }
+            check_ace(entry as *const u8, &broad)?;
         }
         Ok(())
+    }
+
+    /// The accounts whose write access makes a path untrusted.
+    fn broad_sids() -> Vec<(&'static str, Vec<u8>)> {
+        [
+            ("Everyone", WinWorldSid),
+            ("Users", WinBuiltinUsersSid),
+            ("Authenticated Users", WinAuthenticatedUserSid),
+            ("Anonymous Logon", WinAnonymousSid),
+            ("Guests", WinBuiltinGuestsSid),
+            ("INTERACTIVE", WinInteractiveSid),
+        ]
+        .into_iter()
+        .filter_map(|(name, kind)| Some((name, well_known(kind)?)))
+        .collect()
+    }
+
+    /// Judges one access-list entry. Denials and inherit-only entries grant
+    /// nothing here. Every other kind that grants write to a broad account
+    /// refuses, including kinds this rule can only partly read: an entry whose
+    /// type it does not recognise refuses outright, since it cannot say whom it names.
+    ///
+    /// # Safety contract
+    /// `entry` must point at a complete ACE as `GetAce` returns it.
+    fn check_ace(entry: *const u8, broad: &[(&str, Vec<u8>)]) -> Result<(), String> {
+        let header = unsafe { std::ptr::read_unaligned(entry as *const ACE_HEADER) };
+        if matches!(
+            header.AceType,
+            ACCESS_DENIED
+                | ACCESS_DENIED_OBJECT
+                | ACCESS_DENIED_CALLBACK
+                | ACCESS_DENIED_CALLBACK_OBJECT
+        ) || header.AceFlags & INHERIT_ONLY_ACE as u8 != 0
+        {
+            return Ok(());
+        }
+        let ace_size = header.AceSize as usize;
+        let read_u32 = |offset: usize| -> Option<u32> {
+            (offset + 4 <= ace_size)
+                .then(|| unsafe { std::ptr::read_unaligned(entry.add(offset) as *const u32) })
+        };
+        let sid_offset = match header.AceType {
+            ACCESS_ALLOWED | ACCESS_ALLOWED_CALLBACK => Some(8),
+            ACCESS_ALLOWED_OBJECT | ACCESS_ALLOWED_CALLBACK_OBJECT => read_u32(8).map(|flags| {
+                12 + if flags & ACE_OBJECT_TYPE_PRESENT != 0 {
+                    16
+                } else {
+                    0
+                } + if flags & ACE_INHERITED_OBJECT_TYPE_PRESENT != 0 {
+                    16
+                } else {
+                    0
+                }
+            }),
+            _ => return Err("has an access list entry of a kind that cannot be judged".into()),
+        };
+        let (Some(mask), Some(sid_offset)) = (read_u32(4), sid_offset) else {
+            return Err("has an access list entry that cannot be read".into());
+        };
+        if sid_offset >= ace_size {
+            return Err("has an access list entry that cannot be read".into());
+        }
+        if mask & WRITE_RIGHTS == 0 {
+            return Ok(());
+        }
+        let sid = unsafe { entry.add(sid_offset) } as PSID;
+        match broad
+            .iter()
+            .find(|(_, wide)| unsafe { EqualSid(sid, wide.as_ptr() as PSID) } != 0)
+        {
+            Some((name, _)) => Err(format!("grants write access to {name}")),
+            None => Ok(()),
+        }
     }
 
     fn well_known(kind: WELL_KNOWN_SID_TYPE) -> Option<Vec<u8>> {
@@ -421,6 +482,139 @@ mod windows_trust {
         }
         let index = (u64::from(info.nFileIndexHigh) << 32) | u64::from(info.nFileIndexLow);
         Ok(format!("{}:{index}", info.dwVolumeSerialNumber))
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+        use windows_sys::Win32::Security::{GetLengthSid, WinBuiltinAdministratorsSid};
+
+        fn sid(kind: WELL_KNOWN_SID_TYPE) -> Vec<u8> {
+            let wide = well_known(kind).expect("well-known SID");
+            let len = unsafe { GetLengthSid(wide.as_ptr() as PSID) } as usize;
+            wide[..len].to_vec()
+        }
+
+        /// An ACE of `ace_type` in the simple (header, mask, SID) layout, or the
+        /// object layout when `object_flags` is given (no GUID bytes counted unless flagged).
+        fn ace(
+            ace_type: u8,
+            ace_flags: u8,
+            mask: u32,
+            object_flags: Option<u32>,
+            sid: &[u8],
+        ) -> Vec<u8> {
+            let mut body = mask.to_le_bytes().to_vec();
+            if let Some(flags) = object_flags {
+                body.extend(flags.to_le_bytes());
+                if flags & ACE_OBJECT_TYPE_PRESENT != 0 {
+                    body.extend([7u8; 16]);
+                }
+                if flags & ACE_INHERITED_OBJECT_TYPE_PRESENT != 0 {
+                    body.extend([9u8; 16]);
+                }
+            }
+            body.extend(sid);
+            let size = (4 + body.len()) as u16;
+            let mut out = vec![ace_type, ace_flags];
+            out.extend(size.to_le_bytes());
+            out.extend(body);
+            out
+        }
+
+        fn verdict(entry: &[u8]) -> Result<(), String> {
+            check_ace(entry.as_ptr(), &broad_sids())
+        }
+
+        #[test]
+        fn write_grants_of_every_allow_kind_to_a_broad_account_refuse() {
+            let everyone = sid(WinWorldSid);
+            for kind in [ACCESS_ALLOWED, ACCESS_ALLOWED_CALLBACK] {
+                let entry = ace(kind, 0, FILE_WRITE_DATA, None, &everyone);
+                assert_eq!(
+                    verdict(&entry),
+                    Err("grants write access to Everyone".into()),
+                    "type {kind}"
+                );
+            }
+            for flags in [
+                0,
+                ACE_OBJECT_TYPE_PRESENT,
+                ACE_OBJECT_TYPE_PRESENT | ACE_INHERITED_OBJECT_TYPE_PRESENT,
+            ] {
+                for kind in [ACCESS_ALLOWED_OBJECT, ACCESS_ALLOWED_CALLBACK_OBJECT] {
+                    let entry = ace(kind, 0, GENERIC_ALL, Some(flags), &everyone);
+                    assert_eq!(
+                        verdict(&entry),
+                        Err("grants write access to Everyone".into()),
+                        "type {kind} flags {flags}"
+                    );
+                }
+            }
+        }
+
+        #[test]
+        fn denials_inherit_only_read_only_and_narrow_entries_pass() {
+            let everyone = sid(WinWorldSid);
+            let admins = sid(WinBuiltinAdministratorsSid);
+            for kind in [ACCESS_DENIED, ACCESS_DENIED_CALLBACK] {
+                assert_eq!(
+                    verdict(&ace(kind, 0, FILE_WRITE_DATA, None, &everyone)),
+                    Ok(())
+                );
+            }
+            for kind in [ACCESS_DENIED_OBJECT, ACCESS_DENIED_CALLBACK_OBJECT] {
+                assert_eq!(
+                    verdict(&ace(kind, 0, FILE_WRITE_DATA, Some(0), &everyone)),
+                    Ok(())
+                );
+            }
+            let inherit_only = ace(
+                ACCESS_ALLOWED_CALLBACK,
+                INHERIT_ONLY_ACE as u8,
+                FILE_WRITE_DATA,
+                None,
+                &everyone,
+            );
+            assert_eq!(verdict(&inherit_only), Ok(()));
+            assert_eq!(
+                verdict(&ace(ACCESS_ALLOWED_CALLBACK, 0, 0x1, None, &everyone)),
+                Ok(())
+            );
+            assert_eq!(
+                verdict(&ace(
+                    ACCESS_ALLOWED_CALLBACK,
+                    0,
+                    FILE_WRITE_DATA,
+                    None,
+                    &admins
+                )),
+                Ok(())
+            );
+        }
+
+        #[test]
+        fn an_entry_of_an_unrecognised_kind_refuses() {
+            let admins = sid(WinBuiltinAdministratorsSid);
+            assert!(verdict(&ace(0x7f, 0, FILE_WRITE_DATA, None, &admins)).is_err());
+        }
+
+        #[test]
+        fn anonymous_guests_and_interactive_are_broad() {
+            for (kind, name) in [
+                (WinAnonymousSid, "Anonymous Logon"),
+                (WinBuiltinGuestsSid, "Guests"),
+                (WinInteractiveSid, "INTERACTIVE"),
+                (WinBuiltinUsersSid, "Users"),
+                (WinAuthenticatedUserSid, "Authenticated Users"),
+            ] {
+                let entry = ace(ACCESS_ALLOWED, 0, FILE_APPEND_DATA, None, &sid(kind));
+                assert_eq!(
+                    verdict(&entry),
+                    Err(format!("grants write access to {name}"))
+                );
+            }
+        }
     }
 }
 
@@ -4373,9 +4567,16 @@ mod tests {
     }
     #[test]
     fn ten_thousand_terminal_operations_have_no_record_directories() {
+        // Linux owns the scale proof. Each operation costs several fsyncs and
+        // directory renames on NTFS, so Windows proves the same
+        // no-record-directories property at a tenth of the count in CI time.
+        #[cfg(windows)]
+        const OPERATIONS: usize = 1_000;
+        #[cfg(not(windows))]
+        const OPERATIONS: usize = 10_000;
         let t = Temp::new();
         let w = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
-        for n in 0..10_000 {
+        for n in 0..OPERATIONS {
             let id = format!("op-{n}");
             let c = success(&w, &attempted(&w, &id));
             let c = w
@@ -4394,11 +4595,11 @@ mod tests {
             w.compact(&c, &r, &Authority).unwrap();
         }
         assert_eq!(fs::read_dir(w.root.path()).unwrap().count(), 0);
-        let scan = w.scan(10_001).unwrap();
+        let scan = w.scan(OPERATIONS + 1).unwrap();
         assert!(scan.complete);
         assert_eq!(scan.unresolved, 0);
-        assert!(scan.ledger_bytes <= 10_000 * 512);
-        assert_eq!(scan.entries.len(), 10_000);
+        assert!(scan.ledger_bytes <= OPERATIONS as u64 * 512);
+        assert_eq!(scan.entries.len(), OPERATIONS);
     }
     #[test]
     fn missing_borrow_refuses_before_intent_and_doctor_never_writes() {
