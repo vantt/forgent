@@ -7,7 +7,7 @@ import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { computeArtifactDigest, hashFile } from '../../scripts/build-rust-distribution.mjs';
 import { holdLock } from './fgctl-lock-holder.mjs';
-import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit, processesUnder, withoutActiveRelease, removeTree, removeStateHome } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit, processesUnder, withoutActiveRelease, removeTree, removeStateHome, restampRelease, injectTailFailure } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -219,43 +219,19 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
   const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-tailfail-home-'));
   const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-tailfail-state-'));
   const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-tailfail-proj-'));
-  const tailFailReleaseDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-tailfail-rel-'));
+  const candidate = restampRelease(fixture.releaseDir, 'fgctl-tailfail-rel-');
+  const newDigest = candidate.digest;
 
   try {
     execFileSync('git', ['init'], { cwd: tempProj });
     execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
     execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
 
-    // Copy fixture release into tailFailReleaseDir
-    fs.cpSync(fixture.releaseDir, tailFailReleaseDir, { recursive: true });
-
-    // The Node rows bridge is the payload's one door the native `init` and `doctor` reach: make it die when
-    // SIMULATE_TAIL_FAILURE is set, so `init`, the first tail step, fails at its Work store step.
-    const bridgePath = path.join(tailFailReleaseDir, 'libexec', 'legacy-node', 'src', 'setup', 'doctor-bridge.mjs');
-    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1') {\n  console.error('simulated init failure in tail');\n  process.exit(42);\n}\n`;
-    fs.writeFileSync(bridgePath, failInjection + fs.readFileSync(bridgePath, 'utf8'));
-
-    // Update manifest.json with the updated hash of the bridge module
-    const manifestPath = path.join(tailFailReleaseDir, 'manifest.json');
-    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    const newMjsHash = hashFile(bridgePath);
-    const newMjsSize = fs.statSync(bridgePath).size;
-
-    for (const f of manifest.files) {
-      if (f.path === 'libexec/legacy-node/src/setup/doctor-bridge.mjs') {
-        f.digest = newMjsHash;
-        f.size = newMjsSize;
-      }
-    }
-    delete manifest.artifactDigest;
-    const newDigest = computeArtifactDigest(manifest);
-    manifest.artifactDigest = newDigest;
-    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
-
-    const res = runFgctl(['init', '--from', tailFailReleaseDir], {
+    injectTailFailure(tempState);
+    const res = runFgctl(['init', '--from', candidate.dir], {
       cwd: tempProj,
       stateHome: tempState,
-      env: { HOME: tempHome, SIMULATE_TAIL_FAILURE: '1' },
+      env: { HOME: tempHome },
     });
 
     assert.notEqual(res.status, 0, 'fgctl init must fail when tail command fails');
@@ -292,7 +268,7 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
     removeTree(tempHome);
     removeStateHome(tempState);
     removeTree(tempProj);
-    removeTree(tailFailReleaseDir);
+    removeTree(candidate.dir);
   }
 });
 

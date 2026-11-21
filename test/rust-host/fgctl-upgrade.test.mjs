@@ -30,6 +30,7 @@ import {
   pathWithGcLeakingGit,
   processesUnder,
   removeTree, removeStateHome,
+  restampRelease, injectTailFailure,
 } from './fgctl-init-fixture.mjs';
 
 const FGOS_BIN = releaseBinaryPath(releaseOutputDir(), 'fgos');
@@ -75,41 +76,6 @@ function hashDirectory(dirPath) {
   return hashes;
 }
 
-/**
- * A copy of the release at `fromDir` whose manifest `edit(manifest, dir)` changed, published
- * under the digest of the edited manifest, as the build computes it. Returns its dir and digest.
- */
-function restampRelease(fromDir, prefix, edit) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
-  fs.cpSync(fromDir, dir, { recursive: true });
-  const manifestPath = path.join(dir, 'manifest.json');
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  edit(manifest, dir);
-  delete manifest.artifactDigest;
-  manifest.artifactDigest = computeArtifactDigest(manifest);
-  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
-  return { dir, digest: manifest.artifactDigest };
-}
-
-/**
- * A copy of `fromDir` whose payload's Node rows bridge exits 42 while SIMULATE_TAIL_FAILURE=1: `init`, the first tail
- * step, is native and asks that bridge only for its Work store, so it fails there (with status 1).
- */
-function releaseWithFailingTail(fromDir, prefix, label) {
-  return restampRelease(fromDir, prefix, (manifest, dir) => {
-    const bridgePath = path.join(dir, 'libexec', 'legacy-node', 'src', 'setup', 'doctor-bridge.mjs');
-    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1') {\n  console.error('simulated ${label} init failure in tail');\n  process.exit(42);\n}\n`;
-    fs.writeFileSync(bridgePath, failInjection + fs.readFileSync(bridgePath, 'utf8'));
-    const newHash = 'sha256:' + hashFile(bridgePath);
-    const newSize = fs.statSync(bridgePath).size;
-    for (const f of manifest.files) {
-      if (f.path === 'libexec/legacy-node/src/setup/doctor-bridge.mjs') {
-        f.digest = newHash;
-        f.size = newSize;
-      }
-    }
-  });
-}
 
 before(() => {
   assert.ok(fs.existsSync(FGCTL_BIN), `fgctl binary must exist at ${FGCTL_BIN}`);
@@ -563,15 +529,15 @@ test('P7: Upgrade candidate preflight failure refuses upgrade and leaves existin
 
 test('P7: Upgrade candidate local tail failure leaves workspace in diagnosable state with ready-degraded transaction', () => {
   const { proj: projDir, state: stateHome } = workspaceAtA.restore();
-  // Release B whose tail fails when SIMULATE_TAIL_FAILURE is set
-  const candidate = releaseWithFailingTail(releaseDirB, 'fgctl-upg-tailfail-cand-', 'upgrade');
+  // Release B whose tail fails
+  const candidate = restampRelease(releaseDirB, 'fgctl-upg-tailfail-cand-');
   const newDigest = candidate.digest;
 
   try {
+    injectTailFailure(stateHome);
     const upgRes = runFgctl(['upgrade', '--from', candidate.dir], {
       cwd: projDir,
       stateHome,
-      env: { SIMULATE_TAIL_FAILURE: '1' },
     });
 
     assert.notEqual(upgRes.status, 0, 'upgrade must fail when tail fails');
@@ -610,8 +576,8 @@ test('P7: Upgrade candidate local tail failure leaves workspace in diagnosable s
 test('P7: Repair local tail failure leaves workspace in diagnosable state with ready-degraded transaction', () => {
   const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-rep-tailfail-state-'));
   const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-rep-tailfail-proj-'));
-  // Release A whose tail fails when SIMULATE_TAIL_FAILURE is set
-  const candidate = releaseWithFailingTail(releaseDirA, 'fgctl-rep-tailfail-cand-', 'repair');
+  // Release A whose tail fails
+  const candidate = restampRelease(releaseDirA, 'fgctl-rep-tailfail-cand-');
   const newDigest = candidate.digest;
 
   try {
@@ -624,10 +590,10 @@ test('P7: Repair local tail failure leaves workspace in diagnosable state with r
     assert.equal(initRes.status, 0);
 
     // Now run fgctl repair with tail failure enabled
+    injectTailFailure(stateHome);
     const repRes = runFgctl(['repair'], {
       cwd: projDir,
       stateHome,
-      env: { SIMULATE_TAIL_FAILURE: '1' },
     });
 
     assert.notEqual(repRes.status, 0, 'repair must fail when tail fails');

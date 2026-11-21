@@ -11,7 +11,7 @@ import crypto from 'node:crypto';
 import { waitForSealChildrenOf } from '../helpers/process-tmp-root.mjs';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 import { releaseTargetForHost } from '../../src/util/release-targets.mjs';
-import { REPO_ROOT, buildRustDistribution, releaseOutputDir } from '../../scripts/build-rust-distribution.mjs';
+import { REPO_ROOT, buildRustDistribution, releaseOutputDir, computeArtifactDigest } from '../../scripts/build-rust-distribution.mjs';
 
 export const FGCTL_BIN = releaseBinaryPath(releaseOutputDir(), 'fgctl');
 
@@ -56,6 +56,32 @@ const NOT_READY = /not ready: the checks listed above need you/;
 /** True when an init, upgrade or repair run activated its release: it exited 0, or ended on "not ready". Takes a spawn result (`status`) or a waitForProcess result (`code`). */
 export function activated(run) {
   return (run.status ?? run.code) === 0 || NOT_READY.test(run.stderr);
+}
+
+/**
+ * Restamps a release directory into a new temp directory with a new digest computed
+ * under the digest of the edited manifest, as the build computes it. Returns its dir and digest.
+ */
+export function restampRelease(fromDir, prefix, edit) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  fs.cpSync(fromDir, dir, { recursive: true });
+  const manifestPath = path.join(dir, 'manifest.json');
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  if (edit) edit(manifest, dir);
+  delete manifest.artifactDigest;
+  manifest.artifactDigest = computeArtifactDigest(manifest);
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+  return { dir, digest: manifest.artifactDigest };
+}
+
+/**
+ * Writes an invalid machine-id into stateHome so that post-publish fgos init
+ * in the runtime tail refuses on every platform.
+ */
+export function injectTailFailure(stateHome) {
+  if (!stateHome) return;
+  fs.mkdirSync(stateHome, { recursive: true });
+  fs.writeFileSync(path.join(stateHome, 'machine-id'), 'INVALID_MACHINE_ID\n');
 }
 
 /**
