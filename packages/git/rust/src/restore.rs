@@ -1391,59 +1391,24 @@ impl GitDriver {
 #[cfg(not(unix))]
 mod windows_extract {
     use super::{failure, Path, Result};
-    use std::ffi::OsString;
+    use crate::windows_fs::DirectoryRefusal;
     use std::fs::{File, OpenOptions};
     use std::io::Write;
-    use std::os::windows::{
-        ffi::OsStringExt,
-        fs::{MetadataExt, OpenOptionsExt},
-        io::AsRawHandle,
-    };
+    use std::os::windows::{fs::OpenOptionsExt, io::AsRawHandle};
     use windows_sys::Win32::Foundation::HANDLE;
     use windows_sys::Win32::Storage::FileSystem::{
-        FileDispositionInfo, GetFinalPathNameByHandleW, SetFileInformationByHandle, DELETE,
-        FILE_ATTRIBUTE_REPARSE_POINT, FILE_DISPOSITION_INFO, FILE_FLAG_BACKUP_SEMANTICS,
-        FILE_FLAG_OPEN_REPARSE_POINT, FILE_NAME_NORMALIZED, FILE_SHARE_READ, FILE_SHARE_WRITE,
-        VOLUME_NAME_DOS,
+        FileDispositionInfo, SetFileInformationByHandle, DELETE, FILE_DISPOSITION_INFO,
     };
 
     /// Opens the directory itself (never what a link at the leaf points to) and refuses a reparse point. The share
     /// mode leaves out `FILE_SHARE_DELETE`, which is what stops a rename while the handle lives.
     pub(super) fn open_directory(path: &Path) -> Result<File> {
-        let dir = OpenOptions::new()
-            .read(true)
-            .share_mode(FILE_SHARE_READ | FILE_SHARE_WRITE)
-            .custom_flags(FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT)
-            .open(path)
-            .map_err(failure)?;
-        let metadata = dir.metadata().map_err(failure)?;
-        if !metadata.is_dir() || metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0 {
-            return Err(failure("restore-extract-directory-required"));
-        }
-        Ok(dir)
-    }
-
-    fn final_path(file: &File) -> std::io::Result<std::path::PathBuf> {
-        let mut buffer = vec![0u16; 512];
-        loop {
-            // SAFETY: the pointer and length describe `buffer`; the handle is open for the call.
-            let n = unsafe {
-                GetFinalPathNameByHandleW(
-                    file.as_raw_handle() as HANDLE,
-                    buffer.as_mut_ptr(),
-                    buffer.len() as u32,
-                    FILE_NAME_NORMALIZED | VOLUME_NAME_DOS,
-                )
-            } as usize;
-            if n == 0 {
-                return Err(std::io::Error::last_os_error());
-            }
-            if n >= buffer.len() {
-                buffer.resize(n + 1, 0);
-                continue;
-            }
-            return Ok(OsString::from_wide(&buffer[..n]).into());
-        }
+        crate::windows_fs::open_directory(path, crate::windows_fs::SHARE_NO_DELETE).map_err(
+            |refusal| match refusal {
+                DirectoryRefusal::Io(error) => failure(error),
+                DirectoryRefusal::NotDirectory => failure("restore-extract-directory-required"),
+            },
+        )
     }
 
     /// Marks the open file for deletion when its last handle closes; no path is involved.
@@ -1482,7 +1447,7 @@ mod windows_extract {
             .create_new(true)
             .open(destination.join(filename))
             .map_err(failure)?;
-        let beneath = final_path(&output)
+        let beneath = crate::windows_fs::final_path(&output)
             .map(|path| {
                 path.parent()
                     .is_some_and(|p| fgos_process::path::plain_path(p) == destination)

@@ -13,6 +13,8 @@ mod inspect;
 pub mod invocation_root;
 mod objects;
 mod refs;
+#[cfg(windows)]
+mod windows_fs;
 pub use refs::{acquire_checkout_custody, acquire_worktree_admin};
 mod worktree;
 pub use worktree::{

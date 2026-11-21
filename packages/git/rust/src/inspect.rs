@@ -1025,7 +1025,7 @@ pub(crate) fn fingerprint(
     remaining: &mut u64,
 ) -> Result<PathFingerprint> {
     use std::io::Read;
-    use std::os::windows::fs::{MetadataExt, OpenOptionsExt};
+    use std::os::windows::fs::MetadataExt;
     const REPARSE: u32 = windows_sys::Win32::Storage::FileSystem::FILE_ATTRIBUTE_REPARSE_POINT;
     let text = std::str::from_utf8(path).map_err(|_| failure("invalid-literal-path"))?;
     let root = std::fs::symlink_metadata(root)
@@ -1069,15 +1069,11 @@ pub(crate) fn fingerprint(
             mtime: metadata.last_write_time().to_string(),
         };
         // The open itself never follows a reparse point; the opened handle must still be the plain file checked above.
-        let Ok(mut file) = std::fs::OpenOptions::new()
-            .read(true)
-            .custom_flags(windows_sys::Win32::Storage::FileSystem::FILE_FLAG_OPEN_REPARSE_POINT)
-            .open(&full)
-        else {
+        let Ok(mut file) = crate::windows_fs::open_no_follow(&full) else {
             return Ok(unreadable());
         };
         match file.metadata() {
-            Ok(m) if m.is_file() && m.file_attributes() & REPARSE == 0 => {}
+            Ok(m) if crate::windows_fs::is_plain_file(&m) => {}
             _ => return Err(failure("snapshot-path-changed")),
         }
         let key = crate::refs::file_key_of(&file)?;

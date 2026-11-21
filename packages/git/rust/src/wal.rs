@@ -148,12 +148,10 @@ fn non_canonical(path: &Path, canonical: &Path) -> WalError {
 #[cfg(windows)]
 mod windows_trust {
     use std::ffi::{c_void, OsString};
-    use std::fs::{File, OpenOptions};
+    use std::fs::File;
     use std::io;
     use std::os::windows::ffi::OsStringExt;
-    use std::os::windows::fs::{MetadataExt, OpenOptionsExt};
     use std::os::windows::io::{AsRawHandle, FromRawHandle, OwnedHandle};
-    use std::path::{Path, PathBuf};
     use std::ptr::null_mut;
     use windows_sys::Win32::Foundation::{
         LocalFree, ERROR_SUCCESS, GENERIC_ALL, GENERIC_WRITE, HANDLE,
@@ -170,10 +168,8 @@ mod windows_trust {
         PSECURITY_DESCRIPTOR, PSID, SECURITY_MAX_SID_SIZE, TOKEN_QUERY, WELL_KNOWN_SID_TYPE,
     };
     use windows_sys::Win32::Storage::FileSystem::{
-        GetFileInformationByHandle, GetFinalPathNameByHandleW, BY_HANDLE_FILE_INFORMATION, DELETE,
-        FILE_APPEND_DATA, FILE_ATTRIBUTE_REPARSE_POINT, FILE_DELETE_CHILD,
-        FILE_FLAG_BACKUP_SEMANTICS, FILE_FLAG_OPEN_REPARSE_POINT, FILE_NAME_NORMALIZED,
-        FILE_WRITE_ATTRIBUTES, FILE_WRITE_DATA, FILE_WRITE_EA, VOLUME_NAME_DOS, WRITE_DAC,
+        GetFileInformationByHandle, BY_HANDLE_FILE_INFORMATION, DELETE, FILE_APPEND_DATA,
+        FILE_DELETE_CHILD, FILE_WRITE_ATTRIBUTES, FILE_WRITE_DATA, FILE_WRITE_EA, WRITE_DAC,
         WRITE_OWNER,
     };
     use windows_sys::Win32::System::Threading::{GetCurrentProcess, OpenProcessToken};
@@ -202,23 +198,6 @@ mod windows_trust {
         | WRITE_OWNER
         | GENERIC_WRITE
         | GENERIC_ALL;
-
-    /// Opens a directory without following a reparse point at the leaf and
-    /// refuses a handle that is one, or is not a directory.
-    pub(super) fn open_directory(path: &Path) -> io::Result<File> {
-        let file = OpenOptions::new()
-            .read(true)
-            .custom_flags(FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT)
-            .open(path)?;
-        let metadata = file.metadata()?;
-        if metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0 || !metadata.is_dir() {
-            return Err(io::Error::new(
-                io::ErrorKind::PermissionDenied,
-                "refused: not a directory (link or reparse point)",
-            ));
-        }
-        Ok(file)
-    }
 
     /// A `LocalAlloc` block released on drop.
     struct Local(*mut c_void);
@@ -437,33 +416,14 @@ mod windows_trust {
             .into_owned()
     }
 
-    fn final_path(file: &File) -> io::Result<PathBuf> {
-        let mut buffer = vec![0u16; 512];
-        loop {
-            let n = unsafe {
-                GetFinalPathNameByHandleW(
-                    file.as_raw_handle() as HANDLE,
-                    buffer.as_mut_ptr(),
-                    buffer.len() as u32,
-                    FILE_NAME_NORMALIZED | VOLUME_NAME_DOS,
-                )
-            } as usize;
-            if n == 0 {
-                return Err(io::Error::last_os_error());
-            }
-            if n >= buffer.len() {
-                buffer.resize(n + 1, 0);
-                continue;
-            }
-            return Ok(PathBuf::from(OsString::from_wide(&buffer[..n])));
-        }
-    }
-
     /// The child was opened by the parent's path, which a rename could have
     /// pointed elsewhere since the parent was opened: the child must still sit
     /// directly under the directory the parent handle names.
     pub(super) fn require_beneath(parent: &File, child: &File) -> io::Result<()> {
-        let (parent, child) = (final_path(parent)?, final_path(child)?);
+        let (parent, child) = (
+            crate::windows_fs::final_path(parent)?,
+            crate::windows_fs::final_path(child)?,
+        );
         if child.parent() == Some(parent.as_path()) {
             Ok(())
         } else {
@@ -1821,7 +1781,8 @@ impl Directory {
         }
         #[cfg(windows)]
         {
-            let file = windows_trust::open_directory(path)?;
+            let file = crate::windows_fs::open_directory(path, crate::windows_fs::SHARE_ALL)
+                .map_err(io::Error::from)?;
             windows_trust::check(&file, common).map_err(|reason| unsafe_path(path, &reason))?;
             Ok(Self {
                 file,

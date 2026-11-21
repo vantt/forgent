@@ -175,20 +175,11 @@ fn state(path: &Path) -> Result<(File, u64, u64, String)> {
     #[cfg(windows)]
     {
         use std::io::Read;
-        use std::os::windows::fs::{MetadataExt, OpenOptionsExt};
-        const FILE_ATTRIBUTE_REPARSE_POINT: u32 = 0x400;
-        const FILE_FLAG_OPEN_REPARSE_POINT: u32 = 0x0020_0000;
+        use std::os::windows::fs::MetadataExt;
         // A reparse point is opened as itself, never followed, and then refused.
-        let mut file = fs::OpenOptions::new()
-            .read(true)
-            .custom_flags(FILE_FLAG_OPEN_REPARSE_POINT)
-            .open(path)
-            .map_err(failure)?;
+        let mut file = crate::windows_fs::open_no_follow(path).map_err(failure)?;
         let m = file.metadata().map_err(failure)?;
-        if !m.is_file()
-            || m.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0
-            || m.len() > 16 * 1024 * 1024
-        {
+        if !crate::windows_fs::is_plain_file(&m) || m.len() > 16 * 1024 * 1024 {
             return Err(recovery(
                 "native-lock-inspected-repair-required: unsupported artifact",
             ));

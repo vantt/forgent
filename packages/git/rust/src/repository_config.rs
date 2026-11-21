@@ -530,21 +530,15 @@ impl StagingFile {
         }
         #[cfg(windows)]
         {
-            use std::os::windows::fs::{MetadataExt, OpenOptionsExt};
-            const FILE_ATTRIBUTE_REPARSE_POINT: u32 = 0x400;
-            const FILE_FLAG_OPEN_REPARSE_POINT: u32 = 0x0020_0000;
             // A reparse point is opened as itself, never followed, and is never ours.
-            fs::OpenOptions::new()
-                .read(true)
-                .custom_flags(FILE_FLAG_OPEN_REPARSE_POINT)
-                .open(&self.path)
+            crate::windows_fs::open_no_follow(&self.path)
                 .ok()
                 .is_some_and(|now| {
-                    now.metadata().is_ok_and(|m| {
-                        m.is_file() && m.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT == 0
-                    }) && crate::refs::file_key_of(&now).is_ok_and(|k| {
-                        k.device == self.identity.device && k.index == self.identity.index
-                    })
+                    now.metadata()
+                        .is_ok_and(|m| crate::windows_fs::is_plain_file(&m))
+                        && crate::refs::file_key_of(&now).is_ok_and(|k| {
+                            k.device == self.identity.device && k.index == self.identity.index
+                        })
                 })
         }
     }
