@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Secretary and supervisor rotate at 0.15 soft, and three red npm tests are fixed at their cause"
-status: running
+status: done
 lead: lead:SMALLFIX
 base: 258c2db98af1c583592de43dec05cb546934fa97
 priority: P1
@@ -37,7 +37,7 @@ No change to hard, to other personas, or to the merge-slot semantics beyond what
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | Persona soft 0.15 and the three reds | - | config, schema, tests, head-start.mjs | 1 | running |
+| 1 | Persona soft 0.15 and the three reds | - | config, schema, tests, head-start.mjs | 1 | done |
 
 ## Risks and rollback
 Risk: low. Rollback: git revert.
