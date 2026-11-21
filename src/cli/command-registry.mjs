@@ -1491,7 +1491,7 @@ export const COMMAND_REGISTRY = [
       positional: ['branch'],
       required: [],
     },
-    examples: ['fgos land plan-x', 'fgos land --paths plans/backlog.md --message "docs: backlog" --test test/x.test.mjs'],
+    examples: ['fgos land plan-x', 'fgos land --paths plans/backlog/<id>-<slug>.md --message "docs: backlog item" --test test/x.test.mjs'],
     touchesState: true,
     store: 'open',
     externalEffect: true,
@@ -2528,7 +2528,7 @@ export const COMMAND_REGISTRY = [
   withSubcommands({
     name: 'session',
     invoke: 'fgos session <start|rotate|stop|write|read|type>',
-    description: 'Agent head sessions: "read" shows the last lines of a session\'s screen and "type" types into a stuck session\'s pane (both served natively by the Rust host); "start" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; "rotate" asks for its replacement by a successor that reads a redacted handoff; "stop" ends a head on purpose; "write" replaces a file of a confined head\'s grant (the secretary\'s docs/backlog.md) through its supervisor. From inside a confined head all six go through its request socket.',
+    description: 'Agent head sessions: "read" shows the last lines of a session\'s screen and "type" types into a stuck session\'s pane (both served natively by the Rust host); "start" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; "rotate" asks for its replacement by a successor that reads a redacted handoff; "stop" ends a head on purpose; "write" replaces a file of a confined head\'s grant (the secretary\'s backlog items) through its supervisor. From inside a confined head all six go through its request socket.',
     subcommands: {
       start: {
         description: 'Start head:<persona>-<name> as a confined supervised session, or front the live holder of that role.',
@@ -2576,13 +2576,13 @@ export const COMMAND_REGISTRY = [
         parameters: {
           type: 'object',
           properties: {
-            path: { type: 'string', description: 'Positional: the project-relative path of the granted file, e.g. docs/backlog.md.' },
+            path: { type: 'string', description: 'Positional: the project-relative path of the granted file, e.g. a backlog item under plans/backlog/.' },
             base: { type: 'string', description: 'The git blob id of the file content the edit was based on (git hash-object --no-filters <copy> of the copy edited). Without it no base is sent and the file is compared with what it held when the request arrived.' },
           },
           positional: ['path'],
           required: ['path'],
         },
-        examples: ['fgos session write docs/backlog.md < "$TMPDIR/backlog.md"'],
+        examples: ['fgos session write plans/backlog/<id>-<slug>.md < "$TMPDIR/item.md"'],
       },
       read: {
         description: 'Read-only: the last lines of a session\'s screen. The target is a role, handle or slot key that Identity resolves to one live session, never a raw pane id; the lines are capped by the terminal-control contract.',
@@ -2611,7 +2611,7 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos session type head:lead-demo-p1 --text "continue"'],
       },
     },
-    examples: ['fgos session start secretary --name miu', 'fgos session rotate secretary --name miu', 'fgos session write docs/backlog.md < "$TMPDIR/backlog.md"'],
+    examples: ['fgos session start secretary --name miu', 'fgos session rotate secretary --name miu', 'fgos session write plans/backlog/<id>-<slug>.md < "$TMPDIR/item.md"'],
     touchesState: true,
     store: 'none',
     externalEffect: true,

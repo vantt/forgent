@@ -273,12 +273,15 @@ function loadSourceFiles(
 ) {
   const sources = [];
   if (fs.existsSync(backlogPath)) {
-    sources.push({
-      file: path.relative(cwd, backlogPath).replaceAll('\\', '/'),
-      lines: fs
-        .readFileSync(backlogPath, 'utf8')
-        .split('\n'),
-    });
+    const backlogFiles = fs.statSync(backlogPath).isDirectory()
+      ? collectMarkdownFiles(backlogPath).sort()
+      : [backlogPath];
+    for (const full of backlogFiles) {
+      sources.push({
+        file: path.relative(cwd, full).replaceAll('\\', '/'),
+        lines: fs.readFileSync(full, 'utf8').split('\n'),
+      });
+    }
   }
   // Read set under the platform root: area specs, decision narratives and the
   // platform foundations; retired history trees are never scanned.
@@ -322,7 +325,7 @@ function escapeRegExp(str) {
  * Recursively collect `{file, lines}` for every markdown/JS source file
  * under `roots` (repo-root-relative), for the write-time citation sweep
  * `fgos decision --relation supersedes:<id>|touches:<id>` runs (D2/D8's
- * "sweep docs/**+src/**+plugins/**", not just docs/backlog.md+the platform
+ * "sweep docs/**+src/**+plugins/**", not just plans/backlog/+the platform
  * specs like this file's own CLI mode above). `excludeRelDirs` additionally
  * skips any file whose repo-relative path starts with one of the given
  * prefixes — the "feature's own docs/history dir" self-citation carve-out
@@ -415,7 +418,7 @@ function parseArgs(argv) {
     backlogPath:
       backlogIdx >= 0
         ? argv[backlogIdx + 1]
-        : 'docs/backlog.md',
+        : 'plans/backlog',
     specsDir:
       specsIdx >= 0 ? argv[specsIdx + 1] : 'docs/platform',
     skillsDirs,

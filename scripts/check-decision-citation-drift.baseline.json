@@ -277,5 +277,14 @@
   ],
   "plugins/fgOS/skills/triage/SKILL.md": [
     "bare-citation:ADR0020:`--dir` (tsk-2ew): a worktree never carries its own `.fgos/` (ADR0020),"
+  ],
+  "plans/backlog/STR43-work-graph-metrics-surface-d-f176c18a-d-i.md": [
+    "bare-citation:RUL42:title: Work-graph metrics surface (D f176c18a, dưới stance RUL42 (STANCE trí-tuệ-giao-việc — picker cơ học"
+  ],
+  "plans/backlog/STR7-tr-ng-priority-cho-frontier-ordering-ch-t-qua.md": [
+    "bare-citation:RUL42:title: Trường priority cho frontier ordering. **Chốt qua thảo luận RUL42 (STANCE trí-tuệ-giao-việc — picker"
+  ],
+  "plans/backlog/STR8-intent-scoring-signal-driven-chaining-h-ng-ch-t.md": [
+    "bare-citation:RUL42:title: Intent-scoring + signal-driven chaining (hướng đã chốt từ consult). **Chốt qua thảo luận RUL42 (STAN"
   ]
 }

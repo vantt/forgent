@@ -366,7 +366,7 @@ A value is added only together with its area spec and its row in the [component 
 | `lookup` | `vocabulary`, `generated-doc` | `lookup-table` |
 | `proof` | `verification`, `evidence-payload` | `evidence` |
 | `navigation` | `platform-portal`, `area-portal`, `subcomponent-portal`, `collection-index`, `portal`, `reading-map` | — |
-| `past-state` | `history`, `proposal`, `discussion-scratchpad` (placement of `plans/discussions/<slug>/**`; its name-template twin is kind `discussion`) | — |
+| `past-state` | `history`, `proposal` | — |
 
 The six user-document roles the owner admitted on 2026-11-06 map one to one onto six values, so no role is lost and none is added.
 

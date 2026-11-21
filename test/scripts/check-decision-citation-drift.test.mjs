@@ -785,3 +785,73 @@ test('default citation scan reads nested area specs and decision narratives unde
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test(
+  'passing a directory as --backlog scans all markdown files in it with findings keyed by repo-relative path',
+  () => {
+    const dir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'citation-backlog-dir-'),
+    );
+    try {
+      const decisionsDir = path.join(dir, 'decisions');
+      const specsDir = path.join(dir, 'specs');
+      const backlogDir = path.join(dir, 'plans', 'backlog');
+      fs.mkdirSync(decisionsDir, { recursive: true });
+      fs.mkdirSync(specsDir, { recursive: true });
+      fs.mkdirSync(backlogDir, { recursive: true });
+
+      const itemWithFinding = path.join(backlogDir, 'p-01-item.md');
+      const itemClean = path.join(backlogDir, 'p-02-item.md');
+      fs.writeFileSync(
+        itemWithFinding,
+        'bare citation RUL104 without gloss\n',
+      );
+      fs.writeFileSync(
+        itemClean,
+        'glossed citation RUL104 (valid explanatory gloss)\n',
+      );
+
+      const result = runDrift(
+        [
+          '--decisions-dir',
+          decisionsDir,
+          '--backlog',
+          backlogDir,
+          '--specs-dir',
+          specsDir,
+        ],
+        dir,
+      );
+
+      assert.equal(result.status, 1);
+      assert.match(result.stdout, /1 finding/);
+      assert.match(
+        result.stdout,
+        /plans\/backlog\/p-01-item\.md:1: cites RUL104 with no gloss/,
+      );
+      assert.doesNotMatch(result.stdout, /p-02-item\.md/);
+
+      const baselinePath = path.join(dir, 'baseline.json');
+      const writeResult = runDrift(
+        [
+          '--decisions-dir',
+          decisionsDir,
+          '--backlog',
+          backlogDir,
+          '--specs-dir',
+          specsDir,
+          '--baseline',
+          baselinePath,
+          '--write-baseline',
+        ],
+        dir,
+      );
+      assert.equal(writeResult.status, 0);
+      const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+      assert.deepEqual(Object.keys(baseline), ['plans/backlog/p-01-item.md']);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  },
+);
+
