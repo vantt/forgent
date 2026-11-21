@@ -15,6 +15,8 @@ import { resolveCollaboration } from '../../src/runner/execution/patterns/catalo
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 
+const DOCTOR_REGISTRY = JSON.parse(fs.readFileSync(new URL('../../packages/distribution/contracts/doctor-registry.v1.json', import.meta.url), 'utf8'));
+
 // Native-agent executors carry no spawned process, so bind() accepts them for any posture without
 // consulting the machine's confinement backend registry: the run depends only on the fixture.
 const FAMILIES = { alpha: 'claude', beta: 'xai', gamma: 'z-ai', delta: 'deepseek' };
@@ -114,7 +116,8 @@ test('the dry-bind row replaces the two rows it covers in the doctor registry', 
   assert.ok(ids.includes('seat-binding-dry-bind'));
   assert.ok(!ids.includes('workflow-pools-satisfy-independence'));
   assert.ok(!ids.includes('model-policy-tier-coverage'));
-  assert.ok(ids.includes('agent-cli-project-trusted'));
+  // The trust row is judged by the host now (owner rust:execution); the registry contract still carries it.
+  assert.ok(DOCTOR_REGISTRY.rows.some((row) => row.id === 'agent-cli-project-trusted' && row.owner === 'rust:execution'));
 });
 
 test('a panel whose pool has only as many families as panelists passes and reports the synthesizer sharing a family', async () => {
