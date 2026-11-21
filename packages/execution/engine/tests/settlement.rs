@@ -473,6 +473,20 @@ fn every_settlement_scenario_writes_the_files_node_wrote() {
 }
 
 #[test]
+fn a_run_of_no_work_item_settles_a_result_with_no_work_id() {
+    let mut case = vector("settle.json")["settle"][0].clone();
+    case["runMeta"].as_object_mut().unwrap().remove("workId");
+    case["assignment"].as_object_mut().unwrap().remove("workId");
+    let (run_dir, outcome, _, _) = run_settle(&case);
+    assert!(outcome.is_ok(), "{outcome:?}");
+    let result: Value =
+        serde_json::from_str(&std::fs::read_to_string(run_dir.join("result.json")).unwrap())
+            .unwrap();
+    assert!(result.get("runId").is_some());
+    assert!(result.get("workId").is_none(), "{result}");
+}
+
+#[test]
 fn settling_twice_leaves_the_first_result_standing() {
     let case = &vector("settle.json")["settle"][0];
     let (run_dir, outcome, epoch, token) = run_settle(case);
