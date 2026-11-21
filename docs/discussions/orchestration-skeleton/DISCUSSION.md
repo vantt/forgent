@@ -11,6 +11,7 @@ discussion: open
 - 2026-11-21 16:35: đã xác định 4 bản sửa của OS-D1 (nguồn: memory `orchestration-stabilize-first-decision` của secretary Miu và tin supervisor gửi Miu sáng 2026-11-21: "1547 first, then the idle-lead nudge, then the names, then the reaper"): `p-l22vozecxg`, `p-waxzxz5mio`, `p-mhwe24fttr`, `p-yqanenewb4`. **Cả 4 đã `done`** (xem §7 `#related`). Điều kiện đậu theo chữ của OS-D1 đã thỏa, nhưng release hold ("no new work until the release hold is lifted", handoff secretary 14:45) vẫn còn hiệu lực. Discussion vẫn `paused` cho tới khi chủ dự án cho mở lại.
 - **2026-11-21 16:16: chủ dự án cho mở lại (OS-D2).** Trạng thái `discussion: open`. Architecture panel (T0) vẫn hoãn. Release hold không bị ảnh hưởng vì discussion không sinh code.
 - **2026-11-21 16:23 (round 6):** chủ dự án trả lời câu hỏi round 5 là "cả hai": mọi thành phần phải có authority, boundary và contract rõ, **và** hệ thống cần một cơ chế hoặc một vai làm nhạc trưởng nắm nhịp điều phối tổng. Câu hỏi mở thành §3 row 9: nhạc trưởng, hay mọi thứ chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan theo chuỗi watcher -> ghi signal -> phản ứng tiếp. Đang chạy 5 agent con (haiku, chỉ đọc) dò lại tier 0 tới 9 từ dưới lên; kết quả sẽ vào bảng §3 row 4b.
+- **2026-11-21 22:35 (round 36): chủ dự án thấy định nghĩa rõ hơn, hỏi một plan coding do ak:plan làm ra được điều phối thế nào.** Đi thử từ đầu tới cuối theo phương án C ở §3 4p, ghi rõ phần nào hôm nay đã có, phần nào còn thiếu.
 - **2026-11-21 22:21 (round 35): chủ dự án hỏi guide khác plan thế nào và "khung" là gì.** Làm rõ ở §3 4o bằng thuật ngữ có sẵn của `docs/platform/workflow/spec.md` §2.2; chữ "khung" trong discussion này đã dùng lẫn hai nghĩa, đề xuất dùng đúng nghĩa của spec. Đang chờ chủ dự án xác nhận định nghĩa trước khi chọn A/B/C.
 - **2026-11-21 22:25 (round 34): chủ dự án đồng ý thứ tự surface port -> OS-D20; hàng 7 rõ.** OS-D19 (handoff) giữ, chủ dự án không phản đối. Bàn hàng 5 (ngôn ngữ khung) ở §3 4o. Đang hỏi: plan là khung hay là một ca chạy trong khung.
 - **2026-11-21 22:15 (round 33): bàn hàng 7 (surface port).** Sáu port của plan nháp multica soát lại với các quyết định mới ở §3 4n: còn bốn port, đề xuất thứ tự. Đang hỏi: thứ tự, và xác nhận OS-D19.
@@ -367,6 +368,28 @@ Ví dụ quán phở: guide là quy trình nấu phở của quán; plan là đ�
 - **(B) Giữ hai ngôn ngữ, mỗi bên tự chiếu bản ghi lập lịch.** Rẻ, nhưng giữ hai harness (lead chạy phase bằng `fgos run`, case chạy bằng workflow), trái SR-D9.
 - **(C) Guide là khung duy nhất; plan là một ca chạy trong khung, không phải khung.** Plan-v1 giữ vai tài liệu của một ca (đích, phạm vi, bảng phase là lộ trình đã chọn qua các activity của guide, status cho portfolio); harness thi hành là workflow case, như `propose` đã làm. Lead chạy phase qua case thay vì tự gọi `fgos run` ngoài khung. Work FSM rút theo N12. Step id của bản ghi lập lịch là step của case.
 
+**4p. Đi thử: một plan coding do ak:plan làm ra, theo phương án C (round 36, 2026-11-21 22:35)**
+
+Nguồn: `domains/coding/workflows/feature.yaml` (milestone, activity, decision, must), `domains/coding/slice-kinds.yaml`, `docs/platform/workflow/spec.md` §7.8, `core/watcher/definitions/plan-became-ready.query.json`.
+
+| # | Chuyện gì xảy ra | Ai làm (code hay LLM) | Bản ghi lập lịch | Hôm nay |
+|---|---|---|---|---|
+| 1 | ak:plan viết `plans/<dir>/`, status `draft`. Review plan (activity `validate-plan`, pattern `reviewed`) rồi chủ dự án duyệt: đạt milestone `plan-validated`, status `ready`. | LLM viết và review; chủ dự án duyệt | item = plan, step = `validate-plan`, `waitingOn: person` (câu hỏi duyệt) | Có (planner, validate); duyệt đi qua Questions |
+| 2 | Watcher tick thấy plan chuyển `ready` (definition `plan-became-ready`), ghi event. | Code (giữ nhịp) | — | Có |
+| 3 | Domain coding chiếu bản ghi bước kế: chia plan thành mảnh. Đây là phán đoán (mảnh nào, `verify` hẹp, phụ thuộc thật). | Giữ nhịp khởi lead (`needs: role lead`) | step = `slice`, `needs: role lead` | Lead có; nhưng hôm nay supervisor LLM admit, chưa phải code (T1) |
+| 4 | Lead viết bản kê mảnh, chạy `fgos workflow propose`: mã tra `slice-kinds.yaml` ra capability, pattern, rigor từng mảnh và **tính khung** (số lượt, rigor floor). Mảnh `critical` (dữ liệu, di trú) bị đậu, hỏi trước. Đề xuất thành một câu hỏi năm phần. Lead ngủ (OS-D18: kết thúc session). | LLM chia mảnh, code tính khung | step = `frame-approval`, `waitingOn: person, ref: q-…` | Có (`propose`), chỉ `fgos-cook` dùng; lead hôm nay không dùng |
+| 5 | Chủ dự án duyệt khung (một lần cho cả plan). Câu trả lời thành event; giữ nhịp chạy `workflow start --frame`: mở case. | Chủ dự án; code | outcome của `frame-approval` = done | Có (`workflow start`) |
+| 6 | Mỗi mảnh là một bản ghi (OS-D12). Mảnh không phụ thuộc nhau chạy song song. Trước khi khởi, giữ nhịp hỏi cap: lane, `maxLeads`, resource referee về va chạm write-scope (OS-D14). Rồi `fgos run` gọi tên case: `bind()` chọn executor theo capability, pattern `reviewed` chạy người làm rồi người review, harness chạy `verify`, runner commit đúng `writes`. Đạt milestone `child-verified`. | Code điều phối; worker LLM làm, reviewer LLM chấm; harness kiểm | step = mảnh, `needs: capability` | `fgos run` có; khởi theo bản ghi chưa có (giữ nhịp, T1) |
+| 7 | Mảnh hỏng hoặc lệch đường (deviation): quá `deviationsBeforeAsk` hoặc hết lượt trong khung thì không tự nới: raise "cần phán đoán", giữ nhịp đánh thức lead; lead chọn đường MAY (`fix-verify-red`, `scoped-subtask`) hoặc hỏi chủ dự án. | Code phát hiện; LLM phán đoán | `needs: role lead` hoặc `waitingOn: person` | Phát hiện một phần; failure ladder là T4 |
+| 8 | Đủ mảnh: activity `integrate` chạy verify trên cây tích hợp (milestone `integrated`). | Harness | step = `integrate` | Có trong guide |
+| 9 | Consent trước merge (MUST `consent-before-merge`): hỏi chủ dự án duyệt đúng digest của cây đã tích hợp. | Chủ dự án | `waitingOn: person` | Có (gate); về sau qua Questions (OS-D16) |
+| 10 | Merge tại approve door / `fgos land` (merge slot, gate, Iron Law, verify sau merge): milestone `merged`. Plan status `done`, case đóng. | Code | outcome = done | Có |
+| 11 | Suốt quá trình: supervisor LLM chỉ được gọi khi có "cần phán đoán" ở mức portfolio (hai plan tranh lane, ưu tiên); Unit rà soát định kỳ chạy mỗi 24 giờ (OS-D17). | Code gọi LLM khi cần | — | Supervisor hôm nay được wake cho mọi event |
+
+*Khác biệt lớn nhất với hôm nay:* lead hiện tự chạy từng phase bằng `fgos run` **ngoài case** (không khung được duyệt, không milestone, không deviation event), còn `fgos-cook` thì đi qua `propose` và case. Đó là hai harness cho cùng một việc. Phương án C gộp về một: lead là người phán đoán của case (chia mảnh, chọn đường khi lệch), không phải người chạy phase; giữ nhịp khởi worker theo bản ghi.
+
+*Chủ dự án chạm vào ba chỗ:* duyệt plan (1), duyệt khung (5), consent trước merge (9); cộng các câu hỏi khi vượt khung (7). Mỗi câu đi qua Questions, gom theo "Release con người".
+
 ## 4. Quyết định đã chốt
 
 Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
@@ -437,6 +460,7 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 - 2026-11-21 22:15 round 33: Bàn hàng 7. Đọc lại plan nháp multica (sáu port); soát ở §3 4n.
 - 2026-11-21 22:25 round 34: Chủ dự án: "đồng ý". Mint OS-D20; OS-D19 giữ vì không bị phản đối. Bàn hàng 5: đọc discussion `workflow-engine` (mô hình hai tầng, D1), `work-data-model` (plan-v1 là sự thật portfolio), `docs/platform/workflow/spec.md` (N12, N16, §7.8 propose); phân tích ở §3 4o.
 - 2026-11-21 22:21 round 35: Chủ dự án: "cần làm rõ guide và plan khác nhau như nào, và khung theo em hiểu là gì (định nghĩa của em là gì)". Đọc `docs/platform/workflow/spec.md` §2.2, §7.8, `domains/coding/workflows/feature.yaml`, `bugfix.yaml`; ghi bảng thuật ngữ ở §3 4o và nhận lỗi dùng lẫn hai nghĩa của "khung".
+- 2026-11-21 22:35 round 36: Chủ dự án: "co vẻ rõ hơn. như vậy nếu đưa 1 plan (coding domain, do ak:plan làm ra), đưa vào hệ thống thì sẽ được điều phối kiểu gì." Đọc `feature.yaml` (milestone, activity, decision, must), `slice-kinds.yaml`, definition `plan-became-ready`; đi thử ở §3 4p.
 
 ## 6. Thiết kế đã chốt {#design}
 
