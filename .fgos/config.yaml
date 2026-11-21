@@ -248,6 +248,13 @@ runner:
       prefer:
         - executor: claude
           invocation: claude-herdr-bypass-bwrap
+    # @fgos:doc The tier, executors and account pool one persona prefers. Only a persona may name a pool; a role entry refuses the key by name.
+    # @fgos:why [f381c6d2-3f10-4128-aeac-d0f158513f83] owner 2026-11-21: shaper heads run Claude (agy out of quota)
+    shaper:
+      tier: standard
+      prefer:
+        - executor: claude
+          invocation: claude-herdr-bypass-bwrap
 # @fgos:doc How far agent work may skip human approval gates.
 gateBypass:
   # @fgos:doc Gate bypass level for agent work; off approves nothing automatically and each higher level approves work up to that size. Values: off | light | standard | heavy. Default: off.
