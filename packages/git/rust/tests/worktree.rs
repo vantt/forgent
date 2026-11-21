@@ -1,5 +1,13 @@
-//! Linked-worktree trust and the worktree port. `topology` runs wherever the driver runs a child git; the
-//! rest needs the WAL and `/proc`, which only Linux has.
+//! Linked-worktree trust and the worktree port. `topology` runs wherever the driver runs a child git. The
+//! `wal_backed` module stays Linux only: its cases run the worktree port through a library test harness, whose
+//! borrowed children need a helper executable it is not on Windows. Windows proofs live in
+//! apps/fgos/tests/windows_git_custody.rs: worktree create and remove with discarded ignored bytes, and the three
+//! `discarding_*` refusals (main and unregistered paths, tracked or untracked changes, a nested repository).
+//! Per remaining case: the three `killed_*` cases stop git at an exact syscall with ptrace; the two `lock_naming_*`
+//! cases date a lock against the process start time read from `/proc`; `discarding_removes_an_ignored_symlink_*`
+//! needs symlink creation, which Windows allows only with a privilege; `clean_git_refusals_*`,
+//! `successful_registered_create_*`, `missing_checkout_prune_*` and `missing_owned_detached_history_*` drive the
+//! WAL and registration by hand and are not yet ported.
 
 #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
 mod wal_backed {

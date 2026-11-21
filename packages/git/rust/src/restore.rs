@@ -1104,11 +1104,12 @@ impl GitDriver {
                 .open(destination)
                 .map_err(failure)?
         };
-        let destination = destination.canonicalize().map_err(failure)?;
-        if destination.starts_with(checkout::root(&repo)?)
-            || destination.starts_with(repo.trusted_main_root())
-            || destination.starts_with(repo.common_dir())
-            || destination.starts_with(self.state_root())
+        // Containment is compared in one spelling: Windows canonicalizes to the verbatim `\\?\D:\` form.
+        let destination = plain_path(&destination.canonicalize().map_err(failure)?);
+        if destination.starts_with(plain_path(checkout::root(&repo)?))
+            || destination.starts_with(plain_path(repo.trusted_main_root()))
+            || destination.starts_with(plain_path(repo.common_dir()))
+            || destination.starts_with(plain_path(self.state_root()))
         {
             return Err(failure("restore-extract-outside-repository-required"));
         }
@@ -1118,7 +1119,7 @@ impl GitDriver {
             for row in page.entries {
                 let registered = Path::new(std::str::from_utf8(&row.path).map_err(failure)?);
                 let registered = match registered.canonicalize() {
-                    Ok(path) => path,
+                    Ok(path) => plain_path(&path),
                     Err(e) if e.kind() == std::io::ErrorKind::NotFound => registered.to_path_buf(),
                     Err(e) => return Err(failure(e)),
                 };
@@ -1178,8 +1179,17 @@ impl GitDriver {
         }
         #[cfg(not(unix))]
         {
-            let _ = (bytes, filename);
-            Err(failure("restore-extract-platform-unsupported"))
+            use std::io::Write;
+            // The destination was checked to be a directory above and this process holds the checkout's custody;
+            // `create_new` refuses an existing name, a link included, so nothing is overwritten or followed.
+            let mut output = fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(destination.join(filename))
+                .map_err(failure)?;
+            output.write_all(&bytes).map_err(failure)?;
+            output.sync_all().map_err(failure)?;
+            Ok(())
         }
     }
     fn restore_evidence_authority<'a>(

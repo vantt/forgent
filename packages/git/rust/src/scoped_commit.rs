@@ -285,7 +285,6 @@ pub(crate) fn root(repo: &RepoHandle) -> Result<&Path> {
         .ok_or_else(|| failure("checkout-required"))
 }
 pub(crate) fn scope<'a>(repo: &RepoHandle, held: Vec<BorrowedHandle<'a>>) -> Result<LockScope<'a>> {
-    require_lock_scope_platform()?;
     let mut scope = LockScope::seeded(held).map_err(failure)?;
     if scope
         .holding()
@@ -326,9 +325,6 @@ pub(crate) fn scope<'a>(repo: &RepoHandle, held: Vec<BorrowedHandle<'a>>) -> Res
         let lease = scope
             .handle("dispatch-cwd")
             .ok_or_else(|| failure("checkout-custody-required"))?;
-        #[cfg(not(unix))]
-        let _ = lease;
-        #[cfg(unix)]
         if lease.path() != crate::refs::custody_lock_path(repo, root(repo)?)? {
             return Err(failure("checkout-custody-stale"));
         }
@@ -346,25 +342,13 @@ pub(crate) fn handle<'a>(scope: &'a LockScope<'_>, repo: &RepoHandle) -> Result<
         .ok_or_else(|| failure("checkout-authority-required"))
 }
 pub(crate) fn binding(handle: &Handle) -> Result<String> {
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::MetadataExt;
-        let m = fs::metadata(handle.path()).map_err(failure)?;
-        Ok(format!("{}:{}", m.dev(), m.ino()))
-    }
-    #[cfg(not(unix))]
-    {
-        let _ = handle;
-        Err(failure("git-lockscope-unavailable-windows"))
-    }
+    let key = crate::refs::file_key(handle.path())?;
+    Ok(format!("{}:{}", key.device, key.index))
 }
 /// New chains bind the directory identity used by custody; legacy chains keep
 /// their path-only resource and are accepted only under their original lease.
 pub(crate) fn checkout_resources(repo: &RepoHandle) -> Result<Vec<String>> {
-    #[cfg(unix)]
     let custody = crate::refs::custody_lock_path(repo, root(repo)?)?;
-    #[cfg(not(unix))]
-    let custody = std::path::PathBuf::new();
     Ok(vec![format!(
         "worktree:{}:custody:{}",
         root(repo)?.display(),
