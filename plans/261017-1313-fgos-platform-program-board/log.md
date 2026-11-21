@@ -1,3 +1,4 @@
+- 2026-11-21 08:18 OPC: fg-server2 release sha256:c9506cc4453600194b73144879565d9a5950e04c55580bb4821c9d6c76363a85 active (origin/main 0011311b5: orchestration fixes BIND 4d724e2db, NAMES f6f88e8d6, NUDGE 595a7f0b1, ROTATE 65ad518d5, LANDDOOR e7701dcfc), cut with 10 known npm reds (S6A fixing) and guarded by a doctor comparison: 116 rows, the same 3 old fails, no new fail, no rollback. Review note on LANDDOOR (backlog asked): undo_unpublished_commit moves the branch with a raw git reset outside the refs door (no CAS, journal or read-back).
 - 2026-11-21 07:54 SUPERVISION: plan 261121-0745-head-rotation-trace DONE (source p-4r4h3jqtth landed 65ad518d5).
 - 2026-11-21 07:52 SUPERVISION: plan 261121-0722-idle-lead-replace DONE. Live idle lead is replaced (source p-waxzxz5mio landed 595a7f0b1).
 - 2026-11-21 07:52 SUPERVISION: plan 261119-1730-supervision-powers-cores DONE. Part 1 four Rust cores landed (ec34f897a); part 2 doors running.
