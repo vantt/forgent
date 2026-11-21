@@ -365,9 +365,9 @@ impl GitDriver {
             let _draft = Draft(draft_dir.clone());
             let draft = draft_dir.join("config");
             fs::write(&draft, &old_bytes).map_err(failed)?;
-            let staging_text = draft
-                .to_str()
-                .ok_or_else(|| failed("non-utf8-config-path"))?;
+            let staging_text =
+                crate::driver::text_path(&draft).map_err(|_| failed("non-utf8-config-path"))?;
+            let staging_text = staging_text.as_str();
             let key = format!("remote.{remote}.fetch");
             if let Some(hooks) = &hooks {
                 let out = if let Some(next) = &hooks.next {
@@ -770,9 +770,9 @@ impl GitDriver {
         if !owned_path.is_absolute() {
             return Err(failure("invalid-hooks-path"));
         }
-        let path = owned_path
-            .to_str()
-            .ok_or_else(|| failure("invalid-hooks-path"))?;
+        let path =
+            crate::driver::text_path(owned_path).map_err(|_| failure("invalid-hooks-path"))?;
+        let path = path.as_str();
         let configured = self.hooks_value(repo)?;
         let provenance = if self.local_hooks_value(repo)?.as_deref() == Some(path) {
             self.hooks_provenance(repo, path)?
@@ -827,9 +827,9 @@ impl GitDriver {
         if before.status == "skippedExisting" {
             return Ok(before);
         }
-        let path = owned_path
-            .to_str()
-            .ok_or_else(|| failure("invalid-hooks-path"))?;
+        let path =
+            crate::driver::text_path(owned_path).map_err(|_| failure("invalid-hooks-path"))?;
+        let path = path.as_str();
         self.change_config(repo, "", &[], id, Some((path, false)), filesystem)?;
         self.inspect_hooks(repo, owned_path)
     }
@@ -843,9 +843,9 @@ impl GitDriver {
         if before.status != "owned" {
             return Ok(before);
         }
-        let path = owned_path
-            .to_str()
-            .ok_or_else(|| failure("invalid-hooks-path"))?;
+        let path =
+            crate::driver::text_path(owned_path).map_err(|_| failure("invalid-hooks-path"))?;
+        let path = path.as_str();
         self.change_config(repo, "", &[], id, Some((path, true)), &wal::OsFileSystem)?;
         self.inspect_hooks(repo, owned_path)
     }
