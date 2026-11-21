@@ -6,14 +6,14 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { checkDeadReferences, checkPlatformLinks, checkPlatformMetadata, governanceBaselineFields } from '../../scripts/doc-health.mjs';
+import { checkDeadReferences, checkDocuments, checkPlatformLinks, checkPlatformMetadata, checkRuleClaims, checkVerbReferences, governanceBaselineFields } from '../../scripts/doc-health.mjs';
 import { checkIdentityIdsUnique } from '../../scripts/identity-ids-unique.mjs';
 import { enumerateDocEntries, manifestPathFor } from '../../src/report/enduser-index-generate.mjs';
 import { buildDecisionIndexMarkdown, indexPathFor, narrativeHolderResolver } from '../../src/report/decision-index.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const BUILT_HOST = process.env.FGOS_HOST_BIN || path.join(REPO_ROOT, 'target', 'debug', 'fgos');
-const baseline = governanceBaselineFields(REPO_ROOT);
+const baseline = governanceBaselineFields(fs.readFileSync(path.join(REPO_ROOT, 'docs/platform/governance.md'), 'utf8'));
 
 function header(fields, related = []) {
   const lines = fields.map((f) => `${f}: x`);
@@ -91,7 +91,7 @@ test('metadata rule exempts classified evidence, and reports a missing field or 
 
 // Owns the dead-reference rule: a backticked repo-root path must exist unless the
 // line pins a commit, and only canonical, current-state documents are held to it.
-test('dead-reference rule reports a missing path, but not a pinned (real commit), fenced, pattern or past-state reference, and fails without the canonical flag', () => {
+test('dead-reference rule reports a missing path, but not a pinned (real commit), fenced, pattern, past-state or Canonical: No reference, and fails without the canonical flag', () => {
   const docs = {
     'docs/platform/a/spec.md': [
       'Exists: `src/alive.mjs` and `src/alive.mjs:10-20`.',
@@ -105,10 +105,12 @@ test('dead-reference rule reports a missing path, but not a pinned (real commit)
     ].join('\n'),
     'docs/platform/a/decisions/d.md': 'Past: `src/gone.mjs`\n',
     'docs/platform/a/notes.md': 'Not canonical: `src/gone.mjs`\n',
+    'docs/platform/b/spec.md': '# Draft\n\n```txt\nCanonical: No; unsigned draft\n```\n\nPlanned: `src/gone.mjs`\n',
   };
   const kinds = { 'docs/platform/a/spec.md': { canonical: true, kind: 'spec' },
     'docs/platform/a/decisions/d.md': { canonical: true, kind: 'decision' },
-    'docs/platform/a/notes.md': { canonical: false, kind: 'unplaced-platform' } };
+    'docs/platform/a/notes.md': { canonical: false, kind: 'unplaced-platform' },
+    'docs/platform/b/spec.md': { canonical: true, kind: 'spec' } };
   const { findings } = checkDeadReferences({
     files: Object.keys(docs), readFile: (f) => docs[f], exists: (f) => f === 'src/alive.mjs',
     classify: (f) => kinds[f], isCommit: (token) => token === '53523a917',
@@ -122,8 +124,100 @@ test('dead-reference rule reports a missing path, but not a pinned (real commit)
     classify: () => ({ kind: 'spec' }), isCommit: () => false }), /no canonical flag/);
 });
 
-// One wiring proof for both rules over the real repository and the real host.
-test('live self-check: every repository platform doc passes link, metadata and dead-reference health', () => {
+// Owns the verb reference rule: a code span naming `fgos <verb>` in a document that holds current
+// claims must name a verb of the listing; the exemptions are the dead-reference rule's.
+test('verb reference rule reports an unknown verb, but not a listed or hidden verb, a pinned line, prose, a fence, a past-state or a Canonical: No document', () => {
+  const docs = {
+    'docs/platform/a/spec.md': [
+      'Live: `fgos run "x"`, `fgos doctor --fix` and `fgos internal terminal-control`.',
+      'Dead: `fgos setup` and `fgos evolve --pick <id>`; prose fgos setup is not a span.',
+      'Pinned: `fgos setup` was retired in 53523a917.',
+      'Not a verb: `fgos.v1`, `fgos-coding-knowledge`, `fgos <verb>`, `npm run fgos:dev -- run`.',
+      '```',
+      '`fgos fenced`',
+      '```',
+    ].join('\n'),
+    'docs/platform/a/history/h.md': 'Past: `fgos setup`\n',
+    'docs/platform/b/spec.md': '# Draft\n\n```txt\nCanonical: No\n```\n\nPlanned: `fgos secrets`\n',
+  };
+  const kinds = { 'docs/platform/a/spec.md': { canonical: true, kind: 'spec' },
+    'docs/platform/a/history/h.md': { canonical: true, kind: 'history' },
+    'docs/platform/b/spec.md': { canonical: true, kind: 'spec' } };
+  let listed = 0;
+  const { findings } = checkVerbReferences({
+    files: Object.keys(docs), readFile: (f) => docs[f], classify: (f) => kinds[f],
+    isCommit: (token) => token === '53523a917',
+    verbs: () => { listed += 1; return new Set(['run', 'doctor', 'internal']); },
+  });
+  assert.deepEqual(findings.map((f) => [f.path, f.line, f.target, f.type]), [
+    ['docs/platform/a/spec.md', 2, 'setup', 'unknown-verb'],
+    ['docs/platform/a/spec.md', 2, 'evolve', 'unknown-verb'],
+  ]);
+  assert.equal(listed, 1, 'the listing is read once, and only because a mention exists');
+});
+
+// Owns the rule-claim owner rule: the key is (holder, id) with the title, so a repeat of the same
+// id and title in a second holder is a finding and the same id under another title is not.
+test('rule-claim rule reports the same id and title defined in two holders, not a holder-local id with another title or a plain citation', () => {
+  const docs = {
+    'docs/platform/work/spec.md': '- **RUL1 (one write door).** Every write.\n- **RUL2 (one log (append-only)).** Truth.\n- **D-ADR0055 (sealed events) — text.**\n',
+    'docs/platform/runner/spec.md': '- **RUL1 (one write door).** Again.\n- **RUL2 (runner owns the batch).** Other.\n- **RUL1 (one write door) note 2.** Same holder twice is not a second holder.\nRUL2 (one log (append-only)) of work is cited, not bold.\n',
+    'docs/platform/event/spec.md': '**D-ADR0055 (sealed events) — repeated.**\n```\n**RUL2 (one log (append-only)).** fenced\n```\n',
+  };
+  const all = checkRuleClaims({ files: Object.keys(docs), readFile: (f) => docs[f] });
+  assert.deepEqual(all.findings.map((f) => [f.path, f.line, f.target]), [
+    ['docs/platform/event/spec.md', 1, 'D-ADR0055'],
+    ['docs/platform/runner/spec.md', 1, 'RUL1'],
+    ['docs/platform/work/spec.md', 1, 'RUL1'],
+    ['docs/platform/work/spec.md', 3, 'D-ADR0055'],
+  ]);
+  assert.match(all.findings[1].message, /RUL1 \(one write door\) is also defined in docs\/platform\/work\/spec\.md/);
+  // Under path input a repeat still counts against an unchecked holder, but only checked paths are reported.
+  const scoped = checkRuleClaims({ files: Object.keys(docs), readFile: (f) => docs[f], report: new Set(['docs/platform/runner/spec.md']) });
+  assert.deepEqual(scoped.findings.map((f) => f.path), ['docs/platform/runner/spec.md']);
+});
+
+// Owns path input: only the named paths are checked, a deleted one is never read, placement runs
+// once over the paths that exist, and each document is classified at most once across rules.
+test('path input checks only the named paths, never reads a deleted one, asks placement once and classifies each document once', () => {
+  const docs = {
+    'docs/platform/governance.md': 'Required baseline:\n```txt\nDocument type:\n```\n',
+    'docs/platform/a/spec.md': '# A\n\n[gone](b.md) `src/gone.mjs` `fgos setup`\n',
+    'docs/platform/c/spec.md': '# C\n\n[also broken](nope.md)\n',
+    'packages/host-runtime/contracts/command-manifest.json': JSON.stringify({ commands: [{ name: 'run' }] }),
+  };
+  const read = [];
+  const source = {
+    files: ['docs/platform/governance.md', 'docs/platform/a/spec.md', 'docs/platform/c/spec.md'],
+    readFile: (f) => { read.push(f); if (!(f in docs)) throw new Error(`read a path that is not there: ${f}`); return docs[f]; },
+    exists: (f) => f in docs,
+  };
+  const classified = [], placed = [];
+  const result = checkDocuments({
+    source, paths: ['./docs/platform/a/spec.md', 'docs/platform/b.md', 'plans/reports/x.md'],
+    classify: (f) => { classified.push(f); return { canonical: true, kind: 'spec', metadataExempt: true }; },
+    isCommit: () => false,
+    placement: (paths) => { placed.push(paths); return { violations: [
+      { path: 'docs/platform/a/spec.md', code: 'wrong-location', message: 'blocked', posture: 'block' },
+      { path: 'docs/platform/a/spec.md', code: 'pattern-mismatch', message: 'only a warning' },
+    ] }; },
+  });
+  assert.deepEqual(placed, [['docs/platform/a/spec.md']]);
+  assert.deepEqual(result.findings.map((f) => [f.path, f.type]), [
+    ['docs/platform/a/spec.md', 'convention-wrong-location'],
+    ['docs/platform/a/spec.md', 'unresolved-link'],
+    ['docs/platform/a/spec.md', 'dead-reference'],
+    ['docs/platform/a/spec.md', 'unknown-verb'],
+  ]);
+  assert.deepEqual(result.warnings.map((w) => w.type), ['convention-pattern-mismatch']);
+  assert.deepEqual(classified, ['docs/platform/a/spec.md']);
+  assert.equal(read.includes('docs/platform/b.md'), false);
+  assert.equal(result.counts.files, 1);
+  assert.throws(() => checkDocuments({ source, paths: ['../outside.md'], classify: () => ({}), isCommit: () => false, placement: () => ({}) }), /not a repository-relative path/);
+});
+
+// One wiring proof for every rule over the real repository and the real host.
+test('live self-check: every repository platform doc passes every doc-health rule', () => {
   const result = spawnSync(process.execPath, [
     path.join(REPO_ROOT, 'scripts/doc-health.mjs'), '--json', '--repo-root', REPO_ROOT,
   ], { cwd: REPO_ROOT, encoding: 'utf8', timeout: 120_000, env: { ...process.env, FGOS_HOST_BIN: BUILT_HOST } });

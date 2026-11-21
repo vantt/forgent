@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f2f63dd13d823cb48d7dccc0eae367505a83246381bffde112165b98f70d52a1",
+  "payloadDigest": "bfa4cd7194621a2bea8c1de919f0268a19d7cbceb40f2c5e1a1110bd314eb72c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1331,7 +1331,7 @@
     "scripts/ci-setup-bwrap.sh": "04e07490fff85c7e2116f4fe8b9b78f300a4ee488c6475e37aadbaf1c15de9ce",
     "scripts/convention-conformance.mjs": "14ceed9e37eb8b914f50a6237b61a2bd9b2c591e2d3f611a8321544930e419ea",
     "scripts/decision-question-hook.mjs": "af83a0333f802f38696c818186887ba439cd47f1b4616dec7bd727c792346d14",
-    "scripts/doc-health.mjs": "1bd1bda92e7ece63176115cc789593e06b550fc8d08abaeaf0a5472b96b4da8d",
+    "scripts/doc-health.mjs": "40431d1c935d9b7aaef0144425252db4b7ddace6691a60e0e2cd709f9b882965",
     "scripts/event-store/forge-probe.sh": "58f6e0a88b89acac30022a5c414f395af696c9073b2c004e6c1545fa628145a1",
     "scripts/event-store/power-loss-driver.mjs": "f7f88a6d9e80fe17027d7d6981c04f544d4b49e6629e46b0cfbdcbdeac75a7a3",
     "scripts/event-store/power-loss.sh": "f0023c1352dc57b85aba68c844d5abc28e8967a9a892c557d80b77434b9b2136",
