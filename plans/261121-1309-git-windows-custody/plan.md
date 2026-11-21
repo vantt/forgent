@@ -1,0 +1,153 @@
+---
+contract: plan-v1
+title: "Git door takes custody on Windows: commit, sync and verify under a held lock, proven on native Windows CI"
+status: running
+lead: lead:WINCUSTODY
+base: 3f009686ddffd026c7aab09d6056659f04390e5a
+priority: P1
+blockedBy: []
+footprint:
+  - plans/261121-1309-git-windows-custody/**
+  - .github/workflows/release-assets-check.yml
+  - packages/holder-lock/rust/src/port.rs
+  - packages/holder-lock/rust/src/borrow_windows.rs
+  - packages/holder-lock/rust/src/driver/windows.rs
+  - packages/holder-lock/rust/tests/**
+  - packages/git/rust/src/**
+  - packages/git/rust/tests/**
+  - packages/git/contracts/mutation-census.v1.json
+  - packages/supervision/rust/tests/land.rs
+  - packages/execution/checkout/tests/**
+  - packages/distribution/rust/src/git_gate.rs
+  - packages/distribution/rust/src/release_rows.rs
+  - packages/distribution/rust/src/workspace.rs
+  - packages/distribution/rust/src/init.rs
+  - packages/distribution/rust/src/verify.rs
+  - packages/distribution/rust/tests/**
+  - packages/execution/engine/src/assignment_runner/launch.rs
+  - apps/fgos/src/wiring/unit_run_host/verify.rs
+  - apps/fgos/tests/windows_cwd_lease_owner.rs
+  - apps/fgos/tests/unit_run_host.rs
+  - docs/platform/holder-lock/spec.md
+  - docs/platform/git/spec.md
+  - docs/platform/run-supervisor/spec.md
+  - docs/platform/packaging-distribution/contracts/activation-binding.md
+  - docs/platform/packaging-distribution/contracts/release-manifest.md
+  - CHANGELOG.md
+source:
+  - "owner decision 2026-11-21 option (a): the Git lane builds Windows custody for the Git door, proven on native Windows CI, before S6A deletes the Node execution core"
+  - "plans/261118-1341-s6a-execution-tier-rust/phase-19c-run-route-flip.md (Windows lease decision, the two preconditions)"
+  - p-nk6xf5laob
+  - p-w4cxqq2sbw
+created: 2026-11-21
+---
+
+# Git door takes custody on Windows
+
+## Outcome
+On Windows the Git door runs a scoped commit, a sync, a land and a verify under a held custody lock, exactly as it
+does on Linux: a borrowed copy of the held lock reaches the Git ports in the same process, git and hook children run
+inside the lock's kill-on-close job with captured output, the WAL opens, the release advertises `git-wal-v1`, and the
+controller answers the cwd lease channel for the attempt's whole life. Every piece is proven by a job on native
+`windows-latest` CI. After this plan lands, S6A lifts `windows-cwd-lease-holder-missing` and `legacyOn: ['win32']`
+and deletes the Node execution core with no second win32 path.
+
+## Facts (prior art, 2026-11-21)
+- `BorrowedHandle::new` refuses `Unsupported` first on Windows (`packages/holder-lock/rust/src/port.rs:395`). Its
+  Drop takes the file before `Handle::drop`, so a borrowed copy never calls `before_close` (`UnlockFileEx`). A
+  `DuplicateHandle` copy shares the owner's lock; the Windows lock belongs to the process that took it (CI run
+  44627498081, job "windows lock inheritance probe").
+- Git children run through `driver.rs` `BorrowedSpawn` -> `run_borrowed_io(_watched)`, which is Unix only
+  (`IoUnsupported`, `port.rs:1240-1271`). `run_borrowed` on Windows already runs a child in a named kill-on-close job
+  (`borrow_windows.rs`, holder-lock spec 8.1) but without stdin bytes, captured output or a deadline.
+- `require_lock_scope_platform` (`packages/git/rust/src/lib.rs:649`) refuses `git-lockscope-unavailable-windows` on
+  every lock-taking port (repository_config, refs, remote, scoped_commit, land); `scoped_commit` `binding()` and
+  `checkout-custody-stale`, `native_lock` identity, `restore` and `publication` have their own Unix/Linux gates.
+- The WAL directory open and trust check is Linux only (`wal.rs` `Directory::open_trusted`, `git-wal-unsupported`).
+- C5: `packages/distribution/rust/src/git_gate.rs:208` refuses `git-wal-v1` off Linux; the fence placement needs Linux
+  atomic exchange (`init.rs`); activation-binding.md and release-manifest.md say "Linux only until Windows C5 scan and
+  fence admission exist".
+- The engine serves `cwdLeaseOwner` only around the supervisor start and `wait_for_binding`
+  (`packages/execution/engine/src/assignment_runner/launch.rs` `serving_lease_owner`); an adopted or restarted
+  supervisor that declares again gets no answer. `unit_run_host/verify.rs:92-101` refuses a Windows verify under
+  custody.
+- The Git driver distrusts a linked worktree on Windows (p-nk6xf5laob, `driver.rs` `topology_on_disk`), and worktree
+  path arguments reach git in the verbatim `\\?\D:\` spelling (p-w4cxqq2sbw).
+
+## Prior art reused, and what was missing
+Reused: the borrowed-handle port and its non-owning Drop, the Windows named-job borrow (`borrow_windows.rs`, job
+keeper, `FGOS_LOCK_JOB` hook check), the predecessor record, the controller's `cwdLeaseOwner` endpoint and
+`route::serve_requests`, `fgos_process::path::plain_path`, the driver's `text_path` door, the C5 gate and fence
+format, the existing `windows-cwd-lease-owner` CI job. Missing, and built here as extensions of those doors (no new
+lock, record, verb or config key): the Windows arm of `BorrowedHandle::new` and of `run_borrowed_io`, the Windows
+WAL directory trust check, the Windows fence placement and process scan, and a lease endpoint that lives as long as
+the custody. This reverses the Git plan's Q6 default (a) (refuse on win32) by the owner's 2026-11-21 decision; the
+narrative goes into the Git spec's decision history.
+
+## Acceptance criteria
+1. Native Windows CI job `windows git custody` in `.github/workflows/release-assets-check.yml` is green and runs
+   `cargo test --release` for `fgos-git` (worktree, WAL, scoped commit, sync, land, restore, refs), `fgos-holder-lock`
+   (borrowed handle, borrow I/O, scope) and the land and checkout tests, with none of those cases gated off Windows.
+2. Native Windows CI job `windows cwd lease owner` is green and proves: an adopted supervisor re-declares its domain
+   on the held lease and is answered; a verify runs under custody.
+3. `focused tests (windows-latest)` is green with the distribution C5 cases: a Windows release that claims
+   `git-wal-v1` activates with the fence placed, and a live predecessor writer refuses.
+4. A Windows unit-run-host test commits a writing Unit's declared paths under custody into the worktree branch
+   (`apps/fgos/tests/unit_run_host.rs`, run in `windows git custody`).
+5. `rg -n "git-lockscope-unavailable-windows" packages apps` returns nothing; `BorrowedHandle::new` and
+   `run_borrowed_io` have no Windows refusal.
+6. Linux gates stay green: `cargo test` for every touched crate, `cargo clippy -D warnings`, `cargo fmt --check`,
+   and `cargo check --target x86_64-pc-windows-msvc` for the touched crates.
+
+## Non-goals
+- Lifting `windows-cwd-lease-holder-missing` in the engine, the `legacyOn: ['win32']` route and the Node `run` arm:
+  S6A does that once this plan lands.
+- macOS WAL and custody (the WAL is Linux only today; macOS keeps its present behaviour).
+- The Node addon's Windows handover (`from_acquired_description`): S6A deletes the Node writers.
+- A self-hosted Windows runner.
+
+## Phases
+
+| id | title | depends-on | footprint | wave | status |
+|---|---|---|---|---|---|
+| 1 | [Linked worktree trust and plain paths on Windows, CI job](phase-01-windows-worktree-and-ci-job.md) | - | packages/git/rust/src/driver.rs, packages/git/rust/src/worktree.rs, packages/git/rust/tests/worktree.rs, packages/distribution/rust/src/release_rows.rs, packages/distribution/rust/src/workspace.rs, .github/workflows/release-assets-check.yml | 1 | ready |
+| 2 | [WAL opens on Windows](phase-02-windows-wal.md) | - | packages/git/rust/src/wal.rs, packages/git/rust/src/wal/** | 1 | ready |
+| 3 | [Borrowed handle and borrow I/O on Windows](phase-03-holder-lock-windows-borrow.md) | - | packages/holder-lock/rust/src/port.rs, packages/holder-lock/rust/src/borrow_windows.rs, packages/holder-lock/rust/src/driver/windows.rs, packages/holder-lock/rust/tests/**, .github/workflows/release-assets-check.yml | 2 | ready |
+| 4 | [C5 fence and scan on Windows, git-wal-v1 advertised](phase-04-windows-c5.md) | 2 | packages/distribution/rust/src/git_gate.rs, packages/distribution/rust/src/init.rs, packages/distribution/rust/src/verify.rs, packages/distribution/rust/tests/**, docs/platform/packaging-distribution/contracts/activation-binding.md, docs/platform/packaging-distribution/contracts/release-manifest.md | 2 | ready |
+| 5 | [Git ports take custody on Windows](phase-05-git-ports-windows-custody.md) | 1, 2, 3 | packages/git/rust/src/lib.rs, packages/git/rust/src/scoped_commit.rs, packages/git/rust/src/sync.rs, packages/git/rust/src/land.rs, packages/git/rust/src/refs.rs, packages/git/rust/src/remote.rs, packages/git/rust/src/restore.rs, packages/git/rust/src/recovery.rs, packages/git/rust/src/repository_config.rs, packages/git/rust/src/native_lock.rs, packages/git/rust/src/publication.rs, packages/git/rust/tests/scoped_commit_sync.rs, packages/git/rust/tests/land.rs, packages/git/rust/tests/land_crash_matrix.rs, packages/git/rust/tests/land_push_catch_up.rs, packages/git/rust/tests/safe_restore.rs, packages/git/rust/tests/refs_remote.rs, packages/git/rust/tests/recovery_matrix.rs, packages/git/rust/tests/repository_config.rs, packages/git/rust/tests/borrow_deadline.rs, packages/git/rust/tests/support/**, packages/git/contracts/mutation-census.v1.json, packages/supervision/rust/tests/land.rs, packages/execution/checkout/tests/**, .github/workflows/release-assets-check.yml | 3 | ready |
+| 6 | [Lease channel for the attempt's whole life, verify under custody](phase-06-lease-whole-life-and-verify.md) | 3 | packages/execution/engine/src/assignment_runner/launch.rs, apps/fgos/src/wiring/unit_run_host/verify.rs, apps/fgos/tests/windows_cwd_lease_owner.rs | 3 | ready |
+| 7 | [Windows unit-run commit end to end, docs, integration](phase-07-e2e-docs-integration.md) | 4, 5, 6 | apps/fgos/tests/unit_run_host.rs, .github/workflows/release-assets-check.yml, docs/platform/holder-lock/spec.md, docs/platform/git/spec.md, docs/platform/run-supervisor/spec.md, CHANGELOG.md | 4 | ready |
+
+Reading check: every phase sits in a later wave than its dependencies; the only hot file,
+`.github/workflows/release-assets-check.yml`, has one writer per wave (1, 3, 5, 7); phases 1 and 2 share no path, nor
+do 3 and 4, nor 5 and 6. Phase 1 creates the `windows git custody` job; later phases add steps to it.
+
+Execution: the lead opens one linked worktree per phase (`fgos worktree create`) and hands it to a worker with
+`fgos run --writes <phase footprint> --worktree <wt> --plan plans/261121-1309-git-windows-custody --phase <id>`.
+Windows proof runs by pushing the phase branch and `gh workflow run release-assets-check.yml --ref <branch>`; the
+run id goes into the phase row's log line below. The lead rebases and lands each phase with `fgos land <branch>`.
+
+## Owner questions
+None open. The owner chose option (a) on 2026-11-21. Every mechanism here extends an existing door; the supervisor
+is told of each in the plan-landed message and may stop a phase.
+
+## Risks and rollback
+- A `DuplicateHandle` copy closed while a borrow runs might release the owner's lock. Phase 3 proves on Windows that
+  the owner still holds after the copy closes, before any port uses it; if it does not hold, the Windows borrow keeps a
+  non-owning reference to the owner's handle instead of a duplicate.
+- The Windows WAL trust rule (owner SID, no world-writable ACE) may refuse runner temp directories; phase 2 measures
+  it on CI and records the rule in the Git spec.
+- The Windows fence placement has no atomic exchange; phase 4 must keep "an old controller can never open the WAL"
+  provable or stop and report.
+- S6A is paused on its phases 20 and 21 and shares `packages/execution/engine/**`, `apps/fgos/src/wiring/unit_run_host/**`
+  and the CI file; this plan edits only the files listed, and S6A rebases after each land.
+- Rollback: revert the phase's land commit; each phase is one land.
+
+## Overlap note
+plan-contract-check reports an overlap with 261118-1341-s6a-execution-tier-rust. That is intended: by the owner's
+decision S6A waits for this plan (its phases 20 and 21 are parked on it) and rebases after each land. Backlog rows
+p-nk6xf5laob and p-w4cxqq2sbw are set done through the portfolio owner when phase 7 lands, not by this plan
+(docs/backlog.md belongs to 261120-0625-work-data-model).
+
+## Log
+- 2026-11-21 lead:WINCUSTODY: plan written against origin/main 3f009686d.
