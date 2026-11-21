@@ -109,12 +109,16 @@ test('the secretary head launches bypass in the main checkout it is granted, and
   } finally { fs.rmSync(workerRoot, { recursive: true, force: true }); }
 });
 
-test('a head grant of a one-level directory binds the directory itself, a path the sandbox validator accepts', () => {
-  for (const role of ['head:secretary-miu', 'head:supervisor']) {
+test('a head grant binds only existing, glob-free, non-nested directories, a set the launch accepts', () => {
+  const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+  for (const role of ['head:secretary-miu', 'head:supervisor-main', 'head:shaper-main', 'head:planner-main']) {
     const grant = requirementOf(grantOf(role)).policy.grants.find((g) => g.resource === WORKSPACE_PATHS_RESOURCE);
-    assert.ok(grant.paths.includes('plans/backlog'), `${role} binds plans/backlog`);
     assert.equal(new Set(grant.paths).size, grant.paths.length, `${role} lists no path twice`);
     assert.ok(grant.paths.every((p) => !p.includes('*')), `${role} has no glob in any path`);
+    for (const p of grant.paths) {
+      assert.ok(!grant.paths.some((o) => o !== p && p.startsWith(`${o}/`)), `${role} path ${p} is not nested under another`);
+      assert.ok(fs.existsSync(path.join(repoRoot, p)), `${role} path ${p} exists under the repository root`);
+    }
     validateWorkspacePaths(grant.paths, role);
   }
 });
