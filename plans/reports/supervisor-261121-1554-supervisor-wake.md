@@ -16,3 +16,11 @@ The order had three parts. One is done, one turned out to be unnecessary, and on
 ## Open
 
 - q-o3omqvtsuc: planner pin, waiting for the owner.
+
+## Late events (7)
+
+- The session-no-result event for `unit-run-1795250332012-cf1ab10b` (windows-ci-packaging-reds phase 1, Gemini producer) is not a failure: the unit settled `pass` at 08:52Z.
+- The lane-freed event changed nothing. 4 of 4 leads are live, and no plan is admissible.
+- The session-idle events for `lead:WINCUSTODY` and `lead:WINCI` were false alarms. On screen, WINCUSTODY is mid-turn on phase 4, and WINCI is waiting on its own CI monitors for phase 1 and phase 2.
+- WINCUSTODY's screen shows a message "two backlog items, token expiry" sent to `forgent-1d`. It did not reach this session, so check whether the intended recipient got it.
+- The session-no-result event for `unit-run-1795251202230-992b7d64` (git-windows-custody phase 2) is a real failure: `execution-failure` with infrastructure reason `run-error` at 08:53Z, and no seat settled. The live `lead:WINCUSTODY` owns the retry. If the phase stalls, the next wake raises plan-no-progress.
