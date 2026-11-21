@@ -15,7 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { parseYaml } from '../util/yaml.mjs';
-import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { RunnerConfigError } from '../native/execution-door.mjs';
 import { canonicalizeWriteEntry, globsMeet } from '../runner/dispatch/write-scope.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';
 

@@ -9,7 +9,7 @@ use super::catalog_entries::{
     check_catalog, deep_equal, resolve_layer, LoopTables, ParamDef, SeatError,
 };
 use super::CollaborationError;
-use crate::unit::js_trim;
+use crate::js::trim as js_trim;
 use serde_json::{json, Map, Value};
 
 /// A refusal of the resolution: the catalog's own, or the seat modules'.

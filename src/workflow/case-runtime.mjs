@@ -9,7 +9,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { RunnerConfigError } from '../native/execution-door.mjs';
 import { custodyHeld } from '../runner/execution/custody-door.mjs';
 import { gateAnswerFile, runDirOf } from '../runner/execution/case-run-paths.mjs';
 import { unitRunFacts } from '../runner/execution/unit-run-record.mjs';

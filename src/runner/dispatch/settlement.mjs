@@ -1,8 +1,8 @@
 // dispatch/settlement.mjs — Unified Run settlement pipeline and primitives
 //
-// The one settlement pipeline: the settle-attempt step of a supervised attempt
-// (src/run-supervisor/steps/settle-attempt.mjs) and the inline paths both end in
-// settleRunOutcome.
+// The one settlement pipeline in Node: the inline paths end in settleRunOutcome.
+// The settle-attempt step of a supervised attempt runs in the host's engine
+// (packages/execution/engine/src/steps/settle_attempt.rs).
 
 import fs from 'node:fs';
 import path from 'node:path';

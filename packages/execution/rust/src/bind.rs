@@ -897,7 +897,7 @@ pub fn run_timeout_problem(value: &Value, label: &str) -> Option<String> {
 /// `90m`, `5400s`, `2h`, `600000ms` (`parseRunTimeout`, `src/runner/dispatch/config.mjs`): one whole number and one
 /// unit as milliseconds, checked like any run timeout; the refusal sentence otherwise.
 pub fn parse_run_timeout(text: &str, label: &str) -> Result<u64, String> {
-    let trimmed = crate::unit::js_trim(text);
+    let trimmed = crate::js::trim(text);
     let split = trimmed
         .find(|c: char| !c.is_ascii_digit())
         .unwrap_or(trimmed.len());

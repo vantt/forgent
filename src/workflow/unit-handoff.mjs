@@ -14,7 +14,7 @@ import { removeWorktree, deleteBranchRef } from '../runner/worktree.mjs';
 import { worktreeAdminScope } from '../runner/execution/custody-door.mjs';
 import { unitRunFacts } from '../runner/execution/unit-run-record.mjs';
 
-import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { RunnerConfigError } from '../native/execution-door.mjs';
 import { foldRunSetting } from '../runner/execution/run-request.mjs';
 import { anonymousInputName, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, reportDigest, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
 import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';

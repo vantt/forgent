@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { RunnerConfigError } from '../native/execution-door.mjs';
 import { runDirOf, runsRoot } from '../runner/execution/case-run-paths.mjs';
 import { installOnce } from '../native/door.mjs';
 import { legacyInfrastructureOf, legacyStepOutcomeOf } from './legacy-ledger-read.mjs';

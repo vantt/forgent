@@ -15,7 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
-import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { RunnerConfigError } from '../native/execution-door.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { resolveGitRoots } from '../runner/execution/run.mjs';
 import { capabilityVerifyOf } from '../runner/capability-config.mjs';

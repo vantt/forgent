@@ -34,7 +34,7 @@ import { declaredActivities, readWorkflowCatalog, withUnreadableDefinitions } fr
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 
 import { validateRunnerLoopsShape, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
-import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { RunnerConfigError } from '../native/execution-door.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
 import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';

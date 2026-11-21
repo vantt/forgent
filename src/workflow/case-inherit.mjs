@@ -14,7 +14,7 @@ import path from 'node:path';
 import { isDeliveryMilestone, readCaseProjection } from './case-projection.mjs';
 import { eventsFilePath, readWorkflowEvents } from './store.mjs';
 import { runsRoot } from '../runner/execution/case-run-paths.mjs';
-import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { RunnerConfigError } from '../native/execution-door.mjs';
 
 /** Milestones a case may take over: produced by an activity that writes nothing, and named by no `must` row. */
 function inheritableMilestones(guide) {

@@ -15,7 +15,7 @@
 //! since no rule can be read from it.
 
 use crate::decide::{DecideAnswer, DecideFailure};
-use crate::runner_check::js_trim;
+use crate::js::trim as js_trim;
 use serde_json::{json, Map, Value};
 use std::panic::{catch_unwind, AssertUnwindSafe};
 

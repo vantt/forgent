@@ -13,7 +13,8 @@
 mod slug;
 mod slug_table;
 
-use crate::unit::{js_trim, normalize_plan_ref, PlanRef, Refusal};
+use crate::js::trim as js_trim;
+use crate::unit::{normalize_plan_ref, PlanRef, Refusal};
 use serde_json::{json, Map, Value};
 
 pub use slug::slug_of;

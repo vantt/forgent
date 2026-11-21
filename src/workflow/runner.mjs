@@ -35,14 +35,13 @@ import {
 } from './unit-handoff.mjs';
 import { stepSubjectDigest } from './ref-digests.mjs';
 import { runUnit } from '../runner/execution/run.mjs';
-import { CaseAdmissionRefusedError } from '../runner/execution/case-admission-port.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
 import { closeCaseUnderHold } from './case-close.mjs';
 import { workflowPersonaScope } from './loader.mjs';
 import { unitFieldsOfTemplate } from './steps.mjs';
 import { loopOf } from '../runner/execution/patterns/catalog.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
-import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { CaseAdmissionRefusedError, RunnerConfigError } from '../native/execution-door.mjs';
 
 /** One log line for the events that mark a step's progress, null for every other event. */
 function progressLine({ ts, type, payload }) {

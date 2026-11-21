@@ -34,6 +34,7 @@ pub mod run_request;
 pub mod runner_check;
 pub mod runner_config;
 pub mod seat_resolver;
+pub mod tier_cell;
 pub mod tools;
 pub mod unit;
 pub mod unit_record;
