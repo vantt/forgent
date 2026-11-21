@@ -18,6 +18,8 @@ This revises the earlier reading: the hardcoded `planning`/`discovery`/`executin
 
 2026-11-21 11:10, owner confirmed: bugfix goes into the guide tier only, because Work is too rigid and lacks supporting frameworks, which is the reason it is delayed. Minted D1 and D2. Next: shape the bugfix guide itself (milestones, activities, patterns).
 
+2026-11-21 11:20, owner: everything already has code; audit, do not invent. Audit of the carrier for a second coding guide, all existing: (a) a domain already holds several workflow files (council has seven, marketing one); (b) `--guide <id>` already exists on `fgos workflow propose` and `start`, default `coding/feature` (`src/workflow/propose.mjs:34`, `command-registry.mjs:2943`); (c) `propose` refuses a guide that lacks the activities `implement-item`, `validate-plan` and `judge-ambiguity` (`propose.mjs:382`, code `guide-activity-missing`), so a bugfix guide used through `propose` keeps those three ids; (d) a slice's kind, capability, pattern and rigor come from its write paths in `domains/coding/slice-kinds.yaml`, not from the guide, and there is no bug-specific kind; (e) each domain's YAML is compiled to `domains/<d>/compiled.json`, which `fgos doctor` checks for staleness, so a new workflow file needs a recompile. The milestone and activity names I sketched in chat at 11:10 were invented and are withdrawn; the bugfix guide must be derived from `feature.yaml`'s own guide part (§3).
+
 ## 2. Mục tiêu & đề bài
 
 Today a coding Work item always walks one workflow, `coding/feature` (discovery, exploring, planning, executing, and so on). `resolveWorkflow(domain, kind)` already exists in `src/state/domain-registry.mjs` and the registry already has `defaultWorkflow: feature` and an empty `workflowFor: {}`, but the item-walking code does not consult it per item kind. The owner wants a domain to carry more than one workflow, starting with a shorter `bugfix` workflow for coding, with domain-specific logic living in the coding domain pack and none of it in the shared supervisor layer. The outcome of this discussion is a settled slice that a planner can plan: which code paths are wired, what the bugfix workflow's stages are, and how the domain pack plugs in.
@@ -50,6 +52,11 @@ Today a coding Work item always walks one workflow, `coding/feature` (discovery,
 | Two tiers: pattern (one piece of work) and workflow (a chain of work) | owner-stated 2026-11-21 11:00 | matches D-ADR0073 loops/patterns and the guide tier |
 | The guide tier already runs for `coding/feature`, and `feature.yaml`'s guide part already names a pattern per activity | verified | `src/workflow/*`, `feature.yaml:126-` (its own comment "nothing reads this part until the coding cutover" looks stale; confirm) |
 | Whether the older lifecycle part also needs a bugfix variant | settled by D2: no | owner 2026-11-21 11:10 |
+| Audit: a second guide needs no new mechanism | verified | multiple workflow files per domain exist (`domains/council/workflows/` has seven); `--guide <id>` exists; slice kind and pattern are table-driven by write path |
+| Audit constraint: a guide used through `propose` must keep activities `implement-item`, `validate-plan`, `judge-ambiguity` | verified | `src/workflow/propose.mjs:382` |
+| Audit constraint: new workflow YAML must be recompiled into `compiled.json` | verified in `domain-registry.mjs:62-65` | `fgos doctor` row `domain-registry-compiled` reports staleness |
+| Audit: a guide-only file registered in coding is also read by the Work resolver, but only if `workflowFor` names it; D2 leaves `workflowFor` empty | verified by reading `resolveWorkflow` | no effect on Work items |
+| How the bugfix guide differs from `feature`'s guide part (which activities, decision points, MUST guards) | open: derive from `feature.yaml:126-`, change only what bugs need | provisional default, to confirm: express "prove the cause before editing" as a SHOULD decision with a reason, as `feature.yaml` does for its other routes, and keep the verify receipt as the only MUST |
 | Where is "a team under a lead per task type" settled? Today `lead` leads one plan | not found yet | `core/agents/lead.yaml`; `docs/platform/workflow/spec.md` §7.8 has a conductor case driven by `fgos-cook`; ask the owner for the earlier discussion if the scan cannot find it |
 | `feature.yaml` carries no `seats:` yet; spec §10.2 describes a guide part to be added at cutover | open | `grep seats` gives 0 in `domains/coding/workflows/feature.yaml` |
 | Title says "domain task types"; is more than bugfix in scope (other kinds, other domains)? | open | the item only covers coding bugfix |
@@ -69,6 +76,7 @@ Today a coding Work item always walks one workflow, `coding/feature` (discovery,
 - 2026-11-21 10:55 (shaper): read the callers of the kind-aware accessors and the hardcoded stage literals; result in §3 (rows "Per-kind wiring" to "Real gap").
 - 2026-11-21 11:00 (owner): two-tier model and that `fgos-cook` already drives `ak:plan` plans through a workflow. Shaper checked the guide tier in code; hardcoded-stage gap re-read as older-path only (§1).
 - 2026-11-21 11:10 (owner): confirmed guide tier only; Work is delayed because it is too rigid and has no supporting framework. D1 and D2 minted.
+- 2026-11-21 11:20 (owner): everything already has code; audit only. Shaper audited the guide carrier (rows "Audit" in §3); withdrew the invented milestone names.
 
 ## 6. Thiết kế đã chốt {#design}
 
