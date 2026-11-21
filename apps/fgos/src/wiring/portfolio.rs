@@ -674,6 +674,121 @@ pub fn edit_item(repo_root: &Path, req: &EditItemRequest) -> Result<ItemResult, 
     })
 }
 
+/// Why a backlog index could not be generated for a commit.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CommitIndexError {
+    /// The portfolio could not be read.
+    Unreadable(String),
+    /// The items that count have errors or a duplicate id; the messages joined by `; `.
+    Invalid(String),
+}
+
+/// The `plans/backlog.md` text for a commit: the items Git tracks (`tracked`, repo-relative item paths)
+/// plus the ones being committed (`committing`, any repo-relative paths), never a stray file of the
+/// working tree. A report error about an item file the index leaves out is not this commit's to refuse;
+/// any other error, or a duplicate id among the items that count, is `Invalid`.
+pub fn generate_backlog_index_for_commit(
+    root: &Path,
+    tracked: &std::collections::HashSet<String>,
+    committing: &[String],
+) -> Result<String, CommitIndexError> {
+    let report = check_portfolio(
+        root,
+        &CheckOptions {
+            check_index: false,
+            ..CheckOptions::default()
+        },
+    )
+    .map_err(|e| CommitIndexError::Unreadable(e.to_string()))?;
+    let counts = |rel: &Path| {
+        let rel = rel.to_string_lossy();
+        tracked.contains(rel.as_ref()) || committing.iter().any(|c| c.as_str() == rel)
+    };
+    let items: Vec<_> = report
+        .items
+        .iter()
+        .filter(|it| counts(&it.rel_path))
+        .cloned()
+        .collect();
+    let mut errors: Vec<String> = report
+        .errors
+        .iter()
+        .filter(|e| {
+            !e.strip_prefix("plans/backlog/")
+                .and_then(|rest| rest.split_once(": "))
+                .is_some_and(|(name, _)| !counts(Path::new("plans/backlog").join(name).as_path()))
+        })
+        .cloned()
+        .collect();
+    let mut seen = std::collections::HashSet::new();
+    for it in &items {
+        if !seen.insert(it.id.as_str()) {
+            errors.push(format!(
+                "duplicate-id: backlog id '{}' is used twice",
+                it.id
+            ));
+        }
+    }
+    if !errors.is_empty() {
+        return Err(CommitIndexError::Invalid(errors.join("; ")));
+    }
+    Ok(generate_backlog_index(
+        &items,
+        &report.discussions,
+        &report.plans,
+    ))
+}
+
+/// How a plan `source` entry reads to the land door: the one place the id shapes are decided.
+pub fn classify_backlog_ref(src: &str) -> fgos_supervision::land::BacklogRef {
+    use fgos_supervision::land::BacklogRef;
+    if is_valid_backlog_id(src) {
+        BacklogRef::Minted
+    } else if is_legacy_backlog_id(src) {
+        BacklogRef::Legacy
+    } else if names_backlog_item(src) {
+        BacklogRef::Invalid
+    } else {
+        BacklogRef::NotBacklog
+    }
+}
+
+/// The file name when `path` is a backlog item path, `plans/backlog/<name>.md`, one level beneath the directory.
+pub(super) fn backlog_item_name(path: &str) -> Option<&str> {
+    path.strip_prefix("plans/backlog/")
+        .filter(|name| name.ends_with(".md") && !name.contains('/'))
+}
+
+const TRACKED_PAGE: usize = 4096;
+const MAX_TRACKED_PAGES: usize = 25;
+
+/// The backlog item paths the index of the checkout `repo` tracks, read through the Git door; the
+/// `tracked` argument of `generate_backlog_index_for_commit`. The error is the Git door's cause.
+pub(super) fn tracked_item_paths(
+    driver: &fgos_git::GitDriver,
+    repo: &fgos_git::RepoHandle,
+) -> Result<std::collections::HashSet<String>, String> {
+    let mut tracked = std::collections::HashSet::new();
+    let mut cursor = None;
+    for _ in 0..MAX_TRACKED_PAGES {
+        let page = driver
+            .tracked_paths(repo, cursor, TRACKED_PAGE)
+            .map_err(|e| e.cause)?;
+        tracked.extend(
+            page.entries
+                .iter()
+                .filter_map(|p| std::str::from_utf8(p).ok())
+                .filter(|p| backlog_item_name(p).is_some())
+                .map(str::to_owned),
+        );
+        if page.complete {
+            return Ok(tracked);
+        }
+        cursor = page.next_cursor;
+    }
+    Err("the checkout tracks too many paths to read".to_owned())
+}
+
 /// Generates the markdown index for `plans/backlog.md`.
 pub fn generate_backlog_index(
     items: &[BacklogItem],

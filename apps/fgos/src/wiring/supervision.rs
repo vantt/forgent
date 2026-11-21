@@ -20,7 +20,7 @@ use fgos_host_runtime::{
 };
 use fgos_observe::record::store::RecordDoor;
 use fgos_observe::record::types::{AttrValue, Basis, Origin, Record, SubjectRef, RECORD_VERSION};
-use fgos_supervision::land::{land, LandCommand, LandPorts, ShellRunner};
+use fgos_supervision::land::{land, BacklogPort, LandCommand, LandPorts, ShellRunner};
 use fgos_supervision::notify::MailboxNotifier;
 use fgos_supervision::portfolio::{self, Plan};
 use fgos_supervision::queue::{Queue, QueueError, Raised, RaisedEvent};
@@ -1449,6 +1449,8 @@ fn run_land(root: &Path, command: &LandCommand) -> Result<Value, CategorisedRefu
     let writer = writer();
     let next = || operation_id("land");
     let log_dir = state_dir(&main, "land");
+    let index =
+        |root: &Path, committing: &[String]| backlog_index(&driver, &repo, root, committing);
     let ports = LandPorts {
         git: &driver,
         repo: &repo,
@@ -1458,6 +1460,10 @@ fn run_land(root: &Path, command: &LandCommand) -> Result<Value, CategorisedRefu
         runner: &ShellRunner,
         log_dir: &log_dir,
         wait_ms: 30_000,
+        backlog_index: Some(BacklogPort {
+            classify: &super::portfolio::classify_backlog_ref,
+            index: &index,
+        }),
     };
     let landed =
         land(command, &config, &ports).map_err(|why| refused(&why.code, why.detail_with_note()))?;
@@ -1465,6 +1471,24 @@ fn run_land(root: &Path, command: &LandCommand) -> Result<Value, CategorisedRefu
         "mainSha": landed.main_sha, "landedPaths": landed.landed_paths,
         "retries": landed.retries, "gatesRun": landed.gates_run,
     }))
+}
+
+/// The backlog index a land commits: the one generator every index write uses, over the items Git
+/// tracks plus the paths being committed, refusing on errors.
+fn backlog_index(
+    driver: &GitDriver,
+    repo: &RepoHandle,
+    root: &Path,
+    committing: &[String],
+) -> Result<String, String> {
+    use super::portfolio::{
+        generate_backlog_index_for_commit, tracked_item_paths, CommitIndexError,
+    };
+    let tracked = tracked_item_paths(driver, repo)
+        .map_err(|cause| format!("write-status-unreadable: {cause}"))?;
+    generate_backlog_index_for_commit(root, &tracked, committing).map_err(|why| match why {
+        CommitIndexError::Unreadable(why) | CommitIndexError::Invalid(why) => why,
+    })
 }
 
 /// `land.gates` and `land.regenerate`, read once as the one config value `land`.

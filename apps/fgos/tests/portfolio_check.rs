@@ -1,5 +1,6 @@
 //! Tests for portfolio check, item contract, and index generation (D-ADR0082, phase 2).
 
+#[allow(dead_code)]
 #[path = "../src/wiring/portfolio.rs"]
 mod portfolio;
 
@@ -699,4 +700,19 @@ fn test_check_portfolio_index_drift() {
         .any(|e| e.contains("index-drift")));
 
     let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn test_classify_backlog_ref_reads_each_id_shape_once() {
+    use fgos_supervision::land::BacklogRef;
+    for (src, want) in [
+        ("p-aaaaaaaaaa", BacklogRef::Minted),
+        ("p-0123abcd", BacklogRef::Legacy),
+        ("STR12", BacklogRef::Legacy),
+        ("wf-some-flow", BacklogRef::Legacy),
+        ("p-XYZ", BacklogRef::Invalid),
+        ("docs/discussions/x/DISCUSSION.md", BacklogRef::NotBacklog),
+    ] {
+        assert_eq!(portfolio::classify_backlog_ref(src), want, "{src}");
+    }
 }
