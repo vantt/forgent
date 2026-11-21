@@ -416,7 +416,7 @@ export function toMergeLockError(err, details = {}) {
 // tsk-3yl D1: a prior `approve` run can already have landed this branch's
 // merge commit and died at a LATER step (any failure after merge-commit
 // but before the status-move to `done` — not just the compound-learn gap
-// that first surfaced this, docs/backlog.md p-b91d487a). Retrying then
+// that first surfaced this, plans/backlog.md p-b91d487a). Retrying then
 // finds `git merge --no-commit --no-ff` a no-op (nothing to stage), so
 // `git commit --no-edit` fails with "nothing to commit" and this function
 // used to throw an opaque MergeError instead of recognizing the merge

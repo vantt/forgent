@@ -25,7 +25,7 @@ export function evaluateBypassPairing({ isBypass, hasOwnWorktree, hasPrivateHome
  * session also lives in the main checkout, which is allowed only while the policy denies host writes: the grant
  * narrows what it may write, so the declared own workspace is met by that policy rather than by a worktree.
  * That narrowing is not a prompt: under bypass the paths the grant opens (for the secretary, its plans, its
- * discussion files and docs/backlog.md through the door) are written without asking.
+ * discussion files and backlog items through the door) are written without asking.
  */
 export function controlDelivery({ launchKind, requirement, backend }) {
   const backendDelivers = requirement?.mode === 'required' && Boolean(backend);

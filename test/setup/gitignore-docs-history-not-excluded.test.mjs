@@ -1,5 +1,5 @@
 // tsk-2gw: verifies the fix landed at `fgw/tsk-1wd` (commit ffd211a,
-// docs/backlog.md row p-4b7dd2ed) still holds -- `docs/history/` must
+// plans/backlog.md row p-4b7dd2ed) still holds -- `docs/history/` must
 // never be excluded from git, since `fgos-coding-exploring`'s own hard
 // rule requires committing `CONTEXT.md` to the item's `fgw/<id>` branch,
 // and an ignored path can never be committed there.

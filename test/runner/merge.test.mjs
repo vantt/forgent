@@ -597,7 +597,7 @@ test('landRunnerItem releases the main mutex and the slot after a merge', async 
   assert.equal(probe('merge-slot', slotParams(repoRoot, 'refs/heads/main')).result, 'free');
 });
 
-// tsk-3yl: idempotent already-merged branch (docs/backlog.md p-b91d487a) —
+// tsk-3yl: idempotent already-merged branch (plans/backlog.md p-b91d487a) —
 // a prior approve run already landed the merge commit but died at a LATER
 // step, so a retry finds the branch already an ancestor of HEAD. Reproduced
 // here by fast-forwarding the merge in directly (bypassing landRunnerItem

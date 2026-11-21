@@ -34,7 +34,7 @@ Full decision record: `docs/history/fgos-terminal-pane-rename/CONTEXT.md`.
 Not every orchestrator has a concept of a pane label, so this skill is
 gated on a declared **`pane-labeling`** capability rather than assuming
 herdr (D5,
-`docs/discussions/orchestrator-worker-slots/DISCUSSION.md` §6 "Nhãn: session
+`plans/discussions/ds-ah5r4zn2ab-orchestrator-worker-slots/DISCUSSION.md` §6 "Nhãn: session
 tự đặt qua helper skill có gate"). The capability is declared through the
 tool executor that serves it: a `kind: "tool"` entry under `runner.executors`
 names the capability in `for`, and `fgos dispatch decide --for pane-labeling`
