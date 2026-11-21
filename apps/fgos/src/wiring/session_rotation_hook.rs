@@ -325,7 +325,8 @@ mod tests {
     }
 
     #[test]
-    fn the_shipped_standard_rotates_the_secretary_and_supervisor_at_a_lower_soft_than_every_other_persona() {
+    fn the_shipped_standard_rotates_the_secretary_and_supervisor_at_a_lower_soft_than_every_other_persona(
+    ) {
         let (schemas, _) = fgos_config::schema::Schemas::bundled().unwrap();
         let standard = fgos_config::standard::Standard::bundled(&schemas).unwrap();
         let config =
