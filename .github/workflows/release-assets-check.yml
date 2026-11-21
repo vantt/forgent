@@ -174,8 +174,8 @@ jobs:
           git config --global user.email "ci@example.com"
           git config --global user.name "CI"
 
-      # `fgos run` is served by the host on Windows too: a writing run reaches the unit run's bind, where Windows
-      # (no confinement backend) refuses the seat by its posture and commits nothing.
+      # `fgos run` is served by the host on Windows too; a writing run stops at the Config crate's Windows refusal
+      # (config-platform-unsupported) before any unit run and commits nothing.
       - name: fgos run --writes is served by the host on Windows
         shell: bash
         run: node scripts/run-tests.mjs test/cli/run-verb.test.mjs

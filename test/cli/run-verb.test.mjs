@@ -104,11 +104,11 @@ test('fgos run "<prompt>" builds a read-only unit from the prompt, runs it and p
   assert.deepEqual(unit.writes, []);
 });
 
-// A writing run on every platform, Windows included, is served by the host (there is no Node route left). Where the
-// seat's confinement backend exists (bwrap, Linux) the run commits only the declared path on the worktree's branch,
-// through the engine's custody of the linked worktree; Windows has no confinement backend, so the same call is
-// refused by the seat's posture before any agent starts, and nothing is committed.
-test('fgos run --writes commits the declared path through custody where the seat can be confined, and is refused by its posture where not', () => {
+// A writing run on every platform, Windows included, is served by the host (there is no Node route left). On Linux
+// it commits only the declared path on the worktree's branch, through the engine's custody of the linked worktree.
+// On Windows the host stops it before any unit run where the Config crate stops every reader there: a project
+// config file cannot be read without a no-follow open (config-platform-unsupported), and nothing is committed.
+test('fgos run --writes commits the declared path through custody on the linked worktree branch, and is refused by the config door on Windows', () => {
   // The worker writes the declared file in its cwd (the worktree) beside its result.
   const tmp = setupTestRepo({ prelude: "fs.writeFileSync('notes.md', 'notes\\n');" });
   fs.writeFileSync(path.join(tmp, '.gitignore'), '.fgos/\necho-worker.mjs\n');
@@ -120,11 +120,9 @@ test('fgos run --writes commits the declared path through custody where the seat
   const run = spawnFgos(BIN_FGOS, ['run', 'Write the notes', '--capability', 'docs:write', '--writes', 'notes.md', '--worktree', worktree, '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
   if (process.platform === 'win32') {
     assert.equal(run.status, 4, run.stderr || run.stdout);
-    assert.ok(run.stdout, `no envelope; stderr: ${run.stderr}`);
-    const { data } = JSON.parse(run.stdout);
-    assert.equal(data.outcome, 'policy-refusal');
-    assert.equal(data.results.at(-1).refused.reason, 'posture-unavailable');
+    assert.match(run.stderr, /^fgos: config-platform-unsupported file=\.fgos\\config\.yaml/, run.stderr);
     assert.equal(execFileSync('git', ['-C', worktree, 'rev-parse', 'wt'], { encoding: 'utf8' }).trim(), seed);
+    assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'assignments')), false);
     return;
   }
   assert.equal(run.status, 0, run.stderr || run.stdout);
