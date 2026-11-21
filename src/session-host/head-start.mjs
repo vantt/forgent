@@ -18,6 +18,7 @@ import { grantOf, HEAD_PERSONAS } from './head-grants.mjs';
 import { subjectOfDir, taskOfHead } from './head-plan.mjs';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
+import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 
 const PERSONA_PATTERN = /^[a-z][a-z0-9-]{0,63}$/;
 const NAME_PATTERN = /^[a-z0-9-]{1,32}$/;
@@ -166,12 +167,13 @@ const ROLE_REFUSAL_CODES = new Set(['head-role-not-bound', 'head-role-held']);
  * the launch that just failed, so a note an earlier run left is never taken for this one's.
  */
 export function roleRefusalOf(projectRoot, key) {
-  const runs = path.join(fgosDirFromRoot(projectRoot), 'assignments', key, 'runs');
-  let latest;
-  try { latest = fs.readdirSync(runs).sort().at(-1); } catch { return null; }
+  const latest = [...listAssignmentRuns(fgosDirFromRoot(projectRoot))]
+    .filter((run) => run.assignmentId === key)
+    .sort((a, b) => (a.attempt < b.attempt ? -1 : a.attempt > b.attempt ? 1 : 0))
+    .at(-1);
   if (latest === undefined) return null;
   try {
-    const note = JSON.parse(fs.readFileSync(path.join(runs, latest, 'start-refused.json'), 'utf8'));
+    const note = JSON.parse(fs.readFileSync(path.join(latest.runDir, 'start-refused.json'), 'utf8'));
     if (ROLE_REFUSAL_CODES.has(note?.code)) return { code: note.code, why: String(note.why ?? '') };
   } catch { /* no note in this run */ }
   return null;

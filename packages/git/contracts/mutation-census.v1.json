@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8959e25c7c30f7043362da4432382ed71f892573dce1cac147eee3eaeaa5b705",
+  "payloadDigest": "e68e96834476c6039444e0734aca5e6312b160fc725d2da6d674902bf6c8024b",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -153,7 +153,7 @@
     "apps/fgos/src/wiring/resource_check.rs": "b0752a0b571180b33526bb854443f5f77c5ef007763305890f51f50bc5f57bf4",
     "apps/fgos/src/wiring/run_dirs.rs": "8248bf1a45d37e2ca03315dea11489b6b90362a47479244a10a7c71648e90f60",
     "apps/fgos/src/wiring/seat_binding.rs": "9eb8ef8e81b7314cab1d579a3e7312aa413c268405271db2d3dc64f0cfe7b1b3",
-    "apps/fgos/src/wiring/session_rotation_hook.rs": "370874fcc61612fe3ad6c1fb8540a2a320ca448e99560915337e0666172380f7",
+    "apps/fgos/src/wiring/session_rotation_hook.rs": "20782a7a73725c725531adaf42ab15de1b7f0dcacfb6492567923df55ad72580",
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
     "apps/fgos/src/wiring/session_write_publish.rs": "0b830327e6ef3925025c2ad0fe9c30a4c87a24dea4fe122371d92b90ba2b5907",
     "apps/fgos/src/wiring/supervision.rs": "7f8ff1f09976cd1544e9e6e8f4bbc499b36d62c7536fa7b5f33d70a904703db3",
@@ -1615,7 +1615,7 @@
     "src/session-host/head-plan.mjs": "8ef62d00ffe5394d380cfc2049d9285b231a29b34fe8d66659505989493be099",
     "src/session-host/head-request-client.mjs": "5a28c461dc6574d1246ba2898a11ce52e3e149f76da572f8127db2e532f0636d",
     "src/session-host/head-request.mjs": "8bceffb4d6142231533e0b765ba4ed5c84e545c56f09a1adccc017e44b5fb097",
-    "src/session-host/head-start.mjs": "d11a7502ab0dfed683e410042ac9b13c15eb201800ddf27319c5b3904c962932",
+    "src/session-host/head-start.mjs": "6e01fc59184a0fb576597a8d8e980289f15c65a0f1c9b75037c8f07d564e2da1",
     "src/session-host/head-stop.mjs": "4284bc2638e3ac4a71d151763c981d220a017c4f948cefc829115be5a6221ad3",
     "src/session-rotation/handoff-store.mjs": "3d1385774aa7c09573a6e298f82e7bf75d55beb436d9caa7c266cc1735c46128",
     "src/session-rotation/rotate.mjs": "593f875a9fc599e43a91f7e1a335d67f22319487c87970a52be1eb8cb1f13b71",
@@ -4716,7 +4716,7 @@
     },
     {
       "path": "src/session-host/head-start.mjs",
-      "line": 75,
+      "line": 76,
       "spawn": "spawnSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
