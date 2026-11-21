@@ -11,6 +11,7 @@ discussion: open
 - 2026-11-21 16:35: đã xác định 4 bản sửa của OS-D1 (nguồn: memory `orchestration-stabilize-first-decision` của secretary Miu và tin supervisor gửi Miu sáng 2026-11-21: "1547 first, then the idle-lead nudge, then the names, then the reaper"): `p-l22vozecxg`, `p-waxzxz5mio`, `p-mhwe24fttr`, `p-yqanenewb4`. **Cả 4 đã `done`** (xem §7 `#related`). Điều kiện đậu theo chữ của OS-D1 đã thỏa, nhưng release hold ("no new work until the release hold is lifted", handoff secretary 14:45) vẫn còn hiệu lực. Discussion vẫn `paused` cho tới khi chủ dự án cho mở lại.
 - **2026-11-21 16:16: chủ dự án cho mở lại (OS-D2).** Trạng thái `discussion: open`. Architecture panel (T0) vẫn hoãn. Release hold không bị ảnh hưởng vì discussion không sinh code.
 - **2026-11-21 16:23 (round 6):** chủ dự án trả lời câu hỏi round 5 là "cả hai": mọi thành phần phải có authority, boundary và contract rõ, **và** hệ thống cần một cơ chế hoặc một vai làm nhạc trưởng nắm nhịp điều phối tổng. Câu hỏi mở thành §3 row 9: nhạc trưởng, hay mọi thứ chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan theo chuỗi watcher -> ghi signal -> phản ứng tiếp. Đang chạy 5 agent con (haiku, chỉ đọc) dò lại tier 0 tới 9 từ dưới lên; kết quả sẽ vào bảng §3 row 4b.
+- **2026-11-21 18:35 (round 21): chủ dự án đồng ý `needs` là mục thứ ba -> OS-D11.** Thử ánh xạ marketing (guide có thật, không vướng) và video editing (giả định, năm chỗ vướng) ở §3 4i. Đang hỏi: bước song song trong một việc.
 - **2026-11-21 18:29 (round 20): chủ dự án đồng ý `until` -> OS-D10**, hỏi `needs` thêm vào đâu. Đang trả lời: `needs` sinh từ bước tiếp theo của khung, domain đặt nó cạnh hai facet.
 - **2026-11-21 18:25 (round 19): chủ dự án đồng ý hai facet `waitingOn`, `outcome` -> OS-D9.** Thử ánh xạ cho plan, work item, question, workflow case và một đơn hàng business (§3 4h): còn vướng gợi ý `needs` (gọi ai) và hạn `until`.
 - **2026-11-21 17:44 (round 17): chủ dự án chốt hình dạng cửa raise và wake, nguồn để sau -> OS-D8.** Row 9 đã rõ. Tiếp theo: facet lập lịch chung (§3 row 6), vì giữ nhịp đọc facet; rồi ngôn ngữ khung (row 5) và chi tiết rà soát (row 10).
@@ -41,7 +42,7 @@ discussion: open
 | 3 | Domain Injection: domain pack (`domains/<d>/`) inject phase frames, doctrine, refusal ladder map, doors (coding: review verdict, land door, trunk merge, toggles/retires) | SR-D7, G12. Plan và supervisor hoàn toàn domain-agnostic | **Rõ (SR-D7)** |
 | 4 | Danh mục primitives của Skeleton & vị trí code: triggers (Event Store / watcher), timers (OS timer), start/sleep/wake (`session start`, `supervisor wake`, wake pane/socket), handoff (contract), who-next (`bind()` / `dispatch decide`), surface ports (6 ports) | G13 (`supervisor-review`), `plans/261118-1117-external-ui-integration-multica`. Hiện nằm rải rác giữa Supervision, Session Host, Runner | **Đang bàn (round 5):** gần hết primitive đã có chủ, xem bảng 4a. Chủ dự án trả lời "cả hai" (OS-D3): mỗi thành phần có authority, boundary, contract riêng, và skeleton có nhạc trưởng code. Kết quả dò ở bảng 4b |
 | 5 | Ngôn ngữ khung hợp nhất (One Frame Language): Hợp nhất `plan-v1` (plan/wave/phase) và workflow guide YAML (steps/milestones/guards). Cú pháp, schema và runtime runner nào thi hành? | G16. Hiện fgOS có 2 ngôn ngữ khung riêng rẽ, plan không chạy trên workflow harness | **Chưa rõ: Mở khảo sát thiết kế** |
-| 6 | Universal work facets: Skeleton chỉ đọc các thuộc tính lịch trình phổ quát (actionable/runnable, waiting on what, finished) thay vì work states cụ thể | G14. Schema của facets này là gì để skeleton lập lịch được? | **Rõ một phần (OS-D9, OS-D10):** hai facet `waitingOn` (có hạn `until`), `outcome`. Thử ánh xạ ở 4h; còn mở: gợi ý `needs` gắn vào đâu |
+| 6 | Universal work facets: Skeleton chỉ đọc các thuộc tính lịch trình phổ quát (actionable/runnable, waiting on what, finished) thay vì work states cụ thể | G14. Schema của facets này là gì để skeleton lập lịch được? | **Rõ một phần (OS-D9, OS-D10):** hai facet `waitingOn` (có hạn `until`), `outcome`. `needs` là mục thứ ba (OS-D11). Thử ánh xạ ở 4h, 4i (marketing, video); còn mở: bước song song, `person` ngoài hệ thống, người chơi là tool |
 | 7 | Tích hợp Surface (Multica 6 ports): Portfolio read, Command, Wake door, Notifier, Session placement, Question port | `plans/261118-1117-external-ui-integration-multica`. G13 | **Chưa rõ: Thứ tự ưu tiên cổng & adapter** |
 | 9 | Nhạc trưởng vs chuỗi phản ứng: có một cơ chế hoặc vai nắm nhịp và điều phối tổng, hay mọi hoạt động chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan qua watcher -> ghi signal -> phản ứng tiếp? | Chủ dự án nêu round 6 (2026-11-21 16:23), "open for discuss". Bằng chứng ở 4c: chuỗi timer -> watcher -> event -> wake đã có trong code; nhạc trưởng thực tế là supervisor LLM, cap không bị code ép; chưa có lối vào signal ngoài | **Hướng đã chốt (OS-D3, OS-D4):** lối vào timer + signal; giữ nhịp là code, diễn giải là LLM được hỏi ý. Không zombie: OS-D5 (4e). **Rõ:** chỗ đặt OS-D7, lối vào OS-D8. Mặc định tạm (đổi nếu chủ dự án phản đối hoặc adapter đầu tiên cần khác): id event của signal ngoài suy từ nguồn + id giao hàng của nguồn, không từ thời điểm, để webhook gửi lại không thành hai event; payload là dữ liệu không tin cậy, event chỉ trỏ tới nó, không bao giờ là lệnh |
 | 10 | Nhịp rà soát định kỳ của LLM: tần suất, nội dung brief, kết quả ghi ở đâu, có rà soát khi hệ thống rảnh không | OS-D5 ý 6; đề xuất biểu đạt bằng watcher definition `review-due` + action `wake-supervisor` (§3 4e) | **Đang bàn** |
@@ -197,6 +198,45 @@ Ba nơi không đồng bộ với nhau và không nơi nào vừa đầy đủ v
 4. **Không rõ thì không bao giờ là "làm được ngay".** Work `blocked` không ghi lý do phải ánh xạ thành `person`, giống port `Activity` của wake door không bao giờ đoán "rảnh" (`wake.rs`).
 5. **Actor ngoài hệ thống** (bên vận chuyển) vẫn là `actor`; `ref` trỏ tới bên ngoài, và tiến độ về qua cửa raise (OS-D8).
 
+
+**4i. Thử ánh xạ: marketing và video editing (round 21, 2026-11-21 18:35)**
+
+*Marketing* theo guide có thật `domains/marketing/workflows/content-publish.yaml` (brief -> draft có review -> gate người duyệt -> publish):
+
+| Bước của khung | `waitingOn` | `needs` | `outcome` |
+|---|---|---|---|
+| Chưa ai làm brief | — | `capability: marketing:research` | — |
+| Brief đang chạy | `actor` (unit run) | — | — |
+| Draft + review | — | `capability: marketing:write` (pattern reviewed) | — |
+| Gate "duyệt publish?" | `person` (chủ dự án, qua question store) | — | — |
+| Sửa copy sau khi đã duyệt | `person` lại (luật `consent-before-publish`: sửa thì phải duyệt lại) | — | — |
+| Publish | — | `capability: marketing:publish` | — |
+| Đã publish (`publish-recorded`) | — | — | `done` |
+
+Không vướng gì: guide đã khai `capability` cho từng unit và gate người, nên `needs` và `person` suy thẳng từ khung.
+
+*Video editing* (domain giả định, chưa có trong repo):
+
+| Bước | `waitingOn` | `needs` | `outcome` |
+|---|---|---|---|
+| Chờ khách upload footage | `event` (signal ngoài qua cửa raise, OS-D8), `until` hạn nhận | — | — |
+| Transcode | — | `capability: transcode` (một tool, không phải agent) | — |
+| Transcode đang chạy, ước 40 phút | `actor` (job của tool), `until` trần thời gian | — | — |
+| Dựng rough cut | — | `capability: video:edit` | — |
+| Khách xem bản nháp, hạn 3 ngày | `person` (khách, không phải chủ dự án), `until` | — | — |
+| Khách góp ý -> sửa (vòng lặp) | — | `capability: video:edit` | — |
+| Chỉnh màu **và** chỉnh âm, song song | ? | ? hai `needs` cùng lúc | — |
+| Render bản cuối | — | `capability: render` (tool, máy render) | — |
+| Hẹn đăng 20 giờ thứ Sáu | `time` | — | — |
+| Đã giao / khách hủy | — | — | `done` / `cancelled` |
+
+*Chỗ vướng mới:*
+1. **Hai bước song song trong một việc.** Chỉnh màu và chỉnh âm cùng làm được ngay, cần hai người khác nhau. Một bản ghi có một `needs` thì không chở được. Hai cách: bản ghi lập lịch gắn với **bước đang mở** (một việc có hai bước mở thì đưa hai bản ghi), hoặc `needs` là danh sách.
+2. **`person` không chỉ là chủ dự án.** Khách hàng là người ngoài; `ref` phải nói người nào, và đường liên lạc với họ là một surface port (adapter), không phải question store của chủ dự án.
+3. **Người chơi có thể là tool, không phải agent.** Transcode, render là job của máy; `capability` giải qua `bind()` có thể ra một executor `kind: tool` (hôm nay `fgos run` từ chối tool executor, AGENTS.md mục Dispatch). Giữ nhịp phải giao được cho tool qua cửa của tool.
+4. **Vòng lặp sửa bài cần cap.** Khách góp ý mãi thì sao: số vòng tối đa thuộc khung của domain (như `frameDefaults` của guide), quá cap thì "cần phán đoán".
+5. **Tài nguyên nặng (máy render) là cap, không phải facet**, giống lane; chỗ quyết là resource referee, không phải bản ghi lập lịch.
+
 ## 4. Quyết định đã chốt
 
 Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
@@ -218,6 +258,7 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 | OS-D8 | Lối vào signal ngoài: chốt hình dạng cửa, chưa chọn nguồn; mỗi nguồn (GitHub, Multica/UI, business workflow…) là một adapter làm sau. Hình dạng: (a) **một cửa raise duy nhất**, cửa watcher đang dùng (`packages/supervision/rust/src/queue.rs`): signal ghi thành event trong Event Store trước, rồi mới wake; (b) **wake mang lý do** `--trigger <kind> --ref <id>` (port 3 của plan Multica; hôm nay gán cứng `"manual"`, `apps/fgos/src/wiring/supervision.rs:1872`); (c) **gateway có một route webhook có ký** chỉ gọi cửa raise; `POST /v1/runner/tick` (đi vòng cửa `fgos run`) không được là lối vào thứ hai. Đề xuất round 16, chủ dự án chốt round 17 ("Chưa cần nguồn cụ thể: chỉ chốt hình dạng cửa raise và wake, nguồn đầu tiên để sau"). | 2026-11-21 | Chủ dự án, trực tiếp trong session shaper |
 | OS-D9 | Giữ nhịp chỉ đọc hai facet lập lịch chung: `waitingOn` (không có = làm được ngay; có = chờ `actor` / `time` / `event` / `person`, kèm `ref`) và `outcome` (không có = việc còn mở; có = đã đóng, kèm kết cục `done` / `withdrawn` / `wontfix` / `cancelled`). Mỗi domain tự ánh xạ trạng thái riêng sang hai facet; giữ nhịp không biết trạng thái của domain. `priority` không phải facet: domain và Miu quyết, giữ nhịp chỉ đọc. Thay phác thảo ba facet cũ (`actionable` = chưa có `outcome` và không có `waitingOn`); `finished` đổi tên thành `outcome` vì dễ hiểu nhầm. Đề xuất round 17, đổi tên round 18, chủ dự án đồng ý round 19. | 2026-11-21 | Chủ dự án, trực tiếp trong session shaper |
 | OS-D10 | `waitingOn` mang thêm hạn tùy chọn `until`: chờ X nhưng tối đa tới T, cái nào tới trước. Quá hạn thì giữ nhịp raise một event; domain quyết làm gì tiếp, hoặc chuyển thành "cần phán đoán". Ví dụ: đơn hàng chờ webhook thanh toán, hạn 24 giờ. Đề xuất round 19, chủ dự án đồng ý round 20 ("đồng ý until"). | 2026-11-21 | Chủ dự án, trực tiếp trong session shaper |
+| OS-D11 | Bản ghi lập lịch domain đưa cho giữ nhịp có ba mục: `{ waitingOn?, outcome?, needs? }`. `needs` chỉ có nghĩa khi việc làm được ngay; domain suy nó từ bước tiếp theo của khung, không bịa. Ba dạng, mỗi dạng giải ở cửa có sẵn: `role` (Session Host start head với role đó), `actor` (Identity tìm session; chết thì start successor), `capability` (`bind()` chọn executor, như `dispatch decide --for`). Giữ nhịp không tự chọn ai; `needs` trống thì raise "cần phán đoán". Đề xuất round 20, chủ dự án đồng ý round 21 ("đồng ý needs, tức là item thứ 3"). | 2026-11-21 | Chủ dự án, trực tiếp trong session shaper |
 
 ## 5. Q&A log
 
@@ -242,10 +283,11 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 - 2026-11-21 18:22 round 18: Chủ dự án: "ủa sao finished lại là chưa xong." Shaper nhận cách viết gây nhầm (giá trị "không" của `finished` được viết là "chưa xong"); đề xuất đổi tên `finished` thành `outcome`.
 - 2026-11-21 18:25 round 19: Chủ dự án: "đồng ý, có thể nào nhìn xa thêm 1 bước để thử viễn cảnh domain sẽ map như thế nào không". Mint OS-D9. Thử ánh xạ ở §3 4h, tìm được năm chỗ vướng.
 - 2026-11-21 18:29 round 20: Chủ dự án: "đồng ý until; needs là thêm vào đâu." Mint OS-D10. Giải thích chỗ gắn `needs`.
+- 2026-11-21 18:35 round 21: Chủ dự án: "đồng ý needs, tức là item thứ 3. thử map vào marketing, video editing xem ra sao". Mint OS-D11. Đọc `domains/marketing/AGENTS.md` và `domains/marketing/workflows/content-publish.yaml`; thử ánh xạ ở §3 4i.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Đây là hình dạng hiện tại cho người đọc lạ. Phần đã chốt dựa trên SR-D6 tới SR-D10 và OS-D3 tới OS-D10; phần ghi "còn mở" đang bàn ở §3.
+Đây là hình dạng hiện tại cho người đọc lạ. Phần đã chốt dựa trên SR-D6 tới SR-D10 và OS-D3 tới OS-D11; phần ghi "còn mở" đang bàn ở §3.
 
 ```mermaid
 flowchart TB
@@ -296,7 +338,7 @@ flowchart TB
 
 **Người chơi.** Lead và worker lái trong khung và làm ra giá trị thật; năng lực quan trọng là suy luận, hiểu domain, thích nghi, báo cáo trung thực và báo friction khi khung sai. Quyết định và kết quả của họ quay lại hệ thống dưới dạng event qua cùng cửa raise, nên giữ nhịp luôn nhìn thấy.
 
-**Facet lập lịch (OS-D9).** Giữ nhịp chỉ đọc hai facet chung: `waitingOn` (không có = làm được ngay; có = `{kind: actor | time | event | person, ref}`) và `outcome` (không có = còn mở; có = kết cục). Domain pack ánh xạ trạng thái riêng của nó (plan status, work status, workflow gate, question state, trạng thái business) vào hai facet; không rõ thì không bao giờ là "làm được ngay". Năng lực (lane, `maxLeads`) là cap của giữ nhịp, không phải facet. `waitingOn` có hạn tùy chọn `until`; quá hạn thì giữ nhịp raise event (OS-D10). Còn mở (§3 4h): gợi ý `needs` để giữ nhịp biết gọi ai. Hôm nay chưa có facet chung.
+**Facet lập lịch (OS-D9).** Giữ nhịp chỉ đọc hai facet chung: `waitingOn` (không có = làm được ngay; có = `{kind: actor | time | event | person, ref}`) và `outcome` (không có = còn mở; có = kết cục). Domain pack ánh xạ trạng thái riêng của nó (plan status, work status, workflow gate, question state, trạng thái business) vào hai facet; không rõ thì không bao giờ là "làm được ngay". Năng lực (lane, `maxLeads`) là cap của giữ nhịp, không phải facet. `waitingOn` có hạn tùy chọn `until`; quá hạn thì giữ nhịp raise event (OS-D10). Mục thứ ba `needs` (OS-D11) nói bước tiếp cần ai, ở dạng `role`, `actor` hoặc `capability`, suy từ bước tiếp theo của khung và giải ở cửa có sẵn (Session Host, Identity, `bind()`); giữ nhịp không tự chọn ai. Còn mở (§3 4i): việc có hai bước song song, `person` là người ngoài, người chơi là tool. Hôm nay chưa có facet chung.
 
 **Primitive và khoảng trống.** Start, rotate, cap đã có chủ. Còn thiếu sleep ("ngủ chờ X"), timer theo actor ("đánh thức X lúc T"), và một contract handoff duy nhất thay cho ba đường hiện có (§3 4a).
 
