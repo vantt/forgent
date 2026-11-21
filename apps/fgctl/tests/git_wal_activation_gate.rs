@@ -18,6 +18,13 @@ const HOST_ENTRY: &str = if cfg!(windows) {
 } else {
     "bin/fgos"
 };
+/// The addon target the release manifest invariant expects for this OS: its
+/// rule is private to the distribution crate (`windows` releases name `win32-x64`).
+const ADDON_TARGET: &str = if cfg!(windows) {
+    "win32-x64"
+} else {
+    "linux-x64"
+};
 /// The Git door trusts only owner-only state directories; Windows has no mode bits to set.
 fn owner_only(path: &Path) {
     #[cfg(unix)]
@@ -50,7 +57,7 @@ fn candidate(root: &Path, wal: bool) {
     let addon = b"fixture native addon";
     fs::create_dir_all(root.join("native")).unwrap();
     fs::write(root.join("native/fgos.node"), addon).unwrap();
-    m["components"]["nativeAddon"] = serde_json::json!({"path":"native/fgos.node","digest":format!("{:x}",Sha256::digest(addon)),"target":format!("{OS}-x64"),"napiVersion":8,"capabilities":["git-wal-v1"],"crateChecksums":fgos_distribution::manifest::native_addon_crate_checksums()});
+    m["components"]["nativeAddon"] = serde_json::json!({"path":"native/fgos.node","digest":format!("{:x}",Sha256::digest(addon)),"target":ADDON_TARGET,"napiVersion":8,"capabilities":["git-wal-v1"],"crateChecksums":fgos_distribution::manifest::native_addon_crate_checksums()});
     m["files"].as_array_mut().unwrap().push(serde_json::json!({"path":"native/fgos.node","kind":"file","digest":hash(addon),"mode":"644","class":"immutable-runtime"}));
     let path = root.join("manifest.json");
     fs::write(&path, serde_json::to_vec(&m).unwrap()).unwrap();
