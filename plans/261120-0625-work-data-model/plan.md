@@ -56,6 +56,7 @@ footprint:
   - apps/fgos/src/routing.rs
   - apps/fgos/src/cli_projector.rs
   - apps/fgos/tests/migrate_portfolio.rs
+  - test/rust-host/vectors/envelope/version.json
   - apps/fgos/src/main.rs
   - packages/host-runtime/contracts/command-routes.json
   - packages/host-runtime/contracts/command-route-annotations.json
