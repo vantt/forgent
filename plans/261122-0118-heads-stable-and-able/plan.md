@@ -215,8 +215,13 @@ writer, phase 11.
     failures count as `failed`.
   - The script refuses a live run outside a head (no `FGOS_HEAD_REQUEST_SOCKET`).
   - The `head-start.test.mjs` comment now cites `apps/fgos/tests/questions_head.rs`.
-- **The land of `p11` is parked on `q-pfecbg6ffn`:** ticket `c-80805-1795354765816` passed its gates and then failed
-  `fast-forward main: resource-recovery-required`, so it needs `fgos git recover`.
+- **The land of `p11` is parked twice:**
+  - Ticket `c-80805-1795354765816` passed its gates and then failed `fast-forward main: resource-recovery-required`
+    (`q-pfecbg6ffn`).
+  - A retry at 20:45 got past that step but failed the citation gate on a finding that is not this plan's:
+    `plans/backlog/p-24xw2cwdvo-delete-the-dead-tier-5-node-execution-modules-and-their-tests.md:30` cites `ADR0083`
+    with no gloss. It came in through the paths land `958532a25`, which skips that gate.
+  Every branch land is red until that row is glossed. `p11` lands with the same command right after.
 - **Phase 11 stays `ready`** for its remaining steps:
   - step 1, the gate on main;
   - step 2, the CHANGELOG line, rebased after s6a 22b;
