@@ -7,6 +7,9 @@ priority: P1
 blockedBy: []
 base: aa35c0664447f6d01d214911973c4d0246715e39
 footprint:
+  - packages/run-supervisor/rust/src/attempt_step.rs
+  - packages/supervision/rust/observe-kinds.json
+  - src/cli/command-registry.mjs
   - plans/261122-0118-heads-stable-and-able/**
   - src/session-host/head-grants.mjs
   - src/session-host/head-request.mjs
@@ -168,10 +171,10 @@ the grants, verb by verb.
 | 2 | [Head verbs through the request socket](phase-02-head-verbs.md) | - | src/session-host/head-grants.mjs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, test/session-host/head-start.test.mjs, apps/fgos/src/routing.rs, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/rust/tests/head_request.rs, docs/platform/session-host/spec.md | 1 | running |
 | 3 | [The land door runs the plan check](phase-03-land-plan-check.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, core/skills/_shared/plan-contract.md, .agents/skills/**, plugins/fgOS/skills/**, .fgos/config.yaml | 1 | done |
 | 4 | [Coordinating heads keep their provider floor](phase-04-provider-floor.md) | 3 | .fgos/config.yaml, test/session-host/head-start.test.mjs | 2 | done |
-| 5 | [A live head's requests run the active release](phase-05-release-pickup.md) | 2, 6 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/run-supervisor/spec.md | 3 | parked: q-zwvjlsuqgc |
+| 5 | [A live head's requests run the active release](phase-05-release-pickup.md) | 2, 6 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/run-supervisor/spec.md | 3 | ready |
 | 6 | [A rotation whose executor died is resolved](phase-06-orphan-rotation.md) | 2 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/session-host/contracts/rotation-files.v1.json, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/**, docs/platform/session-host/spec.md | 2 | done |
 | 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs | 2 | done |
-| 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | parked: q-2ul3tjw3kd |
+| 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | ready |
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | running |
 | 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | ready |
 | 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md | 5 | ready |
@@ -331,6 +334,8 @@ first). `blockedBy` stays empty because no phase here needs a result of either p
 
 ## Owner questions
 
+
+- **q-lnq3nbjssw, q-2ul3tjw3kd, q-zwvjlsuqgc: decided 2026-11-22 14:55 by lead:SUPERVISOR inside the approved frame**: the footprint takes `src/cli/command-registry.mjs` (shared with s6a, disjoint hunks; whichever lands second rebases), `packages/supervision/rust/observe-kinds.json` and `packages/run-supervisor/rust/src/attempt_step.rs`, each as the question recommended. Phases 5 and 8 are ready again. The phase 9 disarm is committed as a6608f628.
 None asked now. The owner said not to ask tonight, and the one open point (the secretary wake mechanism, a choice the
 owner reserved on 2026-11-21 21:28) blocks only phase 10: that phase's first step asks it with `fgos questions ask` in
 the five-part form, with the proposal written in the phase file, and lists the `q-` id here.
