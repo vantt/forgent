@@ -19,15 +19,18 @@ Closes acceptance criteria 1, 2 and 5, and the verb-by-verb list of `p-vquz26ibn
 ## Footprint
 
 `test/live/head-grant-probe.live.mjs`, `CHANGELOG.md`,
-`plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md`.
+`plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md`, `docs/platform/run-supervisor/spec.md` and
+`test/session-host/head-start.test.mjs` (step 6 only).
 
 ## Steps
 
 1. Gate: on main with every phase landed, run `npm test` and `cargo test --workspace`. Fix a regression in the phase
    that caused it, through that phase's footprint and a plan note. Never weaken a test.
 2. Changelog: under `## [Unreleased]` in `CHANGELOG.md`, add one line per user-visible change. Heads record friction
-   and the supervisor patches config through the request socket. The land door checks landed plans. A live head
-   follows the active release. Orphan rotations are resolved. The secretary keeps a Claude pin.
+   and the supervisor patches config through the request socket. The land door checks landed plans and removes a
+   landed branch's clean worktree. A head's request routes run the active release, while its grant stays the one set
+   at its start. Orphan rotations are resolved, and a rotation's handoff carries the last message and the head's task.
+   The secretary keeps a Claude pin. A pool login near expiry is renewed even while a live seat shares it.
 3. Probe script, `test/live/head-grant-probe.live.mjs`, run inside a confined head. For every verb of the contract it
    makes one call through the CLI with arguments chosen so the call cannot change state, and records the reply:
    - `served`: the route ran and answered done, or a domain refusal that proves the grant and the route passed. Examples:
@@ -40,12 +43,17 @@ Closes acceptance criteria 1, 2 and 5, and the verb-by-verb list of `p-vquz26ibn
    `session restore role`, `session bind session`) are not called. Their row cites the head's own request-log line from
    its last real use, or says "no use in the window". The script also prints `TMPDIR` and proves it writable, which
    covers `p-d3ub553ogh`. Output is one JSON document.
-4. Run it from both confined heads. Raise `coordination-chore` for the supervisor to run it in its own head, and ask
+4. Run it only from heads started on release `1e544460` or later. A head started earlier keeps its launch release's
+   request server and grant, and must be rotated first. Run it from both confined heads. Raise `coordination-chore` for the supervisor to run it in its own head, and ask
    Miu through the supervisor's mailbox to run it in hers. Each head lands its JSON under this plan's `reports/` with
    `fgos land --paths`; both hold `plans` writes.
 5. Write `reports/head-grant-probe.md`: a verb-by-verb table for the secretary and the supervisor (verb, expected from
    the grant, observed, evidence). Name each verb out of scope with its reason. Add the "Folded rows" check: each row
    of `plan.md` with the commit or report that closes it.
+6. Two stale notes reported by s6a (lead:SUPERVISOR, 2026-11-22 19:10). `docs/platform/run-supervisor/spec.md:66` names
+   `stray-writes.mjs` under `src/run-supervisor`; it now lives at `src/runner/stray-writes.mjs`.
+   `test/session-host/head-start.test.mjs:343` cites the deleted `test/helpers/head-sandbox-argv.mjs`. Correct both
+   texts and change nothing else.
 
 ## Verify
 

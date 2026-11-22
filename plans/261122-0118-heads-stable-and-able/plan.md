@@ -187,7 +187,7 @@ the grants, verb by verb.
 | 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | running |
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | running |
 | 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | running |
-| 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md | 5 | ready |
+| 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md, docs/platform/run-supervisor/spec.md, test/session-host/head-start.test.mjs | 5 | ready |
 | 12 | [Rotation reliability](phase-12-rotation-reliability.md) | 6 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, docs/platform/session-host/spec.md | 4 | running |
 
 Each phase names its canonical dispatch capability in its file: `code:implement` for 2 to 7 and 10 and the probe script
@@ -202,6 +202,27 @@ wave), `head-request.v1.json` (2, then 5), `docs/platform/session-host/spec.md` 
 writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
+
+### Lead progress (2026-11-22 19:15, head:lead-forgent-261122-0118-heads-b52f9)
+
+- **Phase 12b** is on `p12b` (`89e75d68a`) and in independent review. A live seat's account now renews below the
+  threshold, the new pair reaches the sharing seats, and the renewal owner is recorded and shown in `probe-account`.
+  Credentials 23/25 and confinement_cleanup 11/14 inside the unit sandbox. The unit attributes the 5 failures to the
+  sandbox's PID namespace (staging-writer liveness reads `Unknown`); the land's unconfined gates decide.
+- **The two stale s6a notes** (`docs/platform/run-supervisor/spec.md:66`, `test/session-host/head-start.test.mjs:343`)
+  are added to phase 11 as step 6, with both paths in its row.
+- **"A live head keeps its launch release": phase 12 does not close it, and part of it needs its own row.** There are
+  two halves:
+  - Request routes are closed by phase 5 for every head started on a release that contains it (`1e544460` on). This
+    lead predates it, so it self-heals at its next rotation, and phase 12a makes that rotation reliable.
+  - The grant does not follow. `cfg.verbs` is fixed in the head-request server's config at session start
+    (`packages/run-supervisor/rust/src/head_request.rs:1363`), so a verb added to `GRANTS` in a later release reaches
+    a live head only after it restarts or rotates. That may be intended (the grant is bound at start), but no spec
+    says so. It is outside this plan's outcome. Proposed as its own backlog row (lead:SUPERVISOR or the secretary
+    files it): "a live head's grant is fixed at its start: decide whether `GRANTS` changes reach it per request, and
+    record the answer in the session-host spec".
+  Phase 11's step 2 and step 4 now say this: the changelog line names the grant limit, and the probe runs only on heads
+  started on `1e544460` or later.
 
 ### Lead progress (2026-11-22 18:45, head:lead-forgent-261122-0118-heads-b52f9)
 
