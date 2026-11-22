@@ -2457,9 +2457,9 @@
     "paths": [],
     "exceptions": [],
     "owns": [
-      "runtime definition registry, domain and workflow loader, flow definition validation",
+      "runtime definition registry, domain and workflow loader, workflow definition validation",
       "workflow/stage/operation declarations, task-spec/skill references, roles",
-      "FlowDefinition validation/projection"
+      "workflow definition validation/projection"
     ],
     "mustNotOwn": [
       "runtime session state",
@@ -2513,14 +2513,14 @@
       "Group-Thinking Protocol Pack",
       "fgos-group-thinking"
     ],
-    "meaning": "Versioned CoordinationProtocol definitions and skill for structured multi-agent deliberation.",
+    "meaning": "Versioned group-thinking protocol pack definitions and skill for structured multi-agent deliberation.",
     "layer": "domain",
     "tier": 7,
     "paths": [],
     "exceptions": [],
     "owns": [
       "group-thinking protocol definitions, public request and replay adapters",
-      "versioned data-first CoordinationProtocol definitions",
+      "versioned data-first protocol pack definitions",
       "fgos-group-thinking skill",
       "selects an explicit registered protocol, builds a public request, launches/resumes through coordination surfaces, renders public replay/evidence"
     ],

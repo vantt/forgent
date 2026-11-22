@@ -2142,7 +2142,7 @@
     "id": "domain-registry/definition-load",
     "canonical": "domain-registry/definition-load",
     "aliases": [],
-    "meaning": "Work Driver / domain callers ↔ Domain Registry: load legal workflow/stage/operation declarations and FlowDefinition validation/projection without inventing undeclared domain operations",
+    "meaning": "Work Driver / domain callers ↔ Domain Registry: load legal workflow/stage/operation declarations and workflow definition validation/projection without inventing undeclared domain operations",
     "provider": "domain-registry-loader",
     "consumers": [
       "work-driver",

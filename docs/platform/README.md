@@ -76,7 +76,7 @@ Component owners, one row per component and subcomponent, sorted by id. <!-- ren
 | `fgos-gateway` | — | Detached gateway daemon serving REST API, MCP search/execute, and embedded web dashboard. | `docs/platform/herdr-web-dashboard/spec.md` | — |
 | `git` | — | Repository facts, typed Git operations, index, refs, worktrees, and WAL recovery. | `docs/platform/git/spec.md` | `src/git/` |
 | `graph` | — | Deterministic facts about directed graphs with typed edges and exclusion pairs. | `docs/platform/graph/spec.md` | `packages/graph/` |
-| `group-thinking` | — | Versioned CoordinationProtocol definitions and skill for structured multi-agent deliberation. | `docs/platform/component-boundary.md` | — |
+| `group-thinking` | — | Versioned group-thinking protocol pack definitions and skill for structured multi-agent deliberation. | `docs/platform/component-boundary.md` | — |
 | `h-02842f76ffd2` | `runner` | Runner data dictionary definitions and data schema mapping. | `docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md` | `docs/platform/runner/subcomponents/h-02842f76ffd2/` |
 | `h-2e032393add1` | `runner` | Runner gap tracking and known technical limits. | `docs/platform/runner/subcomponents/h-2e032393add1/spec.md` | `docs/platform/runner/subcomponents/h-2e032393add1/` |
 | `h-37aced3896a8` | `runner` | Runner settled edge case records and historical resolutions. | `docs/platform/runner/subcomponents/h-37aced3896a8/spec.md` | `docs/platform/runner/subcomponents/h-37aced3896a8/` |

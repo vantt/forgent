@@ -43,7 +43,7 @@ Area rows from the model: one row per area listing its top-level components. Spe
 
 | Area | Components | What it owns | Owner doc |
 | --- | --- | --- | --- |
-| `(cross-area)` | `canonical-json`, `coding-domain`, `domain-components`, `domain-registry-loader`, `durable-file`, `group-thinking`, `host-surface`, `platform-foundations`, `work-driver` | Authority for canonical JSON bytes per RFC 8785.; Coding Domain Core, policies, repo scope, footprint, worktree isolation, merge catchup, and code verification doctrine.; Domain-specific behavior, workflows, skills, task specs, and doctrine.; General runtime definition registry and config loader for domains, workflows, and declarations.; Authority for how records reach disk durably: temp file, fsync, atomic install.; Versioned CoordinationProtocol definitions and skill for structured multi-agent deliberation.; CLI entrypoints, top-level verbs, argument parsing, and command execution.; Core platform utilities, foundation laws L1-L10, and cross-cutting helpers.; Ready-work selection, Stage Operation choice, cross-flow routing, park/halt and recovery around Work execution; invokes lifecycle verbs and dispatch surfaces without owning domain workflow semantics. | `docs/platform/component-boundary.md`, `docs/platform/README.md`, `docs/platform/platform-foundations.md` |
+| `(cross-area)` | `canonical-json`, `coding-domain`, `domain-components`, `domain-registry-loader`, `durable-file`, `group-thinking`, `host-surface`, `platform-foundations`, `work-driver` | Authority for canonical JSON bytes per RFC 8785.; Coding Domain Core, policies, repo scope, footprint, worktree isolation, merge catchup, and code verification doctrine.; Domain-specific behavior, workflows, skills, task specs, and doctrine.; General runtime definition registry and config loader for domains, workflows, and declarations.; Authority for how records reach disk durably: temp file, fsync, atomic install.; Versioned group-thinking protocol pack definitions and skill for structured multi-agent deliberation.; CLI entrypoints, top-level verbs, argument parsing, and command execution.; Core platform utilities, foundation laws L1-L10, and cross-cutting helpers.; Ready-work selection, Stage Operation choice, cross-flow routing, park/halt and recovery around Work execution; invokes lifecycle verbs and dispatch surfaces without owning domain workflow semantics. | `docs/platform/component-boundary.md`, `docs/platform/README.md`, `docs/platform/platform-foundations.md` |
 | `agent-confinement` | `agent-confinement` | Single authority for agent isolation, container boundaries, and sandboxing. | `docs/platform/agent-confinement/spec.md` |
 | `agent-coordination` | `agent-coordination`, `agent-coordination-engine`, `team-cognition-engine` | Agent coordination area portal; former coordination engine retired, execution uses runner/Workflow.; Authority for CoordinationSession manifest/events, actor bounds, session recovery, and synthesis boundary.; Typed deliberation interpretation, aggregation-method semantics, and cognitive outcomes. | `docs/platform/agent-coordination/spec.md` |
 | `agent-mailbox` | `agent-mailbox` | Placing a message from one agent session into context of the right live head. | `docs/platform/agent-mailbox/spec.md` |
@@ -150,9 +150,9 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | document axis model, locate before write, and claim units | `document-identity` | `docs/platform/documentation/subcomponents/document-identity/spec.md` |
 | documentation architecture and maintained corpus | `documentation` | `docs/platform/documentation/spec.md` |
 | domain-specific workflows, skills, task specs, and doctrine | `domain-components` | `docs/platform/component-boundary.md` |
-| runtime definition registry, domain and workflow loader, flow definition validation | `domain-registry-loader` | `docs/platform/component-boundary.md` |
+| runtime definition registry, domain and workflow loader, workflow definition validation | `domain-registry-loader` | `docs/platform/component-boundary.md` |
 | workflow/stage/operation declarations, task-spec/skill references, roles | `domain-registry-loader` | `docs/platform/component-boundary.md` |
-| FlowDefinition validation/projection | `domain-registry-loader` | `docs/platform/component-boundary.md` |
+| workflow definition validation/projection | `domain-registry-loader` | `docs/platform/component-boundary.md` |
 | atomic and durable file write primitives, fsync | `durable-file` | `docs/platform/component-boundary.md` |
 | end-user documentation authoring and maintenance | `enduser-docs-authoring` | `docs/platform/work-state/spec.md` |
 | end-user documentation tag-based indexing | `enduser-docs-index` | `docs/platform/work-state/spec.md` |
@@ -171,7 +171,7 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | refs management and publication | `git` | `docs/platform/git/spec.md` |
 | directed graph analysis, cycle detection, topological sorting | `graph` | `docs/platform/graph/spec.md` |
 | group-thinking protocol definitions, public request and replay adapters | `group-thinking` | `docs/platform/component-boundary.md` |
-| versioned data-first CoordinationProtocol definitions | `group-thinking` | `docs/platform/component-boundary.md` |
+| versioned data-first protocol pack definitions | `group-thinking` | `docs/platform/component-boundary.md` |
 | fgos-group-thinking skill | `group-thinking` | `docs/platform/component-boundary.md` |
 | selects an explicit registered protocol, builds a public request, launches/resumes through coordination surfaces, renders public replay/evidence | `group-thinking` | `docs/platform/component-boundary.md` |
 | runner data dictionary definitions | `h-02842f76ffd2` | `docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md` |
