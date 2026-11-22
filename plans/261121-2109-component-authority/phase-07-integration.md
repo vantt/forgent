@@ -1,9 +1,11 @@
 # Phase 7: Retire the manifest and integrate
 
-This phase starts only when phase 6 has landed and `261122-0118-heads-stable-and-able` is `done`. That plan owns
-`docs/architecture-manifest.json` and `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`
-until then (owner order 2026-11-22 23:19, option c). If heads-stable is still running when phase 6 lands, this
-phase waits for it and does not take those two files early.
+This phase starts when phase 6 has landed. It does not wait for `261122-0118-heads-stable-and-able`. The earlier
+wait (owner order 2026-11-22 23:19, option c) was replaced by the owner at 23:21 (Miu mail 9e491a48: "no waiting on
+heads-stable at all; admit including the two shared files") and repeated at 00:06 ("heads-stable never gates
+component-authority"). heads-stable dropped `docs/architecture-manifest.json` and
+`docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` from its footprint at 00:07 (9fc5261af)
+and watches them instead, so step 1 below ports any change it still makes to the manifest.
 
 ## Inputs
 - The landed branches of phases 1-6, and the `plan.md` acceptance criteria.
