@@ -49,3 +49,26 @@ Closes `p-ndortdckid` (code half), `p-vquz26ibnn` item (2), and the grant half o
 ## Rollback
 
 Revert the phase commit. The grant table, the route and the mapping return together.
+
+## Added 2026-11-22 12:28 (owner-approved via lead:SUPERVISOR): `config patch` held to the project file by the host
+
+The route-side guard for the supervisor's `config patch` was removed in review: it copied the host's key-to-file
+resolution and could be bypassed (bracket-quoted paths, the patch file swapped between two reads, symlinks). The owner
+approved the recommended answer to `q-va5vu7zeza` at 12:28: the host gains a `--project-only` flag on `config patch`, and
+the confined route always passes it. `config patch` stays out of the supervisor grant until the flag has landed.
+
+Footprint addition (landed by the supervisor, since a lead's paths land refuses a footprint change):
+`packages/config/rust/src/provider.rs`, `packages/config/rust/src/provider/unix_verbs.rs`,
+`packages/config/contracts/fixtures/scope.v1.json`, `packages/config/rust/tests/golden_scope.rs`,
+`apps/fgos/src/cli_projector.rs`, `packages/host-runtime/contracts/command-manifest.json`, `docs/platform/config/spec.md`.
+
+8. Host flag: `fgos config patch <file> --project-only` refuses, before any write and with the file byte-identical, when
+   any edit's target (`target_of`, the one resolution) is not the project config file (a `global-only` key, an accounts
+   key, or `--global`), with one refusal code named in the scope fixture. Without the flag nothing changes.
+9. Owning proof: rows in `packages/config/contracts/fixtures/scope.v1.json` read by `golden_scope.rs`: a project key
+   passes, a global-only key and an accounts key are refused, `--project-only --global` is refused. One parse test in
+   `cli_projector.rs` for the flag. The manifest and `docs/platform/config/spec.md` name the flag.
+10. After 8 lands: `config patch` joins the supervisor row of `GRANTS`; the route (`head-request.mjs`) runs the host's
+    `config patch <file> --project-only --json` through `hostCall`, checking only arg shape; `routing.rs` maps
+    `("config", Some("patch"))`; contract and session-host spec name it; tests as in step 6. The host is the only
+    authority for which file a key lives in.
