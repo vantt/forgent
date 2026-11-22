@@ -5370,6 +5370,77 @@ fn the_execution_route_launch_session_op_refuses_an_incomplete_request_and_answe
 
 /// A project with a stub executor serving `docs:write`, a linked worktree of it, and a `node` the case chooses on a
 /// `PATH` that holds no real agent CLI.
+/// A dev release manifest that also ships this checkout's Node addon, for the runs whose Workflow admission peer is a
+/// real Node payload: the peer's case port reads the Execution Core helpers through the addon, and the payload loads
+/// the addon only from the release manifest it runs under. The addon is built once per test process (cargo reuses a
+/// fresh build) and copied under the checkout's ignored `.fgos/runtime/`, inside the release root the door requires.
+#[cfg(unix)]
+fn addon_dev_manifest() -> PathBuf {
+    static MANIFEST: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
+    MANIFEST
+        .get_or_init(|| {
+            let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".to_owned());
+            let built = Command::new(cargo)
+                .args(["build", "-p", "fgos-node-addon"])
+                .current_dir(repo_root())
+                .status()
+                .expect("cargo must run to build the Node addon");
+            assert!(built.success(), "building fgos-node-addon failed");
+            let library = if cfg!(target_os = "macos") {
+                "libfgos_node_addon.dylib"
+            } else {
+                "libfgos_node_addon.so"
+            };
+            let bytes = fs::read(fgos_bin().parent().unwrap().join(library)).unwrap();
+            let digest = format!("{:x}", Sha256::digest(&bytes));
+            // Named by its digest: a rebuilt addon gets a new directory, an unchanged one is reused.
+            let relative = format!(".fgos/runtime/cli-tests-addon/{}/fgos.node", &digest[..16]);
+            let staged = repo_root().join(&relative);
+            if !staged.exists() {
+                fs::create_dir_all(staged.parent().unwrap()).unwrap();
+                let partial = staged.with_extension(format!("{}.tmp", std::process::id()));
+                fs::write(&partial, &bytes).unwrap();
+                fs::rename(&partial, &staged).unwrap();
+            }
+            let arch = match std::env::consts::ARCH {
+                "x86_64" => "x64",
+                "aarch64" => "arm64",
+                other => other,
+            };
+            let platform = match std::env::consts::OS {
+                "macos" => "darwin",
+                other => other,
+            };
+            let mut manifest = valid_dev_manifest();
+            manifest["components"]["nativeAddon"] = serde_json::json!({
+                "capabilities": ["git-wal-v1"],
+                "path": relative,
+                "digest": digest,
+                "target": format!("{platform}-{arch}"),
+                "napiVersion": 8,
+                "crateChecksums": fgos_distribution::manifest::native_addon_crate_checksums(),
+            });
+            manifest["files"]
+                .as_array_mut()
+                .unwrap()
+                .push(serde_json::json!({
+                    "path": relative,
+                    "kind": "file",
+                    "digest": format!("sha256:{digest}"),
+                    "mode": "644",
+                    "class": "immutable-runtime",
+                }));
+            manifest.as_object_mut().unwrap().remove("artifactDigest");
+            let canonical = fgos_distribution::verify::to_canonical_json(&manifest);
+            manifest["artifactDigest"] =
+                serde_json::json!(format!("sha256:{:x}", Sha256::digest(canonical.as_bytes())));
+            let path = fresh_dir("fgos_addon_manifest").join("manifest.json");
+            fs::write(&path, serde_json::to_string_pretty(&manifest).unwrap()).unwrap();
+            path
+        })
+        .clone()
+}
+
 #[cfg(unix)]
 struct RunWorld {
     world: ExecutionWorld,
@@ -5395,6 +5466,7 @@ impl RunWorld {
             .collect::<Vec<_>>()
             .join(":");
         world.path = format!("{}:{agent_free}", node_dir.display());
+        world.manifest = addon_dev_manifest();
         fs::write(
             world.home.join(".fgos/config.yaml"),
             "runner:\n  executors:\n    stub:\n      kind: agent\n      providerModel: stub\n      allowCrossProvider: true\n      invocations:\n        - id: stub-cli\n          via: cli\n          adapter: cli-spawn\n          command: /bin/true\n          args: [\"{prompt}\"]\n",
