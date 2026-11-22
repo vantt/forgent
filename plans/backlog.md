@@ -2,6 +2,7 @@
 
 | ID | Title | Status | Priority | Area | Citing |
 |---|---|---|---|---|---|
+| [p-ivmvh7y2hf](backlog/p-ivmvh7y2hf-plans-split-the-switch-to-a-new-path-from-deleting-the-old-one.md) | Plans split the switch to a new path from deleting the old one, and a deletion estimate counts the tests it retires (planning, priority medium; source: owner, 2026-11-22 18:40, lesson from s6a phase 21) | proposed | P2 | planning | - |
 | [p-24xw2cwdvo](backlog/p-24xw2cwdvo-delete-the-dead-tier-5-node-execution-modules-and-their-tests.md) | Delete the dead tier-5 Node execution modules and their tests left after plan s6a phase 21 (execution, priority high; source: owner decision 2026-11-22 18:23, option B) | proposed | P1 | execution | - |
 | [p-tgzw6xmsru](backlog/p-tgzw6xmsru-case-close-concurrent-prunes-test-flakes.md) | test/workflow/case-close.test.mjs "concurrent prunes remove each directory once" fails about one run in three, also alone (tests, priority medium; source: lead:S6A, 2026-11-22 17:50) | proposed | P2 | tests | - |
 | [p-l54vuzupa5](backlog/p-l54vuzupa5-test-select-mutate-leaves-a-7-gb-mutation-checkout.md) | test-select-mutate leaves a 7 GB mutation checkout under the cargo target of every worktree that runs the full suite (tests, priority high; source: lead:S6A, 2026-11-22 16:20) | proposed | P1 | tests | - |
