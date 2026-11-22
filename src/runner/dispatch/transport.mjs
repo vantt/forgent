@@ -24,9 +24,8 @@
 
 import path from 'node:path';
 import fs from 'node:fs';
-import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
-import { inspectEntries, inspectPath } from '../../util/git-paths.mjs';
-import { assertReasoningEffort } from './config.mjs';
+import { captureDispatchAttestation } from '../worktree.mjs';
+import { assertReasoningEffort } from './config-twin.mjs';
 import { RunnerConfigError } from './runner-config-error.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
 import { credentialStoreOf } from './provider-capacity.mjs';
@@ -81,65 +80,7 @@ export { resolveHerdrBin };
  * executor block's own `provider` display alias when present, else
  * `command` itself.
  */
-/**
- * Worktree-dispatch attestation (tsk-2ig, D1/D3 of docs/history/parallel-
- * decomposition-footprint-avoidance/CONTEXT.md — mức 1, advisory-only):
- * chụp `baseCommit`/`headRef` NGAY TRƯỚC khi dispatch — captured by the
- * launcher itself, never trusted from whatever the dispatched executor
- * later reports.
- *
- * `attestRoot`, when given, is read instead of `fgosDir`'s own root
- * (tsk-4hl fix, independent review after tsk-2ig merged): a worker
- * dispatched via `spawnWorker` runs inside its OWN dispatch worktree
- * (`fgw/<id>`, `loop.mjs`'s `wt.path`), a DIFFERENT checkout than
- * `fgosDir`'s root (always the main checkout, ADR0020 — worktrees never
- * carry their own `.fgos/`). Reading `fgosDir`'s root unconditionally used
- * to attest the main checkout's HEAD regardless of which branch the
- * worker actually dispatched on — correct only for a first-attempt ROOT
- * item (whose dispatch branch happens to fork from main's then-current
- * tip), wrong for a leaf (forks from `fgw/<rootId>`, not main) or a retry
- * (the branch already carries the prior attempt's own commits).
- * `spawnWorker` passes its own worktree `cwd` as `attestRoot`;
- * a caller with no worktree of its own (genuinely running against
- * `fgosDir`'s own root) omits it, unchanged.
- *
- * Fail-safe either way: a git read that cannot resolve (detached checkout
- * weirdness, no `.git`, etc.) never throws and never blocks dispatch —
- * this is advisory metadata, not a precondition (same "advisory, không tự
- * fail" stance `frozen-judge.mjs` already states for its own checks).
- * Returns `{baseCommit, headRef}`, either field `null` when it could not
- * be read.
- */
-export function captureDispatchAttestation(fgosDir, attestRoot) {
-  const repoRoot = attestRoot ?? (fgosDir ? path.dirname(fgosDir) : null);
-  if (!repoRoot) return { baseCommit: null, headRef: null };
-  const read = (fn) => {
-    try {
-      return fn();
-    } catch {
-      return null;
-    }
-  };
-  const inspect = read(() => createGitInspect(gitPortOptions(repoRoot)));
-  if (!inspect) return { baseCommit: null, headRef: null };
-  const head = read(() => inspect.resolveCommit({ name: 'HEAD' }));
-  return {
-    baseCommit: typeof head === 'string' ? head : null,
-    headRef: read(() => checkedOutBranch(inspect)), // null on detached HEAD, never a throw
-  };
-}
-
-// The short name of the branch the inspected checkout has checked out, from
-// its own row of the worktree list; null when that checkout is detached.
-function checkedOutBranch(inspect) {
-  const { worktreeRoot } = inspect.resolveRepo();
-  if (!worktreeRoot) return null;
-  const own = fs.realpathSync(worktreeRoot);
-  const row = inspectEntries((page) => inspect.listWorktrees(page)).find((entry) => {
-    try { return fs.realpathSync(inspectPath(entry.path)) === own; } catch { return false; }
-  });
-  return row?.branch?.startsWith('refs/heads/') ? row.branch.slice('refs/heads/'.length) : null;
-}
+export { captureDispatchAttestation };
 
 export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, fgosDir, attestRoot, contentCarries, resolvedAgentType, invocationId, reasoningEffort, requestedModel } = {}) {
   // Captured BEFORE resolveExecutorConfig, not after (D3) — cheap and

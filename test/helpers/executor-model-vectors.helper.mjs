@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
-import { withDefaultExecutor, validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
+import { withDefaultExecutor, validateRunnerConfigShape } from '../../src/runner/dispatch/config-twin.mjs';
 import { familyOf, renderedEffortLevels } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { lookupExecutor } from '../../src/runner/dispatch/resolve.mjs';
 import { resolveExecutorGovernance, resolveExecutorProvider } from '../../src/runner/dispatch/executor-governance.mjs';
@@ -101,7 +101,7 @@ const evaluators = {
   posture: ({ runner, args }, paths) => resolvePostureInvocation(args.candidate, 'read-only', { runnerConfig: runner, herdrPresent: args.herdrPresent === true, registryPath: paths.registryPath, envPath: paths.binDir }),
   launchFacts: ({ runner, args }) => launchFactsOf(runner, args.session ?? {}),
   missingCli: ({ runner, args }, paths) => preflightOf(runner, { session: { hasNativeAgent: args.hasNativeAgent === true, pathEnv: paths.binDir } }).agentCliMissing ?? null,
-  accountQuarantine: ({ runner, args }, paths) => preflightOf(runner, { pin: args.account, accounts: { runtimeDir: paths.runtimeDir }, now: args.now }).pinQuarantinedUntil ?? null,
+  accountQuarantine: ({ runner, args }, paths) => preflightOf(runner, { pin: args.account, accountState: readAccountStateOverlay({ runtimeDir: paths.runtimeDir, now: args.now }), now: args.now }).pinQuarantinedUntil ?? null,
   accountInventory: ({ runner }) => providerAccountInventory(runner),
   llmAccounts: ({ runner }) => readLlmAccounts(runner),
   stateKey: ({ args }) => legacyStateKey(args.pool),

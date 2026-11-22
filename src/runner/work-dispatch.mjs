@@ -15,14 +15,13 @@ import { selectTemplate, hashTemplate } from './prompt-templates.mjs';
 import { DispatchError, RunnerConfigError, runUnitInHost, stampDeclaredAssignment, resolveExecutorConfig, purposeSeatInHost } from '../native/execution-door.mjs';
 import { resolveStrongerRigor, RIGOR_VALUES } from './rigor.mjs';
 import { deriveOperationCapability } from './operation-capability.mjs';
-import { watchWritesOutsideWorkspace, strayWriteWarning } from './dispatch/cli.mjs';
+import { watchWritesOutsideWorkspace, strayWriteWarning } from './stray-writes.mjs';
 import { resolveGitRoots } from '../git/inspect.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, workCapabilityHints, buildPrompt } from './work-compat.mjs';
 import { DOMAINS, getDomain, resolveDomainName, effectiveStep, bundleForStep, operationsForStep } from '../state/domain-registry.mjs';
 import { listWork } from '../state/store.mjs';
-import { captureDispatchAttestation } from './dispatch/transport.mjs';
-import { safeGitHead } from './dispatch/settlement.mjs';
+import { captureDispatchAttestation, safeGitHead } from './worktree.mjs';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 
 // The lookup runs once per dispatch, so the same broken file would repeat on every one; each distinct

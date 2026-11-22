@@ -515,9 +515,15 @@ fn a_confined_supervisor_reads_its_queue_plans_and_lanes_and_marks_several_event
     );
 }
 
-/// The bwrap command of a confined head, built by the real resolver and driver (`test/helpers/head-sandbox-argv.mjs`),
-/// or the named reason this machine cannot run one.
+/// The bwrap command of a confined head, built by the real resolver and driver of the Execution engine
+/// (`PolicyResolver`, the bwrap driver) in the terminal launch mode a head uses, with the head's request socket bound
+/// back; nothing here decides what the sandbox hides. An `Err` names why this machine cannot run one. The reply
+/// is the command, its argv and the sandbox's private home (the HOME a head runs with).
 fn head_sandbox(scene: &Scene, socket: &Path) -> Result<(String, Vec<String>, PathBuf), String> {
+    use fgos_execution_engine::confinement::cleanup::probes::{driver_over, PolicyResolver};
+    use fgos_execution_engine::confinement::driver::ports::ResourceResolver;
+    use fgos_execution_engine::confinement::policy::builtin_policy;
+
     let bwrap_runs = Command::new("bwrap")
         .args(["--ro-bind", "/", "/", "true"])
         .output()
@@ -526,45 +532,83 @@ fn head_sandbox(scene: &Scene, socket: &Path) -> Result<(String, Vec<String>, Pa
     if !bwrap_runs {
         return Err("no-bwrap: bwrap is absent or cannot create a sandbox here".to_owned());
     }
-    let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
     let runtime_dir = scene.root.join("rt");
     // The go socket the driver binds back must exist; nothing in this proof dials it.
     fs::create_dir_all(runtime_dir.join("fgos")).unwrap();
     fs::write(runtime_dir.join("fgos/go.sock"), "").unwrap();
+    let project = scene.project();
+    let scratch = scene.root.join("scratch");
+    let home = scene.root.join("home");
+    let fgos_dir = project.join(".fgos");
+    let run_dir = fgos_dir.join("assignments/head-sandbox-proof/self/1/runs/01");
+    let creds_dir = scratch.join("creds");
+    for dir in [creds_dir.clone(), run_dir.join("worker-output/outbox")] {
+        fs::create_dir_all(dir).unwrap();
+    }
+    let context =
+        json!({ "cwd": project, "repoRoot": project, "runDir": run_dir, "fgosDir": fgos_dir });
+    let grants = builtin_policy("host-write-denied").expect("a builtin policy")["grants"].clone();
+    let resources = PolicyResolver
+        .resolve(&json!({
+            "dispatchId": "head-sandbox-proof",
+            "context": { "cwd": project, "repoRoot": project, "runDir": run_dir, "fgosDir": fgos_dir, "assignmentLaunchContext": {} },
+            "grants": grants,
+            "backendConfig": { "tempRoot": scratch.join("confinement-temp") },
+            "providerSources": { "credentialsPath": creds_dir },
+            "blind": false,
+            "homeDir": home,
+            "claudeSocketBase": scratch.join("claude"),
+            "xdgRuntimeDir": runtime_dir,
+            "herdrSocketPath": home.join(".config/herdr/herdr.sock"),
+            "loginStores": [],
+        }))
+        .unwrap_or_else(|e| panic!("the resolver refused the head's resources: {}", e.message));
     let request = json!({
-        "project": scene.project(),
-        "scratch": scene.root.join("scratch"),
-        "home": scene.root.join("home"),
-        "runtimeDir": runtime_dir,
+        "dispatchId": "head-sandbox-proof",
+        "launchMode": "terminal",
+        "attemptId": "head-sandbox-proof",
+        "gateCommand": ["/bin/true", "internal", "gate", "--go-socket", runtime_dir.join("fgos/go.sock")],
         "requestSocket": socket,
-        "gateBin": "/bin/true",
-        // The fixture lives under /tmp, which the sandbox replaces with its own; a real project does not.
-        "bindBack": [scene.project(), fgos_bin()],
+        "invocation": { "command": "agent", "args": [], "env": {} },
+        "context": context,
     });
-    let out = Command::new("node")
-        .current_dir(&repo)
-        .arg(repo.join("test/helpers/head-sandbox-argv.mjs"))
-        .arg(request.to_string())
-        .env("FGOS_STATE_ROOT", scene.root.join("state"))
-        .output()
-        .unwrap();
-    assert!(
-        out.status.success(),
-        "head-sandbox-argv: {}",
-        String::from_utf8_lossy(&out.stderr)
-    );
-    let line = String::from_utf8_lossy(&out.stdout);
-    let built: Value = serde_json::from_str(line.lines().last().unwrap()).unwrap();
-    let args = built["args"]
+    let prepared = driver_over(&runtime_dir)
+        .prepare(
+            &json!({ "resources": resources }),
+            &request,
+            &json!({ "id": "bwrap", "config": { "executable": "/usr/bin/bwrap" } }),
+        )
+        .unwrap_or_else(|e| panic!("the bwrap driver refused the head's launch: {}", e.message));
+    let mut args: Vec<String> = prepared.invocation["args"]
         .as_array()
         .unwrap()
         .iter()
         .map(|a| a.as_str().unwrap().to_owned())
         .collect();
+    // The private /tmp comes first in the argv; every later mount (the head's own binds) lands on top of it. The
+    // fixture lives under /tmp, which the sandbox replaces with its own; a real project does not, so the project
+    // and the binary are bound back read-only right after it.
+    let tmp_at = args
+        .windows(2)
+        .position(|pair| pair[0] == "--tmpfs" && pair[1] == "/tmp")
+        .expect("the sandbox has a private /tmp");
+    let bind_back: Vec<String> = [project.clone(), fgos_bin()]
+        .iter()
+        .flat_map(|host| {
+            let host = host.to_string_lossy().into_owned();
+            ["--ro-bind".to_owned(), host.clone(), host]
+        })
+        .collect();
+    args.splice(tmp_at + 2..tmp_at + 2, bind_back);
+    let private_home = resources
+        .iter()
+        .find(|res| res["resource"] == "private-home")
+        .and_then(|res| res["executionTarget"]["path"].as_str())
+        .expect("a head has a private home");
     Ok((
-        built["command"].as_str().unwrap().to_owned(),
+        prepared.invocation["command"].as_str().unwrap().to_owned(),
         args,
-        PathBuf::from(built["home"].as_str().unwrap()),
+        PathBuf::from(private_home),
     ))
 }
 

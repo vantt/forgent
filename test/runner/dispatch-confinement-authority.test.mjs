@@ -6,7 +6,7 @@ import path from "node:path";
 import os from "node:os";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { buildConfinementAttestation, prepareConfinementForLaunch } from "../../src/runner/dispatch/confinement/authority.mjs";
+import { buildConfinementAttestation, prepareConfinementForLaunch } from "../../src/runner/dispatch/confinement/authority-twin.mjs";
 import { buildConfinementRequest, validateAssignmentLaunchContext, validateConfinementRequest } from "../../src/runner/dispatch/confinement/request.mjs";
 import { ensureMachineBackendRegistryDefaults } from "../../src/runner/dispatch/confinement/backend-registry.mjs";
 import { resolveConfinementPolicy } from "../../src/runner/dispatch/confinement/policies.mjs";
@@ -486,7 +486,7 @@ test("MED-A: production bwrap executor argvs yield process: unverified while hos
 });
 
 test("M4 / M4b lock: authority.mjs contains 0 adapter layer imports (static or dynamic)", () => {
-  const authorityPath = fileURLToPath(new URL("../../src/runner/dispatch/confinement/authority.mjs", import.meta.url));
+  const authorityPath = fileURLToPath(new URL("../../src/runner/dispatch/confinement/authority-twin.mjs", import.meta.url));
   const content = fs.readFileSync(authorityPath, "utf8");
   const forbiddenAdapters = [
     "herdr-round",

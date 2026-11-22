@@ -10,7 +10,7 @@ import { execFileSync } from 'node:child_process';
 
 import { resolveGitRoots } from '../../../src/git/inspect.mjs';
 import { snapshotRunnerConfig } from '../../../src/native/execution-door.mjs';
-import { loadRunnerConfigForDir } from '../../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../../../src/runner/dispatch/config-twin.mjs';
 import { digest as seatConfigDigest } from '../../../src/seat-binding/client.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 

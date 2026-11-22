@@ -1,16 +1,19 @@
-//! Where a seat's session is while its run settles.
+//! Read-only answers about a seat's session: where a seat's session folder is while its run settles, and which
+//! head a launch environment names. Both are reads (a run directory, an environment map); the engine's settle and
+//! finalize steps and its session launch compose them, and the Node session host asks them through the addon.
 
+use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
-use serde_json::Value;
+use serde_json::{json, Map, Value};
 
-use super::js::{get, truthy};
+use crate::js::truthy;
 
 /// Where finalize-home keeps a seat's session, relative to the run directory.
-pub(crate) const TRANSCRIPT_DIR: &str = "protected/session";
+pub const TRANSCRIPT_DIR: &str = "protected/session";
 
 /// Where a seat's kept session is, relative to the run directory, or `None` when none was kept.
-pub(crate) fn transcript_path_of(run_dir: &Path) -> Option<&'static str> {
+pub fn transcript_path_of(run_dir: &Path) -> Option<&'static str> {
     let kept = std::fs::read_dir(run_dir.join(TRANSCRIPT_DIR))
         .ok()?
         .next()
@@ -39,6 +42,32 @@ pub fn seat_session_dir(run_dir: &Path, launch_command_id: Option<&str>) -> Opti
     })?;
     let session = get(home, "sessionDir").and_then(Value::as_str)?;
     Some(Path::new(home_path(home)?).join(session))
+}
+
+/// The head the session is, as its launch environment names it (`FGOS_HEAD_PERSONA`, `FGOS_HEAD_NAME`,
+/// `FGOS_HEAD_GEN`): `{ persona, name, gen }` for the envelope's `session`, whose supervisor records it in the
+/// session's Identity entry, or an empty map when the environment does not name all three (a generation is a
+/// whole number of at least 1).
+pub fn head_of(env: &BTreeMap<String, String>) -> Map<String, Value> {
+    let gen = env
+        .get("FGOS_HEAD_GEN")
+        .and_then(|g| g.trim().parse::<f64>().ok());
+    let persona = env.get("FGOS_HEAD_PERSONA").filter(|v| !v.is_empty());
+    let name = env.get("FGOS_HEAD_NAME").filter(|v| !v.is_empty());
+    match (persona, name, gen) {
+        (Some(persona), Some(name), Some(gen)) if gen.fract() == 0.0 && gen >= 1.0 => {
+            let mut out = Map::new();
+            out.insert("persona".into(), json!(persona));
+            out.insert("name".into(), json!(name));
+            out.insert("gen".into(), json!(gen as u64));
+            out
+        }
+        _ => Map::new(),
+    }
+}
+
+fn get<'a>(value: &'a Value, key: &str) -> Option<&'a Value> {
+    value.as_object()?.get(key)
 }
 
 /// `typeof sessionDir === 'string'`: any string, however blank.

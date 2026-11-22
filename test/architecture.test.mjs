@@ -642,7 +642,7 @@ test('R8 EXECUTOR_ADAPTERS execute-handle lookups do not exist in src/**: every 
   const allowedReferences = new Set([
     'src/runner/dispatch/adapters.mjs',
     'src/runner/dispatch/transport.mjs',
-    'src/runner/dispatch/config.mjs',
+    'src/runner/dispatch/config-twin.mjs',
   ]);
   const invalidRefFiles = [];
   for (const file of mjsFilesUnder('src')) {
@@ -660,7 +660,7 @@ test('R8 EXECUTOR_ADAPTERS execute-handle lookups do not exist in src/**: every 
 });
 
 test('R8 cycle cut: src/runner/dispatch/config.mjs does not import src/runner/dispatch/transport.mjs', () => {
-  const configSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/config.mjs'), 'utf8');
+  const configSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/config-twin.mjs'), 'utf8');
   const imports = extractImports(configSource);
   const importsTransport = imports.some((spec) => spec.includes('transport.mjs'));
   assert.equal(
@@ -671,7 +671,7 @@ test('R8 cycle cut: src/runner/dispatch/config.mjs does not import src/runner/di
 });
 
 test('R8 posture check actually catches an EXECUTOR_ADAPTERS direct call site violation', () => {
-  for (const file of ['src/runner/dispatch/cli.mjs', 'src/runner/dispatch/transport.mjs', 'src/runner/dispatch/confinement/authority.mjs']) {
+  for (const file of ['src/runner/dispatch/cli.mjs', 'src/runner/dispatch/transport.mjs', 'src/runner/dispatch/confinement/authority-twin.mjs']) {
     assert.ok(
       checkExecutorAdapterCallSitePostures([{ file, line: 1, callText: 'EXECUTOR_ADAPTERS[name]()' }]).length > 0,
       `a direct EXECUTOR_ADAPTERS[...] lookup in ${file} must be flagged as a violation`,
@@ -1555,7 +1555,7 @@ test('pattern vocabulary rename is complete with no live retired aliases or dele
 
 test('retired pattern literals appear only in permitted refusal and decoder paths', () => {
   const allowed = new Set([
-    'src/runner/dispatch/config.mjs',
+    'src/runner/dispatch/config-twin.mjs',
     'src/runner/execution/legacy-seat-read.mjs',
     'src/runner/execution/patterns/retired-keys.mjs',
   ]);

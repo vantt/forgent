@@ -47,6 +47,7 @@ pub mod run_unit_contract;
 pub mod runner_check;
 pub mod runner_config;
 pub mod seat_resolver;
+pub mod seat_session;
 pub mod tier_cell;
 pub mod tools;
 pub mod unit;

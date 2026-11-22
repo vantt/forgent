@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
+import { validateRunnerConfigShape } from '../../src/runner/dispatch/config-twin.mjs';
 import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
 import {
   BUILTIN_POLICIES,

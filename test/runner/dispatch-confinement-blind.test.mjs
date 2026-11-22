@@ -13,7 +13,7 @@ import path from 'node:path';
 
 import { assessBwrap, prepareBwrap, CONFINED_MARKER_ENV } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
-import { assessAndPrepare } from '../../src/runner/dispatch/confinement/authority.mjs';
+import { assessAndPrepare } from '../../src/runner/dispatch/confinement/authority-twin.mjs';
 import { loadAttestationRecord, saveProbeCacheRecord } from '../../src/runner/dispatch/confinement/attestation-store.mjs';
 import { createBlindRootsWhenMissing, resolveBlindHiddenRoots } from '../../src/runner/dispatch/confinement/resources.mjs';
 import {

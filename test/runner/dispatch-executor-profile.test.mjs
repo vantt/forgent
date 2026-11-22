@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { loadRunnerConfigForDir, validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir, validateRunnerConfigShape } from '../../src/runner/dispatch/config-twin.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { terminalPromptDelivery } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { resolveExecutorConfig, lookupExecutor } from '../../src/runner/dispatch/resolve.mjs';

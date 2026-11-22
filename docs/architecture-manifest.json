@@ -63,6 +63,7 @@
     "src/runner/rigor.mjs": 0,
     "src/runner/capability-config.mjs": 0,
     "src/runner/worktree.mjs": 2,
+    "src/runner/stray-writes.mjs": 2,
     "src/seat-binding/": 5,
     "src/portfolio/": 8,
     "src/session-host/": 3,
@@ -369,7 +370,7 @@
       ],
       "allowed": [
         {
-          "path": "src/runner/dispatch/assignment-layout.mjs",
+          "path": "src/runner/dispatch/assignment-layout-twin.mjs",
           "reason": "the runner's assignment layout lister (its twin is run_dirs.rs)"
         },
         {
@@ -643,7 +644,7 @@
       "patterns": ["['\"`]config\\.ya?ml['\"`]", "['\"`]config\\.json['\"`]"],
       "allowed": [
         "src/config/facade.mjs",
-        { "path": "src/runner/dispatch/config.mjs", "reason": "names the file in the display of a finding's origin; reads nothing" },
+        { "path": "src/runner/dispatch/config-twin.mjs", "reason": "names the file in the display of a finding's origin; reads nothing" },
         { "path": "packages/execution/rust/src/runner_config/mod.rs", "reason": "the Rust twin of src/runner/dispatch/config.mjs: names the global file a refusal shows when its origin carries none; reads nothing (the pure crate cannot depend on fgos-config)" },
         { "path": "packages/execution/rust/src/runner_config/origins.rs", "reason": "the Rust twin of src/runner/dispatch/config.mjs: names the file in the display of a finding's origin; reads nothing (the pure crate cannot depend on fgos-config)" },
         { "path": "packages/config/rust/src/files.rs", "reason": "the fgos-config crate owns the file names" },
@@ -1020,7 +1021,7 @@
         "\\bbindingTasteOf\\("
       ],
       "allowed": [
-        "src/runner/dispatch/config.mjs",
+        "src/runner/dispatch/config-twin.mjs",
         "src/setup/seat-binding-checks.mjs"
       ],
       "reason": "reading prefer here never picks an executor: the load validator checks the named executors exist, and the seat-binding checks decide which capabilities to dry-bind and then ask bind(). The chooser is the seat-binding crate's ranking, composed by packages/execution/rust/src/bind.rs; the Node seat-policy module is gone"
@@ -1198,7 +1199,7 @@
       ],
       "debt": [
         {
-          "path": "src/runner/dispatch/config.mjs",
+          "path": "src/runner/dispatch/config-twin.mjs",
           "reason": "twin, same vectors as the contract: withDefaultExecutor, validateRunnerConfigShape and validateGeneratedPathsShape stay for Node launch code and the run snapshot"
         },
         {
@@ -1674,11 +1675,13 @@
     "src/runner/work-compat.mjs": "infra",
     "src/runner/dispatch/adapters.mjs": "infra",
     "src/runner/dispatch/config.mjs": "infra",
+    "src/runner/dispatch/config-twin.mjs": "infra",
     "src/runner/dispatch/runner-config-error.mjs": "infra",
     "src/runner/dispatch/confinement/policies.mjs": "infra",
     "src/runner/dispatch/confinement/bypass-pairing.mjs": "infra",
     "src/runner/dispatch/confinement/backend-registry.mjs": "infra",
     "src/runner/dispatch/confinement/authority.mjs": "infra",
+    "src/runner/dispatch/confinement/authority-twin.mjs": "infra",
     "src/runner/dispatch/confinement/request.mjs": "infra",
     "src/runner/dispatch/confinement/resources.mjs": "infra",
     "src/runner/dispatch/confinement/workspace-paths.mjs": "infra",
@@ -1694,6 +1697,7 @@
     "src/runner/dispatch/transport.mjs": "infra",
     "src/runner/dispatch/assignment.mjs": "infra",
     "src/runner/dispatch/assignment-layout.mjs": "infra",
+    "src/runner/dispatch/assignment-layout-twin.mjs": "infra",
     "src/runner/dispatch/assignment-normalizer.mjs": "infra",
     "src/runner/dispatch/execution-contract.mjs": "infra",
     "src/runner/dispatch/effective-execution-contract.mjs": "infra",
@@ -1712,7 +1716,7 @@
     "src/runner/dispatch/session-attempt.mjs": "infra",
     "src/runner/dispatch/run-admission.mjs": "infra",
     "src/runner/dispatch/settlement.mjs": "infra",
-    "src/run-supervisor/stray-writes.mjs": "infra",
+    "src/runner/stray-writes.mjs": "infra",
     "src/runner/dispatch/cli.mjs": "infra",
     "src/runner/hook.mjs": "use-case",
     "src/runner/prompt-templates.mjs": "infra",
@@ -1909,6 +1913,7 @@
     "src/runner/execution/outcome.mjs": "kernel",
     "src/runner/execution/unit-state.mjs": "infra",
     "src/runner/execution/unit-summary.mjs": "infra",
+    "src/runner/execution/unit-summary-twin.mjs": "infra",
     "src/runner/execution/loops/index.mjs": "domain",
     "src/runner/execution/loops/debate.mjs": "domain",
     "src/runner/execution/loops/panel.mjs": "domain",

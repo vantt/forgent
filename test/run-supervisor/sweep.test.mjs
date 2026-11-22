@@ -48,7 +48,7 @@ function deadAttempt(w, name, home, { countFile } = {}) {
   fs.writeFileSync(path.join(runDir, 'protected', 'confinement-finalization', 'cmd-1.json'), JSON.stringify({
     contract: 'confinement-finalization.v1', launchCommandId: 'cmd-1', resources: [{ pathRef: home }], cleanupState: 'pending', cleanupResult: null,
   }));
-  const script = `import(${JSON.stringify(path.join(REPO, 'src/runner/dispatch/confinement/authority.mjs'))}).then((m) => { const r = m.finalizeAttemptHome({ runDir: ${JSON.stringify(runDir)}, attemptId: ${JSON.stringify(`att-${name}`)} }); ${countFile ? `if (r.state === 'cleaned') require('node:fs').appendFileSync(${JSON.stringify(countFile)}, 'x\\n'); ` : ''}process.exit(r.state === 'cleaned' ? 0 : 75); });`;
+  const script = `import(${JSON.stringify(path.join(REPO, 'src/runner/dispatch/confinement/authority-twin.mjs'))}).then((m) => { const r = m.finalizeAttemptHome({ runDir: ${JSON.stringify(runDir)}, attemptId: ${JSON.stringify(`att-${name}`)} }); ${countFile ? `if (r.state === 'cleaned') require('node:fs').appendFileSync(${JSON.stringify(countFile)}, 'x\\n'); ` : ''}process.exit(r.state === 'cleaned' ? 0 : 75); });`;
   const envelope = {
     v: 3, attemptId: `att-${name}`, unitRunId: 'unit-1', runDir, mode: 'direct', protocolId: 1,
     hostBin: HOST ?? '/bin/false', payloadRoot: '/', cwd: runDir, mutation: 'read-only',

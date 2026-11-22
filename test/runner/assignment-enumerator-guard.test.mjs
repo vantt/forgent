@@ -56,7 +56,7 @@ import { lexSource } from '../../scripts/lib/js-source-lexer.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 
 const root = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
-const LAYOUT_OWNER = 'src/runner/dispatch/assignment-layout.mjs';
+const LAYOUT_OWNER = 'src/runner/dispatch/assignment-layout-twin.mjs';
 const SCAN_ROOTS = ['src', 'scripts', 'apps', 'bin'];
 const SOURCE_EXT = /\.(?:mjs|cjs|js)$/;
 const SKIP_DIRS = new Set(['node_modules', 'target', 'dist', '.git']);
@@ -87,9 +87,9 @@ const ALLOWED = new Map([
   ['src/runner/execution/unit-run-history.mjs: readSeatDirectory: readdirSync(runsDir)', { count: 1, reason: 'unit owner: numbered attempts of one known round' }],
   // The unit summary writer shares the unit owner's seat/round rules to decide
   // whether a unit still has an attempt in flight.
-  ['src/runner/execution/unit-summary.mjs: unitHasActiveRun: readdirSync(unitDir)', { count: 1, reason: 'unit owner: seats of one known unit directory' }],
-  ['src/runner/execution/unit-summary.mjs: unitHasActiveRun: readdirSync(seatDir)', { count: 1, reason: 'unit owner: rounds of one known seat directory' }],
-  ['src/runner/execution/unit-summary.mjs: unitHasActiveRun: readdirSync(runsDir)', { count: 1, reason: 'unit owner: attempts of one known round' }],
+  ['src/runner/execution/unit-summary-twin.mjs: unitHasActiveRun: readdirSync(unitDir)', { count: 1, reason: 'unit owner: seats of one known unit directory' }],
+  ['src/runner/execution/unit-summary-twin.mjs: unitHasActiveRun: readdirSync(seatDir)', { count: 1, reason: 'unit owner: rounds of one known seat directory' }],
+  ['src/runner/execution/unit-summary-twin.mjs: unitHasActiveRun: readdirSync(runsDir)', { count: 1, reason: 'unit owner: attempts of one known round' }],
   // Assignment-id allocation: lists only immediate children to find ids that
   // share a newly minted flat id prefix. Nested unit ids never use that prefix.
   ['src/runner/dispatch/assignment.mjs: createAssignmentId: readdirSync(assignmentsDir)', { count: 1, reason: 'id allocation: top-level names sharing a new flat id prefix' }],

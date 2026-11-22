@@ -12,7 +12,6 @@ use serde_json::{json, Value};
 use super::error::RequestError;
 use super::js::{get, truthy};
 use super::launch::publish_mutable_projection;
-use super::seat_dir::transcript_path_of;
 use crate::confinement::cleanup::{
     count_credential_keep, describe_attempt_home, keep_session_transcript, read_agent_file,
     read_attempt_home_record, remove_attempt_home, settle_held_credential_homes,
@@ -21,6 +20,7 @@ use crate::confinement::cleanup::{
     OWNERSHIP_MARKER_FILE,
 };
 use crate::credentials::{write_back_renewed_credential, AccountLocks, SqliteAdapter};
+use fgos_execution::seat_session::transcript_path_of;
 
 /// How [`finalize_attempt_home`] left an attempt's homes.
 #[derive(Debug, Clone, PartialEq)]

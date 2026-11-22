@@ -23,7 +23,7 @@ import { executeAssignment as executeAssignmentRaw } from '../../src/runner/disp
 import { bindableExecute } from '../helpers/work-seat-config.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { resolveRunWorkerArtifactPath } from '../../src/runner/dispatch/settlement.mjs';
-import { listAssignmentRuns } from '../../src/runner/dispatch/assignment-layout.mjs';
+import { listAssignmentRuns } from '../../src/runner/dispatch/assignment-layout-twin.mjs';
 import { runOnce as loopRunOnce } from '../../src/runner/loop.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';

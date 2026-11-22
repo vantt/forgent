@@ -16,19 +16,18 @@ mod finalize;
 mod js;
 mod launch;
 mod launch_context;
-mod seat_dir;
 mod shape;
 
 pub use attestation::build_confinement_attestation;
 pub use build::{build_confinement_request, system_clock_parts, BuildClock};
 pub use delivery::{control_delivery_of, effective_backend_of, own_worktree_unavailable};
 pub use error::RequestError;
+pub use fgos_execution::seat_session::seat_session_dir;
 pub use finalize::{finalize_attempt_home, FinalizedAttemptHome, StageRenewedLogin};
 pub use launch::{prepare_confinement_for_launch, Launch, LaunchHost, ProbeVerdict, Probes};
 pub use launch_context::{
     cross_check_assignment_launch_context, validate_assignment_launch_context,
 };
-pub use seat_dir::seat_session_dir;
 pub use shape::validate_confinement_request;
 
 /// The request a worker is confined under. Fields land with the module that owns the request authority.

@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { parseTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
-import { loadRunnerConfigForDir, supportsPolicyTier } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir, supportsPolicyTier } from '../../src/runner/dispatch/config-twin.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 

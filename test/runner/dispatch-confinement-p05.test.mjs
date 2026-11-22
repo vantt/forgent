@@ -13,7 +13,7 @@ import {
   assessAndPrepare,
   buildConfinementAttestation,
   ownWorktreeUnavailable,
-} from "../../src/runner/dispatch/confinement/authority.mjs";
+} from "../../src/runner/dispatch/confinement/authority-twin.mjs";
 import {
   buildConfinementRequest,
   validateConfinementRequest,

@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { assignmentDir, findRunDir, RunLookupError, listAssignmentRuns, scanAssignmentLayout } from '../../src/runner/dispatch/assignment-layout.mjs';
+import { assignmentDir, findRunDir, RunLookupError, listAssignmentRuns, scanAssignmentLayout } from '../../src/runner/dispatch/assignment-layout-twin.mjs';
 import { findRunningRuns } from '../../src/runner/dispatch/visibility-session.mjs';
 import { RUN_DIRS_VECTORS, buildRunDirsTree, relativeTo } from '../helpers/run-dirs-fixture.mjs';
 

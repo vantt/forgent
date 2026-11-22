@@ -14,7 +14,7 @@ import {
 } from '../../run-supervisor/direct-launch.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from '../../session-host/head-grants.mjs';
-import { withDefaultExecutor } from './config.mjs';
+import { withDefaultExecutor } from './config-twin.mjs';
 import { createCredentialRenewal } from './provider-credential-renewal.mjs';
 import { BUILTIN_POLICIES } from './confinement/policies.mjs';
 import { MAILBOX_RECORD_RESOURCE, PEER_SESSIONS_RESOURCE, WORKSPACE_PATHS_RESOURCE } from './confinement/workspace-paths.mjs';
@@ -23,6 +23,7 @@ import {
   releaseSelectedProviderLease, renewLeasedLogin, startAndBind,
 } from './assignment-runner.mjs';
 import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
+import { headOf } from '../../native/execution-door.mjs';
 
 export class SessionLaunchError extends Error {
   constructor(code, message, extra = {}) {
@@ -62,16 +63,8 @@ export function requirementOf(grant) {
   return { mode: 'required', policyId: 'host-write-denied', policy };
 }
 
-/**
- * The head the session is, as its launch environment names it (`FGOS_HEAD_PERSONA`, `FGOS_HEAD_NAME`,
- * `FGOS_HEAD_GEN`): `{ persona, name, gen }` for the envelope's `session`, whose supervisor records it in the
- * session's Identity entry, or nothing when the environment does not name all three.
- */
-export function headOf(env) {
-  const gen = Number(env.FGOS_HEAD_GEN);
-  if (!env.FGOS_HEAD_PERSONA || !env.FGOS_HEAD_NAME || !Number.isInteger(gen) || gen < 1) return {};
-  return { persona: env.FGOS_HEAD_PERSONA, name: env.FGOS_HEAD_NAME, gen };
-}
+// The head a launch environment names is `fgos-execution::seat_session::head_of`'s, asked through the door.
+export { headOf };
 
 /**
  * Starts the session attempt of `key` and returns once the supervisor has bound it; it never waits for the session to

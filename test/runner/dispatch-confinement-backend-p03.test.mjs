@@ -70,7 +70,7 @@ import {
   computePlatformDigest,
 } from '../../src/runner/dispatch/confinement/probes/harness.mjs';
 
-import { assessAndPrepare, buildConfinementAttestation } from '../../src/runner/dispatch/confinement/authority.mjs';
+import { assessAndPrepare, buildConfinementAttestation } from '../../src/runner/dispatch/confinement/authority-twin.mjs';
 import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
 import { requirementOf } from '../../src/runner/dispatch/session-attempt.mjs';
 import { grantOf } from '../../src/session-host/head-grants.mjs';

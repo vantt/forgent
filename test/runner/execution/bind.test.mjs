@@ -12,7 +12,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { ensureScriptAddon } from '../../../scripts/lib/git-ports.mjs';
-import { askFor, bind } from '../../../src/runner/execution/bind.mjs';
+import { bind } from '../../../src/runner/execution/bind.mjs';
+import { askFor } from '../../../src/runner/execution/seat-resolver.mjs';
 import { createSeatLedger } from '../../../src/runner/execution/seat-ledger.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 import { seedStubAgentClis } from '../../helpers/agent-clis.mjs';
@@ -73,14 +74,14 @@ function accountConfig(accounts) {
 const piStore = (name) => ({ credentialStore: { pi: `/srv/pi/${name}` } });
 const docsAsk = { unit: { id: 'u', capability: 'docs:write', writes: [] }, role: 'producer' };
 
-test('the lease state is read for a bind only when the caller names accounts: a quarantined account is skipped, and a replay without them names the candidate the runner bound', async () => {
-  const { quarantineProviderAccount } = await import('../../../src/runner/dispatch/provider-capacity.mjs');
+test('the lease state counts for a bind only when the caller passes it: a quarantined account is skipped, and a replay without it names the candidate the runner bound', async () => {
+  const { quarantineProviderAccount, readAccountStateOverlay } = await import('../../../src/runner/dispatch/provider-capacity.mjs');
   const runtimeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bind-accounts-'));
   const runnerConfig = accountConfig({ a: piStore('a'), b: piStore('b') });
-  const ctx = { runnerConfig, session: {}, accounts: { runtimeDir, assignmentId: 'asgn' } };
-  assert.equal(bind(docsAsk, ctx).leaseAccount, 'a');
+  const ctx = () => ({ runnerConfig, session: {}, accountState: readAccountStateOverlay({ runtimeDir, assignmentId: 'asgn' }) });
+  assert.equal(bind(docsAsk, ctx()).leaseAccount, 'a');
   quarantineProviderAccount({ provider: 'alpha', accountId: 'a', reasonCode: 'quota-limit', until: new Date(Date.now() + 3_600_000).toISOString(), runtimeDir });
-  assert.equal(bind(docsAsk, ctx).leaseAccount, 'b', 'the quarantined account is out until its end time');
+  assert.equal(bind(docsAsk, ctx()).leaseAccount, 'b', 'the quarantined account is out until its end time');
   const replayed = bind(docsAsk, { runnerConfig, session: {} });
   assert.equal(replayed.leaseAccount, 'a', 'a replay reads no lease state, so it arrives at the account the seat was first bound to');
 });

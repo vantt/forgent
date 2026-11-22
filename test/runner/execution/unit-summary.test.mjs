@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import { nativeDoor } from '../../../src/native/door.mjs';
 import path from 'node:path';
-import { buildUnitSummary, writeUnitSummary, extractStance, serializeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
+import { buildUnitSummary, writeUnitSummary, extractStance, serializeUnitSummary } from '../../../src/runner/execution/unit-summary-twin.mjs';
 import { readUnitRunHistory } from '../../../src/runner/execution/unit-run-history.mjs';
 import { runLoop } from '../../../src/runner/execution/loops/index.mjs';
 

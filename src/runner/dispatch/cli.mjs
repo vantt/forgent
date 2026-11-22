@@ -6,7 +6,7 @@ import fs from 'node:fs';
 
 import { commandCli } from './provider-capacity.mjs';
 
-export { watchWritesOutsideWorkspace, strayWriteWarning } from '../../run-supervisor/stray-writes.mjs';
+export { watchWritesOutsideWorkspace, strayWriteWarning } from '../stray-writes.mjs';
 
 // Work-driven dispatch (`spawnWorker`, the executor a Work item's step resolves to) lives in
 // the Work layer, src/runner/work-dispatch.mjs; this module takes what that layer resolved.

@@ -10,7 +10,7 @@ import { execFileSync } from 'node:child_process';
 
 import { legacySeatsOf, seatsOfRecord, seatKeyOf, isVerdictResult, isVerifyResult, isSeatRecord, collaborationOfRecord } from '../../../src/runner/execution/legacy-seat-read.mjs';
 import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs';
-import { buildUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
+import { buildUnitSummary } from '../../../src/runner/execution/unit-summary-twin.mjs';
 import { readUnitRunHistory } from '../../../src/runner/execution/unit-run-history.mjs';
 import { handoffRef } from '../../../src/native/execution-door.mjs';
 

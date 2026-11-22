@@ -54,7 +54,7 @@ const FIXED_NOW = '2026-01-02T03:04:05.000Z';
 
 const confinement = path.join(repo, 'src/runner/dispatch/confinement');
 const request = await import(path.join(confinement, 'request.mjs'));
-const authority = await import(path.join(confinement, 'authority.mjs'));
+const authority = await import(path.join(confinement, 'authority-twin.mjs'));
 const registry = await import(path.join(confinement, 'backend-registry.mjs'));
 const policies = await import(path.join(confinement, 'policies.mjs'));
 

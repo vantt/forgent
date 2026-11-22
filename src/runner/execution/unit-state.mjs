@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { listGenerations } from '../../run-supervisor/run-lock.mjs';
-import { assignmentDir } from '../dispatch/assignment-layout.mjs';
+import { assignmentDir } from '../dispatch/assignment-layout-twin.mjs';
 import { unitControllerHeld } from './unit-control.mjs';
 
 const readJson = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; } };
