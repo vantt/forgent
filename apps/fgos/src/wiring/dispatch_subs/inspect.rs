@@ -182,7 +182,14 @@ fn attention_definitions(store_root: &Path) -> Definitions {
             .unwrap_or_else(|_| ATTENTION_DEFINITIONS.to_owned());
         return Box::new(move |_, _| unmeasured(format!("definitions-missing: {shown}")));
     };
-    let store_root = store_root.to_path_buf();
+    definitions_at(dir, store_root.to_path_buf())
+}
+
+/// The reader of the attention definitions in `dir`: each call runs the host's `metrics query --def` over the
+/// directory as it is then, so a definition file added between calls is measured by the next one. A query that
+/// fails degrades to one `unmeasured` entry.
+pub(crate) fn definitions_at(dir: PathBuf, store_root: PathBuf) -> Definitions {
+    let unmeasured = |reason: String| json!({ "definitions": [{ "name": ATTENTION_DEFINITIONS, "unmeasured": reason }] });
     Box::new(move |since, now| {
         let request = ObserveRequest {
             operation: "observe.metrics".into(),
