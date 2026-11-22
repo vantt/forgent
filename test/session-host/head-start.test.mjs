@@ -254,7 +254,117 @@ test('the session launches with its role, its grant and the opening verbatim as 
   assert.equal(request.ceilingMs, HEAD_HARD_CEILING_MS);
   assert.deepEqual(request.display, { role: 'planner', title: 'ds-aaaaaaaaaa-probe' });
   assert.deepEqual(request.binding, { executor: 'alpha', key: 'head-planner-probe-1' });
+  const invocation = request.runnerConfig.executors?.alpha?.invocations?.[0];
+  assert.ok(!invocation?.args?.includes('--settings'), 'a non-Claude binding does not carry the setting');
   fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+test('a Claude binding carries statusLine on the launch invocation, a non-Claude binding does not', async () => {
+  const projectRoot = scratch();
+  const { calls, ports } = fakes();
+  ports.runnerConfig = () => ({
+    executors: {
+      claude: {
+        command: 'claude',
+        invocations: [{ id: 'claude-pane', command: 'claude', args: [] }],
+      },
+      codex: {
+        command: 'codex',
+        invocations: [{ id: 'codex-pane', command: 'codex', args: [] }],
+      },
+    },
+  });
+
+  // Non-Claude (codex)
+  ports.bind = ({ key }) => ({ executor: 'codex', cli: 'codex', invocation: 'codex-pane', key });
+  await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, ports);
+  const codexReq = calls.launch[0];
+  const codexInv = codexReq.runnerConfig.executors.codex.invocations[0];
+  assert.ok(!codexInv.args.includes('--settings'), 'a non-Claude binding does not carry the setting');
+
+  // Claude
+  ports.bind = ({ key }) => ({ executor: 'claude', cli: 'claude', invocation: 'claude-pane', key });
+  await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, ports);
+  const claudeReq = calls.launch[1];
+  const claudeInv = claudeReq.runnerConfig.executors.claude.invocations[0];
+  const settingsIdx = claudeInv.args.indexOf('--settings');
+  assert.ok(settingsIdx >= 0, 'a Claude binding carries the setting');
+  const settings = JSON.parse(claudeInv.args[settingsIdx + 1]);
+  assert.deepEqual(settings.statusLine, {
+    type: 'command',
+    command: 'fgos hook session-rotation --event status-line',
+  });
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+test('a head launch merges statusLine into an existing --settings object on the invocation', async () => {
+  const projectRoot = scratch();
+  const { calls, ports } = fakes();
+  ports.runnerConfig = () => ({
+    executors: {
+      claude: {
+        command: 'claude',
+        invocations: [
+          { id: 'claude-pane', command: 'claude', args: ['--settings', JSON.stringify({ enabledMcpjsonServers: ['test'] })] },
+        ],
+      },
+    },
+  });
+  ports.bind = ({ key }) => ({ executor: 'claude', invocation: 'claude-pane', key });
+  await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, ports);
+  const request = calls.launch[0];
+  const invocation = request.runnerConfig.executors.claude.invocations[0];
+  const settingsIdx = invocation.args.indexOf('--settings');
+  assert.ok(settingsIdx >= 0);
+  const merged = JSON.parse(invocation.args[settingsIdx + 1]);
+  assert.deepEqual(merged, {
+    enabledMcpjsonServers: ['test'],
+    statusLine: {
+      type: 'command',
+      command: 'fgos hook session-rotation --event status-line',
+    },
+  });
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+test('a head launch leaves an existing non-JSON --settings value unchanged and does not add statusLine', async () => {
+  const projectRoot = scratch();
+  const { calls, ports } = fakes();
+  ports.runnerConfig = () => ({
+    executors: {
+      claude: {
+        command: 'claude',
+        invocations: [
+          { id: 'claude-pane', command: 'claude', args: ['--settings', '/etc/claude/settings.json'] },
+        ],
+      },
+    },
+  });
+  ports.bind = ({ key }) => ({ executor: 'claude', invocation: 'claude-pane', key });
+  await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, ports);
+  const request = calls.launch[0];
+  const invocation = request.runnerConfig.executors.claude.invocations[0];
+  assert.deepEqual(invocation.args, ['--settings', '/etc/claude/settings.json']);
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+test('withHeadSettings leaves runner config unchanged when executor has no invocations or no id matches', async () => {
+  const { withHeadSettings } = await import('../../src/session-host/head-start.mjs');
+  const baseConfig = {
+    executors: {
+      claude: { command: 'claude', invocations: [] },
+    },
+  };
+  const resEmpty = withHeadSettings(baseConfig, { executor: 'claude', invocation: 'claude-pane' });
+  assert.equal(resEmpty, baseConfig);
+
+  const configWithInv = {
+    executors: {
+      claude: { command: 'claude', invocations: [{ id: 'other-pane', command: 'claude', args: [] }] },
+    },
+  };
+  const resNoMatch = withHeadSettings(configWithInv, { executor: 'claude', invocation: 'claude-pane' });
+  assert.equal(resNoMatch, configWithInv);
 });
 
 test('a secretary launches with the paths and the verb its grant names; the lineage keeps the live key', async () => {

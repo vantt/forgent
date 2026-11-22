@@ -1,7 +1,7 @@
 //! `ClaudeTranscriptsSource` as a `RecordSource`: per-session usage by model and hour, and the last activity of each
 //! session from its transcript or its status-line sidecar.
 
-use super::claude_transcripts::{ClaudeTranscriptsSource, Message};
+use super::claude_transcripts::{encode_project_dir, ClaudeTranscriptsSource, Message};
 use crate::contract::{RecordSource, SourceError, Window};
 use crate::record::registry::EmbeddedDeclaration;
 use crate::record::types::{AttrValue, Basis, Origin, Record, SubjectRef, RECORD_VERSION};
@@ -21,7 +21,6 @@ pub const TRANSCRIPT_DECLARATION: EmbeddedDeclaration = EmbeddedDeclaration {
     json: include_str!("../../transcript-kinds.json"),
 };
 const SOURCE_ID: &str = "claude-transcripts";
-const SIDECAR_FILE: &str = "context-sidecar.jsonl";
 /// A status-line sidecar is a few lines per refresh; a file past this is not read.
 const SIDECAR_MAX_BYTES: u64 = 64 * 1024 * 1024;
 const MODEL_ATTR: &str = "gen_ai.request.model";
@@ -85,37 +84,77 @@ fn sidecar_millis(record: &Value) -> Option<i64> {
     }
 }
 
-/// Last activity per session found in every project sidecar, windowed.
-fn sidecar_activity(root: &Path, window: &ParsedWindow) -> BTreeMap<String, i64> {
-    let mut last = BTreeMap::new();
-    let base = root.join(".fgos/runtime/session-rotation");
-    let Ok(lineages) = std::fs::read_dir(&base) else {
-        return last;
+fn matching_project_dirs(root: &Path) -> Vec<std::path::PathBuf> {
+    let Some(claude_dir) = fgos_identity::cli_dirs::claude_config_dir(
+        std::env::var_os("HOME").as_deref(),
+        std::env::var_os("CLAUDE_CONFIG_DIR").as_deref(),
+    ) else {
+        return Vec::new();
     };
-    for lineage in lineages.flatten() {
-        let path = lineage.path().join(SIDECAR_FILE);
-        let Ok(meta) = std::fs::symlink_metadata(&path) else {
-            continue;
-        };
-        if !meta.is_file() || meta.len() > SIDECAR_MAX_BYTES {
+    let projects_dir = claude_dir.join("projects");
+    if !projects_dir.is_dir() {
+        return Vec::new();
+    }
+    let root_canon = root.canonicalize().unwrap_or_else(|_| root.to_path_buf());
+    let enc = encode_project_dir(&root_canon);
+    let worktree_prefix = format!("{enc}--claude-worktrees-");
+
+    let entries = match std::fs::read_dir(&projects_dir) {
+        Ok(e) => e,
+        Err(_) => return Vec::new(),
+    };
+    let mut matching = Vec::new();
+    for entry in entries.flatten() {
+        let p = entry.path();
+        if !p.is_dir() {
             continue;
         }
-        let Ok(text) = std::fs::read_to_string(&path) else {
+        let name = entry.file_name().to_string_lossy().to_string();
+        if name == enc || name.starts_with(&worktree_prefix) {
+            matching.push(p);
+        }
+    }
+    matching
+}
+
+/// Last activity per session found in every project sidecar beside the transcripts, windowed.
+fn sidecar_activity(root: &Path, window: &ParsedWindow) -> BTreeMap<String, i64> {
+    let mut last = BTreeMap::new();
+    for proj_dir in matching_project_dirs(root) {
+        let Ok(files) = std::fs::read_dir(&proj_dir) else {
             continue;
         };
-        for line in text.lines() {
-            let Ok(record) = serde_json::from_str::<Value>(line) else {
+        for file in files.flatten() {
+            let path = file.path();
+            let Some(name) = path.file_name().and_then(|n| n.to_str()) else {
                 continue;
             };
-            let (Some(sid), Some(ms)) = (
-                record.get("session_id").and_then(Value::as_str),
-                sidecar_millis(&record),
-            ) else {
+            if !name.ends_with(".context-sidecar.jsonl") {
+                continue;
+            }
+            let Ok(meta) = std::fs::symlink_metadata(&path) else {
                 continue;
             };
-            if window.contains(ms) {
-                let slot = last.entry(sid.to_owned()).or_insert(ms);
-                *slot = (*slot).max(ms);
+            if !meta.is_file() || meta.len() > SIDECAR_MAX_BYTES {
+                continue;
+            }
+            let Ok(text) = std::fs::read_to_string(&path) else {
+                continue;
+            };
+            for line in text.lines() {
+                let Ok(record) = serde_json::from_str::<Value>(line) else {
+                    continue;
+                };
+                let (Some(sid), Some(ms)) = (
+                    record.get("session_id").and_then(Value::as_str),
+                    sidecar_millis(&record),
+                ) else {
+                    continue;
+                };
+                if window.contains(ms) {
+                    let slot = last.entry(sid.to_owned()).or_insert(ms);
+                    *slot = (*slot).max(ms);
+                }
             }
         }
     }

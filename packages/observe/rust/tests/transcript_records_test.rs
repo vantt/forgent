@@ -40,9 +40,10 @@ impl Fixture {
     }
 
     fn sidecar(&self, lines: &str) {
-        let dir = self.root.join(".fgos/runtime/session-rotation/head-a");
+        let home = self.base.join("home");
+        let dir = home.join("projects").join(encode_project_dir(&self.root));
         std::fs::create_dir_all(&dir).unwrap();
-        std::fs::write(dir.join("context-sidecar.jsonl"), lines).unwrap();
+        std::fs::write(dir.join("s1.context-sidecar.jsonl"), lines).unwrap();
     }
 }
 

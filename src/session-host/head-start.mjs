@@ -226,6 +226,105 @@ export function assertHeadArgs({ persona, name, projectRoot, gen = null, forQues
   if (gen !== null && (!Number.isInteger(gen) || gen < 1)) throw new HeadStartError('bad-generation', `gen must be a positive integer, got ${JSON.stringify(gen)}`);
 }
 
+export const STATUS_LINE_COMMAND = 'fgos hook session-rotation --event status-line';
+
+export function isClaudeCodeBinding(binding, runnerConfig) {
+  const cli = (binding?.cli ?? '').toLowerCase();
+  if (cli) {
+    if (cli === 'claude') return true;
+    if (['codex', 'pi', 'agy', 'omp', 'gemini'].includes(cli)) return false;
+  }
+  const family = (binding?.family ?? '').toLowerCase();
+  if (family) {
+    if (family === 'claude') return true;
+    if (['codex', 'pi', 'agy', 'openai', 'gemini'].includes(family)) return false;
+  }
+  const executorId = binding?.executor ?? 'claude';
+  const exec = runnerConfig?.executors?.[executorId];
+  if (exec) {
+    const prov = (exec.providerModel || exec.provider || '').toLowerCase();
+    if (prov) {
+      if (prov === 'claude') return true;
+      if (['codex', 'pi', 'agy', 'openai', 'gemini'].includes(prov)) return false;
+    }
+    if (exec.command) {
+      const base = path.basename(String(exec.command)).toLowerCase();
+      if (base === 'claude') return true;
+      if (['codex', 'pi', 'agy'].includes(base)) return false;
+    }
+    if (Array.isArray(exec.invocations) && exec.invocations.length > 0) {
+      const inv = exec.invocations.find((i) => !binding?.invocation || i.id === binding?.invocation) ?? exec.invocations[0];
+      if (inv?.command) {
+        const base = path.basename(String(inv.command)).toLowerCase();
+        if (base === 'claude') return true;
+        if (['codex', 'pi', 'agy'].includes(base)) return false;
+      }
+    }
+  }
+  return executorId === 'claude';
+}
+
+export function mergeStatusLineSettings(args = []) {
+  const result = [...args];
+  const STATUS_LINE = {
+    type: 'command',
+    command: STATUS_LINE_COMMAND,
+  };
+  const idx = result.findIndex((a) => a === '--settings' || (typeof a === 'string' && a.startsWith('--settings=')));
+  if (idx >= 0) {
+    if (result[idx].startsWith('--settings=')) {
+      const raw = result[idx].slice('--settings='.length);
+      let parsed = null;
+      try { parsed = JSON.parse(raw); } catch {}
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        parsed.statusLine = STATUS_LINE;
+        result[idx] = `--settings=${JSON.stringify(parsed)}`;
+      }
+    } else if (idx + 1 < result.length) {
+      const raw = result[idx + 1];
+      let parsed = null;
+      if (typeof raw === 'object' && raw !== null && !Array.isArray(raw)) {
+        parsed = { ...raw };
+      } else if (typeof raw === 'string') {
+        try { parsed = JSON.parse(raw); } catch {}
+      }
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        parsed.statusLine = STATUS_LINE;
+        result[idx + 1] = JSON.stringify(parsed);
+      }
+    }
+  } else {
+    result.push('--settings', JSON.stringify({ statusLine: STATUS_LINE }));
+  }
+  return result;
+}
+
+export function withHeadSettings(runnerConfig, binding) {
+  if (!isClaudeCodeBinding(binding, runnerConfig)) {
+    return runnerConfig;
+  }
+  const executorId = binding?.executor ?? 'claude';
+  const exec = runnerConfig?.executors?.[executorId];
+  if (!exec || !Array.isArray(exec.invocations) || exec.invocations.length === 0) {
+    return runnerConfig;
+  }
+  const invocationId = binding?.invocation;
+  const hasMatch = invocationId
+    ? exec.invocations.some((inv) => inv?.id === invocationId)
+    : true;
+  if (!hasMatch) {
+    return runnerConfig;
+  }
+  const cfg = structuredClone(runnerConfig);
+  const targetExec = cfg.executors[executorId];
+  for (const inv of targetExec.invocations) {
+    if (!invocationId || inv?.id === invocationId) {
+      inv.args = mergeStatusLineSettings(inv.args);
+    }
+  }
+  return cfg;
+}
+
 /**
  * Binds a seat and launches the head of `persona` and `name` as a confined supervised attempt: the one launch path
  * of a head, with no check of who holds the role and no record of where it went. `startHeadSession` calls it for a
@@ -254,9 +353,10 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
   const text = await (ports.opening ?? defaultOpening)({ persona, name, projectRoot, pinned, handoff, forQuestion, task: taskBriefOf(persona, task) });
   const runnerConfig = await (ports.runnerConfig ?? defaultRunnerConfig)(projectRoot);
   const binding = await (ports.bind ?? bindHeadSeat)({ persona, key, runnerConfig, runtimeDir: ports.runtimeDir });
+  const launchRunnerConfig = withHeadSettings(runnerConfig, binding);
 
   const request = {
-    binding, runnerConfig, key, role, grant, opening: text, ceilingMs: HEAD_HARD_CEILING_MS,
+    binding, runnerConfig: launchRunnerConfig, key, role, grant, opening: text, ceilingMs: HEAD_HARD_CEILING_MS,
     // The sandbox gives every launch a private writable tmpfs at /tmp (bwrap driver `--tmpfs /tmp`), so /tmp is the head's own scratch, not the shared one.
     env: { TMPDIR: '/tmp', FGOS_HEAD_ROLE: role, FGOS_HEAD_PERSONA: persona, FGOS_HEAD_NAME: name, FGOS_HEAD_GEN: String(generation) },
     projectRoot, beside, display: { role: persona, title: subjectOfHead(persona, name, task) },

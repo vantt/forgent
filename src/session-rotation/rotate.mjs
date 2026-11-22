@@ -37,6 +37,7 @@ import { seatSessionDir } from '../runner/dispatch/confinement/authority.mjs';
 import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
 import { redactText, writeHandoff } from './handoff-store.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
+import { providerCapacityStatePaths, quarantineProviderAccount } from '../runner/dispatch/provider-capacity.mjs';
 
 export const ROTATION_REASONS = Object.freeze(['soft', 'hard', 'manual']);
 /** The reason of a stop that measured below soft: nothing is rotated, the stop is only recorded. */
@@ -55,7 +56,7 @@ const CLOSE_WAIT_MS = 60_000;
 // How long a manual rotation waits for the old session to end the turn it asked for the rotation in, so the message
 // it writes after the request (where the secretary batches its open questions) is the one handed over.
 const FINAL_TURN_WAIT_MS = 60_000;
-const STOP_FACT_KEYS = ['sessionId', 'portfolio', 'delta', 'lastAssistantMessage', 'pendingQuestion', 'sessionCrons', 'backgroundTasks'];
+const STOP_FACT_KEYS = ['sessionId', 'portfolio', 'delta', 'lastAssistantMessage', 'pendingQuestion', 'sessionCrons', 'backgroundTasks', 'quota'];
 const CRON_FACT_KEYS = ['schedule', 'prompt', 'recurring'];
 const TASK_FACT_KEYS = ['id', 'command', 'description'];
 
@@ -70,7 +71,7 @@ export class RotationError extends Error {
 
 const fail = (code, message) => { throw new RotationError(code, message); };
 
-/** `{ sessionId?, portfolio?, delta?, lastAssistantMessage?, pendingQuestion?, sessionCrons?, backgroundTasks? }` checked and bounded; anything else is refused. */
+/** `{ sessionId?, portfolio?, delta?, lastAssistantMessage?, pendingQuestion?, sessionCrons?, backgroundTasks?, quota? }` checked and bounded; anything else is refused. */
 export function checkStopFacts(facts) {
   if (facts === undefined || facts === null) return {};
   if (typeof facts !== 'object' || Array.isArray(facts)) fail('bad-stop-facts', 'stopFacts must be an object');
@@ -92,6 +93,21 @@ export function checkStopFacts(facts) {
             fail('bad-stop-facts', `${key} entry field ${field} must be a string of at most ${MAX_TEXT} characters`);
           }
         }
+      }
+    } else if (key === 'quota') {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) fail('bad-stop-facts', 'quota must be an object');
+      for (const [field, val] of Object.entries(value)) {
+        if (!['weeklyUsed', 'resetsAt'].includes(field)) fail('bad-stop-facts', `unknown quota field ${JSON.stringify(field)}`);
+        if (field === 'weeklyUsed') {
+          if (typeof val !== 'number' || !Number.isFinite(val)) fail('bad-stop-facts', 'quota field weeklyUsed must be a number');
+        } else if (field === 'resetsAt') {
+          if (val !== null && (typeof val !== 'string' || val.length > MAX_TEXT)) {
+            fail('bad-stop-facts', 'quota field resetsAt must be a string');
+          }
+        }
+      }
+      if (typeof value.weeklyUsed !== 'number' || !Number.isFinite(value.weeklyUsed)) {
+        fail('bad-stop-facts', 'quota field weeklyUsed must be a number');
       }
     } else if (value !== null && (typeof value !== 'string' || value.length > MAX_TEXT)) {
       fail('bad-stop-facts', `${key} must be a string of at most ${MAX_TEXT} characters`);
@@ -157,6 +173,36 @@ const incident = (dir, line) => {
     fs.appendFileSync(path.join(dir, 'incidents.jsonl'), `${JSON.stringify({ at: new Date().toISOString(), ...line })}\n`, { mode: FILE_MODE });
   } catch { /* the incident line is best effort; the returned reason is the record that matters */ }
 };
+
+function logRotation(dir, message) {
+  try {
+    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+    const line = `[${new Date().toISOString()}] ${message}\n`;
+    fs.appendFileSync(path.join(dir, 'rotation.log'), line, { mode: FILE_MODE });
+  } catch { /* logging to rotation.log is best effort */ }
+}
+
+function findPredecessorLease(persona, name, gen, runtimeDir, ports) {
+  if (ports?.predecessorLease) return ports.predecessorLease;
+  if (!gen) return null;
+  const assignmentId = headKeyOf(persona, name, gen);
+  const statePath = (ports?.providerCapacityStatePaths ?? providerCapacityStatePaths)(runtimeDir).statePath;
+  let state = null;
+  try {
+    if (fs.existsSync(statePath)) {
+      state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    }
+  } catch {
+    state = null;
+  }
+  const assignments = state?.assignments ?? {};
+  const heldKey = Object.keys(assignments).find((k) => k.endsWith(`:${assignmentId}`));
+  if (!heldKey) return null;
+  const provider = heldKey.slice(0, -(assignmentId.length + 1));
+  const accountId = assignments[heldKey]?.accountId;
+  if (!provider || !accountId) return null;
+  return { provider, accountId };
+}
 
 /**
  * Appends one line for a stop to the lineage's `stop-trace.jsonl` (what the stop measured, decided and how the request
@@ -494,9 +540,35 @@ export async function rotateHeadSession(request, ports = {}) {
       executor: (ports.selfRecord ?? selfRecord)(), old,
     });
 
+    if (stopFacts.quota) {
+      const lease = findPredecessorLease(persona, name, old?.gen, ports.runtimeDir, ports);
+      const resetsAt = stopFacts.quota.resetsAt;
+      if (!lease) {
+        logRotation(dir, `missing lease record for quota rotation of ${role}`);
+      }
+      if (!resetsAt || typeof resetsAt !== 'string' || !resetsAt.trim()) {
+        logRotation(dir, `missing reset time for quota rotation of ${role}`);
+      }
+      if (lease && resetsAt && typeof resetsAt === 'string' && resetsAt.trim()) {
+        try {
+          const quarantine = ports.quarantineProviderAccount ?? quarantineProviderAccount;
+          quarantine({
+            provider: lease.provider,
+            accountId: lease.accountId,
+            reasonCode: 'quota-limit',
+            until: resetsAt,
+            resetKnown: true,
+            runtimeDir: ports.runtimeDir,
+          });
+        } catch (err) {
+          logRotation(dir, `failed to quarantine account ${lease.provider}/${lease.accountId}: ${err.message}`);
+        }
+      }
+    }
+
     try {
       // The successor's tab opens beside the slot the role holder's Identity record names.
-      successor = await (ports.place ?? placeHead)({ persona, name, projectRoot, beside: slotKeyOf(holder.record), gen }, ports.placePorts ?? {});
+      successor = await (ports.place ?? placeHead)({ persona, name, projectRoot, beside: slotKeyOf(holder.record), gen }, { runtimeDir: ports.runtimeDir, ...(ports.placePorts ?? {}) });
       writeJson(dir, 'rotation.json', { ...readJson(pendingFile), successor });
     } catch (err) {
       if (isOldRunStopped()) {

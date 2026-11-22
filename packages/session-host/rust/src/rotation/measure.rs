@@ -18,6 +18,12 @@ pub enum Source {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+pub struct QuotaRecord {
+    pub weekly_used: f64,
+    pub resets_at: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct Measure {
     pub fraction: f64,
     pub tokens: u64,
@@ -25,6 +31,7 @@ pub struct Measure {
     pub source: Source,
     /// The transcript lags one turn at Stop; a sidecar record newer than the hook is current.
     pub stale: bool,
+    pub quota: Option<QuotaRecord>,
 }
 
 fn lines_of(file: &Path) -> Vec<Value> {
@@ -106,6 +113,26 @@ fn tokens_of(usage: &Value) -> u64 {
     .sum()
 }
 
+fn quota_of(q: &Value) -> Option<QuotaRecord> {
+    let weekly_used = q.get("weeklyUsed")?.as_f64()?;
+    let resets_at = q.get("resetsAt")?.as_str()?.to_string();
+    Some(QuotaRecord {
+        weekly_used,
+        resets_at: Some(resets_at),
+    })
+}
+
+/// Computes the sidecar file path beside a session transcript:
+/// `<dir of transcript_path>/<session_id>.context-sidecar.jsonl`.
+pub fn sidecar_path(transcript: &Path, session_id: &str) -> Option<std::path::PathBuf> {
+    if session_id.is_empty() {
+        return None;
+    }
+    transcript
+        .parent()
+        .map(|p| p.join(format!("{session_id}.context-sidecar.jsonl")))
+}
+
 /// Fraction from one sidecar record, or `None` when it carries no usage or window.
 pub fn from_sidecar_record(record: &Value) -> Option<Measure> {
     let window = record.get("context_window")?;
@@ -115,12 +142,14 @@ pub fn from_sidecar_record(record: &Value) -> Option<Measure> {
         .as_u64()
         .filter(|s| *s > 0)?;
     let tokens = tokens_of(usage);
+    let quota = record.get("quota").and_then(quota_of);
     Some(Measure {
         fraction: tokens as f64 / size as f64,
         tokens,
         window_size: size,
         source: Source::Sidecar,
         stale: false,
+        quota,
     })
 }
 
@@ -189,6 +218,7 @@ pub fn from_transcript(transcript: &Path, window_size: u64) -> Option<Measure> {
         window_size,
         source: Source::Transcript,
         stale: true,
+        quota: None,
     })
 }
 
@@ -216,7 +246,18 @@ fn writer_seen(sidecar: &Path, session_id: Option<&str>) -> bool {
 /// neither has data.
 pub fn measure(sources: &Sources, wait: Duration) -> Option<Measure> {
     let deadline = Instant::now() + wait;
-    if let Some(sidecar) = sources.sidecar {
+    let derived_sidecar;
+    let sidecar_opt = match sources.sidecar {
+        Some(s) => Some(s),
+        None => {
+            derived_sidecar = match (sources.transcript, sources.session_id) {
+                (Some(t), Some(s)) => sidecar_path(t, s),
+                _ => None,
+            };
+            derived_sidecar.as_deref()
+        }
+    };
+    if let Some(sidecar) = sidecar_opt {
         loop {
             if let Some(fresh) =
                 latest_sidecar_record(sidecar, sources.session_id, sources.after_ms)
@@ -276,6 +317,92 @@ mod tests {
             after_ms,
             window_size: 1_000_000,
         }
+    }
+
+    #[test]
+    fn a_fresh_sidecar_record_returns_quota_with_the_context_fraction() {
+        let d = dir("quota");
+        let sidecar = write(
+            &d,
+            "quota.jsonl",
+            &[json!({
+                "ts": 300,
+                "session_id": "s",
+                "context_window": {
+                    "context_window_size": 1_000_000,
+                    "current_usage": { "input_tokens": 500_000 }
+                },
+                "quota": {
+                    "weeklyUsed": 0.85,
+                    "resetsAt": "2026-11-28T16:00:00Z"
+                }
+            })],
+        );
+        let m = measure(&sources(Some(&sidecar), None, 200), Duration::ZERO).unwrap();
+        assert_eq!(m.fraction, 0.5);
+        assert_eq!(
+            m.quota,
+            Some(QuotaRecord {
+                weekly_used: 0.85,
+                resets_at: Some("2026-11-28T16:00:00Z".to_string())
+            })
+        );
+    }
+
+    #[test]
+    fn numeric_or_missing_resets_at_yields_no_quota() {
+        assert_eq!(
+            quota_of(&json!({ "weeklyUsed": 0.5, "resetsAt": 1732800000 })),
+            None
+        );
+        assert_eq!(quota_of(&json!({ "weeklyUsed": 0.5 })), None);
+    }
+
+    #[test]
+    fn integer_current_usage_yields_none() {
+        let rec = json!({
+            "context_window": {
+                "context_window_size": 1000,
+                "current_usage": 500
+            }
+        });
+        assert_eq!(from_sidecar_record(&rec), None);
+    }
+
+    #[test]
+    fn measure_reads_sidecar_beside_transcript_when_sidecar_source_is_none() {
+        let d = dir("beside");
+        let transcript = d.join("s.jsonl");
+        std::fs::write(&transcript, "").unwrap();
+        let sidecar = d.join("s.context-sidecar.jsonl");
+        std::fs::write(
+            &sidecar,
+            format!(
+                "{}\n",
+                json!({
+                    "ts": 500,
+                    "session_id": "s",
+                    "context_window": {
+                        "context_window_size": 1000,
+                        "current_usage": { "input_tokens": 400 }
+                    }
+                })
+            ),
+        )
+        .unwrap();
+        let m = measure(
+            &Sources {
+                sidecar: None,
+                transcript: Some(&transcript),
+                session_id: Some("s"),
+                after_ms: 100,
+                window_size: 1000,
+            },
+            Duration::ZERO,
+        )
+        .unwrap();
+        assert_eq!(m.fraction, 0.4);
+        assert_eq!(m.source, Source::Sidecar);
     }
 
     #[test]
