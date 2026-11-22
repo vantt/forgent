@@ -1,6 +1,6 @@
 ---
 id: ds-sovgvawfyv
-title: "Red tests on main and the docs/backlog.md to plans/backlog.md sweep"
+title: "Red tests on main and the docs/backlog.md sweep"
 status: settled
 source:
   - p-vnsigyw6h7
@@ -11,11 +11,13 @@ discussion: settled
 
 ## Hand-off to the planner
 
-Seeded by head:supervisor-forgent from backlog row `p-vnsigyw6h7` on the secretary's order (coordination event `f1dfb666f976e854`, 2026-11-22). The topic needs no shaping round: the row's "Why", "Done when" and triage notes are the whole content, and the secretary set the rules below.
+- **Outcome:** `npm test` and `cargo test --workspace` are green on main, and no file still names `docs/backlog.md` or `docs/discussions` except the migration reader, the pre-move history fallback and their tests.
+- **Constraints (owner, 2026-11-22 07:52):** P1, ranked below plan `261122-0118-heads-stable-and-able`. ONE lane. The footprint is disjoint from 0118's; 0118 holds `test/session-host/head-start.test.mjs`, so that case goes to 0118 or waits for it. No assertion is weakened; a stale test is updated to the landed behaviour.
+- **Non-goals:** the execution-door seam reds (`dispatch-reconciliation-import-graph`), which lead:S6A fixed in p20-3a; the reds that look environmental (one-door scan, install-packaging EISDIR, `cli_tests.rs:3666`, `supervise_portable.rs:274`, `mailbox-live-confined.test.mjs:289`), which are only re-measured and shown environmental or opened as their own row.
+- **Acceptance criteria:** every red in the Notes triage of `p-vnsigyw6h7` is green or shown environmental with evidence; the path sweep is redone on the current tip, not copied from the abandoned `261120-0625-work-data-model-p05k` draft; `policy.v1.json` changes go through its golden recorder; both suites green.
+- **Evidence:** the Notes of `plans/backlog/p-vnsigyw6h7-two-tests-are-red-on-main-head-start-probe.md` (cause commit per red); full-suite logs `forgent-worktrees/main-npm-test-ce1ef4d36.log` and `main-cargo-test-ce1ef4d36.log`.
+- **Open points:** none.
 
-- **Outcome:** `npm test` and `cargo test --workspace` on main carry no red caused by landed code, so a lead's gate shows only its own reds. Every red the row traces to a landed commit asserts the behaviour that landed; the `docs/backlog.md` and `docs/discussions` references left on main by the portfolio move point at `plans/backlog.md` and `plans/discussions`.
-- **Constraints (secretary, 2026-11-22):** one lane; priority P1, ordered below plan `261122-0118-heads-stable-and-able`; footprint disjoint from that plan's footprint. No assertion is weakened (design principle 8); a test whose behaviour moved names its new owner. Redo the backlog-path sweep on the current tip; do not copy the patch in the abandoned worktree `261120-0625-work-data-model-p05k`. `policy.v1.json` is golden-guarded: regenerate it with its recorder, never by hand.
-- **Non-goals:** the execution door seam reds (`test/runner/dispatch-reconciliation-import-graph.test.mjs:251,279`), which plan S6a owns; the reds the row marks "likely environmental, unproven" beyond proving or disproving them, unless a proof shows a code cause.
-- **Acceptance criteria:** each red listed in `plans/backlog/p-vnsigyw6h7-two-tests-are-red-on-main-head-start-probe.md` (head-start probe, guide-schema count with bugfix playbook, subcommand-flag drift `migrate`, confinement `docs/discussions`, convention-conformance `plans/backlog/*`, tab-label separator in two tests, config scrub needle, `secretary.schema.yaml` in `SCHEMAS`) is green with the landed behaviour asserted; `rg 'docs/backlog\.md|docs/discussions'` on main finds only historical records (plans, reports, decision history); the environmental four are each proven environmental or fixed; `npm test` and `cargo test --workspace` green except S6a's seam reds.
-- **Open points:** none blocking.
-- **Source ids:** `p-vnsigyw6h7`.
+## Log
+
+- 2026-11-22 08:20, lead:SUPERVISOR: written for the secretary, who cannot create files, so the supervisor head can start one planner. No shaping rounds were needed; the backlog row carries the triage.
