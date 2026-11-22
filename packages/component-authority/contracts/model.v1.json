@@ -191,6 +191,7 @@
           "items": { "type": "string" }
         },
         "meaning": { "type": "string" },
+        "reason": { "type": "string" },
         "provider": { "type": "string" },
         "consumers": {
           "type": "array",

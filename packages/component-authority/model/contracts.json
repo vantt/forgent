@@ -15,7 +15,8 @@
       "bin/fgos.mjs",
       "src/cli/"
     ],
-    "status": "live"
+    "status": "live",
+    "reason": "host-surface owns the CLI fgos.v1 envelope and exit taxonomy; schema file lives under packages/host-runtime/contracts/ which no component paths[] entry covers."
   },
   {
     "id": "CTR002",
@@ -29,7 +30,8 @@
       "src/state/dep-graph.mjs",
       "docs/platform/work-state/spec.md"
     ],
-    "status": "live"
+    "status": "live",
+    "path": "src/state/store.mjs"
   },
   {
     "id": "CTR003",
@@ -43,7 +45,8 @@
       "src/runner/dispatch/",
       "src/runner/worktree.mjs"
     ],
-    "status": "live"
+    "status": "live",
+    "path": "src/runner/loop.mjs"
   },
   {
     "id": "CTR004",
@@ -58,7 +61,8 @@
       "docs/platform/work-state/spec.md",
       "src/state/"
     ],
-    "status": "live"
+    "status": "live",
+    "path": "docs/platform/work-state/spec.md"
   },
   {
     "id": "CTR005",
@@ -84,7 +88,8 @@
     "evidence": [
       "docs/platform/runner/contracts/routing-handoff.md"
     ],
-    "status": "designed"
+    "status": "designed",
+    "reason": "runner owns the agent↔agent routing-handoff boundary; file sits under docs/platform/runner/contracts/ whose longest path prefix is executor-model."
   },
   {
     "id": "CTR007",
@@ -147,7 +152,8 @@
       "packages/execution/contracts/transport/**",
       "packages/execution/contracts/unit-run/**"
     ],
-    "status": "live"
+    "status": "live",
+    "reason": "executor-model owns executor.v1; machine schema lives under packages/execution/contracts/ which no component paths[] entry covers (executor-model paths only cover docs/platform/runner/contracts/)."
   },
   {
     "id": "CTR010",
@@ -166,7 +172,8 @@
       "docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml",
       "apps/fgos-gateway/"
     ],
-    "status": "live"
+    "status": "live",
+    "reason": "fgos-gateway owns the REST/OpenAPI surface; yaml lives under docs/platform/herdr-web-dashboard/contracts/ which no component paths[] entry covers."
   },
   {
     "id": "CTR011",
@@ -178,7 +185,7 @@
     "meaning": "dispatch ↔ executor adapter: confinement-authority.v1 — prepareConfinementForLaunch door, policy/plan/attestation, fail-closed required.",
     "provider": "agent-confinement",
     "consumers": [
-      "runner",
+      "dispatch-transport",
       "execution-core"
     ],
     "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
@@ -221,7 +228,7 @@
     "meaning": "Assignment repository ↔ Dispatch Control Plane: immutable Assignment request across attempts/recovery; DispatchPlan carried in assignment-run.v2.",
     "provider": "agent-coordination",
     "consumers": [
-      "runner",
+      "dispatch-transport",
       "execution-core"
     ],
     "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
@@ -656,7 +663,8 @@
     "consumers": [],
     "path": "docs/platform/runner/contracts/conserved-dispatch-doctrine.md",
     "evidence": [],
-    "status": "live"
+    "status": "live",
+    "reason": "runner owns conserved dispatch doctrine prose; file sits under docs/platform/runner/contracts/ whose longest path prefix is executor-model."
   },
   {
     "id": "docs.runner/executor-model",
@@ -678,7 +686,8 @@
     "consumers": [],
     "path": "docs/platform/runner/contracts/h-b3eb60fb4d2b.md",
     "evidence": [],
-    "status": "live"
+    "status": "live",
+    "reason": "runner owns this runner decision/prose contract; file sits under docs/platform/runner/contracts/ whose longest path prefix is executor-model."
   },
   {
     "id": "docs.runner/unit-run-result",
@@ -689,7 +698,8 @@
     "consumers": [],
     "path": "docs/platform/runner/contracts/unit-run-result.md",
     "evidence": [],
-    "status": "live"
+    "status": "live",
+    "reason": "run-result owns unit-run-result semantics; prose file sits under docs/platform/runner/contracts/ whose longest path prefix is executor-model."
   },
   {
     "id": "docs.ui-spec/15-system-events",
@@ -1485,8 +1495,8 @@
     "id": "process/process-facts.judge.v1",
     "canonical": "process/process-facts.judge.v1",
     "aliases": [],
-    "meaning": "Machine-readable contract file process-facts.judge.v1.json owned under packages/process/contracts/. Provider process via package-vs-narrow-prefix (component path prefix did not cover this file).",
-    "provider": "process",
+    "meaning": "Machine-readable contract file process-facts.judge.v1.json under packages/process/contracts/ (containment-port path owner).",
+    "provider": "containment-port",
     "consumers": [],
     "path": "packages/process/contracts/process-facts.judge.v1.json",
     "evidence": [],

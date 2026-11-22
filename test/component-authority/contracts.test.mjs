@@ -19,9 +19,10 @@ const contractDef = schema.$defs.contract;
 const validStatuses = new Set(contractDef.properties.status.enum);
 
 /** Top-level files under packages/<pkg>/contracts/ (not nested fixtures or vectors). */
-function listPackageContractFiles() {
+function listPackageContractFiles(repoRoot) {
   const out = [];
-  const packagesDir = path.join(root, 'packages');
+  const packagesDir = path.join(repoRoot, 'packages');
+  if (!fs.existsSync(packagesDir)) return out;
   for (const pkg of fs.readdirSync(packagesDir)) {
     const cdir = path.join(packagesDir, pkg, 'contracts');
     if (!fs.existsSync(cdir) || !fs.statSync(cdir).isDirectory()) continue;
@@ -34,10 +35,14 @@ function listPackageContractFiles() {
   return out.sort();
 }
 
-/** Top-level docs/platform/<area>/contracts markdown or yaml files. */
-function listProseContractFiles() {
+/**
+ * Top-level docs/platform/<area>/contracts markdown or yaml files.
+ * .yaml is included because live prose contracts such as CTR010
+ * (fgos-gateway-api-v1.yaml) are OpenAPI YAML under docs/platform/.../contracts/.
+ */
+function listProseContractFiles(repoRoot) {
   const out = [];
-  const platformDir = path.join(root, 'docs/platform');
+  const platformDir = path.join(repoRoot, 'docs/platform');
   if (!fs.existsSync(platformDir)) return out;
   for (const area of fs.readdirSync(platformDir)) {
     const cdir = path.join(platformDir, area, 'contracts');
@@ -78,6 +83,10 @@ function assertContractShape(row, label) {
     assert.equal(typeof row.path, 'string');
     assert.ok(row.path.length > 0, `${label} empty path`);
   }
+  if (row.reason !== undefined) {
+    assert.equal(typeof row.reason, 'string');
+    assert.ok(row.reason.length > 0, `${label} empty reason`);
+  }
   if (row.guards !== undefined) {
     if (Array.isArray(row.guards)) {
       for (const g of row.guards) assert.equal(typeof g, 'string');
@@ -90,21 +99,14 @@ function assertContractShape(row, label) {
   }
 }
 
-test('contracts.json rows validate against model.v1.json $defs/contract', () => {
-  assert.ok(Array.isArray(contracts), 'contracts.json must be an array');
-  assert.ok(contracts.length > 0, 'contracts.json must not be empty');
-  for (const [idx, row] of contracts.entries()) {
-    assertContractShape(row, `contracts[${idx}] (${row.id})`);
-  }
-});
-
-test('every top-level package contract file and every prose contract has exactly one row', () => {
-  const packageFiles = listPackageContractFiles();
-  const proseFiles = listProseContractFiles();
+/** Every top-level package/prose contract file under root has exactly one row. */
+function assertContractFileCoverage(rows, repoRoot) {
+  const packageFiles = listPackageContractFiles(repoRoot);
+  const proseFiles = listProseContractFiles(repoRoot);
   const allFiles = [...packageFiles, ...proseFiles];
 
   const pathCounts = new Map();
-  for (const row of contracts) {
+  for (const row of rows) {
     if (!row.path) continue;
     pathCounts.set(row.path, (pathCounts.get(row.path) || 0) + 1);
   }
@@ -117,6 +119,67 @@ test('every top-level package contract file and every prose contract has exactly
       `contract file ${file} must have exactly one row, found ${n}`,
     );
   }
+}
+
+/** Every row has a non-empty provider string. */
+function assertProvidersPresent(rows) {
+  for (const row of rows) {
+    assert.equal(typeof row.provider, 'string', `${row.id ?? '<row>'} provider must be a string`);
+    assert.ok(
+      row.provider && row.provider.length > 0,
+      `${row.id ?? '<row>'} missing provider`,
+    );
+  }
+}
+
+/**
+ * live and designed rows must set path, and that path must exist under repoRoot.
+ * No skip when path is unset.
+ */
+function assertLiveDesignedPathsExist(rows, repoRoot) {
+  for (const row of rows) {
+    if (row.status !== 'live' && row.status !== 'designed') continue;
+    assert.ok(
+      typeof row.path === 'string' && row.path.length > 0,
+      `${row.id} status ${row.status} must have path set`,
+    );
+    assert.ok(
+      fs.existsSync(path.join(repoRoot, row.path)),
+      `${row.id} status ${row.status} path missing: ${row.path}`,
+    );
+  }
+}
+
+/** Longest components.json paths[] prefix that covers filePath, or null. */
+function longestPathOwner(filePath, componentRows) {
+  let best = null;
+  let bestLen = -1;
+  for (const comp of componentRows) {
+    const paths = Array.isArray(comp.paths) ? comp.paths : [];
+    for (const raw of paths) {
+      if (typeof raw !== 'string' || raw.length === 0) continue;
+      const pref = raw.replace(/\\/g, '/').replace(/\/+$/, '');
+      if (filePath === pref || filePath.startsWith(pref + '/')) {
+        if (pref.length > bestLen) {
+          best = comp.id;
+          bestLen = pref.length;
+        }
+      }
+    }
+  }
+  return best;
+}
+
+test('contracts.json rows validate against model.v1.json $defs/contract', () => {
+  assert.ok(Array.isArray(contracts), 'contracts.json must be an array');
+  assert.ok(contracts.length > 0, 'contracts.json must not be empty');
+  for (const [idx, row] of contracts.entries()) {
+    assertContractShape(row, `contracts[${idx}] (${row.id})`);
+  }
+});
+
+test('every top-level package contract file and every prose contract has exactly one row', () => {
+  assertContractFileCoverage(contracts, root);
 
   // No row path points at a missing top-level file that should be indexed as live/designed
   for (const row of contracts) {
@@ -130,9 +193,8 @@ test('every top-level package contract file and every prose contract has exactly
 });
 
 test('every row has exactly one provider that exists in components.json', () => {
+  assertProvidersPresent(contracts);
   for (const row of contracts) {
-    assert.equal(typeof row.provider, 'string');
-    assert.ok(row.provider.length > 0, `${row.id} missing provider`);
     assert.ok(
       componentIds.has(row.provider),
       `${row.id} provider "${row.provider}" is not a component id`,
@@ -151,15 +213,8 @@ test('every consumer exists in components.json', () => {
   }
 });
 
-test('live and designed rows name an existing path when path is set', () => {
-  for (const row of contracts) {
-    if (row.status !== 'live' && row.status !== 'designed') continue;
-    if (row.path === undefined) continue;
-    assert.ok(
-      fs.existsSync(path.join(root, row.path)),
-      `${row.id} status ${row.status} path missing: ${row.path}`,
-    );
-  }
+test('live and designed rows name an existing path', () => {
+  assertLiveDesignedPathsExist(contracts, root);
 });
 
 test('id, canonical and aliases are unique across contracts (case-insensitive)', () => {
@@ -199,45 +254,95 @@ test('id, canonical and aliases are unique across contracts (case-insensitive)',
   }
 });
 
-test('synthetic: provider-less row and missing file fail shape and existence checks', () => {
+test('provider differing from longest-prefix path owner carries reason', () => {
+  for (const row of contracts) {
+    if (!row.path) continue;
+    const owner = longestPathOwner(row.path, components);
+    if (!owner || owner === row.provider) continue;
+    assert.equal(
+      typeof row.reason,
+      'string',
+      `${row.id} provider "${row.provider}" differs from path owner "${owner}" for ${row.path} but reason is missing`,
+    );
+    assert.ok(
+      row.reason.length > 0,
+      `${row.id} provider "${row.provider}" differs from path owner "${owner}" for ${row.path} but reason is empty`,
+    );
+  }
+});
+
+test('synthetic: coverage, provider, and path-existence checks fail with named file or row', () => {
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ca-contracts-'));
   try {
-    const badProviderRow = {
-      id: 'synthetic-no-provider',
-      canonical: 'synthetic-no-provider',
+    const orphanRel = 'packages/orphan-pkg/contracts/unindexed.v1.json';
+    fs.mkdirSync(path.join(tmpRoot, 'packages/orphan-pkg/contracts'), { recursive: true });
+    fs.writeFileSync(path.join(tmpRoot, orphanRel), '{}\n');
+
+    const baseRow = {
+      id: 'synthetic-ok',
+      canonical: 'synthetic-ok',
       aliases: [],
-      meaning: 'synthetic row without provider for negative test',
-      // provider intentionally omitted
+      meaning: 'synthetic baseline row',
+      provider: 'component-authority',
       consumers: [],
       evidence: [],
       status: 'live',
-      path: 'packages/does-not-exist/contracts/missing.v1.json',
+      path: orphanRel,
     };
+
+    // Coverage: contracts dir holds a file with no row
     assert.throws(
-      () => assertContractShape(badProviderRow, 'synthetic-no-provider'),
-      /missing required field "provider"/,
+      () => assertContractFileCoverage([], tmpRoot),
+      (err) => {
+        assert.match(String(err.message), /unindexed\.v1\.json/);
+        return true;
+      },
     );
 
-    const withProviderMissingFile = {
-      ...badProviderRow,
-      provider: 'component-authority',
+    // Provider: provider-less row
+    const providerLess = { ...baseRow, id: 'synthetic-no-provider' };
+    delete providerLess.provider;
+    assert.throws(
+      () => assertProvidersPresent([providerLess]),
+      (err) => {
+        assert.match(String(err.message), /synthetic-no-provider/);
+        return true;
+      },
+    );
+
+    // Path existence: live row whose path is missing under temp root
+    const missingPathRow = {
+      ...baseRow,
+      id: 'synthetic-missing-path',
+      path: 'packages/orphan-pkg/contracts/does-not-exist.v1.json',
     };
-    assertContractShape(withProviderMissingFile, 'synthetic-with-provider');
-    assert.equal(
-      fs.existsSync(path.join(root, withProviderMissingFile.path)),
-      false,
-      'synthetic path must not exist',
+    assert.throws(
+      () => assertLiveDesignedPathsExist([missingPathRow], tmpRoot),
+      (err) => {
+        assert.match(String(err.message), /synthetic-missing-path/);
+        return true;
+      },
     );
-    assert.ok(
-      withProviderMissingFile.status === 'live' || withProviderMissingFile.status === 'designed',
-    );
-    // Mirror the live/designed path existence assertion from the real test
-    assert.equal(
-      fs.existsSync(path.join(tmpRoot, withProviderMissingFile.path)),
-      false,
+
+    // Live/designed without path set also fails (no skip when unset)
+    const unsetPathRow = {
+      id: 'synthetic-unset-path',
+      canonical: 'synthetic-unset-path',
+      aliases: [],
+      meaning: 'live without path',
+      provider: 'component-authority',
+      consumers: [],
+      evidence: [],
+      status: 'live',
+    };
+    assert.throws(
+      () => assertLiveDesignedPathsExist([unsetPathRow], tmpRoot),
+      (err) => {
+        assert.match(String(err.message), /synthetic-unset-path/);
+        return true;
+      },
     );
   } finally {
     fs.rmSync(tmpRoot, { recursive: true, force: true });
   }
 });
-
