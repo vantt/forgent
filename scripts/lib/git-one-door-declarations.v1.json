@@ -23,6 +23,13 @@
       "retireWhen": "the scanner's Rust path classifies a shell whose script operand is configuration data as configured-binary, or worktree setup commands stop running through a shell"
     },
     {
+      "path": "packages/run-supervisor/rust/src/head_request.rs",
+      "siteId": "run_verb:aeba26434cfca4863448bf70db3ec085b1bbfca9377e9ee5cc082405c9d742df",
+      "class": "configured-binary",
+      "reason": "the host binary named by the project's activation record, read per request",
+      "retireWhen": "p-7aqs6rhb2k"
+    },
+    {
       "path": "packages/supervision/rust/src/land.rs",
       "siteId": "run:cdc7c50ed5243f3814732be4be5d94a22428f659fdd491986300a2a75894d2dd",
       "class": "configured-binary",

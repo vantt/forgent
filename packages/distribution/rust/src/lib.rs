@@ -235,59 +235,11 @@ pub fn resolve_cli_version_info() -> BuildShowOutcome {
     }
 }
 
-/// Where the activation record of the project at `workspace_root` is (it may not be there).
-pub fn activation_record_path(workspace_root: &std::path::Path) -> PathBuf {
-    workspace_root
-        .join(".fgos")
-        .join("installation")
-        .join("activation.json")
-}
+use fgos_host_runtime::activation::ready_activation;
+pub use fgos_host_runtime::activation::{activated_host_bin, activation_record_path};
 
 /// The activation record relative to a project root, with forward slashes.
 pub(crate) const ACTIVATION_RELATIVE: &str = ".fgos/installation/activation.json";
-
-/// The activation record of the project at `workspace_root` when it is there, parses and is `ready`.
-pub(crate) fn ready_activation(workspace_root: &std::path::Path) -> Option<serde_json::Value> {
-    let text = std::fs::read_to_string(activation_record_path(workspace_root)).ok()?;
-    let activation: serde_json::Value = serde_json::from_str(&text).ok()?;
-    (activation["status"].as_str() == Some("ready")).then_some(activation)
-}
-
-/// The host binary of the release the project at `workspace_root` has activated: `<releasePath>/bin/fgos`
-/// (or `fgos.exe`), an executable file that really sits inside the release. Never a checkout script, a
-/// project-local install or whatever `fgos` the PATH holds.
-pub fn activated_host_bin(workspace_root: &std::path::Path) -> Option<PathBuf> {
-    let activation = ready_activation(workspace_root)?;
-    let release = activation["releasePath"]
-        .as_str()
-        .filter(|p| !p.is_empty())?;
-    let base = std::path::absolute(release).ok()?;
-    let real_base = std::fs::canonicalize(&base).ok()?;
-    ["fgos", "fgos.exe"]
-        .iter()
-        .map(|name| base.join("bin").join(name))
-        .find(|candidate| {
-            is_executable_file(candidate)
-                && std::fs::canonicalize(candidate)
-                    .map(|real| real.starts_with(&real_base))
-                    .unwrap_or(false)
-        })
-}
-
-fn is_executable_file(path: &std::path::Path) -> bool {
-    let Ok(meta) = std::fs::metadata(path) else {
-        return false;
-    };
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        meta.is_file() && meta.permissions().mode() & 0o111 != 0
-    }
-    #[cfg(not(unix))]
-    {
-        meta.is_file()
-    }
-}
 
 /// Resolves the runtime identity info from .fgos/installation/activation.json (R10).
 pub fn resolve_runtime_identity_info() -> RuntimeIdentityInfo {

@@ -6,6 +6,8 @@
 //! `src/head_request.rs`.
 #![cfg(unix)]
 
+mod support;
+
 use std::collections::BTreeMap;
 use std::fs;
 use std::io::Write;
@@ -158,6 +160,20 @@ fn serve_with(
     verbs: &[&str],
     timeout: Duration,
 ) -> Served {
+    serve_config(name, script_body, holds, identity, verbs, timeout, |cfg| {
+        cfg
+    })
+}
+
+fn serve_config(
+    name: &str,
+    script_body: &str,
+    holds: Result<bool, String>,
+    identity: Identity,
+    verbs: &[&str],
+    timeout: Duration,
+    configure: impl FnOnce(Config) -> Config,
+) -> Served {
     let dir = std::env::temp_dir().join(format!("fgos-head-req-{name}-{}", std::process::id()));
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
@@ -179,9 +195,10 @@ fn serve_with(
     listener.set_nonblocking(true).unwrap();
     let log = Arc::new(Mutex::new(Vec::new()));
     let sink = log.clone();
-    let server = HeadRequests::new(Config {
+    let server = HeadRequests::new(configure(Config {
         run_dir: dir.clone(),
         host_bin: script.to_string_lossy().into_owned(),
+        request_host_bin: None,
         cwd: dir.clone(),
         env: BTreeMap::from([("OUT".to_string(), dir.to_string_lossy().into_owned())]),
         verbs: verbs.iter().map(|v| v.to_string()).collect(),
@@ -288,7 +305,7 @@ fn serve_with(
             }
         }),
         log: Box::new(move |line| sink.lock().unwrap().push(line.to_string())),
-    });
+    }));
     let stop = Arc::new(AtomicBool::new(false));
     let slowest = Arc::new(Mutex::new(Duration::ZERO));
     let (stop_flag, slowest_poll) = (stop.clone(), slowest.clone());
@@ -325,6 +342,152 @@ const GRANTED_WRITES: [&str; 7] = [
     "plans/backlog/*",
     "link/*",
 ];
+
+#[test]
+fn live_requests_pick_up_activation_but_dev_hosts_stay_pinned_and_bad_activation_falls_back() {
+    // This owns release selection at the socket boundary; the payload proof owns nested host calls.
+    for dev in [false, true] {
+        let name = if dev { "release-dev" } else { "release-live" };
+        let server = serve_config(
+            name,
+            "echo '{\"result\":\"done\",\"data\":{\"release\":\"dev\"}}'",
+            Ok(true),
+            Identity::default(),
+            &["session start"],
+            Duration::from_secs(5),
+            |mut cfg| {
+                let project = cfg.cwd.clone();
+                for release in ["one", "two"] {
+                    let bin = project.join(release).join("bin");
+                    fs::create_dir_all(&bin).unwrap();
+                    let host = bin.join("fgos");
+                    fs::write(&host, format!("#!/bin/sh\necho '{{\"result\":\"done\",\"data\":{{\"release\":\"{release}\"}}}}'\n")).unwrap();
+                    fs::set_permissions(host, fs::Permissions::from_mode(0o755)).unwrap();
+                }
+                let installation = project.join(".fgos/installation");
+                fs::create_dir_all(&installation).unwrap();
+                fs::write(
+                    installation.join("activation.json"),
+                    json!({"status":"ready", "releasePath":project.join("one")}).to_string(),
+                )
+                .unwrap();
+                if !dev {
+                    cfg.host_bin = project.join("one/bin/fgos").to_string_lossy().into_owned();
+                }
+                cfg.request_host_bin = Some(fgos_run_supervisor::head_request::request_host_bin(
+                    &project,
+                    &cfg.host_bin,
+                ));
+                cfg
+            },
+        );
+        assert_eq!(
+            ask(&server.socket, "session start")["data"]["release"],
+            if dev { "dev" } else { "one" }
+        );
+        let record = server.dir.join(".fgos/installation/activation.json");
+        fs::write(
+            &record,
+            json!({"status":"ready", "releasePath":server.dir.join("two")}).to_string(),
+        )
+        .unwrap();
+        assert_eq!(
+            ask(&server.socket, "session start")["data"]["release"],
+            if dev { "dev" } else { "two" }
+        );
+        for bad in [
+            "not json".to_string(),
+            json!({"status":"ready", "releasePath":server.dir.join("gone")}).to_string(),
+        ] {
+            fs::write(&record, bad).unwrap();
+            assert_eq!(
+                ask(&server.socket, "session start")["data"]["release"],
+                if dev { "dev" } else { "one" }
+            );
+        }
+        // Reply precedes the normal request log, but the fallback log always precedes the reply.
+        assert_eq!(
+            server
+                .log
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|line| line.starts_with("head-request r1 release-fallback: "))
+                .count(),
+            if dev { 0 } else { 2 }
+        );
+    }
+}
+
+#[test]
+fn only_the_head_request_handover_uses_the_active_payload_and_still_verifies_the_envelope() {
+    let project = state_root("release-handover", false);
+    let release = project.join("release");
+    fs::create_dir_all(release.join("bin")).unwrap();
+    let host = release.join("bin/fgos");
+    fs::copy(support::supervisor::internal_harness(), &host).unwrap();
+    let payload = release.join("libexec/legacy-node");
+    fs::create_dir_all(payload.join("src/session-host")).unwrap();
+    fs::write(payload.join("src/session-host/head-request.mjs"), "console.log(JSON.stringify({result:'done',data:{release:'new',host:process.env.FGOS_HEAD_REQUEST_HOST_BIN}}));").unwrap();
+    let manifest = release.join("manifest.json");
+    fs::write(
+        &manifest,
+        json!({"components":{"legacyNode":{"root":"libexec/legacy-node"}}}).to_string(),
+    )
+    .unwrap();
+    let installation = project.join(".fgos/installation");
+    fs::create_dir_all(&installation).unwrap();
+    fs::write(
+        installation.join("activation.json"),
+        json!({"status":"ready","releasePath":release}).to_string(),
+    )
+    .unwrap();
+    let mut envelope = json!({"v":3,"protocolId":1,"cwd":project,"hostBin":"/old-release/bin/fgos","payloadRoot":"/old-release/payload","session":{"requestSocketPath":"/unused"},"steps":[{"stepId":"finalize-home"}]});
+    envelope["digest"] = json!(fgos_run_supervisor::envelope::digest(&envelope).unwrap());
+    let file = project.join("envelope.json");
+    let before = envelope.to_string();
+    fs::write(&file, &before).unwrap();
+    let run = |route: &str| {
+        let mut cmd = std::process::Command::new(&host);
+        cmd.args(["internal", route]);
+        if route == "attempt-step" {
+            cmd.arg("finalize-home");
+        }
+        cmd.args(["--protocol", "1", "--run-dir"])
+            .arg(&project)
+            .output()
+            .unwrap()
+    };
+    let request = run("head-request");
+    assert!(
+        request.status.success(),
+        "{}",
+        String::from_utf8_lossy(&request.stderr)
+    );
+    let answer: Value = serde_json::from_slice(&request.stdout).unwrap();
+    assert_eq!(answer["data"]["release"], "new");
+    assert_eq!(answer["data"]["host"], host.to_str().unwrap());
+    assert_eq!(
+        run("attempt-step").status.code(),
+        Some(3),
+        "attempt steps never switch hosts"
+    );
+    assert_eq!(fs::read_to_string(&file).unwrap(), before);
+    fs::write(
+        &manifest,
+        json!({"components":{"legacyNode":{"root":"../outside"}}}).to_string(),
+    )
+    .unwrap();
+    assert_eq!(run("head-request").status.code(), Some(3));
+    envelope["cwd"] = json!("/tampered");
+    fs::write(&file, envelope.to_string()).unwrap();
+    assert_eq!(
+        run("head-request").status.code(),
+        Some(65),
+        "digest verification still applies"
+    );
+    fs::remove_dir_all(project).unwrap();
+}
 
 const DONE_LINE: &str = r#"cat > "$OUT/stdin.json"; echo "$@" > "$OUT/argv"; echo '{"v":1,"protocol":1,"result":"done","data":{"key":"head-planner-x-1"}}'"#;
 
@@ -1181,6 +1344,7 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_r
     let server = HeadRequests::new(Config {
         run_dir: dir.clone(),
         host_bin: "/bin/false".into(),
+        request_host_bin: None,
         cwd: dir.clone(),
         env: BTreeMap::new(),
         verbs: vec![BIND_VERB.to_string()],

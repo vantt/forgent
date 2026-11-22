@@ -122,6 +122,7 @@
       "rule": "refusals (verb-failed detail): bad-args, land-branch-lead-only, path-outside-grant, write-outside-footprint, footprint-change-refused, ticket-used, plan-not-found, plan-ambiguous"
     },
     "run": {
+      "routeHost": "which host the route child is, for this verb and every other verb that runs the Node payload: the active release's host. A head launched from an activated release (its start host lies inside the release that was active at launch) resolves the project's current activation again on every request and runs that release's host and its manifest payload, so a head that outlives a release switch picks the new release up without a restart. The handover is verified in the child: the running host must be the activated host and the payload a manifest-relative directory inside that same release, otherwise the child refuses host-version-mismatch; no request argument names either path. This is the head-request route only: attempt steps stay pinned to the host their envelope names. A head launched from a dev start host (one outside an activated release) is never switched. When the activation cannot be read, is not ready, or names no executable host inside its release, the request runs on the start host and the supervisor logs one line, `head-request <id> release-fallback: <why>`.",
       "args": {
         "prompt": "string, required; must not start with '-'",
         "provider": "string, optional; must not start with '-'",

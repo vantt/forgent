@@ -875,6 +875,7 @@
         "src/util/host-bin-path.mjs",
         "packages/distribution/rust/src/init.rs",
         "packages/distribution/rust/src/lib.rs",
+        { "path": "packages/host-runtime/rust/src/activation.rs", "reason": "the shared pure activation-to-host read, used by distribution and live head requests" },
         "packages/distribution/rust/src/shim.rs",
         "packages/distribution/rust/src/uninstall.rs",
         "packages/distribution/rust/src/fgctl_refresh.rs",

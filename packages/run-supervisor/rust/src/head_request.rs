@@ -123,6 +123,28 @@ type ChecksPeer = Box<dyn Fn(Option<u32>) -> Result<(), HoldError> + Send + Sync
 const DETAIL_LOG_CHARS: usize = 300;
 
 type LogLine = Box<dyn Fn(&str) + Send + Sync>;
+/// Per-request host selection; an error runs the start host and is logged once.
+pub type RequestHostBin = Box<dyn Fn() -> Result<PathBuf, String> + Send + Sync>;
+
+/// Follow activation only if the start host belongs to the release active at launch. Dev hosts stay pinned.
+pub fn request_host_bin(project_root: &Path, start_host: &str) -> RequestHostBin {
+    let start = PathBuf::from(start_host);
+    let active_root = fgos_host_runtime::activation::activated_host_bin(project_root)
+        .and_then(|bin| bin.parent()?.parent().map(Path::to_path_buf))
+        .and_then(|root| std::fs::canonicalize(root).ok());
+    let follows = active_root
+        .is_some_and(|root| std::fs::canonicalize(&start).is_ok_and(|host| host.starts_with(root)));
+    let project_root = project_root.to_path_buf();
+    Box::new(move || {
+        if !follows {
+            return Ok(start.clone());
+        }
+        fgos_host_runtime::activation::activated_host_bin(&project_root).ok_or_else(|| {
+            "activation unreadable, not ready, or names no executable host inside its release"
+                .into()
+        })
+    })
+}
 type CatchesUp = Box<dyn Fn(&Path) -> Result<(), CatchUpRefusal> + Send + Sync>;
 type PathOid = Box<dyn Fn(&Path, &str) -> Result<String, PublishRefusal> + Send + Sync>;
 type PathClean = Box<dyn Fn(&Path, &str) -> Result<bool, PublishRefusal> + Send + Sync>;
@@ -134,6 +156,8 @@ pub use crate::route::{CatchUpRefusal, PublishRefusal, WritePublisher};
 pub struct Config {
     pub run_dir: PathBuf,
     pub host_bin: String,
+    /// None preserves the start host (including callers that do not opt into release pickup).
+    pub request_host_bin: Option<RequestHostBin>,
     pub cwd: PathBuf,
     /// The step environment: the route child starts with exactly this.
     pub env: BTreeMap<String, String>,
@@ -196,6 +220,14 @@ pub struct HeadRequests {
 impl HeadRequests {
     pub fn new(cfg: Config) -> HeadRequests {
         Self::with_gate(cfg, Arc::new(Mutex::new(None)))
+    }
+
+    /// Install the host read before polling begins.
+    pub fn with_request_host(mut self, port: RequestHostBin) -> Self {
+        Arc::get_mut(&mut self.cfg)
+            .expect("not yet shared")
+            .request_host_bin = Some(port);
+        self
     }
 
     fn with_gate(cfg: Config, gate: Arc<Mutex<Option<HeadRef>>>) -> HeadRequests {
@@ -298,6 +330,7 @@ impl HeadRequests {
         let cfg = Config {
             run_dir: run_dir.to_path_buf(),
             host_bin: text(&envelope["hostBin"], "hostBin")?,
+            request_host_bin: None,
             cwd: cwd.clone(),
             env: step_env,
             verbs,
@@ -1400,7 +1433,19 @@ fn run_verb(cfg: &Config, request: &Request) -> Outcome {
         code: "verb-failed",
         detail: Some(detail),
     };
-    let mut cmd = Command::new(&cfg.host_bin);
+    let host = match cfg.request_host_bin.as_ref().map(|read| read()) {
+        Some(Ok(host)) => host,
+        Some(Err(why)) => {
+            (cfg.log)(&format!(
+                "head-request {} release-fallback: {}",
+                request.id,
+                loggable_detail(&why)
+            ));
+            PathBuf::from(&cfg.host_bin)
+        }
+        None => PathBuf::from(&cfg.host_bin),
+    };
+    let mut cmd = Command::new(&host);
     cmd.args(["internal", "head-request", "--protocol", "1", "--run-dir"])
         .arg(&cfg.run_dir)
         .env_clear()

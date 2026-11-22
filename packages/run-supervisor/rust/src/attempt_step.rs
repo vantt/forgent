@@ -72,8 +72,9 @@ pub(crate) fn verified_envelope(
     Ok(envelope)
 }
 
-/// The head request route's hand-over to the Node payload: [`verified_envelope`], then find `entry` under the
-/// envelope's `payloadRoot` (never PATH, never the cwd) and exec it as `node <entry> <leading...> --run-dir <dir>`.
+/// The head-request-only handover: verify the immutable envelope, then accept either its pinned host or the
+/// project's current activated host. Only the latter uses that release's manifest payload; attempt steps still
+/// go exclusively through [`verified_envelope`].
 /// stdin, stdout and stderr pass through; the exit code is the payload's.
 #[cfg(unix)]
 pub(crate) fn exec_payload(
@@ -83,15 +84,42 @@ pub(crate) fn exec_payload(
     leading: &[String],
     require: impl Fn(&serde_json::Value) -> Result<(), &'static str>,
 ) -> i32 {
-    let envelope = match verified_envelope(route, run_dir, require) {
+    let envelope = match envelope::read_verified(&run_dir.join("envelope.json")) {
         Ok(envelope) => envelope,
-        Err(exit) => return exit,
+        Err(why) => {
+            report(route, "envelope-invalid", &why);
+            return EXIT_ENVELOPE_INVALID;
+        }
     };
-    let Some(root) = envelope["payloadRoot"].as_str().map(PathBuf::from) else {
-        report(route, "envelope-invalid", "payloadRoot missing");
+    if let Err(why) = require(&envelope) {
+        report(route, "envelope-invalid", why);
         return EXIT_ENVELOPE_INVALID;
+    }
+    let (root, release) = if envelope::host_bin_is_current(&envelope) {
+        let Some(root) = envelope["payloadRoot"].as_str().map(PathBuf::from) else {
+            report(route, "envelope-invalid", "payloadRoot missing");
+            return EXIT_ENVELOPE_INVALID;
+        };
+        (root, None)
+    } else {
+        match active_request_payload(&envelope) {
+            Ok((root, release)) => (root, Some(release)),
+            Err(why) => {
+                report(route, "host-version-mismatch", &why);
+                return EXIT_VERSION_MISMATCH;
+            }
+        }
     };
     let entry = root.join(entry);
+    if release.is_some() && !std::fs::canonicalize(&entry).is_ok_and(|path| path.starts_with(&root))
+    {
+        report(
+            route,
+            "payload-missing",
+            "the request entry is not inside the release payload",
+        );
+        return EXIT_PAYLOAD_MISSING;
+    }
     if !entry.is_file() {
         report(
             route,
@@ -100,7 +128,35 @@ pub(crate) fn exec_payload(
         );
         return EXIT_PAYLOAD_MISSING;
     }
-    hand_over(route, &entry, leading, run_dir)
+    hand_over(route, &entry, leading, run_dir, release.as_deref())
+}
+
+/// The new host must be the activated host, and its payload must be a manifest-relative directory inside that
+/// same release. No request argument or attempt-envelope rewrite supplies either path.
+#[cfg(unix)]
+fn active_request_payload(envelope: &serde_json::Value) -> Result<(PathBuf, PathBuf), String> {
+    let resolve = || {
+        let project = Path::new(envelope["cwd"].as_str()?);
+        let host = fgos_host_runtime::activation::activated_host_bin(project)?;
+        let current = std::fs::canonicalize(std::env::current_exe().ok()?).ok()?;
+        if std::fs::canonicalize(&host).ok()? != current {
+            return None;
+        }
+        let release = std::fs::canonicalize(host.parent()?.parent()?).ok()?;
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(release.join("manifest.json")).ok()?).ok()?;
+        let relative = Path::new(manifest["components"]["legacyNode"]["root"].as_str()?);
+        if relative.as_os_str().is_empty()
+            || !relative
+                .components()
+                .all(|c| matches!(c, std::path::Component::Normal(_)))
+        {
+            return None;
+        }
+        let root = std::fs::canonicalize(release.join(relative)).ok()?;
+        (root.starts_with(&release) && root.is_dir()).then_some((root, release))
+    };
+    resolve().ok_or_else(|| "the running host is neither the envelope host nor a ready activated release with a confined manifest payload".into())
 }
 
 /// `node` through PATH; a route started with a cleared environment searches the standard system directories.
@@ -114,9 +170,26 @@ fn node_program() -> PathBuf {
 }
 
 #[cfg(unix)]
-fn hand_over(route: &str, entry: &Path, leading: &[String], run_dir: &Path) -> i32 {
+fn hand_over(
+    route: &str,
+    entry: &Path,
+    leading: &[String],
+    run_dir: &Path,
+    release: Option<&Path>,
+) -> i32 {
     use std::os::unix::process::CommandExt;
-    let err = std::process::Command::new(node_program())
+    let mut command = std::process::Command::new(node_program());
+    if let Ok(host) = std::env::current_exe() {
+        command
+            .env("FGOS_HEAD_REQUEST_HOST_BIN", &host)
+            .env("FGOS_HOST_BIN", host);
+    }
+    if let Some(release) = release {
+        command
+            .env("FGOS_ACTIVE_RELEASE_PATH", release)
+            .env("FGOS_ACTIVE_MANIFEST_PATH", release.join("manifest.json"));
+    }
+    let err = command
         .arg(entry)
         .args(leading)
         .arg("--run-dir")
