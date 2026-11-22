@@ -123,6 +123,7 @@ the grants, verb by verb.
 | p-ekqtvofdoh admission writes `base` and `lead` | phases 3, 7 | skill writes both; check makes a missing `lead` an error |
 | p-d3ub553ogh secretary sandbox TMPDIR | already closed | `bbe0ffe2a` sets `TMPDIR=/tmp` (private tmpfs); proof `test/session-host/head-start.test.mjs:247`; phase 11 re-confirms live |
 | p-bakpfrvigb orphan rotation state | phase 6 | resolved on the lineage's normal path plus one doctor pointer row |
+| (owner 2026-11-22 09:08) rotation Stop hook fires in no head | phase 6 steps 6-8, phase 11 probe row | owner-approved 2026-11-22 09:08 via lead:SUPERVISOR: prove the Stop hook runs in a confined head, writes stop-trace and rotates at soft; find and fix the cause in this plan |
 | p-4r4h3jqtth head ran 33 h without rotating | already done | plan `261121-0745-head-rotation-trace`, `65ad518d5` |
 
 ## Prior art reused and what was missing
@@ -148,8 +149,8 @@ the grants, verb by verb.
 |---|---|---|---|---|---|
 | 1 | [Baseline: wake rate and idle alarms](phase-01-baseline-wake-and-idle.md) | - | plans/261122-0118-heads-stable-and-able/reports/baseline-wake-and-idle.md | 1 | done (e6ec41161) |
 | 2 | [Head verbs through the request socket](phase-02-head-verbs.md) | - | src/session-host/head-grants.mjs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, apps/fgos/src/routing.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/session-host/spec.md | 1 | running |
-| 3 | [The land door runs the plan check](phase-03-land-plan-check.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, core/skills/_shared/plan-contract.md, .agents/skills/**, plugins/fgOS/skills/**, .fgos/config.yaml | 1 | parked: code landed aa6b13729; the land.gates entry (step 3) waits q-ns4o7uqamq, no unit may write .fgos/ |
-| 4 | [Coordinating heads keep their provider floor](phase-04-provider-floor.md) | 3 | .fgos/config.yaml, test/session-host/head-start.test.mjs | 2 | parked: waits q-ns4o7uqamq (config pin must land before its repo-config test) |
+| 3 | [The land door runs the plan check](phase-03-land-plan-check.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, core/skills/_shared/plan-contract.md, .agents/skills/**, plugins/fgOS/skills/**, .fgos/config.yaml | 1 | parked: code landed aa6b13729; the gate entry is applied by lead:SUPERVISOR from config-patch-items.yaml |
+| 4 | [Coordinating heads keep their provider floor](phase-04-provider-floor.md) | 3 | .fgos/config.yaml, test/session-host/head-start.test.mjs | 2 | waiting: its pin is applied by lead:SUPERVISOR from config-patch-items.yaml, then its test unit runs |
 | 5 | [A live head's requests run the active release](phase-05-release-pickup.md) | 2 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/run-supervisor/spec.md | 2 | ready |
 | 6 | [A rotation whose executor died is resolved](phase-06-orphan-rotation.md) | 2 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/**, docs/platform/session-host/spec.md | 2 | ready |
 | 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs | 2 | ready |
@@ -200,6 +201,11 @@ the five-part form, with the proposal written in the phase file, and lists the `
   `9467856911fda6a6`). A now: Miu arms a 15-minute recurring check on every start. Then B through
   `261122-0056-orchestration-skeleton` phase 6 (player wake), handed off there with a `coordination-handoff` event; A
   stays as the slow fallback. Phase 10 step 1 is done by this answer; the phase is `ready`.
+
+- **q-ns4o7uqamq, who writes `.fgos/config.yaml`: answered 2026-11-22** by lead:SUPERVISOR: no unit may write `.fgos/`
+  (the runner's write scope refuses the store directory), so lead:SUPERVISOR, the manual supervisor session in the main
+  checkout, applies the patch items, keeping the owner's uncommitted edits, lands them and replies with the commit. The
+  items are in `config-patch-items.yaml` in this directory (phase 3 gate, phase 4 pin; phase 9 added when chosen).
 
 ## Risks and rollback
 

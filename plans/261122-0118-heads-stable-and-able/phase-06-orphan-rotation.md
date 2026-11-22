@@ -42,10 +42,46 @@ Closes `p-bakpfrvigb`.
    is refused. Use the test's existing fake ports for process judge and Identity.
 5. Docs: the rotation section of `docs/platform/session-host/spec.md` gains the rule.
 
+## Added 2026-11-22 09:08 (owner-approved): the rotation Stop hook runs in a confined head
+
+Reported by lead:SUPERVISOR from the owner: the automatic rotation path fires for no head. No `stop-trace.jsonl` existed
+under any `.fgos/runtime/session-rotation/<lineage>/`, although `2c10a76a4` (2026-11-21 07:48) makes every head Stop
+append one there (`apps/fgos/src/wiring/session_rotation_hook.rs`, `recordStopTrace` and `STOP_TRACE_FILE` in
+`src/session-rotation/rotate.mjs`). The last `rotation.log` line anywhere is secretary-miu gen 20 (2026-11-21 09:38
+local); Miu's next generations ran for many hours with no decision. The secretary cannot measure her own context, so the
+Stop hook is the only path.
+
+Evidence the lead gathered (2026-11-22 09:14):
+
+- The Stop entry exists in `.claude/settings.json` (since `728942829`):
+  `"$S" hook session-rotation --event stop || true`, timeout 80, where `S=${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos`.
+- Run by hand from inside this confined lead with a minimal payload, the same command exits 0 and writes
+  `lineage lead-forgent-261122-0118-heads-b52f9/stop-trace.jsonl` (`decision: no-measure`, 02:14:02Z). So the shim, the
+  activated host, the request socket and the host's trace write all work from a confined head.
+- The hook prints its failures to stderr only, and `|| true` plus exit 0 hides them: a Stop that fails leaves no trace
+  and no visible error. The confined home (`CLAUDE_CONFIG_DIR`) is per dispatch, so its transcript is the only place a
+  hook error is recorded.
+- Live data point: this lead's own turn-end Stop after 02:14Z either adds a second line to its `stop-trace.jsonl` or it
+  does not. The lead reads it at its next wake and records the result here.
+
+Steps:
+
+6. Prove it live: in a confined head, a real Stop (not a hand call) appends to `stop-trace.jsonl`, and a stop whose
+   measure is at or above soft asks for and starts a rotation. Read the head's transcript for the Stop hook's recorded
+   output to find where a real Stop differs from the hand call: hook not run, killed by its timeout, stdin payload shape
+   (`transcript_path`, `session_id`), measure, config, or the socket ask.
+7. Fix the cause on the hook's normal path, and make a failing Stop visible: a hook failure leaves an incident line in
+   the lineage (`incidents.jsonl`, the existing best-effort writer), not only stderr.
+8. Owning proof at the lowest layer that observes the cause, and the live proof is one row of phase 11's probe.
+
+If the cause lies outside this phase's footprint (for example `session_rotation_hook.rs`,
+`packages/session-host/rust/src/rotation/measure.rs` or `.claude/settings.json`), stop and report the exact files; the
+lead asks the supervisor to widen the plan footprint before the fix unit runs.
+
 ## Verify
 
 `node scripts/run-tests.mjs test/session-rotation/rotate.test.mjs` passes, and `fgos doctor --json` lists the pointer
-row.
+row. A confined head's real Stop appends to its `stop-trace.jsonl`, and a stop at soft rotates.
 
 ## Rollback
 

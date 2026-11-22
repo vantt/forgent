@@ -1,0 +1,34 @@
+# Config patch items for plan 261122-0118-heads-stable-and-able, applied by lead:SUPERVISOR to the project
+# .fgos/config.yaml (no unit may write .fgos/, see q-ns4o7uqamq). Apply each phase's block as its own patch, keeping
+# the owner's uncommitted edits, e.g.:
+#   fgos config patch .fgos/config.yaml <file holding that block's items> --reason "<reason below>"
+# Add each `doc` and `why` text as the entry's @fgos:doc / @fgos:why comment if the patch door does not write them.
+
+# --- Phase 3: the land door runs the plan check (code landed aa6b13729) ---
+# reason: heads-stable phase 3: the land door runs the plan contract check on every landed plan (p-erwx4t7gl6)
+# doc: Check that landed plans keep the plan contract; {plans} renders --plan '<dir>' for each changed plans/<dir>
+#      holding a plan.md (backlog, discussions, reports, handoffs left out); the gate is skipped when no plan dir qualifies.
+# why: enforce the plan contract at the land door so a plan that breaks it (for example running without lead) cannot
+#      land (p-erwx4t7gl6, plan 261122-0118-heads-stable-and-able phase 3)
+# land.gates has 4 entries on main today, so the new one is index 4.
+phase3:
+  - set: land.gates[4]
+    value:
+      run: node scripts/plan-contract-check.mjs {plans}
+      when:
+        - plans/*/plan.md
+        - plans/*/phase-*.md
+
+# --- Phase 4: coordinating heads keep their provider floor ---
+# reason: heads-stable phase 4: the secretary head never binds a weaker provider family (p-of5vpvce3e)
+# why: owner rule 2026-11-21: a head that coordinates others runs on Claude; the secretary on Sonnet (tier standard
+#      and pool claude-miu stay), never another family even when it is the freest account (p-of5vpvce3e)
+phase4:
+  - set: runner.personas.secretary.prefer
+    value:
+      - executor: claude
+        invocation: claude-herdr-bypass-bwrap
+
+# --- Phase 9: one watcher tuning change ---
+# Not ready yet: phase 9 picks the change after phases 4 and 7 land, from the baseline in
+# reports/baseline-wake-and-idle.md. The lead adds its block here and raises again then.
