@@ -42,7 +42,7 @@ Related:
 - `docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md` (proposed design/evidence; not implementation authority)
 - `docs/platform/proposals/step-09-group-thinking-substrate.md` (proposed design/evidence; not implementation authority)
 - `docs/platform/proposals/step-10-coding-domain-adoption.md` (proposed design/evidence; not implementation authority)
-- `docs/platform/proposals/component-authority-boundary-map.md` (proposed design/evidence; not implementation authority)
+- `docs/platform/component-authority/spec.md` (accepted structural authority model)
 - `docs/platform/agent-coordination/history/retired-engine/intent-preservation-ledger.md` — history of the retired engine; not current runtime authority
 
 This is a discussion document. It does not accept a design, does not change

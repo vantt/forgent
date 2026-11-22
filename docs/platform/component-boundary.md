@@ -11,7 +11,7 @@ Last reviewed: 2026-10-21
 Related:
 - Historical source: `docs/architect/component-boundary/README.md` at `2636ba229a054750a370bf5c2e9b83f27492bf3d`
 - docs/platform/component-boundary.md#fgos-component-boundary-advisory
-- docs/platform/proposals/component-authority-boundary-map.md
+- docs/platform/component-authority/spec.md
 - docs/platform/README.md
 Implementation: Partial
 Provenance: Source corpus `docs/architect/component-boundary` at `947dc310396071a4d530216d5c06d05993d63bf5`; the imported sections below name their individual source files.
@@ -43,7 +43,7 @@ The current detailed source remains:
 | --- | --- |
 | `docs/platform/component-boundary.md` | Reading portal for the existing component-boundary architecture package. |
 | [#fgos-component-boundary-advisory](#fgos-component-boundary-advisory) | Advisory map of components, bounded contexts, and authority boundaries. |
-| [proposals/component-authority-boundary-map.md](proposals/component-authority-boundary-map.md) | Draft authority map with parent/child and dependency vocabulary. |
+| [component-authority/spec.md](component-authority/spec.md) | Accepted component-authority structural model (ownership, doors, contracts). |
 
 Until this anchor is fully promoted, use those sources for detail and update this file as the stable entry point.
 
@@ -155,7 +155,7 @@ Ownership rows, one per component and subcomponent, sorted by id. <!-- rendered 
 | --- | --- |
 | platform portal | [README.md](README.md) |
 | detailed component-boundary source | [#fgos-component-boundary-advisory](#fgos-component-boundary-advisory) |
-| draft authority map | [proposals/component-authority-boundary-map.md](proposals/component-authority-boundary-map.md) |
+| component-authority spec | [component-authority/spec.md](component-authority/spec.md) |
 | packaging-distribution area | [packaging-distribution/README.md](packaging-distribution/README.md) |
 | observe component | [observe/spec.md](observe/spec.md) |
 | supervision component (planned) | [supervision/spec.md](supervision/spec.md) |
@@ -595,7 +595,7 @@ Agent Coordination Engine:
 
 Dispatch And Execution Engine:
   DispatchResolverPort   (superseded in naming by DispatchRuntimePort,
-                          [Component Authority Boundary Map §13](../proposals/component-authority-boundary-map.md#13-draft-ports);
+                          [component-authority spec §2.4 Doors](component-authority/spec.md#24-doors);
                           same candidate facade, not two live ports)
   RunStorePort
   ExecutorAdapterPort

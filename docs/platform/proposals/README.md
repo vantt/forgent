@@ -49,7 +49,7 @@ their scope crosses the area boundary.
   software-system problem, deliberate on architectures, advise a person, and
   support a bounded decision dialogue.
 - [Step 10: Coding Domain Adoption Of The Coordination Foundation](step-10-coding-domain-adoption.md)
-- [Component Authority Boundary Map](component-authority-boundary-map.md)
+- [Component Authority](../component-authority/spec.md)
 
 ## Handoff Prompts
 
@@ -61,7 +61,7 @@ The historical active list above is preserved. This navigation lists the other
 candidate files in this collection without changing their acceptance status:
 
 - [architecture-advisory-panel](architecture-advisory-panel.md).
-- [component-authority-boundary-map](component-authority-boundary-map.md).
+- [component-authority](../component-authority/spec.md).
 - [coordination-capability-envelope](coordination-capability-envelope.md).
 - [coordination-dispatch-contract](coordination-dispatch-contract.md).
 - [coordination-envelope-probe-contract](coordination-envelope-probe-contract.md).

@@ -60,7 +60,7 @@ Related: [Coordination Foundation Baseline](../agent-coordination/history/retire
 [CoordinationSession Contract](../agent-coordination/history/retired-engine/contracts/coordination-session.md),
 [FlowDefinition Contract](../agent-coordination/history/retired-engine/contracts/flow-definition.md),
 [Team Communication Protocol V1](../agent-coordination/proposals/team-communication-protocol-v1.md),
-[Component Authority Boundary Map](component-authority-boundary-map.md),
+[Component Authority](../component-authority/spec.md),
 [Step 10 Coding Domain Adoption](step-10-coding-domain-adoption.md),
 [Step 09 MVP1/MVP2 group-thinking verification](../agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md),
 [Step 09 MVP3-MVP5 verification](../agent-coordination/verification/step-09-mvp3-to-mvp5/index.md),
@@ -563,8 +563,8 @@ the session ledger, or contain the group-thinking logic itself.
 
 ## 12. Relationship To Component Boundary
 
-[Component Authority Boundary Map](component-authority-boundary-map.md) runs
-in parallel with this step. It is not a Step 10 appendix.
+[Component Authority](../component-authority/spec.md) is the accepted
+owner of structural authority boundaries for this step.
 
 Step 09 must use that map to keep new primitives in the right component:
 

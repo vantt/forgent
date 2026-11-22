@@ -26,7 +26,7 @@ Writer type: Agent draft writer
 Canonical for: Who owns what: components, subcomponents, decision kinds, doors, contract index, file-to-component mappings, and the locate and declare doors
 Use this when: Finding which component owns a decision kind, door, contract, or path, declaring new structural elements, or understanding system authority boundaries
 Do not use this for: Runtime agent confinement (Agent Confinement Authority), contract contents, RULs, L1-L10 platform laws, design principles, or decision records
-Supersedes: docs/platform/proposals/component-authority-boundary-map.md
+Supersedes: docs/platform/proposals/component-authority-boundary-map.md (retired; last commit e0d208e38)
 Superseded by: None recorded
 ```
 
@@ -181,7 +181,7 @@ The model at `packages/component-authority/model/` is the single source of truth
 ### Retired ledgers
 
 With the establishment of Component Authority, previous disparate ownership ledgers are consolidated and retired:
-- `docs/platform/proposals/component-authority-boundary-map.md`: Retired; useful boundary definitions are incorporated into the model.
+- `docs/platform/proposals/component-authority-boundary-map.md` (retired; last commit e0d208e38): Retired; useful boundary definitions are incorporated into the model.
 - `docs/architecture-manifest.json`: Fully migrated into `packages/component-authority/model/` and retired in phase 7.
 
 ## 6. Settled facts
@@ -191,6 +191,7 @@ With the establishment of Component Authority, previous disparate ownership ledg
 3. When porting from Node to Rust, twin implementations are forbidden (decision 2 in section 7). The legacy implementation is removed in the same change, and the commit message and specification record the final commit SHA of the removed implementation.
 4. Subcomponents are modeled as component rows with a `parent` field rather than maintained in a separate ledger.
 5. Business rules (RULs), platform foundation laws (L1–L10), and decision records remain outside the structural model; the model points to their locations.
+6. The proposal map `docs/platform/proposals/component-authority-boundary-map.md` was retired; its rows and contract matrix were carried into `packages/component-authority/model/` (evidence `plans/261121-2109-component-authority/reports/proposal-map-coverage.md`), last commit `e0d208e38`.
 
 ## 7. Lịch sử quyết định
 

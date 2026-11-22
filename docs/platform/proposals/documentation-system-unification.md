@@ -625,10 +625,9 @@ or one constraint while leaving the rest of an older decision active.
 > the Knowledge and Documentation Engine, the Agent Context Engine, or the
 > decision projection above; its nearest row ("Knowledge, Learning, And
 > Documentation Registry") does not mention decisions. Whoever lands H2 or H3, or
-> gives the `tsk-1lv` pieces an owner, must update that map (and its detailed
-> source `docs/architect/proposals/component-authority-boundary-map.md` while it
-> is still the source) under that file's Update Rule, or record `No
-> component-boundary change`.
+> gives the `tsk-1lv` pieces an owner, must update that map (and its accepted
+> source `docs/platform/component-authority/spec.md`) under that file's Update
+> Rule, or record `No component-boundary change`.
 
 The projection compiler should select content using registry metadata and real
 task context: target repo/domain/component/area/subcomponent, document authority,
