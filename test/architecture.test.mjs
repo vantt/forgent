@@ -2090,6 +2090,10 @@ test('door check: a unit is run only by the engine and the host callers of its o
   for (const file of ['apps/fgos/src/wiring/run.rs', 'apps/fgos/src/wiring/execution_routes.rs', 'apps/fgos/src/wiring/dispatch_subs/probes.rs', 'apps/fgos/src/wiring/unit_run_host/host.rs', 'packages/execution/engine/src/unit_run/run.rs']) {
     assert.deepEqual(doorHits(row, file, 'let out = host.run_unit(&options);\n'), [], file);
   }
+  for (const text of ['export const runUnit = async (options) => {};\n', 'export { runUnit };\n', 'export { helper, runUnit as run };\n']) {
+    assert.equal(doorHits(row, 'src/runner/seeded.mjs', text).length, 1, text);
+  }
+  assert.deepEqual(doorHits(row, 'src/native/seeded.mjs', 'export { runUnitInHost };\n'), [], 'the seam export is not a run loop');
   assert.deepEqual(doorHits(row, 'src/runner/seeded.mjs', 'await runUnitInHost(request);\n'), [], 'the seam call is the seam row\'s');
   assert.deepEqual(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', '// host.run_unit(&options)\n'), []);
 });
@@ -2103,11 +2107,26 @@ test('door check: case admission crosses processes only through the peer adapter
     ['src/workflow/seeded.mjs', "await serveAdmissionPeer(port, process.stdin, process.stdout);\n"],
     ['src/workflow/seeded.mjs', "const PREFIX = '\\u001eFGOS-ADMISSION-PEER ';\n"],
   ]) assert.equal(doorHits(row, file, text).length, 1, `${file}: ${text}`);
+  assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'impl<P: Port> CaseAdmission for Wire<P> {}\n').length, 1, 'a generic adapter');
+  assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'const PEER: &str = "src/workflow/admission-peer.mjs";\n').length, 1, 'a second spawn of the peer module');
+  assert.deepEqual(doorHits(row, 'apps/fgos/src/wiring/run.rs', 'const PEER_MODULE: &str = "src/workflow/admission-peer.mjs";\n'), []);
   assert.deepEqual(doorHits(row, 'packages/execution/engine/src/unit_run/peer.rs', 'impl CaseAdmission for PeerAdmission {}\n'), []);
   assert.deepEqual(doorHits(row, 'apps/fgos/src/wiring/run.rs', 'let ch = PeerChannel::over_child(&mut child, d);\n'), []);
   assert.deepEqual(doorHits(row, 'apps/fgos/src/wiring/execution_routes.rs', 'PeerChannel::with_deadline(i, o, d)\n'), []);
   assert.deepEqual(doorHits(row, 'src/workflow/admission-peer.mjs', "await serveAdmissionPeer(port, process.stdin, process.stdout);\n"), []);
   assert.deepEqual(doorHits(row, 'src/workflow/seeded.mjs', "const port = createCaseAdmissionPort({ repoRoot });\n"), [], 'building the port in process is not a wire');
+});
+
+test('door check: a Node import past the Execution seam into the old Execution directories fails outside the named callers', () => {
+  const row = execRow('Node callers reach Execution only through its seam, never into the Node Execution closure');
+  assert.equal(row.retiredBy.startsWith('p-24xw2cwdvo'), true);
+  for (const text of ["import { bind } from '../runner/execution/bind.mjs';\n", "const m = await import('../../src/runner/dispatch/config.mjs');\n", "import { requestCancel } from '../run-supervisor/cancel-registry.mjs';\n"]) {
+    assert.equal(doorHits(row, 'src/verbs/seeded.mjs', text).length, 1, text);
+  }
+  assert.equal(doorHits(row, 'src/runner/seeded.mjs', "import { x } from './dispatch/plan.mjs';\n").length, 1, 'a sibling of the closure under src/runner');
+  assert.deepEqual(doorHits(row, 'src/runner/loop.mjs', "import { bind } from './execution/bind.mjs';\n"), []);
+  assert.deepEqual(doorHits(row, 'src/runner/dispatch/seeded.mjs', "import { x } from '../../run-supervisor/client.mjs';\n"), [], 'inside the closure');
+  assert.deepEqual(doorHits(row, 'src/verbs/seeded.mjs', "import { x } from '../native/execution-door.mjs';\n"), [], 'the seam itself');
 });
 
 test('door check: a new importer of the Execution seam or a second spawn of its host route fails; each named caller passes', () => {
@@ -2147,6 +2166,8 @@ test('doctor registry: every bridged row and fix is labelled no earlier than the
   assert.deepEqual(bridgeFailures(entries.filter((entry) => entry.kind === 'row'), DOCTOR_REGISTRY.layers, (module) => fs.existsSync(path.join(root, module))), []);
   const read = new Set(entries.flatMap((entry) => entry.judge ?? []));
   assert.deepEqual(Object.keys(DOCTOR_REGISTRY.layers).filter((module) => !read.has(module)), [], 'a layer no row or fix reads is stale: drop it from layers');
+  assert.deepEqual(Object.entries(DOCTOR_REGISTRY.layers).filter(([, step]) => step === 'S6a').map(([module]) => module), [], 'the Execution step has landed: no layer may wait for it');
+  assert.deepEqual(entries.filter((entry) => entry.owner === 'bridge:S6a').map((entry) => entry.id), [], 'the Execution step has landed: no row or fix may be bridged to it');
 });
 
 test('doctor registry: a label before a layer, a layer with no step, a row with neither judge nor note and an unknown step each fail by name', () => {

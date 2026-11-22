@@ -157,9 +157,9 @@
     ]
   },
   "layers": {
-    "src/runner/execution/bind.mjs": "S6a",
-    "src/runner/capability-config.mjs": "S6a",
-    "src/seat-binding/client.mjs": "S6a",
+    "src/runner/execution/bind.mjs": "S6b",
+    "src/runner/capability-config.mjs": "S6b",
+    "src/seat-binding/client.mjs": "S6b",
     "src/setup/registrations.mjs": "S7",
     "src/state/drift-status.mjs": "S7",
     "src/state/frontier.mjs": "S7",

@@ -404,7 +404,7 @@
           "reason": "twin: the run-result doctor scan walks the assignment tree with its own symlink and depth barriers (walk_assignments, scan_assignment_runs); fgos-run-result sits below the engine and cannot ask assignment/layout.rs until the walk moves to a crate both can use"
         }
       ],
-      "retiredBy": "p-24xw2cwdvo for the two Node listers, which only the dead Node Execution closure imports; the host's run_dirs.rs and the fgos-run-result walk ask the engine's assignment layout once that walk moves to a crate both can use",
+      "retiredBy": "p-24xw2cwdvo for the two Node listers, which only the dead Node Execution closure imports; the host's run_dirs.rs and the fgos-run-result walk move onto fgos-execution's assignment layout (packages/execution/rust/src/assignment_layout.rs), the owner of the walk, once fgos-run-result can depend on it",
       "reason": "the lock report needs the run directories the runner lays out, one layer above the lock crate; until the layouts move the host lists them with a twin of each Node lister, pinned by one fixture"
     },
     {
@@ -1130,7 +1130,9 @@
       "kind": "door",
       "patterns": [
         "\\brun_unit(?:_result)?\\(",
-        "export (?:async )?function runUnit\\b"
+        "export (?:async )?function runUnit\\b",
+        "export\\s+(?:const|let|var)\\s+runUnit\\b",
+        "export\\s*\\{[^}]*\\brunUnit\\b[^}]*\\}"
       ],
       "allowed": [
         {
@@ -1164,7 +1166,8 @@
         "FGOS-ADMISSION-PEER",
         "\\bserveAdmissionPeer\\b",
         "PeerChannel::(?:new|with_deadline|over_child|over_stdio)\\b",
-        "\\bimpl\\s+CaseAdmission\\s+for\\b"
+        "\\bimpl\\s*(?:<[^>]*>)?\\s*CaseAdmission\\s+for\\b",
+        "admission-peer\\.mjs"
       ],
       "allowed": [
         {
@@ -1408,6 +1411,70 @@
       "debt": [],
       "retiredBy": "S6b for the Workflow callers, S7 for the Work callers; the session-host facades with the tail of plan 261122-0118, the doctor rows with their bridge steps, and the dead Node closure with p-24xw2cwdvo",
       "reason": "Node above tier 5 reaches Execution only through src/native/execution-door.mjs: host routes over stdin and stdout for long or effectful operations, the addon execution namespace for reads (plan decisions P4, P14). Every importer is named with the step that retires it, so a new Node caller of Execution is a decision, not an accident"
+    },
+    {
+      "job": "Node callers reach Execution only through its seam, never into the Node Execution closure",
+      "kind": "door",
+      "patterns": [
+        "(?:from\\s+|import\\(\\s*)['\"](?:[^'\"]*(?:runner/(?:dispatch|execution)|run-supervisor)/|\\./(?:dispatch|execution)/)[^'\"]*['\"]"
+      ],
+      "allowed": [
+        {
+          "path": "src/runner/dispatch/**",
+          "reason": "the Node closure itself; its live files are facades or twins, the rest is dead code (p-24xw2cwdvo)"
+        },
+        {
+          "path": "src/runner/execution/**",
+          "reason": "the Node closure itself; its live files are facades, the bind facade or twins, the rest is dead code (p-24xw2cwdvo)"
+        },
+        {
+          "path": "src/session-host/head-start.mjs",
+          "reason": "S7: the session head start reads the assignment layout and the runner config through their facades and binds through the bind facade"
+        },
+        {
+          "path": "src/session-host/head-request.mjs",
+          "reason": "plan 261122-0118 tail: the head request reads the assignment layout, the write scope, the unit summary and the unit-run facts through facades"
+        },
+        {
+          "path": "src/session-host/head-stop.mjs",
+          "reason": "plan 261122-0118 tail: head stop asks the Node cancel registry until it awaits the host cancel op"
+        },
+        {
+          "path": "src/session-rotation/rotate.mjs",
+          "reason": "plan 261122-0118 tail: rotation reads the assignment layout and the seat session folder through facades and asks the Node cancel registry"
+        },
+        {
+          "path": "src/setup/seat-binding-checks.mjs",
+          "reason": "doctor row seat-binding-dry-bind, bridge:S6b: binds through the bind facade"
+        },
+        {
+          "path": "src/setup/blind-steps-proven-pools.mjs",
+          "reason": "doctor row blind-steps-use-proven-pools, bridge:S6b: explains a seat through the bind facade"
+        },
+        {
+          "path": "src/runner/loop.mjs",
+          "reason": "S7: the Work runner loop binds each Work item's seat through the bind facade"
+        },
+        {
+          "path": "src/workflow/definition.mjs",
+          "reason": "S6b: the Workflow twins of write-scope, run-timeout and outcome"
+        },
+        {
+          "path": "domains/coding/harness/enrich-and-validate-contract.mjs",
+          "reason": "names the runner config error class through its dead re-export; moves to the seam with p-24xw2cwdvo"
+        },
+        {
+          "path": "scripts/lib/mailbox-live-confined.mjs",
+          "reason": "frozen mailbox live measurement module; reads the Node confinement driver (p-24xw2cwdvo)"
+        },
+        {
+          "path": "scripts/record-mailbox-hook-fixtures.mjs",
+          "reason": "mailbox fixture recorder; boots a worker session through the Node closure (p-24xw2cwdvo)"
+        }
+      ],
+      "debt": [],
+      "retiredBy": "p-24xw2cwdvo: the dead closure goes, its facades and twins with the session-host tail of plan 261122-0118, S6b and S7",
+      "reason": "src/native/execution-door.mjs is Execution's one Node seam; a Node file outside the old Execution directories that imports into them reaches past it, into facades, twins or dead code. Every such importer is named with the step that removes it, so a new one is a decision, not an accident"
     },
     {
       "job": "the Node bind facade has only its named callers",
