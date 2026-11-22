@@ -2313,6 +2313,1052 @@
       }
     },
     {
+      "name": "a capability pin of a bypass invocation is refused for a worker seat",
+      "ask": {
+        "unit": {
+          "id": "u1",
+          "capability": "execute",
+          "writes": []
+        },
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+        },
+        "raiseAuthorized": false,
+        "readOnly": false,
+        "independentOf": [],
+        "overrides": []
+      },
+      "cfg": {
+        "executors": {
+          "claude": {
+            "kind": "agent",
+            "providerModel": "claude",
+            "supports": {
+              "reasoningEffort": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "skills": [
+                "fgos-coding-implement"
+              ]
+            },
+            "invocations": [
+              {
+                "id": "claude-cli-bwrap",
+                "via": "cli",
+                "adapter": "cli-spawn",
+                "command": "claude",
+                "credentialStore": {
+                  "use": "claude",
+                  "homeEnv": "CLAUDE_CONFIG_DIR",
+                  "sessionDir": "projects",
+                  "files": [
+                    ".credentials.json"
+                  ]
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                },
+                "permissionMode": "bypass"
+              },
+              {
+                "id": "claude-herdr-bwrap",
+                "via": "cli",
+                "adapter": "herdr-spawn",
+                "command": "claude",
+                "credentialStore": {
+                  "use": "claude",
+                  "homeEnv": "CLAUDE_CONFIG_DIR",
+                  "sessionDir": "projects",
+                  "files": [
+                    ".credentials.json"
+                  ]
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              }
+            ]
+          },
+          "openai": {
+            "kind": "agent",
+            "providerModel": "openai",
+            "invocations": [
+              {
+                "id": "codex-cli-bwrap",
+                "via": "cli",
+                "adapter": "cli-spawn",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              },
+              {
+                "id": "pi-herdr-bwrap",
+                "via": "cli",
+                "adapter": "herdr-spawn",
+                "command": "pi",
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "sessionDir": "sessions",
+                  "files": [
+                    "auth.json"
+                  ]
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              },
+              {
+                "id": "codex-herdr-bwrap",
+                "via": "cli",
+                "adapter": "herdr-spawn",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              },
+              {
+                "id": "pi-cli-bwrap",
+                "via": "cli",
+                "adapter": "cli-spawn",
+                "command": "pi",
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "sessionDir": "sessions",
+                  "files": [
+                    "auth.json"
+                  ]
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              }
+            ]
+          },
+          "gemini": {
+            "kind": "agent",
+            "providerModel": "gemini",
+            "invocations": [
+              {
+                "id": "agy-cli-bwrap",
+                "via": "cli",
+                "adapter": "cli-spawn",
+                "command": "agy",
+                "credentialStore": {
+                  "use": "agy",
+                  "homeEnv": "AGY_HOME"
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              },
+              {
+                "id": "agy-herdr-bwrap",
+                "via": "cli",
+                "adapter": "herdr-spawn",
+                "command": "agy",
+                "credentialStore": {
+                  "use": "agy",
+                  "homeEnv": "AGY_HOME"
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              }
+            ]
+          }
+        },
+        "modelPolicies": {
+          "claude": {
+            "nano": "haiku",
+            "mini": {
+              "model": "haiku",
+              "effort": "high"
+            },
+            "standard": "sonnet",
+            "advanced": "sonnet",
+            "flagship": "opus",
+            "frontier": "fable"
+          },
+          "openai": {
+            "nano": {
+              "model": "gpt-6-luna",
+              "effort": "low"
+            },
+            "mini": "gpt-6-luna",
+            "standard": "gpt-5.6-terra",
+            "advanced": {
+              "model": "gpt-6.1-sol",
+              "effort": "medium"
+            },
+            "flagship": [
+              "gpt-6.1-sol",
+              "gpt-6.1-sol@openai-team"
+            ],
+            "frontier": "gpt-6-astra"
+          },
+          "gemini": {
+            "nano": "gemini-flash-low",
+            "mini": "gemini-flash-low",
+            "standard": "gemini-flash-medium",
+            "advanced": "gemini-flash-high",
+            "flagship": "gemini-pro",
+            "frontier": "gemini-pro"
+          }
+        },
+        "tierFallback": {
+          "nano": [
+            "gemini",
+            "claude",
+            "openai"
+          ],
+          "mini": [
+            "gemini",
+            "claude",
+            "openai"
+          ],
+          "standard": [
+            "gemini",
+            "claude",
+            "openai"
+          ],
+          "advanced": [
+            "gemini",
+            "claude",
+            "openai"
+          ],
+          "flagship": [
+            "claude",
+            "openai",
+            "gemini"
+          ],
+          "frontier": [
+            "claude",
+            "openai",
+            "gemini"
+          ]
+        },
+        "defaults": {
+          "tier": "standard"
+        },
+        "maxTier": "frontier",
+        "capabilities": {
+          "execute": {
+            "description": "run a task",
+            "prefer": [
+              {
+                "executor": "claude",
+                "invocation": "claude-cli-bwrap"
+              }
+            ]
+          },
+          "code:*": {
+            "tier": "advanced"
+          },
+          "code:review": {
+            "tier": "flagship",
+            "rigor": "high",
+            "prefer": [
+              "openai",
+              "claude"
+            ]
+          },
+          "code:debug": {
+            "prefer": [
+              {
+                "executor": "claude",
+                "invocation": "claude-cli-bwrap"
+              }
+            ]
+          },
+          "write:docs": {
+            "persona": "tech-writer"
+          },
+          "write:*": {
+            "rigor": "low"
+          },
+          "architecture:shape": {
+            "tier": "frontier",
+            "maxTier": "flagship",
+            "prefer": [
+              "claude",
+              "openai"
+            ]
+          }
+        },
+        "roles": {
+          "red-team": {
+            "prefer": [
+              "claude",
+              "openai"
+            ]
+          }
+        },
+        "personas": {
+          "tech-writer": {
+            "tier": "mini"
+          }
+        },
+        "llmAccounts": {
+          "openai": {
+            "work": {
+              "credentialStore": {
+                "codex": "~/.codex-work",
+                "pi": "~/.pi-work"
+              }
+            },
+            "spare": {
+              "credentialStore": {
+                "codex": "~/.codex-spare"
+              }
+            }
+          },
+          "openai-team": {
+            "team": {
+              "credentialStore": {
+                "codex": "~/.codex-team"
+              }
+            }
+          },
+          "claude": {
+            "main": {
+              "credentialStore": {
+                "claude": "~/.claude-main"
+              }
+            }
+          }
+        }
+      },
+      "walk": {},
+      "headLaunch": false,
+      "result": {
+        "ok": {
+          "refused": {
+            "reason": "bypass-invocation-not-allowed",
+            "detail": "invocation \"claude/claude-cli-bwrap\" never asks before acting and is only for a head session's launch, not a worker seat",
+            "fix": "name it only under runner.personas.<persona>.prefer of a head persona"
+          }
+        }
+      }
+    },
+    {
+      "name": "a role pin of a bypass invocation is refused for a worker seat",
+      "ask": {
+        "unit": {
+          "id": "u1",
+          "capability": "execute",
+          "writes": []
+        },
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+        },
+        "raiseAuthorized": false,
+        "readOnly": false,
+        "independentOf": [],
+        "overrides": []
+      },
+      "cfg": {
+        "executors": {
+          "claude": {
+            "kind": "agent",
+            "providerModel": "claude",
+            "supports": {
+              "reasoningEffort": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "skills": [
+                "fgos-coding-implement"
+              ]
+            },
+            "invocations": [
+              {
+                "id": "claude-cli-bwrap",
+                "via": "cli",
+                "adapter": "cli-spawn",
+                "command": "claude",
+                "credentialStore": {
+                  "use": "claude",
+                  "homeEnv": "CLAUDE_CONFIG_DIR",
+                  "sessionDir": "projects",
+                  "files": [
+                    ".credentials.json"
+                  ]
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                },
+                "permissionMode": "bypass"
+              },
+              {
+                "id": "claude-herdr-bwrap",
+                "via": "cli",
+                "adapter": "herdr-spawn",
+                "command": "claude",
+                "credentialStore": {
+                  "use": "claude",
+                  "homeEnv": "CLAUDE_CONFIG_DIR",
+                  "sessionDir": "projects",
+                  "files": [
+                    ".credentials.json"
+                  ]
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              }
+            ]
+          },
+          "openai": {
+            "kind": "agent",
+            "providerModel": "openai",
+            "invocations": [
+              {
+                "id": "codex-cli-bwrap",
+                "via": "cli",
+                "adapter": "cli-spawn",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              },
+              {
+                "id": "pi-herdr-bwrap",
+                "via": "cli",
+                "adapter": "herdr-spawn",
+                "command": "pi",
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "sessionDir": "sessions",
+                  "files": [
+                    "auth.json"
+                  ]
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              },
+              {
+                "id": "codex-herdr-bwrap",
+                "via": "cli",
+                "adapter": "herdr-spawn",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              },
+              {
+                "id": "pi-cli-bwrap",
+                "via": "cli",
+                "adapter": "cli-spawn",
+                "command": "pi",
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "sessionDir": "sessions",
+                  "files": [
+                    "auth.json"
+                  ]
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              }
+            ]
+          },
+          "gemini": {
+            "kind": "agent",
+            "providerModel": "gemini",
+            "invocations": [
+              {
+                "id": "agy-cli-bwrap",
+                "via": "cli",
+                "adapter": "cli-spawn",
+                "command": "agy",
+                "credentialStore": {
+                  "use": "agy",
+                  "homeEnv": "AGY_HOME"
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              },
+              {
+                "id": "agy-herdr-bwrap",
+                "via": "cli",
+                "adapter": "herdr-spawn",
+                "command": "agy",
+                "credentialStore": {
+                  "use": "agy",
+                  "homeEnv": "AGY_HOME"
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              }
+            ]
+          }
+        },
+        "modelPolicies": {
+          "claude": {
+            "nano": "haiku",
+            "mini": {
+              "model": "haiku",
+              "effort": "high"
+            },
+            "standard": "sonnet",
+            "advanced": "sonnet",
+            "flagship": "opus",
+            "frontier": "fable"
+          },
+          "openai": {
+            "nano": {
+              "model": "gpt-6-luna",
+              "effort": "low"
+            },
+            "mini": "gpt-6-luna",
+            "standard": "gpt-5.6-terra",
+            "advanced": {
+              "model": "gpt-6.1-sol",
+              "effort": "medium"
+            },
+            "flagship": [
+              "gpt-6.1-sol",
+              "gpt-6.1-sol@openai-team"
+            ],
+            "frontier": "gpt-6-astra"
+          },
+          "gemini": {
+            "nano": "gemini-flash-low",
+            "mini": "gemini-flash-low",
+            "standard": "gemini-flash-medium",
+            "advanced": "gemini-flash-high",
+            "flagship": "gemini-pro",
+            "frontier": "gemini-pro"
+          }
+        },
+        "tierFallback": {
+          "nano": [
+            "gemini",
+            "claude",
+            "openai"
+          ],
+          "mini": [
+            "gemini",
+            "claude",
+            "openai"
+          ],
+          "standard": [
+            "gemini",
+            "claude",
+            "openai"
+          ],
+          "advanced": [
+            "gemini",
+            "claude",
+            "openai"
+          ],
+          "flagship": [
+            "claude",
+            "openai",
+            "gemini"
+          ],
+          "frontier": [
+            "claude",
+            "openai",
+            "gemini"
+          ]
+        },
+        "defaults": {
+          "tier": "standard"
+        },
+        "maxTier": "frontier",
+        "capabilities": {
+          "execute": {
+            "description": "run a task"
+          },
+          "code:*": {
+            "tier": "advanced"
+          },
+          "code:review": {
+            "tier": "flagship",
+            "rigor": "high",
+            "prefer": [
+              "openai",
+              "claude"
+            ]
+          },
+          "code:debug": {
+            "prefer": [
+              {
+                "executor": "claude",
+                "invocation": "claude-cli-bwrap"
+              }
+            ]
+          },
+          "write:docs": {
+            "persona": "tech-writer"
+          },
+          "write:*": {
+            "rigor": "low"
+          },
+          "architecture:shape": {
+            "tier": "frontier",
+            "maxTier": "flagship",
+            "prefer": [
+              "claude",
+              "openai"
+            ]
+          }
+        },
+        "roles": {
+          "red-team": {
+            "prefer": [
+              "claude",
+              "openai"
+            ]
+          },
+          "producer": {
+            "prefer": [
+              {
+                "executor": "claude",
+                "invocation": "claude-cli-bwrap"
+              }
+            ]
+          }
+        },
+        "personas": {
+          "tech-writer": {
+            "tier": "mini"
+          }
+        },
+        "llmAccounts": {
+          "openai": {
+            "work": {
+              "credentialStore": {
+                "codex": "~/.codex-work",
+                "pi": "~/.pi-work"
+              }
+            },
+            "spare": {
+              "credentialStore": {
+                "codex": "~/.codex-spare"
+              }
+            }
+          },
+          "openai-team": {
+            "team": {
+              "credentialStore": {
+                "codex": "~/.codex-team"
+              }
+            }
+          },
+          "claude": {
+            "main": {
+              "credentialStore": {
+                "claude": "~/.claude-main"
+              }
+            }
+          }
+        }
+      },
+      "walk": {},
+      "headLaunch": false,
+      "result": {
+        "ok": {
+          "refused": {
+            "reason": "bypass-invocation-not-allowed",
+            "detail": "invocation \"claude/claude-cli-bwrap\" never asks before acting and is only for a head session's launch, not a worker seat",
+            "fix": "name it only under runner.personas.<persona>.prefer of a head persona"
+          }
+        }
+      }
+    },
+    {
+      "name": "a persona pin of a bypass invocation is refused for a worker seat",
+      "ask": {
+        "unit": {
+          "id": "u1",
+          "capability": "execute",
+          "writes": []
+        },
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+        },
+        "raiseAuthorized": false,
+        "readOnly": false,
+        "independentOf": [],
+        "overrides": [],
+        "persona": "panelist"
+      },
+      "cfg": {
+        "executors": {
+          "claude": {
+            "kind": "agent",
+            "providerModel": "claude",
+            "supports": {
+              "reasoningEffort": [
+                "low",
+                "medium",
+                "high"
+              ],
+              "skills": [
+                "fgos-coding-implement"
+              ]
+            },
+            "invocations": [
+              {
+                "id": "claude-cli-bwrap",
+                "via": "cli",
+                "adapter": "cli-spawn",
+                "command": "claude",
+                "credentialStore": {
+                  "use": "claude",
+                  "homeEnv": "CLAUDE_CONFIG_DIR",
+                  "sessionDir": "projects",
+                  "files": [
+                    ".credentials.json"
+                  ]
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                },
+                "permissionMode": "bypass"
+              },
+              {
+                "id": "claude-herdr-bwrap",
+                "via": "cli",
+                "adapter": "herdr-spawn",
+                "command": "claude",
+                "credentialStore": {
+                  "use": "claude",
+                  "homeEnv": "CLAUDE_CONFIG_DIR",
+                  "sessionDir": "projects",
+                  "files": [
+                    ".credentials.json"
+                  ]
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              }
+            ]
+          },
+          "openai": {
+            "kind": "agent",
+            "providerModel": "openai",
+            "invocations": [
+              {
+                "id": "codex-cli-bwrap",
+                "via": "cli",
+                "adapter": "cli-spawn",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              },
+              {
+                "id": "pi-herdr-bwrap",
+                "via": "cli",
+                "adapter": "herdr-spawn",
+                "command": "pi",
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "sessionDir": "sessions",
+                  "files": [
+                    "auth.json"
+                  ]
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              },
+              {
+                "id": "codex-herdr-bwrap",
+                "via": "cli",
+                "adapter": "herdr-spawn",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              },
+              {
+                "id": "pi-cli-bwrap",
+                "via": "cli",
+                "adapter": "cli-spawn",
+                "command": "pi",
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "sessionDir": "sessions",
+                  "files": [
+                    "auth.json"
+                  ]
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              }
+            ]
+          },
+          "gemini": {
+            "kind": "agent",
+            "providerModel": "gemini",
+            "invocations": [
+              {
+                "id": "agy-cli-bwrap",
+                "via": "cli",
+                "adapter": "cli-spawn",
+                "command": "agy",
+                "credentialStore": {
+                  "use": "agy",
+                  "homeEnv": "AGY_HOME"
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              },
+              {
+                "id": "agy-herdr-bwrap",
+                "via": "cli",
+                "adapter": "herdr-spawn",
+                "command": "agy",
+                "credentialStore": {
+                  "use": "agy",
+                  "homeEnv": "AGY_HOME"
+                },
+                "confinement": {
+                  "backend": "bwrap"
+                }
+              }
+            ]
+          }
+        },
+        "modelPolicies": {
+          "claude": {
+            "nano": "haiku",
+            "mini": {
+              "model": "haiku",
+              "effort": "high"
+            },
+            "standard": "sonnet",
+            "advanced": "sonnet",
+            "flagship": "opus",
+            "frontier": "fable"
+          },
+          "openai": {
+            "nano": {
+              "model": "gpt-6-luna",
+              "effort": "low"
+            },
+            "mini": "gpt-6-luna",
+            "standard": "gpt-5.6-terra",
+            "advanced": {
+              "model": "gpt-6.1-sol",
+              "effort": "medium"
+            },
+            "flagship": [
+              "gpt-6.1-sol",
+              "gpt-6.1-sol@openai-team"
+            ],
+            "frontier": "gpt-6-astra"
+          },
+          "gemini": {
+            "nano": "gemini-flash-low",
+            "mini": "gemini-flash-low",
+            "standard": "gemini-flash-medium",
+            "advanced": "gemini-flash-high",
+            "flagship": "gemini-pro",
+            "frontier": "gemini-pro"
+          }
+        },
+        "tierFallback": {
+          "nano": [
+            "gemini",
+            "claude",
+            "openai"
+          ],
+          "mini": [
+            "gemini",
+            "claude",
+            "openai"
+          ],
+          "standard": [
+            "gemini",
+            "claude",
+            "openai"
+          ],
+          "advanced": [
+            "gemini",
+            "claude",
+            "openai"
+          ],
+          "flagship": [
+            "claude",
+            "openai",
+            "gemini"
+          ],
+          "frontier": [
+            "claude",
+            "openai",
+            "gemini"
+          ]
+        },
+        "defaults": {
+          "tier": "standard"
+        },
+        "maxTier": "frontier",
+        "capabilities": {
+          "execute": {
+            "description": "run a task"
+          },
+          "code:*": {
+            "tier": "advanced"
+          },
+          "code:review": {
+            "tier": "flagship",
+            "rigor": "high",
+            "prefer": [
+              "openai",
+              "claude"
+            ]
+          },
+          "code:debug": {
+            "prefer": [
+              {
+                "executor": "claude",
+                "invocation": "claude-cli-bwrap"
+              }
+            ]
+          },
+          "write:docs": {
+            "persona": "tech-writer"
+          },
+          "write:*": {
+            "rigor": "low"
+          },
+          "architecture:shape": {
+            "tier": "frontier",
+            "maxTier": "flagship",
+            "prefer": [
+              "claude",
+              "openai"
+            ]
+          }
+        },
+        "roles": {
+          "red-team": {
+            "prefer": [
+              "claude",
+              "openai"
+            ]
+          }
+        },
+        "personas": {
+          "tech-writer": {
+            "tier": "mini"
+          },
+          "panelist": {
+            "prefer": [
+              {
+                "executor": "claude",
+                "invocation": "claude-cli-bwrap"
+              }
+            ]
+          }
+        },
+        "llmAccounts": {
+          "openai": {
+            "work": {
+              "credentialStore": {
+                "codex": "~/.codex-work",
+                "pi": "~/.pi-work"
+              }
+            },
+            "spare": {
+              "credentialStore": {
+                "codex": "~/.codex-spare"
+              }
+            }
+          },
+          "openai-team": {
+            "team": {
+              "credentialStore": {
+                "codex": "~/.codex-team"
+              }
+            }
+          },
+          "claude": {
+            "main": {
+              "credentialStore": {
+                "claude": "~/.claude-main"
+              }
+            }
+          }
+        }
+      },
+      "walk": {},
+      "headLaunch": false,
+      "result": {
+        "ok": {
+          "refused": {
+            "reason": "bypass-invocation-not-allowed",
+            "detail": "invocation \"claude/claude-cli-bwrap\" never asks before acting and is only for a head session's launch, not a worker seat",
+            "fix": "name it only under runner.personas.<persona>.prefer of a head persona"
+          }
+        }
+      }
+    },
+    {
       "name": "a bypass invocation is allowed for a head launch",
       "ask": {
         "unit": {
