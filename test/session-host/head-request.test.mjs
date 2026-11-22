@@ -327,6 +327,30 @@ test('a land answers a ticket at once, the runner finishes it and request result
   runTicket(ticketFile('t1'), { exec: () => assert.fail('a finished ticket is never run twice') });
 });
 
+test('the request release supplies nested host calls, questions and tickets without rewriting the attempt envelope', async (t) => {
+  // This owns propagation inside the payload; Rust owns activation selection and handover verification.
+  const { runDir, project, ports, ticketFile } = headCase(t);
+  const file = path.join(runDir, 'envelope.json');
+  const before = fs.readFileSync(file, 'utf8');
+  const seen = [];
+  const requestHostBin = '/new-release/bin/fgos';
+  const ask = (verb, args, id) => runHeadRequest({ runDir, requestHostBin, request: { id, verb, args } }, {
+    ...ports,
+    hostCall: (call) => { seen.push(call.hostBin); return { status: 0, stdout: '{"data":{}}' }; },
+    questions: (call) => { seen.push(call.hostBin); assert.equal(call.runDir, runDir); return {}; },
+  });
+  assert.equal((await ask('supervisor queue', {}, 'q')).exit, 0);
+  assert.equal((await ask('questions ask', { input: {} }, 'a')).exit, 0);
+  assert.equal((await ask('run', { prompt: 'do it' }, 't1')).exit, 0);
+  const ticket = JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8'));
+  assert.equal(ticket.hostBin, requestHostBin);
+  runTicket(ticketFile('t1'), { selfRecord: SELF, exec: (bin) => { seen.push(bin); return { status: 0, stdout: '{}' }; } });
+  assert.deepEqual(seen, [requestHostBin, requestHostBin, requestHostBin]);
+  assert.equal(fs.readFileSync(file, 'utf8'), before);
+  assert.equal(JSON.parse(before).hostBin, '/the/fgos');
+  assert.equal(JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8')).cwd, project);
+});
+
 test('request result without an id lists the role tickets newest first and never another role', async (t) => {
   const { ask, ticketFile, project } = headCase(t);
   await ask('land', { paths: ['plans/p/a.md'], message: 'm' }, 'old');

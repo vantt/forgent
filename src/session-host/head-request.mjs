@@ -161,8 +161,8 @@ const covered = (p, footprint) => {
 const planOfCaller = (envelope, projectRoot, ports) => (ports.planOf ?? ((root, persona, name) => planOfHead(root, persona, name, ports.plan ?? {})))(projectRoot, personaOf(envelope), envelope.session.name);
 
 function hostBinOf(envelope) {
-  const { hostBin } = envelope;
-  if (typeof hostBin !== 'string' || hostBin === '') throw Object.assign(new Error('the envelope names no host binary'), { code: 'envelope-invalid' });
+  const hostBin = envelope.requestHostBin ?? envelope.hostBin;
+  if (typeof hostBin !== 'string' || hostBin === '') throw Object.assign(new Error('the request names no host binary'), { code: 'envelope-invalid' });
   return hostBin;
 }
 
@@ -701,9 +701,11 @@ export async function runStopSelf({ persona, name, projectRoot, waitPid }, ports
  * `session rotate` returns at once (the rotation runs detached); `session answered` is the one verb of a successor that does
  * not hold the role yet: it records the answer, and the supervisor moves the role after this line says done.
  */
-export async function runHeadRequest({ runDir, request }, ports = {}) {
+export async function runHeadRequest({ runDir, request, requestHostBin }, ports = {}) {
   try {
-    const envelope = readEnvelope(runDir);
+    // A per-request context only: the verified attempt envelope on disk and its hostBin/payloadRoot stay immutable.
+    // The Rust handover supplies this host out of band, never from the sandbox's request frame.
+    const envelope = { ...readEnvelope(runDir), requestHostBin };
     const args = request?.args;
     if (args === null || typeof args !== 'object' || Array.isArray(args)) throw badArgs('args must be an object');
     const projectRoot = envelope.cwd;
@@ -745,8 +747,7 @@ export async function runHeadRequest({ runDir, request }, ports = {}) {
       case HEAD_QUESTIONS_ACK_VERB:
       case HEAD_QUESTIONS_CANCEL_VERB:
       case HEAD_QUESTIONS_ANSWER_VERB: {
-        const { hostBin } = envelope;
-        if (typeof hostBin !== 'string' || hostBin === '') throw Object.assign(new Error('the envelope names no host binary'), { code: 'envelope-invalid' });
+        const hostBin = hostBinOf(envelope);
         const call = { hostBin, runDir, cwd: projectRoot, request: { verb: request.verb, args } };
         data = ports.questions ? await ports.questions(call) : callHeadQuestions(call);
         break;
@@ -861,7 +862,7 @@ if (process.argv[1] && fs.realpathSync(process.argv[1]) === fs.realpathSync(file
         process.exitCode = 70;
       }
       if (request !== undefined) {
-        const { exit, line } = await runHeadRequest({ runDir: path.resolve(runDir), request });
+        const { exit, line } = await runHeadRequest({ runDir: path.resolve(runDir), request, requestHostBin: process.env.FGOS_HEAD_REQUEST_HOST_BIN });
         emit(line);
         process.exitCode = exit;
       }

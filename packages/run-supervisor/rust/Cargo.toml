@@ -5,6 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+fgos-host-runtime = { path = "../../host-runtime/rust", optional = true }
 fgos-durable-file = { path = "../../durable-file/rust" }
 fgos-canonical-json = { path = "../../canonical-json/rust" }
 fgos-process = { path = "../../process/rust" }
@@ -29,7 +30,7 @@ sha2 = { workspace = true }
 # supervisor routes and the rest of the controller, and is on by default.
 default = ["supervise"]
 lease = []
-supervise = ["lease", "fgos-identity/directory", "dep:fgos-agent-protocol", "dep:fgos-terminal-control", "dep:fgos-session-host", "dep:fgos-config", "dep:fgos-git"]
+supervise = ["lease", "dep:fgos-host-runtime", "fgos-identity/directory", "dep:fgos-agent-protocol", "dep:fgos-terminal-control", "dep:fgos-session-host", "dep:fgos-config", "dep:fgos-git"]
 
 [target.'cfg(unix)'.dependencies]
 libc = { workspace = true }

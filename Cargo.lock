@@ -621,6 +621,7 @@ dependencies = [
  "fgos-durable-file",
  "fgos-git",
  "fgos-holder-lock",
+ "fgos-host-runtime",
  "fgos-identity",
  "fgos-process",
  "fgos-session-host",

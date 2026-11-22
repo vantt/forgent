@@ -2,6 +2,7 @@
 //!
 //! Kernel types, pure router, authority gate, and invocation pipeline.
 
+pub mod activation;
 pub mod authority_gate;
 pub mod catalog;
 pub mod civil_time;

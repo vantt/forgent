@@ -811,7 +811,10 @@ pub(super) fn run(
                 code: "envelope-invalid",
                 why,
             })?,
-            server,
+            server.with_request_host(crate::head_request::request_host_bin(
+                Path::new(envelope["cwd"].as_str().unwrap_or_default()),
+                envelope["hostBin"].as_str().unwrap_or_default(),
+            )),
         )),
         None => None,
     };
