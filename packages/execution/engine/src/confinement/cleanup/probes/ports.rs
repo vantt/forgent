@@ -39,7 +39,9 @@ impl ResourceResolver for PolicyResolver {
                 repo_root: ctx("repoRoot"),
                 cwd: ctx("cwd"),
                 assignment_launch_context: context.get("assignmentLaunchContext").is_some(),
-                ..Default::default()
+                adapter: ctx("adapter"),
+                launch_command: ctx("launchCommand"),
+                launch_path: ctx("launchPath"),
             },
             grants: input["grants"]
                 .as_array()
@@ -48,16 +50,19 @@ impl ResourceResolver for PolicyResolver {
                         .map(|grant| Grant {
                             resource: grant["resource"].as_str().unwrap_or_default().into(),
                             access: grant["access"].as_str().unwrap_or_default().into(),
-                            ..Default::default()
+                            subpath: grant["subpath"].as_str().map(str::to_owned),
+                            paths: grant.get("paths").filter(|p| !p.is_null()).cloned(),
                         })
                         .collect()
                 })
                 .unwrap_or_default(),
+            private_home_root: text(&["backendConfig", "privateHomeRoot"]),
             temp_root: text(&["backendConfig", "tempRoot"]),
             default_temp_root: resolve_confinement_temp_root(&temp)
                 .to_string_lossy()
                 .into_owned(),
             credentials_path: text(&["providerSources", "credentialsPath"]),
+            credentials_dir: text(&["providerSources", "credentialsDir"]),
             default_credentials_dir: temp.join("fgos-credentials").to_string_lossy().into_owned(),
             blind: input["blind"].as_bool().unwrap_or(false),
             home_dir: text(&["homeDir"])
@@ -75,7 +80,27 @@ impl ResourceResolver for PolicyResolver {
                         .collect()
                 })
                 .unwrap_or_default(),
-            ..Default::default()
+            confinement_roots: input["confinementRoots"]
+                .as_array()
+                .map(|list| {
+                    list.iter()
+                        .filter_map(|root| root.as_str().map(str::to_owned))
+                        .collect()
+                })
+                .unwrap_or_default(),
+            // The lock file of the holder-lock registry's `mailbox` row, filled by the registry's own template.
+            mailbox_lock_path: ctx("fgosDir")
+                .filter(|dir| !dir.is_empty())
+                .and_then(|dir| {
+                    fgos_holder_lock::scope::lock_path(
+                        "mailbox",
+                        &std::collections::BTreeMap::from([("fgosDir".to_owned(), dir)]),
+                    )
+                    .ok()
+                })
+                .map(|path| path.to_string_lossy().into_owned())
+                .unwrap_or_default(),
+            uid: current_uid(),
         };
         let resolved = resolve_confinement_resources(&resolve_input)
             .map_err(|error| DriverError::new(ErrorKind::Port, error.to_string()))?;
