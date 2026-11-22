@@ -268,6 +268,10 @@ overlap. The plan turns `ready` once all three are done; reordering them is a pr
   nghị"): OS-D12 (one scheduling record per open step, keyed by `item`, `step`) and OS-D19 (handoff closes one record
   and opens the next) are final. The planner head cannot write `questions answer`, so it closed the question with
   the owner's words as the reason.
+- `q-yoxcjqa46z` (answered by the owner via the secretary, 2026-11-22 22:12): run this plan after the three land.
+  `blockedBy` stays as written; the supervisor admits it once `261122-0118-heads-stable-and-able`,
+  `261122-1950-owner-communication-standard` and `261121-2109-component-authority` are done. No other plan's order or
+  scope changes.
 
 ## Risks and rollback
 

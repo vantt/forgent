@@ -203,6 +203,12 @@ writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
 
+### Owner answer (2026-11-22 22:12, recorded by head:supervisor-forgent)
+
+- `q-dcbq73d2rr`: the owner activates the release carrying 12c (`8883c2a62`) on the host and removes the five finished
+  worktrees (p02, p02g, p06, p06f, p12c); lead:SUPERVISOR then reruns the real soft rotation (phase 12 done-when item
+  3). The supervisor neither activates a release nor removes a worktree.
+
 ### Lead progress (2026-11-22 22:10, head:lead-forgent-261122-0118-heads-b52f9, gen 7)
 
 - **Measure windows, checked against the heads' request logs:**
