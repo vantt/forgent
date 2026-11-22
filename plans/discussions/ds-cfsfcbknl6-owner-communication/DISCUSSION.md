@@ -1,6 +1,6 @@
 ---
 id: ds-cfsfcbknl6
-title: "Thấu hiểu user: one shared standard for how every agent talks to the owner"
+title: "Tiêu chuẩn giao tiếp: one shared communication standard for how every agent talks to the owner"
 status: settled
 source:
   - p-wb6rkwpjsg
@@ -11,13 +11,16 @@ discussion: settled
 
 ## Hand-off to the planner
 
-- **Outcome:** one shared standard, **thấu hiểu user**, always loaded by every head, lead and worker in every CLI, that gives the motive, the principle judged from the reader's side, its applications (before speaking, names and ids, language and length, decision questions, status and incident reports) and a few curated cases; bad exchanges are captured in the friction store, partly by a hook on the owner's own reaction; the question door makes answers cheap. Decisions OC-D1 to OC-D7.
+- **Outcome:** one shared standard, **tiêu chuẩn giao tiếp** (communication standard), always loaded by every head, lead and worker in every CLI, that gives the motive, the principle judged from the reader's side, its applications (before speaking, names and ids, language and length, decision questions, status and incident reports) and a few curated cases; bad exchanges are captured in the friction store, partly by a hook on the owner's own reaction; the question door makes answers cheap. Decisions OC-D1 to OC-D7.
 - **Constraints:** the standard replaces `core/skills/_shared/decision-question.md` and `core/instructions/decision-question.md`; every caller moves and the old paths are removed in the same change (L10, design principle 1); generated copies are rebuilt with `npm run build:skills`, never edited; a new friction layer value goes into `packages/observe/rust/friction-kinds.json` only; a new hook kind needs its rows in `packages/distribution/contracts/agent-hooks.v1.json` and the doctor registry; the reaction hook never blocks or delays the owner's prompt; a user-visible change gets a line in `CHANGELOG.md`; `npm test` and `cargo test --workspace` green.
 - **Non-goals:** keeping information valid (OC-D1, its own item); the coach role (OC-D5, its own item); a check on the agent's outgoing messages (OC-D7, level 3); changing the approved-frame rule or the product priority order.
 - **Acceptance criteria:** see each task in section 7.
 - **Open points that block only part:** the T-signal phrase list is provisional (section 6, step 3); task 2 starts with it and the coach refines it later. Codex support for a prompt-submit hook is unverified; task 2 covers Claude Code and adds Codex only where its hook surface allows.
 - **Source ids:** `p-wb6rkwpjsg`; decisions OC-D1 to OC-D7.
-- **Separate items this discussion produced (not for this planner):** information freshness by watchers and monitors (OC-D1); the coach role (OC-D5). Neither has a backlog row yet.
+- **Collision to resolve in planning:** draft plan `261122-0056-orchestration-skeleton` also lists `packages/questions/contracts/questions-input.v1.json` and `packages/questions/rust/src/*` in its footprint; task 3 touches the same files, so the planner either sequences task 3 after that plan or folds task 3 into it.
+- **Separate items this discussion produced (not for this planner):**
+  - Information freshness (OC-D1). Owner 17:53 asked whether it fits the running plan `261122-0118-heads-stable-and-able`. Shaper's reading: the idle-lead part (status resting on `leadLive`) is already folded there (`p-4uqiyjwrtd`, phases 7 and 9). The stale-question part needs the question store to notice the state behind a question, which that plan's non-goals hand to draft plan `261122-0056-orchestration-skeleton` (question recipients and notifier, footprint `packages/questions/rust/src/notifier.rs`). That plan is at its last phases (8-12 running, 11 the integration gate), so widening it would delay its done.
+  - The coach as part of a complete observation cluster. Owner 17:53: a separate discussion; observe metrics plus friction already give the data; extend the cluster into a whole with a coach that cares for it, and harden observe with ready-built harness and tools so the coach gets aggregated data fast, for example pre-built SQL views as in the owner's `vantt/pkm` project. Shaper notes: L3 already says truth in JSONL, the database is a view, so pre-built views fit the law; observe already has named query definitions (`fgos metrics query`, observe spec section 1), the nearest existing door to extend; `vantt/pkm` is not on this machine, so its views were not read.
 
 ## Seed
 
@@ -34,13 +37,13 @@ Opened by the secretary (Miu) on the owner's order, 2026-11-22. The owner wants 
 
 Settled, 2026-11-22 17:50. Domain: coding (the change edits fgOS core skills, the always-loaded instruction, the friction declarations, an agent hook and the question door).
 
-The standard **thấu hiểu user** is defined: the motive (the owner's attention is the scarcest resource), the principle judged from the reader's side, its applications and seed cases (section 6). Bad exchanges go to the friction store, triggered by the owner's reaction (signals T1-T12). A coach, started by the supervisor, learns from them and hands problems back through the normal pipeline. Program support: capture the owner's reaction, make answers cheap in the question door, no check on outgoing messages for now. Decisions OC-D1 to OC-D7.
+The standard **tiêu chuẩn giao tiếp** (communication standard) is defined: the motive (the owner's attention is the scarcest resource), the principle judged from the reader's side, its applications and seed cases (section 6). Bad exchanges go to the friction store, triggered by the owner's reaction (signals T1-T12). A coach, started by the supervisor, learns from them and hands problems back through the normal pipeline. Program support: capture the owner's reaction, make answers cheap in the question door, no check on outgoing messages for now. Decisions OC-D1 to OC-D7.
 
 **Output:** three tasks for one planner (section 7): write the standard and move every caller; capture the owner's reaction; cheap answers in the question door. Two separate items that need their own backlog rows and shapers: information freshness by watchers and monitors (OC-D1) and the coach role (OC-D5). No owner question is open.
 
 ## 2. Mục tiêu & đề bài
 
-Agents in fgOS speak to the owner many times a day, and the owner's attention is the scarcest and most expensive thing in the whole system. Today the only shared rule is the five-part decision question, and it covers one act (asking the owner to choose). Its guard only counts labels, so a question can pass it and still be hard to understand. Nothing tells an agent why it should communicate well, or what "well" means outside a question. On 2026-11-22 the owner spent turns asking permission back ("yes, just do it"), asking what a name meant ("who is OPC?"), re-reading long blocks and having a question rewritten; the shaper's own first messages in this discussion did the same (English, long, full of ids and file paths). The outcome is one shared standard, **thấu hiểu user**, always loaded by every head, lead and worker in every CLI. It gives the motive first, then a principle judged from the reader's side, then how the principle applies to each kind of message (before speaking, names and ids, decision questions, status and incident reports), then a growing set of real cases, good and bad, that agents learn from and that improve the standard over time. A program check is a last safety net, chosen at the end, never the reason an agent communicates well. The standard replaces the existing decision-question text rather than sitting beside it. Out of scope: keeping information valid (fresh data, stale questions, nudging the concerned agent), which belongs to the watchers and monitors and is a separate item.
+Agents in fgOS speak to the owner many times a day, and the owner's attention is the scarcest and most expensive thing in the whole system. Today the only shared rule is the five-part decision question, and it covers one act (asking the owner to choose). Its guard only counts labels, so a question can pass it and still be hard to understand. Nothing tells an agent why it should communicate well, or what "well" means outside a question. On 2026-11-22 the owner spent turns asking permission back ("yes, just do it"), asking what a name meant ("who is OPC?"), re-reading long blocks and having a question rewritten; the shaper's own first messages in this discussion did the same (English, long, full of ids and file paths). The outcome is one shared standard, **tiêu chuẩn giao tiếp** (communication standard), always loaded by every head, lead and worker in every CLI. It gives the motive first, then a principle judged from the reader's side, then how the principle applies to each kind of message (before speaking, names and ids, decision questions, status and incident reports), then a growing set of real cases, good and bad, that agents learn from and that improve the standard over time. A program check is a last safety net, chosen at the end, never the reason an agent communicates well. The standard replaces the existing decision-question text rather than sitting beside it. Out of scope: keeping information valid (fresh data, stale questions, nudging the concerned agent), which belongs to the watchers and monitors and is a separate item.
 
 ## 3. Vấn đề rõ / chưa rõ
 
@@ -69,6 +72,7 @@ Agents in fgOS speak to the owner many times a day, and the owner's attention is
 | OC-D5 | A coach, not the secretary and not the agent that made the message, learns from those records. The supervisor starts it at the right moment. It owns the learning loop only: collect signals, diagnose the real cause, propose, measure the signature's count afterwards; it merges and deletes rules, not only adds; proposals are thresholded and capped per batch. Hand-off: a small text change to the standard is drafted by the coach and approved by the owner in a batch, then landed by one run; anything else goes back to the supervisor as a well-evidenced problem, becomes a backlog row and runs through the normal pipeline, which assembles a fitting team. There are no standing area owners. | Owner 17:16 (coach), 17:37 (no area owners, hand to a fitting team), 17:45 ("đồng ý" to the hand-off points) | 2026-11-22 |
 | OC-D6 | One standard file, not two: the standard absorbs today's decision-question text as one of its applications; split the case examples out only if the file grows past what an agent will read. | Shaper default since 13:05, unchallenged through 17:46 | 2026-11-22 |
 | OC-D7 | Program support, in order: (1) a hook on the owner's incoming message spots the T-signals and records a friction candidate with the owner's words and the agent's previous message; (2) the question door shows options lettered A-D and carries a stated default; (3) no check on the agent's outgoing message for now, the coach may propose it from data. | Shaper proposal 17:45, owner "đồng ý" 17:46 | 2026-11-22 |
+| OC-D8 | Supersedes OC-D2's name and sharpens its principle. The standard is named **tiêu chuẩn giao tiếp** (communication standard). The understanding behind it: the owner is cognitively overloaded, with too much to handle, so every message must make taking in information as easy, as clear and as high in quality as possible; deciding at once is one case of that, reports and status included. Motive and safety-net role of checks unchanged from OC-D2. | Owner 18:00 | 2026-11-22 |
 
 ## 5. Q&A log
 
@@ -98,9 +102,13 @@ Agents in fgOS speak to the owner many times a day, and the owner's attention is
 
 - 2026-11-22 17:46 — Owner: "đồng ý. như vậy thảo luận này ra 2 việc phải làm?" Shaper minted OC-D6 (one file) and OC-D7 (program support levels); answered that the discussion yields three tasks for one planner plus two separate items (freshness, coach); wrote §7 and the hand-off block; marked the discussion settled.
 
+- 2026-11-22 17:53 — Owner: "1-3 anh cần làm rõ thêm. watcher và monitor có thể nhét luôn và lead đang làm là : heads-stable-and-able không? Vai coach anh nghĩ cần một thảo luận thêm, như vậy đã có observation/metrics và friction để lấy dữ liệu, giờ chúng ta có thể mở rộng thêm một chút ở chổ cụm này thì có thể trở thành 1 cụm hoàn chỉnh bao gồm có 1 coach để lo chăm sóc và quản hệ này và anh nghĩ chắc cũng sẽ cần làm cứng thêm chổ observation/metrics, chủ yếu là build sẵn harness/tool để coach có thể nhanh chóng lấy dữ liệu quan sát đã được tổng hợp, ví dụ các dạng sql-view được build sẵn như project vantt/pkm đã làm ." Shaper scouted the heads-stable plan, the orchestration-skeleton draft and the observe spec; recorded the freshness split, the coach-cluster seed and the task 3 collision in the hand-off block; explained tasks 1-3 in plain words in chat.
+
+- 2026-11-22 18:00 — Owner: "việc 1: tên gọi thấu hiểu user thì cũng không đúng lắm nhỉ. thật ra là tiêu chuẩn giao tiếp thì đúng hơn. sự thấu hiểu ở đây là hiểu user bị quá tải nhận thức, quá nhiều việc, nên hướng giao tiếp phải làm cho việc tiếp nhận thông tin dễ dàng nhất, rõ ràng và chất lượng nhất." Shaper agreed: the old name read as a general empathy rule while the scope is communication; the overload is the reason, not the name. Minted OC-D8 superseding OC-D2's name; widened the principle from deciding at once to taking in information easily, with deciding as one case; renamed throughout outside §4-§5.
+
 ## 6. Thiết kế đã chốt {#design}
 
-The standard **thấu hiểu user**, as it stands. Steps 1 and 2 are settled in substance (OC-D2), their wording is not final; step 3 holds seed cases; step 4 is not started.
+The standard **tiêu chuẩn giao tiếp** (communication standard), as it stands. Steps 1 and 2 are settled in substance (OC-D2), their wording is not final; step 3 holds seed cases; step 4 is not started.
 
 ### Bước 1 — Vì sao (động lực)
 
@@ -108,9 +116,11 @@ Of everything in the system, the owner's attention is the scarcest and the most 
 
 ### Bước 2 — Thế nào là tốt (chuẩn mực, đo từ phía người đọc)
 
-**Principle.** The agent finishes its own work before it speaks, and everything it brings is enough for the owner to decide at once, without asking back and without looking anything up.
+**The understanding behind it.** The owner is overloaded: too much to think about, too many things at once. Every message competes for attention that is already spent. So the direction of all communication is to make taking in information as easy, as clear and as high in quality as possible.
 
-**Test before sending.** Read the message as a busy person with no context: can that person understand it in one read and decide? If the person would ask "what is this?", "why?", "what do you suggest?" or "what happens if I say yes?", the message is not done.
+**Principle.** The agent finishes its own work before it speaks, and what it brings is received with the least effort: clear, complete, accurate, in the owner's words. When a decision is needed, it is enough to decide at once, without asking back and without looking anything up.
+
+**Test before sending.** Read the message as an overloaded person with no context: can that person take it in with one read, and decide if a decision is asked? If the person would ask "what is this?", "why?", "what do you suggest?" or "what happens if I say yes?", the message is not done.
 
 **Applications** (each is the principle applied to one kind of message):
 
@@ -175,7 +185,7 @@ Three tasks for one planner. Task 1 lands first; tasks 2 and 3 can run in parall
 
 ### Task 1 — Write the standard and move every caller {#task-standard}
 
-- **Goal:** the standard thấu hiểu user exists as one shared fragment and one always-loaded instruction (suggested names `core/skills/_shared/owner-communication.md` and `core/instructions/owner-communication.md`), replacing both decision-question files; the friction store can hold owner-communication cases.
+- **Goal:** the communication standard exists as one shared fragment and one always-loaded instruction (suggested names `core/skills/_shared/owner-communication.md` and `core/instructions/owner-communication.md`), replacing both decision-question files; the friction store can hold owner-communication cases.
 - **§6 excerpt:** steps 1-3 (motive, principle and test, applications, curated cases, how cases are kept and the T-signals).
 - **D-IDs:** OC-D2, OC-D3, OC-D4, OC-D6.
 - **Includes:** every caller of the old paths moved (about 20 source files: core and coding-domain skills, platform docs, reading map; code and test refs in `src/state/decision-question.mjs`, `src/state/status-fsm.mjs`, `test/docs/rul11-anchor-phrase.test.mjs`, `test/state/awaiting.test.mjs`); the "at most 10 lines" report lines in `fgos-lead`, `fgos-secretary`, `fgos-supervisor` replaced by a pointer; a friction layer value for owner communication in `packages/observe/rust/friction-kinds.json`; the owner-signal trigger in `core/skills/_shared/friction-capture.md`; generated copies rebuilt.
