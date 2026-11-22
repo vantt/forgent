@@ -340,7 +340,7 @@ test('placeHead launches a head and leaves the holder check and the placement re
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 
-// The private /tmp itself is proven at the lowest layer by the head sandbox argv (`--tmpfs /tmp`, test/helpers/head-sandbox-argv.mjs).
+// The private /tmp itself is proven at the lowest layer by the head sandbox argv (`--tmpfs /tmp`, apps/fgos/tests/questions_head.rs).
 test('a head launch exports TMPDIR=/tmp, the sandbox private tmpfs, and makes no scratch directory', async () => {
   const projectRoot = scratch();
   const { calls, ports } = fakes();
