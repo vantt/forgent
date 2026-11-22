@@ -1,0 +1,29 @@
+{
+  "job": "Node rows bridge",
+  "kind": "door",
+  "patterns": [
+    "doctor-bridge",
+    "\\brunBridged\\b"
+  ],
+  "allowed": [
+    {
+      "path": "apps/fgos/src/wiring/doctor/bridge.rs",
+      "reason": "the host side: starts the payload module and reads its result lines"
+    },
+    {
+      "path": "src/setup/doctor-bridge.mjs",
+      "reason": "the payload side: runs the bodies the host asks for"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "reason": "defines the body map the bridge runs"
+    },
+    {
+      "path": "src/setup/checks.mjs",
+      "reason": "re-exports it for the bridge"
+    }
+  ],
+  "debt": [],
+  "retiredBy": "S7: the last Node-owned doctor row and init's Work-store step move to Rust, and the bridge module and its host caller are deleted",
+  "reason": "the one bounded way a native verb reaches Node: a payload module the host starts through legacy_exec, never a verb, route or fgos internal entry, never a parsed command line"
+}

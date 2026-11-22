@@ -1,0 +1,24 @@
+{
+  "job": "kernel lock primitive",
+  "kind": "door",
+  "patterns": [
+    "libc::flock",
+    "\\bLockFileEx\\b",
+    "F_OFD_SETLK",
+    "F_SETLK",
+    "CreateMutexW",
+    "File::lock\\(",
+    "\\.try_lock_(?:shared|exclusive)\\("
+  ],
+  "allowed": [
+    "packages/holder-lock/rust/src/driver/flock.rs",
+    "packages/holder-lock/rust/src/driver/windows.rs"
+  ],
+  "debt": [
+    {
+      "path": "packages/git/node-addon/src/single_load.rs",
+      "reason": "takes a kernel lock of its own (Windows mutex, Unix flock) for the single-load marker instead of a holder-lock resource"
+    }
+  ],
+  "reason": "a kernel lock is taken only inside the holder-lock drivers; every other lock goes through its Resource. The patterns cannot see std file.lock(), try_lock() or lock_shared(), whose names are too common to match without false hits"
+}

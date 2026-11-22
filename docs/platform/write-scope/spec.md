@@ -231,7 +231,7 @@ the port stays and is pinned to the Rust rule by `test/git/write-scope-parity.te
 golden suite `test/runner/write-scope.test.mjs` through the addon as well as through Node. Plan phase 3 adds
 whole-scope `overlaps` cases to that one golden suite so both sides run them; no second parity file exists.
 
-**Guard against a new copy.** The door plan adds a `door` entry to `docs/architecture-manifest.json` whose
+**Guard against a new copy.** The door plan adds a `door` entry to `packages/component-authority/model/` whose
 patterns match only definitions of the rule (`export function pathsOverlap`, `footprintOverlapAmong`,
 `fn overlaps(` in `.rs` files under `packages/`), with the pinned JS port and `globsMeet` listed as debt with
 a `retiredBy`.

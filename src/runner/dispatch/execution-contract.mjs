@@ -74,7 +74,7 @@ export function normalizeSavedPolicyTier(policy, { allowAdditionalFields = false
 // declared `dispatchDeclaredOperation` call. Defined here (dispatch/infra
 // layer) rather than in session-engine.mjs (coordination/use-case layer) so
 // this module and assignment-normalizer.mjs -- both infra-layer, per
-// docs/architecture-manifest.json -- never import upward from
+// packages/component-authority/model/ -- never import upward from
 // src/runner/coordination/** (the one-directional-layer rule
 // test/architecture.test.mjs enforces); session-engine.mjs imports this
 // constant from here instead of re-declaring it, so there is exactly one

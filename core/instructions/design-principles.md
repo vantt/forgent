@@ -27,7 +27,7 @@ check exists it is named, otherwise the reviewer checks it.
    lowest layer that needs them, not in a feature or adapter module. When an
    import guard blocks you, import the shared leaf module it names; never copy
    the code. Checked by `test/architecture.test.mjs` against
-   `docs/architecture-manifest.json`.
+   `packages/component-authority/model/`.
 3. **Hexagonal and pluggable.** Keep shared logic independent of any one tool;
    the CLI, herdr, tmux and each agent CLI are thin, replaceable drivers behind
    a port.

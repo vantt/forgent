@@ -444,29 +444,43 @@ function scanMarkdownFiles(dir, containmentRoot = dir) {
 
 /**
  * Discover allowed components and domains under project root from the authoritative
- * architecture manifest (e.g. docs/architecture-manifest.json), rejecting unregistered roots.
+ * component-authority model (packages/component-authority/model/), rejecting unregistered roots.
  *
  * Options:
- *   - manifestPath: custom path to architecture manifest (internal/test-only)
+ *   - modelDir: custom path to component-authority model directory (internal/test-only)
  *   - allowedComponents: explicit array/set of allowed component names (internal/test-only)
  *   - allowedDomains: explicit array/set of allowed domain names (internal/test-only)
  */
 export function discoverKnownOwners(projectRoot, options = {}) {
-  const manifestPath = options.manifestPath ?? path.join(projectRoot, 'docs', 'architecture-manifest.json');
+  const modelDir = options.modelDir ?? options.manifestPath ?? path.join(projectRoot, 'packages', 'component-authority', 'model');
   const owners = new Set(['core', 'platform']);
 
-  if (fs.existsSync(manifestPath)) {
+  const componentsPath = path.join(modelDir, 'components.json');
+  if (fs.existsSync(componentsPath)) {
     try {
-      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-      if (Array.isArray(manifest.components)) {
-        for (const comp of manifest.components) {
-          if (typeof comp === 'string' && comp.trim()) {
-            owners.add(comp.trim());
+      const components = JSON.parse(fs.readFileSync(componentsPath, 'utf8'));
+      if (Array.isArray(components)) {
+        for (const comp of components) {
+          const id = typeof comp === 'string' ? comp.trim() : (comp && typeof comp.id === 'string' ? comp.id.trim() : '');
+          if (id) {
+            owners.add(id);
           }
         }
       }
-      if (Array.isArray(manifest.domains)) {
-        for (const dom of manifest.domains) {
+    } catch (err) {
+      throw new InstructionRegistryError(
+        `Failed to parse components model at ${componentsPath}: ${err.message}`,
+        { filePath: componentsPath, code: 'MANIFEST_ERROR', cause: err },
+      );
+    }
+  }
+
+  const layersPath = path.join(modelDir, 'layers.json');
+  if (fs.existsSync(layersPath)) {
+    try {
+      const layers = JSON.parse(fs.readFileSync(layersPath, 'utf8'));
+      if (Array.isArray(layers.domains)) {
+        for (const dom of layers.domains) {
           if (typeof dom === 'string' && dom.trim()) {
             owners.add(dom.trim());
           }
@@ -474,8 +488,8 @@ export function discoverKnownOwners(projectRoot, options = {}) {
       }
     } catch (err) {
       throw new InstructionRegistryError(
-        `Failed to parse architecture manifest at ${manifestPath}: ${err.message}`,
-        { filePath: manifestPath, code: 'MANIFEST_ERROR', cause: err },
+        `Failed to parse layers model at ${layersPath}: ${err.message}`,
+        { filePath: layersPath, code: 'MANIFEST_ERROR', cause: err },
       );
     }
   }
@@ -577,7 +591,7 @@ export class InstructionRegistry extends Array {
  *
  * In production default discovery, instruction sources are strictly discovered
  * from within projectRoot. Allowed component and domain owners are authoritatively
- * resolved from docs/architecture-manifest.json. Unregistered default roots are rejected.
+ * resolved from packages/component-authority/model/. Unregistered default roots are rejected.
  *
  * Custom roots (coreRoot, componentsRoot) are test-only/internal options
  * intended solely for test harness fixture isolation and cannot be used by production
@@ -586,7 +600,7 @@ export class InstructionRegistry extends Array {
  * Options:
  *   - coreRoot: (internal/test-only) custom path to core/instructions/
  *   - componentsRoot: (internal/test-only) custom path to components/
- *   - manifestPath: (internal/test-only) custom path to architecture manifest
+ *   - modelDir: (internal/test-only) custom path to component-authority model directory
  *   - knownOwners: Set or Array of valid owner names (internal/test-only override)
  *   - allowDuplicates: boolean (default false, throws on duplicate id)
  */
@@ -602,7 +616,7 @@ export function discoverInstructionSources(projectRoot, options = {}) {
       : new Set(options.knownOwners);
   } else {
     knownOwners = discoverKnownOwners(projectRoot, {
-      manifestPath: options.manifestPath,
+      modelDir: options.modelDir ?? options.manifestPath,
       allowedComponents: options.allowedComponents,
       allowedDomains: options.allowedDomains,
     });

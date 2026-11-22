@@ -113,7 +113,7 @@ The component is hexagonal (design principle 3) and sits in a low layer (princip
         (later, open item)
 ```
 
-Rules, checked by `test/architecture.test.mjs` against `docs/architecture-manifest.json` once code exists:
+Rules, checked by `test/architecture.test.mjs` against `packages/component-authority/model/` once code exists:
 
 1. The core imports no adapter, no CLI name (`pi`, `codex`, `omp`, `agy`, `claude`) and no config file format.
 2. One door (principle 1). The two `${VAR}` copies of section 2 collapse into the one expansion function in the same change that introduces it; both old paths are deleted (L10). The `${HOME}`-only copies move to it only if the owner extends the function to `~` and `$HOME` in section 15.

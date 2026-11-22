@@ -1,0 +1,35 @@
+{
+  "job": "doctor readiness registry",
+  "kind": "door",
+  "patterns": [
+    "\\bregisterCheck\\(",
+    "\\bregisterFix\\(",
+    "\\bDOCTOR_CHECKS\\b",
+    "\\bFIX_REGISTRATIONS\\b",
+    "doctor-registry\\.v1\\.json",
+    "\\bpub const FIX_COMMAND\\b",
+    "\\bpub fn render_pretty\\b"
+  ],
+  "allowed": [
+    {
+      "path": "packages/distribution/rust/src/doctor.rs",
+      "reason": "the doctor engine: the one fix command, the one report renderer"
+    },
+    {
+      "path": "apps/fgos/src/wiring/doctor/**",
+      "reason": "the host's registry reader and the in-process row adapters"
+    }
+  ],
+  "debt": [
+    {
+      "path": "src/setup/registrations.mjs",
+      "reason": "the bodies of the rows and fixes of the layers Node still owns, keyed by id (bridge:S6b and bridge:S7 in the registry; S6a removed its own); each step removes its own"
+    },
+    {
+      "path": "src/setup/checks.mjs",
+      "reason": "the re-export of the same body map, removed with it"
+    }
+  ],
+  "retiredBy": "S7: the last Node-owned row moves to Rust and the body map goes",
+  "reason": "one registry of every doctor row and fix, in run order, with an owner each (packages/distribution/contracts/doctor-registry.v1.json): Rust runs it, Node keeps only bodies"
+}

@@ -142,16 +142,16 @@ Where this direction is already stated or applied:
 | Hard outside, soft inside: the skeleton and the soul | [System Vision: Trong Mem Ngoai Cung](system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md) |
 | Workflow vocabulary: workflow, case, unit, loop, pattern, seat | [Workflow spec](workflow/spec.md) |
 | Domain doctrine placement | [Domainization](domainization/architecture/domainization.md) |
-| Code tiers and the import rule that enforces them | `docs/architecture-manifest.json` (`tierNames`, `tiers`), checked by `test/architecture.test.mjs` |
+| Code tiers and the import rule that enforces them | `packages/component-authority/model/` (`tierNames`, `tiers`), checked by `test/architecture.test.mjs` |
 
 Known gaps against this direction:
 
-- The code tiers in `docs/architecture-manifest.json` put Work lifecycle at
+- The code tiers in `packages/component-authority/model/` put Work lifecycle at
   tier 7 and Skill and Domain at tier 8, so Domain sits above Work. Point 5
   places Work above Domain. The tier change goes with the coding cutover,
   because until then Work's step machine drives coding's progress. This is an
   open gap, not a decision.
-- The same manifest also has a `layers` list (`entry`, `use-case`, `infra`,
+- The same model also has a `layers` list (`entry`, `use-case`, `infra`,
   `domain`, `kernel`), the per-file ranks of its one-directional import rule.
   Its `domain` rank does not mean the Domain layer above.
 - Business names have leaked into generic code and must move to Domain: the

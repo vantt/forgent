@@ -1,5 +1,5 @@
 // Giữ bản đồ kiến trúc thật thà bằng máy (architecture-map §9.3, record 0010).
-// Các phép kiểm trên docs/architecture-manifest.json:
+// Các phép kiểm trên mô hình cấu trúc packages/component-authority/model/:
 //   (a) đủ sổ — mọi file .mjs trong src/ + bin/ có row trong manifest, một-một
 //       (file thiếu row VÀ row chỉ file đã xóa đều đỏ);
 //   (b) một chiều xuống — mọi import tương đối chỉ trỏ cùng tầng hoặc tầng sâu
@@ -27,9 +27,27 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const manifest = JSON.parse(
-  fs.readFileSync(path.join(root, 'docs', 'architecture-manifest.json'), 'utf8'),
-);
+
+function loadModel(modelDir = path.join(root, 'packages/component-authority/model')) {
+  const layers = JSON.parse(fs.readFileSync(path.join(modelDir, 'layers.json'), 'utf8'));
+  const tiers = JSON.parse(fs.readFileSync(path.join(modelDir, 'tiers.json'), 'utf8'));
+  const files = JSON.parse(fs.readFileSync(path.join(modelDir, 'files.json'), 'utf8'));
+  const doorsDir = path.join(modelDir, 'doors');
+  const doorFiles = fs.readdirSync(doorsDir).filter((f) => f.endsWith('.json')).sort();
+  const doors = doorFiles.map((file) => JSON.parse(fs.readFileSync(path.join(doorsDir, file), 'utf8')));
+  return {
+    layers: layers.layers,
+    rules: layers.rules,
+    domains: layers.domains,
+    tierNames: layers.tierNames,
+    tiers: tiers.tiers,
+    tierExceptions: tiers.tierExceptions ?? layers.tierExceptions ?? [],
+    doors,
+    files,
+  };
+}
+
+const manifest = loadModel();
 const rank = new Map(manifest.layers.map((layer, i) => [layer, i]));
 
 function mjsFilesUnder(dir) {
@@ -1587,7 +1605,7 @@ test('retired pattern literals appear only in permitted refusal and decoder path
 });
 
 test('loops and patterns architecture manifest paths exist and all files on disk are declared', () => {
-  const manifest = JSON.parse(fs.readFileSync(path.join(root, 'docs/architecture-manifest.json'), 'utf8'));
+  const manifest = loadModel();
   const declared = Object.keys(manifest.files).filter((f) => f.startsWith('src/runner/execution/loops/') || f.startsWith('src/runner/execution/patterns/'));
 
   for (const p of declared) {
@@ -1598,7 +1616,7 @@ test('loops and patterns architecture manifest paths exist and all files on disk
     for (const ent of fs.readdirSync(path.join(root, d), { withFileTypes: true })) {
       if (ent.isFile() && ent.name.endsWith('.mjs')) {
         const rel = `${d}/${ent.name}`;
-        assert.ok(manifest.files[rel] !== undefined, `file "${rel}" on disk must be declared in architecture-manifest.json`);
+        assert.ok(manifest.files[rel] !== undefined, `file "${rel}" on disk must be declared in packages/component-authority/model/`);
       }
     }
   }

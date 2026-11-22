@@ -1,0 +1,14 @@
+{
+  "job": "init steps",
+  "kind": "door",
+  "patterns": [
+    "\\bWORK_STORE_NOTE\\b",
+    "\\bGLOBAL_MOVED_NOTE\\b",
+    "&dyn Steps\\b"
+  ],
+  "allowed": [
+    "apps/fgos/src/wiring/init.rs"
+  ],
+  "debt": [],
+  "reason": "`fgos init` composes its steps in one place, init.rs, in one order: the machine id, the legacy config settle, the Event Store lock directories, the Work store (the one step Node still owns, asked through the Node rows bridge), the coexistence manifest, the config files, the headless notice and the Git recovery; only the first three refuse"
+}

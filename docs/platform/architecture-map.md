@@ -73,7 +73,7 @@ If a design changes whole-system structure, do all of the following:
 3. Update this architecture map when the structural reading path changes.
 4. Link proof or record `No component-boundary change`.
 
-One-door guard. Each job the system does exactly one way (read the manifest projection, take a lock, resolve the invocation root, admit store access, parse CLI arguments, and so on) has one row in the `doors` table of `docs/architecture-manifest.json`, which `test/architecture.test.mjs` checks against every product file in Node, Rust and `scripts/`. A row names the job, its `patterns`, the `allowed` paths (a `scripts/` entry carries a reason), the known leaks as `debt` (each with a reason; an entry that no longer matches fails as stale, so a fixed leak must be deleted), and `retiredBy`, which the check requires when a row allows both a Node (`.mjs`) and a Rust (`.rs`) file (a twin) and which any row may carry to say when its leaks or its Node side go. A `ratchet` row only stops growth and is never proof of one path. Adding or moving a door means adding or editing its row in the same change.
+One-door guard. Each job the system does exactly one way (read the manifest projection, take a lock, resolve the invocation root, admit store access, parse CLI arguments, and so on) has one row in the `doors` table of `packages/component-authority/model/`, which `test/architecture.test.mjs` checks against every product file in Node, Rust and `scripts/`. A row names the job, its `patterns`, the `allowed` paths (a `scripts/` entry carries a reason), the known leaks as `debt` (each with a reason; an entry that no longer matches fails as stale, so a fixed leak must be deleted), and `retiredBy`, which the check requires when a row allows both a Node (`.mjs`) and a Rust (`.rs`) file (a twin) and which any row may carry to say when its leaks or its Node side go. A `ratchet` row only stops growth and is never proof of one path. Adding or moving a door means adding or editing its row in the same change.
 
 ## 5. Legacy Source
 
@@ -388,7 +388,7 @@ Chú ý cách mọi lời giải đều là **phép tách** — đó chính là 
 Hai loại row — **component** (một module, đúng một nhà) và **slice** (tính năng
 xuyên tầng, trỏ về các component). Cột maturity buộc sổ nói thật: `live` · `partial`
 · `planned` (có PBI) · `idea`. Sổ xây bottom-up từ `find src bin -name "*.mjs"` —
-**đủ 13/13 module** (bản máy-đọc: `docs/architecture-manifest.json`), và §9.3 giao
+**đủ 13/13 module** (bản máy-đọc: `packages/component-authority/model/`), và §9.3 giao
 cho máy giữ tình trạng "đủ" này. (v0.2 lúc đầu khai "14/14" — chính phép đếm bằng
 máy bắt được lỗi đếm tay này.)
 
@@ -544,13 +544,13 @@ lai (S2, STR14, STR17, STR8) **đã có chỗ ngồi vẽ sẵn**.
 2. **Năm từ dành riêng.** `event` · `state` · `store` · `signal` · `run` chỉ mang
    nghĩa §4. Không đặt tên module, biến, khái niệm khác bằng năm từ này.
 3. **Bản đồ nói thật — và máy giữ lời.** Mọi row mang maturity; khát vọng ghi là
-   `planned`/`idea`. Hiện thực (STR20): **`docs/architecture-manifest.json`**
-   (file→tầng, contract `architecture-manifest.v1`) + **`test/architecture.test.mjs`**
+   `planned`/`idea`. Hiện thực (STR20): **`packages/component-authority/model/`**
+   (file→tầng) + **`test/architecture.test.mjs`**
    chạy trong `npm test` — (a) chiều import một-chiều-xuống theo nhà đã khai;
    (b) **đủ sổ**: mọi file `src/**` `bin/**` có row, một-một. Hai phép kiểm là hai
    mặt một test; v0.1 thiếu cả hai nên vừa sai chiều tầng vừa thiếu 5 module mà
-   không ai thấy. Thêm module mới = thêm row manifest + row §6, không thì test đỏ.
-   Manifest còn khai `tiers` (T0-T9, theo thư mục, một row file đổi tier cho một
+   không ai thấy. Thêm module mới = thêm row trong model + row §6, không thì test đỏ.
+   Model còn khai `tiers` (T0-T9, theo thư mục, một row file đổi tier cho một
    lá) và test giữ luật "file tier N chỉ import tier ≤ N"; cặp import lên có tên
    và lý do nằm trong `tierExceptions`, không có ngoại lệ chung.
 4. **Một nhà duy nhất cho component; slice khai là slice.** Tranh cãi "X để đâu"

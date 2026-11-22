@@ -6,7 +6,7 @@
 // because it reads `IRON_LAW_LEVELS`/`DEFAULT_IRON_LAW_LEVEL` from
 // `src/setup/registrations.mjs`, itself use-case tier — an infra file
 // importing a use-case file would invert the layer this whole boundary
-// refactor exists to keep one-directional (docs/architecture-manifest.json).
+// refactor exists to keep one-directional (packages/component-authority/model/).
 import { readConfig } from '../../config/facade.mjs';
 import { IRON_LAW_LEVELS, DEFAULT_IRON_LAW_LEVEL } from '../../setup/registrations.mjs';
 import { addDecision } from '../../state/store.mjs';

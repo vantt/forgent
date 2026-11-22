@@ -80,7 +80,7 @@ domains/<domain>/instructions/
 
 Component and domain additions must not hand-edit generated projections directly. They register canonical fragments and let the projection path render the correct host/workspace files.
 
-Allowed component and domain owners are resolved authoritatively from `docs/architecture-manifest.json` (or explicitly configured known owners). Unregistered component or domain roots are rejected by default discovery. Custom roots are internal/test-only options for fixture isolation and cannot be used by production default discovery.
+Allowed component and domain owners are resolved authoritatively from `packages/component-authority/model/` (or explicitly configured known owners). Unregistered component or domain roots are rejected by default discovery. Custom roots are internal/test-only options for fixture isolation and cannot be used by production default discovery.
 
 ## 5. Instruction Unit
 
