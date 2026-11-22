@@ -12,7 +12,7 @@ phase waits for it and does not take those two files early.
 - `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md:164`, the one row that names the manifest.
 
 ## Files it may write
-docs/architecture-manifest.json (delete), docs/platform/packaging-distribution/contracts/setup-doctor-registry.md, packages/component-authority/model/ (only to port manifest changes that landed after the copy), plans/261121-2109-component-authority/.
+docs/architecture-manifest.json (delete), docs/platform/packaging-distribution/contracts/setup-doctor-registry.md, packages/component-authority/model/ (only to port manifest changes that landed after the copy), the four live docs that still name the manifest (only to point that mention at the model): docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md, docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md, docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md, docs/platform/domainization/architecture/domainization.md, plans/261121-2109-component-authority/.
 Any other gate failure is fixed in the owning phase's branch, never here.
 
 ## Steps

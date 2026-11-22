@@ -47,6 +47,10 @@ footprint:
   - docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md
   - docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
   - docs/platform/proposals/component-authority-boundary-map.md
+  - docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md
+  - docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md
+  - docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md
+  - docs/platform/domainization/architecture/domainization.md
 source:
   - plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md
   - p-esa3lau6kd
@@ -158,7 +162,7 @@ generator for the human views, and one machine-read home for all of it.
 | 4 | [Contract index](phase-04-contract-index.md) | 3 | packages/component-authority/model/contracts.json, test/component-authority/contracts.test.mjs | 4 | draft |
 | 5 | [Generated ownership views and decision-index on the model](phase-05-ownership-views.md) | 3 | scripts/component-authority-render.mjs, test/component-authority/render.test.mjs, src/report/decision-index.mjs, test/report/decision-index.test.mjs, docs/platform/component-boundary.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 4 | draft |
 | 6 | [Architecture-map registries generated; proposal map retired](phase-06-architecture-map-views.md) | 4, 5 | scripts/component-authority-render.mjs, test/component-authority/render.test.mjs, docs/platform/architecture-map.md, docs/platform/proposals/component-authority-boundary-map.md, docs/platform/component-authority/spec.md | 5 | draft |
-| 7 | [Retire the manifest and integrate](phase-07-integration.md) | 6 | docs/architecture-manifest.json, docs/platform/packaging-distribution/contracts/setup-doctor-registry.md, packages/component-authority/model/, plans/261121-2109-component-authority/ | 6 | draft |
+| 7 | [Retire the manifest and integrate](phase-07-integration.md) | 6 | docs/architecture-manifest.json, docs/platform/packaging-distribution/contracts/setup-doctor-registry.md, packages/component-authority/model/, docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md, docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md, docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md, docs/platform/domainization/architecture/domainization.md, plans/261121-2109-component-authority/ | 6 | draft |
 
 **Lead notes (2026-11-23, head:lead-forgent-261121-2109-compon-8ee21):**
 - Phase 1: the citation-drift gate (decision 0017) refuses `CA-D<n>` tokens in prose, so the spec cites CA-D1..CA-D5 in
@@ -171,6 +175,9 @@ generator for the human views, and one machine-read home for all of it.
   `docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md`,
   `docs/platform/domainization/architecture/domainization.md`. Acceptance criterion 2 needs them swept before phase 7
   ends. The lead cannot widen the footprint; raised to the supervisor.
+- Footprint widened (2026-11-23 01:40, head:supervisor-forgent): the four docs above joined the plan footprint and
+  phase 7's write list. Acceptance criterion 2 already requires them swept, so this stays inside the approved frame;
+  no running or ready plan lists them.
 
 Phases are layered (one model, one test file), so most of the plan runs serially. Phases 4 and 5 run in
 parallel in wave 4. Hot files: `components.json` has one writer per wave (phase 1, then phase 2, then phase 3).
