@@ -99,3 +99,13 @@ then age (what a question blocks is shown, not a sort key), headline first. Ever
 `core/skills/_shared/decision-question.md`, in the owner's plain words (see its "Make it easy to answer" section).
 Rewrite a question that breaks that guide before showing it. Record the owner's reply with `fgos questions answer
 <id>`; only the secretary answers. Workflow gates keep their own door (`answerDoor` of the item).
+
+"Seen by the owner" means your message to the owner that names the question id: your report or batch. A question the
+owner answers before any relay counts as seen at its answer time. Each time you relay open questions, record one
+`fgos.coordination.question-relayed` per question, all in one call, with the question id as `fgos.coordination.questionId`,
+the `askedAt` of `fgos questions --json` as `fgos.coordination.askedAt` and the time of the relay as
+`fgos.coordination.relayedAt`:
+
+```sh
+fgos metrics record --json - <<< '[{"kind":"fgos.coordination.question-relayed","subject":{"kind":"session","id":"<session>"},"attrs":{"fgos.coordination.questionId":"<id>","fgos.coordination.askedAt":"<iso>","fgos.coordination.relayedAt":"<iso>"}}]'
+```
