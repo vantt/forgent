@@ -43,7 +43,7 @@ Agents in fgOS speak to the owner many times a day, and the owner's attention is
 | Information validity | **settled out of scope, OC-D1** | Owner 13:10; held unchallenged through rounds 3-5 | Separate item for watchers and monitors. Not yet in the backlog: the secretary could not be reached by mailbox (name `secretary` unknown); the owner was told at 13:15. |
 | Where it is loaded so every agent sees it | clear | `core/instructions/*.md` with `appliesTo: ["*"]` is rendered into each project's `AGENTS.md` by `src/setup/instruction-projections.mjs`, which every agent CLI reads; `decision-question.md` is already one of them | The always-loaded instruction carries the motive and the principle in a few lines and points to the full standard. |
 | One file or two | provisional | The decision-question fragment is cited by about 20 source files and 4 code/test files | Default: one standard file that absorbs today's decision-question text as one of its applications; every caller moves in the same change (L10). Reverse if the file grows past what an agent will read, in which case the case log moves to a sibling file. |
-| Case log: where, who adds, how it improves the standard | **open** (not blocking steps 1-3) | Owner 15:50: "thu thập thêm các tình huống trao đổi không tốt và học rồi cải thiện" | Draft: each case records the situation, what the agent wrote, what it cost the owner, which part of the principle it broke, and the better version. Any agent adds a case when the owner shows friction (asks back, asks what a term means, corrects, rewrites). A case that repeats becomes a line of the standard; the case then stays as its example. Open: whether cases live in the standard file or a sibling, and who curates. |
+| Case log: where, who adds, how it improves the standard | provisional (round 6) | Owner 15:50: "thu thập thêm các tình huống trao đổi không tốt và học rồi cải thiện"; owner 16:00: "bộ friction có ghi nhận được không?". Friction store (`docs/platform/observe/spec.md` lines 136-138; `core/skills/_shared/friction-capture.md`): one record has a subject, a stable signature (`class`), a kind (`awkward` fits), a detail text (capped), refs; `fgos friction rank` counts each signature's repeats with first and last seen. The layer list is closed (`skill`, `tool`, `runner`, ..., `context`, `task`) with no value for talking to the owner; a value is added by editing `packages/observe/rust/friction-kinds.json`, no code. `friction-capture.md`'s "record when" list has no owner-confusion trigger. | **Default: the friction store is the case log; no new file** (one door). Raw cases go to friction as records (the log); the standard keeps only a few curated examples (the state), matching L1. Needed: (1) a layer value for owner communication in `friction-kinds.json`; (2) a trigger in `friction-capture.md`: the owner asked back, asked what a term means, corrected the agent or had a message rewritten; (3) one stable signature per kind of fault (for example permission-asking, unexplained id, too long or wrong language); (4) when `fgos friction rank` shows a signature repeating, it is proposed as a line of the standard, batched for the owner. Open: who watches the rank and proposes (draft: the secretary, who sees the owner's replies). |
 | Gaps 1 and 4 | in scope (owner 14:55) | Seed cases C1 and C4 in section 6 | Covered by the principle's applications "before you speak" and "names and ids". |
 | Gaps 5, 6, 7 | provisional | Owner named 1 and 4 at 14:55 | 5 and 6 are applications of the principle (cheap answers, report shape). 7 is answered by the standard itself: the lesson lives in one shared place, not in one agent's memory. |
 | Program support (step 4) | not started | Existing guard checks labels only (`src/state/decision-question.mjs`), on ask-tool calls only; Claude and Codex already run fgOS end-of-turn hooks | Taken up after step 3. Earlier questions on it cancelled. |
@@ -71,6 +71,8 @@ Agents in fgOS speak to the owner many times a day, and the owner's attention is
 
 - 2026-11-22 15:50 — Owner: "đúng và anh nghĩ em nên ghi rõ ràng cái hiểu như trên của em vào thảo luận để xem nó như là một tiêu chuẩn: `thấu hiểu user`. để xuất 4 bước của em cũng tốt. và bộ chuẩn mực này có thể thu thập thêm các tình huống trao đổi không tốt và học rồi cải thiện cách trao đổi vào đây." Shaper: minted OC-D1 to OC-D3; wrote steps 1-2 and seed cases into §6; cancelled q-xkrbp66xy6 and q-nfgvjge6zg as premature (step 4); case-log mechanics opened in §3.
 
+- 2026-11-22 16:00 — Owner, after the shaper proposed a separate case file: "bộ friction có ghi nhận được không?" Shaper scouted the friction store: yes, with a data-only addition (a layer value) and a new trigger in the friction-capture rule; `fgos friction rank` already gives the repeat count that decides when a case becomes a rule. The separate case file is dropped; raw cases go to friction (log), curated examples stay in the standard (state).
+
 ## 6. Thiết kế đã chốt {#design}
 
 The standard **thấu hiểu user**, as it stands. Steps 1 and 2 are settled in substance (OC-D2), their wording is not final; step 3 holds seed cases; step 4 is not started.
@@ -95,7 +97,7 @@ Of everything in the system, the owner's attention is the scarcest and the most 
 
 ### Bước 3 — Tình huống (case log)
 
-Each case: situation, what the agent wrote, what it cost the owner, the part of the principle it broke, the better version. Seed cases from 2026-11-22:
+**How cases are kept (provisional).** Every bad exchange is recorded in the friction store, the same door agents already use for any obstacle: a signature naming the kind of fault, and a detail holding the situation, what the agent wrote, what it cost the owner, the part of the principle it broke and the better version. The trigger is the owner's reaction: asking back, asking what a term means, correcting the agent, or having a message rewritten. `fgos friction rank` shows which faults repeat; a repeating one is proposed, in a batch, as a line of the standard. The standard itself keeps only a few curated examples like the ones below. Seed cases from 2026-11-22:
 
 | # | Situation | What the agent wrote | Cost to the owner | Broke | Better |
 |---|---|---|---|---|---|
@@ -114,7 +116,8 @@ flowchart TD
   W[1. Vì sao: sự chú ý của người là đắt nhất] --> P[2. Nguyên tắc: làm xong phần mình, đưa đủ để quyết ngay]
   P --> A[Ứng dụng: trước khi nói, tên và id, ngôn ngữ, câu hỏi quyết định, báo cáo]
   A --> C[3. Tình huống thật: tốt và xấu]
-  C -->|lặp lại thì thành quy tắc| P
+  F[Friction store: mỗi lần người phải hỏi lại, sửa, viết lại] --> C
+  C -->|friction rank: lặp lại thì đề xuất thành quy tắc| P
   A -.-> M[4. Chương trình: lưới an toàn cuối]
 ```
 
