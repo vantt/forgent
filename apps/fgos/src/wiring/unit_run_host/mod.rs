@@ -31,7 +31,7 @@ pub mod accounts;
 pub mod checks;
 pub mod dispatch_plan;
 pub mod execution;
-pub mod handoff;
+pub use fgos_execution_engine::unit_run::handoff;
 pub mod host;
 pub mod machine;
 pub mod persona;

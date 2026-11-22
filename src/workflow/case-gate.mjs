@@ -12,9 +12,8 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { assertRunTimeoutMs, loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
-import { CaseAdmissionRefusedError, RunnerConfigError } from '../native/execution-door.mjs';
-import { answerOfVerify, outcomeOfVerify, runUnderCustody, runVerify } from '../runner/execution/custody-door.mjs';
+import { assertRunTimeoutMs } from '../runner/dispatch/config.mjs';
+import { CaseAdmissionRefusedError, RunnerConfigError, ExecutionRouteError, executionOp, loadRunnerConfigForDir } from '../native/execution-door.mjs';
 import { verifyCommandOf, verifySeatResult } from '../runner/execution/loops/verify.mjs';
 import { evaluationsOf } from '../runner/execution/outcome.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
@@ -79,26 +78,32 @@ export async function runCaseGate({
   // The gate's command runs as a borrower of the worktree's custody lease, so killing the gate ends the command
   // with it and a reservation whose custody is free is provably dead. Custody is released before the settle, so
   // the worktree is quiet when the port gives its binding back.
-  let admitted;
-  const verified = await runUnderCustody(fgosDirFromRoot(mainRoot), realWorktree, async (custody) => {
-    admitted = port.admit({
-      unitRunId,
-      caseRef: { caseId, activity, ...(reason ? { reason } : {}) },
-      activity,
-      writes,
-      worktree: realWorktree,
-      readOnly: false,
-      seatLaunches: 0,
-      blind: false,
-      handoffRefs: [],
-      reason: reason ?? null,
-    });
-    if (admitted.refused) throw new CaseAdmissionRefusedError(admitted.refused);
-    return runVerify({ command: verify, cwd: realWorktree, timeoutMs: limit, custody });
-  });
+  const proposal = {
+    unitRunId,
+    caseRef: { caseId, activity, ...(reason ? { reason } : {}) },
+    activity,
+    writes,
+    worktree: realWorktree,
+    readOnly: false,
+    seatLaunches: 0,
+    blind: false,
+    handoffRefs: [],
+    reason: reason ?? null,
+  };
+  const ran = await executionOp('custody', {
+    fgosDir: fgosDirFromRoot(mainRoot),
+    worktree: realWorktree,
+    admit: proposal,
+    verify: { command: verify, ...(limit !== undefined && limit !== null ? { timeoutMs: limit } : {}), subject: 'Gate command' },
+  }, { cwd: mainRoot, caseAdmission: port });
+  if (ran.custodyError) throw new ExecutionRouteError(ran.custodyError.code, ran.custodyError.message);
+  if (ran.admissionError) throw new ExecutionRouteError(ran.admissionError.code, ran.admissionError.message);
+  const admitted = ran.admission;
+  if (admitted?.refused) throw new CaseAdmissionRefusedError(admitted.refused);
+  const verified = ran.verified;
   // A verdict is the outcome as it stands; a check that did not run to an end is an execution failure, which the
   // case treats as nothing proven.
-  const outcome = outcomeOfVerify(verified);
+  const { outcome } = ran;
   const passed = outcome === 'pass';
   const gate = {
     command: verify,
@@ -109,7 +114,7 @@ export async function runCaseGate({
     outputDigest: verified.outputDigest,
   };
   const tail = verified.tail;
-  const seatResult = verifySeatResult(answerOfVerify(verified, 'Gate command', verify), 1);
+  const seatResult = verifySeatResult(ran.answer, 1);
 
   port.settle(admitted.reservationId, {
     caseId,

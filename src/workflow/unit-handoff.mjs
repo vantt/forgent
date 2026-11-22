@@ -11,12 +11,10 @@ import os from 'node:os';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { createWorktreeCheckoutSync } from '../runner/repo-locks.mjs';
 import { removeWorktree, deleteBranchRef } from '../runner/worktree.mjs';
-import { worktreeAdminScope } from '../runner/execution/custody-door.mjs';
-import { unitRunFacts } from '../runner/execution/unit-run-record.mjs';
 
-import { RunnerConfigError } from '../native/execution-door.mjs';
-import { foldRunSetting } from '../runner/execution/run-request.mjs';
+import { RunnerConfigError, worktreeAdminScopeName, unitRunFacts, foldRunSetting } from '../native/execution-door.mjs';
 import { anonymousInputName, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, reportDigest, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
+import { createLockScope } from '../holder-lock/index.mjs';
 import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
 import { stepSubjectDigest, unitRunsOf } from './ref-digests.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
@@ -341,7 +339,7 @@ export function createWorkflowWorktree({ repoRoot, branch, baseRef = 'HEAD', wor
   const worktreePath = path.resolve(worktreeDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-wt-')));
   const inspect = workflowInspect(repoRoot);
   const existing = inspect.resolveRef({ name: `refs/heads/${branch}` });
-  createWorktreeCheckoutSync(worktreeAdminScope(), repoRoot, { path: worktreePath, branch, base: existing.kind === 'direct' ? existing.oid : baseRef }, { inspect });
+  createWorktreeCheckoutSync(createLockScope(worktreeAdminScopeName()), repoRoot, { path: worktreePath, branch, base: existing.kind === 'direct' ? existing.oid : baseRef }, { inspect });
   return { worktreePath: fs.realpathSync(worktreePath), branch };
 }
 

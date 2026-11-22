@@ -95,9 +95,8 @@ test('every production call of a unit run injects the case admission port, so no
   }
   assert.equal(calls, 6, 'the five writing call sites of a unit run and the read-only session probe door are the ones checked');
   // The native `fgos run` builds its request, port included, in the host (fgos-execution run_request).
-  // runUnitInHost (the host seam) is the only door to a unit run; nothing else names one but the Node runUnit still
-  // defined, uncalled, in the Execution Core until it is deleted.
-  const core = ['src/native/execution-door.mjs', 'src/runner/execution/run.mjs'];
+  // runUnitInHost (the host seam) is the only door to a unit run; nothing else names one.
+  const core = ['src/native/execution-door.mjs'];
   const stray = ['src', 'bin'].flatMap((dir) => execFileSync('grep', ['-rlE', '--include=*.mjs', 'runUnit(InHost)?\\(', path.join(root, dir)], { encoding: 'utf8' }).split('\n').filter(Boolean))
     .map((f) => path.relative(root, f)).filter((f) => !files.includes(f) && !core.includes(f));
   assert.deepEqual(stray, []);

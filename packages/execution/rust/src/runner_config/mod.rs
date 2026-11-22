@@ -11,9 +11,11 @@
 
 mod confinement;
 mod origins;
+mod snapshot;
 
 pub use confinement::normalize_legacy_confinement;
 pub use origins::{fgos_dir_from_root, resolve_origin_locations};
+pub use snapshot::snapshot_runner_config;
 
 use crate::executor_model::ModelError;
 use crate::js;

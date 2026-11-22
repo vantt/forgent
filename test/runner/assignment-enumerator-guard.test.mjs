@@ -90,9 +90,6 @@ const ALLOWED = new Map([
   ['src/runner/execution/unit-summary.mjs: unitHasActiveRun: readdirSync(unitDir)', { count: 1, reason: 'unit owner: seats of one known unit directory' }],
   ['src/runner/execution/unit-summary.mjs: unitHasActiveRun: readdirSync(seatDir)', { count: 1, reason: 'unit owner: rounds of one known seat directory' }],
   ['src/runner/execution/unit-summary.mjs: unitHasActiveRun: readdirSync(runsDir)', { count: 1, reason: 'unit owner: attempts of one known round' }],
-  // Unit summary backfill lists only top-level `unit-run-*` directories (units
-  // are always top-level) and hands each one to the unit owner.
-  ['scripts/backfill-unit-summaries.mjs: backfillUnitSummaries: readdirSync(root)', { count: 1, reason: 'unit discovery: top-level unit directories, delegated to the unit owner' }],
   // Assignment-id allocation: lists only immediate children to find ids that
   // share a newly minted flat id prefix. Nested unit ids never use that prefix.
   ['src/runner/dispatch/assignment.mjs: createAssignmentId: readdirSync(assignmentsDir)', { count: 1, reason: 'id allocation: top-level names sharing a new flat id prefix' }],

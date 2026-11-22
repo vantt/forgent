@@ -54,7 +54,6 @@ import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { checkDirDiffersFromCwd, attachDirWarning } from '../src/workflow/dir-guard.mjs';
 import { lintPlanCapabilityAnnotations, lintPhaseUnits } from '../src/report/capability-plan-lint.mjs';
 import { appendWorkerLog } from '../src/runner/worker-log.mjs';
-import { enableCancelOnSignal } from '../src/run-supervisor/cancel-opt-in.mjs';
 
 // This running copy's own package root (bin/fgos.mjs -> two levels up): the source `uninstall` reads the owned skill
 // names from, derived from the executing copy's own on-disk location like `integrationScriptPath()` in
@@ -3376,7 +3375,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const persona = requireField(positional[1], `session ${sub} requires a persona: fgos session ${sub} <persona> --name <name>`);
       const name = requireField(flags.name, `session ${sub} requires --name <name>`);
       const { startHead, rotateHead } = await import('../src/session-host/head-request.mjs');
-      const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
+      const { resolveGitRoots } = await import('../src/git/inspect.mjs');
       if (sub === 'stop') {
         // Unconfined callers stop a head directly; a confined head's call is answered by the host through its socket,
         // where the request route decides who may stop which head. A confined call that got here has no socket.
@@ -3423,7 +3422,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const wait = flags.wait === undefined ? undefined : Number(flags.wait);
       if (wait !== undefined && !(Number.isFinite(wait) && wait >= 0)) throw new StoreError('validation', 'request result --wait takes a number of seconds');
       const { requestResult } = await import('../src/session-host/head-request.mjs');
-      const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
+      const { resolveGitRoots } = await import('../src/git/inspect.mjs');
       try {
         return await requestResult({
           projectRoot: resolveGitRoots(process.cwd()).worktreeRoot,
@@ -3620,8 +3619,6 @@ async function handleHook(rest) {
 
 async function main() {
   const [, , verb, ...rest] = process.argv;
-  // This process is a controller: Ctrl-C and SIGTERM cancel the attempts it started (the library asks for it, never assumes it).
-  enableCancelOnSignal();
   // Same rule as the Rust host: any exact `--help`/`-h` token asks for help, `hook` included.
   if (verb === '--help' || verb === '-h' || HELP_TOKENS.some((token) => rest.includes(token))) {
     await forwardHelp();

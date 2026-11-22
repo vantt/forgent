@@ -10,8 +10,8 @@ import path from 'node:path';
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { checkSeatBindingDryBind } from '../../src/setup/seat-binding-checks.mjs';
 import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
-import { simulateUnitBindings } from '../../src/runner/execution/dry-bind.mjs';
-import { resolveCollaboration } from '../../src/runner/execution/patterns/catalog.mjs';
+import { simulateUnitBindings } from '../../src/seat-binding/client.mjs';
+import { resolveCollaboration } from '../../src/native/execution-door.mjs';
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 

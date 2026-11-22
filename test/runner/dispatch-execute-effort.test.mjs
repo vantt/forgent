@@ -19,7 +19,6 @@ import { bindableExecute } from '../helpers/work-seat-config.mjs';
 import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { runUnitWithPort as runUnit } from '../helpers/run-unit-with-port.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 
@@ -177,49 +176,6 @@ console.log('All good');
   assert.deepEqual(result.policy.launch.modelDrift.map((w) => w.code), ['model-reported-different']);
   assert.equal(result.reasoningEffort, undefined);
   assert.equal(result.modelWarnings, undefined);
-});
-
-test('fgos run with an effort override renders it into the CLI the bound executor spawns', async () => {
-  const repoRoot = makeFixtureDir('fgos-run-effort-');
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
-  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
-  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
-  fs.writeFileSync(path.join(repoRoot, 'README.md'), '# t\n');
-  fs.writeFileSync(path.join(repoRoot, '.gitignore'), '.fgos/\n');
-  execFileSync('git', ['add', '.'], { cwd: repoRoot });
-  execFileSync('git', ['commit', '-q', '-m', 'initial'], { cwd: repoRoot });
-  const worktreeDir = makeFixtureDir('fgos-run-effort-wt-');
-  fs.rmSync(worktreeDir, { recursive: true, force: true });
-  execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', worktreeDir], { cwd: repoRoot });
-  const binDir = path.join(worktreeDir, '.bin');
-  fs.mkdirSync(binDir, { recursive: true });
-  const cli = path.join(binDir, 'codex');
-  // Prints its argv; the run keeps the worker's stdout in the run directory.
-  fs.writeFileSync(cli, `#!${process.execPath}\nprocess.stdout.write('ARGV' + JSON.stringify(process.argv.slice(2)) + '\\n');\n`);
-  fs.chmodSync(cli, 0o755);
-  const runner = {
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-    modelPolicies: { openai: { standard: 'gpt-std' } },
-    executors: { codex: { kind: 'agent', providerModel: 'openai', allowCrossProvider: true, invocations: [{ id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: cli, args: ['exec', '--model', '{model}', '{prompt}'] }] } },
-    capabilities: { 'docs:write': { prefer: [{ executor: 'codex' }], rigor: 'standard', tier: 'standard' } },
-  };
-  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  writeProjectConfig(repoRoot, { runner });
-
-  const res = await runUnit({
-    unitData: { id: 'u-effort', objective: 'Touch the readme', capability: 'docs:write', writes: ['README.md'] },
-    repoRoot,
-    cwd: worktreeDir,
-    pattern: 'solo',
-    overrides: [{ reasoningEffort: 'low', origin: 'human-cli' }],
-  });
-  const record = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'unit.json'), 'utf8'));
-  const attempt = Object.values(record.bindings)[0][0];
-  assert.equal(attempt.binding.reasoningEffort, 'low');
-  const stdoutLogs = execFileSync('find', [path.join(repoRoot, '.fgos', 'assignments', res.unitRunId), '-name', 'stdout.log'], { encoding: 'utf8' }).trim().split('\n');
-  const argvLine = fs.readFileSync(stdoutLogs[0], 'utf8').split('\n').find((line) => line.startsWith('ARGV'));
-  assert.ok(argvLine, `no ARGV line in ${stdoutLogs[0]}`);
-  assert.deepEqual(JSON.parse(argvLine.slice(4)).slice(0, 5), ['exec', '-c', 'model_reasoning_effort=low', '--model', 'gpt-std']);
 });
 
 test('fgos run --effort reaches bind() as an override, and a level the executor does not declare is a policy refusal', () => {

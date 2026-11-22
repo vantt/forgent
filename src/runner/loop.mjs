@@ -100,7 +100,7 @@ import { mintWorkId } from '../util/identity-mint.mjs';
 import { checkDispatchAttestation } from './attestation-guard.mjs';
 import { chooseStageOperation, executeDriverOperationChoice } from './operation-choice.mjs';
 import { runOutcome } from './dispatch/run-result.mjs';
-import { sweepAttempts } from '../run-supervisor/client.mjs';
+import { executionOp } from '../native/execution-door.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
@@ -1306,7 +1306,7 @@ async function drainOnce(options) {
     // above, since a dry run must never mutate the filesystem.
     if (!dryRun) {
       try {
-        const { adopt } = sweepAttempts({ assignmentsRoot: path.join(dir, 'assignments') });
+        const { adopt } = await executionOp('sweep-attempts', { assignmentsRoot: path.join(dir, 'assignments') }, { cwd: dir });
         const adopted = (adopt ?? []).filter((verdict) => verdict.state === 'adopted').length;
         if (adopted > 0) {
           log(`fgos-runner: adopted ${adopted} unfinished attempt(s)`);

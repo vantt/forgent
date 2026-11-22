@@ -1,24 +1,17 @@
-// test/runner/execution/run-posture.test.mjs -- the bound posture reaches the OS
-// confinement backend through the one confinement path (runUnit -> executeAssignment
-// -> Confinement Authority -> bwrap driver), and an unavailable backend refuses.
+// test/runner/execution/run-posture.test.mjs -- the posture a seat is bound with maps onto the built-in
+// confinement policies, and a posture applies only on a declared backend this machine can run.
 
 import '../../helpers/process-tmp-root.mjs';
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 
-import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { resolvePosture, canApplyPosture } from '../../../src/runner/dispatch/confinement/policies.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
+import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 
 seedFileLocalBwrapRegistry();
-
-// Confined runs mount a private tmpfs over /tmp, so fixtures live outside it.
-import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
-import { writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
 
 const fixtureDirs = [];
 const fixtureDir = (prefix) => {
@@ -28,196 +21,6 @@ const fixtureDir = (prefix) => {
 };
 after(() => {
   for (const dir of fixtureDirs) fs.rmSync(dir, { recursive: true, force: true });
-});
-
-function bwrapUsable() {
-  try {
-    execFileSync('/usr/bin/bwrap', ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' });
-    return true;
-  } catch {
-    return false;
-  }
-}
-const SKIP = bwrapUsable() ? false : 'bwrap is not usable in this environment (user namespaces unavailable)';
-
-// Tries three writes and records the error code (or "ok") of each in the run outbox:
-//   worktree -> the Unit worktree (the worker's cwd)
-//   main     -> the main checkout (holds fgOS state)
-//   outbox   -> the run outbox
-const PROBE_WORKER = `
-import fs from 'node:fs';
-import path from 'node:path';
-const prompt = process.argv.slice(2).join(' ');
-const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
-if (match) {
-  const claimDir = path.dirname(match[1]);
-  const outbox = path.join(claimDir, 'worker-output', 'outbox');
-  const dir = fs.existsSync(outbox) ? outbox : claimDir;
-  const attempt = (file) => {
-    try { fs.writeFileSync(file, 'x'); return 'ok'; } catch (err) { return err.code || String(err); }
-  };
-  const cfg = JSON.parse(fs.readFileSync(path.join(path.dirname(new URL(import.meta.url).pathname), 'probe-targets.json'), 'utf8'));
-  const results = {
-    worktree: attempt(path.join(cfg.worktree, 'probe-worktree.txt')),
-    main: attempt(path.join(cfg.main, 'probe-main.txt')),
-  };
-  fs.mkdirSync(dir, { recursive: true });
-  results.outbox = attempt(path.join(dir, 'probe-outbox.txt'));
-  fs.writeFileSync(path.join(dir, 'probe-results.json'), JSON.stringify(results));
-  fs.writeFileSync(path.join(dir, 'report-1.md'), '# Report\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
-  fs.writeFileSync(path.join(dir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
-}
-`;
-
-function setupProbeRepo(executorNames) {
-  const repoRoot = fixtureDir('fgos-posture-');
-  const git = (args, cwd = repoRoot) => execFileSync('git', args, { cwd, stdio: 'ignore' });
-  git(['init', '-b', 'main']);
-  git(['config', 'user.name', 'Test Runner']);
-  git(['config', 'user.email', 'test@runner.local']);
-  fs.writeFileSync(path.join(repoRoot, 'README.md'), '# Test\n');
-  git(['add', 'README.md']);
-  git(['commit', '-m', 'initial']);
-  const worktreeDir = fixtureDir('fgos-posture-wt-');
-  git(['worktree', 'add', '-b', 'wt-branch', worktreeDir]);
-
-  const script = path.join(repoRoot, 'probe-worker.mjs');
-  fs.writeFileSync(script, PROBE_WORKER);
-  fs.writeFileSync(
-    path.join(repoRoot, 'probe-targets.json'),
-    JSON.stringify({ worktree: fs.realpathSync(worktreeDir), main: fs.realpathSync(repoRoot) }),
-  );
-
-  const executors = {};
-  for (const name of executorNames) {
-    const command = path.join(repoRoot, `${name}-bin`);
-    fs.symlinkSync(process.execPath, command);
-    executors[name] = {
-      kind: 'agent',
-      allowCrossProvider: true,
-      providerModel: name,
-      invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
-    };
-  }
-  const prefer = executorNames.map((executor) => ({ executor }));
-  const cfg = {
-    runner: {
-      defaultExecutor: executorNames[0],
-      defaults: { tier: 'standard' },
-      modelPolicies: Object.fromEntries(executorNames.map((name) => [name, { nano: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' }])),
-      executors,
-      capabilities: {
-        'docs:write': { prefer, rigor: 'standard', tier: 'standard' },
-        'docs:review': { prefer, persona: 'code-reviewer', rigor: 'standard', tier: 'standard' },
-      },
-      patterns: { seatBinding: { schema: 1 } },
-      loops: {
-        reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'], high: ['reviewer'], critical: ['reviewer'] } },
-      },
-    },
-  };
-  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
-  writeProjectConfig(repoRoot, cfg);
-  return { repoRoot, worktreeDir };
-}
-
-function readProbe(repoRoot, unitRunId, role, round = 1) {
-  const outbox = path.join(repoRoot, '.fgos', 'assignments', unitRunId, role, String(round), 'runs', '01', 'worker-output', 'outbox');
-  return JSON.parse(fs.readFileSync(path.join(outbox, 'probe-results.json'), 'utf8'));
-}
-
-const BLOCKED = /^(EROFS|EACCES|EPERM)$/;
-
-test('read-only posture: repo writes are blocked, the run outbox stays writable', { skip: SKIP }, async () => {
-  const { repoRoot, worktreeDir } = setupProbeRepo(['alpha']);
-  const res = await runUnit({
-    unitData: { id: 'u-ro', objective: 'Inspect the docs', capability: 'docs:write', writes: [], pattern: 'solo' },
-    repoRoot,
-    cwd: worktreeDir,
-    worktree: worktreeDir,
-    pattern: 'solo',
-  });
-  assert.equal(res.results[0].runResult?.classification?.outcome?.category, 'ok', JSON.stringify(res.results[0]).slice(0, 1500));
-  const probe = readProbe(repoRoot, res.unitRunId, 'producer');
-  assert.match(probe.worktree, BLOCKED);
-  assert.match(probe.main, BLOCKED);
-  assert.equal(probe.outbox, 'ok');
-  assert.equal(fs.existsSync(path.join(worktreeDir, 'probe-worktree.txt')), false);
-});
-
-test('workspace-write producer writes in its worktree only; the reviewer is read-only', { skip: SKIP }, async () => {
-  const { repoRoot, worktreeDir } = setupProbeRepo(['alpha', 'beta']);
-  const res = await runUnit({
-    unitData: { id: 'u-rw', objective: 'Write docs', capability: 'docs:write', writes: ['probe-worktree.txt'], pattern: 'reviewed' },
-    repoRoot,
-    cwd: worktreeDir,
-    worktree: worktreeDir,
-    pattern: 'reviewed',
-  });
-  const producer = readProbe(repoRoot, res.unitRunId, 'producer');
-  assert.equal(producer.worktree, 'ok');
-  assert.match(producer.main, BLOCKED);
-  assert.equal(producer.outbox, 'ok');
-  assert.equal(fs.existsSync(path.join(worktreeDir, 'probe-worktree.txt')), true);
-  assert.equal(fs.existsSync(path.join(repoRoot, 'probe-main.txt')), false);
-
-  const reviewer = readProbe(repoRoot, res.unitRunId, 'reviewer');
-  assert.match(reviewer.worktree, BLOCKED);
-  assert.match(reviewer.main, BLOCKED);
-  assert.equal(reviewer.outbox, 'ok');
-});
-
-test('a run uses the confined invocation that was approved, not the executor first cli invocation', { skip: SKIP }, async () => {
-  const { repoRoot, worktreeDir } = setupProbeRepo(['alpha']);
-  const cfg = readProjectConfig(repoRoot);
-  const failScript = path.join(repoRoot, 'unconfined-must-not-run.mjs');
-  fs.writeFileSync(failScript, "process.stderr.write('the unconfined invocation must not run\\n'); process.exit(7);\n");
-  const alpha = cfg.runner.executors.alpha;
-  const confined = { ...alpha.invocations[0], id: 'cli-confined' };
-  alpha.invocations = [
-    { id: 'cli-plain', via: 'cli', adapter: 'cli-spawn', command: alpha.invocations[0].command, args: [failScript, '{prompt}'] },
-    confined,
-  ];
-  writeProjectConfig(repoRoot, cfg);
-
-  const res = await runUnit({
-    unitData: { id: 'u-two', objective: 'Inspect the docs', capability: 'docs:write', writes: [], pattern: 'solo' },
-    repoRoot,
-    cwd: worktreeDir,
-    worktree: worktreeDir,
-    pattern: 'solo',
-  });
-  assert.equal(res.results[0].runResult?.classification?.outcome?.category, 'ok', JSON.stringify(res.results[0]).slice(0, 1500));
-  assert.equal(res.results[0].binding?.invocation, 'cli-confined');
-  const probe = readProbe(repoRoot, res.unitRunId, 'producer');
-  assert.match(probe.worktree, BLOCKED);
-  assert.equal(probe.outbox, 'ok');
-});
-
-test('an unavailable backend refuses with posture-unavailable and never runs unconfined', async () => {
-  const { repoRoot, worktreeDir } = setupProbeRepo(['alpha']);
-  const registry = path.join(repoRoot, 'no-bwrap-registry.json');
-  fs.writeFileSync(registry, JSON.stringify({
-    contract: 'confinement-backend-registry.v1',
-    confinementBackends: { bwrap: { type: 'bwrap', enabled: true, executable: '/nonexistent/bwrap' } },
-  }));
-  const previous = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-  process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = registry;
-  try {
-    const res = await runUnit({
-      unitData: { id: 'u-nobw', objective: 'Inspect the docs', capability: 'docs:write', writes: [], pattern: 'solo' },
-      repoRoot,
-      cwd: worktreeDir,
-      worktree: worktreeDir,
-      pattern: 'solo',
-    });
-    assert.equal(res.outcome, 'policy-refusal');
-    assert.equal(res.results[0].refused.reason, 'posture-unavailable');
-    assert.equal(res.results[0].runResult, undefined, 'nothing may have been launched');
-  } finally {
-    if (previous === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = previous;
-  }
 });
 
 test('resolvePosture maps posture onto the built-in policies without building sandbox arguments', () => {

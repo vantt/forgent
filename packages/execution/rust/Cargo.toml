@@ -18,6 +18,9 @@ fgos-yaml-doc = { path = "../../yaml-doc/rust" }
 fgos-convention = { path = "../../convention/rust" }
 # A Unit's declared writes are matched by the one write-scope door.
 fgos-write-scope = { path = "../../write-scope" }
+# The unit-run record and custody reads ask the run control ledger and the worktree lease: the `lease` part only, so
+# the Node addon that reads them links no supervisor.
+fgos-run-supervisor = { path = "../../run-supervisor/rust", default-features = false, features = ["lease"] }
 serde = { workspace = true }
 # preserve_order: the declared order of executors and accounts is part of what the facts mean (the account
 # order is the order the lease tries them in).

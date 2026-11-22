@@ -28,7 +28,7 @@ Current execution chain: Workflow step or inline request -> Assignment -> Dispat
 
 ## Runtime Profiles
 
-The retired CoordinationSession profiles are historical. Workflow nodes call the Unit runner; Unit runs use CollaborationPattern. Neither revives FlowDefinition or a CoordinationSession store. Evidence: src/workflow/runner.mjs:419-428; src/runner/execution/run.mjs:532-540.
+The retired CoordinationSession profiles are historical. Workflow nodes call the Unit runner; Unit runs use CollaborationPattern. Neither revives FlowDefinition or a CoordinationSession store. Evidence: src/workflow/runner.mjs:419-428; packages/execution/engine/src/unit_run/run.rs.
 
 ## Ownership Rules
 

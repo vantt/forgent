@@ -44,7 +44,7 @@ It owns:
 It holds **no default policy** (the default belongs to the door), compares no claims itself (the caller
 passes collisions as facts), reads no file and computes no hash. It never acts: a verdict is an answer, and
 what happens next is the caller's decision. The name is `resource-referee`; `referee` alone is already a seat
-name in the execution catalog (`test/runner/execution/patterns/catalog.test.mjs:676,692,2135`, role `judge`)
+name in the execution catalog (`packages/execution/rust/tests/core_unit.rs`, role `judge`)
 and the planner verb is therefore `fgos resource-check` (plan decisions 10, 26).
 
 ## 2. Shared entities

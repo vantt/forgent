@@ -7,7 +7,7 @@ import fs from 'node:fs';
 
 import { workerBaseEnv, caseContextEnv, CASE_ID_ENV, CASE_RESERVATION_ENV } from '../../../src/runner/dispatch/adapters.mjs';
 import { terminalAgentArgs } from '../../../src/runner/dispatch/assignment-runner.mjs';
-import { runUnit } from '../../../src/runner/execution/run.mjs';
+import { runUnitInHost } from '../../../src/native/execution-door.mjs';
 import { resolveUnitInputs } from '../../../src/runner/execution/handoff-refs.mjs';
 import { createCaseAdmissionPort } from '../../../src/workflow/case-admission-port.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -15,6 +15,9 @@ import { setupWorkflowFixtureRepo } from '../../helpers/workflow-fixture-repo.mj
 import { openCase } from '../../helpers/workflow-case-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
+
+// A unit run through the host, the caller's admission port served beside the request.
+const runUnit = ({ caseAdmission, ...request }) => runUnitInHost(request, { caseAdmission });
 
 // The worker reports the case variables it was started with, as its own report.
 const WORKER_BODY = `

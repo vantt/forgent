@@ -599,3 +599,23 @@ test('the reviewed loop refuses by name when no round limit reached it, instead 
     assert.throws(() => historyOutcomeOf(unit, {}, [], params, []), { code: 'reviewed-max-rounds-missing' });
   }
 });
+
+test('a reviewed run that cannot launch its next round ends at the last evaluation', async () => {
+  const roles = [];
+  const result = await runReviewed(
+    { id: 'u', objective: 'x', capability: 'docs:write', writes: [] },
+    { loops: { reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } } } },
+    {
+      runRole: async ({ seat, round = 1 }) => {
+        roles.push(`${seat.seat}/${round}`);
+        return { seat: seat.seat, round, outcome: seat.seat === 'producer' ? 'pass' : 'findings', findings: ['fix this'] };
+      },
+      hasLaunchRoom: (seats) => { roles.push(`room?${seats}`); return false; },
+      shippedCheckersByRigor: shippedCatalog().loops.reviewed.checkersByRigor,
+    },
+    { maxRounds: 2 },
+  );
+  assert.equal(result.outcome, 'findings');
+  assert.equal(result.rounds, 1);
+  assert.deepEqual(roles, ['producer/1', 'reviewer/1', 'room?2']);
+});

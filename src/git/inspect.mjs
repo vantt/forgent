@@ -1,8 +1,10 @@
 // Typed read facade; policy, parsing and byte paths belong to fgos-git.
+import fs from 'node:fs';
 import { resolveStateRoot } from '../holder-lock/index.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { loadNativeAddon } from './native.mjs';
+import { RunnerConfigError } from '../native/execution-door.mjs';
 function outsideGate() {
   if (hotLockDepth() > 0) throw Object.assign(new Error('exec-under-hot-lock: Git Inspect'), { code: 'exec-under-hot-lock' });
 }
@@ -62,6 +64,33 @@ export function worktreeDoor(door, request) {
  * The one read every root answer is built from. */
 export function readRepoFacts(cwd = process.cwd(), { detached = false } = {}) {
   return createGitInspect(gitPortOptions(cwd, { detached })).resolveRepo();
+}
+
+/**
+ * The main checkout root and the worktree path of `cwd`: `{ worktreeRoot, mainCheckoutRoot, isLinkedWorktree }`.
+ * A read-only caller (`allowNoRepository`) may work in a directory that is no repository: that directory is its own
+ * project root (`notARepository: true`). Anything else that is no working repository is a `RunnerConfigError`.
+ */
+export function resolveGitRoots(cwd = process.cwd(), { allowNoRepository = false } = {}) {
+  try {
+    const result = readRepoFacts(cwd);
+    if (result.notARepository && allowNoRepository) {
+      let root = cwd;
+      try { root = fs.realpathSync(cwd); } catch { /* the directory is as given */ }
+      return { worktreeRoot: root, mainCheckoutRoot: root, isLinkedWorktree: false, notARepository: true };
+    }
+    if (result.notARepository || !result.worktreeRoot) throw new Error('not a working repository');
+    return { worktreeRoot: result.worktreeRoot, mainCheckoutRoot: result.trustedMainRoot, isLinkedWorktree: result.worktreeRoot !== result.trustedMainRoot };
+  } catch (error) {
+    throw new RunnerConfigError(`fgos run must run inside a git repository (cwd: ${cwd}): ${error.message}`);
+  }
+}
+
+/** A unit that writes or syncs needs a repository; a read-only one runs where `resolveGitRoots` found none. */
+export function assertRepositoryForWrites(roots, cwd, { writes = false } = {}) {
+  if (roots?.notARepository && writes) {
+    throw new RunnerConfigError(`fgos run must run inside a git repository (cwd: ${cwd}): not a working repository`);
+  }
 }
 
 /**

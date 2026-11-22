@@ -317,11 +317,12 @@ test('prepareWorkflowRun loads runner config from disk exactly once', (t) => {
   const tmp = setupTestRepo();
   t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
 
+  // The runner config is read through the addon's one loader; count its calls.
   let snapshotCalls = 0;
-  const originalSnapshot = nativeDoor().config.snapshot;
-  t.mock.method(nativeDoor().config, 'snapshot', (req) => {
+  const originalLoad = nativeDoor().execution.loadRunnerConfig;
+  t.mock.method(nativeDoor().execution, 'loadRunnerConfig', (req) => {
     snapshotCalls++;
-    return originalSnapshot(req);
+    return originalLoad(req);
   });
 
   const workflow = {

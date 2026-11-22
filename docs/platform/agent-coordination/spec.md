@@ -57,7 +57,7 @@ This area does not own:
 
 | Surface | Current owner |
 |---|---|
-| Unit execution | `src/runner/execution/run.mjs` and `src/runner/execution/loops/index.mjs` |
+| Unit execution | `packages/execution/engine/src/unit_run/run.rs` and `src/runner/execution/loops/index.mjs` |
 | Workflow execution | `src/workflow/runner.mjs` |
 | Assignment/Run dispatch and normalization | `src/runner/dispatch/assignment.mjs`, `plan.mjs`, `assignment-runner.mjs`, `run-result.mjs` |
 | Retired coordination CLI | [Historical snapshot](history/retired-engine/spec.md#literal-snapshot), not a current public door |

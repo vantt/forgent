@@ -20,9 +20,11 @@ import {
   runUnitErrorOf,
   DispatchError,
   serveAdmissionPeer,
+  runDirOf,
+  loadRunnerConfigForDir,
+  judgeUnitRun,
 } from '../../src/native/execution-door.mjs';
 import { RunnerConfigError as DispatchRunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
-import { CaseAdmissionRefusedError as ExecutionCaseAdmissionRefusedError } from '../../src/runner/execution/case-admission-port.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -131,7 +133,6 @@ test('the admission peer refuses another protocol, an unknown operation and an o
 test('a native run-unit error result is rethrown as the Node class its tag names, with the class Node gave it', () => {
   // One class identity for an error thrown in process and one rethrown from a native result.
   assert.equal(DispatchRunnerConfigError, RunnerConfigError);
-  assert.equal(ExecutionCaseAdmissionRefusedError, CaseAdmissionRefusedError);
 
   const byName = Object.fromEntries(runUnitContract.vectors.map((v) => [v.name, runUnitErrorOf({ ok: false, error: v.error })]));
   const refused = byName['admission refused'];
@@ -185,4 +186,16 @@ test('the peer entry the host starts serves the Workflow port of the main checko
   assert.equal(await exited, 0);
   assert.deepEqual(answers.answers.slice(0, 2), [{ protocol: 1, id: 1, result: null }, { protocol: 1, id: 2, result: null }]);
   assert.equal(answers.answers[2].result.answer, 'unbound');
+});
+
+test('the addon helpers answer under their Node names: a refusal comes back as the Node class with its code, a runner config keeps its origins', () => {
+  const dir = makeFixtureDir('execution-door-addon');
+  assert.throws(() => runDirOf(dir, '../escape'), (err) => err instanceof RunnerConfigError && err.code === 'invalid-case-id' && /is not a case id/.test(err.message));
+  assert.equal(runDirOf(dir, 'case-1'), path.join(dir, '.fgos', 'workflow-runs', 'case-1'));
+  const cfg = loadRunnerConfigForDir(dir);
+  assert.equal(typeof cfg, 'object');
+  assert.ok(Array.isArray(cfg[Symbol.for('fgos.runner.origins')]), 'the origins ride along, out of the enumerable keys');
+  assert.equal(Object.keys(cfg).includes(Symbol.for('fgos.runner.origins').toString()), false);
+  assert.deepEqual(judgeUnitRun(path.join(dir, '.fgos'), 'unit-run-none', { caseId: 'case-1' }), { gone: true });
+  assert.deepEqual(judgeUnitRun(path.join(dir, '.fgos'), '../x', { caseId: 'case-1' }), { keep: 'unsafe-path', blocks: true });
 });

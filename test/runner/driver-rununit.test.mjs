@@ -10,14 +10,21 @@ import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
 import { chooseStageOperation, executeDriverOperationChoice } from '../../src/runner/operation-choice.mjs';
-import { runUnitWithPort as runUnit } from '../helpers/run-unit-with-port.mjs';
+import { runUnitInHost } from '../../src/native/execution-door.mjs';
+import { createCaseAdmissionPort } from '../../src/workflow/case-admission-port.mjs';
 import { digestPinnedInputs } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { operationsForStep, getDomain } from '../../src/state/domain-registry.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
-import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { activateGitFixture, prepareActivatedGitFixture } from '../helpers/git-fixture.mjs';
 import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
+
+// A unit run the way the Work driver starts one: through the host, with the Workflow's admission port.
+const runUnit = (options) => {
+  prepareActivatedGitFixture(options.repoRoot);
+  return runUnitInHost(options, { caseAdmission: createCaseAdmissionPort({ repoRoot: options.repoRoot }) });
+};
 
 seedFileLocalBwrapRegistry();
 

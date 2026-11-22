@@ -8,7 +8,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { bind } from '../../../src/runner/execution/bind.mjs';
-import { parseAccountPin, runnerConfigForBinding } from '../../../src/runner/execution/account-pin.mjs';
+import { parseAccountPin } from '../../../src/native/execution-door.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 import { seedStubAgentClis } from '../../helpers/agent-clis.mjs';
 
@@ -126,17 +126,6 @@ test('the pin follows the override scope: a role the override does not name bind
   const overrides = [{ origin: 'human-cli', scope: { role: 'producer' }, account: 'alpha/a1' }];
   const reviewer = bind({ ...ask(overrides), role: 'reviewer', readOnly: true }, ctx);
   assert.equal(reviewer.account, undefined);
-});
-
-test('the dispatch config of a pinned binding lists only the pinned account of its pool', () => {
-  const bound = bind(ask([{ origin: 'human-cli', account: 'alpha/a2' }]), ctx);
-  const pinned = runnerConfigForBinding(runnerConfig, bound);
-  assert.deepEqual(Object.keys(pinned.llmAccounts.alpha), ['a2']);
-  assert.deepEqual(Object.keys(pinned.llmAccounts.beta), ['b1'], 'other pools are untouched');
-  assert.equal(runnerConfigForBinding(runnerConfig, { executor: 'alpha' }), runnerConfig, 'an unpinned binding keeps the config as it is');
-
-  const viaRouter = runnerConfigForBinding(runnerConfig, bind(ask([{ origin: 'human-cli', account: 'router/r1' }], 'docs:delta'), ctx));
-  assert.deepEqual(Object.keys(viaRouter.llmAccounts.router), ['r1']);
 });
 
 test('a pinned account launches through the invocation whose login store it holds, and one holding none is refused', () => {

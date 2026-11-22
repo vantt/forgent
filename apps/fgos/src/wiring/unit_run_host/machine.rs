@@ -143,22 +143,7 @@ pub fn is_main_checkout(worktree: &Path) -> bool {
 /// sockets no supervisor holds are removed. Best effort: what adopt judged comes back (the `sweep-attempts`
 /// internal op reports it; a unit run ignores it).
 pub fn sweep_attempts(assignments_root: &Path) -> fgos_run_supervisor::controller::sweep::Swept {
-    use fgos_run_supervisor::controller::runtime_dir::{
-        current_uid, process_env, remove_orphan_attempt_sockets,
-    };
-    let uid = cfg!(unix).then(current_uid);
-    fgos_run_supervisor::controller::sweep::sweep_attempts(
-        Some(assignments_root),
-        false,
-        None,
-        || {
-            remove_orphan_attempt_sockets(
-                &process_env,
-                uid,
-                fgos_process::facts::bound_unix_socket_paths,
-            );
-        },
-    )
+    fgos_execution_engine::unit_run::machine_reads::sweep_attempts(assignments_root)
 }
 
 /// A refusal of the runner config loader as the `run-unit` error the caller rethrows: its class tag, code and

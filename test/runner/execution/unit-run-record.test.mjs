@@ -8,7 +8,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { UNIT_RUN_RECORD_CONTRACT, judgeUnitRun, removeUnitRun, unitRunFacts } from '../../../src/runner/execution/unit-run-record.mjs';
-import { releasedUnitRunSettle, UNIT_RUN_RESULT_CONTRACT } from '../../../src/runner/execution/case-admission-port.mjs';
 import { acquireUnitControl } from '../../../src/runner/execution/unit-control.mjs';
 import { acquireDispatchCwdLock } from '../../../src/run-supervisor/cwd-lock.mjs';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
@@ -111,16 +110,4 @@ test('removeUnitRun deletes only a run that judges removable and never follows a
   assert.equal(fs.existsSync(ok), false);
   assert.equal(fs.existsSync(unsettled), true);
   assert.equal(fs.readFileSync(path.join(target, 'precious.txt'), 'utf8'), 'keep');
-});
-
-test('the settle of a released reservation is the Unit shape of a run that never started', () => {
-  const settle = releasedUnitRunSettle('case-1');
-  assert.deepEqual(settle.contract, UNIT_RUN_RESULT_CONTRACT);
-  assert.equal(settle.caseId, 'case-1');
-  assert.equal(settle.outcome, 'not-started');
-  assert.equal(settle.unitRunId, null);
-  assert.equal(settle.infrastructure, true);
-  assert.deepEqual(settle.started, { value: false, reason: 'reservation-released' });
-  assert.equal(settle.seatLaunchesUsed, 0);
-  assert.equal(settle.frameExhausted, false);
 });
