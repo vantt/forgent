@@ -52,3 +52,6 @@ read by the supervisor on every wake (phase 7 rule), but they no longer start a 
 because the query never reported one. A missed idle lead is caught by the supervisor's per-wake check of running
 plans and by `plan-no-progress`. Applied by lead:SUPERVISOR from block `phase9` of `config-patch-items.yaml`; the
 24-hour after-window starts at its commit.
+
+Applied 2026-11-22 14:20 (+07) by lead:SUPERVISOR as `fgos watcher tune session-idle --disarm` (not committed yet). The
+after-window starts then. Rollback: re-arm `session-idle`.
