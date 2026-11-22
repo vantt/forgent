@@ -26,3 +26,13 @@ Every red in the report has an owner other than this plan, and no row is marked 
 ## Rollback
 
 Nothing to revert. The report is the only output.
+
+## Status note (2026-11-22, 11:40)
+
+The host run at 0044018d1 (lead:SUPERVISOR, answering q-vgwalbohwj) is classified in `reports/integration-gate.md`. One
+red was this plan's: the phase 1 secretary case lost the line that created `docs/`. Fix 634fd7121 on branch
+`red-tests-and-backlog-sweep/p01r` passed on the host inside its land gate, but the land was refused by two reds already
+on main in the gate's fixed list (`check-decision-citation-drift` real-repo CLI since 68420ee14/bddb4fe0d/edd3e4486, and
+the stale git mutation census). Plan-file lands are refused by the plan-contract gate, which receives a literal
+`{plans}`. When both clear: land p01r with `--test test/runner/dispatch-confinement-backend-p03.test.mjs`, then set this
+phase and the plan done.

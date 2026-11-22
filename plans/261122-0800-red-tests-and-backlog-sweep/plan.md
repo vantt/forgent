@@ -107,6 +107,8 @@ plans own, so this plan does not touch them. The secretary routes each one to th
 | 6 | [Prove or disprove the environmental four](phase-06-environmental-proof.md) | - | plans/261122-0800-red-tests-and-backlog-sweep/reports/environmental-reds.md | 1 | done |
 | 7 | [Integration gate](phase-07-integration-gate.md) | 1, 2, 3, 4, 5, 6 | plans/261122-0800-red-tests-and-backlog-sweep/reports/integration-gate.md | 2 | running |
 
+Landed: phase 1 f25ab4c9a, phase 2 eb3378b49, phase 3 c831999d4, phase 4 7180cca94, phase 5 bb9675c8d, phase 6 1fee82c55. Phase 1 reopened fix 634fd7121 (branch `red-tests-and-backlog-sweep/p01r`) waits to land; see the phase 7 file.
+
 Phase 1 note: the read-only backlog-file probe of the secretary case was retired because a1022572a made `plans` a read-write bind; the positive `plans/backlog.md` probe in the same case now owns the backlog behaviour (fix commit 4aa0a7e81 carries no body saying so).
 
 Each phase names its dispatch capability in its file: `code:implement` for phases 1 to 5, `code:debug` for phase 6
@@ -118,6 +120,8 @@ overlap today; whichever lands second rebases.
 ## Owner questions
 
 - q-4qtu54bnxz (phase 4): answered by lead:SUPERVISOR inside the approved frame; the footprint took `packages/config/contracts/fixtures/repo-differences.v1.json` (ede5e84f5) and phase 4 appended exactly one `["secretary"]` to standard-only by hand (3ae6cc921; no recorder exists, precedent a750637d3).
+
+- q-vgwalbohwj (phase 7): answered by lead:SUPERVISOR, who ran both suites on the host at 0044018d1; classified in `reports/integration-gate.md`.
 
 At planning time the discussion left no open point. The footprint narrowing above follows two rules already in force (the
 secretary's disjoint-footprint rule and the plan check's active-overlap error), so it needed no owner decision.

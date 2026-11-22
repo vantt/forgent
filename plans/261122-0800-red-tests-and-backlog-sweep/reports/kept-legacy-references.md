@@ -1,6 +1,6 @@
 # Kept Legacy Portfolio References
 
-References to `docs/backlog.md` and `docs/discussions` still present outside `plans/**`, `archive/**`, and `CHANGELOG.md` following phase 5 implementation.
+References to `docs/backlog.md` and `docs/discussions` still present outside `plans/**`, `archive/**`, and `CHANGELOG.md` following phase 1-6 implementation and verified in phase 7.
 
 ## Drift Checker Analysis (`check-decision-citation-drift.test.mjs`)
 
@@ -13,6 +13,8 @@ References to `docs/backlog.md` and `docs/discussions` still present outside `pl
 - `test/scripts/check-decision-citation-drift.test.mjs`: Updated pure function test fixtures from `docs/backlog.md` to `plans/backlog.md`.
 
 ## Kept and Handed References
+
+Note: Files under `docs/history/**` count as recorded historical artifacts, like the execution corpora under `packages/execution/contracts/corpus/`.
 
 | File | Disposition |
 |---|---|
@@ -91,7 +93,5 @@ References to `docs/backlog.md` and `docs/discussions` still present outside `pl
 | packages/supervision/rust/tests/discussion_source.rs | kept: test for pre-migration discussion source reader |
 | test/cli/session-verb.test.mjs | handed to S6a |
 | test/golden-recorders/confinement-policy.recorder.mjs | handed to S6a |
-| test/runner/dispatch-confinement-backend-p03.test.mjs | handed to phase 1 (confinement-portfolio-paths) |
-| test/runner/dispatch-confinement-machine-private.test.mjs | handed to phase 1 (confinement-portfolio-paths) |
-| test/runner/dispatch-confinement-policies.test.mjs | handed to phase 1 (confinement-portfolio-paths) |
+| test/runner/dispatch-confinement-backend-p03.test.mjs | kept: pointer file check (asserts confined secretary cannot write pointer docs/backlog.md; landed phase 1) |
 | test/session-host/head-request.test.mjs | handed to heads-stable-and-able |
