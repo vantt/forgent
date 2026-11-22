@@ -267,8 +267,8 @@ Domain boundaries should be mechanically checked where possible:
   checks;
 - task-spec and agent eligibility should fail loud when no valid match exists.
 
-This should reuse the existing architecture-manifest/test approach where
-possible instead of introducing a separate package system only for enforcement.
+This should reuse the existing `packages/component-authority/model/` and
+`test/architecture.test.mjs` approach where possible instead of introducing a separate package system only for enforcement.
 
 ## 12. What Stays Out
 
