@@ -1,7 +1,7 @@
 ---
 id: p-esa3lau6kd
 title: "Shaper discussion `component-authority` (supervisor, priority high; source: owner via the orchestration-skeleton shaper, 2026-11-21 17:02, the owner chose to give component authority its own discussion: \"chọn A, mở discussion riêng đi em\")"
-status: proposed
+status: done
 priority: P1
 area: supervisor
 created: 2026-11-21

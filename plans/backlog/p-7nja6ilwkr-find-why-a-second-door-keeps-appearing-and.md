@@ -1,7 +1,7 @@
 ---
 id: p-7nja6ilwkr
 title: "Find why a second door keeps appearing and being cleaned up, and how parallel agents avoid conflicting implicit decisions (supervisor, priority medium; source: `docs/discussions/supervisor-review/DISCUSSION.md` §7 `#task-small-fixes`-sibling `#task-second-doors`, branch shape/supervisor-review-2, owner agreed 2026-11-19 round 19)"
-status: proposed
+status: done
 priority: P2
 area: supervisor
 created: 2026-11-19
