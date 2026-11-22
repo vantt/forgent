@@ -184,7 +184,7 @@ execution sau này mà không đổi nghĩa các control đã có.
 ### 5.1 Vị trí và parent
 
 Component dự kiến sống tại `src/runner/dispatch/confinement/`, là component con
-của dispatch Infra. Facade `src/runner/dispatch.mjs` công bố cửa runtime; caller
+của dispatch Infra. Host `fgos dispatch` (`apps/fgos/src/wiring/dispatch_subs.rs`) công bố cửa runtime; caller
 không import backend hay adapter execute function trực tiếp.
 
 Agent Confinement Authority sở hữu:

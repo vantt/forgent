@@ -29,7 +29,7 @@ runtime mới (chỉ prose + bảng).
 ## Khung prompt 4 phần
 
 Mỗi lần dispatch, runner dựng prompt cho worker từ đúng bốn phần cố định
-(nguồn: `src/runner/dispatch.mjs`'s `buildPrompt`, per D3) — thứ tự và tiêu
+(nguồn: `src/runner/work-compat.mjs`'s `buildPrompt`, per D3) — thứ tự và tiêu
 đề là contract, test đã pin sự hiện diện của cả bốn:
 
 1. **Goal** — tiêu đề + kind của work item, lấy nguyên từ item, không diễn
@@ -110,6 +110,6 @@ Kênh agent-tới-agent thứ hai: **Agent Mailbox** (`docs/platform/agent-mailb
 
 ## Tham chiếu
 
-`src/runner/dispatch.mjs` (prompt + trust invariant) · `src/runner/worktree.mjs`
+`src/runner/work-compat.mjs` (prompt) · `src/runner/dispatch/` (trust invariant) · `src/runner/worktree.mjs`
 (same-user trust invariant) · `docs/platform/platform-foundations.md` L4 (`14ebeea9`)
 · `docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0005-runner-cô-lập-worker` (ADR-0005 Runner & cô lập worker, D3/D4).

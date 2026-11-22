@@ -4991,6 +4991,37 @@ fn dispatch_reconcile_plans_by_default_and_refuses_a_missing_plan_or_mode() {
         stderr_text(&quarantine),
         "fgos: provider-capacity quarantine requires --provider\n"
     );
+    // The world's own HOME holds no accounts, so an account the machine does not list is refused by name.
+    let quarantine_of = |until: &str| {
+        ExecutionWorld::data(&world.run(&[
+            "dispatch",
+            "reconcile",
+            "provider-capacity",
+            "quarantine",
+            "--provider",
+            "openai-codex",
+            "--account",
+            "nope",
+            "--reason",
+            "quota",
+            "--until",
+            until,
+        ]))
+    };
+    let past = quarantine_of("2000-01-01T00:00:00Z");
+    assert_eq!(
+        (past["status"].as_str(), past["reasonCode"].as_str()),
+        (Some("refused"), Some("until-in-past"))
+    );
+    let unknown = quarantine_of("2999-01-01T00:00:00Z");
+    assert_eq!(
+        (unknown["status"].as_str(), unknown["reasonCode"].as_str()),
+        (Some("refused"), Some("unknown-account"))
+    );
+    assert_eq!(
+        unknown["detail"],
+        "unknown provider/account openai-codex/nope"
+    );
     assert!(!world.node_started(), "reconcile started a Node child");
 }
 

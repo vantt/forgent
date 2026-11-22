@@ -399,7 +399,7 @@ máy bắt được lỗi đếm tay này.)
 | `bin/fgos.mjs` (add/list/ready/move/ask/answer/check + mọi verb) | Entry | — | — (cửa) | CTR001 *(live — envelope trên MỌI verb + exit-code taxonomy + sổ verb `--help --json`, STR37)*, CTR002 |
 | `bin/fgos-runner.mjs` | Entry | — | — (cửa) | CTR001, CTR003 (surface), CTR009 (nạp config) |
 | `src/runner/loop.mjs` | Use-case | — | control + execution | CTR002, CTR003 |
-| `src/runner/dispatch.mjs` — port executor + validate config + spawn | Infra | — | model gateway + tool | **CTR009 (định nghĩa port)**, CTR003 |
+| `src/runner/dispatch/` — port executor + validate config + spawn | Infra | — | model gateway + tool | **CTR009 (định nghĩa port)**, CTR003 |
 | `src/runner/worktree.mjs` — vòng đời nhánh `fgw/` | Infra | — | tool | CTR003 (nửa sandbox) |
 | `src/state/store.mjs` — facade một cửa ghi | Infra | store | tool | CTR002 |
 | `src/runner/recovery.mjs` — ma trận crash-recovery | Domain | — | control | — (nội bộ) |
