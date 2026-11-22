@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+import { readRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { bindHeadSeat, headKeyOf, taskBriefOf, headRoleOf, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, openingText, personasHeadsFirst, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
 import { grantOf } from '../../src/session-host/head-grants.mjs';
@@ -161,7 +162,7 @@ test('this repository\'s runner configuration pins every coordinating persona to
   // A linked worktree reads the main checkout's project file (skip-worktree there); CI reads the committed file.
   const { root } = resolveInvocationRoot({ cwd: process.cwd(), policy: 'main-checkout' });
   const filename = path.join(root, '.fgos', 'config.yaml');
-  const config = parseYaml(fs.readFileSync(filename, 'utf8'), { filename });
+  const config = parseYaml(readRawProjectConfig(root), { filename });
   const standardFilename = path.join(root, 'core', 'config-standard', 'runner.yaml');
   const standard = parseYaml(fs.readFileSync(standardFilename, 'utf8'), { filename: standardFilename });
   const coordinating = ['secretary', 'supervisor', 'lead', 'planner', 'shaper'];
