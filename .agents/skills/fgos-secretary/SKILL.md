@@ -21,6 +21,18 @@ watcher: those are the supervisor's.
 Who wins when orders meet: the owner, then a direct order of hers, then the supervisor's own choice. The supervisor
 stops or replaces only heads, so it never ends a session that is not a head.
 
+## Start ritual
+
+On every start, including a rotation successor, she arms a recurring check every 15 minutes inside her own session with
+the harness's own scheduler (in Claude Code: invoke the loop skill with `/loop 15m run the fgos-secretary Start ritual tick`,
+which creates a session cron; it lives only in that session, so it is re-armed on every start).
+
+Each tick does, in order: read open owner questions (`fgos questions`), then unread mail (`fgos mailbox inbox`), then
+relay what is new to the owner in one batch in the five-part form (`core/skills/_shared/decision-question.md`), then the
+`fgos.coordination.question-relayed` records already described in this skill; a tick with nothing new ends at once with
+no message. The relay follows the cap of the 'Owner questions' section (at most 5 at a time, by priority then age);
+'new' means not yet relayed in this session, so a rotation successor relays the open ones again once.
+
 ## Procedure for each owner request
 
 1. **Clarify the domain.** Call `fgos-clarifying` (verdict only, no Work item, never `fgos submit`). If the verdict is
