@@ -2,6 +2,7 @@
 contract: plan-v1
 title: "Turn main's landed-code reds green and finish the docs/backlog.md to plans/backlog.md sweep"
 status: running
+lead: head:lead-forgent-261122-0800-red-te-96f0f
 priority: P1
 blockedBy: []
 base: 645d43a6a4dd30c752bc736b4df3476590d47f63
