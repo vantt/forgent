@@ -15,7 +15,7 @@ use fgos_run_supervisor::head_client::{
 };
 use fgos_session_host::rotation::decide::{decide, AtRest, RotationConfig};
 use fgos_session_host::rotation::handoff::{
-    awaits_answer, lineage_dir, read_latest, rotation_id_of, session_start_context,
+    awaits_answer, lineage_dir, read_latest, rotation_id_of, session_start_context, CONTEXT_LIMIT,
 };
 use fgos_session_host::rotation::measure::{measure, Source, Sources, FRESH_WAIT};
 use serde_json::{json, Value};
@@ -262,14 +262,61 @@ fn answer(head: &Head, lineage: &Path, payload: &Value, ports: &Ports) -> Result
         .map_err(|e| StopError::from_client(e, "session answered"))
 }
 
+fn absolute_project_root(fgos_dir: &Path) -> PathBuf {
+    let parent = fgos_dir.parent().unwrap_or_else(|| Path::new(""));
+    let abs = if parent.is_absolute() {
+        parent.to_path_buf()
+    } else if let Ok(cwd) = std::env::current_dir() {
+        cwd.join(parent)
+    } else {
+        parent.to_path_buf()
+    };
+    if abs.file_name().and_then(|n| n.to_str()) == Some(".") {
+        abs.parent().unwrap_or(&abs).to_path_buf()
+    } else {
+        abs
+    }
+}
+
 /// A session start: the latest handoff of the lineage as the one `additionalContext` object, or nothing.
 fn session_start(head: &Head, fgos_dir: &Path) -> Result<Option<String>, String> {
     let lineage = lineage_dir(fgos_dir, &head.persona, &head.name).map_err(|e| e.to_string())?;
     let Some(latest) = read_latest(&lineage).map_err(|e| e.to_string())? else {
         return Ok(None);
     };
-    let context = session_start_context(&latest, fgos_dir.parent());
-    Ok(Some(json!({ "hookSpecificOutput": { "hookEventName": "SessionStart", "additionalContext": context } }).to_string()))
+    let project_root = absolute_project_root(fgos_dir);
+    let mut context = session_start_context(&latest, Some(&project_root));
+    let should_append = match head.gen {
+        Some(gen) => awaits_answer(&lineage, gen).map_err(|e| e.to_string())?,
+        None => false,
+    };
+    if should_append {
+        let bin = project_root.join(".fgos/installation/bin/fgos");
+        let instruction = format!(
+            "a rotation is waiting for this session's first answer; right after the start ritual's one line, in this same turn, answer by running printf '%s' '{{\"last_assistant_message\":\"<that line>\"}}' | \"{}\" hook session-rotation --event stop ; use the installed path, not the fgos shell function; role-gated verbs wait until the role moves.",
+            bin.display()
+        );
+        let sep = if context.is_empty() || context.ends_with("\n\n") {
+            ""
+        } else if context.ends_with('\n') {
+            "\n"
+        } else {
+            "\n\n"
+        };
+        let addition = format!("{sep}{instruction}");
+        if context.chars().count() + addition.chars().count() > CONTEXT_LIMIT {
+            let room = CONTEXT_LIMIT.saturating_sub(addition.chars().count());
+            let mut trimmed: String = context.chars().take(room).collect();
+            trimmed.push_str(&addition);
+            context = trimmed;
+        } else {
+            context.push_str(&addition);
+        }
+    }
+    Ok(Some(
+        json!({ "hookSpecificOutput": { "hookEventName": "SessionStart", "additionalContext": context } })
+            .to_string(),
+    ))
 }
 
 /// `<project>/.fgos` of the directory the head was started in: Claude Code's project directory when it names a
@@ -652,6 +699,68 @@ mod tests {
             out,
             json!({ "hookSpecificOutput": { "hookEventName": "SessionStart", "additionalContext": "handoff text\n" } })
         );
+    }
+
+    #[test]
+    fn session_start_appends_rotation_answer_instruction_when_awaiting_answer_and_leaves_context_unchanged_when_answered(
+    ) {
+        let (fgos_dir, lineage) = fgos("start-instruction");
+        let project_root = fgos_dir.parent().unwrap();
+        let expected_bin = project_root.join(".fgos/installation/bin/fgos");
+        assert!(expected_bin.is_absolute());
+
+        std::fs::write(lineage.join("261118-1000-abc12345.md"), "handoff text\n").unwrap();
+        std::fs::write(
+            lineage.join("latest.json"),
+            r#"{"file":"261118-1000-abc12345.md"}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            lineage.join("rotation.json"),
+            r#"{"id":"0123456789abcdef","gen":2}"#,
+        )
+        .unwrap();
+
+        let head = head(Some(2));
+        let out: Value =
+            serde_json::from_str(&session_start(&head, &fgos_dir).unwrap().unwrap()).unwrap();
+        let context = out["hookSpecificOutput"]["additionalContext"]
+            .as_str()
+            .unwrap();
+
+        let expected_instruction = format!(
+            "a rotation is waiting for this session's first answer; right after the start ritual's one line, in this same turn, answer by running printf '%s' '{{\"last_assistant_message\":\"<that line>\"}}' | \"{}\" hook session-rotation --event stop ; use the installed path, not the fgos shell function; role-gated verbs wait until the role moves.",
+            expected_bin.display()
+        );
+        assert!(
+            context.ends_with(&expected_instruction),
+            "context should end with instruction carrying absolute installed path: {context}"
+        );
+        assert!(context.starts_with("handoff text\n"));
+
+        // When answered.json exists for that generation, context is unchanged
+        std::fs::write(lineage.join("answered.json"), r#"{"gen":2}"#).unwrap();
+        let out_answered: Value =
+            serde_json::from_str(&session_start(&head, &fgos_dir).unwrap().unwrap()).unwrap();
+        let context_answered = out_answered["hookSpecificOutput"]["additionalContext"]
+            .as_str()
+            .unwrap();
+        assert_eq!(context_answered, "handoff text\n");
+
+        // When handoff is long, instruction survives and context remains within CONTEXT_LIMIT
+        std::fs::remove_file(lineage.join("answered.json")).unwrap();
+        let huge_handoff = format!("# Handoff\n\n{}\n", "x".repeat(CONTEXT_LIMIT + 500));
+        std::fs::write(lineage.join("261118-1000-abc12345.md"), &huge_handoff).unwrap();
+        let out_long: Value =
+            serde_json::from_str(&session_start(&head, &fgos_dir).unwrap().unwrap()).unwrap();
+        let context_long = out_long["hookSpecificOutput"]["additionalContext"]
+            .as_str()
+            .unwrap();
+        assert!(
+            context_long.ends_with(&expected_instruction),
+            "instruction must survive when handoff is long"
+        );
+        assert!(context_long.chars().count() <= CONTEXT_LIMIT);
     }
 
     #[test]
