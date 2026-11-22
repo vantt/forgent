@@ -9,20 +9,43 @@
 import fs from 'node:fs';
 import { commitAt, pathExistsAt } from '../src/git/inspect.mjs';
 import { conventionCheck } from '../src/convention/convention-client.mjs';
+import { matchesWriteScope } from '../src/runner/dispatch/write-scope.mjs';
 
 const CONVENTION_RULES_PATH = new URL('../packages/convention/contracts/convention.rules.v1.json', import.meta.url);
 
-function packagedConventionCutoff() {
-  const contract = JSON.parse(fs.readFileSync(CONVENTION_RULES_PATH, 'utf8'));
-  const cutoffs = new Set(
-    contract.rules
-      .filter((rule) => Array.isArray(rule.scope) && rule.scope.length > 0 && rule.cutoff)
-      .map((rule) => rule.cutoff),
-  );
-  if (cutoffs.size !== 1) {
-    throw new Error(`expected one launch cutoff across scoped packaged rules, found ${cutoffs.size}`);
+let cachedContract = null;
+function getContract() {
+  if (!cachedContract) {
+    cachedContract = JSON.parse(fs.readFileSync(CONVENTION_RULES_PATH, 'utf8'));
   }
-  return [...cutoffs][0];
+  return cachedContract;
+}
+
+function ruleForPath(rules, relativePath) {
+  for (const rule of rules) {
+    if (Array.isArray(rule.scope) && rule.scope.length > 0 && matchesWriteScope(relativePath, rule.scope)) {
+      return rule;
+    }
+  }
+  const candidate = rules
+    .filter((rule) => Array.isArray(rule.roots) && rule.roots.length > 0 && Array.isArray(rule.scope) && rule.scope.length > 0)
+    .flatMap((rule) => rule.roots.map((root) => ({ rule, root })))
+    .filter(({ root, rule }) => {
+      if (rule.template && !rule.template.includes('{')) {
+        return relativePath === `${root}${rule.template}`;
+      }
+      return root !== 'plans/' && relativePath.startsWith(root);
+    })
+    .sort((a, b) => b.root.length - a.root.length)[0];
+  return candidate?.rule ?? null;
+}
+
+function packagedConventionCutoff(_root, relativePath) {
+  const contract = getContract();
+  const launchCutoff = contract.rules.find((rule) => rule.id === 'report')?.cutoff ?? '3faf81996';
+  if (!relativePath) return launchCutoff;
+  const rule = ruleForPath(contract.rules, relativePath);
+  return rule?.cutoff ?? launchCutoff;
 }
 
 function pathWasIntroducedAfter(root, relativePath, cutoff) {
@@ -61,17 +84,31 @@ export function checkConventionConformance(root, {
     };
   }
 
-  let cutoff;
-  try {
-    cutoff = cutoffResolver(root);
-    commitAt(root, cutoff);
-  } catch (error) {
-    return { passed: false, message: `convention check unavailable: cutoff cannot be inspected: ${error.message}` };
-  }
+  const resolveCutoffFor = (relPath) => {
+    if (typeof cutoffResolver === 'function') {
+      return cutoffResolver(root, relPath);
+    }
+    return cutoffResolver;
+  };
+
+  const commitCache = new Map();
+  const getCommit = (cutoff) => {
+    if (!commitCache.has(cutoff)) {
+      commitCache.set(cutoff, commitAt(root, cutoff));
+    }
+    return commitCache.get(cutoff);
+  };
 
   const recent = [];
   const existing = [];
   for (const violation of result.violations) {
+    let cutoff;
+    try {
+      cutoff = resolveCutoffFor(violation.path);
+      getCommit(cutoff);
+    } catch (error) {
+      return { passed: false, message: `convention check unavailable: cutoff cannot be inspected: ${error.message}` };
+    }
     (introducedAfter(root, violation.path, cutoff) ? recent : existing).push(violation);
   }
   const examples = result.violations

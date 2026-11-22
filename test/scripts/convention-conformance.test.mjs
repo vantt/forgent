@@ -77,6 +77,74 @@ test('convention conformance passes for pre-cutoff violations but fails for post
   assert.match(oldAndNew.message, /new-bad\.md/);
 });
 
+test('convention conformance judges violations by their own rule cutoff when rules have different cutoffs', (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-convention-conformance-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const git = (args) => execFileSync('git', args, {
+    cwd: root,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  }).trim();
+  const put = (relative, content = '# fixture\n') => {
+    const destination = path.join(root, relative);
+    fs.mkdirSync(path.dirname(destination), { recursive: true });
+    fs.writeFileSync(destination, content);
+  };
+  git(['init', '-q', '-b', 'main']);
+  git(['config', 'user.name', 'Convention conformance fixture']);
+  git(['config', 'user.email', 'convention-conformance@example.invalid']);
+  put('apps/fgos/Cargo.toml', '[package]\nname="fixture"\n');
+  put('plans/reports/old-report.md');
+  git(['add', 'apps/fgos/Cargo.toml', 'plans/reports/old-report.md']);
+  git(['commit', '-qm', 'initial commit with old report']);
+  const reportCutoff = git(['rev-parse', 'HEAD']);
+
+  put('plans/reports/mid-report.md');
+  put('plans/backlog/old-backlog.md');
+  git(['add', 'plans/reports/mid-report.md', 'plans/backlog/old-backlog.md']);
+  git(['commit', '-qm', 'second commit with backlog migration and mid report']);
+  const backlogCutoff = git(['rev-parse', 'HEAD']);
+
+  put('plans/backlog/new-backlog.md');
+  git(['add', 'plans/backlog/new-backlog.md']);
+  git(['commit', '-qm', 'third commit with new backlog item']);
+
+  const resolveCutoff = (_root, relPath) => {
+    if (relPath.startsWith('plans/backlog/')) return backlogCutoff;
+    return reportCutoff;
+  };
+
+  const oldBacklogViolation = violation('plans/backlog/old-backlog.md');
+  const midReportViolation = violation('plans/reports/mid-report.md');
+
+  // old-backlog was introduced after reportCutoff but at/before backlogCutoff:
+  // judged by its own rule's cutoff (backlogCutoff), it is pre-cutoff and passes.
+  const backlogResult = checkConventionConformance(root, {
+    hostRunner: () => ({ checked: 1, violations: [oldBacklogViolation] }),
+    cutoffResolver: resolveCutoff,
+  });
+  assert.equal(backlogResult.passed, true);
+  assert.match(backlogResult.message, /1 pre-cutoff, 0 post-cutoff/);
+
+  // mid-report was introduced after reportCutoff:
+  // judged by its own rule's cutoff (reportCutoff), it is post-cutoff and fails.
+  const reportResult = checkConventionConformance(root, {
+    hostRunner: () => ({ checked: 1, violations: [midReportViolation] }),
+    cutoffResolver: resolveCutoff,
+  });
+  assert.equal(reportResult.passed, false);
+  assert.match(reportResult.message, /0 pre-cutoff, 1 post-cutoff/);
+  assert.match(reportResult.message, /mid-report\.md/);
+
+  // Together: 1 pre-cutoff, 1 post-cutoff -> fails.
+  const combined = checkConventionConformance(root, {
+    hostRunner: () => ({ checked: 2, violations: [oldBacklogViolation, midReportViolation] }),
+    cutoffResolver: resolveCutoff,
+  });
+  assert.equal(combined.passed, false);
+  assert.match(combined.message, /1 pre-cutoff, 1 post-cutoff/);
+});
+
 // One wiring proof only: path/placement cases belong to Convention's Rust golden suite.
 test('convention conformance honors native blocking posture without applying the historical warning cutoff', (t) => {
   const { root } = initSourceRepo(t);

@@ -487,27 +487,6 @@ fn check_path(rules: &RuleSet, path: &str) -> Option<Violation> {
         });
     }
     let file_name = path.rsplit('/').next().unwrap_or(path);
-    if file_name.ends_with(".md") && looks_like_named_file(file_name) {
-        let is_in_report_root = rules
-            .by_kind("report")
-            .is_some_and(|r| r.roots.iter().any(|root| path.starts_with(root.as_str())));
-        let is_in_journal_root = rules
-            .by_kind("journal")
-            .is_some_and(|r| r.roots.iter().any(|root| path.starts_with(root.as_str())));
-        let is_in_plan = rules
-            .rules
-            .iter()
-            .filter(|rule| rule.shape == RuleShape::NameTemplate)
-            .any(|rule| accepted_plan_location(rule, path));
-        if !is_in_report_root && !is_in_journal_root && !is_in_plan {
-            let report = rules.by_kind("report")?;
-            return Some(violation(
-                path,
-                "wrong-location",
-                &format!("recognized {} is outside an accepted location", report.kind),
-            ));
-        }
-    }
     let scoped = rules
         .rules
         .iter()
@@ -515,7 +494,13 @@ fn check_path(rules: &RuleSet, path: &str) -> Option<Violation> {
         .filter(|rule| {
             rule.template
                 .as_deref()
-                .is_some_and(|template| template.ends_with(".md") == file_name.ends_with(".md"))
+                .is_some_and(|template| {
+                    if template.contains('{') {
+                        template.ends_with(".md") == file_name.ends_with(".md")
+                    } else {
+                        template == file_name
+                    }
+                })
         })
         .flat_map(|rule| rule.roots.iter().map(move |root| (rule, root)))
         .filter(|(_, root)| path.starts_with(root.as_str()))
