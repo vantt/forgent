@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import { readRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
@@ -16,7 +17,10 @@ import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { headOf } from '../../src/runner/dispatch/session-attempt.mjs';
 import { resolveInvocationRoot } from '../../src/runner/paths.mjs';
 import { parseYaml } from '../../src/util/yaml.mjs';
+import { quarantineProviderAccount } from '../../src/runner/dispatch/provider-capacity.mjs';
 
+ensureGitAddon();
+process.env.FGOS_STATE_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-head-start-state-root-'));
 seedFileLocalBwrapRegistry();
 seedStubAgentClis('alpha-bin');
 
@@ -82,6 +86,63 @@ test('a head seat takes the executor\'s pane invocation, not its headless one', 
   };
   const binding = await bindHeadSeat({ persona: 'planner', key: 'head-planner-probe-1', runnerConfig });
   assert.equal(binding.invocation, 'alpha-pane');
+});
+
+test('a head seat bind never ranks an account the lease state quarantines', async () => {
+  seedStubAgentClis('alpha-bin');
+  const runtimeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-head-bind-quarantine-'));
+  const store = (f) => ({ use: f, homeEnv: `${f.toUpperCase()}_HOME`, files: ['login'] });
+  const runnerConfig = {
+    defaults: { tier: 'standard' },
+    patterns: { seatBinding: { schema: 1 } },
+    modelPolicies: { alpha: { standard: 'a-m' } },
+    capabilities: { execute: { prefer: [{ executor: 'alpha' }] } },
+    executors: {
+      alpha: {
+        kind: 'agent',
+        providerModel: 'alpha',
+        invocations: [
+          { id: 'alpha-pane', via: 'cli', adapter: 'herdr-spawn', command: 'alpha-bin', confinement: { backend: 'bwrap' }, credentialStore: store('alpha') },
+        ],
+      },
+    },
+    llmAccounts: {
+      alpha: {
+        a1: { label: 'a1', credentialStore: { alpha: '/nonexistent/a1' } },
+        a2: { label: 'a2', credentialStore: { alpha: '/nonexistent/a2' } },
+      },
+    },
+  };
+
+  quarantineProviderAccount({
+    provider: 'alpha',
+    accountId: 'a1',
+    reasonCode: 'quota-limit',
+    until: new Date(Date.now() + 3_600_000).toISOString(),
+    runtimeDir,
+  });
+
+  const binding = await bindHeadSeat({ persona: 'planner', key: 'head-planner-probe-1', runnerConfig, runtimeDir });
+  assert.equal(binding.leaseAccount, 'a2', 'the binding names the healthy account');
+
+  const onlyQuarantinedConfig = {
+    ...runnerConfig,
+    llmAccounts: {
+      alpha: {
+        a1: { label: 'a1', credentialStore: { alpha: '/nonexistent/a1' } },
+      },
+    },
+  };
+
+  await assert.rejects(
+    () => bindHeadSeat({ persona: 'planner', key: 'head-planner-probe-2', runnerConfig: onlyQuarantinedConfig, runtimeDir }),
+    (err) => {
+      assert.ok(err instanceof HeadStartError, 'error must be HeadStartError');
+      assert.equal(err.code, 'bind-refused');
+      assert.equal(err.reason ?? err.refusal?.reason, 'no-account-available');
+      return true;
+    },
+  );
 });
 
 // Existing seat tests cover tier and invocation selection, not refusal when the pinned family's accounts are disabled.

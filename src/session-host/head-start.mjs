@@ -134,15 +134,23 @@ export function openingText({ persona, name, personaLines, handoff = null, forQu
  * `runner.personas.<persona>.tier`, else `defaults.tier` (a persona names no model). A head lives in a pane, so the seat is
  * asked for with herdr present: the executor's pane invocation, never its headless one. A refusal throws.
  */
-export async function bindHeadSeat({ persona, key, runnerConfig }) {
+export async function bindHeadSeat({ persona, key, runnerConfig, runtimeDir }) {
   const { bind } = await import('../runner/execution/bind.mjs');
+  const { readAccountStateOverlay } = await import('../runner/dispatch/provider-capacity.mjs');
+  let accountState = null;
+  try {
+    accountState = readAccountStateOverlay({ runtimeDir });
+  } catch {
+    // An unreadable lease state stays what it is today, the config-only view. Do not invent a fallback.
+    accountState = null;
+  }
   const binding = bind(
     { unit: { id: key, capability: 'execute', rigor: 'standard', writes: [] }, seat: 'producer', role: 'producer', persona, readOnly: true, raiseAuthorized: false },
-    { runnerConfig, session: { headless: false, herdrPresent: true, postureAtLaunch: true } },
+    { runnerConfig, session: { headless: false, herdrPresent: true, postureAtLaunch: true }, ...(accountState ? { accountState } : {}) },
     { headLaunch: true },
   );
   if (binding.refused) {
-    throw new HeadStartError('bind-refused', `no seat can serve persona "${persona}": ${binding.refused.reason}: ${binding.refused.detail}${binding.refused.fix ? `; ${binding.refused.fix}` : ''}`);
+    throw new HeadStartError('bind-refused', `no seat can serve persona "${persona}": ${binding.refused.reason}: ${binding.refused.detail}${binding.refused.fix ? `; ${binding.refused.fix}` : ''}`, { refusal: binding.refused, reason: binding.refused.reason });
   }
   return binding;
 }
@@ -245,7 +253,7 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
   const handoff = await (ports.handoff ?? defaultHandoff)({ persona, name, projectRoot });
   const text = await (ports.opening ?? defaultOpening)({ persona, name, projectRoot, pinned, handoff, forQuestion, task: taskBriefOf(persona, task) });
   const runnerConfig = await (ports.runnerConfig ?? defaultRunnerConfig)(projectRoot);
-  const binding = await (ports.bind ?? bindHeadSeat)({ persona, key, runnerConfig });
+  const binding = await (ports.bind ?? bindHeadSeat)({ persona, key, runnerConfig, runtimeDir: ports.runtimeDir });
 
   const request = {
     binding, runnerConfig, key, role, grant, opening: text, ceilingMs: HEAD_HARD_CEILING_MS,
