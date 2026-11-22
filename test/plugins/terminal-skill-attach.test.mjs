@@ -117,7 +117,7 @@ test('rename.sh attaches the caller pane and labels it through the port', () => 
   assert.equal(record.display.id, 'tsk-1lvxq7m2h9', 'the record keeps the whole id');
   const rename = fake.calls().find((c) => c[0] === 'pane' && c[1] === 'rename' && c[2] === pane);
   assert.ok(rename, 'a pane rename reached herdr');
-  assert.equal(rename[3], 'tsk-1lvx \u00b7 fix terminal layout | fg.ssid:sess-ski');
+  assert.equal(rename[3], 'tsk-1lvx: fix terminal layout | fg.ssid:sess-ski');
   assert.equal(fake.closedPaneIds().length, 0);
 });
 
