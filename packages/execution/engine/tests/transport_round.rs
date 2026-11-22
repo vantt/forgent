@@ -301,6 +301,51 @@ fn a_heads_requirement_names_each_grant_it_has_and_the_posture_it_starts_from() 
 }
 
 #[test]
+fn a_coordinator_grant_with_a_one_level_entry_launches_in_the_main_checkout_it_may_write() {
+    use fgos_execution_engine::confinement::policy::{
+        control_delivery, resolve_confinement_resources, Grant, ResolveContext, ResolveInput,
+    };
+    let root = scratch("coordinator-grant");
+    std::fs::create_dir_all(root.join("plans/backlog")).unwrap();
+    let grant = HeadGrant {
+        verbs: vec!["session start".into()],
+        writes: vec!["plans".into(), "plans/backlog/*".into()],
+        mailbox: true,
+        peers: true,
+    };
+    let requirement = requirement_of(&grant);
+    let paths = requirement["policy"]["grants"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|g| g["resource"] == "workspace-paths")
+        .map(|g| g["paths"].clone())
+        .unwrap();
+    let resolved = resolve_confinement_resources(&ResolveInput {
+        dispatch_id: "head-secretary-miu-1".into(),
+        context: ResolveContext {
+            repo_root: Some(root.to_string_lossy().into_owned()),
+            ..ResolveContext::default()
+        },
+        grants: vec![Grant {
+            resource: "workspace-paths".into(),
+            access: "read-write".into(),
+            subpath: None,
+            paths: Some(paths),
+        }],
+        ..ResolveInput::default()
+    });
+    let resolved =
+        resolved.unwrap_or_else(|e| panic!("the grant's sandbox paths are refused: {e:?}"));
+    assert!(!resolved.is_empty(), "the granted directory is bound");
+    // The head lives in the main checkout: under a backend its host-write-denied requirement allows the root
+    // workspace for a session launch, never for an assignment's worker.
+    assert!(control_delivery(Some("session"), Some(&requirement), true).root_workspace_allowed);
+    assert!(!control_delivery(Some("assignment"), Some(&requirement), true).root_workspace_allowed);
+    let _ = std::fs::remove_dir_all(root);
+}
+
+#[test]
 fn a_head_is_named_only_when_its_environment_names_persona_name_and_a_whole_generation() {
     for case in vectors("session-attempt.v1.json")["envs"]
         .as_array()
