@@ -154,7 +154,7 @@ the grants, verb by verb.
 | 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs | 2 | ready |
 | 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | ready |
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | ready |
-| 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | draft |
+| 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | ready |
 | 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md | 5 | ready |
 
 Each phase names its canonical dispatch capability in its file: `code:implement` for 2 to 7 and 10 and the probe script
@@ -192,6 +192,11 @@ first). `blockedBy` stays empty because no phase here needs a result of either p
 None asked now. The owner said not to ask tonight, and the one open point (the secretary wake mechanism, a choice the
 owner reserved on 2026-11-21 21:28) blocks only phase 10: that phase's first step asks it with `fgos questions ask` in
 the five-part form, with the proposal written in the phase file, and lists the `q-` id here.
+
+- **Phase 10, secretary wake mechanism: answered C** (owner via the secretary, 2026-11-22, supervision event
+  `9467856911fda6a6`). A now: Miu arms a 15-minute recurring check on every start. Then B through
+  `261122-0056-orchestration-skeleton` phase 6 (player wake), handed off there with a `coordination-handoff` event; A
+  stays as the slow fallback. Phase 10 step 1 is done by this answer; the phase is `ready`.
 
 ## Risks and rollback
 

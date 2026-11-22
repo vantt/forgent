@@ -2,7 +2,9 @@
 
 Capability: `code:implement` (skill text), after an owner choice.
 
-Closes `p-vquz26ibnn` item (a). Status `draft` until the owner picks the mechanism; no other phase waits on it.
+Closes `p-vquz26ibnn` item (a). The owner picked **C** on 2026-11-22 (recorded under "Owner questions" in `plan.md`):
+step 1 is answered, so the phase is `ready`. Step 2 does both halves: the timer in the secretary skill, and the
+`coordination-handoff` to `261122-0056-orchestration-skeleton` (already raised by the supervisor on 2026-11-22).
 
 ## Inputs
 
