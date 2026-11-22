@@ -157,30 +157,8 @@
     ]
   },
   "layers": {
-    "src/run-supervisor/client.mjs": "S6a",
-    "src/run-supervisor/protocol.mjs": "S6a",
-    "src/run-supervisor/runtime-dir.mjs": "S6a",
-    "src/run-supervisor/trust-store.mjs": "S6a",
-    "src/runner/agent-definitions.mjs": "S6a",
-    "src/runner/agent-listing.mjs": "S6a",
-    "src/runner/dispatch/assignment-layout.mjs": "S6a",
-    "src/runner/dispatch/config.mjs": "S6a",
-    "src/runner/dispatch/confinement/backend-registry.mjs": "S6a",
-    "src/runner/dispatch/confinement/cleanup.mjs": "S6a",
-    "src/runner/dispatch/confinement/policies.mjs": "S6a",
-    "src/runner/dispatch/confinement/probes/harness.mjs": "S6a",
-    "src/runner/dispatch/llm-accounts.mjs": "S6a",
-    "src/runner/dispatch/operation-prompt-templates.mjs": "S6a",
-    "src/runner/dispatch/provider-adapter.mjs": "S6a",
-    "src/runner/dispatch/provider-capacity.mjs": "S6a",
-    "src/runner/dispatch/provider-credential-renewal.mjs": "S6a",
-    "src/runner/dispatch/shipped-catalog.mjs": "S6a",
-    "src/runner/dispatch/tier-cell.mjs": "S6a",
-    "src/runner/dispatch/tool-providers.mjs": "S6a",
-    "src/runner/dispatch/transport.mjs": "S6a",
     "src/runner/execution/bind.mjs": "S6a",
     "src/runner/capability-config.mjs": "S6a",
-    "src/runner/execution/patterns/retired-keys.mjs": "S6a",
     "src/seat-binding/client.mjs": "S6a",
     "src/setup/registrations.mjs": "S7",
     "src/state/drift-status.mjs": "S7",
@@ -217,11 +195,7 @@
       "id": "runner-patterns-config",
       "description": "project and global runner patterns configuration is present, well-formed, and cumulative",
       "owner": "bridge:S6b",
-      "judge": [
-        "src/runner/execution/patterns/retired-keys.mjs",
-        "src/runner/dispatch/config.mjs",
-        "src/runner/dispatch/shipped-catalog.mjs"
-      ]
+      "note": "reads the retired pattern keys and the shipped catalog of fgos-execution through the addon (src/native/execution-door.mjs) and the config through src/config/facade.mjs; no Node Execution layer is left, the body moves to Rust with the Workflow rows"
     },
     {
       "id": "executor-family-unique",
@@ -554,9 +528,9 @@
       "description": "every seat of every Workflow unit, and every core capability (execute, code:implement, any capability declaring an agent pool) as a writing producer, binds under the committed config in a fixed headless session (no lease, nothing started); a policy refusal or a pool with no executor able to carry the confinement posture fails, no pool, account state, tier caps and shared families are information",
       "owner": "bridge:S6b",
       "judge": [
-        "src/runner/dispatch/config.mjs",
         "src/runner/execution/bind.mjs",
-        "src/seat-binding/client.mjs"
+        "src/seat-binding/client.mjs",
+        "src/runner/capability-config.mjs"
       ]
     },
     {
@@ -564,7 +538,6 @@
       "description": "every blind Workflow unit can only bind executors whose provider family and transport were proven to keep a worker blind (read-only, no model call)",
       "owner": "bridge:S6b",
       "judge": [
-        "src/runner/dispatch/config.mjs",
         "src/runner/execution/bind.mjs",
         "src/seat-binding/client.mjs"
       ]

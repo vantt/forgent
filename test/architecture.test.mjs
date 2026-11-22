@@ -2141,10 +2141,12 @@ function doctorRegistryEntries() {
   return entries;
 }
 
-test('doctor registry: every bridged row and fix is labelled no earlier than the layers it reads, and every layer is a file', () => {
+test('doctor registry: every bridged row and fix is labelled no earlier than the layers it reads, and every layer is a file some row reads', () => {
   const entries = doctorRegistryEntries();
   assert.ok(entries.some((entry) => entry.owner.startsWith('bridge:')), 'the registry gives no row to the bridge');
   assert.deepEqual(bridgeFailures(entries.filter((entry) => entry.kind === 'row'), DOCTOR_REGISTRY.layers, (module) => fs.existsSync(path.join(root, module))), []);
+  const read = new Set(entries.flatMap((entry) => entry.judge ?? []));
+  assert.deepEqual(Object.keys(DOCTOR_REGISTRY.layers).filter((module) => !read.has(module)), [], 'a layer no row or fix reads is stale: drop it from layers');
 });
 
 test('doctor registry: a label before a layer, a layer with no step, a row with neither judge nor note and an unknown step each fail by name', () => {
