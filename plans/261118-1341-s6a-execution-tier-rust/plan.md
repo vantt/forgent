@@ -37,7 +37,6 @@ footprint:
   - packages/process/rust/src/platform/linux.rs
   - packages/process/rust/src/platform/windows_job.rs
   - packages/process/rust/src/platform/windows_spawn.rs
-  - packages/distribution/contracts/doctor-registry.v1.json
   - apps/fgos/Cargo.toml
   - apps/fgos/src/main.rs
   - apps/fgos/src/cli_projector.rs
@@ -730,3 +729,4 @@ consumes that decision and keeps `src/seat-binding/client.mjs`.
 - 2026-11-22 lead:S6A: footprint narrowed for plan 261122-0118 (heads stable and able, owner rank 1; supervisor 2026-11-22): dropped apps/fgos/src/routing.rs, src/session-host/head-request.mjs, src/session-rotation/rotate.mjs; packages/run-supervisor/** -> packages/run-supervisor/rust/src/controller/**; apps/fgos/src/wiring/doctor/** -> wiring/doctor/mod.rs. Kept doctor-registry.v1.json (phase 20 drops the dry-bind owner lines, phase 22 the bridge:S6a owners). Phase 20 leaves head-request/rotate imports alone, so the Node modules they import (unit-summary, unit-run-record and rotate's import) stay until 0118 lands; phases 21/22 re-add and rebase before editing any dropped path.
 - 2026-11-22 lead:S6A: apps/fgos/src/wiring/doctor/mod.rs dropped from the footprint (its phase 20 hunk landed in ca4a90eec) for plan 261122-0118; doctor-registry.v1.json stays until s6/p20-3b lands (deleting dry-bind.mjs moves its two judge rows), then drops too; phase 22 re-adds and rebases for the bridge:S6a owner cleanup.
 - 2026-11-22 lead:S6A: CHANGELOG.md and docs/platform/run-supervisor/spec.md dropped from the footprint for plan 261122-0118 (s6/p20-3b edits neither); phases 21/22 re-add and rebase before writing their lines.
+- 2026-11-22 lead:S6A: phase 20 parts 3a (ca4a90eec) and 3b (dc77999ca) landed: shared unit/plan answers in fgos-execution, Workflow crash-loop limit (execution-host-crash-loop), reconcile import graph off the Execution door, addon serves the Execution Core helpers without the engine (P3 guarded on both Cargo.toml files), sweep through the host route, 14 Node Execution files deleted with named owners. doctor-registry.v1.json dropped from the footprint for plan 261122-0118. Tail to phase 21: 0118-held unit-summary, unit-run-record, unit, loops/history-outcome, custody-door and the Node cancel-registry (head-request/rotate/head-stop imports, host cancel route has no caller until then); handoff-refs (Workflow imports it); case-run-paths, commit-unit-work (0625 closed, free now).
