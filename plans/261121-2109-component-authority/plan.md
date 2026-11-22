@@ -7,7 +7,6 @@ blockedBy:
   - 261118-1341-s6a-execution-tier-rust
   - 261120-0625-work-data-model
   - 261122-0118-heads-stable-and-able
-  - 261122-0056-orchestration-skeleton
   - 261122-1950-owner-communication-standard
 base: 8a7839d3881a03527cfcf003e05dc323d191a613
 footprint:
@@ -178,10 +177,17 @@ the manifest counts and reader line numbers in Facts were re-read, and the discu
 this plan was written own files in its footprint, so they joined `blockedBy`:
 - `261122-0118-heads-stable-and-able` (running): `docs/architecture-manifest.json` and
   `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`.
-- `261122-0056-orchestration-skeleton` (ready): `docs/platform/workflow/spec.md` and `docs/platform/runner/spec.md`.
+- `261122-0056-orchestration-skeleton`: removed from `blockedBy` by the owner order below; it now waits on this plan.
 - `261122-1950-owner-communication-standard` (ready): `AGENTS.md`, `docs/reading-map.md`,
   `docs/platform/agent-mailbox/spec.md` and `docs/platform/observe/spec.md`.
 The same rule applies when they are `done`: refresh `base`, re-read the manifest, run the check, set `ready`.
+
+**Owner order (2026-11-22 23:20, via the secretary, recorded by head:supervisor-forgent):** component-authority
+goes first, then its doors plan `261121-2110-component-authority-doors`; `261122-0056-orchestration-skeleton` runs in
+parallel only where it does not collide. The two plans listed each other in `blockedBy`, a cycle that admitted
+neither, so `261122-0056-orchestration-skeleton` left this plan's `blockedBy` and keeps this plan in its own. It still
+shares `docs/platform/workflow/spec.md` and `docs/platform/runner/spec.md` with this plan and many host files with
+the doors plan, so it runs after them, not beside them. The other two waits are real file collisions and stay.
 
 **Why it first waited:** two plans that were running when it was written owned files this plan must change.
 - `261118-1341-s6a-execution-tier-rust` owns `docs/architecture-manifest.json`, `test/architecture.test.mjs`,
