@@ -406,6 +406,23 @@ export function classifyOutcome(verb, isGranted, res) {
     };
   }
 
+  // The friction host verb reports its domain code only in the message text.
+  // Over the request socket, the reply is {ok:false, code:"error", detail:"... friction-invalid-input: invalid disposition ..."}
+  // without a structured domain code. For 'friction record' only, when the reply code is 'error'
+  // and the detail carries 'friction-invalid-input' together with 'disposition', the domain refusal
+  // proves the grant and the route passed.
+  if (verb === 'friction record' && code === 'error') {
+    const detailText = String(detail || rawErr || rawOut || '');
+    if (detailText.includes('friction-invalid-input') && detailText.toLowerCase().includes('disposition')) {
+      return {
+        observed: 'served',
+        code: 'friction-invalid-input',
+        detail: detail || 'domain refusal: friction-invalid-input',
+        reply,
+      };
+    }
+  }
+
   // 5. Domain refusal that proves the route ran
   if (code && expectedCodes.has(code)) {
     if (verb === 'friction record') {
