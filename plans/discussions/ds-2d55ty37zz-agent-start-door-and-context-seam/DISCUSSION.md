@@ -78,10 +78,20 @@ A new dimension is one registry row plus unit frontmatter, never a change to the
 
 **`Refusal` (`refusals.v1.json`).** Fails closed, each refusal named: `start-fact-unknown`, `start-fact-value-invalid`, `start-fact-missing`, `start-payload-invalid`, `start-unit-invalid`, `start-delivery-unsupported`.
 
+**How a rule or context gets in: two doors (owner 19:45).**
+
+The rule-gathering door already exists. `discoverInstructionSources` (`src/setup/instruction-registry.mjs:573-640`) collects units from three roots: `core/instructions/`, `components/<component>/instructions/` and `domains/<domain>/instructions/`. A unit's owner must be registered in `docs/architecture-manifest.json`, so an unregistered root is refused. Precedence is already defined: authority `platform < component < domain` (`instruction-composition.mjs:66`), scope specificity from repo 10 to session 70 (`instruction-registry.mjs:72-83`), and `supersedes`/`conflicts`. A real component unit already exists: `components/packaging-distribution/instructions/verification.md`. Today this only feeds the AGENTS.md projection at setup time. The composer takes it over as its `UnitSource` (one matcher, ASC council), so it feeds every start.
+
+1. **Static door: a rule is a file, no code.** A new component registers itself once in the architecture manifest. It then drops a unit into `components/<name>/instructions/<id>.md` with `when:` facts. The build-time test checks owner, keys, values and conflicts. From the next start on, every start whose facts match receives it.
+2. **Live door: context computed at start time.** Examples: the handoff, open questions for the asker, the bound item's state, and later an agent-context-injection or knowledge component. A component implements one port, `Contributor::contribute(facts) -> Option<Block>`, and registers it by id in `start-contributors.v1.json`. The registration carries `when:`, an owner, a byte budget and a timeout. The host wires the adapter. A contributor that fails or times out is left out and recorded (fail open), so one broken component cannot stop every start. A static unit that does not parse fails closed at build instead. The rotation handoff becomes the first contributor (owner: session-host), replacing its separate SessionStart text.
+
+**Budget and order.** Each `delivery` has a byte budget. The composer orders blocks by authority and specificity. Optional blocks beyond the budget are dropped by lowest priority and listed in the record, so a growing rule set shows up as numbers, not as silent bloat.
+
 **Ports inside the crate (hexagonal).** Each has one adapter today, wired by the host:
 - `UnitSource` reads the unit files by layer.
 - `FactRegistry` reads the registry and the live value sources.
 - `RecordSink` appends the per-start record.
+- `Contributor` is the live door above; it has one registered adapter per contributing component.
 
 ### Council, round 3 {#council}
 
@@ -256,6 +266,7 @@ Plus hooks: AgentKit `session-init` (≤4 KB), `dev-rules-reminder` on every pro
 - 2026-11-22 19:00 — Council round 3 (three postures, independent): all chose A narrowed; details in #council. Minted ASC-D1 to ASC-D4. P5 (open facts from a key registry, typed payloads, one matcher, per-start record) and P7 (slice 0 deletion; slice 1 moves every persona and opening producer at once with an architecture test; C separate) put to the owner.
 - 2026-11-22 19:35 — Owner: how many different flows start an agent, can they be gathered too? Shaper answer in P14: about 13 trigger flows, 2 engine entry ops, 1 seat-and-spawn step. The context is gathered here; the 2 entry ops are item C; the three Node fronts that bypass the declared doors (one of them only runnable inside the fgOS checkout) are proposed as a separate runner item.
 - 2026-11-22 19:40 — Owner: the contract is good, but do its arguments have a clear interface? Shaper: not yet in round 3 (`facts` was a loose map). Round 4 writes the explicit interface (#interface): three typed arguments with schema files, a fact registry whose values come from live data, a closed payload union, a delivery enum, `when:` frontmatter checked at build, and named refusals.
+- 2026-11-22 19:45 — Owner: does compose have an injection mechanism, or a way to gather rules? A rule in a new component needs a door in. Shaper: the rule-gathering door already exists (instruction registry: core, components/<c>, domains/<d> roots, owners from the architecture manifest, authority and specificity order) and becomes the composer's UnitSource. Added a live door, a registered `Contributor` port for context computed at start, plus a budget per delivery (#interface).
 
 ## 6. Thiết kế đã chốt {#design}
 
