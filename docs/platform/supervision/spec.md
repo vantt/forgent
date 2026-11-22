@@ -147,6 +147,38 @@ Trust: every verb above is granted per persona and checked again by the route ch
 | Answered question | A `question-answered` event is handled by the numbered procedure in `fgos-supervisor`: a live idle asker is stopped, then its successor is started with `--for-question`; a live busy asker is left; a gone one only gets the start. The stop route allows the asker of an answered question. |
 | Windows | No timer scheduler: supervision does not run there and the `watcher-timer` doctor row says so. |
 
+### 6.1 Missed idle lead, 2026-11-22
+
+The watcher was running, but a handled detection is not a recurring reminder. The project stream
+(`.git/fgos/events/project/closed/2490-2491.jsonl`) raised `plan-no-progress` for
+`261122-0118-heads-stable-and-able` and `261122-0800-red-tests-and-backlog-sweep` at 03:23Z; files
+`2493-2493.jsonl` and `2492-2492.jsonl` handled them by 03:24Z. Miu's later `coordination-help` records
+(`2512-2512.jsonl`, 03:40Z; `2602-2602.jsonl`, 05:28Z) report live idle leads and empty queues. The tick at
+05:26:08Z (`.fgos/observe/records/pid-575373.jsonl` in that checkout) was active with 212 duplicates, zero
+raised, zero wakes and zero errors/unmeasured rows. Thus “nothing raised” means no **fresh** event, not no prior alarm
+or proof the watcher was disabled. The readable project `.fgos/config.yaml` contains no watcher override; the baseline's
+resolved `enabled: false` is not proof that no timer tick ran.
+
+The code explains the gap: `core/watcher/definitions/session-idle.query.json` tests activity **count**, not elapsed
+silence (`watcher.sessionIdleLimit: 0` in `core/config-standard/watcher.yaml`). Observe's
+`packages/observe/rust/src/sources/transcript_records.rs` emits the latest transcript/sidecar activity per session;
+when activity stops, `max:ts` stops changing. `packages/supervision/rust/src/watcher.rs` derives the event id from
+kind, subject and that instant; `packages/supervision/rust/src/queue.rs` deduplicates already-raised ids even after
+handling, so silence creates no new idle edge.
+`core/attention/definitions/plan-no-progress.query.json` uses the latest running-status timestamp, not a new
+no-progress episode, and suppresses rows for recent commits, board entries or run attempts. Its standard threshold is
+60 minutes (`core/config-standard/dispatch.yaml`), not the 20–24 minutes of unchanged plan files reported by the owner.
+A live lead is neither gone nor retired, so `head-gone`/`lead-ended` do not fill the gap. Tick counters are aggregate;
+they do not identify which individual session row was absent versus duplicate. The exact per-lead activity snapshot
+at those ticks is not retained in these records. The earlier [baseline](../../../plans/261122-0118-heads-stable-and-able/reports/baseline-wake-and-idle.md)
+counts false alarms (688/688), not missed episodes; it does not prove silence will raise again.
+
+The supervisor therefore inspects every running plan on each wake, including an empty queue. For an idle lead with
+unfinished phases and no verified ongoing wait, it raises `coordination-help` naming the head before `session type`,
+keeps the event open until an answer or progress, and applies stop-then-start if idle again at the next wake. This uses
+existing verbs only; it does not promise a wake when no new event exists. Automatic fresh detection and missed-alarm
+measurement remain outside this skill correction.
+
 ## 7. Trust boundary (PS-19, decided)
 
 `fgos land` runs `land.gates` and `land.regenerate` with `sh -c` in the candidate worktree, **unconfined, as the owner, on branch code**. The control is review (a lead lands only a phase its reviewer passed) and the trusted main checkout's config, the same trust as `runner.capabilities.<c>.verify`. Gate commands are project config, never constants of the fgOS repo. Confined gates are a separate backlog row (plan phase 19).
@@ -186,6 +218,8 @@ Dated 2026-11-18, from [the plan](../../../plans/261118-1045-project-supervisor/
 
 - Secretary and supervisor powers (shaped with the owner 2026-11-19, in [the discussion](../../../plans/discussions/ds-nmk2mz6vkk-secretary-supervisor-powers/DISCUSSION.md), which holds each ground, the rejected options and the owner's words): Miu orders and stops sessions and raises work on the queue; the supervisor carries on and goes on site only on a watcher signal, with the pane as the last of three means; coordination acts are State on the queue and their evidence is Log in Observe, pruned when settled; defaults, ceilings and the winner order are settled there too. Section 4.1 holds the resulting verbs.
 
-- A lead writes `lead: <its role>` into the plan with `status: running` in one `land --paths` commit; `supervisor plans` reports `leadLive` from that role's live holder in this project, and holds a running plan with no `lead` (`leadUnnamed`, never restarted), because a non-head lead's role never matched the head name and the supervisor nearly started a second lead.
+- At admission the supervisor writes `status: running`, `lead: head:lead-<headName>` (the role it starts) and `base: <trunk sha at admission>` (`git rev-parse <trunk>`) in one `land --paths` commit; `supervisor plans` reports `leadLive` from that role's live holder in this project, and holds a running plan with no `lead` (`leadUnnamed`, never restarted), because a non-head lead's role never matched the head name and the supervisor nearly started a second lead.
+
+- Owner-approved 2026-11-21: the manual `lead:SUPERVISOR` session retires once the supervisor head runs one plan end to end alone (admitted, lead started, phases landed, plan closed), with no command typed by `lead:SUPERVISOR`. Evidence is the plan's commits and the supervision records.
 
 Three deliberate departures from the settled wording, reported to the owner: the landing door serialises through the Git Land port's merge slot instead of a `land` holder-lock (PS-2); the supervisor singleton is an Identity role instead of a holder-lock (PS-8); the supervisor, which the settled design says never lands, lands portfolio edits with `land --paths` only, never code (PS-6, PS-14). Item 4 of the settled design (the plan's footprint as sandbox writes) was amended by Q1 (PS-24).

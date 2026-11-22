@@ -25,10 +25,10 @@ A wake is one turn: never end it before your done step (`fgos supervisor done`).
 1. `fgos supervisor queue` lists the unhandled events. For each event, do the action below, and only after the action
    is done run `fgos supervisor handled <id>`. A crash mid-drain leaves the event unhandled, so the next wake redoes
    it; make every action safe to redo (check before you start a session).
-2. Admit plans (below), then close and restart work the events name.
+2. Admit plans (below), then inspect all running plans, even when the queue is empty; close and restart work as below.
 3. `fgos supervisor done` last, and always: every wake ends with it, and a turn never ends without it. Handle every
-   event first: mark handled what needs no further action. A still-running ticket or lead is not a reason to stay or to
-   leave the event open: the next wake reads `fgos request result` and the plan state. An idle open session is never
+   event first: mark handled what needs no further action. Except for the `session-idle` check below, a still-running
+   ticket or lead is not a reason to stay or to leave the event open: the next wake reads `fgos request result` and the plan state. An idle open session is never
    woken again (nothing types into a live pane), so events queued behind it would be stranded. If `done` refuses,
    handle the events it names and call it again. On an empty queue it ends this session.
 
@@ -40,7 +40,8 @@ a running plan, `leadLive` or `leadUnnamed`) plus `leadsLive` and `maxLeads`. Ro
 with a running plan) and `fgos slots --json` shows `lanes.free` above zero (null means no ceiling is armed: no limit,
 not zero). For each:
 
-1. Mark the plan `running` with `fgos land --paths <plan.md> --message "..."`.
+1. In one `fgos land --paths <plan.md> --message "..."` commit, write `status: running`,
+   `lead: head:lead-<headName>` (the role you start) and `base: <trunk sha at admission>` (from `git rev-parse <trunk>`).
 2. `fgos session start lead --name <headName from plans>`.
 
 Before a start, check yourself that no live role already holds that `headName`; on a collision do not start, ask the
@@ -54,6 +55,23 @@ holder in this project). Handle `leadLive: false`, or an event `head-gone` or `p
 plan directory, then restart the lead (`fgos session start lead --name <headName>`; the lead resumes from the phase
 table and `fgos request result`), park the plan with a reason in its phase table, or ask the owner. Only the supervisor
 stops a lead (`fgos session stop lead --name <headName> --reason "<why>"`); a lead never does.
+
+On every wake, read `fgos supervisor plans --json` and the phase tables of all running plans, not only plans named by
+an event. An empty queue and `leadLive: true` prove neither progress nor a real wait. For a live lead with unfinished
+phases and no recorded progress, use `fgos session read head:lead-<headName>` and `fgos request result <ticket id>` for
+any pending ticket named in the plan. Leave a busy lead or a genuinely running ticket alone; park an external wait with
+its reason in the phase table. If the lead is idle without a verified ongoing wait and no open event names it, run
+`fgos supervisor raise --kind coordination-help --ref head:lead-<headName> --reason "idle lead with unfinished phases; no fresh watcher event"`
+before typing; an event naming only the plan does not authorize typing into its lead. Apply the same idle check below
+to this event. Do not wait for a fresh `session-idle` or `plan-no-progress`: handled rows may remain duplicates.
+This catches a missed idle lead on the next supervisor wake, not necessarily within one watcher interval; with no
+new event or other wake, this skill cannot detect it by itself.
+
+For `session-idle` naming a live lead (or the `coordination-help` raised above), never close the event on a screen claim such as "waiting on a background shell".
+Run `fgos session type head:lead-<headName> --text "Check the wait you named; if it is over, continue; if not, say what it is and when it ends."`
+The lead's shell can check its own background job; yours cannot. Close the event only when the lead answers or makes
+progress. If it is idle again at the next wake without a verified ongoing wait, apply the existing `plan-no-progress`
+stop-then-start rule below, even without a fresh watcher row.
 
 A live lead that makes no progress is replaced, never left alone. For `plan-no-progress` naming a plan with
 `leadLive: true`, the lead is alive but idle (a live idle lead raises no `lead-ended`, and `fgos session start` only
