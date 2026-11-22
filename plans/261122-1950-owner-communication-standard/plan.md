@@ -3,7 +3,11 @@ contract: plan-v1
 title: "Communication standard (tiêu chuẩn giao tiếp): one always-loaded standard for how every agent talks to the owner, and cheap answers in the question door"
 status: ready
 priority: P1
-blockedBy: []
+blockedBy:
+  - 261122-2307-heads-rotate-on-their-own
+  - 261121-2109-component-authority
+  - 261121-2110-component-authority-doors
+  - 261122-0056-orchestration-skeleton
 footprint:
   - plans/261122-1950-owner-communication-standard/**
   - core/skills/_shared/owner-communication.md
@@ -171,6 +175,11 @@ the landing commit's message. Same-wave footprints (phases 1 and 2) are disjoint
 
 None. Every point the discussion left open is decided above from its evidence; the T-signal list is written as
 provisional (discussion section 6, step 3) and refined by the coach later.
+
+**Owner order (2026-11-22 23:25 and 23:30, via the secretary, recorded by head:supervisor-forgent):** this plan is low
+priority and runs last. It shares files with each plan now in `blockedBy` (CHANGELOG.md, core skills, AGENTS.md and
+specs), and it is listed ahead of them, so without `blockedBy` admission would start it first. It stays `ready` and
+is admitted once those plans are `done`.
 
 ## Risks and rollback
 
