@@ -577,6 +577,91 @@ fn a_tests_gate_receives_the_test_paths_and_an_unknown_test_is_refused() {
 }
 
 #[test]
+fn a_paths_land_whose_gate_gets_plans_fails_when_handed_the_plan() {
+    let f = Fixture::new();
+    let plan_dir = f.main.join("plans").join("my-plan");
+    fs::create_dir_all(&plan_dir).unwrap();
+    fs::write(plan_dir.join("plan.md"), "content\n").unwrap();
+    let remote_before = f.remote_tip();
+    let local_before = f.local_tip();
+    let script = f.temp.join("gate.sh");
+    fs::write(
+        &script,
+        "#!/bin/sh\nfor arg in \"$@\"; do if [ \"$arg\" = \"plans/my-plan\" ]; then echo \"plan rejected\" >&2; exit 1; fi; done\nexit 0\n",
+    )
+    .unwrap();
+    let cfg = config(vec![gate_when(
+        &format!("sh {} {{plans}}", script.display()),
+        &["plans/*/plan.md"],
+    )]);
+    let refusal = f
+        .land(&paths(&["plans/my-plan/plan.md"]), &cfg)
+        .unwrap_err();
+    assert_eq!(refusal.code, "land-gate-failed");
+    assert!(refusal.detail.contains("plan rejected"));
+    assert_eq!(f.remote_tip(), remote_before);
+    assert_eq!(f.local_tip(), local_before);
+}
+
+#[test]
+fn a_paths_land_whose_gate_gets_plans_expands_plan_directories() {
+    let f = Fixture::new();
+    let plan_dir1 = f.main.join("plans").join("plan-a");
+    let plan_dir2 = f.main.join("plans").join("plan-b");
+    fs::create_dir_all(&plan_dir1).unwrap();
+    fs::create_dir_all(&plan_dir2).unwrap();
+    fs::write(plan_dir1.join("plan.md"), "content a\n").unwrap();
+    fs::write(plan_dir2.join("plan.md"), "content b\n").unwrap();
+    let out_file = f.temp.join("plans.out");
+    let cfg = config(vec![gate_when(
+        &format!("printf '%s\\n' {{plans}} > {}", out_file.display()),
+        &["plans/*/plan.md"],
+    )]);
+    let out = f
+        .land(
+            &paths(&["plans/plan-a/plan.md", "plans/plan-b/plan.md"]),
+            &cfg,
+        )
+        .unwrap();
+    assert_eq!(
+        out.landed_paths,
+        vec![
+            "plans/plan-a/plan.md".to_string(),
+            "plans/plan-b/plan.md".to_string()
+        ]
+    );
+    assert_eq!(
+        fs::read_to_string(out_file).unwrap(),
+        "--plan\nplans/plan-a\n--plan\nplans/plan-b\n"
+    );
+}
+
+#[test]
+fn a_paths_land_plans_placeholder_ignores_excluded_and_missing_plan_dirs() {
+    let f = Fixture::new();
+    let backlog_dir = f.main.join("plans").join("backlog");
+    fs::create_dir_all(&backlog_dir).unwrap();
+    fs::write(backlog_dir.join("p-1.md"), "content\n").unwrap();
+    let no_plan_dir = f.main.join("plans").join("no-plan-md");
+    fs::create_dir_all(&no_plan_dir).unwrap();
+    fs::write(no_plan_dir.join("other.md"), "content\n").unwrap();
+    let out_file = f.temp.join("plans.out");
+    let cfg = config(vec![gate(&format!(
+        "printf 'P:%s\\n' \"{{plans}}\" > {}",
+        out_file.display()
+    ))]);
+    let out = f
+        .land(
+            &paths(&["plans/backlog/p-1.md", "plans/no-plan-md/other.md"]),
+            &cfg,
+        )
+        .unwrap();
+    assert!(out.gates_run.is_empty(), "{:?}", out.gates_run);
+    assert!(!out_file.exists());
+    assert_eq!(out.main_sha, f.remote_tip());
+}
+
+#[test]
 fn a_paths_land_commits_exactly_the_named_paths_and_runs_only_matching_gates() {
     let f = Fixture::new();
     fs::write(f.main.join("a"), "landed\n").unwrap();

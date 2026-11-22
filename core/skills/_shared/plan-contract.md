@@ -45,7 +45,7 @@ the YAML door (`src/util/yaml.mjs`), never a private parser.
 | `blockedBy` | list of plan dir names | each must exist under `plans/`; `[]` when none |
 | `footprint` | list of repo-relative paths or globs | everything the plan may write: code, tests, docs, CHANGELOG, the plan dir. Required when `ready` or `running` |
 | `base` | 40-char commit sha | the commit the plan was written against; required when `ready` or `running` |
-| `lead` | Identity role string, e.g. `lead:S6A` or `head:lead-<handle>-<plan>` | the role of the lead that runs the plan; written in the same commit that sets `status: running`. The check warns when a `running` plan lacks it; the supervisor holds a running plan with no `lead` and never restarts it |
+| `lead` | Identity role string, e.g. `lead:S6A` or `head:lead-<handle>-<plan>` | the role of the lead that runs the plan; written in the same commit that sets `status: running`. Required when `status: running` (the check fails if a `running` plan lacks it); the supervisor holds a running plan with no `lead` and never restarts it |
 | `source` | list of strings | the DISCUSSION.md path and/or backlog ids the plan answers |
 | `created` | `YYYY-MM-DD` | |
 
@@ -115,11 +115,17 @@ The phase table has exactly these columns (order free):
 
 - `ready` is set last, and only after the check passes with no error: the script in the
   fgOS repo, the planner's stated reading check elsewhere.
+- `lead` is required with `running` (written in the same commit that sets `status: running`;
+  the check fails if a `running` plan lacks it).
+- The land door runs the check on every landed plan (`node scripts/plan-contract-check.mjs`);
+  a plan that breaks the contract cannot land.
+- Cross-plan footprint overlap: for a plan that is `ready`, overlap with another active plan
+  is an error (resolve by `blockedBy` or by narrowing a footprint); for a plan already `running`,
+  overlap is read as a warning, because admission already decided it and the plan's own leads
+  must keep landing.
 - A plan blocked by an owner question stays `draft` as a whole, but every phase the answer
   does not touch is marked `ready` in the phase table and may start. List the blocked phase
   and its question; do not hold the others.
-- Two `ready` or `running` plans whose footprints overlap are flagged by the check; resolve
-  by `blockedBy` or by narrowing a footprint.
 - Prior art before design: say what the plan reused and what was missing.
 - No plan ids, phase numbers, audit labels or finding codes in code comments, test names,
   migration names or commit messages: describe the behavior.

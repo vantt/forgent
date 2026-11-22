@@ -18,6 +18,7 @@ use fgos_git::{
 use fgos_holder_lock::BorrowedHandle;
 use sha2::{Digest, Sha256};
 use std::cell::Cell;
+use std::collections::BTreeSet;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
@@ -43,6 +44,12 @@ pub struct LandCommand {
     pub branch: Option<String>,
     pub paths: Option<Vec<String>>,
     /// Test paths given to a gate that uses `{tests}`.
+    ///
+    /// Gates also support the `{plans}` placeholder, rendered as `--plan '<dir>'` pairs for
+    /// qualifying plan directories (a directory under `plans/` containing a `plan.md` with a changed
+    /// path under it, excluding `plans/backlog`, `plans/discussions`, `plans/reports` and
+    /// `plans/handoffs`). A gate whose run text contains `{plans}` is skipped when the qualifying
+    /// plan-dir set is empty.
     pub tests: Vec<String>,
     /// The caller's plan footprint, given for a lead. A branch may change only paths it matches; a paths
     /// land may not change the `footprint` of any `plan.md` it commits (`footprint-change-refused`).
@@ -55,6 +62,8 @@ pub struct LandCommand {
 
 #[derive(Debug, Clone)]
 pub struct Gate {
+    /// Command line to run. Supports `{tests}` and `{plans}` (`--plan '<dir>'` pairs, gate skipped
+    /// when empty).
     pub run: String,
     /// Path globs; empty means the gate always runs.
     pub when: Vec<String>,
@@ -450,6 +459,23 @@ fn ref_name(text: &str) -> Result<RefName, LandRefusal> {
 
 fn shell_quote(text: &str) -> String {
     format!("'{}'", text.replace('\'', "'\\''"))
+}
+
+fn plan_dir_of(path: &str) -> Option<String> {
+    let p = Path::new(path);
+    let mut normals = p.components().filter_map(|c| match c {
+        std::path::Component::Normal(s) => s.to_str(),
+        _ => None,
+    });
+    if normals.next()? != "plans" {
+        return None;
+    }
+    let name = normals.next()?;
+    const EXCLUDED: &[&str] = &["backlog", "discussions", "reports", "handoffs"];
+    if EXCLUDED.contains(&name) || name.is_empty() {
+        return None;
+    }
+    Some(format!("plans/{name}"))
 }
 
 fn hex(bytes: &[u8]) -> String {
@@ -851,11 +877,30 @@ impl Lander<'_> {
             .map(|t| shell_quote(t))
             .collect::<Vec<_>>()
             .join(" ");
+        let mut plan_dirs = BTreeSet::new();
+        for path in changed {
+            if let Some(plan_dir) = plan_dir_of(path) {
+                if cwd.join(&plan_dir).join("plan.md").is_file() {
+                    plan_dirs.insert(plan_dir);
+                }
+            }
+        }
+        let quoted_plans = plan_dirs
+            .iter()
+            .map(|d| format!("--plan {}", shell_quote(d)))
+            .collect::<Vec<_>>()
+            .join(" ");
         for gate in &self.config.gates {
             if !self.any_matches(changed, &gate.when)? {
                 continue;
             }
-            let command = gate.run.replace("{tests}", &quoted);
+            if gate.run.contains("{plans}") && plan_dirs.is_empty() {
+                continue;
+            }
+            let command = gate
+                .run
+                .replace("{tests}", &quoted)
+                .replace("{plans}", &quoted_plans);
             self.run_logged(cwd, &command, &gate.run, id, "land-gate-failed")?;
             gates_run.push(gate.run.clone());
         }
