@@ -7,6 +7,8 @@ priority: P1
 blockedBy: []
 base: aa35c0664447f6d01d214911973c4d0246715e39
 footprint:
+  - apps/fgos/src/wiring/supervision.rs
+  - scripts/lib/git-one-door-declarations.v1.json
   - packages/run-supervisor/rust/src/attempt_step.rs
   - packages/supervision/rust/observe-kinds.json
   - src/cli/command-registry.mjs
@@ -360,6 +362,8 @@ first). `blockedBy` stays empty because no phase here needs a result of either p
 
 ## Owner questions
 
+
+- **q-r5w6funyv5, q-qki26cwunf: decided 2026-11-22 15:55 by lead:SUPERVISOR inside the approved frame**: the footprint takes `scripts/lib/git-one-door-declarations.v1.json` (phase 5 route host declaration) and `apps/fgos/src/wiring/supervision.rs` (phase 7 follow-up, owner-approved landed-worktree removal), as each question recommended.
 
 - **q-lnq3nbjssw, q-2ul3tjw3kd, q-zwvjlsuqgc: decided 2026-11-22 14:55 by lead:SUPERVISOR inside the approved frame**: the footprint takes `src/cli/command-registry.mjs` (shared with s6a, disjoint hunks; whichever lands second rebases), `packages/supervision/rust/observe-kinds.json` and `packages/run-supervisor/rust/src/attempt_step.rs`, each as the question recommended. Phases 5 and 8 are ready again. The phase 9 disarm is committed as a6608f628.
 None asked now. The owner said not to ask tonight, and the one open point (the secretary wake mechanism, a choice the
