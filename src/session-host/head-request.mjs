@@ -686,9 +686,11 @@ export const HEAD_CONFIG_PATCH_VERB = 'config patch';
 function configPatchVerb({ args, envelope, projectRoot, ports }) {
   exactKeys(args, ['file', 'reason']);
   if (typeof args.file !== 'string' || args.file === '') throw badArgs('file must be a non-empty string');
+  if (Buffer.byteLength(args.file) > TYPE_TEXT_MAX) throw badArgs(`file must be at most ${TYPE_TEXT_MAX} bytes`);
   noDash('file', args.file);
   if (args.reason !== undefined) {
     if (typeof args.reason !== 'string' || args.reason === '') throw badArgs('reason must be a non-empty string');
+    if (Buffer.byteLength(args.reason) > TYPE_TEXT_MAX) throw badArgs(`reason must be at most ${TYPE_TEXT_MAX} bytes`);
     noDash('reason', args.reason);
   }
   const argv = ['config', 'patch', args.file, '--project-only'];

@@ -764,6 +764,14 @@ pub(crate) fn confined_head_call_with_reader<R: std::io::Read>(
                 }
             }
             "config patch" => {
+                if let Some(flag) = ["global", "project-only"]
+                    .iter()
+                    .find(|f| call.flags().flag(f).is_some())
+                {
+                    return Err(format!(
+                        "bad-args: --{flag} is the host's to set, not a confined caller's"
+                    ));
+                }
                 let [file] = words.as_slice() else {
                     return Err("bad-args: config patch takes one file".to_owned());
                 };
@@ -1430,6 +1438,25 @@ mod confined_tests {
         assert!(confined(&["config", "patch", "a.yaml", "b.yaml"])
             .unwrap()
             .is_err());
+        assert!(confined(&["config", "patch", "patch.yaml", "--global"])
+            .unwrap()
+            .is_err());
+        assert!(
+            confined(&["config", "patch", "patch.yaml", "--project-only"])
+                .unwrap()
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn a_confined_caller_cannot_choose_the_scope_of_config_patch() {
+        for flag in ["--global", "--project-only"] {
+            let refused = confined(&["config", "patch", "patch.yaml", flag])
+                .unwrap()
+                .unwrap_err();
+            assert!(refused.starts_with("bad-args"), "{refused}");
+            assert!(refused.contains(flag), "expected {refused} to name {flag}");
+        }
     }
 
     #[test]
