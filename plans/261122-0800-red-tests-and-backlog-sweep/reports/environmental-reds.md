@@ -6,10 +6,10 @@ Investigation and reproduction of the four suspected environmental reds recorded
 
 | Red test | Condition at `ce1ef4d36` | Verdict | Owner / Target |
 |---|---|---|---|
-| `test/git/one-door.test.mjs:58` | Commit landing on main / status change during scan | **Code cause** | New backlog row `p-m1d00rscan2` (`scripts/git-one-door-scan.mjs`) |
+| `test/git/one-door.test.mjs:58` | Commit landing on main / status change during scan | **Code cause** | needs a new backlog row: the lead asks the secretary to open it (`scripts/git-one-door-scan.mjs`) |
 | `test/install-packaging.test.mjs:71` | Directory symlink under `.fgos/assignments/*/outbox` | **Code cause** | Plan `261118-1341-s6a-execution-tier-rust` (lead:S6A) |
-| `apps/fgos/tests/cli_tests.rs:3666` | CPU load / starvation from parallel test suites | **Environmental** | None (environmental timing under load) |
-| `packages/run-supervisor/rust/tests/supervise_portable.rs:274` | Immediate probe race under multi-threaded test load | **Environmental** | None (environmental timing under load) |
+| `apps/fgos/tests/cli_tests.rs:3666` | CPU load / starvation from parallel test suites | **Environmental by elimination, not reproduced** | Plan `261118-1341-s6a-execution-tier-rust` (lead:S6A owns file) / None (environmental) |
+| `packages/run-supervisor/rust/tests/supervise_portable.rs:274` | Immediate probe race under multi-threaded test load | **Environmental by elimination, not reproduced** | needs a new backlog row: the lead asks the secretary to open it (test hardening candidate) |
 
 ---
 
@@ -106,7 +106,7 @@ The scan should never page the whole live repository when scanning an isolated f
 ### Proposed Fix & Owning Plan
 - **File:** `scripts/git-one-door-scan.mjs` (and/or `scripts/lib/git-dir-layout.mjs`).
 - **Change:** Ensure `listFiles(root)` only delegates to `repositoryFiles` when `root` is legitimately the root of a git repository (e.g. `fs.existsSync(path.join(root, '.git'))` or matching `facts.worktreeRoot`), rather than whenever `root` happens to be any subdirectory located within a git repository. For subdirectories/fixtures, use the direct filesystem walk.
-- **Owning Plan / Backlog Row:** Does not belong to plan S6a's footprint; assigned to new backlog row `p-m1d00rscan2` (`plans/backlog/p-m1d00rscan2-one-door-scan-pages-live-repo-for-fixture-subdirs.md`).
+- **Owning Plan / Backlog Row:** Does not belong to plan S6a's footprint; needs a new backlog row: the lead asks the secretary to open it.
 
 ---
 
@@ -118,12 +118,14 @@ The scan should never page the whole live repository when scanning an isolated f
 ### Reported Failure at `ce1ef4d36`
 Failed with `EISDIR: illegal operation on a directory, read` at `readFileSync` in `walk` (`test/install-packaging.test.mjs:39`, `snapshotDir` of `REPO_ROOT/.fgos`).
 
-The live checkout at `ce1ef4d36` held two directory symlinks:
+The main checkout holds two directory symlinks today:
 - `.fgos/assignments/unit-run-1795055869808-93bfb6c8/producer/1/runs/01/outbox/link`
 - `.fgos/assignments/unit-run-1795055277552-a85436e8/producer/1/runs/01/outbox/linked-plan`
 
+Because the test snapshots the live `REPO_ROOT/.fgos` rather than its own temp tree, the test fails deterministically in the main checkout.
+
 ### Quiet Machine Runs (Alone)
-Executed with `node scripts/run-tests.mjs test/install-packaging.test.mjs` on an idle machine:
+The three quiet passes ran in this worktree (`/home/vantt/projects/forgent-worktrees/261122-0800-red-tests-and-backlog-sweep-p06`), whose `.fgos` holds no directory symlink:
 - Run 1: **PASS** (5 passed, 0 failed, 5.57s)
 - Run 2: **PASS** (5 passed, 0 failed, 5.53s)
 - Run 3: **PASS** (5 passed, 0 failed, 9.27s)
@@ -179,9 +181,14 @@ At line 174 of `test/install-packaging.test.mjs`, the test calls:
 ```javascript
 const repoFgosAfter = snapshotDir(path.join(REPO_ROOT, '.fgos'));
 ```
-`snapshotDir` uses `fs.readdirSync(dir, { withFileTypes: true })`. For symbolic links pointing to directories, `entry.isDirectory()` returns `false` (only `entry.isSymbolicLink()` is `true`). The code falls through to `fs.readFileSync(full)`. Because Node follows symlinks in `readFileSync`, attempting to read the target directory causes `readFileSync` to throw `EISDIR`.
+The test snapshots the live `REPO_ROOT/.fgos` rather than its own temp tree. `snapshotDir` uses `fs.readdirSync(dir, { withFileTypes: true })`. For symbolic links pointing to directories, `entry.isDirectory()` returns `false` (only `entry.isSymbolicLink()` is `true`). The code falls through to `fs.readFileSync(full)`. Because Node follows symlinks in `readFileSync`, attempting to read the target directory causes `readFileSync` to throw `EISDIR`.
 
-The test code should tolerate directory symlinks created legitimately in `.fgos` by background tasks or unit runs.
+The main checkout holds two directory symlinks today:
+- `.fgos/assignments/unit-run-1795055869808-93bfb6c8/producer/1/runs/01/outbox/link`
+- `.fgos/assignments/unit-run-1795055277552-a85436e8/producer/1/runs/01/outbox/linked-plan`
+Consequently, the test fails deterministically in the main checkout, whereas it passed in this worktree because this worktree's `.fgos` holds no directory symlinks.
+
+The test code should tolerate directory symlinks created legitimately in `.fgos` by background tasks or unit runs, and avoid snapshotting live shared state outside its test sandbox.
 
 ### Verdict
 **Code cause**
@@ -225,7 +232,7 @@ wait $CARGO_PID
 ```
 
 **Reproduction Result:**
-Under moderate parallel test load, the test completed and passed in 1.91s. At `ce1ef4d36`, the test was executed during a simultaneous machine-wide run of both `npm test` and `cargo test --workspace --no-fail-fast` spanning dozens of concurrent test suites across all CPU cores. Extreme scheduling latency and CPU starvation caused the reaped child process and host exit handling to exceed the 30-second poll limit.
+Under the exact load tried—running one parallel cargo test (`CARGO_TARGET_DIR=target cargo test -p fgos-git --lib` in the background)—the test completed and passed in 1.91s; the failure was not reproduced. At `ce1ef4d36`, the test was executed during a simultaneous machine-wide run of both `npm test` and `cargo test --workspace --no-fail-fast` spanning dozens of concurrent test suites across all CPU cores. Extreme scheduling latency and CPU starvation caused the reaped child process and host exit handling to exceed the 30-second poll limit.
 
 ### Analysis & Root Cause
 The test verifies that when the host receives `SIGINT`, it properly:
@@ -238,10 +245,10 @@ The test verifies that when the host receives `SIGINT`, it properly:
 The implementation functions correctly and reliably under normal operation (completing in 2-3 seconds). The failure at `ce1ef4d36` was an environmental timeout where total CPU core saturation starved the test and child processes, causing `ended.elapsed()` to cross 30 seconds.
 
 ### Verdict
-**Environmental** (timing under heavy load)
+**Environmental by elimination, not reproduced**
 
 ### Owning Plan
-None (environmental). Plan S6a owns `apps/fgos/tests/cli_tests.rs`; if desired, lead:S6A may adjust the deadline in `cli_tests.rs` for heavily loaded CI runners, but no production code defect exists.
+Plan S6a owns `apps/fgos/tests/cli_tests.rs`; if desired, lead:S6A may adjust the deadline in `cli_tests.rs` for heavily loaded CI runners, but no production code defect exists.
 
 ---
 
@@ -279,7 +286,7 @@ wait $CARGO_PID
 ```
 
 **Reproduction Result:**
-All 10 runs passed in 0.02s each.
+Under the exact load tried—running one parallel cargo test (`CARGO_TARGET_DIR=target cargo test -p fgos-git &` in the background) while repeating the test 10 times—all 10 runs passed in 0.02s each; the failure was not reproduced.
 
 ### Analysis & Root Cause
 The test verifies that an envelope specifying a mismatched `hostBin` causes the supervisor to refuse with exit code 3 (`host-version-mismatch`) and immediately release the attempt lock.
@@ -287,10 +294,10 @@ The test verifies that an envelope specifying a mismatched `hostBin` causes the 
 `finish(supervisor, LIMIT)` waits for the child process to terminate and reaps it. Immediately upon `finish` returning, line 274 calls `run.lock_is_free()`, which performs an instantaneous single check:
 `probe(&Resource::new("attempt", &self.lock_path))` (via `fgos_holder_lock::probe`).
 
-Unlike other supervisor tests (which utilize polling with `wait_until` to give OS kernel asynchronous file description closing a brief window to settle), line 274 executes an instantaneous non-retrying probe. During a full-suite run with multi-threaded test execution (`cargo test --workspace`), concurrent thread forks or micro-delays in kernel `exit_files()` descriptor table cleanup can cause an instantaneous non-retrying probe to observe `Probe::Held` for a fraction of a millisecond.
+Unlike other supervisor tests (which utilize polling with `wait_until` to give OS kernel asynchronous file description closing a brief window to settle), line 274 probes once with no `wait_until` unlike its sibling tests. This is a test-code weakness that would make the race possible: during a full-suite run with multi-threaded test execution (`cargo test --workspace`), concurrent thread forks or micro-delays in kernel `exit_files()` descriptor table cleanup can cause an instantaneous single non-retrying probe to observe `Probe::Held` for a fraction of a millisecond.
 
 ### Verdict
-**Environmental** (timing race under multi-threaded full-suite load)
+**Environmental by elimination, not reproduced**
 
 ### Owning Plan
-None (environmental). If hardened in a future sweep, `supervise_portable.rs:274` can employ `wait_until` to poll for lock release within a small grace period, consistent with the other portable supervisor tests.
+`packages/run-supervisor` (specifically `packages/run-supervisor/rust/tests/supervise_portable.rs`) is not in plan S6a's footprint (verified in `plans/261118-1341-s6a-execution-tier-rust/plan.md`). This test-code weakness that would make the race possible is offered as a hardening candidate for the owner of the file; as no active plan owns it, it needs a new backlog row: the lead asks the secretary to open it. If hardened, `supervise_portable.rs:274` can employ `wait_until` to poll for lock release within a small grace period, consistent with its sibling portable supervisor tests.
