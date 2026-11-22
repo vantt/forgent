@@ -58,6 +58,9 @@ footprint:
   - docs/platform/agent-coordination/proposals/README.md
   - docs/platform/system-architecture/architecture/roadmap.md
   - docs/platform/system-architecture/architecture/architecture-intent.md
+  - docs/platform/packaging-distribution/spec.md
+  - docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.1.md
+  - .fgos/instructions/effective/repo.json
 source:
   - plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md
   - p-esa3lau6kd
@@ -169,7 +172,7 @@ generator for the human views, and one machine-read home for all of it.
 | 4 | [Contract index](phase-04-contract-index.md) | 3 | packages/component-authority/model/contracts.json, test/component-authority/contracts.test.mjs | 4 | done |
 | 5 | [Generated ownership views and decision-index on the model](phase-05-ownership-views.md) | 3 | scripts/component-authority-render.mjs, test/component-authority/render.test.mjs, src/report/decision-index.mjs, test/report/decision-index.test.mjs, docs/platform/component-boundary.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 4 | running |
 | 6 | [Architecture-map registries generated; proposal map retired](phase-06-architecture-map-views.md) | 4, 5 | scripts/component-authority-render.mjs, test/component-authority/render.test.mjs, docs/platform/architecture-map.md, docs/platform/proposals/component-authority-boundary-map.md, docs/platform/component-authority/spec.md, docs/platform/proposals/README.md, docs/platform/proposals/step-09-group-thinking-substrate.md, docs/platform/proposals/documentation-system-unification.md, docs/platform/proposals/step-10-coding-domain-adoption.md, docs/platform/agent-coordination/proposals/README.md, docs/platform/system-architecture/architecture/roadmap.md, docs/platform/system-architecture/architecture/architecture-intent.md | 5 | done |
-| 7 | [Retire the manifest and integrate](phase-07-integration.md) | 6 | docs/architecture-manifest.json, docs/platform/packaging-distribution/contracts/setup-doctor-registry.md, packages/component-authority/model/, docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md, docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md, docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md, docs/platform/domainization/architecture/domainization.md, plans/261121-2109-component-authority/ | 6 | running |
+| 7 | [Retire the manifest and integrate](phase-07-integration.md) | 6 | docs/architecture-manifest.json, docs/platform/packaging-distribution/contracts/setup-doctor-registry.md, packages/component-authority/model/, docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md, docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md, docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md, docs/platform/domainization/architecture/domainization.md, plans/261121-2109-component-authority/, docs/platform/packaging-distribution/spec.md, docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.1.md, .fgos/instructions/effective/repo.json | 6 | running |
 
 
 ## Progress
@@ -203,6 +206,14 @@ Phase status in the table above is the bare contract value; the detail lives her
   `docs/platform/proposals/README.md`, `docs/platform/proposals/step-09-group-thinking-substrate.md`, `docs/platform/proposals/documentation-system-unification.md`, `docs/platform/proposals/step-10-coding-domain-adoption.md`, `docs/platform/agent-coordination/proposals/README.md`, `docs/platform/system-architecture/architecture/roadmap.md`, `docs/platform/system-architecture/architecture/architecture-intent.md`.
   The link fixes follow from a deletion the approved plan already makes, so this stays inside the approved frame; no
   running or ready plan lists them.
+- Footprint widened (2026-11-23 05:25, head:supervisor-forgent, event 56a1a6edcbeb83ea): the host suite shows reds
+  caused by this plan's retirements, so three paths joined the plan footprint and phase 7's write list:
+  `docs/platform/packaging-distribution/spec.md` (pin the retired reference at lines 792-793),
+  `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.1.md` (repoint its link to
+  `component-authority/spec.md`) and `.fgos/instructions/effective/repo.json` (regenerate with `npm run build:skills`).
+  Acceptance criterion 5 requires a green suite, so this stays inside the approved frame. No running plan lists them;
+  the ready plan `261122-1950-owner-communication-standard` lists the generated `repo.json`, but it already shares
+  `AGENTS.md` and `docs/reading-map.md` with this plan and runs after it, so the order does not change.
 
 Phases are layered (one model, one test file), so most of the plan runs serially. Phases 4 and 5 run in
 parallel in wave 4. Hot files: `components.json` has one writer per wave (phase 1, then phase 2, then phase 3).
