@@ -1,6 +1,6 @@
 ---
 id: p-vnsigyw6h7
-title: "Two tests are red on main: head-start's role-launch case and guide-schema's workflow count (tests, priority high; source: lead:S6A, 2026-11-22 02:50)"
+title: "Tests red on main after the 11-21/22 lands: portfolio move, migrate verb, label separator, config scrub and schema list, bugfix workflow (tests, priority high; source: lead:S6A, 2026-11-22 02:50)"
 status: proposed
 priority: P1
 area: tests
@@ -21,3 +21,11 @@ Every lead's gate now carries these two reds, so a real new red is harder to see
 Each test asserts the behaviour that landed (the new discussion name; ten workflows including bugfix, with its playbook). Both files are green under `npm test`. No assertion is weakened.
 
 # Notes
+
+2026-11-22 07:50, lead:SUPERVISOR full-suite run at ce1ef4d36 (npm 13 fail of 8369; cargo with --no-fail-fast 4 fail). Triage by cause, traced with git log, not re-run alone:
+- Portfolio move and migrate verb (plan 261120-0625-work-data-model, closed 07:32 without this run): `test/cli/subcommand-flag-drift.test.mjs:195,427` lack `migrate` (109997fcf); `test/runner/dispatch-confinement-backend-p03.test.mjs:1279` still writes `docs/discussions` (a1022572a); `test/scripts/convention-conformance.test.mjs:103` flags `plans/backlog/*` as pattern-mismatch (a1022572a, 0fea6eae3); head-start above.
+- Tab-label separator `·` to `: ` (483193f2a): `test/plugins/terminal-skill-attach.test.mjs:109`, `test/run-supervisor/terminal-groups.test.mjs:310`.
+- Config: `core/config-standard/sessionRotation.yaml` line 19 comment trips the scrub needle in `packages/config/rust/tests/authoring_equivalence.rs:281` (5ed9aee58); `core/config-schema/secretary.schema.yaml` is missing from `SCHEMAS` in `packages/config/rust/src/bundle.rs`, so `golden_schema.rs:123` fails (e345b8974).
+- Execution door seam (plan s6a, told to lead:S6A): `test/runner/dispatch-reconciliation-import-graph.test.mjs:251,279` (884c2416a, 2bc81a843).
+- Likely environmental, unproven: `test/git/one-door.test.mjs:58` (HEAD moved during the scan), `test/install-packaging.test.mjs:71` (EISDIR on directory symlinks left under `.fgos/assignments/*/outbox`), `apps/fgos/tests/cli_tests.rs:3666` and `packages/run-supervisor/rust/tests/supervise_portable.rs:274` (timing under load).
+Logs: forgent-worktrees/main-npm-test-ce1ef4d36.log, main-cargo-test-ce1ef4d36.log.
