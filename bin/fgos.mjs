@@ -3559,12 +3559,6 @@ async function main() {
       } else if (verb === 'session' && positional[0] === 'write' && !flags.json) {
         // A published write is its commit; a write that was not published threw before here.
         process.stdout.write(`committed ${data.commit}\n`);
-      } else if (verb === 'dispatch' && sub === 'inspect' && flags.attention === true && !flags.json) {
-        // One line per run that needs a person, then one line for the terminal part unless it scanned clean.
-        const terminal = data.terminal;
-        const terminalLine = !terminal || (terminal.state === 'scanned' && !terminal.findings?.length) ? []
-          : [terminal.state === 'scanned' ? `terminal scanned: ${terminal.findings.map((f) => f.text).join('; ')}` : `terminal ${terminal.state}: ${terminal.reason}`];
-        process.stdout.write(`${[...(data.lines ?? []), ...terminalLine].join('\n')}${data.lines?.length || terminalLine.length ? '\n' : ''}`);
       } else {
         process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
       }
@@ -3592,7 +3586,7 @@ async function main() {
       process.stderr.write(`fgos: invocation fault recorded to ${recorded}\n`);
     }
     const { DispatchError } = await import('../src/run-supervisor/dispatch-error.mjs');
-    if (err instanceof DispatchError || (verb === 'dispatch' && err.errorClass && err.errorClass !== 'validation')) {
+    if (err instanceof DispatchError) {
       process.exitCode = 1;
     } else {
       process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1;

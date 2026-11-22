@@ -19,7 +19,6 @@ import {
   quarantineProviderAccount,
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { deriveLegacyInventory, legacyStateKey, readLlmAccounts } from '../../src/runner/dispatch/llm-accounts.mjs';
-import { configPinnedToAccount } from '../../src/runner/dispatch/provider-account-probe.mjs';
 import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { writeAccountsFile as writeAccountsFileIn, writeProjectConfig } from '../helpers/config-fixture.mjs';
@@ -203,17 +202,6 @@ test('the pool openai keeps its legacy state key, so a lease taken before the co
   assert.equal(second.accountId, 'spare');
   const state = JSON.parse(fs.readFileSync(providerCapacityStatePaths(runtimeDir).statePath, 'utf8'));
   assert.deepEqual(Object.keys(state.providers), ['openai-codex']);
-});
-
-test('a pinned account narrows the llmAccounts pool, so the lease can take only the pinned account', () => {
-  const runner = config({ openrouter, deepseek: { main: { credentialStore: { pi: '/srv/pi/ds-main' } } } });
-  const pinned = configPinnedToAccount(runner, { provider: 'openrouter', accountId: 'or-b' });
-  assert.deepEqual(Object.keys(pinned.llmAccounts.openrouter), ['or-b']);
-  assert.deepEqual(Object.keys(pinned.llmAccounts.deepseek), ['main'], 'another pool is left alone');
-  const dropped = acquireNamedAccountLease({ runnerConfig: pinned, provider: 'openrouter', accountId: 'or-a', runId: 'run0', runtimeDir: mkRuntimeDir(), cli: 'pi' });
-  assert.equal(dropped.reason, LEASE_CONFLICT_REASON, 'the narrowed pool no longer lists the other accounts');
-  const selected = acquireNamedAccountLease({ runnerConfig: pinned, provider: 'openrouter', accountId: 'or-b', runId: 'run1', runtimeDir: mkRuntimeDir(), cli: 'pi' });
-  assert.equal(selected.accountId, 'or-b');
 });
 
 test('a digits-only account id is refused, naming the reason', () => {

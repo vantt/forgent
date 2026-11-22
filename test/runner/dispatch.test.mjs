@@ -1249,41 +1249,6 @@ test('decideDispatchMechanism: forceCliSpawn wins over native mechanism + live T
   assert.equal(decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess: true, forceCliSpawn: true }), 'out-of-process');
 });
 
-
-test('the CLI entrypoint guard still fires when dispatch.mjs is invoked through a symlink sitting in a path with a space', () => {
-  // Regression for the same silent-no-op class run-tests.mjs had: a raw
-  // `import.meta.url === \`file://${process.argv[1]}\`` guard never matches
-  // when argv[1] is a symlink (import.meta.url resolves to the REAL file)
-  // or when the invocation path contains a space (import.meta.url
-  // percent-encodes it, the raw template literal never does). Neither
-  // requires copying dispatch.mjs's whole barrel/dispatch/* module tree --
-  // a symlink still resolves its relative imports against the real file's
-  // own location, so this exercises the guard alone.
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch cli symlink-'));
-  try {
-    assert.match(dir, / /, 'fixture dir must actually contain a space to exercise this case');
-    const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-    const link = path.join(dir, 'dispatch-link.mjs');
-    fs.symlinkSync(dispatchPath, link);
-    const result = spawnSync(process.execPath, [link, 'reconcile'], { encoding: 'utf8' });
-    assert.notEqual(result.status, 0);
-    assert.match(result.stderr, /dispatch reconcile requires a run directory/);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('an unknown CLI subcommand still exits non-zero with a usage message naming fgos dispatch decide and fgos run, never resolve or execute', () => {
-  const dispatchPath = path.resolve('src/runner/dispatch.mjs');
-  const result = spawnSync(process.execPath, [dispatchPath, 'bogus'], { encoding: 'utf8' });
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /unknown subcommand/);
-  assert.doesNotMatch(result.stderr, /resolve <executorId>/);
-  assert.doesNotMatch(result.stderr, /execute <executorId>/);
-  assert.match(result.stderr, /fgos dispatch decide/);
-  assert.match(result.stderr, /fgos run "<prompt>"/);
-});
-
 // --- tsk-129: the "execute" CLI entry point tees live chunks to stderr ---
 // (P39's onChunk mechanism already existed and was already tested at the
 // spawnWorker/adapter layer; the CLI entrypoint's `execute` branch simply

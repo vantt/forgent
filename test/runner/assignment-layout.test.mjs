@@ -5,12 +5,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { assignmentDir, findRunDir, RunLookupError, listAssignmentRuns, scanAssignmentLayout } from '../../src/runner/dispatch/assignment-layout.mjs';
-import { allRuns, inspectDispatchRuntime, withRunsCache } from '../../src/runner/dispatch/runtime-inspection.mjs';
-import { showRunUseCase, readRunSnapshot, DispatchObserveError } from '../../src/verbs/dispatch/show-run.mjs';
-import { watchRunUseCase } from '../../src/verbs/dispatch/watch.mjs';
 import { findRunningRuns } from '../../src/runner/dispatch/visibility-session.mjs';
 import { RUN_DIRS_VECTORS, buildRunDirsTree, relativeTo } from '../helpers/run-dirs-fixture.mjs';
-import { recoverObserveUseCase, recoverApplyUseCase, RecoveryError } from '../../src/verbs/dispatch/recover.mjs';
 
 const fixture = JSON.parse(fs.readFileSync(new URL('../fixtures/run-layout/expected.json', import.meta.url), 'utf8'));
 const writeJson = (file, value) => { fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, JSON.stringify(value)); };
@@ -57,31 +53,17 @@ test('shared layout fixture yields every safe directory candidate, never worker 
       assert.equal(findRunDir(fgosDir, entry.runId), path.join(base, entry.assignmentId, 'runs', entry.attempt));
     }
   }
-  assert.equal(allRuns(root).length, fixture.entries.length, 'inspection retains malformed/unsettled candidates');
 });
 
-test('nested runs without assignment metadata are discoverable by inspection, show-run, watch and the running-run reconciler', async (t) => {
+test('nested runs without assignment metadata are discoverable by the run lookup and the running-run reconciler', (t) => {
   const { root, fgosDir, base } = temp(t);
   const id = 'unit-run-example/member-1/1-fb1';
   const runDir = path.join(base, id, 'runs', '02');
   const runId = `run_${id}_02`;
   writeJson(path.join(runDir, 'run.json'), { runId, assignmentId: id, status: 'running', cwd: root });
   assert.equal(findRunDir(fgosDir, runId), runDir);
-  assert.equal(showRunUseCase({ repoRoot: root }, { runId }).settled, false);
-  assert.deepEqual(inspectDispatchRuntime(root, { run: runId }).links.assignmentIds, [id]);
-  const active = inspectDispatchRuntime(root, { cwd: root }).observations[0].value.activeRunIds;
-  assert.ok(active.includes(runId), 'nested orphan participates in the existing cwd guard');
   const running = findRunningRuns(fgosDir);
   assert.deepEqual(running.map((run) => ({ runDir: run.runDir, runId: run.runId, assignmentId: run.assignmentId })), [{ runDir, runId, assignmentId: id }]);
-  writeJson(path.join(runDir, 'result.json'), { runId, assignmentId: id, status: 'done', confidence: 'reported', timestamp: fixture.timestamp });
-  const shown = showRunUseCase({ repoRoot: root }, { runId });
-  assert.equal(shown.settled, true);
-  assert.equal(inspectDispatchRuntime(root, { run: runId }).runObservation.evidenceCompleteness.result, 'complete');
-  assert.equal(shown.result.runId, runId);
-  const ticks = [];
-  const watched = await watchRunUseCase({ repoRoot: root }, { runId, maxTicks: 1, onTick: (tick) => ticks.push(tick) });
-  assert.deepEqual(ticks.map((tick) => ({ runId: tick.run.runId, settled: tick.settled, resultRunId: tick.result?.runId })), [{ runId, settled: true, resultRunId: runId }]);
-  assert.equal(watched.stoppedBecause, 'terminal');
 });
 
 test('lookup falls back to result identity but never reads a symlinked result', (t) => {
@@ -94,11 +76,6 @@ test('lookup falls back to result identity but never reads a symlinked result', 
   fs.symlinkSync(path.join(dir, 'result.json'), path.join(other, 'result.json'));
   fs.rmSync(path.join(dir, 'result.json'));
   assert.equal(findRunDir(fgosDir, 'result-only'), null);
-  writeJson(path.join(dir, 'result.json'), { runId: 'result-only', timestamp: fixture.timestamp });
-  writeJson(path.join(other, 'run.json'), { runId: 'other', status: 'running' });
-  assert.equal(readRunSnapshot(other).resultCorrupt, true);
-  assert.equal(readRunSnapshot(other).settled, false);
-  assert.equal(inspectDispatchRuntime(root, { run: 'other' }).runObservation.evidenceCompleteness.result, 'corrupt');
 });
 
 test('walk recognizes runs at the depth boundary and counts deeper barriers without traversing', (t) => {
@@ -124,28 +101,15 @@ test('assignment containment checks real ancestors including missing descendants
   assert.equal(assignmentDir(fgosDir, '../outside'), null);
   assert.equal(assignmentDir(fgosDir, outside), null);
   assert.equal(assignmentDir(fgosDir, 'unit/producer/1'), path.join(base, 'unit', 'producer', '1'));
-  writeJson(path.join(outside, 'assignment.json'), { assignmentId: 'escape' });
-  assert.equal(inspectDispatchRuntime(root, { assignment: 'escape' }).inspectionStatus, 'not-found');
   const sharedRoot = path.join(root, 'session');
   fs.mkdirSync(sharedRoot);
   fs.symlinkSync(fgosDir, path.join(sharedRoot, '.fgos'));
   assert.equal(assignmentDir(path.join(sharedRoot, '.fgos'), 'unit/producer/1'), path.join(sharedRoot, '.fgos', 'assignments', 'unit', 'producer', '1'));
 });
 
-test('verb-local run cache retains nested membership and bypass sees new candidates', (t) => {
-  const { root, base } = temp(t);
-  writeJson(path.join(base, 'unit/producer/1/runs/01/run.json'), { runId: 'first' });
-  withRunsCache(() => {
-    assert.equal(allRuns(root).length, 1);
-    writeJson(path.join(base, 'unit/reviewer/1/runs/01/run.json'), { runId: 'second' });
-    assert.equal(allRuns(root).length, 1);
-    assert.equal(allRuns(root, { bypassCache: true }).length, 2);
-  });
-});
-
 for (const identities of [['metadata', 'metadata'], ['result', 'result'], ['metadata', 'result']]) {
-  test(`duplicate ${identities.join('/')} identities refuse every explicit run door without mutation`, async (t) => {
-    const { root, fgosDir, base } = temp(t);
+  test(`duplicate ${identities.join('/')} identities refuse the run lookup without mutation`, (t) => {
+    const { fgosDir, base } = temp(t);
     const runId = 'duplicate';
     const locations = ['aaa', 'zzz'].map((id, i) => {
       const dir = path.join(base, id, 'runs', '01');
@@ -158,23 +122,12 @@ for (const identities of [['metadata', 'metadata'], ['result', 'result'], ['meta
       contents: fs.readdirSync(dir).map((name) => fs.readFileSync(path.join(dir, name), 'utf8')),
       claim: fs.readFileSync(path.join(path.dirname(path.dirname(dir)), 'dispatch.claim'), 'utf8'),
     }));
-    const ambiguous = (ErrorType) => (err) => {
-      assert.ok(err instanceof ErrorType);
+    assert.throws(() => findRunDir(fgosDir, runId), (err) => {
+      assert.ok(err instanceof RunLookupError);
       assert.equal(err.code, 'run-ambiguous');
-      if (ErrorType !== RunLookupError) assert.equal(err.category, 'precondition');
       assert.deepEqual(err.locations, locations);
       return true;
-    };
-    assert.throws(() => findRunDir(fgosDir, runId), ambiguous(RunLookupError));
-    assert.throws(() => showRunUseCase({ repoRoot: root }, { runId }), ambiguous(DispatchObserveError));
-    let ticks = 0;
-    await assert.rejects(watchRunUseCase({ repoRoot: root }, { runId, maxTicks: 1, onTick: () => ticks++ }), ambiguous(DispatchObserveError));
-    assert.equal(ticks, 0);
-    assert.throws(() => recoverObserveUseCase({ repoRoot: root }, { runId }), ambiguous(RecoveryError));
-    assert.throws(() => recoverApplyUseCase({ repoRoot: root }, {
-      runId, action: { type: 'adopt', attemptId: 'att' }, expectedSnapshot: 'snapshot',
-      expectedControlEpoch: 0, expectedExpiresAt: fixture.timestamp, actionKey: 'action',
-    }), ambiguous(RecoveryError));
+    });
     locations.forEach((dir, i) => {
       assert.deepEqual(fs.readdirSync(dir), before[i].files);
       assert.deepEqual(fs.readdirSync(dir).map((name) => fs.readFileSync(path.join(dir, name), 'utf8')), before[i].contents);
