@@ -151,7 +151,7 @@ the grants, verb by verb.
 | 1 | [Baseline: wake rate and idle alarms](phase-01-baseline-wake-and-idle.md) | - | plans/261122-0118-heads-stable-and-able/reports/baseline-wake-and-idle.md | 1 | done |
 | 2 | [Head verbs through the request socket](phase-02-head-verbs.md) | - | src/session-host/head-grants.mjs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, test/session-host/head-start.test.mjs, apps/fgos/src/routing.rs, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/rust/tests/head_request.rs, docs/platform/session-host/spec.md | 1 | running |
 | 3 | [The land door runs the plan check](phase-03-land-plan-check.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, core/skills/_shared/plan-contract.md, .agents/skills/**, plugins/fgOS/skills/**, .fgos/config.yaml | 1 | done |
-| 4 | [Coordinating heads keep their provider floor](phase-04-provider-floor.md) | 3 | .fgos/config.yaml, test/session-host/head-start.test.mjs | 2 | running |
+| 4 | [Coordinating heads keep their provider floor](phase-04-provider-floor.md) | 3 | .fgos/config.yaml, test/session-host/head-start.test.mjs | 2 | done |
 | 5 | [A live head's requests run the active release](phase-05-release-pickup.md) | 2, 6 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/run-supervisor/spec.md | 3 | ready |
 | 6 | [A rotation whose executor died is resolved](phase-06-orphan-rotation.md) | 2 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/session-host/contracts/rotation-files.v1.json, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/**, docs/platform/session-host/spec.md | 2 | running |
 | 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs | 2 | running |
@@ -173,7 +173,15 @@ writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
 
-### Lead progress (2026-11-22 12:05, head:lead-forgent-261122-0118-heads-b52f9)
+### Lead progress (2026-11-22 12:45, head:lead-forgent-261122-0118-heads-b52f9)
+
+Landed: phase 2 code (`b310eb241`; `routing.rs` in 94edcbdc3, reported to lead:SUPERVISOR for S6A's route flip), phase
+4 (`9abfa5257`). Phase 2 stays `running` for steps 8-10 (`config patch --project-only`, owner-approved 12:28), which
+wait on the footprint widen `q-eyb5i7m7wq`. Phase 7 (`heads-stable-and-able/p07`) was refused by the census gate:
+`land.regenerate.when` misses `core/**`, so a skill-only land never rebuilds the mutation census; asked
+`q-y24ukwgfpo`. Its new step 9 (missed idle-lead alarm) runs on `heads-stable-and-able/p07b`, stacked on `p07`.
+
+Earlier notes, kept for the record:
 
 Branches ready (reviewed, green), landing in this order once the merge resource is recovered (`q-rbleatcask`: a land
 started 04:32Z, pid 3502900, died in its census step; every land since answers `resource-recovery-required`):
