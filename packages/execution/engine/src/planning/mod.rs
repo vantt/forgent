@@ -30,7 +30,8 @@ pub mod bind_facade;
 pub mod policy;
 pub mod reconciliation;
 pub mod recovery;
-pub mod resolve;
+/// The capability a dispatch is for is pure, in `fgos-execution`.
+pub use fgos_execution::capability_resolve as resolve;
 
 /// JavaScript truthiness of a JSON value (`undefined` is `None`).
 pub(crate) fn truthy(value: Option<&serde_json::Value>) -> bool {

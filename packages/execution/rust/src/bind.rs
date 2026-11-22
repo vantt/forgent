@@ -896,6 +896,26 @@ pub fn run_timeout_problem(value: &Value, label: &str) -> Option<String> {
     None
 }
 
+/// The refusal of a run timeout that is not one whole number and one unit; `shown` is the value as Node's
+/// `JSON.stringify` printed it.
+fn unit_refusal(label: &str, shown: &str) -> String {
+    format!(
+        "{label} takes a whole number and a unit (ms, s, m or h), e.g. 90m or 5400s; got: {shown}"
+    )
+}
+
+/// [`parse_run_timeout`] over any value: a value that is not text is refused, named as Node printed it (`undefined`
+/// when absent).
+pub fn parse_run_timeout_value(value: Option<&Value>, label: &str) -> Result<u64, String> {
+    match value {
+        Some(Value::String(text)) => parse_run_timeout(text, label),
+        other => Err(unit_refusal(
+            label,
+            &other.map_or_else(|| "undefined".to_string(), Value::to_string),
+        )),
+    }
+}
+
 /// `90m`, `5400s`, `2h`, `600000ms` (`parseRunTimeout`, `src/runner/dispatch/config.mjs`): one whole number and one
 /// unit as milliseconds, checked like any run timeout; the refusal sentence otherwise.
 pub fn parse_run_timeout(text: &str, label: &str) -> Result<u64, String> {
@@ -912,9 +932,9 @@ pub fn parse_run_timeout(text: &str, label: &str) -> Result<u64, String> {
         _ => 0.0,
     };
     if digits.is_empty() || unit_ms == 0.0 {
-        return Err(format!(
-            "{label} takes a whole number and a unit (ms, s, m or h), e.g. 90m or 5400s; got: {}",
-            Value::String(text.to_string())
+        return Err(unit_refusal(
+            label,
+            &Value::String(text.to_string()).to_string(),
         ));
     }
     // `Number(digits) * unit`, as Node counts it: a number too large to count is named by the text typed.

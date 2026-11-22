@@ -68,9 +68,11 @@ export function buildUnitHandoff({ template, state, step, workflow }) {
         index.push(`### ${label ?? 'Your own earlier result'}\nIt is the file named "${OWN_PREVIOUS_NAME}" under Context refs: what you yourself produced in an earlier step.`);
         continue;
       }
+      // The seat of each result, read once.
+      const seats = results.map(seatKeyOf);
       if (anonymize) {
-        for (const seat of new Set(results.map(seatKeyOf))) {
-          const summary = results.filter((r) => seatKeyOf(r) === seat).at(-1)?.runResult.agentClaim?.summary;
+        for (const seat of new Set(seats)) {
+          const summary = results.filter((_, i) => seats[i] === seat).at(-1)?.runResult.agentClaim?.summary;
           index.push(`### ${anonymousInputName(anonymized++)}${label ? ` (${label})` : ''}${summary ? `\nSummary: ${summary}` : ''}`);
           inputs.push(`unit-run:${unitState.unitRunId}/${seat}`);
         }
@@ -78,7 +80,7 @@ export function buildUnitHandoff({ template, state, step, workflow }) {
       }
       const summary = results.at(-1)?.runResult.agentClaim?.summary;
       index.push(`### ${prior.id} / ${unitId} (unit run ${unitState.unitRunId})${label ? ` (${label})` : ''}${summary ? `\nSummary: ${summary}` : ''}`);
-      for (const seat of new Set(results.map(seatKeyOf))) inputs.push(`unit-run:${unitState.unitRunId}/${seat}`);
+      for (const seat of new Set(seats)) inputs.push(`unit-run:${unitState.unitRunId}/${seat}`);
     }
   }
   if (index.length > 0) {

@@ -5,16 +5,16 @@
 //! (`executor_model`); this module composes them and adds the capability resolution rules of the launch path. Which executor
 //! a purpose runs on is Seat Binding's answer, never chosen here.
 
-use fgos_execution::executor_model::{capability_confinement, registered_capability_of};
+use crate::executor_model::{capability_confinement, registered_capability_of};
 use serde_json::{json, Value};
 
-use crate::assignment::truthy;
+use crate::js::truthy;
 
-pub use fgos_execution::executor_model::lookup_executor;
+pub use crate::executor_model::lookup_executor;
 
 /// The executor block a name resolves to and its egress gate are `fgos-execution`'s, the same answer `decide`
 /// judges a dispatch by.
-pub use fgos_execution::executor_config::{
+pub use crate::executor_config::{
     resolve_executor_config, CLAUDE_CLI_COMMANDS, EXECUTOR_CARRIES, EXECUTOR_MISSING_MESSAGE,
 };
 

@@ -14,12 +14,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { unservedToolAbilityOf } from '../runner/dispatch/tool-providers.mjs';
-import { nativeDoor } from '../native/door.mjs';
-
-/** Whether two path globs (segments) can name the same file: the write-scope leaf's answer. */
-const globsMeet = (a, b) => nativeDoor().writeScope('globsMeet', { a, b });
 import { RIGOR_ORDER } from './guide-schema.mjs';
-import { normalizeWrite } from './propose-classify.mjs';
+import { normalizeWrite, globsMeet } from './propose-classify.mjs';
 
 /**
  * Trees no slice may write: the repository's own bookkeeping, installed dependencies and, for a slice that

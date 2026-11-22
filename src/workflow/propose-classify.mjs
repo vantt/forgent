@@ -20,7 +20,7 @@ import { nativeDoor } from '../native/door.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';
 
 /** Whether two path globs (segments) can name the same file: the write-scope leaf's answer. */
-const globsMeet = (a, b) => nativeDoor().writeScope('globsMeet', { a, b });
+export const globsMeet = (a, b) => nativeDoor().writeScope('globsMeet', { a, b });
 
 const TABLE_PATH = path.resolve(import.meta.dirname, '../../domains/coding/slice-kinds.yaml');
 const TABLE_VERSION = 1;

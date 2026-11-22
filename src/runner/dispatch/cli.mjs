@@ -12,54 +12,6 @@ export { watchWritesOutsideWorkspace, strayWriteWarning } from '../../run-superv
 // the Work layer, src/runner/work-dispatch.mjs; this module takes what that layer resolved.
 
 /**
- * Resolve persona/agentType for a given taskSpec header & list of registered agent-types (D20/D21/D22/D32).
- * Tie-break priority (D32):
- * 1. Task-spec declares `agent:` pin -> wins immediately, skipping skill-matching.
- * 2. No pin -> if `currentAgentType` matches all `requires-skill`, stay with `currentAgentType`.
- * 3. Otherwise -> select deterministically by declaration order (first matching agent-type in `agentDefs`).
- */
-export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], currentAgentType = null) {
-  if (!taskSpecHeader) return null;
-
-  const pinnedAgents = Array.isArray(taskSpecHeader.agent)
-    ? taskSpecHeader.agent
-    : typeof taskSpecHeader.agent === 'string' && taskSpecHeader.agent.trim()
-      ? [taskSpecHeader.agent.trim()]
-      : [];
-
-  if (pinnedAgents.length > 0) {
-    const found = agentDefs.find((a) => pinnedAgents.includes(a.name));
-    return found ? found.name : null;
-  }
-
-  const requiredSkills = Array.isArray(taskSpecHeader['requires-skill'])
-    ? taskSpecHeader['requires-skill']
-    : typeof taskSpecHeader['requires-skill'] === 'string' && taskSpecHeader['requires-skill'].trim()
-      ? [taskSpecHeader['requires-skill'].trim()]
-      : [];
-
-  if (requiredSkills.length === 0) {
-    return null;
-  }
-
-  if (currentAgentType) {
-    const currentDef = agentDefs.find((a) => a.name === currentAgentType);
-    if (currentDef && Array.isArray(currentDef.skills)) {
-      const hasAllSkills = requiredSkills.every((s) => currentDef.skills.includes(s));
-      if (hasAllSkills) return currentAgentType;
-    }
-  }
-
-  const matching = agentDefs.find(
-    (a) => Array.isArray(a.skills) && requiredSkills.every((s) => a.skills.includes(s)),
-  );
-  if (matching) return matching.name;
-
-  return null;
-}
-
-
-/**
  * Claude asks the human before touching a path outside its working directories, and no human answers a
  * seat. A seat's run directory lives under the store, outside its cwd (its worktree), so claude is told
  * which directories it may use. This is claude's own prompt; the OS-level posture is unchanged.

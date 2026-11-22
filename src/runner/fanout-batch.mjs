@@ -1,10 +1,9 @@
 import { execFileSync } from 'node:child_process';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from './paths.mjs';
 import { listWork } from '../state/store.mjs';
-import { compileDispatchPlan } from './dispatch/plan.mjs';
 import { loadRunnerConfigForDir, runUnitInHost } from '../native/execution-door.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
-import { workDispatchHint, workUnitFor } from './work-dispatch.mjs';
+import { workUnitFor } from './work-dispatch.mjs';
 import fs from 'node:fs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { isMainModule } from '../../scripts/lib/is-main-module.mjs';
@@ -24,7 +23,7 @@ export function resolveBinFgos(root) {
  *
  * Boundary Note (R1 / M10):
  * Lives in the Work Driver layer (next to loop.mjs) rather than dispatch core.
- * Dispatch core owns compileDispatchPlan; the worker runs as one Unit through runUnit (the
+ * The host's `dispatch decide` chooses the mechanism; the worker runs as one Unit through runUnit (the
  * door `fgos run` uses), which commits what the worker left in the item's worktree. Work
  * lifecycle driving (pick, return) belongs here in the Work Driver layer.
  *
@@ -61,12 +60,13 @@ export async function fanoutBatchExecutorCli(
         return { kind: 'unavailable', entry: { id: candidateId, reason: 'not-found' } };
       }
 
-      const { mechanism, executorId } = compileDispatchPlan(cfg, {
-        workId: candidateId,
-        workHint: workDispatchHint(workItem),
-        hasLiveTaskAccess,
-        repoRoot: root,
-      });
+      // The host decides the mechanism (`fgos dispatch decide --work`), reading the item's hint from the Work layer.
+      const decided = JSON.parse(execFileSync(resolveBinFgos(root), ['dispatch', 'decide', '--work', candidateId, '--repo-root', root, '--json', ...(hasLiveTaskAccess ? ['--has-live-task-access'] : [])], {
+        cwd: root,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      }));
+      const { mechanism, executorId } = decided.data ?? decided;
 
       if (mechanism === 'in-process') {
         return { kind: 'mechanismChanged', entry: { id: candidateId, mechanism, executorId } };

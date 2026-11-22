@@ -1,7 +1,6 @@
 //! The one hand-off, file side, of the host's unit run: a Unit's `inputs` resolved to the paths its seats read once the run is created, and
-//! the digest of the report one attempt left. Ported from `resolveUnitInputs`, `reportRefOf` and `reportDigestOf`
-//! (`src/runner/execution/handoff-refs.mjs:59,140,203`); what an input names, the refusal reasons and the copy names
-//! are `fgos-execution::handoff`'s, the seats a unit run settled are the engine history's.
+//! the digest of the report one attempt left. Ported from the Node hand-off (`resolveUnitInputs`, `reportRefOf`,
+//! `reportDigestOf`); what an input names, the refusal reasons and the copy names are `fgos-execution::handoff`'s, the seats a unit run settled are the engine history's.
 
 use std::path::{Path, PathBuf};
 
@@ -158,7 +157,7 @@ fn seat_inputs(
     Ok(json!({ "refs": [], "inputMap": input_map }))
 }
 
-/// `reportRefsOf(records, { mainRoot })` (`src/runner/execution/handoff-refs.mjs:78`): the reports of in-run seat
+/// `reportRefsOf(records, { mainRoot })`: the reports of in-run seat
 /// results, in input order, each listed once.
 pub fn report_refs_of(records: &[Value], main_root: &Path) -> Result<Vec<String>, RunUnitError> {
     let mut refs: Vec<String> = Vec::new();
@@ -172,7 +171,7 @@ pub fn report_refs_of(records: &[Value], main_root: &Path) -> Result<Vec<String>
     Ok(refs)
 }
 
-/// `copyHandoffsInto(dir, entries)` (`src/runner/execution/handoff-refs.mjs:265`): copies of hand-off files
+/// `copyHandoffsInto(dir, entries)`: copies of hand-off files
 /// (`{ name, source, sha256? }`) as `<dir>/inputs/<name>`, paths in entry order. A source whose bytes changed from
 /// `sha256` is refused; a copy already in place with those bytes is kept, so a resume reads the same files.
 pub fn copy_handoffs_into(dir: &Path, entries: &[Value]) -> Result<Vec<String>, RunUnitError> {

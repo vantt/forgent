@@ -452,45 +452,45 @@ test('graph use case --what-if on an unknown id: exists false, zero impact', () 
 
 // --- stale use case -------------------------------------------------------
 
-test('stale use case on a store with nothing in doing: empty advisory', () => {
+test('stale use case on a store with nothing in doing: empty advisory', async () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
   addTestWork(dir, 'a');
-  const data = staleUseCase({ dir, repoRoot: cwd, cleanupTtlDays: 7 });
+  const data = await staleUseCase({ dir, repoRoot: cwd, cleanupTtlDays: 7 });
   assert.deepEqual(data.stale, []);
 });
 
-test('stale use case: a freshly-claimed doing item is NOT stale', () => {
+test('stale use case: a freshly-claimed doing item is NOT stale', async () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
   addTestWork(dir, 'a');
   moveToDurableDoingForTest(cwd, 'a');
 
-  const data = staleUseCase({ dir, repoRoot: cwd, cleanupTtlDays: 7 });
+  const data = await staleUseCase({ dir, repoRoot: cwd, cleanupTtlDays: 7 });
   assert.deepEqual(data.stale, []);
   assert.equal(data.thresholds.agentMs, 15 * 60 * 1000);
   assert.equal(data.thresholds.humanMs, 24 * 60 * 60 * 1000);
 });
 
-test('stale use case: postDelivery is additive sibling field', () => {
+test('stale use case: postDelivery is additive sibling field', async () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
   addTestWork(dir, 'a');
   moveToDurableDoingForTest(cwd, 'a');
 
-  const data = staleUseCase({ dir, repoRoot: cwd, cleanupTtlDays: 7 });
+  const data = await staleUseCase({ dir, repoRoot: cwd, cleanupTtlDays: 7 });
   assert.deepEqual(data.stale, []);
   assert.deepEqual(data.postDelivery.stale, []);
   assert.ok(Number.isFinite(data.postDelivery.thresholds.deliveredMs));
 });
 
-test('stale use case: a just-delivered item is NOT flagged in postDelivery', () => {
+test('stale use case: a just-delivered item is NOT flagged in postDelivery', async () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
   addTestWork(dir, 'just-delivered');
   moveToDurableDoingForTest(cwd, 'just-delivered');
   moveWork(dir, { id: 'just-delivered', to: 'delivered' });
 
-  const data = staleUseCase({ dir, repoRoot: cwd, cleanupTtlDays: 7 });
+  const data = await staleUseCase({ dir, repoRoot: cwd, cleanupTtlDays: 7 });
   assert.deepEqual(data.postDelivery.stale, []);
 });

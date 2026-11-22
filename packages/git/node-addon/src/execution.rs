@@ -19,8 +19,9 @@ use napi_derive::napi;
 use serde_json::{json, Map, Value};
 use std::path::PathBuf;
 
-/// The contract version `versions().execution` answers.
-pub const CONTRACT_VERSION: u32 = 1;
+/// The contract version `versions().execution` answers: 1 is the first with the Execution Core helpers, 2 the first
+/// with the outcome, seat, run result, hand-off and Work reads.
+pub const CONTRACT_VERSION: u32 = 2;
 
 fn refused(error: RunUnitError) -> Error {
     Error::from_reason(error.to_json().to_string())
@@ -668,10 +669,16 @@ pub fn verify_command_of(request: Value) -> Result<Value> {
 #[napi(namespace = "execution", js_name = "verifySeatResult")]
 pub fn verify_seat_result(request: Value) -> Result<Value> {
     check()?;
-    Ok(fgos_execution::loops::verify_seat_result(
-        present(&request, "answer"),
-        request.get("round").and_then(Value::as_u64).unwrap_or(1),
-    ))
+    // A round the caller did not give stays absent from the result, as Node left it undefined.
+    let round = request.get("round").and_then(Value::as_u64);
+    let mut result =
+        fgos_execution::loops::verify_seat_result(present(&request, "answer"), round.unwrap_or(0));
+    if round.is_none() {
+        if let Some(map) = result.as_object_mut() {
+            map.remove("round");
+        }
+    }
+    Ok(result)
 }
 
 // ---- the runner config rules ------------------------------------------------------------------------------
@@ -715,11 +722,7 @@ pub fn parse_run_timeout(request: Value) -> Result<f64> {
     check()?;
     let label = text(&request, "label")?;
     // A value that is not text is refused with the sentence that names it, as Node printed it.
-    let given = match request.get("text") {
-        Some(Value::String(s)) => s.clone(),
-        _ => String::new(),
-    };
-    fgos_execution::bind::parse_run_timeout(&given, label)
+    fgos_execution::bind::parse_run_timeout_value(request.get("text"), label)
         .map(|ms| ms as f64)
         .map_err(|message| refused(RunUnitError::config(message, None, None)))
 }
@@ -1038,4 +1041,60 @@ pub fn handoff_ref(request: Value) -> Result<String> {
     )
     .map(|file| file.to_string_lossy().into_owned())
     .map_err(|e| refused(handoff_reports::refusal(e)))
+}
+
+// ---- executor facts a Work caller reads ---------------------------------------------------------------------
+
+/// `resolveExecutorConfig(runnerConfig, executorId, { contentCarries, resolvedAgentType, invocationId })`: the
+/// executor block a name resolves to (`command`, `provider`, `governance`, ...), or the refusal.
+#[napi(namespace = "execution", js_name = "resolveExecutorConfig")]
+pub fn resolve_executor_config(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    let str_at = |key: &str| request.get(key).and_then(Value::as_str);
+    fgos_execution::executor_config::resolve_executor_config(
+        request.get("runnerConfig").unwrap_or(&null),
+        str_at("executorId"),
+        str_at("contentCarries"),
+        str_at("resolvedAgentType"),
+        str_at("invocationId"),
+    )
+    .map_err(|e| refused(named(e.name, e.message, e.code, None)))
+}
+
+/// `resolveCapabilityDetailsFromHints({ runnerConfig, executorId, resolvedExecutor, purpose, hints })`:
+/// `{ capability, anchorCapability }`, the canonical capability of a dispatch independent of any Work item.
+#[napi(namespace = "execution", js_name = "resolveCapabilityDetailsFromHints")]
+pub fn resolve_capability_details_from_hints(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    let hints = request.get("hints").unwrap_or(&null);
+    let strings = |key: &str| -> Vec<String> {
+        hints
+            .get(key)
+            .and_then(Value::as_array)
+            .map(|list| {
+                list.iter()
+                    .filter_map(Value::as_str)
+                    .map(str::to_string)
+                    .collect()
+            })
+            .unwrap_or_default()
+    };
+    let text_of = |key: &str| hints.get(key).and_then(Value::as_str).map(str::to_string);
+    let asked = fgos_execution::capability_resolve::CapabilityHints {
+        candidates: strings("candidates"),
+        preferred: text_of("preferred"),
+        fallback_label: text_of("fallbackLabel"),
+    };
+    Ok(
+        fgos_execution::capability_resolve::resolve_capability_details_from_hints(
+            request.get("runnerConfig").unwrap_or(&null),
+            request.get("executorId").and_then(Value::as_str),
+            present(&request, "resolvedExecutor"),
+            request.get("purpose").and_then(Value::as_str),
+            &asked,
+        )
+        .to_json(),
+    )
 }

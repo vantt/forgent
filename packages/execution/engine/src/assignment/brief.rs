@@ -14,7 +14,7 @@ use fgos_host_runtime::civil_time::format_unix_millis_rfc3339;
 use serde_json::Value;
 
 use super::{js_space, js_str, present};
-use crate::run_result::claim::{render_agent_result_claim_instructions, ClaimContext};
+use crate::run_result::claim::render_agent_result_claim_instructions;
 
 /// Where one round's artifacts live, all absolute: a worker's cwd is its own worktree and has no relationship to
 /// the run directory.
@@ -111,17 +111,8 @@ pub fn deadline_text(
     ))
 }
 
-/// What a claim's instructions need to know about the assignment (role, operation, posture verdict).
-pub fn claim_context_of(assignment: &Value) -> ClaimContext {
-    let pick = |key: &str| present(assignment.get(key));
-    ClaimContext {
-        role: pick("role").and_then(Value::as_str).map(str::to_string),
-        operation: pick("operation")
-            .and_then(Value::as_str)
-            .map(str::to_string),
-        posture_verdict: pick("posture").map(|p| p.get("verdict") == Some(&Value::Bool(true))),
-    }
-}
+// What a claim's instructions need to know about the assignment is the claim contract's reading.
+pub use crate::run_result::claim::claim_context_of;
 
 fn is_blank(c: char) -> bool {
     c == ' ' || c == '\t'
