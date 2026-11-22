@@ -174,12 +174,12 @@ the grants, verb by verb.
 | 2 | [Head verbs through the request socket](phase-02-head-verbs.md) | - | src/session-host/head-grants.mjs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, test/session-host/head-start.test.mjs, apps/fgos/src/routing.rs, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/rust/tests/head_request.rs, docs/platform/session-host/spec.md | 1 | running |
 | 3 | [The land door runs the plan check](phase-03-land-plan-check.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, core/skills/_shared/plan-contract.md, .agents/skills/**, plugins/fgOS/skills/**, .fgos/config.yaml | 1 | done |
 | 4 | [Coordinating heads keep their provider floor](phase-04-provider-floor.md) | 3 | .fgos/config.yaml, test/session-host/head-start.test.mjs | 2 | done |
-| 5 | [A live head's requests run the active release](phase-05-release-pickup.md) | 2, 6 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/run-supervisor/spec.md | 3 | ready |
+| 5 | [A live head's requests run the active release](phase-05-release-pickup.md) | 2, 6 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/run-supervisor/spec.md | 3 | done |
 | 6 | [A rotation whose executor died is resolved](phase-06-orphan-rotation.md) | 2 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/session-host/contracts/rotation-files.v1.json, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/**, docs/platform/session-host/spec.md | 2 | done |
 | 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs, packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs | 2 | running |
-| 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | ready |
+| 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | running |
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | running |
-| 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | ready |
+| 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | running |
 | 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md | 5 | ready |
 
 Each phase names its canonical dispatch capability in its file: `code:implement` for 2 to 7 and 10 and the probe script
@@ -194,6 +194,31 @@ wave), `head-request.v1.json` (2, then 5), `docs/platform/session-host/spec.md` 
 writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
+
+### Lead progress (2026-11-22 16:25, head:lead-forgent-261122-0118-heads-b52f9)
+
+- **Phase 5 done:** landed as `78220dddb` (branch `p05c`, recut at the trunk tip from the reviewed `p06f` plus the
+  one-door declaration `8da6d51a4`; head_request 50/50, head-request.mjs 89/89, one-door scan 0 undeclared). It takes
+  effect for a head once the next release is activated.
+- **Phase 10 steps 2-3 landed** as `2fa775706` (`p10b`): on every start the secretary arms `/loop 15m`, and each tick
+  reads `fgos questions`, then `fgos mailbox inbox`, then relays within the 5-question cap. The review found no
+  blockers. The supervisor already raised the B half. The phase stays `running` until step 4's 24-hour measure
+  (`reports/secretary-wake.md`).
+- **Phase 8** steps 1-3 landed (`827bbb7e1`); it stays `running` until step 4's 24-hour measure.
+- **Phase 2 step 10** (`config patch` for the supervisor) is on `p02h` (`31dcaab69`). The review found no blockers.
+  Its nits are fixed in `3a00fc207`: bounded args, `--global`/`--project-only` refused from a confined caller, and a
+  relative path documented as read from the project root.
+- **Phase 7 follow-up parked on `q-d5mrno2mfk`:** the removal is green in its crate (land 57/57, fgos-supervision
+  152/152) and saved in `reports/carry-p07c-landed-worktree-removal.diff`. The fgos binary still needs
+  `worktree_removal: None` at two `LandPorts` literals in `apps/fgos/src/wiring/session_write_publish.rs`, which is
+  outside the footprint. `fgos supervisor raise` is still refused `verb-not-granted` for this lead, because its socket
+  runs the launch release.
+- **Land friction:** a land counts every trunk path changed since the branch base. A shaper's dirty `DISCUSSION.md` in
+  the main checkout therefore refused `p10` and `p06f` with `main-checkout-dirty-overlap`. A unit sandbox cannot rebase
+  (`.git` is read-only), and a prompt-less `run --sync` is refused through the socket (`bad-args`), so both branches were
+  recut at the tip and reapplied by a unit.
+- **Worktrees safe to remove** (landed or superseded): p02e, p02f, p02g, p04, p06, p06c, p06d, p06e, p06f, p08, p10,
+  p10b, p05c.
 
 ### Lead progress (2026-11-22 15:20, head:lead-forgent-261122-0118-heads-b52f9)
 
