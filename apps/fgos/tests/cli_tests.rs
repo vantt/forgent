@@ -4793,6 +4793,267 @@ fn dispatch_decide_work_asks_the_work_layer_through_the_node_bridge_for_an_item_
     );
 }
 
+// ---- the other `fgos dispatch` sub-commands: one wiring case each. What each answers is owned by
+// apps/fgos/src/wiring/dispatch_subs (tests.rs replays the Node-era corpus); these cases prove the argv reaches the
+// host's provider, the envelope carries the answer, a refusal exits with its category, and no Node starts.
+
+/// The Node-era corpus samples a dispatch read needs, copied into the world's project at the ids they name.
+#[cfg(unix)]
+fn with_corpus(world: &ExecutionWorld) {
+    fn copy(from: &Path, to: &Path) {
+        fs::create_dir_all(to).unwrap();
+        for entry in fs::read_dir(from).unwrap().flatten() {
+            let target = to.join(entry.file_name());
+            if entry.file_type().unwrap().is_dir() {
+                copy(&entry.path(), &target);
+            } else {
+                fs::copy(entry.path(), &target).unwrap();
+            }
+        }
+    }
+    let corpus = repo_root().join("packages/execution/contracts/corpus");
+    for (sample, id) in [
+        (
+            "adopt-v3-envelope-attempt",
+            "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+        ),
+        ("v3-open-attempt", "unit-run-1794987012087-5f3337a8"),
+    ] {
+        copy(
+            &corpus.join(sample),
+            &world.project.join(".fgos/assignments").join(id),
+        );
+    }
+}
+
+#[cfg(unix)]
+const SETTLED_RUN: &str = "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01";
+#[cfg(unix)]
+const OPEN_RUN: &str = "run_unit-run-1794987012087-5f3337a8/producer/1_01";
+
+#[cfg(unix)]
+fn stderr_text(output: &std::process::Output) -> String {
+    String::from_utf8_lossy(&output.stderr).into_owned()
+}
+
+#[cfg(unix)]
+#[test]
+fn dispatch_show_run_reads_the_run_its_positional_or_flag_names_and_starts_no_node() {
+    let world = ExecutionWorld::new("fgos_dispatch_show_run");
+    with_corpus(&world);
+    let shown = ExecutionWorld::data(&world.run(&["dispatch", "show-run", SETTLED_RUN, "--json"]));
+    assert_eq!(shown["runId"], SETTLED_RUN);
+    assert_eq!(shown["attemptState"], "closed");
+    let by_flag = ExecutionWorld::data(&world.run(&["dispatch", "show-run", "--run", SETTLED_RUN]));
+    assert_eq!(by_flag["runDir"], shown["runDir"]);
+    let missing = world.run(&["dispatch", "show-run", "run_absent"]);
+    assert_eq!(missing.status.code(), Some(2), "{}", stderr_text(&missing));
+    assert!(stderr_text(&missing).starts_with("fgos: no run \"run_absent\" under "));
+    let bare = world.run(&["dispatch", "show-run"]);
+    assert_eq!(bare.status.code(), Some(4));
+    assert!(!world.node_started(), "show-run started a Node child");
+}
+
+#[cfg(unix)]
+#[test]
+fn dispatch_watch_reads_until_the_run_stops_and_writes_one_line_per_reading() {
+    let world = ExecutionWorld::new("fgos_dispatch_watch");
+    with_corpus(&world);
+    let watched = world.run(&[
+        "dispatch",
+        "watch",
+        SETTLED_RUN,
+        "--interval",
+        "1",
+        "--ticks",
+        "3",
+    ]);
+    let data = ExecutionWorld::data(&watched);
+    assert_eq!(
+        (data["ticks"].clone(), data["stoppedBecause"].clone()),
+        (serde_json::json!(1), serde_json::json!("terminal"))
+    );
+    assert_eq!(
+        stderr_text(&watched),
+        format!("fgos: run={SETTLED_RUN} status=settled visibility=none outbox=0\n")
+    );
+    assert!(!world.node_started(), "watch started a Node child");
+}
+
+#[cfg(unix)]
+#[test]
+fn dispatch_recover_recommends_without_action_and_refuses_an_action_that_is_not_json() {
+    let world = ExecutionWorld::new("fgos_dispatch_recover");
+    with_corpus(&world);
+    // What the recommendation says depends on this host's judgement of the attempt's gate; the wiring is that the
+    // run id reaches the planner and its answer comes back in the envelope.
+    let recommended = ExecutionWorld::data(&world.run(&["dispatch", "recover", OPEN_RUN]));
+    assert_eq!(recommended["runId"], OPEN_RUN);
+    assert!(recommended["kind"].is_string(), "{recommended}");
+    let parked = ExecutionWorld::data(
+        &world.run(&["dispatch", "recover", OPEN_RUN, "--intent", "reassign"]),
+    );
+    assert_eq!(parked["kind"], "park");
+    let bad = world.run(&["dispatch", "recover", OPEN_RUN, "--action", "{"]);
+    assert_eq!(bad.status.code(), Some(4));
+    assert!(stderr_text(&bad).starts_with("fgos: dispatch recover --action must be valid JSON: "));
+    let unkeyed = world.run(&[
+        "dispatch",
+        "recover",
+        OPEN_RUN,
+        "--action",
+        "{}",
+        "--expected-snapshot",
+        "h",
+    ]);
+    assert_eq!(unkeyed.status.code(), Some(4));
+    assert_eq!(
+        stderr_text(&unkeyed),
+        "fgos: dispatch recover --action requires --expected-control-epoch\n"
+    );
+    assert!(!world.node_started(), "recover started a Node child");
+}
+
+#[cfg(unix)]
+#[test]
+fn dispatch_inspect_maps_each_selector_and_prints_the_attention_view_as_text_without_json() {
+    let world = ExecutionWorld::new("fgos_dispatch_inspect");
+    with_corpus(&world);
+    let run =
+        ExecutionWorld::data(&world.run(&["dispatch", "inspect", "--run", SETTLED_RUN, "--json"]));
+    assert_eq!(run["subject"]["kind"], "run");
+    assert_eq!(run["attemptState"], "closed");
+    let assignment = ExecutionWorld::data(&world.run(&[
+        "dispatch",
+        "inspect",
+        "--assignment",
+        "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+    ]));
+    assert_eq!(assignment["subject"]["kind"], "assignment");
+    let attention = world.run(&[
+        "dispatch",
+        "inspect",
+        "--attention",
+        "--since",
+        "2026-11-01",
+    ]);
+    assert_eq!(
+        attention.status.code(),
+        Some(0),
+        "{}",
+        stderr_text(&attention)
+    );
+    assert!(!String::from_utf8_lossy(&attention.stdout).contains("\"contract\": \"fgos.v1\""));
+    let combined = world.run(&[
+        "dispatch",
+        "inspect",
+        "--attention",
+        "--terminal",
+        "--since",
+        "2026-11-01",
+    ]);
+    assert_eq!(combined.status.code(), Some(4));
+    assert_eq!(
+        stderr_text(&combined),
+        "fgos: dispatch inspect --attention cannot be combined with --terminal; run each view on its own\n"
+    );
+    let none = world.run(&["dispatch", "inspect"]);
+    assert_eq!(none.status.code(), Some(4));
+    assert!(!world.node_started(), "inspect started a Node child");
+}
+
+#[cfg(unix)]
+#[test]
+fn dispatch_reconcile_plans_by_default_and_refuses_a_missing_plan_or_mode() {
+    let world = ExecutionWorld::new("fgos_dispatch_reconcile");
+    with_corpus(&world);
+    let planned = ExecutionWorld::data(&world.run(&["dispatch", "reconcile"]));
+    assert_eq!(planned["outcome"], "blocked");
+    let collect = ExecutionWorld::data(&world.run(&[
+        "dispatch",
+        "reconcile",
+        "plan",
+        "--action",
+        "collect-result",
+        "--run",
+        OPEN_RUN,
+    ]));
+    assert_eq!(collect["outcome"], "blocked");
+    let unplanned = world.run(&["dispatch", "reconcile", "apply"]);
+    assert_eq!(unplanned.status.code(), Some(4));
+    assert_eq!(
+        stderr_text(&unplanned),
+        "fgos: dispatch reconcile apply --plan must be valid JSON: dispatch reconcile apply requires --plan\n"
+    );
+    let quarantine = world.run(&["dispatch", "reconcile", "provider-capacity", "quarantine"]);
+    assert_eq!(quarantine.status.code(), Some(4));
+    assert_eq!(
+        stderr_text(&quarantine),
+        "fgos: provider-capacity quarantine requires --provider\n"
+    );
+    assert!(!world.node_started(), "reconcile started a Node child");
+}
+
+#[cfg(unix)]
+#[test]
+fn dispatch_probe_account_reads_its_raw_flags_and_refuses_before_any_seat_starts() {
+    let world = ExecutionWorld::new("fgos_dispatch_probe_account");
+    let narrowed = world.run(&["dispatch", "probe-account", "--all", "--provider", "openai"]);
+    assert_eq!(narrowed.status.code(), Some(4));
+    assert_eq!(
+        stderr_text(&narrowed),
+        "fgos: dispatch probe-account --all probes every account and cannot be narrowed by --provider\n"
+    );
+    let leg = world.run(&[
+        "dispatch",
+        "probe-account",
+        "--provider",
+        "p",
+        "--account",
+        "a",
+        "--leg",
+        "both,",
+    ]);
+    assert_eq!(leg.status.code(), Some(4));
+    assert!(stderr_text(&leg)
+        .starts_with("fgos: dispatch probe-account --leg must be one of direct, harness, both"));
+    let unknown = world.run(&[
+        "dispatch",
+        "probe-account",
+        "--provider",
+        "p",
+        "--account",
+        "a",
+    ]);
+    assert_eq!(unknown.status.code(), Some(1), "{}", stderr_text(&unknown));
+    assert!(stderr_text(&unknown).starts_with("fgos: no account \"a\" for provider "));
+    let swept = ExecutionWorld::data(&world.run(&[
+        "dispatch",
+        "probe-account",
+        "--all",
+        "--leg",
+        "direct",
+    ]));
+    assert_eq!(swept["accounts"], serde_json::json!([]));
+    assert!(!world.node_started(), "probe-account started a Node child");
+}
+
+#[cfg(unix)]
+#[test]
+fn dispatch_probe_session_names_its_executor_positionally_and_refuses_an_unknown_one() {
+    let world = ExecutionWorld::new("fgos_dispatch_probe_session");
+    let bare = world.run(&["dispatch", "probe-session"]);
+    assert_eq!(bare.status.code(), Some(4));
+    assert!(stderr_text(&bare).starts_with("fgos: dispatch probe-session requires an executor id"));
+    let unknown = world.run(&["dispatch", "probe-session", "ghost", "--invocation", "x"]);
+    assert_eq!(unknown.status.code(), Some(1), "{}", stderr_text(&unknown));
+    assert_eq!(
+        stderr_text(&unknown),
+        "fgos: no agent executor \"ghost\" in the runner config\n"
+    );
+    assert!(!world.node_started(), "probe-session started a Node child");
+}
+
 // ---- `fgos worktree` and `fgos resync-worktree`: argv shapes, exit codes and envelopes ----
 //
 // The checkout engine is `fgos-checkout`, which owns every outcome (what is created, provisioned, set aside,

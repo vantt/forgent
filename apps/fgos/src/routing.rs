@@ -89,7 +89,7 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("events", wiring::events::AVAILABLE_SUBCOMMANDS),
     ("git", wiring::git_incidents::AVAILABLE_SUBCOMMANDS),
     ("lock", wiring::lock_fence::AVAILABLE_SUBCOMMANDS),
-    ("dispatch", wiring::dispatch_decide::AVAILABLE_SUBCOMMANDS),
+    ("dispatch", wiring::dispatch_subs::AVAILABLE_SUBCOMMANDS),
     ("agents", wiring::agents::AVAILABLE_SUBCOMMANDS),
     ("worktree", wiring::worktree::AVAILABLE_SUBCOMMANDS),
     ("questions", wiring::questions::AVAILABLE_SUBCOMMANDS),
@@ -112,12 +112,9 @@ pub fn default_subcommand(selector: &str) -> Option<&'static str> {
 }
 
 /// The operation a `legacy-cli` selector runs for the first positionals it serves natively. The route table gives
-/// one only to a verb that is native whole, so a verb served in part names its operation here: `dispatch` serves
-/// `decide` and `explain`, one operation each, told apart by the projector.
-const PARTIAL_VERB_OPERATIONS: &[(&str, &str)] = &[
-    ("dispatch", wiring::dispatch_decide::DECIDE_OPERATION_ID),
-    ("session", wiring::supervision::SUPERVISOR_READ_OPERATION_ID),
-];
+/// one only to a verb that is native whole, so a verb served in part names its operation here.
+const PARTIAL_VERB_OPERATIONS: &[(&str, &str)] =
+    &[("session", wiring::supervision::SUPERVISOR_READ_OPERATION_ID)];
 
 /// The `hook` kinds the host runs before the composition root.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -982,19 +979,19 @@ mod tests {
         ] {
             assert_eq!(decide(route("hook"), &other), Lane::Legacy);
         }
-        for sub in ["decide", "explain"] {
+        for sub in [
+            "decide",
+            "explain",
+            "inspect",
+            "reconcile",
+            "probe-account",
+            "recover",
+        ] {
             assert_eq!(
                 decide(route("dispatch"), &call("dispatch", &[sub, "--for", "x"])),
                 Lane::Native {
                     operation_id: "dispatch.decide".into()
                 },
-                "dispatch {sub}"
-            );
-        }
-        for sub in ["inspect", "reconcile", "probe-account", "recover"] {
-            assert_eq!(
-                decide(route("dispatch"), &call("dispatch", &[sub])),
-                Lane::Legacy,
                 "dispatch {sub}"
             );
         }

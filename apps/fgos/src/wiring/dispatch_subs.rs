@@ -37,6 +37,19 @@ pub const RECONCILE_OPERATION_ID: &str = "dispatch.runtime.reconcile";
 pub const PROBE_ACCOUNT_OPERATION_ID: &str = "dispatch.probe.account";
 pub const PROBE_SESSION_OPERATION_ID: &str = "dispatch.probe.session";
 
+/// Every sub-command of `fgos dispatch` the host serves (`decide` and `explain` are `wiring::dispatch_decide`'s).
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
+    "decide",
+    "explain",
+    "show-run",
+    "inspect",
+    "watch",
+    "recover",
+    "reconcile",
+    "probe-account",
+    "probe-session",
+];
+
 const fn descriptor(
     operation: &'static str,
     request: &'static str,
