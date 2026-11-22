@@ -1,6 +1,6 @@
 //! The terminal doctor rows: what the terminal-control driver (herdr) says about this machine, and what the
 //! executors dispatched through a herdr pane need from it. The route is asked in process, through the one door
-//! the `terminal-control` route builds its core by (`CoreParts`); the judgements are pure functions over what it
+//! the `terminal-control` route builds its core by (`crate::wiring::terminal_route`); the judgements are pure functions over what it
 //! answered, so a fake route proves each of them.
 //!
 //! Every row reads. `terminal-allocations` is a pointer: it counts, names the verb, and closes nothing.
@@ -8,17 +8,15 @@
 use super::{judged, project_root_refusal, Rows};
 use crate::wiring::dispatch_decide::HostWorkspace;
 use crate::wiring::process_env;
+use crate::wiring::terminal_route::{
+    allocation_grace, scan_allocations, HostRoute, NotScanned, ScanFault,
+};
 use fgos_distribution::doctor::FixResult;
 use fgos_distribution::doctor::{timed, RowOutcome};
 use fgos_execution::decide::{check_loaded_runner, Workspace};
-use fgos_execution_engine::transport::terminal_slot::resolve_herdr_bin;
-use fgos_terminal_control::port::{
-    AnchorPane, CapabilitiesAsk, CapabilitiesReport, Finding, Refusal,
-};
-use fgos_terminal_control::route::CoreParts;
+use fgos_terminal_control::port::{AnchorPane, CapabilitiesAsk, CapabilitiesReport, Finding};
 use serde_json::{json, Map, Value};
 use std::path::Path;
-use std::time::Instant;
 
 pub const ROWS: &[&str] = &[
     "terminal-control",
@@ -43,9 +41,6 @@ fn fix(_root: &Path, _ids: &[&str]) -> Vec<FixResult> {
 /// must stay larger than this by [`GRACE_MARGIN_MS`].
 const READY_TIMEOUT_MS: u64 = 30_000;
 const GRACE_MARGIN_MS: u64 = 30_000;
-
-/// The whole budget of one route question, as the Node client gave it.
-const ROUTE_TIMEOUT_MS: u64 = 15_000;
 
 /// Every `terminal.*` setting, as its dotted path in the `terminal` section.
 const SETTINGS: [&str; 6] = [
@@ -87,52 +82,27 @@ pub trait Route {
     fn reconcile_scan(&self, older_than_ms: u64) -> Result<Vec<Finding>, ScanFault>;
 }
 
-/// Why an allocation scan gave no findings: the core could not be built, or it answered without a scan.
-#[derive(Debug, Clone)]
-pub enum ScanFault {
-    NotAnswered(String),
-    Refused(Refusal),
-}
-
-/// The route of this machine: the core built from the same envelope the route process reads.
-struct HostRoute {
-    herdr_bin: String,
-    env: Map<String, Value>,
-}
-
-impl HostRoute {
-    fn new(env: &[(String, String)], anchor: Option<&str>) -> Self {
-        let lookup = |key: &str| {
-            env.iter()
-                .find(|(k, _)| k == key)
-                .map(|(_, value)| value.clone())
-        };
-        let mut route_env = Map::new();
-        if let Some(pane) = anchor.filter(|pane| !pane.is_empty()) {
-            route_env.insert("FGOS_HERDR_ANCHOR_PANE".into(), json!(pane));
-        }
-        HostRoute {
-            herdr_bin: resolve_herdr_bin(None, &lookup),
-            env: route_env,
-        }
+/// The route of this machine, with the anchor pane the doctor was run from (if any) in its endpoint.
+fn host_route(env: &[(String, String)], anchor: Option<&str>) -> HostRoute {
+    let lookup = |key: &str| {
+        env.iter()
+            .find(|(k, _)| k == key)
+            .map(|(_, value)| value.clone())
+    };
+    let mut route_env = Map::new();
+    if let Some(pane) = anchor.filter(|pane| !pane.is_empty()) {
+        route_env.insert("FGOS_HERDR_ANCHOR_PANE".into(), json!(pane));
     }
-
-    fn parts(&self, config: &Value) -> Result<CoreParts, (String, String)> {
-        let envelope = json!({
-            "herdrBin": self.herdr_bin,
-            "env": self.env,
-            "config": config,
-            "timeoutMs": ROUTE_TIMEOUT_MS,
-        });
-        CoreParts::from_envelope(&envelope, Instant::now())
-            .map_err(|refusal| (refusal.code.to_owned(), refusal.message))
-    }
+    HostRoute::new(route_env, &lookup)
 }
 
 impl Route for HostRoute {
     fn capabilities(&self, config: &Value, anchor: Option<&str>, agents: bool) -> Asked {
         match self.parts(config) {
-            Err((code, message)) => Asked::ConfigRefused { code, message },
+            Err(refusal) => Asked::ConfigRefused {
+                code: refusal.code.to_owned(),
+                message: refusal.message,
+            },
             Ok(parts) => {
                 let report = parts.core().capabilities(CapabilitiesAsk {
                     anchor_pane: anchor,
@@ -144,11 +114,7 @@ impl Route for HostRoute {
     }
 
     fn reconcile_scan(&self, older_than_ms: u64) -> Result<Vec<Finding>, ScanFault> {
-        let parts = self
-            .parts(&json!({}))
-            .map_err(|(_, message)| ScanFault::NotAnswered(message))?;
-        let scan = parts.core().reconcile_scan(older_than_ms);
-        scan.map_err(ScanFault::Refused)
+        HostRoute::reconcile_scan(self, older_than_ms)
     }
 }
 
@@ -409,48 +375,14 @@ fn did_not_answer(why: &str) -> String {
 
 /// `terminal-allocations`: a read-only pointer. Counts the slots past `allocationGraceMs` that never launched
 /// and the retained panes past their time; closes nothing.
-fn terminal_allocations(entries: Result<Vec<Entry>, String>, route: &dyn Route) -> (bool, String) {
-    let entries = match entries {
-        Ok(entries) => entries,
-        Err(why) => {
-            return (
-                true,
-                format!("warning: terminal.* unreadable, allocations not scanned: {why}"),
-            )
-        }
-    };
-    let grace = entries
-        .iter()
-        .find(|e| e.name == "allocationGraceMs")
-        .and_then(|e| e.value.as_u64());
-    let Some(grace) = grace else {
-        return (true, "warning: terminal.allocationGraceMs is invalid (see terminal-control), allocations not scanned".to_owned());
-    };
-    match route.reconcile_scan(grace) {
-        Err(ScanFault::NotAnswered(why)) => (
-            true,
-            format!("warning: the terminal-control route did not answer, allocations not scanned ({why})"),
-        ),
-        Err(ScanFault::Refused(Refusal::Unsupported { capability, detail })) => (
-            true,
-            format!(
-                "info: allocations not scanned: terminal mode is unsupported here ({})",
-                if detail.is_empty() { capability } else { detail }
-            ),
-        ),
-        Err(ScanFault::Refused(Refusal::Unknown { reason })) => (
-            true,
-            if reason.is_empty() {
-                "warning: allocation scan answered unknown".to_owned()
-            } else {
-                format!("warning: allocation scan answered unknown ({reason})")
-            },
-        ),
-        Ok(findings) if findings.is_empty() => (
+fn terminal_allocations(grace: Result<u64, NotScanned>, route: &dyn Route) -> (bool, String) {
+    match scan_allocations(grace, |grace| route.reconcile_scan(grace)) {
+        Err(NotScanned { level, reason }) => (true, format!("{level}: {reason}")),
+        Ok((grace, findings)) if findings.is_empty() => (
             true,
             format!("no slot older than {grace} ms is stuck and no retained pane is past its time"),
         ),
-        Ok(findings) => (
+        Ok((_, findings)) => (
             true,
             format!("warning: {} slot(s) need a person; nothing was closed; run `fgos dispatch inspect --terminal`", findings.len()),
         ),
@@ -605,7 +537,7 @@ fn herdr_facts(route: &dyn Route) -> HerdrFacts {
 fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
     let env = process_env();
     let anchor = anchor_of(&env);
-    let route = HostRoute::new(&env, anchor.as_deref());
+    let route = host_route(&env, anchor.as_deref());
     ids.iter()
         .map(|id| {
             timed(|| {
@@ -619,10 +551,10 @@ fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
                                 "windows" => "win32",
                                 other => other,
                             },
-                            herdr_bin: &route.herdr_bin,
+                            herdr_bin: route.herdr_bin(),
                         },
                     ),
-                    "terminal-allocations" => terminal_allocations(read_entries(root), &route),
+                    "terminal-allocations" => terminal_allocations(allocation_grace(root), &route),
                     "herdr-executor-kinds" => match load_runner(root) {
                         Ok(runner) => herdr_executor_kinds(&runner, || herdr_facts(&route)),
                         Err(why) => (
@@ -642,7 +574,9 @@ fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
 mod tests {
 
     use super::*;
+    use crate::wiring::terminal_route::grace_of;
     use fgos_terminal_control::port::FindingKind;
+    use fgos_terminal_control::port::Refusal;
     use fgos_terminal_control::port::ServerIncarnation;
     use std::cell::RefCell;
     use std::collections::BTreeMap;
@@ -961,7 +895,7 @@ mod tests {
     fn terminal_allocations_passes_when_nothing_is_stuck_and_counts_findings_without_listing_them()
     {
         let mut route = Fake::answering(vec![]);
-        let (passed, message) = terminal_allocations(Ok(defaults()), &route);
+        let (passed, message) = terminal_allocations(Ok(60000), &route);
         assert!(passed);
         assert_eq!(
             message,
@@ -971,7 +905,7 @@ mod tests {
             finding(FindingKind::RetainExpired),
             finding(FindingKind::Unknown),
         ]);
-        let (passed, message) = terminal_allocations(Ok(defaults()), &route);
+        let (passed, message) = terminal_allocations(Ok(60000), &route);
         assert!(passed, "a pointer never fails");
         assert_eq!(message, "warning: 2 slot(s) need a person; nothing was closed; run `fgos dispatch inspect --terminal`");
         assert_eq!(
@@ -984,7 +918,7 @@ mod tests {
     fn terminal_allocations_says_it_did_not_scan_instead_of_failing() {
         let mut route = Fake::answering(vec![]);
         route.scan = Err(ScanFault::NotAnswered("spawn herdr: ENOENT".into()));
-        let (passed, message) = terminal_allocations(Ok(defaults()), &route);
+        let (passed, message) = terminal_allocations(Ok(60000), &route);
         assert!(passed);
         assert!(
             message.starts_with(
@@ -996,7 +930,7 @@ mod tests {
             reason: "herdr status server reports no running socket".into(),
         }));
         assert_eq!(
-            terminal_allocations(Ok(defaults()), &route).1,
+            terminal_allocations(Ok(60000), &route).1,
             "warning: allocation scan answered unknown (herdr status server reports no running socket)"
         );
         route.scan = Err(ScanFault::Refused(Refusal::Unsupported {
@@ -1004,17 +938,16 @@ mod tests {
             detail: String::new(),
         }));
         assert_eq!(
-            terminal_allocations(Ok(defaults()), &route).1,
+            terminal_allocations(Ok(60000), &route).1,
             "info: allocations not scanned: terminal mode is unsupported here (pane.list)"
         );
-        let (passed, message) = terminal_allocations(Err("config-parse".into()), &route);
+        let (passed, message) = terminal_allocations(grace_of(Err("config-parse".into())), &route);
         assert!(passed);
         assert!(
             message.contains("terminal.* unreadable, allocations not scanned"),
             "{message}"
         );
-        let bad = entries(json!("soon"), Value::Null);
-        let (passed, message) = terminal_allocations(Ok(bad), &route);
+        let (passed, message) = terminal_allocations(grace_of(Ok(Some(json!("soon")))), &route);
         assert!(passed);
         assert!(
             message.contains("terminal.allocationGraceMs is invalid"),

@@ -11,7 +11,6 @@ mod observe;
 mod probes;
 mod reconcile;
 mod recover;
-mod terminal;
 #[cfg(test)]
 mod tests;
 

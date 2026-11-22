@@ -1841,6 +1841,32 @@ test('fgos-execution links the run supervisor with default features off and the 
   assert.match(toml, /^fgos-run-supervisor = \{[^}]*default-features = false, features = \["lease"\] \}$/m, 'fgos-execution links the run supervisor with its lease part only');
 });
 
+/** The crate directories `crateDir` links (normal dependencies with a `path`, optional ones included), transitively. */
+function pathDependencyClosure(crateDir) {
+  const seen = new Set();
+  const visit = (dir) => {
+    if (seen.has(dir)) return;
+    seen.add(dir);
+    const toml = fs.readFileSync(path.join(root, dir, 'Cargo.toml'), 'utf8');
+    let section = '';
+    for (const line of toml.split('\n')) {
+      const header = line.match(/^\s*\[([^\]]+)\]\s*$/);
+      if (header) { section = header[1].trim(); continue; }
+      if (section !== 'dependencies' && !/^target\..*\.dependencies$/.test(section)) continue;
+      const dep = line.match(/^\s*[\w-]+\s*=\s*\{[^}]*\bpath\s*=\s*"([^"]+)"/);
+      if (dep) visit(path.posix.normalize(path.posix.join(dir, dep[1])));
+    }
+  };
+  visit(crateDir);
+  return seen;
+}
+
+test('no crate the Node addon links, directly or through another crate, is the Execution engine', () => {
+  const closure = pathDependencyClosure('packages/git/node-addon');
+  assert.ok(closure.has('packages/execution/rust') && closure.has('packages/run-supervisor/rust'), 'the walk reaches the crates the addon links');
+  assert.ok(!closure.has('packages/execution/engine'), `the addon reaches fgos-execution-engine through: ${[...closure].join(', ')}`);
+});
+
 test('every door row holds: patterns appear only in allowed or debt files, and no entry is stale', () => {
   const files = new Map(doorFiles().map((file) => [file, fs.readFileSync(path.join(root, file), 'utf8')]));
   assert.deepEqual(checkDoors(manifest.doors ?? [], files), []);
@@ -1980,7 +2006,7 @@ test('door check: a new importer of the Node bind facade fails, each named calle
   const row = execRow('the Node bind facade has only its named callers');
   const callers = row.allowed.map((e) => e.path);
   assert.ok(callers.includes('src/runner/loop.mjs') && callers.includes('src/runner/dispatch/plan.mjs'));
-  for (const e of row.allowed) assert.match(e.reason, /^(S6a|S7|doctor row)/, `${e.path} names its owner step`);
+  for (const e of row.allowed) assert.match(e.reason, /^(p-24xw2cwdvo|S6b|S7|doctor row)/, `${e.path} names its owner step`);
   for (const text of ["import { bind } from '../runner/execution/bind.mjs';\n", "const m = await import('../runner/execution/bind.mjs');\n", "import { bind } from './bind.mjs';\n"]) {
     assert.equal(doorHits(row, 'src/verbs/seeded.mjs', text).length, 1, text);
     assert.deepEqual(doorHits(row, 'src/runner/loop.mjs', text), [], text);
@@ -1990,7 +2016,7 @@ test('door check: a new importer of the Node bind facade fails, each named calle
 
 test('door check: a Node or Rust twin of an executor derivation fails outside its owner, passes as declared debt, and passes in the crate', () => {
   const row = execRow('derive executor facts');
-  assert.equal(row.retiredBy, 'S6a');
+  assert.match(row.retiredBy, /^p-24xw2cwdvo:/);
   for (const d of row.debt) assert.match(d.reason, /^twin, same vectors as the contract/, d.path);
   for (const text of ['export function familyOf() {}\n', 'export const lookupExecutor = () => 1;\n', 'function readLlmAccounts() {}\n', 'function detectHerdrPresent() {}\n']) {
     assert.equal(doorHits(row, 'src/runner/seeded.mjs', text).length, 1, text);
@@ -2004,7 +2030,7 @@ test('door check: the decider has one Rust owner and one declared Node twin', ()
   const row = execRow('decide a dispatch');
   assert.deepEqual(row.allowed.map((e) => e.path), ['packages/execution/rust/src/decide.rs']);
   assert.deepEqual(row.debt.map((e) => e.path), ['src/runner/dispatch/plan.mjs']);
-  assert.equal(row.retiredBy, 'S6a');
+  assert.match(row.retiredBy, /^p-24xw2cwdvo:/);
   assert.equal(doorHits(row, 'src/runner/dispatch/other.mjs', 'export function compileDispatchPlan() {}\n').length, 1);
   assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'fn purpose_seat() {}\n').length, 1);
   assert.deepEqual(doorHits(row, 'packages/execution/rust/src/decide.rs', 'fn purpose_seat() {}\n'), []);
@@ -2049,11 +2075,69 @@ test('door check: the old dispatch hook script name appears only as a legacy mar
 });
 
 test('door check: the tool lookup row names tools.rs as the Rust owner and tool-providers.mjs as debt', () => {
-  const row = execRow('tool lookup by capability: ask toolProvidersOf in src/runner/dispatch/tool-providers.mjs (or fgos dispatch decide --for)');
+  const row = execRow('tool lookup by capability: ask fgos dispatch decide --for (packages/execution/rust/src/tools.rs)');
   assert.deepEqual(row.allowed.map((e) => e.path), ['packages/execution/rust/src/tools.rs']);
   assert.deepEqual(row.debt.map((e) => e.path), ['src/runner/dispatch/tool-providers.mjs']);
   assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'fn index_is_stale() {}\n').length, 1);
   assert.deepEqual(doorHits(row, 'packages/execution/rust/src/tools.rs', 'fn index_is_stale() {}\n'), []);
+});
+
+test('door check: a unit is run only by the engine and the host callers of its one composition; a Node runUnit or a second caller fails', () => {
+  const row = execRow('run a unit');
+  for (const [file, text] of [['apps/fgos/src/wiring/seeded.rs', 'let out = host.run_unit(&options);\n'], ['packages/execution/engine/src/seeded/run.rs', 'run_unit_result(&o, &h);\n'], ['src/runner/seeded.mjs', 'export async function runUnit(options) {}\n']]) {
+    assert.equal(doorHits(row, file, text).length, 1, text);
+  }
+  for (const file of ['apps/fgos/src/wiring/run.rs', 'apps/fgos/src/wiring/execution_routes.rs', 'apps/fgos/src/wiring/dispatch_subs/probes.rs', 'apps/fgos/src/wiring/unit_run_host/host.rs', 'packages/execution/engine/src/unit_run/run.rs']) {
+    assert.deepEqual(doorHits(row, file, 'let out = host.run_unit(&options);\n'), [], file);
+  }
+  for (const text of ['export const runUnit = async (options) => {};\n', 'export { runUnit };\n', 'export { helper, runUnit as run };\n']) {
+    assert.equal(doorHits(row, 'src/runner/seeded.mjs', text).length, 1, text);
+  }
+  assert.deepEqual(doorHits(row, 'src/native/seeded.mjs', 'export { runUnitInHost };\n'), [], 'the seam export is not a run loop');
+  assert.deepEqual(doorHits(row, 'src/runner/seeded.mjs', 'await runUnitInHost(request);\n'), [], 'the seam call is the seam row\'s');
+  assert.deepEqual(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', '// host.run_unit(&options)\n'), []);
+});
+
+test('door check: case admission crosses processes only through the peer adapter, the host ends that open it and the Node server', () => {
+  const row = execRow('case admission crosses the process boundary only through the peer protocol');
+  for (const [file, text] of [
+    ['apps/fgos/src/wiring/seeded.rs', 'let ch = PeerChannel::over_child(&mut child, d);\n'],
+    ['apps/fgos/src/wiring/seeded.rs', 'impl CaseAdmission for Wire {}\n'],
+    ['packages/execution/engine/src/seeded.rs', 'const P: &str = "\\u{1e}FGOS-ADMISSION-PEER ";\n'],
+    ['src/workflow/seeded.mjs', "await serveAdmissionPeer(port, process.stdin, process.stdout);\n"],
+    ['src/workflow/seeded.mjs', "const PREFIX = '\\u001eFGOS-ADMISSION-PEER ';\n"],
+  ]) assert.equal(doorHits(row, file, text).length, 1, `${file}: ${text}`);
+  assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'impl<P: Port> CaseAdmission for Wire<P> {}\n').length, 1, 'a generic adapter');
+  assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'const PEER: &str = "src/workflow/admission-peer.mjs";\n').length, 1, 'a second spawn of the peer module');
+  assert.deepEqual(doorHits(row, 'apps/fgos/src/wiring/run.rs', 'const PEER_MODULE: &str = "src/workflow/admission-peer.mjs";\n'), []);
+  assert.deepEqual(doorHits(row, 'packages/execution/engine/src/unit_run/peer.rs', 'impl CaseAdmission for PeerAdmission {}\n'), []);
+  assert.deepEqual(doorHits(row, 'apps/fgos/src/wiring/run.rs', 'let ch = PeerChannel::over_child(&mut child, d);\n'), []);
+  assert.deepEqual(doorHits(row, 'apps/fgos/src/wiring/execution_routes.rs', 'PeerChannel::with_deadline(i, o, d)\n'), []);
+  assert.deepEqual(doorHits(row, 'src/workflow/admission-peer.mjs', "await serveAdmissionPeer(port, process.stdin, process.stdout);\n"), []);
+  assert.deepEqual(doorHits(row, 'src/workflow/seeded.mjs', "const port = createCaseAdmissionPort({ repoRoot });\n"), [], 'building the port in process is not a wire');
+});
+
+test('door check: a Node import past the Execution seam into the old Execution directories fails outside the named callers', () => {
+  const row = execRow('Node callers reach Execution only through its seam, never into the Node Execution closure');
+  assert.equal(row.retiredBy.startsWith('p-24xw2cwdvo'), true);
+  for (const text of ["import { bind } from '../runner/execution/bind.mjs';\n", "const m = await import('../../src/runner/dispatch/config.mjs');\n", "import { requestCancel } from '../run-supervisor/cancel-registry.mjs';\n"]) {
+    assert.equal(doorHits(row, 'src/verbs/seeded.mjs', text).length, 1, text);
+  }
+  assert.equal(doorHits(row, 'src/runner/seeded.mjs', "import { x } from './dispatch/plan.mjs';\n").length, 1, 'a sibling of the closure under src/runner');
+  assert.deepEqual(doorHits(row, 'src/runner/loop.mjs', "import { bind } from './execution/bind.mjs';\n"), []);
+  assert.deepEqual(doorHits(row, 'src/runner/dispatch/seeded.mjs', "import { x } from '../../run-supervisor/client.mjs';\n"), [], 'inside the closure');
+  assert.deepEqual(doorHits(row, 'src/verbs/seeded.mjs', "import { x } from '../native/execution-door.mjs';\n"), [], 'the seam itself');
+});
+
+test('door check: a new importer of the Execution seam or a second spawn of its host route fails; each named caller passes', () => {
+  const row = execRow("Execution's Node seam");
+  for (const e of row.allowed) assert.match(e.reason, /^(S6b|S7|p-24xw2cwdvo|plan 261122-0118|doctor row|the seam itself|the Node bind facade)/, `${e.path} names its owner step`);
+  for (const text of ["import { runUnitInHost } from '../native/execution-door.mjs';\n", "const door = await import('../../native/execution-door.mjs');\n", "spawn(bin, ['internal', 'execution', op]);\n"]) {
+    assert.equal(doorHits(row, 'src/verbs/seeded.mjs', text).length, 1, text);
+  }
+  assert.deepEqual(doorHits(row, 'src/workflow/runner.mjs', "import { runUnitInHost } from '../native/execution-door.mjs';\n"), []);
+  assert.deepEqual(doorHits(row, 'src/runner/work-dispatch.mjs', "import { runUnitInHost } from '../native/execution-door.mjs';\n"), []);
+  assert.deepEqual(doorHits(row, 'src/verbs/seeded.mjs', "// see src/native/execution-door.mjs\n"), []);
 });
 
 // ─── The doctor registry's bridged entries (packages/distribution/contracts/doctor-registry.v1.json) ───────────────
@@ -2076,10 +2160,14 @@ function doctorRegistryEntries() {
   return entries;
 }
 
-test('doctor registry: every bridged row and fix is labelled no earlier than the layers it reads, and every layer is a file', () => {
+test('doctor registry: every bridged row and fix is labelled no earlier than the layers it reads, and every layer is a file some row reads', () => {
   const entries = doctorRegistryEntries();
   assert.ok(entries.some((entry) => entry.owner.startsWith('bridge:')), 'the registry gives no row to the bridge');
   assert.deepEqual(bridgeFailures(entries.filter((entry) => entry.kind === 'row'), DOCTOR_REGISTRY.layers, (module) => fs.existsSync(path.join(root, module))), []);
+  const read = new Set(entries.flatMap((entry) => entry.judge ?? []));
+  assert.deepEqual(Object.keys(DOCTOR_REGISTRY.layers).filter((module) => !read.has(module)), [], 'a layer no row or fix reads is stale: drop it from layers');
+  assert.deepEqual(Object.entries(DOCTOR_REGISTRY.layers).filter(([, step]) => step === 'S6a').map(([module]) => module), [], 'the Execution step has landed: no layer may wait for it');
+  assert.deepEqual(entries.filter((entry) => entry.owner === 'bridge:S6a').map((entry) => entry.id), [], 'the Execution step has landed: no row or fix may be bridged to it');
 });
 
 test('doctor registry: a label before a layer, a layer with no step, a row with neither judge nor note and an unknown step each fail by name', () => {

@@ -204,7 +204,7 @@
           "reason": "the wire-agents description names the settings it never sets"
         }
       ],
-      "retiredBy": "S5 and S6a: the agy sub-HOME rows and the agent CLI trust row leave Node, and the settings reader with them",
+      "retiredBy": "S7: the wire-agents help text in src/cli/command-registry.mjs retires with the Node payload",
       "reason": "fgOS changes a person's own agent config only through the opt-in wire-agents verb (RUL111); init and doctor --fix write only the project and ~/.fgos. The patterns catch the backup suffix, the claude plugin calls and the agy permission setting that only that verb applies"
     },
     {
@@ -404,7 +404,7 @@
           "reason": "twin: the run-result doctor scan walks the assignment tree with its own symlink and depth barriers (walk_assignments, scan_assignment_runs); fgos-run-result sits below the engine and cannot ask assignment/layout.rs until the walk moves to a crate both can use"
         }
       ],
-      "retiredBy": "the runner's layouts move to Rust",
+      "retiredBy": "p-24xw2cwdvo for the two Node listers, which only the dead Node Execution closure imports; the host's run_dirs.rs and the fgos-run-result walk move onto fgos-execution's assignment layout (packages/execution/rust/src/assignment_layout.rs), the owner of the walk, once fgos-run-result can depend on it",
       "reason": "the lock report needs the run directories the runner lays out, one layer above the lock crate; until the layouts move the host lists them with a twin of each Node lister, pinned by one fixture"
     },
     {
@@ -588,7 +588,7 @@
         { "path": "packages/holder-lock/rust/src/borrow_vectors.rs", "reason": "a vector module compiled into the crate whose shell snippet reads /proc/$!/winpid to learn a Windows pid" },
         { "path": "scripts/lib/mailbox-live-confined.mjs", "reason": "frozen V7n measurement module; moves onto the process door when V7n is re-measured (MAIL)" }
       ],
-      "retiredBy": "the Node socket-table read and the bwrap probe arguments go when the run-supervisor directory and the confinement probes move to Rust",
+      "retiredBy": "p-24xw2cwdvo: the run-supervisor directory and the confinement probes run in Rust; their Node copies are reached only by the dead Node Execution closure and the mailbox live scripts, and go with them",
       "reason": "only fgos-process judges a process; holder-lock reads fdinfo for lock holders, the Git WAL names an open file, and bwrap arguments are not reads of process facts"
     },
     {
@@ -786,7 +786,7 @@
       ],
       "debt": [],
       "retiredBy": "S7: the Node twin retires with the last Node verb",
-      "reason": "the fault record has a Rust writer for the host and a Node writer for the Node CLI, which must also record a missing host; one vector file (test/rust-host/fixtures/invocation-fault-vectors.json) is read by both. The capped append has the same two owners (two other Node callers, approve-fault-log and provider-capacity, move with S7 and S6a). Known gap kept visible: the Node writer does not redact `message` (an unknown-flag message quotes the typed token, value included), which the Rust writer does"
+      "reason": "the fault record has a Rust writer for the host and a Node writer for the Node CLI, which must also record a missing host; one vector file (test/rust-host/fixtures/invocation-fault-vectors.json) is read by both. The capped append has the same two owners (two other Node callers: approve-fault-log moves with S7, and provider-capacity goes with the dead Node Execution closure, p-24xw2cwdvo). Known gap kept visible: the Node writer does not redact `message` (an unknown-flag message quotes the typed token, value included), which the Rust writer does"
     },
     {
       "job": "classify a failed Event Store child",
@@ -917,7 +917,7 @@
         { "path": "apps/fgos/src/wiring/agents.rs", "reason": "the host adapter reads the tier directories beneath the project and the payload and hands the files to the listing in the execution crate" }
       ],
       "debt": [],
-      "retiredBy": "S6a: the doctor row agent-type-names-unique moves to Rust and the Node listing is deleted",
+      "retiredBy": "S7: src/runner/agent-definitions.mjs retires when its last importers (the session head start, the agent roster and scripts/project-agents.mjs) read the tiers through the host",
       "reason": "one module knows the tier directories and their order"
     },
     {
@@ -1037,7 +1037,7 @@
       "reason": "the first-prefer chooser and the string-only reverse prefer match were a second executor chooser beside Seat Binding"
     },
     {
-      "job": "tool lookup by capability: ask toolProvidersOf in src/runner/dispatch/tool-providers.mjs (or fgos dispatch decide --for)",
+      "job": "tool lookup by capability: ask fgos dispatch decide --for (packages/execution/rust/src/tools.rs)",
       "kind": "door",
       "patterns": [
         "(?<!\\b(?:flags|opts|Symbol)\\??)\\.for\\b(?!\\s*\\\\?\\()",
@@ -1057,11 +1057,11 @@
       "debt": [
         {
           "path": "src/runner/dispatch/tool-providers.mjs",
-          "reason": "twin of tools.rs for what Node launch code still reads (the unserved-ability check, the presence probe); same cases as the crate's tests"
+          "reason": "twin of tools.rs left in the dead Node Execution closure (the unserved-ability check, the presence probe): no product code imports it since launch runs in the host; same cases as the crate's tests"
         }
       ],
-      "retiredBy": "S6a: launch stops reading the tool providers in Node",
-      "reason": "the one reader of an executor's for list and the one presence and staleness probe, so doctor and decide cannot disagree about a tool: packages/execution/rust/src/tools.rs is that owner for decide, explain and the doctor row, and src/runner/dispatch/tool-providers.mjs keeps only what Node launch code still reads, as debt"
+      "retiredBy": "p-24xw2cwdvo: the Node twin goes with the dead Node Execution closure",
+      "reason": "the one reader of an executor's for list and the one presence and staleness probe, so doctor and decide cannot disagree about a tool: packages/execution/rust/src/tools.rs is that owner for decide, explain and the doctor row, and src/runner/dispatch/tool-providers.mjs is a dead twin kept as debt until the dead Node closure is deleted"
     },
     {
       "job": "the old tool registry and its status overlay are gone: ask fgos dispatch decide --for <capability>",
@@ -1126,6 +1126,357 @@
       "reason": "the addon reads the unit-run helpers from fgos-execution and the run supervisor's lease part only (plan decision P3): linking fgos-execution-engine would pull the terminal, session-host, secret and SQLite stores into the Node process and, by feature unification, the whole supervisor. test/architecture.test.mjs also refuses the dependency in packages/git/node-addon/Cargo.toml"
     },
     {
+      "job": "run a unit",
+      "kind": "door",
+      "patterns": [
+        "\\brun_unit(?:_result)?\\(",
+        "export (?:async )?function runUnit\\b",
+        "export\\s+(?:const|let|var)\\s+runUnit\\b",
+        "export\\s*\\{[^}]*\\brunUnit\\b[^}]*\\}"
+      ],
+      "allowed": [
+        {
+          "path": "packages/execution/engine/src/unit_run/**",
+          "reason": "the run loop: admission, seats, rounds, verify, commit and settle of one Unit"
+        },
+        {
+          "path": "apps/fgos/src/wiring/unit_run_host/host.rs",
+          "reason": "the host's one call of the engine's run_unit, with the machine ports injected"
+        },
+        {
+          "path": "apps/fgos/src/wiring/run.rs",
+          "reason": "fgos run: builds the Unit from argv and asks the host"
+        },
+        {
+          "path": "apps/fgos/src/wiring/execution_routes.rs",
+          "reason": "the run-unit route Workflow and Work reach through src/native/execution-door.mjs"
+        },
+        {
+          "path": "apps/fgos/src/wiring/dispatch_subs/probes.rs",
+          "reason": "fgos dispatch probe-session runs its probe as one Unit through the same host"
+        }
+      ],
+      "debt": [],
+      "reason": "one Rust door runs a Unit end to end (fgos-execution-engine unit_run); the host composes it once and every caller (fgos run, the run-unit route, the session probe) asks that composition. A second run loop, or a Node runUnit, must be declared"
+    },
+    {
+      "job": "case admission crosses the process boundary only through the peer protocol",
+      "kind": "door",
+      "patterns": [
+        "FGOS-ADMISSION-PEER",
+        "\\bserveAdmissionPeer\\b",
+        "PeerChannel::(?:new|with_deadline|over_child|over_stdio)\\b",
+        "\\bimpl\\s*(?:<[^>]*>)?\\s*CaseAdmission\\s+for\\b",
+        "admission-peer\\.mjs"
+      ],
+      "allowed": [
+        {
+          "path": "packages/execution/engine/src/unit_run/peer.rs",
+          "reason": "the one Rust adapter of CaseAdmission over a framed (reader, writer) pair, and the frame prefix"
+        },
+        {
+          "path": "apps/fgos/src/wiring/run.rs",
+          "reason": "standalone fgos run starts the admission peer on its first ask and talks to it over the peer's stdin and stdout"
+        },
+        {
+          "path": "apps/fgos/src/wiring/execution_routes.rs",
+          "reason": "the run-unit route opens the channel on its own stdin and stdout, to the Node parent that serves the port"
+        },
+        {
+          "path": "src/native/execution-door.mjs",
+          "reason": "the one Node server of the protocol, for both directions"
+        },
+        {
+          "path": "src/workflow/admission-peer.mjs",
+          "reason": "the payload module the host starts; serves the Workflow port through the door"
+        }
+      ],
+      "debt": [],
+      "retiredBy": "S6b: Workflow admission moves to Rust and the peer entry goes",
+      "reason": "Workflow's case admission is asked across the host and Node only over pipes, with prefixed JSON lines and one protocol number (packages/execution/contracts/admission-peer/admission-peer.v1.json): one Rust adapter, one Node server, no inherited descriptor above 2 (plan decision P13). A second wire, frame prefix or CaseAdmission adapter must be declared"
+    },
+    {
+      "job": "Execution's Node seam",
+      "kind": "door",
+      "patterns": [
+        "(?:from\\s+|import\\(\\s*)['\"][^'\"]*execution-door\\.mjs['\"]",
+        "'internal',\\s*'execution'"
+      ],
+      "allowed": [
+        {
+          "path": "src/native/execution-door.mjs",
+          "reason": "the seam itself: spawns `fgos internal execution <op> --protocol 1` and carries the addon `execution` namespace under its Node names"
+        },
+        {
+          "path": "src/workflow/admission-peer.mjs",
+          "reason": "S6b: the admission peer payload module the host starts for a standalone `fgos run`; serves the case admission port over the peer protocol"
+        },
+        {
+          "path": "src/workflow/case-admission-port.mjs",
+          "reason": "S6b: imports isCaseId, runDirOf, seatKeyOf, isVerdict, currentDispatchDepth, executionVocabulary"
+        },
+        {
+          "path": "src/workflow/case-bindings.mjs",
+          "reason": "S6b: imports custodyHeld, worktreeKey, runsRoot, currentDispatchDepth"
+        },
+        {
+          "path": "src/workflow/case-close.mjs",
+          "reason": "S6b: imports RunnerConfigError, isCaseId, runDirOf, runsRoot, judgeUnitRun, removeUnitRun"
+        },
+        {
+          "path": "src/workflow/case-frame.mjs",
+          "reason": "S6b: imports RunnerConfigError"
+        },
+        {
+          "path": "src/workflow/case-gate.mjs",
+          "reason": "S6b: imports executionOp, loadRunnerConfigForDir, verifyCommandOf, verifySeatResult and the refusal classes"
+        },
+        {
+          "path": "src/workflow/case-inherit.mjs",
+          "reason": "S6b: imports RunnerConfigError, runsRoot"
+        },
+        {
+          "path": "src/workflow/case-lock.mjs",
+          "reason": "S6b: imports RunnerConfigError, runDirOf"
+        },
+        {
+          "path": "src/workflow/case-projection.mjs",
+          "reason": "S6b: imports executionVocabulary"
+        },
+        {
+          "path": "src/workflow/case-runtime.mjs",
+          "reason": "S6b: imports custodyHeld, unitRunFacts, releasedUnitRunSettle, gateAnswerFile, runDirOf"
+        },
+        {
+          "path": "src/workflow/case-start.mjs",
+          "reason": "S6b: imports loadRunnerConfigForDir, snapshotRunnerConfig, resolveCollaboration, providerAccountInventory, shippedCatalog and the run option parsers"
+        },
+        {
+          "path": "src/workflow/case-verbs.mjs",
+          "reason": "S6b: imports RunnerConfigError, runDirOf, currentDispatchDepth"
+        },
+        {
+          "path": "src/workflow/checked.mjs",
+          "reason": "S6b: imports checkDeclaredSeats, assertNoSeatTier, assertNoUnitTier, executionVocabulary"
+        },
+        {
+          "path": "src/workflow/legacy-ledger-read.mjs",
+          "reason": "S6b: imports infrastructure"
+        },
+        {
+          "path": "src/workflow/loader.mjs",
+          "reason": "S6b: imports RunnerConfigError"
+        },
+        {
+          "path": "src/workflow/propose-classify.mjs",
+          "reason": "S6b: imports RunnerConfigError"
+        },
+        {
+          "path": "src/workflow/propose-frame.mjs",
+          "reason": "S6b: imports resolveCollaboration"
+        },
+        {
+          "path": "src/workflow/propose.mjs",
+          "reason": "S6b: imports RunnerConfigError, loadRunnerConfigForDir, shippedCatalog"
+        },
+        {
+          "path": "src/workflow/propose-validate.mjs",
+          "reason": "S6b: imports unservedToolAbilitiesOf"
+        },
+        {
+          "path": "src/workflow/ref-digests.mjs",
+          "reason": "S6b: imports seatKeyOf, reportDigest"
+        },
+        {
+          "path": "src/workflow/runner.mjs",
+          "reason": "S6b: imports runUnitInHost (each step) and the refusal classes"
+        },
+        {
+          "path": "src/workflow/seat-providers.mjs",
+          "reason": "S6b: imports seatKeyOf, legacyFamilyOf"
+        },
+        {
+          "path": "src/workflow/seats.mjs",
+          "reason": "S6b: imports RunnerConfigError"
+        },
+        {
+          "path": "src/workflow/store.mjs",
+          "reason": "S6b: imports RunnerConfigError, runDirOf, runsRoot"
+        },
+        {
+          "path": "src/workflow/unit-handoff.mjs",
+          "reason": "S6b: imports unitRunFacts, handoffRef, reportDigest, foldRunSetting, executionVocabulary"
+        },
+        {
+          "path": "src/workflow/units-source.mjs",
+          "reason": "S6b: imports RunnerConfigError, validateUnit, assertNoUnitTier"
+        },
+        {
+          "path": "bin/fgos-runner.mjs",
+          "reason": "S7: the Work runner entry loads the runner config"
+        },
+        {
+          "path": "src/runner/fanout-batch.mjs",
+          "reason": "S7: Work fanout runs each worker through runUnitInHost"
+        },
+        {
+          "path": "src/runner/loop.mjs",
+          "reason": "S7: the Work runner loop asks executionOp and runOutcome"
+        },
+        {
+          "path": "src/runner/operation-choice.mjs",
+          "reason": "S7: a Work operation runs through runUnitInHost"
+        },
+        {
+          "path": "src/runner/work-compat.mjs",
+          "reason": "S7: Work's capability hints"
+        },
+        {
+          "path": "src/runner/work-dispatch.mjs",
+          "reason": "S7: a Work dispatch runs through runUnitInHost"
+        },
+        {
+          "path": "src/verbs/state/read.mjs",
+          "reason": "S7: the Work read verb asks executionOp"
+        },
+        {
+          "path": "src/report/capability-plan-lint.mjs",
+          "reason": "S7: the Work plan lint reads the unit validation and the unserved tool abilities"
+        },
+        {
+          "path": "src/git/inspect.mjs",
+          "reason": "S7: a Node verb that names the runner config error class"
+        },
+        {
+          "path": "src/cli/verb-exit.mjs",
+          "reason": "S7: the Node verb exit table reads the outcome exit codes"
+        },
+        {
+          "path": "bin/fgos.mjs",
+          "reason": "S7: the Node payload loads the runner config for its remaining verbs"
+        },
+        {
+          "path": "src/runner/agent-definitions.mjs",
+          "reason": "S7: the Node agent definition reader names the runner config error class"
+        },
+        {
+          "path": "src/session-host/head-start.mjs",
+          "reason": "S7: the session head start launches its session through launchSessionInHost"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-layout.mjs",
+          "reason": "plan 261122-0118 tail: a facade for the session-host callers (head request), removed when they import the door"
+        },
+        {
+          "path": "src/runner/dispatch/config.mjs",
+          "reason": "plan 261122-0118 tail: a facade for the session-host callers (head start), removed when they import the door"
+        },
+        {
+          "path": "src/runner/dispatch/confinement/authority.mjs",
+          "reason": "plan 261122-0118 tail: a facade for the session rotation, removed when it imports the door"
+        },
+        {
+          "path": "src/runner/execution/unit-run-record.mjs",
+          "reason": "plan 261122-0118 tail: a facade for the head request, removed when it imports the door"
+        },
+        {
+          "path": "src/runner/execution/unit-summary.mjs",
+          "reason": "plan 261122-0118 tail: a facade for the head request, removed when it imports the door"
+        },
+        {
+          "path": "src/runner/execution/bind.mjs",
+          "reason": "the Node bind facade (its own row names its callers) reads the runner config error class"
+        },
+        {
+          "path": "src/setup/doctor-bridge.mjs",
+          "reason": "doctor row: the Node rows bridge loads the door for the bridged rows (S6b, S7)"
+        },
+        {
+          "path": "src/setup/registrations.mjs",
+          "reason": "doctor row: the bodies of the bridged rows (S6b, S7) read the runner config rules"
+        },
+        {
+          "path": "src/setup/seat-binding-checks.mjs",
+          "reason": "doctor row seat-binding-dry-bind, bridge:S6b"
+        },
+        {
+          "path": "src/runner/dispatch/runner-config-error.mjs",
+          "reason": "p-24xw2cwdvo: dead re-export of the runner config error class; only the dead Node closure and tests import it"
+        },
+        {
+          "path": "src/runner/dispatch/session-attempt.mjs",
+          "reason": "p-24xw2cwdvo: dead Node session attempt (the host launches head sessions); only tests import it"
+        }
+      ],
+      "debt": [],
+      "retiredBy": "S6b for the Workflow callers, S7 for the Work callers; the session-host facades with the tail of plan 261122-0118, the doctor rows with their bridge steps, and the dead Node closure with p-24xw2cwdvo",
+      "reason": "Node above tier 5 reaches Execution only through src/native/execution-door.mjs: host routes over stdin and stdout for long or effectful operations, the addon execution namespace for reads (plan decisions P4, P14). Every importer is named with the step that retires it, so a new Node caller of Execution is a decision, not an accident"
+    },
+    {
+      "job": "Node callers reach Execution only through its seam, never into the Node Execution closure",
+      "kind": "door",
+      "patterns": [
+        "(?:from\\s+|import\\(\\s*)['\"](?:[^'\"]*(?:runner/(?:dispatch|execution)|run-supervisor)/|\\./(?:dispatch|execution)/)[^'\"]*['\"]"
+      ],
+      "allowed": [
+        {
+          "path": "src/runner/dispatch/**",
+          "reason": "the Node closure itself; its live files are facades or twins, the rest is dead code (p-24xw2cwdvo)"
+        },
+        {
+          "path": "src/runner/execution/**",
+          "reason": "the Node closure itself; its live files are facades, the bind facade or twins, the rest is dead code (p-24xw2cwdvo)"
+        },
+        {
+          "path": "src/session-host/head-start.mjs",
+          "reason": "S7: the session head start reads the assignment layout and the runner config through their facades and binds through the bind facade"
+        },
+        {
+          "path": "src/session-host/head-request.mjs",
+          "reason": "plan 261122-0118 tail: the head request reads the assignment layout, the write scope, the unit summary and the unit-run facts through facades"
+        },
+        {
+          "path": "src/session-host/head-stop.mjs",
+          "reason": "plan 261122-0118 tail: head stop asks the Node cancel registry until it awaits the host cancel op"
+        },
+        {
+          "path": "src/session-rotation/rotate.mjs",
+          "reason": "plan 261122-0118 tail: rotation reads the assignment layout and the seat session folder through facades and asks the Node cancel registry"
+        },
+        {
+          "path": "src/setup/seat-binding-checks.mjs",
+          "reason": "doctor row seat-binding-dry-bind, bridge:S6b: binds through the bind facade"
+        },
+        {
+          "path": "src/setup/blind-steps-proven-pools.mjs",
+          "reason": "doctor row blind-steps-use-proven-pools, bridge:S6b: explains a seat through the bind facade"
+        },
+        {
+          "path": "src/runner/loop.mjs",
+          "reason": "S7: the Work runner loop binds each Work item's seat through the bind facade"
+        },
+        {
+          "path": "src/workflow/definition.mjs",
+          "reason": "S6b: the Workflow twins of write-scope, run-timeout and outcome"
+        },
+        {
+          "path": "domains/coding/harness/enrich-and-validate-contract.mjs",
+          "reason": "names the runner config error class through its dead re-export; moves to the seam with p-24xw2cwdvo"
+        },
+        {
+          "path": "scripts/lib/mailbox-live-confined.mjs",
+          "reason": "frozen mailbox live measurement module; reads the Node confinement driver (p-24xw2cwdvo)"
+        },
+        {
+          "path": "scripts/record-mailbox-hook-fixtures.mjs",
+          "reason": "mailbox fixture recorder; boots a worker session through the Node closure (p-24xw2cwdvo)"
+        }
+      ],
+      "debt": [],
+      "retiredBy": "p-24xw2cwdvo: the dead closure goes, its facades and twins with the session-host tail of plan 261122-0118, S6b and S7",
+      "reason": "src/native/execution-door.mjs is Execution's one Node seam; a Node file outside the old Execution directories that imports into them reaches past it, into facades, twins or dead code. Every such importer is named with the step that removes it, so a new one is a decision, not an accident"
+    },
+    {
       "job": "the Node bind facade has only its named callers",
       "kind": "door",
       "patterns": [
@@ -1137,19 +1488,19 @@
       "allowed": [
         {
           "path": "src/runner/dispatch/plan.mjs",
-          "reason": "S6a: dispatch plan asks bind for the Work seat and the route for the purpose seats"
+          "reason": "p-24xw2cwdvo: dead Node dispatch plan (only the dead assignment runner and tests import it); it asked bind for the Work seat"
         },
         {
           "path": "src/runner/dispatch/assignment-runner.mjs",
-          "reason": "S6a: the assignment runner binds each round's seat and asks the replay digest"
+          "reason": "p-24xw2cwdvo: dead Node assignment runner (the host runs every round); it bound each round's seat"
         },
         {
           "path": "src/runner/execution/account-rotation.mjs",
-          "reason": "S6a: account rotation compares binding identities"
+          "reason": "p-24xw2cwdvo: dead Node account rotation (only the dead assignment runner imports it); it compared binding identities"
         },
         {
           "path": "src/session-host/head-start.mjs",
-          "reason": "S6a: the session head start binds its seat"
+          "reason": "S7: the session head start binds its seat until head start runs in the host"
         },
         {
           "path": "src/runner/loop.mjs",
@@ -1165,7 +1516,7 @@
         }
       ],
       "debt": [],
-      "retiredBy": "S6a, S7: each caller moves with its step and asks the Rust bind directly; the facade goes with the last one",
+      "retiredBy": "p-24xw2cwdvo for the dead dispatch callers, S6b for the two doctor rows, S7 for the Work loop and the session head start: each caller moves with its step and asks the Rust bind directly; the facade goes with the last one",
       "reason": "src/runner/execution/bind.mjs is the Node client of the Rust bind (host route protocol 2). Its callers are exactly these files, each named with the step that retires it; a new importer fails here, so a new Node caller of Seat Binding is a decision, not an accident"
     },
     {
@@ -1243,8 +1594,8 @@
           "reason": "twin, same vectors as the contract: the agent-type-names-unique row is judged in Rust; listAgents stays only for the vector recorder (scripts/agents-vectors.mjs), its replay test and the npm test judgement of the release source tiers (test/setup/packaged-definitions.test.mjs)"
         }
       ],
-      "retiredBy": "S6a",
-      "reason": "the facts about an executor (its family, lookup, confinement, credential store, effort levels, posture, account inventory, config shape) are derived once, in the fgos-execution crate, over executor-model.v1.json and its vectors. Node launch code still needs the same derivations until S6a moves launch; each Node definition is a declared twin proven on the same vectors, owned by S6a (launch code, confinement, account state, the agents vector recorder)"
+      "retiredBy": "p-24xw2cwdvo: every remaining Node twin is reached only by the dead Node Execution closure and the mailbox live scripts (src/runner/capability-config.mjs keeps product importers, but its capabilityConfinementOf is called only from that closure); they go together",
+      "reason": "the facts about an executor (its family, lookup, confinement, credential store, effort levels, posture, account inventory, config shape) are derived once, in the fgos-execution crate, over executor-model.v1.json and its vectors. launch runs in the host since S6a; each Node definition left is a declared twin proven on the same vectors, kept only until the dead Node Execution closure is deleted"
     },
     {
       "job": "decide a dispatch",
@@ -1262,11 +1613,11 @@
       "debt": [
         {
           "path": "src/runner/dispatch/plan.mjs",
-          "reason": "bind-free selectors for launch and fanout, same vectors; the purpose seat asks the host route"
+          "reason": "dead twin: bind-free selectors on the same vectors, imported only by the dead Node assignment runner and tests since launch and fanout run in the host"
         }
       ],
-      "retiredBy": "S6a",
-      "reason": "fgos dispatch decide, explain and the hook are native over packages/execution/rust/src/decide.rs. Node launch and fanout still compile a plan for the selectors that bind no seat (executor id, assignment, Work hint) in src/runner/dispatch/plan.mjs, a twin on the same vectors owned by S6a"
+      "retiredBy": "p-24xw2cwdvo: the dead Node twin goes with the dead Node Execution closure",
+      "reason": "fgos dispatch decide, explain and the hook are native over packages/execution/rust/src/decide.rs. launch and fanout compile their plan in the host since S6a; src/runner/dispatch/plan.mjs is a dead twin on the same vectors for the selectors that bind no seat (executor id, assignment, Work hint)"
     },
     {
       "job": "execution doctor judgments",
@@ -1281,11 +1632,11 @@
       "debt": [
         {
           "path": "src/setup/agy-permissions.mjs",
-          "reason": "findAgySubHomes is a twin of find_sub_homes in checks.rs: the person's agy permission check still reads the sub-HOMEs"
+          "reason": "findAgySubHomes is a twin of find_sub_homes in checks.rs in a file no product code imports any more (the agy permission check is judged in Rust)"
         }
       ],
-      "retiredBy": "S6a: the agy permission check leaves Node and its sub-HOME reader with it",
-      "reason": "seven executor-model doctor rows (runner-generated-paths, executor-confinement, invocation-git-write-grants, capability-serves-valid, omp-natives-present, agy-sub-homes-configured, tool-registry-configured) are judged in process by the host over fgos-execution checks.rs (the host adapter apps/fgos/src/wiring/doctor/execution.rs only reads and wires them and defines none of these names; the executor, account, agent-definition and template rows are judged in checks.rs too), never by a Node body that asks the host back; the Node judge names are retired, and a second judge of the same row must be declared. seat-binding-route stays on the Node bridge (bridge:S6a) because it probes the binary the Node client runs"
+      "retiredBy": "p-24xw2cwdvo: the dead Node file goes with the dead Node closure",
+      "reason": "seven executor-model doctor rows (runner-generated-paths, executor-confinement, invocation-git-write-grants, capability-serves-valid, omp-natives-present, agy-sub-homes-configured, tool-registry-configured) are judged in process by the host over fgos-execution checks.rs (the host adapter apps/fgos/src/wiring/doctor/execution.rs only reads and wires them and defines none of these names; the executor, account, agent-definition and template rows are judged in checks.rs too), never by a Node body that asks the host back; the Node judge names are retired, and a second judge of the same row must be declared. seat-binding-route is judged in Rust too, by probing the route the Node client calls"
     },
     {
       "job": "capability rows hold jobs and tool abilities",
@@ -1480,7 +1831,7 @@
       "debt": [
         {
           "path": "src/setup/registrations.mjs",
-          "reason": "the bodies of the rows and fixes of the layers Node still owns, keyed by id (bridge:S6a, S6b, S7 in the registry); each step removes its own"
+          "reason": "the bodies of the rows and fixes of the layers Node still owns, keyed by id (bridge:S6b and bridge:S7 in the registry; S6a removed its own); each step removes its own"
         },
         {
           "path": "src/setup/checks.mjs",
