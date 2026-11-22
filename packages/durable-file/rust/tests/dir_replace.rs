@@ -31,7 +31,9 @@ fn names(dir: &Path) -> Vec<String> {
 fn a_replace_lands_in_the_held_directory_even_after_its_path_was_swapped_for_a_symlink() {
     let base = base("swap");
     let root = base.join("root");
-    let dir = open_dir_beneath(&root, Path::new("plans")).unwrap().unwrap();
+    let dir = open_dir_beneath(&root, Path::new("plans"))
+        .unwrap()
+        .unwrap();
     // A concurrent host process moves the directory away and puts a symlink in its place.
     fs::rename(root.join("plans"), root.join("plans.moved")).unwrap();
     symlink(base.join("outside"), root.join("plans")).unwrap();
