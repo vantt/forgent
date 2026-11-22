@@ -7,6 +7,7 @@ priority: P1
 blockedBy: []
 base: aa35c0664447f6d01d214911973c4d0246715e39
 footprint:
+  - apps/fgos/src/wiring/session_write_publish.rs
   - apps/fgos/src/wiring/supervision.rs
   - scripts/lib/git-one-door-declarations.v1.json
   - packages/run-supervisor/rust/src/attempt_step.rs
@@ -389,6 +390,8 @@ first). `blockedBy` stays empty because no phase here needs a result of either p
 
 ## Owner questions
 
+
+- **q-d5mrno2mfk: decided 2026-11-22 16:50 by lead:SUPERVISOR inside the approved frame**: the footprint takes `apps/fgos/src/wiring/session_write_publish.rs` for the phase 7 follow-up (owner-approved landed-worktree removal), as recommended.
 
 - **q-r5w6funyv5, q-qki26cwunf: decided 2026-11-22 15:55 by lead:SUPERVISOR inside the approved frame**: the footprint takes `scripts/lib/git-one-door-declarations.v1.json` (phase 5 route host declaration) and `apps/fgos/src/wiring/supervision.rs` (phase 7 follow-up, owner-approved landed-worktree removal), as each question recommended.
 
