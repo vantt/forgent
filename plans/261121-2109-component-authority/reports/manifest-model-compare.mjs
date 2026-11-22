@@ -31,8 +31,7 @@ const doorFiles = fs.readdirSync(doorsDir).filter((f) => f.endsWith('.json')).so
 const modelDoors = doorFiles.map((file) => JSON.parse(fs.readFileSync(path.join(doorsDir, file), 'utf8')));
 
 const reconstructed = {
-  contract: layersData.contract ?? 'architecture-manifest.v1',
-  map: 'docs/platform/architecture-map.md',
+  contract: layersData.contract,
   layers: layersData.layers,
   rules: layersData.rules,
   components: componentsData.filter((c) => c.id !== 'component-authority').map((c) => c.id),
@@ -90,7 +89,7 @@ function deepEqual(a, b, keyPath) {
 }
 
 // Compare top-level sections
-for (const key of ['contract', 'map', 'layers', 'rules', 'components', 'domains', 'tierNames', 'tiers', 'tierExceptions', 'files']) {
+for (const key of ['contract', 'layers', 'rules', 'components', 'domains', 'tierNames', 'tiers', 'tierExceptions', 'files']) {
   deepEqual(original[key], reconstructed[key], key);
 }
 
@@ -137,6 +136,7 @@ const summary = [
   'manifest-model-compare: 0 differences found.',
   `Verified against docs/architecture-manifest.json:`,
   `- contract: ${reconstructed.contract}`,
+  `- map: intentionally dropped (schema $defs/layers does not allow it)`,
   `- layers: ${reconstructed.layers.join(', ')}`,
   `- rules: ${reconstructed.rules.join(', ')}`,
   `- domains: ${reconstructed.domains.join(', ')}`,

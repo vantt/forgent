@@ -452,7 +452,7 @@ function scanMarkdownFiles(dir, containmentRoot = dir) {
  *   - allowedDomains: explicit array/set of allowed domain names (internal/test-only)
  */
 export function discoverKnownOwners(projectRoot, options = {}) {
-  const modelDir = options.modelDir ?? options.manifestPath ?? path.join(projectRoot, 'packages', 'component-authority', 'model');
+  const modelDir = options.modelDir ?? path.join(projectRoot, 'packages', 'component-authority', 'model');
   const owners = new Set(['core', 'platform']);
 
   const componentsPath = path.join(modelDir, 'components.json');
@@ -461,7 +461,7 @@ export function discoverKnownOwners(projectRoot, options = {}) {
       const components = JSON.parse(fs.readFileSync(componentsPath, 'utf8'));
       if (Array.isArray(components)) {
         for (const comp of components) {
-          const id = typeof comp === 'string' ? comp.trim() : (comp && typeof comp.id === 'string' ? comp.id.trim() : '');
+          const id = comp && typeof comp.id === 'string' ? comp.id.trim() : '';
           if (id) {
             owners.add(id);
           }
@@ -616,7 +616,7 @@ export function discoverInstructionSources(projectRoot, options = {}) {
       : new Set(options.knownOwners);
   } else {
     knownOwners = discoverKnownOwners(projectRoot, {
-      modelDir: options.modelDir ?? options.manifestPath,
+      modelDir: options.modelDir,
       allowedComponents: options.allowedComponents,
       allowedDomains: options.allowedDomains,
     });

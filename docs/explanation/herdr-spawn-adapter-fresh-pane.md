@@ -348,7 +348,7 @@ was deleted outright; an invocation missing `interactiveMode` now throws
 a named `invalid-config` `DispatchError` instead of silently falling
 through to a removed path. The two live-renderer scripts
 (`claude-stream-json.mjs`, `pi-agent-session.mjs`) were deleted along
-with their `packages/component-authority/model/` entries — dead code the
+with their `docs/architecture-manifest.json` entries — dead code the
 moment `liveOutput` stopped existing. `test/runner/herdr-spawn-adapter.test.mjs`
 lost the plain-path (mocked + live) and `liveOutput`/renderer-format
 tests; every `interactiveMode` test (including `tsk-2rr`'s own) stayed,
