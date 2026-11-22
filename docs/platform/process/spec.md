@@ -47,7 +47,7 @@ Facts are almost never on the lock decision path any more (the kernel decides); 
 | `domain_is_empty`, `domain_kill_all` for a declared domain | The attempt, envelope and lock that use the containment port (run supervisor); the port itself is section 10 |
 | The OS-neutral `ProcessPlatform` trait and one driver per OS | mtime of anything; a boot time derived from a clock |
 
-The reconcile planner imports only the thin client `src/native/process-identity.mjs` and, through it, the door; the import-graph test (`test/runner/dispatch-reconciliation-import-graph.test.mjs`) pins that closure. The component-boundary entry is [Process Facts & Control (L0)](../component-boundary.md#4-current-high-level-components).
+The reconcile planner runs in the host (`packages/execution/engine/src/planning/reconciliation.rs`); it starts no process and reads lock holders through the run supervisor's controller. The component-boundary entry is [Process Facts & Control (L0)](../component-boundary.md#4-current-high-level-components).
 
 ## 3. Facts: the judge table
 

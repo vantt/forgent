@@ -295,9 +295,9 @@ Component-Outer Boundary Note's responsibilities.
 
 Forbidden dependencies for all eight:
 
-- no `Work` lifecycle mutation (`pick`, `return`, `claim`, `take`): enforced by boundary grep tests (`test/runner/dispatch-reconciliation-import-graph.test.mjs`). Work driving orchestration lives exclusively in Work Driver (`src/runner/loop.mjs`, `src/runner/fanout-batch.mjs`);
+- no `Work` lifecycle mutation (`pick`, `return`, `claim`, `take`): enforced by the A4 guard in `test/architecture.test.mjs`. Work driving orchestration lives exclusively in Work Driver (`src/runner/loop.mjs`, `src/runner/fanout-batch.mjs`);
 - no event store append (`appendEvent`): audit dispatch logging was isolated to `src/runner/dispatch-log.mjs` (deleted in 5cf4fd52f) outside dispatch core (module removed with `dispatch log`, decision 0062; `fgos run` records provenance under `.fgos/assignments/<unitRunId>/`);
-- no semantic Workflow/domain operation lookup in the strictly decoupled dispatch core. Work-layer lookups belong to `src/runner/work-compat.mjs` and `src/runner/operation-choice.mjs`; caller-derived hints enter the compiler. Historical compatibility re-exports and an `infra` manifest label are not current ownership proof. See boundary tests at `test/runner/dispatch-reconciliation-import-graph.test.mjs:434-443`.
+- no semantic Workflow/domain operation lookup in the strictly decoupled dispatch core. Work-layer lookups belong to `src/runner/work-compat.mjs` and `src/runner/operation-choice.mjs`; caller-derived hints enter the compiler. Historical compatibility re-exports and an `infra` manifest label are not current ownership proof. See the A4 guard in `test/architecture.test.mjs`.
 - no semantic operation choice;
 - no direct protocol/skill/domain executor launch;
 - no RunResult confidence decision (owned by the Run Result Evaluator);

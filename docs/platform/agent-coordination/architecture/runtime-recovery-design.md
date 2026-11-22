@@ -194,8 +194,8 @@ launch a replacement worker, close a session or advance a Workflow. Dormant
 session-ownership checks still refuse `resume-driver` for old session-owned
 Assignments; this is not a claim that the retired coordination door exists.
 
-Implementation evidence: `src/runner/dispatch/recovery-planner.mjs:118-173,
-243-316,319-361` and `src/verbs/dispatch/recover.mjs:95-132,266-408`.
+Implementation evidence: `packages/execution/engine/src/planning/recovery.rs` and
+`apps/fgos/src/wiring/dispatch_subs/recover.rs`.
 Read the [area portal](../README.md) and [runner spec](../../runner/spec.md)
 for the wider execution boundary; recovery here does not own Work lifecycle.
 
@@ -287,9 +287,9 @@ worker or execute the retired session `driver-replaced` continuation door.
 Evidence: `src/runner/dispatch/assignment-runner.mjs:2118` creates the random
 launch command; `src/runner/dispatch/confinement/authority.mjs:1608-1629`
 normalizes and persists its identity. Replacement authority is checked in
-`src/runner/dispatch/recovery-planner.mjs:160-171,204-212`; reassign records
+`packages/execution/engine/src/planning/recovery.rs`; reassign records
 the fenced epoch without launching a worker in
-`src/verbs/dispatch/recover.mjs:235-247,382-398`.
+`apps/fgos/src/wiring/dispatch_subs/recover.rs`.
 
 Operation-specific grants/effect policies must be supplied by their owner;
 no adapter may infer permission to duplicate external effects. Live-process
