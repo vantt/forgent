@@ -5,6 +5,8 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 
+use serde_json::Value;
+
 use super::apply::{
     apply_renewed_credential, judge_copy, select_provider_entry, ApplyOutcome, ApplyRequest,
     Verdict,
@@ -78,17 +80,143 @@ impl<'a> RefreshOptions<'a> {
     }
 }
 
+pub const RENEWAL_OWNER_FILE: &str = "renewal-owner.json";
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RenewalOwner {
+    pub seat: String,
+    pub last_renewed_at: String,
+}
+
+pub fn is_seat_ended(seat: &str) -> bool {
+    if seat == "fgOS refresh-ahead" || seat.ends_with(" (ended)") {
+        return false;
+    }
+    let p = Path::new(seat);
+    if p.is_absolute() {
+        if !p.exists() {
+            return true;
+        }
+        if p.join("closed.json").exists() || p.join("exit-code.json").exists() {
+            return true;
+        }
+    }
+    false
+}
+
+pub fn record_renewal_owner(account_dir: &Path, seat: &str, now: f64) -> std::io::Result<()> {
+    let res = write_file_atomic(
+        &account_dir.join(RENEWAL_OWNER_FILE),
+        &format!(
+            "{}\n",
+            serde_json::json!({
+                "seat": seat,
+                "lastRenewedAt": iso_from_ms(now),
+            })
+        ),
+    );
+    if let Err(ref e) = res {
+        eprintln!("fgos: failed to record renewal owner: {e}");
+    }
+    res
+}
+
+pub fn clear_renewal_owner(account_dir: &Path) {
+    let _ = fs::remove_file(account_dir.join(RENEWAL_OWNER_FILE));
+}
+
+pub fn read_renewal_owner(account_dir: &Path) -> Option<RenewalOwner> {
+    let file = account_dir.join(RENEWAL_OWNER_FILE);
+    let parsed = read_json_file(&file, false).ok()?;
+    let mut seat = parsed.doc.get("seat").and_then(Value::as_str)?.to_owned();
+    let last_renewed_at = parsed
+        .doc
+        .get("lastRenewedAt")
+        .and_then(Value::as_str)
+        .map(str::to_owned)
+        .or_else(|| {
+            parsed
+                .doc
+                .get("lastRenewedAt")
+                .and_then(Value::as_f64)
+                .map(iso_from_ms)
+        })?;
+    if is_seat_ended(&seat) {
+        seat = format!("{seat} (ended)");
+    }
+    Some(RenewalOwner {
+        seat,
+        last_renewed_at,
+    })
+}
+
+pub fn find_account_renewal_owner(
+    runtime_dir: &Path,
+    provider: &str,
+    account_id: &str,
+) -> Option<RenewalOwner> {
+    let account_dir = credential_store_dir(runtime_dir, provider, account_id, None)?;
+    let mut candidates = Vec::new();
+    if let Some(owner) = read_renewal_owner(&account_dir) {
+        candidates.push((account_dir.clone(), owner));
+    }
+    let stores_dir = account_dir.join("stores");
+    if let Ok(entries) = fs::read_dir(&stores_dir) {
+        let mut store_paths: Vec<PathBuf> = entries.flatten().map(|e| e.path()).collect();
+        store_paths.sort();
+        for path in store_paths {
+            if let Some(owner) = read_renewal_owner(&path) {
+                candidates.push((path, owner));
+            }
+        }
+    }
+    candidates.sort_by(|(p1, o1), (p2, o2)| {
+        o2.last_renewed_at
+            .cmp(&o1.last_renewed_at)
+            .then_with(|| p1.cmp(p2))
+    });
+    candidates.into_iter().next().map(|(_, owner)| owner)
+}
+
 /// `status` is `fresh`, `renewed`, `failed`, `cooldown` or `skipped`; `reason` is a fixed word. Never a credential.
 #[derive(Debug, Clone, PartialEq)]
 pub struct RefreshOutcome {
     pub status: &'static str,
     pub reason: String,
+    pub owner: Option<String>,
+    pub left_behind: Vec<(String, String)>,
+}
+
+impl RefreshOutcome {
+    pub fn note(&self) -> String {
+        crate::credentials::refresh_ahead_note_with_owner(
+            self.status,
+            Some(&self.reason),
+            self.owner.as_deref(),
+        )
+    }
 }
 
 fn outcome(status: &'static str, reason: impl Into<String>) -> RefreshOutcome {
     RefreshOutcome {
         status,
         reason: reason.into(),
+        owner: None,
+        left_behind: Vec::new(),
+    }
+}
+
+fn outcome_with_owner(
+    status: &'static str,
+    reason: impl Into<String>,
+    owner: Option<String>,
+) -> RefreshOutcome {
+    RefreshOutcome {
+        status,
+        reason: reason.into(),
+        owner,
+        left_behind: Vec::new(),
     }
 }
 
@@ -124,12 +252,12 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
         return outcome("skipped", "unsupported-layout");
     };
     let now = options.now;
-    let threshold = options
+    let base_threshold = options
         .threshold_ms
         .unwrap_or_else(|| default_refresh_ahead_threshold_ms(options.probe_timeout_ms as f64));
     let seat = options.seat_timeout_ms.filter(|t| t.is_finite());
-    let threshold = seat.map_or(threshold, |seat| {
-        threshold.max(seat + options.probe_timeout_ms as f64 + SEAT_RENEWAL_MARGIN_MS)
+    let threshold = seat.map_or(base_threshold, |seat| {
+        base_threshold.max(seat + options.probe_timeout_ms as f64 + SEAT_RENEWAL_MARGIN_MS)
     });
     // A seat that even a token issued at the end of one renewal call could not cover: renewing cannot admit it.
     let seat_outlives_any_token = seat
@@ -224,16 +352,26 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
             outcome("fresh", "outside-window")
         };
     }
-    // A running seat that shares the store's refresh token owns its renewal: the next refresh-ahead after the seat
-    // renewed takes its newer pair (take_live_seat_login).
-    if live_seat_shares_refresh(
-        layout,
-        &homes,
-        &entry.key,
-        entry.refresh.as_deref(),
-        options.sqlite,
-    ) {
-        return outcome("skipped", "live-seat-owns-renewal");
+    // A running seat that shares the store's refresh token owns its renewal only while the token has more than the
+    // base threshold_ms left; below that, fall through to the existing cooldown check and renew_in_scratch.
+    let sharing_seats: Vec<PathBuf> = homes
+        .iter()
+        .filter(|dir| {
+            seat_shares_refresh(
+                layout,
+                dir,
+                &entry.key,
+                entry.refresh.as_deref(),
+                options.sqlite,
+            )
+        })
+        .cloned()
+        .collect();
+    if !sharing_seats.is_empty() {
+        if entry.expires_ms - now() > base_threshold {
+            let owner = read_renewal_owner(&account_dir).map(|o| o.seat);
+            return outcome_with_owner("skipped", "live-seat-owns-renewal", owner);
+        }
     }
     // A renewal could not make this seat's life check pass, and every start would spend another one.
     if seat_outlives_any_token {
@@ -248,6 +386,7 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
         &home,
         &account_dir,
         &entry.key,
+        &sharing_seats,
         lock.as_ref(),
         options,
     )
@@ -290,6 +429,7 @@ fn renew_in_scratch(
     home: &Path,
     account_dir: &Path,
     key: &str,
+    sharing_seats: &[PathBuf],
     lock: &dyn AccountLockGuard,
     options: &RefreshOptions<'_>,
 ) -> RefreshOutcome {
@@ -394,8 +534,60 @@ fn renew_in_scratch(
             remove_all(&scratch);
             if matches!(other, ApplyOutcome::Applied(_)) {
                 clear_failure(account_dir);
+                let mut left_behind = Vec::new();
+                for seat_dir in sharing_seats {
+                    let seat_desc =
+                        crate::confinement::cleanup::read_attempt_home_record(seat_dir, None, None)
+                            .and_then(|r| {
+                                r.get("runDir").and_then(Value::as_str).map(str::to_owned)
+                            })
+                            .unwrap_or_else(|| seat_dir.to_string_lossy().into_owned());
+                    match layout.read(seat_dir, true, sqlite) {
+                        Ok(_) => {
+                            let apply_seat = ApplyRequest {
+                                layout_name: layout.name(),
+                                source_home: seat_dir,
+                                copy_home: home,
+                                provider: Some(request.provider),
+                                require_future: true,
+                                now: now(),
+                                sqlite,
+                            };
+                            match apply_renewed_credential(&apply_seat) {
+                                Ok(ApplyOutcome::Applied(_)) | Ok(ApplyOutcome::Unchanged) => {}
+                                Ok(ApplyOutcome::ApplyDeferred(code)) => {
+                                    left_behind.push((seat_desc, code));
+                                }
+                                Ok(ApplyOutcome::Unreadable(code)) => {
+                                    left_behind.push((seat_desc, code.to_string()));
+                                }
+                                Err(err) => {
+                                    left_behind.push((seat_desc, err));
+                                }
+                            }
+                        }
+                        Err(code) => {
+                            left_behind.push((seat_desc, code.to_string()));
+                        }
+                    }
+                }
+                let _ = record_renewal_owner(account_dir, "fgOS refresh-ahead", now());
                 report_lifetime_shortfall(layout, request.provider, home, renewed_at, sqlite);
-                return outcome("renewed", "applied");
+                let reason = if left_behind.is_empty() {
+                    "applied".to_string()
+                } else {
+                    let items: Vec<String> = left_behind
+                        .iter()
+                        .map(|(seat, code)| format!("{seat} ({code})"))
+                        .collect();
+                    format!("applied left-behind: {}", items.join(", "))
+                };
+                return RefreshOutcome {
+                    status: "renewed",
+                    reason,
+                    owner: Some("fgOS refresh-ahead".to_string()),
+                    left_behind,
+                };
             }
             let reason = if probe_ok {
                 "not-renewed"
@@ -511,6 +703,10 @@ fn take_live_seat_login(
     remove_all(&probe_home);
     if taken {
         clear_failure(account_dir);
+        let seat_desc = crate::confinement::cleanup::read_attempt_home_record(seat, None, None)
+            .and_then(|r| r.get("runDir").and_then(Value::as_str).map(str::to_owned))
+            .unwrap_or_else(|| seat.to_string_lossy().into_owned());
+        let _ = record_renewal_owner(account_dir, &seat_desc, now());
     }
     taken
 }
@@ -521,11 +717,9 @@ fn refresh_digest(refresh: Option<&str>) -> Option<[u8; 32]> {
     refresh.map(|r| Sha256::digest(r.as_bytes()).into())
 }
 
-/// Whether a running seat still holds the store's own refresh token for `key`: every seat starts on the store's pair,
-/// and the token is single use, so a renewal here would leave that seat with a spent token at its next refresh.
-fn live_seat_shares_refresh(
+fn seat_shares_refresh(
     layout: Layout,
-    homes: &[PathBuf],
+    dir: &Path,
     key: &str,
     refresh: Option<&str>,
     sqlite: &dyn SqliteAdapter,
@@ -533,14 +727,12 @@ fn live_seat_shares_refresh(
     let Some(own) = refresh_digest(refresh) else {
         return false;
     };
-    homes.iter().any(|dir| {
-        layout
-            .read(dir, true, sqlite)
-            .ok()
-            .and_then(|read| read.entries.into_iter().find(|e| e.key == key))
-            .and_then(|e| refresh_digest(e.refresh.as_deref()))
-            == Some(own)
-    })
+    layout
+        .read(dir, true, sqlite)
+        .ok()
+        .and_then(|read| read.entries.into_iter().find(|e| e.key == key))
+        .and_then(|e| refresh_digest(e.refresh.as_deref()))
+        == Some(own)
 }
 
 // ------------------------------------------------------------------------------------------ probe gate

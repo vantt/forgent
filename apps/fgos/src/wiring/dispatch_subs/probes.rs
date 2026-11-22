@@ -552,6 +552,16 @@ fn probe_one_account(
         "verdict": verdict,
         "results": results,
     });
+    if let Some(owner) = fgos_execution_engine::credentials::find_account_renewal_owner(
+        &accounts.runtime_dir,
+        &family,
+        account_id,
+    ) {
+        report["renewalOwner"] = json!({
+            "seat": owner.seat,
+            "lastRenewedAt": owner.last_renewed_at,
+        });
+    }
     if plan.record {
         let direct: Vec<Value> = direct_rows
             .iter()
