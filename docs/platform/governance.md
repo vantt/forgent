@@ -98,7 +98,6 @@ docs/
   storytelling-material/
 
   backlog.md
-  architecture-manifest.json
   doc-registry.md
   doc-registry.json
   enduser-docs-index.json

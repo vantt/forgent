@@ -20,8 +20,7 @@ and every prose reference to them:
 | `src/state/stage.mjs` | `src/state/stage-fsm.mjs` |
 
 Every real import site, the Iron Law self-modification rule and its test
-fixtures, and `docs/architecture-manifest.json`/`docs/architecture-map.md`'s
-file-map rows were updated to match.
+fixtures, and `docs/architecture-manifest.json`/`docs/architecture-map.md`'s file-map rows were updated to match (retired; last commit 00dddf7ae).
 
 ## Related, now-corrected naming drift
 

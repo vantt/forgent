@@ -14,8 +14,8 @@ fgOS's source is organized into five layers — entry, use-case, infra, domain,
 kernel — with one rule enforced by a real test rather than left as a diagram
 convention: a module may only import from its own layer or a deeper one, never
 from a shallower one. `kernel` is the deepest layer, importable by anyone;
-`entry` is the shallowest. `docs/architecture-manifest.json` records every
-module's layer, and a dedicated test enforces two things off that manifest:
+`entry` is the shallowest. `packages/component-authority/model/` records every
+module's layer, and a dedicated test enforces two things off that model:
 every `.mjs` file under `src/` and `bin/` has exactly one registered row (a
 one-to-one "đủ sổ" check), and no module's declared layer imports upward from
 one that ranks shallower.
@@ -61,7 +61,7 @@ predicted:
 > `src/report/enduser-index-generate.mjs`, added by `tsk-1m0` (commit
 > `70a88ff`) without registering it — fails both `architecture.test.mjs`
 > checks (file-manifest 1:1 sync and one-way-down import direction) on
-> `main` right now."
+> `main` right now." (retired; last commit 00dddf7ae)
 > — real item description, `tsk-1kh`
 
 Unlike a pure module (which always registers at `kernel`, the deepest
@@ -86,8 +86,7 @@ default drop to `kernel`.
 
 **Source:** the historical learning log (the dated entries below have no repository content commit at that path) —
 [20260718] "Adding ANY new `.mjs` module under `repo/` obliges a
-`docs/architecture-manifest.json` layer row in the SAME cell" (feature
-entry-standardization, P37), with a fourth recurrence noted against
+`docs/architecture-manifest.json` layer row in the SAME cell" (feature entry-standardization, P37; retired; last commit 00dddf7ae), with a fourth recurrence noted against
 compound-learn-enduser-docs (bước-3, `enduser-index.mjs` itself);
 [20260717] "New `src/**.mjs` module without its manifest row → guaranteed
 suite-red" (feature worker-dispatch-log P32, first occurrence stage-intake

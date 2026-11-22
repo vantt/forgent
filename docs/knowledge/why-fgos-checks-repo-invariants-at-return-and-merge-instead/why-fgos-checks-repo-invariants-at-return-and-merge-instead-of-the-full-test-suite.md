@@ -13,7 +13,7 @@ item's own narrow `item.verify` command, never the full `npm test`
 suite (`runGoalCheck` spawns exactly `item.verify`, confirmed by reading
 `src/runner/goal-check.mjs` directly). That let a real regression land on
 `main`: `70a88ffd` (`tsk-1m0`) added `src/report/enduser-index-generate.mjs`
-with no matching row in `docs/architecture-manifest.json`.
+with no matching row in `docs/architecture-manifest.json` (retired; last commit 00dddf7ae).
 `test/architecture.test.mjs` went red on `main` after the merge, but
 `tsk-1m0`'s own narrow verify never touched that test file, so both
 `return` and the post-merge re-verify stayed green and the item landed
