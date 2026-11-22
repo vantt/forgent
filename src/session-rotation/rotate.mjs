@@ -435,13 +435,25 @@ export async function rotateHeadSession(request, ports = {}) {
     const config = (ports.config ?? readRotationConfig)(projectRoot);
     const bound = config.answerWaitMs ?? DEFAULT_ANSWER_WAIT_MS;
 
+    const isOldRunStopped = () => {
+      if (!old?.runDir) return false;
+      if (ports.oldStopped) return ports.oldStopped(old.runDir);
+      return fs.existsSync(path.join(old.runDir, 'cancel-requested.json')) || fs.existsSync(path.join(old.runDir, 'closed.json'));
+    };
+
+    if (isOldRunStopped()) {
+      return await abandon('old-not-live', `${role}: the old run was asked to stop or had closed, there is nothing to rotate`);
+    }
+
     const id = crypto.randomBytes(8).toString('hex');
     const lastAssistantMessage = stopFacts.lastAssistantMessage
       ?? (reason === 'manual' ? await lastMessageOfOld(old, ports, clock) : null);
     let task = null;
     try {
       task = await (ports.taskOfHead ?? taskOfHead)(projectRoot, persona, name, ports);
-    } catch { /* not a plan or discussion head, or plan/discussion not found */ }
+    } catch (err) {
+      incident(dir, { event: 'task-failed', role, code: err?.code ?? 'task-error', detail: String(err?.message ?? err).slice(0, 300) });
+    }
     const taskPath = task?.path ?? null;
     const basePortfolio = stopFacts.portfolio ?? reloadOf(config, persona);
     const candidatePortfolio = taskPath
@@ -464,23 +476,14 @@ export async function rotateHeadSession(request, ports = {}) {
       executor: (ports.selfRecord ?? selfRecord)(), old,
     });
 
-    const isOldRunStopped = () => {
-      if (!old?.runDir) return false;
-      if (ports.oldStopped) return ports.oldStopped(old.runDir);
-      return fs.existsSync(path.join(old.runDir, 'cancel-requested.json')) || fs.existsSync(path.join(old.runDir, 'closed.json'));
-    };
-
-    if (isOldRunStopped()) {
-      return await abandon('old-not-live', `${role} is not held by a live session, there is nothing to rotate`);
-    }
-
     try {
       // The successor's tab opens beside the slot the role holder's Identity record names.
       successor = await (ports.place ?? placeHead)({ persona, name, projectRoot, beside: slotKeyOf(holder.record), gen }, ports.placePorts ?? {});
       writeJson(dir, 'rotation.json', { ...readJson(pendingFile), successor });
     } catch (err) {
       if (isOldRunStopped()) {
-        return await abandon('old-not-live', `${role} is not held by a live session, there is nothing to rotate`);
+        const errCode = err?.code ?? err?.message ?? String(err);
+        return await abandon('old-not-live', `${role}: the old run was asked to stop or had closed (${errCode}), there is nothing to rotate`);
       }
       return await abandon(err.code ?? 'start-refused', String(err.message ?? err));
     }

@@ -12,6 +12,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { markSuccessorAnswered, requestRotation, rotateHeadSession, rotationHolds, rotationIdOf } from '../../src/session-rotation/rotate.mjs';
 import { lineageDirOf, readHeadPlacement, writeHeadPlacement } from '../../src/session-host/head-start.mjs';
+import { taskOfHead } from '../../src/session-host/head-plan.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 
 const OLD = { host: 'terminal', key: 'cmd_old' };
@@ -53,6 +54,7 @@ function fakes(root, { onSleep = () => {}, holder = { live: true, session: 'old-
     config: () => ({ keep: 10, answerWaitMs: 5000 }),
     clock: { now: () => now, sleep: async (ms) => { now += ms; sleeps += 1; await onSleep(sleeps); } },
     pollMs: 1000,
+    taskOfHead: (r, p, n, pt) => (p === 'lead' ? taskOfHead(r, p, n, pt) : null),
   };
   return { calls, ports, request: { persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionId: 'oldsess1', pendingQuestion: 'Should the backlog rows be merged?' } } };
 }
@@ -384,6 +386,7 @@ globalThis.__rotatePorts = {
   place: (request) => ({ role: 'head:planner-x', gen: request.gen, key: 'cmd_new', placement: { host: 'terminal', key: 'cmd_new' }, runDir: ${JSON.stringify(path.join(root, 'run-new'))}, cli: null, persona: 'planner' }),
   end: (runDir) => { if (runDir.endsWith('run-new')) ended = true; return true; },
   closed: () => true,
+  taskOfHead: async () => null,
 };
 process.argv = [process.execPath, ${JSON.stringify(entry)}, '--request', ${JSON.stringify(file)}];
 await import(${JSON.stringify(new URL(`file://${entry}`).href)});
@@ -639,6 +642,52 @@ test('a lead\'s handoff lists its plan.md even when stopFacts portfolio is empty
   assert.match(text, /^- plans\/261122-0118-heads-stable-and-able\/plan\.md$/m, 'lead handoff carries its plan.md');
 });
 
+test('a task path already in the stop-facts portfolio is listed once', async (t) => {
+  const { root } = project(t);
+  const planDir = '261122-0118-heads-stable-and-able';
+  const planFile = path.join(root, 'plans', planDir, 'plan.md');
+  fs.mkdirSync(path.dirname(planFile), { recursive: true });
+  fs.writeFileSync(planFile, '# Phase 12\n');
+  const leadDir = lineageDirOf(root, 'lead', 'sv-p12');
+  writeHeadPlacement(leadDir, { role: 'head:lead-sv-p12', gen: 1, placement: OLD, runDir: '/run/old', persona: 'lead', startedAt: '2026-11-22T00:00:00Z' });
+  fs.mkdirSync(path.join(root, '.fgos', 'assignments', 'head-lead-sv-p12-1'), { recursive: true });
+
+  const { ports } = fakes(root, {
+    holder: { live: true, session: 'old-session', record: { id: 'fg-lead/old', roles: ['head:lead-sv-p12'], ids: { terminal: { driver: 'herdr', key: 'cmd_old-slot', paneId: 'w1:p1' }, head: { persona: 'lead', name: 'sv-p12', gen: 1 } } } },
+  });
+  ports.planOfHead = () => ({ dir: planDir, footprint: [] });
+  ports.place = (req) => ({ role: 'head:lead-sv-p12', gen: req.gen, key: NEW.key, placement: NEW, runDir: '/run/new', cli: null, persona: 'lead' });
+
+  const taskPath = `plans/${planDir}/plan.md`;
+  await rotateHeadSession({
+    persona: 'lead', name: 'sv-p12', reason: 'soft', projectRoot: root,
+    stopFacts: { portfolio: [taskPath] },
+  }, ports);
+  const latest = JSON.parse(fs.readFileSync(path.join(leadDir, 'latest.json'), 'utf8'));
+  const text = fs.readFileSync(path.join(leadDir, latest.file), 'utf8');
+  const lines = text.split('\n').filter((l) => l === `- ${taskPath}`);
+  assert.equal(lines.length, 1, 'task path is listed exactly once in portfolio');
+});
+
+test('a taskOfHead failure records a task-failed incident and rotation continues with no task path', async (t) => {
+  const { root, dir } = project(t);
+  let moved = false;
+  const { calls, ports, request } = fakes(root, {
+    holder: () => (moved ? { live: true, session: 'new-session' } : { live: true, session: 'old-session', record: OLD_RECORD }),
+    onSleep: (n) => { if (n === 2) { answer(root); moved = true; } },
+  });
+  ports.taskOfHead = () => {
+    throw Object.assign(new Error('plan ambiguous: multiple plans found'), { code: 'plan-ambiguous' });
+  };
+  const result = await rotateHeadSession({ ...request, reason: 'hard' }, ports);
+  assert.equal(result.rotated, true);
+  const incidents = fs.readFileSync(path.join(dir, 'incidents.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  const taskIncident = incidents.find((i) => i.event === 'task-failed');
+  assert.ok(taskIncident, 'task-failed incident was recorded');
+  assert.equal(taskIncident.code, 'plan-ambiguous');
+  assert.match(taskIncident.detail, /plan ambiguous/);
+});
+
 test('an old run closed mid-rotation logs old-not-live', async (t) => {
   const { root, dir } = project(t);
   const oldRunDir = path.join(root, 'run-old');
@@ -647,11 +696,15 @@ test('an old run closed mid-rotation logs old-not-live', async (t) => {
 
   // 1. closed before placeHead
   fs.writeFileSync(path.join(oldRunDir, 'closed.json'), '{}');
+  let lastMessageCalled = false;
   const { calls: calls1, ports: ports1, request: request1 } = fakes(root);
-  const result1 = await rotateHeadSession(request1, ports1);
+  ports1.lastMessage = () => { lastMessageCalled = true; return { result: 'found', message: 'msg', turnEnded: true }; };
+  const result1 = await rotateHeadSession({ ...request1, reason: 'manual', stopFacts: {} }, ports1);
   assert.equal(result1.rotated, false);
   assert.equal(result1.reason, 'old-not-live');
   assert.deepEqual(calls1.place, [], 'placeHead was not called');
+  assert.equal(lastMessageCalled, false, 'lastMessageOfOld was not called before abandoned');
+  assert.equal(fs.existsSync(path.join(dir, 'latest.json')), false, 'no handoff was written when closed before placeHead');
 
   // 2. closed appearing mid-rotation when placeHead fails (e.g. no-envelope beside closed pane)
   const { root: root2, dir: dir2 } = project(t);
@@ -673,4 +726,8 @@ test('an old run closed mid-rotation logs old-not-live', async (t) => {
   const incident2 = JSON.parse(fs.readFileSync(path.join(dir2, 'incidents.jsonl'), 'utf8').trim());
   assert.equal(incident2.event, 'rotation-failed');
   assert.equal(incident2.code, 'old-not-live');
+  assert.match(incident2.detail, /no-envelope/, 'detail keeps original placement error code');
+  assert.match(incident2.detail, /the old run was asked to stop or had closed/, 'detail says old run was asked to stop or had closed');
+  assert.doesNotMatch(incident2.detail, /not held by a live session/, 'detail does not say not held by a live session');
+  assert.equal(result2.detail, incident2.detail);
 });
