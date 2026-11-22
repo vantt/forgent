@@ -134,6 +134,16 @@ waits for both. Phase 4 is the single writer of the hot files `docs/platform/ses
 `CHANGELOG.md`, so this plan is `blockedBy` it as a whole. Phase 1 alone would overlap only on
 `head-start.test.mjs`, which that plan's phase 11 writes. Once phase 11 lands, nothing overlaps.
 
+**Held at draft (2026-11-22 23:20).** The plan passes the contract check at `draft`. The `ready` flip is refused
+because `scripts/plan-contract-check.mjs` (`activeOverlaps`, lines 249-296) fails any footprint overlap with another
+`ready` or `running` plan, and it does not honor `blockedBy`. Two overlaps remain. The first is with
+`261122-0118-heads-stable-and-able` (running) on the rotation files. The second is with
+`261122-1950-owner-communication-standard` (ready) on `CHANGELOG.md`. Neither can be narrowed away: the rotation files
+are the subject of this plan, and AGENTS.md requires a changelog line. Flip this plan to `ready` once both plans are
+`done`. If the check is first changed to honor `blockedBy`, adding `261122-1950-owner-communication-standard` to
+`blockedBy` clears the second overlap earlier. The check is in the running plan's footprint, so this plan does not
+change it.
+
 ## Owner questions
 
 None. The discussion left no point open. The quota threshold is a plan-time choice: 0.9 of the weekly window. It
