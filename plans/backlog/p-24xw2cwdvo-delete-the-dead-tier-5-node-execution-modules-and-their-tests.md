@@ -18,3 +18,5 @@ Those Node modules are deleted, and every retired test names the Rust test that 
 # Notes
 
 Order: right after plan 261122-0118-heads-stable-and-able lands, since its files (head-start, head-request, rotate, head-stop) hold the last tail. lead:S6A's facades make the deletion mechanical. Watch disk and memory: run one suite at a time and keep cargo builds inside one worktree.
+
+Owner 2026-11-22 18:27: this deletion runs immediately after (not later in the queue). Plan it now so it is ready the moment its blockers (261122-0118-heads-stable-and-able, then s6a phase 22) are done.
