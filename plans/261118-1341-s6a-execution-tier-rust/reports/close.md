@@ -1,6 +1,6 @@
 # S6a close (phase 22 part a)
 
-Branch `s6/p22`, rebased onto `origin/main` `9a8788892`; canary built from `a1d4ee029` (the branch head then). Lead: lead:S6A. Owner decision B (2026-11-22 18:23): S6a closes at the
+Branch `s6/p22`, rebased onto `origin/main` (last at 49dc48a0e); canary built from `a1d4ee029` (the branch head on `9a8788892`; the later review fixes are docs, door rows and the shared terminal reader, proven by the gates below). Lead: lead:S6A. Owner decision B (2026-11-22 18:23): S6a closes at the
 execution door; the dead Node closure is backlog p-24xw2cwdvo.
 
 ## 1. Doors rows
