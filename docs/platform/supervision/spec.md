@@ -150,7 +150,7 @@ Trust: every verb above is granted per persona and checked again by the route ch
 ### 6.1 Missed idle lead, 2026-11-22
 
 The watcher was running, but a handled detection is not a recurring reminder. The project stream
-(`/home/vantt/projects/forgent/.git/fgos/events/project/closed/2490-2491.jsonl`) raised `plan-no-progress` for
+(`.git/fgos/events/project/closed/2490-2491.jsonl`) raised `plan-no-progress` for
 `261122-0118-heads-stable-and-able` and `261122-0800-red-tests-and-backlog-sweep` at 03:23Z; files
 `2493-2493.jsonl` and `2492-2492.jsonl` handled them by 03:24Z. Miu's later `coordination-help` records
 (`2512-2512.jsonl`, 03:40Z; `2602-2602.jsonl`, 05:28Z) report live idle leads and empty queues. The tick at
