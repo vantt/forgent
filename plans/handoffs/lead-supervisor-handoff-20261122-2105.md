@@ -41,5 +41,7 @@ You are the manual project supervisor (`lead:SUPERVISOR`, owner-facing, Vietname
 - **Other open plans:** 261122-0800 red-tests (done); owner-communication plan (ready, held by a footprint overlap with heads-stable); agent-start plan (planned); coach-agent shaper (talking with the owner).
 - **Today's backlog rows:** p-vnsigyw6h7, p-o4juyw2ntg, p-6sd4fslxv7, p-l54vuzupa5, p-24xw2cwdvo, p-ivmvh7y2hf, p-g3btj3bpqc, p-auypprszfz, and the flaky case-close row. p-q2dn2cnzlq is reopened: dead land chains come from heads landing without FGOS_SESSION_ID.
 
+- **DOCOS recover fix (decided 21:10, option 1):** DOCOS fixes `fgos git recover` itself. It settles a Land RefUpdate as effect-present only when the candidate pin is readable, the target contains it, and the target has not diverged; every other case keeps the operation. Tests cover the settled case plus the diverged and unreadable cases, with a spec line and a CHANGELOG line. lead:OPC must review the diff before it lands. When DOCOS pushes the branch, send it to OPC, then land it here if design-lap still cannot.
+
 ## Open owner questions
 - None pending from me. The owner approved the B option for s6a, the Miu pool change, and the fixture timer disable (done).
