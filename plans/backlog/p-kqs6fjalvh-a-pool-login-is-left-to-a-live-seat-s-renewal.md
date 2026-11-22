@@ -18,3 +18,5 @@ The renewal owner of each pool account is visible through the account's own verb
 # Notes
 
 Migrated from the legacy backlog table. Original status: proposed.
+
+2026-11-22 evidence (lead:SUPERVISOR): two long-lived heads stopped on "Login expired · Please run /login" while a direct probe of the same account was ok: the orchestration-skeleton shaper (2026-11-22 00:48, token held since 2026-11-21 17:02) and the heads-stable lead (2026-11-22 15:45). Both needed a manual stop or rotate. The 15:47 rotate brought the lead back, but its handoff had no last message (the confined transcript was unreadable), and rotation.log recorded start-refused although the successor ran.
