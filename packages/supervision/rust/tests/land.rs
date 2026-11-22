@@ -646,15 +646,19 @@ fn a_paths_land_plans_placeholder_ignores_excluded_and_missing_plan_dirs() {
     fs::create_dir_all(&no_plan_dir).unwrap();
     fs::write(no_plan_dir.join("other.md"), "content\n").unwrap();
     let out_file = f.temp.join("plans.out");
-    let cfg = config(vec![gate(
-        &format!("printf 'P:%s\\n' \"{{plans}}\" > {}", out_file.display()),
-    )]);
-    f.land(
-        &paths(&["plans/backlog/p-1.md", "plans/no-plan-md/other.md"]),
-        &cfg,
-    )
-    .unwrap();
-    assert_eq!(fs::read_to_string(out_file).unwrap(), "P:\n");
+    let cfg = config(vec![gate(&format!(
+        "printf 'P:%s\\n' \"{{plans}}\" > {}",
+        out_file.display()
+    ))]);
+    let out = f
+        .land(
+            &paths(&["plans/backlog/p-1.md", "plans/no-plan-md/other.md"]),
+            &cfg,
+        )
+        .unwrap();
+    assert!(out.gates_run.is_empty(), "{:?}", out.gates_run);
+    assert!(!out_file.exists());
+    assert_eq!(out.main_sha, f.remote_tip());
 }
 
 #[test]

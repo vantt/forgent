@@ -44,6 +44,12 @@ pub struct LandCommand {
     pub branch: Option<String>,
     pub paths: Option<Vec<String>>,
     /// Test paths given to a gate that uses `{tests}`.
+    ///
+    /// Gates also support the `{plans}` placeholder, rendered as `--plan '<dir>'` pairs for
+    /// qualifying plan directories (a directory under `plans/` containing a `plan.md` with a changed
+    /// path under it, excluding `plans/backlog`, `plans/discussions`, `plans/reports` and
+    /// `plans/handoffs`). A gate whose run text contains `{plans}` is skipped when the qualifying
+    /// plan-dir set is empty.
     pub tests: Vec<String>,
     /// The caller's plan footprint, given for a lead. A branch may change only paths it matches; a paths
     /// land may not change the `footprint` of any `plan.md` it commits (`footprint-change-refused`).
@@ -56,6 +62,8 @@ pub struct LandCommand {
 
 #[derive(Debug, Clone)]
 pub struct Gate {
+    /// Command line to run. Supports `{tests}` and `{plans}` (`--plan '<dir>'` pairs, gate skipped
+    /// when empty).
     pub run: String,
     /// Path globs; empty means the gate always runs.
     pub when: Vec<String>,
@@ -884,6 +892,9 @@ impl Lander<'_> {
             .join(" ");
         for gate in &self.config.gates {
             if !self.any_matches(changed, &gate.when)? {
+                continue;
+            }
+            if gate.run.contains("{plans}") && plan_dirs.is_empty() {
                 continue;
             }
             let command = gate
