@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Component authority: one structural model of layers, components, decision kinds, doors, contracts and files, with generated human views"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 base: 27fd8a9b09b6a8584c37d7b18a6a96be4b2e1225
@@ -224,6 +224,10 @@ The check passes as `draft`. As `ready` it refuses with two cross-plan overlap e
   one in its `blockedBy`, or go back to `draft`.
 When both are fixed, re-run the check and set `status: ready`. The planner or supervisor does this, and it needs no
 further owner question.
+
+**Set ready (2026-11-23 00:12, head:supervisor-forgent, owner order 00:15 via Miu):** heads-stable narrowed its footprint
+(`9fc5261af`); `261122-1950-owner-communication-standard` already lists this plan in its `blockedBy`. The land door's
+plan check decides the transition.
 
 **Why it first waited (history):** two plans that were running when it was written owned files this plan must change.
 - `261118-1341-s6a-execution-tier-rust` owns `docs/architecture-manifest.json`, `test/architecture.test.mjs`,
