@@ -231,7 +231,7 @@ Logs are in `/home/vantt/projects/forgent-worktrees/`: `main-cargo-test-4c5f5554
 |---|---|---|
 | live self-check: every repository platform doc passes every doc-health rule | The deleted manifest was still backticked without a commit pin in `component-authority/spec.md` (lines 61, 127, 185, 224) and `packaging-distribution/spec.md` (792-793). `P08.1.md:8` linked the deleted proposal map. | Fixed in `3bf544312` (commits c35d66acf, df8eaa3d9). The land gate's run of this same self-check passed. |
 | dead vocabulary guard: Request-to-Run P5 retired symbols | `FlowDefinition` and `CoordinationProtocol` in model rows `domain-registry-loader` and `group-thinking` and in one contract row reached `system-overview/spec.md` through the generated views. | Fixed in `3bf544312`: the model text was reworded and the views regenerated. |
-| this repository's tracked instruction projections are current | The design-principles edit made `.fgos/instructions/effective/repo.json` stale (it still names the manifest). The ledger entry is per-checkout runtime state. | **Open.** The lead's run door refuses this `.fgos/` path even though the footprint lists it. Raised to the supervisor (event ae0f1b4f5b564c3d) to regenerate it with `npm run build:skills`. |
+| this repository's tracked instruction projections are current | The design-principles edit made `.fgos/instructions/effective/repo.json` stale (it still named the manifest). | Fixed in `148769e1c`: lead:SUPERVISOR regenerated it from the main checkout with `npm run build:skills`, because the lead run door refuses `.fgos/` paths. `test/setup/instruction-projections.test.mjs` passes 15/15 on the host. |
 
 ### Reds this plan did not cause
 
@@ -258,3 +258,5 @@ The other 9 reds were already red at 4951cf3da, the supervisor's baseline:
 - tracked instruction projections. This one is listed above as caused by this plan: the baseline already contained the phase 2 design-principles edit.
 
 None of these nine touch this plan's files.
+
+**Result:** every red this plan caused is fixed (`3bf544312`, `148769e1c`). Acceptance criterion 5 holds, except for reds this plan did not cause, which are classified above.
