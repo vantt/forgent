@@ -1595,7 +1595,7 @@
       "luật nghiệp vụ runner",
       "Runner Business Rules"
     ],
-    "meaning": "Runner business rules RUL1 to RUL104.",
+    "meaning": "Runner business rules: the numbered RUL series of the runner.",
     "layer": "infra",
     "tier": 7,
     "paths": [
@@ -1603,7 +1603,7 @@
     ],
     "exceptions": [],
     "owns": [
-      "runner business rules RUL1 to RUL104"
+      "runner business rules"
     ],
     "mustNotOwn": [
       "execution loops"

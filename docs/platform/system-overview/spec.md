@@ -157,7 +157,7 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | runner data dictionary definitions | `h-02842f76ffd2` | `docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md` |
 | runner gap tracking and known limits | `h-2e032393add1` | `docs/platform/runner/subcomponents/h-2e032393add1/spec.md` |
 | runner settled edge case records | `h-37aced3896a8` | `docs/platform/runner/subcomponents/h-37aced3896a8/spec.md` |
-| runner business rules RUL1 to RUL104 | `h-6979005beaf7` | `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md` |
+| runner business rules | `h-6979005beaf7` | `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md` |
 | runner actors and access controls | `h-6df5686d0d54` | `docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md` |
 | runner entry point triggers and routes | `h-ce5b9771a26a` | `docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md` |
 | runner visual architecture diagrams | `h-d3b49ef7edf5` | `docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md` |

@@ -80,7 +80,7 @@ Component owners, one row per component and subcomponent, sorted by id. <!-- ren
 | `h-02842f76ffd2` | `runner` | Runner data dictionary definitions and data schema mapping. | `docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md` | `docs/platform/runner/subcomponents/h-02842f76ffd2/` |
 | `h-2e032393add1` | `runner` | Runner gap tracking and known technical limits. | `docs/platform/runner/subcomponents/h-2e032393add1/spec.md` | `docs/platform/runner/subcomponents/h-2e032393add1/` |
 | `h-37aced3896a8` | `runner` | Runner settled edge case records and historical resolutions. | `docs/platform/runner/subcomponents/h-37aced3896a8/spec.md` | `docs/platform/runner/subcomponents/h-37aced3896a8/` |
-| `h-6979005beaf7` | `runner` | Runner business rules RUL1 to RUL104. | `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md` | `docs/platform/runner/subcomponents/h-6979005beaf7/` |
+| `h-6979005beaf7` | `runner` | Runner business rules: the numbered RUL series of the runner. | `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md` | `docs/platform/runner/subcomponents/h-6979005beaf7/` |
 | `h-6df5686d0d54` | `runner` | Runner actors, access control definitions, and caller bounds. | `docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md` | `docs/platform/runner/subcomponents/h-6df5686d0d54/` |
 | `h-ce5b9771a26a` | `runner` | Runner entry points, trigger routes, and invocation hooks. | `docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md` | `docs/platform/runner/subcomponents/h-ce5b9771a26a/` |
 | `h-d3b49ef7edf5` | `runner` | Runner visual architecture diagrams and sequence maps. | `docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md` | `docs/platform/runner/subcomponents/h-d3b49ef7edf5/` |
