@@ -70,3 +70,25 @@ Revert the phase commit and rebuild the renders.
 Add `core/**` to `land.regenerate.when`, so a skill-only land rebuilds the mutation census. No unit may write `.fgos/`
 (`q-ns4o7uqamq`), so the item is block `phase7` of `config-patch-items.yaml`, applied by lead:SUPERVISOR; the branch
 lands after that patch is on main.
+
+## Follow-up (owner-approved 2026-11-22 14:55): a landed branch's worktree is removed by the land door
+
+Backlog `p-6sd4fslxv7` (`69a20ce3a`), folded in by lead:SUPERVISOR. On 2026-11-22 the disk filled three times because
+each phase attempt left a worktree with a 6-12 GB cargo build, and one land failed with ENOSPC.
+
+10. Land door, `packages/supervision/rust/src/land.rs`: after a successful **branch** land, remove the worktree that
+    has the landed branch checked out through the existing worktree door (the code behind `fgos worktree remove
+    <path> --delivered-to <target> --discard-ignored`, never a copy of its checks). Remove it only when it is clean
+    and no process stands in it; the door's own refusals decide that. The land result names each worktree removed,
+    and each one kept with the door's refusal code. A refusal never fails the land. A paths land removes nothing.
+11. Owning proof in `packages/supervision/rust/tests/land.rs`: a fixture lands a branch from a clean worktree, which
+    is removed, and one from a dirty worktree, which is kept and named with its reason.
+12. Lead skill, `core/skills/fgos-lead/SKILL.md`: reuse one worktree per phase (a later unit of the same phase runs in
+    it, with `--sync <trunk>` when it must catch up), and hand any worktree the land kept to the supervisor by name.
+    Run `npm run build:skills`.
+13. `docs/platform/supervision/spec.md`: the land section records the removal as a settled fact.
+
+If the land crate cannot reach the worktree door from its layer, or needs a file outside the footprint (for example
+`packages/supervision/rust/Cargo.toml`), stop and report the exact files.
+
+Verify: `cargo test -p fgos-supervision --test land`, `node scripts/run-tests.mjs test/skills/fgos-mirror.test.mjs`.

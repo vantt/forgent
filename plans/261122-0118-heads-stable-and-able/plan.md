@@ -144,6 +144,7 @@ the grants, verb by verb.
 | p-d3ub553ogh secretary sandbox TMPDIR | already closed | `bbe0ffe2a` sets `TMPDIR=/tmp` (private tmpfs); proof `test/session-host/head-start.test.mjs:247`; phase 11 re-confirms live |
 | p-bakpfrvigb orphan rotation state | phase 6 | resolved on the lineage's normal path plus one doctor pointer row |
 | (owner 2026-11-22 09:08) rotation Stop hook fires in no head | phase 6 steps 6-8, phase 11 probe row | owner-approved 2026-11-22 09:08 via lead:SUPERVISOR: prove the Stop hook runs in a confined head, writes stop-trace and rotates at soft; find and fix the cause in this plan |
+| p-6sd4fslxv7 landed worktree removed by the land door | phase 7 steps 10-13 | owner-approved 2026-11-22 14:55, folded in by lead:SUPERVISOR (`69a20ce3a`) |
 | p-4r4h3jqtth head ran 33 h without rotating | already done | plan `261121-0745-head-rotation-trace`, `65ad518d5` |
 
 ## Prior art reused and what was missing
@@ -173,7 +174,7 @@ the grants, verb by verb.
 | 4 | [Coordinating heads keep their provider floor](phase-04-provider-floor.md) | 3 | .fgos/config.yaml, test/session-host/head-start.test.mjs | 2 | done |
 | 5 | [A live head's requests run the active release](phase-05-release-pickup.md) | 2, 6 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/run-supervisor/spec.md | 3 | ready |
 | 6 | [A rotation whose executor died is resolved](phase-06-orphan-rotation.md) | 2 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/session-host/contracts/rotation-files.v1.json, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/**, docs/platform/session-host/spec.md | 2 | done |
-| 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs | 2 | done |
+| 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs, packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs | 2 | running (follow-up steps 10-13) |
 | 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | ready |
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | running |
 | 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | ready |
@@ -191,6 +192,20 @@ wave), `head-request.v1.json` (2, then 5), `docs/platform/session-host/spec.md` 
 writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
+
+### Lead progress (2026-11-22 15:20, head:lead-forgent-261122-0118-heads-b52f9)
+
+- **Phase 2 steps 8-9 done:** `p02g` landed as `c9594d0d4` (the land regenerated `command-routes.json`). Step 10 follows
+  phase 5 (shared `head-request.mjs`).
+- **Phase 5 reviewed and ready, parked on `q-r5w6funyv5`.** The review found no code defects; its blocking gap
+  (contract note and spec fact) is fixed in `f33ffddb8`. The land stopped in the regenerate step: git-one-door-scan
+  reports `head_request.rs` `Command::new(&host)` as `unresolved-binary`. The fix is one `configured-binary` entry
+  in `scripts/lib/git-one-door-declarations.v1.json`, which is outside the footprint; the doctor's identity row has
+  the same kind of entry as precedent.
+- **Phase 8** running on `p02g` (ticket `c-41126-1795334991265`, Gemini; OpenAI is at its usage limit, and Claude
+  units here are refused every shell command).
+- **Phase 7 follow-up (steps 10-13, owner-approved 14:55, `p-6sd4fslxv7`):** the land door removes a landed branch's
+  clean worktree. It runs in `p02g` after phase 8 lands, so no new worktree is used while the disk is full.
 
 ### Lead progress (2026-11-22 14:55, head:lead-forgent-261122-0118-heads-b52f9)
 
