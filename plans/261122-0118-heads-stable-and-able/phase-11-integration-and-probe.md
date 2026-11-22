@@ -19,8 +19,8 @@ Closes acceptance criteria 1, 2 and 5, and the verb-by-verb list of `p-vquz26ibn
 ## Footprint
 
 `test/live/head-grant-probe.live.mjs`, `CHANGELOG.md`,
-`plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md`, `docs/platform/run-supervisor/spec.md` and
-`test/session-host/head-start.test.mjs` (step 6 only).
+`plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md` and `test/session-host/head-start.test.mjs`
+(step 6 only).
 
 ## Steps
 
@@ -50,10 +50,10 @@ Closes acceptance criteria 1, 2 and 5, and the verb-by-verb list of `p-vquz26ibn
 5. Write `reports/head-grant-probe.md`: a verb-by-verb table for the secretary and the supervisor (verb, expected from
    the grant, observed, evidence). Name each verb out of scope with its reason. Add the "Folded rows" check: each row
    of `plan.md` with the commit or report that closes it.
-6. Two stale notes reported by s6a (lead:SUPERVISOR, 2026-11-22 19:10). `docs/platform/run-supervisor/spec.md:66` names
-   `stray-writes.mjs` under `src/run-supervisor`; it now lives at `src/runner/stray-writes.mjs`.
-   `test/session-host/head-start.test.mjs:343` cites the deleted `test/helpers/head-sandbox-argv.mjs`. Correct both
-   texts and change nothing else.
+6. A stale note reported by s6a (lead:SUPERVISOR, 2026-11-22 19:10): `test/session-host/head-start.test.mjs:343` cites
+   the deleted `test/helpers/head-sandbox-argv.mjs`. Correct that text and change nothing else. The stray-writes path at
+   `docs/platform/run-supervisor/spec.md:66` is fixed by s6a phase 22b, not here. s6a 22b also edits `CHANGELOG.md` in
+   disjoint hunks, so if step 2's line lands second, rebase it.
 
 ## Verify
 
