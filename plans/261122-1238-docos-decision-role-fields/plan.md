@@ -1,7 +1,7 @@
 ---
 type: plan
 title: Decision units carry their role fields, projected from the decision events
-status: in-progress
+status: done
 owner: lead:DOCOS
 created: 2026-11-22
 ---
@@ -33,7 +33,7 @@ The line is projected from the decision events. It is never written by hand, and
 1. **The fields are a projection.** `fgos decision-index` writes them and `fgos decision-index --check` fails on drift. They are never hand-written, so they cannot drift from the events (L3: truth in the log, documents are views).
 2. **A correction is a new event.** Events are append-only. For each `D-ADR` id, the latest scoped event decides the relation, so a decision whose old event says `supersedes` but is partial gets a new event that says `amends`. The latest event restates the relation in full (`none` clears it).
 3. **`valid_from` is the date of the act.** It is the event's optional `validFrom` when present, otherwise the timestamp of the first event for that id. `fgos decision --valid-from <date>` sets it, for an act that predates its record (the migrated decisions).
-4. **Targets are written as ids.** A `D-ADR`, law (`L3`) or `RUL` target is written as is. An event-hash target resolves to the `D-ADR` id of that event. A target that does not resolve is reported by the check and not written.
+4. **Targets are written as ids.** A `D-ADR`, `ADR####` (read as `D-ADR####`), bare decision-file number, law (`L3`) or `RUL` target is written as is. An event-hash target is not resolved: the decisions that had one got a correction event naming the unit. Any other target is a warning and is not written.
 5. **A decision with no heading in its holder is a finding,** not an inserted heading: the projection never creates prose.
 6. **Out of scope:** relations between `RUL` bullets that no decision event carries (RUL72 and RUL69, RUL108 and RUL101), clause targets (waiting for pkm request 2), and the `fgos doc` decisions-in-force view, which needs `pkm-core` linked (documentation build step 3).
 
@@ -41,9 +41,9 @@ The line is projected from the decision events. It is never written by hand, and
 
 | # | Phase | Status | Done when |
 |---|---|---|---|
-| 1 | Event `validFrom` and the field projection in `decision-index`, with `--check` | pending | `decision-index` tests cover: field line written, rewritten in place, removed when the relation becomes `none`, hash target resolved, unresolvable target and missing heading reported; `--valid-from` round trip |
-| 2 | Data: correction events for the 11 classified relations, `--valid-from` events for the migrated decisions from the retired corpus dates, then regenerate | pending | `fgos decision-index --check` exits 0 on main; the diff touches only field lines and index rows |
-| 3 | Acceptance with pkm `v0.5.0` over the real documents | pending | `in_force --units` ends exactly the units the events say end, `--as-of 2026-10-18T14:40Z` shows D-ADR0061 in force, and the result is in a report |
+| 1 | Event `validFrom` and the field projection in `decision-index`, with `--check` | done (693916070, 8cb301708, 2a3e7f2f3) | `decision-index` tests cover: field line written, rewritten in place, removed when the relation becomes `none`, hash target resolved, unresolvable target and missing heading reported; `--valid-from` round trip |
+| 2 | Data: correction events for the 11 classified relations, `--valid-from` events for the migrated decisions from the retired corpus dates, then regenerate | done (74045ce23, 9e3842f21: 51 events) | `fgos decision-index --check` exits 0 on main; the diff touches only field lines and index rows |
+| 3 | Acceptance with pkm `v0.5.0` over the real documents | done ([report](../reports/acceptance-261122-1359-docos-decision-role-fields-pkm-v050.md)) | `in_force --units` ends exactly the units the events say end, `--as-of 2026-10-18T14:40Z` shows D-ADR0061 in force, and the result is in a report |
 
 ## Risks
 
