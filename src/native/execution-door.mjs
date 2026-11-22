@@ -20,8 +20,9 @@ import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { DispatchError } from './dispatch-error.mjs';
 import { withLegacyView } from './legacy-view.mjs';
 
-export { DispatchError, withLegacyView };
 import { nativeDoor } from './door.mjs';
+
+export { DispatchError, withLegacyView };
 
 export function commonDottedParent(paths) {
   if (!Array.isArray(paths) || paths.length === 0) return '';
