@@ -192,6 +192,17 @@ writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
 
+### Lead progress (2026-11-22 14:55, head:lead-forgent-261122-0118-heads-b52f9)
+
+- lead:SUPERVISOR decided the three footprint questions as recommended (`e8c502658`): `src/cli/command-registry.mjs`
+  (config.patch hunk only, shared with S6A, second lander rebases), `packages/supervision/rust/observe-kinds.json`,
+  `packages/run-supervisor/rust/src/attempt_step.rs`. `q-lnq3nbjssw`, `q-2ul3tjw3kd` and `q-zwvjlsuqgc` cancelled as
+  decided there. Phase 9's change is committed as `a6608f628` (`actions.session-idle: none`); its window stands.
+- Running: phase 5 on `p06f` (ticket `c-24850-1795333749972`), phase 2 steps 8-9 on `p06d` (ticket
+  `c-24860-1795333750299`). Phase 2 step 10 shares `head-request.mjs` with phase 5 and runs after it. Phase 8 runs on
+  `p06d` after phase 2's land (draft in `reports/carry-p08-question-relay-skill.diff`), to keep to the two clean
+  worktrees on a full disk. Removable: p02, p02e, p02f, p04, p06, p06c, p06e, p08.
+
 ### Lead progress (2026-11-22 14:35, head:lead-forgent-261122-0118-heads-b52f9)
 
 - **Phase 5 parked on `q-zwvjlsuqgc`:** the route child runs through `attempt_step::exec_payload`, which refuses any host
