@@ -1,13 +1,23 @@
 ---
 id: ds-cfsfcbknl6
 title: "Thấu hiểu user: one shared standard for how every agent talks to the owner"
-status: open
+status: settled
 source:
   - p-wb6rkwpjsg
 created: 2026-11-22
 ---
 
-discussion: open
+discussion: settled
+
+## Hand-off to the planner
+
+- **Outcome:** one shared standard, **thấu hiểu user**, always loaded by every head, lead and worker in every CLI, that gives the motive, the principle judged from the reader's side, its applications (before speaking, names and ids, language and length, decision questions, status and incident reports) and a few curated cases; bad exchanges are captured in the friction store, partly by a hook on the owner's own reaction; the question door makes answers cheap. Decisions OC-D1 to OC-D7.
+- **Constraints:** the standard replaces `core/skills/_shared/decision-question.md` and `core/instructions/decision-question.md`; every caller moves and the old paths are removed in the same change (L10, design principle 1); generated copies are rebuilt with `npm run build:skills`, never edited; a new friction layer value goes into `packages/observe/rust/friction-kinds.json` only; a new hook kind needs its rows in `packages/distribution/contracts/agent-hooks.v1.json` and the doctor registry; the reaction hook never blocks or delays the owner's prompt; a user-visible change gets a line in `CHANGELOG.md`; `npm test` and `cargo test --workspace` green.
+- **Non-goals:** keeping information valid (OC-D1, its own item); the coach role (OC-D5, its own item); a check on the agent's outgoing messages (OC-D7, level 3); changing the approved-frame rule or the product priority order.
+- **Acceptance criteria:** see each task in section 7.
+- **Open points that block only part:** the T-signal phrase list is provisional (section 6, step 3); task 2 starts with it and the coach refines it later. Codex support for a prompt-submit hook is unverified; task 2 covers Claude Code and adds Codex only where its hook surface allows.
+- **Source ids:** `p-wb6rkwpjsg`; decisions OC-D1 to OC-D7.
+- **Separate items this discussion produced (not for this planner):** information freshness by watchers and monitors (OC-D1); the coach role (OC-D5). Neither has a backlog row yet.
 
 ## Seed
 
@@ -44,12 +54,12 @@ Agents in fgOS speak to the owner many times a day, and the owner's attention is
 | Order of work | **settled, OC-D3** | Owner 15:50 accepts the shaper's four steps | Why, then standard, then cases, then mechanism. |
 | Information validity | **settled out of scope, OC-D1** | Owner 13:10; held unchallenged through rounds 3-5 | Separate item for watchers and monitors. Not yet in the backlog: the secretary could not be reached by mailbox (name `secretary` unknown); the owner was told at 13:15. |
 | Where it is loaded so every agent sees it | clear | `core/instructions/*.md` with `appliesTo: ["*"]` is rendered into each project's `AGENTS.md` by `src/setup/instruction-projections.mjs`, which every agent CLI reads; `decision-question.md` is already one of them | The always-loaded instruction carries the motive and the principle in a few lines and points to the full standard. |
-| One file or two | provisional | The decision-question fragment is cited by about 20 source files and 4 code/test files | Default: one standard file that absorbs today's decision-question text as one of its applications; every caller moves in the same change (L10). Reverse if the file grows past what an agent will read, in which case the case log moves to a sibling file. |
+| One file or two | **settled, OC-D6** | The decision-question fragment is cited by about 20 source files and 4 code/test files | Default: one standard file that absorbs today's decision-question text as one of its applications; every caller moves in the same change (L10). Reverse if the file grows past what an agent will read, in which case the case log moves to a sibling file. |
 | Case log: where, who adds, how it improves the standard | provisional (round 6) | Owner 15:50: "thu thập thêm các tình huống trao đổi không tốt và học rồi cải thiện"; owner 16:00: "bộ friction có ghi nhận được không?". Friction store (`docs/platform/observe/spec.md` lines 136-138; `core/skills/_shared/friction-capture.md`): one record has a subject, a stable signature (`class`), a kind (`awkward` fits), a detail text (capped), refs; `fgos friction rank` counts each signature's repeats with first and last seen. The layer list is closed (`skill`, `tool`, `runner`, ..., `context`, `task`) with no value for talking to the owner; a value is added by editing `packages/observe/rust/friction-kinds.json`, no code. `friction-capture.md`'s "record when" list has no owner-confusion trigger. | **Default: the friction store is the case log; no new file** (one door). Raw cases go to friction as records (the log); the standard keeps only a few curated examples (the state), matching L1. Needed: (1) a layer value for owner communication in `friction-kinds.json`; (2) a trigger in `friction-capture.md`: the signals listed in section 6, step 3 (owner 17:30 named emotion change, frustration and not following the agent's recommendation; the shaper added the rest); (3) one stable signature per kind of fault (for example permission-asking, unexplained id, too long or wrong language); (4) when `fgos friction rank` shows a signature repeating, it is proposed as a line of the standard, batched for the owner. Who watches the rank and proposes: **the coach** (owner 17:16), not the secretary. |
 | Coach role | **settled for this standard, OC-D5; the coach itself is its own item** | Owner: "không nên là miu. là một người khác được bật bởi supervisor luôn. có thể là coach ... mọi thứ cần tối ưu, self-improve, self-learning đều nên cho coacher làm." Prior art: no coach persona in `core/agents/` and no `coach` in code, specs or git history; adjacent skills `instruction-audit` (periodic audit of the instruction surface) and `distill` exist; the supervisor already starts heads with `fgos session start`. | A coach head, started by the supervisor when the watcher sees the right moment, owns every optimisation, self-improvement and self-learning job of the system. This standard is one of its inputs: the coach reads the owner-communication friction, proposes new lines for the standard in a batch for the owner, and curates its examples. Defining the coach (persona, when it is started, its verbs) is a separate backlog item with its own shaper; this discussion only names the hand-off. Not yet in the backlog (shaper cannot write it; mailbox to the secretary refused from this sandbox). **Shaper's position (17:35):** agree that the learner must not be the secretary or any agent judging its own messages (C1 and S1-S2 went unnoticed by their authors; the secretary would grade her own cases). Disagree with "everything self-improving goes to the coach" as stated: (a) one role owning every kind of improvement becomes a bottleneck and a role without a boundary (RUL11); proposed boundary: the coach owns the learning loop (read signals, find repeats, propose, measure after), and the fix goes to the area that owns it; (b) every proposal adds to the owner's load, the opposite of this standard's goal, so the coach needs a threshold (a signature repeated, or a fixed rhythm) and a cap per batch; (c) the coach must also merge and delete rules, not only add (RUL104), or the always-loaded standard bloats; (d) a change is verified by the signature's count dropping afterwards (`fgos friction rank --bucket`); (e) self-reporting under-reports, so the coach may need to scan owner messages for the T-signals itself, which has a cost. **Round 8 (owner 17:37):** there are no standing area owners; work is done by starting the team whose setup fits the task. So the coach collects signals, finds the real problem, and hands it to a team set up for it. Shaper's additions, provisional: (f) the hand-off uses the existing intake, not a new dispatch path: the coach returns a well-evidenced problem (signature, count, examples, diagnosed cause, proposed outcome) to the supervisor that started it, which writes the backlog row and queues it, and the normal pipeline (shaper, planner, lead) assembles the team; (g) a change to the standard's own text (one line, one example) is too small for that pipeline: the coach drafts the exact wording, the owner approves it in a batch by letter, and one run lands it; (h) "finding the real problem" is the coach's core work: a repeated signal may come from a skill or prompt that produces the fault rather than a missing rule, so the coach diagnoses before it proposes. |
 | Gaps 1 and 4 | in scope (owner 14:55) | Seed cases C1 and C4 in section 6 | Covered by the principle's applications "before you speak" and "names and ids". |
 | Gaps 5, 6, 7 | provisional | Owner named 1 and 4 at 14:55 | 5 and 6 are applications of the principle (cheap answers, report shape). 7 is answered by the standard itself: the lesson lives in one shared place, not in one agent's memory. |
-| Program support (step 4) | **open, shaper proposal 17:45** | Existing guard checks labels only, on ask-tool calls only; Claude Code runs fgOS hooks on `UserPromptSubmit` (the questions row, `src/setup/agent-hooks.mjs:241`) and `Stop`; Codex on `Stop` | Ranked by value: (1) **capture the owner's reaction**: a hook on the owner's incoming message spots the T-signals ("là gì", "khoan", "không phải", "cứ làm đi", ...) and records a friction candidate with the owner's words and the agent's previous message; the coach judges it. It measures from the reader's side and fixes the coach's main risk, under-reporting. (2) **cheap answers in the question door**: options lettered A-D on display and a stated default field. (3) **checking the agent's own outgoing message**: not now; it invites writing for the check (step 1); the coach decides later from data. |
+| Program support (step 4) | **settled, OC-D7** | Existing guard checks labels only, on ask-tool calls only; Claude Code runs fgOS hooks on `UserPromptSubmit` (the questions row, `src/setup/agent-hooks.mjs:241`) and `Stop`; Codex on `Stop` | Ranked by value: (1) **capture the owner's reaction**: a hook on the owner's incoming message spots the T-signals ("là gì", "khoan", "không phải", "cứ làm đi", ...) and records a friction candidate with the owner's words and the agent's previous message; the coach judges it. It measures from the reader's side and fixes the coach's main risk, under-reporting. (2) **cheap answers in the question door**: options lettered A-D on display and a stated default field. (3) **checking the agent's own outgoing message**: not now; it invites writing for the check (step 1); the coach decides later from data. |
 | Approved-frame rule, priority order | non-goal | Seed | Moved into the standard unchanged. |
 
 ## 4. Quyết định đã chốt
@@ -61,6 +71,8 @@ Agents in fgOS speak to the owner many times a day, and the owner's attention is
 | OC-D3 | The work goes in four steps: why, standard, cases, mechanism. | Shaper proposal 15:44, owner accepted 15:50 | 2026-11-22 |
 | OC-D4 | Bad exchanges are kept in the friction store, not a new file: raw cases are friction records (the log), the standard keeps only a few curated examples (the state). Needs a layer value for owner communication and an owner-signal trigger in the friction-capture rule. | Owner 16:00 asked; shaper scouted and proposed; unchallenged through 17:45 and built on by OC-D5 | 2026-11-22 |
 | OC-D5 | A coach, not the secretary and not the agent that made the message, learns from those records. The supervisor starts it at the right moment. It owns the learning loop only: collect signals, diagnose the real cause, propose, measure the signature's count afterwards; it merges and deletes rules, not only adds; proposals are thresholded and capped per batch. Hand-off: a small text change to the standard is drafted by the coach and approved by the owner in a batch, then landed by one run; anything else goes back to the supervisor as a well-evidenced problem, becomes a backlog row and runs through the normal pipeline, which assembles a fitting team. There are no standing area owners. | Owner 17:16 (coach), 17:37 (no area owners, hand to a fitting team), 17:45 ("đồng ý" to the hand-off points) | 2026-11-22 |
+| OC-D6 | One standard file, not two: the standard absorbs today's decision-question text as one of its applications; split the case examples out only if the file grows past what an agent will read. | Shaper default since 13:05, unchallenged through 17:46 | 2026-11-22 |
+| OC-D7 | Program support, in order: (1) a hook on the owner's incoming message spots the T-signals and records a friction candidate with the owner's words and the agent's previous message; (2) the question door shows options lettered A-D and carries a stated default; (3) no check on the agent's outgoing message for now, the coach may propose it from data. | Shaper proposal 17:45, owner "đồng ý" 17:46 | 2026-11-22 |
 
 ## 5. Q&A log
 
@@ -87,6 +99,8 @@ Agents in fgOS speak to the owner many times a day, and the owner's attention is
 - 2026-11-22 17:37 — Owner: "đồng ý, nhưng chưa rõ người sở hữu mảng là ai? hiện hệ thống không hề có ai sở hữu mảng. thực chất khi làm gì thật bật team liên quan và giao cho task phù hợp thì nó sẽ làm. vì vậy coach thu thập và xác định đúng vấn đề rồi giao cho một team có setup phù hợp để giải quyết?" Shaper: agreed that there are no standing owners; added that the hand-off should go through the existing intake (coach to supervisor to backlog row to the normal pipeline), a fast path for small text changes to the standard, and diagnosis before proposal.
 
 - 2026-11-22 17:45 — Owner: "đồng ý" to the coach hand-off points (intake through the supervisor, fast path for small text changes, diagnosis before proposal). Shaper minted OC-D4 (friction store as case log) and OC-D5 (coach scope and hand-off), and opened step 4 with a ranked proposal: capture the owner's reaction first, cheap answers in the question door second, no check on outgoing messages for now.
+
+- 2026-11-22 17:46 — Owner: "đồng ý. như vậy thảo luận này ra 2 việc phải làm?" Shaper minted OC-D6 (one file) and OC-D7 (program support levels); answered that the discussion yields three tasks for one planner plus two separate items (freshness, coach); wrote §7 and the hand-off block; marked the discussion settled.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -161,4 +175,31 @@ flowchart TD
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Filled once step 3's case-log mechanics are settled and step 4 is decided.
+Three tasks for one planner. Task 1 lands first; tasks 2 and 3 can run in parallel after it.
+
+### Task 1 — Write the standard and move every caller {#task-standard}
+
+- **Goal:** the standard thấu hiểu user exists as one shared fragment and one always-loaded instruction (suggested names `core/skills/_shared/owner-communication.md` and `core/instructions/owner-communication.md`), replacing both decision-question files; the friction store can hold owner-communication cases.
+- **§6 excerpt:** steps 1-3 (motive, principle and test, applications, curated cases, how cases are kept and the T-signals).
+- **D-IDs:** OC-D2, OC-D3, OC-D4, OC-D6.
+- **Includes:** every caller of the old paths moved (about 20 source files: core and coding-domain skills, platform docs, reading map; code and test refs in `src/state/decision-question.mjs`, `src/state/status-fsm.mjs`, `test/docs/rul11-anchor-phrase.test.mjs`, `test/state/awaiting.test.mjs`); the "at most 10 lines" report lines in `fgos-lead`, `fgos-secretary`, `fgos-supervisor` replaced by a pointer; a friction layer value for owner communication in `packages/observe/rust/friction-kinds.json`; the owner-signal trigger in `core/skills/_shared/friction-capture.md`; generated copies rebuilt.
+- **Siblings:** tasks 2 and 3 depend on it (the layer value, and the text they point to).
+- **Draft verify:** `git grep -n -e "_shared/decision-question" -e "instructions/decision-question" -- ':!plans' ':!CHANGELOG.md'` prints nothing; `npm run build:skills` leaves no diff; `npm test` green.
+
+### Task 2 — Capture the owner's reaction {#task-reaction-capture}
+
+- **Goal:** when the owner's message carries a T-signal, one friction record is written with the owner-communication layer, a signature per signal kind, the owner's words and a pointer to the agent's previous message; the coach reads these later.
+- **§6 excerpt:** step 3 signal table; step 4 level 1.
+- **D-IDs:** OC-D4, OC-D7.
+- **Includes:** a hook kind on the owner's prompt (Claude Code `UserPromptSubmit`, beside the existing questions row in `src/setup/agent-hooks.mjs`; Codex where supported), its contract and doctor rows; it never blocks, delays or changes the prompt, and a failed record is silent.
+- **Siblings:** needs task 1's layer value.
+- **Draft verify:** a prompt containing "khoan, cái này là gì" records exactly one friction with that layer; a neutral prompt records none; the hook exits 0 in both; `npm test` green.
+
+### Task 3 — Cheap answers in the question door {#task-cheap-answers}
+
+- **Goal:** every owner question shows its options lettered A-D with the recommended one marked, and states what the asker does, and when, if no answer comes.
+- **§6 excerpt:** step 2, "Decision question" application; step 4 level 2.
+- **D-IDs:** OC-D7.
+- **Includes:** a required default field in `packages/questions/contracts/questions-input.v1.json` and its check; lettered options in `fgos questions` output and wherever the secretary shows questions; the skills that ask questions updated to fill the field.
+- **Siblings:** after task 1, so the standard's text and the door agree.
+- **Draft verify:** `fgos questions ask` without the default field is refused `question-unclear` naming it; `fgos questions` shows "A." to "D."; `cargo test --workspace` and `npm test` green.
