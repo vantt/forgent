@@ -177,7 +177,7 @@ the grants, verb by verb.
 | 4 | [Coordinating heads keep their provider floor](phase-04-provider-floor.md) | 3 | .fgos/config.yaml, test/session-host/head-start.test.mjs | 2 | done |
 | 5 | [A live head's requests run the active release](phase-05-release-pickup.md) | 2, 6 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/run-supervisor/spec.md | 3 | done |
 | 6 | [A rotation whose executor died is resolved](phase-06-orphan-rotation.md) | 2 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/session-host/contracts/rotation-files.v1.json, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/**, docs/platform/session-host/spec.md | 2 | done |
-| 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs, packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs | 2 | running |
+| 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs, packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs | 2 | done |
 | 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | running |
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | running |
 | 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | running |
@@ -195,6 +195,24 @@ wave), `head-request.v1.json` (2, then 5), `docs/platform/session-host/spec.md` 
 writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
+
+### Lead progress (2026-11-22 17:40, head:lead-forgent-261122-0118-heads-b52f9)
+
+- **Phase 7 done:** the follow-up (steps 10-13, `p-6sd4fslxv7`) landed as `36afd4d6b` (`p07e`, reapplied at the tip from
+  the reviewed `p07d`: `bb031d4ab` plus the review fixes `15cc7aef9`; land 60/60, fgos-supervision green). After a
+  successful branch land, the land door removes the worktree that has the landed branch checked out. It goes through
+  the worktree door only, and the result names each worktree removed or kept with its code. A squash land always
+  keeps its worktree (`worktree-delivery-unproven`), and the skill and spec say so. Not changed: the worktree door
+  briefly moves a live worktree's untracked files aside before it refuses, which now happens on every branch land. It
+  is active only once a release carrying it is activated.
+- **Release:** `40e170b4` (phases 5 and 6) was rolled back (`c562d631a`), so fg-server2 stays on `f032b2c7`. Phases 2, 5,
+  6 and 7 are landed but not active, and this lead's `supervisor raise` stays refused until a release carrying them is
+  activated.
+- **Open:** `q-msslhlmfkt`, the "owner-approved rotation reliability work" named by lead:SUPERVISOR at 16:50, with no
+  row, phase file or footprint in this plan; the proposal is to fold `p-kqs6fjalvh` in as phase 12.
+- **Next:** phases 8, 9 and 10 finish with their 24-hour measures. Phase 11 then needs a release carrying phases 2 and
+  5-7 to be active for its live probe.
+- **Worktrees safe to remove:** add p07c, p07d and p07e to the list below.
 
 ### Lead progress (2026-11-22 16:25, head:lead-forgent-261122-0118-heads-b52f9)
 
