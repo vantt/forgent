@@ -11,12 +11,14 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { ensureGitAddon } from '../helpers/git-addon.mjs';
-import { markSuccessorAnswered, requestRotation, rotateHeadSession, rotationHolds, rotationIdOf } from '../../src/session-rotation/rotate.mjs';
+import { checkStopFacts, markSuccessorAnswered, requestRotation, rotateHeadSession, rotationHolds, rotationIdOf } from '../../src/session-rotation/rotate.mjs';
 import { lineageDirOf, readHeadPlacement, writeHeadPlacement } from '../../src/session-host/head-start.mjs';
 import { taskOfHead } from '../../src/session-host/head-plan.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
+import { providerCapacityStatePaths } from '../../src/runner/dispatch/provider-capacity.mjs';
 
 ensureGitAddon();
+process.env.FGOS_STATE_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rotate-state-root-'));
 
 const OLD = { host: 'terminal', key: 'cmd_old' };
 const NEW = { host: 'terminal', key: 'cmd_new' };
@@ -757,4 +759,138 @@ test('an old run closed mid-rotation logs old-not-live', async (t) => {
   assert.match(incident2.detail, /the old run was asked to stop or had closed/, 'detail says old run was asked to stop or had closed');
   assert.doesNotMatch(incident2.detail, /not held by a live session/, 'detail does not say not held by a live session');
   assert.equal(result2.detail, incident2.detail);
+});
+
+test('checkStopFacts accepts and validates quota { weeklyUsed: number, resetsAt: string }', () => {
+  assert.deepEqual(
+    checkStopFacts({ quota: { weeklyUsed: 0.85, resetsAt: '2026-11-28T16:00:00Z' } }),
+    { quota: { weeklyUsed: 0.85, resetsAt: '2026-11-28T16:00:00Z' } },
+  );
+  assert.throws(
+    () => checkStopFacts({ quota: 'invalid' }),
+    (err) => err.code === 'bad-stop-facts',
+  );
+  assert.throws(
+    () => checkStopFacts({ quota: { weeklyUsed: 'not-a-number' } }),
+    (err) => err.code === 'bad-stop-facts',
+  );
+  assert.throws(
+    () => checkStopFacts({ quota: { weeklyUsed: 0.9, unknownField: true } }),
+    (err) => err.code === 'bad-stop-facts',
+  );
+  assert.throws(
+    () => checkStopFacts({ quota: { weeklyUsed: 0.9, resetsAt: 12345 } }),
+    (err) => err.code === 'bad-stop-facts',
+  );
+});
+
+test('a quota rotation quarantines the old account before the successor binds', async (t) => {
+  const { root } = project(t);
+  const runtimeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rotate-quarantine-'));
+  t.after(() => fs.rmSync(runtimeDir, { recursive: true, force: true }));
+
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(
+    statePath,
+    JSON.stringify({
+      contract: 'provider-capacity-state.v1',
+      assignments: {
+        'alpha:head-planner-x-1': { accountId: 'a1', selectedAt: '2026-11-20T00:00:00Z' },
+      },
+      providers: {
+        alpha: {
+          accounts: {
+            a1: { leases: {} },
+          },
+        },
+      },
+    }),
+  );
+
+  let moved = false;
+  let quarantinedBeforePlace = false;
+  const { ports, request } = fakes(root, {
+    holder: () => (moved ? { live: true, session: 'new-session' } : { live: true, session: 'old-session', record: OLD_RECORD }),
+    onSleep: (n) => { if (n === 2) { answer(root); moved = true; } },
+  });
+  ports.runtimeDir = runtimeDir;
+
+  const origPlace = ports.place;
+  ports.place = (req) => {
+    const raw = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    const q = raw.providers.alpha.accounts.a1.quarantine;
+    if (q && q.reasonCode === 'quota-limit' && q.until === '2026-11-28T16:00:00Z' && q.resetKnown === true) {
+      quarantinedBeforePlace = true;
+    }
+    return origPlace(req);
+  };
+
+  const resetsAt = '2026-11-28T16:00:00Z';
+  const quota = { weeklyUsed: 0.95, resetsAt };
+  const result = await rotateHeadSession(
+    { ...request, reason: 'hard', stopFacts: { ...request.stopFacts, quota } },
+    ports,
+  );
+
+  assert.equal(result.rotated, true);
+  assert.equal(quarantinedBeforePlace, true, 'quarantineProviderAccount was called before placeHead');
+
+  const finalState = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+  const quarantine = finalState.providers.alpha.accounts.a1.quarantine;
+  assert.equal(quarantine.reasonCode, 'quota-limit');
+  assert.equal(quarantine.until, resetsAt);
+  assert.equal(quarantine.resetKnown, true);
+});
+
+test('a quota rotation logs to rotation.log when lease record or reset time is missing and rotation continues', async (t) => {
+  const { root, dir } = project(t);
+  const runtimeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rotate-quarantine-missing-'));
+  t.after(() => fs.rmSync(runtimeDir, { recursive: true, force: true }));
+
+  // 1. Missing lease record
+  let moved = false;
+  const { ports: ports1, request: request1 } = fakes(root, {
+    holder: () => (moved ? { live: true, session: 'new-session' } : { live: true, session: 'old-session', record: OLD_RECORD }),
+    onSleep: (n) => { if (n === 2) { answer(root); moved = true; } },
+  });
+  ports1.runtimeDir = runtimeDir;
+
+  const result1 = await rotateHeadSession(
+    { ...request1, reason: 'hard', stopFacts: { ...request1.stopFacts, quota: { weeklyUsed: 0.92, resetsAt: '2026-11-28T16:00:00Z' } } },
+    ports1,
+  );
+  assert.equal(result1.rotated, true);
+  const log1 = fs.readFileSync(path.join(dir, 'rotation.log'), 'utf8');
+  assert.match(log1, /missing lease record/);
+
+  // 2. Missing reset time
+  const { root: root2, dir: dir2 } = project(t);
+  moved = false;
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(
+    statePath,
+    JSON.stringify({
+      contract: 'provider-capacity-state.v1',
+      assignments: {
+        'alpha:head-planner-x-1': { accountId: 'a1', selectedAt: '2026-11-20T00:00:00Z' },
+      },
+      providers: { alpha: { accounts: { a1: {} } } },
+    }),
+  );
+
+  const { ports: ports2, request: request2 } = fakes(root2, {
+    holder: () => (moved ? { live: true, session: 'new-session' } : { live: true, session: 'old-session', record: OLD_RECORD }),
+    onSleep: (n) => { if (n === 2) { answer(root2); moved = true; } },
+  });
+  ports2.runtimeDir = runtimeDir;
+
+  const result2 = await rotateHeadSession(
+    { ...request2, reason: 'hard', stopFacts: { ...request2.stopFacts, quota: { weeklyUsed: 0.92 } } },
+    ports2,
+  );
+  assert.equal(result2.rotated, true);
+  const log2 = fs.readFileSync(path.join(dir2, 'rotation.log'), 'utf8');
+  assert.match(log2, /missing reset time/);
 });

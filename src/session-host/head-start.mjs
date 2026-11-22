@@ -237,6 +237,63 @@ export function assertHeadArgs({ persona, name, projectRoot, gen = null, forQues
  * tab the new one opens next to. `ports` as for `startHeadSession` (`taskOfHead(projectRoot, persona, name) -> { dir, path } | null`, `planOfHead(projectRoot, persona, name) -> { dir }` for a lead, `pin`, `handoff`, `opening`, `runnerConfig`, `bind`,
  * `launch`). Returns `{ role, gen, key, placement, runDir, cli, persona }`; a refusal throws `HeadStartError`.
  */
+export const STATUS_LINE_COMMAND = 'fgos hook session-rotation --event status-line';
+
+export function mergeStatusLineSettings(args = []) {
+  const result = [...args];
+  const STATUS_LINE = {
+    type: 'command',
+    command: STATUS_LINE_COMMAND,
+  };
+  const idx = result.findIndex((a) => a === '--settings' || (typeof a === 'string' && a.startsWith('--settings=')));
+  if (idx >= 0) {
+    if (result[idx].startsWith('--settings=')) {
+      const raw = result[idx].slice('--settings='.length);
+      let parsed = {};
+      try { parsed = JSON.parse(raw); } catch {}
+      parsed.statusLine = STATUS_LINE;
+      result[idx] = `--settings=${JSON.stringify(parsed)}`;
+    } else if (idx + 1 < result.length) {
+      const raw = result[idx + 1];
+      let parsed = {};
+      if (typeof raw === 'object' && raw !== null) {
+        parsed = { ...raw };
+      } else if (typeof raw === 'string') {
+        try { parsed = JSON.parse(raw); } catch {}
+      }
+      parsed.statusLine = STATUS_LINE;
+      result[idx + 1] = JSON.stringify(parsed);
+    }
+  } else {
+    result.push('--settings', JSON.stringify({ statusLine: STATUS_LINE }));
+  }
+  return result;
+}
+
+export function withHeadSettings(runnerConfig, binding) {
+  const cfg = structuredClone(runnerConfig ?? {});
+  const executorId = binding?.executor ?? 'claude';
+  const invocationId = binding?.invocation;
+  cfg.executors ??= {};
+  cfg.executors[executorId] ??= {};
+  const exec = cfg.executors[executorId];
+  if (!Array.isArray(exec.invocations) || exec.invocations.length === 0) {
+    exec.invocations = [{ id: invocationId ?? 'default', args: mergeStatusLineSettings([]) }];
+  } else {
+    let matched = false;
+    for (const inv of exec.invocations) {
+      if (!invocationId || inv.id === invocationId) {
+        inv.args = mergeStatusLineSettings(inv.args);
+        matched = true;
+      }
+    }
+    if (!matched) {
+      exec.invocations.push({ id: invocationId, args: mergeStatusLineSettings([]) });
+    }
+  }
+  return cfg;
+}
+
 export async function placeHead({ persona, name, projectRoot, beside = null, gen = null, forQuestion = null } = {}, ports = {}) {
   assertHeadArgs({ persona, name, projectRoot, gen, forQuestion });
   const role = headRoleOf(persona, name);
@@ -254,9 +311,10 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
   const text = await (ports.opening ?? defaultOpening)({ persona, name, projectRoot, pinned, handoff, forQuestion, task: taskBriefOf(persona, task) });
   const runnerConfig = await (ports.runnerConfig ?? defaultRunnerConfig)(projectRoot);
   const binding = await (ports.bind ?? bindHeadSeat)({ persona, key, runnerConfig, runtimeDir: ports.runtimeDir });
+  const launchRunnerConfig = withHeadSettings(runnerConfig, binding);
 
   const request = {
-    binding, runnerConfig, key, role, grant, opening: text, ceilingMs: HEAD_HARD_CEILING_MS,
+    binding, runnerConfig: launchRunnerConfig, key, role, grant, opening: text, ceilingMs: HEAD_HARD_CEILING_MS,
     // The sandbox gives every launch a private writable tmpfs at /tmp (bwrap driver `--tmpfs /tmp`), so /tmp is the head's own scratch, not the shared one.
     env: { TMPDIR: '/tmp', FGOS_HEAD_ROLE: role, FGOS_HEAD_PERSONA: persona, FGOS_HEAD_NAME: name, FGOS_HEAD_GEN: String(generation) },
     projectRoot, beside, display: { role: persona, title: subjectOfHead(persona, name, task) },

@@ -254,6 +254,43 @@ test('the session launches with its role, its grant and the opening verbatim as 
   assert.equal(request.ceilingMs, HEAD_HARD_CEILING_MS);
   assert.deepEqual(request.display, { role: 'planner', title: 'ds-aaaaaaaaaa-probe' });
   assert.deepEqual(request.binding, { executor: 'alpha', key: 'head-planner-probe-1' });
+  const invocation = request.runnerConfig.executors.alpha.invocations[0];
+  const settingsIdx = invocation.args.indexOf('--settings');
+  assert.ok(settingsIdx >= 0, 'the launch carries --settings');
+  const settings = JSON.parse(invocation.args[settingsIdx + 1]);
+  assert.deepEqual(settings.statusLine, {
+    type: 'command',
+    command: 'fgos hook session-rotation --event status-line',
+  });
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+test('a head launch merges statusLine into an existing --settings object on the invocation', async () => {
+  const projectRoot = scratch();
+  const { calls, ports } = fakes();
+  ports.runnerConfig = () => ({
+    executors: {
+      alpha: {
+        invocations: [
+          { id: 'alpha-pane', args: ['--settings', JSON.stringify({ enabledMcpjsonServers: ['test'] })] },
+        ],
+      },
+    },
+  });
+  ports.bind = ({ key }) => ({ executor: 'alpha', invocation: 'alpha-pane', key });
+  await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, ports);
+  const request = calls.launch[0];
+  const invocation = request.runnerConfig.executors.alpha.invocations[0];
+  const settingsIdx = invocation.args.indexOf('--settings');
+  assert.ok(settingsIdx >= 0);
+  const merged = JSON.parse(invocation.args[settingsIdx + 1]);
+  assert.deepEqual(merged, {
+    enabledMcpjsonServers: ['test'],
+    statusLine: {
+      type: 'command',
+      command: 'fgos hook session-rotation --event status-line',
+    },
+  });
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 
