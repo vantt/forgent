@@ -70,18 +70,18 @@ test('every one of the 34 retired ADR ids has its narrative present in a docs/pl
   for (const id of RETIRED_ADR_HEADINGS) {
     const present = combined.some(({ rel, content }) => {
       const depth = rel === 'docs/platform/architecture-map.md' ? '#####' : '###';
-      return new RegExp(`^${depth} ${id} `, 'm').test(content);
+      return new RegExp(`^${depth} (?:D-ADR)?${id} `, 'm').test(content);
     });
     if (!present) missing.push(id);
   }
-  assert.deepEqual(missing, [], `every retired ADR id must have a "### <id> ..." heading somewhere in ${NARRATIVE_TARGETS.join(', ')}`);
+  assert.deepEqual(missing, [], `every retired ADR id must have a "### <id> ..." or "### D-ADR<id> ..." heading somewhere in ${NARRATIVE_TARGETS.join(', ')}`);
 });
 
 test('the real 0032 numbering collision migrated as two distinct sections (both topics preserved, neither silently dropped)', () => {
   const runner = fs.readFileSync(path.join(REPO_ROOT, 'docs/platform/runner/decisions/h-36d872fbb0e5.md'), 'utf8');
   const workState = fs.readFileSync(path.join(REPO_ROOT, 'docs/platform/work-state/decisions/retired-decision-history.md'), 'utf8');
-  assert.match(runner, /### 0032 — Cổng Iron Law/, 'the Iron Law 0032 record must be in runner.md');
-  assert.match(workState, /### 0032 — Multi-role Team Harness/, 'the Team Harness 0032 record must be in work-state.md');
+  assert.match(runner, /### (?:D-ADR)?0032 — Cổng Iron Law/, 'the Iron Law 0032 record must be in runner.md');
+  assert.match(workState, /### (?:D-ADR)?0032 — Multi-role Team Harness/, 'the Team Harness 0032 record must be in work-state.md');
 });
 
 test('each target spec file carries the "Lịch sử quyết định retired" section heading exactly once', () => {

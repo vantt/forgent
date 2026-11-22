@@ -615,3 +615,22 @@ test(
   },
 );
 
+
+test(
+  'a role-field line and the leading own id of a decision heading are not citations; another id in the heading still is',
+  () => {
+    const findings = findCitationFormatFindings([
+      {
+        file: 'docs/platform/area/spec.md',
+        lines: [
+          '### D-ADR0062 — better, not bigger',
+          '',
+          '[valid_from:: 2026-10-18T14:42:56.368Z] [replaces:: D-ADR0061]',
+          '#### ADR0058 — recovery after a crashed seal (amends ADR0057)',
+          '[valid_from:: 2026-07-18] [amends:: D-ADR0002] see ADR0003',
+        ],
+      },
+    ]);
+    assert.deepEqual(findings.map((f) => [f.line, f.id]), [[4, 'ADR0057'], [5, 'ADR0002'], [5, 'ADR0003']]);
+  },
+);

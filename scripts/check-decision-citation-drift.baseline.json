@@ -46,7 +46,6 @@
     "d-local-outside-home:D7:Why the token leaves config now (owner, 2026-10-22, folding backlog item p-a189ff31): a confined worker can read `~/.fgos/config.json` today, because it is not among the paths `hostRead: blind` hides (`BLIND_HIDDEN_ROOTS`, `src/runner/dispatch/confinement/resources.mjs:26`), and with the gateway bound to `0.0.0.0` by design (D7 in `gateway.rs`) it could call the gateway outside its sandbox."
   ],
   "docs/platform/event-store/spec.md": [
-    "bare-citation:ADR0055:### D-ADR0055 — Event truth is sealed changesets as git objects on per-machine refs",
     "d-local-outside-home:D13:- Section 21 (the lifecycle triggers of sections 14 and 16): the opportunistic sync runs at the end of a command that opens the store, after its result is written, and only when the process is not a dispatched worker (`FGOS_DISPATCH_DEPTH` is 0). Plan decision D13 said \"sessions of the main checkout's own user\"; it is narrowed to \"not a dispatched worker\", because on the two writer machines only the owner's user runs fgOS sessions, so an owner-user check would add code with no case. Reverse this if another user ever runs sessions on a writer machine. Sealing is not gated: any process seals what is due. A push attempt, failed ones included, counts against `eventStore.sync.intervalSec`, so an offline machine tries once per interval, not once per command."
   ],
   "docs/platform/git/spec.md": [
@@ -54,8 +53,6 @@
     "bare-citation:ADR0058:Amended 2026-10-18 (owner, A1): Publication supersession, §10 rule 4a; amends D-ADR0057 as D-ADR0058; re-checked 2026-10-18 (a1-model-recheck `wf-run-1792294509927-9dd08319`, a1-vcas-recheck `wf-run-1792294510067-c73acc31`), two wording fixes folded (holder-lock admission, not a raw kernel acquire; backend native lock artifacts).",
     "bare-citation:ADR0055:| `src/state/events-jsonl-truncation-guard.mjs` (deleted in 9f23f7438) and `src/runner/main-fgos-checkpoint.mjs` (deleted in 9f23f7438) | Removed at the Work cutover (2026-10-22): the files, their callers in `claim-port.mjs` and `merge.mjs`, and the typed event declaration they used are gone; Work no longer commits event files (behaviour removed: legacy tracked event files, D-ADR0055) |",
     "bare-citation:ADR0055:**Temporary Work event declaration: removed at Work cutover (2026-10-22).** The typed optional `legacyEvents: {exactPaths}` declaration on `ScopedCommit` and `Checkpoint`, its closed legacy event layout validation, the hook grant-check branch that accepted event deletions from an active ScopedCommit intent, and the native route argument are deleted together with Work's adapter, checkpoint, truncation-guard and compaction duties (behaviour removed: legacy tracked event files, D-ADR0055). Work's events now live only in the Event Store. The cutover seal grant stays the single authority for staged `.fgos` deletions; Checkpoint still refuses `.fgos` paths; normal Unit scopes still exclude `.fgos`. The Inspect bounded last-commit timestamp read and the absent-versus-read-failure distinction stay as general Inspect facts.",
-    "bare-citation:ADR0057:### D-ADR0057 — Git is one foundation component",
-    "bare-citation:ADR0058:### D-ADR0058 — Git publication recovery after a crashed seal (amends D-ADR0057)",
     "bare-citation:ADR0057:### D-ADR0058 — Git publication recovery after a crashed seal (amends D-ADR0057)",
     "bare-citation:ADR0042:| Q7 | D-ADR0042 is preserved as in amendment A5: own-file-set clean gate, non-overlapping dirty paths tolerated, lagging checkout reported in the receipt. | §9 step 5; §17 claim wording. |",
     "d-local-outside-home:D2:- **D2, D3 (sequence counter and the scp form)**: the counter stays CAS-only with no WAL. Teaching the one remote door git's scp spelling makes the documented SSH support true and adds no transport. A claim is durable before it is reported (the local home flushes with `core.fsync=all`), and a push the remote refuses for its own reason keeps that reason; only git's own expected-value-not-held spellings count as a lost lease.",
@@ -79,69 +76,7 @@
     "d-local-outside-home:D3:| run-complete | `proposed` | runner (D3, verify tự chạy lại) | worker chạy xong + verify xanh TRÊN NHÁNH — \"đã làm\" nhưng CHƯA vào main |",
     "d-local-outside-home:D1:*artifact* (nó SỐNG ở đâu: D1 nhánh … D5 local-only). L9 đo TRẠNG THÁI hoàn tất",
     "d-local-outside-home:D5:*artifact* (nó SỐNG ở đâu: D1 nhánh … D5 local-only). L9 đo TRẠNG THÁI hoàn tất",
-    "d-local-outside-home:D1:run-complete ở L9 trong khi artifact nhánh của nó là L7-D1 — cùng một sự việc,",
-    "bare-citation:ADR0001:### D-ADR0001 — Nhật ký sự kiện là sự thật; store/DB là bản chiếu dựng lại được",
-    "bare-citation:ADR0009:### D-ADR0009 — Chống giao thoa tiến trình lúc cài",
-    "bare-citation:ADR0014:### D-ADR0014 — Kiến trúc giao tiếp người ↔ fgOS",
-    "bare-citation:ADR0035:### D-ADR0035 — Xác lập ranh giới sứ mệnh: fgOS phục vụ project khác/business workflow, không tự-phát-triển-chính-nó mặc định",
-    "bare-citation:ADR0036:### D-ADR0036 — Khoá RUL11 (tùm lum không phải nặng): \"tùm lum\", không phải \"nặng\"",
-    "bare-citation:ADR0054:### D-ADR0054 — RUL11 (tùm lum không phải nặng) gom trong phạm vi việc đang làm (supersede 0036)",
-    "bare-citation:ADR0036:[valid_from:: 2026-10-08] [replaces:: D-ADR0036]",
-    "bare-citation:ADR0061:### D-ADR0061 — Khoá RUL104 (tốt hơn, không to hơn): audit làm thứ đang có tốt hơn, không làm nó to ra",
-    "bare-citation:ADR0062:### D-ADR0062 — RUL104 (tốt hơn, không to hơn) thêm clean code và hexagonal (supersede 0061)",
-    "bare-citation:ADR0061:[valid_from:: 2026-10-18T14:42:56.368Z] [replaces:: D-ADR0061]"
-  ],
-  "docs/platform/runner/decisions/h-36d872fbb0e5.md": [
-    "bare-citation:ADR0005:### D-ADR0005 — Runner & cô lập worker",
-    "bare-citation:ADR0008:### D-ADR0008 — Routing theo audience của từng interface",
-    "bare-citation:ADR0020:### D-ADR0020 — Chặn `.fgos/` khỏi worktree worker (không khóa, không cô lập)",
-    "bare-citation:ADR0021:### D-ADR0021 — Wire main-checkout lock hook qua fgos doctor/setup, không epoch-fence",
-    "bare-citation:ADR0022:### D-ADR0022 — Khảo sát choke-point fgOS (quyết định lặp/lệch xuyên CLI/runner/skill)",
-    "bare-citation:ADR0023:### D-ADR0023 — Thứ tự ưu tiên sản phẩm: ship faster > DoD (result + docs) > hoàn thiện sau ngưỡng",
-    "bare-citation:ADR0025:### D-ADR0025 — Thứ tự ưu tiên sản phẩm (chi tiết hoá 0023), nạp always-loaded qua AGENTS.md",
-    "bare-citation:ADR0023:[valid_from:: 2026-07-30] [replaces:: D-ADR0023]",
-    "bare-citation:ADR0026:### D-ADR0026 — Native-First Dispatch Doctrine: launcher/rootTask/capacity",
-    "bare-citation:ADR0028:### D-ADR0028 — Đổi tên pinned term `orchestrator` thành `launcher`",
-    "bare-citation:ADR0026:[valid_from:: 2026-08-08] [amends:: D-ADR0026]",
-    "bare-citation:ADR0029:### D-ADR0029 — Sửa ba mệnh đề từ vựng dispatch của `0026`: bỏ `rootTask`/`subTask`, `capacity` là năng lực có tên, T1 hai giá trị",
-    "bare-citation:ADR0026:[valid_from:: 2026-08-09] [amends:: D-ADR0026]",
-    "bare-citation:ADR0030:### D-ADR0030 — Thêm bậc ưu tiên #2 \"Release con người\" vào thứ tự ưu tiên sản phẩm",
-    "bare-citation:ADR0025:[valid_from:: 2026-08-10] [replaces:: D-ADR0025]",
-    "bare-citation:ADR0031:### D-ADR0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới",
-    "bare-citation:ADR0028:[valid_from:: 2026-08-11] [amends:: D-ADR0028]",
-    "bare-citation:ADR0032:### D-ADR0032 — Cổng Iron Law chỉ hỏi ở ranh giới trunk, thêm mức `warn`, agent gõ lệnh thay người",
-    "bare-citation:ADR0033:### D-ADR0033 — Capacity cli-spawn-shaped thắng hasLiveTaskAccess, thu hẹp 0026 rule 2",
-    "bare-citation:ADR0034:### D-ADR0034 — Đổi tên `capacity`/`capacities` thành `executor`/`executors`, chốt tách `capability`",
-    "bare-citation:ADR0042:### D-ADR0042 — Đổi sang atomic CAS commit tree cho Merge Gate",
-    "bare-citation:ADR0043:### D-ADR0043 — Vocabulary: bound-invocation-supervisor vs detached-run-supervisor [PHẦN `detached-run-supervisor` ĐÃ BỊ THAY bởi D-ADR0056 (run supervisor Rust cách direct), cuối mục này]",
-    "bare-citation:ADR0056:### D-ADR0056 — Run supervisor Rust thay `detached-run-supervisor`: cách `direct` không pipe, không IPC, receipt qua file (D-ADR0056 (run supervisor Rust cách direct), thay phần `detached-run-supervisor` của 0043)",
-    "bare-citation:ADR0043:[valid_from:: 2026-10-18T01:32:53.084Z] [amends:: D-ADR0043]",
-    "bare-citation:ADR0059:### D-ADR0059 — Round herdr do supervisor canh qua terminal-control, không còn canh trong controller (D-ADR0059 (round herdr do supervisor canh), mở rộng D-ADR0056 (run supervisor Rust cách direct))",
-    "bare-citation:ADR0060:### D-ADR0060 — Controller chết: attempt settle, unit chờ `--resume` tường minh; tự resume là việc hoãn có tên",
-    "bare-citation:RUL102:[valid_from:: 2026-11-12] [amends:: RUL102]",
-    "bare-citation:ADR0076:[valid_from:: 2026-11-17] [amends:: D-ADR0076]"
-  ],
-  "docs/platform/seat-binding/spec.md": [
-    "bare-citation:ADR0072:[valid_from:: 2026-11-17] [amends:: D-ADR0072]"
-  ],
-  "docs/platform/system-overview/spec.md": [
-    "bare-citation:ADR0016:### D-ADR0016 — Mốc MVP của fgOS",
-    "bare-citation:ADR0018:### D-ADR0018 — Mốc MVP2 của fgOS"
-  ],
-  "docs/platform/work-state/decisions/retired-decision-history.md": [
-    "bare-citation:ADR0002:### D-ADR0002 — Mô hình việc phẳng",
-    "bare-citation:ADR0003:### D-ADR0003 — Đặt tên & bố cục dữ liệu",
-    "bare-citation:ADR0004:### D-ADR0004 — Phạm vi & non-goal",
-    "bare-citation:ADR0006:### D-ADR0006 — Trạng thái `proposed`",
-    "bare-citation:ADR0007:### D-ADR0007 — Tiến hoá schema & event",
-    "bare-citation:ADR0011:### D-ADR0011 — Version tường minh cho mọi contract",
-    "bare-citation:ADR0012:### D-ADR0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời",
-    "bare-citation:ADR0002:[valid_from:: 2026-07-18] [amends:: D-ADR0002]",
-    "bare-citation:ADR0013:### D-ADR0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`",
-    "bare-citation:ADR0019:### D-ADR0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)",
-    "bare-citation:ADR0024:### D-ADR0024 — Đổi tên status `proposed` thành `awaiting-approval`",
-    "bare-citation:ADR0006:[valid_from:: 2026-07-29] [amends:: D-ADR0006]",
-    "bare-citation:ADR0027:### D-ADR0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)"
+    "d-local-outside-home:D1:run-complete ở L9 trong khi artifact nhánh của nó là L7-D1 — cùng một sự việc,"
   ],
   "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md": [
     "d-local-outside-home:D2:`docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` D2).",
