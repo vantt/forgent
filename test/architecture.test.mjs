@@ -1853,6 +1853,12 @@ test('the Node addon depends on fgos-execution and the run supervisor\'s lease p
   assert.match(toml, /^fgos-run-supervisor = \{[^}]*default-features = false, features = \["lease"\] \}$/m, 'the run supervisor is linked with its lease part only');
 });
 
+test('fgos-execution links the run supervisor with default features off and the lease part only, and no Execution engine', () => {
+  const toml = fs.readFileSync(path.join(root, 'packages/execution/rust/Cargo.toml'), 'utf8');
+  assert.doesNotMatch(toml, /^\s*fgos-execution-engine\s*=/m, 'fgos-execution links fgos-execution-engine');
+  assert.match(toml, /^fgos-run-supervisor = \{[^}]*default-features = false, features = \["lease"\] \}$/m, 'fgos-execution links the run supervisor with its lease part only');
+});
+
 test('every door row holds: patterns appear only in allowed or debt files, and no entry is stale', () => {
   const files = new Map(doorFiles().map((file) => [file, fs.readFileSync(path.join(root, file), 'utf8')]));
   assert.deepEqual(checkDoors(manifest.doors ?? [], files), []);
