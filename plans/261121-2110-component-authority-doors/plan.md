@@ -117,7 +117,7 @@ footprint:
   - .claude/skills/**
   - CHANGELOG.md
 source:
-  - docs/discussions/component-authority/DISCUSSION.md
+  - plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md
   - p-esa3lau6kd
   - p-7nja6ilwkr
 created: 2026-11-21

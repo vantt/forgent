@@ -2,7 +2,7 @@
 
 ## Inputs
 - `docs/architecture-manifest.json` (whole).
-- `test/architecture.test.mjs`: reads the manifest at :31 and :1610; `checkDoors` is at :1794-1853.
+- `test/architecture.test.mjs`: reads the manifest at :31 and :1590; `checkDoors` is at :1768-1828.
 - `src/setup/instruction-registry.mjs:445-480` (`discoverKnownOwners`) and its fixtures in `test/setup/instruction-registry.test.mjs` (:116, 501, 574, 605, 636, 665, 780).
 - `packages/component-authority/contracts/model.v1.json` and `model/components.json` (phase 1).
 - To list the live mentions, run `rg -l 'architecture-manifest' --glob '!archive/**' --glob '!docs/history/**' --glob '!plans/**' --glob '!**/verification/**'`.
@@ -31,7 +31,7 @@ packages/component-authority/model/layers.json, packages/component-authority/mod
    Keep `contract`/`map` as a `model` stamp in `layers.json`.
 3. Add one small loader at the top of `test/architecture.test.mjs` that reads the model files and builds the same
    in-memory shape the tests used (`layers`, `rules`, `tiers`, `tierExceptions`, `doors` sorted by slug, `files`).
-   Point :31 and :1610 at it. Change no assertion. Update the header comment.
+   Point :31 and :1590 at it. Change no assertion. Update the header comment.
 4. In `src/setup/instruction-registry.mjs`, `discoverKnownOwners` reads component ids from `components.json` (each
    row's `id`) and domains from `layers.json`. Rename the `manifestPath` option to `modelDir`, move every caller and
    fixture, and keep the behaviour the same.

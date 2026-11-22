@@ -8,9 +8,12 @@
   §Area Map and §Shared Entities, and §Shared Entities in `docs/platform/observe/spec.md` and
   `docs/platform/workflow/spec.md`.
 - `scripts/run-tests.mjs`, to see how a check joins `npm test`.
+- `plans/261121-2109-component-authority/reports/docos-boundary-answer.md`: DOCOS keeps the holder table's shape
+  (scope to holder file or directory) and wants to see the generated holder view before it replaces the
+  hand-written table.
 
 ## Files it may write
-scripts/component-authority-render.mjs, test/component-authority/render.test.mjs, src/report/decision-index.mjs, test/report/decision-index.test.mjs, docs/platform/component-boundary.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md
+scripts/component-authority-render.mjs, test/component-authority/render.test.mjs, src/report/decision-index.mjs, test/report/decision-index.test.mjs, docs/platform/component-boundary.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md, plans/261121-2109-component-authority/reports/holder-view-preview.md
 
 ## Steps
 1. Write `scripts/component-authority-render.mjs` with exports `computeViews(repoRoot)` and `main(argv)`, plus a
@@ -21,7 +24,11 @@ scripts/component-authority-render.mjs, test/component-authority/render.test.mjs
 2. Views:
    - `component-boundary.md`: full component list with Owns / Must not own, door count and source links.
    - README §2: the owner table.
-   - governance holder table: same columns as today, so the scope aliases remain.
+   - governance holder table: same columns and the same scope-to-holder shape as today, so the scope aliases
+     remain and `fgos decision-index` keeps working. Before this block replaces the hand-written table, write the
+     generated table to `reports/holder-view-preview.md` with a row-by-row diff against the current table, and send
+     it to DOCOS through the supervisor (the route its boundary answer came by). Replace the table only after DOCOS
+     answers; until then the table stays hand-written and the other views land without waiting.
    - system-overview Area Map and Shared Entities.
    - observe and workflow Shared Entities: the rows whose owner is that area.
 3. `src/report/decision-index.mjs`: `narrativeHolderResolver` reads `decision-kinds.json` (canonical, aliases and
@@ -33,7 +40,8 @@ scripts/component-authority-render.mjs, test/component-authority/render.test.mjs
 
 ## Verify
 `node scripts/component-authority-render.mjs --check` exits 0, and
-`node --test test/component-authority/render.test.mjs test/report/decision-index.test.mjs` is green. Running
+`node --test test/component-authority/render.test.mjs test/report/decision-index.test.mjs` is green, and
+`fgos decision-index --check` reports `docs/decisions/index.md` unchanged (the holder shape did not move). Running
 `node scripts/component-authority-render.mjs` (write mode) twice leaves `git diff` empty the second time.
 
 ## Rollback

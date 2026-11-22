@@ -6,7 +6,10 @@ priority: P1
 blockedBy:
   - 261118-1341-s6a-execution-tier-rust
   - 261120-0625-work-data-model
-base: bf061ff358fc3c8669195a5989e0ee5f3b2940ee
+  - 261122-0118-heads-stable-and-able
+  - 261122-0056-orchestration-skeleton
+  - 261122-1950-owner-communication-standard
+base: 8a7839d3881a03527cfcf003e05dc323d191a613
 footprint:
   - plans/261121-2109-component-authority/**
   - docs/platform/component-authority/**
@@ -49,7 +52,7 @@ footprint:
   - docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
   - docs/platform/proposals/component-authority-boundary-map.md
 source:
-  - docs/discussions/component-authority/DISCUSSION.md
+  - plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md
   - p-esa3lau6kd
   - p-7nja6ilwkr
 created: 2026-11-21
@@ -75,19 +78,20 @@ cleanup, and the primitive-and-alias land checks are in the sibling plan
 [`261121-2110-component-authority-doors`](../261121-2110-component-authority-doors/plan.md). That plan touches
 files that three running plans own, so it waits for them (see Risks).
 
-## Facts (prior art, 2026-11-21, HEAD bf061ff35)
+## Facts (prior art, written 2026-11-21 at bf061ff35, refreshed 2026-11-22 at 8a7839d38)
 
 - `docs/architecture-manifest.json` (since 7349a52bc): keys `contract`, `map`, `layers` (5), `rules` (3:
   `one-directional-layer`, `domain-siloing`, `tier-downward`), `components` (1: `packaging-distribution`),
-  `domains` (3), `tierNames`, `tiers` (44 prefixes), `tierExceptions` (0), `doors` (78 rows, fields `job`,
-  `kind`, `patterns`, `allowed`, `debt`, `reason`, `retiredBy`; 76 debt entries in 22 rows), `files` (344
-  file-to-layer rows).
-- Live readers: `test/architecture.test.mjs:31,1610` (all checks, `checkDoors` at :1794-1853);
+  `domains` (3), `tierNames`, `tiers` (44 prefixes), `tierExceptions` (0), `doors` (83 rows, fields `job`,
+  `kind`, `patterns`, `allowed`, `debt`, `reason`, `retiredBy`; 320 allowed entries; 75 debt entries in 22
+  rows), `files` (325 file-to-layer rows). At bf061ff35 it had 78 door rows, 76 debt entries and 344 files;
+  the s6a and work-data-model plans changed it since, and phase 2 moves it as it stands.
+- Live readers: `test/architecture.test.mjs:31,1590` (all checks, `checkDoors` at :1768-1828);
   `src/setup/instruction-registry.mjs:455` (`discoverKnownOwners` reads `components` and `domains`), with
   fixtures in `test/setup/instruction-registry.test.mjs`. Comment mentions are in `src/verbs/merge/iron-law-level.mjs:9`,
   `src/runner/dispatch/execution-contract.mjs:77`, `src/cli/command-registry.mjs:7` and
   `scripts/install-git-hooks.mjs:6`. Placement rule `doc-architecture-manifest-1` is in
-  `packages/convention/contracts/convention.rules.v1.json:157`. Live prose mentions are in AGENTS.md,
+  `packages/convention/contracts/convention.rules.v1.json:155`. Live prose mentions are in AGENTS.md,
   `core/instructions/design-principles.md`, `docs/reading-map.md` and the platform docs listed in the footprint.
 - `src/report/decision-index.mjs:30` (`narrativeHolderResolver`) parses the governance "Decision scope to
   holder table" by hand. It is the only generator that reads an ownership ledger today.
@@ -168,7 +172,18 @@ mention; phases 5 and 6 then replace their registry sections with generated bloc
 
 **Owner approval (2026-11-21 23:34):** the owner approved this plan and its sibling as written (option A of the approval question lead:SUPERVISOR put to him). It stays `draft` only because the plan-contract check refuses `ready` while its footprint overlaps the running plans below. When every `blockedBy` plan is `done`, the planner or supervisor sets `ready` with no further owner question.
 
-**Why it waits:** two running plans own files this plan must change.
+**Refresh (2026-11-22, planner wake):** the two original `blockedBy` plans are `done`. `base` moved to 8a7839d38,
+the manifest counts and reader line numbers in Facts were re-read, and the discussion path follows its move to
+`plans/discussions/` (a1022572a). The check still refuses `ready`, because three plans that became active after
+this plan was written own files in its footprint, so they joined `blockedBy`:
+- `261122-0118-heads-stable-and-able` (running): `docs/architecture-manifest.json` and
+  `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`.
+- `261122-0056-orchestration-skeleton` (ready): `docs/platform/workflow/spec.md` and `docs/platform/runner/spec.md`.
+- `261122-1950-owner-communication-standard` (ready): `AGENTS.md`, `docs/reading-map.md`,
+  `docs/platform/agent-mailbox/spec.md` and `docs/platform/observe/spec.md`.
+The same rule applies when they are `done`: refresh `base`, re-read the manifest, run the check, set `ready`.
+
+**Why it first waited:** two plans that were running when it was written owned files this plan must change.
 - `261118-1341-s6a-execution-tier-rust` owns `docs/architecture-manifest.json`, `test/architecture.test.mjs`,
   `src/setup/**`, `test/setup/**`, `src/runner/dispatch/**`, `docs/reading-map.md`,
   `docs/platform/component-boundary.md`, `docs/platform/runner/**` and `docs/platform/seat-binding/spec.md`. It edits

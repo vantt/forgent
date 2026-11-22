@@ -1,7 +1,7 @@
 # Phase 1: Spec, model schema and the self row
 
 ## Inputs
-- `docs/discussions/component-authority/DISCUSSION.md`: the hand-off, §3 rows 1a, 1b, 3b, 4, 4a, 4b, §4 CA-D1..CA-D5, and §6 (the approved design, CA-D5).
+- `plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md`: the hand-off, §3 rows 1a, 1b, 3b, 4, 4a, 4b, §4 CA-D1..CA-D5, and §6 (the approved design, CA-D5).
 - `docs/platform/convention/spec.md`: the header block and section style of a small component spec.
 - `docs/platform/documentation/subcomponents/document-identity/spec.md` and `.../admission/spec.md`: the locate-before-write and admission models that `locate` and `declare` reuse.
 - `docs/platform/governance.md#decision-scope-to-holder-table`: where a new area's decision narrative goes.
