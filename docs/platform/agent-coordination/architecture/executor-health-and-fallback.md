@@ -24,7 +24,7 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/archi
 
 ## Implementation And Design Status
 
-The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs. The retained recovery planner produces a recommendation, park or needs-input decision from snapshot and evidence. Evidence: `src/runner/dispatch/recovery-planner.mjs:243-266`. Applying a recommendation checks its action key, snapshot hash, control epoch, expiry and current legality again. Evidence: `src/runner/dispatch/recovery-planner.mjs:281-316`.
+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs. The retained recovery planner produces a recommendation, park or needs-input decision from snapshot and evidence. Evidence: `packages/execution/engine/src/planning/recovery.rs:243-266`. Applying a recommendation checks its action key, snapshot hash, control epoch, expiry and current legality again. Evidence: `packages/execution/engine/src/planning/recovery.rs:281-316`.
 
 | Section | Status | Evidence / limit |
 |---|---|---|
