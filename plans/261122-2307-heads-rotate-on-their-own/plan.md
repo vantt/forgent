@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Heads rotate on their own: a cron, a background task, a near weekly quota and a quarantined account no longer need a manual rotate"
-status: running
+status: done
 priority: P1
 blockedBy: []
 base: 27fd8a9b09b6a8584c37d7b18a6a96be4b2e1225
@@ -120,7 +120,7 @@ A head session rotates without anyone running `fgos session rotate` in each of t
 | 1 | [A head launch sees the quarantine](phase-01-head-launch-sees-quarantine.md) | - | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs | 1 | done |
 | 2 | [Crons and background tasks no longer block rotation](phase-02-crons-and-tasks-rotate.md) | - | packages/session-host/rust/src/rotation/decide.rs, apps/fgos/src/wiring/session_rotation_hook.rs, src/session-rotation/rotate.mjs, src/session-rotation/handoff-store.mjs, test/session-rotation/rotate.test.mjs, test/session-rotation/handoff-store.test.mjs, packages/session-host/contracts/rotation-files.v1.json, plans/261122-2307-heads-rotate-on-their-own/reports/stop-payload-lists.md | 1 | done |
 | 3 | [A near weekly quota rotates the head](phase-03-weekly-quota-rotates.md) | 1, 2 | packages/session-host/rust/src/rotation/decide.rs, packages/session-host/rust/src/rotation/measure.rs, apps/fgos/src/wiring/session_rotation_hook.rs, src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, packages/observe/rust/src/sources/transcript_records.rs, packages/observe/rust/tests/transcript_records_test.rs, src/runner/dispatch/confinement/authority.mjs, src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, core/config-standard/sessionRotation.yaml, core/config-schema/sessionRotation.schema.yaml, plans/261122-2307-heads-rotate-on-their-own/reports/status-line-payload.md | 2 | done |
-| 4 | [Integration, docs and changelog](phase-04-integration.md) | 1, 2, 3 | docs/platform/session-host/spec.md, CHANGELOG.md, plans/261122-2307-heads-rotate-on-their-own/reports/integration.md | 3 | ready: host full-suite run landed on main 4951cf3da (after 7717d9a05): /home/vantt/projects/forgent-worktrees/main-cargo-test-4951cf3da.log and main-npm-test-4951cf3da.log (npm ended exit 1); lead judges the reds against acceptance 6 (q-zcileomdpa) |
+| 4 | [Integration, docs and changelog](phase-04-integration.md) | 1, 2, 3 | docs/platform/session-host/spec.md, CHANGELOG.md, plans/261122-2307-heads-rotate-on-their-own/reports/integration.md | 3 | done |
 
 Every phase's capability is `code:implement`, except phase 4, which is `code:test`.
 
@@ -134,8 +134,9 @@ its file in two points. First, the status-line sidecar lives beside the session 
 (`<dir of transcript_path>/<session_id>.context-sidecar.jsonl`), not under the lineage, because the confinement policy
 (`packages/execution/contracts/confinement-policy/policy.v1.json`) never grants a writable path under `.fgos`. Second,
 the payload in `reports/status-line-payload.md` was reconstructed from the installed CLI bundle, so a real recording
-is still owed. Phase 4's gate result is in `reports/integration.md`. Phase 4 landed `7717d9a05` and stays `running`,
-parked on acceptance criterion 6. In a sandbox, `npm test` cannot start because the full-suite lock is read-only, and
+is still owed. Phase 4's gate result is in `reports/integration.md`. Phase 4 landed `7717d9a05`. Acceptance criterion 6 was judged on the host run at `4951cf3da`: every owning proof of
+this plan passed, and the reds are all outside the footprint and handed to the supervisor
+(`reports/lead-261123-0250-heads-rotate-full-suite-judgment.md`). Phase 4 and the plan are `done`. Earlier note: In a sandbox, `npm test` cannot start because the full-suite lock is read-only, and
 `cargo test --workspace` shows 7 process-liveness failures in `apps/fgos/src/wiring/doctor/confinement.rs`, a module
 this plan does not touch. Both gates must run outside a sandbox
 (`reports/lead-261123-0214-heads-rotate-wave-run.md`).

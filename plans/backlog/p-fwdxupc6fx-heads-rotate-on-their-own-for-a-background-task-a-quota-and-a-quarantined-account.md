@@ -1,7 +1,7 @@
 ---
 id: p-fwdxupc6fx
 title: "Heads rotate on their own: a background task, an account quota and a quarantined account each stop a head rotating without a manual step (session rotation, priority high; source: lead:SUPERVISOR via mail, owner-approved 2026-11-22 23:10)"
-status: proposed
+status: done
 priority: P1
 area: session-rotation
 created: 2026-11-22

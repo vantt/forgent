@@ -1,7 +1,7 @@
 ---
 id: p-njgws5wsex
 title: "A head launch's seat ranking leases a quarantined account, so a head rotation is refused (execution, priority high; source: lead:supervisor via mail, 2026-11-22 22:50)"
-status: proposed
+status: done
 priority: P1
 area: execution
 created: 2026-11-22
