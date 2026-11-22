@@ -1614,6 +1614,7 @@ const ENTRY_LEAF_IMPORTS = [
   '../src/cli/exit-codes.mjs',
   '../src/cli/parse-args.mjs',
   '../src/cli/verb-exit.mjs',
+  '../src/native/dispatch-depth.mjs',
   '../src/state/envelope.mjs',
   '../src/util/store-error.mjs',
 ];

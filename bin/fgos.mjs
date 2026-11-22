@@ -49,6 +49,7 @@ import { deriveTitle, classify } from '../src/intake/classify.mjs';
 import { mintWorkId } from '../src/util/identity-mint.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfigForDir, RunnerConfigError, parseRunTimeout } from '../src/native/execution-door.mjs';
+import { currentDispatchDepth } from '../src/native/dispatch-depth.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { checkDirDiffersFromCwd, attachDirWarning } from '../src/workflow/dir-guard.mjs';
 import { lintPlanCapabilityAnnotations, lintPhaseUnits } from '../src/report/capability-plan-lint.mjs';
@@ -3501,7 +3502,6 @@ async function main() {
   // Set once the verb is known: whether it is itself a seal or publish child, and its sub-verb (the only argument the
   // fault record keeps by value).
   let sub;
-  const { currentDispatchDepth } = await import('../src/runner/dispatch/adapters.mjs');
   try {
     const { flags, positional } = withFaultClass('arg-parse', () => parseArgs(rest));
 

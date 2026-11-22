@@ -1888,6 +1888,7 @@
     "src/runner/dispatch/worker-home.mjs": "infra",
     "src/native/stop-processes-inside.mjs": "infra",
     "src/native/execution-door.mjs": "infra",
+    "src/native/dispatch-depth.mjs": "kernel",
     "src/native/dispatch-error.mjs": "infra",
     "src/native/legacy-view.mjs": "infra",
     "src/runner/dispatch/worker-session.mjs": "infra",
