@@ -1,34 +1,25 @@
 #!/usr/bin/env node
-// check-decision-citation-drift.mjs -- detects two families of citation
-// defect across backlog, retained specs, recursive platform specs/decisions, and --skills-dir
-// roots (recursive, *.md):
-// (1) dead-framing: a line cites a decision (ADR<n> or a bare NNNN) which
-//     has since been superseded, without naming the superseding decision
-//     on the same line (STR72 CoS clause 2, PBI p-2d71dfc3 -- not covered
-//     by p-9fb81485, which checks decisions/*.md's own internal
-//     backward-pointer pair instead).
-// (2) citation-format (tsk-37i D3): a bare ADR<n>/RUL<n> id with no
-//     one-line gloss immediately after it, or a D-local id (D<n>) cited
-//     anywhere outside its own CONTEXT.md at all (decision 0017 -- a
-//     D-local id is never cited outside its home, gloss or not; the only
-//     correct fix is inlining the content and deleting the id).
-//     Deliberately out of scope (tsk-37i D3, not re-opened here): a bare
-//     4-digit id with no `ADR`/`RUL`/`D` prefix at all is not detected by
-//     this finding type -- that is the pre-tsk-1lv-4 ADR<n>-prefix
-//     convention, superseded by docs/decisions/index.md (generated,
-//     tsk-1lv-2/4) now that docs/decisions/000N-*.md itself is retired; a
-//     bare 4-digit id is only ever caught here when it cites a superseded
-//     decision (finding (1) above already covers that case).
+// check-decision-citation-drift.mjs -- detects citation-format defects
+// across backlog, retained specs, recursive platform specs/decisions, and
+// --skills-dir roots (recursive, *.md) (tsk-37i D3): a bare ADR<n>/RUL<n>
+// id with no one-line gloss immediately after it, or a D-local id (D<n>)
+// cited anywhere outside its own CONTEXT.md at all (decision 0017 -- a
+// D-local id is never cited outside its home, gloss or not; the only
+// correct fix is inlining the content and deleting the id). A bare 4-digit
+// id with no `ADR`/`RUL`/`D` prefix is not detected.
+// The dead-framing family (a citation of a superseded decision) was retired
+// on 2026-11-22: it read `superseded_by` from docs/decisions/NNNN-*.md
+// frontmatter, a corpus retired by tsk-1lv-4, so it could never fire.
+// Decisions in force come from the documentation area's pkm view instead.
 // Detection only -- flags, never fixes. Ratchets against a checked-in
 // baseline (tsk-37i D4/D8): --write-baseline snapshots every current
 // finding of every kind; a bare run only fails on a finding NOT already
 // in the baseline.
 //
 // tsk-1lv-1 additive exports (below `runCli`): the write-time sweep
-// `fgos decision --relation supersedes:<id>|touches:<id>` runs widens
-// this file's own citation scan from backlog.md+platform specs/decisions only to
-// docs/**+src/**+plugins/**, for an arbitrary relation id (not only the
-// 4-digit ADR ids `extractCitedIds` above assumes) — see
+// `fgos decision --relation supersedes:<id>` runs widens this file's own
+// citation scan from backlog.md+platform specs/decisions only to
+// docs/**+src/**+plugins/**, for an arbitrary relation id — see
 // `collectWideSourceFiles`/`findWideCitationFindings`. These are pure,
 // additive, and never called by this file's own CLI mode above, so the
 // existing backlog/platform-specs default stays byte-identical.
@@ -38,9 +29,7 @@ import path from 'node:path';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { ownedFileSet } from './lib/git-ports.mjs';
 import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
-import { readFrontmatter, YamlParseError } from '../src/util/yaml.mjs';
 
-const DECISION_ID_PATTERN = /^\d{4}$/;
 const DEFAULT_BASELINE_PATH =
   'scripts/check-decision-citation-drift.baseline.json';
 const CITATION_RE =
@@ -48,52 +37,6 @@ const CITATION_RE =
 
 export function isDLocalId(id) {
   return typeof id === 'string' && /^D\d+$/.test(id);
-}
-
-export function extractCitedIds(line, knownIds) {
-  const ids = new Set();
-  for (const m of line.matchAll(/ADR(\d{4})/g)) {
-    ids.add(m[1]);
-  }
-  const bareRe = /(?<!ADR)\b(\d{4})\b/g;
-  for (const m of line.matchAll(bareRe)) {
-    if (knownIds.has(m[1])) ids.add(m[1]);
-  }
-  return ids;
-}
-
-export function findCitationDriftFindings(
-  sourceFiles,
-  supersededById,
-) {
-  const knownIds = new Set(supersededById.keys());
-  const findings = [];
-
-  for (const { file, lines } of sourceFiles) {
-    lines.forEach((line, idx) => {
-      const cited = extractCitedIds(line, knownIds);
-      for (const id of cited) {
-        const supersededBy = supersededById.get(id);
-        if (!supersededBy) continue;
-        if (cited.has(supersededBy)) continue;
-
-        const ln = idx + 1;
-        findings.push({
-          kind: 'dead-framing',
-          file,
-          line: ln,
-          text: line.trim(),
-          id,
-          supersededBy,
-          message:
-            `${file}:${ln}: cites ${id} ` +
-            `(superseded by ${supersededBy}) ` +
-            'without acknowledging the supersession',
-        });
-      }
-    });
-  }
-  return findings;
 }
 
 // Pure: does a parenthetical (including its own parens, e.g. "(D2, D4)")
@@ -221,28 +164,6 @@ export function baselineFromFindings(findings) {
   return baseline;
 }
 
-function loadSupersededById(decisionsDir) {
-  const nameRe = /^\d{4}-.*\.md$/;
-  const files = fs
-    .readdirSync(decisionsDir)
-    .filter((f) => nameRe.test(f));
-  const map = new Map();
-  for (const file of files) {
-    const id = file.slice(0, 4);
-    const full = path.join(decisionsDir, file);
-    const content = fs.readFileSync(full, 'utf8');
-    const { meta } = readFrontmatter(content, full);
-    const sb = meta.superseded_by;
-    if (
-      typeof sb === 'string' &&
-      DECISION_ID_PATTERN.test(sb)
-    ) {
-      map.set(id, sb);
-    }
-  }
-  return map;
-}
-
 function collectMarkdownFiles(dir) {
   const results = [];
   if (!fs.existsSync(dir)) return results;
@@ -363,10 +284,8 @@ export function collectWideSourceFiles(cwd, { roots = WIDE_SWEEP_ROOTS, excludeR
 
 /**
  * Pure: whole-word literal citations of `targetId` across `sourceFiles`
- * that do NOT also mention `supersedingLabel` on the same line — the
- * generalized form of `findCitationDriftFindings` above, for an arbitrary
- * relation id token (a `state.decisions` D-ID or work-item id, not only
- * the 4-digit ADR ids `extractCitedIds`/`DECISION_ID_PATTERN` assume).
+ * that do NOT also mention `supersedingLabel` on the same line, for an
+ * arbitrary relation id token (a `state.decisions` D-ID or work-item id).
  */
 export function findWideCitationFindings(sourceFiles, targetId, supersedingLabel, homeFile) {
   let effectiveSourceFiles = sourceFiles;
@@ -402,7 +321,6 @@ function loadBaseline(baselinePath) {
 }
 
 function parseArgs(argv) {
-  const decisionsIdx = argv.indexOf('--decisions-dir');
   const backlogIdx = argv.indexOf('--backlog');
   const specsIdx = argv.indexOf('--specs-dir');
   const baselineIdx = argv.indexOf('--baseline');
@@ -411,10 +329,6 @@ function parseArgs(argv) {
     if (a === '--skills-dir') skillsDirs.push(argv[i + 1]);
   });
   return {
-    decisionsDir:
-      decisionsIdx >= 0
-        ? argv[decisionsIdx + 1]
-        : 'docs/decisions',
     backlogPath:
       backlogIdx >= 0
         ? argv[backlogIdx + 1]
@@ -432,30 +346,21 @@ function parseArgs(argv) {
 
 export function runCli(argv, cwd, log = console.log) {
   const {
-    decisionsDir,
     backlogPath,
     specsDir,
     skillsDirs,
     baselinePath,
     writeBaseline,
   } = parseArgs(argv);
-  const supersededById = loadSupersededById(
-    path.resolve(cwd, decisionsDir),
-  );
   const sourceFiles = loadSourceFiles(
     path.resolve(cwd, backlogPath),
     path.resolve(cwd, specsDir),
     skillsDirs.map((d) => path.resolve(cwd, d)),
     cwd,
   );
-  const driftFindings = findCitationDriftFindings(
-    sourceFiles,
-    supersededById,
-  );
-  const formatFindings = findCitationFormatFindings(
+  const findings = findCitationFormatFindings(
     sourceFiles,
   );
-  const findings = [...driftFindings, ...formatFindings];
   const resolvedBaselinePath = path.resolve(
     cwd,
     baselinePath,
@@ -505,11 +410,5 @@ export function runCli(argv, cwd, log = console.log) {
 if (isMainModule(import.meta.url)) {
   // Staged here, never at module scope: bin/fgos.mjs imports this file and must not build Rust on every start.
   ensureAddonForScript();
-  try {
-    process.exitCode = runCli(process.argv.slice(2), process.cwd());
-  } catch (err) {
-    if (!(err instanceof YamlParseError)) throw err;
-    console.error(`check-decision-citation-drift: ${err.message}`);
-    process.exitCode = 1;
-  }
+  process.exitCode = runCli(process.argv.slice(2), process.cwd());
 }

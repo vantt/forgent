@@ -1,6 +1,6 @@
 ---
 area: decision-citation-drift
-updated: 2026-07-27
+updated: 2026-11-22
 sources: [str72-supersede-drift-check]
 decisions: [28f8d8f8]
 coverage: partial
@@ -30,108 +30,94 @@ Superseded by: None
 > Source carriage:  Implementation corrections: only identified false current sentences corrected; evidence: scripts/check-decision-citation-drift.mjs:16-20; docs/decisions/index.md:1; package.json:1; scripts/check-decision-citation-drift.mjs:1-34; no tracked .bee/config.json or CI trigger.
 
 
-A read-only detection check that scans the product backlog and area specs for
-lines that still cite a decision by its old id after that decision has been
-superseded, without also naming the decision that replaced it. Its purpose is
-to catch "dead framing" — a backlog row or spec line whose reasoning was
-overturned, but whose wording still reads as if the old decision were current,
-so a reader (human or agent) re-derives the outdated conclusion. Used by
-whoever maintains `plans/backlog.md` and the platform specs under `docs/platform/` (a human operator or
-an agent doing grooming/scribing).
+A read-only detection check over the product backlog, the platform specs and
+decision narratives, and the skill trees. It flags two citation-format defects:
+
+- **bare citation:** an `ADR<n>` or `RUL<n>` id with no one-line gloss right after
+  it, so a reader cannot tell what it says without opening another file;
+- **D-local outside home:** an item-local `D<n>` id cited anywhere outside its own
+  `CONTEXT.md`. A D-local id is never cited outside its home, gloss or not; the fix
+  is to inline the content and drop the id (decision 0017).
+
+Used by whoever maintains `plans/backlog/` and the platform specs (a human operator or
+an agent doing grooming), and by `npm run check:before-merge`.
+
+The check used to have a third family, **dead framing**: a line citing a decision that
+had since been superseded, without naming its successor. It was retired on 2026-11-22
+(see Decision history). Which decisions are in force will come from the documentation
+area's pkm view ([document identity 8.2](../documentation/subcomponents/document-identity/spec.md#82-the-search-view)),
+not from this check.
 
 ## Entry Points & Triggers
 
-- `node scripts/check-decision-citation-drift.mjs` (from the product repo
-  root) — the only way to run the check today. Manual invocation only; there
-  is no scheduled or CI trigger yet (see Open Gaps).
-- Optional flags override the default locations: `--decisions-dir <path>`
-  (default `docs/decisions`), `--backlog <path>` (default `plans/backlog.md`),
-  `--specs-dir <path>` (default `docs/platform`, the root scanned for area specs and decision narratives).
+- `node scripts/check-decision-citation-drift.mjs` from the product repo root.
+- `npm run check:before-merge` runs it with `--skills-dir plugins/fgOS/skills`.
+- Optional flags: `--backlog <path>` (default `plans/backlog`, a file or a directory of
+  Markdown files), `--specs-dir <path>` (default `docs/platform`), `--skills-dir <path>`
+  (repeatable), `--baseline <path>` (default
+  `scripts/check-decision-citation-drift.baseline.json`) and `--write-baseline`.
 
 ## Data Dictionary
 
 | # | Element | Meaning | Values | Required | Default |
 |---|---------|---------|--------|----------|---------|
-| 1 | Decision id | The 4-digit id of a legacy decision record read by the parser; this repo's hand-authored decisions corpus is retired | 4 digits, e.g. `0002` | yes | — |
-| 2 | Superseded-by id | The id of the decision that replaced a given decision, read from that decision's own front matter | 4 digits | no (absent when a decision was never superseded) | — |
-| 3 | Cited id (in a scanned line) | A decision id referenced in a backlog row or spec line | written either as `ADR<4-digit>` or as a bare 4-digit number that matches a known decision id | — | — |
-| 4 | Finding | One flagged line | `{kind: "dead-framing", file, line, id, supersededBy, message}` | — | — |
-| 5 | Scan scope | Which files are scanned | the backlog file + the area `spec.md` files, decision narratives and `platform-foundations.md` under the specs root (history trees excluded) | — | `plans/backlog.md` + `docs/platform/**` read set |
+| 1 | Cited id | An id referenced in a scanned line | `ADR<n>`, `RUL<n>` or `D<n>` | — | — |
+| 2 | Gloss | A parenthetical right after the id that explains it in words | not just other id tokens or punctuation | — | — |
+| 3 | Finding | One flagged citation | `{kind: "bare-citation" or "d-local-outside-home", file, line, id, text, message}` | — | — |
+| 4 | Baseline | Known findings, keyed by file, kind, id and full line text, counted per occurrence | JSON object | — | the checked-in baseline |
+| 5 | Scan scope | Which files are scanned | the backlog path, the area `spec.md` files, decision narratives and `platform-foundations.md` under the specs root (history trees excluded), and every `--skills-dir` tree | — | `plans/backlog` + `docs/platform/**` |
 
 ## Behaviors & Operations
 
-### Run citation-drift scan
+### Run the citation scan
 
-- **Runs when:** an operator or agent invokes the check manually.
-- **What changes:** nothing — the check only reads files, never writes.
-- **Side effects:** none. Findings are printed to the console; nothing is
-  persisted.
-- **Afterwards:** the operator sees either "no findings" (and the process
-  exits 0), or a numbered list of dead-framing findings, each naming the
-  file, line number, the stale cited id, and the id that superseded it (and
-  the process exits 1). No line is edited automatically — a human or agent
-  must add the superseding id to the flagged line by hand.
+- **Runs when:** an operator or agent invokes it, or `check:before-merge` runs.
+- **What changes:** nothing; `--write-baseline` is the only mode that writes, and it writes only the baseline file.
+- **Afterwards:** "no findings" or "no new findings (N baselined)" exits 0. A finding not in the baseline is listed and the process exits 1. No line is edited automatically.
+
+### Write-time sweep for `fgos decision --relation supersedes:<id>`
+
+`collectWideSourceFiles` and `findWideCitationFindings` are exported for the `decision`
+verb. After a `supersedes` write, it lists citations of the old id under `docs/`, `src/`,
+`plugins/`, `core/skills/` and `domains/` that do not also name the new decision. The list
+is reported, never refused. `touches:<id>` and `amends:<id>` leave the target in force, so they
+run no sweep.
 
 ## Actors & Access
 
-| Capability | Operator (manual run) | CI |
+| Capability | Operator (manual run) | `check:before-merge` |
 |---|---|---|
-| Run the scan | yes | not wired yet (Open Gap) |
-| See findings | yes (console output) | — |
-| Auto-fix a finding | never — detection only | — |
+| Run the scan | yes | yes |
+| See findings | yes (console output) | yes |
+| Auto-fix a finding | never: detection only | never |
 
 ## Business Rules
 
-- **R1.** A line in `plans/backlog.md` or any scanned platform spec or decision narrative that cites
-  a decision id whose decision record carries a superseded-by value is a
-  finding unless the same line also cites the superseding id (per `28f8d8f8`).
-- **R2.** A bare 4-digit number in a scanned line counts as a citation only
-  when it matches a real, known decision id — an unrelated 4-digit number
-  (a year, a count, an unrelated code) is never treated as a citation
-  (per `28f8d8f8`).
-- **R3.** The scan scope is `plans/backlog.md` plus the `spec.md` files, decision narratives (`decisions/` folders) and `platform-foundations.md` under `docs/platform/`; `history/` folders are never scanned.
-  `docs/decisions/*.md` itself is out of scope for this check — a decision
-  record's own internal backward-pointer consistency (does the superseding
-  record point back to what it superseded) is a different check, not this one.
-
-## Edge Cases Settled
-
-- A line citing a superseded decision that also cites the superseding id on
-  the same line produces no finding — the citation already carries a live
-  pointer forward.
-- A line citing a decision that has never been superseded never produces a
-  finding, regardless of citation form.
-- A bare digit sequence that does not match any known decision id is ignored,
-  never counted as a citation.
-- Real dogfood run against this repo (2026-07-26) found exactly one finding:
-  `plans/backlog.md:88` (the STR53 row) cited ADR0002 (flat work-item model, one item kind, one FSM, "epic" is a plain item) without mentioning
-  `0012`, its superseder — confirming the check catches a real, not
-  hypothetical, instance of dead framing.
+- **R1.** An `ADR<n>` or `RUL<n>` citation without a gloss is a finding.
+- **R2.** A `D<n>` citation outside its own `CONTEXT.md` is a finding, glossed or not.
+- **R3.** A bare 4-digit id with no `ADR`, `RUL` or `D` prefix is not detected.
+- **R4.** The scan never reads `history/` trees, and skips skill directories that git ignores.
 
 ## Open Gaps
 
-- Not wired into any automated gate: neither an npm script nor a CI workflow runs this check today. It must be
-  invoked manually, so citation drift can persist undetected between manual
-  runs. Answerable by whoever next wires a backlog/spec consistency gate.
-- No auto-fix: a flagged line's acknowledgement of the superseding id must be
-  added by hand; the check only ever reports.
+- No auto-fix: a gloss must be added by hand, and the check cannot judge whether a gloss is correct ([how-to](../../how-to/fix-bare-citation-findings.md)).
+
+## Decision history
+
+- 2026-11-22: the dead-framing family was retired. It read `superseded_by` from
+  `docs/decisions/NNNN-*.md` front matter, and that corpus was retired by tsk-1lv-4, so
+  its map was always empty and it could never fire (the checked-in baseline held 0
+  dead-framing entries). The pkm roles probe
+  ([report](../../../plans/reports/research-261122-0828-docos-pkm-roles-probe-effective-decisions.md))
+  showed that decisions in force need explicit ids and role fields, which the
+  documentation area's pkm view computes. The `--decisions-dir` flag went with it.
 
 ## Pointers (implementation)
 
-- `scripts/check-decision-citation-drift.mjs` — pure functions
-  (`extractCitedIds`, `findCitationDriftFindings`) plus a thin CLI
-  (`loadSupersededById`, `loadSourceFiles`, `runCli`).
-- `test/scripts/check-decision-citation-drift.test.mjs` — 9 tests covering
-  the rules and edge cases above.
-- `readFrontmatter` in `src/util/yaml.mjs` — reused to read a decision record's
-  `superseded_by` front-matter field. The script stages the native addon in its
-  main-only entry (`ensureAddonForScript`), so it runs from a checkout.
-- `scripts/check-decision-supersession.mjs` — the sibling check this one
-  mirrors in structure; it checks a decision record's own internal
-  backward-pointer instead of backlog/spec citations (a different area).
-  **Retired against the real repo (tsk-1lv-4/review-fix F9):** the
-  `docs/decisions/NNNN-*.md` + `0000-index.md` pointer-pair format it
-  validates was retired for good along with the hand-authored ADR corpus
-  -- no longer wired into `npm run check:*` (removed from `package.json`).
-  Its pure functions stay real and unit-tested against synthetic
-  fixtures; only the real-repo CLI mode has nothing left to run against.
+- `scripts/check-decision-citation-drift.mjs`: pure functions (`isGlossed`,
+  `findCitationFormatFindings`, `findNewFindings`, `baselineFromFindings`,
+  `collectWideSourceFiles`, `findWideCitationFindings`) and a thin CLI (`runCli`). It
+  stages the native addon in its main-only entry (`ensureAddonForScript`), so it runs from
+  a checkout.
+- `test/scripts/check-decision-citation-drift.test.mjs`: the owning tests.
+- `test/state/decision-relation.test.mjs`: the write-time sweep through the `decision` verb.

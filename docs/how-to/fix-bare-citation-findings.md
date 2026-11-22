@@ -50,7 +50,7 @@ needed after the mechanical pass.
 
 ```bash
 node scripts/check-decision-citation-drift.mjs \
-  --decisions-dir docs/decisions --backlog plans/backlog.md \
+  --backlog plans/backlog \
   --specs-dir docs/platform --skills-dir .agents/skills \
   --skills-dir plugins/fgOS/skills --write-baseline
 ```
