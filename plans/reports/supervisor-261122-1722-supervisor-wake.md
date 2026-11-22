@@ -19,3 +19,9 @@ No owner question has been answered, so I resumed none. Three are still open. Tw
 ## Note
 
 `fgos session type` does not press Enter. I had to send `\r` in a second `type` call before the lead read the text.
+
+## Late events (3 handled)
+
+- `4e54f390d32cae3b` session-no-result, ref `run_unit-run-1795341329759-b6a48816/producer/1_01`. This is the heads lead's ad-hoc unit that fixes the review findings on `bb031d4ab`. The unit settled with outcome `pass` (gemini, 22 min), and its branch `heads-stable-and-able/p07d` is the one the lead will land after the window. The lead owns it, so I took no action.
+- `13ff65bf21f43e89` lane-freed: no plan is admissible.
+- `041f547bdc4810c4` session-idle, ref `f381c6d2-…`: the same release-window coordinator as above, waiting on OPC.
