@@ -199,6 +199,18 @@ writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
 
+### Lead progress (2026-11-22 18:45, head:lead-forgent-261122-0118-heads-b52f9)
+
+- **Phase 12a landed** as `809c83190` (`p12`). `q-ctjxjol33f` was cancelled as moot: OPC recovered the abandoned land
+  and pushed the stray main commit. The land still waited on a shaper's dirty `DISCUSSION.md` and a second stray
+  local main commit (`e5077ae40`) before it went through at 18:42. Phase 12 stays `running` for 12b (`q-3g32txifg5`).
+- **This head still runs its launch release.** The land ticket's `hostBin` is
+  `sha256:f032b2c7` although `1e544460` is active. The head-request server of a live head is the launch release's own
+  code, and that release predates phase 5, so per-request pickup starts only for a head started on a release that
+  contains phase 5. Effects seen: `supervisor raise` refused, and the `p12` worktree was not removed by the land (no
+  `worktreesRemoved` field). Both are expected until this lead restarts or rotates onto `1e544460`. Phase 11's probe
+  must run on heads started on `1e544460` or later.
+
 ### Lead progress (2026-11-22 18:30, head:lead-forgent-261122-0118-heads-b52f9)
 
 - **Phase 12a is ready to land, parked on `q-ctjxjol33f`.** Branch `heads-stable-and-able/p12` (`24672c180` plus the
