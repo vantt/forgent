@@ -9,6 +9,7 @@ use crate::wiring::dispatch_decide::HostWorkspace;
 use crate::wiring::execution_routes::{attempt_host, unit_run_host, SharedPort};
 use crate::wiring::run::LazyPeer;
 use crate::wiring::seat_binding::HostMachine;
+use crate::wiring::terminal_route::HostRoute;
 use crate::wiring::unit_run_host::execution::HostExecution;
 use fgos_execution::account_pin::config_pinned_to_account;
 use fgos_execution::accounts::provider_account_inventory;
@@ -282,7 +283,7 @@ fn close_pane(terminal_key: Option<&str>, herdr_session: Option<&str>) -> bool {
         }
         None => process,
     };
-    let Ok(parts) = super::terminal::route_parts(herdr_endpoint_env(&env)) else {
+    let Ok(parts) = HostRoute::from_process(herdr_endpoint_env(&env)).parts(&json!({})) else {
         return false;
     };
     let core = parts.core();

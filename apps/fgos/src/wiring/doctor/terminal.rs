@@ -1,6 +1,6 @@
 //! The terminal doctor rows: what the terminal-control driver (herdr) says about this machine, and what the
 //! executors dispatched through a herdr pane need from it. The route is asked in process, through the one door
-//! the `terminal-control` route builds its core by (`CoreParts`); the judgements are pure functions over what it
+//! the `terminal-control` route builds its core by (`crate::wiring::terminal_route`); the judgements are pure functions over what it
 //! answered, so a fake route proves each of them.
 //!
 //! Every row reads. `terminal-allocations` is a pointer: it counts, names the verb, and closes nothing.
@@ -8,17 +8,15 @@
 use super::{judged, project_root_refusal, Rows};
 use crate::wiring::dispatch_decide::HostWorkspace;
 use crate::wiring::process_env;
+use crate::wiring::terminal_route::HostRoute;
 use fgos_distribution::doctor::FixResult;
 use fgos_distribution::doctor::{timed, RowOutcome};
 use fgos_execution::decide::{check_loaded_runner, Workspace};
-use fgos_execution_engine::transport::terminal_slot::resolve_herdr_bin;
 use fgos_terminal_control::port::{
     AnchorPane, CapabilitiesAsk, CapabilitiesReport, Finding, Refusal,
 };
-use fgos_terminal_control::route::CoreParts;
 use serde_json::{json, Map, Value};
 use std::path::Path;
-use std::time::Instant;
 
 pub const ROWS: &[&str] = &[
     "terminal-control",
@@ -43,9 +41,6 @@ fn fix(_root: &Path, _ids: &[&str]) -> Vec<FixResult> {
 /// must stay larger than this by [`GRACE_MARGIN_MS`].
 const READY_TIMEOUT_MS: u64 = 30_000;
 const GRACE_MARGIN_MS: u64 = 30_000;
-
-/// The whole budget of one route question, as the Node client gave it.
-const ROUTE_TIMEOUT_MS: u64 = 15_000;
 
 /// Every `terminal.*` setting, as its dotted path in the `terminal` section.
 const SETTINGS: [&str; 6] = [
@@ -94,45 +89,27 @@ pub enum ScanFault {
     Refused(Refusal),
 }
 
-/// The route of this machine: the core built from the same envelope the route process reads.
-struct HostRoute {
-    herdr_bin: String,
-    env: Map<String, Value>,
-}
-
-impl HostRoute {
-    fn new(env: &[(String, String)], anchor: Option<&str>) -> Self {
-        let lookup = |key: &str| {
-            env.iter()
-                .find(|(k, _)| k == key)
-                .map(|(_, value)| value.clone())
-        };
-        let mut route_env = Map::new();
-        if let Some(pane) = anchor.filter(|pane| !pane.is_empty()) {
-            route_env.insert("FGOS_HERDR_ANCHOR_PANE".into(), json!(pane));
-        }
-        HostRoute {
-            herdr_bin: resolve_herdr_bin(None, &lookup),
-            env: route_env,
-        }
+/// The route of this machine, with the anchor pane the doctor was run from (if any) in its endpoint.
+fn host_route(env: &[(String, String)], anchor: Option<&str>) -> HostRoute {
+    let lookup = |key: &str| {
+        env.iter()
+            .find(|(k, _)| k == key)
+            .map(|(_, value)| value.clone())
+    };
+    let mut route_env = Map::new();
+    if let Some(pane) = anchor.filter(|pane| !pane.is_empty()) {
+        route_env.insert("FGOS_HERDR_ANCHOR_PANE".into(), json!(pane));
     }
-
-    fn parts(&self, config: &Value) -> Result<CoreParts, (String, String)> {
-        let envelope = json!({
-            "herdrBin": self.herdr_bin,
-            "env": self.env,
-            "config": config,
-            "timeoutMs": ROUTE_TIMEOUT_MS,
-        });
-        CoreParts::from_envelope(&envelope, Instant::now())
-            .map_err(|refusal| (refusal.code.to_owned(), refusal.message))
-    }
+    HostRoute::new(route_env, &lookup)
 }
 
 impl Route for HostRoute {
     fn capabilities(&self, config: &Value, anchor: Option<&str>, agents: bool) -> Asked {
         match self.parts(config) {
-            Err((code, message)) => Asked::ConfigRefused { code, message },
+            Err(refusal) => Asked::ConfigRefused {
+                code: refusal.code.to_owned(),
+                message: refusal.message,
+            },
             Ok(parts) => {
                 let report = parts.core().capabilities(CapabilitiesAsk {
                     anchor_pane: anchor,
@@ -146,7 +123,7 @@ impl Route for HostRoute {
     fn reconcile_scan(&self, older_than_ms: u64) -> Result<Vec<Finding>, ScanFault> {
         let parts = self
             .parts(&json!({}))
-            .map_err(|(_, message)| ScanFault::NotAnswered(message))?;
+            .map_err(|refusal| ScanFault::NotAnswered(refusal.message))?;
         let scan = parts.core().reconcile_scan(older_than_ms);
         scan.map_err(ScanFault::Refused)
     }
@@ -605,7 +582,7 @@ fn herdr_facts(route: &dyn Route) -> HerdrFacts {
 fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
     let env = process_env();
     let anchor = anchor_of(&env);
-    let route = HostRoute::new(&env, anchor.as_deref());
+    let route = host_route(&env, anchor.as_deref());
     ids.iter()
         .map(|id| {
             timed(|| {
@@ -619,7 +596,7 @@ fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
                                 "windows" => "win32",
                                 other => other,
                             },
-                            herdr_bin: &route.herdr_bin,
+                            herdr_bin: route.herdr_bin(),
                         },
                     ),
                     "terminal-allocations" => terminal_allocations(read_entries(root), &route),

@@ -7,6 +7,7 @@ use super::observe::{probe_attempt, read_attempt_view, read_json};
 use super::{fgos_dir, validation, Answer, Answered, Flags, SubRequest};
 use crate::wiring::dispatch_decide::HostWorkspace;
 use crate::wiring::observe_query::HostRecordEnvironment;
+use crate::wiring::terminal_route::HostRoute;
 use fgos_execution::decide::CheckoutFacts;
 use fgos_execution_engine::accounts::{Accounts, SystemHost};
 use fgos_execution_engine::transport_round::attention::{
@@ -54,14 +55,15 @@ fn not_scanned(level: &str, reason: String) -> Value {
 /// What the terminal-control scan finds past `terminal.allocationGraceMs`: slots allocated but never launched,
 /// retained panes past their time, records of a herdr server that is gone. Reads only.
 pub(crate) fn scan_terminal_allocations(root: &Path) -> Value {
-    let parts = match super::terminal::route_parts(Map::new()) {
+    let parts = match HostRoute::from_process(Map::new()).parts(&json!({})) {
         Ok(parts) => parts,
-        Err(message) => {
+        Err(refusal) => {
             return not_scanned(
                 "warning",
                 format!(
-                "the terminal-control route did not answer, allocations not scanned ({message})"
-            ),
+                    "the terminal-control route did not answer, allocations not scanned ({})",
+                    refusal.message
+                ),
             )
         }
     };

@@ -67,6 +67,7 @@ pub mod session_rotation_hook;
 pub mod session_rotation_hook;
 pub mod session_write_publish;
 pub mod supervision;
+pub mod terminal_route;
 pub mod terminal_tabs;
 pub mod uninstall;
 pub mod unit_run_host;
