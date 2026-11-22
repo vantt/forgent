@@ -9,7 +9,7 @@
     },
     "handoff file": {
       "writer": "handoff store, immutable",
-      "carries": "a line `- rotation: soft | hard | manual`; a line `Rotation id: <16 lowercase hex characters>` when a rotation executor wrote it; the portfolio files to reread (the head's own task file merged with the stop facts' portfolio or `sessionRotation.personas.<persona>.reload`; an entry the project does not have is left out); a `## Last assistant message (verbatim)` section (the message in a code fence one backtick longer than its longest backtick run, at least three, so nothing in it reads as a heading; kept to its last 8000 characters behind `…(earlier text cut)` when longer) and a `## Pending question (verbatim)` section on a hard or manual rotation; the reader takes the pending question only from that heading outside any fence. A manual rotation's last message is read by the executor from the old session's transcript (the `last-message` op below, after the old session ended its turn, at most 60 s); when it cannot be read, the section says `(not found: <why>)`",
+      "carries": "a line `- rotation: soft | hard | manual`; a line `Rotation id: <16 lowercase hex characters>` when a rotation executor wrote it; the portfolio files to reread (the head's own task file merged with the stop facts' portfolio or `sessionRotation.personas.<persona>.reload`; an entry the project does not have is left out); a `## Crons to recreate` section when non-empty (one line per cron with instruction to recreate it with the session's cron tool before the first task); a `## Background tasks that were running` section when non-empty (one line per task with instruction to rerun only if its result still matters); a `## Last assistant message (verbatim)` section (the message in a code fence one backtick longer than its longest backtick run, at least three, so nothing in it reads as a heading; kept to its last 8000 characters behind `…(earlier text cut)` when longer) and a `## Pending question (verbatim)` section on a hard or manual rotation; the reader takes the pending question only from that heading outside any fence. A manual rotation's last message is read by the executor from the old session's transcript (the `last-message` op below, after the old session ended its turn, at most 60 s); when it cannot be read, the section says `(not found: <why>)`",
       "sessionStart": "the reader inlines the text when it is under 10000 characters, else a pointer to the file plus the pending question verbatim"
     },
     "rotation.json": {
@@ -22,7 +22,7 @@
     "answered.json": { "writer": "markSuccessorAnswered", "readFields": { "gen": "integer" } },
     "stop-trace.jsonl": {
       "writer": "the host, when it handles the `session rotate` request every stop sends (requestRotation, src/session-rotation/rotate.mjs); the hook itself runs inside the head's sandbox, where the lineage folder is read-only",
-      "shape": { "at": "ISO-8601 UTC", "fraction": "number or null (nothing measured)", "source": "sidecar | transcript | null", "stale": "boolean", "decision": "the decide reason, e.g. below-soft, at-or-above-soft, background-work-running, no-measure", "reason": "none | soft | hard", "outcome": "below-threshold | started | rotation-in-progress | spawn-failed" },
+      "shape": { "at": "ISO-8601 UTC", "fraction": "number or null (nothing measured)", "source": "sidecar | transcript | null", "stale": "boolean", "decision": "the decide reason, e.g. below-soft, at-or-above-soft, background-task-running, no-measure", "reason": "none | soft | hard", "outcome": "below-threshold | started | rotation-in-progress | spawn-failed" },
       "readerRule": "for the owner; one line per stop that reached the host, newest 500 kept once the file passes 256 KiB. A hook failure before requestRotation leaves no trace line; after locating its lineage the native hook attempts a best-effort stop-failed incident and reports stderr, but the confined head's read-only lineage may prevent that local write. A measured request rejected by requestRotation validation or start leaves a stop-failed incident when its lineage is valid"
     },
     "incidents.jsonl": {
@@ -51,6 +51,7 @@
     "command": "fgos hook session-rotation --event stop|session-start",
     "never": "blocks, prints to the conversation (only session-start prints, one hookSpecificOutput.additionalContext object), or exits other than 0",
     "stop": "a successor whose generation the pending rotation waits for answers with `session answered` (the rotation id from its handoff); every other stop measures, decides and on soft or hard asks `session rotate`; a stop that answered does not also measure",
+    "stopFacts": ["sessionId", "portfolio", "delta", "lastAssistantMessage", "pendingQuestion", "sessionCrons", "backgroundTasks"],
     "pendingQuestion": "no lineage state defines a pending owner question yet, so the hook never reports one: soft is never held by a question, and a hard or manual rotation carries the last assistant message verbatim, where a head batches its open questions"
   },
   "lastMessageRoute": {

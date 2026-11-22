@@ -29,6 +29,7 @@ const MAX_STDIN: u64 = 4 * 1024 * 1024;
 const MAX_TEXT: usize = 8000;
 const MAX_PORTFOLIO: usize = 50;
 const MAX_PATH_CHARS: usize = 300;
+const MAX_FACT_LIST: usize = 20;
 const SIDECAR_FILE: &str = "context-sidecar.jsonl";
 /// The reason of a stop that measured below soft: the host records it and rotates nothing.
 const NO_ROTATION_REASON: &str = "none";
@@ -232,6 +233,48 @@ fn stop_inner(
     }
     if let Some(message) = payload_str(payload, "last_assistant_message") {
         facts["lastAssistantMessage"] = json!(bounded(message));
+    }
+    if let Some(crons) = payload.get("session_crons").and_then(Value::as_array) {
+        let list: Vec<Value> = crons
+            .iter()
+            .take(MAX_FACT_LIST)
+            .filter_map(|c| c.as_object())
+            .map(|obj| {
+                let mut entry = serde_json::Map::new();
+                if let Some(s) = obj.get("schedule").and_then(Value::as_str) {
+                    entry.insert("schedule".into(), json!(bounded(s)));
+                }
+                if let Some(p) = obj.get("prompt").and_then(Value::as_str) {
+                    entry.insert("prompt".into(), json!(bounded(p)));
+                }
+                if let Some(r) = obj.get("recurring").and_then(Value::as_bool) {
+                    entry.insert("recurring".into(), json!(r));
+                }
+                Value::Object(entry)
+            })
+            .collect();
+        facts["sessionCrons"] = json!(list);
+    }
+    if let Some(tasks) = payload.get("background_tasks").and_then(Value::as_array) {
+        let list: Vec<Value> = tasks
+            .iter()
+            .take(MAX_FACT_LIST)
+            .filter_map(|t| t.as_object())
+            .map(|obj| {
+                let mut entry = serde_json::Map::new();
+                if let Some(id) = obj.get("id").and_then(Value::as_str) {
+                    entry.insert("id".into(), json!(bounded(id)));
+                }
+                if let Some(desc) = obj.get("description").and_then(Value::as_str) {
+                    entry.insert("description".into(), json!(bounded(desc)));
+                }
+                if let Some(cmd) = obj.get("command").and_then(Value::as_str) {
+                    entry.insert("command".into(), json!(bounded(cmd)));
+                }
+                Value::Object(entry)
+            })
+            .collect();
+        facts["backgroundTasks"] = json!(list);
     }
     let args = json!({ "persona": head.persona, "name": head.name, "reason": reason, "stopFacts": facts, "measure": measure });
     (ports.ask)("session rotate", &args)
@@ -582,10 +625,25 @@ mod tests {
     fn a_running_background_task_holds_the_rotation_and_a_refused_request_is_the_error_not_a_panic()
     {
         let (fgos_dir, lineage) = fgos("busy");
-        let busy = json!({ "transcript_path": transcript(&lineage, 900), "background_tasks": [{ "id": "b" }] });
+        let busy = json!({ "transcript_path": transcript(&lineage, 500), "background_tasks": [{ "id": "b" }] });
         let (calls, _) = run_stop(&head(None), &fgos_dir, busy, Ok(json!({})));
         assert_eq!(calls[0].1["reason"], "none");
-        assert_eq!(calls[0].1["measure"]["decision"], "background-work-running");
+        assert_eq!(calls[0].1["measure"]["decision"], "background-task-running");
+        let busy_hard = json!({
+            "transcript_path": transcript(&lineage, 900),
+            "background_tasks": [{ "id": "b", "command": "sleep 10" }],
+            "session_crons": [{ "schedule": "*/5 * * * *", "prompt": "hi", "recurring": true }]
+        });
+        let (calls_hard, _) = run_stop(&head(None), &fgos_dir, busy_hard, Ok(json!({})));
+        assert_eq!(calls_hard[0].1["reason"], "hard");
+        assert_eq!(
+            calls_hard[0].1["stopFacts"]["backgroundTasks"],
+            json!([{ "id": "b", "command": "sleep 10" }])
+        );
+        assert_eq!(
+            calls_hard[0].1["stopFacts"]["sessionCrons"],
+            json!([{ "schedule": "*/5 * * * *", "prompt": "hi", "recurring": true }])
+        );
         let full = json!({ "transcript_path": transcript(&lineage, 900) });
         let (_, result) = run_stop(
             &head(None),
