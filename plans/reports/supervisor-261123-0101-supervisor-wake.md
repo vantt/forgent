@@ -13,3 +13,7 @@
 
 ## Owner questions
 - `q-rfxqncjrax` (who runs the account probe for Miu's quota) is still open. It blocks only Miu's move to a fresh account.
+
+## Late events
+- `3fea5e5636f9095f` coordination-help (plan component-authority). After parking phase 2 the lead went idle. I raised `d586311b086ab050` naming `head:lead-forgent-261121-2109-compon-8ee21` and typed the wait-check prompt. The lead resumed and is polling `fgos request result c-7239-1795369809226` itself. Both events are handled.
+- Friction: `fgos session type --text` put the text in the pane's input box without submitting it. A second `--text $'\r'` was needed to send it. The unsent line in the heads-stable lead's box is probably left over from the same behaviour.
