@@ -1262,9 +1262,27 @@ impl<'de> serde::de::Visitor<'de> for Bounded<'_> {
     fn visit_map<A: serde::de::MapAccess<'de>>(self, mut map: A) -> Result<Value, A::Error> {
         self.take()?;
         let mut object = serde_json::Map::new();
-        while let Some(key) = map.next_key::<String>()? {
+        let mut key = map.next_key::<String>()?;
+        // With arbitrary_precision serde_json delivers a number through this private map,
+        // not visit_f64. It is one scalar at this depth, not an object plus a child string.
+        // Parse through Number to retain precision and validate the token; never accept a
+        // second entry or an arbitrary nested value in the scalar representation.
+        if key.as_deref() == Some("$serde_json::private::Number") {
+            let token = map.next_value::<String>()?;
+            let number = token
+                .parse::<serde_json::Number>()
+                .map_err(serde::de::Error::custom)?;
+            if map.next_key::<String>()?.is_some() {
+                return Err(serde::de::Error::custom(
+                    "unexpected entry after a JSON number",
+                ));
+            }
+            return Ok(Value::Number(number));
+        }
+        while let Some(name) = key {
             let value = map.next_value_seed(self.child())?;
-            object.insert(key, value);
+            object.insert(name, value);
+            key = map.next_key::<String>()?;
         }
         Ok(Value::Object(object))
     }

@@ -110,6 +110,7 @@
       "run-supervisor-route",
       "runtime-socket-dir",
       "run-attempts-stuck",
+      "session-rotation-orphans",
       "run-supervisor-config",
       "operation-prompt-templates-valid",
       "terminal-control",
@@ -405,6 +406,12 @@
       "id": "run-attempts-stuck",
       "description": "read-only pointer: attempts with no closed.json and no lock holder, an attempt whose release was removed named with what to restore; the next fgos run adopts them, or run fgos dispatch recover (a warning, never a failure)",
       "owner": "rust:execution",
+      "pointer": true
+    },
+    {
+      "id": "session-rotation-orphans",
+      "description": "read-only pointer: pending rotations with a dead executor, resolved on the lineage's next session rotate or session answered (a warning, never a failure)",
+      "owner": "rust:session-host",
       "pointer": true
     },
     {

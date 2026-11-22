@@ -15,6 +15,7 @@ pub mod mailbox;
 pub mod observe;
 pub mod packaging;
 pub mod run_supervisor;
+pub mod session_host;
 pub mod supervision;
 pub mod terminal;
 
@@ -206,6 +207,7 @@ const GROUPS: &[&Rows] = &[
     &observe::GROUP,
     &packaging::GROUP,
     &run_supervisor::GROUP,
+    &session_host::GROUP,
     &supervision::GROUP,
     &terminal::GROUP,
 ];
@@ -534,12 +536,12 @@ mod tests {
                 .filter(|row| row.owner.kind == OwnerKind::Bridge && row.owner.label == step)
                 .count()
         };
-        assert_eq!(registry.rows.len(), 116);
+        assert_eq!(registry.rows.len(), 117);
         assert_eq!(
             (count("S5"), count("S6a"), count("S6b"), count("S7")),
             (0, 0, 6, 7)
         );
-        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 103);
+        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 104);
         assert_eq!(registry.fixes.len(), 30);
         assert_eq!(registry.fix_ids(OwnerKind::Bridge).len(), 1);
     }

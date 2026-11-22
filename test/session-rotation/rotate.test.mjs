@@ -89,7 +89,16 @@ test('the old session is ended only after the successor answered and Identity na
   let moved = false;
   const { calls, ports, request } = fakes(root, {
     holder: () => (moved ? { live: true, session: 'new-session' } : { live: true, session: 'old-session', record: OLD_RECORD }),
-    onSleep: (n) => { if (n === 2) { answer(root); moved = true; } },
+    onSleep: (n) => {
+      if (n === 2) {
+        const pending = pendingOf(root);
+        assert.equal(pending.executor.pid, process.pid, 'the executor records itself through the process door');
+        assert.equal(typeof pending.executor.startTime, 'string');
+        assert.equal(pending.old.runDir, '/run/old');
+        assert.equal(pending.successor.runDir, '/run/new');
+        answer(root); moved = true;
+      }
+    },
   });
   const result = await rotateHeadSession({ ...request, reason: 'hard' }, ports);
   assert.deepEqual(result, { rotated: true, key: 'cmd_new', gen: 2, oldEnded: true });
@@ -400,6 +409,115 @@ test('every stop request leaves one trace line with its measure and outcome; bel
     { fraction: 0.33, source: 'transcript', stale: true, decision: 'below-soft', reason: 'none', outcome: 'below-threshold' },
     { fraction: 0.5, source: 'transcript', stale: true, decision: 'at-or-above-soft', reason: 'soft', outcome: 'rotation-in-progress' },
   ]);
+});
+
+// These crash cases have no other owner: the executor proofs above never leave a dead executor on disk.
+function orphan(root, dir, { savedSuccessor = true } = {}) {
+  const successor = { key: NEW.key, placement: NEW, runDir: '/run/new', persona: 'planner' };
+  const record = {
+    id: '0123456789abcdef', gen: 2, successorKey: 'head-planner-x-2',
+    executor: { pid: 123, startTime: '100', host: 'fixture' },
+    old: readHeadPlacement(dir), startedAt: '2026-11-22T00:00:00Z',
+    ...(savedSuccessor ? { successor } : {}),
+  };
+  fs.writeFileSync(path.join(dir, 'rotation.json'), JSON.stringify(record));
+  return record;
+}
+
+const orphanEvents = (dir) => fs.readFileSync(path.join(dir, 'incidents.jsonl'), 'utf8').trim().split('\n').map(JSON.parse);
+
+test('the next rotate completes a dead executor rotation from Identity before taking its own rotation lock', async (t) => {
+  const { root, dir } = project(t);
+  const pending = orphan(root, dir);
+  const { calls, ports, request } = fakes(root, {
+    holder: { live: true, session: 'new-session', record: { ids: { head: { persona: 'planner', name: 'x', gen: 2 } } } },
+  });
+  ports.judge = (record) => { assert.deepEqual(record, pending.executor); return 'dead'; };
+  let locks = 0;
+  ports.lock = () => {
+    locks += 1;
+    if (locks === 1) return { release() { calls.released += 1; } };
+    assert.equal(readHeadPlacement(dir).placement.key, NEW.key, 'recovery precedes the new rotation lock');
+    assert.equal(fs.existsSync(path.join(dir, 'rotation.json')), false);
+    return null;
+  };
+  assert.equal((await rotateHeadSession(request, ports)).reason, 'rotation-in-progress');
+  assert.deepEqual(calls.end, ['/run/old']);
+  assert.equal(calls.released, 1);
+  assert.deepEqual(orphanEvents(dir).map(({ event, outcome }) => [event, outcome]), [['resolved-orphan', 'completed']]);
+});
+
+test('a dead executor with the old Identity holder abandons before accepting a late successor answer', (t) => {
+  const { root, dir } = project(t);
+  orphan(root, dir);
+  const { calls, ports } = fakes(root);
+  ports.judge = () => 'dead';
+  const late = () => markSuccessorAnswered({ projectRoot: root, persona: 'planner', name: 'x', key: 'head-planner-x-2', sessionId: 'new-session', rotationId: '0123456789abcdef', message: 'ready' }, ports);
+  assert.throws(late, { code: 'no-rotation-pending' });
+  assert.throws(late, { code: 'no-rotation-pending' });
+  assert.deepEqual(calls.end, ['/run/new']);
+  assert.equal(readHeadPlacement(dir).placement.key, OLD.key);
+  assert.equal(fs.existsSync(path.join(dir, 'answered.json')), false);
+  assert.deepEqual(orphanEvents(dir).map(({ event, outcome }) => [event, outcome]), [['resolved-orphan', 'abandoned']]);
+});
+
+test('orphan recovery finds the supervised successor when the executor died before saving its returned placement', (t) => {
+  const { root, dir } = project(t);
+  orphan(root, dir, { savedSuccessor: false });
+  const runDir = path.join(root, '.fgos/assignments/head-planner-x-2/runs/01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ host: 'terminal', slot: { key: NEW.key } }));
+  const { calls, ports } = fakes(root, { holder: { live: true, session: 'new-session', record: { ids: { terminal: { key: NEW.key } } } } });
+  ports.judge = () => 'dead';
+  assert.throws(() => markSuccessorAnswered({ projectRoot: root, persona: 'planner', name: 'x', key: 'head-planner-x-2', sessionId: 'new-session', rotationId: '0123456789abcdef', message: 'ready' }, ports), { code: 'no-rotation-pending' });
+  assert.equal(readHeadPlacement(dir).runDir, runDir);
+  assert.deepEqual(calls.end, ['/run/old']);
+});
+
+test('a live, unknown or legacy executor is never reclaimed or overwritten, and a failed recovery stays retryable', async (t) => {
+  const { root, dir } = project(t);
+  const { calls, ports, request } = fakes(root);
+  for (const verdict of ['alive', 'unknown', 'legacy']) {
+    const pending = orphan(root, dir);
+    if (verdict === 'legacy') { delete pending.executor; fs.writeFileSync(path.join(dir, 'rotation.json'), JSON.stringify(pending)); }
+    ports.judge = () => verdict;
+    assert.equal((await rotateHeadSession(request, ports)).reason, 'rotation-in-progress');
+    assert.deepEqual(pendingOf(root), pending);
+  }
+  assert.deepEqual(calls.end, []);
+  orphan(root, dir);
+  ports.judge = () => 'dead';
+  ports.identity = () => { throw Object.assign(new Error('Identity unavailable'), { code: 'identity-unavailable' }); };
+  await assert.rejects(rotateHeadSession(request, ports), { code: 'identity-unavailable' });
+  assert.ok(pendingOf(root));
+  assert.deepEqual(calls.end, []);
+  ports.identity = () => ({ live: true, session: 'old-session' });
+  ports.end = () => false;
+  await assert.rejects(rotateHeadSession(request, ports), { code: 'cancel-unwritable' });
+  assert.ok(pendingOf(root));
+  assert.equal(fs.existsSync(path.join(dir, 'incidents.jsonl')), false);
+  orphan(root, dir, { savedSuccessor: false });
+  ports.end = () => assert.fail('an unknown successor must not be guessed ended');
+  await assert.rejects(rotateHeadSession(request, ports), { code: 'placement-unknown' });
+  assert.ok(pendingOf(root), 'an unlocated successor stays pending for recovery');
+});
+
+test('a Stop rejected for a malformed measure leaves an incident without accepting the malformed number', (t) => {
+  const { root, dir } = project(t);
+  const malformed = { fraction: { '$serde_json::private::Number': '0.33' }, source: 'transcript', stale: true, decision: 'below-soft' };
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'none', projectRoot: root, measure: malformed }), { code: 'bad-measure' });
+  assert.deepEqual(orphanEvents(dir).map(({ event, code }) => [event, code]), [['stop-failed', 'bad-measure']]);
+  assert.equal(fs.existsSync(path.join(dir, 'stop-trace.jsonl')), false, 'an invalid measure never becomes a trusted trace');
+  assert.throws(() => requestRotation({ persona: '../escape', name: 'x', reason: 'none', projectRoot: root, measure: malformed }), { code: 'bad-persona' });
+  assert.equal(orphanEvents(dir).length, 1, 'an invalid lineage writes no incident');
+});
+
+test('a stop whose host-side start throws leaves a best-effort incident before returning the error', (t) => {
+  const { root, dir } = project(t);
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, measure: { fraction: 0.5, source: 'transcript', stale: true, decision: 'at-or-above-soft' } }, {
+    holds: () => { throw Object.assign(new Error('probe unavailable'), { code: 'lock-driver-unavailable' }); },
+  }), { code: 'lock-driver-unavailable' });
+  assert.deepEqual(orphanEvents(dir).map(({ event, code }) => [event, code]), [['stop-failed', 'lock-driver-unavailable']]);
 });
 
 test('the stop trace keeps its newest lines once it passes its size bound', (t) => {
