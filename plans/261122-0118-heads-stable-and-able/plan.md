@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Make the secretary and the supervisor heads stable and fully able: head verbs, plan check at the land door, provider floor, release pickup, rotation recovery, idle and wake tuning, live grant probe"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 base: aa35c0664447f6d01d214911973c4d0246715e39
@@ -167,6 +167,8 @@ path; each phase sits in a later wave than its dependencies. Hot files are seria
 (3, then 4, then 9), the generated skill renders `.agents/skills/**` and `plugins/fgOS/skills/**` (3, 7, 8, 10, one per
 wave), `head-request.v1.json` (2, then 5), `docs/platform/session-host/spec.md` (2, then 6). `CHANGELOG.md` has one
 writer, phase 11.
+
+**Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
 
 ### Footprint overlap with the two running plans
 
