@@ -169,7 +169,7 @@ the grants, verb by verb.
 | 3 | [The land door runs the plan check](phase-03-land-plan-check.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, core/skills/_shared/plan-contract.md, .agents/skills/**, plugins/fgOS/skills/**, .fgos/config.yaml | 1 | done |
 | 4 | [Coordinating heads keep their provider floor](phase-04-provider-floor.md) | 3 | .fgos/config.yaml, test/session-host/head-start.test.mjs | 2 | done |
 | 5 | [A live head's requests run the active release](phase-05-release-pickup.md) | 2, 6 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/run-supervisor/spec.md | 3 | ready |
-| 6 | [A rotation whose executor died is resolved](phase-06-orphan-rotation.md) | 2 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/session-host/contracts/rotation-files.v1.json, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/**, docs/platform/session-host/spec.md | 2 | running |
+| 6 | [A rotation whose executor died is resolved](phase-06-orphan-rotation.md) | 2 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/session-host/contracts/rotation-files.v1.json, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/**, docs/platform/session-host/spec.md | 2 | parked: main citation gate red (74045ce23) |
 | 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs | 2 | done |
 | 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | parked: q-2ul3tjw3kd |
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | running |
@@ -188,6 +188,25 @@ wave), `head-request.v1.json` (2, then 5), `docs/platform/session-host/spec.md` 
 writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
+
+### Lead progress (2026-11-22 14:25, head:lead-forgent-261122-0118-heads-b52f9)
+
+- **Phase 6 ready to land, parked on main's red citation gate.** Branch `heads-stable-and-able/p06f` (`23d6c85a0`,
+  `e844e2e5d`): an independent review found two blocking wedges, an old-format or `unknown` `rotation.json`, and an
+  executor that died before the successor was placed. Both are fixed and proven red-to-green (rotation 31/31; Node 171/171).
+  `fgos land` (ticket `c-20288-1795330518526`) failed `land-gate-failed` in
+  `test/scripts/check-decision-citation-drift.test.mjs`: 14 unglossed citations in
+  `docs/platform/platform-foundations.md`, `docs/platform/runner/decisions/h-36d872fbb0e5.md`,
+  `docs/platform/seat-binding/spec.md` and `docs/platform/work-state/decisions/retired-decision-history.md`.
+  Commit `74045ce23` added them through a paths land, which skips that gate. None of those files are in this
+  footprint. **Every code land is red until main is fixed (lead:SUPERVISOR).** Phase 6 lands with the same command
+  right after.
+- **Phase 5** follows phase 6 (shared `head_request.rs`) and starts on `p06f`'s worktree once phase 6 lands, so no
+  new worktree is used (disk).
+- **Waiting on others:** phase 2 steps 8-9 on `q-lnq3nbjssw`, phase 8 on `q-2ul3tjw3kd`, phase 9 on lead:SUPERVISOR
+  applying block `phase9`.
+- **Worktrees removable:** p02, p04, p06, p02e, p02f, p06c, p06d, p06e (their work is in the landed `reports/carry-*.diff`).
+  Keep p06f and p08.
 
 ### Lead progress (2026-11-22 14:00, head:lead-forgent-261122-0118-heads-b52f9)
 
