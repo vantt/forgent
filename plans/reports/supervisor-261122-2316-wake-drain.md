@@ -13,3 +13,10 @@ Pending owner question: q-rfxqncjrax (who runs the account probe for Miu's quota
 ## Admission
 - leadsLive 1/4, lanes free 4. No plan is admissible. owner-communication-standard is `ready`, but its footprint overlaps heads-stable.
 - component-authority still waits on two real file collisions: heads-stable (2 files) and owner-communication-standard (AGENTS.md, reading-map, agent-mailbox spec, observe spec). In the current order, owner-communication-standard goes first after heads-stable closes. I did not reorder those two. If the owner wants component-authority ahead of it, that order goes through Miu.
+
+## Later events in the same wake
+- `ccf75709f49cb76d` coordination-handoff (owner 23:25: owner-communication-standard is low priority, blocks nothing, runs last). I removed it from the `blockedBy` of component-authority and orchestration-skeleton, and recorded the order in both plans. Landed as `a0d920038`. Miu confirmed it runs last, so it now waits on heads-rotate, component-authority, the doors plan and orchestration-skeleton. It shares files with each of them and is listed ahead of them, so without that wait admission would start it first. It stays `ready`, and plan-lint passes. Landed as `b32eeecdf`. Handled.
+- `8985d58d1283bc76` coordination-handoff `backlog:p-fwdxupc6fx` (owner 23:30: heads-rotation outranks component-authority and orchestration-skeleton; start its planner). Its planner `head:planner-heads-rotate-on-their-own` is already live, and plan `261122-2307-heads-rotate-on-their-own` is written as a draft (75f1f0900, d42ff939c), so I started no second planner. It shares no files with component-authority. Both wait only on heads-stable and are admitted together when it closes, with heads-rotate first in intent. It overlaps orchestration-skeleton and the doors plan only on CHANGELOG.md, and both of those already wait behind component-authority. Handled.
+
+## Order after heads-stable closes
+heads-rotate and component-authority (parallel, no shared files), then the doors plan, then orchestration-skeleton, then owner-communication-standard. Each draft still needs its planner's `ready` flip.
