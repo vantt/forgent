@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "90aa11cea6dd22affa1aeb9bf51ac88590cc021d40025cffad8f9a8e46cd0020",
+  "payloadDigest": "08bdece653c897b475c5d16ebe55729b5cf61cf4e2bff773ee460c587266e999",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1463,8 +1463,10 @@
     "src/intake/plan.mjs": "324719e6edfbf41282538a62ba0c64db4949ac808e4d668faaba4ea9108b2943",
     "src/intake/risk-keywords.mjs": "b71f9c07e58ad759538ac3a287027273d08b9a65a397be2f39b2716595f14445",
     "src/intake/verify-pattern-check.mjs": "227ec546c4461d268ce2413f3db9af76e4358c892d5e2225567a3c876c106ae6",
+    "src/native/dispatch-error.mjs": "d8eec6bd6afa2b88ba9bd7e0d125310ed6b0cac1d46a1c890cadf9823d6d5894",
     "src/native/door.mjs": "647ebd3af48a1fee9a8955da48fedd2a741844fcec1d557960c5900bb27b0cdc",
-    "src/native/execution-door.mjs": "1c4160a53b873fc5cbe800215dcac85b1c08ff793e91a2e43a7982082f26dab8",
+    "src/native/execution-door.mjs": "c0168427baae7f311675183526dee0078b3022deb0756218999ad94f8dcc22d1",
+    "src/native/legacy-view.mjs": "63b373dcfe4406ece71a8e6345b3a2e362280e2597fa597387e0fc8bfb324c8d",
     "src/native/process-identity.mjs": "2a9324b9f416af7dadfde723ea10526f97cbd3639d3b0a4abec2c970bd98d9b6",
     "src/native/proof-helpers.mjs": "9077e45fa8f2d5a9441d2640f1c6dcfc015f78d060a61a144a011344078621d8",
     "src/native/stop-processes-inside.mjs": "e10a7a5d0d06fbdff611086138e914969aea3813db3a301a0a72b4ad870613ff",
@@ -1487,7 +1489,7 @@
     "src/run-supervisor/client.mjs": "16445d0a7d4a4a145fc75187da3da8420b92a4a8b38903b88c9fff88c3c54cbc",
     "src/run-supervisor/cwd-lock.mjs": "e397642c0d8f4dc0c7aadb557d5e74e6b2ef43a07f0ea86cc043d7efd4dcb5d5",
     "src/run-supervisor/direct-launch.mjs": "34ba705b5f884b88a8d0a21c752963a484113acdec30665de39fae90a4a60c01",
-    "src/run-supervisor/dispatch-error.mjs": "f6c0bfd80a28ccbda24e87b00f3377207439a1f5b1902492b3b753f1bfa4e805",
+    "src/run-supervisor/dispatch-error.mjs": "6da9498f97898b282e7b82fe2d19467e83992bd3e57231498479fc0cc28b49db",
     "src/run-supervisor/gate-kill-grace.mjs": "a4490fb22db5839f39e0c98aaf9cf6f4cc4870cba36f11e5219edb18cb1a0d32",
     "src/run-supervisor/protocol.mjs": "63bb68a1f04dc6d58a0d7a8d7711308fdcdf718d61d09da4f09047e24d05badd",
     "src/run-supervisor/run-lock.mjs": "1c556b14b63b421536af3137aa35245879ee116706c82cdb24d20b1d35a9a026",
@@ -1545,7 +1547,7 @@
     "src/runner/dispatch/recovery-planner.mjs": "cebf66e9c7cb427dfb7c6800cd4f0790a7185d70d2ea54cf0942fefca2f7ccc4",
     "src/runner/dispatch/resolve.mjs": "734ee2b1c14111e8dc0473a0bc476ef23a9e7e0667e1d4e3869d0c95b1726597",
     "src/runner/dispatch/run-admission.mjs": "66e85923397ad83807e92ce21523d84c474bdf741da6d8259a6e2cdf3c769eed",
-    "src/runner/dispatch/run-result.mjs": "47b6aae9984056f2890a28c9c87c3eed6972d3226a9d9c8f32c1ec8ab57c77da",
+    "src/runner/dispatch/run-result.mjs": "d855e421bde1ddeca6bf88426519a562208cc0864949e0474e48bb8a377f43e8",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runner-config-error.mjs": "f1cf79e848936226739903b20c6cec2e8c2831c7f5bd95f85d5a850f58480490",
     "src/runner/dispatch/runtime-inspection.mjs": "3ce9f61a48afbc739c5c83b261ba09bc3864decd810c13c5d0345ebf467b1649",
@@ -4577,7 +4579,7 @@
     },
     {
       "path": "src/native/execution-door.mjs",
-      "line": 271,
+      "line": 237,
       "spawn": "spawn",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
