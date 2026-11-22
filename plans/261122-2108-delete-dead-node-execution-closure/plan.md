@@ -3,9 +3,11 @@ contract: plan-v1
 title: "Delete the dead tier-5 Node execution modules and the tests that test them"
 status: draft
 priority: P1
+base: 4ad3bfaf8b6ac875f0f6693600df8532588260af
 blockedBy:
   - 261122-0118-heads-stable-and-able
   - 261118-1341-s6a-execution-tier-rust
+  - 261122-1950-owner-communication-standard
 footprint:
   - plans/261122-2108-delete-dead-node-execution-closure/**
   - src/runner/dispatch/**
@@ -268,6 +270,18 @@ that phase 8 owns. The hot files have one writer each: `docs/architecture-manife
 phase 9. A tree with only wave 2 merged stays green: removing a test, or swapping a test's dead import for a live
 one, cannot break a still-present source file. A tree that also has phase 8 is green, because phases 2 to 7 already
 removed every importer.
+
+## When this plan turns ready
+
+The plan stays `draft` while any blocker is active. `scripts/plan-contract-check.mjs` reports every footprint
+overlap between active plans and does not exempt a `blockedBy` pair. This plan shares unavoidable hot files with
+`261122-0118-heads-stable-and-able` (the architecture manifest, `test/session-host/head-start.test.mjs`, the
+run-supervisor and config specs, the skill renders) and with `261122-1950-owner-communication-standard` (the
+census, `docs/reading-map.md`, `core/skills/fgos-run/SKILL.md`, the skill renders). Both are listed in `blockedBy`
+so that each hot file has one writer at a time. When both are `done` (S6a already is), rebase `base:` onto `main`,
+rerun `node scripts/plan-contract-check.mjs --plan plans/261122-2108-delete-dead-node-execution-closure`, set the
+plan and its phase rows to `ready`, and land `plan.md` alone. That flip wakes the supervisor. Whoever sees the
+second blocker land does it: the supervisor, the secretary, or this head on a later wake.
 
 ## Owner questions
 
