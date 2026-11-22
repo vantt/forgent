@@ -86,3 +86,10 @@ row. A confined head's real Stop appends to its `stop-trace.jsonl`, and a stop a
 ## Rollback
 
 Revert the phase commit. The new `rotation.json` field is optional to readers, so an older record still parses.
+
+## Owner answer `q-obm5mrukjc` (2026-11-22)
+
+Widen by all three files: `test/setup/registrations.test.mjs`,
+`docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` and
+`apps/fgos/src/wiring/session_rotation_hook.rs`. The supervisor widened the footprint in `9a30bd755`; branch
+`heads-stable-and-able/p06b` lands on a fresh cut at the trunk tip.

@@ -32,3 +32,11 @@ phase4:
 # --- Phase 9: one watcher tuning change ---
 # Not ready yet: phase 9 picks the change after phases 4 and 7 land, from the baseline in
 # reports/baseline-wake-and-idle.md. The lead adds its block here and raises again then.
+
+# --- Phase 7: a skill-only land rebuilds the mutation census (owner answer q-y24ukwgfpo, 2026-11-22) ---
+# reason: heads-stable phase 7: land.regenerate runs for core/** too, so a skill-only land rebuilds the mutation census
+# why: owner 2026-11-22 (q-y24ukwgfpo): a land touching only core/** skipped regenerate and the census gate refused it
+# Append core/** to the existing land.regenerate.when list (src/**, apps/**, packages/**, bin/**, ...), keeping every entry.
+phase7:
+  - append: land.regenerate.when
+    value: core/**

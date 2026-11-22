@@ -72,3 +72,6 @@ Footprint addition (landed by the supervisor, since a lead's paths land refuses 
     `config patch <file> --project-only --json` through `hostCall`, checking only arg shape; `routing.rs` maps
     `("config", Some("patch"))`; contract and session-host spec name it; tests as in step 6. The host is the only
     authority for which file a key lives in.
+
+Owner answer `q-eyb5i7m7wq` (2026-11-22): the supervisor lands the seven-path widen. Landed in `9a30bd755`; steps 8-10
+run on a fresh branch cut at the trunk tip.

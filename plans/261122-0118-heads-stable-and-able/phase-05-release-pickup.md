@@ -51,3 +51,11 @@ cannot.
 ## Rollback
 
 Revert the phase commit. The port's default is today's fixed host.
+
+## Owner answer `q-pn6ur6wrjf` (2026-11-22)
+
+Move the pure read into `fgos-host-runtime`. Step 2 moves the activation-to-host-binary read from
+`fgos_distribution::activated_host_bin` down to `packages/host-runtime/rust/src/activation.rs` (exported from its
+`lib.rs`); `packages/distribution/rust/src/lib.rs` calls it instead of keeping its own copy, and
+`fgos-run-supervisor` depends on `fgos-host-runtime` (`packages/run-supervisor/rust/Cargo.toml`, `Cargo.lock`,
+`docs/architecture-manifest.json`). The supervisor widened the footprint by these paths in `9a30bd755`.

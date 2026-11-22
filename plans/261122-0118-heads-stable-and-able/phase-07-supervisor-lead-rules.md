@@ -64,3 +64,9 @@ mirror test proves the renders match their sources.
 ## Rollback
 
 Revert the phase commit and rebuild the renders.
+
+## Owner answer `q-y24ukwgfpo` (2026-11-22)
+
+Add `core/**` to `land.regenerate.when`, so a skill-only land rebuilds the mutation census. No unit may write `.fgos/`
+(`q-ns4o7uqamq`), so the item is block `phase7` of `config-patch-items.yaml`, applied by lead:SUPERVISOR; the branch
+lands after that patch is on main.
