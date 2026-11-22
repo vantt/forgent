@@ -36,8 +36,11 @@ For each phase of the wave whose footprint is disjoint from the others in it:
 1. `fgos worktree create <path> --branch <name>`. The path is absolute, in the sibling worktrees directory of the
    project (`<parent of the project root>/<project directory name>-worktrees/`, e.g.
    `/home/me/projects/forgent-worktrees/`), never inside the project root or your plan directory. One worktree per
-   phase. Its last segment must be unique in the repository (git keys the worktree by it) and is named from the plan
-   and phase: `<plan dir name>-p<NN>`. The branch is `<plan slug>/p<NN>`.
+   phase: reuse the one worktree for later units of the same phase (run inside it with `--sync <trunk>` when it must
+   catch up with the trunk tip instead of creating a fresh worktree); a fix unit after the land needs a new worktree,
+   because the land may have removed the phase's worktree. Its last segment must be unique in the repository
+   (git keys the worktree by it) and is named from the plan and phase: `<plan dir name>-p<NN>`. The branch is
+   `<plan slug>/p<NN>`.
    Read a refusal's code and message before anything else. A refused verb is reported in the plan file or with
    `fgos questions ask`; never investigate it in the host's source.
 2. `fgos run "<prompt naming the phase file>" --provider <id> --capability <purpose> --worktree <path> --writes <paths>`
@@ -47,9 +50,13 @@ For each phase of the wave whose footprint is disjoint from the others in it:
    `fgos request result <id> --wait 50` until it leaves `running`, then continue (review, land). If it is still
    `running` after 12 waits, park the phase in the plan file with the ticket id and that reason.
 4. Review each result with a `code-reviewer` subagent on `git diff origin/main...HEAD` of the branch, with the phase
-   file as the spec. Fix blocking findings through another unit.
-5. Land with `fgos land <branch> [--test <path>...]` (name the tests the phase file lists). Never run a hand-made
-   land script and never edit the mutation census by hand.
+   file as the spec. Fix blocking findings through another unit (reusing the phase worktree).
+5. Land with `fgos land <branch> [--test <path>...]` (name the tests the phase file lists). After a successful branch
+   land, the clean worktree is automatically removed (`worktreesRemoved`). Squash lands always keep their worktree
+   (the door refuses `worktree-delivery-unproven` because the tip is not an ancestor of the target). Hand any worktree
+   the land kept (`worktreesKept`) to the supervisor by name (raise an event with `fgos supervisor raise --kind
+   coordination-help --ref plan:<dir> --reason "worktree kept: <path> (<refusal code>)"`). Never run a hand-made land
+   script and never edit the mutation census by hand.
 6. Update the phase table in the plan directory with `fgos land --paths` and set the phase `done`, or park it with a
    reason. After the last phase set the plan `done`.
 

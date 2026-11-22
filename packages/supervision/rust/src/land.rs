@@ -84,11 +84,20 @@ pub struct LandConfig {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KeptWorktree {
+    pub path: String,
+    pub code: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LandOutcome {
     pub main_sha: String,
     pub landed_paths: Vec<String>,
     pub retries: u32,
     pub gates_run: Vec<String>,
+    pub worktrees_removed: Vec<String>,
+    pub worktrees_kept: Vec<KeptWorktree>,
+    pub worktree_list_error: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
@@ -258,7 +267,15 @@ pub struct LandPorts<'a> {
     /// plan cites as done and regenerates the index, in the same commit. Without it the land never
     /// touches an item.
     pub backlog_index: Option<BacklogPort<'a>>,
+    /// With the port, after a successful branch land, the land door removes the worktree that has the
+    /// landed branch checked out through this function, passing the worktree path and the landed target ref.
+    pub worktree_removal: Option<&'a WorktreeRemovalFn<'a>>,
 }
+
+/// What the composition root supplies to remove a worktree whose branch just landed.
+/// Passed the worktree path and the landed target ref (e.g. `refs/heads/main`).
+/// Returns `Ok(())` if removed, or `Err(code)` with the refusal code if kept.
+pub type WorktreeRemovalFn<'a> = dyn Fn(&Path, &str) -> Result<(), String> + 'a;
 
 /// What a plan `source` entry is, as the one owner of backlog id shapes classifies it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -310,6 +327,63 @@ pub fn land(
             "land-request-invalid",
             "give exactly one of a branch or a set of paths",
         )),
+    }
+}
+
+/// Remove any worktree that had the landed branch checked out, or record why it was kept.
+/// A failure to list worktrees records `worktree_list_error` in `outcome`, never failing the land.
+pub fn clean_landed_worktree(
+    ports: &LandPorts<'_>,
+    branch: &str,
+    target_branch: &str,
+    outcome: &mut LandOutcome,
+) {
+    let Some(remove) = ports.worktree_removal else {
+        return;
+    };
+    let full_branch_ref = format!(
+        "refs/heads/{}",
+        branch.strip_prefix("refs/heads/").unwrap_or(branch)
+    );
+    let target_ref = format!(
+        "refs/heads/{}",
+        target_branch
+            .strip_prefix("refs/heads/")
+            .unwrap_or(target_branch)
+    );
+    let mut worktrees = Vec::new();
+    let mut cursor = None;
+    loop {
+        match ports.git.list_worktrees(ports.repo, cursor, 4096) {
+            Ok(page) => {
+                worktrees.extend(page.entries);
+                if page.complete {
+                    break;
+                }
+                cursor = page.next_cursor;
+            }
+            Err(err) => {
+                outcome.worktree_list_error = Some(err.cause);
+                break;
+            }
+        }
+    }
+    for wt in worktrees {
+        if wt.branch.as_ref().map(|b| b.as_str()) == Some(full_branch_ref.as_str()) {
+            let wt_path_str = lossy(&wt.path);
+            let wt_path = Path::new(&wt_path_str);
+            match remove(wt_path, &target_ref) {
+                Ok(()) => {
+                    outcome.worktrees_removed.push(wt_path_str);
+                }
+                Err(code) => {
+                    outcome.worktrees_kept.push(KeptWorktree {
+                        path: wt_path_str,
+                        code,
+                    });
+                }
+            }
+        }
     }
 }
 
@@ -961,7 +1035,10 @@ impl Lander<'_> {
         let mut retries = 0;
         loop {
             match self.branch_attempt(command, branch, &target, retries)? {
-                Attempt::Landed(outcome) => return Ok(outcome),
+                Attempt::Landed(mut outcome) => {
+                    self.clean_landed_worktree(branch, &target, &mut outcome);
+                    return Ok(outcome);
+                }
                 Attempt::RemoteMoved if retries >= MAX_RETRIES => {
                     return Err(refuse(
                         "land-retries-exhausted",
@@ -971,6 +1048,10 @@ impl Lander<'_> {
                 Attempt::RemoteMoved => retries += 1,
             }
         }
+    }
+
+    fn clean_landed_worktree(&self, branch: &str, target_branch: &str, outcome: &mut LandOutcome) {
+        clean_landed_worktree(self.ports, branch, target_branch, outcome);
     }
 
     fn prepare(
@@ -1275,6 +1356,9 @@ impl Lander<'_> {
             landed_paths: changed,
             retries,
             gates_run,
+            worktrees_removed: Vec::new(),
+            worktrees_kept: Vec::new(),
+            worktree_list_error: None,
         }))
     }
 
@@ -1855,6 +1939,9 @@ impl Lander<'_> {
             landed_paths: result.files,
             retries,
             gates_run,
+            worktrees_removed: Vec::new(),
+            worktrees_kept: Vec::new(),
+            worktree_list_error: None,
         }))
     }
 
