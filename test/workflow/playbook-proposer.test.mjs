@@ -14,7 +14,7 @@ import { startWorkflow, resumeWorkflow, answerWorkflow, statusWorkflow, closeWor
 import { conductorWorkflow } from '../helpers/workflow-case-fixture.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { projectCase } from '../../src/workflow/case-projection.mjs';
-import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
+import { handoffRef } from '../../src/native/execution-door.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 
@@ -131,7 +131,7 @@ test('an answer that arrives while a proposer holds advance reaches the ledger b
 
   // The approved copy is edited after the answer was given and before the next proposer acts.
   const draftRun = parked.steps.draft.units['draft-copy'].unitRunId;
-  const [report] = resolveUnitInputs([`unit-run:${draftRun}/producer`], tmp).refs;
+  const report = handoffRef(`unit-run:${draftRun}/producer`, tmp);
   fs.appendFileSync(report, '\nEdited after approval.\n');
 
   const state = await resumeWorkflow(id, opts(tmp));

@@ -4,8 +4,9 @@ use crate::{check, error};
 use napi::Result;
 use napi_derive::napi;
 use serde_json::{json, Value};
-/// The contract version `versions()` reports for this namespace: 1 is the first with `overlaps` and `collidingPairs`.
-pub const CONTRACT_VERSION: u32 = 1;
+/// The contract version `versions()` reports for this namespace: 1 is the first with `overlaps` and `collidingPairs`,
+/// 2 the first with `globsMeet`.
+pub const CONTRACT_VERSION: u32 = 2;
 
 #[allow(dead_code)] // exported through N-API
 #[napi]
@@ -60,6 +61,10 @@ fn dispatch(method: &str, args: &Value) -> Result<Value> {
             )
             .map_err(error)?))
         }
+        "globsMeet" => Ok(json!(fgos_write_scope::globs_meet(
+            &strings("a")?,
+            &strings("b")?
+        ))),
         "overlaps" => Ok(json!(fgos_write_scope::scopes_overlap(
             &strings("a")?,
             &strings("b")?

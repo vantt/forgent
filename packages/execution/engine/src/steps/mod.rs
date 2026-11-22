@@ -14,7 +14,8 @@ pub mod cleanup_trust;
 pub mod finalize_home;
 pub mod settle_attempt;
 pub mod stray_writes;
-pub mod worker_artifacts;
+/// Where a worker's claim and report are: a read of the run directory, in `fgos-execution`.
+pub use fgos_execution::worker_artifacts;
 
 pub use cleanup_trust::cleanup_trust;
 pub use finalize_home::{

@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { parseRequest, readWorkQuestions, serve, RESULT_PREFIX } from '../../src/setup/doctor-bridge.mjs';
-import { runsRoot, isCaseId } from '../../src/runner/execution/case-run-paths.mjs';
+import { runsRoot, isCaseId } from '../../src/native/execution-door.mjs';
 import { readCaseProjection } from '../../src/workflow/case-projection.mjs';
 import { addWork, listWork, putInAwaiting } from '../../src/state/store.mjs';
 import { validateWorkflow } from '../../src/workflow/definition.mjs';

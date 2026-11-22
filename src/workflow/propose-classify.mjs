@@ -16,8 +16,11 @@ import path from 'node:path';
 
 import { parseYaml } from '../util/yaml.mjs';
 import { RunnerConfigError } from '../native/execution-door.mjs';
-import { canonicalizeWriteEntry, globsMeet } from '../runner/dispatch/write-scope.mjs';
+import { nativeDoor } from '../native/door.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';
+
+/** Whether two path globs (segments) can name the same file: the write-scope leaf's answer. */
+const globsMeet = (a, b) => nativeDoor().writeScope('globsMeet', { a, b });
 
 const TABLE_PATH = path.resolve(import.meta.dirname, '../../domains/coding/slice-kinds.yaml');
 const TABLE_VERSION = 1;
@@ -93,7 +96,7 @@ export function normalizeWrite(raw) {
   if (raw.trim().split('/').every((segment) => segment === '' || segment === '.')) return writeOf(['**']);
   let entry;
   try {
-    entry = canonicalizeWriteEntry(raw);
+    entry = nativeDoor().writeScope('canonicalize', { raw });
   } catch (err) {
     throw refuse(`slice write path "${raw}" is refused: ${err.message}`, 'slice-write-invalid');
   }

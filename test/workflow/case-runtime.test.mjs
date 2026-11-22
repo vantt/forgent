@@ -14,7 +14,7 @@ import { applySettle, drainCaseInbox, recordGateAnswerRound, unconsumedGateRound
 import { bindWorktree, readBinding } from '../../src/workflow/case-bindings.mjs';
 import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { digestSubject, digestText, digestContextRefs } from '../../src/workflow/ref-digests.mjs';
-import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
+import { handoffRef } from '../../src/native/execution-door.mjs';
 import { readFrontmatter } from '../../src/util/yaml.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { appendAll, append, eventsOf, FRAME, openCase, projectionOf, settle, withHold } from '../helpers/workflow-case-fixture.mjs';
@@ -102,8 +102,7 @@ test('a gate that parks again is a new occurrence and can be answered again', ()
 test('the file the Execution Core hands to later units still resolves through gate-answer refs', () => {
   const run = gatedRun();
   answer(run);
-  const { refs } = resolveUnitInputs([`gate-answer:${run.caseId}/ok`], run.repoRoot);
-  assert.equal(refs[0], answerFile(run));
+  assert.equal(handoffRef(`gate-answer:${run.caseId}/ok`, run.repoRoot), answerFile(run));
 });
 
 test('a settle that could not take advance is a file the next holder appends first and removes', () => {

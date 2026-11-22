@@ -12,10 +12,8 @@ import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { createWorktreeCheckoutSync } from '../runner/repo-locks.mjs';
 import { removeWorktree, deleteBranchRef } from '../runner/worktree.mjs';
 
-import { RunnerConfigError, worktreeAdminScopeName, unitRunFacts, foldRunSetting } from '../native/execution-door.mjs';
-import { anonymousInputName, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, reportDigest, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
+import { RunnerConfigError, worktreeAdminScopeName, unitRunFacts, foldRunSetting, seatKeyOf, anonymousInputName, reportDigest, handoffRef, executionVocabulary } from '../native/execution-door.mjs';
 import { createLockScope } from '../holder-lock/index.mjs';
-import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
 import { stepSubjectDigest, unitRunsOf } from './ref-digests.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
@@ -57,6 +55,7 @@ export function buildUnitHandoff({ template, state, step, workflow }) {
   // unit, unit run or seat. A same-seat input is not part of that numbering: the seat it is for
   // gets it as its own earlier result, and the brief only says so.
   const anonymize = template.anonymizeInputs === true;
+  const { SEAT_PLACEHOLDER, OWN_PREVIOUS_NAME } = executionVocabulary();
   const index = [];
   const inputs = [...(template.contextRefs ?? []), ...(step.dependsOn.length === 0 ? state.contextRefs ?? [] : [])];
   let anonymized = 0;
@@ -145,7 +144,7 @@ export function renderGateQuestion(step, state, mainRoot) {
       if (unit?.status !== 'completed' || !unit.unitRunId) throw new RunnerConfigError('gate report producer is not settled');
       const producer = unit.results?.filter((record) => seatKeyOf(record) === 'producer').at(-1);
       if (!producer?.runResult?.settleReports?.length) throw new RunnerConfigError('gate requires a settled producer report');
-      const [file] = resolveUnitInputs([`unit-run:${unit.unitRunId}/producer`], mainRoot).refs;
+      const file = handoffRef(`unit-run:${unit.unitRunId}/producer`, mainRoot);
       const expertise = readMissingExpertise(file, producer.runResult.settledAt);
       if (!Array.isArray(expertise) || expertise.some((entry) => typeof entry !== 'string' || !entry.trim())) {
         throw new RunnerConfigError('gate report requires "missing expertise" as an array of non-empty strings');

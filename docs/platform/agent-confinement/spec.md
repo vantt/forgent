@@ -485,7 +485,7 @@ và worker ghi được workspace có thể commit việc xoá đó; (2) `--unsh
 đọc được cmdline của tiến trình anh em; (3) socket herdr bị che vì `--ro-bind / /` vẫn cho
 `connect()`, tức worker có thể `pane read` pane của anh em (nay che cho mọi dispatch, §9.3). Blind chỉ dùng được khi cái
 worker *được trao* nằm sẵn trong thư mục của chính nó, nên với Unit `blind` resolver hand-off
-(`resolveUnitInputs`, `src/runner/execution/handoff-refs.mjs`) không giao đường dẫn gốc: mọi input
+(`resolve_inputs`, `packages/execution/engine/src/unit_run/handoff.rs`) không giao đường dẫn gốc: mọi input
 `unit-run:`, `gate-answer:` và mọi ref nằm trong hidden root được chép nguyên byte (kiểm lại sha256
 lúc chép; nguồn đã đổi sau settle thì từ chối `report-changed-after-settle`) vào `inputs/` của
 *round dir của chính vai đó* (`<round>/inputs/<tên>`), vô điều kiện, không cần `anonymizeInputs`; tên

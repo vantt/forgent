@@ -501,3 +501,541 @@ pub fn herdr_present() -> Result<bool> {
     check()?;
     Ok(machine_reads::herdr_present())
 }
+
+// ---- outcomes, seats and the loop checks ------------------------------------------------------------------
+
+/// The named values a caller above the tier compares with: `{ NOT_STARTED_OUTCOME, RESERVED_PATTERN_NAMES,
+/// SEAT_BINDING_MARKER_PATH, MODEL_POLICY_TIERS, CASE_ID_ENV, CASE_RESERVATION_ENV, SEAT_PLACEHOLDER,
+/// OWN_PREVIOUS_NAME }`.
+#[napi(namespace = "execution", js_name = "vocabulary")]
+pub fn vocabulary() -> Result<Value> {
+    check()?;
+    Ok(json!({
+        "NOT_STARTED_OUTCOME": fgos_execution::outcome::NOT_STARTED_OUTCOME,
+        "RESERVED_PATTERN_NAMES": fgos_execution::patterns::RESERVED_PATTERN_NAMES,
+        "SEAT_BINDING_MARKER_PATH": fgos_execution::patterns::SEAT_BINDING_MARKER_PATH,
+        "MODEL_POLICY_TIERS": fgos_execution::hosts::tiers(),
+        "CASE_ID_ENV": fgos_execution::dispatch_env::CASE_ID_ENV,
+        "CASE_RESERVATION_ENV": fgos_execution::dispatch_env::CASE_RESERVATION_ENV,
+        "SEAT_PLACEHOLDER": fgos_execution::handoff::SEAT_PLACEHOLDER,
+        "OWN_PREVIOUS_NAME": fgos_execution::handoff::OWN_PREVIOUS_NAME,
+    }))
+}
+
+/// `currentDispatchDepth()`: how deep in a chain of dispatches this process runs (`FGOS_DISPATCH_DEPTH`, else 0).
+#[napi(namespace = "execution", js_name = "currentDispatchDepth")]
+pub fn current_dispatch_depth() -> Result<f64> {
+    check()?;
+    Ok(fgos_execution::dispatch_env::current_dispatch_depth())
+}
+
+fn outcome_text(request: &Value) -> &str {
+    request
+        .get("outcome")
+        .and_then(Value::as_str)
+        .unwrap_or_default()
+}
+
+/// `isVerdict(outcome)`: whether the outcome is a completed judgment of the work.
+#[napi(namespace = "execution", js_name = "isVerdict")]
+pub fn is_verdict(request: Value) -> Result<bool> {
+    check()?;
+    Ok(fgos_execution::outcome::is_verdict(outcome_text(&request)))
+}
+
+/// `exitCodeForOutcome(outcome)`: the process exit code of an execution outcome (1 for a value that is no text).
+#[napi(namespace = "execution", js_name = "exitCodeForOutcome")]
+pub fn exit_code_for_outcome(request: Value) -> Result<i32> {
+    check()?;
+    Ok(match request.get("outcome").and_then(Value::as_str) {
+        Some(outcome) => fgos_execution::outcome::exit_code_for_outcome(outcome),
+        None => 1,
+    })
+}
+
+/// `infrastructure(unitResult)`: whether a unit ended on infrastructure, so a rerun can still produce the verdict.
+#[napi(namespace = "execution", js_name = "infrastructure")]
+pub fn infrastructure(request: Value) -> Result<bool> {
+    check()?;
+    let null = Value::Null;
+    Ok(fgos_execution::outcome::infrastructure(
+        request.get("unitResult").unwrap_or(&null),
+    ))
+}
+
+/// `evaluationsOf(results)`: one entry per evaluator result that reached a verdict.
+#[napi(namespace = "execution", js_name = "evaluationsOf")]
+pub fn evaluations_of(request: Value) -> Result<Value> {
+    check()?;
+    let results = request
+        .get("results")
+        .and_then(Value::as_array)
+        .map(Vec::as_slice)
+        .unwrap_or_default();
+    Ok(json!(fgos_execution::outcome::evaluations_of(results)))
+}
+
+/// `seatKeyOf(result)`: the seat a recorded result belongs to (`seat`, or the legacy `role`), or null.
+#[napi(namespace = "execution", js_name = "seatKeyOf")]
+pub fn seat_key_of(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    Ok(
+        fgos_execution::seat_resolver::seat_key_of(request.get("result").unwrap_or(&null))
+            .cloned()
+            .unwrap_or(Value::Null),
+    )
+}
+
+/// `legacyFamilyOf(result)`: the provider family an old result recorded, or null.
+#[napi(namespace = "execution", js_name = "legacyFamilyOf")]
+pub fn legacy_family_of(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    Ok(
+        fgos_execution::seat_resolver::legacy_family_of(request.get("result").unwrap_or(&null))
+            .cloned()
+            .unwrap_or(Value::Null),
+    )
+}
+
+fn seat_refused(e: fgos_execution::seat_resolver::SeatResolutionError) -> Error {
+    let mut error = named(e.class, e.message, Some(&e.code), None);
+    for (key, value) in [("at", e.at), ("detail", e.detail)] {
+        if let Some(value) = value {
+            error = error.with(key, json!(value));
+        }
+    }
+    refused(error)
+}
+
+/// `checkDeclaredSeats(raw, label, { tiers })`: the declared seats as plain entries, or the refusal.
+#[napi(namespace = "execution", js_name = "checkDeclaredSeats")]
+pub fn check_declared_seats(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    let tiers: Option<Vec<String>> = request.get("tiers").and_then(Value::as_array).map(|list| {
+        list.iter()
+            .filter_map(Value::as_str)
+            .map(str::to_string)
+            .collect()
+    });
+    fgos_execution::seat_resolver::check_declared_seats(
+        request.get("raw").unwrap_or(&null),
+        text(&request, "label")?,
+        tiers.as_deref(),
+    )
+    .map(|seats| json!(seats))
+    .map_err(seat_refused)
+}
+
+/// `assertNoSeatTier(seats, source)`: refuses a seat list that carries a tier.
+#[napi(namespace = "execution", js_name = "assertNoSeatTier")]
+pub fn assert_no_seat_tier(request: Value) -> Result<()> {
+    check()?;
+    let null = Value::Null;
+    fgos_execution::seat_resolver::assert_no_seat_tier(
+        request.get("raw").unwrap_or(&null),
+        text(&request, "source")?,
+    )
+    .map_err(seat_refused)
+}
+
+/// `assertNoUnitTier(unit, source)`: refuses a unit that carries a tier.
+#[napi(namespace = "execution", js_name = "assertNoUnitTier")]
+pub fn assert_no_unit_tier(request: Value) -> Result<()> {
+    check()?;
+    let null = Value::Null;
+    fgos_execution::seat_resolver::assert_no_unit_tier(
+        request.get("raw").unwrap_or(&null),
+        text(&request, "source")?,
+    )
+    .map_err(seat_refused)
+}
+
+/// `verifyCommandOf(unit, cfg)`: the verify command a unit runs (its own, else its capability's), or null.
+#[napi(namespace = "execution", js_name = "verifyCommandOf")]
+pub fn verify_command_of(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    Ok(json!(fgos_execution::loops::verify_command_of(
+        request.get("unit").unwrap_or(&null),
+        request.get("cfg").unwrap_or(&null),
+    )))
+}
+
+/// `verifySeatResult(answer, round)`: the verify seat's result for one answer of the verify command.
+#[napi(namespace = "execution", js_name = "verifySeatResult")]
+pub fn verify_seat_result(request: Value) -> Result<Value> {
+    check()?;
+    Ok(fgos_execution::loops::verify_seat_result(
+        present(&request, "answer"),
+        request.get("round").and_then(Value::as_u64).unwrap_or(1),
+    ))
+}
+
+// ---- the runner config rules ------------------------------------------------------------------------------
+
+/// `detectRetiredPatternKeys(input)`: the retired keys a dotted path or a pattern map carries.
+#[napi(namespace = "execution", js_name = "detectRetiredPatternKeys")]
+pub fn detect_retired_pattern_keys(request: Value) -> Result<Value> {
+    check()?;
+    Ok(json!(
+        fgos_execution::patterns::detect_retired_pattern_keys(present(&request, "input"))
+            .iter()
+            .map(|finding| finding.to_json())
+            .collect::<Vec<_>>()
+    ))
+}
+
+/// `formatRetiredKeySentence(item, instruction)`: `<key> was retired; <instruction>`.
+#[napi(namespace = "execution", js_name = "formatRetiredKeySentence")]
+pub fn format_retired_key_sentence(request: Value) -> Result<String> {
+    check()?;
+    Ok(fgos_execution::patterns::format_retired_key_sentence(
+        present(&request, "item"),
+        request.get("instruction").and_then(Value::as_str),
+    ))
+}
+
+/// `runTimeoutProblem(value, label)`: why a value is not a usable run timeout, or null.
+#[napi(namespace = "execution", js_name = "runTimeoutProblem")]
+pub fn run_timeout_problem(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    Ok(json!(fgos_execution::bind::run_timeout_problem(
+        request.get("value").unwrap_or(&null),
+        text(&request, "label")?,
+    )))
+}
+
+/// `parseRunTimeout(text, label)`: `90m`, `5400s`, `2h` or `600000ms` as milliseconds, or a `RunnerConfigError`.
+#[napi(namespace = "execution", js_name = "parseRunTimeout")]
+pub fn parse_run_timeout(request: Value) -> Result<f64> {
+    check()?;
+    let label = text(&request, "label")?;
+    // A value that is not text is refused with the sentence that names it, as Node printed it.
+    let given = match request.get("text") {
+        Some(Value::String(s)) => s.clone(),
+        _ => String::new(),
+    };
+    fgos_execution::bind::parse_run_timeout(&given, label)
+        .map(|ms| ms as f64)
+        .map_err(|message| refused(RunUnitError::config(message, None, None)))
+}
+
+/// `assertReasoningEffort(value, { supported, executorId })`: the value when the vocabulary and the executor's own
+/// list allow it, else a `RunnerConfigError`.
+#[napi(namespace = "execution", js_name = "assertReasoningEffort")]
+pub fn assert_reasoning_effort(request: Value) -> Result<Value> {
+    check()?;
+    let value = request.get("value").cloned().unwrap_or(Value::Null);
+    let shown = match &value {
+        Value::String(s) => s.clone(),
+        Value::Null => "undefined".into(),
+        other => other.to_string(),
+    };
+    fgos_execution::tier_cell::assert_reasoning_effort(
+        &shown,
+        request
+            .get("supported")
+            .and_then(Value::as_array)
+            .map(Vec::as_slice),
+        request.get("executorId").and_then(Value::as_str),
+    )
+    .map(|()| value)
+    .map_err(|e| refused(named(e.name, e.message, e.code, None)))
+}
+
+/// `validateRunnerLoopsShape(loops, label)`: the rules of `runner.loops` that read beyond its own fields; a
+/// refusal is a `RunnerConfigError` naming its `path`, `paths` and `detail`.
+#[napi(namespace = "execution", js_name = "validateRunnerLoopsShape")]
+pub fn validate_runner_loops_shape(request: Value) -> Result<()> {
+    check()?;
+    let null = Value::Null;
+    fgos_execution::runner_check::validate_runner_loops_shape(
+        request.get("loops").unwrap_or(&null),
+        text(&request, "label")?,
+    )
+    .map_err(|failure| {
+        let mut error = named(
+            failure.error.name,
+            failure.error.message,
+            failure.error.code,
+            None,
+        );
+        if let Some(path) = failure.path {
+            error = error.with("path", json!(path));
+        }
+        if !failure.paths.is_empty() {
+            error = error.with("paths", json!(failure.paths));
+        }
+        if let Some(detail) = failure.detail {
+            error = error.with("detail", json!(detail));
+        }
+        refused(error)
+    })
+}
+
+/// `attributeRunnerConfigError`'s message: a refusal about `paths` attributed to the files and lines its values
+/// came from, or null when no origin names them.
+#[napi(namespace = "execution", js_name = "attributedRefusal")]
+pub fn attributed_refusal(request: Value) -> Result<Value> {
+    check()?;
+    let strings = |key: &str| -> Vec<String> {
+        request
+            .get(key)
+            .and_then(Value::as_array)
+            .map(|list| {
+                list.iter()
+                    .filter_map(Value::as_str)
+                    .map(str::to_string)
+                    .collect()
+            })
+            .unwrap_or_default()
+    };
+    let origins = request
+        .get("origins")
+        .and_then(Value::as_array)
+        .map(Vec::as_slice)
+        .unwrap_or_default();
+    Ok(json!(fgos_execution::runner_config::attributed_message(
+        &strings("paths"),
+        text(&request, "detail")?,
+        origins,
+        text(&request, "projectDir")?,
+    )))
+}
+
+// ---- the accounts ------------------------------------------------------------------------------------------
+
+/// The machine an account read sees from the Node process. The inventory reads only the home directory a login
+/// store names; the PATH and herdr answers are the real ones, and the confinement backend registry, which no
+/// account read asks, answers none.
+struct AccountsMachine;
+
+impl fgos_execution::ports::Machine for AccountsMachine {
+    fn on_path(&self, program: &str) -> bool {
+        let path_env = std::env::var("PATH").unwrap_or_default();
+        let pathext = std::env::var("PATHEXT").unwrap_or_default();
+        fgos_process::spawn::resolve_program(program, &path_env, &pathext, cfg!(windows)).is_some()
+    }
+
+    fn posture_backend(&self, _id: &str) -> Option<fgos_execution::ports::Backend> {
+        None
+    }
+
+    fn herdr_present(&self) -> bool {
+        machine_reads::herdr_present()
+    }
+
+    fn home_dir(&self) -> Option<String> {
+        let var = if cfg!(unix) { "HOME" } else { "USERPROFILE" };
+        std::env::var(var).ok().filter(|home| !home.is_empty())
+    }
+}
+
+/// `providerAccountInventory(runnerConfig)`: the accounts of `runner.llmAccounts` per state key, as the lease reads
+/// them (a config with a `runner` section is read through it).
+#[napi(namespace = "execution", js_name = "providerAccountInventory")]
+pub fn provider_account_inventory(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    let config = request.get("runnerConfig").unwrap_or(&null);
+    let runner = config
+        .get("runner")
+        .filter(|r| r.is_object())
+        .unwrap_or(config);
+    Ok(Value::Object(
+        fgos_execution::accounts::provider_account_inventory(runner, &AccountsMachine),
+    ))
+}
+
+/// `legacyStateKey(pool)`: the provider-capacity state key of an account pool.
+#[napi(namespace = "execution", js_name = "legacyStateKey")]
+pub fn legacy_state_key(request: Value) -> Result<String> {
+    check()?;
+    Ok(fgos_execution::accounts::legacy_state_key(text(
+        &request, "pool",
+    )?))
+}
+
+// ---- the run result, the worker's claim and the assignment stamp -------------------------------------------
+
+/// `interpretRunResult(input, { expectedRunId })`: `{ record, status, confidence, corrupt }`, the deterministic
+/// reading of a Run Result of any version (a record that cannot be read soundly reads as `contract-corrupt`).
+#[napi(namespace = "execution", js_name = "interpretRunResult")]
+pub fn interpret_run_result(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    let read = fgos_execution::run_result::interpret_run_result(
+        request.get("input").unwrap_or(&null),
+        request.get("expectedRunId").and_then(Value::as_str),
+    );
+    Ok(
+        json!({ "record": read.record, "status": read.status, "confidence": read.confidence, "corrupt": read.corrupt }),
+    )
+}
+
+/// `runOutcome(result, { evidenceFloor })`: the one outcome every dispatch, loop and legality decision reads.
+#[napi(namespace = "execution", js_name = "runOutcome")]
+pub fn run_outcome(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    Ok(fgos_execution::run_result::run_outcome(
+        request.get("result").unwrap_or(&null),
+        present(&request, "evidenceFloor").filter(|floor| floor.is_object()),
+    )
+    .to_json())
+}
+
+/// `validateAgentResultClaim(value, { role, operation, posture })`: `{ valid, reason? }` of an untrusted claim.
+#[napi(namespace = "execution", js_name = "validateAgentResultClaim")]
+pub fn validate_agent_result_claim(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    let context = fgos_execution::run_result::claim::claim_context_of(
+        request.get("context").unwrap_or(&null),
+    );
+    let checked = fgos_execution::run_result::validate_agent_result_claim_contract(
+        request.get("value").unwrap_or(&null),
+        &context,
+    );
+    Ok(match checked.reason {
+        Some(reason) => json!({ "valid": checked.valid, "reason": reason }),
+        None => json!({ "valid": checked.valid }),
+    })
+}
+
+/// `isSubstantiveReportText(text)`: whether a report says something beyond placeholders and headings.
+#[napi(namespace = "execution", js_name = "isSubstantiveReportText")]
+pub fn is_substantive_report_text(request: Value) -> Result<bool> {
+    check()?;
+    Ok(request
+        .get("text")
+        .and_then(Value::as_str)
+        .is_some_and(fgos_execution::run_result::claim::is_substantive_report_text))
+}
+
+/// `isReadOnlyAssignment(assignment)`: read-only or mutating, from the `mutation` stamped at build time.
+#[napi(namespace = "execution", js_name = "isReadOnlyAssignment")]
+pub fn is_read_only_assignment(request: Value) -> Result<bool> {
+    check()?;
+    let null = Value::Null;
+    Ok(fgos_execution::dispatch_policy::is_read_only_assignment(
+        request.get("assignment").unwrap_or(&null),
+    ))
+}
+
+/// `stampDeclaredAssignment({ role, operation })`: `{ mutation, evidence: { required }, resultKind, onAdvance? }`.
+#[napi(namespace = "execution", js_name = "stampDeclaredAssignment")]
+pub fn stamp_declared_assignment(request: Value) -> Result<Value> {
+    check()?;
+    Ok(fgos_execution::declared_stamp::stamp_declared_assignment(
+        request.get("role").and_then(Value::as_str),
+        request
+            .get("operation")
+            .and_then(Value::as_str)
+            .unwrap_or_default(),
+    )
+    .to_json())
+}
+
+/// `resolveWorkerArtifactPath(runDir, roundPrefix, roundSuffix, legacyName)`: where a worker's claim or report is,
+/// outbox first and the highest round winning; the legacy flat path when no directory holds one.
+#[napi(namespace = "execution", js_name = "resolveWorkerArtifactPath")]
+pub fn resolve_worker_artifact_path(request: Value) -> Result<String> {
+    check()?;
+    Ok(
+        fgos_execution::worker_artifacts::resolve_worker_artifact_path(
+            &path_of(&request, "runDir")?,
+            text(&request, "roundPrefix")?,
+            text(&request, "roundSuffix")?,
+            text(&request, "legacyName")?,
+        )
+        .to_string_lossy()
+        .into_owned(),
+    )
+}
+
+/// `assignmentDir(fgosDir, assignmentId)`: the directory of an assignment, or null for an id that is no safe nested
+/// path under `assignments/`.
+#[napi(namespace = "execution", js_name = "assignmentDir")]
+pub fn assignment_dir(request: Value) -> Result<Value> {
+    check()?;
+    let fgos = path_of(&request, "fgosDir")?;
+    Ok(request
+        .get("assignmentId")
+        .and_then(Value::as_str)
+        .and_then(|id| fgos_execution::assignment_layout::assignment_dir(&fgos, id))
+        .map_or(Value::Null, |dir| json!(dir.to_string_lossy())))
+}
+
+/// `listAssignmentRuns(fgosDir)`: every attempt directory under `assignments/`, `{ assignmentId, attempt, runDir,
+/// hasAssignmentJson }`, a symlink or a too-deep directory never followed.
+#[napi(namespace = "execution", js_name = "listAssignmentRuns")]
+pub fn list_assignment_runs(request: Value) -> Result<Value> {
+    check()?;
+    Ok(json!(
+        fgos_execution::assignment_layout::list_assignment_runs(&path_of(&request, "fgosDir")?)
+            .iter()
+            .map(|run| json!({
+                "assignmentId": run.assignment_id,
+                "attempt": run.attempt,
+                "runDir": run.run_dir.to_string_lossy(),
+                "hasAssignmentJson": run.has_assignment_json,
+            }))
+            .collect::<Vec<_>>()
+    ))
+}
+
+/// `shippedCatalog()`: the bundled standard's `{ patterns, loops }` (the Config crate's shipped catalog).
+#[napi(namespace = "execution", js_name = "shippedCatalog")]
+pub fn shipped_catalog() -> Result<Value> {
+    check()?;
+    Ok(fgos_config::standard::shipped_runner_catalog())
+}
+
+// ---- the hand-off -------------------------------------------------------------------------------------------
+
+/// `anonymousInputName(index)`: the neutral name of the nth anonymized input (`seat-A` ... `seat-Z`, `seat-AA`).
+#[napi(namespace = "execution", js_name = "anonymousInputName")]
+pub fn anonymous_input_name(request: Value) -> Result<String> {
+    check()?;
+    let index = request
+        .get("index")
+        .and_then(Value::as_u64)
+        .ok_or_else(|| invalid("index must be a whole number"))?;
+    Ok(fgos_execution::handoff::anonymous_input_name(
+        usize::try_from(index).map_err(|_| invalid("index is too large"))?,
+    ))
+}
+
+/// `reportDigest(unitRunId, seat, mainRoot)`: `{ path, bytes, sha256 }` of the report a seat of a unit run left in
+/// its latest round, as its bytes lie now; a report that cannot be resolved or read is refused (`reason`).
+#[napi(namespace = "execution", js_name = "reportDigest")]
+pub fn report_digest(request: Value) -> Result<Value> {
+    check()?;
+    fgos_execution::handoff_reports::report_digest_of_seat(
+        text(&request, "unitRunId")?,
+        text(&request, "seat")?,
+        &path_of(&request, "mainRoot")?,
+    )
+    .map_err(refused)
+}
+
+/// `handoffRef(input, mainRoot, { accept })`: the path one input names (a `unit-run:` input the report it hands
+/// over, only while it keeps the bytes settlement recorded unless `accept` covers the revision; a `gate-answer:`
+/// input the owner's answer file; any other input itself). One that cannot be handed over is refused (`reason`).
+#[napi(namespace = "execution", js_name = "handoffRef")]
+pub fn handoff_ref(request: Value) -> Result<String> {
+    check()?;
+    use fgos_execution::handoff_reports;
+    handoff_reports::resolve_ref(
+        text(&request, "input")?,
+        &path_of(&request, "mainRoot")?,
+        &handoff_reports::accept_of(request.get("accept")),
+    )
+    .map(|file| file.to_string_lossy().into_owned())
+    .map_err(|e| refused(handoff_reports::refusal(e)))
+}

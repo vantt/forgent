@@ -14,7 +14,7 @@ import {
   TEST_SCAN_LIMITS,
 } from '../../src/workflow/propose-validate.mjs';
 import { classifySlice } from '../../src/workflow/propose-classify.mjs';
-import { globsMeet } from '../../src/runner/dispatch/write-scope.mjs';
+import { nativeDoor } from '../../src/native/door.mjs';
 import { proposeFrame } from '../../src/workflow/propose-frame.mjs';
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 import { readStandardValue } from '../../src/config/facade.mjs';
@@ -34,7 +34,7 @@ function memoryPorts(files, { links = [] } = {}) {
     const found = stat(scope);
     if (found === 'file') return [scope];
     if (found === 'dir') return names.filter((name) => name.startsWith(`${scope}/`)).sort();
-    return names.filter((name) => globsMeet(segments(name), segments(scope))).sort();
+    return names.filter((name) => nativeDoor().writeScope('globsMeet', { a: segments(name), b: segments(scope) })).sort();
   };
   const findTests = (terms) => names.filter((name) => name.startsWith('test/') && terms.some((term) => files[name].includes(term))).sort();
   const crateOf = (file) => {

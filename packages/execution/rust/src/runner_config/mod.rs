@@ -244,6 +244,27 @@ pub fn door_refusal(
     }
 }
 
+/// The message of a refusal about `paths` attributed to the files and lines the values came from (`runner config
+/// (<file:line>, ... <subpath>) <detail>`), or `None` when no origin names them.
+pub fn attributed_message(
+    paths: &[String],
+    detail: &str,
+    origins: &[Value],
+    project_dir: &str,
+) -> Option<String> {
+    let locations = resolve_origin_locations(origins, paths, project_dir);
+    if locations.is_empty() {
+        return None;
+    }
+    let shown = subpath(paths)
+        .map(|sub| format!(" {sub}"))
+        .unwrap_or_default();
+    Some(format!(
+        "runner config ({}{shown}) {detail}",
+        locations.join(", ")
+    ))
+}
+
 /// A refusal of the shape check, attributed to the file and line the values came from when the origins name them.
 fn attribute(failure: RunnerCheckError, origins: &[Value], project_dir: &str) -> RunnerCheckError {
     if failure.error.name != RUNNER_CONFIG_ERROR {
@@ -252,23 +273,19 @@ fn attribute(failure: RunnerCheckError, origins: &[Value], project_dir: &str) ->
     let Some(paths) = paths_of(&failure) else {
         return failure;
     };
-    let locations = resolve_origin_locations(origins, &paths, project_dir);
-    if locations.is_empty() {
-        return failure;
-    }
-    let shown = subpath(&paths)
-        .map(|sub| format!(" {sub}"))
-        .unwrap_or_default();
     let detail = failure
         .detail
         .clone()
         .unwrap_or_else(|| failure.error.message.clone());
+    let Some(message) = attributed_message(&paths, &detail, origins, project_dir) else {
+        return failure;
+    };
     RunnerCheckError {
         error: ModelError {
-            message: format!("runner config ({}{shown}) {detail}", locations.join(", ")),
+            message,
             ..failure.error
         },
-        paths: paths_of(&failure).unwrap_or_default(),
+        paths,
         ..failure
     }
 }

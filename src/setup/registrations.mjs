@@ -32,10 +32,7 @@ import { ownedSkillNames } from './skill-wrappers.mjs';
 import { declaredActivities, readWorkflowCatalog, withUnreadableDefinitions } from './workflow-catalog-reader.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 
-import { validateRunnerLoopsShape, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
-import { RunnerConfigError, checkCatalog, deepEqual, loadRunnerConfigForDir } from '../native/execution-door.mjs';
-import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
-import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH, formatRetiredKeySentence } from '../runner/execution/patterns/retired-keys.mjs';
+import { RunnerConfigError, checkCatalog, deepEqual, loadRunnerConfigForDir, validateRunnerLoopsShape, attributeRunnerConfigError, detectRetiredPatternKeys, formatRetiredKeySentence, executionVocabulary, shippedCatalog } from '../native/execution-door.mjs';
 import { isCommandAvailable, resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import {
   capabilityNamesOf,
@@ -340,6 +337,7 @@ export function checkRunnerPatternsConfig(cwd, run) {
     return { passed: false, message: err.message };
   }
 
+  const { RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH } = executionVocabulary();
   const runner = cfg?.value?.runner ?? {};
   const effectivePatterns = runner.patterns ?? {};
   const effectiveLoops = runner.loops ?? {};

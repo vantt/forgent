@@ -14,7 +14,7 @@ import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { acquireAdvanceLock, tryAcquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { readBinding } from '../../src/workflow/case-bindings.mjs';
-import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
+import { handoffRef } from '../../src/native/execution-door.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 import { capabilityServedBy, readProjectConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
@@ -130,7 +130,7 @@ test('close: refused while a consent gate is parked or a closure milestone went 
     ...opts(tmp),
   });
   assert.equal(stalled.status, 'parked');
-  const [report] = resolveUnitInputs([`unit-run:${stalled.steps.a.units.ua.unitRunId}/producer`], tmp).refs;
+  const report = handoffRef(`unit-run:${stalled.steps.a.units.ua.unitRunId}/producer`, tmp);
   fs.appendFileSync(report, '\nchanged\n');
   const stale = statusWorkflow(stalled.workflowRunId, opts(tmp));
   assert.equal(stale.case.milestones['a.settled'].state, 'stale');

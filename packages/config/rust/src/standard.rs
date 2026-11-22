@@ -77,3 +77,23 @@ impl Standard {
         Some((file.doc.file(), key_span(&file.doc, path)?))
     }
 }
+
+/// The shipped pattern catalog: the bundled standard's `runner.patterns` and `runner.loops`, `{}` each when the
+/// standard names none (an unreadable bundle names none).
+pub fn shipped_runner_catalog() -> Value {
+    let runner = Schemas::bundled()
+        .ok()
+        .and_then(|(schemas, _)| Standard::bundled(&schemas).ok())
+        .and_then(|standard| standard.value().get("runner").cloned())
+        .unwrap_or(Value::Null);
+    let section = |key: &str| {
+        runner
+            .get(key)
+            .cloned()
+            .unwrap_or_else(|| Value::Object(serde_json::Map::new()))
+    };
+    let mut catalog = serde_json::Map::new();
+    catalog.insert("patterns".into(), section("patterns"));
+    catalog.insert("loops".into(), section("loops"));
+    Value::Object(catalog)
+}

@@ -1,8 +1,8 @@
 //! Run result: the writer, the readers and the attribution replay the vectors the Node modules recorded
 //! (`test/golden-recorders/run-result.recorder.mjs`), and the readers replay the phase-00 corpus.
 
-use fgos_execution_engine::run_result::vocabulary as vocab;
-use fgos_execution_engine::run_result::{
+use fgos_execution::run_result::vocabulary as vocab;
+use fgos_execution::run_result::{
     attribute_claim_evidence_refs, attribute_workspace_changes, claim_report_path,
     evaluate_attribution_policy, interpret_run_result, is_assessment_required, is_verdict_seat,
     legacy_confidence, legacy_status, normalize_run_result_v3, read_settled_result,
@@ -43,10 +43,7 @@ fn strs(value: &Value) -> Vec<&str> {
 }
 
 fn outcome_json(o: &RunOutcome) -> Value {
-    json!({
-        "category": o.category, "executed": o.executed, "verdict": o.verdict, "refused": o.refused, "evidence": o.evidence,
-        "satisfied": o.satisfied, "infraFailure": o.infra_failure, "failure": o.failure,
-    })
+    o.to_json()
 }
 
 #[test]
@@ -73,12 +70,12 @@ fn vocabularies_and_contract_names_match_the_node_release() {
     );
     same_bytes(
         "corrupt classification",
-        &fgos_execution_engine::run_result::corrupt_classification(),
+        &fgos_execution::run_result::corrupt_classification(),
         &v["corruptClassification"],
     );
     assert_eq!(
         strs(&v["attributionLevels"]),
-        fgos_execution_engine::run_result::attribution::ATTRIBUTION_LEVELS
+        fgos_execution::run_result::attribution::ATTRIBUTION_LEVELS
     );
     assert_eq!(
         v["claimContract"],
@@ -86,15 +83,15 @@ fn vocabularies_and_contract_names_match_the_node_release() {
     );
     assert_eq!(
         strs(&v["claimStatuses"]),
-        fgos_execution_engine::run_result::claim::ALLOWED_AGENT_CLAIM_STATUSES
+        fgos_execution::run_result::claim::ALLOWED_AGENT_CLAIM_STATUSES
     );
     assert_eq!(
         v["frictionsMax"],
-        fgos_execution_engine::run_result::claim::CLAIM_FRICTIONS_MAX
+        fgos_execution::run_result::claim::CLAIM_FRICTIONS_MAX
     );
     assert_eq!(
         v["frictionFieldMax"],
-        fgos_execution_engine::run_result::claim::CLAIM_FRICTION_FIELD_MAX
+        fgos_execution::run_result::claim::CLAIM_FRICTION_FIELD_MAX
     );
 }
 
@@ -182,7 +179,7 @@ fn validators_name_the_same_reasons_for_v2_and_v3() {
     for case in readers["records"].as_array().unwrap() {
         let name = case["name"].as_str().unwrap();
         let expected = expected_run_id(case);
-        let reasons = |v: &fgos_execution_engine::run_result::Validation| {
+        let reasons = |v: &fgos_execution::run_result::Validation| {
             v.reasons.iter().map(|r| json!(r)).collect::<Vec<_>>()
         };
         if let Some(want) = case.get("validateV2") {

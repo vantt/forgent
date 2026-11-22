@@ -48,8 +48,8 @@ fn text(value: Option<&Value>) -> String {
     crate::js::text(value)
 }
 
-/// Whether an assignment declares itself read-only.
-fn is_read_only_assignment(assignment: &Value) -> bool {
+/// Read-only or mutating, from the `mutation` stamped once at build time.
+pub fn is_read_only_assignment(assignment: &Value) -> bool {
     assignment.is_object()
         && assignment.get("mutation").and_then(Value::as_str) == Some("read-only")
 }

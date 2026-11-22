@@ -742,11 +742,8 @@ fn is_runner_committed(assignment: &Value) -> bool {
         && assignment.get("mutation").and_then(Value::as_str) == Some("mutating")
 }
 
-/// Read-only or mutating, from the `mutation` stamped once at build time.
-pub fn is_read_only_assignment(assignment: &Value) -> bool {
-    assignment.is_object()
-        && assignment.get("mutation").and_then(Value::as_str) == Some("read-only")
-}
+// Read-only or mutating, from the `mutation` stamped once at build time: the rule lives in `fgos-execution`.
+pub use fgos_execution::dispatch_policy::is_read_only_assignment;
 
 fn list_or_none(lines: &mut Vec<String>, label: &str, items: &Value) {
     lines.push(label.to_string());

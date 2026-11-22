@@ -23,6 +23,16 @@ import {
   runDirOf,
   loadRunnerConfigForDir,
   judgeUnitRun,
+  executionVocabulary,
+  checkDeclaredSeats,
+  validateRunnerLoopsShape,
+  attributeRunnerConfigError,
+  parseRunTimeout,
+  seatKeyOf,
+  interpretRunResult,
+  runOutcome,
+  listAssignmentRuns,
+  assignmentDir,
 } from '../../src/native/execution-door.mjs';
 import { RunnerConfigError as DispatchRunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
@@ -198,4 +208,29 @@ test('the addon helpers answer under their Node names: a refusal comes back as t
   assert.equal(Object.keys(cfg).includes(Symbol.for('fgos.runner.origins').toString()), false);
   assert.deepEqual(judgeUnitRun(path.join(dir, '.fgos'), 'unit-run-none', { caseId: 'case-1' }), { gone: true });
   assert.deepEqual(judgeUnitRun(path.join(dir, '.fgos'), '../x', { caseId: 'case-1' }), { keep: 'unsafe-path', blocks: true });
+});
+
+test('the outcome, seat and runner config rules answer under their Node names: a seat refusal keeps its class name and code, a loops refusal is a RunnerConfigError with its paths and attributes to its origin', () => {
+  const v = executionVocabulary();
+  assert.ok(v.RESERVED_PATTERN_NAMES instanceof Set && v.RESERVED_PATTERN_NAMES.has('seatBinding'));
+  assert.ok(v.MODEL_POLICY_TIERS.length > 0 && typeof v.NOT_STARTED_OUTCOME === 'string');
+  assert.equal(seatKeyOf({}), undefined, 'a result with no seat reads undefined, as the old reader returned');
+  assert.throws(() => checkDeclaredSeats([], 'seats'), (err) => err.name === 'SeatResolutionError' && err.code === 'invalid-seats');
+  assert.equal(parseRunTimeout('90m'), 5400000);
+  assert.throws(() => parseRunTimeout('90'), (err) => err instanceof RunnerConfigError);
+  let refusal;
+  assert.throws(() => validateRunnerLoopsShape({ reviewed: { bounds: { nope: { min: 1 } } } }, 'runner.loops'), (err) => { refusal = err; return err instanceof RunnerConfigError && err.path === 'runner.loops.reviewed.bounds.nope'; });
+  const origins = [{ path: 'runner.loops.reviewed.bounds.nope', layer: 'project', file: 'project:config.yaml', line: 7 }];
+  assert.match(attributeRunnerConfigError(refusal, origins, '/p').message, /^runner config \(.*config\.yaml:7 loops\.reviewed\.bounds\.nope\) is not a parameter/);
+});
+
+test('the run result reader answers under its Node name: a version-3 record reads its legacy status as a non-enumerable view, a corrupt one fails closed, and the assignment layout lists attempts', () => {
+  const v3 = interpretRunResult({ contract: { id: 'assignment-run-result', version: 3 }, runId: 'r', classification: { execution: { status: 'completed', exitCode: 0 }, assessment: { verdict: 'pass' }, confidence: { level: 'reported', basis: [] }, failure: null, policy: { disposition: 'allow', code: null }, delivery: { mode: 'fresh' }, provenance: 'native-v3', outcome: { category: 'ok', reason: 'x' } } });
+  assert.equal(v3.status, 'done');
+  assert.equal(Object.keys(v3).includes('status'), false, 'the legacy status stays out of the enumerable keys');
+  assert.equal(runOutcome('not a record').category, 'corrupt');
+  const dir = makeFixtureDir('execution-door-layout');
+  fs.mkdirSync(path.join(dir, 'assignments', 'a', 'runs', 'run-1'), { recursive: true });
+  assert.deepEqual(listAssignmentRuns(dir).map((r) => [r.assignmentId, r.attempt]), [['a', 'run-1']]);
+  assert.equal(assignmentDir(dir, '../x'), null);
 });

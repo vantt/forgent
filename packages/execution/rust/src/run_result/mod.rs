@@ -1,6 +1,6 @@
 //! Run result: writing and reading the result a worker leaves, and attributing what a run changed.
 //!
-//! The record shapes and the outcome derivation live in `fgos-run-result`; this module is the engine's writer and
+//! The record shapes and the outcome derivation live in `fgos-run-result`; this module is the writer and
 //! readers over them (no second outcome type), the attribution of stray writes, and the contract of the worker's
 //! own claim. Golden vectors: `packages/execution/contracts/run-result/`, replayed by `tests/run_result.rs`.
 

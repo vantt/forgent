@@ -475,3 +475,138 @@ export const parseAccountPin = (value) => addon('parseAccountPin', { value: valu
 
 /** Whether this process runs inside a live herdr session. */
 export const detectHerdrPresent = () => addon('detectHerdrPresent');
+
+// ---- outcomes, seats, the loop checks and the runner config rules ------------------------------------------
+
+let vocabularyOnce = null;
+/**
+ * The named values a caller compares with, read once: `NOT_STARTED_OUTCOME`, `RESERVED_PATTERN_NAMES` (a Set),
+ * `SEAT_BINDING_MARKER_PATH`, `MODEL_POLICY_TIERS` (weakest first), and `CASE_ID_ENV` and `CASE_RESERVATION_ENV`
+ * (the case a worker was launched into).
+ */
+export function executionVocabulary() {
+  if (vocabularyOnce === null) {
+    const v = addon('vocabulary');
+    vocabularyOnce = Object.freeze({ ...v, RESERVED_PATTERN_NAMES: new Set(v.RESERVED_PATTERN_NAMES), MODEL_POLICY_TIERS: Object.freeze([...v.MODEL_POLICY_TIERS]) });
+  }
+  return vocabularyOnce;
+}
+
+const orUndefined = (value) => (value === null ? undefined : value);
+/** How deep in a chain of dispatches this process runs (`FGOS_DISPATCH_DEPTH`, else 0). */
+export const currentDispatchDepth = () => addon('currentDispatchDepth');
+/** Whether an outcome is a completed judgment of the work: `pass` or `findings`. */
+export const isVerdict = (outcome) => addon('isVerdict', { outcome: outcome ?? null });
+/** The process exit code of an execution outcome: 0 for `pass`, the table's code, else 1. */
+export const exitCodeForOutcome = (outcome) => addon('exitCodeForOutcome', { outcome: outcome ?? null });
+/** Whether a unit ended on infrastructure, so a rerun can still produce the verdict. */
+export const infrastructure = (unitResult) => addon('infrastructure', { unitResult: unitResult ?? null });
+/** One `{ kind, seat, round, passed }` per evaluator result that reached a verdict. */
+export const evaluationsOf = (results = []) => addon('evaluationsOf', { results });
+/** The seat a recorded result belongs to (`seat`, or the legacy `role`). */
+export const seatKeyOf = (result) => orUndefined(addon('seatKeyOf', { result: result ?? null }));
+/** The provider family an old result recorded, or null. */
+export const legacyFamilyOf = (result) => addon('legacyFamilyOf', { result: result ?? null });
+/** The declared seats `[{ seat, role, persona?, tier? }]` checked; `tiers` checks each seat's tier. */
+export const checkDeclaredSeats = (raw, label, { tiers } = {}) => addon('checkDeclaredSeats', { raw: raw ?? null, label, ...(tiers ? { tiers: [...tiers] } : {}) });
+/** Refuses a seat list that carries a tier. */
+export const assertNoSeatTier = (raw, source) => addon('assertNoSeatTier', { raw: raw ?? null, source });
+/** Refuses a unit that carries a tier. */
+export const assertNoUnitTier = (raw, source) => addon('assertNoUnitTier', { raw: raw ?? null, source });
+/** The verify command a unit runs (its own, else its capability's), or null. */
+export const verifyCommandOf = (unit, cfg) => addon('verifyCommandOf', { unit: unit ?? null, cfg: cfg ?? null });
+/** The verify seat's result for one answer of the verify command. */
+export const verifySeatResult = (answer, round = 1) => addon('verifySeatResult', { answer: answer ?? null, round });
+
+/** The retired `runner.patterns` keys a dotted path or a pattern map carries: `[{ key, replacement, instruction }]`. */
+export const detectRetiredPatternKeys = (input) => addon('detectRetiredPatternKeys', { input: input ?? null });
+/** `<key> was retired; <instruction>` for a dotted path or a finding. */
+export const formatRetiredKeySentence = (item, instruction) => addon('formatRetiredKeySentence', { item: item ?? null, ...(typeof instruction === 'string' ? { instruction } : {}) });
+/** Why `value` is not a usable run timeout (whole ms inside the floor and ceiling), or null when it is. */
+export const runTimeoutProblem = (value, label = 'run timeout') => addon('runTimeoutProblem', { value: value === undefined ? null : value, label });
+/** A run timeout in milliseconds, refused (`RunnerConfigError`) when it is not usable. */
+export function assertRunTimeoutMs(value, label = 'run timeout') {
+  const problem = runTimeoutProblem(value, label);
+  if (problem) throw new RunnerConfigError(problem);
+  return value;
+}
+/** `90m`, `5400s`, `2h`, `600000ms` as milliseconds, refused (`RunnerConfigError`) otherwise. */
+export const parseRunTimeout = (text, label = '--timeout') => addon('parseRunTimeout', { text: text ?? null, label });
+/** The requested reasoning effort, refused (`RunnerConfigError`) outside the vocabulary or the executor's own list. */
+export const assertReasoningEffort = (value, { supported, executorId } = {}) => addon('assertReasoningEffort', { value: value ?? null, ...(Array.isArray(supported) ? { supported } : {}), ...(typeof executorId === 'string' ? { executorId } : {}) });
+/** The rules of `runner.loops` that read beyond its own fields; a refusal is a `RunnerConfigError` with its paths. */
+export const validateRunnerLoopsShape = (loops, label = 'loops') => addon('validateRunnerLoopsShape', { loops: loops ?? {}, label });
+/**
+ * `err` attributed to the files and lines its values came from (`origins`), as a new `RunnerConfigError`; null for
+ * an error that is no runner config refusal with a path, or one no origin names.
+ */
+export function attributeRunnerConfigError(err, origins, projectDir) {
+  if (!(err instanceof RunnerConfigError) || !(err.paths?.length || err.path)) return null;
+  const message = addon('attributedRefusal', { paths: err.paths ?? [err.path], detail: err.detail ?? err.message, origins: origins ?? [], projectDir });
+  if (message === null) return null;
+  return new RunnerConfigError(message, { code: err.code, phase: err.phase, path: err.path, paths: err.paths, detail: err.detail });
+}
+
+/** The accounts of `runner.llmAccounts` per state key, as the lease reads them. */
+export const providerAccountInventory = (runnerConfig) => Object.freeze(addon('providerAccountInventory', { runnerConfig: runnerConfig ?? {} }));
+/** The provider-capacity state key of an account pool. */
+export const legacyStateKey = (pool) => addon('legacyStateKey', { pool });
+
+// ---- the run result, the worker's claim and the assignment stamp -------------------------------------------
+
+/**
+ * The deterministic reading of a Run Result of any version: the record with its legacy `status` and `confidence`
+ * (a version-3 record reads them from its classification, as a non-enumerable view) and `corrupt` when it cannot
+ * be read soundly.
+ */
+export function interpretRunResult(input, options = {}) {
+  const expectedRunId = typeof options === 'string' ? options : options?.expectedRunId;
+  const { record } = addon('interpretRunResult', { input: input ?? null, ...(typeof expectedRunId === 'string' ? { expectedRunId } : {}) });
+  return Object.hasOwn(record, 'status') ? record : withLegacyView(record);
+}
+/** The one outcome of a Run Result: `{ category, executed, verdict, refused, evidence, satisfied, infraFailure, failure }`. */
+export const runOutcome = (result, { evidenceFloor } = {}) => Object.freeze(addon('runOutcome', { result: result ?? null, ...(evidenceFloor && typeof evidenceFloor === 'object' ? { evidenceFloor } : {}) }));
+/** `{ valid, reason? }` of an untrusted worker claim, under the claim context `{ role, operation, posture }`. */
+export const validateAgentResultClaim = (value, context = {}) => addon('validateAgentResultClaim', { value: value ?? null, context: { role: context.role ?? context.assignment?.role, operation: context.operation ?? context.assignment?.operation, posture: context.posture ?? context.assignment?.posture } });
+/** Whether a report says something beyond placeholders and headings. */
+export const isSubstantiveReportText = (text) => addon('isSubstantiveReportText', { text: typeof text === 'string' ? text : null });
+/** Whether an assignment is read-only, from the `mutation` stamped at build time. */
+export const isReadOnlyAssignment = (assignment) => addon('isReadOnlyAssignment', { assignment: assignment ?? null });
+/** The declared stamp of an assignment: `{ mutation, evidence: { required }, resultKind, onAdvance? }`. */
+export const stampDeclaredAssignment = ({ role, operation } = {}) => Object.freeze(addon('stampDeclaredAssignment', { ...(typeof role === 'string' ? { role } : {}), ...(typeof operation === 'string' ? { operation } : {}) }));
+/** Where a worker's claim (`result-`, `.json`, `agent-result.json`) or report (`report-`, `.md`, `agent-report.md`) is. */
+export const resolveWorkerArtifactPath = (runDir, roundPrefix, roundSuffix, legacyName) => addon('resolveWorkerArtifactPath', { runDir, roundPrefix, roundSuffix, legacyName });
+/** The directory of an assignment, or null for an id that is no safe nested path under `assignments/`. */
+export const assignmentDir = (fgosDir, assignmentId) => addon('assignmentDir', { fgosDir, assignmentId: typeof assignmentId === 'string' ? assignmentId : null });
+/** Every attempt directory under `assignments/`: `{ assignmentId, attempt, runDir, hasAssignmentJson }`. */
+export const listAssignmentRuns = (fgosDir) => addon('listAssignmentRuns', { fgosDir });
+
+const deepFreeze = (value) => {
+  if (value === null || typeof value !== 'object' || Object.isFrozen(value)) return value;
+  Object.freeze(value);
+  for (const inner of Object.values(value)) deepFreeze(inner);
+  return value;
+};
+let shippedOnce = null;
+/** The bundled standard's pattern catalog `{ patterns, loops }`, frozen and read once per process. */
+export function shippedCatalog() {
+  if (shippedOnce === null) shippedOnce = deepFreeze(addon('shippedCatalog'));
+  return shippedOnce;
+}
+
+// ---- the hand-off -------------------------------------------------------------------------------------------
+
+/** The neutral name (without extension) of the nth anonymized input: seat-A ... seat-Z, seat-AA, ... */
+export const anonymousInputName = (index) => addon('anonymousInputName', { index });
+/**
+ * `{ path, bytes, sha256 }` of the report a seat of a unit run left in its latest round, as its bytes lie now; a
+ * report that cannot be resolved or read throws `RunnerConfigError` with its `reason`.
+ */
+export const reportDigest = (unitRunId, seat, mainRoot) => addon('reportDigest', { unitRunId, seat, mainRoot });
+/**
+ * The path one hand-off input names: a `unit-run:<id>/<seat>` input the report it hands over, only while it keeps
+ * the bytes settlement recorded unless `accept` (`'any'` or the digests a person approved) covers the revision; a
+ * `gate-answer:<case>/<step>` input the owner's answer file; any other input itself. One that cannot be handed over
+ * throws `RunnerConfigError` with its `reason`.
+ */
+export const handoffRef = (input, mainRoot, { accept } = {}) => addon('handoffRef', { input, mainRoot, ...(accept !== undefined ? { accept } : {}) });

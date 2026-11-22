@@ -12,8 +12,9 @@ import path from 'node:path';
 
 import { buildUnitHandoff, unitPatternOf, renderGateQuestion } from '../../src/workflow/unit-handoff.mjs';
 import { unitFieldsOfTemplate } from '../../src/workflow/steps.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
-import { HandoffRefError, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER } from '../../src/runner/execution/handoff-refs.mjs';
+import { RunnerConfigError, executionVocabulary } from '../../src/native/execution-door.mjs';
+
+const { OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER } = executionVocabulary();
 
 const GATE = { id: 'close', gate: { kind: 'human', mode: 'input', question: 'Bring in {{report:synthesis/synthesize-recommendation:missing expertise}} or not?' } };
 
@@ -73,7 +74,7 @@ test('a report that is not raw JSON is not searched for a packet: fenced or pros
 test('a report edited after it settled is refused before its packet is read', () => {
   const fixture = settledProducer({ report: recommendation({ 'missing expertise': [] }) });
   fs.appendFileSync(fixture.reportFile, 'tampered');
-  assert.throws(() => question(fixture), (err) => err instanceof HandoffRefError && err.reason === 'report-changed-after-settle');
+  assert.throws(() => question(fixture), (err) => err instanceof RunnerConfigError && err.reason === 'report-changed-after-settle');
 });
 
 test('the gate reads the settled report, then an untouched packet file beside it, with either key spelling', () => {

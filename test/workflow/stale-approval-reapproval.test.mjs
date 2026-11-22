@@ -14,7 +14,7 @@ import { startWorkflow, resumeWorkflow, answerWorkflow } from '../../src/workflo
 import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { projectCase } from '../../src/workflow/case-projection.mjs';
-import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
+import { handoffRef } from '../../src/native/execution-door.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 
@@ -60,7 +60,7 @@ test('approve, edit the approved report, re-park, re-approve: the next step runs
   await answerWorkflow(id, { stepId: 'approval', answer: 'looks right', approved: true, ...opts(tmp) });
   held.release();
   const draftRun = parked.steps.draft.units['draft-copy'].unitRunId;
-  const [report] = resolveUnitInputs([`unit-run:${draftRun}/producer`], tmp).refs;
+  const report = handoffRef(`unit-run:${draftRun}/producer`, tmp);
   fs.appendFileSync(report, '\nEdited after approval.\n');
 
   const reparked = await resumeWorkflow(id, opts(tmp));
@@ -86,17 +86,17 @@ test('an edit no approval covers is still refused: only the exact approved bytes
   const parked = await startWorkflow({ workflow: validateWorkflow(GUIDE), ...opts(tmp) });
   const draftRun = parked.steps.draft.units['draft-copy'].unitRunId;
   const ref = `unit-run:${draftRun}/producer`;
-  const [report] = resolveUnitInputs([ref], tmp).refs;
+  const report = handoffRef(ref, tmp);
   const sha = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
   const settled = sha(report);
-  assert.deepEqual(resolveUnitInputs([ref], tmp).refs, [report], 'as settled, it is handed over');
+  assert.equal(handoffRef(ref, tmp), report, 'as settled, it is handed over');
 
   fs.appendFileSync(report, '\nEdited by nobody who was asked.\n');
   const edited = sha(report);
   for (const accept of [undefined, [], [settled], ['0'.repeat(64)]]) {
-    assert.throws(() => resolveUnitInputs([ref], tmp, { accept }), /report-changed-after-settle/, JSON.stringify(accept));
+    assert.throws(() => handoffRef(ref, tmp, { accept }), /report-changed-after-settle/, JSON.stringify(accept));
   }
-  assert.deepEqual(resolveUnitInputs([ref], tmp, { accept: [edited] }).refs, [report], 'the revision a person approved is handed over');
+  assert.equal(handoffRef(ref, tmp, { accept: [edited] }), report, 'the revision a person approved is handed over');
 
   // The run itself: nothing is approved for the edited copy, so the gate asks and no next Unit starts.
   const held = acquireAdvanceLock(tmp, parked.workflowRunId);

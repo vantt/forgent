@@ -9,8 +9,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { reportDigest } from '../runner/execution/handoff-refs.mjs';
-import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
+import { seatKeyOf, reportDigest } from '../native/execution-door.mjs';
 
 const RUN_REF = /^(unit-run:|gate-answer:)/;
 

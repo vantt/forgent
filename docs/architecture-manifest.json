@@ -293,7 +293,10 @@
           "path": "scripts/verify-fanout-overlap.mjs",
           "reason": "importer of the Work adapter surface: the verifier excludes children whose footprints conflict"
         },
-        "src/workflow/case-admission.mjs",
+        {
+          "path": "packages/git/node-addon/src/git/write_scope.rs",
+          "reason": "binds the write-scope package's overlap and glob answers to Node (the writeScope namespace); it matches nothing itself"
+        },
         "src/workflow/propose-classify.mjs",
         "src/workflow/propose-validate.mjs"
       ],
@@ -374,10 +377,6 @@
           "reason": "the run supervisor's open attempt lister (its twin is run_dirs.rs)"
         },
         {
-          "path": "src/runner/execution/case-run-paths.mjs",
-          "reason": "the runner's case run directory (its twin is run_dirs.rs)"
-        },
-        {
           "path": "src/native/execution-door.mjs",
           "reason": "carries case_paths::runs_root of fgos-execution to Node under its Node name (the addon's execution namespace); it lists nothing"
         },
@@ -386,8 +385,12 @@
           "reason": "the Rust port of case-run-paths.mjs on the same vectors; the execution crate's one spelling of the case runs root, which hand-off naming asks instead of repeating it"
         },
         {
-          "path": "packages/execution/engine/src/assignment/layout.rs",
-          "reason": "the Rust owner of the assignment layout walk (port of assignment-layout.mjs on packages/execution/contracts/assignment/layout.json and corpus.json); every engine reader of the assignment tree asks it"
+          "path": "packages/execution/rust/src/assignment_layout.rs",
+          "reason": "the Rust owner of the assignment layout walk (port of assignment-layout.mjs on packages/execution/contracts/assignment/layout.json and corpus.json); every engine reader of the assignment tree asks it, and the addon carries it to Node"
+        },
+        {
+          "path": "packages/git/node-addon/src/execution.rs",
+          "reason": "carries assignment_layout::list_assignment_runs of fgos-execution to Node under its Node name (the addon's execution namespace); it walks nothing itself"
         }
       ],
       "debt": [
@@ -1186,6 +1189,10 @@
         {
           "path": "src/native/execution-door.mjs",
           "reason": "carries fgos-execution's herdr detection (machine_reads::herdr_present) to Node under its Node name; it derives nothing"
+        },
+        {
+          "path": "packages/git/node-addon/src/execution.rs",
+          "reason": "the addon's execution namespace carries fgos-execution's account inventory and state key (accounts.rs) to Node under their Node names; it derives nothing"
         }
       ],
       "debt": [
@@ -1896,8 +1903,6 @@
     "src/runner/execution/seat-resolver.mjs": "domain",
     "src/runner/execution/legacy-seat-read.mjs": "kernel",
     "src/runner/execution/loops/history-outcome.mjs": "domain",
-    "src/runner/execution/case-run-paths.mjs": "infra",
-    "src/runner/execution/handoff-refs.mjs": "infra",
     "src/runner/execution/unit-run-history.mjs": "infra",
     "src/runner/execution/outcome.mjs": "kernel",
     "src/runner/execution/unit-state.mjs": "infra",

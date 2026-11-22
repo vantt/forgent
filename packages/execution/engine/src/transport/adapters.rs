@@ -14,11 +14,11 @@ pub const DEFAULT_ADAPTER: &str = "cli-spawn";
 pub const HERDR_ADAPTER: &str = "herdr-spawn";
 pub const EXECUTOR_ADAPTER_NAMES: [&str; 2] = [DEFAULT_ADAPTER, HERDR_ADAPTER];
 
-pub const DISPATCH_DEPTH_ENV: &str = "FGOS_DISPATCH_DEPTH";
-pub const MAX_DISPATCH_DEPTH: u32 = 3;
-/// The case a worker was launched into. Only the door sets these, from the reservation it admitted.
-pub const CASE_ID_ENV: &str = "FGOS_CASE_ID";
-pub const CASE_RESERVATION_ENV: &str = "FGOS_CASE_RESERVATION";
+// The dispatch depth and the case a worker was launched into are read by layers above the engine too.
+pub use fgos_execution::dispatch_env::{
+    case_context_env, current_dispatch_depth, dispatch_depth_of, CASE_ID_ENV, CASE_RESERVATION_ENV,
+    DISPATCH_DEPTH_ENV, MAX_DISPATCH_DEPTH,
+};
 pub const STATE_ROOT_ENV: &str = "FGOS_STATE_ROOT";
 
 /// What an adapter's recovery profile needs to know about it.
@@ -53,34 +53,6 @@ pub fn adapter_metadata(name: &str) -> Option<AdapterMetadata> {
         }),
         _ => None,
     }
-}
-
-/// The two variables a worker admitted into a case carries.
-pub fn case_context_env(case_id: &str, reservation_id: &str) -> [(&'static str, String); 2] {
-    [
-        (CASE_ID_ENV, case_id.to_string()),
-        (CASE_RESERVATION_ENV, reservation_id.to_string()),
-    ]
-}
-
-/// The dispatch depth `raw` (the value of [`DISPATCH_DEPTH_ENV`]) names: a finite number of at least zero, else
-/// zero. Read as `Number(raw)` reads it, so a fractional depth is kept.
-pub fn dispatch_depth_of(raw: Option<&str>) -> f64 {
-    let Some(raw) = raw.filter(|text| !text.is_empty()) else {
-        return 0.0;
-    };
-    let trimmed = raw.trim();
-    if trimmed.is_empty() {
-        return 0.0;
-    }
-    match trimmed.parse::<f64>() {
-        Ok(n) if n.is_finite() && n >= 0.0 => n,
-        _ => 0.0,
-    }
-}
-
-pub fn current_dispatch_depth() -> f64 {
-    dispatch_depth_of(std::env::var(DISPATCH_DEPTH_ENV).ok().as_deref())
 }
 
 struct Allowlist {

@@ -8,8 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { runUnitInHost } from '../../src/native/execution-door.mjs';
-import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
+import { runUnitInHost, handoffRef } from '../../src/native/execution-door.mjs';
 import { createCaseAdmissionPort } from '../../src/workflow/case-admission-port.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
@@ -56,7 +55,7 @@ test('a nested `fgos run --writes` from a confined worker is refused as nested-w
     repoRoot: tmp, cwd: wt, worktree: wt,
   });
   assert.equal(res.outcome, 'pass');
-  const [report] = resolveUnitInputs([`unit-run:${res.unitRunId}/producer`], tmp).refs;
+  const report = handoffRef(`unit-run:${res.unitRunId}/producer`, tmp);
   const text = fs.readFileSync(report, 'utf8');
   const answered = JSON.parse(/answered: (\{.*\})\. Nothing more/s.exec(text)[1]);
   t.diagnostic(JSON.stringify(answered));

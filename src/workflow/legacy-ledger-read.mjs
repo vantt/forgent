@@ -4,7 +4,7 @@
 // Execution's outcome module so no second list exists. It also renames Workflow's old step outcome `refused`. Nothing else reads the old shape. Delete this file one
 // release after it lands, when every ledger on every machine has been written by the new runner.
 
-import { infrastructure } from '../runner/execution/outcome.mjs';
+import { infrastructure } from '../native/execution-door.mjs';
 
 /**
  * Whether an old `unit.complete` entry ended on infrastructure. An entry that carries the fact is never routed

@@ -17,14 +17,9 @@ import { resolveContentRoot } from '../intake/plan.mjs';
 import { planVerdictFromPlanMd } from '../intake/plan-verdict-from-plan-md.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityIdentity, buildPrompt } from './work-compat.mjs';
 import { workUnitFor } from './work-dispatch.mjs';
-import { isReadOnlyAssignment, validateAgentResultClaim } from './dispatch/assignment.mjs';
-import { isSubstantiveReportText, resolveRunWorkerArtifactPath } from './dispatch/assignment-runner.mjs';
-import { loadRunnerConfigForDir, runUnitInHost } from '../native/execution-door.mjs';
+import { loadRunnerConfigForDir, runUnitInHost, isReadOnlyAssignment, validateAgentResultClaim, isSubstantiveReportText, resolveWorkerArtifactPath, interpretRunResult, runOutcome, stampDeclaredAssignment, assignmentDir, listAssignmentRuns } from '../native/execution-door.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
-import { interpretRunResult, runOutcome } from './dispatch/run-result.mjs';
-import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
 import { detectTrunk, compareCommits } from './worktree.mjs';
-import { assignmentDir, listAssignmentRuns } from './dispatch/assignment-layout.mjs';
 
 // Non-enumerable stamp the cross-pass scan attaches to a consumed runResult:
 // the dispatched member dir the result was physically read from. Evidence
@@ -258,7 +253,7 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
           // verdict in result.json, or in the worker's own file) breaks the
           // pairing. A schema-valid result recorded without the binding is
           // not consumable (fail closed, same stance as the plan hash).
-          const storedClaimPath = resolveRunWorkerArtifactPath(path.join(runsDir, runSub), /^result-(\d+)\.json$/, 'agent-result.json');
+          const storedClaimPath = resolveWorkerArtifactPath(path.join(runsDir, runSub), 'result-', '.json', 'agent-result.json');
           if (runResult.agentClaim !== undefined && runResult.agentClaim !== null) {
             const recordedClaimHash = typeof runResult.claimSha256 === 'string' ? runResult.claimSha256 : '';
             if (!recordedClaimHash) continue;
@@ -1617,7 +1612,7 @@ export function getReportText(runResult, repoRoot) {
     (resolvedRecorded === consumingDir || resolvedRecorded.startsWith(`${consumingDir}${path.sep}`));
   if (recordedInRun) candidatePaths.push(resolvedRecorded);
   candidatePaths.push(path.join(consumingDir, path.basename(reportPath)));
-  candidatePaths.push(resolveRunWorkerArtifactPath(consumingDir, /^report-(\d+)\.md$/, 'agent-report.md'));
+  candidatePaths.push(resolveWorkerArtifactPath(consumingDir, 'report-', '.md', 'agent-report.md'));
 
   for (const p of candidatePaths) {
     try {

@@ -14,8 +14,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { RunnerConfigError, loadRunnerConfigForDir } from '../native/execution-door.mjs';
-import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
+import { RunnerConfigError, loadRunnerConfigForDir, shippedCatalog } from '../native/execution-door.mjs';
 import { capabilityVerifyOf } from '../runner/capability-config.mjs';
 import { slugOf } from '../util/slug.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';

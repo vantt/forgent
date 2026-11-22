@@ -104,6 +104,48 @@ fn glob(pattern: &[&str], path: &[&str]) -> bool {
     }
     row[path.len()]
 }
+/// Whether two path-segment patterns can name the same segment: two literals are equal, a literal is matched by
+/// the pattern, and two wildcard segments are judged by their fixed ends (the text before the first `*` and after
+/// the last).
+fn segments_meet(a: &str, b: &str) -> bool {
+    match (a.contains('*'), b.contains('*')) {
+        (false, false) => a == b,
+        (false, true) => segment(b, a),
+        (true, false) => segment(a, b),
+        (true, true) => {
+            let compatible = |x: &str, y: &str| x.starts_with(y) || y.starts_with(x);
+            let compatible_ends = |x: &str, y: &str| x.ends_with(y) || y.ends_with(x);
+            let head = |s: &'_ str| -> String { s[..s.find('*').unwrap_or(0)].to_owned() };
+            let tail = |s: &'_ str| -> String { s[s.rfind('*').map_or(0, |i| i + 1)..].to_owned() };
+            compatible(&head(a), &head(b)) && compatible_ends(&tail(a), &tail(b))
+        }
+    }
+}
+/// Whether two path globs (segments, `**` for any number of segments) can name the same file. Memoized by
+/// position, so stacked `**` stay polynomial.
+pub fn globs_meet(a: &[String], b: &[String]) -> bool {
+    let mut memo = vec![None; (a.len() + 1) * (b.len() + 1)];
+    fn walk(a: &[String], b: &[String], i: usize, j: usize, memo: &mut [Option<bool>]) -> bool {
+        let key = i * (b.len() + 1) + j;
+        if let Some(known) = memo[key] {
+            return known;
+        }
+        let result = if i == a.len() && j == b.len() {
+            true
+        } else if a.get(i).is_some_and(|s| s == "**") {
+            walk(a, b, i + 1, j, memo) || (j < b.len() && walk(a, b, i, j + 1, memo))
+        } else if b.get(j).is_some_and(|s| s == "**") {
+            walk(a, b, i, j + 1, memo) || (i < a.len() && walk(a, b, i + 1, j, memo))
+        } else if i == a.len() || j == b.len() {
+            false
+        } else {
+            segments_meet(&a[i], &b[j]) && walk(a, b, i + 1, j + 1, memo)
+        };
+        memo[key] = Some(result);
+        result
+    }
+    walk(a, b, 0, 0, &mut memo)
+}
 /// Query bytes are never trimmed. Invalid UTF-8 has a lossless diagnostic.
 pub fn path_text(bytes: &[u8]) -> Result<&str> {
     std::str::from_utf8(bytes).map_err(|_| {
@@ -534,6 +576,57 @@ mod tests {
         assert!(!scopes_overlap(&s(&["docs"]), &s(&["docs-old/x"])).unwrap());
         assert!(scopes_overlap(&s(&["**"]), &s(&["x"])).unwrap());
         assert!(scopes_overlap(&s(&["."]), &s(&["x"])).is_err());
+    }
+    #[test]
+    fn a_glob_meets_a_concrete_path_exactly_when_the_scope_matches_it() {
+        let seg = |g: &str| g.split('/').map(str::to_owned).collect::<Vec<_>>();
+        for (pattern, file, want) in [
+            ("a?*", "a.txt", false),
+            ("a?*", "a?.txt", true),
+            ("a$*", "a$b", true),
+            ("{x}*", "{x}y", true),
+            ("{x}*", "xy", false),
+            ("(a|b)*", "(a|b)c", true),
+            ("(a|b)*", "ac", false),
+            ("a+*", "a+b", true),
+            ("a+*", "aab", false),
+            ("^a*", "^ab", true),
+            ("[ab]*", "[ab]c", true),
+            ("[ab]*", "ac", false),
+            ("a.*", "a.b", true),
+            ("a.*", "axb", false),
+            ("tài*", "tài-liệu", true),
+            ("*.mjs", "a.mjs", true),
+            ("*.mjs", "a.mjs.bak", false),
+            ("src/**/x.mjs", "src/a/b/x.mjs", true),
+            ("src/**/x.mjs", "src/x.mjs", true),
+        ] {
+            assert_eq!(
+                matches(file.as_bytes(), &[pattern.into()]).unwrap(),
+                want,
+                "scope {pattern} on {file}"
+            );
+            assert_eq!(
+                globs_meet(&seg(pattern), &seg(file)),
+                want,
+                "globs_meet {pattern} with {file}"
+            );
+        }
+    }
+    #[test]
+    fn two_globs_meet_when_some_path_can_match_both() {
+        let seg = |g: &str| g.split('/').map(str::to_owned).collect::<Vec<_>>();
+        for (a, b, want) in [
+            ("**/*.md", "docs/**", true),
+            ("a/*/c", "a/b/*", true),
+            ("*/**", ".git/**", true),
+            ("a/x*", "a/y*", false),
+            ("src/*.mjs", "test/**", false),
+            ("a/b", "a/b", true),
+        ] {
+            assert_eq!(globs_meet(&seg(a), &seg(b)), want, "{a} with {b}");
+            assert_eq!(globs_meet(&seg(b), &seg(a)), want, "{b} with {a}");
+        }
     }
     #[test]
     fn golden_matching() {
