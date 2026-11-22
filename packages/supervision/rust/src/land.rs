@@ -18,6 +18,7 @@ use fgos_git::{
 use fgos_holder_lock::BorrowedHandle;
 use sha2::{Digest, Sha256};
 use std::cell::Cell;
+use std::collections::BTreeSet;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
@@ -452,6 +453,23 @@ fn shell_quote(text: &str) -> String {
     format!("'{}'", text.replace('\'', "'\\''"))
 }
 
+fn plan_dir_of(path: &str) -> Option<String> {
+    let p = Path::new(path);
+    let mut normals = p.components().filter_map(|c| match c {
+        std::path::Component::Normal(s) => s.to_str(),
+        _ => None,
+    });
+    if normals.next()? != "plans" {
+        return None;
+    }
+    let name = normals.next()?;
+    const EXCLUDED: &[&str] = &["backlog", "discussions", "reports", "handoffs"];
+    if EXCLUDED.contains(&name) || name.is_empty() {
+        return None;
+    }
+    Some(format!("plans/{name}"))
+}
+
 fn hex(bytes: &[u8]) -> String {
     bytes.iter().map(|b| format!("{b:02x}")).collect()
 }
@@ -851,11 +869,27 @@ impl Lander<'_> {
             .map(|t| shell_quote(t))
             .collect::<Vec<_>>()
             .join(" ");
+        let mut plan_dirs = BTreeSet::new();
+        for path in changed {
+            if let Some(plan_dir) = plan_dir_of(path) {
+                if cwd.join(&plan_dir).join("plan.md").is_file() {
+                    plan_dirs.insert(plan_dir);
+                }
+            }
+        }
+        let quoted_plans = plan_dirs
+            .iter()
+            .map(|d| format!("--plan {}", shell_quote(d)))
+            .collect::<Vec<_>>()
+            .join(" ");
         for gate in &self.config.gates {
             if !self.any_matches(changed, &gate.when)? {
                 continue;
             }
-            let command = gate.run.replace("{tests}", &quoted);
+            let command = gate
+                .run
+                .replace("{tests}", &quoted)
+                .replace("{plans}", &quoted_plans);
             self.run_logged(cwd, &command, &gate.run, id, "land-gate-failed")?;
             gates_run.push(gate.run.clone());
         }

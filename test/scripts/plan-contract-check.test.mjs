@@ -190,14 +190,46 @@ test('a list key that is not a list is refused by name', () => {
   assert.ok(errorsOf(planText({ fm: { footprint: 'src/a/' } })).includes('footprint must be a list of repo-relative paths or globs'));
 });
 
-test('a lead role must be an Identity role string, and a running plan without one only warns', () => {
+test('a lead role must be an Identity role string, and a running plan without one is an error', () => {
   assert.ok(errorsOf(planText({ fm: { lead: 'not a role' } })).some((e) => e.startsWith('lead must be an Identity role')));
   const r = root({ named: planText({ fm: { status: 'running', lead: 'lead:S6A' } }), bare: planText({ fm: { status: 'running' } }) });
   const named = checkPlanDir(path.join(r, 'named'));
   const bare = checkPlanDir(path.join(r, 'bare'), { plansRoot: r });
   assert.deepEqual([named.errors, named.warnings], [[], []]);
-  assert.deepEqual(bare.errors, []);
-  assert.equal(bare.warnings.length, 1);
+  assert.ok(bare.errors.some((e) => e.includes('a running plan names its lead')));
+  assert.deepEqual(bare.warnings, []);
+});
+
+test('--plan accepts several plan directories and checks each', () => {
+  const r = root({
+    good1: planText({ fm: { footprint: '[src/a/]' }, rows: ['| 1 | a | - | `src/a/` | 1 | ready |'] }),
+    good2: planText({ fm: { footprint: '[src/b/]' }, rows: ['| 1 | b | - | `src/b/` | 1 | ready |'] }),
+    bad: planText({ fm: { footprint: '[src/c/]', source: undefined }, rows: ['| 1 | c | - | `src/c/` | 1 | ready |'] }),
+  });
+  const outGood = [];
+  assert.equal(main(['--plan', path.join(r, 'good1'), '--plan', path.join(r, 'good2')], (l) => outGood.push(l)), 0);
+  assert.ok(outGood.includes('ok good1'));
+  assert.ok(outGood.includes('ok good2'));
+
+  const outMixed = [];
+  assert.equal(main(['--plan', path.join(r, 'good1'), '--plan', path.join(r, 'bad')], (l) => outMixed.push(l)), 1);
+  assert.ok(outMixed.includes('ok good1'));
+  assert.ok(outMixed.some((l) => l.startsWith('ERROR bad:')));
+});
+
+test('cross-plan overlap is an error when ready and a warning when running', () => {
+  const r = root({
+    planReady: planText({ fm: { footprint: '[src/a/]' } }),
+    planRunning: planText({ fm: { status: 'running', lead: 'lead:S6A', footprint: '[src/a/file.mjs]' } }),
+  });
+  const outReady = [];
+  assert.equal(main(['--plan', path.join(r, 'planReady')], (l) => outReady.push(l)), 1);
+  assert.ok(outReady.some((l) => l.startsWith('ERROR planReady:') && l.includes('footprint overlaps another active plan')));
+
+  const outRunning = [];
+  assert.equal(main(['--plan', path.join(r, 'planRunning')], (l) => outRunning.push(l)), 0);
+  assert.ok(outRunning.some((l) => l.startsWith('WARN planRunning:') && l.includes('footprint overlaps another active plan')));
+  assert.ok(outRunning.includes('ok planRunning'));
 });
 
 test('a pair scan that stops at its cap is an error, never a clean verdict', () => {

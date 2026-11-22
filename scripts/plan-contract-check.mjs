@@ -3,7 +3,7 @@
 // (core/skills/_shared/plan-contract.md). It reads plan frontmatter only through the
 // YAML door (src/util/yaml.mjs) and never edits a plan.
 //
-//   node scripts/plan-contract-check.mjs --plan plans/<dir>   one plan; any error exits 1
+//   node scripts/plan-contract-check.mjs --plan plans/<dir>... one or more plans; any error exits 1
 //   node scripts/plan-contract-check.mjs --all [--root plans] every plan; plans without the
 //                                                             `contract` marker are counted as
 //                                                             legacy (warning), marked plans fail hard
@@ -223,12 +223,15 @@ export function checkPlanDir(dir, { plansRoot = path.dirname(path.resolve(dir)) 
     if (!Array.isArray(meta.footprint) || meta.footprint.length === 0) errors.push(`footprint is required when status is ${meta.status}`);
     if (meta.base === undefined) errors.push(`base is required when status is ${meta.status}`);
   }
+  if (meta.status === 'running' && meta.lead === undefined) {
+    errors.push('a running plan names its lead: write `lead: <role>` with status running');
+  }
   if (meta.status === 'ready' && strings(meta.footprint ?? [])) {
     for (const entry of unreadableEntries(meta.footprint ?? [])) errors.push(`footprint entry ${JSON.stringify(entry)} is not a repo-relative path or glob`);
   }
   for (const [name] of PLAN_SECTIONS) if (!hasSection(body, name)) errors.push(`missing section: ${name}`);
   checkPhaseTable(body, errors, meta.status);
-  const warnings = meta.status === 'running' && meta.lead === undefined ? ['a running plan names its lead: write `lead: <role>` with status running'] : [];
+  const warnings = [];
   return { dir, legacy: false, meta, errors, warnings };
 }
 
@@ -250,15 +253,25 @@ export function activeOverlaps(results) {
 }
 
 function parseArgs(argv) {
-  const flags = {};
+  const flags = { plan: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === '--all') flags.all = true;
-    else if (a === '--plan' || a === '--root') flags[a.slice(2)] = argv[++i];
-    else return { error: `unknown argument ${a}` };
+    if (a === '--all') {
+      flags.all = true;
+    } else if (a === '--plan') {
+      const val = argv[++i];
+      if (val === undefined) return { error: 'a flag lacks its value' };
+      flags.plan.push(val);
+    } else if (a === '--root') {
+      const val = argv[++i];
+      if (val === undefined) return { error: 'a flag lacks its value' };
+      flags.root = val;
+    } else {
+      return { error: `unknown argument ${a}` };
+    }
   }
-  if (flags.all === !!flags.plan) return { error: 'give exactly one of --all or --plan <dir>' };
-  if ((flags.plan === undefined && 'plan' in flags) || (flags.root === undefined && 'root' in flags)) return { error: 'a flag lacks its value' };
+  const hasPlan = flags.plan.length > 0;
+  if (Boolean(flags.all) === hasPlan) return { error: 'give exactly one of --all or --plan <dir>' };
   return { flags };
 }
 
@@ -266,16 +279,29 @@ export function main(argv, out = console.log) {
   const { flags, error } = parseArgs(argv);
   if (error) { out(`plan-contract-check: ${error}`); return 2; }
   try {
-    if (flags.plan) {
-      const dir = path.resolve(flags.plan);
-      const r = checkPlanDir(dir, { plansRoot: flags.root ? path.resolve(flags.root) : undefined });
-      const errors = r.legacy ? r.errors.map((e) => `legacy plan: ${e}`) : r.errors;
-      const others = r.legacy ? [] : activeOverlaps([r, ...siblings(dir, flags.root)]).filter((p) => p.includes(path.basename(dir)));
-      for (const [a, b] of others) errors.push(`footprint overlaps another active plan: ${a} and ${b}`);
-      for (const e of errors) out(`ERROR ${path.basename(dir)}: ${e}`);
-      for (const w of r.warnings ?? []) out(`WARN ${path.basename(dir)}: ${w}`);
-      if (!errors.length) out(`ok ${path.basename(dir)}`);
-      return errors.length ? 1 : 0;
+    if (flags.plan.length > 0) {
+      let anyError = false;
+      const plans = [...new Set(flags.plan)];
+      for (const p of plans) {
+        const dir = path.resolve(p);
+        const r = checkPlanDir(dir, { plansRoot: flags.root ? path.resolve(flags.root) : undefined });
+        const errors = r.legacy ? r.errors.map((e) => `legacy plan: ${e}`) : [...r.errors];
+        const warnings = [...(r.warnings ?? [])];
+        const others = r.legacy ? [] : activeOverlaps([r, ...siblings(dir, flags.root)]).filter((pair) => pair.includes(path.basename(dir)));
+        for (const [a, b] of others) {
+          const msg = `footprint overlaps another active plan: ${a} and ${b}`;
+          if (r.meta?.status === 'running') {
+            warnings.push(msg);
+          } else {
+            errors.push(msg);
+          }
+        }
+        for (const e of errors) out(`ERROR ${path.basename(dir)}: ${e}`);
+        for (const w of warnings) out(`WARN ${path.basename(dir)}: ${w}`);
+        if (!errors.length) out(`ok ${path.basename(dir)}`);
+        if (errors.length) anyError = true;
+      }
+      return anyError ? 1 : 0;
     }
     const { results, overlaps: clashes } = checkAll(path.resolve(flags.root ?? 'plans'));
     const legacy = results.filter((r) => r.legacy);
