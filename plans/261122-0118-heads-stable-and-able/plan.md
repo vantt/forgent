@@ -203,6 +203,18 @@ writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
 
+### Lead progress (2026-11-22 20:05, head:lead-forgent-261122-0118-heads-b52f9)
+
+- **The clippy fix for 12b is ready on `p12c` (`b800a1601`):** the nested if is collapsed and `renew_in_scratch`'s
+  arguments are grouped in `RenewInScratchArgs`, with no `allow`. `cargo clippy -p fgos --bins -- -D warnings` and
+  `cargo clippy -p fgos-execution-engine --all-targets -- -D warnings` are clean, and credentials pass 26/26.
+- **Its land is parked on a red main gate that is not this plan's.** Ticket `c-67254-1795352250452` failed
+  `test/scripts/check-decision-citation-drift.test.mjs:485` with 3 new findings: `D12` cited at
+  `plans/backlog/p-kihregmfxm-a-moot-owner-question-cannot-be-closed-once-its-asking-head-is-gone.md:22`, and `D13` at
+  `plans/backlog/p-kmavlfevvu-a-coach-the-supervisor-starts-from-observe-metrics-and-friction.md:12,20`. Both files came
+  in through paths lands, which skip that gate, and neither is in this footprint. Every branch land stays red until
+  their owner inlines those ids. `p12c` lands with the same command right after.
+
 ### Lead progress (2026-11-22 19:35, head:lead-forgent-261122-0118-heads-b52f9)
 
 - **Phase 12 done.** 12a landed as `809c83190`, and 12b as `039acaa7e` (`p12b`: `89e75d68a` plus the review fixes
