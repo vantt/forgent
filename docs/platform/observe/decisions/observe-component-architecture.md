@@ -30,6 +30,8 @@ Store lock đổi từ file `O_EXCL` có pid/TTL sang kernel lock `<fgosDir>/loc
 
 ### D-ADR0037 (Observe Component Architecture)
 
+[valid_from:: 2026-09-29]
+
 - **Một component Observe**: Gom toàn bộ đo lường (`fgos metrics`) và friction (`fgos friction`) vào một crate Rust duy nhất (`packages/observe/rust`).
 - **Subject tầng nền**: Subject đo lường là các thực thể tầng nền (`run`, `session`, `executor`, `case`); Work Item là source quan sát tuỳ chọn, không phải trung tâm đo lường.
 - **Friction rời Work**: Lưu trữ friction tách rời khỏi `work.friction` trong Work event store; chuyển thành append-only shards trong `.fgos/observe/friction/<writerId>.jsonl`.

@@ -680,6 +680,8 @@ Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (ts
 
 ##### D-ADR0010 — Bản đồ kiến trúc là bản chuẩn
 
+[valid_from:: 2026-07-16]
+
 **Ngày:** 2026-07-16 · **Trạng thái:** chốt
 
 ###### Bối cảnh
@@ -723,6 +725,8 @@ sai giữa Domain và Infra.
   C3 partial (3 field RUN_CONTRACT vay khi fan-out).
 
 ##### D-ADR0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009
+
+[valid_from:: 2026-07-18]
 
 ###### Bối cảnh
 
@@ -773,6 +777,8 @@ nghĩa/ranh giới/maturity của bất kỳ contract nào.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
 ##### D-ADR0017 — Đóng audit hệ id/tên gọi (STR47)
+
+[valid_from:: 2026-07-27]
 
 ###### Bối cảnh
 

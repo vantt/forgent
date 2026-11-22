@@ -493,6 +493,8 @@ Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (ts
 
 ### D-ADR0001 — Nhật ký sự kiện là sự thật; store/DB là bản chiếu dựng lại được
 
+[valid_from:: 2026-07-13]
+
 #### Bối cảnh
 
 forgent cần bộ nhớ bền cho nhiều loại dữ liệu (trước hết là work-state của chính
@@ -532,6 +534,8 @@ Hệ quả trực tiếp của luật này:
 
 ### D-ADR0009 — Chống giao thoa tiến trình lúc cài
 
+[valid_from:: 2026-07-14]
+
 #### Bối cảnh
 
 Tách sạch *artifacts* (file, thư mục, release) giữa forgent và các bộ công cụ khác
@@ -569,6 +573,8 @@ với harness khác cùng máy. Bốn nguyên tắc:
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
 ### D-ADR0014 — Kiến trúc giao tiếp người ↔ fgOS
+
+[valid_from:: 2026-07-18]
 
 Quyết định ở **mức interface** (hình dạng cửa giao tiếp), không phải mức
 implementation. Chốt qua thảo luận mở với người dùng 2026-07-18.
@@ -655,6 +661,8 @@ Chọn **mô hình (3)**, với các chốt sau — tất cả ở mức interfa
   `session-snapshot-bootstrap-rpc`) làm mẫu thiết kế cửa.
 
 ### D-ADR0035 — Xác lập ranh giới sứ mệnh: fgOS phục vụ project khác/business workflow, không tự-phát-triển-chính-nó mặc định
+
+[valid_from:: 2026-08-17T15:23:30.570Z]
 
 #### Bối cảnh
 
@@ -858,6 +866,8 @@ khong phai no nang ma no tum lum
 
 ### D-ADR0054 — RUL11 (tùm lum không phải nặng) gom trong phạm vi việc đang làm (supersede 0036)
 
+[valid_from:: 2026-10-08] [replaces:: D-ADR0036]
+
 #### Bối cảnh
 
 Thảo luận gốc rễ phình to (2026-10-08, `plans/reports/prompt-261008-bloat-root-cause-discussion.md`) thấy năm luật/thói quen mỗi cái đúng khi đứng riêng nhưng cộng lại không có điểm dừng: RUL11 ("gom tới khi hết, quy mô không bao giờ là lý do miễn trừ"), "làm cho xong" (gate đủ-hết, cấm defer), release human (ưu tiên #2), L5 (bài kiểm tài liệu) và "có bằng chứng là có tiến độ". Bằng chứng: doc-unification Phase 02 xây 21.044 dòng tool cho một gate đối chiếu từng claim; advisory Phase 02 sửa ~880 dòng dispatch nằm ngoài Exclusions để gỡ một live gate. Phát biểu của người dùng (giữ nguyên văn): "không dọn dẹp này là dọn dẹp liên quan đến việc đang làm á"; "anh thấy có bô các luật khi kết hợp có thể tạo ra bloating … rõ ràng anh cảm thấy có rò rì khi 4 thứ đó kết hợp".
@@ -878,6 +888,8 @@ Giữ nguyên ý và phát biểu gốc của 0036; thêm vế phạm vi: gom ph
 - 0036 — quyết định bị supersede.
 
 ### D-ADR0061 — Khoá RUL104 (tốt hơn, không to hơn): audit làm thứ đang có tốt hơn, không làm nó to ra
+
+[valid_from:: 2026-10-18T14:37:44.131Z]
 
 > Superseded bởi 0062 (2026-10-18): RUL104 (tốt hơn, không to hơn) thêm clean code và hexagonal. Phát biểu gốc dưới đây giữ nguyên.
 
@@ -906,6 +918,8 @@ Khoá thành RUL104 (`docs/platform/platform-foundations.md#business-rules`'s Bu
 - Bảng chương trình `plans/261017-1313-fgos-platform-program-board/plan.md`, luồng HARDEN.
 
 ### D-ADR0062 — RUL104 (tốt hơn, không to hơn) thêm clean code và hexagonal (supersede 0061)
+
+[valid_from:: 2026-10-18T14:42:56.368Z] [replaces:: D-ADR0061]
 
 #### Bối cảnh
 

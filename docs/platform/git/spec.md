@@ -961,9 +961,13 @@ No repository evidence shows external consumers using shallow or alternates clon
 
 ### D-ADR0057 — Git is one foundation component
 
+[valid_from:: 2026-10-18T02:14:27.415Z]
+
 The owner signed this spec on 2026-10-18 as D-ADR0057 (Git is one foundation component): Git is one foundation component (`fgos-git`, a Rust live core) that owns every git operation. The answers below are the decisions it was signed with.
 
 ### D-ADR0058 — Git publication recovery after a crashed seal (amends D-ADR0057)
+
+[valid_from:: 2026-10-18T04:36:27.567Z]
 
 Amendment A1 of 2026-10-18: publication supersession, §10 rule 4a. It amends D-ADR0057 (Git is one foundation component); D-ADR0057 (Git is one foundation component) stays in force.
 

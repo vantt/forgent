@@ -438,12 +438,16 @@ Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker 
 
 ### D-ADR0081 (Persona pool key: a persona leases only from its own account pool) — một khoá tuỳ chọn `runner.personas.<name>.pool` để persona thuê account từ pool riêng
 
+[valid_from:: 2026-11-18]
+
 - **Quyết định:** `runner.personas.<name>.pool` (chỉ file project) khiến mọi ghế của persona thuê account chỉ từ pool đó, cho mọi family nó đi qua; vắng khoá = pool của cell, hành vi cũ không đổi. Backlog `p-mnymjukvqd`, quyết định OD4 của thảo luận account-lease-secretary.
 - **Vì sao không ghim account:** một ghim `pool/account` chỉ áp khi lựa chọn đầu của ghế đã thuộc pool đó và "never moves a seat to another pool" (mục 8), nên không đưa được ghế sang pool mà không cell nào gọi tên.
 - **Hệ quả thấy được:** pane không bao giờ chạm pool của persona (không cell nào gọi tên nó); persona có pool hết account thì bị từ chối đích danh, không rơi sang pool `claude`. Role không có khoá này.
 - **Điều kiện đảo:** owner muốn pool theo role hoặc theo capability (nơi của nó là một dòng backlog mới).
 
 ### D-ADR0080 (persona and role taste live in runner.personas and runner.roles) — khẩu vị persona và role có bảng riêng; hàng capability giữ việc và khả năng tool; sửa mục 6.3 của D-ADR0072 (Seat Binding: one authority for agent seat choice), luật file persona của nó giữ nguyên
+
+[valid_from:: 2026-11-17] [amends:: D-ADR0072]
 
 - **Quyết định:** khẩu vị persona và role sống trong `runner.personas` và `runner.roles` (chỉ file project), áp cho mọi capability; hàng capability chỉ giữ việc và khả năng tool (`tier`, `maxTier`, `rigor`, `prefer`, `confinement`, `serves` và các khoá hiện có). Mỗi loại tuỳ biến có đúng một chỗ (`docs/platform/vision.md` mục 6).
 - **Sửa mục 6.3 của D-ADR0072 (Seat Binding: one authority for agent seat choice):** thứ tự mỗi thuộc tính, phần còn lại giữ nguyên thứ tự tương đối: `tier` là override > `personas.<p>` > `roles.<role>` > tier workflow (ghế, rồi unit) > `cap.tier` > `prefix.tier` > `defaults.tier`; `prefer` là override executor > `personas.<p>` > `roles.<role>` > `cap.prefer` > `prefix.prefer` > `tierFallback.<tier>`. Khoá khẩu vị theo ghế (`cap.seats.<seat>`) bị bỏ: ghế mang tier qua workflow (khuyến nghị của ghế, rồi của unit), không qua config. Luật file persona của D-ADR0072 (file persona không mang `tier` hay `prefer`, mục 6.4) đứng nguyên; chỉ nơi khẩu vị của persona đổi sang `runner.personas.<name>`.

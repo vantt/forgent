@@ -743,6 +743,8 @@ Mỗi dòng: ai quyết, **tín hiệu quan sát được** sẽ mở lại, và
 
 ### D-ADR0073 (bộ từ workflow / case / unit / pattern / run) — một chữ cho một tầng; supersede phần thuật ngữ "guide" của D-ADR0070 (workflow guide + admission ledger)
 
+[valid_from:: 2026-10-24T05:48:26.190Z]
+
 - **Trạng thái:** **Settled (owner 2026-10-24 12:45, "ok giữ case, chốt bộ từ đi em").**
 - **Bối cảnh:** chữ "pattern" đang gọi cả cơ chế trong code (`solo`, `reviewed`, `panel`, `debate`) lẫn bộ params có tên (`code-change`, `consult`, gọi là preset); chữ "workflow" gọi component, file định nghĩa và một lần chạy; chữ "run" gọi ba tầng (`wf-run-…` là case, `unit-run-…` là unit, `runs/NN` là một ghế chạy một lần, mà Run Supervisor lại gọi là "attempt"); chữ "guide" trùng nghĩa thường ngày (tài liệu hướng dẫn). Owner thấy lẫn trong lúc thiết kế "mức độ áp pattern" ([spec nháp](../../../plans/261023-1619-collaboration-degree-spec/spec-draft.md)).
 - **Quyết định:**
@@ -756,6 +758,8 @@ Mỗi dòng: ai quyết, **tín hiệu quan sát được** sẽ mở lại, và
 - **Đảo lại nếu:** một tầng mới xuất hiện mà bộ từ này không gọi tên được mà không dùng một chữ cho hai tầng.
 
 ### D-ADR0070 (workflow guide + admission ledger) — Workflow là guide + ledger admission; agent chọn thứ tự; supersede một phần 0048 §2 và 0049 §4
+
+[valid_from:: 2026-10-19T05:38:16.178Z]
 
 - **Trạng thái:** **Settled (owner 2026-10-19 12:32, "duyệt spec").** Record chính thức ở "Lịch sử quyết định" của [runner decisions](../runner/decisions/h-36d872fbb0e5.md); mục này là bản tóm tắt trong spec khu vực.
 - **Bối cảnh:** 0049 đóng authority sprawl bằng cách để Workflow runner vừa giữ bản ghi vừa *quyết thứ tự*. Phần thứ hai lấy phán đoán về thứ tự khỏi agent, trái với tầm nhìn "trong mềm, ngoài cứng" (2026-09-05) và hướng owner 2026-10-18. Bằng chứng: `coding/feature` chưa từng chạy trên runner; mọi run đã lưu là playbook; chuỗi lead 6.4 cho thấy luật chỉ-văn-xuôi bị bỏ qua ba lần, còn luật máy giữ được.

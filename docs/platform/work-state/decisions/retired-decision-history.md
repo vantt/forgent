@@ -27,6 +27,8 @@ Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (ts
 
 ### D-ADR0002 — Mô hình việc phẳng
 
+[valid_from:: 2026-07-14]
+
 > **Một phần đã supersede bởi [0012](#d-adr0012--mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời):**
 > "deps và parent tách rời có chủ đích" nay đọc là "tách rời về lưu trữ và ngữ
 > nghĩa, nhưng hợp nhất thành một đồ thị typed-edge derive". Phần còn lại của
@@ -63,6 +65,8 @@ và khoá độ mịn công việc vào schema.
 
 ### D-ADR0003 — Đặt tên & bố cục dữ liệu
 
+[valid_from:: 2026-07-14]
+
 #### Bối cảnh
 
 Cần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước khi viết
@@ -89,6 +93,8 @@ layout.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
 ### D-ADR0004 — Phạm vi & non-goal
+
+[valid_from:: 2026-07-14]
 
 #### Bối cảnh
 
@@ -120,6 +126,8 @@ forgent. Không chốt hai biên này thì phạm vi trôi và dễ xây thừa.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
 ### D-ADR0006 — Trạng thái `proposed`
+
+[valid_from:: 2026-07-14]
 
 #### Bối cảnh
 
@@ -162,6 +170,8 @@ Ngữ nghĩa:
 
 ### D-ADR0007 — Tiến hoá schema & event
 
+[valid_from:: 2026-07-14]
+
 #### Bối cảnh
 
 Trạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ liệu** ghi trên
@@ -194,6 +204,8 @@ Ba luật cho mọi tiến hoá schema/event từ đây về sau:
 <a id="7-adr-0011-explicit-version-for-every-contract"></a>
 
 ### D-ADR0011 — Version tường minh cho mọi contract
+
+[valid_from:: 2026-07-16]
 
 #### Bối cảnh
 
@@ -250,6 +262,8 @@ version tường minh trong định danh của chính nó, theo mẫu `<name>/v<
 <a id="8-adr-0012-unified-typed-edge-graph-model"></a>
 
 ### D-ADR0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời
+
+[valid_from:: 2026-07-18] [amends:: D-ADR0002]
 
 #### Bối cảnh
 
@@ -329,6 +343,8 @@ và bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách 
 <a id="9-adr-0013-report-not-write-channel-for-discovered-from"></a>
 
 ### D-ADR0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`
+
+[valid_from:: 2026-07-18]
 
 #### Bối cảnh
 
@@ -423,6 +439,8 @@ lưu để phục hồi report đã mất. Xem spec Runner "Báo việc-phát-hi
 
 ### D-ADR0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)
 
+[valid_from:: 2026-07-27]
+
 #### Bối cảnh
 
 `RUL11 (tiến hóa schema)` (`docs/platform/work-state/decisions/retired-decision-history.md#d-adr0019-miễn-trừ-pre-release-cho-rul11-viết-lại-nhật-ký-tại-chỗ`, D-ID `feed7428`) cấm tường minh: "Nhật ký
@@ -486,6 +504,8 @@ là một decision record.
 
 ### D-ADR0024 — Đổi tên status `proposed` thành `awaiting-approval`
 
+[valid_from:: 2026-07-29] [amends:: D-ADR0006]
+
 #### Bối cảnh
 
 `0006` đặt tên status `proposed` cho trạng thái "goal-check đạt, đề xuất nằm
@@ -542,6 +562,8 @@ dry-run, seq-contiguity check) để ghi đè tại chỗ 3 kho `.fgos` trong ph
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
 ### D-ADR0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)
+
+[valid_from:: 2026-08-04]
 
 #### Bối cảnh
 

@@ -106,6 +106,8 @@ Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (ts
 
 ### D-ADR0016 — Mốc MVP của fgOS
 
+[valid_from:: 2026-07-20]
+
 #### Bối cảnh
 
 Trước quyết định này fgOS chưa có phát biểu MVP/milestone chính thức nào — grep "MVP"/"milestone" trong `docs/` trả 0 hit. Định nghĩa "có harness" ở `platform-foundations.md` L5 (sáu câu hỏi) và thang trưởng thành hạ tầng L6 (F0–F5, fgOS tự tuyên F4 tại 2026-07-16) đo ĐỘ CHÍN CỦA HẠ TẦNG, không đo "người dùng cuối LÀM ĐƯỢC GÌ". Một câu MVP nháp xuất hiện trong báo cáo tích hợp P50 (2026-07-20) nhưng gắn nhãn "chưa chốt" và chỉ sống trong một file HTML report — không phải tài liệu sản phẩm đã ship.
@@ -133,6 +135,8 @@ Mốc dogfood tự-phát-triển (STR25) đã ĐẠT 2026-07-17: item thật đi
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
 ### D-ADR0018 — Mốc MVP2 của fgOS
+
+[valid_from:: 2026-07-27]
 
 #### Bối cảnh
 
