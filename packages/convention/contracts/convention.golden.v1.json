@@ -192,6 +192,18 @@
       "expected": {"checked":1,"violations":[{"path":"plans/report-261006-1415-x.md","code":"wrong-location","message":"recognized report is outside an accepted location"}]}
     },
     {
+      "name": "a valid minted backlog id whose slug holds a plan stamp passes, and a report-named file outside every root still gets wrong-location",
+      "operation": "check",
+      "input": {"paths":["plans/backlog/p-xyod5s5h6r-replace-phase-4-of-plan-261119-1615-secretary.md","report-261006-1415-x.md"]},
+      "expected": {"checked":2,"violations":[{"path":"report-261006-1415-x.md","code":"wrong-location","message":"recognized report is outside an accepted location"}]}
+    },
+    {
+      "name": "a report-named file nested under backlog root gets wrong-location",
+      "operation": "check",
+      "input": {"paths":["plans/backlog/nested/report-261006-1415-x.md"]},
+      "expected": {"checked":1,"violations":[{"path":"plans/backlog/nested/report-261006-1415-x.md","code":"wrong-location","message":"recognized report is outside an accepted location"}]}
+    },
+    {
       "name": "classify singleton",
       "operation": "classify",
       "input": {"path":"fixtures/demo/spec.md"},

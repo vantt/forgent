@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b4152a96fe9fad64ab23b773826605adcfc9da6693a9a1b1995903423f7738ac",
+  "payloadDigest": "627bf7cbebb89116befeea69441770b9eec8fbc110e39f1c8038d47b21956467",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -363,7 +363,7 @@
     "packages/config/rust/tests/write_concurrency.rs": "466b6a6db77e8be51c54a29d5ed57bf3a373b85804648f9fce36dec27606d28f",
     "packages/config/rust/tests/write_golden.rs": "d9711e6f873a1045fca43730fbf96aab2c117f83512a83b03ed4ea4b3a895f90",
     "packages/convention/rust/src/lib.rs": "de83f219d7259f2ffa7f266562b02c8b073434c6e7d10e70faf440f6c35d1d92",
-    "packages/convention/rust/src/operations.rs": "673552a0ddd27310493d0b035acf1b7b984431dfb648ae1a80dc18b13429191a",
+    "packages/convention/rust/src/operations.rs": "538a369aa18f24c267b915d6b94ac47835181b54e656e9656158129a9d59f2da",
     "packages/convention/rust/src/provider.rs": "8b2897c48d254f0bf5073752bc491165d7b1ca373074a3604f65d88368fe1af2",
     "packages/convention/rust/src/rules.rs": "2129412c7da6153e254852b24016910d52289b50f134fd74a33bafddeb34fe0c",
     "packages/convention/rust/tests/golden.rs": "1b71da8cea27b56719dda523ae66c2d2a25c41df80477c251142fb032daeff23",
@@ -1336,7 +1336,7 @@
     "scripts/ci-asset-server.mjs": "2de382cc02067014690b358d4c939149bf0c1b7977071896d9b12137526ff32a",
     "scripts/ci-external-consumer.sh": "aabec414125ada7a812586174c53a116af29a96f9b6e6c0e218adc58fd47c5a9",
     "scripts/ci-setup-bwrap.sh": "04e07490fff85c7e2116f4fe8b9b78f300a4ee488c6475e37aadbaf1c15de9ce",
-    "scripts/convention-conformance.mjs": "14ceed9e37eb8b914f50a6237b61a2bd9b2c591e2d3f611a8321544930e419ea",
+    "scripts/convention-conformance.mjs": "fb2971690a952f740c9f588e38d61de2b19caa93138c6d6f97b0203d3c1fea8b",
     "scripts/decision-question-hook.mjs": "af83a0333f802f38696c818186887ba439cd47f1b4616dec7bd727c792346d14",
     "scripts/doc-health.mjs": "6c7176b419cdd68e79a205004f5bfc91893ec21a8b669dd82ec97e3f2127e2c3",
     "scripts/event-store/forge-probe.sh": "58f6e0a88b89acac30022a5c414f395af696c9073b2c004e6c1545fa628145a1",
