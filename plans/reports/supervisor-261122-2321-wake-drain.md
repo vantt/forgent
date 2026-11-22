@@ -17,3 +17,10 @@ Pending owner question: q-rfxqncjrax (who runs the account probe for Miu's quota
 
 ## Friction
 - `fgos mailbox send` from the confined supervisor fails with `git-floor-probe-failed ... Read-only file system`.
+
+## Later event in the same wake
+- `58b946817ad97a8b` coordination-handoff, `plan:261122-0118-heads-stable-and-able`. Owner order: heads-stable blocks nobody, so heads-rotate and component-authority are admitted now, and heads-stable's lead watches the shared files.
+  - heads-rotate: I set `status: running`, `lead: head:lead-forgent-261122-2307-heads-5c830` and `base: 27fd8a9b0`. I removed heads-stable from `blockedBy`, marked phases 1-4 `ready` and recorded the order. Landed as `4a75c0d4e`. I started the lead and stopped the finished planner `head:planner-heads-rotate-on-their-own`.
+  - component-authority: not admitted yet. `head:planner-component-authority` is still applying option c to `plan.md`, so a lead started now would be a second writer on the same file. The next wake admits it once the planner lands `ready` (owner order: no further question).
+  - Handled.
+- Leads live: 2 of 4 (heads-stable, heads-rotate).
