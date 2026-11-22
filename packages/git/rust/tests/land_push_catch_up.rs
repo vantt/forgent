@@ -402,6 +402,68 @@ fn catch_up_interrupted_before_its_cas_settles_as_not_moved_and_a_retry_succeeds
     assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), tip);
 }
 
+#[test]
+fn recovery_settles_an_unknown_catch_up_only_when_trunk_already_contains_its_candidate() {
+    // Each case leaves a catch-up attempted but unanswered (cut before its CAS), then moves trunk
+    // the way another door would, without the chain's knowledge.
+    let cut = |f: &Fixture| {
+        let tip = commit_ahead(f, "ahead", "c");
+        git(&f.main, &["update-ref", "refs/remotes/origin/trunk", &tip]);
+        catch_up_with(f, &f.request.target, "cut", &StopAt("catch-up-before-cas")).unwrap_err();
+        tip
+    };
+    let pin = "refs/fgos/git-operations/cut/candidate";
+
+    // Trunk moved past the candidate: the effect is present, so the chain settles and its pin goes.
+    let f = Fixture::new();
+    let tip = cut(&f);
+    git(&f.main, &["merge", "-q", "--ff-only", &tip]);
+    let later = commit_ahead(&f, "later", "d");
+    git(&f.main, &["merge", "-q", "--ff-only", &later]);
+    let recovered = recover(&f);
+    assert_eq!(
+        recovered["recovered"],
+        serde_json::json!(["cut"]),
+        "{recovered}"
+    );
+    assert_eq!(
+        git(&f.main, &["rev-parse", "HEAD"]),
+        later,
+        "recovery moves nothing"
+    );
+    assert_eq!(
+        git(&f.main, &["for-each-ref", pin]),
+        "",
+        "the settled chain's pin is released"
+    );
+
+    // Trunk diverged: it holds neither the candidate nor its own old tip, so the chain is kept.
+    let f = Fixture::new();
+    cut(&f);
+    git(&f.main, &["checkout", "-q", "--orphan", "elsewhere"]);
+    git(
+        &f.main,
+        &["commit", "-q", "--allow-empty", "-m", "elsewhere"],
+    );
+    let elsewhere = git(&f.main, &["rev-parse", "HEAD"]);
+    git(&f.main, &["checkout", "-q", "-f", "trunk"]);
+    git(&f.main, &["update-ref", "refs/heads/trunk", &elsewhere]);
+    let kept = recover(&f);
+    assert_eq!(kept["recovered"], serde_json::json!([]), "{kept}");
+    assert_eq!(kept["kept"][0]["cause"], "ref-effect-unknown", "{kept}");
+
+    // The candidate pin no longer reads: nothing proves which candidate this chain had, so it is kept.
+    let f = Fixture::new();
+    let tip = cut(&f);
+    git(&f.main, &["merge", "-q", "--ff-only", &tip]);
+    let later = commit_ahead(&f, "later", "d");
+    git(&f.main, &["merge", "-q", "--ff-only", &later]);
+    git(&f.main, &["update-ref", "-d", pin]);
+    let kept = recover(&f);
+    assert_eq!(kept["recovered"], serde_json::json!([]), "{kept}");
+    assert_eq!(kept["kept"][0]["cause"], "ref-effect-unknown", "{kept}");
+}
+
 /// Moves the remote-tracking ref at one production boundary, as a fetch landing there would.
 struct FetchAt {
     step: &'static str,
