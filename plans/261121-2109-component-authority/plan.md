@@ -193,6 +193,16 @@ is low priority and blocks nothing, so it left `blockedBy`. Its four shared file
 `docs/platform/agent-mailbox/spec.md`, `docs/platform/observe/spec.md`) are now kept apart by admission alone: whichever
 of the two runs, the other waits for it.
 
+**Owner order (2026-11-22 23:19, via the secretary, option c, recorded by head:supervisor-forgent):** start this
+plan now, without waiting for `261122-0118-heads-stable-and-able`. Its edits to the two files it shares with
+heads-stable (`docs/architecture-manifest.json` and
+`docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`) move to its last phase. For the planner
+(`head:planner-component-authority`, started for this): reshape so phase 2 copies the manifest into the model without
+deleting it or touching the registry contract, and the manifest deletion plus both file edits move to phase 7, which
+also waits for heads-stable to be `done`. Then drop heads-stable from `blockedBy`, run the plan-contract check and
+set `ready`. Heads-stable's open phases (8-11) write neither file, but its plan-level footprint still lists both, so
+admission may still report an overlap; the planner says in its report whether the check accepts this or what remains.
+
 **Why it first waited:** two plans that were running when it was written owned files this plan must change.
 - `261118-1341-s6a-execution-tier-rust` owns `docs/architecture-manifest.json`, `test/architecture.test.mjs`,
   `src/setup/**`, `test/setup/**`, `src/runner/dispatch/**`, `docs/reading-map.md`,
