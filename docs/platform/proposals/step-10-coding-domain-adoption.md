@@ -48,7 +48,7 @@ Related: [Step 09 Group Thinking Substrate](step-09-group-thinking-substrate.md)
 [Component Boundary Advisory](../component-boundary/component-boundary-advisory.md),
 [Step 08 plan](../../../plans/260901-1542-step08-standalone-coordination/plan.md),
 [Architecture Intent](../architecture-intent.md),
-[Component Authority Boundary Map](component-authority-boundary-map.md)
+[Component Authority](../component-authority/spec.md)
 ````
 
 
@@ -91,7 +91,7 @@ Current progress:
 
 | Track | Status | Notes |
 |---|---|---|
-| Boundary map — architect-level authority guardrail | `draft-ready` | Now tracked in `component-authority-boundary-map.md`, parallel to Step 09 and Step 10. |
+| Boundary map — architect-level authority guardrail | `draft-ready` | Now tracked in `docs/platform/component-authority/spec.md`, parallel to Step 09 and Step 10. |
 | Step 09 substrate dependency | `accepted-prerequisite` | The implemented Step 09 slice is closed through the promoted CoordinationSession/FlowDefinition contracts; deferred substrate features remain parked in the architecture intent docs. |
 | Step 10 high-level adoption plan | `draft-ready` | This document now records the large plan for making Coding Domain a first-class fgOS domain consumer. |
 | Step 10 implementation | `implementation-ready` for read-only adoption; `waiting-topology` for mutating adoption | Read-only Work-attached sessions may start. Mutating work must wait for Workspace Topology resolver/root migration and the ADR-010 live proof gate. |
@@ -350,7 +350,7 @@ coding-domain proof actually needs one.
 
 **Proposed:** keep the authority map as a parallel architect-level
 prerequisite, not a child step of coding adoption. The
-[Component Authority Boundary Map](component-authority-boundary-map.md)
+[Component Authority](../component-authority/spec.md)
 classifies ownership and forbidden dependencies before Step 10 implementation
 starts. Mutating adoption remains blocked by the ADR-010 gate and depends on
 the Step 08 proofs for crash recovery and concurrent-mutating-actor refusal.
@@ -581,7 +581,7 @@ useful output is:
    authority, state, ports, adapters, forbidden dependencies, and layer:
    foundation, platform support, domain, integration, host/surface, or plugin.
    Draft artifact:
-   [Component Authority Boundary Map](component-authority-boundary-map.md).
+   [Component Authority](../component-authority/spec.md).
 2. **Foundation-vs-coding extraction matrix.** Classifies F1-F7 above and names
    which currently-coding-used modules are reusable foundation/platform
    components versus Coding Domain Core.
@@ -774,7 +774,7 @@ ledger's Deferral Audit template.
   parent-child = responsibility grouping + runtime coupling + placement hint;
   dependency = explicit contract direction, never inferred from nesting.
 - **2026-09-02** — Step 1A artifact structure cleanup. Human flagged that
-  `component-authority-boundary-map.md` had become ad hoc because new
+  the Component Authority proposal had become ad hoc because new
   ideas were appended as the discussion evolved. The artifact was reorganized
   around the shorthand rule above: status, organizing formula, vocabulary,
   classification axes, parent-child responsibility map, authority ownership,

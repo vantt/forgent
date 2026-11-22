@@ -69,8 +69,8 @@ declare those contracts canonical or the engine delivered in the current release
   records the earlier coding-adoption plan. Current coding operations and
   Workflow definitions must be checked in `domains/coding/`, not inferred from
   the old Step 08/ADR-010 proof sequence.
-- [Component Authority Boundary Map](../../proposals/component-authority-boundary-map.md)
-  is the parallel architect-level authority/layout draft for cross-component
+- [Component Authority](../../component-authority/spec.md)
+  is the accepted structural authority/layout model for cross-component
   placement and forbidden dependencies.
 
 ## Promotion Rule
