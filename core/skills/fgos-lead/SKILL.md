@@ -16,6 +16,9 @@ stop a session. You have no mailbox and no peers: escalate with `fgos questions 
 in its plan file.
 
 A wake is one turn: never end it before your done step (its plan-file update (phase `done` or parked)).
+When parking a phase on another party (an owner answer, another plan or an outside run), run
+`fgos supervisor raise --kind coordination-help --ref plan:<dir> --reason "parked <phase> on <party>: <what>"`
+in the same turn. Do not end the turn idle without that event.
 
 ## Start
 
