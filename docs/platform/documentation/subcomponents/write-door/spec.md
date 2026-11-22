@@ -145,7 +145,7 @@ Condition before it ships: a retrospective item whose knowledge fits no section 
 | Admission | [admission](../admission/spec.md) | creations |
 | `fgos convention classify` / `path` | [Convention](../../../convention/spec.md) | paths and kinds |
 | `fgos doc` lifecycle, `fgos knowledge attest` | [knowledge-registry contract](../../../work-state/contracts/knowledge-registry.md) | user-document slots and lifecycle |
-| `fgos decision-index` | decisions (`src/report/decision-index.mjs`) | regeneration after a decision changes |
+| `fgos decision-index` | decisions (`src/report/decision-index.mjs`): `docs/decisions/index.md` and the role-field line under each scoped `D-ADR` heading | regeneration after a decision changes |
 
 ## 10. Edge Cases
 

@@ -1695,6 +1695,24 @@ export function parseDecisionRelation(raw) {
   );
 }
 
+/**
+ * Pure: parse `fgos decision`'s `--valid-from` value, the date an act took effect when it predates its record.
+ * Accepts a calendar date (`2026-07-14`) or a full ISO timestamp and returns it trimmed; throws
+ * `StoreError('validation', …)` on anything else, including an impossible date.
+ */
+export function parseDecisionValidFrom(raw) {
+  const text = typeof raw === 'string' ? raw.trim() : '';
+  const shape = /^(\d{4})-(\d{2})-(\d{2})(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2}))?$/.exec(text);
+  const day = shape ? new Date(Date.UTC(+shape[1], +shape[2] - 1, +shape[3])) : null;
+  if (!shape || Number.isNaN(Date.parse(text)) || day.getUTCMonth() !== +shape[2] - 1 || day.getUTCDate() !== +shape[3]) {
+    throw new StoreError(
+      'validation',
+      `decision --valid-from "${raw}" is not a date (YYYY-MM-DD) or an ISO timestamp with a zone.`,
+    );
+  }
+  return text;
+}
+
 // Diataxis doc-type axis (per CONTEXT D5/D6): an OPTIONAL, additive tag on
 // the compound-learn capture payload, orthogonal to the engineer type-axis
 // (pattern/decision/failure). Exactly the four Diataxis quadrants — no

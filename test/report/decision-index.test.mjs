@@ -17,6 +17,9 @@ import { fileURLToPath } from 'node:url';
 import {
   buildDecisionIndexMarkdown,
   computeDecisionIndex,
+  computeDecisionRoleFields,
+  decisionRoleFields,
+  placeRoleFields,
   generateDecisionIndex,
   indexPathFor,
   narrativeHolderResolver,
@@ -253,4 +256,77 @@ test('narrativeHolderResolver: reads the governance scope-to-holder table by leg
   assert.equal(holderFor('packaging-distribution'), 'docs/platform/packaging-distribution/decisions/');
   assert.equal(holderFor('system-overview'), 'docs/platform/system-overview/spec.md');
   assert.equal(holderFor('nowhere'), null);
+});
+
+// --- role fields in the holder documents ---
+
+test('decisionRoleFields: the latest event of an id decides its relation, ADR#### reads as D-ADR####, touches writes no field, and valid_from is the latest declared validFrom or else the first timestamp', () => {
+  const ev = (text, relation, ts, extra = {}) => ({ scope: 'runner', text, rationale: 'r', relation, ts, ...extra });
+  const { fields, warnings } = decisionRoleFields([
+    ev('D-ADR0012: flat items', 'supersedes:ADR0002', '2026-08-17T00:00:00Z'),
+    ev('D-ADR0012: flat items', 'amends:D-ADR0002', '2026-11-22T00:00:00Z', { validFrom: '2026-07-14' }),
+    ev('D-ADR0062: better', 'supersedes:D-ADR0061', '2026-10-18T14:42:56Z'),
+    ev('D-ADR0057: touch', 'touches:D-ADR0055', '2026-10-18T02:00:00Z'),
+    ev('D-ADR0077: names', 'supersedes:docs/x.md:413', '2026-11-22T03:00:00Z'),
+    { kind: 'engine', scope: 'runner', text: 'D-ADR0099: engine', relation: 'supersedes:D-ADR0001', ts: '2026-01-01' },
+    { text: 'D-ADR0098: unscoped', relation: 'none', ts: '2026-01-01' },
+  ]);
+  assert.deepEqual(Object.fromEntries([...fields].map(([id, f]) => [id, f.line])), {
+    'D-ADR0012': '[valid_from:: 2026-07-14] [amends:: D-ADR0002]',
+    'D-ADR0062': '[valid_from:: 2026-10-18T14:42:56Z] [replaces:: D-ADR0061]',
+    'D-ADR0057': '[valid_from:: 2026-10-18T02:00:00Z]',
+    'D-ADR0077': '[valid_from:: 2026-11-22T03:00:00Z]',
+  });
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0], /^D-ADR0077: supersedes:docs\/x\.md:413 names no unit id/);
+});
+
+test('placeRoleFields: the field line goes under its heading, replaces the line already there in place, and leaves other headings alone', () => {
+  const doc = ['# Holder', '', '### D-ADR0061 — old', '', 'Body.', '', '#### D-ADR0062 — new', '', 'Body two.', ''].join('\n');
+  const lines = new Map([['D-ADR0062', '[valid_from:: 2026-10-18] [replaces:: D-ADR0061]']]);
+  const first = placeRoleFields(doc, lines);
+  assert.deepEqual([...first.placed], ['D-ADR0062']);
+  assert.equal(first.content, doc.replace('#### D-ADR0062 — new\n', '#### D-ADR0062 — new\n\n[valid_from:: 2026-10-18] [replaces:: D-ADR0061]\n'));
+  assert.equal(placeRoleFields(first.content, lines).content, first.content, 'a second placement changes nothing');
+  const cleared = placeRoleFields(first.content, new Map([['D-ADR0062', '[valid_from:: 2026-10-18]']]));
+  assert.match(cleared.content, /#### D-ADR0062 — new\n\n\[valid_from:: 2026-10-18\]\n\nBody two\./);
+  assert.doesNotMatch(cleared.content, /replaces::/);
+});
+
+test('computeDecisionRoleFields: a directory holder is searched file by file, and a missing heading or holder is a warning, never inserted prose', () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-fields-'));
+  const dir = path.join(repoRoot, 'docs', 'platform', 'runner', 'decisions');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'a.md'), '# A\n\n### D-ADR0030 — thirty\n\nText.\n');
+  fs.writeFileSync(path.join(dir, 'b.md'), '# B\n\nNo decisions here.\n');
+  const holders = { runner: 'docs/platform/runner/decisions/' };
+  const { holders: out, warnings } = computeDecisionRoleFields(repoRoot, [
+    { scope: 'runner', text: 'D-ADR0030: thirty', relation: 'supersedes:ADR0025', ts: '2026-08-17T00:00:00Z' },
+    { scope: 'runner', text: 'D-ADR0031: no heading', relation: 'none', ts: '2026-08-17T00:00:00Z' },
+    { scope: 'ghost', text: 'D-ADR0040: no holder', relation: 'none', ts: '2026-08-17T00:00:00Z' },
+  ], (name) => holders[name] ?? null);
+  assert.deepEqual(out.map((h) => [h.path, h.changed]), [['docs/platform/runner/decisions/a.md', true]]);
+  assert.match(out[0].next, /### D-ADR0030 — thirty\n\n\[valid_from:: 2026-08-17T00:00:00Z\] \[replaces:: D-ADR0025\]\n\nText\./);
+  assert.deepEqual(warnings.sort(), [
+    'D-ADR0031: no "D-ADR0031" heading in docs/platform/runner/decisions/',
+    'D-ADR0040: scope "ghost" has no narrative holder',
+  ]);
+});
+
+test('CLI: decision --valid-from is projected by decision-index into the holder, and --check refuses once a later event changes the relation', () => {
+  const cwd = initCwd();
+  fs.mkdirSync(path.join(cwd, 'docs', 'platform'), { recursive: true });
+  const holder = path.join(cwd, 'docs', 'platform', 'repo.md');
+  fs.writeFileSync(holder, '# Repo\n\n### D-ADR0012 — flat items\n\nText.\n');
+  const decide = (relation, extra = []) => run(cwd, ['decision', '--text', 'D-ADR0012: flat items', '--rationale', 'r', '--relation', relation, '--scope', 'repo', ...extra]);
+  assert.equal(decide('none', ['--valid-from', '2026-31-01']).status, 4, 'an impossible date is refused');
+  assert.equal(decide('supersedes:ADR0002', ['--valid-from', '2026-07-14']).status, 0);
+  assert.equal(run(cwd, ['decision-index']).status, 0);
+  assert.match(fs.readFileSync(holder, 'utf8'), /### D-ADR0012 — flat items\n\n\[valid_from:: 2026-07-14\] \[replaces:: D-ADR0002\]\n/);
+  assert.equal(run(cwd, ['decision-index', '--check']).status, 0);
+  assert.equal(decide('amends:D-ADR0002').status, 0);
+  const stale = run(cwd, ['decision-index', '--check']);
+  assert.equal(stale.status, 4);
+  assert.match(stale.stderr, /docs\/platform\/repo\.md/);
+  assert.match(fs.readFileSync(holder, 'utf8'), /\[replaces:: D-ADR0002\]/, '--check never writes');
 });

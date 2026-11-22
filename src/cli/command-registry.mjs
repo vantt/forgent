@@ -993,6 +993,7 @@ export const COMMAND_REGISTRY = [
         id: { type: 'string', description: 'Work item id to also fold this decision under (optional; omit for the global log only).' },
         relation: { type: 'string', description: 'none|supersedes:<id>|amends:<id>|touches:<id> -- amends:<id> changes part of <id>, which stays in force; every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> or amends:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.' },
         scope: { type: 'string', description: 'An area slug (e.g. "repo", or one matching docs/platform/governance.md#decision-scope-to-holder-table) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by "fgos decision-index". Optional; omit for an item-scoped (--id) or unscoped decision.' },
+        'valid-from': { type: 'string', description: 'The date the decision took effect (YYYY-MM-DD or an ISO timestamp with a zone), for an act that predates its record. "fgos decision-index" writes it as the unit\'s valid_from; without it, the first event\'s timestamp is used. Optional.' },
       },
       positional: ['text'],
       required: ['text', 'rationale', 'relation'],
@@ -1008,11 +1009,11 @@ export const COMMAND_REGISTRY = [
   {
     name: 'decision-index',
     invoke: 'fgos decision-index',
-    description: '(Re)generate docs/decisions/index.md, a projection of state.decisions\' platform/repo-wide (scope-carrying) records -- never hand-edited, mirrors "fgos docs-index"\'s own generate+drift shape for docs/enduser-docs-index.json (tsk-1lv-2 D4). --check never writes: reports whether the on-disk file matches a fresh regenerate, refusing (validation) on drift.',
+    description: '(Re)generate docs/decisions/index.md, a projection of state.decisions\' platform/repo-wide (scope-carrying) records, and the role-field line ([valid_from:: ...] plus [replaces:: id] or [amends:: id]) under each scoped D-ADR heading in its holder document -- never hand-edited, mirrors "fgos docs-index"\'s own generate+drift shape for docs/enduser-docs-index.json (tsk-1lv-2 D4). The latest event of a D-ADR id decides its relation; ids with no local event are left as committed. A relation target that is no unit id, a missing holder or a missing heading is reported in warnings, never written. --check never writes: refuses (validation) when the index or a holder document would change on a fresh regenerate.',
     parameters: {
       type: 'object',
       properties: {
-        check: { type: 'boolean', description: 'Never write; refuse (validation) if the on-disk index would change on a fresh regenerate.' },
+        check: { type: 'boolean', description: 'Never write; refuse (validation) if the index or a holder document would change on a fresh regenerate.' },
       },
       positional: [],
       required: [],

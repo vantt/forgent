@@ -25,6 +25,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnFgos } from '../helpers/cli-entry.mjs';
 import {
   parseDecisionRelation,
+  parseDecisionValidFrom,
   decisionTextLooksLikeSupersession,
   StoreError,
 } from '../../src/state/store.mjs';
@@ -348,4 +349,13 @@ test('CLI: supersedes with D-local id scopes sweep to host item CONTEXT.md only 
   assert.ok(Array.isArray(data.danglingCitations));
   assert.equal(data.danglingCitations.length, 1);
   assert.match(data.danglingCitations[0], /host-item\/CONTEXT\.md:1/);
+});
+
+test('parseDecisionValidFrom: accepts a calendar date or an ISO timestamp with a zone, refuses anything else', () => {
+  assert.equal(parseDecisionValidFrom('2026-07-14'), '2026-07-14');
+  assert.equal(parseDecisionValidFrom(' 2026-10-18T14:42:56.368Z '), '2026-10-18T14:42:56.368Z');
+  assert.equal(parseDecisionValidFrom('2026-10-18T21:42:56+07:00'), '2026-10-18T21:42:56+07:00');
+  for (const bad of ['', 'yesterday', '2026-02-30', '2026-13-01', '2026-10-18T14:42:56', '14/07/2026']) {
+    assert.throws(() => parseDecisionValidFrom(bad), (err) => err instanceof StoreError && err.category === 'validation', bad);
+  }
 });

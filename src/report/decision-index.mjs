@@ -6,6 +6,9 @@
 //     (enduser-index-generate.mjs's computeEnduserDocsIndex/
 //     generateEnduserDocsIndex) — compute-without-writing is shared by the
 //     write path and the `--check` drift mode below.
+// The same projection writes each scoped decision's role-field line into its
+// holder document (see "role fields" below), so both outputs share one
+// regenerate and one `--check`.
 // Committed rows are unioned with local state until decision events travel
 // across machines. State wins on identity; explicit removal requires editing
 // both the committed index and state, never just regenerating a partial view.
@@ -113,6 +116,132 @@ export function buildDecisionIndexMarkdown(decisions, existingMarkdown = '', { h
   return writeFrontmatter({ type: 'explanation', title: 'Decisions index', generated: true }, lines.join('\n'), 'docs/decisions/index.md');
 }
 
+// ---- role fields in the holder documents ----------------------------------------------------------------------
+//
+// Each scoped `D-ADR####` decision unit carries one field line under its heading, which pkm reads to compute the
+// decisions in force: `[valid_from:: <date>]`, then `[replaces:: <id>]` or `[amends:: <id>]` when the decision ends
+// or changes an earlier unit. The line is a projection of the decision events, never hand-written: the latest event
+// for an id decides its relation, and `valid_from` is the latest `validFrom` an event declares, else the first event's
+// timestamp. Ids with no local event are left untouched, as committed index rows are.
+
+const DECISION_ID = /^D-ADR\d{4}\b/;
+const HEADING_ID = /^#{2,6} +(D-ADR\d{4})\b/;
+const FIELD_LINE = /^\[valid_from:: [^\]]*\](?: \[[a-z_]+:: [^\]]*\])*$/;
+const RELATION_FIELD = { supersedes: 'replaces', amends: 'amends' };
+
+/** A relation target as a unit id pkm can resolve, or null: `ADR####` reads as `D-ADR####`. */
+export function roleFieldTarget(target) {
+  const text = String(target ?? '').trim();
+  const alias = /^ADR(\d{4})$/.exec(text);
+  if (alias) return `D-ADR${alias[1]}`;
+  return /^(?:D-ADR\d{4}|0\d{3}|L\d+|RUL\d+)$/.test(text) ? text : null;
+}
+
+/**
+ * Pure: the field line of every scoped decision id, from its events in log order. Returns
+ * `{ fields: Map<id, { scope, line }>, warnings: string[] }`; a relation whose target is no unit id is left out
+ * of the line and named in `warnings`.
+ */
+export function decisionRoleFields(decisions) {
+  const byId = new Map();
+  for (const d of decisions ?? []) {
+    if (d.kind === 'engine' || typeof d.scope !== 'string' || !d.scope.trim()) continue;
+    const id = DECISION_ID.exec(String(d.text ?? ''))?.[0];
+    if (!id) continue;
+    if (!byId.has(id)) byId.set(id, []);
+    byId.get(id).push(d);
+  }
+  const fields = new Map();
+  const warnings = [];
+  for (const [id, events] of byId) {
+    const latest = events.at(-1);
+    const declared = events.filter((e) => typeof e.validFrom === 'string' && e.validFrom).at(-1);
+    const parts = [`[valid_from:: ${declared?.validFrom ?? events[0].ts}]`];
+    const [kind, ...rest] = String(latest.relation ?? 'none').split(':');
+    const field = RELATION_FIELD[kind];
+    if (field) {
+      const target = roleFieldTarget(rest.join(':'));
+      if (target) parts.push(`[${field}:: ${target}]`);
+      else warnings.push(`${id}: ${latest.relation} names no unit id; no ${field} field is written (record a new decision event naming the unit)`);
+    }
+    fields.set(id, { scope: latest.scope, line: parts.join(' ') });
+  }
+  return { fields, warnings };
+}
+
+/**
+ * Pure: `markdown` with the field line of every id in `lines` (Map id → line) placed under that id's heading,
+ * replacing a field line already there. Returns `{ content, placed: Set<id> }`.
+ */
+export function placeRoleFields(markdown, lines) {
+  const input = String(markdown ?? '').split('\n');
+  const out = [];
+  const placed = new Set();
+  for (let i = 0; i < input.length; i += 1) {
+    out.push(input[i]);
+    const id = HEADING_ID.exec(input[i])?.[1];
+    if (!id || !lines.has(id)) continue;
+    placed.add(id);
+    if (input[i + 1] === '' && FIELD_LINE.test(input[i + 2] ?? '')) i += 2;
+    out.push('', lines.get(id));
+  }
+  return { content: out.join('\n'), placed };
+}
+
+/**
+ * The holder documents with their field lines refreshed, in memory: `{ holders: [{ path, filePath, previous,
+ * next, changed }], warnings }`. A decision whose holder or heading is missing is a warning, never inserted prose.
+ */
+export function computeDecisionRoleFields(repoRoot, decisions, holderFor = narrativeHolderResolver(repoRoot)) {
+  const { fields, warnings } = decisionRoleFields(decisions);
+  const perHolder = new Map();
+  for (const [id, { scope, line }] of fields) {
+    const holder = holderFor(scope);
+    if (!holder) {
+      warnings.push(`${id}: scope "${scope}" has no narrative holder`);
+      continue;
+    }
+    if (!perHolder.has(holder)) perHolder.set(holder, new Map());
+    perHolder.get(holder).set(id, line);
+  }
+  const holders = [];
+  for (const [holder, lines] of [...perHolder].sort(([a], [b]) => (a < b ? -1 : 1))) {
+    const files = holderFiles(repoRoot, holder);
+    if (!files) {
+      warnings.push(`${holder}: holder does not exist; ${lines.size} decision(s) not placed`);
+      continue;
+    }
+    const placedAnywhere = new Set();
+    for (const rel of files) {
+      const filePath = path.join(repoRoot, rel);
+      const previous = fs.readFileSync(filePath, 'utf8');
+      const { content, placed } = placeRoleFields(previous, lines);
+      for (const id of placed) placedAnywhere.add(id);
+      if (placed.size) holders.push({ path: rel, filePath, previous, next: content, changed: content !== previous });
+    }
+    for (const id of lines.keys()) {
+      if (!placedAnywhere.has(id)) warnings.push(`${id}: no "${id}" heading in ${holder}`);
+    }
+  }
+  return { holders, warnings };
+}
+
+/** The Markdown files a holder names, repo-relative and sorted: the file itself, or a directory's `.md` files. */
+function holderFiles(repoRoot, holder) {
+  let stat;
+  try {
+    stat = fs.statSync(path.join(repoRoot, holder));
+  } catch (err) {
+    if (err.code === 'ENOENT') return null;
+    throw err;
+  }
+  if (!stat.isDirectory()) return [holder];
+  return fs.readdirSync(path.join(repoRoot, holder))
+    .filter((name) => name.endsWith('.md'))
+    .sort()
+    .map((name) => path.posix.join(holder.replace(/\/+$/, ''), name));
+}
+
 /**
  * Compute the current decisions index in memory, without writing anything
  * — the read-only half shared by `fgos decision-index`'s write path and
@@ -128,8 +257,15 @@ export function computeDecisionIndex(repoRoot, fgosDir) {
     if (err.code !== 'ENOENT') throw err;
   }
   const view = listWork(fgosDir);
-  const nextContent = buildDecisionIndexMarkdown(view.decisions, previousContent, { holderFor: narrativeHolderResolver(repoRoot) });
-  return { indexPath, nextContent, previousContent, changed: previousContent !== nextContent };
+  const holderFor = narrativeHolderResolver(repoRoot);
+  const nextContent = buildDecisionIndexMarkdown(view.decisions, previousContent, { holderFor });
+  const roleFields = computeDecisionRoleFields(repoRoot, view.decisions, holderFor);
+  return { indexPath, nextContent, previousContent, changed: previousContent !== nextContent, roleFields };
+}
+
+/** The repo-relative paths of the holder documents whose field lines would change. */
+export function staleRoleFieldHolders(roleFields) {
+  return roleFields.holders.filter((h) => h.changed).map((h) => h.path);
 }
 
 /**
@@ -151,7 +287,7 @@ export function computeDecisionIndex(repoRoot, fgosDir) {
  * than relying on a wall that was never built to cover it.
  */
 export function generateDecisionIndex(repoRoot, fgosDir) {
-  const { indexPath, nextContent, previousContent, changed } = computeDecisionIndex(repoRoot, fgosDir);
+  const { indexPath, nextContent, previousContent, changed, roleFields } = computeDecisionIndex(repoRoot, fgosDir);
   const previousHasRows = typeof previousContent === 'string' && /^\|.+\|.*\|\s*$/m.test(previousContent);
   const nextHasRows = /^\|.+\|.*\|\s*$/m.test(nextContent);
   if (changed && previousHasRows && !nextHasRows) {
@@ -164,5 +300,14 @@ export function generateDecisionIndex(repoRoot, fgosDir) {
     fs.mkdirSync(path.dirname(indexPath), { recursive: true });
     fs.writeFileSync(indexPath, nextContent, 'utf8');
   }
-  return { path: path.relative(repoRoot, indexPath).split(path.sep).join('/'), changed, content: nextContent };
+  for (const holder of roleFields.holders) {
+    if (holder.changed) fs.writeFileSync(holder.filePath, holder.next, 'utf8');
+  }
+  return {
+    path: path.relative(repoRoot, indexPath).split(path.sep).join('/'),
+    changed,
+    content: nextContent,
+    holders: staleRoleFieldHolders(roleFields),
+    warnings: roleFields.warnings,
+  };
 }

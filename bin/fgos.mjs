@@ -29,7 +29,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore, handoffCaptureStore } from '../src/state/store.mjs';
+import { addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, parseDecisionValidFrom, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore, handoffCaptureStore } from '../src/state/store.mjs';
 import { StoreError, categoryOf, withFaultClass } from '../src/util/store-error.mjs';
 import { EXIT_CODES } from '../src/cli/exit-codes.mjs';
 import { exitCodeOf } from '../src/cli/verb-exit.mjs';
@@ -37,7 +37,7 @@ import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
 import { knowledgeFindings } from '../src/report/knowledge-lints.mjs';
-import { computeDecisionIndex, generateDecisionIndex } from '../src/report/decision-index.mjs';
+import { computeDecisionIndex, generateDecisionIndex, staleRoleFieldHolders } from '../src/report/decision-index.mjs';
 import { renderLockedDecisionsTable } from '../src/report/context-render.mjs';
 import { runFourDoorChecks } from '../src/state/retrospective-doors.mjs';
 import { findAuthoritativeMatch, findDuplicateAuthoritativeClaims } from '../src/report/authoritative-match.mjs';
@@ -1779,8 +1779,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           'decision text reads like a supersession ("supersedes/replaces/overrides/no longer applies/instead of the previous") but neither --relation supersedes:<id> nor amends:<id> was declared -- declare the relation explicitly (or rephrase the text if it is not actually a supersession).',
         );
       }
-      const { event } = addDecision(dir, { text, rationale, alternatives, source, id, scope, kind, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}` });
-      const result = { seq: event.seq, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}` };
+      // An act that predates its record (a decision migrated from an older corpus) states when it took effect;
+      // the role-field projection writes it as the unit's valid_from instead of the event timestamp.
+      const validFrom = flags['valid-from'] === undefined ? undefined : parseDecisionValidFrom(flags['valid-from']);
+      const { event } = addDecision(dir, { text, rationale, alternatives, source, id, scope, kind, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}`, ...(validFrom ? { validFrom } : {}) });
+      const result = { seq: event.seq, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}`, ...(validFrom ? { validFrom } : {}) };
       // Write-time citation sweep (D2 "sweep tươi tại write-time, không
       // cache"): only `supersedes` has a real dangling-citation shape (a
       // line citing the OLD id without acknowledging the new one) -- a
@@ -1838,17 +1841,18 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     case 'decision-index': {
       const repoRoot = path.dirname(dir);
       if (flags.check) {
-        const { indexPath, changed } = computeDecisionIndex(repoRoot, dir);
-        if (changed) {
+        const { indexPath, changed, roleFields } = computeDecisionIndex(repoRoot, dir);
+        const stale = [...(changed ? [path.relative(repoRoot, indexPath)] : []), ...staleRoleFieldHolders(roleFields)];
+        if (stale.length) {
           throw new StoreError(
             'validation',
-            `${path.relative(repoRoot, indexPath)} is stale (regenerating would change its content) -- run "fgos decision-index" (no --check) to refresh it.`,
+            `${stale.join(', ')} ${stale.length === 1 ? 'is' : 'are'} stale (regenerating would change the content) -- run "fgos decision-index" (no --check) to refresh.`,
           );
         }
-        return { path: path.relative(repoRoot, indexPath).split(path.sep).join('/'), changed: false };
+        return { path: path.relative(repoRoot, indexPath).split(path.sep).join('/'), changed: false, holders: [], warnings: roleFields.warnings };
       }
-      const { path: indexRelPath, changed } = generateDecisionIndex(repoRoot, dir);
-      return { path: indexRelPath, changed };
+      const { path: indexRelPath, changed, holders, warnings } = generateDecisionIndex(repoRoot, dir);
+      return { path: indexRelPath, changed, holders, warnings };
     }
 
     // tsk-1lv-3 D3: CONTEXT.md's "## Locked decisions" table becomes a
