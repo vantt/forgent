@@ -20,6 +20,8 @@
  * `session restore role`, `session bind session`) are not called; their row says
  * 'not called: acts on the caller' and cites the head's own request-log line from its last
  * real use, or says "no use in the window".
+ * 'supervisor wake' is unsafe (takes no args, always records a wake, may mark events handled
+ * and may start a supervisor head); it is not called and listed with that reason.
  *
  * It also prints TMPDIR and proves it writable, and records the head's `stop-trace.jsonl`
  * last line (fraction present or null) for the rotation proof.
@@ -28,7 +30,7 @@
  *
  * Options:
  *   --dry-run       print the planned calls and contract verbs without executing them
- *   --role <role>   override caller role (default: FGOS_HEAD_ROLE or 'head:supervisor-probe')
+ *   --role <role>   override caller role (default: FGOS_HEAD_ROLE; refusing to guess when missing)
  *   --persona <p>   override caller persona (default: FGOS_HEAD_PERSONA)
  *   --name <n>      override caller name (default: FGOS_HEAD_NAME)
  *   --plan-dir <d>  plan directory for lead role (default: '261122-0118-heads-stable-and-able')
@@ -39,7 +41,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { grantOf } from '../../src/session-host/head-grants.mjs';
+import { grantOf, HEAD_REQUEST_SOCKET_ENV } from '../../src/session-host/head-grants.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT), '..', '..');
@@ -47,13 +49,79 @@ const CONTRACT_PATH = path.join(REPO_ROOT, 'packages', 'run-supervisor', 'contra
 
 const FGOS_BIN = process.env.FGOS_BIN || 'fgos';
 
-/** Verbs that act on the caller itself: not called; their row cites the head's request log. */
+/**
+ * Verbs not called by the probe:
+ * - Caller-acting verbs act on the caller itself; their row cites the head's request log.
+ * - 'supervisor wake' is unsafe: it takes no args, always records a wake, may mark events handled and may start a supervisor head.
+ */
+export const NOT_CALLED_VERBS = new Map([
+  ['supervisor done', 'acts on the caller'],
+  ['session rotate', 'acts on the caller'],
+  ['session answered', 'acts on the caller'],
+  ['session restore role', 'acts on the caller'],
+  ['session bind session', 'acts on the caller'],
+  ['supervisor wake', 'unsafe: takes no args, always records a wake, may mark events handled and may start a supervisor head'],
+]);
+
 export const SELF_ACTING_VERBS = new Set([
   'supervisor done',
   'session rotate',
   'session answered',
   'session restore role',
   'session bind session',
+  'supervisor wake',
+]);
+
+/**
+ * Per-verb table of expected domain refusal codes that prove the route ran.
+ */
+export const EXPECTED_DOMAIN_CODES = {
+  'session start': new Set(['persona-not-found', 'bad-persona']),
+  'questions list': new Set(['done']),
+  'questions ask': new Set(['parts-incomplete', 'ref-invalid', 'question-unclear']),
+  'questions ack': new Set(['question-unknown', 'not-asker', 'question-not-open']),
+  'questions cancel': new Set(['question-unknown', 'not-asker', 'question-not-open']),
+  'questions answer': new Set(['question-unknown', 'answer-not-owner', 'question-already-answered', 'question-not-open']),
+  'session write': new Set(['path-not-granted', 'path-outside-grant', 'path-invalid', 'path-symlink', 'not-a-file']),
+  'land': new Set(['path-outside-grant', 'write-outside-footprint', 'footprint-change-refused', 'land-branch-lead-only']),
+  'run': new Set(['write-outside-footprint', 'writes-need-linked-worktree', 'role-mismatch', 'run-one-unit', 'run-ceiling-exceeded']),
+  'request result': new Set(['ticket-unknown']),
+  'worktree create': new Set(['role-mismatch', 'worktree-create-failed']),
+  'session stop': new Set(['stop-target-not-head', 'role-mismatch', 'bad-persona', 'bad-name', 'stop-not-ended']),
+  'supervisor handled': new Set(['event-unknown', 'event-not-found', 'event-store-no-repository']),
+  'supervisor queue': new Set(['done']),
+  'supervisor plans': new Set(['done']),
+  'slots': new Set(['done']),
+  'supervisor raise': new Set(['bad-args', 'bad-event', 'kind-not-allowed']),
+  'watcher tune': new Set(['bad-args', 'watcher-key-forbidden']),
+  'session read': new Set(['session-not-found', 'target-not-found', 'session-unknown', 'target-unknown', 'ambiguous', 'session-has-no-pane', 'terminal-refused']),
+  'session type': new Set(['session-not-found', 'target-not-found', 'session-unknown', 'target-unknown', 'ambiguous', 'target-not-stuck', 'session-has-no-pane', 'terminal-refused']),
+  'metrics record': new Set(['kind-not-allowed']),
+  'metrics prune': new Set(['done']),
+  'friction record': new Set(['friction-invalid-input', 'friction-invalid-disposition', 'invalid-disposition', 'bad-disposition']),
+  'config patch': new Set(['patch-project-only', 'config-comment-reason-required', 'config-unknown-key', 'bad-args', 'config-patch-failed', 'not-a-file', 'file-not-found']),
+};
+
+export const TRANSPORT_CODES = new Set([
+  'no-request-socket',
+  'request-socket-unavailable',
+  'request-socket-foreign',
+  'reply-timeout',
+  'bad-reply',
+  'peer-uid',
+  'busy',
+  'bad-frame',
+  'request-too-large',
+  'reply-too-large',
+  'verb-timeout',
+  'spawn-failed',
+]);
+
+export const GENERIC_FAILURE_CODES = new Set([
+  'role-not-held',
+  'role-pending-rotation',
+  'host-version-mismatch',
+  'verb-failed',
 ]);
 
 /** Returns CLI arguments and optional stdin for each callable verb, chosen so the call cannot change state. */
@@ -126,9 +194,8 @@ export function planForVerb(verb) {
         args: ['slots', '--json'],
       };
     case 'supervisor wake':
-      return {
-        args: ['supervisor', 'wake', '--json'],
-      };
+      // Not called (unsafe)
+      return null;
     case 'supervisor raise':
       return {
         args: ['supervisor', 'raise', '--kind', 'invalid-kind', '--ref', 'probe', '--reason', 'probe', '--json'],
@@ -155,8 +222,9 @@ export function planForVerb(verb) {
         args: ['metrics', 'prune', '--json'],
       };
     case 'friction record':
+      // Only the bad disposition stops the call.
       return {
-        args: ['friction', 'record', '--subject', 'invalid-no-colon', '--layer', 'runner', '--error-class', 'probe', '--disposition', 'invalid-disp', '--producer', 'probe', '--json'],
+        args: ['friction', 'record', '--subject', 'session:probe', '--layer', 'runner', '--error-class', 'probe', '--disposition', 'invalid-disp', '--producer', 'probe', '--json'],
       };
     case 'config patch':
       return {
@@ -210,7 +278,12 @@ function readSupervisorLogLine(repoRoot, persona, name, verb) {
       if (fs.existsSync(assignmentsDir)) {
         const matching = fs.readdirSync(assignmentsDir).filter((d) => d.includes(`head-${persona}-${name}`));
         if (matching.length > 0) {
-          matching.sort();
+          // Sort run generations numerically, not as text
+          matching.sort((a, b) => {
+            const genA = parseInt((/-(\d+)$/.exec(a) || [])[1] ?? '0', 10);
+            const genB = parseInt((/-(\d+)$/.exec(b) || [])[1] ?? '0', 10);
+            return genA - genB;
+          });
           runDir = path.join(assignmentsDir, matching[matching.length - 1], 'runs', '01');
         }
       }
@@ -230,8 +303,8 @@ function readSupervisorLogLine(repoRoot, persona, name, verb) {
   }
 }
 
-/** Classifies the CLI response according to phase 11 step 3. */
-function classifyOutcome(verb, isGranted, res) {
+/** Classifies the CLI response according to phase 11 step 3 and review findings. */
+export function classifyOutcome(verb, isGranted, res) {
   if (res.error) {
     return {
       observed: 'failed',
@@ -250,15 +323,46 @@ function classifyOutcome(verb, isGranted, res) {
     try { reply = JSON.parse(rawErr); } catch {}
   }
 
-  const code = reply?.code || reply?.error?.code || null;
-  const status = res.status;
+  let code = reply?.code || reply?.error?.code || null;
+  let detail = reply?.detail || reply?.message || reply?.error?.message || null;
 
-  if (code === 'verb-not-granted') {
+  // Wrapped use-case code from supervisor REPLY (code: "verb-failed", detail: "<domain-code>")
+  if (code === 'verb-failed' && typeof reply?.detail === 'string' && /^[a-z][a-z0-9-]*$/.test(reply.detail)) {
+    code = reply.detail;
+  }
+
+  // Parse code from plain stderr (Node-door verbs: session start, session write print plain stderr)
+  if (!code || code === 'head-refused' || code === 'precondition' || code === 'validation') {
+    const lines = rawErr.split('\n').concat(rawOut.split('\n'));
+    for (const line of lines) {
+      const trimmed = line.trim();
+      const stripped = trimmed.startsWith('fgos: ') ? trimmed.slice(6).trim() : trimmed;
+      if (stripped.startsWith('invocation fault recorded')) continue;
+      const bracketed = /\[([a-z][a-z0-9-]*)\]$/.exec(stripped);
+      const prefixed = /^([a-z][a-z0-9-]*):(?:\s*(.*))?$/.exec(stripped);
+      if (bracketed) {
+        code = bracketed[1];
+        detail = detail || bracketed[0];
+        break;
+      } else if (prefixed) {
+        code = prefixed[1];
+        detail = detail || (prefixed[2] ? prefixed[2].trim() : stripped);
+        break;
+      }
+    }
+  }
+
+  // 1. Refused as expected: verb-not-granted when the grant lacks the verb
+  const isVerbNotGranted = code === 'verb-not-granted' ||
+    rawOut.includes('verb-not-granted') ||
+    rawErr.includes('verb-not-granted');
+
+  if (isVerbNotGranted) {
     if (!isGranted) {
       return {
         observed: 'refused as expected',
         code: 'verb-not-granted',
-        detail: reply?.message || reply?.detail || 'verb not in envelope.session.verbs',
+        detail: detail || 'verb not in envelope.session.verbs',
         reply,
       };
     }
@@ -270,63 +374,66 @@ function classifyOutcome(verb, isGranted, res) {
     };
   }
 
-  const transportCodes = new Set([
-    'no-request-socket',
-    'request-socket-unavailable',
-    'request-socket-foreign',
-    'reply-timeout',
-    'bad-reply',
-    'peer-uid',
-    'busy',
-  ]);
-  if (code && transportCodes.has(code)) {
+  // 2. Transport failures: always failed (including no-request-socket)
+  if (code && TRANSPORT_CODES.has(code)) {
     return {
       observed: 'failed',
       code,
-      detail: reply?.message || reply?.detail || `transport refusal: ${code}`,
+      detail: detail || `transport failure: ${code}`,
       reply,
     };
   }
 
-  if (status === 0) {
+  // 3. Generic failure codes: role-not-held, role-pending-rotation, host-version-mismatch, verb-failed
+  if (code && GENERIC_FAILURE_CODES.has(code)) {
+    return {
+      observed: 'failed',
+      code,
+      detail: detail || `supervisory failure: ${code}`,
+      reply,
+    };
+  }
+
+  // 4. Successful route reply (done)
+  const expectedCodes = EXPECTED_DOMAIN_CODES[verb] || new Set();
+  const isDoneReply = res.status === 0 && (reply?.result === 'done' || code === 'done' || expectedCodes.has('done'));
+  if (isDoneReply) {
     return {
       observed: 'served',
       code: 'done',
-      detail: 'route completed successfully',
+      detail: detail || 'route completed successfully',
       reply,
     };
   }
 
-  if (code) {
+  // 5. Domain refusal that proves the route ran
+  if (code && expectedCodes.has(code)) {
+    if (verb === 'friction record') {
+      const mentionsDisp = (detail || '').toLowerCase().includes('disposition') ||
+        rawErr.toLowerCase().includes('disposition') ||
+        rawOut.toLowerCase().includes('disposition');
+      if (!mentionsDisp && code !== 'friction-invalid-disposition' && code !== 'invalid-disposition' && code !== 'bad-disposition') {
+        return {
+          observed: 'failed',
+          code,
+          detail: detail || `friction refusal was not disposition-related: ${code}`,
+          reply,
+        };
+      }
+    }
     return {
       observed: 'served',
       code,
-      detail: reply?.message || reply?.detail || `domain refusal: ${code}`,
+      detail: detail || `domain refusal: ${code}`,
       reply,
     };
   }
 
-  if (rawOut.includes('verb-not-granted') || rawErr.includes('verb-not-granted')) {
-    if (!isGranted) {
-      return {
-        observed: 'refused as expected',
-        code: 'verb-not-granted',
-        detail: rawErr || rawOut,
-        reply,
-      };
-    }
-    return {
-      observed: 'failed',
-      code: 'verb-not-granted',
-      detail: 'unexpected verb-not-granted',
-      reply,
-    };
-  }
-
+  // 6. Everything else is failed (local client bad-args, unexpected status/code, etc.)
   return {
-    observed: 'served',
-    code: `exit-${status}`,
-    detail: rawErr || rawOut,
+    observed: 'failed',
+    code: code || `exit-${res.status}`,
+    detail: detail || rawErr || rawOut || `unexpected outcome (exit ${res.status})`,
     reply,
   };
 }
@@ -334,6 +441,15 @@ function classifyOutcome(verb, isGranted, res) {
 export function main() {
   const argv = process.argv.slice(2);
   const dryRun = argv.includes('--dry-run');
+
+  // Refuse to run unless FGOS_HEAD_REQUEST_SOCKET is set, except with --dry-run
+  if (!dryRun) {
+    const socket = process.env[HEAD_REQUEST_SOCKET_ENV] || process.env.FGOS_HEAD_REQUEST_SOCKET;
+    if (typeof socket !== 'string' || socket.trim() === '') {
+      process.stderr.write(`head-grant-probe: ${HEAD_REQUEST_SOCKET_ENV} is not set; refusing to run live probe outside a head session (use --dry-run to inspect planned calls)\n`);
+      process.exit(1);
+    }
+  }
 
   const roleArg = (() => {
     const at = argv.indexOf('--role');
@@ -352,25 +468,34 @@ export function main() {
     return at >= 0 && argv[at + 1] ? argv[at + 1] : '261122-0118-heads-stable-and-able';
   })();
 
-  const role = roleArg || process.env.FGOS_HEAD_ROLE || 'head:supervisor-probe';
-  const persona = personaArg || process.env.FGOS_HEAD_PERSONA || (() => {
+  const role = roleArg || process.env.FGOS_HEAD_ROLE || null;
+  if (!role && !dryRun) {
+    process.stderr.write('head-grant-probe: FGOS_HEAD_ROLE environment variable is missing and no --role was passed; refusing to guess caller role\n');
+    process.exit(1);
+  }
+
+  const persona = personaArg || process.env.FGOS_HEAD_PERSONA || (role ? (() => {
     const match = /^head:([a-z][a-z0-9-]*)$/.exec(role);
     if (!match) return null;
     const hyphen = match[1].indexOf('-');
     return hyphen > 0 ? match[1].slice(0, hyphen) : null;
-  })();
-  const name = nameArg || process.env.FGOS_HEAD_NAME || (() => {
+  })() : null);
+
+  const name = nameArg || process.env.FGOS_HEAD_NAME || (role ? (() => {
     const match = /^head:([a-z][a-z0-9-]*)$/.exec(role);
     if (!match) return 'probe';
     const hyphen = match[1].indexOf('-');
     return hyphen > 0 ? match[1].slice(hyphen + 1) : 'probe';
-  })();
+  })() : null);
 
-  let grant;
-  try {
-    grant = grantOf(role, persona, { planDir: planDirArg });
-  } catch {
-    grant = { writes: [], verbs: [], mailbox: false, peers: false };
+  let grant = null;
+  if (role) {
+    try {
+      grant = grantOf(role, persona, { planDir: planDirArg });
+    } catch (err) {
+      process.stderr.write(`head-grant-probe: grantOf failed for role ${JSON.stringify(role)}: ${err.message} [${err.code || 'grant-error'}]\n`);
+      process.exit(1);
+    }
   }
 
   const contract = JSON.parse(fs.readFileSync(CONTRACT_PATH, 'utf8'));
@@ -399,14 +524,15 @@ export function main() {
     const isGranted = Array.isArray(grant?.verbs) && grant.verbs.includes(verb);
     const expected = isGranted ? 'served' : 'refused as expected';
 
-    if (SELF_ACTING_VERBS.has(verb)) {
+    if (NOT_CALLED_VERBS.has(verb)) {
+      const reason = NOT_CALLED_VERBS.get(verb);
       const logLine = readSupervisorLogLine(REPO_ROOT, persona, name, verb);
       results.push({
         verb,
         expected,
-        observed: 'not called: acts on the caller',
-        action: 'not called: acts on the caller',
-        reason: 'acts on the caller',
+        observed: `not called: ${reason}`,
+        action: `not called: ${reason}`,
+        reason,
         evidence: logLine,
         logLine,
       });
