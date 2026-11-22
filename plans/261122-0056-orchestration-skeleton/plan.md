@@ -7,7 +7,6 @@ blockedBy:
   - 261118-1341-s6a-execution-tier-rust
   - 261120-0625-work-data-model
   - 261121-2109-component-authority
-  - 261122-0118-heads-stable-and-able
 footprint:
   - plans/261122-0056-orchestration-skeleton/**
   - packages/supervision/contracts/scheduling-record.v1.json
@@ -276,6 +275,12 @@ overlap. The plan turns `ready` once all three are done; reordering them is a pr
   `docs/platform/workflow/spec.md` and `docs/platform/runner/spec.md` with component-authority and many host files with
   the doors plan, so it still waits for component-authority. `261122-1950-owner-communication-standard` is low
   priority and blocks nothing, so it left `blockedBy`; admission alone keeps their shared files apart.
+- Owner orders 2026-11-22 23:16 to 00:06 (via the secretary, supervisor brief): heads-stable blocks nobody, so
+  `261122-0118-heads-stable-and-able` left `blockedBy`. Component-authority's only remaining work is phase 5 (the
+  generated holder table in `docs/platform/governance.md` and the other ownership views). Its file list shares
+  `docs/platform/workflow/spec.md` with this plan's footprint (phase 15 writes it), so the footprints are not
+  disjoint and `261121-2109-component-authority` stays in `blockedBy`. The plan stays `draft` until component-authority
+  is done. `261121-2110-component-authority-doors` stays behind component-authority.
 
 ## Risks and rollback
 
