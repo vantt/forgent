@@ -24,6 +24,13 @@ back to the default). The limit is decided in plan.md: `watcher.conversationSlee
    limit. `Unknown` activity is never stopped.
 3. When its record becomes actionable again, the existing start path starts a new session that receives the handoff
    per `routing-handoff.md`; no pane or lane is held while asleep.
+4. Wake the secretary on new owner input (owner choice C of 2026-11-22, handed off from plan
+   `261122-0118-heads-stable-and-able` phase 10, supervision event `cda876817cff4f21`): a new owner question in the
+   question store, or new mail to the secretary, makes her record actionable, so an idle or sleeping secretary is
+   woken (or a successor started) within one watcher interval. That plan ships only a 15-minute timer inside the
+   secretary session, kept as the slow fallback; it builds no wake path, so this step is the only one. If the question
+   store or mailbox source is not yet a keeper source after phase 5, widen this phase's footprint in the plan rather
+   than adding a path beside the keeper.
 
 ## Verify
 
