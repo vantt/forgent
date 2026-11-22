@@ -1277,9 +1277,16 @@ mod tests {
             }
         );
         assert_eq!(
-            config(&["config", "patch", "p.yaml", "--project-only", "--reason", "r"])
-                .unwrap()
-                .verb,
+            config(&[
+                "config",
+                "patch",
+                "p.yaml",
+                "--project-only",
+                "--reason",
+                "r"
+            ])
+            .unwrap()
+            .verb,
             Verb::Patch {
                 file: "p.yaml".into(),
                 reason: "r".into(),
