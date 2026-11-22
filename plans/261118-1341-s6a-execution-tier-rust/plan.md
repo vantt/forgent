@@ -318,13 +318,11 @@ footprint:
   - test/workflow/**
   - docs/architecture-manifest.json
   - docs/platform/runner/**
-  - docs/platform/run-supervisor/spec.md
   - docs/platform/holder-lock/spec.md
   - docs/platform/terminal-control/spec.md
   - docs/platform/seat-binding/spec.md
   - docs/platform/component-boundary.md
   - docs/reading-map.md
-  - CHANGELOG.md
 base: b5b23753415a5cfd04822ab47b55d11b12e25a2e
 source:
   - docs/discussions/rust-verb-migration-s6a/DISCUSSION.md
@@ -731,3 +729,4 @@ consumes that decision and keeps `src/seat-binding/client.mjs`.
 - 2026-11-21 lead:S6A: owner answer (via Miu): option (a) — a Git-lane plan builds Windows custody for the Git door with native Windows CI proof first; S6A then deletes the Node execution core whole. No Windows feature dropped, no second win32 path kept. Phases 20 (rest) and 21 wait for that plan; 22 after them.
 - 2026-11-22 lead:S6A: footprint narrowed for plan 261122-0118 (heads stable and able, owner rank 1; supervisor 2026-11-22): dropped apps/fgos/src/routing.rs, src/session-host/head-request.mjs, src/session-rotation/rotate.mjs; packages/run-supervisor/** -> packages/run-supervisor/rust/src/controller/**; apps/fgos/src/wiring/doctor/** -> wiring/doctor/mod.rs. Kept doctor-registry.v1.json (phase 20 drops the dry-bind owner lines, phase 22 the bridge:S6a owners). Phase 20 leaves head-request/rotate imports alone, so the Node modules they import (unit-summary, unit-run-record and rotate's import) stay until 0118 lands; phases 21/22 re-add and rebase before editing any dropped path.
 - 2026-11-22 lead:S6A: apps/fgos/src/wiring/doctor/mod.rs dropped from the footprint (its phase 20 hunk landed in ca4a90eec) for plan 261122-0118; doctor-registry.v1.json stays until s6/p20-3b lands (deleting dry-bind.mjs moves its two judge rows), then drops too; phase 22 re-adds and rebases for the bridge:S6a owner cleanup.
+- 2026-11-22 lead:S6A: CHANGELOG.md and docs/platform/run-supervisor/spec.md dropped from the footprint for plan 261122-0118 (s6/p20-3b edits neither); phases 21/22 re-add and rebase before writing their lines.
