@@ -58,8 +58,10 @@ surfaces `AGENTS.md`, `.fgos/instructions/effective/repo.json`, `packages/git/co
    line, the approved-frame sentence, and the pointer to the fragment.
 3. In `core/skills/_shared/friction-capture.md`, add to "Record when": the owner's reaction shows a message fell
    short (point to the standard's signal table), and your own reflection shows it; add to "Record how" the layer
-   `owner-communication` with a fault signature as `--error-class`, the owner's words and your message in
-   `--detail`, and the OC-D14 fallback when the door refuses.
+   `owner-communication` with a fault signature as `--error-class`, a short redacted paraphrase of the owner's
+   reaction and of your message in `--detail` (never the owner's words verbatim, no names, ids of people or
+   private details: friction records sit in a git-tracked path that reaches GitHub), and the OC-D14 fallback
+   when the door refuses.
 4. Replace the "At most 10 lines" sentence in `fgos-lead`, `fgos-secretary` and `fgos-supervisor` with a pointer to
    the standard's status-report shape; keep each skill's own sentence about where the full report file goes.
 5. Move every other caller from `_shared/decision-question.md` or `instructions/decision-question.md` to the new
