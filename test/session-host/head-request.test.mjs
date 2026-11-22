@@ -6,6 +6,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
@@ -26,21 +27,31 @@ const scratch = (t) => {
 /** Serves one connection: reads one frame, answers with `reply(request)` as one frame. Returns the frames it saw. */
 function serveOnce(t, socketPath, reply) {
   const seen = [];
+  let handlerError;
   const server = net.createServer((conn) => {
     let received = Buffer.alloc(0);
-    conn.on('data', (chunk) => {
+    conn.on('data', async (chunk) => {
       received = Buffer.concat([received, chunk]);
       if (received.length < 4 || received.length < 4 + received.readUInt32BE(0)) return;
-      const request = JSON.parse(received.subarray(4, 4 + received.readUInt32BE(0)).toString('utf8'));
-      seen.push(request);
-      const body = Buffer.from(JSON.stringify(reply(request)));
-      const head = Buffer.alloc(4);
-      head.writeUInt32BE(body.length);
-      conn.end(Buffer.concat([head, body]));
+      try {
+        const request = JSON.parse(received.subarray(4, 4 + received.readUInt32BE(0)).toString('utf8'));
+        seen.push(request);
+        const answer = await reply(request);
+        const body = Buffer.from(JSON.stringify(answer));
+        const head = Buffer.alloc(4);
+        head.writeUInt32BE(body.length);
+        conn.end(Buffer.concat([head, body]));
+      } catch (err) {
+        handlerError = err;
+        conn.destroy();
+      }
     });
   });
   server.listen(socketPath);
-  t.after(() => server.close());
+  t.after(() => {
+    server.close();
+    assert.ifError(handlerError);
+  });
   return seen;
 }
 
@@ -858,4 +869,108 @@ test('a secretary run that writes needs a linked worktree', async (t) => {
   assert.equal((await ask('run', { prompt: 'x', writes: ['../a.md'], worktree }, 'v3', ports)).line.code, 'bad-args');
   assert.equal((await ask('run', { prompt: 'x', writes: ['docs/a.md'], worktree }, 'v4', ports)).exit, 0);
   assert.deepEqual(ticketArgv(ticketFile('v4')).slice(-5), ['--writes', 'docs/a.md', '--worktree', worktree, '--json']);
+});
+
+test('friction record runs the host verb with its flags and refuses bad args', async (t) => {
+  const { ask } = headCase(t, { persona: 'planner', name: 'x', writes: [] });
+  const calls = [];
+  const done = await ask('friction record', {
+    subject: 'work:tsk-1',
+    kind: 'bug',
+    layer: 'verification',
+    'error-class': 'verify-miss',
+    disposition: 'advisory',
+    producer: 'test',
+    attempts: 2,
+    'doc-type': 'reference',
+    ref: ['work:tsk-0'],
+    detail: 'something went wrong',
+  }, 'f1', { hostCall: hostEcho(calls) });
+  assert.equal(done.exit, 0);
+  assert.deepEqual(calls[0].argv, [
+    'friction', 'record',
+    '--subject', 'work:tsk-1',
+    '--kind', 'bug',
+    '--layer', 'verification',
+    '--error-class', 'verify-miss',
+    '--disposition', 'advisory',
+    '--producer', 'test',
+    '--doc-type', 'reference',
+    '--attempts', '2',
+    '--ref', 'work:tsk-0',
+    '--detail', 'something went wrong',
+    '--json',
+  ]);
+
+  for (const bad of [
+    { subject: '--bad' },
+    { subject: 'invalid ref with spaces' },
+    { layer: '-x' },
+    { 'error-class': '--bad' },
+    { errorClass: 'verify-miss' },
+    { docType: 'reference' },
+    { attempts: -1 },
+    { attempts: 'abc' },
+    { 'detail-stdin': true },
+    { 'detail-stdin': 'yes' },
+    { ref: ['bad ref with spaces!'] },
+    { detail: 'x'.repeat(4097) },
+    { unknown: 1 },
+  ]) {
+    assert.equal((await ask('friction record', bad, 'f2', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
+  }
+});
+
+test('a confined head records a friction via --detail-stdin that reads stdin and friction list shows', async (t) => {
+  const dir = scratch(t);
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  const socketPath = path.join(dir, 'req.sock');
+  const bin = process.env.FGOS_HOST_BIN;
+  const runDir = scratch(t);
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({
+    v: 3,
+    cwd: dir,
+    hostBin: bin,
+    session: {
+      role: 'head:planner-x',
+      persona: 'planner',
+      name: 'x',
+      verbs: ['friction record'],
+      writes: [],
+      requestSocketPath: socketPath,
+    },
+  }));
+
+  const seen = serveOnce(t, socketPath, async (request) => {
+    const res = await runHeadRequest({ runDir, request });
+    return { type: 'REPLY', id: request.id, result: res.line.result, data: res.line.data };
+  });
+  await listening();
+
+  const child = spawn(bin, [
+    'friction', 'record',
+    '--subject', 'work:tsk-confined-stdin',
+    '--layer', 'verification',
+    '--error-class', 'verify-miss',
+    '--disposition', 'advisory',
+    '--producer', 'test',
+    '--detail-stdin',
+    '--json',
+  ], {
+    cwd: dir,
+    env: { ...process.env, FGOS_CONFINED: '1', [HEAD_REQUEST_SOCKET_ENV]: socketPath },
+  });
+  const detail = 'confined test friction from stdin';
+  child.stdin.write(detail);
+  child.stdin.end();
+  const exitCode = await new Promise((resolve) => child.on('close', resolve));
+  assert.equal(exitCode, 0);
+  assert.equal(seen.length, 1);
+  assert.equal(seen[0].verb, 'friction record');
+  assert.equal(seen[0].args.detail, detail);
+
+  const list = spawnSync(bin, ['friction', 'list', '--json'], { cwd: dir, encoding: 'utf8' });
+  assert.equal(list.status, 0);
+  const items = JSON.parse(list.stdout).data;
+  assert.ok(items.some((item) => item.subject?.id === 'tsk-confined-stdin' && item.detail === 'confined test friction from stdin'));
 });

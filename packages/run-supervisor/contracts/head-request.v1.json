@@ -222,7 +222,7 @@
         "reason": "string, required, one line of at most 500 characters",
         "next": "string, optional, one line of at most 200 characters: the command the supervisor runs next"
       },
-      "does": "as supervisor handled, running `fgos supervisor raise --kind <kind> --ref <ref> --reason <reason> [--next <next>] --json`: puts one coordination event on the supervision queue through the queue's one raise path (the id is derived from kind, ref and the instant) and records a `fgos.coordination.act` record. The supervisor closes it with `supervisor handled`",
+      "does": "as supervisor handled, running `fgos supervisor raise --kind <kind> --ref <ref> --reason <reason> [--next <next>] --json`: puts one coordination event on the supervision queue through the queue's one raise path (the id is derived from kind, ref and the instant) and records a `fgos.coordination.act` record. The supervisor closes it with `supervisor handled`. Granted to the secretary, supervisor, and lead (LEAD_VERBS)",
       "data": "the host verb's JSON data ({id, raised: true|false})",
       "identity": "held",
       "rule": "refusals (verb-failed detail): bad-args, bad-event (an unknown kind or an empty ref) and the host verb's own code"
@@ -277,6 +277,25 @@
       "data": "the host verb's JSON data ({applied, scanned, prunableFound, pruned, ids})",
       "identity": "held",
       "rule": "refusals (verb-failed detail): bad-args and the host verb's own code"
+    },
+    "friction record": {
+      "args": {
+        "subject": "string, required: kind:id (e.g. plan:<dir>, session:<handle>, work:<id>)",
+        "kind": "string, optional: bug, instability, missing, awkward or doc",
+        "ref": "string or array of strings, optional: kind:id references",
+        "layer": "string, required: platform component layer (e.g. runner, skill, config, ...)",
+        "error-class": "string, required: a short lowercase-hyphenated signature naming the obstacle",
+        "disposition": "string, required: advisory, blocked, parked or halted",
+        "producer": "string, required: who observed it (e.g. head role, role, agent)",
+        "attempts": "integer, optional: whole number of attempts",
+        "doc-type": "string, optional: tutorial, how-to, reference, explanation",
+        "detail": "string, optional",
+        "detail-stdin": "boolean, optional: handled on CLI by reading stdin into detail; refused over socket (pass detail)"
+      },
+      "does": "the route child runs `fgos friction record ... --json` (envelope hostBin) outside the sandbox through hostCall: records one friction against a subject as a v2 record. Granted to every head (HEAD_VERBS); a confined head's `fgos friction record` sends its flags through this verb. Fail-open: returns its code and exits non-zero if refused or failed",
+      "data": "the host verb's JSON data ({ok, outcome, id, ...})",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): bad-args, and the host verb's own code (e.g. friction-invalid-input)"
     }
   },
   "questionsRoute": {
