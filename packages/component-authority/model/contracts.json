@@ -6,9 +6,14 @@
       "host-runtime/exit-codes.v1",
       "fgos.v1"
     ],
-    "meaning": "người/agent ↔ CLI: fgos.v1 envelope on every verb, exit-code taxonomy, stdout=data/stderr=diagnostics, machine-readable --help --json verb catalog.",
+    "meaning": "người/agent ↔ CLI: `fgos.v1` envelope `{contract, generated_at, data_hash, data}` trên MỌI verb + exit-code taxonomy đóng (nguồn duy nhất: `packages/host-runtime/contracts/exit-codes.v1.json` (Node `EXIT_CODES`, Rust host `packages/host-runtime/rust/src/exit_codes.rs`) + `src/runner/loop.mjs`'s `EXIT_BUSY`) + stdout=data/stderr=chẩn-đoán + sổ verb máy-đọc `--help --json` (`{schema_version, commands[]}`, `schema_version` hiện `'2.0'`; mỗi verb mang `touchesState`+`externalEffect` — hai trục thay `access` cũ — cộng `paginated` khai verb nào phân trang qua con trỏ đục `--cursor`/`--limit`, cộng `multiValueFormat` trên tham số nhiều-giá-trị, và `deprecated` khi một verb là legacy compatibility, per str46-io-contract verb-catalog axes + P8 (packaging-distribution workspace/runtime skeleton); xem `docs/platform/work-state/contracts/cli-io-contract.md` cho hợp đồng đầy đủ)",
     "provider": "host-surface",
-    "consumers": [],
+    "consumers": [
+      "runner",
+      "execution-core",
+      "work-driver",
+      "packaging-distribution"
+    ],
     "path": "packages/host-runtime/contracts/exit-codes.v1.json",
     "evidence": [
       "packages/host-runtime/contracts/exit-codes.v1.json",
@@ -22,9 +27,15 @@
     "id": "CTR002",
     "canonical": "CTR002",
     "aliases": [],
-    "meaning": "mọi caller ↔ store: single write door, event schema v2, evolution rules, acyclic blocks+parent-child invariant (ADR0012). Multi-process lease still named debt.",
+    "meaning": "mọi caller ↔ store: bốn vế: (a) verbs một-cửa-GHI — đọc tự do; (b) event schema v2; (c) luật evolution (additive event, lazy view key, tolerate-unknown-field, hard-fail-unknown-version); (d) bất biến phi-chu-trình (record ADR0012 (acyclic unified blocks+parent-child graph at the write door)): đồ thị cạnh-định-kiểu hợp nhất `blocks`+`parent-child` (chiếu từ `deps`+`parent`) được cửa ghi bảo đảm phi-chu-trình — `addWork`/`editWork` từ chối mọi ghi khép một chu trình trên đồ thị hợp nhất, không chỉ trên `deps`. Nợ có tên: một-cửa là per-process; multi-process cần lease (chưa có)",
     "provider": "work-state",
-    "consumers": [],
+    "consumers": [
+      "work-driver",
+      "workflow",
+      "runner",
+      "host-surface",
+      "execution-core"
+    ],
     "evidence": [
       "src/state/store.mjs",
       "src/state/dep-graph.mjs",
@@ -37,16 +48,21 @@
     "id": "CTR003",
     "canonical": "CTR003",
     "aliases": [],
-    "meaning": "orchestrator ↔ worker: dispatch job + verify + proof; fgw/ sandbox; report-not-write fgos-discovered channel (ADR0013). architecture-map maturity was partial; schema allows live|designed|planned only so status is live.",
+    "meaning": "orchestrator ↔ worker: dispatch: việc + verify đòi hỏi + proof khi về; trust boundary của worker: sandbox = nhánh `fgw/` cô lập (worktree) + vay 3 field RUN_CONTRACT khi fan-out (`forbidden_paths`, `required_outputs`, `result_json_schema`); kênh báo-cáo-không-ghi (record ADR0013 (worker report-not-write discovered channel)): worker CÓ THỂ phát khối `fgos-discovered` (dữ liệu thuần) để nêu việc mới phát hiện — vẫn không gọi `fgos`/ghi `.fgos/`; RUNNER đọc và tự tạo item `discoveredFrom` (runner vẫn một-cửa-ghi); stdout surface of `bin/fgos-runner.mjs` reuses CTR001's `fgos.v1` envelope mechanism (contract field `'fgos.v1'`) as its version token rather than minting a separate CTR003-specific tag, per str46-io-contract envelope reuse",
     "provider": "runner",
-    "consumers": [],
+    "consumers": [
+      "host-surface",
+      "work-driver",
+      "agent-coordination-engine"
+    ],
     "evidence": [
       "src/runner/loop.mjs",
       "src/runner/dispatch/",
       "src/runner/worktree.mjs"
     ],
     "status": "live",
-    "path": "src/runner/loop.mjs"
+    "path": "src/runner/loop.mjs",
+    "reason": "architecture-map maturity was partial; schema allows live|designed|planned only so status is live."
   },
   {
     "id": "CTR004",
@@ -54,9 +70,13 @@
     "aliases": [
       "CTR004/v1"
     ],
-    "meaning": "người ↔ hệ (async): ask/answer + awaiting-human; frontier filters waiting work. Version token via work.move SCHEMA_VERSION.",
+    "meaning": "người ↔ hệ (bất đồng bộ): ask/answer + trạng thái `awaiting-human`; frontier loại việc đang chờ; carries version token CTR004/v1 embodied through the `SCHEMA_VERSION` field of source `work.move` events (currently 3) rather than a separate field on `gates[id]`, per str46-io-contract gate version token",
     "provider": "work-state",
-    "consumers": [],
+    "consumers": [
+      "host-surface",
+      "work-driver",
+      "questions"
+    ],
     "evidence": [
       "docs/platform/work-state/spec.md",
       "src/state/"
@@ -68,11 +88,12 @@
     "id": "CTR005",
     "canonical": "CTR005",
     "aliases": [],
-    "meaning": "hệ ↔ người (PR): review gate + merge policy + integrated re-verify after merge (STR17). planned — no contract file yet.",
+    "meaning": "hệ ↔ người (PR): review gate + merge policy + integrated re-verify sau merge",
     "provider": "runner",
     "consumers": [],
     "evidence": [],
-    "status": "planned"
+    "status": "planned",
+    "reason": "planned — no contract file yet."
   },
   {
     "id": "CTR006",
@@ -81,35 +102,45 @@
       "docs.runner/routing-handoff",
       "routing-handoff"
     ],
-    "meaning": "agent ↔ agent: routing-handoff contract + trust boundary. designed — full spec, no implementing code gate.",
+    "meaning": "agent ↔ agent: routing-handoff contract + trust boundary",
     "provider": "runner",
-    "consumers": [],
+    "consumers": [
+      "host-surface",
+      "agent-coordination-engine",
+      "work-driver"
+    ],
     "path": "docs/platform/runner/contracts/routing-handoff.md",
     "evidence": [
       "docs/platform/runner/contracts/routing-handoff.md"
     ],
     "status": "designed",
-    "reason": "runner owns the agent↔agent routing-handoff boundary; file sits under docs/platform/runner/contracts/ whose longest path prefix is executor-model."
+    "reason": "runner owns the agent↔agent routing-handoff boundary; file sits under docs/platform/runner/contracts/ whose longest path prefix is executor-model; designed — full spec, no implementing code gate."
   },
   {
     "id": "CTR007",
     "canonical": "CTR007",
     "aliases": [],
-    "meaning": "state ↔ reactor: signal pointers, lossy/at-least-once, idempotent consumers (STR8). planned — no contract file yet.",
+    "meaning": "state ↔ reactor: signal: con trỏ tối thiểu, lossy/at-least-once, consumer bắt buộc idempotent",
     "provider": "event-store",
     "consumers": [],
     "evidence": [],
-    "status": "planned"
+    "status": "planned",
+    "reason": "planned — no contract file yet."
   },
   {
     "id": "CTR008",
     "canonical": "CTR008",
     "aliases": [],
-    "meaning": "hệ ↔ hub chú ý: attention envelope (gate-opened/question-raised/blocked), versioned. architecture-map maturity was idea; schema has no idea enum so status is planned.",
+    "meaning": "hệ ↔ hub chú ý: attention envelope (`gate-opened`/`question-raised`/`blocked`), versioned",
     "provider": "observe",
-    "consumers": [],
+    "consumers": [
+      "host-surface",
+      "runner",
+      "work-driver"
+    ],
     "evidence": [],
-    "status": "planned"
+    "status": "planned",
+    "reason": "architecture-map maturity was idea; schema has no idea enum so status is planned."
   },
   {
     "id": "CTR009",
@@ -118,7 +149,7 @@
       "execution/executor-model.v1",
       "executor.v1"
     ],
-    "meaning": "model gateway ↔ provider: executor.v1 runner config {command, args[]} validated at load (RunnerConfigError).",
+    "meaning": "model gateway ↔ provider: `executor.v1`: runner config `{command, args[]}` thay `{prompt}`/`{model}` per-element — không nối chuỗi; validate RunnerConfigError tại nạp",
     "provider": "executor-model",
     "consumers": [
       "runner"
@@ -162,7 +193,7 @@
       "docs.herdr-web-dashboard/fgos-gateway-api-v1",
       "fgos-gateway.v1"
     ],
-    "meaning": "fgos Gateway REST server ↔ web/desktop/API clients: REST /v1 HTTP+JSON; OpenAPI served at /contract.",
+    "meaning": "fgos Gateway REST server ↔ web/desktop/API clients: `fgos-gateway.v1`: REST `/v1` qua HTTP+JSON; OpenAPI là contract được phục vụ tại `/contract`",
     "provider": "fgos-gateway",
     "consumers": [
       "herdr-web-dashboard"
@@ -182,7 +213,7 @@
       "docs.agent-confinement/confinement-authority-v1",
       "confinement-authority.v1"
     ],
-    "meaning": "dispatch ↔ executor adapter: confinement-authority.v1 — prepareConfinementForLaunch door, policy/plan/attestation, fail-closed required.",
+    "meaning": "dispatch ↔ executor adapter: `confinement-authority.v1`: nhãn registry chỉ có trong tài liệu, không phải version stamp trong code; một cửa runtime duy nhất `prepareConfinementForLaunch(request)` trước khi run supervisor chạy agent; chuẩn hóa `confinement-policy.v1`, compile `confinement-plan.v1`, đối chiếu năng lực backend driver (`bwrap` v1 với 8 falsification probes), fail-closed cho `required`, cấm bypass thiếu full confinement, và phát `confinement-attestation.v1` bền",
     "provider": "agent-confinement",
     "consumers": [
       "dispatch-transport",
@@ -203,11 +234,17 @@
       "docs.agent-coordination/workflow-stage-operation",
       "workflow-step-operation"
     ],
-    "meaning": "Workflow step definition ↔ Assignment builder: workflow-step-operation identity, TaskSpec, Skill, Role, dispatch hints.",
+    "meaning": "Workflow step definition ↔ Assignment builder: `workflow-step-operation`: operation identity, TaskSpec, Skill, Role, dispatch hints và evidence/mutation expectations được normalize/de-duplicate rồi chiếu vào Assignment; payload hiện không có version field",
     "provider": "agent-coordination",
     "consumers": [
       "workflow",
-      "execution-core"
+      "execution-core",
+      "work-driver",
+      "coding-domain",
+      "domain-components",
+      "agent-coordination-engine",
+      "group-thinking",
+      "host-surface"
     ],
     "path": "docs/platform/agent-coordination/contracts/workflow-stage-operation.md",
     "evidence": [
@@ -225,11 +262,17 @@
       "docs.agent-coordination/assignment-run-runresult",
       "Assignment"
     ],
-    "meaning": "Assignment repository ↔ Dispatch Control Plane: immutable Assignment request across attempts/recovery; DispatchPlan carried in assignment-run.v2.",
+    "meaning": "Assignment repository ↔ Dispatch Control Plane: `Assignment`: immutable persisted request được đọc lại qua attempts/recovery; payload hiện không có contract/schema version field (chỉ có policy/normalizer stamps). DispatchPlan không có id riêng và tiếp tục được chở trong `assignment-run.v2`",
     "provider": "agent-coordination",
     "consumers": [
       "dispatch-transport",
-      "execution-core"
+      "execution-core",
+      "run-result",
+      "team-cognition-engine",
+      "work-driver",
+      "coding-domain",
+      "host-surface",
+      "agent-coordination-engine"
     ],
     "path": "docs/platform/agent-coordination/contracts/assignment-run-runresult.md",
     "evidence": [
@@ -695,7 +738,14 @@
     "aliases": [],
     "meaning": "Prose contract unit-run-result.md under docs/platform/runner/contracts/.",
     "provider": "run-result",
-    "consumers": [],
+    "consumers": [
+      "agent-coordination-engine",
+      "team-cognition-engine",
+      "observe",
+      "work-driver",
+      "work-state",
+      "group-thinking"
+    ],
     "path": "docs/platform/runner/contracts/unit-run-result.md",
     "evidence": [],
     "status": "live",
@@ -1376,7 +1426,11 @@
     "aliases": [],
     "meaning": "Machine-readable contract file observe-names.json owned under packages/observe/contracts/. Provider observe via package (component path prefix did not cover this file).",
     "provider": "observe",
-    "consumers": [],
+    "consumers": [
+      "host-surface",
+      "runner",
+      "execution-core"
+    ],
     "path": "packages/observe/contracts/observe-names.json",
     "evidence": [],
     "status": "live"
@@ -1387,7 +1441,11 @@
     "aliases": [],
     "meaning": "Machine-readable contract file observe.case.v1.json owned under packages/observe/contracts/. Provider observe via package (component path prefix did not cover this file).",
     "provider": "observe",
-    "consumers": [],
+    "consumers": [
+      "host-surface",
+      "runner",
+      "execution-core"
+    ],
     "path": "packages/observe/contracts/observe.case.v1.json",
     "evidence": [],
     "status": "live"
@@ -1398,7 +1456,11 @@
     "aliases": [],
     "meaning": "Machine-readable contract file observe.eval.v1.json owned under packages/observe/contracts/. Provider observe via package (component path prefix did not cover this file).",
     "provider": "observe",
-    "consumers": [],
+    "consumers": [
+      "host-surface",
+      "runner",
+      "execution-core"
+    ],
     "path": "packages/observe/contracts/observe.eval.v1.json",
     "evidence": [],
     "status": "live"
@@ -1409,7 +1471,11 @@
     "aliases": [],
     "meaning": "Machine-readable contract file observe.friction.v1.json owned under packages/observe/contracts/. Provider observe via package (component path prefix did not cover this file).",
     "provider": "observe",
-    "consumers": [],
+    "consumers": [
+      "host-surface",
+      "runner",
+      "execution-core"
+    ],
     "path": "packages/observe/contracts/observe.friction.v1.json",
     "evidence": [],
     "status": "live"
@@ -1420,7 +1486,11 @@
     "aliases": [],
     "meaning": "Machine-readable contract file observe.observation.v1.json owned under packages/observe/contracts/. Provider observe via package (component path prefix did not cover this file).",
     "provider": "observe",
-    "consumers": [],
+    "consumers": [
+      "host-surface",
+      "runner",
+      "execution-core"
+    ],
     "path": "packages/observe/contracts/observe.observation.v1.json",
     "evidence": [],
     "status": "live"
@@ -1431,7 +1501,11 @@
     "aliases": [],
     "meaning": "Machine-readable contract file observe.record.v2.json owned under packages/observe/contracts/. Provider observe via package (component path prefix did not cover this file).",
     "provider": "observe",
-    "consumers": [],
+    "consumers": [
+      "host-surface",
+      "runner",
+      "execution-core"
+    ],
     "path": "packages/observe/contracts/observe.record.v2.json",
     "evidence": [],
     "status": "live"
@@ -1442,7 +1516,11 @@
     "aliases": [],
     "meaning": "Machine-readable contract file observe.snapshot.v1.json owned under packages/observe/contracts/. Provider observe via package (component path prefix did not cover this file).",
     "provider": "observe",
-    "consumers": [],
+    "consumers": [
+      "host-surface",
+      "runner",
+      "execution-core"
+    ],
     "path": "packages/observe/contracts/observe.snapshot.v1.json",
     "evidence": [],
     "status": "live"
@@ -1563,7 +1641,14 @@
     "aliases": [],
     "meaning": "Machine-readable contract file run-result.read.v1.json owned under packages/run-result/contracts/.",
     "provider": "run-result",
-    "consumers": [],
+    "consumers": [
+      "agent-coordination-engine",
+      "team-cognition-engine",
+      "observe",
+      "work-driver",
+      "work-state",
+      "group-thinking"
+    ],
     "path": "packages/run-result/contracts/run-result.read.v1.json",
     "evidence": [
       "packages/run-result/contracts/fixtures/**"
@@ -1576,7 +1661,14 @@
     "aliases": [],
     "meaning": "Machine-readable contract file unit-summary.read.v3.json owned under packages/run-result/contracts/.",
     "provider": "run-result",
-    "consumers": [],
+    "consumers": [
+      "agent-coordination-engine",
+      "team-cognition-engine",
+      "observe",
+      "work-driver",
+      "work-state",
+      "group-thinking"
+    ],
     "path": "packages/run-result/contracts/unit-summary.read.v3.json",
     "evidence": [
       "packages/run-result/contracts/fixtures/**"
@@ -2045,5 +2137,36 @@
       "packages/yaml-doc/contracts/fixtures/**"
     ],
     "status": "live"
+  },
+  {
+    "id": "domain-registry/definition-load",
+    "canonical": "domain-registry/definition-load",
+    "aliases": [],
+    "meaning": "Work Driver / domain callers ↔ Domain Registry: load legal workflow/stage/operation declarations and FlowDefinition validation/projection without inventing undeclared domain operations",
+    "provider": "domain-registry-loader",
+    "consumers": [
+      "work-driver",
+      "workflow",
+      "coding-domain",
+      "domain-components"
+    ],
+    "evidence": [],
+    "status": "planned",
+    "reason": "proposal §7 Work Driver -> Domain Registry edge; no dedicated live contract file yet"
+  },
+  {
+    "id": "group-thinking/protocol-public-request",
+    "canonical": "group-thinking/protocol-public-request",
+    "aliases": [],
+    "meaning": "Group-Thinking Protocol Pack ↔ Agent Coordination / Team Cognition: versioned protocol definitions and public request/replay/contribution/aggregation contracts only",
+    "provider": "group-thinking",
+    "consumers": [
+      "agent-coordination-engine",
+      "team-cognition-engine",
+      "host-surface"
+    ],
+    "evidence": [],
+    "status": "planned",
+    "reason": "proposal §7 Group-Thinking -> ACE/TCE and skill -> host edges; no dedicated live contract file yet"
   }
 ]

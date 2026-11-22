@@ -35,16 +35,18 @@ function readJson(file) {
 const cell = (text) => String(text ?? '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ').trim();
 const code = (text) => `\`${cell(text)}\``;
 
-/** The model as the phases before this one leave it: component rows, decision kinds, every door file. */
+/** The model as the phases before this one leave it: component rows, decision kinds, contracts, every door file. */
 export function loadModel(repoRoot) {
   const dir = path.join(repoRoot, MODEL_DIR);
   const doorsDir = path.join(dir, 'doors');
   const doorFiles = fs.existsSync(doorsDir)
     ? fs.readdirSync(doorsDir).filter((name) => name.endsWith('.json')).sort()
     : [];
+  const contractsPath = path.join(dir, 'contracts.json');
   return {
     components: readJson(path.join(dir, 'components.json')),
     decisionKinds: readJson(path.join(dir, 'decision-kinds.json')),
+    contracts: fs.existsSync(contractsPath) ? readJson(contractsPath) : [],
     doors: doorFiles.map((name) => ({
       file: path.posix.join(MODEL_DIR, 'doors', name),
       row: readJson(path.join(doorsDir, name)),
@@ -199,6 +201,68 @@ function sharedEntitiesBody(model, area) {
 }
 
 /**
+ * Architecture-map §6 component registry: one row per model component/subcomponent.
+ * Module/Nhà/Physics/Vai and slice tables from the old hand-written §6 are not in the
+ * model, so they stay outside the markers (or are retired as intentional removals).
+ */
+function architectureMapComponentsBody(model) {
+  const lines = [
+    `Component registry rows from the model, one per component and subcomponent, sorted by id. ${NOTE}`,
+    '',
+    '| Component | Parent | Layer | Tier | Status | Owns | Must not own | Owner doc |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- |',
+  ];
+  for (const component of sortedComponents(model)) {
+    const owns = (component.owns ?? []).map(cell).join('; ');
+    const mustNotOwn = (component.mustNotOwn ?? []).map(cell).join('; ');
+    lines.push(`| ${code(component.id)} | ${component.parent ? code(component.parent) : '—'} | ${cell(component.layer)} | ${component.tier} | ${cell(component.status)} | ${owns} | ${mustNotOwn} | ${component.spec ? code(component.spec) : '—'} |`);
+  }
+  return lines.join('\n');
+}
+
+/** Boundary label for a contract row: the clause before the first ": ", else the full meaning. */
+function contractBoundary(contract) {
+  const meaning = String(contract.meaning ?? '').trim();
+  const idx = meaning.indexOf(': ');
+  return idx === -1 ? meaning : meaning.slice(0, idx);
+}
+
+/** Contract cell: text after the first ": " so the boundary is shown only once. */
+function contractMeaningCell(contract) {
+  const meaning = String(contract.meaning ?? '').trim();
+  const idx = meaning.indexOf(': ');
+  return idx === -1 ? meaning : meaning.slice(idx + 2).trim();
+}
+
+/** Path cell: print the model path as-is (backticked); empty path stays em dash. Missing live paths are owned by contracts.test, not hidden here. */
+function contractPathCell(contract) {
+  const rel = contract.path;
+  if (typeof rel !== 'string' || !rel.trim()) return '—';
+  return code(rel);
+}
+
+/**
+ * Architecture-map §7 contract registry: one row per model contract.
+ * Columns: id, boundary (clause before first ": " in meaning), Contract (text
+ * after that ": "), provider, consumers, status, path. Path is the model value
+ * as-is; contracts.test fails missing live/designed paths.
+ */
+function architectureMapContractsBody(model, repoRoot) {
+  const lines = [
+    `Contract registry rows from the model, one per contract, sorted by id. ${NOTE}`,
+    '',
+    '| ID | Boundary | Contract | Provider | Consumers | Status | Path |',
+    '| --- | --- | --- | --- | --- | --- | --- |',
+  ];
+  const contracts = [...(model.contracts ?? [])].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  for (const contract of contracts) {
+    const consumers = (contract.consumers ?? []).map(cell).filter(Boolean);
+    lines.push(`| ${code(contract.id)} | ${cell(contractBoundary(contract))} | ${cell(contractMeaningCell(contract))} | ${contract.provider ? code(contract.provider) : '—'} | ${consumers.length ? consumers.map(code).join(', ') : '—'} | ${cell(contract.status)} | ${contractPathCell(contract)} |`);
+  }
+  return lines.join('\n');
+}
+
+/**
  * Every view this renderer owns. `required: true` means the block must already be in the
  * file, so a view cannot silently stop being generated. A missing block on a view that is
  * not required is simply not rendered yet: that is how the governance holder table waits
@@ -213,6 +277,8 @@ export function viewDefinitions(model, repoRoot = REPO_ROOT) {
     { view: 'system-overview-shared-entities', file: 'docs/platform/system-overview/spec.md', required: true, body: () => sharedEntitiesBody(model, null) },
     { view: 'observe-shared-entities', file: 'docs/platform/observe/spec.md', required: true, body: () => sharedEntitiesBody(model, 'observe') },
     { view: 'workflow-shared-entities', file: 'docs/platform/workflow/spec.md', required: true, body: () => sharedEntitiesBody(model, 'workflow') },
+    { view: 'architecture-map-components', file: 'docs/platform/architecture-map.md', required: true, body: () => architectureMapComponentsBody(model) },
+    { view: 'architecture-map-contracts', file: 'docs/platform/architecture-map.md', required: true, body: () => architectureMapContractsBody(model, repoRoot) },
   ];
 }
 

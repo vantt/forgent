@@ -67,6 +67,13 @@ Ownership rows owned by `observe`: each thing a component declares it owns, with
 | --- | --- | --- |
 | friction repository and metrics collection | `observe` | `docs/platform/observe/spec.md` |
 | case lifecycle journals and telemetry | `observe` | `docs/platform/observe/spec.md` |
+| Measurement and scorecard calculation across substrate entities (run, session, executor, case, work) | `observe` | `docs/platform/observe/spec.md` |
+| case lifecycle journal (.fgos/observe/cases/) | `observe` | `docs/platform/observe/spec.md` |
+| independent friction repository (.fgos/observe/friction/) | `observe` | `docs/platform/observe/spec.md` |
+| writer shards | `observe` | `docs/platform/observe/spec.md` |
+| store locks (.fgos/observe/.lock) | `observe` | `docs/platform/observe/spec.md` |
+| snapshots | `observe` | `docs/platform/observe/spec.md` |
+| declaring ObservationSource / LegacyFrictionSource traits | `observe` | `docs/platform/observe/spec.md` |
 <!-- /generated:component-authority:observe-shared-entities -->
 
 ## 3. Storage Model
