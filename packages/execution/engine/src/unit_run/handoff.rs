@@ -1,22 +1,27 @@
-//! The one hand-off, host side: a Unit's `inputs` resolved to the paths its seats read once the run is created, and
+//! The one hand-off, file side, of the host's unit run: a Unit's `inputs` resolved to the paths its seats read once the run is created, and
 //! the digest of the report one attempt left. Ported from `resolveUnitInputs`, `reportRefOf` and `reportDigestOf`
 //! (`src/runner/execution/handoff-refs.mjs:59,140,203`); what an input names, the refusal reasons and the copy names
 //! are `fgos-execution::handoff`'s, the seats a unit run settled are the engine history's.
 
 use std::path::{Path, PathBuf};
 
+use crate::confinement::cleanup::resolve_confinement_temp_root;
+use crate::confinement::policy::{is_inside_root, resolve_blind_hidden_roots};
+use crate::unit_run::history::read_seat_directory;
+use crate::unit_run::run_unit_contract::RunUnitError;
 use fgos_execution::handoff::{
     anonymous_input_name, classify_input, gate_answer_path, is_seat_input, own_previous_name,
     plain_input_name, report_ref_of_record, settled_report_stands, unit_run_dir,
     unit_run_ref_refusal, Accept, HandoffRefError, InputRef, ReportRef,
 };
-use fgos_execution_engine::confinement::cleanup::resolve_confinement_temp_root;
-use fgos_execution_engine::confinement::policy::{is_inside_root, resolve_blind_hidden_roots};
-use fgos_execution_engine::unit_run::history::read_seat_directory;
-use fgos_execution_engine::unit_run::run_unit_contract::RunUnitError;
 use serde_json::{json, Value};
 
-use super::machine::fgos_dir;
+/// The `.fgos` directory of the project at `main_root`.
+fn fgos_dir(main_root: &Path) -> PathBuf {
+    PathBuf::from(fgos_execution::runner_config::fgos_dir_from_root(
+        &main_root.to_string_lossy(),
+    ))
+}
 
 /// A `HandoffRefError`: a `RunnerConfigError` carrying its `reason`.
 fn refusal(error: HandoffRefError) -> RunUnitError {
@@ -269,6 +274,24 @@ pub fn report_digest(result: &Value, main_root: &Path) -> Value {
         }),
         Err(_) => Value::Null,
     }
+}
+
+/// `reportDigest(unitRunId, seat, mainRoot)`: `{ path, bytes, sha256 }` of the report `seat` of another unit run
+/// left in its latest round, as its bytes lie now; a report that cannot be resolved or read is refused.
+pub fn report_digest_of_seat(
+    unit_run_id: &str,
+    seat: &str,
+    main_root: &Path,
+) -> Result<Value, RunUnitError> {
+    let subject = format!("unit-run:{unit_run_id}/{seat}");
+    let file = unit_run_ref(&subject, main_root, None, &Accept::Any).map_err(refusal)?;
+    let bytes = std::fs::read(&file)
+        .map_err(|e| refusal(HandoffRefError::new(&subject, format!("unreadable: {e}"))))?;
+    Ok(json!({
+        "path": file,
+        "bytes": bytes.len(),
+        "sha256": fgos_execution::handoff::sha256_hex(&bytes),
+    }))
 }
 
 /// `reportRefsOf(records, { mainRoot })` (`src/runner/execution/handoff-refs.mjs:78`): the reports of in-run seat

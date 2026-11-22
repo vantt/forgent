@@ -39,7 +39,7 @@ test('the addon marker names the config namespace at the version this payload ca
   assert.equal(combinedAbiMatches({ ...v, runResult: 1 }, v.napi), false, 'an addon before parseUsage');
   assert.equal(combinedAbiMatches({ ...v, config: 3 }, v.napi), false, 'an addon before eventStore and globalDir');
   assert.equal(combinedAbiMatches({ ...v, config: undefined }, v.napi), false, 'an addon with no config namespace');
-  for (const field of ['graph', 'writeScope']) {
+  for (const field of ['graph', 'writeScope', 'execution']) {
     assert.equal(combinedAbiMatches({ ...v, [field]: undefined }, v.napi), false, `an addon with no ${field} field`);
     assert.equal(abiShortfall({ ...v, [field]: undefined }, v.napi), field, `the refusal names ${field}`);
     assert.equal(abiShortfall({ ...v, [field]: 0 }, v.napi), field, `an addon below ${field} 1 is refused by name`);

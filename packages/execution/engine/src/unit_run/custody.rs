@@ -4,11 +4,11 @@
 use std::path::Path;
 
 use fgos_holder_lock::{Handle, LockScope};
-use fgos_run_supervisor::controller::cwd_lock::{
-    admit_successor, cwd_dev_ino, dispatch_cwd_holder, record_custody_handoff,
-};
+use fgos_run_supervisor::controller::cwd_lock::{admit_successor, record_custody_handoff};
 use fgos_run_supervisor::controller::error::DispatchError;
 use serde_json::{json, Value};
+
+pub use fgos_execution::custody::{custody_held, worktree_key, WORKTREE_ADMIN_SCOPE};
 
 /// Run `body` as the successor holder of `worktree`'s custody: admitted before the body starts, the hand-off
 /// recorded on the object the body returns once it ends, released whichever way it ends (the handle drops). A
@@ -38,14 +38,4 @@ where
         }
     }
     Ok(result)
-}
-
-/// Whether a dispatch holds custody of `worktree` right now (a directory that is gone is held by nobody).
-pub fn custody_held(fgos_dir: &Path, worktree: &Path) -> bool {
-    dispatch_cwd_holder(fgos_dir, worktree).is_some()
-}
-
-/// The identity key of a worktree, the same for every spelling of its path; `None` when it does not exist.
-pub fn worktree_key(worktree: &Path) -> Option<String> {
-    cwd_dev_ino(worktree)
 }

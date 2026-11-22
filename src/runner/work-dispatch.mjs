@@ -20,7 +20,7 @@ import { resolveExecutorConfig } from './dispatch/resolve.mjs';
 import { purposeSeatOf } from './dispatch/plan.mjs';
 import { DispatchError } from '../run-supervisor/dispatch-error.mjs';
 import { resolveAgentTypeForTaskSpec, watchWritesOutsideWorkspace, strayWriteWarning } from './dispatch/cli.mjs';
-import { resolveGitRoots } from './execution/run.mjs';
+import { resolveGitRoots } from '../git/inspect.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, workCapabilityHints, buildPrompt } from './work-compat.mjs';
 import { DOMAINS, getDomain, resolveDomainName, effectiveStep, bundleForStep, operationsForStep } from '../state/domain-registry.mjs';

@@ -185,6 +185,9 @@ export function createSeatBindingClient({ hostBin, cwd, fgosDir, payloadRoot, ti
     digest(request) {
       return section(call('digest', request), 'digest', bin(), (value) => typeof value === 'string' && value !== '');
     },
+    dryBind(request) {
+      return section(call('dry-bind', request), 'dryBind', bin());
+    },
     tierLadder() {
       const line = call('ladder', {});
       if (line.result !== 'ok' || !Array.isArray(line.ladder?.vocabulary)) {
@@ -204,6 +207,24 @@ export const plan = (request) => client().plan(request);
 export const preflight = (request) => client().preflight(request);
 export const digest = (request) => client().digest(request);
 export const tierLadder = () => client().tierLadder();
+
+/**
+ * Bind every seat a unit's pattern would dispatch, in the order the pattern dispatches them, without running any of
+ * them (`{ outcome, seats }`): the same crate bind a run makes. `options`: `session` (headless unless it says
+ * otherwise), `overrides`, `raiseAuthorized`, `workflowId`, and `collaboration` (else resolved over the bundled catalog, or `shipped`).
+ */
+export function simulateUnitBindings(unit, runnerConfig, { session = {}, overrides = [], raiseAuthorized = false, workflowId, collaboration, shipped } = {}) {
+  return client().dryBind({
+    unit,
+    runner: runnerConfig,
+    session: { headless: true, ...session },
+    overrides,
+    raiseAuthorized,
+    ...(workflowId ? { workflowId } : {}),
+    ...(collaboration ? { collaboration } : {}),
+    ...(shipped ? { shipped } : {}),
+  });
+}
 
 /** For tests: forget the host the default client resolved. */
 export function resetSeatBindingClient() {

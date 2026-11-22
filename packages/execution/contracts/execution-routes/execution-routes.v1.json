@@ -22,8 +22,8 @@
       "implementation": "launchSessionAttempt (src/runner/dispatch/session-attempt.mjs): engine transport_round::session_attempt over the host's AttemptDriver (apps/fgos/src/wiring/unit_run_host/session_attempt.rs); returns once the supervisor bound the attempt, never waits for the session to end"
     },
     "custody": {
-      "payload": { "fgosDir": "string", "worktree": "string, an existing directory", "admit": "object?, the proposal asked of the peer's admit before the command runs", "verify": { "command": "string", "timeoutMs": "number?" } },
-      "result": { "admission": "the peer's admit answer, when admit was given; a refused one runs nothing", "admissionError": "{ code, message }? the peer could not answer", "verified": "the verify answer, when the command ran", "warnings": "string[]? custody-handoff-not-recorded", "custodyError": "{ code, message }? custody could not be taken" }
+      "payload": { "fgosDir": "string", "worktree": "string, an existing directory", "admit": "object?, the proposal asked of the peer's admit before the command runs", "verify": { "command": "string", "timeoutMs": "number?", "subject": "string?, what ran as the answer text names it (default Gate command)" } },
+      "result": { "admission": "the peer's admit answer, when admit was given; a refused one runs nothing", "admissionError": "{ code, message }? the peer could not answer", "verified": "the verify answer, when the command ran", "outcome": "pass | findings | execution-failure, with verified", "answer": "what a loop's verify hook is told, with verified", "warnings": "string[]? custody-handoff-not-recorded", "custodyError": "{ code, message }? custody could not be taken" }
     },
     "verify": {
       "payload": { "command": "string", "cwd": "string", "timeoutMs": "number?" },

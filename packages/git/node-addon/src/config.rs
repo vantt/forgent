@@ -445,3 +445,112 @@ pub fn check_config(args: Value) -> Result<String> {
 pub fn fix_config(args: Value) -> Result<String> {
     entry(args, unix::fix_entry)
 }
+
+/// A refusal of the door as one line of text, the way the Node facade's `ConfigDoorError` words it: every refusal
+/// (`id`, where, `(keyword)`, message), `; ` between them.
+fn failure_text(f: &Failure) -> String {
+    let one = |f: &Failure| {
+        let more = f.more.as_deref();
+        let mut place = f.file.clone();
+        if let (false, Some(line), Some(column)) = (place.is_empty(), f.line, f.column) {
+            place.push_str(&format!(":{line}:{column}"));
+        }
+        let path = more.and_then(|m| m.path.clone()).unwrap_or_default();
+        let place = [place, path]
+            .into_iter()
+            .filter(|p| !p.is_empty())
+            .collect::<Vec<_>>()
+            .join(" ");
+        let keyword = more
+            .and_then(|m| m.keyword.as_ref())
+            .map(|k| format!("({k})"))
+            .unwrap_or_default();
+        let message = more.and_then(|m| m.message.clone()).unwrap_or_default();
+        [f.id.clone(), place, keyword, message]
+            .into_iter()
+            .filter(|p| !p.is_empty())
+            .collect::<Vec<_>>()
+            .join(" ")
+    };
+    match f.more.as_deref().map(|m| m.refusals.as_slice()) {
+        Some(all) if !all.is_empty() => all.iter().map(one).collect::<Vec<_>>().join("; "),
+        _ => one(f),
+    }
+}
+
+/// Where a refusal or a check finding points, as the runner config loader reads it: `{ path?, file?, line?, column? }`.
+fn place_of(f: &Failure) -> Value {
+    let mut out = serde_json::Map::new();
+    if let Some(path) = f.more.as_deref().and_then(|m| m.path.clone()) {
+        out.insert("path".into(), json!(path));
+    }
+    if !f.file.is_empty() {
+        out.insert("file".into(), json!(f.file));
+    }
+    if let Some(line) = f.line {
+        out.insert("line".into(), json!(line));
+    }
+    if let Some(column) = f.column {
+        out.insert("column".into(), json!(column));
+    }
+    Value::Object(out)
+}
+
+/// The `runner` section of the project at `project_root` as the runner config loader reads it from this door: project
+/// over global over the standard (the detected executor filled in, nothing written), with the origins of the values
+/// the loader attributes; or the door's refusal with every refusal's place and, read once, the places of the config
+/// check's findings. The global directory and the session class come from this process's environment, as the Node
+/// facade takes them.
+pub(crate) fn runner_door_read(project_root: &str) -> fgos_execution::runner_config::DoorRead {
+    use fgos_execution::runner_config::{DoorRead, ORIGIN_KEYS};
+    let lookup = |name: &str| std::env::var(name).ok();
+    let class = match fgos_config::session::session_class(lookup) {
+        SessionClass::Confined => "confined",
+        SessionClass::Unconfined => "unconfined",
+    };
+    let request = |global_dir: String| Request {
+        global_dir,
+        class: class.into(),
+        project_root: Some(project_root.into()),
+        sections: Some(vec!["runner".into()]),
+        origins: ORIGIN_KEYS.iter().map(|k| k.to_string()).collect(),
+        ..Request::default()
+    };
+    let read = || -> Res<Value> {
+        let global_dir = machine::global_dir(lookup).ok_or_else(home_unset)?;
+        let a = request(global_dir.to_string_lossy().into_owned());
+        let detectors = on_path();
+        let ctx = context(&detectors)?;
+        cached(&a.roots(true)?, false, &ctx, &a)
+    };
+    match guarded_as("config-internal-error", read) {
+        Ok(mut answer) => DoorRead::Read {
+            runner: answer["value"]
+                .get_mut("runner")
+                .map(Value::take)
+                .unwrap_or_else(|| json!({})),
+            origins: answer
+                .get_mut("origins")
+                .and_then(|o| o.as_array_mut())
+                .map(std::mem::take)
+                .unwrap_or_default(),
+        },
+        Err(refused) => {
+            let refusals = refused
+                .more
+                .as_deref()
+                .map(|m| m.refusals.iter().map(place_of).collect())
+                .unwrap_or_default();
+            let check_findings = machine::global_dir(lookup)
+                .and_then(|dir| unix::check_entry(request(dir.to_string_lossy().into_owned())).ok())
+                .and_then(|found| found["findings"].as_array().cloned())
+                .unwrap_or_default();
+            DoorRead::Refused {
+                code: refused.id.clone(),
+                message: failure_text(&refused),
+                refusals,
+                check_findings,
+            }
+        }
+    }
+}

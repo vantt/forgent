@@ -379,6 +379,10 @@
           "reason": "the runner's case run directory (its twin is run_dirs.rs)"
         },
         {
+          "path": "src/native/execution-door.mjs",
+          "reason": "carries case_paths::runs_root of fgos-execution to Node under its Node name (the addon's execution namespace); it lists nothing"
+        },
+        {
           "path": "packages/execution/rust/src/case_paths/mod.rs",
           "reason": "the Rust port of case-run-paths.mjs on the same vectors; the execution crate's one spelling of the case runs root, which hand-off naming asks instead of repeating it"
         },
@@ -1106,6 +1110,21 @@
       "reason": "one seat composition, in Rust (packages/execution/rust/src/bind.rs) over the ranking of packages/seat-binding/rust; Node callers ask the host route through src/seat-binding/client.mjs and re-derive nothing. The names are the composition steps and the single call of the ranking function; a second composition under the same names, or a second caller of the ranking function, fails here"
     },
     {
+      "job": "the Node addon never links the Execution engine",
+      "kind": "door",
+      "patterns": [
+        "\\bfgos_execution_engine\\b"
+      ],
+      "allowed": [
+        {
+          "path": "apps/fgos/**",
+          "reason": "the host composes the engine (unit runs, dispatch, the attempt steps)"
+        }
+      ],
+      "debt": [],
+      "reason": "the addon reads the unit-run helpers from fgos-execution and the run supervisor's lease part only (plan decision P3): linking fgos-execution-engine would pull the terminal, session-host, secret and SQLite stores into the Node process and, by feature unification, the whole supervisor. test/architecture.test.mjs also refuses the dependency in packages/git/node-addon/Cargo.toml"
+    },
+    {
       "job": "the Node bind facade has only its named callers",
       "kind": "door",
       "patterns": [
@@ -1183,6 +1202,10 @@
         {
           "path": "packages/execution/rust/src/runner_check.rs",
           "reason": "the runner config check is derived here from the contracts under packages/execution/contracts"
+        },
+        {
+          "path": "src/native/execution-door.mjs",
+          "reason": "carries fgos-execution's herdr detection (machine_reads::herdr_present) to Node under its Node name; it derives nothing"
         }
       ],
       "debt": [

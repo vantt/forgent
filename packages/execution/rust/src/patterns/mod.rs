@@ -7,7 +7,7 @@
 //! through [`LoopTables`]; what the resolution asks of the seat modules (seats, launch bound, checker plan) comes
 //! through [`Seating`]. The module is pure: no file, clock, environment or process.
 
-mod catalog_entries;
+pub mod catalog_entries;
 mod collaboration;
 mod retired_keys;
 

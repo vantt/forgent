@@ -1658,7 +1658,6 @@ const ARM_STATIC_IMPORTS = [
   '../src/report/knowledge-lints.mjs',
   '../src/report/knowledge-projection.mjs',
   '../src/report/knowledge-resolver.mjs',
-  '../src/run-supervisor/cancel-opt-in.mjs',
   '../src/runner/anti-loop.mjs',
   '../src/runner/attestation-guard.mjs',
   '../src/runner/claim-liveness.mjs',
@@ -1852,6 +1851,14 @@ export function checkDoors(rows, files) {
   }
   return failures;
 }
+
+// The door row "the Node addon never links the Execution engine" sees only Rust code; the dependency that would pull
+// the engine (and, by feature unification, the whole run supervisor) into the Node process lives in Cargo.toml.
+test('the Node addon depends on fgos-execution and the run supervisor\'s lease part, never on the Execution engine', () => {
+  const toml = fs.readFileSync(path.join(root, 'packages/git/node-addon/Cargo.toml'), 'utf8');
+  assert.doesNotMatch(toml, /^\s*fgos-execution-engine\s*=/m, 'the addon links fgos-execution-engine');
+  assert.match(toml, /^fgos-run-supervisor = \{[^}]*default-features = false, features = \["lease"\] \}$/m, 'the run supervisor is linked with its lease part only');
+});
 
 test('every door row holds: patterns appear only in allowed or debt files, and no entry is stale', () => {
   const files = new Map(doorFiles().map((file) => [file, fs.readFileSync(path.join(root, file), 'utf8')]));

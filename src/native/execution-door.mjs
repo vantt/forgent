@@ -9,7 +9,11 @@
 // operations (`fgos internal execution <op> --protocol 1`, `packages/execution/contracts/execution-routes/
 // execution-routes.v1.json`): `executionOp`, `runUnitInHost` and `launchSessionInHost`, one host process per call,
 // spawned asynchronously.
-// Besides Node built-ins it imports only the tier-0 host lookup (`src/util/host-bin-path.mjs`).
+// It also serves the Execution Core helpers a caller above the tier asks in process (case paths, the unit-run
+// record, the runner config, patterns, the unit and plan checks, hand-off names and digests, cancel and sweep),
+// each one call of the native addon's `execution` namespace under the Node name it had.
+// Besides Node built-ins it imports only the tier-0 host lookup (`src/util/host-bin-path.mjs`) and the tier-0
+// addon door (`src/native/door.mjs`).
 import { spawn } from 'node:child_process';
 import readline from 'node:readline';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
@@ -17,6 +21,7 @@ import { DispatchError } from './dispatch-error.mjs';
 import { withLegacyView } from './legacy-view.mjs';
 
 export { DispatchError, withLegacyView };
+import { nativeDoor } from './door.mjs';
 
 export function commonDottedParent(paths) {
   if (!Array.isArray(paths) || paths.length === 0) return '';
@@ -380,3 +385,92 @@ export async function launchSessionInHost(request) {
   }
   return result;
 }
+
+// ---- the Execution Core helpers, served by the addon's `execution` namespace --------------------------------
+
+/**
+ * One call of the addon's `execution` namespace; a refusal (a `run-unit` error document in the error's message) is
+ * rethrown as the class Node threw (`runUnitErrorOf`), any other failure as it came.
+ */
+// The parser of a refusal document, taken once: a refusal is the addon's message, never caller data.
+const parseRefusal = JSON.parse;
+
+function addon(name, request) {
+  const call = nativeDoor().execution?.[name];
+  if (typeof call !== 'function') throw new ExecutionRouteError(HOST_VERSION_MISMATCH, `the native addon has no execution.${name}: the active release is older than this payload`);
+  try {
+    return call(request);
+  } catch (err) {
+    let doc = null;
+    try { doc = parseRefusal(err?.message); } catch { /* not a refusal document */ }
+    const error = doc?.error ?? doc;
+    if (error && typeof error === 'object' && typeof error.tag === 'string') throw runUnitErrorOf({ error });
+    throw err;
+  }
+}
+
+/** Whether `id` is a case id. */
+export const isCaseId = (id) => addon('isCaseId', { id });
+/** The directory that holds every case, and the bindings directory beside them. */
+export const runsRoot = (mainRoot) => addon('runsRoot', { mainRoot });
+/** The directory of one case; refuses an id that is not a case id (`invalid-case-id`). */
+export const runDirOf = (mainRoot, caseId) => addon('runDirOf', { mainRoot, caseId });
+/** Where the owner's answer to one gate of a case is kept, absolute; null when an id names no file there. */
+export const gateAnswerFile = (mainRoot, caseId, stepId) => addon('gateAnswerFile', { mainRoot, caseId, stepId });
+
+/** Whether a dispatch holds custody of `worktree` right now (a directory that is gone is held by nobody). */
+export const custodyHeld = (fgosDir, worktree) => addon('custodyHeld', { fgosDir, worktree });
+/** The identity key of a worktree, the same for every spelling of its path; null when it does not exist. */
+export const worktreeKey = (worktree) => addon('worktreeKey', { worktree });
+/** The name of the lock scope under which a worktree is added to or removed from a repository. */
+export const worktreeAdminScopeName = () => addon('worktreeAdminScopeName');
+/** What a Unit run's directory says: `{ contract, exists, settled, controllerHeld, worktree, writeScope, resumable, caseId }`. */
+export const unitRunFacts = (fgosDir, unitRunId) => addon('unitRunFacts', { fgosDir, unitRunId: typeof unitRunId === 'string' ? unitRunId : '' });
+const ownerOf = (fgosDir, unitRunId, { caseId, unless = new Set() } = {}) => ({ fgosDir, unitRunId: typeof unitRunId === 'string' ? unitRunId : '', caseId, unless: [...unless] });
+/** Where one Unit run of `caseId` stands: `{ dir }`, `{ gone: true }` or `{ keep, blocks }`. */
+export const judgeUnitRun = (fgosDir, unitRunId, owner) => addon('judgeUnitRun', ownerOf(fgosDir, unitRunId, owner));
+/** Delete a Unit run that judges removable, judged again now: `{ removed: true }`, `{ gone: true }` or `{ keep, blocks }`. */
+export const removeUnitRun = (fgosDir, unitRunId, owner) => addon('removeUnitRun', ownerOf(fgosDir, unitRunId, owner));
+/** The stored summary text of a unit run directory, or null when there is none. */
+export const readStoredUnitSummary = (unitDir) => addon('readStoredUnitSummary', { unitDir });
+/** The settle of a reservation whose Unit run can no longer run and never reported: no seat was given a brief. */
+export const releasedUnitRunSettle = (caseId) => addon('releasedUnitRunSettle', { caseId });
+
+const RUNNER_CONFIG_ORIGINS = Symbol.for('fgos.runner.origins');
+/**
+ * The project's checked runner config: project over global over the standard, with the origins of its attributed
+ * values kept (non-enumerable) under `Symbol.for('fgos.runner.origins')`. A refusal throws `RunnerConfigError` (or
+ * the class of the rule that refused); an advisory finding is printed as a warning.
+ */
+export function loadRunnerConfigForDir(dir) {
+  const { config, origins, warnings } = addon('loadRunnerConfig', { dir });
+  for (const warning of warnings ?? []) console.warn(warning);
+  Object.defineProperty(config, RUNNER_CONFIG_ORIGINS, { value: Object.freeze([...(origins ?? [])]), writable: false, enumerable: false, configurable: true });
+  return config;
+}
+/** The runner config a unit run records, and the hash of what seat choice and the run read from it. */
+export const snapshotRunnerConfig = (mainRoot, runnerConfig) => addon('snapshotRunnerConfig', { runnerConfig: runnerConfig ?? loadRunnerConfigForDir(mainRoot) });
+
+/** The loop a pattern name runs under `options` (`{ effective }`, a runner config or a pattern map), or null. */
+export const loopOf = (name, options = {}) => addon('loopOf', { name: name ?? null, options: options ?? null });
+/** The collaboration of a unit: its parameters, seats, launch bounds and pin, over the catalog and the runner config. */
+export const resolveCollaboration = (options = {}) => addon('resolveCollaboration', options);
+/** The pattern catalog checked and merged: `{ entries, merged, problems }`. */
+export const checkCatalog = (options = {}) => addon('checkCatalog', options);
+/** Structural equality as the catalog compares entries. */
+export const deepEqual = (a, b) => addon('deepEqual', { a: a ?? null, b: b ?? null });
+/** The normalized unit, or the refusal that names what is wrong with it. */
+export const validateUnit = (raw) => addon('validateUnit', { unit: raw ?? null });
+/** The stance options of a unit, checked. */
+export const normalizeStanceOptions = (value = []) => addon('normalizeStanceOptions', { value });
+/** `overrides` with one run-wide setting folded in. */
+export const foldRunSetting = (overrides, key, value) => addon('foldRunSetting', { overrides: overrides ?? [], key, value: value ?? null });
+/** The plan a unit file names, checked as `--plan` is; null for none. */
+export const existingPlanRef = (value, mainRoot) => addon('existingPlanRef', { value: value ?? null, mainRoot });
+/** The plan `--plan`/`--phase` name, checked; null for none. */
+export const planFromFlags = (flags, mainRoot) => addon('planFromFlags', { flags: flags ?? {}, mainRoot });
+/** `pool/account` split at the first `/`: `{ pool, id }`, or `{ refused: { reason, detail } }`. */
+export const parseAccountPin = (value) => addon('parseAccountPin', { value: value ?? null });
+
+/** Whether this process runs inside a live herdr session. */
+export const detectHerdrPresent = () => addon('detectHerdrPresent');

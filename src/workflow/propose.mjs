@@ -14,10 +14,8 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
-import { RunnerConfigError } from '../native/execution-door.mjs';
+import { RunnerConfigError, loadRunnerConfigForDir } from '../native/execution-door.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
-import { resolveGitRoots } from '../runner/execution/run.mjs';
 import { capabilityVerifyOf } from '../runner/capability-config.mjs';
 import { slugOf } from '../util/slug.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';
@@ -30,6 +28,7 @@ import { workflowCommit } from './unit-handoff.mjs';
 import { classifySlice, defaultSliceTable } from './propose-classify.mjs';
 import { proposeFrame, ProposeFrameError } from './propose-frame.mjs';
 import { validateProposal, createRepoPorts } from './propose-validate.mjs';
+import { resolveGitRoots } from '../git/inspect.mjs';
 
 export const DEFAULT_GUIDE = 'coding/feature';
 

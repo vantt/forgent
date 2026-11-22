@@ -11,9 +11,9 @@ import { parseYaml } from '../../src/util/yaml.mjs';
 import { validateWorkflowChecked } from '../../src/workflow/checked.mjs';
 import { translateUnitsToWorkflow } from '../../src/workflow/units-source.mjs';
 import { expandWorkflowSeats } from '../../src/workflow/seats.mjs';
-import { simulateUnitBindings } from '../../src/runner/execution/dry-bind.mjs';
+import { simulateUnitBindings } from '../../src/seat-binding/client.mjs';
 import { resolveSeats } from '../../src/runner/execution/seat-resolver.mjs';
-import { loopOf } from '../../src/runner/execution/patterns/catalog.mjs';
+import { loopOf } from '../../src/native/execution-door.mjs';
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 
 const dir = new URL('../../domains/council/workflows/', import.meta.url);

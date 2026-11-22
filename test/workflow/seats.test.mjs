@@ -8,7 +8,7 @@ import path from 'node:path';
 import { loadWorkflow } from '../../src/workflow/loader.mjs';
 import { validateWorkflow } from '../../src/workflow/definition.mjs';
 import { expandWorkflowSeats as rawExpandWorkflowSeats, normalizeSeats, seatTask } from '../../src/workflow/seats.mjs';
-import { loopOf } from '../../src/runner/execution/patterns/catalog.mjs';
+import { loopOf } from '../../src/native/execution-door.mjs';
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 
 const defaultLoopOf = (name) => loopOf(name, { effective: shippedCatalog() });

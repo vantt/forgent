@@ -107,7 +107,7 @@ impl RunUnitError {
     }
 
     /// The `CaseAdmissionRefusedError` a port's refusal becomes; the refusal rides along.
-    pub fn admission_refused(refusal: &fgos_execution::admission::Refusal) -> Self {
+    pub fn admission_refused(refusal: &crate::admission::Refusal) -> Self {
         // The port's own refusal object rides along whole, as Node's `this.refusal = refusal`.
         let answer = refusal.answer.clone().unwrap_or_else(|| {
             let mut built = Map::new();

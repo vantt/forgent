@@ -8,7 +8,7 @@
 // below, calibrated against the frames of real cases; it is data, so a calibration changes one constant.
 
 import { RIGOR_ORDER } from './guide-schema.mjs';
-import { resolveCollaboration } from '../runner/execution/patterns/catalog.mjs';
+import { resolveCollaboration } from '../native/execution-door.mjs';
 
 /**
  * Slack a frame carries beyond the slices themselves.

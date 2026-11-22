@@ -12,9 +12,7 @@ import { appendWorkflowEvent, eventsFilePath, projectWorkflowState, readWorkflow
 import { readCaseProjection } from './case-projection.mjs';
 import { listBindingRecords, unbindWorktree } from './case-bindings.mjs';
 import { tryAcquireAdvanceLock } from './case-lock.mjs';
-import { RunnerConfigError } from '../native/execution-door.mjs';
-import { isCaseId, runDirOf, runsRoot } from '../runner/execution/case-run-paths.mjs';
-import { judgeUnitRun, removeUnitRun } from '../runner/execution/unit-run-record.mjs';
+import { RunnerConfigError, isCaseId, runDirOf, runsRoot, judgeUnitRun, removeUnitRun } from '../native/execution-door.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 /**

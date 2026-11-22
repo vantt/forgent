@@ -3,10 +3,10 @@ import path from 'node:path';
 
 import { parseYaml } from '../util/yaml.mjs';
 import { nativeDoor } from '../native/door.mjs';
-import { validateUnit } from '../runner/execution/unit.mjs';
 import { unservedToolAbilityOf } from '../runner/dispatch/tool-providers.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { RESERVED_PATTERN_NAMES } from '../runner/execution/patterns/retired-keys.mjs';
+import { validateUnit } from '../native/execution-door.mjs';
 // capability-plan-lint.mjs — static/read-only harness (docs/history/
 // agent-coordination-foundation/plan.md): checks a plan's own text against
 // the shared planning-capability-awareness doctrine without touching Work

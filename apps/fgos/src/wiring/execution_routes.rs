@@ -409,6 +409,11 @@ fn custody(request: &Value, peer: impl FnOnce() -> PeerChannel) -> Result<Value,
     let ask = request.get("verify").ok_or("verify must be an object")?;
     let command = text(ask, "command")?.to_string();
     let timeout = timeout_ms(ask)?;
+    let subject = ask
+        .get("subject")
+        .and_then(Value::as_str)
+        .unwrap_or("Gate command")
+        .to_string();
     let proposal = request.get("admit").filter(|p| !p.is_null()).cloned();
     let channel = proposal.as_ref().map(|_| peer());
     let ran = fgos_execution_engine::unit_run::custody::run_under_custody(
@@ -434,6 +439,13 @@ fn custody(request: &Value, peer: impl FnOnce() -> PeerChannel) -> Result<Value,
             }
             let verified = verify::verify(&command, &worktree, timeout, Some(custody));
             out["verified"] = verified_json(&verified);
+            // What the run proves, as the caller settles it: the outcome and what a loop's verify hook is told.
+            out["outcome"] = json!(fgos_execution_engine::unit_run::verify::outcome_of_verify(
+                &verified
+            ));
+            out["answer"] = fgos_execution_engine::unit_run::verify::answer_of_verify(
+                &verified, &subject, &command,
+            );
             out
         },
     );

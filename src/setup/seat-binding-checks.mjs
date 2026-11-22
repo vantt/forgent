@@ -1,11 +1,11 @@
 // Doctor row for Seat Binding: `seat-binding-dry-bind` (every seat of every Workflow unit binds under the committed config).
 
 import { bind } from '../runner/execution/bind.mjs';
-import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
+import { simulateUnitBindings } from '../seat-binding/client.mjs';
 import { capabilityNamesOf, hasOwnPreferPool, preferOf } from '../runner/capability-config.mjs';
-import { resolveCollaboration, loopOf } from '../runner/execution/patterns/catalog.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { declaredActivities, readWorkflowCatalog, sourceOf, withUnreadableDefinitions, workflowUnitContract } from './workflow-catalog-reader.mjs';
+import { resolveCollaboration, loopOf } from '../native/execution-door.mjs';
 const MAX_LISTED = 8;
 const listed = (items) => (items.length > MAX_LISTED ? `${items.slice(0, MAX_LISTED).join('; ')}; and ${items.length - MAX_LISTED} more` : items.join('; '));
 
