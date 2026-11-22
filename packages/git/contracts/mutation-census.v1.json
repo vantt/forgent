@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d1783ba2463f0b14212f5a88a3f97b20b4e8d0e459dc7c1a43b2ae6f26da3655",
+  "payloadDigest": "8f90445794da174e3f98ce82e9ebb26b7e7158249f571cee6029bf5a2a60b81c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -593,7 +593,7 @@
     "packages/execution/engine/src/credentials/layout.rs": "33be40bd940ef0510bae927c47be8fe2db4c7d199b7e1c8a8ce89dd10ddf5365",
     "packages/execution/engine/src/credentials/mod.rs": "e5c64538bf8258a20030f5ba2b3f414a85ee57723788bae60f4280de030b10a8",
     "packages/execution/engine/src/credentials/ports.rs": "1f6d04c2b1f55393818952ade3cc349e682c1d6011ed0d96deb8c76e88d56262",
-    "packages/execution/engine/src/credentials/renew.rs": "e792d3cda29f978010d8591f701ac21b924e3e21b2339dae3c6dd005c1861369",
+    "packages/execution/engine/src/credentials/renew.rs": "9ef75cfe7dab26487250a09467f0ce8c4194eb7d29f8dec08ba9a24c2a3599dc",
     "packages/execution/engine/src/credentials/sqlite.rs": "1c86e7ef600ebfbe930b4bd4a126481688c33ef40432eb1aa8de22315c9cba85",
     "packages/execution/engine/src/credentials/store.rs": "93763dfec525951de6fb7635eff6d19456684c608e6426d95e555258fa17b422",
     "packages/execution/engine/src/lib.rs": "cf98841b6656b10ef73f9f7560c667c04d6c1c753de9f31c83993e19314d0613",
