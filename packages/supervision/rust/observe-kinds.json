@@ -16,7 +16,10 @@
     "fgos.coordination.act": { "type": "string", "values": ["handoff", "chore", "wake", "ask", "replace", "tune", "type", "read"] },
     "fgos.coordination.from": { "type": "string" },
     "fgos.coordination.to": { "type": "string" },
-    "fgos.coordination.outcome": { "type": "string" }
+    "fgos.coordination.outcome": { "type": "string" },
+    "fgos.coordination.questionId": { "type": "string" },
+    "fgos.coordination.askedAt": { "type": "string" },
+    "fgos.coordination.relayedAt": { "type": "string" }
   },
   "measures": {
     "fgos.watcher.interval": { "unit": "s", "aggs": ["max", "p50"] },
@@ -56,6 +59,17 @@
         "fgos.coordination.from",
         "fgos.coordination.to",
         "fgos.coordination.outcome"
+      ],
+      "measures": [],
+      "prunable": true,
+      "retention": "30d"
+    },
+    "fgos.coordination.question-relayed": {
+      "subjects": ["session"],
+      "attrs": [
+        "fgos.coordination.questionId",
+        "fgos.coordination.askedAt",
+        "fgos.coordination.relayedAt"
       ],
       "measures": [],
       "prunable": true,

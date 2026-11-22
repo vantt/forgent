@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "24a013476b2a1b987158cdd8c576f07f39db8583963287fafe3f716f215cf6be",
+  "payloadDigest": "00a061a4cd2f60e828eb817d9a402a9fb25748453d31f0621fdb12d5167f00c8",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -65,7 +65,7 @@
     ".agents/skills/fgos-researching/SKILL.md": "81f94ec67b7cafe77a809e786b00f304c505a52cade46ec75a5be2b3ed996e93",
     ".agents/skills/fgos-routing/SKILL.md": "cd1143c3ff1cd01159ae8b06a62c56fd2a6a38ee89437964d66fb41be55c49d5",
     ".agents/skills/fgos-run/SKILL.md": "04c3ddb332589b9bb5c3bd4ebd30acdb812e2603915a229e07c84e0d3ef919e2",
-    ".agents/skills/fgos-secretary/SKILL.md": "46413ae93b17d02fd1fb0cd8a790e50f4607445997735ab60387234d82450a95",
+    ".agents/skills/fgos-secretary/SKILL.md": "251ce3bd53f835239f2b1b78a628b4f28d0b80ae0e56351bc13defedfa370932",
     ".agents/skills/fgos-shaping/SKILL.md": "a9390e29290dbe6db33183d6dc5c0d2f11f6f5933c4bf7565f6e9cd4bc04c3b9",
     ".agents/skills/fgos-supervisor/SKILL.md": "65fb934417bf3dba05da8e631a136a0dd1aaeaacc0db1c71c27053273053493f",
     ".agents/skills/handoff/SKILL.md": "124ace4391416aa9f713f9f86a0c0f752123fcdd32d9e653855c62947bacf0ee",
@@ -252,7 +252,7 @@
     "core/skills/fgos-researching/SKILL.md": "26a8d7e2f909f53fad478a98ba010cb85ef0de7d405516f1b01d6a7967e061dc",
     "core/skills/fgos-routing/SKILL.md": "61aeab18845185ab3e729e1996f063442e184bb442545221f42f531e5628bd4d",
     "core/skills/fgos-run/SKILL.md": "7f8a0d3be342c8c6a2a83c832d5751ab6ed309fde1dd2293cc3bf645f18da690",
-    "core/skills/fgos-secretary/SKILL.md": "1fccc7fcf153c35251025fbdde5c283a1fc7ff2dd6bc8a616104f625add58105",
+    "core/skills/fgos-secretary/SKILL.md": "d563a7a2a01a5056933bb79e2f281b528dd5a026cc451c3739ca549e08e881c1",
     "core/skills/fgos-shaping/SKILL.md": "6d7d50886f119d89bb23b42c1534cf23f8dd234b9ce24511cfaf99c0636690a0",
     "core/skills/fgos-supervisor/SKILL.md": "73a03fb376d4d3f53afeca25e9409efd3fecdb41f264f71ad5f07d26334de0a4",
     "core/skills/handoff/SKILL.md": "343de2c43cdcb3f01106a91c5b26953655450bafe2822d2a90a6e33561694a6a",
