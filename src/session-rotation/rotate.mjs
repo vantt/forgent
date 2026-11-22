@@ -56,6 +56,8 @@ const CLOSE_WAIT_MS = 60_000;
 // it writes after the request (where the secretary batches its open questions) is the one handed over.
 const FINAL_TURN_WAIT_MS = 60_000;
 const STOP_FACT_KEYS = ['sessionId', 'portfolio', 'delta', 'lastAssistantMessage', 'pendingQuestion', 'sessionCrons', 'backgroundTasks'];
+const CRON_FACT_KEYS = ['schedule', 'prompt', 'recurring'];
+const TASK_FACT_KEYS = ['id', 'command', 'description'];
 
 export class RotationError extends Error {
   constructor(code, message, extra = {}) {
@@ -79,8 +81,17 @@ export function checkStopFacts(facts) {
       if (!Array.isArray(value) || value.length > MAX_LIST || value.some((p) => typeof p !== 'string' || p === '' || p.length > 300)) fail('bad-stop-facts', `portfolio must be at most ${MAX_LIST} paths`);
     } else if (key === 'sessionCrons' || key === 'backgroundTasks') {
       if (!Array.isArray(value) || value.length > 20) fail('bad-stop-facts', `${key} must be an array of at most 20 entries`);
+      const allowed = key === 'sessionCrons' ? CRON_FACT_KEYS : TASK_FACT_KEYS;
       for (const item of value) {
         if (!item || typeof item !== 'object' || Array.isArray(item)) fail('bad-stop-facts', `${key} entries must be objects`);
+        for (const [field, val] of Object.entries(item)) {
+          if (!allowed.includes(field)) fail('bad-stop-facts', `unknown ${key} entry field ${JSON.stringify(field)}`);
+          if (field === 'recurring') {
+            if (typeof val !== 'boolean') fail('bad-stop-facts', `${key} entry field recurring must be a boolean`);
+          } else if (typeof val !== 'string' || val.length > MAX_TEXT) {
+            fail('bad-stop-facts', `${key} entry field ${field} must be a string of at most ${MAX_TEXT} characters`);
+          }
+        }
       }
     } else if (value !== null && (typeof value !== 'string' || value.length > MAX_TEXT)) {
       fail('bad-stop-facts', `${key} must be a string of at most ${MAX_TEXT} characters`);

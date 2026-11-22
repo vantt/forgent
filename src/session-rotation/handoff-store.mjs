@@ -58,6 +58,10 @@ export function fenced(text) {
   return `${fence}text\n${text}\n${fence}`;
 }
 
+export function escapeSingleLine(text) {
+  return JSON.stringify(String(text ?? '')).slice(1, -1);
+}
+
 /** The Markdown body: pointers, delta, optional crons/tasks, and on `hard` or `manual` the last assistant message (fenced, see `fenced`) and pending question verbatim. */
 export function buildHandoff({
   persona, name, sessionId, rotate, portfolio = [], delta = '',
@@ -69,19 +73,19 @@ export function buildHandoff({
   if (sessionCrons.length > 0) {
     lines.push('## Crons to recreate', '');
     for (const cron of sessionCrons) {
-      const schedule = cron.schedule ?? '(no schedule)';
-      const prompt = cron.prompt ?? '';
+      const schedule = cron.schedule ? escapeSingleLine(cron.schedule).replaceAll("'", "\\'") : '(no schedule)';
+      const prompt = JSON.stringify(String(cron.prompt ?? ''));
       const recurring = cron.recurring === false ? ' (one-shot)' : '';
-      lines.push(`- Recreate with the session's cron tool before the first task: schedule '${schedule}', prompt "${prompt}"${recurring}.`);
+      lines.push(`- Recreate with the session's cron tool before the first task: schedule '${schedule}', prompt ${prompt}${recurring}.`);
     }
     lines.push('');
   }
   if (backgroundTasks.length > 0) {
     lines.push('## Background tasks that were running', '');
     for (const task of backgroundTasks) {
-      const id = task.id ? `task ${task.id}` : 'task';
-      const cmd = task.command ? `: \`${task.command}\`` : '';
-      const desc = task.description ? ` (${task.description})` : '';
+      const id = task.id ? `task ${escapeSingleLine(task.id)}` : 'task';
+      const cmd = task.command ? `: \`${escapeSingleLine(task.command).replaceAll('`', '\\`')}\`` : '';
+      const desc = task.description ? ` (${escapeSingleLine(task.description)})` : '';
       lines.push(`- ${id}${cmd}${desc}: rerun only if its result still matters.`);
     }
     lines.push('');

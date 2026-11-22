@@ -318,12 +318,21 @@ test('requestRotation validates sessionCrons and backgroundTasks in stopFacts', 
     persona: 'planner', name: 'x', reason: 'hard', projectRoot: root,
     stopFacts: {
       sessionCrons: [{ schedule: '*/5 * * * *', prompt: 'ping', recurring: true }],
-      backgroundTasks: [{ id: 'b1', command: 'sleep 5' }],
+      backgroundTasks: [{ id: 'b1', command: 'sleep 5', description: 'test task' }],
     },
   }, ports);
   assert.equal(valid.started, false);
   assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionCrons: 'not-array' } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionCrons: ['not-object'] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionCrons: [{ prompt: 123 }] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionCrons: [{ recurring: 'yes' }] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionCrons: [{ prompt: 'x'.repeat(8001) }] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionCrons: [{ unknownField: 'val' }] } }, ports), { code: 'bad-stop-facts' });
   assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { backgroundTasks: 'not-array' } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { backgroundTasks: ['not-object'] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { backgroundTasks: [{ command: 123 }] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { backgroundTasks: [{ id: 'x'.repeat(8001) }] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { backgroundTasks: [{ unknownField: 'val' }] } }, ports), { code: 'bad-stop-facts' });
 });
 
 test('the detached entry reads its request file, removes it and prints one result line', (t) => {
