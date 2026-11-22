@@ -2,6 +2,7 @@
 
 | ID | Title | Status | Priority | Area | Citing |
 |---|---|---|---|---|---|
+| [p-g3btj3bpqc](backlog/p-g3btj3bpqc-fgctl-init-in-a-scratch-clone-installs-live-watcher-timers.md) | fgctl init or repair in a scratch clone or fixture installs live per-project watcher and mailbox timers that wake supervisor heads (packaging-distribution, priority high; source: lead:S6A canary, 2026-11-22 20:25) | proposed | P1 | packaging-distribution | - |
 | [p-ivmvh7y2hf](backlog/p-ivmvh7y2hf-plans-split-the-switch-to-a-new-path-from-deleting-the-old-one.md) | Plans split the switch to a new path from deleting the old one, and a deletion estimate counts the tests it retires (planning, priority medium; source: owner, 2026-11-22 18:40, lesson from s6a phase 21) | proposed | P2 | planning | - |
 | [p-24xw2cwdvo](backlog/p-24xw2cwdvo-delete-the-dead-tier-5-node-execution-modules-and-their-tests.md) | Delete the dead tier-5 Node execution modules and their tests left after plan s6a phase 21 (execution, priority high; source: owner decision 2026-11-22 18:23, option B) | proposed | P1 | execution | - |
 | [p-tgzw6xmsru](backlog/p-tgzw6xmsru-case-close-concurrent-prunes-test-flakes.md) | test/workflow/case-close.test.mjs "concurrent prunes remove each directory once" fails about one run in three, also alone (tests, priority medium; source: lead:S6A, 2026-11-22 17:50) | proposed | P2 | tests | - |
