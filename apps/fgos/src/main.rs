@@ -167,6 +167,13 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::init::DESCRIPTOR,
     wiring::dispatch_decide::DECIDE_DESCRIPTOR,
     wiring::dispatch_decide::EXPLAIN_DESCRIPTOR,
+    wiring::dispatch_subs::SHOW_RUN_DESCRIPTOR,
+    wiring::dispatch_subs::WATCH_DESCRIPTOR,
+    wiring::dispatch_subs::RECOVER_DESCRIPTOR,
+    wiring::dispatch_subs::INSPECT_DESCRIPTOR,
+    wiring::dispatch_subs::RECONCILE_DESCRIPTOR,
+    wiring::dispatch_subs::PROBE_ACCOUNT_DESCRIPTOR,
+    wiring::dispatch_subs::PROBE_SESSION_DESCRIPTOR,
     wiring::agents::DESCRIPTOR,
     wiring::run::DESCRIPTOR,
     wiring::worktree::CREATE_DESCRIPTOR,
@@ -482,6 +489,11 @@ fn main() {
     ] {
         service.register_provider(Arc::new(
             wiring::dispatch_decide::DispatchProvider::for_descriptor(descriptor),
+        ));
+    }
+    for descriptor in wiring::dispatch_subs::DESCRIPTORS {
+        service.register_provider(Arc::new(
+            wiring::dispatch_subs::DispatchSubProvider::for_descriptor(descriptor),
         ));
     }
     service.register_provider(Arc::new(wiring::agents::AgentsProvider::new(

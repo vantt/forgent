@@ -198,6 +198,18 @@ pub fn project_cli_invocation(
                 args,
             )),
         ),
+        crate::wiring::dispatch_subs::SHOW_RUN_OPERATION_ID
+        | crate::wiring::dispatch_subs::WATCH_OPERATION_ID
+        | crate::wiring::dispatch_subs::RECOVER_OPERATION_ID
+        | crate::wiring::dispatch_subs::INSPECT_OPERATION_ID
+        | crate::wiring::dispatch_subs::RECONCILE_OPERATION_ID
+        | crate::wiring::dispatch_subs::PROBE_ACCOUNT_OPERATION_ID
+        | crate::wiring::dispatch_subs::PROBE_SESSION_OPERATION_ID => (
+            ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
+            Box::new(crate::wiring::dispatch_subs::project_sub_request(
+                args, root,
+            )?),
+        ),
         crate::wiring::run::OPERATION_ID => (
             ContractRef::from_static("run.unit.request", "1.0.0"),
             Box::new(crate::wiring::run::project_run_request(args)),
@@ -237,7 +249,8 @@ pub fn project_cli_invocation(
 /// `identity.read`, `identity.write`) and `mailbox` over five
 /// (`mailbox.send`, `mailbox.inbox`, `mailbox.inbox.claim` with `--claim`,
 /// `mailbox.list`, `mailbox.status`) and `git` over two (`git.status`, `git.recover`),
-/// and `dispatch` over two (`dispatch.decide`, `dispatch.explain`), and the arguments decide which.
+/// and `dispatch` over one operation per sub-command (`dispatch.decide`, `dispatch.explain`, and the Run, runtime and
+/// probe operations of `wiring::dispatch_subs`), and the arguments decide which.
 pub fn native_operation_id(
     route_operation: &str,
     args: &[OsString],
@@ -261,6 +274,13 @@ pub fn native_operation_id(
             .to_string());
     }
     if route_operation == crate::wiring::dispatch_decide::DECIDE_OPERATION_ID {
+        let call = crate::routing::Call::new(args);
+        if let Some(operation) = call
+            .sub_word()
+            .and_then(crate::wiring::dispatch_subs::operation_of_sub)
+        {
+            return Ok(operation.to_string());
+        }
         return Ok(
             if crate::wiring::dispatch_decide::project_dispatch_request(args).explain {
                 crate::wiring::dispatch_decide::EXPLAIN_OPERATION_ID

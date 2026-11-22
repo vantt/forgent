@@ -454,6 +454,83 @@ pub const CATALOG: &[OperationDescriptor] = &[
         streaming_mode: StreamingMode::None,
     },
     OperationDescriptor {
+        operation_id: OperationId::from_static("dispatch.run.show"),
+        owning_component_id: Cow::Borrowed("execution"),
+        request_contract: ContractRef::from_static("dispatch.run.show.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("dispatch.run.show.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("execution.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("dispatch.run.watch"),
+        owning_component_id: Cow::Borrowed("execution"),
+        request_contract: ContractRef::from_static("dispatch.run.watch.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("dispatch.run.watch.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("execution.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("dispatch.run.recover"),
+        owning_component_id: Cow::Borrowed("execution"),
+        request_contract: ContractRef::from_static("dispatch.run.recover.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("dispatch.run.recover.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::Keyed,
+        authority_policy_id: Cow::Borrowed("execution.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("dispatch.runtime.inspect"),
+        owning_component_id: Cow::Borrowed("execution"),
+        request_contract: ContractRef::from_static("dispatch.runtime.inspect.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("dispatch.runtime.inspect.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("execution.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("dispatch.runtime.reconcile"),
+        owning_component_id: Cow::Borrowed("execution"),
+        request_contract: ContractRef::from_static("dispatch.runtime.reconcile.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("dispatch.runtime.reconcile.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::Keyed,
+        authority_policy_id: Cow::Borrowed("execution.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("dispatch.probe.account"),
+        owning_component_id: Cow::Borrowed("execution"),
+        request_contract: ContractRef::from_static("dispatch.probe.account.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("dispatch.probe.account.outcome", "1.0.0"),
+        effect: OperationEffect::External,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("execution.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("dispatch.probe.session"),
+        owning_component_id: Cow::Borrowed("execution"),
+        request_contract: ContractRef::from_static("dispatch.probe.session.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("dispatch.probe.session.outcome", "1.0.0"),
+        effect: OperationEffect::External,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("execution.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
         operation_id: OperationId::from_static("agents.list"),
         owning_component_id: Cow::Borrowed("execution"),
         request_contract: ContractRef::from_static("agents.list.request", "1.0.0"),
@@ -528,8 +605,8 @@ mod tests {
     #[test]
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
-        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run, the init run, the migrate portfolio run, the dispatch decide and explain, the unit run, the agents list, the supervision tick, supervisor read and write, land and slots, and the resource-check run.
-        assert_eq!(CATALOG.len(), 46);
+        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run, the init run, the migrate portfolio run, the dispatch decide and explain, the dispatch Run show, watch and recover, the dispatch runtime inspect and reconcile, the dispatch account and session probes, the unit run, the agents list, the supervision tick, supervisor read and write, land and slots, and the resource-check run.
+        assert_eq!(CATALOG.len(), 53);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -568,6 +645,17 @@ mod tests {
         assert!(ids.contains(&"migrate.portfolio"));
         assert!(ids.contains(&"dispatch.decide"));
         assert!(ids.contains(&"dispatch.explain"));
+        for dispatch in [
+            "dispatch.run.show",
+            "dispatch.run.watch",
+            "dispatch.run.recover",
+            "dispatch.runtime.inspect",
+            "dispatch.runtime.reconcile",
+            "dispatch.probe.account",
+            "dispatch.probe.session",
+        ] {
+            assert!(ids.contains(&dispatch), "{dispatch}");
+        }
         assert!(ids.contains(&"run.unit"));
         assert!(ids.contains(&"agents.list"));
         assert!(ids.contains(&"questions.read"));
