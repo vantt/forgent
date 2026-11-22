@@ -26,3 +26,5 @@ Counts from lead:S6A at phase 21 close (2026-11-22 19:10, after s6/p21-facades):
 - 11 are still reached from product code: the facades (assignment-layout, config, confinement/authority, unit-run-record, unit-summary, execution/bind); cancel-registry, until 0118 makes head-stop and rotate await the host cancel op; and the definition.mjs twins (write-scope, run-timeout, outcome, legacy-seat-read).
 - 78 files (about 26.1k lines) have no product importer. 145 test files import them (133 of them *.test.mjs), plus scripts/lib/mailbox-live-confined.mjs and scripts/record-mailbox-hook-fixtures.mjs.
 - The facade slice moved those Node bodies into *-twin.mjs files beside their modules, so the deletion is mechanical.
+
+Also from lead:S6A at plan close (2026-11-22 20:30, plan done at 8ed5e8cdb, decision D-ADR0083): stale notes to fix in the same deletion. packages/run-supervisor/contracts/recover-actions.v1.json and packages/holder-lock/contracts/lock-registry.v1.json still name Node modules of the closure.
