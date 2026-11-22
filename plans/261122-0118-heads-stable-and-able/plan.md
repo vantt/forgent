@@ -188,7 +188,7 @@ the grants, verb by verb.
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | running |
 | 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | running |
 | 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md, test/session-host/head-start.test.mjs | 5 | ready |
-| 12 | [Rotation reliability](phase-12-rotation-reliability.md) | 6 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, docs/platform/session-host/spec.md | 4 | done |
+| 12 | [Rotation reliability](phase-12-rotation-reliability.md) | 6 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, docs/platform/session-host/spec.md, apps/fgos/src/wiring/session_rotation_hook.rs | 4 | running |
 
 Each phase names its canonical dispatch capability in its file: `code:implement` for 2 to 7 and 10 and the probe script
 of 11; phases 1, 8's measure, 9's after-measure and 11's gate are evidence reads (`code:test`). No executor, provider or

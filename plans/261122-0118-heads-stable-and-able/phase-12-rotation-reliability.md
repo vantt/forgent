@@ -67,11 +67,37 @@ Owner-approved 2026-11-22 16:05; folded in by lead:SUPERVISOR at 17:47 (answer t
    The JS twin `refreshAhead` (`src/runner/dispatch/provider-credential-renewal.mjs`) is called only by tests; leave it
    and say so in the report.
 
+### 12c: a lead successor answers inside its first turn (lead:SUPERVISOR, 2026-11-22 21:22)
+
+Cause, checked against the code: the successor's answer (`session answered`) is sent only by the Stop hook
+(`apps/fgos/src/wiring/session_rotation_hook.rs` `stop_inner` -> `answer`), that is, at the end of its first turn. A
+lead's opening (`# On wake`) says never to end the turn after the start ritual, so the lead keeps working. Its
+role-gated verbs are refused `role-pending-rotation`, the client waits them out, and the executor hits its 120 s answer
+bound (`no-answer`, rotation `55465224e078c9c2`, gen 6 to 7, 21:10). A secretary passes because its turns end fast.
+The hook door works from inside a confined head when it is called by the installed path (a direct call at 14:24Z wrote
+a `stop-trace` line). Through the `fgos` shell function it returns at once and does nothing, because the function
+appends `--dir`.
+
+9. `session_rotation_hook.rs` `session_start`: when `awaits_answer(lineage, gen)` holds for this head's generation,
+   append one instruction to the `additionalContext` after the handoff text. It tells the successor to answer right
+   after the start ritual's one line, in the same turn, by running
+   `printf '%s' '{"last_assistant_message":"<that line>"}' | "<project root>/.fgos/installation/bin/fgos" hook session-rotation --event stop`.
+   The project root is the absolute parent of `fgos_dir`. The instruction also says its role-gated verbs wait until the
+   role moves. No new door: the stop path already answers when `awaits_answer` holds, and once `answered.json` names this
+   generation, a later Stop measures as usual. With no pending rotation for this generation, the context is unchanged.
+10. Owning proof in the same file's tests, next to the existing session-start test: with `rotation.json` naming this
+    head's generation and no `answered.json`, the context ends with the instruction carrying the absolute installed path.
+    Without it, the context is unchanged (the existing test).
+11. `docs/platform/session-host/spec.md` (section 8.8): a successor answers either at the end of its first turn (Stop) or
+    mid-turn through the hook door when its session-start context asks it to. A head whose first turn does not end (a
+    lead) depends on the second.
+
 ## Verify
 
 - 12a: `node scripts/run-tests.mjs test/session-rotation/rotate.test.mjs`.
 - 12b: `cargo test -p fgos-execution-engine --test credentials` (use the crate's real package name) and
   `cargo test -p fgos dispatch_subs`.
+- 12c: `cargo test -p fgos session_rotation_hook`.
 
 ## Rollback
 
