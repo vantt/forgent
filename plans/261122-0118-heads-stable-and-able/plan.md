@@ -199,6 +199,24 @@ writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
 
+### Lead progress (2026-11-22 18:30, head:lead-forgent-261122-0118-heads-b52f9)
+
+- **Phase 12a is ready to land, parked on `q-ctjxjol33f`.** Branch `heads-stable-and-able/p12` (`24672c180` plus the
+  review fixes `50aaf575f`; rotate and head-start 59/59; independent review found no blockers). The fixes:
+  - the last message is found again on each poll pass after finalize-home;
+  - the head's own task file (a lead's `plan.md`) is in the handoff portfolio;
+  - a rotation whose old run was asked to stop or had closed logs `old-not-live`, never `start-refused`, and leaves no
+    handoff.
+  The land is refused `land-abandoned-writer-mismatch` ("run `fgos git recover`") after an attempt at 18:19 failed
+  `lock-acquire-unavailable`. Before that, lands were refused `land-target-ahead` while local main held the unpushed
+  supervisor report `3b9baf34a`.
+- **Phase 12b** waits on `q-3g32txifg5` (footprint widen by the credential renewal and probe-account files).
+- **Release 1e544460 (phases 2, 5-7) is active since the second window.** This lead's `supervisor raise` is still
+  refused `verb-not-granted`: the grant list is fixed at session start, so phase 5's per-request release pickup does
+  not refresh a live head's grant. A head gains a new verb only after a restart or rotation. Phase 11's probe should
+  name this. `stop-trace.jsonl` of this lead has no record after 02:14Z yet (its last has `fraction: null`). The first
+  Stop under 1e544460 is the one to read for phase 12's soft-rotation proof.
+
 ### Lead progress (2026-11-22 17:40, head:lead-forgent-261122-0118-heads-b52f9)
 
 - **Phase 7 done:** the follow-up (steps 10-13, `p-6sd4fslxv7`) landed as `36afd4d6b` (`p07e`, reapplied at the tip from
