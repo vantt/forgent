@@ -4,8 +4,8 @@
 //! are owned by `packages/git/rust/tests/land.rs`; one pass-through proof lives here.
 use fgos_git::{GitDriver, RemoteGrant, RepoHandle, ResolveRepo};
 use fgos_supervision::land::{
-    catch_up, land, BacklogPort, BacklogRef, Gate, LandCommand, LandConfig, LandPorts, Regenerate,
-    ShellRunner,
+    catch_up, clean_landed_worktree, land, BacklogPort, BacklogRef, Gate, LandCommand, LandConfig,
+    LandOutcome, LandPorts, Regenerate, ShellRunner,
 };
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -204,6 +204,7 @@ fn ports<'a>(env: &'a Env, next: &'a dyn Fn() -> String, wait_ms: u64) -> LandPo
         log_dir: &env.log_dir,
         wait_ms,
         backlog_index: None,
+        worktree_removal: None,
     }
 }
 
@@ -1590,4 +1591,205 @@ fn a_glob_in_the_paths_reaches_the_index_as_the_files_it_matches() {
     fs::write(f.main.join(PLAN_PATH), plan).unwrap();
     land_with_index(&f, &paths(&[PLAN_PATH, "plans/backlog/p-c*.md"])).unwrap();
     assert_eq!(last_committing(), vec![PLAN_PATH, ITEM_A, new_item]);
+}
+
+#[test]
+fn branch_land_removes_clean_worktree() {
+    let f = Fixture::new();
+
+    let clean_wt = f.temp.join("clean-worktree");
+    git(
+        &f.main,
+        &[
+            "worktree",
+            "add",
+            clean_wt.to_str().unwrap(),
+            "-b",
+            "topic-clean",
+        ],
+    );
+    fs::write(clean_wt.join("file-clean.txt"), "clean-content\n").unwrap();
+    git(&clean_wt, &["add", "."]);
+    git(&clean_wt, &["commit", "-qm", "clean branch commit"]);
+
+    let clean_path_lossy = clean_wt.to_string_lossy().to_string();
+    let passed_targets = std::cell::RefCell::new(Vec::new());
+
+    let fake_remove = |path: &Path, target: &str| -> Result<(), String> {
+        passed_targets
+            .borrow_mut()
+            .push((path.to_string_lossy().to_string(), target.to_string()));
+        if path == clean_wt {
+            Ok(())
+        } else {
+            Err("unknown-worktree".to_string())
+        }
+    };
+
+    let next = || format!("rm-{}", f.ids.fetch_add(1, Ordering::Relaxed));
+    let mut ports_clean = ports(&f.env, &next, 30_000);
+    ports_clean.worktree_removal = Some(&fake_remove);
+
+    let clean_outcome = land(
+        &branch("topic-clean"),
+        &config(vec![gate("true")]),
+        &ports_clean,
+    )
+    .unwrap();
+    assert_eq!(
+        clean_outcome.worktrees_removed,
+        vec![clean_path_lossy.clone()]
+    );
+    assert!(clean_outcome.worktrees_kept.is_empty());
+    assert!(clean_outcome.worktree_list_error.is_none());
+
+    let targets = passed_targets.into_inner();
+    assert_eq!(targets.len(), 1);
+    assert_eq!(
+        targets[0],
+        (clean_path_lossy, "refs/heads/trunk".to_string())
+    );
+}
+
+#[test]
+fn branch_land_keeps_dirty_worktree() {
+    let f = Fixture::new();
+
+    let dirty_wt = f.temp.join("dirty-worktree");
+    git(
+        &f.main,
+        &[
+            "worktree",
+            "add",
+            dirty_wt.to_str().unwrap(),
+            "-b",
+            "topic-dirty",
+        ],
+    );
+    fs::write(dirty_wt.join("file-dirty.txt"), "dirty-content\n").unwrap();
+    git(&dirty_wt, &["add", "."]);
+    git(&dirty_wt, &["commit", "-qm", "dirty branch commit"]);
+    fs::write(dirty_wt.join("uncommitted.txt"), "dirty changes\n").unwrap();
+
+    let dirty_path_lossy = dirty_wt.to_string_lossy().to_string();
+    let passed_targets = std::cell::RefCell::new(Vec::new());
+
+    let fake_remove = |path: &Path, target: &str| -> Result<(), String> {
+        passed_targets
+            .borrow_mut()
+            .push((path.to_string_lossy().to_string(), target.to_string()));
+        if path == dirty_wt {
+            Err("worktree-dirty-preserved".to_string())
+        } else {
+            Err("unknown-worktree".to_string())
+        }
+    };
+
+    let next_dirty = || format!("rm-{}", f.ids.fetch_add(1, Ordering::Relaxed));
+    let mut ports_dirty = ports(&f.env, &next_dirty, 30_000);
+    ports_dirty.worktree_removal = Some(&fake_remove);
+
+    let dirty_outcome = land(
+        &branch("topic-dirty"),
+        &config(vec![gate("true")]),
+        &ports_dirty,
+    )
+    .unwrap();
+    assert!(dirty_outcome.worktrees_removed.is_empty());
+    assert_eq!(dirty_outcome.worktrees_kept.len(), 1);
+    assert_eq!(dirty_outcome.worktrees_kept[0].path, dirty_path_lossy);
+    assert_eq!(
+        dirty_outcome.worktrees_kept[0].code,
+        "worktree-dirty-preserved"
+    );
+    assert!(dirty_outcome.worktree_list_error.is_none());
+
+    let targets = passed_targets.into_inner();
+    assert_eq!(targets.len(), 1);
+    assert_eq!(
+        targets[0],
+        (dirty_path_lossy, "refs/heads/trunk".to_string())
+    );
+}
+
+#[test]
+fn paths_land_removes_nothing() {
+    let f = Fixture::new();
+
+    let passed_targets = std::cell::RefCell::new(Vec::new());
+    let fake_remove = |path: &Path, target: &str| -> Result<(), String> {
+        passed_targets
+            .borrow_mut()
+            .push((path.to_string_lossy().to_string(), target.to_string()));
+        Ok(())
+    };
+
+    let next_paths = || format!("rm-{}", f.ids.fetch_add(1, Ordering::Relaxed));
+    let mut ports_paths = ports(&f.env, &next_paths, 30_000);
+    ports_paths.worktree_removal = Some(&fake_remove);
+
+    fs::write(f.main.join("a"), "paths-landed-content\n").unwrap();
+    let paths_outcome = land(&paths(&["a"]), &config(vec![gate("true")]), &ports_paths).unwrap();
+    assert!(paths_outcome.worktrees_removed.is_empty());
+    assert!(paths_outcome.worktrees_kept.is_empty());
+    assert!(paths_outcome.worktree_list_error.is_none());
+    assert!(passed_targets.into_inner().is_empty());
+}
+
+#[test]
+fn branch_land_worktree_listing_failure_is_reported_without_failing_land() {
+    let f = Fixture::new();
+
+    let clean_wt = f.temp.join("clean-worktree");
+    git(
+        &f.main,
+        &[
+            "worktree",
+            "add",
+            clean_wt.to_str().unwrap(),
+            "-b",
+            "topic-fail-list",
+        ],
+    );
+    fs::write(clean_wt.join("file-fail.txt"), "fail-content\n").unwrap();
+    git(&clean_wt, &["add", "."]);
+    git(&clean_wt, &["commit", "-qm", "fail branch commit"]);
+
+    let removed_called = std::cell::Cell::new(false);
+    let fake_remove = |_path: &Path, _target: &str| -> Result<(), String> {
+        removed_called.set(true);
+        Ok(())
+    };
+
+    let next = || format!("rm-{}", f.ids.fetch_add(1, Ordering::Relaxed));
+    let mut ports = ports(&f.env, &next, 30_000);
+    ports.worktree_removal = Some(&fake_remove);
+
+    // Temporarily rename .git in main checkout so list_worktrees fails
+    let git_dir = f.main.join(".git");
+    let git_dir_bak = f.main.join(".git.bak");
+    fs::rename(&git_dir, &git_dir_bak).unwrap();
+
+    let mut outcome = LandOutcome {
+        main_sha: "test-sha".to_string(),
+        landed_paths: vec!["file-fail.txt".to_string()],
+        retries: 0,
+        gates_run: vec!["true".to_string()],
+        worktrees_removed: Vec::new(),
+        worktrees_kept: Vec::new(),
+        worktree_list_error: None,
+    };
+
+    clean_landed_worktree(&ports, "topic-fail-list", "trunk", &mut outcome);
+
+    // Restore .git so fixture cleanup succeeds
+    fs::rename(&git_dir_bak, &git_dir).unwrap();
+
+    assert!(outcome.worktrees_removed.is_empty());
+    assert!(outcome.worktrees_kept.is_empty());
+    assert_eq!(
+        outcome.worktree_list_error.as_deref(),
+        Some("git-command-failed")
+    );
+    assert!(!removed_called.get());
 }

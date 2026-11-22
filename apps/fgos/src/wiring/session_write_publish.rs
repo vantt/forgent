@@ -314,6 +314,7 @@ fn catch_up_once(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
         log_dir: &checkout.main.join(".fgos").join("runtime").join("land"),
         wait_ms: BUSY_ATTEMPT_WAIT_MS,
         backlog_index: None,
+        worktree_removal: None,
     };
     let command = LandCommand {
         target: Some(target),
@@ -406,6 +407,7 @@ fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, 
         log_dir: &checkout.main.join(".fgos").join("runtime").join("land"),
         wait_ms: WAIT_MS,
         backlog_index: None,
+        worktree_removal: None,
     };
     let mut paths = vec![path.to_owned()];
     if portfolio::backlog_item_name(path).is_some() {

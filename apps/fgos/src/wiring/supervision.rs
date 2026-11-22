@@ -1425,6 +1425,23 @@ fn operation_id(what: &str) -> String {
     )
 }
 
+fn is_machine_code(text: &str) -> bool {
+    !text.is_empty()
+        && text
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-' || c == '_')
+}
+
+fn worktree_removal_refusal_code(refusal: &CategorisedRefusal) -> String {
+    if refusal.category != "unexpected" {
+        refusal.category.to_string()
+    } else if is_machine_code(&refusal.message) {
+        refusal.message.clone()
+    } else {
+        refusal.category.to_string()
+    }
+}
+
 fn run_land(root: &Path, command: &LandCommand) -> Result<Value, CategorisedRefusal> {
     let main = fgos_git::main_checkout_root(root)
         .map_err(|e| refused("land-root-unreadable", e.cause))?
@@ -1455,6 +1472,17 @@ fn run_land(root: &Path, command: &LandCommand) -> Result<Value, CategorisedRefu
     let log_dir = state_dir(&main, "land");
     let index =
         |root: &Path, committing: &[String]| backlog_index(&driver, &repo, root, committing);
+    let remove_worktree = |path: &Path, target: &str| -> Result<(), String> {
+        let request = super::worktree::WorktreeRequest::Remove {
+            cwd: main.clone(),
+            path: path.to_string_lossy().into_owned(),
+            delivered_to: target.to_owned(),
+            discard_ignored: true,
+        };
+        super::worktree::run(&request)
+            .map(|_| ())
+            .map_err(|refusal| worktree_removal_refusal_code(&refusal))
+    };
     let ports = LandPorts {
         git: &driver,
         repo: &repo,
@@ -1468,13 +1496,25 @@ fn run_land(root: &Path, command: &LandCommand) -> Result<Value, CategorisedRefu
             classify: &super::portfolio::classify_backlog_ref,
             index: &index,
         }),
+        worktree_removal: Some(&remove_worktree),
     };
     let landed =
         land(command, &config, &ports).map_err(|why| refused(&why.code, why.detail_with_note()))?;
-    Ok(json!({
-        "mainSha": landed.main_sha, "landedPaths": landed.landed_paths,
-        "retries": landed.retries, "gatesRun": landed.gates_run,
-    }))
+    let mut outcome_json = json!({
+        "mainSha": landed.main_sha,
+        "landedPaths": landed.landed_paths,
+        "retries": landed.retries,
+        "gatesRun": landed.gates_run,
+        "worktreesRemoved": landed.worktrees_removed,
+        "worktreesKept": landed.worktrees_kept.iter().map(|k| json!({
+            "path": k.path,
+            "code": k.code,
+        })).collect::<Vec<_>>(),
+    });
+    if let Some(err) = &landed.worktree_list_error {
+        outcome_json["worktreeListError"] = json!(err);
+    }
+    Ok(outcome_json)
 }
 
 /// The backlog index a land commits: the one generator every index write uses, over the items Git
@@ -2189,5 +2229,39 @@ mod tests {
         assert_eq!(rows[1].subject.as_deref(), Some("plans/x"));
         assert_eq!(rows[1].ts.as_deref(), Some("2026-02-01T00:00:00Z"));
         assert!(rows[2].unmeasured && rows[2].kind == "broken");
+    }
+
+    #[test]
+    fn worktree_removal_refusal_code_maps_refusals_to_short_machine_codes() {
+        let git_dirty = CategorisedRefusal::unexpected("worktree-dirty-preserved");
+        assert_eq!(
+            worktree_removal_refusal_code(&git_dirty),
+            "worktree-dirty-preserved"
+        );
+
+        let git_unproven = CategorisedRefusal::unexpected("worktree-delivery-unproven");
+        assert_eq!(
+            worktree_removal_refusal_code(&git_unproven),
+            "worktree-delivery-unproven"
+        );
+
+        let lock = CategorisedRefusal::new("lock-timeout", "admin lock held by pid 123");
+        assert_eq!(worktree_removal_refusal_code(&lock), "lock-timeout");
+
+        let validation = CategorisedRefusal::new("validation", "something is invalid");
+        assert_eq!(worktree_removal_refusal_code(&validation), "validation");
+
+        let unexpected_sentence = CategorisedRefusal::unexpected(
+            "worktree remove: --delivered-to target does not name an existing branch",
+        );
+        assert_eq!(
+            worktree_removal_refusal_code(&unexpected_sentence),
+            "unexpected"
+        );
+
+        let io_error = CategorisedRefusal::unexpected(
+            "setting aside .env: No such file or directory (os error 2)",
+        );
+        assert_eq!(worktree_removal_refusal_code(&io_error), "unexpected");
     }
 }
