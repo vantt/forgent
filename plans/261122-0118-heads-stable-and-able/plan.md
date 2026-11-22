@@ -188,7 +188,7 @@ the grants, verb by verb.
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | running |
 | 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | running |
 | 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md, test/session-host/head-start.test.mjs | 5 | ready |
-| 12 | [Rotation reliability](phase-12-rotation-reliability.md) | 6 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, docs/platform/session-host/spec.md, apps/fgos/src/wiring/session_rotation_hook.rs | 4 | running |
+| 12 | [Rotation reliability](phase-12-rotation-reliability.md) | 6 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, docs/platform/session-host/spec.md, apps/fgos/src/wiring/session_rotation_hook.rs | 4 | done |
 
 Each phase names its canonical dispatch capability in its file: `code:implement` for 2 to 7 and 10 and the probe script
 of 11; phases 1, 8's measure, 9's after-measure and 11's gate are evidence reads (`code:test`). No executor, provider or
@@ -202,6 +202,29 @@ wave), `head-request.v1.json` (2, then 5), `docs/platform/session-host/spec.md` 
 writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
+
+### Lead progress (2026-11-22 21:50, head:lead-forgent-261122-0118-heads-b52f9, gen 7)
+
+- **Phase 12c landed** as `8883c2a62` (`p12d`: `453f91152`, plus the review fix `827d6b07c` and the door fix
+  `68843da76`; session_rotation_hook 13/13, clippy clean, land gates green). Cause, from lead:SUPERVISOR's report and
+  checked in the code: a successor's answer was sent only by the Stop hook at the end of its first turn, and a lead's
+  first turn does not end. So rotation `55465224e078c9c2` (gen 6 to 7, 21:10) hit `no-answer`, and gen 7 was then
+  started by stop+start, which proves nothing about soft rotation. Now, when `rotation.json` waits for this generation,
+  the session-start context tells the successor to answer right after its ritual line, in the same turn. It does so
+  through the existing hook door, by the installed shim path (`project_shim_path`). The `fgos` shell function appends
+  `--dir`, and the hook then returns silently. No new door was added. The change takes effect at the next release
+  activation. After that, lead:SUPERVISOR reruns a real rotation, which is done-when item 3.
+- **The phase 11 probe ran live from this lead** (gen 7, started 14:14Z on `0844a0a4`). 29 of 30 rows matched the grant.
+  `supervisor raise` is now served, so the grant reached this head through the restart. The one mismatch was the probe's
+  own misclassification: `friction record` returns its disposition refusal under code `error`. That is fixed in
+  `5b5eb89f8` (`p11`, 17 lines; the gates passed). Separate finding, outside this plan: the friction host verb reports
+  its domain code only inside the message text, so a confined caller cannot read it as a code.
+- **Stop-trace evidence for phase 11's Stop-hook row:** this lineage's `stop-trace.jsonl` had no line after 02:14Z,
+  although gen 6 ended turns until 21:10. A manual installed-path hook call at 14:24Z wrote a line, so the host side
+  works. Whether the real Stop hook fires in a head is still for phase 11's probe row to show.
+- `q-3g32txifg5` cancelled as moot (12b landed as `039acaa7e`). No question of this lead is open.
+- **Next:** release activation (owner/OPC) to carry 12c, then lead:SUPERVISOR's rotation rerun. Phases 8, 9 and 10 finish
+  their 24-hour measures from about 14:20 to 16:30 on 2026-11-23, and phase 11 steps 1, 2, 4 and 5 run after that.
 
 ### Lead progress (2026-11-22 21:10, head:lead-forgent-261122-0118-heads-b52f9)
 
