@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "933fd47bb0aa27c8355960c2ba9bc89582f65937cfd650da026ad4f4b579669b",
+  "payloadDigest": "b84270687a0d7f771390f097c916cb70b9e80a8da4822e51364611a8b4548a23",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1340,7 +1340,7 @@
     "scripts/build-rust-distribution.mjs": "7889b3c06dfd048457526689d2c7c3e586053ebf6dfde02a906544c2de558f5d",
     "scripts/build-skill-wrappers.mjs": "8b12a9e8b2c2ab2f6757f795b5370561389d727437a5b1bdc7ba8ab450e3b943",
     "scripts/check-backlog-reconciliation.mjs": "8c01af47ab2709596e7dda0d6edb1fd9962130b73352697b1ae9442640186b4a",
-    "scripts/check-decision-citation-drift.mjs": "f9f88fa41ab2dcc3b6872f92ab787cb74782a8befb634e86d4681fca07c1a966",
+    "scripts/check-decision-citation-drift.mjs": "79fa2194b1a4f607e7c1b4be211e886055b62f87ea417481cddfa2b0fa7ba8e6",
     "scripts/check-decision-codes.mjs": "c9f0ae0dbb6f6368eec818de11a785428d4517736f180359a344c73ad789571c",
     "scripts/check-decision-supersession.mjs": "47dfad28990d1410d0fd9cda8cf1d8e9efce61a0788f01ccf43bde9c4a0a12e8",
     "scripts/check-glibc-ceiling.sh": "6ce52ee1a3197104aded910b937b593153f51915001a5946e2c822702df07e99",

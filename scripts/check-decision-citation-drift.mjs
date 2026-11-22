@@ -35,6 +35,9 @@ const DEFAULT_BASELINE_PATH =
 const CITATION_RE =
   /\b(ADR|RUL|D)(\d{1,4})\b(\s*(\([^)]*\)))?/g;
 
+const ROLE_FIELD_LINE = /^\s*(?:\[[a-z_]+:: [^\]]*\]\s*)+$/;
+const OWN_ID_HEADING = /^#{1,6}[ \t]+(?:D-)?(?:ADR|RUL)\d{1,4}\b/;
+
 export function isDLocalId(id) {
   return typeof id === 'string' && /^D\d+$/.test(id);
 }
@@ -62,11 +65,18 @@ export function findCitationFormatFindings(sourceFiles) {
         return;
       }
       if (inFence) return;
+      // A role-field line (`[valid_from:: …] [replaces:: D-ADR0061]`, projected by `fgos decision-index`) is data
+      // for pkm, not prose: a gloss would break its format.
+      if (ROLE_FIELD_LINE.test(line)) return;
+      // A heading that leads with its own decision id names that decision; it cites nothing. Only that leading
+      // id is skipped: another id later in the heading is still a citation.
+      const ownIdEnd = OWN_ID_HEADING.exec(line)?.[0].length ?? -1;
 
       const ln = idx + 1;
       CITATION_RE.lastIndex = 0;
       let m;
       while ((m = CITATION_RE.exec(line)) !== null) {
+        if (m.index + m[1].length + m[2].length === ownIdEnd) continue;
         const kind = m[1];
         const num = m[2];
         const paren = m[4];
