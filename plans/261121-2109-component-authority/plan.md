@@ -51,6 +51,13 @@ footprint:
   - docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md
   - docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md
   - docs/platform/domainization/architecture/domainization.md
+  - docs/platform/proposals/README.md
+  - docs/platform/proposals/step-09-group-thinking-substrate.md
+  - docs/platform/proposals/documentation-system-unification.md
+  - docs/platform/proposals/step-10-coding-domain-adoption.md
+  - docs/platform/agent-coordination/proposals/README.md
+  - docs/platform/system-architecture/architecture/roadmap.md
+  - docs/platform/system-architecture/architecture/architecture-intent.md
 source:
   - plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md
   - p-esa3lau6kd
@@ -161,7 +168,7 @@ generator for the human views, and one machine-read home for all of it.
 | 3 | [Component and decision-kind rows; layer and tier from components](phase-03-components-and-decision-kinds.md) | 2 | packages/component-authority/model/components.json, packages/component-authority/model/decision-kinds.json, packages/component-authority/model/files.json, packages/component-authority/model/tiers.json, test/architecture.test.mjs, src/setup/instruction-registry.mjs, test/setup/instruction-registry.test.mjs, test/component-authority/components.test.mjs | 3 | done: landed b7744e074 from branch component-authority/p03b (units c-16989 timed out, c-25759 data fixes, c-27737 carry-over plus loader fixes; land c-29713). 70 components, 9 decision kinds, 86 exceptions; derived layer and tier equal phase 2 for all 325 files. Old worktree ../forgent-worktrees/261121-2109-component-authority-p03 handed to the supervisor (event 7f34a492f3c8fcdc) |
 | 4 | [Contract index](phase-04-contract-index.md) | 3 | packages/component-authority/model/contracts.json, test/component-authority/contracts.test.mjs | 4 | done: landed fc277aa8e (units c-30213 gemini quota, c-32984 xai, review fixes c-42575; land c-44152). 157 rows, 13 CTR; live and designed rows name existing files; 7 rows carry a provider reason. Note: the fix commit message names a phase number, against the stable-artifact rule; it cannot be reworded after the land |
 | 5 | [Generated ownership views and decision-index on the model](phase-05-ownership-views.md) | 3 | scripts/component-authority-render.mjs, test/component-authority/render.test.mjs, src/report/decision-index.mjs, test/report/decision-index.test.mjs, docs/platform/component-boundary.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 4 | landed 9486a7d80 (units c-30221 gemini quota, c-33542 commit refused, c-34650, review fixes c-43812, c-47932, c-48998; land c-49359). Views generated except the governance holder table, which is parked on DOCOS: preview in reports/holder-view-preview.md, sent through the supervisor. When DOCOS answers, one unit swaps the table for the generated block and phase 5 is done. Phase 6 does not depend on that block |
-| 6 | [Architecture-map registries generated; proposal map retired](phase-06-architecture-map-views.md) | 4, 5 | scripts/component-authority-render.mjs, test/component-authority/render.test.mjs, docs/platform/architecture-map.md, docs/platform/proposals/component-authority-boundary-map.md, docs/platform/component-authority/spec.md | 5 | draft |
+| 6 | [Architecture-map registries generated; proposal map retired](phase-06-architecture-map-views.md) | 4, 5 | scripts/component-authority-render.mjs, test/component-authority/render.test.mjs, docs/platform/architecture-map.md, docs/platform/proposals/component-authority-boundary-map.md, docs/platform/component-authority/spec.md, docs/platform/proposals/README.md, docs/platform/proposals/step-09-group-thinking-substrate.md, docs/platform/proposals/documentation-system-unification.md, docs/platform/proposals/step-10-coding-domain-adoption.md, docs/platform/agent-coordination/proposals/README.md, docs/platform/system-architecture/architecture/roadmap.md, docs/platform/system-architecture/architecture/architecture-intent.md | 5 | draft |
 | 7 | [Retire the manifest and integrate](phase-07-integration.md) | 6 | docs/architecture-manifest.json, docs/platform/packaging-distribution/contracts/setup-doctor-registry.md, packages/component-authority/model/, docs/knowledge/fgos-s-layered-architecture-is-a-live-tested-invariant-not-a/layered-architecture-invariant.md, docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md, docs/knowledge/state-machine-module-file-names/state-machine-module-file-names.md, docs/platform/domainization/architecture/domainization.md, plans/261121-2109-component-authority/ | 6 | draft |
 
 **Lead notes (2026-11-23, head:lead-forgent-261121-2109-compon-8ee21):**
@@ -178,6 +185,11 @@ generator for the human views, and one machine-read home for all of it.
 - Footprint widened (2026-11-23 01:40, head:supervisor-forgent): the four docs above joined the plan footprint and
   phase 7's write list. Acceptance criterion 2 already requires them swept, so this stays inside the approved frame;
   no running or ready plan lists them.
+- Footprint widened (2026-11-23 03:45, head:supervisor-forgent, event 9a7601026705e4c9): retiring the proposal map in
+  phase 6 breaks links in seven docs, which joined the plan footprint and phase 6's write list:
+  `docs/platform/proposals/README.md`, `docs/platform/proposals/step-09-group-thinking-substrate.md`, `docs/platform/proposals/documentation-system-unification.md`, `docs/platform/proposals/step-10-coding-domain-adoption.md`, `docs/platform/agent-coordination/proposals/README.md`, `docs/platform/system-architecture/architecture/roadmap.md`, `docs/platform/system-architecture/architecture/architecture-intent.md`.
+  The link fixes follow from a deletion the approved plan already makes, so this stays inside the approved frame; no
+  running or ready plan lists them.
 
 Phases are layered (one model, one test file), so most of the plan runs serially. Phases 4 and 5 run in
 parallel in wave 4. Hot files: `components.json` has one writer per wave (phase 1, then phase 2, then phase 3).
