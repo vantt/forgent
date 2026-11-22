@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2f4a0c16bb39183f59c5f2559da6913988306ed1bcbf1a1efab42b3f251e4bad",
+  "payloadDigest": "df2949e7643f83b3d704a69945f959e7193505cfcf8181fa3a0be4148a8de8db",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1350,7 +1350,7 @@
     "scripts/ci-asset-server.mjs": "2de382cc02067014690b358d4c939149bf0c1b7977071896d9b12137526ff32a",
     "scripts/ci-external-consumer.sh": "aabec414125ada7a812586174c53a116af29a96f9b6e6c0e218adc58fd47c5a9",
     "scripts/ci-setup-bwrap.sh": "04e07490fff85c7e2116f4fe8b9b78f300a4ee488c6475e37aadbaf1c15de9ce",
-    "scripts/component-authority-render.mjs": "48d9e347a488c45a9a93a3c37ac33e013a3ed6f10cbf29d1c8529d6ce5992790",
+    "scripts/component-authority-render.mjs": "476ad04a3c9229e904b7d23525d4eadd50fc673a883b27df7f30cc3bf25f5a57",
     "scripts/convention-conformance.mjs": "fb2971690a952f740c9f588e38d61de2b19caa93138c6d6f97b0203d3c1fea8b",
     "scripts/decision-question-hook.mjs": "af83a0333f802f38696c818186887ba439cd47f1b4616dec7bd727c792346d14",
     "scripts/doc-health.mjs": "6c7176b419cdd68e79a205004f5bfc91893ec21a8b669dd82ec97e3f2127e2c3",

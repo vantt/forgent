@@ -27,7 +27,9 @@
     ],
     "meaning": "Decisions on authoring and maintaining end-user documentation.",
     "owner": "enduser-docs-authoring",
-    "narrative": "docs/platform/work-state/decisions/"
+    "narrative": "docs/platform/work-state/decisions/",
+    "readFirst": "docs/platform/work-state/contracts/knowledge-registry.md#spec-soạn--nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring",
+    "facts": "docs/platform/work-state/contracts/knowledge-registry.md#spec-soạn--nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring"
   },
   {
     "id": "enduser-docs-index",
@@ -37,7 +39,9 @@
     ],
     "meaning": "Decisions on tag-based indexing of end-user documentation.",
     "owner": "enduser-docs-index",
-    "narrative": "docs/platform/work-state/decisions/"
+    "narrative": "docs/platform/work-state/decisions/",
+    "readFirst": "docs/platform/work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index",
+    "facts": "docs/platform/work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index"
   },
   {
     "id": "observe",
