@@ -1,7 +1,7 @@
 ---
 id: p-nsngcpgoi2
 title: "Identity and convention for the new kinds (identity, priority medium); source: p-mc25x5pfi6, `docs/discussions/work-data-model/DISCUSSION.md` §7 `#task-ids-and-paths`"
-status: proposed
+status: done
 priority: P2
 area: identity
 created: 2026-11-21

@@ -1,7 +1,7 @@
 ---
 id: p-nxibnmfhra
 title: "Migration of the backlog and discussions to the new data model (portfolio, priority medium); source: p-mc25x5pfi6, `docs/discussions/work-data-model/DISCUSSION.md` §7 `#task-migration`"
-status: proposed
+status: done
 priority: P2
 area: portfolio
 created: 2026-11-21

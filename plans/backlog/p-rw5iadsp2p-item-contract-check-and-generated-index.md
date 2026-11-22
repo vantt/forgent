@@ -1,7 +1,7 @@
 ---
 id: p-rw5iadsp2p
 title: "Item contract, check and generated index (portfolio, priority medium); source: p-mc25x5pfi6, `docs/discussions/work-data-model/DISCUSSION.md` §7 `#task-item-check`"
-status: proposed
+status: done
 priority: P2
 area: portfolio
 created: 2026-11-21

@@ -104,7 +104,7 @@ base: b704fdd08e7cbb54a6b3a023eafcd80f7dd19341
 source:
   - docs/history/secretary-miu/DISCUSSION.md (hand-off block, SM-D1..SM-D13, section 7)
   - p-r4u2ewexvn
-  - p-g2iprtzptz (the `fgos head` name is provisional)
+  - p-g2iprtzptz
   - plans/reports/research-261117-1624-handoff-skills-research.md
   - shaper notes 2026-11-17 (main d77ca29aa) — existing `fgos session` verb collision; Terminal Control launch_line quoting; opening prompt typed visibly in a pane
 created: 2026-11-17

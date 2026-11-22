@@ -1,5 +1,5 @@
 ---
-id: heads-stable-and-able
+id: ds-fvoi45qccq
 title: "Make the secretary and the supervisor heads stable and fully able, as one plan"
 status: settled
 source:

@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Work data model: the shape of the portfolio data"
-status: running
+status: done
 lead: head:lead-forgent-261120-0625-work-d-ce9f6
 base: 8288e13ab08becd109d0c0746243b5502010aa8d
 priority: P1

@@ -1,7 +1,7 @@
 ---
 id: p-xmpheuduez
 title: "Plan statuses held to the plan-v1 enum (portfolio, priority medium); source: p-mc25x5pfi6, `docs/discussions/work-data-model/DISCUSSION.md` §7 `#task-plan-status`"
-status: proposed
+status: done
 priority: P2
 area: portfolio
 created: 2026-11-21

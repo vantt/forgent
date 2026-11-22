@@ -42,7 +42,7 @@ footprint:
   - test/live/head-grant-probe.live.mjs
   - CHANGELOG.md
 source:
-  - plans/discussions/heads-stable-and-able/DISCUSSION.md
+  - plans/discussions/ds-fvoi45qccq-heads-stable-and-able/DISCUSSION.md
   - p-vquz26ibnn
   - p-of5vpvce3e
   - p-s2t244hkqj

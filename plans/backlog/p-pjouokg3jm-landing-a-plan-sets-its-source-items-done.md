@@ -1,7 +1,7 @@
 ---
 id: p-pjouokg3jm
 title: "Landing a plan sets its source items done (supervisor, priority medium); source: p-mc25x5pfi6, `docs/discussions/work-data-model/DISCUSSION.md` §7 `#task-landing-done`"
-status: proposed
+status: done
 priority: P2
 area: supervisor
 created: 2026-11-21

@@ -1,7 +1,7 @@
 ---
 id: p-lsjboo4xzg
 title: "A concurrent claim is refused at landing (supervisor, priority medium); source: p-mc25x5pfi6, `docs/discussions/work-data-model/DISCUSSION.md` §7 `#task-claim-test`"
-status: proposed
+status: done
 priority: P2
 area: supervisor
 created: 2026-11-21

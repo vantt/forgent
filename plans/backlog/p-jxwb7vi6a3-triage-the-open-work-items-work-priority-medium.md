@@ -1,7 +1,7 @@
 ---
 id: p-jxwb7vi6a3
 title: "Triage the open Work items (work, priority medium); source: p-mc25x5pfi6, `docs/discussions/work-data-model/DISCUSSION.md` §7 `#task-work-triage`"
-status: proposed
+status: done
 priority: P2
 area: work
 created: 2026-11-21
