@@ -752,10 +752,12 @@ test('workspace-paths: the resolver binds a granted directory writable, gives a 
     });
     const real = fs.realpathSync(root);
     const bound = (paths) => resolve(paths).filter((r) => r.resource === 'workspace-paths').map((r) => [r.delivery, r.hostTarget, r.access]);
-    // The granted file and its directory stay read-only: no bind of the file, none of its parent.
-    assert.deepEqual(bound(['plans', 'plans/backlog.md', 'plans/discussions']), [
-      ['mount', path.join(real, 'plans'), 'read-write'],
+    // The granted file and its parent directory stay read-only: no bind of the file, none of its parent.
+    assert.deepEqual(bound(['plans/discussions', 'plans/backlog.md']), [
       ['mount', path.join(real, 'plans', 'discussions'), 'read-write'],
+    ]);
+    assert.deepEqual(bound(['plans']), [
+      ['mount', path.join(real, 'plans'), 'read-write'],
     ]);
     assert.deepEqual(bound(['top.md']), [], 'a file in the project root is checked, never bound');
     assert.throws(() => resolve(['nope']), (err) => err.code === 'workspace-path-missing');
