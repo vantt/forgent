@@ -19,4 +19,4 @@ One door closes a question that is moot or decided elsewhere, whoever asked it, 
 
 Related: `p-wb6rkwpjsg` (agent-to-owner communication standard, gap 3, stale questions). Whether the door is a new `cancel` rule or a new verb is a mechanism choice for the owner.
 
-Owner 2026-11-22 19:50 (relayed by the owner-communication shaper, OC-D12): carry this in draft plan `261122-0056-orchestration-skeleton`, which already touches the question-door files.
+Owner 2026-11-22 19:50 (relayed by the owner-communication shaper as its decision 12): carry this in draft plan `261122-0056-orchestration-skeleton`, which already touches the question-door files.

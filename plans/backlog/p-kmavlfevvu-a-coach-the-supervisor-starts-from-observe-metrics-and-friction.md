@@ -9,7 +9,7 @@ created: 2026-11-22
 
 # Why
 
-Owner decision 2026-11-22 19:50, relayed by the owner-communication shaper: open a separate shaper discussion for the coach observation cluster. A coach agent is started by the supervisor at the right moment and learns from the observe metrics and the friction records. Observe is hardened with ready-made views for the coach, in the manner of the owner's repository vantt/pkm. Automatic capture of owner reactions to agent messages (dropped from the communication standard plan as OC-D13) also belongs here.
+Owner decision 2026-11-22 19:50, relayed by the owner-communication shaper: open a separate shaper discussion for the coach observation cluster. A coach agent is started by the supervisor at the right moment and learns from the observe metrics and the friction records. Observe is hardened with ready-made views for the coach, in the manner of the owner's repository vantt/pkm. Automatic capture of owner reactions to agent messages (dropped from the communication standard plan as its decision 13) also belongs here.
 
 # Done when
 
@@ -17,4 +17,4 @@ A shaped discussion states when the supervisor starts the coach, which observe v
 
 # Notes
 
-Related: `p-wb6rkwpjsg` and discussion `ds-cfsfcbknl6` (the communication standard and its friction-recording duty). Seed: that discussion, decision OC-D13.
+Related: `p-wb6rkwpjsg` and discussion `ds-cfsfcbknl6` (the communication standard and its friction-recording duty). Seed: that discussion, its decision 13.
