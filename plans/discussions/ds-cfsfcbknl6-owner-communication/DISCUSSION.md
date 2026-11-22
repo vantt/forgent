@@ -1,15 +1,15 @@
 ---
 id: ds-cfsfcbknl6
 title: "Tiêu chuẩn giao tiếp: one shared communication standard for how every agent talks to the owner"
-status: settled
+status: open
 source:
   - p-wb6rkwpjsg
 created: 2026-11-22
 ---
 
-discussion: settled
+discussion: open
 
-## Hand-off to the planner
+## Hand-off to the planner (under revision, round 12)
 
 - **Outcome:** one shared standard, **tiêu chuẩn giao tiếp** (communication standard), always loaded by every head, lead and worker in every CLI, that gives the motive, the principle judged from the reader's side, its applications (before speaking, names and ids, language and length, decision questions, status and incident reports) and a few curated cases; bad exchanges are captured in the friction store, partly by a hook on the owner's own reaction; the question door makes answers cheap. Decisions OC-D1 to OC-D7.
 - **Constraints:** the standard replaces `core/skills/_shared/decision-question.md` and `core/instructions/decision-question.md`; every caller moves and the old paths are removed in the same change (L10, design principle 1); generated copies are rebuilt with `npm run build:skills`, never edited; a new friction layer value goes into `packages/observe/rust/friction-kinds.json` only; a new hook kind needs its rows in `packages/distribution/contracts/agent-hooks.v1.json` and the doctor registry; the reaction hook never blocks or delays the owner's prompt; a user-visible change gets a line in `CHANGELOG.md`; `npm test` and `cargo test --workspace` green.
@@ -35,11 +35,13 @@ Opened by the secretary (Miu) on the owner's order, 2026-11-22. The owner wants 
 
 ## 1. Trạng thái hiện tại
 
-Settled, 2026-11-22 17:50. Domain: coding (the change edits fgOS core skills, the always-loaded instruction, the friction declarations, an agent hook and the question door).
+Reopened, 2026-11-22 18:05 (round 12). Domain: coding.
 
-The standard **tiêu chuẩn giao tiếp** (communication standard) is defined: the motive (the owner's attention is the scarcest resource), the principle judged from the reader's side, its applications and seed cases (section 6). Bad exchanges go to the friction store, triggered by the owner's reaction (signals T1-T12). A coach, started by the supervisor, learns from them and hands problems back through the normal pipeline. Program support: capture the owner's reaction, make answers cheap in the question door, no check on outgoing messages for now. Decisions OC-D1 to OC-D7.
+Settled so far (OC-D1, OC-D3 to OC-D8): the **tiêu chuẩn giao tiếp** (communication standard), grounded in the owner being cognitively overloaded, so every message must make taking in information as easy, clear and high in quality as possible; the friction store as case log; a coach that learns from it; one standard file; program support levels.
 
-**Output:** three tasks for one planner (section 7): write the standard and move every caller; capture the owner's reaction; cheap answers in the question door. Two separate items that need their own backlog rows and shapers: information freshness by watchers and monitors (OC-D1) and the coach role (OC-D5). No owner question is open.
+Round 12: the owner said the reaction signals were a hint for the agent itself to notice that its presentation fell short, not a hook to build, and that presenting information is the core of the standard. Proposed and waiting for the owner: (a) the reaction-signal rule moves into the standard (Part A), the automatic capture moves to the coach cluster discussion, leaving two tasks; (b) step 2 split into three parts (conduct, presenting information in nine points, when and where).
+
+Also waiting for the owner: where the stale-question part of freshness goes (recommended: draft plan `261122-0056-orchestration-skeleton`), and the path to the owner's `vantt/pkm` project for the coach discussion.
 
 ## 2. Mục tiêu & đề bài
 
@@ -58,7 +60,7 @@ Agents in fgOS speak to the owner many times a day, and the owner's attention is
 | Coach role | **settled for this standard, OC-D5; the coach itself is its own item** | Owner: "không nên là miu. là một người khác được bật bởi supervisor luôn. có thể là coach ... mọi thứ cần tối ưu, self-improve, self-learning đều nên cho coacher làm." Prior art: no coach persona in `core/agents/` and no `coach` in code, specs or git history; adjacent skills `instruction-audit` (periodic audit of the instruction surface) and `distill` exist; the supervisor already starts heads with `fgos session start`. | A coach head, started by the supervisor when the watcher sees the right moment, owns every optimisation, self-improvement and self-learning job of the system. This standard is one of its inputs: the coach reads the owner-communication friction, proposes new lines for the standard in a batch for the owner, and curates its examples. Defining the coach (persona, when it is started, its verbs) is a separate backlog item with its own shaper; this discussion only names the hand-off. Not yet in the backlog (shaper cannot write it; mailbox to the secretary refused from this sandbox). **Shaper's position (17:35):** agree that the learner must not be the secretary or any agent judging its own messages (C1 and S1-S2 went unnoticed by their authors; the secretary would grade her own cases). Disagree with "everything self-improving goes to the coach" as stated: (a) one role owning every kind of improvement becomes a bottleneck and a role without a boundary (RUL11); proposed boundary: the coach owns the learning loop (read signals, find repeats, propose, measure after), and the fix goes to the area that owns it; (b) every proposal adds to the owner's load, the opposite of this standard's goal, so the coach needs a threshold (a signature repeated, or a fixed rhythm) and a cap per batch; (c) the coach must also merge and delete rules, not only add (RUL104), or the always-loaded standard bloats; (d) a change is verified by the signature's count dropping afterwards (`fgos friction rank --bucket`); (e) self-reporting under-reports, so the coach may need to scan owner messages for the T-signals itself, which has a cost. **Round 8 (owner 17:37):** there are no standing area owners; work is done by starting the team whose setup fits the task. So the coach collects signals, finds the real problem, and hands it to a team set up for it. Shaper's additions, provisional: (f) the hand-off uses the existing intake, not a new dispatch path: the coach returns a well-evidenced problem (signature, count, examples, diagnosed cause, proposed outcome) to the supervisor that started it, which writes the backlog row and queues it, and the normal pipeline (shaper, planner, lead) assembles the team; (g) a change to the standard's own text (one line, one example) is too small for that pipeline: the coach drafts the exact wording, the owner approves it in a batch by letter, and one run lands it; (h) "finding the real problem" is the coach's core work: a repeated signal may come from a skill or prompt that produces the fault rather than a missing rule, so the coach diagnoses before it proposes. |
 | Gaps 1 and 4 | in scope (owner 14:55) | Seed cases C1 and C4 in section 6 | Covered by the principle's applications "before you speak" and "names and ids". |
 | Gaps 5, 6, 7 | provisional | Owner named 1 and 4 at 14:55 | 5 and 6 are applications of the principle (cheap answers, report shape). 7 is answered by the standard itself: the lesson lives in one shared place, not in one agent's memory. |
-| Program support (step 4) | **settled, OC-D7** | Existing guard checks labels only, on ask-tool calls only; Claude Code runs fgOS hooks on `UserPromptSubmit` (the questions row, `src/setup/agent-hooks.mjs:241`) and `Stop`; Codex on `Stop` | Ranked by value: (1) **capture the owner's reaction**: a hook on the owner's incoming message spots the T-signals ("là gì", "khoan", "không phải", "cứ làm đi", ...) and records a friction candidate with the owner's words and the agent's previous message; the coach judges it. It measures from the reader's side and fixes the coach's main risk, under-reporting. (2) **cheap answers in the question door**: options lettered A-D on display and a stated default field. (3) **checking the agent's own outgoing message**: not now; it invites writing for the check (step 1); the coach decides later from data. |
+| Program support (step 4) | **OC-D7, item (1) under revision (owner 18:05)** | Existing guard checks labels only, on ask-tool calls only; Claude Code runs fgOS hooks on `UserPromptSubmit` (the questions row, `src/setup/agent-hooks.mjs:241`) and `Stop`; Codex on `Stop` | Ranked by value: (1) **capture the owner's reaction**: a hook on the owner's incoming message spots the T-signals ("là gì", "khoan", "không phải", "cứ làm đi", ...) and records a friction candidate with the owner's words and the agent's previous message; the coach judges it. It measures from the reader's side and fixes the coach's main risk, under-reporting. (2) **cheap answers in the question door**: options lettered A-D on display and a stated default field. (3) **checking the agent's own outgoing message**: not now; it invites writing for the check (step 1); the coach decides later from data. |
 | Approved-frame rule, priority order | non-goal | Seed | Moved into the standard unchanged. |
 
 ## 4. Quyết định đã chốt
@@ -106,6 +108,8 @@ Agents in fgOS speak to the owner many times a day, and the owner's attention is
 
 - 2026-11-22 18:00 — Owner: "việc 1: tên gọi thấu hiểu user thì cũng không đúng lắm nhỉ. thật ra là tiêu chuẩn giao tiếp thì đúng hơn. sự thấu hiểu ở đây là hiểu user bị quá tải nhận thức, quá nhiều việc, nên hướng giao tiếp phải làm cho việc tiếp nhận thông tin dễ dàng nhất, rõ ràng và chất lượng nhất." Shaper agreed: the old name read as a general empathy rule while the scope is communication; the overload is the reason, not the name. Minted OC-D8 superseding OC-D2's name; widened the principle from deciding at once to taking in information easily, with deciding as one case; renamed throughout outside §4-§5.
 
+- 2026-11-22 18:05 — Owner: "việc 2: chổ này anh chỉ hint là sử dụng một số phản ứng của anh như là một tín hiệu để nhận ra là cách trình bày thông tin của em chưa đạt. à, nói tới đây mới vỡ lẻ ra là việc số 1 chính xác là tiêu chuẩn trình bày thông tin là một vấn đề lớn trong tiêu chuẩn giao tiếp." Shaper: the reaction signals are for the agent to notice and re-present at once, not a hook to build here; proposed moving the automatic capture to the coach cluster and folding the rule into task 1 (two tasks left). Restructured step 2 into three parts (conduct, presenting information, when and where) and drafted presenting information in nine points. Discussion reopened until the owner confirms.
+
 ## 6. Thiết kế đã chốt {#design}
 
 The standard **tiêu chuẩn giao tiếp** (communication standard), as it stands. Steps 1 and 2 are settled in substance (OC-D2), their wording is not final; step 3 holds seed cases; step 4 is not started.
@@ -122,13 +126,33 @@ Of everything in the system, the owner's attention is the scarcest and the most 
 
 **Test before sending.** Read the message as an overloaded person with no context: can that person take it in with one read, and decide if a decision is asked? If the person would ask "what is this?", "why?", "what do you suggest?" or "what happens if I say yes?", the message is not done.
 
-**Applications** (each is the principle applied to one kind of message):
+**Three parts of the standard** (draft, round 12). Presenting information is the largest part, and the owner named it as the core (18:05).
 
-- **Before you speak.** Reading, checking and drafting are the agent's own work; never ask permission for them. Come with findings and a recommendation. Ask only for what is the owner's to decide.
-- **Names and ids.** The first time a role, lane, id or term appears, give it one plain phrase. A pointer to a numbered item names the item. An id is never the only handle.
-- **Language and length.** The owner's language, plain words, outcome first, the shortest message that is still complete.
-- **Decision question.** The five parts each answer a question the owner would otherwise ask back: what is happening (context), cause (proof the agent investigated), options with gain, harm and cost (the comparison already done), recommendation (the agent takes a position), scope of the answer (a yes has edges). Options are lettered, the recommended one first, with a stated default, so one letter or silence is a full answer.
-- **Status and incident reports.** Outcome first; what was done, with names explained; what was checked and what was not; the one decision needed, if any, as a decision question; at most 10 lines, detail in a file.
+**Part A. Conduct: what the agent does before and while it speaks.**
+
+- Reading, checking and drafting are the agent's own work; never ask permission for them. Come with findings and a recommendation; ask only for what is the owner's to decide.
+- Bring your own view. Weigh what the owner proposes; say where you agree and where you do not, with evidence; then the owner decides (case S3).
+- When the owner's reaction shows the presentation fell short (the signals in step 3: mood change, asking back, not following the recommendation, re-aiming, ...), present it again now in a better form, and record a friction.
+
+**Part B. Presenting information (trình bày thông tin), the largest part.**
+
+1. **Outcome first.** The first sentence is the conclusion, or the decision needed.
+2. **One item, one point.** Several items are numbered; each holds one fact or one decision.
+3. **The owner's words.** The owner's language, plain words, no internal jargon. The first mention of a role, lane, id or term gets one plain phrase; a pointer to a numbered item names the item; an id is only a secondary handle.
+4. **Concrete, not abstract.** Numbers with units, before and after, what the owner will see or feel.
+5. **Certain, assumed, not checked.** Say which is which.
+6. **Shape fits the content.** A table for three or more comparable items, a list for steps, a diagram for structure; never a wall of text.
+7. **Shortest complete length.** Do not repeat what the owner already knows; detail goes to a linked file.
+8. **A fixed shape per kind of message.**
+   - Decision question: the five parts, each answering a question the owner would otherwise ask back (what is happening, cause, options with gain, harm and cost, recommendation, scope of the answer); options lettered, the recommended one first, a stated default.
+   - Status or progress report: outcome; what was done, names explained; checked and not checked; the one decision needed, if any; at most 10 lines.
+   - Incident report: impact now; what was done to contain it; what is still at risk; the one decision needed.
+9. **End with the owner's action.** Exactly what the owner needs to do, or "nothing needed".
+
+**Part C. When and where to speak.**
+
+- Speak when there is a decision or a material change, not to show progress.
+- Batch questions so each return of the owner answers as many as possible; questions go through the question store, long detail into a file, the message carries the link.
 
 ### Bước 3 — Tình huống (case log)
 
@@ -181,7 +205,7 @@ flowchart TD
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Three tasks for one planner. Task 1 lands first; tasks 2 and 3 can run in parallel after it.
+Proposed in round 12: two tasks for one planner. Task 1 lands first; task 3 follows it.
 
 ### Task 1 — Write the standard and move every caller {#task-standard}
 
@@ -192,14 +216,9 @@ Three tasks for one planner. Task 1 lands first; tasks 2 and 3 can run in parall
 - **Siblings:** tasks 2 and 3 depend on it (the layer value, and the text they point to).
 - **Draft verify:** `git grep -n -e "_shared/decision-question" -e "instructions/decision-question" -- ':!plans' ':!CHANGELOG.md'` prints nothing; `npm run build:skills` leaves no diff; `npm test` green.
 
-### Task 2 — Capture the owner's reaction {#task-reaction-capture}
+### Task 2 — moved {#task-reaction-capture}
 
-- **Goal:** when the owner's message carries a T-signal, one friction record is written with the owner-communication layer, a signature per signal kind, the owner's words and a pointer to the agent's previous message; the coach reads these later.
-- **§6 excerpt:** step 3 signal table; step 4 level 1.
-- **D-IDs:** OC-D4, OC-D7.
-- **Includes:** a hook kind on the owner's prompt (Claude Code `UserPromptSubmit`, beside the existing questions row in `src/setup/agent-hooks.mjs`; Codex where supported), its contract and doctor rows; it never blocks, delays or changes the prompt, and a failed record is silent.
-- **Siblings:** needs task 1's layer value.
-- **Draft verify:** a prompt containing "khoan, cái này là gì" records exactly one friction with that layer; a neutral prompt records none; the hook exits 0 in both; `npm test` green.
+Proposed in round 12: the automatic capture hook leaves this discussion. The owner meant the reactions as a signal for the agent to notice that its presentation fell short (owner 18:05), which is a rule in Part A and lands with task 1. Collecting the signals automatically for the coach goes to the coach observation-cluster discussion as an input.
 
 ### Task 3 — Cheap answers in the question door {#task-cheap-answers}
 
