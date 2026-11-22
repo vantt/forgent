@@ -1,7 +1,8 @@
 ---
 contract: plan-v1
 title: "Make the secretary and the supervisor heads stable and fully able: head verbs, plan check at the land door, provider floor, release pickup, rotation recovery, idle and wake tuning, live grant probe"
-status: ready
+status: running
+lead: head:lead-forgent-261122-0118-heads-b52f9
 priority: P1
 blockedBy: []
 base: aa35c0664447f6d01d214911973c4d0246715e39
