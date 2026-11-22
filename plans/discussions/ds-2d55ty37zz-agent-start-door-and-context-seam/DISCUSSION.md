@@ -1,15 +1,49 @@
 ---
 id: ds-2d55ty37zz
 title: "One door and one context-injection seam for starting an agent"
-status: open
+status: settled
 source:
   - p-25q7tz6jtt
 created: 2026-11-22
 ---
 
-discussion: open
+discussion: settled
+
+## Hand-off to the planner
+
+- **Outcome.** Every agent fgOS starts gets its start text from one composer, the crate **Agent Start Context**: heads, workers, `.claude/agents` files, and sessions opened by hand on CLIs with hooks. The composer receives typed start facts and payloads and returns ordered blocks. Rules enter as unit files and live context through registered contributors. The always-loaded fgOS text in AGENTS.md shrinks to a standing sheet (L8).
+- **Constraints.**
+  - Hexagonal, with the composer pure behind ports.
+  - Rust, tier 3.
+  - One door: every old producer is moved and deleted in the same slice (L10, design principle 1).
+  - Golden openings per persona are the owning proof.
+  - An architecture test allows one start-text producer.
+  - The composer fails closed for bad static data and fails open for a broken live contributor.
+  - The area spec names the crate's owner before code (L5 question 2).
+- **Non-goals.**
+  - External text: AgentKit, GitNexus, MDView (ASC-D2).
+  - Changing what persona or doctrine says.
+  - The decision component (P12) and the entry-persona UX (P13), both separate items (ASC-D4).
+  - Merging the two engine entry ops (item C).
+  - Moving the Node runner fronts onto the declared doors (P14, separate item).
+- **Acceptance criteria.**
+  1. A spec exists for the area, and `start-request`, `start-context`, `start-facts`, `start-contributors` and `refusals` v1 schemas exist with golden vectors.
+  2. The dead Node dispatch mirror is gone (slice 0).
+  3. Node `openingText`, `FIRST_STEPS`, `renderOnWake`, `renderPersonaSection`, `persona.rs` rendering, the renderer in `scripts/project-agents.mjs` and the second claim render are deleted. Their callers use the composer.
+  4. The architecture test fails on a second start-text producer.
+  5. Golden openings per persona equal today's text except the named fixes: the filled domain, a head-worded preamble and a single handoff.
+  6. Each start appends a record with facts, matched units and bytes per block. A before/after table of tokens per start exists for each head persona and each worker operation.
+  7. Units declare `when:` facts, and a build test refuses unknown keys and values.
+  8. The setup-time matcher calls the composer.
+  9. The rotation handoff reaches a successor through one channel, as a contributor.
+  10. The fgOS part of AGENTS.md passes the L8 test, and a SessionStart hook injects context for hand-opened sessions.
+  11. `npm test` and `cargo test --workspace` are green.
+- **Open, blocking only part.** P10: the domain field on items. The secretary writes it, and the decision port is the fallback; this blocks only slice 2's domain doctrine for heads. Item C and the runner item run separately.
+- **Source ids.** `p-25q7tz6jtt`; decisions ASC-D1 to ASC-D7; related `ds-cfsfcbknl6`.
 
 ## 1. Trạng thái hiện tại
+
+2026-11-22 19:55 — **Settled.** The owner agreed to the typed interface and the two doors (round 4). ASC-D5 to ASC-D7 are minted, §6 and §7 are written, and the hand-off block is at the top. P14's runner item gets the shaper's advice in §5 19:55; it is a separate item for the secretary.
 
 2026-11-22 19:00 — Round 3 closed. The council of three postures (assumptions, feedback loops, ship-and-maintain) agreed independently: **A, narrowed** ([#council](#council)). The new crate makes things simpler, not messier, on three conditions: it replaces every old producer in the same slice, it absorbs the setup-time instruction matcher, and an architecture test allows exactly one start-text producer. Settled and minted: ASC-D1 to ASC-D4 (§4). Still proposed, waiting for the owner: the revised contract (open start facts from a key registry plus typed payloads) and the revised slice order (§3 P5, P7). When the owner confirms them, §6 and §7 are written and the discussion is handed to the planner.
 
@@ -249,6 +283,9 @@ Plus hooks: AgentKit `session-init` (≤4 KB), `dev-rules-reminder` on every pro
 | ASC-D2 | Scope is fgOS-owned text only; MDView, AgentKit and GitNexus blocks are external and not touched, with no deep integration | 2026-11-22 | owner 17:15 (Q1, `q-excujq527g` cancelled with that answer), held through rounds 2–3 |
 | ASC-D3 | Sessions opened by hand go through the seam by a fgOS SessionStart hook (CLIs with hooks: claude, codex, agy); with no role they ask for the project's entry persona | 2026-11-22 | owner 17:45 (P11 option B), held through round 3 |
 | ASC-D4 | Two topics leave this discussion: the decision component for fixed-option judgments (P12, prior art multica patch 0007) and the entry-persona UX flow (P13); the secretary was asked to open both | 2026-11-22 | owner 17:30 and 17:50 |
+| ASC-D5 | The contract is `compose(StartRequest{facts, payloads, delivery}) -> StartContext | Refusal`, with every argument typed by a v1 schema. Facts use keys from the `start-facts` registry, with values read from live data. Payloads are a closed union whose content belongs to its producer. Delivery is an enum. Refusals are named (#interface) | 2026-11-22 | proposed round 3 (council), interface round 4, owner agreed 19:37 and 19:50 |
+| ASC-D6 | Two doors in. Static rules are unit files found by the existing instruction registry (core, `components/<c>`, `domains/<d>`, owners from the architecture manifest), selected by `when:` facts. Live context comes from registered `Contributor` adapters with a budget and timeout, which fail open. One matcher for setup and start | 2026-11-22 | owner question 19:45, answered round 4, owner agreed 19:50 |
+| ASC-D7 | Slice order. Slice 0: delete the dead Node mirror alone. Slice 1: spec and crate, with every persona and opening producer moved at once, plus the one-producer architecture test. Slice 2: doctrine by facts, setup matcher folded in, the handoff as a contributor. Slice 3: AGENTS.md cut by L8 and the SessionStart hook | 2026-11-22 | council round 3, owner agreed 19:50 |
 
 ## 5. Q&A log
 
@@ -267,11 +304,77 @@ Plus hooks: AgentKit `session-init` (≤4 KB), `dev-rules-reminder` on every pro
 - 2026-11-22 19:35 — Owner: how many different flows start an agent, can they be gathered too? Shaper answer in P14: about 13 trigger flows, 2 engine entry ops, 1 seat-and-spawn step. The context is gathered here; the 2 entry ops are item C; the three Node fronts that bypass the declared doors (one of them only runnable inside the fgOS checkout) are proposed as a separate runner item.
 - 2026-11-22 19:40 — Owner: the contract is good, but do its arguments have a clear interface? Shaper: not yet in round 3 (`facts` was a loose map). Round 4 writes the explicit interface (#interface): three typed arguments with schema files, a fact registry whose values come from live data, a closed payload union, a delivery enum, `when:` frontmatter checked at build, and named refusals.
 - 2026-11-22 19:45 — Owner: does compose have an injection mechanism, or a way to gather rules? A rule in a new component needs a door in. Shaper: the rule-gathering door already exists (instruction registry: core, components/<c>, domains/<d> roots, owners from the architecture manifest, authority and specificity order) and becomes the composer's UnitSource. Added a live door, a registered `Contributor` port for context computed at start, plus a budget per delivery (#interface).
+- 2026-11-22 19:55 — Owner agreed (interface, doors, slices) and asked for advice on the runner item. Advice: yes, a separate item in three parts by value. (1) The fanout batch onto `fgos workflow start --units` first, because `node src/runner/fanout-batch.mjs` runs only inside the fgOS checkout (mission #1). (2) The operation step of `fgos step`/`discover`/`plan` builds its Unit through the same function `fgos run --unit` uses, and its objective templates move to domain units. (3) The Work loop `fgos-runner`: measure use first; retiring a shipped entry point is a decision question with that evidence. It does not collide with this discussion's slices. Discussion settled.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Not yet: P4, P5 and P7 are proposals after one round; P6 waits on Q1.
+fgOS starts agents through about 13 trigger flows: 4 for heads, 6 for workers, plus Claude's own subagents, sessions opened by hand and the credential probe. They converge on two engine entry ops and one shared seat-and-spawn step, so spawning is already one door, and Agent Protocol owns delivery. What had no owner was the text an agent receives at start. About 12 places built it, in Node and in Rust, with three persona renderers on one source. Behind them sat 3,003 lines of dead Node dispatch code.
+
+**Agent Start Context** is a small pure Rust crate at tier 3 that owns that text (ASC-D1). Every start, whatever its trigger, calls `compose` with typed arguments (ASC-D5):
+- `facts`: registered keys such as `kind`, `cli`, `project`, `persona`, `role`, `domain`, `workflow` and `stage`, whose values are read from live data.
+- `payloads`: content owned by others, such as Execution's assignment, a head's task, a handoff or a question.
+- `delivery`: opening, prompt argument, agent file or hook context.
+
+`compose` returns ordered blocks and appends a record of what it chose and how many bytes each block cost.
+
+Rules come in through the existing instruction registry as unit files with `when:` facts. Live context comes in through registered contributors (ASC-D6). The engine's `PromptPort` stays; its host side becomes an adapter of the crate. The head path sends facts instead of finished text. The `.claude/agents` projection and a SessionStart hook for sessions opened by hand (ASC-D3) call the same composer. External tools' text is out of scope (ASC-D2). An architecture test keeps the producer count at one, and the per-start record makes token cost measurable.
+
+```mermaid
+flowchart LR
+  subgraph triggers[About 13 trigger flows]
+    H[heads: start, socket, wake, rotation]
+    W[workers: run, unit, workflow, Node fronts]
+    P[.claude/agents projection]
+    K[SessionStart hook: hand-opened]
+  end
+  H --> LS[launch-session]
+  W --> RU[run-unit]
+  LS & RU --> SEAT[shared seat and spawn]
+  subgraph asc[Agent Start Context, tier 3]
+    C[compose: facts, payloads, delivery]
+    U[(UnitSource: core / components / domains units)]
+    F[(FactRegistry: live values)]
+    CT[(Contributors: handoff, later others)]
+    R[(RecordSink)]
+    C --- U & F & CT & R
+  end
+  LS -- facts --> C
+  RU -- PromptPort host adapter --> C
+  P --> C
+  K --> C
+  C --> AP[Agent Protocol delivery]
+```
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Not yet.
+### Slice 0: delete the dead Node dispatch mirror {#task-delete-dead-mirror}
+- **Goal:** remove `src/runner/dispatch/{session-attempt,assignment-runner,herdr-round,brief}.mjs`, `src/run-supervisor/direct-launch.mjs`, the dead `renderAssignmentPrompt` and the two dead functions in `transport.mjs`, the tests that only import them, and the comments naming them.
+- **Design:** §6 first paragraph.
+- **Decisions:** ASC-D7.
+- **Siblings:** none; it lands alone first.
+- **Verify (draft):** `rg -l "assignment-runner|herdr-round|direct-launch" src test bin` is empty; `npm test` is green.
+
+### Slice 1: spec, crate, every producer moved {#task-crate-and-producers}
+- **Goal:** the area spec (owner, contracts, refusals), the crate with `compose` and its ports, and the head path switched to send facts. Every persona and opening producer moves at once: the head opening, the `PromptPort` host adapter, `scripts/project-agents.mjs` and the second claim render. The one-producer architecture test and golden openings per persona land with it.
+- **Design:** §6 and #interface.
+- **Decisions:** ASC-D1, ASC-D5, ASC-D7.
+- **Siblings:** after slice 0.
+- **Verify (draft):** `cargo test -p <crate>` (golden openings, schema vectors); `node --test test/architecture.test.mjs`; `npm test`.
+
+### Slice 2: doctrine by facts, one matcher, the handoff as a contributor {#task-doctrine-by-facts}
+- **Goal:**
+  - Units gain `when:` facts, with a build test on keys and values.
+  - `instruction-composition.mjs` calls the composer.
+  - The rotation handoff becomes the first contributor (single channel).
+  - The domain fact comes from the bound item (P10).
+- **Design:** #interface (two doors).
+- **Decisions:** ASC-D6.
+- **Siblings:** after slice 1; P10's item field comes from the secretary.
+- **Verify (draft):** golden openings show one handoff; the per-start record lists the matched domain units; `npm test`, `cargo test --workspace`.
+
+### Slice 3: AGENTS.md cut and the hand-opened hook {#task-agents-md-cut}
+- **Goal:** move the fgOS-owned AGENTS.md sections that fail the L8 test into units (#advice split), and register the SessionStart hook that composes for hand-opened sessions with the entry persona as default (ASC-D3).
+- **Design:** #advice (AGENTS.md split).
+- **Decisions:** ASC-D2, ASC-D3.
+- **Siblings:** after slice 2.
+- **Verify (draft):** a before/after token table per start; RUL11 and RUL104 anchor tests still green; `npm test`.
