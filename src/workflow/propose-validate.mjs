@@ -13,7 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { unservedToolAbilityOf } from '../runner/dispatch/tool-providers.mjs';
+import { unservedToolAbilitiesOf } from '../native/execution-door.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';
 import { normalizeWrite, globsMeet } from './propose-classify.mjs';
 
@@ -127,12 +127,16 @@ function changedCodeFiles(described, ports) {
  * @param {{ stat: (p: string) => 'file'|'dir'|'link'|null, listFiles: (scope: string) => string[], findTests: (terms: string[]) => string[], crateOf: (file: string) => ({ dir: string, name: string }|null) }} params.ports
  * @returns {{ ok: boolean, refusals: object[], expansions: Array<{ slice: string, add: string[], coveredElsewhere: Array<{ path: string, slice: string }>, terms: string[] }>, ownerFirst: string[] }}
  */
-export function validateProposal({ slices, runnerConfig, rigorFloor, ports }) {
+export async function validateProposal({ slices, runnerConfig, rigorFloor, ports }) {
   if (!Array.isArray(slices) || slices.length === 0) throw new ProposeValidateError('a proposal needs at least one slice', 'no-slices');
   if (rigorFloor !== undefined && !RIGOR_ORDER.includes(rigorFloor)) throw new ProposeValidateError(`rigorFloor must be one of ${RIGOR_ORDER.join(', ')}`, 'floor-invalid');
   const refusals = [];
   const refuse = (code, slice, detail, extra = {}) => refusals.push({ code, slice: slice.id, detail, ...extra });
   const described = new Map();
+  const wantedOf = (slice) => [slice.askOwnerFirst === true ? null : slice.capability, slice.followUp?.capability];
+  // A capability no tool executor names is a label the seat binds through the role, persona and tier tables; only a
+  // tool ability needs its tool present, asked of the host once for the whole proposal.
+  const unserved = await unservedToolAbilitiesOf(runnerConfig, slices.flatMap(wantedOf));
 
   for (const slice of slices) {
     if (Array.isArray(slice.unresolvedScopes) && slice.unresolvedScopes.length > 0) {
@@ -152,11 +156,8 @@ export function validateProposal({ slices, runnerConfig, rigorFloor, ports }) {
     }
     described.set(slice.id, { writes, writesSound });
 
-    const wanted = [slice.askOwnerFirst === true ? null : slice.capability, slice.followUp?.capability];
-    for (const capability of wanted) {
-      // A capability no tool executor names is a label the seat binds through the role, persona and tier tables;
-      // only a tool ability needs its tool present.
-      if (typeof capability === 'string' && capability !== '' && unservedToolAbilityOf(runnerConfig, capability) !== undefined) {
+    for (const capability of wantedOf(slice)) {
+      if (typeof capability === 'string' && capability !== '' && Object.hasOwn(unserved, capability)) {
         refuse('capability-tool-unserved', slice, `"${capability}" is a tool ability whose tool is not present (install the tool its kind: tool executor names)`, { capability });
       }
     }

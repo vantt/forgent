@@ -102,28 +102,28 @@ function writeProjectWorkflow(cwd, capabilities) {
   fs.writeFileSync(path.join(cwd, 'core', 'workflows', 'mine.yaml'), `id: mine\nsteps:\n  - id: s\n    units:\n${units}`);
 }
 
-test('workflow-capabilities-configured passes on the standard alone, and a capability with no row is a label that passes', () => {
+test('workflow-capabilities-configured passes on the standard alone, and a capability with no row is a label that passes', async () => {
   const cwd = mkTemp('doctor-workflow-caps-label-');
-  assert.equal(checkById('workflow-capabilities-configured').check(cwd).passed, true);
+  assert.equal((await checkById('workflow-capabilities-configured').check(cwd)).passed, true);
   writeProjectWorkflow(cwd, ['mine:frame']);
-  const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
+  const { passed, message } = await checkById('workflow-capabilities-configured').check(cwd);
   assert.equal(passed, true, message);
   assert.doesNotMatch(message, /warning|mine:frame/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('workflow-capabilities-configured fails only for a tool ability whose tool is not present, naming it and the Workflow', () => {
+test('workflow-capabilities-configured fails only for a tool ability whose tool is not present, naming it and the Workflow', async () => {
   const cwd = mkTemp('doctor-workflow-caps-tool-');
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   writeProjectWorkflow(cwd, ['impact-analysis', 'mine:frame']);
-  assert.equal(checkById('workflow-capabilities-configured').check(cwd).passed, true, 'no tool executor names it: a label');
+  assert.equal((await checkById('workflow-capabilities-configured').check(cwd)).passed, true, 'no tool executor names it: a label');
   declareExecutor(cwd, 'gone-graph', { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: 'fgos-no-such-tool-binary', args: [] }] });
-  const failed = checkById('workflow-capabilities-configured').check(cwd);
+  const failed = await checkById('workflow-capabilities-configured').check(cwd);
   assert.equal(failed.passed, false);
   assert.match(failed.message, /impact-analysis \(mine from project\)/);
   assert.doesNotMatch(failed.message, /mine:frame/);
   declareExecutor(cwd, 'graph', { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: process.execPath, args: [] }] });
-  const served = checkById('workflow-capabilities-configured').check(cwd);
+  const served = await checkById('workflow-capabilities-configured').check(cwd);
   assert.equal(served.passed, true, served.message);
   fs.rmSync(cwd, { recursive: true, force: true });
 });

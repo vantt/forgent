@@ -2313,7 +2313,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           throw new StoreError('precondition', `plan-lint: no phase file matching phase ${flags.phase} found in "${planDir}".`);
         }
         targetPath = path.join(planDir, files[0]);
-        result = lintPhaseUnits(targetPath, { config: cfg, phase: phaseNum, cellId });
+        result = await lintPhaseUnits(targetPath, { config: cfg, phase: phaseNum, cellId });
       } else if (fs.statSync(absPath).isDirectory()) {
         const planMd = path.join(absPath, 'plan.md');
         if (!fs.existsSync(planMd)) {
@@ -2321,14 +2321,14 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
         targetPath = planMd;
         const text = fs.readFileSync(targetPath, 'utf8');
-        result = lintPlanCapabilityAnnotations(text, cfg, cellId !== undefined ? { cellId } : {});
+        result = await lintPlanCapabilityAnnotations(text, cfg, cellId !== undefined ? { cellId } : {});
       } else {
         targetPath = absPath;
         if (/^phase-\d+/i.test(path.basename(targetPath))) {
-          result = lintPhaseUnits(targetPath, { config: cfg, cellId });
+          result = await lintPhaseUnits(targetPath, { config: cfg, cellId });
         } else {
           const text = fs.readFileSync(targetPath, 'utf8');
-          result = lintPlanCapabilityAnnotations(text, cfg, cellId !== undefined ? { cellId } : {});
+          result = await lintPlanCapabilityAnnotations(text, cfg, cellId !== undefined ? { cellId } : {});
         }
       }
 

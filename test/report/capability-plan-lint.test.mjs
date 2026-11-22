@@ -25,7 +25,7 @@ const STANDARD = JSON.parse(JSON.stringify(readStandardValue('runner').value));
 const GONE_GRAPH = { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: 'fgos-no-such-tool-binary', args: [] }] };
 const STANDARD_RUNNER = { ...STANDARD, executors: { ...STANDARD.executors, 'gone-graph': GONE_GRAPH } };
 
-test('a plan with valid, registered, unpinned units passes clean', () => {
+test('a plan with valid, registered, unpinned units passes clean', async () => {
   const text = `# Plan
 
 - unit: apply the fix to src/foo.mjs
@@ -33,7 +33,7 @@ test('a plan with valid, registered, unpinned units passes clean', () => {
 - unit: independent review of the fix
   capability: code:review
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, true);
   assert.deepEqual(result.findings, []);
   assert.equal(result.units.length, 2);
@@ -41,11 +41,11 @@ test('a plan with valid, registered, unpinned units passes clean', () => {
   assert.equal(result.units[0].source, 'unit-block');
 });
 
-test('a unit with no capability line is flagged capability.missing, severity hard', () => {
+test('a unit with no capability line is flagged capability.missing, severity hard', async () => {
   const text = `- unit: apply the fix to src/foo.mjs
   action: just do it
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, false);
   assert.equal(result.findings.length, 1);
   assert.equal(result.findings[0].code, 'capability.missing');
@@ -53,48 +53,48 @@ test('a unit with no capability line is flagged capability.missing, severity har
   assert.match(result.findings[0].message, /has no "capability:" line/);
 });
 
-test('an invalid capability shape (not generic, not domain:capability) is flagged capability.invalid-shape', () => {
+test('an invalid capability shape (not generic, not domain:capability) is flagged capability.invalid-shape', async () => {
   const text = `- unit: apply the fix
   capability: Code Implement
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, false);
   assert.equal(result.findings[0].code, 'capability.invalid-shape');
   assert.equal(result.findings[0].severity, 'hard');
   assert.match(result.findings[0].message, /not a valid canonical shape/);
 });
 
-test('a capability no tool executor names is a label and passes; a tool ability whose tool is not present is flagged capability.tool-unserved, naming the remedy', () => {
-  const label = lintPlanCapabilityAnnotations(`- unit: apply the fix\n  capability: code:teleport\n`, STANDARD_RUNNER);
+test('a capability no tool executor names is a label and passes; a tool ability whose tool is not present is flagged capability.tool-unserved, naming the remedy', async () => {
+  const label = await lintPlanCapabilityAnnotations(`- unit: apply the fix\n  capability: code:teleport\n`, STANDARD_RUNNER);
   assert.equal(label.ok, true);
   assert.deepEqual(label.findings, []);
   const text = `- unit: blast radius
   capability: impact-analysis
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, false);
   assert.equal(result.findings[0].code, 'capability.tool-unserved');
   assert.match(result.findings[0].message, /whose tool is not present/);
   const served = { ...STANDARD_RUNNER, executors: { ...STANDARD_RUNNER.executors, graph: { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: process.execPath, args: [] }] } } };
-  assert.equal(lintPlanCapabilityAnnotations(text, served).ok, true);
+  assert.equal((await lintPlanCapabilityAnnotations(text, served)).ok, true);
 });
 
-test('a capability explicitly marked "unresolved" is warn-severity, never blocks ok', () => {
+test('a capability explicitly marked "unresolved" is warn-severity, never blocks ok', async () => {
   const text = `- unit: apply the fix
   capability: unresolved (needs a new capability, not yet registered)
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, true);
   assert.equal(result.findings.length, 1);
   assert.equal(result.findings[0].code, 'capability.unresolved');
   assert.equal(result.findings[0].severity, 'warn');
 });
 
-test('a hedged parenthetical on a NON-unresolved capability is flagged capability.hedged, hard severity', () => {
+test('a hedged parenthetical on a NON-unresolved capability is flagged capability.hedged, hard severity', async () => {
   const text = `- unit: apply the fix
   capability: code:implement (pretty sure this is right)
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, false);
   const hedged = result.findings.find((f) => f.code === 'capability.hedged');
   assert.ok(hedged, 'expected a capability.hedged finding');
@@ -104,12 +104,12 @@ test('a hedged parenthetical on a NON-unresolved capability is flagged capabilit
   assert.equal(result.findings.length, 1);
 });
 
-test('two "capability:" lines in one unit are flagged capability.duplicate, first value wins', () => {
+test('two "capability:" lines in one unit are flagged capability.duplicate, first value wins', async () => {
   const text = `- unit: apply the fix
   capability: code:implement
   capability: code:review
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, false);
   assert.equal(result.units[0].capability, 'code:implement');
   const dup = result.findings.find((f) => f.code === 'capability.duplicate');
@@ -118,7 +118,7 @@ test('two "capability:" lines in one unit are flagged capability.duplicate, firs
   assert.equal(dup.line, 3);
 });
 
-test('pin keys cover executor/provider/model/tier/prefer/invocation/actors, one finding per pinned field', () => {
+test('pin keys cover executor/provider/model/tier/prefer/invocation/actors, one finding per pinned field', async () => {
   const text = `- unit: apply the fix
   capability: code:implement
   executor: agy
@@ -129,7 +129,7 @@ test('pin keys cover executor/provider/model/tier/prefer/invocation/actors, one 
   invocation: cli
   actors: doer,reviewer
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, false);
   const pinned = result.findings.filter((f) => f.code === 'capability.pinned');
   assert.equal(pinned.length, 7);
@@ -140,7 +140,7 @@ test('pin keys cover executor/provider/model/tier/prefer/invocation/actors, one 
   );
 });
 
-test('provider/executor/model prose OUTSIDE a unit block is never flagged (scoped to unit blocks only, not whole-file)', () => {
+test('provider/executor/model prose OUTSIDE a unit block is never flagged (scoped to unit blocks only, not whole-file)', async () => {
   const text = `# Plan
 
 This plan discusses provider/model/executor selection as a concept, never
@@ -149,23 +149,23 @@ as a literal pin: execution-time decide chooses the provider and model.
 - unit: apply the fix
   capability: code:implement
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, true);
 });
 
-test('a real doctrine document (no "- unit:" lines at all) lints clean -- zero units, zero findings', () => {
+test('a real doctrine document (no "- unit:" lines at all) lints clean -- zero units, zero findings', async () => {
   const text = `# Shared fragment
 
 This fragment never uses the "- unit:" convention -- it is dispatch prose,
 not a plan. provider, model, executor, tier are all discussed in prose.
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, true);
   assert.deepEqual(result.units, []);
   assert.deepEqual(result.findings, []);
 });
 
-test('multiple units are each linted independently -- one bad unit does not swallow a good sibling', () => {
+test('multiple units are each linted independently -- one bad unit does not swallow a good sibling', async () => {
   const text = `- unit: first
   capability: code:implement
 - unit: second
@@ -173,13 +173,13 @@ test('multiple units are each linted independently -- one bad unit does not swal
 - unit: third
   capability: code:review
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.units.length, 3);
   assert.equal(result.findings.length, 1);
   assert.equal(result.findings[0].unit, 'second');
 });
 
-test('a Product Gates table row parses into a unit with source "product-gates"', () => {
+test('a Product Gates table row parses into a unit with source "product-gates"', async () => {
   const text = `## Product Gates
 
 | Phase | Cell | Capability | Exit |
@@ -187,7 +187,7 @@ test('a Product Gates table row parses into a unit with source "product-gates"',
 | 00 | cell-a | code:implement | tests green |
 | 01 | cell-b | code:review | reviewed. **Full-suite gate.** |
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, true);
   assert.equal(result.units.length, 2);
   assert.equal(result.units[0].unit, 'cell-a');
@@ -197,69 +197,69 @@ test('a Product Gates table row parses into a unit with source "product-gates"',
   assert.deepEqual(result.findings, []);
 });
 
-test('a Product Gates row naming an unserved tool ability is flagged the same as a unit block', () => {
+test('a Product Gates row naming an unserved tool ability is flagged the same as a unit block', async () => {
   const text = `| Phase | Cell | Capability | Exit |
 |---|---|---|---|
 | 00 | cell-a | impact-analysis | tests green |
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, false);
   assert.equal(result.findings[0].code, 'capability.tool-unserved');
   assert.equal(result.findings[0].source, 'product-gates');
   assert.equal(result.findings[0].unit, 'cell-a');
 });
 
-test('a Product Gates row with an empty Capability cell is flagged capability.missing', () => {
+test('a Product Gates row with an empty Capability cell is flagged capability.missing', async () => {
   const text = `| Phase | Cell | Capability | Exit |
 |---|---|---|---|
 | 00 | cell-a |  | tests green |
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, false);
   assert.equal(result.findings[0].code, 'capability.missing');
   assert.match(result.findings[0].message, /Product Gates row/);
 });
 
-test('a table that never matches the exact Phase|Cell|Capability|Exit header is never treated as Product Gates', () => {
+test('a table that never matches the exact Phase|Cell|Capability|Exit header is never treated as Product Gates', async () => {
   const text = `| A | B | C |
 |---|---|---|
 | 1 | 2 | 3 |
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.deepEqual(result.units, []);
   assert.deepEqual(result.findings, []);
 });
 
-test('--cell scopes to the matching unit block only, by its leading id token', () => {
+test('--cell scopes to the matching unit block only, by its leading id token', async () => {
   const text = `- unit: I18 — plan lint hardening
   capability: code:implement
 - unit: I19 — catalog serves schema
   capability: impact-analysis
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER, { cellId: 'I18' });
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER, { cellId: 'I18' });
   assert.equal(result.ok, true);
   assert.equal(result.units.length, 1);
   assert.equal(result.units[0].unit, 'I18 — plan lint hardening');
   assert.deepEqual(result.findings, []);
 });
 
-test('--cell scopes to a matching Product Gates row by its exact Cell column value', () => {
+test('--cell scopes to a matching Product Gates row by its exact Cell column value', async () => {
   const text = `| Phase | Cell | Capability | Exit |
 |---|---|---|---|
 | 00 | cell-a | code:implement | ok |
 | 01 | cell-b | impact-analysis | ok |
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER, { cellId: 'cell-a' });
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER, { cellId: 'cell-a' });
   assert.equal(result.ok, true);
   assert.equal(result.units.length, 1);
   assert.equal(result.units[0].unit, 'cell-a');
 });
 
-test('--cell with no match anywhere returns capability.undeclared, severity hard, ok turns false', () => {
+test('--cell with no match anywhere returns capability.undeclared, severity hard, ok turns false', async () => {
   const text = `- unit: I18 — plan lint hardening
   capability: code:implement
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER, { cellId: 'I99' });
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER, { cellId: 'I99' });
   assert.equal(result.ok, false);
   assert.deepEqual(result.units, []);
   assert.equal(result.findings.length, 1);
@@ -267,26 +267,26 @@ test('--cell with no match anywhere returns capability.undeclared, severity hard
   assert.equal(result.findings[0].severity, 'hard');
 });
 
-test('--cell still surfaces hard findings scoped to the matched unit', () => {
+test('--cell still surfaces hard findings scoped to the matched unit', async () => {
   const text = `- unit: I18 — plan lint hardening
   capability: impact-analysis
 - unit: I19 — catalog serves schema
   capability: code:implement
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER, { cellId: 'I18' });
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER, { cellId: 'I18' });
   assert.equal(result.ok, false);
   assert.equal(result.units.length, 1);
   assert.equal(result.findings.length, 1);
   assert.equal(result.findings[0].code, 'capability.tool-unserved');
 });
 
-test('a Product Gates Exit cell containing a literal "|" does not truncate the table -- every row after it still parses', () => {
+test('a Product Gates Exit cell containing a literal "|" does not truncate the table -- every row after it still parses', async () => {
   const text = `| Phase | Cell | Capability | Exit |
 |---|---|---|---|
 | 00 | cell-a | code:implement | stages a release from <dir|tar.gz> |
 | 01 | cell-b | code:review | reviewed |
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.units.length, 2);
   assert.equal(result.units[0].unit, 'cell-a');
   assert.equal(result.units[0].capability, 'code:implement');
@@ -295,38 +295,38 @@ test('a Product Gates Exit cell containing a literal "|" does not truncate the t
   assert.deepEqual(result.findings, []);
 });
 
-test('a backticked Capability cell naming a served capability is not flagged (backticks stripped before matching)', () => {
+test('a backticked Capability cell naming a served capability is not flagged (backticks stripped before matching)', async () => {
   const text = `| Phase | Cell | Capability | Exit |
 |---|---|---|---|
 | 00 | cell-a | \`code:implement\` | ok |
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, true);
   assert.deepEqual(result.findings, []);
   assert.equal(result.units[0].capability, '`code:implement`');
 });
 
-test('a backticked Capability cell naming an unserved tool ability is still flagged, with backticks stripped from the reported name', () => {
+test('a backticked Capability cell naming an unserved tool ability is still flagged, with backticks stripped from the reported name', async () => {
   const text = `| Phase | Cell | Capability | Exit |
 |---|---|---|---|
 | 00 | cell-a | \`impact-analysis\` | ok |
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, false);
   assert.equal(result.findings[0].code, 'capability.tool-unserved');
   assert.match(result.findings[0].message, /capability "impact-analysis" is a tool ability whose tool is not present/);
 });
 
-test('"unresolved-foo" is never treated as the exact "unresolved" hedge token', () => {
+test('"unresolved-foo" is never treated as the exact "unresolved" hedge token', async () => {
   const text = `- unit: apply the fix
   capability: unresolved-foo
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.equal(result.ok, true, 'a label');
   assert.deepEqual(result.findings, []);
 });
 
-test('a later markdown heading ends the unit block, so an indented key under it is never read as a pin on the stale unit', () => {
+test('a later markdown heading ends the unit block, so an indented key under it is never read as a pin on the stale unit', async () => {
   const text = `- unit: apply the fix
   capability: code:implement
 
@@ -336,14 +336,14 @@ Example executor config:
 
   model: sonnet
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.deepEqual(result.findings, [], JSON.stringify(result.findings));
   assert.equal(result.ok, true);
   assert.equal(result.units.length, 1);
   assert.equal(result.units[0].unit, 'apply the fix');
 });
 
-test('a Product-Gates-shaped table inside a fenced code block is never parsed as a real table (docs/how-to/author-a-plan-loop-track.md convention example)', () => {
+test('a Product-Gates-shaped table inside a fenced code block is never parsed as a real table (docs/how-to/author-a-plan-loop-track.md convention example)', async () => {
   const text = `## Product Gates table
 
 Mark each phase's proof obligation explicitly; do not leave it implicit.
@@ -359,20 +359,20 @@ Mark each phase's proof obligation explicitly; do not leave it implicit.
 
 Real content after the fence.
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.deepEqual(result.units, []);
   assert.deepEqual(result.findings, []);
 });
 
-test('the real docs/how-to/author-a-plan-loop-track.md fenced Product Gates example produces zero phantom units', () => {
+test('the real docs/how-to/author-a-plan-loop-track.md fenced Product Gates example produces zero phantom units', async () => {
   const docPath = path.resolve(__dirname, '../../docs/how-to/author-a-plan-loop-track.md');
   const text = fs.readFileSync(docPath, 'utf8');
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.deepEqual(result.units, []);
   assert.deepEqual(result.findings, []);
 });
 
-test('an inner fence-looking line with an info string (e.g. "```js") never closes an outer fence early -- a real unit after the true close still parses', () => {
+test('an inner fence-looking line with an info string (e.g. "```js") never closes an outer fence early -- a real unit after the true close still parses', async () => {
   const text = `\`\`\`
 outer fence content
 \`\`\`js
@@ -382,32 +382,32 @@ inner odd line that looks like a nested fence open
 - unit: real unit after
   capability: code:implement
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.deepEqual(result.findings, [], JSON.stringify(result.findings));
   assert.equal(result.units.length, 1);
   assert.equal(result.units[0].unit, 'real unit after');
 });
 
-test('a same-line backtick fence whose info string itself contains a backtick never opens a fence -- it never swallows the rest of the file', () => {
+test('a same-line backtick fence whose info string itself contains a backtick never opens a fence -- it never swallows the rest of the file', async () => {
   const text = `\`\`\` not a fence \`\`\`
 
 - unit: real unit after
   capability: code:implement
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   assert.deepEqual(result.findings, [], JSON.stringify(result.findings));
   assert.equal(result.units.length, 1);
   assert.equal(result.units[0].unit, 'real unit after');
 });
 
-test('a pin key is caught case-insensitively, tolerating whitespace around the colon and an optional leading bullet', () => {
+test('a pin key is caught case-insensitively, tolerating whitespace around the colon and an optional leading bullet', async () => {
   const text = `- unit: apply the fix
   capability: code:implement
   Model: sonnet
   provider : openai
   - tier: heavy
 `;
-  const result = lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
+  const result = await lintPlanCapabilityAnnotations(text, STANDARD_RUNNER);
   const pinned = result.findings.filter((f) => f.code === 'capability.pinned');
   assert.equal(pinned.length, 3, JSON.stringify(result.findings));
   assert.ok(pinned.every((f) => f.severity === 'hard'));
@@ -417,7 +417,7 @@ test('a pin key is caught case-insensitively, tolerating whitespace around the c
 // (packages/write-scope/src/lib.rs: scopes_overlap_compares_whole_scopes and colliding_pairs_agree_with_the_naive_oracle); the retired
 // pathsOverlap unit cases live there. This is the one wiring case: the lint asks the package, so the glob case whose
 // answer changed from the old JS rule (a `*` glob and a file one directory down) is now a collision.
-test('lintPhaseUnits asks the write-scope package: src/*.mjs and src/sub/foo.mjs collide (the old JS rule called them disjoint)', () => {
+test('lintPhaseUnits asks the write-scope package: src/*.mjs and src/sub/foo.mjs collide (the old JS rule called them disjoint)', async () => {
   const text = `## Units
 - unit: glob-writer
   capability: docs:write
@@ -437,12 +437,12 @@ test('lintPhaseUnits asks the write-scope package: src/*.mjs and src/sub/foo.mjs
   writes: [docs/other.md]
   dependsOn: []
 `;
-  const collisions = lintPhaseUnits(text).findings.filter((f) => f.code === 'unit.writes-collision');
+  const collisions = (await lintPhaseUnits(text)).findings.filter((f) => f.code === 'unit.writes-collision');
   assert.equal(collisions.length, 1);
   assert.match(collisions[0].message, /"glob-writer" and "nested-writer"/);
 });
 
-test('resolvePhaseFile finds padded and unpadded phase files in a directory', () => {
+test('resolvePhaseFile finds padded and unpadded phase files in a directory', async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-phase-test-'));
   try {
     fs.writeFileSync(path.join(tmpDir, 'phase-01-refresh.md'), '# Phase 1');
@@ -461,7 +461,7 @@ test('resolvePhaseFile finds padded and unpadded phase files in a directory', ()
   }
 });
 
-test('lintPhaseUnits validates valid units in ## Units section', () => {
+test('lintPhaseUnits validates valid units in ## Units section', async () => {
   const text = `# Phase 2: Units
 
 ## Overview
@@ -492,7 +492,7 @@ Overview text
       },
     },
   };
-  const result = lintPhaseUnits(text, { config });
+  const result = await lintPhaseUnits(text, { config });
   assert.equal(result.ok, true);
   assert.equal(result.findings.length, 0);
   assert.equal(result.units.length, 2);
@@ -503,7 +503,7 @@ Overview text
   assert.deepEqual(result.units[1].dependsOn, ['area-runner']);
 });
 
-test('lintPhaseUnits flags G2 violations as hard errors (executor, provider, model, tier, invocation, prefer, overrides)', () => {
+test('lintPhaseUnits flags G2 violations as hard errors (executor, provider, model, tier, invocation, prefer, overrides)', async () => {
   const text = `## Units
 - unit: area-runner
   capability: docs:write
@@ -516,14 +516,14 @@ test('lintPhaseUnits flags G2 violations as hard errors (executor, provider, mod
   prefer: test-pref
   overrides: test-overrides
 `;
-  const result = lintPhaseUnits(text);
+  const result = await lintPhaseUnits(text);
   assert.equal(result.ok, false);
   const pinned = result.findings.filter((f) => f.code === 'capability.pinned');
   assert.equal(pinned.length, 7);
   assert.ok(pinned.every((f) => f.severity === 'hard'));
 });
 
-test('lintPhaseUnits flags duplicate unit IDs within the same phase as hard error', () => {
+test('lintPhaseUnits flags duplicate unit IDs within the same phase as hard error', async () => {
   const text = `## Units
 - unit: step-a
   capability: docs:write
@@ -533,7 +533,7 @@ test('lintPhaseUnits flags duplicate unit IDs within the same phase as hard erro
   capability: code:review
   objective: "Duplicate step A"
 `;
-  const result = lintPhaseUnits(text);
+  const result = await lintPhaseUnits(text);
   assert.equal(result.ok, false);
   const dups = result.findings.filter((f) => f.code === 'unit.duplicate-id');
   assert.equal(dups.length, 1);
@@ -541,7 +541,7 @@ test('lintPhaseUnits flags duplicate unit IDs within the same phase as hard erro
   assert.match(dups[0].message, /duplicate unit id "step-a"/);
 });
 
-test('lintPhaseUnits flags direct and indirect dependency cycles as hard errors', () => {
+test('lintPhaseUnits flags direct and indirect dependency cycles as hard errors', async () => {
   const directCycle = `## Units
 - unit: u1
   capability: docs:write
@@ -553,7 +553,7 @@ test('lintPhaseUnits flags direct and indirect dependency cycles as hard errors'
   objective: "Unit 2"
   dependsOn: [u1]
 `;
-  const r1 = lintPhaseUnits(directCycle);
+  const r1 = await lintPhaseUnits(directCycle);
   assert.equal(r1.ok, false);
   const c1 = r1.findings.filter((f) => f.code === 'unit.dependency-cycle');
   assert.ok(c1.length >= 1);
@@ -575,13 +575,13 @@ test('lintPhaseUnits flags direct and indirect dependency cycles as hard errors'
   objective: "Unit C"
   dependsOn: [b]
 `;
-  const r2 = lintPhaseUnits(threeCycle);
+  const r2 = await lintPhaseUnits(threeCycle);
   assert.equal(r2.ok, false);
   const c2 = r2.findings.filter((f) => f.code === 'unit.dependency-cycle');
   assert.ok(c2.length >= 1);
 });
 
-test('lintPhaseUnits flags writes collision when units overlap without dependency', () => {
+test('lintPhaseUnits flags writes collision when units overlap without dependency', async () => {
   const colliding = `## Units
 - unit: writer-1
   capability: docs:write
@@ -595,7 +595,7 @@ test('lintPhaseUnits flags writes collision when units overlap without dependenc
   writes: [docs/platform/runner/guide.md]
   dependsOn: []
 `;
-  const result = lintPhaseUnits(colliding);
+  const result = await lintPhaseUnits(colliding);
   assert.equal(result.ok, false);
   const collisions = result.findings.filter((f) => f.code === 'unit.writes-collision');
   assert.equal(collisions.length, 1);
@@ -603,7 +603,7 @@ test('lintPhaseUnits flags writes collision when units overlap without dependenc
   assert.match(collisions[0].message, /overlapping writes/);
 });
 
-test('lintPhaseUnits allows overlapping writes when units have dependency relationship', () => {
+test('lintPhaseUnits allows overlapping writes when units have dependency relationship', async () => {
   const dependent = `## Units
 - unit: writer-1
   capability: docs:write
@@ -617,13 +617,13 @@ test('lintPhaseUnits allows overlapping writes when units have dependency relati
   writes: [docs/platform/runner/guide.md]
   dependsOn: [writer-1]
 `;
-  const result = lintPhaseUnits(dependent);
+  const result = await lintPhaseUnits(dependent);
   assert.equal(result.ok, true);
   const collisions = result.findings.filter((f) => f.code === 'unit.writes-collision');
   assert.equal(collisions.length, 0);
 });
 
-test('lintPhaseUnits accepts a label and warns on a tool ability whose tool is not present, read from a config given as runner', () => {
+test('lintPhaseUnits accepts a label and warns on a tool ability whose tool is not present, read from a config given as runner', async () => {
   const text = `## Units
 - unit: u-label
   capability: deploy:custom-target
@@ -638,7 +638,7 @@ test('lintPhaseUnits accepts a label and warns on a tool ability whose tool is n
   objective: "Unresolved capability"
 `;
   const config = { runner: { capabilities: { 'impact-analysis': { description: 'A tool ability' } }, executors: { 'gone-graph': GONE_GRAPH } } };
-  const result = lintPhaseUnits(text, { config });
+  const result = await lintPhaseUnits(text, { config });
   // An unserved tool ability is a warning, so ok is true.
   assert.equal(result.ok, true);
   const unserved = result.findings.filter((f) => f.code === 'capability.tool-unserved');
@@ -647,32 +647,32 @@ test('lintPhaseUnits accepts a label and warns on a tool ability whose tool is n
   const unres = result.findings.filter((f) => f.code === 'capability.unresolved');
   assert.deepEqual(unres.map((f) => f.unit), ['u-unresolved']);
   const served = { runner: { ...config.runner, executors: { graph: { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: process.execPath, args: [] }] } } } };
-  assert.deepEqual(lintPhaseUnits(text, { config: served }).findings.filter((f) => f.code === 'capability.tool-unserved'), []);
+  assert.deepEqual((await lintPhaseUnits(text, { config: served })).findings.filter((f) => f.code === 'capability.tool-unserved'), []);
 });
 
-test('lintPhaseUnits warns on unknown pattern', () => {
+test('lintPhaseUnits warns on unknown pattern', async () => {
   const text = `## Units
 - unit: u1
   capability: docs:write
   objective: "Unknown pattern"
   pattern: unearthly-ritual
 `;
-  const result = lintPhaseUnits(text);
+  const result = await lintPhaseUnits(text);
   assert.equal(result.ok, true);
   const unknownPattern = result.findings.filter((f) => f.code === 'pattern.unknown');
   assert.equal(unknownPattern.length, 1);
   assert.equal(unknownPattern[0].severity, 'warn');
 });
 
-test('lintPhaseUnits throws when the shipped catalog cannot be read instead of skipping the pattern check', () => {
+test('lintPhaseUnits throws when the shipped catalog cannot be read instead of skipping the pattern check', async () => {
   const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith('FGOS_')));
   const modulePath = path.join(__dirname, '..', '..', 'src', 'report', 'capability-plan-lint.mjs');
-  const script = `import(${JSON.stringify(modulePath)}).then((m) => { try { m.lintPhaseUnits('## Units\\n- unit: u1\\n  capability: docs:write\\n  objective: x\\n  pattern: unearthly-ritual\\n'); console.log('LINTED'); } catch (e) { console.log('THROWN ' + e.message.slice(0, 200)); } });`;
+  const script = `import(${JSON.stringify(modulePath)}).then((m) => m.lintPhaseUnits('## Units\\n- unit: u1\\n  capability: docs:write\\n  objective: x\\n  pattern: unearthly-ritual\\n')).then(() => console.log('LINTED'), (e) => console.log('THROWN ' + e.message.slice(0, 200)));`;
   const res = spawnSync(process.execPath, ['-e', script], { cwd: os.tmpdir(), env, encoding: 'utf8' });
   assert.match(res.stdout, /^THROWN git-addon-unavailable: addon not shipped/m, res.stderr);
 });
 
-test('lintPhaseUnits accepts a pattern defined in the project catalog and flags a typo', () => {
+test('lintPhaseUnits accepts a pattern defined in the project catalog and flags a typo', async () => {
   const text = `## Units
 - unit: u-valid
   capability: docs:write
@@ -691,19 +691,19 @@ test('lintPhaseUnits accepts a pattern defined in the project catalog and flags 
       },
     },
   };
-  const result = lintPhaseUnits(text, { config });
+  const result = await lintPhaseUnits(text, { config });
   const unknown = result.findings.filter((f) => f.code === 'pattern.unknown');
   assert.equal(unknown.length, 1);
   assert.equal(unknown[0].unit, 'u-typo');
   assert.match(unknown[0].message, /reviwed/);
 });
 
-test('lintPhaseUnits flags missing objective as hard error', () => {
+test('lintPhaseUnits flags missing objective as hard error', async () => {
   const text = `## Units
 - unit: u1
   capability: docs:write
 `;
-  const result = lintPhaseUnits(text);
+  const result = await lintPhaseUnits(text);
   assert.equal(result.ok, false);
   const invalid = result.findings.filter((f) => f.code === 'unit.invalid');
   assert.equal(invalid.length, 1);
@@ -711,7 +711,7 @@ test('lintPhaseUnits flags missing objective as hard error', () => {
   assert.match(invalid[0].message, /unit\.objective must be a non-empty string/);
 });
 
-test('lintPlanCapabilityAnnotations supports options.phase to target phase files', () => {
+test('lintPlanCapabilityAnnotations supports options.phase to target phase files', async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plan-target-'));
   try {
     fs.writeFileSync(path.join(tmpDir, 'plan.md'), '# Main Plan\n');
@@ -725,7 +725,7 @@ test('lintPlanCapabilityAnnotations supports options.phase to target phase files
 `,
     );
 
-    const result = lintPlanCapabilityAnnotations(tmpDir, STANDARD_RUNNER, { phase: 2 });
+    const result = await lintPlanCapabilityAnnotations(tmpDir, STANDARD_RUNNER, { phase: 2 });
     assert.equal(result.ok, true);
     assert.equal(result.units.length, 1);
     assert.equal(result.units[0].id, 'u-phase2');
@@ -734,7 +734,7 @@ test('lintPlanCapabilityAnnotations supports options.phase to target phase files
   }
 });
 
-test('CLI fgos plan-lint supports --phase and --json end-to-end', () => {
+test('CLI fgos plan-lint supports --phase and --json end-to-end', async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-lint-'));
   try {
     fs.writeFileSync(path.join(tmpDir, 'plan.md'), '# Plan\n');

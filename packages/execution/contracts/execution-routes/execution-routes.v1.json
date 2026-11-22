@@ -40,6 +40,14 @@
     "stale-runs": {
       "payload": { "fgosDir": "string", "reconcile": "boolean" },
       "result": { "orphans": "[{ runId, runDir, startedAt, wouldBecome, hasWorkerResult, reconciled? }]: the runs still marked running whose dispatch process is gone, each with the verdict a reader that cannot probe liveness gives it; written into run.json when reconcile is true" }
+    },
+    "purpose-seat": {
+      "payload": { "runnerConfig": "object: the runner section", "purpose": "string, optional: a capability row name or an executor id", "repoRoot": "string, optional: resolves a tool's scanTarget and HEAD; the process cwd when absent" },
+      "result": { "seat": "{ configured, executorId, executor?, bindingSource, tool?, invocationId?, binding?, refused? }: a registered executor of that name, else the tools serving it by live presence, else the seat Seat Binding binds for a row with a prefer pool of its own, else nothing configured", "error": "{ name, code?, message }: a failure of the model other than a coded bind refusal; the door rethrows it" }
+    },
+    "tool-abilities": {
+      "payload": { "runnerConfig": "object: the runner section", "capabilities": "[string]", "repoRoot": "string, optional" },
+      "result": { "unserved": "{ <capability>: <registered name> }: each capability a tool executor declares whose every tool is missing or cannot be probed; labels and served tool abilities are left out" }
     }
   }
 }

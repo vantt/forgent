@@ -7,8 +7,8 @@
 // `packages/execution/contracts/admission-peer/admission-peer.v1.json`), and the rethrow of a native `run-unit`
 // error result (`packages/execution/contracts/unit-run/run-unit.v1.json`), and the calls of the host's Execution
 // operations (`fgos internal execution <op> --protocol 1`, `packages/execution/contracts/execution-routes/
-// execution-routes.v1.json`): `executionOp`, `runUnitInHost` and `launchSessionInHost`, one host process per call,
-// spawned asynchronously.
+// execution-routes.v1.json`): `executionOp`, `runUnitInHost`, `launchSessionInHost`, and the machine-probing reads
+// `purposeSeatInHost` and `unservedToolAbilitiesOf`, one host process per call, spawned asynchronously.
 // It also serves the Execution Core helpers a caller above the tier asks in process (case paths, the unit-run
 // record, the runner config, patterns, the unit and plan checks, hand-off names and digests, cancel and sweep),
 // each one call of the native addon's `execution` namespace under the Node name it had.
@@ -618,3 +618,36 @@ export const handoffRef = (input, mainRoot, { accept } = {}) => addon('handoffRe
 export const resolveExecutorConfig = (runnerConfig, executorId, { contentCarries, resolvedAgentType, invocationId } = {}) => addon('resolveExecutorConfig', { runnerConfig: runnerConfig ?? {}, ...Object.fromEntries(Object.entries({ executorId, contentCarries, resolvedAgentType, invocationId }).filter(([, v]) => typeof v === 'string')) });
 /** `{ capability, anchorCapability }`: the canonical capability of a dispatch, from its hints. */
 export const resolveCapabilityDetailsFromHints = ({ cfg, executorId, resolvedExecutor, purpose, hints } = {}) => addon('resolveCapabilityDetailsFromHints', { runnerConfig: cfg ?? {}, ...(typeof executorId === 'string' ? { executorId } : {}), ...(resolvedExecutor ? { resolvedExecutor } : {}), ...(typeof purpose === 'string' ? { purpose } : {}), hints: hints ?? {} });
+
+// ---- what serves a purpose, asked of the machine ------------------------------------------------------------
+
+/**
+ * What serves a purpose (a capability row name, or an executor id), asked of the host (`purpose-seat`): a registered
+ * executor of that name; else the tools serving it, by their live presence; else the seat Seat Binding binds for a
+ * row with a `prefer` pool of its own; else nothing configured. `{ configured, executorId, executor?, bindingSource,
+ * tool?, invocationId?, binding?, refused? }`. A failure of the model is rethrown (`RunnerConfigError` by its name).
+ */
+export async function purposeSeatInHost(runnerConfig, purpose, { repoRoot } = {}) {
+  const { seat, error } = await executionOp('purpose-seat', {
+    runnerConfig: runnerConfig ?? {},
+    ...(typeof purpose === 'string' ? { purpose } : {}),
+    ...(repoRoot ? { repoRoot } : {}),
+  }, { cwd: repoRoot });
+  if (error) {
+    if (error.name === 'RunnerConfigError') throw new RunnerConfigError(error.message, { code: error.code ?? undefined });
+    throw Object.assign(new Error(error.message), { name: error.name, ...(error.code ? { code: error.code } : {}) });
+  }
+  return seat;
+}
+
+/**
+ * The capabilities of `capabilities` that name a tool ability no tool is present to serve (`tool-abilities`), as
+ * `{ <capability>: <registered name> }`. A capability no tool executor declares is a label and is never in it. No
+ * capability asks nothing of the host.
+ */
+export async function unservedToolAbilitiesOf(runnerConfig, capabilities, { repoRoot } = {}) {
+  const asked = [...new Set([...capabilities].filter((c) => typeof c === 'string' && c !== ''))];
+  if (asked.length === 0) return {};
+  const { unserved } = await executionOp('tool-abilities', { runnerConfig: runnerConfig ?? {}, capabilities: asked, ...(repoRoot ? { repoRoot } : {}) }, { cwd: repoRoot });
+  return unserved;
+}

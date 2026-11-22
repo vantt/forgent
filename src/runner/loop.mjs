@@ -1564,7 +1564,7 @@ async function drainOnce(options) {
       // Binding's answer for the item's unit. The item's rigor is a demand (checkers, independence)
       // and never moves them.
       const itemRigor = item.rigor ?? (item.risk === 'heavy' ? 'high' : 'standard');
-      const { unitData } = workUnitFor(item, { cfg: config, worktree: repoRoot });
+      const { unitData } = await workUnitFor(item, { cfg: config, worktree: repoRoot });
       const bound = bind({ unit: unitData, role: 'producer' }, { runnerConfig: config, session: { headless: true, herdrPresent: false } });
       const tier = bound.refused ? null : bound.tier;
       const plan = {

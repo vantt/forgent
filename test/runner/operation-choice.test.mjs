@@ -1168,7 +1168,7 @@ test('driver loop runOnce: validate-plan reported READY advances Work from plann
   assert.equal(item.workflowStep, 'executing');
 });
 
-test('the Work layer turns docsRef and refs into the Unit inputs, and dispatch derives the expected outputs (Finding 1)', () => {
+test('the Work layer turns docsRef and refs into the Unit inputs, and dispatch derives the expected outputs (Finding 1)', async () => {
   const tempDir = mkTempDir();
   const work = {
     id: 'tsk-refs-1',
@@ -1178,7 +1178,7 @@ test('the Work layer turns docsRef and refs into the Unit inputs, and dispatch d
     docsRef: 'docs/history/feat-refs',
     refs: ['extra-ref.txt'],
   };
-  const { unitData } = workUnitFor(work, { cfg: {}, stateRoot: tempDir, stage: 'planning', operation: 'validate-plan' });
+  const { unitData } = await workUnitFor(work, { cfg: {}, stateRoot: tempDir, stage: 'planning', operation: 'validate-plan' });
   assert.deepEqual(unitData.inputs, [
     'docs/history/feat-refs',
     path.posix.join('docs/history/feat-refs', 'plan.md'),

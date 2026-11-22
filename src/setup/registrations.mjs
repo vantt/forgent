@@ -32,7 +32,7 @@ import { ownedSkillNames } from './skill-wrappers.mjs';
 import { declaredActivities, readWorkflowCatalog, withUnreadableDefinitions } from './workflow-catalog-reader.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 
-import { RunnerConfigError, checkCatalog, deepEqual, loadRunnerConfigForDir, validateRunnerLoopsShape, attributeRunnerConfigError, detectRetiredPatternKeys, formatRetiredKeySentence, executionVocabulary, shippedCatalog } from '../native/execution-door.mjs';
+import { RunnerConfigError, checkCatalog, deepEqual, loadRunnerConfigForDir, validateRunnerLoopsShape, attributeRunnerConfigError, detectRetiredPatternKeys, formatRetiredKeySentence, executionVocabulary, shippedCatalog, unservedToolAbilitiesOf } from '../native/execution-door.mjs';
 import { isCommandAvailable, resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import {
   capabilityNamesOf,
@@ -43,7 +43,6 @@ import { listWork } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { getDomain, resolveDomainName, effectiveStep, domainSteps } from '../state/domain-registry.mjs';
-import { unservedToolAbilityOf } from '../runner/dispatch/tool-providers.mjs';
 import { checkConfig, globalFgosDir, readConfig, readMachineConfig, readProjectConfigSource } from '../config/facade.mjs';
 import { parseYaml } from '../util/yaml.mjs';
 import { foldEvents } from '../state/replay.mjs';
@@ -976,14 +975,15 @@ function capabilityValues(root) {
   return found;
 }
 
-function checkWorkflowCapabilitiesConfigured(cwd) {
+async function checkWorkflowCapabilitiesConfigured(cwd) {
   const { catalog, unreadable } = readWorkflowCatalog(cwd);
-  return withUnreadableDefinitions(evaluateWorkflowCapabilities(cwd, workflowCapabilityUses(catalog)), unreadable);
+  return withUnreadableDefinitions(await evaluateWorkflowCapabilities(cwd, workflowCapabilityUses(catalog)), unreadable);
 }
 
-function evaluateWorkflowCapabilities(cwd, uses) {
+async function evaluateWorkflowCapabilities(cwd, uses) {
   const runner = effectiveSection(cwd, 'runner');
-  const unserved = [...uses].filter(([capability]) => unservedToolAbilityOf(runner, capability, { repoRoot: cwd }) !== undefined);
+  const absent = await unservedToolAbilitiesOf(runner, [...uses.keys()], { repoRoot: cwd });
+  const unserved = [...uses].filter(([capability]) => Object.hasOwn(absent, capability));
   if (unserved.length > 0) {
     const list = unserved.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
     return {

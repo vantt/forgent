@@ -24,9 +24,9 @@ function tmpRoot() {
 
 const item = (over = {}) => ({ id: 'tsk-abc', title: 'Add pagination', status: 'todo', domain: 'coding', ...over });
 
-test('an executing item becomes a mutating solo Unit whose objective is the worker prompt', () => {
+test('an executing item becomes a mutating solo Unit whose objective is the worker prompt', async () => {
   const work = item();
-  const { unitData, declared, pinInputs, worktree } = workUnitFor(work, { cfg: {}, worktree: '/wt/tsk-abc' });
+  const { unitData, declared, pinInputs, worktree } = await workUnitFor(work, { cfg: {}, worktree: '/wt/tsk-abc' });
   assert.deepEqual(unitData.writes, ['**']);
   assert.equal(unitData.pattern, 'solo');
   assert.equal(unitData.id, 'work-tsk-abc-executing');
@@ -39,63 +39,63 @@ test('an executing item becomes a mutating solo Unit whose objective is the work
   validateUnit(unitData);
 });
 
-test('a mutating Unit with declared expected files writes exactly those files', () => {
-  const { unitData } = workUnitFor(item(), { cfg: {}, worktree: '/wt', expectedFiles: ['src/a.mjs', 'test/a.test.mjs'] });
+test('a mutating Unit with declared expected files writes exactly those files', async () => {
+  const { unitData } = await workUnitFor(item(), { cfg: {}, worktree: '/wt', expectedFiles: ['src/a.mjs', 'test/a.test.mjs'] });
   assert.deepEqual(unitData.writes, ['src/a.mjs', 'test/a.test.mjs']);
 });
 
-test('the Unit id is ascii and stable for the same item and step', () => {
-  const a = workUnitFor(item({ id: 'Tsk_ÄB.9' }), { cfg: {}, worktree: '/wt' }).unitData.id;
-  const b = workUnitFor(item({ id: 'Tsk_ÄB.9' }), { cfg: {}, worktree: '/wt' }).unitData.id;
+test('the Unit id is ascii and stable for the same item and step', async () => {
+  const a = (await workUnitFor(item({ id: 'Tsk_ÄB.9' }), { cfg: {}, worktree: '/wt' })).unitData.id;
+  const b = (await workUnitFor(item({ id: 'Tsk_ÄB.9' }), { cfg: {}, worktree: '/wt' })).unitData.id;
   assert.equal(a, b);
   assert.match(a, /^[a-z0-9-]+$/);
 });
 
-test('rigor: risk heavy without an explicit rigor reads as high', () => {
-  const { unitData } = workUnitFor(item({ risk: 'heavy' }), { cfg: {}, worktree: '/wt' });
+test('rigor: risk heavy without an explicit rigor reads as high', async () => {
+  const { unitData } = await workUnitFor(item({ risk: 'heavy' }), { cfg: {}, worktree: '/wt' });
   assert.equal(unitData.rigor, 'high');
 });
 
-test('rigor: an explicit work rigor wins over risk heavy, even when lower', () => {
-  const { unitData } = workUnitFor(item({ risk: 'heavy', rigor: 'low' }), { cfg: {}, worktree: '/wt' });
+test('rigor: an explicit work rigor wins over risk heavy, even when lower', async () => {
+  const { unitData } = await workUnitFor(item({ risk: 'heavy', rigor: 'low' }), { cfg: {}, worktree: '/wt' });
   assert.equal(unitData.rigor, 'low');
 });
 
-test('rigor: no explicit source leaves the Unit rigor to the lower layer', () => {
-  const { unitData } = workUnitFor(item(), { cfg: {}, worktree: '/wt' });
+test('rigor: no explicit source leaves the Unit rigor to the lower layer', async () => {
+  const { unitData } = await workUnitFor(item(), { cfg: {}, worktree: '/wt' });
   assert.equal(unitData.rigor, undefined);
 });
 
-test('rigor: the operation policy rigor comes first and later sources only raise it', () => {
+test('rigor: the operation policy rigor comes first and later sources only raise it', async () => {
   const stateRoot = tmpRoot();
-  const raised = workUnitFor(item({ rigor: 'high' }), { cfg: {}, stateRoot, stage: 'planning', operation: 'validate-plan' });
+  const raised = await workUnitFor(item({ rigor: 'high' }), { cfg: {}, stateRoot, stage: 'planning', operation: 'validate-plan' });
   assert.equal(raised.unitData.rigor, 'high');
-  const notLowered = workUnitFor(item({ rigor: 'low' }), { cfg: {}, stateRoot, stage: 'planning', operation: 'validate-plan' });
+  const notLowered = await workUnitFor(item({ rigor: 'low' }), { cfg: {}, stateRoot, stage: 'planning', operation: 'validate-plan' });
   assert.equal(notLowered.unitData.rigor, 'standard');
 });
 
-test('rigor: an invalid work rigor is refused', () => {
-  assert.throws(() => workUnitFor(item({ rigor: 'extreme' }), { cfg: {}, worktree: '/wt' }), RunnerConfigError);
+test('rigor: an invalid work rigor is refused', async () => {
+  await assert.rejects(() => workUnitFor(item({ rigor: 'extreme' }), { cfg: {}, worktree: '/wt' }), RunnerConfigError);
 });
 
-test('feedback reaches the objective of a step Unit and of an operation Unit', () => {
+test('feedback reaches the objective of a step Unit and of an operation Unit', async () => {
   const feedback = { answer: 'use the existing OAuth provider', reason: 'tests were missing' };
-  const step = workUnitFor(item(), { cfg: {}, worktree: '/wt', feedback });
+  const step = await workUnitFor(item(), { cfg: {}, worktree: '/wt', feedback });
   assert.match(step.unitData.objective, /use the existing OAuth provider/);
   assert.match(step.unitData.objective, /tests were missing/);
-  const op = workUnitFor(item(), { cfg: {}, stateRoot: tmpRoot(), stage: 'planning', operation: 'validate-plan', feedback });
+  const op = await workUnitFor(item(), { cfg: {}, stateRoot: tmpRoot(), stage: 'planning', operation: 'validate-plan', feedback });
   assert.match(op.unitData.objective, /^Execute planning\.validate-plan operation/);
   assert.match(op.unitData.objective, /use the existing OAuth provider/);
   assert.match(op.unitData.objective, /tests were missing/);
 });
 
-test('a read-only operation Unit writes nothing, declares its operation and pins the plan where it lives', () => {
+test('a read-only operation Unit writes nothing, declares its operation and pins the plan where it lives', async () => {
   const stateRoot = tmpRoot();
   const docsRef = 'docs/history/work-unit-for-fixture-plan';
   fs.mkdirSync(path.join(stateRoot, docsRef), { recursive: true });
   fs.writeFileSync(path.join(stateRoot, docsRef, 'plan.md'), '# plan\n');
   const work = item({ docsRef, refs: ['src/x.mjs', docsRef] });
-  const { unitData, declared, pinInputs, worktree } = workUnitFor(work, {
+  const { unitData, declared, pinInputs, worktree } = await workUnitFor(work, {
     cfg: {}, stateRoot, stage: 'planning', operation: 'validate-plan',
   });
   assert.deepEqual(unitData.writes, []);
@@ -114,41 +114,41 @@ test('a read-only operation Unit writes nothing, declares its operation and pins
   validateUnit(unitData);
 });
 
-test('an operation Unit pins nothing when the plan file does not exist', () => {
-  const { pinInputs } = workUnitFor(item({ docsRef: 'docs/history/work-unit-for-fixture-none' }), {
+test('an operation Unit pins nothing when the plan file does not exist', async () => {
+  const { pinInputs } = await workUnitFor(item({ docsRef: 'docs/history/work-unit-for-fixture-none' }), {
     cfg: {}, stateRoot: tmpRoot(), stage: 'planning', operation: 'validate-plan',
   });
   assert.deepEqual(pinInputs, []);
 });
 
-test('a mutating operation Unit runs in the worktree the caller names', () => {
-  const { unitData, worktree } = workUnitFor(item(), {
+test('a mutating operation Unit runs in the worktree the caller names', async () => {
+  const { unitData, worktree } = await workUnitFor(item(), {
     cfg: {}, stateRoot: tmpRoot(), stage: 'executing', operation: 'implement-item', worktree: '/wt/item',
   });
   assert.deepEqual(unitData.writes, ['**']);
   assert.equal(worktree, '/wt/item');
 });
 
-test('a mutating Unit without a worktree is refused', () => {
-  assert.throws(() => workUnitFor(item(), { cfg: {} }), RunnerConfigError);
+test('a mutating Unit without a worktree is refused', async () => {
+  await assert.rejects(() => workUnitFor(item(), { cfg: {} }), RunnerConfigError);
 });
 
-test('an operation the step does not declare is refused', () => {
-  assert.throws(
+test('an operation the step does not declare is refused', async () => {
+  await assert.rejects(
     () => workUnitFor(item(), { cfg: {}, stateRoot: tmpRoot(), stage: 'planning', operation: 'implement-item' }),
     RunnerConfigError,
   );
 });
 
-test('work refs that are not safe repo-relative paths are skipped with a warning', () => {
-  const { unitData, warnings } = workUnitFor(item({ refs: ['/etc/passwd', '../outside.md', 'ok.md'] }), { cfg: {}, worktree: '/wt' });
+test('work refs that are not safe repo-relative paths are skipped with a warning', async () => {
+  const { unitData, warnings } = await workUnitFor(item({ refs: ['/etc/passwd', '../outside.md', 'ok.md'] }), { cfg: {}, worktree: '/wt' });
   assert.deepEqual(unitData.inputs, ['ok.md']);
   assert.equal(warnings.length, 2);
   validateUnit(unitData);
 });
 
-test('prefer names the step executor only when it is configured', () => {
-  const none = workUnitFor(item(), { cfg: {}, worktree: '/wt' });
+test('prefer names the step executor only when it is configured', async () => {
+  const none = await workUnitFor(item(), { cfg: {}, worktree: '/wt' });
   assert.equal(none.unitData.prefer, undefined);
   const boundCfg = bindable({
     executor: { command: 'claude', args: ['{prompt}'] },
@@ -156,28 +156,28 @@ test('prefer names the step executor only when it is configured', () => {
     modelPolicies: { claude: { standard: 'sonnet' } },
     capabilities: { 'fgos-coding-implement': { prefer: 'claude' } },
   });
-  const viaCapability = workUnitFor(item(), { cfg: boundCfg, worktree: '/wt' });
+  const viaCapability = await workUnitFor(item(), { cfg: boundCfg, worktree: '/wt' });
   assert.deepEqual(viaCapability.unitData.prefer, ['claude'], 'the soft prefer is the executor Seat Binding binds for the step');
-  const direct = workUnitFor(item(), {
+  const direct = await workUnitFor(item(), {
     cfg: { executors: { 'fgos-coding-implement': { invocations: [{ id: 'fgos-coding-implement-cli', via: 'cli', command: 'x' }]} } },
     worktree: '/wt',
   });
   assert.deepEqual(direct.unitData.prefer, ['fgos-coding-implement']);
 });
 
-test('a step purpose Seat Binding refuses leaves the Unit with no soft prefer, to be refused where it runs', () => {
+test('a step purpose Seat Binding refuses leaves the Unit with no soft prefer, to be refused where it runs', async () => {
   const refusedCfg = bindable({
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { claude: { kind: 'agent', providerModel: 'claude', invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] } },
     modelPolicies: { claude: { standard: 'sonnet' } },
     capabilities: { 'fgos-coding-implement': { prefer: 'not-registered' } },
   });
-  const { unitData } = workUnitFor(item(), { cfg: refusedCfg, worktree: '/wt' });
+  const { unitData } = await workUnitFor(item(), { cfg: refusedCfg, worktree: '/wt' });
   assert.equal(unitData.prefer, undefined);
 });
 
-test('work refs that name another run or a gate answer are skipped, never read as inputs', () => {
-  const { unitData, warnings } = workUnitFor(
+test('work refs that name another run or a gate answer are skipped, never read as inputs', async () => {
+  const { unitData, warnings } = await workUnitFor(
     item({ refs: ['unit-run:abc', 'gate-answer:run1/step1', 'unit-run:u1/producer', 'ok.md'] }),
     { cfg: {}, worktree: '/wt' },
   );
@@ -186,12 +186,12 @@ test('work refs that name another run or a gate answer are skipped, never read a
   validateUnit(unitData);
 });
 
-test('an unsafe docsRef is treated as absent: nothing outside the repo is pinned or chosen as worktree', () => {
+test('an unsafe docsRef is treated as absent: nothing outside the repo is pinned or chosen as worktree', async () => {
   const stateRoot = tmpRoot();
   const outside = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-work-unit-for-outside-'));
   fs.writeFileSync(path.join(outside, 'plan.md'), '# foreign\n');
   const docsRef = path.relative(stateRoot, outside);
-  const { unitData, pinInputs, worktree, warnings } = workUnitFor(item({ docsRef }), {
+  const { unitData, pinInputs, worktree, warnings } = await workUnitFor(item({ docsRef }), {
     cfg: {}, stateRoot, stage: 'planning', operation: 'validate-plan',
   });
   assert.deepEqual(unitData.inputs, []);
@@ -200,37 +200,37 @@ test('an unsafe docsRef is treated as absent: nothing outside the repo is pinned
   assert.ok(warnings.some((w) => w.includes('docsRef')));
 });
 
-test('a docsRef without refs gives exactly the folder, its plan and its context', () => {
-  const { unitData } = workUnitFor(item({ docsRef: 'docs/history/x' }), { cfg: {}, worktree: '/wt' });
+test('a docsRef without refs gives exactly the folder, its plan and its context', async () => {
+  const { unitData } = await workUnitFor(item({ docsRef: 'docs/history/x' }), { cfg: {}, worktree: '/wt' });
   assert.deepEqual(unitData.inputs, ['docs/history/x', 'docs/history/x/plan.md', 'docs/history/x/CONTEXT.md']);
 });
 
-test('rigor: risk heavy raises an operation above its own rigor', () => {
-  const { unitData } = workUnitFor(item({ risk: 'heavy' }), { cfg: {}, stateRoot: tmpRoot(), stage: 'planning', operation: 'validate-plan' });
+test('rigor: risk heavy raises an operation above its own rigor', async () => {
+  const { unitData } = await workUnitFor(item({ risk: 'heavy' }), { cfg: {}, stateRoot: tmpRoot(), stage: 'planning', operation: 'validate-plan' });
   assert.equal(unitData.rigor, 'high');
 });
 
-test('rigor: an invalid operation rigor is refused', () => {
+test('rigor: an invalid operation rigor is refused', async () => {
   assert.throws(() => workRigorFor(item(), { rigor: 'extreme' }), RunnerConfigError);
 });
 
-test('an operation Unit takes the operation capability, and a work-product operation falls back to the step capability', () => {
-  const review = workUnitFor(item(), { cfg: { capabilities: { 'coding:review': {} } }, stateRoot: tmpRoot(), stage: 'planning', operation: 'validate-plan' });
+test('an operation Unit takes the operation capability, and a work-product operation falls back to the step capability', async () => {
+  const review = await workUnitFor(item(), { cfg: { capabilities: { 'coding:review': {} } }, stateRoot: tmpRoot(), stage: 'planning', operation: 'validate-plan' });
   assert.equal(review.unitData.capability, 'coding:review');
-  const step = workUnitFor(item(), { cfg: {}, worktree: '/wt', stage: 'executing' });
-  const product = workUnitFor(item(), { cfg: {}, stateRoot: tmpRoot(), stage: 'executing', operation: 'implement-item', worktree: '/wt' });
+  const step = await workUnitFor(item(), { cfg: {}, worktree: '/wt', stage: 'executing' });
+  const product = await workUnitFor(item(), { cfg: {}, stateRoot: tmpRoot(), stage: 'executing', operation: 'implement-item', worktree: '/wt' });
   assert.equal(product.unitData.capability, step.unitData.capability);
 });
 
-test('an operation Unit without stateRoot is refused', () => {
-  assert.throws(() => workUnitFor(item(), { cfg: {}, stage: 'planning', operation: 'validate-plan' }), RunnerConfigError);
+test('an operation Unit without stateRoot is refused', async () => {
+  await assert.rejects(() => workUnitFor(item(), { cfg: {}, stage: 'planning', operation: 'validate-plan' }), RunnerConfigError);
 });
 
-test('empty feedback adds no feedback section to an operation Unit', () => {
-  const { unitData } = workUnitFor(item(), { cfg: {}, stateRoot: tmpRoot(), stage: 'planning', operation: 'validate-plan', feedback: { answer: ' ', reason: '' } });
+test('empty feedback adds no feedback section to an operation Unit', async () => {
+  const { unitData } = await workUnitFor(item(), { cfg: {}, stateRoot: tmpRoot(), stage: 'planning', operation: 'validate-plan', feedback: { answer: ' ', reason: '' } });
   assert.equal(unitData.objective, 'Execute planning.validate-plan operation');
 });
 
-test('an item without an id is refused', () => {
-  assert.throws(() => workUnitFor(item({ id: undefined }), { cfg: {}, worktree: '/wt' }), RunnerConfigError);
+test('an item without an id is refused', async () => {
+  await assert.rejects(() => workUnitFor(item({ id: undefined }), { cfg: {}, worktree: '/wt' }), RunnerConfigError);
 });

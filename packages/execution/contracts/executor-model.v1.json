@@ -1,7 +1,7 @@
 {
  "version": "executor-model.v1",
  "about": "Golden vectors of the executor model: what is derived from an executor entry and the machine, recorded from the Node functions that derive it today. A vector is { name, fact, entry?, runner?, machine?, args?, expect }. fact names the derivation; entry is one executor entry and runner the effective runner config the fact reads; machine describes the machine facts it reads (pathCommands: the only programs on PATH, registry: the confinement backend registry as absent/a document/raw text, home, accountState: the lease state file, files: relative path to text under the repository root, git: a repository with one commit); args are the remaining arguments; expect is the answer, a refusal being { error: { name, code?, message } }. A vector marked knownDefect records today's output of behaviour that looks wrong and is reported, not fixed. The doc is docs/platform/runner/contracts/executor-model.md.",
- "facts": ["defaultExecutor","family","executorLookup","governance","capabilityConfinement","credentialStore","effortLevels","mechanism","posture","launchFacts","missingCli","accountQuarantine","accountInventory","llmAccounts","stateKey","toolProviders","validate"],
+ "facts": ["defaultExecutor","family","executorLookup","governance","capabilityConfinement","credentialStore","effortLevels","mechanism","posture","launchFacts","missingCli","accountQuarantine","accountInventory","llmAccounts","stateKey","toolProviders","validate","unservedToolAbility"],
  "vectors": [
   {
    "name": "defaultExecutor: no default executor leaves the registry as it is",
@@ -2297,6 +2297,54 @@
    "fact": "validate",
    "runner": {"executors":{"a":{"kind":"agent","providerModel":"claude"}},"llmAccounts":{"claude":{"main":{"credentialStore":{"claude":"/h"}}}}},
    "expect": {"ok":true}
+  },
+  {
+   "name": "unservedToolAbility: a capability no tool executor names is a label, never unserved",
+   "fact": "unservedToolAbility",
+   "runner": {"executors":{"gitnexus":{"kind":"tool","for":["impact-analysis"],"scanTarget":".gitnexus","invocations":[{"id":"gitnexus-mcp","via":"mcp","tools":{"impact-analysis":"impact"}}]}}},
+   "machine": {"files":{},"pathCommands":[]},
+   "args": {"capability":"code:review"},
+   "expect": {"name":null}
+  },
+  {
+   "name": "unservedToolAbility: a tool ability whose every tool is missing is unserved by its name",
+   "fact": "unservedToolAbility",
+   "runner": {"executors":{"gone":{"kind":"tool","for":["impact-analysis"],"invocations":[{"id":"g","via":"cli","command":"no-such-graph-tool"}]}}},
+   "machine": {"files":{},"pathCommands":[]},
+   "args": {"capability":"impact-analysis"},
+   "expect": {"name":"impact-analysis"}
+  },
+  {
+   "name": "unservedToolAbility: a tool ability one present tool serves is served",
+   "fact": "unservedToolAbility",
+   "runner": {"executors":{"gone":{"kind":"tool","for":["impact-analysis"],"invocations":[{"id":"g","via":"cli","command":"no-such-graph-tool"}]},"gitnexus":{"kind":"tool","for":["impact-analysis"],"scanTarget":".gitnexus","invocations":[{"id":"gitnexus-mcp","via":"mcp","tools":{"impact-analysis":"impact"}}]}}},
+   "machine": {"files":{".gitnexus/meta.json":"{}"},"pathCommands":[]},
+   "args": {"capability":"impact-analysis"},
+   "expect": {"name":null}
+  },
+  {
+   "name": "unservedToolAbility: a stale tool still serves its ability",
+   "fact": "unservedToolAbility",
+   "runner": {"executors":{"gitnexus":{"kind":"tool","for":["impact-analysis"],"scanTarget":".gitnexus","invocations":[{"id":"gitnexus-mcp","via":"mcp","tools":{"impact-analysis":"impact"}}]}}},
+   "machine": {"files":{".gitnexus/meta.json":"{\"lastCommit\":\"an older commit\"}"},"pathCommands":[],"git":true},
+   "args": {"capability":"impact-analysis"},
+   "expect": {"name":null}
+  },
+  {
+   "name": "unservedToolAbility: an alias is asked under its registered name and reported by it",
+   "fact": "unservedToolAbility",
+   "runner": {"capabilities":{"impact-analysis":{"aliases":["blast-radius"]}},"executors":{"gone":{"kind":"tool","for":["impact-analysis"],"invocations":[{"id":"g","via":"cli","command":"no-such-graph-tool"}]}}},
+   "machine": {"files":{},"pathCommands":[]},
+   "args": {"capability":"blast-radius"},
+   "expect": {"name":"impact-analysis"}
+  },
+  {
+   "name": "unservedToolAbility: a tool that cannot be probed does not serve its ability",
+   "fact": "unservedToolAbility",
+   "runner": {"executors":{"bare":{"kind":"tool","for":["impact-analysis"]}}},
+   "machine": {"files":{},"pathCommands":[]},
+   "args": {"capability":"impact-analysis"},
+   "expect": {"name":"impact-analysis"}
   }
  ]
 }
