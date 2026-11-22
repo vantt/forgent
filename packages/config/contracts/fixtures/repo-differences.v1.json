@@ -484,6 +484,9 @@
   [
    "docRegistry",
    "topicMaxDocs"
+  ],
+  [
+   "secretary"
   ]
  ]
 }
