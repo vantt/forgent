@@ -14,3 +14,4 @@
 - `261122-2307-heads-rotate-on-their-own`: the lead is live and busy. Phase 1 is finished, and the lead is waiting on phase 2 and lining up a review. Left alone.
 - `261122-0118-heads-stable-and-able`: phases 1-7 and 12 are done, 8-10 are running (measure windows close on 2026-11-23), and 11 is ready. The lead is live but paused on the weekly usage limit and continues automatically at 00:00, as its screen shows. That wait is real.
   - The owner's footprint-trim order (unblocks component-authority) is typed into the lead's pane and not yet answered. The lead was not replaced, because a stop-then-start would drop that pending order. If the trim has not landed after 00:00, the next wake applies the idle check.
+- `e9007161e125e7dc` session-idle `39631fb7…`: this is the secretary (Miu), idle after her 23:35 turn with a re-check booked for 00:07. It is not a lead, so nothing was done. Marked handled.
