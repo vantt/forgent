@@ -58,10 +58,38 @@ export function fenced(text) {
   return `${fence}text\n${text}\n${fence}`;
 }
 
-/** The Markdown body: pointers, delta, and on `hard` or `manual` the last assistant message (fenced, see `fenced`) and pending question verbatim. */
-export function buildHandoff({ persona, name, sessionId, rotate, portfolio = [], delta = '', lastAssistantMessage = null, pendingQuestion = null }) {
+export function escapeSingleLine(text) {
+  return JSON.stringify(String(text ?? '')).slice(1, -1);
+}
+
+/** The Markdown body: pointers, delta, optional crons/tasks, and on `hard` or `manual` the last assistant message (fenced, see `fenced`) and pending question verbatim. */
+export function buildHandoff({
+  persona, name, sessionId, rotate, portfolio = [], delta = '',
+  lastAssistantMessage = null, pendingQuestion = null,
+  sessionCrons = [], backgroundTasks = [],
+}) {
   const lines = [VERIFY_LINE, '', `# Handoff: ${persona}-${name}`, '', `- session: ${sessionId}`, `- rotation: ${rotate}`, '', '## Portfolio files to reread', ''];
   lines.push(...(portfolio.length > 0 ? portfolio.map((p) => `- ${p}`) : ['- (none listed)']), '', '## Delta since the last handoff', '', delta.trim() || '(none recorded)', '');
+  if (sessionCrons.length > 0) {
+    lines.push('## Crons to recreate', '');
+    for (const cron of sessionCrons) {
+      const schedule = cron.schedule ? escapeSingleLine(cron.schedule).replaceAll("'", "\\'") : '(no schedule)';
+      const prompt = JSON.stringify(String(cron.prompt ?? ''));
+      const recurring = cron.recurring === false ? ' (one-shot)' : '';
+      lines.push(`- Recreate with the session's cron tool before the first task: schedule '${schedule}', prompt ${prompt}${recurring}.`);
+    }
+    lines.push('');
+  }
+  if (backgroundTasks.length > 0) {
+    lines.push('## Background tasks that were running', '');
+    for (const task of backgroundTasks) {
+      const id = task.id ? `task ${escapeSingleLine(task.id)}` : 'task';
+      const cmd = task.command ? `: \`${escapeSingleLine(task.command).replaceAll('`', '\\`')}\`` : '';
+      const desc = task.description ? ` (${escapeSingleLine(task.description)})` : '';
+      lines.push(`- ${id}${cmd}${desc}: rerun only if its result still matters.`);
+    }
+    lines.push('');
+  }
   if (CARRIES_LAST_MESSAGE.has(rotate)) {
     lines.push('## Last assistant message (verbatim)', '', lastAssistantMessage === null ? '(none)' : fenced(lastAssistantMessage), '', '## Pending question (verbatim)', '', pendingQuestion ?? '(none)', '');
   }

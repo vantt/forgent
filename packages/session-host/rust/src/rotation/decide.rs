@@ -152,8 +152,9 @@ pub struct AtRest {
     pub session_crons: usize,
 }
 
-/// A background task or cron of the session blocks both levels (rotating would lose it); a pending owner question
-/// blocks only `soft`, because `hard` carries the question verbatim into the handoff.
+/// A background task blocks only `soft` (hard carries it into the handoff); a cron never blocks (the
+/// successor recreates it); a pending owner question blocks only `soft`, because `hard` carries the question
+/// verbatim into the handoff.
 pub fn decide(fraction: Option<f64>, thresholds: Thresholds, rest: AtRest) -> Decision {
     let none = |reason| Decision {
         rotate: Level::None,
@@ -165,14 +166,14 @@ pub fn decide(fraction: Option<f64>, thresholds: Thresholds, rest: AtRest) -> De
     if fraction < thresholds.soft {
         return none("below-soft");
     }
-    if rest.background_tasks > 0 || rest.session_crons > 0 {
-        return none("background-work-running");
-    }
     if fraction >= thresholds.hard {
         return Decision {
             rotate: Level::Hard,
             reason: "at-or-above-hard",
         };
+    }
+    if rest.background_tasks > 0 {
+        return none("background-task-running");
     }
     if rest.pending_question {
         return none("pending-question");
@@ -224,17 +225,21 @@ mod tests {
     }
 
     #[test]
-    fn a_running_background_task_or_cron_blocks_every_level() {
-        let task = AtRest {
-            background_tasks: 1,
-            ..AtRest::default()
-        };
+    fn a_cron_never_blocks_and_a_background_task_holds_soft_but_not_hard() {
         let cron = AtRest {
             session_crons: 1,
             ..AtRest::default()
         };
-        assert_eq!(run(Some(0.9), task).reason, "background-work-running");
-        assert_eq!(run(Some(0.9), cron).rotate, Level::None);
+        assert_eq!(run(Some(0.5), cron).rotate, Level::Soft);
+        assert_eq!(run(Some(0.9), cron).rotate, Level::Hard);
+
+        let task = AtRest {
+            background_tasks: 1,
+            ..AtRest::default()
+        };
+        assert_eq!(run(Some(0.5), task).reason, "background-task-running");
+        assert_eq!(run(Some(0.5), task).rotate, Level::None);
+        assert_eq!(run(Some(0.9), task).rotate, Level::Hard);
     }
 
     #[test]

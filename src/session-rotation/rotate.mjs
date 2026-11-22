@@ -55,7 +55,9 @@ const CLOSE_WAIT_MS = 60_000;
 // How long a manual rotation waits for the old session to end the turn it asked for the rotation in, so the message
 // it writes after the request (where the secretary batches its open questions) is the one handed over.
 const FINAL_TURN_WAIT_MS = 60_000;
-const STOP_FACT_KEYS = ['sessionId', 'portfolio', 'delta', 'lastAssistantMessage', 'pendingQuestion'];
+const STOP_FACT_KEYS = ['sessionId', 'portfolio', 'delta', 'lastAssistantMessage', 'pendingQuestion', 'sessionCrons', 'backgroundTasks'];
+const CRON_FACT_KEYS = ['schedule', 'prompt', 'recurring'];
+const TASK_FACT_KEYS = ['id', 'command', 'description'];
 
 export class RotationError extends Error {
   constructor(code, message, extra = {}) {
@@ -68,7 +70,7 @@ export class RotationError extends Error {
 
 const fail = (code, message) => { throw new RotationError(code, message); };
 
-/** `{ sessionId?, portfolio?, delta?, lastAssistantMessage?, pendingQuestion? }` checked and bounded; anything else is refused. */
+/** `{ sessionId?, portfolio?, delta?, lastAssistantMessage?, pendingQuestion?, sessionCrons?, backgroundTasks? }` checked and bounded; anything else is refused. */
 export function checkStopFacts(facts) {
   if (facts === undefined || facts === null) return {};
   if (typeof facts !== 'object' || Array.isArray(facts)) fail('bad-stop-facts', 'stopFacts must be an object');
@@ -77,6 +79,20 @@ export function checkStopFacts(facts) {
     if (!STOP_FACT_KEYS.includes(key)) fail('bad-stop-facts', `unknown stop fact ${JSON.stringify(key)}`);
     if (key === 'portfolio') {
       if (!Array.isArray(value) || value.length > MAX_LIST || value.some((p) => typeof p !== 'string' || p === '' || p.length > 300)) fail('bad-stop-facts', `portfolio must be at most ${MAX_LIST} paths`);
+    } else if (key === 'sessionCrons' || key === 'backgroundTasks') {
+      if (!Array.isArray(value) || value.length > 20) fail('bad-stop-facts', `${key} must be an array of at most 20 entries`);
+      const allowed = key === 'sessionCrons' ? CRON_FACT_KEYS : TASK_FACT_KEYS;
+      for (const item of value) {
+        if (!item || typeof item !== 'object' || Array.isArray(item)) fail('bad-stop-facts', `${key} entries must be objects`);
+        for (const [field, val] of Object.entries(item)) {
+          if (!allowed.includes(field)) fail('bad-stop-facts', `unknown ${key} entry field ${JSON.stringify(field)}`);
+          if (field === 'recurring') {
+            if (typeof val !== 'boolean') fail('bad-stop-facts', `${key} entry field recurring must be a boolean`);
+          } else if (typeof val !== 'string' || val.length > MAX_TEXT) {
+            fail('bad-stop-facts', `${key} entry field ${field} must be a string of at most ${MAX_TEXT} characters`);
+          }
+        }
+      }
     } else if (value !== null && (typeof value !== 'string' || value.length > MAX_TEXT)) {
       fail('bad-stop-facts', `${key} must be a string of at most ${MAX_TEXT} characters`);
     }
@@ -465,6 +481,8 @@ export async function rotateHeadSession(request, ports = {}) {
       rotate: reason, keep: config.keep, portfolio,
       delta: `${rotationIdLine(id)}\n${stopFacts.delta ?? ''}`,
       lastAssistantMessage, pendingQuestion: stopFacts.pendingQuestion ?? null,
+      sessionCrons: stopFacts.sessionCrons ?? [],
+      backgroundTasks: stopFacts.backgroundTasks ?? [],
     });
 
     gen = nextHeadGeneration(projectRoot, persona, name);

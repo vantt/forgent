@@ -10,10 +10,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import { markSuccessorAnswered, requestRotation, rotateHeadSession, rotationHolds, rotationIdOf } from '../../src/session-rotation/rotate.mjs';
 import { lineageDirOf, readHeadPlacement, writeHeadPlacement } from '../../src/session-host/head-start.mjs';
 import { taskOfHead } from '../../src/session-host/head-plan.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
+
+ensureGitAddon();
 
 const OLD = { host: 'terminal', key: 'cmd_old' };
 const NEW = { host: 'terminal', key: 'cmd_new' };
@@ -306,6 +309,30 @@ test('a request is checked, written beside the lineage and handed to one detache
   assert.deepEqual(requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root }, { holds: () => false, spawn: () => ({ pid: null, error: 'ENOENT' }) }), { started: false, reason: 'spawn-failed' });
   assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'sometimes', projectRoot: root }, ports), { code: 'bad-reason' });
   assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { extra: 1 } }, ports), { code: 'bad-stop-facts' });
+});
+
+test('requestRotation validates sessionCrons and backgroundTasks in stopFacts', (t) => {
+  const { root } = project(t);
+  const ports = { holds: () => true };
+  const valid = requestRotation({
+    persona: 'planner', name: 'x', reason: 'hard', projectRoot: root,
+    stopFacts: {
+      sessionCrons: [{ schedule: '*/5 * * * *', prompt: 'ping', recurring: true }],
+      backgroundTasks: [{ id: 'b1', command: 'sleep 5', description: 'test task' }],
+    },
+  }, ports);
+  assert.equal(valid.started, false);
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionCrons: 'not-array' } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionCrons: ['not-object'] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionCrons: [{ prompt: 123 }] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionCrons: [{ recurring: 'yes' }] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionCrons: [{ prompt: 'x'.repeat(8001) }] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionCrons: [{ unknownField: 'val' }] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { backgroundTasks: 'not-array' } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { backgroundTasks: ['not-object'] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { backgroundTasks: [{ command: 123 }] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { backgroundTasks: [{ id: 'x'.repeat(8001) }] } }, ports), { code: 'bad-stop-facts' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { backgroundTasks: [{ unknownField: 'val' }] } }, ports), { code: 'bad-stop-facts' });
 });
 
 test('the detached entry reads its request file, removes it and prints one result line', (t) => {
