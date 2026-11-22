@@ -1007,3 +1007,53 @@ test('discoverInstructionSources discovers real canonical instructions in reposi
   assert.equal(codingSafety.authority.type, 'domain');
   assert.equal(codingSafety.scope, 'domain');
 });
+
+test('discoverKnownOwners admits top-level component ids and component-authority, but rejects subcomponents with parent', () => {
+  const tmp = mkTempDir('fgos-inst-subcomp-');
+  try {
+    fs.mkdirSync(path.join(tmp, 'packages', 'component-authority', 'model'), { recursive: true });
+    fs.writeFileSync(
+      path.join(tmp, 'packages', 'component-authority', 'model', 'components.json'),
+      JSON.stringify([
+        { id: 'component-authority' },
+        { id: 'runner' },
+        { id: 'h-6979005beaf7', parent: 'runner' },
+        { id: 'admission', parent: 'documentation' },
+      ]),
+      'utf8',
+    );
+    fs.writeFileSync(
+      path.join(tmp, 'packages', 'component-authority', 'model', 'layers.json'),
+      JSON.stringify({ domains: ['coding'] }),
+      'utf8',
+    );
+
+    const owners = discoverKnownOwners(tmp);
+    assert.ok(owners.has('component-authority'), 'component-authority must be an admitted known owner');
+    assert.ok(owners.has('runner'), 'top-level runner must be an admitted known owner');
+    assert.equal(owners.has('h-6979005beaf7'), false, 'subcomponent with parent must not be in known owners');
+    assert.equal(owners.has('admission'), false, 'subcomponent with parent must not be in known owners');
+
+    // Valid instruction under component-authority
+    writeInstructionFile(
+      path.join(tmp, 'components', 'component-authority', 'instructions'),
+      'rule.md',
+      'id: ca-rule\nkind: boundary\nowner: component-authority',
+    );
+    const reg = discoverInstructionSources(tmp);
+    assert.ok(reg.has('ca-rule'));
+
+    // Subcomponent directory must be rejected as UNKNOWN_OWNER
+    writeInstructionFile(
+      path.join(tmp, 'components', 'admission', 'instructions'),
+      'sub-rule.md',
+      'id: sub-rule\nkind: procedure',
+    );
+    assert.throws(
+      () => discoverInstructionSources(tmp),
+      (err) => err instanceof InstructionRegistryError && err.code === 'UNKNOWN_OWNER',
+    );
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});

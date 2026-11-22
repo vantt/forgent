@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "47dcba50cd5bb6cf9e27cd698b3bef935a5871b0509e1cd5093bdc2c61aa6d5d",
+  "payloadDigest": "e355e4d791e1903129057492c05ee432137f7a04ca0ed2d40890dee21603869c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1647,7 +1647,7 @@
     "src/setup/git-hooks.mjs": "4a85ffcf4b6a9da44e620bf4cf340a37642f74701f300c5840546958b6525195",
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
     "src/setup/instruction-projections.mjs": "82aaa1ec07a5d2925fcb3117a020eb4576777f901c09d054cb17c659d8c144f3",
-    "src/setup/instruction-registry.mjs": "19b41df21ccf148154d8777f9c6c37d44721222a2dd60322fd04b51d7eff29ae",
+    "src/setup/instruction-registry.mjs": "af82322eeaef7daeeaf3b3191a1d39aa14ba05610ea3fdd184bba30208dfaca4",
     "src/setup/mailbox-limits.mjs": "b8ed2c018a71ee1a06582ea90c7a73ec1a7ebe29e3d931f9a2ba89108a763323",
     "src/setup/registrations.mjs": "2434ef9feecd3c7f9ebf93e92aab22791d774b2167426f684b3acdee858e634c",
     "src/setup/seat-binding-checks.mjs": "caf11494333872b9b2e6c516bb5b84e44824e7a9aacbcdd6c0b42d7de2393085",

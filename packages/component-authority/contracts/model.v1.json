@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://fgos.invalid/component-authority/model.v1.json",
   "title": "fgOS Component Authority Model Schema v1",
-  "description": "Defines the single structural model of layers, components, decision kinds, doors, contracts, and files. Each model file validates against its own def (components.json items: #/$defs/component, decision-kinds.json items: #/$defs/decisionKind, doors/*.json: #/$defs/door, contracts.json items: #/$defs/contract, layers.json: #/$defs/layers, files.json: #/$defs/files).",
+  "description": "Defines the single structural model of layers, components, decision kinds, doors, and contracts. Each model file validates against its own def (components.json items: #/$defs/component, decision-kinds.json items: #/$defs/decisionKind, doors/*.json: #/$defs/door, contracts.json items: #/$defs/contract, layers.json: #/$defs/layers).",
   "$defs": {
     "layers": {
       "type": "object",
@@ -109,7 +109,8 @@
         "status": {
           "type": "string",
           "enum": ["live", "designed", "planned", "draft", "retired"]
-        }
+        },
+        "reason": { "type": "string" }
       }
     },
     "decisionKind": {
@@ -216,16 +217,6 @@
           "type": "string",
           "enum": ["live", "designed", "planned"]
         }
-      }
-    },
-    "files": {
-      "type": "object",
-      "propertyNames": {
-        "pattern": "^[a-zA-Z0-9._-]+(/[a-zA-Z0-9._-]+)*$"
-      },
-      "additionalProperties": {
-        "type": "string",
-        "pattern": "^[a-z0-9-]+$"
       }
     }
   }
