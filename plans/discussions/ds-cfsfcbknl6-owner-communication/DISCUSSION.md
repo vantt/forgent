@@ -1,6 +1,6 @@
 ---
 id: ds-cfsfcbknl6
-title: "One shared way for every agent to talk to the owner"
+title: "Thấu hiểu user: one shared standard for how every agent talks to the owner"
 status: open
 source:
   - p-wb6rkwpjsg
@@ -22,50 +22,40 @@ Opened by the secretary (Miu) on the owner's order, 2026-11-22. The owner wants 
 
 ## 1. Trạng thái hiện tại
 
-Round 2 (2026-11-22 13:10). Domain: coding (the change edits fgOS core skills, the always-loaded instruction and possibly the `fgos questions` door).
+Round 5 (2026-11-22 15:50). Domain: coding (the change edits fgOS core skills and the always-loaded instruction).
 
-The owner split the topic in two (section 5, 13:10). **Keeping information valid** (stale questions, status resting on an old flag) is not a communication rule. It is the job of the watchers and monitors: they must always supply fresh data and nudge the agent concerned. That part leaves this discussion and goes to its own backlog item; the secretary is asked to open it. **This discussion keeps only the form of communicating with the owner.** The goal: low cognitive load, so the owner can decide at once, in time, with information that is ready, clear and easy to understand.
+**What just settled.** The owner confirmed the shaper's reading of "communicating better with a human" and asked for it to be written down as a standard named **thấu hiểu user** (understanding the user). The discussion works in four steps, in order: (1) why, the motive; (2) what good looks like, judged from the reader's side; (3) cases, good and bad, taken from real exchanges; (4) only then, whether a program should help. The standard is a living one: bad exchanges are collected as cases, learned from, and folded back into it.
 
-Consequences: q-von37r6ef6 (how to withdraw a stale question) is cancelled as out of scope. The status-report rule no longer requires source, age and activity evidence; guaranteeing freshness belongs to the systems.
+**Where it stands.** Step 1 and the core of step 2 are written (section 6). Step 3 has its seed cases from 2026-11-22, including the shaper's own messages. Step 4 is not started. The two mechanism questions asked earlier (program checks in `fgos questions ask`, and an end-of-turn check) were cancelled as premature; they come back at step 4 only if still needed.
 
-Round 3 (14:55): the owner named gap 1 (asking permission to do read-only work) and gap 4 (roles, ids and terms reaching the owner unexplained) as the problems this discussion must solve. The owner also recalled the earlier guard that forces every question to say what is happening, why and what is advised. Scout found that guard fires only on the `AskUserQuestion` tool, while both frictions this morning were plain chat. That makes enforcement on plain chat an owner choice.
-
-Open owner questions (parked in the store; shaping continues around them):
-
-- **q-nfgvjge6zg**: whether an end-of-turn check catches permission-asking and unexplained ids in plain chat (section 3 row "Enforcement of gaps 1 and 4").
-- **q-xkrbp66xy6**: which form rules `fgos questions ask` enforces by program (section 3 row "Program checks").
-
-Every other point carries a provisional default.
+**Open, not blocking.** How the case log is kept and who adds to it (section 3). No owner question is open.
 
 ## 2. Mục tiêu & đề bài
 
-The big goal is to lower the owner's cognitive load, so the owner can decide at once and in time, with the information already ready, clear and easy to understand. Today every agent that speaks to the owner follows only one shared rule, the five-part decision question, and that rule covers only one act: asking the owner to choose. Status, progress and incident reports have no shared shape (three head skills each say only "at most 10 lines, full report in a file"). Nothing says read-only work is done before speaking. Nothing says how to introduce a role, lane or id. Nothing makes an answer cheap (lettered options, the recommendation marked, a stated default). On 2026-11-22 this cost the owner avoidable turns: asked permission to read, unexplained names, long blocks to re-read, sentences to type where one letter would do. The outcome is one shared source, always loaded by every head, lead and worker in every CLI, that defines the **form** of every message to the owner: what the agent prepares before speaking, the common rules for any owner message, the decision question, the status report and the incident report. Rules a program can measure are checked by the `fgos questions ask` door; the rest stays prose. The source replaces the existing text rather than sitting beside it, and every caller moves in the same change. Out of scope: keeping information valid (fresh data, stale questions, nudging the concerned agent), which belongs to the watchers and monitors and is a separate item.
+Agents in fgOS speak to the owner many times a day, and the owner's attention is the scarcest and most expensive thing in the whole system. Today the only shared rule is the five-part decision question, and it covers one act (asking the owner to choose). Its guard only counts labels, so a question can pass it and still be hard to understand. Nothing tells an agent why it should communicate well, or what "well" means outside a question. On 2026-11-22 the owner spent turns asking permission back ("yes, just do it"), asking what a name meant ("who is OPC?"), re-reading long blocks and having a question rewritten; the shaper's own first messages in this discussion did the same (English, long, full of ids and file paths). The outcome is one shared standard, **thấu hiểu user**, always loaded by every head, lead and worker in every CLI. It gives the motive first, then a principle judged from the reader's side, then how the principle applies to each kind of message (before speaking, names and ids, decision questions, status and incident reports), then a growing set of real cases, good and bad, that agents learn from and that improve the standard over time. A program check is a last safety net, chosen at the end, never the reason an agent communicates well. The standard replaces the existing decision-question text rather than sitting beside it. Out of scope: keeping information valid (fresh data, stale questions, nudging the concerned agent), which belongs to the watchers and monitors and is a separate item.
 
 ## 3. Vấn đề rõ / chưa rõ
 
 | Point | State | Evidence | Current answer |
 |---|---|---|---|
-| Where it is loaded so every agent sees it | clear | `core/instructions/*.md` with `appliesTo: ["*"]` is rendered into each project's `AGENTS.md` by `src/setup/instruction-projections.mjs` (adapter `portable-agents-md`), which every agent CLI reads; `decision-question.md` is already one of them | The always-loaded instruction stays the door; it carries a short summary and points to the full fragment. |
-| One file or two | **provisional** | `core/skills/_shared/decision-question.md` (53 lines) is cited by about 20 source files (6 core skills, 6 coding-domain skills, 4 platform docs, reading map, AGENTS render) plus 4 code/test refs (`src/state/decision-question.mjs`, `src/state/status-fsm.mjs`, `test/docs/rul11-anchor-phrase.test.mjs`, `test/state/awaiting.test.mjs`); generated copies under `.agents/skills` and `plugins/fgOS` rebuild with `npm run build:skills` | **Default: one file.** Rename the fragment to `core/skills/_shared/owner-communication.md` and the instruction to `core/instructions/owner-communication.md`; the decision question becomes one section of it; every caller moves and the old paths are removed in the same change (L10). Two files would split one act (speaking to the owner) across two doors, and the common rules (names, source and age, answer friction) apply to both. Reverse if the single file goes past about 150 lines, or the owner wants questions kept as a separately citable law. |
-| Enforcement of gaps 1 and 4 | **open, owner question q-nfgvjge6zg** | `src/runner/hook.mjs` runs `decision-question` only for `AskUserQuestion` (Claude), `RequestUserInput\|ask.*` (Codex) and `ask.*` (agy), per `src/setup/agent-hooks.mjs:227,246,255`; plain chat text is never checked. Claude and Codex already run fgOS `Stop` hooks (mailbox, questions: `agent-hooks.mjs:233,242,251,253`). No earlier permission-ask or id check exists (`git log -G` empty). | Recommended: rule text plus an end-of-turn (`Stop`) check that sends the agent back once when its last message asks permission for read-only work or names an id with no plain phrase. agy gets the rule only. |
-| Read-only work first (gap 1) | **in scope (owner, 14:55)**, wording provisional | Report gap 1: two secretary messages asked permission to read or check | Prose rule: reading, checking, re-verifying and drafting are done before speaking; a message never asks permission for read-only work; it brings findings plus a recommendation. Only a write, a spend outside the approved frame, or an outward action is asked. |
-| Explain names and ids (gap 4) | **in scope (owner, 14:55)**, wording provisional | Gap 4: "OPC là ai", "list nào không refresh", a supervisor line naming a role and "question 2" with no pointer | Prose rule: the first mention of a role, lane, id or term in a message gets one plain phrase ("OPC, the lead running the stability plan"); a pointer to a numbered item names the item; an id is never the only handle. |
-| Common rules for any owner message | provisional | Gap 5 | Prose: outcome first; one action per item; say what was checked and what was not. |
-| Gaps 5, 6, 7 | provisional, owner named only 1 and 4 | Owner's 14:55 message lists all seven and names 1 and 4 | Kept as provisional form rules (5 answer friction, 6 report shape, 7 solved by the shared file itself) until the owner says otherwise. |
-| Status / progress report shape | provisional | Gap 6; `core/skills/fgos-lead/SKILL.md:76`, `fgos-secretary/SKILL.md:93`, `fgos-supervisor/SKILL.md:112` each repeat "at most 10 lines, full report in a file" | Section in the shared file: outcome; done (with ids explained); checked and not checked; owner decisions (one per item, recommendation first, lettered, default); at most 10 lines, full report in a file named by `fgos convention path --kind report`. The three skills drop their own lines and point to it. |
-| Incident report shape | provisional | Gap 6 | Same frame plus: impact now, what was done to contain it, what is still at risk, the one decision needed. |
-| Answer friction | provisional | Gap 5: owner answers "A", "ok", "ok duyệt" | Options lettered A-D, recommended one first and marked, a stated default ("no answer by <when> → I take A"). Whether the store enforces part of this: **q-xkrbp66xy6**. |
-| Program checks | **open, owner question q-xkrbp66xy6** | `packages/questions/contracts/questions-input.v1.json` already checks headline ≤120 chars on one line, 2-4 options, exactly one recommended, scope allows/forbids, `blocks`; it has no field for a default | Recommended: add a required `parts.ifUnanswered` (what the asker does, and when, if no answer comes) and require the headline to end with "?"; the store letters options A-D when it renders, so the asker writes nothing extra. Everything else stays prose. |
-| Information validity (stale questions, status on an old flag) | **out of scope (owner, 13:10)** | Gaps 2 and 3: 5 of 8 open questions were moot; `leadLive: true` reported while the lead was idle. `refusals.v1.json` `not-asker`; the store never looks at the state behind a `ref`. | Separate backlog item: watchers and monitors always supply fresh data and nudge the concerned agent. q-von37r6ef6 cancelled. The secretary is asked to open the item. |
-| Shared memory of lessons | provisional | Gap 7 | Solved by the outcome itself: the lesson lives in the shared fragment, not in one head's memory. No memory mechanism is built. |
-| Approved-frame rule, priority order | non-goal | Seed | Moved into the new file unchanged. |
+| Name and purpose of the standard | **settled, OC-D2** | Owner 15:50 | "Thấu hiểu user". Purpose: the owner decides at once from what is on the screen, without asking back or looking anything up. |
+| Order of work | **settled, OC-D3** | Owner 15:50 accepts the shaper's four steps | Why, then standard, then cases, then mechanism. |
+| Information validity | **settled out of scope, OC-D1** | Owner 13:10; held unchallenged through rounds 3-5 | Separate item for watchers and monitors. Not yet in the backlog: the secretary could not be reached by mailbox (name `secretary` unknown); the owner was told at 13:15. |
+| Where it is loaded so every agent sees it | clear | `core/instructions/*.md` with `appliesTo: ["*"]` is rendered into each project's `AGENTS.md` by `src/setup/instruction-projections.mjs`, which every agent CLI reads; `decision-question.md` is already one of them | The always-loaded instruction carries the motive and the principle in a few lines and points to the full standard. |
+| One file or two | provisional | The decision-question fragment is cited by about 20 source files and 4 code/test files | Default: one standard file that absorbs today's decision-question text as one of its applications; every caller moves in the same change (L10). Reverse if the file grows past what an agent will read, in which case the case log moves to a sibling file. |
+| Case log: where, who adds, how it improves the standard | **open** (not blocking steps 1-3) | Owner 15:50: "thu thập thêm các tình huống trao đổi không tốt và học rồi cải thiện" | Draft: each case records the situation, what the agent wrote, what it cost the owner, which part of the principle it broke, and the better version. Any agent adds a case when the owner shows friction (asks back, asks what a term means, corrects, rewrites). A case that repeats becomes a line of the standard; the case then stays as its example. Open: whether cases live in the standard file or a sibling, and who curates. |
+| Gaps 1 and 4 | in scope (owner 14:55) | Seed cases C1 and C4 in section 6 | Covered by the principle's applications "before you speak" and "names and ids". |
+| Gaps 5, 6, 7 | provisional | Owner named 1 and 4 at 14:55 | 5 and 6 are applications of the principle (cheap answers, report shape). 7 is answered by the standard itself: the lesson lives in one shared place, not in one agent's memory. |
+| Program support (step 4) | not started | Existing guard checks labels only (`src/state/decision-question.mjs`), on ask-tool calls only; Claude and Codex already run fgOS end-of-turn hooks | Taken up after step 3. Earlier questions on it cancelled. |
+| Approved-frame rule, priority order | non-goal | Seed | Moved into the standard unchanged. |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Decision | Source | Date |
 |---|---|---|---|
-
-(None yet. A point gets a D-ID only after it holds across more than one round.)
+| OC-D1 | Keeping information valid (fresh data, stale questions, status on an old flag) is not part of this standard; it belongs to the watchers and monitors and is a separate item. | Owner 13:10, unchallenged through 15:50 | 2026-11-22 |
+| OC-D2 | The standard is named **thấu hiểu user**. Its core: the owner's attention is the scarcest resource; the agent does all of its own work before speaking; what it brings must let the owner decide at once without asking back or looking anything up. The motive is respect for the owner's attention and freeing the owner from waiting (product priority 2); a program check is a safety net, not the reason. | Shaper's reading at 15:44, owner confirmed at 15:50 | 2026-11-22 |
+| OC-D3 | The work goes in four steps: why, standard, cases, mechanism. | Shaper proposal 15:44, owner accepted 15:50 | 2026-11-22 |
 
 ## 5. Q&A log
 
@@ -75,30 +65,59 @@ The big goal is to lower the owner's cognitive load, so the owner can decide at 
 
 - 2026-11-22 14:55 — Owner, quoting the seven gaps: "câu 1 và câu 4 là các vấn đề cần xử lý tại đây. nó cũng giống như trước đây hình như cũng từng có lần xử lý hook gì đó mà mỗi lần hỏi phải ghi rõ là: chuyện gì đang xảy ra, tại sao, em advise thế nào, ..." Shaper: gaps 1 and 4 confirmed in scope. The recalled guard is `fgos hook decision-question` (commit 3d3d32648); it sees only ask-tool calls, never plain chat. Parked q-nfgvjge6zg on enforcing gaps 1 and 4 at turn end. Gaps 5-7 stay provisional.
 
+- 2026-11-22 15:44 — Owner: "trước khi anh trả lời, anh muốn hỏi là em có hiểu ý của anh trong việc: trao đổi tốt hơn với người là như thế nào không. discussion này nhắm thiết lập một chuẩn mực cũng như động lực trao đổi tốt hơn với người." Shaper restated its understanding (attention is the scarcest resource; the agent does the heavy work; a good message is decided on in one read; standard judged from the reader's side; motive over checks), admitted it had jumped to mechanisms and that its own messages showed the same faults, and proposed four steps: why, standard, cases, mechanism.
+
+- 2026-11-22 15:47 — Owner: "ví dụ như ở hook decision question, tại sao phải làm như vậy, nhằ mục đích gì". Shaper: no written rationale found beyond the commit (2026-10-08, "check owner questions against one decision-question template") and the template's own words ("the question is a narrow confirm on top of the analysis"). Read each of the five parts as answering a question the owner would otherwise ask back; the guard counts labels only, so a question can pass it and still be hard to read. Gaps 1 and 4 share the root: the agent pushes its own work onto the owner. Proposed the root principle.
+
+- 2026-11-22 15:50 — Owner: "đúng và anh nghĩ em nên ghi rõ ràng cái hiểu như trên của em vào thảo luận để xem nó như là một tiêu chuẩn: `thấu hiểu user`. để xuất 4 bước của em cũng tốt. và bộ chuẩn mực này có thể thu thập thêm các tình huống trao đổi không tốt và học rồi cải thiện cách trao đổi vào đây." Shaper: minted OC-D1 to OC-D3; wrote steps 1-2 and seed cases into §6; cancelled q-xkrbp66xy6 and q-nfgvjge6zg as premature (step 4); case-log mechanics opened in §3.
+
 ## 6. Thiết kế đã chốt {#design}
 
-Nothing is settled yet. Draft shape under the provisional answers, for the owner to react to:
+The standard **thấu hiểu user**, as it stands. Steps 1 and 2 are settled in substance (OC-D2), their wording is not final; step 3 holds seed cases; step 4 is not started.
 
-One shared fragment, `core/skills/_shared/owner-communication.md`, replaces `decision-question.md`. The always-loaded instruction `core/instructions/owner-communication.md` (replacing `decision-question.md`, `appliesTo: ["*"]`) gives every agent in every CLI a five-line summary and the pointer. Sections of the fragment:
+### Bước 1 — Vì sao (động lực)
 
-The yardstick for every rule is the owner's cognitive load: can the owner decide at once from what is on the screen?
+Of everything in the system, the owner's attention is the scarcest and the most expensive. Every message the owner reads costs some of it. An agent holds the full context and the owner does not, so the heavy work (reading, checking, comparing, weighing) is the agent's job, done before it speaks; the owner is left with only the decision. An agent communicates well because it understands this and respects the owner's attention, which is what frees the owner from sitting and waiting (product priority 2). A program check can catch a slip, but if the check becomes the reason, agents learn to write for the check: all five labels present and still hard to read.
 
-1. **Before you speak**: do the read-only work first; never ask permission to read, check or draft; arrive with findings and a recommendation.
-2. **Every owner message**: outcome first; one action per item; explain names and ids on first use; say what was checked and what was not.
-3. **Decision question**: today's five parts, the approved frame and "make it easy to answer", plus lettered options, the recommendation first and a stated default.
-4. **Status and progress report**: fixed order, at most 10 lines, full report in a file.
-5. **Incident report**: the same order plus impact, containment and remaining risk.
+### Bước 2 — Thế nào là tốt (chuẩn mực, đo từ phía người đọc)
 
-`fgos questions ask` checks what q-xkrbp66xy6 settles. If q-nfgvjge6zg settles on A, an end-of-turn hook (Claude, Codex) checks sections 1 and 2 on plain chat: permission-asking for read-only work, and ids with no plain phrase. Every other rule stays prose. Keeping the information fresh is not in this design; it belongs to the watchers and monitors (separate item).
+**Principle.** The agent finishes its own work before it speaks, and everything it brings is enough for the owner to decide at once, without asking back and without looking anything up.
+
+**Test before sending.** Read the message as a busy person with no context: can that person understand it in one read and decide? If the person would ask "what is this?", "why?", "what do you suggest?" or "what happens if I say yes?", the message is not done.
+
+**Applications** (each is the principle applied to one kind of message):
+
+- **Before you speak.** Reading, checking and drafting are the agent's own work; never ask permission for them. Come with findings and a recommendation. Ask only for what is the owner's to decide.
+- **Names and ids.** The first time a role, lane, id or term appears, give it one plain phrase. A pointer to a numbered item names the item. An id is never the only handle.
+- **Language and length.** The owner's language, plain words, outcome first, the shortest message that is still complete.
+- **Decision question.** The five parts each answer a question the owner would otherwise ask back: what is happening (context), cause (proof the agent investigated), options with gain, harm and cost (the comparison already done), recommendation (the agent takes a position), scope of the answer (a yes has edges). Options are lettered, the recommended one first, with a stated default, so one letter or silence is a full answer.
+- **Status and incident reports.** Outcome first; what was done, with names explained; what was checked and what was not; the one decision needed, if any, as a decision question; at most 10 lines, detail in a file.
+
+### Bước 3 — Tình huống (case log)
+
+Each case: situation, what the agent wrote, what it cost the owner, the part of the principle it broke, the better version. Seed cases from 2026-11-22:
+
+| # | Situation | What the agent wrote | Cost to the owner | Broke | Better |
+|---|---|---|---|---|---|
+| C1 | Secretary presenting an owner question | "I have not read it closely, do you want me to present it in the five-part form?" | A turn spent saying "yes, just do it", no information gained | Before you speak | Read it, then present it in five parts with a recommendation |
+| C4 | Supervisor line relayed to the owner | "Asked OPC to handle it, passed question 2 to the stability lead" | "Who is OPC?", "which question 2?" | Names and ids | "Asked OPC (the lead running the stability plan) to handle it; passed the question about X to that lead" |
+| C5 | Several owner questions | Options unlettered, no default | The owner typed sentences where one letter would do | Decision question | Lettered options, recommended first, "no answer → I take A" |
+| S1 | This shaper's first question to the owner | A long English question with ids (`q-…`), file paths and refusal codes | "What is the question?" — a full rewrite was needed | Language and length; names and ids | Short Vietnamese, plain words, no ids unless explained |
+| S2 | This shaper's first rounds | Jumped to hooks, validators and new required fields | The owner had to step back and ask whether the shaper understood the goal | Why before how | State the understanding first, check it with the owner, then the mechanism |
+
+### Bước 4 — Hỗ trợ bằng chương trình
+
+Not started. Known facts: the existing guard checks labels only, on ask-tool calls only; Claude Code and Codex already run fgOS end-of-turn hooks.
 
 ```mermaid
-flowchart LR
-  I[core/instructions/owner-communication.md<br/>always loaded, 5 lines] --> F[_shared/owner-communication.md]
-  S[head and domain skills] -->|cite sections| F
-  F --> Q[fgos questions ask<br/>program checks]
-  F --> R[reports: prose rules]
+flowchart TD
+  W[1. Vì sao: sự chú ý của người là đắt nhất] --> P[2. Nguyên tắc: làm xong phần mình, đưa đủ để quyết ngay]
+  P --> A[Ứng dụng: trước khi nói, tên và id, ngôn ngữ, câu hỏi quyết định, báo cáo]
+  A --> C[3. Tình huống thật: tốt và xấu]
+  C -->|lặp lại thì thành quy tắc| P
+  A -.-> M[4. Chương trình: lưới an toàn cuối]
 ```
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Filled once Q1 and Q2 are answered and the shape holds for a second round.
+Filled once step 3's case-log mechanics are settled and step 4 is decided.
