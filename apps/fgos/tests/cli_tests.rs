@@ -4403,6 +4403,8 @@ struct ExecutionWorld {
     /// A `node` that records being started and fails, and the PATH that finds it first.
     node_log: PathBuf,
     path: String,
+    /// The host binary the world's calls start.
+    host: PathBuf,
 }
 
 #[cfg(unix)]
@@ -4441,6 +4443,7 @@ impl ExecutionWorld {
             manifest: ensure_dev_manifest(),
             node_log,
             path,
+            host: fgos_bin(),
         }
     }
 
@@ -4456,8 +4459,10 @@ impl ExecutionWorld {
     }
 
     fn command(&self, args: &[&str]) -> Command {
-        let mut command = host_command();
+        let mut command = Command::new(&self.host);
         command
+            .env_remove("FGOS_CONFINED")
+            .env_remove("FGOS_HEAD_REQUEST_SOCKET")
             .args(args)
             .current_dir(&self.project)
             .env("PATH", &self.path)
@@ -5374,6 +5379,46 @@ fn the_execution_route_launch_session_op_refuses_an_incomplete_request_and_answe
 /// real Node payload: the peer's case port reads the Execution Core helpers through the addon, and the payload loads
 /// the addon only from the release manifest it runs under. The addon is built once per test process (cargo reuses a
 /// fresh build) and copied under the checkout's ignored `.fgos/runtime/`, inside the release root the door requires.
+/// The host the run cases start, under the release root: the payload trusts a manifest only when its
+/// `entries.fgos` resolves to the host that started it, and only while that host lies inside the release root. A
+/// host built outside the checkout (a `CARGO_TARGET_DIR` elsewhere, as the full suite uses) is linked, or copied
+/// when the two sit on different file systems, under the checkout's ignored `.fgos/runtime/`. Returns its path
+/// relative to the root and in full.
+#[cfg(unix)]
+fn staged_host() -> (String, PathBuf) {
+    use std::os::unix::fs::MetadataExt;
+    let root = fs::canonicalize(repo_root()).unwrap();
+    let host = fs::canonicalize(fgos_bin()).unwrap();
+    if let Ok(inside) = host.strip_prefix(&root) {
+        return (inside.to_string_lossy().into_owned(), host);
+    }
+    let meta = fs::metadata(&host).unwrap();
+    let key = format!(
+        "{:x}",
+        Sha256::digest(
+            format!(
+                "{}:{}:{}",
+                host.display(),
+                meta.len(),
+                meta.mtime_nsec() + meta.mtime() * 1_000_000_000
+            )
+            .as_bytes()
+        )
+    );
+    let relative = format!(".fgos/runtime/cli-tests-addon/host-{}/fgos", &key[..16]);
+    let staged = root.join(&relative);
+    if !staged.exists() {
+        fs::create_dir_all(staged.parent().unwrap()).unwrap();
+        let partial = staged.with_extension(format!("{}.tmp", std::process::id()));
+        let _ = fs::remove_file(&partial);
+        if fs::hard_link(&host, &partial).is_err() {
+            fs::copy(&host, &partial).unwrap();
+        }
+        fs::rename(&partial, &staged).unwrap();
+    }
+    (relative, staged)
+}
+
 #[cfg(unix)]
 fn addon_dev_manifest() -> PathBuf {
     static MANIFEST: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
@@ -5412,6 +5457,7 @@ fn addon_dev_manifest() -> PathBuf {
                 other => other,
             };
             let mut manifest = valid_dev_manifest();
+            manifest["entries"]["fgos"] = serde_json::json!(staged_host().0);
             manifest["components"]["nativeAddon"] = serde_json::json!({
                 "capabilities": ["git-wal-v1"],
                 "path": relative,
@@ -5467,6 +5513,7 @@ impl RunWorld {
             .join(":");
         world.path = format!("{}:{agent_free}", node_dir.display());
         world.manifest = addon_dev_manifest();
+        world.host = staged_host().1;
         fs::write(
             world.home.join(".fgos/config.yaml"),
             "runner:\n  executors:\n    stub:\n      kind: agent\n      providerModel: stub\n      allowCrossProvider: true\n      invocations:\n        - id: stub-cli\n          via: cli\n          adapter: cli-spawn\n          command: /bin/true\n          args: [\"{prompt}\"]\n",
