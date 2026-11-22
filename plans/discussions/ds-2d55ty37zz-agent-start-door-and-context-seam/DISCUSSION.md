@@ -11,15 +11,7 @@ discussion: open
 
 ## 1. Trạng thái hiện tại
 
-2026-11-22 16:15 — The scan is done (§3 table, inventory in [#scan](#scan)). The three main findings:
-
-1. Agents start through two families plus Claude's own subagent tool, and all fgOS-made starts already reach one spawn point (the Rust execution engine). What is split is the *text*: two prompt composers and three persona renderers.
-2. Always-loaded context for Claude in this repo is about 17k tokens (about 29k with the skill listing). fgOS writes less than half of it; about 4.2k tokens is AgentKit rules loaded twice.
-3. Prior art already holds a dormant per-domain instruction composition that nothing uses.
-
-A proposed shape for the door and the seam is in §3 (P4–P7) as provisional; nothing is minted yet.
-
-Open owner question: **Q1** (`q-excujq527g`) — does the seam's job include the parts of AGENTS.md that other tools write (AgentKit, GitNexus, MDView), or only fgOS's own text? It blocks only P6 (what leaves AGENTS.md). Shaping P4, P5 and P7 continues meanwhile.
+2026-11-22 17:30 — Round 2. The owner settled the scope (Q1): fgOS manages only its own text; MDView, AgentKit and GitNexus are external and out of scope for now, with no deep integration. The question `q-excujq527g` was cancelled with that answer. The shaper's advice on how to gather the paths is in [#advice](#advice): one owning component, **Agent Start Context**, a small Rust crate whose one composer every fgOS start calls at the existing spawn door (the run supervisor's session attempt). The Node head opening and two of the three persona renderers go away. P4, P5, P7 and P8 are now proposals after two rounds (no owner revision yet). P10 (where a head's domain comes from) and P11 (whether sessions opened by hand go through the seam) are open. Council: not convened; the options in #advice separate clearly on evidence, so it is not needed unless the owner disagrees with the owning component.
 
 ## 2. Mục tiêu & đề bài
 
@@ -32,12 +24,60 @@ Every agent that fgOS starts should start through one door, and that door should
 | P1 | How many ways an agent is started today, and who owns each start prompt | clear | [#scan](#scan): 5 head paths into one `placeHead`; 7 live worker paths into one Rust engine; Claude's Agent/Task subagents outside both |
 | P2 | Which context is always loaded, its size, who writes it | clear | [#ambient](#ambient): ~17.1k tokens for Claude here, ~29k with skills; fgOS writes ~7.7k of it |
 | P3 | Prior art for start-time injection | clear | [#prior-art](#prior-art): dormant domain composition targets; the only role-keyed start injection today is the rotation hook (728942829) |
-| P4 | Where the single door lives | proposed, one round | The Rust engine's attempt launch (`launch_session_attempt`, `packages/execution/engine/src/transport_round/session_attempt.rs:222`): heads reach it through `launch-session` with a verbatim opening, workers through `run-unit`. Spawning is already one door; composition is not. Proposal: composition moves to that door too, and Node `openingText` (`src/session-host/head-start.mjs:114`) and `renderPersonaSection` (`src/runner/agent-definitions.mjs:310`) are deleted |
-| P5 | Seam contract | proposed, one round | One port in Rust. In: role (head persona or worker seat), persona id, domain, task reference (plan, discussion or Unit objective), target CLI, delivery mode. Out: ordered context blocks — persona, domain doctrine, task, start ritual / on-wake, handoff. Sources plug in as adapters: persona definitions, the dormant domain-target instruction composition (`src/setup/instruction-composition.mjs:94-125`), the rotation handoff. Delivery adapters: typed opening (all five CLIs today), `-p` prompt (headless), Claude `SessionStart` additionalContext |
-| P6 | What leaves CLAUDE.md / AGENTS.md | **blocked by Q1** (`q-excujq527g`) | fgOS-owned part: L8 placement test decides — a rule that need not hold with no workflow running moves behind the seam. Open: whether third-party blocks are in scope. Hand-opened sessions (the owner typing `claude` in a repo) bypass any door, so a standing sheet stays in every case |
-| P7 | First increment | proposed, one round | (a) one persona renderer and one composer behind the seam, used by heads and workers, Node copies deleted; (b) domain doctrine through the seam by switching on the domain targets; (c) AGENTS.md cut per P6. Each slice lands alone |
-| P8 | Claude Agent/Task subagents | open | They start from `.claude/agents/<type>.md` (third persona renderer, `scripts/project-agents.mjs:110`) and the AgentKit `SubagentStart` hook; fgOS's hook only allows or blocks. Whether the seam should render that file too is not yet discussed |
+| P4 | Where the single door lives | proposed, two rounds | Spawning is already one door: every head and worker is a run-supervisor session attempt (`launch_session_attempt`, `packages/execution/engine/src/transport_round/session_attempt.rs:222`; Session Host spec 8.1 and its 2026-11-18 decision). The door gains the composition: callers pass a start request, never finished text. See [#advice](#advice) |
+| P5 | Seam contract | proposed, two rounds | `compose(StartRequest) -> StartContext`. In: kind (head or worker), persona, name, domain (optional), task (a reference for heads; the Execution-owned assignment block for workers), forQuestion, handoff, target CLI. Out: ordered named blocks (persona, standing doctrine, domain doctrine, task, start ritual, on-wake, handoff). Sources are ports; delivery stays with Agent Protocol. See [#advice](#advice) |
+| P6 | What leaves CLAUDE.md / AGENTS.md | scope settled by owner (Q1, 17:15); content proposed | Only fgOS-owned text (~7.7k tokens here). L8 test: what must hold with no workflow running stays as a short standing sheet; the rest becomes core or domain doctrine the seam injects by role and domain. Proposed split in [#advice](#advice). Third-party blocks untouched |
+| P7 | First increment | proposed, two rounds | Four slices, each lands alone, in [#advice](#advice): (1) the crate and heads, (2) workers and the agent-file projection, (3) domain doctrine, (4) the AGENTS.md cut |
+| P8 | Claude Agent/Task subagents | proposed, one round | Yes, through the seam at build time: `scripts/project-agents.mjs` asks the composer for the persona block instead of rendering its own (third renderer removed). Delivery adapter "agent file" |
 | P9 | Mess seen outside this scope | for the secretary as separate items | Codex cuts AGENTS.md at 32 KiB (file is 50.8 KB; Id Minting and the AgentKit block are lost); a stray `<!-- mdview:START -->` at AGENTS.md:232; `statusLine` points into `forgentX`; 6 of 14 `core/agents` never projected to `.claude/agents`; workflow personas `advisor`, `panelist`, `synthesizer`, `critic`, `brand-guardian` have no definition; Node dispatch/prompt mirror looks unreachable; `core/prompt-templates/*` used by no live flow; Unit `skills` never reach the prompt; a Claude rotation successor gets the handoff twice, other CLIs get only the path |
+| P10 | Where a head's domain comes from | open | Workers have it (`owningDomain`, `apps/fgos/src/wiring/unit_run_host/persona.rs:117`). Heads do not: 0 of 150 plans and no discussion carry a `domain:` field, and this shaper's own opening said literally "Read domains/<domain>/AGENTS.md" with the placeholder unfilled. Proposal: the item a head is bound to carries `domain:` in its frontmatter, written by the secretary when she opens it (she already classifies the domain with fgos-clarifying); absent, no domain block is injected and the head reads doctrine on demand as today |
+| P11 | Sessions opened by hand (owner types `claude` in a repo) | open, owner intent | They never pass the spawn door. Either AGENTS.md keeps enough for them, or a fgOS `SessionStart` hook asks the composer with no role (standing doctrine plus the repo's default domain). The hook path makes the seam cover every start on CLIs with hooks (claude, codex, agy) and lets AGENTS.md shrink further |
+
+### Shaper's advice, round 2 {#advice}
+
+**What is actually split.** Spawning is already one door. Delivery is already one owner (Agent Protocol types the text; Session Host places the pane). The *text* has no owner: the head opening is built in Node (`openingText`, `src/session-host/head-start.mjs:114`, with the start ritual and `FIRST_STEPS` hardcoded), the worker prompt in Rust (`builder.rs:757`), and the persona block has three renderers on one source (`src/runner/agent-definitions.mjs:310`, `apps/fgos/src/wiring/unit_run_host/persona.rs:310`, `scripts/project-agents.mjs:110`), even though e749259d2 meant "one persona door". fgOS doctrine reaches agents only through this repo's AGENTS.md, so agents fgOS starts in *other* projects get no fgOS doctrine at all since `fgos setup` was retired (12f8a187a). Fixing that serves mission #1/#2, not only fgOS's own token bill.
+
+**Who should own the text — three options weighed.**
+
+| Option | Gain | Harm |
+|---|---|---|
+| A. Execution owns it (extend the assignment builder to heads) | no new crate | the assignment prompt is a worker contract (write scope, result claim); heads do not fit, and Execution (tier 5) grows a second job |
+| B. **New small component "Agent Start Context"** (Rust crate, tier 3 beside Agent Protocol) | one authority for start text (principle 7); pure, testable with golden openings; sources and delivery are ports (principle 3); new code in Rust per the Session Host 2026-11-18 decision | one new crate; heads' composition moves from Node to Rust |
+| C. Session Host owns it | heads already start there | Session Host is placement only and its spec forbids typing; workers would cross into it |
+
+**Recommendation: B.** The owner pre-approved an owning component; B is the only option where one component owns exactly one kind of decision. It stays small: a composer and ports, no new mechanism beside the door (L10).
+
+```mermaid
+flowchart LR
+  subgraph callers[Callers pass a StartRequest]
+    HS[session start / rotate / wake]
+    RU[fgos run / workflow units]
+    PA[agent-file projection at build]
+    HK[SessionStart hook, if P11]
+  end
+  subgraph asc[Agent Start Context]
+    C[compose]
+    S1[(persona source)]
+    S2[(doctrine source: core + domain targets)]
+    S3[(handoff source)]
+    C --- S1 & S2 & S3
+  end
+  HS & RU --> D[run supervisor session attempt]
+  D --> C
+  PA --> C
+  HK --> C
+  C --> AP[Agent Protocol delivery: typed opening, -p prompt, agent file, hook context]
+```
+
+**Contract sketch.** `compose(StartRequest{kind, persona, name, domain?, task, forQuestion?, handoff?, cli}) -> StartContext{blocks[]}`. Blocks are named and ordered; Execution keeps owning the assignment block (objective, write scope, result claim) and passes it in as the task. The start ritual and first step become persona data (`core/agents/*.yaml`), not code. Later components (an agent-context injector, a skill-text inliner) add a source port, never a new path.
+
+**Proposed AGENTS.md split (fgOS-owned text only).** Stays as the standing sheet: mission boundary, product priority, the laws index, scratch artifacts, destructive cleanup, id minting, the decision-question rule. Moves to doctrine injected by role/domain: before-touching-code, definition of done detail, the install/setup/doctor gate, the legacy-Node boundary, dispatch, the gateway, the impact-analysis gate (coding domain on fgOS itself), the RUL11/RUL104 narratives (core doctrine for heads and reviewers). Rough effect here: fgOS-owned always-loaded text from ~7.7k to ~2k tokens; the rest arrives only for the starts that need it. The anchor phrases of RUL11 and RUL104 keep their tests wherever the text lives.
+
+**Increments (each lands alone, old path deleted in the same slice).**
+1. Crate + heads: compose the head opening in Rust; `launch-session` takes the start request instead of text; Node `openingText`, `renderPersonaSection`, `renderOnWake` deleted. Proof: golden openings per persona equal today's text except the fixes named (unfilled `<domain>`, worker-worded preamble).
+2. Workers + agent files: `builder.rs` and `scripts/project-agents.mjs` take the persona block from the composer; `persona.rs` rendering deleted.
+3. Domain doctrine: switch on the dormant domain targets (`src/setup/instruction-composition.mjs:94-125`) as the doctrine source; P10 decides the head's domain.
+4. AGENTS.md cut per the split above, plus P11's hook if chosen.
 
 ### Scan inventory {#scan}
 
@@ -107,6 +147,8 @@ Plus hooks: AgentKit `session-init` (≤4 KB), `dev-rules-reminder` on every pro
 
 - 2026-11-22 15:57 — Seed from the secretary on the owner's order: goal, first task (scan), shaping order, constraints, non-goals as in §2. The owner names `head start`'s activation prompt as the reference.
 - 2026-11-22 16:15 — Scan done by three read-only sweeps (head/session, run/workflow/executor, ambient context + prior art); results in §3. Proposals P4, P5, P7 written for a first round. Q1 asked through the question store (scope of P6); Asked as `q-excujq527g`; recommended "fgOS text only; third-party mess is a separate item".
+- 2026-11-22 17:15 — Owner on Q1: MDView, AgentKit and GitNexus are external; not our concern for now, no deep integration; only manage our own system well, smoothly, without mess. The owner's goal statement stands as written. Task for the shaper: scan all paths, brainstorm, think it through, advise how to gather them; an owning component is allowed; a council may be convened if it is too messy. `q-excujq527g` cancelled with this answer.
+- 2026-11-22 17:30 — Round 2 advice written ([#advice](#advice)): owning component B (Agent Start Context), contract sketch, AGENTS.md split, four increments. New open points P10 (head domain source) and P11 (hand-opened sessions). Council not convened: the evidence separates the options.
 
 ## 6. Thiết kế đã chốt {#design}
 
