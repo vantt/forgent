@@ -7,7 +7,6 @@ blockedBy:
   - 261118-1341-s6a-execution-tier-rust
   - 261120-0625-work-data-model
   - 261122-0118-heads-stable-and-able
-  - 261122-1950-owner-communication-standard
 base: 8a7839d3881a03527cfcf003e05dc323d191a613
 footprint:
   - plans/261121-2109-component-authority/**
@@ -188,6 +187,11 @@ parallel only where it does not collide. The two plans listed each other in `blo
 neither, so `261122-0056-orchestration-skeleton` left this plan's `blockedBy` and keeps this plan in its own. It still
 shares `docs/platform/workflow/spec.md` and `docs/platform/runner/spec.md` with this plan and many host files with
 the doors plan, so it runs after them, not beside them. The other two waits are real file collisions and stay.
+
+**Owner order (2026-11-22 23:25, via the secretary, recorded by head:supervisor-forgent):** `261122-1950-owner-communication-standard`
+is low priority and blocks nothing, so it left `blockedBy`. Its four shared files (`AGENTS.md`, `docs/reading-map.md`,
+`docs/platform/agent-mailbox/spec.md`, `docs/platform/observe/spec.md`) are now kept apart by admission alone: whichever
+of the two runs, the other waits for it.
 
 **Why it first waited:** two plans that were running when it was written owned files this plan must change.
 - `261118-1341-s6a-execution-tier-rust` owns `docs/architecture-manifest.json`, `test/architecture.test.mjs`,

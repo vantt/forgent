@@ -8,7 +8,6 @@ blockedBy:
   - 261120-0625-work-data-model
   - 261121-2109-component-authority
   - 261122-0118-heads-stable-and-able
-  - 261122-1950-owner-communication-standard
 footprint:
   - plans/261122-0056-orchestration-skeleton/**
   - packages/supervision/contracts/scheduling-record.v1.json
@@ -272,6 +271,11 @@ overlap. The plan turns `ready` once all three are done; reordering them is a pr
   `blockedBy` stays as written; the supervisor admits it once `261122-0118-heads-stable-and-able`,
   `261122-1950-owner-communication-standard` and `261121-2109-component-authority` are done. No other plan's order or
   scope changes.
+- Owner orders 2026-11-22 23:20 and 23:25 (via the secretary, recorded by head:supervisor-forgent): component-authority
+  goes first, then its doors plan; this plan runs beside them only where it does not collide. It shares
+  `docs/platform/workflow/spec.md` and `docs/platform/runner/spec.md` with component-authority and many host files with
+  the doors plan, so it still waits for component-authority. `261122-1950-owner-communication-standard` is low
+  priority and blocks nothing, so it left `blockedBy`; admission alone keeps their shared files apart.
 
 ## Risks and rollback
 
