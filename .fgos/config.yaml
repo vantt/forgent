@@ -356,3 +356,10 @@ land:
       - bin/**
       - scripts/**
       - core/**
+# @fgos:doc The project watcher: a no-LLM timer tick that runs detection definitions and records each raised event once.
+watcher:
+  # @fgos:doc The action per row kind.
+  actions:
+    # @fgos:doc The action for this row kind. Values: wake-supervisor | notify | none.
+    # @fgos:why [3199073] watcher tune: actions.session-idle=none
+    session-idle: none
