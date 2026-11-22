@@ -23,13 +23,6 @@ function tempRoot(label = 'dispatch-operability-door-') {
   return root;
 }
 
-function cli(args, { cwd = repo } = {}) {
-  return spawnSync(process.execPath, ['bin/fgos.mjs', ...args], {
-    cwd,
-    encoding: 'utf8',
-  });
-}
-
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
 }
@@ -125,13 +118,6 @@ test('production assignment door writes RunResult v3, effective contract, adapte
   assert.equal(effective.limits.executorTimeoutMs, 4321);
   assert.deepEqual(argv.slice(0, 2), ['--sentinel-config-field', 'forwarded-through-adapter']);
 
-  const inspected = cli(['dispatch', 'inspect', '--dir', root, '--run', result.runId]);
-  assert.equal(inspected.status, 0, inspected.stderr);
-  const data = JSON.parse(inspected.stdout).data;
-  assert.equal(data.inspectionStatus, 'resolved');
-  assert.equal(data.runResult.runId, result.runId);
-  assert.equal(data.runResult.classification.provenance, 'native-v3');
-  assert.equal(data.runObservation.subject.runId, result.runId);
 });
 
 test('production assignment door distinguishes reviewer findings, invalid claim, provider crash, and resource timeout families', async () => {
@@ -231,41 +217,6 @@ test('production assignment door distinguishes reviewer findings, invalid claim,
   assert.equal(timedOut.classification.failure.code, 'execution-timeout');
 });
 
-test('inspect production door interprets historical and replayed RunResults without rewriting terminal bytes', () => {
-  const root = tempRoot();
-  const legacyBytes = `${JSON.stringify({ assignmentId: 'a', runId: 'run-legacy', status: 'done', confidence: 'reported' }, null, 2)}\n`;
-  writeAssignmentMaterialization(root, 'a', 'run-legacy', legacyBytes);
-
-  const legacy = cli(['dispatch', 'inspect', '--dir', root, '--run', 'run-legacy']);
-  assert.equal(legacy.status, 0, legacy.stderr);
-  const legacyData = JSON.parse(legacy.stdout).data;
-  assert.equal(legacyData.runResult.classification.provenance, 'legacy-derived');
-  assert.equal(fs.readFileSync(path.join(root, '.fgos', 'assignments', 'a', 'runs', '01', 'result.json'), 'utf8'), legacyBytes);
-
-  const replayedBytes = `${JSON.stringify({
-    contract: { id: 'assignment-run-result', version: 2 },
-    assignmentId: 'b',
-    runId: 'run-replayed',
-    status: 'done',
-    confidence: 'reported',
-    classification: {
-      execution: { status: 'completed', exitCode: 0 },
-      assessment: { verdict: 'pass' },
-      confidence: { level: 'reported', basis: ['replay-cache'] },
-      failure: null,
-      policy: { disposition: 'allow', code: null },
-      delivery: { mode: 'replayed', sourceRunId: 'run-original' },
-      provenance: 'native-v2',
-    },
-  }, null, 2)}\n`;
-  writeAssignmentMaterialization(root, 'b', 'run-replayed', replayedBytes);
-  const replayed = cli(['dispatch', 'inspect', '--dir', root, '--run', 'run-replayed']);
-  assert.equal(replayed.status, 0, replayed.stderr);
-  const replayedData = JSON.parse(replayed.stdout).data;
-  assert.equal(replayedData.runResult.classification.delivery.mode, 'replayed');
-  assert.equal(replayedData.runResult.classification.delivery.sourceRunId, 'run-original');
-});
-
 test('reconcile production routes refuse recovery semantics through CLI, operation catalog, dynamic import, and subprocess plan tampering', async () => {
   const root = tempRoot();
   const forbidden = [
@@ -283,9 +234,7 @@ test('reconcile production routes refuse recovery semantics through CLI, operati
   ];
 
   for (const action of forbidden) {
-    const answer = cli(['dispatch', 'reconcile', 'plan', '--dir', root, '--action', action]);
-    assert.equal(answer.status, 0, answer.stderr);
-    assert.equal(JSON.parse(answer.stdout).data.outcome, 'refused', `CLI must refuse ${action}`);
+    assert.equal(planReconciliation(root, { action, now: '2026-09-15T00:00:00.000Z' }).outcome, 'refused', `the planner must refuse ${action}`);
   }
 
   const dispatchEntry = COMMAND_REGISTRY.find((entry) => entry.name === 'dispatch');
@@ -326,9 +275,7 @@ test('reconcile production routes refuse recovery semantics through CLI, operati
     snapshot: { expiresAt: '2099-01-01T00:00:00.000Z' },
     proposedAction: { kind: 'resume-driver', runId: 'run-any' },
   };
-  const applied = cli(['dispatch', 'reconcile', 'apply', '--dir', root, '--plan', JSON.stringify(tampered)]);
-  assert.equal(applied.status, 0, applied.stderr);
-  assert.equal(JSON.parse(applied.stdout).data.outcome, 'refused');
+  assert.equal(invokeDispatchReconcileOperation({ operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx: { repoRoot: root }, payload: { apply: true, plan: tampered } }).outcome, 'refused');
 
   const subprocess = spawnSync(process.execPath, ['-e', `
     import { invokeDispatchReconcileOperation } from ${JSON.stringify(pathToFileUrl(path.join(repo, 'src/verbs/dispatch/reconcile.mjs')))};

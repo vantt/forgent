@@ -9,14 +9,9 @@ import { spawnSync, execFileSync } from 'node:child_process';
 import { initStore, addWork } from '../../src/state/store.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
-import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 
-// Seat Binding names only an executor whose CLI this machine has: the config below states which one is.
-seedStubAgentClis('claude');
-
-// `dispatch execute` (prompt, --contract, --assignment) and `dispatch log` are gone: one task
-// runs through `fgos run`, planned work through a Workflow. Calling a removed door is a
-// validation error that names the door to use, and it never runs or records anything.
+// `dispatch execute` and `dispatch log` are gone: one task runs through `fgos run`, planned work
+// through a Workflow. The compatibility alias refuses them as unknown subcommands and records nothing.
 
 const repo = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const FGOS = path.join(repo, 'bin', 'fgos.mjs');
@@ -49,79 +44,6 @@ function eventLines(fgosDir) {
   if (!fs.existsSync(dir)) return 0;
   return fs.readdirSync(dir).reduce((n, f) => n + fs.readFileSync(path.join(dir, f), 'utf8').split('\n').filter(Boolean).length, 0);
 }
-
-function writeConfig(fgosDir) {
-  writeProjectConfig(path.dirname(fgosDir), {
-    runner: {
-      patterns: { seatBinding: { schema: 1 } },
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { blocked: { description: 'a purpose only a tool serves' }, 'fgos-coding-implement': { prefer: 'ag1' } },
-      executors: {
-        'tool-only': { kind: 'tool', for: ['blocked'], allowCrossProvider: true },
-        ag1: { kind: 'agent', invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] },
-      },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 5000,
-    },
-  });
-}
-
-test('fgos dispatch execute <agent executor> is a validation error pointing at fgos run --provider, and spawns nothing', () => {
-  const { root, fgosDir } = mkStore();
-  writeConfig(fgosDir);
-  const before = eventLines(fgosDir);
-  const out = run(FGOS, ['dispatch', 'execute', 'ag1', '--prompt', 'hi', '--for', 'execute'], root);
-  assert.equal(out.status, 4, out.stderr);
-  assert.match(out.stderr, /fgos dispatch execute was removed/);
-  assert.match(out.stderr, /fgos run "<prompt>" --provider ag1 --capability execute \[--writes <paths> --worktree <path>\]/);
-  assert.match(out.stderr, /--provider is a preference/);
-  assert.match(out.stderr, /fgos run --unit <file>/);
-  assert.equal(fs.existsSync(path.join(fgosDir, 'assignments')), false);
-  assert.equal(eventLines(fgosDir), before);
-});
-
-test('fgos dispatch execute <tool executor> never suggests --provider for it, which fgos run would refuse', () => {
-  const { root, fgosDir } = mkStore();
-  writeConfig(fgosDir);
-  const out = run(FGOS, ['dispatch', 'execute', 'tool-only', '--prompt', 'hi'], root);
-  assert.equal(out.status, 4, out.stderr);
-  assert.doesNotMatch(out.stderr, /--provider tool-only/);
-  assert.match(out.stderr, /"tool-only" is a tool executor, which fgos run cannot name -- call that tool directly/);
-});
-
-test('fgos dispatch execute <unregistered executor> suggests a plain fgos run', () => {
-  const { root } = mkStore();
-  const out = run(FGOS, ['dispatch', 'execute', 'codex', '--prompt', 'hi'], root);
-  assert.equal(out.status, 4, out.stderr);
-  assert.match(out.stderr, /fgos run "<prompt>" \[--writes <paths> --worktree <path>\]/);
-  assert.doesNotMatch(out.stderr, /--provider codex/);
-});
-
-test('fgos dispatch execute --contract points at fgos run --unit', () => {
-  const { root } = mkStore();
-  const out = run(FGOS, ['dispatch', 'execute', 'codex', '--contract', 'c.json'], root);
-  assert.equal(out.status, 4, out.stderr);
-  assert.match(out.stderr, /fgos run --unit <file>/);
-});
-
-test('fgos dispatch execute --assignment points at fgos run --unit or a Workflow', () => {
-  const { root } = mkStore();
-  const out = run(FGOS, ['dispatch', 'execute', '--assignment', 'asgn-1'], root);
-  assert.equal(out.status, 4, out.stderr);
-  assert.match(out.stderr, /--assignment was removed/);
-  assert.match(out.stderr, /fgos run --unit <file>/);
-  assert.match(out.stderr, /fgos workflow start/);
-});
-
-test('fgos dispatch log is a validation error pointing at the unit run directory, and writes no event', () => {
-  const { root, fgosDir } = mkStore();
-  const before = eventLines(fgosDir);
-  const out = run(FGOS, ['dispatch', 'log', 'codex', '--id', 'cand1', '--provider', 'openai', '--command', 'codex'], root);
-  assert.equal(out.status, 4, out.stderr);
-  assert.match(out.stderr, /fgos dispatch log was removed/);
-  assert.match(out.stderr, /\.fgos\/assignments\/<unitRunId>\//);
-  assert.equal(eventLines(fgosDir), before);
-});
 
 for (const sub of ['execute', 'log', 'fanout-batch', 'decide']) {
   test(`node src/runner/dispatch.mjs ${sub} is an unknown subcommand`, () => {
