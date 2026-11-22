@@ -7,28 +7,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { fileURLToPath } from 'node:url';
 
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { bindableExecute } from '../helpers/work-seat-config.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { showRunUseCase, readRunSnapshot } from '../../src/verbs/dispatch/show-run.mjs';
-import { watchRunUseCase } from '../../src/verbs/dispatch/watch.mjs';
-import {
-  inspectDispatchRuntime,
-  VALID_PHASES,
-  VALID_RESOURCE_STATES,
-  VALID_DELIVERIES,
-  VALID_COMPLETENESS,
-  INSPECTION_STATUSES,
-} from '../../src/runner/dispatch/runtime-inspection.mjs';
 import {
 } from '../../src/setup/registrations.mjs';
 
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-const REPO = path.resolve(HERE, '..', '..');
 
 // ─── 2. Cross-Provider Refusal Before Spawn ───────────────────────────────────
 
@@ -151,101 +138,5 @@ test('an opted-in cross-provider executor runs and records executor + provider i
 
 // ─── 4. Watch with Valid/Corrupt/Empty/Directory Result Evidence ───────────────
 
-test('watch terminates on valid result.json and stops on corrupt/empty/directory evidence', async () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-probe-watch-'));
-  const runDir = path.join(tmp, '.fgos', 'assignments', 'asgn_probe', 'runs', '01');
-  fs.mkdirSync(runDir, { recursive: true });
-  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ runId: 'run_p4', assignmentId: 'asgn_probe', status: 'running' }));
-
-  const resultPath = path.join(runDir, 'result.json');
-
-  // Case A: Absent -> settled false
-  const snapA = showRunUseCase({ repoRoot: tmp }, { runId: 'run_p4' });
-  assert.equal(snapA.settled, false);
-  assert.equal(snapA.resultCorrupt, undefined);
-
-  // Case B: Valid result -> terminates terminal, settled: true
-  fs.writeFileSync(resultPath, JSON.stringify({ runId: 'run_p4', status: 'done' }));
-  const watchB = await watchRunUseCase({ repoRoot: tmp }, { runId: 'run_p4' });
-  assert.equal(watchB.settled, true);
-  assert.equal(watchB.stoppedBecause, 'terminal');
-
-  // Case C: Empty result (0 bytes) -> terminates corrupt-evidence, settled: false
-  fs.writeFileSync(resultPath, '');
-  const watchC = await watchRunUseCase({ repoRoot: tmp }, { runId: 'run_p4' });
-  assert.equal(watchC.settled, false);
-  assert.equal(watchC.resultCorrupt, true);
-  assert.equal(watchC.stoppedBecause, 'corrupt-evidence');
-
-  // Case D: Invalid JSON -> terminates corrupt-evidence, settled: false
-  fs.writeFileSync(resultPath, '{ not json');
-  const watchD = await watchRunUseCase({ repoRoot: tmp }, { runId: 'run_p4' });
-  assert.equal(watchD.settled, false);
-  assert.equal(watchD.resultCorrupt, true);
-  assert.equal(watchD.stoppedBecause, 'corrupt-evidence');
-
-  // Case E: Vacuous {} -> terminates corrupt-evidence, settled: false
-  fs.writeFileSync(resultPath, '{}');
-  const watchE = await watchRunUseCase({ repoRoot: tmp }, { runId: 'run_p4' });
-  assert.equal(watchE.settled, false);
-  assert.equal(watchE.resultCorrupt, true);
-  assert.equal(watchE.stoppedBecause, 'corrupt-evidence');
-
-  // Case F: Directory result.json -> terminates corrupt-evidence, settled: false
-  fs.rmSync(resultPath);
-  fs.mkdirSync(resultPath);
-  const watchF = await watchRunUseCase({ repoRoot: tmp }, { runId: 'run_p4' });
-  assert.equal(watchF.settled, false);
-  assert.equal(watchF.resultCorrupt, true);
-  assert.equal(watchF.stoppedBecause, 'corrupt-evidence');
-
-  // Case G: Terminal run status with corrupt result -> never reports settled success
-  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ runId: 'run_p4', assignmentId: 'asgn_probe', status: 'settled' }));
-  const watchG = await watchRunUseCase({ repoRoot: tmp }, { runId: 'run_p4' });
-  assert.equal(watchG.settled, false);
-  assert.equal(watchG.resultCorrupt, true);
-  assert.equal(watchG.stoppedBecause, 'corrupt-evidence');
-
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
 // ─── 5. Workspace and Ownership Closed Vocabulary ──────────────────────────────
 
-test('RunObservation fields strictly adhere to closed vocabularies', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-probe-vocab-'));
-  const asgnDir = path.join(tmp, '.fgos', 'assignments', 'asgn_vocab');
-  const runDir = path.join(asgnDir, 'runs', '01');
-  const genDir = path.join(asgnDir, 'admission', 'generations');
-  fs.mkdirSync(runDir, { recursive: true });
-  fs.mkdirSync(genDir, { recursive: true });
-
-  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify({ assignmentId: 'asgn_vocab' }));
-  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({
-    runId: 'run_v1',
-    assignmentId: 'asgn_vocab',
-    status: 'running',
-    launchedAt: new Date().toISOString(),
-  }));
-  fs.writeFileSync(path.join(genDir, '0000000001.json'), JSON.stringify({ runId: 'run_v1', attempt: 1 }));
-
-  const res = inspectDispatchRuntime(tmp, { run: 'run_v1' });
-  const obs = res.runObservation;
-
-  assert.ok(obs, 'runObservation must exist');
-  assert.ok(VALID_PHASES.has(obs.phase), `phase ${obs.phase} must be valid`);
-  assert.ok(VALID_RESOURCE_STATES.has(obs.resourceState), `resourceState ${obs.resourceState} must be valid`);
-  assert.ok(VALID_DELIVERIES.has(obs.delivery), `delivery ${obs.delivery} must be valid`);
-  assert.ok(INSPECTION_STATUSES.has(obs.inspectionStatus), `inspectionStatus ${obs.inspectionStatus} must be valid`);
-
-  // Closed completeness assertions
-  assert.equal(obs.evidenceCompleteness.workspace, 'unsupported', 'workspace completeness must be unsupported without writer');
-  assert.equal(obs.evidenceCompleteness.ownership, 'complete', 'admitted run ownership must be complete');
-
-  for (const [dim, val] of Object.entries(obs.evidenceCompleteness)) {
-    assert.ok(VALID_COMPLETENESS.has(val), `completeness for ${dim}: ${val} must be in VALID_COMPLETENESS`);
-    assert.notEqual(val, 'partial', `completeness field ${dim} must never leak partial`);
-    assert.notEqual(val, 'incomplete', `completeness field ${dim} must never leak incomplete`);
-  }
-
-  fs.rmSync(tmp, { recursive: true, force: true });
-});

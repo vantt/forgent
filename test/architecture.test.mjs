@@ -444,14 +444,6 @@ export function checkExecuteAssignmentCallSitePostures(sites) {
       if (!/isReadOnlyMode:\s*assignment\.mutation\s*!==\s*'mutating'/.test(callText)) {
         violations.push(`${file}: runExecutorAttempt's executeAssignment(...) call no longer derives isReadOnlyMode from assignment.mutation -- found: ${callText}`);
       }
-    } else if (file === 'src/runner/dispatch/cli.mjs') {
-      // The one cli.mjs call site left is the read-only probe-account diagnostic:
-      // it must keep isReadOnlyMode literally true.
-      if (/isReadOnlyMode:\s*false\b/.test(callText)) {
-        violations.push(`${file}: executeAssignment(...) call sets isReadOnlyMode: false literally -- illegal anywhere outside session-engine.mjs's runExecutorAttempt`);
-      } else if (!/isReadOnlyMode:\s*true\b/.test(callText)) {
-        violations.push(`${file}: executeAssignment(...) call's isReadOnlyMode is not literal true -- ${callText}`);
-      }
     } else {
       violations.push(`${file}: unexpected NEW executeAssignment(...) call site -- add explicit posture coverage to checkExecuteAssignmentCallSitePostures before accepting it`);
     }
@@ -462,7 +454,7 @@ export function checkExecuteAssignmentCallSitePostures(sites) {
 // The symbols that run a worker or commit its work. Each may be called only from
 // the files named below; any other caller has to come through runUnit.
 const RUN_DOOR_CALLERS = {
-  executeAssignment: ['src/runner/dispatch/cli.mjs'],
+  executeAssignment: [],
   commitUnitWork: ['scripts/git/e3-bench.mjs'], // Paired E3 baseline calls the real legacy writer.
 };
 // Where each symbol is defined. Its home and the dispatch barrel may define or re-export it; calling it still counts.
@@ -579,9 +571,6 @@ test('executeAssignment(...) isReadOnlyMode posture: only session-engine.mjs\'s 
     const raw = fs.readFileSync(path.join(root, file), 'utf8');
     for (const callText of findExecuteAssignmentCallTexts(raw)) sites.push({ file, callText });
   }
-  const cliSites = sites.filter((s) => s.file === 'src/runner/dispatch/cli.mjs');
-  // Only the read-only `probe-account` diagnostic is left in cli.mjs.
-  assert.equal(cliSites.length, 1, `expected exactly one executeAssignment(...) call site in cli.mjs, found ${cliSites.length}`);
   assert.deepEqual(checkExecuteAssignmentCallSitePostures(sites), []);
 });
 
@@ -594,9 +583,9 @@ test('R6b posture check actually catches a violation (deliberately broken synthe
   );
   assert.ok(
     checkExecuteAssignmentCallSitePostures([
-      { file: 'src/runner/dispatch/cli.mjs', callText: 'executeAssignment(assignment, { isReadOnlyMode: false })' },
+      { file: 'src/runner/dispatch/cli.mjs', callText: 'executeAssignment(assignment, { isReadOnlyMode: true })' },
     ]).length > 0,
-    'a literal isReadOnlyMode: false in cli.mjs must be flagged',
+    'cli.mjs holds no CLI door any more, so any executeAssignment(...) call there is a new site and must be flagged',
   );
   assert.ok(
     checkExecuteAssignmentCallSitePostures([
@@ -613,7 +602,6 @@ test('R6b posture check actually catches a violation (deliberately broken synthe
   assert.deepEqual(
     checkExecuteAssignmentCallSitePostures([
       { file: 'src/runner/coordination/session-engine.mjs', callText: "executeAssignment(assignment, { ...opts, isReadOnlyMode: assignment.mutation !== 'mutating' })" },
-      { file: 'src/runner/dispatch/cli.mjs', callText: 'executeAssignment(assignment, { isReadOnlyMode: true })' },
     ]),
     [],
   );
@@ -860,13 +848,12 @@ test('F-R01 posture check catches violations (deliberate mutator introduction or
   );
 });
 
-// The A4 guard covers dispatch, the execution core, the dispatch barrel and the Workflow
-// runner: none of them may know a Work item, the Work store or a domain. No allowlist.
+// The A4 guard covers dispatch, the execution core and the Workflow runner: none of them may
+// know a Work item, the Work store or a domain. No allowlist.
 function a4GuardedFiles() {
   return [
     ...mjsFilesUnder('src/runner/dispatch'),
     ...mjsFilesUnder('src/runner/execution'),
-    'src/runner/dispatch.mjs',
     ...mjsFilesUnder('src/workflow'),
   ];
 }

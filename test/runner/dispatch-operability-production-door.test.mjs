@@ -4,18 +4,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
 
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { bindableExecute } from '../helpers/work-seat-config.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
-import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
-import { invokeDispatchReconcileOperation } from '../../src/verbs/dispatch/reconcile.mjs';
-import { planReconciliation } from '../../src/runner/dispatch/reconciliation-planner.mjs';
 
-const repo = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
 function tempRoot(label = 'dispatch-operability-door-') {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), label));
@@ -216,81 +210,3 @@ test('production assignment door distinguishes reviewer findings, invalid claim,
   assert.equal(timedOut.classification.failure.family, 'resource');
   assert.equal(timedOut.classification.failure.code, 'execution-timeout');
 });
-
-test('reconcile production routes refuse recovery semantics through CLI, operation catalog, dynamic import, and subprocess plan tampering', async () => {
-  const root = tempRoot();
-  const forbidden = [
-    'kill-process',
-    'signal-worker',
-    'retry-run',
-    'relaunch-run',
-    'resume-driver',
-    'reattach-execution',
-    'reassign-work',
-    'takeover-work',
-    'admit-run',
-    'cancel-execution',
-    'recover',
-  ];
-
-  for (const action of forbidden) {
-    assert.equal(planReconciliation(root, { action, now: '2026-09-15T00:00:00.000Z' }).outcome, 'refused', `the planner must refuse ${action}`);
-  }
-
-  const dispatchEntry = COMMAND_REGISTRY.find((entry) => entry.name === 'dispatch');
-  assert.ok(dispatchEntry, 'dispatch command registry entry exists');
-  assert.deepEqual(dispatchEntry.subcommands.reconcile.parameters.properties.action.description.match(/clear-cwd-lock|collect-result|clear-assignment-claim|repair-projection/g), [
-    'clear-cwd-lock',
-    'collect-result',
-    'repair-projection',
-  ]);
-  // Every advertised action must be one the planner recognizes.
-  for (const advertised of ['clear-cwd-lock', 'collect-result', 'repair-projection']) {
-    const plan = planReconciliation(root, { action: advertised, runId: 'r', now: '2026-09-15T00:00:00.000Z' });
-    assert.doesNotMatch(plan.reason ?? '', /unsupported reconciliation action/, `${advertised} is advertised`);
-  }
-
-  assert.throws(
-    () => invokeDispatchReconcileOperation({
-      operationId: 'dispatch.runtime.recover',
-      effect: 'write',
-      ctx: { repoRoot: root },
-      payload: { action: 'resume-driver' },
-    }),
-    /unsupported Dispatch reconciliation operation/,
-  );
-  const hostRefusal = invokeDispatchReconcileOperation({
-    operationId: 'dispatch.runtime.reconcile',
-    effect: 'write',
-    ctx: { repoRoot: root },
-    payload: { action: 'resume-driver' },
-  });
-  assert.equal(hostRefusal.outcome, 'refused');
-
-  const module = await import('../../src/verbs/dispatch/reconcile.mjs');
-  assert.equal(module.reconcilePlanUseCase({ repoRoot: root }, { action: 'retry-run' }).outcome, 'refused');
-
-  const tampered = {
-    actionKey: 'reconcile_tampered_recovery',
-    snapshot: { expiresAt: '2099-01-01T00:00:00.000Z' },
-    proposedAction: { kind: 'resume-driver', runId: 'run-any' },
-  };
-  assert.equal(invokeDispatchReconcileOperation({ operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx: { repoRoot: root }, payload: { apply: true, plan: tampered } }).outcome, 'refused');
-
-  const subprocess = spawnSync(process.execPath, ['-e', `
-    import { invokeDispatchReconcileOperation } from ${JSON.stringify(pathToFileUrl(path.join(repo, 'src/verbs/dispatch/reconcile.mjs')))};
-    const answer = invokeDispatchReconcileOperation({
-      operationId: 'dispatch.runtime.reconcile',
-      effect: 'write',
-      ctx: { repoRoot: ${JSON.stringify(root)} },
-      payload: { action: 'admit-run' }
-    });
-    process.stdout.write(JSON.stringify(answer));
-  `], { encoding: 'utf8' });
-  assert.equal(subprocess.status, 0, subprocess.stderr);
-  assert.equal(JSON.parse(subprocess.stdout).outcome, 'refused');
-});
-
-function pathToFileUrl(file) {
-  return new URL(`file://${file}`).href;
-}

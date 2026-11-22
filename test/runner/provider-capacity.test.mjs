@@ -27,10 +27,9 @@ import {
   recordProviderAccountFault,
   releaseProviderAccountLease,
 } from '../../src/runner/dispatch/provider-capacity.mjs';
-import { reconcileProviderCapacityQuarantineUseCase } from '../../src/verbs/dispatch/reconcile.mjs';
 import { selfRecord } from '../../src/native/process-identity.mjs';
 import { lockHolders, resolveLockRoot } from '../../src/holder-lock/index.mjs';
-import { globalConfigPath as globalConfigFile, writeAccountsFile } from '../helpers/config-fixture.mjs';
+import { writeAccountsFile } from '../helpers/config-fixture.mjs';
 
 // Every lock here is machine-scoped under the state root: a private root keeps this file's locks off
 // the machine's real ones, and every child process started below inherits it.
@@ -728,24 +727,13 @@ test('a provider wait or reset longer than a day quarantines for a day, so text 
 
 test('an owner-set quarantine keeps the account out of selection until its end time', () => {
   const dir = mkTempDir();
-  const globalConfigPath = globalConfigFile(dir);
   writeAccountsFile(path.join(dir, '.fgos'), { llmAccounts: runnerConfig().llmAccounts });
   const until = new Date(Date.now() + 3600_000).toISOString();
-
-  const refusedPast = reconcileProviderCapacityQuarantineUseCase({}, {
-    provider: 'openai-codex', account: 'a', reason: 'quota', until: new Date(Date.now() - 1000).toISOString(), globalConfigPath, runtimeDir: dir,
+  const quarantine = quarantineProviderAccount({
+    provider: 'openai-codex', accountId: 'a', reasonCode: 'quota-limit', quarantineKind: 'temporary', until, runtimeDir: dir,
+    detail: { kind: 'owner', reason: 'quota exhausted', caller: 'fgos dispatch reconcile provider-capacity quarantine' },
   });
-  assert.equal(refusedPast.reasonCode, 'until-in-past');
-  const refusedUnknown = reconcileProviderCapacityQuarantineUseCase({}, {
-    provider: 'openai-codex', account: 'nope', reason: 'quota', until, globalConfigPath, runtimeDir: dir,
-  });
-  assert.equal(refusedUnknown.reasonCode, 'unknown-account');
-
-  const result = reconcileProviderCapacityQuarantineUseCase({}, {
-    provider: 'openai-codex', account: 'a', reason: 'quota exhausted', until, globalConfigPath, runtimeDir: dir,
-  });
-  assert.equal(result.status, 'quarantined');
-  assert.equal(result.quarantine.detail.kind, 'owner');
+  assert.equal(quarantine.detail.kind, 'owner');
 
   const lease = (now, runId) => acquireNamedAccountLease({ accountId: 'a', runnerConfig: runnerConfig(), provider: 'openai-codex', runId, runtimeDir: dir, now: new Date(now) });
   assert.equal(lease(Date.now(), 'run-owner-before').reason, LEASE_CONFLICT_REASON, 'out of selection before the end time');

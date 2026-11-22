@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e8ab25305b9bf0e2996c0a633ca21203fe17b9219db9b18b97138eaccded3912",
+  "payloadDigest": "dda436537652cd27b10a8f3edaf8e4fbf6a17dcb9bf20dbd763a98a0e8418191",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -192,7 +192,7 @@
     "apps/fgos/src/wiring/wire_agents.rs": "a434308907a3e7d87c880ebf95a957e1342b77e83ebe1ee0272002335b7a248c",
     "apps/fgos/src/wiring/worktree.rs": "d783eec09a03bcc50b77659f23bf860137daeef4afd699b7781bcb119676545a",
     "apps/fgos/tests/attention_definitions.rs": "81db902eb0d8bf5515f7574bcf4b13f61db680dc0d569f4db55b4271e4df9a54",
-    "apps/fgos/tests/cli_tests.rs": "da5ef5cca91ce8173fc88c105ea084a2be8c6a65661d90baa83043dcba8378a6",
+    "apps/fgos/tests/cli_tests.rs": "52dd85e35d3a510db2a941edbeadcd9dee6fe95c68f2d76f72fcd5728ef804ad",
     "apps/fgos/tests/driving_definitions.rs": "fa31e9456150a2e8038d54916be5b2373b434cb3521a2d97afb02219815c20a5",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
     "apps/fgos/tests/mailbox_routes.rs": "a35e94cd71509b6fb9de91bf771a0b65a8dbb9e495c5aefefb633b9f3a880643",
@@ -213,7 +213,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "b420e19de285791c8e80e23b04a6c8a54830fbb7d84449c9dfabad33791e0449",
+    "bin/fgos.mjs": "0bea6cbefd13a751a673c03de0637e2d27d9db15b71ea7877e4a672fffaa5383",
     "core/skills/_shared/capability-catalog.md": "abb355e91c92f728f1a527777945e80b9cc97c57af82e2c1a4e3eac64b928da6",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -1519,16 +1519,14 @@
     "src/runner/capability-config.mjs": "007901e2937caeb3e5d6960a4ddd6d986966c4ab40ef85582fb6695ed4c54f18",
     "src/runner/claim-liveness.mjs": "81343f229916449e5ec0b4531cb3d9414a90b6b75c738e9fc10586f8adbee567",
     "src/runner/claim-port.mjs": "71e9f212219924e34aceb54cc7157a5acf962463317bab05094ce2a0f149ad68",
-    "src/runner/dispatch.mjs": "49864b737fd4c875f5360c61d442ff10dd0d05a0da56197a102b7e53f82c80af",
     "src/runner/dispatch/adapters.mjs": "af0278e126f6d871cade36adae321d1ede5a5295845de2cb9ce9a115465e5f35",
     "src/runner/dispatch/agent-result-claim-contract.mjs": "9c406b39f7d84dcb84646522e1927fafd70d2168700d61698918f3cceb88fef7",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "1e1a922ad6d9ef2c9d8f0e7f6fec77d2c8b83b27ce9adfc8eaf3ec69e200ce6b",
     "src/runner/dispatch/assignment-runner.mjs": "cb3cb6741e724cee40488e8bd9d73a2bdacbd0baefd33062f7168c04b4a89115",
     "src/runner/dispatch/assignment.mjs": "e17a8b1dd75893d3b0607a6f333fbccc32678e9c69f9ba42caa9169ba9135d1c",
-    "src/runner/dispatch/attention-view.mjs": "df39da987b880a632e06d73dc7dea1a9b8f21ec52db3182e2736407e499c1667",
     "src/runner/dispatch/brief.mjs": "c51d5398653cd6f839c2902134e627e57af7911b473fe16904478919c2d95e14",
-    "src/runner/dispatch/cli.mjs": "fe6bf9c186e686a059cd100915c610f76cb027d3666870b2118076869a2bbf5b",
+    "src/runner/dispatch/cli.mjs": "de800e4ae35dfbb308560d3a4a30259e94914283a40fcb5ff9758008db87a799",
     "src/runner/dispatch/config.mjs": "b5b395e848ef232253ba39e5f4bf6b9cf1659bbb335de97a981ca13949bf71e6",
     "src/runner/dispatch/confinement/attestation-store.mjs": "25aeaef901e6c331ec84de3f4e072224d3f14c77775ba46fe6b91348ad795805",
     "src/runner/dispatch/confinement/authority.mjs": "fb0f507d355a25d850116f8c17763344b43a174ba7477071f74c22687899c7ae",
@@ -1550,20 +1548,15 @@
     "src/runner/dispatch/mechanism.mjs": "52dcc0c704f16b4ce0f2e8b5e71d0672ada7922bcfc0f7da8e8d0f9b3912c435",
     "src/runner/dispatch/operation-prompt-templates.mjs": "8c8d4975085c31b6f9722174de8c7ca79e7d4132ec2fdeb4445bf1952672ef7d",
     "src/runner/dispatch/plan.mjs": "c5fd5ea19281afe3a9c631ebb09b224be2e919b68958a06534d99e4f160b936f",
-    "src/runner/dispatch/provider-account-probe.mjs": "9b0fd2f5c0c4aad0adbd5b96d193577665d0f0ed89fec5acbbf3cd3dbbebc333",
     "src/runner/dispatch/provider-adapter.mjs": "152397dc861d56dd0ed40d35d569401236979dd37eb989602a1dd472e57c3290",
     "src/runner/dispatch/provider-capacity.mjs": "ff7a090c5f658c9bfd42ea46a4c9704634f6cdfcf3a0c0ff39426beb8ed57441",
     "src/runner/dispatch/provider-credential-probe.mjs": "e8df7e4b480aca672a4b416a924004350460cb6341605cfd0a4b71a71cd7a60a",
     "src/runner/dispatch/provider-credential-renewal.mjs": "2dbebb085878fbe1a576d8dd1137b0014a8c1eb5b14e371b2d27659ec53c2d20",
-    "src/runner/dispatch/provider-session-probe.mjs": "e6c8b44f406e294d65c26b5459910f645dba0e8022f32af8e7c05af0585e6d0f",
-    "src/runner/dispatch/reconciliation-planner.mjs": "b48292fc0568693b10d5557081ee505ffac9c55746abdb59fa87f561b14b17ec",
-    "src/runner/dispatch/recovery-planner.mjs": "cebf66e9c7cb427dfb7c6800cd4f0790a7185d70d2ea54cf0942fefca2f7ccc4",
     "src/runner/dispatch/resolve.mjs": "734ee2b1c14111e8dc0473a0bc476ef23a9e7e0667e1d4e3869d0c95b1726597",
     "src/runner/dispatch/run-admission.mjs": "66e85923397ad83807e92ce21523d84c474bdf741da6d8259a6e2cdf3c769eed",
     "src/runner/dispatch/run-result.mjs": "d855e421bde1ddeca6bf88426519a562208cc0864949e0474e48bb8a377f43e8",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runner-config-error.mjs": "f1cf79e848936226739903b20c6cec2e8c2831c7f5bd95f85d5a850f58480490",
-    "src/runner/dispatch/runtime-inspection.mjs": "3ce9f61a48afbc739c5c83b261ba09bc3864decd810c13c5d0345ebf467b1649",
     "src/runner/dispatch/session-attempt.mjs": "f4fefce2f230d31cef8bcd0afada8f3c5b23330edd3349a9d82a3a9b5d180c78",
     "src/runner/dispatch/settlement.mjs": "d824e52e903c68c07e95506265df335e8bb4bf45e8cc2ed3bf245dd283e28d65",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
@@ -1580,7 +1573,6 @@
     "src/runner/execution/account-rotation.mjs": "3f7263e6d0a291ce33aa9c44381138a6ca436f20543565ef857c8f7936388cbe",
     "src/runner/execution/bind.mjs": "3eda47ca90d35270c52e3d4eb4e6573ca7b9e23c8259f1a28f2ea64005c45088",
     "src/runner/execution/case-run-paths.mjs": "29c45c96ef53f160a103b3fc88ede3fcc7dbd6cff9dbf1fff05a17138bb38872",
-    "src/runner/execution/commit-unit-work.mjs": "78c39cd47ddf7a7ba5ef1cb8ab8172a0756b0f756e0dd878b72d1b2d339a8810",
     "src/runner/execution/custody-door.mjs": "46da4de9b5e7bffc7848cfa27f7ffa2e5f2c4b89e3c9fd035468fb3e01f8f637",
     "src/runner/execution/handoff-refs.mjs": "e9feb649050278bb858dcaca0efd1a14bba42767fa6fb9c88665009101de9971",
     "src/runner/execution/legacy-seat-read.mjs": "8126d8b92841f992d7347190cd11f2566ffcf60fb23d12b75caf318ebefef754",
@@ -1713,11 +1705,6 @@
     "src/util/store-error.mjs": "c4718424cba7a88262d5c7d4c06b3f28ec1c75bd622b8bacb699c7cd6765cfdb",
     "src/util/unique-tmp-tag.mjs": "712eb59d8753224dc3197af5739a3a01fa4188f0b60e6e8ed22a1854d8b68dde",
     "src/util/yaml.mjs": "48f2bb8d843984b5fe0928af539b68c4b704eede410ad8a980301337fdc571a4",
-    "src/verbs/dispatch/inspect.mjs": "9ce8a916d70716b3586f342c12cbbb18205cf9f256ce41353a2ce87cbe7cb31d",
-    "src/verbs/dispatch/reconcile.mjs": "caedd393114d8e85ded4323f2aaafd0f8a24a0603d9dc2e4bf8f88131d8f36e6",
-    "src/verbs/dispatch/recover.mjs": "6036a0009f2182193f71480dcb02f0a1c1f7edbc315e614652333e7b518a8eb6",
-    "src/verbs/dispatch/show-run.mjs": "967b5d2b60c2eb047ef385da5b996470909a396105bbb272128678bd8a1af0c2",
-    "src/verbs/dispatch/watch.mjs": "e7aaa68e30316650871d622d0a2829c20859bc2945007b20f1e89de435d08d58",
     "src/verbs/events/context.mjs": "6579eafcb90bf8a80d12b86e9ac132c6eb6e27f122942480b5062efbae181716",
     "src/verbs/events/rebuild.mjs": "8a0bbcede40014b964ec1f675565f481f9adb6513f9e90bb855a860039bcb398",
     "src/verbs/merge/approve.mjs": "1de035ed57eb91720587c0d70c7feb25dc0e0721fc5b81f9b796e0279dc921ef",
@@ -2523,28 +2510,28 @@
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 5131,
+      "line": 5153,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 5750,
+      "line": 5772,
       "spawn": "Command::new",
       "binary": "(env CARGO)",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 5856,
+      "line": 5878,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 5883,
+      "line": 5905,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"
@@ -4625,6 +4612,14 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
+      "line": 1555,
+      "spawn": "buildLaunch -> src/runner/dispatch/assignment-runner.mjs:894",
+      "binary": "param opts",
+      "class": "uncalled-wrapper",
+      "function": "executeAssignment"
+    },
+    {
+      "path": "src/runner/dispatch/assignment-runner.mjs",
       "line": 1561,
       "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1185",
       "binary": "(env FGOS_HOST_BIN)",
@@ -4658,102 +4653,6 @@
       "spawn": "startSessionServer -> src/runner/dispatch/worker-session-boot.mjs:195",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
-    },
-    {
-      "path": "src/runner/execution/commit-unit-work.mjs",
-      "line": 27,
-      "spawn": "state -> src/runner/execution/commit-unit-work.mjs:25",
-      "binary": "param ctx",
-      "class": "uncalled-wrapper",
-      "function": "changedPaths"
-    },
-    {
-      "path": "src/runner/execution/commit-unit-work.mjs",
-      "line": 46,
-      "spawn": "scoped -> src/runner/execution/commit-unit-work.mjs:22",
-      "binary": "param args",
-      "class": "uncalled-wrapper",
-      "function": "preflightUnitWorktree"
-    },
-    {
-      "path": "src/runner/execution/commit-unit-work.mjs",
-      "line": 52,
-      "spawn": "state -> src/runner/execution/commit-unit-work.mjs:25",
-      "binary": "param args",
-      "class": "uncalled-wrapper",
-      "function": "preflightUnitWorktree"
-    },
-    {
-      "path": "src/runner/execution/commit-unit-work.mjs",
-      "line": 106,
-      "spawn": "scoped -> src/runner/execution/commit-unit-work.mjs:22",
-      "binary": "param args",
-      "class": "uncalled-wrapper",
-      "function": "commitUnitWork"
-    },
-    {
-      "path": "src/runner/execution/commit-unit-work.mjs",
-      "line": 168,
-      "spawn": "inspect -> src/runner/execution/commit-unit-work.mjs:24",
-      "binary": "param loaderOptions",
-      "class": "uncalled-wrapper",
-      "function": "commitOnBranch"
-    },
-    {
-      "path": "src/runner/execution/commit-unit-work.mjs",
-      "line": 176,
-      "spawn": "inspect -> src/runner/execution/commit-unit-work.mjs:24",
-      "binary": "param args",
-      "class": "uncalled-wrapper",
-      "function": "resolveSyncBase"
-    },
-    {
-      "path": "src/runner/execution/commit-unit-work.mjs",
-      "line": 192,
-      "spawn": "syncPort -> src/runner/execution/commit-unit-work.mjs:23",
-      "binary": "param args",
-      "class": "uncalled-wrapper",
-      "function": "startSyncMerge"
-    },
-    {
-      "path": "src/runner/execution/commit-unit-work.mjs",
-      "line": 199,
-      "spawn": "syncPort -> src/runner/execution/commit-unit-work.mjs:23",
-      "binary": "param args",
-      "class": "uncalled-wrapper",
-      "function": "startSyncMerge"
-    },
-    {
-      "path": "src/runner/execution/commit-unit-work.mjs",
-      "line": 208,
-      "spawn": "syncPort -> src/runner/execution/commit-unit-work.mjs:23",
-      "binary": "param args",
-      "class": "uncalled-wrapper",
-      "function": "syncMergeState"
-    },
-    {
-      "path": "src/runner/execution/commit-unit-work.mjs",
-      "line": 209,
-      "spawn": "state -> src/runner/execution/commit-unit-work.mjs:25",
-      "binary": "param args",
-      "class": "uncalled-wrapper",
-      "function": "syncMergeState"
-    },
-    {
-      "path": "src/runner/execution/commit-unit-work.mjs",
-      "line": 216,
-      "spawn": "syncPort -> src/runner/execution/commit-unit-work.mjs:23",
-      "binary": "param args",
-      "class": "uncalled-wrapper",
-      "function": "finishSyncMerge"
-    },
-    {
-      "path": "src/runner/execution/commit-unit-work.mjs",
-      "line": 219,
-      "spawn": "state -> src/runner/execution/commit-unit-work.mjs:25",
-      "binary": "param args",
-      "class": "uncalled-wrapper",
-      "function": "finishSyncMerge"
     },
     {
       "path": "src/runner/execution/custody-door.mjs",

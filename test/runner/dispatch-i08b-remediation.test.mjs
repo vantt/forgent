@@ -20,10 +20,6 @@ const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { interpretRunResult, validateRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
 import { familyOf } from '../../src/runner/dispatch/provider-adapter.mjs';
-import { readRunSnapshot } from '../../src/verbs/dispatch/show-run.mjs';
-import { watchRunUseCase } from '../../src/verbs/dispatch/watch.mjs';
-import { reconcilePlanUseCase, DispatchReconcileError } from '../../src/verbs/dispatch/reconcile.mjs';
-import { planReconciliation } from '../../src/runner/dispatch/reconciliation-planner.mjs';
 
 
 // ─── 2. F5: Declared Vendor Precedence Over CLI Harness ──────────
@@ -242,53 +238,6 @@ test('F7: result.json with mismatched runId is flagged contract-corrupt and neve
   assert.equal(interpretedLegacy.corrupt, undefined);
   assert.equal(interpretedLegacy.status, 'done');
   assert.equal(interpretedLegacy.classification.provenance, 'legacy-derived');
-
-  // 4b. readRunSnapshot in show-run.mjs
-  const runDir = path.join(tmp, '.fgos', 'assignments', 'asgn_f7_test', 'runs', '01');
-  fs.mkdirSync(runDir, { recursive: true });
-  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ runId: 'run_expected_123', status: 'running', assignmentId: 'asgn_f7_test' }));
-  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({
-    ...mismatchedV2,
-    runId: 'run_different_456',
-  }));
-
-  const snapshot = readRunSnapshot(runDir);
-  assert.equal(snapshot.settled, false, 'must NOT be settled');
-  assert.equal(snapshot.resultCorrupt, true, 'must be marked resultCorrupt');
-
-  // 4c. watchRunUseCase in watch.mjs terminates with corrupt-evidence
-  const watchResult = await watchRunUseCase(
-    { cwd: tmp, repoRoot: tmp },
-    { runId: 'run_expected_123', maxTicks: 5, intervalMs: 10 },
-  );
-  assert.equal(watchResult.stoppedBecause, 'corrupt-evidence');
-  assert.equal(watchResult.settled, false);
-
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-// ─── 5. F10: reconcile plan without --action Fails with Exit 4 ───────────────
-
-test('F10: reconcile plan with --run requires --action before checking cwd lock', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-f10-regression-'));
-  // Ensure no cwd lock exists in tmp workspace
-  assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'dispatch.lock')), false);
-
-  // 5c. reconcilePlanUseCase direct call throws DispatchReconcileError with category 'validation'
-  assert.throws(
-    () => reconcilePlanUseCase({ cwd: tmp }, { runId: 'run_f10_test' }),
-    (err) => {
-      assert.ok(err instanceof DispatchReconcileError);
-      assert.equal(err.category, 'validation');
-      assert.match(err.message, /requires --action/);
-      return true;
-    },
-  );
-
-  // 5e. planReconciliation direct call returns refused before examining cwd lock
-  const planRes = planReconciliation(tmp, { runId: 'run_f10_test' });
-  assert.equal(planRes.outcome, 'refused');
-  assert.match(planRes.reason, /requires --action/);
 
   fs.rmSync(tmp, { recursive: true, force: true });
 });

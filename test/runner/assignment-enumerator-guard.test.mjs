@@ -102,8 +102,6 @@ const ALLOWED = new Map([
   ['src/runner/dispatch/run-admission.mjs: admitRunAttempt: readdirSync(runsDir)', { count: 2, reason: 'attempt numbering and abandoned-staging cleanup of one resolved assignment' }],
   ['src/run-supervisor/client.mjs: walk: readdirSync(dir)', { count: 1, reason: 'the adopt scan walks the assignments root it was handed and recurses through every level, collecting the attempt directories that are not closed' }],
   ['src/run-supervisor/client.mjs: walk: readdirSync(child)', { count: 1, reason: 'attempt directories of one resolved runs directory found by that same walk' }],
-  ['src/runner/dispatch/runtime-inspection.mjs: admissions: readdirSync(genDir)', { count: 1, reason: 'generation records of one resolved run' }],
-  ['src/runner/dispatch/runtime-inspection.mjs: derivePhase: readdirSync(commandsDir)', { count: 1, reason: 'command queue of one resolved run' }],
   // The test runner snapshots every file of the repository's `.fgos` store
   // before and after a suite to report leaked writes. It compares file
   // contents and never interprets assignments or runs.

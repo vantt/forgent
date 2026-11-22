@@ -25,7 +25,6 @@ import {
 import { prepareBwrap } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
-import { accountInvocations } from '../../src/runner/dispatch/provider-account-probe.mjs';
 
 // One provider account used through several CLIs: each CLI keeps its own login store, and a launch
 // gets the store of the CLI it runs. Every token below is an obviously fake string.
@@ -250,24 +249,3 @@ test('the unlock probe calls through the store of the CLI the dispatch runs', as
   } finally { w.cleanup(); }
 });
 
-test('the account probe leases the account into each confined CLI it has a store for', () => {
-  const w = workspace();
-  try {
-    const cfg = {
-      llmAccounts: { openai: { acct: perCliAccount(w) } },
-      executors: {
-        openai: {
-          providerModel: 'openai',
-          invocations: [
-            { id: 'codex-cli-bwrap', via: 'cli', command: 'codex', confinement: { backend: 'bwrap' }, credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
-            { id: 'pi-cli-bwrap-other', via: 'cli', command: 'pi', confinement: { backend: 'bwrap' }, credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR', files: PI_FILES } },
-            { id: 'omp-cli-bwrap', via: 'cli', command: 'omp', confinement: { backend: 'bwrap' }, credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' } },
-            { id: 'pi-cli-plain', via: 'cli', command: 'pi', env: { PI_CODING_AGENT_DIR: w.piHome } },
-          ],
-        },
-      },
-    };
-    const found = accountInvocations(cfg, { provider: 'openai', accountId: 'acct' }).invocations.map((i) => [i.invocationId, i.via]);
-    assert.deepEqual(found, [['codex-cli-bwrap', 'lease'], ['pi-cli-bwrap-other', 'lease'], ['pi-cli-plain', 'env']]);
-  } finally { w.cleanup(); }
-});

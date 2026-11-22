@@ -10,12 +10,8 @@ import { initStore, addWork } from '../../src/state/store.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
-// `dispatch execute` and `dispatch log` are gone: one task runs through `fgos run`, planned work
-// through a Workflow. The compatibility alias refuses them as unknown subcommands and records nothing.
-
 const repo = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const FGOS = path.join(repo, 'bin', 'fgos.mjs');
-const DISPATCH = path.join(repo, 'src', 'runner', 'dispatch.mjs');
 
 function mkStore() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-retired-doors-'));
@@ -31,29 +27,6 @@ function mkStore() {
     workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'true',
   });
   return { root, fgosDir };
-}
-
-function run(script, args, cwd) {
-  const env = { ...process.env };
-  delete env.CLAUDE_CODE_SESSION_ID;
-  return spawnSync(process.execPath, [script, ...args], { cwd, encoding: 'utf8', env });
-}
-
-function eventLines(fgosDir) {
-  const dir = path.join(fgosDir, 'events');
-  if (!fs.existsSync(dir)) return 0;
-  return fs.readdirSync(dir).reduce((n, f) => n + fs.readFileSync(path.join(dir, f), 'utf8').split('\n').filter(Boolean).length, 0);
-}
-
-for (const sub of ['execute', 'log', 'fanout-batch', 'decide']) {
-  test(`node src/runner/dispatch.mjs ${sub} is an unknown subcommand`, () => {
-    const { root, fgosDir } = mkStore();
-    const before = eventLines(fgosDir);
-    const out = run(DISPATCH, [sub, 'cand1', '--prompt', 'hi', '--id', 'a', '--provider', 'p', '--command', 'c'], root);
-    assert.equal(out.status, 1);
-    assert.match(out.stderr, new RegExp(`unknown subcommand "${sub}"`));
-    assert.equal(eventLines(fgosDir), before);
-  });
 }
 
 test('the legacy payload refuses the native hook kinds by name instead of answering them', () => {
