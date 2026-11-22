@@ -121,9 +121,28 @@ Hand-written registry rows the model does not hold (non-component areas and port
 
 | Area | Current exact owner / retained scope |
 |---|---|
+| [runner](runner/README.md) | [runner/spec.md](runner/spec.md), exact contracts/rules/decisions linked there; retained root handoff contract |
+| [work-state](work-state/README.md) | [work-state/spec.md](work-state/spec.md), exact area contracts; retained root CLI I/O authority |
+| [packaging-distribution](packaging-distribution/README.md) | [Area spec](packaging-distribution/spec.md), exact contracts and implementation alignment, not legacy-source fallback |
+| [host-invocation-routing](host-invocation-routing/README.md) | Exact area contracts/architecture/decisions linked by the portal |
+| [convention](convention/spec.md) | [convention/spec.md](convention/spec.md) — implemented executable naming and placement authority; no document-body health rules |
+| [component-authority](component-authority/spec.md) | [component-authority/spec.md](component-authority/spec.md) — single structural model of authority, components, decision kinds, doors, contracts, and file mapping; holds design ownership and grants no runtime permission |
+| [agent-mailbox](agent-mailbox/spec.md) | [agent-mailbox/spec.md](agent-mailbox/spec.md) — first slice signed at G0 on 2026-10-20 (numeric values and later parts stay proposals; implementation not started): first slice is delivery of a message into a live agent session (Claude Code, Codex, agy, one machine, same project; the recipient is an independently started head, never a runner Unit attempt); acknowledgement, expiry and cross-machine are recorded as later parts; V-011 narrowed by V-013 (2026-10-20); revised after a second architecture panel before signing |
+| [secrets](secrets/spec.md) | [secrets/spec.md](secrets/spec.md) — draft proposal, not signed: where a secret lives, one resolver and one `${VAR}` expansion that fails loud, a `SecretSource` port (first adapter a 0600 file), login-store writers per agent CLI, and trust rules for loading a secret into the one process that needs it; config loading depends on it later |
+| [agent-coordination](agent-coordination/README.md) | Surviving current contracts and qualified design; retired-engine records are history, execution uses runner/Workflow |
 | system-architecture | Architecture routes: [architecture intent](system-architecture/architecture/architecture-intent.md), [roadmap](system-architecture/architecture/roadmap.md), [workspace topology](system-architecture/architecture/workspace-topology.md), [topology audit](system-architecture/architecture/workspace-topology-audit.md); related [topology roadmap](system-architecture/architecture/workspace-topology-roadmap.md) and [system vision](system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md) |
 | [system-overview](system-overview/spec.md) | System overview; use [component boundaries](component-boundary.md#4-current-high-level-components) for current ownership routes |
+| [holder-lock](holder-lock/spec.md) | Kernel lock port, registry, predecessor-domain rules and guarantee levels |
+| [process](process/spec.md) | Process facts and control; shared judge vectors and platform limits |
+| [event-store](event-store/spec.md) | Signed durability design ([D-ADR0055, 2026-10-17](event-store/spec.md#26-decision-record)); implementation not started, acceptance under the [proof gates](event-store/spec.md#23-proof-gates); navigation does not implement it |
+| [agent-confinement](agent-confinement/README.md) | Area portal; retained sources are identified there |
+| [claude-plugin](claude-plugin/README.md) | Area portal; retained sources are identified there |
+| [decision-citation-drift](decision-citation-drift/README.md) | Area portal; retained sources are identified there |
+| [distillery](distillery/README.md) | Area portal; retained sources are identified there |
+| [herdr-web-dashboard](herdr-web-dashboard/README.md) | Area portal; retained sources are identified there |
+| [observe](observe/README.md) | Area portal; retained sources are identified there |
 | `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |
+| [ui-spec](ui-spec/README.md) | Retained [../ui-spec/](../ui-spec/) for visual contracts; functional behavior remains area-owned |
 | `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); historical documentation migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `archive/plans/260825-1841-knowledge-registry/plan.md` |
 
 ## 3. Decision Surface
