@@ -1,13 +1,25 @@
 ---
 id: ds-abplbwphmm
 title: "A coach agent started by the supervisor, fed by observe metrics, friction and owner reactions"
-status: open
+status: settled
 source:
   - p-kmavlfevvu
 created: 2026-11-22
 ---
 
-discussion: open
+discussion: settled
+
+## Hand-off to the planner
+
+- **Outcome:** a coach head that the supervisor starts at the right moment, which reads ready-made observe views, session transcripts and memory stores, finds the problems that hurt the highest goals, diagnoses their cause, and proposes fixes as reviewable new versions: small instruction text to the owner in one batch, anything else to the supervisor as an evidenced problem that becomes a backlog row. Decisions CA-D1 to CA-D6, inheriting OC-D4 and OC-D5 from `ds-cfsfcbknl6`.
+- **Constraints:** one door: views in the existing named-query door, trigger through the watcher and supervisor, intake through `fgos friction` and `fgos metrics record`, no new query mechanism (CA-D3). Private text never in a git-tracked file or an external service, for every producer (CA-D4); the managed Dreams service is not used (CA-D6). The coach never writes goals or edits live rules in place (CA-D5, CA-D6). Thresholds and budgets are config keys in `core/config-standard` and `core/config-schema`.
+- **Non-goals:** the communication standard itself (`ds-cfsfcbknl6`); a SQLite projection with SQL views (reopened only on `coach-query-gap` evidence, CA-D3); reviving the work-item retrospective loop; Codex and other CLI hooks for owner reactions (later, through their own adapters).
+- **Acceptance criteria:** (1) a fixture store with one signature at the threshold makes the watcher raise `coach-due` once and the supervisor start exactly one coach head; (2) every new view of section 6 answers on a fixture store and is held by a contract test on name, version and row shape; every reused definition answers or returns a named `unmeasured`; (3) a friction recorded with private detail leaves no detail text under `.fgos/observe/records/`, and `git check-ignore` matches the private store; (4) a coach run on a fixture writes one report whose every proposal cites the goal and source line it serves, at most 3 proposals, within its budget; (5) the owner-reaction hook records one friction for "khoan, cái này là gì" with no owner words in the tracked store.
+- **Open points that block only part:** trigger thresholds and budget numbers are provisional defaults (section 3); how U14 finds the transcripts and records that cite a rule cheaply is for the planner to design (task `transcript-and-memory-curation` only); the `owner-communication` friction layer comes from the communication-standard plan (task `owner-reaction` only).
+- **For another session:** the communication-standard plan's OC-D14 duty quotes the owner's words into `friction record --detail`, which lands in a store git does not ignore; its planner should point that text at the private store of CA-D4.
+- **Source ids:** `p-kmavlfevvu`; decisions CA-D1 to CA-D6.
+
+discussion: settled
 
 ## Seed
 
@@ -22,15 +34,7 @@ Opened by the secretary (Miu) on the owner's order relayed by the owner-communic
 
 ## 1. Trạng thái hiện tại
 
-Round 3 (2026-11-22 21:00). The owner clarified the views point: the measurement layer simply prepares the views so the coach never has to work out how to fetch its data; the views follow from what the coach does. The shaper had framed it as a mechanism question (named queries or a pkm-style SQLite), so both versions of Q1 are withdrawn (`q-6yhs63ru4i` superseded, `q-kml4ipaweg` cancelled). Section 6 now holds a brainstorm of 12 coach use cases, each with the view it needs; 9 are coach views to write, and the other 3 reuse existing definitions or tools. The views are built in the existing named-query door; no new mechanism (shaper decision inside the frame, reversal trigger in section 3).
-
-- **Settled by inheritance:** coach scope and hand-off (OC-D5), friction store as the case log (OC-D4).
-- **Shaper decisions inside the frame (not yet minted):** generic loop with pluggable producers (held since round 2); trigger as a watcher definition; private detail never in a git-tracked file; views derived from use cases, in the named-query door.
-- **New point from the owner (21:05), shaper draft:** how the coach knows the vision and goals to steer by, and reads them accurately while it works (section 3, row "Goal compass").
-- **Lessons from Claude Dreams (owner 21:10), shaper reading:** section 3, row "Lessons from Claude Dreams"; adds use cases U13 and U14.
-- **Open for the owner to react to:** the goal compass draft; the Dreams lessons; the use-case list in section 6 (anything missing, anything that is not the coach's job); trigger thresholds and budget numbers (section 3, provisional).
-- **No owner question is open** for this discussion.
-- **For another session:** the communication-standard plan's friction duty quotes the owner's words into friction detail, which lands in a store git does not ignore (section 3, row "Privacy of detail").
+Settled 2026-11-22 21:10 and handed to the planner (block at the top). The generic loop, the trigger door, the private-detail rule and the use-case views held from rounds 1-3 through round 5 without revision; the goal compass and the Dreams lessons met no revision when the owner moved on at 21:06 ("tiếp theo là gì"). Minted CA-D1 to CA-D6. No owner question is open for this discussion. Open points that block only part are listed in the hand-off block.
 
 ## 2. Mục tiêu & đề bài
 
@@ -59,8 +63,14 @@ fgOS already writes two kinds of learning material: metrics records and friction
 
 | ID | Decision | Source | Date |
 |---|---|---|---|
+| CA-D1 | One generic learning loop: many producers (agents, run settle, runner, plans, questions, the owner-reaction hook) write learning events through the existing doors (friction records, metrics records); the coach never knows a producer by name; adding a producer adds a writer and at most a declared layer value or record kind, never a coach change. The owner's reactions are one producer among many. | Owner 20:43; shaper reshape round 2, unrevised through 21:06 | 2026-11-22 |
+| CA-D2 | The coach starts through the watcher: a `coach-due` definition raises an event and the supervisor starts one coach head (`head:coach-<handle>`), never two. Default rule: an unsettled signature reaches 3 records, or 7 days passed with any unsettled friction; a run handles at most 3 signatures and makes at most 3 proposals. Numbers are config keys, provisional, reversed by the coach's own reports. | Shaper round 1, unrevised through 21:06 | 2026-11-22 |
+| CA-D3 | Observe prepares ready views so the coach never works out how to fetch data. Views follow from the coach's use cases (section 6) and are versioned named definitions under `core/coach/definitions/` in the existing named-query door, held by contract tests on name, version and row shape; existing definitions are reused. A SQLite projection with SQL views is reopened only when the coach records enough `coach-query-gap` frictions. | Owner 20:55; shaper round 3, unrevised through 21:06 | 2026-11-22 |
+| CA-D4 | Private text (people's words, transcript excerpts, credentials in output) never enters a git-tracked file or an external service: tracked records keep ids and signatures only, and the text goes to a git-ignored local store (draft `.fgos/observe/private/<writerId>.jsonl`). It holds for every producer. | Seed constraint; shaper rounds 1-2, unrevised through 21:06 | 2026-11-22 |
+| CA-D5 | Goal compass: the coach takes goals only from written sources (product priority order, mission boundary, platform and area visions, intent-preservation ledger, locked laws, D-ADR decisions, settled discussions); each goal is tied to the views that measure it; problems are ranked by the goal they hurt and its place in the fixed priority order, then by count; every proposal cites its goal and source line; an owner rejection or re-aim is recorded as evidence of a misread goal; a conflict between recent owner decisions and a vision document is raised as a batched owner question with both sources and dates; the coach never writes or changes a goal. | Owner 21:05; shaper round 4, unrevised at 21:06 | 2026-11-22 |
+| CA-D6 | Take the dreaming pattern, not the managed Dreams service (it stores sessions on Anthropic's platform, not zero-retention): the coach's output is a proposed new version, never an in-place edit; rules and memories are predictions checked against transcripts and run records, and one that never fires or is contradicted is proposed for deletion; the coach reads transcripts, not only friction counts; the always-loaded layer stays small, detail moves down with a link (L8); each transcript is analysed separately, then one consolidating pass, under a hard budget; the coach also curates the heads' memory stores. | Owner 21:10; shaper round 5, unrevised at 21:06 | 2026-11-22 |
 
-No decision minted yet: the shaper decisions in section 3 have held for one round only. Inherited and not re-minted: OC-D4, OC-D5 (`ds-cfsfcbknl6`).
+Inherited and not re-minted: OC-D4, OC-D5 (`ds-cfsfcbknl6`).
 
 ## 5. Q&A log
 
@@ -70,13 +80,16 @@ No decision minted yet: the shaper decisions in section 3 have held for one roun
 - 2026-11-22 20:50 — Owner: "em xem pkm dựng sẵn view chưa?" Shaper re-read pkm's `docs/agent-views.md` and `phase-03-views.md`: pkm's views are a stable, versioned table layer the agent writes its own SQL over, not pre-answered queries, so `q-6yhs63ru4i` had described pkm wrongly. Asked a corrected question, `q-kml4ipaweg`, superseding it.
 - 2026-11-22 20:55 — Owner: "thực chất là ý của anh chỉ đơn thuần là thay vì coach phải suy nghĩ cách để lấy thì bộ đo cũng đã chuẩn bị sẵn các view rồi. việc này em brainstorm use cases của coach". Shaper agreed: the owner's need is ready answers, not a query mechanism. Cancelled `q-kml4ipaweg`, brainstormed 12 use cases with their views (section 6), and decided inside the frame to build the views in the existing named-query door. Signal T4 for the second time today (the shaper turned an outcome into a mechanism choice). Friction to record once the door works (OC-D14 fallback): kind `awkward`, layer `spec`, class `shaping-asks-mechanism-before-use-cases`, ref `backlog:p-kmavlfevvu`.
 - 2026-11-22 21:05 — Owner: "có một ý là làm sao coach nhận ra, vision, mục tiêu cần được hướng tới, làm sao coach tự nhận ra các điều đó một cách chính xác trong quá trình làm việc." Shaper drafted the goal compass (section 3): goals only from written sources, each tied to its views, problems ranked by the goal they hurt, three accuracy checks, no goal written by the coach. Put to the owner as an open prose question.
-- 2026-11-22 21:10 — Owner: "à, anh nhớ là claude có một khái niệm gọi là Dream/Dreaming, em thử research thêm về nó xem có học gì được từ đó không" with the Dreams doc link. Shaper read the doc, Anthropic's "components of agent memory" article and the cookbook's do-it-yourself dreaming workflow; recorded eight lessons in section 3, added U13 and U14, and decided not to use the managed service (privacy).
+- 2026-11-22 21:10 — Owner: "à, anh nhớ là claude có một khái niệm gọi là Dream/Dreaming, em thử reseach thêm về nó xem có học gì được từ đó không" with the Dreams doc link. Shaper read the doc, Anthropic's "components of agent memory" article and the cookbook's do-it-yourself dreaming workflow; recorded eight lessons in section 3, added U13 and U14, and decided not to use the managed service (privacy).
+- 2026-11-22 21:06 — Owner: "tiếp theo là gì". Shaper: the shape had held across rounds without revision, so minted CA-D1 to CA-D6, regenerated sections 6 and 7, wrote the hand-off block and marked the discussion settled.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Provisional: nothing here is minted yet. It is the shaper's draft for the owner to react to.
+Settled by CA-D1 to CA-D6.
 
-**One generic loop.** Many producers write learning events through the doors that already exist: agents and run settle write friction records, the runner and other components write metrics records, and small producers such as the owner-reaction hook write friction like anyone else. The coach does not know producers by name. Each watcher tick runs the `coach-due` definition over all unsettled friction. When it raises, the supervisor starts one coach head. The coach reads the coach views, picks at most 3 signatures whatever their source, diagnoses each, and writes one report. A small change to an instruction text (the communication standard, a skill) becomes one batched owner question; anything else becomes a supervisor event that the supervisor turns into a backlog row for the normal pipeline. The coach settles the frictions it filed and, on its next run, reports each signature's count before and after the fix.
+**Goal compass (CA-D5).** The coach reads goals from the written sources, ties each to the views that measure it, and ranks problems by the goal they hurt. Every proposal names its goal and source line; a conflict between sources is raised to the owner, never resolved by guessing.
+
+**One generic loop (CA-D1, CA-D2).** Many producers write learning events through the doors that already exist: agents and run settle write friction records, the runner and other components write metrics records, and small producers such as the owner-reaction hook write friction like anyone else. The coach does not know producers by name. Each watcher tick runs the `coach-due` definition over all unsettled friction. When it raises, the supervisor starts one coach head. The coach reads the coach views, picks at most 3 problems ranked by the goal compass, diagnoses each from the views, the transcripts (one analysis per transcript, then one consolidating pass) and the memory stores, and writes one report. Every change it proposes is a reviewable new version, never an in-place edit (CA-D6): a small change to an instruction text or a memory store becomes one batched owner question; anything else becomes a supervisor event that the supervisor turns into a backlog row for the normal pipeline. The coach settles the frictions it filed and, on its next run, reports each signature's count before and after the fix.
 
 **Adding a producer** means a writer plus, at most, a layer value or record kind declared beside its owner. The coach, its views and its trigger do not change.
 
@@ -124,36 +137,44 @@ flowchart LR
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Draft; the order is the proposed first increment.
+Order: `coach-head` first; `coach-views` and `private-detail` next, independent of each other; `transcript-and-memory-curation` after `private-detail`; `owner-reaction` last.
 
 ### Coach head and its start {#task-coach-head}
 
-- **Goal:** a `coach` persona and skill, and a `coach-due` watcher definition that makes the supervisor start one coach head; the coach works from today's `friction rank` and `metrics query` with no new views.
-- **Design excerpt:** section 6, "The loop"; section 3 rows "When the supervisor starts the coach", "Coach budget", "What the coach produces".
-- **D-IDs:** none yet; inherits OC-D5.
-- **Siblings:** first; the other two only add inputs.
-- **Draft verify:** `cargo test -p fgos-supervision` and the watcher definition test pass; a fixture store with one signature at 3 records raises `coach-due` once.
+- **Goal:** a `coach` persona and skill carrying the goal compass, the hand-off rules of OC-D5 and the new-version rule; the `coach-due` watcher definition; the supervisor's action for it; `coach.*` config keys for thresholds and budget; the coach works from today's `friction rank` and `metrics query` before the new views exist.
+- **Design excerpt:** section 6, "Goal compass" and "One generic loop".
+- **D-IDs:** CA-D1, CA-D2, CA-D5; inherits OC-D5.
+- **Siblings:** first; the others add inputs.
+- **Draft verify:** a fixture store with one signature at the threshold raises `coach-due` once and the supervisor starts exactly one coach head; a fixture coach run writes one report with at most 3 proposals, each citing a goal and its source line.
 
 ### Coach views {#task-coach-views}
 
-- **Goal:** the 9 new views of section 6's use-case table (U1-U5, U7, U10, U11) as versioned named definitions under `core/coach/definitions/`, plus a list of the reused ones in the coach skill.
-- **Design excerpt:** section 6, "Coach use cases and the view each needs"; section 3 row "Coach views".
-- **D-IDs:** none yet.
-- **Siblings:** after `task-coach-head`; independent of `task-owner-reaction`.
+- **Goal:** the new views of section 6's use-case table (U1-U5, U7, U10, U11) as versioned named definitions under `core/coach/definitions/`, and the list of reused definitions (U6, U8, U9) in the coach skill.
+- **Design excerpt:** section 6, "Coach use cases and the view each needs".
+- **D-IDs:** CA-D3.
+- **Siblings:** after `coach-head`; independent of `private-detail`.
 - **Draft verify:** a contract test asserts each view's name, version and row shape on a fixture store; every reused definition answers on the same fixture or returns a named `unmeasured`.
 
 ### Private detail store {#task-private-detail}
 
 - **Goal:** a git-ignored local store for record detail that may hold private text, used by any producer; the friction door writes detail there when asked and keeps only ids in the tracked record.
-- **Design excerpt:** section 6, "Private detail"; section 3 row "Privacy of detail".
-- **D-IDs:** none yet.
-- **Siblings:** before any producer that quotes people; independent of the coach tasks.
-- **Draft verify:** a friction recorded with private detail leaves no detail text in `.fgos/observe/records/`; `git check-ignore` matches the private store path.
+- **Design excerpt:** section 6, "Private detail".
+- **D-IDs:** CA-D4.
+- **Siblings:** before `transcript-and-memory-curation` and `owner-reaction`.
+- **Draft verify:** a friction recorded with private detail leaves no detail text under `.fgos/observe/records/`; `git check-ignore` matches the private store path.
+
+### Transcript and memory curation {#task-transcript-and-memory-curation}
+
+- **Goal:** U13 and U14: the coach analyses session transcripts one by one and then consolidates, checks rules and memories against them, and proposes a new version of a memory store or rule set (merges, stale or contradicted entries marked, unused rules proposed for deletion), under a hard budget.
+- **Design excerpt:** section 6, use cases U13 and U14; section 3 row "Lessons from Claude Dreams".
+- **D-IDs:** CA-D6.
+- **Siblings:** after `private-detail` (excerpts are private text). Open point for the planner: a cheap way to find the transcripts and records that cite or contradict a rule.
+- **Draft verify:** on fixture transcripts and a fixture memory store with one duplicate and one contradicted entry, the coach's proposed version merges the duplicate, marks the contradiction with both sources and dates, and leaves the input store unchanged.
 
 ### Owner-reaction hook, one producer {#task-owner-reaction}
 
-- **Goal:** the `UserPromptSubmit` hook from the dropped phase-02 plan, as one ordinary producer of friction.
+- **Goal:** the `UserPromptSubmit` hook from the dropped phase-02 plan (`c61de4c1c`), as one ordinary producer of friction.
 - **Design excerpt:** section 3 rows "Learning producers" and "Owner-reaction hook".
-- **D-IDs:** none yet.
-- **Siblings:** after `task-private-detail`; needs the `owner-communication` friction layer from the communication-standard plan (its task 1). Ranked last.
+- **D-IDs:** CA-D1, CA-D4.
+- **Siblings:** after `private-detail`; needs the `owner-communication` friction layer from the communication-standard plan. Last.
 - **Draft verify:** `cargo test -p fgos --test owner_reaction_hook`: "khoan, cái này là gì" records one friction whose tracked record has no owner words.
