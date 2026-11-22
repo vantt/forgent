@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Communication standard (tiêu chuẩn giao tiếp): one always-loaded standard for how every agent talks to the owner, and cheap answers in the question door"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 footprint:
@@ -56,7 +56,7 @@ footprint:
   - plugins/fgOS/skills/**
   - .claude/skills/**
   - CHANGELOG.md
-base: 392373096f1bb832a7bde0c66a35ea8bb072f5b9
+base: 94610e6fa4552a990ac6083cd2109c7c6ccfd965
 source:
   - plans/discussions/ds-cfsfcbknl6-owner-communication/DISCUSSION.md
   - p-wb6rkwpjsg
