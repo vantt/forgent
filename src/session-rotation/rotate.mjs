@@ -30,6 +30,7 @@ import { requestCancel } from '../run-supervisor/cancel-registry.mjs';
 import {
   assertHeadArgs, headKeyOf, headRoleOf, identityHolder, lineageDirOf, nextHeadGeneration, placeHead, readHeadPlacement, slotKeyOf, writeHeadPlacement,
 } from '../session-host/head-start.mjs';
+import { taskOfHead } from '../session-host/head-plan.mjs';
 import { requestHeadRestoreRole } from '../session-host/head-request-client.mjs';
 import { readLastAssistantMessage } from '../session-host/client.mjs';
 import { seatSessionDir } from '../runner/dispatch/confinement/authority.mjs';
@@ -229,16 +230,31 @@ const bounded = (text) => {
  * handoff shows the gap instead of an empty section.
  */
 async function lastMessageOfOld(old, ports, clock) {
-  const projectsDir = (ports.sessionDir ?? seatSessionDir)(old.runDir, old.placement?.key);
-  if (!projectsDir) return '(not found: the old session\'s launch recorded no session folder)';
+  const sessionDir = ports.sessionDir ?? seatSessionDir;
   const read = ports.lastMessage ?? readLastAssistantMessage;
   const until = clock.now() + (ports.finalTurnWaitMs ?? FINAL_TURN_WAIT_MS);
   for (;;) {
+    const projectsDir = sessionDir(old.runDir, old.placement?.key);
+    if (!projectsDir) return '(not found: the old session\'s launch recorded no session folder)';
     let answer;
-    try { answer = await read({ projectsDir }); } catch (err) {
-      return `(not found: the old session's transcript could not be read: ${err.code ?? err.message})`;
+    try {
+      answer = await read({ projectsDir });
+    } catch (err) {
+      const msg = String(err?.message ?? err);
+      if (msg.includes('not a readable directory') && clock.now() < until) {
+        await clock.sleep(ports.pollMs ?? POLL_MS);
+        continue;
+      }
+      return `(not found: the old session's transcript could not be read: ${err?.code ?? err?.message ?? err})`;
     }
-    if (answer.result !== 'found') return `(not found: ${answer.detail ?? answer.result})`;
+    if (answer.result !== 'found') {
+      const detail = String(answer.detail ?? answer.result);
+      if (detail.includes('not a readable directory') && clock.now() < until) {
+        await clock.sleep(ports.pollMs ?? POLL_MS);
+        continue;
+      }
+      return `(not found: ${answer.detail ?? answer.result})`;
+    }
     if (answer.turnEnded || clock.now() >= until) {
       return typeof answer.message === 'string' && answer.message !== '' ? bounded(answer.message) : '(the old session wrote no assistant message)';
     }
@@ -419,12 +435,34 @@ export async function rotateHeadSession(request, ports = {}) {
     const config = (ports.config ?? readRotationConfig)(projectRoot);
     const bound = config.answerWaitMs ?? DEFAULT_ANSWER_WAIT_MS;
 
+    const isOldRunStopped = () => {
+      if (!old?.runDir) return false;
+      if (ports.oldStopped) return ports.oldStopped(old.runDir);
+      return fs.existsSync(path.join(old.runDir, 'cancel-requested.json')) || fs.existsSync(path.join(old.runDir, 'closed.json'));
+    };
+
+    if (isOldRunStopped()) {
+      return await abandon('old-not-live', `${role}: the old run was asked to stop or had closed, there is nothing to rotate`);
+    }
+
     const id = crypto.randomBytes(8).toString('hex');
     const lastAssistantMessage = stopFacts.lastAssistantMessage
       ?? (reason === 'manual' ? await lastMessageOfOld(old, ports, clock) : null);
+    let task = null;
+    try {
+      task = await (ports.taskOfHead ?? taskOfHead)(projectRoot, persona, name, ports);
+    } catch (err) {
+      incident(dir, { event: 'task-failed', role, code: err?.code ?? 'task-error', detail: String(err?.message ?? err).slice(0, 300) });
+    }
+    const taskPath = task?.path ?? null;
+    const basePortfolio = stopFacts.portfolio ?? reloadOf(config, persona);
+    const candidatePortfolio = taskPath
+      ? [taskPath, ...basePortfolio.filter((p) => p !== taskPath)]
+      : basePortfolio;
+    const portfolio = existingIn(projectRoot, candidatePortfolio);
     const handoff = writeHandoff({
       fgosDir: fgosDirFromRoot(projectRoot), persona, name, sessionId: stopFacts.sessionId ?? old.placement.key,
-      rotate: reason, keep: config.keep, portfolio: existingIn(projectRoot, stopFacts.portfolio ?? reloadOf(config, persona)),
+      rotate: reason, keep: config.keep, portfolio,
       delta: `${rotationIdLine(id)}\n${stopFacts.delta ?? ''}`,
       lastAssistantMessage, pendingQuestion: stopFacts.pendingQuestion ?? null,
     });
@@ -437,11 +475,16 @@ export async function rotateHeadSession(request, ports = {}) {
       pendingQuestion: stopFacts.pendingQuestion ?? null, startedAt: new Date(clock.now()).toISOString(),
       executor: (ports.selfRecord ?? selfRecord)(), old,
     });
+
     try {
       // The successor's tab opens beside the slot the role holder's Identity record names.
       successor = await (ports.place ?? placeHead)({ persona, name, projectRoot, beside: slotKeyOf(holder.record), gen }, ports.placePorts ?? {});
       writeJson(dir, 'rotation.json', { ...readJson(pendingFile), successor });
     } catch (err) {
+      if (isOldRunStopped()) {
+        const errCode = err?.code ?? err?.message ?? String(err);
+        return await abandon('old-not-live', `${role}: the old run was asked to stop or had closed (${errCode}), there is nothing to rotate`);
+      }
       return await abandon(err.code ?? 'start-refused', String(err.message ?? err));
     }
 

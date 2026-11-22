@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "933fd47bb0aa27c8355960c2ba9bc89582f65937cfd650da026ad4f4b579669b",
+  "payloadDigest": "cf9e6052e2789fe2771891c368c37104ed6d03d12507b6dea351594d128d209f",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1633,7 +1633,7 @@
     "src/session-host/head-start.mjs": "cb24e602718da82112b76260b2f14b20f3e305003f749f62b0d5d69a246f5346",
     "src/session-host/head-stop.mjs": "4284bc2638e3ac4a71d151763c981d220a017c4f948cefc829115be5a6221ad3",
     "src/session-rotation/handoff-store.mjs": "3d1385774aa7c09573a6e298f82e7bf75d55beb436d9caa7c266cc1735c46128",
-    "src/session-rotation/rotate.mjs": "981c6a5db696f5e0b4d9a6d47759c9d6cfc43df5f3985b25d0ac649830c424c1",
+    "src/session-rotation/rotate.mjs": "d3a6aeb0f833c9135177d13bbe7590b07c7d39a36f3df0c29775485f5aa13b73",
     "src/setup/agent-hooks.mjs": "850a6660bf2588d850190e9ed5e45369d0d30e467568462b478dd6327fddffac",
     "src/setup/agy-permissions.mjs": "09951c187dec7082caee5a1695dd81320eda7ea962ca41ff8bb785f103f87397",
     "src/setup/bin-discovery.mjs": "b5302797ac763fecb24608818bdc8bf37850e0cd5d7a9d98ae677e1f3e684633",
