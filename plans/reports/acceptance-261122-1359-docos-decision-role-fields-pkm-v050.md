@@ -24,7 +24,7 @@ Compared with the probe's run A on the prose (14 units ended, 5 of them correct)
 
 ## Open
 
-- **D-ADR0032 (work-state, Team Harness) has no heading anywhere.** Its narrative is missing; the projection reports it and writes nothing.
+- **D-ADR0032 (work-state, Team Harness) had no D-ADR heading.** Corrected later the same day: its narrative was there under the bare heading `### 0032` in `docs/platform/work-state/decisions/retired-decision-history.md`, which is now `### D-ADR0032 — Multi-role Team Harness…` with its role field line (landed in `ee2b0a01a`).
 - **Three relation targets name no unit:** D-ADR0027 (a retired document hash), D-ADR0077 (a spec line), D-ADR0078 (a commit). Nothing in force ends, which is right; the warnings stay.
 - **pkm's incremental index missed an edited file.** After the 0076 correction, `in_force` (which updates the index incrementally before each command) still showed the old target; a full `index build --full` showed the new one. Worth a pkm issue once reproduced on a small vault.
 - **Relations between RUL bullets** that no decision event carries (RUL72 and RUL69, RUL108 and RUL101) and clause targets (L3 clauses 1 and 4, pkm request 2) are outside this plan.
