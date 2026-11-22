@@ -126,7 +126,23 @@
         },
         "meaning": { "type": "string" },
         "owner": { "type": "string" },
-        "narrative": { "type": "string" }
+        "narrative": { "type": "string" },
+        "readFirst": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional Read-first cell override: repo-relative path with optional #anchor. When set, the governance holder view uses this instead of deriving the portal from the owner component."
+        },
+        "facts": {
+          "description": "Optional Facts-and-RULs cell override: one path (with optional #anchor) or an array of them. When set, the governance holder view uses these instead of deriving specs from the owner and its children.",
+          "oneOf": [
+            { "type": "string", "minLength": 1 },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1 }
+            }
+          ]
+        }
       }
     },
     "door": {

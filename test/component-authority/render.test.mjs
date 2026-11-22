@@ -93,6 +93,7 @@ function seedTempRepo() {
   const docs = {
     'docs/platform/component-boundary.md': 'component-boundary',
     'docs/platform/README.md': 'readme-owner-table',
+    'docs/platform/governance.md': 'governance-holder-table',
     'docs/platform/system-overview/spec.md': ['system-overview-area-map', 'system-overview-shared-entities'],
     'docs/platform/observe/spec.md': 'observe-shared-entities',
     'docs/platform/workflow/spec.md': 'workflow-shared-entities',
@@ -158,6 +159,7 @@ test('writeViews twice is byte-identical', () => {
   for (const rel of [
     'docs/platform/component-boundary.md',
     'docs/platform/README.md',
+    'docs/platform/governance.md',
     'docs/platform/system-overview/spec.md',
     'docs/platform/observe/spec.md',
     'docs/platform/workflow/spec.md',
@@ -182,13 +184,59 @@ test('area map lists cross-area components under (cross-area)', () => {
   assert.match(areaMap, /\| Area \| Components \|/);
 });
 
-test('governance-holder-table is optional: missing markers do not fail --check', () => {
+test('governance-holder-table is required: missing markers fail --check', () => {
   const views = computeViews(REPO_ROOT);
   const holder = views.find((view) => view.view === 'governance-holder-table');
   assert.ok(holder, 'governance-holder-table view must be defined');
-  assert.equal(holder.required, false);
-  assert.equal(holder.present, false);
-  assert.equal(checkViews(REPO_ROOT).some((entry) => entry.view === 'governance-holder-table'), false);
+  assert.equal(holder.required, true);
+
+  const tmp = seedTempRepo();
+  writeViews(tmp);
+  assert.equal(main(['--check'], { repoRoot: tmp }), 0);
+
+  fs.writeFileSync(path.join(tmp, 'docs/platform/governance.md'), '# seed\n\nno markers\n', 'utf8');
+  const drift = checkViews(tmp);
+  assert.ok(
+    drift.some((entry) => entry.view === 'governance-holder-table' && /no .*governance-holder-table/.test(entry.reason)),
+    `expected missing governance-holder-table marker, got ${JSON.stringify(drift)}`,
+  );
+  assert.equal(main(['--check'], { repoRoot: tmp }), 1);
+});
+
+test('governance holder row uses readFirst/facts overrides when set', () => {
+  const tmp = seedTempRepo();
+  const modelDir = path.join(tmp, 'packages', 'component-authority', 'model');
+  fs.writeFileSync(path.join(modelDir, 'decision-kinds.json'), JSON.stringify([
+    {
+      id: 'demo-kind',
+      canonical: 'decision-kind:demo-kind',
+      aliases: ['demo-scope'],
+      meaning: 'demo decisions',
+      owner: 'demo',
+      narrative: 'docs/platform/demo/decisions/',
+      readFirst: 'docs/platform/demo/contracts/special.md#anchor-one',
+      facts: 'docs/platform/demo/contracts/special.md#anchor-one',
+    },
+  ], null, 2));
+  fs.mkdirSync(path.join(tmp, 'docs/platform/demo/decisions'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'docs/platform/demo/decisions/.keep'), '', 'utf8');
+  fs.mkdirSync(path.join(tmp, 'docs/platform/demo/contracts'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'docs/platform/demo/contracts/special.md'), '# special\n', 'utf8');
+  fs.writeFileSync(path.join(tmp, 'docs/platform/demo/spec.md'), '# demo\n', 'utf8');
+  fs.writeFileSync(path.join(tmp, 'docs/platform/demo/README.md'), '# demo readme\n', 'utf8');
+
+  writeViews(tmp);
+  const text = fs.readFileSync(path.join(tmp, 'docs/platform/governance.md'), 'utf8');
+  const block = text.match(
+    new RegExp(`${startMarker('governance-holder-table')}([\\s\\S]*?)${endMarker('governance-holder-table')}`),
+  );
+  assert.ok(block, 'governance-holder-table block missing');
+  assert.match(
+    block[1],
+    /\| demo-scope → demo \| `docs\/platform\/demo\/contracts\/special\.md#anchor-one` \| `docs\/platform\/demo\/contracts\/special\.md#anchor-one` \| `docs\/platform\/demo\/decisions\/` \|/,
+  );
+  assert.doesNotMatch(block[1], /docs\/platform\/demo\/README\.md/);
+  assert.doesNotMatch(block[1], /docs\/platform\/demo\/spec\.md/);
 });
 
 test('loadModel reads components, decision kinds, contracts and door files', () => {

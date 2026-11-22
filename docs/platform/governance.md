@@ -544,16 +544,21 @@ Decision narratives live under `docs/platform/` in each owning area.
 strings do not get renamed in historical decisions. The generated
 `docs/decisions/index.md` remains at its retained path.
 
+<!-- generated:component-authority:governance-holder-table -->
+<!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
+
 | Scope (legacy alias retained) | Read first | Facts and RULs | Narrative home |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | confinement-authority → agent-confinement | `docs/platform/agent-confinement/README.md` | `docs/platform/agent-confinement/spec.md` | `docs/platform/agent-confinement/decisions/` |
 | distribution → packaging-distribution | `docs/platform/packaging-distribution/README.md` | `docs/platform/packaging-distribution/spec.md` | `docs/platform/packaging-distribution/decisions/` |
 | enduser-docs-authoring → work-state | `docs/platform/work-state/contracts/knowledge-registry.md#spec-soạn--nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring` | `docs/platform/work-state/contracts/knowledge-registry.md#spec-soạn--nuôi-tài-liệu-người-dùng-cuối-enduser-docs-authoring` | `docs/platform/work-state/decisions/` |
 | enduser-docs-index → work-state | `docs/platform/work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index` | `docs/platform/work-state/contracts/knowledge-registry.md#spec-chỉ-mục-đọc-theo-tag-tài-liệu-người-dùng-cuối-enduser-docs-index` | `docs/platform/work-state/decisions/` |
 | observe → observe | `docs/platform/observe/README.md` | `docs/platform/observe/spec.md` | `docs/platform/observe/decisions/` |
-| questions → questions | `docs/platform/questions/spec.md` | `docs/platform/questions/spec.md` | `docs/platform/questions/spec.md#11-lịch-sử-quyết-định` |
+| questions → questions | `docs/platform/questions/spec.md` | `docs/platform/questions/spec.md` | `docs/platform/questions/spec.md` |
 | runner → runner | `docs/platform/runner/README.md` | `docs/platform/runner/spec.md`; `docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md`; `docs/platform/runner/subcomponents/h-2e032393add1/spec.md`; `docs/platform/runner/subcomponents/h-37aced3896a8/spec.md`; `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md`; `docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md`; `docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md`; `docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md`; `docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md` | `docs/platform/runner/decisions/` |
 | work-state → work-state | `docs/platform/work-state/README.md` | `docs/platform/work-state/spec.md` | `docs/platform/work-state/decisions/` |
+| component-authority → component-authority | `docs/platform/component-authority/spec.md` | `docs/platform/component-authority/spec.md` | `docs/platform/component-authority/spec.md` |
+<!-- /generated:component-authority:governance-holder-table -->
 
 For split runner rules use
 `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules`;

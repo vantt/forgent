@@ -12,9 +12,8 @@
 // the document's author and is never touched. A view is drift when its block is missing
 // (`required: true`) or when the block on disk differs from the render.
 //
-// The governance holder table is `required: false` until DOCOS accepts the preview
-// written via `--preview-holder <path>`; `--check` does not demand its markers, and
-// write mode only rewrites it when the markers already exist.
+// The governance holder table is a required view: its markers must be present in
+// governance.md, and `--check` fails when the block is missing or drifts from the model.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -113,16 +112,15 @@ function ownerTableBody(model) {
 
 /**
  * The governance "Decision scope to holder table": the same four columns and the same
- * scope-to-holder shape the hand-written table carries, so every legacy scope alias
- * survives and `fgos decision-index` keeps resolving narratives from them. Held back from
- * governance.md until DOCOS answers; rendered into the preview report so that answer can
- * be given against the real table. `required: false` keeps `--check` green while the
- * markers are absent.
+ * scope-to-holder shape the hand-written table carried, so every legacy scope alias
+ * survives and `fgos decision-index` keeps resolving narratives from them. Optional
+ * `readFirst` / `facts` on a decision kind override the derived portal and facts cells
+ * (path with optional #anchor); otherwise derivation matches the prior table rules.
  */
 function governanceHolderBody(model, repoRoot) {
   const byId = new Map(model.components.map((component) => [component.id, component]));
   const lines = [
-    `Decision scopes, one row per decision kind, scope aliases retained. ${NOTE}`,
+    NOTE,
     '',
     '| Scope (legacy alias retained) | Read first | Facts and RULs | Narrative home |',
     '| --- | --- | --- | --- |',
@@ -140,17 +138,30 @@ function governanceHolderBody(model, repoRoot) {
     } else {
       scopeParts.push(`${kind.id} → ${target}`);
     }
-    const area = owner ? areaOf(owner) : narrativeArea;
-    const portalCandidates = [];
-    if (area) portalCandidates.push(`docs/platform/${area}/README.md`);
-    if (owner?.spec) portalCandidates.push(owner.spec);
-    if (kind.narrative) portalCandidates.push(kind.narrative);
-    const portal = portalCandidates.find((rel) => fs.existsSync(path.join(repoRoot, rel))) || owner?.spec || kind.narrative || '—';
-    const childSpecs = model.components
-      .filter((component) => component.parent === kind.owner && component.spec)
-      .map((component) => component.spec);
-    const facts = [owner?.spec, ...childSpecs].filter(Boolean);
-    const uniqueFacts = [...new Set(facts)];
+    let portal;
+    if (typeof kind.readFirst === 'string' && kind.readFirst.trim()) {
+      portal = kind.readFirst.trim();
+    } else {
+      const area = owner ? areaOf(owner) : narrativeArea;
+      const portalCandidates = [];
+      if (area) portalCandidates.push(`docs/platform/${area}/README.md`);
+      if (owner?.spec) portalCandidates.push(owner.spec);
+      if (kind.narrative) portalCandidates.push(kind.narrative);
+      portal = portalCandidates.find((rel) => {
+        const filePart = rel.split('#')[0];
+        return fs.existsSync(path.join(repoRoot, filePart));
+      }) || owner?.spec || kind.narrative || '—';
+    }
+    let uniqueFacts;
+    if (kind.facts !== undefined && kind.facts !== null && kind.facts !== '') {
+      const list = Array.isArray(kind.facts) ? kind.facts : [kind.facts];
+      uniqueFacts = [...new Set(list.map((item) => String(item).trim()).filter(Boolean))];
+    } else {
+      const childSpecs = model.components
+        .filter((component) => component.parent === kind.owner && component.spec)
+        .map((component) => component.spec);
+      uniqueFacts = [...new Set([owner?.spec, ...childSpecs].filter(Boolean))];
+    }
     lines.push(`| ${cell(scopeParts.join('<br>'))} | ${portal === '—' ? '—' : code(portal)} | ${uniqueFacts.map(code).join('; ') || '—'} | ${code(kind.narrative)} |`);
   }
   return lines.join('\n');
@@ -265,14 +276,13 @@ function architectureMapContractsBody(model, repoRoot) {
 /**
  * Every view this renderer owns. `required: true` means the block must already be in the
  * file, so a view cannot silently stop being generated. A missing block on a view that is
- * not required is simply not rendered yet: that is how the governance holder table waits
- * for DOCOS to answer before it replaces the hand-written table.
+ * not required is simply not rendered yet.
  */
 export function viewDefinitions(model, repoRoot = REPO_ROOT) {
   return [
     { view: 'component-boundary', file: 'docs/platform/component-boundary.md', required: true, body: () => componentTableBody(model) },
     { view: 'readme-owner-table', file: 'docs/platform/README.md', required: true, body: () => ownerTableBody(model) },
-    { view: 'governance-holder-table', file: 'docs/platform/governance.md', required: false, body: () => governanceHolderBody(model, repoRoot) },
+    { view: 'governance-holder-table', file: 'docs/platform/governance.md', required: true, body: () => governanceHolderBody(model, repoRoot) },
     { view: 'system-overview-area-map', file: 'docs/platform/system-overview/spec.md', required: true, body: () => areaMapBody(model) },
     { view: 'system-overview-shared-entities', file: 'docs/platform/system-overview/spec.md', required: true, body: () => sharedEntitiesBody(model, null) },
     { view: 'observe-shared-entities', file: 'docs/platform/observe/spec.md', required: true, body: () => sharedEntitiesBody(model, 'observe') },
@@ -453,9 +463,9 @@ export function buildHolderViewPreview(repoRoot) {
     'generated view before the hand-written table in `docs/platform/governance.md` is replaced',
     '(see `plans/261121-2109-component-authority/reports/docos-boundary-answer.md`).',
     '',
-    'The render script owns the `governance-holder-table` view with `required: false`, so',
-    '`node scripts/component-authority-render.mjs --check` does **not** demand its markers',
-    'until DOCOS accepts this preview and the markers are inserted.',
+    'The render script owns the `governance-holder-table` view with `required: true`, so',
+    '`node scripts/component-authority-render.mjs --check` demands its markers once they are',
+    'inserted and the block must match the model.',
     '',
     '## Generated table',
     '',
