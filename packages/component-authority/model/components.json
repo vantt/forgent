@@ -3,8 +3,10 @@
     "id": "component-authority",
     "canonical": "component-authority",
     "aliases": [
-      "ownership registry",
-      "authority ledger"
+      "ownership-registry",
+      "authority-ledger",
+      "sổ quyền sở hữu",
+      "mô hình cấu trúc"
     ],
     "meaning": "Defines the single structural model of layers, components, decision kinds, doors, contracts, and file-to-component mappings.",
     "layer": "kernel",
@@ -36,23 +38,2411 @@
     "id": "packaging-distribution",
     "canonical": "packaging-distribution",
     "aliases": [
-      "distribution",
-      "packaging"
+      "cài đặt và phân phối",
+      "setup-doctor-distribution",
+      "release-distribution"
     ],
-    "meaning": "Packaging, distribution, installation, upgrade, and doctor checks.",
+    "meaning": "Packaging, distribution, installation, upgrade, and doctor readiness.",
+    "layer": "infra",
+    "tier": 9,
+    "paths": [
+      "src/setup/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/setup/blind-steps-proven-pools.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/setup/workflow-catalog-reader.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/setup/seat-binding-checks.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/setup/checks.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/setup/doctor-bridge.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/setup/registrations.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      }
+    ],
+    "owns": [
+      "packaging, release artifacts, and distribution",
+      "doctor readiness registry and check execution",
+      "setup and global/project config precedence"
+    ],
+    "mustNotOwn": [
+      "runtime lifecycle truth",
+      "state store writes",
+      "domain workflow execution"
+    ],
+    "spec": "docs/platform/packaging-distribution/spec.md",
+    "source": [
+      "packages/distribution/",
+      "src/setup/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "host-surface",
+    "canonical": "host-surface",
+    "aliases": [
+      "bề mặt máy chủ",
+      "Host And Surface Layer"
+    ],
+    "meaning": "CLI entrypoints, top-level verbs, argument parsing, and command execution.",
     "layer": "entry",
     "tier": 9,
     "paths": [
-      "packages/distribution/",
-      "docs/platform/packaging-distribution/"
+      "bin/",
+      "src/cli/",
+      "src/verbs/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/cli/command-registry.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      },
+      {
+        "path": "src/cli/exit-codes.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel",
+        "tier": 0
+      },
+      {
+        "path": "src/cli/flag-check.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      },
+      {
+        "path": "src/cli/parse-args.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel",
+        "tier": 0
+      },
+      {
+        "path": "src/cli/verb-exit.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/verbs/merge/",
+        "layer": "use-case",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers"
+      },
+      {
+        "path": "src/verbs/state/",
+        "layer": "use-case",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers"
+      },
+      {
+        "path": "src/verbs/events/",
+        "layer": "use-case",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers"
+      }
     ],
     "owns": [
-      "packaging, release artifacts, and distribution"
+      "cli command dispatch",
+      "top-level verb routing",
+      "cli IO and exit codes"
     ],
-    "mustNotOwn": [],
-    "spec": "docs/platform/packaging-distribution/spec.md",
+    "mustNotOwn": [
+      "engine lifecycle truth",
+      "state store writes",
+      "lock acquisition outside doors"
+    ],
+    "spec": "docs/platform/README.md",
     "source": [
-      "packages/distribution/"
+      "bin/",
+      "src/cli/",
+      "src/verbs/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "config",
+    "canonical": "config",
+    "aliases": [
+      "cấu hình",
+      "configuration-system",
+      "effective-config"
+    ],
+    "meaning": "Configuration authority: project and global config, schema and facade.",
+    "layer": "kernel",
+    "tier": 1,
+    "paths": [
+      "src/config/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "configuration files, schemas, and effective config snapshot",
+      "config facade src/config/facade.mjs"
+    ],
+    "mustNotOwn": [
+      "secrets storage",
+      "lock implementations",
+      "yaml parsing"
+    ],
+    "spec": "docs/platform/config/spec.md",
+    "source": [
+      "packages/config/rust/",
+      "src/config/"
+    ],
+    "status": "live",
+    "reason": "src/config/facade.mjs still exists at HEAD."
+  },
+  {
+    "id": "convention",
+    "canonical": "convention",
+    "aliases": [
+      "quy ước",
+      "path-convention",
+      "artifact-convention"
+    ],
+    "meaning": "Deterministic artifact names, repository-relative placement, path classification, and conformance checking.",
+    "layer": "domain",
+    "tier": 1,
+    "paths": [
+      "src/convention/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/convention/convention-client.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      }
+    ],
+    "owns": [
+      "artifact placement rules",
+      "path conventions and slugs",
+      "convention check"
+    ],
+    "mustNotOwn": [
+      "filesystem operations",
+      "state store writes"
+    ],
+    "spec": "docs/platform/convention/spec.md",
+    "source": [
+      "packages/convention/rust/",
+      "src/convention/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "event-store",
+    "canonical": "event-store",
+    "aliases": [
+      "kho sự kiện",
+      "event-store-core",
+      "git-event-streams"
+    ],
+    "meaning": "Authority for how an fgOS event becomes durable, is sealed into git objects on refs/fgos/*, and is read back.",
+    "layer": "infra",
+    "tier": 3,
+    "paths": [
+      "src/event-store/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "event sealing, refs/fgos/* publication",
+      "event streams and causal ordering"
+    ],
+    "mustNotOwn": [
+      "event schema definitions",
+      "business projection logic"
+    ],
+    "spec": "docs/platform/event-store/spec.md",
+    "source": [
+      "packages/event-store/rust/",
+      "src/event-store/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "git",
+    "canonical": "git",
+    "aliases": [
+      "hệ thống git",
+      "git-foundation",
+      "typed-git-operations"
+    ],
+    "meaning": "Repository facts, typed Git operations, index, refs, worktrees, and WAL recovery.",
+    "layer": "infra",
+    "tier": 2,
+    "paths": [
+      "src/git/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "git repository operations",
+      "worktree allocation and removal",
+      "refs management and publication"
+    ],
+    "mustNotOwn": [
+      "work lifecycle semantics",
+      "event stream interpretation"
+    ],
+    "spec": "docs/platform/git/spec.md",
+    "source": [
+      "packages/git/rust/",
+      "packages/git/node-addon/",
+      "src/git/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "holder-lock",
+    "canonical": "holder-lock",
+    "aliases": [
+      "khoá tài nguyên",
+      "holder-lock-authority",
+      "kernel-resource-locks"
+    ],
+    "meaning": "Authority for who holds which resource as kernel sees it, lock registry, and state root resolution.",
+    "layer": "infra",
+    "tier": 1,
+    "paths": [
+      "src/holder-lock/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/holder-lock/hot-guard.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      }
+    ],
+    "owns": [
+      "kernel locks and lock scopes",
+      "main checkout mutex",
+      "lock registry"
+    ],
+    "mustNotOwn": [
+      "writer identity",
+      "state store transaction semantics"
+    ],
+    "spec": "docs/platform/holder-lock/spec.md",
+    "source": [
+      "packages/holder-lock/rust/",
+      "src/holder-lock/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "identity",
+    "canonical": "identity",
+    "aliases": [
+      "danh tính",
+      "writer-identity",
+      "machine-identity-mint"
+    ],
+    "meaning": "Foundation authority for writer, machine, and project identities.",
+    "layer": "infra",
+    "tier": 1,
+    "paths": [
+      "src/identity/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "writer identity minting and verification",
+      "machine and project id minting",
+      "launcher env scrub"
+    ],
+    "mustNotOwn": [
+      "lock authority",
+      "claim authority"
+    ],
+    "spec": "docs/platform/identity/spec.md",
+    "source": [
+      "packages/identity/rust/",
+      "src/identity/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "observe",
+    "canonical": "observe",
+    "aliases": [
+      "quan sát",
+      "observability-telemetry",
+      "friction-repository",
+      "scorecard-metrics"
+    ],
+    "meaning": "Measurement and scorecard calculation across substrate entities, metrics, friction repository, and shards.",
+    "layer": "infra",
+    "tier": 3,
+    "paths": [
+      "src/observe/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "friction repository and metrics collection",
+      "case lifecycle journals and telemetry"
+    ],
+    "mustNotOwn": [
+      "work item status mutation",
+      "dispatch governance"
+    ],
+    "spec": "docs/platform/observe/spec.md",
+    "source": [
+      "packages/observe/rust/",
+      "src/observe/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "run-supervisor",
+    "canonical": "run-supervisor",
+    "aliases": [
+      "giám sát chạy",
+      "attempt-supervisor",
+      "supervisor-process"
+    ],
+    "meaning": "Rust supervisor process owning attempt lifecycle, deadlines, containment domain, and adopt door.",
+    "layer": "infra",
+    "tier": 4,
+    "paths": [
+      "src/run-supervisor/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/run-supervisor/steps/",
+        "tier": 5,
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers"
+      }
+    ],
+    "owns": [
+      "attempt supervision and receipts",
+      "adopt door and cleanup",
+      "attempt timeout enforcement"
+    ],
+    "mustNotOwn": [
+      "terminal pane control",
+      "provider selection",
+      "work evaluation"
+    ],
+    "spec": "docs/platform/run-supervisor/spec.md",
+    "source": [
+      "packages/run-supervisor/rust/",
+      "src/run-supervisor/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "seat-binding",
+    "canonical": "seat-binding",
+    "aliases": [
+      "gán chỗ",
+      "chỗ ngồi",
+      "agent-seat-ranking",
+      "seat-tier-ladder"
+    ],
+    "meaning": "Authority for which executor, invocation, model, effort, tier and account runs an agent seat.",
+    "layer": "infra",
+    "tier": 5,
+    "paths": [
+      "src/seat-binding/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "seat ranking and tier ladder",
+      "account assignment policy",
+      "executor binding"
+    ],
+    "mustNotOwn": [
+      "execution launch",
+      "transport",
+      "confinement",
+      "seat list"
+    ],
+    "spec": "docs/platform/seat-binding/spec.md",
+    "source": [
+      "packages/seat-binding/rust/",
+      "src/seat-binding/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "terminal-control",
+    "canonical": "terminal-control",
+    "aliases": [
+      "điều khiển terminal",
+      "pane-allocation-control",
+      "multiplexer-driver"
+    ],
+    "meaning": "Foundation component for terminal multiplexer pane allocation and key addressing.",
+    "layer": "infra",
+    "tier": 2,
+    "paths": [
+      "src/terminal-control/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "terminal pane allocation and lifecycle",
+      "multiplexer driver port"
+    ],
+    "mustNotOwn": [
+      "run supervision",
+      "containment",
+      "agent protocol"
+    ],
+    "spec": "docs/platform/terminal-control/spec.md",
+    "source": [
+      "packages/terminal-control/rust/",
+      "src/terminal-control/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "session-host",
+    "canonical": "session-host",
+    "aliases": [
+      "máy chủ phiên",
+      "session-placement-host",
+      "session-front-start"
+    ],
+    "meaning": "Authority for placing an agent session, worker or head: start, alive, front, retire.",
+    "layer": "infra",
+    "tier": 3,
+    "paths": [
+      "src/session-host/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/session-host/head-start.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case",
+        "tier": 5
+      },
+      {
+        "path": "src/session-host/head-grants.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      },
+      {
+        "path": "src/session-host/head-request.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case",
+        "tier": 5
+      },
+      {
+        "path": "src/session-host/head-stop.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case",
+        "tier": 5
+      }
+    ],
+    "owns": [
+      "agent session placement port",
+      "direct and terminal adapters"
+    ],
+    "mustNotOwn": [
+      "pane allocation record",
+      "containment or receipts",
+      "identity minting"
+    ],
+    "spec": "docs/platform/session-host/spec.md",
+    "source": [
+      "src/session-host/"
+    ],
+    "status": "designed"
+  },
+  {
+    "id": "workflow",
+    "canonical": "workflow",
+    "aliases": [
+      "quy trình",
+      "luồng công việc",
+      "workflow-guide-ledger",
+      "admission-ledger-case"
+    ],
+    "meaning": "Workflow guide schema, case ledger, reservations, admission, and worktree binding.",
+    "layer": "infra",
+    "tier": 6,
+    "paths": [
+      "src/workflow/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/workflow/definition.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      },
+      {
+        "path": "src/workflow/guide-schema.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      },
+      {
+        "path": "src/workflow/propose.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/workflow/admission-peer.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/workflow/case-start.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/workflow/case-verbs.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/workflow/runner.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/workflow/index.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/workflow/steps.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      }
+    ],
+    "owns": [
+      "workflow guide and case ledger",
+      "admission port implementation",
+      "reservations and route events"
+    ],
+    "mustNotOwn": [
+      "git mutation",
+      "work status",
+      "locks",
+      "unit execution"
+    ],
+    "spec": "docs/platform/workflow/spec.md",
+    "source": [
+      "src/workflow/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "work-state",
+    "canonical": "work-state",
+    "aliases": [
+      "vòng đời công việc",
+      "trạng thái công việc",
+      "Work Lifecycle Engine",
+      "Work Driver"
+    ],
+    "meaning": "Domain-agnostic work-unit lifecycle, status board, claim/return, and human gates.",
+    "layer": "domain",
+    "tier": 7,
+    "paths": [
+      "src/state/",
+      "src/intake/",
+      "src/evolve/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/state/drift-status.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      },
+      {
+        "path": "src/state/store.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      },
+      {
+        "path": "src/state/gate-bypass.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      },
+      {
+        "path": "src/state/cursor.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/state/porting-store.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      },
+      {
+        "path": "src/state/cleanup-harness.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      },
+      {
+        "path": "src/state/cleanup-pool.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      },
+      {
+        "path": "src/intake/discovery.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/intake/plan.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/intake/plan-verdict-from-plan-md.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/intake/verify-pattern-check.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      },
+      {
+        "path": "src/state/event-log.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      },
+      {
+        "path": "src/state/hot-lock.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      },
+      {
+        "path": "src/state/consumer-event-gate.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      },
+      {
+        "path": "src/state/work-event-store.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      },
+      {
+        "path": "src/state/work.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      },
+      {
+        "path": "src/state/envelope.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      },
+      {
+        "path": "src/intake/risk-keywords.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      },
+      {
+        "path": "src/intake/classify.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/state/runtime-coordination.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      },
+      {
+        "path": "src/state/domain-registry.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      }
+    ],
+    "owns": [
+      "work item identity, status, and stage",
+      "claim and return lifecycle",
+      "lifecycle event truth"
+    ],
+    "mustNotOwn": [
+      "unit execution",
+      "assignment membership",
+      "git merge and worktree mutation"
+    ],
+    "spec": "docs/platform/work-state/spec.md",
+    "source": [
+      "src/state/",
+      "src/intake/",
+      "src/evolve/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "supervision",
+    "canonical": "supervision",
+    "aliases": [
+      "giám sát dự án",
+      "project-supervision",
+      "plan-lane-pool"
+    ],
+    "meaning": "Coordinates the plans of a project with no person sitting by.",
+    "layer": "kernel",
+    "tier": 8,
+    "paths": [
+      "src/portfolio/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "project supervisor orchestration",
+      "portfolio status and plan lane pool"
+    ],
+    "mustNotOwn": [
+      "work item state writes",
+      "code land decisions"
+    ],
+    "spec": "docs/platform/supervision/spec.md",
+    "source": [
+      "packages/supervision/rust/",
+      "src/portfolio/"
+    ],
+    "status": "live",
+    "reason": "The crate packages/supervision/rust and supervisor verbs exist at HEAD."
+  },
+  {
+    "id": "session-rotation",
+    "canonical": "session-rotation",
+    "aliases": [
+      "xoay phiên",
+      "session-rotation-mechanics",
+      "session-rotate-handoff"
+    ],
+    "meaning": "Session handoff and rotation mechanics across session boundaries.",
+    "layer": "infra",
+    "tier": 2,
+    "paths": [
+      "src/session-rotation/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/session-rotation/rotate.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case",
+        "tier": 5
+      }
+    ],
+    "owns": [
+      "session rotation mechanics",
+      "session handoff contract"
+    ],
+    "mustNotOwn": [
+      "work lifecycle writes",
+      "identity minting"
+    ],
+    "spec": "docs/platform/runner/spec.md",
+    "source": [
+      "src/session-rotation/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "learning-docs-registry",
+    "canonical": "learning-docs-registry",
+    "aliases": [
+      "sổ đăng ký tri thức",
+      "Knowledge, Learning, And Documentation Registry"
+    ],
+    "meaning": "Retrospective knowledge capture, doc registry, Diataxis index, and evolve signals.",
+    "layer": "domain",
+    "tier": 9,
+    "paths": [
+      "src/report/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/report/enduser-index-generate.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      },
+      {
+        "path": "src/report/decision-index.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      },
+      {
+        "path": "src/report/capability-plan-lint.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      },
+      {
+        "path": "src/report/knowledge-resolver.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "tier": 7
+      },
+      {
+        "path": "src/report/knowledge-lints.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      }
+    ],
+    "owns": [
+      "knowledge registry and resolution",
+      "retrospective learning and doc indexing"
+    ],
+    "mustNotOwn": [
+      "work lifecycle mutation",
+      "run execution truth"
+    ],
+    "spec": "docs/platform/work-state/contracts/knowledge-registry.md",
+    "source": [
+      "src/report/"
+    ],
+    "status": "live",
+    "reason": "Dedicated area spec does not exist yet; authority currently sits in contract docs/platform/work-state/contracts/knowledge-registry.md."
+  },
+  {
+    "id": "process",
+    "canonical": "process",
+    "aliases": [
+      "tiến trình",
+      "Process Facts & Control"
+    ],
+    "meaning": "Process liveness, signalling by identity, and native process facts door.",
+    "layer": "infra",
+    "tier": 0,
+    "paths": [
+      "src/native/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/native/door.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      },
+      {
+        "path": "src/native/dispatch-depth.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      }
+    ],
+    "owns": [
+      "process liveness judgement",
+      "process signalling and process domain facts"
+    ],
+    "mustNotOwn": [
+      "attempt supervision",
+      "run lifecycle",
+      "terminal control"
+    ],
+    "spec": "docs/platform/process/spec.md",
+    "source": [
+      "packages/process/rust/",
+      "src/native/"
+    ],
+    "status": "live",
+    "reason": "The claim \"never kills by bare pid\" is false at HEAD: src/holder-lock/index.mjs sweepProcessGroup sends kill(-pgid) / process.kill at :442; the debt lives in doors/process-control-signal.json."
+  },
+  {
+    "id": "platform-foundations",
+    "canonical": "platform-foundations",
+    "aliases": [
+      "nền tảng",
+      "platform-foundations-laws",
+      "core-platform-laws"
+    ],
+    "meaning": "Core platform utilities, foundation laws L1-L10, and cross-cutting helpers.",
+    "layer": "kernel",
+    "tier": 0,
+    "paths": [
+      "src/util/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/util/domain-compile.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      },
+      {
+        "path": "src/util/host-bin.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "infra"
+      }
+    ],
+    "owns": [
+      "pure foundation utilities",
+      "common path and text helpers"
+    ],
+    "mustNotOwn": [
+      "domain-specific logic",
+      "lifecycle writes",
+      "direct process control"
+    ],
+    "spec": "docs/platform/platform-foundations.md",
+    "source": [
+      "src/util/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "execution-core",
+    "canonical": "execution-core",
+    "aliases": [
+      "lõi thực thi",
+      "execution-engine-unit",
+      "unit-run-posture",
+      "fgos-run-door"
+    ],
+    "meaning": "Single authority for how a Unit runs (mechanism, posture, gates) through run door.",
+    "layer": "infra",
+    "tier": 5,
+    "paths": [
+      "src/runner/execution/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/runner/execution/seat-ledger.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "domain"
+      },
+      {
+        "path": "src/runner/execution/seat-resolver.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "domain"
+      },
+      {
+        "path": "src/runner/execution/legacy-seat-read.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      },
+      {
+        "path": "src/runner/execution/outcome.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      }
+    ],
+    "owns": [
+      "unit run execution loop",
+      "run admission and settlement",
+      "posture enforcement"
+    ],
+    "mustNotOwn": [
+      "seat ranking",
+      "work lifecycle",
+      "git merge"
+    ],
+    "spec": "docs/platform/runner/spec.md",
+    "source": [
+      "packages/execution/engine/",
+      "packages/execution/rust/",
+      "src/runner/execution/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "dispatch-transport",
+    "canonical": "dispatch-transport",
+    "aliases": [
+      "điều phối",
+      "Dispatch Transport & Confinement"
+    ],
+    "meaning": "Supervised attempt dispatch, execution planning, isolation request, and executor adapters.",
+    "layer": "infra",
+    "tier": 5,
+    "paths": [
+      "src/runner/dispatch/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/runner/dispatch/write-scope.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      },
+      {
+        "path": "src/runner/dispatch/run-timeout.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel"
+      }
+    ],
+    "owns": [
+      "dispatch planning and launch",
+      "executor adapter invocation",
+      "confinement request assembly"
+    ],
+    "mustNotOwn": [
+      "work lifecycle",
+      "unit run settlement",
+      "seat ranking"
+    ],
+    "spec": "docs/platform/runner/spec.md",
+    "source": [
+      "src/runner/dispatch/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "runner",
+    "canonical": "runner",
+    "aliases": [
+      "bộ chạy",
+      "runner-orchestration-paths",
+      "execution-runner-top"
+    ],
+    "meaning": "Top-level runner orchestration, paths, locks, rigor, and agent definitions.",
+    "layer": "infra",
+    "tier": 7,
+    "paths": [
+      "src/runner/"
+    ],
+    "exceptions": [
+      {
+        "path": "src/runner/loop.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/runner/paths.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "tier": 2
+      },
+      {
+        "path": "src/runner/operation-capability.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "domain",
+        "tier": 0
+      },
+      {
+        "path": "src/runner/rigor.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel",
+        "tier": 0
+      },
+      {
+        "path": "src/runner/capability-config.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "kernel",
+        "tier": 0
+      },
+      {
+        "path": "src/runner/fanout-batch.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/runner/stray-writes.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "tier": 2
+      },
+      {
+        "path": "src/runner/hook.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/runner/agent-definitions.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "tier": 5
+      },
+      {
+        "path": "src/runner/worktree.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "tier": 2
+      },
+      {
+        "path": "src/runner/goal-check.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "tier": 1
+      },
+      {
+        "path": "src/runner/frozen-judge.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "domain"
+      },
+      {
+        "path": "src/runner/repo-locks.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "tier": 2
+      },
+      {
+        "path": "src/runner/recovery.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "domain"
+      },
+      {
+        "path": "src/runner/anti-loop.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "domain"
+      },
+      {
+        "path": "src/runner/write-queue.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "domain"
+      },
+      {
+        "path": "src/runner/root-affinity.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "domain"
+      },
+      {
+        "path": "src/runner/operation-choice.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      },
+      {
+        "path": "src/runner/work-dispatch.mjs",
+        "reason": "per-file layer carried over from the manifest; the directory mixes layers",
+        "layer": "use-case"
+      }
+    ],
+    "owns": [
+      "runner paths and repo locks",
+      "agent definitions and rigor rules"
+    ],
+    "mustNotOwn": [
+      "work lifecycle",
+      "state store truth"
+    ],
+    "spec": "docs/platform/runner/spec.md",
+    "source": [
+      "src/runner/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "agent-confinement",
+    "canonical": "agent-confinement",
+    "aliases": [
+      "bảo vệ cách ly agent",
+      "agent-isolation-sandboxing",
+      "bwrap-confinement-driver"
+    ],
+    "meaning": "Single authority for agent isolation, container boundaries, and sandboxing.",
+    "layer": "infra",
+    "tier": 5,
+    "paths": [
+      "docs/platform/agent-confinement/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "agent confinement enforcement",
+      "bwrap isolation driver",
+      "private home hiding"
+    ],
+    "mustNotOwn": [
+      "unit execution loop",
+      "work lifecycle"
+    ],
+    "spec": "docs/platform/agent-confinement/spec.md",
+    "source": [
+      "docs/platform/agent-confinement/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "questions",
+    "canonical": "questions",
+    "aliases": [
+      "câu hỏi",
+      "owner-question-lifecycle",
+      "decision-question-store"
+    ],
+    "meaning": "One authority for questions a session sends to owner: asked, stored, answered, received.",
+    "layer": "domain",
+    "tier": 3,
+    "paths": [
+      "packages/questions/",
+      "docs/platform/questions/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "owner question shape and states",
+      "questions verbs and receipt hook"
+    ],
+    "mustNotOwn": [
+      "workflow gates",
+      "wake-up of idle asker"
+    ],
+    "spec": "docs/platform/questions/spec.md",
+    "source": [
+      "packages/questions/contracts/",
+      "packages/questions/rust/"
+    ],
+    "status": "designed"
+  },
+  {
+    "id": "executor-model",
+    "parent": "execution-core",
+    "canonical": "executor-model",
+    "aliases": [
+      "mô hình executor",
+      "executor-registry-model",
+      "executor-derived-facts"
+    ],
+    "meaning": "Authority for what an executor entry means and facts derived from it.",
+    "layer": "infra",
+    "tier": 5,
+    "paths": [
+      "docs/platform/runner/contracts/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "executor model and derived facts",
+      "executor doctor judgments"
+    ],
+    "mustNotOwn": [
+      "seat ranking",
+      "dispatch launch"
+    ],
+    "spec": "docs/platform/runner/contracts/executor-model.md",
+    "source": [
+      "packages/execution/rust/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "collaboration-patterns",
+    "parent": "execution-core",
+    "canonical": "collaboration-patterns",
+    "aliases": [
+      "mẫu cộng tác",
+      "collaboration-loops",
+      "solo-reviewed-panel-loops"
+    ],
+    "meaning": "Domain-neutral small collaboration loops (solo, reviewed, panel) and presets.",
+    "layer": "domain",
+    "tier": 5,
+    "paths": [
+      "src/runner/execution/loops/",
+      "src/runner/execution/patterns/",
+      "docs/platform/runner/patterns/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "collaboration loop definitions and preset configurations"
+    ],
+    "mustNotOwn": [
+      "unit execution engine",
+      "work status"
+    ],
+    "spec": "docs/platform/runner/spec.md",
+    "source": [
+      "src/runner/execution/loops/",
+      "src/runner/execution/patterns/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "run-result",
+    "canonical": "run-result",
+    "aliases": [
+      "đánh giá kết quả chạy",
+      "Run Result Evaluator"
+    ],
+    "meaning": "Evidence and confidence boundary for assignment run results.",
+    "layer": "infra",
+    "tier": 5,
+    "paths": [
+      "packages/run-result/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "run outcome derivation",
+      "evidence policy evaluation",
+      "result normalization"
+    ],
+    "mustNotOwn": [
+      "executor launch",
+      "work lifecycle"
+    ],
+    "spec": "docs/platform/runner/spec.md",
+    "source": [
+      "packages/run-result/rust/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "documentation",
+    "canonical": "documentation",
+    "aliases": [
+      "tài liệu nền tảng",
+      "platform-documentation-tree",
+      "maintained-docs-corpus"
+    ],
+    "meaning": "Platform documentation umbrella, architecture docs, and maintained doc tree.",
+    "layer": "domain",
+    "tier": 9,
+    "paths": [
+      "docs/platform/documentation/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "documentation architecture and maintained corpus"
+    ],
+    "mustNotOwn": [
+      "runtime state mutation",
+      "code execution"
+    ],
+    "spec": "docs/platform/documentation/spec.md",
+    "source": [
+      "docs/platform/documentation/"
+    ],
+    "status": "designed"
+  },
+  {
+    "id": "admission",
+    "parent": "documentation",
+    "canonical": "admission",
+    "aliases": [
+      "tiếp nhận tài liệu",
+      "documentation-admission-frame",
+      "doc-admission-review"
+    ],
+    "meaning": "Defines how a change that opens or moves documentation authority is admitted.",
+    "layer": "domain",
+    "tier": 9,
+    "paths": [
+      "docs/platform/documentation/subcomponents/admission/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "documentation admission frame and review gate"
+    ],
+    "mustNotOwn": [
+      "document checking",
+      "content writing"
+    ],
+    "spec": "docs/platform/documentation/subcomponents/admission/spec.md",
+    "source": [
+      "docs/platform/documentation/subcomponents/admission/"
+    ],
+    "status": "designed"
+  },
+  {
+    "id": "doc-checks",
+    "parent": "documentation",
+    "canonical": "doc-checks",
+    "aliases": [
+      "kiểm tra tài liệu",
+      "documentation-checks-gate",
+      "doc-health-command"
+    ],
+    "meaning": "Defines the command checking maintained documentation, body rules, and commit gate.",
+    "layer": "domain",
+    "tier": 9,
+    "paths": [
+      "docs/platform/documentation/subcomponents/doc-checks/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "doc health checks and body rules"
+    ],
+    "mustNotOwn": [
+      "path convention",
+      "admission decisions"
+    ],
+    "spec": "docs/platform/documentation/subcomponents/doc-checks/spec.md",
+    "source": [
+      "docs/platform/documentation/subcomponents/doc-checks/"
+    ],
+    "status": "designed"
+  },
+  {
+    "id": "document-identity",
+    "parent": "documentation",
+    "canonical": "document-identity",
+    "aliases": [
+      "danh tính tài liệu",
+      "document-identity-axes",
+      "locate-before-write-search"
+    ],
+    "meaning": "Defines how maintained documentation is placed in axes so writers find before create.",
+    "layer": "domain",
+    "tier": 9,
+    "paths": [
+      "docs/platform/documentation/subcomponents/document-identity/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "document axis model, locate before write, and claim units"
+    ],
+    "mustNotOwn": [
+      "convention placement",
+      "doc checks"
+    ],
+    "spec": "docs/platform/documentation/subcomponents/document-identity/spec.md",
+    "source": [
+      "docs/platform/documentation/subcomponents/document-identity/"
+    ],
+    "status": "designed"
+  },
+  {
+    "id": "write-door",
+    "parent": "documentation",
+    "canonical": "write-door",
+    "aliases": [
+      "cửa ghi tài liệu",
+      "documentation-write-door-skill",
+      "doc-write-procedure"
+    ],
+    "meaning": "Defines the one door through which any agent writes, changes, or moves documentation.",
+    "layer": "domain",
+    "tier": 9,
+    "paths": [
+      "docs/platform/documentation/subcomponents/write-door/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "documentation write procedure and template enforcement"
+    ],
+    "mustNotOwn": [
+      "document identity axes",
+      "admission policy"
+    ],
+    "spec": "docs/platform/documentation/subcomponents/write-door/spec.md",
+    "source": [
+      "docs/platform/documentation/subcomponents/write-door/"
+    ],
+    "status": "designed"
+  },
+  {
+    "id": "h-02842f76ffd2",
+    "parent": "runner",
+    "canonical": "runner-data-dictionary",
+    "aliases": [
+      "từ điển dữ liệu runner",
+      "Runner Data Dictionary"
+    ],
+    "meaning": "Runner data dictionary definitions and data schema mapping.",
+    "layer": "infra",
+    "tier": 7,
+    "paths": [
+      "docs/platform/runner/subcomponents/h-02842f76ffd2/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "runner data dictionary definitions"
+    ],
+    "mustNotOwn": [
+      "business rules"
+    ],
+    "spec": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+    "source": [
+      "docs/platform/runner/subcomponents/h-02842f76ffd2/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "h-2e032393add1",
+    "parent": "runner",
+    "canonical": "runner-open-gaps",
+    "aliases": [
+      "khoảng trống runner",
+      "Runner Open Gaps"
+    ],
+    "meaning": "Runner gap tracking and known technical limits.",
+    "layer": "infra",
+    "tier": 7,
+    "paths": [
+      "docs/platform/runner/subcomponents/h-2e032393add1/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "runner gap tracking and known limits"
+    ],
+    "mustNotOwn": [
+      "runner code"
+    ],
+    "spec": "docs/platform/runner/subcomponents/h-2e032393add1/spec.md",
+    "source": [
+      "docs/platform/runner/subcomponents/h-2e032393add1/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "h-37aced3896a8",
+    "parent": "runner",
+    "canonical": "runner-edge-cases-settled",
+    "aliases": [
+      "ca biên runner",
+      "Runner Edge Cases Settled"
+    ],
+    "meaning": "Runner settled edge case records and historical resolutions.",
+    "layer": "infra",
+    "tier": 7,
+    "paths": [
+      "docs/platform/runner/subcomponents/h-37aced3896a8/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "runner settled edge case records"
+    ],
+    "mustNotOwn": [
+      "execution engine"
+    ],
+    "spec": "docs/platform/runner/subcomponents/h-37aced3896a8/spec.md",
+    "source": [
+      "docs/platform/runner/subcomponents/h-37aced3896a8/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "h-6979005beaf7",
+    "parent": "runner",
+    "canonical": "runner-business-rules",
+    "aliases": [
+      "luật nghiệp vụ runner",
+      "Runner Business Rules"
+    ],
+    "meaning": "Runner business rules RUL1 to RUL104.",
+    "layer": "infra",
+    "tier": 7,
+    "paths": [
+      "docs/platform/runner/subcomponents/h-6979005beaf7/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "runner business rules RUL1 to RUL104"
+    ],
+    "mustNotOwn": [
+      "execution loops"
+    ],
+    "spec": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+    "source": [
+      "docs/platform/runner/subcomponents/h-6979005beaf7/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "h-6df5686d0d54",
+    "parent": "runner",
+    "canonical": "runner-actors-access",
+    "aliases": [
+      "tác nhân runner",
+      "Runner Actors & Access"
+    ],
+    "meaning": "Runner actors, access control definitions, and caller bounds.",
+    "layer": "infra",
+    "tier": 7,
+    "paths": [
+      "docs/platform/runner/subcomponents/h-6df5686d0d54/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "runner actors and access controls"
+    ],
+    "mustNotOwn": [
+      "identity minting"
+    ],
+    "spec": "docs/platform/runner/subcomponents/h-6df5686d0d54/spec.md",
+    "source": [
+      "docs/platform/runner/subcomponents/h-6df5686d0d54/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "h-ce5b9771a26a",
+    "parent": "runner",
+    "canonical": "runner-entry-points-triggers",
+    "aliases": [
+      "điểm vào runner",
+      "Runner Entry Points & Triggers"
+    ],
+    "meaning": "Runner entry points, trigger routes, and invocation hooks.",
+    "layer": "infra",
+    "tier": 7,
+    "paths": [
+      "docs/platform/runner/subcomponents/h-ce5b9771a26a/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "runner entry point triggers and routes"
+    ],
+    "mustNotOwn": [
+      "cli verbs"
+    ],
+    "spec": "docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md",
+    "source": [
+      "docs/platform/runner/subcomponents/h-ce5b9771a26a/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "h-d3b49ef7edf5",
+    "parent": "runner",
+    "canonical": "runner-visuals",
+    "aliases": [
+      "sơ đồ runner",
+      "Runner Visuals"
+    ],
+    "meaning": "Runner visual architecture diagrams and sequence maps.",
+    "layer": "infra",
+    "tier": 7,
+    "paths": [
+      "docs/platform/runner/subcomponents/h-d3b49ef7edf5/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "runner visual architecture diagrams"
+    ],
+    "mustNotOwn": [
+      "diagram engine"
+    ],
+    "spec": "docs/platform/runner/subcomponents/h-d3b49ef7edf5/spec.md",
+    "source": [
+      "docs/platform/runner/subcomponents/h-d3b49ef7edf5/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "h-f34e0d170d89",
+    "parent": "runner",
+    "canonical": "runner-pointers",
+    "aliases": [
+      "con trỏ hiện thực runner",
+      "Runner Pointers"
+    ],
+    "meaning": "Runner implementation pointers and source coordinate mapping.",
+    "layer": "infra",
+    "tier": 7,
+    "paths": [
+      "docs/platform/runner/subcomponents/h-f34e0d170d89/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "runner implementation pointers"
+    ],
+    "mustNotOwn": [
+      "source implementation"
+    ],
+    "spec": "docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md",
+    "source": [
+      "docs/platform/runner/subcomponents/h-f34e0d170d89/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "containment-port",
+    "parent": "process",
+    "canonical": "containment-port",
+    "aliases": [
+      "cổng cách ly",
+      "process-domain-port",
+      "attempt-containment-port"
+    ],
+    "meaning": "OS-neutral process domain per attempt with drivers and containment guarantees.",
+    "layer": "infra",
+    "tier": 0,
+    "paths": [
+      "packages/process/contracts/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "containment port contract and process domain guarantees"
+    ],
+    "mustNotOwn": [
+      "attempt envelope",
+      "run supervisor process"
+    ],
+    "spec": "docs/platform/process/spec.md",
+    "source": [
+      "packages/process/rust/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "launch-gate",
+    "parent": "run-supervisor",
+    "canonical": "launch-gate",
+    "aliases": [
+      "cổng khởi chạy",
+      "agent-launch-gate",
+      "gate-process-root"
+    ],
+    "meaning": "Process root of the agent inside containment domain, owns IO, GO signal, and ceiling.",
+    "layer": "infra",
+    "tier": 4,
+    "paths": [
+      "packages/run-supervisor/rust/src/gate/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "agent process gate, env scrub application, and hard ceiling enforcement"
+    ],
+    "mustNotOwn": [
+      "supervisor adoption",
+      "seat assignment"
+    ],
+    "spec": "docs/platform/run-supervisor/spec.md",
+    "source": [
+      "packages/run-supervisor/rust/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "agent-protocol",
+    "canonical": "agent-protocol",
+    "aliases": [
+      "giao thức agent",
+      "per-cli-protocol-adapter",
+      "agent-cli-protocol"
+    ],
+    "meaning": "Pure per-CLI adapters (claude, codex, agy, pi, omp) translating CLI output to status.",
+    "layer": "infra",
+    "tier": 3,
+    "paths": [
+      "packages/agent-protocol/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "agent CLI output parsing and protocol status mapping"
+    ],
+    "mustNotOwn": [
+      "terminal control",
+      "executor launch"
+    ],
+    "spec": "docs/platform/agent-protocol/spec.md",
+    "source": [
+      "packages/agent-protocol/rust/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "agent-mailbox",
+    "canonical": "agent-mailbox",
+    "aliases": [
+      "hòm thư agent",
+      "peer-agent-mailbox",
+      "inter-agent-messaging"
+    ],
+    "meaning": "Placing a message from one agent session into context of the right live head.",
+    "layer": "infra",
+    "tier": 4,
+    "paths": [
+      "packages/mailbox/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "agent mailbox delivery and head registration"
+    ],
+    "mustNotOwn": [
+      "writer identity",
+      "process liveness"
+    ],
+    "spec": "docs/platform/agent-mailbox/spec.md",
+    "source": [
+      "packages/mailbox/rust/"
+    ],
+    "status": "designed"
+  },
+  {
+    "id": "durable-file",
+    "canonical": "durable-file",
+    "aliases": [
+      "atomic file write",
+      "ghi file nguyên tử",
+      "durable-atomic-file",
+      "atomic-write-door"
+    ],
+    "meaning": "Authority for how records reach disk durably: temp file, fsync, atomic install.",
+    "layer": "kernel",
+    "tier": 0,
+    "paths": [
+      "packages/durable-file/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "atomic and durable file write primitives, fsync"
+    ],
+    "mustNotOwn": [
+      "file contents",
+      "lock acquisition"
+    ],
+    "spec": "docs/platform/component-boundary.md",
+    "source": [
+      "packages/durable-file/rust/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "canonical-json",
+    "canonical": "canonical-json",
+    "aliases": [
+      "json chuẩn tắc",
+      "rfc-8785-bytes",
+      "canonical-json-encoding"
+    ],
+    "meaning": "Authority for canonical JSON bytes per RFC 8785.",
+    "layer": "kernel",
+    "tier": 0,
+    "paths": [
+      "packages/canonical-json/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "RFC 8785 canonical JSON serialization"
+    ],
+    "mustNotOwn": [
+      "json parsing outside canonical form"
+    ],
+    "spec": "docs/platform/component-boundary.md",
+    "source": [
+      "packages/canonical-json/rust/"
+    ],
+    "status": "live",
+    "reason": "HEAD code supports the door allowing packages/canonical-json/rust and git/node-addon/src/canonical_json.rs (per doors/canonical-json-bytes.json)."
+  },
+  {
+    "id": "yaml-document",
+    "canonical": "yaml-document",
+    "aliases": [
+      "tài liệu yaml",
+      "lossless-yaml-doc",
+      "yaml-document-parser"
+    ],
+    "meaning": "Lossless reading, editing, and merging of YAML documents with positions.",
+    "layer": "kernel",
+    "tier": 0,
+    "paths": [
+      "packages/yaml-doc/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "lossless YAML document parsing and modification"
+    ],
+    "mustNotOwn": [
+      "config schema validation"
+    ],
+    "spec": "docs/platform/yaml-document/spec.md",
+    "source": [
+      "packages/yaml-doc/rust/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "write-scope",
+    "canonical": "write-scope",
+    "aliases": [
+      "phạm vi ghi",
+      "path-write-scope",
+      "scope-overlap-checker"
+    ],
+    "meaning": "Authority for what a declared path scope means and whether two scopes overlap.",
+    "layer": "kernel",
+    "tier": 0,
+    "paths": [
+      "packages/write-scope/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "write scope parsing, overlap detection, and set-level collisions"
+    ],
+    "mustNotOwn": [
+      "git commit enforcement",
+      "filesystem access"
+    ],
+    "spec": "docs/platform/write-scope/spec.md",
+    "source": [
+      "packages/write-scope/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "graph",
+    "canonical": "graph",
+    "aliases": [
+      "đồ thị",
+      "directed-graph-facts",
+      "dependency-graph-cycles"
+    ],
+    "meaning": "Deterministic facts about directed graphs with typed edges and exclusion pairs.",
+    "layer": "kernel",
+    "tier": 0,
+    "paths": [
+      "packages/graph/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "directed graph analysis, cycle detection, topological sorting"
+    ],
+    "mustNotOwn": [
+      "domain-specific graph models"
+    ],
+    "spec": "docs/platform/graph/spec.md",
+    "source": [
+      "packages/graph/contracts/"
+    ],
+    "status": "designed"
+  },
+  {
+    "id": "resource-referee",
+    "canonical": "resource-referee",
+    "aliases": [
+      "trọng tài tài nguyên",
+      "unit-resource-referee",
+      "resource-claim-referee"
+    ],
+    "meaning": "Applying ruleset data to facts about units and resource claims.",
+    "layer": "kernel",
+    "tier": 0,
+    "paths": [
+      "packages/resource-referee/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "resource referee evaluation and claim arbitration"
+    ],
+    "mustNotOwn": [
+      "resource locking",
+      "filesystem state"
+    ],
+    "spec": "docs/platform/resource-referee/spec.md",
+    "source": [
+      "packages/resource-referee/contracts/"
+    ],
+    "status": "designed"
+  },
+  {
+    "id": "secrets",
+    "canonical": "secrets",
+    "aliases": [
+      "bí mật",
+      "credentials-secrets-vault",
+      "secret-token-store"
+    ],
+    "meaning": "Secrets vault and safe token management.",
+    "layer": "infra",
+    "tier": 1,
+    "paths": [
+      "packages/secrets/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "secrets storage and credential retrieval"
+    ],
+    "mustNotOwn": [
+      "config file parsing"
+    ],
+    "spec": "docs/platform/secrets/spec.md",
+    "source": [
+      "packages/secrets/rust/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "host-invocation-routing",
+    "canonical": "host-invocation-routing",
+    "aliases": [
+      "định tuyến gọi máy chủ",
+      "host-invocation"
+    ],
+    "meaning": "Host invocation routing, provider routing, legacy CLI transition, and external provider docs.",
+    "layer": "entry",
+    "tier": 9,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "host invocation routing",
+      "provider routing"
+    ],
+    "mustNotOwn": [
+      "runtime lifecycle truth"
+    ],
+    "spec": "docs/platform/host-invocation-routing/spec.md",
+    "source": [
+      "docs/platform/host-invocation-routing/"
+    ],
+    "status": "retired"
+  },
+  {
+    "id": "claude-plugin",
+    "canonical": "claude-plugin",
+    "aliases": [
+      "tiện ích mở rộng claude",
+      "fgos-plugin"
+    ],
+    "meaning": "Claude Code slash-command surface and plugin wrappers.",
+    "layer": "entry",
+    "tier": 9,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "claude code slash-command surface"
+    ],
+    "mustNotOwn": [
+      "core platform execution"
+    ],
+    "spec": "docs/platform/claude-plugin/spec.md",
+    "source": [
+      "docs/platform/claude-plugin/"
+    ],
+    "status": "retired"
+  },
+  {
+    "id": "distillery",
+    "canonical": "distillery",
+    "aliases": [
+      "lò chưng cất",
+      "distillery-porting-lifecycle"
+    ],
+    "meaning": "Porting lifecycle and state consumer for external repository extraction.",
+    "layer": "use-case",
+    "tier": 7,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "porting lifecycle and reference analysis"
+    ],
+    "mustNotOwn": [
+      "runtime execution"
+    ],
+    "spec": "docs/platform/distillery/spec.md",
+    "source": [
+      "docs/platform/distillery/"
+    ],
+    "status": "retired"
+  },
+  {
+    "id": "decision-citation-drift",
+    "canonical": "decision-citation-drift",
+    "aliases": [
+      "kiểm tra trôi trích dẫn quyết định",
+      "citation-drift-check"
+    ],
+    "meaning": "Read-only detection check for bare citations and decision drift.",
+    "layer": "infra",
+    "tier": 9,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "citation-format defect checks"
+    ],
+    "mustNotOwn": [
+      "decision index authority"
+    ],
+    "spec": "docs/platform/decision-citation-drift/spec.md",
+    "source": [
+      "docs/platform/decision-citation-drift/"
+    ],
+    "status": "retired"
+  },
+  {
+    "id": "herdr-web-dashboard",
+    "canonical": "herdr-web-dashboard",
+    "aliases": [
+      "bảng điều khiển web herdr",
+      "web-dashboard-portal"
+    ],
+    "meaning": "Web dashboard surface and interface daemon for fgOS work observation.",
+    "layer": "entry",
+    "tier": 9,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "web dashboard portal"
+    ],
+    "mustNotOwn": [
+      "platform kernel truth"
+    ],
+    "spec": "docs/platform/herdr-web-dashboard/spec.md",
+    "source": [
+      "docs/platform/herdr-web-dashboard/"
+    ],
+    "status": "retired"
+  },
+  {
+    "id": "agent-coordination",
+    "canonical": "agent-coordination",
+    "aliases": [
+      "điều phối tác tử",
+      "Agent Coordination"
+    ],
+    "meaning": "Agent coordination area portal; former coordination engine retired, execution uses runner/Workflow.",
+    "layer": "use-case",
+    "tier": 5,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "coordination area navigation and historical evidence"
+    ],
+    "mustNotOwn": [
+      "current execution loop"
+    ],
+    "spec": "docs/platform/agent-coordination/spec.md",
+    "source": [
+      "docs/platform/agent-coordination/"
+    ],
+    "status": "retired"
+  },
+  {
+    "id": "ui-spec",
+    "canonical": "ui-spec",
+    "aliases": [
+      "đặc tả giao diện",
+      "visual-contracts-spec"
+    ],
+    "meaning": "Visual contracts and UI specifications for fgOS web surfaces.",
+    "layer": "entry",
+    "tier": 9,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "visual contracts and dashboard UI specification"
+    ],
+    "mustNotOwn": [
+      "functional behavior truth"
+    ],
+    "spec": "docs/platform/ui-spec/spec.md",
+    "source": [
+      "docs/platform/ui-spec/"
+    ],
+    "status": "retired"
+  },
+  {
+    "id": "fgos-gateway",
+    "canonical": "fgos-gateway",
+    "aliases": [
+      "fgos Gateway",
+      "cổng kết nối fgos"
+    ],
+    "meaning": "Detached gateway daemon serving REST API, MCP search/execute, and embedded web dashboard.",
+    "layer": "entry",
+    "tier": 9,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "REST API, MCP gateway, embedded web dashboard bundle"
+    ],
+    "mustNotOwn": [
+      "transport internals",
+      "in-process runner"
+    ],
+    "spec": "docs/platform/herdr-web-dashboard/spec.md",
+    "source": [
+      "apps/fgos-gateway/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "herdr-transport",
+    "canonical": "herdr-transport",
+    "aliases": [
+      "Herdr transport",
+      "vận chuyển herdr"
+    ],
+    "meaning": "Default transport for out-of-process runs, pane execution liveness, and herdr dashboard plugin.",
+    "layer": "infra",
+    "tier": 1,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "herdr transport, pane liveness, and dashboard plugin adapter"
+    ],
+    "mustNotOwn": [
+      "assignment lifecycle decisions"
+    ],
+    "spec": "docs/platform/herdr-web-dashboard/spec.md",
+    "source": [
+      "packages/herdr-fgos-common/rust/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "domain-components",
+    "canonical": "domain-components",
+    "aliases": [
+      "Domain Components And Extension Layer",
+      "tầng thành phần miền"
+    ],
+    "meaning": "Domain-specific behavior, workflows, skills, task specs, and doctrine.",
+    "layer": "domain",
+    "tier": 7,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "domain-specific workflows, skills, task specs, and doctrine"
+    ],
+    "mustNotOwn": [
+      "generic runner primitives",
+      "state store kernel"
+    ],
+    "spec": "docs/platform/component-boundary.md",
+    "source": [
+      "domains/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "agent-coordination-engine",
+    "canonical": "agent-coordination-engine",
+    "aliases": [
+      "Agent Coordination Engine",
+      "động cơ điều phối tác tử"
+    ],
+    "meaning": "Authority for CoordinationSession manifest/events, actor bounds, session recovery, and synthesis boundary.",
+    "layer": "use-case",
+    "tier": 5,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "CoordinationSession manifest/events, Assignment membership, actor/topology/bounds, session recovery"
+    ],
+    "mustNotOwn": [
+      "Work stage/status/claim/return, declared Work operation selection, dispatch mechanism"
+    ],
+    "spec": "docs/platform/agent-coordination/spec.md",
+    "source": [
+      "docs/platform/agent-coordination/"
+    ],
+    "status": "retired"
+  },
+  {
+    "id": "team-cognition-engine",
+    "canonical": "team-cognition-engine",
+    "aliases": [
+      "Team Cognition Engine",
+      "động cơ nhận thức nhóm"
+    ],
+    "meaning": "Typed deliberation interpretation, aggregation-method semantics, and cognitive outcomes.",
+    "layer": "use-case",
+    "tier": 5,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "typed deliberation interpretation, aggregation semantics, source/dissent coverage validation"
+    ],
+    "mustNotOwn": [
+      "CoordinationSession terminal transitions, dispatch, Work lifecycle"
+    ],
+    "spec": "docs/platform/agent-coordination/spec.md",
+    "source": [
+      "docs/platform/agent-coordination/"
+    ],
+    "status": "designed"
+  },
+  {
+    "id": "domain-registry-loader",
+    "canonical": "domain-registry-loader",
+    "aliases": [
+      "Domain Registry And Definition Loader",
+      "bộ đăng ký và nạp định nghĩa miền"
+    ],
+    "meaning": "General runtime definition registry and config loader for domains, workflows, and declarations.",
+    "layer": "infra",
+    "tier": 7,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "runtime definition registry, domain and workflow loader, flow definition validation"
+    ],
+    "mustNotOwn": [
+      "runtime session state",
+      "Work lifecycle writes"
+    ],
+    "spec": "docs/platform/component-boundary.md",
+    "source": [
+      "domains/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "coding-domain",
+    "canonical": "coding-domain",
+    "aliases": [
+      "Coding Domain Component",
+      "thành phần miền lập trình"
+    ],
+    "meaning": "Coding Domain Core, policies, repo scope, footprint, worktree isolation, merge catchup, and code verification doctrine.",
+    "layer": "domain",
+    "tier": 7,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "coding domain policies, worktree isolation doctrine, merge/catchup, code verification doctrine"
+    ],
+    "mustNotOwn": [
+      "generic Work lifecycle",
+      "generic Agent Coordination runtime"
+    ],
+    "spec": "docs/platform/component-boundary.md",
+    "source": [
+      "domains/coding/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "group-thinking",
+    "canonical": "group-thinking",
+    "aliases": [
+      "Group-Thinking pack and skill",
+      "Group-Thinking Protocol Pack",
+      "fgos-group-thinking"
+    ],
+    "meaning": "Versioned CoordinationProtocol definitions and skill for structured multi-agent deliberation.",
+    "layer": "domain",
+    "tier": 7,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "group-thinking protocol definitions, public request and replay adapters, fgos-group-thinking skill"
+    ],
+    "mustNotOwn": [
+      "session state mutation",
+      "terminal authority"
+    ],
+    "spec": "docs/platform/component-boundary.md",
+    "source": [
+      ".agents/skills/fgos-group-thinking/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "enduser-docs-authoring",
+    "canonical": "enduser-docs-authoring",
+    "aliases": [
+      "soạn thảo tài liệu người dùng cuối",
+      "enduser-docs-author"
+    ],
+    "meaning": "Authority for authoring and maintaining end-user documentation.",
+    "layer": "domain",
+    "tier": 7,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "end-user documentation authoring and maintenance"
+    ],
+    "mustNotOwn": [
+      "platform specification authority"
+    ],
+    "spec": "docs/platform/work-state/spec.md",
+    "source": [
+      "docs/platform/work-state/"
+    ],
+    "status": "live"
+  },
+  {
+    "id": "enduser-docs-index",
+    "canonical": "enduser-docs-index",
+    "aliases": [
+      "đánh chỉ mục tài liệu người dùng cuối",
+      "enduser-docs-tag-index"
+    ],
+    "meaning": "Authority for tag-based indexing of end-user documentation.",
+    "layer": "domain",
+    "tier": 7,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "end-user documentation tag-based indexing"
+    ],
+    "mustNotOwn": [
+      "document authoring decisions"
+    ],
+    "spec": "docs/platform/work-state/spec.md",
+    "source": [
+      "docs/platform/work-state/"
     ],
     "status": "live"
   }

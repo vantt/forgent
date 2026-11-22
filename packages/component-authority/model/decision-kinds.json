@@ -1,0 +1,92 @@
+[
+  {
+    "id": "agent-confinement",
+    "canonical": "decision-kind:agent-confinement",
+    "aliases": [
+      "confinement-authority"
+    ],
+    "meaning": "Decisions on agent sandboxing, isolation boundaries, and process containment.",
+    "owner": "agent-confinement",
+    "narrative": "docs/platform/agent-confinement/decisions/"
+  },
+  {
+    "id": "packaging-distribution",
+    "canonical": "decision-kind:packaging-distribution",
+    "aliases": [
+      "distribution"
+    ],
+    "meaning": "Decisions on packaging, installation, upgrade, distribution health, and doctor checks.",
+    "owner": "packaging-distribution",
+    "narrative": "docs/platform/packaging-distribution/decisions/"
+  },
+  {
+    "id": "enduser-docs-authoring",
+    "canonical": "decision-kind:enduser-docs-authoring",
+    "aliases": [
+      "soạn tài liệu người dùng cuối"
+    ],
+    "meaning": "Decisions on authoring and maintaining end-user documentation.",
+    "owner": "enduser-docs-authoring",
+    "narrative": "docs/platform/work-state/decisions/"
+  },
+  {
+    "id": "enduser-docs-index",
+    "canonical": "decision-kind:enduser-docs-index",
+    "aliases": [
+      "chỉ mục tài liệu người dùng cuối"
+    ],
+    "meaning": "Decisions on tag-based indexing of end-user documentation.",
+    "owner": "enduser-docs-index",
+    "narrative": "docs/platform/work-state/decisions/"
+  },
+  {
+    "id": "observe",
+    "canonical": "decision-kind:observe",
+    "aliases": [
+      "quan sát số liệu"
+    ],
+    "meaning": "Decisions on event tracing, metrics, telemetry, and observability.",
+    "owner": "observe",
+    "narrative": "docs/platform/observe/decisions/"
+  },
+  {
+    "id": "questions",
+    "canonical": "decision-kind:questions",
+    "aliases": [
+      "câu hỏi quyết định"
+    ],
+    "meaning": "Decisions on structured questions, owner interaction gates, and clarification lifecycle.",
+    "owner": "questions",
+    "narrative": "docs/platform/questions/spec.md"
+  },
+  {
+    "id": "runner",
+    "canonical": "decision-kind:runner",
+    "aliases": [
+      "vận hành runner"
+    ],
+    "meaning": "Decisions on unit execution, agent lifecycle, runner dispatch, and attempts.",
+    "owner": "runner",
+    "narrative": "docs/platform/runner/decisions/"
+  },
+  {
+    "id": "work-state",
+    "canonical": "decision-kind:work-state",
+    "aliases": [
+      "quyết định trạng thái công việc"
+    ],
+    "meaning": "Decisions on work items, lifecycle states, transitions, and state store.",
+    "owner": "work-state",
+    "narrative": "docs/platform/work-state/decisions/"
+  },
+  {
+    "id": "component-authority",
+    "canonical": "decision-kind:component-authority",
+    "aliases": [
+      "quyết định mô hình cấu trúc"
+    ],
+    "meaning": "Decisions on system structural model, component boundaries, decision kinds, doors, and contracts.",
+    "owner": "component-authority",
+    "narrative": "docs/platform/component-authority/spec.md"
+  }
+]

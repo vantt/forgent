@@ -28,27 +28,30 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-function loadModel(modelDir = path.join(root, 'packages/component-authority/model')) {
-  const layers = JSON.parse(fs.readFileSync(path.join(modelDir, 'layers.json'), 'utf8'));
-  const tiers = JSON.parse(fs.readFileSync(path.join(modelDir, 'tiers.json'), 'utf8'));
-  const files = JSON.parse(fs.readFileSync(path.join(modelDir, 'files.json'), 'utf8'));
-  const doorsDir = path.join(modelDir, 'doors');
-  const doorFiles = fs.readdirSync(doorsDir).filter((f) => f.endsWith('.json')).sort();
-  const doors = doorFiles.map((file) => JSON.parse(fs.readFileSync(path.join(doorsDir, file), 'utf8')));
-  return {
-    layers: layers.layers,
-    rules: layers.rules,
-    domains: layers.domains,
-    tierNames: layers.tierNames,
-    tiers: tiers.tiers,
-    tierExceptions: tiers.tierExceptions ?? layers.tierExceptions ?? [],
-    doors,
-    files,
-  };
+export function resolveComponentForFile(file, components) {
+  let best = null;
+  let bestLen = -1;
+  let candidates = [];
+  for (const comp of components) {
+    if (!Array.isArray(comp.paths)) continue;
+    for (const p of comp.paths) {
+      const hit = p.endsWith('/') ? file.startsWith(p) : file === p;
+      if (hit) {
+        if (p.length > bestLen) {
+          bestLen = p.length;
+          best = comp;
+          candidates = [comp];
+        } else if (p.length === bestLen) {
+          candidates.push(comp);
+        }
+      }
+    }
+  }
+  if (candidates.length > 1) {
+    throw new Error(`Multiple components claiming same longest prefix for "${file}": ${candidates.map((c) => c.id).join(', ')}`);
+  }
+  return best;
 }
-
-const manifest = loadModel();
-const rank = new Map(manifest.layers.map((layer, i) => [layer, i]));
 
 function mjsFilesUnder(dir) {
   const fullPath = path.join(root, dir);
@@ -61,6 +64,67 @@ function mjsFilesUnder(dir) {
     .filter((e) => e.isFile() && e.name.endsWith('.mjs'))
     .map((e) => path.relative(root, path.join(e.parentPath, e.name)).split(path.sep).join('/'));
 }
+
+function loadModel(modelDir = path.join(root, 'packages/component-authority/model')) {
+  const layers = JSON.parse(fs.readFileSync(path.join(modelDir, 'layers.json'), 'utf8'));
+  const components = JSON.parse(fs.readFileSync(path.join(modelDir, 'components.json'), 'utf8'));
+  const doorsDir = path.join(modelDir, 'doors');
+  const doorFiles = fs.readdirSync(doorsDir).filter((f) => f.endsWith('.json')).sort();
+  const doors = doorFiles.map((file) => JSON.parse(fs.readFileSync(path.join(doorsDir, file), 'utf8')));
+
+  const tiers = {};
+  for (const comp of components) {
+    if (Array.isArray(comp.paths)) {
+      for (const p of comp.paths) {
+        if (p.startsWith('src/') || p.startsWith('bin/')) {
+          tiers[p] = comp.tier;
+        }
+      }
+    }
+    if (Array.isArray(comp.exceptions)) {
+      for (const exc of comp.exceptions) {
+        if (exc.tier !== undefined && (exc.path.startsWith('src/') || exc.path.startsWith('bin/'))) {
+          tiers[exc.path] = exc.tier;
+        }
+      }
+    }
+  }
+
+  const allMjs = [...mjsFilesUnder('src'), ...mjsFilesUnder('bin')].sort();
+  const files = {};
+  for (const file of allMjs) {
+    const comp = resolveComponentForFile(file, components);
+    if (!comp) {
+      throw new Error(`File "${file}" does not resolve to any component`);
+    }
+    let layerExc = null;
+    let maxLayerLen = -1;
+    for (const exc of comp.exceptions || []) {
+      if (exc.layer === undefined) continue;
+      const hit = exc.path.endsWith('/') ? file.startsWith(exc.path) : file === exc.path;
+      if (hit && exc.path.length > maxLayerLen) {
+        maxLayerLen = exc.path.length;
+        layerExc = exc;
+      }
+    }
+    files[file] = layerExc?.layer ?? comp.layer;
+  }
+
+  return {
+    layers: layers.layers,
+    rules: layers.rules,
+    domains: layers.domains,
+    tierNames: layers.tierNames,
+    tiers,
+    tierExceptions: layers.tierExceptions ?? [],
+    doors,
+    files,
+    components,
+  };
+}
+
+const manifest = loadModel();
+const rank = new Map(manifest.layers.map((layer, i) => [layer, i]));
 
 const onDisk = [...mjsFilesUnder('src'), ...mjsFilesUnder('bin')].sort();
 const inManifest = Object.keys(manifest.files).sort();
@@ -156,8 +220,35 @@ function relativeSpecifiers(source) {
   ];
 }
 
-test('đủ sổ: file .mjs trên đĩa ↔ row trong manifest, một-một', () => {
-  assert.deepEqual(onDisk, inManifest);
+test('every .mjs under src/ and bin/ resolves to exactly one component', () => {
+  for (const file of onDisk) {
+    const comp = resolveComponentForFile(file, manifest.components);
+    assert.ok(comp, `${file} không resolve về component nào`);
+  }
+  // Two components claiming the same longest prefix is red:
+  const duplicate = [
+    { id: 'comp-a', paths: ['src/dup/'], layer: 'infra', tier: 1 },
+    { id: 'comp-b', paths: ['src/dup/'], layer: 'kernel', tier: 2 },
+  ];
+  assert.throws(
+    () => resolveComponentForFile('src/dup/file.mjs', duplicate),
+    /Multiple components claiming same longest prefix/,
+  );
+});
+
+test('every component exceptions[].path exists on disk and resolves to the component that declares it', () => {
+  for (const comp of manifest.components) {
+    for (const exc of comp.exceptions ?? []) {
+      const fullPath = path.join(root, exc.path);
+      assert.ok(fs.existsSync(fullPath), `exception path "${exc.path}" declared by ${comp.id} must exist on disk`);
+      const resolved = resolveComponentForFile(exc.path, manifest.components);
+      assert.equal(
+        resolved?.id,
+        comp.id,
+        `exception path "${exc.path}" declared by ${comp.id} must resolve to ${comp.id}, got ${resolved?.id}`,
+      );
+    }
+  }
 });
 
 test('mọi row dùng tầng đã khai trong layers', () => {
@@ -1604,23 +1695,6 @@ test('retired pattern literals appear only in permitted refusal and decoder path
   assert.deepEqual(violations, []);
 });
 
-test('loops and patterns architecture manifest paths exist and all files on disk are declared', () => {
-  const manifest = loadModel();
-  const declared = Object.keys(manifest.files).filter((f) => f.startsWith('src/runner/execution/loops/') || f.startsWith('src/runner/execution/patterns/'));
-
-  for (const p of declared) {
-    assert.ok(fs.existsSync(path.join(root, p)), `declared file "${p}" must exist on disk`);
-  }
-
-  for (const d of ['src/runner/execution/loops', 'src/runner/execution/patterns']) {
-    for (const ent of fs.readdirSync(path.join(root, d), { withFileTypes: true })) {
-      if (ent.isFile() && ent.name.endsWith('.mjs')) {
-        const rel = `${d}/${ent.name}`;
-        assert.ok(manifest.files[rel] !== undefined, `file "${rel}" on disk must be declared in packages/component-authority/model/`);
-      }
-    }
-  }
-});
 
 // The shell entry loads little at start. Its static imports are the four leaves below plus the arm imports named in
 // ARM_STATIC_IMPORTS, a list that only shrinks: each layer phase that moves an arm's logic down into its owning layer

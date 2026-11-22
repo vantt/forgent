@@ -462,7 +462,7 @@ export function discoverKnownOwners(projectRoot, options = {}) {
       if (Array.isArray(components)) {
         for (const comp of components) {
           const id = comp && typeof comp.id === 'string' ? comp.id.trim() : '';
-          if (id) {
+          if (id && !comp.parent) {
             owners.add(id);
           }
         }
