@@ -1945,7 +1945,7 @@
           },
           "relation": {
             "type": "string",
-            "description": "none|supersedes:<id>|touches:<id> -- every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep."
+            "description": "none|supersedes:<id>|amends:<id>|touches:<id> -- amends:<id> changes part of <id>, which stays in force; every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> or amends:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep."
           },
           "scope": {
             "type": "string",

@@ -1662,7 +1662,7 @@ export function decisionTextLooksLikeSupersession(text) {
 
 /**
  * Pure: parse `fgos decision`'s `--relation` value into a structured
- * relation (D2: "supersedes:<id>|touches:<id>|none", every write declares
+ * relation (D2: "supersedes:<id>|amends:<id>|touches:<id>|none", every write declares
  * one explicitly — no default, no inference). Throws `StoreError('validation', …)`
  * on anything else, the same error shape every other CLI-facing parse in
  * this module uses.
@@ -1671,7 +1671,7 @@ export function parseDecisionRelation(raw) {
   if (typeof raw !== 'string' || !raw.trim()) {
     throw new StoreError(
       'validation',
-      'decision requires --relation none|supersedes:<id>|touches:<id>.',
+      'decision requires --relation none|supersedes:<id>|amends:<id>|touches:<id>.',
     );
   }
   const trimmed = raw.trim();
@@ -1680,13 +1680,18 @@ export function parseDecisionRelation(raw) {
   if (supersedesMatch && supersedesMatch[1].trim()) {
     return { kind: 'supersedes', id: supersedesMatch[1].trim() };
   }
+  // amends:<id> -- the new decision changes part of <id>, and <id> stays in force.
+  const amendsMatch = /^amends:(.+)$/.exec(trimmed);
+  if (amendsMatch && amendsMatch[1].trim()) {
+    return { kind: 'amends', id: amendsMatch[1].trim() };
+  }
   const touchesMatch = /^touches:(.+)$/.exec(trimmed);
   if (touchesMatch && touchesMatch[1].trim()) {
     return { kind: 'touches', id: touchesMatch[1].trim() };
   }
   throw new StoreError(
     'validation',
-    `decision --relation "${raw}" is not one of none|supersedes:<id>|touches:<id>.`,
+    `decision --relation "${raw}" is not one of none|supersedes:<id>|amends:<id>|touches:<id>.`,
   );
 }
 

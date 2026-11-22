@@ -1,7 +1,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // test/state/decision-relation.test.mjs — tsk-1lv-1: `fgos decision`
-// requires `--relation none|supersedes:<id>|touches:<id>` (D2/D8), refuses
+// requires `--relation none|supersedes:<id>|amends:<id>|touches:<id>` (D2/D8), refuses
 // a write whose text narrates a supersession without declaring one (STR72's
 // own root cause), and `supersedes` runs a write-time citation sweep across
 // docs/**+src/**+plugins/** (widened from the pre-existing backlog.md+
@@ -64,6 +64,10 @@ test('parseDecisionRelation: "supersedes:<id>" parses to {kind, id}', () => {
   assert.deepEqual(parseDecisionRelation('supersedes:0012'), { kind: 'supersedes', id: '0012' });
 });
 
+test('parseDecisionRelation: "amends:<id>" parses to its own kind, never folded into supersedes', () => {
+  assert.deepEqual(parseDecisionRelation('amends:D-ADR0026'), { kind: 'amends', id: 'D-ADR0026' });
+});
+
 test('parseDecisionRelation: "touches:<id>" parses to {kind, id}', () => {
   assert.deepEqual(parseDecisionRelation('touches:tsk-1lv'), { kind: 'touches', id: 'tsk-1lv' });
 });
@@ -82,9 +86,10 @@ test('parseDecisionRelation: undefined/empty throws StoreError validation', () =
 test('parseDecisionRelation: an unrecognized shape throws StoreError validation', () => {
   assert.throws(
     () => parseDecisionRelation('bogus'),
-    (err) => err instanceof StoreError && err.category === 'validation' && /not one of none\|supersedes:<id>\|touches:<id>/.test(err.message),
+    (err) => err instanceof StoreError && err.category === 'validation' && /not one of none\|supersedes:<id>\|amends:<id>\|touches:<id>/.test(err.message),
   );
   assert.throws(() => parseDecisionRelation('supersedes:'), (err) => err instanceof StoreError);
+  assert.throws(() => parseDecisionRelation('amends:'), (err) => err instanceof StoreError);
 });
 
 // --- decisionTextLooksLikeSupersession (pure) ---
@@ -213,17 +218,19 @@ test('CLI: text that reads like a supersession without --relation supersedes:<id
   assert.match(result.stderr, /supersession/);
 });
 
-test('CLI: the same supersession text passes once --relation supersedes:<id> is declared', () => {
-  const cwd = initCwd();
-  const result = run(cwd, [
-    'decision',
-    '--text', 'this decision supersedes the earlier approach',
-    '--rationale', 'because reasons',
-    '--relation', 'supersedes:0012',
-  ]);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.relation, 'supersedes:0012');
+test('CLI: the same supersession text passes once --relation supersedes:<id> or amends:<id> is declared', () => {
+  for (const relation of ['supersedes:0012', 'amends:0012']) {
+    const cwd = initCwd();
+    const result = run(cwd, [
+      'decision',
+      '--text', 'this decision supersedes the earlier approach',
+      '--rationale', 'because reasons',
+      '--relation', relation,
+    ]);
+    assert.equal(result.status, 0, relation);
+    const data = envelopeData(result.stdout);
+    assert.equal(data.relation, relation);
+  }
 });
 
 // --- CLI: write-time citation sweep (supersedes only) ---
@@ -295,20 +302,22 @@ test('CLI: supersedes without --id (a platform/--scope decision) still surfaces 
   assert.match(data.danglingCitations[0], /example\.md:1/);
 });
 
-test('CLI: touches does not run the dangling-citation sweep', () => {
-  const cwd = initCwd();
-  fs.mkdirSync(path.join(cwd, 'docs', 'specs'), { recursive: true });
-  fs.writeFileSync(path.join(cwd, 'docs', 'specs', 'example.md'), 'cites OLDID with no other context\n');
+test('CLI: touches and amends do not run the dangling-citation sweep, because the target stays in force', () => {
+  for (const relation of ['touches:OLDID', 'amends:OLDID']) {
+    const cwd = initCwd();
+    fs.mkdirSync(path.join(cwd, 'docs', 'specs'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, 'docs', 'specs', 'example.md'), 'cites OLDID with no other context\n');
 
-  const result = run(cwd, [
-    'decision',
-    '--text', 'D2: touches OLDID for context only',
-    '--rationale', 'because reasons',
-    '--relation', 'touches:OLDID',
-  ]);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  assert.ok(!('danglingCitations' in data));
+    const result = run(cwd, [
+      'decision',
+      '--text', 'D2: refers to OLDID for context only',
+      '--rationale', 'because reasons',
+      '--relation', relation,
+    ]);
+    assert.equal(result.status, 0, relation);
+    const data = envelopeData(result.stdout);
+    assert.ok(!('danglingCitations' in data), relation);
+  }
 });
 
 test('CLI: supersedes with D-local id scopes sweep to host item CONTEXT.md only (tsk-679 regression)', () => {

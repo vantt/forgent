@@ -1771,12 +1771,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // (`kind:'engine'`, resolveDiscovery/resolvePlan) writes through
       // `addDecision` directly, not this CLI case, so it is unaffected
       // (CONTEXT.md D4: "không đổi").
-      const relationRaw = requireField(flags.relation, 'decision requires --relation none|supersedes:<id>|touches:<id>');
+      const relationRaw = requireField(flags.relation, 'decision requires --relation none|supersedes:<id>|amends:<id>|touches:<id>');
       const relation = parseDecisionRelation(relationRaw);
-      if (relation.kind !== 'supersedes' && decisionTextLooksLikeSupersession(text)) {
+      if (relation.kind !== 'supersedes' && relation.kind !== 'amends' && decisionTextLooksLikeSupersession(text)) {
         throw new StoreError(
           'validation',
-          'decision text reads like a supersession ("supersedes/replaces/overrides/no longer applies/instead of the previous") but --relation supersedes:<id> was not declared -- declare the relation explicitly (or rephrase the text if it is not actually a supersession).',
+          'decision text reads like a supersession ("supersedes/replaces/overrides/no longer applies/instead of the previous") but neither --relation supersedes:<id> nor amends:<id> was declared -- declare the relation explicitly (or rephrase the text if it is not actually a supersession).',
         );
       }
       const { event } = addDecision(dir, { text, rationale, alternatives, source, id, scope, kind, relation: relation.kind === 'none' ? 'none' : `${relation.kind}:${relation.id}` });
@@ -1784,8 +1784,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // Write-time citation sweep (D2 "sweep tươi tại write-time, không
       // cache"): only `supersedes` has a real dangling-citation shape (a
       // line citing the OLD id without acknowledging the new one) -- a
-      // `touches:<id>` write references `id` without replacing anything,
-      // so there is nothing for this sweep to flag as stale (round 3's
+      // `touches:<id>` or `amends:<id>` write leaves `id` in force (amends
+      // changes only part of it), so there is nothing for this sweep to flag as stale (round 3's
       // "chạy CÙNG sweep này ở thời điểm log thường" is about the same
       // machinery being exercised at every write, not a claim that
       // `touches` produces findings). Non-blocking either way -- a

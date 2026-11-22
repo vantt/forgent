@@ -991,7 +991,7 @@ export const COMMAND_REGISTRY = [
         alternatives: { type: 'string', description: 'What was considered and rejected, and why (optional).' },
         source: { type: 'string', description: 'Free text identifying who/what made the decision (optional, defaults to "session").' },
         id: { type: 'string', description: 'Work item id to also fold this decision under (optional; omit for the global log only).' },
-        relation: { type: 'string', description: 'none|supersedes:<id>|touches:<id> -- every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.' },
+        relation: { type: 'string', description: 'none|supersedes:<id>|amends:<id>|touches:<id> -- amends:<id> changes part of <id>, which stays in force; every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> or amends:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.' },
         scope: { type: 'string', description: 'An area slug (e.g. "repo", or one matching docs/platform/governance.md#decision-scope-to-holder-table) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by "fgos decision-index". Optional; omit for an item-scoped (--id) or unscoped decision.' },
       },
       positional: ['text'],
