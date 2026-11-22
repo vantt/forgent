@@ -171,7 +171,7 @@ the grants, verb by verb.
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Baseline: wake rate and idle alarms](phase-01-baseline-wake-and-idle.md) | - | plans/261122-0118-heads-stable-and-able/reports/baseline-wake-and-idle.md | 1 | done |
-| 2 | [Head verbs through the request socket](phase-02-head-verbs.md) | - | src/session-host/head-grants.mjs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, test/session-host/head-start.test.mjs, apps/fgos/src/routing.rs, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/rust/tests/head_request.rs, docs/platform/session-host/spec.md | 1 | running |
+| 2 | [Head verbs through the request socket](phase-02-head-verbs.md) | - | src/session-host/head-grants.mjs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, test/session-host/head-start.test.mjs, apps/fgos/src/routing.rs, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/rust/tests/head_request.rs, docs/platform/session-host/spec.md | 1 | done |
 | 3 | [The land door runs the plan check](phase-03-land-plan-check.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, core/skills/_shared/plan-contract.md, .agents/skills/**, plugins/fgOS/skills/**, .fgos/config.yaml | 1 | done |
 | 4 | [Coordinating heads keep their provider floor](phase-04-provider-floor.md) | 3 | .fgos/config.yaml, test/session-host/head-start.test.mjs | 2 | done |
 | 5 | [A live head's requests run the active release](phase-05-release-pickup.md) | 2, 6 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/run-supervisor/spec.md | 3 | done |
@@ -205,9 +205,11 @@ writer, phase 11.
   blockers. The supervisor already raised the B half. The phase stays `running` until step 4's 24-hour measure
   (`reports/secretary-wake.md`).
 - **Phase 8** steps 1-3 landed (`827bbb7e1`); it stays `running` until step 4's 24-hour measure.
-- **Phase 2 step 10** (`config patch` for the supervisor) is on `p02h` (`31dcaab69`). The review found no blockers.
-  Its nits are fixed in `3a00fc207`: bounded args, `--global`/`--project-only` refused from a confined caller, and a
-  relative path documented as read from the project root.
+- **Phase 2 done:** step 10 (`config patch` for the supervisor) landed as `3e13a0e61` (`p02h`, `31dcaab69` plus the
+  review fixes `3a00fc207`: bounded args, `--global`/`--project-only` refused from a confined caller, and a relative
+  path documented as read from the project root). The supervisor can use it once a release carrying it is activated.
+- **Next:** phase 7 follow-up once `q-d5mrno2mfk` is answered (apply the carry diff on a fresh tip worktree, add the two
+  `worktree_removal: None` lines, land). Phases 8, 9 and 10 finish with their 24-hour measures. Phase 11 runs after them.
 - **Phase 7 follow-up parked on `q-d5mrno2mfk`:** the removal is green in its crate (land 57/57, fgos-supervision
   152/152) and saved in `reports/carry-p07c-landed-worktree-removal.diff`. The fgos binary still needs
   `worktree_removal: None` at two `LandPorts` literals in `apps/fgos/src/wiring/session_write_publish.rs`, which is
@@ -218,7 +220,7 @@ writer, phase 11.
   (`.git` is read-only), and a prompt-less `run --sync` is refused through the socket (`bad-args`), so both branches were
   recut at the tip and reapplied by a unit.
 - **Worktrees safe to remove** (landed or superseded): p02e, p02f, p02g, p04, p06, p06c, p06d, p06e, p06f, p08, p10,
-  p10b, p05c.
+  p10b, p05c, p02h.
 
 ### Lead progress (2026-11-22 15:20, head:lead-forgent-261122-0118-heads-b52f9)
 
