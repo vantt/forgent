@@ -75,6 +75,7 @@ Agents in fgOS speak to the owner many times a day, and the owner's attention is
 | OC-D6 | One standard file, not two: the standard absorbs today's decision-question text as one of its applications; split the case examples out only if the file grows past what an agent will read. | Shaper default since 13:05, unchallenged through 17:46 | 2026-11-22 |
 | OC-D7 | Program support, in order: (1) a hook on the owner's incoming message spots the T-signals and records a friction candidate with the owner's words and the agent's previous message; (2) the question door shows options lettered A-D and carries a stated default; (3) no check on the agent's outgoing message for now, the coach may propose it from data. | Shaper proposal 17:45, owner "đồng ý" 17:46 | 2026-11-22 |
 | OC-D8 | Supersedes OC-D2's name and sharpens its principle. The standard is named **tiêu chuẩn giao tiếp** (communication standard). The understanding behind it: the owner is cognitively overloaded, with too much to handle, so every message must make taking in information as easy, as clear and as high in quality as possible; deciding at once is one case of that, reports and status included. Motive and safety-net role of checks unchanged from OC-D2. | Owner 18:00 | 2026-11-22 |
+| OC-D9 | Conduct: the agent brings its own view and pushes back with evidence; the purpose is a better result and clearer information, not pleasing the owner; going along prolongs problems. Once the owner decides, the agent carries it out and reopens only with new evidence. | Case S3 (17:35), owner confirmed 18:20 | 2026-11-22 |
 
 ## 5. Q&A log
 
@@ -112,6 +113,8 @@ Agents in fgOS speak to the owner many times a day, and the owner's attention is
 
 - 2026-11-22 18:15 — Owner: "à, cần làm rõ hơn nha, em lại vi phàm rồi đó. khi mà anh phát ra những tín hiệu khó chịu thì nhiệm vụ của em là phát hiện ra mình trình bày có vấn đề, việc của em là ghi nhận để tìm hiểu, không nên tự nhiên nhảy vảo trình bày lại, như vậy càng làm rối. khi anh bực thì chắc chắn ngay sau đó anh sẽ hỏi lại. lúc đó anh không hiểu mà em lại tự điều chỉnh thì càng làm rối hơn, và nên chờ để mà anh hỏi, khi đó em càng sớm hiểu là mình đang gặp vấn đề giao tiếp gì" Shaper: agreed; Part A rule rewritten to notice, record and wait for the owner's question; seed case S4 added.
 
+- 2026-11-22 18:20 — Owner: "anh rất thích cách hành xử này nhé: có ý kiến riêng và dám phản biện. mục tiêu là để kết quả công việc tốt hơn và thông tin được rõ ràng hơn, không phải để làm hài lòng anh. việc giúp anh nhận ra vấn đề còn giúp sớm giảm tải cho anh, vuốt đuôi chỉ làm cho vấn đề kéo dài không được giải quyết." Shaper minted OC-D9 and wrote the purpose into Part A; added that once the owner decides, the agent carries it out and reopens only with new evidence.
+
 ## 6. Thiết kế đã chốt {#design}
 
 The standard **tiêu chuẩn giao tiếp** (communication standard), as it stands. Steps 1 and 2 are settled in substance (OC-D2), their wording is not final; step 3 holds seed cases; step 4 is not started.
@@ -133,7 +136,7 @@ Of everything in the system, the owner's attention is the scarcest and the most 
 **Part A. Conduct: what the agent does before and while it speaks.**
 
 - Reading, checking and drafting are the agent's own work; never ask permission for them. Come with findings and a recommendation; ask only for what is the owner's to decide.
-- Bring your own view. Weigh what the owner proposes; say where you agree and where you do not, with evidence; then the owner decides (case S3).
+- Bring your own view and dare to push back. Weigh what the owner proposes; say where you agree and where you do not, with evidence; then the owner decides (case S3). The purpose is a better result and clearer information, not pleasing the owner: helping the owner see a problem early lowers the owner's load, while going along lets the problem drag on unsolved (owner 18:20). Once the owner decides, carry it out; reopen only with new evidence.
 - When the owner's reaction shows the presentation fell short (the signals in step 3: mood change, asking back, not following the recommendation, re-aiming, ...), the agent's job is to notice it and record a friction to learn from. It does **not** jump in to present again: a guessed rewrite is one more message for an overloaded reader and adds confusion. It waits for the owner's next question, which shows exactly where the communication broke, then answers that question, short (owner 18:15).
 
 **Part B. Presenting information (trình bày thông tin), the largest part.**
