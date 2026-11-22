@@ -4403,6 +4403,8 @@ struct ExecutionWorld {
     /// A `node` that records being started and fails, and the PATH that finds it first.
     node_log: PathBuf,
     path: String,
+    /// The host binary the world's calls start.
+    host: PathBuf,
 }
 
 #[cfg(unix)]
@@ -4441,6 +4443,7 @@ impl ExecutionWorld {
             manifest: ensure_dev_manifest(),
             node_log,
             path,
+            host: fgos_bin(),
         }
     }
 
@@ -4456,8 +4459,10 @@ impl ExecutionWorld {
     }
 
     fn command(&self, args: &[&str]) -> Command {
-        let mut command = host_command();
+        let mut command = Command::new(&self.host);
         command
+            .env_remove("FGOS_CONFINED")
+            .env_remove("FGOS_HEAD_REQUEST_SOCKET")
             .args(args)
             .current_dir(&self.project)
             .env("PATH", &self.path)
@@ -5370,6 +5375,107 @@ fn the_execution_route_launch_session_op_refuses_an_incomplete_request_and_answe
 
 /// A project with a stub executor serving `docs:write`, a linked worktree of it, and a `node` the case chooses on a
 /// `PATH` that holds no real agent CLI.
+/// Where the run cases stage the host and the addon, under the checkout's ignored `.fgos/runtime/`.
+#[cfg(unix)]
+const STAGING_DIR: &str = ".fgos/runtime/cli-tests-addon";
+
+/// How long a staged directory another test process touched stays: a run of `cli_tests` takes seconds, so a
+/// directory nobody touched for this long belongs to no running process.
+#[cfg(unix)]
+const STAGING_GRACE: std::time::Duration = std::time::Duration::from_secs(15 * 60);
+
+/// The file a test process touches in each staged directory it uses.
+#[cfg(unix)]
+const STAGING_MARK: &str = ".in-use";
+
+/// Whether `name` is one of the harness's own staged directories: `host-<16 hex>` or `<16 hex>`.
+#[cfg(unix)]
+fn is_staging_name(name: &str) -> bool {
+    let key = name.strip_prefix("host-").unwrap_or(name);
+    key.len() == 16
+        && key
+            .bytes()
+            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+}
+
+/// Marks the staged directories this process uses, then removes the harness's other staged directories that no test
+/// process touched within the grace: a rebuilt host or addon would otherwise keep every old copy (a link keeps the
+/// replaced inode alive). Only names of the harness's own pattern, directly in its staging directory, are removed.
+#[cfg(unix)]
+fn prune_staging(kept: &[PathBuf]) {
+    let dir = fs::canonicalize(repo_root()).unwrap().join(STAGING_DIR);
+    for path in kept {
+        let _ = fs::write(path.join(STAGING_MARK), std::process::id().to_string());
+    }
+    let Ok(entries) = fs::read_dir(&dir) else {
+        return;
+    };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        let name = entry.file_name().to_string_lossy().into_owned();
+        if !is_staging_name(&name)
+            || kept.contains(&path)
+            || !entry.file_type().is_ok_and(|kind| kind.is_dir())
+        {
+            continue;
+        }
+        let touched = fs::metadata(path.join(STAGING_MARK))
+            .or_else(|_| fs::metadata(&path))
+            .and_then(|meta| meta.modified());
+        let stale = touched
+            .ok()
+            .and_then(|at| at.elapsed().ok())
+            .is_some_and(|age| age > STAGING_GRACE);
+        if stale {
+            let _ = fs::remove_dir_all(&path);
+        }
+    }
+}
+
+/// The host the run cases start, under the release root: the payload trusts a manifest only when its
+/// `entries.fgos` resolves to the host that started it, and only while that host lies inside the release root. A
+/// host built outside the checkout (a `CARGO_TARGET_DIR` elsewhere, as the full suite uses) is linked, or copied
+/// when the two sit on different file systems, into the staging directory. Staged once per test process; returns its
+/// path relative to the root and in full.
+#[cfg(unix)]
+fn staged_host() -> (String, PathBuf) {
+    static HOST: std::sync::OnceLock<(String, PathBuf)> = std::sync::OnceLock::new();
+    HOST.get_or_init(|| {
+        use std::os::unix::fs::MetadataExt;
+        let root = fs::canonicalize(repo_root()).unwrap();
+        let host = fs::canonicalize(fgos_bin()).unwrap();
+        if let Ok(inside) = host.strip_prefix(&root) {
+            return (inside.to_string_lossy().into_owned(), host);
+        }
+        let meta = fs::metadata(&host).unwrap();
+        let key = format!(
+            "{:x}",
+            Sha256::digest(
+                format!(
+                    "{}:{}:{}",
+                    host.display(),
+                    meta.len(),
+                    meta.mtime_nsec() + meta.mtime() * 1_000_000_000
+                )
+                .as_bytes()
+            )
+        );
+        let relative = format!("{STAGING_DIR}/host-{}/fgos", &key[..16]);
+        let staged = root.join(&relative);
+        if !staged.exists() {
+            fs::create_dir_all(staged.parent().unwrap()).unwrap();
+            let partial = staged.with_extension(format!("{}.tmp", std::process::id()));
+            let _ = fs::remove_file(&partial);
+            if fs::hard_link(&host, &partial).is_err() {
+                fs::copy(&host, &partial).unwrap();
+            }
+            fs::rename(&partial, &staged).unwrap();
+        }
+        (relative, staged)
+    })
+    .clone()
+}
+
 /// A dev release manifest that also ships this checkout's Node addon, for the runs whose Workflow admission peer is a
 /// real Node payload: the peer's case port reads the Execution Core helpers through the addon, and the payload loads
 /// the addon only from the release manifest it runs under. The addon is built once per test process (cargo reuses a
@@ -5394,7 +5500,7 @@ fn addon_dev_manifest() -> PathBuf {
             let bytes = fs::read(fgos_bin().parent().unwrap().join(library)).unwrap();
             let digest = format!("{:x}", Sha256::digest(&bytes));
             // Named by its digest: a rebuilt addon gets a new directory, an unchanged one is reused.
-            let relative = format!(".fgos/runtime/cli-tests-addon/{}/fgos.node", &digest[..16]);
+            let relative = format!("{STAGING_DIR}/{}/fgos.node", &digest[..16]);
             let staged = repo_root().join(&relative);
             if !staged.exists() {
                 fs::create_dir_all(staged.parent().unwrap()).unwrap();
@@ -5412,6 +5518,14 @@ fn addon_dev_manifest() -> PathBuf {
                 other => other,
             };
             let mut manifest = valid_dev_manifest();
+            let (host_entry, host) = staged_host();
+            // Only directories this process staged are kept; a host inside the checkout keeps none of its own.
+            let mut kept = vec![fs::canonicalize(staged.parent().unwrap()).unwrap()];
+            if host_entry.starts_with(STAGING_DIR) {
+                kept.push(fs::canonicalize(host.parent().unwrap()).unwrap());
+            }
+            prune_staging(&kept);
+            manifest["entries"]["fgos"] = serde_json::json!(host_entry);
             manifest["components"]["nativeAddon"] = serde_json::json!({
                 "capabilities": ["git-wal-v1"],
                 "path": relative,
@@ -5467,6 +5581,7 @@ impl RunWorld {
             .join(":");
         world.path = format!("{}:{agent_free}", node_dir.display());
         world.manifest = addon_dev_manifest();
+        world.host = staged_host().1;
         fs::write(
             world.home.join(".fgos/config.yaml"),
             "runner:\n  executors:\n    stub:\n      kind: agent\n      providerModel: stub\n      allowCrossProvider: true\n      invocations:\n        - id: stub-cli\n          via: cli\n          adapter: cli-spawn\n          command: /bin/true\n          args: [\"{prompt}\"]\n",
