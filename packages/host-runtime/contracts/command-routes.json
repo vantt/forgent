@@ -142,7 +142,8 @@
         "help",
         "file",
         "reason",
-        "global"
+        "global",
+        "project-only"
       ],
       "refresh-docs": [
         "dir",

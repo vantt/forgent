@@ -524,7 +524,7 @@ fn project_config_request(
         "explain" => (&[], &[], 1),
         "set" => (&["reason"], &["global"], 2),
         "unset" => (&["reason"], &["global", "acknowledge-comment-loss"], 1),
-        "patch" => (&["reason"], &["global"], 1),
+        "patch" => (&["reason"], &["global", "project-only"], 1),
         "migrate" => (
             &[],
             &[
@@ -583,6 +583,7 @@ fn project_config_request(
             file: next().into(),
             reason,
             global,
+            project_only: has("project-only")?,
         },
         "refresh-docs" => Verb::RefreshDocs { global },
         _ => {
@@ -1271,7 +1272,26 @@ mod tests {
             Verb::Patch {
                 file: "p.yaml".into(),
                 reason: "r".into(),
-                global: false
+                global: false,
+                project_only: false,
+            }
+        );
+        assert_eq!(
+            config(&[
+                "config",
+                "patch",
+                "p.yaml",
+                "--project-only",
+                "--reason",
+                "r"
+            ])
+            .unwrap()
+            .verb,
+            Verb::Patch {
+                file: "p.yaml".into(),
+                reason: "r".into(),
+                global: false,
+                project_only: true,
             }
         );
         assert_eq!(

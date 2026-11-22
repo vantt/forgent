@@ -230,13 +230,34 @@ fn write(ctx: &Context, roots: &SnapshotRequest, verb: &Verb) -> Result<Value, R
             file,
             reason,
             global,
+            project_only,
         } => {
+            if *project_only && *global {
+                return Err(refuse(
+                    "patch-project-only",
+                    "--project-only and --global cannot be used together",
+                ));
+            }
             let edits = patch_edits(file)?;
             let kinds: Result<Vec<_>, _> = edits
                 .iter()
                 .map(|e| target_of(ctx, edited_path(e), *global))
                 .collect();
             let kinds = kinds?;
+            if *project_only {
+                for (kind, edit) in kinds.iter().zip(&edits) {
+                    if *kind != SourceKind::Project {
+                        return Err(refuse(
+                            "patch-project-only",
+                            format!(
+                                "{} resolves to {}; --project-only permits only project config edits",
+                                format_path(edited_path(edit)),
+                                file_of(*kind),
+                            ),
+                        ));
+                    }
+                }
+            }
             if kinds.iter().any(|k| *k != kinds[0]) {
                 return Err(refuse(
                     "patch-spans-files",
