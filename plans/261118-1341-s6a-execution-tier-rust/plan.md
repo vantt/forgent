@@ -50,7 +50,6 @@ footprint:
   - apps/fgos/src/wiring/execution_routes.rs
   - apps/fgos/src/wiring/attempt_step.rs
   - apps/fgos/src/wiring/steps_runner.rs
-  - apps/fgos/src/wiring/doctor/mod.rs
   - apps/fgos/src/wiring/unit_run_host/**
   - apps/fgos/tests/cli_tests.rs
   - apps/fgos/tests/unit_run_host.rs
@@ -731,3 +730,4 @@ consumes that decision and keeps `src/seat-binding/client.mjs`.
 - 2026-11-21 lead:S6A: phase 20 BLOCKED on Windows: 19c kept `fgos run` on the Node arm on win32 (`legacyOn`) because the engine refuses Windows mutating attempts until the Git door takes custody there. 19 of the remaining 19 files of phase 20's list are in run.mjs's import closure, and switching Workflow/Work to runUnitInHost would make Windows writing units refused. Deleting them (and the caller switches) needs either the Windows custody item landed or an owner decision to drop Windows writing runs; also case-run-paths.mjs and commit-unit-work.mjs stay while plan 261120-0625 holds test/portfolio/work-questions and test/runner/dispatch-confinement-backend-p03.
 - 2026-11-21 lead:S6A: owner answer (via Miu): option (a) — a Git-lane plan builds Windows custody for the Git door with native Windows CI proof first; S6A then deletes the Node execution core whole. No Windows feature dropped, no second win32 path kept. Phases 20 (rest) and 21 wait for that plan; 22 after them.
 - 2026-11-22 lead:S6A: footprint narrowed for plan 261122-0118 (heads stable and able, owner rank 1; supervisor 2026-11-22): dropped apps/fgos/src/routing.rs, src/session-host/head-request.mjs, src/session-rotation/rotate.mjs; packages/run-supervisor/** -> packages/run-supervisor/rust/src/controller/**; apps/fgos/src/wiring/doctor/** -> wiring/doctor/mod.rs. Kept doctor-registry.v1.json (phase 20 drops the dry-bind owner lines, phase 22 the bridge:S6a owners). Phase 20 leaves head-request/rotate imports alone, so the Node modules they import (unit-summary, unit-run-record and rotate's import) stay until 0118 lands; phases 21/22 re-add and rebase before editing any dropped path.
+- 2026-11-22 lead:S6A: apps/fgos/src/wiring/doctor/mod.rs dropped from the footprint (its phase 20 hunk landed in ca4a90eec) for plan 261122-0118; doctor-registry.v1.json stays until s6/p20-3b lands (deleting dry-bind.mjs moves its two judge rows), then drops too; phase 22 re-adds and rebases for the bridge:S6a owner cleanup.
