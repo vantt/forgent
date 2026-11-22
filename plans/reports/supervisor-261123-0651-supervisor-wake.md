@@ -25,3 +25,8 @@
 
 ### (2) probe-account from this session
 - Cannot. `fgos dispatch probe-account --all --json` returns `{"accounts":[]}`. `--provider claude --account vantt` returns: `no account "vantt" for provider "claude" in runner.llmAccounts (~/.fgos/private/accounts.yaml)`. Confinement redirects HOME, so the private accounts file is not visible. q-rfxqncjrax stays: the owner or an unconfined host session (OPC) runs the probe.
+
+## Component-authority done (event 1765f7c344d1f7e0)
+- Plan `261121-2109-component-authority` is `done` at `c52ffa192`. Phase 5 landed `a800db0b8`, so q-4lmw3q6la7 no longer blocks anything. Board log line added; lead stopped.
+- Lead note: worktree p03 is superseded (every edit is on main or replaced by `8606aec16`). The owner can remove it whenever they choose.
+- Doors plan `261121-2110-component-authority-doors`: all five `blockedBy` plans are now `done`, but the plan is still `draft`. A planner pass has to bring it to `ready` before admission. I did not start a planner: the supervisor skill forbids a planner start once a plan's `source` already names the discussion (`ds-at6x3xj2ng`), because a fresh planner could write a second plan. For the secretary: order a planner pass on the existing doors plan if it should go next.
