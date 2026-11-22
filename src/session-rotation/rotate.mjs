@@ -175,7 +175,7 @@ export function markSuccessorAnswered({ projectRoot, persona, name, key, session
   if (typeof rotationId !== 'string' || !ROTATION_ID_PATTERN.test(rotationId)) fail('bad-args', 'rotationId must be the 16 hex characters of the handoff\'s rotation id line');
   if (typeof message !== 'string' || message.trim() === '' || message.length > MAX_TEXT) fail('bad-args', `message must be a non-empty string of at most ${MAX_TEXT} characters`);
   const dir = lineageDirOf(projectRoot, persona, name);
-  resolveOrphan({ projectRoot, persona, name }, ports);
+  if (resolveOrphan({ projectRoot, persona, name }, ports) === false) fail('rotation-in-progress', 'the orphan rotation is being resolved');
   const pending = readJson(path.join(dir, 'rotation.json'));
   if (!pending || pending.successorKey !== key) fail('no-rotation-pending', `${headRoleOf(persona, name)} has no rotation waiting for ${key}`);
   if (rotationId !== pending.id) fail('answer-mismatch', 'rotationId is not the id of the pending rotation');
@@ -262,18 +262,26 @@ function orphanSuccessor(pending, projectRoot, persona) {
     .filter((r) => r.assignmentId === pending.successorKey)
     .sort((a, b) => a.attempt.localeCompare(b.attempt)).at(-1);
   const envelope = run && readJson(path.join(run.runDir, 'envelope.json'));
-  if (!envelope?.slot?.key) return null;
+  if (!run) return null;
+  if (!envelope?.slot?.key) return { runDir: run.runDir };
   return { key: envelope.slot.key, placement: { host: 'terminal', key: envelope.slot.key }, runDir: run.runDir, persona };
 }
 
-/** Only a proven-dead executor is reclaimed. Synchronous like the answer entry and Identity's holder door. */
+/** Malformed and legacy records are not process identities and must never reach the native judge. */
+function executorVerdict(pending, ports) {
+  const record = pending?.executor;
+  if (!record || !Number.isInteger(record.pid) || record.pid <= 0 || typeof record.startTime !== 'string' || !record.startTime) return 'unknown';
+  return (ports.judge ?? judge)(record);
+}
+
+/** Only a proven-dead executor is reclaimed. False means its recovery lock was busy. */
 function resolveOrphan({ projectRoot, persona, name }, ports) {
   const dir = lineageDirOf(projectRoot, persona, name);
   const file = path.join(dir, 'rotation.json');
-  const dead = (p) => p?.executor && (ports.judge ?? judge)(p.executor) === 'dead';
+  const dead = (p) => executorVerdict(p, ports) === 'dead';
   if (!dead(readJson(file))) return;
   const lock = (ports.lock ?? takeLock)({ projectRoot, persona, name });
-  if (!lock) fail('rotation-in-progress', 'the orphan rotation is being resolved');
+  if (!lock) return false;
   try {
     const pending = readJson(file);
     if (!dead(pending)) return;
@@ -285,20 +293,21 @@ function resolveOrphan({ projectRoot, persona, name }, ports) {
     const holds = holder.live && (
       (answered?.gen === pending.gen && answered.key === pending.successorKey && holder.session === answered.sessionId)
       || (head?.persona === persona && head.name === name && head.gen === pending.gen)
-      || (successor && slotKeyOf(holder.record) === successor.placement.key)
+      || (successor?.placement?.key && slotKeyOf(holder.record) === successor.placement.key)
     );
     const end = ports.end ?? ((runDir) => requestCancel(runDir, 'session-rotation'));
     const old = pending.old ?? readHeadPlacement(dir);
-    if (!successor?.runDir || !successor.placement?.key) fail('placement-unknown', 'the orphan rotation has no recorded successor placement');
-    if (holds) {
+    const complete = holds && !!successor?.runDir;
+    if (complete) {
+      if (!successor.placement?.key) fail('placement-unknown', 'the orphan rotation has no recorded successor placement');
       if (!old?.runDir) fail('placement-unknown', 'the orphan rotation has no recorded head placement');
       (ports.recordPlacement ?? writeHeadPlacement)(dir, { role, gen: pending.gen, placement: successor.placement, runDir: successor.runDir, persona: successor.persona, startedAt: pending.startedAt });
       if (!end(old.runDir)) fail('cancel-unwritable', 'the orphan rotation could not request the old head to stop');
-    } else if (!end(successor.runDir)) {
+    } else if (successor?.runDir && !end(successor.runDir)) {
       fail('cancel-unwritable', 'the orphan rotation could not request the successor to stop');
     }
     fs.rmSync(file, { force: true });
-    incident(dir, { event: 'resolved-orphan', role, id: pending.id, outcome: holds ? 'completed' : 'abandoned' });
+    incident(dir, { event: 'resolved-orphan', role, id: pending.id, outcome: complete ? 'completed' : 'abandoned' });
   } finally {
     lock.release();
   }
@@ -325,10 +334,10 @@ export async function rotateHeadSession(request, ports = {}) {
   const { persona, name, reason, projectRoot, stopFacts } = checkRequest(request);
   const role = headRoleOf(persona, name);
   const dir = lineageDirOf(projectRoot, persona, name);
-  resolveOrphan({ projectRoot, persona, name }, ports);
+  if (resolveOrphan({ projectRoot, persona, name }, ports) === false) return { rotated: false, reason: 'rotation-in-progress' };
   const lock = (ports.lock ?? takeLock)({ projectRoot, persona, name });
   if (!lock) return { rotated: false, reason: 'rotation-in-progress' };
-  if (readJson(path.join(dir, 'rotation.json'))) {
+  if (executorVerdict(readJson(path.join(dir, 'rotation.json')), ports) === 'alive') {
     lock.release();
     return { rotated: false, reason: 'rotation-in-progress' };
   }

@@ -474,17 +474,50 @@ test('orphan recovery finds the supervised successor when the executor died befo
   assert.deepEqual(calls.end, ['/run/old']);
 });
 
-test('a live, unknown or legacy executor is never reclaimed or overwritten, and a failed recovery stays retryable', async (t) => {
+test('only a proven-live executor holds off the next rotation; legacy, unknown and malformed records do not wedge it', async (t) => {
+  for (const executor of [undefined, { pid: 123, startTime: '100' }, {}, { pid: '123', startTime: '100' }, { pid: 123 }, { pid: 123, startTime: 100 }, { pid: -1, startTime: '' }, 'bad']) {
+    const { root, dir } = project(t);
+    const pending = orphan(root, dir);
+    pending.executor = executor;
+    fs.writeFileSync(path.join(dir, 'rotation.json'), JSON.stringify(pending));
+    let moved = false;
+    const { calls, ports, request } = fakes(root, {
+      holder: () => ({ live: true, session: moved ? 'new-session' : 'old-session', record: OLD_RECORD }),
+      onSleep: () => { answer(root); moved = true; },
+    });
+    ports.judge = (record) => {
+      assert.deepEqual(record, { pid: 123, startTime: '100' }, 'malformed executors never reach the process door');
+      return 'unknown';
+    };
+    assert.equal((await rotateHeadSession(request, ports)).rotated, true);
+    assert.equal(calls.place.length, 1);
+    assert.deepEqual(calls.end, ['/run/old'], 'unproven executors are not reclaimed as dead');
+    assert.equal(fs.existsSync(path.join(dir, 'rotation.json')), false);
+  }
+  const { root, dir } = project(t);
+  const pending = orphan(root, dir);
+  const { calls, ports, request } = fakes(root);
+  ports.judge = () => 'alive';
+  assert.deepEqual(await rotateHeadSession(request, ports), { rotated: false, reason: 'rotation-in-progress' });
+  assert.deepEqual(pendingOf(root), pending);
+  assert.deepEqual(calls.place, []);
+  assert.deepEqual(calls.end, []);
+});
+
+test('an orphan recovery with a busy lock returns the normal rotation-in-progress result', async (t) => {
+  const { root, dir } = project(t);
+  const pending = orphan(root, dir);
+  const { calls, ports, request } = fakes(root, { lock: () => null });
+  ports.judge = () => 'dead';
+  assert.deepEqual(await rotateHeadSession(request, ports), { rotated: false, reason: 'rotation-in-progress' });
+  assert.deepEqual(pendingOf(root), pending);
+  assert.deepEqual(calls.end, []);
+  assert.deepEqual(calls.place, []);
+});
+
+test('a failed orphan recovery stays retryable while a successor run exists but its placement cannot yet be located', async (t) => {
   const { root, dir } = project(t);
   const { calls, ports, request } = fakes(root);
-  for (const verdict of ['alive', 'unknown', 'legacy']) {
-    const pending = orphan(root, dir);
-    if (verdict === 'legacy') { delete pending.executor; fs.writeFileSync(path.join(dir, 'rotation.json'), JSON.stringify(pending)); }
-    ports.judge = () => verdict;
-    assert.equal((await rotateHeadSession(request, ports)).reason, 'rotation-in-progress');
-    assert.deepEqual(pendingOf(root), pending);
-  }
-  assert.deepEqual(calls.end, []);
   orphan(root, dir);
   ports.judge = () => 'dead';
   ports.identity = () => { throw Object.assign(new Error('Identity unavailable'), { code: 'identity-unavailable' }); };
@@ -497,9 +530,41 @@ test('a live, unknown or legacy executor is never reclaimed or overwritten, and 
   assert.ok(pendingOf(root));
   assert.equal(fs.existsSync(path.join(dir, 'incidents.jsonl')), false);
   orphan(root, dir, { savedSuccessor: false });
-  ports.end = () => assert.fail('an unknown successor must not be guessed ended');
+  const runDir = path.join(root, '.fgos/assignments/head-planner-x-2/runs/01');
+  fs.mkdirSync(runDir, { recursive: true });
+  ports.identity = () => ({ live: true, record: { ids: { head: { persona: 'planner', name: 'x', gen: 2 } } } });
+  ports.end = () => assert.fail('an unknown successor placement must not be guessed');
   await assert.rejects(rotateHeadSession(request, ports), { code: 'placement-unknown' });
-  assert.ok(pendingOf(root), 'an unlocated successor stays pending for recovery');
+  assert.ok(pendingOf(root), 'an existing but unlocated successor stays pending for recovery');
+});
+
+test('an orphan with no successor run abandons even when Identity names the successor', (t) => {
+  for (const namesSuccessor of [false, true]) {
+    const { root, dir } = project(t);
+    orphan(root, dir, { savedSuccessor: false });
+    const { calls, ports } = fakes(root, { holder: namesSuccessor
+      ? { live: true, record: { ids: { head: { persona: 'planner', name: 'x', gen: 2 } } } }
+      : { live: true, session: 'old-session', record: OLD_RECORD } });
+    ports.judge = () => 'dead';
+    assert.throws(() => markSuccessorAnswered({ projectRoot: root, persona: 'planner', name: 'x', key: 'head-planner-x-2', sessionId: 'new-session', rotationId: '0123456789abcdef', message: 'ready' }, ports), { code: 'no-rotation-pending' });
+    assert.equal(fs.existsSync(path.join(dir, 'rotation.json')), false);
+    assert.deepEqual(calls.end, []);
+    assert.equal(readHeadPlacement(dir).placement.key, OLD.key);
+    assert.deepEqual(orphanEvents(dir).map(({ event, outcome }) => [event, outcome]), [['resolved-orphan', 'abandoned']]);
+  }
+});
+
+test('an orphan run without an envelope is abandoned when Identity still names the predecessor', (t) => {
+  const { root, dir } = project(t);
+  orphan(root, dir, { savedSuccessor: false });
+  const runDir = path.join(root, '.fgos/assignments/head-planner-x-2/runs/01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const { calls, ports } = fakes(root);
+  ports.judge = () => 'dead';
+  assert.throws(() => markSuccessorAnswered({ projectRoot: root, persona: 'planner', name: 'x', key: 'head-planner-x-2', sessionId: 'new-session', rotationId: '0123456789abcdef', message: 'ready' }, ports), { code: 'no-rotation-pending' });
+  assert.deepEqual(calls.end, [runDir]);
+  assert.equal(fs.existsSync(path.join(dir, 'rotation.json')), false);
+  assert.deepEqual(orphanEvents(dir).map(({ event, outcome }) => [event, outcome]), [['resolved-orphan', 'abandoned']]);
 });
 
 test('a Stop rejected for a malformed measure leaves an incident without accepting the malformed number', (t) => {
