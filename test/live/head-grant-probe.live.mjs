@@ -455,8 +455,6 @@ export function classifyOutcome(verb, isGranted, res) {
   };
 }
 
-export const classify = classifyOutcome;
-
 export function main() {
   const argv = process.argv.slice(2);
   const dryRun = argv.includes('--dry-run');
