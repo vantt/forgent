@@ -89,8 +89,24 @@ pub struct RenewalOwner {
     pub last_renewed_at: String,
 }
 
-pub fn record_renewal_owner(account_dir: &Path, seat: &str, now: f64) {
-    let _ = write_file_atomic(
+pub fn is_seat_ended(seat: &str) -> bool {
+    if seat == "fgOS refresh-ahead" || seat.ends_with(" (ended)") {
+        return false;
+    }
+    let p = Path::new(seat);
+    if p.is_absolute() {
+        if !p.exists() {
+            return true;
+        }
+        if p.join("closed.json").exists() || p.join("exit-code.json").exists() {
+            return true;
+        }
+    }
+    false
+}
+
+pub fn record_renewal_owner(account_dir: &Path, seat: &str, now: f64) -> std::io::Result<()> {
+    let res = write_file_atomic(
         &account_dir.join(RENEWAL_OWNER_FILE),
         &format!(
             "{}\n",
@@ -100,12 +116,20 @@ pub fn record_renewal_owner(account_dir: &Path, seat: &str, now: f64) {
             })
         ),
     );
+    if let Err(ref e) = res {
+        eprintln!("fgos: failed to record renewal owner: {e}");
+    }
+    res
+}
+
+pub fn clear_renewal_owner(account_dir: &Path) {
+    let _ = fs::remove_file(account_dir.join(RENEWAL_OWNER_FILE));
 }
 
 pub fn read_renewal_owner(account_dir: &Path) -> Option<RenewalOwner> {
     let file = account_dir.join(RENEWAL_OWNER_FILE);
     let parsed = read_json_file(&file, false).ok()?;
-    let seat = parsed.doc.get("seat").and_then(Value::as_str)?.to_owned();
+    let mut seat = parsed.doc.get("seat").and_then(Value::as_str)?.to_owned();
     let last_renewed_at = parsed
         .doc
         .get("lastRenewedAt")
@@ -118,10 +142,41 @@ pub fn read_renewal_owner(account_dir: &Path) -> Option<RenewalOwner> {
                 .and_then(Value::as_f64)
                 .map(iso_from_ms)
         })?;
+    if is_seat_ended(&seat) {
+        seat = format!("{seat} (ended)");
+    }
     Some(RenewalOwner {
         seat,
         last_renewed_at,
     })
+}
+
+pub fn find_account_renewal_owner(
+    runtime_dir: &Path,
+    provider: &str,
+    account_id: &str,
+) -> Option<RenewalOwner> {
+    let account_dir = credential_store_dir(runtime_dir, provider, account_id, None)?;
+    let mut candidates = Vec::new();
+    if let Some(owner) = read_renewal_owner(&account_dir) {
+        candidates.push((account_dir.clone(), owner));
+    }
+    let stores_dir = account_dir.join("stores");
+    if let Ok(entries) = fs::read_dir(&stores_dir) {
+        let mut store_paths: Vec<PathBuf> = entries.flatten().map(|e| e.path()).collect();
+        store_paths.sort();
+        for path in store_paths {
+            if let Some(owner) = read_renewal_owner(&path) {
+                candidates.push((path, owner));
+            }
+        }
+    }
+    candidates.sort_by(|(p1, o1), (p2, o2)| {
+        o2.last_renewed_at
+            .cmp(&o1.last_renewed_at)
+            .then_with(|| p1.cmp(p2))
+    });
+    candidates.into_iter().next().map(|(_, owner)| owner)
 }
 
 /// `status` is `fresh`, `renewed`, `failed`, `cooldown` or `skipped`; `reason` is a fixed word. Never a credential.
@@ -130,6 +185,17 @@ pub struct RefreshOutcome {
     pub status: &'static str,
     pub reason: String,
     pub owner: Option<String>,
+    pub left_behind: Vec<(String, String)>,
+}
+
+impl RefreshOutcome {
+    pub fn note(&self) -> String {
+        crate::credentials::refresh_ahead_note_with_owner(
+            self.status,
+            Some(&self.reason),
+            self.owner.as_deref(),
+        )
+    }
 }
 
 fn outcome(status: &'static str, reason: impl Into<String>) -> RefreshOutcome {
@@ -137,6 +203,7 @@ fn outcome(status: &'static str, reason: impl Into<String>) -> RefreshOutcome {
         status,
         reason: reason.into(),
         owner: None,
+        left_behind: Vec::new(),
     }
 }
 
@@ -149,6 +216,7 @@ fn outcome_with_owner(
         status,
         reason: reason.into(),
         owner,
+        left_behind: Vec::new(),
     }
 }
 
@@ -466,28 +534,60 @@ fn renew_in_scratch(
             remove_all(&scratch);
             if matches!(other, ApplyOutcome::Applied(_)) {
                 clear_failure(account_dir);
+                let mut left_behind = Vec::new();
                 for seat_dir in sharing_seats {
-                    let apply_seat = ApplyRequest {
-                        layout_name: layout.name(),
-                        source_home: seat_dir,
-                        copy_home: home,
-                        provider: Some(request.provider),
-                        require_future: true,
-                        now: now(),
-                        sqlite,
-                    };
-                    let _ = apply_renewed_credential(&apply_seat);
+                    let seat_desc =
+                        crate::confinement::cleanup::read_attempt_home_record(seat_dir, None, None)
+                            .and_then(|r| {
+                                r.get("runDir").and_then(Value::as_str).map(str::to_owned)
+                            })
+                            .unwrap_or_else(|| seat_dir.to_string_lossy().into_owned());
+                    match layout.read(seat_dir, true, sqlite) {
+                        Ok(_) => {
+                            let apply_seat = ApplyRequest {
+                                layout_name: layout.name(),
+                                source_home: seat_dir,
+                                copy_home: home,
+                                provider: Some(request.provider),
+                                require_future: true,
+                                now: now(),
+                                sqlite,
+                            };
+                            match apply_renewed_credential(&apply_seat) {
+                                Ok(ApplyOutcome::Applied(_)) | Ok(ApplyOutcome::Unchanged) => {}
+                                Ok(ApplyOutcome::ApplyDeferred(code)) => {
+                                    left_behind.push((seat_desc, code));
+                                }
+                                Ok(ApplyOutcome::Unreadable(code)) => {
+                                    left_behind.push((seat_desc, code.to_string()));
+                                }
+                                Err(err) => {
+                                    left_behind.push((seat_desc, err));
+                                }
+                            }
+                        }
+                        Err(code) => {
+                            left_behind.push((seat_desc, code.to_string()));
+                        }
+                    }
                 }
-                if let Some(first_seat) = sharing_seats.first() {
-                    let seat_desc = crate::confinement::cleanup::read_attempt_home_record(
-                        first_seat, None, None,
-                    )
-                    .and_then(|r| r.get("runDir").and_then(Value::as_str).map(str::to_owned))
-                    .unwrap_or_else(|| first_seat.to_string_lossy().into_owned());
-                    record_renewal_owner(account_dir, &seat_desc, now());
-                }
+                let _ = record_renewal_owner(account_dir, "fgOS refresh-ahead", now());
                 report_lifetime_shortfall(layout, request.provider, home, renewed_at, sqlite);
-                return outcome("renewed", "applied");
+                let reason = if left_behind.is_empty() {
+                    "applied".to_string()
+                } else {
+                    let items: Vec<String> = left_behind
+                        .iter()
+                        .map(|(seat, code)| format!("{seat} ({code})"))
+                        .collect();
+                    format!("applied left-behind: {}", items.join(", "))
+                };
+                return RefreshOutcome {
+                    status: "renewed",
+                    reason,
+                    owner: Some("fgOS refresh-ahead".to_string()),
+                    left_behind,
+                };
             }
             let reason = if probe_ok {
                 "not-renewed"
@@ -606,7 +706,7 @@ fn take_live_seat_login(
         let seat_desc = crate::confinement::cleanup::read_attempt_home_record(seat, None, None)
             .and_then(|r| r.get("runDir").and_then(Value::as_str).map(str::to_owned))
             .unwrap_or_else(|| seat.to_string_lossy().into_owned());
-        record_renewal_owner(account_dir, &seat_desc, now());
+        let _ = record_renewal_owner(account_dir, &seat_desc, now());
     }
     taken
 }

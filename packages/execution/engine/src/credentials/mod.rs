@@ -42,8 +42,9 @@ pub use ports::{
     LockBusy, NoLiveSeatHomes, NoLocks, NoSqlite, ProbeRequest, ProbeRun, SqliteAdapter,
 };
 pub use renew::{
-    read_renewal_owner, record_renewal_owner, refresh_ahead, RefreshOptions, RefreshOutcome,
-    RefreshRequest, RenewalOwner, RENEWAL_OWNER_FILE,
+    clear_renewal_owner, find_account_renewal_owner, is_seat_ended, read_renewal_owner,
+    record_renewal_owner, refresh_ahead, RefreshOptions, RefreshOutcome, RefreshRequest,
+    RenewalOwner, RENEWAL_OWNER_FILE,
 };
 pub use sqlite::BundledSqlite;
 pub use store::{
@@ -52,7 +53,7 @@ pub use store::{
     AccountInventory, InventoryAccount, RetainedCopy, StoreJudgement, WriteBackOutcome,
 };
 
-pub use crate::accounts::state::credential_store_dir;
+pub(crate) use crate::accounts::state::credential_store_dir;
 use files::MINUTE_MS;
 
 pub const DEFAULT_REFRESH_AHEAD_MIN_THRESHOLD_MS: f64 = 60.0 * MINUTE_MS;
