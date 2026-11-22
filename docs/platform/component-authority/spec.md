@@ -58,19 +58,21 @@ The structural model stores six distinct row kinds under `packages/component-aut
 
 ### 2.1 Layers, rules, domains, and tiers
 
-Defined in `layers.json` (migrated from `docs/architecture-manifest.json`):
+Defined in `layers.json` (created by phase 2 of the plan, migrating from `docs/architecture-manifest.json`):
 - `layers`: Ordered architectural layer names (`entry`, `use-case`, `infra`, `domain`, `kernel`) defining allowed one-directional import flows.
 - `rules`: Structural layering rules (`one-directional-layer`, `domain-siloing`, `tier-downward`).
 - `domains`: Registered business and execution domains (`coding`, `council`, `marketing`).
 - `tierNames`: Descriptive names for numeric tiers 0 through 9.
 - `tierExceptions`: Explicit exceptions with path, tier, and documented rationale.
 
+`tiers.json` and its schema definition arrive with phase 2.
+
 ### 2.2 Components and subcomponents
 
 Defined in `components.json`:
 - `id`: Unique identifier (e.g., `component-authority`).
 - `canonical`: Primary canonical display name.
-- `aliases`: Array of synonyms and alternate terms, including Vietnamese equivalents (e.g., `["ownership registry", "authority ledger"]`).
+- `aliases`: Array of synonyms and alternate terms (e.g., `["ownership registry", "authority ledger"]`).
 - `meaning`: Clear single-sentence summary of component purpose.
 - `parent`: Optional parent component ID for hierarchical subcomponents.
 - `layer`: Architectural layer (`entry`, `use-case`, `infra`, `domain`, `kernel`).
@@ -85,7 +87,7 @@ Defined in `components.json`:
 
 ### 2.3 Decision kinds
 
-Defined in `decision-kinds.json`:
+Defined in `decision-kinds.json` (created by phase 3 of the plan):
 - `id`: Stable decision kind identifier.
 - `canonical`: Canonical name.
 - `aliases`: Alternative and legacy scope strings (derived from `docs/platform/governance.md#decision-scope-to-holder-table`).
@@ -95,7 +97,7 @@ Defined in `decision-kinds.json`:
 
 ### 2.4 Doors
 
-Defined under `doors/` (one JSON file per door job):
+Defined under `doors/` (one JSON file per door job, created by phase 2 of the plan):
 - `job`: Description of the single-door job being protected.
 - `kind`: Door kind identifier (`door`).
 - `patterns`: Regular expression patterns matching both primitive operations and canonical/alias symbols.
@@ -107,7 +109,7 @@ Defined under `doors/` (one JSON file per door job):
 
 ### 2.5 Contract index
 
-Defined in `contracts.json`:
+Defined in `contracts.json` (created by phase 4 of the plan):
 - `id`: Unique contract identifier (e.g., CTR code or package contract name).
 - `canonical`: Canonical contract name.
 - `aliases`: Alternate names or legacy designations.
@@ -122,7 +124,7 @@ Defined in `contracts.json`:
 
 ### 2.6 Files
 
-Transitional file-to-layer mapping (`files.json`) moved from `docs/architecture-manifest.json` during model migration. In phase 3, layer and tier assignments are derived directly from component path mappings, rendering `files.json` obsolete.
+Transitional file-to-layer mapping (`files.json`, created by phase 2 of the plan) moved from `docs/architecture-manifest.json` during model migration. In phase 3, layer and tier assignments are derived directly from component path mappings, rendering `files.json` obsolete.
 
 ## 3. Operations: `locate` and `declare`
 
@@ -132,8 +134,8 @@ Component Authority provides two operational doors (specified for implementation
 
 `locate` accepts a natural language sentence describing an intended task or capability and returns matching components, decision kinds, doors, and contracts.
 
-- Phase 1: Matches against canonical names, recorded aliases, and meaning sentences.
-- Phase 2: Integrates with the hybrid search mechanism (BM25 + embeddings, via pkm + OHS) from Documentation H2 (`docs/platform/documentation/subcomponents/document-identity/spec.md`).
+- First: Matches against canonical names, recorded aliases, and meaning sentences.
+- Once documentation H2 search lands: Integrates with the hybrid search mechanism (BM25 + embeddings, via pkm + OHS) from Documentation H2 (`docs/platform/documentation/subcomponents/document-identity/spec.md`).
 
 ### 3.2 `declare`
 
