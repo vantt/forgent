@@ -148,9 +148,9 @@ the grants, verb by verb.
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Baseline: wake rate and idle alarms](phase-01-baseline-wake-and-idle.md) | - | plans/261122-0118-heads-stable-and-able/reports/baseline-wake-and-idle.md | 1 | done |
-| 2 | [Head verbs through the request socket](phase-02-head-verbs.md) | - | src/session-host/head-grants.mjs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, apps/fgos/src/routing.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/session-host/spec.md | 1 | running |
+| 2 | [Head verbs through the request socket](phase-02-head-verbs.md) | - | src/session-host/head-grants.mjs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, test/session-host/head-start.test.mjs, apps/fgos/src/routing.rs, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/rust/tests/head_request.rs, docs/platform/session-host/spec.md | 1 | running |
 | 3 | [The land door runs the plan check](phase-03-land-plan-check.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, core/skills/_shared/plan-contract.md, .agents/skills/**, plugins/fgOS/skills/**, .fgos/config.yaml | 1 | done |
-| 4 | [Coordinating heads keep their provider floor](phase-04-provider-floor.md) | 3 | .fgos/config.yaml, test/session-host/head-start.test.mjs | 2 | ready |
+| 4 | [Coordinating heads keep their provider floor](phase-04-provider-floor.md) | 3 | .fgos/config.yaml, test/session-host/head-start.test.mjs | 2 | running |
 | 5 | [A live head's requests run the active release](phase-05-release-pickup.md) | 2 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/run-supervisor/spec.md | 2 | ready |
 | 6 | [A rotation whose executor died is resolved](phase-06-orphan-rotation.md) | 2 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/**, docs/platform/session-host/spec.md | 2 | ready |
 | 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs | 2 | ready |
@@ -171,6 +171,32 @@ wave), `head-request.v1.json` (2, then 5), `docs/platform/session-host/spec.md` 
 writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
+
+### Lead progress (2026-11-22 11:20, head:lead-forgent-261122-0118-heads-b52f9)
+
+- **Phase 2: parked, ready to land.** Branch `heads-stable-and-able/p02c` (c6de687a4, cut from main 0044018d1) holds the
+  reviewed change: `friction record` for every head, `supervisor raise` for leads, route, mapping, contract, spec, tests
+  (94 Node, 26 routing, 47 contract tests pass, fmt clean). `config patch` is left out until `q-va5vu7zeza` is answered;
+  it is then a follow-up unit of this phase. Review findings fixed: contract verb list in `head_request.rs`, the exact
+  grant table in `head-start.test.mjs` (both added to this phase's footprint above), the confined friction end-to-end
+  test now asserts the socket saw the frame. Land refused `land-gate-failed`: main's citation-drift test reports 48
+  findings in docs this branch never touches (after bddb4fe0d); asked `q-uvr4yu4x3c`. Next: retry `fgos land
+  heads-stable-and-able/p02c --test test/session-host/head-grants.test.mjs --test test/session-host/head-request.test.mjs`.
+- **Phase 4: running.** `q-3f6qen2bsd` answered by lead:SUPERVISOR 11:17: the secretary pin is in force from the
+  standard layer (`core/config-standard/runner.yaml` `runner.personas.secretary.prefer`), which every project inherits,
+  so step 1 needs no project patch. The repo-config assertion therefore reads the effective standard-plus-project
+  config, not the raw project file. The reviewed test edits in worktree `...-p04` move to a fresh worktree from main by
+  patch (the runner never commits a path that was dirty when a round started).
+- **Gates:** `q-vs4eqnprod` answered: lead:SUPERVISOR held the plan-contract land gate (14287de27) until the next
+  release activation carries the `{plans}` substitution. `q-uvr4yu4x3c`: lead:DOCOS fixes the 48 citation findings, or
+  lead:SUPERVISOR does within about 30 minutes. `q-va5vu7zeza` (host `--project-only` switch) went to the owner;
+  `config patch` stays out of the grant until then.
+- **Phases 5, 6, 7** wait on phase 2's land. Unit prompts use the worktree's own ignored build directory for
+  `CARGO_TARGET_DIR` (lead:SUPERVISOR 2026-11-22).
+- Friction met: `fgos request result <id> --wait <n>` is refused `bad-args` through the socket and `--wait=<n>` does not
+  block; a unit seat that ends without `report-1.md` settles `inconclusive` and commits nothing; `fgos land` refuses
+  `main-checkout-dirty-overlap` on dirty main-checkout paths the branch does not write (another plan's `plan.md`,
+  untracked files in this plan directory).
 
 ### Footprint overlap with the two running plans
 
