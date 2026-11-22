@@ -5,6 +5,8 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 
+use serde_json::Value;
+
 use super::apply::{
     apply_renewed_credential, judge_copy, select_provider_entry, ApplyOutcome, ApplyRequest,
     Verdict,
@@ -78,17 +80,75 @@ impl<'a> RefreshOptions<'a> {
     }
 }
 
+pub const RENEWAL_OWNER_FILE: &str = "renewal-owner.json";
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RenewalOwner {
+    pub seat: String,
+    pub last_renewed_at: String,
+}
+
+pub fn record_renewal_owner(account_dir: &Path, seat: &str, now: f64) {
+    let _ = write_file_atomic(
+        &account_dir.join(RENEWAL_OWNER_FILE),
+        &format!(
+            "{}\n",
+            serde_json::json!({
+                "seat": seat,
+                "lastRenewedAt": iso_from_ms(now),
+            })
+        ),
+    );
+}
+
+pub fn read_renewal_owner(account_dir: &Path) -> Option<RenewalOwner> {
+    let file = account_dir.join(RENEWAL_OWNER_FILE);
+    let parsed = read_json_file(&file, false).ok()?;
+    let seat = parsed.doc.get("seat").and_then(Value::as_str)?.to_owned();
+    let last_renewed_at = parsed
+        .doc
+        .get("lastRenewedAt")
+        .and_then(Value::as_str)
+        .map(str::to_owned)
+        .or_else(|| {
+            parsed
+                .doc
+                .get("lastRenewedAt")
+                .and_then(Value::as_f64)
+                .map(iso_from_ms)
+        })?;
+    Some(RenewalOwner {
+        seat,
+        last_renewed_at,
+    })
+}
+
 /// `status` is `fresh`, `renewed`, `failed`, `cooldown` or `skipped`; `reason` is a fixed word. Never a credential.
 #[derive(Debug, Clone, PartialEq)]
 pub struct RefreshOutcome {
     pub status: &'static str,
     pub reason: String,
+    pub owner: Option<String>,
 }
 
 fn outcome(status: &'static str, reason: impl Into<String>) -> RefreshOutcome {
     RefreshOutcome {
         status,
         reason: reason.into(),
+        owner: None,
+    }
+}
+
+fn outcome_with_owner(
+    status: &'static str,
+    reason: impl Into<String>,
+    owner: Option<String>,
+) -> RefreshOutcome {
+    RefreshOutcome {
+        status,
+        reason: reason.into(),
+        owner,
     }
 }
 
@@ -124,12 +184,12 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
         return outcome("skipped", "unsupported-layout");
     };
     let now = options.now;
-    let threshold = options
+    let base_threshold = options
         .threshold_ms
         .unwrap_or_else(|| default_refresh_ahead_threshold_ms(options.probe_timeout_ms as f64));
     let seat = options.seat_timeout_ms.filter(|t| t.is_finite());
-    let threshold = seat.map_or(threshold, |seat| {
-        threshold.max(seat + options.probe_timeout_ms as f64 + SEAT_RENEWAL_MARGIN_MS)
+    let threshold = seat.map_or(base_threshold, |seat| {
+        base_threshold.max(seat + options.probe_timeout_ms as f64 + SEAT_RENEWAL_MARGIN_MS)
     });
     // A seat that even a token issued at the end of one renewal call could not cover: renewing cannot admit it.
     let seat_outlives_any_token = seat
@@ -224,16 +284,26 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
             outcome("fresh", "outside-window")
         };
     }
-    // A running seat that shares the store's refresh token owns its renewal: the next refresh-ahead after the seat
-    // renewed takes its newer pair (take_live_seat_login).
-    if live_seat_shares_refresh(
-        layout,
-        &homes,
-        &entry.key,
-        entry.refresh.as_deref(),
-        options.sqlite,
-    ) {
-        return outcome("skipped", "live-seat-owns-renewal");
+    // A running seat that shares the store's refresh token owns its renewal only while the token has more than the
+    // base threshold_ms left; below that, fall through to the existing cooldown check and renew_in_scratch.
+    let sharing_seats: Vec<PathBuf> = homes
+        .iter()
+        .filter(|dir| {
+            seat_shares_refresh(
+                layout,
+                dir,
+                &entry.key,
+                entry.refresh.as_deref(),
+                options.sqlite,
+            )
+        })
+        .cloned()
+        .collect();
+    if !sharing_seats.is_empty() {
+        if entry.expires_ms - now() > base_threshold {
+            let owner = read_renewal_owner(&account_dir).map(|o| o.seat);
+            return outcome_with_owner("skipped", "live-seat-owns-renewal", owner);
+        }
     }
     // A renewal could not make this seat's life check pass, and every start would spend another one.
     if seat_outlives_any_token {
@@ -248,6 +318,7 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
         &home,
         &account_dir,
         &entry.key,
+        &sharing_seats,
         lock.as_ref(),
         options,
     )
@@ -290,6 +361,7 @@ fn renew_in_scratch(
     home: &Path,
     account_dir: &Path,
     key: &str,
+    sharing_seats: &[PathBuf],
     lock: &dyn AccountLockGuard,
     options: &RefreshOptions<'_>,
 ) -> RefreshOutcome {
@@ -394,6 +466,26 @@ fn renew_in_scratch(
             remove_all(&scratch);
             if matches!(other, ApplyOutcome::Applied(_)) {
                 clear_failure(account_dir);
+                for seat_dir in sharing_seats {
+                    let apply_seat = ApplyRequest {
+                        layout_name: layout.name(),
+                        source_home: seat_dir,
+                        copy_home: home,
+                        provider: Some(request.provider),
+                        require_future: true,
+                        now: now(),
+                        sqlite,
+                    };
+                    let _ = apply_renewed_credential(&apply_seat);
+                }
+                if let Some(first_seat) = sharing_seats.first() {
+                    let seat_desc = crate::confinement::cleanup::read_attempt_home_record(
+                        first_seat, None, None,
+                    )
+                    .and_then(|r| r.get("runDir").and_then(Value::as_str).map(str::to_owned))
+                    .unwrap_or_else(|| first_seat.to_string_lossy().into_owned());
+                    record_renewal_owner(account_dir, &seat_desc, now());
+                }
                 report_lifetime_shortfall(layout, request.provider, home, renewed_at, sqlite);
                 return outcome("renewed", "applied");
             }
@@ -511,6 +603,10 @@ fn take_live_seat_login(
     remove_all(&probe_home);
     if taken {
         clear_failure(account_dir);
+        let seat_desc = crate::confinement::cleanup::read_attempt_home_record(seat, None, None)
+            .and_then(|r| r.get("runDir").and_then(Value::as_str).map(str::to_owned))
+            .unwrap_or_else(|| seat.to_string_lossy().into_owned());
+        record_renewal_owner(account_dir, &seat_desc, now());
     }
     taken
 }
@@ -521,11 +617,9 @@ fn refresh_digest(refresh: Option<&str>) -> Option<[u8; 32]> {
     refresh.map(|r| Sha256::digest(r.as_bytes()).into())
 }
 
-/// Whether a running seat still holds the store's own refresh token for `key`: every seat starts on the store's pair,
-/// and the token is single use, so a renewal here would leave that seat with a spent token at its next refresh.
-fn live_seat_shares_refresh(
+fn seat_shares_refresh(
     layout: Layout,
-    homes: &[PathBuf],
+    dir: &Path,
     key: &str,
     refresh: Option<&str>,
     sqlite: &dyn SqliteAdapter,
@@ -533,14 +627,12 @@ fn live_seat_shares_refresh(
     let Some(own) = refresh_digest(refresh) else {
         return false;
     };
-    homes.iter().any(|dir| {
-        layout
-            .read(dir, true, sqlite)
-            .ok()
-            .and_then(|read| read.entries.into_iter().find(|e| e.key == key))
-            .and_then(|e| refresh_digest(e.refresh.as_deref()))
-            == Some(own)
-    })
+    layout
+        .read(dir, true, sqlite)
+        .ok()
+        .and_then(|read| read.entries.into_iter().find(|e| e.key == key))
+        .and_then(|e| refresh_digest(e.refresh.as_deref()))
+        == Some(own)
 }
 
 // ------------------------------------------------------------------------------------------ probe gate

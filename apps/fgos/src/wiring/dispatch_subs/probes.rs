@@ -552,6 +552,33 @@ fn probe_one_account(
         "verdict": verdict,
         "results": results,
     });
+    if let Some(account_dir) = fgos_execution_engine::credentials::credential_store_dir(
+        &accounts.runtime_dir,
+        &family,
+        account_id,
+        None,
+    ) {
+        let owner =
+            fgos_execution_engine::credentials::read_renewal_owner(&account_dir).or_else(|| {
+                let stores_dir = account_dir.join("stores");
+                if let Ok(entries) = std::fs::read_dir(stores_dir) {
+                    for entry in entries.flatten() {
+                        if let Some(owner) =
+                            fgos_execution_engine::credentials::read_renewal_owner(&entry.path())
+                        {
+                            return Some(owner);
+                        }
+                    }
+                }
+                None
+            });
+        if let Some(owner) = owner {
+            report["renewalOwner"] = json!({
+                "seat": owner.seat,
+                "lastRenewedAt": owner.last_renewed_at,
+            });
+        }
+    }
     if plan.record {
         let direct: Vec<Value> = direct_rows
             .iter()

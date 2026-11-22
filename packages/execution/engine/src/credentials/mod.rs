@@ -41,15 +41,18 @@ pub use ports::{
     AccountLockGuard, AccountLocks, AccountsLocks, AccountsProbe, CredentialProbe, LiveSeatHomes,
     LockBusy, NoLiveSeatHomes, NoLocks, NoSqlite, ProbeRequest, ProbeRun, SqliteAdapter,
 };
-pub use renew::{refresh_ahead, RefreshOptions, RefreshOutcome, RefreshRequest};
+pub use renew::{
+    read_renewal_owner, record_renewal_owner, refresh_ahead, RefreshOptions, RefreshOutcome,
+    RefreshRequest, RenewalOwner, RENEWAL_OWNER_FILE,
+};
 pub use sqlite::BundledSqlite;
 pub use store::{
-    credential_write_back_target, inspect_pending_copies_over_limit,
+    credential_write_back_target, in_cooldown, inspect_pending_copies_over_limit,
     inspect_retained_credential_copies, sweep_interrupted_stagings, write_back_renewed_credential,
     AccountInventory, InventoryAccount, RetainedCopy, StoreJudgement, WriteBackOutcome,
 };
 
-pub(crate) use crate::accounts::state::credential_store_dir;
+pub use crate::accounts::state::credential_store_dir;
 use files::MINUTE_MS;
 
 pub const DEFAULT_REFRESH_AHEAD_MIN_THRESHOLD_MS: f64 = 60.0 * MINUTE_MS;
@@ -133,11 +136,23 @@ pub fn read_credential_expiry(
 }
 
 /// The suffix a seat's life-check refusal carries to name what refresh-ahead did for the store:
-/// `; refresh-ahead: <status>[ <reason>]`. Fixed words only, never a credential.
+/// `; refresh-ahead: <status>[ <reason>][; owner: <owner>]`. Fixed words only, never a credential.
 pub fn refresh_ahead_note(status: &str, reason: Option<&str>) -> String {
     match reason.filter(|r| !r.is_empty()) {
         Some(reason) => format!("; refresh-ahead: {status} {reason}"),
         None => format!("; refresh-ahead: {status}"),
+    }
+}
+
+pub fn refresh_ahead_note_with_owner(
+    status: &str,
+    reason: Option<&str>,
+    owner: Option<&str>,
+) -> String {
+    let note = refresh_ahead_note(status, reason);
+    match owner.filter(|o| !o.is_empty()) {
+        Some(owner) => format!("{note}; owner: {owner}"),
+        None => note,
     }
 }
 
@@ -169,7 +184,7 @@ pub fn login_life_problem(
         - now;
     (left < timeout).then(|| {
         let status = refresh_ahead
-            .map(|r| refresh_ahead_note(r.status, Some(&r.reason)))
+            .map(|r| refresh_ahead_note_with_owner(r.status, Some(&r.reason), r.owner.as_deref()))
             .unwrap_or_default();
         format!(
             "login-expires-before-seat-timeout: the login has {} min of access-token life left and the seat may run {} min, so the seat would refresh it inside its home{status}",

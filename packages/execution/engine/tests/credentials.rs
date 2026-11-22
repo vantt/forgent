@@ -1176,7 +1176,8 @@ fn while_a_running_seat_shares_the_store_refresh_token_nothing_renews_it_and_its
         scratch("share-runtime"),
         scratch("share-seats"),
     );
-    let store = claude_auth("shared", NOW + 10.0 * 60_000.0);
+    // 70 minutes left: outside base threshold (60 min), inside widened seat window.
+    let store = claude_auth("shared", NOW + 70.0 * 60_000.0);
     fs::write(source.join(".credentials.json"), &store).unwrap();
     let home = seat(&seats, "a", &store);
     let homes = Seats(vec![home.clone()]);
@@ -1195,6 +1196,7 @@ fn while_a_running_seat_shares_the_store_refresh_token_nothing_renews_it_and_its
     };
     let options = RefreshOptions {
         live_seat_homes: &homes,
+        seat_timeout_ms: Some(90.0 * 60_000.0),
         ..RefreshOptions::new(&Free, &probe, &NoSqlite, &now)
     };
     let shared = refresh_ahead(&request, &options);
@@ -1225,6 +1227,10 @@ fn while_a_running_seat_shares_the_store_refresh_token_nothing_renews_it_and_its
     assert!(fs::read_to_string(source.join(".credentials.json"))
         .unwrap()
         .contains("\"seat-renewed\""));
+    let owner =
+        read_renewal_owner(&runtime.join("account-locks/claude-miu/acct")).expect("owner recorded");
+    assert_eq!(owner.seat, home.to_string_lossy());
+    assert_eq!(owner.last_renewed_at, iso_from_ms(NOW));
     let reported = format!("{shared:?}{taken:?}");
     assert!(
         !reported.contains("FAKE-ACCESS") && !reported.contains("seat-renewed"),
@@ -1254,6 +1260,158 @@ impl CredentialProbe for RenewsClaude {
         .unwrap();
         ProbeRun::Ran { ok: true }
     }
+}
+
+#[test]
+fn a_live_seat_near_expiry_is_renewed_and_recorded() {
+    let (source, runtime, seats) = (
+        scratch("near-expiry-source"),
+        scratch("near-expiry-runtime"),
+        scratch("near-expiry-seats"),
+    );
+    // 10 minutes left: below the base threshold (60 min).
+    let store = claude_auth("shared", NOW + 10.0 * 60_000.0);
+    fs::write(source.join(".credentials.json"), &store).unwrap();
+    let home = seat(&seats, "a", &store);
+    let homes = Seats(vec![home.clone()]);
+    let credential_source = source_claude(&source);
+    let request = RefreshRequest {
+        provider: "claude-miu",
+        account_id: "acct",
+        credential_source: &credential_source,
+        runtime_dir: &runtime,
+        home_dir: None,
+    };
+    let now = || NOW;
+    let probe = RenewsClaude(RefCell::new(vec![]));
+    let options = RefreshOptions {
+        live_seat_homes: &homes,
+        ..RefreshOptions::new(&Free, &probe, &NoSqlite, &now)
+    };
+    let outcome = refresh_ahead(&request, &options);
+    assert_eq!(
+        (outcome.status, outcome.reason.as_str()),
+        ("renewed", "applied")
+    );
+    assert_eq!(probe.0.borrow().len(), 1, "scratch renewal was executed");
+
+    // The store holds the renewed pair.
+    assert!(fs::read_to_string(source.join(".credentials.json"))
+        .unwrap()
+        .contains("\"renewed\""));
+
+    // The live seat home also received the renewed pair so it does not end on a spent token.
+    assert!(fs::read_to_string(home.join(".credentials.json"))
+        .unwrap()
+        .contains("\"renewed\""));
+
+    // The renewal owner is recorded in the account directory.
+    let account_dir = runtime.join("account-locks/claude-miu/acct");
+    let owner = read_renewal_owner(&account_dir).expect("renewal owner recorded");
+    assert_eq!(owner.seat, home.to_string_lossy());
+    assert_eq!(owner.last_renewed_at, iso_from_ms(NOW));
+
+    for dir in [source, runtime, seats] {
+        fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+#[test]
+fn a_seat_ending_leaves_a_recorded_attempt() {
+    let (source, runtime, seats) = (
+        scratch("ending-source"),
+        scratch("ending-runtime"),
+        scratch("ending-seats"),
+    );
+    // 10 minutes left: below the base threshold (60 min).
+    let store = claude_auth("shared", NOW + 10.0 * 60_000.0);
+    fs::write(source.join(".credentials.json"), &store).unwrap();
+    let home = seat(&seats, "a", &store);
+    let homes = Seats(vec![home.clone()]);
+    let credential_source = source_claude(&source);
+    let request = RefreshRequest {
+        provider: "claude-miu",
+        account_id: "acct",
+        credential_source: &credential_source,
+        runtime_dir: &runtime,
+        home_dir: None,
+    };
+    let now = || NOW;
+    let probe = Answers {
+        seen: RefCell::new(vec![]),
+        ok: false, // renewal fails
+    };
+    let options = RefreshOptions {
+        live_seat_homes: &homes,
+        ..RefreshOptions::new(&Free, &probe, &NoSqlite, &now)
+    };
+    let outcome = refresh_ahead(&request, &options);
+    assert_eq!(
+        (outcome.status, outcome.reason.as_str()),
+        ("failed", "probe-failed")
+    );
+
+    // The failure and cooldown are recorded in account_dir.
+    let account_dir = runtime.join("account-locks/claude-miu/acct");
+    assert!(in_cooldown(&account_dir, DEFAULT_RENEWAL_COOLDOWN_MS, NOW));
+
+    // The seat ends (e.g. stopped, home removed).
+    fs::remove_dir_all(&home).unwrap();
+    let empty_homes = Seats(vec![]);
+    let post_options = RefreshOptions {
+        live_seat_homes: &empty_homes,
+        ..RefreshOptions::new(&Free, &probe, &NoSqlite, &now)
+    };
+
+    // The next refresh / start attempt sees the recorded attempt and cooldown.
+    let next_outcome = refresh_ahead(&request, &post_options);
+    assert_eq!(
+        (next_outcome.status, next_outcome.reason.as_str()),
+        ("cooldown", "recent-failure")
+    );
+    let problem = login_life_problem(
+        &credential_source,
+        None,
+        Some(15.0 * 60_000.0),
+        Some(&next_outcome),
+        NOW,
+        &NoSqlite,
+    );
+    assert!(problem.is_some_and(|p| p.ends_with("; refresh-ahead: cooldown recent-failure")));
+
+    for dir in [source, runtime, seats] {
+        if dir.exists() {
+            fs::remove_dir_all(dir).unwrap();
+        }
+    }
+}
+
+#[test]
+fn the_owner_record_is_readable_for_probe_account() {
+    let runtime = scratch("probe-owner-runtime");
+    let account_dir = runtime.join("account-locks/claude-miu/acct");
+    fs::create_dir_all(&account_dir).unwrap();
+
+    // No record yet.
+    assert_eq!(read_renewal_owner(&account_dir), None);
+
+    // Record an owner.
+    record_renewal_owner(&account_dir, "/tmp/fgos-confinement/seat-1/home", NOW);
+
+    // Read back.
+    let owner = read_renewal_owner(&account_dir).expect("owner record present");
+    assert_eq!(owner.seat, "/tmp/fgos-confinement/seat-1/home");
+    assert_eq!(owner.last_renewed_at, iso_from_ms(NOW));
+
+    // Also verify display in refresh-ahead line.
+    let note =
+        refresh_ahead_note_with_owner("skipped", Some("live-seat-owns-renewal"), Some(&owner.seat));
+    assert_eq!(
+        note,
+        "; refresh-ahead: skipped live-seat-owns-renewal; owner: /tmp/fgos-confinement/seat-1/home"
+    );
+
+    fs::remove_dir_all(runtime).unwrap();
 }
 
 #[test]
