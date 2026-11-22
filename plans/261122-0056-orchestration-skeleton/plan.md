@@ -6,6 +6,9 @@ priority: P1
 blockedBy:
   - 261118-1341-s6a-execution-tier-rust
   - 261120-0625-work-data-model
+  - 261121-2109-component-authority
+  - 261122-0118-heads-stable-and-able
+  - 261122-1950-owner-communication-standard
 footprint:
   - plans/261122-0056-orchestration-skeleton/**
   - packages/supervision/contracts/scheduling-record.v1.json
@@ -210,13 +213,13 @@ The discussion left five points open, each blocking part of the plan. OS-D12 and
 
 - Reused: the wake door and its ports (`Drain`, `Identity`, `StartSession`, `StopSession`, `Activity`), its capacity
   close rule (`CAPACITY_KINDS`) and `admissible()` in `portfolio.rs`; the raise door `queue.rs`; `run_wake` already
-  takes a trigger and ref (the wiring hardcodes `"manual"`, `apps/fgos/src/wiring/supervision.rs:1900`); watcher
+  takes a trigger and ref (the wiring hardcodes `"manual"`, `apps/fgos/src/wiring/supervision.rs:1940`); watcher
   definitions and their age conditions; `fgos run --case --activity` (case admission already exists in the run door);
   `fgos workflow propose` and `src/workflow/propose-frame.mjs`; the case projection `src/workflow/case-projection.mjs`;
   the referee's claim spaces; `kind: tool` executors and their invocation list (`packages/execution/rust/src/tools.rs`);
   `supervisor.maxLeads` already in `core/config-standard/supervisor.yaml`.
 - Missing: admission in code (the supervisor skill admits today, and `maxLeads` falls back to a hardcoded 4 in the
-  wiring, `supervision.rs:1925`); any scheduling record; wake reasons; a webhook route; question recipients; a resource
+  wiring, `supervision.rs:1965`); any scheduling record; wake reasons; a webhook route; question recipients; a resource
   claim space; tool job invocations; the review definition; the plan-contract check at takeover; frame intent; a
   refusal for a lead's writing run outside a case.
 
@@ -251,8 +254,13 @@ phases 9, 5, 6), `apps/fgos-gateway/src/gateway.rs` and `command-manifest.json` 
 only skill sources. Specs and `CHANGELOG.md` are written only in phase 15.
 
 No phase waits on an owner question: the owner confirmed OS-D12 and OS-D19 as final on 2026-11-22
-(`q-e2bpqz65c2`). The whole plan still waits on `blockedBy` (both plans are at their last phases and share wiring,
-execution and plan-check files with this one).
+(`q-e2bpqz65c2`). The whole plan still waits on `blockedBy`. The first two (`261118-1341-s6a-execution-tier-rust`,
+`261120-0625-work-data-model`) are done. On 2026-11-22 the `ready` flip was refused for footprint overlap with three
+active plans, now added to `blockedBy`: `261122-1950-owner-communication-standard` (the Questions crate and contracts,
+`wiring/questions.rs`, the questions spec), `261122-0118-heads-stable-and-able` (`wiring/supervision.rs`, routing, the
+plan-contract check, the supervisor and lead skills, the supervision spec) and `261121-2109-component-authority` (the
+runner and workflow specs). These paths are each plan's core files, so narrowing the footprint would not clear the
+overlap. The plan turns `ready` once all three are done; reordering them is a priority call for the secretary.
 
 ## Owner questions
 
