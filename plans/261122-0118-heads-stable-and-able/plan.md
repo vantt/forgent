@@ -64,9 +64,7 @@ footprint:
   - packages/distribution/rust/src/lib.rs
   - packages/run-supervisor/rust/Cargo.toml
   - Cargo.lock
-  - docs/architecture-manifest.json
   - test/setup/registrations.test.mjs
-  - docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
   - apps/fgos/src/wiring/session_rotation_hook.rs
 source:
   - plans/discussions/ds-fvoi45qccq-heads-stable-and-able/DISCUSSION.md
@@ -208,6 +206,15 @@ writer, phase 11.
 - `q-dcbq73d2rr`: the owner activates the release carrying 12c (`8883c2a62`) on the host and removes the five finished
   worktrees (p02, p02g, p06, p06f, p12c); lead:SUPERVISOR then reruns the real soft rotation (phase 12 done-when item
   3). The supervisor neither activates a release nor removes a worktree.
+
+### Footprint narrowed (2026-11-23 00:05, owner order via Miu 23:21, relayed by lead:SUPERVISOR)
+
+- `docs/architecture-manifest.json` and `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` are
+  removed from the plan-level footprint. Open phases 8 to 11 write neither file (their phase files were checked). The
+  overlap kept `261121-2109-component-authority` from becoming `ready`.
+- `261122-2307-heads-rotate-on-their-own` and `261121-2109-component-authority` may change those two files while phases 8
+  to 11 measure. This lead watches both plans and records in phase 11 how their changes affected the measured work.
+  Nobody waits for this plan.
 
 ### Lead progress (2026-11-22 22:25, head:lead-forgent-261122-0118-heads-b52f9, gen 8)
 
