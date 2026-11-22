@@ -28,8 +28,11 @@ The owner split the topic in two (section 5, 13:10). **Keeping information valid
 
 Consequences: q-von37r6ef6 (how to withdraw a stale question) is cancelled as out of scope. The status-report rule no longer requires source, age and activity evidence; guaranteeing freshness belongs to the systems.
 
-Open owner question (parked in the store; shaping continues around it):
+Round 3 (14:55): the owner named gap 1 (asking permission to do read-only work) and gap 4 (roles, ids and terms reaching the owner unexplained) as the problems this discussion must solve. The owner also recalled the earlier guard that forces every question to say what is happening, why and what is advised. Scout found that guard fires only on the `AskUserQuestion` tool, while both frictions this morning were plain chat. That makes enforcement on plain chat an owner choice.
 
+Open owner questions (parked in the store; shaping continues around them):
+
+- **q-nfgvjge6zg**: whether an end-of-turn check catches permission-asking and unexplained ids in plain chat (section 3 row "Enforcement of gaps 1 and 4").
 - **q-xkrbp66xy6**: which form rules `fgos questions ask` enforces by program (section 3 row "Program checks").
 
 Every other point carries a provisional default.
@@ -44,8 +47,11 @@ The big goal is to lower the owner's cognitive load, so the owner can decide at 
 |---|---|---|---|
 | Where it is loaded so every agent sees it | clear | `core/instructions/*.md` with `appliesTo: ["*"]` is rendered into each project's `AGENTS.md` by `src/setup/instruction-projections.mjs` (adapter `portable-agents-md`), which every agent CLI reads; `decision-question.md` is already one of them | The always-loaded instruction stays the door; it carries a short summary and points to the full fragment. |
 | One file or two | **provisional** | `core/skills/_shared/decision-question.md` (53 lines) is cited by about 20 source files (6 core skills, 6 coding-domain skills, 4 platform docs, reading map, AGENTS render) plus 4 code/test refs (`src/state/decision-question.mjs`, `src/state/status-fsm.mjs`, `test/docs/rul11-anchor-phrase.test.mjs`, `test/state/awaiting.test.mjs`); generated copies under `.agents/skills` and `plugins/fgOS` rebuild with `npm run build:skills` | **Default: one file.** Rename the fragment to `core/skills/_shared/owner-communication.md` and the instruction to `core/instructions/owner-communication.md`; the decision question becomes one section of it; every caller moves and the old paths are removed in the same change (L10). Two files would split one act (speaking to the owner) across two doors, and the common rules (names, source and age, answer friction) apply to both. Reverse if the single file goes past about 150 lines, or the owner wants questions kept as a separately citable law. |
-| Read-only work first | provisional | Report gap 1: two secretary messages asked permission to read or check | Prose rule: reading, checking, re-verifying and drafting are done before speaking; a message never asks permission for read-only work; it brings findings plus a recommendation. Only a write, a spend outside the approved frame, or an outward action is asked. |
-| Common rules for any owner message | provisional | Gaps 4, 5 | Prose: outcome first; one action per item; first mention of a role, lane, id or term gets one plain phrase; a pointer to a numbered item says which item; say what was checked and what was not. |
+| Enforcement of gaps 1 and 4 | **open, owner question q-nfgvjge6zg** | `src/runner/hook.mjs` runs `decision-question` only for `AskUserQuestion` (Claude), `RequestUserInput\|ask.*` (Codex) and `ask.*` (agy), per `src/setup/agent-hooks.mjs:227,246,255`; plain chat text is never checked. Claude and Codex already run fgOS `Stop` hooks (mailbox, questions: `agent-hooks.mjs:233,242,251,253`). No earlier permission-ask or id check exists (`git log -G` empty). | Recommended: rule text plus an end-of-turn (`Stop`) check that sends the agent back once when its last message asks permission for read-only work or names an id with no plain phrase. agy gets the rule only. |
+| Read-only work first (gap 1) | **in scope (owner, 14:55)**, wording provisional | Report gap 1: two secretary messages asked permission to read or check | Prose rule: reading, checking, re-verifying and drafting are done before speaking; a message never asks permission for read-only work; it brings findings plus a recommendation. Only a write, a spend outside the approved frame, or an outward action is asked. |
+| Explain names and ids (gap 4) | **in scope (owner, 14:55)**, wording provisional | Gap 4: "OPC là ai", "list nào không refresh", a supervisor line naming a role and "question 2" with no pointer | Prose rule: the first mention of a role, lane, id or term in a message gets one plain phrase ("OPC, the lead running the stability plan"); a pointer to a numbered item names the item; an id is never the only handle. |
+| Common rules for any owner message | provisional | Gap 5 | Prose: outcome first; one action per item; say what was checked and what was not. |
+| Gaps 5, 6, 7 | provisional, owner named only 1 and 4 | Owner's 14:55 message lists all seven and names 1 and 4 | Kept as provisional form rules (5 answer friction, 6 report shape, 7 solved by the shared file itself) until the owner says otherwise. |
 | Status / progress report shape | provisional | Gap 6; `core/skills/fgos-lead/SKILL.md:76`, `fgos-secretary/SKILL.md:93`, `fgos-supervisor/SKILL.md:112` each repeat "at most 10 lines, full report in a file" | Section in the shared file: outcome; done (with ids explained); checked and not checked; owner decisions (one per item, recommendation first, lettered, default); at most 10 lines, full report in a file named by `fgos convention path --kind report`. The three skills drop their own lines and point to it. |
 | Incident report shape | provisional | Gap 6 | Same frame plus: impact now, what was done to contain it, what is still at risk, the one decision needed. |
 | Answer friction | provisional | Gap 5: owner answers "A", "ok", "ok duyệt" | Options lettered A-D, recommended one first and marked, a stated default ("no answer by <when> → I take A"). Whether the store enforces part of this: **q-xkrbp66xy6**. |
@@ -67,6 +73,8 @@ The big goal is to lower the owner's cognitive load, so the owner can decide at 
 
 - 2026-11-22 13:10 — Owner (in the shaper session, after the two questions were explained in Vietnamese): "cần lưu ý, có 2 vấn đề 1) độ còn valid của thông tin, việc này không cover trong cách giao tiếp, mà là cách các hệ thống watcher, monitor phải luôn cung cấp dữ liệu mới và nhắc agent liên quan. 2) chổ này liên quan đến cách, hình thức giao tiếp và trao đổi với human. mục tiêu lớn giảm tải nhận thức, ra quyết định ngay, kịp thới với thông tin sẵn sàng, rõ ràng, dễ hiểu." Shaper: information validity leaves this discussion and becomes a separate item; q-von37r6ef6 cancelled; §2 rewritten around the cognitive-load goal; the status-report source/age rule and the "life of an open question" section dropped; §6 regenerated. q-xkrbp66xy6 still stands (form).
 
+- 2026-11-22 14:55 — Owner, quoting the seven gaps: "câu 1 và câu 4 là các vấn đề cần xử lý tại đây. nó cũng giống như trước đây hình như cũng từng có lần xử lý hook gì đó mà mỗi lần hỏi phải ghi rõ là: chuyện gì đang xảy ra, tại sao, em advise thế nào, ..." Shaper: gaps 1 and 4 confirmed in scope. The recalled guard is `fgos hook decision-question` (commit 3d3d32648); it sees only ask-tool calls, never plain chat. Parked q-nfgvjge6zg on enforcing gaps 1 and 4 at turn end. Gaps 5-7 stay provisional.
+
 ## 6. Thiết kế đã chốt {#design}
 
 Nothing is settled yet. Draft shape under the provisional answers, for the owner to react to:
@@ -81,7 +89,7 @@ The yardstick for every rule is the owner's cognitive load: can the owner decide
 4. **Status and progress report**: fixed order, at most 10 lines, full report in a file.
 5. **Incident report**: the same order plus impact, containment and remaining risk.
 
-`fgos questions ask` checks what q-xkrbp66xy6 settles; every other rule stays prose. Keeping the information fresh is not in this design; it belongs to the watchers and monitors (separate item).
+`fgos questions ask` checks what q-xkrbp66xy6 settles. If q-nfgvjge6zg settles on A, an end-of-turn hook (Claude, Codex) checks sections 1 and 2 on plain chat: permission-asking for read-only work, and ids with no plain phrase. Every other rule stays prose. Keeping the information fresh is not in this design; it belongs to the watchers and monitors (separate item).
 
 ```mermaid
 flowchart LR
