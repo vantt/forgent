@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3a79d3630237ea1b7529926a83f836a73e8be763191c8c428dd090d739e45d32",
+  "payloadDigest": "b4152a96fe9fad64ab23b773826605adcfc9da6693a9a1b1995903423f7738ac",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -194,7 +194,7 @@
     "apps/fgos/tests/questions_head.rs": "351a1e52ae8ad3f5f0e0586ddf800314fa86464e4894d4187d59a0020a0e9080",
     "apps/fgos/tests/questions_hook.rs": "1c206c5633a8ec75345fdcc4debd1efe30f8aa996aa48e00e3963c426061f5a2",
     "apps/fgos/tests/questions_verb.rs": "b0ccc8a1c82bbf81b7ad84eecfdcf4a2e3c350eb297cf6749645b4ee1a3296dd",
-    "apps/fgos/tests/session_write_publish.rs": "d2dde870edfba92c0ef06327d4fd0a7db374c263bb2afc491a1fc0d32651f50e",
+    "apps/fgos/tests/session_write_publish.rs": "b4c33aba8cd04c05e1e5e0dd61b36cabe49c0d489ee077dc82b7f867213cd51d",
     "apps/fgos/tests/supervision_verbs.rs": "5fb362d442797502a2975e814f612683df87777b982af9e4053e994cbfa1a0c7",
     "apps/fgos/tests/windows_borrow.rs": "deeb68f3b777b64c076bfd317baac95b11cff6c0bceede7eb3774a3d6d25f7bf",
     "apps/fgos/tests/windows_cwd_lease_owner.rs": "c3e833710c3dfa42f98addbca06e1dd7935470e73880a5ce7bb9622a9991f26a",
@@ -407,7 +407,7 @@
     "packages/durable-file/rust/src/lib.rs": "4009c760fbc193a281157aee4dad203fc1b53ce04cc557819322ded12c0ce6f3",
     "packages/durable-file/rust/tests/beneath.rs": "640a72d38f8b5360f3ba8ebf825877742b7f28c64d9c5fde4dcfd6f3bfcc4f59",
     "packages/durable-file/rust/tests/creation_modes.rs": "eaa469ec9d3091c882e3801243b4c7901878ec0243bfb101ea8d42ba9e97e4a7",
-    "packages/durable-file/rust/tests/dir_replace.rs": "1aac42f48ea4464a0ebc3ea720b881d985e3a2e25e4f167beb2034f45b2bf71d",
+    "packages/durable-file/rust/tests/dir_replace.rs": "c85b073e16c0ff8d5876af295fbea7b5ffa8d060583c2fca5202e8ccaa38e786",
     "packages/durable-file/rust/tests/install.rs": "9117ad49f4abb7279c39b4661240126fc27eda2d603e9c6da1e1e6555d930ebc",
     "packages/event-store/rust/build.rs": "e4044e37a23a7776c0a417e384a78276e19f19d8145dc74631caadc86ef62d65",
     "packages/event-store/rust/examples/distribution_digest_audit.rs": "3793a8a4d92cfc469eb3b6220d15b709b662990c801d082870ad1c7fc289f089",

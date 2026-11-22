@@ -100,7 +100,7 @@ test(
   () => {
     const sourceFiles = [
       {
-        file: 'docs/backlog.md',
+        file: 'plans/backlog.md',
         lines: ['line 0', 'cites ADR0002 here'],
       },
     ];
@@ -113,7 +113,7 @@ test(
 
     assert.equal(findings.length, 1);
     assert.equal(findings[0].kind, 'dead-framing');
-    assert.equal(findings[0].file, 'docs/backlog.md');
+    assert.equal(findings[0].file, 'plans/backlog.md');
     assert.equal(findings[0].line, 2);
     assert.equal(findings[0].id, '0002');
     assert.equal(findings[0].supersededBy, '0012');
@@ -148,7 +148,7 @@ test(
   () => {
     const sourceFiles = [
       {
-        file: 'docs/backlog.md',
+        file: 'plans/backlog.md',
         lines: ['per record ADR0010'],
       },
     ];
