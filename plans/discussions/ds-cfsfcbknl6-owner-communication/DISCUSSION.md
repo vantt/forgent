@@ -1,26 +1,26 @@
 ---
 id: ds-cfsfcbknl6
 title: "Tiêu chuẩn giao tiếp: one shared communication standard for how every agent talks to the owner"
-status: open
+status: settled
 source:
   - p-wb6rkwpjsg
 created: 2026-11-22
 ---
 
-discussion: open
+discussion: settled
 
-## Hand-off to the planner (under revision, round 12)
+## Hand-off to the planner
 
-- **Outcome:** one shared standard, **tiêu chuẩn giao tiếp** (communication standard), always loaded by every head, lead and worker in every CLI, that gives the motive, the principle judged from the reader's side, its applications (before speaking, names and ids, language and length, decision questions, status and incident reports) and a few curated cases; bad exchanges are captured in the friction store, partly by a hook on the owner's own reaction; the question door makes answers cheap. Decisions OC-D1 to OC-D7.
-- **Constraints:** the standard replaces `core/skills/_shared/decision-question.md` and `core/instructions/decision-question.md`; every caller moves and the old paths are removed in the same change (L10, design principle 1); generated copies are rebuilt with `npm run build:skills`, never edited; a new friction layer value goes into `packages/observe/rust/friction-kinds.json` only; a new hook kind needs its rows in `packages/distribution/contracts/agent-hooks.v1.json` and the doctor registry; the reaction hook never blocks or delays the owner's prompt; a user-visible change gets a line in `CHANGELOG.md`; `npm test` and `cargo test --workspace` green.
-- **Non-goals:** keeping information valid (OC-D1, its own item); the coach role (OC-D5, its own item); a check on the agent's outgoing messages (OC-D7, level 3); changing the approved-frame rule or the product priority order.
+- **Outcome:** one shared standard, **tiêu chuẩn giao tiếp** (communication standard), always loaded by every head, lead and worker in every CLI, that gives the motive, the principle judged from the reader's side, its applications (before speaking, names and ids, language and length, decision questions, status and incident reports) and a few curated cases; an agent that sees its communication fell short records a friction so the system can improve; the question door makes answers cheap. Decisions OC-D1, OC-D3 to OC-D14 (OC-D2 superseded by OC-D8, OC-D7 item 1 by OC-D13).
+- **Constraints:** the standard replaces `core/skills/_shared/decision-question.md` and `core/instructions/decision-question.md`; every caller moves and the old paths are removed in the same change (L10, design principle 1); generated copies are rebuilt with `npm run build:skills`, never edited; a new friction layer value goes into `packages/observe/rust/friction-kinds.json` only; a user-visible change gets a line in `CHANGELOG.md`; `npm test` and `cargo test --workspace` green.
+- **Non-goals:** keeping information valid (OC-D1, its own item); the coach role (OC-D5, its own item); a check on the agent's outgoing messages (OC-D7, level 3); an automatic hook that scans the owner's messages (OC-D13, moved to the coach discussion); changing the approved-frame rule or the product priority order.
 - **Acceptance criteria:** see each task in section 7.
-- **Open points that block only part:** the T-signal phrase list is provisional (section 6, step 3); task 2 starts with it and the coach refines it later. Codex support for a prompt-submit hook is unverified; task 2 covers Claude Code and adds Codex only where its hook surface allows.
-- **Source ids:** `p-wb6rkwpjsg`; decisions OC-D1 to OC-D7.
+- **Open points that block only part:** the T-signal list is provisional (section 6, step 3); task 1 writes it as is and the coach refines it later. The activated release refuses `friction record` to heads (`verb-not-granted`, seen 19:35) although `src/session-host/head-grants.mjs:29` grants it; until a newer release is activated, heads use the fallback in OC-D14.
+- **Source ids:** `p-wb6rkwpjsg`; decisions OC-D1 to OC-D14.
 - **Collision to resolve in planning:** draft plan `261122-0056-orchestration-skeleton` also lists `packages/questions/contracts/questions-input.v1.json` and `packages/questions/rust/src/*` in its footprint; task 3 touches the same files, so the planner either sequences task 3 after that plan or folds task 3 into it.
 - **Separate items this discussion produced (not for this planner):**
-  - Information freshness (OC-D1). Owner 17:53 asked whether it fits the running plan `261122-0118-heads-stable-and-able`. Shaper's reading: the idle-lead part (status resting on `leadLive`) is already folded there (`p-4uqiyjwrtd`, phases 7 and 9). The stale-question part needs the question store to notice the state behind a question, which that plan's non-goals hand to draft plan `261122-0056-orchestration-skeleton` (question recipients and notifier, footprint `packages/questions/rust/src/notifier.rs`). That plan is at its last phases (8-12 running, 11 the integration gate), so widening it would delay its done.
-  - The coach as part of a complete observation cluster. Owner 17:53: a separate discussion; observe metrics plus friction already give the data; extend the cluster into a whole with a coach that cares for it, and harden observe with ready-built harness and tools so the coach gets aggregated data fast, for example pre-built SQL views as in the owner's `vantt/pkm` project. Shaper notes: L3 already says truth in JSONL, the database is a view, so pre-built views fit the law; observe already has named query definitions (`fgos metrics query`, observe spec section 1), the nearest existing door to extend; `vantt/pkm` is the owner's GitHub repository (owner 19:35); not cloned on this machine, its pre-built SQL views are input for the coach discussion.
+  - Information freshness (OC-D1). Owner 17:53 asked whether it fits the running plan `261122-0118-heads-stable-and-able`. Shaper's reading: the idle-lead part (status resting on `leadLive`) is already folded there (`p-4uqiyjwrtd`, phases 7 and 9). The stale-question part goes to draft plan `261122-0056-orchestration-skeleton` (question recipients and notifier), OC-D12.
+  - The coach as part of a complete observation cluster, plus the automatic capture of owner reactions (OC-D13). Owner 17:53: a separate discussion; observe metrics plus friction already give the data; extend the cluster into a whole with a coach that cares for it, and harden observe with ready-built harness and tools so the coach gets aggregated data fast, for example pre-built SQL views as in the owner's `vantt/pkm` project. Shaper notes: L3 already says truth in JSONL, the database is a view, so pre-built views fit the law; observe already has named query definitions (`fgos metrics query`, observe spec section 1), the nearest existing door to extend; `vantt/pkm` is the owner's GitHub repository (owner 19:35); not cloned on this machine, its pre-built SQL views are input for the coach discussion.
 
 ## Seed
 
@@ -35,13 +35,11 @@ Opened by the secretary (Miu) on the owner's order, 2026-11-22. The owner wants 
 
 ## 1. Trạng thái hiện tại
 
-Reopened, 2026-11-22 18:05 (round 12). Domain: coding.
+Settled again, 2026-11-22 19:45. Domain: coding.
 
-Settled so far (OC-D1, OC-D3 to OC-D8): the **tiêu chuẩn giao tiếp** (communication standard), grounded in the owner being cognitively overloaded, so every message must make taking in information as easy, clear and high in quality as possible; the friction store as case log; a coach that learns from it; one standard file; program support levels.
+The **tiêu chuẩn giao tiếp** (communication standard) is defined: grounded in the owner's cognitive overload; three parts (A conduct, B presenting information in nine points, C when and where); seed cases; bad exchanges recorded as friction, by every agent that notices its own communication fell short, with a fallback when the door refuses (OC-D14); a coach learns from them (its own discussion).
 
-Round 12: the owner said the reaction signals were a hint for the agent itself to notice that its presentation fell short, not a hook to build, and that presenting information is the core of the standard. Corrected by the owner at 18:15: on a reaction signal the agent notices and records, and does not re-present; it waits for the owner's question. Proposed and waiting for the owner: (a) the reaction-signal rule moves into the standard (Part A), the automatic capture moves to the coach cluster discussion, leaving two tasks; (b) step 2 split into three parts (conduct, presenting information in nine points, when and where).
-
-Also waiting for the owner: where the stale-question part of freshness goes (recommended: draft plan `261122-0056-orchestration-skeleton`), and the path to the owner's `vantt/pkm` project for the coach discussion.
+**Output:** two tasks for one planner (section 7): write the standard and move every caller; cheap answers in the question door. Separate: stale questions go to draft plan `261122-0056-orchestration-skeleton` (OC-D12); the coach observation cluster, with automatic capture and pre-built views as in `vantt/pkm`, needs its own discussion. No owner question is open.
 
 ## 2. Mục tiêu & đề bài
 
@@ -79,6 +77,8 @@ Agents in fgOS speak to the owner many times a day, and the owner's attention is
 | OC-D10 | Sharpens OC-D9: the motive is to weigh everything the owner says and reflect on one's own view; agree plainly when the owner is right, push back only with a better-grounded view. Neither flattery nor contrarianism; a discussion exists to reach a better result, clearer information, or a lesson. | Owner 18:29 | 2026-11-22 |
 | OC-D11 | The standard has three parts: A conduct, B presenting information (the nine points in section 6, the largest part), C when and where to speak. | Shaper draft 18:05, owner confirmed the nine points 19:35 | 2026-11-22 |
 | OC-D12 | The stale-question part of information freshness goes to draft plan `261122-0056-orchestration-skeleton` (question recipients and notifier), not to `261122-0118-heads-stable-and-able`; the idle-lead part is already folded in the latter (`p-4uqiyjwrtd`). | Shaper recommendation 17:55, owner "theo đề nghị của em" 19:35 | 2026-11-22 |
+| OC-D13 | Supersedes OC-D7 item 1: no automatic hook scanning the owner's messages is built in this work; the reaction signals are a rule for the agent itself (Part A). The automatic capture idea moves to the coach discussion. This leaves two tasks. | Shaper proposal 18:05, owner "đúng, đồng ý bỏ" 19:45 | 2026-11-22 |
+| OC-D14 | An agent that sees its own communication or presentation fell short (from a reaction signal or by its own reflection) must find a way to record a friction, so the system has a chance to improve. Door: `fgos friction record`; a worker inside a run lists it under `frictions` in its result claim; if the door refuses, the agent writes the same facts into its own working file (discussion, plan report) and records it once the door works. Never lost, never blocking the work. | Owner 19:45 | 2026-11-22 |
 
 ## 5. Q&A log
 
@@ -122,6 +122,8 @@ Agents in fgOS speak to the owner many times a day, and the owner's attention is
 
 - 2026-11-22 19:35 — Owner: "xác nhận 9 điểm trình bày thông tin; gộp việc 2 vào tiêu chuẩn anh chưa hiểu. chọn chổ: theo đề nghị của em. project repo pkm: vantt/pkm;" Shaper minted OC-D11 (three parts, nine points) and OC-D12 (stale questions to the orchestration-skeleton plan); recorded the pkm pointer. "anh chưa hiểu" is signal T3: the shaper had written "gộp việc 2 vào tiêu chuẩn" with a task number as the only handle. Tried to record it as a friction; the running release refused `friction record` for this head (`verb-not-granted`), although `src/session-host/head-grants.mjs:29` already lists it in `HEAD_VERBS`, so the activated release lags the source. Answered the owner's question in plain words in chat.
 
+- 2026-11-22 19:45 — After the shaper restated the question as one yes/no with a default, owner: "đúng, đồng ý bỏ. nhưng cũng làm rõ thêm là khi agent nhìn ra mình giao tiếp, hoặc trình bày chưa đạt nó phải tìm cách ghi nhận friction để còn có cơ hội tối ưu". Shaper minted OC-D13 (task 2 dropped) and OC-D14 (recording duty with a fallback, since the activated release refused this head's `friction record` at 19:35); marked the discussion settled with two tasks.
+
 ## 6. Thiết kế đã chốt {#design}
 
 The standard **tiêu chuẩn giao tiếp** (communication standard), as it stands. Steps 1 and 2 are settled in substance (OC-D2), their wording is not final; step 3 holds seed cases; step 4 is not started.
@@ -144,6 +146,7 @@ Of everything in the system, the owner's attention is the scarcest and the most 
 
 - Reading, checking and drafting are the agent's own work; never ask permission for them. Come with findings and a recommendation; ask only for what is the owner's to decide.
 - Weigh everything the owner says, and reflect on your own view too. If the owner is right, agree plainly, with the reason in a line; pushing back for its own sake is as wrong as going along. If you hold a better-grounded view, push back with evidence; then the owner decides (case S3). The purpose is a better result, clearer information, or a lesson learned, never pleasing the owner and never always arguing: helping the owner see a problem early lowers the owner's load, while going along lets it drag on (owner 18:20, 18:29). Once the owner decides, carry it out; reopen only with new evidence.
+- When the agent sees its communication fell short, from the owner's reaction or its own reflection, it must find a way to record a friction so the system can improve: `fgos friction record`, or `frictions` in a run's result claim, or, if the door refuses, the same facts in its own working file to record later (OC-D14).
 - When the owner's reaction shows the presentation fell short (the signals in step 3: mood change, asking back, not following the recommendation, re-aiming, ...), the agent's job is to notice it and record a friction to learn from. It does **not** jump in to present again: a guessed rewrite is one more message for an overloaded reader and adds confusion. It waits for the owner's next question, which shows exactly where the communication broke, then answers that question, short (owner 18:15).
 
 **Part B. Presenting information (trình bày thông tin), the largest part.**
@@ -219,20 +222,20 @@ flowchart TD
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Proposed in round 12: two tasks for one planner. Task 1 lands first; task 3 follows it.
+Two tasks for one planner (task 2 dropped, OC-D13). Task 1 lands first; task 3 follows it.
 
 ### Task 1 — Write the standard and move every caller {#task-standard}
 
 - **Goal:** the communication standard exists as one shared fragment and one always-loaded instruction (suggested names `core/skills/_shared/owner-communication.md` and `core/instructions/owner-communication.md`), replacing both decision-question files; the friction store can hold owner-communication cases.
 - **§6 excerpt:** steps 1-3 (motive, principle and test, applications, curated cases, how cases are kept and the T-signals).
 - **D-IDs:** OC-D2, OC-D3, OC-D4, OC-D6.
-- **Includes:** every caller of the old paths moved (about 20 source files: core and coding-domain skills, platform docs, reading map; code and test refs in `src/state/decision-question.mjs`, `src/state/status-fsm.mjs`, `test/docs/rul11-anchor-phrase.test.mjs`, `test/state/awaiting.test.mjs`); the "at most 10 lines" report lines in `fgos-lead`, `fgos-secretary`, `fgos-supervisor` replaced by a pointer; a friction layer value for owner communication in `packages/observe/rust/friction-kinds.json`; the owner-signal trigger in `core/skills/_shared/friction-capture.md`; generated copies rebuilt.
+- **Includes:** every caller of the old paths moved (about 20 source files: core and coding-domain skills, platform docs, reading map; code and test refs in `src/state/decision-question.mjs`, `src/state/status-fsm.mjs`, `test/docs/rul11-anchor-phrase.test.mjs`, `test/state/awaiting.test.mjs`); the "at most 10 lines" report lines in `fgos-lead`, `fgos-secretary`, `fgos-supervisor` replaced by a pointer; a friction layer value for owner communication in `packages/observe/rust/friction-kinds.json`; the owner-signal trigger and the recording duty with its fallback (OC-D14) in `core/skills/_shared/friction-capture.md`; generated copies rebuilt.
 - **Siblings:** tasks 2 and 3 depend on it (the layer value, and the text they point to).
 - **Draft verify:** `git grep -n -e "_shared/decision-question" -e "instructions/decision-question" -- ':!plans' ':!CHANGELOG.md'` prints nothing; `npm run build:skills` leaves no diff; `npm test` green.
 
-### Task 2 — moved {#task-reaction-capture}
+### Task 2 — dropped {#task-reaction-capture}
 
-Proposed in round 12: the automatic capture hook leaves this discussion. The owner meant the reactions as a signal for the agent to notice that its presentation fell short (owner 18:05), which is a rule in Part A and lands with task 1. Collecting the signals automatically for the coach goes to the coach observation-cluster discussion as an input.
+OC-D13: no automatic capture hook in this work; the rule for agents lands with task 1, the automatic capture idea goes to the coach discussion.
 
 ### Task 3 — Cheap answers in the question door {#task-cheap-answers}
 
