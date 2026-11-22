@@ -42,6 +42,22 @@ footprint:
   - test/skills/fgos-supervisor-idle-lead.test.mjs
   - test/live/head-grant-probe.live.mjs
   - CHANGELOG.md
+  - packages/config/rust/src/provider.rs
+  - packages/config/rust/src/provider/unix_verbs.rs
+  - packages/config/contracts/fixtures/scope.v1.json
+  - packages/config/rust/tests/golden_scope.rs
+  - apps/fgos/src/cli_projector.rs
+  - packages/host-runtime/contracts/command-manifest.json
+  - docs/platform/config/spec.md
+  - packages/host-runtime/rust/src/activation.rs
+  - packages/host-runtime/rust/src/lib.rs
+  - packages/distribution/rust/src/lib.rs
+  - packages/run-supervisor/rust/Cargo.toml
+  - Cargo.lock
+  - docs/architecture-manifest.json
+  - test/setup/registrations.test.mjs
+  - docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
+  - apps/fgos/src/wiring/session_rotation_hook.rs
 source:
   - plans/discussions/ds-fvoi45qccq-heads-stable-and-able/DISCUSSION.md
   - p-vquz26ibnn
