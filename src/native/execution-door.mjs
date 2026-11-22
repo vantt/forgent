@@ -13,6 +13,10 @@
 import { spawn } from 'node:child_process';
 import readline from 'node:readline';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
+import { DispatchError } from './dispatch-error.mjs';
+import { withLegacyView } from './legacy-view.mjs';
+
+export { DispatchError, withLegacyView };
 
 export function commonDottedParent(paths) {
   if (!Array.isArray(paths) || paths.length === 0) return '';
@@ -57,22 +61,6 @@ export class RunnerConfigError extends Error {
 
   get subpath() {
     return deriveSubpath(this.paths, this.path);
-  }
-}
-
-/**
- * Raised when spawning or running the executor itself fails at runtime. `errorClass` reuses the vocabulary of
- * `recovery.mjs`'s `ERROR_CLASSES`, so the runner feeds it straight into `resolveAction`. Declared here once, so
- * `instanceof` holds for an error rethrown from a native unit run (`runUnitErrorOf`).
- */
-export class DispatchError extends Error {
-  constructor(errorClass, message, details = {}) {
-    super(message);
-    this.name = 'DispatchError';
-    this.errorClass = errorClass;
-    this.code = details.code ?? errorClass;
-    this.data = details;
-    Object.assign(this, details);
   }
 }
 
@@ -215,28 +203,6 @@ export function runUnitErrorOf(result) {
     thrown.errorClass = error.errorClass;
   }
   return thrown;
-}
-
-/**
- * A version-3 record with the legacy `status` and `confidence` read from its classification; assigning either
- * replaces the reading with the assigned value. Both are non-enumerable views, so a RunResult that crossed the host's
- * JSON line gets them back here (`runUnitInHost`), as Node's settle gave them.
- */
-export function withLegacyView(record) {
-  const view = (name, read) => Object.defineProperty(record, name, {
-    get: read,
-    set(v) { Object.defineProperty(this, name, { value: v, writable: true, configurable: true, enumerable: true }); },
-    enumerable: false,
-    configurable: true,
-  });
-  view('status', function status() {
-    if (this.classification?.outcome?.category === 'ok') return 'done';
-    if (this.classification?.outcome?.category === 'blocked') return 'blocked';
-    if (this.classification?.confidence?.level === 'no-evidence') return 'no-evidence';
-    return 'failed';
-  });
-  view('confidence', function confidence() { return this.classification?.confidence?.level ?? null; });
-  return record;
 }
 
 /** The prefix of the answer line of an Execution operation; every other line is a peer frame or stray output. */

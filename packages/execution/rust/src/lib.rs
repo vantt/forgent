@@ -24,6 +24,7 @@ pub mod executor_model;
 pub mod explain;
 pub mod handoff;
 pub mod hook;
+pub mod hosts;
 mod js;
 pub mod loops;
 pub mod outcome;

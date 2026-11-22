@@ -48,6 +48,36 @@ impl ConfigRefusal {
         }
     }
 
+    /// The refusal as one line of text, the way the Node config door words it: the id, then the file with its
+    /// 1-based line and column and the dotted path, then the keyword in parentheses; an absent part is left out.
+    pub fn door_text(&self) -> String {
+        let mut place = self.file.clone().unwrap_or_default();
+        if let (false, Some(line), Some(column)) = (place.is_empty(), self.line, self.column) {
+            place.push_str(&format!(":{line}:{column}"));
+        }
+        if let Some(path) = &self.path {
+            place = [place.as_str(), path.as_str()]
+                .iter()
+                .filter(|part| !part.is_empty())
+                .copied()
+                .collect::<Vec<_>>()
+                .join(" ");
+        }
+        let keyword = self
+            .detail
+            .as_deref()
+            .and_then(|detail| detail.keyword.clone())
+            .or_else(|| self.yaml.as_ref().map(|yaml| yaml.rule.to_string()))
+            .map(|keyword| format!("({keyword})"))
+            .unwrap_or_default();
+        [self.code, place.as_str(), keyword.as_str()]
+            .iter()
+            .filter(|part| !part.is_empty())
+            .copied()
+            .collect::<Vec<_>>()
+            .join(" ")
+    }
+
     pub(crate) fn in_file(mut self, file: &str) -> Self {
         self.file = Some(file.to_string());
         self

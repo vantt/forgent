@@ -78,6 +78,11 @@ function createRun({ workflowRunId, workflow, mainRoot, worktreePath, hold, onLo
     personaScope: workflowPersonaScope(workflow.id, { packageRoot: mainRoot }),
 
     /** Record one event; a step's start, end or park also reaches onLog as one line. */
+    /** Hand one line to the run's log (the detached advance prints it); the case ledger never sees it. */
+    log(line) {
+      if (onLog) onLog(line);
+    },
+
     emit(type, payload) {
       const stored = appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId, event: { type, payload }, hold });
       const line = progressLine(stored);
@@ -224,6 +229,27 @@ function refuseUnit(run, { step, u, error, attempt }) {
   return 'failed';
 }
 
+/** How many host exits in a row, with no progress of the unit between them, fail the step. */
+const HOST_EXIT_CAP = 3;
+/** How much of the host's first stderr line a `unit.host-exit` event keeps. */
+const HOST_EXIT_STDERR_LIMIT = 200;
+
+/**
+ * How many `unit.host-exit` events of one unit run end the ledger's record of that unit, counted back from its last
+ * event: any other event of the unit (it was scheduled, started or completed again) or an exit of another unit run
+ * is progress and ends the count.
+ */
+function hostExitStreak(events, stepId, unitId, unitRunId) {
+  let streak = 0;
+  for (let i = events.length - 1; i >= 0; i -= 1) {
+    const { type, payload } = events[i];
+    if (payload?.stepId !== stepId || payload?.unitId !== unitId) continue;
+    if (type !== 'unit.host-exit' || payload.unitRunId !== unitRunId) break;
+    streak += 1;
+  }
+  return streak;
+}
+
 /**
  * Run one unit of a step to its recorded end.
  *
@@ -283,9 +309,14 @@ async function runStepUnit(run, { step, u, state, uState }) {
       // The host ended after its unit run began and before settling it: nothing is settled here. The unit stays
       // `running` with its reservation live, as when this controller itself dies; the ledger names the exit, and a
       // later advance resumes the unit run or its dead-reservation sweep decides it.
+      // The ledger keeps the first line of the host's stderr; the whole of it goes to the run's log.
       const { reservationId, unitRunId, code, signal, stderr } = error.unsettled;
-      run.emit('unit.host-exit', { stepId: step.id, unitId: u.id, unitRunId, reservationId, code, signal, ...(stderr ? { stderr } : {}) });
-      return 'unsettled';
+      const firstLine = String(stderr ?? '').trim().split('\n')[0].slice(0, HOST_EXIT_STDERR_LIMIT);
+      if (stderr) run.log(`step ${step.id} unit ${u.id}: host stderr:\n${stderr}`);
+      run.emit('unit.host-exit', { stepId: step.id, unitId: u.id, unitRunId, reservationId, code, signal, ...(firstLine ? { stderr: firstLine } : {}) });
+      if (hostExitStreak(readWorkflowEvents({ repoRoot: mainRoot, workflowRunId }), step.id, u.id, unitRunId) < HOST_EXIT_CAP) return 'unsettled';
+      run.failStep(step, 'execution-host-crash-loop', `unit ${u.id}: its host ended before settling ${HOST_EXIT_CAP} times in a row with no progress (last: ${signal ? `signal ${signal}` : `exit ${code}`}${firstLine ? `: ${firstLine}` : ''})`, u.id);
+      return 'failed';
     }
     recordScheduled();
     result = { unitRunId: attempt.resumeUnitRunId ?? attempt.unitRunId, outcome: 'execution-failure', infrastructure: true, results: [], error: String(error?.message ?? error) };

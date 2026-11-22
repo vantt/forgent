@@ -287,14 +287,6 @@ fn door_failure(error: SnapshotError) -> DecideFailure {
     }
 }
 
-/// The keys of the runner section whose refusals are attributed to a file and line.
-const ORIGIN_KEYS: [&str; 4] = [
-    "runner.modelPolicies",
-    "runner.rigorToTier",
-    "runner.patterns",
-    "runner.loops",
-];
-
 impl CheckoutFacts for HostWorkspace {
     fn repo_root(&self, dir: &str) -> Result<String, String> {
         let shown = dir.to_owned();
@@ -346,13 +338,7 @@ impl Workspace for HostWorkspace {
             .iter()
             .filter_map(|origin| {
                 let path = fgos_yaml_doc::path::format_path(&origin.path);
-                let wanted = ORIGIN_KEYS.iter().any(|key| {
-                    path == *key
-                        || path
-                            .strip_prefix(key)
-                            .is_some_and(|rest| rest.starts_with(['.', '[']))
-                });
-                wanted.then(|| RunnerOrigin {
+                fgos_execution::runner_config::is_origin_path(&path).then(|| RunnerOrigin {
                     path,
                     layer: origin.provenance.layer.to_owned(),
                     file: origin.provenance.file.clone(),

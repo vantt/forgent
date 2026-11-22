@@ -216,6 +216,8 @@ const EXPECTED_CLOSURE = [
   // The door loads the addon lazily through node:module (never at import time);
   // payload-root.mjs locates the release it belongs to (node:fs/node:path only).
   'src/native/door.mjs',
+  'src/native/dispatch-error.mjs',
+  'src/native/legacy-view.mjs',
   'src/util/payload-root.mjs',
   // ... and the lock door guarding the provider-capacity state file
   // (see LOCK_DOOR_FILES), with the host-binary lookup its driver needs.
