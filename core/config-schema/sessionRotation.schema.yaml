@@ -13,6 +13,11 @@ properties:
     description: Fraction of the context window at which a session rotates at the next safe point even when a question is pending; must be at least soft.
     type: number
     minimum: 0
+  quota:
+    description: Fraction of the weekly account quota at which a session rotates into hard rotation; neither a pending question nor a background task holds it.
+    type: number
+    minimum: 0
+    maximum: 1
   keep:
     description: Newest handoff files kept per persona and name; older ones are removed.
     type: integer
@@ -41,6 +46,11 @@ properties:
           description: This persona's hard fraction; the global value when absent.
           type: number
           minimum: 0
+        quota:
+          description: This persona's weekly quota fraction; the global value when absent.
+          type: number
+          minimum: 0
+          maximum: 1
         reload:
           description: Repo-relative files or folders the successor rereads before acting, listed as written in its handoff; at most 50 are listed, each at most 300 characters.
           type: array

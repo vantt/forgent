@@ -30,7 +30,8 @@ const MAX_TEXT: usize = 8000;
 const MAX_PORTFOLIO: usize = 50;
 const MAX_PATH_CHARS: usize = 300;
 const MAX_FACT_LIST: usize = 20;
-const SIDECAR_FILE: &str = "context-sidecar.jsonl";
+const SIDECAR_MAX_BYTES: u64 = 256 * 1024;
+const SIDECAR_KEEP_LINES: usize = 500;
 /// The reason of a stop that measured below soft: the host records it and rotates nothing.
 const NO_ROTATION_REASON: &str = "none";
 
@@ -44,14 +45,16 @@ pub fn main(args: &[OsString]) -> ! {
 enum Event {
     Stop,
     SessionStart,
+    StatusLine,
 }
 
-/// `--event <stop|session-start>`, once, nothing else.
+/// `--event <stop|session-start|status-line>`, once, nothing else.
 fn parse(args: &[OsString]) -> Option<Event> {
     match args {
         [flag, value] if flag == "--event" => match value.to_str()? {
             "stop" => Some(Event::Stop),
             "session-start" => Some(Event::SessionStart),
+            "status-line" => Some(Event::StatusLine),
             _ => None,
         },
         _ => None,
@@ -186,12 +189,15 @@ fn stop_inner(
     let thresholds = config
         .thresholds_for(&head.persona)
         .map_err(|e| StopError::new("thresholds-error", e))?;
-    let sidecar = lineage.join(SIDECAR_FILE);
     let transcript = payload_str(payload, "transcript_path").map(PathBuf::from);
     let session = payload_str(payload, "session_id");
+    let sidecar = match (&transcript, session) {
+        (Some(t), Some(s)) => fgos_session_host::rotation::measure::sidecar_path(t, s),
+        _ => None,
+    };
     let measured = measure(
         &Sources {
-            sidecar: Some(&sidecar),
+            sidecar: sidecar.as_deref(),
             transcript: transcript.as_deref(),
             session_id: session,
             after_ms: ports.now_ms,
@@ -204,7 +210,16 @@ fn stop_inner(
         background_tasks: count(payload, "background_tasks"),
         session_crons: count(payload, "session_crons"),
     };
-    let decision = decide(measured.as_ref().map(|m| m.fraction), thresholds, rest);
+    let weekly_used = measured
+        .as_ref()
+        .and_then(|m| m.quota.as_ref())
+        .map(|q| q.weekly_used);
+    let decision = decide(
+        measured.as_ref().map(|m| m.fraction),
+        thresholds,
+        rest,
+        weekly_used,
+    );
     // Every stop asks, so the host sees and records each decision; below soft the host starts nothing.
     let reason = decision.rotate.reason().unwrap_or(NO_ROTATION_REASON);
     let measure = json!({
@@ -275,6 +290,16 @@ fn stop_inner(
             })
             .collect();
         facts["backgroundTasks"] = json!(list);
+    }
+    if decision.reason == "weekly-quota-near-limit" {
+        if let Some(quota) = measured.as_ref().and_then(|m| m.quota.as_ref()) {
+            let mut q = serde_json::Map::new();
+            q.insert("weeklyUsed".into(), json!(quota.weekly_used));
+            if let Some(resets_at) = &quota.resets_at {
+                q.insert("resetsAt".into(), json!(resets_at));
+            }
+            facts["quota"] = Value::Object(q);
+        }
     }
     let args = json!({ "persona": head.persona, "name": head.name, "reason": reason, "stopFacts": facts, "measure": measure });
     (ports.ask)("session rotate", &args)
@@ -365,6 +390,100 @@ fn now_ms() -> u64 {
         .map_or(0, |d| u64::try_from(d.as_millis()).unwrap_or(u64::MAX))
 }
 
+fn append_sidecar_record(sidecar: &Path, record: &Value) -> Result<(), std::io::Error> {
+    if let Some(parent) = sidecar.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    let line = serde_json::to_string(record)
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+    let mut f = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(sidecar)?;
+    use std::io::Write;
+    writeln!(f, "{line}")?;
+    if let Ok(meta) = std::fs::metadata(sidecar) {
+        if meta.len() > SIDECAR_MAX_BYTES {
+            if let Ok(text) = std::fs::read_to_string(sidecar) {
+                let lines: Vec<&str> = text.lines().filter(|l| !l.trim().is_empty()).collect();
+                if lines.len() > SIDECAR_KEEP_LINES {
+                    let kept = &lines[lines.len() - SIDECAR_KEEP_LINES..];
+                    let mut truncated = kept.join("\n");
+                    truncated.push('\n');
+                    let _ = std::fs::write(sidecar, truncated);
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
+fn status_line(_head: &Head, _fgos_dir: &Path, payload: &Value) -> Result<String, String> {
+    let session_id = payload
+        .get("session_id")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    let transcript = payload
+        .get("transcript_path")
+        .and_then(Value::as_str)
+        .map(Path::new);
+    let sidecar = match (transcript, session_id) {
+        (Some(t), s) if !s.is_empty() => fgos_session_host::rotation::measure::sidecar_path(t, s),
+        _ => None,
+    };
+    let mut record = json!({
+        "ts": now_ms(),
+        "session_id": session_id,
+    });
+    if let Some(cw) = payload.get("context_window").filter(|v| v.is_object()) {
+        record["context_window"] = cw.clone();
+    }
+    if let Some(seven_day) = payload
+        .pointer("/rate_limits/seven_day")
+        .and_then(Value::as_object)
+    {
+        let used_percentage = seven_day.get("used_percentage").and_then(Value::as_f64);
+        let resets_at = seven_day.get("resets_at").and_then(Value::as_i64);
+        if let (Some(pct), Some(secs)) = (used_percentage, resets_at.filter(|s| *s > 0)) {
+            let reset_sys = UNIX_EPOCH + Duration::from_secs(secs as u64);
+            let iso = fgos_host_runtime::civil_time::format_system_time_utc(reset_sys);
+            let mut quota = serde_json::Map::new();
+            quota.insert("weeklyUsed".into(), json!(pct / 100.0));
+            quota.insert("resetsAt".into(), json!(iso));
+            record["quota"] = Value::Object(quota);
+        }
+    }
+    let write_err: Option<String> = if let Some(sidecar_path) = &sidecar {
+        if let Err(e) = append_sidecar_record(sidecar_path, &record) {
+            Some(format!("sidecar write failed: {e}"))
+        } else {
+            None
+        }
+    } else {
+        Some("sidecar path unavailable: missing transcript_path or session_id".to_string())
+    };
+
+    let ctx_pct = payload
+        .pointer("/context_window/used_percentage")
+        .and_then(Value::as_f64);
+    let quota_pct = record
+        .pointer("/quota/weeklyUsed")
+        .and_then(Value::as_f64)
+        .map(|u| u * 100.0);
+    let normal_line = match (ctx_pct, quota_pct) {
+        (Some(c), Some(q)) => format!("fgOS head · ctx {:.0}% | quota {:.0}%", c, q),
+        (Some(c), None) => format!("fgOS head · ctx {:.0}%", c),
+        (None, Some(q)) => format!("fgOS head · quota {:.0}%", q),
+        (None, None) => "fgOS head".to_string(),
+    };
+    let line = if let Some(err) = write_err {
+        format!("{normal_line} ({err})")
+    } else {
+        normal_line
+    };
+    Ok(line)
+}
+
 fn run(args: &[OsString]) {
     let Some(event) = parse(args) else { return };
     let Some(head) = head_from_env(&|key| std::env::var(key).ok()) else {
@@ -384,6 +503,15 @@ fn run(args: &[OsString]) {
             Ok(None) => {}
             Err(why) => fail(why),
         },
+        Event::StatusLine => {
+            let mut text = String::new();
+            let _ = std::io::stdin().take(MAX_STDIN).read_to_string(&mut text);
+            let payload: Value = serde_json::from_str(&text).unwrap_or(Value::Null);
+            match status_line(&head, &fgos_dir, &payload) {
+                Ok(line) => println!("{line}"),
+                Err(why) => fail(why),
+            }
+        }
         Event::Stop => {
             let mut text = String::new();
             let _ = std::io::stdin().take(MAX_STDIN).read_to_string(&mut text);
@@ -864,5 +992,95 @@ mod tests {
         assert_eq!(incident["event"], "stop-failed");
         assert_eq!(incident["code"], "busy");
         assert_eq!(incident["detail"], "😀".repeat(300));
+    }
+
+    #[test]
+    fn one_record_is_written_for_a_head_payload_and_nothing_is_written_outside_a_head() {
+        let (fgos_dir, lineage) = fgos("status-line");
+        let transcript_dir = lineage.join("transcripts");
+        std::fs::create_dir_all(&transcript_dir).unwrap();
+        let transcript_path = transcript_dir.join("test-sid-123.jsonl");
+        let payload = json!({
+            "session_id": "test-sid-123",
+            "transcript_path": transcript_path.to_str().unwrap(),
+            "context_window": {
+                "total_input_tokens": 15420,
+                "total_output_tokens": 3120,
+                "context_window_size": 200000,
+                "current_usage": {
+                    "input_tokens": 15420,
+                    "output_tokens": 3120,
+                    "cache_creation_input_tokens": 0,
+                    "cache_read_input_tokens": 0
+                },
+                "used_percentage": 9.27,
+                "remaining_percentage": 90.73
+            },
+            "rate_limits": {
+                "seven_day": {
+                    "used_percentage": 42.0,
+                    "resets_at": 1732800000
+                }
+            }
+        });
+
+        // 1. Head payload -> one record is written beside the transcript
+        let line = status_line(&head(None), &fgos_dir, &payload).unwrap();
+        assert!(line.contains("fgOS head"));
+        let sidecar = transcript_dir.join("test-sid-123.context-sidecar.jsonl");
+        assert!(sidecar.exists(), "sidecar must exist beside transcript");
+        let text = std::fs::read_to_string(&sidecar).unwrap();
+        let records: Vec<&str> = text.lines().filter(|l| !l.trim().is_empty()).collect();
+        assert_eq!(records.len(), 1);
+        let rec: Value = serde_json::from_str(records[0]).unwrap();
+        assert_eq!(rec["session_id"], "test-sid-123");
+        assert_eq!(rec["context_window"]["context_window_size"], 200000);
+        assert_eq!(rec["quota"]["weeklyUsed"], 0.42);
+        assert!(rec["quota"]["resetsAt"]
+            .as_str()
+            .is_some_and(|s| s.contains('T') && s.ends_with('Z')));
+
+        // 2. If writer cannot write, it still exits 0 (returns Ok), but prints failure in its status line
+        let no_transcript_payload = json!({
+            "session_id": "test-sid-123",
+            "context_window": {
+                "used_percentage": 9.27
+            }
+        });
+        let failed_line = status_line(&head(None), &fgos_dir, &no_transcript_payload).unwrap();
+        assert!(
+            failed_line.contains("sidecar path unavailable") || failed_line.contains("failed"),
+            "failure must be printed in the status line: {failed_line}"
+        );
+
+        // 3. Outside a head: head_from_env returns None
+        assert_eq!(head_from_env(&env(&[])), None);
+    }
+
+    #[test]
+    fn run_writes_nothing_outside_a_head() {
+        let (fgos_dir, lineage) = fgos("run-outside");
+        let project = fgos_dir.parent().unwrap();
+        let transcript_dir = lineage.join("transcripts");
+        std::fs::create_dir_all(&transcript_dir).unwrap();
+        let expected_sidecar = transcript_dir.join("outside.context-sidecar.jsonl");
+
+        // Clear FGOS_HEAD_ROLE
+        std::env::remove_var("FGOS_HEAD_ROLE");
+        std::env::set_var("CLAUDE_PROJECT_DIR", project);
+
+        // Run with status-line event
+        run(&[OsString::from("--event"), OsString::from("status-line")]);
+        assert!(
+            !expected_sidecar.exists(),
+            "run() must write nothing outside a head for status-line"
+        );
+
+        // Run with stop event
+        run(&[OsString::from("--event"), OsString::from("stop")]);
+        assert!(
+            !expected_sidecar.exists(),
+            "run() must write nothing outside a head for stop"
+        );
     }
 }

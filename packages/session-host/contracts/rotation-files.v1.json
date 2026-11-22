@@ -22,7 +22,7 @@
     "answered.json": { "writer": "markSuccessorAnswered", "readFields": { "gen": "integer" } },
     "stop-trace.jsonl": {
       "writer": "the host, when it handles the `session rotate` request every stop sends (requestRotation, src/session-rotation/rotate.mjs); the hook itself runs inside the head's sandbox, where the lineage folder is read-only",
-      "shape": { "at": "ISO-8601 UTC", "fraction": "number or null (nothing measured)", "source": "sidecar | transcript | null", "stale": "boolean", "decision": "the decide reason, e.g. below-soft, at-or-above-soft, background-task-running, no-measure", "reason": "none | soft | hard", "outcome": "below-threshold | started | rotation-in-progress | spawn-failed" },
+      "shape": { "at": "ISO-8601 UTC", "fraction": "number or null (nothing measured)", "source": "sidecar | transcript | null", "stale": "boolean", "decision": "the decide reason, e.g. below-soft, at-or-above-soft, background-task-running, no-measure, weekly-quota-near-limit", "reason": "none | soft | hard", "outcome": "below-threshold | started | rotation-in-progress | spawn-failed" },
       "readerRule": "for the owner; one line per stop that reached the host, newest 500 kept once the file passes 256 KiB. A hook failure before requestRotation leaves no trace line; after locating its lineage the native hook attempts a best-effort stop-failed incident and reports stderr, but the confined head's read-only lineage may prevent that local write. A measured request rejected by requestRotation validation or start leaves a stop-failed incident when its lineage is valid"
     },
     "incidents.jsonl": {
@@ -30,10 +30,11 @@
       "shape": "one JSON object per line with at and event; resolved-orphan has role, id, outcome (completed | abandoned); stop-failed has code and detail bounded to 300 characters when a measured Stop's validation or host-side start throws, or the native Stop fails after locating its lineage",
       "readerRule": "host-side failures are recorded here; the native hook's local best-effort write may fail in a read-only confined lineage, so reliable pre-request reporting still needs a host-writable path"
     },
-    "context-sidecar.jsonl": {
-      "writer": "a status-line wrapper, optional; none ships with fgOS",
-      "shape": { "ts": "number of epoch milliseconds, or an RFC 3339 string (YYYY-MM-DDTHH:MM:SS[.fff] with Z or +HH:MM) or a YYYY-MM-DD date, read through the civil-time door", "session_id": "string", "context_window": { "context_window_size": "integer", "current_usage": "object of input_tokens, cache_creation_input_tokens, cache_read_input_tokens" } },
-      "readerRule": "only a record newer than the Stop hook's own timestamp is fresh; the hook waits up to 1500 ms for a newer record only when the file already holds a record of this session (a writer is running); otherwise, and after the wait, the transcript (one turn stale) is used at once"
+    "<session_id>.context-sidecar.jsonl": {
+      "path": "<dir of transcript_path>/<session_id>.context-sidecar.jsonl (beside the session transcript)",
+      "writer": "fgos hook session-rotation --event status-line",
+      "shape": { "ts": "number of epoch milliseconds, or an RFC 3339 string (YYYY-MM-DDTHH:MM:SS[.fff] with Z or +HH:MM) or a YYYY-MM-DD date, read through the civil-time door", "session_id": "string", "context_window": { "context_window_size": "integer", "current_usage": "object of input_tokens, cache_creation_input_tokens, cache_read_input_tokens" }, "quota": { "weeklyUsed": "number", "resetsAt": "ISO-8601 string" } },
+      "readerRule": "beside the session transcript; only a record newer than the Stop hook's own timestamp is fresh; the hook waits up to 1500 ms for a newer record only when the file already holds a record of this session (a writer is running); otherwise, and after the wait, the transcript (one turn stale) is used at once"
     }
   },
   "environment": {
@@ -45,14 +46,16 @@
   },
   "hookPayload": {
     "stop": ["session_id", "transcript_path", "last_assistant_message", "background_tasks", "session_crons"],
+    "status-line": ["session_id", "transcript_path", "context_window", "rate_limits"],
     "session-start": []
   },
   "hook": {
-    "command": "fgos hook session-rotation --event stop|session-start",
+    "command": "fgos hook session-rotation --event stop|session-start|status-line",
     "never": "blocks, prints to the conversation (only session-start prints, one hookSpecificOutput.additionalContext object), or exits other than 0",
     "stop": "a successor whose generation the pending rotation waits for answers with `session answered` (the rotation id from its handoff); every other stop measures, decides and on soft or hard asks `session rotate`; a stop that answered does not also measure",
-    "stopFacts": ["sessionId", "portfolio", "delta", "lastAssistantMessage", "pendingQuestion", "sessionCrons", "backgroundTasks"],
-    "pendingQuestion": "no lineage state defines a pending owner question yet, so the hook never reports one: soft is never held by a question, and a hard or manual rotation carries the last assistant message verbatim, where a head batches its open questions"
+    "stopFacts": ["sessionId", "portfolio", "delta", "lastAssistantMessage", "pendingQuestion", "sessionCrons", "backgroundTasks", "quota"],
+    "pendingQuestion": "no lineage state defines a pending owner question yet, so the hook never reports one: soft is never held by a question, and a hard or manual rotation carries the last assistant message verbatim, where a head batches its open questions",
+    "quota": "on a quota rotation (weekly-quota-near-limit), carries { weeklyUsed, resetsAt }"
   },
   "lastMessageRoute": {
     "command": "fgos internal session-host last-message --protocol 1 --json, stdin {\"v\":1,\"request\":{\"projectsDir\":\"<session folder>\"}}",
