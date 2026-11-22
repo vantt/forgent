@@ -388,6 +388,50 @@ fn a_granted_request_runs_the_route_child_and_returns_its_line() {
 }
 
 #[test]
+fn a_rotation_frame_preserves_decimal_exponent_and_integer_numbers_for_the_route() {
+    // The existing route wiring proof uses strings only; it cannot observe the bounded decoder's
+    // arbitrary-precision number handling. Send raw JSON so the exponent reaches that decoder as written.
+    let served = serve(
+        "rotation-numbers",
+        DONE_LINE,
+        Ok(true),
+        &["session rotate"],
+        Duration::from_secs(20),
+    );
+    let body = br#"{"type":"REQUEST","id":"r1","verb":"session rotate","args":{"measure":{"fraction":0.33},"exponent":1e-3,"integer":42,"large":18446744073709551616}}"#;
+    let mut stream = UnixStream::connect(&served.socket).unwrap();
+    stream
+        .set_read_timeout(Some(Duration::from_secs(15)))
+        .unwrap();
+    stream
+        .write_all(&(body.len() as u32).to_be_bytes())
+        .unwrap();
+    stream.write_all(body).unwrap();
+    let reply = read_frame(&mut stream).expect("a REPLY frame");
+    assert_eq!(reply["result"], "done", "{reply}");
+    let routed_text = fs::read_to_string(served.dir.join("stdin.json")).unwrap();
+    assert!(
+        !routed_text.contains("$serde_json::private::Number"),
+        "the route must receive number tokens, not serde's private map: {routed_text}"
+    );
+    let routed: Value = serde_json::from_str(&routed_text).unwrap();
+    let args = &routed["args"];
+    for number in [
+        &args["measure"]["fraction"],
+        &args["exponent"],
+        &args["integer"],
+        &args["large"],
+    ] {
+        assert!(number.is_number(), "not a JSON number: {number}");
+    }
+    assert_eq!(args["measure"]["fraction"].as_f64(), Some(0.33));
+    assert_eq!(args["exponent"].as_f64(), Some(0.001));
+    assert_eq!(args["integer"].as_u64(), Some(42));
+    let expected_large: Value = serde_json::from_str("18446744073709551616").unwrap();
+    assert_eq!(args["large"], expected_large);
+}
+
+#[test]
 fn an_answer_too_large_for_one_reply_frame_is_refused_by_name_and_never_dropped() {
     // The route's line (kept up to 65536 bytes) just fits; the reply around the same data does not.
     let served = granted(
@@ -1814,6 +1858,27 @@ fn a_frame_of_too_many_or_too_deep_values_or_a_large_frame_that_is_not_head_writ
     let fits = json!({"type": "REQUEST", "id": "r1", "verb": "session start",
         "args": {"persona": "planner", "name": "x", "pad": vec![0; MAX_REQUEST_VALUES - 10]}});
     assert_eq!(request(&served.socket, &fits)["result"], "done");
+    // Numbers count as one value even when serde_json represents them as private maps.
+    // These frames hold eight container/string values before the array's numeric elements.
+    for number in [json!(0), json!(0.33)] {
+        let mut frame = json!({"type": "REQUEST", "id": "r1", "verb": "session start",
+            "args": {"persona": "planner", "name": "x", "pad": vec![number.clone(); MAX_REQUEST_VALUES - 8]}});
+        assert_eq!(request(&served.socket, &frame)["result"], "done");
+        frame["args"]["pad"]
+            .as_array_mut()
+            .unwrap()
+            .push(number.clone());
+        assert_eq!(request(&served.socket, &frame)["code"], "bad-frame");
+        // A scalar at depth seven fits; at depth eight it is refused, regardless of its representation.
+        let mut leaf = number;
+        for _ in 0..5 {
+            leaf = json!([leaf]);
+        }
+        frame["args"] = json!({"pad": leaf});
+        assert_eq!(request(&served.socket, &frame)["result"], "done");
+        frame["args"]["pad"] = json!([frame["args"]["pad"]]);
+        assert_eq!(request(&served.socket, &frame)["code"], "bad-frame");
+    }
     // Only a session write may be larger than a GO frame.
     let big = json!({"type": "REQUEST", "id": "r1", "verb": "session start",
         "args": {"persona": "p".repeat(MAX_FRAME_BYTES), "name": "x"}});

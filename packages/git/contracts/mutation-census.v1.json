@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7df0a4a975820a575851ad4ddd07b950d774bfa38e45934c07201bd3fbbc9694",
+  "payloadDigest": "36edf7625a2e85fdbf7f5a17cf75cd7977a57dac931e9e47ca1238b32161a363",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -119,10 +119,11 @@
     "apps/fgos/src/wiring/doctor/holder_lock.rs": "2a6d8f4513a042d4178cad1942782b63b4445ae558b6018dcdc8c93c80dfaff6",
     "apps/fgos/src/wiring/doctor/identity.rs": "d92101d047a7fca05650e1b837a7495e79fbc2613af985b816c26fec2dbd0212",
     "apps/fgos/src/wiring/doctor/mailbox.rs": "44dadd32096ec6059f41f3ec46b1576d24ca272712f9ff5880ba58595bf7cf3b",
-    "apps/fgos/src/wiring/doctor/mod.rs": "64e5be6685bc92d8a05e3bf790261cb9a98c203f186ca778573db8f288b8737d",
+    "apps/fgos/src/wiring/doctor/mod.rs": "398ecd52d2e7eb1efa4d8d0aa7b354a1c5bc3b1a45bb3317525522c4c3fc3a43",
     "apps/fgos/src/wiring/doctor/observe.rs": "a91f721e558e5378a5bc305c8aaf617b2859fe3234088e66bcc20df06ae0741c",
     "apps/fgos/src/wiring/doctor/packaging.rs": "cc62d9a55a1a9c36fd2c47f2c426c0ec2c300cf6b35898b45c646fac1afea3f4",
     "apps/fgos/src/wiring/doctor/run_supervisor.rs": "36bcd60f54b9c21d5725e5f01024e2d212ca3477debc8fbb9c6981bc49e075c1",
+    "apps/fgos/src/wiring/doctor/session_host.rs": "70152fa7aa51681994935fb0758432d020c943eedfd90e14e0034003bded80f7",
     "apps/fgos/src/wiring/doctor/supervision.rs": "4581f3dd563da9135dce6c128d407a8d467a4206f1b98d85038fe5fc0e96ed05",
     "apps/fgos/src/wiring/doctor/terminal.rs": "219528ead0070c5f0ea908fad90e708f4450844e68a3df275e0dbdc0c72aa47d",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
@@ -166,7 +167,7 @@
     "apps/fgos/src/wiring/run.rs": "120b3bb91acae41eb70489cac447336f36e3faa13e29cfb49d222b291e11ba0a",
     "apps/fgos/src/wiring/run_dirs.rs": "8248bf1a45d37e2ca03315dea11489b6b90362a47479244a10a7c71648e90f60",
     "apps/fgos/src/wiring/seat_binding.rs": "15312c9c1d9fea319147a886829a627b73973d2b854a350b68d9b690b4f65158",
-    "apps/fgos/src/wiring/session_rotation_hook.rs": "20782a7a73725c725531adaf42ab15de1b7f0dcacfb6492567923df55ad72580",
+    "apps/fgos/src/wiring/session_rotation_hook.rs": "ef2c383cbeaac5ed8e4b037bef61a4aecfcc6b9960ee96b69339e1959d4f2297",
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
     "apps/fgos/src/wiring/session_write_publish.rs": "5441315a22e1e3c38e1ca1fdd78edc81a172003f03d751235c2a8c97eceb4b3b",
     "apps/fgos/src/wiring/supervision.rs": "d1dfde2c0b30f5f50ff5862e554b67b34e46ff168d1ce1b522a60c4ea0d5d0ab",
@@ -1152,7 +1153,7 @@
     "packages/run-supervisor/rust/src/go_channel.rs": "fdd459ac110097c4e8774499be3ffb859e5a486e2a6bb422dc65b0a6146595d4",
     "packages/run-supervisor/rust/src/go_pipe.rs": "0994684b54f1765799e4198c6e39ea2c8d83660ae1336cdac447ea1acd3681b0",
     "packages/run-supervisor/rust/src/head_client.rs": "ee0ceac9b2af86e221fc8a692bfa9e5a48a20f54e4142dd2ef74b5d53c3da74b",
-    "packages/run-supervisor/rust/src/head_request.rs": "36bd10fa0f4cb0a3e8e3bd9ca8c4898ce58c1d0acb3c765de2cb2bfe80b99604",
+    "packages/run-supervisor/rust/src/head_request.rs": "168ae45cb346f6f2bf4ac4f94eded0a29a0712c7103f418110128ad1cd101fea",
     "packages/run-supervisor/rust/src/lanes.rs": "62a5b7bf690639f380813728b6a70053d86623ae35a4acb642235a3d4c004972",
     "packages/run-supervisor/rust/src/lib.rs": "44257e02d2e99620aecb25b1b45824106f481b267b9a328e82d08adab62de269",
     "packages/run-supervisor/rust/src/publish.rs": "008072f32aa305e4f2feabe554455d9f7c680a4cd4aa912514e55ac922257a62",
@@ -1183,7 +1184,7 @@
     "packages/run-supervisor/rust/tests/gate_pid1.rs": "73f2e89f16a3a4a76e95aa73c98a3f7fafef8c1d41e5748a87f538c2c82e8478",
     "packages/run-supervisor/rust/tests/gate_portable.rs": "1a97989cd9fbebc519506651eb3a79c7c577e0ffb199abb71bd07a0e133cc0db",
     "packages/run-supervisor/rust/tests/gate_terminal_socket.rs": "cba60e64b6f41309553c78216e66937d164b70bc2f1b37e49d657882daf2ce00",
-    "packages/run-supervisor/rust/tests/head_request.rs": "d91733d164526c27594834249accd1295c303664661bbf1b3f3fec03b21fdabb",
+    "packages/run-supervisor/rust/tests/head_request.rs": "2a5a70381b17a439c306a9e5bb4557cad6c43a43687fcf6d3aa769753be393b6",
     "packages/run-supervisor/rust/tests/head_role_binding.rs": "86928b9c8303a3633b9865081bd195d949b6295c14839f277c1471eb33fab110",
     "packages/run-supervisor/rust/tests/lanes.rs": "982d01cd1ad9217eb89164c3a15286c123268908582fab81a0cd59dbc8926d95",
     "packages/run-supervisor/rust/tests/portable/mod.rs": "6153ea7719f18ef0cc293fde0d603101df1308a4b2980edcc8dff57ad6d37363",
@@ -1628,7 +1629,7 @@
     "src/session-host/head-start.mjs": "cb24e602718da82112b76260b2f14b20f3e305003f749f62b0d5d69a246f5346",
     "src/session-host/head-stop.mjs": "4284bc2638e3ac4a71d151763c981d220a017c4f948cefc829115be5a6221ad3",
     "src/session-rotation/handoff-store.mjs": "3d1385774aa7c09573a6e298f82e7bf75d55beb436d9caa7c266cc1735c46128",
-    "src/session-rotation/rotate.mjs": "593f875a9fc599e43a91f7e1a335d67f22319487c87970a52be1eb8cb1f13b71",
+    "src/session-rotation/rotate.mjs": "981c6a5db696f5e0b4d9a6d47759c9d6cfc43df5f3985b25d0ac649830c424c1",
     "src/setup/agent-hooks.mjs": "850a6660bf2588d850190e9ed5e45369d0d30e467568462b478dd6327fddffac",
     "src/setup/agy-permissions.mjs": "09951c187dec7082caee5a1695dd81320eda7ea962ca41ff8bb785f103f87397",
     "src/setup/bin-discovery.mjs": "b5302797ac763fecb24608818bdc8bf37850e0cd5d7a9d98ae677e1f3e684633",
@@ -2328,7 +2329,7 @@
     },
     {
       "path": "apps/fgos/src/wiring/doctor/mod.rs",
-      "line": 624,
+      "line": 626,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -4004,14 +4005,14 @@
     {
       "path": "packages/run-supervisor/rust/src/head_request.rs",
       "line": 298,
-      "spawn": "Command::new <- packages/run-supervisor/rust/src/head_request.rs:1385",
+      "spawn": "Command::new <- packages/run-supervisor/rust/src/head_request.rs:1403",
       "binary": "(parsed configuration (text(&envelope[\"hostBin\"], \"hostBin\")))",
       "class": "configured-binary"
     },
     {
       "path": "packages/run-supervisor/rust/src/head_request.rs",
-      "line": 1385,
-      "spawn": "Command::new <- packages/run-supervisor/rust/src/head_request.rs:1385",
+      "line": 1403,
+      "spawn": "Command::new <- packages/run-supervisor/rust/src/head_request.rs:1403",
       "binary": "(deserialized configuration (Config.host_bin))",
       "class": "configured-binary"
     },

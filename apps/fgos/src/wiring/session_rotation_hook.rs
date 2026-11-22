@@ -110,19 +110,80 @@ fn count(payload: &Value, key: &str) -> usize {
         .map_or(0, Vec::len)
 }
 
+struct StopError {
+    code: String,
+    detail: String,
+    message: String,
+}
+
+impl StopError {
+    fn new(code: &str, detail: impl ToString) -> Self {
+        let detail = detail.to_string();
+        Self {
+            code: code.into(),
+            message: detail.clone(),
+            detail,
+        }
+    }
+
+    fn from_client(e: ClientError, verb: &str) -> Self {
+        let message = format!("{verb}: {e}");
+        let detail = e.detail.or(e.message).unwrap_or_else(|| e.code.clone());
+        let mut error = Self::new(&e.code, detail);
+        error.message = message;
+        error
+    }
+}
+
+fn record_incident(lineage: &Path, code: &str, detail: &str) {
+    let file = lineage.join("incidents.jsonl");
+    let at = fgos_host_runtime::civil_time::format_system_time_utc(SystemTime::now());
+    let detail_bounded: String = detail.chars().take(300).collect();
+    let line = json!({
+        "at": at,
+        "event": "stop-failed",
+        "code": code,
+        "detail": detail_bounded,
+    });
+    let _ = std::fs::create_dir_all(lineage);
+    let _ = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&file)
+        .and_then(|mut f| {
+            use std::io::Write;
+            writeln!(f, "{line}")
+        });
+}
+
 /// A stop: a successor whose generation the pending rotation waits for answers it; any other stop measures,
 /// decides and, on soft or hard, asks for the rotation. A stop that answered does not also measure.
 fn stop(head: &Head, fgos_dir: &Path, payload: &Value, ports: &Ports) -> Result<(), String> {
     let lineage = lineage_dir(fgos_dir, &head.persona, &head.name).map_err(|e| e.to_string())?;
-    if let Some(gen) = head.gen {
-        if awaits_answer(&lineage, gen).map_err(|e| e.to_string())? {
-            return answer(head, &lineage, payload, ports);
+    match stop_inner(head, &lineage, payload, ports) {
+        Ok(()) => Ok(()),
+        Err(err) => {
+            record_incident(&lineage, &err.code, &err.detail);
+            Err(err.message)
         }
     }
-    let config = (ports.config)()?;
+}
+
+fn stop_inner(
+    head: &Head,
+    lineage: &Path,
+    payload: &Value,
+    ports: &Ports,
+) -> Result<(), StopError> {
+    if let Some(gen) = head.gen {
+        if awaits_answer(lineage, gen).map_err(|e| StopError::new("awaits-answer-error", e))? {
+            return answer(head, lineage, payload, ports);
+        }
+    }
+    let config = (ports.config)().map_err(|e| StopError::new("config-error", e))?;
     let thresholds = config
         .thresholds_for(&head.persona)
-        .map_err(|e| e.to_string())?;
+        .map_err(|e| StopError::new("thresholds-error", e))?;
     let sidecar = lineage.join(SIDECAR_FILE);
     let transcript = payload_str(payload, "transcript_path").map(PathBuf::from);
     let session = payload_str(payload, "session_id");
@@ -156,7 +217,7 @@ fn stop(head: &Head, fgos_dir: &Path, payload: &Value, ports: &Ports) -> Result<
             &json!({ "persona": head.persona, "name": head.name, "reason": reason, "measure": measure }),
         )
         .map(|_| ())
-        .map_err(|e| format!("session rotate: {e}"));
+        .map_err(|e| StopError::from_client(e, "session rotate"));
     }
     let portfolio: Vec<&String> = config
         .reload_of(&head.persona)
@@ -174,24 +235,31 @@ fn stop(head: &Head, fgos_dir: &Path, payload: &Value, ports: &Ports) -> Result<
     let args = json!({ "persona": head.persona, "name": head.name, "reason": reason, "stopFacts": facts, "measure": measure });
     (ports.ask)("session rotate", &args)
         .map(|_| ())
-        .map_err(|e| format!("session rotate: {e}"))
+        .map_err(|e| StopError::from_client(e, "session rotate"))
 }
 
 /// The successor's first answer: its session id, the rotation id read from its own handoff, and its first message.
-fn answer(head: &Head, lineage: &Path, payload: &Value, ports: &Ports) -> Result<(), String> {
+fn answer(head: &Head, lineage: &Path, payload: &Value, ports: &Ports) -> Result<(), StopError> {
     // No message yet: this stop was not an answer; the next one is.
     let Some(message) = payload_str(payload, "last_assistant_message") else {
         return Ok(());
     };
     let latest = read_latest(lineage)
-        .map_err(|e| e.to_string())?
-        .ok_or("the successor has no handoff to read the rotation id from")?;
-    let rotation_id = rotation_id_of(&latest.text).ok_or("the handoff carries no rotation id")?;
-    let session_id = (ports.session_id)().ok_or("this session has no Identity id")?;
+        .map_err(|e| StopError::new("handoff-read-error", e))?
+        .ok_or_else(|| {
+            StopError::new(
+                "no-handoff",
+                "the successor has no handoff to read the rotation id from",
+            )
+        })?;
+    let rotation_id = rotation_id_of(&latest.text)
+        .ok_or_else(|| StopError::new("no-rotation-id", "the handoff carries no rotation id"))?;
+    let session_id = (ports.session_id)()
+        .ok_or_else(|| StopError::new("no-session-id", "this session has no Identity id"))?;
     let args = json!({ "persona": head.persona, "name": head.name, "sessionId": session_id, "rotationId": rotation_id, "message": bounded(message) });
     (ports.ask)("session answered", &args)
         .map(|_| ())
-        .map_err(|e| format!("session answered: {e}"))
+        .map_err(|e| StopError::from_client(e, "session answered"))
 }
 
 /// A session start: the latest handoff of the lineage as the one `additionalContext` object, or nothing.
@@ -590,5 +658,59 @@ mod tests {
     fn text_sent_to_a_verb_is_cut_at_the_stated_unit_bound() {
         assert_eq!(bounded(&"a".repeat(9000)).len(), MAX_TEXT);
         assert_eq!(bounded(&"😀".repeat(9000)).encode_utf16().count(), MAX_TEXT);
+    }
+
+    #[test]
+    fn a_stop_hook_that_fails_before_the_node_route_runs_leaves_one_incident_line_in_the_lineage() {
+        let (fgos_dir, lineage) = fgos("incident");
+        let full = json!({ "transcript_path": transcript(&lineage, 900) });
+        let (_, result) = run_stop(
+            &head(None),
+            &fgos_dir,
+            full,
+            Err(ClientError {
+                code: "verb-not-granted".into(),
+                detail: Some("supervisor refused verb".into()),
+                message: None,
+            }),
+        );
+        assert_eq!(
+            result.unwrap_err(),
+            "session rotate: verb-not-granted (supervisor refused verb)"
+        );
+        let incidents_file = lineage.join("incidents.jsonl");
+        assert!(incidents_file.exists(), "incidents.jsonl must exist");
+        let content = std::fs::read_to_string(&incidents_file).unwrap();
+        let lines: Vec<&str> = content.trim().split('\n').collect();
+        assert_eq!(lines.len(), 1, "exactly one incident line expected");
+        let incident: Value = serde_json::from_str(lines[0]).unwrap();
+        assert_eq!(incident["event"], "stop-failed");
+        assert_eq!(incident["code"], "verb-not-granted");
+        assert_eq!(incident["detail"], "supervisor refused verb");
+        assert!(incident["at"]
+            .as_str()
+            .is_some_and(|s| s.contains('T') && s.ends_with('Z')));
+        assert_eq!(incident.as_object().unwrap().len(), 4);
+
+        // The same owning proof also exercises the character bound without splitting Unicode.
+        let (fgos_dir, lineage) = fgos("incident-bounded");
+        let (_, result) = run_stop(
+            &head(None),
+            &fgos_dir,
+            json!({}),
+            Err(ClientError {
+                code: "busy".into(),
+                detail: Some("😀".repeat(301)),
+                message: None,
+            }),
+        );
+        assert!(result.is_err());
+        let content = std::fs::read_to_string(lineage.join("incidents.jsonl")).unwrap();
+        let lines: Vec<_> = content.lines().collect();
+        assert_eq!(lines.len(), 1);
+        let incident: Value = serde_json::from_str(lines[0]).unwrap();
+        assert_eq!(incident["event"], "stop-failed");
+        assert_eq!(incident["code"], "busy");
+        assert_eq!(incident["detail"], "😀".repeat(300));
     }
 }

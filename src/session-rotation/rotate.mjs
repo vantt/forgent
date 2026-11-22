@@ -22,6 +22,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { replaceDurably } from '../native/door.mjs';
+import { judge, selfRecord } from '../native/process-identity.mjs';
+import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { readConfig } from '../config/facade.mjs';
 import { acquireSync, createLockScope, probe } from '../holder-lock/index.mjs';
 import { requestCancel } from '../run-supervisor/cancel-registry.mjs';
@@ -166,12 +168,14 @@ export function recordStopTrace(dir, line) {
  * checked. `{ sessionId, rotationId, message }` are the successor's Identity session id, the id it read from its
  * handoff (`rotationIdLine`) and its last assistant message, kept as evidence.
  */
-export function markSuccessorAnswered({ projectRoot, persona, name, key, sessionId, rotationId, message }, { now = () => new Date() } = {}) {
+export function markSuccessorAnswered({ projectRoot, persona, name, key, sessionId, rotationId, message }, ports = {}) {
+  const { now = () => new Date() } = ports;
   try { assertHeadArgs({ persona, name, projectRoot }); } catch (err) { fail(err.code ?? 'bad-args', err.message); }
   if (typeof sessionId !== 'string' || sessionId === '' || sessionId.length > 200) fail('bad-args', 'sessionId must be a non-empty string');
   if (typeof rotationId !== 'string' || !ROTATION_ID_PATTERN.test(rotationId)) fail('bad-args', 'rotationId must be the 16 hex characters of the handoff\'s rotation id line');
   if (typeof message !== 'string' || message.trim() === '' || message.length > MAX_TEXT) fail('bad-args', `message must be a non-empty string of at most ${MAX_TEXT} characters`);
   const dir = lineageDirOf(projectRoot, persona, name);
+  if (resolveOrphan({ projectRoot, persona, name }, ports) === false) fail('rotation-in-progress', 'the orphan rotation is being resolved');
   const pending = readJson(path.join(dir, 'rotation.json'));
   if (!pending || pending.successorKey !== key) fail('no-rotation-pending', `${headRoleOf(persona, name)} has no rotation waiting for ${key}`);
   if (rotationId !== pending.id) fail('answer-mismatch', 'rotationId is not the id of the pending rotation');
@@ -249,6 +253,66 @@ const reloadOf = (config, persona) => (config.personas?.[persona]?.reload ?? [])
 /** The portfolio entries that exist in the project; a path the project does not have is left out quietly. */
 const existingIn = (projectRoot, portfolio) => portfolio.filter((p) => !path.isAbsolute(p) && fs.existsSync(path.join(projectRoot, p)));
 
+// ---- orphan resolution -----------------------------------------------------------------------------
+
+/** The launch may have finished just before the executor died, before it could save the returned placement. */
+function orphanSuccessor(pending, projectRoot, persona) {
+  if (pending.successor) return pending.successor;
+  const run = [...listAssignmentRuns(fgosDirFromRoot(projectRoot))]
+    .filter((r) => r.assignmentId === pending.successorKey)
+    .sort((a, b) => a.attempt.localeCompare(b.attempt)).at(-1);
+  const envelope = run && readJson(path.join(run.runDir, 'envelope.json'));
+  if (!run) return null;
+  if (!envelope?.slot?.key) return { runDir: run.runDir };
+  return { key: envelope.slot.key, placement: { host: 'terminal', key: envelope.slot.key }, runDir: run.runDir, persona };
+}
+
+/** Malformed and legacy records are not process identities and must never reach the native judge. */
+function executorVerdict(pending, ports) {
+  const record = pending?.executor;
+  if (!record || !Number.isInteger(record.pid) || record.pid <= 0 || typeof record.startTime !== 'string' || !record.startTime) return 'unknown';
+  return (ports.judge ?? judge)(record);
+}
+
+/** Only a proven-dead executor is reclaimed. False means its recovery lock was busy. */
+function resolveOrphan({ projectRoot, persona, name }, ports) {
+  const dir = lineageDirOf(projectRoot, persona, name);
+  const file = path.join(dir, 'rotation.json');
+  const dead = (p) => executorVerdict(p, ports) === 'dead';
+  if (!dead(readJson(file))) return;
+  const lock = (ports.lock ?? takeLock)({ projectRoot, persona, name });
+  if (!lock) return false;
+  try {
+    const pending = readJson(file);
+    if (!dead(pending)) return;
+    const role = headRoleOf(persona, name);
+    const holder = (ports.identity ?? ((ask) => identityHolder(ask.role, ask.projectRoot)))({ role, projectRoot });
+    const successor = orphanSuccessor(pending, projectRoot, persona);
+    const answered = readJson(path.join(dir, 'answered.json'));
+    const head = holder.record?.ids?.head;
+    const holds = holder.live && (
+      (answered?.gen === pending.gen && answered.key === pending.successorKey && holder.session === answered.sessionId)
+      || (head?.persona === persona && head.name === name && head.gen === pending.gen)
+      || (successor?.placement?.key && slotKeyOf(holder.record) === successor.placement.key)
+    );
+    const end = ports.end ?? ((runDir) => requestCancel(runDir, 'session-rotation'));
+    const old = pending.old ?? readHeadPlacement(dir);
+    const complete = holds && !!successor?.runDir;
+    if (complete) {
+      if (!successor.placement?.key) fail('placement-unknown', 'the orphan rotation has no recorded successor placement');
+      if (!old?.runDir) fail('placement-unknown', 'the orphan rotation has no recorded head placement');
+      (ports.recordPlacement ?? writeHeadPlacement)(dir, { role, gen: pending.gen, placement: successor.placement, runDir: successor.runDir, persona: successor.persona, startedAt: pending.startedAt });
+      if (!end(old.runDir)) fail('cancel-unwritable', 'the orphan rotation could not request the old head to stop');
+    } else if (successor?.runDir && !end(successor.runDir)) {
+      fail('cancel-unwritable', 'the orphan rotation could not request the successor to stop');
+    }
+    fs.rmSync(file, { force: true });
+    incident(dir, { event: 'resolved-orphan', role, id: pending.id, outcome: complete ? 'completed' : 'abandoned' });
+  } finally {
+    lock.release();
+  }
+}
+
 // ---- the executor ----------------------------------------------------------------------------------
 
 /**
@@ -259,7 +323,8 @@ const existingIn = (projectRoot, portfolio) => portfolio.filter((p) => !path.isA
  *
  * `ports` (all optional, for tests): `end(runDir) -> boolean` (asks that session attempt's supervisor to stop it),
  * `identity({ role, projectRoot }) -> { live, session, record }`, `lock(lineage) -> { release } | null`, `place` (`placeHead`),
- * `placePorts` (its ports), `config(projectRoot)`, `clock { now, sleep }`, `pollMs`, and for a manual rotation
+ * `placePorts` (its ports), `config(projectRoot)`, `clock { now, sleep }`, `pollMs`, `selfRecord()` and `judge(record)`
+ * (the process door; orphan recovery uses the synchronous Identity/lock/end ports like the answer entry), and for a manual rotation
  * `sessionDir(runDir, launchCommandId)` (`seatSessionDir`), `lastMessage({ projectsDir })` (the session-host route's
  * `last-message`) and `finalTurnWaitMs`. The handoff and `latest.json` record `reason` as the rotation kind, and a
  * handoff without a stop-fact portfolio lists the persona's `sessionRotation.personas.<persona>.reload`; an entry
@@ -269,8 +334,13 @@ export async function rotateHeadSession(request, ports = {}) {
   const { persona, name, reason, projectRoot, stopFacts } = checkRequest(request);
   const role = headRoleOf(persona, name);
   const dir = lineageDirOf(projectRoot, persona, name);
+  if (resolveOrphan({ projectRoot, persona, name }, ports) === false) return { rotated: false, reason: 'rotation-in-progress' };
   const lock = (ports.lock ?? takeLock)({ projectRoot, persona, name });
   if (!lock) return { rotated: false, reason: 'rotation-in-progress' };
+  if (executorVerdict(readJson(path.join(dir, 'rotation.json')), ports) === 'alive') {
+    lock.release();
+    return { rotated: false, reason: 'rotation-in-progress' };
+  }
   const end = ports.end ?? ((runDir) => requestCancel(runDir, 'session-rotation'));
   const recordPlacement = ports.recordPlacement ?? writeHeadPlacement;
   const clock = ports.clock ?? realClock;
@@ -365,10 +435,12 @@ export async function rotateHeadSession(request, ports = {}) {
     writeJson(dir, 'rotation.json', {
       id, successorKey, gen, reason, handoff: handoff.file, oldKey: old.placement.key, oldSession: holder.session ?? null,
       pendingQuestion: stopFacts.pendingQuestion ?? null, startedAt: new Date(clock.now()).toISOString(),
+      executor: (ports.selfRecord ?? selfRecord)(), old,
     });
     try {
       // The successor's tab opens beside the slot the role holder's Identity record names.
       successor = await (ports.place ?? placeHead)({ persona, name, projectRoot, beside: slotKeyOf(holder.record), gen }, ports.placePorts ?? {});
+      writeJson(dir, 'rotation.json', { ...readJson(pendingFile), successor });
     } catch (err) {
       return await abandon(err.code ?? 'start-refused', String(err.message ?? err));
     }
@@ -403,9 +475,24 @@ export async function rotateHeadSession(request, ports = {}) {
  * Returns `{ started: true, pid }`, or `{ started: false, reason }` for `rotation-in-progress` or `spawn-failed`.
  */
 export function requestRotation(request, ports = {}) {
-  const checked = checkRequest(request);
-  const dir = lineageDirOf(checked.projectRoot, checked.persona, checked.name);
-  const outcome = startRotation(checked, dir, ports);
+  let checked;
+  let dir;
+  let outcome;
+  try {
+    checked = checkRequest(request);
+    dir = lineageDirOf(checked.projectRoot, checked.persona, checked.name);
+    outcome = startRotation(checked, dir, ports);
+  } catch (err) {
+    if (request?.measure !== undefined) {
+      try {
+        // A malformed measure still belongs to a Stop, but an invalid lineage must never become a write path.
+        assertHeadArgs(request);
+        dir ??= lineageDirOf(request.projectRoot, request.persona, request.name);
+        incident(dir, { event: 'stop-failed', code: err.code ?? 'internal', detail: String(err.message ?? err).slice(0, 300) });
+      } catch { /* recording a failed Stop is best effort, like every incident */ }
+    }
+    throw err;
+  }
   if (checked.measure) {
     const { fraction, source, stale, decision } = checked.measure;
     recordStopTrace(dir, { fraction, source, stale, decision, reason: checked.reason, outcome: outcome.started ? 'started' : outcome.reason });

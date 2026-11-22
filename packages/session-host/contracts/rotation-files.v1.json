@@ -12,12 +12,23 @@
       "carries": "a line `- rotation: soft | hard | manual`; a line `Rotation id: <16 lowercase hex characters>` when a rotation executor wrote it; the portfolio files to reread (the stop facts' portfolio, else `sessionRotation.personas.<persona>.reload`; an entry the project does not have is left out); a `## Last assistant message (verbatim)` section (the message in a code fence one backtick longer than its longest backtick run, at least three, so nothing in it reads as a heading; kept to its last 8000 characters behind `…(earlier text cut)` when longer) and a `## Pending question (verbatim)` section on a hard or manual rotation; the reader takes the pending question only from that heading outside any fence. A manual rotation's last message is read by the executor from the old session's transcript (the `last-message` op below, after the old session ended its turn, at most 60 s); when it cannot be read, the section says `(not found: <why>)`",
       "sessionStart": "the reader inlines the text when it is under 10000 characters, else a pointer to the file plus the pending question verbatim"
     },
-    "rotation.json": { "writer": "rotation executor", "readFields": { "gen": "integer, the successor's generation", "id": "the rotation id" } },
+    "rotation.json": {
+      "writer": "rotation executor",
+      "readFields": { "gen": "integer, the successor's generation", "id": "the rotation id" },
+      "executor": "the process door's selfRecord: {host, bootId?, pidNs, pid, startTime}; optional for readers of older records. Only judge(executor) == dead permits reclamation; alive, unknown and a missing record do not",
+      "recoveryFields": { "successorKey": "the successor's assignment id", "old": "the predecessor's placement.json snapshot, saved before launch", "successor": "placeHead's returned {key, placement, runDir, persona}, saved after launch; if absent, read the successor assignment's newest run envelope for slot.key and runDir" },
+      "recovery": "before rotate takes its normal lock or answered records an answer, a proven-dead executor is resolved under the lineage lock: Identity naming the successor completes placement and requests the old head's normal stop; otherwise requests the successor's normal stop and abandons. Remove rotation.json only after successful resolution, append one resolved-orphan incident with outcome completed or abandoned; Identity/read/stop failures retain the record for retry. Doctor only points here"
+    },
     "answered.json": { "writer": "markSuccessorAnswered", "readFields": { "gen": "integer" } },
     "stop-trace.jsonl": {
       "writer": "the host, when it handles the `session rotate` request every stop sends (requestRotation, src/session-rotation/rotate.mjs); the hook itself runs inside the head's sandbox, where the lineage folder is read-only",
       "shape": { "at": "ISO-8601 UTC", "fraction": "number or null (nothing measured)", "source": "sidecar | transcript | null", "stale": "boolean", "decision": "the decide reason, e.g. below-soft, at-or-above-soft, background-work-running, no-measure", "reason": "none | soft | hard", "outcome": "below-threshold | started | rotation-in-progress | spawn-failed" },
-      "readerRule": "for the owner; one line per stop that reached the host, newest 500 kept once the file passes 256 KiB. A hook failure before the request (no .fgos, bad config, no socket, a refused request) reaches stderr only and leaves no line: a known gap"
+      "readerRule": "for the owner; one line per stop that reached the host, newest 500 kept once the file passes 256 KiB. A hook failure before requestRotation leaves no trace line; after locating its lineage the native hook attempts a best-effort stop-failed incident and reports stderr, but the confined head's read-only lineage may prevent that local write. A measured request rejected by requestRotation validation or start leaves a stop-failed incident when its lineage is valid"
+    },
+    "incidents.jsonl": {
+      "writer": "rotation executor, host requestRotation and native Stop hook, best effort",
+      "shape": "one JSON object per line with at and event; resolved-orphan has role, id, outcome (completed | abandoned); stop-failed has code and detail bounded to 300 characters when a measured Stop's validation or host-side start throws, or the native Stop fails after locating its lineage",
+      "readerRule": "host-side failures are recorded here; the native hook's local best-effort write may fail in a read-only confined lineage, so reliable pre-request reporting still needs a host-writable path"
     },
     "context-sidecar.jsonl": {
       "writer": "a status-line wrapper, optional; none ships with fgOS",
