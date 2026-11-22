@@ -4,7 +4,7 @@
 Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent, tool author
 Purpose: Define the single structural model of layers, components, decision kinds, doors, contracts, and file-to-component mappings
-Design status: Accepted (signed by CA-D5, 2026-11-21)
+Design status: Accepted (CA-D1..CA-D5, plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md §4, signed by CA-D5)
 Canonical: Yes
 Owner: Component authority
 Source: packages/component-authority/
@@ -188,43 +188,43 @@ With the establishment of Component Authority, previous disparate ownership ledg
 
 1. Component authority is design ownership, not runtime permission. It does not replace or duplicate Agent Confinement Authority (`docs/platform/agent-confinement/spec.md`).
 2. Every contract in the system has exactly one provider component.
-3. When porting from Node to Rust, twin implementations are forbidden (CA-D2). The legacy implementation is removed in the same change, and the commit message and specification record the final commit SHA of the removed implementation.
+3. When porting from Node to Rust, twin implementations are forbidden (decision 2 in section 7). The legacy implementation is removed in the same change, and the commit message and specification record the final commit SHA of the removed implementation.
 4. Subcomponents are modeled as component rows with a `parent` field rather than maintained in a separate ledger.
 5. Business rules (RULs), platform foundation laws (L1–L10), and decision records remain outside the structural model; the model points to their locations.
 
 ## 7. Lịch sử quyết định
 
-### CA-D1 — Authority, boundary và contract là yếu tố hạng nhất của toàn hệ thống
+### Quyết định 1 — Authority, boundary và contract là yếu tố hạng nhất của toàn hệ thống
 
 - **Ngày**: 2026-11-21
 - **Lời chủ dự án**: "chọn A, mở discussion riêng đi em" và "authority/boundary và contract là yếu tố hạng nhất của cả system"
-- **Nguồn**: `plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md` §4 CA-D1; rounds 12–14 của `orchestration-skeleton`
+- **Nguồn**: `plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md` §4 decision 1; rounds 12–14 của `orchestration-skeleton`
 - **Nội dung**: Xác lập việc quản lý authority, boundary và contracts là yếu tố hạng nhất của hệ thống, tách riêng thành một chủ đề nghiên cứu và giải quyết độc lập thay vì xử lý tạm bợ hoặc gom chung vào các kế hoạch khác.
 
-### CA-D2 — Cấm giữ twin khi port sang Rust
+### Quyết định 2 — Cấm giữ twin khi port sang Rust
 
 - **Ngày**: 2026-11-21
 - **Lời chủ dự án**: "anh không muốn giữ bản node để làm chi, git có rồi thì truy lịch sử cũng được, chỉ cần ghi chuyển rust thì có note đầy đủ tham chiếu bản cũ."
-- **Nguồn**: `plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md` §4 CA-D2, §3 row 3d
+- **Nguồn**: `plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md` §4 decision 2, §3 row 3d
 - **Nội dung**: Cấm duy trì triển khai song song (twin) giữa Node và Rust khi thực hiện chuyển đổi. Bản cũ phải được xoá trong cùng đợt cắt chuyển, toàn bộ caller phải được chuyển sang bản Rust. Lịch sử được truy xuất qua Git; commit và lịch sử quyết định ghi rõ commit SHA cuối cùng còn giữ bản cũ.
 
-### CA-D3 — Thành phần mới component-authority quản lý quyền sở hữu
+### Quyết định 3 — Thành phần mới component-authority quản lý quyền sở hữu
 
 - **Ngày**: 2026-11-21
 - **Lời chủ dự án**: "ok, chọn thành phần mới component-authority" (Q4) và "giữ component-authority" (round 12)
-- **Nguồn**: `plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md` §4 CA-D3, §3 row 4
+- **Nguồn**: `plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md` §4 decision 3, §3 row 4
 - **Nội dung**: Quyền sở hữu và ranh giới kiến trúc được giao cho một thành phần mới, nhỏ gọn, cô lập mang tên `component-authority`. Thành phần này chỉ thực hiện công việc quản lý mô hình cấu trúc, cung cấp hai cửa `locate` và `declare`, tái sử dụng năng lực tìm kiếm và mô hình admission của Documentation H2 (`docs/platform/documentation/subcomponents/admission/spec.md`).
 
-### CA-D4 — Gộp tầng kiến trúc vào mô hình cấu trúc duy nhất
+### Quyết định 4 — Gộp tầng kiến trúc vào mô hình cấu trúc duy nhất
 
 - **Ngày**: 2026-11-21
 - **Lời chủ dự án**: "ok, gộp: một mô hình cấu trúc" (Q5)
-- **Nguồn**: `plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md` §4 CA-D4, §3 row 4a(iv)
+- **Nguồn**: `plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md` §4 decision 4, §3 row 4a(iv)
 - **Nội dung**: Gộp toàn bộ dữ liệu tầng kiến trúc (layers, rules, tiers, mapping file) từ `docs/architecture-manifest.json` vào mô hình cấu trúc của `component-authority`, loại bỏ tình trạng duy trì hai tập tin bản đồ kiến trúc song song.
 
-### CA-D5 — Duyệt thiết kế tổng thể của component-authority
+### Quyết định 5 — Duyệt thiết kế tổng thể của component-authority
 
 - **Ngày**: 2026-11-21
 - **Lời chủ dự án**: "ok duyệt."
-- **Nguồn**: `plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md` §4 CA-D5, §6
+- **Nguồn**: `plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md` §4 decision 5, §6
 - **Nội dung**: Phê duyệt toàn bộ thiết kế kiến trúc và vận hành của `component-authority`: hai cửa `locate`/`declare`, các điểm kiểm tra tại planning/land, tự động sinh các bản đọc cho người và thu hồi các sổ cũ; quản lý contract theo chỉ mục; subcomponent là hàng có `parent`; quy tắc kinh doanh và bản ghi quyết định nằm ngoài mô hình.
