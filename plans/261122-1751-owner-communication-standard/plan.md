@@ -1,6 +1,6 @@
 ---
 contract: plan-v1
-title: "Thấu hiểu user: one shared standard for talking to the owner, reaction capture and cheap answers"
+title: "Tiêu chuẩn giao tiếp: one shared communication standard for talking to the owner, reaction capture and cheap answers"
 status: draft
 priority: P1
 base: 29a99b87b68160b259a268888c3d270ea3b7a1c9
@@ -76,17 +76,17 @@ source:
 created: 2026-11-22
 ---
 
-# Thấu hiểu user: one shared standard for talking to the owner
+# Tiêu chuẩn giao tiếp: one shared communication standard for talking to the owner
 
 Mode: standard (three tasks from one settled discussion; one shared-text change that moves about 40 callers, one new
 hook kind, one contract change in the question door).
 
 ## Outcome
 
-Every head, lead and worker, in every agent CLI, loads one standard named **thấu hiểu user**. It says why the
-owner's attention matters, the principle judged from the reader's side, how the principle applies to each kind of
+Every head, lead and worker, in every agent CLI, loads one standard named **tiêu chuẩn giao tiếp** (communication standard, OC-D8). It says why the
+owner's attention matters (the owner is overloaded, so every message is made as easy to take in as possible), the principle judged from the reader's side, how the principle applies to each kind of
 message (before speaking, names and ids, language and length, decision questions, status and incident reports) and a
-few curated cases (OC-D2, OC-D3). It replaces both decision-question files; no caller points at the old paths
+few curated cases (OC-D2 as superseded by OC-D8, OC-D3). It replaces both decision-question files; no caller points at the old paths
 (OC-D6, L10). Bad exchanges land in the friction store under a new `owner-communication` layer (OC-D4). A hook on
 the owner's prompt records one friction candidate when the prompt carries a reaction signal, and never blocks or
 slows the prompt (OC-D7 level 1). The question door shows options lettered A to D with the recommended one first,
@@ -185,7 +185,7 @@ lettering touch the option shape, not the recipients and notifier the skeleton a
 
 ## Owner questions
 
-None. Every point the plan needs is settled in the discussion (OC-D1 to OC-D7). Two choices the discussion left to
+None. Every point the plan needs is settled in the discussion (OC-D1 to OC-D8). Two choices the discussion left to
 the planner are decided here and recorded in the phase files: the default field is `parts.default` with `does` and
 `when`, required on decided questions only (phase 3); letters follow a recommended-first order computed by one
 function in the questions package, so display and answer cannot disagree (phase 3). The T-signal phrase list starts

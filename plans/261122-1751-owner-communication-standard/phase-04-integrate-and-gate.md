@@ -14,7 +14,7 @@ Capability: `code:test`. Wave 3. Depends on phases 2 and 3.
 ## Steps
 
 1. Confirm phases 1 to 3 are on `main` (`git log --oneline` shows their commits).
-2. Add under `## [Unreleased]` in `CHANGELOG.md`: the standard "thấu hiểu user" replaces the decision-question
+2. Add under `## [Unreleased]` in `CHANGELOG.md`: the communication standard ("tiêu chuẩn giao tiếp") replaces the decision-question
    template for every agent; a new friction layer `owner-communication`; the `owner-reaction` prompt hook for Claude
    Code (installed on the next `fgos setup`); owner questions now show lettered options, accept a letter as an answer
    and need a stated default.

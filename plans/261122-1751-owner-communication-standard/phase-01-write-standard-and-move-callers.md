@@ -5,7 +5,8 @@ Capability: `code:implement`. Wave 1. Depends on nothing.
 ## Inputs
 
 - `plans/discussions/ds-cfsfcbknl6-owner-communication/DISCUSSION.md`, section 6 steps 1 to 3 (the text of the
-  standard, the T-signal table, the seed cases) and decisions OC-D2, OC-D3, OC-D4, OC-D6.
+  standard, the T-signal table, the seed cases) and decisions OC-D2, OC-D3, OC-D4, OC-D6, OC-D8 (the name and the
+  sharpened principle, which supersede OC-D2's).
 - `core/skills/_shared/decision-question.md` and `core/instructions/decision-question.md` (the text being absorbed).
 - `core/skills/_shared/friction-capture.md` (the "Record when" list gets the owner-signal trigger).
 - `packages/observe/rust/friction-kinds.json` and `docs/platform/observe/spec.md` line 136 (the layer list).
@@ -22,8 +23,10 @@ Modified: every other path in this phase's row of the plan's phase table. Genera
 
 ## Steps
 
-1. Write `core/skills/_shared/owner-communication.md`, titled "Thấu hiểu user", in this order (OC-D3): why (step 1
-   of the discussion's section 6); the principle and the test before sending (step 2); the applications: before you
+1. Write `core/skills/_shared/owner-communication.md`, titled "Tiêu chuẩn giao tiếp" (communication standard, OC-D8), in this order (OC-D3): why
+   (step 1 of the discussion's section 6); the understanding behind it (the owner is overloaded, so every message
+   makes taking in information as easy, clear and high in quality as possible), the principle and the test before
+   sending, all as OC-D8 words them in step 2; the applications: before you
    speak, names and ids, language and length, decision question, status and incident reports (step 2). The decision
    question application carries the whole of today's five-part template, its approved-frame rule and its "make it
    easy to answer" section word for word, plus lettered options with the recommended one first and a stated default
