@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Turn main's landed-code reds green and finish the docs/backlog.md to plans/backlog.md sweep"
-status: running
+status: done
 lead: head:lead-forgent-261122-0800-red-te-96f0f
 priority: P1
 blockedBy: []
@@ -105,9 +105,9 @@ plans own, so this plan does not touch them. The secretary routes each one to th
 | 4 | [Config bundle lists secretary and the rotation comment passes the scrub](phase-04-config-bundle.md) | - | core/config-standard/sessionRotation.yaml, packages/config/rust/src/bundle.rs | 1 | done |
 | 5 | [Remaining portfolio sample paths](phase-05-portfolio-sample-paths.md) | - | test/scripts/check-decision-citation-drift.test.mjs, packages/durable-file/rust/tests/dir_replace.rs, apps/fgos/tests/session_write_publish.rs, plans/261122-0800-red-tests-and-backlog-sweep/reports/kept-legacy-references.md | 1 | done |
 | 6 | [Prove or disprove the environmental four](phase-06-environmental-proof.md) | - | plans/261122-0800-red-tests-and-backlog-sweep/reports/environmental-reds.md | 1 | done |
-| 7 | [Integration gate](phase-07-integration-gate.md) | 1, 2, 3, 4, 5, 6 | plans/261122-0800-red-tests-and-backlog-sweep/reports/integration-gate.md | 2 | running |
+| 7 | [Integration gate](phase-07-integration-gate.md) | 1, 2, 3, 4, 5, 6 | plans/261122-0800-red-tests-and-backlog-sweep/reports/integration-gate.md | 2 | done |
 
-Landed: phase 1 f25ab4c9a, phase 2 eb3378b49, phase 3 c831999d4, phase 4 7180cca94, phase 5 bb9675c8d, phase 6 1fee82c55. Phase 1 reopened fix 634fd7121 (branch `red-tests-and-backlog-sweep/p01r`) waits to land; see the phase 7 file.
+Landed: phase 1 f25ab4c9a, phase 2 eb3378b49, phase 3 c831999d4, phase 4 7180cca94, phase 5 bb9675c8d, phase 6 1fee82c55. Phase 1 reopened after the host gate: fix 634fd7121 landed as 0f76f09df. Phase 7: `reports/integration-gate.md`, landed with this update.
 
 Phase 1 note: the read-only backlog-file probe of the secretary case was retired because a1022572a made `plans` a read-write bind; the positive `plans/backlog.md` probe in the same case now owns the backlog behaviour (fix commit 4aa0a7e81 carries no body saying so).
 

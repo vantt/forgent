@@ -1,7 +1,7 @@
 ---
 id: p-vnsigyw6h7
 title: "Tests red on main after the 11-21/22 lands: portfolio move, migrate verb, label separator, config scrub and schema list, bugfix workflow (tests, priority high; source: lead:S6A, 2026-11-22 02:50)"
-status: proposed
+status: done
 priority: P1
 area: tests
 created: 2026-11-22

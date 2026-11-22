@@ -36,3 +36,5 @@ on main in the gate's fixed list (`check-decision-citation-drift` real-repo CLI 
 the stale git mutation census). Plan-file lands are refused by the plan-contract gate, which receives a literal
 `{plans}`. When both clear: land p01r with `--test test/runner/dispatch-confinement-backend-p03.test.mjs`, then set this
 phase and the plan done.
+
+Done 2026-11-22 11:40: p01r landed as 0f76f09df with the secretary case passing in its host land gate; no red on main is owned by this plan.

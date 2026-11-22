@@ -7,12 +7,12 @@ lead:SUPERVISOR ran both suites on the host, main `0044018d1`, in the main check
 `main-npm-fails-0044018d1.txt`.
 
 - `cargo test --workspace --no-fail-fast`: 3 reds, the `apps/fgos` run-peer `cli_tests` (S6A's, already sent to them).
-- `npm test`: 8096 tests, 17 failed, classified below. No red is owned by this plan once branch
-  `red-tests-and-backlog-sweep/p01r` (634fd7121) lands.
+- `npm test`: 8096 tests, 17 failed, classified below. No red is owned by this plan: the one that was (phase 1) landed
+  its fix as 0f76f09df.
 
 | Test | Cause from the log | Class | Owner |
 |---|---|---|---|
-| `test/runner/dispatch-confinement-backend-p03.test.mjs:1279` secretary shape | `ENOENT mkdir …/docs/sub`: phase 1 removed the line that created `docs/` | **owned by phase 1**, reopened | fixed in 634fd7121; passed on the host in its land gate (`.fgos/runtime/land/land-2559638-1795320755476330147-1.log:401`); land blocked by the two main reds below |
+| `test/runner/dispatch-confinement-backend-p03.test.mjs:1279` secretary shape | `ENOENT mkdir …/docs/sub`: phase 1 removed the line that created `docs/` | **owned by phase 1**, reopened | fixed in 634fd7121, landed as 0f76f09df; the case passes on the host in its land gate |
 | `test/scripts/convention-conformance.test.mjs:200` | 240 pre-cutoff, 1 post-cutoff: the post-cutoff one is `plans/reports/secretary-handoff-261118-2330.md`, untracked in the main checkout and outside every template (the host ran in the dirty checkout) | environmental: dirty main checkout | the secretary (rename it through `fgos convention path` or remove it); green on a clean tree, as in phase 2's land gate |
 | `test/scripts/check-decision-citation-drift.test.mjs:485` real-repo CLI | 48 `cites ADR00xx with no gloss` findings in `platform-foundations.md`, `runner/decisions/h-36d872fbb0e5.md`, `git/spec.md`, `event-store/spec.md` | new | the decisions commits 68420ee14, bddb4fe0d, edd3e4486 (10:18-10:38); needs a backlog row or their author's fix. It is in the land door's fixed gate list, so it blocks every land |
 | `test/docs/decisions-corpus-retired.test.mjs:67`, `:80` | `### <id>` headings and the Iron Law 0032 record no longer found | new | bddb4fe0d (decision headings now lead with the D-ADR id), same owner as above |
@@ -37,7 +37,7 @@ regenerated after those files changed; owner of the latest change to them.
 
 ## Acceptance
 
-- Criterion 7: met for this plan's own scope once 634fd7121 lands. Every other red above has a named owner or a
+- Criterion 7: met. The phase 1 fix landed as 0f76f09df. Every other red above has a named owner or a
   backlog-row request.
 - Criterion 5: `rg -n 'docs/backlog\.md|docs/discussions' --glob '!plans/**' --glob '!archive/**' --glob '!CHANGELOG.md' -l`
   lists 77 files and `reports/kept-legacy-references.md` has exactly those 77 rows (checked file for file).
