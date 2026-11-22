@@ -89,7 +89,8 @@ impl Scene {
         );
         git(&project, &["config", "fgos.machineid", "m-test"]);
         fs::create_dir_all(project.join("docs")).unwrap();
-        fs::write(project.join("docs/backlog.md"), "old\n").unwrap();
+        fs::create_dir_all(project.join("plans")).unwrap();
+        fs::write(project.join("plans/backlog.md"), "old\n").unwrap();
         fs::write(project.join("docs/other.md"), "keep\n").unwrap();
         git(&project, &["add", "."]);
         git(&project, &["commit", "-qm", "base"]);
@@ -144,7 +145,7 @@ impl Scene {
             "hostBin": "/bin/false",
             "cwd": project,
             "identity": {"writerId": "att-own"},
-            "session": {"role": ROLE, "verbs": ["session write"], "writes": ["docs/backlog.md", "plans/backlog/*"],
+            "session": {"role": ROLE, "verbs": ["session write"], "writes": ["plans/backlog.md", "plans/backlog/*"],
                         "requestSocketPath": socket},
             "steps": [{"stepId": "finalize-home", "env": {}}]
         });
@@ -258,29 +259,29 @@ fn land_config_reads_gates_with_and_without_when_and_a_regenerate() {
 /// A write based on a blob a newer remote commit replaced is refused and the newer content survives; the current
 /// blob id is accepted. (A step of the scene's one scenario: the scene holds process-wide state, so only one runs.)
 fn a_stale_base_is_refused_and_the_current_one_written(scene: &Scene) {
-    let read = git(&scene.project, &["hash-object", "docs/backlog.md"]);
+    let read = git(&scene.project, &["hash-object", "plans/backlog.md"]);
 
     // A newer row lands on the remote after the writer read the file.
     git(
         &scene.other,
         &["pull", "-q", "--ff-only", "origin", "trunk"],
     );
-    fs::write(scene.other.join("docs/backlog.md"), "old\nnewer row\n").unwrap();
+    fs::write(scene.other.join("plans/backlog.md"), "old\nnewer row\n").unwrap();
     git(&scene.other, &["commit", "-qam", "newer row"]);
     git(&scene.other, &["push", "-q", "origin", "trunk"]);
     let tip = scene.remote_tip();
 
-    let reply = scene.write_based("docs/backlog.md", "stale edit\n", &read);
+    let reply = scene.write_based("plans/backlog.md", "stale edit\n", &read);
     assert_eq!(reply["code"], "write-base-stale", "{reply}");
     assert_eq!(
-        fs::read_to_string(scene.project.join("docs/backlog.md")).unwrap(),
+        fs::read_to_string(scene.project.join("plans/backlog.md")).unwrap(),
         "old\nnewer row\n"
     );
     assert_eq!(scene.remote_tip(), tip, "nothing was published");
 
     // Re-read, same edit on the new content: the current blob id is accepted.
-    let current = git(&scene.project, &["hash-object", "docs/backlog.md"]);
-    let reply = scene.write_based("docs/backlog.md", "old\nnewer row\nmine\n", &current);
+    let current = git(&scene.project, &["hash-object", "plans/backlog.md"]);
+    let reply = scene.write_based("plans/backlog.md", "old\nnewer row\nmine\n", &current);
     assert_eq!(reply["result"], "done", "{reply}");
     assert_eq!(reply["data"]["commit"], scene.remote_tip());
 }
@@ -344,25 +345,25 @@ fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_fo
     // other dirty path stays out), the subject names the head role, and the remote then holds the commit.
     scene.move_remote("moved-first.md");
     fs::write(scene.project.join("docs/other.md"), "dirty elsewhere\n").unwrap();
-    let reply = scene.write("docs/backlog.md", "new\n");
+    let reply = scene.write("plans/backlog.md", "new\n");
     assert_eq!(reply["result"], "done", "{reply}");
     let commit = reply["data"]["commit"]
         .as_str()
         .unwrap_or_else(|| panic!("no commit: {reply}"))
         .to_owned();
-    assert_eq!(reply["data"]["path"], "docs/backlog.md");
+    assert_eq!(reply["data"]["path"], "plans/backlog.md");
     assert_eq!(reply["data"]["bytes"], 4);
     assert_eq!(commit, scene.remote_tip(), "the remote holds the commit");
     assert_eq!(
         git(&scene.project, &["log", "-1", "--format=%s", &commit]),
-        format!("docs({ROLE}): write docs/backlog.md")
+        format!("docs({ROLE}): write plans/backlog.md")
     );
     assert_eq!(
         git(
             &scene.project,
             &["show", "--format=", "--name-only", &commit]
         ),
-        "docs/backlog.md"
+        "plans/backlog.md"
     );
     assert!(
         scene.project.join("moved-first.md").exists(),
@@ -375,17 +376,17 @@ fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_fo
     git(&scene.project, &["checkout", "--", "docs/other.md"]);
 
     // 2. A path with an uncommitted change is refused and nothing is written.
-    fs::write(scene.project.join("docs/backlog.md"), "edited by hand\n").unwrap();
+    fs::write(scene.project.join("plans/backlog.md"), "edited by hand\n").unwrap();
     let before = scene.remote_tip();
-    let reply = scene.write("docs/backlog.md", "newer\n");
+    let reply = scene.write("plans/backlog.md", "newer\n");
     assert_eq!(reply["result"], "refused", "{reply}");
     assert_eq!(reply["code"], "write-path-dirty");
     assert_eq!(
-        fs::read_to_string(scene.project.join("docs/backlog.md")).unwrap(),
+        fs::read_to_string(scene.project.join("plans/backlog.md")).unwrap(),
         "edited by hand\n"
     );
     assert_eq!(scene.remote_tip(), before);
-    git(&scene.project, &["checkout", "--", "docs/backlog.md"]);
+    git(&scene.project, &["checkout", "--", "plans/backlog.md"]);
 
     // 3. The remote moves outside fgos while the land runs: the push is rejected, the commit is undone, and the
     // land starts over from a fresh sync, so the write ends on the remote with no hand push. A remote that moves
@@ -402,8 +403,8 @@ fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_fo
         ),
     )
     .unwrap();
-    scene.gates("docs/**", &format!("sh {}", mover.display()));
-    let reply = scene.write("docs/backlog.md", "third\n");
+    scene.gates("plans/**", &format!("sh {}", mover.display()));
+    let reply = scene.write("plans/backlog.md", "third\n");
     assert_eq!(reply["result"], "done", "{reply}");
     assert_eq!(reply["data"]["bytes"], 6);
     let commit = reply["data"]["commit"]
@@ -418,7 +419,7 @@ fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_fo
         "local main equals the remote tip"
     );
     let tip = scene.remote_tip();
-    let reply = scene.write("docs/backlog.md", "fourth\n");
+    let reply = scene.write("plans/backlog.md", "fourth\n");
     assert_eq!(
         reply["result"], "done",
         "a later write is not refused: {reply}"
