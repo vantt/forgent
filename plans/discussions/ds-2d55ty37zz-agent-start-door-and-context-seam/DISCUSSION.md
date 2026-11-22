@@ -39,6 +39,11 @@ discussion: settled
   10. The fgOS part of AGENTS.md passes the L8 test, and a SessionStart hook injects context for hand-opened sessions.
   11. `npm test` and `cargo test --workspace` are green.
 - **Open, blocking only part.** P10: the domain field on items. The secretary writes it, and the decision port is the fallback; this blocks only slice 2's domain doctrine for heads. Item C and the runner item run separately.
+- **Order with the runner item (owner 19:45).**
+  1. **Now, in parallel:** slice 0 here and runner part 1 (fanout onto `fgos workflow start --units`). They share no file: `src/runner/fanout-batch.mjs` imports only `execution-door`. Measuring `fgos-runner` use starts too.
+  2. **Then slice 1** here.
+  3. **Then runner part 2** (the operation step), so its objective templates (`work-compat buildPrompt`, `src/runner/prompt-templates`) move once, straight into units read by the composer.
+  4. **Runner part 3** (retire or keep `fgos-runner`) is decided when the usage evidence is in.
 - **Source ids.** `p-25q7tz6jtt`; decisions ASC-D1 to ASC-D7; related `ds-cfsfcbknl6`.
 
 ## 1. Trạng thái hiện tại
@@ -305,6 +310,7 @@ Plus hooks: AgentKit `session-init` (≤4 KB), `dev-rules-reminder` on every pro
 - 2026-11-22 19:40 — Owner: the contract is good, but do its arguments have a clear interface? Shaper: not yet in round 3 (`facts` was a loose map). Round 4 writes the explicit interface (#interface): three typed arguments with schema files, a fact registry whose values come from live data, a closed payload union, a delivery enum, `when:` frontmatter checked at build, and named refusals.
 - 2026-11-22 19:45 — Owner: does compose have an injection mechanism, or a way to gather rules? A rule in a new component needs a door in. Shaper: the rule-gathering door already exists (instruction registry: core, components/<c>, domains/<d> roots, owners from the architecture manifest, authority and specificity order) and becomes the composer's UnitSource. Added a live door, a registered `Contributor` port for context computed at start, plus a budget per delivery (#interface).
 - 2026-11-22 19:55 — Owner agreed (interface, doors, slices) and asked for advice on the runner item. Advice: yes, a separate item in three parts by value. (1) The fanout batch onto `fgos workflow start --units` first, because `node src/runner/fanout-batch.mjs` runs only inside the fgOS checkout (mission #1). (2) The operation step of `fgos step`/`discover`/`plan` builds its Unit through the same function `fgos run --unit` uses, and its objective templates move to domain units. (3) The Work loop `fgos-runner`: measure use first; retiring a shipped entry point is a decision question with that evidence. It does not collide with this discussion's slices. Discussion settled.
+- 2026-11-22 20:00 — Owner agreed to the separate runner item and asked whether it goes before or after Agent Start Context. Order recorded in the hand-off block. Runner part 1 runs in parallel with slice 0 now: it is a live bug in other projects, and the two share no file. Runner part 2 waits for slice 1, so its templates move once. Runner part 3 waits for usage evidence. The secretary was asked to file the item.
 
 ## 6. Thiết kế đã chốt {#design}
 
