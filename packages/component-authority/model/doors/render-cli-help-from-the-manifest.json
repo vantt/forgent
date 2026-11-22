@@ -1,0 +1,17 @@
+{
+  "job": "render CLI help from the manifest",
+  "kind": "door",
+  "patterns": [
+    "command-manifest\\.json"
+  ],
+  "allowed": [
+    {
+      "path": "scripts/export-command-selectors.mjs",
+      "reason": "the generator writes and drift-checks the committed manifest file"
+    },
+    "apps/fgos/src/help.rs"
+  ],
+  "debt": [],
+  "retiredBy": "S7: the generator is not a twin; it stays as the only writer while the Node renderer is deleted",
+  "reason": "the host renders every help form from the one committed manifest; no other product file reads the file"
+}

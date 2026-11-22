@@ -113,14 +113,16 @@ test('discoverInstructionSources discovers instruction fragments from core, comp
       'Worktree safety boundaries.',
     );
 
-    // Authorize packaging and coding via authoritative architecture-manifest.json
-    fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
+    // Authorize packaging and coding via authoritative packages/component-authority/model/
+    fs.mkdirSync(path.join(tmp, 'packages', 'component-authority', 'model'), { recursive: true });
     fs.writeFileSync(
-      path.join(tmp, 'docs', 'architecture-manifest.json'),
-      JSON.stringify({
-        components: ['packaging'],
-        domains: ['coding'],
-      }),
+      path.join(tmp, 'packages', 'component-authority', 'model', 'components.json'),
+      JSON.stringify([{ id: 'packaging' }]),
+      'utf8',
+    );
+    fs.writeFileSync(
+      path.join(tmp, 'packages', 'component-authority', 'model', 'layers.json'),
+      JSON.stringify({ domains: ['coding'] }),
       'utf8',
     );
 
@@ -496,10 +498,10 @@ test('discoverInstructionSources throws DUPLICATE_ID when two files share the sa
 test('discoverInstructionSources throws DUPLICATE_ID when two files share the same id across different roots', () => {
   const tmp = mkTempDir('fgos-inst-dup-cross-');
   try {
-    fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'packages', 'component-authority', 'model'), { recursive: true });
     fs.writeFileSync(
-      path.join(tmp, 'docs', 'architecture-manifest.json'),
-      JSON.stringify({ components: ['auth'] }),
+      path.join(tmp, 'packages', 'component-authority', 'model', 'components.json'),
+      JSON.stringify([{ id: 'auth' }]),
       'utf8',
     );
     writeInstructionFile(path.join(tmp, 'core', 'instructions'), 'rule-core.md', 'id: shared-rule-id\nkind: law');
@@ -569,9 +571,9 @@ test('discoverInstructionSources throws UNKNOWN_OWNER when component folder is n
 test('discoverInstructionSources throws AUTHORITY_MISMATCH when declared owner does not match root authority owner', () => {
   const tmp = mkTempDir('fgos-inst-owner-mismatch-');
   try {
-    fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'packages', 'component-authority', 'model'), { recursive: true });
     fs.writeFileSync(
-      path.join(tmp, 'docs', 'architecture-manifest.json'),
+      path.join(tmp, 'packages', 'component-authority', 'model', 'layers.json'),
       JSON.stringify({ domains: ['coding'] }),
       'utf8',
     );
@@ -600,10 +602,10 @@ test('discoverInstructionSources throws AUTHORITY_MISMATCH when declared owner d
 test('discoverInstructionSources throws UNKNOWN_OWNER under default options when component is not in manifest', () => {
   const tmp = mkTempDir('fgos-inst-unreg-comp-');
   try {
-    fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'packages', 'component-authority', 'model'), { recursive: true });
     fs.writeFileSync(
-      path.join(tmp, 'docs', 'architecture-manifest.json'),
-      JSON.stringify({ components: ['packaging-distribution'] }),
+      path.join(tmp, 'packages', 'component-authority', 'model', 'components.json'),
+      JSON.stringify([{ id: 'packaging-distribution' }]),
       'utf8',
     );
     writeInstructionFile(
@@ -631,9 +633,9 @@ test('discoverInstructionSources throws UNKNOWN_OWNER under default options when
 test('discoverInstructionSources throws UNKNOWN_OWNER under default options when domain is not in manifest', () => {
   const tmp = mkTempDir('fgos-inst-unreg-dom-');
   try {
-    fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'packages', 'component-authority', 'model'), { recursive: true });
     fs.writeFileSync(
-      path.join(tmp, 'docs', 'architecture-manifest.json'),
+      path.join(tmp, 'packages', 'component-authority', 'model', 'layers.json'),
       JSON.stringify({ domains: ['coding'] }),
       'utf8',
     );
@@ -662,7 +664,7 @@ test('discoverInstructionSources throws UNKNOWN_OWNER under default options when
 test('discoverInstructionSources throws UNKNOWN_OWNER under default options when no manifest exists and component is present', () => {
   const tmp = mkTempDir('fgos-inst-nomanifest-comp-');
   try {
-    // No docs/architecture-manifest.json in tmp
+    // No packages/component-authority/model in tmp
     writeInstructionFile(
       path.join(tmp, 'components', 'some-component', 'instructions'),
       'rule.md',
@@ -775,10 +777,15 @@ test('InstructionRegistry: concat returns InstructionRegistry and preserves look
 test('InstructionRegistry: query methods return InstructionRegistry and preserve lookup semantics', () => {
   const tmp = mkTempDir('fgos-inst-reg-queries-');
   try {
-    fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'packages', 'component-authority', 'model'), { recursive: true });
     fs.writeFileSync(
-      path.join(tmp, 'docs', 'architecture-manifest.json'),
-      JSON.stringify({ components: ['comp1'], domains: ['dom1'] }),
+      path.join(tmp, 'packages', 'component-authority', 'model', 'components.json'),
+      JSON.stringify([{ id: 'comp1' }]),
+      'utf8',
+    );
+    fs.writeFileSync(
+      path.join(tmp, 'packages', 'component-authority', 'model', 'layers.json'),
+      JSON.stringify({ domains: ['dom1'] }),
       'utf8',
     );
     writeInstructionFile(path.join(tmp, 'core', 'instructions'), 'r1.md', 'id: r1\nkind: law\nscope: repo');

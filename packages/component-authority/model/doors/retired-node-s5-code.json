@@ -1,0 +1,14 @@
+{
+  "job": "retired Node S5 code",
+  "kind": "door",
+  "patterns": [
+    "\\bdecideDispatchHook\\b",
+    "\\bexplainCapability\\b",
+    "seat-policy\\.mjs",
+    "seat-binding[^\\n]{0,24}--protocol 1\\b",
+    "dispatch\\.mjs decide\\b"
+  ],
+  "allowed": [],
+  "debt": [],
+  "reason": "the Node decide, explain and hook, the seat-policy module, the Seat Binding route at protocol 1 and the `node src/runner/dispatch.mjs decide` alias are gone; the host serves dispatch decide, dispatch explain and hook dispatch-decide, and the route speaks protocol 2. The old hook script name stays only in the agent-hook table as a marker for removing entries written by an earlier install (scripts/dispatch-decide-hook.mjs, below)"
+}

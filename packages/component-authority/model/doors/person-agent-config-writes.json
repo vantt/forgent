@@ -1,0 +1,32 @@
+{
+  "job": "person's agent config writes",
+  "kind": "door",
+  "patterns": [
+    "pre-wire-agents",
+    "['\"]marketplace['\"],\\s*['\"]add['\"]",
+    "['\"]plugin['\"],\\s*['\"]install['\"]",
+    "toolPermission"
+  ],
+  "allowed": [
+    {
+      "path": "packages/distribution/rust/src/agent_config.rs",
+      "reason": "builds the wire-agents plan: the claude plugin steps and the settings it shows and never writes; the writes themselves are the wire-agents verb's"
+    },
+    {
+      "path": "apps/fgos/src/wiring/wire_agents.rs",
+      "reason": "the wire-agents verb: the only code that applies the plan, copying each existing file to <file>.pre-wire-agents-<time> through the Durable File door before the claude steps run, and never writing a permission that widens what an agent may do"
+    },
+    {
+      "path": "apps/fgos/src/wiring/uninstall.rs",
+      "reason": "the uninstall notice names the backup suffix wire-agents leaves beside a person's config, and how to undo the plugin by hand; it never writes that config"
+    }
+  ],
+  "debt": [
+    {
+      "path": "src/cli/command-registry.mjs",
+      "reason": "the wire-agents description names the settings it never sets"
+    }
+  ],
+  "retiredBy": "S7: the wire-agents help text in src/cli/command-registry.mjs retires with the Node payload",
+  "reason": "fgOS changes a person's own agent config only through the opt-in wire-agents verb (RUL111); init and doctor --fix write only the project and ~/.fgos. The patterns catch the backup suffix, the claude plugin calls and the agy permission setting that only that verb applies"
+}

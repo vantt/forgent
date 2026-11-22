@@ -635,7 +635,7 @@ capabilities, never tools" — US-027). Registry không còn là một kho riên
 - **Một người đọc:** `toolProvidersOf` (`src/runner/dispatch/tool-providers.mjs`)
   là nơi duy nhất đọc `for` của executor và là lần probe duy nhất; `decide`, hàng
   doctor `tool-registry-configured` và cảnh báo của `executor-profile-warnings`
-  đều hỏi nó. Hàng `doors` trong `docs/architecture-manifest.json` chặn đường thứ hai.
+  đều hỏi nó. Hàng `doors` trong `packages/component-authority/model/` chặn đường thứ hai.
 - **Trạng thái là sự thật về máy này, không được lưu:** `present`, `stale`,
   `missing`, `unknown` được tính lúc hỏi, không ghi file, không qua event-log.
   "Chưa từng probe" không còn tồn tại như một trạng thái riêng. Phân biệt cốt lõi

@@ -31,5 +31,29 @@
       "packages/component-authority/"
     ],
     "status": "designed"
+  },
+  {
+    "id": "packaging-distribution",
+    "canonical": "packaging-distribution",
+    "aliases": [
+      "distribution",
+      "packaging"
+    ],
+    "meaning": "Packaging, distribution, installation, upgrade, and doctor checks.",
+    "layer": "entry",
+    "tier": 9,
+    "paths": [
+      "packages/distribution/",
+      "docs/platform/packaging-distribution/"
+    ],
+    "owns": [
+      "packaging, release artifacts, and distribution"
+    ],
+    "mustNotOwn": [],
+    "spec": "docs/platform/packaging-distribution/spec.md",
+    "source": [
+      "packages/distribution/"
+    ],
+    "status": "live"
   }
 ]

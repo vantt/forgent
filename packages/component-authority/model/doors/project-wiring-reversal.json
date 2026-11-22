@@ -1,0 +1,14 @@
+{
+  "job": "project wiring reversal",
+  "kind": "door",
+  "patterns": [
+    "\\.pre-uninstall-(?:\\$\\{|\\{)",
+    "export function (?:uninstallProject|uninstallGitHooks)\\b",
+    "pub fn (?:uninstall_project|unwire_git_hooks)\\b"
+  ],
+  "allowed": [
+    "apps/fgos/src/wiring/uninstall.rs"
+  ],
+  "debt": [],
+  "reason": "what fgOS wrote into a project (hook entries, generated skill directories, the git hooks path it wired, its managed timers) is taken out in one place, uninstall.rs: it plans and applies together, copies every file it rewrites or deletes to <file>.pre-uninstall-<time> first, removes file by file under a root it asserted, and refuses links; the hook table's own reversal, the skill stamp reader, the timer module, the rc-line reader and RepositoryConfig's ownership proof are the pieces it composes"
+}

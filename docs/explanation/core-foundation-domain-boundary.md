@@ -109,7 +109,7 @@ one copy. The `workflows` map is synthesized by core's aggregator
 (directory scan, never hand-authored); `defaultWorkflow`/`workflowFor`
 are real domain-level selector data in `registry.yaml`.
 
-**Cross-cutting guards (D12, D17, D27–D28).** `architecture-manifest.json`
+**Cross-cutting guards (D12, D17, D27–D28).** `packages/component-authority/model/`
 + `architecture.test.mjs` gain a domain-siloing rule (core never imports a
 specific domain; domains never import each other) — reusing the existing
 one-directional-layer mechanism. `core/task-specs/` holds contracts for

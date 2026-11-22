@@ -1,0 +1,92 @@
+# Baseline architecture tests
+# tests 87
+# pass 87
+# fail 0
+
+đủ sổ: file .mjs trên đĩa ↔ row trong manifest, một-một
+mọi row dùng tầng đã khai trong layers
+mọi rule khai báo trong manifest là hợp lệ
+import một chiều xuống: không file nào import ngược lên tầng trên
+tầng thấp không import Dispatch: native, state, holder-lock, run-supervisor không chạm src/runner/dispatch
+tier: every file has one tier, every tier row names a file, every exception names two files
+tier: no file imports a higher tier, and every named exception is still a real upward import
+tier rule catches an upward import, takes a same-tier or downward one, and honours only the exact named pair
+src/workflow names no worktree custody mechanism: not cwd-lock, not the unit-custody or workflow-worktree scope
+the custody guard catches an import, a scope string and a dynamic load, and lets holder-lock and comments through
+domain-siloing: core không import/couple domain cụ thể, domain không import domain khác
+domain-siloing: phát hiện vi phạm fixture (core → domain cụ thể, domain A → domain B, path/literal coupling)
+run-door call sites: executeAssignment and commitUnitWork are called only from their named files
+run-door call-site guard catches an aliased import, a dynamic import(), a require() and a namespace call
+executeAssignment(...) isReadOnlyMode posture: only session-engine.mjs's runExecutorAttempt may ever resolve it to false
+R6b posture check actually catches a violation (deliberately broken synthetic input, not a passing no-op)
+R8 EXECUTOR_ADAPTERS execute-handle lookups do not exist in src/**: every dispatch runs as a supervised attempt
+R8 cycle cut: src/runner/dispatch/config.mjs does not import src/runner/dispatch/transport.mjs
+R8 posture check actually catches an EXECUTOR_ADAPTERS direct call site violation
+F-R01 architectural authority: coordination actions.mjs retired
+F-R01 posture check catches violations (deliberate mutator introduction or missing kernel delegation)
+A4 boundary guard: dispatch, execution, the dispatch barrel and src/workflow/** contain ZERO imports from state/ or workflow/
+A4 boundary guard: dispatch, execution, the dispatch barrel and src/workflow/** reach nothing in the Work layer, directly or through a re-export
+A4 Work-layer guard catches a dynamic import(), a require() and a re-export one hop away
+A4 boundary guard: dispatch, execution, the dispatch barrel and src/workflow/** name no domain or Workflow step literal
+Work stays a consumer: dispatch, execution, the dispatch barrel and src/workflow/** take no Work-shaped input
+Work-shaped input guard catches each way a Work item can come in, and ignores comments, strings and longer names
+A4 dynamic-load guard: no computed import()/require(), createRequire or eval in the guarded files beyond the named allowlist
+A4 dynamic-load guard catches a computed specifier, createRequire and eval, and passes literal loads
+A4 guarded folders hold only plain .mjs sources, so every guard reads every file
+config has one test door: no test file writes or reads a config file outside the config fixture helper
+config has one production door: no source, bin, script or core file reads or writes a config file outside the facade
+config access guard catches each way to touch the file by hand and ignores other file names, mentions and the helper calls
+config has one Rust door: no tracked Rust file outside the config crate opens a config file
+Rust config read guard catches each way to open the file and ignores comments, other names and a bare path
+config has one shell door: no script or git hook reads a config file with a shell tool
+shell config read guard catches each reader and ignores comments and a line that only names the file
+native description handover has exactly one Git loader importer
+Event Store keeps consumer boundaries and one native export importer
+event-store, workflow, observe, verbs and setup import nothing from src/cli
+the src/cli import guard catches a static, a dynamic and a multi-line import and ignores other folders
+pattern vocabulary rename is complete with no live retired aliases or deleted modules
+retired pattern literals appear only in permitted refusal and decoder paths
+loops and patterns architecture manifest paths exist and all files on disk are declared
+the shell entry statically imports only its leaves and the named arm imports
+the shell entry loads dispatch depth, the Land release and the decision citation scan only when a verb needs them
+the Node addon depends on fgos-execution and the run supervisor's lease part, never on the Execution engine
+fgos-execution links the run supervisor with default features off and the lease part only, and no Execution engine
+no crate the Node addon links, directly or through another crate, is the Execution engine
+every door row holds: patterns appear only in allowed or debt files, and no entry is stale
+door check: a match outside allowed fails, in debt passes, and a retired name fails anywhere
+door check: every name of the retired Node help renderer fails when a file declares it again
+door check: every name of the retired Node events, session and gateway code fails when a file declares it again
+door check: every name of the retired Node config, identity and observe doctor rows fails when a file declares it again
+door check: every name of the retired Node S4 verb code fails when a file declares it again
+door check: every name of the retired Node S2 verb code fails when a file declares it again
+door check: every name of the retired Node init code fails when a file declares it again
+door check: the init steps live in init.rs only: a second composition under the same names fails, a comment does not
+door check: every name of the retired Node Git and Event Store doctor rows fails when a file declares it again
+door check: a seat composition or a second call of the ranking function outside the Rust bind fails; the crate passes; a comment does not
+door check: a new importer of the Node bind facade fails, each named caller passes, and a dynamic import counts
+door check: a Node or Rust twin of an executor derivation fails outside its owner, passes as declared debt, and passes in the crate
+door check: the decider has one Rust owner and one declared Node twin
+door check: the execution doctor judges live in checks.rs, their Node names are retired, and the agy sub-HOME reader is declared debt
+door check: the retired capability-row names and the retired Node S5 names fail wherever a file brings them back
+door check: the old dispatch hook script name appears only as a legacy marker of the hook table
+door check: the tool lookup row names tools.rs as the Rust owner and tool-providers.mjs as debt
+door check: a unit is run only by the engine and the host callers of its one composition; a Node runUnit or a second caller fails
+door check: case admission crosses processes only through the peer adapter, the host ends that open it and the Node server
+door check: a Node import past the Execution seam into the old Execution directories fails outside the named callers
+door check: a new importer of the Execution seam or a second spawn of its host route fails; each named caller passes
+doctor registry: every bridged row and fix is labelled no earlier than the layers it reads, and every layer is a file some row reads
+doctor registry: a label before a layer, a layer with no step, a row with neither judge nor note and an unknown step each fail by name
+door rows of the doctor registry, the Node rows bridge and Node from the packaging verbs reject a second path and accept their own
+door check: a stale allowed path, stale glob and stale debt entry each fail
+door check: a debt entry or a scripts entry without a reason fails, and a twin needs retiredBy
+door check: a match in a comment passes, and a Rust test module passes while code after its closing brace fails
+door check: a ratchet count above its ceiling fails, below it is stale, and equal passes
+door check: a pattern that does not compile fails
+door rows catch a process signal, a /proc read and a second lock taker, and skip comments
+door rows catch a second lock report, a second reader of the beacon, a second run lister and a second cleaner of a hot record
+the machine-service door rows catch each of their patterns outside the owning file and skip comments
+the door walk prunes vendored and fixture trees only outside bin and src
+door row for YAML parser loads catches each single-line way to load a parser and ignores comments and other packages
+door rows for the agent hook table and a person's agent config catch a second table or writer and skip comments
+door row for a YAML frontmatter fence catches each literal way to open a block and ignores other dashes
+door row for making, provisioning and removing a checkout catches each call beside the checkout crate and passes the crate, the wiring and comments

@@ -1,0 +1,15 @@
+{
+  "job": "the Node addon never links the Execution engine",
+  "kind": "door",
+  "patterns": [
+    "\\bfgos_execution_engine\\b"
+  ],
+  "allowed": [
+    {
+      "path": "apps/fgos/**",
+      "reason": "the host composes the engine (unit runs, dispatch, the attempt steps)"
+    }
+  ],
+  "debt": [],
+  "reason": "the addon reads the unit-run helpers from fgos-execution and the run supervisor's lease part only (plan decision P3): linking fgos-execution-engine would pull the terminal, session-host, secret and SQLite stores into the Node process and, by feature unification, the whole supervisor. test/architecture.test.mjs also refuses the dependency in packages/git/node-addon/Cargo.toml"
+}

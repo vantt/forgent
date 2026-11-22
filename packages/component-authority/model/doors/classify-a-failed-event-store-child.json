@@ -1,0 +1,13 @@
+{
+  "job": "classify a failed Event Store child",
+  "kind": "door",
+  "patterns": [
+    "event-store-child"
+  ],
+  "allowed": [
+    "apps/fgos/src/invocation_doors.rs"
+  ],
+  "debt": [],
+  "retiredBy": "S7: the host doors are the only classifier once no Node verb runs",
+  "reason": "a detached seal or publish child has no caller to read its error, so a failure leaves a record whatever the verb's own classification is; the host records it where the doors leave an invocation, from the failure text the verb answered"
+}

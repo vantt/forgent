@@ -1,0 +1,13 @@
+manifest-model-compare: 0 differences found.
+Verified against docs/architecture-manifest.json:
+- contract: architecture-manifest.v1
+- map: intentionally dropped (schema $defs/layers does not allow it)
+- layers: entry, use-case, infra, domain, kernel
+- rules: one-directional-layer, domain-siloing, tier-downward
+- domains: coding, council, marketing
+- components: packaging-distribution
+- tierNames: 10 tiers
+- tiers: 44 prefixes
+- tierExceptions: 0 exceptions
+- doors: 83 door rows
+- files: 325 mapped files

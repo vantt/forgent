@@ -1,0 +1,15 @@
+{
+  "job": "read the Event Store config section",
+  "kind": "door",
+  "patterns": [
+    "export function (?:readEventStoreConfig|eventStoreConfig)\\b",
+    "\\.get\\(\\\"eventStore\\\"\\)"
+  ],
+  "allowed": [
+    "src/event-store/config.mjs",
+    "packages/config/rust/src/event_store.rs"
+  ],
+  "debt": [],
+  "retiredBy": "S7: the Node adapter retires with the Node payload",
+  "reason": "the section, its minimums, its defaults and what a refused file means are read once, by fgos-config; the Node reader is an adapter over the addon"
+}
