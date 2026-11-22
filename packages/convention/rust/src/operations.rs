@@ -492,18 +492,21 @@ fn check_path(rules: &RuleSet, path: &str) -> Option<Violation> {
         .iter()
         .filter(|rule| rule.shape == RuleShape::NameTemplate)
         .filter(|rule| {
-            rule.template
-                .as_deref()
-                .is_some_and(|template| {
-                    if template.contains('{') {
-                        template.ends_with(".md") == file_name.ends_with(".md")
-                    } else {
-                        template == file_name
-                    }
-                })
+            rule.template.as_deref().is_some_and(|template| {
+                if template.contains('{') {
+                    template.ends_with(".md") == file_name.ends_with(".md")
+                } else {
+                    template == file_name
+                }
+            })
         })
         .flat_map(|rule| rule.roots.iter().map(move |root| (rule, root)))
         .filter(|(_, root)| path.starts_with(root.as_str()))
+        .filter(|(rule, root)| {
+            rule.template
+                .as_deref()
+                .is_some_and(|template| template.contains('/') || !path[root.len()..].contains('/'))
+        })
         .max_by_key(|(_, root)| root.len());
     if let Some((rule, root)) = scoped {
         return validate_scoped(rule, root, path, file_name);
@@ -562,9 +565,6 @@ fn validate_scoped(rule: &Rule, root: &str, path: &str, file_name: &str) -> Opti
                 "name does not match an accepted template",
             )),
         };
-    }
-    if path[root.len()..].contains('/') {
-        return None;
     }
     let result = std::iter::once(match_template(template, file_name, false))
         .chain(

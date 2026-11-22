@@ -7,7 +7,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import { checkConventionConformance } from '../../scripts/convention-conformance.mjs';
+import { checkConventionConformance, packagedConventionCutoff, ruleForPath } from '../../scripts/convention-conformance.mjs';
 
 function initSourceRepo(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-convention-conformance-'));
@@ -109,40 +109,69 @@ test('convention conformance judges violations by their own rule cutoff when rul
   git(['add', 'plans/backlog/new-backlog.md']);
   git(['commit', '-qm', 'third commit with new backlog item']);
 
-  const resolveCutoff = (_root, relPath) => {
-    if (relPath.startsWith('plans/backlog/')) return backlogCutoff;
-    return reportCutoff;
-  };
+  const testRules = [
+    {
+      id: 'report',
+      roots: ['plans/reports/'],
+      scope: ['plans/reports/*.md'],
+      template: '{type}-{YYMMDD-HHMM}-{slug}.md',
+      cutoff: reportCutoff,
+    },
+    {
+      id: 'backlog-item',
+      roots: ['plans/backlog/'],
+      scope: ['plans/backlog/*.md'],
+      template: '{id}-{slug}.md',
+      cutoff: backlogCutoff,
+    },
+  ];
+
+  assert.equal(ruleForPath(testRules, 'plans/reports/old-report.md')?.id, 'report');
+  assert.equal(ruleForPath(testRules, 'plans/backlog/old-backlog.md')?.id, 'backlog-item');
+  assert.equal(packagedConventionCutoff(root, 'plans/reports/old-report.md', testRules), reportCutoff);
+  assert.equal(packagedConventionCutoff(root, 'plans/backlog/old-backlog.md', testRules), backlogCutoff);
+  assert.equal(packagedConventionCutoff(root, 'unmatched-path.md', testRules), reportCutoff);
 
   const oldBacklogViolation = violation('plans/backlog/old-backlog.md');
+  const newBacklogViolation = violation('plans/backlog/new-backlog.md');
   const midReportViolation = violation('plans/reports/mid-report.md');
 
   // old-backlog was introduced after reportCutoff but at/before backlogCutoff:
   // judged by its own rule's cutoff (backlogCutoff), it is pre-cutoff and passes.
   const backlogResult = checkConventionConformance(root, {
     hostRunner: () => ({ checked: 1, violations: [oldBacklogViolation] }),
-    cutoffResolver: resolveCutoff,
+    cutoffResolver: (r, relPath) => packagedConventionCutoff(r, relPath, testRules),
   });
   assert.equal(backlogResult.passed, true);
   assert.match(backlogResult.message, /1 pre-cutoff, 0 post-cutoff/);
+
+  // new-backlog was introduced after backlogCutoff:
+  // judged by its own rule's cutoff (backlogCutoff), it is post-cutoff and fails (risk-bullet proof).
+  const newBacklogResult = checkConventionConformance(root, {
+    hostRunner: () => ({ checked: 1, violations: [newBacklogViolation] }),
+    cutoffResolver: (r, relPath) => packagedConventionCutoff(r, relPath, testRules),
+  });
+  assert.equal(newBacklogResult.passed, false);
+  assert.match(newBacklogResult.message, /0 pre-cutoff, 1 post-cutoff/);
+  assert.match(newBacklogResult.message, /new-backlog\.md/);
 
   // mid-report was introduced after reportCutoff:
   // judged by its own rule's cutoff (reportCutoff), it is post-cutoff and fails.
   const reportResult = checkConventionConformance(root, {
     hostRunner: () => ({ checked: 1, violations: [midReportViolation] }),
-    cutoffResolver: resolveCutoff,
+    cutoffResolver: (r, relPath) => packagedConventionCutoff(r, relPath, testRules),
   });
   assert.equal(reportResult.passed, false);
   assert.match(reportResult.message, /0 pre-cutoff, 1 post-cutoff/);
   assert.match(reportResult.message, /mid-report\.md/);
 
-  // Together: 1 pre-cutoff, 1 post-cutoff -> fails.
+  // Together: 1 pre-cutoff, 2 post-cutoff -> fails.
   const combined = checkConventionConformance(root, {
-    hostRunner: () => ({ checked: 2, violations: [oldBacklogViolation, midReportViolation] }),
-    cutoffResolver: resolveCutoff,
+    hostRunner: () => ({ checked: 3, violations: [oldBacklogViolation, midReportViolation, newBacklogViolation] }),
+    cutoffResolver: (r, relPath) => packagedConventionCutoff(r, relPath, testRules),
   });
   assert.equal(combined.passed, false);
-  assert.match(combined.message, /1 pre-cutoff, 1 post-cutoff/);
+  assert.match(combined.message, /1 pre-cutoff, 2 post-cutoff/);
 });
 
 // One wiring proof only: path/placement cases belong to Convention's Rust golden suite.
