@@ -9,8 +9,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { RunnerConfigError, custodyHeld, gateAnswerFile, runDirOf, unitRunFacts, releasedUnitRunSettle } from '../native/execution-door.mjs';
-import { NOT_STARTED_OUTCOME } from '../runner/execution/outcome.mjs';
+import { RunnerConfigError, custodyHeld, gateAnswerFile, runDirOf, unitRunFacts, releasedUnitRunSettle, executionVocabulary } from '../native/execution-door.mjs';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 import { gateOfStep, projectCase } from './case-projection.mjs';
 import { repairCaseBindings, unbindWorktree } from './case-bindings.mjs';
@@ -127,6 +126,7 @@ export function writeSettlePending({ mainRoot, caseId, settle }) {
 export function applySettle({ mainRoot, caseId, hold, settle, events = null }) {
   const known = events ?? readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId });
   const earlier = known.filter((e) => e.type === 'settle' && e.payload?.reservationId === settle.reservationId);
+  const { NOT_STARTED_OUTCOME } = executionVocabulary();
   const fresh = earlier.every((e) => e.payload.outcome === NOT_STARTED_OUTCOME) && (earlier.length === 0 || settle.outcome !== NOT_STARTED_OUTCOME);
   if (fresh) appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId: caseId, event: { type: 'settle', payload: settle }, hold });
   const { worktree } = known.find((e) => e.type === 'reservation' && e.payload?.reservationId === settle.reservationId)?.payload ?? {};

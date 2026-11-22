@@ -1280,7 +1280,7 @@ fn integer_params_of(loop_name: &str) -> &'static [&'static str] {
 
 /// The rules of `runner.loops` that read beyond its own fields: a bound names a parameter its loop reads, `min`
 /// does not exceed `max`, and the checkers of each rigor include those of every weaker rigor.
-fn validate_runner_loops_shape(loops: &Value, label: &str) -> Check {
+pub fn validate_runner_loops_shape(loops: &Value, label: &str) -> Result<(), RunnerCheckError> {
     let site = Site {
         label,
         canonical_prefix: "runner.loops",

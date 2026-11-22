@@ -8,6 +8,33 @@ use serde_json::{json, Value};
 /// The reasoning effort levels a tier cell or a request may name.
 pub const REASONING_EFFORT_VALUES: [&str; 4] = ["low", "medium", "high", "max"];
 
+/// Validate a requested reasoning-effort level: the canonical vocabulary first, then the executor's own list (a
+/// narrower list there is a deliberate limit, never bypassed by a command-line flag).
+pub fn assert_reasoning_effort(
+    value: &str,
+    supported: Option<&[Value]>,
+    executor_id: Option<&str>,
+) -> Result<(), crate::executor_model::ModelError> {
+    use crate::executor_model::ModelError;
+    if !REASONING_EFFORT_VALUES.contains(&value) {
+        return Err(ModelError::runner(format!(
+            "invalid reasoningEffort \"{value}\". Valid values: [{}]",
+            REASONING_EFFORT_VALUES.join(", ")
+        )));
+    }
+    if let Some(list) = supported {
+        if !list.iter().any(|v| v.as_str() == Some(value)) {
+            let names: Vec<&str> = list.iter().filter_map(Value::as_str).collect();
+            return Err(ModelError::runner(format!(
+                "executor \"{}\" supports reasoningEffort [{}], not \"{value}\"",
+                executor_id.unwrap_or("undefined"),
+                names.join(", ")
+            )));
+        }
+    }
+    Ok(())
+}
+
 const OBJECT_ENTRY_KEYS: [&str; 3] = ["model", "pool", "effort"];
 
 #[derive(Debug, Clone, PartialEq, Eq)]

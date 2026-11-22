@@ -501,3 +501,349 @@ pub fn herdr_present() -> Result<bool> {
     check()?;
     Ok(machine_reads::herdr_present())
 }
+
+// ---- outcomes, seats and the loop checks ------------------------------------------------------------------
+
+/// The named values a caller above the tier compares with: `{ NOT_STARTED_OUTCOME, RESERVED_PATTERN_NAMES,
+/// SEAT_BINDING_MARKER_PATH, MODEL_POLICY_TIERS }`.
+#[napi(namespace = "execution", js_name = "vocabulary")]
+pub fn vocabulary() -> Result<Value> {
+    check()?;
+    Ok(json!({
+        "NOT_STARTED_OUTCOME": fgos_execution::outcome::NOT_STARTED_OUTCOME,
+        "RESERVED_PATTERN_NAMES": fgos_execution::patterns::RESERVED_PATTERN_NAMES,
+        "SEAT_BINDING_MARKER_PATH": fgos_execution::patterns::SEAT_BINDING_MARKER_PATH,
+        "MODEL_POLICY_TIERS": fgos_execution::hosts::tiers(),
+    }))
+}
+
+fn outcome_text(request: &Value) -> &str {
+    request
+        .get("outcome")
+        .and_then(Value::as_str)
+        .unwrap_or_default()
+}
+
+/// `isVerdict(outcome)`: whether the outcome is a completed judgment of the work.
+#[napi(namespace = "execution", js_name = "isVerdict")]
+pub fn is_verdict(request: Value) -> Result<bool> {
+    check()?;
+    Ok(fgos_execution::outcome::is_verdict(outcome_text(&request)))
+}
+
+/// `exitCodeForOutcome(outcome)`: the process exit code of an execution outcome (1 for a value that is no text).
+#[napi(namespace = "execution", js_name = "exitCodeForOutcome")]
+pub fn exit_code_for_outcome(request: Value) -> Result<i32> {
+    check()?;
+    Ok(match request.get("outcome").and_then(Value::as_str) {
+        Some(outcome) => fgos_execution::outcome::exit_code_for_outcome(outcome),
+        None => 1,
+    })
+}
+
+/// `infrastructure(unitResult)`: whether a unit ended on infrastructure, so a rerun can still produce the verdict.
+#[napi(namespace = "execution", js_name = "infrastructure")]
+pub fn infrastructure(request: Value) -> Result<bool> {
+    check()?;
+    let null = Value::Null;
+    Ok(fgos_execution::outcome::infrastructure(
+        request.get("unitResult").unwrap_or(&null),
+    ))
+}
+
+/// `evaluationsOf(results)`: one entry per evaluator result that reached a verdict.
+#[napi(namespace = "execution", js_name = "evaluationsOf")]
+pub fn evaluations_of(request: Value) -> Result<Value> {
+    check()?;
+    let results = request
+        .get("results")
+        .and_then(Value::as_array)
+        .map(Vec::as_slice)
+        .unwrap_or_default();
+    Ok(json!(fgos_execution::outcome::evaluations_of(results)))
+}
+
+/// `seatKeyOf(result)`: the seat a recorded result belongs to (`seat`, or the legacy `role`), or null.
+#[napi(namespace = "execution", js_name = "seatKeyOf")]
+pub fn seat_key_of(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    Ok(
+        fgos_execution::seat_resolver::seat_key_of(request.get("result").unwrap_or(&null))
+            .cloned()
+            .unwrap_or(Value::Null),
+    )
+}
+
+/// `legacyFamilyOf(result)`: the provider family an old result recorded, or null.
+#[napi(namespace = "execution", js_name = "legacyFamilyOf")]
+pub fn legacy_family_of(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    Ok(
+        fgos_execution::seat_resolver::legacy_family_of(request.get("result").unwrap_or(&null))
+            .cloned()
+            .unwrap_or(Value::Null),
+    )
+}
+
+fn seat_refused(e: fgos_execution::seat_resolver::SeatResolutionError) -> Error {
+    let mut error = named(e.class, e.message, Some(&e.code), None);
+    for (key, value) in [("at", e.at), ("detail", e.detail)] {
+        if let Some(value) = value {
+            error = error.with(key, json!(value));
+        }
+    }
+    refused(error)
+}
+
+/// `checkDeclaredSeats(raw, label, { tiers })`: the declared seats as plain entries, or the refusal.
+#[napi(namespace = "execution", js_name = "checkDeclaredSeats")]
+pub fn check_declared_seats(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    let tiers: Option<Vec<String>> = request.get("tiers").and_then(Value::as_array).map(|list| {
+        list.iter()
+            .filter_map(Value::as_str)
+            .map(str::to_string)
+            .collect()
+    });
+    fgos_execution::seat_resolver::check_declared_seats(
+        request.get("raw").unwrap_or(&null),
+        text(&request, "label")?,
+        tiers.as_deref(),
+    )
+    .map(|seats| json!(seats))
+    .map_err(seat_refused)
+}
+
+/// `assertNoSeatTier(seats, source)`: refuses a seat list that carries a tier.
+#[napi(namespace = "execution", js_name = "assertNoSeatTier")]
+pub fn assert_no_seat_tier(request: Value) -> Result<()> {
+    check()?;
+    let null = Value::Null;
+    fgos_execution::seat_resolver::assert_no_seat_tier(
+        request.get("raw").unwrap_or(&null),
+        text(&request, "source")?,
+    )
+    .map_err(seat_refused)
+}
+
+/// `assertNoUnitTier(unit, source)`: refuses a unit that carries a tier.
+#[napi(namespace = "execution", js_name = "assertNoUnitTier")]
+pub fn assert_no_unit_tier(request: Value) -> Result<()> {
+    check()?;
+    let null = Value::Null;
+    fgos_execution::seat_resolver::assert_no_unit_tier(
+        request.get("raw").unwrap_or(&null),
+        text(&request, "source")?,
+    )
+    .map_err(seat_refused)
+}
+
+/// `verifyCommandOf(unit, cfg)`: the verify command a unit runs (its own, else its capability's), or null.
+#[napi(namespace = "execution", js_name = "verifyCommandOf")]
+pub fn verify_command_of(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    Ok(json!(fgos_execution::loops::verify_command_of(
+        request.get("unit").unwrap_or(&null),
+        request.get("cfg").unwrap_or(&null),
+    )))
+}
+
+/// `verifySeatResult(answer, round)`: the verify seat's result for one answer of the verify command.
+#[napi(namespace = "execution", js_name = "verifySeatResult")]
+pub fn verify_seat_result(request: Value) -> Result<Value> {
+    check()?;
+    Ok(fgos_execution::loops::verify_seat_result(
+        present(&request, "answer"),
+        request.get("round").and_then(Value::as_u64).unwrap_or(1),
+    ))
+}
+
+// ---- the runner config rules ------------------------------------------------------------------------------
+
+/// `detectRetiredPatternKeys(input)`: the retired keys a dotted path or a pattern map carries.
+#[napi(namespace = "execution", js_name = "detectRetiredPatternKeys")]
+pub fn detect_retired_pattern_keys(request: Value) -> Result<Value> {
+    check()?;
+    Ok(json!(
+        fgos_execution::patterns::detect_retired_pattern_keys(present(&request, "input"))
+            .iter()
+            .map(|finding| finding.to_json())
+            .collect::<Vec<_>>()
+    ))
+}
+
+/// `formatRetiredKeySentence(item, instruction)`: `<key> was retired; <instruction>`.
+#[napi(namespace = "execution", js_name = "formatRetiredKeySentence")]
+pub fn format_retired_key_sentence(request: Value) -> Result<String> {
+    check()?;
+    Ok(fgos_execution::patterns::format_retired_key_sentence(
+        present(&request, "item"),
+        request.get("instruction").and_then(Value::as_str),
+    ))
+}
+
+/// `runTimeoutProblem(value, label)`: why a value is not a usable run timeout, or null.
+#[napi(namespace = "execution", js_name = "runTimeoutProblem")]
+pub fn run_timeout_problem(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    Ok(json!(fgos_execution::bind::run_timeout_problem(
+        request.get("value").unwrap_or(&null),
+        text(&request, "label")?,
+    )))
+}
+
+/// `parseRunTimeout(text, label)`: `90m`, `5400s`, `2h` or `600000ms` as milliseconds, or a `RunnerConfigError`.
+#[napi(namespace = "execution", js_name = "parseRunTimeout")]
+pub fn parse_run_timeout(request: Value) -> Result<f64> {
+    check()?;
+    let label = text(&request, "label")?;
+    // A value that is not text is refused with the sentence that names it, as Node printed it.
+    let given = match request.get("text") {
+        Some(Value::String(s)) => s.clone(),
+        _ => String::new(),
+    };
+    fgos_execution::bind::parse_run_timeout(&given, label)
+        .map(|ms| ms as f64)
+        .map_err(|message| refused(RunUnitError::config(message, None, None)))
+}
+
+/// `assertReasoningEffort(value, { supported, executorId })`: the value when the vocabulary and the executor's own
+/// list allow it, else a `RunnerConfigError`.
+#[napi(namespace = "execution", js_name = "assertReasoningEffort")]
+pub fn assert_reasoning_effort(request: Value) -> Result<Value> {
+    check()?;
+    let value = request.get("value").cloned().unwrap_or(Value::Null);
+    let shown = match &value {
+        Value::String(s) => s.clone(),
+        Value::Null => "undefined".into(),
+        other => other.to_string(),
+    };
+    fgos_execution::tier_cell::assert_reasoning_effort(
+        &shown,
+        request
+            .get("supported")
+            .and_then(Value::as_array)
+            .map(Vec::as_slice),
+        request.get("executorId").and_then(Value::as_str),
+    )
+    .map(|()| value)
+    .map_err(|e| refused(named(e.name, e.message, e.code, None)))
+}
+
+/// `validateRunnerLoopsShape(loops, label)`: the rules of `runner.loops` that read beyond its own fields; a
+/// refusal is a `RunnerConfigError` naming its `path`, `paths` and `detail`.
+#[napi(namespace = "execution", js_name = "validateRunnerLoopsShape")]
+pub fn validate_runner_loops_shape(request: Value) -> Result<()> {
+    check()?;
+    let null = Value::Null;
+    fgos_execution::runner_check::validate_runner_loops_shape(
+        request.get("loops").unwrap_or(&null),
+        text(&request, "label")?,
+    )
+    .map_err(|failure| {
+        let mut error = named(
+            failure.error.name,
+            failure.error.message,
+            failure.error.code,
+            None,
+        );
+        if let Some(path) = failure.path {
+            error = error.with("path", json!(path));
+        }
+        if !failure.paths.is_empty() {
+            error = error.with("paths", json!(failure.paths));
+        }
+        if let Some(detail) = failure.detail {
+            error = error.with("detail", json!(detail));
+        }
+        refused(error)
+    })
+}
+
+/// `attributeRunnerConfigError`'s message: a refusal about `paths` attributed to the files and lines its values
+/// came from, or null when no origin names them.
+#[napi(namespace = "execution", js_name = "attributedRefusal")]
+pub fn attributed_refusal(request: Value) -> Result<Value> {
+    check()?;
+    let strings = |key: &str| -> Vec<String> {
+        request
+            .get(key)
+            .and_then(Value::as_array)
+            .map(|list| {
+                list.iter()
+                    .filter_map(Value::as_str)
+                    .map(str::to_string)
+                    .collect()
+            })
+            .unwrap_or_default()
+    };
+    let origins = request
+        .get("origins")
+        .and_then(Value::as_array)
+        .map(Vec::as_slice)
+        .unwrap_or_default();
+    Ok(json!(fgos_execution::runner_config::attributed_message(
+        &strings("paths"),
+        text(&request, "detail")?,
+        origins,
+        text(&request, "projectDir")?,
+    )))
+}
+
+// ---- the accounts ------------------------------------------------------------------------------------------
+
+/// The machine an account read sees from the Node process. The inventory reads only the home directory a login
+/// store names; the PATH and herdr answers are the real ones, and the confinement backend registry, which no
+/// account read asks, answers none.
+struct AccountsMachine;
+
+impl fgos_execution::ports::Machine for AccountsMachine {
+    fn on_path(&self, program: &str) -> bool {
+        let path_env = std::env::var("PATH").unwrap_or_default();
+        let pathext = std::env::var("PATHEXT").unwrap_or_default();
+        fgos_process::spawn::resolve_program(program, &path_env, &pathext, cfg!(windows)).is_some()
+    }
+
+    fn posture_backend(&self, _id: &str) -> Option<fgos_execution::ports::Backend> {
+        None
+    }
+
+    fn herdr_present(&self) -> bool {
+        machine_reads::herdr_present()
+    }
+
+    fn home_dir(&self) -> Option<String> {
+        let var = if cfg!(unix) { "HOME" } else { "USERPROFILE" };
+        std::env::var(var).ok().filter(|home| !home.is_empty())
+    }
+}
+
+/// `providerAccountInventory(runnerConfig)`: the accounts of `runner.llmAccounts` per state key, as the lease reads
+/// them (a config with a `runner` section is read through it).
+#[napi(namespace = "execution", js_name = "providerAccountInventory")]
+pub fn provider_account_inventory(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    let config = request.get("runnerConfig").unwrap_or(&null);
+    let runner = config
+        .get("runner")
+        .filter(|r| r.is_object())
+        .unwrap_or(config);
+    Ok(Value::Object(
+        fgos_execution::accounts::provider_account_inventory(runner, &AccountsMachine),
+    ))
+}
+
+/// `legacyStateKey(pool)`: the provider-capacity state key of an account pool.
+#[napi(namespace = "execution", js_name = "legacyStateKey")]
+pub fn legacy_state_key(request: Value) -> Result<String> {
+    check()?;
+    Ok(fgos_execution::accounts::legacy_state_key(text(
+        &request, "pool",
+    )?))
+}

@@ -12,10 +12,9 @@ import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { createWorktreeCheckoutSync } from '../runner/repo-locks.mjs';
 import { removeWorktree, deleteBranchRef } from '../runner/worktree.mjs';
 
-import { RunnerConfigError, worktreeAdminScopeName, unitRunFacts, foldRunSetting } from '../native/execution-door.mjs';
+import { RunnerConfigError, worktreeAdminScopeName, unitRunFacts, foldRunSetting, seatKeyOf } from '../native/execution-door.mjs';
 import { anonymousInputName, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, reportDigest, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
 import { createLockScope } from '../holder-lock/index.mjs';
-import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
 import { stepSubjectDigest, unitRunsOf } from './ref-digests.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 

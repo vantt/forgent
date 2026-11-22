@@ -2,9 +2,7 @@
 // Architecture guard: infra layer; the kernel-level definition module stays free of runner imports.
 
 import { validateWorkflow, WorkflowDefinitionError } from './definition.mjs';
-import { MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
-import { RunnerConfigError } from '../native/execution-door.mjs';
-import { checkDeclaredSeats, assertNoSeatTier, assertNoUnitTier } from '../runner/execution/seat-resolver.mjs';
+import { RunnerConfigError, checkDeclaredSeats, assertNoSeatTier, assertNoUnitTier, executionVocabulary } from '../native/execution-door.mjs';
 
 /**
  * Validate a raw Workflow definition, surfacing a malformed definition as the
@@ -24,6 +22,7 @@ export function validateWorkflowChecked(raw, options) {
   }
   // Declared seats: ids by Convention's rule, roles from the seat vocabulary, tiers from the ladder. A
   // tier is a recommendation of a registered definition, so one from a units file is refused.
+  const { MODEL_POLICY_TIERS } = executionVocabulary();
   for (const step of workflow.steps) {
     for (const unit of step.units ?? []) {
       if (options?.source === 'units-file') assertNoUnitTier(unit.template, 'a units file');

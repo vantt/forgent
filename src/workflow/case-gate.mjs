@@ -12,10 +12,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { assertRunTimeoutMs } from '../runner/dispatch/config.mjs';
-import { CaseAdmissionRefusedError, RunnerConfigError, ExecutionRouteError, executionOp, loadRunnerConfigForDir } from '../native/execution-door.mjs';
-import { verifyCommandOf, verifySeatResult } from '../runner/execution/loops/verify.mjs';
-import { evaluationsOf } from '../runner/execution/outcome.mjs';
+import { CaseAdmissionRefusedError, RunnerConfigError, ExecutionRouteError, executionOp, loadRunnerConfigForDir, assertRunTimeoutMs, verifyCommandOf, verifySeatResult, evaluationsOf } from '../native/execution-door.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
 import { GATE_RUN_PREFIX } from './case-runtime.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';

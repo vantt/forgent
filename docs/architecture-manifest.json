@@ -1186,6 +1186,10 @@
         {
           "path": "src/native/execution-door.mjs",
           "reason": "carries fgos-execution's herdr detection (machine_reads::herdr_present) to Node under its Node name; it derives nothing"
+        },
+        {
+          "path": "packages/git/node-addon/src/execution.rs",
+          "reason": "the addon's execution namespace carries fgos-execution's account inventory and state key (accounts.rs) to Node under their Node names; it derives nothing"
         }
       ],
       "debt": [

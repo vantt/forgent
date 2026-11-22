@@ -23,9 +23,7 @@ import { admitProposal, newReservationId, recheckReservation } from './case-admi
 import { bindingsDir, bindWorktree, ensureBindingsSentinel, readBinding, SENTINEL_NAME } from './case-bindings.mjs';
 import { workflowCheckout } from './unit-handoff.mjs';
 import { CASE_ID_ENV, CASE_RESERVATION_ENV, currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
-import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
-import { isVerdict } from '../runner/execution/outcome.mjs';
-import { isCaseId, runDirOf } from '../native/execution-door.mjs';
+import { isCaseId, runDirOf, seatKeyOf, isVerdict } from '../native/execution-door.mjs';
 
 /** Admission reads without `advance`, so it can meet an append in flight. */
 const readEvents = (mainRoot, caseId) => readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId, retryTail: true });

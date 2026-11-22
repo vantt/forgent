@@ -12,9 +12,7 @@ use fgos_execution::executor_model::{credential_store_of, ModelError};
 use serde_json::{json, Map, Value};
 
 use crate::transport::adapters::{adapter_metadata, DEFAULT_ADAPTER, EXECUTOR_ADAPTER_NAMES};
-use crate::transport::provider_adapter::{
-    check_launched_model, render_reasoning_effort_args, REASONING_EFFORT_VALUES,
-};
+use crate::transport::provider_adapter::{check_launched_model, render_reasoning_effort_args};
 
 /// Linux refuses one argv element above this; a longer one is warned about, never cut.
 pub const MAX_ARG_STRLEN: usize = 131_072;
@@ -118,30 +116,8 @@ fn string_args(executor: &Value) -> Result<Vec<String>, ModelError> {
         .collect()
 }
 
-/// Validate a requested reasoning-effort level: the canonical vocabulary first, then the executor's own list.
-pub fn assert_reasoning_effort(
-    value: &str,
-    supported: Option<&[Value]>,
-    executor_id: Option<&str>,
-) -> Result<(), ModelError> {
-    if !REASONING_EFFORT_VALUES.contains(&value) {
-        return Err(runner_error(format!(
-            "invalid reasoningEffort \"{value}\". Valid values: [{}]",
-            REASONING_EFFORT_VALUES.join(", ")
-        )));
-    }
-    if let Some(list) = supported {
-        if !list.iter().any(|v| v.as_str() == Some(value)) {
-            let names: Vec<&str> = list.iter().filter_map(Value::as_str).collect();
-            return Err(runner_error(format!(
-                "executor \"{}\" supports reasoningEffort [{}], not \"{value}\"",
-                executor_id.unwrap_or("undefined"),
-                names.join(", ")
-            )));
-        }
-    }
-    Ok(())
-}
+// The reasoning-effort check is pure; it lives with the vocabulary in `fgos-execution`.
+pub use fgos_execution::tier_cell::assert_reasoning_effort;
 
 /// The command, args and launch facts of `executor` (the resolved executor entry), with `{prompt}` and `{model}`
 /// substituted in each `args` element. Returns the same object Dispatch reads: `command`, `args`, `argsTemplate`,

@@ -48,7 +48,7 @@ import { foldEvents, conflictsFor } from '../src/state/replay.mjs';
 import { deriveTitle, classify } from '../src/intake/classify.mjs';
 import { mintWorkId } from '../src/util/identity-mint.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
-import { loadRunnerConfigForDir, RunnerConfigError } from '../src/native/execution-door.mjs';
+import { loadRunnerConfigForDir, RunnerConfigError, parseRunTimeout } from '../src/native/execution-door.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { checkDirDiffersFromCwd, attachDirWarning } from '../src/workflow/dir-guard.mjs';
 import { lintPlanCapabilityAnnotations, lintPhaseUnits } from '../src/report/capability-plan-lint.mjs';
@@ -2140,7 +2140,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       if (sub === 'gate') {
         const { gateWorkflow } = await import('../src/workflow/index.mjs');
-        const { parseRunTimeout } = await import('../src/runner/dispatch/config.mjs');
         return gateWorkflow(runIdOf('fgos workflow gate <id> --worktree <path> --writes <paths> --capability <capability>'), {
           repoRoot: flags.dir,
           worktree: requireField(flags.worktree, 'workflow gate requires --worktree <path>'),

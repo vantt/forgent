@@ -1,6 +1,6 @@
 // src/workflow/seat-providers.mjs — which executor and provider actually served each seat of a run.
 // A result written before seats existed carries only the name it was keyed by, which is its seat.
-import { seatKeyOf, legacyFamilyOf } from '../runner/execution/legacy-seat-read.mjs';
+import { seatKeyOf, legacyFamilyOf } from '../native/execution-door.mjs';
 
 // The binding a seat was planned with can differ from the one that settled it (a provider limit moves
 // the seat to another account or another candidate), and a persona's text and the documents it was

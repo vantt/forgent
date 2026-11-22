@@ -475,3 +475,76 @@ export const parseAccountPin = (value) => addon('parseAccountPin', { value: valu
 
 /** Whether this process runs inside a live herdr session. */
 export const detectHerdrPresent = () => addon('detectHerdrPresent');
+
+// ---- outcomes, seats, the loop checks and the runner config rules ------------------------------------------
+
+let vocabularyOnce = null;
+/**
+ * The named values a caller compares with, read once: `NOT_STARTED_OUTCOME`, `RESERVED_PATTERN_NAMES` (a Set),
+ * `SEAT_BINDING_MARKER_PATH` and `MODEL_POLICY_TIERS` (weakest first).
+ */
+export function executionVocabulary() {
+  if (vocabularyOnce === null) {
+    const v = addon('vocabulary');
+    vocabularyOnce = Object.freeze({ ...v, RESERVED_PATTERN_NAMES: new Set(v.RESERVED_PATTERN_NAMES), MODEL_POLICY_TIERS: Object.freeze([...v.MODEL_POLICY_TIERS]) });
+  }
+  return vocabularyOnce;
+}
+
+const orUndefined = (value) => (value === null ? undefined : value);
+/** Whether an outcome is a completed judgment of the work: `pass` or `findings`. */
+export const isVerdict = (outcome) => addon('isVerdict', { outcome: outcome ?? null });
+/** The process exit code of an execution outcome: 0 for `pass`, the table's code, else 1. */
+export const exitCodeForOutcome = (outcome) => addon('exitCodeForOutcome', { outcome: outcome ?? null });
+/** Whether a unit ended on infrastructure, so a rerun can still produce the verdict. */
+export const infrastructure = (unitResult) => addon('infrastructure', { unitResult: unitResult ?? null });
+/** One `{ kind, seat, round, passed }` per evaluator result that reached a verdict. */
+export const evaluationsOf = (results = []) => addon('evaluationsOf', { results });
+/** The seat a recorded result belongs to (`seat`, or the legacy `role`). */
+export const seatKeyOf = (result) => orUndefined(addon('seatKeyOf', { result: result ?? null }));
+/** The provider family an old result recorded, or null. */
+export const legacyFamilyOf = (result) => addon('legacyFamilyOf', { result: result ?? null });
+/** The declared seats `[{ seat, role, persona?, tier? }]` checked; `tiers` checks each seat's tier. */
+export const checkDeclaredSeats = (raw, label, { tiers } = {}) => addon('checkDeclaredSeats', { raw: raw ?? null, label, ...(tiers ? { tiers: [...tiers] } : {}) });
+/** Refuses a seat list that carries a tier. */
+export const assertNoSeatTier = (raw, source) => addon('assertNoSeatTier', { raw: raw ?? null, source });
+/** Refuses a unit that carries a tier. */
+export const assertNoUnitTier = (raw, source) => addon('assertNoUnitTier', { raw: raw ?? null, source });
+/** The verify command a unit runs (its own, else its capability's), or null. */
+export const verifyCommandOf = (unit, cfg) => addon('verifyCommandOf', { unit: unit ?? null, cfg: cfg ?? null });
+/** The verify seat's result for one answer of the verify command. */
+export const verifySeatResult = (answer, round = 1) => addon('verifySeatResult', { answer: answer ?? null, round });
+
+/** The retired `runner.patterns` keys a dotted path or a pattern map carries: `[{ key, replacement, instruction }]`. */
+export const detectRetiredPatternKeys = (input) => addon('detectRetiredPatternKeys', { input: input ?? null });
+/** `<key> was retired; <instruction>` for a dotted path or a finding. */
+export const formatRetiredKeySentence = (item, instruction) => addon('formatRetiredKeySentence', { item: item ?? null, ...(typeof instruction === 'string' ? { instruction } : {}) });
+/** Why `value` is not a usable run timeout (whole ms inside the floor and ceiling), or null when it is. */
+export const runTimeoutProblem = (value, label = 'run timeout') => addon('runTimeoutProblem', { value: value === undefined ? null : value, label });
+/** A run timeout in milliseconds, refused (`RunnerConfigError`) when it is not usable. */
+export function assertRunTimeoutMs(value, label = 'run timeout') {
+  const problem = runTimeoutProblem(value, label);
+  if (problem) throw new RunnerConfigError(problem);
+  return value;
+}
+/** `90m`, `5400s`, `2h`, `600000ms` as milliseconds, refused (`RunnerConfigError`) otherwise. */
+export const parseRunTimeout = (text, label = '--timeout') => addon('parseRunTimeout', { text: text ?? null, label });
+/** The requested reasoning effort, refused (`RunnerConfigError`) outside the vocabulary or the executor's own list. */
+export const assertReasoningEffort = (value, { supported, executorId } = {}) => addon('assertReasoningEffort', { value: value ?? null, ...(Array.isArray(supported) ? { supported } : {}), ...(typeof executorId === 'string' ? { executorId } : {}) });
+/** The rules of `runner.loops` that read beyond its own fields; a refusal is a `RunnerConfigError` with its paths. */
+export const validateRunnerLoopsShape = (loops, label = 'loops') => addon('validateRunnerLoopsShape', { loops: loops ?? {}, label });
+/**
+ * `err` attributed to the files and lines its values came from (`origins`), as a new `RunnerConfigError`; null for
+ * an error that is no runner config refusal with a path, or one no origin names.
+ */
+export function attributeRunnerConfigError(err, origins, projectDir) {
+  if (!(err instanceof RunnerConfigError) || !(err.paths?.length || err.path)) return null;
+  const message = addon('attributedRefusal', { paths: err.paths ?? [err.path], detail: err.detail ?? err.message, origins: origins ?? [], projectDir });
+  if (message === null) return null;
+  return new RunnerConfigError(message, { code: err.code, phase: err.phase, path: err.path, paths: err.paths, detail: err.detail });
+}
+
+/** The accounts of `runner.llmAccounts` per state key, as the lease reads them. */
+export const providerAccountInventory = (runnerConfig) => Object.freeze(addon('providerAccountInventory', { runnerConfig: runnerConfig ?? {} }));
+/** The provider-capacity state key of an account pool. */
+export const legacyStateKey = (pool) => addon('legacyStateKey', { pool });
