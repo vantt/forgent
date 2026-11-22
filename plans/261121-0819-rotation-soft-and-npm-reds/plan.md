@@ -39,5 +39,9 @@ No change to hard, to other personas, or to the merge-slot semantics beyond what
 |---|---|---|---|---|---|
 | 1 | Persona soft 0.15 and the three reds | - | config, schema, tests, head-start.mjs | 1 | done |
 
+## Owner questions
+
+None.
+
 ## Risks and rollback
 Risk: low. Rollback: git revert.

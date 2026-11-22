@@ -13,4 +13,4 @@ created: 2026-11-22
 
 # Done when
 
-One door lets a settled backlog row reach a planner without a hand-seeded discussion: either the planner binds to a backlog row (`plans/backlog/<id>-*.md`), or a coordinator verb creates a discussion directory from a row. The owner picks which (RUL104: new mechanism needs the owner's choice).
+One door lets a settled backlog row reach a planner without a hand-seeded discussion: either the planner binds to a backlog row (`plans/backlog/<id>-*.md`), or a coordinator verb creates a discussion directory from a row. The owner picks which (RUL104 (better, not bigger): a new mechanism needs the owner's choice).

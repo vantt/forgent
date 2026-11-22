@@ -5,6 +5,7 @@ status: done
 lead: lead:ROTATE2
 base: 2996306e4e558baa1a9a183697ea782152705d46
 priority: P1
+blockedBy: []
 footprint:
   - plans/261121-0851-rotation-successor-launch/**
   - packages/terminal-control/rust/src/core.rs
@@ -40,6 +41,10 @@ Trust seeding of untrusted projects; the supervisor's one-shot handling of a ref
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | Send waits for a starting program | - | packages/terminal-control/rust/src/core.rs, packages/terminal-control/rust/tests/core_failures.rs, packages/terminal-control/rust/tests/common/mod.rs, CHANGELOG.md | 1 | done |
+
+## Owner questions
+
+None.
 
 ## Risks and rollback
 A pane with a stuck unlisted process delays the refusal by the identify window (default of launchIdentifyTimeoutMs). Revert the commit.
