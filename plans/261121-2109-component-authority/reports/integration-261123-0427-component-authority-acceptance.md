@@ -199,3 +199,20 @@ WARN ... footprint overlaps another active plan: ... 261122-1950-owner-communica
 | AC5 npm test | EROFS lock (sandbox) |
 | AC5 cargo test --workspace | 8 unrelated failures |
 | plan-contract-check | fails on pre-existing phase status prose |
+
+## Residual mentions
+
+Nine live-remaining paths from criterion 2 residual, classified after the follow-up pin/fix pass:
+
+| Path | Class |
+| --- | --- |
+| `src/cli/command-registry.mjs` | Sibling plan sweep (comment still names the retired path). |
+| `docs/platform/component-authority/spec.md` | Retirement narrative (owns the migration story; path stays intentional). |
+| `docs/explanation/herdr-spawn-adapter-fresh-pane.md` | Pinned dated history line (`(retired; last commit 00dddf7ae)`). |
+| `docs/platform/agent-mailbox/spec.md` | Pinned dated history line (`(retired; last commit 00dddf7ae)`). |
+| `docs/platform/host-invocation-routing/spec.md` | Pinned dated history line (`(retired; last commit 00dddf7ae)`). |
+| `docs/platform/governance.md` | Fixed: removed `architecture-manifest.json` from the live `docs/` tree listing. |
+| `docs/platform/proposals/doing-coordination-redesign.md` | Canonical: No, exempt. |
+| `docs/platform/proposals/knowledge-registry-redesign.md` | Canonical: No, exempt. |
+| `docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md` | Outside the footprint; a dated task table. |
+
