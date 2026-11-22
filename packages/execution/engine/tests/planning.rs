@@ -718,11 +718,11 @@ struct RecordedViews {
 }
 
 impl RuntimeView for RecordedViews {
-    fn inspect_run(&self, _root: &Path, _run_id: &str) -> Value {
-        self.run.clone()
+    fn inspect_run(&self, _root: &Path, _run_id: &str) -> Result<Value, String> {
+        Ok(self.run.clone())
     }
-    fn inspect_assignment(&self, _root: &Path, _assignment_id: &str) -> Value {
-        self.assignment.clone()
+    fn inspect_assignment(&self, _root: &Path, _assignment_id: &str) -> Result<Value, String> {
+        Ok(self.assignment.clone())
     }
 }
 

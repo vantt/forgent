@@ -1,0 +1,4146 @@
+{
+  "samples": {
+    "v3-solo-settled": "unit-run-1795056603528-44eb3ca1",
+    "v3-open-attempt": "unit-run-1794987012087-5f3337a8",
+    "adopt-v3-envelope-attempt": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+    "pre-v3-layout-assignment": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001"
+  },
+  "mtime": "2026-11-19T00:00:00.000Z",
+  "now": "2026-11-22T12:00:00.000Z",
+  "probes": {
+    ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01": {
+      "v": 1,
+      "protocol": 1,
+      "attemptDir": "<ROOT>/.fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01",
+      "state": "closed"
+    },
+    ".fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01": {
+      "v": 1,
+      "protocol": 1,
+      "attemptDir": "<ROOT>/.fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01",
+      "state": "legacy-run"
+    },
+    ".fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01": {
+      "v": 1,
+      "protocol": 1,
+      "attemptDir": "<ROOT>/.fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01",
+      "state": "needs-adopt",
+      "adoptable": false,
+      "gone": [
+        "/SCRUBBED-PATH"
+      ]
+    },
+    ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01": {
+      "v": 1,
+      "protocol": 1,
+      "attemptDir": "<ROOT>/.fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01",
+      "state": "closed"
+    }
+  },
+  "cases": [
+    {
+      "sub": "show-run",
+      "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+      "answer": {
+        "ok": {
+          "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+          "runDir": "<ROOT>/.fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01",
+          "run": {
+            "contract": "assignment-run.v2",
+            "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+            "assignmentId": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+            "attempt": 1,
+            "supersedesRunId": null,
+            "retryId": null,
+            "payloadDigest": "sha256:f468296ed003be66acd5caad527589f9c3ae4e271599379a051113e24e0fa39e",
+            "dispatchPlanDigest": "sha256:19343173450278be5f2c80fb87465829168051b5005cc469883243724c4b6757",
+            "phase": "admitted",
+            "delivery": "not-sent",
+            "executorId": "claude",
+            "dispatchPlanPath": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/dispatch-plan.json",
+            "effectiveContractPath": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/effective-execution-contract.json",
+            "cwd": "/SCRUBBED-PATH",
+            "startedAt": "2026-11-18T12:05:01.057Z",
+            "timeoutMs": 2100000,
+            "status": "settled",
+            "providerCapacitySelectionPath": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/provider-capacity-selection.json",
+            "settledAt": "2026-11-18T12:05:16.188Z"
+          },
+          "settled": true,
+          "result": {
+            "contract": {
+              "id": "assignment-run-result",
+              "version": 3
+            },
+            "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+            "assignmentId": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+            "workId": null,
+            "controlEpoch": 1,
+            "controlToken": "SCRUBBED-TOKEN",
+            "executorId": "claude",
+            "adapter": "cli-spawn",
+            "confinement": "bwrap",
+            "role": "reviewer",
+            "executorRedirected": false,
+            "policy": {
+              "role": "reviewer",
+              "persona": "code-reviewer",
+              "executorId": "claude",
+              "providerModel": "claude",
+              "rigor": "standard",
+              "tier": "standard",
+              "model": "fable",
+              "visibility": "headless",
+              "repeatMode": null,
+              "constraints": {
+                "requiresSkills": []
+              },
+              "provenance": {
+                "executor": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "cliOverride"
+                  }
+                },
+                "provider": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "registeredExecutor",
+                    "id": "claude"
+                  }
+                },
+                "model": {
+                  "value": "fable",
+                  "source": {
+                    "scope": "cliOverride"
+                  }
+                },
+                "rigor": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "tier": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "defaults.tier"
+                  }
+                },
+                "reasoningEffort": {
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "persona": {
+                  "value": "code-reviewer",
+                  "source": {
+                    "scope": "default",
+                    "id": "reviewer"
+                  }
+                },
+                "visibility": {
+                  "value": "headless",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "repeatMode": {
+                  "value": null,
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "constraints": {
+                  "value": {
+                    "requiresSkills": []
+                  },
+                  "source": {
+                    "scope": "assignment",
+                    "id": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001"
+                  }
+                },
+                "governance": {
+                  "value": "allowed",
+                  "source": {
+                    "scope": "governance",
+                    "id": "claude"
+                  }
+                }
+              }
+            },
+            "promptEnvelope": {
+              "persona": {
+                "ref": "code-reviewer",
+                "delivery": "section",
+                "applied": true,
+                "source": {
+                  "scope": "default",
+                  "id": "reviewer"
+                }
+              }
+            },
+            "settledAt": "2026-11-18T12:05:16.188Z",
+            "durationMs": null,
+            "claimSha256": "c6dee099ab510a442e2fec838f889afe92007372a4642d4b4bf9f1f1776cbb92",
+            "settleReports": [
+              {
+                "path": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/worker-output/outbox/report-1.md",
+                "sha256": "51d7dd3f8263fc4da7c698d836c104131a75b2bfe42813d3bf690e0f1db4c7db"
+              }
+            ],
+            "reportDeclaration": {
+              "complete": true,
+              "incompleteReason": null
+            },
+            "classification": {
+              "execution": {
+                "status": "completed",
+                "exitCode": 0
+              },
+              "assessment": {
+                "verdict": "pass"
+              },
+              "confidence": {
+                "level": "reported",
+                "basis": [
+                  "valid-agent-result-claim",
+                  "captured-stdout"
+                ]
+              },
+              "failure": null,
+              "policy": {
+                "disposition": "allow",
+                "code": null
+              },
+              "delivery": {
+                "mode": "fresh"
+              },
+              "provenance": "native-v3",
+              "outcome": {
+                "category": "ok",
+                "reason": "SCRUBBED"
+              }
+            },
+            "runtime": {
+              "exitCode": 0,
+              "stdoutLog": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/stdout.log",
+              "stderrLog": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/stderr.log"
+            },
+            "agentClaim": {
+              "contract": {
+                "id": "agent-result-claim",
+                "version": 2
+              },
+              "status": "done",
+              "summary": "SCRUBBED",
+              "assessment": {
+                "verdict": "not-applicable"
+              }
+            },
+            "runnerNote": {
+              "summary": "SCRUBBED"
+            },
+            "usage": {
+              "inputTokens": null,
+              "outputTokens": null,
+              "totalTokens": null,
+              "cacheReadTokens": null,
+              "cacheCreationTokens": null,
+              "source": "transcript"
+            },
+            "evidence": {
+              "gitBefore": "1ba5ecbd3ce59ad64bebdd34d380bd1aee0f8297",
+              "gitAfter": "1ba5ecbd3ce59ad64bebdd34d380bd1aee0f8297",
+              "gitBeforeSource": "pre-launch",
+              "changedFiles": [],
+              "mutatedDirtyBeforeFiles": [],
+              "attribution": [
+                {
+                  "path": ".claude/settings.json",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": ".claude/skills/instruction-audit/references/lane-prompts.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": ".claude/skills/instruction-audit/references/report-template.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": ".claude/skills/instruction-audit/scripts/instruction-audit.mjs",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "docs/backlog.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "node_trace.1.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-00-baseline-and-test-investigation.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-02-t1-holder-lock-identity-convention.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-04-t3-agent-protocol-observe-event-store.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-05-t4-run-supervisor-launch-gate.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-06-t5-execution-core-dispatch-seat-run-result.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/handoffs/harden-phase-07-closing-and-handoff-20261118-1341.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/reports/audit-261117-1545-supervisor-watcher-audit.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/reports/debugger-261115-1400-ci-only-test-failures.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/reports/review-261118-1850-harden-plan-review.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "sc.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "sh1.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "sw.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "w1.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                }
+              ],
+              "artifacts": [
+                ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/worker-output/outbox/report-1.md",
+                ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/worker-output/outbox/result-1.json"
+              ],
+              "tests": []
+            }
+          },
+          "visibility": null,
+          "outbox": [],
+          "controller": [
+            {
+              "name": "evaluator-baseline.json",
+              "bytes": 5721,
+              "modifiedAt": "2026-11-19T00:00:00.000Z"
+            },
+            {
+              "name": "settle-context.json",
+              "bytes": 4020,
+              "modifiedAt": "2026-11-19T00:00:00.000Z"
+            }
+          ],
+          "attemptState": "closed"
+        }
+      }
+    },
+    {
+      "sub": "recover",
+      "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+      "intent": "resume",
+      "answer": {
+        "ok": {
+          "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+          "runDir": "<ROOT>/.fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01",
+          "kind": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover",
+          "evidenceIds": [
+            "receipt.json",
+            "gate-exit.json",
+            "closed.json",
+            "steps/finalize-home.json",
+            "steps/settle-attempt.json"
+          ]
+        }
+      }
+    },
+    {
+      "sub": "recover",
+      "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+      "intent": "reassign",
+      "answer": {
+        "ok": {
+          "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+          "runDir": "<ROOT>/.fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01",
+          "kind": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover",
+          "evidenceIds": [
+            "receipt.json",
+            "gate-exit.json",
+            "closed.json",
+            "steps/finalize-home.json",
+            "steps/settle-attempt.json"
+          ]
+        }
+      }
+    },
+    {
+      "sub": "inspect",
+      "selector": {
+        "run": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01"
+      },
+      "answer": {
+        "ok": {
+          "inspectionStatus": "resolved",
+          "subject": {
+            "kind": "run",
+            "id": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+                "attempt": "01",
+                "path": "<ROOT>/.fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "run-record",
+              "source": "run-repository",
+              "level": "correlated",
+              "value": {
+                "status": "settled",
+                "phase": "settled"
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-22T12:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01"
+            },
+            "phase": "settled",
+            "resourceState": "unobserved",
+            "delivery": "not-started",
+            "inspectionStatus": "resolved",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "missing",
+              "result": "complete",
+              "ownership": "complete",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "settled",
+                  "phase": "settled"
+                }
+              }
+            ]
+          },
+          "runResult": {
+            "contract": {
+              "id": "assignment-run-result",
+              "version": 3
+            },
+            "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+            "assignmentId": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+            "workId": null,
+            "controlEpoch": 1,
+            "controlToken": "SCRUBBED-TOKEN",
+            "executorId": "claude",
+            "adapter": "cli-spawn",
+            "confinement": "bwrap",
+            "role": "reviewer",
+            "executorRedirected": false,
+            "policy": {
+              "role": "reviewer",
+              "persona": "code-reviewer",
+              "executorId": "claude",
+              "providerModel": "claude",
+              "rigor": "standard",
+              "tier": "standard",
+              "model": "fable",
+              "visibility": "headless",
+              "repeatMode": null,
+              "constraints": {
+                "requiresSkills": []
+              },
+              "provenance": {
+                "executor": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "cliOverride"
+                  }
+                },
+                "provider": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "registeredExecutor",
+                    "id": "claude"
+                  }
+                },
+                "model": {
+                  "value": "fable",
+                  "source": {
+                    "scope": "cliOverride"
+                  }
+                },
+                "rigor": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "tier": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "defaults.tier"
+                  }
+                },
+                "reasoningEffort": {
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "persona": {
+                  "value": "code-reviewer",
+                  "source": {
+                    "scope": "default",
+                    "id": "reviewer"
+                  }
+                },
+                "visibility": {
+                  "value": "headless",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "repeatMode": {
+                  "value": null,
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "constraints": {
+                  "value": {
+                    "requiresSkills": []
+                  },
+                  "source": {
+                    "scope": "assignment",
+                    "id": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001"
+                  }
+                },
+                "governance": {
+                  "value": "allowed",
+                  "source": {
+                    "scope": "governance",
+                    "id": "claude"
+                  }
+                }
+              }
+            },
+            "promptEnvelope": {
+              "persona": {
+                "ref": "code-reviewer",
+                "delivery": "section",
+                "applied": true,
+                "source": {
+                  "scope": "default",
+                  "id": "reviewer"
+                }
+              }
+            },
+            "settledAt": "2026-11-18T12:05:16.188Z",
+            "durationMs": null,
+            "claimSha256": "c6dee099ab510a442e2fec838f889afe92007372a4642d4b4bf9f1f1776cbb92",
+            "settleReports": [
+              {
+                "path": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/worker-output/outbox/report-1.md",
+                "sha256": "51d7dd3f8263fc4da7c698d836c104131a75b2bfe42813d3bf690e0f1db4c7db"
+              }
+            ],
+            "reportDeclaration": {
+              "complete": true,
+              "incompleteReason": null
+            },
+            "classification": {
+              "execution": {
+                "status": "completed",
+                "exitCode": 0
+              },
+              "assessment": {
+                "verdict": "pass"
+              },
+              "confidence": {
+                "level": "reported",
+                "basis": [
+                  "valid-agent-result-claim",
+                  "captured-stdout"
+                ]
+              },
+              "failure": null,
+              "policy": {
+                "disposition": "allow",
+                "code": null
+              },
+              "delivery": {
+                "mode": "fresh"
+              },
+              "provenance": "native-v3",
+              "outcome": {
+                "category": "ok",
+                "reason": "SCRUBBED"
+              }
+            },
+            "runtime": {
+              "exitCode": 0,
+              "stdoutLog": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/stdout.log",
+              "stderrLog": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/stderr.log"
+            },
+            "agentClaim": {
+              "contract": {
+                "id": "agent-result-claim",
+                "version": 2
+              },
+              "status": "done",
+              "summary": "SCRUBBED",
+              "assessment": {
+                "verdict": "not-applicable"
+              }
+            },
+            "runnerNote": {
+              "summary": "SCRUBBED"
+            },
+            "usage": {
+              "inputTokens": null,
+              "outputTokens": null,
+              "totalTokens": null,
+              "cacheReadTokens": null,
+              "cacheCreationTokens": null,
+              "source": "transcript"
+            },
+            "evidence": {
+              "gitBefore": "1ba5ecbd3ce59ad64bebdd34d380bd1aee0f8297",
+              "gitAfter": "1ba5ecbd3ce59ad64bebdd34d380bd1aee0f8297",
+              "gitBeforeSource": "pre-launch",
+              "changedFiles": [],
+              "mutatedDirtyBeforeFiles": [],
+              "attribution": [
+                {
+                  "path": ".claude/settings.json",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": ".claude/skills/instruction-audit/references/lane-prompts.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": ".claude/skills/instruction-audit/references/report-template.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": ".claude/skills/instruction-audit/scripts/instruction-audit.mjs",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "docs/backlog.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "node_trace.1.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-00-baseline-and-test-investigation.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-02-t1-holder-lock-identity-convention.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-04-t3-agent-protocol-observe-event-store.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-05-t4-run-supervisor-launch-gate.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-06-t5-execution-core-dispatch-seat-run-result.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/handoffs/harden-phase-07-closing-and-handoff-20261118-1341.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/reports/audit-261117-1545-supervisor-watcher-audit.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/reports/debugger-261115-1400-ci-only-test-failures.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/reports/review-261118-1850-harden-plan-review.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "sc.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "sh1.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "sw.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "w1.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                }
+              ],
+              "artifacts": [
+                ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/worker-output/outbox/report-1.md",
+                ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/worker-output/outbox/result-1.json"
+              ],
+              "tests": []
+            }
+          },
+          "recoveryAuthority": {
+            "kind": "standalone-run",
+            "id": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+            "observeCommand": "fgos dispatch recover run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01"
+            ]
+          },
+          "attemptState": "closed"
+        }
+      }
+    },
+    {
+      "sub": "reconcile",
+      "action": "collect-result",
+      "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+      "answer": {
+        "ok": {
+          "outcome": "planned",
+          "actionKey": "reconcile_2f33419a3264234ee9939ec845536c1ba20ef3035d84a09486f23629b324ec39",
+          "snapshot": {
+            "digest": "sha256:9c24a25191f6b3049040fc11e511d39e89755f5d810c9e9a8df2ab315c24cb9b",
+            "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+            "ownerAuthority": {
+              "kind": "standalone-run",
+              "id": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01"
+            },
+            "controlEpoch": 2,
+            "expiresAt": "2026-11-22T12:05:00.000Z"
+          },
+          "proposedAction": {
+            "kind": "collect-result",
+            "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+            "path": "<ROOT>/.fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/run.json"
+          },
+          "preconditions": [
+            "result-valid",
+            "owner-authority-standalone",
+            "not-superseded"
+          ]
+        }
+      }
+    },
+    {
+      "sub": "reconcile",
+      "action": "repair-projection",
+      "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+      "answer": {
+        "ok": {
+          "outcome": "blocked",
+          "reason": "run.json.status already reflects settlement; nothing to repair"
+        }
+      }
+    },
+    {
+      "sub": "show-run",
+      "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+      "answer": {
+        "ok": {
+          "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+          "runDir": "<ROOT>/.fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01",
+          "run": {
+            "contract": "assignment-run.v2",
+            "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+            "assignmentId": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001",
+            "attempt": 1,
+            "supersedesRunId": null,
+            "retryId": null,
+            "payloadDigest": "sha256:74042cf8d64ed3f7d1439791afa11c630cc805e6b5317fe4d6b48e6c58671d07",
+            "dispatchPlanDigest": "sha256:99ca3c2f61adf21ac5239124152e8e9392053fdf8d3fba029f000bf1ea21e9fe",
+            "phase": "admitted",
+            "delivery": "not-sent",
+            "executorId": "gemini",
+            "dispatchPlanPath": ".fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01/dispatch-plan.json",
+            "effectiveContractPath": ".fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01/effective-execution-contract.json",
+            "cwd": "/SCRUBBED-PATH",
+            "startedAt": "2026-11-11T22:31:26.263Z",
+            "timeoutMs": 2100000,
+            "status": "settled",
+            "settledAt": "2026-11-11T22:31:26.388Z"
+          },
+          "settled": true,
+          "result": {
+            "contract": {
+              "id": "assignment-run-result",
+              "version": 3
+            },
+            "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+            "assignmentId": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001",
+            "workId": null,
+            "executorId": "gemini",
+            "adapter": "cli-spawn",
+            "confinement": null,
+            "role": "reviewer",
+            "policy": {
+              "role": "reviewer",
+              "persona": "code-reviewer",
+              "executorId": "gemini",
+              "providerModel": "gemini",
+              "rigor": "standard",
+              "tier": "standard",
+              "model": "gemini-3.8-flash-low",
+              "visibility": "headless",
+              "repeatMode": null,
+              "constraints": {
+                "requiresSkills": []
+              },
+              "provenance": {
+                "executor": {
+                  "value": "gemini",
+                  "source": {
+                    "scope": "cliOverride"
+                  }
+                },
+                "provider": {
+                  "value": "gemini",
+                  "source": {
+                    "scope": "registeredExecutor",
+                    "id": "gemini"
+                  }
+                },
+                "model": {
+                  "value": "gemini-3.8-flash-low",
+                  "source": {
+                    "scope": "cliOverride"
+                  }
+                },
+                "rigor": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "tier": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "defaults.tier"
+                  }
+                },
+                "reasoningEffort": {
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "persona": {
+                  "value": "code-reviewer",
+                  "source": {
+                    "scope": "default",
+                    "id": "reviewer"
+                  }
+                },
+                "visibility": {
+                  "value": "headless",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "repeatMode": {
+                  "value": null,
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "constraints": {
+                  "value": {
+                    "requiresSkills": []
+                  },
+                  "source": {
+                    "scope": "assignment",
+                    "id": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001"
+                  }
+                },
+                "governance": {
+                  "value": "allowed",
+                  "source": {
+                    "scope": "governance",
+                    "id": "gemini"
+                  }
+                }
+              }
+            },
+            "promptEnvelope": {
+              "persona": {
+                "ref": "code-reviewer",
+                "delivery": "section",
+                "applied": true,
+                "source": {
+                  "scope": "default",
+                  "id": "reviewer"
+                }
+              }
+            },
+            "settledAt": "2026-11-11T22:31:26.332Z",
+            "durationMs": null,
+            "settleReports": [],
+            "classification": {
+              "execution": {
+                "status": "failed",
+                "exitCode": null
+              },
+              "assessment": {
+                "verdict": "not-applicable"
+              },
+              "confidence": {
+                "level": "failed",
+                "basis": [
+                  "captured-stdout",
+                  "failed-exit"
+                ]
+              },
+              "failure": {
+                "family": "provider",
+                "code": "provider-capacity-refused",
+                "message": "SCRUBBED"
+              },
+              "policy": {
+                "disposition": "needs-input",
+                "code": "provider-capacity-refused"
+              },
+              "delivery": {
+                "mode": "fresh"
+              },
+              "provenance": "native-v3",
+              "outcome": {
+                "category": "infra",
+                "reason": "SCRUBBED"
+              }
+            },
+            "runtime": {
+              "exitCode": null,
+              "stdoutLog": ".fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01/stdout.log",
+              "stderrLog": ".fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01/stderr.log"
+            },
+            "runnerNote": {
+              "summary": "SCRUBBED"
+            },
+            "usage": null,
+            "evidence": {
+              "operationMutability": "read-only",
+              "gitBefore": null,
+              "gitAfter": null,
+              "gitBeforeSource": "pre-launch",
+              "dirtyBefore": [],
+              "dirtyAfter": [],
+              "mutatedDirtyBeforeFiles": [],
+              "changedFiles": [],
+              "changedFileReasons": {},
+              "attribution": [],
+              "artifacts": [],
+              "tests": []
+            }
+          },
+          "visibility": null,
+          "outbox": [],
+          "controller": [],
+          "attemptState": "legacy-run"
+        }
+      }
+    },
+    {
+      "sub": "recover",
+      "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+      "intent": "resume",
+      "answer": {
+        "ok": {
+          "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+          "runDir": "<ROOT>/.fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01",
+          "kind": "park",
+          "reason": "run already settled -- there is nothing to recover",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "sub": "recover",
+      "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+      "intent": "reassign",
+      "answer": {
+        "ok": {
+          "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+          "runDir": "<ROOT>/.fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01",
+          "kind": "park",
+          "reason": "run already settled -- there is nothing to recover",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "sub": "inspect",
+      "selector": {
+        "run": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01"
+      },
+      "answer": {
+        "ok": {
+          "inspectionStatus": "resolved",
+          "subject": {
+            "kind": "run",
+            "id": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001",
+                "attempt": "01",
+                "path": "<ROOT>/.fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "run-record",
+              "source": "run-repository",
+              "level": "correlated",
+              "value": {
+                "status": "settled",
+                "phase": "settled"
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-22T12:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01"
+            },
+            "phase": "settled",
+            "resourceState": "unobserved",
+            "delivery": "not-started",
+            "inspectionStatus": "resolved",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "missing",
+              "result": "complete",
+              "ownership": "complete",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "settled",
+                  "phase": "settled"
+                }
+              }
+            ]
+          },
+          "runResult": {
+            "contract": {
+              "id": "assignment-run-result",
+              "version": 3
+            },
+            "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+            "assignmentId": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001",
+            "workId": null,
+            "executorId": "gemini",
+            "adapter": "cli-spawn",
+            "confinement": null,
+            "role": "reviewer",
+            "policy": {
+              "role": "reviewer",
+              "persona": "code-reviewer",
+              "executorId": "gemini",
+              "providerModel": "gemini",
+              "rigor": "standard",
+              "tier": "standard",
+              "model": "gemini-3.8-flash-low",
+              "visibility": "headless",
+              "repeatMode": null,
+              "constraints": {
+                "requiresSkills": []
+              },
+              "provenance": {
+                "executor": {
+                  "value": "gemini",
+                  "source": {
+                    "scope": "cliOverride"
+                  }
+                },
+                "provider": {
+                  "value": "gemini",
+                  "source": {
+                    "scope": "registeredExecutor",
+                    "id": "gemini"
+                  }
+                },
+                "model": {
+                  "value": "gemini-3.8-flash-low",
+                  "source": {
+                    "scope": "cliOverride"
+                  }
+                },
+                "rigor": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "tier": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "defaults.tier"
+                  }
+                },
+                "reasoningEffort": {
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "persona": {
+                  "value": "code-reviewer",
+                  "source": {
+                    "scope": "default",
+                    "id": "reviewer"
+                  }
+                },
+                "visibility": {
+                  "value": "headless",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "repeatMode": {
+                  "value": null,
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "constraints": {
+                  "value": {
+                    "requiresSkills": []
+                  },
+                  "source": {
+                    "scope": "assignment",
+                    "id": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001"
+                  }
+                },
+                "governance": {
+                  "value": "allowed",
+                  "source": {
+                    "scope": "governance",
+                    "id": "gemini"
+                  }
+                }
+              }
+            },
+            "promptEnvelope": {
+              "persona": {
+                "ref": "code-reviewer",
+                "delivery": "section",
+                "applied": true,
+                "source": {
+                  "scope": "default",
+                  "id": "reviewer"
+                }
+              }
+            },
+            "settledAt": "2026-11-11T22:31:26.332Z",
+            "durationMs": null,
+            "settleReports": [],
+            "classification": {
+              "execution": {
+                "status": "failed",
+                "exitCode": null
+              },
+              "assessment": {
+                "verdict": "not-applicable"
+              },
+              "confidence": {
+                "level": "failed",
+                "basis": [
+                  "captured-stdout",
+                  "failed-exit"
+                ]
+              },
+              "failure": {
+                "family": "provider",
+                "code": "provider-capacity-refused",
+                "message": "SCRUBBED"
+              },
+              "policy": {
+                "disposition": "needs-input",
+                "code": "provider-capacity-refused"
+              },
+              "delivery": {
+                "mode": "fresh"
+              },
+              "provenance": "native-v3",
+              "outcome": {
+                "category": "infra",
+                "reason": "SCRUBBED"
+              }
+            },
+            "runtime": {
+              "exitCode": null,
+              "stdoutLog": ".fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01/stdout.log",
+              "stderrLog": ".fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01/stderr.log"
+            },
+            "runnerNote": {
+              "summary": "SCRUBBED"
+            },
+            "usage": null,
+            "evidence": {
+              "operationMutability": "read-only",
+              "gitBefore": null,
+              "gitAfter": null,
+              "gitBeforeSource": "pre-launch",
+              "dirtyBefore": [],
+              "dirtyAfter": [],
+              "mutatedDirtyBeforeFiles": [],
+              "changedFiles": [],
+              "changedFileReasons": {},
+              "attribution": [],
+              "artifacts": [],
+              "tests": []
+            }
+          },
+          "recoveryAuthority": {
+            "kind": "standalone-run",
+            "id": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+            "observeCommand": "fgos dispatch recover run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01"
+            ]
+          },
+          "attemptState": "legacy-run"
+        }
+      }
+    },
+    {
+      "sub": "reconcile",
+      "action": "collect-result",
+      "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+      "answer": {
+        "ok": {
+          "outcome": "planned",
+          "actionKey": "reconcile_9fb3b4a69392c0efcc31c7ab31784923ae951735c863cca41941901b1dd0122d",
+          "snapshot": {
+            "digest": "sha256:594144693216bf1c96afa0da8a8dbca815ed27f4012e60896be7fc7fda25dd28",
+            "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+            "ownerAuthority": {
+              "kind": "standalone-run",
+              "id": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01"
+            },
+            "controlEpoch": 2,
+            "expiresAt": "2026-11-22T12:05:00.000Z"
+          },
+          "proposedAction": {
+            "kind": "collect-result",
+            "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+            "path": "<ROOT>/.fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01/run.json"
+          },
+          "preconditions": [
+            "result-valid",
+            "owner-authority-standalone",
+            "not-superseded"
+          ]
+        }
+      }
+    },
+    {
+      "sub": "reconcile",
+      "action": "repair-projection",
+      "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+      "answer": {
+        "ok": {
+          "outcome": "blocked",
+          "reason": "run.json.status already reflects settlement; nothing to repair"
+        }
+      }
+    },
+    {
+      "sub": "show-run",
+      "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+      "answer": {
+        "ok": {
+          "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+          "runDir": "<ROOT>/.fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01",
+          "run": {
+            "contract": "assignment-run.v2",
+            "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+            "assignmentId": "unit-run-1794987012087-5f3337a8/producer/1",
+            "attempt": 1,
+            "supersedesRunId": null,
+            "retryId": "unit-run-1794987012087-5f3337a8/producer/1~7e08f9f2b100",
+            "payloadDigest": "sha256:2d40f3d7f2cbb18545c628f542c102788af0fe7e476a410ce2c2cccce0651809",
+            "dispatchPlanDigest": "sha256:de69352dd8b1a1f266db7cfc4961d0efbf8374f92dcfd4442707256b01df5165",
+            "phase": "admitted",
+            "delivery": "not-sent",
+            "executorId": "openai",
+            "dispatchPlanPath": ".fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01/dispatch-plan.json",
+            "effectiveContractPath": ".fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01/effective-execution-contract.json",
+            "cwd": "/SCRUBBED-PATH",
+            "startedAt": "2026-11-18T07:30:12.230Z",
+            "timeoutMs": 1500000,
+            "status": "running",
+            "providerCapacitySelectionPath": ".fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01/provider-capacity-selection.json"
+          },
+          "settled": false,
+          "visibility": {
+            "status": "pane-created",
+            "agentName": "fgos-run_unit-run-1794987a8345eb",
+            "round": 1,
+            "terminalKey": "cmd_1794987012269_a51ae631",
+            "lastSeenAt": "2026-11-18T07:30:13.089Z",
+            "confinement": {
+              "status": "unconfined",
+              "confined": false
+            },
+            "paneId": "w6:p12K"
+          },
+          "outbox": [],
+          "controller": [
+            {
+              "name": "evaluator-baseline.json",
+              "bytes": 473,
+              "modifiedAt": "2026-11-19T00:00:00.000Z"
+            },
+            {
+              "name": "settle-context.json",
+              "bytes": 5385,
+              "modifiedAt": "2026-11-19T00:00:00.000Z"
+            }
+          ],
+          "attemptState": "needs-adopt",
+          "unitRunId": "unit-run-1794987012087-5f3337a8",
+          "unitState": "failed"
+        }
+      }
+    },
+    {
+      "sub": "recover",
+      "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+      "intent": "resume",
+      "answer": {
+        "ok": {
+          "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+          "runDir": "<ROOT>/.fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01",
+          "kind": "recommendation",
+          "snapshotHash": "5cb36792b4b9212890e43b8ca5bb8d52025c5f880f2635f7fae333429c30ab5a",
+          "expectedControlEpoch": 1,
+          "actionKey": "6a625ea1bc70c68518d95a5f55bf6f036c78c4664cdcf03ea1406d413cfc6758",
+          "evidenceIds": [
+            "receipt.json",
+            "gate-exit.json"
+          ],
+          "action": {
+            "type": "adopt",
+            "attemptId": "cmd_1794987012269_a51ae631"
+          },
+          "expiresAt": "2026-11-22T12:05:00.000Z",
+          "reason": "attempt cmd_1794987012269_a51ae631 is needs-adopt (no holder, not closed) -- adopt settles it and closes it"
+        }
+      }
+    },
+    {
+      "sub": "recover",
+      "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+      "intent": "reassign",
+      "answer": {
+        "ok": {
+          "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+          "runDir": "<ROOT>/.fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01",
+          "kind": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)",
+          "evidenceIds": [
+            "receipt.json",
+            "gate-exit.json"
+          ]
+        }
+      }
+    },
+    {
+      "sub": "inspect",
+      "selector": {
+        "run": "run_unit-run-1794987012087-5f3337a8/producer/1_01"
+      },
+      "answer": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "run",
+            "id": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "unit-run-1794987012087-5f3337a8/producer/1",
+                "attempt": "01",
+                "path": "<ROOT>/.fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "run-record",
+              "source": "run-repository",
+              "level": "correlated",
+              "value": {
+                "status": "running",
+                "phase": "bound"
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-22T12:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01"
+            },
+            "phase": "bound",
+            "resourceState": "ambiguous",
+            "delivery": "not-started",
+            "inspectionStatus": "partial",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "stale",
+              "result": "missing",
+              "ownership": "complete",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "running",
+                  "phase": "bound"
+                }
+              }
+            ]
+          },
+          "runResult": null,
+          "recoveryAuthority": {
+            "kind": "standalone-run",
+            "id": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+            "observeCommand": "fgos dispatch recover run_unit-run-1794987012087-5f3337a8/producer/1_01"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "unit-run-1794987012087-5f3337a8/producer/1"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "run_unit-run-1794987012087-5f3337a8/producer/1_01"
+            ]
+          },
+          "attemptState": "needs-adopt",
+          "unitRunId": "unit-run-1794987012087-5f3337a8",
+          "unitState": "failed"
+        }
+      }
+    },
+    {
+      "sub": "reconcile",
+      "action": "collect-result",
+      "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+      "answer": {
+        "ok": {
+          "outcome": "blocked",
+          "reason": "no result exists yet to collect"
+        }
+      }
+    },
+    {
+      "sub": "reconcile",
+      "action": "repair-projection",
+      "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+      "answer": {
+        "ok": {
+          "outcome": "blocked",
+          "reason": "no terminal result exists yet to prove settlement"
+        }
+      }
+    },
+    {
+      "sub": "show-run",
+      "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+      "answer": {
+        "ok": {
+          "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+          "runDir": "<ROOT>/.fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01",
+          "run": {
+            "contract": "assignment-run.v2",
+            "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+            "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+            "attempt": 1,
+            "supersedesRunId": null,
+            "retryId": "unit-run-1795056603528-44eb3ca1/producer/1~14b0cbea82d0",
+            "payloadDigest": "sha256:f224a89dde29c40b06387857ef885e1b7b763f1331f304635aeb95044e22ed21",
+            "dispatchPlanDigest": "sha256:7ee40f82d6deb511462d9e63e4d09ca3a132703d3ef7f8a0a0d9d77bbe1d64bc",
+            "phase": "admitted",
+            "delivery": "not-sent",
+            "executorId": "claude",
+            "dispatchPlanPath": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/dispatch-plan.json",
+            "effectiveContractPath": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/effective-execution-contract.json",
+            "cwd": "/SCRUBBED-PATH",
+            "startedAt": "2026-11-19T02:50:06.062Z",
+            "timeoutMs": 3600000,
+            "status": "settled",
+            "providerCapacitySelectionPath": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/provider-capacity-selection.json",
+            "settledAt": "2026-11-19T02:51:30.127Z"
+          },
+          "settled": true,
+          "result": {
+            "contract": {
+              "id": "assignment-run-result",
+              "version": 3
+            },
+            "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+            "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+            "controlEpoch": 1,
+            "controlToken": "SCRUBBED-TOKEN",
+            "executorId": "claude",
+            "adapter": "herdr-spawn",
+            "confinement": "bwrap",
+            "role": "producer",
+            "executorRedirected": false,
+            "policy": {
+              "role": "producer",
+              "executorId": "claude",
+              "providerModel": "claude",
+              "rigor": "standard",
+              "tier": "advanced",
+              "model": "sonnet",
+              "visibility": "headless",
+              "repeatMode": null,
+              "constraints": {
+                "requiresSkills": []
+              },
+              "provenance": {
+                "executor": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "unit-prefer"
+                  }
+                },
+                "provider": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "registeredExecutor",
+                    "id": "claude"
+                  }
+                },
+                "model": {
+                  "value": "sonnet",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "modelPolicies.claude.advanced"
+                  }
+                },
+                "rigor": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "tier": {
+                  "value": "advanced",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "capabilities.\"code:*\".tier"
+                  }
+                },
+                "reasoningEffort": {
+                  "value": null,
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "invocation-default"
+                  }
+                },
+                "persona": {
+                  "value": null,
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "none"
+                  }
+                },
+                "visibility": {
+                  "value": "headless",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "repeatMode": {
+                  "value": null,
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "constraints": {
+                  "value": {
+                    "requiresSkills": []
+                  },
+                  "source": {
+                    "scope": "assignment",
+                    "id": "unit-run-1795056603528-44eb3ca1/producer/1"
+                  }
+                },
+                "governance": {
+                  "value": "allowed",
+                  "source": {
+                    "scope": "governance",
+                    "id": "claude"
+                  }
+                }
+              }
+            },
+            "settledAt": "2026-11-19T02:51:30.127Z",
+            "claimSha256": "1f6e2698e3729dd53534b1371c5757da7737809a7f2919777b8e40101b04d41f",
+            "settleReports": [
+              {
+                "path": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/outbox/report-1.md",
+                "sha256": "d1a59589a1dbdbca1d71d98613b00ddb1fb115a759e7c343f20e6397cef6db86"
+              }
+            ],
+            "reportDeclaration": {
+              "complete": true,
+              "incompleteReason": null
+            },
+            "classification": {
+              "execution": {
+                "status": "completed",
+                "exitCode": 0
+              },
+              "assessment": {
+                "verdict": "pass"
+              },
+              "confidence": {
+                "level": "verified",
+                "basis": [
+                  "valid-agent-result-claim",
+                  "captured-stdout",
+                  "workspace-git-diff"
+                ]
+              },
+              "failure": null,
+              "policy": {
+                "disposition": "allow",
+                "code": null
+              },
+              "delivery": {
+                "mode": "fresh"
+              },
+              "provenance": "native-v3",
+              "outcome": {
+                "category": "ok",
+                "reason": "SCRUBBED"
+              }
+            },
+            "runtime": {
+              "exitCode": 0,
+              "stdoutLog": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/stdout.log",
+              "stderrLog": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/stderr.log"
+            },
+            "agentClaim": {
+              "contract": {
+                "id": "agent-result-claim",
+                "version": 2
+              },
+              "status": "done",
+              "summary": "SCRUBBED",
+              "evidenceRefs": [
+                "CHANGELOG.md",
+                "docs/reading-map.md",
+                "core/skills/_shared/plan-contract.md"
+              ]
+            },
+            "runnerNote": {
+              "summary": "SCRUBBED"
+            },
+            "usage": {
+              "inputTokens": null,
+              "outputTokens": null,
+              "totalTokens": null,
+              "cacheReadTokens": null,
+              "cacheCreationTokens": null,
+              "reasoningTokens": null,
+              "source": "transcript",
+              "reason": "SCRUBBED"
+            },
+            "evidence": {
+              "gitBefore": "63ec9b7ca8371f02ea4f442bdd9a5288d71722c5",
+              "gitAfter": "63ec9b7ca8371f02ea4f442bdd9a5288d71722c5",
+              "gitBeforeSource": "pre-launch",
+              "changedFiles": [
+                ".agents/skills/_shared/plan-contract.md",
+                ".agents/skills/fgos-coding-planning/references/approach-and-shape.md",
+                ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                ".agents/skills/fgos-cook/references/reading-ak-plans.md",
+                "CHANGELOG.md",
+                "core/skills/_shared/plan-contract.md",
+                "core/skills/fgos-cook/references/reading-ak-plans.md",
+                "docs/reading-map.md",
+                "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+                "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                "plugins/fgOS/skills/_shared/plan-contract.md",
+                "plugins/fgOS/skills/fgos-coding-planning/references/approach-and-shape.md",
+                "plugins/fgOS/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                "plugins/fgOS/skills/fgos-cook/references/reading-ak-plans.md"
+              ],
+              "mutatedDirtyBeforeFiles": [],
+              "attribution": [
+                {
+                  "path": ".agents/skills/_shared/plan-contract.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": ".agents/skills/fgos-coding-planning/references/approach-and-shape.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": ".agents/skills/fgos-cook/references/reading-ak-plans.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "CHANGELOG.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "core/skills/_shared/plan-contract.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "core/skills/fgos-cook/references/reading-ak-plans.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "docs/reading-map.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "plugins/fgOS/skills/_shared/plan-contract.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "plugins/fgOS/skills/fgos-coding-planning/references/approach-and-shape.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "plugins/fgOS/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "plugins/fgOS/skills/fgos-cook/references/reading-ak-plans.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                }
+              ],
+              "artifacts": [
+                ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/outbox/report-1.md",
+                ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/outbox/result-1.json"
+              ],
+              "tests": [],
+              "findingRefs": [
+                "CHANGELOG.md",
+                "docs/reading-map.md",
+                "core/skills/_shared/plan-contract.md"
+              ]
+            }
+          },
+          "visibility": {
+            "status": "pane-created",
+            "agentName": "fgos-run_unit-run-179505666b08d7",
+            "round": 1,
+            "terminalKey": "cmd_1795056606138_efbc9592",
+            "lastSeenAt": "2026-11-19T02:50:07.068Z",
+            "confinement": {
+              "status": "confined",
+              "confined": true
+            },
+            "trustSeeded": "claude-json",
+            "paneId": "w6:p16X"
+          },
+          "outbox": [],
+          "controller": [
+            {
+              "name": "evaluator-baseline.json",
+              "bytes": 473,
+              "modifiedAt": "2026-11-19T00:00:00.000Z"
+            },
+            {
+              "name": "settle-context.json",
+              "bytes": 4917,
+              "modifiedAt": "2026-11-19T00:00:00.000Z"
+            }
+          ],
+          "attemptState": "closed",
+          "unitRunId": "unit-run-1795056603528-44eb3ca1",
+          "unitState": "completed"
+        }
+      }
+    },
+    {
+      "sub": "recover",
+      "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+      "intent": "resume",
+      "answer": {
+        "ok": {
+          "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+          "runDir": "<ROOT>/.fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01",
+          "kind": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover",
+          "evidenceIds": [
+            "receipt.json",
+            "gate-exit.json",
+            "closed.json",
+            "steps/cleanup-trust.json",
+            "steps/finalize-home.json",
+            "steps/release-slot.json",
+            "steps/settle-attempt.json"
+          ]
+        }
+      }
+    },
+    {
+      "sub": "recover",
+      "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+      "intent": "reassign",
+      "answer": {
+        "ok": {
+          "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+          "runDir": "<ROOT>/.fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01",
+          "kind": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover",
+          "evidenceIds": [
+            "receipt.json",
+            "gate-exit.json",
+            "closed.json",
+            "steps/cleanup-trust.json",
+            "steps/finalize-home.json",
+            "steps/release-slot.json",
+            "steps/settle-attempt.json"
+          ]
+        }
+      }
+    },
+    {
+      "sub": "inspect",
+      "selector": {
+        "run": "run_unit-run-1795056603528-44eb3ca1/producer/1_01"
+      },
+      "answer": {
+        "ok": {
+          "inspectionStatus": "resolved",
+          "subject": {
+            "kind": "run",
+            "id": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+                "attempt": "01",
+                "path": "<ROOT>/.fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "run-record",
+              "source": "run-repository",
+              "level": "correlated",
+              "value": {
+                "status": "settled",
+                "phase": "settled"
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-22T12:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01"
+            },
+            "phase": "settled",
+            "resourceState": "ambiguous",
+            "delivery": "not-started",
+            "inspectionStatus": "resolved",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "stale",
+              "result": "complete",
+              "ownership": "complete",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "settled",
+                  "phase": "settled"
+                }
+              }
+            ]
+          },
+          "runResult": {
+            "contract": {
+              "id": "assignment-run-result",
+              "version": 3
+            },
+            "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+            "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+            "controlEpoch": 1,
+            "controlToken": "SCRUBBED-TOKEN",
+            "executorId": "claude",
+            "adapter": "herdr-spawn",
+            "confinement": "bwrap",
+            "role": "producer",
+            "executorRedirected": false,
+            "policy": {
+              "role": "producer",
+              "executorId": "claude",
+              "providerModel": "claude",
+              "rigor": "standard",
+              "tier": "advanced",
+              "model": "sonnet",
+              "visibility": "headless",
+              "repeatMode": null,
+              "constraints": {
+                "requiresSkills": []
+              },
+              "provenance": {
+                "executor": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "unit-prefer"
+                  }
+                },
+                "provider": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "registeredExecutor",
+                    "id": "claude"
+                  }
+                },
+                "model": {
+                  "value": "sonnet",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "modelPolicies.claude.advanced"
+                  }
+                },
+                "rigor": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "tier": {
+                  "value": "advanced",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "capabilities.\"code:*\".tier"
+                  }
+                },
+                "reasoningEffort": {
+                  "value": null,
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "invocation-default"
+                  }
+                },
+                "persona": {
+                  "value": null,
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "none"
+                  }
+                },
+                "visibility": {
+                  "value": "headless",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "repeatMode": {
+                  "value": null,
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "constraints": {
+                  "value": {
+                    "requiresSkills": []
+                  },
+                  "source": {
+                    "scope": "assignment",
+                    "id": "unit-run-1795056603528-44eb3ca1/producer/1"
+                  }
+                },
+                "governance": {
+                  "value": "allowed",
+                  "source": {
+                    "scope": "governance",
+                    "id": "claude"
+                  }
+                }
+              }
+            },
+            "settledAt": "2026-11-19T02:51:30.127Z",
+            "claimSha256": "1f6e2698e3729dd53534b1371c5757da7737809a7f2919777b8e40101b04d41f",
+            "settleReports": [
+              {
+                "path": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/outbox/report-1.md",
+                "sha256": "d1a59589a1dbdbca1d71d98613b00ddb1fb115a759e7c343f20e6397cef6db86"
+              }
+            ],
+            "reportDeclaration": {
+              "complete": true,
+              "incompleteReason": null
+            },
+            "classification": {
+              "execution": {
+                "status": "completed",
+                "exitCode": 0
+              },
+              "assessment": {
+                "verdict": "pass"
+              },
+              "confidence": {
+                "level": "verified",
+                "basis": [
+                  "valid-agent-result-claim",
+                  "captured-stdout",
+                  "workspace-git-diff"
+                ]
+              },
+              "failure": null,
+              "policy": {
+                "disposition": "allow",
+                "code": null
+              },
+              "delivery": {
+                "mode": "fresh"
+              },
+              "provenance": "native-v3",
+              "outcome": {
+                "category": "ok",
+                "reason": "SCRUBBED"
+              }
+            },
+            "runtime": {
+              "exitCode": 0,
+              "stdoutLog": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/stdout.log",
+              "stderrLog": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/stderr.log"
+            },
+            "agentClaim": {
+              "contract": {
+                "id": "agent-result-claim",
+                "version": 2
+              },
+              "status": "done",
+              "summary": "SCRUBBED",
+              "evidenceRefs": [
+                "CHANGELOG.md",
+                "docs/reading-map.md",
+                "core/skills/_shared/plan-contract.md"
+              ]
+            },
+            "runnerNote": {
+              "summary": "SCRUBBED"
+            },
+            "usage": {
+              "inputTokens": null,
+              "outputTokens": null,
+              "totalTokens": null,
+              "cacheReadTokens": null,
+              "cacheCreationTokens": null,
+              "reasoningTokens": null,
+              "source": "transcript",
+              "reason": "SCRUBBED"
+            },
+            "evidence": {
+              "gitBefore": "63ec9b7ca8371f02ea4f442bdd9a5288d71722c5",
+              "gitAfter": "63ec9b7ca8371f02ea4f442bdd9a5288d71722c5",
+              "gitBeforeSource": "pre-launch",
+              "changedFiles": [
+                ".agents/skills/_shared/plan-contract.md",
+                ".agents/skills/fgos-coding-planning/references/approach-and-shape.md",
+                ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                ".agents/skills/fgos-cook/references/reading-ak-plans.md",
+                "CHANGELOG.md",
+                "core/skills/_shared/plan-contract.md",
+                "core/skills/fgos-cook/references/reading-ak-plans.md",
+                "docs/reading-map.md",
+                "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+                "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                "plugins/fgOS/skills/_shared/plan-contract.md",
+                "plugins/fgOS/skills/fgos-coding-planning/references/approach-and-shape.md",
+                "plugins/fgOS/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                "plugins/fgOS/skills/fgos-cook/references/reading-ak-plans.md"
+              ],
+              "mutatedDirtyBeforeFiles": [],
+              "attribution": [
+                {
+                  "path": ".agents/skills/_shared/plan-contract.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": ".agents/skills/fgos-coding-planning/references/approach-and-shape.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": ".agents/skills/fgos-cook/references/reading-ak-plans.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "CHANGELOG.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "core/skills/_shared/plan-contract.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "core/skills/fgos-cook/references/reading-ak-plans.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "docs/reading-map.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "plugins/fgOS/skills/_shared/plan-contract.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "plugins/fgOS/skills/fgos-coding-planning/references/approach-and-shape.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "plugins/fgOS/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "plugins/fgOS/skills/fgos-cook/references/reading-ak-plans.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                }
+              ],
+              "artifacts": [
+                ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/outbox/report-1.md",
+                ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/outbox/result-1.json"
+              ],
+              "tests": [],
+              "findingRefs": [
+                "CHANGELOG.md",
+                "docs/reading-map.md",
+                "core/skills/_shared/plan-contract.md"
+              ]
+            }
+          },
+          "recoveryAuthority": {
+            "kind": "standalone-run",
+            "id": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+            "observeCommand": "fgos dispatch recover run_unit-run-1795056603528-44eb3ca1/producer/1_01"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "unit-run-1795056603528-44eb3ca1/producer/1"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "run_unit-run-1795056603528-44eb3ca1/producer/1_01"
+            ]
+          },
+          "attemptState": "closed",
+          "unitRunId": "unit-run-1795056603528-44eb3ca1",
+          "unitState": "completed"
+        }
+      }
+    },
+    {
+      "sub": "reconcile",
+      "action": "collect-result",
+      "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+      "answer": {
+        "ok": {
+          "outcome": "planned",
+          "actionKey": "reconcile_4caea48f05d6fe627dc125585ddf4125538113801d707717aff475bc39af0783",
+          "snapshot": {
+            "digest": "sha256:b50fcb9e3dd96f907dea7ff9bb8e3b1654cfd559995ccb8fb682e9694d4d1385",
+            "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+            "ownerAuthority": {
+              "kind": "standalone-run",
+              "id": "run_unit-run-1795056603528-44eb3ca1/producer/1_01"
+            },
+            "controlEpoch": 2,
+            "expiresAt": "2026-11-22T12:05:00.000Z"
+          },
+          "proposedAction": {
+            "kind": "collect-result",
+            "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+            "path": "<ROOT>/.fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/run.json"
+          },
+          "preconditions": [
+            "result-valid",
+            "owner-authority-standalone",
+            "not-superseded"
+          ]
+        }
+      }
+    },
+    {
+      "sub": "reconcile",
+      "action": "repair-projection",
+      "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+      "answer": {
+        "ok": {
+          "outcome": "blocked",
+          "reason": "run.json.status already reflects settlement; nothing to repair"
+        }
+      }
+    },
+    {
+      "sub": "show-run",
+      "runId": "run_absent",
+      "answer": {
+        "error": {
+          "name": "DispatchObserveError",
+          "code": "run-not-found",
+          "category": "precondition",
+          "message": "no run \"run_absent\" under <ROOT>"
+        }
+      }
+    },
+    {
+      "sub": "recover",
+      "runId": "run_absent",
+      "intent": "resume",
+      "answer": {
+        "error": {
+          "name": "RecoveryError",
+          "code": "run-not-found",
+          "category": "precondition",
+          "message": "no run \"run_absent\" under <ROOT>"
+        }
+      }
+    },
+    {
+      "sub": "recover",
+      "runId": "run_absent",
+      "intent": "reassign",
+      "answer": {
+        "error": {
+          "name": "RecoveryError",
+          "code": "run-not-found",
+          "category": "precondition",
+          "message": "no run \"run_absent\" under <ROOT>"
+        }
+      }
+    },
+    {
+      "sub": "inspect",
+      "selector": {
+        "run": "run_absent"
+      },
+      "answer": {
+        "ok": {
+          "inspectionStatus": "not-found",
+          "subject": {
+            "kind": "run",
+            "id": "run_absent",
+            "locations": []
+          },
+          "observations": [],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No matching Run was found in registered Assignment or ad-hoc Run repositories."
+          },
+          "links": {
+            "assignmentIds": [],
+            "coordinationIds": [],
+            "runIds": []
+          }
+        }
+      }
+    },
+    {
+      "sub": "reconcile",
+      "action": "collect-result",
+      "runId": "run_absent",
+      "answer": {
+        "ok": {
+          "outcome": "blocked",
+          "reason": "no matching Run was found for collect-result"
+        }
+      }
+    },
+    {
+      "sub": "reconcile",
+      "action": "repair-projection",
+      "runId": "run_absent",
+      "answer": {
+        "ok": {
+          "outcome": "blocked",
+          "reason": "no matching Run was found for repair-projection"
+        }
+      }
+    },
+    {
+      "sub": "inspect",
+      "selector": {
+        "assignment": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001"
+      },
+      "answer": {
+        "ok": {
+          "inspectionStatus": "resolved",
+          "subject": {
+            "kind": "assignment",
+            "id": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+                "attempt": "01",
+                "path": "<ROOT>/.fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "assignment-history",
+              "source": "admission-generation-ledger",
+              "level": "correlated",
+              "value": {
+                "delivery": "started",
+                "currentRunIds": [
+                  "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01"
+                ],
+                "runIds": [
+                  "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01"
+                ],
+                "missingMaterializations": [],
+                "malformedMaterializations": [],
+                "unadmittedMaterializations": [],
+                "duplicateCurrentMaterializations": []
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-22T12:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01"
+            },
+            "phase": "settled",
+            "resourceState": "unobserved",
+            "delivery": "not-started",
+            "inspectionStatus": "resolved",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "missing",
+              "result": "complete",
+              "ownership": "complete",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "settled",
+                  "phase": "settled"
+                }
+              }
+            ]
+          },
+          "runResult": {
+            "contract": {
+              "id": "assignment-run-result",
+              "version": 3
+            },
+            "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+            "assignmentId": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+            "workId": null,
+            "controlEpoch": 1,
+            "controlToken": "SCRUBBED-TOKEN",
+            "executorId": "claude",
+            "adapter": "cli-spawn",
+            "confinement": "bwrap",
+            "role": "reviewer",
+            "executorRedirected": false,
+            "policy": {
+              "role": "reviewer",
+              "persona": "code-reviewer",
+              "executorId": "claude",
+              "providerModel": "claude",
+              "rigor": "standard",
+              "tier": "standard",
+              "model": "fable",
+              "visibility": "headless",
+              "repeatMode": null,
+              "constraints": {
+                "requiresSkills": []
+              },
+              "provenance": {
+                "executor": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "cliOverride"
+                  }
+                },
+                "provider": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "registeredExecutor",
+                    "id": "claude"
+                  }
+                },
+                "model": {
+                  "value": "fable",
+                  "source": {
+                    "scope": "cliOverride"
+                  }
+                },
+                "rigor": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "tier": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "defaults.tier"
+                  }
+                },
+                "reasoningEffort": {
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "persona": {
+                  "value": "code-reviewer",
+                  "source": {
+                    "scope": "default",
+                    "id": "reviewer"
+                  }
+                },
+                "visibility": {
+                  "value": "headless",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "repeatMode": {
+                  "value": null,
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "constraints": {
+                  "value": {
+                    "requiresSkills": []
+                  },
+                  "source": {
+                    "scope": "assignment",
+                    "id": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001"
+                  }
+                },
+                "governance": {
+                  "value": "allowed",
+                  "source": {
+                    "scope": "governance",
+                    "id": "claude"
+                  }
+                }
+              }
+            },
+            "promptEnvelope": {
+              "persona": {
+                "ref": "code-reviewer",
+                "delivery": "section",
+                "applied": true,
+                "source": {
+                  "scope": "default",
+                  "id": "reviewer"
+                }
+              }
+            },
+            "settledAt": "2026-11-18T12:05:16.188Z",
+            "durationMs": null,
+            "claimSha256": "c6dee099ab510a442e2fec838f889afe92007372a4642d4b4bf9f1f1776cbb92",
+            "settleReports": [
+              {
+                "path": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/worker-output/outbox/report-1.md",
+                "sha256": "51d7dd3f8263fc4da7c698d836c104131a75b2bfe42813d3bf690e0f1db4c7db"
+              }
+            ],
+            "reportDeclaration": {
+              "complete": true,
+              "incompleteReason": null
+            },
+            "classification": {
+              "execution": {
+                "status": "completed",
+                "exitCode": 0
+              },
+              "assessment": {
+                "verdict": "pass"
+              },
+              "confidence": {
+                "level": "reported",
+                "basis": [
+                  "valid-agent-result-claim",
+                  "captured-stdout"
+                ]
+              },
+              "failure": null,
+              "policy": {
+                "disposition": "allow",
+                "code": null
+              },
+              "delivery": {
+                "mode": "fresh"
+              },
+              "provenance": "native-v3",
+              "outcome": {
+                "category": "ok",
+                "reason": "SCRUBBED"
+              }
+            },
+            "runtime": {
+              "exitCode": 0,
+              "stdoutLog": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/stdout.log",
+              "stderrLog": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/stderr.log"
+            },
+            "agentClaim": {
+              "contract": {
+                "id": "agent-result-claim",
+                "version": 2
+              },
+              "status": "done",
+              "summary": "SCRUBBED",
+              "assessment": {
+                "verdict": "not-applicable"
+              }
+            },
+            "runnerNote": {
+              "summary": "SCRUBBED"
+            },
+            "usage": {
+              "inputTokens": null,
+              "outputTokens": null,
+              "totalTokens": null,
+              "cacheReadTokens": null,
+              "cacheCreationTokens": null,
+              "source": "transcript"
+            },
+            "evidence": {
+              "gitBefore": "1ba5ecbd3ce59ad64bebdd34d380bd1aee0f8297",
+              "gitAfter": "1ba5ecbd3ce59ad64bebdd34d380bd1aee0f8297",
+              "gitBeforeSource": "pre-launch",
+              "changedFiles": [],
+              "mutatedDirtyBeforeFiles": [],
+              "attribution": [
+                {
+                  "path": ".claude/settings.json",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": ".claude/skills/instruction-audit/references/lane-prompts.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": ".claude/skills/instruction-audit/references/report-template.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": ".claude/skills/instruction-audit/scripts/instruction-audit.mjs",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "docs/backlog.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "node_trace.1.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-00-baseline-and-test-investigation.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-02-t1-holder-lock-identity-convention.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-04-t3-agent-protocol-observe-event-store.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-05-t4-run-supervisor-launch-gate.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-06-t5-execution-core-dispatch-seat-run-result.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/handoffs/harden-phase-07-closing-and-handoff-20261118-1341.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/reports/audit-261117-1545-supervisor-watcher-audit.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/reports/debugger-261115-1400-ci-only-test-failures.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "plans/reports/review-261118-1850-harden-plan-review.md",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "sc.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "sh1.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "sw.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                },
+                {
+                  "path": "w1.log",
+                  "firstObserved": "pre-launch",
+                  "level": "excluded",
+                  "basis": [
+                    "pre-launch-git-status"
+                  ],
+                  "coverageMatched": false
+                }
+              ],
+              "artifacts": [
+                ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/worker-output/outbox/report-1.md",
+                ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/worker-output/outbox/result-1.json"
+              ],
+              "tests": []
+            }
+          },
+          "recoveryAuthority": {
+            "kind": "standalone-run",
+            "id": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+            "observeCommand": "fgos dispatch recover run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01"
+            ]
+          },
+          "attemptState": "closed"
+        }
+      }
+    },
+    {
+      "sub": "inspect",
+      "selector": {
+        "assignment": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001"
+      },
+      "answer": {
+        "ok": {
+          "inspectionStatus": "resolved",
+          "subject": {
+            "kind": "assignment",
+            "id": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001",
+                "attempt": "01",
+                "path": "<ROOT>/.fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "assignment-history",
+              "source": "admission-generation-ledger",
+              "level": "correlated",
+              "value": {
+                "delivery": "started",
+                "currentRunIds": [
+                  "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01"
+                ],
+                "runIds": [
+                  "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01"
+                ],
+                "missingMaterializations": [],
+                "malformedMaterializations": [],
+                "unadmittedMaterializations": [],
+                "duplicateCurrentMaterializations": []
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-22T12:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01"
+            },
+            "phase": "settled",
+            "resourceState": "unobserved",
+            "delivery": "not-started",
+            "inspectionStatus": "resolved",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "missing",
+              "result": "complete",
+              "ownership": "complete",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "settled",
+                  "phase": "settled"
+                }
+              }
+            ]
+          },
+          "runResult": {
+            "contract": {
+              "id": "assignment-run-result",
+              "version": 3
+            },
+            "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+            "assignmentId": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001",
+            "workId": null,
+            "executorId": "gemini",
+            "adapter": "cli-spawn",
+            "confinement": null,
+            "role": "reviewer",
+            "policy": {
+              "role": "reviewer",
+              "persona": "code-reviewer",
+              "executorId": "gemini",
+              "providerModel": "gemini",
+              "rigor": "standard",
+              "tier": "standard",
+              "model": "gemini-3.8-flash-low",
+              "visibility": "headless",
+              "repeatMode": null,
+              "constraints": {
+                "requiresSkills": []
+              },
+              "provenance": {
+                "executor": {
+                  "value": "gemini",
+                  "source": {
+                    "scope": "cliOverride"
+                  }
+                },
+                "provider": {
+                  "value": "gemini",
+                  "source": {
+                    "scope": "registeredExecutor",
+                    "id": "gemini"
+                  }
+                },
+                "model": {
+                  "value": "gemini-3.8-flash-low",
+                  "source": {
+                    "scope": "cliOverride"
+                  }
+                },
+                "rigor": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "tier": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "defaults.tier"
+                  }
+                },
+                "reasoningEffort": {
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "persona": {
+                  "value": "code-reviewer",
+                  "source": {
+                    "scope": "default",
+                    "id": "reviewer"
+                  }
+                },
+                "visibility": {
+                  "value": "headless",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "repeatMode": {
+                  "value": null,
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "constraints": {
+                  "value": {
+                    "requiresSkills": []
+                  },
+                  "source": {
+                    "scope": "assignment",
+                    "id": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001"
+                  }
+                },
+                "governance": {
+                  "value": "allowed",
+                  "source": {
+                    "scope": "governance",
+                    "id": "gemini"
+                  }
+                }
+              }
+            },
+            "promptEnvelope": {
+              "persona": {
+                "ref": "code-reviewer",
+                "delivery": "section",
+                "applied": true,
+                "source": {
+                  "scope": "default",
+                  "id": "reviewer"
+                }
+              }
+            },
+            "settledAt": "2026-11-11T22:31:26.332Z",
+            "durationMs": null,
+            "settleReports": [],
+            "classification": {
+              "execution": {
+                "status": "failed",
+                "exitCode": null
+              },
+              "assessment": {
+                "verdict": "not-applicable"
+              },
+              "confidence": {
+                "level": "failed",
+                "basis": [
+                  "captured-stdout",
+                  "failed-exit"
+                ]
+              },
+              "failure": {
+                "family": "provider",
+                "code": "provider-capacity-refused",
+                "message": "SCRUBBED"
+              },
+              "policy": {
+                "disposition": "needs-input",
+                "code": "provider-capacity-refused"
+              },
+              "delivery": {
+                "mode": "fresh"
+              },
+              "provenance": "native-v3",
+              "outcome": {
+                "category": "infra",
+                "reason": "SCRUBBED"
+              }
+            },
+            "runtime": {
+              "exitCode": null,
+              "stdoutLog": ".fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01/stdout.log",
+              "stderrLog": ".fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01/stderr.log"
+            },
+            "runnerNote": {
+              "summary": "SCRUBBED"
+            },
+            "usage": null,
+            "evidence": {
+              "operationMutability": "read-only",
+              "gitBefore": null,
+              "gitAfter": null,
+              "gitBeforeSource": "pre-launch",
+              "dirtyBefore": [],
+              "dirtyAfter": [],
+              "mutatedDirtyBeforeFiles": [],
+              "changedFiles": [],
+              "changedFileReasons": {},
+              "attribution": [],
+              "artifacts": [],
+              "tests": []
+            }
+          },
+          "recoveryAuthority": {
+            "kind": "standalone-run",
+            "id": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+            "observeCommand": "fgos dispatch recover run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01"
+            ]
+          },
+          "attemptState": "legacy-run"
+        }
+      }
+    },
+    {
+      "sub": "inspect",
+      "selector": {
+        "assignment": "unit-run-1794987012087-5f3337a8/producer/1"
+      },
+      "answer": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "assignment",
+            "id": "unit-run-1794987012087-5f3337a8/producer/1",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "unit-run-1794987012087-5f3337a8/producer/1",
+                "attempt": "01",
+                "path": "<ROOT>/.fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "assignment-history",
+              "source": "admission-generation-ledger",
+              "level": "correlated",
+              "value": {
+                "delivery": "started",
+                "currentRunIds": [
+                  "run_unit-run-1794987012087-5f3337a8/producer/1_01"
+                ],
+                "runIds": [
+                  "run_unit-run-1794987012087-5f3337a8/producer/1_01"
+                ],
+                "missingMaterializations": [],
+                "malformedMaterializations": [],
+                "unadmittedMaterializations": [],
+                "duplicateCurrentMaterializations": []
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-22T12:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01"
+            },
+            "phase": "bound",
+            "resourceState": "ambiguous",
+            "delivery": "not-started",
+            "inspectionStatus": "partial",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "stale",
+              "result": "missing",
+              "ownership": "complete",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "running",
+                  "phase": "bound"
+                }
+              }
+            ]
+          },
+          "runResult": null,
+          "recoveryAuthority": {
+            "kind": "standalone-run",
+            "id": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+            "observeCommand": "fgos dispatch recover run_unit-run-1794987012087-5f3337a8/producer/1_01"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "unit-run-1794987012087-5f3337a8/producer/1"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "run_unit-run-1794987012087-5f3337a8/producer/1_01"
+            ]
+          },
+          "attemptState": "needs-adopt",
+          "unitRunId": "unit-run-1794987012087-5f3337a8",
+          "unitState": "failed"
+        }
+      }
+    },
+    {
+      "sub": "inspect",
+      "selector": {
+        "assignment": "unit-run-1795056603528-44eb3ca1/producer/1"
+      },
+      "answer": {
+        "ok": {
+          "inspectionStatus": "resolved",
+          "subject": {
+            "kind": "assignment",
+            "id": "unit-run-1795056603528-44eb3ca1/producer/1",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+                "attempt": "01",
+                "path": "<ROOT>/.fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "assignment-history",
+              "source": "admission-generation-ledger",
+              "level": "correlated",
+              "value": {
+                "delivery": "started",
+                "currentRunIds": [
+                  "run_unit-run-1795056603528-44eb3ca1/producer/1_01"
+                ],
+                "runIds": [
+                  "run_unit-run-1795056603528-44eb3ca1/producer/1_01"
+                ],
+                "missingMaterializations": [],
+                "malformedMaterializations": [],
+                "unadmittedMaterializations": [],
+                "duplicateCurrentMaterializations": []
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-22T12:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01"
+            },
+            "phase": "settled",
+            "resourceState": "ambiguous",
+            "delivery": "not-started",
+            "inspectionStatus": "resolved",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "stale",
+              "result": "complete",
+              "ownership": "complete",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "settled",
+                  "phase": "settled"
+                }
+              }
+            ]
+          },
+          "runResult": {
+            "contract": {
+              "id": "assignment-run-result",
+              "version": 3
+            },
+            "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+            "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+            "controlEpoch": 1,
+            "controlToken": "SCRUBBED-TOKEN",
+            "executorId": "claude",
+            "adapter": "herdr-spawn",
+            "confinement": "bwrap",
+            "role": "producer",
+            "executorRedirected": false,
+            "policy": {
+              "role": "producer",
+              "executorId": "claude",
+              "providerModel": "claude",
+              "rigor": "standard",
+              "tier": "advanced",
+              "model": "sonnet",
+              "visibility": "headless",
+              "repeatMode": null,
+              "constraints": {
+                "requiresSkills": []
+              },
+              "provenance": {
+                "executor": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "unit-prefer"
+                  }
+                },
+                "provider": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "registeredExecutor",
+                    "id": "claude"
+                  }
+                },
+                "model": {
+                  "value": "sonnet",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "modelPolicies.claude.advanced"
+                  }
+                },
+                "rigor": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "tier": {
+                  "value": "advanced",
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "capabilities.\"code:*\".tier"
+                  }
+                },
+                "reasoningEffort": {
+                  "value": null,
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "invocation-default"
+                  }
+                },
+                "persona": {
+                  "value": null,
+                  "source": {
+                    "scope": "seat-binding",
+                    "id": "none"
+                  }
+                },
+                "visibility": {
+                  "value": "headless",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "repeatMode": {
+                  "value": null,
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "constraints": {
+                  "value": {
+                    "requiresSkills": []
+                  },
+                  "source": {
+                    "scope": "assignment",
+                    "id": "unit-run-1795056603528-44eb3ca1/producer/1"
+                  }
+                },
+                "governance": {
+                  "value": "allowed",
+                  "source": {
+                    "scope": "governance",
+                    "id": "claude"
+                  }
+                }
+              }
+            },
+            "settledAt": "2026-11-19T02:51:30.127Z",
+            "claimSha256": "1f6e2698e3729dd53534b1371c5757da7737809a7f2919777b8e40101b04d41f",
+            "settleReports": [
+              {
+                "path": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/outbox/report-1.md",
+                "sha256": "d1a59589a1dbdbca1d71d98613b00ddb1fb115a759e7c343f20e6397cef6db86"
+              }
+            ],
+            "reportDeclaration": {
+              "complete": true,
+              "incompleteReason": null
+            },
+            "classification": {
+              "execution": {
+                "status": "completed",
+                "exitCode": 0
+              },
+              "assessment": {
+                "verdict": "pass"
+              },
+              "confidence": {
+                "level": "verified",
+                "basis": [
+                  "valid-agent-result-claim",
+                  "captured-stdout",
+                  "workspace-git-diff"
+                ]
+              },
+              "failure": null,
+              "policy": {
+                "disposition": "allow",
+                "code": null
+              },
+              "delivery": {
+                "mode": "fresh"
+              },
+              "provenance": "native-v3",
+              "outcome": {
+                "category": "ok",
+                "reason": "SCRUBBED"
+              }
+            },
+            "runtime": {
+              "exitCode": 0,
+              "stdoutLog": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/stdout.log",
+              "stderrLog": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/stderr.log"
+            },
+            "agentClaim": {
+              "contract": {
+                "id": "agent-result-claim",
+                "version": 2
+              },
+              "status": "done",
+              "summary": "SCRUBBED",
+              "evidenceRefs": [
+                "CHANGELOG.md",
+                "docs/reading-map.md",
+                "core/skills/_shared/plan-contract.md"
+              ]
+            },
+            "runnerNote": {
+              "summary": "SCRUBBED"
+            },
+            "usage": {
+              "inputTokens": null,
+              "outputTokens": null,
+              "totalTokens": null,
+              "cacheReadTokens": null,
+              "cacheCreationTokens": null,
+              "reasoningTokens": null,
+              "source": "transcript",
+              "reason": "SCRUBBED"
+            },
+            "evidence": {
+              "gitBefore": "63ec9b7ca8371f02ea4f442bdd9a5288d71722c5",
+              "gitAfter": "63ec9b7ca8371f02ea4f442bdd9a5288d71722c5",
+              "gitBeforeSource": "pre-launch",
+              "changedFiles": [
+                ".agents/skills/_shared/plan-contract.md",
+                ".agents/skills/fgos-coding-planning/references/approach-and-shape.md",
+                ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                ".agents/skills/fgos-cook/references/reading-ak-plans.md",
+                "CHANGELOG.md",
+                "core/skills/_shared/plan-contract.md",
+                "core/skills/fgos-cook/references/reading-ak-plans.md",
+                "docs/reading-map.md",
+                "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+                "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                "plugins/fgOS/skills/_shared/plan-contract.md",
+                "plugins/fgOS/skills/fgos-coding-planning/references/approach-and-shape.md",
+                "plugins/fgOS/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                "plugins/fgOS/skills/fgos-cook/references/reading-ak-plans.md"
+              ],
+              "mutatedDirtyBeforeFiles": [],
+              "attribution": [
+                {
+                  "path": ".agents/skills/_shared/plan-contract.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": ".agents/skills/fgos-coding-planning/references/approach-and-shape.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": ".agents/skills/fgos-cook/references/reading-ak-plans.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "CHANGELOG.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "core/skills/_shared/plan-contract.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "core/skills/fgos-cook/references/reading-ak-plans.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "docs/reading-map.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "plugins/fgOS/skills/_shared/plan-contract.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "plugins/fgOS/skills/fgos-coding-planning/references/approach-and-shape.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "plugins/fgOS/skills/fgos-coding-planning/references/split-and-child-specs.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                },
+                {
+                  "path": "plugins/fgOS/skills/fgos-cook/references/reading-ak-plans.md",
+                  "firstObserved": "post-run",
+                  "level": "correlated",
+                  "basis": [
+                    "pre-post-git-snapshot"
+                  ],
+                  "coverageMatched": true
+                }
+              ],
+              "artifacts": [
+                ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/outbox/report-1.md",
+                ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/outbox/result-1.json"
+              ],
+              "tests": [],
+              "findingRefs": [
+                "CHANGELOG.md",
+                "docs/reading-map.md",
+                "core/skills/_shared/plan-contract.md"
+              ]
+            }
+          },
+          "recoveryAuthority": {
+            "kind": "standalone-run",
+            "id": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+            "observeCommand": "fgos dispatch recover run_unit-run-1795056603528-44eb3ca1/producer/1_01"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "unit-run-1795056603528-44eb3ca1/producer/1"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "run_unit-run-1795056603528-44eb3ca1/producer/1_01"
+            ]
+          },
+          "attemptState": "closed",
+          "unitRunId": "unit-run-1795056603528-44eb3ca1",
+          "unitState": "completed"
+        }
+      }
+    },
+    {
+      "sub": "reconcile",
+      "action": "clear-cwd-lock",
+      "answer": {
+        "ok": {
+          "outcome": "blocked",
+          "reason": "no cwd lock is held"
+        }
+      }
+    },
+    {
+      "sub": "attention",
+      "since": "2026-11-01",
+      "answer": {
+        "ok": {
+          "contract": {
+            "id": "attention-view",
+            "version": 2
+          },
+          "since": "2026-11-01",
+          "observedAt": "2026-11-22T12:00:00.000Z",
+          "rows": [
+            {
+              "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+              "subject": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+              "assignmentId": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001",
+              "worktree": "/SCRUBBED-PATH",
+              "kind": "blocked",
+              "reason": "blocked (provider-capacity-refused)",
+              "nextCommand": "fgos dispatch inspect --run run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+              "line": "blocked run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01 /SCRUBBED-PATH blocked (provider-capacity-refused) -> fgos dispatch inspect --run run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01"
+            }
+          ],
+          "unmeasured": [],
+          "idle": {
+            "state": "not-readable",
+            "reason": "the supervisor keeps its idle clock in memory; no readable record, so no idle rows"
+          },
+          "lines": [
+            "blocked run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01 /SCRUBBED-PATH blocked (provider-capacity-refused) -> fgos dispatch inspect --run run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01"
+          ]
+        }
+      }
+    }
+  ]
+}
