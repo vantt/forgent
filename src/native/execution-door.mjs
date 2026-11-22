@@ -503,10 +503,10 @@ export const exitCodeForOutcome = (outcome) => addon('exitCodeForOutcome', { out
 export const infrastructure = (unitResult) => addon('infrastructure', { unitResult: unitResult ?? null });
 /** One `{ kind, seat, round, passed }` per evaluator result that reached a verdict. */
 export const evaluationsOf = (results = []) => addon('evaluationsOf', { results });
-/** The seat a recorded result belongs to (`seat`, or the legacy `role`). */
-export const seatKeyOf = (result) => orUndefined(addon('seatKeyOf', { result: result ?? null }));
-/** The provider family an old result recorded, or null. */
-export const legacyFamilyOf = (result) => addon('legacyFamilyOf', { result: result ?? null });
+/** The seat a recorded result belongs to (`seat`, or the legacy `role`); only those two fields cross to the addon. */
+export const seatKeyOf = (result) => orUndefined(addon('seatKeyOf', { result: { seat: result?.seat, role: result?.role } }));
+/** The provider family an old result recorded, or null; only `runResult.policy.providerModel` crosses to the addon. */
+export const legacyFamilyOf = (result) => addon('legacyFamilyOf', { result: { runResult: { policy: { providerModel: result?.runResult?.policy?.providerModel } } } });
 /** The declared seats `[{ seat, role, persona?, tier? }]` checked; `tiers` checks each seat's tier. */
 export const checkDeclaredSeats = (raw, label, { tiers } = {}) => addon('checkDeclaredSeats', { raw: raw ?? null, label, ...(tiers ? { tiers: [...tiers] } : {}) });
 /** Refuses a seat list that carries a tier. */
@@ -516,7 +516,7 @@ export const assertNoUnitTier = (raw, source) => addon('assertNoUnitTier', { raw
 /** The verify command a unit runs (its own, else its capability's), or null. */
 export const verifyCommandOf = (unit, cfg) => addon('verifyCommandOf', { unit: unit ?? null, cfg: cfg ?? null });
 /** The verify seat's result for one answer of the verify command. */
-export const verifySeatResult = (answer, round = 1) => addon('verifySeatResult', { answer: answer ?? null, round });
+export const verifySeatResult = (answer, round) => addon('verifySeatResult', { answer: answer ?? null, ...(round === undefined ? {} : { round }) });
 
 /** The retired `runner.patterns` keys a dotted path or a pattern map carries: `[{ key, replacement, instruction }]`. */
 export const detectRetiredPatternKeys = (input) => addon('detectRetiredPatternKeys', { input: input ?? null });
@@ -531,7 +531,7 @@ export function assertRunTimeoutMs(value, label = 'run timeout') {
   return value;
 }
 /** `90m`, `5400s`, `2h`, `600000ms` as milliseconds, refused (`RunnerConfigError`) otherwise. */
-export const parseRunTimeout = (text, label = '--timeout') => addon('parseRunTimeout', { text: text ?? null, label });
+export const parseRunTimeout = (text, label = '--timeout') => addon('parseRunTimeout', { ...(text === undefined ? {} : { text }), label });
 /** The requested reasoning effort, refused (`RunnerConfigError`) outside the vocabulary or the executor's own list. */
 export const assertReasoningEffort = (value, { supported, executorId } = {}) => addon('assertReasoningEffort', { value: value ?? null, ...(Array.isArray(supported) ? { supported } : {}), ...(typeof executorId === 'string' ? { executorId } : {}) });
 /** The rules of `runner.loops` that read beyond its own fields; a refusal is a `RunnerConfigError` with its paths. */
@@ -605,7 +605,8 @@ export const anonymousInputName = (index) => addon('anonymousInputName', { index
 export const reportDigest = (unitRunId, seat, mainRoot) => addon('reportDigest', { unitRunId, seat, mainRoot });
 /**
  * The path one hand-off input names: a `unit-run:<id>/<seat>` input the report it hands over, only while it keeps
- * the bytes settlement recorded unless `accept` (`'any'` or the digests a person approved) covers the revision; a
+ * the bytes settlement recorded unless `accept` covers the revision (`'any'`, or an array of the digests a person
+ * approved; any other value accepts nothing); a
  * `gate-answer:<case>/<step>` input the owner's answer file; any other input itself. One that cannot be handed over
  * throws `RunnerConfigError` with its `reason`.
  */

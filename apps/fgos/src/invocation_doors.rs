@@ -497,10 +497,7 @@ fn verb_root(verb: &str) -> VerbRoot {
 
 /// `FGOS_DISPATCH_DEPTH` as the Node CLI reads it: a non-negative finite number, else 0.
 fn dispatch_depth(raw: Option<&str>) -> u64 {
-    raw.filter(|raw| !raw.is_empty())
-        .and_then(|raw| raw.trim().parse::<f64>().ok())
-        .filter(|n| n.is_finite() && *n >= 0.0)
-        .map_or(0, |n| n as u64)
+    fgos_execution::dispatch_env::dispatch_depth_of(raw) as u64
 }
 
 /// The project a native operation that reads a project acts on. A named `--dir` is the project (the home

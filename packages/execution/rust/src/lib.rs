@@ -8,8 +8,9 @@
 //! What it decides: what an executor is, which family, mechanism, login store, effort levels and posture it has,
 //! whether governance or a missing program rules it out. What it never decides: which executor, model, tier or
 //! account a seat takes (Seat Binding ranks, `fgos-seat-binding`), nor how a Unit is launched, leased or settled
-//! (Dispatch). The crate is pure: no file, clock, environment or process. The machine facts a derivation needs
-//! come through the one trait the host implements, [`ports::Machine`].
+//! (Dispatch). The crate holds pure rules plus read-only file and environment reads; no writes, no process control,
+//! no engine dependency. The machine facts a derivation needs come through the one trait the host implements,
+//! [`ports::Machine`].
 
 pub mod account_pin;
 pub mod accounts;

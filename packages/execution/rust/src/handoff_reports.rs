@@ -46,6 +46,22 @@ pub fn accept_of(value: Option<&Value>) -> Accept {
     }
 }
 
+/// `path.resolve(base, relative)`: `relative` against `base` (an absolute `relative` is itself), with `.` and `..`
+/// folded away lexically, never through the disk.
+fn resolved(base: &Path, relative: &str) -> PathBuf {
+    let mut out = PathBuf::new();
+    for part in base.join(relative).components() {
+        match part {
+            std::path::Component::CurDir => {}
+            std::path::Component::ParentDir => {
+                out.pop();
+            }
+            other => out.push(other),
+        }
+    }
+    out
+}
+
 /// `reportRefOf(record, { mainRoot, accept })`: the absolute path of the account one seat result left, its settled
 /// report only while it still has the bytes settlement recorded (or the caller accepts the revision).
 pub fn report_ref_of(
@@ -55,12 +71,12 @@ pub fn report_ref_of(
 ) -> Result<PathBuf, HandoffRefError> {
     match report_ref_of_record(record)? {
         ReportRef::Settled { path, sha256 } => {
-            let file = main_root.join(path);
+            let file = resolved(main_root, &path);
             let actual = sha256_of_file(&file).ok();
             settled_report_stands(record, sha256.as_deref(), actual.as_deref(), accept)?;
             Ok(file)
         }
-        ReportRef::Artifact(artifact) => Ok(main_root.join(artifact)),
+        ReportRef::Artifact(artifact) => Ok(resolved(main_root, &artifact)),
     }
 }
 
@@ -149,7 +165,7 @@ pub fn report_digest_of_seat(
 }
 
 /// The path one input names: a `unit-run:` input the report it hands over (under `accept`), a `gate-answer:` input
-/// the owner's answer file, any other input itself.
+/// the owner's answer file (refused `no-such-answer` when none was recorded), any other input itself.
 pub fn resolve_ref(
     input: &str,
     main_root: &Path,
@@ -157,7 +173,16 @@ pub fn resolve_ref(
 ) -> Result<PathBuf, HandoffRefError> {
     match classify_input(input) {
         InputRef::UnitRun { .. } => unit_run_ref(input, main_root, None, accept),
-        InputRef::GateAnswer { .. } => gate_answer_path(input, &fgos_dir(main_root)),
+        // The answer must have been recorded: a path to no file is no answer.
+        InputRef::GateAnswer { .. } => {
+            gate_answer_path(input, &fgos_dir(main_root)).and_then(|file| {
+                if file.exists() {
+                    Ok(file)
+                } else {
+                    Err(HandoffRefError::new(input, "no-such-answer"))
+                }
+            })
+        }
         _ => Ok(PathBuf::from(input)),
     }
 }

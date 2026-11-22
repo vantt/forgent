@@ -19,8 +19,9 @@ use napi_derive::napi;
 use serde_json::{json, Map, Value};
 use std::path::PathBuf;
 
-/// The contract version `versions().execution` answers.
-pub const CONTRACT_VERSION: u32 = 1;
+/// The contract version `versions().execution` answers: 1 is the first with the Execution Core helpers, 2 the first
+/// with the outcome, seat, run result, hand-off and Work reads.
+pub const CONTRACT_VERSION: u32 = 2;
 
 fn refused(error: RunUnitError) -> Error {
     Error::from_reason(error.to_json().to_string())
@@ -668,10 +669,16 @@ pub fn verify_command_of(request: Value) -> Result<Value> {
 #[napi(namespace = "execution", js_name = "verifySeatResult")]
 pub fn verify_seat_result(request: Value) -> Result<Value> {
     check()?;
-    Ok(fgos_execution::loops::verify_seat_result(
-        present(&request, "answer"),
-        request.get("round").and_then(Value::as_u64).unwrap_or(1),
-    ))
+    // A round the caller did not give stays absent from the result, as Node left it undefined.
+    let round = request.get("round").and_then(Value::as_u64);
+    let mut result =
+        fgos_execution::loops::verify_seat_result(present(&request, "answer"), round.unwrap_or(0));
+    if round.is_none() {
+        if let Some(map) = result.as_object_mut() {
+            map.remove("round");
+        }
+    }
+    Ok(result)
 }
 
 // ---- the runner config rules ------------------------------------------------------------------------------
@@ -715,11 +722,7 @@ pub fn parse_run_timeout(request: Value) -> Result<f64> {
     check()?;
     let label = text(&request, "label")?;
     // A value that is not text is refused with the sentence that names it, as Node printed it.
-    let given = match request.get("text") {
-        Some(Value::String(s)) => s.clone(),
-        _ => String::new(),
-    };
-    fgos_execution::bind::parse_run_timeout(&given, label)
+    fgos_execution::bind::parse_run_timeout_value(request.get("text"), label)
         .map(|ms| ms as f64)
         .map_err(|message| refused(RunUnitError::config(message, None, None)))
 }
