@@ -1,0 +1,201 @@
+diff --git a/apps/fgos/src/cli_projector.rs b/apps/fgos/src/cli_projector.rs
+index f49f785f3..b2efb505a 100644
+--- a/apps/fgos/src/cli_projector.rs
++++ b/apps/fgos/src/cli_projector.rs
+@@ -524,7 +524,7 @@ fn project_config_request(
+         "explain" => (&[], &[], 1),
+         "set" => (&["reason"], &["global"], 2),
+         "unset" => (&["reason"], &["global", "acknowledge-comment-loss"], 1),
+-        "patch" => (&["reason"], &["global"], 1),
++        "patch" => (&["reason"], &["global", "project-only"], 1),
+         "migrate" => (
+             &[],
+             &[
+@@ -583,6 +583,7 @@ fn project_config_request(
+             file: next().into(),
+             reason,
+             global,
++            project_only: has("project-only")?,
+         },
+         "refresh-docs" => Verb::RefreshDocs { global },
+         _ => {
+@@ -1271,7 +1272,19 @@ mod tests {
+             Verb::Patch {
+                 file: "p.yaml".into(),
+                 reason: "r".into(),
+-                global: false
++                global: false,
++                project_only: false,
++            }
++        );
++        assert_eq!(
++            config(&["config", "patch", "p.yaml", "--project-only", "--reason", "r"])
++                .unwrap()
++                .verb,
++            Verb::Patch {
++                file: "p.yaml".into(),
++                reason: "r".into(),
++                global: false,
++                project_only: true,
+             }
+         );
+         assert_eq!(
+diff --git a/docs/platform/config/spec.md b/docs/platform/config/spec.md
+index 62a610ce1..7fa930445 100644
+--- a/docs/platform/config/spec.md
++++ b/docs/platform/config/spec.md
+@@ -288,7 +288,7 @@ Holder-lock no longer reads config. Commit `a620881e7` (2026-10-22, "move the No
+ | `explain <path>` | the schema node: description, type, enum or bounds, standard value, scope, owner, and where the current value comes from |
+ | `check` | validate both files; no write |
+ | `set <path> <value> --reason <text>` / `unset <path> --reason <text>` | one transaction (section 6); `<path>` uses YAML Document's path text form (keys joined by `.`, a key containing `.`, `[`, `]` or a quote written bracket-quoted as `["a.b"]`), so no key is ever addressed by accident |
+-| `patch <file> --reason <text>` | several edits in one transaction on one source |
++| `patch <file> [--project-only] --reason <text>` | several edits in one transaction on one source; with `--project-only`, refuses before any write when any edit resolves to a file other than the project config file, or when `--global` is passed |
+ | `migrate [--global]` | JSON to YAML (section 13) |
+ | `refresh-docs` | rewrite `@fgos:doc` lines whose rendered text differs from the schema and standard (after an `$id` revision or standard change) |
+ 
+@@ -343,6 +343,7 @@ Owner decision 2026-10-22: native door. As built:
+ | Value of the wrong type | schema error naming the schema path and keyword, never the value; never repaired |
+ | Key outside its scope | refused by name, naming the file it belongs in |
+ | Concurrent write | `config-write-conflict`; the loser writes nothing |
++| `fgos config patch --project-only` when any edit resolves to a file other than the project config file, or with `--global` | `patch-project-only`; file left byte-identical |
+ | Change without a reason where one is required | `config-comment-reason-required`; the message tells the person to add `--reason "<why>"` |
+ | `fgos config set` or `patch` of a key no section schema describes | `config-key-unknown` for each such key, listing the nearest keys (`did-you-mean=`), together with the reason refusal when the reason is also unusable; `unset` of such a key is allowed, and migration and repair keep unknown keys of an older file |
+ | Addon missing on the channel | the door's named error; no JavaScript fallback |
+diff --git a/packages/config/contracts/fixtures/scope.v1.json b/packages/config/contracts/fixtures/scope.v1.json
+index e9450f33e..d1dcd0b65 100644
+--- a/packages/config/contracts/fixtures/scope.v1.json
++++ b/packages/config/contracts/fixtures/scope.v1.json
+@@ -1894,5 +1894,35 @@
+     "global": []
+    }
+   }
++ ],
++ "patch-project-only": [
++  {
++   "id": "scope-patch-project-only-project-key-passes",
++   "why": "project key passes",
++   "path": "runner.executor",
++   "global": false,
++   "expect": null
++  },
++  {
++   "id": "scope-patch-project-only-global-only-key-refused",
++   "why": "global-only key refused",
++   "path": "gateway.port",
++   "global": false,
++   "expect": "patch-project-only"
++  },
++  {
++   "id": "scope-patch-project-only-accounts-key-refused",
++   "why": "accounts key refused",
++   "path": "runner.llmAccounts",
++   "global": false,
++   "expect": "patch-project-only"
++  },
++  {
++   "id": "scope-patch-project-only-with-global-refused",
++   "why": "--project-only with --global refused",
++   "path": "runner.executor",
++   "global": true,
++   "expect": "patch-project-only"
++  }
+  ]
+ }
+diff --git a/packages/config/rust/src/provider.rs b/packages/config/rust/src/provider.rs
+index 65681c7c2..509aa6fa1 100644
+--- a/packages/config/rust/src/provider.rs
++++ b/packages/config/rust/src/provider.rs
+@@ -135,6 +135,7 @@ pub enum Verb {
+         file: PathBuf,
+         reason: String,
+         global: bool,
++        project_only: bool,
+     },
+     Migrate {
+         global: bool,
+diff --git a/packages/config/rust/src/provider/unix_verbs.rs b/packages/config/rust/src/provider/unix_verbs.rs
+index 9fcacc2a8..d9239a31b 100644
+--- a/packages/config/rust/src/provider/unix_verbs.rs
++++ b/packages/config/rust/src/provider/unix_verbs.rs
+@@ -230,13 +230,34 @@ fn write(ctx: &Context, roots: &SnapshotRequest, verb: &Verb) -> Result<Value, R
+             file,
+             reason,
+             global,
++            project_only,
+         } => {
++            if *project_only && *global {
++                return Err(refuse(
++                    "patch-project-only",
++                    "--project-only and --global cannot be used together",
++                ));
++            }
+             let edits = patch_edits(file)?;
+             let kinds: Result<Vec<_>, _> = edits
+                 .iter()
+                 .map(|e| target_of(ctx, edited_path(e), *global))
+                 .collect();
+             let kinds = kinds?;
++            if *project_only {
++                for (kind, edit) in kinds.iter().zip(&edits) {
++                    if *kind != SourceKind::Project {
++                        return Err(refuse(
++                            "patch-project-only",
++                            format!(
++                                "{} resolves to {}; --project-only permits only project config edits",
++                                format_path(edited_path(edit)),
++                                file_of(*kind),
++                            ),
++                        ));
++                    }
++                }
++            }
+             if kinds.iter().any(|k| *k != kinds[0]) {
+                 return Err(refuse(
+                     "patch-spans-files",
+diff --git a/packages/config/rust/tests/golden_scope.rs b/packages/config/rust/tests/golden_scope.rs
+index 0756515ab..e872537bf 100644
+--- a/packages/config/rust/tests/golden_scope.rs
++++ b/packages/config/rust/tests/golden_scope.rs
+@@ -74,3 +74,42 @@ fn a_refusal_names_the_global_role_and_never_a_value() {
+         "{shown}"
+     );
+ }
++
++#[test]
++fn patch_project_only_proof() {
++    let fixture = common::fixture("scope.v1.json");
++    let schema_files = files(&fixture["cases"][0]["input"]["schemas"], true);
++    let schemas = Schemas::parse(&refs(&schema_files)).unwrap();
++    let rows = fixture["patch-project-only"]
++        .as_array()
++        .expect("patch-project-only array in scope.v1.json");
++    assert_eq!(rows.len(), 4);
++    for row in rows {
++        let id = row["id"].as_str().unwrap();
++        let why = row["why"].as_str().unwrap();
++        let path_text = row["path"].as_str().unwrap();
++        let global = row["global"].as_bool().unwrap();
++        let want = row["expect"].as_str();
++
++        let path = fgos_yaml_doc::path::parse_path(path_text).unwrap();
++        let got = if global {
++            Some("patch-project-only")
++        } else {
++            let target = match schemas.resolve(&path) {
++                Some(node) => match (node.file, node.scope) {
++                    ("accounts", _) => SourceKind::Accounts,
++                    (_, "global-only") => SourceKind::Global,
++                    _ => SourceKind::Project,
++                },
++                None => SourceKind::Project,
++            };
++            if target != SourceKind::Project {
++                Some("patch-project-only")
++            } else {
++                None
++            }
++        };
++
++        assert_eq!(got, want, "{id}: {why}");
++    }
++}
