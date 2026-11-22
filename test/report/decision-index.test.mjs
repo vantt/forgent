@@ -238,22 +238,24 @@ test('buildDecisionIndexMarkdown: a retired docs/specs pointer carried by an eve
   assert.doesNotMatch(md, /docs\/specs\/runner\.md/);
 });
 
-test('narrativeHolderResolver: reads the governance scope-to-holder table by legacy alias or area name, falls back to the platform file carrying the scope name, and returns null otherwise', () => {
+test('narrativeHolderResolver: reads decision-kinds.json by id, alias or owner, falls back to the platform file carrying the scope name, and returns null otherwise', () => {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-holder-'));
   fs.mkdirSync(path.join(repoRoot, 'docs', 'platform', 'system-overview'), { recursive: true });
+  fs.mkdirSync(path.join(repoRoot, 'packages', 'component-authority', 'model'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, 'docs', 'platform', 'system-overview', 'spec.md'), '# spec\n');
-  fs.writeFileSync(path.join(repoRoot, 'docs', 'platform', 'governance.md'), [
-    '## Decision scope to holder table',
-    '',
-    '| Scope (legacy alias retained) | Read first | Facts and RULs | Narrative home |',
-    '|---|---|---|---|',
-    '| distribution → packaging-distribution | `docs/platform/packaging-distribution/README.md` | `docs/platform/packaging-distribution/spec.md` | `docs/platform/packaging-distribution/decisions/` |',
-    '',
-    '## Next section',
-  ].join('\n'));
+  fs.writeFileSync(path.join(repoRoot, 'packages', 'component-authority', 'model', 'decision-kinds.json'), JSON.stringify([
+    {
+      id: 'packaging-distribution',
+      canonical: 'decision-kind:packaging-distribution',
+      aliases: ['distribution'],
+      owner: 'packaging-distribution',
+      narrative: 'docs/platform/packaging-distribution/decisions/',
+    },
+  ], null, 2));
   const holderFor = narrativeHolderResolver(repoRoot);
   assert.equal(holderFor('distribution'), 'docs/platform/packaging-distribution/decisions/');
   assert.equal(holderFor('packaging-distribution'), 'docs/platform/packaging-distribution/decisions/');
+  assert.equal(holderFor('decision-kind:packaging-distribution'), 'docs/platform/packaging-distribution/decisions/');
   assert.equal(holderFor('system-overview'), 'docs/platform/system-overview/spec.md');
   assert.equal(holderFor('nowhere'), null);
 });

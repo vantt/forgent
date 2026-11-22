@@ -183,6 +183,25 @@ test('every spec, source, and decision-kind narrative path exists on disk', () =
   }
 });
 
+test('every component paths[] entry exists on disk', () => {
+  for (const comp of components) {
+    for (const p of comp.paths) {
+      const full = path.join(root, p);
+      if (p.endsWith('/')) {
+        assert.ok(
+          fs.existsSync(full) && fs.statSync(full).isDirectory(),
+          `component "${comp.id}" paths[] directory missing on disk: ${p}`,
+        );
+      } else {
+        assert.ok(
+          fs.existsSync(full),
+          `component "${comp.id}" paths[] entry missing on disk: ${p}`,
+        );
+      }
+    }
+  }
+});
+
 test('canonical and aliases are unique across components and decision kinds (case-insensitive)', () => {
   const names = new Map();
 

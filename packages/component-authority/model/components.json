@@ -1316,8 +1316,7 @@
     "tier": 5,
     "paths": [
       "src/runner/execution/loops/",
-      "src/runner/execution/patterns/",
-      "docs/platform/runner/patterns/"
+      "src/runner/execution/patterns/"
     ],
     "exceptions": [],
     "owns": [

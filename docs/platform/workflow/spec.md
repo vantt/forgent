@@ -173,15 +173,17 @@ Phép tách authority: **chọn / cho phép / thi hành / chấp nhận.**
 
 Bản ghi mới gọi id **bằng tên**, không có trường `runId` trần: `caseId` (hoặc `workflowRunId`), `unitRunId`, `assignmentId`, `attemptId`. Trước đây `unit.json` mang `workflow: {runId, stepId, unitId}` chỉ để truy vết; liên kết nay là `{caseId, activity, reservationId}`, do harness ghi lúc admission (bản ghi cũ vẫn đọc được qua cùng một hàm chuẩn hoá).
 
-| Entity | Nghĩa | Chủ | Ai chạm |
-|---|---|---|---|
-| Workflow guide | mục đích; vai và cạnh tham vấn; milestone với subject, loại bằng chứng, authority chấp nhận; activity; decision point; bảng MUST và mục unenforced; route table; mặc định khung; tiêu chí đóng | Workflow (schema); domain/core (nội dung) | agent đọc; case pin snapshot |
-| Workflow case | khung, binding, reservation, route/deviation, gate answer gắn digest, receipt, projection milestone, close | Workflow | Execution Core qua AdmissionPort; Work qua con trỏ `workflowRunId` |
-| Binding | `{caseId, generation, worktreeRoot, commonDir, ref, state}` theo danh tính gốc worktree | Workflow | cửa đọc qua port |
-| Unit, Unit run | hợp đồng một lần thi hành; liên kết `{caseId, activity, reservationId}` | Execution Core | Workflow đọc receipt |
-| Approved frame | xem 2.2 | Workflow | Execution Core nhận trần seat launch của Unit |
-| Work item | bản ghi nghiệp vụ tuỳ chọn: status lifecycle, claim/return, slot, settlement, tail `delivered → retrospective → cleanup → done` | Work Lifecycle | trỏ tới case |
-| Plan | đầu vào, không authority | tác giả | conductor đọc như artifact |
+Rows owned by the workflow area, generated from `packages/component-authority/model/`.
+
+<!-- generated:component-authority:workflow-shared-entities -->
+Ownership rows owned by `workflow`: each thing a component declares it owns, with that component. <!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
+
+| Entity | Owner | Owner doc |
+| --- | --- | --- |
+| workflow guide and case ledger | `workflow` | `docs/platform/workflow/spec.md` |
+| admission port implementation | `workflow` | `docs/platform/workflow/spec.md` |
+| reservations and route events | `workflow` | `docs/platform/workflow/spec.md` |
+<!-- /generated:component-authority:workflow-shared-entities -->
 
 ## 5. Ranh giới component và authority
 
