@@ -22,17 +22,17 @@ Opened by the secretary (Miu) on the owner's order relayed by the owner-communic
 
 ## 1. Trạng thái hiện tại
 
-Round 1 (2026-11-22 20:10), shaper only, no owner exchange yet. Scouted prior art, the observe spec, the supervision watcher and `vantt/pkm`'s agent views. Found that the coach's scope and hand-off are **already settled** in the sibling discussion (OC-D5), so this discussion does not reopen them; it shapes the parts OC-D5 left open. Drafted a provisional shape (section 6) for all five seed points.
+Round 2 (2026-11-22 20:45). The owner corrected the framing: his reactions are one learning event among many, and round 1 treated them too specially. The shaper agrees (section 5) and reshaped the design around **one generic learning loop**: many producers write learning events through the existing doors (friction, metrics records), and the coach reads them all the same way. Owner-reaction capture is now just one producer, with no design of its own beyond the hook. The privacy rule stays, but generalised: any detail that may hold private text (not only the owner's words) goes to a git-ignored local store.
 
-- **Settled by inheritance:** coach scope and hand-off (OC-D5), friction store as the case log (OC-D4), T1-T12 signal list (provisional, sibling section 6 step 3).
-- **Decided by the shaper inside the frame:** owner words never go into a git-tracked file (the seed's privacy constraint plus the finding in section 3, row "Privacy"); the trigger is a watcher definition, like `discussion-settled` starting the planner.
-- **Open, asked:** Q1 `q-6yhs63ru4i` (how to build the coach views: extend the named query definitions, or a pkm-style SQLite projection with SQL views). Blocks only the views task; everything else proceeds.
+- **Settled by inheritance:** coach scope and hand-off (OC-D5), friction store as the case log (OC-D4).
+- **Shaper decisions inside the frame (held one round, not minted):** generic loop with pluggable producers; trigger as a watcher definition; private detail never in a git-tracked file.
+- **Open, asked:** Q1 `q-6yhs63ru4i` (coach views: extend the named query definitions, or a pkm-style SQLite projection). Blocks only the views task.
 - **Open, provisional defaults:** trigger thresholds and budget numbers (section 3).
-- **For another session:** the sibling plan's friction duty quotes the owner's words into friction detail, which lands in a store git does not ignore (section 3, row "Privacy"). The secretary should route this to the communication-standard planner.
+- **For another session:** the communication-standard plan's friction duty quotes the owner's words into friction detail, which lands in a store git does not ignore (section 3, row "Privacy of detail"). The secretary should route this to that plan.
 
 ## 2. Mục tiêu & đề bài
 
-fgOS already writes two kinds of learning material: metrics records and friction records (`fgos metrics`, `fgos friction`, both in `packages/observe/rust`), and the communication standard adds a third, the owner's reactions to agent messages (signals T1-T12). Nobody reads them on a schedule: the friction store's top classes are from August and September, and no session owns "look at what keeps going wrong and fix the cause". OC-D5 named that job the coach: a head the supervisor starts, which collects signals, diagnoses the real cause, proposes a fix capped per batch, measures the signature's count afterwards, and deletes or merges rules as readily as it adds them; a small text change to the standard goes to the owner in a batch, anything else goes back to the supervisor as an evidenced problem that becomes a backlog row. This discussion settles what OC-D5 left open: the moment and budget of a coach run, the ready-made views the coach reads so it gets aggregated data fast (the owner's model is `vantt/pkm`'s versioned agent views), what the coach writes and where, how the owner's reactions are captured automatically and kept private, and the smallest first increment.
+fgOS already writes two kinds of learning material: metrics records and friction records (`fgos metrics`, `fgos friction`, both in `packages/observe/rust`), and more producers will come (the owner's reactions to agent messages, question wait times, verify misses, review findings). Nobody reads them on a schedule: the friction store's top classes are from August and September, and no session owns "look at what keeps going wrong and fix the cause". OC-D5 named that job the coach: a head the supervisor starts, which collects signals, diagnoses the real cause, proposes a fix capped per batch, measures the signature's count afterwards, and deletes or merges rules as readily as it adds them; a small text change to the standard goes to the owner in a batch, anything else goes back to the supervisor as an evidenced problem that becomes a backlog row. This discussion settles what OC-D5 left open: the moment and budget of a coach run, the ready-made views the coach reads so it gets aggregated data fast (the owner's model is `vantt/pkm`'s versioned agent views), what the coach writes and where, how a new producer of learning events plugs in without changing the coach (the owner-reaction hook is the first such producer, not a special case), how private detail is kept off git, and the smallest first increment.
 
 ## 3. Vấn đề rõ / chưa rõ
 
@@ -44,11 +44,12 @@ fgOS already writes two kinds of learning material: metrics records and friction
 | When the supervisor starts the coach | **shaper decision on the door; numbers provisional** | `docs/platform/supervision/spec.md` lines 38, 121, 129: the watcher (Rust, no LLM) runs detection definitions each tick, records raised events, and the supervisor acts per row kind; `discussion-settled` already starts a planner this way. Definitions are `*.query.json` files run through `fgos metrics query` (`core/attention/definitions/`). | A watcher definition `coach-due` raises an event; the supervisor starts one coach head (`head:coach-<handle>`), never two. Provisional rule: raise when an unsettled friction signature reaches **3** records, or **5** new owner-communication frictions have arrived since the last coach run, or, as a floor, **7 days** passed with any unsettled friction. Reversal trigger: the coach's own report shows runs with nothing worth proposing (raise the thresholds) or a repeated fault that waited too long (lower them). |
 | Coach budget | **provisional** | OC-D5 "thresholded and capped per batch" | One run handles at most **3** signatures and makes at most **3** proposals; it stops after its report. Numbers go to config (`coach.*` keys in `core/config-standard`), not code. |
 | Coach views (how to build them) | **open, Q1 `q-6yhs63ru4i`** | Observe has a query grammar with join, anti-join, latest-per and having, plus named definitions in `*.query.json` (`packages/observe/rust/src/definition/`; observe spec section "Record contract v2"). `vantt/pkm` (`docs/agent-views.md`) builds a SQLite index from files that can always be rebuilt, exposes versioned SQL views (`v_note`, `v_link`, `v_issue` ...), records versions in an `agent_views` table, and holds names, versions and columns by contract tests; the agent opens it with `sqlite3 -readonly`. L3 ("truth in JSONL, the database is a view") allows either. | See Q1 in section 5 and the question store. Default while unanswered: named definitions first, SQL projection only on measured need. |
-| What the coach reads | **clear in outline** | Friction records (layer, class, refs), run and unit records (`fgos.run.attempt`, `fgos.unit.verify`), plan activity, question records (`fgos.question.*`, declared but not yet produced), owner-reaction records (below) | Exact view list follows Q1; draft list in section 6. |
+| What the coach reads | **clear in outline** | Friction records of every layer, run and unit records (`fgos.run.attempt`, `fgos.unit.verify`), plan activity, question records (`fgos.question.*`, declared but not yet produced) | Exact view list follows Q1; draft list in section 6. |
 | What the coach produces | **shaper draft** | OC-D5 hand-off | One report per run (path from `fgos convention path --kind report`), at most 3 proposals; a batched owner question for standard text; a supervisor event per evidenced problem (the supervisor files the backlog row; the coach does not write the backlog); `friction resolve --class <sig> --reason filed:<backlog-id>` once filed; a before/after count per signature in the next run's report. |
-| Owner-reaction capture | **shaper draft, reuses a dropped plan phase** | `plans/261122-1751-owner-communication-standard/phase-02-capture-owner-reaction.md` (commit `c61de4c1c`, dropped by OC-D13) already designed it: a Claude Code `UserPromptSubmit` hook `fgos hook owner-reaction`, built like `apps/fgos/src/wiring/questions_hook.rs`, matching text-detectable signals (T1, T3, T4, T5, T6, T8, T9) from a data file `owner-signals.v1.json`, recording one friction per matched signature, exit 0 on every path. | Reuse that design with one change, privacy (next row). Codex and other CLIs get it later, through their own hook adapters. |
-| Privacy of the owner's words | **shaper decision inside the frame; one item for another session** | `git check-ignore` matches nothing under `.fgos/observe/`; `git ls-files .fgos/observe` lists a committed friction shard (`friction/pid-2016389.jsonl`) and eval shards; `records/` is untracked but not ignored, and `.fgos` sync chores have committed `.fgos` trees before (`fbb52c64c`, `c3b0de893`). The remote is GitHub, an external service. | The tracked friction record holds only the signature, signal id, session and refs. The owner's words and the agent's previous message go to a **local private store that git ignores** (draft: `.fgos/observe/private/<writerId>.jsonl`, with a `.gitignore` entry and a doctor-free rule test), referenced from the friction record by id. The coach reads both locally. **Another session:** the sibling plan's OC-D14 duty tells agents to quote the owner's words in `friction record --detail`, which would put them in the tracked store; its planner should point quoting at the private store. |
-| First increment | **shaper draft** | — | Section 7: coach persona and skill plus the `coach-due` definition first (reads today's friction with no new views), then the views, then reaction capture. |
+| Learning producers | **shaper reading after owner 20:43** | Owner 20:43: his reactions are one learning event among countless others. Existing producers: agents (`fgos friction record`), run settle (`frictions` in a result claim), run/unit/verify records, plan activity, head state; declared but not yet produced: `fgos.question.*`. | Every producer writes through an existing door: a friction record (kind, layer, signature, refs) or a metrics record. The coach never knows a producer by name; it reads signatures and records through the views. A new producer is a new writer plus, at most, a new layer value or record kind declared beside its owner; no coach change. |
+| Owner-reaction hook | **one producer among many** | Dropped phase-02 plan (`c61de4c1c`): a Claude Code `UserPromptSubmit` hook matching text-detectable signals and recording one friction per signature. | Kept as one small producer task, ranked after the coach and its views; it gets no special store, view or coach logic. |
+| Privacy of detail | **shaper decision inside the frame; one item for another session** | `git check-ignore` matches nothing under `.fgos/observe/`; a friction shard and eval shards are committed; `records/` is untracked but not ignored; `.fgos` sync chores have committed `.fgos` trees before (`fbb52c64c`, `c3b0de893`); the remote is GitHub. | General rule, not owner-specific: a record whose detail may hold private text (the owner's words, transcript excerpts, credentials in output) keeps only ids and signature in the tracked store and puts the text in a git-ignored local store (draft `.fgos/observe/private/<writerId>.jsonl`). **Another session:** the communication-standard plan's OC-D14 duty quotes the owner's words in `friction record --detail`; its planner should point that text at the private store. |
+| First increment | **shaper draft** | — | Section 7: coach head and its start first (reads today's friction with no new views), then the views, then producers one by one, the owner-reaction hook being one of them. |
 
 ## 4. Quyết định đã chốt
 
@@ -60,37 +61,43 @@ No decision minted yet: the shaper decisions in section 3 have held for one roun
 ## 5. Q&A log
 
 - 2026-11-22 20:10 — Round 1, shaper. Read the seed, OC-D4/OC-D5/OC-D11-D14, the observe spec, the supervision spec, the dropped phase-02 plan, `fgos friction rank` and `vantt/pkm/docs/agent-views.md`. Found OC-D5 already settles scope and hand-off, the retrospective loop as the nearest ancestor (stopped 2026-09-11), and that owner words in friction detail would land in a store git does not ignore. Wrote the provisional shape. Asked Q1 (coach views: named definitions or pkm-style SQL projection) through the question store.
+- 2026-11-22 20:38 — Owner: "hãy trình bày lại mục tiêu của thảo luận này". Signals T8/T9: the round-1 report was in English and dense with ids. Shaper restated the goal in plain Vietnamese in chat. Friction to record (OC-D14 fallback, `friction record` refused this head with `verb-not-granted` at 20:38): kind `awkward`, layer `docs` (no `owner-communication` layer yet), class `owner-restate-too-dense-english`, ref `backlog:p-kmavlfevvu`.
+- 2026-11-22 20:43 — Owner: "4. phản ửng của anh chỉ là một sự việc cần học trong muôn vàng sự việc khác, em đang treat nó quá đặc biệt". Shaper agreed: round 1 gave the owner's reactions their own hook, store, view and coach input, when they are one producer among many. Reshaped section 6 around one generic loop with pluggable producers; the privacy rule stays but covers any private detail; the owner-reaction view was removed and the hook ranked last. Signal T4 (re-aim). Friction to record once the door works (OC-D14 fallback; `friction record` refused this head at 20:38): kind `awkward`, layer `spec`, class `shaping-overweights-one-input`, ref `backlog:p-kmavlfevvu`.
 
 ## 6. Thiết kế đã chốt {#design}
 
 Provisional: nothing here is minted yet. It is the shaper's draft for the owner to react to.
 
-**The loop.** Agents and a hook write friction (tracked store) and owner-reaction detail (private, ignored store). Each watcher tick runs the `coach-due` definition. When it raises, the supervisor starts one coach head. The coach reads the coach views and the private store, picks at most 3 signatures, diagnoses each, and writes one report. A small change to the communication standard becomes one batched owner question; anything else becomes a supervisor event that the supervisor turns into a backlog row for the normal pipeline. The coach settles the frictions it filed and, on its next run, reports each signature's count before and after the fix.
+**One generic loop.** Many producers write learning events through the doors that already exist: agents and run settle write friction records, the runner and other components write metrics records, and small producers such as the owner-reaction hook write friction like anyone else. The coach does not know producers by name. Each watcher tick runs the `coach-due` definition over all unsettled friction. When it raises, the supervisor starts one coach head. The coach reads the coach views, picks at most 3 signatures whatever their source, diagnoses each, and writes one report. A small change to an instruction text (the communication standard, a skill) becomes one batched owner question; anything else becomes a supervisor event that the supervisor turns into a backlog row for the normal pipeline. The coach settles the frictions it filed and, on its next run, reports each signature's count before and after the fix.
+
+**Adding a producer** means a writer plus, at most, a layer value or record kind declared beside its owner. The coach, its views and its trigger do not change.
 
 **Coach views (pending Q1).** Default draft as named definitions under `core/coach/definitions/`, each versioned and held by a contract test on name, version and row shape (pkm's `agent_views` idea without a new database):
 
-- `friction-hot`: unsettled signatures by count, distinct refs, first and last seen (what `friction rank` gives, as a definition).
+- `friction-hot`: unsettled signatures by count, distinct refs, first and last seen, any layer.
 - `friction-by-layer-week`: counts per layer per week, to see trends and the effect of a fix.
-- `owner-signal-by-signature`: owner-communication frictions by signal and signature.
 - `run-failure-by-cause`: failed runs and verify findings by provider, executor and plan.
 - `owner-wait`: time questions wait for the owner (`unmeasured` until `fgos.question.*` is produced).
 - `fix-effect`: a signature's count in the window before and after its `filed:` resolve.
 
-**Privacy.** Owner words never enter a git-tracked file or an external service. The hook and agents write them only to the ignored private store; tracked records carry ids.
+**Private detail.** Any detail that may hold private text stays in a git-ignored local store; tracked records carry ids and signatures only. This holds for every producer.
 
 ```mermaid
 flowchart LR
-  A[agents: friction record] --> F[(friction records, tracked)]
-  H[UserPromptSubmit hook: T-signals] --> F
-  H --> P[(private store, git-ignored: owner words)]
+  P1[agents] --> F[(friction records, tracked)]
+  P2[run settle] --> F
+  P3[owner-reaction hook] --> F
+  P4[runner, plans, questions] --> M[(metrics records)]
+  F -. private text .-> X[(private store, git-ignored)]
   F --> W{watcher tick: coach-due}
   W -- raised --> S[supervisor]
   S -- session start --> C[coach head]
   F --> V[coach views]
+  M --> V
   V --> C
-  P --> C
+  X --> C
   C --> R[report per run]
-  C -- standard text --> Q[batched owner question]
+  C -- instruction text --> Q[batched owner question]
   C -- evidenced problem --> S
   S --> B[backlog row, normal pipeline]
   C -- resolve filed --> F
@@ -116,10 +123,18 @@ Draft; the order is the proposed first increment.
 - **Siblings:** after `task-coach-head`; independent of `task-owner-reaction`.
 - **Draft verify:** a contract test asserts each view's name, version and row shape on a fixture store.
 
-### Owner-reaction capture {#task-owner-reaction}
+### Private detail store {#task-private-detail}
 
-- **Goal:** the `UserPromptSubmit` hook from the dropped phase-02 plan, writing owner words only to the git-ignored private store.
-- **Design excerpt:** section 3 rows "Owner-reaction capture" and "Privacy of the owner's words".
+- **Goal:** a git-ignored local store for record detail that may hold private text, used by any producer; the friction door writes detail there when asked and keeps only ids in the tracked record.
+- **Design excerpt:** section 6, "Private detail"; section 3 row "Privacy of detail".
 - **D-IDs:** none yet.
-- **Siblings:** needs the `owner-communication` friction layer from the communication-standard plan (its task 1).
-- **Draft verify:** `cargo test -p fgos --test owner_reaction_hook`: "khoan, cái này là gì" records one friction with no owner words in the tracked store and one private record; `git check-ignore` matches the private store path.
+- **Siblings:** before any producer that quotes people; independent of the coach tasks.
+- **Draft verify:** a friction recorded with private detail leaves no detail text in `.fgos/observe/records/`; `git check-ignore` matches the private store path.
+
+### Owner-reaction hook, one producer {#task-owner-reaction}
+
+- **Goal:** the `UserPromptSubmit` hook from the dropped phase-02 plan, as one ordinary producer of friction.
+- **Design excerpt:** section 3 rows "Learning producers" and "Owner-reaction hook".
+- **D-IDs:** none yet.
+- **Siblings:** after `task-private-detail`; needs the `owner-communication` friction layer from the communication-standard plan (its task 1). Ranked last.
+- **Draft verify:** `cargo test -p fgos --test owner_reaction_hook`: "khoan, cái này là gì" records one friction whose tracked record has no owner words.
