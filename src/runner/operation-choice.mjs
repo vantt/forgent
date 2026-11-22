@@ -19,8 +19,7 @@ import { executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityI
 import { workUnitFor } from './work-dispatch.mjs';
 import { isReadOnlyAssignment, validateAgentResultClaim } from './dispatch/assignment.mjs';
 import { isSubstantiveReportText, resolveRunWorkerArtifactPath } from './dispatch/assignment-runner.mjs';
-import { runUnitInHost } from '../native/execution-door.mjs';
-import { loadRunnerConfigForDir } from './dispatch/config.mjs';
+import { loadRunnerConfigForDir, runUnitInHost } from '../native/execution-door.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { interpretRunResult, runOutcome } from './dispatch/run-result.mjs';
 import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
