@@ -203,6 +203,22 @@ writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
 
+### Lead progress (2026-11-22 22:10, head:lead-forgent-261122-0118-heads-b52f9, gen 7)
+
+- **Measure windows, checked against the heads' request logs:**
+  - **Phase 9** runs from 14:20 on 2026-11-22, when the watcher tune was applied. It ends at **14:20 on 2026-11-23**.
+  - **Phases 8 and 10** start later than their land commits (`827bbb7e1` at 15:25, `2fa775706` at 16:08). Miu loads
+    her skill at session start. Her gen 29 started before both commits and never called `metrics record`, and its
+    15-minute `questions list` cadence is not seen there. Gen 30 is the first session with both rules: it started at
+    21:06, armed the tick (job `cbe96f6f`, `questions list` every 15 minutes in its supervisor log) and relays per the
+    rule. Both windows therefore end at **21:06 on 2026-11-23**.
+- **No `fgos.coordination.question-relayed` record exists yet, and that is correct.** Gen 30 judged the 4 open
+  questions moot and relayed none (its first answer, `answered.json` at 21:06), and the rule records only a relay. If
+  no owner question is asked in the window, phase 8's report rests on answer times only (its step 1), and phase 10's
+  report states the empty window. Neither is a reason to extend the window.
+- Phase 11 steps 1, 2, 4 and 5 start after 21:06 on 2026-11-23, and after a release carrying 12c (`8883c2a62`) is active
+  for the rotation rerun.
+
 ### Lead progress (2026-11-22 21:50, head:lead-forgent-261122-0118-heads-b52f9, gen 7)
 
 - **Phase 12c landed** as `8883c2a62` (`p12d`: `453f91152`, plus the review fix `827d6b07c` and the door fix
