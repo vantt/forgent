@@ -9,8 +9,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import {
@@ -27,16 +25,6 @@ import { watchRunUseCase } from '../../src/verbs/dispatch/watch.mjs';
 import { reconcilePlanUseCase, DispatchReconcileError } from '../../src/verbs/dispatch/reconcile.mjs';
 import { planReconciliation } from '../../src/runner/dispatch/reconciliation-planner.mjs';
 
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-const REPO = path.resolve(HERE, '..', '..');
-
-function runFgos(args, options = {}) {
-  return spawnSync(process.execPath, ['bin/fgos.mjs', ...args], {
-    cwd: REPO,
-    encoding: 'utf8',
-    ...options,
-  });
-}
 
 // ─── 2. F5: Declared Vendor Precedence Over CLI Harness ──────────
 
@@ -285,16 +273,6 @@ test('F10: reconcile plan with --run requires --action before checking cwd lock'
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-f10-regression-'));
   // Ensure no cwd lock exists in tmp workspace
   assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'dispatch.lock')), false);
-
-  // 5a. CLI with --run without --action must exit 4
-  const resRun = runFgos(['dispatch', 'reconcile', 'plan', '--run', 'run_f10_test', '--dir', tmp]);
-  assert.equal(resRun.status, 4, `expected exit code 4, got ${resRun.status}\nstderr: ${resRun.stderr}`);
-  assert.match(resRun.stderr, /requires --action/);
-
-  // 5b. CLI with --run and --action clear-cwd-lock must exit 4
-  const resClear = runFgos(['dispatch', 'reconcile', 'plan', '--run', 'run_f10_test', '--action', 'clear-cwd-lock', '--dir', tmp]);
-  assert.equal(resClear.status, 4, `expected exit code 4, got ${resClear.status}\nstderr: ${resClear.stderr}`);
-  assert.match(resClear.stderr, /requires --action/);
 
   // 5c. reconcilePlanUseCase direct call throws DispatchReconcileError with category 'validation'
   assert.throws(

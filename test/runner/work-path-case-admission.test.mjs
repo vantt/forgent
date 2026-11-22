@@ -72,7 +72,6 @@ function callText(source, open) {
 
 test('every production call of a unit run injects the case admission port, so no writer is missed', () => {
   const files = [
-    'bin/fgos.mjs',
     'src/workflow/runner.mjs',
     'src/runner/work-dispatch.mjs',
     'src/runner/operation-choice.mjs',
@@ -93,11 +92,20 @@ test('every production call of a unit run injects the case admission port, so no
       }
     }
   }
-  assert.equal(calls, 6, 'the five writing call sites of a unit run and the read-only session probe door are the ones checked');
+  assert.equal(calls, 5, 'the five writing call sites of a unit run are the ones checked');
   // The native `fgos run` builds its request, port included, in the host (fgos-execution run_request).
   // runUnitInHost (the host seam) is the only door to a unit run; nothing else names one.
   const core = ['src/native/execution-door.mjs'];
-  const stray = ['src', 'bin'].flatMap((dir) => execFileSync('grep', ['-rlE', '--include=*.mjs', 'runUnit(InHost)?\\(', path.join(root, dir)], { encoding: 'utf8' }).split('\n').filter(Boolean))
+  // grep exits 1 when a directory has no match at all (bin/ holds no unit run call).
+  const callersIn = (dir) => {
+    try {
+      return execFileSync('grep', ['-rlE', '--include=*.mjs', 'runUnit(InHost)?\\(', path.join(root, dir)], { encoding: 'utf8' });
+    } catch (error) {
+      if (error.status === 1) return '';
+      throw error;
+    }
+  };
+  const stray = ['src', 'bin'].flatMap((dir) => callersIn(dir).split('\n').filter(Boolean))
     .map((f) => path.relative(root, f)).filter((f) => !files.includes(f) && !core.includes(f));
   assert.deepEqual(stray, []);
 });

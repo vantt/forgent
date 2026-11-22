@@ -27,8 +27,7 @@
 //   - every sub-verb the registry lists has its own branch in the handler;
 //   - GLOBAL flags (read by main() for every verb) are exempt both ways.
 // Limits: a flag read in the shared region passes when ANY sub-verb declares
-// it; nested modes inside one sub-verb (dispatch reconcile plan|apply|
-// provider-capacity), required-ness and types are not checked; a flag read through a computed key (`flags[name]`), or by code that
+// it; nested modes inside one sub-verb, required-ness and types are not checked; a flag read through a computed key (`flags[name]`), or by code that
 // only receives an object already built from flags, is invisible to this
 // scan; regex literals containing braces would confuse the brace matcher.
 import '../helpers/process-tmp-root.mjs';
@@ -42,16 +41,12 @@ import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
 const BIN = fs.readFileSync(path.join(REPO_ROOT, 'bin/fgos.mjs'), 'utf8');
-const DISPATCH_CLI = fs.readFileSync(path.join(REPO_ROOT, 'src/runner/dispatch/cli.mjs'), 'utf8');
 
 const GLOBAL = new Set(['dir', 'json', 'help']);
 
 // Sub-verbs whose handler hands the raw argv to another parser: the region of
 // that parser which handles the sub-verb.
-const DELEGATES = {
-  'dispatch probe-account': () => caseBlock(functionBody(DISPATCH_CLI, 'runDispatchCli'), 'probe-account'),
-  'dispatch probe-session': () => caseBlock(functionBody(DISPATCH_CLI, 'runDispatchCli'), 'probe-session'),
-};
+const DELEGATES = {};
 
 // Verbs whose shared tail is itself one sub-verb's handler.
 const FALLTHROUGH = { workflow: 'operations', tool: 'query', request: 'result' };
@@ -193,29 +188,13 @@ const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nati
 const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.native === true);
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
-  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['dispatch', 'goal', 'merge', 'request', 'session', 'workflow']);
-  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['agents', 'config', 'convention', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'questions', 'supervisor', 'watcher', 'worktree']);
+  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['goal', 'merge', 'request', 'session', 'workflow']);
+  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['agents', 'config', 'convention', 'dispatch', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'questions', 'supervisor', 'watcher', 'worktree']);
 });
 
 // A verb that lists sub-verbs in `native` serves those in the Rust host: the Node handler holds no branch for them
-// (a branch would be a second path), and their flags are read from the one Rust projector instead.
+// (a branch would be a second path).
 const nativeSubsOf = (entry) => (Array.isArray(entry.native) ? entry.native : []);
-const DISPATCH_NATIVE_FLAGS = () => {
-  const src = fs.readFileSync(path.join(REPO_ROOT, 'apps/fgos/src/wiring/dispatch_decide.rs'), 'utf8');
-  const start = src.indexOf('pub fn project_dispatch_request');
-  const region = src.slice(start, src.indexOf('// ---- failures', start));
-  return new Set([...region.matchAll(/\bpresent\("([a-z][a-z-]*)"\)|\btext_flag\(&call, "([a-z][a-z-]*)"\)/g)].map((m) => m[1] ?? m[2]));
-};
-
-test('dispatch: the sub-verbs it serves natively have no Node branch, and their schemas name exactly the flags the Rust projector reads', () => {
-  const entry = MULTI.find((e) => e.name === 'dispatch');
-  const natives = nativeSubsOf(entry);
-  assert.deepEqual(natives.sort(), ['decide', 'explain']);
-  const { regions } = subRegions('dispatch', verbCase('dispatch'), Object.keys(entry.subcommands));
-  for (const sub of natives) assert.equal(regions[sub], undefined, `dispatch ${sub} is native: the Node handler must not branch on it`);
-  const declared = new Set(natives.flatMap((sub) => schemaFlags(entry.subcommands[sub])).filter((name) => !GLOBAL.has(name)));
-  assert.deepEqual([...declared].sort(), [...DISPATCH_NATIVE_FLAGS()].sort());
-});
 
 for (const entry of MULTI) {
   test(`${entry.name}: flags read by each sub-verb's handler match that sub-verb's schema`, () => {
@@ -259,12 +238,12 @@ for (const entry of MULTI) {
 }
 
 test('the scanner sees what it claims to: known reads in known regions', () => {
-  const dispatch = subRegions('dispatch', verbCase('dispatch'), Object.keys(MULTI.find((e) => e.name === 'dispatch').subcommands));
-  assert.ok(regionReads(dispatch.regions.inspect, 'probe').has('provider-capacity'));
+  const session = subRegions('session', verbCase('session'), Object.keys(MULTI.find((e) => e.name === 'session').subcommands));
+  assert.ok(regionReads(session.regions.stop, 'probe').has('reason'));
   const merge = subRegions('merge', verbCase('merge'), ['list', 'next']);
   const nextReads = regionReads(merge.regions.next, 'probe');
   for (const name of ['acknowledge-iron-law', 'timeout', 'no-timeout', 'wait', 'no-wait']) assert.ok(nextReads.has(name), name);
-  assert.ok(regionReads(dispatch.shared, 'probe').has('for'));
+  assert.ok(regionReads(session.shared, 'probe').has('name'));
 });
 
 // Native verbs (the Rust host runs them; `--help` is answered from this
@@ -328,6 +307,47 @@ const NATIVE_SOURCES = {
       const src = RUST('apps/fgos/src/wiring/mailbox_verbs.rs');
       const start = src.indexOf('pub fn project_mailbox_request');
       return src.slice(start, src.indexOf('pub struct MailboxAnswer', start));
+    },
+  },
+  // dispatch -> decide and explain share one projector (project_dispatch_request, apps/fgos/src/wiring/dispatch_decide.rs);
+  // every other sub-verb is its entry function in apps/fgos/src/wiring/dispatch_subs/<file>.rs plus the functions that
+  // read its flags for it (run_id_of for the run-scoped ones, Raw::dirs for the probes).
+  dispatch: {
+    subs: RUST('apps/fgos/src/wiring/dispatch_subs.rs'),
+    region: (sub) => {
+      const fnBody = (rel, name) => {
+        const src = RUST(rel);
+        const at = src.indexOf(`fn ${name}(`);
+        assert.ok(at >= 0, `${rel} has no fn ${name}`);
+        return blockAt(src, at);
+      };
+      const subFile = (file) => `apps/fgos/src/wiring/dispatch_subs/${file}.rs`;
+      const runId = () => fnBody('apps/fgos/src/wiring/dispatch_subs.rs', 'run_id_of');
+      // The decide projector names a flag through its two readers `text_flag(&call, "x")` and `present("x")`. A flag
+      // the other of the pair declares is that one's read; any other read stays and must be in this sub-verb's schema.
+      const decide = (own) => () => {
+        const accepted = (name) => Object.keys(COMMAND_REGISTRY.find((e) => e.name === 'dispatch').subcommands[name].parameters.properties);
+        const pair = new Set([...accepted('decide'), ...accepted('explain')]);
+        const mine = new Set(accepted(own));
+        return [...fnBody('apps/fgos/src/wiring/dispatch_decide.rs', 'project_dispatch_request')
+          .matchAll(/\btext_flag\(&call, "([a-z][a-z-]*)"\)|\bpresent\("([a-z][a-z-]*)"\)/g)]
+          .map((m) => m[1] ?? m[2])
+          .filter((name) => mine.has(name) || !pair.has(name))
+          .map((name) => `"--${name}"`).join(' ');
+      };
+      const regions = {
+        decide: decide('decide'),
+        explain: decide('explain'),
+        'show-run': () => fnBody(subFile('observe'), 'show_run') + runId(),
+        watch: () => fnBody(subFile('observe'), 'watch') + runId(),
+        recover: () => fnBody(subFile('recover'), 'recover') + fnBody(subFile('recover'), 'apply_params_of') + runId(),
+        inspect: () => fnBody(subFile('inspect'), 'inspect'),
+        reconcile: () => ['reconcile', 'quarantine', 'clear_quarantine'].map((name) => fnBody(subFile('reconcile'), name)).join('\n'),
+        'probe-account': () => fnBody(subFile('probes'), 'probe_account') + fnBody(subFile('probes'), 'dirs'),
+        'probe-session': () => fnBody(subFile('probes'), 'probe_session') + fnBody(subFile('probes'), 'dirs'),
+      };
+      assert.ok(regions[sub], `dispatch: no Rust region named for sub-verb "${sub}"`);
+      return regions[sub]();
     },
   },
   // gateway -> one projector (project_gateway_request) over the three sub-verbs, none of which takes a flag of its own.

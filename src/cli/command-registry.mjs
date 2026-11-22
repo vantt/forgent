@@ -1969,7 +1969,7 @@ export const COMMAND_REGISTRY = [
       'fgos dispatch inspect --run run_abc123',
       'fgos dispatch reconcile plan',
     ],
-    native: ['decide', 'explain'],
+    native: true,
     touchesState: true,
     // "reconcile"/"recover" write guard and Run state (touchesState: true);
     // "probe-account" and "probe-session" spawn provider CLIs (externalEffect: true). A verb with

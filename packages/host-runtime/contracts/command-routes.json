@@ -282,17 +282,13 @@
   },
   "dispatch": {
     "selector": "dispatch",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
+    "route_kind": "native",
+    "operation_id": "dispatch.decide",
+    "owner_path": "apps/fgos",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
     "subcommands": true,
-    "native_subcommands": [
-      "decide",
-      "explain"
-    ],
     "subcommand_flags": {
       "decide": [
         "dir",
@@ -314,6 +310,88 @@
         "help",
         "for",
         "rigor"
+      ],
+      "inspect": [
+        "dir",
+        "json",
+        "help",
+        "run",
+        "assignment",
+        "cwd",
+        "provider-capacity",
+        "terminal",
+        "attention",
+        "since"
+      ],
+      "probe-account": [
+        "dir",
+        "json",
+        "help",
+        "provider",
+        "account",
+        "all",
+        "record",
+        "leg",
+        "executor",
+        "invocation",
+        "timeout-ms",
+        "cwd",
+        "repo-root"
+      ],
+      "probe-session": [
+        "dir",
+        "json",
+        "help",
+        "executor",
+        "invocation",
+        "cwd",
+        "repo-root"
+      ],
+      "reconcile": [
+        "dir",
+        "json",
+        "help",
+        "mode",
+        "capacity-action",
+        "action",
+        "run",
+        "run-id",
+        "cwd",
+        "plan",
+        "provider",
+        "account",
+        "reason",
+        "until",
+        "force"
+      ],
+      "recover": [
+        "dir",
+        "json",
+        "help",
+        "run-id",
+        "run",
+        "intent",
+        "action",
+        "expected-snapshot",
+        "expected-control-epoch",
+        "expected-expires-at",
+        "action-key"
+      ],
+      "show-run": [
+        "dir",
+        "json",
+        "help",
+        "run-id",
+        "run"
+      ],
+      "watch": [
+        "dir",
+        "json",
+        "help",
+        "run-id",
+        "run",
+        "interval",
+        "ticks"
       ]
     },
     "store": "none",

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1aa8d91d2ad92e9018c499840b4f0775e368672a2626acf4b9d54d72b4ec08f2",
+  "payloadDigest": "e8ab25305b9bf0e2996c0a633ca21203fe17b9219db9b18b97138eaccded3912",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -98,11 +98,11 @@
     "apps/fgos/src/invocation_doors.rs": "6b874024689dfc1134dfb89487c744caf1ec784e6dd4313b4ed099026fefce39",
     "apps/fgos/src/legacy_exec.rs": "409d3fd5fc829b7febd7a57b24bf9c6f9bab6c91e1807668cab6bf3d5c1c15c4",
     "apps/fgos/src/main.rs": "199dda8a1e4cd0cbfe753e332128621c634c8d8e1cfb4c575e338e9a63b41af6",
-    "apps/fgos/src/routing.rs": "48270aca013e5e8bb9a37a2a340d22b8ad4bcfdd28d9442aeee4e0581a5d11ea",
+    "apps/fgos/src/routing.rs": "d1dd56e24e5dfa2c99e72b6cc38a23ccc6efcef247558d8bd54879b0899025be",
     "apps/fgos/src/wiring/agents.rs": "d40cd43facea6c5d1e5a7b3363b8e69567f3ad7aa33b628eb269c935a88f06e4",
     "apps/fgos/src/wiring/attempt_step.rs": "5dade9079e7e99ca3f9bc2cf18d226583f96be2bf6cc590398ac93fded4b141f",
-    "apps/fgos/src/wiring/dispatch_decide.rs": "a252ae44cfe42547231b07201f2e0efb9d30327d4db02974ffbeed3e5e99a6b5",
-    "apps/fgos/src/wiring/dispatch_subs.rs": "d335b7c7f53ba48becce6b87d16052a2b28841137968c4923e4253f04f3c47dd",
+    "apps/fgos/src/wiring/dispatch_decide.rs": "ec4cb3297b19bf0bc17e23a8c81b8a3a08bc12938ad3290ac58e42ceba8023d8",
+    "apps/fgos/src/wiring/dispatch_subs.rs": "3adbeb83790c6504bdf630b44298940d9ee6ad8d5f0a0023389573611ada4b74",
     "apps/fgos/src/wiring/dispatch_subs/inspect.rs": "c4bc400c93a8c60ee8603365219977cc58f46d6ed8a32b5aa3c09b85ff0c9321",
     "apps/fgos/src/wiring/dispatch_subs/observe.rs": "110205482bf94f1587730c62f6b42fb251b23b95c5358ad78572442bdfd5c54e",
     "apps/fgos/src/wiring/dispatch_subs/probes.rs": "db8a174f132383b2668b351609f1f43fbfc3d8d1bdfb9bb800ae9ba7b2147326",
@@ -192,7 +192,7 @@
     "apps/fgos/src/wiring/wire_agents.rs": "a434308907a3e7d87c880ebf95a957e1342b77e83ebe1ee0272002335b7a248c",
     "apps/fgos/src/wiring/worktree.rs": "d783eec09a03bcc50b77659f23bf860137daeef4afd699b7781bcb119676545a",
     "apps/fgos/tests/attention_definitions.rs": "81db902eb0d8bf5515f7574bcf4b13f61db680dc0d569f4db55b4271e4df9a54",
-    "apps/fgos/tests/cli_tests.rs": "2ddd69e0949de06a54a2148e2e3d90b49bb7e243c6964471f8a24ab826ea94ca",
+    "apps/fgos/tests/cli_tests.rs": "da5ef5cca91ce8173fc88c105ea084a2be8c6a65661d90baa83043dcba8378a6",
     "apps/fgos/tests/driving_definitions.rs": "fa31e9456150a2e8038d54916be5b2373b434cb3521a2d97afb02219815c20a5",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
     "apps/fgos/tests/mailbox_routes.rs": "a35e94cd71509b6fb9de91bf771a0b65a8dbb9e495c5aefefb633b9f3a880643",
@@ -213,7 +213,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "1a0db475f554e9b3419c74e7e4d6619ff1e6561b82ceebb984530707f217ca45",
+    "bin/fgos.mjs": "b420e19de285791c8e80e23b04a6c8a54830fbb7d84449c9dfabad33791e0449",
     "core/skills/_shared/capability-catalog.md": "abb355e91c92f728f1a527777945e80b9cc97c57af82e2c1a4e3eac64b928da6",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -1431,7 +1431,7 @@
     "scripts/verify-fanout-overlap.mjs": "b74a0ac9f350c5d62a47f3e3bf0896e9d142e5cbba15284527383d1b529ea435",
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
-    "src/cli/command-registry.mjs": "9d0c24923ce3b152bab88eb9f881cdac680e0146beb2d014d1acd61782cb262b",
+    "src/cli/command-registry.mjs": "decd6b4f71677a153d833a78501b68bb3f2d4b021e48ec829b9e20d63aaebf11",
     "src/cli/exit-codes.mjs": "55a68e5a0b03a38adced7ddc9bcfb60964db94b3b868e2c854b6a6a78fdb4964",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
@@ -2523,28 +2523,28 @@
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 4870,
+      "line": 5131,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 5489,
+      "line": 5750,
       "spawn": "Command::new",
       "binary": "(env CARGO)",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 5595,
+      "line": 5856,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 5622,
+      "line": 5883,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"
@@ -2733,14 +2733,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3036,
+      "line": 2897,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3151,
+      "line": 3012,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"

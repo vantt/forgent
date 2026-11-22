@@ -39,9 +39,6 @@ use std::pin::Pin;
 pub const DECIDE_OPERATION_ID: &str = "dispatch.decide";
 pub const EXPLAIN_OPERATION_ID: &str = "dispatch.explain";
 
-/// The sub-commands of `fgos dispatch` the host serves; every other one reaches the legacy payload.
-pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["decide", "explain"];
-
 /// The most bytes of a hook payload read from stdin; a payload cut at the cap does not parse and so allows.
 const HOOK_STDIN_CAP: u64 = 8 * 1024 * 1024;
 
