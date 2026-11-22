@@ -7,7 +7,7 @@ use super::observe::{probe_attempt, read_attempt_view, read_json};
 use super::{fgos_dir, validation, Answer, Answered, Flags, SubRequest};
 use crate::wiring::dispatch_decide::HostWorkspace;
 use crate::wiring::observe_query::HostRecordEnvironment;
-use crate::wiring::terminal_route::HostRoute;
+use crate::wiring::terminal_route::{allocation_grace, scan_allocations, HostRoute, NotScanned};
 use fgos_execution::decide::CheckoutFacts;
 use fgos_execution_engine::accounts::{Accounts, SystemHost};
 use fgos_execution_engine::transport_round::attention::{
@@ -19,7 +19,7 @@ use fgos_execution_engine::transport_round::inspection::{
 use fgos_execution_engine::unit_run::history::outcome_of_run_result;
 use fgos_host_runtime::{CategorisedRefusal, VerbAnswer};
 use fgos_observe::ObserveRequest;
-use fgos_terminal_control::port::{FindingKind, Refusal};
+use fgos_terminal_control::port::FindingKind;
 use serde_json::{json, Map, Value};
 use std::path::{Path, PathBuf};
 
@@ -55,59 +55,10 @@ fn not_scanned(level: &str, reason: String) -> Value {
 /// What the terminal-control scan finds past `terminal.allocationGraceMs`: slots allocated but never launched,
 /// retained panes past their time, records of a herdr server that is gone. Reads only.
 pub(crate) fn scan_terminal_allocations(root: &Path) -> Value {
-    let parts = match HostRoute::from_process(Map::new()).parts(&json!({})) {
-        Ok(parts) => parts,
-        Err(refusal) => {
-            return not_scanned(
-                "warning",
-                format!(
-                    "the terminal-control route did not answer, allocations not scanned ({})",
-                    refusal.message
-                ),
-            )
-        }
-    };
-    let grace = match fgos_config::provider::effective_value(root, "terminal.allocationGraceMs") {
-        Ok(value) => value,
-        Err(refusal) => {
-            return not_scanned(
-                "warning",
-                format!(
-                    "terminal.* unreadable, allocations not scanned: {}: {}",
-                    refusal.reason, refusal.detail
-                ),
-            )
-        }
-    };
-    let Some(grace_ms) = grace.as_ref().and_then(Value::as_u64) else {
-        return not_scanned(
-            "warning",
-            "terminal.allocationGraceMs is invalid (see terminal-control), allocations not scanned"
-                .to_owned(),
-        );
-    };
-    let scanned = parts.core().reconcile_scan(grace_ms);
-    match scanned {
-        Err(Refusal::Unsupported { capability, detail }) => not_scanned(
-            "info",
-            format!(
-                "allocations not scanned: terminal mode is unsupported here ({})",
-                if detail.is_empty() {
-                    capability
-                } else {
-                    detail
-                }
-            ),
-        ),
-        Err(Refusal::Unknown { reason }) => not_scanned(
-            "warning",
-            if reason.is_empty() {
-                "allocation scan answered unknown".to_owned()
-            } else {
-                format!("allocation scan answered unknown ({reason})")
-            },
-        ),
-        Ok(findings) => json!({
+    let route = HostRoute::from_process(Map::new());
+    match scan_allocations(allocation_grace(root), |grace| route.reconcile_scan(grace)) {
+        Err(NotScanned { level, reason }) => not_scanned(level, reason),
+        Ok((grace_ms, findings)) => json!({
             "state": "scanned",
             "graceMs": grace_ms,
             "findings": findings.iter().map(|f| json!({
