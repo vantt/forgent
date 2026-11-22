@@ -58,7 +58,7 @@ The structural model stores six distinct row kinds under `packages/component-aut
 
 ### 2.1 Layers, rules, domains, and tiers
 
-Defined in `layers.json` (created by phase 2 of the plan, migrating from `docs/architecture-manifest.json`):
+Defined in `layers.json` (created by phase 2 of the plan, migrating from `docs/architecture-manifest.json` (retired; last commit 00dddf7ae)):
 - `layers`: Ordered architectural layer names (`entry`, `use-case`, `infra`, `domain`, `kernel`) defining allowed one-directional import flows.
 - `rules`: Structural layering rules (`one-directional-layer`, `domain-siloing`, `tier-downward`).
 - `domains`: Registered business and execution domains (`coding`, `council`, `marketing`).
@@ -124,7 +124,7 @@ Defined in `contracts.json` (created by phase 4 of the plan):
 
 ### 2.6 Files
 
-Transitional file-to-layer mapping (`files.json`, created by phase 2 of the plan) moved from `docs/architecture-manifest.json` during model migration. In phase 3, layer and tier assignments are derived directly from component path mappings, rendering `files.json` obsolete.
+Transitional file-to-layer mapping (`files.json`, created by phase 2 of the plan) moved from `docs/architecture-manifest.json` (retired; last commit 00dddf7ae) during model migration. In phase 3, layer and tier assignments are derived directly from component path mappings, rendering `files.json` obsolete.
 
 ## 3. Operations: `locate` and `declare`
 
@@ -182,7 +182,7 @@ The model at `packages/component-authority/model/` is the single source of truth
 
 With the establishment of Component Authority, previous disparate ownership ledgers are consolidated and retired:
 - `docs/platform/proposals/component-authority-boundary-map.md` (retired; last commit e0d208e38): Retired; useful boundary definitions are incorporated into the model.
-- `docs/architecture-manifest.json`: Fully migrated into `packages/component-authority/model/` and retired in phase 7.
+- `docs/architecture-manifest.json` (retired; last commit 00dddf7ae): Fully migrated into `packages/component-authority/model/` and retired in phase 7.
 
 ## 6. Settled facts
 
@@ -221,7 +221,7 @@ With the establishment of Component Authority, previous disparate ownership ledg
 - **Ngày**: 2026-11-21
 - **Lời chủ dự án**: "ok, gộp: một mô hình cấu trúc" (Q5)
 - **Nguồn**: `plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md` §4 decision 4, §3 row 4a(iv)
-- **Nội dung**: Gộp toàn bộ dữ liệu tầng kiến trúc (layers, rules, tiers, mapping file) từ `docs/architecture-manifest.json` vào mô hình cấu trúc của `component-authority`, loại bỏ tình trạng duy trì hai tập tin bản đồ kiến trúc song song.
+- **Nội dung**: Gộp toàn bộ dữ liệu tầng kiến trúc (layers, rules, tiers, mapping file) từ `docs/architecture-manifest.json` (retired; last commit 00dddf7ae) vào mô hình cấu trúc của `component-authority`, loại bỏ tình trạng duy trì hai tập tin bản đồ kiến trúc song song.
 
 ### Quyết định 5 — Duyệt thiết kế tổng thể của component-authority
 
