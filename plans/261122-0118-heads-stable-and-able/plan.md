@@ -203,6 +203,26 @@ writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
 
+### Lead progress (2026-11-22 20:40, head:lead-forgent-261122-0118-heads-b52f9)
+
+- **The 12b clippy fix landed** as `df93b230f` once the D12/D13 citations were fixed (`31321e24f`).
+- **Phase 11 steps 3 and 6 are ready on `p11` (`41130f13c` plus the review fixes `6f4ea6ca7`):**
+  - `test/live/head-grant-probe.live.mjs` covers all 30 contract verbs.
+  - An independent review checked every call's argv and found 24 that are refused before any write, or only read.
+  - `supervisor wake` is not called. It takes no args, always records a wake and may start a supervisor head, so it is
+    listed with the caller-acting verbs.
+  - `served` now counts only the expected domain refusal per verb. Local `bad-args`, route failures and transport
+    failures count as `failed`.
+  - The script refuses a live run outside a head (no `FGOS_HEAD_REQUEST_SOCKET`).
+  - The `head-start.test.mjs` comment now cites `apps/fgos/tests/questions_head.rs`.
+- **The land of `p11` is parked on `q-pfecbg6ffn`:** ticket `c-80805-1795354765816` passed its gates and then failed
+  `fast-forward main: resource-recovery-required`, so it needs `fgos git recover`.
+- **Phase 11 stays `ready`** for its remaining steps:
+  - step 1, the gate on main;
+  - step 2, the CHANGELOG line, rebased after s6a 22b;
+  - steps 4-5, the live runs and the report, on heads started on a release that carries phases 2, 5-7 and 12.
+  These come after phases 8, 9 and 10 finish their 24-hour measures (phase 9's window ends about 14:20 on 2026-11-23).
+
 ### Lead progress (2026-11-22 20:05, head:lead-forgent-261122-0118-heads-b52f9)
 
 - **The clippy fix for 12b is ready on `p12c` (`b800a1601`):** the nested if is collapsed and `renew_in_scratch`'s
