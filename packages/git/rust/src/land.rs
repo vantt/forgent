@@ -1594,6 +1594,15 @@ impl GitDriver {
                     observed: crate::refs::tip(&observed),
                     attribution: wal::Attribution::EffectObservedOnly,
                 }
+            } else if self.target_contains_candidate(repo, &scope, id, old, next, &observed)? {
+                // Effect present (target contains candidate): the ref already moved past this
+                // chain's candidate, so its fast-forward is in the ref whoever made it, and its
+                // CAS from the old tip can never take effect again. A success outcome names the
+                // chain's next tip, the effect observed in the ref's history, never a CAS win.
+                Outcome::Success {
+                    observed: i.next.clone(),
+                    attribution: wal::Attribution::EffectObservedOnly,
+                }
             } else {
                 return Err(recovery("ref-effect-unknown"));
             }
@@ -1601,6 +1610,43 @@ impl GitDriver {
         let terminal = wal.append(&chain, Phase::Outcome(outcome.clone()))?;
         crate::refs::release_pin(self, repo, admin, &wal, &terminal)?;
         Ok(outcome)
+    }
+
+    /// True only when all three hold: the chain's own candidate pin reads back as its next tip,
+    /// the target ref now has that candidate as an ancestor, and it still descends from the old
+    /// tip the chain meant to move (no divergence from the branch it updated). An unreadable or
+    /// different pin, a diverged ref or an ancestry check Git cannot answer is false, and the
+    /// chain stays kept.
+    fn target_contains_candidate(
+        &self,
+        repo: &RepoHandle,
+        scope: &LockScope<'_>,
+        id: &str,
+        old: &str,
+        next: &str,
+        observed: &ExpectedTip,
+    ) -> Result<bool> {
+        let ExpectedTip::Oid(observed) = observed else {
+            return Ok(false);
+        };
+        let pin =
+            RefName::parse(&format!("refs/fgos/git-operations/{id}/candidate")).map_err(failure)?;
+        if !matches!(crate::refs::direct(self, repo, &pin), Ok(ExpectedTip::Oid(p)) if p.as_str() == next)
+        {
+            return Ok(false);
+        }
+        for ancestor in [next, old] {
+            let out = self.land_call(
+                repo,
+                scope,
+                &["merge-base", "--is-ancestor", ancestor, observed.as_str()],
+                &[],
+            )?;
+            if !out.success {
+                return Ok(false);
+            }
+        }
+        Ok(true)
     }
 }
 fn land_receipt(chain: &wal::Chain, repo: &RepoHandle) -> Result<Receipt> {

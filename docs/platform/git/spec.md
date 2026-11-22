@@ -193,6 +193,8 @@ and inspection after Worktree repair). A compacted operation returns its
 terminal WAL outcome without introducing any new effect. Recovery holds are
 released before returning to consumer settlement; no consumer state is written.
 
+An attempted main-checkout catch-up whose ref is at neither its old nor its next tip settles as effect present (target contains candidate), recorded as `effectObservedOnly` at its next tip (the journal's success outcome always names next; the ref has moved past it), only when all three hold: its own candidate pin reads back as its next tip, the target ref has that candidate as an ancestor, and the ref still descends from the chain's old tip. Its pin is then released. An unreadable or different pin, a diverged ref or an ancestry check Git cannot answer keeps it `ref-effect-unknown`, as before (2026-11-22, tsk-uq4ziqg3yd).
+
 ConfigChange reconciliation delegates to the existing config recovery under
 repo-config 80, without acquiring the peer-rank recovery leaf. This resource
 authority excludes fgOS config writers and recoverers; native config.lock
