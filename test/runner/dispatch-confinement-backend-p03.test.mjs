@@ -1259,7 +1259,7 @@ test('a workspace-write producer in a linked worktree cannot write git metadata;
 
 /** A project with docs and plans directories: the granted plans directory and discussions, the pointer backlog and other docs files, a dotfile and a subdirectory. */
 function docsProject(base) {
-  fs.mkdirSync(path.join(base, 'docs', 'sub'));
+  fs.mkdirSync(path.join(base, 'docs', 'sub'), { recursive: true });
   fs.mkdirSync(path.join(base, 'plans', 'discussions'), { recursive: true });
   fs.writeFileSync(path.join(base, 'plans', 'backlog.md'), 'old\n');
   fs.writeFileSync(path.join(base, 'docs', 'backlog.md'), 'pointer\n');
