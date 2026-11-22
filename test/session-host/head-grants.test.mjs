@@ -4,7 +4,7 @@ import test from 'node:test';
 
 import { grantOf } from '../../src/session-host/head-grants.mjs';
 
-const HEAD = ['session bind session', 'session rotate', 'session answered', 'session restore role'];
+const HEAD = ['session bind session', 'session rotate', 'session answered', 'session restore role', 'friction record'];
 const QUESTIONS = ['questions list', 'questions ask', 'questions ack', 'questions cancel'];
 const LAND = ['land', 'request result'];
 const PORTFOLIO_READ = ['supervisor plans', 'supervisor queue', 'slots'];

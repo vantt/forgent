@@ -15,7 +15,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { CONFINED_MARKER_ENV, readConfig } from '../config/facade.mjs';
 import { HEAD_PERSONAS, HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
-import { HEAD_ANSWERED_VERB, HEAD_LAND_VERB, HEAD_METRICS_PRUNE_VERB, HEAD_METRICS_RECORD_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_QUESTIONS_LIST_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_SESSION_READ_VERB, HEAD_SESSION_TYPE_VERB, HEAD_START_VERB, HEAD_SLOTS_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_SUPERVISOR_HANDLED_VERB, HEAD_SUPERVISOR_PLANS_VERB, HEAD_SUPERVISOR_QUEUE_VERB, HEAD_SUPERVISOR_RAISE_VERB, HEAD_SUPERVISOR_WAKE_VERB, HEAD_WATCHER_TUNE_VERB, HEAD_WORKTREE_CREATE_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
+import { HEAD_ANSWERED_VERB, HEAD_FRICTION_RECORD_VERB, HEAD_LAND_VERB, HEAD_METRICS_PRUNE_VERB, HEAD_METRICS_RECORD_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_QUESTIONS_LIST_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_SESSION_READ_VERB, HEAD_SESSION_TYPE_VERB, HEAD_START_VERB, HEAD_SLOTS_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_SUPERVISOR_HANDLED_VERB, HEAD_SUPERVISOR_PLANS_VERB, HEAD_SUPERVISOR_QUEUE_VERB, HEAD_SUPERVISOR_RAISE_VERB, HEAD_SUPERVISOR_WAKE_VERB, HEAD_WATCHER_TUNE_VERB, HEAD_WORKTREE_CREATE_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
 import { assertHeadArgs, headRoleOf, startHeadSession } from './head-start.mjs';
 import { HeadPlanError, isPlanHeadName, planOfHead } from './head-plan.mjs';
 import { stopHeadSession } from './head-stop.mjs';
@@ -106,6 +106,8 @@ function callHeadQuestions({ hostBin, runDir, cwd, request }) {
 
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
 const REF_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$/;
+/** A friction subject or ref is `kind:id`, so it also allows ':' and '@'. */
+const FRICTION_REF_PATTERN = /^[A-Za-z0-9][A-Za-z0-9:@._/-]{0,199}$/;
 const SELF_PATH = fileURLToPath(import.meta.url);
 const HOST_VERB_TIMEOUT_MS = 55_000;
 /** A reply frame holds 65536 bytes with its own envelope; a host answer over this is refused rather than lost. */
@@ -625,6 +627,60 @@ function metricsPruneVerb({ args, envelope, projectRoot, ports }) {
   return hostCall({ envelope, projectRoot, argv }, ports);
 }
 
+function frictionRecordVerb({ args, envelope, projectRoot, ports }) {
+  exactKeys(args, ['subject', 'kind', 'ref', 'layer', 'error-class', 'disposition', 'producer', 'attempts', 'doc-type', 'detail', 'detail-stdin']);
+  if (args['detail-stdin'] !== undefined) {
+    throw badArgs('detail-stdin is not supported over the request socket; pass detail');
+  }
+  const str = (key, value) => {
+    if (value === undefined) return;
+    if (typeof value !== 'string') throw badArgs(`${key} must be a string`);
+    if (Buffer.byteLength(value) > TYPE_TEXT_MAX) throw badArgs(`${key} must be at most ${TYPE_TEXT_MAX} bytes`);
+    noDash(key, value);
+  };
+  if (args.subject !== undefined) {
+    str('subject', args.subject);
+    if (!FRICTION_REF_PATTERN.test(args.subject)) throw badArgs('subject must be a valid ref (kind:id)');
+  }
+  str('kind', args.kind);
+  str('layer', args.layer);
+  const errorClass = args['error-class'];
+  str('error-class', errorClass);
+  str('disposition', args.disposition);
+  str('producer', args.producer);
+  const docType = args['doc-type'];
+  str('doc-type', docType);
+  str('detail', args.detail);
+  if (args.attempts !== undefined) {
+    if (typeof args.attempts === 'string') {
+      noDash('attempts', args.attempts);
+      if (!/^[0-9]+$/.test(args.attempts)) throw badArgs('attempts must be a non-negative integer');
+    } else if (!Number.isInteger(args.attempts) || args.attempts < 0) {
+      throw badArgs('attempts must be a non-negative integer');
+    }
+  }
+  const argv = ['friction', 'record'];
+  if (args.subject !== undefined) argv.push('--subject', args.subject);
+  if (args.kind !== undefined) argv.push('--kind', args.kind);
+  if (args.layer !== undefined) argv.push('--layer', args.layer);
+  if (errorClass !== undefined) argv.push('--error-class', errorClass);
+  if (args.disposition !== undefined) argv.push('--disposition', args.disposition);
+  if (args.producer !== undefined) argv.push('--producer', args.producer);
+  if (docType !== undefined) argv.push('--doc-type', docType);
+  if (args.attempts !== undefined) argv.push('--attempts', String(args.attempts));
+  if (args.ref !== undefined) {
+    const refs = Array.isArray(args.ref) ? args.ref : [args.ref];
+    for (const r of refs) {
+      str('ref', r);
+      if (!FRICTION_REF_PATTERN.test(r)) throw badArgs('ref must be a valid ref (kind:id)');
+      argv.push('--ref', r);
+    }
+  }
+  if (args.detail !== undefined) argv.push('--detail', args.detail);
+  argv.push('--json');
+  return hostCall({ envelope, projectRoot, argv }, ports);
+}
+
 /** The detached stop of the caller's own session: waits until the route that started it has exited, so the reply is out first. */
 export async function runStopSelf({ persona, name, projectRoot, waitPid }, ports = {}) {
   const sleep = ports.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
@@ -734,6 +790,9 @@ export async function runHeadRequest({ runDir, request }, ports = {}) {
         break;
       case HEAD_METRICS_PRUNE_VERB:
         data = metricsPruneVerb({ args, envelope, projectRoot, ports });
+        break;
+      case HEAD_FRICTION_RECORD_VERB:
+        data = frictionRecordVerb({ args, envelope, projectRoot, ports });
         break;
       case HEAD_SUPERVISOR_QUEUE_VERB:
       case HEAD_SUPERVISOR_PLANS_VERB:

@@ -23,10 +23,10 @@ const NONE = Object.freeze({ writes: Object.freeze([]), verbs: Object.freeze([])
 export const HEAD_BIND_SESSION_VERB = 'session bind session';
 
 /**
- * Every head may bind its agent session, rotate itself, report its first turn as a successor and take its role back
- * after a failed rotation; only the secretary may also start sessions and write its granted file (the backlog).
+ * Every head may bind its agent session, rotate itself, report its first turn as a successor, take its role back
+ * after a failed rotation, and record friction; only the secretary may also start sessions and write its granted file (the backlog).
  */
-const HEAD_VERBS = Object.freeze([HEAD_BIND_SESSION_VERB, 'session rotate', 'session answered', 'session restore role']);
+const HEAD_VERBS = Object.freeze([HEAD_BIND_SESSION_VERB, 'session rotate', 'session answered', 'session restore role', 'friction record']);
 
 /**
  * Every head may list the open owner questions (a read the sandbox cannot make itself: the event store is masked) and
@@ -76,7 +76,7 @@ const GRANTS = Object.freeze({
   }),
 });
 /** A lead's verbs; its writes are its plan dir, which the caller resolves (this module reads no files). No `session start`. */
-const LEAD_VERBS = Object.freeze([...HEAD_VERBS, ...QUESTION_VERBS, 'run', 'land', 'worktree create', 'request result']);
+const LEAD_VERBS = Object.freeze([...HEAD_VERBS, ...QUESTION_VERBS, 'supervisor raise', 'run', 'land', 'worktree create', 'request result']);
 
 /** Every persona that holds a head grant: the table's keys and `lead`, whose grant is its plan directory. */
 export const HEAD_PERSONAS = Object.freeze([...Object.keys(GRANTS), 'lead']);

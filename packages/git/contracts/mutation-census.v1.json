@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a5f205e153cf6c7563320ccc440bb1c4c02ce2ef0deacdf76e32d5406b5aceac",
+  "payloadDigest": "071447b5b35bf633f221237862a3f8d505a88856b05f087a6fe71212f919e10c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -98,7 +98,7 @@
     "apps/fgos/src/invocation_doors.rs": "6b874024689dfc1134dfb89487c744caf1ec784e6dd4313b4ed099026fefce39",
     "apps/fgos/src/legacy_exec.rs": "409d3fd5fc829b7febd7a57b24bf9c6f9bab6c91e1807668cab6bf3d5c1c15c4",
     "apps/fgos/src/main.rs": "199dda8a1e4cd0cbfe753e332128621c634c8d8e1cfb4c575e338e9a63b41af6",
-    "apps/fgos/src/routing.rs": "ecbf40301c05839eee05ffd1533c998e753008741dcc59eecb2014048fc76a70",
+    "apps/fgos/src/routing.rs": "48270aca013e5e8bb9a37a2a340d22b8ad4bcfdd28d9442aeee4e0581a5d11ea",
     "apps/fgos/src/wiring/agents.rs": "d40cd43facea6c5d1e5a7b3363b8e69567f3ad7aa33b628eb269c935a88f06e4",
     "apps/fgos/src/wiring/attempt_step.rs": "5dade9079e7e99ca3f9bc2cf18d226583f96be2bf6cc590398ac93fded4b141f",
     "apps/fgos/src/wiring/dispatch_decide.rs": "a252ae44cfe42547231b07201f2e0efb9d30327d4db02974ffbeed3e5e99a6b5",
@@ -1183,7 +1183,7 @@
     "packages/run-supervisor/rust/tests/gate_pid1.rs": "73f2e89f16a3a4a76e95aa73c98a3f7fafef8c1d41e5748a87f538c2c82e8478",
     "packages/run-supervisor/rust/tests/gate_portable.rs": "1a97989cd9fbebc519506651eb3a79c7c577e0ffb199abb71bd07a0e133cc0db",
     "packages/run-supervisor/rust/tests/gate_terminal_socket.rs": "cba60e64b6f41309553c78216e66937d164b70bc2f1b37e49d657882daf2ce00",
-    "packages/run-supervisor/rust/tests/head_request.rs": "863e2a0b0e4a8c974a3d87a61ad4e404ff05e61573d88d16f8f0d10b31e5e52a",
+    "packages/run-supervisor/rust/tests/head_request.rs": "d91733d164526c27594834249accd1295c303664661bbf1b3f3fec03b21fdabb",
     "packages/run-supervisor/rust/tests/head_role_binding.rs": "86928b9c8303a3633b9865081bd195d949b6295c14839f277c1471eb33fab110",
     "packages/run-supervisor/rust/tests/lanes.rs": "982d01cd1ad9217eb89164c3a15286c123268908582fab81a0cd59dbc8926d95",
     "packages/run-supervisor/rust/tests/portable/mod.rs": "6153ea7719f18ef0cc293fde0d603101df1308a4b2980edcc8dff57ad6d37363",
@@ -1629,10 +1629,10 @@
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
     "src/seat-binding/client.mjs": "421d4ae4b1605096d7646e29461be4eafbf6a990ef92fdcfe5e0756614496fd1",
     "src/session-host/client.mjs": "e49192345fa315a153ace4c3de0422351b0989bf20b663ae0a77b398767cd0eb",
-    "src/session-host/head-grants.mjs": "c189734398d3faa76005d4e327ea27c8b6326b743cf0815b878f86cd24cfaa74",
+    "src/session-host/head-grants.mjs": "fbab74e9a5195145330f46e4a673ad217e7c3abf63b53dac993dcd3e8b10c8c2",
     "src/session-host/head-plan.mjs": "634ba6bd771661549baef7c50d3a8102a487ec00b0b6c67349d289c44941fa13",
-    "src/session-host/head-request-client.mjs": "eb600336e0f07fefcdec8499d366044b399dc74e3cfdda546954d884af67559d",
-    "src/session-host/head-request.mjs": "cea2b7a0c493ebdbad7b410c636c1d0742f6b67ab28727a6643ad31920656fd4",
+    "src/session-host/head-request-client.mjs": "3ae89878a0c3b33bb383474c20d33b5aa610febcdb5a5a5d04f2f6e693fab499",
+    "src/session-host/head-request.mjs": "9a77d0850e35e8a3ccab0e321f9b1bc0e6c516dc607336c33cb8a96490ea1d6a",
     "src/session-host/head-start.mjs": "cb24e602718da82112b76260b2f14b20f3e305003f749f62b0d5d69a246f5346",
     "src/session-host/head-stop.mjs": "4284bc2638e3ac4a71d151763c981d220a017c4f948cefc829115be5a6221ad3",
     "src/session-rotation/handoff-store.mjs": "3d1385774aa7c09573a6e298f82e7bf75d55beb436d9caa7c266cc1735c46128",
@@ -4867,92 +4867,99 @@
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 685,
-      "spawn": "hostCall -> src/session-host/head-request.mjs:183",
+      "line": 741,
+      "spawn": "hostCall -> src/session-host/head-request.mjs:185",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 695,
+      "line": 751,
       "spawn": "callHeadQuestions -> src/session-host/head-request.mjs:94",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 708,
-      "spawn": "worktreeCreate -> src/session-host/head-request.mjs:512",
+      "line": 764,
+      "spawn": "worktreeCreate -> src/session-host/head-request.mjs:514",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 711,
-      "spawn": "stopVerb -> src/session-host/head-request.mjs:544",
+      "line": 767,
+      "spawn": "stopVerb -> src/session-host/head-request.mjs:546",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 718,
-      "spawn": "hostCall -> src/session-host/head-request.mjs:183",
+      "line": 774,
+      "spawn": "hostCall -> src/session-host/head-request.mjs:185",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 721,
-      "spawn": "raiseVerb -> src/session-host/head-request.mjs:575",
+      "line": 777,
+      "spawn": "raiseVerb -> src/session-host/head-request.mjs:577",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 724,
-      "spawn": "tuneVerb -> src/session-host/head-request.mjs:588",
+      "line": 780,
+      "spawn": "tuneVerb -> src/session-host/head-request.mjs:590",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 727,
-      "spawn": "sessionReadVerb -> src/session-host/head-request.mjs:595",
+      "line": 783,
+      "spawn": "sessionReadVerb -> src/session-host/head-request.mjs:597",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 730,
-      "spawn": "sessionTypeVerb -> src/session-host/head-request.mjs:603",
+      "line": 786,
+      "spawn": "sessionTypeVerb -> src/session-host/head-request.mjs:605",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 733,
-      "spawn": "metricsRecordVerb -> src/session-host/head-request.mjs:616",
+      "line": 789,
+      "spawn": "metricsRecordVerb -> src/session-host/head-request.mjs:618",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 736,
-      "spawn": "metricsPruneVerb -> src/session-host/head-request.mjs:625",
+      "line": 792,
+      "spawn": "metricsPruneVerb -> src/session-host/head-request.mjs:627",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 743,
-      "spawn": "hostCall -> src/session-host/head-request.mjs:183",
+      "line": 795,
+      "spawn": "frictionRecordVerb -> src/session-host/head-request.mjs:681",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 747,
-      "spawn": "hostCall -> src/session-host/head-request.mjs:183",
+      "line": 802,
+      "spawn": "hostCall -> src/session-host/head-request.mjs:185",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/head-request.mjs",
+      "line": 806,
+      "spawn": "hostCall -> src/session-host/head-request.mjs:185",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },

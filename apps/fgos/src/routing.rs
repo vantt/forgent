@@ -493,10 +493,29 @@ pub struct ConfinedCall {
     pub args: serde_json::Value,
 }
 
+/// The most stdin bytes a confined `friction record --detail-stdin` reads.
+const MAX_DETAIL_INPUT_BYTES: u64 = 4096;
+
+fn detail_from_stdin<R: std::io::Read>(reader: &mut R) -> Result<String, String> {
+    use std::io::Read;
+    let mut bytes = Vec::new();
+    reader
+        .take(MAX_DETAIL_INPUT_BYTES + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|e| format!("bad-args: friction record: cannot read stdin: {e}"))?;
+    if bytes.len() as u64 > MAX_DETAIL_INPUT_BYTES {
+        return Err(format!(
+            "bad-args: friction record: detail on stdin is over {MAX_DETAIL_INPUT_BYTES} bytes"
+        ));
+    }
+    String::from_utf8(bytes)
+        .map_err(|e| format!("bad-args: friction record: stdin detail is not UTF-8: {e}"))
+}
+
 /// The call as the head request contract reads it, or why the call cannot be one. `None`: the call is not of a
 /// verb the contract names, so it takes the route its selector has. This is the one confined rule of the host
 /// (PS-20): a confined caller reaches `land`, `worktree create`, `request result`, `session stop`,
-/// `supervisor handled|raise|done`, `watcher tune`, `session read|type` and `metrics record|prune` only through its
+/// `supervisor handled|raise|done`, `watcher tune`, `session read|type`, `friction record` and `metrics record|prune` only through its
 /// supervisor's request socket. `run` goes there only from a head with a grant (`head_socket`: it has a request
 /// socket, as for `metrics record|prune`); a confined worker without one takes the native `run` verb, which refuses its writing run before admission
 /// and lets a read-only one go on, as the Node arm did. The marker is the caller's to check; this reads the words and
@@ -507,6 +526,20 @@ pub struct ConfinedCall {
 pub fn confined_head_call(
     cli_args: &[OsString],
     head_socket: bool,
+) -> Option<Result<ConfinedCall, String>> {
+    use std::io::IsTerminal;
+    // A terminal on stdin is never read: `--detail-stdin` then sees empty input instead of waiting on the keyboard.
+    if std::io::stdin().is_terminal() {
+        confined_head_call_with_reader(cli_args, head_socket, &mut std::io::empty())
+    } else {
+        confined_head_call_with_reader(cli_args, head_socket, &mut std::io::stdin())
+    }
+}
+
+pub(crate) fn confined_head_call_with_reader<R: std::io::Read>(
+    cli_args: &[OsString],
+    head_socket: bool,
+    stdin: &mut R,
 ) -> Option<Result<ConfinedCall, String>> {
     use serde_json::{json, Map, Value};
     let selector = cli_args.first()?.to_string_lossy().into_owned();
@@ -523,6 +556,7 @@ pub fn confined_head_call(
         // A confined worker has no socket and keeps the local route of these two; only a head asks through its own.
         ("metrics", Some("record")) if head_socket => "metrics record",
         ("metrics", Some("prune")) if head_socket => "metrics prune",
+        ("friction", Some("record")) if head_socket => "friction record",
         ("supervisor", Some("raise")) => "supervisor raise",
         ("supervisor", Some("handled")) => "supervisor handled",
         ("supervisor", Some("done")) => "supervisor done",
@@ -697,6 +731,38 @@ pub fn confined_head_call(
             "metrics record" => {
                 if !words.is_empty() {
                     return Err("bad-args: metrics record sends its records on stdin".to_owned());
+                }
+            }
+            "friction record" => {
+                if !words.is_empty() {
+                    return Err("bad-args: friction record takes no arguments".to_owned());
+                }
+                text(&mut args, "subject", "subject")?;
+                text(&mut args, "kind", "kind")?;
+                text(&mut args, "layer", "layer")?;
+                text(&mut args, "error-class", "error-class")?;
+                text(&mut args, "disposition", "disposition")?;
+                text(&mut args, "producer", "producer")?;
+                text(&mut args, "doc-type", "doc-type")?;
+                text(&mut args, "detail", "detail")?;
+                if let Some(attempts) = call.value("attempts")? {
+                    let attempts: u32 = attempts.parse().map_err(|_| {
+                        format!("bad-args: --attempts needs a number, got {attempts}")
+                    })?;
+                    args.insert("attempts".to_owned(), json!(attempts));
+                }
+                if let Some(refs) = list("ref")? {
+                    args.insert("ref".to_owned(), json!(refs));
+                }
+                if call.switch("detail-stdin")? {
+                    if args.contains_key("detail") {
+                        return Err(
+                            "bad-args: choose either --detail or --detail-stdin, not both"
+                                .to_owned(),
+                        );
+                    }
+                    let detail = detail_from_stdin(stdin)?;
+                    args.insert("detail".to_owned(), json!(detail));
                 }
             }
             "supervisor handled" => {
@@ -1197,7 +1263,7 @@ mod confined_tests {
 
     fn confined(args: &[&str]) -> Option<Result<ConfinedCall, String>> {
         let os: Vec<OsString> = args.iter().map(OsString::from).collect();
-        confined_head_call(&os, true)
+        confined_head_call_with_reader(&os, true, &mut std::io::empty())
     }
 
     fn built(args: &[&str]) -> ConfinedCall {
@@ -1307,6 +1373,113 @@ mod confined_tests {
             built(&["run", "do it", "--writes", "src/a,src/b"]).args,
             json!({"prompt": "do it", "writes": ["src/a", "src/b"]})
         );
+        assert_eq!(
+            built(&[
+                "friction",
+                "record",
+                "--subject",
+                "work:w1",
+                "--kind",
+                "bug",
+                "--layer",
+                "runner",
+                "--error-class",
+                "tool-missing",
+                "--disposition",
+                "advisory",
+                "--producer",
+                "agent",
+                "--attempts",
+                "3",
+                "--doc-type",
+                "reference",
+                "--detail",
+                "desc",
+                "--ref",
+                "run:r1",
+            ])
+            .args,
+            json!({
+                "subject": "work:w1",
+                "kind": "bug",
+                "layer": "runner",
+                "error-class": "tool-missing",
+                "disposition": "advisory",
+                "producer": "agent",
+                "attempts": 3,
+                "doc-type": "reference",
+                "detail": "desc",
+                "ref": ["run:r1"]
+            })
+        );
+        assert!(confined(&["friction", "record", "extra"]).unwrap().is_err());
+    }
+
+    #[test]
+    fn friction_record_detail_stdin_reads_stdin_and_drops_the_flag() {
+        use std::io::Cursor;
+        let os: Vec<OsString> = [
+            "friction",
+            "record",
+            "--subject",
+            "work:w1",
+            "--layer",
+            "runner",
+            "--error-class",
+            "tool-missing",
+            "--disposition",
+            "advisory",
+            "--producer",
+            "agent",
+            "--detail-stdin",
+        ]
+        .iter()
+        .map(OsString::from)
+        .collect();
+        let mut input = Cursor::new(b"friction detail text from stdin");
+        let call = confined_head_call_with_reader(&os, true, &mut input)
+            .expect("friction record is a contract verb")
+            .expect("valid call");
+        assert_eq!(
+            call.args.get("detail"),
+            Some(&json!("friction detail text from stdin"))
+        );
+        assert!(call.args.get("detail-stdin").is_none());
+
+        // Choosing both --detail and --detail-stdin is refused
+        let both_os: Vec<OsString> = [
+            "friction",
+            "record",
+            "--subject",
+            "work:w1",
+            "--layer",
+            "runner",
+            "--error-class",
+            "tool-missing",
+            "--disposition",
+            "advisory",
+            "--producer",
+            "agent",
+            "--detail",
+            "some detail",
+            "--detail-stdin",
+        ]
+        .iter()
+        .map(OsString::from)
+        .collect();
+        let mut empty = Cursor::new(b"");
+        let err = confined_head_call_with_reader(&both_os, true, &mut empty)
+            .unwrap()
+            .unwrap_err();
+        assert!(err.contains("choose either --detail or --detail-stdin"));
+
+        // Over-limit stdin is refused
+        let big = vec![b'x'; 4097];
+        let mut big_input = Cursor::new(big);
+        let err = confined_head_call_with_reader(&os, true, &mut big_input)
+            .unwrap()
+            .unwrap_err();
+        assert!(err.contains("detail on stdin is over 4096 bytes"));
     }
 
     #[test]
@@ -1325,6 +1498,25 @@ mod confined_tests {
             .collect();
         assert!(confined_head_call(&os, false).is_none());
         assert!(confined_head_call(&os, true).is_some());
+        let friction: Vec<OsString> = [
+            "friction",
+            "record",
+            "--subject",
+            "work:w1",
+            "--layer",
+            "runner",
+            "--error-class",
+            "tool-missing",
+            "--disposition",
+            "advisory",
+            "--producer",
+            "agent",
+        ]
+        .iter()
+        .map(OsString::from)
+        .collect();
+        assert!(confined_head_call(&friction, false).is_none());
+        assert!(confined_head_call(&friction, true).is_some());
         let land: Vec<OsString> = ["land"].iter().map(OsString::from).collect();
         assert!(
             confined_head_call(&land, false).is_some(),
