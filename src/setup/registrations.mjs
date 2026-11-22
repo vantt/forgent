@@ -27,14 +27,13 @@ import { fileURLToPath } from 'node:url';
 import { domainCatalog } from '../util/domain-dirs.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { checkCompiledDomains } from '../util/domain-compile.mjs';
-import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
 import { ownedSkillNames } from './skill-wrappers.mjs';
 import { declaredActivities, readWorkflowCatalog, withUnreadableDefinitions } from './workflow-catalog-reader.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 
 import { validateRunnerLoopsShape, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
-import { RunnerConfigError, checkCatalog, deepEqual } from '../native/execution-door.mjs';
+import { RunnerConfigError, checkCatalog, deepEqual, loadRunnerConfigForDir } from '../native/execution-door.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH, formatRetiredKeySentence } from '../runner/execution/patterns/retired-keys.mjs';
 import { isCommandAvailable, resolveMainCheckoutRoot } from '../runner/paths.mjs';

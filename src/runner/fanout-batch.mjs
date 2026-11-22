@@ -1,9 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from './paths.mjs';
-import { loadRunnerConfigForDir } from './dispatch/config.mjs';
 import { listWork } from '../state/store.mjs';
 import { compileDispatchPlan } from './dispatch/plan.mjs';
-import { runUnitInHost } from '../native/execution-door.mjs';
+import { loadRunnerConfigForDir, runUnitInHost } from '../native/execution-door.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { workDispatchHint, workUnitFor } from './work-dispatch.mjs';
 import fs from 'node:fs';

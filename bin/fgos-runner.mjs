@@ -22,7 +22,7 @@
 
 import { categoryOf } from '../src/state/store.mjs';
 import { EXIT_CODES } from '../src/cli/exit-codes.mjs';
-import { loadRunnerConfigForDir } from '../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../src/native/execution-door.mjs';
 import { resolveRepoRoot, runOnce, runWatch } from '../src/runner/loop.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 

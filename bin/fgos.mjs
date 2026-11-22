@@ -48,8 +48,7 @@ import { foldEvents, conflictsFor } from '../src/state/replay.mjs';
 import { deriveTitle, classify } from '../src/intake/classify.mjs';
 import { mintWorkId } from '../src/util/identity-mint.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
-import { loadRunnerConfigForDir } from '../src/runner/dispatch/config.mjs';
-import { RunnerConfigError } from '../src/runner/dispatch/runner-config-error.mjs';
+import { loadRunnerConfigForDir, RunnerConfigError } from '../src/native/execution-door.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { checkDirDiffersFromCwd, attachDirWarning } from '../src/workflow/dir-guard.mjs';
 import { lintPlanCapabilityAnnotations, lintPhaseUnits } from '../src/report/capability-plan-lint.mjs';
@@ -3585,7 +3584,7 @@ async function main() {
     if (recorded) {
       process.stderr.write(`fgos: invocation fault recorded to ${recorded}\n`);
     }
-    const { DispatchError } = await import('../src/run-supervisor/dispatch-error.mjs');
+    const { DispatchError } = await import('../src/native/dispatch-error.mjs');
     if (err instanceof DispatchError) {
       process.exitCode = 1;
     } else {

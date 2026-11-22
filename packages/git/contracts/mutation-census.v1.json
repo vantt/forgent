@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "36edf7625a2e85fdbf7f5a17cf75cd7977a57dac931e9e47ca1238b32161a363",
+  "payloadDigest": "1a6363f21239ce76acf0abb3bc8fd51749f2ecfc3fb00c5771ada55ec655fcd4",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -213,8 +213,8 @@
     "apps/fgos/tests/windows_predecessor_stress.rs": "1b5268d306deffe0946748a441a1b107427469d310348d6866efd9237b95ada8",
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
-    "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "0bea6cbefd13a751a673c03de0637e2d27d9db15b71ea7877e4a672fffaa5383",
+    "bin/fgos-runner.mjs": "5e09ca42a394267dc54a4cbff4cbf5f527330162916f32f1f49a5fe9c9379f63",
+    "bin/fgos.mjs": "2718bbf483bab8423f147bf2d67f9ba0fd802784a38ceb6bff7e9f4bca4b61e4",
     "core/skills/_shared/capability-catalog.md": "abb355e91c92f728f1a527777945e80b9cc97c57af82e2c1a4e3eac64b928da6",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -1595,7 +1595,7 @@
     "src/runner/execution/unit-state.mjs": "70e84ac79254919aece01fb93088479fd62d58d2eda5100fc7df85f06791f9c3",
     "src/runner/execution/unit-summary.mjs": "548830a55bbfde17f2f0ff5a8222a62580eddf5586a19506a3aac856d9e59e78",
     "src/runner/execution/unit.mjs": "0de2c193af4804f31863f293bc031ee17dc853dde8768a80205320081f42296e",
-    "src/runner/fanout-batch.mjs": "8e9b58a7a51d2b7b4fdaee3102c4f1222178117776c2357dcd7052f9501ab73f",
+    "src/runner/fanout-batch.mjs": "8ddbd9820d07c1b4844a7886e7b3819c21c68533f0da657ad4df2077ada7971d",
     "src/runner/frozen-judge.mjs": "96265fab86a2a57ae4b191c83a864a4f285942f2c35318fbdae435a832bb75ed",
     "src/runner/github-adapter.mjs": "162d7b2064b9b311ea88afba25567601420626743dff6b72b0aba78f42220c00",
     "src/runner/goal-check.mjs": "bed1a778d1f702695160cab5896bb65a96e6c18c7a446ed6bc3b530c7b8ab66c",
@@ -1606,7 +1606,7 @@
     "src/runner/main-checkout-reset-guard.mjs": "24989beae13b117626bee3375c6266532cac9638156902d5b02feeb04bc2a610",
     "src/runner/merge.mjs": "f00a5c54648d20c9085cb14c18f21cfb4ab33f651459ec5d3605773ec1240ca9",
     "src/runner/operation-capability.mjs": "09112f85fe94e2786d5f5a1d5cf1639e718ffe537413bb2a990185f6f5054a9f",
-    "src/runner/operation-choice.mjs": "1f5709e4c17b8170577745529b6b07198d58c70fb7d84f7ac3880f64bc204966",
+    "src/runner/operation-choice.mjs": "37e88596b340f6153f52168938ebedb71a52b79f1c32aa59496d151749828991",
     "src/runner/paths.mjs": "81afadcf35a2f9411b190e53897a79ea119ec6797908f8884a461640603c9d7d",
     "src/runner/promote-engine.mjs": "36b87e1bd743c7d38bfe48db02fafbcd79a5c9f1d092a32a2be20167ec61cf02",
     "src/runner/promote-preflight.mjs": "26db2c2670fc445a4c170af18880ead88e13c4ff1545846b5c8cf760fbd34e54",
@@ -1616,7 +1616,7 @@
     "src/runner/rigor.mjs": "f85eabe784dd24de1e2431f16cccecd6634da8a6ca6be128dc9a87a3c91258c0",
     "src/runner/root-affinity.mjs": "0e074df4c61d29f60a2ce43fb62830ec2a2eaebe0e1998fec0cbacb4cd15e871",
     "src/runner/work-compat.mjs": "f587566545425e2cd1f20390d9474ba6e2d2935f87097e48f3fccba3a24b1352",
-    "src/runner/work-dispatch.mjs": "a471a6adb67adc6191d9d5ed25a21cfd15de8fa901926764978462271200bcf8",
+    "src/runner/work-dispatch.mjs": "ba2cd206782f4000296276cd56e5e9616a36536e953fc84d5fc6d260f4792e0d",
     "src/runner/worker-log.mjs": "c5b978ff9fa7533a62213c77cf7b6241d7b10e43d9fd5cf07f15209b7335a793",
     "src/runner/worktree.mjs": "7bb9dcf75c10ff4ef64ffc68c555135a43db8a96f422b5e91eb2a2e6cce9bc30",
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
@@ -1641,7 +1641,7 @@
     "src/setup/instruction-projections.mjs": "82aaa1ec07a5d2925fcb3117a020eb4576777f901c09d054cb17c659d8c144f3",
     "src/setup/instruction-registry.mjs": "54422d21433247b6bbdf580a8480cd4ce912c8c7928c96ca03a72e8be25abdd7",
     "src/setup/mailbox-limits.mjs": "b8ed2c018a71ee1a06582ea90c7a73ec1a7ebe29e3d931f9a2ba89108a763323",
-    "src/setup/registrations.mjs": "282e17a4d6fde74c6e05e1aeed628d211388eea3cad9ae5adc37b9485f48adff",
+    "src/setup/registrations.mjs": "f5169af908484c22366945b869e61d85057405cd436be45f784f0ba851ed855d",
     "src/setup/seat-binding-checks.mjs": "0ed62754c075f480921dddcec8bcdcffbca20789d9749ecbc9524ec326ae18a0",
     "src/setup/shell-rc.mjs": "260deb1e3dddb3b9f006bb8eab34f39f656f64188b004542effd9fc7072a0bd4",
     "src/setup/skill-wrappers.mjs": "362dfdfb10c62bf90f8f7205db1dcfdc67f013fc62a24501e6e6cec2eb2fffb2",
@@ -2721,14 +2721,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 2897,
+      "line": 2896,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3012,
+      "line": 3011,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
@@ -4665,7 +4665,7 @@
     },
     {
       "path": "src/runner/fanout-batch.mjs",
-      "line": 80,
+      "line": 79,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
