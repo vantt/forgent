@@ -9,7 +9,6 @@ use crate::wiring::dispatch_decide::HostWorkspace;
 use crate::wiring::observe_query::HostRecordEnvironment;
 use fgos_execution::decide::CheckoutFacts;
 use fgos_execution_engine::accounts::{Accounts, SystemHost};
-use fgos_execution_engine::transport::terminal_slot::resolve_herdr_bin;
 use fgos_execution_engine::transport_round::attention::{
     attention_view, AttentionReaders, DefinitionsReader,
 };
@@ -20,18 +19,13 @@ use fgos_execution_engine::unit_run::history::outcome_of_run_result;
 use fgos_host_runtime::{CategorisedRefusal, VerbAnswer};
 use fgos_observe::ObserveRequest;
 use fgos_terminal_control::port::{FindingKind, Refusal};
-use fgos_terminal_control::route::CoreParts;
 use serde_json::{json, Map, Value};
 use std::path::{Path, PathBuf};
-use std::time::Instant;
 
 /// The host's `metrics query --def` call for `(since, now)`, owned.
 type Definitions = Box<dyn Fn(&str, &str) -> Value>;
 
 const ATTENTION_DEFINITIONS: &str = "core/attention/definitions";
-
-/// The terminal-control route is asked in process with the timeout the doctor's rows use.
-const ROUTE_TIMEOUT_MS: u64 = 15_000;
 
 fn now_iso() -> String {
     fgos_identity::text::iso_utc_now()
@@ -60,22 +54,14 @@ fn not_scanned(level: &str, reason: String) -> Value {
 /// What the terminal-control scan finds past `terminal.allocationGraceMs`: slots allocated but never launched,
 /// retained panes past their time, records of a herdr server that is gone. Reads only.
 pub(crate) fn scan_terminal_allocations(root: &Path) -> Value {
-    let lookup = |key: &str| std::env::var(key).ok();
-    let envelope = json!({
-        "herdrBin": resolve_herdr_bin(None, &lookup),
-        "env": {},
-        "config": {},
-        "timeoutMs": ROUTE_TIMEOUT_MS,
-    });
-    let parts = match CoreParts::from_envelope(&envelope, Instant::now()) {
+    let parts = match super::terminal::route_parts(Map::new()) {
         Ok(parts) => parts,
-        Err(refusal) => {
+        Err(message) => {
             return not_scanned(
                 "warning",
                 format!(
-                    "the terminal-control route did not answer, allocations not scanned ({})",
-                    refusal.message
-                ),
+                "the terminal-control route did not answer, allocations not scanned ({message})"
+            ),
             )
         }
     };

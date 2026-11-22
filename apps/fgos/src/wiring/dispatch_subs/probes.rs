@@ -13,6 +13,7 @@ use crate::wiring::unit_run_host::execution::HostExecution;
 use fgos_execution::account_pin::config_pinned_to_account;
 use fgos_execution::accounts::provider_account_inventory;
 use fgos_execution::decide::{load_checked_runner, CheckoutFacts};
+use fgos_execution::run_request::resolve_path;
 use fgos_execution_engine::accounts::account_probe::{
     account_invocations, account_probe_verdict, classify_account_probe, probe_contract,
     probe_model_for, run_direct_leg, with_probe_binding, ProbeRun,
@@ -31,12 +32,11 @@ use fgos_execution_engine::assignment_runner::execute::{
 use fgos_execution_engine::contract::validate::ExecutionContract;
 use fgos_execution_engine::run_result::reader::run_outcome;
 use fgos_execution_engine::run_result::vocabulary::LEASE_CONFLICT_FAILURE_CODE;
-use fgos_execution_engine::transport::terminal_slot::{herdr_endpoint_env, resolve_herdr_bin};
+use fgos_execution_engine::transport::terminal_slot::herdr_endpoint_env;
 use fgos_execution_engine::transport::worker_session::env_for_session;
 use fgos_execution_engine::transport_round::round::close_live_pane;
 use fgos_host_runtime::CategorisedRefusal;
 use fgos_session_host::SessionHost;
-use fgos_terminal_control::route::CoreParts;
 use serde_json::{json, Map, Value};
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
@@ -49,8 +49,6 @@ pub const SESSION_PROBE_PROMPT: &str =
     "Session probe: there is no task. Reply with the single word OK.";
 const ACCOUNT_PROBE_LEGS: [&str; 3] = ["direct", "harness", "both"];
 const DEFAULT_ACCOUNT_PROBE_TIMEOUT_MS: u64 = 3 * 60 * 1000;
-/// The terminal-control route is asked in process with the timeout the doctor's rows use.
-const ROUTE_TIMEOUT_MS: u64 = 15_000;
 
 fn now_ms() -> i64 {
     std::time::SystemTime::now()
@@ -124,20 +122,9 @@ impl<'a> Raw<'a> {
     }
 }
 
-/// `path.resolve(base, path)`: absolute, with `.` and `..` folded.
+/// `path.resolve(base, path)`, through the one resolver the run request uses.
 fn resolve(base: &Path, path: &str) -> PathBuf {
-    let joined = base.join(path);
-    let mut out = PathBuf::new();
-    for part in joined.components() {
-        match part {
-            std::path::Component::ParentDir => {
-                out.pop();
-            }
-            std::path::Component::CurDir => {}
-            other => out.push(other),
-        }
-    }
-    out
+    PathBuf::from(resolve_path(&base.to_string_lossy(), path))
 }
 
 /// The checked runner of the project at `root`; its warnings go to stderr.
@@ -295,14 +282,7 @@ fn close_pane(terminal_key: Option<&str>, herdr_session: Option<&str>) -> bool {
         }
         None => process,
     };
-    let lookup = |name: &str| std::env::var(name).ok();
-    let envelope = json!({
-        "herdrBin": resolve_herdr_bin(None, &lookup),
-        "env": herdr_endpoint_env(&env),
-        "config": {},
-        "timeoutMs": ROUTE_TIMEOUT_MS,
-    });
-    let Ok(parts) = CoreParts::from_envelope(&envelope, Instant::now()) else {
+    let Ok(parts) = super::terminal::route_parts(herdr_endpoint_env(&env)) else {
         return false;
     };
     let core = parts.core();

@@ -42,21 +42,22 @@ pub fn unit_run_facts_at(fgos_dir: &Path, unit_run_id: &str) -> UnitRunFacts {
     unit_run_facts(bytes.as_deref(), held, worktree_exists)
 }
 
-/// Whether the attempt the admission ledger committed for `assignment_id` is open, as the unit state reads it
-/// without a live probe: an attempt directory that exists and was not settled by the legacy sweep. A ledger that
-/// cannot be read counts as open, so a run nobody can prove finished is never judged removable.
-fn attempt_state(assignments_dir: &Path, assignment_id: &str) -> AttemptState {
+/// What the attempt the admission ledger committed for `assignment_id` is, as `probe` judges an attempt directory
+/// that exists and was not settled by the legacy sweep. Nothing admitted, or a directory never made, is
+/// `NotAdmitted`; a ledger that cannot be read is the error.
+pub fn attempt_state_at(
+    assignments_dir: &Path,
+    assignment_id: &str,
+    probe: &dyn Fn(&Path) -> AttemptState,
+) -> std::io::Result<AttemptState> {
     let assignment = assignments_dir.join(assignment_id);
-    let Ok(generations) = list_generations(&assignment.join("admission").join("generations"))
-    else {
-        return AttemptState::Open;
-    };
+    let generations = list_generations(&assignment.join("admission").join("generations"))?;
     let Some(name) = generations.last().and_then(|g| attempt_dir_name(&g.record)) else {
-        return AttemptState::NotAdmitted;
+        return Ok(AttemptState::NotAdmitted);
     };
     let dir = assignment.join("runs").join(name);
     if !dir.exists() {
-        return AttemptState::NotAdmitted;
+        return Ok(AttemptState::NotAdmitted);
     }
     if read_json(&dir.join("run.json"))
         .and_then(|r| {
@@ -67,12 +68,46 @@ fn attempt_state(assignments_dir: &Path, assignment_id: &str) -> AttemptState {
         .as_deref()
         == Some("abandoned-legacy")
     {
-        return AttemptState::AbandonedLegacy;
+        return Ok(AttemptState::AbandonedLegacy);
     }
-    AttemptState::Open
+    Ok(probe(&dir))
 }
 
-/// `deriveUnitState(unitDir, { probe: unprobed })`: the state of a unit run directory with no live probe.
+/// `deriveUnitState(unitDir, { probe })`: what a unit run directory is doing, with each committed attempt judged by
+/// `probe`. A ledger that cannot be read is the error (the caller decides what that means).
+pub fn unit_state_at(
+    unit_dir: &Path,
+    probe: &dyn Fn(&Path) -> AttemptState,
+) -> std::io::Result<Value> {
+    let unit_run_id = unit_dir
+        .file_name()
+        .map(|n| n.to_string_lossy().into_owned())
+        .unwrap_or_default();
+    let summary = read_json(&unit_dir.join("unit-summary.json"));
+    let record = read_json(&unit_dir.join("unit.json"));
+    let assignments = unit_dir.parent().unwrap_or(unit_dir).to_path_buf();
+    let mut failure = None;
+    let state = derive_unit_state(
+        &unit_run_id,
+        summary.as_ref(),
+        || unit_controller_held(unit_dir),
+        record.as_ref(),
+        |id| match attempt_state_at(&assignments, id, probe) {
+            Ok(state) => state,
+            Err(error) => {
+                failure.get_or_insert(error);
+                AttemptState::Open
+            }
+        },
+    );
+    match failure {
+        Some(error) => Err(error),
+        None => Ok(state),
+    }
+}
+
+/// The state of a unit run directory with no live probe: an attempt that exists is open, and a ledger that cannot be
+/// read counts as open, so a run nobody can prove finished is never judged removable.
 fn unit_state_of(unit_dir: &Path) -> UnitState {
     let unit_run_id = unit_dir
         .file_name()
@@ -86,7 +121,10 @@ fn unit_state_of(unit_dir: &Path) -> UnitState {
         summary.as_ref(),
         || unit_controller_held(unit_dir),
         record.as_ref(),
-        |id| attempt_state(&assignments, id),
+        |id| {
+            attempt_state_at(&assignments, id, &|_| AttemptState::Open)
+                .unwrap_or(AttemptState::Open)
+        },
     );
     match state.get("unitState").and_then(Value::as_str) {
         Some("completed") => UnitState::Completed,

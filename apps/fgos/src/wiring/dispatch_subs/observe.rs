@@ -4,9 +4,9 @@
 //! attention view add to what they read.
 
 use super::{fgos_dir, run_id_of, validation, Answer, Answered, Flags, SubRequest};
+use fgos_execution::record_facts::unit_state_at;
 use fgos_execution::unit_record::{
-    attempt_dir_name, derive_unit_state, record_owns_assignment, unit_control_dir,
-    unit_run_id_of_assignment, AttemptState,
+    record_owns_assignment, unit_run_id_of_assignment, AttemptState,
 };
 use fgos_execution_engine::assignment::layout::{
     assignment_dir, find_run_dir, list_assignment_runs, RunLookupError,
@@ -15,7 +15,6 @@ use fgos_execution_engine::run_result::reader::interpret_run_result_file;
 use fgos_execution_engine::transport::visibility_session::read_visibility;
 use fgos_host_runtime::CategorisedRefusal;
 use fgos_run_supervisor::adopt::{adopt_one, AdoptArgs, Target};
-use fgos_run_supervisor::controller::lease::{inspect_run_control, list_generations};
 use serde_json::{json, Map, Value};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, UNIX_EPOCH};
@@ -204,44 +203,17 @@ fn unit_dir_of_assignment(fgos: &Path, assignment_id: &str) -> Option<PathBuf> {
     record_owns_assignment(&record, assignment_id).then_some(unit_dir)
 }
 
-/// What a unit run is doing, with the adopt probe asked of each attempt the admission ledger committed.
-fn unit_state(unit_dir: &Path, probe: &dyn Fn(&Path) -> Value) -> Value {
-    let unit_run_id = unit_dir
-        .file_name()
-        .map(|name| name.to_string_lossy().into_owned())
-        .unwrap_or_default();
-    let summary = read_json(&unit_dir.join("unit-summary.json"));
-    let record = read_json(&unit_dir.join("unit.json"));
-    let assignments = unit_dir.parent().unwrap_or(unit_dir).to_path_buf();
-    derive_unit_state(
-        &unit_run_id,
-        summary.as_ref(),
-        || inspect_run_control(&unit_control_dir(unit_dir)).is_ok_and(|state| state.held),
-        record.as_ref(),
-        |assignment_id| {
-            let assignment = assignments.join(assignment_id);
-            let generations = list_generations(&assignment.join("admission").join("generations"))
-                .unwrap_or_default();
-            let Some(name) = generations.last().and_then(|g| attempt_dir_name(&g.record)) else {
-                return AttemptState::NotAdmitted;
-            };
-            let dir = assignment.join("runs").join(name);
-            if !dir.exists() {
-                return AttemptState::NotAdmitted;
-            }
-            let legacy = read_json(&dir.join("run.json"))
-                .and_then(|run| run.get("settlement").cloned())
-                .and_then(|s| s.as_str().map(str::to_owned));
-            if legacy.as_deref() == Some("abandoned-legacy") {
-                return AttemptState::AbandonedLegacy;
-            }
-            if state_of(&probe(&dir)) == "closed" {
-                AttemptState::Closed
-            } else {
-                AttemptState::Open
-            }
-        },
-    )
+/// What a unit run is doing, with the adopt probe asked of each attempt the admission ledger committed; `None` when a
+/// ledger cannot be read (the view then carries no unit fields, as the Node reader dropped them).
+fn unit_state(unit_dir: &Path, probe: &dyn Fn(&Path) -> Value) -> Option<Value> {
+    let judged = |dir: &Path| {
+        if state_of(&probe(dir)) == "closed" {
+            AttemptState::Closed
+        } else {
+            AttemptState::Open
+        }
+    };
+    unit_state_at(unit_dir, &judged).ok()
 }
 
 /// What the run supervisor and the unit say about one attempt directory: `attemptState` (the probe's word, the
@@ -307,7 +279,9 @@ pub(crate) fn read_attempt_view(
     else {
         return view;
     };
-    let unit = unit_state(&unit_dir, probe);
+    let Some(unit) = unit_state(&unit_dir, probe) else {
+        return view;
+    };
     for key in ["unitRunId", "unitState", "resumeCommand"] {
         if let Some(value) = unit.get(key) {
             view.insert(key.into(), value.clone());

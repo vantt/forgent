@@ -3,6 +3,7 @@
 //! state. It never recovers, launches, signals or controls a Run.
 
 use super::{validation, Answer, Answered, Flags, SubRequest};
+use fgos_execution::run_request::resolve_path;
 use fgos_execution_engine::accounts::{Accounts, AccountsError, QuarantineSet, SystemHost};
 use fgos_execution_engine::planning::reconciliation::{
     apply_reconciliation, plan_reconciliation, ApplyGuard, ApplyLock, PlanRequest, RuntimeView,
@@ -34,13 +35,13 @@ fn now_ms() -> i64 {
 pub(crate) struct HostRuntimeView;
 
 impl HostRuntimeView {
-    fn inspect(root: &Path, options: InspectionOptions) -> Value {
-        inspect_dispatch_runtime(root, &options, &now_iso, true, None).unwrap_or(Value::Null)
+    fn inspect(root: &Path, options: InspectionOptions) -> Result<Value, String> {
+        inspect_dispatch_runtime(root, &options, &now_iso, true, None)
     }
 }
 
 impl RuntimeView for HostRuntimeView {
-    fn inspect_run(&self, root: &Path, run_id: &str) -> Value {
+    fn inspect_run(&self, root: &Path, run_id: &str) -> Result<Value, String> {
         Self::inspect(
             root,
             InspectionOptions {
@@ -50,7 +51,7 @@ impl RuntimeView for HostRuntimeView {
         )
     }
 
-    fn inspect_assignment(&self, root: &Path, assignment_id: &str) -> Value {
+    fn inspect_assignment(&self, root: &Path, assignment_id: &str) -> Result<Value, String> {
         Self::inspect(
             root,
             InspectionOptions {
@@ -271,11 +272,7 @@ pub(crate) fn reconcile(request: &SubRequest, flags: &Flags) -> Answered {
             let run_id = flags.text("run").or_else(|| flags.text("run-id"));
             let cwd = flags.text("cwd").map_or_else(
                 || request.process_cwd.clone(),
-                |cwd| {
-                    let path = PathBuf::from(&cwd);
-                    std::path::absolute(request.process_cwd.join(path))
-                        .unwrap_or_else(|_| request.process_cwd.join(&cwd))
-                },
+                |cwd| PathBuf::from(resolve_path(&request.process_cwd.to_string_lossy(), &cwd)),
             );
             plan_at(
                 &request.root,

@@ -28,10 +28,11 @@ pub const RECONCILE_RUN_REQUIRES_ACTION: &str = "dispatch reconcile plan with --
 const SETTLED_STATUS: &str = "settled";
 const DEFAULT_TTL_MS: i64 = 300_000;
 
-/// The read-only views of the dispatch runtime this planner reads: the `--run` and `--assignment` inspections.
+/// The read-only views of the dispatch runtime this planner reads: the `--run` and `--assignment` inspections. An
+/// inspection that cannot answer ends the plan with its message, as the Node planner let it throw.
 pub trait RuntimeView {
-    fn inspect_run(&self, root: &Path, run_id: &str) -> Value;
-    fn inspect_assignment(&self, root: &Path, assignment_id: &str) -> Value;
+    fn inspect_run(&self, root: &Path, run_id: &str) -> Result<Value, String>;
+    fn inspect_assignment(&self, root: &Path, assignment_id: &str) -> Result<Value, String>;
 }
 
 /// A held apply mutex; released when dropped.
@@ -55,6 +56,13 @@ impl ReconcileError {
         ReconcileError {
             name: "Error",
             message: error.to_string(),
+        }
+    }
+
+    fn inspection(message: String) -> Self {
+        ReconcileError {
+            name: "Error",
+            message,
         }
     }
 
@@ -164,7 +172,9 @@ fn locate(
     run_id: &str,
     action: &str,
 ) -> Result<Located, ReconcileError> {
-    let run = view.inspect_run(root, run_id);
+    let run = view
+        .inspect_run(root, run_id)
+        .map_err(ReconcileError::inspection)?;
     let missing =
         || outcome("blocked", format!("no matching Run was found for {action}")).map(Located::Done);
     match run.get("inspectionStatus").and_then(Value::as_str) {
@@ -236,7 +246,9 @@ fn plan_collect_result(
         .pointer("/links/assignmentIds/0")
         .and_then(Value::as_str)
     {
-        let assignment = view.inspect_assignment(root, assignment_id);
+        let assignment = view
+            .inspect_assignment(root, assignment_id)
+            .map_err(ReconcileError::inspection)?;
         let current: Vec<&str> = assignment
             .pointer("/observations/0/value/currentRunIds")
             .and_then(Value::as_array)

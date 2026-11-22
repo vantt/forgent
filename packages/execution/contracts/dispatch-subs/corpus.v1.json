@@ -7,6 +7,36 @@
   },
   "mtime": "2026-11-19T00:00:00.000Z",
   "now": "2026-11-22T12:00:00.000Z",
+  "probes": {
+    ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01": {
+      "v": 1,
+      "protocol": 1,
+      "attemptDir": "<ROOT>/.fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01",
+      "state": "closed"
+    },
+    ".fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01": {
+      "v": 1,
+      "protocol": 1,
+      "attemptDir": "<ROOT>/.fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01",
+      "state": "legacy-run"
+    },
+    ".fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01": {
+      "v": 1,
+      "protocol": 1,
+      "attemptDir": "<ROOT>/.fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01",
+      "state": "needs-adopt",
+      "adoptable": false,
+      "gone": [
+        "/SCRUBBED-PATH"
+      ]
+    },
+    ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01": {
+      "v": 1,
+      "protocol": 1,
+      "attemptDir": "<ROOT>/.fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01",
+      "state": "closed"
+    }
+  },
   "cases": [
     {
       "sub": "show-run",
@@ -982,7 +1012,7 @@
       "answer": {
         "ok": {
           "outcome": "planned",
-          "actionKey": "reconcile_6e17bb3ce27e3012c43512d2d522faab07dcd4afccb26d3bd060b6f82b9d4c04",
+          "actionKey": "reconcile_2f33419a3264234ee9939ec845536c1ba20ef3035d84a09486f23629b324ec39",
           "snapshot": {
             "digest": "sha256:9c24a25191f6b3049040fc11e511d39e89755f5d810c9e9a8df2ab315c24cb9b",
             "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
@@ -1517,7 +1547,7 @@
       "answer": {
         "ok": {
           "outcome": "planned",
-          "actionKey": "reconcile_f1f11facb8a0bf143f2c40752acb36c9619834ea4647a0c88e174a016d377c89",
+          "actionKey": "reconcile_9fb3b4a69392c0efcc31c7ab31784923ae951735c863cca41941901b1dd0122d",
           "snapshot": {
             "digest": "sha256:594144693216bf1c96afa0da8a8dbca815ed27f4012e60896be7fc7fda25dd28",
             "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
@@ -2646,7 +2676,7 @@
       "answer": {
         "ok": {
           "outcome": "planned",
-          "actionKey": "reconcile_c2a3ab07267e43d0eb8e0f273b3199f6045f2edd2591022f7f90adf60f935eee",
+          "actionKey": "reconcile_4caea48f05d6fe627dc125585ddf4125538113801d707717aff475bc39af0783",
           "snapshot": {
             "digest": "sha256:b50fcb9e3dd96f907dea7ff9bb8e3b1654cfd559995ccb8fb682e9694d4d1385",
             "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",

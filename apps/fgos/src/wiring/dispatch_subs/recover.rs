@@ -11,9 +11,9 @@ use fgos_execution_engine::planning::recovery::{
 };
 use fgos_execution_engine::transport::visibility_session::classify_run_outcome;
 use fgos_execution_engine::transport_round::inspection::find_coordination_session_owning_assignment;
-use fgos_holder_lock::{lock_path, LockScope, Wait};
+use fgos_holder_lock::{lock_path, Acquire, LockScope, ScopeError, Wait};
 use fgos_host_runtime::CategorisedRefusal;
-use fgos_run_supervisor::adopt::{adopt_one, AdoptArgs, Target};
+use fgos_run_supervisor::adopt::{adopt_one, AdoptArgs, Target, Verdict};
 use fgos_run_supervisor::controller::lease::{control_dirs, current_generation};
 use serde_json::{json, Map, Value};
 use std::collections::BTreeMap;
@@ -170,22 +170,29 @@ fn append_recovery_command(run_dir: &Path, record: &Value) -> Result<(), Categor
         .map_err(|error| CategorisedRefusal::unexpected(error.to_string()))
 }
 
-/// `adopt`: the run supervisor's adopt door settles the attempt (receipt, the steps after it, `closed.json`). It
-/// starts no agent and no second supervisor, and leaves the control epoch alone.
-fn apply_adopt(
-    run_id: &str,
-    run_dir: &Path,
-    params: &ApplyParams,
-    now: &str,
-) -> Result<Value, CategorisedRefusal> {
-    let verdict = adopt_one(
+/// The run supervisor's adopt door over one attempt directory: it takes the attempt lock, writes the receipt, runs
+/// the steps after it and publishes `closed.json`.
+pub(crate) fn adopt_attempt(run_dir: &Path) -> Verdict {
+    adopt_one(
         run_dir,
         &AdoptArgs {
             target: Target::RunDir(run_dir.to_path_buf()),
             probe_only: false,
             kill_wait_ms: fgos_holder_lock::DEFAULT_KILL_WAIT_MS,
         },
-    );
+    )
+}
+
+/// `adopt`: the adopt door settles the attempt. It starts no agent and no second supervisor, and leaves the control
+/// epoch alone.
+fn apply_adopt(
+    run_id: &str,
+    run_dir: &Path,
+    params: &ApplyParams,
+    now: &str,
+    adopt: &dyn Fn(&Path) -> Verdict,
+) -> Result<Value, CategorisedRefusal> {
+    let verdict = adopt(run_dir);
     if verdict.state != "adopted" && verdict.state != "closed" {
         let outcome = if verdict.state == "open" {
             "adopt-incomplete"
@@ -249,14 +256,25 @@ fn with_run_lock<T>(
     let params = BTreeMap::from([("runDir".to_owned(), run_dir.to_string_lossy().into_owned())]);
     let mut scope = LockScope::seeded(Vec::new())
         .map_err(|error| CategorisedRefusal::unexpected(error.to_string()))?;
-    if scope.acquire("recovery", &params, Wait::Ms(0)).is_err() {
-        let path = lock_path("recovery", &params)
-            .map(|path| path.display().to_string())
-            .unwrap_or_default();
-        return Err(refused(
-            "lock-busy",
-            format!("a recovery apply is already in progress for this run ({path})"),
-        ));
+    match scope.acquire("recovery", &params, Wait::Ms(0)) {
+        Ok(_) => {}
+        Err(ScopeError::Acquire(why))
+            if matches!(*why, Acquire::Held { .. } | Acquire::Timeout { .. }) =>
+        {
+            let path = lock_path("recovery", &params)
+                .map(|path| path.display().to_string())
+                .unwrap_or_default();
+            return Err(refused(
+                "lock-busy",
+                format!("a recovery apply is already in progress for this run ({path})"),
+            ));
+        }
+        Err(other) => {
+            return Err(CategorisedRefusal::unexpected(format!(
+                "the recovery lock of {} cannot be taken: {other}",
+                run_dir.display()
+            )))
+        }
     }
     let answered = body();
     drop(scope);
@@ -270,6 +288,7 @@ pub(crate) fn recover_apply(
     params: &ApplyParams,
     now: &str,
     probe: &dyn Fn(&Path) -> Value,
+    adopt: &dyn Fn(&Path) -> Verdict,
 ) -> Answered {
     let run_id = params.run_id.as_str();
     if run_id.trim().is_empty() {
@@ -359,28 +378,61 @@ pub(crate) fn recover_apply(
                 "reason": check.get("reason").cloned().unwrap_or(Value::Null),
             }));
         }
-        apply_adopt(run_id, &run_dir, params, now)
+        apply_adopt(run_id, &run_dir, params, now, adopt)
     })?;
     Ok(Answer::Json(answer))
 }
 
-/// `Number(text)` for the expected control epoch: an integer stays an integer, anything else that is not a
-/// number has no JSON form (`null`).
-fn epoch_number(text: &str) -> Value {
+/// The expected control epoch: a number, as the recommendation gave it. Text that is not one is refused here, where
+/// the Node CLI let `NaN` through to a plan-stale answer naming `NaN`.
+fn epoch_number(text: &str) -> Result<Value, CategorisedRefusal> {
     let trimmed = text.trim();
-    if trimmed.is_empty() {
-        return json!(0);
-    }
     if let Ok(n) = trimmed.parse::<i64>() {
-        return json!(n);
+        return Ok(json!(n));
     }
     match trimmed.parse::<f64>() {
-        Ok(f) if f.is_finite() && f.fract() == 0.0 && f.abs() < 9.007_199_254_740_992e15 => {
-            json!(f as i64)
-        }
-        Ok(f) if f.is_finite() => json!(f),
-        _ => Value::Null,
+        Ok(f) if f.is_finite() => Ok(json!(f)),
+        _ => Err(validation(format!(
+            "dispatch recover --expected-control-epoch must be a number, got {}",
+            Value::String(text.to_owned())
+        ))),
     }
+}
+
+/// What `recover <runId> --action ...` applies, as the CLI reads it: the action as JSON and every expectation
+/// named, in the order the Node CLI asked for them.
+pub(crate) fn apply_params_of(
+    flags: &Flags,
+    run_id: String,
+    action_text: &str,
+) -> Result<ApplyParams, CategorisedRefusal> {
+    let action: Value = serde_json::from_str(action_text).map_err(|error| {
+        validation(format!(
+            "dispatch recover --action must be valid JSON: {error}"
+        ))
+    })?;
+    let expected_snapshot = require(
+        flags.text("expected-snapshot"),
+        "dispatch recover --action requires --expected-snapshot",
+    )?;
+    let expected_control_epoch = epoch_number(&require(
+        flags.text("expected-control-epoch"),
+        "dispatch recover --action requires --expected-control-epoch",
+    )?)?;
+    Ok(ApplyParams {
+        run_id,
+        action,
+        expected_snapshot,
+        expected_control_epoch,
+        expected_expires_at: require(
+            flags.text("expected-expires-at"),
+            "dispatch recover --action requires --expected-expires-at",
+        )?,
+        action_key: require(
+            flags.text("action-key"),
+            "dispatch recover --action requires --action-key",
+        )?,
+    })
 }
 
 pub(crate) fn recover(request: &SubRequest, flags: &Flags) -> Answered {
@@ -397,30 +449,6 @@ pub(crate) fn recover(request: &SubRequest, flags: &Flags) -> Answered {
             .unwrap_or_else(|| DEFAULT_INTENT.to_owned());
         return recover_observe(root, &run_id, &intent, &now_iso(), &probe_attempt);
     };
-    let action: Value = serde_json::from_str(&action_text).map_err(|error| {
-        validation(format!(
-            "dispatch recover --action must be valid JSON: {error}"
-        ))
-    })?;
-    let params = ApplyParams {
-        run_id,
-        action,
-        expected_snapshot: require(
-            flags.text("expected-snapshot"),
-            "dispatch recover --action requires --expected-snapshot",
-        )?,
-        expected_control_epoch: epoch_number(&require(
-            flags.text("expected-control-epoch"),
-            "dispatch recover --action requires --expected-control-epoch",
-        )?),
-        expected_expires_at: require(
-            flags.text("expected-expires-at"),
-            "dispatch recover --action requires --expected-expires-at",
-        )?,
-        action_key: require(
-            flags.text("action-key"),
-            "dispatch recover --action requires --action-key",
-        )?,
-    };
-    recover_apply(root, &params, &now_iso(), &probe_attempt)
+    let params = apply_params_of(flags, run_id, &action_text)?;
+    recover_apply(root, &params, &now_iso(), &probe_attempt, &adopt_attempt)
 }

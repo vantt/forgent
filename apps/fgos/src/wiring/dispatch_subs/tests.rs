@@ -3,13 +3,15 @@
 //! (`packages/execution/contracts/dispatch-subs/corpus.v1.json`, recorded by
 //! `test/golden-recorders/dispatch-subs.recorder.mjs`), and the apply and watch paths against real files.
 
-use super::observe::{probe_attempt, show_run_at, watch_run};
-use super::recover::{recover_apply, recover_observe, ApplyParams};
+use super::observe::{show_run_at, watch_run};
+use super::recover::{apply_params_of, recover_apply, recover_observe, ApplyParams};
 use super::{inspect, reconcile, Answer};
+use super::{probes, Flags, SubRequest};
 use fgos_execution_engine::transport_round::inspection::{
     inspect_dispatch_runtime, InspectionOptions, RunsCache,
 };
 use fgos_host_runtime::CategorisedRefusal;
+use fgos_run_supervisor::adopt::Verdict;
 use serde_json::{json, Map, Value};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -52,6 +54,25 @@ impl Project {
 
     fn root(&self) -> &Path {
         &self.0
+    }
+
+    /// The adopt probe as the recorder's host answered it for each corpus attempt directory. Any other directory
+    /// fails the test: a replay never asks this host's live probe, whose gate judgement depends on the host name and
+    /// the pid namespace the test runs in.
+    fn recorded_probe(&self) -> impl Fn(&Path) -> Value + '_ {
+        let recorded = vectors()["probes"].clone();
+        move |dir: &Path| {
+            let key = dir
+                .strip_prefix(&self.0)
+                .unwrap_or_else(|_| panic!("probe asked outside the project: {}", dir.display()))
+                .to_string_lossy()
+                .replace('\\', "/");
+            let line = recorded
+                .get(&key)
+                .unwrap_or_else(|| panic!("no recorded probe answer for {key}"));
+            let root = self.0.to_string_lossy();
+            serde_json::from_str(&line.to_string().replace("<ROOT>", &root)).unwrap()
+        }
     }
 
     /// A value with this project's root written as the recorder's placeholder.
@@ -171,7 +192,7 @@ fn show_run_reads_every_corpus_run_as_the_node_use_case_did() {
         let run_id = case["runId"].as_str().unwrap();
         let got = recorded(
             &project,
-            show_run_at(project.root(), run_id, &probe_attempt),
+            show_run_at(project.root(), run_id, &project.recorded_probe()),
         );
         assert_same(&got, &expected(case), &format!("show-run {run_id}"));
     }
@@ -191,7 +212,7 @@ fn recover_recommends_for_every_corpus_run_as_the_node_use_case_did() {
                 run_id,
                 intent,
                 &now(&vectors),
-                &probe_attempt,
+                &project.recorded_probe(),
             ),
         );
         assert_same(&got, &expected(case), &format!("recover {run_id} {intent}"));
@@ -217,7 +238,7 @@ fn inspect_reads_every_corpus_run_and_assignment_with_its_attempt_view_as_node_d
             Some(&mut RunsCache::default()),
         )
         .unwrap();
-        let got = inspect::with_attempt_view(project.root(), inspected, &probe_attempt);
+        let got = inspect::with_attempt_view(project.root(), inspected, &project.recorded_probe());
         assert_same(
             &json!({ "ok": project.normalized(&got) }),
             &expected(case),
@@ -236,7 +257,7 @@ fn the_attention_view_reads_the_corpus_project_with_attempt_views_as_node_did() 
         project.root(),
         case["since"].as_str().unwrap(),
         &|| stamp.clone(),
-        &probe_attempt,
+        &project.recorded_probe(),
         None,
         &mut RunsCache::default(),
     )
@@ -303,9 +324,13 @@ fn a_plan_naming_a_run_without_a_repair_action_is_refused_before_anything_is_rea
 /// The open Node-era attempt's recommendation, from the observe path.
 fn open_attempt_recommendation(project: &Project, now: &str) -> (String, Map<String, Value>) {
     let run_id = "run_unit-run-1794987012087-5f3337a8/producer/1_01";
-    let Ok(Answer::Json(Value::Object(recommendation))) =
-        recover_observe(project.root(), run_id, "resume", now, &probe_attempt)
-    else {
+    let Ok(Answer::Json(Value::Object(recommendation))) = recover_observe(
+        project.root(),
+        run_id,
+        "resume",
+        now,
+        &project.recorded_probe(),
+    ) else {
         panic!("the open attempt must give a recommendation");
     };
     assert_eq!(recommendation["kind"], "recommendation");
@@ -323,10 +348,32 @@ fn params_of(run_id: &str, recommendation: &Map<String, Value>) -> ApplyParams {
     }
 }
 
-/// A probe that judges every attempt as the adopt door would before adopting: nobody holds it and it is not
-/// closed.
-fn needs_adopt(dir: &Path) -> Value {
-    json!({ "v": 1, "protocol": 1, "attemptDir": dir, "state": "needs-adopt" })
+/// An adopt door a test does not expect to be reached.
+fn no_adopt(dir: &Path) -> Verdict {
+    panic!("the adopt door was reached for {}", dir.display())
+}
+
+/// An adopt door that answers `state` (with `outcome`, the step left pending and the reason).
+fn adopt_answering(
+    state: &'static str,
+    outcome: Option<&str>,
+    pending: Option<&str>,
+    reason: Option<&str>,
+) -> impl Fn(&Path) -> Verdict {
+    let (outcome, pending, reason) = (
+        outcome.map(str::to_owned),
+        pending.map(str::to_owned),
+        reason.map(str::to_owned),
+    );
+    move |_| Verdict {
+        state,
+        outcome: outcome.clone(),
+        pending_step: pending.clone(),
+        reason: reason.clone(),
+        adoptable: None,
+        gone: Vec::new(),
+        lane: None,
+    }
 }
 
 #[test]
@@ -336,7 +383,13 @@ fn an_apply_whose_expectations_no_longer_hold_is_stale_and_writes_nothing() {
     let (run_id, recommendation) = open_attempt_recommendation(&project, now);
     let mut params = params_of(&run_id, &recommendation);
     params.expected_snapshot = "0".repeat(64);
-    let Ok(Answer::Json(answer)) = recover_apply(project.root(), &params, now, &needs_adopt) else {
+    let Ok(Answer::Json(answer)) = recover_apply(
+        project.root(),
+        &params,
+        now,
+        &project.recorded_probe(),
+        &no_adopt,
+    ) else {
         panic!("a stale apply answers, it does not refuse");
     };
     assert_eq!(answer["outcome"], "plan-stale");
@@ -344,8 +397,13 @@ fn an_apply_whose_expectations_no_longer_hold_is_stale_and_writes_nothing() {
     assert!(!run_dir.join("recovery-commands.jsonl").exists());
     let late = "2026-11-22T13:00:00.000Z";
     let params = params_of(&run_id, &recommendation);
-    let Ok(Answer::Json(answer)) = recover_apply(project.root(), &params, late, &needs_adopt)
-    else {
+    let Ok(Answer::Json(answer)) = recover_apply(
+        project.root(),
+        &params,
+        late,
+        &project.recorded_probe(),
+        &no_adopt,
+    ) else {
         panic!("an expired apply answers, it does not refuse");
     };
     assert_eq!(answer["outcome"], "plan-expired");
@@ -366,7 +424,8 @@ fn an_apply_missing_an_expectation_or_naming_a_gone_run_refuses_with_the_node_wo
         project.root(),
         &params,
         "2026-11-22T00:00:00.000Z",
-        &needs_adopt,
+        &project.recorded_probe(),
+        &no_adopt,
     ) else {
         panic!("missing expectations refuse");
     };
@@ -384,7 +443,8 @@ fn an_apply_missing_an_expectation_or_naming_a_gone_run_refuses_with_the_node_wo
         project.root(),
         &params,
         "2026-11-22T00:00:00.000Z",
-        &needs_adopt,
+        &project.recorded_probe(),
+        &no_adopt,
     ) else {
         panic!("an unknown run refuses");
     };
@@ -409,7 +469,13 @@ fn a_consumed_action_key_returns_the_recorded_outcome_without_acting_again() {
         format!("{record}\n"),
     )
     .unwrap();
-    let Ok(Answer::Json(answer)) = recover_apply(project.root(), &params, now, &needs_adopt) else {
+    let Ok(Answer::Json(answer)) = recover_apply(
+        project.root(),
+        &params,
+        now,
+        &project.recorded_probe(),
+        &no_adopt,
+    ) else {
         panic!("a replay answers");
     };
     assert_eq!(answer["outcome"], "already-applied");
@@ -470,4 +536,314 @@ fn a_reconcile_plan_applies_once_under_the_repo_mutex_and_a_replay_is_stale() {
         panic!("a replay answers");
     };
     assert_ne!(replayed["outcome"], "applied", "{replayed}");
+}
+
+#[test]
+fn the_replays_follow_the_recorded_probe_answer_not_the_host_they_run_on() {
+    // The same corpus read with the open attempt's recorded answer swapped for a held gate: the recommendation
+    // follows the answer it is handed, so nothing in a replay comes from this host's process facts.
+    let project = Project::new("probe-swap");
+    let recorded = project.recorded_probe();
+    let held = |dir: &Path| {
+        let mut line = recorded(dir);
+        if line["state"] == "needs-adopt" {
+            line = json!({ "v": 1, "protocol": 1, "attemptDir": dir, "state": "running", "reason": "gate-alive" });
+        }
+        line
+    };
+    let run_id = "run_unit-run-1794987012087-5f3337a8/producer/1_01";
+    let Ok(Answer::Json(parked)) = recover_observe(
+        project.root(),
+        run_id,
+        "resume",
+        "2026-11-22T12:00:00.000Z",
+        &held,
+    ) else {
+        panic!("a held attempt answers");
+    };
+    assert_ne!(parked["kind"], "recommendation", "{parked}");
+    let Ok(Answer::Json(shown)) = show_run_at(project.root(), run_id, &held) else {
+        panic!("show-run answers");
+    };
+    assert_eq!(shown["attemptState"], "running");
+}
+
+fn recovery_log(run_dir: &Path) -> Vec<Value> {
+    std::fs::read_to_string(run_dir.join("recovery-commands.jsonl"))
+        .unwrap_or_default()
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect()
+}
+
+#[test]
+fn an_adopt_that_settles_the_attempt_writes_one_recovery_line_with_the_node_fields() {
+    for (state, outcome) in [("adopted", Some("abandoned-crash")), ("closed", None)] {
+        let project = Project::new("apply-applied");
+        let now = "2026-11-22T12:00:00.000Z";
+        let (run_id, recommendation) = open_attempt_recommendation(&project, now);
+        let params = params_of(&run_id, &recommendation);
+        let adopt = adopt_answering(state, outcome, None, None);
+        let Ok(Answer::Json(answer)) = recover_apply(
+            project.root(),
+            &params,
+            now,
+            &project.recorded_probe(),
+            &adopt,
+        ) else {
+            panic!("a fresh apply answers");
+        };
+        assert_eq!(answer["outcome"], "applied", "{answer}");
+        let run_dir = PathBuf::from(answer["runDir"].as_str().unwrap());
+        let mut expected = json!({
+            "actionKey": params.action_key,
+            "action": params.action,
+            "appliedAt": now,
+            "controlEpochBefore": params.expected_control_epoch,
+            "controlEpochAfter": params.expected_control_epoch,
+            "snapshotHash": params.expected_snapshot,
+            "adoptState": state,
+        });
+        if let Some(outcome) = outcome {
+            expected["adoptOutcome"] = json!(outcome);
+        }
+        assert_eq!(recovery_log(&run_dir), vec![expected.clone()]);
+        for (key, value) in expected.as_object().unwrap() {
+            assert_eq!(&answer[key], value, "{key}");
+        }
+    }
+}
+
+#[test]
+fn an_adopt_that_leaves_the_attempt_open_or_held_writes_nothing() {
+    for (state, outcome, reason) in [
+        (
+            "open",
+            "adopt-incomplete",
+            "adopt left the attempt open (step settle is not done): gate gone",
+        ),
+        (
+            "running",
+            "held",
+            "adopt left the attempt running: gate-alive",
+        ),
+    ] {
+        let project = Project::new("apply-incomplete");
+        let now = "2026-11-22T12:00:00.000Z";
+        let (run_id, recommendation) = open_attempt_recommendation(&project, now);
+        let params = params_of(&run_id, &recommendation);
+        let (pending, why) = if state == "open" {
+            (Some("settle"), Some("gate gone"))
+        } else {
+            (None, Some("gate-alive"))
+        };
+        let adopt = adopt_answering(state, None, pending, why);
+        let Ok(Answer::Json(answer)) = recover_apply(
+            project.root(),
+            &params,
+            now,
+            &project.recorded_probe(),
+            &adopt,
+        ) else {
+            panic!("an incomplete adopt answers");
+        };
+        assert_eq!(
+            (answer["outcome"].as_str(), answer["reason"].as_str()),
+            (Some(outcome), Some(reason))
+        );
+        let run_dir = PathBuf::from(answer["runDir"].as_str().unwrap());
+        assert!(recovery_log(&run_dir).is_empty());
+    }
+}
+
+#[test]
+fn an_adopt_of_a_run_a_coordination_session_owns_is_refused_before_any_lock() {
+    let project = Project::new("apply-session");
+    let now = "2026-11-22T12:00:00.000Z";
+    let (run_id, recommendation) = open_attempt_recommendation(&project, now);
+    let sessions = project.root().join(".fgos/coordination/sessions/cs-1");
+    std::fs::create_dir_all(&sessions).unwrap();
+    std::fs::write(
+        sessions.join("session.json"),
+        json!({ "assignmentRefs": ["unit-run-1794987012087-5f3337a8/producer/1"] }).to_string(),
+    )
+    .unwrap();
+    let params = params_of(&run_id, &recommendation);
+    let Err(refusal) = recover_apply(
+        project.root(),
+        &params,
+        now,
+        &project.recorded_probe(),
+        &no_adopt,
+    ) else {
+        panic!("a session-owned run refuses");
+    };
+    assert_eq!(refusal.category, "validation");
+    assert_eq!(refusal.message, format!("run \"{run_id}\" (assignment \"unit-run-1794987012087-5f3337a8/producer/1\") is owned by CoordinationSession \"cs-1\" -- adopt recovery belongs to that session's own recovery door (fgos coordination recover cs-1), not dispatch recover"));
+    let run_dir = PathBuf::from(recommendation["runDir"].as_str().unwrap());
+    assert!(!run_dir.join("locks").exists());
+}
+
+#[test]
+fn an_apply_while_another_holds_the_run_recovery_lock_is_refused_as_busy() {
+    let project = Project::new("apply-busy");
+    let now = "2026-11-22T12:00:00.000Z";
+    let (run_id, recommendation) = open_attempt_recommendation(&project, now);
+    let run_dir = PathBuf::from(recommendation["runDir"].as_str().unwrap());
+    let params_map = std::collections::BTreeMap::from([(
+        "runDir".to_owned(),
+        run_dir.to_string_lossy().into_owned(),
+    )]);
+    let mut holder = fgos_holder_lock::LockScope::seeded(Vec::new()).unwrap();
+    holder
+        .acquire("recovery", &params_map, fgos_holder_lock::Wait::Ms(0))
+        .unwrap();
+    let params = params_of(&run_id, &recommendation);
+    let Err(refusal) = recover_apply(
+        project.root(),
+        &params,
+        now,
+        &project.recorded_probe(),
+        &no_adopt,
+    ) else {
+        panic!("a held lock refuses");
+    };
+    assert_eq!(refusal.category, "validation");
+    assert!(
+        refusal
+            .message
+            .starts_with("a recovery apply is already in progress for this run ("),
+        "{}",
+        refusal.message
+    );
+    drop(holder);
+    assert!(recovery_log(&run_dir).is_empty());
+}
+
+fn args(words: &[&str]) -> Vec<std::ffi::OsString> {
+    words.iter().map(std::ffi::OsString::from).collect()
+}
+
+fn request_at(root: &Path, words: &[&str]) -> (SubRequest, Flags) {
+    let args = args(words);
+    (
+        SubRequest {
+            args: args.clone(),
+            process_cwd: root.to_path_buf(),
+            root: root.to_path_buf(),
+            json: false,
+        },
+        Flags::of(&args),
+    )
+}
+
+fn refusal_of(answered: Result<Answer, CategorisedRefusal>) -> (&'static str, String) {
+    match answered {
+        Err(refusal) => (refusal.category, refusal.message),
+        Ok(_) => panic!("expected a refusal"),
+    }
+}
+
+#[test]
+fn recover_reads_its_action_and_expectations_and_refuses_an_epoch_that_is_no_number() {
+    let flags = Flags::of(&args(&[
+        "dispatch",
+        "recover",
+        "r",
+        "--action",
+        "{\"type\":\"adopt\"}",
+        "--expected-snapshot",
+        "h",
+        "--expected-control-epoch",
+        "2",
+        "--expected-expires-at",
+        "t",
+        "--action-key",
+        "k",
+    ]));
+    let params = apply_params_of(&flags, "r".into(), "{\"type\":\"adopt\"}")
+        .ok()
+        .unwrap();
+    assert_eq!(params.action, json!({ "type": "adopt" }));
+    assert_eq!(params.expected_control_epoch, json!(2));
+    assert_eq!(
+        (
+            params.expected_snapshot.as_str(),
+            params.expected_expires_at.as_str(),
+            params.action_key.as_str()
+        ),
+        ("h", "t", "k")
+    );
+    let flags = Flags::of(&args(&[
+        "dispatch",
+        "recover",
+        "r",
+        "--action",
+        "{}",
+        "--expected-snapshot",
+        "h",
+        "--expected-control-epoch",
+        "abc",
+    ]));
+    let Err(refusal) = apply_params_of(&flags, "r".into(), "{}") else {
+        panic!("a non-numeric epoch refuses");
+    };
+    assert_eq!(
+        (refusal.category, refusal.message.as_str()),
+        (
+            "validation",
+            "dispatch recover --expected-control-epoch must be a number, got \"abc\""
+        )
+    );
+    let flags = Flags::of(&args(&["dispatch", "recover", "r", "--action", "{}"]));
+    let Err(refusal) = apply_params_of(&flags, "r".into(), "{}") else {
+        panic!("a missing snapshot refuses");
+    };
+    assert_eq!(
+        refusal.message,
+        "dispatch recover --action requires --expected-snapshot"
+    );
+}
+
+#[test]
+fn reconcile_selects_its_mode_from_the_positionals() {
+    let project = Project::new("reconcile-modes");
+    let root = project.root();
+    for (words, message) in [
+        (&["dispatch", "reconcile", "apply"][..], "dispatch reconcile apply --plan must be valid JSON: dispatch reconcile apply requires --plan"),
+        (&["dispatch", "reconcile", "bogus"][..], "dispatch reconcile expects plan or apply"),
+        (&["dispatch", "reconcile", "provider-capacity", "bogus"][..], "dispatch reconcile expects plan or apply"),
+        (&["dispatch", "reconcile", "provider-capacity", "quarantine"][..], "provider-capacity quarantine requires --provider"),
+        (&["dispatch", "reconcile", "provider-capacity", "clear-quarantine", "--provider", "p"][..], "provider-capacity clear-quarantine requires --account"),
+        (&["dispatch", "reconcile", "--run", "r"][..], fgos_execution_engine::planning::reconciliation::RECONCILE_RUN_REQUIRES_ACTION),
+    ] {
+        let (request, flags) = request_at(root, words);
+        assert_eq!(refusal_of(reconcile::reconcile(&request, &flags)), ("validation", message.to_owned()), "{words:?}");
+    }
+    let (request, flags) = request_at(root, &["dispatch", "reconcile"]);
+    let Ok(Answer::Json(planned)) = reconcile::reconcile(&request, &flags) else {
+        panic!("a bare reconcile plans");
+    };
+    assert_eq!(planned["outcome"], "blocked");
+}
+
+#[test]
+fn the_probes_refuse_a_malformed_call_before_any_config_is_read_or_seat_started() {
+    let project = Project::new("probe-flags");
+    let root = project.root();
+    for (words, message) in [
+        (&["dispatch", "probe-account"][..], "dispatch probe-account requires --provider <provider> --account <accountId>, or --all".to_owned()),
+        (&["dispatch", "probe-account", "--all", "--account", "a", "--invocation", "x"][..], "dispatch probe-account --all probes every account and cannot be narrowed by --account, --invocation".to_owned()),
+        (&["dispatch", "probe-account", "--all", "--leg", "both,"][..], "dispatch probe-account --leg must be one of direct, harness, both, got \"both,\"".to_owned()),
+        (&["dispatch", "probe-account", "--all", "--timeout-ms", "0"][..], "--timeout-ms must be a positive integer (milliseconds), got \"0\"".to_owned()),
+        (&["dispatch", "probe-session"][..], "dispatch probe-session requires an executor id: fgos dispatch probe-session <executorId> [--invocation <id>]".to_owned()),
+    ] {
+        let (request, flags) = request_at(root, words);
+        let answered = if words[1] == "probe-session" {
+            probes::probe_session(&request, &flags)
+        } else {
+            probes::probe_account(&request, &flags)
+        };
+        assert_eq!(refusal_of(answered), ("validation", message), "{words:?}");
+    }
 }

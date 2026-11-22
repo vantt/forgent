@@ -59,6 +59,27 @@ const { inspectDispatchUseCase } = await import('../../src/verbs/dispatch/inspec
 const { planReconciliation } = await import('../../src/runner/dispatch/reconciliation-planner.mjs');
 const { attentionView } = await import('../../src/runner/dispatch/attention-view.mjs');
 
+const { adoptRun } = await import('../../src/run-supervisor/client.mjs');
+
+// The adopt probe judges an attempt's gate by this host's process facts (host name, pid namespace), so a replay
+// elsewhere would judge differently: its answer for every attempt directory is recorded once, here, and the replays
+// read it back instead of probing.
+const attemptDirs = [];
+const walkRuns = (dir) => {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const child = path.join(dir, entry.name);
+    if (entry.name === 'runs') {
+      for (const attempt of fs.readdirSync(child, { withFileTypes: true })) if (attempt.isDirectory()) attemptDirs.push(path.join(child, attempt.name));
+    } else walkRuns(child);
+  }
+};
+walkRuns(path.join(project, '.fgos', 'assignments'));
+const probes = {};
+for (const dir of attemptDirs.sort()) {
+  probes[path.relative(project, dir).split(path.sep).join('/')] = JSON.parse(JSON.stringify(adoptRun(dir, { probeOnly: true })).split(project).join('<ROOT>'));
+}
+
 const normalize = (value) => JSON.parse(JSON.stringify(value ?? null).split(project).join('<ROOT>'));
 const attempt = (call) => {
   try { return { ok: normalize(call()) }; } catch (error) {
@@ -104,6 +125,6 @@ cases.push({
   })),
 });
 
-fs.writeFileSync(path.join(outDir, 'corpus.v1.json'), `${JSON.stringify({ samples: SAMPLES, mtime: MTIME.toISOString(), now: NOW, cases }, null, 2)}\n`);
+fs.writeFileSync(path.join(outDir, 'corpus.v1.json'), `${JSON.stringify({ samples: SAMPLES, mtime: MTIME.toISOString(), now: NOW, probes, cases }, null, 2)}\n`);
 fs.rmSync(project, { recursive: true, force: true });
 process.stdout.write(`recorded ${cases.length} cases\n`);
