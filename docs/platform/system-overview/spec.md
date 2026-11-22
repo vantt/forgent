@@ -43,7 +43,7 @@ Area rows from the model: one row per area listing its top-level components. Spe
 
 | Area | Components | What it owns | Owner doc |
 | --- | --- | --- | --- |
-| `(cross-area)` | `canonical-json`, `coding-domain`, `domain-components`, `domain-registry-loader`, `durable-file`, `group-thinking`, `host-surface`, `platform-foundations` | Authority for canonical JSON bytes per RFC 8785.; Coding Domain Core, policies, repo scope, footprint, worktree isolation, merge catchup, and code verification doctrine.; Domain-specific behavior, workflows, skills, task specs, and doctrine.; General runtime definition registry and config loader for domains, workflows, and declarations.; Authority for how records reach disk durably: temp file, fsync, atomic install.; Versioned CoordinationProtocol definitions and skill for structured multi-agent deliberation.; CLI entrypoints, top-level verbs, argument parsing, and command execution.; Core platform utilities, foundation laws L1-L10, and cross-cutting helpers. | `docs/platform/component-boundary.md`, `docs/platform/README.md`, `docs/platform/platform-foundations.md` |
+| `(cross-area)` | `canonical-json`, `coding-domain`, `domain-components`, `domain-registry-loader`, `durable-file`, `group-thinking`, `host-surface`, `platform-foundations`, `work-driver` | Authority for canonical JSON bytes per RFC 8785.; Coding Domain Core, policies, repo scope, footprint, worktree isolation, merge catchup, and code verification doctrine.; Domain-specific behavior, workflows, skills, task specs, and doctrine.; General runtime definition registry and config loader for domains, workflows, and declarations.; Authority for how records reach disk durably: temp file, fsync, atomic install.; Versioned CoordinationProtocol definitions and skill for structured multi-agent deliberation.; CLI entrypoints, top-level verbs, argument parsing, and command execution.; Core platform utilities, foundation laws L1-L10, and cross-cutting helpers.; Ready-work selection, Stage Operation choice, cross-flow routing, park/halt and recovery around Work execution; invokes lifecycle verbs and dispatch surfaces without owning domain workflow semantics. | `docs/platform/component-boundary.md`, `docs/platform/README.md`, `docs/platform/platform-foundations.md` |
 | `agent-confinement` | `agent-confinement` | Single authority for agent isolation, container boundaries, and sandboxing. | `docs/platform/agent-confinement/spec.md` |
 | `agent-coordination` | `agent-coordination`, `agent-coordination-engine`, `team-cognition-engine` | Agent coordination area portal; former coordination engine retired, execution uses runner/Workflow.; Authority for CoordinationSession manifest/events, actor bounds, session recovery, and synthesis boundary.; Typed deliberation interpretation, aggregation-method semantics, and cognitive outcomes. | `docs/platform/agent-coordination/spec.md` |
 | `agent-mailbox` | `agent-mailbox` | Placing a message from one agent session into context of the right live head. | `docs/platform/agent-mailbox/spec.md` |
@@ -112,12 +112,22 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | bwrap isolation driver | `agent-confinement` | `docs/platform/agent-confinement/spec.md` |
 | private home hiding | `agent-confinement` | `docs/platform/agent-confinement/spec.md` |
 | coordination area navigation and historical evidence | `agent-coordination` | `docs/platform/agent-coordination/spec.md` |
-| CoordinationSession manifest/events, Assignment membership, actor/topology/bounds, session recovery | `agent-coordination-engine` | `docs/platform/agent-coordination/spec.md` |
+| CoordinationSession manifest/events | `agent-coordination-engine` | `docs/platform/agent-coordination/spec.md` |
+| Assignment membership | `agent-coordination-engine` | `docs/platform/agent-coordination/spec.md` |
+| actor/topology/bounds | `agent-coordination-engine` | `docs/platform/agent-coordination/spec.md` |
+| session recovery | `agent-coordination-engine` | `docs/platform/agent-coordination/spec.md` |
+| session synthesis boundary | `agent-coordination-engine` | `docs/platform/agent-coordination/spec.md` |
+| Team Cognition invocation | `agent-coordination-engine` | `docs/platform/agent-coordination/spec.md` |
+| optional protocol/dynamic planning consumption | `agent-coordination-engine` | `docs/platform/agent-coordination/spec.md` |
 | agent mailbox delivery and head registration | `agent-mailbox` | `docs/platform/agent-mailbox/spec.md` |
 | agent CLI output parsing and protocol status mapping | `agent-protocol` | `docs/platform/agent-protocol/spec.md` |
 | RFC 8785 canonical JSON serialization | `canonical-json` | `docs/platform/component-boundary.md` |
 | claude code slash-command surface | `claude-plugin` | `docs/platform/claude-plugin/spec.md` |
 | coding domain policies, worktree isolation doctrine, merge/catchup, code verification doctrine | `coding-domain` | `docs/platform/component-boundary.md` |
+| product/design, cook, bugfix, and small-change policies | `coding-domain` | `docs/platform/component-boundary.md` |
+| repo scope, footprint, worktree/branch/isolation | `coding-domain` | `docs/platform/component-boundary.md` |
+| merge/catchup, technical approval | `coding-domain` | `docs/platform/component-boundary.md` |
+| coding evidence adapters | `coding-domain` | `docs/platform/component-boundary.md` |
 | collaboration loop definitions and preset configurations | `collaboration-patterns` | `docs/platform/runner/spec.md` |
 | who owns what: components, subcomponents, decision kinds, doors, contract index, file-to-component mappings | `component-authority` | `docs/platform/component-authority/spec.md` |
 | single structural model at packages/component-authority/model/ | `component-authority` | `docs/platform/component-authority/spec.md` |
@@ -132,12 +142,17 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | dispatch planning and launch | `dispatch-transport` | `docs/platform/runner/spec.md` |
 | executor adapter invocation | `dispatch-transport` | `docs/platform/runner/spec.md` |
 | confinement request assembly | `dispatch-transport` | `docs/platform/runner/spec.md` |
+| Assignment-to-DispatchPlan resolution | `dispatch-transport` | `docs/platform/runner/spec.md` |
+| governance/egress | `dispatch-transport` | `docs/platform/runner/spec.md` |
+| launch, timeout, cancellation, retry attempt metadata | `dispatch-transport` | `docs/platform/runner/spec.md` |
 | porting lifecycle and reference analysis | `distillery` | `docs/platform/distillery/spec.md` |
 | doc health checks and body rules | `doc-checks` | `docs/platform/documentation/subcomponents/doc-checks/spec.md` |
 | document axis model, locate before write, and claim units | `document-identity` | `docs/platform/documentation/subcomponents/document-identity/spec.md` |
 | documentation architecture and maintained corpus | `documentation` | `docs/platform/documentation/spec.md` |
 | domain-specific workflows, skills, task specs, and doctrine | `domain-components` | `docs/platform/component-boundary.md` |
 | runtime definition registry, domain and workflow loader, flow definition validation | `domain-registry-loader` | `docs/platform/component-boundary.md` |
+| workflow/stage/operation declarations, task-spec/skill references, roles | `domain-registry-loader` | `docs/platform/component-boundary.md` |
+| FlowDefinition validation/projection | `domain-registry-loader` | `docs/platform/component-boundary.md` |
 | atomic and durable file write primitives, fsync | `durable-file` | `docs/platform/component-boundary.md` |
 | end-user documentation authoring and maintenance | `enduser-docs-authoring` | `docs/platform/work-state/spec.md` |
 | end-user documentation tag-based indexing | `enduser-docs-index` | `docs/platform/work-state/spec.md` |
@@ -146,6 +161,8 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | unit run execution loop | `execution-core` | `docs/platform/runner/spec.md` |
 | run admission and settlement | `execution-core` | `docs/platform/runner/spec.md` |
 | posture enforcement | `execution-core` | `docs/platform/runner/spec.md` |
+| Run creation | `execution-core` | `docs/platform/runner/spec.md` |
+| in-process Run mechanism | `execution-core` | `docs/platform/runner/spec.md` |
 | executor model and derived facts | `executor-model` | `docs/platform/runner/contracts/executor-model.md` |
 | executor doctor judgments | `executor-model` | `docs/platform/runner/contracts/executor-model.md` |
 | REST API, MCP gateway, embedded web dashboard bundle | `fgos-gateway` | `docs/platform/herdr-web-dashboard/spec.md` |
@@ -153,7 +170,10 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | worktree allocation and removal | `git` | `docs/platform/git/spec.md` |
 | refs management and publication | `git` | `docs/platform/git/spec.md` |
 | directed graph analysis, cycle detection, topological sorting | `graph` | `docs/platform/graph/spec.md` |
-| group-thinking protocol definitions, public request and replay adapters, fgos-group-thinking skill | `group-thinking` | `docs/platform/component-boundary.md` |
+| group-thinking protocol definitions, public request and replay adapters | `group-thinking` | `docs/platform/component-boundary.md` |
+| versioned data-first CoordinationProtocol definitions | `group-thinking` | `docs/platform/component-boundary.md` |
+| fgos-group-thinking skill | `group-thinking` | `docs/platform/component-boundary.md` |
+| selects an explicit registered protocol, builds a public request, launches/resumes through coordination surfaces, renders public replay/evidence | `group-thinking` | `docs/platform/component-boundary.md` |
 | runner data dictionary definitions | `h-02842f76ffd2` | `docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md` |
 | runner gap tracking and known limits | `h-2e032393add1` | `docs/platform/runner/subcomponents/h-2e032393add1/spec.md` |
 | runner settled edge case records | `h-37aced3896a8` | `docs/platform/runner/subcomponents/h-37aced3896a8/spec.md` |
@@ -169,6 +189,9 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | lock registry | `holder-lock` | `docs/platform/holder-lock/spec.md` |
 | host invocation routing | `host-invocation-routing` | `docs/platform/host-invocation-routing/spec.md` |
 | provider routing | `host-invocation-routing` | `docs/platform/host-invocation-routing/spec.md` |
+| CLI/API/plugin/gateway/Herdr/webhook/chat entrypoints | `host-surface` | `docs/platform/README.md` |
+| auth, envelopes, visibility | `host-surface` | `docs/platform/README.md` |
+| process control, operator diagnostics | `host-surface` | `docs/platform/README.md` |
 | cli command dispatch | `host-surface` | `docs/platform/README.md` |
 | top-level verb routing | `host-surface` | `docs/platform/README.md` |
 | cli IO and exit codes | `host-surface` | `docs/platform/README.md` |
@@ -178,11 +201,26 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | agent process gate, env scrub application, and hard ceiling enforcement | `launch-gate` | `docs/platform/run-supervisor/spec.md` |
 | knowledge registry and resolution | `learning-docs-registry` | `docs/platform/work-state/contracts/knowledge-registry.md` |
 | retrospective learning and doc indexing | `learning-docs-registry` | `docs/platform/work-state/contracts/knowledge-registry.md` |
+| retrospective knowledge capture | `learning-docs-registry` | `docs/platform/work-state/contracts/knowledge-registry.md` |
+| doc slot/topic registry, projections, traces | `learning-docs-registry` | `docs/platform/work-state/contracts/knowledge-registry.md` |
+| end-user docs index | `learning-docs-registry` | `docs/platform/work-state/contracts/knowledge-registry.md` |
+| learning outputs | `learning-docs-registry` | `docs/platform/work-state/contracts/knowledge-registry.md` |
 | friction repository and metrics collection | `observe` | `docs/platform/observe/spec.md` |
 | case lifecycle journals and telemetry | `observe` | `docs/platform/observe/spec.md` |
+| Measurement and scorecard calculation across substrate entities (run, session, executor, case, work) | `observe` | `docs/platform/observe/spec.md` |
+| case lifecycle journal (.fgos/observe/cases/) | `observe` | `docs/platform/observe/spec.md` |
+| independent friction repository (.fgos/observe/friction/) | `observe` | `docs/platform/observe/spec.md` |
+| writer shards | `observe` | `docs/platform/observe/spec.md` |
+| store locks (.fgos/observe/.lock) | `observe` | `docs/platform/observe/spec.md` |
+| snapshots | `observe` | `docs/platform/observe/spec.md` |
+| declaring ObservationSource / LegacyFrictionSource traits | `observe` | `docs/platform/observe/spec.md` |
 | packaging, release artifacts, and distribution | `packaging-distribution` | `docs/platform/packaging-distribution/spec.md` |
 | doctor readiness registry and check execution | `packaging-distribution` | `docs/platform/packaging-distribution/spec.md` |
 | setup and global/project config precedence | `packaging-distribution` | `docs/platform/packaging-distribution/spec.md` |
+| config defaults, config merge | `packaging-distribution` | `docs/platform/packaging-distribution/spec.md` |
+| install/upgrade/distribution health | `packaging-distribution` | `docs/platform/packaging-distribution/spec.md` |
+| required binaries/services/directories | `packaging-distribution` | `docs/platform/packaging-distribution/spec.md` |
+| doctor checks/fixes registry | `packaging-distribution` | `docs/platform/packaging-distribution/spec.md` |
 | pure foundation utilities | `platform-foundations` | `docs/platform/platform-foundations.md` |
 | common path and text helpers | `platform-foundations` | `docs/platform/platform-foundations.md` |
 | process liveness judgement | `process` | `docs/platform/process/spec.md` |
@@ -190,6 +228,12 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | owner question shape and states | `questions` | `docs/platform/questions/spec.md` |
 | questions verbs and receipt hook | `questions` | `docs/platform/questions/spec.md` |
 | resource referee evaluation and claim arbitration | `resource-referee` | `docs/platform/resource-referee/spec.md` |
+| Worker result parsing | `run-result` | `docs/platform/runner/spec.md` |
+| evidence collection coordination | `run-result` | `docs/platform/runner/spec.md` |
+| artifact freshness/provenance checks | `run-result` | `docs/platform/runner/spec.md` |
+| confidence decision | `run-result` | `docs/platform/runner/spec.md` |
+| RunResult normalization | `run-result` | `docs/platform/runner/spec.md` |
+| failure classification for one Assignment Run | `run-result` | `docs/platform/runner/spec.md` |
 | run outcome derivation | `run-result` | `docs/platform/runner/spec.md` |
 | evidence policy evaluation | `run-result` | `docs/platform/runner/spec.md` |
 | result normalization | `run-result` | `docs/platform/runner/spec.md` |
@@ -201,6 +245,8 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | seat ranking and tier ladder | `seat-binding` | `docs/platform/seat-binding/spec.md` |
 | account assignment policy | `seat-binding` | `docs/platform/seat-binding/spec.md` |
 | executor binding | `seat-binding` | `docs/platform/seat-binding/spec.md` |
+| executor/provider/model/tier/mechanism selection | `seat-binding` | `docs/platform/seat-binding/spec.md` |
+| exactly two routing identities (capability, executor-id); purpose/--for is capability compatibility syntax; job is not a routing identity (ADR-004 (reserved unused job routing identity)) | `seat-binding` | `docs/platform/seat-binding/spec.md` |
 | secrets storage and credential retrieval | `secrets` | `docs/platform/secrets/spec.md` |
 | agent session placement port | `session-host` | `docs/platform/session-host/spec.md` |
 | direct and terminal adapters | `session-host` | `docs/platform/session-host/spec.md` |
@@ -208,13 +254,27 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | session handoff contract | `session-rotation` | `docs/platform/runner/spec.md` |
 | project supervisor orchestration | `supervision` | `docs/platform/supervision/spec.md` |
 | portfolio status and plan lane pool | `supervision` | `docs/platform/supervision/spec.md` |
-| typed deliberation interpretation, aggregation semantics, source/dissent coverage validation | `team-cognition-engine` | `docs/platform/agent-coordination/spec.md` |
+| typed deliberation interpretation | `team-cognition-engine` | `docs/platform/agent-coordination/spec.md` |
+| aggregation-method semantics | `team-cognition-engine` | `docs/platform/agent-coordination/spec.md` |
+| source/dissent/omission coverage validation | `team-cognition-engine` | `docs/platform/agent-coordination/spec.md` |
+| cognitive outcomes linked to immutable RunResult/artifact evidence | `team-cognition-engine` | `docs/platform/agent-coordination/spec.md` |
 | terminal pane allocation and lifecycle | `terminal-control` | `docs/platform/terminal-control/spec.md` |
 | multiplexer driver port | `terminal-control` | `docs/platform/terminal-control/spec.md` |
 | visual contracts and dashboard UI specification | `ui-spec` | `docs/platform/ui-spec/spec.md` |
+| Ready-work selection | `work-driver` | `docs/platform/component-boundary.md` |
+| automation loop policy | `work-driver` | `docs/platform/component-boundary.md` |
+| declared Stage Operation choice | `work-driver` | `docs/platform/component-boundary.md` |
+| cross-flow routing | `work-driver` | `docs/platform/component-boundary.md` |
+| park/halt behavior | `work-driver` | `docs/platform/component-boundary.md` |
+| recovery/anti-loop around Work execution | `work-driver` | `docs/platform/component-boundary.md` |
+| invoking lifecycle verbs and dispatch surfaces | `work-driver` | `docs/platform/component-boundary.md` |
 | work item identity, status, and stage | `work-state` | `docs/platform/work-state/spec.md` |
 | claim and return lifecycle | `work-state` | `docs/platform/work-state/spec.md` |
 | lifecycle event truth | `work-state` | `docs/platform/work-state/spec.md` |
+| related refs, context refs, document refs | `work-state` | `docs/platform/work-state/spec.md` |
+| questions, human gates | `work-state` | `docs/platform/work-state/spec.md` |
+| lifecycle verbs | `work-state` | `docs/platform/work-state/spec.md` |
+| domain-agnostic Work event truth | `work-state` | `docs/platform/work-state/spec.md` |
 | workflow guide and case ledger | `workflow` | `docs/platform/workflow/spec.md` |
 | admission port implementation | `workflow` | `docs/platform/workflow/spec.md` |
 | reservations and route events | `workflow` | `docs/platform/workflow/spec.md` |

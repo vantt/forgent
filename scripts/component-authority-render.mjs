@@ -227,18 +227,25 @@ function contractBoundary(contract) {
   return idx === -1 ? meaning : meaning.slice(0, idx);
 }
 
-/** Path cell: backticked only when the path exists on disk (doc-health dead-reference). */
-function contractPathCell(contract, repoRoot) {
+/** Contract cell: text after the first ": " so the boundary is shown only once. */
+function contractMeaningCell(contract) {
+  const meaning = String(contract.meaning ?? '').trim();
+  const idx = meaning.indexOf(': ');
+  return idx === -1 ? meaning : meaning.slice(idx + 2).trim();
+}
+
+/** Path cell: print the model path as-is (backticked); empty path stays em dash. Missing live paths are owned by contracts.test, not hidden here. */
+function contractPathCell(contract) {
   const rel = contract.path;
   if (typeof rel !== 'string' || !rel.trim()) return '—';
-  return fs.existsSync(path.join(repoRoot, rel)) ? code(rel) : '—';
+  return code(rel);
 }
 
 /**
  * Architecture-map §7 contract registry: one row per model contract.
- * Columns: id, boundary (clause before first ": " in meaning), Contract (full
- * meaning), provider, consumers, status, path. Path is backticked only when the
- * file exists so doc-health dead-reference stays clean.
+ * Columns: id, boundary (clause before first ": " in meaning), Contract (text
+ * after that ": "), provider, consumers, status, path. Path is the model value
+ * as-is; contracts.test fails missing live/designed paths.
  */
 function architectureMapContractsBody(model, repoRoot) {
   const lines = [
@@ -250,7 +257,7 @@ function architectureMapContractsBody(model, repoRoot) {
   const contracts = [...(model.contracts ?? [])].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   for (const contract of contracts) {
     const consumers = (contract.consumers ?? []).map(cell).filter(Boolean);
-    lines.push(`| ${code(contract.id)} | ${cell(contractBoundary(contract))} | ${cell(contract.meaning)} | ${contract.provider ? code(contract.provider) : '—'} | ${consumers.length ? consumers.map(code).join(', ') : '—'} | ${cell(contract.status)} | ${contractPathCell(contract, repoRoot)} |`);
+    lines.push(`| ${code(contract.id)} | ${cell(contractBoundary(contract))} | ${cell(contractMeaningCell(contract))} | ${contract.provider ? code(contract.provider) : '—'} | ${consumers.length ? consumers.map(code).join(', ') : '—'} | ${cell(contract.status)} | ${contractPathCell(contract)} |`);
   }
   return lines.join('\n');
 }

@@ -40,7 +40,8 @@
     "aliases": [
       "cài đặt và phân phối",
       "setup-doctor-distribution",
-      "release-distribution"
+      "release-distribution",
+      "Setup, Doctor, And Distribution Health"
     ],
     "meaning": "Packaging, distribution, installation, upgrade, and doctor readiness.",
     "layer": "infra",
@@ -83,12 +84,19 @@
     "owns": [
       "packaging, release artifacts, and distribution",
       "doctor readiness registry and check execution",
-      "setup and global/project config precedence"
+      "setup and global/project config precedence",
+      "config defaults, config merge",
+      "install/upgrade/distribution health",
+      "required binaries/services/directories",
+      "doctor checks/fixes registry"
     ],
     "mustNotOwn": [
       "runtime lifecycle truth",
       "state store writes",
-      "domain workflow execution"
+      "domain workflow execution",
+      "Domain behavior",
+      "lifecycle mutation",
+      "dispatch or evidence truth"
     ],
     "spec": "docs/platform/packaging-distribution/spec.md",
     "source": [
@@ -157,11 +165,18 @@
       }
     ],
     "owns": [
+      "CLI/API/plugin/gateway/Herdr/webhook/chat entrypoints",
+      "auth, envelopes, visibility",
+      "process control, operator diagnostics",
       "cli command dispatch",
       "top-level verb routing",
       "cli IO and exit codes"
     ],
     "mustNotOwn": [
+      "Work truth",
+      "CoordinationSession truth",
+      "dispatch governance",
+      "evidence confidence",
       "engine lifecycle truth",
       "state store writes",
       "lock acquisition outside doors"
@@ -391,11 +406,22 @@
     "exceptions": [],
     "owns": [
       "friction repository and metrics collection",
-      "case lifecycle journals and telemetry"
+      "case lifecycle journals and telemetry",
+      "Measurement and scorecard calculation across substrate entities (run, session, executor, case, work)",
+      "case lifecycle journal (.fgos/observe/cases/)",
+      "independent friction repository (.fgos/observe/friction/)",
+      "writer shards",
+      "store locks (.fgos/observe/.lock)",
+      "snapshots",
+      "declaring ObservationSource / LegacyFrictionSource traits"
     ],
     "mustNotOwn": [
       "work item status mutation",
-      "dispatch governance"
+      "work item status/stage mutation",
+      "dispatch governance",
+      "RunResult confidence truth",
+      "Agent Coordination session lifecycle",
+      "direct dispatch governance"
     ],
     "spec": "docs/platform/observe/spec.md",
     "source": [
@@ -461,13 +487,19 @@
     "owns": [
       "seat ranking and tier ladder",
       "account assignment policy",
-      "executor binding"
+      "executor binding",
+      "executor/provider/model/tier/mechanism selection",
+      "exactly two routing identities (capability, executor-id); purpose/--for is capability compatibility syntax; job is not a routing identity (ADR-004 (reserved unused job routing identity))"
     ],
     "mustNotOwn": [
       "execution launch",
       "transport",
       "confinement",
-      "seat list"
+      "seat list",
+      "Semantic operation choice",
+      "Work lifecycle",
+      "evidence confidence",
+      "coding merge/approval"
     ],
     "spec": "docs/platform/seat-binding/spec.md",
     "source": [
@@ -641,13 +673,48 @@
     "status": "live"
   },
   {
+    "id": "work-driver",
+    "canonical": "work-driver",
+    "aliases": [
+      "Work Driver / Domain Workflow Interpreter",
+      "Work Lifecycle Driver",
+      "Domain Workflow Interpreter",
+      "bộ lái công việc"
+    ],
+    "meaning": "Ready-work selection, Stage Operation choice, cross-flow routing, park/halt and recovery around Work execution; invokes lifecycle verbs and dispatch surfaces without owning domain workflow semantics.",
+    "layer": "use-case",
+    "tier": 6,
+    "paths": [],
+    "exceptions": [],
+    "owns": [
+      "Ready-work selection",
+      "automation loop policy",
+      "declared Stage Operation choice",
+      "cross-flow routing",
+      "park/halt behavior",
+      "recovery/anti-loop around Work execution",
+      "invoking lifecycle verbs and dispatch surfaces"
+    ],
+    "mustNotOwn": [
+      "Domain workflow semantics",
+      "lifecycle writes outside Work Lifecycle verbs",
+      "dispatch target choice",
+      "RunResult confidence",
+      "coding repository isolation",
+      "CoordinationSession progress"
+    ],
+    "spec": "docs/platform/component-boundary.md",
+    "source": [],
+    "status": "planned",
+    "reason": "Proposal Work Driver / Domain Workflow Interpreter has no dedicated live src tree yet; authority is designed in component-boundary and agent-coordination docs."
+  },
+  {
     "id": "work-state",
     "canonical": "work-state",
     "aliases": [
       "vòng đời công việc",
       "trạng thái công việc",
-      "Work Lifecycle Engine",
-      "Work Driver"
+      "Work Lifecycle Engine"
     ],
     "meaning": "Domain-agnostic work-unit lifecycle, status board, claim/return, and human gates.",
     "layer": "domain",
@@ -767,12 +834,20 @@
     "owns": [
       "work item identity, status, and stage",
       "claim and return lifecycle",
-      "lifecycle event truth"
+      "lifecycle event truth",
+      "related refs, context refs, document refs",
+      "questions, human gates",
+      "lifecycle verbs",
+      "domain-agnostic Work event truth"
     ],
     "mustNotOwn": [
       "unit execution",
       "assignment membership",
-      "git merge and worktree mutation"
+      "git merge and worktree mutation",
+      "Agent runtime",
+      "executor choice",
+      "evidence confidence",
+      "coding merge/worktree/technical approval"
     ],
     "spec": "docs/platform/work-state/spec.md",
     "source": [
@@ -854,7 +929,8 @@
     "canonical": "learning-docs-registry",
     "aliases": [
       "sổ đăng ký tri thức",
-      "Knowledge, Learning, And Documentation Registry"
+      "Knowledge, Learning, And Documentation Registry",
+      "Learning, Knowledge, And Documentation Registry"
     ],
     "meaning": "Retrospective knowledge capture, doc registry, Diataxis index, and evolve signals.",
     "layer": "domain",
@@ -891,11 +967,17 @@
     ],
     "owns": [
       "knowledge registry and resolution",
-      "retrospective learning and doc indexing"
+      "retrospective learning and doc indexing",
+      "retrospective knowledge capture",
+      "doc slot/topic registry, projections, traces",
+      "end-user docs index",
+      "learning outputs"
     ],
     "mustNotOwn": [
       "work lifecycle mutation",
-      "run execution truth"
+      "run execution truth",
+      "Agent Coordination runtime",
+      "RunResult confidence"
     ],
     "spec": "docs/platform/work-state/contracts/knowledge-registry.md",
     "source": [
@@ -994,7 +1076,8 @@
       "lõi thực thi",
       "execution-engine-unit",
       "unit-run-posture",
-      "fgos-run-door"
+      "fgos-run-door",
+      "Dispatch And Execution Engine"
     ],
     "meaning": "Single authority for how a Unit runs (mechanism, posture, gates) through run door.",
     "layer": "infra",
@@ -1027,12 +1110,17 @@
     "owns": [
       "unit run execution loop",
       "run admission and settlement",
-      "posture enforcement"
+      "posture enforcement",
+      "Run creation",
+      "in-process Run mechanism"
     ],
     "mustNotOwn": [
       "seat ranking",
       "work lifecycle",
-      "git merge"
+      "git merge",
+      "Semantic operation choice",
+      "evidence confidence",
+      "coding merge/approval"
     ],
     "spec": "docs/platform/runner/spec.md",
     "source": [
@@ -1070,12 +1158,18 @@
     "owns": [
       "dispatch planning and launch",
       "executor adapter invocation",
-      "confinement request assembly"
+      "confinement request assembly",
+      "Assignment-to-DispatchPlan resolution",
+      "governance/egress",
+      "launch, timeout, cancellation, retry attempt metadata"
     ],
     "mustNotOwn": [
       "work lifecycle",
       "unit run settlement",
-      "seat ranking"
+      "seat ranking",
+      "Semantic operation choice",
+      "evidence confidence",
+      "coding merge/approval"
     ],
     "spec": "docs/platform/runner/spec.md",
     "source": [
@@ -1348,13 +1442,22 @@
     ],
     "exceptions": [],
     "owns": [
+      "Worker result parsing",
+      "evidence collection coordination",
+      "artifact freshness/provenance checks",
+      "confidence decision",
+      "RunResult normalization",
+      "failure classification for one Assignment Run",
       "run outcome derivation",
       "evidence policy evaluation",
       "result normalization"
     ],
     "mustNotOwn": [
-      "executor launch",
-      "work lifecycle"
+      "Executor launch",
+      "provider choice",
+      "Work lifecycle",
+      "session completion policy",
+      "domain-specific evidence collection ownership"
     ],
     "spec": "docs/platform/runner/spec.md",
     "source": [
@@ -2286,10 +2389,20 @@
     "paths": [],
     "exceptions": [],
     "owns": [
-      "CoordinationSession manifest/events, Assignment membership, actor/topology/bounds, session recovery"
+      "CoordinationSession manifest/events",
+      "Assignment membership",
+      "actor/topology/bounds",
+      "session recovery",
+      "session synthesis boundary",
+      "Team Cognition invocation",
+      "optional protocol/dynamic planning consumption"
     ],
     "mustNotOwn": [
-      "Work stage/status/claim/return, declared Work operation selection, dispatch mechanism"
+      "Work stage/status/claim/return",
+      "declared Work operation selection",
+      "dispatch mechanism",
+      "provider/model choice",
+      "coding worktree/merge authority"
     ],
     "spec": "docs/platform/agent-coordination/spec.md",
     "source": [
@@ -2310,10 +2423,20 @@
     "paths": [],
     "exceptions": [],
     "owns": [
-      "typed deliberation interpretation, aggregation semantics, source/dissent coverage validation"
+      "typed deliberation interpretation",
+      "aggregation-method semantics",
+      "source/dissent/omission coverage validation",
+      "cognitive outcomes linked to immutable RunResult/artifact evidence"
     ],
     "mustNotOwn": [
-      "CoordinationSession terminal transitions, dispatch, Work lifecycle"
+      "CoordinationSession terminal transitions",
+      "context-grant authority",
+      "Assignment dispatch",
+      "RunResult confidence upgrades",
+      "Work lifecycle",
+      "chat/mailbox delivery",
+      "protocol-specific RFC/NGT/Delphi control flow",
+      "dispatch"
     ],
     "spec": "docs/platform/agent-coordination/spec.md",
     "source": [
@@ -2334,11 +2457,16 @@
     "paths": [],
     "exceptions": [],
     "owns": [
-      "runtime definition registry, domain and workflow loader, flow definition validation"
+      "runtime definition registry, domain and workflow loader, flow definition validation",
+      "workflow/stage/operation declarations, task-spec/skill references, roles",
+      "FlowDefinition validation/projection"
     ],
     "mustNotOwn": [
       "runtime session state",
-      "Work lifecycle writes"
+      "Work lifecycle writes",
+      "dispatch target choice",
+      "evidence confidence",
+      "setup/distribution config authority"
     ],
     "spec": "docs/platform/component-boundary.md",
     "source": [
@@ -2359,11 +2487,17 @@
     "paths": [],
     "exceptions": [],
     "owns": [
-      "coding domain policies, worktree isolation doctrine, merge/catchup, code verification doctrine"
+      "coding domain policies, worktree isolation doctrine, merge/catchup, code verification doctrine",
+      "product/design, cook, bugfix, and small-change policies",
+      "repo scope, footprint, worktree/branch/isolation",
+      "merge/catchup, technical approval",
+      "coding evidence adapters"
     ],
     "mustNotOwn": [
       "generic Work lifecycle",
-      "generic Agent Coordination runtime"
+      "generic Agent Coordination runtime",
+      "direct executor launch",
+      "final confidence outside Run Result Evaluator"
     ],
     "spec": "docs/platform/component-boundary.md",
     "source": [
@@ -2385,11 +2519,25 @@
     "paths": [],
     "exceptions": [],
     "owns": [
-      "group-thinking protocol definitions, public request and replay adapters, fgos-group-thinking skill"
+      "group-thinking protocol definitions, public request and replay adapters",
+      "versioned data-first CoordinationProtocol definitions",
+      "fgos-group-thinking skill",
+      "selects an explicit registered protocol, builds a public request, launches/resumes through coordination surfaces, renders public replay/evidence"
     ],
     "mustNotOwn": [
       "session state mutation",
-      "terminal authority"
+      "terminal authority",
+      "visibility legality",
+      "aggregation validity",
+      "dispatch",
+      "Work lifecycle",
+      "hidden protocol semantics in prompts/adapters",
+      "Group-thinking runtime logic",
+      "hidden actor/topology changes",
+      "context grants",
+      "aggregate validation",
+      "specialist authorization",
+      "Work/git mutation"
     ],
     "spec": "docs/platform/component-boundary.md",
     "source": [

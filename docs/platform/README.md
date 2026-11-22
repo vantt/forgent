@@ -110,6 +110,7 @@ Component owners, one row per component and subcomponent, sorted by id. <!-- ren
 | `team-cognition-engine` | — | Typed deliberation interpretation, aggregation-method semantics, and cognitive outcomes. | `docs/platform/agent-coordination/spec.md` | — |
 | `terminal-control` | — | Foundation component for terminal multiplexer pane allocation and key addressing. | `docs/platform/terminal-control/spec.md` | `src/terminal-control/` |
 | `ui-spec` | — | Visual contracts and UI specifications for fgOS web surfaces. | `docs/platform/ui-spec/spec.md` | — |
+| `work-driver` | — | Ready-work selection, Stage Operation choice, cross-flow routing, park/halt and recovery around Work execution; invokes lifecycle verbs and dispatch surfaces without owning domain workflow semantics. | `docs/platform/component-boundary.md` | — |
 | `work-state` | — | Domain-agnostic work-unit lifecycle, status board, claim/return, and human gates. | `docs/platform/work-state/spec.md` | `src/state/`, `src/intake/`, `src/evolve/` |
 | `workflow` | — | Workflow guide schema, case ledger, reservations, admission, and worktree binding. | `docs/platform/workflow/spec.md` | `src/workflow/` |
 | `write-door` | `documentation` | Defines the one door through which any agent writes, changes, or moves documentation. | `docs/platform/documentation/subcomponents/write-door/spec.md` | `docs/platform/documentation/subcomponents/write-door/` |

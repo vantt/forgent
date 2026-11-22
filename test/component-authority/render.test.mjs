@@ -74,8 +74,19 @@ function seedTempRepo() {
       evidence: [],
       status: 'planned',
     },
+    {
+      id: 'CTR-NAMED-MISSING',
+      canonical: 'CTR-NAMED-MISSING',
+      aliases: [],
+      meaning: 'named missing ↔ side: path printed even if absent',
+      provider: 'cross',
+      consumers: [],
+      path: 'packages/missing/contracts/x.v1.json',
+      evidence: [],
+      status: 'planned',
+    },
   ], null, 2));
-  // Existing path so architecture-map-contracts can backtick it; missing path stays "—".
+  // Existing path so architecture-map-contracts can backtick it.
   fs.mkdirSync(path.join(tmp, 'packages/demo/contracts'), { recursive: true });
   fs.writeFileSync(path.join(tmp, 'packages/demo/contracts/demo.v1.json'), '{}\n', 'utf8');
 
@@ -209,17 +220,19 @@ test('architecture-map-contracts prints id boundary contract provider consumers 
   assert.ok(block, 'architecture-map-contracts block missing');
   const body = block[1];
   assert.match(body, /\| ID \| Boundary \| Contract \| Provider \| Consumers \| Status \| Path \|/);
+  // Boundary before ": "; Contract cell is only the text after ": " (boundary shown once).
   assert.match(
     body,
-    /\| `CTR-DEMO` \| demo boundary ↔ other \| demo boundary ↔ other: detail that must not appear as boundary \| `demo` \| `cross` \| live \| `packages\/demo\/contracts\/demo\.v1\.json` \|/,
+    /\| `CTR-DEMO` \| demo boundary ↔ other \| detail that must not appear as boundary \| `demo` \| `cross` \| live \| `packages\/demo\/contracts\/demo\.v1\.json` \|/,
   );
-  // Planned row with no path → em dash, not a backticked missing path.
+  // Planned row with no path → em dash.
   assert.match(
     body,
-    /\| `CTR-PLANNED` \| planned side ↔ other side \| planned side ↔ other side: no file yet \| `cross` \| — \| planned \| — \|/,
+    /\| `CTR-PLANNED` \| planned side ↔ other side \| no file yet \| `cross` \| — \| planned \| — \|/,
   );
-  // Boundary is the clause before ": "; the Contract cell holds full meaning.
-  assert.match(body, /\| `CTR-DEMO` \| demo boundary ↔ other \|/);
-  assert.doesNotMatch(body, /\| `CTR-DEMO` \| demo boundary ↔ other: detail/);
-  assert.doesNotMatch(body, /`packages\/missing/);
+  // Named path prints as-is even when the file is absent (contracts.test owns live/designed existence).
+  assert.match(
+    body,
+    /\| `CTR-NAMED-MISSING` \| named missing ↔ side \| path printed even if absent \| `cross` \| — \| planned \| `packages\/missing\/contracts\/x\.v1\.json` \|/,
+  );
 });
