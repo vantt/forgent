@@ -102,10 +102,10 @@ plans own, so this plan does not touch them. The secretary routes each one to th
 | 1 | [Confinement tests use the plans/ portfolio](phase-01-confinement-portfolio-paths.md) | - | test/runner/dispatch-confinement-backend-p03.test.mjs, test/runner/dispatch-confinement-policies.test.mjs, test/runner/dispatch-confinement-machine-private.test.mjs | 1 | done (f25ab4c9a) |
 | 2 | [Convention accepts the migrated portfolio names](phase-02-convention-portfolio-names.md) | - | packages/convention/contracts/convention.rules.v1.json, packages/convention/contracts/convention.golden.v1.json, packages/convention/rust/src/operations.rs, packages/convention/rust/tests/golden.rs, scripts/convention-conformance.mjs, test/scripts/convention-conformance.test.mjs | 1 | done (eb3378b49) |
 | 3 | [The terminal skill test asserts the colon tab label](phase-03-tab-label-separator.md) | - | test/plugins/terminal-skill-attach.test.mjs | 1 | done (c831999d4) |
-| 4 | [Config bundle lists secretary and the rotation comment passes the scrub](phase-04-config-bundle.md) | - | core/config-standard/sessionRotation.yaml, packages/config/rust/src/bundle.rs | 1 | parked: needs packages/config/contracts/fixtures/repo-differences.v1.json in the footprint (owner question q-4qtu54bnxz) |
+| 4 | [Config bundle lists secretary and the rotation comment passes the scrub](phase-04-config-bundle.md) | - | core/config-standard/sessionRotation.yaml, packages/config/rust/src/bundle.rs | 1 | done (7180cca94) |
 | 5 | [Remaining portfolio sample paths](phase-05-portfolio-sample-paths.md) | - | test/scripts/check-decision-citation-drift.test.mjs, packages/durable-file/rust/tests/dir_replace.rs, apps/fgos/tests/session_write_publish.rs, plans/261122-0800-red-tests-and-backlog-sweep/reports/kept-legacy-references.md | 1 | done (bb9675c8d) |
 | 6 | [Prove or disprove the environmental four](phase-06-environmental-proof.md) | - | plans/261122-0800-red-tests-and-backlog-sweep/reports/environmental-reds.md | 1 | done (1fee82c55) |
-| 7 | [Integration gate](phase-07-integration-gate.md) | 1, 2, 3, 4, 5, 6 | plans/261122-0800-red-tests-and-backlog-sweep/reports/integration-gate.md | 2 | waiting: depends on parked phase 4 (q-4qtu54bnxz) |
+| 7 | [Integration gate](phase-07-integration-gate.md) | 1, 2, 3, 4, 5, 6 | plans/261122-0800-red-tests-and-backlog-sweep/reports/integration-gate.md | 2 | running |
 
 Phase 1 note: the read-only backlog-file probe of the secretary case was retired because a1022572a made `plans` a read-write bind; the positive `plans/backlog.md` probe in the same case now owns the backlog behaviour (fix commit 4aa0a7e81 carries no body saying so).
 
@@ -117,7 +117,7 @@ overlap today; whichever lands second rebases.
 
 ## Owner questions
 
-- q-4qtu54bnxz (phase 4): widen the footprint by `packages/config/contracts/fixtures/repo-differences.v1.json` so `["secretary"]` can be recorded as standard-only; without it `authoring_equivalence` stays red.
+- q-4qtu54bnxz (phase 4): answered by lead:SUPERVISOR inside the approved frame; the footprint took `packages/config/contracts/fixtures/repo-differences.v1.json` (ede5e84f5) and phase 4 appended exactly one `["secretary"]` to standard-only by hand (3ae6cc921; no recorder exists, precedent a750637d3).
 
 At planning time the discussion left no open point. The footprint narrowing above follows two rules already in force (the
 secretary's disjoint-footprint rule and the plan check's active-overlap error), so it needed no owner decision.

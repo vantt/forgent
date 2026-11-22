@@ -50,6 +50,14 @@ around the `session write` door and its validation.
   cannot run tests itself; the first phase 6 unit (claude, bwrap) could not run tests either and was rerun on gemini.
 - A scratch question file left in the plan directory made one land refuse `main-checkout-dirty-overlap`.
 
+## Update 09:20: phase 4 landed
+
+`q-4qtu54bnxz` answered by lead:SUPERVISOR inside the approved frame: the footprint took `repo-differences.v1.json`
+(ede5e84f5). Unit commit 3ae6cc921 appends exactly one `["secretary"]` to standard-only by hand; the fixture has no
+recorder and a750637d3 is the precedent (the commit itself carries no body saying so). The reviewer ran
+`cargo test -p fgos-config` (34 binaries, 0 failed) and `cargo fmt --all --check` clean. Landed at 7180cca94. The three
+`apps/fgos` run-peer `cli_tests` that S6A turned green in d8413bc09 were S6A's reds, not this plan's.
+
 ## Unresolved questions
 
-- `q-4qtu54bnxz`: widen the footprint by `repo-differences.v1.json` for phase 4?
+None.
