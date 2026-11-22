@@ -8,7 +8,7 @@ import path from 'node:path';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 
 import { createCaseAdmissionPort, activityUnitOf } from '../../src/workflow/case-admission-port.mjs';
-import { assertCaseAdmissionPort, seatLaunchesOf } from '../../src/runner/execution/case-admission-port.mjs';
+import { seatLaunchesOf } from '../../src/runner/execution/seat-resolver.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { createPendingBinding, readBinding, listBindingRecords } from '../../src/workflow/case-bindings.mjs';
@@ -40,10 +40,12 @@ const proposal = (run, extra = {}) => ({
 });
 const types = (run) => eventsOf(run).map((e) => e.type);
 
-test('the port is complete: every operation the core asks is there', () => {
+// The four case operations of the admission peer (packages/execution/contracts/admission-peer); a port that lacks one
+// is answered with an error by the peer (test/native/execution-door.test.mjs).
+test('the port is complete: every case operation the admission peer asks is there', () => {
   const run = openCase();
-  assert.doesNotThrow(() => assertCaseAdmissionPort(createCaseAdmissionPort({ repoRoot: run.repoRoot })));
-  assert.throws(() => assertCaseAdmissionPort({ admit() {} }), { code: 'case-admission-port-missing' });
+  const port = createCaseAdmissionPort({ repoRoot: run.repoRoot });
+  for (const op of ['resolveBinding', 'admit', 'recheckEffect', 'settle']) assert.equal(typeof port[op], 'function', op);
 });
 
 test('admit records route and reservation under advance, and lets go of advance', () => {

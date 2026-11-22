@@ -8,13 +8,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { runUnit } from '../../src/runner/execution/run.mjs';
+import { runUnitInHost } from '../../src/native/execution-door.mjs';
 import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
 import { createCaseAdmissionPort } from '../../src/workflow/case-admission-port.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 import { openCase } from '../helpers/workflow-case-fixture.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+
+// A unit run through the host, the caller's admission port served beside the request.
+const runUnit = ({ caseAdmission, ...request }) => runUnitInHost(request, { caseAdmission });
 
 seedFileLocalBwrapRegistry();
 

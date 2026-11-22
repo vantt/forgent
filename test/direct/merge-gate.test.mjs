@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { prepareActivatedGitFixture } from '../helpers/run-unit-with-port.mjs';
+import { prepareActivatedGitFixture } from '../helpers/git-fixture.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const execGit = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8' });

@@ -1,7 +1,7 @@
 // src/workflow/case-admission-port.mjs — the Workflow's implementation of the Execution Core's admission port
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/** (A4 boundary)
 //
-// The Execution Core owns the interface (src/runner/execution/case-admission-port.mjs) and asks it
+// The Execution Core owns the interface (the admission-peer contract, packages/execution/contracts/admission-peer) and asks it
 // before it runs a Unit for a case; the entry point builds this port and injects it, so the core never
 // imports the Workflow. Every operation is a short section under the case's `advance`:
 //

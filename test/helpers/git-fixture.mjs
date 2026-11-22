@@ -31,6 +31,13 @@ export function activateGitFixture(repo) {
   fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
 }
 
+/** `activateGitFixture` for a repository that is not activated yet; a path without `.git` is left alone. */
+export function prepareActivatedGitFixture(repoRoot) {
+  if (!repoRoot || !fs.existsSync(path.join(repoRoot, '.git'))) return;
+  if (fs.existsSync(path.join(repoRoot, '.fgos/locks/activation.lock'))) return;
+  activateGitFixture(repoRoot);
+}
+
 /** A fresh repository at `dir` with one seed commit, the store's local paths
  * ignored the way this repository ignores them (or as `ignore` says), and the
  * activation fence. */

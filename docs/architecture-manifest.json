@@ -1082,10 +1082,8 @@
       "patterns": [
         "\\bcatalogOf\\("
       ],
-      "allowed": [
-        "src/runner/execution/run.mjs"
-      ],
-      "reason": "catalogOf (defined in the port) is the only function that returns the whole section: run.mjs snapshots it into the run record and hash"
+      "allowed": [],
+      "reason": "catalogOf (defined in the port) is the only function that returns the whole section; the run record and its hash are snapshotted by the Rust engine (fgos-execution-engine), so no Node file may ask for it"
     },
     {
       "job": "bind a seat",
@@ -1141,22 +1139,6 @@
         {
           "path": "src/runner/dispatch/assignment-runner.mjs",
           "reason": "S6a: the assignment runner binds each round's seat and asks the replay digest"
-        },
-        {
-          "path": "src/runner/execution/run.mjs",
-          "reason": "S6a: the run start binds the unit seats"
-        },
-        {
-          "path": "src/runner/execution/dry-bind.mjs",
-          "reason": "S6a: the dry-bind simulator asks bind for every unit seat; doctor rows seat-binding-dry-bind and blind-steps-use-proven-pools (bridge:S6b) read it"
-        },
-        {
-          "path": "src/runner/execution/account-pin.mjs",
-          "reason": "S6a: account pin asks the preflight"
-        },
-        {
-          "path": "src/runner/execution/unit-run-start.mjs",
-          "reason": "S6a: unit run start asks the preflight"
         },
         {
           "path": "src/runner/execution/account-rotation.mjs",
@@ -1240,10 +1222,6 @@
         {
           "path": "src/runner/dispatch/llm-accounts.mjs",
           "reason": "twin, same vectors as the contract: readLlmAccounts and legacyStateKey stay for Node account state"
-        },
-        {
-          "path": "src/runner/execution/run.mjs",
-          "reason": "twin, same vectors as the contract: detectHerdrPresent stays for the Node run start"
         },
         {
           "path": "src/runner/capability-config.mjs",
@@ -1891,7 +1869,6 @@
     "src/report/knowledge-resolver.mjs": "domain",
     "src/report/knowledge-projection.mjs": "domain",
     "src/report/knowledge-lints.mjs": "infra",
-    "src/run-supervisor/cancel-opt-in.mjs": "infra",
     "src/run-supervisor/cancel-registry.mjs": "infra",
     "src/run-supervisor/client.mjs": "infra",
     "src/run-supervisor/direct-launch.mjs": "infra",
@@ -1927,37 +1904,27 @@
     "src/runner/execution/unit-control.mjs": "infra",
     "src/runner/execution/unit-run-record.mjs": "infra",
     "src/runner/execution/bind.mjs": "infra",
-    "src/runner/execution/account-pin.mjs": "infra",
     "src/runner/execution/account-rotation.mjs": "infra",
-    "src/runner/execution/dry-bind.mjs": "infra",
     "src/runner/execution/custody-door.mjs": "infra",
     "src/runner/execution/seat-ledger.mjs": "domain",
     "src/runner/execution/seat-resolver.mjs": "domain",
     "src/runner/execution/legacy-seat-read.mjs": "kernel",
     "src/runner/execution/loops/history-outcome.mjs": "domain",
     "src/runner/execution/commit-unit-work.mjs": "infra",
-    "src/runner/execution/partial-writes.mjs": "infra",
-    "src/runner/execution/unit-sync.mjs": "infra",
     "src/runner/execution/case-run-paths.mjs": "infra",
     "src/runner/execution/handoff-refs.mjs": "infra",
     "src/runner/execution/unit-run-history.mjs": "infra",
     "src/runner/execution/outcome.mjs": "kernel",
     "src/runner/execution/unit-state.mjs": "infra",
     "src/runner/execution/unit-summary.mjs": "infra",
-    "src/runner/execution/case-admission-port.mjs": "infra",
-    "src/runner/execution/run.mjs": "use-case",
-    "src/runner/execution/unit-run-start.mjs": "use-case",
     "src/runner/execution/loops/index.mjs": "domain",
     "src/runner/execution/loops/debate.mjs": "domain",
     "src/runner/execution/loops/panel.mjs": "domain",
-    "src/runner/execution/patterns/catalog.mjs": "domain",
-    "src/runner/execution/patterns/catalog-entries.mjs": "domain",
     "src/runner/execution/patterns/retired-keys.mjs": "domain",
     "src/runner/execution/loops/reviewed.mjs": "domain",
     "src/runner/execution/loops/role-tasks.mjs": "domain",
     "src/runner/execution/loops/solo.mjs": "domain",
     "src/runner/execution/loops/verify.mjs": "domain",
-    "src/runner/execution/run-request.mjs": "infra",
     "src/workflow/definition.mjs": "kernel",
     "src/workflow/guide-schema.mjs": "kernel",
     "src/workflow/dir-guard.mjs": "infra",

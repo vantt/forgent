@@ -452,10 +452,6 @@ export function checkExecuteAssignmentCallSitePostures(sites) {
       } else if (!/isReadOnlyMode:\s*true\b/.test(callText)) {
         violations.push(`${file}: executeAssignment(...) call's isReadOnlyMode is not literal true -- ${callText}`);
       }
-    } else if (file === 'src/runner/execution/run.mjs') {
-      if (!/isReadOnlyMode:\s*readOnly\b/.test(callText)) {
-        violations.push(`${file}: runRole's executeAssignment(...) call must pass isReadOnlyMode: readOnly -- found: ${callText}`);
-      }
     } else {
       violations.push(`${file}: unexpected NEW executeAssignment(...) call site -- add explicit posture coverage to checkExecuteAssignmentCallSitePostures before accepting it`);
     }
@@ -466,8 +462,8 @@ export function checkExecuteAssignmentCallSitePostures(sites) {
 // The symbols that run a worker or commit its work. Each may be called only from
 // the files named below; any other caller has to come through runUnit.
 const RUN_DOOR_CALLERS = {
-  executeAssignment: ['src/runner/execution/run.mjs', 'src/runner/dispatch/cli.mjs'],
-  commitUnitWork: ['src/runner/execution/run.mjs', 'scripts/git/e3-bench.mjs'], // Paired E3 baseline calls the real legacy writer.
+  executeAssignment: ['src/runner/dispatch/cli.mjs'],
+  commitUnitWork: ['scripts/git/e3-bench.mjs'], // Paired E3 baseline calls the real legacy writer.
 };
 // Where each symbol is defined. Its home and the dispatch barrel may define or re-export it; calling it still counts.
 const RUN_DOOR_HOMES = {
@@ -568,12 +564,12 @@ test('run-door call-site guard catches an aliased import, a dynamic import(), a 
     ['src/runner/relay.mjs: export * from ./dispatch/assignment-runner.mjs']);
   assert.equal(findStarRelaysOfRunDoors('src/runner/relay.mjs', "export * as d from './execution/commit-unit-work.mjs';").length, 1);
   assert.deepEqual(findStarRelaysOfRunDoors('src/runner/relay.mjs', "export * from './dispatch/config.mjs';"), []);
-  assert.ok(checkRunDoorCallers({ executeAssignment: ['src/runner/execution/run.mjs', 'src/runner/new.mjs'] })
+  assert.ok(checkRunDoorCallers({ executeAssignment: ['src/runner/dispatch/cli.mjs', 'src/runner/new.mjs'] })
     .some((v) => v.includes('src/runner/new.mjs')));
-  assert.ok(checkRunDoorCallers({ commitUnitWork: ['src/runner/execution/run.mjs', 'src/runner/loop.mjs'] })
+  assert.ok(checkRunDoorCallers({ commitUnitWork: ['scripts/git/e3-bench.mjs', 'src/runner/loop.mjs'] })
     .some((v) => v.includes('unexpected caller src/runner/loop.mjs')));
   // Work runs on runUnit now: the Work driver calling a run door again is an unexpected caller.
-  assert.ok(checkRunDoorCallers({ executeAssignment: ['src/runner/execution/run.mjs', 'src/runner/dispatch/cli.mjs', 'src/runner/operation-choice.mjs'] })
+  assert.ok(checkRunDoorCallers({ executeAssignment: ['src/runner/dispatch/cli.mjs', 'src/runner/operation-choice.mjs'] })
     .some((v) => v.includes('unexpected caller src/runner/operation-choice.mjs')));
 });
 
@@ -586,8 +582,6 @@ test('executeAssignment(...) isReadOnlyMode posture: only session-engine.mjs\'s 
   const cliSites = sites.filter((s) => s.file === 'src/runner/dispatch/cli.mjs');
   // Only the read-only `probe-account` diagnostic is left in cli.mjs.
   assert.equal(cliSites.length, 1, `expected exactly one executeAssignment(...) call site in cli.mjs, found ${cliSites.length}`);
-  const runSites = sites.filter((s) => s.file === 'src/runner/execution/run.mjs');
-  assert.equal(runSites.length, 1, `expected exactly one executeAssignment(...) call site in run.mjs, found ${runSites.length}`);
   assert.deepEqual(checkExecuteAssignmentCallSitePostures(sites), []);
 });
 
@@ -1576,7 +1570,6 @@ test('retired pattern literals appear only in permitted refusal and decoder path
   const allowed = new Set([
     'src/runner/dispatch/config.mjs',
     'src/runner/execution/legacy-seat-read.mjs',
-    'src/runner/execution/patterns/catalog-entries.mjs',
     'src/runner/execution/patterns/retired-keys.mjs',
   ]);
 

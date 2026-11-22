@@ -1,5 +1,4 @@
-// test/runner/execution/run-herdr.test.mjs -- what runUnit still decides about a herdr seat on its own:
-// that the run path reads the transport bind() chose, and what a claude REPL in a pane may read. A seat
+// test/runner/execution/run-herdr.test.mjs -- what a claude REPL in a herdr pane may read. A seat
 // itself -- the pane, the brief, the supervisor, the crash cases, the confined `fgos run` -- is tested in
 // test/run-supervisor/terminal-*.test.mjs against a fake herdr that keeps a real pane.
 
@@ -14,12 +13,6 @@ import { readStandardValue } from '../../../src/config/facade.mjs';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 
 const fixtureDir = (prefix) => makeFixtureDir(prefix);
-
-test('guards: the run path reads bound.transport and walks through bind', () => {
-  const runSource = fs.readFileSync(new URL('../../../src/runner/execution/run.mjs', import.meta.url), 'utf8');
-  assert.match(runSource, /bound\.transport/);
-  assert.match(runSource, /bind\(role\.ask\(\), bindCtxOf\(ctx, role, attemptNo \+ 1\), \{\s*walk:/);
-});
 
 test('Claude reads blind inputs without granting the assignment or store root, preserving operator directories', () => {
   const assignment = fixtureDir('fgos-blind-access-');

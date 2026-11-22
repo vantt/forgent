@@ -62,7 +62,7 @@ Status words: `done` met and proven; `partial` met in part, the residual is name
 | ONB-09 | MUST | gap | No CI extraction of README code blocks. `first-run-guide.test.mjs` pins the three commands only. Owner idea: README extraction plus an agent-native CI run. |
 | ONB-10 | MUST | done | `fgctl init` ends on `Ready:` or a numbered list (`packages/distribution/rust/src/init.rs` `closing_block`; `test/rust-host/closing-block.test.mjs`). |
 | ONB-12 | MUST | done | Installer, README, `fgctl --help` and `fgos` print the same three steps; one test pins them. The three texts are still three copies. |
-| ONB-14 | MUST | done | `fgos run` with no agent CLI exits 4 with `agent-cli-missing`, the CLIs looked for and the fix (`src/runner/execution/unit-run-start.mjs`; `test/cli/run-verb.test.mjs`). |
+| ONB-14 | MUST | done | `fgos run` with no agent CLI exits 4 with `agent-cli-missing`, the CLIs looked for and the fix (`packages/execution/engine/src/unit_run/start.rs`; `test/cli/run-verb.test.mjs`). |
 | ONB-16 | SHOULD | gap | Internal task ids left the rows P02 touched; no lint over user-facing strings (owner idea). |
 | CMD-01 | MUST | partial | The header-only config files moved from `setup` to `fgos init`; `setup` still wires the git hooks path and the shell line, which no registered fix repairs. |
 | CMD-02 | MUST | done | Doctor is read-only by default. |

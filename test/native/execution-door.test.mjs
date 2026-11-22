@@ -25,7 +25,6 @@ import {
   judgeUnitRun,
 } from '../../src/native/execution-door.mjs';
 import { RunnerConfigError as DispatchRunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
-import { CaseAdmissionRefusedError as ExecutionCaseAdmissionRefusedError } from '../../src/runner/execution/case-admission-port.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -134,7 +133,6 @@ test('the admission peer refuses another protocol, an unknown operation and an o
 test('a native run-unit error result is rethrown as the Node class its tag names, with the class Node gave it', () => {
   // One class identity for an error thrown in process and one rethrown from a native result.
   assert.equal(DispatchRunnerConfigError, RunnerConfigError);
-  assert.equal(ExecutionCaseAdmissionRefusedError, CaseAdmissionRefusedError);
 
   const byName = Object.fromEntries(runUnitContract.vectors.map((v) => [v.name, runUnitErrorOf({ ok: false, error: v.error })]));
   const refused = byName['admission refused'];

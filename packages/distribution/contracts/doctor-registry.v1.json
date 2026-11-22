@@ -179,7 +179,6 @@
     "src/runner/dispatch/transport.mjs": "S6a",
     "src/runner/execution/bind.mjs": "S6a",
     "src/runner/capability-config.mjs": "S6a",
-    "src/runner/execution/dry-bind.mjs": "S6a",
     "src/runner/execution/patterns/retired-keys.mjs": "S6a",
     "src/seat-binding/client.mjs": "S6a",
     "src/setup/registrations.mjs": "S7",
@@ -550,7 +549,7 @@
       "judge": [
         "src/runner/dispatch/config.mjs",
         "src/runner/execution/bind.mjs",
-        "src/runner/execution/dry-bind.mjs"
+        "src/seat-binding/client.mjs"
       ]
     },
     {
@@ -560,7 +559,7 @@
       "judge": [
         "src/runner/dispatch/config.mjs",
         "src/runner/execution/bind.mjs",
-        "src/runner/execution/dry-bind.mjs"
+        "src/seat-binding/client.mjs"
       ]
     },
     {

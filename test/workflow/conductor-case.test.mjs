@@ -12,13 +12,15 @@ import { startWorkflow, statusWorkflow } from '../../src/workflow/index.mjs';
 import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { createCaseAdmissionPort } from '../../src/workflow/case-admission-port.mjs';
 import { createPendingBinding, commitBinding } from '../../src/workflow/case-bindings.mjs';
-import { runUnit } from '../../src/runner/execution/run.mjs';
+import { runUnitInHost, CaseAdmissionRefusedError } from '../../src/native/execution-door.mjs';
 import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
-import { CaseAdmissionRefusedError } from '../../src/runner/execution/case-admission-port.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { appendAll, conductorWorkflow, FRAME, openCase, projectionOf, eventsOf } from '../helpers/workflow-case-fixture.mjs';
+
+// A unit run through the host, the caller's admission port served beside the request.
+const runUnit = ({ caseAdmission, ...request }) => runUnitInHost(request, { caseAdmission });
 
 seedFileLocalBwrapRegistry();
 

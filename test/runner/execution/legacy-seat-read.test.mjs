@@ -1,4 +1,4 @@
-// Records written before seats existed stay readable through one path, and are never resumed.
+// Records written before seats existed stay readable through one path (a resume of one is refused by the host's unit run).
 
 import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
@@ -13,7 +13,6 @@ import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs
 import { buildUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { readUnitRunHistory } from '../../../src/runner/execution/unit-run-history.mjs';
 import { resolveUnitInputs } from '../../../src/runner/execution/handoff-refs.mjs';
-import { runUnit } from '../../../src/runner/execution/run.mjs';
 
 const settledAt = '2026-10-05T01:01:00Z';
 
@@ -125,21 +124,6 @@ import crypto from 'node:crypto';
 function require_sha(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 }
-
-test('a pre-fence record is refused on resume by name, whatever its execution says, and is left untouched', async (t) => {
-  for (const execution of [{ status: 'running' }, { status: 'pending' }, { status: 'settled' }, undefined]) {
-    const record = { unit: { id: 'q', capability: 'q:a', objective: 'x', writes: [] }, pattern: 'solo', ...(execution ? { execution } : {}) };
-    const { root, dir } = recordDir(t, record);
-    const before = fs.readFileSync(path.join(dir, 'unit.json'), 'utf8');
-    await assert.rejects(
-      runUnit({ repoRoot: root, cwd: root, resumeUnitRunId: 'unit-run-prefence' }),
-      (error) => error.code === 'record-predates-seat-binding' && /record-predates-seat-binding/.test(error.message),
-      JSON.stringify(execution),
-    );
-    assert.equal(fs.readFileSync(path.join(dir, 'unit.json'), 'utf8'), before);
-    assert.equal(fs.existsSync(path.join(dir, 'unit-control')), false, 'no controller was taken for a record that cannot resume');
-  }
-});
 
 test('collaborationOfRecord decodes an unpinned record reading snapshot patterns.reviewed.maxRounds as tuning', () => {
   const shipped = shippedCatalog();

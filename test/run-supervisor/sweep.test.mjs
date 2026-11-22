@@ -152,7 +152,6 @@ test('no production code reaches a home by any rule but adopt', () => {
     try { out = execFileSync('grep', ['-rln', name, 'src'], { cwd: REPO, encoding: 'utf8' }); } catch { /* no match */ }
     assert.equal(out.trim(), '', `${name} is gone from src`);
   }
-  assert.match(fs.readFileSync(path.join(REPO, 'src/runner/execution/run.mjs'), 'utf8'), /sweepAttempts\(/);
   // The runner loop sweeps through the host's operation, never a Node path of its own.
   assert.match(fs.readFileSync(path.join(REPO, 'src/runner/loop.mjs'), 'utf8'), /executionOp\('sweep-attempts'/);
 });

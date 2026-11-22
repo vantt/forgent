@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { createSeatLedger, createBindBarrier } from '../../../src/runner/execution/seat-ledger.mjs';
-import { simulateUnitBindings } from '../../../src/runner/execution/dry-bind.mjs';
+import { simulateUnitBindings } from '../../../src/seat-binding/client.mjs';
 
 const tick = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 

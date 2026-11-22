@@ -7,7 +7,6 @@ import { nativeDoor } from '../../../src/native/door.mjs';
 import path from 'node:path';
 import { buildUnitSummary, writeUnitSummary, extractStance, serializeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { readUnitRunHistory } from '../../../src/runner/execution/unit-run-history.mjs';
-import { backfillUnitSummaries } from '../../../scripts/backfill-unit-summaries.mjs';
 import { runLoop } from '../../../src/runner/execution/loops/index.mjs';
 
 const startedAt = '2026-10-05T01:00:00Z';
@@ -137,30 +136,6 @@ test('corrupt latest result is not silently replaced by an earlier passing attem
   assert.deepEqual(readUnitRunHistory(dir), []);
 });
 
-test('backfill uses explicit owner completion for legacy refusal, dry-runs and reruns without rewriting originals', (t) => {
-  const { root, dir } = fixture(t);
-  const eventDir = path.join(root, '.fgos', 'workflow-runs', 'wf-synthetic');
-  fs.mkdirSync(eventDir, { recursive: true });
-  const eventFile = path.join(eventDir, 'events.jsonl');
-  fs.writeFileSync(eventFile, `${JSON.stringify({ type: 'unit.complete', seq: 4, ts: settledAt,
-    payload: { unitRunId: 'unit-run-synthetic', stepId: 'step', unitId: 'question', outcome: 'policy-refusal' } })}\n`);
-  const original = fs.readFileSync(path.join(dir, 'unit.json'), 'utf8');
-  const eventOriginal = fs.readFileSync(eventFile, 'utf8');
-  assert.equal(backfillUnitSummaries({ repoRoot: root, dryRun: true }).changed, 1);
-  assert.equal(fs.existsSync(path.join(dir, 'unit-summary.json')), false);
-  assert.equal(backfillUnitSummaries({ repoRoot: root }).changed, 1);
-  const summary = JSON.parse(fs.readFileSync(path.join(dir, 'unit-summary.json'), 'utf8'));
-  assert.equal(summary.outcome, 'policy-refusal');
-  assert.equal(summary.settledAt, settledAt);
-  assert.deepEqual(summary.workflow, { caseId: 'wf-synthetic', activity: 'step', reservationId: null });
-  assert.equal(summary.derivation.seq, 4);
-  const before = fs.statSync(path.join(dir, 'unit-summary.json')).mtimeMs;
-  assert.equal(backfillUnitSummaries({ repoRoot: root }).unchanged, 1);
-  assert.equal(fs.statSync(path.join(dir, 'unit-summary.json')).mtimeMs, before);
-  assert.equal(fs.readFileSync(path.join(dir, 'unit.json'), 'utf8'), original);
-  assert.equal(fs.readFileSync(eventFile, 'utf8'), eventOriginal);
-});
-
 test('numeric run attempts 99/100 share final selection and ordering across summary and history', (t) => {
   const { dir } = fixture(t);
   result(dir, 'producer', '1', '99', { classification: { outcome: { category: 'infra' } } });
@@ -170,22 +145,6 @@ test('numeric run attempts 99/100 share final selection and ordering across summ
   assert.equal(seat.final.runId, 'producer-1-100');
   assert.equal(seat.final.outcome, 'pass');
   assert.equal(readUnitRunHistory(dir)[0].runResult.runId, 'producer-1-100');
-});
-
-test('legacy reviewed findings followed by a complete passing round backfill as pass', (t) => {
-  const { root, dir } = fixture(t, {
-    unit: { id: 'reviewed-question', capability: 'docs:write', pattern: 'reviewed' },
-  });
-  result(dir, 'producer', '1', '01');
-  result(dir, 'reviewer', '1', '01', { classification: { outcome: { category: 'verdict' }, assessment: { verdict: 'findings' } } });
-  result(dir, 'producer', '2', '01');
-  result(dir, 'reviewer', '2', '01');
-  const report = backfillUnitSummaries({ repoRoot: root });
-  assert.equal(report.summaries[0].outcome, 'pass');
-  const summary = JSON.parse(fs.readFileSync(path.join(dir, 'unit-summary.json'), 'utf8'));
-  assert.equal(summary.outcome, 'pass');
-  assert.equal(summary.seats.find((seat) => seat.seat === 'reviewer' && seat.round === 1).final.outcome, 'findings');
-  assert.equal(summary.seats.find((seat) => seat.seat === 'reviewer' && seat.round === 2).final.outcome, 'pass');
 });
 
 test('legacy reviewed incomplete terminal round or absent verify evidence stays unknown', (t) => {
@@ -207,7 +166,7 @@ test('legacy reviewed incomplete terminal round or absent verify evidence stays 
 
 test('panel summary kinds follow the dispatched membership for researcher presets', async (t) => {
   for (const pattern of ['research-fan-out', 'research-fan-out-gated']) {
-    const { root, dir, record } = fixture(t, { pattern });
+    const { dir, record } = fixture(t, { pattern });
     const dispatched = [];
     const fanOutSeats = [
       { seat: 'researcher-1', role: 'producer' },
@@ -233,10 +192,6 @@ test('panel summary kinds follow the dispatched membership for researcher preset
     }
     assert.equal(bySeat.get(dispatched.at(-1)).kind, 'synthesizer');
     assert.equal(bySeat.get(dispatched.at(-1)).role, 'synthesizer');
-    assert.equal(backfillUnitSummaries({ repoRoot: root }).changed, 1);
-    const stored = JSON.parse(fs.readFileSync(path.join(dir, 'unit-summary.json'), 'utf8'));
-    assert.deepEqual(stored.seats.map(({ seat, role, kind }) => ({ seat, role, kind })),
-      summary.seats.map(({ seat, role, kind }) => ({ seat, role, kind })));
   }
 });
 
@@ -283,85 +238,6 @@ test('a record that carries its seats is summarised from them, by seat id', (t) 
   ]);
 });
 
-test('backfill never settles a passing partial panel or a reviewed producer without its checkers', (t) => {
-  for (const pattern of ['panel', 'reviewed', 'code-change']) {
-    const { root, dir } = fixture(t, { pattern });
-    result(dir, pattern === 'panel' ? 'panelist-1' : 'producer', '1', '01');
-    const before = fs.readFileSync(path.join(dir, 'unit.json'), 'utf8');
-    const summary = buildUnitSummary(dir);
-    assert.equal(summary.outcome, 'unknown');
-    assert.equal(summary.settledAt, null);
-    const report = backfillUnitSummaries({ repoRoot: root });
-    assert.equal(report.units, 1);
-    assert.equal(report.changed, 0);
-    assert.equal(report.unchanged, 0);
-    assert.equal(report.skippedUnsettled, 1);
-    assert.deepEqual(report.errors, []);
-    assert.equal(fs.existsSync(path.join(dir, 'unit-summary.json')), false);
-    assert.equal(fs.readFileSync(path.join(dir, 'unit.json'), 'utf8'), before);
-  }
-});
-
-test('backfill skips active owner execution even with complete history or old completion evidence', (t) => {
-  for (const status of ['running', 'pending']) {
-    const { root, dir } = fixture(t, { pattern: 'solo', execution: { status }, settlement: { outcome: 'pass', settledAt } });
-    result(dir, 'producer', '1', '01');
-    const before = fs.readFileSync(path.join(dir, 'unit.json'), 'utf8');
-    const report = backfillUnitSummaries({ repoRoot: root });
-    assert.equal(report.skippedActive, 1);
-    assert.equal(report.changed, 0);
-    assert.equal(report.skippedUnsettled, 0);
-    assert.equal(fs.existsSync(path.join(dir, 'unit-summary.json')), false);
-    assert.equal(fs.readFileSync(path.join(dir, 'unit.json'), 'utf8'), before);
-  }
-});
-
-test('backfill skips materialized attempts without terminal results', (t) => {
-  const { root, dir } = fixture(t, { pattern: 'solo' });
-  result(dir, 'producer', '1', '01');
-  const live = path.join(dir, 'producer', '1', 'runs', '02');
-  fs.mkdirSync(live);
-  fs.writeFileSync(path.join(live, 'run.json'), JSON.stringify({ status: 'running', runId: 'still-working' }));
-  const report = backfillUnitSummaries({ repoRoot: root });
-  assert.equal(report.skippedActive, 1);
-  assert.equal(report.changed, 0);
-  assert.equal(fs.existsSync(path.join(dir, 'unit-summary.json')), false);
-});
-
-test('backfill requires real completion, including every dispatched checker and verify result', (t) => {
-  const { root, dir, record } = fixture(t, {
-    pattern: 'reviewed',
-    unit: { id: 'complete-review', capability: 'code:implement', verify: 'check-command' },
-  });
-  result(dir, 'producer', '1', '01');
-  result(dir, 'reviewer', '1', '01', { classification: { outcome: { category: 'infra' } } });
-  assert.equal(backfillUnitSummaries({ repoRoot: root }).skippedUnsettled, 1);
-  result(dir, 'red-team', '1', '01');
-  assert.equal(backfillUnitSummaries({ repoRoot: root }).skippedUnsettled, 1);
-  result(dir, 'verify', '1', '01');
-  const report = backfillUnitSummaries({ repoRoot: root });
-  assert.equal(report.changed, 1);
-  assert.equal(report.summaries[0].outcome, 'execution-failure');
-  assert.equal(report.skippedActive + report.skippedUnsettled, 0);
-  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir, 'unit.json'), 'utf8')), record);
-});
-
-test('settled owner evidence backfills without seats and complete solo history backfills without owner rewriting', (t) => {
-  for (const ownerEvidence of [true, false]) {
-    const { root, dir } = fixture(t, {
-      pattern: 'solo',
-      ...(ownerEvidence ? { settlement: { outcome: 'blocked', settledAt } } : {}),
-    });
-    if (!ownerEvidence) result(dir, 'producer', '1', '01');
-    const before = fs.readFileSync(path.join(dir, 'unit.json'), 'utf8');
-    const report = backfillUnitSummaries({ repoRoot: root });
-    assert.equal(report.changed, 1);
-    assert.equal(report.skippedActive + report.skippedUnsettled, 0);
-    assert.equal(report.summaries[0].outcome, ownerEvidence ? 'blocked' : 'pass');
-    assert.equal(fs.readFileSync(path.join(dir, 'unit.json'), 'utf8'), before);
-  }
-});
-
 // A unit record written before the owner stored its pattern: the caller's --pattern was never kept.
 const patternless = { unit: { id: 'legacy-question', capability: 'code:implement' } };
 
@@ -392,62 +268,6 @@ test('owner completion still decides a patternless unit, and one that never ran 
   const unpublished = writeUnitSummary(empty.dir);
   assert.equal(unpublished.skipped, 'unsettled');
   assert.equal(fs.existsSync(path.join(empty.dir, 'unit-summary.json')), false);
-});
-
-test('backfill keeps stored summaries by default and regenerate rewrites stale ones idempotently', (t) => {
-  const { root, dir } = fixture(t, patternless);
-  result(dir, 'producer', '1', '01');
-  result(dir, 'reviewer', '1', '01', { classification: { outcome: { category: 'blocked' } } });
-  const file = path.join(dir, 'unit-summary.json');
-  // What an earlier writer published: an older contract that derived the unit as a solo pass.
-  const stale = `${JSON.stringify({ contract: { id: 'unit-summary', version: 1 }, unitRunId: 'unit-run-synthetic', outcome: 'pass' })}\n`;
-  fs.writeFileSync(file, stale);
-  const kept = backfillUnitSummaries({ repoRoot: root });
-  assert.equal(kept.stale, 1);
-  assert.deepEqual(kept.staleSummaries, [{ unitRunId: 'unit-run-synthetic', derivedOutcome: 'undetermined', reason: 'differs' }]);
-  assert.equal(kept.changed, 0);
-  assert.equal(fs.readFileSync(file, 'utf8'), stale);
-  const dry = backfillUnitSummaries({ repoRoot: root, regenerate: true, dryRun: true });
-  assert.equal(dry.changed, 1);
-  assert.equal(dry.summaries[0].outcome, 'undetermined');
-  assert.equal(fs.readFileSync(file, 'utf8'), stale, 'dry-run writes nothing');
-  assert.equal(backfillUnitSummaries({ repoRoot: root, regenerate: true }).changed, 1);
-  const rewritten = JSON.parse(fs.readFileSync(file, 'utf8'));
-  assert.deepEqual(rewritten.contract, { id: 'unit-summary', version: 3 });
-  assert.equal(rewritten.outcome, 'undetermined');
-  const before = fs.statSync(file).mtimeMs;
-  const again = backfillUnitSummaries({ repoRoot: root, regenerate: true });
-  assert.equal(again.unchanged, 1);
-  assert.equal(again.changed, 0);
-  assert.equal(fs.statSync(file).mtimeMs, before);
-  assert.equal(backfillUnitSummaries({ repoRoot: root }).unchanged, 1, 'a regenerated summary is no longer stale');
-});
-
-test('regenerate removes a stored summary the current writer cannot establish but never touches an active unit', (t) => {
-  const stale = `${JSON.stringify({ contract: { id: 'unit-summary', version: 1 }, unitRunId: 'unit-run-synthetic', outcome: 'unknown', settledAt: null })}\n`;
-  const finished = fixture(t, { pattern: 'panel' });
-  result(finished.dir, 'panelist-1', '1', '01');
-  const finishedFile = path.join(finished.dir, 'unit-summary.json');
-  fs.writeFileSync(finishedFile, stale);
-  assert.deepEqual(backfillUnitSummaries({ repoRoot: finished.root }).staleSummaries,
-    [{ unitRunId: 'unit-run-synthetic', derivedOutcome: null, reason: 'unsettled' }]);
-  const dry = backfillUnitSummaries({ repoRoot: finished.root, regenerate: true, dryRun: true });
-  assert.deepEqual(dry.removedSummaries, ['unit-run-synthetic']);
-  assert.equal(fs.existsSync(finishedFile), true);
-  assert.equal(backfillUnitSummaries({ repoRoot: finished.root, regenerate: true }).removed, 1);
-  assert.equal(fs.existsSync(finishedFile), false);
-  assert.equal(backfillUnitSummaries({ repoRoot: finished.root, regenerate: true }).removed, 0);
-
-  const active = fixture(t, { ...patternless, execution: { status: 'running' } });
-  result(active.dir, 'producer', '1', '01');
-  const activeFile = path.join(active.dir, 'unit-summary.json');
-  fs.writeFileSync(activeFile, stale);
-  for (const regenerate of [false, true]) {
-    const report = backfillUnitSummaries({ repoRoot: active.root, regenerate });
-    assert.equal(report.skippedActive, 1);
-    assert.equal(report.changed + report.removed + report.stale, 0);
-    assert.equal(fs.readFileSync(activeFile, 'utf8'), stale);
-  }
 });
 
 test('a debate summary names each seat by its owner kind and derives the outcome from the judge', (t) => {
