@@ -18,3 +18,5 @@ A named recovery door settles a chain whose writer is a dead pid with no session
 # Notes
 
 Evidence: lead:OPC board line d9c4da587. The stale index held a one-line staged deletion of the board log.md. Three older pending chains (two pushsrc-drop RefDeletes and one RemoteTransfer) remain and do not block lands.
+
+Likely root cause (lead:OPC, 2026-11-22 18:35): both dead chains of the day (land-50307 at 11:55, land-258313 at 18:24) were pid writers with no session id. The secretary and shaper lands appear to run without FGOS_SESSION_ID, so a land that dies leaves a chain nobody can recover by its own id, and its pushed-or-not commit sits on local main (2a295e00b, cc8bb2699).

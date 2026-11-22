@@ -20,3 +20,5 @@ The cause is proven by naming the door and the step. A head write, or a `land --
 Migrated from the legacy backlog table. Original status: done (plan 261121-0747-land-door-hygiene, commit e7701dcfc: a rejected paths land undoes its own unpublished commit and retries from a fresh sync).
 
 2026-11-22 18:24 recurrence (lead:SUPERVISOR): a secretary land of a discussion seed left local main at 2a295e00b, not pushed, with pending chain land-258313-1795346357099722999-1. Every other land was then refused with land-target-ahead, and once with land-abandoned-writer-mismatch, until lead:SUPERVISOR pushed it by hand. Same shape as 8c3c3a611 on 2026-11-21.
+
+Likely root cause (lead:OPC, 2026-11-22 18:35): both dead chains of the day (land-50307 at 11:55, land-258313 at 18:24) were pid writers with no session id. The secretary and shaper lands appear to run without FGOS_SESSION_ID, so a land that dies leaves a chain nobody can recover by its own id, and its pushed-or-not commit sits on local main (2a295e00b, cc8bb2699).
