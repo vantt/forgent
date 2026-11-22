@@ -29,9 +29,15 @@ phase4:
       - executor: claude
         invocation: claude-herdr-bypass-bwrap
 
-# --- Phase 9: one watcher tuning change ---
-# Not ready yet: phase 9 picks the change after phases 4 and 7 land, from the baseline in
-# reports/baseline-wake-and-idle.md. The lead adds its block here and raises again then.
+# --- Phase 9: one watcher tuning change (chosen by the lead 2026-11-22 13:35, see phase-09 "Chosen change") ---
+# Apply with `fgos watcher tune` if it sets a row kind's action, otherwise as a config patch; one change only.
+# reason: heads-stable phase 9: session-idle rows stop waking the supervisor; 688 of 688 baseline rows were false
+# why: the session-idle query fires on activity, never on silence (docs/platform/supervision/spec.md 6.1), so every
+#      wake it caused was false (reports/baseline-wake-and-idle.md); rows are still raised and read on each wake
+# Baseline value to revert to: no session-idle entry under watcher.actions (defaultAction wake-supervisor applies).
+phase9:
+  - set: watcher.actions.session-idle
+    value: none
 
 # --- Phase 7: a skill-only land rebuilds the mutation census (owner answer q-y24ukwgfpo, 2026-11-22) ---
 # reason: heads-stable phase 7: land.regenerate runs for core/** too, so a skill-only land rebuilds the mutation census

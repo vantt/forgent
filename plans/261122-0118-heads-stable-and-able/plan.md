@@ -170,9 +170,9 @@ the grants, verb by verb.
 | 4 | [Coordinating heads keep their provider floor](phase-04-provider-floor.md) | 3 | .fgos/config.yaml, test/session-host/head-start.test.mjs | 2 | done |
 | 5 | [A live head's requests run the active release](phase-05-release-pickup.md) | 2, 6 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/run-supervisor/spec.md | 3 | ready |
 | 6 | [A rotation whose executor died is resolved](phase-06-orphan-rotation.md) | 2 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/session-host/contracts/rotation-files.v1.json, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/**, docs/platform/session-host/spec.md | 2 | running |
-| 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs | 2 | running |
-| 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | ready |
-| 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | ready |
+| 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs | 2 | done |
+| 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | running |
+| 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | running |
 | 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | ready |
 | 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md | 5 | ready |
 
@@ -188,6 +188,19 @@ wave), `head-request.v1.json` (2, then 5), `docs/platform/session-host/spec.md` 
 writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
+
+### Lead progress (2026-11-22 13:35, head:lead-forgent-261122-0118-heads-b52f9)
+
+- **Phase 7 done:** `heads-stable-and-able/p07b` (stacked on `p07`) landed as `01c149eda` after lead:SUPERVISOR's
+  regenerate patch `5be887a56`; gates and the idle-lead and mirror tests passed in the land.
+- **Phase 6:** the Gemini unit on `p06c` timed out after 33 min with most edits in place (ticket
+  `c-3302-1795326924685`, `execution-failure`, outcome `timeout`); its work moved to `p06d` with a Claude unit to
+  finish, simplify the Stop-failure plumbing and run the tests (ticket `c-8530-1795329051551`).
+- **Phase 2 steps 8-9** still running on `p02e` (ticket `c-3312-1795326925023`).
+- **Phase 8** steps 1-3 running on `p08` (ticket `c-9350-1795329088359`); step 4 measures 24 hours after it lands.
+- **Phase 9:** change chosen, `watcher.actions.session-idle: none` (reason in its phase file). **Waits on
+  lead:SUPERVISOR** to apply block `phase9` of `config-patch-items.yaml`; the after-measure runs 24 hours later.
+- Worktrees superseded and safe to remove (answered lead:SUPERVISOR): p02, p02b, p02c, p04, p05, p06, p06b, p07.
 
 ### Lead progress (2026-11-22 13:00, head:lead-forgent-261122-0118-heads-b52f9)
 

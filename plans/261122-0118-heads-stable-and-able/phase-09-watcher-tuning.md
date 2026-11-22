@@ -39,3 +39,16 @@ Both reports exist and use the same commands and rule, and the after report stat
 ## Rollback
 
 `fgos watcher tune` back to the baseline value recorded in the baseline report.
+
+## Chosen change (lead, 2026-11-22 13:35)
+
+`watcher.actions.session-idle: none`, the one change. The expected candidate, a higher `sessionIdleLimit`, does not
+fit the evidence. The query (`core/watcher/definitions/session-idle.query.json`) fires when a session's
+activity-record **count** over `lookbackSec` exceeds the limit. That makes it an activity edge, not a silence
+detector: silence leaves `max:ts` unchanged, so it raises nothing new (`docs/platform/supervision/spec.md` 6.1). A
+higher limit would only change how much activity it takes to fire. The baseline shows 688 of 688 rows false and 0
+true, with 211 supervisor generations started over 49 hours. With the action at `none` the rows are still raised and
+read by the supervisor on every wake (phase 7 rule), but they no longer start a supervisor. No true idle is hidden,
+because the query never reported one. A missed idle lead is caught by the supervisor's per-wake check of running
+plans and by `plan-no-progress`. Applied by lead:SUPERVISOR from block `phase9` of `config-patch-items.yaml`; the
+24-hour after-window starts at its commit.
