@@ -153,7 +153,7 @@ test('dead vocabulary guard: the project config does not contain runner.models o
 });
 
 import os from 'node:os';
-import { validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
+import { validateRunnerConfigShape } from '../../src/runner/dispatch/config-twin.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 
 // A removed key has no schema node to refuse it by name, so `validateRunnerConfigShape` says what replaced it. A

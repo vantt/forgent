@@ -3,7 +3,7 @@
 // the crate as a pin, so a config with a default executor needs no pool. Only a config with no executor at all
 // has nothing to pin and no `prefer`, so `bindable` gives it the families its executors serve as the tier list.
 
-import { MODEL_POLICY_TIERS, withDefaultExecutor } from '../../src/runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, withDefaultExecutor } from '../../src/runner/dispatch/config-twin.mjs';
 import { familyOf } from '../../src/runner/dispatch/provider-adapter.mjs';
 
 

@@ -18,7 +18,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config-twin.mjs';
 import { lookupExecutor } from '../../src/runner/dispatch/resolve.mjs';
 import { purposeSeatOf } from '../../src/runner/dispatch/plan.mjs';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';

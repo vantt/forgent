@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
-import { loadRunnerConfigForDir, validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir, validateRunnerConfigShape } from '../../src/runner/dispatch/config-twin.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { resolveExecutorCommand, resolveExecutorEnv, DispatchError, DEFAULT_ADAPTER, EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
 import { decideDispatchMechanism } from '../../src/runner/dispatch/mechanism.mjs';

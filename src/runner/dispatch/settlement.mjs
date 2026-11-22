@@ -30,7 +30,7 @@ import { resolveWorkerArtifactPath } from '../../run-supervisor/worker-artifacts
 import { attributeWorkspaceChanges, evaluateAttributionPolicy } from './evidence-attribution.mjs';
 import { matchesWriteScope } from './write-scope.mjs';
 import { nativeDoor } from '../../native/door.mjs';
-import { seatSessionDir } from './confinement/authority.mjs';
+import { seatSessionDir } from './confinement/authority-twin.mjs';
 
 // A claim keeps at most CLAIM_FRICTIONS_MAX frictions; the rest are counted in `frictionsDropped`, never stored and
 // never a reason to refuse the claim. The claim digest stays the digest of the file the worker wrote.
@@ -53,6 +53,7 @@ import {
 } from './provider-capacity.mjs';
 import { inspectEntries, inspectPath } from '../../util/git-paths.mjs';
 import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
+import { safeGitHead } from '../worktree.mjs';
 
 /**
  * Safely resolve root path without failing if not in a git repository.
@@ -148,18 +149,7 @@ export function isSubstantiveReportText(text) {
   return true;
 }
 
-/**
- * Capture current git HEAD commit safely without throwing.
- */
-export function safeGitHead(dir) {
-  if (!dir) return null;
-  try {
-    const head = createGitInspect(gitPortOptions(dir)).resolveCommit({ name: 'HEAD' });
-    return typeof head === 'string' ? head : null;
-  } catch {
-    return null;
-  }
-}
+export { safeGitHead };
 
 const isStorePath = (filePath) => filePath === '.fgos' || filePath.startsWith('.fgos/');
 

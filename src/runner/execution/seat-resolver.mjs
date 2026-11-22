@@ -355,6 +355,29 @@ export function workflowTierOf(seat, unit, workflowId) {
 }
 
 /**
+ * The ask of one seat, built alike by the run and the dry bind from what the pattern hands its seat runner.
+ * Independence and spread are read from the seat ledger now, so they see exactly the seats bound before this
+ * one; independence is symmetric (a seat bound earlier that must differ from this one holds it to that too).
+ */
+export function askFor({ seat, unit, independentOf = [], preferIndependentOf = [] }, ledger, { overrides = [], workflowId, raiseAuthorized, blind } = {}) {
+  const workflowTier = workflowTierOf(seat, unit, workflowId);
+  return {
+    unit,
+    seat: seat.seat,
+    role: seat.role,
+    posture: seat.posture,
+    ...(seat.persona ? { persona: seat.persona } : {}),
+    ...(workflowTier ? { workflowTier } : {}),
+    raiseAuthorized: raiseAuthorized === true,
+    readOnly: seat.posture.readOnly,
+    independentOf: [...ledger.resolve(independentOf), ...ledger.dependentExecutors(seat.seat)],
+    ...(preferIndependentOf.length > 0 ? { preferIndependentOf: ledger.seats(preferIndependentOf) } : {}),
+    overrides,
+    ...(blind ? { blind: true } : {}),
+  };
+}
+
+/**
  * The seat part of a bind ask for a seat recorded in `unitRecord` (id, role, posture, persona, recommended
  * tier), so a replay asks what the run asked; a seat the record does not list is the unit's producer seat.
  */

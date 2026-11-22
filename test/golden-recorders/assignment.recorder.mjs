@@ -25,7 +25,7 @@ const normalizer = await load('src/runner/dispatch/assignment-normalizer.mjs');
 const brief = await load('src/runner/dispatch/brief.mjs');
 const tierCell = await load('src/runner/dispatch/tier-cell.mjs');
 const workItemInput = await load('src/runner/dispatch/work-item-input.mjs');
-const layout = await load('src/runner/dispatch/assignment-layout.mjs');
+const layout = await load('src/runner/dispatch/assignment-layout-twin.mjs');
 const contractModule = await load('src/runner/dispatch/execution-contract.mjs');
 
 const plain = (v) => JSON.parse(JSON.stringify(v ?? null));

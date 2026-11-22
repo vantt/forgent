@@ -36,7 +36,7 @@
 // deliberate exception to the "no fs" header above -- inspection only, never
 // a contract-validation side effect, and never a write.
 
-import { MODEL_POLICY_TIERS } from './config.mjs';
+import { MODEL_POLICY_TIERS } from './config-twin.mjs';
 import { RunnerConfigError } from './runner-config-error.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
 export const REPEAT_MODE_VALUES = Object.freeze(['pre-delivery', 'post-delivery']);

@@ -2,12 +2,11 @@
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/**
 // Every decision (tier, ranking, independence, pins, effort, continuity, the walk, the launch and account
 // views, the pre-admission facts) is the host's, asked through the fail-closed route client. This module is
-// the facade: it builds the ask, collects the session and the lease-state overlay the host must not read,
-// and carries the host's answer back; it never ranks, filters or derives a binding fact.
+// the facade: it passes the ask, the session and a lease-state overlay the caller read (the host must not read
+// it under the lock), and carries the host's answer back; it never ranks, filters or derives a binding fact.
+// It imports only the route client and the Execution door.
 
-import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
-import { readAccountStateOverlay } from '../dispatch/provider-capacity.mjs';
-import { workflowTierOf } from './seat-resolver.mjs';
+import { RunnerConfigError } from '../../native/execution-door.mjs';
 import { SeatBindingError, bind as routeBind, explain as routeExplain, preflight as routePreflight } from '../../seat-binding/client.mjs';
 
 export const BIND_CONTRACT_VERSION = 'v1alpha1';
@@ -18,39 +17,16 @@ const identityKey = (executor, invocation, pool, model, effort) => [executor, in
 export const bindingIdentity = (binding) => identityKey(binding?.executor, binding?.invocation, binding?.pool, binding?.model, binding?.reasoningEffort);
 
 /**
- * The ask of one seat, built alike by the run and the dry bind from what the pattern hands its seat runner.
- * Independence and spread are read from the seat ledger now, so they see exactly the seats bound before this
- * one; independence is symmetric (a seat bound earlier that must differ from this one holds it to that too).
- */
-export function askFor({ seat, unit, independentOf = [], preferIndependentOf = [] }, ledger, { overrides = [], workflowId, raiseAuthorized, blind } = {}) {
-  const workflowTier = workflowTierOf(seat, unit, workflowId);
-  return {
-    unit,
-    seat: seat.seat,
-    role: seat.role,
-    posture: seat.posture,
-    ...(seat.persona ? { persona: seat.persona } : {}),
-    ...(workflowTier ? { workflowTier } : {}),
-    raiseAuthorized: raiseAuthorized === true,
-    readOnly: seat.posture.readOnly,
-    independentOf: [...ledger.resolve(independentOf), ...ledger.dependentExecutors(seat.seat)],
-    ...(preferIndependentOf.length > 0 ? { preferIndependentOf: ledger.seats(preferIndependentOf) } : {}),
-    overrides,
-    ...(blind ? { blind: true } : {}),
-  };
-}
-
-/**
- * What the host is asked besides the ask: the run's runner section, the session, the lease state read here
- * (and not under the lock) when `ctx.accounts` ({ runtimeDir, assignmentId }) is given, and the clock. Without
- * `accounts` the host binds from the config alone, as replay and explain read it.
+ * What the host is asked besides the ask: the run's runner section, the session, the lease-state overlay
+ * `ctx.accountState` the caller read (not under the lock), and the clock. Without `accountState` the host binds
+ * from the config alone, as replay and explain read it.
  */
 function requestOf(ctx, now) {
-  const { runnerConfig = {}, session = {}, accounts = null } = ctx ?? {};
+  const { runnerConfig = {}, session = {}, accountState = null } = ctx ?? {};
   return {
     runner: runnerConfig,
     session,
-    ...(accounts ? { accountState: readAccountStateOverlay({ assignmentId: accounts.assignmentId, runtimeDir: accounts.runtimeDir, now }) } : {}),
+    ...(accountState ? { accountState } : {}),
     now,
   };
 }
@@ -81,8 +57,8 @@ export function viaSeatRoute(call) {
  * The binding of one seat (one host call), or `{ refused: { reason, detail } }`; execution admission
  * belongs to the calling door.
  *
- * @param {object} ask what `askFor` builds
- * @param {object} ctx { runnerConfig, session, accounts? }
+ * @param {object} ask the seat's ask (`askFor` of the seat resolver builds a pattern seat's)
+ * @param {object} ctx { runnerConfig, session, accountState? }
  * @param {object} [options.walk] where the seat stands after a failure: `tried` (earlier bindings, oldest
  *   first), `excludePools`, `failedAccounts`, `continuity` (a binding whose executor, model and effort the seat
  *   keeps, else `seat-continuity-unavailable`), `from` (the binding left, default the last tried; recorded as
@@ -146,14 +122,14 @@ export function explainSeat(ask, ctx, { walk = {} } = {}) {
  * The pre-admission facts of a run start, before any bind: `agentCliMissing` (the refusal for a machine on which
  * no agent executor can start) and `pinQuarantinedUntil` (when a pinned account `pin` ({ pool, id }) is
  * quarantined until, epoch milliseconds, the largest safe integer when only a person clears it). The account
- * state is read here from `accounts` ({ runtimeDir, assignmentId }) when a pin is named.
+ * state is the caller's `accountState` overlay, asked only when a pin is named.
  */
-export function preflightOf(runnerConfig, { session = {}, pin = null, accounts = null, now = Date.now() } = {}) {
+export function preflightOf(runnerConfig, { session = {}, pin = null, accountState = null, now = Date.now() } = {}) {
   return viaSeatRoute(() => routePreflight({
     runner: runnerConfig,
     session,
     ...(pin ? { pin: { pool: pin.pool, id: pin.id } } : {}),
-    ...(pin && accounts ? { accountState: readAccountStateOverlay({ assignmentId: accounts.assignmentId, runtimeDir: accounts.runtimeDir, now }) } : {}),
+    ...(pin && accountState ? { accountState } : {}),
     now,
   }));
 }

@@ -27,7 +27,7 @@ const load = (rel) => import(path.join(repo, rel));
 const tpl = await load('src/runner/dispatch/operation-prompt-templates.mjs');
 const ec = await load('src/runner/dispatch/execution-contract.mjs');
 const eec = await load('src/runner/dispatch/effective-execution-contract.mjs');
-const config = await load('src/runner/dispatch/config.mjs');
+const config = await load('src/runner/dispatch/config-twin.mjs');
 
 const { ensureGitAddon } = await import('../helpers/git-addon.mjs');
 ensureGitAddon();

@@ -46,7 +46,7 @@ import { renewLeasedLogin } from '../../src/runner/dispatch/assignment-runner.mj
 import { selfRecord } from '../../src/native/process-identity.mjs';
 import { prepareBwrap, prepareBwrapSync } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
-import { finalizeAttemptHome } from '../../src/runner/dispatch/confinement/authority.mjs';
+import { finalizeAttemptHome } from '../../src/runner/dispatch/confinement/authority-twin.mjs';
 import { CREDENTIAL_KEEP_MAX_ATTEMPTS, CREDENTIAL_KEEP_MIN_INTERVAL_MS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { rewriteOwnershipMarker } from '../helpers/ownership-marker.mjs';
 

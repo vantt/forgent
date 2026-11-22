@@ -14,7 +14,7 @@ import { CHECKER_SEATS, SEAT_ROLES, LOOP_NAMES } from '../../src/runner/executio
 import { paramTableOf } from '../../src/runner/execution/loops/index.mjs';
 import { RIGOR_VALUES } from '../../src/runner/rigor.mjs';
 import { RUN_TIMEOUT_MAX_MS } from '../../src/runner/dispatch/run-timeout.mjs';
-import { MODEL_POLICY_TIERS, EXECUTOR_CARRIES, REASONING_EFFORT_VALUES } from '../../src/runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, EXECUTOR_CARRIES, REASONING_EFFORT_VALUES } from '../../src/runner/dispatch/config-twin.mjs';
 
 const schemaFile = path.resolve(import.meta.dirname, '../../core/config-schema/runner.schema.yaml');
 const schema = JSON.parse(JSON.stringify(parseYaml(fs.readFileSync(schemaFile, 'utf8'), { filename: schemaFile })));

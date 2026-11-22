@@ -20,8 +20,9 @@ use serde_json::{json, Map, Value};
 use std::path::PathBuf;
 
 /// The contract version `versions().execution` answers: 1 is the first with the Execution Core helpers, 2 the first
-/// with the outcome, seat, run result, hand-off and Work reads.
-pub const CONTRACT_VERSION: u32 = 2;
+/// with the outcome, seat, run result, hand-off and Work reads, 3 the first with the seat session folder and the head
+/// a launch environment names (`seatSessionDir`, `headOf`).
+pub const CONTRACT_VERSION: u32 = 3;
 
 fn refused(error: RunUnitError) -> Error {
     Error::from_reason(error.to_json().to_string())
@@ -990,6 +991,39 @@ pub fn list_assignment_runs(request: Value) -> Result<Value> {
             }))
             .collect::<Vec<_>>()
     ))
+}
+
+/// `seatSessionDir(runDir, launchCommandId)`: the folder a seat's session is in while its run settles (the copy
+/// finalize-home kept, else the private home's session folder), or null when the launch declared none.
+#[napi(namespace = "execution", js_name = "seatSessionDir")]
+pub fn seat_session_dir(request: Value) -> Result<Value> {
+    check()?;
+    let launch = request.get("launchCommandId").and_then(Value::as_str);
+    Ok(
+        fgos_execution::seat_session::seat_session_dir(&path_of(&request, "runDir")?, launch)
+            .map_or(Value::Null, |dir| json!(dir.to_string_lossy())),
+    )
+}
+
+/// `headOf(env)`: the head a launch environment names, `{ persona, name, gen }`, or `{}` when it does not name all
+/// three. A value that is no string reads as its JSON text, as `Number()` would read a number.
+#[napi(namespace = "execution", js_name = "headOf")]
+pub fn head_of(request: Value) -> Result<Value> {
+    check()?;
+    let env = request
+        .get("env")
+        .and_then(Value::as_object)
+        .map(|env| {
+            env.iter()
+                .filter_map(|(name, value)| match value {
+                    Value::String(text) => Some((name.clone(), text.clone())),
+                    Value::Number(number) => Some((name.clone(), number.to_string())),
+                    _ => None,
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    Ok(Value::Object(fgos_execution::seat_session::head_of(&env)))
 }
 
 /// `shippedCatalog()`: the bundled standard's `{ patterns, loops }` (the Config crate's shipped catalog).

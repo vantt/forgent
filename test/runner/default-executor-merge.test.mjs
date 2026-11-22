@@ -1,7 +1,7 @@
 import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { withDefaultExecutor } from '../../src/runner/dispatch/config.mjs';
+import { withDefaultExecutor } from '../../src/runner/dispatch/config-twin.mjs';
 
 const defaultExec = { command: 'claude', args: ['-p', '{prompt}'] };
 const registered = {

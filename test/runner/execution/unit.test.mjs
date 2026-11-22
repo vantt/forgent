@@ -303,7 +303,7 @@ test('validateUnit: skills are a non-empty list of names, trimmed and de-duplica
 });
 
 test('validateUnit: a unit may ask for its own run timeout, inside the ceiling', async () => {
-  const { RUN_TIMEOUT_MAX_MS, RUN_TIMEOUT_MIN_MS } = await import('../../../src/runner/dispatch/config.mjs');
+  const { RUN_TIMEOUT_MAX_MS, RUN_TIMEOUT_MIN_MS } = await import('../../../src/runner/dispatch/config-twin.mjs');
   const base = { id: 'u-heavy', objective: 'Port the parser', capability: 'code:implement' };
   assert.equal(validateUnit({ ...base, timeoutMs: 5400000 }).timeoutMs, 5400000);
   assert.equal('timeoutMs' in validateUnit(base), false);

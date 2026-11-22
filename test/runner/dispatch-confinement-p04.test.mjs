@@ -9,7 +9,7 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import cp from "node:child_process";
-import { assessAndPrepare, buildConfinementAttestation } from "../../src/runner/dispatch/confinement/authority.mjs";
+import { assessAndPrepare, buildConfinementAttestation } from "../../src/runner/dispatch/confinement/authority-twin.mjs";
 import { buildConfinementRequest, validateConfinementRequest } from "../../src/runner/dispatch/confinement/request.mjs";
 import {
   validateOverrideConfinementShape,

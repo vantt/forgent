@@ -4,7 +4,7 @@
 //
 //   node test/golden-recorders/core-runner-config.recorder.mjs
 //
-// The config vectors run the real `loadRunnerConfigForDir` (`src/runner/dispatch/config.mjs`) over documents the config
+// The config vectors run the real `loadRunnerConfigForDir` (`src/runner/dispatch/config-twin.mjs`) over documents the config
 // door would hand it: only `src/config/facade.mjs` is replaced, by a module that answers from the recorded document, so
 // the recorder needs no native addon. The run vectors run the real `unitRunFacts` and `judgeUnitRun` over a real
 // directory built per vector; the controller, custody and unit-state reads are the only inputs the Rust side takes as
@@ -49,7 +49,7 @@ export async function load(url, context, next) {
 }`;
 register(`data:text/javascript,${encodeURIComponent(hooks)}`);
 
-const config = await import(path.join(repo, 'src/runner/dispatch/config.mjs'));
+const config = await import(path.join(repo, 'src/runner/dispatch/config-twin.mjs'));
 const { ConfigDoorError } = await import(path.join(repo, 'src/config/facade.mjs'));
 const { fgosDirFromRoot } = await import(path.join(repo, 'src/util/fgos-file-registry.mjs'));
 const { unitRunFacts, judgeUnitRun } = await import(path.join(repo, 'src/runner/execution/unit-run-record.mjs'));

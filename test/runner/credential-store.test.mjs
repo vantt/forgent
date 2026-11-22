@@ -8,7 +8,7 @@ import { credentialStoreOf, credentialStoreProblem } from '../../src/runner/disp
 import { readMachineConfig } from '../../src/config/facade.mjs';
 import { DEFAULT_SEAT_TIMEOUT_MS } from '../../src/runner/dispatch/confinement/resources.mjs';
 import { credentialLayout } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
-import { validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
+import { validateRunnerConfigShape } from '../../src/runner/dispatch/config-twin.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
 import { buildConfinementRequest, validateConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';

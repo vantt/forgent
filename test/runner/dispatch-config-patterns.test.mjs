@@ -16,7 +16,7 @@ import {
   RUNNER_CONFIG_ORIGINS,
   resolveOriginLocations,
   withDefaultExecutor,
-} from '../../src/runner/dispatch/config.mjs';
+} from '../../src/runner/dispatch/config-twin.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { readStandardValue, ConfigDoorError } from '../../src/config/facade.mjs';
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';

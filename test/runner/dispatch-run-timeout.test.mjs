@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { parseRunTimeout, assertRunTimeoutMs, RUN_TIMEOUT_MAX_MS, RUN_TIMEOUT_MIN_MS } from '../../src/runner/dispatch/config.mjs';
+import { parseRunTimeout, assertRunTimeoutMs, RUN_TIMEOUT_MAX_MS, RUN_TIMEOUT_MIN_MS } from '../../src/runner/dispatch/config-twin.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -36,7 +36,7 @@ test('a duration too large to count is refused with the text that was typed', ()
 });
 
 test('runner.timeoutMs is held to the same ceiling as a run timeout', async () => {
-  const { loadRunnerConfigForDir } = await import('../../src/runner/dispatch/config.mjs');
+  const { loadRunnerConfigForDir } = await import('../../src/runner/dispatch/config-twin.mjs');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cfg-timeout-'));
   try {
     fs.mkdirSync(path.join(dir, '.fgos'));

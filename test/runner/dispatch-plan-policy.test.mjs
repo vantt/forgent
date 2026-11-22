@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { effectiveDispatchPolicy as policyOf } from '../../src/runner/dispatch/plan.mjs';
 import { bindable } from '../helpers/work-seat-config.mjs';
-import { supportsPolicyTier } from '../../src/runner/dispatch/config.mjs';
+import { supportsPolicyTier } from '../../src/runner/dispatch/config-twin.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
 import { familyOf } from '../../src/runner/dispatch/provider-adapter.mjs';
@@ -510,7 +510,7 @@ function nanoOnlyInlineAssignment(overrides = {}) {
 
 // ─── Phase 2: rigor demand → tier supply ────────────────────────────────
 
-import { REASONING_EFFORT_VALUES } from '../../src/runner/dispatch/config.mjs';
+import { REASONING_EFFORT_VALUES } from '../../src/runner/dispatch/config-twin.mjs';
 
 test('the dispatch policy: rigor is recorded as a demand and the tier comes from the config, with both sources named', () => {
   const runnerConfig = claudeConfig({ capabilities: { review: { tier: 'flagship', rigor: 'critical' } } });

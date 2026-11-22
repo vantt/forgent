@@ -15,7 +15,7 @@ import { writeOwnershipMarkerV2 } from '../../src/runner/dispatch/confinement/cl
 import {
   prepareConfinementForLaunch,
   finalizeAttemptHome,
-} from '../../src/runner/dispatch/confinement/authority.mjs';
+} from '../../src/runner/dispatch/confinement/authority-twin.mjs';
 
 function mkTempDir(prefix = 'fgos-reconcile-test-') {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));

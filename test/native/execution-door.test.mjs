@@ -32,6 +32,7 @@ import {
   interpretRunResult,
   runOutcome,
   listAssignmentRuns,
+  seatSessionDir,
   assignmentDir,
 } from '../../src/native/execution-door.mjs';
 import { RunnerConfigError as DispatchRunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
@@ -224,7 +225,7 @@ test('the outcome, seat and runner config rules answer under their Node names: a
   assert.match(attributeRunnerConfigError(refusal, origins, '/p').message, /^runner config \(.*config\.yaml:7 loops\.reviewed\.bounds\.nope\) is not a parameter/);
 });
 
-test('the run result reader answers under its Node name: a version-3 record reads its legacy status as a non-enumerable view, a corrupt one fails closed, and the assignment layout lists attempts', () => {
+test('the run result reader answers under its Node name: a version-3 record reads its legacy status as a non-enumerable view, a corrupt one fails closed, and the assignment layout lists attempts and finds a seat\'s kept session folder', () => {
   const v3 = interpretRunResult({ contract: { id: 'assignment-run-result', version: 3 }, runId: 'r', classification: { execution: { status: 'completed', exitCode: 0 }, assessment: { verdict: 'pass' }, confidence: { level: 'reported', basis: [] }, failure: null, policy: { disposition: 'allow', code: null }, delivery: { mode: 'fresh' }, provenance: 'native-v3', outcome: { category: 'ok', reason: 'x' } } });
   assert.equal(v3.status, 'done');
   assert.equal(Object.keys(v3).includes('status'), false, 'the legacy status stays out of the enumerable keys');
@@ -233,4 +234,8 @@ test('the run result reader answers under its Node name: a version-3 record read
   fs.mkdirSync(path.join(dir, 'assignments', 'a', 'runs', 'run-1'), { recursive: true });
   assert.deepEqual(listAssignmentRuns(dir).map((r) => [r.assignmentId, r.attempt]), [['a', 'run-1']]);
   assert.equal(assignmentDir(dir, '../x'), null);
+  const runDir = path.join(dir, 'assignments', 'a', 'runs', 'run-1');
+  assert.equal(seatSessionDir(runDir, 'cmd-1'), null, 'no kept copy and no finalization descriptor: no session folder');
+  fs.mkdirSync(path.join(runDir, 'protected', 'session', 'projects'), { recursive: true });
+  assert.equal(seatSessionDir(runDir, 'cmd-1'), path.join(runDir, 'protected', 'session'));
 });

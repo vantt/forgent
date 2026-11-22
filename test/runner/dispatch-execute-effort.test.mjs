@@ -26,7 +26,7 @@ import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helpe
 seedFileLocalBwrapRegistry();
 // The machine's ~/.fgos/config.json must not leak executors into these runs.
 process.env.HOME = makeFixtureDir('fgos-effort-home-');
-import { assertReasoningEffort } from '../../src/runner/dispatch/config.mjs';
+import { assertReasoningEffort } from '../../src/runner/dispatch/config-twin.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { spawnFgos } from '../helpers/cli-entry.mjs';
 

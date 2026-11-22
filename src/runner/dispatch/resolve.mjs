@@ -9,7 +9,7 @@
 // CONTEXT.md` D7 for the split rationale.
 
 import { familyOf } from './provider-adapter.mjs';
-import { EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, EXECUTOR_MISSING_MESSAGE } from './config.mjs';
+import { EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, EXECUTOR_MISSING_MESSAGE } from './config-twin.mjs';
 import { RunnerConfigError } from './runner-config-error.mjs';
 import { capabilityConfinementOf, hasCapabilityEntry, registeredCapabilityOf } from '../capability-config.mjs';
 import { servedCapabilitiesOf } from './tool-providers.mjs';

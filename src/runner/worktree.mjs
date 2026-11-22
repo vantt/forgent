@@ -62,7 +62,7 @@ function restoreCheckout(repo, worktree, target, { baseline, reapplyLocalDelta =
 }
 export function resetDispatchWorktree(repo, worktree, target) { return restoreCheckout(repo, worktree, target, { discardLocalDelta: true }); }
 
-import { statusPaths } from '../util/git-paths.mjs';
+import { inspectEntries, inspectPath, statusPaths } from '../util/git-paths.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 /** Raised for any git worktree/branch operation failure. `errorClass`
@@ -463,4 +463,77 @@ export function provisionDependencies(worktreePath) {
 export function runWorktreeSetupCommands(worktreePath, repoRoot) {
   const facts = inspectGit(repoRoot).resolveRepo();
   checkoutCall('runSetupCommands', { worktree: worktreePath, repoRoot: facts.notARepository ? repoRoot : facts.trustedMainRoot });
+}
+
+/**
+ * Capture current git HEAD commit safely without throwing.
+ */
+export function safeGitHead(dir) {
+  if (!dir) return null;
+  try {
+    const head = createGitInspect(gitPortOptions(dir)).resolveCommit({ name: 'HEAD' });
+    return typeof head === 'string' ? head : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Worktree-dispatch attestation (tsk-2ig, D1/D3 of docs/history/parallel-
+ * decomposition-footprint-avoidance/CONTEXT.md — mức 1, advisory-only):
+ * chụp `baseCommit`/`headRef` NGAY TRƯỚC khi dispatch — captured by the
+ * launcher itself, never trusted from whatever the dispatched executor
+ * later reports.
+ *
+ * `attestRoot`, when given, is read instead of `fgosDir`'s own root
+ * (tsk-4hl fix, independent review after tsk-2ig merged): a worker
+ * dispatched via `spawnWorker` runs inside its OWN dispatch worktree
+ * (`fgw/<id>`, `loop.mjs`'s `wt.path`), a DIFFERENT checkout than
+ * `fgosDir`'s root (always the main checkout, ADR0020 — worktrees never
+ * carry their own `.fgos/`). Reading `fgosDir`'s root unconditionally used
+ * to attest the main checkout's HEAD regardless of which branch the
+ * worker actually dispatched on — correct only for a first-attempt ROOT
+ * item (whose dispatch branch happens to fork from main's then-current
+ * tip), wrong for a leaf (forks from `fgw/<rootId>`, not main) or a retry
+ * (the branch already carries the prior attempt's own commits).
+ * `spawnWorker` passes its own worktree `cwd` as `attestRoot`;
+ * a caller with no worktree of its own (genuinely running against
+ * `fgosDir`'s own root) omits it, unchanged.
+ *
+ * Fail-safe either way: a git read that cannot resolve (detached checkout
+ * weirdness, no `.git`, etc.) never throws and never blocks dispatch —
+ * this is advisory metadata, not a precondition (same "advisory, không tự
+ * fail" stance `frozen-judge.mjs` already states for its own checks).
+ * Returns `{baseCommit, headRef}`, either field `null` when it could not
+ * be read.
+ */
+export function captureDispatchAttestation(fgosDir, attestRoot) {
+  const repoRoot = attestRoot ?? (fgosDir ? path.dirname(fgosDir) : null);
+  if (!repoRoot) return { baseCommit: null, headRef: null };
+  const read = (fn) => {
+    try {
+      return fn();
+    } catch {
+      return null;
+    }
+  };
+  const inspect = read(() => createGitInspect(gitPortOptions(repoRoot)));
+  if (!inspect) return { baseCommit: null, headRef: null };
+  const head = read(() => inspect.resolveCommit({ name: 'HEAD' }));
+  return {
+    baseCommit: typeof head === 'string' ? head : null,
+    headRef: read(() => inspectedBranch(inspect)), // null on detached HEAD, never a throw
+  };
+}
+
+// The short name of the branch the inspected checkout has checked out, from
+// its own row of the worktree list; null when that checkout is detached.
+function inspectedBranch(inspect) {
+  const { worktreeRoot } = inspect.resolveRepo();
+  if (!worktreeRoot) return null;
+  const own = fs.realpathSync(worktreeRoot);
+  const row = inspectEntries((page) => inspect.listWorktrees(page)).find((entry) => {
+    try { return fs.realpathSync(inspectPath(entry.path)) === own; } catch { return false; }
+  });
+  return row?.branch?.startsWith('refs/heads/') ? row.branch.slice('refs/heads/'.length) : null;
 }

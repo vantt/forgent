@@ -118,26 +118,7 @@ pub fn requirement_of(grant: &HeadGrant) -> Value {
     json!({ "mode": "required", "policyId": "host-write-denied", "policy": policy })
 }
 
-/// The head the session is, as its launch environment names it (`FGOS_HEAD_PERSONA`, `FGOS_HEAD_NAME`,
-/// `FGOS_HEAD_GEN`): `{ persona, name, gen }` for the envelope's `session`, whose supervisor records it in the
-/// session's Identity entry, or nothing when the environment does not name all three.
-pub fn head_of(env: &std::collections::BTreeMap<String, String>) -> Map<String, Value> {
-    let gen = env
-        .get("FGOS_HEAD_GEN")
-        .and_then(|g| g.trim().parse::<f64>().ok());
-    let persona = env.get("FGOS_HEAD_PERSONA").filter(|v| !v.is_empty());
-    let name = env.get("FGOS_HEAD_NAME").filter(|v| !v.is_empty());
-    match (persona, name, gen) {
-        (Some(persona), Some(name), Some(gen)) if gen.fract() == 0.0 && gen >= 1.0 => {
-            let mut out = Map::new();
-            out.insert("persona".into(), json!(persona));
-            out.insert("name".into(), json!(name));
-            out.insert("gen".into(), json!(gen as u64));
-            out
-        }
-        _ => Map::new(),
-    }
-}
+pub use fgos_execution::seat_session::head_of;
 
 /// What the account lease answered.
 #[derive(Debug, Clone, PartialEq)]

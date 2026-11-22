@@ -580,6 +580,10 @@ export const resolveWorkerArtifactPath = (runDir, roundPrefix, roundSuffix, lega
 export const assignmentDir = (fgosDir, assignmentId) => addon('assignmentDir', { fgosDir, assignmentId: typeof assignmentId === 'string' ? assignmentId : null });
 /** Every attempt directory under `assignments/`: `{ assignmentId, attempt, runDir, hasAssignmentJson }`. */
 export const listAssignmentRuns = (fgosDir) => addon('listAssignmentRuns', { fgosDir });
+/** The folder a seat's session is in while its run settles (the kept copy, else the private home's), or null. */
+export const seatSessionDir = (runDir, launchCommandId) => addon('seatSessionDir', { runDir, ...(typeof launchCommandId === 'string' ? { launchCommandId } : {}) });
+/** The head a launch environment names (`FGOS_HEAD_PERSONA`, `FGOS_HEAD_NAME`, `FGOS_HEAD_GEN`): `{ persona, name, gen }`, else `{}`. */
+export const headOf = (env) => addon('headOf', { env: env ?? {} });
 
 const deepFreeze = (value) => {
   if (value === null || typeof value !== 'object' || Object.isFrozen(value)) return value;
