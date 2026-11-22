@@ -327,6 +327,46 @@ test('a head launch merges statusLine into an existing --settings object on the 
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 
+test('a head launch leaves an existing non-JSON --settings value unchanged and does not add statusLine', async () => {
+  const projectRoot = scratch();
+  const { calls, ports } = fakes();
+  ports.runnerConfig = () => ({
+    executors: {
+      claude: {
+        command: 'claude',
+        invocations: [
+          { id: 'claude-pane', command: 'claude', args: ['--settings', '/etc/claude/settings.json'] },
+        ],
+      },
+    },
+  });
+  ports.bind = ({ key }) => ({ executor: 'claude', invocation: 'claude-pane', key });
+  await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, ports);
+  const request = calls.launch[0];
+  const invocation = request.runnerConfig.executors.claude.invocations[0];
+  assert.deepEqual(invocation.args, ['--settings', '/etc/claude/settings.json']);
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+test('withHeadSettings leaves runner config unchanged when executor has no invocations or no id matches', async () => {
+  const { withHeadSettings } = await import('../../src/session-host/head-start.mjs');
+  const baseConfig = {
+    executors: {
+      claude: { command: 'claude', invocations: [] },
+    },
+  };
+  const resEmpty = withHeadSettings(baseConfig, { executor: 'claude', invocation: 'claude-pane' });
+  assert.equal(resEmpty, baseConfig);
+
+  const configWithInv = {
+    executors: {
+      claude: { command: 'claude', invocations: [{ id: 'other-pane', command: 'claude', args: [] }] },
+    },
+  };
+  const resNoMatch = withHeadSettings(configWithInv, { executor: 'claude', invocation: 'claude-pane' });
+  assert.equal(resNoMatch, configWithInv);
+});
+
 test('a secretary launches with the paths and the verb its grant names; the lineage keeps the live key', async () => {
   const projectRoot = scratch();
   const { calls, ports } = fakes();

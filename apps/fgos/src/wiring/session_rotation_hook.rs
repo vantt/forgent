@@ -418,7 +418,10 @@ fn append_sidecar_record(sidecar: &Path, record: &Value) -> Result<(), std::io::
     Ok(())
 }
 
-fn status_line(_head: &Head, _fgos_dir: &Path, payload: &Value) -> Result<String, String> {
+fn status_line(head_role: Option<&str>, payload: &Value) -> Option<String> {
+    if head_role.filter(|r| !r.trim().is_empty()).is_none() {
+        return None;
+    }
     let session_id = payload
         .get("session_id")
         .and_then(Value::as_str)
@@ -481,11 +484,25 @@ fn status_line(_head: &Head, _fgos_dir: &Path, payload: &Value) -> Result<String
     } else {
         normal_line
     };
-    Ok(line)
+    Some(line)
+}
+
+fn handle_status_line(head_role: Option<&str>, stdin: impl Read) -> Option<String> {
+    let mut text = String::new();
+    let _ = stdin.take(MAX_STDIN).read_to_string(&mut text);
+    let payload: Value = serde_json::from_str(&text).unwrap_or(Value::Null);
+    status_line(head_role, &payload)
 }
 
 fn run(args: &[OsString]) {
     let Some(event) = parse(args) else { return };
+    if event == Event::StatusLine {
+        let head_role = std::env::var("FGOS_HEAD_ROLE").ok();
+        if let Some(line) = handle_status_line(head_role.as_deref(), std::io::stdin()) {
+            println!("{line}");
+        }
+        return;
+    }
     let Some(head) = head_from_env(&|key| std::env::var(key).ok()) else {
         return;
     };
@@ -503,15 +520,7 @@ fn run(args: &[OsString]) {
             Ok(None) => {}
             Err(why) => fail(why),
         },
-        Event::StatusLine => {
-            let mut text = String::new();
-            let _ = std::io::stdin().take(MAX_STDIN).read_to_string(&mut text);
-            let payload: Value = serde_json::from_str(&text).unwrap_or(Value::Null);
-            match status_line(&head, &fgos_dir, &payload) {
-                Ok(line) => println!("{line}"),
-                Err(why) => fail(why),
-            }
-        }
+        Event::StatusLine => unreachable!(),
         Event::Stop => {
             let mut text = String::new();
             let _ = std::io::stdin().take(MAX_STDIN).read_to_string(&mut text);
@@ -996,7 +1005,7 @@ mod tests {
 
     #[test]
     fn one_record_is_written_for_a_head_payload_and_nothing_is_written_outside_a_head() {
-        let (fgos_dir, lineage) = fgos("status-line");
+        let (_fgos_dir, lineage) = fgos("status-line");
         let transcript_dir = lineage.join("transcripts");
         std::fs::create_dir_all(&transcript_dir).unwrap();
         let transcript_path = transcript_dir.join("test-sid-123.jsonl");
@@ -1025,7 +1034,7 @@ mod tests {
         });
 
         // 1. Head payload -> one record is written beside the transcript
-        let line = status_line(&head(None), &fgos_dir, &payload).unwrap();
+        let line = status_line(Some("secretary"), &payload).unwrap();
         assert!(line.contains("fgOS head"));
         let sidecar = transcript_dir.join("test-sid-123.context-sidecar.jsonl");
         assert!(sidecar.exists(), "sidecar must exist beside transcript");
@@ -1047,40 +1056,51 @@ mod tests {
                 "used_percentage": 9.27
             }
         });
-        let failed_line = status_line(&head(None), &fgos_dir, &no_transcript_payload).unwrap();
+        let failed_line = status_line(Some("secretary"), &no_transcript_payload).unwrap();
         assert!(
             failed_line.contains("sidecar path unavailable") || failed_line.contains("failed"),
             "failure must be printed in the status line: {failed_line}"
         );
 
-        // 3. Outside a head: head_from_env returns None
+        // 3. Outside a head: head_from_env returns None, and status_line returns None
         assert_eq!(head_from_env(&env(&[])), None);
+        assert_eq!(status_line(None, &payload), None);
     }
 
     #[test]
     fn run_writes_nothing_outside_a_head() {
-        let (fgos_dir, lineage) = fgos("run-outside");
-        let project = fgos_dir.parent().unwrap();
+        let (_fgos_dir, lineage) = fgos("run-outside");
         let transcript_dir = lineage.join("transcripts");
         std::fs::create_dir_all(&transcript_dir).unwrap();
-        let expected_sidecar = transcript_dir.join("outside.context-sidecar.jsonl");
+        let transcript_path = transcript_dir.join("outside.jsonl");
+        let expected_sidecar = transcript_dir.join("outside-sid.context-sidecar.jsonl");
 
-        // Clear FGOS_HEAD_ROLE
-        std::env::remove_var("FGOS_HEAD_ROLE");
-        std::env::set_var("CLAUDE_PROJECT_DIR", project);
+        let payload = json!({
+            "session_id": "outside-sid",
+            "transcript_path": transcript_path.to_str().unwrap(),
+            "context_window": {
+                "used_percentage": 10.0
+            }
+        });
+        let payload_bytes = serde_json::to_vec(&payload).unwrap();
 
-        // Run with status-line event
-        run(&[OsString::from("--event"), OsString::from("status-line")]);
+        // 1. Outside a head: nothing is written
+        let res = handle_status_line(None, &payload_bytes[..]);
+        assert_eq!(res, None);
         assert!(
             !expected_sidecar.exists(),
-            "run() must write nothing outside a head for status-line"
+            "outside a head nothing is written"
         );
 
-        // Run with stop event
-        run(&[OsString::from("--event"), OsString::from("stop")]);
+        // 2. Inside a head: one record is written
+        let res = handle_status_line(Some("head:secretary-miu"), &payload_bytes[..]);
+        assert!(res.is_some());
         assert!(
-            !expected_sidecar.exists(),
-            "run() must write nothing outside a head for stop"
+            expected_sidecar.exists(),
+            "inside a head one record is written"
         );
+        let text = std::fs::read_to_string(&expected_sidecar).unwrap();
+        let records: Vec<&str> = text.lines().filter(|l| !l.trim().is_empty()).collect();
+        assert_eq!(records.len(), 1);
     }
 }

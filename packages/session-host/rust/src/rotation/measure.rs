@@ -114,15 +114,8 @@ fn tokens_of(usage: &Value) -> u64 {
 }
 
 fn quota_of(q: &Value) -> Option<QuotaRecord> {
-    let weekly_used = q
-        .get("weeklyUsed")
-        .or_else(|| q.get("weekly_used"))?
-        .as_f64()?;
-    let resets_at = q
-        .get("resetsAt")
-        .or_else(|| q.get("resets_at"))?
-        .as_str()?
-        .to_string();
+    let weekly_used = q.get("weeklyUsed")?.as_f64()?;
+    let resets_at = q.get("resetsAt")?.as_str()?.to_string();
     Some(QuotaRecord {
         weekly_used,
         resets_at: Some(resets_at),

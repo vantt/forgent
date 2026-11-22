@@ -226,17 +226,6 @@ export function assertHeadArgs({ persona, name, projectRoot, gen = null, forQues
   if (gen !== null && (!Number.isInteger(gen) || gen < 1)) throw new HeadStartError('bad-generation', `gen must be a positive integer, got ${JSON.stringify(gen)}`);
 }
 
-/**
- * Binds a seat and launches the head of `persona` and `name` as a confined supervised attempt: the one launch path
- * of a head, with no check of who holds the role and no record of where it went. `startHeadSession` calls it for a
- * start; the rotation executor calls it for a successor while the predecessor still holds the role, and records the
- * placement itself once the predecessor is gone.
- *
- * `gen` is the generation of the lineage (absent: the first unused one); `forQuestion` is the id of an owner question the
- * new head continues (one more opening line); `beside` is the live key of the session whose
- * tab the new one opens next to. `ports` as for `startHeadSession` (`taskOfHead(projectRoot, persona, name) -> { dir, path } | null`, `planOfHead(projectRoot, persona, name) -> { dir }` for a lead, `pin`, `handoff`, `opening`, `runnerConfig`, `bind`,
- * `launch`). Returns `{ role, gen, key, placement, runDir, cli, persona }`; a refusal throws `HeadStartError`.
- */
 export const STATUS_LINE_COMMAND = 'fgos hook session-rotation --event status-line';
 
 export function isClaudeCodeBinding(binding, runnerConfig) {
@@ -285,20 +274,24 @@ export function mergeStatusLineSettings(args = []) {
   if (idx >= 0) {
     if (result[idx].startsWith('--settings=')) {
       const raw = result[idx].slice('--settings='.length);
-      let parsed = {};
+      let parsed = null;
       try { parsed = JSON.parse(raw); } catch {}
-      parsed.statusLine = STATUS_LINE;
-      result[idx] = `--settings=${JSON.stringify(parsed)}`;
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        parsed.statusLine = STATUS_LINE;
+        result[idx] = `--settings=${JSON.stringify(parsed)}`;
+      }
     } else if (idx + 1 < result.length) {
       const raw = result[idx + 1];
-      let parsed = {};
-      if (typeof raw === 'object' && raw !== null) {
+      let parsed = null;
+      if (typeof raw === 'object' && raw !== null && !Array.isArray(raw)) {
         parsed = { ...raw };
       } else if (typeof raw === 'string') {
         try { parsed = JSON.parse(raw); } catch {}
       }
-      parsed.statusLine = STATUS_LINE;
-      result[idx + 1] = JSON.stringify(parsed);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        parsed.statusLine = STATUS_LINE;
+        result[idx + 1] = JSON.stringify(parsed);
+      }
     }
   } else {
     result.push('--settings', JSON.stringify({ statusLine: STATUS_LINE }));
@@ -310,31 +303,39 @@ export function withHeadSettings(runnerConfig, binding) {
   if (!isClaudeCodeBinding(binding, runnerConfig)) {
     return runnerConfig;
   }
-  const cfg = structuredClone(runnerConfig ?? {});
   const executorId = binding?.executor ?? 'claude';
+  const exec = runnerConfig?.executors?.[executorId];
+  if (!exec || !Array.isArray(exec.invocations) || exec.invocations.length === 0) {
+    return runnerConfig;
+  }
   const invocationId = binding?.invocation;
-  cfg.executors ??= {};
-  cfg.executors[executorId] ??= {};
-  const exec = cfg.executors[executorId];
-  const command = exec.command ?? (binding?.cli === 'claude' ? 'claude' : (exec.invocations?.[0]?.command ?? 'claude'));
-  if (!Array.isArray(exec.invocations) || exec.invocations.length === 0) {
-    exec.invocations = [{ id: invocationId ?? 'default', command, args: mergeStatusLineSettings([]) }];
-  } else {
-    let matched = false;
-    for (const inv of exec.invocations) {
-      if (!invocationId || inv.id === invocationId) {
-        inv.command ??= command;
-        inv.args = mergeStatusLineSettings(inv.args);
-        matched = true;
-      }
-    }
-    if (!matched) {
-      exec.invocations.push({ id: invocationId, command, args: mergeStatusLineSettings([]) });
+  const hasMatch = invocationId
+    ? exec.invocations.some((inv) => inv?.id === invocationId)
+    : true;
+  if (!hasMatch) {
+    return runnerConfig;
+  }
+  const cfg = structuredClone(runnerConfig);
+  const targetExec = cfg.executors[executorId];
+  for (const inv of targetExec.invocations) {
+    if (!invocationId || inv?.id === invocationId) {
+      inv.args = mergeStatusLineSettings(inv.args);
     }
   }
   return cfg;
 }
 
+/**
+ * Binds a seat and launches the head of `persona` and `name` as a confined supervised attempt: the one launch path
+ * of a head, with no check of who holds the role and no record of where it went. `startHeadSession` calls it for a
+ * start; the rotation executor calls it for a successor while the predecessor still holds the role, and records the
+ * placement itself once the predecessor is gone.
+ *
+ * `gen` is the generation of the lineage (absent: the first unused one); `forQuestion` is the id of an owner question the
+ * new head continues (one more opening line); `beside` is the live key of the session whose
+ * tab the new one opens next to. `ports` as for `startHeadSession` (`taskOfHead(projectRoot, persona, name) -> { dir, path } | null`, `planOfHead(projectRoot, persona, name) -> { dir }` for a lead, `pin`, `handoff`, `opening`, `runnerConfig`, `bind`,
+ * `launch`). Returns `{ role, gen, key, placement, runDir, cli, persona }`; a refusal throws `HeadStartError`.
+ */
 export async function placeHead({ persona, name, projectRoot, beside = null, gen = null, forQuestion = null } = {}, ports = {}) {
   assertHeadArgs({ persona, name, projectRoot, gen, forQuestion });
   const role = headRoleOf(persona, name);
