@@ -1,10 +1,11 @@
 ---
 contract: plan-v1
 title: "Component authority: one structural model of layers, components, decision kinds, doors, contracts and files, with generated human views"
-status: ready
+status: running
+lead: head:lead-forgent-261121-2109-compon-8ee21
 priority: P1
 blockedBy: []
-base: 27fd8a9b09b6a8584c37d7b18a6a96be4b2e1225
+base: 4d91f3043c0006dcc85b0bf2bffab4d9b96752f3
 footprint:
   - plans/261121-2109-component-authority/**
   - docs/platform/component-authority/**
