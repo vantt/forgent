@@ -199,7 +199,7 @@ test('architecture-map-components lists model component rows with owns columns',
   assert.match(text, /other thing/);
 });
 
-test('architecture-map-contracts prints id boundary provider consumers status path', () => {
+test('architecture-map-contracts prints id boundary contract provider consumers status path', () => {
   const tmp = seedTempRepo();
   writeViews(tmp);
   const text = fs.readFileSync(path.join(tmp, 'docs/platform/architecture-map.md'), 'utf8');
@@ -208,10 +208,18 @@ test('architecture-map-contracts prints id boundary provider consumers status pa
   );
   assert.ok(block, 'architecture-map-contracts block missing');
   const body = block[1];
-  assert.match(body, /\| ID \| Boundary \| Provider \| Consumers \| Status \| Path \|/);
-  assert.match(body, /\| `CTR-DEMO` \| demo boundary ↔ other \| `demo` \| `cross` \| live \| `packages\/demo\/contracts\/demo\.v1\.json` \|/);
+  assert.match(body, /\| ID \| Boundary \| Contract \| Provider \| Consumers \| Status \| Path \|/);
+  assert.match(
+    body,
+    /\| `CTR-DEMO` \| demo boundary ↔ other \| demo boundary ↔ other: detail that must not appear as boundary \| `demo` \| `cross` \| live \| `packages\/demo\/contracts\/demo\.v1\.json` \|/,
+  );
   // Planned row with no path → em dash, not a backticked missing path.
-  assert.match(body, /\| `CTR-PLANNED` \| planned side ↔ other side \| `cross` \| — \| planned \| — \|/);
-  assert.doesNotMatch(body, /detail that must not appear as boundary/);
+  assert.match(
+    body,
+    /\| `CTR-PLANNED` \| planned side ↔ other side \| planned side ↔ other side: no file yet \| `cross` \| — \| planned \| — \|/,
+  );
+  // Boundary is the clause before ": "; the Contract cell holds full meaning.
+  assert.match(body, /\| `CTR-DEMO` \| demo boundary ↔ other \|/);
+  assert.doesNotMatch(body, /\| `CTR-DEMO` \| demo boundary ↔ other: detail/);
   assert.doesNotMatch(body, /`packages\/missing/);
 });

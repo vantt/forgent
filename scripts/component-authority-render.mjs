@@ -236,20 +236,21 @@ function contractPathCell(contract, repoRoot) {
 
 /**
  * Architecture-map §7 contract registry: one row per model contract.
- * Columns the model holds: id, boundary (from meaning), provider, consumers, status, path.
- * Long hand-written "Hợp đồng" prose and non-model path notes stay outside the markers.
+ * Columns: id, boundary (clause before first ": " in meaning), Contract (full
+ * meaning), provider, consumers, status, path. Path is backticked only when the
+ * file exists so doc-health dead-reference stays clean.
  */
 function architectureMapContractsBody(model, repoRoot) {
   const lines = [
     `Contract registry rows from the model, one per contract, sorted by id. ${NOTE}`,
     '',
-    '| ID | Boundary | Provider | Consumers | Status | Path |',
-    '| --- | --- | --- | --- | --- | --- |',
+    '| ID | Boundary | Contract | Provider | Consumers | Status | Path |',
+    '| --- | --- | --- | --- | --- | --- | --- |',
   ];
   const contracts = [...(model.contracts ?? [])].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   for (const contract of contracts) {
     const consumers = (contract.consumers ?? []).map(cell).filter(Boolean);
-    lines.push(`| ${code(contract.id)} | ${cell(contractBoundary(contract))} | ${contract.provider ? code(contract.provider) : '—'} | ${consumers.length ? consumers.map(code).join(', ') : '—'} | ${cell(contract.status)} | ${contractPathCell(contract, repoRoot)} |`);
+    lines.push(`| ${code(contract.id)} | ${cell(contractBoundary(contract))} | ${cell(contract.meaning)} | ${contract.provider ? code(contract.provider) : '—'} | ${consumers.length ? consumers.map(code).join(', ') : '—'} | ${cell(contract.status)} | ${contractPathCell(contract, repoRoot)} |`);
   }
   return lines.join('\n');
 }
