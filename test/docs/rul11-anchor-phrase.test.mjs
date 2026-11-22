@@ -41,7 +41,7 @@ test('the RUL11 line matches the locked law text word-for-word', () => {
 
 test('the RUL11 decision narrative (D-ADR0036) is present in the "Lịch sử quyết định" section', () => {
   const spec = fs.readFileSync(PLATFORM_FOUNDATIONS_SPEC, 'utf8');
-  assert.match(spec, /^### 0036 — Khoá RUL11/m, 'a "### 0036 — Khoá RUL11..." heading must exist in the decision history section');
+  assert.match(spec, /^### (?:D-ADR)?0036 — Khoá RUL11/m, 'a "### 0036 — Khoá RUL11..." heading must exist in the decision history section');
 });
 
 test('AGENTS.md carries the decision-question template law and points at its shared fragment', () => {

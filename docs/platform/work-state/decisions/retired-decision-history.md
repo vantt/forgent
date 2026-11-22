@@ -794,7 +794,9 @@ phải một "consumer literal status" cần audit ở record này.
   gap có thật nhưng ĐỘC LẬP khỏi quyết định category — không chặn record này,
   nhưng nên sửa cùng đợt `tsk-38t-3` để tránh phải quét lại 2 lần.
 
-### 0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption
+### D-ADR0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption
+
+[valid_from:: 2026-08-15]
 
 > Bằng chứng distill của 24 vòng thảo luận (2026-08-15, item `tsk-2t9c`),
 > người dùng duyệt từng cụm qua các vòng và duyệt bản distill này ở vòng
