@@ -13,6 +13,8 @@ import { bindHeadSeat, headKeyOf, taskBriefOf, headRoleOf, HeadStartError, HEAD_
 import { grantOf } from '../../src/session-host/head-grants.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { headOf } from '../../src/runner/dispatch/session-attempt.mjs';
+import { resolveInvocationRoot } from '../../src/runner/paths.mjs';
+import { parseYaml } from '../../src/util/yaml.mjs';
 
 seedFileLocalBwrapRegistry();
 seedStubAgentClis('alpha-bin');
@@ -81,6 +83,100 @@ test('a head seat takes the executor\'s pane invocation, not its headless one', 
   assert.equal(binding.invocation, 'alpha-pane');
 });
 
+// Existing seat tests cover tier and invocation selection, not refusal when the pinned family's accounts are disabled.
+test('starting each coordinating persona under prefer: claude with only a non-Claude free account is refused with bind-refused and never binds the other family', async (t) => {
+  seedStubAgentClis('claude-bin', 'other-bin');
+  const store = (f) => ({ use: f, homeEnv: `${f.toUpperCase()}_HOME`, files: ['login'] });
+  const runnerConfig = {
+    defaults: { tier: 'standard' },
+    patterns: { seatBinding: { schema: 1 } },
+    modelPolicies: {
+      claude: { standard: 'c-sonnet', flagship: 'c-opus' },
+      other: { standard: 'o-m', flagship: 'o-l' },
+    },
+    personas: {
+      secretary: { tier: 'standard', pool: 'claude-miu', prefer: [{ executor: 'claude', invocation: 'claude-pane' }] },
+      supervisor: { tier: 'flagship', prefer: [{ executor: 'claude', invocation: 'claude-pane' }] },
+      lead: { tier: 'flagship', prefer: [{ executor: 'claude', invocation: 'claude-pane' }] },
+      planner: { tier: 'flagship', prefer: [{ executor: 'claude', invocation: 'claude-pane' }] },
+      shaper: { tier: 'flagship', prefer: [{ executor: 'claude', invocation: 'claude-pane' }] },
+    },
+    capabilities: { execute: { prefer: [{ executor: 'claude' }, { executor: 'other' }] } },
+    executors: {
+      claude: {
+        kind: 'agent',
+        providerModel: 'claude',
+        invocations: [{ id: 'claude-pane', via: 'cli', adapter: 'herdr-spawn', command: 'claude-bin', confinement: { backend: 'bwrap' }, credentialStore: store('claude') }],
+      },
+      other: {
+        kind: 'agent',
+        providerModel: 'other',
+        invocations: [{ id: 'other-pane', via: 'cli', adapter: 'herdr-spawn', command: 'other-bin', confinement: { backend: 'bwrap' }, credentialStore: store('other') }],
+      },
+    },
+    llmAccounts: {
+      claude: { c1: { label: 'c1', disabled: true, credentialStore: { claude: '/nonexistent/c1' } } },
+      'claude-miu': {
+        m1: { label: 'm1', disabled: true, credentialStore: { claude: '/nonexistent/m1' } },
+        m2: { label: 'm2', credentialStore: { other: '/nonexistent/m2' } },
+      },
+      other: { o1: { label: 'o1', credentialStore: { other: '/nonexistent/o1' } } },
+    },
+  };
+
+  // Prove the alternate family can actually serve both tiers; an unusable fixture would make refusal vacuous.
+  for (const tier of ['standard', 'flagship']) {
+    const availableConfig = { ...runnerConfig, personas: { available: { tier, prefer: [{ executor: 'other' }] } } };
+    const binding = await bindHeadSeat({ persona: 'available', key: `head-available-${tier}-1`, runnerConfig: availableConfig });
+    assert.equal(binding.executor, 'other');
+    assert.equal(binding.tier, tier);
+  }
+
+  // Without its pin, the secretary's own pool can serve the other family too.
+  const unpinnedConfig = { ...runnerConfig, personas: { secretary: { tier: 'standard', pool: 'claude-miu' } } };
+  const unpinned = await bindHeadSeat({ persona: 'secretary', key: 'head-secretary-unpinned-1', runnerConfig: unpinnedConfig });
+  assert.equal(unpinned.executor, 'other');
+
+  const coordinating = ['secretary', 'supervisor', 'lead', 'planner', 'shaper'];
+  const projectRoot = scratch();
+  t.after(() => fs.rmSync(projectRoot, { recursive: true, force: true }));
+  const { calls, ports } = fakes();
+  delete ports.bind;
+  const planOfHead = () => ({ dir: '261118-1045-project-supervisor', footprint: [] });
+  for (const persona of coordinating) {
+    const name = persona === 'secretary' ? 'miu' : persona === 'lead' ? 'sv-p09' : 'probe';
+    await assert.rejects(
+      () => startHeadSession({ persona, name, projectRoot }, { ...ports, planOfHead, runnerConfig: () => runnerConfig }),
+      (err) => err instanceof HeadStartError && err.code === 'bind-refused' && /\bclaude\b/.test(err.message),
+      `${persona} must be refused with bind-refused naming claude`,
+    );
+    assert.equal(readHeadPlacement(lineageDirOf(projectRoot, persona, name)), null, `${persona} leaves no placement`);
+  }
+  assert.equal(calls.launch.length, 0, 'never launched or bound to the other family');
+});
+
+// This is a repository-file rule, not binding behavior: effective pins come from project over standard only.
+test('this repository\'s runner configuration pins every coordinating persona to claude', () => {
+  // Read only .fgos/config.yaml and core/config-standard/runner.yaml, never home/global config.
+  // A linked worktree reads the main checkout's project file (skip-worktree there); CI reads the committed file.
+  const { root } = resolveInvocationRoot({ cwd: process.cwd(), policy: 'main-checkout' });
+  const filename = path.join(root, '.fgos', 'config.yaml');
+  const config = parseYaml(fs.readFileSync(filename, 'utf8'), { filename });
+  const standardFilename = path.join(root, 'core', 'config-standard', 'runner.yaml');
+  const standard = parseYaml(fs.readFileSync(standardFilename, 'utf8'), { filename: standardFilename });
+  const coordinating = ['secretary', 'supervisor', 'lead', 'planner', 'shaper'];
+  for (const persona of coordinating) {
+    const projectPersona = config.runner?.personas?.[persona];
+    const prefer = projectPersona && Object.hasOwn(projectPersona, 'prefer')
+      ? projectPersona.prefer
+      : standard.runner?.personas?.[persona]?.prefer;
+    const list = [].concat(prefer ?? []);
+    assert.ok(list.length > 0, `${persona} must have an explicit prefer list`);
+    assert.deepEqual(list.map((entry) => typeof entry === 'string' ? entry : entry.executor), ['claude'], `${persona} must pin claude only`);
+    assert.ok(list.every((entry) => entry.crossProvider !== true), `${persona} must not allow crossing provider`);
+  }
+});
+
 test('the session launches with its role, its grant and the opening verbatim as the full persona text with the start ritual', async () => {
   const projectRoot = scratch();
   const { calls, ports } = fakes();
@@ -94,7 +190,7 @@ test('the session launches with its role, its grant and the opening verbatim as 
   assert.deepEqual(request.grant, grantOf('head:planner-probe'));
   assert.deepEqual(request.grant.writes, ['plans']);
   assert.equal(request.ceilingMs, HEAD_HARD_CEILING_MS);
-  assert.deepEqual(request.display, { role: 'planner', title: 'probe' });
+  assert.deepEqual(request.display, { role: 'planner', title: 'ds-aaaaaaaaaa-probe' });
   assert.deepEqual(request.binding, { executor: 'alpha', key: 'head-planner-probe-1' });
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
