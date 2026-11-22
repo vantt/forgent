@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "4a363334cc114871460f29878a99605ebdece17ac52b831df1f2460d1e91c590",
+  "payloadDigest": "96e2bfdb5f3d03a29b03280ac2f9b4c43d5d990f56647f7110abf71f4ef9e90a",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -107,9 +107,9 @@
     "apps/fgos/src/wiring/dispatch_subs/observe.rs": "110205482bf94f1587730c62f6b42fb251b23b95c5358ad78572442bdfd5c54e",
     "apps/fgos/src/wiring/dispatch_subs/probes.rs": "db8a174f132383b2668b351609f1f43fbfc3d8d1bdfb9bb800ae9ba7b2147326",
     "apps/fgos/src/wiring/dispatch_subs/reconcile.rs": "a727d6a920048c9320bac78a9263a86b682ef21262192cb675672b12d84bb71e",
-    "apps/fgos/src/wiring/dispatch_subs/recover.rs": "15cd3e533520912898034874630fdab253a360b2e8ac42b1452adbbaaaced7e0",
+    "apps/fgos/src/wiring/dispatch_subs/recover.rs": "5c1eb09494cd8f9b833dc20ed3194d71a8c020bce905c5a3b3ed8fea6756079f",
     "apps/fgos/src/wiring/dispatch_subs/terminal.rs": "2afb7fca34a447cdd711d11fe3f2bd5a73ea817825b562bc74ea72916e5c0292",
-    "apps/fgos/src/wiring/dispatch_subs/tests.rs": "4a64aa2a8abb95d49890d9de4e35bf092fe850c8d3554762e171cdca5e5d3eff",
+    "apps/fgos/src/wiring/dispatch_subs/tests.rs": "e85351fcf8d45105d97207c405a8f6af8e5ed101ffdd4729452801a2fb76d35e",
     "apps/fgos/src/wiring/doctor/bridge.rs": "a6b02429a290007ad641d3fa265eb07fe8de1815e8dc7dde321caf7a8cb8232e",
     "apps/fgos/src/wiring/doctor/config.rs": "e97ee08e7d791a811c2b84d4d12c35433adcdbd1dc17e93c9a94e82ae6f169bb",
     "apps/fgos/src/wiring/doctor/confinement.rs": "6ac1c78306b55b2c67561738f2460ec356ab047a00741ff9e55b4403721a4302",

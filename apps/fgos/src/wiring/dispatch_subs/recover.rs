@@ -383,20 +383,16 @@ pub(crate) fn recover_apply(
     Ok(Answer::Json(answer))
 }
 
-/// The expected control epoch: a number, as the recommendation gave it. Text that is not one is refused here, where
-/// the Node CLI let `NaN` through to a plan-stale answer naming `NaN`.
+/// The expected control epoch: an integer, as the recommendation gave it (a control epoch counts generations).
+/// Anything else, `1.0` and `1e0` included, is refused here by name: the Node CLI let it through as a number that
+/// then compared as a stale plan.
 fn epoch_number(text: &str) -> Result<Value, CategorisedRefusal> {
-    let trimmed = text.trim();
-    if let Ok(n) = trimmed.parse::<i64>() {
-        return Ok(json!(n));
-    }
-    match trimmed.parse::<f64>() {
-        Ok(f) if f.is_finite() => Ok(json!(f)),
-        _ => Err(validation(format!(
-            "dispatch recover --expected-control-epoch must be a number, got {}",
+    text.trim().parse::<i64>().map(|n| json!(n)).map_err(|_| {
+        validation(format!(
+            "dispatch recover --expected-control-epoch must be an integer, got {}",
             Value::String(text.to_owned())
-        ))),
-    }
+        ))
+    })
 }
 
 /// What `recover <runId> --action ...` applies, as the CLI reads it: the action as JSON and every expectation

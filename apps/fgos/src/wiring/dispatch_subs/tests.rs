@@ -774,27 +774,32 @@ fn recover_reads_its_action_and_expectations_and_refuses_an_epoch_that_is_no_num
         ),
         ("h", "t", "k")
     );
-    let flags = Flags::of(&args(&[
-        "dispatch",
-        "recover",
-        "r",
-        "--action",
-        "{}",
-        "--expected-snapshot",
-        "h",
-        "--expected-control-epoch",
-        "abc",
-    ]));
-    let Err(refusal) = apply_params_of(&flags, "r".into(), "{}") else {
-        panic!("a non-numeric epoch refuses");
-    };
-    assert_eq!(
-        (refusal.category, refusal.message.as_str()),
-        (
-            "validation",
-            "dispatch recover --expected-control-epoch must be a number, got \"abc\""
-        )
-    );
+    for epoch in ["abc", "1.0", "1e0", ""] {
+        let flags = Flags::of(&args(&[
+            "dispatch",
+            "recover",
+            "r",
+            "--action",
+            "{}",
+            "--expected-snapshot",
+            "h",
+            "--expected-control-epoch",
+            epoch,
+        ]));
+        let Err(refusal) = apply_params_of(&flags, "r".into(), "{}") else {
+            panic!("the epoch {epoch:?} must refuse");
+        };
+        let expected = if epoch.is_empty() {
+            "dispatch recover --action requires --expected-control-epoch".to_owned()
+        } else {
+            format!("dispatch recover --expected-control-epoch must be an integer, got \"{epoch}\"")
+        };
+        assert_eq!(
+            (refusal.category, refusal.message),
+            ("validation", expected),
+            "{epoch:?}"
+        );
+    }
     let flags = Flags::of(&args(&["dispatch", "recover", "r", "--action", "{}"]));
     let Err(refusal) = apply_params_of(&flags, "r".into(), "{}") else {
         panic!("a missing snapshot refuses");
