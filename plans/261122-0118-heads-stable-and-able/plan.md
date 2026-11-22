@@ -149,6 +149,8 @@ the grants, verb by verb.
 | (owner 2026-11-22 09:08) rotation Stop hook fires in no head | phase 6 steps 6-8, phase 11 probe row | owner-approved 2026-11-22 09:08 via lead:SUPERVISOR: prove the Stop hook runs in a confined head, writes stop-trace and rotates at soft; find and fix the cause in this plan |
 | p-6sd4fslxv7 landed worktree removed by the land door | phase 7 steps 10-13 | owner-approved 2026-11-22 14:55, folded in by lead:SUPERVISOR (`69a20ce3a`) |
 | p-4r4h3jqtth head ran 33 h without rotating | already done | plan `261121-0745-head-rotation-trace`, `65ad518d5` |
+| (owner 2026-11-22 16:05) rotation reliability: handoff last message and portfolio, true rotation.log outcome, live soft rotate | phase 12 (12a), phase 11 probe row | folded in by lead:SUPERVISOR 17:47 (`q-msslhlmfkt`) |
+| p-kqs6fjalvh pool login expires inside a long seat | phase 12 (12b) | folded in by lead:SUPERVISOR 17:47; 12b waits on its footprint widen |
 
 ## Prior art reused and what was missing
 
@@ -181,7 +183,8 @@ the grants, verb by verb.
 | 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | running |
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | running |
 | 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | running |
-| 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md | 5 | ready |
+| 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md | 5 | ready |
+| 12 | [Rotation reliability](phase-12-rotation-reliability.md) | 6 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, docs/platform/session-host/spec.md | 4 | running |
 
 Each phase names its canonical dispatch capability in its file: `code:implement` for 2 to 7 and 10 and the probe script
 of 11; phases 1, 8's measure, 9's after-measure and 11's gate are evidence reads (`code:test`). No executor, provider or
