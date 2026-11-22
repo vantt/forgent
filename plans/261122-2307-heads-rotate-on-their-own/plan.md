@@ -134,7 +134,11 @@ its file in two points. First, the status-line sidecar lives beside the session 
 (`<dir of transcript_path>/<session_id>.context-sidecar.jsonl`), not under the lineage, because the confinement policy
 (`packages/execution/contracts/confinement-policy/policy.v1.json`) never grants a writable path under `.fgos`. Second,
 the payload in `reports/status-line-payload.md` was reconstructed from the installed CLI bundle, so a real recording
-is still owed. Phase 4's gate result is in `reports/integration.md`.
+is still owed. Phase 4's gate result is in `reports/integration.md`. Phase 4 landed `7717d9a05` and stays `running`,
+parked on acceptance criterion 6. In a sandbox, `npm test` cannot start because the full-suite lock is read-only, and
+`cargo test --workspace` shows 7 process-liveness failures in `apps/fgos/src/wiring/doctor/confinement.rs`, a module
+this plan does not touch. Both gates must run outside a sandbox
+(`reports/lead-261123-0214-heads-rotate-wave-run.md`).
 
 **Owner order (2026-11-22 23:30, via the secretary, recorded by head:supervisor-forgent):** heads-stable blocks
 nobody. This plan is admitted now; heads-stable's lead watches the files the two plans share (its open phase 11 writes
