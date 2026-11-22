@@ -74,3 +74,112 @@ fn a_refusal_names_the_global_role_and_never_a_value() {
         "{shown}"
     );
 }
+
+// The provider is an optional edge: replay this proof with --features host-provider, as the
+// CLI builds it. Existing scope_cases proves placement, not the provider's pre-write guard.
+#[cfg(all(unix, feature = "host-provider"))]
+#[test]
+fn project_only_patch_checks_real_targets_before_writing() {
+    use fgos_config::provider::{answer, ConfigRequest, Verb};
+    use std::{fs, process::Command};
+
+    const CHILD: &str = "FGOS_SCOPE_PATCH_CASE";
+    if let Ok(row) = std::env::var(CHILD) {
+        let row: Value = serde_json::from_str(&row).unwrap();
+        let dir = std::env::current_dir().unwrap();
+        let root = dir.join("project");
+        let files = [
+            root.join(".fgos/config.yaml"),
+            dir.join("home/.fgos/config.yaml"),
+            dir.join("home/.fgos/private/accounts.yaml"),
+        ];
+        let original = b"# @fgos:v1\n# Keep this note byte-identical on refusal.\n";
+        for file in &files {
+            fs::create_dir_all(file.parent().unwrap()).unwrap();
+            fs::write(file, original).unwrap();
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(file, fs::Permissions::from_mode(0o600)).unwrap();
+        }
+        let edits = row
+            .get("edits")
+            .cloned()
+            .unwrap_or_else(|| json!([{"set": row["path"], "value": row["value"]}]));
+        let patch = dir.join("patch.json");
+        fs::write(&patch, serde_json::to_vec(&edits).unwrap()).unwrap();
+        for project_only in [true, false] {
+            let got = answer(&ConfigRequest {
+                root: root.clone(),
+                verb: Verb::Patch {
+                    file: patch.clone(),
+                    reason: "exercise project-only patch scope".into(),
+                    global: row["global"].as_bool().unwrap(),
+                    project_only,
+                },
+            });
+            let want = if project_only {
+                row["expect"].as_str()
+            } else {
+                row["withoutFlag"].as_str()
+            };
+            assert_eq!(got.as_ref().err().map(|r| r.reason), want, "{row}: {got:?}");
+            if want.is_some() {
+                for file in &files {
+                    assert_eq!(
+                        fs::read(file).unwrap(),
+                        original,
+                        "{} changed",
+                        file.display()
+                    );
+                }
+            } else {
+                let done = got.unwrap();
+                assert_eq!(done.exit, 0);
+                let target = done.data["target"].as_str().unwrap();
+                let index = match target {
+                    ".fgos/config.yaml" => 0,
+                    "~/.fgos/config.yaml" => 1,
+                    "~/.fgos/private/accounts.yaml" => 2,
+                    _ => panic!("unexpected target {target}"),
+                };
+                assert!(!done.data["applied"].as_array().unwrap().is_empty());
+                assert_ne!(fs::read(&files[index]).unwrap(), original);
+                for (i, file) in files.iter().enumerate() {
+                    if i != index {
+                        assert_eq!(fs::read(file).unwrap(), original);
+                    }
+                }
+            }
+            for file in &files {
+                fs::write(file, original).unwrap();
+            }
+        }
+        return;
+    }
+
+    let fixture = common::fixture("scope.v1.json");
+    for row in fixture["patch-project-only"].as_array().unwrap() {
+        let dir = common::temp("patch-scope", row["id"].as_str().unwrap());
+        fs::create_dir_all(dir.join("home")).unwrap();
+        // Isolate HOME and confinement in a child instead of racing the test process's env.
+        let output = Command::new(std::env::current_exe().unwrap())
+            .args([
+                "--exact",
+                "project_only_patch_checks_real_targets_before_writing",
+                "--nocapture",
+            ])
+            .current_dir(&dir)
+            .env(CHILD, row.to_string())
+            .env("HOME", dir.join("home"))
+            .env("FGOS_STATE_ROOT", dir.join("state"))
+            .env_remove("FGOS_CONFINED")
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "{}\n{}\n{}",
+            row["id"],
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+}

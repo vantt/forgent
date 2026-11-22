@@ -1894,5 +1894,58 @@
     "global": []
    }
   }
+ ],
+ "patch-project-only": [
+  {
+   "id": "scope-patch-project-only-project-key-passes",
+   "why": "project key passes",
+   "path": "dispatch.cancelWaitMs",
+   "value": 23456,
+   "global": false,
+   "expect": null
+  },
+  {
+   "id": "scope-patch-project-only-global-only-key-refused",
+   "why": "global-only key refused",
+   "path": "gateway.port",
+   "value": 18088,
+   "global": false,
+   "expect": "patch-project-only"
+  },
+  {
+   "id": "scope-patch-project-only-accounts-key-refused",
+   "why": "accounts key refused",
+   "path": "runner.llmAccounts",
+   "value": {},
+   "global": false,
+   "expect": "patch-project-only"
+  },
+  {
+   "id": "scope-patch-project-only-with-global-refused",
+   "why": "--project-only with --global refused",
+   "path": "dispatch.cancelWaitMs",
+   "value": 23456,
+   "global": true,
+   "expect": "patch-project-only"
+  },
+  {
+   "id": "scope-patch-project-only-bracket-quoted-global-key-refused",
+   "why": "bracket-quoted paths use the same target resolution",
+   "path": "[\"gateway\"][\"port\"]",
+   "value": 18088,
+   "global": false,
+   "expect": "patch-project-only"
+  },
+  {
+   "id": "scope-patch-project-only-mixed-targets-write-nothing",
+   "why": "a later non-project edit refuses the entire patch before the first edit writes",
+   "edits": [
+    {"set": "dispatch.cancelWaitMs", "value": 23456},
+    {"set": "runner.llmAccounts", "value": {}}
+   ],
+   "global": false,
+   "expect": "patch-project-only",
+   "withoutFlag": "patch-spans-files"
+  }
  ]
 }

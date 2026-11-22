@@ -135,6 +135,7 @@ pub enum Verb {
         file: PathBuf,
         reason: String,
         global: bool,
+        project_only: bool,
     },
     Migrate {
         global: bool,

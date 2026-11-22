@@ -288,7 +288,7 @@ Holder-lock no longer reads config. Commit `a620881e7` (2026-10-22, "move the No
 | `explain <path>` | the schema node: description, type, enum or bounds, standard value, scope, owner, and where the current value comes from |
 | `check` | validate both files; no write |
 | `set <path> <value> --reason <text>` / `unset <path> --reason <text>` | one transaction (section 6); `<path>` uses YAML Document's path text form (keys joined by `.`, a key containing `.`, `[`, `]` or a quote written bracket-quoted as `["a.b"]`), so no key is ever addressed by accident |
-| `patch <file> --reason <text>` | several edits in one transaction on one source |
+| `patch <file> [--project-only] --reason <text>` | several edits in one transaction on one source; with `--project-only`, refuses before any write when any edit resolves to a file other than the project config file, or when `--global` is passed |
 | `migrate [--global]` | JSON to YAML (section 13) |
 | `refresh-docs` | rewrite `@fgos:doc` lines whose rendered text differs from the schema and standard (after an `$id` revision or standard change) |
 
@@ -343,6 +343,7 @@ Owner decision 2026-10-22: native door. As built:
 | Value of the wrong type | schema error naming the schema path and keyword, never the value; never repaired |
 | Key outside its scope | refused by name, naming the file it belongs in |
 | Concurrent write | `config-write-conflict`; the loser writes nothing |
+| `fgos config patch --project-only` when any edit resolves to a file other than the project config file, or with `--global` | `patch-project-only`; file left byte-identical |
 | Change without a reason where one is required | `config-comment-reason-required`; the message tells the person to add `--reason "<why>"` |
 | `fgos config set` or `patch` of a key no section schema describes | `config-key-unknown` for each such key, listing the nearest keys (`did-you-mean=`), together with the reason refusal when the reason is also unusable; `unset` of such a key is allowed, and migration and repair keep unknown keys of an older file |
 | Addon missing on the channel | the door's named error; no JavaScript fallback |

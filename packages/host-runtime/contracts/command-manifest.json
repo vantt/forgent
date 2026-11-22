@@ -2746,6 +2746,10 @@
               "global": {
                 "type": "boolean",
                 "description": "Write the global file for keys that may live in either file."
+              },
+              "project-only": {
+                "type": "boolean",
+                "description": "Refuse before any write unless every edit lands in the project config file; incompatible with --global."
               }
             },
             "positional": [
