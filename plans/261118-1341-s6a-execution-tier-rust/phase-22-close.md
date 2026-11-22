@@ -73,3 +73,4 @@ reverse-read tables present.
 Risk: a door pattern too broad (false hits) or too narrow. Step 1 enumeration and seeded cases. Risk: the canary
 finds a defect: fix on the integration branch before landing; the base release is reactivated meanwhile. Rollback:
 revert the phase (docs and rows); reverting the whole series follows plan.md "Risks and rollback".
+- Deferred to plan 261122-0118 (heads stable and able, supervisor 2026-11-22): before editing `apps/fgos/src/routing.rs`, `src/session-host/head-request.mjs`, `src/session-rotation/rotate.mjs`, `packages/run-supervisor/**` outside `rust/src/controller/`, or `apps/fgos/src/wiring/doctor/` other than `mod.rs`, re-add the path to plan.md frontmatter and this phase's row and rebase onto what 0118 has landed in it.

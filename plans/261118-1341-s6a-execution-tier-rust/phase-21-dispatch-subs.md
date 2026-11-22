@@ -107,3 +107,4 @@ gate-kill-grace,packaged-definitions,seat-binding-dry-bind}.test.mjs`, `test/sta
 
 Risk: `recover --action adopt` on a Node-era attempt. Landing precondition nothing in flight in this repo; corpus
 adopt fixture; CHANGELOG upgrade line for other projects (phase 22). Rollback: revert the phase.
+- Deferred to plan 261122-0118 (heads stable and able, supervisor 2026-11-22): before editing `apps/fgos/src/routing.rs`, `src/session-host/head-request.mjs`, `src/session-rotation/rotate.mjs`, `packages/run-supervisor/**` outside `rust/src/controller/`, or `apps/fgos/src/wiring/doctor/` other than `mod.rs`, re-add the path to plan.md frontmatter and this phase's row and rebase onto what 0118 has landed in it.

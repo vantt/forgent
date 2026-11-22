@@ -126,3 +126,4 @@ concurrently. Risk: the dead-reservation proof cannot tell a settled committed r
 (`case-runtime.mjs:73-79` releases both as not-started); this exists today when Workflow itself dies, so RUL104 keeps
 it and the phase report files it as a backlog row. Rollback: revert the phase (directories return; phase 19 still
 serves the verb).
+- Deferred to plan 261122-0118 (heads stable and able, supervisor 2026-11-22): before editing `apps/fgos/src/routing.rs`, `src/session-host/head-request.mjs`, `src/session-rotation/rotate.mjs`, `packages/run-supervisor/**` outside `rust/src/controller/`, or `apps/fgos/src/wiring/doctor/` other than `mod.rs`, re-add the path to plan.md frontmatter and this phase's row and rebase onto what 0118 has landed in it.
