@@ -10,6 +10,7 @@
 //! show the model. Files read: `packages/session-host/contracts/rotation-files.v1.json`.
 use super::mailbox_config::effective_config;
 use super::mailbox_identity::state_root;
+use fgos_distribution::shim::project_shim_path;
 use fgos_run_supervisor::head_client::{
     request_head_waiting, ClientError, RotationWait, REPLY_TIMEOUT,
 };
@@ -274,10 +275,8 @@ fn session_start(head: &Head, fgos_dir: &Path) -> Result<Option<String>, String>
         None => false,
     };
     if should_append {
-        let bin = fgos_dir
-            .parent()
-            .unwrap_or(Path::new(""))
-            .join(".fgos/installation/bin/fgos");
+        let root = fgos_dir.parent().unwrap_or(Path::new(""));
+        let bin = project_shim_path(root);
         let instruction = format!(
             "A rotation is waiting for this session's first answer; right after the start ritual's one line, in this same turn, answer by running printf '%s' '{{\"last_assistant_message\":\"<that line, with no quote characters>\"}}' | \"{}\" hook session-rotation --event stop ; use the installed path, not the fgos shell function; role-gated verbs wait until the role moves.",
             bin.display()
@@ -692,7 +691,7 @@ mod tests {
     ) {
         let (fgos_dir, lineage) = fgos("start-instruction");
         let project_root = fgos_dir.parent().unwrap();
-        let expected_bin = project_root.join(".fgos/installation/bin/fgos");
+        let expected_bin = project_shim_path(project_root);
         assert!(expected_bin.is_absolute());
 
         std::fs::write(lineage.join("261118-1000-abc12345.md"), "handoff text\n").unwrap();
