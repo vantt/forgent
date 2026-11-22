@@ -39,7 +39,7 @@ Reopened, 2026-11-22 18:05 (round 12). Domain: coding.
 
 Settled so far (OC-D1, OC-D3 to OC-D8): the **tiêu chuẩn giao tiếp** (communication standard), grounded in the owner being cognitively overloaded, so every message must make taking in information as easy, clear and high in quality as possible; the friction store as case log; a coach that learns from it; one standard file; program support levels.
 
-Round 12: the owner said the reaction signals were a hint for the agent itself to notice that its presentation fell short, not a hook to build, and that presenting information is the core of the standard. Proposed and waiting for the owner: (a) the reaction-signal rule moves into the standard (Part A), the automatic capture moves to the coach cluster discussion, leaving two tasks; (b) step 2 split into three parts (conduct, presenting information in nine points, when and where).
+Round 12: the owner said the reaction signals were a hint for the agent itself to notice that its presentation fell short, not a hook to build, and that presenting information is the core of the standard. Corrected by the owner at 18:15: on a reaction signal the agent notices and records, and does not re-present; it waits for the owner's question. Proposed and waiting for the owner: (a) the reaction-signal rule moves into the standard (Part A), the automatic capture moves to the coach cluster discussion, leaving two tasks; (b) step 2 split into three parts (conduct, presenting information in nine points, when and where).
 
 Also waiting for the owner: where the stale-question part of freshness goes (recommended: draft plan `261122-0056-orchestration-skeleton`), and the path to the owner's `vantt/pkm` project for the coach discussion.
 
@@ -110,6 +110,8 @@ Agents in fgOS speak to the owner many times a day, and the owner's attention is
 
 - 2026-11-22 18:05 — Owner: "việc 2: chổ này anh chỉ hint là sử dụng một số phản ứng của anh như là một tín hiệu để nhận ra là cách trình bày thông tin của em chưa đạt. à, nói tới đây mới vỡ lẻ ra là việc số 1 chính xác là tiêu chuẩn trình bày thông tin là một vấn đề lớn trong tiêu chuẩn giao tiếp." Shaper: the reaction signals are for the agent to notice and re-present at once, not a hook to build here; proposed moving the automatic capture to the coach cluster and folding the rule into task 1 (two tasks left). Restructured step 2 into three parts (conduct, presenting information, when and where) and drafted presenting information in nine points. Discussion reopened until the owner confirms.
 
+- 2026-11-22 18:15 — Owner: "à, cần làm rõ hơn nha, em lại vi phàm rồi đó. khi mà anh phát ra những tín hiệu khó chịu thì nhiệm vụ của em là phát hiện ra mình trình bày có vấn đề, việc của em là ghi nhận để tìm hiểu, không nên tự nhiên nhảy vảo trình bày lại, như vậy càng làm rối. khi anh bực thì chắc chắn ngay sau đó anh sẽ hỏi lại. lúc đó anh không hiểu mà em lại tự điều chỉnh thì càng làm rối hơn, và nên chờ để mà anh hỏi, khi đó em càng sớm hiểu là mình đang gặp vấn đề giao tiếp gì" Shaper: agreed; Part A rule rewritten to notice, record and wait for the owner's question; seed case S4 added.
+
 ## 6. Thiết kế đã chốt {#design}
 
 The standard **tiêu chuẩn giao tiếp** (communication standard), as it stands. Steps 1 and 2 are settled in substance (OC-D2), their wording is not final; step 3 holds seed cases; step 4 is not started.
@@ -132,7 +134,7 @@ Of everything in the system, the owner's attention is the scarcest and the most 
 
 - Reading, checking and drafting are the agent's own work; never ask permission for them. Come with findings and a recommendation; ask only for what is the owner's to decide.
 - Bring your own view. Weigh what the owner proposes; say where you agree and where you do not, with evidence; then the owner decides (case S3).
-- When the owner's reaction shows the presentation fell short (the signals in step 3: mood change, asking back, not following the recommendation, re-aiming, ...), present it again now in a better form, and record a friction.
+- When the owner's reaction shows the presentation fell short (the signals in step 3: mood change, asking back, not following the recommendation, re-aiming, ...), the agent's job is to notice it and record a friction to learn from. It does **not** jump in to present again: a guessed rewrite is one more message for an overloaded reader and adds confusion. It waits for the owner's next question, which shows exactly where the communication broke, then answers that question, short (owner 18:15).
 
 **Part B. Presenting information (trình bày thông tin), the largest part.**
 
@@ -173,7 +175,7 @@ Of everything in the system, the owner's attention is the scarcest and the most 
 | T11 | The owner ignores a question or answers a different point | The message did not land or did not look like a decision | — |
 | T12 | The owner interrupts the agent or rejects a tool call | The agent was doing something the owner did not expect | — |
 
-The agent that receives the owner's message is the one placed to see the signal, so it records the friction, quoting the owner's words and its own message; it never argues with the signal or waits to be sure. Some signals (T10, T11, T12) can be counted by a program; that belongs to step 4. `fgos friction rank` shows which faults repeat. The **coach** (a head the supervisor starts at the right moment; defined in its own item) reads them, finds the real cause, and either drafts a line of the standard for the owner to approve in a batch, or hands a well-evidenced problem back to the supervisor, which puts it through the normal pipeline so a fitting team solves it. The standard itself keeps only a few curated examples like the ones below. Seed cases from 2026-11-22:
+The agent that receives the owner's message is the one placed to see the signal, so it records the friction, quoting the owner's words and its own message; it never argues with the signal or waits to be sure. It does not rewrite its message on its own; the owner's follow-up question is the evidence of what went wrong, and is quoted in the friction. Some signals (T10, T11, T12) can be counted by a program; that belongs to step 4. `fgos friction rank` shows which faults repeat. The **coach** (a head the supervisor starts at the right moment; defined in its own item) reads them, finds the real cause, and either drafts a line of the standard for the owner to approve in a batch, or hands a well-evidenced problem back to the supervisor, which puts it through the normal pipeline so a fitting team solves it. The standard itself keeps only a few curated examples like the ones below. Seed cases from 2026-11-22:
 
 | # | Situation | What the agent wrote | Cost to the owner | Broke | Better |
 |---|---|---|---|---|---|
@@ -182,6 +184,7 @@ The agent that receives the owner's message is the one placed to see the signal,
 | C5 | Several owner questions | Options unlettered, no default | The owner typed sentences where one letter would do | Decision question | Lettered options, recommended first, "no answer → I take A" |
 | S1 | This shaper's first question to the owner | A long English question with ids (`q-…`), file paths and refusal codes | "What is the question?" — a full rewrite was needed | Language and length; names and ids | Short Vietnamese, plain words, no ids unless explained |
 | S3 | Owner gave the coach direction | The shaper wrote it down and moved on, with no view of its own | "anh nói gì là em vuốt đuôi đi theo, không hề thảo luận, advise hay debate" | Before you speak: the agent's own analysis is part of its work | Weigh the proposal, say where it agrees and where it does not, with evidence, then let the owner decide |
+| S4 | Shaper drafting the reaction-signal rule | "present it again now in a better form" | Owner: unprompted re-presenting confuses more; the follow-up question is what shows the problem | Part A conduct | Notice, record, wait for the owner's question, answer it short |
 | S2 | This shaper's first rounds | Jumped to hooks, validators and new required fields | The owner had to step back and ask whether the shaper understood the goal | Why before how | State the understanding first, check it with the owner, then the mechanism |
 
 ### Bước 4 — Hỗ trợ bằng chương trình
