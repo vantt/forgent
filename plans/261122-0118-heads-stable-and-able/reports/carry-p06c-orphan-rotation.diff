@@ -34,7 +34,7 @@ index 9ff067909..fe61c1325 100644
          assert_eq!(registry.fix_ids(OwnerKind::Bridge).len(), 1);
      }
 diff --git a/apps/fgos/src/wiring/session_rotation_hook.rs b/apps/fgos/src/wiring/session_rotation_hook.rs
-index d283203a3..963b127ad 100644
+index d283203a3..1534cd7f2 100644
 --- a/apps/fgos/src/wiring/session_rotation_hook.rs
 +++ b/apps/fgos/src/wiring/session_rotation_hook.rs
 @@ -110,19 +110,80 @@ fn count(payload: &Value, key: &str) -> usize {
@@ -48,14 +48,21 @@ index d283203a3..963b127ad 100644
 +}
 +
 +impl StopError {
++    fn new(code: &str, detail: impl ToString) -> Self {
++        let detail = detail.to_string();
++        Self {
++            code: code.into(),
++            message: detail.clone(),
++            detail,
++        }
++    }
++
 +    fn from_client(e: ClientError, verb: &str) -> Self {
 +        let message = format!("{verb}: {e}");
 +        let detail = e.detail.or(e.message).unwrap_or_else(|| e.code.clone());
-+        Self {
-+            code: e.code,
-+            detail,
-+            message,
-+        }
++        let mut error = Self::new(&e.code, detail);
++        error.message = message;
++        error
 +    }
 +}
 +
@@ -93,32 +100,25 @@ index d283203a3..963b127ad 100644
 +    }
 +}
 +
-+fn stop_inner(head: &Head, lineage: &Path, payload: &Value, ports: &Ports) -> Result<(), StopError> {
++fn stop_inner(
++    head: &Head,
++    lineage: &Path,
++    payload: &Value,
++    ports: &Ports,
++) -> Result<(), StopError> {
      if let Some(gen) = head.gen {
 -        if awaits_answer(&lineage, gen).map_err(|e| e.to_string())? {
 -            return answer(head, &lineage, payload, ports);
-+        if awaits_answer(lineage, gen).map_err(|e| StopError {
-+            code: "awaits-answer-error".into(),
-+            detail: e.to_string(),
-+            message: e.to_string(),
-+        })? {
++        if awaits_answer(lineage, gen).map_err(|e| StopError::new("awaits-answer-error", e))? {
 +            return answer(head, lineage, payload, ports);
          }
      }
 -    let config = (ports.config)()?;
-+    let config = (ports.config)().map_err(|why| StopError {
-+        code: "config-error".into(),
-+        detail: why.clone(),
-+        message: why,
-+    })?;
++    let config = (ports.config)().map_err(|e| StopError::new("config-error", e))?;
      let thresholds = config
          .thresholds_for(&head.persona)
 -        .map_err(|e| e.to_string())?;
-+        .map_err(|e| StopError {
-+            code: "thresholds-error".into(),
-+            detail: e.to_string(),
-+            message: e.to_string(),
-+        })?;
++        .map_err(|e| StopError::new("thresholds-error", e))?;
      let sidecar = lineage.join(SIDECAR_FILE);
      let transcript = payload_str(payload, "transcript_path").map(PathBuf::from);
      let session = payload_str(payload, "session_id");
@@ -131,7 +131,7 @@ index d283203a3..963b127ad 100644
      }
      let portfolio: Vec<&String> = config
          .reload_of(&head.persona)
-@@ -174,24 +235,40 @@ fn stop(head: &Head, fgos_dir: &Path, payload: &Value, ports: &Ports) -> Result<
+@@ -174,24 +235,31 @@ fn stop(head: &Head, fgos_dir: &Path, payload: &Value, ports: &Ports) -> Result<
      let args = json!({ "persona": head.persona, "name": head.name, "reason": reason, "stopFacts": facts, "measure": measure });
      (ports.ask)("session rotate", &args)
          .map(|_| ())
@@ -151,26 +151,17 @@ index d283203a3..963b127ad 100644
 -        .ok_or("the successor has no handoff to read the rotation id from")?;
 -    let rotation_id = rotation_id_of(&latest.text).ok_or("the handoff carries no rotation id")?;
 -    let session_id = (ports.session_id)().ok_or("this session has no Identity id")?;
-+        .map_err(|e| StopError {
-+            code: "handoff-read-error".into(),
-+            detail: e.to_string(),
-+            message: e.to_string(),
-+        })?
-+        .ok_or_else(|| StopError {
-+            code: "no-handoff".into(),
-+            detail: "the successor has no handoff to read the rotation id from".into(),
-+            message: "the successor has no handoff to read the rotation id from".into(),
++        .map_err(|e| StopError::new("handoff-read-error", e))?
++        .ok_or_else(|| {
++            StopError::new(
++                "no-handoff",
++                "the successor has no handoff to read the rotation id from",
++            )
 +        })?;
-+    let rotation_id = rotation_id_of(&latest.text).ok_or_else(|| StopError {
-+        code: "no-rotation-id".into(),
-+        detail: "the handoff carries no rotation id".into(),
-+        message: "the handoff carries no rotation id".into(),
-+    })?;
-+    let session_id = (ports.session_id)().ok_or_else(|| StopError {
-+        code: "no-session-id".into(),
-+        detail: "this session has no Identity id".into(),
-+        message: "this session has no Identity id".into(),
-+    })?;
++    let rotation_id = rotation_id_of(&latest.text)
++        .ok_or_else(|| StopError::new("no-rotation-id", "the handoff carries no rotation id"))?;
++    let session_id = (ports.session_id)()
++        .ok_or_else(|| StopError::new("no-session-id", "this session has no Identity id"))?;
      let args = json!({ "persona": head.persona, "name": head.name, "sessionId": session_id, "rotationId": rotation_id, "message": bounded(message) });
      (ports.ask)("session answered", &args)
          .map(|_| ())
@@ -179,7 +170,7 @@ index d283203a3..963b127ad 100644
  }
  
  /// A session start: the latest handoff of the lineage as the one `additionalContext` object, or nothing.
-@@ -591,4 +668,34 @@ mod tests {
+@@ -591,4 +659,58 @@ mod tests {
          assert_eq!(bounded(&"a".repeat(9000)).len(), MAX_TEXT);
          assert_eq!(bounded(&"😀".repeat(9000)).encode_utf16().count(), MAX_TEXT);
      }
@@ -211,31 +202,65 @@ index d283203a3..963b127ad 100644
 +        assert_eq!(incident["event"], "stop-failed");
 +        assert_eq!(incident["code"], "verb-not-granted");
 +        assert_eq!(incident["detail"], "supervisor refused verb");
-+        assert!(incident["at"].as_str().is_some_and(|s| s.contains('T') && s.ends_with('Z')));
++        assert!(incident["at"]
++            .as_str()
++            .is_some_and(|s| s.contains('T') && s.ends_with('Z')));
++        assert_eq!(incident.as_object().unwrap().len(), 4);
++
++        // The same owning proof also exercises the character bound without splitting Unicode.
++        let (fgos_dir, lineage) = fgos("incident-bounded");
++        let (_, result) = run_stop(
++            &head(None),
++            &fgos_dir,
++            json!({}),
++            Err(ClientError {
++                code: "busy".into(),
++                detail: Some("😀".repeat(301)),
++                message: None,
++            }),
++        );
++        assert!(result.is_err());
++        let content = std::fs::read_to_string(lineage.join("incidents.jsonl")).unwrap();
++        let lines: Vec<_> = content.lines().collect();
++        assert_eq!(lines.len(), 1);
++        let incident: Value = serde_json::from_str(lines[0]).unwrap();
++        assert_eq!(incident["event"], "stop-failed");
++        assert_eq!(incident["code"], "busy");
++        assert_eq!(incident["detail"], "😀".repeat(300));
 +    }
  }
 diff --git a/docs/platform/packaging-distribution/contracts/setup-doctor-registry.md b/docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
-index 32ed899a2..a63e87ef3 100644
+index 32ed899a2..d45b116f5 100644
 --- a/docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
 +++ b/docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
-@@ -171,7 +171,7 @@ The exact list of registered checks/fixes changes over time. This contract shoul
+@@ -73,6 +73,7 @@ A pointer row reads one component's incident count and names the verb that shows
+ | `event-store-incidents` | `fgos events status` | integrity problems, skipped peer mirrors and their sync warnings |
+ | `lock-holders` | `fgos lock-status` | never |
+ | `run-attempts-stuck` | the next `fgos run` (adopts), `fgos dispatch recover` | never |
++| `session-rotation-orphans` | the lineage's next `fgos session rotate` or `session answered` (resolves a proven-dead executor) | never |
+ | `terminal-allocations` | `fgos dispatch inspect --terminal` | never |
+ | `mailbox-hook` | `fgos mailbox status` | the record is unreadable or untrusted |
+ | `session-keep-declared` | `fgos dispatch probe-session <executorId>` (never run by doctor: it starts a seat) | never |
+@@ -171,7 +172,9 @@ The exact list of registered checks/fixes changes over time. This contract shoul
  
  The registry file `packages/distribution/contracts/doctor-registry.v1.json` is the inventory of record (rows and fixes in run order, each with its owner); the lists below are a snapshot checked against it by `test/setup/registrations.test.mjs`, and the legacy distribution Data Dictionary is a historical projection.
  
 -Today's registered checks: `account-probe-timer`, `activation-matches-pin`, `active-release-matches-checkout`, `agent-cli-project-trusted`, `agent-type-names-unique`, `agy-hook-wired`, `agy-permissions-configured`, `agy-sub-homes-configured`, `blind-steps-use-proven-pools`, `bwrap-available`, `capability-serves-valid`, `claude-plugin-marketplace`, `cli-version-visible`, `codex-hook-wired`, `config-capability-taste-moved`, `config-comment-migrated-why`, `config-comment-missing-doc`, `config-comment-missing-why`, `config-doc-drift`, `config-empty-provider-accounts`, `config-format-legacy-json`, `config-global-permissions`, `config-key-in-wrong-file`, `config-legacy-shadowed`, `config-migrate-backup-stale`, `config-parse`, `config-redundant-value`, `config-schema`, `config-secret-outside-private`, `config-unknown-key`, `confined-pane-accounts`, `confinement-backend-registry-readable`, `confinement-blind-read`, `confinement-bwrap-platform`, `confinement-herdr-maturity`, `confinement-orphaned-resources-reaped`, `confinement-policies-declared`, `confinement-probe-freshness`, `confinement-strict-readiness`, `credential-copies-retained`, `curl-available`, `delivered-not-on-trunk`, `dispatch-decide-hook-wired`, `domain-registry-compiled`, `event-store-incidents`, `event-store-legacy-layout`, `event-store-machine-id`, `event-store-open-root`, `executor-confinement`, `executor-family-unique`, `executor-profile-warnings`, `executor-skills-installed`, `gateway-token-configured`, `git-component-compatible`, `git-incidents`, `git-operation-journal`, `git-repository-config`, `herdr-executor-kinds`, `identity-machine-id`, `identity-machine-key`, `identity-project-id`, `identity-shared-directory`, `identity-ssh-keygen`, `invocation-git-write-grants`, `land-gates-configured`, `legacy-node-payload-present`, `llm-accounts-default-login-home`, `llm-accounts-shape`, `lock-borrow-vectors`, `lock-holders`, `lock-kernel-semantics`, `mailbox-claude-accept`, `mailbox-hook`, `mailbox-sync-timer`, `main-checkout-hook-wired`, `model-policy-pools`, `node-version-and-git`, `non-claude-trust-stores-readable`, `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `observe-write-health`, `omp-hook-wired`, `omp-natives-present`, `operation-prompt-templates-valid`, `pi-hook-wired`, `project-fgos-launcher`, `provider-capacity-state`, `root-drift`, `run-attempts-stuck`, `run-supervisor-config`, `run-supervisor-route`, `runner-generated-paths`, `runner-patterns-config`, `runtime-socket-dir`, `rust-host-binary-present`, `rust-host-target-supported`, `seat-binding-dry-bind`, `seat-binding-route`, `session-keep-declared`, `supervision-pace`, `supervisor-events-unhandled`, `terminal-allocations`, `terminal-control`, `tier-fallback`, `tool-registry-configured`, `trust-store-readable`, `watcher-timer` (the OS timer that runs the supervision watcher tick; it has a fix), `work-classification-vocabulary`, `work-recorded-conflicts`, `work-step-vocabulary`, `worker-slots-ceiling-usable`, `workflow-capabilities-configured`, `workflow-case-binding-sentinel`, `workflow-case-bindings`, `writer-identity-resolvable`. This list changes with the corresponding registrations`.
++The registry has 117 checks (104 native and 13 bridged) and 30 fixes (29 native and 1 bridged).
++
 +Today's registered checks: `account-probe-timer`, `activation-matches-pin`, `active-release-matches-checkout`, `agent-cli-project-trusted`, `agent-type-names-unique`, `agy-hook-wired`, `agy-permissions-configured`, `agy-sub-homes-configured`, `blind-steps-use-proven-pools`, `bwrap-available`, `capability-serves-valid`, `claude-plugin-marketplace`, `cli-version-visible`, `codex-hook-wired`, `config-capability-taste-moved`, `config-comment-migrated-why`, `config-comment-missing-doc`, `config-comment-missing-why`, `config-doc-drift`, `config-empty-provider-accounts`, `config-format-legacy-json`, `config-global-permissions`, `config-key-in-wrong-file`, `config-legacy-shadowed`, `config-migrate-backup-stale`, `config-parse`, `config-redundant-value`, `config-schema`, `config-secret-outside-private`, `config-unknown-key`, `confined-pane-accounts`, `confinement-backend-registry-readable`, `confinement-blind-read`, `confinement-bwrap-platform`, `confinement-herdr-maturity`, `confinement-orphaned-resources-reaped`, `confinement-policies-declared`, `confinement-probe-freshness`, `confinement-strict-readiness`, `credential-copies-retained`, `curl-available`, `delivered-not-on-trunk`, `dispatch-decide-hook-wired`, `domain-registry-compiled`, `event-store-incidents`, `event-store-legacy-layout`, `event-store-machine-id`, `event-store-open-root`, `executor-confinement`, `executor-family-unique`, `executor-profile-warnings`, `executor-skills-installed`, `gateway-token-configured`, `git-component-compatible`, `git-incidents`, `git-operation-journal`, `git-repository-config`, `herdr-executor-kinds`, `identity-machine-id`, `identity-machine-key`, `identity-project-id`, `identity-shared-directory`, `identity-ssh-keygen`, `invocation-git-write-grants`, `land-gates-configured`, `legacy-node-payload-present`, `llm-accounts-default-login-home`, `llm-accounts-shape`, `lock-borrow-vectors`, `lock-holders`, `lock-kernel-semantics`, `mailbox-claude-accept`, `mailbox-hook`, `mailbox-sync-timer`, `main-checkout-hook-wired`, `model-policy-pools`, `node-version-and-git`, `non-claude-trust-stores-readable`, `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `observe-write-health`, `omp-hook-wired`, `omp-natives-present`, `operation-prompt-templates-valid`, `pi-hook-wired`, `project-fgos-launcher`, `provider-capacity-state`, `root-drift`, `run-attempts-stuck`, `run-supervisor-config`, `run-supervisor-route`, `runner-generated-paths`, `runner-patterns-config`, `runtime-socket-dir`, `rust-host-binary-present`, `rust-host-target-supported`, `seat-binding-dry-bind`, `seat-binding-route`, `session-keep-declared`, `session-rotation-orphans`, `supervision-pace`, `supervisor-events-unhandled`, `terminal-allocations`, `terminal-control`, `tier-fallback`, `tool-registry-configured`, `trust-store-readable`, `watcher-timer` (the OS timer that runs the supervision watcher tick; it has a fix), `work-classification-vocabulary`, `work-recorded-conflicts`, `work-step-vocabulary`, `worker-slots-ceiling-usable`, `workflow-capabilities-configured`, `workflow-case-binding-sentinel`, `workflow-case-bindings`, `writer-identity-resolvable`. This list changes with the corresponding registrations`.
  
  Today's registered fixes: `account-probe-timer`, `agy-hook-wired`, `bin-discovery-cache`, `codex-hook-wired`, `config-chmod`, `config-copy-to-destination`, `config-move-capability-taste`, `config-move-under-private`, `config-refresh-docs`, `config-remove-empty-provider-accounts`, `config-remove-redundant`, `confinement-backend-registry-readable`, `confinement-orphaned-resources-reaped`, `credential-copies-retained`, `dispatch-decide-hook-wired`, `event-store-lock-dirs`, `gateway-token-configured`, `git-driver-directories`, `git-publication-refspecs`, `git-wal-dir`, `identity-machine-id`, `identity-machine-key`, `lock-dirs`, `mailbox-sync-timer`, `omp-hook-wired`, `pi-hook-wired`, `project-fgos-launcher`, `runtime-socket-dir`, `watcher-timer`, `workflow-case-bindings`. This list changes with the corresponding registrations.
  
 diff --git a/docs/platform/session-host/spec.md b/docs/platform/session-host/spec.md
-index 7b4d60126..1a4eb80e5 100644
+index 7b4d60126..07faf45b2 100644
 --- a/docs/platform/session-host/spec.md
 +++ b/docs/platform/session-host/spec.md
 @@ -110,6 +110,8 @@ A head is replaced before its context fills. The replacement is two steps, never
  
  Failure before the successor holds the role (start refused, no valid answer within `sessionRotation.answerWaitMs`): `rotation.json` is removed first (a late `session answered` is then refused), then Identity is asked once. If it already names the successor as holder, the rotation is finished and the incident `rotation-completed` says it was finished after the deadline; if Identity cannot answer nothing is ended and the incident says so; only otherwise the successor is ended the same way. After the ended successor's attempt has closed, Identity is asked who holds the role (invariant: after any outcome exactly one live head holds it): if nobody live does, a take that landed late hit the dead successor, and the old head registers the role again through its own supervisor (verb `session restore role`, registered without `take`, so Identity refuses when any live session holds it) with the incident `role-restored`; if that fails too the incident is `no-live-head` and the executor stops. In that last case the old session stays alive and keeps its placement record, one incident line goes to `incidents.jsonl`, and the reason is returned. Nothing is ever killed with SIGKILL: ending a session is its supervisor's normal stop. The next `session start` fronts whichever session Identity says holds the role.
  
-+**An executor that died is resolved on the normal path.** Before `session rotate` takes its normal rotation lock, and before `session answered` records an answer, the pending record's `executor` is judged by the process door (pid and start time, with host/boot/namespace identity). Only `dead` permits recovery; `alive`, `unknown`, and older records without this field are never guessed dead or overwritten. Recovery takes the same lineage lock without waiting and rereads the record. Identity alone then decides: if it names the successor (its head generation, terminal key, or matching recorded answer), placement follows the successor and the predecessor is asked to stop; otherwise the successor is asked to stop and the rotation is abandoned. The predecessor snapshot is saved before launch; the returned successor placement is saved after launch. A crash between launch and that save reads the successor assignment's newest run envelope through the existing assignment-layout reader. Successful resolution removes `rotation.json` and appends one `resolved-orphan` incident with outcome `completed` or `abandoned`; a late answer is then `no-rotation-pending`. An unavailable Identity or an unwritable stop request retains the record for retry and ends nothing on a guessed holder. A new rotate request proceeds only after resolution; an unreclaimed pending record answers `rotation-in-progress`. Doctor's `session-rotation-orphans` is one read-only pointer: it counts proven-dead executors within its 250 ms budget (otherwise omits the count), warns, never fails or repairs, and points to the lineage's next rotate or answer.
++**An executor that died is resolved on the normal path.** Before `session rotate` takes its normal rotation lock, and before `session answered` records an answer, the pending record's `executor` is judged by the process door (pid and start time, with host/boot/namespace identity). Only `dead` permits recovery; `alive`, `unknown`, and older records without this field are never guessed dead or overwritten. Recovery takes the same lineage lock without waiting and rereads the record. Identity alone then decides: if it names the successor (its head generation, terminal key, or matching recorded answer), placement follows the successor and the predecessor is asked to stop; otherwise the successor is asked to stop and the rotation is abandoned. The predecessor snapshot is saved before launch; the returned successor placement is saved after launch. A crash between launch and that save reads the successor assignment's newest run envelope through the existing assignment-layout reader. Successful resolution removes `rotation.json` and appends one `resolved-orphan` incident with outcome `completed` or `abandoned`; a late answer is then `no-rotation-pending`. An unavailable Identity, an unlocated successor or an unwritable stop request retains the record for retry and ends nothing on a guessed holder. A new rotate request proceeds only after resolution; an unreclaimed pending record answers `rotation-in-progress`. Doctor's `session-rotation-orphans` is one read-only pointer: it counts proven-dead executors within its 250 ms budget (otherwise omits the count), warns, never fails or repairs, and points to the lineage's next rotate or answer.
 +
  Authority: Identity alone says who holds the role. The executor owns the replacement and the lineage files. The run supervisor transports and enforces the verbs and moves the role on the one `session answered` verb. `placeHead` starts heads; there is no second launch path.
  
@@ -256,7 +281,7 @@ index 7b4d60126..1a4eb80e5 100644
 +Orphan recovery and refusal of a late answer are owned by `test/session-rotation/rotate.test.mjs`; the read-only pointer and registry wiring by `apps/fgos/src/wiring/doctor/session_host.rs` and `doctor/mod.rs`. Older pending records without executor identity cannot be proven orphaned and are deliberately left alone.
  
 -- **Executor crash after `placeHead`.** If the detached executor dies after it started the successor, `rotation.json` stays, the lock frees itself, and nothing ends or completes the rotation: the successor waits unanswered and the old session keeps the role. No recovery is built; it is tracked as backlog `p-bakpfrvigb`.
-+The automatic Stop path still lacks a passing confined-head live proof. On 2026-11-22 the lead `lead-forgent-261122-0118-heads-b52f9` ended a real turn at about 04:00Z, but its trace retained only the 02:14:02Z hand-call line (`no-measure`). Its generation 2 `supervisor.log` identifies real hook requests at 03:32:17.856Z and 03:57:35.683Z refused `bad-measure` (`fraction must be a number of at least 0, or null`). Source diagnosis: the bounded request decoder (`packages/run-supervisor/rust/src/head_request.rs`, `Bounded::visit_map`) treats serde_json's arbitrary-precision decimal number token as an ordinary map. The host enables that feature through Config and Distribution; a decimal such as `0.33` therefore arrives as `{"$serde_json::private::Number":"0.33"}`, not a number, and the rotation boundary correctly refuses it. Integer/null hand calls do not exercise this case. The bounded decoder now reconstructs a `serde_json::Number` from that scalar representation, counting it as one value at its original depth and rejecting extra entries; numeric validation at the rotation boundary stays unchanged. Its owning regression in `packages/run-supervisor/rust/tests/head_request.rs` checks raw route input for decimal, exponent and large-integer numbers (not private maps), and the existing bounds proof now checks integer and decimal values exactly at and beyond the value/depth limits. Run that suite with `--features serde_json/arbitrary_precision` as well as its default features, since the standalone crate does not enable the host's feature unification. The native hook also still reports failures before `requestRotation` only on stderr; fixing that boundary requires its Rust wiring and a host-writable incident route. See 8.8.
++The automatic Stop path still lacks a passing confined-head live proof. On 2026-11-22 the lead `lead-forgent-261122-0118-heads-b52f9` ended a real turn at about 04:00Z, but its trace retained only the 02:14:02Z hand-call line (`no-measure`). Its generation 2 `supervisor.log` identifies real hook requests at 03:32:17.856Z and 03:57:35.683Z refused `bad-measure` (`fraction must be a number of at least 0, or null`). Source diagnosis: the bounded request decoder (`packages/run-supervisor/rust/src/head_request.rs`, `Bounded::visit_map`) treats serde_json's arbitrary-precision decimal number token as an ordinary map. The host enables that feature through Config and Distribution; a decimal such as `0.33` therefore arrives as `{"$serde_json::private::Number":"0.33"}`, not a number, and the rotation boundary correctly refuses it. Integer/null hand calls do not exercise this case. The bounded decoder now reconstructs a `serde_json::Number` from that scalar representation, counting it as one value at its original depth and rejecting extra entries; numeric validation at the rotation boundary stays unchanged. Its owning regression in `packages/run-supervisor/rust/tests/head_request.rs` checks raw route input for decimal, exponent and large-integer numbers (not private maps), and the existing bounds proof now checks integer and decimal values exactly at and beyond the value/depth limits. Run that suite with `--features serde_json/arbitrary_precision` as well as its default features, since the standalone crate does not enable the host's feature unification. The native hook now also attempts one best-effort `stop-failed` incident for a failure after locating the lineage, preserving its error code and detail bounded to 300 characters. Its owning unit proof checks the exact line count, shape and Unicode bound. A confined head's lineage is read-only, so this local write can fail; durable reporting of a failure that never reaches the host still needs a host-writable route. See 8.8.
  
  ### 8.6 Configuration and the `/clear` fallback
  
@@ -265,7 +290,7 @@ index 7b4d60126..1a4eb80e5 100644
  
  - **Stop, successor.** When the lineage's `rotation.json` waits for `FGOS_HEAD_GEN` and no answer is recorded, the stop sends `session answered` (rotation id read from its own handoff, its Identity session id, its first assistant message) over `FGOS_HEAD_REQUEST_SOCKET` and does not measure. No message yet or a refusal: nothing is recorded and the next stop tries again.
 -- **Stop, any head.** Measure (`rotation/measure.rs`: a status-line sidecar record newer than the hook, else the transcript marked one turn stale), decide (`rotation/decide.rs`, thresholds of the persona), and send `session rotate` at every stop: on soft or hard with the stop facts, otherwise with reason `none` (the host rotates nothing and answers `below-threshold`). The request carries `measure` (fraction, source, stale, decision) and the host appends one line with the request outcome to `<lineage>/stop-trace.jsonl` (the hook runs in the head's sandbox, where the lineage folder is read-only, so only the host can write it). A failure before the request reaches the host (no `.fgos`, a bad config, no socket, a refused request) is stderr only: a known gap. Without a request socket nothing is asked. No lineage state defines a pending owner question yet, so none is reported.
-+- **Stop, any head.** Measure (`rotation/measure.rs`: a status-line sidecar record newer than the hook, else the transcript marked one turn stale), decide (`rotation/decide.rs`, thresholds of the persona), and send `session rotate` at every stop: on soft or hard with the stop facts, otherwise with reason `none` (the host rotates nothing and answers `below-threshold`). The request carries `measure` (fraction, source, stale, decision) and the host appends one line with the request outcome to `<lineage>/stop-trace.jsonl` (the hook runs in the head's sandbox, where the lineage folder is read-only, so only the host can write it). A failure before the request reaches `requestRotation` (no `.fgos`, a bad config, no socket, a supervisor refusal) is stderr only: a known gap. Once a measured Stop reaches `requestRotation` with a valid lineage, a validation or start exception appends a best-effort `stop-failed` incident (code and bounded detail) through the existing incident writer before propagating; this does not repair the pre-request gap. Without a request socket nothing is asked. No lineage state defines a pending owner question yet, so none is reported.
++- **Stop, any head.** Measure (`rotation/measure.rs`: a status-line sidecar record newer than the hook, else the transcript marked one turn stale), decide (`rotation/decide.rs`, thresholds of the persona), and send `session rotate` at every stop: on soft or hard with the stop facts, otherwise with reason `none` (the host rotates nothing and answers `below-threshold`). The request carries `measure` (fraction, source, stale, decision) and the host appends one line with the request outcome to `<lineage>/stop-trace.jsonl` (the hook runs in the head's sandbox, where the lineage folder is read-only, so only the host can write it). A failure after the hook locates its lineage attempts one best-effort `stop-failed` incident (`at`, `event`, `code`, `detail` bounded to 300 characters) and still reports stderr. A missing `.fgos` has no lineage to write to, and the confined head's read-only lineage can prevent this local incident write. Once a measured Stop reaches `requestRotation` with a valid lineage, a validation or start exception appends a best-effort `stop-failed` incident through the existing host incident writer before propagating; reliable reporting of a failure that cannot reach the host remains a gap. Without a request socket nothing is asked. No lineage state defines a pending owner question yet, so none is reported.
  - **Session start.** Prints the latest handoff of the lineage (inline under 10000 characters, else a pointer and the pending question verbatim).
  - **What a handoff records.** `- rotation:` in the handoff, `rotate` in `latest.json` and `reason` in `rotation.json` are the real kind: `soft`, `hard` or `manual`. A hard or manual handoff carries the old session's last assistant message and the pending question verbatim (a head batches its open questions in that last message; no structured pending-question source exists yet). The portfolio is the stop facts' list, else `sessionRotation.personas.<persona>.reload` (files or folders, listed as written; an entry the project does not have is left out quietly); the release standard lists the secretary's backlog and discussions folder, so the secretary rereads them after any rotation.
  - **A manual rotation's last message.** No Stop hook carries it, so the executor reads it: the session folder the old launch kept or declared (`seatSessionDir`), then the route `fgos internal session-host last-message` (`rotation/last_message.rs`: the newest `<session-id>.jsonl` one level under the folder, read backwards from its end, at most 8 MiB; its last non-sidechain assistant message with text). The turn has ended only when the last user or assistant entry is an assistant `end_turn`; the executor reads again until then (at most 60 s), so the message written after the request is the one handed over. The handoff fences the message (a fence its backticks cannot close, so a heading quoted in it is never read as the pending question) and keeps its last 8000 characters behind `…(earlier text cut)`. A Codex head's rollout transcript is not read: no fixture proves its assistant record, so the section names it as not found. A folder or transcript that cannot be found leaves `(not found: <why>)` in that section and the rotation goes on. Proofs: `test/session-rotation/rotate.test.mjs`, the crate's `last_message` tests, and the route wiring in `test/session-host/client.test.mjs`.
@@ -412,7 +437,7 @@ index 388fd0a10..1a33203a8 100644
      let big = json!({"type": "REQUEST", "id": "r1", "verb": "session start",
          "args": {"persona": "p".repeat(MAX_FRAME_BYTES), "name": "x"}});
 diff --git a/packages/session-host/contracts/rotation-files.v1.json b/packages/session-host/contracts/rotation-files.v1.json
-index 33bbd67bd..94c0693d9 100644
+index 33bbd67bd..684e7d2f6 100644
 --- a/packages/session-host/contracts/rotation-files.v1.json
 +++ b/packages/session-host/contracts/rotation-files.v1.json
 @@ -12,12 +12,23 @@
@@ -432,17 +457,17 @@ index 33bbd67bd..94c0693d9 100644
        "writer": "the host, when it handles the `session rotate` request every stop sends (requestRotation, src/session-rotation/rotate.mjs); the hook itself runs inside the head's sandbox, where the lineage folder is read-only",
        "shape": { "at": "ISO-8601 UTC", "fraction": "number or null (nothing measured)", "source": "sidecar | transcript | null", "stale": "boolean", "decision": "the decide reason, e.g. below-soft, at-or-above-soft, background-work-running, no-measure", "reason": "none | soft | hard", "outcome": "below-threshold | started | rotation-in-progress | spawn-failed" },
 -      "readerRule": "for the owner; one line per stop that reached the host, newest 500 kept once the file passes 256 KiB. A hook failure before the request (no .fgos, bad config, no socket, a refused request) reaches stderr only and leaves no line: a known gap"
-+      "readerRule": "for the owner; one line per stop that reached the host, newest 500 kept once the file passes 256 KiB. A hook failure before requestRotation (no .fgos, bad config, no socket, a supervisor refusal) reaches stderr only and leaves no line: a known gap. A measured request rejected by requestRotation validation or start leaves a stop-failed incident when its lineage is valid"
++      "readerRule": "for the owner; one line per stop that reached the host, newest 500 kept once the file passes 256 KiB. A hook failure before requestRotation leaves no trace line; after locating its lineage the native hook attempts a best-effort stop-failed incident and reports stderr, but the confined head's read-only lineage may prevent that local write. A measured request rejected by requestRotation validation or start leaves a stop-failed incident when its lineage is valid"
 +    },
 +    "incidents.jsonl": {
-+      "writer": "rotation executor and host requestRotation, best effort",
-+      "shape": "one JSON object per line with at and event; resolved-orphan has role, id, outcome (completed | abandoned); stop-failed has code and bounded detail when a measured Stop's validation or host-side start throws",
-+      "readerRule": "host-side failures are recorded here; failures before a Stop reaches requestRotation still need the native hook's host-side failure reporting path"
++      "writer": "rotation executor, host requestRotation and native Stop hook, best effort",
++      "shape": "one JSON object per line with at and event; resolved-orphan has role, id, outcome (completed | abandoned); stop-failed has code and detail bounded to 300 characters when a measured Stop's validation or host-side start throws, or the native Stop fails after locating its lineage",
++      "readerRule": "host-side failures are recorded here; the native hook's local best-effort write may fail in a read-only confined lineage, so reliable pre-request reporting still needs a host-writable path"
      },
      "context-sidecar.jsonl": {
        "writer": "a status-line wrapper, optional; none ships with fgOS",
 diff --git a/src/session-rotation/rotate.mjs b/src/session-rotation/rotate.mjs
-index 16119e2ce..03c139a39 100644
+index 16119e2ce..23980566b 100644
 --- a/src/session-rotation/rotate.mjs
 +++ b/src/session-rotation/rotate.mjs
 @@ -22,6 +22,8 @@ import fs from 'node:fs';
@@ -470,7 +495,7 @@ index 16119e2ce..03c139a39 100644
    const pending = readJson(path.join(dir, 'rotation.json'));
    if (!pending || pending.successorKey !== key) fail('no-rotation-pending', `${headRoleOf(persona, name)} has no rotation waiting for ${key}`);
    if (rotationId !== pending.id) fail('answer-mismatch', 'rotationId is not the id of the pending rotation');
-@@ -249,6 +253,56 @@ const reloadOf = (config, persona) => (config.personas?.[persona]?.reload ?? [])
+@@ -249,6 +253,57 @@ const reloadOf = (config, persona) => (config.personas?.[persona]?.reload ?? [])
  /** The portfolio entries that exist in the project; a path the project does not have is left out quietly. */
  const existingIn = (projectRoot, portfolio) => portfolio.filter((p) => !path.isAbsolute(p) && fs.existsSync(path.join(projectRoot, p)));
  
@@ -510,11 +535,12 @@ index 16119e2ce..03c139a39 100644
 +    );
 +    const end = ports.end ?? ((runDir) => requestCancel(runDir, 'session-rotation'));
 +    const old = pending.old ?? readHeadPlacement(dir);
++    if (!successor?.runDir || !successor.placement?.key) fail('placement-unknown', 'the orphan rotation has no recorded successor placement');
 +    if (holds) {
-+      if (!successor || !old?.runDir) fail('placement-unknown', 'the orphan rotation has no recorded head placement');
++      if (!old?.runDir) fail('placement-unknown', 'the orphan rotation has no recorded head placement');
 +      (ports.recordPlacement ?? writeHeadPlacement)(dir, { role, gen: pending.gen, placement: successor.placement, runDir: successor.runDir, persona: successor.persona, startedAt: pending.startedAt });
 +      if (!end(old.runDir)) fail('cancel-unwritable', 'the orphan rotation could not request the old head to stop');
-+    } else if (successor && !end(successor.runDir)) {
++    } else if (!end(successor.runDir)) {
 +      fail('cancel-unwritable', 'the orphan rotation could not request the successor to stop');
 +    }
 +    fs.rmSync(file, { force: true });
@@ -527,7 +553,7 @@ index 16119e2ce..03c139a39 100644
  // ---- the executor ----------------------------------------------------------------------------------
  
  /**
-@@ -259,7 +313,8 @@ const existingIn = (projectRoot, portfolio) => portfolio.filter((p) => !path.isA
+@@ -259,7 +314,8 @@ const existingIn = (projectRoot, portfolio) => portfolio.filter((p) => !path.isA
   *
   * `ports` (all optional, for tests): `end(runDir) -> boolean` (asks that session attempt's supervisor to stop it),
   * `identity({ role, projectRoot }) -> { live, session, record }`, `lock(lineage) -> { release } | null`, `place` (`placeHead`),
@@ -537,7 +563,7 @@ index 16119e2ce..03c139a39 100644
   * `sessionDir(runDir, launchCommandId)` (`seatSessionDir`), `lastMessage({ projectsDir })` (the session-host route's
   * `last-message`) and `finalTurnWaitMs`. The handoff and `latest.json` record `reason` as the rotation kind, and a
   * handoff without a stop-fact portfolio lists the persona's `sessionRotation.personas.<persona>.reload`; an entry
-@@ -269,8 +324,13 @@ export async function rotateHeadSession(request, ports = {}) {
+@@ -269,8 +325,13 @@ export async function rotateHeadSession(request, ports = {}) {
    const { persona, name, reason, projectRoot, stopFacts } = checkRequest(request);
    const role = headRoleOf(persona, name);
    const dir = lineageDirOf(projectRoot, persona, name);
@@ -551,7 +577,7 @@ index 16119e2ce..03c139a39 100644
    const end = ports.end ?? ((runDir) => requestCancel(runDir, 'session-rotation'));
    const recordPlacement = ports.recordPlacement ?? writeHeadPlacement;
    const clock = ports.clock ?? realClock;
-@@ -365,10 +425,12 @@ export async function rotateHeadSession(request, ports = {}) {
+@@ -365,10 +426,12 @@ export async function rotateHeadSession(request, ports = {}) {
      writeJson(dir, 'rotation.json', {
        id, successorKey, gen, reason, handoff: handoff.file, oldKey: old.placement.key, oldSession: holder.session ?? null,
        pendingQuestion: stopFacts.pendingQuestion ?? null, startedAt: new Date(clock.now()).toISOString(),
@@ -564,7 +590,7 @@ index 16119e2ce..03c139a39 100644
      } catch (err) {
        return await abandon(err.code ?? 'start-refused', String(err.message ?? err));
      }
-@@ -403,9 +465,24 @@ export async function rotateHeadSession(request, ports = {}) {
+@@ -403,9 +466,24 @@ export async function rotateHeadSession(request, ports = {}) {
   * Returns `{ started: true, pid }`, or `{ started: false, reason }` for `rotation-in-progress` or `spawn-failed`.
   */
  export function requestRotation(request, ports = {}) {
@@ -593,7 +619,7 @@ index 16119e2ce..03c139a39 100644
      const { fraction, source, stale, decision } = checked.measure;
      recordStopTrace(dir, { fraction, source, stale, decision, reason: checked.reason, outcome: outcome.started ? 'started' : outcome.reason });
 diff --git a/test/session-rotation/rotate.test.mjs b/test/session-rotation/rotate.test.mjs
-index 3e37041f5..661f5a237 100644
+index 3e37041f5..35ecf3e46 100644
 --- a/test/session-rotation/rotate.test.mjs
 +++ b/test/session-rotation/rotate.test.mjs
 @@ -89,7 +89,16 @@ test('the old session is ended only after the successor answered and Identity na
@@ -614,7 +640,7 @@ index 3e37041f5..661f5a237 100644
    });
    const result = await rotateHeadSession({ ...request, reason: 'hard' }, ports);
    assert.deepEqual(result, { rotated: true, key: 'cmd_new', gen: 2, oldEnded: true });
-@@ -402,6 +411,111 @@ test('every stop request leaves one trace line with its measure and outcome; bel
+@@ -402,6 +411,115 @@ test('every stop request leaves one trace line with its measure and outcome; bel
    ]);
  });
  
@@ -703,6 +729,10 @@ index 3e37041f5..661f5a237 100644
 +  await assert.rejects(rotateHeadSession(request, ports), { code: 'cancel-unwritable' });
 +  assert.ok(pendingOf(root));
 +  assert.equal(fs.existsSync(path.join(dir, 'incidents.jsonl')), false);
++  orphan(root, dir, { savedSuccessor: false });
++  ports.end = () => assert.fail('an unknown successor must not be guessed ended');
++  await assert.rejects(rotateHeadSession(request, ports), { code: 'placement-unknown' });
++  assert.ok(pendingOf(root), 'an unlocated successor stays pending for recovery');
 +});
 +
 +test('a Stop rejected for a malformed measure leaves an incident without accepting the malformed number', (t) => {

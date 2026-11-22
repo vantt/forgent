@@ -62,10 +62,10 @@ index 62a610ce1..7fa930445 100644
  | `fgos config set` or `patch` of a key no section schema describes | `config-key-unknown` for each such key, listing the nearest keys (`did-you-mean=`), together with the reason refusal when the reason is also unusable; `unset` of such a key is allowed, and migration and repair keep unknown keys of an older file |
  | Addon missing on the channel | the door's named error; no JavaScript fallback |
 diff --git a/packages/config/contracts/fixtures/scope.v1.json b/packages/config/contracts/fixtures/scope.v1.json
-index e9450f33e..d1dcd0b65 100644
+index e9450f33e..7f6839d2d 100644
 --- a/packages/config/contracts/fixtures/scope.v1.json
 +++ b/packages/config/contracts/fixtures/scope.v1.json
-@@ -1894,5 +1894,35 @@
+@@ -1894,5 +1894,58 @@
      "global": []
     }
    }
@@ -74,7 +74,8 @@ index e9450f33e..d1dcd0b65 100644
 +  {
 +   "id": "scope-patch-project-only-project-key-passes",
 +   "why": "project key passes",
-+   "path": "runner.executor",
++   "path": "dispatch.cancelWaitMs",
++   "value": 23456,
 +   "global": false,
 +   "expect": null
 +  },
@@ -82,6 +83,7 @@ index e9450f33e..d1dcd0b65 100644
 +   "id": "scope-patch-project-only-global-only-key-refused",
 +   "why": "global-only key refused",
 +   "path": "gateway.port",
++   "value": 18088,
 +   "global": false,
 +   "expect": "patch-project-only"
 +  },
@@ -89,15 +91,36 @@ index e9450f33e..d1dcd0b65 100644
 +   "id": "scope-patch-project-only-accounts-key-refused",
 +   "why": "accounts key refused",
 +   "path": "runner.llmAccounts",
++   "value": {},
 +   "global": false,
 +   "expect": "patch-project-only"
 +  },
 +  {
 +   "id": "scope-patch-project-only-with-global-refused",
 +   "why": "--project-only with --global refused",
-+   "path": "runner.executor",
++   "path": "dispatch.cancelWaitMs",
++   "value": 23456,
 +   "global": true,
 +   "expect": "patch-project-only"
++  },
++  {
++   "id": "scope-patch-project-only-bracket-quoted-global-key-refused",
++   "why": "bracket-quoted paths use the same target resolution",
++   "path": "[\"gateway\"][\"port\"]",
++   "value": 18088,
++   "global": false,
++   "expect": "patch-project-only"
++  },
++  {
++   "id": "scope-patch-project-only-mixed-targets-write-nothing",
++   "why": "a later non-project edit refuses the entire patch before the first edit writes",
++   "edits": [
++    {"set": "dispatch.cancelWaitMs", "value": 23456},
++    {"set": "runner.llmAccounts", "value": {}}
++   ],
++   "global": false,
++   "expect": "patch-project-only",
++   "withoutFlag": "patch-spans-files"
 +  }
   ]
  }
@@ -153,49 +176,134 @@ index 9fcacc2a8..d9239a31b 100644
                  return Err(refuse(
                      "patch-spans-files",
 diff --git a/packages/config/rust/tests/golden_scope.rs b/packages/config/rust/tests/golden_scope.rs
-index 0756515ab..e872537bf 100644
+index 0756515ab..d29f2a8e1 100644
 --- a/packages/config/rust/tests/golden_scope.rs
 +++ b/packages/config/rust/tests/golden_scope.rs
-@@ -74,3 +74,42 @@ fn a_refusal_names_the_global_role_and_never_a_value() {
+@@ -74,3 +74,112 @@ fn a_refusal_names_the_global_role_and_never_a_value() {
          "{shown}"
      );
  }
 +
++// The provider is an optional edge: replay this proof with --features host-provider, as the
++// CLI builds it. Existing scope_cases proves placement, not the provider's pre-write guard.
++#[cfg(all(unix, feature = "host-provider"))]
 +#[test]
-+fn patch_project_only_proof() {
-+    let fixture = common::fixture("scope.v1.json");
-+    let schema_files = files(&fixture["cases"][0]["input"]["schemas"], true);
-+    let schemas = Schemas::parse(&refs(&schema_files)).unwrap();
-+    let rows = fixture["patch-project-only"]
-+        .as_array()
-+        .expect("patch-project-only array in scope.v1.json");
-+    assert_eq!(rows.len(), 4);
-+    for row in rows {
-+        let id = row["id"].as_str().unwrap();
-+        let why = row["why"].as_str().unwrap();
-+        let path_text = row["path"].as_str().unwrap();
-+        let global = row["global"].as_bool().unwrap();
-+        let want = row["expect"].as_str();
++fn project_only_patch_checks_real_targets_before_writing() {
++    use fgos_config::provider::{answer, ConfigRequest, Verb};
++    use std::{fs, process::Command};
 +
-+        let path = fgos_yaml_doc::path::parse_path(path_text).unwrap();
-+        let got = if global {
-+            Some("patch-project-only")
-+        } else {
-+            let target = match schemas.resolve(&path) {
-+                Some(node) => match (node.file, node.scope) {
-+                    ("accounts", _) => SourceKind::Accounts,
-+                    (_, "global-only") => SourceKind::Global,
-+                    _ => SourceKind::Project,
++    const CHILD: &str = "FGOS_SCOPE_PATCH_CASE";
++    if let Ok(row) = std::env::var(CHILD) {
++        let row: Value = serde_json::from_str(&row).unwrap();
++        let dir = std::env::current_dir().unwrap();
++        let root = dir.join("project");
++        let files = [
++            root.join(".fgos/config.yaml"),
++            dir.join("home/.fgos/config.yaml"),
++            dir.join("home/.fgos/private/accounts.yaml"),
++        ];
++        let original = b"# @fgos:v1\n# Keep this note byte-identical on refusal.\n";
++        for file in &files {
++            fs::create_dir_all(file.parent().unwrap()).unwrap();
++            fs::write(file, original).unwrap();
++            use std::os::unix::fs::PermissionsExt;
++            fs::set_permissions(file, fs::Permissions::from_mode(0o600)).unwrap();
++        }
++        let edits = row
++            .get("edits")
++            .cloned()
++            .unwrap_or_else(|| json!([{"set": row["path"], "value": row["value"]}]));
++        let patch = dir.join("patch.json");
++        fs::write(&patch, serde_json::to_vec(&edits).unwrap()).unwrap();
++        for project_only in [true, false] {
++            let got = answer(&ConfigRequest {
++                root: root.clone(),
++                verb: Verb::Patch {
++                    file: patch.clone(),
++                    reason: "exercise project-only patch scope".into(),
++                    global: row["global"].as_bool().unwrap(),
++                    project_only,
 +                },
-+                None => SourceKind::Project,
-+            };
-+            if target != SourceKind::Project {
-+                Some("patch-project-only")
++            });
++            let want = if project_only {
++                row["expect"].as_str()
 +            } else {
-+                None
++                row["withoutFlag"].as_str()
++            };
++            assert_eq!(got.as_ref().err().map(|r| r.reason), want, "{row}: {got:?}");
++            if want.is_some() {
++                for file in &files {
++                    assert_eq!(
++                        fs::read(file).unwrap(),
++                        original,
++                        "{} changed",
++                        file.display()
++                    );
++                }
++            } else {
++                let done = got.unwrap();
++                assert_eq!(done.exit, 0);
++                let target = done.data["target"].as_str().unwrap();
++                let index = match target {
++                    ".fgos/config.yaml" => 0,
++                    "~/.fgos/config.yaml" => 1,
++                    "~/.fgos/private/accounts.yaml" => 2,
++                    _ => panic!("unexpected target {target}"),
++                };
++                assert!(!done.data["applied"].as_array().unwrap().is_empty());
++                assert_ne!(fs::read(&files[index]).unwrap(), original);
++                for (i, file) in files.iter().enumerate() {
++                    if i != index {
++                        assert_eq!(fs::read(file).unwrap(), original);
++                    }
++                }
 +            }
-+        };
++            for file in &files {
++                fs::write(file, original).unwrap();
++            }
++        }
++        return;
++    }
 +
-+        assert_eq!(got, want, "{id}: {why}");
++    let fixture = common::fixture("scope.v1.json");
++    for row in fixture["patch-project-only"].as_array().unwrap() {
++        let dir = common::temp("patch-scope", row["id"].as_str().unwrap());
++        fs::create_dir_all(dir.join("home")).unwrap();
++        // Isolate HOME and confinement in a child instead of racing the test process's env.
++        let output = Command::new(std::env::current_exe().unwrap())
++            .args([
++                "--exact",
++                "project_only_patch_checks_real_targets_before_writing",
++                "--nocapture",
++            ])
++            .current_dir(&dir)
++            .env(CHILD, row.to_string())
++            .env("HOME", dir.join("home"))
++            .env("FGOS_STATE_ROOT", dir.join("state"))
++            .env_remove("FGOS_CONFINED")
++            .output()
++            .unwrap();
++        assert!(
++            output.status.success(),
++            "{}\n{}\n{}",
++            row["id"],
++            String::from_utf8_lossy(&output.stdout),
++            String::from_utf8_lossy(&output.stderr)
++        );
 +    }
 +}
+diff --git a/packages/host-runtime/contracts/command-manifest.json b/packages/host-runtime/contracts/command-manifest.json
+index 6d28a3f72..17ff0042a 100644
+--- a/packages/host-runtime/contracts/command-manifest.json
++++ b/packages/host-runtime/contracts/command-manifest.json
+@@ -2746,6 +2746,10 @@
+               "global": {
+                 "type": "boolean",
+                 "description": "Write the global file for keys that may live in either file."
++              },
++              "project-only": {
++                "type": "boolean",
++                "description": "Refuse before any write unless every edit targets the project config file; incompatible with --global."
+               }
+             },
+             "positional": [
