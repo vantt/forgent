@@ -70,7 +70,7 @@ const GRANTS = Object.freeze({
   // `session write` replaces its read-only backlog file. It goes on site (`session read`, `session type` into a stuck
   // session), tunes the watcher, prunes settled evidence, and reaches sessions by mailbox and peers.
   supervisor: Object.freeze({
-    ...frozen(['plans', 'plans/backlog/*'], ['session start', 'session stop', 'session write', ...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS, ...PORTFOLIO_READ_VERBS, 'supervisor handled', 'supervisor done', 'session read', 'session type', 'watcher tune', ...COORDINATION_VERBS, 'metrics prune']),
+    ...frozen(['plans', 'plans/backlog/*'], ['session start', 'session stop', 'session write', ...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS, ...PORTFOLIO_READ_VERBS, 'supervisor handled', 'supervisor done', 'session read', 'session type', 'watcher tune', ...COORDINATION_VERBS, 'metrics prune', 'config patch']),
     mailbox: true,
     peers: true,
   }),

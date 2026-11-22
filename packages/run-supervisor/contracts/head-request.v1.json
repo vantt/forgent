@@ -297,6 +297,16 @@
       "data": "the host verb's JSON data ({ok, outcome, id, ...})",
       "identity": "held",
       "rule": "refusals (verb-failed detail): bad-args, and the host verb's own code (e.g. friction-invalid-input)"
+    },
+    "config patch": {
+      "args": {
+        "file": "string, required: the patch file (YAML or JSON list of edits)",
+        "reason": "string, optional: why the values change"
+      },
+      "does": "the route child runs `fgos config patch <file> --project-only --json` (envelope hostBin) outside the sandbox through hostCall. Granted to the supervisor only. A relative patch-file path is read from the project root. The host's own validation stays the authority; the host's --project-only flag ensures every edit targets the project config file",
+      "data": "the host verb's JSON data",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): bad-args, and the host verb's own code (e.g. patch-project-only, config-comment-reason-required, config-unknown-key)"
     }
   },
   "questionsRoute": {

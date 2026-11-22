@@ -681,6 +681,24 @@ function frictionRecordVerb({ args, envelope, projectRoot, ports }) {
   return hostCall({ envelope, projectRoot, argv }, ports);
 }
 
+export const HEAD_CONFIG_PATCH_VERB = 'config patch';
+
+function configPatchVerb({ args, envelope, projectRoot, ports }) {
+  exactKeys(args, ['file', 'reason']);
+  if (typeof args.file !== 'string' || args.file === '') throw badArgs('file must be a non-empty string');
+  if (Buffer.byteLength(args.file) > TYPE_TEXT_MAX) throw badArgs(`file must be at most ${TYPE_TEXT_MAX} bytes`);
+  noDash('file', args.file);
+  if (args.reason !== undefined) {
+    if (typeof args.reason !== 'string' || args.reason === '') throw badArgs('reason must be a non-empty string');
+    if (Buffer.byteLength(args.reason) > TYPE_TEXT_MAX) throw badArgs(`reason must be at most ${TYPE_TEXT_MAX} bytes`);
+    noDash('reason', args.reason);
+  }
+  const argv = ['config', 'patch', args.file, '--project-only'];
+  if (args.reason !== undefined) argv.push('--reason', args.reason);
+  argv.push('--json');
+  return hostCall({ envelope, projectRoot, argv }, ports);
+}
+
 /** The detached stop of the caller's own session: waits until the route that started it has exited, so the reply is out first. */
 export async function runStopSelf({ persona, name, projectRoot, waitPid }, ports = {}) {
   const sleep = ports.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
@@ -794,6 +812,9 @@ export async function runHeadRequest({ runDir, request, requestHostBin }, ports 
         break;
       case HEAD_FRICTION_RECORD_VERB:
         data = frictionRecordVerb({ args, envelope, projectRoot, ports });
+        break;
+      case HEAD_CONFIG_PATCH_VERB:
+        data = configPatchVerb({ args, envelope, projectRoot, ports });
         break;
       case HEAD_SUPERVISOR_QUEUE_VERB:
       case HEAD_SUPERVISOR_PLANS_VERB:

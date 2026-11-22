@@ -19,7 +19,7 @@ const EXPECTED = {
   },
   supervisor: {
     writes: ['plans', 'plans/backlog/*'],
-    verbs: ['session start', 'session stop', 'session write', ...HEAD, ...QUESTIONS, ...LAND, ...PORTFOLIO_READ, 'supervisor handled', 'supervisor done', 'session read', 'session type', 'watcher tune', ...COORDINATION, 'metrics prune'],
+    verbs: ['session start', 'session stop', 'session write', ...HEAD, ...QUESTIONS, ...LAND, ...PORTFOLIO_READ, 'supervisor handled', 'supervisor done', 'session read', 'session type', 'watcher tune', ...COORDINATION, 'metrics prune', 'config patch'],
     mailbox: true,
     peers: true,
   },
@@ -36,11 +36,19 @@ for (const [persona, expected] of Object.entries(EXPECTED)) {
   });
 }
 
-test('Miu never holds the supervisor-only verbs: handled, session type, session read, watcher tune (nor done or prune)', () => {
+test('Miu never holds the supervisor-only verbs: handled, session type, session read, watcher tune (nor done, prune or config patch)', () => {
   const { verbs } = grantOf('head:secretary-miu', 'secretary');
-  for (const verb of ['supervisor handled', 'supervisor done', 'session type', 'session read', 'watcher tune', 'metrics prune']) {
+  for (const verb of ['supervisor handled', 'supervisor done', 'session type', 'session read', 'watcher tune', 'metrics prune', 'config patch']) {
     assert.ok(!verbs.includes(verb), `${verb} is the supervisor's, not Miu's`);
   }
+});
+
+test('only the supervisor holds config patch', () => {
+  assert.ok(grantOf('head:supervisor-x', 'supervisor').verbs.includes('config patch'));
+  assert.ok(!grantOf('head:secretary-x', 'secretary').verbs.includes('config patch'));
+  assert.ok(!grantOf('head:shaper-x', 'shaper').verbs.includes('config patch'));
+  assert.ok(!grantOf('head:planner-x', 'planner').verbs.includes('config patch'));
+  assert.ok(!grantOf('head:lead-x', 'lead', { planDir: '261122-0118-test' }).verbs.includes('config patch'));
 });
 
 test('the supervisor never answers an owner question', () => {

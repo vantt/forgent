@@ -512,7 +512,7 @@ fn detail_from_stdin<R: std::io::Read>(reader: &mut R) -> Result<String, String>
 /// The call as the head request contract reads it, or why the call cannot be one. `None`: the call is not of a
 /// verb the contract names, so it takes the route its selector has. This is the one confined rule of the host
 /// (PS-20): a confined caller reaches `land`, `worktree create`, `request result`, `session stop`,
-/// `supervisor handled|raise|done`, `watcher tune`, `session read|type`, `friction record` and `metrics record|prune` only through its
+/// `supervisor handled|raise|done`, `watcher tune`, `session read|type`, `friction record`, `config patch` and `metrics record|prune` only through its
 /// supervisor's request socket. `run` goes there only from a head with a grant (`head_socket`: it has a request
 /// socket, as for `metrics record|prune`); a confined worker without one takes the native `run` verb, which refuses its writing run before admission
 /// and lets a read-only one go on, as the Node arm did. The marker is the caller's to check; this reads the words and
@@ -554,6 +554,7 @@ pub(crate) fn confined_head_call_with_reader<R: std::io::Read>(
         ("metrics", Some("record")) if head_socket => "metrics record",
         ("metrics", Some("prune")) if head_socket => "metrics prune",
         ("friction", Some("record")) if head_socket => "friction record",
+        ("config", Some("patch")) if head_socket => "config patch",
         ("supervisor", Some("raise")) => "supervisor raise",
         ("supervisor", Some("handled")) => "supervisor handled",
         ("supervisor", Some("done")) => "supervisor done",
@@ -761,6 +762,21 @@ pub(crate) fn confined_head_call_with_reader<R: std::io::Read>(
                     let detail = detail_from_stdin(stdin)?;
                     args.insert("detail".to_owned(), json!(detail));
                 }
+            }
+            "config patch" => {
+                if let Some(flag) = ["global", "project-only"]
+                    .iter()
+                    .find(|f| call.flags().flag(f).is_some())
+                {
+                    return Err(format!(
+                        "bad-args: --{flag} is the host's to set, not a confined caller's"
+                    ));
+                }
+                let [file] = words.as_slice() else {
+                    return Err("bad-args: config patch takes one file".to_owned());
+                };
+                args.insert("file".to_owned(), json!(file));
+                text(&mut args, "reason", "reason")?;
             }
             "supervisor handled" => {
                 if words.is_empty() {
@@ -1410,6 +1426,37 @@ mod confined_tests {
             })
         );
         assert!(confined(&["friction", "record", "extra"]).unwrap().is_err());
+        assert_eq!(
+            built(&["config", "patch", "patch.yaml"]).args,
+            json!({"file": "patch.yaml"})
+        );
+        assert_eq!(
+            built(&["config", "patch", "patch.yaml", "--reason", "tune watcher"]).args,
+            json!({"file": "patch.yaml", "reason": "tune watcher"})
+        );
+        assert!(confined(&["config", "patch"]).unwrap().is_err());
+        assert!(confined(&["config", "patch", "a.yaml", "b.yaml"])
+            .unwrap()
+            .is_err());
+        assert!(confined(&["config", "patch", "patch.yaml", "--global"])
+            .unwrap()
+            .is_err());
+        assert!(
+            confined(&["config", "patch", "patch.yaml", "--project-only"])
+                .unwrap()
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn a_confined_caller_cannot_choose_the_scope_of_config_patch() {
+        for flag in ["--global", "--project-only"] {
+            let refused = confined(&["config", "patch", "patch.yaml", flag])
+                .unwrap()
+                .unwrap_err();
+            assert!(refused.starts_with("bad-args"), "{refused}");
+            assert!(refused.contains(flag), "expected {refused} to name {flag}");
+        }
     }
 
     #[test]
@@ -1485,6 +1532,8 @@ mod confined_tests {
         assert!(confined(&["session", "start", "lead"]).is_none());
         assert!(confined(&["questions", "ask"]).is_none());
         assert!(confined(&["supervisor", "tick"]).is_none());
+        assert!(confined(&["config", "show"]).is_none());
+        assert!(confined(&["config", "set", "a", "b"]).is_none());
     }
 
     #[test]
@@ -1514,6 +1563,12 @@ mod confined_tests {
         .collect();
         assert!(confined_head_call(&friction, false).is_none());
         assert!(confined_head_call(&friction, true).is_some());
+        let config_patch: Vec<OsString> = ["config", "patch", "patch.yaml"]
+            .iter()
+            .map(OsString::from)
+            .collect();
+        assert!(confined_head_call(&config_patch, false).is_none());
+        assert!(confined_head_call(&config_patch, true).is_some());
         let land: Vec<OsString> = ["land"].iter().map(OsString::from).collect();
         assert!(
             confined_head_call(&land, false).is_some(),

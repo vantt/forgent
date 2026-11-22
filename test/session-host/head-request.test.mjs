@@ -945,6 +945,52 @@ test('friction record runs the host verb with its flags and refuses bad args', a
   }
 });
 
+test('config patch runs the host verb with --project-only and refuses bad args', async (t) => {
+  const { ask } = headCase(t, { persona: 'supervisor', name: 'x', writes: [] });
+  const calls = [];
+  const done = await ask('config patch', {
+    file: 'patch.yaml',
+    reason: 'tune watcher',
+  }, 'cp1', { hostCall: hostEcho(calls) });
+  assert.equal(done.exit, 0);
+  assert.deepEqual(calls[0].argv, [
+    'config', 'patch',
+    'patch.yaml',
+    '--project-only',
+    '--reason', 'tune watcher',
+    '--json',
+  ]);
+
+  const calls2 = [];
+  const done2 = await ask('config patch', {
+    file: 'changes.json',
+  }, 'cp2', { hostCall: hostEcho(calls2) });
+  assert.equal(done2.exit, 0);
+  assert.deepEqual(calls2[0].argv, [
+    'config', 'patch',
+    'changes.json',
+    '--project-only',
+    '--json',
+  ]);
+
+  for (const bad of [
+    {},
+    { file: '' },
+    { file: '--bad' },
+    { file: 123 },
+    { file: 'x'.repeat(4097) },
+    { file: 'patch.yaml', reason: '--bad' },
+    { file: 'patch.yaml', reason: 123 },
+    { file: 'patch.yaml', reason: '' },
+    { file: 'patch.yaml', reason: 'x'.repeat(4097) },
+    { file: 'patch.yaml', global: true },
+    { file: 'patch.yaml', 'project-only': true },
+    { file: 'patch.yaml', unknown: 1 },
+  ]) {
+    assert.equal((await ask('config patch', bad, 'cp-bad', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
+  }
+});
+
 test('a confined head records a friction via --detail-stdin that reads stdin and friction list shows', async (t) => {
   const dir = scratch(t);
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
