@@ -1257,12 +1257,12 @@ test('a workspace-write producer in a linked worktree cannot write git metadata;
   }
 });
 
-/** A project with a docs directory: the granted backlog and discussions, other files, a dotfile and a subdirectory. */
+/** A project with docs and plans directories: the granted plans directory and discussions, the pointer backlog and other docs files, a dotfile and a subdirectory. */
 function docsProject(base) {
-  fs.mkdirSync(path.join(base, 'docs', 'discussions'), { recursive: true });
   fs.mkdirSync(path.join(base, 'docs', 'sub'));
-  fs.mkdirSync(path.join(base, 'plans'));
-  fs.writeFileSync(path.join(base, 'docs', 'backlog.md'), 'old\n');
+  fs.mkdirSync(path.join(base, 'plans', 'discussions'), { recursive: true });
+  fs.writeFileSync(path.join(base, 'plans', 'backlog.md'), 'old\n');
+  fs.writeFileSync(path.join(base, 'docs', 'backlog.md'), 'pointer\n');
   fs.writeFileSync(path.join(base, 'docs', 'other.md'), 'keep\n');
   fs.writeFileSync(path.join(base, 'docs', '.hidden'), 'keep\n');
   fs.mkdirSync(path.join(base, '.fgos'));
@@ -1276,14 +1276,14 @@ async function waitFor(file, ms = 20000) {
   }
 }
 
-test('a launched secretary shape cannot write docs/backlog.md or any docs file, reads the backlog the host write door replaced, still cannot write a docs file the host replaced, and writes only its granted directories and the mailbox record', async (t) => {
+test('a launched secretary shape cannot write docs/backlog.md or any docs file, writes plans/backlog.md directly, reads the backlog the host write door replaced, still cannot write a docs file the host replaced, and writes only its granted directories and the mailbox record', async (t) => {
   if (!HAS_WORKING_BWRAP) return t.skip('no working bwrap on this machine');
   // Outside /tmp: the sandbox mounts a private tmpfs there.
   const base = fs.mkdtempSync(path.join(fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir(), 'fgos-secretary-shape-'));
   try {
     docsProject(base);
     const fgosDir = path.join(base, '.fgos');
-    const backlog = path.join(base, 'docs', 'backlog.md');
+    const backlog = path.join(base, 'plans', 'backlog.md');
     const headGrants = requirementOf(grantOf('head:secretary-miu')).policy.grants.filter((g) => ['workspace-paths', 'mailbox-record'].includes(g.resource));
     assert.deepEqual(headGrants.map((g) => g.resource), ['workspace-paths', 'mailbox-record']);
     const resources = resolveConfinementResources({ dispatchId: 'disp_secretary', context: { cwd: base, repoRoot: base, fgosDir }, grants: headGrants });
@@ -1302,8 +1302,9 @@ test('a launched secretary shape cannot write docs/backlog.md or any docs file, 
       ...docsReadOnly('docs/other.md'),
       '[ "$(cat docs/.hidden)" = keep ]',
       '! (echo x > docs/sub/x.md) 2>/dev/null',
-      'echo d > docs/discussions/new.md',
+      'echo d > plans/discussions/new.md',
       'echo p > plans/p.md',
+      'echo head > plans/backlog.md',
       // The mailbox: its lock opened read-write (O_CREAT), its record replaced by temp file and rename; nothing else of .fgos.
       '(exec 3<>.fgos/locks/mailbox.lock)',
       `mkdir -p ${record} && echo s > ${record}/snapshot.json.tmp && mv ${record}/snapshot.json.tmp ${record}/snapshot.json`,
@@ -1313,7 +1314,7 @@ test('a launched secretary shape cannot write docs/backlog.md or any docs file, 
       // file renamed over each), and wait for it.
       'echo > plans/ready',
       'while [ ! -e plans/go ]; do sleep 0.02; done',
-      '[ "$(cat docs/backlog.md)" = door ]',
+      '[ "$(cat plans/backlog.md)" = door ]',
       '[ "$(cat docs/other.md)" = pulled ]',
       ...docsReadOnly('docs/backlog.md'),
       ...docsReadOnly('docs/other.md'),
@@ -1330,7 +1331,8 @@ test('a launched secretary shape cannot write docs/backlog.md or any docs file, 
     child.stderr.on('data', (chunk) => { output += chunk; });
     const exited = new Promise((resolve) => child.on('close', resolve));
     await Promise.race([waitFor(path.join(base, 'plans', 'ready')), exited.then((code) => { throw new Error(`the sandbox ended early (${code}): ${output}`); })]);
-    assert.equal(fs.readFileSync(backlog, 'utf8'), 'old\n', 'the head changed nothing in docs');
+    assert.equal(fs.readFileSync(backlog, 'utf8'), 'head\n', 'the head can write plans/backlog.md directly');
+    assert.equal(fs.readFileSync(path.join(base, 'docs', 'backlog.md'), 'utf8'), 'pointer\n', 'the pointer docs/backlog.md was not changed');
     for (const [file, content] of [[backlog, 'door\n'], [path.join(base, 'docs', 'other.md'), 'pulled\n']]) {
       fs.writeFileSync(`${file}.host-tmp`, content);
       fs.renameSync(`${file}.host-tmp`, file);
@@ -1339,8 +1341,8 @@ test('a launched secretary shape cannot write docs/backlog.md or any docs file, 
     assert.equal(await exited, 0, output);
     assert.equal(fs.readFileSync(backlog, 'utf8'), 'door\n');
     assert.equal(fs.readFileSync(path.join(base, 'docs', 'other.md'), 'utf8'), 'pulled\n');
-    assert.deepEqual(fs.readdirSync(path.join(base, 'docs')).sort(), ['.hidden', 'backlog.md', 'discussions', 'other.md', 'sub']);
-    assert.ok(fs.existsSync(path.join(base, 'docs', 'discussions', 'new.md')));
+    assert.deepEqual(fs.readdirSync(path.join(base, 'docs')).sort(), ['.hidden', 'backlog.md', 'other.md', 'sub']);
+    assert.ok(fs.existsSync(path.join(base, 'plans', 'discussions', 'new.md')));
     assert.ok(fs.existsSync(path.join(base, 'plans', 'p.md')));
     assert.equal(fs.readFileSync(path.join(base, record, 'snapshot.json'), 'utf8'), 's\n');
     assert.deepEqual(fs.readdirSync(path.join(fgosDir, 'locks')), ['mailbox.lock']);

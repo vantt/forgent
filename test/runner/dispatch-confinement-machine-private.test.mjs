@@ -482,8 +482,7 @@ test('a head granted its peers starts with the session sockets and registry insi
   const host = makeHost({ withPrivate: false, socketBase: 'with-sockets' });
   const registry = path.join(host.home, '.claude', 'sessions');
   fs.mkdirSync(registry, { recursive: true, mode: 0o700 });
-  for (const dir of ['plans', 'docs/discussions']) fs.mkdirSync(path.join(host.project, dir), { recursive: true });
-  fs.writeFileSync(path.join(host.project, 'docs', 'backlog.md'), '');
+  fs.mkdirSync(path.join(host.project, 'plans'), { recursive: true });
   const role = 'head:secretary-miu';
   const launch = (assignmentLaunchContext) => buildConfinementRequest({
     capability: 'execute',

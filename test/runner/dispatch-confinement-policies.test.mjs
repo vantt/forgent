@@ -723,7 +723,7 @@ const pathsPolicy = (paths) => ({
 });
 
 test('workspace-paths: the shape takes project-relative paths and refuses empty, absolute, climbing and glob entries by name', () => {
-  validateConfinementPolicyShape(pathsPolicy(['plans', 'docs/backlog.md']));
+  validateConfinementPolicyShape(pathsPolicy(['plans', 'plans/backlog.md']));
   assert.throws(() => validateConfinementPolicyShape(pathsPolicy()), /"paths" must be a non-empty array/);
   assert.throws(() => validateConfinementPolicyShape(pathsPolicy([])), /"paths" must be a non-empty array/);
   assert.throws(() => validateConfinementPolicyShape(pathsPolicy(['/etc'])), /is absolute/);
@@ -741,11 +741,10 @@ test('workspace-paths: the shape takes project-relative paths and refuses empty,
 test('workspace-paths: the resolver binds a granted directory writable, gives a granted file no bind (only the head write door writes it), and refuses a missing path and any symbolic link on the way', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-ws-paths-'));
   try {
-    fs.mkdirSync(path.join(root, 'plans'));
-    fs.mkdirSync(path.join(root, 'docs', 'discussions'), { recursive: true });
-    fs.writeFileSync(path.join(root, 'docs', 'backlog.md'), '# b\n');
+    fs.mkdirSync(path.join(root, 'plans', 'discussions'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'plans', 'backlog.md'), '# b\n');
     fs.writeFileSync(path.join(root, 'top.md'), 't\n');
-    fs.symlinkSync(path.join(root, 'docs'), path.join(root, 'link'));
+    fs.symlinkSync(path.join(root, 'plans'), path.join(root, 'link'));
     const resolve = (paths) => resolveConfinementResources({
       dispatchId: 'd-1',
       context: { repoRoot: root },
@@ -753,10 +752,12 @@ test('workspace-paths: the resolver binds a granted directory writable, gives a 
     });
     const real = fs.realpathSync(root);
     const bound = (paths) => resolve(paths).filter((r) => r.resource === 'workspace-paths').map((r) => [r.delivery, r.hostTarget, r.access]);
-    // The granted file and its directory stay read-only: no bind of the file, none of its parent.
-    assert.deepEqual(bound(['plans', 'docs/backlog.md', 'docs/discussions']), [
+    // The granted file and its parent directory stay read-only: no bind of the file, none of its parent.
+    assert.deepEqual(bound(['plans/discussions', 'plans/backlog.md']), [
+      ['mount', path.join(real, 'plans', 'discussions'), 'read-write'],
+    ]);
+    assert.deepEqual(bound(['plans']), [
       ['mount', path.join(real, 'plans'), 'read-write'],
-      ['mount', path.join(real, 'docs', 'discussions'), 'read-write'],
     ]);
     assert.deepEqual(bound(['top.md']), [], 'a file in the project root is checked, never bound');
     assert.throws(() => resolve(['nope']), (err) => err.code === 'workspace-path-missing');
