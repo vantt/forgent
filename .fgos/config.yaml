@@ -348,9 +348,11 @@ land:
       - packages/host-runtime/contracts/command-routes.json
       - packages/host-runtime/contracts/command-manifest.json
     # @fgos:doc Path globs; the command runs only if a landed path matches one. Absent runs it on every landing.
+    # @fgos:why [f381c6d2-3f10-4128-aeac-d0f158513f83] heads-stable phase 7: land.regenerate runs for core/** too, so a skill-only land rebuilds the mutation census (owner q-y24ukwgfpo)
     when:
       - src/**
       - apps/**
       - packages/**
       - bin/**
       - scripts/**
+      - core/**
