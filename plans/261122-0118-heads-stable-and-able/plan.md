@@ -7,6 +7,10 @@ priority: P1
 blockedBy: []
 base: aa35c0664447f6d01d214911973c4d0246715e39
 footprint:
+  - packages/execution/engine/tests/credentials.rs
+  - packages/execution/engine/src/credentials/renew.rs
+  - packages/execution/engine/src/credentials/mod.rs
+  - apps/fgos/src/wiring/dispatch_subs/probes.rs
   - apps/fgos/src/wiring/session_write_publish.rs
   - apps/fgos/src/wiring/supervision.rs
   - scripts/lib/git-one-door-declarations.v1.json
@@ -441,6 +445,8 @@ first). `blockedBy` stays empty because no phase here needs a result of either p
 
 ## Owner questions
 
+
+- **q-3g32txifg5: decided 2026-11-22 18:50 by lead:SUPERVISOR inside the approved frame** (phase 12b, owner-approved 16:05): the footprint takes the credential renewal files and `apps/fgos/src/wiring/dispatch_subs/probes.rs`. probes.rs is also in s6a's footprint (`dispatch_subs/**`); keep the hunk to the renewal call, and whichever lands second rebases.
 
 - **q-d5mrno2mfk: decided 2026-11-22 16:50 by lead:SUPERVISOR inside the approved frame**: the footprint takes `apps/fgos/src/wiring/session_write_publish.rs` for the phase 7 follow-up (owner-approved landed-worktree removal), as recommended.
 
