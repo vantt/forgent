@@ -367,11 +367,9 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
         })
         .cloned()
         .collect();
-    if !sharing_seats.is_empty() {
-        if entry.expires_ms - now() > base_threshold {
-            let owner = read_renewal_owner(&account_dir).map(|o| o.seat);
-            return outcome_with_owner("skipped", "live-seat-owns-renewal", owner);
-        }
+    if !sharing_seats.is_empty() && entry.expires_ms - now() > base_threshold {
+        let owner = read_renewal_owner(&account_dir).map(|o| o.seat);
+        return outcome_with_owner("skipped", "live-seat-owns-renewal", owner);
     }
     // A renewal could not make this seat's life check pass, and every start would spend another one.
     if seat_outlives_any_token {
@@ -380,16 +378,16 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
     if in_cooldown(&account_dir, options.cooldown_ms, now()) {
         return outcome("cooldown", "recent-failure");
     }
-    renew_in_scratch(
+    renew_in_scratch(&RenewInScratchArgs {
         layout,
         request,
-        &home,
-        &account_dir,
-        &entry.key,
-        &sharing_seats,
-        lock.as_ref(),
+        home: &home,
+        account_dir: &account_dir,
+        key: &entry.key,
+        sharing_seats: &sharing_seats,
+        lock: lock.as_ref(),
         options,
-    )
+    })
 }
 
 /// Says once, numbers only, when a renewal fgOS made got a shorter token than the layout's assumed lifetime, so a
@@ -423,16 +421,28 @@ fn report_lifetime_shortfall(
     }
 }
 
-fn renew_in_scratch(
+struct RenewInScratchArgs<'a> {
     layout: Layout,
-    request: &RefreshRequest<'_>,
-    home: &Path,
-    account_dir: &Path,
-    key: &str,
-    sharing_seats: &[PathBuf],
-    lock: &dyn AccountLockGuard,
-    options: &RefreshOptions<'_>,
-) -> RefreshOutcome {
+    request: &'a RefreshRequest<'a>,
+    home: &'a Path,
+    account_dir: &'a Path,
+    key: &'a str,
+    sharing_seats: &'a [PathBuf],
+    lock: &'a dyn AccountLockGuard,
+    options: &'a RefreshOptions<'a>,
+}
+
+fn renew_in_scratch(args: &RenewInScratchArgs<'_>) -> RefreshOutcome {
+    let (layout, request, home, account_dir, key, sharing_seats, lock, options) = (
+        args.layout,
+        args.request,
+        args.home,
+        args.account_dir,
+        args.key,
+        args.sharing_seats,
+        args.lock,
+        args.options,
+    );
     let (now, sqlite, source) = (options.now, options.sqlite, request.credential_source);
     // The name a kept scratch copy moves to is drawn before any token is spent: without it nothing is renewed.
     let Ok(kept_suffix) = random_hex() else {
