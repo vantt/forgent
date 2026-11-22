@@ -22,26 +22,32 @@ export function indexPathFor(repoRoot) {
   return path.join(repoRoot, 'docs', 'decisions', 'index.md');
 }
 
-const GOVERNANCE_PATH = path.join('docs', 'platform', 'governance.md');
+const DECISION_KINDS_PATH = path.join('packages', 'component-authority', 'model', 'decision-kinds.json');
 const LEGACY_SPEC_PATH = /docs\/specs\/([A-Za-z0-9-]+)\.md/g;
 
 /**
- * Resolve where a decision scope's narrative lives today. The governance
- * decision-scope-to-holder table names the narrative home per scope (its scope
- * cell reads `legacy alias → area`); a scope the table does not list falls back
- * to the platform file that carries its name. Returns `(scopeName) => path|null`.
+ * Resolve where a decision scope's narrative lives today. Decision kinds in
+ * `packages/component-authority/model/decision-kinds.json` name the narrative
+ * home per scope (id, canonical, aliases). A scope the model does not list
+ * falls back to the platform file that carries its name
+ * (`docs/platform/<name>.md` or `docs/platform/<name>/spec.md`, covering
+ * scopes such as `questions`). Returns `(scopeName) => path|null`.
  */
 export function narrativeHolderResolver(repoRoot) {
   const homes = new Map();
   try {
-    const governance = fs.readFileSync(path.join(repoRoot, GOVERNANCE_PATH), 'utf8');
-    const section = governance.split(/^## Decision scope to holder table$/m)[1]?.split(/^## /m)[0] ?? '';
-    for (const line of section.split('\n')) {
-      const cells = line.split('|').map((cell) => cell.trim());
-      if (cells.length < 6 || !cells[1] || cells[1] === 'Scope (legacy alias retained)' || /^-+$/.test(cells[1])) continue;
-      const home = /`([^`]+)`/.exec(cells[4])?.[1];
+    const kinds = JSON.parse(fs.readFileSync(path.join(repoRoot, DECISION_KINDS_PATH), 'utf8'));
+    for (const kind of kinds) {
+      const home = kind?.narrative;
       if (!home) continue;
-      for (const name of cells[1].split('→').map((part) => part.trim())) homes.set(name, home);
+      const names = new Set();
+      // Match by id, canonical, and aliases only — not owner or area name.
+      if (kind.id) names.add(kind.id);
+      if (kind.canonical) names.add(kind.canonical);
+      for (const alias of kind.aliases ?? []) names.add(alias);
+      for (const name of names) {
+        if (name) homes.set(name, home);
+      }
     }
   } catch (err) {
     if (err.code !== 'ENOENT') throw err;

@@ -58,6 +58,17 @@ Observe được chuyển trọn gói sang Rust trong kế hoạch `archive/plan
 
 Bảng trên là subject của hình v1. Ở bản ghi v2, `subject.kind` và kind của `refs` là chuỗi mở, được kiểm theo registry đã gộp: tên dùng chung là `run`, `unit`, `plan`, `phase`, `backlog`, `session`, `head`, `account`, `provider` (`packages/observe/contracts/observe-names.json`); bên dùng khai báo thêm (friction thêm `case`, `work`, `executor`). `plan:<id>` là thư mục plan (`plans/<dir>`), giống id mà ref plan của một run attempt mang.
 
+Rows owned by the observe area, generated from `packages/component-authority/model/`:
+
+<!-- generated:component-authority:observe-shared-entities -->
+Ownership rows owned by `observe`: each thing a component declares it owns, with that component. <!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
+
+| Entity | Owner | Owner doc |
+| --- | --- | --- |
+| friction repository and metrics collection | `observe` | `docs/platform/observe/spec.md` |
+| case lifecycle journals and telemetry | `observe` | `docs/platform/observe/spec.md` |
+<!-- /generated:component-authority:observe-shared-entities -->
+
 ## 3. Storage Model
 
 - **Tracked Shard theo Writer**: mọi thao tác ghi đều ghi vào `.fgos/observe/<store>/<writerId>.jsonl`.
