@@ -262,38 +262,24 @@ fn answer(head: &Head, lineage: &Path, payload: &Value, ports: &Ports) -> Result
         .map_err(|e| StopError::from_client(e, "session answered"))
 }
 
-fn absolute_project_root(fgos_dir: &Path) -> PathBuf {
-    let parent = fgos_dir.parent().unwrap_or_else(|| Path::new(""));
-    let abs = if parent.is_absolute() {
-        parent.to_path_buf()
-    } else if let Ok(cwd) = std::env::current_dir() {
-        cwd.join(parent)
-    } else {
-        parent.to_path_buf()
-    };
-    if abs.file_name().and_then(|n| n.to_str()) == Some(".") {
-        abs.parent().unwrap_or(&abs).to_path_buf()
-    } else {
-        abs
-    }
-}
-
 /// A session start: the latest handoff of the lineage as the one `additionalContext` object, or nothing.
 fn session_start(head: &Head, fgos_dir: &Path) -> Result<Option<String>, String> {
     let lineage = lineage_dir(fgos_dir, &head.persona, &head.name).map_err(|e| e.to_string())?;
     let Some(latest) = read_latest(&lineage).map_err(|e| e.to_string())? else {
         return Ok(None);
     };
-    let project_root = absolute_project_root(fgos_dir);
-    let mut context = session_start_context(&latest, Some(&project_root));
+    let mut context = session_start_context(&latest, fgos_dir.parent());
     let should_append = match head.gen {
         Some(gen) => awaits_answer(&lineage, gen).map_err(|e| e.to_string())?,
         None => false,
     };
     if should_append {
-        let bin = project_root.join(".fgos/installation/bin/fgos");
+        let bin = fgos_dir
+            .parent()
+            .unwrap_or(Path::new(""))
+            .join(".fgos/installation/bin/fgos");
         let instruction = format!(
-            "a rotation is waiting for this session's first answer; right after the start ritual's one line, in this same turn, answer by running printf '%s' '{{\"last_assistant_message\":\"<that line>\"}}' | \"{}\" hook session-rotation --event stop ; use the installed path, not the fgos shell function; role-gated verbs wait until the role moves.",
+            "A rotation is waiting for this session's first answer; right after the start ritual's one line, in this same turn, answer by running printf '%s' '{{\"last_assistant_message\":\"<that line, with no quote characters>\"}}' | \"{}\" hook session-rotation --event stop ; use the installed path, not the fgos shell function; role-gated verbs wait until the role moves.",
             bin.display()
         );
         let sep = if context.is_empty() || context.ends_with("\n\n") {
@@ -729,7 +715,7 @@ mod tests {
             .unwrap();
 
         let expected_instruction = format!(
-            "a rotation is waiting for this session's first answer; right after the start ritual's one line, in this same turn, answer by running printf '%s' '{{\"last_assistant_message\":\"<that line>\"}}' | \"{}\" hook session-rotation --event stop ; use the installed path, not the fgos shell function; role-gated verbs wait until the role moves.",
+            "A rotation is waiting for this session's first answer; right after the start ritual's one line, in this same turn, answer by running printf '%s' '{{\"last_assistant_message\":\"<that line, with no quote characters>\"}}' | \"{}\" hook session-rotation --event stop ; use the installed path, not the fgos shell function; role-gated verbs wait until the role moves.",
             expected_bin.display()
         );
         assert!(
