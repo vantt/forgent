@@ -203,6 +203,15 @@ writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
 
+### Lead progress (2026-11-22 21:10, head:lead-forgent-261122-0118-heads-b52f9)
+
+- **Phase 11 steps 3 and 6 landed** as `6765c56df` (`p11`) at 20:47, once `baf9a59bf` glossed the backlog citation.
+  The land went through its fast-forward step, so `q-pfecbg6ffn` (git recover) was not needed and is cancelled.
+- **Release `0844a0a4` is active** (contract 3 plus phase 12), and carries phases 2, 5-7 and 12.
+- **Phase 11 stays `ready`** for steps 1, 2, 4 and 5. They run once phases 8, 9 and 10 have their 24-hour measures
+  (from about 14:20 on 2026-11-23), on heads started on `0844a0a4` or later. This lead started on `f032b2c7`, so its own
+  probe run needs a rotation first, and that rotation is the live soft-rotation proof of phase 12's done-when item 3.
+
 ### Lead progress (2026-11-22 20:40, head:lead-forgent-261122-0118-heads-b52f9)
 
 - **The 12b clippy fix landed** as `df93b230f` once the D12/D13 citations were fixed (`31321e24f`).
