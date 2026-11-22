@@ -52,6 +52,32 @@ function seedTempRepo() {
     },
   ], null, 2));
   fs.writeFileSync(path.join(modelDir, 'decision-kinds.json'), '[]');
+  fs.writeFileSync(path.join(modelDir, 'contracts.json'), JSON.stringify([
+    {
+      id: 'CTR-DEMO',
+      canonical: 'CTR-DEMO',
+      aliases: [],
+      meaning: 'demo boundary ↔ other: detail that must not appear as boundary',
+      provider: 'demo',
+      consumers: ['cross'],
+      path: 'packages/demo/contracts/demo.v1.json',
+      evidence: [],
+      status: 'live',
+    },
+    {
+      id: 'CTR-PLANNED',
+      canonical: 'CTR-PLANNED',
+      aliases: [],
+      meaning: 'planned side ↔ other side: no file yet',
+      provider: 'cross',
+      consumers: [],
+      evidence: [],
+      status: 'planned',
+    },
+  ], null, 2));
+  // Existing path so architecture-map-contracts can backtick it; missing path stays "—".
+  fs.mkdirSync(path.join(tmp, 'packages/demo/contracts'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'packages/demo/contracts/demo.v1.json'), '{}\n', 'utf8');
 
   const docs = {
     'docs/platform/component-boundary.md': 'component-boundary',
@@ -59,6 +85,7 @@ function seedTempRepo() {
     'docs/platform/system-overview/spec.md': ['system-overview-area-map', 'system-overview-shared-entities'],
     'docs/platform/observe/spec.md': 'observe-shared-entities',
     'docs/platform/workflow/spec.md': 'workflow-shared-entities',
+    'docs/platform/architecture-map.md': ['architecture-map-components', 'architecture-map-contracts'],
   };
 
   for (const [rel, views] of Object.entries(docs)) {
@@ -123,6 +150,7 @@ test('writeViews twice is byte-identical', () => {
     'docs/platform/system-overview/spec.md',
     'docs/platform/observe/spec.md',
     'docs/platform/workflow/spec.md',
+    'docs/platform/architecture-map.md',
   ]) {
     afterFirst.set(rel, fs.readFileSync(path.join(tmp, rel)));
   }
@@ -152,9 +180,38 @@ test('governance-holder-table is optional: missing markers do not fail --check',
   assert.equal(checkViews(REPO_ROOT).some((entry) => entry.view === 'governance-holder-table'), false);
 });
 
-test('loadModel reads components, decision kinds and door files', () => {
+test('loadModel reads components, decision kinds, contracts and door files', () => {
   const model = loadModel(REPO_ROOT);
   assert.ok(Array.isArray(model.components) && model.components.length > 0);
   assert.ok(Array.isArray(model.decisionKinds) && model.decisionKinds.length > 0);
+  assert.ok(Array.isArray(model.contracts) && model.contracts.length > 0);
   assert.ok(Array.isArray(model.doors) && model.doors.length > 0);
+});
+
+test('architecture-map-components lists model component rows with owns columns', () => {
+  const tmp = seedTempRepo();
+  writeViews(tmp);
+  const text = fs.readFileSync(path.join(tmp, 'docs/platform/architecture-map.md'), 'utf8');
+  assert.match(text, new RegExp(`${startMarker('architecture-map-components')}[\\s\\S]*${endMarker('architecture-map-components')}`));
+  assert.match(text, /\| Component \| Parent \| Layer \| Tier \| Status \| Owns \| Must not own \| Owner doc \|/);
+  assert.match(text, /\| `demo` \|/);
+  assert.match(text, /demo thing/);
+  assert.match(text, /other thing/);
+});
+
+test('architecture-map-contracts prints id boundary provider consumers status path', () => {
+  const tmp = seedTempRepo();
+  writeViews(tmp);
+  const text = fs.readFileSync(path.join(tmp, 'docs/platform/architecture-map.md'), 'utf8');
+  const block = text.match(
+    new RegExp(`${startMarker('architecture-map-contracts')}([\\s\\S]*?)${endMarker('architecture-map-contracts')}`),
+  );
+  assert.ok(block, 'architecture-map-contracts block missing');
+  const body = block[1];
+  assert.match(body, /\| ID \| Boundary \| Provider \| Consumers \| Status \| Path \|/);
+  assert.match(body, /\| `CTR-DEMO` \| demo boundary ↔ other \| `demo` \| `cross` \| live \| `packages\/demo\/contracts\/demo\.v1\.json` \|/);
+  // Planned row with no path → em dash, not a backticked missing path.
+  assert.match(body, /\| `CTR-PLANNED` \| planned side ↔ other side \| `cross` \| — \| planned \| — \|/);
+  assert.doesNotMatch(body, /detail that must not appear as boundary/);
+  assert.doesNotMatch(body, /`packages\/missing/);
 });
