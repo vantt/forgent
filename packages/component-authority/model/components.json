@@ -1,0 +1,35 @@
+[
+  {
+    "id": "component-authority",
+    "canonical": "component-authority",
+    "aliases": [
+      "ownership registry",
+      "authority ledger"
+    ],
+    "meaning": "Defines the single structural model of layers, components, decision kinds, doors, contracts, and file-to-component mappings.",
+    "layer": "kernel",
+    "tier": 1,
+    "paths": [
+      "packages/component-authority/",
+      "docs/platform/component-authority/"
+    ],
+    "exceptions": [],
+    "owns": [
+      "who owns what: components, subcomponents, decision kinds, doors, contract index, file-to-component mappings",
+      "single structural model at packages/component-authority/model/",
+      "locate and declare doors for structural registration"
+    ],
+    "mustNotOwn": [
+      "contract contents (owned by providing components)",
+      "runtime agent confinement (owned by Agent Confinement Authority)",
+      "business rules and RULs (owned by individual area specs)",
+      "L1-L10 platform laws and design principles (owned by platform foundations)",
+      "decision records and historical narratives (owned by individual area specs)"
+    ],
+    "spec": "docs/platform/component-authority/spec.md",
+    "source": [
+      "packages/component-authority/"
+    ],
+    "status": "live"
+  }
+]
