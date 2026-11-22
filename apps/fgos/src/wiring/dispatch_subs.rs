@@ -196,11 +196,6 @@ impl Flags {
     pub(crate) fn positional(&self, index: usize) -> Option<&str> {
         self.call.parsed().positional.get(index).map(String::as_str)
     }
-
-    /// The raw tokens after the sub-command, as `runDispatchCli` reads them (`rest`).
-    pub(crate) fn raw_after_sub(&self) -> Vec<String> {
-        self.call.without_sub()
-    }
 }
 
 // ---- the answer ---------------------------------------------------------------------------------------------

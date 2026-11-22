@@ -58,36 +58,28 @@ fn now_ms() -> i64 {
         .map_or(0, |d| d.as_millis() as i64)
 }
 
-/// The raw tokens of a probe call as `runDispatchCli` reads them: the positional id right after the sub-command
-/// (when it is no flag), then the rest, where a flag's value is the token after its first use.
-struct Raw {
+/// The flags of a probe call, read through the shared parser: the positional id right after the sub-command, and
+/// each flag by its name.
+struct Raw<'a> {
     executor_id: Option<String>,
-    rest: Vec<String>,
+    flags: &'a Flags,
 }
 
-impl Raw {
-    fn of(flags: &Flags) -> Self {
-        let mut tokens = flags.raw_after_sub();
-        let executor_id = tokens
-            .first()
-            .filter(|token| !token.starts_with("--"))
-            .cloned();
-        if executor_id.is_some() {
-            tokens.remove(0);
-        }
+impl<'a> Raw<'a> {
+    fn of(flags: &'a Flags) -> Self {
         Raw {
-            executor_id,
-            rest: tokens,
+            executor_id: flags.positional(1).map(str::to_owned),
+            flags,
         }
     }
 
+    /// `name` is the flag as the help writes it (`--provider`).
     fn value(&self, name: &str) -> Option<String> {
-        let at = self.rest.iter().position(|token| token == name)?;
-        self.rest.get(at + 1).cloned()
+        self.flags.text(name.trim_start_matches('-'))
     }
 
     fn has(&self, name: &str) -> bool {
-        self.rest.iter().any(|token| token == name)
+        self.flags.given(name.trim_start_matches('-'))
     }
 
     /// A milliseconds flag: absent stays absent (the config value applies).
