@@ -12,7 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { isAssessmentRequired } from './agent-result-claim-contract.mjs';
 import { nativeDoor } from '../../native/door.mjs';
-import { withLegacyView } from '../../native/execution-door.mjs';
+import { withLegacyView } from '../../native/legacy-view.mjs';
 
 /**
  * An extensible copy of a settled (frozen) result that keeps its accessors (`status`, `confidence`) and
