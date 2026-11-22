@@ -198,6 +198,8 @@ pub fn seat_config(runner: &Value) -> Value {
         Some(nested) if truthy(Some(nested)) && runner.get("modelPolicies").is_none() => nested,
         _ => runner,
     };
+    // Keyed by family name here, so a replay that digests the config as read finds the digest bind recorded.
+    let runner = &family_keyed(runner);
     let mut config = Map::new();
     for key in SEAT_CONFIG_KEYS {
         if let Some(value) = runner.get(key) {

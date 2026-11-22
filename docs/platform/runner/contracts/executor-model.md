@@ -192,7 +192,9 @@ walk (in lease order, each usable or not with the reason, plus the `problems` of
 
 The seat-config digest is `sha256:` of the canonical JSON of the slice of the runner config seat choice reads
 (`defaults`, `maxTier`, `tierFallback`, `modelPolicies` and the per-capability taste), read back from its JSON text so
-that the digest is over the bytes the crate receives. A replay recomputes it; a stage-one answer is cached per ask and
+that the digest is over the bytes the crate receives. The slice keys `tierFallback` and `modelPolicies` by family name
+(`codex` and `openai-codex` read as `openai`), so a replay that digests the config as read gets the digest the bind
+recorded. A replay recomputes it; a stage-one answer is cached per ask and
 digest for the life of the process.
 
 ### 6.5 Pre-admission facts
