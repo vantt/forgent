@@ -80,7 +80,7 @@ Each step is one phase that ships something checkable on its own. Revised on 202
 
 1. **Retrospective writer adds evidence to claim units** (stop 1 of document identity; item `p-ixrbglli5o`), with the cleanup gate accepting the evidence or the admission handoff. Cuts the main source without new technology.
 2. **doc-checks**: path input, the verb and rule-claim rules, staged reads and the pre-commit gate (item `p-cd2ejz7wa5`); the 6 documents with invalid YAML frontmatter (already quoted in `51f39d252`).
-3. **Locate through pkm**: link `pkm-core` (tag `v0.4.0`: search, `WriteGuard` for read-only, unit-level `in_force`) into the `fgos` host behind a locate port, run pkm's index worker as a process and fetch its model at setup, the `fgos doc locate` door (translation, top 10, log), doctor rows for index freshness and the model, and the recall regression set as a repeatable measurement.
+3. **Locate through pkm**: link `pkm-core` (tag `v0.5.0`: search, `WriteGuard` for read-only, unit-level `in_force` with `amended_by`) into the `fgos` host behind a locate port, run pkm's index worker as a process and fetch its model at setup, the `fgos doc locate` door (translation, top 10, log), doctor rows for index freshness and the model, and the recall regression set as a repeatable measurement.
 4. **Admission**: effect checks at the doors, the reviewer run, the frame and its weekly ceiling, refusal texts.
 5. **Write door**: the skill, the pointer seed, live templates.
 6. **Observer**: pkm's structural proposals into fgOS work items; merging the 479 story documents into claim units over time.
