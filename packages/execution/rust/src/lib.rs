@@ -17,6 +17,7 @@ pub mod admission;
 pub mod agents;
 pub mod assignment_layout;
 pub mod bind;
+pub mod capability_resolve;
 pub mod case_paths;
 pub mod checks;
 pub mod custody;

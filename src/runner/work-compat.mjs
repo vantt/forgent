@@ -11,7 +11,7 @@ import {
 } from '../state/domain-registry.mjs';
 import { stepById } from '../workflow/steps.mjs';
 import { selectTemplate, renderTemplate } from './prompt-templates.mjs';
-import { resolveCapabilityDetailsFromHints } from './dispatch/resolve.mjs';
+import { resolveCapabilityDetailsFromHints } from '../native/execution-door.mjs';
 
 /**
  * Executor identifier for a work item's dispatch (D3, tsk-62v): the skill name

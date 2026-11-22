@@ -10,14 +10,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { resolveTaskSpecPath, resolveContentRoot } from './paths.mjs';
-import { loadAgentRoster, readTaskSpecHeader } from './agent-roster.mjs';
+import { loadAgentRoster, readTaskSpecHeader, resolveAgentTypeForTaskSpec } from './agent-roster.mjs';
 import { selectTemplate, hashTemplate } from './prompt-templates.mjs';
-import { DispatchError, RunnerConfigError, runUnitInHost, stampDeclaredAssignment } from '../native/execution-door.mjs';
+import { DispatchError, RunnerConfigError, runUnitInHost, stampDeclaredAssignment, resolveExecutorConfig } from '../native/execution-door.mjs';
+import { purposeSeatOf } from './dispatch/plan.mjs';
 import { resolveStrongerRigor, RIGOR_VALUES } from './rigor.mjs';
 import { deriveOperationCapability } from './operation-capability.mjs';
-import { resolveExecutorConfig } from './dispatch/resolve.mjs';
-import { purposeSeatOf } from './dispatch/plan.mjs';
-import { resolveAgentTypeForTaskSpec, watchWritesOutsideWorkspace, strayWriteWarning } from './dispatch/cli.mjs';
+import { watchWritesOutsideWorkspace, strayWriteWarning } from './dispatch/cli.mjs';
 import { resolveGitRoots } from '../git/inspect.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, workCapabilityHints, buildPrompt } from './work-compat.mjs';
@@ -262,7 +261,7 @@ function describeBinding(mainRoot, unitRunId, binding) {
   try {
     const record = JSON.parse(fs.readFileSync(path.join(mainRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
     const config = record.configSnapshot?.runner ?? {};
-    const resolved = resolveExecutorConfig(config, binding.tier, binding.executor, undefined, undefined, undefined, binding.invocation);
+    const resolved = resolveExecutorConfig(config, binding.executor, { invocationId: binding.invocation });
     return { command: resolved.command ?? null, provider: resolved.provider ?? resolved.command ?? null, governance: resolved.governance ?? null };
   } catch {
     return { command: null, provider: null, governance: null };

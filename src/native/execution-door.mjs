@@ -610,3 +610,10 @@ export const reportDigest = (unitRunId, seat, mainRoot) => addon('reportDigest',
  * throws `RunnerConfigError` with its `reason`.
  */
 export const handoffRef = (input, mainRoot, { accept } = {}) => addon('handoffRef', { input, mainRoot, ...(accept !== undefined ? { accept } : {}) });
+
+// ---- executor facts a Work caller reads ---------------------------------------------------------------------
+
+/** The executor block a name resolves to (`command`, `provider`, `governance`, ...); a refusal is `RunnerConfigError`. */
+export const resolveExecutorConfig = (runnerConfig, executorId, { contentCarries, resolvedAgentType, invocationId } = {}) => addon('resolveExecutorConfig', { runnerConfig: runnerConfig ?? {}, ...Object.fromEntries(Object.entries({ executorId, contentCarries, resolvedAgentType, invocationId }).filter(([, v]) => typeof v === 'string')) });
+/** `{ capability, anchorCapability }`: the canonical capability of a dispatch, from its hints. */
+export const resolveCapabilityDetailsFromHints = ({ cfg, executorId, resolvedExecutor, purpose, hints } = {}) => addon('resolveCapabilityDetailsFromHints', { runnerConfig: cfg ?? {}, ...(typeof executorId === 'string' ? { executorId } : {}), ...(resolvedExecutor ? { resolvedExecutor } : {}), ...(typeof purpose === 'string' ? { purpose } : {}), hints: hints ?? {} });

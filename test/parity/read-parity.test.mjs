@@ -109,12 +109,12 @@ test('parity: graphUseCase matches CLI graph output', () => {
   assert.deepEqual(directResult.stepByItem, cliData.stepByItem);
 });
 
-test('parity: staleUseCase matches CLI stale output', () => {
+test('parity: staleUseCase matches CLI stale output', async () => {
   const cwdDirect = tmpCwdFast();
   const dirDirect = path.join(cwdDirect, '.fgos');
   addTestWork(dirDirect, 'item-doing');
   moveToDurableDoingForTest(cwdDirect, 'item-doing');
-  const directResult = staleUseCase({ dir: dirDirect, repoRoot: cwdDirect, cleanupTtlDays: 7 });
+  const directResult = await staleUseCase({ dir: dirDirect, repoRoot: cwdDirect, cleanupTtlDays: 7 });
 
   const cwdCli = tmpCwdFast();
   const dirCli = path.join(cwdCli, '.fgos');

@@ -1,11 +1,8 @@
 // agent-roster.mjs — reads the real agent-type roster (the agent-definitions door's tiers) and a task-spec's own header
 // fields, for plans/discussions/ds-kgfuqa23hi-core-foundation-domain-boundary/DISCUSSION.md's D20/D22
-// eligibility-inversion resolution (resolveAgentTypeForTaskSpec, src/runner/dispatch/cli.mjs). LAYER: infra
-// (same tier as dispatch/cli.mjs, which is the runtime consumer this
-// module exists for) -- one-directional-layer forbids dispatch/cli.mjs
-// (infra) importing src/setup/registrations.mjs (use-case, shallower). Both
-// read an agent file through `readAgentDefinition` (agent-definitions.mjs),
-// so the name and skills of an agent have one reader.
+// eligibility-inversion resolution (resolveAgentTypeForTaskSpec, below), which the Work dispatch asks. LAYER: infra
+// -- one-directional-layer forbids it importing src/setup/registrations.mjs (use-case, shallower). Both read an
+// agent file through `readAgentDefinition` (agent-definitions.mjs), so the name and skills of an agent have one reader.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -87,4 +84,51 @@ export function readTaskSpecHeader(filePath) {
     }
   }
   return res;
+}
+
+/**
+ * Resolve persona/agentType for a given taskSpec header & list of registered agent-types (D20/D21/D22/D32).
+ * Tie-break priority (D32):
+ * 1. Task-spec declares `agent:` pin -> wins immediately, skipping skill-matching.
+ * 2. No pin -> if `currentAgentType` matches all `requires-skill`, stay with `currentAgentType`.
+ * 3. Otherwise -> select deterministically by declaration order (first matching agent-type in `agentDefs`).
+ */
+export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], currentAgentType = null) {
+  if (!taskSpecHeader) return null;
+
+  const pinnedAgents = Array.isArray(taskSpecHeader.agent)
+    ? taskSpecHeader.agent
+    : typeof taskSpecHeader.agent === 'string' && taskSpecHeader.agent.trim()
+      ? [taskSpecHeader.agent.trim()]
+      : [];
+
+  if (pinnedAgents.length > 0) {
+    const found = agentDefs.find((a) => pinnedAgents.includes(a.name));
+    return found ? found.name : null;
+  }
+
+  const requiredSkills = Array.isArray(taskSpecHeader['requires-skill'])
+    ? taskSpecHeader['requires-skill']
+    : typeof taskSpecHeader['requires-skill'] === 'string' && taskSpecHeader['requires-skill'].trim()
+      ? [taskSpecHeader['requires-skill'].trim()]
+      : [];
+
+  if (requiredSkills.length === 0) {
+    return null;
+  }
+
+  if (currentAgentType) {
+    const currentDef = agentDefs.find((a) => a.name === currentAgentType);
+    if (currentDef && Array.isArray(currentDef.skills)) {
+      const hasAllSkills = requiredSkills.every((s) => currentDef.skills.includes(s));
+      if (hasAllSkills) return currentAgentType;
+    }
+  }
+
+  const matching = agentDefs.find(
+    (a) => Array.isArray(a.skills) && requiredSkills.every((s) => a.skills.includes(s)),
+  );
+  if (matching) return matching.name;
+
+  return null;
 }

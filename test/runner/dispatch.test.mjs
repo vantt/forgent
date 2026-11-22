@@ -15,7 +15,7 @@ import { loadRunnerConfigForDir, validateRunnerConfigShape } from '../../src/run
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { resolveExecutorCommand, resolveExecutorEnv, DispatchError, DEFAULT_ADAPTER, EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
 import { decideDispatchMechanism } from '../../src/runner/dispatch/mechanism.mjs';
-import { resolveAgentTypeForTaskSpec } from '../../src/runner/dispatch/cli.mjs';
+import { resolveAgentTypeForTaskSpec } from '../../src/runner/agent-roster.mjs';
 import { buildPrompt, executorIdForWork } from '../../src/runner/work-compat.mjs';
 import { spawnWorker, resolveAgentTypeForWork, resolveWorkForDispatch, workDispatchHint } from '../../src/runner/work-dispatch.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';

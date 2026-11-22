@@ -2,7 +2,7 @@ import path from 'node:path';
 import { listWork, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, StoreError } from '../../state/store.mjs';
 import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '../../state/gate-bypass.mjs';
 import { DEFAULT_DOMAIN, resolveDomainName, operationsForStep, getDomain, effectiveStep } from '../../state/domain-registry.mjs';
-import { findRunningRuns, classifyRunOutcome, reconcileRun } from '../../runner/dispatch/visibility-session.mjs';
+import { executionOp } from '../../native/execution-door.mjs';
 import { isResolvedStatus } from '../../state/frontier.mjs';
 import { paginate } from '../../state/cursor.mjs';
 import { computeAwaitingContext } from '../../state/awaiting-context.mjs';
@@ -40,33 +40,13 @@ export function gateCheckUseCase({ dir }, { id, gate, artifactText, planText, ch
   throw new StoreError('validation', `gate-check: --gate must be "contextApprove" or "validateApprove", got "${gate}"`);
 }
 
-export function staleUseCase({ dir, repoRoot, cleanupTtlDays }, { reconcile = false } = {}) {
+export async function staleUseCase({ dir, repoRoot, cleanupTtlDays }, { reconcile = false } = {}) {
   const doing = staleDoingAdvisory(dir);
   const postDelivery = stalePostDeliveryAdvisory(dir, { ttlDays: cleanupTtlDays });
-  const orphans = [];
-  for (const run of findRunningRuns(dir)) {
-    let verdict;
-    try {
-      verdict = classifyRunOutcome(run.runDir, { liveness: 'unknown' });
-    } catch {
-      continue;
-    }
-    if (!verdict.changed) continue;
-    const row = {
-      runId: run.runId,
-      runDir: path.relative(repoRoot, run.runDir),
-      startedAt: run.startedAt,
-      wouldBecome: verdict.outcome,
-      hasWorkerResult: Boolean(verdict.resultPath),
-    };
-    if (reconcile) {
-      reconcileRun(run.runDir, { liveness: 'unknown' });
-      row.reconciled = true;
-    }
-    orphans.push(row);
-  }
-
-  return { ...doing, postDelivery, orphanedRuns: orphans, reconciled: Boolean(reconcile) };
+  // The host reads which runs lost their dispatch process and, with `reconcile`, records the verdict in run.json.
+  const { orphans } = await executionOp('stale-runs', { fgosDir: dir, reconcile: Boolean(reconcile) }, { cwd: repoRoot });
+  const orphanedRuns = orphans.map(({ runDir, ...row }) => ({ ...row, runDir: path.relative(repoRoot, runDir) }));
+  return { ...doing, postDelivery, orphanedRuns, reconciled: Boolean(reconcile) };
 }
 
 export function parseListFlag(value) {

@@ -1039,3 +1039,59 @@ pub fn handoff_ref(request: Value) -> Result<String> {
     .map(|file| file.to_string_lossy().into_owned())
     .map_err(|e| refused(handoff_reports::refusal(e)))
 }
+
+// ---- executor facts a Work caller reads ---------------------------------------------------------------------
+
+/// `resolveExecutorConfig(runnerConfig, executorId, { contentCarries, resolvedAgentType, invocationId })`: the
+/// executor block a name resolves to (`command`, `provider`, `governance`, ...), or the refusal.
+#[napi(namespace = "execution", js_name = "resolveExecutorConfig")]
+pub fn resolve_executor_config(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    let str_at = |key: &str| request.get(key).and_then(Value::as_str);
+    fgos_execution::executor_config::resolve_executor_config(
+        request.get("runnerConfig").unwrap_or(&null),
+        str_at("executorId"),
+        str_at("contentCarries"),
+        str_at("resolvedAgentType"),
+        str_at("invocationId"),
+    )
+    .map_err(|e| refused(named(e.name, e.message, e.code, None)))
+}
+
+/// `resolveCapabilityDetailsFromHints({ runnerConfig, executorId, resolvedExecutor, purpose, hints })`:
+/// `{ capability, anchorCapability }`, the canonical capability of a dispatch independent of any Work item.
+#[napi(namespace = "execution", js_name = "resolveCapabilityDetailsFromHints")]
+pub fn resolve_capability_details_from_hints(request: Value) -> Result<Value> {
+    check()?;
+    let null = Value::Null;
+    let hints = request.get("hints").unwrap_or(&null);
+    let strings = |key: &str| -> Vec<String> {
+        hints
+            .get(key)
+            .and_then(Value::as_array)
+            .map(|list| {
+                list.iter()
+                    .filter_map(Value::as_str)
+                    .map(str::to_string)
+                    .collect()
+            })
+            .unwrap_or_default()
+    };
+    let text_of = |key: &str| hints.get(key).and_then(Value::as_str).map(str::to_string);
+    let asked = fgos_execution::capability_resolve::CapabilityHints {
+        candidates: strings("candidates"),
+        preferred: text_of("preferred"),
+        fallback_label: text_of("fallbackLabel"),
+    };
+    Ok(
+        fgos_execution::capability_resolve::resolve_capability_details_from_hints(
+            request.get("runnerConfig").unwrap_or(&null),
+            request.get("executorId").and_then(Value::as_str),
+            present(&request, "resolvedExecutor"),
+            request.get("purpose").and_then(Value::as_str),
+            &asked,
+        )
+        .to_json(),
+    )
+}

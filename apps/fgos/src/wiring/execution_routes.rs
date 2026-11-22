@@ -63,13 +63,14 @@ pub const EXIT_VERSION_MISMATCH: i32 = 3;
 pub const EXIT_INVALID_REQUEST: i32 = 65;
 
 /// The operations this route serves, in the contract's order.
-pub const OPS: [&str; 6] = [
+pub const OPS: [&str; 7] = [
     "run-unit",
     "launch-session",
     "custody",
     "verify",
     "sweep-attempts",
     "cancel",
+    "stale-runs",
 ];
 
 /// Run the route with the args after `execution`; returns the exit code.
@@ -219,6 +220,7 @@ pub fn run(
         "custody" => custody(&request, peer),
         "verify" => verify_op(&request),
         "sweep-attempts" => sweep_attempts(&request),
+        "stale-runs" => stale_runs(&request),
         _ => cancel(&request),
     };
     match answered {
@@ -469,6 +471,39 @@ fn sweep_attempts(request: &Value) -> Result<Value, String> {
             .collect::<Vec<_>>()
     });
     Ok(json!({ "adopt": adopt, "adoptError": swept.adopt_error }))
+}
+
+/// The runs still marked running whose dispatch process is gone: each one's verdict as a reader that cannot probe
+/// liveness gives it, written into its `run.json` when `reconcile` is true. A run that cannot be classified is
+/// left out.
+fn stale_runs(request: &Value) -> Result<Value, String> {
+    use fgos_execution_engine::transport::visibility_session::{
+        classify_run_outcome, find_running_runs, iso_now, reconcile_run,
+    };
+    let fgos_dir = PathBuf::from(text(request, "fgosDir")?);
+    let reconcile = request.get("reconcile") == Some(&Value::Bool(true));
+    let mut orphans = Vec::new();
+    for run in find_running_runs(&fgos_dir) {
+        let Ok(verdict) = classify_run_outcome(&run.run_dir, "unknown") else {
+            continue;
+        };
+        if !verdict.changed {
+            continue;
+        }
+        let mut row = json!({
+            "runId": run.run_id,
+            "runDir": run.run_dir.to_string_lossy(),
+            "startedAt": run.started_at,
+            "wouldBecome": verdict.outcome.as_str(),
+            "hasWorkerResult": verdict.result_path.is_some(),
+        });
+        if reconcile {
+            reconcile_run(&run.run_dir, "unknown", &iso_now).map_err(|e| e.to_string())?;
+            row["reconciled"] = json!(true);
+        }
+        orphans.push(row);
+    }
+    Ok(json!({ "orphans": orphans }))
 }
 
 fn cancel(request: &Value) -> Result<Value, String> {
