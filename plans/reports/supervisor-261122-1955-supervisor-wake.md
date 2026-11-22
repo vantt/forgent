@@ -19,3 +19,8 @@ No plan has `admissible: true`. Leads live 2 of 4; lanes free 3.
 - Owner questions `q-4qtu54bnxz` (red-tests phase 4) and `q-vgwalbohwj` (red-tests phase 7) are still open, but plan `261122-0800-red-tests-and-backlog-sweep` is done and closed (board log 12:34). `q-3g32txifg5` (heads-stable phase 12b widen) is also open while phase 12 is done. All three look moot; the supervisor never acks or cancels a question.
 - The heads-stable lead proposes a backlog row: decide whether grant changes should reach a live head (grants are fixed at session start, `packages/run-supervisor/rust/src/head_request.rs:1363`) and record the answer in the session-host spec.
 - Clippy is red on main until heads-stable unit p12c lands; S6A's phase 22 gate runs clippy.
+
+## Late events (12:54Z)
+
+- `fb035de2f97a9306` plan-priority-changed, `2fa6f5c511b33811` plan-became-ready, `57c5e9a96da8763f` plan-ready-waiting, all `plans/261122-1950-owner-communication-standard`: `ready` but `admissible: false`. Its footprint shares `.agents/skills/**` and `plugins/fgOS/skills/**` with running plan `261122-0118-heads-stable-and-able` (phase 3 row), so it is not started. Heads-stable will not close before its phase 8-10 measures end (about 14:20 on 2026-11-23), so the communication plan waits about 18 hours unless the secretary changes the order or the overlap is narrowed.
+- Older draft `261122-1751-owner-communication-standard` covers the same topic and is still `draft`; it looks superseded by 1950 and should be withdrawn by its owner.
