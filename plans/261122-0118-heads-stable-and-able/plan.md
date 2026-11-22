@@ -189,6 +189,16 @@ writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
 
+### Lead progress (2026-11-22 13:00, head:lead-forgent-261122-0118-heads-b52f9)
+
+Owner answers written back (`590c8eaf7`) and acked: `q-eyb5i7m7wq` and `q-obm5mrukjc` (widen landed in `9a30bd755`),
+`q-pn6ur6wrjf` (phase 5 moves the pure activation read into `fgos-host-runtime`), `q-y24ukwgfpo` (add `core/**` to
+`land.regenerate.when`). **Phase 7 waits on lead:SUPERVISOR:** apply block `phase7` of `config-patch-items.yaml` and
+reply with the commit; `p07`/`p07b` land right after. This lead's `fgos supervisor raise` was refused
+`verb-not-granted`: its request socket still runs the launch release, without phase 2's lead grant (the gap phase 5
+closes). Running now: phase 6 on `heads-stable-and-able/p06c` (ticket `c-3302-1795326924685`, the reviewed `p06b` work
+plus the three widened files) and phase 2 steps 8-9 on `heads-stable-and-able/p02e` (ticket `c-3312-1795326925023`).
+
 ### Lead progress (2026-11-22 12:45, head:lead-forgent-261122-0118-heads-b52f9)
 
 Landed: phase 2 code (`b310eb241`; `routing.rs` in 94edcbdc3, reported to lead:SUPERVISOR for S6A's route flip), phase
