@@ -765,6 +765,8 @@ Outside expertise: the owner engages none (decision of 2026-10-17 15:13). The si
 
 ## 26. Decision record
 
+### D-ADR0055 — Event truth is sealed changesets as git objects on per-machine refs
+
 **D-ADR0055 (signed by the owner 2026-10-17, decision log seq 65) — Event truth is sealed changesets as git objects on per-machine refs.** An event is acknowledged when it is `fsync`ed in the store's open log outside the work tree, and becomes git truth when sealed, by compare-and-swap, into a commit on `refs/fgos/events/<machine-id>`; machines share by pushing the own ref and fetching the others; every view is a rebuildable cache. Supersedes L3 clause 1 ("truth = changeset JSONL committed in git, appended in the same transaction as the mutation") and clause 4 ("every write through one CLI door, single writer") of D-ID `ae461c8b`, and the data layout of D-ADR0003 (tracked `events.jsonl`, gitignored `state.json`). L3 clauses 2 and 3 (database is a view, graph store is a second-level view) stand. Review threshold: a recorded cross-machine conflict that a person had to resolve by hand more than once a month, or any acknowledged event lost while fgOS was running.
 
 ## Changes from the draft

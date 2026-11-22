@@ -112,4 +112,4 @@ Kênh agent-tới-agent thứ hai: **Agent Mailbox** (`docs/platform/agent-mailb
 
 `src/runner/dispatch.mjs` (prompt + trust invariant) · `src/runner/worktree.mjs`
 (same-user trust invariant) · `docs/platform/platform-foundations.md` L4 (`14ebeea9`)
-· `docs/platform/runner/decisions/h-36d872fbb0e5.md#0005-runner-cô-lập-worker` (ADR-0005 Runner & cô lập worker, D3/D4).
+· `docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0005-runner-cô-lập-worker` (ADR-0005 Runner & cô lập worker, D3/D4).

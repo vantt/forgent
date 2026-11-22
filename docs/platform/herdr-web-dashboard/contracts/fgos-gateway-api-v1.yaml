@@ -47,8 +47,8 @@ info:
     name: fgOS
     url: https://github.com
   x-decisions:
-    - docs/platform/work-state/decisions/retired-decision-history.md#0011-version-tường-minh-cho-mọi-contract
-    - docs/platform/platform-foundations.md#0014-kiến-trúc-giao-tiếp-người-fgos
+    - docs/platform/work-state/decisions/retired-decision-history.md#d-adr0011-version-tường-minh-cho-mọi-contract
+    - docs/platform/platform-foundations.md#d-adr0014-kiến-trúc-giao-tiếp-người-fgos
   x-specs:
     - docs/platform/work-state/contracts/cli-io-contract.md
     - docs/platform/work-state/spec.md

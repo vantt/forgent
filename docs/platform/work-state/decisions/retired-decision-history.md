@@ -25,14 +25,13 @@ Superseded by: None recorded
 Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
 
 
-### 0002 — Mô hình việc phẳng
+### D-ADR0002 — Mô hình việc phẳng
 
-> **Một phần đã supersede bởi [0012](#0012--mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời):**
+> **Một phần đã supersede bởi [0012](#d-adr0012--mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời):**
 > "deps và parent tách rời có chủ đích" nay đọc là "tách rời về lưu trữ và ngữ
 > nghĩa, nhưng hợp nhất thành một đồ thị typed-edge derive". Phần còn lại của
 > record này (mô hình việc phẳng, một FSM, "epic" là item thường) vẫn hiện hành.
 
-# 0002 — Mô hình việc phẳng
 
 #### Bối cảnh
 
@@ -62,7 +61,7 @@ và khoá độ mịn công việc vào schema.
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-### 0003 — Đặt tên & bố cục dữ liệu
+### D-ADR0003 — Đặt tên & bố cục dữ liệu
 
 #### Bối cảnh
 
@@ -89,7 +88,7 @@ layout.
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-### 0004 — Phạm vi & non-goal
+### D-ADR0004 — Phạm vi & non-goal
 
 #### Bối cảnh
 
@@ -120,7 +119,7 @@ forgent. Không chốt hai biên này thì phạm vi trôi và dễ xây thừa.
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-### 0006 — Trạng thái `proposed`
+### D-ADR0006 — Trạng thái `proposed`
 
 #### Bối cảnh
 
@@ -161,7 +160,7 @@ Ngữ nghĩa:
 - Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-state cập nhật khi đóng feature)**.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-### 0007 — Tiến hoá schema & event
+### D-ADR0007 — Tiến hoá schema & event
 
 #### Bối cảnh
 
@@ -194,7 +193,7 @@ Ba luật cho mọi tiến hoá schema/event từ đây về sau:
 
 <a id="7-adr-0011-explicit-version-for-every-contract"></a>
 
-### 0011 — Version tường minh cho mọi contract
+### D-ADR0011 — Version tường minh cho mọi contract
 
 #### Bối cảnh
 
@@ -250,7 +249,7 @@ version tường minh trong định danh của chính nó, theo mẫu `<name>/v<
 
 <a id="8-adr-0012-unified-typed-edge-graph-model"></a>
 
-### 0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời
+### D-ADR0012 — Mô hình đồ thị cạnh-định-kiểu hợp nhất thay thế deps/parent tách rời
 
 #### Bối cảnh
 
@@ -329,7 +328,7 @@ và bảo đảm phi-chu-trình, trong khi hai trường lưu trữ vẫn tách 
 
 <a id="9-adr-0013-report-not-write-channel-for-discovered-from"></a>
 
-### 0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`
+### D-ADR0013 — Kênh báo-cáo-không-ghi (worker→runner) cho `discovered-from`
 
 #### Bối cảnh
 
@@ -422,11 +421,11 @@ lưu để phục hồi report đã mất. Xem spec Runner "Báo việc-phát-hi
 - **Parse trong mỗi lần retry.** Bỏ — một khối phát lại qua các lần thử sẽ đúc ra
   item trùng; parse một lần tại kết cục cuối là điểm đúng.
 
-### 0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)
+### D-ADR0019 — Miễn trừ pre-release cho RUL11 (viết lại nhật ký tại chỗ)
 
 #### Bối cảnh
 
-`RUL11 (tiến hóa schema)` (`docs/platform/work-state/decisions/retired-decision-history.md#0019-miễn-trừ-pre-release-cho-rul11-viết-lại-nhật-ký-tại-chỗ`, D-ID `feed7428`) cấm tường minh: "Nhật ký
+`RUL11 (tiến hóa schema)` (`docs/platform/work-state/decisions/retired-decision-history.md#d-adr0019-miễn-trừ-pre-release-cho-rul11-viết-lại-nhật-ký-tại-chỗ`, D-ID `feed7428`) cấm tường minh: "Nhật ký
 đã commit bất khả xâm phạm — không bao giờ migration ghi đè". Luật này nằm trong
 một spec, không phải một decision record — nó không có file riêng mang khoá
 `superseded_by` để trỏ ngược.
@@ -471,7 +470,7 @@ phát hành, một thao tác migration được phép **viết lại tại chỗ
 
 Vì `RUL11 (tiến hóa schema)` là một luật trong spec chứ không phải một decision record, cách
 supersede đúng là: bản ghi này mang `supersedes: []` (không có id nào để trỏ),
-và chính dòng `RUL11 (tiến hóa schema)` trong `docs/platform/work-state/decisions/retired-decision-history.md#0019-miễn-trừ-pre-release-cho-rul11-viết-lại-nhật-ký-tại-chỗ` được sửa để trích dẫn
+và chính dòng `RUL11 (tiến hóa schema)` trong `docs/platform/work-state/decisions/retired-decision-history.md#d-adr0019-miễn-trừ-pre-release-cho-rul11-viết-lại-nhật-ký-tại-chỗ` được sửa để trích dẫn
 ngược lại bản ghi này — văn xuôi làm việc mà `superseded_by` sẽ làm nếu mục tiêu
 là một decision record.
 
@@ -485,7 +484,7 @@ là một decision record.
   — nó không bị đưa vào bất kỳ lần viết lại nào, kể cả lần này.
 - Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-### 0024 — Đổi tên status `proposed` thành `awaiting-approval`
+### D-ADR0024 — Đổi tên status `proposed` thành `awaiting-approval`
 
 #### Bối cảnh
 
@@ -542,7 +541,7 @@ dry-run, seq-contiguity check) để ghi đè tại chỗ 3 kho `.fgos` trong ph
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-### 0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)
+### D-ADR0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)
 
 #### Bối cảnh
 

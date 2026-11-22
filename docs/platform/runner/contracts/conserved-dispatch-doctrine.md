@@ -20,11 +20,11 @@ Related:
 
 Owner: Runner
 Status: Conserved dispatch doctrine; no new execution mechanism.
-Related links: [Runner spec](../spec.md), [Native-First Dispatch Doctrine](../decisions/h-36d872fbb0e5.md#0026--native-first-dispatch-doctrine-launcherroottaskcapacity), [Seat Binding](../../seat-binding/spec.md).
+Related links: [Runner spec](../spec.md), [Native-First Dispatch Doctrine](../decisions/h-36d872fbb0e5.md#d-adr0026--native-first-dispatch-doctrine-launcherroottaskcapacity), [Seat Binding](../../seat-binding/spec.md).
 
 ## Native-First Reasoning
 
-The complete verbatim Native-First rules, their 0033 narrowing, the no-extra-judge rationale and live caller self-declaration are held in [Native-First Dispatch Doctrine](../decisions/h-36d872fbb0e5.md#0026--native-first-dispatch-doctrine-launcherroottaskcapacity). This is the governing passage, not the missing filename `executor-native-vs-cli-spawn`. Inline reasoning does not need a second judge to re-derive the live session's judgment with less context. Pure mechanical targets, different providers and explicitly CLI-shaped executors still follow the existing decide/bind door; the live caller never guesses the mechanism.
+The complete verbatim Native-First rules, their 0033 narrowing, the no-extra-judge rationale and live caller self-declaration are held in [Native-First Dispatch Doctrine](../decisions/h-36d872fbb0e5.md#d-adr0026--native-first-dispatch-doctrine-launcherroottaskcapacity). This is the governing passage, not the missing filename `executor-native-vs-cli-spawn`. Inline reasoning does not need a second judge to re-derive the live session's judgment with less context. Pure mechanical targets, different providers and explicitly CLI-shaped executors still follow the existing decide/bind door; the live caller never guesses the mechanism.
 
 ## Session Participation And Merge Isolation
 

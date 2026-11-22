@@ -1,10 +1,10 @@
 ---
-authoritative_for: docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity's D0026 "Lớp còn thiếu" narrative claiming no automatic decision layer existed yet for the Native-First Dispatch Doctrine, stale against the very 5-phase table two paragraphs below it showing 4 of 5 phases done (tsk-1ni/27y/53h/3ik) and phase 5 (agy) deliberately deferred; also names what shipped as a deliberate narrowing from the original 4-factor LLM-judgment vision to 3 mechanical config-time factors plus one self-declared has-live-task-access flag, cross-linked from docs/platform/proposals/dispatch-control-plane-redesign.md
+authoritative_for: docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0026-native-first-dispatch-doctrine-launcherroottaskcapacity's D0026 "Lớp còn thiếu" narrative claiming no automatic decision layer existed yet for the Native-First Dispatch Doctrine, stale against the very 5-phase table two paragraphs below it showing 4 of 5 phases done (tsk-1ni/27y/53h/3ik) and phase 5 (agy) deliberately deferred; also names what shipped as a deliberate narrowing from the original 4-factor LLM-judgment vision to 3 mechanical config-time factors plus one self-declared has-live-task-access flag, cross-linked from docs/platform/proposals/dispatch-control-plane-redesign.md
 ---
 
 # A doc's own opening paragraph contradicted its own table two screens down
 
-`tsk-17m` fixed a stale-narrative bug in `docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity`'s D0026
+`tsk-17m` fixed a stale-narrative bug in `docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0026-native-first-dispatch-doctrine-launcherroottaskcapacity`'s D0026
 section ("Lớp còn thiếu — LLM đủ thông minh để tự nhận ra khi nào dùng
 nhánh nào", the Native-First Dispatch Doctrine's own gap description).
 

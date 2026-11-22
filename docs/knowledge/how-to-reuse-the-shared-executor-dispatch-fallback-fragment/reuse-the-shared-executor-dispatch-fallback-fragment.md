@@ -120,7 +120,7 @@ detail to paper over.
   still the reference for config-entry/registration steps 1–3.
 - `docs/how-to/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md`
   — Step B's own dispatch-decision mechanism in more depth.
-- `docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity`
+- `docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0026-native-first-dispatch-doctrine-launcherroottaskcapacity`
   — Native-First Dispatch Doctrine, the governing rules behind Step B.
 - `.agents/skills/_shared/executor-dispatch-fallback.md` — the assembled
   fragment loaded by local wrappers.

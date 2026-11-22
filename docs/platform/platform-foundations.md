@@ -491,7 +491,7 @@ Not applicable — không có màn hình.
 Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
 
 
-### 0001 — Nhật ký sự kiện là sự thật; store/DB là bản chiếu dựng lại được
+### D-ADR0001 — Nhật ký sự kiện là sự thật; store/DB là bản chiếu dựng lại được
 
 #### Bối cảnh
 
@@ -530,7 +530,7 @@ Hệ quả trực tiếp của luật này:
 
 Đổi luật này = supersede record bằng record mới, không sửa tại chỗ.
 
-### 0009 — Chống giao thoa tiến trình lúc cài
+### D-ADR0009 — Chống giao thoa tiến trình lúc cài
 
 #### Bối cảnh
 
@@ -568,7 +568,7 @@ với harness khác cùng máy. Bốn nguyên tắc:
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-### 0014 — Kiến trúc giao tiếp người ↔ fgOS
+### D-ADR0014 — Kiến trúc giao tiếp người ↔ fgOS
 
 Quyết định ở **mức interface** (hình dạng cửa giao tiếp), không phải mức
 implementation. Chốt qua thảo luận mở với người dùng 2026-07-18.
@@ -654,7 +654,7 @@ Chọn **mô hình (3)**, với các chốt sau — tất cả ở mức interfa
   interface của herdr (`socket-api-control-surface`, `self-describing-protocol-schema`,
   `session-snapshot-bootstrap-rpc`) làm mẫu thiết kế cửa.
 
-### 0035 — Xác lập ranh giới sứ mệnh: fgOS phục vụ project khác/business workflow, không tự-phát-triển-chính-nó mặc định
+### D-ADR0035 — Xác lập ranh giới sứ mệnh: fgOS phục vụ project khác/business workflow, không tự-phát-triển-chính-nó mặc định
 
 #### Bối cảnh
 
@@ -698,7 +698,7 @@ fgos-mission-boundary/CONTEXT.md`.
 
 **Trục riêng, đứng cạnh, không phải bậc #5.** Ranh giới mission
 self-vs-host là một trục quyết định riêng, đứng CẠNH danh sách 4 bậc ưu
-tiên sản phẩm D-ADR0030 (thang 4 bậc Ship Faster/Release con người/DoD/Polish Sau DoD, docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm)
+tiên sản phẩm D-ADR0030 (thang 4 bậc Ship Faster/Release con người/DoD/Polish Sau DoD, docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm)
 — không nối vào làm bậc thứ 5. Thang đó trả lời "khi
 hai giá trị xung đột, ưu tiên cái nào" (cùng một trục, khác mức độ). Câu
 hỏi self-vs-host là phân loại đối tượng phục vụ TRƯỚC KHI bất kỳ ưu tiên
@@ -765,7 +765,7 @@ nhân đôi chỗ ghi, vi phạm KISS.
 
 #### Tham chiếu
 
-- D-ADR0030 (`docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm`) — thang ưu tiên sản phẩm mà quyết
+- D-ADR0030 (`docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm`) — thang ưu tiên sản phẩm mà quyết
   định này đứng cạnh, không phải bên trong.
 - `plans/discussions/ds-wc4x244f6k-fgos-mission-boundary/DISCUSSION.md` — toàn bộ thảo luận,
   §6 thiết kế tổng hợp, §7 task breakdown.
@@ -776,7 +776,7 @@ nhân đôi chỗ ghi, vi phạm KISS.
 - `docs/distillery/sources/beegog.md` (deleted in dd4816c0f) — nguồn upstream: `evolving-loop-
   two-gates`, `grooming-project-first`, `product-root-repo-divorce-topology`.
 
-### 0036 — Khoá RUL11 (tùm lum không phải nặng): "tùm lum", không phải "nặng"
+### D-ADR0036 — Khoá RUL11 (tùm lum không phải nặng): "tùm lum", không phải "nặng"
 
 > Superseded bởi 0054 (2026-10-08): RUL11 (tùm lum không phải nặng) thêm vế phạm vi. Phát biểu gốc dưới đây giữ nguyên.
 
@@ -856,7 +856,7 @@ khong phai no nang ma no tum lum
 - RUL9 (doctrine nạp-mọi-turn: placement test, transport mệnh lệnh, anchor phrase; `docs/platform/platform-foundations.md`) — ba quy tắc tầng doctrine
   mà RUL11 (tùm lum không phải nặng) phải tuân để "dính" thay vì chỉ là khẩu hiệu.
 
-### 0054 — RUL11 (tùm lum không phải nặng) gom trong phạm vi việc đang làm (supersede 0036)
+### D-ADR0054 — RUL11 (tùm lum không phải nặng) gom trong phạm vi việc đang làm (supersede 0036)
 
 #### Bối cảnh
 
@@ -877,7 +877,7 @@ Giữ nguyên ý và phát biểu gốc của 0036; thêm vế phạm vi: gom ph
 - `plans/261008-1353-decision-question-template-and-cleanup/` — plan thực hiện.
 - 0036 — quyết định bị supersede.
 
-### 0061 — Khoá RUL104 (tốt hơn, không to hơn): audit làm thứ đang có tốt hơn, không làm nó to ra
+### D-ADR0061 — Khoá RUL104 (tốt hơn, không to hơn): audit làm thứ đang có tốt hơn, không làm nó to ra
 
 > Superseded bởi 0062 (2026-10-18): RUL104 (tốt hơn, không to hơn) thêm clean code và hexagonal. Phát biểu gốc dưới đây giữ nguyên.
 
@@ -905,7 +905,7 @@ Khoá thành RUL104 (`docs/platform/platform-foundations.md#business-rules`'s Bu
 
 - Bảng chương trình `plans/261017-1313-fgos-platform-program-board/plan.md`, luồng HARDEN.
 
-### 0062 — RUL104 (tốt hơn, không to hơn) thêm clean code và hexagonal (supersede 0061)
+### D-ADR0062 — RUL104 (tốt hơn, không to hơn) thêm clean code và hexagonal (supersede 0061)
 
 #### Bối cảnh
 

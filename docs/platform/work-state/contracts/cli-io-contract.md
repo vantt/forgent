@@ -27,7 +27,7 @@ Superseded by: None recorded
 Hợp đồng giao tiếp VÀO/RA hạng nhất cho bề mặt CLI của fgOS (`bin/fgos.mjs`)
 và bề mặt stdout của vòng tự hành (`bin/fgos-runner.mjs`), theo record
 `0014` (`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` (deleted in 4722361ae)) (kiến trúc cửa, đã
-khoá) và [0011](../decisions/retired-decision-history.md#0011-version-tường-minh-cho-mọi-contract) (mọi
+khoá) và [0011](../decisions/retired-decision-history.md#d-adr0011-version-tường-minh-cho-mọi-contract) (mọi
 contract mang version tường minh `<name>/v<N>`). Tài liệu này là bản chốt
 bằng văn xuôi hợp nhất những gì `str46-io-contract` đã dựng qua ba lát —
 không phải code runtime mới, không lặp lại chi tiết cài đặt đã có trong
@@ -392,7 +392,7 @@ payload Node, nơi giữ sổ verb, thay vì chạy verb.
 
 ## 10. Version Tokens
 
-Theo [0011](../decisions/retired-decision-history.md#0011-version-tường-minh-cho-mọi-contract): mỗi
+Theo [0011](../decisions/retired-decision-history.md#d-adr0011-version-tường-minh-cho-mọi-contract): mỗi
 contract mang version tường minh trong định danh của chính nó.
 
 | Bề mặt | Token | Hiện thân |

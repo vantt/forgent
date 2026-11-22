@@ -14,7 +14,7 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 - docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in each area's spec.md "Lịch sử quyết định" section and in decisions/ where present; resolve renamed/split scopes through docs/platform/governance.md#decision-scope-to-holder-table
 - domains/<domain>/AGENTS.md — domain-specific doctrine (e.g. domains/coding/AGENTS.md for fgos-coding-* workflows), read dynamically by fgos-routing
 
-## Product priority order (D-ADR0030, docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm)
+## Product priority order (D-ADR0030, docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm)
 
 1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.
 2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp; mỗi câu theo mẫu câu hỏi quyết định (`core/skills/_shared/decision-question.md`). Tự quyết trong khung đã duyệt (phạm vi + ngân sách ghi lúc duyệt); sắp vượt khung thì dừng và hỏi theo mẫu. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.
@@ -24,9 +24,9 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 
 Tốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** (fgOS không loại trừ khi tự dogfood) — không phải tốc độ tự thân team fgOS build một tính năng của chính fgOS. Đừng chọn phương án rẻ để fgOS tự triển khai nếu nó làm project dùng fgOS chậm hơn.
 
-Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm's "Lịch sử quyết định" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4).
+Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm's "Lịch sử quyết định" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4).
 
-## Ranh giới sứ mệnh (D-ADR0035, docs/platform/platform-foundations.md#0035-xác-lập-ranh-giới-sứ-mệnh-fgos-phục-vụ-project-khácbusiness-workflow-không-tự-phát-triển-chính-nó-mặc-định)
+## Ranh giới sứ mệnh (D-ADR0035, docs/platform/platform-foundations.md#d-adr0035-xác-lập-ranh-giới-sứ-mệnh-fgos-phục-vụ-project-khácbusiness-workflow-không-tự-phát-triển-chính-nó-mặc-định)
 
 fgOS tồn tại để: 
  1. phát triển các project khác 
@@ -171,7 +171,7 @@ cài đặt/setup/doctor story. Before any change is done, check:
 Laws in `docs/platform/platform-foundations.md` are fixed until their named review
 threshold is hit. Changing one supersedes its decision ID — never edit it in place.
 
-## RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/platform/platform-foundations.md#0054-rul11-tùm-lum-không-phải-nặng-gom-trong-phạm-vi-việc-đang-làm-supersede-0036)
+## RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/platform/platform-foundations.md#d-adr0054-rul11-tùm-lum-không-phải-nặng-gom-trong-phạm-vi-việc-đang-làm-supersede-0036)
 
 Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của
 tình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum trong phạm vi
@@ -183,7 +183,7 @@ hình dễ, không chắp vá.
 
 khong phai no nang ma no tum lum
 
-## RUL104 — tốt hơn, không to hơn (D-ADR0062, supersedes D-ADR0061, docs/platform/platform-foundations.md#0062-rul104-tốt-hơn-không-to-hơn-thêm-clean-code-và-hexagonal-supersede-0061)
+## RUL104 — tốt hơn, không to hơn (D-ADR0062, supersedes D-ADR0061, docs/platform/platform-foundations.md#d-adr0062-rul104-tốt-hơn-không-to-hơn-thêm-clean-code-và-hexagonal-supersede-0061)
 
 Khi audit, soát lại hay làm cứng phần đã có, mỗi thay đổi phải làm thứ đang
 có tốt hơn: ổn định hơn, nhanh hơn, nhẹ hơn, code đơn giản hơn theo các

@@ -9,7 +9,7 @@ created: 2026-11-21
 
 # Why
 
-`research-260929-1203-herdr-cook-plan-vs-fgos-dispatch-coordination.md` đề xuất chạy thật một plan 3-4 phase qua cả `thieung/herdr-cook-plan` lẫn engine dispatch/coordination riêng của fgOS trên MỘT PROJECT NGOÀI repo này (đúng mission #1/#2, D-ADR0035 (ranh giới sứ mệnh fgOS) trong `docs/platform/platform-foundations.md#0035-xác-lập-ranh-giới-sứ-mệnh-fgos-phục-vụ-project-khácbusiness-workflow-không-tự-phát-triển-chính-nó-mặc-định` — fgOS tồn tại để phát triển project khác, không phải tự phát triển chính nó), để so sánh throughput/friction thật thay vì chỉ so code tĩnh. Chưa bắt đầu.
+`research-260929-1203-herdr-cook-plan-vs-fgos-dispatch-coordination.md` đề xuất chạy thật một plan 3-4 phase qua cả `thieung/herdr-cook-plan` lẫn engine dispatch/coordination riêng của fgOS trên MỘT PROJECT NGOÀI repo này (đúng mission #1/#2, D-ADR0035 (ranh giới sứ mệnh fgOS) trong `docs/platform/platform-foundations.md#d-adr0035-xác-lập-ranh-giới-sứ-mệnh-fgos-phục-vụ-project-khácbusiness-workflow-không-tự-phát-triển-chính-nó-mặc-định` — fgOS tồn tại để phát triển project khác, không phải tự phát triển chính nó), để so sánh throughput/friction thật thay vì chỉ so code tĩnh. Chưa bắt đầu.
 
 # Done when
 

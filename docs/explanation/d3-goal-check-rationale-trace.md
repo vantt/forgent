@@ -41,14 +41,14 @@ directly-verified incidents in the repo prove it:
 
 A third premise also didn't hold: "there's always a human reviewing before
 merge, so re-verify isn't needed" doesn't match how the system actually
-operates. fgOS's own priority #2, "Release con người" (docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm),
+operates. fgOS's own priority #2, "Release con người" (docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm),
 drives toward unattended batch self-approval loops
 (`/fgOS:merge-loop`, `/fgOS:cleanup-loop`) — exactly the scenario where an
 independent re-verify catches drift a human isn't watching for.
 
 ## What shipped
 
-`docs/platform/runner/decisions/h-36d872fbb0e5.md#0005-runner-cô-lập-worker`'s ADR-0005 entry ("Runner & cô lập worker") gained
+`docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0005-runner-cô-lập-worker`'s ADR-0005 entry ("Runner & cô lập worker") gained
 the two fgOS-specific evidence citations and the corrected review-cadence
 premise, plus a new locked-decision line: independent re-verify guards
 against unintentional worker drift specifically because batch unattended

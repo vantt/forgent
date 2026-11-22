@@ -28,7 +28,7 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/vocab
 
 Platform event-log participant: any process that speaks the event-log format
 and append/read/subscribe contract, including a non-Node implementation
-(`docs/platform/platform-foundations.md#0014--kiến-trúc-giao-tiếp-người--fgos`). Do not redefine this platform
+(`docs/platform/platform-foundations.md#d-adr0014--kiến-trúc-giao-tiếp-người--fgos`). Do not redefine this platform
 term as a CoordinationSession actor or a terminal pane.
 
 ### Job

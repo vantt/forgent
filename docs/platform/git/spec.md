@@ -959,6 +959,16 @@ No repository evidence shows external consumers using shallow or alternates clon
 
 ## 18. Owner decisions (2026-10-17)
 
+### D-ADR0057 — Git is one foundation component
+
+The owner signed this spec on 2026-10-18 as D-ADR0057: Git is one foundation component (`fgos-git`, a Rust live core) that owns every git operation. The answers below are the decisions it was signed with.
+
+### D-ADR0058 — Git publication recovery after a crashed seal (amends D-ADR0057)
+
+Amendment A1 of 2026-10-18: publication supersession, §10 rule 4a. It amends D-ADR0057; D-ADR0057 stays in force.
+
+### Answers of 2026-10-17
+
 The owner answered every open question on 2026-10-17 at 23:18 (Asia/Saigon), accepting the recommendation on each (“theo khuyến nghị của em cả 8 câu”). These are decisions, not proofs; §19 still gates signature.
 
 | Id | Decision | What it changed |

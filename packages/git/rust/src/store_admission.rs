@@ -69,7 +69,7 @@ pub struct Admitted {
 
 fn store_missing(dir: &Path) -> String {
     format!(
-        ".fgos/ not found at \"{}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).",
+        ".fgos/ not found at \"{}\" -- run \"fgos init\" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).",
         dir.display()
     )
 }

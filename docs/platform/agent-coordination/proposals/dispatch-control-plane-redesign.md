@@ -32,7 +32,7 @@ The current system has:
 
 - a runner config that maps capabilities/purposes to concrete executors;
 - executor declarations with kind, carries, provider/model policy, invocation shape, and optional adapter;
-- a `decide` command that chooses whether a target should run native/in-process or out-of-process (this command is the concrete result of D0026's 4 done phases, with phase 5 extending native detection to agy deliberately deferred per `docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity`'s "Lớp còn thiếu — LLM đủ thông minh để tự nhận ra khi nào dùng nhánh nào" section);
+- a `decide` command that chooses whether a target should run native/in-process or out-of-process (this command is the concrete result of D0026's 4 done phases, with phase 5 extending native detection to agy deliberately deferred per `docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0026-native-first-dispatch-doctrine-launcherroottaskcapacity`'s "Lớp còn thiếu — LLM đủ thông minh để tự nhận ra khi nào dùng nhánh nào" section);
 - an `execute` path that resolves an executor, spawns a process, captures output, and returns a JSON result;
 - prompt contracts for work items and ad-hoc dispatches;
 - legacy stdout tokens such as `[DONE]` and `[BLOCKED]`;
@@ -147,7 +147,7 @@ Therefore mailbox and AgentMessage are still design targets, not prerequisites f
 - `executor` - a concrete configured implementation, for example `claude`, `gemini`, `gitnexus` or `herdr`; names are configuration-local, not fixed runtime capabilities.
 - `ad-hoc task` / `exec packet` - an ephemeral runtime-composed unit outside the work ledger.
 
-The old `rootTask`/`subTask` vocabulary is not part of the current dispatch model. A "subtask" is either child work with lifecycle or an ephemeral ad-hoc dispatch target. Note that the runner spec's (`docs/platform/runner/decisions/h-36d872fbb0e5.md#0034-đổi-tên-capacitycapacities-thành-executorexecutors-chốt-tách-capability`) historical `capacity` concept maps to `capability` for abstract behavior promises and to `executor` for concrete execution units per ADR 0034.
+The old `rootTask`/`subTask` vocabulary is not part of the current dispatch model. A "subtask" is either child work with lifecycle or an ephemeral ad-hoc dispatch target. Note that the runner spec's (`docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0034-đổi-tên-capacitycapacities-thành-executorexecutors-chốt-tách-capability`) historical `capacity` concept maps to `capability` for abstract behavior promises and to `executor` for concrete execution units per ADR 0034.
 
 ### 5.2 Design-Target Rename
 

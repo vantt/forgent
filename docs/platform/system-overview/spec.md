@@ -104,7 +104,7 @@ coverage: partial
 Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
 
 
-### 0016 — Mốc MVP của fgOS
+### D-ADR0016 — Mốc MVP của fgOS
 
 #### Bối cảnh
 
@@ -132,7 +132,7 @@ Mốc dogfood tự-phát-triển (STR25) đã ĐẠT 2026-07-17: item thật đi
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-### 0018 — Mốc MVP2 của fgOS
+### D-ADR0018 — Mốc MVP2 của fgOS
 
 #### Bối cảnh
 

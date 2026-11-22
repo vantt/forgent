@@ -98,13 +98,13 @@ Last reviewed: 2026-09-13
 ```
 
 **Phiên bản:** v0.6. **Trạng thái:** CHUẨN — chấp nhận 2026-07-16, record
-[0010](#0010-bản-đồ-kiến-trúc-là-bản-chuẩn); nâng v0.3 theo record
-[0012](work-state/decisions/retired-decision-history.md#0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời);
+[0010](#d-adr0010-bản-đồ-kiến-trúc-là-bản-chuẩn); nâng v0.3 theo record
+[0012](work-state/decisions/retired-decision-history.md#d-adr0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời);
 nâng v0.4 theo record
-[0013](work-state/decisions/retired-decision-history.md#0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from); nâng v0.5
+[0013](work-state/decisions/retired-decision-history.md#d-adr0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from); nâng v0.5
 theo record
-[0015](#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009); nâng v0.6 theo record
-[0017](#0017-đóng-audit-hệ-idtên-gọi-str47) (§12 thêm dòng id-systems-audit,
+[0015](#d-adr0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009); nâng v0.6 theo record
+[0017](#d-adr0017-đóng-audit-hệ-idtên-gọi-str47) (§12 thêm dòng id-systems-audit,
 Phụ lục B mới — sổ đăng ký 13 hệ id/tên gọi).
 
 Chưng từ tài liệu bàn luận ở xưởng và hai deep-dive distillery (`work-item-management`,
@@ -125,7 +125,7 @@ record kèm nâng version — supersede, không sửa ngầm.
 5. Sequence §8 thêm **nhánh fail** (park/halt → friction, chỗ S2 cắm vào).
 6. Thêm §12: quan hệ với `system-overview.md`, `reading-map.md`, `backlog.md`.
 
-**Changelog v0.2 → v0.3** (record [0012](work-state/decisions/retired-decision-history.md#0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời) — supersede ADR0002, chi tiết ở §11):
+**Changelog v0.2 → v0.3** (record [0012](work-state/decisions/retired-decision-history.md#d-adr0012-mô-hình-đồ-thị-cạnh-định-kiểu-hợp-nhất-thay-thế-depsparent-tách-rời) — supersede ADR0002, chi tiết ở §11):
 
 1. `src/state/dep-graph.mjs` (§6) không còn chỉ kiểm chu trình trên `deps` —
    đổi thành đồ thị cạnh-định-kiểu HỢP NHẤT `blocks`+`parent-child` (`deps`
@@ -139,7 +139,7 @@ record kèm nâng version — supersede, không sửa ngầm.
    2 (nay đã lên 3, per D19/D27 str46-io-contract), không có row §6/manifest
    mới (mở rộng module đã có, không tạo module mới).
 
-**Changelog v0.3 → v0.4** (record [0013](work-state/decisions/retired-decision-history.md#0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from) — mở rộng CTR003, không supersede):
+**Changelog v0.3 → v0.4** (record [0013](work-state/decisions/retired-decision-history.md#d-adr0013-kênh-báo-cáo-không-ghi-workerrunner-cho-discovered-from) — mở rộng CTR003, không supersede):
 
 1. Contract **CTR003** (§7, orchestrator ↔ worker) thêm một mệnh đề **kênh
    báo-cáo-không-ghi** (report-not-write): worker CÓ THỂ phát một khối
@@ -152,7 +152,7 @@ record kèm nâng version — supersede, không sửa ngầm.
    là lineage phi-chặn (loại khỏi cycle-check theo thiết kế), cưỡi SCHEMA_VERSION
    khi ấy vẫn là 2 (nay đã lên 3, per D19/D27 str46-io-contract).
 
-**Changelog v0.4 → v0.5** (record [0015](#0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009) — đổi tên định danh, không supersede):
+**Changelog v0.4 → v0.5** (record [0015](#d-adr0015-đổi-tên-định-danh-contract-c1-c9-thành-ctr001-ctr009) — đổi tên định danh, không supersede):
 
 1. Định danh contract một-chữ-số-trần cũ (§7, từ số 1 đến số 9) đổi tên
    thành `CTR001`-`CTR009` (3-digit zero-padded, cùng quy ước padding với
@@ -678,7 +678,7 @@ nguyên định dạng hiện tại, không đầu tư đổi tên/migrate (khun
 Các ADR dưới đây được di dời nguyên văn từ `docs/decisions/` (tsk-1lv-4, D5) -- corpus đó đã retired, `state.decisions` (qua `fgos decision --scope`) giữ record ngắn làm nguồn thật, phần narrative đầy đủ sống ở đây. Thứ tự theo số ADR gốc.
 
 
-##### 0010 — Bản đồ kiến trúc là bản chuẩn
+##### D-ADR0010 — Bản đồ kiến trúc là bản chuẩn
 
 **Ngày:** 2026-07-16 · **Trạng thái:** chốt
 
@@ -722,7 +722,7 @@ sai giữa Domain và Infra.
 - Nợ có tên còn mở: C2 cross-process lease (trước STR6), C6 designed-chưa-code,
   C3 partial (3 field RUN_CONTRACT vay khi fan-out).
 
-##### 0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009
+##### D-ADR0015 — Đổi tên định danh contract C1-C9 thành CTR001-CTR009
 
 ###### Bối cảnh
 
@@ -772,7 +772,7 @@ nghĩa/ranh giới/maturity của bất kỳ contract nào.
 
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
 
-##### 0017 — Đóng audit hệ id/tên gọi (STR47)
+##### D-ADR0017 — Đóng audit hệ id/tên gọi (STR47)
 
 ###### Bối cảnh
 

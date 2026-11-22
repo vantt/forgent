@@ -18,7 +18,7 @@ map between them.
 
 ## Why this page exists
 
-[Decision 0014](../../platform/platform-foundations.md#0014--kiến-trúc-giao-tiếp-người--fgos)
+[Decision 0014](../../platform/platform-foundations.md#d-adr0014--kiến-trúc-giao-tiếp-người--fgos)
 locked this claim: "the standard contract is the event-log schema plus the
 append/read/subscribe protocol, **not a linkable lib** — any process, in
 any language, that speaks the log-format correctly is a full participant."
@@ -255,7 +255,7 @@ directly.
   reimplement.
 - `herdr-plugin/src/fgos.rs:297,344-371,378,438,468,587,659,710,757` —
   the worked-example participant.
-- [Decision 0014](../../platform/platform-foundations.md#0014--kiến-trúc-giao-tiếp-người--fgos) —
+- [Decision 0014](../../platform/platform-foundations.md#d-adr0014--kiến-trúc-giao-tiếp-người--fgos) —
   the locked architecture this page makes usable.
 - [Decision 0011](../decisions/0011-version-tuong-minh-cho-moi-contract.md) —
   the version-token convention.

@@ -34,7 +34,7 @@ This portal owns work-state navigation, not a second state contract. Read [spec.
 | Reader goal | Read |
 | --- | --- |
 | Find state and CLI I/O owners | [spec.md](spec.md); [CLI I/O contract and root I/O authority](contracts/cli-io-contract.md) |
-| Review schema/event evolution before changing a field or verb | [ADR 0007](decisions/retired-decision-history.md#0007--tiến-hoá-schema--event) |
+| Review schema/event evolution before changing a field or verb | [ADR 0007](decisions/retired-decision-history.md#d-adr0007--tiến-hoá-schema--event) |
 | Open the behavior spec | [spec.md](spec.md) |
 | Open the scoped CLI input/output contract | [contracts/cli-io-contract.md](contracts/cli-io-contract.md) |
 | Open the candidate implementation pointers | [architecture/implementation-pointers.md](architecture/implementation-pointers.md) |
