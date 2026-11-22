@@ -29,6 +29,8 @@ Closes `p-vquz26ibnn` item (7).
 4. Write `reports/after-wake-and-idle.md`: the before and after per-hour wakes, the false and true idle rows, the change
    made, and whether any true idle was missed, meaning a session idle with unfinished work for longer than the new
    threshold with no row. If a true idle was missed, revert the change and say so.
+5. Backlog p-4uqiyjwrtd (owner decision A, 2026-11-22): both reports count missed idle alarms (a live lead idle with
+   unfinished phases and no row) next to the false ones, and the before report names the 2026-11-22 case.
 
 ## Verify
 

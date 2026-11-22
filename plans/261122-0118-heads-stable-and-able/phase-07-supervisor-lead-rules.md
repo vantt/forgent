@@ -52,6 +52,9 @@ item (8).
    text. It checks that the `session-idle` rule types a check and never closes on a screen claim, and that admission
    writes `status`, `lead` and `base` in one land. No new skill test file.
 8. Run `npm run build:skills`.
+9. Missed idle, backlog p-4uqiyjwrtd (owner decision A, 2026-11-22): a live idle lead raises no event, so nobody
+   notices it stopped. State in `docs/platform/supervision/spec.md` why the watcher raised nothing for the idle lead on
+   2026-11-22, from the watcher and supervision records, and make the supervisor rule above cover that case.
 
 ## Verify
 
