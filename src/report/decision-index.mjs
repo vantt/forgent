@@ -138,9 +138,9 @@ export function roleFieldTarget(target) {
 }
 
 /**
- * Pure: the field line of every scoped decision id, from its events in log order. Returns
- * `{ fields: Map<id, { scope, line }>, warnings: string[] }`; a relation whose target is no unit id is left out
- * of the line and named in `warnings`.
+ * Pure: the field line of every scoped decision, from its events in log order. A decision is its scope and id
+ * (two scopes once minted the same number). Returns `{ fields: Map<key, { id, scope, line }>, warnings }`; a
+ * relation whose target is no unit id is left out of the line and named in `warnings`.
  */
 export function decisionRoleFields(decisions) {
   const byId = new Map();
@@ -148,12 +148,14 @@ export function decisionRoleFields(decisions) {
     if (d.kind === 'engine' || typeof d.scope !== 'string' || !d.scope.trim()) continue;
     const id = DECISION_ID.exec(String(d.text ?? ''))?.[0];
     if (!id) continue;
-    if (!byId.has(id)) byId.set(id, []);
-    byId.get(id).push(d);
+    const key = `${d.scope}\0${id}`;
+    if (!byId.has(key)) byId.set(key, []);
+    byId.get(key).push(d);
   }
   const fields = new Map();
   const warnings = [];
-  for (const [id, events] of byId) {
+  for (const [key, events] of byId) {
+    const id = DECISION_ID.exec(events[0].text)[0];
     const latest = events.at(-1);
     const declared = events.filter((e) => typeof e.validFrom === 'string' && e.validFrom).at(-1);
     const parts = [`[valid_from:: ${declared?.validFrom ?? events[0].ts}]`];
@@ -164,7 +166,7 @@ export function decisionRoleFields(decisions) {
       if (target) parts.push(`[${field}:: ${target}]`);
       else warnings.push(`${id}: ${latest.relation} names no unit id; no ${field} field is written (record a new decision event naming the unit)`);
     }
-    fields.set(id, { scope: latest.scope, line: parts.join(' ') });
+    fields.set(key, { id, scope: latest.scope, line: parts.join(' ') });
   }
   return { fields, warnings };
 }
@@ -195,7 +197,7 @@ export function placeRoleFields(markdown, lines) {
 export function computeDecisionRoleFields(repoRoot, decisions, holderFor = narrativeHolderResolver(repoRoot)) {
   const { fields, warnings } = decisionRoleFields(decisions);
   const perHolder = new Map();
-  for (const [id, { scope, line }] of fields) {
+  for (const { id, scope, line } of fields.values()) {
     const holder = holderFor(scope);
     if (!holder) {
       warnings.push(`${id}: scope "${scope}" has no narrative holder`);

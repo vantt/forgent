@@ -268,15 +268,20 @@ test('decisionRoleFields: the latest event of an id decides its relation, ADR###
     ev('D-ADR0062: better', 'supersedes:D-ADR0061', '2026-10-18T14:42:56Z'),
     ev('D-ADR0057: touch', 'touches:D-ADR0055', '2026-10-18T02:00:00Z'),
     ev('D-ADR0077: names', 'supersedes:docs/x.md:413', '2026-11-22T03:00:00Z'),
+    { scope: 'work-state', text: 'D-ADR0062: same number, other scope', relation: 'none', ts: '2026-10-19T00:00:00Z' },
     { kind: 'engine', scope: 'runner', text: 'D-ADR0099: engine', relation: 'supersedes:D-ADR0001', ts: '2026-01-01' },
     { text: 'D-ADR0098: unscoped', relation: 'none', ts: '2026-01-01' },
   ]);
-  assert.deepEqual(Object.fromEntries([...fields].map(([id, f]) => [id, f.line])), {
+  assert.deepEqual(Object.fromEntries([...fields.values()].filter((f) => f.scope === 'runner').map((f) => [f.id, f.line])), {
     'D-ADR0012': '[valid_from:: 2026-07-14] [amends:: D-ADR0002]',
     'D-ADR0062': '[valid_from:: 2026-10-18T14:42:56Z] [replaces:: D-ADR0061]',
     'D-ADR0057': '[valid_from:: 2026-10-18T02:00:00Z]',
     'D-ADR0077': '[valid_from:: 2026-11-22T03:00:00Z]',
   });
+  assert.deepEqual([...fields.values()].filter((f) => f.id === 'D-ADR0062').map((f) => [f.scope, f.line]), [
+    ['runner', '[valid_from:: 2026-10-18T14:42:56Z] [replaces:: D-ADR0061]'],
+    ['work-state', '[valid_from:: 2026-10-19T00:00:00Z]'],
+  ], 'one number minted in two scopes stays two decisions');
   assert.equal(warnings.length, 1);
   assert.match(warnings[0], /^D-ADR0077: supersedes:docs\/x\.md:413 names no unit id/);
 });
