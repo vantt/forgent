@@ -238,11 +238,13 @@ test('buildDecisionIndexMarkdown: a retired docs/specs pointer carried by an eve
   assert.doesNotMatch(md, /docs\/specs\/runner\.md/);
 });
 
-test('narrativeHolderResolver: reads decision-kinds.json by id, alias or owner, falls back to the platform file carrying the scope name, and returns null otherwise', () => {
+test('narrativeHolderResolver: reads decision-kinds.json by id, canonical or alias, falls back to the platform file carrying the scope name, and returns null otherwise', () => {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-holder-'));
   fs.mkdirSync(path.join(repoRoot, 'docs', 'platform', 'system-overview'), { recursive: true });
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'platform', 'questions'), { recursive: true });
   fs.mkdirSync(path.join(repoRoot, 'packages', 'component-authority', 'model'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, 'docs', 'platform', 'system-overview', 'spec.md'), '# spec\n');
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'platform', 'questions', 'spec.md'), '# questions\n');
   fs.writeFileSync(path.join(repoRoot, 'packages', 'component-authority', 'model', 'decision-kinds.json'), JSON.stringify([
     {
       id: 'packaging-distribution',
@@ -256,7 +258,9 @@ test('narrativeHolderResolver: reads decision-kinds.json by id, alias or owner, 
   assert.equal(holderFor('distribution'), 'docs/platform/packaging-distribution/decisions/');
   assert.equal(holderFor('packaging-distribution'), 'docs/platform/packaging-distribution/decisions/');
   assert.equal(holderFor('decision-kind:packaging-distribution'), 'docs/platform/packaging-distribution/decisions/');
+  // owner / area-name keys are not matched on their own; bare area names fall back.
   assert.equal(holderFor('system-overview'), 'docs/platform/system-overview/spec.md');
+  assert.equal(holderFor('questions'), 'docs/platform/questions/spec.md');
   assert.equal(holderFor('nowhere'), null);
 });
 

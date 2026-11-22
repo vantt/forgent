@@ -12,9 +12,9 @@
 // the document's author and is never touched. A view is drift when its block is missing
 // (`required: true`) or when the block on disk differs from the render.
 //
-// The governance holder table is `required: false` until DOCOS accepts the preview at
-// plans/261121-2109-component-authority/reports/holder-view-preview.md; `--check` does
-// not demand its markers, and write mode only rewrites it when the markers already exist.
+// The governance holder table is `required: false` until DOCOS accepts the preview
+// written via `--preview-holder <path>`; `--check` does not demand its markers, and
+// write mode only rewrites it when the markers already exist.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -113,9 +113,9 @@ function ownerTableBody(model) {
  * The governance "Decision scope to holder table": the same four columns and the same
  * scope-to-holder shape the hand-written table carries, so every legacy scope alias
  * survives and `fgos decision-index` keeps resolving narratives from them. Held back from
- * governance.md until DOCOS answers (phase 5 step 2); rendered into the preview report so
- * that answer can be given against the real table. `required: false` keeps `--check` green
- * while the markers are absent.
+ * governance.md until DOCOS answers; rendered into the preview report so that answer can
+ * be given against the real table. `required: false` keeps `--check` green while the
+ * markers are absent.
  */
 function governanceHolderBody(model, repoRoot) {
   const byId = new Map(model.components.map((component) => [component.id, component]));
@@ -138,9 +138,6 @@ function governanceHolderBody(model, repoRoot) {
     } else {
       scopeParts.push(`${kind.id} → ${target}`);
     }
-    if (kind.id !== target && !asciiAliases.includes(kind.id) && !scopeParts.some((part) => part.startsWith(`${kind.id} →`))) {
-      // id already covered when no ascii alias forced the id→target form above.
-    }
     const area = owner ? areaOf(owner) : narrativeArea;
     const portalCandidates = [];
     if (area) portalCandidates.push(`docs/platform/${area}/README.md`);
@@ -157,18 +154,30 @@ function governanceHolderBody(model, repoRoot) {
   return lines.join('\n');
 }
 
+/**
+ * One row per area. Specs not under `docs/platform/<area>/` land in `(cross-area)`
+ * instead of being dropped (host-surface, durable-file, domain-*, group-thinking, …).
+ */
 function areaMapBody(model) {
   const lines = [
-    `Area rows from the model: the component that owns each area, whose owner doc reads first. ${NOTE}`,
+    `Area rows from the model: one row per area listing its top-level components. Specs outside docs/platform/<area>/ are listed under (cross-area). ${NOTE}`,
     '',
-    '| Area | Owner component | What it owns | Owner doc |',
+    '| Area | Components | What it owns | Owner doc |',
     '| --- | --- | --- | --- |',
   ];
+  const byArea = new Map();
   for (const component of sortedComponents(model)) {
     if (component.parent) continue;
-    const area = areaOf(component);
-    if (!area) continue;
-    lines.push(`| ${code(area)} | ${code(component.id)} | ${cell(component.meaning)} | ${code(component.spec)} |`);
+    const area = areaOf(component) ?? '(cross-area)';
+    if (!byArea.has(area)) byArea.set(area, []);
+    byArea.get(area).push(component);
+  }
+  for (const area of [...byArea.keys()].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))) {
+    const comps = byArea.get(area);
+    const ids = comps.map((component) => code(component.id)).join(', ');
+    const meanings = comps.map((component) => cell(component.meaning)).filter(Boolean).join('; ') || '—';
+    const specs = [...new Set(comps.map((component) => component.spec).filter(Boolean))].map(code).join(', ') || '—';
+    lines.push(`| ${code(area)} | ${ids} | ${meanings} | ${specs} |`);
   }
   return lines.join('\n');
 }
@@ -223,30 +232,66 @@ const spanOf = (text, view) => {
 /**
  * Every view computed against the model, without writing: `{ view, file, required, block,
  * present, previous, next, changed }`. `present: false` means the file has no block for the
- * view, and `next` is then the file unchanged.
+ * view. File content is computed once per file: every view that shares a file carries the
+ * same fully-applied `previous`/`next` pair.
  */
 export function computeViews(repoRoot) {
   const model = loadModel(repoRoot);
-  const results = [];
-  for (const def of viewDefinitions(model, repoRoot)) {
+  const defs = viewDefinitions(model, repoRoot);
+
+  // Read each file once.
+  const fileState = new Map();
+  for (const def of defs) {
+    if (fileState.has(def.file)) continue;
     const filePath = path.join(repoRoot, def.file);
-    const previous = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : '';
+    fileState.set(def.file, {
+      filePath,
+      previous: fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : '',
+    });
+  }
+
+  // Render every block once, then apply all present blocks onto each file once.
+  const prepared = defs.map((def) => {
+    const state = fileState.get(def.file);
     const block = renderBlock(def.view, def.body());
-    const span = spanOf(previous, def.view);
-    const next = span ? `${previous.slice(0, span.from)}${block}${previous.slice(span.to)}` : previous;
-    results.push({
+    const span = spanOf(state.previous, def.view);
+    return {
       view: def.view,
       file: def.file,
-      filePath,
+      filePath: state.filePath,
       required: def.required,
       block,
       present: Boolean(span),
-      previous,
-      next,
-      changed: Boolean(span) && next !== previous,
-    });
+      previous: state.previous,
+    };
+  });
+
+  const nextByFile = new Map();
+  for (const [file, state] of fileState) {
+    let next = state.previous;
+    for (const entry of prepared) {
+      if (entry.file !== file || !entry.present) continue;
+      const span = spanOf(next, entry.view);
+      if (!span) continue;
+      next = `${next.slice(0, span.from)}${entry.block}${next.slice(span.to)}`;
+    }
+    nextByFile.set(file, next);
   }
-  return results;
+
+  return prepared.map((entry) => {
+    const next = nextByFile.get(entry.file) ?? entry.previous;
+    const span = entry.present ? spanOf(entry.previous, entry.view) : null;
+    const singleNext = span
+      ? `${entry.previous.slice(0, span.from)}${entry.block}${entry.previous.slice(span.to)}`
+      : entry.previous;
+    return {
+      ...entry,
+      next,
+      // Per-view drift: this view's own block vs disk (not the multi-view file rollup).
+      changed: entry.present && singleNext !== entry.previous,
+      fileChanged: next !== entry.previous,
+    };
+  });
 }
 
 /** Views whose block differs from the tree: `{ view, file, reason }`. */
@@ -262,38 +307,29 @@ export function checkViews(repoRoot) {
   return drift;
 }
 
-/** Write mode: rewrite every present block in place. Returns `{ written, skipped }`. */
+/**
+ * Write mode: rewrite every present block in place. Reuses the file content
+ * `computeViews` already built — no second span/body pass.
+ */
 export function writeViews(repoRoot) {
   const written = [];
   const skipped = [];
-  // Group by file so two views in one file both apply.
-  const byFile = new Map();
-  for (const view of computeViews(repoRoot)) {
-    if (!byFile.has(view.filePath)) byFile.set(view.filePath, []);
-    byFile.get(view.filePath).push(view);
-  }
-  for (const [filePath, views] of byFile) {
-    let content = views[0].previous;
-    let fileWritten = false;
-    for (const view of views) {
-      if (!view.present) {
-        skipped.push({ view: view.view, file: view.file });
-        continue;
-      }
-      const span = spanOf(content, view.view);
-      if (!span) {
-        skipped.push({ view: view.view, file: view.file });
-        continue;
-      }
-      const block = view.block;
-      const next = `${content.slice(0, span.from)}${block}${content.slice(span.to)}`;
-      if (next !== content) {
-        content = next;
-        fileWritten = true;
-        written.push({ view: view.view, file: view.file });
+  const views = computeViews(repoRoot);
+  const seenFiles = new Set();
+  for (const view of views) {
+    if (!view.present) {
+      skipped.push({ view: view.view, file: view.file });
+      continue;
+    }
+    if (seenFiles.has(view.filePath)) continue;
+    seenFiles.add(view.filePath);
+    if (!view.fileChanged) continue;
+    fs.writeFileSync(view.filePath, view.next, 'utf8');
+    for (const entry of views) {
+      if (entry.filePath === view.filePath && entry.present && entry.changed) {
+        written.push({ view: entry.view, file: entry.file });
       }
     }
-    if (fileWritten) fs.writeFileSync(filePath, content, 'utf8');
   }
   return { written, skipped };
 }
@@ -303,9 +339,9 @@ function parseTable(markdown) {
   const rows = [];
   for (const line of markdown.split('\n')) {
     if (!line.startsWith('|')) continue;
-    const cells = line.split('|').slice(1, -1).map((cell) => cell.trim());
+    const cells = line.split('|').slice(1, -1).map((part) => part.trim());
     if (cells.length === 0) continue;
-    if (cells.every((cell) => /^-+$/.test(cell.replace(/\s/g, '')))) continue;
+    if (cells.every((part) => /^-+$/.test(part.replace(/\s/g, '')))) continue;
     rows.push(cells);
   }
   return rows;
@@ -345,7 +381,7 @@ export function buildHolderViewPreview(repoRoot) {
     diffLines.push(`| ${cell(scope)} | ${notes.length ? 'changed' : 'same'} | ${cell(cur[3] ?? '')} | ${cell(gen[3] ?? '')} | ${notes.join('; ') || '—'} |`);
   }
   return [
-    '# Holder view preview (component-authority phase 5)',
+    '# Holder view preview (component-authority)',
     '',
     'DOCOS keeps the holder table shape (scope → holder file or directory) and wants this',
     'generated view before the hand-written table in `docs/platform/governance.md` is replaced',
@@ -366,19 +402,33 @@ export function buildHolderViewPreview(repoRoot) {
   ].join('\n');
 }
 
+function previewHolderPath(argv, repoRoot) {
+  const idx = argv.indexOf('--preview-holder');
+  if (idx === -1) return null;
+  const value = argv[idx + 1];
+  if (!value || value.startsWith('-')) {
+    throw new Error('component-authority-render: --preview-holder requires an output path');
+  }
+  return path.isAbsolute(value) ? value : path.join(repoRoot, value);
+}
+
 export function main(argv = process.argv.slice(2), { repoRoot = REPO_ROOT } = {}) {
   if (argv.includes('--preview-holder')) {
-    const out = argv.includes('--stdout')
-      ? null
-      : path.join(repoRoot, 'plans', '261121-2109-component-authority', 'reports', 'holder-view-preview.md');
-    const content = buildHolderViewPreview(repoRoot);
-    if (out) {
-      fs.mkdirSync(path.dirname(out), { recursive: true });
-      fs.writeFileSync(out, content, 'utf8');
-      console.log(`component-authority-render: wrote ${path.relative(repoRoot, out)}`);
-    } else {
-      process.stdout.write(content);
+    let out;
+    try {
+      out = previewHolderPath(argv, repoRoot);
+    } catch (err) {
+      console.error(err.message);
+      return 1;
     }
+    const content = buildHolderViewPreview(repoRoot);
+    if (argv.includes('--stdout')) {
+      process.stdout.write(content);
+      return 0;
+    }
+    fs.mkdirSync(path.dirname(out), { recursive: true });
+    fs.writeFileSync(out, content, 'utf8');
+    console.log(`component-authority-render: wrote ${path.relative(repoRoot, out)}`);
     return 0;
   }
   if (argv.includes('--check')) {

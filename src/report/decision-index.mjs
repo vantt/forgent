@@ -28,9 +28,10 @@ const LEGACY_SPEC_PATH = /docs\/specs\/([A-Za-z0-9-]+)\.md/g;
 /**
  * Resolve where a decision scope's narrative lives today. Decision kinds in
  * `packages/component-authority/model/decision-kinds.json` name the narrative
- * home per scope (canonical id, aliases, owner). A scope the model does not
- * list falls back to the platform file that carries its name. Returns
- * `(scopeName) => path|null`.
+ * home per scope (id, canonical, aliases). A scope the model does not list
+ * falls back to the platform file that carries its name
+ * (`docs/platform/<name>.md` or `docs/platform/<name>/spec.md`, covering
+ * scopes such as `questions`). Returns `(scopeName) => path|null`.
  */
 export function narrativeHolderResolver(repoRoot) {
   const homes = new Map();
@@ -40,12 +41,10 @@ export function narrativeHolderResolver(repoRoot) {
       const home = kind?.narrative;
       if (!home) continue;
       const names = new Set();
+      // Match by id, canonical, and aliases only — not owner or area name.
       if (kind.id) names.add(kind.id);
       if (kind.canonical) names.add(kind.canonical);
-      if (kind.owner) names.add(kind.owner);
       for (const alias of kind.aliases ?? []) names.add(alias);
-      const area = /^docs\/platform\/([^/]+)\//.exec(home)?.[1];
-      if (area) names.add(area);
       for (const name of names) {
         if (name) homes.set(name, home);
       }

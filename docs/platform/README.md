@@ -117,6 +117,15 @@ Component owners, one row per component and subcomponent, sorted by id. <!-- ren
 | `yaml-document` | — | Lossless reading, editing, and merging of YAML documents with positions. | `docs/platform/yaml-document/spec.md` | `packages/yaml-doc/` |
 <!-- /generated:component-authority:readme-owner-table -->
 
+Hand-written registry rows the model does not hold (non-component areas and portal links retained from the prior area registry):
+
+| Area | Current exact owner / retained scope |
+|---|---|
+| system-architecture | Architecture routes: [architecture intent](system-architecture/architecture/architecture-intent.md), [roadmap](system-architecture/architecture/roadmap.md), [workspace topology](system-architecture/architecture/workspace-topology.md), [topology audit](system-architecture/architecture/workspace-topology-audit.md); related [topology roadmap](system-architecture/architecture/workspace-topology-roadmap.md) and [system vision](system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md) |
+| [system-overview](system-overview/spec.md) | System overview; use [component boundaries](component-boundary.md#4-current-high-level-components) for current ownership routes |
+| `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |
+| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); historical documentation migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `archive/plans/260825-1841-knowledge-registry/plan.md` |
+
 ## 3. Decision Surface
 
 | Status | Question | Where |

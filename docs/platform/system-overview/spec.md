@@ -39,13 +39,13 @@ coverage: partial
 ## Area Map
 
 <!-- generated:component-authority:system-overview-area-map -->
-Area rows from the model: the component that owns each area, whose owner doc reads first. <!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
+Area rows from the model: one row per area listing its top-level components. Specs outside docs/platform/<area>/ are listed under (cross-area). <!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
 
-| Area | Owner component | What it owns | Owner doc |
+| Area | Components | What it owns | Owner doc |
 | --- | --- | --- | --- |
+| `(cross-area)` | `canonical-json`, `coding-domain`, `domain-components`, `domain-registry-loader`, `durable-file`, `group-thinking`, `host-surface`, `platform-foundations` | Authority for canonical JSON bytes per RFC 8785.; Coding Domain Core, policies, repo scope, footprint, worktree isolation, merge catchup, and code verification doctrine.; Domain-specific behavior, workflows, skills, task specs, and doctrine.; General runtime definition registry and config loader for domains, workflows, and declarations.; Authority for how records reach disk durably: temp file, fsync, atomic install.; Versioned CoordinationProtocol definitions and skill for structured multi-agent deliberation.; CLI entrypoints, top-level verbs, argument parsing, and command execution.; Core platform utilities, foundation laws L1-L10, and cross-cutting helpers. | `docs/platform/component-boundary.md`, `docs/platform/README.md`, `docs/platform/platform-foundations.md` |
 | `agent-confinement` | `agent-confinement` | Single authority for agent isolation, container boundaries, and sandboxing. | `docs/platform/agent-confinement/spec.md` |
-| `agent-coordination` | `agent-coordination` | Agent coordination area portal; former coordination engine retired, execution uses runner/Workflow. | `docs/platform/agent-coordination/spec.md` |
-| `agent-coordination` | `agent-coordination-engine` | Authority for CoordinationSession manifest/events, actor bounds, session recovery, and synthesis boundary. | `docs/platform/agent-coordination/spec.md` |
+| `agent-coordination` | `agent-coordination`, `agent-coordination-engine`, `team-cognition-engine` | Agent coordination area portal; former coordination engine retired, execution uses runner/Workflow.; Authority for CoordinationSession manifest/events, actor bounds, session recovery, and synthesis boundary.; Typed deliberation interpretation, aggregation-method semantics, and cognitive outcomes. | `docs/platform/agent-coordination/spec.md` |
 | `agent-mailbox` | `agent-mailbox` | Placing a message from one agent session into context of the right live head. | `docs/platform/agent-mailbox/spec.md` |
 | `agent-protocol` | `agent-protocol` | Pure per-CLI adapters (claude, codex, agy, pi, omp) translating CLI output to status. | `docs/platform/agent-protocol/spec.md` |
 | `claude-plugin` | `claude-plugin` | Claude Code slash-command surface and plugin wrappers. | `docs/platform/claude-plugin/spec.md` |
@@ -53,45 +53,54 @@ Area rows from the model: the component that owns each area, whose owner doc rea
 | `config` | `config` | Configuration authority: project and global config, schema and facade. | `docs/platform/config/spec.md` |
 | `convention` | `convention` | Deterministic artifact names, repository-relative placement, path classification, and conformance checking. | `docs/platform/convention/spec.md` |
 | `decision-citation-drift` | `decision-citation-drift` | Read-only detection check for bare citations and decision drift. | `docs/platform/decision-citation-drift/spec.md` |
-| `runner` | `dispatch-transport` | Supervised attempt dispatch, execution planning, isolation request, and executor adapters. | `docs/platform/runner/spec.md` |
 | `distillery` | `distillery` | Porting lifecycle and state consumer for external repository extraction. | `docs/platform/distillery/spec.md` |
 | `documentation` | `documentation` | Platform documentation umbrella, architecture docs, and maintained doc tree. | `docs/platform/documentation/spec.md` |
-| `work-state` | `enduser-docs-authoring` | Authority for authoring and maintaining end-user documentation. | `docs/platform/work-state/spec.md` |
-| `work-state` | `enduser-docs-index` | Authority for tag-based indexing of end-user documentation. | `docs/platform/work-state/spec.md` |
 | `event-store` | `event-store` | Authority for how an fgOS event becomes durable, is sealed into git objects on refs/fgos/*, and is read back. | `docs/platform/event-store/spec.md` |
-| `runner` | `execution-core` | Single authority for how a Unit runs (mechanism, posture, gates) through run door. | `docs/platform/runner/spec.md` |
-| `herdr-web-dashboard` | `fgos-gateway` | Detached gateway daemon serving REST API, MCP search/execute, and embedded web dashboard. | `docs/platform/herdr-web-dashboard/spec.md` |
 | `git` | `git` | Repository facts, typed Git operations, index, refs, worktrees, and WAL recovery. | `docs/platform/git/spec.md` |
 | `graph` | `graph` | Deterministic facts about directed graphs with typed edges and exclusion pairs. | `docs/platform/graph/spec.md` |
-| `herdr-web-dashboard` | `herdr-transport` | Default transport for out-of-process runs, pane execution liveness, and herdr dashboard plugin. | `docs/platform/herdr-web-dashboard/spec.md` |
-| `herdr-web-dashboard` | `herdr-web-dashboard` | Web dashboard surface and interface daemon for fgOS work observation. | `docs/platform/herdr-web-dashboard/spec.md` |
+| `herdr-web-dashboard` | `fgos-gateway`, `herdr-transport`, `herdr-web-dashboard` | Detached gateway daemon serving REST API, MCP search/execute, and embedded web dashboard.; Default transport for out-of-process runs, pane execution liveness, and herdr dashboard plugin.; Web dashboard surface and interface daemon for fgOS work observation. | `docs/platform/herdr-web-dashboard/spec.md` |
 | `holder-lock` | `holder-lock` | Authority for who holds which resource as kernel sees it, lock registry, and state root resolution. | `docs/platform/holder-lock/spec.md` |
 | `host-invocation-routing` | `host-invocation-routing` | Host invocation routing, provider routing, legacy CLI transition, and external provider docs. | `docs/platform/host-invocation-routing/spec.md` |
 | `identity` | `identity` | Foundation authority for writer, machine, and project identities. | `docs/platform/identity/spec.md` |
-| `work-state` | `learning-docs-registry` | Retrospective knowledge capture, doc registry, Diataxis index, and evolve signals. | `docs/platform/work-state/contracts/knowledge-registry.md` |
 | `observe` | `observe` | Measurement and scorecard calculation across substrate entities, metrics, friction repository, and shards. | `docs/platform/observe/spec.md` |
 | `packaging-distribution` | `packaging-distribution` | Packaging, distribution, installation, upgrade, and doctor readiness. | `docs/platform/packaging-distribution/spec.md` |
 | `process` | `process` | Process liveness, signalling by identity, and native process facts door. | `docs/platform/process/spec.md` |
 | `questions` | `questions` | One authority for questions a session sends to owner: asked, stored, answered, received. | `docs/platform/questions/spec.md` |
 | `resource-referee` | `resource-referee` | Applying ruleset data to facts about units and resource claims. | `docs/platform/resource-referee/spec.md` |
-| `runner` | `run-result` | Evidence and confidence boundary for assignment run results. | `docs/platform/runner/spec.md` |
 | `run-supervisor` | `run-supervisor` | Rust supervisor process owning attempt lifecycle, deadlines, containment domain, and adopt door. | `docs/platform/run-supervisor/spec.md` |
-| `runner` | `runner` | Top-level runner orchestration, paths, locks, rigor, and agent definitions. | `docs/platform/runner/spec.md` |
+| `runner` | `dispatch-transport`, `execution-core`, `run-result`, `runner`, `session-rotation` | Supervised attempt dispatch, execution planning, isolation request, and executor adapters.; Single authority for how a Unit runs (mechanism, posture, gates) through run door.; Evidence and confidence boundary for assignment run results.; Top-level runner orchestration, paths, locks, rigor, and agent definitions.; Session handoff and rotation mechanics across session boundaries. | `docs/platform/runner/spec.md` |
 | `seat-binding` | `seat-binding` | Authority for which executor, invocation, model, effort, tier and account runs an agent seat. | `docs/platform/seat-binding/spec.md` |
 | `secrets` | `secrets` | Secrets vault and safe token management. | `docs/platform/secrets/spec.md` |
 | `session-host` | `session-host` | Authority for placing an agent session, worker or head: start, alive, front, retire. | `docs/platform/session-host/spec.md` |
-| `runner` | `session-rotation` | Session handoff and rotation mechanics across session boundaries. | `docs/platform/runner/spec.md` |
 | `supervision` | `supervision` | Coordinates the plans of a project with no person sitting by. | `docs/platform/supervision/spec.md` |
-| `agent-coordination` | `team-cognition-engine` | Typed deliberation interpretation, aggregation-method semantics, and cognitive outcomes. | `docs/platform/agent-coordination/spec.md` |
 | `terminal-control` | `terminal-control` | Foundation component for terminal multiplexer pane allocation and key addressing. | `docs/platform/terminal-control/spec.md` |
 | `ui-spec` | `ui-spec` | Visual contracts and UI specifications for fgOS web surfaces. | `docs/platform/ui-spec/spec.md` |
-| `work-state` | `work-state` | Domain-agnostic work-unit lifecycle, status board, claim/return, and human gates. | `docs/platform/work-state/spec.md` |
+| `work-state` | `enduser-docs-authoring`, `enduser-docs-index`, `learning-docs-registry`, `work-state` | Authority for authoring and maintaining end-user documentation.; Authority for tag-based indexing of end-user documentation.; Retrospective knowledge capture, doc registry, Diataxis index, and evolve signals.; Domain-agnostic work-unit lifecycle, status board, claim/return, and human gates. | `docs/platform/work-state/spec.md`, `docs/platform/work-state/contracts/knowledge-registry.md` |
 | `workflow` | `workflow` | Workflow guide schema, case ledger, reservations, admission, and worktree binding. | `docs/platform/workflow/spec.md` |
 | `write-scope` | `write-scope` | Authority for what a declared path scope means and whether two scopes overlap. | `docs/platform/write-scope/spec.md` |
 | `yaml-document` | `yaml-document` | Lossless reading, editing, and merging of YAML documents with positions. | `docs/platform/yaml-document/spec.md` |
 <!-- /generated:component-authority:system-overview-area-map -->
 
+Hand-written area notes the model does not hold:
+
+- distill-skill — skill portable vận hành vòng học (init/add/delta/seal/check); spec: chưa có (harvest sẽ viết)
+- platform-foundations — orientation and non-law rules/decision narratives: `docs/platform/platform-foundations.md`; exclusive binding L1–L10 wording, rationale and thresholds: `docs/platform/platform-foundations.md` (also listed under `(cross-area)` in the generated map when present in the model).
+
 ## Shared Entities
+
+Hand-written shared entities (Meaning / Touched by) retained from the prior overview; the generated ownership block below lists model `owns` rows only.
+
+| Entity | Meaning | Touched by |
+|---|---|---|
+| Nguồn tham chiếu (reference source) | Một repo/tài liệu ngoài được quét để học feature | distillery (owns), distill-skill (đọc/ghi index) |
+| Luật nền (platform law) | Một luật thiết kế đã khóa, có D-ID và ngưỡng xem lại | platform-foundations (owns); mọi area tương lai tuân theo |
+| Work item (`work`) | Đơn vị việc duy nhất của forgent: trạng thái FSM + deps phẳng + tier, đủ trường trả lời sáu câu harness. Một việc có thể đậu lại chờ người quyết (`awaiting-human`, mang câu hỏi) — bất đồng bộ, không chặn việc khác | work-state (owns), runner (đọc frontier — frontier LOẠI việc `awaiting-human`, runner không bao giờ pick việc đang chờ người) |
+| Bản ghi kết quả (outcome) | Bản ghi hai nửa gắn theo id work item — dự đoán lúc nhận việc, thực tế lúc việc tới trạng thái cuối (thành công lẫn thất bại) — cộng dồn theo id, không bao giờ đè nhau; nguồn tín hiệu cho vòng học compound. Mang thêm nhãn Diataxis `docType` và con trỏ tài-liệu `docPath` (cộng-thêm, tùy chọn) khi capture khai — là móc linkage tài-liệu↔việc | work-state (owns fold + đọc qua `fgos metrics outcomes`); mọi skill claim/return/settle ghi; enduser-docs-authoring đọc `docType`/`docPath` |
+| Cổng chờ-người (human-gate) | Điểm một việc dừng chờ người quyết trước khi đi tiếp; mang cặp câu hỏi/câu trả lời gộp theo id. Primitive chung — spine cho mọi cổng-người của vòng đời (intake, exploring, planning, review PR) | work-state (owns — verb `fgos ask`/`answer`, đọc qua `fgos list`) |
+
+[unknown — các entity khác cần harvest interview; xem Open Gaps]
+
+Ownership rows generated from `packages/component-authority/model/`:
 
 <!-- generated:component-authority:system-overview-shared-entities -->
 Ownership rows across every area: each thing a component declares it owns, with that component. <!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->

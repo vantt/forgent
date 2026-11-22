@@ -1,4 +1,4 @@
-# Holder view preview (component-authority phase 5)
+# Holder view preview (component-authority)
 
 DOCOS keeps the holder table shape (scope → holder file or directory) and wants this
 generated view before the hand-written table in `docs/platform/governance.md` is replaced

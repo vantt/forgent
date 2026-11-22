@@ -21,13 +21,8 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
 
-test('main --check exits 0 on the real repo (required views match the model)', () => {
-  assert.equal(main(['--check'], { repoRoot: REPO_ROOT }), 0);
-});
-
-test('checkViews names a view whose generated block was edited by hand', () => {
+function seedTempRepo() {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-ca-render-'));
-  // Minimal model: one component, no doors, empty decision kinds.
   const modelDir = path.join(tmp, 'packages', 'component-authority', 'model');
   fs.mkdirSync(path.join(modelDir, 'doors'), { recursive: true });
   fs.writeFileSync(path.join(modelDir, 'components.json'), JSON.stringify([
@@ -42,6 +37,18 @@ test('checkViews names a view whose generated block was edited by hand', () => {
       spec: 'docs/platform/demo/spec.md',
       source: ['packages/demo/'],
       status: 'designed',
+    },
+    {
+      id: 'cross',
+      meaning: 'cross-area component',
+      layer: 'kernel',
+      tier: 0,
+      paths: ['packages/cross/'],
+      owns: ['cross thing'],
+      mustNotOwn: [],
+      spec: 'docs/platform/component-boundary.md',
+      source: ['packages/cross/'],
+      status: 'live',
     },
   ], null, 2));
   fs.writeFileSync(path.join(modelDir, 'decision-kinds.json'), '[]');
@@ -61,6 +68,15 @@ test('checkViews names a view whose generated block was edited by hand', () => {
     const body = list.map((view) => `${startMarker(view)}\nplaceholder\n${endMarker(view)}`).join('\n\n');
     fs.writeFileSync(filePath, `# seed\n\n${body}\n`, 'utf8');
   }
+  return tmp;
+}
+
+test('main --check exits 0 on the real repo (required views match the model)', () => {
+  assert.equal(main(['--check'], { repoRoot: REPO_ROOT }), 0);
+});
+
+test('checkViews names a view whose generated block was edited by hand', () => {
+  const tmp = seedTempRepo();
 
   // First write fills the blocks from the model.
   writeViews(tmp);
@@ -81,15 +97,59 @@ test('checkViews names a view whose generated block was edited by hand', () => {
   assert.equal(main(['--check'], { repoRoot: tmp }), 1);
 });
 
+test('checkViews names a required view when its markers are removed', () => {
+  const tmp = seedTempRepo();
+  writeViews(tmp);
+  assert.equal(main(['--check'], { repoRoot: tmp }), 0);
+
+  const readmePath = path.join(tmp, 'docs/platform/README.md');
+  fs.writeFileSync(readmePath, '# seed\n\nno markers left\n', 'utf8');
+
+  const drift = checkViews(tmp);
+  assert.ok(
+    drift.some((entry) => entry.view === 'readme-owner-table' && /no .*readme-owner-table/.test(entry.reason)),
+    `expected missing readme-owner-table marker, got ${JSON.stringify(drift)}`,
+  );
+  assert.equal(main(['--check'], { repoRoot: tmp }), 1);
+});
+
+test('writeViews twice is byte-identical', () => {
+  const tmp = seedTempRepo();
+  writeViews(tmp);
+  const afterFirst = new Map();
+  for (const rel of [
+    'docs/platform/component-boundary.md',
+    'docs/platform/README.md',
+    'docs/platform/system-overview/spec.md',
+    'docs/platform/observe/spec.md',
+    'docs/platform/workflow/spec.md',
+  ]) {
+    afterFirst.set(rel, fs.readFileSync(path.join(tmp, rel)));
+  }
+  const { written } = writeViews(tmp);
+  assert.equal(written.length, 0);
+  for (const [rel, first] of afterFirst) {
+    const second = fs.readFileSync(path.join(tmp, rel));
+    assert.ok(Buffer.compare(first, second) === 0, `${rel} changed on second write`);
+  }
+});
+
+test('area map lists cross-area components under (cross-area)', () => {
+  const tmp = seedTempRepo();
+  writeViews(tmp);
+  const areaMap = fs.readFileSync(path.join(tmp, 'docs/platform/system-overview/spec.md'), 'utf8');
+  assert.match(areaMap, /\(cross-area\)/);
+  assert.match(areaMap, /`cross`/);
+  assert.match(areaMap, /\| Area \| Components \|/);
+});
+
 test('governance-holder-table is optional: missing markers do not fail --check', () => {
   const views = computeViews(REPO_ROOT);
   const holder = views.find((view) => view.view === 'governance-holder-table');
   assert.ok(holder, 'governance-holder-table view must be defined');
   assert.equal(holder.required, false);
-  if (!holder.present) {
-    // Expected during phase 5 while DOCOS reviews the preview.
-    assert.equal(checkViews(REPO_ROOT).some((entry) => entry.view === 'governance-holder-table'), false);
-  }
+  assert.equal(holder.present, false);
+  assert.equal(checkViews(REPO_ROOT).some((entry) => entry.view === 'governance-holder-table'), false);
 });
 
 test('loadModel reads components, decision kinds and door files', () => {

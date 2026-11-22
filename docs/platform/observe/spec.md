@@ -47,7 +47,18 @@ Observe được chuyển trọn gói sang Rust trong kế hoạch `archive/plan
 
 ## 2. Shared Entities & Subjects
 
-Rows owned by the observe area, generated from `packages/component-authority/model/`.
+| Subject Kind | Định dạng ID | Ví dụ | Owner dữ liệu |
+|---|---|---|---|
+| `run` | `run:<runId>` | `run:run_1a2b3c` | `packages/run-result/rust` |
+| `run` (unit observation) | `unit-run:<unitRunId>` | `unit-run:unit-run-example` | Node execution writer; Rust run-result read contract |
+| `session` | `session:<id>` | `session:coord_4d5e6f` | `packages/coordination-state/rust` (deleted in 2180b4e72) |
+| `executor` | `executor:<id>` | `executor:judge-discovery` | `.fgos/config.json` |
+| `case` | `case:<name>` | `case:observe-f2` | `packages/observe/rust` |
+| `work` | `work:<id>` | `work:tsk-abc` | `packages/work-state/rust` |
+
+Bảng trên là subject của hình v1. Ở bản ghi v2, `subject.kind` và kind của `refs` là chuỗi mở, được kiểm theo registry đã gộp: tên dùng chung là `run`, `unit`, `plan`, `phase`, `backlog`, `session`, `head`, `account`, `provider` (`packages/observe/contracts/observe-names.json`); bên dùng khai báo thêm (friction thêm `case`, `work`, `executor`). `plan:<id>` là thư mục plan (`plans/<dir>`), giống id mà ref plan của một run attempt mang.
+
+Rows owned by the observe area, generated from `packages/component-authority/model/`:
 
 <!-- generated:component-authority:observe-shared-entities -->
 Ownership rows owned by `observe`: each thing a component declares it owns, with that component. <!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
@@ -57,9 +68,6 @@ Ownership rows owned by `observe`: each thing a component declares it owns, with
 | friction repository and metrics collection | `observe` | `docs/platform/observe/spec.md` |
 | case lifecycle journals and telemetry | `observe` | `docs/platform/observe/spec.md` |
 <!-- /generated:component-authority:observe-shared-entities -->
-
-
-Bảng trên là subject của hình v1. Ở bản ghi v2, `subject.kind` và kind của `refs` là chuỗi mở, được kiểm theo registry đã gộp: tên dùng chung là `run`, `unit`, `plan`, `phase`, `backlog`, `session`, `head`, `account`, `provider` (`packages/observe/contracts/observe-names.json`); bên dùng khai báo thêm (friction thêm `case`, `work`, `executor`). `plan:<id>` là thư mục plan (`plans/<dir>`), giống id mà ref plan của một run attempt mang.
 
 ## 3. Storage Model
 

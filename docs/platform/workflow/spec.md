@@ -173,7 +173,17 @@ Phép tách authority: **chọn / cho phép / thi hành / chấp nhận.**
 
 Bản ghi mới gọi id **bằng tên**, không có trường `runId` trần: `caseId` (hoặc `workflowRunId`), `unitRunId`, `assignmentId`, `attemptId`. Trước đây `unit.json` mang `workflow: {runId, stepId, unitId}` chỉ để truy vết; liên kết nay là `{caseId, activity, reservationId}`, do harness ghi lúc admission (bản ghi cũ vẫn đọc được qua cùng một hàm chuẩn hoá).
 
-Rows owned by the workflow area, generated from `packages/component-authority/model/`.
+| Entity | Nghĩa | Chủ | Ai chạm |
+|---|---|---|---|
+| Workflow guide | mục đích; vai và cạnh tham vấn; milestone với subject, loại bằng chứng, authority chấp nhận; activity; decision point; bảng MUST và mục unenforced; route table; mặc định khung; tiêu chí đóng | Workflow (schema); domain/core (nội dung) | agent đọc; case pin snapshot |
+| Workflow case | khung, binding, reservation, route/deviation, gate answer gắn digest, receipt, projection milestone, close | Workflow | Execution Core qua AdmissionPort; Work qua con trỏ `workflowRunId` |
+| Binding | `{caseId, generation, worktreeRoot, commonDir, ref, state}` theo danh tính gốc worktree | Workflow | cửa đọc qua port |
+| Unit, Unit run | hợp đồng một lần thi hành; liên kết `{caseId, activity, reservationId}` | Execution Core | Workflow đọc receipt |
+| Approved frame | xem 2.2 | Workflow | Execution Core nhận trần seat launch của Unit |
+| Work item | bản ghi nghiệp vụ tuỳ chọn: status lifecycle, claim/return, slot, settlement, tail `delivered → retrospective → cleanup → done` | Work Lifecycle | trỏ tới case |
+| Plan | đầu vào, không authority | tác giả | conductor đọc như artifact |
+
+Rows owned by the workflow area, generated from `packages/component-authority/model/`:
 
 <!-- generated:component-authority:workflow-shared-entities -->
 Ownership rows owned by `workflow`: each thing a component declares it owns, with that component. <!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
@@ -189,7 +199,7 @@ Ownership rows owned by `workflow`: each thing a component declares it owns, wit
 
 ### 5.1 Hàng của bảng ranh giới
 
-- Hàng **Workflow** của [component-boundary.md](../component-boundary.md) ghi authority guide, ledger case, admission và binding worktree; hàng **Work Lifecycle** ghi "Does not own stage or sequencing"; hàng **Execution Core**: authority cho ai làm/model/persona/cơ chế, cửa chạy duy nhất, posture confinement, cổng ghi kiểm chứng được.
+- Hàng **Workflow** của [component-boundary.md](../component-boundary.md) ghi authority guide, ledger case, admission và binding worktree; hàng **`work-state`** của cùng bảng (Must not own) là chỗ Work Lifecycle từ chối stage/sequencing; hàng **Execution Core**: authority cho ai làm/model/persona/cơ chế, cửa chạy duy nhất, posture confinement, cổng ghi kiểm chứng được.
 - **Authority admission nằm ở Workflow** (mục 5.2). Item coding vẫn do claim + step FSM tới cutover coding; hook `dispatch-decide` chỉ quyết *cơ chế*.
 - Workflow đọc kết quả một Unit run qua [hợp đồng unit-run-result](../runner/contracts/unit-run-result.md) (`outcome` cuối cùng, `infrastructure`, `evaluations[]`, `binding.family`) và không tự suy lại điều nào trong đó; các bản đọc cũ còn lại nằm trong một module legacy (`src/workflow/legacy-ledger-read.mjs`).
 - Liên kết `workflow` trong `unit.json` là provenance: cửa không đọc nó để cho hay từ chối gì. Chỉ `fgos workflow prune` đọc nó, để biết một Unit run có thuộc đúng case đang dọn không (RUL-WF-40).
