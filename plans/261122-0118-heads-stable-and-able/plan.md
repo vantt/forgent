@@ -209,6 +209,20 @@ writer, phase 11.
   worktrees (p02, p02g, p06, p06f, p12c); lead:SUPERVISOR then reruns the real soft rotation (phase 12 done-when item
   3). The supervisor neither activates a release nor removes a worktree.
 
+### Lead progress (2026-11-22 22:25, head:lead-forgent-261122-0118-heads-b52f9, gen 8)
+
+- **Phase 12 done-when item 3 is proven live.** Release `f75c3a69` was activated at 22:05. It carries 12c (`8883c2a62`)
+  and the recover fix `245635f84`. lead:SUPERVISOR then ran `fgos session rotate lead` from gen 7. The last line of this
+  lineage's `.fgos/runtime/session-rotation/lead-forgent-261122-0118-heads-b52f9/rotation.log` reads
+  `{"rotated":true,"key":"cmd_1795360686977_028bcd47","gen":8,"oldEnded":true}`. The two earlier attempts logged
+  `start-refused` and `no-answer`.
+- Gen 8 resumed from the handoff alone (`261122-1518-cmd17953.md`). The handoff carried gen 7's verbatim last message
+  (HS-QUIET3) and the plan as the portfolio file to reread, which is item 1. Gen 8 answered right after its ritual line,
+  in the same turn, by the installed shim path. `answered.json` shows gen 8 answering at 15:18:33Z (22:18:33 local),
+  inside the 120 s window that gen 6 to 7 missed. 12c is therefore proven on a live head.
+- Phase 11's probe row for soft rotation can cite this rotation. Phase 11 steps 1, 2, 4 and 5 still wait for the
+  measure windows (phase 9 until 14:20 on 2026-11-23; phases 8 and 10 until 21:06 on 2026-11-23). No ticket is in flight.
+
 ### Lead progress (2026-11-22 22:10, head:lead-forgent-261122-0118-heads-b52f9, gen 7)
 
 - **Measure windows, checked against the heads' request logs:**
