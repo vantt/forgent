@@ -90,7 +90,11 @@ export function buildDecisionIndexMarkdown(decisions, existingMarkdown = '', { h
   const stateRows = (decisions ?? []).filter(
     (d) => d.kind !== 'engine' && typeof d.scope === 'string' && d.scope.trim(),
   );
-  for (const d of stateRows) rows.set(key(d), d);
+  // State wins on text and rationale (the latest event of a decision restates it); Recorded keeps the first record.
+  for (const d of stateRows) {
+    const earlier = rows.get(key(d));
+    rows.set(key(d), earlier && earlier.ts < d.ts ? { ...d, ts: earlier.ts } : d);
+  }
   const scoped = [...rows.values()];
   scoped.sort((a, b) => {
     if (a.scope !== b.scope) return a.scope < b.scope ? -1 : 1;
@@ -192,40 +196,67 @@ export function placeRoleFields(markdown, lines) {
 
 /**
  * The holder documents with their field lines refreshed, in memory: `{ holders: [{ path, filePath, previous,
- * next, changed }], warnings }`. A decision whose holder or heading is missing is a warning, never inserted prose.
+ * next, changed }], warnings }`. A decision is placed under its heading in its scope's holder. When the holder has
+ * no such heading and no other scope uses the same number, the heading is looked for under `docs/platform/`, and
+ * used when exactly one document has it (a decision recorded under one scope whose narrative lives in another
+ * area). Anything else is a warning, never inserted prose.
  */
 export function computeDecisionRoleFields(repoRoot, decisions, holderFor = narrativeHolderResolver(repoRoot)) {
   const { fields, warnings } = decisionRoleFields(decisions);
-  const perHolder = new Map();
+  const headings = new Map();
+  const headingIds = (rel) => {
+    if (!headings.has(rel)) {
+      const text = fs.readFileSync(path.join(repoRoot, rel), 'utf8');
+      headings.set(rel, new Set(text.split('\n').map((line) => HEADING_ID.exec(line)?.[1]).filter(Boolean)));
+    }
+    return headings.get(rel);
+  };
+  let platformFiles;
+  const scopesPerId = new Map();
+  for (const { id } of fields.values()) scopesPerId.set(id, (scopesPerId.get(id) ?? 0) + 1);
+  const perFile = new Map();
   for (const { id, scope, line } of fields.values()) {
     const holder = holderFor(scope);
-    if (!holder) {
-      warnings.push(`${id}: scope "${scope}" has no narrative holder`);
+    const files = holder ? holderFiles(repoRoot, holder) : null;
+    let targets = (files ?? []).filter((rel) => headingIds(rel).has(id));
+    if (!targets.length && scopesPerId.get(id) === 1) {
+      platformFiles ??= markdownFilesUnder(repoRoot, path.posix.join('docs', 'platform'));
+      const elsewhere = platformFiles.filter((rel) => headingIds(rel).has(id));
+      if (elsewhere.length === 1) targets = elsewhere;
+    }
+    if (!targets.length) {
+      warnings.push(!holder
+        ? `${id}: scope "${scope}" has no narrative holder`
+        : `${id}: no "${id}" heading in ${holder}${files ? '' : ' (the holder does not exist)'}`);
       continue;
     }
-    if (!perHolder.has(holder)) perHolder.set(holder, new Map());
-    perHolder.get(holder).set(id, line);
+    for (const rel of targets) {
+      if (!perFile.has(rel)) perFile.set(rel, new Map());
+      perFile.get(rel).set(id, line);
+    }
   }
   const holders = [];
-  for (const [holder, lines] of [...perHolder].sort(([a], [b]) => (a < b ? -1 : 1))) {
-    const files = holderFiles(repoRoot, holder);
-    if (!files) {
-      warnings.push(`${holder}: holder does not exist; ${lines.size} decision(s) not placed`);
-      continue;
-    }
-    const placedAnywhere = new Set();
-    for (const rel of files) {
-      const filePath = path.join(repoRoot, rel);
-      const previous = fs.readFileSync(filePath, 'utf8');
-      const { content, placed } = placeRoleFields(previous, lines);
-      for (const id of placed) placedAnywhere.add(id);
-      if (placed.size) holders.push({ path: rel, filePath, previous, next: content, changed: content !== previous });
-    }
-    for (const id of lines.keys()) {
-      if (!placedAnywhere.has(id)) warnings.push(`${id}: no "${id}" heading in ${holder}`);
-    }
+  for (const [rel, lines] of [...perFile].sort(([a], [b]) => (a < b ? -1 : 1))) {
+    const filePath = path.join(repoRoot, rel);
+    const previous = fs.readFileSync(filePath, 'utf8');
+    const { content } = placeRoleFields(previous, lines);
+    holders.push({ path: rel, filePath, previous, next: content, changed: content !== previous });
   }
   return { holders, warnings };
+}
+
+/** Every `.md` file under `dir`, repo-relative and sorted. */
+function markdownFilesUnder(repoRoot, dir) {
+  const out = [];
+  const walk = (rel) => {
+    for (const entry of fs.readdirSync(path.join(repoRoot, rel), { withFileTypes: true })) {
+      const child = path.posix.join(rel, entry.name);
+      if (entry.isDirectory()) walk(child);
+      else if (entry.name.endsWith('.md')) out.push(child);
+    }
+  };
+  if (fs.existsSync(path.join(repoRoot, dir))) walk(dir);
+  return out.sort();
 }
 
 /** The Markdown files a holder names, repo-relative and sorted: the file itself, or a directory's `.md` files. */

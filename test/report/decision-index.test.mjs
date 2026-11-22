@@ -298,22 +298,36 @@ test('placeRoleFields: the field line goes under its heading, replaces the line 
   assert.doesNotMatch(cleared.content, /replaces::/);
 });
 
-test('computeDecisionRoleFields: a directory holder is searched file by file, and a missing heading or holder is a warning, never inserted prose', () => {
+test('computeDecisionRoleFields: a directory holder is searched file by file, a heading outside the holder is used only for a number one scope owns, and anything else is a warning, never inserted prose', () => {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-fields-'));
   const dir = path.join(repoRoot, 'docs', 'platform', 'runner', 'decisions');
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'a.md'), '# A\n\n### D-ADR0030 — thirty\n\nText.\n');
   fs.writeFileSync(path.join(dir, 'b.md'), '# B\n\nNo decisions here.\n');
-  const holders = { runner: 'docs/platform/runner/decisions/' };
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'platform', 'event-store'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'platform', 'event-store', 'spec.md'), '# ES\n\n### D-ADR0055 — sealed changesets\n\n### D-ADR0032 — iron law\n');
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'platform', 'laws.md'), '# Laws\n');
+  const holders = { runner: 'docs/platform/runner/decisions/', laws: 'docs/platform/laws.md', 'work-state': 'docs/platform/laws.md' };
   const { holders: out, warnings } = computeDecisionRoleFields(repoRoot, [
     { scope: 'runner', text: 'D-ADR0030: thirty', relation: 'supersedes:ADR0025', ts: '2026-08-17T00:00:00Z' },
     { scope: 'runner', text: 'D-ADR0031: no heading', relation: 'none', ts: '2026-08-17T00:00:00Z' },
     { scope: 'ghost', text: 'D-ADR0040: no holder', relation: 'none', ts: '2026-08-17T00:00:00Z' },
+    { scope: 'laws', text: 'D-ADR0055: recorded under laws, told in event-store', relation: 'amends:L3', ts: '2026-10-17T00:00:00Z' },
+    { scope: 'runner', text: 'D-ADR0032: one number', relation: 'none', ts: '2026-08-17T00:00:00Z' },
+    { scope: 'work-state', text: 'D-ADR0032: two scopes', relation: 'none', ts: '2026-08-17T00:00:00Z' },
   ], (name) => holders[name] ?? null);
-  assert.deepEqual(out.map((h) => [h.path, h.changed]), [['docs/platform/runner/decisions/a.md', true]]);
+  assert.deepEqual(out.map((h) => [h.path, h.changed]), [
+    ['docs/platform/event-store/spec.md', true],
+    ['docs/platform/runner/decisions/a.md', true],
+  ], 'D-ADR0055 is found outside its holder; neither D-ADR0032 borrows the other scope\'s heading');
+  assert.match(out[0].next, /### D-ADR0055 — sealed changesets\n\n\[valid_from:: 2026-10-17T00:00:00Z\] \[amends:: L3\]\n/);
+  assert.doesNotMatch(out[0].next, /### D-ADR0032 — iron law\n\n\[/);
+  out.reverse();
   assert.match(out[0].next, /### D-ADR0030 — thirty\n\n\[valid_from:: 2026-08-17T00:00:00Z\] \[replaces:: D-ADR0025\]\n\nText\./);
   assert.deepEqual(warnings.sort(), [
     'D-ADR0031: no "D-ADR0031" heading in docs/platform/runner/decisions/',
+    'D-ADR0032: no "D-ADR0032" heading in docs/platform/laws.md',
+    'D-ADR0032: no "D-ADR0032" heading in docs/platform/runner/decisions/',
     'D-ADR0040: scope "ghost" has no narrative holder',
   ]);
 });
@@ -334,4 +348,13 @@ test('CLI: decision --valid-from is projected by decision-index into the holder,
   assert.equal(stale.status, 4);
   assert.match(stale.stderr, /docs\/platform\/repo\.md/);
   assert.match(fs.readFileSync(holder, 'utf8'), /\[replaces:: D-ADR0002\]/, '--check never writes');
+});
+
+test('buildDecisionIndexMarkdown: a later event of the same decision restates its text and rationale, and Recorded keeps the first record', () => {
+  const md = buildDecisionIndexMarkdown([
+    { scope: 'runner', text: 'D-ADR0012: flat', rationale: 'first', ts: '2026-08-17T00:00:00Z' },
+    { scope: 'runner', text: 'D-ADR0012: flat', rationale: 'restated', ts: '2026-11-22T00:00:00Z' },
+  ]);
+  assert.match(md, /\| runner \| D-ADR0012: flat \| restated \| 2026-08-17T00:00:00Z \|/);
+  assert.doesNotMatch(md, /2026-11-22/);
 });
