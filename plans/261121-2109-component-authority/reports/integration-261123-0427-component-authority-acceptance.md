@@ -216,3 +216,45 @@ Nine live-remaining paths from criterion 2 residual, classified after the follow
 | `docs/platform/proposals/knowledge-registry-redesign.md` | Canonical: No, exempt. |
 | `docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md` | Outside the footprint; a dated task table. |
 
+
+## Host full-suite run (lead:SUPERVISOR, main 4c5f55541, contains 9fd188d74)
+
+Logs are in `/home/vantt/projects/forgent-worktrees/`: `main-cargo-test-4c5f55541.log` and `main-npm-test-4c5f55541-r2.log`. The first npm run had 22 EDQUOT write errors, so this classification uses the r2 rerun.
+
+**`cargo test --workspace`:** 4282 passed and 1 failed. The failure is `head_request the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks` (the contract lists `config patch`, the server does not). It was already red at 4951cf3da and is outside this plan's files.
+
+**`npm test` r2:** 7915 tests, 16 failed.
+
+### Reds this plan caused
+
+| Test | Cause | Fix |
+|---|---|---|
+| live self-check: every repository platform doc passes every doc-health rule | The deleted manifest was still backticked without a commit pin in `component-authority/spec.md` (lines 61, 127, 185, 224) and `packaging-distribution/spec.md` (792-793). `P08.1.md:8` linked the deleted proposal map. | Fixed in `3bf544312` (commits c35d66acf, df8eaa3d9). The land gate's run of this same self-check passed. |
+| dead vocabulary guard: Request-to-Run P5 retired symbols | `FlowDefinition` and `CoordinationProtocol` in model rows `domain-registry-loader` and `group-thinking` and in one contract row reached `system-overview/spec.md` through the generated views. | Fixed in `3bf544312`: the model text was reworded and the views regenerated. |
+| this repository's tracked instruction projections are current | The design-principles edit made `.fgos/instructions/effective/repo.json` stale (it still names the manifest). The ledger entry is per-checkout runtime state. | **Open.** The lead's run door refuses this `.fgos/` path even though the footprint lists it. Raised to the supervisor (event ae0f1b4f5b564c3d) to regenerate it with `npm run build:skills`. |
+
+### Reds this plan did not cause
+
+The supervisor flagged these as new against 4951cf3da:
+
+| Test | Evidence | Class |
+|---|---|---|
+| a changed login copy is set aside, never deleted, keeps its run directory and stops the batch | `Unknown system error -122` on `copyfile` | disk quota (EDQUOT) |
+| L1: ./bin/fgos and bin/fgos are treated as a collision | `-122` on `copyfile` | disk quota (EDQUOT) |
+| R3: Staged release tree runs P02 harness from outside checkout | entry B: `fgos: Unknown system error -122 ... write` | disk quota (EDQUOT) |
+| integration: a real mutant (m-edit-1) is applied and classified inside a real detached git worktree | `git worktree add --detach failed at HEAD: worktree-command-failed` | host environment (worktree creation under load and quota); touches no file of this plan |
+| Reviewer M2: upgrading away from a quarantined activation | `git-predecessor-writer-live: process scan incomplete: 1 unreadable process(es) could be fgOS` | live heads running during the suite |
+
+The other 9 reds were already red at 4951cf3da, the supervisor's baseline:
+
+- a playbook step form becomes one activity per step
+- e2e: npm pack -> npm install -g -> fgos init
+- every registered workflow carries a guide model
+- migrate (native): sub-verbs and their flags match the Rust sources
+- the brief a reviewer reads says its claim needs assessment.verdict
+- the drift scan covers the verbs that branch on a positional sub-verb
+- the static scan reports a Git spawn in each shape a literal search misses
+- this repository has no blocking convention violation and no post-cutoff naming violation
+- tracked instruction projections. This one is listed above as caused by this plan: the baseline already contained the phase 2 design-principles edit.
+
+None of these nine touch this plan's files.
