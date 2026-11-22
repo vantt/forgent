@@ -32,15 +32,11 @@ Opened by the secretary (Miu) on the owner's order, 2026-11-22. The owner wants 
 
 ## 1. Trạng thái hiện tại
 
-Round 5 (2026-11-22 15:50). Domain: coding (the change edits fgOS core skills and the always-loaded instruction).
+Settled, 2026-11-22 17:50. Domain: coding (the change edits fgOS core skills, the always-loaded instruction, the friction declarations, an agent hook and the question door).
 
-**What just settled.** The owner confirmed the shaper's reading of "communicating better with a human" and asked for it to be written down as a standard named **thấu hiểu user** (understanding the user). The discussion works in four steps, in order: (1) why, the motive; (2) what good looks like, judged from the reader's side; (3) cases, good and bad, taken from real exchanges; (4) only then, whether a program should help. The standard is a living one: bad exchanges are collected as cases, learned from, and folded back into it.
+The standard **thấu hiểu user** is defined: the motive (the owner's attention is the scarcest resource), the principle judged from the reader's side, its applications and seed cases (section 6). Bad exchanges go to the friction store, triggered by the owner's reaction (signals T1-T12). A coach, started by the supervisor, learns from them and hands problems back through the normal pipeline. Program support: capture the owner's reaction, make answers cheap in the question door, no check on outgoing messages for now. Decisions OC-D1 to OC-D7.
 
-**Where it stands.** Step 1 and the core of step 2 are written (section 6). Step 3 has its seed cases from 2026-11-22, including the shaper's own messages. Step 4 is not started. The two mechanism questions asked earlier (program checks in `fgos questions ask`, and an end-of-turn check) were cancelled as premature; they come back at step 4 only if still needed.
-
-**Since then.** Bad exchanges are kept in the friction store (round 6). The one who learns from them is a **coach**, started by the supervisor at the right moment and owning every self-improvement job of the system (owner 17:16). The coach is its own item; this discussion only says what the coach takes from the standard.
-
-**Open, not blocking.** Step 4 (program support). Two items need backlog rows the shaper cannot write: information freshness (OC-D1) and the coach role. No owner question is open.
+**Output:** three tasks for one planner (section 7): write the standard and move every caller; capture the owner's reaction; cheap answers in the question door. Two separate items that need their own backlog rows and shapers: information freshness by watchers and monitors (OC-D1) and the coach role (OC-D5). No owner question is open.
 
 ## 2. Mục tiêu & đề bài
 
