@@ -20,8 +20,9 @@ use serde_json::{json, Map, Value};
 use std::path::PathBuf;
 
 /// The contract version `versions().execution` answers: 1 is the first with the Execution Core helpers, 2 the first
-/// with the outcome, seat, run result, hand-off and Work reads.
-pub const CONTRACT_VERSION: u32 = 2;
+/// with the outcome, seat, run result, hand-off and Work reads, 3 the first with the seat session folder and the head
+/// a launch environment names (`seatSessionDir`, `headOf`).
+pub const CONTRACT_VERSION: u32 = 3;
 
 fn refused(error: RunUnitError) -> Error {
     Error::from_reason(error.to_json().to_string())

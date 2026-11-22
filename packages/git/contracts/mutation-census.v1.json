@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c7693ead20225320a6de98ff10a02d239d60af223abc1a94cdce7ba1f0426feb",
+  "payloadDigest": "ed8fa0756e2203aab82441840322f2864d981e8be09a7f662bef0ccc345ce0e8",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -748,7 +748,7 @@
     "packages/git/node-addon/src/config.rs": "f6b5bc3fb11821a6626b6fc9a92864731c3fc0a7e9bafab8046d4d139f2a2625",
     "packages/git/node-addon/src/durable_file.rs": "92d33582a588824a105683b230a694f3b103657b1b1520fc0b86bac079c490e1",
     "packages/git/node-addon/src/event_store.rs": "189480768df880251eaa5ae181f680e13f8d1a782f098787e87cca21ca8a85ae",
-    "packages/git/node-addon/src/execution.rs": "2c33dc0d564592cfcaf71a835454ac79ce411a5825dcc6452683572b1063449f",
+    "packages/git/node-addon/src/execution.rs": "492a078f39785c87f80bada860e48745b3bda04b38de5f343e7a27a0761ece0a",
     "packages/git/node-addon/src/git.rs": "2187d710fa8475eeb8b0712b38e2fd09691e6e9313ba8eea883033291907748b",
     "packages/git/node-addon/src/git/config.rs": "a4f4d6497b6c1f9b3110101b7e39d773ac9a4fab05c096cac8ba6adb31c5648f",
     "packages/git/node-addon/src/git/handover.rs": "7df66e505c41a90315bcaa389491059922e76689265efbd725b177cd3a62eb9f",
@@ -1485,7 +1485,7 @@
     "src/intake/verify-pattern-check.mjs": "227ec546c4461d268ce2413f3db9af76e4358c892d5e2225567a3c876c106ae6",
     "src/native/dispatch-depth.mjs": "28e6bc0fb4da4348694822c537078b38e066d15f8fb8d84a02fa3217dbe7612b",
     "src/native/dispatch-error.mjs": "d8eec6bd6afa2b88ba9bd7e0d125310ed6b0cac1d46a1c890cadf9823d6d5894",
-    "src/native/door.mjs": "aedadeb909f81d0af3064f2ece7a9a2ef09b14d05a68fb237ef143863eef4d0c",
+    "src/native/door.mjs": "6fd4062baa2bdfd2fec4d4140d472657b837582b53c97b9a5c30daeb727b43b6",
     "src/native/execution-door.mjs": "581e32d1b961379e21391106718f44f88a0c9e56e958100f0f21835c2e2b562d",
     "src/native/legacy-view.mjs": "63b373dcfe4406ece71a8e6345b3a2e362280e2597fa597387e0fc8bfb324c8d",
     "src/native/process-identity.mjs": "2a9324b9f416af7dadfde723ea10526f97cbd3639d3b0a4abec2c970bd98d9b6",
