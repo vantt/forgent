@@ -355,10 +355,7 @@ mod tests {
             quota_of(&json!({ "weeklyUsed": 0.5, "resetsAt": 1732800000 })),
             None
         );
-        assert_eq!(
-            quota_of(&json!({ "weeklyUsed": 0.5 })),
-            None
-        );
+        assert_eq!(quota_of(&json!({ "weeklyUsed": 0.5 })), None);
     }
 
     #[test]

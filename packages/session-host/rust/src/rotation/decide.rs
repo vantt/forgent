@@ -218,7 +218,12 @@ mod tests {
         .unwrap()
     }
     fn run_for(persona: &str, fraction: Option<f64>, rest: AtRest) -> Decision {
-        decide(fraction, config().thresholds_for(persona).unwrap(), rest, None)
+        decide(
+            fraction,
+            config().thresholds_for(persona).unwrap(),
+            rest,
+            None,
+        )
     }
     fn run(fraction: Option<f64>, rest: AtRest) -> Decision {
         run_for("other", fraction, rest)
