@@ -2,6 +2,7 @@
 
 | ID | Title | Status | Priority | Area | Citing |
 |---|---|---|---|---|---|
+| [p-6sd4fslxv7](backlog/p-6sd4fslxv7-a-landed-phase-worktree-and-its-cargo-build-stay-on-disk.md) | A landed phase's worktree and its cargo build stay on disk until someone removes them by hand (git/supervision, priority high; source: owner, 2026-11-22 14:55) | proposed | P1 | supervision | - |
 | [p-o4juyw2ntg](backlog/p-o4juyw2ntg-a-git-chain-started-by-a-pid-writer-has-no-recovery-door.md) | A Git chain started by a pid writer with no session id has no recovery door once that pid dies (git, priority high; source: lead:OPC, 2026-11-22 12:40) | proposed | P1 | git | - |
 | [p-ti7prrwace](backlog/p-ti7prrwace-a-pane-seat-inherits-the-runner-s-environment.md) | A pane seat inherits the runner's environment, including `CLAUDE_CODE_MESSAGING_TOKEN`, against the worker env allowlist (Execution, priority high) | done | P1 | harden-t9-p28-e0efc3b62-workerbaseenv-is-an-allowlist-read-from-packages-run-supervisor-contracts-worker-env-allowlist-v1-json-canary-unit-proof-plus-pane-wiring-proof-left-drop-the-claude-code-force-session-persistence-workaround-from-the-claude-invocations-and-the-external-mode-gate-filtering-the-daemon-env-through-the-same-file-paseo | - |
 | [p-ffz65fjo6u](backlog/p-ffz65fjo6u-windows-runtime-support-windows-priority-high.md) | Windows runtime support (Windows, priority high, owner decision 2026-11-13: rc.7 ships Windows at the level "installs and activates") | proposed | P1 | windows | - |
