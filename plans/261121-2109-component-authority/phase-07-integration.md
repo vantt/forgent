@@ -1,20 +1,40 @@
-# Phase 7: Integration
+# Phase 7: Retire the manifest and integrate
+
+This phase starts only when phase 6 has landed and `261122-0118-heads-stable-and-able` is `done`. That plan owns
+`docs/architecture-manifest.json` and `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`
+until then (owner order 2026-11-22 23:19, option c). If heads-stable is still running when phase 6 lands, this
+phase waits for it and does not take those two files early.
 
 ## Inputs
-The landed branches of phases 1-6; `plan.md` acceptance criteria.
+- The landed branches of phases 1-6, and the `plan.md` acceptance criteria.
+- `plans/261121-2109-component-authority/reports/`: the copy-point sha and `manifest-model-compare.mjs`, both from phase 2.
+- `git log <copy point>..HEAD -- docs/architecture-manifest.json`: every manifest change that landed after the copy.
+- `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md:164`, the one row that names the manifest.
 
 ## Files it may write
-plans/261121-2109-component-authority/ (log and reports only). A gate failure is fixed in the owning phase's branch, never here.
+docs/architecture-manifest.json (delete), docs/platform/packaging-distribution/contracts/setup-doctor-registry.md, packages/component-authority/model/ (only to port manifest changes that landed after the copy), plans/261121-2109-component-authority/.
+Any other gate failure is fixed in the owning phase's branch, never here.
 
 ## Steps
-1. On the combined tree, run `npm test` and `cargo test --workspace`.
-2. Run `node scripts/component-authority-render.mjs --check`.
-3. Run each acceptance-criterion command and record its output in `reports/`.
-4. Run `node scripts/plan-contract-check.mjs --plan plans/261121-2109-component-authority`.
-5. Set the plan status to `done`, and wake the sibling plan's planner or supervisor so it re-reads its blockers.
+1. Reconcile. For each commit in `git log <copy point>..HEAD -- docs/architecture-manifest.json`, port the change
+   into the model files (a door row goes to its `doors/<slug>.json`). Phases 3 and 6 reshaped `components.json`,
+   `files.json` and `tiers.json`, so port the meaning of each change, not the raw diff. `manifest-model-compare.mjs`
+   cannot vouch for those reshaped files any more, so run it on the doors, layers and rules only. List every
+   ported change in `reports/`, or record that there were none.
+2. Delete `docs/architecture-manifest.json`. In `setup-doctor-registry.md:164`, point the row at the model's
+   `doctor-readiness-registry` and Node-bridge door files under `packages/component-authority/model/doors/`,
+   changing nothing else in the file. Delete `reports/manifest-model-compare.mjs`.
+3. On the combined tree, run `npm test` and `cargo test --workspace`.
+4. Run `node scripts/component-authority-render.mjs --check`.
+5. Run each acceptance-criterion command and record its output in `reports/`.
+6. Run `node scripts/plan-contract-check.mjs --plan plans/261121-2109-component-authority`.
+7. Set the plan status to `done`, and wake the sibling plan's planner or supervisor so it re-reads its blockers.
 
 ## Verify
-Every acceptance criterion's check passes, and `npm test` and `cargo test --workspace` are green.
+- `test ! -e docs/architecture-manifest.json`.
+- Every manifest change after the copy point appears in `reports/` as ported, or the list is recorded as empty.
+- Every acceptance criterion's check passes, and `npm test` and `cargo test --workspace` are green.
 
 ## Rollback
-None of its own. Revert the phases in reverse wave order.
+Revert this phase's commit to bring the manifest and the registry row back. The model readers do not depend on
+the manifest, so nothing else breaks. Then revert the earlier phases in reverse wave order if needed.

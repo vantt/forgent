@@ -3,11 +3,8 @@ contract: plan-v1
 title: "Component authority: one structural model of layers, components, decision kinds, doors, contracts and files, with generated human views"
 status: draft
 priority: P1
-blockedBy:
-  - 261118-1341-s6a-execution-tier-rust
-  - 261120-0625-work-data-model
-  - 261122-0118-heads-stable-and-able
-base: 8a7839d3881a03527cfcf003e05dc323d191a613
+blockedBy: []
+base: 27fd8a9b09b6a8584c37d7b18a6a96be4b2e1225
 footprint:
   - plans/261121-2109-component-authority/**
   - docs/platform/component-authority/**
@@ -76,14 +73,15 @@ cleanup, and the primitive-and-alias land checks are in the sibling plan
 [`261121-2110-component-authority-doors`](../261121-2110-component-authority-doors/plan.md). That plan touches
 files that three running plans own, so it waits for them (see Risks).
 
-## Facts (prior art, written 2026-11-21 at bf061ff35, refreshed 2026-11-22 at 8a7839d38)
+## Facts (prior art, written 2026-11-21 at bf061ff35, refreshed 2026-11-22 at 8a7839d38, re-checked at 27fd8a9b0)
 
 - `docs/architecture-manifest.json` (since 7349a52bc): keys `contract`, `map`, `layers` (5), `rules` (3:
   `one-directional-layer`, `domain-siloing`, `tier-downward`), `components` (1: `packaging-distribution`),
   `domains` (3), `tierNames`, `tiers` (44 prefixes), `tierExceptions` (0), `doors` (83 rows, fields `job`,
   `kind`, `patterns`, `allowed`, `debt`, `reason`, `retiredBy`; 320 allowed entries; 75 debt entries in 22
   rows), `files` (325 file-to-layer rows). At bf061ff35 it had 78 door rows, 76 debt entries and 344 files;
-  the s6a and work-data-model plans changed it since, and phase 2 moves it as it stands.
+  the s6a and work-data-model plans changed it since, and phase 2 copies it as it stands. It is unchanged between
+  8a7839d38 and 27fd8a9b0.
 - Live readers: `test/architecture.test.mjs:31,1590` (all checks, `checkDoors` at :1768-1828);
   `src/setup/instruction-registry.mjs:455` (`discoverKnownOwners` reads `components` and `domains`), with
   fixtures in `test/setup/instruction-registry.test.mjs`. Comment mentions are in `src/verbs/merge/iron-law-level.mjs:9`,
@@ -122,8 +120,9 @@ generator for the human views, and one machine-read home for all of it.
 1. `docs/platform/component-authority/spec.md` exists with `Design status: Accepted`, cites CA-D1..CA-D5, and
    says the component grants no runtime permission. `packages/component-authority/model/components.json`
    holds the `component-authority` row first. Check: `node --test test/component-authority/components.test.mjs`.
-2. `docs/architecture-manifest.json` does not exist. `node --test test/architecture.test.mjs` is green on the
-   model. Every `.mjs` under `src/` and `bin/` resolves to exactly one component. `rg -l architecture-manifest.json`
+2. `docs/architecture-manifest.json` does not exist, and every manifest change that landed between phase 2's copy
+   and phase 7's deletion is in the model (phase 7's report lists them). `node --test test/architecture.test.mjs`
+   is green on the model. Every `.mjs` under `src/` and `bin/` resolves to exactly one component. `rg -l architecture-manifest.json`
    finds only history (`archive/`, `docs/history/`, `docs/platform/**/verification/**`, decision narratives,
    `plans/`). Exception: `docs/platform/packaging-distribution/spec.md` and the convention rule, which the
    sibling plan sweeps.
@@ -153,20 +152,21 @@ generator for the human views, and one machine-read home for all of it.
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Spec, model schema and the self row](phase-01-spec-and-schema.md) | - | docs/platform/component-authority/spec.md, packages/component-authority/contracts/model.v1.json, packages/component-authority/model/components.json, docs/platform/README.md, docs/reading-map.md | 1 | ready |
-| 2 | [Move the manifest into the model](phase-02-model-migration.md) | 1 | packages/component-authority/model/layers.json, packages/component-authority/model/tiers.json, packages/component-authority/model/files.json, packages/component-authority/model/doors/, packages/component-authority/model/components.json, docs/architecture-manifest.json, test/architecture.test.mjs, src/setup/instruction-registry.mjs, test/setup/instruction-registry.test.mjs, src/verbs/merge/iron-law-level.mjs, src/runner/dispatch/execution-contract.mjs, scripts/install-git-hooks.mjs, core/instructions/design-principles.md, AGENTS.md, docs/reading-map.md, docs/explanation/core-foundation-domain-boundary.md, docs/explanation/herdr-spawn-adapter-fresh-pane.md, docs/platform/vision.md, docs/platform/runner/spec.md, docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md, docs/platform/documentation/subcomponents/document-identity/spec.md, docs/platform/seat-binding/spec.md, docs/platform/agent-mailbox/spec.md, docs/platform/secrets/spec.md, docs/platform/work-state/spec.md, docs/platform/host-invocation-routing/spec.md, docs/platform/write-scope/spec.md, docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md, docs/platform/packaging-distribution/contracts/setup-doctor-registry.md, docs/platform/governance.md, docs/platform/architecture-map.md, docs/platform/component-boundary.md | 2 | draft |
+| 2 | [Copy the manifest into the model and move its readers](phase-02-model-migration.md) | 1 | packages/component-authority/model/layers.json, packages/component-authority/model/tiers.json, packages/component-authority/model/files.json, packages/component-authority/model/doors/, packages/component-authority/model/components.json, test/architecture.test.mjs, src/setup/instruction-registry.mjs, test/setup/instruction-registry.test.mjs, src/verbs/merge/iron-law-level.mjs, src/runner/dispatch/execution-contract.mjs, scripts/install-git-hooks.mjs, core/instructions/design-principles.md, AGENTS.md, docs/reading-map.md, docs/explanation/core-foundation-domain-boundary.md, docs/explanation/herdr-spawn-adapter-fresh-pane.md, docs/platform/vision.md, docs/platform/runner/spec.md, docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md, docs/platform/documentation/subcomponents/document-identity/spec.md, docs/platform/seat-binding/spec.md, docs/platform/agent-mailbox/spec.md, docs/platform/secrets/spec.md, docs/platform/work-state/spec.md, docs/platform/host-invocation-routing/spec.md, docs/platform/write-scope/spec.md, docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md, docs/platform/governance.md, docs/platform/architecture-map.md, docs/platform/component-boundary.md | 2 | draft |
 | 3 | [Component and decision-kind rows; layer and tier from components](phase-03-components-and-decision-kinds.md) | 2 | packages/component-authority/model/components.json, packages/component-authority/model/decision-kinds.json, packages/component-authority/model/files.json, packages/component-authority/model/tiers.json, test/architecture.test.mjs, src/setup/instruction-registry.mjs, test/setup/instruction-registry.test.mjs, test/component-authority/components.test.mjs | 3 | draft |
 | 4 | [Contract index](phase-04-contract-index.md) | 3 | packages/component-authority/model/contracts.json, test/component-authority/contracts.test.mjs | 4 | draft |
 | 5 | [Generated ownership views and decision-index on the model](phase-05-ownership-views.md) | 3 | scripts/component-authority-render.mjs, test/component-authority/render.test.mjs, src/report/decision-index.mjs, test/report/decision-index.test.mjs, docs/platform/component-boundary.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 4 | draft |
 | 6 | [Architecture-map registries generated; proposal map retired](phase-06-architecture-map-views.md) | 4, 5 | scripts/component-authority-render.mjs, test/component-authority/render.test.mjs, docs/platform/architecture-map.md, docs/platform/proposals/component-authority-boundary-map.md, docs/platform/component-authority/spec.md | 5 | draft |
-| 7 | [Integration](phase-07-integration.md) | 6 | plans/261121-2109-component-authority/ | 6 | draft |
+| 7 | [Retire the manifest and integrate](phase-07-integration.md) | 6 | docs/architecture-manifest.json, docs/platform/packaging-distribution/contracts/setup-doctor-registry.md, packages/component-authority/model/, plans/261121-2109-component-authority/ | 6 | draft |
 
 Phases are layered (one model, one test file), so most of the plan runs serially. Phases 4 and 5 run in
 parallel in wave 4. Hot files: `components.json` has one writer per wave (phase 1, then phase 2, then phase 3).
 `test/architecture.test.mjs` is written by phase 2, then phase 3. `scripts/component-authority-render.mjs` is
 written by phase 5, then phase 6. The generated views are regenerated and never merged by hand. Phase 2
 touches `governance.md`, `architecture-map.md` and `component-boundary.md` only to change the manifest
-mention; phases 5 and 6 then replace their registry sections with generated blocks. The check
-`node scripts/plan-contract-check.mjs --plan plans/261121-2109-component-authority` passes while the plan is `draft`.
+mention; phases 5 and 6 then replace their registry sections with generated blocks. Only phase 7 writes
+`docs/architecture-manifest.json` and `setup-doctor-registry.md`, and it starts only after
+`261122-0118-heads-stable-and-able` is `done` (see the reshape note below).
 
 **Owner approval (2026-11-21 23:34):** the owner approved this plan and its sibling as written (option A of the approval question lead:SUPERVISOR put to him). It stays `draft` only because the plan-contract check refuses `ready` while its footprint overlaps the running plans below. When every `blockedBy` plan is `done`, the planner or supervisor sets `ready` with no further owner question.
 
@@ -203,7 +203,29 @@ also waits for heads-stable to be `done`. Then drop heads-stable from `blockedBy
 set `ready`. Heads-stable's open phases (8-11) write neither file, but its plan-level footprint still lists both, so
 admission may still report an overlap; the planner says in its report whether the check accepts this or what remains.
 
-**Why it first waited:** two plans that were running when it was written owned files this plan must change.
+**Reshaped (2026-11-22, planner wake, for the 23:19 order):** phase 2 now copies the manifest into the model,
+moves both readers to the model and points every live mention at it, but leaves the manifest and
+`setup-doctor-registry.md` untouched. Phase 2 also writes a comparison script (`reports/manifest-model-compare.mjs`)
+and records its commit as the copy point. Phase 7 now waits for heads-stable to be `done`. It then ports any manifest
+change that landed after the copy point, deletes the manifest, fixes the one registry row at
+`setup-doctor-registry.md:164`, and runs the integration gate. `blockedBy` is now empty: s6a and work-data-model are
+`done`, and heads-stable left by the order. `base` moved to 27fd8a9b0. The plan-level footprint still lists both
+shared files because phase 7 writes them.
+
+The check passes as `draft`. As `ready` it refuses with two cross-plan overlap errors, so the plan stays `draft`:
+- `261122-0118-heads-stable-and-able` (running): its plan-level footprint still lists
+  `docs/architecture-manifest.json` and `setup-doctor-registry.md`, although its open phases write neither. The fix
+  belongs to that plan: its supervisor narrows its footprint to drop the two files. This plan cannot drop them,
+  because phase 7 writes them.
+- `261122-1950-owner-communication-standard` (ready): the check does not let two active plans share
+  `AGENTS.md`, `docs/reading-map.md`, `docs/platform/agent-mailbox/spec.md` and `docs/platform/observe/spec.md`, so
+  "kept apart by admission alone" (23:25 order) does not hold while both are `ready`. Phases 1, 2 and 5 write those
+  files. Following the owner's order (this plan first, that one low priority), the fix is for that plan to list this
+  one in its `blockedBy`, or go back to `draft`.
+When both are fixed, re-run the check and set `status: ready`. The planner or supervisor does this, and it needs no
+further owner question.
+
+**Why it first waited (history):** two plans that were running when it was written owned files this plan must change.
 - `261118-1341-s6a-execution-tier-rust` owns `docs/architecture-manifest.json`, `test/architecture.test.mjs`,
   `src/setup/**`, `test/setup/**`, `src/runner/dispatch/**`, `docs/reading-map.md`,
   `docs/platform/component-boundary.md`, `docs/platform/runner/**` and `docs/platform/seat-binding/spec.md`. It edits
@@ -212,9 +234,8 @@ admission may still report an overlap; the planner says in its report whether th
   `docs/explanation/core-foundation-domain-boundary.md`, `docs/platform/architecture-map.md`,
   `docs/platform/system-overview/spec.md` and `docs/platform/documentation/subcomponents/document-identity/spec.md`.
 
-When both are `done`, a planner wake does three things: refreshes `base`, re-reads the manifest (s6a retires some
-door debt, which phase 2 then moves as it stands), and runs the check. If the check passes, it sets `status: ready`.
-Phase 1 touches only new files, `docs/platform/README.md` and `docs/reading-map.md`, and is the first to start.
+Both are `done` now. Phase 1 touches only new files, `docs/platform/README.md` and `docs/reading-map.md`, and is
+the first to start.
 
 ## Owner questions
 
@@ -236,14 +257,19 @@ choices from the evidence and reports them here instead of asking:
 - **Layer derived from components disagrees with today's per-file layer.** Phase 3 adds exceptions with
   reasons rather than changing any file's layer. Its verify proves that every file's derived layer and tier
   equal the phase 2 values.
+- **The manifest changes after the copy and the change is lost.** Between phase 2 and phase 7 nothing reads the
+  manifest, so a heads-stable edit to it would be untested and then deleted. Phase 2 points every instruction at the
+  model, so new rows go there. Phase 7 ports every manifest commit after the copy point before deleting the file, and
+  lists them in its report. Proof point for validating: phase 7's ported-change list against
+  `git log <copy point>..HEAD -- docs/architecture-manifest.json`.
 - **Contract provider attribution is wrong.** Provider is taken from the containing `packages/<pkg>` or
   `docs/platform/<area>`. Any row with a different provider must say why.
 - **Sibling plan waits on three running plans** (`261118-1341-s6a-execution-tier-rust`,
   `261120-0625-work-data-model`, `261121-1309-git-windows-custody`; and `261121-1456-windows-ci-packaging-reds`
   for `Cargo.toml`). Until it lands, a door can still be copied under a new name. This plan does not make that
   worse.
-- **Rollback:** each phase is one commit on its own branch. Revert phase commits in reverse wave order. Before
-  phase 7 lands, reverting phase 2 restores the manifest.
+- **Rollback:** each phase is one commit on its own branch. Revert phase commits in reverse wave order. The manifest
+  exists until phase 7, so reverting phase 2 alone restores the old readers.
 
 ## Outstanding questions
 
