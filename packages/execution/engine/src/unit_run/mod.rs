@@ -33,7 +33,8 @@ pub mod consent;
 pub mod custody;
 pub mod git_port;
 pub mod handoff;
-pub mod history;
+/// The settled seat rounds of a unit run are a read of the disk, in `fgos-execution`.
+pub use fgos_execution::unit_history as history;
 pub mod host;
 pub mod machine_reads;
 pub mod partial_writes;

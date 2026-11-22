@@ -1,4 +1,4 @@
-// Records the golden vectors of the Rust run-result module (packages/execution/engine/src/run_result/) by running
+// Records the golden vectors of the Rust run-result module (packages/execution/rust/src/run_result/) by running
 // the Node modules it ports: src/runner/dispatch/{run-result,evidence-attribution,agent-result-claim-contract}.mjs.
 // Run: node test/golden-recorders/run-result.recorder.mjs
 // Writes under packages/execution/contracts/run-result/: writer.json, readers.json, attribution.json, claim.json.

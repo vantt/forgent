@@ -8,7 +8,7 @@
 
 import path from 'node:path';
 
-import { RunnerConfigError, runDirOf } from '../native/execution-door.mjs';
+import { RunnerConfigError, runDirOf, currentDispatchDepth } from '../native/execution-door.mjs';
 import { appendWorkflowEvent, projectWorkflowState, readWorkflowEvents } from './store.mjs';
 import {
   acquireAdvanceLock,
@@ -21,7 +21,6 @@ import {
 import { drainCaseInbox, recordGateAnswerRound } from './case-runtime.mjs';
 import { gateOfStep, readCaseProjection } from './case-projection.mjs';
 import { CONFINED_WRITE_CODE, confinedWriteRefusal, confinedWriteText } from './case-admission-port.mjs';
-import { currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
 import { DEFAULT_PRUNE_DAYS, closeCaseUnderHold, pruneFinishedCases } from './case-close.mjs';
 import { detachedResult, openCaseOnLedger, prepareWorkflowRun, refundIfNotOpened, spawnDetachedAdvance } from './case-start.mjs';
 import { inspectCaseBindings } from './case-bindings.mjs';

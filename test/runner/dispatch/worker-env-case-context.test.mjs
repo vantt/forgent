@@ -7,8 +7,7 @@ import fs from 'node:fs';
 
 import { workerBaseEnv, caseContextEnv, CASE_ID_ENV, CASE_RESERVATION_ENV } from '../../../src/runner/dispatch/adapters.mjs';
 import { terminalAgentArgs } from '../../../src/runner/dispatch/assignment-runner.mjs';
-import { runUnitInHost } from '../../../src/native/execution-door.mjs';
-import { resolveUnitInputs } from '../../../src/runner/execution/handoff-refs.mjs';
+import { runUnitInHost, handoffRef } from '../../../src/native/execution-door.mjs';
 import { createCaseAdmissionPort } from '../../../src/workflow/case-admission-port.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../../helpers/workflow-fixture-repo.mjs';
@@ -34,7 +33,7 @@ function setupRepo() {
 
 const unit = { id: 'u-look', objective: 'Look around', capability: 'docs:write', writes: [] };
 const seenBy = (tmp, unitRunId) => {
-  const [report] = resolveUnitInputs([`unit-run:${unitRunId}/producer`], tmp).refs;
+  const report = handoffRef(`unit-run:${unitRunId}/producer`, tmp);
   return JSON.parse(/case variables: (\{.*?\})\./.exec(fs.readFileSync(report, 'utf8'))[1]);
 };
 
@@ -72,7 +71,7 @@ test('a headless worker sees only allowed names of a controller that carries sec
   try {
     const done = await runUnit({ unitData: unit, caseAdmission: createCaseAdmissionPort({ repoRoot: tmp, env: {} }), repoRoot: tmp, cwd: tmp, worktree: tmp });
     assert.equal(done.outcome, 'pass');
-    const [report] = resolveUnitInputs([`unit-run:${done.unitRunId}/producer`], tmp).refs;
+    const report = handoffRef(`unit-run:${done.unitRunId}/producer`, tmp);
     assert.deepEqual(JSON.parse(/variable names: (\[.*?\])\./.exec(fs.readFileSync(report, 'utf8'))[1]), []);
   } finally {
     for (const [name, value] of Object.entries(before)) {

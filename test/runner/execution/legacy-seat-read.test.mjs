@@ -12,7 +12,7 @@ import { legacySeatsOf, seatsOfRecord, seatKeyOf, isVerdictResult, isVerifyResul
 import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs';
 import { buildUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { readUnitRunHistory } from '../../../src/runner/execution/unit-run-history.mjs';
-import { resolveUnitInputs } from '../../../src/runner/execution/handoff-refs.mjs';
+import { handoffRef } from '../../../src/native/execution-door.mjs';
 
 const settledAt = '2026-10-05T01:01:00Z';
 
@@ -115,7 +115,7 @@ test('a parked workflow gate answered after the fence still resolves its role-ke
   };
   claimOnly('panelist-1');
   claimOnly('synthesizer');
-  const { refs } = resolveUnitInputs(['unit-run:unit-run-prefence/panelist-1', 'unit-run:unit-run-prefence/synthesizer'], root);
+  const refs = ['unit-run:unit-run-prefence/panelist-1', 'unit-run:unit-run-prefence/synthesizer'].map((input) => handoffRef(input, root));
   assert.equal(refs.length, 2);
   assert.ok(refs[0].endsWith(path.join('panelist-1', '1', 'runs', '01', 'report.md')));
 });

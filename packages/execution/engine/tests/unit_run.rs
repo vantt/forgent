@@ -2510,3 +2510,39 @@ mod run_unit_runs {
         }
     }
 }
+
+/// A hand-off ref under `.fgos/assignments` stays hidden from a blind seat whatever state the `.fgos` directory is
+/// in: read-only, or holding a plain file where `runtime/` would be. The check reads; it never creates a root.
+#[cfg(unix)]
+#[test]
+fn a_report_ref_stays_hidden_from_a_blind_seat_under_a_read_only_or_odd_fgos() {
+    use fgos_execution_engine::unit_run::handoff::hidden_from_blind;
+    use std::os::unix::fs::PermissionsExt;
+    let root = std::env::temp_dir().join(format!("fgos-blind-ref-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&root);
+    let fgos = root.join(".fgos");
+    std::fs::create_dir_all(fgos.join("assignments")).unwrap();
+    let reference = fgos.join("assignments/u1/peer/1/outbox/report-1.md");
+    let reference = reference.to_string_lossy().into_owned();
+    let skip = std::process::Command::new("id")
+        .arg("-u")
+        .output()
+        .is_ok_and(|out| String::from_utf8_lossy(&out.stdout).trim() == "0");
+    if !skip {
+        std::fs::set_permissions(&fgos, std::fs::Permissions::from_mode(0o500)).unwrap();
+        let read_only = hidden_from_blind(&reference, &root);
+        std::fs::set_permissions(&fgos, std::fs::Permissions::from_mode(0o755)).unwrap();
+        assert!(read_only, "a read-only .fgos still answers the ref check");
+        assert!(!fgos.join("runtime").exists(), "the check creates nothing");
+    }
+    std::fs::write(fgos.join("runtime"), "a plain file\n").unwrap();
+    assert!(
+        hidden_from_blind(&reference, &root),
+        "a runtime file still answers the ref check"
+    );
+    assert!(
+        !hidden_from_blind("docs/a.md", &root),
+        "a ref outside the hidden roots is visible"
+    );
+    let _ = std::fs::remove_dir_all(&root);
+}

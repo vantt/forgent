@@ -12,7 +12,7 @@ import { bindingsDir } from '../../src/workflow/case-bindings.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { acquireUnitControl } from '../../src/runner/execution/unit-control.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
-import { isCaseId } from '../../src/runner/execution/case-run-paths.mjs';
+import { isCaseId } from '../../src/native/execution-door.mjs';
 import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { append, openCase, withHold } from '../helpers/workflow-case-fixture.mjs';
 

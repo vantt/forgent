@@ -7,113 +7,18 @@ use std::path::{Path, PathBuf};
 
 use crate::confinement::cleanup::resolve_confinement_temp_root;
 use crate::confinement::policy::{is_inside_root, resolve_blind_hidden_roots};
-use crate::unit_run::history::read_seat_directory;
 use crate::unit_run::run_unit_contract::RunUnitError;
 use fgos_execution::handoff::{
-    anonymous_input_name, classify_input, gate_answer_path, is_seat_input, own_previous_name,
-    plain_input_name, report_ref_of_record, settled_report_stands, unit_run_dir,
-    unit_run_ref_refusal, Accept, HandoffRefError, InputRef, ReportRef,
+    anonymous_input_name, classify_input, is_seat_input, own_previous_name, plain_input_name,
+    Accept, HandoffRefError, InputRef,
+};
+use fgos_execution::handoff_reports::{
+    accept_of, fgos_dir, refusal, report_ref_of, resolve_ref, sha256_of_file, unit_run_ref,
 };
 use serde_json::{json, Value};
 
-/// The `.fgos` directory of the project at `main_root`.
-fn fgos_dir(main_root: &Path) -> PathBuf {
-    PathBuf::from(fgos_execution::runner_config::fgos_dir_from_root(
-        &main_root.to_string_lossy(),
-    ))
-}
-
-/// A `HandoffRefError`: a `RunnerConfigError` carrying its `reason`.
-fn refusal(error: HandoffRefError) -> RunUnitError {
-    let reason = error.reason.clone();
-    RunUnitError::config(error.to_string(), None, None).with("reason", json!(reason))
-}
-
-fn sha256_of_file(file: &Path) -> std::io::Result<String> {
-    std::fs::read(file).map(|bytes| fgos_execution::handoff::sha256_hex(&bytes))
-}
-
-/// `acceptsBytes`' authority as the caller states it: `'any'`, or the digests of the revisions it stands behind.
-fn accept_of(value: Option<&Value>) -> Accept {
-    match value {
-        Some(Value::String(s)) if s == "any" => Accept::Any,
-        Some(Value::Array(list)) => Accept::Digests(
-            list.iter()
-                .filter_map(Value::as_str)
-                .map(str::to_string)
-                .collect(),
-        ),
-        _ => Accept::Nothing,
-    }
-}
-
-/// `reportRefOf(record, { mainRoot, accept })`: the absolute path of the account one seat result left, its settled
-/// report only while it still has the bytes settlement recorded (or the caller accepts the revision).
-fn report_ref_of(
-    record: &Value,
-    main_root: &Path,
-    accept: &Accept,
-) -> Result<PathBuf, HandoffRefError> {
-    match report_ref_of_record(record)? {
-        ReportRef::Settled { path, sha256 } => {
-            let file = main_root.join(path);
-            let actual = sha256_of_file(&file).ok();
-            settled_report_stands(record, sha256.as_deref(), actual.as_deref(), accept)?;
-            Ok(file)
-        }
-        ReportRef::Artifact(artifact) => Ok(main_root.join(artifact)),
-    }
-}
-
-/// `resolveUnitRunRef`: the report the named (or the receiving) seat of another unit run left in its latest round.
-fn unit_run_ref(
-    input: &str,
-    main_root: &Path,
-    seat: Option<&str>,
-    accept: &Accept,
-) -> Result<PathBuf, HandoffRefError> {
-    // An own-seat input (`unit-run:<id>/{seat}`) names the run the same way; the seat is the receiving one.
-    let (unit_run_id, named) = match classify_input(input) {
-        InputRef::UnitRun { unit_run_id, seat } => (unit_run_id, seat),
-        InputRef::OwnSeat => {
-            let rest = input.strip_prefix("unit-run:").unwrap_or_default();
-            (rest.split('/').next().unwrap_or_default().to_string(), None)
-        }
-        _ => return Err(unit_run_ref_refusal(input, "no-such-run", seat.is_some())),
-    };
-    let own = seat.is_some();
-    let fail = |reason: &str| unit_run_ref_refusal(input, reason, own);
-    let wanted = seat.map(str::to_string).or(named).unwrap_or_default();
-    let seat_rule = fgos_convention::rules::packaged_rules().identifier("seat-id");
-    if seat_rule.is_some_and(|rule| rule.check(&wanted) == Err("invalid-identifier")) {
-        return Err(fail("no-such-role"));
-    }
-    let assignments = fgos_dir(main_root).join("assignments");
-    let Some(unit_dir) = unit_run_dir(&assignments, &unit_run_id).filter(|d| d.exists()) else {
-        return Err(fail("no-such-run"));
-    };
-    let rounds = match read_seat_directory(&unit_dir, &wanted) {
-        Ok(rounds) => rounds,
-        Err(e)
-            if matches!(
-                e.kind(),
-                std::io::ErrorKind::NotFound | std::io::ErrorKind::NotADirectory
-            ) =>
-        {
-            Vec::new()
-        }
-        Err(e) => return Err(HandoffRefError::new(input, format!("unreadable: {e}"))),
-    };
-    let latest = rounds
-        .into_iter()
-        .filter_map(|r| r.final_attempt.map(|f| (r.round, r.seat, f)))
-        .reduce(|a, b| if b.0 > a.0 { b } else { a });
-    let Some((round, seat_id, final_attempt)) = latest else {
-        return Err(fail("no-such-role"));
-    };
-    let record = json!({ "seat": seat_id, "round": round, "outcome": final_attempt.outcome, "runResult": final_attempt.run_result });
-    report_ref_of(&record, main_root, accept).map_err(|e| fail(&e.reason))
-}
+// Where a seat's settled report lies and its digest are read in `fgos-execution`, which the Workflow asks too.
+pub use fgos_execution::handoff_reports::{report_digest, report_digest_of_seat};
 
 /// `/^[a-z][a-z0-9+.-]*:/i`: a URL-like ref, never a path that could lie inside a hidden root.
 fn has_scheme(text: &str) -> bool {
@@ -173,20 +78,13 @@ pub fn resolve_inputs(
     for input in list.iter().filter(|i| !is_seat_input(i)) {
         let kind = classify_input(input);
         let is_unit_run = matches!(kind, InputRef::UnitRun { .. });
-        let resolved: PathBuf = match kind {
-            InputRef::UnitRun { .. } => {
-                let path = unit_run_ref(input, main_root, None, &accept).map_err(refusal)?;
-                if anonymize_into.is_some() && !blind {
-                    if !sources.iter().any(|(i, _)| i == input) {
-                        sources.push((input.clone(), path));
-                    }
-                    continue;
-                }
-                path
+        let resolved = resolve_ref(input, main_root, &accept).map_err(refusal)?;
+        if is_unit_run && anonymize_into.is_some() && !blind {
+            if !sources.iter().any(|(i, _)| i == input) {
+                sources.push((input.clone(), resolved));
             }
-            InputRef::GateAnswer { .. } => gate_answer_path(input, &fgos).map_err(refusal)?,
-            _ => PathBuf::from(input),
-        };
+            continue;
+        }
         let changed = resolved != Path::new(input);
         if blind {
             let absolute = main_root.join(&resolved);
@@ -258,40 +156,6 @@ fn seat_inputs(
         input_map.push(json!({ "name": name, "input": input, "source": source, "sha256": sha256 }));
     }
     Ok(json!({ "refs": [], "inputMap": input_map }))
-}
-
-/// `reportDigestOf(record, mainRoot)`: `{ path, bytes, sha256 }` of the report one attempt record left, or `null`
-/// when it left none or it cannot be read.
-pub fn report_digest(result: &Value, main_root: &Path) -> Value {
-    let Ok(file) = report_ref_of(result, main_root, &Accept::Any) else {
-        return Value::Null;
-    };
-    match std::fs::read(&file) {
-        Ok(bytes) => json!({
-            "path": file,
-            "bytes": bytes.len(),
-            "sha256": fgos_execution::handoff::sha256_hex(&bytes),
-        }),
-        Err(_) => Value::Null,
-    }
-}
-
-/// `reportDigest(unitRunId, seat, mainRoot)`: `{ path, bytes, sha256 }` of the report `seat` of another unit run
-/// left in its latest round, as its bytes lie now; a report that cannot be resolved or read is refused.
-pub fn report_digest_of_seat(
-    unit_run_id: &str,
-    seat: &str,
-    main_root: &Path,
-) -> Result<Value, RunUnitError> {
-    let subject = format!("unit-run:{unit_run_id}/{seat}");
-    let file = unit_run_ref(&subject, main_root, None, &Accept::Any).map_err(refusal)?;
-    let bytes = std::fs::read(&file)
-        .map_err(|e| refusal(HandoffRefError::new(&subject, format!("unreadable: {e}"))))?;
-    Ok(json!({
-        "path": file,
-        "bytes": bytes.len(),
-        "sha256": fgos_execution::handoff::sha256_hex(&bytes),
-    }))
 }
 
 /// `reportRefsOf(records, { mainRoot })` (`src/runner/execution/handoff-refs.mjs:78`): the reports of in-run seat

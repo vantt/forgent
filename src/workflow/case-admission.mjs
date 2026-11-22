@@ -8,7 +8,7 @@
 
 import crypto from 'node:crypto';
 import { RIGOR_ORDER } from './guide-schema.mjs';
-import { canonicalizeWrites, writeScopesOverlap } from '../runner/dispatch/write-scope.mjs';
+import { nativeDoor } from '../native/door.mjs';
 
 // The refusals that mean "what this admission stood on is no longer true". Frame, route and overlap
 // answers belong to the moment of admission and are not asked again.
@@ -168,7 +168,7 @@ function guardMustRows({ projection, proposal, guide, activity, writing }) {
 function guardWriteScope({ projection, writes, writing }) {
   if (!writing) return [];
   return projection.liveReservations
-    .filter((other) => (other.writes ?? []).length > 0 && writeScopesOverlap(writes, other.writes))
+    .filter((other) => (other.writes ?? []).length > 0 && nativeDoor().writeScope('overlaps', { a: writes, b: other.writes }))
     .map((other) => violation('writes-overlap', 'write-scope-isolation', `writes [${writes.join(', ')}] can touch the same path as reservation ${other.reservationId} (activity ${other.activity}, writes [${other.writes.join(', ')}]); scopes are compared by their literal leading segments, so narrow an entry if the two are disjoint`));
 }
 
@@ -258,7 +258,7 @@ export function admitProposal({ projection, proposal, bindingAnswers = {}, reser
   const activity = guide.activities.find((a) => a.id === proposal.activity);
   if (!activity) return refuse([violation('unknown-activity', 'guide', `the guide has no activity "${proposal.activity}"`)]);
 
-  const writes = canonicalizeWrites(proposal.writes ?? []);
+  const writes = nativeDoor().writeScope('canonicalizeAll', { scope: proposal.writes ?? [] });
   const { kind: routeKind, governing, swappedFrom } = routeKindOf({ guide, projection, activity, proposal });
   const ctx = { projection, proposal, guide, activity, writes, writing: writes.length > 0, bindingAnswers, routeKind, governing, swappedFrom };
   const violations = [guardEntry, guardMustRows, guardWriteScope, guardBinding, guardFrame, guardRoute].flatMap((guard) => guard(ctx));

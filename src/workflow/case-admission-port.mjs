@@ -22,8 +22,7 @@ import { digestSubject, digestUnitRunReports } from './ref-digests.mjs';
 import { admitProposal, newReservationId, recheckReservation } from './case-admission.mjs';
 import { bindingsDir, bindWorktree, ensureBindingsSentinel, readBinding, SENTINEL_NAME } from './case-bindings.mjs';
 import { workflowCheckout } from './unit-handoff.mjs';
-import { CASE_ID_ENV, CASE_RESERVATION_ENV, currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
-import { isCaseId, runDirOf, seatKeyOf, isVerdict } from '../native/execution-door.mjs';
+import { isCaseId, runDirOf, seatKeyOf, isVerdict, currentDispatchDepth, executionVocabulary } from '../native/execution-door.mjs';
 
 /** Admission reads without `advance`, so it can meet an append in flight. */
 const readEvents = (mainRoot, caseId) => readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId, retryTail: true });
@@ -97,6 +96,7 @@ const refusal = (code, condition) => ({ code, condition });
  * variables; they are a claim to check, never an authority.
  */
 function caseEnvOf(env) {
+  const { CASE_ID_ENV, CASE_RESERVATION_ENV } = executionVocabulary();
   const caseId = env[CASE_ID_ENV];
   const reservationId = env[CASE_RESERVATION_ENV];
   if (caseId === undefined && reservationId === undefined) return null;
@@ -149,6 +149,7 @@ function isChildOf(mainRoot, childId, parentId) {
  * that was opened under a live reservation of the other (a nested case).
  */
 function authorityRefusal({ mainRoot, env, refCase, bound = null }) {
+  const { CASE_ID_ENV, CASE_RESERVATION_ENV } = executionVocabulary();
   const claimed = caseEnvOf(env);
   if (claimed?.malformed) return refusal('authority-context-invalid', `${CASE_ID_ENV} and ${CASE_RESERVATION_ENV} must both name a case and a reservation; the environment carries something else`);
   if (claimed) {
@@ -242,6 +243,7 @@ function admitUnderHold({ mainRoot, hold, id, proposal, writing }) {
  * @returns {{ resolveBinding: Function, admit: Function, recheckEffect: Function, settle: Function }} the case admission port (`packages/execution/contracts/admission-peer/admission-peer.v1.json`)
  */
 export function createCaseAdmissionPort({ repoRoot, caseId = null, heldAdvance = null, env = process.env }) {
+  const { CASE_ID_ENV, CASE_RESERVATION_ENV } = executionVocabulary();
   const mainRoot = path.resolve(repoRoot);
   // A host-side sentinel tells a later reader that an empty bindings directory is the real one.
   ensureBindingsSentinel(mainRoot);

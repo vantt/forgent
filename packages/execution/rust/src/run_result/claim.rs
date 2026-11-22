@@ -219,3 +219,153 @@ pub fn validate_agent_result_claim_contract(
         reason: None,
     }
 }
+
+/// Whether a text string constitutes substantive agent report content. Placeholders (TODO, TBD, N/A, ...) and
+/// headings alone are not; a one-word answer (OK, YES, NO) is, since it states what was answered.
+pub fn is_substantive_report_text(text: &str) -> bool {
+    let trimmed = text.trim();
+    if trimmed.is_empty() {
+        return false;
+    }
+    let lower = trimmed.to_lowercase();
+    // `^(todo|n/?a|none|tbd|placeholder|null|undefined)[\s.!\-:#]*$`
+    let bare = [
+        "todo",
+        "n/a",
+        "na",
+        "none",
+        "tbd",
+        "placeholder",
+        "null",
+        "undefined",
+    ];
+    for word in bare {
+        if let Some(rest) = lower.strip_prefix(word) {
+            if rest
+                .chars()
+                .all(|c| c.is_whitespace() || matches!(c, '.' | '!' | '-' | ':' | '#'))
+            {
+                return false;
+            }
+        }
+    }
+    let words = upper_words(trimmed);
+    if words.is_empty() {
+        return false;
+    }
+    const GENERIC: [&str; 29] = [
+        "TODO",
+        "N",
+        "A",
+        "NA",
+        "NONE",
+        "TBD",
+        "PLACEHOLDER",
+        "NULL",
+        "UNDEFINED",
+        "DONE",
+        "PASSED",
+        "PASS",
+        "FAIL",
+        "FAILED",
+        "REJECTED",
+        "READY",
+        "SUMMARY",
+        "VERDICT",
+        "REPORT",
+        "STATUS",
+        "RESULT",
+        "RESULTS",
+        "CHECK",
+        "TITLE",
+        "HEADER",
+        "NOTES",
+        "NOTE",
+        "DETAILS",
+        "FINDINGS",
+    ];
+    let non_generic = words
+        .iter()
+        .filter(|w| !GENERIC.contains(&w.as_str()))
+        .count();
+    if non_generic == 0 {
+        return false;
+    }
+    let explicit_placeholder = has_placeholder_word(&lower);
+    !(explicit_placeholder && non_generic < 3)
+}
+
+/// `trimmed.toUpperCase().match(/\b[A-Z0-9_-]+\b/g)`: runs of `[A-Z0-9_-]` that start and end on a word boundary.
+fn upper_words(text: &str) -> Vec<String> {
+    let upper = text.to_uppercase();
+    let chars: Vec<char> = upper.chars().collect();
+    let is_word = |c: char| c.is_ascii_alphanumeric() || c == '_';
+    let in_class = |c: char| c.is_ascii_uppercase() || c.is_ascii_digit() || c == '_' || c == '-';
+    let mut out = Vec::new();
+    let mut i = 0;
+    while i < chars.len() {
+        if !in_class(chars[i]) {
+            i += 1;
+            continue;
+        }
+        let mut j = i;
+        while j < chars.len() && in_class(chars[j]) {
+            j += 1;
+        }
+        // Trim to boundaries: `\b` sits between a word character and a non-word one (or an edge).
+        let mut s = i;
+        let mut e = j;
+        while s < e && !is_word(chars[s]) {
+            s += 1;
+        }
+        while e > s && !is_word(chars[e - 1]) {
+            e -= 1;
+        }
+        if s < e {
+            out.push(chars[s..e].iter().collect());
+        }
+        i = j;
+    }
+    out
+}
+
+/// `/\b(todo|n\/?a|none|tbd|placeholder)\b/i`
+fn has_placeholder_word(lower: &str) -> bool {
+    let chars: Vec<char> = lower.chars().collect();
+    let is_word = |c: char| c.is_alphanumeric() || c == '_';
+    for word in ["todo", "n/a", "na", "none", "tbd", "placeholder"] {
+        let w: Vec<char> = word.chars().collect();
+        let mut i = 0;
+        while i + w.len() <= chars.len() {
+            if chars[i..i + w.len()] == w[..] {
+                let before = i == 0 || !is_word(chars[i - 1]);
+                let after = i + w.len() == chars.len() || !is_word(chars[i + w.len()]);
+                let first_word = is_word(w[0]);
+                let last_word = is_word(w[w.len() - 1]);
+                if (!first_word || before) && (!last_word || after) {
+                    return true;
+                }
+            }
+            i += 1;
+        }
+    }
+    false
+}
+
+/// The claim context an assignment gives (`role`, `operation`, and a posture when it names one).
+pub fn claim_context_of(assignment: &Value) -> ClaimContext {
+    ClaimContext {
+        role: assignment
+            .get("role")
+            .and_then(Value::as_str)
+            .map(str::to_string),
+        operation: assignment
+            .get("operation")
+            .and_then(Value::as_str)
+            .map(str::to_string),
+        posture_verdict: assignment
+            .get("posture")
+            .filter(|p| !p.is_null() && *p != &Value::Bool(false))
+            .map(|p| p.get("verdict") == Some(&Value::Bool(true))),
+    }
+}

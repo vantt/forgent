@@ -32,8 +32,7 @@ import { ownedSkillNames } from './skill-wrappers.mjs';
 import { declaredActivities, readWorkflowCatalog, withUnreadableDefinitions } from './workflow-catalog-reader.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 
-import { RunnerConfigError, checkCatalog, deepEqual, loadRunnerConfigForDir, validateRunnerLoopsShape, attributeRunnerConfigError, detectRetiredPatternKeys, formatRetiredKeySentence, executionVocabulary } from '../native/execution-door.mjs';
-import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
+import { RunnerConfigError, checkCatalog, deepEqual, loadRunnerConfigForDir, validateRunnerLoopsShape, attributeRunnerConfigError, detectRetiredPatternKeys, formatRetiredKeySentence, executionVocabulary, shippedCatalog } from '../native/execution-door.mjs';
 import { isCommandAvailable, resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import {
   capabilityNamesOf,

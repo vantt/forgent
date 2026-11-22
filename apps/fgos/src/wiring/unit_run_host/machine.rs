@@ -96,16 +96,9 @@ pub fn created_by() -> String {
         .unwrap_or_else(|| "system".into())
 }
 
-/// `shippedCatalog` (`src/runner/dispatch/shipped-catalog.mjs:21`): the bundled standard's `runner.patterns` and
-/// `runner.loops`, `{}` each when the standard names none.
+/// `shippedCatalog`: the bundled standard's `runner.patterns` and `runner.loops`, the Config crate's answer.
 pub fn shipped_catalog() -> Value {
-    let runner = fgos_config::schema::Schemas::bundled()
-        .ok()
-        .and_then(|(schemas, _)| fgos_config::standard::Standard::bundled(&schemas).ok())
-        .and_then(|standard| standard.value().get("runner").cloned())
-        .unwrap_or(Value::Null);
-    let section = |key: &str| runner.get(key).cloned().unwrap_or_else(|| json!({}));
-    json!({ "patterns": section("patterns"), "loops": section("loops") })
+    fgos_config::standard::shipped_runner_catalog()
 }
 
 /// The Git door over `worktree` with `main_root` as its trusted main checkout (`gitPortOptions`,

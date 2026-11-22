@@ -21,7 +21,8 @@ pub mod assignment_runner;
 pub mod contract;
 pub mod credentials;
 pub mod planning;
-pub mod run_result;
+/// The Run Result readers, writer and attribution are pure; they live in `fgos-execution`.
+pub use fgos_execution::run_result;
 pub mod settlement;
 pub mod steps;
 pub mod transport;

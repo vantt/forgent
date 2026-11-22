@@ -17,7 +17,8 @@ use serde_json::{json, Value};
 
 pub mod brief;
 pub mod builder;
-pub mod layout;
+/// The assignments directory layout is a read of the disk, in `fgos-execution`.
+pub use fgos_execution::assignment_layout as layout;
 pub mod normalizer;
 /// The tier cell reader is `fgos-execution`'s: the pure doctor row over `runner.modelPolicies` reads cells by it too.
 pub use fgos_execution::tier_cell;

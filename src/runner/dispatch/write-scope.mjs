@@ -104,24 +104,12 @@ function segmentRegex(segment) {
   return new RegExp(`^${body}$`, 'u');
 }
 
-const compatible = (x, y) => x.startsWith(y) || y.startsWith(x);
-const compatibleEnds = (x, y) => x.endsWith(y) || y.endsWith(x);
-
-/** Can one path-segment pattern and another name the same segment? Two wildcard segments are judged by their fixed ends. */
-function segmentsMeet(a, b) {
-  if (!hasGlob(a) && !hasGlob(b)) return a === b;
-  if (!hasGlob(a)) return segmentRegex(b).test(a);
-  if (!hasGlob(b)) return segmentRegex(a).test(b);
-  return compatible(a.slice(0, a.indexOf('*')), b.slice(0, b.indexOf('*')))
-    && compatibleEnds(a.slice(a.lastIndexOf('*') + 1), b.slice(b.lastIndexOf('*') + 1));
-}
-
 /**
- * The one glob walk: `a` is a pattern (segments, `**` for any number of segments); `b` is a pattern too when
- * `bIsPattern`, otherwise a concrete path whose segments are literal. `agree(x, y)` says whether two segments
- * can be the same one. Memoized by position so stacked `**` stay polynomial.
+ * The one glob walk: `a` is a pattern (segments, `**` for any number of segments), `b` a concrete path whose
+ * segments are literal. `agree(x, y)` says whether a pattern segment matches a path segment. Memoized by
+ * position so stacked `**` stay polynomial. (Pattern against pattern is the write-scope leaf's `globs_meet`.)
  */
-function walkGlobs(a, b, agree, bIsPattern) {
+function walkGlobs(a, b, agree) {
   const memo = new Map();
   const walk = (i, j) => {
     const key = i * (b.length + 1) + j;
@@ -129,7 +117,6 @@ function walkGlobs(a, b, agree, bIsPattern) {
     let result;
     if (i === a.length && j === b.length) result = true;
     else if (a[i] === '**') result = walk(i + 1, j) || (j < b.length && walk(i, j + 1));
-    else if (bIsPattern && b[j] === '**') result = walk(i, j + 1) || (i < a.length && walk(i + 1, j));
     else if (i === a.length || j === b.length) result = false;
     else result = agree(a[i], b[j]) && walk(i + 1, j + 1);
     memo.set(key, result);
@@ -138,9 +125,6 @@ function walkGlobs(a, b, agree, bIsPattern) {
   return walk(0, 0);
 }
 
-/** Can two path globs name the same file? */
-export const globsMeet = (a, b) => walkGlobs(a, b, segmentsMeet, true);
-
 /** Whole-path match of a scope entry's segments against a concrete path. */
 function globMatches(patternSegments, pathSegments) {
   const regexes = new Map();
@@ -148,7 +132,7 @@ function globMatches(patternSegments, pathSegments) {
     if (!regexes.has(pattern)) regexes.set(pattern, segmentRegex(pattern));
     return regexes.get(pattern).test(literal);
   };
-  return walkGlobs(patternSegments, pathSegments, matches, false);
+  return walkGlobs(patternSegments, pathSegments, matches);
 }
 
 /**

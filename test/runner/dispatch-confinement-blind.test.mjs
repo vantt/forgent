@@ -16,7 +16,6 @@ import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/r
 import { assessAndPrepare } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { loadAttestationRecord, saveProbeCacheRecord } from '../../src/runner/dispatch/confinement/attestation-store.mjs';
 import { createBlindRootsWhenMissing, resolveBlindHiddenRoots } from '../../src/runner/dispatch/confinement/resources.mjs';
-import { refIsHiddenFromBlind } from '../../src/runner/execution/handoff-refs.mjs';
 import {
   BLIND_HIDDEN_ROOTS,
   CONTROL_AXES,
@@ -283,10 +282,9 @@ test('hidden roots resolve to the existing ones of this project and the temp roo
   assert.equal(lookup().includes(path.join(project.fgosDir, 'dispatch-runs')), false, 'a root that does not exist is skipped');
 });
 
-test('creating the mailbox root is a no-op without a .fgos or under one that cannot take it, and a handoff-ref check never throws', (t) => {
+test('creating the mailbox root is a no-op without a .fgos or under one that cannot take it', (t) => {
   if (process.getuid?.() === 0) return t.skip('root ignores directory modes');
   const project = makeProject();
-  const ref = path.join(project.fgosDir, 'assignments', 'u1', 'peer', '1', 'outbox', 'report-1.md');
   const missing = path.join(project.root, 'no-project', '.fgos');
   createBlindRootsWhenMissing(missing);
   assert.equal(fs.existsSync(missing), false, 'no .fgos is created');
@@ -295,14 +293,12 @@ test('creating the mailbox root is a no-op without a .fgos or under one that can
   try {
     assert.doesNotThrow(() => createBlindRootsWhenMissing(project.fgosDir));
     assert.equal(fs.existsSync(path.join(project.fgosDir, 'runtime')), false);
-    assert.equal(refIsHiddenFromBlind(ref, project.proj), true, 'a read-only .fgos still answers the ref check');
   } finally {
     fs.chmodSync(project.fgosDir, 0o755);
   }
 
   fs.writeFileSync(path.join(project.fgosDir, 'runtime'), 'a plain file\n');
   assert.doesNotThrow(() => createBlindRootsWhenMissing(project.fgosDir));
-  assert.equal(refIsHiddenFromBlind(ref, project.proj), true, 'a runtime file still answers the ref check');
 });
 
 // ---------------------------------------------------------------------------

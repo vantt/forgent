@@ -905,6 +905,17 @@ pub struct RunOutcome {
     pub failure: Value,
 }
 
+impl RunOutcome {
+    /// The outcome as Node's `runOutcome` answered it.
+    pub fn to_json(&self) -> Value {
+        json!({
+            "category": self.category, "executed": self.executed, "verdict": self.verdict, "refused": self.refused,
+            "evidence": self.evidence, "satisfied": self.satisfied, "infraFailure": self.infra_failure,
+            "failure": self.failure,
+        })
+    }
+}
+
 /// Read the outcome of a Run Result record. A corrupt record fails closed; `evidence_floor` downgrades a
 /// settlement the independent evidence does not support.
 pub fn run_outcome(input: &Value, evidence_floor: Option<&Value>) -> RunOutcome {
