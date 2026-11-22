@@ -20,6 +20,7 @@ footprint:
   - test/plugins/terminal-skill-attach.test.mjs
   - core/config-standard/sessionRotation.yaml
   - packages/config/rust/src/bundle.rs
+  - packages/config/contracts/fixtures/repo-differences.v1.json
   - test/scripts/check-decision-citation-drift.test.mjs
   - packages/durable-file/rust/tests/dir_replace.rs
   - apps/fgos/tests/session_write_publish.rs
