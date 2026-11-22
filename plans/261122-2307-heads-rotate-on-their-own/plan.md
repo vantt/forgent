@@ -1,11 +1,11 @@
 ---
 contract: plan-v1
 title: "Heads rotate on their own: a cron, a background task, a near weekly quota and a quarantined account no longer need a manual rotate"
-status: draft
+status: running
 priority: P1
-blockedBy:
-  - 261122-0118-heads-stable-and-able
-base: aff76d3c96de17bf0692fd0f58d83b8599a9009d
+blockedBy: []
+base: 27fd8a9b09b6a8584c37d7b18a6a96be4b2e1225
+lead: head:lead-forgent-261122-2307-heads-5c830
 footprint:
   - plans/261122-2307-heads-rotate-on-their-own/**
   - src/session-host/head-start.mjs
@@ -117,10 +117,10 @@ A head session rotates without anyone running `fgos session rotate` in each of t
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [A head launch sees the quarantine](phase-01-head-launch-sees-quarantine.md) | - | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs | 1 | draft |
-| 2 | [Crons and background tasks no longer block rotation](phase-02-crons-and-tasks-rotate.md) | - | packages/session-host/rust/src/rotation/decide.rs, apps/fgos/src/wiring/session_rotation_hook.rs, src/session-rotation/rotate.mjs, src/session-rotation/handoff-store.mjs, test/session-rotation/rotate.test.mjs, test/session-rotation/handoff-store.test.mjs, packages/session-host/contracts/rotation-files.v1.json, plans/261122-2307-heads-rotate-on-their-own/reports/stop-payload-lists.md | 1 | draft |
-| 3 | [A near weekly quota rotates the head](phase-03-weekly-quota-rotates.md) | 1, 2 | packages/session-host/rust/src/rotation/decide.rs, packages/session-host/rust/src/rotation/measure.rs, apps/fgos/src/wiring/session_rotation_hook.rs, src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, packages/observe/rust/src/sources/transcript_records.rs, packages/observe/rust/tests/transcript_records_test.rs, src/runner/dispatch/confinement/authority.mjs, src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, core/config-standard/sessionRotation.yaml, core/config-schema/sessionRotation.schema.yaml, plans/261122-2307-heads-rotate-on-their-own/reports/status-line-payload.md | 2 | draft |
-| 4 | [Integration, docs and changelog](phase-04-integration.md) | 1, 2, 3 | docs/platform/session-host/spec.md, CHANGELOG.md, plans/261122-2307-heads-rotate-on-their-own/reports/integration.md | 3 | draft |
+| 1 | [A head launch sees the quarantine](phase-01-head-launch-sees-quarantine.md) | - | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs | 1 | ready |
+| 2 | [Crons and background tasks no longer block rotation](phase-02-crons-and-tasks-rotate.md) | - | packages/session-host/rust/src/rotation/decide.rs, apps/fgos/src/wiring/session_rotation_hook.rs, src/session-rotation/rotate.mjs, src/session-rotation/handoff-store.mjs, test/session-rotation/rotate.test.mjs, test/session-rotation/handoff-store.test.mjs, packages/session-host/contracts/rotation-files.v1.json, plans/261122-2307-heads-rotate-on-their-own/reports/stop-payload-lists.md | 1 | ready |
+| 3 | [A near weekly quota rotates the head](phase-03-weekly-quota-rotates.md) | 1, 2 | packages/session-host/rust/src/rotation/decide.rs, packages/session-host/rust/src/rotation/measure.rs, apps/fgos/src/wiring/session_rotation_hook.rs, src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, packages/observe/rust/src/sources/transcript_records.rs, packages/observe/rust/tests/transcript_records_test.rs, src/runner/dispatch/confinement/authority.mjs, src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, core/config-standard/sessionRotation.yaml, core/config-schema/sessionRotation.schema.yaml, plans/261122-2307-heads-rotate-on-their-own/reports/status-line-payload.md | 2 | ready |
+| 4 | [Integration, docs and changelog](phase-04-integration.md) | 1, 2, 3 | docs/platform/session-host/spec.md, CHANGELOG.md, plans/261122-2307-heads-rotate-on-their-own/reports/integration.md | 3 | ready |
 
 Every phase's capability is `code:implement`, except phase 4, which is `code:test`.
 
@@ -128,6 +128,10 @@ Every phase's capability is `code:implement`, except phase 4, which is `code:tes
 (`decide.rs`, the hook, `rotate.mjs`, the contract, and the head launch settings in `head-start.mjs`), so it
 waits for both. Phase 4 is the single writer of the hot files `docs/platform/session-host/spec.md` and
 `CHANGELOG.md`. The rotation contract `rotation-files.v1.json` has one writer per wave (2, then 3).
+
+**Owner order (2026-11-22 23:30, via the secretary, recorded by head:supervisor-forgent):** heads-stable blocks
+nobody. This plan is admitted now; heads-stable's lead watches the files the two plans share (its open phase 11 writes
+`head-start.test.mjs` and `CHANGELOG.md`). heads-stable left `blockedBy` and every phase is `ready`.
 
 **Cross-plan sequencing.** `261122-0118-heads-stable-and-able` is `running` and owns `session_rotation_hook.rs`,
 `rotate.mjs`, `rotation-files.v1.json`, `head-start.test.mjs`, `docs/platform/session-host/spec.md` and
