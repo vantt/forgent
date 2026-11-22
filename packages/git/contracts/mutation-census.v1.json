@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "53fecd69db4de489e79789230be64e528e40ca52d8f088164c2b3c432c9e8ab7",
+  "payloadDigest": "db3a1b4f70831935d010528da68004ce4972b2166c80d100bc4a64f171e18af0",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -627,7 +627,7 @@
     "packages/execution/engine/src/transport_round/inspection.rs": "48e8cbfabf201c9461d30f7941575c46b9cae077156b2ebfeadb8ef767a68214",
     "packages/execution/engine/src/transport_round/mod.rs": "a6faa521b6b67d61f4879f2baf285a63e255ab81db61362eb8bb7c5d00df34ca",
     "packages/execution/engine/src/transport_round/round.rs": "8516ae176a7b4581d92cf9fb0d2e5840616cdd965defd01e8e673c1dd11c6bd8",
-    "packages/execution/engine/src/transport_round/session_attempt.rs": "67d05779514aef7975507dc28152ba8a4641603a4354434fe7635a1291845846",
+    "packages/execution/engine/src/transport_round/session_attempt.rs": "9532d1e0340d82ade1dce33e08d8a8e502ddf00bb038ee1c85a2042d401fff00",
     "packages/execution/engine/src/unit_run/commit_subject.rs": "505e5907171ba8a89c845bb478a7958c925281dcac2a128e22ff27c9aaeae3d7",
     "packages/execution/engine/src/unit_run/consent.rs": "77ae16c4c438e2b0d01739d45196b22d6dcc0daf70666d521c9de02f5a0ac097",
     "packages/execution/engine/src/unit_run/custody.rs": "d2068d1ef5cb8a8d7c552ed17e9259e078db51179aa7214ce021b08043eec91b",
@@ -658,7 +658,7 @@
     "packages/execution/engine/tests/planning.rs": "0b84b9245c9419352ed5c02c648102902ae4cb5a51fa707e5c8082155fa15c42",
     "packages/execution/engine/tests/settlement.rs": "79434725a3e99e137a2367d97fd3168109bdae86a3481384b0682e2063e19a10",
     "packages/execution/engine/tests/transport.rs": "df814ba577505861a1e3251497398fe9466d8d15068382a68f7384f59c02c2ae",
-    "packages/execution/engine/tests/transport_round.rs": "d9a8b00a12ea3b6e7f2434f3e0a5c0e80ac9ed5e00cf8b32dfe01e139762b314",
+    "packages/execution/engine/tests/transport_round.rs": "827a1caa8fdb9b287d941a5b7a46dec31ecafdb6843d26fc6ac0c0922d597155",
     "packages/execution/engine/tests/unit_run.rs": "7efd044f96a65bdb8517a7746cefa9178351e7ba48cd36f9c439d39e7804bf50",
     "packages/execution/rust/src/account_pin.rs": "1faed5122af54f5c216747199b6ba24d0827023c5950bcdd923cc285a6440c1b",
     "packages/execution/rust/src/accounts.rs": "3dc7fb83b8e2a863057fe9a90909c43d73eef5adf256c84fdd79a1bd5687ef31",

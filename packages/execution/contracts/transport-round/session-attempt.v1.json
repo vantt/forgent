@@ -428,6 +428,127 @@
           ]
         }
       }
+    },
+    {
+      "in": {
+        "verbs": [],
+        "writes": [
+          "plans",
+          "plans/backlog/*"
+        ],
+        "mailbox": true,
+        "peers": true
+      },
+      "out": {
+        "mode": "required",
+        "policyId": "host-write-denied",
+        "policy": {
+          "contract": "confinement-policy.v1",
+          "controls": {
+            "hostWrite": "deny",
+            "hostRead": "allow",
+            "networkEgress": "allow",
+            "process": "host",
+            "home": "host",
+            "session": "shared",
+            "workspace": "shared"
+          },
+          "grants": [
+            {
+              "resource": "run-output",
+              "access": "write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "private-home",
+              "access": "read-write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "executor-credentials",
+              "access": "read",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "workspace-paths",
+              "access": "read-write",
+              "scope": "dispatch",
+              "optional": false,
+              "paths": [
+                "plans"
+              ]
+            },
+            {
+              "resource": "mailbox-record",
+              "access": "read-write",
+              "scope": "dispatch",
+              "optional": false
+            },
+            {
+              "resource": "peer-sessions",
+              "access": "read-write",
+              "scope": "dispatch",
+              "optional": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "in": {
+        "verbs": [],
+        "writes": [
+          "plans/discussions/*",
+          "x/y",
+          "x",
+          "plans/discussions"
+        ],
+        "mailbox": false,
+        "peers": false
+      },
+      "out": {
+        "mode": "required",
+        "policyId": "host-write-denied",
+        "policy": {
+          "contract": "confinement-policy.v1",
+          "controls": {
+            "hostWrite": "deny",
+            "hostRead": "allow",
+            "networkEgress": "allow",
+            "process": "host",
+            "home": "host",
+            "session": "shared",
+            "workspace": "shared"
+          },
+          "grants": [
+            {
+              "resource": "run-output",
+              "access": "write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "private-home",
+              "access": "read-write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "executor-credentials",
+              "access": "read",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "workspace-paths",
+              "access": "read-write",
+              "scope": "dispatch",
+              "optional": false,
+              "paths": [
+                "plans/discussions",
+                "x"
+              ]
+            }
+          ]
+        }
+      }
     }
   ],
   "envs": [

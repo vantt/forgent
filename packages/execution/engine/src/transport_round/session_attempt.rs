@@ -60,18 +60,40 @@ pub struct HeadGrant {
     pub peers: bool,
 }
 
+/// The sandbox paths of a grant's writes: a `<dir>/*` entry is its directory, and an entry equal to or nested under
+/// another is dropped, in order of first appearance.
+fn sandbox_paths_of(writes: &[String]) -> Vec<String> {
+    let mut mapped: Vec<&str> = Vec::new();
+    for entry in writes {
+        let dir = entry.strip_suffix("/*").unwrap_or(entry);
+        if !mapped.contains(&dir) {
+            mapped.push(dir);
+        }
+    }
+    mapped
+        .iter()
+        .filter(|entry| {
+            !mapped
+                .iter()
+                .any(|other| other != *entry && entry.starts_with(&format!("{other}/")))
+        })
+        .map(|entry| (*entry).to_string())
+        .collect()
+}
+
 /// The requirement of a head: the read-only posture plus the writable project paths its grant names, when its
 /// grant says `mailbox`, the mailbox record, and when it says `peers`, the peer sessions (the host pid space and
 /// the session sockets and registry of the machine, read-write, so the head's own Claude Code registers and
 /// listens beside its peers). Every grant is required (`optional: false`): a bind that cannot be made refuses the
-/// launch by name, it never starts the head with less.
+/// launch by name, it never starts the head with less. A grant entry ending in `/*` (the head request door's
+/// one-level rule) binds its directory, since a sandbox path never holds a glob.
 pub fn requirement_of(grant: &HeadGrant) -> Value {
     let base = builtin_policy("host-write-denied").unwrap_or(Value::Null);
     let mut extra = Vec::new();
     if !grant.writes.is_empty() {
         extra.push(json!({
             "resource": WORKSPACE_PATHS_RESOURCE, "access": "read-write", "scope": "dispatch",
-            "optional": false, "paths": grant.writes,
+            "optional": false, "paths": sandbox_paths_of(&grant.writes),
         }));
     }
     if grant.mailbox {
