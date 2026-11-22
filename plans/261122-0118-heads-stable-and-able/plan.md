@@ -188,7 +188,7 @@ the grants, verb by verb.
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | running |
 | 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | running |
 | 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md, test/session-host/head-start.test.mjs | 5 | ready |
-| 12 | [Rotation reliability](phase-12-rotation-reliability.md) | 6 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, docs/platform/session-host/spec.md | 4 | running |
+| 12 | [Rotation reliability](phase-12-rotation-reliability.md) | 6 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, docs/platform/session-host/spec.md | 4 | done |
 
 Each phase names its canonical dispatch capability in its file: `code:implement` for 2 to 7 and 10 and the probe script
 of 11; phases 1, 8's measure, 9's after-measure and 11's gate are evidence reads (`code:test`). No executor, provider or
@@ -202,6 +202,24 @@ wave), `head-request.v1.json` (2, then 5), `docs/platform/session-host/spec.md` 
 writer, phase 11.
 
 **Set `ready` 2026-11-22 08:15 by lead:SUPERVISOR:** work-data-model closed at 07:32 (3d31ef9a5), and S6A narrowed its footprint off every path here (2ccaaaa96, f0d2f44ca, c9c0e42bf, e6d346cdd). The owner ranks this plan first. Run its file-disjoint phases in parallel up to the lead ceiling.
+
+### Lead progress (2026-11-22 19:35, head:lead-forgent-261122-0118-heads-b52f9)
+
+- **Phase 12 done.** 12a landed as `809c83190`, and 12b as `039acaa7e` (`p12b`: `89e75d68a` plus the review fixes
+  `68b9db525`; credentials 26/26, dispatch_subs 19/19). The fixes:
+  - a seat whose copy of the renewed pair failed is named in the outcome (`left-behind`);
+  - the owner scan moved into the engine (`find_account_renewal_owner`), and `probes.rs` keeps only a 10-line call;
+  - seat homes are read in agent mode;
+  - an fgOS scratch renewal is recorded as the renewer, and an ended seat shows as `(ended)`;
+  - a failed owner-file write is no longer ignored.
+  Accepted risk, stated in the unit report: below the threshold, refresh-ahead may redeem the shared refresh token
+  while a seat's CLI still holds the old one in memory. The seat is safe only if its CLI re-reads its credentials file
+  before it refreshes. Done-when item 3 (live soft rotation with resume from the handoff alone) is proved by phase 11's
+  probe on a head started on a release that carries phase 12. Both changes take effect only after the next release
+  activation.
+- **Next:** phases 8, 9 and 10 finish with their 24-hour measures (phase 9's window ends about 14:20 on 2026-11-23).
+  Phase 11 then runs on heads started on a release with phases 2, 5-7 and 12.
+- **Worktrees safe to remove:** p12, p12b, p07d, p10.
 
 ### Lead progress (2026-11-22 19:15, head:lead-forgent-261122-0118-heads-b52f9)
 
