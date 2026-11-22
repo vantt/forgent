@@ -239,6 +239,42 @@ export function assertHeadArgs({ persona, name, projectRoot, gen = null, forQues
  */
 export const STATUS_LINE_COMMAND = 'fgos hook session-rotation --event status-line';
 
+export function isClaudeCodeBinding(binding, runnerConfig) {
+  const cli = (binding?.cli ?? '').toLowerCase();
+  if (cli) {
+    if (cli === 'claude') return true;
+    if (['codex', 'pi', 'agy', 'omp', 'gemini'].includes(cli)) return false;
+  }
+  const family = (binding?.family ?? '').toLowerCase();
+  if (family) {
+    if (family === 'claude') return true;
+    if (['codex', 'pi', 'agy', 'openai', 'gemini'].includes(family)) return false;
+  }
+  const executorId = binding?.executor ?? 'claude';
+  const exec = runnerConfig?.executors?.[executorId];
+  if (exec) {
+    const prov = (exec.providerModel || exec.provider || '').toLowerCase();
+    if (prov) {
+      if (prov === 'claude') return true;
+      if (['codex', 'pi', 'agy', 'openai', 'gemini'].includes(prov)) return false;
+    }
+    if (exec.command) {
+      const base = path.basename(String(exec.command)).toLowerCase();
+      if (base === 'claude') return true;
+      if (['codex', 'pi', 'agy'].includes(base)) return false;
+    }
+    if (Array.isArray(exec.invocations) && exec.invocations.length > 0) {
+      const inv = exec.invocations.find((i) => !binding?.invocation || i.id === binding?.invocation) ?? exec.invocations[0];
+      if (inv?.command) {
+        const base = path.basename(String(inv.command)).toLowerCase();
+        if (base === 'claude') return true;
+        if (['codex', 'pi', 'agy'].includes(base)) return false;
+      }
+    }
+  }
+  return executorId === 'claude';
+}
+
 export function mergeStatusLineSettings(args = []) {
   const result = [...args];
   const STATUS_LINE = {
@@ -271,24 +307,29 @@ export function mergeStatusLineSettings(args = []) {
 }
 
 export function withHeadSettings(runnerConfig, binding) {
+  if (!isClaudeCodeBinding(binding, runnerConfig)) {
+    return runnerConfig;
+  }
   const cfg = structuredClone(runnerConfig ?? {});
   const executorId = binding?.executor ?? 'claude';
   const invocationId = binding?.invocation;
   cfg.executors ??= {};
   cfg.executors[executorId] ??= {};
   const exec = cfg.executors[executorId];
+  const command = exec.command ?? (binding?.cli === 'claude' ? 'claude' : (exec.invocations?.[0]?.command ?? 'claude'));
   if (!Array.isArray(exec.invocations) || exec.invocations.length === 0) {
-    exec.invocations = [{ id: invocationId ?? 'default', args: mergeStatusLineSettings([]) }];
+    exec.invocations = [{ id: invocationId ?? 'default', command, args: mergeStatusLineSettings([]) }];
   } else {
     let matched = false;
     for (const inv of exec.invocations) {
       if (!invocationId || inv.id === invocationId) {
+        inv.command ??= command;
         inv.args = mergeStatusLineSettings(inv.args);
         matched = true;
       }
     }
     if (!matched) {
-      exec.invocations.push({ id: invocationId, args: mergeStatusLineSettings([]) });
+      exec.invocations.push({ id: invocationId, command, args: mergeStatusLineSettings([]) });
     }
   }
   return cfg;
