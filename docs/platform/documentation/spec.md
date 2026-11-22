@@ -76,11 +76,11 @@ A writer never changes structure to get past a refusal; structure changes come o
 
 ## 4. Build Order
 
-Each step is one phase that ships something checkable on its own. Revised on 2026-11-12 after the measurements: the largest source of new documents is the retrospective writer's one-document-per-item design, so it goes first.
+Each step is one phase that ships something checkable on its own. Revised on 2026-11-22: locate goes first, because the retrospective writer can add evidence to the unit that already carries its claim only after finding that unit, and every later writer (admission, write door) uses the same door; doing the writer first would need a grep finder (50% right decisions against pkm's 73%) to be replaced afterwards.
 
-1. **Retrospective writer adds evidence to claim units** (stop 1 of document identity; item `p-ixrbglli5o`), with the cleanup gate accepting the evidence or the admission handoff. Cuts the main source without new technology.
-2. **doc-checks**: path input, the verb and rule-claim rules, staged reads and the pre-commit gate (item `p-cd2ejz7wa5`); the 6 documents with invalid YAML frontmatter (already quoted in `51f39d252`).
-3. **Locate through pkm**: link `pkm-core` (tag `v0.5.0`: search, `WriteGuard` for read-only, unit-level `in_force` with `amended_by`) into the `fgos` host behind a locate port, run pkm's index worker as a process and fetch its model at setup, the `fgos doc locate` door (translation, top 10, log), doctor rows for index freshness and the model, and the recall regression set as a repeatable measurement.
+1. **Locate through pkm**: link `pkm-core` (tag `v0.5.0`: search, `WriteGuard` for read-only, unit-level `in_force` with `amended_by`) into the `fgos` host behind a locate port, with ONNX Runtime linked statically so a release ships no runtime library of its own, run pkm's index worker as a process and fetch its model at setup, the `fgos doc locate` door (translation, top 10, log), doctor rows for index freshness and the model, and the recall regression set as a repeatable measurement.
+2. **Retrospective writer adds evidence to claim units** (stop 1 of document identity; item `p-ixrbglli5o`), finding the unit through `fgos doc locate`, with the cleanup gate accepting the evidence or the admission handoff. Cuts the main source of new documents.
+3. **doc-checks**: path input, the verb and rule-claim rules, staged reads and the pre-commit gate (item `p-cd2ejz7wa5`); the 6 documents with invalid YAML frontmatter (already quoted in `51f39d252`).
 4. **Admission**: effect checks at the doors, the reviewer run, the frame and its weekly ceiling, refusal texts.
 5. **Write door**: the skill, the pointer seed, live templates.
 6. **Observer**: pkm's structural proposals into fgOS work items; merging the 479 story documents into claim units over time.
@@ -160,3 +160,4 @@ D-tsk28x-8 (2026-08-25) set one engine with two tiers, a human tier that accepts
 - 2026-11-07, lead: topic admission by an approved owner answer per topic. The owner objected the same day: asking him for every new topic is wrong.
 - 2026-11-12, owner: a dedicated spec for document identity (axes, locate, search view in Rust, three tiers, self-improvement); the area is split into subcomponents (document identity, doc-checks, admission, write door, later reading surfaces) and this spec becomes their map; admission moves to an independent reviewer inside an approved frame; the build order of section 4.
 - 2026-11-12, owner: the four subcomponent specs are signed; the build order puts the retrospective writer's claim-and-evidence change first; pkm is split into its own repository `vantt/pkm`.
+- 2026-11-22, owner: the build order is revised to put locate through pkm first and the retrospective writer second (the writer finds the unit through locate, so a grep finder is never built and then replaced); ONNX Runtime is linked statically, so a release ships no runtime library.
