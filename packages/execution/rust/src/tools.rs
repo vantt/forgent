@@ -5,7 +5,7 @@
 //! stale, missing or cannot be probed, asked of the machine on every call through [`ToolProbe`], so an answer is
 //! as fresh as the machine. `decide --for` answers from it and the doctor judges the tool posture from it.
 
-use crate::executor_model::tool_for_entries;
+use crate::executor_model::{registered_capability_of, tool_for_entries};
 use serde_json::{json, Map, Value};
 
 /// What the repository's `HEAD` reads as, for the staleness of a tool's index.
@@ -165,6 +165,22 @@ pub fn tool_providers(
             }
         })
         .collect()
+}
+
+/// The name of a tool ability no tool is present to serve, else `None`. A capability is a tool ability when a tool
+/// executor declares it in `for` (its registered name or one of its row's aliases); it is unserved when every such
+/// tool is missing or cannot be probed. A capability no tool executor names is a label and is never reported.
+pub fn unserved_tool_ability(
+    runner: &Value,
+    capability: &str,
+    probe: &dyn ToolProbe,
+) -> Option<String> {
+    let name = registered_capability_of(runner, &json!(capability)).unwrap_or(capability);
+    let providers = tool_providers(runner, Some(name), probe);
+    let served = providers
+        .iter()
+        .any(|p| matches!(p.status, ToolStatus::Present | ToolStatus::Stale));
+    (!providers.is_empty() && !served).then(|| name.to_string())
 }
 
 /// The posture of the tools a config declares, counted once per tool executor.

@@ -12,8 +12,7 @@ import { pathToFileURL } from 'node:url';
 import { resolveTaskSpecPath, resolveContentRoot } from './paths.mjs';
 import { loadAgentRoster, readTaskSpecHeader, resolveAgentTypeForTaskSpec } from './agent-roster.mjs';
 import { selectTemplate, hashTemplate } from './prompt-templates.mjs';
-import { DispatchError, RunnerConfigError, runUnitInHost, stampDeclaredAssignment, resolveExecutorConfig } from '../native/execution-door.mjs';
-import { purposeSeatOf } from './dispatch/plan.mjs';
+import { DispatchError, RunnerConfigError, runUnitInHost, stampDeclaredAssignment, resolveExecutorConfig, purposeSeatInHost } from '../native/execution-door.mjs';
 import { resolveStrongerRigor, RIGOR_VALUES } from './rigor.mjs';
 import { deriveOperationCapability } from './operation-capability.mjs';
 import { watchWritesOutsideWorkspace, strayWriteWarning } from './dispatch/cli.mjs';
@@ -112,7 +111,7 @@ export function resolveAgentTypeForWork(work, cwd, stage, { payloadRoot } = {}) 
  */
 export async function spawnWorker(work, cfg, cwd, opts = {}) {
   const repoRoot = opts.repoRoot ?? (opts.fgosDir ? path.dirname(opts.fgosDir) : undefined);
-  const { unitData, warnings: unitWarnings } = workUnitFor(work, { cfg, stage: opts.stage, feedback: opts.feedback, worktree: cwd });
+  const { unitData, warnings: unitWarnings } = await workUnitFor(work, { cfg, stage: opts.stage, feedback: opts.feedback, worktree: cwd });
   const templateName = selectTemplate({ kind: work.kind, domain: work.domain, stage: opts.stage });
   const templateHash = hashTemplate(templateName);
   const { baseCommit, headRef } = captureDispatchAttestation(null, cwd);
@@ -418,7 +417,7 @@ export function workUnitIdFor(item, stage) {
  *   feedback?: {answer?: string, reason?: string}, expectedFiles?: string[], worktree?: string }} [opts]
  * @returns {{ unitData: object, declared?: object, pinInputs?: string[], worktree: string, warnings: string[] }}
  */
-export function workUnitFor(item, opts = {}) {
+export async function workUnitFor(item, opts = {}) {
   const { cfg = {}, stateRoot, operation, feedback, expectedFiles } = opts;
   if (typeof item?.id !== 'string' || !item.id.trim()) {
     throw new RunnerConfigError('workUnitFor: the work item needs an id.');
@@ -441,7 +440,7 @@ export function workUnitFor(item, opts = {}) {
   }
 
   const executorId = executorIdForWork(item, stage);
-  const resolved = executorId ? purposeSeatOf(cfg, executorId, { repoRoot: stateRoot }) : { configured: false };
+  const resolved = executorId ? await purposeSeatInHost(cfg, executorId, { repoRoot: stateRoot }) : { configured: false };
   const stepCapability = resolveCapabilityIdentityDetails({
     cfg, work: item, stage, executorId, resolvedExecutor: resolved.executor,
   }).capability;

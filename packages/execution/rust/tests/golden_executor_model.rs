@@ -15,7 +15,7 @@ use fgos_execution::executor_model::{
     FamilySource, Governance, ModelError, Session,
 };
 use fgos_execution::runner_check::check_runner_config;
-use fgos_execution::tools::{tool_providers, ToolProvider};
+use fgos_execution::tools::{tool_providers, unserved_tool_ability, ToolProvider};
 use serde_json::{json, Map, Value};
 
 /// What this replay does not state yet, so a vector can never be skipped unseen. An entry is (fact, field, owning
@@ -191,6 +191,11 @@ fn evaluate(vector: &Value) -> Option<Value> {
             .map(ToolProvider::to_json)
             .collect(),
         ),
+        "unservedToolAbility" => json!({ "name": unserved_tool_ability(
+            runner,
+            args["capability"].as_str().unwrap_or_default(),
+            &VectorProbe::of(vector),
+        ) }),
         _ => return None,
     })
 }

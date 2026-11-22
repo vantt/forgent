@@ -368,7 +368,7 @@ function finish(proposal) {
  * @param {object} [params.table] test seam: a slice table
  * @returns {object} the proposal; `ok` is false when anything was refused, and then it holds no frame and no commands
  */
-export function proposeFromSlices({ manifest, plan, guide, runnerConfig, shipped, ports, worktree, branch, table = defaultSliceTable() }) {
+export async function proposeFromSlices({ manifest, plan, guide, runnerConfig, shipped, ports, worktree, branch, table = defaultSliceTable() }) {
   const proposal = emptyProposal({ plan: plan ?? null, guide: { id: guide.id } });
   const refusals = proposal.refusals;
   for (const [name, value] of [['worktree', worktree], ['branch', branch]]) {
@@ -431,7 +431,7 @@ export function proposeFromSlices({ manifest, plan, guide, runnerConfig, shipped
 
   // The proposal is compared with the repository before anyone is asked: a frame sized on slices that do not
   // match what is there is a guess.
-  const verdict = validateProposal({
+  const verdict = await validateProposal({
     slices: classified.map((s) => ({ id: s.id, writes: s.writes, rigor: s.rigor, capability: s.capability, followUp: s.followUp, askOwnerFirst: s.askOwnerFirst, unresolvedScopes: s.unresolvedScopes })),
     runnerConfig,
     ...(proposal.frame ? { rigorFloor: proposal.frame.rigorFloor } : {}),
@@ -473,7 +473,7 @@ export function proposeFromSlices({ manifest, plan, guide, runnerConfig, shipped
  * @param {string} [params.worktree]
  * @param {object} [params.table]
  */
-export function proposeFromRequest({ request, writes = [], verify, ports, runnerConfig, worktree, table = defaultSliceTable() }) {
+export async function proposeFromRequest({ request, writes = [], verify, ports, runnerConfig, worktree, table = defaultSliceTable() }) {
   const proposal = emptyProposal({ kind: 'shape-plan-first', request });
   const refuse = (code, detail) => proposal.refusals.push({ code, detail });
   if (worktree !== undefined && !(isText(worktree) && argumentSafe(worktree))) {
@@ -511,7 +511,7 @@ export function proposeFromRequest({ request, writes = [], verify, ports, runner
     refuse(err.code ?? 'request-invalid', err.message);
     return finish(proposal);
   }
-  const verdict = validateProposal({
+  const verdict = await validateProposal({
     slices: [{ id: 'request', writes, rigor: judged.rigor, capability: judged.capability, followUp: judged.followUp, askOwnerFirst: judged.askOwnerFirst, unresolvedScopes: judged.unresolvedScopes }],
     runnerConfig,
     ports: ports.repo,
@@ -602,7 +602,7 @@ export function createProposePorts({ checkoutRoot, mainRoot }) {
  * @param {string} [params.dir] the store root (`--dir`), the checkout too when given
  * @param {string} [params.cwd]
  */
-export function runPropose({ slices, plan, guide: guideId, request, writes, verify, worktree, branch, dir, cwd = process.cwd() }) {
+export async function runPropose({ slices, plan, guide: guideId, request, writes, verify, worktree, branch, dir, cwd = process.cwd() }) {
   const roots = resolveGitRoots(cwd, { allowNoRepository: false });
   const mainRoot = dir === undefined ? roots.mainCheckoutRoot : path.resolve(dir);
   const checkoutRoot = dir === undefined ? roots.worktreeRoot : mainRoot;

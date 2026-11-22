@@ -93,7 +93,7 @@ export async function fanoutBatchExecutorCli(
         wtPath = pickedData.data?.worktree?.path || cwd;
         picked = true;
 
-        const { unitData } = workUnitFor(workItem, { cfg, worktree: wtPath });
+        const { unitData } = await workUnitFor(workItem, { cfg, worktree: wtPath });
         const unit = await runUnitInHost({
           unitData,
           worktree: wtPath,

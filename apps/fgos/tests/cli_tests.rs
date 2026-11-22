@@ -5620,6 +5620,96 @@ fn the_execution_route_run_unit_op_refuses_an_option_outside_the_contract_and_an
 }
 
 #[test]
+fn the_execution_route_answers_what_serves_a_purpose_and_which_tool_abilities_no_tool_serves() {
+    let scratch = ExecutionScratch::new("purpose-seat");
+    let manifest = ensure_dev_manifest();
+    let root = repo_root();
+    let env = [
+        ("HOME", scratch.0.as_path()),
+        ("FGOS_ACTIVE_RELEASE_PATH", root.as_path()),
+        ("FGOS_ACTIVE_MANIFEST_PATH", manifest.as_path()),
+    ];
+    // A path to an executable file is a present command; a bare name found on no PATH entry is a missing one.
+    let present = std::env::current_exe()
+        .unwrap()
+        .to_string_lossy()
+        .into_owned();
+    let runner = serde_json::json!({
+        "executors": {
+            "stub": { "kind": "agent", "providerModel": "claude" },
+            "graph": { "kind": "tool", "for": ["impact-analysis"], "invocations": [{ "id": "g", "via": "cli", "command": "fgos-no-such-graph-tool" }] },
+            "lint": { "kind": "tool", "for": ["style-check"], "invocations": [{ "id": "l", "via": "cli", "command": present }] },
+        },
+        "capabilities": { "impact-analysis": { "aliases": ["blast-radius"] } },
+    });
+    let seat = |purpose: &str| {
+        let request = serde_json::json!({ "runnerConfig": runner, "purpose": purpose, "repoRoot": scratch.0 });
+        let (code, line) = execution_route(
+            &["purpose-seat", "--protocol", "1"],
+            &request,
+            &env,
+            &no_peer,
+        );
+        assert_eq!(code, Some(0), "{line}");
+        line["result"]["seat"].clone()
+    };
+
+    let named = seat("stub");
+    assert_eq!(
+        (
+            named["configured"].clone(),
+            named["executorId"].clone(),
+            named["bindingSource"].clone()
+        ),
+        (
+            serde_json::json!(true),
+            serde_json::json!("stub"),
+            serde_json::json!("executor-id")
+        ),
+        "{named}"
+    );
+    assert_eq!(named["executor"]["kind"], "agent");
+
+    let missing = seat("impact-analysis");
+    assert_eq!(missing["bindingSource"], "tool-provider", "{missing}");
+    assert_eq!(missing["executorId"], "graph");
+    assert_eq!(
+        missing["tool"],
+        serde_json::json!({ "mechanism": "unavailable", "reasonCode": "tool.missing", "providers": [{ "executorId": "graph", "status": "missing" }] })
+    );
+
+    let callable = seat("style-check");
+    assert_eq!(callable["tool"]["mechanism"], "in-process", "{callable}");
+    assert_eq!(callable["tool"]["reasonCode"], "tool.present");
+    assert_eq!(callable["tool"]["command"], serde_json::json!(present));
+
+    let nothing = seat("code:review");
+    assert_eq!(
+        nothing,
+        serde_json::json!({ "configured": false, "executorId": null, "bindingSource": null })
+    );
+
+    let request = serde_json::json!({
+        "runnerConfig": runner,
+        "capabilities": ["blast-radius", "style-check", "code:review"],
+        "repoRoot": scratch.0,
+    });
+    let (code, line) = execution_route(
+        &["tool-abilities", "--protocol", "1"],
+        &request,
+        &env,
+        &no_peer,
+    );
+    assert_eq!(code, Some(0), "{line}");
+    assert_eq!(
+        line["result"],
+        serde_json::json!({ "unserved": { "blast-radius": "impact-analysis" } }),
+        "an alias is reported under its registered name; a served ability and a label are left out"
+    );
+    let _ = fs::remove_dir_all(manifest.parent().unwrap());
+}
+
+#[test]
 fn the_execution_route_launch_session_op_refuses_an_incomplete_request_and_answers_a_refused_launch(
 ) {
     let scratch = ExecutionScratch::new("launch-session");

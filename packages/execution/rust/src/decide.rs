@@ -523,6 +523,93 @@ fn purpose_seat(
     Ok(named_answer)
 }
 
+/// What serves a purpose (a capability row name, or an executor id), as the Work layer reads it: the answer of the
+/// one purpose door, with the executor entry it names. `{ configured, executorId, executor?, bindingSource }`, plus
+/// `tool` for a tool provider, `invocationId` and `binding` for a seat Seat Binding bound, `refused` for a seat it
+/// refused.
+pub fn purpose_seat_of(
+    runner: &Value,
+    purpose: Option<&str>,
+    probe: &dyn ToolProbe,
+    binder: &dyn SeatBinder,
+) -> Result<Value, ModelError> {
+    let executor_of = |id: &str| {
+        runner
+            .get("executors")
+            .and_then(|all| all.get(id))
+            .filter(|entry| !entry.is_null())
+            .cloned()
+    };
+    let mut out = Map::new();
+    match purpose_seat(runner, purpose, probe, binder)? {
+        PurposeAnswer::Named { .. } => {
+            let named = lookup_executor(runner, purpose);
+            out.insert("configured".into(), json!(named.configured));
+            out.insert("executorId".into(), json!(named.executor_id));
+            if let Some(executor) = named.executor {
+                out.insert("executor".into(), executor.clone());
+            }
+            out.insert("bindingSource".into(), json!(named.binding_source));
+        }
+        PurposeAnswer::Tool {
+            executor_id,
+            mechanism,
+            reason_code,
+            stale,
+            mcp_tool,
+            command,
+            providers,
+        } => {
+            let mut tool = Map::new();
+            tool.insert("mechanism".into(), json!(mechanism));
+            tool.insert("reasonCode".into(), json!(reason_code));
+            if stale {
+                tool.insert("stale".into(), json!(true));
+            }
+            if let Some(mcp_tool) = mcp_tool {
+                tool.insert("mcpTool".into(), json!(mcp_tool));
+            }
+            if let Some(command) = command {
+                tool.insert("command".into(), json!(command));
+            }
+            let providers: Vec<Value> = providers
+                .iter()
+                .map(|(id, status)| json!({ "executorId": id, "status": status.as_str() }))
+                .collect();
+            tool.insert("providers".into(), Value::Array(providers));
+            out.insert("configured".into(), json!(true));
+            out.insert("executorId".into(), json!(executor_id));
+            if let Some(executor) = executor_of(&executor_id) {
+                out.insert("executor".into(), executor);
+            }
+            out.insert("bindingSource".into(), json!("tool-provider"));
+            out.insert("tool".into(), Value::Object(tool));
+        }
+        PurposeAnswer::Bound(seat) => {
+            out.insert("configured".into(), json!(true));
+            out.insert("executorId".into(), json!(seat.executor));
+            if let Some(executor) = executor_of(&seat.executor) {
+                out.insert("executor".into(), executor);
+            }
+            out.insert("bindingSource".into(), json!("seat-binding"));
+            if let Some(invocation) = &seat.invocation {
+                out.insert("invocationId".into(), json!(invocation));
+            }
+            out.insert("binding".into(), seat.binding);
+        }
+        PurposeAnswer::Refused { code, detail } => {
+            out.insert("configured".into(), json!(true));
+            out.insert("executorId".into(), Value::Null);
+            out.insert("bindingSource".into(), Value::Null);
+            out.insert(
+                "refused".into(),
+                json!({ "reason": code, "detail": detail }),
+            );
+        }
+    }
+    Ok(Value::Object(out))
+}
+
 // ---- resolving an out-of-process dispatch ----------------------------------------------------------------
 
 /// Whether an out-of-process dispatch of `executor_id` can be resolved to a command to run: the checks

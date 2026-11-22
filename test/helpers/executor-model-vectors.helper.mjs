@@ -18,7 +18,7 @@ import { credentialStoreOf, providerAccountInventory, readAccountStateOverlay } 
 import { legacyStateKey, readLlmAccounts } from '../../src/runner/dispatch/llm-accounts.mjs';
 import { decideExecutorDispatchMechanism } from '../../src/runner/dispatch/mechanism.mjs';
 import { resolvePostureInvocation } from '../../src/runner/dispatch/confinement/policies.mjs';
-import { toolProvidersOf } from '../../src/runner/dispatch/tool-providers.mjs';
+import { toolProvidersOf, unservedToolAbilityOf } from '../../src/runner/dispatch/tool-providers.mjs';
 import { explainSeat, preflightOf } from '../../src/runner/execution/bind.mjs';
 
 const REGISTRY_ENV = 'FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH';
@@ -110,6 +110,10 @@ const evaluators = {
     return toolProvidersOf(runner, { capability: args.capability, repoRoot: paths.repoRoot, pathEnv: paths.binDir });
   },
   validate: ({ runner }) => { validateRunnerConfigShape(runner, 'vector runner'); return { ok: true }; },
+  unservedToolAbility: ({ runner, args }, paths) => {
+    ensureScriptAddon(); // the staleness probe reads HEAD through the Git port
+    return { name: unservedToolAbilityOf(runner, args.capability, { repoRoot: paths.repoRoot, pathEnv: paths.binDir }) ?? null };
+  },
 };
 
 /** Every derived fact a vector of executor-model.v1.json may name. */

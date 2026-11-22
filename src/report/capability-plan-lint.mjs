@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { parseYaml } from '../util/yaml.mjs';
 import { nativeDoor } from '../native/door.mjs';
-import { unservedToolAbilityOf } from '../runner/dispatch/tool-providers.mjs';
+import { unservedToolAbilitiesOf } from '../native/execution-door.mjs';
 import { validateUnit, executionVocabulary, shippedCatalog } from '../native/execution-door.mjs';
 // capability-plan-lint.mjs — static/read-only harness (docs/history/
 // agent-coordination-foundation/plan.md): checks a plan's own text against
@@ -208,7 +208,7 @@ function extractUnitBlocks(content) {
   return blocks;
 }
 
-export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {
+export async function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {
   let content = contentOrPath;
   let resolvedPath = null;
   if (typeof contentOrPath === 'string' && !contentOrPath.includes('\n')) {
@@ -428,6 +428,7 @@ export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {
   // Capability catalog check
   const runner = config?.runner ?? config;
   const knownPatterns = effectivePatternNames(config);
+  const unserved = await unservedToolAbilitiesOf(runner, units.map((u) => u.capability).filter((cap) => cap && !UNRESOLVED_MARK.test(cap)));
   for (const u of units) {
     const cap = u.capability;
     if (cap) {
@@ -440,7 +441,7 @@ export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {
           code: 'capability.unresolved',
           message: `unit "${u.id}" capability is unresolved -- resolve before merge`,
         });
-      } else if (unservedToolAbilityOf(runner, cap) !== undefined) {
+      } else if (Object.hasOwn(unserved, cap)) {
         pushFinding({
           line: u.line,
           unit: u.id,
@@ -568,7 +569,7 @@ function matchesCellId(entry, cellId) {
  *   findings: Array<{line: number|null, unit: string|null, source: string|null, code: string, severity: 'hard'|'warn', message: string}>,
  * }}
  */
-export function lintPlanCapabilityAnnotations(textOrPath, runnerConfig = {}, options = {}) {
+export async function lintPlanCapabilityAnnotations(textOrPath, runnerConfig = {}, options = {}) {
   const runner = runnerConfig?.runner ?? runnerConfig;
 
   if (options.phase !== undefined) {
@@ -604,7 +605,7 @@ export function lintPlanCapabilityAnnotations(textOrPath, runnerConfig = {}, opt
   const { cellId } = options;
   const lines = String(text ?? '').split('\n');
   const units = [];
-  const findings = [];
+  let findings = [];
 
   const pushFinding = (finding) => findings.push(finding);
 
@@ -643,15 +644,10 @@ export function lintPlanCapabilityAnnotations(textOrPath, runnerConfig = {}, opt
         code: 'capability.invalid-shape',
         message: `capability "${bare}" is not a valid canonical shape (generic "name" or domain-scoped "domain:name")`,
       });
-    } else if (unservedToolAbilityOf(runner, bare) !== undefined) {
-      pushFinding({
-        line: ctx.line,
-        unit: ctx.unit,
-        source: ctx.source,
-        severity: 'hard',
-        code: 'capability.tool-unserved',
-        message: `capability "${bare}" is a tool ability whose tool is not present -- install the tool its kind: tool executor names, or mark the unit "unresolved"`,
-      });
+    } else {
+      // Whether the tool is present is asked of the host once for the whole plan, after the scan; the finding keeps
+      // its place in the order.
+      pushFinding({ pendingToolAbility: bare, line: ctx.line, unit: ctx.unit, source: ctx.source });
     }
   };
 
@@ -793,6 +789,18 @@ export function lintPlanCapabilityAnnotations(textOrPath, runnerConfig = {}, opt
     }
   });
   closeCurrentUnitBlock();
+
+  const unserved = await unservedToolAbilitiesOf(runner, findings.filter((f) => f.pendingToolAbility).map((f) => f.pendingToolAbility));
+  findings = findings.flatMap(({ pendingToolAbility: bare, ...finding }) => {
+    if (bare === undefined) return [finding];
+    if (!Object.hasOwn(unserved, bare)) return [];
+    return [{
+      ...finding,
+      severity: 'hard',
+      code: 'capability.tool-unserved',
+      message: `capability "${bare}" is a tool ability whose tool is not present -- install the tool its kind: tool executor names, or mark the unit "unresolved"`,
+    }];
+  });
 
   if (cellId === undefined) {
     return { ok: !findings.some((f) => f.severity === 'hard'), units, findings };

@@ -25,6 +25,12 @@
 //!   sockets (`sweepAttempts`). Result `{ adopt, adoptError }`.
 //! * `cancel`: `{ runDir, signal }`: publish the attempt's cancel request (`requestCancel`). Result
 //!   `{ requested }`.
+//! * `stale-runs`: `{ fgosDir, reconcile }`: the runs still marked running whose dispatch process is gone. Result
+//!   `{ orphans }`.
+//! * `purpose-seat`: `{ runnerConfig, purpose?, repoRoot? }`: what serves a purpose, the tools probed live. Result
+//!   `{ seat }`, or `{ error }` for a failure of the model.
+//! * `tool-abilities`: `{ runnerConfig, capabilities, repoRoot? }`: the capabilities naming a tool ability no tool
+//!   is present to serve. Result `{ unserved: { <capability>: <name> } }`.
 //!
 //! A `run-unit` process is the unit run's controller for its caller, which keeps stdin open until it read the
 //! answer. Once the request arrived, end of stdin means the caller is gone. Where the attempt's locks were lent to
@@ -50,6 +56,7 @@ use fgos_host_runtime::cli_args::{parse_args, FlagScalar, FlagValue};
 use fgos_run_supervisor::controller::launch::AttemptHost;
 use serde_json::{json, Value};
 
+use super::seat_binding::{HostMachine, HostProbe};
 use super::unit_run_host::host::HostUnitRun;
 use super::unit_run_host::{machine, verify};
 
@@ -63,7 +70,7 @@ pub const EXIT_VERSION_MISMATCH: i32 = 3;
 pub const EXIT_INVALID_REQUEST: i32 = 65;
 
 /// The operations this route serves, in the contract's order.
-pub const OPS: [&str; 7] = [
+pub const OPS: [&str; 9] = [
     "run-unit",
     "launch-session",
     "custody",
@@ -71,6 +78,8 @@ pub const OPS: [&str; 7] = [
     "sweep-attempts",
     "cancel",
     "stale-runs",
+    "purpose-seat",
+    "tool-abilities",
 ];
 
 /// Run the route with the args after `execution`; returns the exit code.
@@ -221,6 +230,8 @@ pub fn run(
         "verify" => verify_op(&request),
         "sweep-attempts" => sweep_attempts(&request),
         "stale-runs" => stale_runs(&request),
+        "purpose-seat" => purpose_seat_op(&request),
+        "tool-abilities" => tool_abilities(&request),
         _ => cancel(&request),
     };
     match answered {
@@ -504,6 +515,70 @@ fn stale_runs(request: &Value) -> Result<Value, String> {
         orphans.push(row);
     }
     Ok(json!({ "orphans": orphans }))
+}
+
+fn runner_of(request: &Value) -> Result<&Value, String> {
+    request
+        .get("runnerConfig")
+        .filter(|runner| runner.is_object())
+        .ok_or_else(|| "runnerConfig must be an object".to_string())
+}
+
+fn repo_root_of(request: &Value) -> Option<PathBuf> {
+    request
+        .get("repoRoot")
+        .and_then(Value::as_str)
+        .filter(|root| !root.is_empty())
+        .map(PathBuf::from)
+}
+
+/// What serves a purpose (a capability row name or an executor id) over the caller's runner section, the tools
+/// probed live on this machine and a seat bound by Seat Binding. A coded runner refusal of the bind is the seat's
+/// answer; any other failure of the model is `error` (`{ name, code?, message }`), which the door rethrows.
+fn purpose_seat_op(request: &Value) -> Result<Value, String> {
+    use fgos_execution::decide::{purpose_seat_of, CrateBinder};
+    let runner = runner_of(request)?;
+    let purpose = request.get("purpose").and_then(Value::as_str);
+    let machine = HostMachine::new(None, None);
+    let probe = HostProbe::new(&machine, repo_root_of(request));
+    let binder = CrateBinder {
+        machine: &machine,
+        now: now_ms(),
+    };
+    Ok(match purpose_seat_of(runner, purpose, &probe, &binder) {
+        Ok(seat) => json!({ "seat": seat }),
+        Err(error) => json!({ "error": error.to_json() }),
+    })
+}
+
+/// The capabilities of `capabilities` that name a tool ability no tool is present to serve, each with the name it
+/// is registered under: `{ unserved: { <capability>: <name> } }`. A label (a capability no tool executor names)
+/// and a served tool ability are left out.
+fn tool_abilities(request: &Value) -> Result<Value, String> {
+    use fgos_execution::tools::unserved_tool_ability;
+    let runner = runner_of(request)?;
+    let capabilities = request
+        .get("capabilities")
+        .and_then(Value::as_array)
+        .ok_or("capabilities must be an array of strings")?;
+    let machine = HostMachine::new(None, None);
+    let probe = HostProbe::new(&machine, repo_root_of(request));
+    let mut unserved = serde_json::Map::new();
+    for capability in capabilities {
+        let capability = capability
+            .as_str()
+            .ok_or("capabilities must be an array of strings")?;
+        if let Some(name) = unserved_tool_ability(runner, capability, &probe) {
+            unserved.insert(capability.to_string(), json!(name));
+        }
+    }
+    Ok(json!({ "unserved": unserved }))
+}
+
+fn now_ms() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |elapsed| elapsed.as_millis() as u64)
 }
 
 fn cancel(request: &Value) -> Result<Value, String> {

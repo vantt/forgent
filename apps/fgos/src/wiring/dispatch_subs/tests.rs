@@ -852,3 +852,103 @@ fn the_probes_refuse_a_malformed_call_before_any_config_is_read_or_seat_started(
         assert_eq!(refusal_of(answered), ("validation", message), "{words:?}");
     }
 }
+
+/// A scratch directory of attention definitions holding a copy of the shipped `head-gone` definition, and a store
+/// root beside it.
+fn definitions_scratch(tag: &str) -> (PathBuf, PathBuf) {
+    let base = std::env::temp_dir().join(format!(
+        "fgos-dispatch-subs-defs-{tag}-{}-{}",
+        std::process::id(),
+        SERIAL.fetch_add(1, Ordering::Relaxed)
+    ));
+    let (defs, store) = (base.join("definitions"), base.join("store"));
+    std::fs::create_dir_all(&defs).unwrap();
+    std::fs::create_dir_all(&store).unwrap();
+    let shipped = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../core/attention/definitions/head-gone.query.json");
+    std::fs::copy(shipped, defs.join("head-gone.query.json")).unwrap();
+    (defs, store)
+}
+
+fn measured(answer: &Value) -> Vec<(String, Option<String>)> {
+    answer["definitions"]
+        .as_array()
+        .unwrap_or_else(|| panic!("no definitions in {answer}"))
+        .iter()
+        .map(|d| {
+            (
+                d["name"].as_str().unwrap_or_default().to_owned(),
+                d["unmeasured"].as_str().map(str::to_owned),
+            )
+        })
+        .collect()
+}
+
+const SINCE: &str = "2026-11-01T00:00:00.000Z";
+const NOW: &str = "2026-11-22T00:00:00.000Z";
+
+#[test]
+fn the_attention_definitions_reader_measures_a_definition_file_added_after_an_earlier_read() {
+    let (defs, store) = definitions_scratch("added");
+    let read = inspect::definitions_at(defs.clone(), store.clone());
+    let names = |answer: &Value| {
+        measured(answer)
+            .into_iter()
+            .map(|(n, _)| n)
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(names(&read(SINCE, NOW)), ["head-gone"]);
+    let added = std::fs::read_to_string(defs.join("head-gone.query.json"))
+        .unwrap()
+        .replacen("\"head-gone\"", "\"head-gone-again\"", 1);
+    std::fs::write(defs.join("head-gone-again.query.json"), added).unwrap();
+    let mut second = names(&read(SINCE, NOW));
+    second.sort();
+    assert_eq!(
+        second,
+        ["head-gone", "head-gone-again"],
+        "the next read measures the new file"
+    );
+    let _ = std::fs::remove_dir_all(defs.parent().unwrap());
+}
+
+#[test]
+fn the_attention_definitions_reader_reports_a_definition_the_host_cannot_measure_beside_the_others()
+{
+    let (defs, store) = definitions_scratch("unmeasured");
+    std::fs::write(
+        defs.join("no-source.query.json"),
+        json!({
+            "name": "no-source",
+            "requires": ["fgos.no-such.kind"],
+            "window": "own",
+            "query": { "since": "-30d", "kind": ["fgos.no-such.kind"], "agg": ["count"] },
+            "row": { "kind": "no-source", "reason": "never measured", "nextCommand": "fgos doctor" },
+        })
+        .to_string(),
+    )
+    .unwrap();
+    let read = inspect::definitions_at(defs.clone(), store);
+    let answer = read(SINCE, NOW);
+    let by_name = measured(&answer);
+    let unmeasurable = by_name
+        .iter()
+        .find(|(name, _)| name == "no-source")
+        .unwrap_or_else(|| panic!("no-source is listed: {answer}"));
+    assert!(
+        unmeasurable
+            .1
+            .as_deref()
+            .is_some_and(|r| r.contains("fgos.no-such.kind")),
+        "the reason names the kind it cannot read: {answer}"
+    );
+    let shipped = by_name
+        .iter()
+        .find(|(name, _)| name == "head-gone")
+        .unwrap();
+    assert_eq!(
+        shipped.1, None,
+        "the shipped definition is still measured: {answer}"
+    );
+    let _ = std::fs::remove_dir_all(defs.parent().unwrap());
+}

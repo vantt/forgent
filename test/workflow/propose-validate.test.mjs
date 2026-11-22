@@ -72,140 +72,140 @@ const slice = (id, writes, extra = {}) => ({ id, writes, rigor: 'standard', capa
 const validate = (slices, extra = {}) => validateProposal({ slices, runnerConfig, ports: memoryPorts(repo), ...extra });
 const codes = (result) => result.refusals.map((r) => r.code);
 
-test('a sound proposal passes, with the tests of the changed code listed as an addition', () => {
-  const result = validate([slice('a', ['src/a/one.mjs'])]);
+test('a sound proposal passes, with the tests of the changed code listed as an addition', async () => {
+  const result = await validate([slice('a', ['src/a/one.mjs'])]);
   assert.equal(result.ok, true);
   assert.deepEqual(result.refusals, []);
   assert.deepEqual(result.expansions.map((e) => e.add), [['test/a/one.test.mjs', 'test/a/shared.test.mjs']]);
 });
 
-test('a proposal with no slice, or a floor that is no rigor, is a programming error, not a refusal', () => {
-  assert.throws(() => validate([]), (err) => err instanceof ProposeValidateError && err.code === 'no-slices');
-  assert.throws(() => validate([slice('x', ['src/a/one.mjs'])], { rigorFloor: 'fast' }), (err) => err.code === 'floor-invalid');
+test('a proposal with no slice, or a floor that is no rigor, is a programming error, not a refusal', async () => {
+  await assert.rejects(validate([]), (err) => err instanceof ProposeValidateError && err.code === 'no-slices');
+  await assert.rejects(validate([slice('x', ['src/a/one.mjs'])], { rigorFloor: 'fast' }), (err) => err.code === 'floor-invalid');
 });
 
-test('a scope judged without the files below it is refused as unresolved', () => {
-  const result = validate([slice('a', ['src/a'], { unresolvedScopes: ['src/a'] })]);
+test('a scope judged without the files below it is refused as unresolved', async () => {
+  const result = await validate([slice('a', ['src/a'], { unresolvedScopes: ['src/a'] })]);
   assert.deepEqual(codes(result), ['unresolved-scope']);
   assert.deepEqual(result.refusals[0].scopes, ['src/a']);
 });
 
-test('a write path that is absolute or leaves the repository is refused as invalid', () => {
-  const result = validate([slice('a', ['/etc/passwd']), slice('b', ['../outside/file.mjs'])]);
+test('a write path that is absolute or leaves the repository is refused as invalid', async () => {
+  const result = await validate([slice('a', ['/etc/passwd']), slice('b', ['../outside/file.mjs'])]);
   assert.deepEqual(codes(result), ['write-path-invalid', 'write-path-invalid']);
 });
 
-test('a write path the write-scope reader would not read the same way is refused as invalid', () => {
-  const result = validate([slice('a', ['src\\a\\one.mjs']), slice('b', ['src/a**.mjs']), slice('c', [':(glob)src/a/one.mjs'])]);
+test('a write path the write-scope reader would not read the same way is refused as invalid', async () => {
+  const result = await validate([slice('a', ['src\\a\\one.mjs']), slice('b', ['src/a**.mjs']), slice('c', [':(glob)src/a/one.mjs'])]);
   assert.deepEqual(codes(result), ['write-path-invalid', 'write-path-invalid', 'write-path-invalid']);
 });
 
-test('a write under the repository bookkeeping or installed dependencies is refused as forbidden, at any depth', () => {
-  const result = validate([slice('a', ['node_modules/pkg/index.js']), slice('b', ['.git/hooks/pre-commit']), slice('c', ['src/a/node_modules/x.js'])]);
+test('a write under the repository bookkeeping or installed dependencies is refused as forbidden, at any depth', async () => {
+  const result = await validate([slice('a', ['node_modules/pkg/index.js']), slice('b', ['.git/hooks/pre-commit']), slice('c', ['src/a/node_modules/x.js'])]);
   assert.deepEqual(codes(result), ['write-path-forbidden', 'write-path-forbidden', 'write-path-forbidden']);
 });
 
-test('a glob that can reach a forbidden tree is refused, one that cannot is not', () => {
-  const broad = validate([slice('a', ['**/*.md']), slice('b', ['*/**']), slice('c', ['**'])]);
+test('a glob that can reach a forbidden tree is refused, one that cannot is not', async () => {
+  const broad = await validate([slice('a', ['**/*.md']), slice('b', ['*/**']), slice('c', ['**'])]);
   assert.deepEqual(codes(broad), ['write-path-forbidden', 'write-path-forbidden', 'write-path-forbidden']);
   assert.match(broad.refusals[0].detail, /reaches/);
-  assert.equal(validate([slice('d', ['docs/**/*.md'], { capability: 'docs:write' })]).ok, true);
-  assert.ok(!codes(validate([slice('s', ['src/a/*.mjs'])])).includes('write-path-forbidden'));
+  assert.equal((await validate([slice('d', ['docs/**/*.md'], { capability: 'docs:write' })])).ok, true);
+  assert.ok(!codes(await validate([slice('s', ['src/a/*.mjs'])])).includes('write-path-forbidden'));
 });
 
-test('the run-state store is forbidden to a slice that dispatches, and a slice that asks the owner first may name it', () => {
+test('the run-state store is forbidden to a slice that dispatches, and a slice that asks the owner first may name it', async () => {
   const files = { ...repo, '.fgos/config.yaml': 'x: 1\n' };
-  const dispatching = validateProposal({ slices: [slice('a', ['.fgos/config.yaml'])], runnerConfig, ports: memoryPorts(files) });
+  const dispatching = await validateProposal({ slices: [slice('a', ['.fgos/config.yaml'])], runnerConfig, ports: memoryPorts(files) });
   assert.deepEqual(codes(dispatching), ['write-path-forbidden']);
-  const asking = validateProposal({ slices: [slice('a', ['.fgos/config.yaml'], { capability: null, pattern: null, askOwnerFirst: true, rigor: 'critical' })], runnerConfig, ports: memoryPorts(files) });
+  const asking = await validateProposal({ slices: [slice('a', ['.fgos/config.yaml'], { capability: null, pattern: null, askOwnerFirst: true, rigor: 'critical' })], runnerConfig, ports: memoryPorts(files) });
   assert.equal(asking.ok, true);
 });
 
-test('a path that goes through a symbolic link, or whose directory does, is refused', () => {
+test('a path that goes through a symbolic link, or whose directory does, is refused', async () => {
   const ports = memoryPorts({ ...repo, 'alias/guide.md': '# same as docs\n' }, { links: ['alias'] });
-  const result = validateProposal({ slices: [slice('a', ['alias/guide.md'], { capability: 'docs:write' }), slice('b', ['alias/new.md'], { capability: 'docs:write' })], runnerConfig, ports });
+  const result = await validateProposal({ slices: [slice('a', ['alias/guide.md'], { capability: 'docs:write' }), slice('b', ['alias/new.md'], { capability: 'docs:write' })], runnerConfig, ports });
   assert.deepEqual(codes(result), ['write-path-forbidden', 'write-path-forbidden']);
   assert.match(result.refusals[0].detail, /symbolic link/);
 });
 
-test('a new file is legitimate only where its directory exists; anything else is refused as missing', () => {
-  assert.equal(validate([slice('ok', ['src/a/brand-new.mjs'])]).ok, true);
-  assert.equal(validate([slice('ok', ['top-level-new.md'])]).ok, true);
-  const missing = validate([slice('a', ['src/nowhere/new.mjs']), slice('b', ['src/missing-dir/'])]);
+test('a new file is legitimate only where its directory exists; anything else is refused as missing', async () => {
+  assert.equal((await validate([slice('ok', ['src/a/brand-new.mjs'])])).ok, true);
+  assert.equal((await validate([slice('ok', ['top-level-new.md'])])).ok, true);
+  const missing = await validate([slice('a', ['src/nowhere/new.mjs']), slice('b', ['src/missing-dir/'])]);
   assert.deepEqual(codes(missing), ['write-path-missing', 'write-path-missing']);
 });
 
-test('a glob or directory that names no file is refused as empty', () => {
-  const result = validate([slice('a', ['src/a/**/*.rs'])]);
+test('a glob or directory that names no file is refused as empty', async () => {
+  const result = await validate([slice('a', ['src/a/**/*.rs'])]);
   assert.deepEqual(codes(result), ['write-scope-empty']);
 });
 
-test('a capability no tool executor names is a label and passes; a tool ability, or its alias, whose tool is not present is refused', () => {
-  assert.equal(validate([slice('a', ['src/a/one.mjs'], { capability: 'code:imagine' })]).ok, true);
-  assert.equal(validate([slice('d', ['docs/guide.md'], { capability: 'docs:write', followUp: { capability: 'audit', pattern: 'solo' } })]).ok, true);
-  assert.deepEqual(codes(validate([slice('a', ['src/a/one.mjs'], { capability: 'impact-analysis' })])), ['capability-tool-unserved']);
-  assert.deepEqual(codes(validate([slice('d', ['docs/guide.md'], { capability: 'docs:write', followUp: { capability: 'impact_analysis', pattern: 'solo' } })])), ['capability-tool-unserved']);
+test('a capability no tool executor names is a label and passes; a tool ability, or its alias, whose tool is not present is refused', async () => {
+  assert.equal((await validate([slice('a', ['src/a/one.mjs'], { capability: 'code:imagine' })])).ok, true);
+  assert.equal((await validate([slice('d', ['docs/guide.md'], { capability: 'docs:write', followUp: { capability: 'audit', pattern: 'solo' } })])).ok, true);
+  assert.deepEqual(codes(await validate([slice('a', ['src/a/one.mjs'], { capability: 'impact-analysis' })])), ['capability-tool-unserved']);
+  assert.deepEqual(codes(await validate([slice('d', ['docs/guide.md'], { capability: 'docs:write', followUp: { capability: 'impact_analysis', pattern: 'solo' } })])), ['capability-tool-unserved']);
   const served = { ...runnerConfig, executors: { ...runnerConfig.executors, graph: { kind: 'tool', for: ['impact-analysis'], invocations: [{ via: 'cli', command: process.execPath, args: [] }] } } };
-  assert.equal(validate([slice('a', ['src/a/one.mjs'], { capability: 'impact-analysis' })], { runnerConfig: served }).ok, true);
+  assert.equal((await validate([slice('a', ['src/a/one.mjs'], { capability: 'impact-analysis' })], { runnerConfig: served })).ok, true);
 });
 
-test('a slice that asks the owner first names no capability and is listed, not refused for it', () => {
-  const result = validate([slice('data', ['src/a/two.mjs'], { capability: null, pattern: null, askOwnerFirst: true, rigor: 'critical' })]);
+test('a slice that asks the owner first names no capability and is listed, not refused for it', async () => {
+  const result = await validate([slice('data', ['src/a/two.mjs'], { capability: null, pattern: null, askOwnerFirst: true, rigor: 'critical' })]);
   assert.equal(result.ok, true);
   assert.deepEqual(result.ownerFirst, ['data']);
 });
 
-test('a slice below the frame floor is refused, and one at or above it is not', () => {
+test('a slice below the frame floor is refused, and one at or above it is not', async () => {
   const low = slice('doc', ['docs/guide.md'], { rigor: 'low', capability: 'docs:write', pattern: 'solo' });
-  assert.deepEqual(codes(validate([low], { rigorFloor: 'standard' })), ['rigor-below-floor']);
-  assert.equal(validate([low], { rigorFloor: 'low' }).ok, true);
-  assert.equal(validate([slice('a', ['src/a/two.mjs'], { rigor: 'high' })], { rigorFloor: 'standard' }).ok, true);
+  assert.deepEqual(codes(await validate([low], { rigorFloor: 'standard' })), ['rigor-below-floor']);
+  assert.equal((await validate([low], { rigorFloor: 'low' })).ok, true);
+  assert.equal((await validate([slice('a', ['src/a/two.mjs'], { rigor: 'high' })], { rigorFloor: 'standard' })).ok, true);
 });
 
-test('two slices writing the same file, or one a directory over the other\'s file, are refused as overlapping', () => {
-  assert.deepEqual(codes(validate([slice('a', ['src/a/two.mjs']), slice('b', ['src/a/two.mjs'])])), ['write-overlap']);
-  const inside = validate([slice('a', ['src/a']), slice('b', ['src/a/two.mjs'])]);
+test('two slices writing the same file, or one a directory over the other\'s file, are refused as overlapping', async () => {
+  assert.deepEqual(codes(await validate([slice('a', ['src/a/two.mjs']), slice('b', ['src/a/two.mjs'])])), ['write-overlap']);
+  const inside = await validate([slice('a', ['src/a']), slice('b', ['src/a/two.mjs'])]);
   assert.deepEqual(codes(inside), ['write-overlap']);
   assert.deepEqual(inside.refusals[0].paths, ['src/a', 'src/a/two.mjs']);
-  assert.deepEqual(codes(validate([slice('a', ['src/**/*.mjs']), slice('b', ['src/b/three.mjs'])])), ['write-overlap']);
-  assert.deepEqual(codes(validate([slice('a', ['src/a/new-file.mjs']), slice('b', ['src/a'])])), ['write-overlap']);
+  assert.deepEqual(codes(await validate([slice('a', ['src/**/*.mjs']), slice('b', ['src/b/three.mjs'])])), ['write-overlap']);
+  assert.deepEqual(codes(await validate([slice('a', ['src/a/new-file.mjs']), slice('b', ['src/a'])])), ['write-overlap']);
 });
 
-test('two modules with the same last two path segments are not confused: a test of one is not a test of the other', () => {
+test('two modules with the same last two path segments are not confused: a test of one is not a test of the other', async () => {
   const files = { 'src/a/hub.mjs': '', 'src/b/a/hub.mjs': '', 'test/b.test.mjs': "import '../src/b/a/hub.mjs';\n" };
-  const result = validateProposal({ slices: [slice('x', ['src/a/hub.mjs']), slice('y', ['src/b/a/hub.mjs'])], runnerConfig, ports: memoryPorts(files) });
+  const result = await validateProposal({ slices: [slice('x', ['src/a/hub.mjs']), slice('y', ['src/b/a/hub.mjs'])], runnerConfig, ports: memoryPorts(files) });
   assert.equal(result.ok, true);
   assert.deepEqual(result.expansions.map((e) => [e.slice, e.add]), [['y', ['test/b.test.mjs']]]);
 });
 
-test('slices over different files and directories do not overlap', () => {
-  assert.equal(validate([slice('a', ['src/a/two.mjs']), slice('b', ['src/b/three.mjs']), slice('c', ['docs/guide.md'], { capability: 'docs:write' })]).ok, true);
-  assert.equal(validate([slice('a', ['src/a/two.*']), slice('b', ['src/b/*.mjs'])]).ok, true);
+test('slices over different files and directories do not overlap', async () => {
+  assert.equal((await validate([slice('a', ['src/a/two.mjs']), slice('b', ['src/b/three.mjs']), slice('c', ['docs/guide.md'], { capability: 'docs:write' })])).ok, true);
+  assert.equal((await validate([slice('a', ['src/a/two.*']), slice('b', ['src/b/*.mjs'])])).ok, true);
 });
 
-test('a test the slice\'s own writes already cover is not added, and one another slice writes is named, not added', () => {
-  const own = validate([slice('a', ['src/a/one.mjs', 'test/a/one.test.mjs'])]);
+test('a test the slice\'s own writes already cover is not added, and one another slice writes is named, not added', async () => {
+  const own = await validate([slice('a', ['src/a/one.mjs', 'test/a/one.test.mjs'])]);
   assert.deepEqual(own.expansions[0].add, ['test/a/shared.test.mjs']);
-  const elsewhere = validate([slice('a', ['src/a/one.mjs']), slice('t', ['test/a'], { capability: 'code:test' })]);
+  const elsewhere = await validate([slice('a', ['src/a/one.mjs']), slice('t', ['test/a'], { capability: 'code:test' })]);
   assert.equal(elsewhere.ok, true);
   assert.deepEqual(elsewhere.expansions[0].add, []);
   assert.deepEqual(elsewhere.expansions[0].coveredElsewhere, [{ path: 'test/a/one.test.mjs', slice: 't' }, { path: 'test/a/shared.test.mjs', slice: 't' }]);
 });
 
-test('a test that exercises the code of two slices cannot be added to both: the overlap is refused and says it came from the addition', () => {
-  const result = validate([slice('a', ['src/a/one.mjs']), slice('b', ['src/b/three.mjs'])]);
+test('a test that exercises the code of two slices cannot be added to both: the overlap is refused and says it came from the addition', async () => {
+  const result = await validate([slice('a', ['src/a/one.mjs']), slice('b', ['src/b/three.mjs'])]);
   const overlap = result.refusals.filter((r) => r.code === 'write-overlap');
   assert.equal(overlap.length, 1);
   assert.deepEqual(overlap[0].paths, ['test/a/shared.test.mjs', 'test/a/shared.test.mjs']);
   assert.equal(overlap[0].viaExpansion, true);
 });
 
-test('tests are searched only for code a slice changes: a document slice and a test slice add nothing', () => {
-  const result = validate([slice('d', ['docs/guide.md'], { capability: 'docs:write' }), slice('t', ['test/b/three.test.mjs'], { capability: 'code:test' })]);
+test('tests are searched only for code a slice changes: a document slice and a test slice add nothing', async () => {
+  const result = await validate([slice('d', ['docs/guide.md'], { capability: 'docs:write' }), slice('t', ['test/b/three.test.mjs'], { capability: 'code:test' })]);
   assert.deepEqual(result.expansions, []);
 });
 
-test('a Rust file is searched by its crate directory and package name, not by a bare directory word', () => {
+test('a Rust file is searched by its crate directory and package name, not by a bare directory word', async () => {
   const rust = {
     ...repo,
     'packages/git/rust/Cargo.toml': '[package]\nname = "fgos-git"\n',
@@ -215,32 +215,32 @@ test('a Rust file is searched by its crate directory and package name, not by a 
     'test/mentions-git.test.mjs': 'a git worktree, git status and git log\n',
     'packages/orphan/src/lib.rs': '',
   };
-  const result = validateProposal({ slices: [slice('r', ['packages/git/rust/src/lib.rs'], { rigor: 'high' })], runnerConfig, ports: memoryPorts(rust) });
+  const result = await validateProposal({ slices: [slice('r', ['packages/git/rust/src/lib.rs'], { rigor: 'high' })], runnerConfig, ports: memoryPorts(rust) });
   assert.deepEqual(result.expansions[0].terms, ['fgos-git', 'fgos_git', 'packages/git/rust']);
   assert.deepEqual(result.expansions[0].add, ['test/uses-crate.test.mjs', 'test/uses-dir.test.mjs']);
-  const orphan = validateProposal({ slices: [slice('o', ['packages/orphan/src/lib.rs'], { rigor: 'high' })], runnerConfig, ports: memoryPorts(rust) });
+  const orphan = await validateProposal({ slices: [slice('o', ['packages/orphan/src/lib.rs'], { rigor: 'high' })], runnerConfig, ports: memoryPorts(rust) });
   assert.deepEqual(orphan.expansions, []);
 });
 
-test('a slice whose code is too broad to size the tests of is refused as too wide, by terms and by tests', () => {
+test('a slice whose code is too broad to size the tests of is refused as too wide, by terms and by tests', async () => {
   const wide = {};
   for (let i = 0; i < TEST_SCAN_LIMITS.terms + 1; i += 1) wide[`src/w/file-${i}.mjs`] = '';
-  const byTerms = validateProposal({ slices: [slice('w', ['src/w'])], runnerConfig, ports: memoryPorts(wide) });
+  const byTerms = await validateProposal({ slices: [slice('w', ['src/w'])], runnerConfig, ports: memoryPorts(wide) });
   assert.deepEqual(codes(byTerms), ['test-scan-too-wide']);
   assert.equal(byTerms.refusals[0].terms, TEST_SCAN_LIMITS.terms + 1);
 
   const busy = { 'src/hub.mjs': '' };
   for (let i = 0; i < TEST_SCAN_LIMITS.tests + 1; i += 1) busy[`test/uses-${i}.test.mjs`] = 'src/hub.mjs';
-  const byTests = validateProposal({ slices: [slice('h', ['src/hub.mjs'])], runnerConfig, ports: memoryPorts(busy) });
+  const byTests = await validateProposal({ slices: [slice('h', ['src/hub.mjs'])], runnerConfig, ports: memoryPorts(busy) });
   assert.deepEqual(codes(byTests), ['test-scan-too-wide']);
   assert.equal(byTests.refusals[0].tests, TEST_SCAN_LIMITS.tests + 1);
 
-  const owned = validateProposal({ slices: [slice('h', ['src/hub.mjs']), slice('t', ['test'], { capability: 'code:test' })], runnerConfig, ports: memoryPorts(busy) });
+  const owned = await validateProposal({ slices: [slice('h', ['src/hub.mjs']), slice('t', ['test'], { capability: 'code:test' })], runnerConfig, ports: memoryPorts(busy) });
   assert.deepEqual(codes(owned), ['test-scan-too-wide'], 'handing the tests to another slice does not make the scan narrower');
 });
 
-test('every problem of a proposal is reported together, not only the first', () => {
-  const result = validate([
+test('every problem of a proposal is reported together, not only the first', async () => {
+  const result = await validate([
     slice('a', ['node_modules/x.js'], { capability: 'impact-analysis' }),
     slice('b', ['src/a/two.mjs'], { rigor: 'low' }),
     slice('c', ['src/a/two.mjs']),
@@ -250,7 +250,7 @@ test('every problem of a proposal is reported together, not only the first', () 
 
 // ---- over a checkout on disk -----------------------------------------------------------------------
 
-test('on disk: links are not followed, tests are found next to the code and by relative import, crates by manifest', () => {
+test('on disk: links are not followed, tests are found next to the code and by relative import, crates by manifest', async () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'propose-validate-'));
   try {
     const put = (rel, text = '') => {
@@ -282,11 +282,11 @@ test('on disk: links are not followed, tests are found next to the code and by r
     assert.deepEqual(ports.crateOf('crates/core/src/lib.rs'), { dir: 'crates/core', name: 'fgos-core' });
     assert.equal(ports.crateOf('outside/note.md'), null);
 
-    const escaped = validateProposal({ slices: [slice('e', ['src/escape/new.md'], { capability: 'docs:write' })], runnerConfig, ports });
+    const escaped = await validateProposal({ slices: [slice('e', ['src/escape/new.md'], { capability: 'docs:write' })], runnerConfig, ports });
     assert.deepEqual(codes(escaped), ['write-path-forbidden']);
-    const colocated = validateProposal({ slices: [slice('c', ['src/a/hub.mjs'])], runnerConfig, ports });
+    const colocated = await validateProposal({ slices: [slice('c', ['src/a/hub.mjs'])], runnerConfig, ports });
     assert.deepEqual(colocated.expansions[0].add, ['src/a/hub.test.mjs', 'test/deep/uses.test.mjs']);
-    const typed = validateProposal({ slices: [slice('t', ['app/client.ts'])], runnerConfig, ports });
+    const typed = await validateProposal({ slices: [slice('t', ['app/client.ts'])], runnerConfig, ports });
     assert.deepEqual(typed.expansions[0].add, ['app/client.test.ts']);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
@@ -295,7 +295,7 @@ test('on disk: links are not followed, tests are found next to the code and by r
 
 // ---- over this repository --------------------------------------------------------------------------
 
-test('over the real repository: classified, validated and sized with the same slices', () => {
+test('over the real repository: classified, validated and sized with the same slices', async () => {
   const root = path.resolve(import.meta.dirname, '../..');
   const ports = createRepoPorts({ root });
   const config = readStandardValue('runner').value;
@@ -311,11 +311,11 @@ test('over the real repository: classified, validated and sized with the same sl
   const classified = classifySlice({ writes, listFiles: ports.listFiles });
   const mine = { id: 'frame', writes, ...classified };
   const docs = { id: 'notes', writes: ['docs/brand-new-note.md'], ...classifySlice({ writes: ['docs/brand-new-note.md'], listFiles: ports.listFiles }) };
-  const result = validateProposal({ slices: [mine, docs], runnerConfig: config, rigorFloor: 'low', ports });
+  const result = await validateProposal({ slices: [mine, docs], runnerConfig: config, rigorFloor: 'low', ports });
   assert.deepEqual(result.refusals, []);
   assert.ok(result.expansions.find((e) => e.slice === 'frame').add.includes('test/workflow/propose-frame.test.mjs'));
 
-  const refused = validateProposal({ slices: [{ id: 'lost', writes: ['src/no-such-dir/x.mjs'], ...classifySlice({ writes: ['src/no-such-dir/x.mjs'], listFiles: ports.listFiles }) }], runnerConfig: config, ports });
+  const refused = await validateProposal({ slices: [{ id: 'lost', writes: ['src/no-such-dir/x.mjs'], ...classifySlice({ writes: ['src/no-such-dir/x.mjs'], listFiles: ports.listFiles }) }], runnerConfig: config, ports });
   assert.deepEqual(codes(refused), ['write-path-missing']);
 
   const sized = proposeFrame({

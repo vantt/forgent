@@ -2300,7 +2300,7 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
     const stateRoot = opts.repoRoot ?? opts.cwd;
     const cfg = opts.runnerConfig ?? loadRunnerConfigForDir(stateRoot);
     const stage = choice.stage ?? work.workflowStep;
-    const built = workUnitFor(work, {
+    const built = await workUnitFor(work, {
       cfg,
       stateRoot,
       stage,
