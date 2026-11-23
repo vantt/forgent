@@ -150,8 +150,17 @@ refusal codes).
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Record the bind-time account state and replay it in the recheck](phase-01-record-and-replay-account-state.md) | - | packages/execution/engine/src/assignment_runner/, packages/execution/engine/src/unit_run/, packages/execution/engine/src/planning/bind_facade.rs, packages/execution/engine/tests/assignment_runner.rs, packages/execution/engine/tests/unit_run.rs, packages/execution/contracts/assignment-runner/legality.v1.json, apps/fgos/src/wiring/unit_run_host/, docs/platform/runner/contracts/executor-model.md, docs/platform/runner/subcomponents/h-6979005beaf7/spec.md | 1 | done: landed `2b903592c` (branch p01b @ `9447e2cd7`); land gates green; [report](reports/lead-261123-1033-phase-01-parked-on-land-recovery.md) |
-| 2 | [Integration and close](phase-02-integration-and-close.md) | 1 | plans/261123-0821-runner-recheck-replays-account-view/ | 2 | parked: units c-72536 (unit-run-1795406601428-f864c2f9) and c-74587 at 11:07 (unit-run-1795406820147-10b05acc) refused by the binding mismatch (bound deepseek/thehive, recheck recomputed gemini): the activated release predates the fix `2b903592c`; resume after a release with it is staged and activated, in worktree `forgent-worktrees/261123-0821-runner-recheck-replays-account-view-p02` (clean, at main) |
+| 1 | [Record the bind-time account state and replay it in the recheck](phase-01-record-and-replay-account-state.md) | - | packages/execution/engine/src/assignment_runner/, packages/execution/engine/src/unit_run/, packages/execution/engine/src/planning/bind_facade.rs, packages/execution/engine/tests/assignment_runner.rs, packages/execution/engine/tests/unit_run.rs, packages/execution/contracts/assignment-runner/legality.v1.json, apps/fgos/src/wiring/unit_run_host/, docs/platform/runner/contracts/executor-model.md, docs/platform/runner/subcomponents/h-6979005beaf7/spec.md | 1 | done |
+| 2 | [Integration and close](phase-02-integration-and-close.md) | 1 | plans/261123-0821-runner-recheck-replays-account-view/ | 2 | running |
+
+Phase notes:
+
+- Phase 1: landed `2b903592c` (branch p01b @ `9447e2cd7`); land gates green;
+  [report](reports/lead-261123-1033-phase-01-parked-on-land-recovery.md).
+- Phase 2: units c-72536 (unit-run-1795406601428-f864c2f9) and c-74587 (unit-run-1795406820147-10b05acc) were refused
+  at 11:07 by the binding mismatch because the activated release predated `2b903592c`. Release `df57ddfcd609`
+  carries the fix and is active; the phase resumed at 12:50 as unit c-84280-1795413023678 in worktree
+  `forgent-worktrees/261123-0821-runner-recheck-replays-account-view-p02`.
 
 Contract check, done by hand and by `node scripts/plan-contract-check.mjs`: phase 2 sits in a later wave than phase 1,
 which it depends on, and each wave holds one phase, so no two phases share a footprint. Phase 1 is one leader's work,
