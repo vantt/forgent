@@ -8,5 +8,6 @@ pub mod model;
 
 pub use locate::{fold, locate, Match, MatchKind, MatchedOn};
 pub use model::{
-    Component, Contract, DecisionKind, Door, DoorPath, Layers, Model, ModelError, MODEL_DIR,
+    Component, Contract, DecisionKind, Door, DoorPath, Layers, Model, ModelError, TierException,
+    MODEL_DIR,
 };

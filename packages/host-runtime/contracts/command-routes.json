@@ -86,6 +86,7 @@
         "dir",
         "json",
         "help",
+        "sentence",
         "limit"
       ]
     },

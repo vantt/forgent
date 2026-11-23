@@ -30,6 +30,15 @@ pub struct Exception {
     pub reason: String,
 }
 
+/// One named exception to the tier downward rule, as `layers.json` `tierExceptions` carries it.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct TierException {
+    pub path: String,
+    pub tier: i64,
+    pub reason: String,
+}
+
 #[derive(Debug, Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Component {
@@ -136,7 +145,7 @@ pub struct Layers {
     #[serde(rename = "tierNames")]
     pub tier_names: BTreeMap<String, String>,
     #[serde(default, rename = "tierExceptions")]
-    pub tier_exceptions: Vec<serde_json::Value>,
+    pub tier_exceptions: Vec<TierException>,
 }
 
 #[derive(Debug, Clone)]
@@ -221,7 +230,7 @@ mod tests {
         write(
             dir,
             "layers.json",
-            r#"{"layers":["kernel"],"rules":[],"domains":[],"tierNames":{"0":"leaf"}}"#,
+            r#"{"layers":["kernel"],"rules":[],"domains":[],"tierNames":{"0":"leaf"},"tierExceptions":[{"path":"src/a.mjs","tier":2,"reason":"moves down later"}]}"#,
         );
         write(
             dir,
@@ -250,6 +259,10 @@ mod tests {
         valid_model(&dir);
         let model = Model::load_dir(&dir).unwrap();
         assert_eq!(model.components.len(), 1);
+        let exception = &model.layers.tier_exceptions[0];
+        assert_eq!(exception.path, "src/a.mjs");
+        assert_eq!(exception.tier, 2);
+        assert_eq!(exception.reason, "moves down later");
         assert_eq!(model.doors[0].slug, "one");
         let _ = fs::remove_dir_all(&dir);
     }
@@ -262,6 +275,21 @@ mod tests {
             &dir,
             "doors/one.json",
             r#"{"job":"j","kind":"door","patterns":[],"allowed":[],"surprise":1}"#,
+        );
+        let error = Model::load_dir(&dir).unwrap_err();
+        assert!(matches!(error, ModelError::Invalid { .. }), "{error}");
+        assert!(error.to_string().contains("surprise"), "{error}");
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn an_unknown_field_inside_a_tier_exception_is_refused() {
+        let dir = scratch("tier-exception-unknown");
+        valid_model(&dir);
+        write(
+            &dir,
+            "layers.json",
+            r#"{"layers":["kernel"],"rules":[],"domains":[],"tierNames":{"0":"leaf"},"tierExceptions":[{"path":"src/a.mjs","tier":2,"reason":"moves down later","surprise":1}]}"#,
         );
         let error = Model::load_dir(&dir).unwrap_err();
         assert!(matches!(error, ModelError::Invalid { .. }), "{error}");

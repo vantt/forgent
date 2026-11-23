@@ -74,14 +74,26 @@ fn is_filler(word: &str) -> bool {
     word.len() < 3
         || matches!(
             word,
-            "the" | "and" | "for" | "with" | "that" | "this" | "from" | "into" | "are" | "its" | "how"
+            "the"
+                | "and"
+                | "for"
+                | "with"
+                | "that"
+                | "this"
+                | "from"
+                | "into"
+                | "are"
+                | "its"
+                | "how"
         )
 }
 
 fn contains_phrase(sentence: &[String], phrase: &[String]) -> bool {
     !phrase.is_empty()
         && sentence.len() >= phrase.len()
-        && sentence.windows(phrase.len()).any(|window| window == phrase)
+        && sentence
+            .windows(phrase.len())
+            .any(|window| window == phrase)
 }
 
 struct Row<'a> {
@@ -95,7 +107,10 @@ struct Row<'a> {
 fn score(sentence: &[String], row: &Row<'_>) -> Option<(MatchedOn, u32)> {
     let canonical = tokens(row.canonical);
     if contains_phrase(sentence, &canonical) {
-        return Some((MatchedOn::Canonical, CANONICAL_BASE + canonical.len() as u32));
+        return Some((
+            MatchedOn::Canonical,
+            CANONICAL_BASE + canonical.len() as u32,
+        ));
     }
     let alias_hit = row
         .aliases
@@ -224,7 +239,10 @@ mod tests {
             component("c", "write-file", &[], "unrelated"),
         ]);
         let found = locate(&m, "write file atomically");
-        let order: Vec<_> = found.iter().map(|f| (f.id.as_str(), f.matched_on)).collect();
+        let order: Vec<_> = found
+            .iter()
+            .map(|f| (f.id.as_str(), f.matched_on))
+            .collect();
         assert_eq!(
             order,
             [
@@ -237,7 +255,12 @@ mod tests {
 
     #[test]
     fn vietnamese_diacritics_fold_to_the_same_match() {
-        let m = model(vec![component("d", "durable-file", &["ghi file nguyên tử"], "x")]);
+        let m = model(vec![component(
+            "d",
+            "durable-file",
+            &["ghi file nguyên tử"],
+            "x",
+        )]);
         assert_eq!(locate(&m, "GHI FILE NGUYEN TU").first().unwrap().id, "d");
         assert_eq!(fold("Đường nguyên tử"), "duong nguyen tu");
         assert_eq!(fold("nguye\u{302}\u{303}n tu\u{309}"), "nguyen tu");
