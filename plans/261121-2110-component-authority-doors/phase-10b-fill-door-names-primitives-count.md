@@ -53,3 +53,15 @@ test output tail, and anything stopped per step 4.
 
 ## Rollback
 Revert the phase commit; the rows lose the fields and the guard returns to phase 10's behaviour.
+
+## Unit 2 (after the first unit, 2026-11-24 02:30)
+The first unit fixed the five guard notes and added their tests (step 1) but could not run node, so it left the rows
+alone and settled `blocked`; nothing was committed. Its diff is `reports/p10b-guard-fixes.patch`; the lead ran
+`node --test test/architecture.test.mjs` on it with the activated host: 93/94 pass, the only failure is A4 (red on main).
+Units cannot run node. So unit 2:
+1. `git apply plans/261121-2110-component-authority-doors/reports/p10b-guard-fixes.patch` (step 1 as it stands).
+2. Does step 2 only: fill `names` and `primitives` on every mechanism row, reading the allowed and debt files with
+   `rg` so each name/primitive matches only inside the row's `allowed` and `debt` files (check every new primitive with
+   `rg` over `src bin packages core domains apps scripts` and narrow it until it does). No `count` yet.
+3. Lists in the report every row left path-only with one line why.
+The lead then runs the guard, measures each allowed file's total and hands the counts (step 3) to a third unit.
