@@ -24,7 +24,8 @@ the supervision queue only once it is settled.
   HARDEN per-layer loop (D7) and opens its own sub-plan. When the last phase closes, every layer has a settled target
   shape in its spec, net size ≤ 0 or paid for, and no Node logic is left. No `legacy-cli` route and no `legacy-node`
   payload remain.
-- **Constraints:** the loop of `261021-1118` "The per-layer loop", steps 1–9, unchanged: a council opens only after the
+- **Constraints:** the loop of `261021-1118` "The per-layer loop", steps 1–9, with council weight set per component by the
+  triage scan (N7) and step 7 on this machine only (N5): a council opens only after the
   layer below closes, and the owner is asked once per layer, in a batch. RUL104 (better, not bigger). L10 and design
   principles 1 and 8: a mechanism that moves takes every caller with it, its old path and tests go in the same change,
   and no twin is left. D1 holds inside each layer. Every sub-plan carries an Authority map (doors phase 5). Work (T7)
@@ -55,6 +56,7 @@ open for round 2:
 - **N3 against the seed's phase T9.** The seed puts the "H7 hook arm" in T9. ds-wham5txfkv O5 had sent
   `git/main-checkout-delete-guard.mjs` to S1. Round 1 suggested phase T2–T3 for it, since it is T2 logic.
 
+At 19:34 the owner ordered a triage scan that decides which components need a council and how heavy (N7). It rides in step 0.
 No owner question is open. The owner answered N5 at 19:3x: step 7 lands and activates on this machine only; the owner lands
 the other machines himself, and mdview and mcp-skill-hub leave the list.
 The hand-off still waits on doors and `261122-2108` (O7), and `261122-2108` is still `draft`.
@@ -101,6 +103,7 @@ This discussion edits them in place from here on. O7, the N rows and F1 are new 
 | N3 | Which phase owns `git/main-checkout-delete-guard.mjs` (505 lines of logic, tier 2): the seed's T9 "H7 hook arm", or phase T2–T3 as its tier suggests. S1's other two verdicts (`state/decision-question.mjs`, `runner/hook.mjs`) are T7 code. | open | seed §7 T9; ds-wham5txfkv O5 and H7; `components.yaml` tier 2 `git` |
 | N4 | "T8" in D8 is the `supervision` component (`src/portfolio`, 1 file of 19 lines, plus `packages/portfolio/*.mjs`). Skill/Domain closed under HARDEN on 2026-11-09 and is not reopened. With so little code, its council is one shared seat round. | provisional (round 1) | `components.yaml` tier 8; closing report §6 row T8 |
 | N5 | HARDEN step 7 lands "on the three workspaces on the owner machine (forgentX, mdview, mcp-skill-hub) and on the second machine". That list dates from 2026-10-21. Which machines and workspaces run fgOS today? **Owner answer:** each phase's step 7 lands, activates, runs doctor and smokes on this machine (`~/projects/forgent`) first; the owner lands the other machines himself; mdview and mcp-skill-hub are dropped from the list. | clear (owner answer 19:3x); minted next round if it holds | HARDEN plan "The per-layer loop" step 7; owner chat 19:3x |
+| N7 | **Triage scan before any council (owner order 19:34).** Step 0 adds one column to the recounted inventory: council weight per component, with its reason. Each layer's step 1 rechecks only its own rows. Weights: **skip**: a facade or thin client over a Rust owner, or dead code; it is deleted with its last caller (D1), so nothing is to be decided. **Light**: one council seat and an ordinary sub-plan; for real logic that is small, or that already went through a council whose shape still holds and only carry-overs remain. **Full**: four seats and `ak-plan --hard`; for logic Rust does not own that also meets at least one of: never through a council (session-host, session-rotation), an open High or carry-over, or a contract to another component. T7 Work is always full (decision 78). The scan decides by these rules without asking; its table rides in the layer's one batched owner ask, where the owner can override a row. | provisional (owner direction, round 1b); amends D7's "loop unchanged"; mint next round if it holds | owner chat 19:34 "cần có 1 bước quét để quyết định chổ nào cần council, không thì phí"; HARDEN plan step 2 ("small components share the layer council") |
 | N6 | H5's first red looks resolved: `test/cli/fgos-workflow.test.mjs` no longer names `--plan` (commit `0a3f46ac5`, 2026-11-18). The instruction-projections red was not rechecked. Step 0 confirms both. | first likely resolved; second not rechecked | `git log` on both test files |
 | F1 | Model tiers today: T2 `git`, `terminal-control`, `session-rotation`; T3 `session-host`; T5 `seat-binding`, `execution-core`, `dispatch-transport`; T6 `workflow`, `work-driver`; T7 `work-state`, `runner`; T8 `supervision`; T9 `packaging-distribution`, `host-surface`, `learning-docs-registry`. The model is YAML now (doors 1b has landed). | clear | `packages/component-authority/model/components.yaml`, `layers.yaml` |
 
@@ -131,6 +134,11 @@ Copied from ds-wham5txfkv §4. They are owner decisions made there and are not r
   `merge-slot-busy`; this head's grant has no `fgos slots`, so the holder was not seen.
 - **2026-11-23 19:3x — owner (N5):** "em cứ land máy này trước đi, anh sẽ tự land các máy khác, loại mdview và mcp-skill ra".
   Step 7 lands on this machine; the owner lands the others; mdview and mcp-skill-hub are dropped.
+- **2026-11-23 19:3x — owner:** "vòng lặp 9 bước này có quá nặng nề không?" Answer: HARDEN's layers took 1 to 5 days each, with
+  one owner ask per layer. The weight comes from four-seat councils on small layers (T8) and multi-machine landing (gone with N5).
+  Keep the outputs; scale the council to the layer's size.
+- **2026-11-23 19:34 — owner:** "cần có 1 bước quét để quyết định chổ nào cần council, không thì phí". Recorded as N7 with three
+  weights (skip, light, full), decided by rule in step 0, overridable in the layer's batched ask.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -140,7 +148,7 @@ the T2–T3 entry and the phase of the delete guard.*
 ### Shape
 
 "HARDEN, next round" is one skeleton plan with one phase per unfinished layer. It reuses the loop and close rules of
-`261021-1118` unchanged. Each phase opens with its own baseline, runs its council, and asks the owner once. It then lands its own
+`261021-1118`, except that a triage scan sets each component's council weight first (skip, light or full; N7). Each phase opens with its own baseline, runs its council, and asks the owner once. It then lands its own
 sub-plan, re-measures and closes. Only then does the next phase's council open. Inside a phase, each component gets a
 target shape (authority, contract and ports, Rust/Node boundary and Node budget, delete list, doctor rows kept, size
 target), written into its spec. Node facades of T0–T5 have no phase; each is deleted by the phase whose migration table
@@ -160,7 +168,7 @@ flowchart BT
   end
 ```
 
-### Per-layer loop (HARDEN `261021-1118`, steps 1–9, unchanged)
+### Per-layer loop (HARDEN `261021-1118`, steps 1–9; council weight from the triage scan, N7)
 
 | Step | Output |
 |---|---|
@@ -213,7 +221,8 @@ and `scripts/*.mjs` callers of `src/` (each plan moves its own script callers).
 *One skeleton plan, phases in D8 order. Each phase opens its own sub-plan from its council, as HARDEN's layer phases did.*
 
 ### Step 0 — recount before hand-off {#task-step-0}
-After doors and `261122-2108` land: rerun the §5 inventory method, check H5 (the two reds), and update §6. Then mark this
+After doors and `261122-2108` land: rerun the §5 inventory method, check H5 (the two reds), update §6, and fill the triage
+column (skip / light / full council, with its reason, N7) for every component. Then mark this
 discussion settled and hand the skeleton to a planner. Owner: this shaper.
 
 ### Phase T2–T3 — session {#task-t2-t3-session}
