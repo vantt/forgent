@@ -1,7 +1,7 @@
 ---
 id: p-b5jixi4mov
 title: "Plans written or reviewed by a confined head are checked by no machine: the plan contract check crashes in a confined head, and the land gate's plan check was taken out and not put back (plan contract, priority P1; source: owner order 2026-11-23, report `plans/reports/planner-261123-0724-contract-check-blind-in-confined-heads.md`)"
-status: proposed
+status: done
 priority: P1
 area: plan-contract
 created: 2026-11-23

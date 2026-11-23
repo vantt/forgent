@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Repo scripts load the staged addon in a confined head: one reuse-or-build door, so planners can run the plan contract check"
-status: running
+status: done
 lead: head:lead-forgent-261123-0726-contra-e554b
 priority: P1
 blockedBy: []
@@ -107,7 +107,7 @@ report.
 |---|---|---|---|---|---|
 | 1 | [One reuse-or-build door in the leaf](phase-01-one-reuse-or-build-door.md) | - | scripts/lib/git-addon-stage.mjs, scripts/git-addon.mjs, test/distribution/native-addon.test.mjs | 1 | done |
 | 3 | [Backlog checks count a migrated item's Original id](phase-03-backlog-checks-count-original-ids.md) | - | scripts/check-backlog-reconciliation.mjs, scripts/identity-ids-unique.mjs, test/scripts/doc-health.test.mjs, docs/history/backlog-execution-reconciliation/RECONCILIATION.md | 1 | done |
-| 2 | [Integration: confined proof and gate hand-off](phase-02-integration-and-gate-handoff.md) | 1, 3 | plans/261123-0726-contract-check-in-confined-heads/reports/ | 2 | running |
+| 2 | [Integration: confined proof and gate hand-off](phase-02-integration-and-gate-handoff.md) | 1, 3 | plans/261123-0726-contract-check-in-confined-heads/reports/ | 2 | done |
 
 Execution: phases 1 and 3 are independent `code:implement` units, each in its own worktree, in wave 1. Phase 2 is a `code:test` unit plus a supervisor
 hand-off note. No two phases share a path.
@@ -118,9 +118,10 @@ hand-off note. No two phases share a path.
   green, ticket c-12066-1795405917947). See reports/lead-261123-1047-phase1-reapply-and-land.md.
 - Phase 3: landed 5eeb2d60a (owner chose option 1 on q-tvhmli3fns: rule kept; the 277 unreconciled items go to a backlog
   row the secretary files).
-- Phase 2: confined check exit 0 from a confined head at 11:16 (criterion 3 met). The gate fix for inherited release
-  manifests landed as deaedf06d (with the dev-host fixture's missing ort-static copy). Waits on lead:SUPERVISOR lifting
-  the gate hold (6d0f6b92c) and running the full cargo and npm suites on deaedf06d or later (criterion 5).
+- Phase 2: done. Confined check exit 0 (criterion 3). Gate fix for inherited release manifests landed deaedf06d.
+  Full suites at deaedf06d: every red classified, none caused by this plan (criterion 5); the dev-host consumers red is
+  from 7c1ae9c09's ort download in an uncached fixture. The gate stays held (6d0f6b92c) until a release carries
+  deaedf06d, then lead:SUPERVISOR restores it. See reports/integration.md and reports/npm-test-full.md.
 
 ## Owner questions
 

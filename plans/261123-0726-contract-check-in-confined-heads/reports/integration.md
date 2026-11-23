@@ -176,3 +176,29 @@ Lead `head:lead-forgent-261123-0726-contra-e554b`, `FGOS_CONFINED=1`, no FGOS_* 
 
 1. lead:SUPERVISOR lifts the gate hold, and a plan land passes the gate.
 2. lead:SUPERVISOR's full `cargo test --workspace` and `npm test` on deaedf06d or later (acceptance criterion 5).
+
+## Criterion 5 closed (14:0x)
+
+lead:SUPERVISOR's full suites at deaedf06d (`reports/npm-test-full.md`): cargo 4301 passed, 1 red (`head_request`,
+pre-existing since 4951cf3da); npm 7923 tests, 12 red, each classified there outside this plan, except one left to this
+lead.
+
+That one, "concurrent dev consumers with distinct Cargo targets keep independent verified artifacts"
+(`test/rust-host/dev-host.test.mjs:169`), is not caused by this plan:
+
+| run | contains 7c1ae9c09 | "dev door propagates Cargo failure ..." | "concurrent dev consumers ..." |
+|---|---|---|---|
+| `main-npm-test-4c5f55541-r2.log` | no | pass, 0.76 s | pass, 5.7 s |
+| `main-npm-test-deaedf06d.log` | yes | pass, 11.8 s | fail at 24.7 s, "both real Node consumers must reach the live-artifact barrier" |
+
+7c1ae9c09 added `ensureOrtStatic(checkoutRoot)` to `scripts/run-rust-dev-host.mjs:134`, before cargo. The dev-host
+fixture is a fresh checkout with no ort cache, so each consumer downloads the 120 MB archive first. The single-consumer
+test slows from 0.8 s to 11.8 s. The two concurrent consumers miss the test's 20 s barrier. 87bebb0b7 (p01c) changed only
+`test/distribution/native-addon.test.mjs`, and p01c's leaf change sits in `ensureAddonForScript`, which
+`run-rust-dev-host.mjs` does not call (it imports only `gitAddonDirectory`). Owner: the ort-static change (7c1ae9c09,
+DOCOS lane). Likely fix there: seed a verified ort cache in the dev-host fixture, as 87bebb0b7 did for the native-addon
+fixtures. Outside this plan's footprint.
+
+Every red is classified, none is caused by this plan, so acceptance criterion 5 is closed. Phase 2 Verify: every red
+classified (this section and `npm-test-full.md`), confined check exit 0 (Confined run 3), gate hand-off recorded
+(restore 0dd71aa83, held 6d0f6b92c until a release carries p01c, then lead:SUPERVISOR restores it).

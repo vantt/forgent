@@ -1,7 +1,7 @@
 ---
 id: p-mtqil2rpyy
 title: "Backlog checks count a migrated item's Original id for duplicate and reconciliation checks (scripts, priority P2; source: owner confirmation 2026-11-23, reported by forgent-claude-a3)"
-status: proposed
+status: done
 priority: P2
 area: scripts
 created: 2026-11-23
