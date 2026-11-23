@@ -7,7 +7,8 @@ use crate::host::SessionHost;
 use crate::types::*;
 use fgos_terminal_control::port::LaunchSpec;
 use fgos_terminal_control::route::{
-    emit, error, line, read_stdin, usage, CoreParts, EXIT_MISMATCH, EXIT_OK, EXIT_USAGE,
+    emit, error, line, read_op_args, read_stdin, usage, CoreParts, OpArgs, EXIT_MISMATCH, EXIT_OK,
+    EXIT_USAGE,
 };
 use serde::de::DeserializeOwned;
 use serde_json::{json, Value};
@@ -129,24 +130,14 @@ fn run(op: &str, host: &SessionHost, envelope: &Value) -> Result<(String, Value)
 /// process exit code and prints one JSON line.
 pub fn main(args: &[String]) -> i32 {
     let started = Instant::now();
-    let mut protocol: Option<&str> = None;
-    let mut json_flag = false;
-    let mut op: Option<&str> = None;
-    let mut stray: Option<String> = None;
-    let mut it = args.iter();
-    while let Some(arg) = it.next() {
-        match arg.as_str() {
-            "--protocol" => protocol = it.next().map(String::as_str),
-            "--json" => json_flag = true,
-            other if other.starts_with("--") => {
-                stray.get_or_insert_with(|| format!("unknown argument {other}"));
-            }
-            other if op.is_none() => op = Some(other),
-            other => {
-                stray.get_or_insert_with(|| format!("unexpected argument {other}"));
-            }
-        }
-    }
+    let OpArgs {
+        protocol,
+        json: json_flag,
+        op,
+        stray,
+    } = read_op_args(args);
+    let protocol = protocol.as_deref();
+    let op = op.as_deref();
     if protocol != Some("1") {
         let message = format!(
             "this host speaks internal protocol {PROTOCOL}; the call asked for {}",

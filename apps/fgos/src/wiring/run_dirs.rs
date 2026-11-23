@@ -2,116 +2,54 @@
 //!
 //! The run-scoped registry rows (`advance`, `recovery`, `attempt`) have their lock files inside directories whose
 //! layout belongs to the runner, one layer above the lock crate, so the host lists them and hands the lock report
-//! one parameter set per directory. These are three listers because the Node CLI's three are three different
-//! rules, kept as they are until the runner's layouts move to Rust:
+//! one parameter set per directory. The assignment layout is the engine's (`fgos_execution::assignment_layout`),
+//! never a second walk here:
 //!
-//! * workflow runs: every real directory under `<fgosDir>/workflow-runs` (no case-id filter, so `.bindings`
-//!   counts), symbolic links excluded;
-//! * assignment runs (`scanAssignmentLayout`): every attempt directory under a `runs` directory of
-//!   `<fgosDir>/assignments`, open or closed, at most 16 levels deep, a symbolic link a barrier that is never read;
-//! * open attempts (`listOpenAttemptDirs`): every attempt directory under a `runs` directory at any depth whose
-//!   `closed.json` does not exist, symbolic links excluded.
+//! * workflow runs: every real directory under the case runs root of `fgos_execution::case_paths` (no case-id
+//!   filter, so `.bindings` counts), symbolic links excluded;
+//! * assignment runs: every attempt directory the engine's layout lists, open or closed (a symbolic link and the
+//!   depth limit are barriers it never reads past);
+//! * open attempts: those assignment runs whose `closed.json` does not exist.
 //!
-//! One fixture, `test/rust-host/fixtures/run-dirs-vectors.json`, pins what each yields for a set of trees; the Node
-//! listers' tests read the same file.
+//! `test/rust-host/fixtures/run-dirs-vectors.json` pins what each yields for a set of trees.
+use fgos_execution::assignment_layout::list_assignment_runs;
+use fgos_execution::case_paths::runs_root;
 use fgos_holder_lock::status::{Params, RunInstances};
 use std::fs;
 use std::path::{Path, PathBuf};
 
-/// How many directories below `assignments` the assignment lister descends.
-const ASSIGNMENT_LAYOUT_MAX_DEPTH: usize = 16;
-
-/// What a directory lists: the entries' names and whether each is a real directory, a real file or neither (a
-/// symbolic link is neither), in byte order of the name.
-struct Entry {
-    name: String,
-    path: PathBuf,
-    is_dir: bool,
-    is_symlink: bool,
-}
-
-fn entries(dir: &Path) -> Vec<Entry> {
-    let Ok(listing) = fs::read_dir(dir) else {
+/// The case directories under the case runs root, in byte order of the name.
+pub fn workflow_case_dirs(fgos_dir: &Path) -> Vec<PathBuf> {
+    let Ok(listing) = fs::read_dir(runs_root(fgos_dir)) else {
         return Vec::new();
     };
-    let mut found: Vec<Entry> = listing
+    let mut dirs: Vec<(String, PathBuf)> = listing
         .filter_map(Result::ok)
-        .filter_map(|entry| {
-            let kind = entry.file_type().ok()?;
-            Some(Entry {
-                name: entry.file_name().to_string_lossy().into_owned(),
-                path: entry.path(),
-                is_dir: kind.is_dir(),
-                is_symlink: kind.is_symlink(),
-            })
+        .filter(|entry| entry.file_type().is_ok_and(|kind| kind.is_dir()))
+        .map(|entry| {
+            (
+                entry.file_name().to_string_lossy().into_owned(),
+                entry.path(),
+            )
         })
         .collect();
-    found.sort_by(|a, b| a.name.as_bytes().cmp(b.name.as_bytes()));
-    found
-}
-
-/// The case directories of `<fgos_dir>/workflow-runs`.
-pub fn workflow_run_dirs(fgos_dir: &Path) -> Vec<PathBuf> {
-    entries(&fgos_dir.join("workflow-runs"))
-        .into_iter()
-        .filter(|entry| entry.is_dir)
-        .map(|entry| entry.path)
-        .collect()
+    dirs.sort_by(|a, b| a.0.as_bytes().cmp(b.0.as_bytes()));
+    dirs.into_iter().map(|(_, path)| path).collect()
 }
 
 /// The attempt directories of the assignment layout, open or closed.
-pub fn assignment_run_dirs(fgos_dir: &Path) -> Vec<PathBuf> {
-    fn walk(dir: &Path, depth: usize, runs: &mut Vec<PathBuf>) {
-        for entry in entries(dir) {
-            if entry.is_symlink || !entry.is_dir {
-                continue;
-            }
-            if entry.name == "runs" {
-                for attempt in entries(&entry.path) {
-                    if attempt.is_dir {
-                        runs.push(attempt.path);
-                    }
-                }
-            } else if depth < ASSIGNMENT_LAYOUT_MAX_DEPTH {
-                walk(&entry.path, depth + 1, runs);
-            }
-        }
-    }
-    let base = fgos_dir.join("assignments");
-    let mut runs = Vec::new();
-    // The root itself is read only when it is a real directory.
-    if fs::symlink_metadata(&base).is_ok_and(|meta| meta.is_dir()) {
-        walk(&base, 0, &mut runs);
-    }
-    runs
+pub fn assignment_attempt_dirs(fgos_dir: &Path) -> Vec<PathBuf> {
+    list_assignment_runs(fgos_dir)
+        .into_iter()
+        .map(|run| run.run_dir)
+        .collect()
 }
 
-/// The attempt directories under `assignments_root` that have no `closed.json`, sorted.
-pub fn open_attempt_dirs(assignments_root: &Path) -> Vec<PathBuf> {
-    fn walk(dir: &Path, found: &mut Vec<PathBuf>) {
-        for entry in entries(dir) {
-            if !entry.is_dir {
-                continue;
-            }
-            if entry.name != "runs" {
-                walk(&entry.path, found);
-                continue;
-            }
-            for attempt in entries(&entry.path) {
-                if attempt.is_dir && !attempt.path.join("closed.json").exists() {
-                    found.push(attempt.path);
-                }
-            }
-        }
-    }
-    let mut found = Vec::new();
-    walk(assignments_root, &mut found);
-    found.sort_by(|a, b| {
-        a.as_os_str()
-            .as_encoded_bytes()
-            .cmp(b.as_os_str().as_encoded_bytes())
-    });
-    found
+/// The attempt directories of the assignment layout that have no `closed.json`.
+pub fn unclosed_attempt_dirs(fgos_dir: &Path) -> Vec<PathBuf> {
+    let mut dirs = assignment_attempt_dirs(fgos_dir);
+    dirs.retain(|dir| !dir.join("closed.json").exists());
+    dirs
 }
 
 fn text(path: &Path) -> String {
@@ -125,21 +63,21 @@ pub fn run_instances(fgos_dir: &Path) -> RunInstances {
     let mut instances = RunInstances::new();
     instances.insert(
         "advance".into(),
-        workflow_run_dirs(fgos_dir)
+        workflow_case_dirs(fgos_dir)
             .iter()
             .map(|dir| single("workflowRunDir", dir))
             .collect(),
     );
     instances.insert(
         "recovery".into(),
-        assignment_run_dirs(fgos_dir)
+        assignment_attempt_dirs(fgos_dir)
             .iter()
             .map(|dir| single("runDir", dir))
             .collect(),
     );
     instances.insert(
         "attempt".into(),
-        open_attempt_dirs(&fgos_dir.join("assignments"))
+        unclosed_attempt_dirs(fgos_dir)
             .iter()
             .filter_map(|dir| {
                 let assignment = dir.parent()?.parent()?;
@@ -236,20 +174,28 @@ mod tests {
             let name = &vector["name"];
             let expect = &vector["expect"];
             assert_eq!(
-                tree.relative(workflow_run_dirs(&fgos)),
+                tree.relative(workflow_case_dirs(&fgos)),
                 strings(&expect["workflowRuns"]),
                 "workflow runs: {name}"
             );
             assert_eq!(
-                tree.relative(assignment_run_dirs(&fgos)),
+                tree.relative(assignment_attempt_dirs(&fgos)),
                 strings(&expect["assignmentRuns"]),
                 "assignment runs: {name}"
             );
-            assert_eq!(
-                tree.relative(open_attempt_dirs(&fgos.join("assignments"))),
-                strings(&expect["openAttempts"]),
-                "open attempts: {name}"
-            );
+            // The open-attempt rows of these two trees are the retired Node lister's own rules (it read through a
+            // symlinked assignments root and had no depth limit); the engine's layout is the rule now.
+            let node_lister_only = [
+                "a symlinked assignments root is never read",
+                "the depth limit stops the recovery lister at 16 levels and not the attempt lister",
+            ];
+            if !node_lister_only.contains(&name.as_str().unwrap()) {
+                assert_eq!(
+                    tree.relative(unclosed_attempt_dirs(&fgos)),
+                    strings(&expect["openAttempts"]),
+                    "open attempts: {name}"
+                );
+            }
         }
     }
 

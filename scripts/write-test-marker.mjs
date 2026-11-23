@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { isMainModule } from './lib/is-main-module.mjs';
+import { parseArgs as parseCliArgs } from '../src/cli/parse-args.mjs';
 
 export function countXmlCases(xmlPath) {
   if (!fs.existsSync(xmlPath)) return 0;
@@ -10,24 +11,21 @@ export function countXmlCases(xmlPath) {
   return matches ? matches.length : 0;
 }
 
-export function parseArgs(argv) {
-  let runType = 'full';
-  let xmlPath = 'test-results/full.xml';
-  let planPath = null;
-  let exitCode = null;
-
-  for (let i = 0; i < argv.length; i++) {
-    if (argv[i] === '--type') runType = argv[++i];
-    if (argv[i] === '--xml') xmlPath = argv[++i];
-    if (argv[i] === '--plan') planPath = argv[++i];
-    if (argv[i] === '--exit-code') {
-      const parsed = parseInt(argv[++i], 10);
-      exitCode = Number.isNaN(parsed) ? null : parsed;
-    }
-  }
-
-  return { runType, xmlPath, planPath, exitCode };
+/** The marker's flags, read by the CLI's own parser (`--flag value`; a bare flag reads as `true`). */
+export function readMarkerArgs(argv) {
+  const { flags } = parseCliArgs(argv);
+  const text = (value, fallback) => (typeof value === 'string' ? value : fallback);
+  const parsed = typeof flags['exit-code'] === 'string' ? parseInt(flags['exit-code'], 10) : NaN;
+  return {
+    runType: text(flags.type, 'full'),
+    xmlPath: text(flags.xml, 'test-results/full.xml'),
+    planPath: text(flags.plan, null),
+    exitCode: Number.isNaN(parsed) ? null : parsed,
+  };
 }
+
+// The name the marker tests import.
+export { readMarkerArgs as parseArgs };
 
 /**
  * A run only counts as `completed` when there is actual evidence it ran to a
@@ -73,7 +71,7 @@ export function writeMarker(outDir, marker) {
 }
 
 function main(argv) {
-  const { runType, xmlPath, planPath, exitCode } = parseArgs(argv);
+  const { runType, xmlPath, planPath, exitCode } = readMarkerArgs(argv);
   const jobStatus = process.env.JOB_STATUS || 'unknown';
   const marker = buildMarker({ runType, xmlPath, planPath, exitCode, jobStatus });
   writeMarker('test-results', marker);
