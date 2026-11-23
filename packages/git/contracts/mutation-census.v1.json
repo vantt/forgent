@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "bff46b1284d1ea55765a7477a31f5c47a78ab3d9058894e9979983464ba031fc",
+  "payloadDigest": "e3887bd1035f68b906a32ee6aa0edc5dda133fa07c312c059ba318f7113d3b7b",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1516,7 +1516,7 @@
     "src/report/authoritative-match.mjs": "4678762776ac5a748426cee142ab90a474f479374205d3997a5cb92e26277a1c",
     "src/report/capability-plan-lint.mjs": "d0e7415bb9086937024205d2104fbbc0ce075e8e07c646e9448235fa97727ee1",
     "src/report/context-render.mjs": "c93dd1f0336bb92cb02b42b60a837708298f7c92b0c451e97cd324f5329df25c",
-    "src/report/decision-index.mjs": "83769e60bd8a7dc7a716704edd273473d16d8100fd9e243a23ba15561db6ff0b",
+    "src/report/decision-index.mjs": "7325009740c1ac47e2b92bfe0c4ccec13492ec3f150b68b1e4173978df1fe7fe",
     "src/report/enduser-index-generate.mjs": "b4ef9eb3fef9fa66415945e3b5a55fae670f7df3e234dd44711352b89459e08b",
     "src/report/enduser-index.mjs": "373da334b9cd862b2c3a0fbf4fffb3fe010f244872702dbfceb25eada5c5e650",
     "src/report/item-trace.mjs": "bb91d0d9635d0794ed9a979cc4fa6721d26db18905637d465be8ce6d831e7155",
@@ -1663,7 +1663,7 @@
     "src/setup/git-hooks.mjs": "4a85ffcf4b6a9da44e620bf4cf340a37642f74701f300c5840546958b6525195",
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
     "src/setup/instruction-projections.mjs": "82aaa1ec07a5d2925fcb3117a020eb4576777f901c09d054cb17c659d8c144f3",
-    "src/setup/instruction-registry.mjs": "c6bddae8c5594b4766eaa305ac407bd1b4835dbb7acdaa8209cac9c2ef6ae106",
+    "src/setup/instruction-registry.mjs": "588bcd4088586bd1700d9d2474f06fbc8ef6c281ba94096618152a76219a28be",
     "src/setup/mailbox-limits.mjs": "b8ed2c018a71ee1a06582ea90c7a73ec1a7ebe29e3d931f9a2ba89108a763323",
     "src/setup/registrations.mjs": "2434ef9feecd3c7f9ebf93e92aab22791d774b2167426f684b3acdee858e634c",
     "src/setup/seat-binding-checks.mjs": "caf11494333872b9b2e6c516bb5b84e44824e7a9aacbcdd6c0b42d7de2393085",

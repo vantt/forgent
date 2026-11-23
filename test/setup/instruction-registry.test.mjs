@@ -42,6 +42,10 @@ function writeInstructionFile(dir, fileName, frontmatterStr, bodyStr = '# Header
 function writeModel(root, { components = [], domains = [] } = {}) {
   const dir = path.join(root, 'packages', 'component-authority', 'model');
   fs.mkdirSync(path.join(dir, 'doors'), { recursive: true });
+  // The host reads a root as the fgOS repository only when it carries this contract.
+  const contractsDir = path.join(root, 'packages', 'component-authority', 'contracts');
+  fs.mkdirSync(contractsDir, { recursive: true });
+  fs.copyFileSync(path.join(projectRoot, 'packages', 'component-authority', 'contracts', 'model.v1.json'), path.join(contractsDir, 'model.v1.json'));
   const domainLines = domains.length ? domains.map((name) => `  - ${name}`).join('\n') : '  []';
   fs.writeFileSync(
     path.join(dir, 'layers.yaml'),
