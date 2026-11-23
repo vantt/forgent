@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Repo scripts load the staged addon in a confined head: one reuse-or-build door, so planners can run the plan contract check"
-status: ready
+status: draft
 priority: P1
 blockedBy: []
 base: c953e546b43870cddd4465961e1ae7178280387b
