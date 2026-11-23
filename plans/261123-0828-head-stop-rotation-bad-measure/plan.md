@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Head Stop-hook rotation requests reach the host with a valid measure: confirm the landed fix and close the row"
-status: running
+status: done
 lead: head:lead-forgent-261123-0828-head-s-62d31
 priority: P1
 blockedBy: []
@@ -64,7 +64,7 @@ Missing: nothing. Found by `git log -S checkMeasure` and `git log -S 'private::N
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Verify on main and close the row](phase-01-verify-and-close.md) | - | plans/261123-0828-head-stop-rotation-bad-measure/reports/, plans/backlog.md, plans/backlog/p-vbv57yc4d5-every-head-stop-rotation-request-is-refused-bad-measure.md | 1 | running |
+| 1 | [Verify on main and close the row](phase-01-verify-and-close.md) | - | plans/261123-0828-head-stop-rotation-bad-measure/reports/, plans/backlog.md, plans/backlog/p-vbv57yc4d5-every-head-stop-rotation-request-is-refused-bad-measure.md | 1 | done |
 
 Phase 1 is parked, with status `running`, since 2026-11-23 21:12 +07: run ticket `c-1493-1795442268950` (unit-run `unit-run-1795442269420-67ac68f8`,
 worktree `/home/vantt/projects/forgent-worktrees/261123-0828-head-stop-rotation-bad-measure-p01`, branch
@@ -127,3 +127,5 @@ None. The evidence settles the cause and shows the fix is live.
 - Rollback: revert the land commit of the backlog edit, which sets the row back to `proposed`.
 
 Supervisor, 2026-11-24 01:50 +07 (event 67369ca905e0f96d): the lead is gone and is not restarted while the plan only waits. Parked on the unconfined full-suite run started 01:38 on `main` `980d1276d` (docs-only since): `npm test` then `cargo test --workspace`, logs `.fgos/runtime/tmp/suite-npm.log` and `.fgos/runtime/tmp/suite-cargo.log` (each ends with an `exit N` line). The next supervisor wake that finds both exit lines starts the lead again; the lead reads the logs and closes from them.
+
+Lead, 2026-11-24 02:15 +07: phase 1 is `done` and the plan is `done`. The unconfined gate on `main` `980d1276d` is red (`npm test` 15 failing tests, `cargo test --workspace` 3 failing targets), and none of the reds is in the rotation path. Criteria 1 to 4 are green, and the rotation-frame and stop-hook incident tests pass in that very run. Under owner answer `q-pcwf3slkfp`, relayed by the manual supervisor (`292290ffe`), the result in `reports/` closes phase 1, and the red tests are owned outside this plan. `p-vbv57yc4d5` is set `done` in `plans/backlog.md` and in its row file. Evidence: [close report](reports/lead-261124-0208-head-stop-rotation-bad-measure-close.md).

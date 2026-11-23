@@ -1,7 +1,7 @@
 ---
 id: p-vbv57yc4d5
 title: "Every head Stop-hook rotation request is refused bad-measure at the host, so no head rotates and no stop-trace line is written (session rotation, priority high; source: owner via Miu, 2026-11-22; same family as p-4r4h3jqtth)"
-status: proposed
+status: done
 priority: P1
 area: session-rotation
 created: 2026-11-22

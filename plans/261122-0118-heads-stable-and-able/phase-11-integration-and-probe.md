@@ -155,3 +155,5 @@ Supervisor, 2026-11-24 01:50 +07 (event 67369ca905e0f96d): the lead is gone and 
   `plans/backlog.md` write and its `TMPDIR` stay unproven from a live secretary. **Carried to the supervisor.**
 - Acceptance 1 is met for the supervisor only, and acceptance 5 is not met. Both are closed by owner order with the
   gaps above named.
+
+Owner answer (2026-11-24 02:20, recorded by head:supervisor-forgent): `q-5v6jpbmbcy` option A, the owner runs both suites on main after phase 8 lands. The run happened: `plans/reports/report-261124-0215-manual-supervisor-suite-and-release.md` (`292290ffe`), which step 1 above reads. Question acknowledged.
