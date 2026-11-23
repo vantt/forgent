@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Communication standard (tiêu chuẩn giao tiếp): one always-loaded standard for how every agent talks to the owner, and cheap answers in the question door"
-status: ready
+status: draft
 priority: P1
 blockedBy:
   - 261122-2307-heads-rotate-on-their-own
@@ -172,6 +172,10 @@ answers. The guard `fgos hook decision-question` (commit 3d3d32648) keeps its na
 the landing commit's message. Same-wave footprints (phases 1 and 2) are disjoint.
 
 ## Owner questions
+
+**Back to draft (lead:SUPERVISOR, 2026-11-23 08:20):** the owner runs this plan last (order of 2026-11-22 23:30). While
+component-authority-doors and orchestration-skeleton are active, a `ready` plan that overlaps them fails the plan
+contract check, so this plan stays `draft` until both are done; then set it `ready`. Scope is unchanged.
 
 None. Every point the discussion left open is decided above from its evidence; the T-signal list is written as
 provisional (discussion section 6, step 3) and refined by the coach later.

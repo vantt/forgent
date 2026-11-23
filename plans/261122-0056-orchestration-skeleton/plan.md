@@ -1,13 +1,13 @@
 ---
 contract: plan-v1
 title: "Orchestration skeleton: a code keeper that admits, starts and wakes players from domain scheduling records, one raise door for every entry, and one harness for plans"
-status: running
-lead: head:lead-forgent-261122-0056-orches-18a8f
+status: draft
 priority: P1
 blockedBy:
   - 261118-1341-s6a-execution-tier-rust
   - 261120-0625-work-data-model
   - 261121-2109-component-authority
+  - 261121-2110-component-authority-doors
 footprint:
   - plans/261122-0056-orchestration-skeleton/**
   - packages/supervision/contracts/scheduling-record.v1.json
@@ -262,6 +262,12 @@ runner and workflow specs). These paths are each plan's core files, so narrowing
 overlap. The plan turns `ready` once all three are done; reordering them is a priority call for the secretary.
 
 ## Owner questions
+
+**Paused for doors (owner 2026-11-23 08:15, recorded by lead:SUPERVISOR):** the owner ordered component-authority-doors
+to run before this plan. Both write the shared CLI routing files (`apps/fgos/src/routing.rs`, `cli_projector.rs`,
+`wiring/mod.rs`, `apps/fgos-gateway/src/gateway.rs`, `command-manifest.json`, `command-routes.json`). Its lead was
+stopped at 08:15 before any phase landed; `blockedBy` now names doors and the plan is `draft` (the contract check refuses a `ready` plan that overlaps an active one); set it `ready` when doors is done. Worktrees p01, p03,
+p10, p11 and p12 stay for the resumed lead; rebase them on main when this plan restarts.
 
 - `q-e2bpqz65c2` (answered by the owner directly in the planner session, 2026-11-22: "chốt cả hai như em khuyến
   nghị"): OS-D12 (one scheduling record per open step, keyed by `item`, `step`) and OS-D19 (handoff closes one record
