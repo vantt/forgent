@@ -23,3 +23,5 @@ A confined head can run the plan contract check and every script that shares the
 # Notes
 
 Owner order 2026-11-23, confirmed by the owner to the secretary at 07:28.
+
+Also carries p-mtqil2rpyy (Original id counted by the backlog checks; `check-backlog-reconciliation.mjs` is red on main today), folded in by owner approval 2026-11-23 07:4x: same planner and lead. Its reference worktrees and constraints are in that row.

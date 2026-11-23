@@ -18,3 +18,5 @@ The patch is landed on main through the normal route, and `doc-health.test.mjs` 
 # Notes
 
 Owner decision 2026-11-23 07:00, relayed by the sending session and confirmed by the owner to the secretary at 07:10.
+
+Folded into p-b5jixi4mov (same planner and lead), owner approval 2026-11-23 07:4x. Why: `scripts/check-backlog-reconciliation.mjs` is red on main today, because migrated items' Original ids are not counted (it reports `tsk-p7-shadow-binders` as reconciled but not a proposed item). Reference only, not to land as is: the worktree `forgent-worktrees/backlog-original-id` (commits 58d4899eb and ae83e60a5, both rejected: the second reads 0 proposed items and fails 5 doc-health tests) and `forgent-worktrees/patches/original-id-handling.patch`. Keep the independent line-scan cross-check and the loud missing-addon failure.
