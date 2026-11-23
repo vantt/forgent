@@ -20,3 +20,8 @@
 
 ## Pending
 - Backlog index line for `p-dgs2lsfudr` (blocked on grant activation).
+
+## Late events
+- `3285de98915d3d82` (same no-result unit) and `22cec02b40b3b63a` (lane freed; no admissible plan, leads at 3/3): handled.
+- `8f7fc120021ff594` (heads-stable asks the CHANGELOG land): CHANGELOG.md is outside my grant and no `lead:SUPERVISOR`
+  is live, so I asked the owner once, `q-q6peavqy7b` (CHANGELOG lines plus the `p-dgs2lsfudr` index row). Handled.
