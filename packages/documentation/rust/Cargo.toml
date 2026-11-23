@@ -22,3 +22,4 @@ pkm-core = { git = "https://github.com/vantt/pkm", tag = "v0.7.0", features = ["
 # The licence export the release copies are proven against; a dev-dependency, so the binary does not carry pkm-cli.
 pkm-cli = { git = "https://github.com/vantt/pkm", tag = "v0.7.0", default-features = false }
 tempfile = "3"
+sha2 = { workspace = true }

@@ -67,6 +67,9 @@ test('the staged legacy-node payload carries the YAML door, loads nothing but th
       'the staged YAML door imports the native door and no parser',
     );
     assert.ok(!listed.has('libexec/legacy-node/src/util/third-party/js-yaml.mjs'), 'no vendored YAML parser ships');
+    for (const file of ['third-party.json', 'LICENSE']) {
+      assert.ok(listed.has(`libexec/legacy-node/packages/documentation/third-party/pkm/${file}`), `pkm's ${file} ships with the release`);
+    }
     for (const dep of declared) {
       const rel = `libexec/legacy-node/${DEPENDENCY_DIR}/${dep}/package.json`;
       assert.ok(fs.existsSync(path.join(tempOut, rel)), `${dep} must be staged next to the legacy-node sources`);

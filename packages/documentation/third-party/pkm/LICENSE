@@ -1,0 +1,50 @@
+Copyright (c) 2026 Van Tran. All rights reserved.
+
+This repository (the libraries `pkm-core`, `pkm-mcp`, `pkm-cli`,
+`pkm-lifecycle`, the `pkm` program, the examples, the tools, and their
+documentation) is proprietary software. Except as granted below, no right to
+use, copy, modify, build, distribute, sublicense, or sell any part of it is
+granted.
+
+Grant to fgOS
+-------------
+
+The fgOS project (https://github.com/vantt/forgent), its maintainers, and the
+people who receive fgOS from them are granted a non-exclusive, worldwide,
+royalty-free, perpetual license to use, copy, modify, build, link, and
+distribute this software, in source or binary form, as part of fgOS or of a
+program built from fgOS, provided that:
+
+1. this notice is kept with every copy of the source and is shipped with every
+   binary release that contains this software, and
+2. this software is not sold or licensed on its own, separately from fgOS.
+
+Third-party components keep their own licenses. The Rust crates compiled into
+a build are listed, with their license texts, by the tooling of the release
+that ships them.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+Bản quyền (c) 2026 Van Tran. Giữ mọi quyền.
+
+Repo này (các thư viện `pkm-core`, `pkm-mcp`, `pkm-cli`, `pkm-lifecycle`,
+chương trình `pkm`, ví dụ, công cụ và tài liệu đi kèm) là phần mềm độc quyền.
+Ngoài quyền cấp dưới đây, không cấp quyền dùng, sao chép, sửa, dựng, phân
+phối, cấp phép lại hay bán bất kỳ phần nào.
+
+Quyền cấp cho fgOS: dự án fgOS (https://github.com/vantt/forgent), người duy
+trì và người nhận fgOS từ họ được dùng, sao chép, sửa, dựng, link và phân phối
+phần mềm này, dạng mã nguồn hay binary, như một phần của fgOS hay của chương
+trình dựng từ fgOS, không thu phí, không thời hạn, với hai điều kiện: giữ
+thông báo này trong mọi bản sao mã nguồn và mọi bản phát hành binary có chứa
+phần mềm này; không bán hay cấp phép riêng phần mềm này tách khỏi fgOS.
+
+Thành phần của bên thứ ba giữ giấy phép riêng. Bản tiếng Anh ở trên là bản
+có hiệu lực.
