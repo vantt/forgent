@@ -77,6 +77,7 @@ import { fileURLToPath } from 'node:url';
 import * as live from '../../scripts/lib/mailbox-live-cli.mjs';
 import { authRefusalAfterRun, removeRunDir } from '../../scripts/lib/codex-auth-guard.mjs';
 import { invokeHost } from '../../src/util/host-bin.mjs';
+import { installHookThroughDoctor } from '../../scripts/lib/mailbox-live-confined.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
@@ -226,7 +227,7 @@ function layOut(name, dry, built) {
 
 /** Wires `cli`'s hooks in `project` through the doctor fix, answered by the host of the project's activation. */
 function wireHooks(project, cli) {
-  invokeHost(['doctor', '--fix', '--only', cli === 'claude' ? 'dispatch-decide-hook-wired' : `${cli}-hook-wired`], { dir: project });
+  installHookThroughDoctor(project, cli);
 }
 
 /** The product installer's rows for the case's CLI, without the PreToolUse guards. */

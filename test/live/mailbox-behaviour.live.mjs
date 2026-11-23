@@ -67,7 +67,6 @@ import * as v7i from '../../scripts/lib/mailbox-behaviour-v7i.mjs';
 import * as v7j from '../../scripts/lib/mailbox-behaviour-v7j.mjs';
 import { runStub } from './mailbox-behaviour-stub.mjs';
 import { rolesCarrying, startRecorder, toolCallsIn } from '../../scripts/lib/mailbox-role-recorder.mjs';
-import { invokeHost } from '../../src/util/host-bin.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { ensureAddonForScript } from '../../scripts/lib/git-addon-stage.mjs';
 
@@ -1544,7 +1543,7 @@ async function fixtureRun(cli, { subagent = false, tag }) {
     layOut: (paths) => {
       writeProjectConfig(paths.ws, { mailbox: { enabled: true } });
       // The host of FGOS_HOST_BIN (this workspace has no activation yet) wires the extension, as `fgos doctor --fix` does.
-      invokeHost(['doctor', '--fix', '--only', `${cli}-hook-wired`], { dir: paths.ws });
+      confined.installHookThroughDoctor(paths.ws, cli);
       const shim = path.join(paths.ws, '.fgos', 'installation', 'bin', 'fgos');
       fs.mkdirSync(path.dirname(shim), { recursive: true });
       fs.writeFileSync(shim, CAPTURE_SHIM, { mode: 0o755 });

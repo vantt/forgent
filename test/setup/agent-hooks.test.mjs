@@ -126,6 +126,55 @@ test('the claude delete guard command passes a shell call without a mass-delete 
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
+test('with no shim present, the claude mailbox Stop command exits 0 and prints nothing', () => {
+  const repoRoot = mkTempDir('agent-hooks-guarded-');
+  writeMailboxOptIn(repoRoot, true);
+  installThroughHost(repoRoot, 'claude');
+  const settings = JSON.parse(fs.readFileSync(path.join(repoRoot, '.claude', 'settings.json'), 'utf8'));
+  const command = settings.hooks.Stop.flatMap((entry) => entry.hooks.map((hook) => hook.command)).find((c) => c.includes('mailbox'));
+  assert.ok(command, 'the opted-in project has a claude mailbox Stop command');
+  const res = spawnSync('/bin/sh', ['-c', command], { env: { ...process.env, CLAUDE_PROJECT_DIR: repoRoot }, input: '{}', encoding: 'utf8' });
+  assert.equal(res.status, 0);
+  assert.equal(res.stdout + res.stderr, '');
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('the codex hook command quotes a project path that contains a space and a quote', () => {
+  const base = mkTempDir('agent-hooks-quote-');
+  const repoRoot = path.join(base, "my proj'ect");
+  fs.mkdirSync(repoRoot, { recursive: true });
+  installThroughHost(repoRoot, 'codex');
+  const command = JSON.parse(fs.readFileSync(path.join(repoRoot, '.codex', 'hooks.json'), 'utf8')).hooks.PreToolUse[0].hooks[0].command;
+  const shim = projectShimPath(repoRoot);
+  assert.equal(command, `'${shim.replace(/'/g, "'\\''")}' hook dispatch-decide`);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('codex and agy hook commands run from a directory other than the project, even when the path is awkward or names a hook kind', () => {
+  const base = mkTempDir('agent-hooks-exec-');
+  const repoRoot = path.join(base, "my decision-question 'app");
+  fs.mkdirSync(repoRoot, { recursive: true });
+  installThroughHost(repoRoot, 'codex');
+  installThroughHost(repoRoot, 'agy');
+  const shim = projectShimPath(repoRoot);
+  fs.mkdirSync(path.dirname(shim), { recursive: true });
+  fs.writeFileSync(shim, '#!/bin/sh\ncat >/dev/null\nexit 0\n', { mode: 0o755 });
+
+  const codex = JSON.parse(fs.readFileSync(path.join(repoRoot, '.codex', 'hooks.json'), 'utf8')).hooks.PreToolUse;
+  assert.equal(codex.length, 3, 'every codex guard is present even though the path contains a kind name');
+  const agy = JSON.parse(fs.readFileSync(path.join(repoRoot, '.agents', 'hooks.json'), 'utf8'));
+  const commands = [
+    ...codex.map((e) => e.hooks[0].command),
+    agy['fgos-dispatch-guard'].PreToolUse[0].hooks[0].command,
+    agy['fgos-delete-guard'].PreToolUse[0].hooks[0].command,
+  ];
+  for (const command of commands) {
+    const res = spawnSync('sh', ['-c', command], { cwd: os.tmpdir(), input: '{}', encoding: 'utf8', timeout: 5000 });
+    assert.notEqual(res.status, 127, `${command} was not found from another directory`);
+  }
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
 // ---------------------------------------------------------------------------
 // Delete guard prefilter, run through each CLI's own command
 // ---------------------------------------------------------------------------
