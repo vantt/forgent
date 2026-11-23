@@ -150,3 +150,5 @@ owning plan (heads-stable phase 3) and hands it to that lead after phase 1 lands
 ## Outstanding questions
 
 None
+
+- **Gate restored (lead:SUPERVISOR, 2026-11-23 16:1x):** the land door runs `plan-contract-check.mjs {plans}` again (fe4e0bb22) on release edf91f57, which carries p01c. This line was landed through that gate as its proof.
