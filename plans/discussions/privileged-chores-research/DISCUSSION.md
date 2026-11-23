@@ -40,7 +40,7 @@ Năng lực được giới hạn bằng hàng rào quanh những thứ cần b�
 | N1 | Nhịp của supervisor: thức theo mức (trạng thái) thay vì theo cạnh (sự kiện) | đề xuất, chờ chủ | §6.1. Không trái PS-9 và OS-D8, vì sự kiện được khoá theo trạng thái nên còn lệch thì còn raise lại. |
 | N2 | Nhịp của Miu | phần lớn đã có | Miu đã có vòng `/loop` 15 phút (plan 0118 phase 10, phương án C). Còn phải kiểm danh sách Miu nhìn mỗi vòng. |
 | C1 | Hàng rào | rõ | Confinement chỉ cam kết "không ghi ra ngoài grant". `.fgos`, `.git` và main checkout chỉ đọc. Các cửa có sẵn đã tự bảo vệ: `worktree remove --delivered-to`, `git recover`, khoá main checkout, cấm `.fgos` trong grant. |
-| Q2 | Cửa nâng quyền nhận gì: chỉ verb `fgos`, hay mọi lệnh shell | **mở**, sẽ hỏi | Khuyến nghị: chỉ verb `fgos`, quyết bằng `decide` của gate door. Shell thô luôn đi hỏi chủ. |
+| Q2 | Cửa nâng quyền quản lý lệnh thế nào | **mở, hội đồng 23:20 khuyến nghị hướng lai** | Đề xuất 23:05: mọi lệnh, luật theo vai dạng dữ liệu (allow, ask, deny), mặc định ask. Bản cũ "chỉ fgos" bị chủ bác. |
 | Q3 | Làm sớm phần tick khoá theo trạng thái và cửa nâng quyền trước khi plan 0056 hết bị chặn, hay chờ | **mở**, sẽ hỏi | Plan 0056 đang draft và bị chặn bởi 4 plan. Chủ đang làm tay mỗi ngày. |
 | Q4 | Điều kiện cho supervisor manual nghỉ hưu chưa đạt mà đã tắt | **đã quyết PC-D4** (20:43): bật lại tạm | `docs/platform/supervision/spec.md:223`: supervisor head phải tự chạy trọn một plan. Chưa có bằng chứng điều này đã xảy ra. |
 | P2 | Lead xong hoặc rảnh mà không phát sự kiện | được N1 hấp thụ | `p-iatzcg2gee`, `p-4uqiyjwrtd`, `p-xuazywhh56`, `p-g6heszkdc7`, `p-xpeg4jshiu` trở thành các điều kiện lệch của tick. |
@@ -137,6 +137,71 @@ Chủ hỏi plan orchestration-skeleton có liên quan gì không. Shaper đọc
 4. Điều lệ vai trò ở spec, skill và grant.
 
 **Điểm cần planner kiểm:** "an `until` that passes raises exactly one event across repeated ticks" vẫn là kiểu báo một lần. Planner cần xác nhận rằng keeper tự tính lại record mỗi tick, để judgement bị bỏ lỡ không làm việc treo mãi.
+
+### 2026-11-23 23:05 — chủ bác "chỉ nhận lệnh fgos"; cách thế giới bật tắt lệnh theo vai
+
+Chủ hỏi: tư tưởng nào lại bỏ hết lệnh shell? Làm sao bật tắt lệnh cho từng loại agent mà không rối? Thế giới quản lý kiểu gì? "Anh tưởng sandbox nhốt thì có phá cũng chỉ phá trong sandbox, giờ cắt chân tay luôn thì còn làm gì được."
+
+Shaper nhận lỗi: đề xuất "chỉ nhận verb fgos" là quá tay, và đã trộn hai chuyện khác nhau.
+
+**(1) Trong sandbox, Miu và supervisor đã có toàn bộ shell.** Phá thì chỉ phá trong sandbox. Không có gì bị cắt, và điều đó giữ nguyên.
+
+**(2) Cửa nâng quyền chỉ dành cho việc có tác dụng ra ngoài sandbox,** như `.git` của main, `.fgos`, config, hay worktree. Với loại việc này, thế giới quản lý bằng luật theo vai, không cấm hẳn shell:
+- Codex `prefix_rule`: mỗi luật gồm một mẫu lệnh và một quyết định `allow`, `prompt` hoặc `forbidden`. Khi nhiều luật cùng khớp, luật chặt nhất thắng. Luật có ví dụ `match` và `not_match` được kiểm ngay lúc nạp, và `codex execpolicy check` cho biết một lệnh sẽ được quyết thế nào. Lệnh ghép được xét từng phần ([Codex rules](https://developers.openai.com/codex/rules)).
+- Claude Code: luật deny, ask, allow theo mẫu `Bash(prefix:*)`, xét theo thứ tự deny, rồi ask, rồi allow ([permissions](https://code.claude.com/docs/en/permissions)).
+- sudoers dùng nhóm người và alias lệnh. Kubernetes dùng Role, RoleBinding và `kubectl auth can-i`.
+
+**Hình dạng đề xuất mới:**
+- Một file luật duy nhất, dạng dữ liệu, gồm các dòng `vai × mẫu lệnh → allow | ask | deny`.
+- Vai kế thừa nhau: luật chung cho mọi head, rồi phần thêm cho supervisor, rồi phần thêm cho Miu.
+- Lệnh không khớp luật nào thì mặc định là `ask`, tức là thành câu hỏi gửi chủ, không bị cấm câm.
+- `deny` dành cho thứ cần bảo vệ (hàng rào, PC-D3).
+- Có lệnh `can-i` để tra, có test cho từng luật, và mọi lần gọi đều ghi log.
+- Bật hay tắt một lệnh cho một vai là sửa một dòng.
+
+Câu hỏi cũ "chỉ nhận lệnh fgos hay mọi lệnh" được thay bằng câu hỏi này.
+
+### 2026-11-23 23:20 — hội đồng ba góc nhìn và kiểm đếm
+
+Chủ (23:12): "sao lại đổi 180 rồi, có gì không ổn không, mở hội đồng thảo luận đi." Shaper nhận mình tự mâu thuẫn: lúc 20:30 đã bác "bảng dữ liệu" vì cho là vẫn liệt kê, đến 23:05 lại đề xuất một bảng khác. Shaper mở ba agent council, mỗi bên một góc nhìn: giả định, vòng phản hồi, ship và bảo trì. Ba bên chạy độc lập, chung một brief trung lập (dữ kiện và bốn phương án A, B, C, D), brief không ghi phương án shaper nghiêng về.
+
+**Kết quả: cả ba cùng một hướng.** "A hay B" là câu hỏi sai. Thực ra có hai lựa chọn riêng:
+1. Đơn vị quyền là gì: verb `fgos` tự bảo vệ, hay chuỗi shell?
+2. Quyết định ghi ở đâu: code viết tay, hay dữ liệu?
+
+Cả ba chọn **verb `fgos` làm đơn vị quyền, và dữ liệu làm nơi ghi quyết định.** Cụ thể:
+- Có một bộ chuyển tiếp argv `fgos`, không qua shell.
+- Có một bảng `vai × tiền tố verb fgos → allow | ask | deny`, vai kế thừa (head < supervisor < Miu), kèm `can-i`.
+- 28 nhánh viết tay và `SUCCESSOR_READ_VERBS` gộp về bảng đó.
+- Shell thô chạy ngoài sandbox không bị cấm, mà thành `ask` kèm đúng lệnh.
+- Shell trong sandbox giữ nguyên.
+- Khi gate door được xây, nó chuyển `ask` thành tự chạy nếu việc nằm trong khung đã duyệt.
+
+**Vì sao không chọn B (luật theo mẫu shell):**
+- Head chạy ngoài lồng có cùng user với `.git`, `.fgos` và release. Tiền tố lệnh không nói được lệnh sẽ tác động tới đâu: `-C`, `sh -c`, chuyển hướng output và biến môi trường đều đi vòng qua được.
+- Danh sách deny phải kể hết mọi cách gây hại, nên không bao giờ xong.
+- Bảng tự nới dần ra mỗi khi chủ chán trả lời lại cùng một câu hỏi.
+- Cùng loại lỗ hổng đã có ở `p-nqftk5hypy`.
+
+**Ba lỗ phải đóng trong cùng đợt:**
+1. Tự nâng quyền: các khoá grant và confinement phải là `deny` với mọi head, vì `config patch` có thể tự mở rộng grant.
+2. Verb chưa tự bảo vệ (`run` không có `--writes`, cổng land) giữ ở mức `ask`.
+3. Forwarder từ chối đối số đổi project root, cwd hoặc env.
+
+**Kiểm đếm (bằng chứng cả ba bên cùng đòi):** `fgos questions --all`, các câu Miu và supervisor hỏi chủ từ 2026-11-20 tới 23:20 ngày 2026-11-23. Có 21 câu:
+
+| Nhóm | Số câu | Ví dụ | Đã có verb `fgos` |
+|---|---|---|---|
+| Ghi config (pin planner, maxLeads, ngưỡng xoay vòng) | 6 | q-o3omqvtsuc, q-ptcieh72p6, q-p5p5q5jlvy | có, `config patch` hoặc `config set` |
+| `git recover` | 3 | q-wjecldhcmr, q-7t27x2qfk2, q-hlbqhlyrct | có |
+| Gỡ worktree hoặc land candidate cũ | 3 | q-luhbwwvlpc, q-dcbq73d2rr, q-ptcieh72p6 | có, `worktree remove --delivered-to` |
+| Activate release, probe account | 2 | q-dcbq73d2rr, q-rfxqncjrax | có. Activate phải là `deny` hoặc `ask` vì nó đổi bộ máy. |
+| Ghi file ngoài grant (backlog index, CHANGELOG) | 3 | q-nudu6zlusf, q-ec5bdhkwoz, q-q6peavqy7b | có `session write`; thiếu grant (`p-dw3h5wscns`) |
+| Chạy full `npm test` hoặc `cargo test` trên host | 3 | q-zcileomdpa, q-br5rlczzav, q-pcwf3slkfp | **không.** Đây không phải việc đặc quyền mà là sandbox không chạy được node hoặc cargo. Là bài toán khác: năng lực bên trong lồng. |
+| Git thô (unstage board log) | 1 | q-gelkp64lo4 | không |
+| Lựa chọn thật hoặc chuyển tin | 3 | q-yoxcjqa46z, q-7wfzidusod, q-4lmw3q6la7 | đúng là việc phải hỏi chủ |
+
+Phân bố: khoảng 14 trên 18 việc đặc quyền đã có verb `fgos`. Chỉ 1 là lệnh shell thô. Nhóm thiếu lớn còn lại là 3 lần chạy test trên host, và đó là lỗ năng lực *trong* sandbox, không phải lỗ quyền. Kết quả kiểm đếm ủng hộ hướng lai của hội đồng.
 
 ## 6. Thiết kế đã chốt {#design}
 
