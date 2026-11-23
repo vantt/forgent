@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Tiêu chuẩn giao tiếp: one shared communication standard for talking to the owner, reaction capture and cheap answers"
-status: draft
+status: withdrawn
 priority: P1
 base: 29a99b87b68160b259a268888c3d270ea3b7a1c9
 blockedBy:
@@ -75,6 +75,10 @@ source:
   - p-wb6rkwpjsg
 created: 2026-11-22
 ---
+
+> **Withdrawn (owner order 2026-11-23, via the secretary, recorded by head:supervisor-forgent):** older duplicate of
+> `261122-1950-owner-communication-standard`, which carries the same decisions OC-D1..D14 plus the friction layer and
+> skills-fill-default. Use that plan.
 
 # Tiêu chuẩn giao tiếp: one shared communication standard for talking to the owner
 
