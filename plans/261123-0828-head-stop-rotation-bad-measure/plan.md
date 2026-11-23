@@ -82,6 +82,10 @@ the worktree, `/proc` and `~/.local/state/fgos` are read-only to it, so it canno
 Parked on owner question `q-pcwf3slkfp` (supervisor, 2026-11-23 22:40 +07): no unconfined `lead:SUPERVISOR` session is
 live, so the full gate waits on the owner. The `plan-no-progress` event for this wait was closed; the live lead is left
 idle on purpose and resumes when the question is answered.
+Owner answer 2026-11-23 22:26 +07 (via Miu), written back by the supervisor: `q-pcwf3slkfp` "Fold into
+`q-vbh2knqpnu`'s suite run". The owner's unconfined host trip for heads-stable phase 11 runs `npm test` and
+`cargo test --workspace` once on main and puts the result in this plan's `reports/` too. No code change is allowed;
+a red this plan caused is the lead's to fix through a plan note. Phase 1 closes when that result is in `reports/`.
 
 Phase 1 evidence so far:
 - Criterion 2 is green: `cargo test -p fgos-run-supervisor --test head_request a_rotation_frame_preserves_decimal_exponent_and_integer_numbers_for_the_route`
