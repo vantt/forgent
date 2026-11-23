@@ -139,9 +139,9 @@ the grants, verb by verb.
 | 5 | [A live head's requests run the active release](phase-05-release-pickup.md) | 2, 6 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/run-supervisor/spec.md | 3 | done |
 | 6 | [A rotation whose executor died is resolved](phase-06-orphan-rotation.md) | 2 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/session-host/contracts/rotation-files.v1.json, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/**, docs/platform/session-host/spec.md | 2 | done |
 | 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs, packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs | 2 | done |
-| 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | running |
+| 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | done |
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | done |
-| 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | running |
+| 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | done |
 | 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md, test/session-host/head-start.test.mjs | 5 | ready |
 | 12 | [Rotation reliability](phase-12-rotation-reliability.md) | 6 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, docs/platform/session-host/spec.md, apps/fgos/src/wiring/session_rotation_hook.rs | 4 | done |
 | 13 | [Heads may write the backlog index file](phase-13-backlog-index-grant.md) | 2 | src/session-host/head-grants.mjs, test/session-host/head-grants.test.mjs | 4 | done |
@@ -171,6 +171,24 @@ writer, phase 11.
   its item file) on the first wake after the release carrying `5ebc25616` is activated. At 19:45 `fgos session write
   plans/backlog.md` was still refused `path-not-granted`, so the row is pending activation. Scope: this one row and item
   file; no grant or release change outside phase 13.
+
+### Phases 8 and 10 are `done` (2026-11-23 21:35, head:lead-forgent-261122-0118-heads-b52f9)
+
+- The window 2026-11-22 14:06Z to 2026-11-23 14:06Z (21:06 to 21:06 +07) is over. Reports:
+  `reports/question-relay.md` (phase 8) and `reports/secretary-wake.md` (phase 10).
+- Ask to seen: median 15.5 and maximum 203.1 minutes over 19 questions, against 76.4 and 863.6 minutes over 11 in the
+  24 hours before.
+- The tick's bound, "at most one tick", was **not** met in Miu gens 32 and 34 to 37 (11-22 15:29Z to 11-23 07:30Z):
+  no tick fired for hours, and those gaps hold the four longest waits. From gen 39 on, the tick held in every
+  generation. Also, 15 of the 19 answered questions have no relay record. The cause of both needs Miu's transcripts,
+  which this lead cannot read. They are raised to the supervisor for a backlog row (event `8d135e51e0068a99`), and row
+  `p-vquz26ibnn (a)` is therefore closed only in part; phase 11's folded-rows check says so.
+- `test/skills/fgos-mirror.test.mjs` cannot run in a confined sandbox (`EROFS` in the git floor probe and the cargo
+  build, in this lead's sandbox and in a unit's). The skill changes passed the land gates when they landed
+  (`827bbb7e1`, `2fa775706`), and the test runs again in phase 11's `npm test` gate on main.
+- `fgos worktree remove` of `-p13` (owner-assigned to this lead) fails in this lead's sandbox before any check:
+  `setting aside .agents/skills/ak-advise/SKILL.md: Read-only file system`. The checkout is also dirty, and the door
+  has no force flag. It stays for an unconfined hand.
 
 ### Phase 13 is `done` (2026-11-23 19:35, head:lead-forgent-261122-0118-heads-b52f9)
 
