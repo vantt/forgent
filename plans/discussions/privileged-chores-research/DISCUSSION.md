@@ -49,6 +49,7 @@ Năng lực được giới hạn bằng hàng rào quanh những thứ cần b�
 | C2 | Xem lại cỡ lồng của Miu và supervisor theo nguyên tắc riêng-nới-lồng, chung-qua-ô-cửa | **đề xuất 23:35, chờ chủ** | Xem §5 23:28. |
 | M1 | Mọi head gửi thư được cho Miu và supervisor; thư đánh thức người nhận đang rảnh | **đề xuất 23:40** | §5 23:40. Lead và planner hiện có `mailbox: false`. |
 | H1 | Kênh xin trợ giúp: mọi head raise lên supervisor; tự chuyển sang Miu khi không có supervisor | **đã chốt PC-D5** | §5 23:50 |
+| R1 | Bản sửa head chỉ xong khi đã vào release đang chạy và có probe sống chứng minh; ai đưa release lên | **mở 23:45** | §5 23:45. `e900a7e10` chưa vào release `edf91f57`. |
 | P5 | Gom 28 verb vào một bộ chuyển tiếp | theo Q2 | Theo L10 và RUL104, phải làm cùng đợt hoặc mở item riêng có tên. |
 
 ## 4. Quyết định đã chốt
@@ -255,6 +256,18 @@ Chủ: các head gần như không có kênh xin trợ giúp. Supervisor quản 
 - **Một kênh xin trợ giúp cho mọi head, gửi tới vai "supervisor".** Đó là `supervisor raise` (loại `coordination-help`), mở cho mọi persona. Nó vào hàng đợi, đánh thức supervisor, và không bị lọt như thư. Mailbox chỉ dùng để trao đổi qua lại, không dùng để xin cứu.
 - **Head không nói chuyện thẳng với Miu trong thời bình.** Như vậy Miu giữ đúng vai PC-D1: ở cạnh chủ và giảm tải cho chủ. Việc cần chủ quyết đã có sẵn kênh câu hỏi (question store), và Miu chuyển những câu đó lên chủ.
 - **Tự chuyển sang Miu khi không có supervisor.** Head không phải tự chọn người nhận. Nếu một yêu cầu trợ giúp nằm chưa xử lý quá ngưỡng, hoặc watcher báo `supervisor-wake-failed` hay không có supervisor sống, thì vòng soát của Miu thấy và Miu khôi phục bộ máy (PC-D1). Đây đúng là "thời chiến" mà chủ mô tả.
+
+### 2026-11-23 23:45 — supervisor có ghi được backlog không; bản sửa chưa vào release
+
+Chủ hỏi supervisor có được ghi backlog không. Shaper kiểm:
+- **Source:** commit `e900a7e10` (2026-11-23 17:46) thêm `plans/backlog.md` vào grant của secretary và supervisor, theo `p-dw3h5wscns` và quyết định `q-nudu6zlusf`.
+- **Release đang chạy:** `~/.local/state/fgos/releases/sha256:edf91f57…/libexec/legacy-node/src/session-host/head-grants.mjs`, activate lúc 23:11, dòng 61 và 73 chỉ có `['plans', 'plans/backlog/*']`. Bản sửa **chưa vào release**, nên `session write plans/backlog.md` vẫn bị từ chối. `q-q6peavqy7b` (21:23) vẫn phải nhờ chủ thêm dòng index.
+
+**Ý nghĩa với bài toán.** Head chạy bằng code của release đã activate, không chạy bằng source. Bản sửa nào chưa build, stage và activate thì head chưa nhận được. Supervisor manual chạy ngoài lồng nên che khoảng trễ này đi. Đây là một phần lý do khiến chủ thấy "tắt supervisor manual là chết hết, như chưa có cải tiến nào". Shaper chưa kiểm các bản sửa head khác trong ba ngày qua đã vào release hay chưa.
+
+**Chủ (23:47):** chủ tự build và activate release bằng tay. **Hiện không có phiên supervisor manual nào đang chạy.** PC-D4 đã được chốt nhưng chưa thực hiện.
+
+**Điểm mở R1:** bản sửa head chỉ được tính là xong khi đã vào release đang chạy và có probe sống chứng minh (dùng lại probe của 0118 phase 11). Ai đưa release lên khi source của head đổi, để chủ không phải làm tay mỗi lần? Activate là thao tác đổi bộ máy. Theo hướng ô cửa, mặc định nó là `ask`, và việc này cần chủ quyết.
 
 ## 6. Thiết kế đã chốt {#design}
 
