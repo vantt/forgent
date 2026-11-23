@@ -123,3 +123,36 @@ Lead `head:lead-forgent-261123-0726-contra-e554b`, `FGOS_CONFINED=1`, no FGOS_* 
    supervisor.
 2. The gate restore: `node scripts/plan-contract-check.mjs {plans}` is still absent from `land.gates`; it belongs to
    heads-stable phase 3.
+
+## Gate hand-off and remaining wait (12:55)
+
+- Gate restore: on main as 0dd71aa83. `land.gates` runs `node scripts/plan-contract-check.mjs {plans}` when a landed
+  path matches `plans/*/plan.md` or `plans/*/phase-*.md`. Step 3 is done.
+- Full trunk `npm test` (acceptance criterion 5): still no verdict. No run was in progress at 12:55 and the newest log
+  is `main-npm-test-637334ca6.log` (11:10, OOM-killed). The run is with lead:SUPERVISOR and needs host memory headroom.
+  Phase 2 closes when that run is green or every red in it is classified.
+
+## Restored gate refused every plan land; fix branch ready (13:10)
+
+- After 0dd71aa83, the gate `node scripts/plan-contract-check.mjs {plans}` failed five plan lands across four plans
+  with `git-addon-unavailable: addon not shipped on this channel` (logs `.fgos/runtime/land/land-*-1.log`, 12:5x).
+- Cause, reproduced from this head: the land door runs gates with the activated release's environment. With the
+  release's `FGOS_ACTIVE_MANIFEST_PATH` set, `ensureAddonForScript` returned early (a check that predates phase 1),
+  and the native door refused that release because its `legacyNode.root` is not this checkout's payload. With only
+  `FGOS_HOST_BIN` set, the check printed `ok`.
+- Fix, branch `contract-check-in-confined-heads/p01c` (worktree
+  `/home/vantt/projects/forgent-worktrees/261123-0726-contract-check-in-confined-heads-p01c`, brief
+  `briefs/phase-01-fix-5-inherited-manifest.txt`): `ensureAddonForScript` skips only when the inherited manifest's
+  `legacyNode.root`, resolved against `FGOS_ACTIVE_RELEASE_PATH`, is this checkout. Otherwise it goes through the
+  reuse-or-build door, which re-points the env trio at the checkout's staged addon. The owning test gained a foreign-release
+  case (reuse, no cargo) and a serving-manifest case (left untouched). Reviewed by the lead.
+- lead:SUPERVISOR held the gate again (6d0f6b92c) meanwhile.
+- Land attempts: c-19449-1795413408277 failed because rustc was OOM-killed in the regenerate step (12:57).
+  c-20406-1795413885096 failed because the `native-addon` test file process was OOM-killed at 13:08:02 (no subtest
+  failed; the other 163 gate tests passed). Host memory: about 8 GB available of 30 GB.
+
+## Still open for phase 2
+
+1. Land p01c when the host has memory headroom, then lift the gate hold (lead:SUPERVISOR's config, not this plan's
+   footprint) and confirm the next plan land passes the gate.
+2. One complete trunk `npm test` verdict (lead:SUPERVISOR; needs fewer concurrent leads).
