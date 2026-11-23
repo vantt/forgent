@@ -15,6 +15,8 @@ The lead of plan `261122-0118-heads-stable-and-able` waits for 21:06 on 2026-11-
 
 Owner direction 2026-11-23: a lead that has nothing to do until a time must not stay live holding memory. It writes one durable sleep record (who, plan, due time, what to do on waking), then its session ends. The watcher reads the records on each tick and, when one is due, wakes the supervisor, which starts a fresh lead that continues from the plan files and the record; the record is then marked woken. This reuses the existing watcher tick and the lead start door; the only new thing is the record, and prior art shows no timed-wake record before this (the only park today is an item awaiting a human answer). One owning test drives a sleep record past its due time and shows the wake and the fresh lead; a record not yet due wakes nobody. The lead of plan \`261122-0118-heads-stable-and-able\` is the first user, for its 21:06 wait.
 
+Owner addition 2026-11-23: sleeping is only safe if the lead's workspace is safe. Before the session ends, the sleep record names the lead's workspace (its worktrees, branches, unlanded changes and held locks or tickets) and the system keeps it intact while the lead sleeps: a worktree removal, a disk cleanup or a rotation must refuse or skip a worktree named by a live sleep record (p-6sd4fslxv7 removes landed worktrees, so it reads this record). On waking, the fresh lead is handed that same workspace and the record says so, so it neither starts from a clean checkout nor loses work. One owning test sleeps a lead with an unlanded change, runs the cleanup, wakes the lead and shows the change is still there and is the lead's again.
+
 Until it lands, the secretary raises \`coordination-help\` for that 21:06 wait at that time.
 
 # Notes
