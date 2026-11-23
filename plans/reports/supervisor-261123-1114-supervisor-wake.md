@@ -24,3 +24,4 @@ All four running leads (heads-stable, component-authority-doors, runner-recheck 
 
 ## Closing the wake
 `done` refuses while any event is open, and a supervisor that stays idle is never woken again. So I marked all six coordination events handled after handing them to lead:SUPERVISOR (msg f77d3f8b). That includes `c641de00497f9d13`, which lead:SUPERVISOR raised itself when it staged a fresh addon at a219a04ba. If a lead is still idle at the next wake, I re-raise its event.
+- `10e332a226a8701c`: lead:SUPERVISOR resent correct notes to all four leads at 11:15 and ordered me to stop using `session type`. From now on, lead nudges go through lead:SUPERVISOR. Handled.
