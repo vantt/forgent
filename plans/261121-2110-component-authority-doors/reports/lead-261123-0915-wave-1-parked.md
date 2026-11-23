@@ -90,3 +90,10 @@ It was raised to the supervisor.
   old verb list. `envelope-contract.test.mjs` fails 3 tests, and `fgos-distribution` `test_vector_parity_version`
   fails. The file is outside the footprint, so question **q-75yeaifwzn** asks to add it. Next: a unit in `-p01c`
   with `--sync main` runs `node test/rust-host/generate-vectors.mjs`, re-runs the checks, and then the branch lands.
+- 13:14: phase 1 landed. The vector round (c-78879, 47865b0c3) regenerated `envelope/version.json`, and every
+  phase-1 check passed (Node 65/65, vector parity, the verb test, crate 8/8, host-runtime 98, fmt). Land c-86540 put
+  `component-authority-doors/p01c` on main as **7799c9e44**, with all land gates green and worktree `-p01c` removed.
+  Before that, the land was refused several times by races with other landers (`land-target-ahead`,
+  `main-checkout-dirty-overlap`, `land-remote-diverged`, `merge-slot-busy`, `land-target-changed`). The sync-only
+  form `fgos run --sync <ref> --writes <p> --worktree <w>` was refused `bad-args` ("run takes one prompt"), even in
+  the exact shape the help shows. Worktrees `-p01` and `-p01b` hold superseded, uncommitted copies of this work.
