@@ -112,15 +112,16 @@ pub fn index_status(paths: &LocatePaths, wait: Option<Duration>) -> IndexStatus 
         None => s.state(),
     };
     s.close();
+    let state = index_state(&st);
     IndexStatus {
-        state: index_state(&st).kind,
+        state: state.kind,
         worker_running: st.worker_running,
         indexed: st.indexed,
         pending: st.pending,
         total: st.total,
         failed: st.failed,
         eta_s: st.eta_s,
-        action: st.action,
+        action: state.action,
     }
 }
 
@@ -269,14 +270,16 @@ impl Locator for PkmLocator {
             explain: true,
         };
         let reply = self.session.locate(&request).map_err(LocateError::Failed)?;
-        let state = self.state();
+        let st = self.session.search_state();
+        let state = index_state(&st);
         if let Some(error) = reply.get("error").and_then(Value::as_str) {
             if error == NOT_READY {
                 let kind = reply["state"].as_str().map_or(state.kind, kind_of_name);
-                let action = reply["action"]
-                    .as_str()
-                    .map(str::to_owned)
-                    .unwrap_or(state.action);
+                let action = action_for(
+                    kind,
+                    st.worker_running,
+                    reply["action"].as_str().unwrap_or(&st.action),
+                );
                 return Ok(Answer {
                     partial: true,
                     state: kind,
@@ -320,7 +323,42 @@ fn index_state(s: &search::SearchState) -> IndexState {
     };
     IndexState {
         kind,
-        action: s.action.clone(),
+        action: action_for(kind, s.worker_running, &s.action),
+    }
+}
+
+/// What a person does about an index state, in fgOS's own verbs: pkm's sentences name pkm commands, which an fgOS
+/// user does not have. pkm's words survive only as the reason a broken index gives.
+fn action_for(kind: IndexKind, worker_running: bool, pkm_action: &str) -> String {
+    match kind {
+        IndexKind::Ready => String::new(),
+        IndexKind::Starting | IndexKind::Indexing if !worker_running => {
+            "no index worker is running; `fgos doc index status --wait 900` starts one and waits for the index".to_owned()
+        }
+        IndexKind::Starting => {
+            "the index worker is reading the documents for the first time; `fgos doc index status --wait 900` waits for it"
+                .to_owned()
+        }
+        IndexKind::Indexing => {
+            "answers use text only while the index worker computes meaning vectors; `fgos doc index status --wait 900` \
+             waits for it"
+                .to_owned()
+        }
+        IndexKind::ModelMissing => {
+            "no usable embedding model, so answers use text only; `fgos doctor --fix` fetches it".to_owned()
+        }
+        IndexKind::Broken => {
+            let reason: Vec<&str> = pkm_action
+                .split(". ")
+                .map(|s| s.trim().trim_end_matches('.'))
+                .filter(|s| !s.is_empty() && !s.contains("`pkm"))
+                .collect();
+            format!(
+                "the locate index cannot run ({}); `fgos doc index reset` clears the worker's crash history once the \
+                 cause is fixed",
+                if reason.is_empty() { "no reason given".to_owned() } else { reason.join("; ") }
+            )
+        }
     }
 }
 
@@ -435,5 +473,34 @@ fn group(g: &Value) -> Group {
             .map(|n| n as usize)
             .collect(),
         home: g["home"].as_str().map(home),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn every_index_state_tells_the_person_an_fgos_verb_and_never_a_pkm_command() {
+        let pkm_words =
+            "Cannot read the search index (disk full). Run `pkm VAULT doctor` to see why.";
+        for kind in [
+            IndexKind::Starting,
+            IndexKind::Indexing,
+            IndexKind::ModelMissing,
+            IndexKind::Broken,
+        ] {
+            for running in [false, true] {
+                let action = action_for(kind, running, pkm_words);
+                assert!(!action.contains("`pkm"), "{kind:?}: {action}");
+                assert!(action.contains("`fgos "), "{kind:?}: {action}");
+            }
+        }
+        assert!(
+            action_for(IndexKind::Starting, false, "").starts_with("no index worker is running")
+        );
+        assert!(action_for(IndexKind::Broken, false, pkm_words)
+            .contains("(Cannot read the search index (disk full))"));
+        assert_eq!(action_for(IndexKind::Ready, true, pkm_words), "");
     }
 }

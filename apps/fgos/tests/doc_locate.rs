@@ -214,6 +214,13 @@ fn locate_answers_partial_starts_the_worker_finds_text_candidates_and_logs_every
         scene.data(&["doc", "index", "stop", "--json"]),
         serde_json::json!({ "stopped": false })
     );
+    // A wait has nothing to wait for without a worker, so it starts one; a bare status above started none.
+    let waited = scene.data(&["doc", "index", "status", "--wait", "3", "--json"]);
+    assert_eq!(waited["workerRunning"], true, "{waited}");
+    assert_eq!(
+        scene.data(&["doc", "index", "stop", "--json"]),
+        serde_json::json!({ "stopped": true })
+    );
     let reset = scene.data(&["doc", "index", "reset", "--json"]);
     assert_eq!(reset["result"], "reset", "{reset}");
 }

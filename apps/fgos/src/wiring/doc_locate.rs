@@ -550,8 +550,30 @@ fn answer(
             })
         }
         DocVerb::IndexStatus { wait, json } => {
-            let status =
-                pkm::index_status(&locate_paths(&request.root), wait.map(Duration::from_secs));
+            let paths = locate_paths(&request.root);
+            // Waiting only makes sense while a worker embeds, so a wait starts one; a bare status reads and writes
+            // nothing.
+            if wait.is_some() && paths.docs_root.is_dir() {
+                profile::write_if_changed(&paths.docs_root, &paths.profile).map_err(|e| {
+                    CategorisedRefusal::unexpected(format!("cannot write the locate profile: {e}"))
+                })?;
+                let launcher = ProcessLauncher {
+                    root: &request.root,
+                    paths: &paths,
+                };
+                let started = ensure_worker(&launcher).map_err(|e| {
+                    CategorisedRefusal::new(
+                        "precondition",
+                        format!("the index worker did not start: {e} [worker-not-started]"),
+                    )
+                })?;
+                // A session opened before the new worker holds its lock reads a missing index as broken.
+                let deadline = Instant::now() + WORKER_LOCK_WAIT;
+                while started && !launcher.running() && Instant::now() < deadline {
+                    std::thread::sleep(Duration::from_millis(100));
+                }
+            }
+            let status = pkm::index_status(&paths, wait.map(Duration::from_secs));
             let text = format!(
                 "index {}{}: {} of {} chunks embedded, {} pending, {} failed{}\n  {}\n",
                 kind_name(status.state),
