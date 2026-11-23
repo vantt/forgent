@@ -306,6 +306,26 @@ Chủ hỏi supervisor có được ghi backlog không. Shaper kiểm:
 
 **Điểm mở R1:** bản sửa head chỉ được tính là xong khi đã vào release đang chạy và có probe sống chứng minh (dùng lại probe của 0118 phase 11). Ai đưa release lên khi source của head đổi, để chủ không phải làm tay mỗi lần? Activate là thao tác đổi bộ máy. Theo hướng ô cửa, mặc định nó là `ask`, và việc này cần chủ quyết.
 
+### 2026-11-24 00:05 — land và release với các domain khác
+
+Chủ nhắc: cái bẫy này từng xảy ra khi bàn orchestration-skeleton. Chủ hỏi land và release nghĩa là gì với các domain khác.
+
+**Định nghĩa domain-free, khớp L9 (run ≠ merge ≠ durable):**
+- **Land:** kết quả của một việc được ghi vào nguồn sự thật chung của project (main), qua một cửa có kiểm. Đây là cơ chế chung của fgOS. Mọi domain đều có sản phẩm là file: plan, tài liệu, bản copy, hồ sơ quyết định.
+- **Release:** kết quả đã land bắt đầu *có hiệu lực ở nơi người dùng hoặc hệ thống ngoài nhìn thấy*. Release thuộc riêng từng domain, và chỉ domain đó biết release là gì.
+
+**Mỗi domain hiểu release như sau:**
+- Coding (repo forgent): `fgctl upgrade` để head dùng code mới. Release đảo ngược được qua `previousArtifactDigest`.
+- Marketing: `domains/marketing/workflows/content-publish.yaml` coi publish là release. Gate `consent-before-publish` bắt người duyệt đúng bản copy đó. Thư đã gửi hay bài đã đăng thì **không đảo ngược được**.
+- Business workflow (mission #2): gửi hoá đơn, cập nhật CRM. Phần lớn không đảo ngược được.
+- Council: land là ghi hồ sơ quyết định. Release là áp dụng quyết định đó.
+
+**Hệ quả cho PC-D9 và PC-D10:**
+- Công thức release mà project khai báo phải nói rõ release đó **có đảo ngược được không**.
+- Đảo ngược được, có probe và có rollback (như coding): supervisor tự làm rồi báo cáo.
+- Không đảo ngược được (như marketing hay business): release luôn qua bước duyệt của người, đúng như `consent-before-publish` của marketing.
+- Phần chung trong skill supervisor chỉ biết "đảo ngược được hay không". Nó không biết `fgctl`, `npm` hay `cargo`.
+
 ## 6. Thiết kế đã chốt {#design}
 
 **Vai trò (PC-D1, PC-D2, PC-D5).**
@@ -402,7 +422,7 @@ Cả năm task nằm trong `src/session-host/`, skill và spec của nó. T3 ch�
 - **Verify:** `node --test test/session-host/head-grants.test.mjs`, cộng probe sống gửi thư từ một lead.
 
 ### T6 — Supervisor release theo quy trình {#task-release}
-- **Mục tiêu:** làm theo PC-D9 và PC-D10. Skill supervisor chỉ mang phần chung: điều kiện, áp dụng, probe, rollback, báo cáo. Công thức là dữ liệu của project, chẳng hạn một khoá config hoặc doctrine của domain, không phải câu chữ trong skill. Công thức của forgent ghi ở phía project. Thêm một nhánh có chính sách riêng trong ô cửa, gồm:
+- **Mục tiêu:** làm theo PC-D9 và PC-D10. Công thức release phải khai báo nó có đảo ngược được hay không. Release đảo ngược được thì supervisor tự làm rồi báo cáo. Release không đảo ngược được thì luôn chờ người duyệt (§5 00:05). Skill supervisor chỉ mang phần chung: điều kiện, áp dụng, probe, rollback, báo cáo. Công thức là dữ liệu của project, chẳng hạn một khoá config hoặc doctrine của domain, không phải câu chữ trong skill. Công thức của forgent ghi ở phía project. Thêm một nhánh có chính sách riêng trong ô cửa, gồm:
   - kiểm điều kiện trước khi release: main có bản sửa head mới đã land, full test xanh, không lead nào đang land;
   - chạy `fgctl upgrade`;
   - chạy probe sống;
