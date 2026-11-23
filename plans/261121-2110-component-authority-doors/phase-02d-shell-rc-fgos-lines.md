@@ -14,6 +14,9 @@ src/setup/shell-rc.mjs, scripts/fgos-session-start-hook.mjs, test/setup/shell-rc
 - A caller outside this phase's files: stop, write Status BLOCKED with the file named, and change nothing. Do not widen.
 - Re-read the door row first. A running plan may already have removed some debt; a row with no `debt` left needs only the check below.
 
+## Execution
+Every writing unit runs with `--provider claude` (owner order, D6 step 0). If claude is unavailable the unit parks and reports. It never falls back to another provider.
+
 ## Steps
 1. Remove the import and the profile line from the hook; it still never throws and always exits 0.
 2. Move any `test/setup/shell-rc.test.mjs` case that `rc_lines.rs`'s tests do not cover into those tests, then delete the Node file and its test.

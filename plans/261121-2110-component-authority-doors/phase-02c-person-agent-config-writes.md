@@ -13,6 +13,9 @@ src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.j
 - A caller outside this phase's files: stop, write Status BLOCKED with the file named, and change nothing. Do not widen.
 - Re-read the door row first. A running plan may already have removed some debt; a row with no `debt` left needs only the check below.
 
+## Execution
+Every writing unit runs with `--provider claude` (owner order, D6 step 0). If claude is unavailable the unit parks and reports. It never falls back to another provider.
+
 ## Steps
 1. Reword the wire-agents description in `src/cli/command-registry.mjs` so it names no setting the verb does not write; the Rust plan in `agent_config.rs` is the reference.
 2. Regenerate or edit the manifest entry so the two agree; run `node --test test/cli/fgos-manifest.test.mjs`.

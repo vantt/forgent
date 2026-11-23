@@ -183,7 +183,10 @@ documentation-writing skills must call these doors. The plan contract requires a
 decision, function or module maps to a model row or to a `declare`, and a plan that overlaps something existing
 names the survivor. `scripts/plan-contract-check.mjs` and the validating reviewer reject a plan without one. Every
 door `debt` entry is gone, and the old copy of each is deleted in the same change, with its last SHA recorded
-(CA-D2). The door guard matches by primitive and by canonical name plus aliases, never by bare words (decision
+(CA-D2). The one exception is named debt (owner decision D6, 2026-11-23): the row `doctor-readiness-registry`, and
+`installation-shim-location` while backlog `p-rypvkc3kai` is open, keep their `debt` with `retiredBy` naming the
+Workflow/Work port (S6b/S7 of `261114-2051-rust-verb-migration-program`) or that backlog item, and the door guard
+allows debt on no other row. The door guard matches by primitive and by canonical name plus aliases, never by bare words (decision
 0031), and counts matches inside allowed files. A new-named copy of an owned primitive turns `npm test` red.
 The structural model is YAML, which people can read and annotate like the config standard. Only the Rust crate
 `packages/component-authority/rust` reads and writes it, through `fgos-yaml-doc`. The renderer is the crate verb
@@ -245,8 +248,10 @@ and deleted (owner correction 2026-11-23 14:15).
    fails. An overlap line without `survivor:` fails. `running`, `done` and `withdrawn` plans are not checked.
    The planning, implement, validating and shaping skills, and `plan-contract.md`, require `locate` before writing
    and `declare` when creating. `npm run build:skills` leaves no diff.
-4. No door row in `packages/component-authority/model/doors/` has a `debt` field, and the schema no longer allows
-   one. Each retirement commit names the deleted path and its last SHA. Check: `node --test test/architecture.test.mjs`.
+4. No door row in `packages/component-authority/model/doors/` has a `debt` field except the named debt of D6:
+   `doctor-readiness-registry`, and `installation-shim-location` while `p-rypvkc3kai` is open, each with a
+   `retiredBy`. The guard fails `debt` on any other row, and fails a named-debt row without `retiredBy`. Each
+   retirement commit names the deleted path and its last SHA. Check: `node --test test/architecture.test.mjs`.
 5. The door guard matches by `primitives` and `names` (canonical plus aliases), and records an allowed `count` per
    file. A synthetic `rename`+`fsync` copy under a new name outside `durable-file` fails `node --test
    test/architecture.test.mjs`, and so does one extra match inside an allowed file. A comment does not fail it.
@@ -285,7 +290,8 @@ and deleted (owner correction 2026-11-23 14:15).
 | 2e | [Retire the dead Node agy sub-home finder](phase-02e-execution-doctor-judgments.md) | 1b | src/setup/agy-permissions.mjs, test/setup/agy-permissions.test.mjs, packages/execution/rust/src/checks.rs, test/architecture.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/execution-doctor-judgments.yaml | 3 | draft |
 | 2f | [Close the Node doctor body map](phase-02f-doctor-readiness-registry.md) | 1b | packages/component-authority/model/doors/doctor-readiness-registry.yaml | 3 | draft |
 | 2g | [Close the herdr driver's own shim path](phase-02g-installation-shim-location.md) | 1b | packages/component-authority/model/doors/installation-shim-location.yaml | 3 | draft |
-| 3a | [Retire the JS write-scope port](phase-03a-footprint-write-scope-overlap-rule.md) | 1b | src/runner/dispatch/write-scope.mjs, src/runner/dispatch/config-twin.mjs, src/runner/dispatch/evidence-attribution.mjs, src/runner/dispatch/settlement.mjs, src/runner/execution/unit.mjs, src/session-host/head-request.mjs, src/workflow/definition.mjs, test/runner/write-scope.test.mjs, test/git/write-scope-parity.test.mjs, test/state/domain-registry-compiled.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/footprint-write-scope-overlap-rule.yaml | 7 | draft |
+| 3a | [Move the live write-scope callers onto the Rust rule](phase-03a-footprint-write-scope-overlap-rule.md) | 1b | src/session-host/head-request.mjs, src/workflow/definition.mjs | 3 | draft |
+| 3a2 | [Delete the JS write-scope port](phase-03a2-delete-write-scope-port.md) | 3a | src/runner/dispatch/write-scope.mjs, test/runner/write-scope.test.mjs, test/git/write-scope-parity.test.mjs, test/state/domain-registry-compiled.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/footprint-write-scope-overlap-rule.yaml | 7 | draft |
 | 3b | [Close the Node tool-provider twin](phase-03b-tool-lookup-by-capability.md) | 1b | packages/component-authority/model/doors/tool-lookup-by-capability.yaml | 3 | draft |
 | 3c | [Retire the Node executor-fact twins](phase-03c-derive-executor-facts.md) | 1b | src/runner/capability-config.mjs, test/runner/capability-config.test.mjs, src/runner/agent-listing.mjs, test/runner/agent-listing.test.mjs, scripts/agents-vectors.mjs, test/helpers/agents-vectors.helper.mjs, test/helpers/executor-model-vectors.helper.mjs, test/setup/packaged-definitions.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/derive-executor-facts.yaml | 8 | draft |
 | 3d | [Close the Node dispatch decider twin](phase-03d-decide-a-dispatch.md) | 1b | packages/component-authority/model/doors/decide-a-dispatch.yaml | 3 | draft |
@@ -296,7 +302,7 @@ and deleted (owner correction 2026-11-23 14:15).
 | 7 | [Retire the Rust argument-parser, run-dirs and packaging copies](phase-07-rust-parse-rundirs-packaging.md) | 5 | packages/holder-lock/rust/src/route.rs, packages/holder-lock/rust/Cargo.toml, packages/run-supervisor/rust/src/route.rs, packages/run-supervisor/rust/src/adopt.rs, packages/run-supervisor/rust/src/supervise.rs, packages/run-supervisor/rust/Cargo.toml, packages/terminal-control/rust/src/route.rs, packages/terminal-control/rust/Cargo.toml, packages/session-host/rust/src/route.rs, packages/session-host/rust/Cargo.toml, apps/fgctl/src/help.rs, scripts/write-test-marker.mjs, apps/fgos/src/wiring/run_dirs.rs, packages/run-result/rust/src/lib.rs, packages/distribution/rust/src/init.rs, Cargo.lock, packages/component-authority/model/doors/parse-cli-arguments.yaml, packages/component-authority/model/doors/list-run-directories.yaml, packages/component-authority/model/doors/no-node-from-native-packaging.yaml | 5 | draft |
 | 8 | [Retire process-control, /proc, kernel-lock and bounded-child copies in the process tier](phase-08-process-primitive-copies.md) | 2a, 7 | packages/git/rust/src/driver.rs, scripts/lib/mailbox-live-confined.mjs, packages/holder-lock/rust/src/borrow_vectors.rs, packages/git/node-addon/src/single_load.rs, packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs, packages/process/rust/src/containment/linux.rs, packages/process/rust/src/mapped.rs, packages/process/rust/src/platform/windows_spawn.rs, packages/run-supervisor/rust/src/attempt_step.rs, packages/run-supervisor/rust/src/controller/launch.rs, packages/run-supervisor/rust/src/gate/windows.rs, packages/run-supervisor/rust/src/steps.rs, packages/run-supervisor/rust/src/supervise.rs, packages/run-supervisor/rust/src/supervise/windows.rs, packages/run-supervisor/rust/Cargo.toml, Cargo.lock, packages/component-authority/model/doors/process-control-signal.yaml, packages/component-authority/model/doors/process-facts-proc.yaml, packages/component-authority/model/doors/kernel-lock-primitive.yaml, packages/component-authority/model/doors/run-bounded-child.yaml | 6 | draft |
 | 9 | [Retire the remaining bounded-child copies](phase-09-bounded-child-copies.md) | 3e, 8 | apps/fgos-gateway/src/gateway.rs, apps/fgos/src/wiring/run.rs, packages/config/rust/src/detect.rs, packages/config/rust/Cargo.toml, packages/distribution/rust/src/init.rs, packages/distribution/rust/Cargo.toml, packages/holder-lock/rust/src/borrow_windows.rs, packages/holder-lock/rust/Cargo.toml, packages/mailbox/rust/store/src/adapters/version.rs, packages/mailbox/rust/store/src/nudge.rs, packages/mailbox/rust/store/Cargo.toml, packages/terminal-control/rust/src/driver/herdr.rs, packages/terminal-control/rust/Cargo.toml, Cargo.lock, packages/component-authority/model/doors/run-bounded-child.yaml, packages/component-authority/model/doors/global-fgos-directory.yaml | 7 | draft |
-| 10 | [Door guard by primitive and aliases, counted, no debt](phase-10-land-checks.md) | 2a, 2b, 2c, 2d, 2e, 2f, 2g, 3a, 3b, 3c, 3d, 3e, 4, 6, 7, 8, 9 | test/architecture.test.mjs, packages/component-authority/model/doors/, packages/component-authority/contracts/model.v1.json, docs/platform/component-authority/spec.md | 9 | draft |
+| 10 | [Door guard by primitive and aliases, counted, no debt but the named debt](phase-10-land-checks.md) | 2a, 2b, 2c, 2d, 2e, 3a2, 3b, 3c, 3d, 3e, 4, 6, 7, 8, 9 | test/architecture.test.mjs, packages/component-authority/model/doors/, packages/component-authority/contracts/model.v1.json, docs/platform/component-authority/spec.md | 9 | draft |
 | 11 | [Sweep and integration](phase-11-sweep-and-integration.md) | 5, 10 | packages/convention/contracts/convention.rules.v1.json, docs/platform/packaging-distribution/spec.md, src/cli/command-registry.mjs, CHANGELOG.md, docs/platform/component-authority/spec.md, plans/261121-2110-component-authority-doors/ | 10 | draft |
 
 **Per-row re-cut (q-swxkda2x5r A, applied 2026-11-23 by the planner).** The old phases 2 and 3 are replaced by one
@@ -304,6 +310,28 @@ phase per door row (2a-2g, 3a-3e). Each retires one row's twin and moves only th
 files are gone; their blocked unit reports stay under `reports/` (unit-261123-0819-p02-result.md,
 unit-261123-0819-p03-result.md). Phases 6, 8 and 9 now depend on the single rows they share files with (6 on 2c,
 8 on 2a, 9 on 3e). Phase 4 no longer waits on phase 3, because no new phase shares its files.
+
+**Re-cut per owner decision D6 (2026-11-23 16:3x, discussion `ds-wham5txfkv` step 0, applied by the planner).**
+Doors closes before the Workflow/Work port. Phase 10 locks every door except the named debt of 2f (and 2g while
+`p-rypvkc3kai` is open), with `retiredBy` the port or that item, so phases 10 and 11 no longer depend on 2f or 2g.
+2f and 2g stay in the table and run only if their wait clears before phase 10 starts; otherwise the port (or
+`p-rypvkc3kai`) removes the debt in the change that deletes the last body, and phase 11 records the hand-off. The
+owner closed O6 the same day: there is no warn-only switch for the door guard.
+
+Phase 3a was cut in two. The order was that 3a deletes the four dead Node files (`dispatch/config-twin.mjs`,
+`evidence-attribution.mjs`, `settlement.mjs`, `execution/unit.mjs`) instead of rewiring them. They have no live
+product importer, but at `a1b4054ba` other dead closure modules (`dispatch/assignment-runner.mjs`, `plan.mjs`,
+`resolve.mjs`, `transport.mjs`, `session-attempt.mjs`, `execution-contract.mjs`, `execution/unit-summary-twin.mjs`) and 35
+test files still import them, and all of those belong to `261122-2108-delete-dead-node-execution-closure` (its
+phases 5-8). Deleting the four here would mean doing that plan's work inside doors. So nothing in doors rewires them,
+and `261122-2108` phase 8 deletes them with the rest of the closure. 3a now only moves the two live callers onto the
+addon's `writeScope` and has no wait. The new 3a2 deletes `write-scope.mjs`, its tests and the debt once phase 8
+has removed the four, its last importers. Phase 10 already waited on that phase through 3b and 3d, so the split
+adds no wait to doors closing.
+
+**Provider (owner order, 2026-11-23 09:01, restated in D6 step 0):** every writing unit of every phase is
+dispatched with `--provider claude` (`fgos run ... --provider claude`, or `provider: claude` on the unit in a
+`--units` file). A unit that cannot get claude parks and reports; it does not fall back to another provider.
 
 **Waits (each such phase stays `draft` until its wait clears; details are in the phase file):**
 - Phase 1 is done (207b6459d). Phase 1b can run now, and every other phase waits for it.
@@ -318,16 +346,17 @@ unit-261123-0819-p03-result.md). Phases 6, 8 and 9 now depend on the single rows
   changes) in the same change. Backlog `p-irt4weqipe` owns the mailbox re-measurement afterwards, and it blocks
   nothing here. 2b waits only for 2a.
 - 2f waits for Rust migration steps S6b and S7 (`261114-2051-rust-verb-migration-program`), which move the last
-  Node-owned doctor bodies.
-- 2g waits for backlog item `p-rypvkc3kai` (the herdr crate edge, kept out of this plan by the owner's answer).
-- 3a-3e wait for phase 8 of `261122-2108-delete-dead-node-execution-closure`, which owns deleting the dead Node
+  Node-owned doctor bodies. It no longer blocks phase 10 or 11 (D6): its row is named debt, `retiredBy` the port.
+- 2g waits for backlog item `p-rypvkc3kai` (the herdr crate edge, kept out of this plan by the owner's answer). It no
+  longer blocks phase 10 or 11 (D6): while the item is open its row is named debt, `retiredBy` the item.
+- 3a has no wait. 3a2, 3b, 3c, 3d and 3e wait for phase 8 of `261122-2108-delete-dead-node-execution-closure`, which owns deleting the dead Node
   execution closure (the rows' `retiredBy`, `p-24xw2cwdvo`). These phases close the door rows and retire what that
   plan leaves live; they never edit its files while it runs. 3e also waits for `p-n22bigucgp` (the home-directory
   rule).
-- 2c, 2d and 2e can run now.
+- 2c, 2d, 2e and 3a can run once 1b lands.
 
 **Waves.** Shared files decide them. `packages/git/contracts/mutation-census.v1.json` and `test/suite-baseline.json`
-have one writer per wave (2e, 2d, 2a, 3a and 3c, in waves 3, 4, 5, 7 and 8). `Cargo.lock` has one writer per wave
+have one writer per wave (2e, 2d, 2a, 3a2 and 3c, in waves 3, 4, 5, 7 and 8). `Cargo.lock` has one writer per wave
 (phases 1, 1b, 5, 7, 8 and 9). `src/cli/command-registry.mjs` and the command manifest are written by phases 1, 5, 2c,
 6 and 11, each in a different wave. `doors/global-fgos-directory.yaml` is written by 3e and then 9;
 `doors/run-bounded-child.yaml` by 8 and then 9; `test/architecture.test.mjs` by 1b, then 2e, then 10.
@@ -409,7 +438,12 @@ admits no plan whose footprint overlaps a `running` one):
   tests and `packages/mailbox/rust/store/src/adapters/extension.rs`. Only `261122-0118-heads-stable-and-able` lists
   any `test/live/` path among running plans, `test/live/head-grant-probe.live.mjs`, which is not one of them.
 
-None. Shape choices the planner settled from the evidence:
+- D6 (owner, 2026-11-23 16:3x, discussion `ds-wham5txfkv`, relayed by lead:SUPERVISOR): option (a), doors closes
+  with the named debt of 2f (and 2g while `p-rypvkc3kai` is open), `retiredBy` the port; O6 closed with no warn-only
+  switch; 3a's dead files are not rewired; every writing unit pins `--provider claude`. Applied in the re-cut above,
+  phases 3a, 3a2, 2f, 2g, 10 and 11, and acceptance 4. Footprint unchanged: every path of 3a and 3a2 was already in it.
+
+None open. Shape choices the planner settled from the evidence:
 - Verb name `fgos authority` with subcommands `locate` and `declare`, after the `fgos convention` pattern.
 - Until H2 exists, `declare` checks the owner answer through the question store (`--approved-by`), and the
   independent review runs at plan validation.

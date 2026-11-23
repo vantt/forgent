@@ -16,6 +16,9 @@ src/runner/capability-config.mjs, test/runner/capability-config.test.mjs, src/ru
 - A caller outside this phase's files: stop, write Status BLOCKED with the file named, and change nothing. Do not widen.
 - Re-read the door row first. A running plan may already have removed some debt; a row with no `debt` left needs only the check below.
 
+## Execution
+Every writing unit runs with `--provider claude` (owner order, D6 step 0). If claude is unavailable the unit parks and reports. It never falls back to another provider.
+
 ## Steps
 1. Remove `capabilityConfinementOf` and its cases once no product caller is left; the executor-model vectors already replay it on `executor_model.rs`.
 2. Move the release-tier judgement in `test/setup/packaged-definitions.test.mjs` and the vector recorder off `listAgents` onto the Rust judgement (the `agent-type-names-unique` doctor row), then delete `agent-listing.mjs`, its test, the recorder and its helper.

@@ -3,6 +3,8 @@
 ## Waits
 Backlog item `p-rypvkc3kai` (the herdr driver resolves the installation shim path on its own). Moving `packages/herdr-fgos-common/rust/src/fgos.rs` onto the distribution crate adds a crate edge; the owner placed that edge in its own item (q-swxkda2x5r A). The phase stays `draft` until that item lands.
 
+This phase does not block phase 10 or 11 (owner decision D6, option a). While `p-rypvkc3kai` is open, phase 10 keeps this row's `debt` as named debt with `retiredBy: p-rypvkc3kai`. If the item lands before phase 10 starts, run this phase first and the row leaves the named list. Otherwise the item removes the debt itself, and phase 11 records the hand-off.
+
 ## Inputs
 - Row `packages/component-authority/model/doors/installation-shim-location.yaml`. Survivors: the row's `allowed` (`packages/distribution/rust/src/shim.rs` and the others). Debt: `packages/herdr-fgos-common/rust/src/fgos.rs` (builds `.fgos/installation/bin/fgos` itself, about lines 375 and 387).
 
@@ -14,6 +16,9 @@ packages/component-authority/model/doors/installation-shim-location.yaml
 - Before deleting, find the test that owns the behaviour the copy gave its callers. If none does, record vectors from the copy and replay them on the survivor, in the survivor's own test file (design principle 8; the 488d3ab28 pattern).
 - A caller outside this phase's files: stop, write Status BLOCKED with the file named, and change nothing. Do not widen.
 - Re-read the door row first. A running plan may already have removed some debt; a row with no `debt` left needs only the check below.
+
+## Execution
+Every writing unit runs with `--provider claude` (owner order, D6 step 0). If claude is unavailable the unit parks and reports. It never falls back to another provider.
 
 ## Steps
 1. Confirm `fgos.rs` no longer builds the shim path (`rg 'installation/bin' packages/herdr-fgos-common`).

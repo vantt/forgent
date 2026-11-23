@@ -15,6 +15,9 @@ packages/component-authority/model/doors/tool-lookup-by-capability.yaml
 - A caller outside this phase's files: stop, write Status BLOCKED with the file named, and change nothing. Do not widen.
 - Re-read the door row first. A running plan may already have removed some debt; a row with no `debt` left needs only the check below.
 
+## Execution
+Every writing unit runs with `--provider claude` (owner order, D6 step 0). If claude is unavailable the unit parks and reports. It never falls back to another provider.
+
 ## Steps
 1. Confirm the file is gone. If the closure plan kept it alive (its `reports/closure.md` names the reason), stop and report the owning step.
 2. Remove the debt entry, citing the closure plan's deleting commit and the last SHA.

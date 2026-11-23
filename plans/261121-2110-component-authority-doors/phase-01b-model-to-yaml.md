@@ -71,6 +71,9 @@ packages/component-authority/model/, packages/component-authority/contracts/mode
 - **Comments are allowed, and the rows stay the same.** This phase adds no annotation, and the loader ignores
   comments.
 
+## Execution
+Every writing unit runs with `--provider claude` (owner order, D6 step 0). If claude is unavailable the unit parks and reports. It never falls back to another provider.
+
 ## Steps
 1. **Convert.** A throwaway program under `.fgos/runtime/tmp/` (never committed) converts each file through the
    crate's own path. That path is `fgos-yaml-doc`'s emitter (`edit::emit`), for example as a crate test helper run

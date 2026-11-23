@@ -16,6 +16,9 @@ packages/distribution/rust/src/agent_hooks.rs, packages/component-authority/mode
 - A caller outside this phase's files: stop, write Status BLOCKED with the file named, and change nothing. Do not widen.
 - Re-read the door row first. A running plan may already have removed some debt; a row with no `debt` left needs only the check below.
 
+## Execution
+Every writing unit runs with `--provider claude` (owner order, D6 step 0). If claude is unavailable the unit parks and reports. It never falls back to another provider.
+
 ## Steps
 1. Confirm `src/setup/agent-hooks.mjs` is gone.
 2. Make sure `agent_hooks.rs` has a test that pins its keyword list equal to the data file; add it there if the Node test was the only proof.

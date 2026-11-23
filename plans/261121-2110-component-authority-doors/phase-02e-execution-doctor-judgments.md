@@ -14,6 +14,9 @@ src/setup/agy-permissions.mjs, test/setup/agy-permissions.test.mjs, packages/exe
 - A caller outside this phase's files: stop, write Status BLOCKED with the file named, and change nothing. Do not widen.
 - Re-read the door row first. A running plan may already have removed some debt; a row with no `debt` left needs only the check below.
 
+## Execution
+Every writing unit runs with `--provider claude` (owner order, D6 step 0). If claude is unavailable the unit parks and reports. It never falls back to another provider.
+
 ## Steps
 1. Replay the two `findAgySubHomes` cases on `find_sub_homes` in `checks.rs`'s tests, unless an existing test there already owns them (name it).
 2. Delete the Node file and its test. Point the synthetic guard case at `test/architecture.test.mjs:2149` at a path the row still governs, so it keeps proving the same thing.

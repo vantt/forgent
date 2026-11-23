@@ -15,6 +15,9 @@ packages/component-authority/model/doors/decide-a-dispatch.yaml
 - A caller outside this phase's files: stop, write Status BLOCKED with the file named, and change nothing. Do not widen.
 - Re-read the door row first. A running plan may already have removed some debt; a row with no `debt` left needs only the check below.
 
+## Execution
+Every writing unit runs with `--provider claude` (owner order, D6 step 0). If claude is unavailable the unit parks and reports. It never falls back to another provider.
+
 ## Steps
 1. Confirm the file is gone; otherwise stop and report the owning step from the closure report.
 2. Remove the debt entry with the deleting commit and last SHA.

@@ -6,12 +6,16 @@ The reports of phases 2-9 (decision-history lines they could not place); `plan.m
 ## Files it may write
 packages/convention/contracts/convention.rules.v1.json, docs/platform/packaging-distribution/spec.md, src/cli/command-registry.mjs (the line 7 comment only), CHANGELOG.md, docs/platform/component-authority/spec.md, plans/261121-2110-component-authority-doors/
 
+## Execution
+Every writing unit runs with `--provider claude` (owner order, D6 step 0). If claude is unavailable the unit parks and reports. It never falls back to another provider.
+
 ## Steps
 1. Replace convention rule `doc-architecture-manifest-1` with a placement rule for `packages/component-authority/model/**`, and run the convention golden tests.
 2. Repoint the manifest mention in `docs/platform/packaging-distribution/spec.md` and the comment in `src/cli/command-registry.mjs:7`.
 3. Place the decision-history lines that phases 2-9 left in their reports into the owning area specs, as far as they are inside this footprint. List any others in the plan log as owner-facing follow-ups for the secretary.
 4. `CHANGELOG.md` `## [Unreleased]`: one line for `fgos authority locate|declare` and the Authority-map plan rule.
 5. Set the component-authority spec's `Implementation:` field to `Implemented`.
+5a. Record the named-debt hand-off (owner decision D6) in the plan log. Phase 2f's row is retired by the Workflow/Work port, and phase 2g's by `p-rypvkc3kai` if it is still open. Name each row, its `retiredBy` and which phases were not run here. The plan does not wait for them.
 6. On the combined tree, run `npm test` and `cargo test --workspace`, then every acceptance-criterion command. Record the output in `reports/`.
 
 ## Verify

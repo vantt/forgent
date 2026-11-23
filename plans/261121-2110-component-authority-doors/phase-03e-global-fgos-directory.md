@@ -17,6 +17,9 @@ packages/component-authority/model/doors/global-fgos-directory.yaml
 - A caller outside this phase's files: stop, write Status BLOCKED with the file named, and change nothing. Do not widen.
 - Re-read the door row first. A running plan may already have removed some debt; a row with no `debt` left needs only the check below.
 
+## Execution
+Every writing unit runs with `--provider claude` (owner order, D6 step 0). If claude is unavailable the unit parks and reports. It never falls back to another provider.
+
 ## Steps
 1. Confirm the two Node files are gone and `state_root.rs` resolves through `machine::global_dir` (or the rule `p-n22bigucgp` settles).
 2. Remove those three debt entries; leave the gateway entry for phase 9.

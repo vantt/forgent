@@ -12,6 +12,9 @@
 ## Files it may write
 packages/component-authority/rust/, Cargo.lock, apps/fgos/src/main.rs, test/cli/subcommand-flag-drift.test.mjs, apps/fgos/src/routing.rs, apps/fgos/src/invocation_doors.rs, apps/fgos/src/cli_projector.rs, apps/fgos/src/wiring/authority.rs, apps/fgos/tests/authority.rs, the three host-runtime command contracts, core/skills/_shared/plan-contract.md, core/skills/fgos-shaping/, domains/coding/skills/fgos-coding-{planning,implement,validating,shaping}/, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, .agents/skills/, plugins/fgOS/skills/, .claude/skills/ (regenerated only)
 
+## Execution
+Every writing unit runs with `--provider claude` (owner order, D6 step 0). If claude is unavailable the unit parks and reports. It never falls back to another provider.
+
 ## Steps
 1. Add `declare.rs` and the subcommand `fgos authority declare --kind component|decision-kind|door|contract --row <json> [--approved-by <q-id>] [--plan <dir>] [--move]` (writes):
    - validate the row against `model.v1.json`;
