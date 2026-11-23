@@ -18,10 +18,14 @@ Theo quy trình ở `docs/how-to/measure-a-real-case.md` mục 5:
 
 ```bash
 cargo build --release -p fgos -p fgctl
-node scripts/build-rust-distribution.mjs --out /tmp/fgos-release-candidate
-./target/release/fgctl stage   --from /tmp/fgos-release-candidate
-./target/release/fgctl upgrade --from /tmp/fgos-release-candidate
+OUT=$(mktemp -d /tmp/fgos-release-candidate-XXXXXX)   # thư mục mới, rỗng mỗi lần build
+node scripts/build-rust-distribution.mjs --out "$OUT"
+./target/release/fgctl stage   --from "$OUT"
+./target/release/fgctl upgrade --from "$OUT"
 ```
+
+Script từ chối một `--out` đã có file (để không lẫn bản build cũ), nên mỗi lần build dùng một thư mục mới như trên.
+Thư mục `/tmp/fgos-release-candidate` cũ để nguyên cũng được, không cần xoá.
 
 Kiểm tra:
 
