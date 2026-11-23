@@ -53,3 +53,21 @@ It was raised to the supervisor.
 ## Worktrees kept
 
 `-p01` (branch at d10cea585, plus uncommitted work), and `-p02` and `-p03` (unchanged, kept for reuse).
+
+## Addendum 10:50: after the claude pin was withdrawn
+
+- Fix round 5 (default binding, deepseek/thehive, unit-run-1795405038571-29e4ef38) passed and committed 97e066738.
+  That commit regenerates the host contracts and types `tierExceptions`. Its checks: route test 19/19, export
+  `--check` clean, crate tests 8/8.
+- The runner does not commit a file that was already dirty when the round started (evidence.json `dirtyBefore`). So
+  the `authority` registry entry and the report's fix rounds 3-5 are still uncommitted in worktree `-p01`. The
+  branch tip has generated contracts but not the registry entry they come from.
+- To fix that, worktree `-p01b` (branch `component-authority-doors/p01b`, based on p01 at 97e066738) received a
+  clean-state unit carrying both diffs (c-41164). The run was refused at the recheck with the binding mismatch
+  (recomputed gemini/gemini, assignment deepseek/thehive). Following lead:SUPERVISOR's order, it is parked and not
+  pinned. It waits on the recheck fix plan 261123-0821.
+- q-sieckdvccb was decided as option A by lead:SUPERVISOR. The lead's land of the frontmatter footprint was refused
+  with `footprint-change-refused`, so the supervisor must land the two footprint lines (event 11ea78162a7d58e7).
+- Next unit, once both are cleared: in `-p01b`, re-apply the registry entry and report rounds, then register the
+  provider in `apps/fgos/src/main.rs`, list `authority` in `test/cli/subcommand-flag-drift.test.mjs`, and run
+  `cargo test -p fgos --test authority`. After that come review and land.
