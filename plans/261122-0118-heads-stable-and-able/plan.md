@@ -165,6 +165,13 @@ writer, phase 11.
   worktrees (p02, p02g, p06, p06f, p12c); lead:SUPERVISOR then reruns the real soft rotation (phase 12 done-when item
   3). The supervisor neither activates a release nor removes a worktree.
 
+### Owner answer (2026-11-23 19:45, recorded by head:supervisor-forgent)
+
+- `q-ec5bdhkwoz`: wait for phase 13. The supervisor adds the `plans/backlog.md` index row for `p-2qle2tjflb` (and lands
+  its item file) on the first wake after the release carrying `5ebc25616` is activated. At 19:45 `fgos session write
+  plans/backlog.md` was still refused `path-not-granted`, so the row is pending activation. Scope: this one row and item
+  file; no grant or release change outside phase 13.
+
 ### Phase 13 is `done` (2026-11-23 19:35, head:lead-forgent-261122-0118-heads-b52f9)
 
 - Landed as `5ebc25616` after the interrupted land was recovered; land gates and
