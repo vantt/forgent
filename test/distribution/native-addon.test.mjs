@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {ensureHostBin, ensureGitAddon as buildAddon, gitAddonDirectory, gitAddonSourceDigest, GIT_ADDON_SOURCE_DIGEST_FILE} from '../../scripts/lib/git-addon-stage.mjs';
+import {archiveDirectory, ARCHIVE_SHA256} from '../../scripts/ort-static.mjs';
 import {devHostManifest} from '../../scripts/lib/dev-host-manifest.mjs';
 import {pathToFileURL} from 'node:url';
 import {ensureGitAddon, root} from '../helpers/git-addon.mjs';
@@ -280,6 +281,29 @@ if (process.argv[1] === 'fresh') {
     // 2. Stale case with an unwritable target directory: named error thrown
     fs.writeFileSync(digestFile, 'stale-source-digest');
     fs.mkdirSync(targetDir, {recursive: true});
+    fs.chmodSync(targetDir, 0o555);
+
+    // 2a. No ort cache and an unwritable target: the pre-cargo archive step fails, still the named error
+    try {
+      const noCacheOut = JSON.parse(runProbe('stale'));
+      assert.match(noCacheOut.message, /staged addon for this checkout is missing or stale/i);
+      assert.ok(noCacheOut.message.includes(gitAddonDirectory(repo)), 'the error names the staged addon directory');
+      if (process.platform === 'linux' && process.arch === 'x64') {
+        assert.equal(fs.existsSync(cargoRecord), false, 'cargo was not reached without an ort cache');
+      } else {
+        fs.rmSync(cargoRecord, {force: true});
+      }
+    } finally {
+      fs.chmodSync(targetDir, 0o755);
+    }
+
+    // 2b. Verified ort cache present: cargo runs once and fails read-only
+    const ortDir = archiveDirectory(repo);
+    fs.mkdirSync(ortDir, {recursive: true});
+    const ortFile = path.join(ortDir, 'libonnxruntime.a');
+    fs.writeFileSync(ortFile, 'seeded archive');
+    const ortStat = fs.statSync(ortFile);
+    fs.writeFileSync(`${ortFile}.verified`, `${ARCHIVE_SHA256} ${ortStat.size} ${ortStat.mtimeMs}\n`);
     fs.chmodSync(targetDir, 0o555);
 
     try {

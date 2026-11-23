@@ -79,10 +79,20 @@ function cargoBuildAddon(cargoEnv, cwd, locked, captureStderr) {
   }
 }
 
+const ORT_STATIC_STEP = 'ort-static';
+
 /** Always builds and stages the addon and host for this checkout (never reuses). */
 export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true, { captureStderr = false } = {}) {
   const dir = path.resolve(cwd, env.CARGO_TARGET_DIR || 'target');
-  const cargoEnv = { ...env, CARGO_TARGET_DIR: dir, ...ensureOrtStatic(cwd) };
+  let ortEnv;
+  try {
+    ortEnv = ensureOrtStatic(cwd);
+  } catch (err) {
+    // The pre-cargo archive step writes under target/, so its failure can be the unwritable target the caller names.
+    err.step = ORT_STATIC_STEP;
+    throw err;
+  }
+  const cargoEnv = { ...env, CARGO_TARGET_DIR: dir, ...ortEnv };
   cargoBuildAddon(cargoEnv, cwd, locked, captureStderr);
   const library = nativeAddonLibraryName();
   const addonDir = gitAddonDirectory(cwd);
@@ -134,11 +144,11 @@ const UNWRITABLE_TEXT = /os error (?:30|13)\b|\bEROFS\b|\bEACCES\b/;
 
 /**
  * True only when the failure names a read-only or permission-denied cause (cargo's os error 30/13 or
- * EROFS/EACCES) and a write to the target directory confirms it. Anything unrecognised is not "unwritable".
+ * EROFS/EACCES, or a failed ort-static step) and a write to the target directory confirms it. Anything unrecognised is not "unwritable".
  */
 function isTargetUnwritable(env, cwd, err) {
   const text = `${err?.message || ''}\n${err?.stderr || ''}`;
-  if (!UNWRITABLE_CODES.includes(err?.code) && !UNWRITABLE_TEXT.test(text)) return false;
+  if (err?.step !== ORT_STATIC_STEP && !UNWRITABLE_CODES.includes(err?.code) && !UNWRITABLE_TEXT.test(text)) return false;
   let probeDir = path.resolve(cwd, env.CARGO_TARGET_DIR || 'target');
   while (!fs.existsSync(probeDir) && path.dirname(probeDir) !== probeDir) probeDir = path.dirname(probeDir);
   const probe = path.join(probeDir, `.probe-writable.${process.pid}.tmp`);
