@@ -84,3 +84,17 @@ The lead checked state at 22:35. None of the three steps had run yet:
 
 Phase 11 is parked on these host steps. When they are done, the lead resumes at step 1 (read the suite result), then
 steps 2-6. The probe runs from a supervisor and a secretary started after the new activation.
+
+### State at 23:20 (2026-11-23)
+
+- Host step 1 done: release `sha256:ef959860…` activated at 23:11. Its `head-grants.mjs` carries `5ebc25616`
+  (`plans/backlog.md` in the secretary and supervisor writes).
+- Host steps 2 (full suite) and 3 (remove p13 and p11c) are still owed by the owner. Guide:
+  `reports/howto-261123-2306-owner-host-steps-phase-11.md`.
+- Steps 3 and 6 are already on main: the probe script (`6f4ea6ca7`, `0ba7be66c`, `32139463b`), and the stale
+  `head-sandbox-argv` note is gone from `head-start.test.mjs`. The step 2 lines wait in
+  `reports/carry-p11-changelog-lines.md` for a land outside this footprint.
+- Event `3bf13f45ec5e0924` (coordination-chore) asks the supervisor to rotate itself and Miu onto `ef959860`, run the
+  probe in both heads, land each JSON under `reports/`, and land the changelog lines.
+- Left for the lead after that: read the suite result, write `reports/head-grant-probe.md` with the folded-rows check,
+  and close the plan.
