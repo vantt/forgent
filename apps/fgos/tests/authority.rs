@@ -3,7 +3,8 @@
 //! loader and the ranking rules are owned by the crate's tests (`packages/component-authority/rust/`); this
 //! file proves the wiring of the binary over them.
 
-use std::path::PathBuf;
+use std::fs;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 fn repo_root() -> PathBuf {
@@ -13,12 +14,40 @@ fn repo_root() -> PathBuf {
         .unwrap()
 }
 
+fn copy_dir(from: &Path, to: &Path) {
+    fs::create_dir_all(to).unwrap();
+    for entry in fs::read_dir(from).unwrap() {
+        let entry = entry.unwrap();
+        let target = to.join(entry.file_name());
+        if entry.file_type().unwrap().is_dir() {
+            copy_dir(&entry.path(), &target);
+        } else {
+            fs::copy(entry.path(), target).unwrap();
+        }
+    }
+}
+
+/// A fresh checkout has no `.fgos`: the verb needs a project, so the test builds one holding a copy of the real model.
+fn temp_project() -> PathBuf {
+    let project =
+        std::env::temp_dir().join(format!("fgos-authority-locate-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&project);
+    fs::create_dir_all(project.join(".fgos")).unwrap();
+    let model = Path::new("packages/component-authority/model");
+    copy_dir(&repo_root().join(model), &project.join(model));
+    project
+}
+
 fn locate_first(sentence: &str) -> serde_json::Value {
+    let project = temp_project();
     let output = Command::new(env!("CARGO_BIN_EXE_fgos"))
         .args(["authority", "locate", sentence, "--json"])
-        .current_dir(repo_root())
+        .env_remove("FGOS_CONFINED")
+        .env_remove("FGOS_HEAD_REQUEST_SOCKET")
+        .current_dir(&project)
         .output()
         .unwrap();
+    let _ = fs::remove_dir_all(&project);
     assert!(
         output.status.success(),
         "locate {sentence:?}: {}{}",
