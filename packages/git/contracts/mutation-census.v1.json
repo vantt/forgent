@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "fe95c60dc08d51acbf8bfa4c48cb3f47a7226a0f723ce03473ad5c960fb0e41d",
+  "payloadDigest": "3a9c293aa1dffb5c88e97cc77e91ba7b551f73013d96c2f97264ac8fa368b2fd",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1646,7 +1646,7 @@
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
     "src/seat-binding/client.mjs": "421d4ae4b1605096d7646e29461be4eafbf6a990ef92fdcfe5e0756614496fd1",
     "src/session-host/client.mjs": "e49192345fa315a153ace4c3de0422351b0989bf20b663ae0a77b398767cd0eb",
-    "src/session-host/head-grants.mjs": "396773b86a1d62d67b9a0bebca971659a0ebd54f4486cbd46007012f5e3787d0",
+    "src/session-host/head-grants.mjs": "76f69ad8d0f343b2f4d09e830d69b7da02cddb04e0c785701f30cfdc491fdd84",
     "src/session-host/head-plan.mjs": "634ba6bd771661549baef7c50d3a8102a487ec00b0b6c67349d289c44941fa13",
     "src/session-host/head-request-client.mjs": "3ae89878a0c3b33bb383474c20d33b5aa610febcdb5a5a5d04f2f6e693fab499",
     "src/session-host/head-request.mjs": "f1375bca902a35317e15017b21eaf13270158c4dc971c346d01c15216afc5071",
