@@ -48,29 +48,37 @@ packages/component-authority/rust/, Cargo.lock, apps/fgos/src/main.rs, test/cli/
 
    Run `npm run build:skills`.
 5. Gate (owner answer q-3iylevstr2 A, 2026-11-23). `locate` and `declare` are a gated capability. Every skill
-   requirement in step 4 and the plan-contract rule in step 2 apply only where the project has
-   `packages/component-authority/model/`. Where it does not, the skill records `authority: inactive` in the plan
+   requirement in step 4 and the plan-contract rule in step 2 apply only where the project has a model at the path
+   step 6 resolves (`packages/component-authority/model/` in fgOS's repository, `.fgos/authority/model/` elsewhere). Where it does not, the skill records `authority: inactive` in the plan
    or verify note and goes on, in the same shape as the impact-analysis gate in AGENTS.md. In step 3,
-   `scripts/plan-contract-check.mjs` skips the Authority-map rule when the checked project has no model. Add one
+   `scripts/plan-contract-check.mjs` skips the Authority-map rule when the checked project has no model at either
+   path, and reads the model from the same path rule as step 6. Add one
    test case for that skip.
 
 6. The project's own model (owner order 2026-11-23 12:5x, scope addition approved). `locate` and `declare` read
    and write the model of the project they run in, never fgOS's repository:
-   - The wiring in `apps/fgos/src/wiring/authority.rs` resolves the project root through the invocation-root door
-     (`packages/git/rust/src/invocation_root.rs`) and passes `<root>/packages/component-authority/model/` to the
-     crate. The crate takes the directory as a parameter and resolves no path itself. No second path rule and no
-     convention entry: the model has one location relative to the project.
+   - Model path (owner addition, 2026-11-23 12:50). The wiring in `apps/fgos/src/wiring/authority.rs` resolves the
+     project root through the invocation-root door (`packages/git/rust/src/invocation_root.rs`), then picks the
+     model directory by one rule in one function: the fgOS repository, recognised because its root carries the
+     component's own contract `packages/component-authority/contracts/model.v1.json`, keeps
+     `<root>/packages/component-authority/model/`; every other project uses `<root>/.fgos/authority/model/`
+     (every fgOS project has `.fgos/`; join it through the host's existing `.fgos` join, never a new
+     `join(".fgos")`). The crate takes the directory as a parameter and resolves no path itself. No convention entry.
+   - The model is committed project state. Confirm the ignore rules `fgos init` writes do not cover
+     `.fgos/authority/`; if they do, stop and report (that file is outside this phase).
    - No model directory: `locate` returns a `fgos.v1` envelope with `authority: "inactive"` and exits 0, the same
      answer the skills record (step 5). A directory that exists but is missing a file is still refused by the
      loader, as in phase 1.
-   - The first `declare` in a project with no model creates an empty one there: `layers.json`, `components.json`,
+   - The first `declare` in a project with no model creates an empty one at the resolved path (in a project other
+     than fgOS, under `.fgos/authority/model/`): `layers.json`, `components.json`,
      `decision-kinds.json`, `contracts.json` and `doors/`, each with no rows and valid against
      `packages/component-authority/contracts/model.v1.json`. It then writes the declared row. Every write goes
      through the durable-file door. The `--approved-by` rule of step 1 still holds, so a new component or decision
      kind still needs an answered owner question; a refused `declare` creates nothing.
-   - Owning proof, in `apps/fgos/tests/authority.rs`: in a temporary project with no model, `locate` answers
-     `inactive`; a `declare --kind component --approved-by <answered q>` creates the model and the row; `locate` then
-     ranks that row first; the five created files load and validate. A crate test covers "refused declare leaves no
+   - Owning proof, in `apps/fgos/tests/authority.rs`: in a temporary project with `.fgos/` and no model, `locate`
+     answers `inactive`; a `declare --kind component --approved-by <answered q>` creates the model under
+     `.fgos/authority/model/` (and nothing under `packages/`) and writes the row; `locate` then ranks that row first;
+     the five created files load and validate. A crate test covers "refused declare leaves no
      model". The run in this repository still reads this repository's model, so the phase 1 tests are unchanged.
 
 ## Verify

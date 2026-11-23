@@ -63,6 +63,7 @@ footprint:
   - packages/git/node-addon/src/single_load.rs
   - packages/process/rust/src/containment/linux.rs
   - packages/process/rust/src/mapped.rs
+  - test/rust-host/vectors/envelope/version.json
   - packages/process/rust/src/platform/windows_spawn.rs
   - packages/config/rust/src/detect.rs
   - packages/config/rust/Cargo.toml
@@ -212,8 +213,8 @@ matching.
 6. `rg -l architecture-manifest.json` finds only history. `CHANGELOG.md` `## [Unreleased]` names the new verb.
    `npm test` and `cargo test --workspace` are green.
 7. `locate` and `declare` work on the model of the project they run in. In a temporary project with no model,
-   `locate` answers `authority: inactive` with exit 0, the first `declare` creates an empty schema-valid model and
-   writes its row (still refusing a new component or decision kind without an answered owner question), and
+   `locate` answers `authority: inactive` with exit 0, the first `declare` creates an empty schema-valid model under
+   `.fgos/authority/model/` (fgOS's own repository keeps `packages/component-authority/model/`) and writes its row (still refusing a new component or decision kind without an answered owner question), and
    `locate` then finds that row. Check: `cargo test -p fgos --test authority` (phase 5, step 6).
 
 ## Non-goals
@@ -228,7 +229,7 @@ matching.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Crate and `fgos authority locate`](phase-01-crate-and-locate.md) | - | packages/component-authority/rust/, Cargo.toml, Cargo.lock, apps/fgos/Cargo.toml, apps/fgos/src/main.rs, test/cli/subcommand-flag-drift.test.mjs, apps/fgos/src/routing.rs, apps/fgos/src/invocation_doors.rs, apps/fgos/src/cli_projector.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/wiring/authority.rs, apps/fgos/tests/authority.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, src/cli/command-registry.mjs (lent by phase 2 while it is parked), test/rust-host/vectors/envelope/version.json (generated verb list, regenerated for the new verb) | 1 | parked: branch component-authority-doors/p01c (49454bd22) passes its checks and its review, except that the generated test/rust-host/vectors/envelope/version.json must be regenerated, and that file is outside the footprint (question q-75yeaifwzn) |
+| 1 | [Crate and `fgos authority locate`](phase-01-crate-and-locate.md) | - | packages/component-authority/rust/, Cargo.toml, Cargo.lock, apps/fgos/Cargo.toml, apps/fgos/src/main.rs, test/cli/subcommand-flag-drift.test.mjs, apps/fgos/src/routing.rs, apps/fgos/src/invocation_doors.rs, apps/fgos/src/cli_projector.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/wiring/authority.rs, apps/fgos/tests/authority.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, src/cli/command-registry.mjs (lent by phase 2 while it is parked), test/rust-host/vectors/envelope/version.json (generated verb list, regenerated for the new verb) | 1 | running |
 | 2a | [Retire the Node agent hook table](phase-02a-agent-hook-table.md) | - | src/setup/agent-hooks.mjs, scripts/lib/mailbox-live-confined.mjs, test/setup/agent-hooks.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/agent-hook-table.json | 3 | draft |
 | 2b | [Close the delete-guard keyword list twin](phase-02b-delete-guard-keyword-list.md) | 2a | packages/distribution/rust/src/agent_hooks.rs, packages/component-authority/model/doors/delete-guard-keyword-list.json | 4 | draft |
 | 2c | [Retire the wire-agents settings wording](phase-02c-person-agent-config-writes.md) | - | src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/component-authority/model/doors/person-agent-config-writes.json | 3 | draft |
@@ -257,9 +258,8 @@ unit-261123-0819-p03-result.md). Phases 6, 8 and 9 now depend on the single rows
 8 on 2a, 9 on 3e). Phase 4 no longer waits on phase 3, because no new phase shares its files.
 
 **Waits (each such phase stays `draft` until its wait clears; details are in the phase file):**
-- Phase 1 is `running` with the lead. Its last gap was the `authority.locate` row in
-  `packages/host-runtime/rust/src/catalog.rs`, now in the footprint (q-klz3vkxjee). The work is green in worktree
-  `-p01b` (unit-run-1795408708927-8c256f08), waiting for a replay in a clean worktree.
+- Phase 1 is `running` with the lead. Last park (lead, 2026-11-23): parked: branch component-authority-doors/p01c (49454bd22) passes its checks and its review, except that the generated test/rust-host/vectors/envelope/version.json must be regenerated, and that file is outside the footprint (question q-75yeaifwzn). Resolved by 243074c37, which
+  adds the envelope version vector to the footprint.
 - 2a and 2b wait for the mailbox lane to re-measure its frozen experiment sets without the Node hook table. No backlog
   item owns that yet; the supervisor asks the secretary for one.
 - 2f waits for Rust migration steps S6b and S7 (`261114-2051-rust-verb-migration-program`), which move the last
@@ -322,6 +322,9 @@ admits no plan whose footprint overlaps a `running` one):
   no model, `locate` and the skills report inactive. Folded into phase 5 as step 6, with acceptance 7. Phase 5
   already owns the verb, its wiring and its tests, so the footprint does not change, and a separate phase would
   share all of phase 5's files.
+- Owner addition 2026-11-23 12:50, relayed by lead:SUPERVISOR: in a project other than fgOS the model lives under
+  `.fgos/authority/model/`; the fgOS repository keeps `packages/component-authority/model/`. Applied to phase 5
+  step 6 (one path rule in the authority wiring), the step 5 gate, and acceptance 7. Footprint unchanged.
 - q-3iylevstr2 (`locate` in projects without a model): the owner answered A on 2026-11-23. `locate` is a gated
   capability. The skills call it only where the project has `packages/component-authority/model/`, and record
   `authority: inactive` otherwise, as the impact-analysis gate does. `plan-contract-check` skips the Authority-map
