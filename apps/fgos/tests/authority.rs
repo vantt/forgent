@@ -38,10 +38,12 @@ fn temp_project() -> PathBuf {
     project
 }
 
-fn locate_first(sentence: &str) -> serde_json::Value {
+fn authority_data(args: &[&str]) -> serde_json::Value {
     let project = temp_project();
     let output = Command::new(env!("CARGO_BIN_EXE_fgos"))
-        .args(["authority", "locate", sentence, "--json"])
+        .arg("authority")
+        .args(args)
+        .arg("--json")
         .env_remove("FGOS_CONFINED")
         .env_remove("FGOS_HEAD_REQUEST_SOCKET")
         .current_dir(&project)
@@ -50,13 +52,17 @@ fn locate_first(sentence: &str) -> serde_json::Value {
     let _ = fs::remove_dir_all(&project);
     assert!(
         output.status.success(),
-        "locate {sentence:?}: {}{}",
+        "authority {args:?}: {}{}",
         String::from_utf8_lossy(&output.stdout),
         String::from_utf8_lossy(&output.stderr)
     );
     let envelope: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(envelope["contract"], "fgos.v1", "{envelope}");
-    envelope["data"]["matches"][0].clone()
+    envelope["data"].clone()
+}
+
+fn locate_first(sentence: &str) -> serde_json::Value {
+    authority_data(&["locate", sentence])["matches"][0].clone()
 }
 
 #[test]
@@ -67,4 +73,19 @@ fn a_vietnamese_and_an_english_description_of_atomic_writes_both_rank_durable_fi
         assert_eq!(first["kind"], "component", "{sentence}: {first}");
         assert_eq!(first["matchedOn"], "alias", "{sentence}: {first}");
     }
+}
+
+#[test]
+fn authority_model_prints_the_loaded_model_with_door_slugs_and_writes_nothing() {
+    let data = authority_data(&["model"]);
+    for key in ["layers", "components", "decisionKinds", "doors", "contracts"] {
+        assert!(!data[key].is_null(), "missing {key}: {data}");
+    }
+    let slugs: Vec<&str> = data["doors"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|door| door["slug"].as_str())
+        .collect();
+    assert!(slugs.contains(&"yaml-parser-loads"), "{slugs:?}");
 }

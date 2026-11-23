@@ -986,7 +986,8 @@
             "type": "string",
             "description": "Sub-verb (positional); its own flags are under subcommands.<sub>.parameters.",
             "enum": [
-              "locate"
+              "locate",
+              "model"
             ]
           }
         },
@@ -998,7 +999,8 @@
         ]
       },
       "examples": [
-        "fgos authority locate \"atomic file write\" --json"
+        "fgos authority locate \"atomic file write\" --json",
+        "fgos authority model --json"
       ],
       "subcommands": {
         "locate": {
@@ -1025,6 +1027,17 @@
           "examples": [
             "fgos authority locate \"atomic file write\" --json",
             "fgos authority locate \"ghi file nguyên tử\" --limit 3"
+          ]
+        },
+        "model": {
+          "description": "Print the loaded, validated component authority model: layers, components, decision kinds, doors with their slugs, and contracts. Read-only; the way Node code reads the model.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "examples": [
+            "fgos authority model --json"
           ]
         }
       },

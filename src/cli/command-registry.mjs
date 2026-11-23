@@ -534,8 +534,17 @@ export const COMMAND_REGISTRY = [
           'fgos authority locate "ghi file nguyên tử" --limit 3',
         ],
       },
+      model: {
+        description: 'Print the loaded, validated component authority model: layers, components, decision kinds, doors with their slugs, and contracts. Read-only; the way Node code reads the model.',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+        examples: ['fgos authority model --json'],
+      },
     },
-    examples: ['fgos authority locate "atomic file write" --json'],
+    examples: ['fgos authority locate "atomic file write" --json', 'fgos authority model --json'],
     guide: {
       changes: 'Nothing: it reads the model files under packages/component-authority/model/.',
       prerequisites: 'A checkout that holds the component authority model.',

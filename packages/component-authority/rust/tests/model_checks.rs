@@ -37,8 +37,7 @@ fn is_id(id: &str) -> bool {
     let ok_first = chars
         .next()
         .is_some_and(|c| c.is_ascii_lowercase() || c.is_ascii_digit());
-    ok_first
-        && chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+    ok_first && chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
 }
 
 fn reasoned_path(item: &DoorPath) -> Option<&str> {
@@ -609,9 +608,7 @@ fn synthetic_coverage_provider_and_path_existence_checks_fail_with_the_named_fil
     assert!(message.contains("synthetic-no-provider"), "{message}");
 
     // Path existence: a live row whose path is missing under the temp root.
-    let mut missing = base_row(Some(
-        "packages/orphan-pkg/contracts/does-not-exist.v1.json",
-    ));
+    let mut missing = base_row(Some("packages/orphan-pkg/contracts/does-not-exist.v1.json"));
     missing.id = "synthetic-missing-path".into();
     let root = tmp.clone();
     let message = panic_message(move || assert_live_designed_paths_exist(&[missing], &root));

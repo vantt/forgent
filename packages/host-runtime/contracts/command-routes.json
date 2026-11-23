@@ -88,6 +88,11 @@
         "help",
         "sentence",
         "limit"
+      ],
+      "model": [
+        "dir",
+        "json",
+        "help"
       ]
     },
     "store": "none"
