@@ -44,6 +44,7 @@ import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk, insp
 import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
 import { readConfig } from '../config/facade.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { listWork, readAppliedEvents } from '../state/store.mjs';
 import { prepareWorkStore } from '../state/work-event-store.mjs';
 import { branchKey } from '../event-store/index.mjs';
@@ -681,7 +682,7 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
     worktrees.create({ path: checkout, branch: ownBranch, base: resolveRefSha(repoRoot, ownBranch), operationId: crypto.randomUUID() });
   }
   const custody = acquireSync(createLockScope('catchup-source'), 'dispatch-cwd', {
-    fgosDir: path.join(options.trustedMain, '.fgos'), cwd: checkout,
+    fgosDir: fgosDirFromRoot(options.trustedMain), cwd: checkout,
   });
   if (custody.result !== 'acquired') {
     throw new MergeError(`cannot catch up "${ownBranch}": source checkout custody is held`, { branch: ownBranch, code: 'lock-held', lock: 'dispatch-cwd' });
@@ -866,7 +867,7 @@ export async function landRunnerItem(repoRoot, item, {
   operationId = crypto.randomUUID(),
 } = {}) {
   const destination = `refs/heads/${target}`;
-  const fgosDir = path.join(repoRoot, '.fgos');
+  const fgosDir = fgosDirFromRoot(repoRoot);
   const mergeSlot = ['merge-slot', { fgosDir, ref: encodeURIComponent(destination) }, `merge slot of "${destination}"`];
   const lockHeld = ([lock, params, label]) => {
     const listed = lockHolders(lock, params);
@@ -1161,7 +1162,7 @@ export function releaseRecordedLand(repoRoot) {
   }
   const recordedBy = new Map();
   try {
-    for (const event of readAppliedEvents(path.join(repoRoot, '.fgos'))) {
+    for (const event of readAppliedEvents(fgosDirFromRoot(repoRoot))) {
       if (typeof event?.h !== 'string' || !event.h) continue;
       for (const operationId of settledLandOperations(event.payload)) if (!recordedBy.has(operationId)) recordedBy.set(operationId, event);
     }

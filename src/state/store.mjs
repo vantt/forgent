@@ -23,7 +23,7 @@ import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { KnowledgeValidationError, applyKnowledgeEvent } from './knowledge-registry.mjs';
 import { resolveFriction, recordFriction } from '../observe/friction-client.mjs';
 export { recordFriction, resolveFriction };
-import { resolveFgosFile, FGOS_FILE } from '../util/fgos-file-registry.mjs';
+import { resolveFgosFile, FGOS_FILE, fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { readClaim, readClaims, releaseClaimTx, withMainState, getMainFgosDir, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';
 
 import { StoreError, categoryOf } from '../util/store-error.mjs';
@@ -2014,7 +2014,7 @@ export function rebuild(dir) {
 /** The consumer registry's existing rebuild port, using prepared authority. */
 export function rebuildFromStore({ cwd, repoRoot, store, maxAttempts, heldRanks = [], globalConfigPath }) {
   const root = cwd ?? repoRoot;
-  const dir = getMainFgosDir(path.join(root, '.fgos'));
+  const dir = getMainFgosDir(fgosDirFromRoot(root));
   const config = readEventStoreConfig(path.dirname(dir), globalConfigPath);
   if (maxAttempts !== undefined) config.rebuild.maxAttempts = maxAttempts;
   let transaction;

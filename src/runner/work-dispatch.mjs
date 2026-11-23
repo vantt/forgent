@@ -8,6 +8,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { pathToFileURL } from 'node:url';
 import { resolveTaskSpecPath, resolveContentRoot } from './paths.mjs';
 import { loadAgentRoster, readTaskSpecHeader, resolveAgentTypeForTaskSpec } from './agent-roster.mjs';
@@ -257,7 +258,7 @@ function workerOutput(mainRoot, runResult, binding) {
 function describeBinding(mainRoot, unitRunId, binding) {
   if (!binding?.executor) return { command: null, provider: null, governance: null };
   try {
-    const record = JSON.parse(fs.readFileSync(path.join(mainRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
+    const record = JSON.parse(fs.readFileSync(path.join(fgosDirFromRoot(mainRoot), 'assignments', unitRunId, 'unit.json'), 'utf8'));
     const config = record.configSnapshot?.runner ?? {};
     const resolved = resolveExecutorConfig(config, binding.executor, { invocationId: binding.invocation });
     return { command: resolved.command ?? null, provider: resolved.provider ?? resolved.command ?? null, governance: resolved.governance ?? null };
