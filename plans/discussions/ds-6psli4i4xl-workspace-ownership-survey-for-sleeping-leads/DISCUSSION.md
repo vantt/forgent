@@ -19,13 +19,18 @@ hold still lacks is a proof, not a mechanism. One question is open: whether the 
 (the owner's wording) or whether the fresh lead finds it from the plan and git (the owner's "no second place" rule).
 That is Q1 (§3), parked as `q-n2o2nbs2or`; the overlap rows do not wait on it. Two overlaps were found and are listed in §7 as candidate backlog rows.
 
+Owner constraint 2026-11-23 15:05: the exit of this discussion is **not a new plan**. It only supplies what was
+discussed, as amendments that make plan `261122-0056-orchestration-skeleton` more exact (phase 6 requirement, footprint
+and verify). The hand-off goes to that plan's planner as an amendment request (§7 `#task-phase6-workspace-hold`).
+
 ## 2. Mục tiêu & đề bài
 
 The owner wants a lead that sleeps until a time to be safe to stop: its worktrees, branches and unlanded changes must
 survive while it sleeps, and the fresh lead that wakes must get the same workspace back instead of a clean checkout.
 The sleep and wake itself belongs to plan `261122-0056-orchestration-skeleton` phase 6 (`keeper.rs`); this topic
 only decides which existing component carries the workspace part, so that no second place tracks worktrees or wakes
-sessions (owner direction in `p-g6heszkdc7`, L10). Survey and design only: no code, no plan.
+sessions (owner direction in `p-g6heszkdc7`, L10). Survey and design only: no code, no new plan; the result is an
+amendment to the existing skeleton plan (owner, 2026-11-23 15:05).
 
 ## 3. Vấn đề rõ / chưa rõ
 
@@ -50,6 +55,8 @@ sessions (owner direction in `p-g6heszkdc7`, L10). Survey and design only: no co
 - 2026-11-23 14:5x, owner: "phát biểu lại mục tiêu của thảo luận này là gì". Shaper restated §2 and the four survey
   questions, with the first findings.
 - 2026-11-23 15:00, shaper: survey written to §6; Q1 raised to the owner.
+- 2026-11-23 15:05, owner: "orchestrate-skeleton đã có plan, vì vậy sau thảo luận này, đừng làm plan mới, chỉ cần cung
+  cấp thông tin được thảo luận hoặc điều chỉnh để plan chính xác hơn." Recorded in §1, §2 and §7.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -86,8 +93,12 @@ flowchart LR
 
 ### Workspace hold as a phase 6 requirement {#task-phase6-workspace-hold}
 
-Goal: the owner's hold, delivered inside skeleton phase 6, with no new store. D-IDs: none yet (waits on Q1). Draft
-verify: `cargo test -p fgos-supervision --test keeper` plus one owning test that sleeps a lead with an unlanded
+Goal: the owner's hold, delivered inside skeleton phase 6, with no new store. Form: an amendment to the existing plan
+`261122-0056-orchestration-skeleton`, never a new plan (owner, 2026-11-23 15:05). Proposed amendments to
+`phase-06-sleep-and-wake.md`: (a) Inputs add the checkout door (`packages/execution/checkout/src/work_remove.rs`) and
+the lead skill's worktree naming; (b) a step saying the successor brief names plan and phase so the fresh lead reuses
+worktree `<plan dir>-p<NN>`, or the Q1 alternative if the owner chooses it; (c) Verify adds the owning test below;
+(d) footprint adds that test's file. D-IDs: none yet (waits on Q1). Draft verify: `cargo test -p fgos-supervision --test keeper` plus one owning test that sleeps a lead with an unlanded
 change, lands another branch, runs the cleanup, wakes and finds the change in the same worktree.
 
 ### Overlap: a second worktree creator beside the checkout door {#task-overlap-workflow-create}
