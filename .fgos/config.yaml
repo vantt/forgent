@@ -308,7 +308,7 @@ eventStore:
 # @fgos:doc How a finished plan branch lands on the trunk: the gates it must pass and the files it regenerates.
 land:
   # @fgos:doc Gates a landing runs, each a command and optional path globs; a gate with when runs only if a landed path matches one, and without when it always runs. Default: [].
-  # @fgos:why [74bda49f-655f-46ea-b76a-7a230bb878a6] fgos land at least as strict as land-branch.sh: add its separate one-door scan and selector checks as gates and its census/selector regeneration (supervisor 2026-11-19, after S6A p05 landed an undeclared site)
+  # @fgos:why [39631fb7-af40-41d5-8e8b-18afb8376e42] heads-stable phase 3: the land door runs the plan contract check on every landed plan (p-erwx4t7gl6); restored now that the active release df57ddfc substitutes {plans}
   gates:
     - run: node scripts/run-tests.mjs test/architecture.test.mjs test/setup/git-mutation-census.test.mjs test/scripts/doc-health.test.mjs test/scripts/check-decision-citation-drift.test.mjs test/scripts/mailbox-behaviour-v7n.test.mjs test/rust-host/command-routes.test.mjs test/cli/fgos-manifest.test.mjs {tests}
       when:
@@ -337,6 +337,10 @@ land:
         - packages/**
         - bin/**
         - scripts/**
+    - run: node scripts/plan-contract-check.mjs {plans}
+      when:
+        - plans/*/plan.md
+        - plans/*/phase-*.md
   # @fgos:doc The command that regenerates derived files after a landing, with the files it rewrites; null runs none.
   # @fgos:why [74bda49f-655f-46ea-b76a-7a230bb878a6] restore land.regenerate for code paths only (when globs, 0414ccf9b); heads have cargo on PATH (timer re-rendered)
   regenerate:
