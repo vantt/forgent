@@ -17,3 +17,9 @@ Nothing was deleted: this is a wording change, so there is no deleted path and n
 Status: DONE_WITH_CONCERNS
 Summary: Reworded the wire-agents description in the registry and manifest and removed the door row's debt.
 Concerns: node and cargo were refused, so neither Verify command ran, and the manifest was edited by hand rather than regenerated.
+
+## Fix round
+The door row's `pre-wire-agents` pattern still matched the old description text `<file>.pre-wire-agents-<time>` in `src/cli/command-registry.mjs`, so the every-door-row-holds check failed once the debt entry was gone. The description now says it first copies each existing file to a timestamped backup beside it, and names the two settings it shows but never writes in plain words (agy's always-proceed mode, Claude's cross-session accept). No row pattern token remains in it. The same text is in `packages/host-runtime/contracts/command-manifest.json` (hand-edited; the apostrophes are escaped only in the JS string). Not run: node tests and `scripts/export-command-selectors.mjs`; the lead should run `test/architecture.test.mjs` and `test/cli/fgos-manifest.test.mjs`.
+
+Status: DONE_WITH_CONCERNS
+Summary: Reworded the wire-agents description in the registry and manifest so it matches no pattern of the door row; node tests not run.
