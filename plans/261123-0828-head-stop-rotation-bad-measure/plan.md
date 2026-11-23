@@ -101,6 +101,12 @@ Needed to close: an unconfined run of `npm test` and `cargo test --workspace` on
 worktree is ready at `/home/vantt/projects/forgent-worktrees/261123-0828-head-stop-rotation-bad-measure-p01v`
 (branch `head-stop-rotation-bad-measure/p01v`, tip `5a5dde6e0`, `node_modules` not installed).
 
+Full gate, 2026-11-23 23:33 +07: the owner ran `npm test` unconfined on `main` `5a5dde6e0`. It is **red**: 7895
+tests, 18 failing, none in the rotation or measure path. Per Risks, the row stays `in-flight` and no unrelated code is
+fixed here. `cargo test --workspace` is still not reported. Reds by name and likely source:
+[phase 1 verify report](reports/lead-261123-2333-head-stop-rotation-bad-measure-verify.md). Phase 1 waits on a green
+`main` (both gates) and then closes from that tree.
+
 With one phase there is no wave overlap. No integration phase is needed because there is nothing to merge: the
 phase's verify step is the full gate on `main`.
 
