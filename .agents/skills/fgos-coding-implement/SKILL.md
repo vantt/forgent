@@ -74,12 +74,21 @@ on how you got here:
   `fgos-coding-exploring`'s and `fgos-coding-planning`'s job, not this
   skill's).
 - Reuse before you add; retire what you replace. Before writing a new
-  function, helper, module or mechanism, search the whole repository (not
-  only the touched files) for one that already does the job, by name and by
-  the primitive it touches; reuse or extend it, and import the shared module
-  an import guard names instead of copying code. A change that replaces a
+  function, helper, module or mechanism, run
+  `fgos authority locate "<one sentence saying what it does>"` and read the
+  owning row it returns: the component, contract or door row that owns that
+  job is where the code lands, and a row that already provides it is reused or
+  extended, never copied. When no row owns it, `fgos authority declare` adds
+  one (a new component or decision kind needs the owner's answered question,
+  `--approved-by <q-id>`); do not write the code under a new name first.
+  `locate` ranks the model's names, aliases and meanings, so also search the
+  repository (`rg` by name and by the primitive it touches) for what the model
+  does not name, and import the shared module an import guard names instead of
+  copying code. Where the project has no model, `locate` answers
+  `authority: inactive`: record `authority: inactive` in the return note and
+  search the repository as above. A change that replaces a
   mechanism moves its consumers and deletes the old path in the same change.
-  Record what you searched and reused in the return note. Same rule as rule 5
+  Record what you located, searched and reused in the return note. Same rule as rule 5
   of `../_shared/coding-worker-contract.md` and AGENTS.md "Design principles".
 - Do not classify the item's domain or re-derive its stage.
   `fgos-routing` already resolved both before handing this item to this

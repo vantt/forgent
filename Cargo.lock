@@ -600,6 +600,7 @@ dependencies = [
 name = "fgos-component-authority"
 version = "0.2.0"
 dependencies = [
+ "fgos-durable-file",
  "fgos-yaml-doc",
  "serde",
  "serde_json",

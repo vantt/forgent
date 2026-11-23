@@ -7,6 +7,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  AUTHORITY,
+  AUTHORITY_MAP_REQUIRED_FROM,
   BACKLOG_SOURCE_REQUIRED_FROM,
   STATUSES,
   activeOverlaps,
@@ -18,6 +20,10 @@ import {
 
 const SCRIPT = fileURLToPath(new URL('../../scripts/plan-contract-check.mjs', import.meta.url));
 const SHA = 'a'.repeat(40);
+
+// The model comes from the host (`fgos authority model --json`); these cases answer for it. Unless a case says
+// otherwise the project has no model, so the Authority-map rule is skipped and the cases below it test their own rules.
+AUTHORITY.read = () => ({ authority: 'inactive' });
 
 const SECTIONS = '## Outcome\nx\n## Acceptance criteria\nx\n## Non-goals\nx\n## Owner questions\nnone\n## Risks and rollback\nx\n';
 const table = (rows) => `## Phases\n\n| id | title | depends-on | footprint | wave | status |\n|---|---|---|---|---|---|\n${rows.join('\n')}\n\n`;
@@ -273,6 +279,79 @@ test('a plan whose frontmatter is not valid YAML is legacy unless it claims the 
   assert.equal(old.legacy, true);
   assert.equal(mine.legacy, false);
   assert.ok(mine.errors[0].startsWith('frontmatter is not valid YAML'));
+});
+
+// The Authority-map rule (plan-contract.md §3). The ranking of rows and the model's own validity are owned by the
+// Rust crate; these cases own the script's reading of a plan's map against the model the host answers.
+const MODEL = {
+  components: [{ id: 'durable-file' }],
+  decisionKinds: [{ id: 'component-authority' }],
+  contracts: [{ id: 'CTR001' }],
+  doors: [{ slug: 'yaml-parser-loads' }],
+};
+const mapSection = (...rows) => `## Authority map\n\n| New thing | Model row | Note |\n|---|---|---|\n${rows.join('\n')}\n\n`;
+const withModel = (answer, fn) => {
+  const before = AUTHORITY.read;
+  AUTHORITY.read = typeof answer === 'function' ? answer : () => answer;
+  try { return fn(); } finally { AUTHORITY.read = before; }
+};
+const mapErrors = (answer, text) => withModel(answer, () => errorsOf(text));
+// A plan created on or after the rule's date, with the backlog source such a plan needs.
+const NEW = { created: AUTHORITY_MAP_REQUIRED_FROM, source: '["DISCUSSION.md", "p-abcdef2345"]' };
+const withMap = (status, ...rows) => planText({ fm: { status, ...NEW }, tail: SECTIONS + mapSection(...rows) });
+
+test('a draft or ready plan without an Authority map section is an error where the project has a model', () => {
+  for (const status of ['draft', 'ready']) {
+    assert.ok(mapErrors(MODEL, planText({ fm: { status, ...NEW } })).includes('missing section: authority map'), status);
+  }
+  assert.deepEqual(mapErrors(MODEL, withMap('ready', '| a new lock | `durable-file` | reuse |')), []);
+});
+
+test('an Authority-map row must name a row of the model or a declare line', () => {
+  const errors = mapErrors(MODEL, withMap('ready', '| x | `durable-file` | ok |', '| y | `no-such-row` | |', '| z | `declare: component billing` | |', '| w | `declare: widget billing` | |'));
+  assert.ok(errors.some((e) => e.includes('"no-such-row"') && e.includes('not a row of the model')));
+  assert.ok(errors.some((e) => e.includes('"declare: widget billing"')));
+  assert.equal(errors.filter((e) => e.startsWith('authority map')).length, 2, 'the model row and the good declare pass');
+  // Every kind of row is a model row: component, decision kind, contract, door slug.
+  assert.deepEqual(mapErrors(MODEL, withMap('draft', '| a | `component-authority` | |', '| b | `CTR001` | |', '| c | `yaml-parser-loads` | |')), []);
+});
+
+test('an overlap line in the Authority map must carry a survivor', () => {
+  const bad = withMap('ready', '| hash | `durable-file` | overlaps the old writer |');
+  assert.ok(mapErrors(MODEL, bad).some((e) => e.includes('an overlap names no survivor')));
+  const good = withMap('ready', '| hash | `durable-file` | overlaps the old writer; survivor: durable-file; retired: src/a.mjs |');
+  assert.deepEqual(mapErrors(MODEL, good), []);
+  // Prose under the table, and the word "overlap" alone, do not ask for a survivor.
+  const prose = planText({ fm: { status: 'ready', ...NEW }, tail: SECTIONS + mapSection('| hash | `durable-file` | no overlap with existing rows |') + 'This overlaps nothing.\n' });
+  assert.deepEqual(mapErrors(MODEL, prose), []);
+});
+
+test('running, done and withdrawn plans are not checked for an Authority map', () => {
+  for (const status of ['running', 'done', 'withdrawn']) {
+    const fm = status === 'running' ? { status, lead: 'lead:S6A' } : { status };
+    assert.deepEqual(mapErrors(MODEL, planText({ fm: { ...fm, ...NEW } })), [], status);
+  }
+});
+
+test('where the project has no model the Authority-map rule is skipped', () => {
+  assert.deepEqual(mapErrors({ authority: 'inactive' }, planText({ fm: { status: 'ready', ...NEW } })), []);
+});
+
+test('a model the host cannot answer is an error for a plan that needs a map, never a silent pass', () => {
+  const errors = mapErrors(() => { throw new Error('Rust host binary unavailable'); }, planText({ fm: NEW }));
+  assert.ok(errors.some((e) => e.startsWith('cannot read the authority model: Rust host binary unavailable')));
+  assert.deepEqual(mapErrors(() => { throw new Error('x'); }, planText({ fm: { status: 'running', lead: 'lead:S6A', ...NEW } })), []);
+});
+
+test('a plan created before the Authority-map rule is not checked for a map', () => {
+  assert.deepEqual(mapErrors(MODEL, planText({ fm: { ...NEW, status: 'ready', created: '2026-11-23' } })), []);
+  assert.ok(mapErrors(MODEL, planText({ fm: { status: 'ready', ...NEW } })).includes('missing section: authority map'));
+});
+
+test('the script gets the model from the host verb and opens no model file', () => {
+  const source = fs.readFileSync(SCRIPT, 'utf8');
+  assert.ok(source.includes("invokeHost(['authority', 'model', '--json'])"));
+  assert.ok(!/component-authority\/model/.test(source));
 });
 
 test('the script statuses equal the plan vocabulary contract', () => {

@@ -16,6 +16,7 @@ import { nativeDoor } from '../src/native/door.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
 import { PLAN_SECTIONS, hasSection } from '../src/portfolio/plan-sections.mjs';
+import { invokeHost } from '../src/util/host-bin.mjs';
 
 // The YAML door and the write-scope package both answer through the native addon; a checkout stages its own.
 ensureAddonForScript();
@@ -23,6 +24,8 @@ ensureAddonForScript();
 export const CONTRACT_MARKER = 'plan-v1';
 // Plans already under the contract before this rule cite no backlog id; only plans created from this date on must.
 export const BACKLOG_SOURCE_REQUIRED_FROM = '2026-11-22';
+// Plans written before the Authority-map rule carry no map; only plans created from this date on must.
+export const AUTHORITY_MAP_REQUIRED_FROM = '2026-11-24';
 // The plan vocabulary has one source, shared with the Rust portfolio reader and the head-name resolver.
 const VOCABULARY = JSON.parse(fs.readFileSync(new URL('../packages/supervision/contracts/plan-vocabulary.v1.json', import.meta.url), 'utf8'));
 export const STATUSES = VOCABULARY.statuses;
@@ -165,6 +168,72 @@ function checkPhaseTable(body, errors, status) {
   }
 }
 
+/**
+ * Where the check gets the component authority model: the host's `fgos authority model --json`, never a model
+ * file (only the Rust crate reads the model). The answer is `{ authority: 'inactive' }` where the project has no
+ * model, else the model itself. Read once per process; a test replaces `read`.
+ */
+export const AUTHORITY = {
+  cache: undefined,
+  read() {
+    this.cache ??= invokeHost(['authority', 'model', '--json']);
+    return this.cache;
+  },
+};
+
+const DECLARE_KINDS = ['component', 'decision-kind', 'door', 'contract'];
+const DECLARE_LINE = new RegExp(`^declare:\\s*(${DECLARE_KINDS.join('|')})\\s+[A-Za-z0-9][A-Za-z0-9-]*$`);
+
+/** The ids a model row can be named by in an Authority map: component, decision kind and contract ids, door slugs. */
+function modelRowIds(model) {
+  return new Set([
+    ...(model.components ?? []).map((row) => row.id),
+    ...(model.decisionKinds ?? []).map((row) => row.id),
+    ...(model.contracts ?? []).map((row) => row.id),
+    ...(model.doors ?? []).map((row) => row.slug),
+  ]);
+}
+
+/** The lines of the Authority map section of `body`: from its heading to the next heading; `null` when absent. */
+function authorityMapLines(body) {
+  const lines = body.split(/\r?\n/);
+  const start = lines.findIndex((l) => /^#{1,6}\s/.test(l) && /authority map/i.test(l));
+  if (start === -1) return null;
+  const rest = lines.slice(start + 1);
+  const end = rest.findIndex((l) => /^#{1,6}\s/.test(l));
+  return end === -1 ? rest : rest.slice(0, end);
+}
+
+/**
+ * The Authority-map rule for a `draft` or `ready` plan (plan-contract.md §3): the section exists, each row of its
+ * table names a row of the model or a `declare: <kind> <id>` line, and a line that says `overlaps` carries
+ * `survivor:`. Skipped where the project has no model, and for plans created before AUTHORITY_MAP_REQUIRED_FROM.
+ */
+function checkAuthorityMap(body, errors) {
+  let model;
+  try { model = AUTHORITY.read(); } catch (e) { errors.push(`cannot read the authority model: ${e.message}`); return; }
+  if (model?.authority === 'inactive') return;
+  const lines = authorityMapLines(body);
+  if (lines === null) { errors.push('missing section: authority map'); return; }
+  const known = modelRowIds(model ?? {});
+  const tableRows = lines.filter((l) => l.trimStart().startsWith('|')).map(cells).slice(2);
+  for (const row of tableRows) {
+    const cell = row[1] ?? '';
+    const tokens = /`/.test(cell) ? [...cell.matchAll(/`([^`]*)`/g)].map((m) => m[1].trim()) : plain(cell).split(/[,;]/).map((s) => s.trim());
+    for (const token of tokens.filter(Boolean)) {
+      if (/^declare:/i.test(token)) {
+        if (!DECLARE_LINE.test(token)) errors.push(`authority map: "${token}" is not "declare: ${DECLARE_KINDS.join('|')} <id>"`);
+      } else if (!known.has(token)) {
+        errors.push(`authority map names "${token}", which is not a row of the model and not a declare: line`);
+      }
+    }
+    if (!tokens.some(Boolean)) errors.push(`authority map: the row for "${plain(row[0] ?? '')}" names no model row`);
+  }
+  for (const line of lines.filter((l) => l.trimStart().startsWith('|'))) {
+    if (/\boverlaps\b/i.test(line) && !/survivor:/i.test(line)) errors.push(`authority map: an overlap names no survivor (write "survivor: <id>; retired: <path>"): ${plain(line).slice(0, 80)}`);
+  }
+}
+
 function legacyStatusErrors(status) {
   if (!status) return ['status is missing; write "draft"'];
   if (!STATUSES.includes(status)) {
@@ -231,6 +300,8 @@ export function checkPlanDir(dir, { plansRoot = path.dirname(path.resolve(dir)) 
   }
   for (const [name] of PLAN_SECTIONS) if (!hasSection(body, name)) errors.push(`missing section: ${name}`);
   checkPhaseTable(body, errors, meta.status);
+  const mapRequired = typeof meta.created === 'string' && meta.created >= AUTHORITY_MAP_REQUIRED_FROM;
+  if ((meta.status === 'draft' || meta.status === 'ready') && mapRequired) checkAuthorityMap(body, errors);
   const warnings = [];
   return { dir, legacy: false, meta, errors, warnings };
 }

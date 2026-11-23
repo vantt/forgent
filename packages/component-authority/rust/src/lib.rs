@@ -4,10 +4,12 @@
 //! `fgos-yaml-doc` into typed rows, `locate` ranks rows against a sentence describing work and `render` writes
 //! the generated blocks of the platform docs.
 
+pub mod declare;
 pub mod locate;
 pub mod model;
 pub mod render;
 
+pub use declare::{declare, Approvals, DeclareRequest, Declared, Kind, QuestionState, Refusal};
 pub use locate::{fold, locate, Match, MatchKind, MatchedOn};
 pub use model::{
     Component, Contract, DecisionKind, Door, DoorPath, Layers, Model, ModelError, TierException,

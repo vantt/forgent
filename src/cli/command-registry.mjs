@@ -542,8 +542,8 @@ export const COMMAND_REGISTRY = [
   }),
   withSubcommands({
     name: 'authority',
-    invoke: 'fgos authority <locate "<sentence>" [--limit N]|model|render [--check] [--preview-holder <path>]>',
-    description: 'Find the components, decision kinds, doors and contracts of the component authority model that match a description of the work, print the model, or render its ownership views into the platform docs. Run locate before writing a function, module or decision, so new code lands under the row that owns it.',
+    invoke: "fgos authority <locate \"<sentence>\" [--limit N]|model|declare --kind component|decision-kind|door|contract --row <json|file> [--approved-by <q-id>] [--plan <dir>] [--move]|render [--check] [--preview-holder <path>]>",
+    description: "Find the components, decision kinds, doors and contracts of the component authority model that match a description of the work, print the model, add or move a model row, or render its ownership views into the platform docs. Run locate before writing a function, module or decision, so new code lands under the row that owns it; run declare when no row owns it.",
     subcommands: {
       locate: {
         description: "Rank the model rows that match a sentence: an exact canonical name first, then an alias, then overlap with the row's meaning. Vietnamese diacritics are folded.",
@@ -562,13 +562,31 @@ export const COMMAND_REGISTRY = [
         ],
       },
       model: {
-        description: 'Print the loaded, validated component authority model: layers, components, decision kinds, doors with their slugs, and contracts. Read-only; the way Node code reads the model.',
+        description: 'Print the loaded, validated component authority model: layers, components, decision kinds, doors with their slugs, and contracts. Read-only; the way Node code reads the model. Answers {"authority": "inactive"} where the project has no model.',
         parameters: {
           type: 'object',
           properties: {},
           required: [],
         },
         examples: ['fgos authority model --json'],
+      },
+      declare: {
+        description: "Add a row to the model of the project, or move the owner of a decision kind. The row is checked against the model schema, against every row already there (canonical names and aliases, parents, owners, providers, consumers, one provider per contract path) and against the files it names. A new component or decision kind needs --approved-by naming an answered owner question; --move needs --plan naming a plan whose Authority map names the survivor. The first declare in a project without a model creates it. Nothing is written when any check refuses.",
+        parameters: {
+          type: 'object',
+          properties: {
+            kind: { type: "string", description: "Which row: component, decision-kind, door or contract.", enum: ["component", "decision-kind", "door", "contract"] },
+            row: { type: "string", description: "The row as JSON, or the path of a file holding it. A door row also carries slug, the name of its file." },
+            "approved-by": { type: "string", description: "The id of the answered owner question that approves a new component or decision kind." },
+            plan: { type: "string", description: "The plan directory whose plan.md Authority map names the survivor of a --move." },
+            move: { type: "boolean", description: "Move the owner of an existing decision kind: the row carries only id and the new owner." },
+          },
+          required: ['kind', 'row'],
+        },
+        examples: [
+          "fgos authority declare --kind component --row component.json --approved-by q-abc123",
+          "fgos authority declare --kind decision-kind --move --row '{\"id\":\"observe\",\"owner\":\"observe\"}' --plan plans/261121-2110-component-authority-doors",
+        ],
       },
       render: {
         description: 'Render the generated ownership views (component table, owner table, holder table, area map, shared entities, architecture map) from the model into the platform docs. With no flag it writes the views; --check writes nothing and fails on drift; --preview-holder writes only the holder-view preview report.',
@@ -588,20 +606,22 @@ export const COMMAND_REGISTRY = [
       },
     },
     examples: [
-      'fgos authority locate "atomic file write" --json',
-      'fgos authority model --json',
-      'fgos authority render --check',
+      "fgos authority locate \"atomic file write\" --json",
+      "fgos authority model --json",
+      "fgos authority declare --kind door --row door.json",
+      "fgos authority render --check",
     ],
     guide: {
-      changes: 'locate and model read the model files under packages/component-authority/model/ and write nothing; render rewrites the generated blocks inside the platform docs (or, with --check, writes nothing).',
-      prerequisites: 'A checkout that holds the component authority model.',
+      changes: "locate and model read the model files (packages/component-authority/model/ in the fgOS repository, .fgos/authority/model/ in every other project) and write nothing; declare writes one row into them, creating the model on a project's first declare; render rewrites the generated blocks inside the platform docs (or, with --check, writes nothing).",
+      prerequisites: "None: where the project has no model, locate and model answer authority: inactive. render needs a checkout that holds the component authority model.",
       exitCodes: [
-        '0 answered, with zero or more matches; render wrote the views or found no drift',
-        '4 refused: unknown sub-command, option or a missing sentence',
-        '1 failed: a model file is missing or invalid, or render --check found drift',
+        "0 answered, with zero or more matches, or inactive where there is no model; declare wrote its row; render wrote the views or found no drift",
+        "4 refused: unknown sub-command, option or a missing sentence, kind or row",
+        "1 failed: a model file is missing or invalid, declare refused the row by name, or render --check found drift",
       ],
-      next: 'Write the new code under the owning row, or declare a new row when none owns it.',
+      next: "Write the new code under the owning row, or declare a new row when none owns it.",
     },
+
     touchesState: false,
     store: 'none',
     externalEffect: true,

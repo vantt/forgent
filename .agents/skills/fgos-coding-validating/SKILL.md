@@ -114,6 +114,17 @@ FAIL on any dimension stops here and returns the item to
 `fgos-coding-planning` with the failing dimension named. Full mechanics:
 `references/bootstrap-and-reality-gate.md`.
 
+Also check the plan's **Authority map** (`../../../core/skills/_shared/plan-contract.md`
+§3) wherever the project has a component authority model. Run
+`fgos authority locate "<new thing>"` for each row and confirm the map names
+the row that owns it, or a `declare: <kind> <id>` with its reason, and a
+`survivor:` for every overlap. A missing or unproven map is a FAIL here: reject
+and return the plan to `fgos-coding-planning`. Until documentation H2 admission
+exists, this review is the independent admission step for each `declare` in
+the map; a new component or decision kind still needs the owner's answered
+question. Where `locate` answers `authority: inactive`, record
+`authority: inactive` in the verify note and go on.
+
 ### Step 3: Feasibility matrix
 For every assumption plan.md's risk map flagged medium or higher, write a
 row: assumption / risk / proof required / evidence found / result.

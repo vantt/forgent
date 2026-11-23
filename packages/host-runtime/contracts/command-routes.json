@@ -82,6 +82,16 @@
     ],
     "subcommands": true,
     "subcommand_flags": {
+      "declare": [
+        "dir",
+        "json",
+        "help",
+        "kind",
+        "row",
+        "approved-by",
+        "plan",
+        "move"
+      ],
       "locate": [
         "dir",
         "json",

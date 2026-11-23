@@ -50,6 +50,12 @@ the shared settled/paused exits.
   `docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md#pointers-implementation`)
   — never splice it raw into a shell command.
 - Call `fgos` subcommands directly: `fgos <verb> ...`.
+- Before the discussion or a spec names a component or contract, run
+  `fgos authority locate "<one sentence>"` and use the owning row's name; when a
+  spec creates one, run `fgos authority declare` (a new component or decision
+  kind needs the owner's answered question, `--approved-by <q-id>`). Where
+  the project has no model, `locate` answers `authority: inactive`: note
+  `authority: inactive` and go on.
 - Commit the discussion files to the item's `fgw/<id>` branch (no item: the
   plain worktree branch) at the end of every round that changed them.
 - Each §4 entry on the item path is also recorded via a real

@@ -65,11 +65,19 @@ Headings (any level) for each, in this order:
 1. **Outcome**: what is true when the plan is done, in plain words.
 2. **Acceptance criteria**: checks a stranger can run; each names its command or file.
 3. **Non-goals**: what is deliberately left out.
-4. **Phases**: the phase table (section 4).
-5. **Owner questions**: only what the owner alone can answer. Ask each with `fgos questions ask`
+4. **Authority map**: a table `New thing | Model row | Note`, between Non-goals and Phases. Each new
+   decision, function, module, verb or contract maps to a row id that `fgos authority locate "<sentence>"`
+   returns, or to `declare: <kind> <id>` when no row owns it (`kind` is `component`, `decision-kind`,
+   `door` or `contract`). A row that overlaps something that already exists says
+   `survivor: <id>; retired: <path>`. Applies only where the project has a component authority model
+   (`packages/component-authority/model/` in the fgOS repository, `.fgos/authority/model/` elsewhere);
+   where it has none, `fgos authority locate` answers `authority: inactive`, and the plan records
+   `authority: inactive` in place of the table and goes on.
+5. **Phases**: the phase table (section 4).
+6. **Owner questions**: only what the owner alone can answer. Ask each with `fgos questions ask`
    (five-part form of [decision-question.md](decision-question.md)) and list the `q-` ids here,
    each with its headline. Decide whatever the evidence settles instead of asking.
-6. **Risks and rollback**: failure modes and the single revert path.
+7. **Risks and rollback**: failure modes and the single revert path.
 
 ## 4. Organize for parallel work
 
@@ -85,7 +93,8 @@ The phase table has exactly these columns (order free):
 - **Footprint**: each phase lists the files it owns (create, modify, delete). Phases in the
   same wave must have disjoint footprints (equal paths or a path inside another's count as
   overlap; a glob counts as its fixed prefix).
-- **Door check**: before fixing the phase table, run `fgos resource-check --units <file.json>` on the
+- **Footprint check** (an overlap check between phases, not a check of what a phase creates; that is the
+  Authority map): before fixing the phase table, run `fgos resource-check --units <file.json>` on the
   draft (before the phase files exist) and `fgos resource-check --plan <plan dir>` after; fix the
   colliding pairs, cycles and layers it reports before you set a wave. In a project without fgOS,
   apply the same overlap rule by hand as stated above.
@@ -127,6 +136,13 @@ The phase table has exactly these columns (order free):
   does not touch is marked `ready` in the phase table and may start. List the blocked phase
   and its question; do not hold the others.
 - Prior art before design: say what the plan reused and what was missing.
+- Authority map: the validating reviewer rejects a plan whose map is missing or unproven (a row id that
+  `fgos authority locate` does not return, a `declare` with no reason, an overlap with no `survivor:`).
+  Until documentation H2 admission exists, that review is the independent admission step for each `declare`
+  in the map; a new component or decision kind still needs the owner's answered question (`fgos authority
+  declare --approved-by <q-id>`). The check for `draft` and `ready` plans fails a missing `Authority map`
+  heading, a row id that is not in the model and is not a `declare:` line, and an `overlaps` line without
+  `survivor:`; it skips the rule where the project has no model, and for plans created before 2026-11-24.
 - No plan ids, phase numbers, audit labels or finding codes in code comments, test names,
   migration names or commit messages: describe the behavior.
 - A planner ends its reply with the status block:
