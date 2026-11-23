@@ -356,7 +356,9 @@ pub fn assert_inline_mutating_assignment_authorized(
         ));
     }
 
-    let account_state = recorded.and_then(|r| r.get("accountState")).filter(|s| s.is_object());
+    let account_state = recorded
+        .and_then(|r| r.get("accountState"))
+        .filter(|s| s.is_object());
     let recomputed = replay_bind(
         &unit_record,
         &seat,
@@ -389,7 +391,9 @@ pub fn assert_inline_mutating_assignment_authorized(
                 )
             };
             return Err(RunnerConfigError::coded(
-                format!("executeAssignment: mutating unit-run assignment \"{id}\" {what} -- refused"),
+                format!(
+                    "executeAssignment: mutating unit-run assignment \"{id}\" {what} -- refused"
+                ),
                 code,
             ));
         }

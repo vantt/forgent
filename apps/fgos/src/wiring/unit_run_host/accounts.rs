@@ -11,10 +11,10 @@ use fgos_execution::bind::BindSession;
 use fgos_execution_engine::accounts::pin::{assert_pinned_accounts_usable, AccountPin};
 use fgos_execution_engine::accounts::rotation::{inspect_account_rotation, Rotation};
 use fgos_execution_engine::accounts::{Accounts, SystemHost};
-use fgos_execution_engine::unit_run::host::{AccountRead, BoundSeat};
 use fgos_execution_engine::planning::bind_facade::{
     bind as facade_bind, preflight_of, AccountStateSource, BindContext, PreflightRequest,
 };
+use fgos_execution_engine::unit_run::host::{AccountRead, BoundSeat};
 use fgos_execution_engine::unit_run::run_unit_contract::{ErrorTag, RunUnitError};
 use serde_json::{json, Value};
 
