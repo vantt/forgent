@@ -7,6 +7,10 @@ patterns:
   - dev\.fgos\.\$\{?stem
   - export function (?:checkManagedTimer|fixManagedTimer|unitStem)\b
   - pub fn (?:check_managed_timer|fix_managed_timer|remove_managed_timer|unit_stem)\b
+names:
+  - checkManagedTimer
+  - fixManagedTimer
+  - unitStem
 allowed:
   - packages/distribution/rust/src/timer.rs
 debt: []

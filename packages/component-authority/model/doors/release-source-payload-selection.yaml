@@ -2,6 +2,9 @@ job: release source payload selection
 kind: door
 patterns:
   - (?:function|fn)\s+(?:collectSourceFiles|listLegacyNodeSourceFiles|list_source_files)\b
+names:
+  - collectSourceFiles
+  - listLegacyNodeSourceFiles
 allowed:
   - packages/distribution/rust/src/source_payload.rs
   - path: scripts/build-rust-distribution.mjs

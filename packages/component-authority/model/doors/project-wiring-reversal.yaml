@@ -4,6 +4,11 @@ patterns:
   - \.pre-uninstall-(?:\$\{|\{)
   - export function (?:uninstallProject|uninstallGitHooks)\b
   - pub fn (?:uninstall_project|unwire_git_hooks)\b
+names:
+  - uninstall_project
+  - unwire_git_hooks
+  - uninstallProject
+  - uninstallGitHooks
 allowed:
   - apps/fgos/src/wiring/uninstall.rs
 debt: []

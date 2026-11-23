@@ -4,6 +4,10 @@ patterns:
   - export function (?:writeCoexistenceManifest|detectHarnesses)\b
   - pub fn (?:write_coexistence_manifest|detect_harnesses)\b
   - <tmpdir>/fgos-worktrees
+names:
+  - detect_harnesses
+  - detectHarnesses
+  - writeCoexistenceManifest
 allowed:
   - packages/distribution/rust/src/coexistence.rs
 debt: []

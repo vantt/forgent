@@ -5,6 +5,10 @@ patterns:
   - \.reclaim\.lock
   - \bhotRecord(?:Read|UnlinkIfUnchanged|Reclaim)\b
   - \.hot\b
+names:
+  - readHotRecord
+  - reclaimDeadHolder
+  - unlinkRecordIfUnchanged
 allowed:
   - packages/holder-lock/rust/src/hot_record.rs
   - path: packages/git/node-addon/src/holder_lock.rs

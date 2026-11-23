@@ -2,6 +2,8 @@ job: verb manifest projection
 kind: door
 patterns:
   - \bpublicManifest\(
+names:
+  - publicManifest
 allowed:
   - src/cli/command-registry.mjs
   - path: scripts/export-command-selectors.mjs

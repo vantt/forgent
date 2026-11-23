@@ -6,6 +6,8 @@ patterns:
   - \bfn overlaps\(
   - \b(?:writeScopesOverlap|literalsOverlap|globsMeet)\b
   - \bfgos_write_scope::(?:scopes_)?overlaps\b
+names:
+  - pathsOverlap
 allowed:
   - packages/write-scope/src/lib.rs
   - path: packages/git/rust/src/land.rs

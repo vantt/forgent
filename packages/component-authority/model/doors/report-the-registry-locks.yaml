@@ -5,6 +5,8 @@ patterns:
   - \bexistingInstances\b
   - export function collectLockStatus
   - pub fn collect\(
+names:
+  - collectLockStatus
 allowed:
   - packages/holder-lock/rust/src/status.rs
 debt: []

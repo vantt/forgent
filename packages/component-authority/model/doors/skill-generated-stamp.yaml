@@ -5,6 +5,8 @@ patterns:
   - generated thin wrapper \(tsk-1qi
   - export function (?:generatedSkillDirs|ownedSkillNames)\b
   - pub fn (?:generated_skill_dirs|owned_skill_names)\b
+names:
+  - generatedSkillDirs
 allowed:
   - packages/distribution/rust/src/skill_stamp.rs
   - path: src/setup/skill-wrappers.mjs

@@ -3,6 +3,14 @@ kind: door
 patterns:
   - export function (?:detectRcFiles|hasSourceLine|deadSourceLines|insertSourceLine)\b
   - pub fn (?:detect_rc_files|has_source_line|dead_source_lines|rc_files_sourcing)\b
+names:
+  - detect_rc_files
+  - has_source_line
+  - dead_source_lines
+  - detectRcFiles
+  - hasSourceLine
+  - deadSourceLines
+  - insertSourceLine
 allowed:
   - packages/distribution/rust/src/rc_lines.rs
 retiredBy: "S7: the Node payload retires"

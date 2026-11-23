@@ -5,6 +5,19 @@ patterns:
   - \bfn (?:executor_facts|launch_view_of|account_view_of|seat_config_of|family_keyed|resolve_persona)\b
   - \bfgos_seat_binding::bind\b
   - \buse fgos_seat_binding::(?:\{[^}]*\b)?bind\b
+names:
+  - executor_facts
+  - launch_view_of
+  - account_view_of
+  - seat_config_of
+  - family_keyed
+  - resolve_persona
+  - executorFacts
+  - launchViewOf
+  - accountViewOf
+  - seatConfigOf
+  - familyKeyed
+  - resolvePersona
 allowed:
   - path: packages/execution/rust/src/bind.rs
     reason: "composes one seat: the persona and launch views, the family-keyed config and the account view, then calls the ranking function of the seat-binding crate (the only call of it outside that crate)"
