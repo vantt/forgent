@@ -1,15 +1,25 @@
 ---
 id: ds-wham5txfkv
 title: "Inventory every live Node area and order the Rust port, one plan per area"
-status: paused
+status: settled
 source:
   - p-vwpnx4gpow
 created: 2026-11-23
 ---
 
-discussion: paused
+discussion: settled
 
-## Hand-off to the planner (suspended 2026-11-23 16:10, owner order: component-authority first; redo on the post-doors tree)
+## Closing note (2026-11-23 16:5x, round 4)
+
+This discussion answers backlog `p-vwpnx4gpow` with the **inventory** in §6: every live Node area in `src/`, its files,
+tests, Rust ownership, callers and tier. It is settled as that inventory and goes to **no planner**. The owner replaced the
+"one port plan per area" part. The remaining work runs the HARDEN per-layer loop, Work last (D7, D8). It continues in a new
+discussion, "HARDEN next round", which the secretary is asked to open with its own backlog row. That discussion takes as
+input the §6 inventory (recounted after doors and `261122-2108` land, D9), the HARDEN carry-overs H1–H7 in §3, and D1, D6–D9.
+T7 Work gets its own discussion when its turn comes. The other layers get none, because each layer's council is its design round (D10).
+The hand-off block below is superseded and kept only as history.
+
+## Hand-off to the planner (superseded 2026-11-23 16:5x by the closing note; kept as history)
 
 - **Outcome:** every live Node area in `src/` (and `bin/*.mjs`) is retired into Rust through the ten plans of §7, opened
   one at a time in that order. When plan 10 lands, no `legacy-cli` route and no `legacy-node` payload remain.
@@ -28,6 +38,11 @@ discussion: paused
 - **Sources:** `p-vwpnx4gpow`, `plans/261114-2051-rust-verb-migration-program/plan.md`, D1–D5.
 
 ## 1. Trạng thái hiện tại
+
+**Round 4 (2026-11-23 16:38–16:5x): closed as the inventory.** The owner rejected a plain port. The remaining layers run the HARDEN
+loop of `261021-1118` (D7), in the order T2–T3 session → T6 → T8 → T9 → T7 Work last (D8). The owner then asked whether to
+rewrite this discussion or start a new one. Rewriting would change the topic of `p-vwpnx4gpow` under the same id, so it was
+split instead (D10): this file closes as the inventory, and "HARDEN next round" is a new discussion. The owner agreed.
 
 **Round 3 (2026-11-23 16:02–16:30): paused by owner order.** The owner learned that HARDEN (`261021-1118`, done
 2026-11-18) moved decisions into Rust and thinned Node for T0–T5, but deleted no Node. T6 was hardened inside Node
@@ -152,6 +167,14 @@ allowed to run beside any step. F0 through S6a have landed (S6a ended after its 
 | O6 | Owner, 16:2x: does component authority have a warn-only versus blocking switch? Today: no setting. `debt` entries act as a visible "known, not yet fixed" list (no failure, but a stale entry fails). Doors phase 10 removes `debt`, after which any match outside allowed files turns `npm test` red. The phase 5 plan gate is a reviewer reject, inactive only when a project has no model. A switch would be a new config key (`core/config-standard`, `core/config-schema`) and a change to the doors plan | closed 16:32: owner needs no switch; `debt` already serves as the warn list | `docs/platform/component-authority/spec.md` §4; doors `phase-10-land-checks.md`, `phase-05-*.md` |
 | O5 | Logic leaves inside facade areas: `util/domain-compile.mjs` → plan 1; `git/main-checkout-delete-guard.mjs` → S1; `identity/directory-store.mjs` is dead (no product importer) → plan 1 | clear | round 2 file-by-file header read |
 | O4 | Test counts in §6 are "test files that import the area", so a test can count under several areas. Backlog says 588 test files in all. | clear (method stated) | scratchpad script, method in §5 |
+| H1 | **T6 carry-over:** hardened in Node (Node +44, tests +695, decision 73); no Workflow crate; Workflow doctor rows on the bridge (`bridge:S6b`) | input to "HARDEN next round" | `plans/reports/closing-261118-1344-harden-root-closing.md` §1, §6 |
+| H2 | **T9 carry-over:** entry loads 211 modules; doctor 15 s vs 12 s; Node +2,136. H9b: echo fixture in the host-runtime crate. H9c: tautological admission gate (`p-ltwb2h3k6s`). Node `version` arm (`command-registry.mjs:140`). First-run text in three places. `findExecutableOnPath` plus four PATH walkers. Did-you-mean third copy (`p-xtawpgzvjy`). Doctor row catalog held twice (`p-pvs4go2qei`). H11: canonical-JSON producer twin, declined in code. | input | closing report §2, §3 |
+| H3 | **Packaging carry-over:** 14 MUST fails open at close (each has a closer). `is_store_entry_name` missing. The `setup` pieces of D2. `doctor-bridge.mjs` goes with the last bridged row. | input | closing report §6, §3 |
+| H4 | **Ledger rows without receiver closure:** H3, H12 (`forgentx-5f` does not run), H22, H23 (WORK), and H9–H13, H17, H24 (self-recorded) | input | closing report §4 |
+| H5 | **Two reds at HARDEN close:** a stale `workflow start --plan` test and stale instruction projections. Not rechecked here. | input | closing report §5 |
+| H6 | **New since HARDEN:** session-host (7 files, 2,127 lines) and session-rotation (2 files, 811 lines) are Node and never went through a council | input | §6 rows 10, 13 |
+| H7 | **S1 hook verdicts** (`git/main-checkout-delete-guard.mjs`, `state/decision-question.mjs`, `runner/hook.mjs`): which layer phase owns them | input | program `261114-2051` row S1 |
+| C5 | The T8 tier name in `layers.json` ("Skill and Domain (no file today)") is stale: the model puts `supervision` at tier 8 and the domains at T7 | input | `layers.json`, `components.json` |
 
 ## 4. Quyết định đã chốt
 
@@ -163,6 +186,10 @@ allowed to run beside any step. F0 through S6a have landed (S6a ended after its 
 | D4 | This inventory sizes the program's remaining rows (S1, S6b, S7), splitting S7 into plans 5–7 and adding plans 1–3 and 8–10. It does not reorder the owner-approved order. | 2 | `261114-2051` "S1-S7 each get their own detailed plan … when they start" |
 | D5 | Owner decision 78 stands: the Work council is held before plan 5 opens. Plans 1–4 do not wait for it. | 2 | `261021-1118` lessons.md:104, :152 |
 | D6 | Owner chose option (a) on 2026-11-23 16:3x: doors phase 10 locks every door except the named debt of 2f (and 2g while `p-rypvkc3kai` is open), `retiredBy` the Workflow/Work port. Doors closes before the port, and this discussion is redone after doors and `261122-2108` land (§1 round 3b, step 4). | owner answer | chat 16:3x "ok, đồng ý phương án a" |
+| D7 | The remaining work is not a plain port. Each unfinished layer runs the HARDEN per-layer loop of `261021-1118` (steps 1–9). Those steps are: baseline; a two-part council producing the migration table, delete list, doctor table and tests table; arbitration; one batched owner ask; a sub-plan with a delete list and tests to retire; independent verify; land and activate; re-measure; close at net Δ ≤ 0. Moving Node to Rust is one column of the migration table. **Supersedes D3 and D4.** | owner answer | chat 16:38 "nó không phải là một porting đơn thuần"; 16:44 "ok đồng ý" |
+| D8 | Layer order, bottom-up, with a council opening only after the layer below closes: T2–T3 session → T6 Workflow → T8 supervision → T9 host, surface, packaging and report → T7 Work last (decision 78 council, after the packaging release per option B). **Supersedes D2's "packaging first" (packaging folds into T9) and D5's plan numbering.** Decision 78 stands. | owner answer | chat 16:38 "anh vẫn muốn delay Work lại sau cùng"; 16:44 "ok đồng ý" |
+| D9 | The §6 inventory is the input to each layer's baseline (step 1), not a list of plans. It is recounted after doors and `261122-2108` land. | follows from D7 | round 4 |
+| D10 | This discussion closes as the inventory. "HARDEN next round" is a new discussion with its own backlog row. T7 Work gets its own discussion when it opens. No other layer gets a separate discussion, because its council is its design round, as in HARDEN. | owner answer | chat 16:5x "anh đồng ý" |
 
 ## 5. Q&A log
 
@@ -185,9 +212,15 @@ allowed to run beside any step. F0 through S6a have landed (S6a ended after its 
 - **2026-11-23 16:3x — owner:** "ok, đồng ý phương án a" → D6.
 - **2026-11-23 16:2x — owner:** asked whether authority has a warn-or-block setting → O6.
 
+- **2026-11-23 16:33–16:38 — owner:** asked how plans 1–10 relate to the tiers and what T0–T9 mean. Answered from `layers.json` and `components.json`; found the stale T8 name (C5).
+- **2026-11-23 16:38 — owner:** "anh vẫn muôn delay Work lại sau cùng … phải làm theo cách của plan HARDEN … không phải là một porting đơn thuần." Answered with the HARDEN per-layer loop and the order T2–T3 → T6 → T8 → T9 → T7.
+- **2026-11-23 16:44 — owner:** "ok đồng ý, viết lại discussion theo khung đó" → D7, D8, D9. A rewrite was drafted and not landed.
+- **2026-11-23 16:4x — owner:** "viết discussion mới hay viết lại … có nên tách …?" Rewriting would change the topic of `p-vwpnx4gpow` under the same id, so the proposal was: close this one as the inventory, open "HARDEN next round", and give Work its own discussion later.
+- **2026-11-23 16:5x — owner:** "anh đồng ý" → D10; closed as the inventory.
+
 ## 6. Thiết kế đã chốt {#design}
 
-*Settled, round 2 (D1–D5).*
+*Round 2 shape (D1–D5), kept as history. D7–D10 superseded the port-plan list; the inventory table below stays valid as input (D9).*
 
 ### Shape
 
@@ -246,7 +279,7 @@ and `scripts/*.mjs` callers of `src/` (each plan moves its own script callers).
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-*Settled order (D2–D5). Each entry becomes one plan, opened one at a time.*
+*Superseded by D7, D8 and D10: these entries are not handed to a planner. The work continues in the "HARDEN next round" discussion, phase by layer.*
 
 ### 1. Packaging remainder {#task-packaging}
 Goal: port the setup pieces in D2 and `util/domain-compile.mjs` into `packages/distribution`, move their script callers (`build:skills` and friends), and
