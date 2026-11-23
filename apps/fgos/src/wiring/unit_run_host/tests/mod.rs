@@ -431,11 +431,14 @@ fn a_seat_binds_to_the_executor_the_machine_can_start() {
     let session = json!({ "pathEnv": scratch.0, "herdrPresent": false, "postureAtLaunch": true });
     let accounts =
         json!({ "runtimeDir": scratch.0.join("runtime"), "assignmentId": "u1/producer/1" });
-    let bound = accounts::bind(&ask, &runner, &session, &accounts, &json!({})).unwrap();
+    let bound = accounts::bind(&ask, &runner, &session, &accounts, &json!({}))
+        .unwrap()
+        .binding;
     assert_eq!(bound["executor"], "stub", "{bound}");
     assert!(bound["bindingInput"]["hostVersion"].is_string(), "{bound}");
     let unbound = accounts::bind(&ask, &runner, &json!({ "pathEnv": scratch.0.join("empty"), "herdrPresent": false, "postureAtLaunch": true }), &Value::Null, &json!({}))
-        .unwrap();
+        .unwrap()
+        .binding;
     assert!(
         unbound.get("refused").is_some() || unbound["executor"] != "stub",
         "{unbound}"

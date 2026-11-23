@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e95752355560f7ea724be2546597aa82ba8904e7e993f95b43732e8f6dd6e105",
+  "payloadDigest": "2b2baa996d7158d83ef83b102c545c2781526cbd0e728ee60c0a49391bc4e153",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -186,7 +186,7 @@
     "apps/fgos/src/wiring/unit_run_host/session_attempt.rs": "99ac26c01f88bdb73d707ce4742a7fe3f81d978ebc07c2cb6d6b1dbafbabf57e",
     "apps/fgos/src/wiring/unit_run_host/settlement.rs": "0705eb7756db621bb274a2eb76e62657b259394dda443576b0fcc75bbf6273da",
     "apps/fgos/src/wiring/unit_run_host/terminal.rs": "c7515140c79a9d1a06a543f2ef795813d90b6ff13ac80f4d9098928ef4f01acc",
-    "apps/fgos/src/wiring/unit_run_host/tests/mod.rs": "a22f2cac7cd5a75628e95bd8dbe1d1f6095c25ba5ce940bc8ea8a3aa989a5dce",
+    "apps/fgos/src/wiring/unit_run_host/tests/mod.rs": "fcc74528ec053f68fcde540a5cf6a51714be160e7b4b599a9d01171275b31f6a",
     "apps/fgos/src/wiring/unit_run_host/tests/run_unit.rs": "6ae520d5bff45b261383fedb310edc5a1aeaff5145d0a1ffb5b0580c3ff3089a",
     "apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs": "4180d325caa7cac8737882398df83da89c713a9b473f6105f098a55163318676",
     "apps/fgos/src/wiring/unit_run_host/tests/terminal.rs": "a96c3fc26fad0dcebe2d752cbf05ebe8279c9201f1e3f6c17c863c23da886b12",
