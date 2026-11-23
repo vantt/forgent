@@ -162,12 +162,30 @@ function isTargetUnwritable(env, cwd, err) {
 }
 
 /**
+ * Whether the inherited FGOS_ACTIVE_MANIFEST_PATH names a release whose Node payload is this checkout. The
+ * release root is FGOS_ACTIVE_RELEASE_PATH (the manifest's directory when unset); an activated release
+ * elsewhere cannot serve this checkout, and an unreadable or malformed manifest serves nothing.
+ */
+function inheritedManifestServes(env, cwd) {
+  const manifestPath = env.FGOS_ACTIVE_MANIFEST_PATH;
+  if (!manifestPath) return false;
+  try {
+    const root = JSON.parse(fs.readFileSync(manifestPath, 'utf8')).components.legacyNode.root;
+    if (typeof root !== 'string') return false;
+    const releaseRoot = env.FGOS_ACTIVE_RELEASE_PATH || path.dirname(manifestPath);
+    return fs.realpathSync(path.resolve(releaseRoot, root)) === fs.realpathSync(cwd);
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Makes the addon loadable for a script that reads YAML from a checkout: every YAML parse goes through the
  * native door, which loads only through a staged manifest. Tries reuse first; builds if missing or stale.
  * If building fails because target is unwritable, throws a named cause.
  */
 export function ensureAddonForScript(env = process.env, cwd = REPO_ROOT) {
-  if (env.FGOS_ACTIVE_MANIFEST_PATH) return;
+  if (inheritedManifestServes(env, cwd)) return;
   try {
     ensureStagedOrBuiltGitAddon(env, cwd, true, { captureStderr: true });
   } catch (err) {

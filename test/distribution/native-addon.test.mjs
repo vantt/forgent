@@ -234,7 +234,7 @@ process.exit(101);
     const digestFile = path.join(addonDir, GIT_ADDON_SOURCE_DIGEST_FILE);
     fs.writeFileSync(digestFile, gitAddonSourceDigest(repo));
 
-    const runProbe = (mode) => {
+    const runProbe = (mode, extraEnv = {}) => {
       const probe = `
 import assert from 'node:assert/strict';
 import { ensureAddonForScript } from './scripts/lib/git-addon-stage.mjs';
@@ -243,8 +243,13 @@ const env = { ...process.env };
 delete env.FGOS_ACTIVE_MANIFEST_PATH;
 delete env.FGOS_HOST_BIN;
 delete env.FGOS_ACTIVE_RELEASE_PATH;
+if (process.argv[1] === 'inherited') {
+  env.FGOS_HOST_BIN = process.env.PROBE_HOST_BIN;
+  env.FGOS_ACTIVE_RELEASE_PATH = process.env.PROBE_RELEASE_PATH;
+  env.FGOS_ACTIVE_MANIFEST_PATH = process.env.PROBE_MANIFEST_PATH;
+}
 
-if (process.argv[1] === 'fresh') {
+if (process.argv[1] === 'fresh' || process.argv[1] === 'inherited') {
   ensureAddonForScript(env, ${JSON.stringify(repo)});
   console.log(JSON.stringify({
     FGOS_HOST_BIN: env.FGOS_HOST_BIN,
@@ -261,7 +266,7 @@ if (process.argv[1] === 'fresh') {
 }
 `;
       // The caller's cargo settings must not steer the probe: the target is always the read-only directory.
-      const childEnv = {...process.env, PATH: `${temp}${path.delimiter}${process.env.PATH}`, CARGO_TARGET_DIR: targetDir};
+      const childEnv = {...process.env, PATH: `${temp}${path.delimiter}${process.env.PATH}`, CARGO_TARGET_DIR: targetDir, ...extraEnv};
       delete childEnv.CARGO_BUILD_TARGET_DIR;
       return execFileSync(process.execPath, ['--input-type=module', '-e', probe, mode], {
         cwd: repo,
@@ -277,6 +282,23 @@ if (process.argv[1] === 'fresh') {
     assert.equal(freshOut.FGOS_ACTIVE_RELEASE_PATH, repo);
     assert.equal(freshOut.FGOS_ACTIVE_MANIFEST_PATH, manifest);
     assert.equal(fs.existsSync(cargoRecord), false, 'cargo stub was not called for fresh staged addon');
+
+    // 1b. An inherited release whose payload is another directory cannot serve this checkout: the staged addon wins
+    const foreign = path.join(temp, 'foreign-release');
+    fs.mkdirSync(path.join(foreign, 'payload'), {recursive: true});
+    const foreignManifest = path.join(foreign, 'manifest.json');
+    fs.writeFileSync(foreignManifest, JSON.stringify({components: {legacyNode: {root: 'payload'}}}));
+    const foreignOut = JSON.parse(runProbe('inherited', {PROBE_HOST_BIN: path.join(foreign, 'fgos'), PROBE_RELEASE_PATH: foreign, PROBE_MANIFEST_PATH: foreignManifest}));
+    assert.equal(foreignOut.FGOS_HOST_BIN, hostBin);
+    assert.equal(foreignOut.FGOS_ACTIVE_RELEASE_PATH, repo);
+    assert.equal(foreignOut.FGOS_ACTIVE_MANIFEST_PATH, manifest);
+    assert.equal(fs.existsSync(cargoRecord), false, 'cargo stub was not called with a foreign inherited release');
+
+    // 1c. An inherited manifest that serves this checkout is left untouched
+    const servingOut = JSON.parse(runProbe('inherited', {PROBE_HOST_BIN: '/inherited/fgos', PROBE_RELEASE_PATH: repo, PROBE_MANIFEST_PATH: manifest}));
+    assert.equal(servingOut.FGOS_HOST_BIN, '/inherited/fgos');
+    assert.equal(servingOut.FGOS_ACTIVE_RELEASE_PATH, repo);
+    assert.equal(servingOut.FGOS_ACTIVE_MANIFEST_PATH, manifest);
 
     // 2. Stale case with an unwritable target directory: named error thrown
     fs.writeFileSync(digestFile, 'stale-source-digest');
