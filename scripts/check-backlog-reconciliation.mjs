@@ -120,6 +120,9 @@ export function checkBacklogReconciliation(root = repoRoot) {
   }
 
   for (const item of proposedItems) {
+    if (item.originalId && sections.has(item.id) && sections.has(item.originalId)) {
+      fail(`${item.id}: has a section under its id and another under its Original id ${item.originalId} in RECONCILIATION.md`);
+    }
     const sectionKey = sections.has(item.id)
       ? item.id
       : (item.originalId && sections.has(item.originalId) ? item.originalId : null);

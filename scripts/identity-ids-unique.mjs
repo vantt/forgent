@@ -38,10 +38,9 @@ export function readBacklogItemIdentity(text, file = 'backlog item') {
     throw new Error(`${file}: missing required frontmatter key 'id'`);
   }
   const status = typeof meta.status === 'string' && meta.status.trim() ? meta.status.trim() : null;
-  const origMatch = /Original id:\s*([^\s.]+)/i.exec(body ?? '');
-  const originalId = (typeof meta.originalId === 'string' && meta.originalId.trim())
-    || (typeof meta.original_id === 'string' && meta.original_id.trim())
-    || (origMatch ? origMatch[1].trim() : null);
+  // Only a line of its own counts; a prose or backtick mention inside a sentence does not.
+  const origMatch = /^Original id:\s*(\S+?)\.?\s*$/m.exec(body ?? '');
+  const originalId = origMatch ? origMatch[1] : null;
   return { id, status, originalId, meta, body };
 }
 

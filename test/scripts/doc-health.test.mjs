@@ -7,7 +7,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { checkDeadReferences, checkDocuments, checkPlatformLinks, checkPlatformMetadata, checkRuleClaims, checkVerbReferences, governanceBaselineFields } from '../../scripts/doc-health.mjs';
-import { checkIdentityIdsUnique } from '../../scripts/identity-ids-unique.mjs';
+import { checkIdentityIdsUnique, readBacklogItemIdentity } from '../../scripts/identity-ids-unique.mjs';
 import { checkBacklogReconciliation } from '../../scripts/check-backlog-reconciliation.mjs';
 import { enumerateDocEntries, manifestPathFor } from '../../src/report/enduser-index-generate.mjs';
 import { buildDecisionIndexMarkdown, indexPathFor, narrativeHolderResolver } from '../../src/report/decision-index.mjs';
@@ -291,7 +291,7 @@ test('no backlog id, D-ADR number title or decision file number is repeated in t
   assert.equal(result.passed, true, result.message);
 });
 
-// Owns original-id handling across backlog checks (p-mtqil2rpyy):
+// Owns original-id handling across backlog checks (an Original id is a body line of its own):
 // 1) reconciliation check resolves a section by Original id across all items, and reports
 //    a section whose item is no longer proposed by name with its id and status.
 // 2) identity check counts Original ids, detecting when a new item reuses an old id.
@@ -334,7 +334,8 @@ test('backlog checks see a migrated item by its Original id', () => {
         '',
         '# Notes',
         '',
-        'Migrated item. Original id: tsk-migrated-done.',
+        'Migrated item.',
+        'Original id: tsk-migrated-done.',
       ].join('\n'),
     );
 
@@ -359,7 +360,10 @@ test('backlog checks see a migrated item by its Original id', () => {
         '',
         '# Notes',
         '',
-        'Migrated item. Original id: tsk-reused-id.',
+        'Migrated item.',
+        'Original id: tsk-reused-id.',
+        '',
+        'Prose that says the line `Original id: tsk-prose-only.` is not an Original id.',
       ].join('\n'),
     );
 
@@ -385,6 +389,14 @@ test('backlog checks see a migrated item by its Original id', () => {
         '# Notes',
         '...',
       ].join('\n'),
+    );
+
+    // A mention inside a sentence or backticks is not an Original id; only the line of its own is.
+    const proseItem = readBacklogItemIdentity(fs.readFileSync(path.join(backlogDir, 'p-prop000001.md'), 'utf8'));
+    assert.equal(proseItem.originalId, 'tsk-reused-id');
+    assert.equal(
+      readBacklogItemIdentity('---\nid: p-x\nstatus: proposed\n---\nCount the line `Original id: tsk-prose-only.` here.\n').originalId,
+      null,
     );
 
     // 1) Duplicate check: detects that tsk-reused-id is used by more than one row.
