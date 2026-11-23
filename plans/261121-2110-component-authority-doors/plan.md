@@ -18,6 +18,8 @@ footprint:
   - Cargo.toml
   - Cargo.lock
   - apps/fgos/Cargo.toml
+  - apps/fgos/src/main.rs
+  - test/cli/subcommand-flag-drift.test.mjs
   - apps/fgos/src/routing.rs
   - apps/fgos/src/invocation_doors.rs
   - apps/fgos/src/cli_projector.rs
