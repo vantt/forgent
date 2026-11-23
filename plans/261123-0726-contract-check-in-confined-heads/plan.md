@@ -1,10 +1,11 @@
 ---
 contract: plan-v1
 title: "Repo scripts load the staged addon in a confined head: one reuse-or-build door, so planners can run the plan contract check"
-status: ready
+status: running
+lead: head:lead-forgent-261123-0726-contra-e554b
 priority: P1
 blockedBy: []
-base: c953e546b43870cddd4465961e1ae7178280387b
+base: a4a5d7a17e6dc5ed0989e4cbd3952915c45c56a3
 footprint:
   - plans/261123-0726-contract-check-in-confined-heads/**
   - scripts/lib/git-addon-stage.mjs
