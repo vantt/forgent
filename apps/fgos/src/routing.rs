@@ -98,6 +98,7 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("supervisor", wiring::supervision::SUPERVISOR_SUBCOMMANDS),
     ("session", wiring::supervision::SESSION_SUBCOMMANDS),
     ("migrate", wiring::migrate::AVAILABLE_SUBCOMMANDS),
+    ("doc", wiring::doc_locate::SUBCOMMANDS),
 ];
 
 /// The sub-command a verb runs when the call names none, by selector.
@@ -114,8 +115,10 @@ pub fn default_subcommand(selector: &str) -> Option<&'static str> {
 
 /// The operation a `legacy-cli` selector runs for the first positionals it serves natively. The route table gives
 /// one only to a verb that is native whole, so a verb served in part names its operation here.
-const PARTIAL_VERB_OPERATIONS: &[(&str, &str)] =
-    &[("session", wiring::supervision::SUPERVISOR_READ_OPERATION_ID)];
+const PARTIAL_VERB_OPERATIONS: &[(&str, &str)] = &[
+    ("session", wiring::supervision::SUPERVISOR_READ_OPERATION_ID),
+    ("doc", wiring::doc_locate::LOCATE_OPERATION_ID),
+];
 
 /// The `hook` kinds the host runs before the composition root.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

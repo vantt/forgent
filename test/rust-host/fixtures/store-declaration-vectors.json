@@ -1,5 +1,15 @@
 {
   "rows": [
+    {"verb":"doc","argv":["reserve","t","guide","docs/t/guide.md"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"doc","argv":["register","t","guide","docs/t/guide.md"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"doc","argv":["mark-rendered","t","guide"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"doc","argv":["move-path","t","guide","--new-path","docs/t/g.md"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"doc","argv":["promote","t","guide"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"doc","argv":["demote","t","guide"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"doc","argv":["supersede","t","guide","--superseded-by","d-2"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"doc","argv":["retire","t","guide"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"doc","argv":["locate","--draft","x"],"mutates":false,"landsWork":false,"eventStoreChild":false},
+    {"verb":"doc","argv":["index","run"],"mutates":false,"landsWork":false,"eventStoreChild":true},
     {"verb":"decision","argv":["--text","x"],"mutates":true,"landsWork":false,"eventStoreChild":false},
     {"verb":"approve","argv":["tsk-1"],"mutates":false,"landsWork":true,"eventStoreChild":false},
     {"verb":"list","argv":[],"mutates":false,"landsWork":false,"eventStoreChild":false},

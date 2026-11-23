@@ -186,6 +186,8 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::supervision::SLOTS_DESCRIPTOR,
     wiring::migrate::DESCRIPTOR,
     wiring::authority::DESCRIPTOR,
+    wiring::doc_locate::LOCATE_DESCRIPTOR,
+    wiring::doc_locate::INDEX_DESCRIPTOR,
 ];
 
 /// The legacy payload root of the running release, for the verbs that read what it ships (its skills, its scripts).
@@ -502,6 +504,15 @@ fn main() {
         active_payload_root,
     )));
     service.register_provider(Arc::new(wiring::run::RunProvider::new()));
+    for descriptor in [
+        wiring::doc_locate::LOCATE_DESCRIPTOR,
+        wiring::doc_locate::INDEX_DESCRIPTOR,
+    ] {
+        service.register_provider(Arc::new(wiring::doc_locate::DocProvider::for_descriptor(
+            descriptor,
+            active_payload_root,
+        )));
+    }
     let tracker = service.tracker();
 
     match lane {

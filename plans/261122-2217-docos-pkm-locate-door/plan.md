@@ -9,6 +9,8 @@ branch: main
 tags: [documentation, document-identity, pkm, locate, rust-host, doctor, packaging]
 created: 2026-11-22
 blockedBy: []
+source:
+  - p-hia45sd2zc
 footprint:
   - plans/261122-2217-docos-pkm-locate-door/**
   - .cargo/config.toml

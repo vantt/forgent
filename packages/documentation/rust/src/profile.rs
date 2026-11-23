@@ -48,6 +48,38 @@ const QUESTION_VALUES: &[(&str, bool)] = &[
     ("past-state", false),
 ];
 
+/// Every `question` value, in spec order.
+pub fn question_values() -> impl Iterator<Item = &'static str> {
+    QUESTION_VALUES.iter().map(|(value, _)| *value)
+}
+
+/// Checks a guessed region against the corpus at `docs_root`: every `area` value must be an area of the corpus or
+/// `platform`, every `question` value one of the spec's. The error names the first unknown value and the valid ones.
+pub fn check_region(docs_root: &Path, area: &[String], question: &[String]) -> Result<(), String> {
+    let areas = areas(docs_root)
+        .map_err(|e| format!("cannot read the areas of {}: {e}", docs_root.display()))?;
+    let valid_areas: Vec<&str> = std::iter::once(PLATFORM)
+        .chain(areas.iter().map(String::as_str))
+        .collect();
+    if let Some(unknown) = area.iter().find(|a| !valid_areas.contains(&a.as_str())) {
+        return Err(format!(
+            "unknown area \"{unknown}\"; valid: {}",
+            valid_areas.join(", ")
+        ));
+    }
+    let valid_questions: Vec<&str> = question_values().collect();
+    if let Some(unknown) = question
+        .iter()
+        .find(|q| !valid_questions.contains(&q.as_str()))
+    {
+        return Err(format!(
+            "unknown question \"{unknown}\"; valid: {}",
+            valid_questions.join(", ")
+        ));
+    }
+    Ok(())
+}
+
 /// Deepest folder level a folder name is looked for at (`platform/<area>/subcomponents/<name>/history/...` is 5).
 const FOLDER_DEPTH: usize = 6;
 
@@ -241,6 +273,23 @@ mod tests {
             Some("navigation")
         );
         assert_eq!(value("question", "platform/notes/readme-only.md"), None);
+    }
+
+    #[test]
+    fn a_region_names_only_corpus_areas_platform_and_spec_questions() {
+        let t = corpus();
+        let s = |v: &[&str]| v.iter().map(|x| (*x).to_owned()).collect::<Vec<_>>();
+        assert!(check_region(t.path(), &s(&["runner", PLATFORM]), &s(&["choice"])).is_ok());
+        let area = check_region(t.path(), &s(&["notes"]), &[]).unwrap_err();
+        assert!(
+            area.contains("unknown area \"notes\"") && area.contains("runner"),
+            "{area}"
+        );
+        let question = check_region(t.path(), &[], &s(&["opinion"])).unwrap_err();
+        assert!(
+            question.contains("unknown question \"opinion\""),
+            "{question}"
+        );
     }
 
     #[test]

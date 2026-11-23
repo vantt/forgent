@@ -440,8 +440,42 @@
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
+    "subcommands": true,
+    "native_subcommands": [
+      "index",
+      "locate"
+    ],
+    "subcommand_flags": {
+      "index": [
+        "dir",
+        "json",
+        "help",
+        "action"
+      ],
+      "locate": [
+        "dir",
+        "json",
+        "help",
+        "draft",
+        "draft-file",
+        "area",
+        "question"
+      ]
+    },
     "store": "require",
-    "mutates_store": true
+    "mutates_store": [
+      "reserve",
+      "register",
+      "mark-rendered",
+      "move-path",
+      "promote",
+      "demote",
+      "supersede",
+      "retire"
+    ],
+    "event_store_child": [
+      "index"
+    ]
   },
   "doc-registry": {
     "selector": "doc-registry",

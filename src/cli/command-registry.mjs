@@ -77,6 +77,21 @@
 
 export const MANIFEST_SCHEMA_VERSION = '3.0';
 
+// The flags every doc lifecycle sub-verb takes (the payload reads the ones each needs).
+const DOC_LIFECYCLE_PROPERTIES = {
+  role: { type: 'string', description: "Doc role (also accepted as positional)." },
+  framework: { type: 'string', description: "Doc framework (default diataxis)." },
+  mode: { type: 'string', description: "Doc mode (default explanation)." },
+  lifecycle: { type: 'string', description: "Doc lifecycle (default provisional)." },
+  aliases: { type: 'string', description: "Comma-separated aliases." },
+  'topic-id': { type: 'string', description: "Topic id." },
+  'doc-path': { type: 'string', description: "Doc path." },
+  'doc-id': { type: 'string', description: "Doc id." },
+  'source-captures': { type: 'string', description: "Comma-separated source capture ids." },
+  'new-path': { type: 'string', description: "New path (move)." },
+  'superseded-by': { type: 'string', description: "Doc id that supersedes this one." },
+};
+
 function withSubcommands(entry) {
   return {
     ...entry,
@@ -2516,38 +2531,60 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
-  {
+  withSubcommands({
     name: 'doc',
-    invoke: 'fgos doc <subcommand>',
-    description: 'Manage knowledge doc slots and lifecycles (reserve, register, mark-rendered, move-path, promote, demote, supersede, retire).',
-    parameters: {
-      type: 'object',
-      properties: {
-        role: { type: 'string', description: "Doc role (also accepted as positional)." },
-        framework: { type: 'string', description: "Doc framework (default diataxis)." },
-        mode: { type: 'string', description: "Doc mode (default explanation)." },
-        lifecycle: { type: 'string', description: "Doc lifecycle (default provisional)." },
-        aliases: { type: 'string', description: "Comma-separated aliases." },
-        'topic-id': { type: 'string', description: "Topic id." },
-        'doc-path': { type: 'string', description: "Doc path." },
-        'doc-id': { type: 'string', description: "Doc id." },
-        'source-captures': { type: 'string', description: "Comma-separated source capture ids." },
-        'new-path': { type: 'string', description: "New path (move)." },
-        'superseded-by': { type: 'string', description: "Doc id that supersedes this one." },
+    invoke: 'fgos doc <locate|index|reserve|register|mark-rendered|move-path|promote|demote|supersede|retire>',
+    description: 'Documents: "locate" lists the documents most likely to already hold a draft (served by the Rust host over pkm), "index run" is the detached index worker it starts; reserve, register, mark-rendered, move-path, promote, demote, supersede and retire manage knowledge doc slots and lifecycles.',
+    subcommands: {
+      locate: {
+        description: 'The ten documents most likely to already hold each draft part: path, title, best section with its heading path, axis values (area, question) and whether the document lies outside the guessed region. Write the draft in the corpus language (English for fgOS). The writer reads the candidates and decides; locate gives no verdict. partial: true while the index or the embedding model is not ready; the first call starts the index worker.',
+        parameters: {
+          type: 'object',
+          properties: {
+            draft: { type: 'string', description: 'A draft part, in the corpus language (repeatable; at most 8 parts in all).' },
+            'draft-file': { type: 'string', description: 'A file holding one draft part (repeatable).' },
+            area: { type: 'string', description: 'Guessed area value (repeatable): a folder under docs/platform/ with a spec.md, or "platform".' },
+            question: { type: 'string', description: 'Guessed question value (repeatable): current-truth, obligation, rationale, choice, direction, procedure, pitfall, lookup, proof, navigation or past-state.' },
+          },
+          required: [],
+        },
+        examples: [
+          'fgos doc locate --draft "A worktree with live uncommitted work must not be reclaimed." --json',
+          'fgos doc locate --draft-file draft.md --area git --question current-truth',
+        ],
       },
-      required: [],
+      index: {
+        description: 'The search index of the corpus. "run" is the index worker\'s entry: locate starts it detached; it indexes docs/ under .fgos/runtime/doc-locate/ and exits after a quiet spell.',
+        parameters: {
+          type: 'object',
+          properties: {
+            action: { type: 'string', description: 'Positional: run.', enum: ['run'] },
+          },
+          positional: ['action'],
+          required: ['action'],
+        },
+        examples: ['fgos doc index run'],
+      },
+      ...Object.fromEntries(['reserve', 'register', 'mark-rendered', 'move-path', 'promote', 'demote', 'supersede', 'retire'].map((sub) => [sub, {
+        description: `Doc lifecycle: ${sub}.`,
+        parameters: { type: 'object', properties: DOC_LIFECYCLE_PROPERTIES, required: [] },
+        examples: [`fgos doc ${sub} worktree-reclaim guide`],
+      }])),
     },
     examples: [
+      'fgos doc locate --draft "A worktree with live uncommitted work must not be reclaimed."',
       'fgos doc reserve worktree-reclaim guide docs/worktree-reclaim/guide.md',
       'fgos doc promote worktree-reclaim guide',
     ],
     touchesState: true,
     store: 'require',
-    mutatesStore: true,
+    mutatesStore: ['reserve', 'register', 'mark-rendered', 'move-path', 'promote', 'demote', 'supersede', 'retire'],
+    eventStoreChild: ['index'],
     externalEffect: false,
     paginated: false,
     deprecated: null,
-  },
+    native: ['index', 'locate'],
+  }),
   {
     name: 'knowledge',
     invoke: 'fgos knowledge <subcommand>',

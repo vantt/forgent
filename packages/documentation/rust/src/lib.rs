@@ -6,3 +6,6 @@ pub mod locate;
 pub mod pkm;
 pub mod port;
 pub mod profile;
+
+/// The Observe kinds this crate owns (`fgos.doc.locate`), embedded so an installed host needs no `packages/` tree.
+pub const OBSERVE_KINDS: &str = include_str!("../observe-kinds.json");

@@ -120,6 +120,15 @@ pub trait Locator {
     fn state(&self) -> IndexState;
 }
 
+impl<T: Locator + ?Sized> Locator for &T {
+    fn locate(&self, query: &Query) -> Result<Answer, LocateError> {
+        (**self).locate(query)
+    }
+    fn state(&self) -> IndexState {
+        (**self).state()
+    }
+}
+
 /// The index worker as a process: is one running for this corpus, and start one.
 pub trait WorkerLauncher {
     fn running(&self) -> bool;

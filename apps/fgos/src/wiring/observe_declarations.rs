@@ -16,6 +16,12 @@ const SUPERVISION_DECLARATION: EmbeddedDeclaration = EmbeddedDeclaration {
     json: include_str!("../../../../packages/supervision/rust/observe-kinds.json"),
 };
 
+/// The locate call record `fgos.doc.locate`, declared by `fgos-documentation`.
+const DOCUMENTATION_DECLARATION: EmbeddedDeclaration = EmbeddedDeclaration {
+    label: "fgos-documentation",
+    json: fgos_documentation::OBSERVE_KINDS,
+};
+
 /// Every declaration a crate embeds with `include_str!`. Each owner adds its own entry next to its kinds.
 pub fn embedded_declarations() -> Vec<EmbeddedDeclaration> {
     vec![
@@ -26,6 +32,7 @@ pub fn embedded_declarations() -> Vec<EmbeddedDeclaration> {
         super::observe_sources::SOURCES_DECLARATION,
         QUESTIONS_DECLARATION,
         SUPERVISION_DECLARATION,
+        DOCUMENTATION_DECLARATION,
     ]
 }
 
@@ -58,5 +65,6 @@ mod tests {
         assert!(registry.kind("fgos.watcher.tick").is_some());
         assert!(registry.kind("fgos.supervisor.wake").is_some());
         assert!(registry.kind("fgos.discussion.status").is_some());
+        assert!(registry.kind("fgos.doc.locate").is_some());
     }
 }

@@ -61,3 +61,21 @@ should not (read `invocation_doors.rs:297-360`). A worker left running by a fail
 ## Rollback
 
 Revert the commit and regenerate contracts; `.fgos/runtime/doc-locate/` can be deleted.
+
+## As built (2026-11-23)
+
+- Ordering fixed in the use case: `locate(open, launcher, query)` checks the question, starts a worker when none runs,
+  and only then opens the locator. The phase 2 rule "do not start when broken" read the state from a session opened
+  before the worker, which reads a missing index as broken, so the first call never started one. A broken index is
+  now the worker's to refuse (it exits 78). `WorkerLauncher::start` returns once the worker holds `writer.lock` or
+  after 5 s.
+- Registry: `doc` became a `withSubcommands` entry; the eight lifecycle sub-verbs keep the old flag set,
+  `mutatesStore` lists them, `eventStoreChild: ['index']` keeps the detached worker out of the lifecycle triggers.
+  The four repeatable locate flags are read with `parse_args_repeating`.
+- Catalog: `doc.locate` (read) and `doc.index` (write), component `documentation`.
+- Record: `fgos.doc.locate` declared in `packages/documentation/rust/observe-kinds.json`; `detail` carries a
+  redaction stamp `doc-locate-draft-digests.v1` (the door refuses a detail without one).
+- The test stops the worker through `fgos_documentation::pkm::stop_worker` (pkm's `stop_worker`) instead of SIGTERM;
+  phase 4's `index stop` wraps the same function.
+- Not run here: `test/rust-host/help-routes.test.mjs` needs a release addon build, skipped for disk pressure on
+  design-lap (22 GB free); the contracts it compares pass `export-command-selectors --check`.

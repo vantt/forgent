@@ -55,6 +55,32 @@ pub fn worker_running(paths: &LocatePaths) -> bool {
     .worker_running
 }
 
+/// Runs the index worker of `paths` in this process until it goes idle or is stopped, and returns pkm's exit code:
+/// 0 idle or stopped, 75 another worker holds the index, 78 cannot run, 1 failed.
+pub fn run_worker(paths: &LocatePaths, embedder: EmbedderChoice) -> u8 {
+    search::run_worker(&paths.docs_root, &search_options(paths, embedder), None)
+}
+
+/// Asks the index worker of `paths` to stop and waits up to `wait` for it to release the index. `Ok(true)` when one
+/// ran and stopped, `Ok(false)` when none ran.
+pub fn stop_worker(paths: &LocatePaths, wait: Duration) -> Result<bool, String> {
+    match search::stop_worker(
+        &paths.docs_root,
+        &search_options(paths, EmbedderChoice::Model),
+        wait,
+    )? {
+        search::StopResult::Stopped => Ok(true),
+        search::StopResult::NotRunning => Ok(false),
+        search::StopResult::NotWritable => {
+            Err("the stop request could not be written: the search index is read-only".into())
+        }
+        search::StopResult::TimedOut => Err(format!(
+            "the index worker did not stop within {} s",
+            wait.as_secs()
+        )),
+    }
+}
+
 /// A locator over one corpus.
 pub struct PkmLocator {
     session: Session,

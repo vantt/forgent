@@ -24,6 +24,9 @@
     "owner_path": "apps/fgos",
     "subcommands": true
   },
+  "doc": {
+    "subcommands": true
+  },
   "doctor": {
     "operation_id": "doctor.run",
     "owner_path": "apps/fgos"

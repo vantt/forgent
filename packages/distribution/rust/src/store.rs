@@ -70,6 +70,11 @@ pub fn resolve_machine_release_store_root() -> PathBuf {
     fgos_holder_lock::state_root::state_root().0
 }
 
+/// The machine folder of the embedding models: one copy serves every project and linked worktree.
+pub fn machine_model_root() -> PathBuf {
+    resolve_machine_release_store_root().join("models")
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StageOutcome {
     Staged { artifact_digest: String },
