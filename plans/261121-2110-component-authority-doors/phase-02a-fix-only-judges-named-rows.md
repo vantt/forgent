@@ -36,3 +36,22 @@ and the unit report `plans/261121-2110-component-authority-doors/reports/unit-26
 
 ## Report
 End with `Status:` and a one-line `Summary:`.
+
+## Fix unit 2 (review of 7a95c38c9, 2026-11-24 02:40)
+The rule above was wrong: "a fix and the row it repairs share the id" holds only for the hook fixes. 14 of the 30
+registered fixes repair rows with other ids (`git-wal-dir` -> `git-operation-journal`, `config-chmod` ->
+`config-global-permissions`, `doc-locate-model-fetch` -> `doc-locate-model`, the `config-` group fixes, and
+`lock-dirs`, `bin-discovery-cache`, `event-store-lock-dirs`, `git-driver-directories`). With the first fix,
+`doctor --fix --only config-chmod --strict` judges no row and exits 0 even when the chmod failed.
+Corrected rule: with `--fix --only <ids>`, judge the union of `RegistryFix::repairs` (already group-expanded) of the
+named fixes, in registry order, one call per owner kind. Hook fixes have `repairs == [id]`, so the speed gain stays.
+Steps:
+1. `packages/distribution/rust/src/doctor.rs`: select rows by the named fixes' `repairs`, not by id.
+2. Same owning test: assert a native-only `--only` judges its repaired row natively and never asks the bridge
+   (`calls == ["fix fix-alpha", "judge alpha"]` or the file's equivalent), and that a fix whose repaired row has
+   another id judges that row.
+3. Contract sentence in `setup-doctor-registry.md` and the request help in `apps/fgos/src/wiring/doctor/mod.rs`:
+   "the rows the named fixes repair".
+4. `src/cli/command-registry.mjs` doctor `only` description: same meaning, no fix-id-equals-row-id claim.
+5. `CHANGELOG.md` `## [Unreleased]`: amend the existing `doctor --fix --only` line to say it judges only the rows
+   the named fixes repair. Do not add a second line.
