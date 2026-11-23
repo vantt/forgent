@@ -76,14 +76,12 @@ and heads-stable rebases and resolves its own conflicts when it returns. Checked
 `src/session-host/head-request.mjs`; only its frontmatter footprint still lists them. The only real overlap with doors is
 the generated skill directories (doors phase 5), and whoever lands second regenerates them with `npm run build:skills`.
 `261122-2108`'s `blockedBy: 261122-0118` likewise has no remaining file reason: the head-stop and rotate change it
-waited on was in heads-stable's done phases. Question 1 = option (a), recommended in chat and the basis of the order
-below: phase 10 locks everything except the named debt of 2f (and 2g while `p-rypvkc3kai` is open), with `retiredBy`
+waited on was in heads-stable's done phases. Question 1 = option (a), confirmed by the owner at 16:3x (D6): phase 10 locks everything except the named debt of 2f (and 2g while `p-rypvkc3kai` is open), with `retiredBy`
 the Workflow/Work port. Revised order: (0) a planner re-cuts doors per (a), adds 3a's dead-file deletion, and pins
 `--provider claude`; (1) doors 1b and then its no-wait phases start now; (2) `261122-2108` starts with its blockedBy on
 heads-stable dropped, rebased on the YAML model; (3) doors 3b, 3d, 10, 11; (4) this discussion is redone.
 
-Open owner points (asked in chat, not yet in the store): whether doors closes with 2f as named debt or stays open until
-the port lands; and whether the door guard gets a warn-only mode (see O6).
+Open owner point (asked in chat, not yet in the store): whether the door guard gets a warn-only mode (see O6).
 
 **Round 2 (2026-11-23 15:57–16:20): settled.** Every check left open in round 1 came back without revising P1–P4, so they
 are minted as D1–D4. Findings:
@@ -164,6 +162,7 @@ allowed to run beside any step. F0 through S6a have landed (S6a ended after its 
 | D3 | One plan per component of the model, not per `src/` directory | 2 | `components.json` `paths` |
 | D4 | This inventory sizes the program's remaining rows (S1, S6b, S7), splitting S7 into plans 5–7 and adding plans 1–3 and 8–10. It does not reorder the owner-approved order. | 2 | `261114-2051` "S1-S7 each get their own detailed plan … when they start" |
 | D5 | Owner decision 78 stands: the Work council is held before plan 5 opens. Plans 1–4 do not wait for it. | 2 | `261021-1118` lessons.md:104, :152 |
+| D6 | Owner chose option (a) on 2026-11-23 16:3x: doors phase 10 locks every door except the named debt of 2f (and 2g while `p-rypvkc3kai` is open), `retiredBy` the Workflow/Work port. Doors closes before the port, and this discussion is redone after doors and `261122-2108` land (§1 round 3b, step 4). | owner answer | chat 16:3x "ok, đồng ý phương án a" |
 
 ## 5. Q&A log
 
@@ -182,6 +181,7 @@ allowed to run beside any step. F0 through S6a have landed (S6a ended after its 
 - **2026-11-23 16:02 — owner:** "anh nghĩ là mọi thứ đã được … harden … chuyển sang rust hết rồi … giải thích plan này đang làm gì" (I thought HARDEN had already moved everything to Rust; explain what this plan does). Explained: HARDEN thinned Node for T0–T5 and deleted none of it; T6, T7, session-host and T9 still hold Node logic.
 - **2026-11-23 16:10 — owner:** component-authority first, then continue; calculate carefully, then patch. Round 3 calculation is recorded in §1; discussion paused.
 - **2026-11-23 16:24 — owner:** heads-stable must not make others wait, and handles its own conflicts on return. Recorded as round 3b in §1.
+- **2026-11-23 16:3x — owner:** "ok, đồng ý phương án a" → D6.
 - **2026-11-23 16:2x — owner:** asked whether authority has a warn-or-block setting → O6.
 
 ## 6. Thiết kế đã chốt {#design}
