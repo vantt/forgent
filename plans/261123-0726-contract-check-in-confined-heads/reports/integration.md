@@ -45,3 +45,21 @@ report's path.
 
 `test/scripts/doc-health.test.mjs` passed inside the phase 1 land gate above. `check-backlog-reconciliation.mjs`
 output against phase 3's Verify waits on the same restage (step 2).
+
+## Confined run 2 (11:08, trunk e11e047c8)
+
+The supervisor restaged the addon at 10:59:56 on 637334ca6. Before this run, the runner-recheck plan landed Rust
+changes (2b903592c, with 4f5030dad, 7d3b31a03, 9447e2cd7 and others), so the staged `source-digest` (5ae11e2f…) no
+longer equals `gitAddonSourceDigest()` (c499fd3b…). Both scripts, run from this confined head with no FGOS_* env set,
+again declined reuse and stopped with the named cause, this time after cargo's `Read-only file system (os error 30)`:
+
+- `node scripts/plan-contract-check.mjs --plan plans/261123-0726-contract-check-in-confined-heads`: exit 1, "The staged
+  addon for this checkout is missing or stale: …/.fgos/runtime/git-addon/e9756c489113b5d0. Restage it from an
+  unconfined session with node scripts/git-addon.mjs."
+- `node scripts/check-backlog-reconciliation.mjs`: exit 1, same cause.
+
+So the stale path behaves as specified for both triggers (cargo's os error 30, and the ort-static step). The exit-0 proof
+for acceptance criterion 3 needs a staged addon matching the tip at the moment of the run. The supervisor's `npm test` run
+restages through `scripts/run-tests.mjs`; the lead reruns both scripts right after it, before another Rust land.
+
+Gate hand-off: still not in `land.gates` at e11e047c8 (`plan-contract-check` absent from `.fgos/config.yaml`).
