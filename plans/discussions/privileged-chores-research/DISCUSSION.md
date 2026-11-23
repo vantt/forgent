@@ -31,14 +31,13 @@ discussion: settled
 - Luật theo mẫu shell.
 - maxLeads theo năng lực máy: `p-tyowvhthul`.
 - `session type` không submit: `p-lfwmzs6zsr`.
-- Tự động activate release (R1).
 
 **Acceptance criteria.**
 1. Mỗi task ở §7 qua lệnh verify của nó.
 2. `npm test` và `cargo test --workspace` xanh.
 3. Bản sửa đã vào release đang chạy, và probe sống `node test/live/head-grant-probe.live.mjs` chứng minh từng verb hoặc grant đã đổi. Chủ build và activate vào sáng 2026-11-24, rồi chạy probe.
 
-**Điểm mở chỉ chặn một phần:** R1, tức ai tự đưa release lên. Cho tới khi có câu trả lời, chủ làm tay. Điểm này không chặn task nào ở §7.
+**R1 đã chốt (PC-D9):** supervisor release theo quy trình cố định, xem T6. Lần build và activate đầu tiên (sáng 2026-11-24) vẫn do chủ làm tay.
 
 **Nguồn:** `p-g5ktat4kej`, `p-v6xinnjoxh`, `p-dw3h5wscns`, `p-ndortdckid`, `p-ia2v33b54u`, `p-btxvtb34u3`, `p-oqs75qwyco`, cùng các quyết định PC-D1 đến PC-D8.
 
@@ -55,7 +54,7 @@ discussion: settled
 
 **Đã rút lại:** tick riêng cho supervisor (giao cho keeper của 0056) và luật theo mẫu shell.
 
-**Còn mở:** R1.
+**Còn mở:** không. R1 đã chốt thành PC-D9 lúc 23:58.
 
 ## 2. Mục tiêu & đề bài
 
@@ -82,7 +81,7 @@ Năng lực được giới hạn bằng hàng rào quanh những thứ cần b�
 | C2 | Xem lại cỡ lồng của Miu và supervisor theo nguyên tắc riêng-nới-lồng, chung-qua-ô-cửa | **đề xuất 23:35, chờ chủ** | Xem §5 23:28. |
 | M1 | Mọi head gửi thư được cho Miu và supervisor; thư đánh thức người nhận đang rảnh | **đề xuất 23:40** | §5 23:40. Lead và planner hiện có `mailbox: false`. |
 | H1 | Kênh xin trợ giúp: mọi head raise lên supervisor; tự chuyển sang Miu khi không có supervisor | **đã chốt PC-D5** | §5 23:50 |
-| R1 | Bản sửa head chỉ xong khi đã vào release đang chạy và có probe sống chứng minh; ai đưa release lên | **mở 23:45** | §5 23:45. `e900a7e10` chưa vào release `edf91f57`. |
+| R1 | Bản sửa head chỉ xong khi đã vào release đang chạy và có probe sống chứng minh; ai đưa release lên | **đã chốt PC-D9** | §5 23:45. `e900a7e10` chưa vào release `edf91f57`. |
 | P5 | Gom 28 verb vào một bộ chuyển tiếp | theo Q2 | Theo L10 và RUL104, phải làm cùng đợt hoặc mở item riêng có tên. |
 
 ## 4. Quyết định đã chốt
@@ -96,6 +95,7 @@ Năng lực được giới hạn bằng hàng rào quanh những thứ cần b�
 | PC-D6 | Ô cửa theo hướng lai. Đơn vị quyền là argv `fgos`, chạy không qua shell. Quyết định nằm trong một bảng dữ liệu `persona × tiền tố verb fgos → allow, ask hoặc deny`, có kế thừa (head < supervisor < Miu), có `can-i`, và mỗi luật có test. Các nhánh chỉ chuyển tiếp thì xoá. Các nhánh có chính sách thật giữ code riêng: `land`, `run`, `session start/stop/write`, `questions`. `SUCCESSOR_READ_VERBS` gộp vào bảng. Ba thứ luôn bị từ chối: khoá grant và confinement (chống tự nâng quyền), đối số đổi cwd, root hoặc env, và activate release. Verb chưa tự bảo vệ giữ ở `ask`. | Hội đồng ba góc nhìn đồng thuận (23:20); kiểm đếm cho thấy khoảng 14 trên 18 việc đặc quyền đã có verb `fgos`; chủ dặn "làm trước" (23:50) | 2026-11-23 |
 | PC-D7 | Xem lại lồng của Miu và supervisor trong đợt này. Nới cho việc riêng: friction, gửi thư, `fgos answer`, và chẩn đoán vì sao full test không chạy được trong lồng. Siết chỗ đang quá rộng: peers giữ pid namespace của host. Đo trước và sau bằng probe sống. | Đề xuất 23:35; chủ không phản đối và dặn "làm trước" | 2026-11-23 |
 | PC-D8 | Mọi head gửi được thư cho Miu và supervisor: lead và planner được bật mailbox, nhưng chỉ gửi tới hai tay. Đánh thức bằng thư thuộc plan 0323. | Đề xuất 23:40; chủ không phản đối | 2026-11-23 |
+| PC-D9 | Supervisor release theo quy trình cố định. Quy trình chỉ chạy khi main có bản sửa head mới đã land và full test xanh, và lúc đó không có lead nào đang land. Các bước: chạy `fgctl upgrade`; ngay sau đó chạy probe sống `test/live/head-grant-probe.live.mjs`; nếu probe hỏng thì tự quay về release trước (`previousArtifactDigest`); gửi chủ một báo cáo, không gửi câu hỏi. Nếu bản mới làm hỏng chính supervisor thì Miu là người quay về (vai thời chiến của PC-D1). Quyết định này sửa luật deny activate trong PC-D6: activate thành một nhánh có chính sách riêng, chỉ supervisor và Miu được dùng, và không bao giờ là pass-through. | Chủ "đồng ý A", 23:58 | 2026-11-23 |
 | PC-D3 | **Năng lực được giới hạn bằng hàng rào quanh thứ cần bảo vệ, cộng một cửa nâng quyền chung, không bằng danh sách verb.** | Chủ 20:30 ("2 là đúng"), giữ nguyên qua 20:35 | 2026-11-23 |
 
 ## 5. Q&A log
@@ -399,3 +399,14 @@ Cả năm task nằm trong `src/session-host/`, skill và spec của nó. T3 ch�
 ### T5 — Mailbox cho lead và planner {#task-mail}
 - **Mục tiêu:** làm theo PC-D8. Lead và planner có `mailbox: true`, nhưng chỉ gửi được tới vai secretary và supervisor.
 - **Verify:** `node --test test/session-host/head-grants.test.mjs`, cộng probe sống gửi thư từ một lead.
+
+### T6 — Supervisor release theo quy trình {#task-release}
+- **Mục tiêu:** làm theo PC-D9. Thêm một nhánh có chính sách riêng trong ô cửa, gồm:
+  - kiểm điều kiện trước khi release: main có bản sửa head mới đã land, full test xanh, không lead nào đang land;
+  - chạy `fgctl upgrade`;
+  - chạy probe sống;
+  - tự rollback nếu probe hỏng;
+  - gửi chủ một báo cáo.
+
+  Skill supervisor ghi lúc nào thì release. Skill Miu ghi cách quay về khi supervisor không lên lại được. Thay luật deny activate trong T3 bằng nhánh này.
+- **Verify:** `node --test test/session-host/head-request.test.mjs`, gồm ba ca: từ chối khi test chưa xanh, từ chối khi đang có land, và rollback khi probe hỏng (dùng fixture `fgctl`). Cộng một lần chạy thật vào sáng 2026-11-24, sau khi chủ đã activate tay lần đầu.
