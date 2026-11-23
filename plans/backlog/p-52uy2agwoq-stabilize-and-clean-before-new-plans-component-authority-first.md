@@ -16,7 +16,7 @@ Owner order 2026-11-23 15:13: instability is starting to appear in many places. 
 1. Stability and cleanup work comes before every feature plan. Feature plans that are draft or ready wait; plans already running (heads-stable-and-able, component-authority-doors) continue.
 2. Component-authority is the first cleanup lane.
 3. No new Node code or module unless it is truly needed; a new Node piece needs a stated reason. Deleting or porting existing Node is welcome.
-4. The fgOS router is one routing set across node, rust, wasm and external CLIs, so fgOS can operate with every one of them. It is kept whole: moving work from Node to Rust never removes or narrows the router. Any phase that touches routing files (command registry, command-routes, command-manifest, `route.rs`, `routing.rs`) must show that all four kinds of caller still route.
+4. The fgOS router: the router mechanism that routes to node, rust, wasm and external CLIs stays whole and keeps all four kinds of backend. What goes is only a route whose work has already moved from Node to Rust: its Node route entry is removed, the Rust route stays. A phase that edits routing files proves the mechanism still supports all four kinds and lists each Node route it removed as already served by Rust.
 
 # Done when
 
