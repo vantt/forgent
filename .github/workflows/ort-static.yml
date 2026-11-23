@@ -1,0 +1,151 @@
+name: ort-static
+# Build ONNX Runtime from source on Ubuntu 22.04 as one static archive for Linux x64 builds that link pkm.
+# The prebuilt static archive that ort-sys downloads needs glibc 2.38, above the release ceiling of 2.35
+# (scripts/check-glibc-ceiling.sh), so fgOS builds its own on the oldest supported image. ort 2.0.0-rc.15 pairs
+# with ONNX Runtime 1.31. The archive is proved by linking pkm's ort-probe against it, checking the glibc ceiling
+# and the embedding parity with pkm's golden vectors, and only then published as a pinned release asset that
+# scripts/ort-static.mjs downloads and verifies by sha256.
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+defaults:
+  run:
+    shell: bash
+env:
+  ORT_TAG: v1.31.1
+  ORT_COMMIT: 6af1a932e2286d5c58166085d24c68783033edee
+  RELEASE_TAG: ort-static-1.31.1-linux-x64-glibc2.35
+  # vantt/pkm-release (public) holds ort-probe, the same probe pkm used to choose its ONNX Runtime linking.
+  PROBE_REPO: vantt/pkm-release
+  PROBE_COMMIT: 19f4502736be314b6a6368b6ae2c75a0a23c881a
+  MODEL_COMMIT: 761b726dd34fb83930e26aab4e9ac3899aa1fa78
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 240
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: ONNX Runtime source
+        run: |
+          # microsoft/onnxruntime answers 404 since 2026-11-19. The tag's commit is fetched by its id from the first
+          # source that serves it, our mirror vantt/onnxruntime first; the id is the tag's target in
+          # microsoft/onnxruntime as archived by Software Heritage (snapshot bb4b98ed9243ab978ad058879a237a24445f4a90,
+          # 2026-11-14), so every source yields the same tree. The onnx submodule comes from our mirror vantt/onnx,
+          # checked out at the commit the tag pins.
+          D="$RUNNER_TEMP/onnxruntime"; git init -q "$D"
+          for src in https://github.com/vantt/onnxruntime.git https://github.com/microsoft/onnxruntime.git https://github.com/intel/onnxruntime.git https://github.com/ROCm/onnxruntime.git; do
+            if git -C "$D" fetch -q --depth 1 "$src" "$ORT_COMMIT"; then echo "source: $src"; break; fi
+          done
+          git -C "$D" checkout -q FETCH_HEAD
+          test "$(git -C "$D" rev-parse HEAD)" = "$ORT_COMMIT"
+          git -C "$D" submodule init -q cmake/external/onnx
+          git -C "$D" config submodule.cmake/external/onnx.url https://github.com/vantt/onnx.git
+          git -C "$D" submodule update -q --depth 1 cmake/external/onnx
+          git -C "$D" rev-parse HEAD | tee "$RUNNER_TEMP/ort-commit.txt"
+      - uses: actions/cache/restore@v4
+        id: ortcache
+        with:
+          path: ${{ runner.temp }}/onnxruntime/build/Linux/Release
+          key: ort-linux-static-${{ env.ORT_TAG }}-v1
+      - name: Build ONNX Runtime (Release, static libraries, no tests, no telemetry)
+        if: steps.ortcache.outputs.cache-hit != 'true'
+        run: |
+          cd "$RUNNER_TEMP/onnxruntime"
+          ./build.sh --config Release --parallel --skip_tests --skip_submodule_sync --compile_no_warning_as_error \
+            --cmake_extra_defines onnxruntime_BUILD_UNIT_TESTS=OFF onnxruntime_USE_TELEMETRY=OFF CMAKE_POSITION_INDEPENDENT_CODE=ON
+      # Saved right after the build, so a later failing step does not cost another build.
+      - uses: actions/cache/save@v4
+        if: steps.ortcache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ runner.temp }}/onnxruntime/build/Linux/Release
+          key: ort-linux-static-${{ env.ORT_TAG }}-v1
+      # ort-sys links a single libonnxruntime.a as is, so every static library ONNX Runtime needs goes into one
+      # archive, the way pyke packages its prebuilt archives. The full protobuf, protoc, upb and test libraries
+      # are left out; ONNX Runtime uses protobuf-lite.
+      # A static-only build leaves out the dependencies that only a final link needs; re2 is one (pkm's Windows
+      # build met the same).
+      - name: Build re2
+        run: |
+          B="$RUNNER_TEMP/onnxruntime/build/Linux/Release"
+          find "$B" -name 'libre2.a' | grep -q . || cmake --build "$B" --config Release --target re2 --parallel
+      - name: Combine into one libonnxruntime.a
+        run: |
+          B="$RUNNER_TEMP/onnxruntime/build/Linux/Release"
+          out="$RUNNER_TEMP/ort-lib"; mkdir -p "$out"
+          find "$B" -name '*.a' -printf '%s %p\n' | sort -k2 > "$RUNNER_TEMP/ort-libs.txt"
+          find "$B" -name '*.a' | sort \
+            | grep -vE '/(libprotobuf|libprotoc|libupb[^/]*|libgtest[^/]*|libgmock[^/]*|libonnx_test[^/]*|libonnxruntime_providers_shared|libbenchmark[^/]*|[^/]*test[^/]*|[^/]*mock[^/]*)\.a$' \
+            > "$RUNNER_TEMP/ort-combined.txt"
+          grep -q '/libre2\.a$' "$RUNNER_TEMP/ort-combined.txt" || { echo "libre2.a missing"; exit 1; }
+          grep -q '/libonnxruntime_session\.a$' "$RUNNER_TEMP/ort-combined.txt" || { echo "libonnxruntime_session.a missing"; exit 1; }
+          { echo "create $out/libonnxruntime.a"; sed 's/^/addlib /' "$RUNNER_TEMP/ort-combined.txt"; echo save; echo end; } | ar -M
+          ranlib "$out/libonnxruntime.a"
+          ls -la "$out"
+          wc -l "$RUNNER_TEMP/ort-combined.txt"
+      - name: ort-probe and model files
+        run: |
+          git clone -q "https://github.com/$PROBE_REPO.git" "$RUNNER_TEMP/probe"
+          git -C "$RUNNER_TEMP/probe" checkout -q "$PROBE_COMMIT"
+          M="$RUNNER_TEMP/e5"; mkdir -p "$M/onnx"
+          for f in config.json tokenizer.json tokenizer_config.json special_tokens_map.json onnx/model_quantized.onnx; do
+            curl -sfL -o "$M/$f" "https://huggingface.co/Xenova/multilingual-e5-small/resolve/$MODEL_COMMIT/$f"
+          done
+          node -e '
+            const fs=require("fs"),c=require("crypto"),path=require("path");
+            const m=JSON.parse(fs.readFileSync(path.join(process.argv[2],"golden/model.json"),"utf8"));
+            for (const f of m.files) {
+              const h=c.createHash("sha256").update(fs.readFileSync(path.join(process.argv[1],f.path))).digest("hex");
+              if (h!==f.sha256) { console.error("sha256 mismatch", f.path); process.exit(1); }
+            }' "$M" "$RUNNER_TEMP/probe/ort-probe"
+      - name: Link ort-probe against the archive
+        working-directory: ${{ runner.temp }}/probe/ort-probe
+        run: |
+          export ORT_LIB_LOCATION="$RUNNER_TEMP/ort-lib"
+          cargo build --release --locked --no-default-features --features system 2>&1 | tail -20
+      - name: glibc ceiling, dependencies and parity
+        working-directory: ${{ runner.temp }}/probe/ort-probe
+        run: |
+          B=target/release/ort-probe
+          "$GITHUB_WORKSPACE/scripts/check-glibc-ceiling.sh" "$B"
+          ldd "$B" | tee "$RUNNER_TEMP/ldd.txt"
+          if grep -q onnxruntime "$RUNNER_TEMP/ldd.txt"; then echo "ONNX Runtime is linked dynamically"; exit 1; fi
+          "$B" "$RUNNER_TEMP/e5" 1,4 > "$RUNNER_TEMP/probe-result.json"
+          node -e '
+            const r=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));
+            const g=r.golden;
+            console.log(JSON.stringify({bin:r.binary_bytes, golden:{rows:g.rows, ids_equal:g.ids_equal, compared:g.compared, min_cosine:g.min_cosine}, timing:r.timing}, null, 1));
+            // Token ids must all match; vectors may drift across CPUs (int8 kernels), so cosine >= 0.99 off the
+            // golden machine, NFD rows excepted (pkm normalises to NFC before tokenizing).
+            const rows=r.rows;
+            if (!Array.isArray(rows) || rows.length===0) { console.error("probe printed no golden rows"); process.exit(1); }
+            const nfd=(x)=>/nfd/i.test(String(x.id)+String(x.type));
+            const idsBad=rows.filter(x=>!nfd(x) && x.ids_equal===false);
+            if (idsBad.length) { console.error("token ids differ from the golden:", JSON.stringify(idsBad)); process.exit(1); }
+            const low=rows.filter(x=>!nfd(x) && typeof x.cosine==="number" && x.cosine<0.99);
+            if (low.length) { console.error("cosine below 0.99:", JSON.stringify(low)); process.exit(1); }' \
+            "$RUNNER_TEMP/probe-result.json"
+      - name: Digest
+        run: |
+          cd "$RUNNER_TEMP/ort-lib"
+          sha256sum libonnxruntime.a | tee libonnxruntime.a.sha256
+          cp "$RUNNER_TEMP/ort-commit.txt" "$RUNNER_TEMP/ort-libs.txt" "$RUNNER_TEMP/ort-combined.txt" \
+            "$RUNNER_TEMP/ldd.txt" "$RUNNER_TEMP/probe-result.json" .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ort-static
+          path: ${{ runner.temp }}/ort-lib/
+      # A published asset never changes: a later run finds the tag and stops, and the pin in
+      # scripts/ort-static.mjs names the digest of the first one.
+      - name: Publish the release asset
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then echo "$RELEASE_TAG exists; not replaced"; exit 0; fi
+          cd "$RUNNER_TEMP/ort-lib"
+          gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --prerelease --latest=false \
+            --title "ONNX Runtime 1.31.1 static, linux-x64, glibc 2.35" \
+            --notes "Built by .github/workflows/ort-static.yml from microsoft/onnxruntime $(cat ort-commit.txt) on ubuntu-22.04. sha256 $(cut -d' ' -f1 libonnxruntime.a.sha256)." \
+            libonnxruntime.a libonnxruntime.a.sha256 probe-result.json ldd.txt ort-combined.txt
