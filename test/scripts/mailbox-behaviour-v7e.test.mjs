@@ -30,9 +30,9 @@ test('V7e has its own harness home apart from V6\'s and V7c\'s', () => {
   assert.match(homes[2].base, /mailbox-v7e-live$/);
 });
 
-test('the V7e addendum binds V6\'s hash and freezes the extension generator, the adapters contract and both measurement modules, so a change to any breaks the freeze', () => {
+test('the V7e addendum binds V6\'s hash and freezes the adapters contract and both measurement modules, so a change to any breaks the freeze', () => {
   const repo = scratch('v7e-repo-');
-  for (const rel of ['test/live/mailbox-behaviour', 'packages/mailbox/contracts/frame.v1.txt', 'packages/mailbox/contracts/limits.v1.json', 'packages/mailbox/contracts/adapters.v1.json', 'scripts/lib/mailbox-behaviour-score.mjs', 'scripts/lib/mailbox-behaviour-v7.mjs', 'scripts/lib/mailbox-behaviour-v7e.mjs', 'src/setup/agent-hooks.mjs']) {
+  for (const rel of ['test/live/mailbox-behaviour', 'packages/mailbox/contracts/frame.v1.txt', 'packages/mailbox/contracts/limits.v1.json', 'packages/mailbox/contracts/adapters.v1.json', 'scripts/lib/mailbox-behaviour-score.mjs', 'scripts/lib/mailbox-behaviour-v7.mjs', 'scripts/lib/mailbox-behaviour-v7e.mjs']) {
     fs.cpSync(path.join(REPO, rel), path.join(repo, rel), { recursive: true });
   }
   const prereg = path.join(repo, v7.PREREGISTRATION_FILE);
@@ -40,14 +40,14 @@ test('the V7e addendum binds V6\'s hash and freezes the extension generator, the
   fs.writeFileSync(prereg, JSON.stringify(frozen));
   const addendum = v7e.addendumV7e({ repo, preregistrationSha256: 'f'.repeat(64), versions: { pi: '1.4.0', omp: '18.12.6' }, seed: 'fixed' });
   assert.equal(addendum.addendumTo.sha256, 'f'.repeat(64));
-  assert.deepEqual(Object.keys(addendum.added).sort(), ['packages/mailbox/contracts/adapters.v1.json', 'scripts/lib/mailbox-behaviour-v7.mjs', 'scripts/lib/mailbox-behaviour-v7e.mjs', 'src/setup/agent-hooks.mjs']);
+  assert.deepEqual(Object.keys(addendum.added).sort(), ['packages/mailbox/contracts/adapters.v1.json', 'scripts/lib/mailbox-behaviour-v7.mjs', 'scripts/lib/mailbox-behaviour-v7e.mjs']);
   assert.deepEqual(addendum.pairs.map((p) => `${p.id} ${p.cli}/${p.arm} ${p.model}`), ['P1 pi/O gpt-6.1-sol', 'P2 omp/O gpt-6.1-sol']);
   assert.deepEqual(addendum.notRun.map((p) => p.id), ['P3']);
   assert.deepEqual([addendum.thinking, addendum.stageARuns, addendum.stageBRuns, addendum.cap, addendum.ceiling], ['low', 5, 10, 13, 405]);
   assert.equal(addendum.cells.length, 20);
   assert.deepEqual(v7.freezeBroken(repo, frozen, addendum), []);
-  fs.appendFileSync(path.join(repo, 'src/setup/agent-hooks.mjs'), '\n// changed\n');
-  assert.deepEqual(v7.freezeBroken(repo, frozen, addendum), ['src/setup/agent-hooks.mjs']);
+  fs.appendFileSync(path.join(repo, 'scripts/lib/mailbox-behaviour-v7e.mjs'), '\n// changed\n');
+  assert.deepEqual(v7.freezeBroken(repo, frozen, addendum), ['scripts/lib/mailbox-behaviour-v7e.mjs']);
   assert.deepEqual(v7.addendumProblems(addendum, v7e.addendumV7e({ repo, preregistrationSha256: 'f'.repeat(64), versions: { pi: '1.4.0', omp: '18.12.6' }, seed: 'other' })), ['added']);
 });
 

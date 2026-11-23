@@ -449,10 +449,32 @@ fn group_of<'a>(
 }
 
 /// What the person asked of one run.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Options {
-    /// Run every registered fix first, so the rows are judged after the repair.
+    /// Run the registered fixes first, so the rows are judged after the repair.
     pub fix: bool,
+    /// With `fix`: run only the fixes with these ids, still in registry order. Empty runs every fix.
+    pub only: Vec<String>,
+}
+
+impl Options {
+    /// Refuses a request the engine cannot honour, by name: `only` without `fix`, or an id no registered fix has.
+    pub fn check(&self, registry: &Registry) -> Result<(), String> {
+        if self.only.is_empty() {
+            return Ok(());
+        }
+        if !self.fix {
+            return Err("--only needs --fix: it names the fixes to run".to_owned());
+        }
+        match self
+            .only
+            .iter()
+            .find(|id| !registry.fixes.iter().any(|fix| &fix.id == *id))
+        {
+            Some(unknown) => Err(format!("--only names no registered fix: {unknown}")),
+            None => Ok(()),
+        }
+    }
 }
 
 /// The report: `{ ok, next, fixed?, checks }`. Every field is optional on the reading side.
@@ -601,7 +623,9 @@ impl Owners<'_> {
 /// put back in registry order. A row an owner could not judge fails with the cause and no fix; the cause is
 /// added once to `next`.
 pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options) -> Report {
-    let fixed = options.fix.then(|| run_fixes(registry, owners, root));
+    let fixed = options
+        .fix
+        .then(|| run_fixes(registry, owners, root, &options.only));
     if let Some(signal) = owners.interrupted() {
         return Report {
             fixed,
@@ -705,20 +729,23 @@ pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options) 
     }
 }
 
-/// Every fix, in exact registry order; consecutive fixes of one owner are one call.
-fn run_fixes(registry: &Registry, owners: &Owners, root: &Path) -> Vec<FixResult> {
-    let mut results = Vec::with_capacity(registry.fixes.len());
+/// Every fix (only the ones in `only` when it is not empty), in exact registry order; consecutive fixes of one
+/// owner are one call.
+fn run_fixes(registry: &Registry, owners: &Owners, root: &Path, only: &[String]) -> Vec<FixResult> {
+    let fixes: Vec<&RegistryFix> = registry
+        .fixes
+        .iter()
+        .filter(|fix| only.is_empty() || only.contains(&fix.id))
+        .collect();
+    let mut results = Vec::with_capacity(fixes.len());
     let mut at = 0;
-    while at < registry.fixes.len() {
-        let kind = owners.kind_of_fix(registry, &registry.fixes[at]);
-        let end = registry.fixes[at..]
+    while at < fixes.len() {
+        let kind = owners.kind_of_fix(registry, fixes[at]);
+        let end = fixes[at..]
             .iter()
             .position(|fix| owners.kind_of_fix(registry, fix) != kind)
-            .map_or(registry.fixes.len(), |len| at + len);
-        let ids: Vec<&str> = registry.fixes[at..end]
-            .iter()
-            .map(|fix| fix.id.as_str())
-            .collect();
+            .map_or(fixes.len(), |len| at + len);
+        let ids: Vec<&str> = fixes[at..end].iter().map(|fix| fix.id.as_str()).collect();
         let mut done = owners.of(kind).run_fixes(root, &ids);
         done.truncate(ids.len());
         for id in &ids[done.len()..] {
@@ -1072,7 +1099,10 @@ mod tests {
                 bridge: &bridge,
             },
             Path::new("/p"),
-            Options { fix: true },
+            Options {
+                fix: true,
+                ..Options::default()
+            },
         );
         let fixed: Vec<&str> = report
             .fixed
@@ -1133,7 +1163,10 @@ mod tests {
                 bridge: &bridge,
             },
             Path::new("/p"),
-            Options { fix: true },
+            Options {
+                fix: true,
+                ..Options::default()
+            },
         );
         assert_eq!(report.checks.unwrap().len(), 6);
         assert!(native.calls.borrow().is_empty());
@@ -1169,7 +1202,10 @@ mod tests {
                 bridge: &bridge,
             },
             Path::new("/p"),
-            Options { fix: true },
+            Options {
+                fix: true,
+                ..Options::default()
+            },
         );
         let bridge_calls = bridge.calls.borrow();
         let last_fix = bridge_calls
@@ -1223,6 +1259,54 @@ mod tests {
     }
 
     #[test]
+    fn only_runs_just_the_named_fixes_in_registry_order_and_refuses_what_it_cannot_honour() {
+        let native = Scripted::new(vec![]);
+        let bridge = Scripted::bridge(vec![]);
+        let only = Options {
+            fix: true,
+            only: vec!["gateway-token-configured".into(), "fix-alpha".into()],
+        };
+        assert_eq!(only.check(&registry()), Ok(()));
+        let report = run(
+            &registry(),
+            &Owners {
+                native: &native,
+                bridge: &bridge,
+            },
+            Path::new("/p"),
+            only,
+        );
+        let fixed: Vec<&str> = report
+            .fixed
+            .as_ref()
+            .unwrap()
+            .iter()
+            .map(|f| f.id.as_str())
+            .collect();
+        assert_eq!(fixed, ["fix-alpha", "gateway-token-configured"]);
+        assert!(
+            report.checks.unwrap().len() > 2,
+            "the rows are still judged"
+        );
+        let unknown = Options {
+            fix: true,
+            only: vec!["no-such-fix".into()],
+        };
+        assert_eq!(
+            unknown.check(&registry()),
+            Err("--only names no registered fix: no-such-fix".to_owned())
+        );
+        let without_fix = Options {
+            fix: false,
+            only: vec!["fix-alpha".into()],
+        };
+        assert_eq!(
+            without_fix.check(&registry()),
+            Err("--only needs --fix: it names the fixes to run".to_owned())
+        );
+    }
+
+    #[test]
     fn the_report_serialises_in_the_documented_key_order_and_omits_what_a_row_does_not_say() {
         let native = Scripted::new(vec![("gamma", judged(false, "x"))]);
         let bridge = Scripted::bridge(vec![]);
@@ -1233,7 +1317,10 @@ mod tests {
                 bridge: &bridge,
             },
             Path::new("/p"),
-            Options { fix: true },
+            Options {
+                fix: true,
+                ..Options::default()
+            },
         );
         let json = serde_json::to_string(&report).unwrap();
         let keys: Vec<usize> = ["\"ok\"", "\"next\"", "\"fixed\"", "\"checks\""]
@@ -1277,7 +1364,7 @@ mod tests {
                 bridge: &bridge,
             },
             Path::new("/p"),
-            Options { fix: false },
+            Options::default(),
         );
         let rows = report.checks.unwrap();
         let elapsed = |id: &str| {

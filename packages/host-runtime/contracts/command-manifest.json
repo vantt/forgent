@@ -6146,6 +6146,13 @@
           "strict": {
             "type": "boolean",
             "description": "Exit 1 when any check fails (after the fixes ran, with --fix). Omit to keep the default exit 0 whatever the checks say."
+          },
+          "only": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Repeatable, with --fix: run only the fix with this id (a row id from `fgos doctor --json`, e.g. codex-hook-wired) instead of every fix. An id no fix has is refused by name; --only without --fix is refused."
           }
         },
         "required": []
@@ -6154,7 +6161,8 @@
         "fgos doctor",
         "fgos doctor --pretty",
         "fgos doctor --fix",
-        "fgos doctor --strict"
+        "fgos doctor --strict",
+        "fgos doctor --fix --only codex-hook-wired"
       ],
       "guide": {
         "changes": "Read-only by default. With --fix it runs every registered fix: the project files they own (shared config defaults, git hook, hook wiring). It never writes your global agent config; `fgos wire-agents` is the one opt-in for that.",

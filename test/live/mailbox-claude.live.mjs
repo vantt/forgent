@@ -43,7 +43,7 @@
  *                                  moved out of the project so only --settings loads them
  *   codex-home/                    Codex: the rows the installer wrote, as hooks.json
  *   home/, zdot/, trace/
- * The hook rows come from src/setup/agent-hooks.mjs; its PreToolUse guards are removed,
+ * The hook rows come from `fgos doctor --fix --only <fix>` (fgos-distribution agent_hooks.rs); its PreToolUse guards are removed,
  * because they need the legacy-node payload, which the private release does not stage
  * (a case that reaches legacy fails loudly instead). Deviation from spec §14 V5 ("the V4
  * live suite through the shim"): the shim this branch's fgctl would write, over a
@@ -76,7 +76,8 @@ import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import * as live from '../../scripts/lib/mailbox-live-cli.mjs';
 import { authRefusalAfterRun, removeRunDir } from '../../scripts/lib/codex-auth-guard.mjs';
-import { installClaudeHook, installCodexHook } from '../../src/setup/agent-hooks.mjs';
+import { invokeHost } from '../../src/util/host-bin.mjs';
+import { installHookThroughDoctor } from '../../scripts/lib/mailbox-live-confined.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
@@ -224,12 +225,17 @@ function layOut(name, dry, built) {
   return { dir, project, rows, shim: { generator: 'fgos_distribution::shim::workspace_shims', sha256: sha256(BRANCH_SHIM), mainCheckoutSha256: fs.existsSync(MAIN_SHIM) ? sha256(MAIN_SHIM) : null } };
 }
 
+/** Wires `cli`'s hooks in `project` through the doctor fix, answered by the host of the project's activation. */
+function wireHooks(project, cli) {
+  installHookThroughDoctor(project, cli);
+}
+
 /** The product installer's rows for the case's CLI, without the PreToolUse guards. */
 function installRows(name, dir) {
   const project = projectOf(dir);
   const cli = CLI_OF[name];
   if (cli === 'claude') {
-    installClaudeHook(project);
+    wireHooks(project, 'claude');
     const file = path.join(project, '.claude', 'settings.json');
     const settings = readJson(file);
     delete settings.hooks.PreToolUse;
@@ -239,7 +245,7 @@ function installRows(name, dir) {
     fs.rmSync(path.join(project, '.claude'), { recursive: true });
     return settings.hooks;
   }
-  installCodexHook(project);
+  wireHooks(project, 'codex');
   const config = readJson(path.join(project, '.codex', 'hooks.json'));
   delete config.hooks.PreToolUse;
   fs.rmSync(path.join(project, '.codex'), { recursive: true });
@@ -573,12 +579,11 @@ async function runL1(ctx) {
 async function runL2(ctx) {
   const { dir } = ctx;
   const uuid = crypto.randomUUID();
-  const { checkClaudeHook } = await import('../../src/setup/agent-hooks.mjs');
-  // The installer's own check, on a copy of the case's settings in the project: it names
-  // the Stop row as in a shape Claude Code does not read.
+  // The doctor's own row for the Claude hooks, read on a copy of the case's settings in the project: it
+  // names the Stop row as in a shape Claude Code does not read.
   fs.mkdirSync(path.join(ctx.project, '.claude'), { recursive: true });
   fs.copyFileSync(path.join(dir, 'settings.json'), path.join(ctx.project, '.claude', 'settings.json'));
-  const installerCheck = checkClaudeHook(ctx.project);
+  const installerCheck = invokeHost(['doctor'], { dir: ctx.project }).checks.find((row) => row.id === 'dispatch-decide-hook-wired');
   fs.rmSync(path.join(ctx.project, '.claude'), { recursive: true });
   const cli = startCli('L2', ctx, { prompt: prompts('L2'), uuid });
   const registered = await waitFor(() => bindings(snapshot(dir)).find((b) => b.key === uuid), cli);
@@ -966,7 +971,7 @@ function cmdCost(runs, which = 'branch') {
   writeJson(path.join(homeOf(dir), '.claude', 'sessions', `${process.pid}.json`), { pid: process.pid, sessionId: session, procStart: start, kind: 'interactive', entrypoint: 'sdk-cli', name: 'cost-session-3c', nameSource: 'derived' });
   const fixture = readJson(path.join(CONTRACTS, 'fixtures', 'hooks', 'claude', 'post-tool-use.json'));
   const payload = JSON.stringify({ ...fixture, session_id: session, cwd: projectOf(dir) });
-  installClaudeHook(projectOf(dir));
+  wireHooks(projectOf(dir), 'claude');
   const command = readJson(path.join(projectOf(dir), '.claude', 'settings.json')).hooks.PostToolUse[0].hooks[0].command;
   const env = { ...live.cliEnv({ zdotdir: path.join(dir, 'zdot'), extra: { HOME: homeOf(dir), CLAUDE_PROJECT_DIR: projectOf(dir) } }), CLAUDE_CODE_SESSION_ID: session };
   const call = (cmd) => {

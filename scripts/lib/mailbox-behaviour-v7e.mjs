@@ -27,7 +27,6 @@ const LIMITS = path.join('packages', 'mailbox', 'contracts', 'limits.v1.json');
 const ADAPTERS = path.join('packages', 'mailbox', 'contracts', 'adapters.v1.json');
 const SELF = path.join('scripts', 'lib', 'mailbox-behaviour-v7e.mjs');
 const V7_MODULE = path.join('scripts', 'lib', 'mailbox-behaviour-v7.mjs');
-const EXTENSION = path.join('src', 'setup', 'agent-hooks.mjs');
 
 /** The pairs measured: an arm letter per model family, the CLI, the model, the account. */
 export const PAIRS = Object.freeze([
@@ -76,13 +75,13 @@ export function addendumV7e({ repo, preregistrationSha256, versions, seed, froze
     addendumTo: { file: v7.PREREGISTRATION_FILE, sha256: preregistrationSha256 },
     frozenAt,
     overrides: { [FRAME]: sha256File(path.join(repo, FRAME)), [LIMITS]: sha256File(path.join(repo, LIMITS)) },
-    added: Object.fromEntries([SELF, V7_MODULE, ADAPTERS, EXTENSION].map((f) => [f, sha256File(path.join(repo, f))])),
+    added: Object.fromEntries([SELF, V7_MODULE, ADAPTERS].map((f) => [f, sha256File(path.join(repo, f))])),
     unchanged: 'the receiver instruction (owner Q3 A bytes), the task, the bodies and V6 scorer, by V6 hash',
     ...V7E,
     pairs: PAIRS,
     notRun: NOT_RUN,
     versions,
-    delivery: 'the generated extension (src/setup/agent-hooks.mjs) appends the frame after the real output of the tool result at which the native hook drains; it reaches the provider as tool output (function_call_output)',
+    delivery: 'the generated extension (fgos-distribution agent_hooks.rs) appends the frame after the real output of the tool result at which the native hook drains; it reaches the provider as tool output (function_call_output)',
     login: 'the approved account\'s Codex OAuth login, read read-only from its omp profile store and materialized in the private home (pi auth.json, omp agent.db by its own auth import); never linked',
     mcp: 'none: pi --offline --no-extensions --no-mcp --no-skills --no-prompt-templates; omp --no-extensions --no-skills --no-rules --no-lsp --no-title with mcp.enableProjectConfig false and an empty private home (phase 7 MCP-off proof)',
     cells: cells().map((c) => c.id),

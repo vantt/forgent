@@ -532,7 +532,8 @@
       "help",
       "pretty",
       "fix",
-      "strict"
+      "strict",
+      "only"
     ],
     "store": "none"
   },

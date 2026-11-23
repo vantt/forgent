@@ -2139,7 +2139,6 @@ test('door check: the old dispatch hook script name appears only as a legacy mar
   const row = execRow('retired Node S5 hook script');
   assert.equal(doorHits(row, 'src/seeded.mjs', "const hook = 'scripts/dispatch-decide-hook.mjs';\n").length, 1);
   assert.equal(doorHits(row, 'src/seeded.mjs', "legacyMarkers: ['dispatch-decide-hook.mjs']\n").length, 1);
-  assert.deepEqual(doorHits(row, 'src/setup/agent-hooks.mjs', "legacyMarkers: ['dispatch-decide-hook.mjs']\n"), []);
   assert.deepEqual(doorHits(row, 'packages/distribution/rust/src/agent_hooks.rs', '.legacy(&["dispatch-decide-hook.mjs"])\n'), []);
 });
 

@@ -4,10 +4,8 @@ patterns:
   - scripts/dispatch-decide-hook\.mjs
   - "['\"]dispatch-decide-hook\\.mjs['\"]"
 allowed:
-  - path: src/setup/agent-hooks.mjs
-    reason: "legacyMarkers: the name of the old hook script, so an install removes an entry an earlier install wrote"
   - path: packages/distribution/rust/src/agent_hooks.rs
-    reason: legacy marker of the dispatch hook entry, same purpose as the Node table
+    reason: "legacy marker of the dispatch hook entry: the name of the old hook script, so an install removes an entry an earlier install wrote"
 debt: []
 retiredBy: the legacy markers go when no install that wrote the old hook entry remains
 reason: scripts/dispatch-decide-hook.mjs is deleted; the name remains only as a legacy marker that lets the hook table recognise and replace an entry an earlier install wrote. Any other mention is a live reference to a script that does not exist

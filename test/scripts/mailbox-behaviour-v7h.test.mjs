@@ -29,7 +29,7 @@ test('V7h has its own harness home apart from V6\'s and every earlier addendum\'
 test('the V7h addendum binds V6\'s hash, pins pi with V6\'s Claude model through OpenRouter at Claude Code\'s effort, eleven cells within the owner\'s ceiling, and freezes the modules that launch and log in the run', () => {
   const repo = scratch('v7h-repo-');
   const files = ['test/live/mailbox-behaviour', 'packages/mailbox/contracts/frame.v1.txt', 'packages/mailbox/contracts/limits.v1.json', 'packages/mailbox/contracts/adapters.v1.json', 'scripts/lib/mailbox-behaviour-score.mjs',
-    'scripts/lib/mailbox-behaviour-v7.mjs', 'scripts/lib/mailbox-behaviour-v7e.mjs', 'scripts/lib/mailbox-behaviour-v7h.mjs', 'scripts/lib/mailbox-behaviour-run.mjs', 'scripts/lib/mailbox-live-confined.mjs', 'src/setup/agent-hooks.mjs'];
+    'scripts/lib/mailbox-behaviour-v7.mjs', 'scripts/lib/mailbox-behaviour-v7e.mjs', 'scripts/lib/mailbox-behaviour-v7h.mjs', 'scripts/lib/mailbox-behaviour-run.mjs', 'scripts/lib/mailbox-live-confined.mjs'];
   for (const rel of files) fs.cpSync(path.join(REPO, rel), path.join(repo, rel), { recursive: true });
   const frozen = preregistration({ repo, versions: { claude: '2.1.309', codex: '0.161.0' }, seed: 'fixed' });
   const addendum = v7h.addendumV7h({ repo, preregistrationSha256: 'f'.repeat(64), versions: { pi: '1.4.0' }, seed: 'fixed' });
@@ -41,7 +41,7 @@ test('the V7h addendum binds V6\'s hash, pins pi with V6\'s Claude model through
   assert.deepEqual(addendum.baselines, ['pi/A/Q0']);
   assert.equal(addendum.ceiling, (5 + 3) + 10 * 13, 'Q0 at 5 and each cell at N = 10, each with 3 more for exclusions');
   assert.match(addendum.network, /canary/);
-  assert.deepEqual(Object.keys(addendum.added).sort(), ['packages/mailbox/contracts/adapters.v1.json', 'scripts/lib/mailbox-behaviour-run.mjs', 'scripts/lib/mailbox-behaviour-v7.mjs', 'scripts/lib/mailbox-behaviour-v7e.mjs', 'scripts/lib/mailbox-behaviour-v7h.mjs', 'scripts/lib/mailbox-live-confined.mjs', 'src/setup/agent-hooks.mjs']);
+  assert.deepEqual(Object.keys(addendum.added).sort(), ['packages/mailbox/contracts/adapters.v1.json', 'scripts/lib/mailbox-behaviour-run.mjs', 'scripts/lib/mailbox-behaviour-v7.mjs', 'scripts/lib/mailbox-behaviour-v7e.mjs', 'scripts/lib/mailbox-behaviour-v7h.mjs', 'scripts/lib/mailbox-live-confined.mjs']);
   assert.deepEqual(v7.freezeBroken(repo, frozen, addendum), []);
   fs.appendFileSync(path.join(repo, 'scripts/lib/mailbox-live-confined.mjs'), '\n// changed\n');
   assert.deepEqual(v7.freezeBroken(repo, frozen, addendum), ['scripts/lib/mailbox-live-confined.mjs']);
