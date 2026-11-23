@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b2f1ecd0bb1ef9de5598d5b1e2d959676cbd71ae73a3bc9b85a7b2dbf7bc5670",
+  "payloadDigest": "df97ec1627ab543d6a471d1962e521d5f83123793c4938dddbbb106b29881771",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1455,7 +1455,7 @@
     "scripts/verify-fanout-overlap.mjs": "b74a0ac9f350c5d62a47f3e3bf0896e9d142e5cbba15284527383d1b529ea435",
     "scripts/write-test-marker.mjs": "c5c41aa3db2be343347cfc148fafe62b262833b42a732f312c4c6e799f330fb2",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
-    "src/cli/command-registry.mjs": "41d6cfdbfe3c24b29913717a7cb1b49e7568c09065a78f9e18473b3c4057b032",
+    "src/cli/command-registry.mjs": "ae9ece10e6c77e3416d7028d6beb97c8a70872fd05f306baf7fcfbad1ec8b441",
     "src/cli/exit-codes.mjs": "55a68e5a0b03a38adced7ddc9bcfb60964db94b3b868e2c854b6a6a78fdb4964",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
