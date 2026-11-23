@@ -189,7 +189,7 @@ const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nat
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
   assert.deepEqual(MULTI.map((e) => e.name).sort(), ['goal', 'merge', 'request', 'session', 'workflow']);
-  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['agents', 'config', 'convention', 'dispatch', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'questions', 'supervisor', 'watcher', 'worktree']);
+  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['agents', 'authority', 'config', 'convention', 'dispatch', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'migrate', 'questions', 'supervisor', 'watcher', 'worktree']);
 });
 
 // A verb that lists sub-verbs in `native` serves those in the Rust host: the Node handler holds no branch for them
@@ -253,6 +253,8 @@ test('the scanner sees what it claims to: known reads in known regions', () => {
 // metrics_cli/<sub>.rs file; friction -> its match arm in friction_cli.rs;
 // lock -> the flags its wiring file reads from the shared parser (`parsed.flag("<name>")`);
 // config, convention, events, identity and questions -> one parser shared by every sub-verb (cli_projector.rs),
+// authority -> one parser in apps/fgos/src/wiring/authority.rs (`project_authority_request`),
+// migrate -> one parser in apps/fgos/src/wiring/migrate.rs (`project_migrate_request`),
 // mailbox -> one parser in apps/fgos/src/wiring/mailbox_verbs.rs, so
 // its flags must equal the union of the sub-verbs' schemas; its sub-verb names
 // live in mailbox_surface.rs, shared by every platform build; worktree -> its sub-verb's match arm in
@@ -427,6 +429,22 @@ const NATIVE_SOURCES = {
       const src = RUST('apps/fgos/src/cli_projector.rs');
       const start = src.indexOf('fn project_convention_request');
       return src.slice(start, src.indexOf('#[cfg(test)]', start));
+    },
+  },
+  authority: {
+    subs: RUST('apps/fgos/src/wiring/authority.rs'),
+    shared: () => {
+      const src = RUST('apps/fgos/src/wiring/authority.rs');
+      const start = src.indexOf('pub fn project_authority_request');
+      return src.slice(start, src.indexOf('#[cfg(test)]', start));
+    },
+  },
+  migrate: {
+    subs: RUST('apps/fgos/src/wiring/migrate.rs'),
+    shared: () => {
+      const src = RUST('apps/fgos/src/wiring/migrate.rs');
+      const start = src.indexOf('pub fn project_migrate_request');
+      return src.slice(start, src.indexOf('/// What a run did', start));
     },
   },
 };

@@ -513,6 +513,46 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
     native: true,
   }),
+  withSubcommands({
+    name: 'authority',
+    invoke: 'fgos authority locate "<sentence>" [--limit N]',
+    description: 'Find the components, decision kinds, doors and contracts of the component authority model that match a description of the work. Run it before writing a function, module or decision, so new code lands under the row that owns it.',
+    subcommands: {
+      locate: {
+        description: "Rank the model rows that match a sentence: an exact canonical name first, then an alias, then overlap with the row's meaning. Vietnamese diacritics are folded.",
+        parameters: {
+          type: 'object',
+          properties: {
+            sentence: { type: 'string', description: 'The description of the work, one positional argument.' },
+            limit: { type: 'integer', description: 'Return at most this many matches (default 10).' },
+          },
+          positional: ['sentence'],
+          required: ['sentence'],
+        },
+        examples: [
+          'fgos authority locate "atomic file write" --json',
+          'fgos authority locate "ghi file nguyên tử" --limit 3',
+        ],
+      },
+    },
+    examples: ['fgos authority locate "atomic file write" --json'],
+    guide: {
+      changes: 'Nothing: it reads the model files under packages/component-authority/model/.',
+      prerequisites: 'A checkout that holds the component authority model.',
+      exitCodes: [
+        '0 answered, with zero or more matches',
+        '4 refused: unknown sub-command, option or a missing sentence',
+        '1 failed: a model file is missing or invalid',
+      ],
+      next: 'Write the new code under the owning row, or declare a new row when none owns it.',
+    },
+    touchesState: false,
+    store: 'none',
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+    native: true,
+  }),
   {
     name: 'init',
     invoke: 'fgos init',
