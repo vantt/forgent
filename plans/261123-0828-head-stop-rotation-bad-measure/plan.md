@@ -79,6 +79,10 @@ to run the gate itself outside the sandbox. Result: blocked. The lead session is
 the worktree, `/proc` and `~/.local/state/fgos` are read-only to it, so it cannot build, install `node_modules` or run
 `npm test` / `cargo test --workspace`. The status stays `running` because the plan contract has no parked status.
 
+Parked on owner question `q-pcwf3slkfp` (supervisor, 2026-11-23 22:40 +07): no unconfined `lead:SUPERVISOR` session is
+live, so the full gate waits on the owner. The `plan-no-progress` event for this wait was closed; the live lead is left
+idle on purpose and resumes when the question is answered.
+
 Phase 1 evidence so far:
 - Criterion 2 is green: `cargo test -p fgos-run-supervisor --test head_request a_rotation_frame_preserves_decimal_exponent_and_integer_numbers_for_the_route`
   reported 1 passed, run by the unit at `d265faf28`.
