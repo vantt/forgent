@@ -466,11 +466,12 @@ export function discoverKnownOwners(projectRoot, options = {}) {
         { filePath: modelDir, code: 'MANIFEST_ERROR', cause: err },
       );
     }
-    for (const comp of model.components) {
+    // An inactive authority answer carries no model: only the default owners apply.
+    for (const comp of model.components ?? []) {
       const id = typeof comp.id === 'string' ? comp.id.trim() : '';
       if (id && !comp.parent) owners.add(id);
     }
-    for (const dom of model.layers.domains) {
+    for (const dom of model.layers?.domains ?? []) {
       if (typeof dom === 'string' && dom.trim()) owners.add(dom.trim());
     }
   }

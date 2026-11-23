@@ -37,7 +37,8 @@ const LEGACY_SPEC_PATH = /docs\/specs\/([A-Za-z0-9-]+)\.md/g;
 export function narrativeHolderResolver(repoRoot) {
   const homes = new Map();
   if (fs.existsSync(path.join(repoRoot, MODEL_DIR))) {
-    const { decisionKinds } = invokeHost(['authority', 'model', '--json'], { dir: repoRoot });
+    // An inactive authority answer carries no decisionKinds: same as an absent model directory.
+    const { decisionKinds = [] } = invokeHost(['authority', 'model', '--json'], { dir: repoRoot });
     for (const kind of decisionKinds) {
       const home = kind?.narrative;
       if (!home) continue;

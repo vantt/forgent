@@ -247,6 +247,10 @@ test('narrativeHolderResolver: reads decision-kinds.yaml through the host by id,
   fs.writeFileSync(path.join(repoRoot, 'docs', 'platform', 'questions', 'spec.md'), '# questions\n');
   const modelDir = path.join(repoRoot, 'packages', 'component-authority', 'model');
   fs.mkdirSync(path.join(modelDir, 'doors'), { recursive: true });
+  // The host reads a root as the fgOS repository only when it carries this contract.
+  const contractsDir = path.join(repoRoot, 'packages', 'component-authority', 'contracts');
+  fs.mkdirSync(contractsDir, { recursive: true });
+  fs.copyFileSync(path.resolve(__dirname, '../../packages/component-authority/contracts/model.v1.json'), path.join(contractsDir, 'model.v1.json'));
   fs.writeFileSync(path.join(modelDir, 'layers.yaml'), [
     'layers:', '  - kernel', 'rules: []', 'domains: []', 'tierNames:', '  "0": leaf', '',
   ].join('\n'));
