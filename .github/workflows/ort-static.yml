@@ -17,6 +17,7 @@ defaults:
     shell: bash
 env:
   ORT_TAG: v1.31.1
+  ORT_COMMIT: 6af1a932e2286d5c58166085d24c68783033edee
   RELEASE_TAG: ort-static-1.31.1-linux-x64-glibc2.35
   # vantt/pkm-release (public) holds ort-probe, the same probe pkm used to choose its ONNX Runtime linking.
   PROBE_REPO: vantt/pkm-release
@@ -32,8 +33,17 @@ jobs:
       - uses: actions/checkout@v4
       - name: ONNX Runtime source
         run: |
-          git clone -q --depth 1 --branch "$ORT_TAG" https://github.com/microsoft/onnxruntime.git "$RUNNER_TEMP/onnxruntime"
-          git -C "$RUNNER_TEMP/onnxruntime" rev-parse HEAD | tee "$RUNNER_TEMP/ort-commit.txt"
+          # microsoft/onnxruntime answers 404 since 2026-11-19. The tag's commit is fetched by its id from the first
+          # source that serves it; the id is the tag's target in microsoft/onnxruntime as archived by Software
+          # Heritage (snapshot bb4b98ed9243ab978ad058879a237a24445f4a90, 2026-11-14), so any fork yields the same tree.
+          D="$RUNNER_TEMP/onnxruntime"; git init -q "$D"
+          for src in https://github.com/microsoft/onnxruntime.git https://github.com/intel/onnxruntime.git https://github.com/ROCm/onnxruntime.git; do
+            if git -C "$D" fetch -q --depth 1 "$src" "$ORT_COMMIT"; then echo "source: $src"; break; fi
+          done
+          git -C "$D" checkout -q FETCH_HEAD
+          test "$(git -C "$D" rev-parse HEAD)" = "$ORT_COMMIT"
+          git -C "$D" submodule update -q --init --depth 1 cmake/external/onnx
+          git -C "$D" rev-parse HEAD | tee "$RUNNER_TEMP/ort-commit.txt"
       - uses: actions/cache/restore@v4
         id: ortcache
         with:
@@ -43,7 +53,7 @@ jobs:
         if: steps.ortcache.outputs.cache-hit != 'true'
         run: |
           cd "$RUNNER_TEMP/onnxruntime"
-          ./build.sh --config Release --parallel --skip_tests --compile_no_warning_as_error \
+          ./build.sh --config Release --parallel --skip_tests --skip_submodule_sync --compile_no_warning_as_error \
             --cmake_extra_defines onnxruntime_BUILD_UNIT_TESTS=OFF onnxruntime_USE_TELEMETRY=OFF CMAKE_POSITION_INDEPENDENT_CODE=ON
       # Saved right after the build, so a later failing step does not cost another build.
       - uses: actions/cache/save@v4
