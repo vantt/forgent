@@ -5,7 +5,6 @@ status: draft
 priority: P1
 base: 4ad3bfaf8b6ac875f0f6693600df8532588260af
 blockedBy:
-  - 261122-0118-heads-stable-and-able
   - 261118-1341-s6a-execution-tier-rust
 footprint:
   - plans/261122-2108-delete-dead-node-execution-closure/**
@@ -283,6 +282,8 @@ plan and its phase rows to `ready`, and land `plan.md` alone. That flip wakes th
 second blocker land does it: the supervisor, the secretary, or this head on a later wake.
 
 ## Owner questions
+
+**heads-stable no longer blocks this plan (lead:SUPERVISOR, 2026-11-23 14:2x):** owner order of 2026-11-22 23:21, heads-stable blocks nobody. s6a is done. What still holds this plan is real footprint overlap with the running plans component-authority-doors and runner-recheck-replays-account-view (`src/runner/dispatch/**`, `src/runner/execution/**`, the model); refresh it after those land, then set it ready.
 
 None. The one judgment call, the frozen mailbox harness, is settled by the manifest's existing frozen-harness
 decision (see Decisions).
