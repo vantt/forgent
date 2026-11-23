@@ -44,15 +44,19 @@ test('a project override of the secretary prefer replaces the standard list and 
   assert.notEqual(invocationOf(cfg, binding).permissionMode, 'bypass');
 });
 
-test('a head grant writes only existing directories of the repository, each named once, a one-level entry ending in /*', () => {
+test('a head grant writes only existing directories or existing files of the repository, each named once, a one-level entry ending in /*', () => {
   const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
   for (const role of ['head:secretary-miu', 'head:supervisor-main', 'head:shaper-main', 'head:planner-main']) {
     const { writes } = grantOf(role);
     assert.equal(new Set(writes).size, writes.length, `${role} lists no path twice`);
     for (const entry of writes) {
-      const dir = entry.endsWith('/*') ? entry.slice(0, -2) : entry;
-      assert.ok(!dir.includes('*') && !path.isAbsolute(dir) && !dir.split('/').includes('..'), `${role} entry ${entry} is a plain project path or <dir>/*`);
-      assert.ok(fs.statSync(path.join(repoRoot, dir), { throwIfNoEntry: false })?.isDirectory(), `${role} entry ${entry} names a directory under the repository root`);
+      const tree = entry.endsWith('/*');
+      const target = tree ? entry.slice(0, -2) : entry;
+      assert.ok(!target.includes('*') && !path.isAbsolute(target) && !target.split('/').includes('..'), `${role} entry ${entry} is a plain project path or <dir>/*`);
+      // A `<dir>/*` entry is a tree the sandbox binds, so it must name a directory; any other entry names one path,
+      // which the sandbox binds writable when it is a directory and keeps read-only when it is a regular file.
+      const stat = fs.statSync(path.join(repoRoot, target), { throwIfNoEntry: false });
+      assert.ok(tree ? stat?.isDirectory() : stat?.isDirectory() || stat?.isFile(), `${role} entry ${entry} names an existing ${tree ? 'directory' : 'directory or regular file'} under the repository root`);
     }
   }
 });

@@ -374,7 +374,7 @@ test('a secretary launches with the paths and the verb its grant names; the line
   const request = calls.launch[0];
   assert.equal(request.key, headKeyOf('secretary', 'miu', 2));
   assert.deepEqual(request.grant, grantOf('head:secretary-miu'));
-  assert.deepEqual(request.grant.writes, ['plans', 'plans/backlog/*']);
+  assert.deepEqual(request.grant.writes, ['plans', 'plans/backlog.md', 'plans/backlog/*']);
   assert.equal(request.grant.mailbox, true, 'the secretary sends and receives mail');
   assert.deepEqual(request.env, { TMPDIR: '/tmp', FGOS_HEAD_ROLE: headRoleOf('secretary', 'miu'), FGOS_HEAD_PERSONA: 'secretary', FGOS_HEAD_NAME: 'miu', FGOS_HEAD_GEN: '2' });
   // The supervisor records this head in the session's Identity entry from the envelope's session fields.
