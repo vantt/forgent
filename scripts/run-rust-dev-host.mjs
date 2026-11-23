@@ -131,7 +131,7 @@ function main() {
   const build = spawnSync('cargo', ['build', '--locked', '--package', 'fgos', '--package', 'fgos-node-addon'], {
     cwd: checkoutRoot,
     stdio: 'inherit',
-    env: { ...process.env, ...ensureOrtStatic(checkoutRoot) },
+    env: { ...process.env, ...ensureOrtStatic() },
   });
   const buildStatus = forwardResult(build, 'Failed to run cargo build');
   if (buildStatus !== 0) return buildStatus;

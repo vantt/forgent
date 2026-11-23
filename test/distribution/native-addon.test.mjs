@@ -13,9 +13,9 @@ import {ensureGitAddon, root} from '../helpers/git-addon.mjs';
 import {buildRustDistribution, nativeAddonLibraryName, nativeAddonComponent, computeArtifactDigest, gitCapabilitiesForHost} from '../../scripts/build-rust-distribution.mjs';
 const built = ensureGitAddon();
 
-// A verified ort archive cache, so a script's ensureOrtStatic never downloads the archive.
-function seedVerifiedOrtCache(repo) {
-  const ortDir = archiveDirectory(repo);
+// A verified ort archive in the machine folder `env` names, so a script's ensureOrtStatic never downloads it.
+function seedVerifiedOrtCache(env) {
+  const ortDir = archiveDirectory(env);
   const ortFile = path.join(ortDir, 'libonnxruntime.a');
   fs.rmSync(ortFile, {recursive: true, force: true});
   fs.mkdirSync(ortDir, {recursive: true});
@@ -178,7 +178,8 @@ test('development host carries and loads the addon from its per-invocation manif
     fs.writeFileSync(path.join(repo, 'package.json'), '{"type":"module"}');
     fs.mkdirSync(path.join(repo, 'bin'));
     fs.writeFileSync(path.join(repo, 'bin/fgos.mjs'), `import fs from 'node:fs'; import {loadNativeAddon} from '../src/git/native.mjs'; const m=JSON.parse(fs.readFileSync(process.env.FGOS_ACTIVE_MANIFEST_PATH)); console.log(JSON.stringify({versions:loadNativeAddon().versions(),component:m.components.nativeAddon,files:m.files}));`);
-    seedVerifiedOrtCache(repo);
+    const ortCache = path.join(temp, 'cache');
+    seedVerifiedOrtCache({XDG_CACHE_HOME: ortCache});
     const cargo = path.join(temp, 'cargo');
     fs.writeFileSync(cargo, `#!${process.execPath}
 const fs=require('node:fs'),path=require('node:path');
@@ -187,7 +188,7 @@ fs.copyFileSync(process.env.DEV_ADDON_HOST,path.join(output,'fgos'));fs.chmodSyn
 fs.copyFileSync(process.env.DEV_ADDON_BYTES,path.join(output,${JSON.stringify(nativeAddonLibraryName())}));
 `, {mode: 0o755});
     const output = execFileSync(process.execPath, [path.join(repo, 'scripts/run-rust-dev-host.mjs'), 'list'], {
-      cwd: temp, encoding: 'utf8', env: {...process.env, PATH: `${temp}${path.delimiter}${process.env.PATH}`, INIT_CWD: temp, CARGO_TARGET_DIR: path.join(temp, 'output'), DEV_ADDON_HOST: host, DEV_ADDON_BYTES: built.addon},
+      cwd: temp, encoding: 'utf8', env: {...process.env, PATH: `${temp}${path.delimiter}${process.env.PATH}`, INIT_CWD: temp, XDG_CACHE_HOME: ortCache, CARGO_TARGET_DIR: path.join(temp, 'output'), DEV_ADDON_HOST: host, DEV_ADDON_BYTES: built.addon},
     });
     const result = JSON.parse(output);
     assert.equal(result.versions.napi, 8);
@@ -246,6 +247,9 @@ process.exit(101);
     const digestFile = path.join(addonDir, GIT_ADDON_SOURCE_DIGEST_FILE);
     fs.writeFileSync(digestFile, gitAddonSourceDigest(repo));
 
+    // The probe's machine archive folder is its own, so the cases below never touch the machine's real archive.
+    const ortCache = path.join(temp, 'cache');
+    const ortDir = archiveDirectory({XDG_CACHE_HOME: ortCache});
     const runProbe = (mode, extraEnv = {}) => {
       const probe = `
 import assert from 'node:assert/strict';
@@ -278,7 +282,7 @@ if (process.argv[1] === 'fresh' || process.argv[1] === 'inherited') {
 }
 `;
       // The caller's cargo settings must not steer the probe: the target is always the read-only directory.
-      const childEnv = {...process.env, PATH: `${temp}${path.delimiter}${process.env.PATH}`, CARGO_TARGET_DIR: targetDir, ...extraEnv};
+      const childEnv = {...process.env, PATH: `${temp}${path.delimiter}${process.env.PATH}`, CARGO_TARGET_DIR: targetDir, XDG_CACHE_HOME: ortCache, ...extraEnv};
       delete childEnv.CARGO_BUILD_TARGET_DIR;
       return execFileSync(process.execPath, ['--input-type=module', '-e', probe, mode], {
         cwd: repo,
@@ -316,7 +320,7 @@ if (process.argv[1] === 'fresh' || process.argv[1] === 'inherited') {
     fs.writeFileSync(digestFile, 'stale-source-digest');
     fs.mkdirSync(targetDir, {recursive: true});
     // A directory at the archive path makes the archive step fail without touching the network.
-    fs.mkdirSync(path.join(archiveDirectory(repo), 'libonnxruntime.a'), {recursive: true});
+    fs.mkdirSync(path.join(ortDir, 'libonnxruntime.a'), {recursive: true});
     fs.chmodSync(targetDir, 0o555);
 
     // 2a. No ort cache and an unwritable target: the pre-cargo archive step fails, still the named error
@@ -334,7 +338,7 @@ if (process.argv[1] === 'fresh' || process.argv[1] === 'inherited') {
     }
 
     // 2b. Verified ort cache present: cargo runs once and fails read-only
-    seedVerifiedOrtCache(repo);
+    seedVerifiedOrtCache({XDG_CACHE_HOME: ortCache});
     fs.chmodSync(targetDir, 0o555);
 
     try {

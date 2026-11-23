@@ -55,7 +55,7 @@ function main() {
   execFileSync('cargo', ['build', '-p', 'fgos'], {
     cwd: REPO_ROOT,
     stdio: 'inherit',
-    env: { ...process.env, ...ensureOrtStatic(REPO_ROOT) },
+    env: { ...process.env, ...ensureOrtStatic() },
   });
 
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'observe-fixture-'));

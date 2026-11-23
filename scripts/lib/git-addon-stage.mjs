@@ -86,9 +86,9 @@ export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true
   const dir = path.resolve(cwd, env.CARGO_TARGET_DIR || 'target');
   let ortEnv;
   try {
-    ortEnv = ensureOrtStatic(cwd);
+    ortEnv = ensureOrtStatic(env);
   } catch (err) {
-    // The pre-cargo archive step writes under target/, so its failure can be the unwritable target the caller names.
+    // The pre-cargo archive step writes the machine archive folder; its failure is named as its own step.
     err.step = ORT_STATIC_STEP;
     throw err;
   }
@@ -239,7 +239,7 @@ export function ensureHostBin(env = process.env, cwd = REPO_ROOT) {
 
   execFileSync('cargo', ['build', '-p', 'fgos'], {
     cwd,
-    env: { ...env, CARGO_TARGET_DIR: targetDir, ...ensureOrtStatic(cwd) },
+    env: { ...env, CARGO_TARGET_DIR: targetDir, ...ensureOrtStatic(env) },
     stdio: 'inherit',
   });
 
