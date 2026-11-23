@@ -5,7 +5,7 @@ Capability: `code:test`.
 ## Inputs
 
 - `plans/261123-0726-contract-check-in-confined-heads/plan.md` (Acceptance criteria 3 and 4, Non-goals).
-- Phase 1's landed commit.
+- Phase 1's and phase 3's landed commits.
 - `plans/261122-0118-heads-stable-and-able/phase-03-land-plan-check.md` step 3 (the gate entry) and that plan's
   Progress line about `14287de27`.
 
@@ -15,17 +15,19 @@ Capability: `code:test`.
 
 ## Steps
 
-1. On the trunk with phase 1 landed, run the full gate: `npm test` and `cargo test --workspace`. Record the result in
+1. On the trunk with phases 1 and 3 landed, run the full gate: `npm test` and `cargo test --workspace`. Record the result in
    `reports/integration.md`. A red outside this plan's footprint gets classified with its cause; it is never waved
    through.
 2. From a confined head (`FGOS_CONFINED=1`), with a fresh staged addon and no env set by hand, run
    `node scripts/plan-contract-check.mjs --plan plans/261123-0726-contract-check-in-confined-heads` and one other
    script from the Facts list (for example `node scripts/check-backlog-reconciliation.mjs`). Record the commands,
    exit codes and output tails in the same report.
-3. Write the gate hand-off in that report, in one paragraph addressed to the supervisor. The hold condition of
-   `14287de27` is met (release `3b595f7c` substitutes `{plans}`), and this plan's fix is on trunk. heads-stable can
-   now restore `node scripts/plan-contract-check.mjs {plans}` in `land.gates` through `fgos config patch`. The lead
-   raises it to the supervisor with the report path.
+3. Record the gate hand-off in that report. The supervisor hands the gate restore to the heads-stable lead as soon as
+   phase 1 lands, without waiting for this phase. This step records whether `node scripts/plan-contract-check.mjs {plans}`
+   is back in `land.gates`, and its commit if it is. If it is not back yet, the lead raises it to the supervisor with the
+   report path.
+4. Run `node scripts/check-backlog-reconciliation.mjs` and `node --test test/scripts/doc-health.test.mjs` on the
+   combined tree, and record their output against phase 3's Verify.
 
 ## Verify
 

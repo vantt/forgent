@@ -10,8 +10,13 @@ footprint:
   - scripts/lib/git-addon-stage.mjs
   - scripts/git-addon.mjs
   - test/distribution/native-addon.test.mjs
+  - scripts/check-backlog-reconciliation.mjs
+  - scripts/identity-ids-unique.mjs
+  - test/scripts/doc-health.test.mjs
+  - docs/history/backlog-execution-reconciliation/RECONCILIATION.md
 source:
   - p-b5jixi4mov
+  - p-mtqil2rpyy
   - plans/reports/planner-261123-0724-contract-check-blind-in-confined-heads.md
 created: 2026-11-23
 ---
@@ -25,6 +30,10 @@ and get a real answer. The same holds for the other repository scripts that load
 `ensureAddonForScript`. When this checkout's staged addon is fresh, scripts reuse it and do not run cargo. When it is
 stale and cannot be rebuilt, the script stops with a named cause instead of a cargo stack trace. There is one
 reuse-or-build door in the leaf module, not two `ensureGitAddon` functions with different behaviour.
+
+Folded in on 2026-11-23 (owner approval relayed by the supervisor): `p-mtqil2rpyy`. The two backlog checks
+(`check-backlog-reconciliation.mjs`, `identity-ids-unique.mjs`) see a migrated item by its `Original id:`, through one
+shared reader, and keep their independent line-scan cross-check and loud missing-addon failure (phase 3).
 
 The owner chose this fix on 2026-11-23 (option A in the report named in `source`). Evidence for the cause is in that
 report.
@@ -71,7 +80,11 @@ report.
 3. From a confined head with a fresh staged addon, `node scripts/plan-contract-check.mjs --plan
    plans/261123-0726-contract-check-in-confined-heads` exits 0 with no env set by hand. The run is recorded in
    `plans/261123-0726-contract-check-in-confined-heads/reports/`.
-4. `npm test` and `cargo test --workspace` are green on the combined tree (L5).
+4. `node scripts/run-tests.mjs test/scripts/doc-health.test.mjs` passes, with one owning proof that the backlog checks
+   see a migrated item by its Original id, keep the line-scan cross-check, and fail loudly without the addon.
+   `node scripts/check-backlog-reconciliation.mjs` no longer reports `tsk-p7-shadow-binders` as an unknown id. How
+   much else of its red run clears is set by the owner question below (phase 3 step 5).
+5. `npm test` and `cargo test --workspace` are green on the combined tree (L5).
 
 ## Non-goals
 
@@ -91,16 +104,22 @@ report.
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [One reuse-or-build door in the leaf](phase-01-one-reuse-or-build-door.md) | - | scripts/lib/git-addon-stage.mjs, scripts/git-addon.mjs, test/distribution/native-addon.test.mjs | 1 | ready |
-| 2 | [Integration: confined proof and gate hand-off](phase-02-integration-and-gate-handoff.md) | 1 | plans/261123-0726-contract-check-in-confined-heads/reports/ | 2 | draft |
+| 3 | [Backlog checks count a migrated item's Original id](phase-03-backlog-checks-count-original-ids.md) | - | scripts/check-backlog-reconciliation.mjs, scripts/identity-ids-unique.mjs, test/scripts/doc-health.test.mjs, docs/history/backlog-execution-reconciliation/RECONCILIATION.md | 1 | ready |
+| 2 | [Integration: confined proof and gate hand-off](phase-02-integration-and-gate-handoff.md) | 1, 3 | plans/261123-0726-contract-check-in-confined-heads/reports/ | 2 | draft |
 
-Execution: phase 1 is one `code:implement` unit in its own worktree. Phase 2 is a `code:test` unit plus a supervisor
-hand-off note. The two phases share no paths.
+Execution: phases 1 and 3 are independent `code:implement` units, each in its own worktree, in wave 1. Phase 2 is a `code:test` unit plus a supervisor
+hand-off note. No two phases share a path. Phase 3 waits on the owner question below; phase 1 does not.
 
 ## Owner questions
 
-None. The owner chose the fix (option A, 2026-11-23). Leaving the gate restore in its owning plan follows from
-design principle 1 and the hot-file rule. It does not drop the owner's choice: the gate still returns, through the
-plan that already owns it.
+- `q-tvhmli3fns`: Backlog reconciliation is red for 278 reasons, not one: what should the folded original-id phase
+  make true? It blocks phase 3 step 5 only. Phases 1 and 3 are `ready`: phase 3's lead does steps 1-4 and 6, then reads
+  the answer before step 5 and parks only that step if it is still open. The plan is `ready` rather than `draft`
+  because admission starts only `ready` plans (`packages/supervision/rust/src/portfolio.rs:259`). A `draft` plan
+  would hold phase 1, which the question does not touch.
+
+The owner chose the confined-check fix (option A, 2026-11-23). The supervisor accepted keeping the gate restore in its
+owning plan (heads-stable phase 3) and hands it to that lead after phase 1 lands.
 
 ## Risks and rollback
 
@@ -110,7 +129,10 @@ plan that already owns it.
 - **In-process load at reuse time.** The moved reuse loads the addon to verify it. A script that later loads a
   different addon file would be refused with `git-addon-second-load`. Scripts load this same manifest, so this is a
   non-issue for script callers. The launcher keeps its build path (phase 1 step 4).
-- **Rollback:** revert the phase 1 commit. Scripts go back to always building, which works outside confinement as it
+- **Legacy overlap:** the running legacy plan `261106-1216-doctor-readiness-only` names
+  `test/scripts/doc-health.test.mjs` in its phase 03 without a frontmatter footprint, so the check cannot see the
+  overlap. Phase 3's lead cuts its branch at the trunk tip right before landing and keeps its test as one new block.
+- **Rollback:** revert the phase 1 commit; revert the phase 3 commit on its own. Scripts go back to always building, which works outside confinement as it
   does today.
 
 ## Outstanding questions
