@@ -37,6 +37,38 @@ function writeInstructionFile(dir, fileName, frontmatterStr, bodyStr = '# Header
   return filePath;
 }
 
+// Writes the YAML files of a component authority model as literal text; the host reads them
+// (`fgos authority model`). `components` are `{ id, parent? }` rows, `domains` are domain names.
+function writeModel(root, { components = [], domains = [] } = {}) {
+  const dir = path.join(root, 'packages', 'component-authority', 'model');
+  fs.mkdirSync(path.join(dir, 'doors'), { recursive: true });
+  const domainLines = domains.length ? domains.map((name) => `  - ${name}`).join('\n') : '  []';
+  fs.writeFileSync(
+    path.join(dir, 'layers.yaml'),
+    `layers:\n  - kernel\nrules: []\ndomains:\n${domainLines}\ntierNames:\n  "0": leaf\n`,
+    'utf8',
+  );
+  const rows = components.map(({ id, parent }) => [
+    `- id: ${id}`,
+    `  canonical: ${id}`,
+    '  aliases: []',
+    '  meaning: fixture component',
+    ...(parent ? [`  parent: ${parent}`] : []),
+    '  layer: kernel',
+    '  tier: 0',
+    '  paths: []',
+    '  owns: []',
+    '  mustNotOwn: []',
+    '  spec: docs/platform/fixture/spec.md',
+    '  source: []',
+    '  status: live',
+  ].join('\n'));
+  fs.writeFileSync(path.join(dir, 'components.yaml'), rows.length ? `${rows.join('\n')}\n` : '[]\n', 'utf8');
+  fs.writeFileSync(path.join(dir, 'decision-kinds.yaml'), '[]\n', 'utf8');
+  fs.writeFileSync(path.join(dir, 'contracts.yaml'), '[]\n', 'utf8');
+  fs.writeFileSync(path.join(dir, 'doors', 'fixture.yaml'), 'job: fixture\nkind: door\npatterns: []\nallowed: []\n', 'utf8');
+}
+
 function writeRecordedDecisionIndex(projectRoot, {
   text = 'D-ADR0001: recorded',
   rationale = 'fixture',
@@ -114,17 +146,7 @@ test('discoverInstructionSources discovers instruction fragments from core, comp
     );
 
     // Authorize packaging and coding via authoritative packages/component-authority/model/
-    fs.mkdirSync(path.join(tmp, 'packages', 'component-authority', 'model'), { recursive: true });
-    fs.writeFileSync(
-      path.join(tmp, 'packages', 'component-authority', 'model', 'components.json'),
-      JSON.stringify([{ id: 'packaging' }]),
-      'utf8',
-    );
-    fs.writeFileSync(
-      path.join(tmp, 'packages', 'component-authority', 'model', 'layers.json'),
-      JSON.stringify({ domains: ['coding'] }),
-      'utf8',
-    );
+    writeModel(tmp, { components: [{ id: 'packaging' }], domains: ['coding'] });
 
     const registry = discoverInstructionSources(tmp);
 
@@ -498,12 +520,7 @@ test('discoverInstructionSources throws DUPLICATE_ID when two files share the sa
 test('discoverInstructionSources throws DUPLICATE_ID when two files share the same id across different roots', () => {
   const tmp = mkTempDir('fgos-inst-dup-cross-');
   try {
-    fs.mkdirSync(path.join(tmp, 'packages', 'component-authority', 'model'), { recursive: true });
-    fs.writeFileSync(
-      path.join(tmp, 'packages', 'component-authority', 'model', 'components.json'),
-      JSON.stringify([{ id: 'auth' }]),
-      'utf8',
-    );
+    writeModel(tmp, { components: [{ id: 'auth' }] });
     writeInstructionFile(path.join(tmp, 'core', 'instructions'), 'rule-core.md', 'id: shared-rule-id\nkind: law');
     writeInstructionFile(path.join(tmp, 'components', 'auth', 'instructions'), 'rule-comp.md', 'id: shared-rule-id\nkind: procedure');
 
@@ -571,12 +588,7 @@ test('discoverInstructionSources throws UNKNOWN_OWNER when component folder is n
 test('discoverInstructionSources throws AUTHORITY_MISMATCH when declared owner does not match root authority owner', () => {
   const tmp = mkTempDir('fgos-inst-owner-mismatch-');
   try {
-    fs.mkdirSync(path.join(tmp, 'packages', 'component-authority', 'model'), { recursive: true });
-    fs.writeFileSync(
-      path.join(tmp, 'packages', 'component-authority', 'model', 'layers.json'),
-      JSON.stringify({ domains: ['coding'] }),
-      'utf8',
-    );
+    writeModel(tmp, { domains: ['coding'] });
     // A domain file attempting to declare platform/core owner
     writeInstructionFile(path.join(tmp, 'domains', 'coding', 'instructions'), 'rule.md', 'id: rule-1\nkind: boundary\nowner: core');
 
@@ -602,12 +614,7 @@ test('discoverInstructionSources throws AUTHORITY_MISMATCH when declared owner d
 test('discoverInstructionSources throws UNKNOWN_OWNER under default options when component is not in manifest', () => {
   const tmp = mkTempDir('fgos-inst-unreg-comp-');
   try {
-    fs.mkdirSync(path.join(tmp, 'packages', 'component-authority', 'model'), { recursive: true });
-    fs.writeFileSync(
-      path.join(tmp, 'packages', 'component-authority', 'model', 'components.json'),
-      JSON.stringify([{ id: 'packaging-distribution' }]),
-      'utf8',
-    );
+    writeModel(tmp, { components: [{ id: 'packaging-distribution' }] });
     writeInstructionFile(
       path.join(tmp, 'components', 'unregistered-comp', 'instructions'),
       'rule.md',
@@ -633,12 +640,7 @@ test('discoverInstructionSources throws UNKNOWN_OWNER under default options when
 test('discoverInstructionSources throws UNKNOWN_OWNER under default options when domain is not in manifest', () => {
   const tmp = mkTempDir('fgos-inst-unreg-dom-');
   try {
-    fs.mkdirSync(path.join(tmp, 'packages', 'component-authority', 'model'), { recursive: true });
-    fs.writeFileSync(
-      path.join(tmp, 'packages', 'component-authority', 'model', 'layers.json'),
-      JSON.stringify({ domains: ['coding'] }),
-      'utf8',
-    );
+    writeModel(tmp, { domains: ['coding'] });
     writeInstructionFile(
       path.join(tmp, 'domains', 'rogue-domain', 'instructions'),
       'rule.md',
@@ -777,17 +779,7 @@ test('InstructionRegistry: concat returns InstructionRegistry and preserves look
 test('InstructionRegistry: query methods return InstructionRegistry and preserve lookup semantics', () => {
   const tmp = mkTempDir('fgos-inst-reg-queries-');
   try {
-    fs.mkdirSync(path.join(tmp, 'packages', 'component-authority', 'model'), { recursive: true });
-    fs.writeFileSync(
-      path.join(tmp, 'packages', 'component-authority', 'model', 'components.json'),
-      JSON.stringify([{ id: 'comp1' }]),
-      'utf8',
-    );
-    fs.writeFileSync(
-      path.join(tmp, 'packages', 'component-authority', 'model', 'layers.json'),
-      JSON.stringify({ domains: ['dom1'] }),
-      'utf8',
-    );
+    writeModel(tmp, { components: [{ id: 'comp1' }], domains: ['dom1'] });
     writeInstructionFile(path.join(tmp, 'core', 'instructions'), 'r1.md', 'id: r1\nkind: law\nscope: repo');
     writeInstructionFile(path.join(tmp, 'components', 'comp1', 'instructions'), 'r2.md', 'id: r2\nkind: procedure\nscope: component');
     writeInstructionFile(path.join(tmp, 'domains', 'dom1', 'instructions'), 'r3.md', 'id: r3\nkind: boundary\nscope: domain');
@@ -1011,22 +1003,15 @@ test('discoverInstructionSources discovers real canonical instructions in reposi
 test('discoverKnownOwners admits top-level component ids and component-authority, but rejects subcomponents with parent', () => {
   const tmp = mkTempDir('fgos-inst-subcomp-');
   try {
-    fs.mkdirSync(path.join(tmp, 'packages', 'component-authority', 'model'), { recursive: true });
-    fs.writeFileSync(
-      path.join(tmp, 'packages', 'component-authority', 'model', 'components.json'),
-      JSON.stringify([
+    writeModel(tmp, {
+      components: [
         { id: 'component-authority' },
         { id: 'runner' },
         { id: 'h-6979005beaf7', parent: 'runner' },
         { id: 'admission', parent: 'documentation' },
-      ]),
-      'utf8',
-    );
-    fs.writeFileSync(
-      path.join(tmp, 'packages', 'component-authority', 'model', 'layers.json'),
-      JSON.stringify({ domains: ['coding'] }),
-      'utf8',
-    );
+      ],
+      domains: ['coding'],
+    });
 
     const owners = discoverKnownOwners(tmp);
     assert.ok(owners.has('component-authority'), 'component-authority must be an admitted known owner');

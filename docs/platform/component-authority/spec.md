@@ -56,20 +56,22 @@ Component Authority is the platform component that answers "who owns what" acros
 
 The structural model stores six distinct row kinds under `packages/component-authority/model/`, validated against `packages/component-authority/contracts/model.v1.json`:
 
+The model files are YAML (`layers.yaml`, `components.yaml`, `decision-kinds.yaml`, `contracts.yaml`, `doors/<slug>.yaml`). Only the Rust crate reads them; every other reader, Node tests and code included, takes the loaded model from `fgos authority model --json`. The generated ownership views of the platform docs are written by `fgos authority render` (`--check` reports drift without writing).
+
 ### 2.1 Layers, rules, domains, and tiers
 
-Defined in `layers.json` (created by phase 2 of the plan, migrating from `docs/architecture-manifest.json` (retired; last commit 00dddf7ae)):
+Defined in `layers.yaml` (migrated from `docs/architecture-manifest.json` (retired; last commit 00dddf7ae)):
 - `layers`: Ordered architectural layer names (`entry`, `use-case`, `infra`, `domain`, `kernel`) defining allowed one-directional import flows.
 - `rules`: Structural layering rules (`one-directional-layer`, `domain-siloing`, `tier-downward`).
 - `domains`: Registered business and execution domains (`coding`, `council`, `marketing`).
 - `tierNames`: Descriptive names for numeric tiers 0 through 9.
 - `tierExceptions`: Explicit exceptions with path, tier, and documented rationale.
 
-`tiers.json` and its schema definition arrive with phase 2.
+Tier numbers live on each component row and on the `tierExceptions` of `layers.yaml`; there is no separate tiers file.
 
 ### 2.2 Components and subcomponents
 
-Defined in `components.json`:
+Defined in `components.yaml`:
 - `id`: Unique identifier (e.g., `component-authority`).
 - `canonical`: Primary canonical display name.
 - `aliases`: Array of synonyms and alternate terms (e.g., `["ownership registry", "authority ledger"]`).
@@ -87,7 +89,7 @@ Defined in `components.json`:
 
 ### 2.3 Decision kinds
 
-Defined in `decision-kinds.json` (created by phase 3 of the plan):
+Defined in `decision-kinds.yaml`:
 - `id`: Stable decision kind identifier.
 - `canonical`: Canonical name.
 - `aliases`: Alternative and legacy scope strings (derived from `docs/platform/governance.md#decision-scope-to-holder-table`).
@@ -97,7 +99,7 @@ Defined in `decision-kinds.json` (created by phase 3 of the plan):
 
 ### 2.4 Doors
 
-Defined under `doors/` (one JSON file per door job, created by phase 2 of the plan):
+Defined under `doors/` (one YAML file per door job; the file name is the door's slug):
 - `job`: Description of the single-door job being protected.
 - `kind`: Door kind identifier (`door`).
 - `patterns`: Regular expression patterns matching both primitive operations and canonical/alias symbols.
@@ -109,7 +111,7 @@ Defined under `doors/` (one JSON file per door job, created by phase 2 of the pl
 
 ### 2.5 Contract index
 
-Defined in `contracts.json` (created by phase 4 of the plan):
+Defined in `contracts.yaml`:
 - `id`: Unique contract identifier (e.g., CTR code or package contract name).
 - `canonical`: Canonical contract name.
 - `aliases`: Alternate names or legacy designations.
@@ -124,7 +126,7 @@ Defined in `contracts.json` (created by phase 4 of the plan):
 
 ### 2.6 Files
 
-Transitional file-to-layer mapping (`files.json`, created by phase 2 of the plan) moved from `docs/architecture-manifest.json` (retired; last commit 00dddf7ae) during model migration. In phase 3, layer and tier assignments are derived directly from component path mappings, rendering `files.json` obsolete.
+The former file-to-layer mapping (`files.json`) moved from `docs/architecture-manifest.json` (retired; last commit 00dddf7ae) during model migration and is gone: layer and tier assignments are derived directly from component path mappings.
 
 ## 3. Operations: `locate` and `declare`
 

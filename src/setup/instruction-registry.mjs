@@ -19,6 +19,7 @@ import { domainCatalog } from '../util/domain-dirs.mjs';
 import { buildDecisionIndexMarkdown, narrativeHolderResolver } from '../report/decision-index.mjs';
 import { listWork } from '../state/store.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
+import { invokeHost } from '../util/host-bin.mjs';
 
 /**
  * Valid instruction rule forces (Section 6)
@@ -444,53 +445,33 @@ function scanMarkdownFiles(dir, containmentRoot = dir) {
 
 /**
  * Discover allowed components and domains under project root from the authoritative
- * component-authority model (packages/component-authority/model/), rejecting unregistered roots.
+ * component-authority model (packages/component-authority/model/, read by the host through
+ * `fgos authority model`), rejecting unregistered roots.
  *
  * Options:
- *   - modelDir: custom path to component-authority model directory (internal/test-only)
  *   - allowedComponents: explicit array/set of allowed component names (internal/test-only)
  *   - allowedDomains: explicit array/set of allowed domain names (internal/test-only)
  */
 export function discoverKnownOwners(projectRoot, options = {}) {
-  const modelDir = options.modelDir ?? path.join(projectRoot, 'packages', 'component-authority', 'model');
+  const modelDir = path.join(projectRoot, 'packages', 'component-authority', 'model');
   const owners = new Set(['core', 'platform']);
 
-  const componentsPath = path.join(modelDir, 'components.json');
-  if (fs.existsSync(componentsPath)) {
+  if (fs.existsSync(modelDir)) {
+    let model;
     try {
-      const components = JSON.parse(fs.readFileSync(componentsPath, 'utf8'));
-      if (Array.isArray(components)) {
-        for (const comp of components) {
-          const id = comp && typeof comp.id === 'string' ? comp.id.trim() : '';
-          if (id && !comp.parent) {
-            owners.add(id);
-          }
-        }
-      }
+      model = invokeHost(['authority', 'model', '--json'], { dir: projectRoot });
     } catch (err) {
       throw new InstructionRegistryError(
-        `Failed to parse components model at ${componentsPath}: ${err.message}`,
-        { filePath: componentsPath, code: 'MANIFEST_ERROR', cause: err },
+        `Failed to load the component authority model at ${modelDir}: ${err.message}`,
+        { filePath: modelDir, code: 'MANIFEST_ERROR', cause: err },
       );
     }
-  }
-
-  const layersPath = path.join(modelDir, 'layers.json');
-  if (fs.existsSync(layersPath)) {
-    try {
-      const layers = JSON.parse(fs.readFileSync(layersPath, 'utf8'));
-      if (Array.isArray(layers.domains)) {
-        for (const dom of layers.domains) {
-          if (typeof dom === 'string' && dom.trim()) {
-            owners.add(dom.trim());
-          }
-        }
-      }
-    } catch (err) {
-      throw new InstructionRegistryError(
-        `Failed to parse layers model at ${layersPath}: ${err.message}`,
-        { filePath: layersPath, code: 'MANIFEST_ERROR', cause: err },
-      );
+    for (const comp of model.components) {
+      const id = typeof comp.id === 'string' ? comp.id.trim() : '';
+      if (id && !comp.parent) owners.add(id);
+    }
+    for (const dom of model.layers.domains) {
+      if (typeof dom === 'string' && dom.trim()) owners.add(dom.trim());
     }
   }
 
@@ -600,7 +581,6 @@ export class InstructionRegistry extends Array {
  * Options:
  *   - coreRoot: (internal/test-only) custom path to core/instructions/
  *   - componentsRoot: (internal/test-only) custom path to components/
- *   - modelDir: (internal/test-only) custom path to component-authority model directory
  *   - knownOwners: Set or Array of valid owner names (internal/test-only override)
  *   - allowDuplicates: boolean (default false, throws on duplicate id)
  */
@@ -616,7 +596,6 @@ export function discoverInstructionSources(projectRoot, options = {}) {
       : new Set(options.knownOwners);
   } else {
     knownOwners = discoverKnownOwners(projectRoot, {
-      modelDir: options.modelDir,
       allowedComponents: options.allowedComponents,
       allowedDomains: options.allowedDomains,
     });

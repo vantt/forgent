@@ -1,0 +1,1754 @@
+- id: CTR001
+  canonical: CTR001
+  aliases:
+    - host-runtime/exit-codes.v1
+    - fgos.v1
+  meaning: "người/agent ↔ CLI: `fgos.v1` envelope `{contract, generated_at, data_hash, data}` trên MỌI verb + exit-code taxonomy đóng (nguồn duy nhất: `packages/host-runtime/contracts/exit-codes.v1.json` (Node `EXIT_CODES`, Rust host `packages/host-runtime/rust/src/exit_codes.rs`) + `src/runner/loop.mjs`'s `EXIT_BUSY`) + stdout=data/stderr=chẩn-đoán + sổ verb máy-đọc `--help --json` (`{schema_version, commands[]}`, `schema_version` hiện `'2.0'`; mỗi verb mang `touchesState`+`externalEffect` — hai trục thay `access` cũ — cộng `paginated` khai verb nào phân trang qua con trỏ đục `--cursor`/`--limit`, cộng `multiValueFormat` trên tham số nhiều-giá-trị, và `deprecated` khi một verb là legacy compatibility, per str46-io-contract verb-catalog axes + P8 (packaging-distribution workspace/runtime skeleton); xem `docs/platform/work-state/contracts/cli-io-contract.md` cho hợp đồng đầy đủ)"
+  provider: host-surface
+  consumers:
+    - runner
+    - execution-core
+    - work-driver
+    - packaging-distribution
+  path: packages/host-runtime/contracts/exit-codes.v1.json
+  evidence:
+    - packages/host-runtime/contracts/exit-codes.v1.json
+    - bin/fgos.mjs
+    - src/cli/
+  status: live
+  reason: host-surface owns the CLI fgos.v1 envelope and exit taxonomy; schema file lives under packages/host-runtime/contracts/ which no component paths[] entry covers.
+- id: CTR002
+  canonical: CTR002
+  aliases: []
+  meaning: "mọi caller ↔ store: bốn vế: (a) verbs một-cửa-GHI — đọc tự do; (b) event schema v2; (c) luật evolution (additive event, lazy view key, tolerate-unknown-field, hard-fail-unknown-version); (d) bất biến phi-chu-trình (record ADR0012 (acyclic unified blocks+parent-child graph at the write door)): đồ thị cạnh-định-kiểu hợp nhất `blocks`+`parent-child` (chiếu từ `deps`+`parent`) được cửa ghi bảo đảm phi-chu-trình — `addWork`/`editWork` từ chối mọi ghi khép một chu trình trên đồ thị hợp nhất, không chỉ trên `deps`. Nợ có tên: một-cửa là per-process; multi-process cần lease (chưa có)"
+  provider: work-state
+  consumers:
+    - work-driver
+    - workflow
+    - runner
+    - host-surface
+    - execution-core
+  evidence:
+    - src/state/store.mjs
+    - src/state/dep-graph.mjs
+    - docs/platform/work-state/spec.md
+  status: live
+  path: src/state/store.mjs
+- id: CTR003
+  canonical: CTR003
+  aliases: []
+  meaning: "orchestrator ↔ worker: dispatch: việc + verify đòi hỏi + proof khi về; trust boundary của worker: sandbox = nhánh `fgw/` cô lập (worktree) + vay 3 field RUN_CONTRACT khi fan-out (`forbidden_paths`, `required_outputs`, `result_json_schema`); kênh báo-cáo-không-ghi (record ADR0013 (worker report-not-write discovered channel)): worker CÓ THỂ phát khối `fgos-discovered` (dữ liệu thuần) để nêu việc mới phát hiện — vẫn không gọi `fgos`/ghi `.fgos/`; RUNNER đọc và tự tạo item `discoveredFrom` (runner vẫn một-cửa-ghi); stdout surface of `bin/fgos-runner.mjs` reuses CTR001's `fgos.v1` envelope mechanism (contract field `'fgos.v1'`) as its version token rather than minting a separate CTR003-specific tag, per str46-io-contract envelope reuse"
+  provider: runner
+  consumers:
+    - host-surface
+    - work-driver
+    - agent-coordination-engine
+  evidence:
+    - src/runner/loop.mjs
+    - src/runner/dispatch/
+    - src/runner/worktree.mjs
+  status: live
+  path: src/runner/loop.mjs
+  reason: architecture-map maturity was partial; schema allows live|designed|planned only so status is live.
+- id: CTR004
+  canonical: CTR004
+  aliases:
+    - CTR004/v1
+  meaning: "người ↔ hệ (bất đồng bộ): ask/answer + trạng thái `awaiting-human`; frontier loại việc đang chờ; carries version token CTR004/v1 embodied through the `SCHEMA_VERSION` field of source `work.move` events (currently 3) rather than a separate field on `gates[id]`, per str46-io-contract gate version token"
+  provider: work-state
+  consumers:
+    - host-surface
+    - work-driver
+    - questions
+  evidence:
+    - docs/platform/work-state/spec.md
+    - src/state/
+  status: live
+  path: docs/platform/work-state/spec.md
+- id: CTR005
+  canonical: CTR005
+  aliases: []
+  meaning: "hệ ↔ người (PR): review gate + merge policy + integrated re-verify sau merge"
+  provider: runner
+  consumers: []
+  evidence: []
+  status: planned
+  reason: planned — no contract file yet.
+- id: CTR006
+  canonical: CTR006
+  aliases:
+    - docs.runner/routing-handoff
+    - routing-handoff
+  meaning: "agent ↔ agent: routing-handoff contract + trust boundary"
+  provider: runner
+  consumers:
+    - host-surface
+    - agent-coordination-engine
+    - work-driver
+  path: docs/platform/runner/contracts/routing-handoff.md
+  evidence:
+    - docs/platform/runner/contracts/routing-handoff.md
+  status: designed
+  reason: runner owns the agent↔agent routing-handoff boundary; file sits under docs/platform/runner/contracts/ whose longest path prefix is executor-model; designed — full spec, no implementing code gate.
+- id: CTR007
+  canonical: CTR007
+  aliases: []
+  meaning: "state ↔ reactor: signal: con trỏ tối thiểu, lossy/at-least-once, consumer bắt buộc idempotent"
+  provider: event-store
+  consumers: []
+  evidence: []
+  status: planned
+  reason: planned — no contract file yet.
+- id: CTR008
+  canonical: CTR008
+  aliases: []
+  meaning: "hệ ↔ hub chú ý: attention envelope (`gate-opened`/`question-raised`/`blocked`), versioned"
+  provider: observe
+  consumers:
+    - host-surface
+    - runner
+    - work-driver
+  evidence: []
+  status: planned
+  reason: architecture-map maturity was idea; schema has no idea enum so status is planned.
+- id: CTR009
+  canonical: CTR009
+  aliases:
+    - execution/executor-model.v1
+    - executor.v1
+  meaning: "model gateway ↔ provider: `executor.v1`: runner config `{command, args[]}` thay `{prompt}`/`{model}` per-element — không nối chuỗi; validate RunnerConfigError tại nạp"
+  provider: executor-model
+  consumers:
+    - runner
+  path: packages/execution/contracts/executor-model.v1.json
+  evidence:
+    - packages/execution/contracts/executor-model.v1.json
+    - docs/platform/runner/contracts/executor-model.md
+    - src/runner/dispatch/
+    - packages/execution/contracts/accounts/**
+    - packages/execution/contracts/admission-peer/**
+    - packages/execution/contracts/assignment-runner/**
+    - packages/execution/contracts/assignment/**
+    - packages/execution/contracts/confinement-cleanup/**
+    - packages/execution/contracts/confinement-driver/**
+    - packages/execution/contracts/confinement-policy/**
+    - packages/execution/contracts/confinement-request/**
+    - packages/execution/contracts/core-loops/**
+    - packages/execution/contracts/core-run-facts/**
+    - packages/execution/contracts/core-runner-config/**
+    - packages/execution/contracts/core-unit/**
+    - packages/execution/contracts/corpus/**
+    - packages/execution/contracts/credentials/**
+    - packages/execution/contracts/dispatch-subs/**
+    - packages/execution/contracts/execution-contract/**
+    - packages/execution/contracts/execution-routes/**
+    - packages/execution/contracts/planning/**
+    - packages/execution/contracts/run-result/**
+    - packages/execution/contracts/settlement/**
+    - packages/execution/contracts/transport-round/**
+    - packages/execution/contracts/transport/**
+    - packages/execution/contracts/unit-run/**
+  status: live
+  reason: executor-model owns executor.v1; machine schema lives under packages/execution/contracts/ which no component paths[] entry covers (executor-model paths only cover docs/platform/runner/contracts/).
+- id: CTR010
+  canonical: CTR010
+  aliases:
+    - docs.herdr-web-dashboard/fgos-gateway-api-v1
+    - fgos-gateway.v1
+  meaning: "fgos Gateway REST server ↔ web/desktop/API clients: `fgos-gateway.v1`: REST `/v1` qua HTTP+JSON; OpenAPI là contract được phục vụ tại `/contract`"
+  provider: fgos-gateway
+  consumers:
+    - herdr-web-dashboard
+  path: docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml
+  evidence:
+    - docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml
+    - apps/fgos-gateway/
+  status: live
+  reason: fgos-gateway owns the REST/OpenAPI surface; yaml lives under docs/platform/herdr-web-dashboard/contracts/ which no component paths[] entry covers.
+- id: CTR011
+  canonical: CTR011
+  aliases:
+    - docs.agent-confinement/confinement-authority-v1
+    - confinement-authority.v1
+  meaning: "dispatch ↔ executor adapter: `confinement-authority.v1`: nhãn registry chỉ có trong tài liệu, không phải version stamp trong code; một cửa runtime duy nhất `prepareConfinementForLaunch(request)` trước khi run supervisor chạy agent; chuẩn hóa `confinement-policy.v1`, compile `confinement-plan.v1`, đối chiếu năng lực backend driver (`bwrap` v1 với 8 falsification probes), fail-closed cho `required`, cấm bypass thiếu full confinement, và phát `confinement-attestation.v1` bền"
+  provider: agent-confinement
+  consumers:
+    - dispatch-transport
+    - execution-core
+  path: docs/platform/agent-confinement/contracts/confinement-authority-v1.md
+  evidence:
+    - docs/platform/agent-confinement/contracts/confinement-authority-v1.md
+    - src/runner/dispatch/confinement/
+    - docs/platform/agent-confinement/spec.md
+  status: live
+- id: CTR012
+  canonical: CTR012
+  aliases:
+    - docs.agent-coordination/workflow-stage-operation
+    - workflow-step-operation
+  meaning: "Workflow step definition ↔ Assignment builder: `workflow-step-operation`: operation identity, TaskSpec, Skill, Role, dispatch hints và evidence/mutation expectations được normalize/de-duplicate rồi chiếu vào Assignment; payload hiện không có version field"
+  provider: agent-coordination
+  consumers:
+    - workflow
+    - execution-core
+    - work-driver
+    - coding-domain
+    - domain-components
+    - agent-coordination-engine
+    - group-thinking
+    - host-surface
+  path: docs/platform/agent-coordination/contracts/workflow-stage-operation.md
+  evidence:
+    - docs/platform/agent-coordination/contracts/workflow-stage-operation.md
+    - src/workflow/definition.mjs
+    - src/workflow/steps.mjs
+    - packages/execution/engine/src/unit_run/run.rs
+  status: live
+- id: CTR013
+  canonical: CTR013
+  aliases:
+    - docs.agent-coordination/assignment-run-runresult
+    - Assignment
+  meaning: "Assignment repository ↔ Dispatch Control Plane: `Assignment`: immutable persisted request được đọc lại qua attempts/recovery; payload hiện không có contract/schema version field (chỉ có policy/normalizer stamps). DispatchPlan không có id riêng và tiếp tục được chở trong `assignment-run.v2`"
+  provider: agent-coordination
+  consumers:
+    - dispatch-transport
+    - execution-core
+    - run-result
+    - team-cognition-engine
+    - work-driver
+    - coding-domain
+    - host-surface
+    - agent-coordination-engine
+  path: docs/platform/agent-coordination/contracts/assignment-run-runresult.md
+  evidence:
+    - docs/platform/agent-coordination/contracts/assignment-run-runresult.md
+    - src/runner/dispatch/assignment.mjs
+    - src/runner/dispatch/plan.mjs
+    - src/runner/dispatch/assignment-runner.mjs
+  status: live
+- id: agent-protocol/agent-protocol.v1
+  canonical: agent-protocol/agent-protocol.v1
+  aliases: []
+  meaning: Machine-readable contract file agent-protocol.v1.json owned under packages/agent-protocol/contracts/.
+  provider: agent-protocol
+  consumers: []
+  path: packages/agent-protocol/contracts/agent-protocol.v1.json
+  evidence:
+    - packages/agent-protocol/contracts/fixtures/**
+  status: live
+- id: agent-protocol/terminal-outcomes.v1
+  canonical: agent-protocol/terminal-outcomes.v1
+  aliases: []
+  meaning: Machine-readable contract file terminal-outcomes.v1.json owned under packages/agent-protocol/contracts/.
+  provider: agent-protocol
+  consumers: []
+  path: packages/agent-protocol/contracts/terminal-outcomes.v1.json
+  evidence:
+    - packages/agent-protocol/contracts/fixtures/**
+  status: live
+- id: component-authority/model.v1
+  canonical: component-authority/model.v1
+  aliases: []
+  meaning: Machine-readable contract file model.v1.json owned under packages/component-authority/contracts/.
+  provider: component-authority
+  consumers: []
+  path: packages/component-authority/contracts/model.v1.json
+  evidence: []
+  status: live
+- id: config/annotations.v1
+  canonical: config/annotations.v1
+  aliases: []
+  meaning: Machine-readable contract file annotations.v1.json owned under packages/config/contracts/. Provider config via package (component path prefix did not cover this file).
+  provider: config
+  consumers: []
+  path: packages/config/contracts/annotations.v1.json
+  evidence:
+    - packages/config/contracts/fixtures/**
+  status: live
+- id: config/comment-grammar.v1
+  canonical: config/comment-grammar.v1
+  aliases: []
+  meaning: Machine-readable contract file comment-grammar.v1.json owned under packages/config/contracts/. Provider config via package (component path prefix did not cover this file).
+  provider: config
+  consumers: []
+  path: packages/config/contracts/comment-grammar.v1.json
+  evidence:
+    - packages/config/contracts/fixtures/**
+  status: live
+- id: config/config-schema.meta.v1
+  canonical: config/config-schema.meta.v1
+  aliases: []
+  meaning: Machine-readable contract file config-schema.meta.v1.json owned under packages/config/contracts/. Provider config via package (component path prefix did not cover this file).
+  provider: config
+  consumers: []
+  path: packages/config/contracts/config-schema.meta.v1.json
+  evidence:
+    - packages/config/contracts/fixtures/**
+  status: live
+- id: config/detected.v1
+  canonical: config/detected.v1
+  aliases: []
+  meaning: Machine-readable contract file detected.v1.json owned under packages/config/contracts/. Provider config via package (component path prefix did not cover this file).
+  provider: config
+  consumers: []
+  path: packages/config/contracts/detected.v1.json
+  evidence:
+    - packages/config/contracts/fixtures/**
+  status: live
+- id: config/doctor-rows.v1
+  canonical: config/doctor-rows.v1
+  aliases: []
+  meaning: Machine-readable contract file doctor-rows.v1.json owned under packages/config/contracts/. Provider config via package (component path prefix did not cover this file).
+  provider: config
+  consumers: []
+  path: packages/config/contracts/doctor-rows.v1.json
+  evidence:
+    - packages/config/contracts/fixtures/**
+  status: live
+- id: config/failure-codes.v1
+  canonical: config/failure-codes.v1
+  aliases: []
+  meaning: Machine-readable contract file failure-codes.v1.json owned under packages/config/contracts/. Provider config via package (component path prefix did not cover this file).
+  provider: config
+  consumers: []
+  path: packages/config/contracts/failure-codes.v1.json
+  evidence:
+    - packages/config/contracts/fixtures/**
+  status: live
+- id: config/migration.v1
+  canonical: config/migration.v1
+  aliases: []
+  meaning: Machine-readable contract file migration.v1.json owned under packages/config/contracts/. Provider config via package (component path prefix did not cover this file).
+  provider: config
+  consumers: []
+  path: packages/config/contracts/migration.v1.json
+  evidence:
+    - packages/config/contracts/fixtures/**
+  status: live
+- id: convention/convention.golden.v1
+  canonical: convention/convention.golden.v1
+  aliases: []
+  meaning: Machine-readable contract file convention.golden.v1.json owned under packages/convention/contracts/. Provider convention via package (component path prefix did not cover this file).
+  provider: convention
+  consumers: []
+  path: packages/convention/contracts/convention.golden.v1.json
+  evidence: []
+  status: live
+- id: convention/convention.query.v1
+  canonical: convention/convention.query.v1
+  aliases: []
+  meaning: Machine-readable contract file convention.query.v1.json owned under packages/convention/contracts/. Provider convention via package (component path prefix did not cover this file).
+  provider: convention
+  consumers: []
+  path: packages/convention/contracts/convention.query.v1.json
+  evidence: []
+  status: live
+- id: convention/convention.rules.v1
+  canonical: convention/convention.rules.v1
+  aliases: []
+  meaning: Machine-readable contract file convention.rules.v1.json owned under packages/convention/contracts/. Provider convention via package (component path prefix did not cover this file).
+  provider: convention
+  consumers: []
+  path: packages/convention/contracts/convention.rules.v1.json
+  evidence: []
+  status: live
+- id: distribution/agent-hooks.v1
+  canonical: distribution/agent-hooks.v1
+  aliases: []
+  meaning: Machine-readable contract file agent-hooks.v1.json owned under packages/distribution/contracts/.
+  provider: packaging-distribution
+  consumers: []
+  path: packages/distribution/contracts/agent-hooks.v1.json
+  evidence: []
+  status: live
+- id: distribution/delete-guard-prefilter.v1
+  canonical: distribution/delete-guard-prefilter.v1
+  aliases: []
+  meaning: Machine-readable contract file delete-guard-prefilter.v1.json owned under packages/distribution/contracts/.
+  provider: packaging-distribution
+  consumers: []
+  path: packages/distribution/contracts/delete-guard-prefilter.v1.json
+  evidence: []
+  status: live
+- id: distribution/doctor-bridge.v1
+  canonical: distribution/doctor-bridge.v1
+  aliases: []
+  meaning: Machine-readable contract file doctor-bridge.v1.json owned under packages/distribution/contracts/.
+  provider: packaging-distribution
+  consumers: []
+  path: packages/distribution/contracts/doctor-bridge.v1.json
+  evidence: []
+  status: live
+- id: distribution/doctor-registry.v1
+  canonical: distribution/doctor-registry.v1
+  aliases: []
+  meaning: Machine-readable contract file doctor-registry.v1.json owned under packages/distribution/contracts/.
+  provider: packaging-distribution
+  consumers: []
+  path: packages/distribution/contracts/doctor-registry.v1.json
+  evidence: []
+  status: live
+- id: distribution/internal-route.source-payload.v1
+  canonical: distribution/internal-route.source-payload.v1
+  aliases: []
+  meaning: Machine-readable contract file internal-route.source-payload.v1.json owned under packages/distribution/contracts/.
+  provider: packaging-distribution
+  consumers: []
+  path: packages/distribution/contracts/internal-route.source-payload.v1.json
+  evidence: []
+  status: live
+- id: distribution/skill-stamp.v1
+  canonical: distribution/skill-stamp.v1
+  aliases: []
+  meaning: Machine-readable contract file skill-stamp.v1.json owned under packages/distribution/contracts/.
+  provider: packaging-distribution
+  consumers: []
+  path: packages/distribution/contracts/skill-stamp.v1.json
+  evidence: []
+  status: live
+- id: docs.herdr-web-dashboard/gateway-readiness
+  canonical: docs.herdr-web-dashboard/gateway-readiness
+  aliases: []
+  meaning: Prose contract gateway-readiness.md under docs/platform/herdr-web-dashboard/contracts/.
+  provider: herdr-web-dashboard
+  consumers: []
+  path: docs/platform/herdr-web-dashboard/contracts/gateway-readiness.md
+  evidence: []
+  status: live
+- id: docs.host-invocation-routing/command-route-descriptor
+  canonical: docs.host-invocation-routing/command-route-descriptor
+  aliases: []
+  meaning: Prose contract command-route-descriptor.md under docs/platform/host-invocation-routing/contracts/.
+  provider: host-invocation-routing
+  consumers: []
+  path: docs/platform/host-invocation-routing/contracts/command-route-descriptor.md
+  evidence: []
+  status: live
+- id: docs.host-invocation-routing/component-protocol
+  canonical: docs.host-invocation-routing/component-protocol
+  aliases: []
+  meaning: Prose contract component-protocol.md under docs/platform/host-invocation-routing/contracts/.
+  provider: host-invocation-routing
+  consumers: []
+  path: docs/platform/host-invocation-routing/contracts/component-protocol.md
+  evidence: []
+  status: live
+- id: docs.host-invocation-routing/external-provider-manifest
+  canonical: docs.host-invocation-routing/external-provider-manifest
+  aliases: []
+  meaning: Prose contract external-provider-manifest.md under docs/platform/host-invocation-routing/contracts/.
+  provider: host-invocation-routing
+  consumers: []
+  path: docs/platform/host-invocation-routing/contracts/external-provider-manifest.md
+  evidence: []
+  status: live
+- id: docs.host-invocation-routing/legacy-payload
+  canonical: docs.host-invocation-routing/legacy-payload
+  aliases: []
+  meaning: Prose contract legacy-payload.md under docs/platform/host-invocation-routing/contracts/.
+  provider: host-invocation-routing
+  consumers: []
+  path: docs/platform/host-invocation-routing/contracts/legacy-payload.md
+  evidence: []
+  status: live
+- id: docs.host-invocation-routing/operation-catalog
+  canonical: docs.host-invocation-routing/operation-catalog
+  aliases: []
+  meaning: Prose contract operation-catalog.md under docs/platform/host-invocation-routing/contracts/.
+  provider: host-invocation-routing
+  consumers: []
+  path: docs/platform/host-invocation-routing/contracts/operation-catalog.md
+  evidence: []
+  status: live
+- id: docs.host-invocation-routing/operation-provider
+  canonical: docs.host-invocation-routing/operation-provider
+  aliases: []
+  meaning: Prose contract operation-provider.md under docs/platform/host-invocation-routing/contracts/.
+  provider: host-invocation-routing
+  consumers: []
+  path: docs/platform/host-invocation-routing/contracts/operation-provider.md
+  evidence: []
+  status: live
+- id: docs.host-invocation-routing/operation-request-outcome
+  canonical: docs.host-invocation-routing/operation-request-outcome
+  aliases: []
+  meaning: Prose contract operation-request-outcome.md under docs/platform/host-invocation-routing/contracts/.
+  provider: host-invocation-routing
+  consumers: []
+  path: docs/platform/host-invocation-routing/contracts/operation-request-outcome.md
+  evidence: []
+  status: live
+- id: docs.host-invocation-routing/README
+  canonical: docs.host-invocation-routing/README
+  aliases: []
+  meaning: Index/README for contracts under docs/platform/host-invocation-routing/contracts/.
+  provider: host-invocation-routing
+  consumers: []
+  path: docs/platform/host-invocation-routing/contracts/README.md
+  evidence: []
+  status: designed
+- id: docs.packaging-distribution/activation-binding
+  canonical: docs.packaging-distribution/activation-binding
+  aliases: []
+  meaning: Prose contract activation-binding.md under docs/platform/packaging-distribution/contracts/. Provider packaging-distribution via area (component path prefix did not cover this file).
+  provider: packaging-distribution
+  consumers: []
+  path: docs/platform/packaging-distribution/contracts/activation-binding.md
+  evidence: []
+  status: live
+- id: docs.packaging-distribution/distribution-pin
+  canonical: docs.packaging-distribution/distribution-pin
+  aliases: []
+  meaning: Prose contract distribution-pin.md under docs/platform/packaging-distribution/contracts/. Provider packaging-distribution via area (component path prefix did not cover this file).
+  provider: packaging-distribution
+  consumers: []
+  path: docs/platform/packaging-distribution/contracts/distribution-pin.md
+  evidence: []
+  status: live
+- id: docs.packaging-distribution/instruction-composition-and-projection
+  canonical: docs.packaging-distribution/instruction-composition-and-projection
+  aliases: []
+  meaning: Prose contract instruction-composition-and-projection.md under docs/platform/packaging-distribution/contracts/. Provider packaging-distribution via area (component path prefix did not cover this file).
+  provider: packaging-distribution
+  consumers: []
+  path: docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md
+  evidence: []
+  status: live
+- id: docs.packaging-distribution/projection-ledger
+  canonical: docs.packaging-distribution/projection-ledger
+  aliases: []
+  meaning: Prose contract projection-ledger.md under docs/platform/packaging-distribution/contracts/. Provider packaging-distribution via area (component path prefix did not cover this file).
+  provider: packaging-distribution
+  consumers: []
+  path: docs/platform/packaging-distribution/contracts/projection-ledger.md
+  evidence: []
+  status: live
+- id: docs.packaging-distribution/release-manifest
+  canonical: docs.packaging-distribution/release-manifest
+  aliases: []
+  meaning: Prose contract release-manifest.md under docs/platform/packaging-distribution/contracts/. Provider packaging-distribution via area (component path prefix did not cover this file).
+  provider: packaging-distribution
+  consumers: []
+  path: docs/platform/packaging-distribution/contracts/release-manifest.md
+  evidence: []
+  status: live
+- id: docs.packaging-distribution/repository-runtime-layout
+  canonical: docs.packaging-distribution/repository-runtime-layout
+  aliases: []
+  meaning: Prose contract repository-runtime-layout.md under docs/platform/packaging-distribution/contracts/. Provider packaging-distribution via area (component path prefix did not cover this file).
+  provider: packaging-distribution
+  consumers: []
+  path: docs/platform/packaging-distribution/contracts/repository-runtime-layout.md
+  evidence: []
+  status: live
+- id: docs.packaging-distribution/setup-doctor-registry
+  canonical: docs.packaging-distribution/setup-doctor-registry
+  aliases: []
+  meaning: Prose contract setup-doctor-registry.md under docs/platform/packaging-distribution/contracts/. Provider packaging-distribution via area (component path prefix did not cover this file).
+  provider: packaging-distribution
+  consumers: []
+  path: docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
+  evidence: []
+  status: live
+- id: docs.packaging-distribution/skill-package-distribution
+  canonical: docs.packaging-distribution/skill-package-distribution
+  aliases: []
+  meaning: Prose contract skill-package-distribution.md under docs/platform/packaging-distribution/contracts/. Provider packaging-distribution via area (component path prefix did not cover this file).
+  provider: packaging-distribution
+  consumers: []
+  path: docs/platform/packaging-distribution/contracts/skill-package-distribution.md
+  evidence: []
+  status: live
+- id: docs.runner/conserved-dispatch-doctrine
+  canonical: docs.runner/conserved-dispatch-doctrine
+  aliases: []
+  meaning: Prose contract conserved-dispatch-doctrine.md under docs/platform/runner/contracts/.
+  provider: runner
+  consumers: []
+  path: docs/platform/runner/contracts/conserved-dispatch-doctrine.md
+  evidence: []
+  status: live
+  reason: runner owns conserved dispatch doctrine prose; file sits under docs/platform/runner/contracts/ whose longest path prefix is executor-model.
+- id: docs.runner/executor-model
+  canonical: docs.runner/executor-model
+  aliases: []
+  meaning: Prose contract executor-model.md under docs/platform/runner/contracts/.
+  provider: executor-model
+  consumers: []
+  path: docs/platform/runner/contracts/executor-model.md
+  evidence: []
+  status: live
+- id: docs.runner/h-b3eb60fb4d2b
+  canonical: docs.runner/h-b3eb60fb4d2b
+  aliases: []
+  meaning: Prose contract h-b3eb60fb4d2b.md under docs/platform/runner/contracts/.
+  provider: runner
+  consumers: []
+  path: docs/platform/runner/contracts/h-b3eb60fb4d2b.md
+  evidence: []
+  status: live
+  reason: runner owns this runner decision/prose contract; file sits under docs/platform/runner/contracts/ whose longest path prefix is executor-model.
+- id: docs.runner/unit-run-result
+  canonical: docs.runner/unit-run-result
+  aliases: []
+  meaning: Prose contract unit-run-result.md under docs/platform/runner/contracts/.
+  provider: run-result
+  consumers:
+    - agent-coordination-engine
+    - team-cognition-engine
+    - observe
+    - work-driver
+    - work-state
+    - group-thinking
+  path: docs/platform/runner/contracts/unit-run-result.md
+  evidence: []
+  status: live
+  reason: run-result owns unit-run-result semantics; prose file sits under docs/platform/runner/contracts/ whose longest path prefix is executor-model.
+- id: docs.ui-spec/15-system-events
+  canonical: docs.ui-spec/15-system-events
+  aliases: []
+  meaning: Prose contract 15-system-events.md under docs/platform/ui-spec/contracts/.
+  provider: ui-spec
+  consumers: []
+  path: docs/platform/ui-spec/contracts/15-system-events.md
+  evidence: []
+  status: live
+- id: docs.ui-spec/20-domain-rules
+  canonical: docs.ui-spec/20-domain-rules
+  aliases: []
+  meaning: Prose contract 20-domain-rules.md under docs/platform/ui-spec/contracts/.
+  provider: ui-spec
+  consumers: []
+  path: docs/platform/ui-spec/contracts/20-domain-rules.md
+  evidence: []
+  status: live
+- id: docs.ui-spec/30-states-and-errors
+  canonical: docs.ui-spec/30-states-and-errors
+  aliases: []
+  meaning: Prose contract 30-states-and-errors.md under docs/platform/ui-spec/contracts/.
+  provider: ui-spec
+  consumers: []
+  path: docs/platform/ui-spec/contracts/30-states-and-errors.md
+  evidence: []
+  status: live
+- id: docs.work-state/cli-io-contract
+  canonical: docs.work-state/cli-io-contract
+  aliases: []
+  meaning: Prose contract cli-io-contract.md under docs/platform/work-state/contracts/.
+  provider: work-state
+  consumers: []
+  path: docs/platform/work-state/contracts/cli-io-contract.md
+  evidence: []
+  status: live
+- id: docs.work-state/knowledge-registry
+  canonical: docs.work-state/knowledge-registry
+  aliases: []
+  meaning: Prose contract knowledge-registry.md under docs/platform/work-state/contracts/.
+  provider: work-state
+  consumers: []
+  path: docs/platform/work-state/contracts/knowledge-registry.md
+  evidence: []
+  status: live
+- id: docs.work-state/non-transitioning-records
+  canonical: docs.work-state/non-transitioning-records
+  aliases: []
+  meaning: Prose contract non-transitioning-records.md under docs/platform/work-state/contracts/.
+  provider: work-state
+  consumers: []
+  path: docs/platform/work-state/contracts/non-transitioning-records.md
+  evidence: []
+  status: live
+- id: event-store/batch-commit.v1.schema
+  canonical: event-store/batch-commit.v1.schema
+  aliases: []
+  meaning: Machine-readable contract file batch-commit.v1.schema.json owned under packages/event-store/contracts/. Provider event-store via package (component path prefix did not cover this file).
+  provider: event-store
+  consumers: []
+  path: packages/event-store/contracts/batch-commit.v1.schema.json
+  evidence:
+    - packages/event-store/contracts/vectors/**
+  status: live
+- id: event-store/consumers.v1
+  canonical: event-store/consumers.v1
+  aliases: []
+  meaning: Machine-readable contract file consumers.v1.json owned under packages/event-store/contracts/. Provider event-store via package (component path prefix did not cover this file).
+  provider: event-store
+  consumers: []
+  path: packages/event-store/contracts/consumers.v1.json
+  evidence:
+    - packages/event-store/contracts/vectors/**
+  status: live
+- id: event-store/envelope.v4.schema
+  canonical: event-store/envelope.v4.schema
+  aliases: []
+  meaning: Machine-readable contract file envelope.v4.schema.json owned under packages/event-store/contracts/. Provider event-store via package (component path prefix did not cover this file).
+  provider: event-store
+  consumers: []
+  path: packages/event-store/contracts/envelope.v4.schema.json
+  evidence:
+    - packages/event-store/contracts/vectors/**
+  status: live
+- id: event-store/result-codes.v1
+  canonical: event-store/result-codes.v1
+  aliases: []
+  meaning: Machine-readable contract file result-codes.v1.json owned under packages/event-store/contracts/. Provider event-store via package (component path prefix did not cover this file).
+  provider: event-store
+  consumers: []
+  path: packages/event-store/contracts/result-codes.v1.json
+  evidence:
+    - packages/event-store/contracts/vectors/**
+  status: live
+- id: event-store/seal.v1.schema
+  canonical: event-store/seal.v1.schema
+  aliases: []
+  meaning: Machine-readable contract file seal.v1.schema.json owned under packages/event-store/contracts/. Provider event-store via package (component path prefix did not cover this file).
+  provider: event-store
+  consumers: []
+  path: packages/event-store/contracts/seal.v1.schema.json
+  evidence:
+    - packages/event-store/contracts/vectors/**
+  status: live
+- id: event-store/stream-registry.schema.v1
+  canonical: event-store/stream-registry.schema.v1
+  aliases: []
+  meaning: Machine-readable contract file stream-registry.schema.v1.json owned under packages/event-store/contracts/. Provider event-store via package (component path prefix did not cover this file).
+  provider: event-store
+  consumers: []
+  path: packages/event-store/contracts/stream-registry.schema.v1.json
+  evidence:
+    - packages/event-store/contracts/vectors/**
+  status: live
+- id: execution/agents.v1
+  canonical: execution/agents.v1
+  aliases: []
+  meaning: Machine-readable contract file agents.v1.json owned under packages/execution/contracts/. Provider execution-core via package (component path prefix did not cover this file).
+  provider: execution-core
+  consumers: []
+  path: packages/execution/contracts/agents.v1.json
+  evidence:
+    - packages/execution/contracts/accounts/**
+    - packages/execution/contracts/admission-peer/**
+    - packages/execution/contracts/assignment-runner/**
+    - packages/execution/contracts/assignment/**
+    - packages/execution/contracts/confinement-cleanup/**
+    - packages/execution/contracts/confinement-driver/**
+    - packages/execution/contracts/confinement-policy/**
+    - packages/execution/contracts/confinement-request/**
+    - packages/execution/contracts/core-loops/**
+    - packages/execution/contracts/core-run-facts/**
+    - packages/execution/contracts/core-runner-config/**
+    - packages/execution/contracts/core-unit/**
+    - packages/execution/contracts/corpus/**
+    - packages/execution/contracts/credentials/**
+    - packages/execution/contracts/dispatch-subs/**
+    - packages/execution/contracts/execution-contract/**
+    - packages/execution/contracts/execution-routes/**
+    - packages/execution/contracts/planning/**
+    - packages/execution/contracts/run-result/**
+    - packages/execution/contracts/settlement/**
+    - packages/execution/contracts/transport-round/**
+    - packages/execution/contracts/transport/**
+    - packages/execution/contracts/unit-run/**
+  status: live
+- id: execution/bind.v1
+  canonical: execution/bind.v1
+  aliases: []
+  meaning: Machine-readable contract file bind.v1.json owned under packages/execution/contracts/. Provider execution-core via package (component path prefix did not cover this file).
+  provider: execution-core
+  consumers: []
+  path: packages/execution/contracts/bind.v1.json
+  evidence:
+    - packages/execution/contracts/accounts/**
+    - packages/execution/contracts/admission-peer/**
+    - packages/execution/contracts/assignment-runner/**
+    - packages/execution/contracts/assignment/**
+    - packages/execution/contracts/confinement-cleanup/**
+    - packages/execution/contracts/confinement-driver/**
+    - packages/execution/contracts/confinement-policy/**
+    - packages/execution/contracts/confinement-request/**
+    - packages/execution/contracts/core-loops/**
+    - packages/execution/contracts/core-run-facts/**
+    - packages/execution/contracts/core-runner-config/**
+    - packages/execution/contracts/core-unit/**
+    - packages/execution/contracts/corpus/**
+    - packages/execution/contracts/credentials/**
+    - packages/execution/contracts/dispatch-subs/**
+    - packages/execution/contracts/execution-contract/**
+    - packages/execution/contracts/execution-routes/**
+    - packages/execution/contracts/planning/**
+    - packages/execution/contracts/run-result/**
+    - packages/execution/contracts/settlement/**
+    - packages/execution/contracts/transport-round/**
+    - packages/execution/contracts/transport/**
+    - packages/execution/contracts/unit-run/**
+  status: live
+- id: execution/checks.v1
+  canonical: execution/checks.v1
+  aliases: []
+  meaning: Machine-readable contract file checks.v1.json owned under packages/execution/contracts/. Provider execution-core via package (component path prefix did not cover this file).
+  provider: execution-core
+  consumers: []
+  path: packages/execution/contracts/checks.v1.json
+  evidence:
+    - packages/execution/contracts/accounts/**
+    - packages/execution/contracts/admission-peer/**
+    - packages/execution/contracts/assignment-runner/**
+    - packages/execution/contracts/assignment/**
+    - packages/execution/contracts/confinement-cleanup/**
+    - packages/execution/contracts/confinement-driver/**
+    - packages/execution/contracts/confinement-policy/**
+    - packages/execution/contracts/confinement-request/**
+    - packages/execution/contracts/core-loops/**
+    - packages/execution/contracts/core-run-facts/**
+    - packages/execution/contracts/core-runner-config/**
+    - packages/execution/contracts/core-unit/**
+    - packages/execution/contracts/corpus/**
+    - packages/execution/contracts/credentials/**
+    - packages/execution/contracts/dispatch-subs/**
+    - packages/execution/contracts/execution-contract/**
+    - packages/execution/contracts/execution-routes/**
+    - packages/execution/contracts/planning/**
+    - packages/execution/contracts/run-result/**
+    - packages/execution/contracts/settlement/**
+    - packages/execution/contracts/transport-round/**
+    - packages/execution/contracts/transport/**
+    - packages/execution/contracts/unit-run/**
+  status: live
+- id: execution/decide.v1
+  canonical: execution/decide.v1
+  aliases: []
+  meaning: Machine-readable contract file decide.v1.json owned under packages/execution/contracts/. Provider execution-core via package (component path prefix did not cover this file).
+  provider: execution-core
+  consumers: []
+  path: packages/execution/contracts/decide.v1.json
+  evidence:
+    - packages/execution/contracts/accounts/**
+    - packages/execution/contracts/admission-peer/**
+    - packages/execution/contracts/assignment-runner/**
+    - packages/execution/contracts/assignment/**
+    - packages/execution/contracts/confinement-cleanup/**
+    - packages/execution/contracts/confinement-driver/**
+    - packages/execution/contracts/confinement-policy/**
+    - packages/execution/contracts/confinement-request/**
+    - packages/execution/contracts/core-loops/**
+    - packages/execution/contracts/core-run-facts/**
+    - packages/execution/contracts/core-runner-config/**
+    - packages/execution/contracts/core-unit/**
+    - packages/execution/contracts/corpus/**
+    - packages/execution/contracts/credentials/**
+    - packages/execution/contracts/dispatch-subs/**
+    - packages/execution/contracts/execution-contract/**
+    - packages/execution/contracts/execution-routes/**
+    - packages/execution/contracts/planning/**
+    - packages/execution/contracts/run-result/**
+    - packages/execution/contracts/settlement/**
+    - packages/execution/contracts/transport-round/**
+    - packages/execution/contracts/transport/**
+    - packages/execution/contracts/unit-run/**
+  status: live
+- id: git/git-floor.v1
+  canonical: git/git-floor.v1
+  aliases: []
+  meaning: Machine-readable contract file git-floor.v1.json owned under packages/git/contracts/. Provider git via package (component path prefix did not cover this file).
+  provider: git
+  consumers: []
+  path: packages/git/contracts/git-floor.v1.json
+  evidence: []
+  status: live
+- id: git/mutation-census.v1
+  canonical: git/mutation-census.v1
+  aliases: []
+  meaning: Machine-readable contract file mutation-census.v1.json owned under packages/git/contracts/. Provider git via package (component path prefix did not cover this file).
+  provider: git
+  consumers: []
+  path: packages/git/contracts/mutation-census.v1.json
+  evidence: []
+  status: live
+- id: git/ports.v1
+  canonical: git/ports.v1
+  aliases: []
+  meaning: Machine-readable contract file ports.v1.json owned under packages/git/contracts/. Provider git via package (component path prefix did not cover this file).
+  provider: git
+  consumers: []
+  path: packages/git/contracts/ports.v1.json
+  evidence: []
+  status: live
+- id: git/receipt.v1.schema
+  canonical: git/receipt.v1.schema
+  aliases: []
+  meaning: Machine-readable contract file receipt.v1.schema.json owned under packages/git/contracts/. Provider git via package (component path prefix did not cover this file).
+  provider: git
+  consumers: []
+  path: packages/git/contracts/receipt.v1.schema.json
+  evidence: []
+  status: live
+- id: git/result-codes.v1
+  canonical: git/result-codes.v1
+  aliases: []
+  meaning: Machine-readable contract file result-codes.v1.json owned under packages/git/contracts/. Provider git via package (component path prefix did not cover this file).
+  provider: git
+  consumers: []
+  path: packages/git/contracts/result-codes.v1.json
+  evidence: []
+  status: live
+- id: git/wal-record.v1.schema
+  canonical: git/wal-record.v1.schema
+  aliases: []
+  meaning: Machine-readable contract file wal-record.v1.schema.json owned under packages/git/contracts/. Provider git via package (component path prefix did not cover this file).
+  provider: git
+  consumers: []
+  path: packages/git/contracts/wal-record.v1.schema.json
+  evidence: []
+  status: live
+- id: graph/graph.v1
+  canonical: graph/graph.v1
+  aliases: []
+  meaning: Machine-readable contract file graph.v1.json owned under packages/graph/contracts/.
+  provider: graph
+  consumers: []
+  path: packages/graph/contracts/graph.v1.json
+  evidence: []
+  status: live
+- id: holder-lock/holder-lock.port.v1
+  canonical: holder-lock/holder-lock.port.v1
+  aliases: []
+  meaning: Machine-readable contract file holder-lock.port.v1.json owned under packages/holder-lock/contracts/. Provider holder-lock via package (component path prefix did not cover this file).
+  provider: holder-lock
+  consumers: []
+  path: packages/holder-lock/contracts/holder-lock.port.v1.json
+  evidence: []
+  status: live
+- id: holder-lock/hot-lock.v1
+  canonical: holder-lock/hot-lock.v1
+  aliases: []
+  meaning: Machine-readable contract file hot-lock.v1.json owned under packages/holder-lock/contracts/. Provider holder-lock via package (component path prefix did not cover this file).
+  provider: holder-lock
+  consumers: []
+  path: packages/holder-lock/contracts/hot-lock.v1.json
+  evidence: []
+  status: live
+- id: holder-lock/internal-route.lock-borrow-vectors.v1
+  canonical: holder-lock/internal-route.lock-borrow-vectors.v1
+  aliases: []
+  meaning: Machine-readable contract file internal-route.lock-borrow-vectors.v1.json owned under packages/holder-lock/contracts/. Provider holder-lock via package (component path prefix did not cover this file).
+  provider: holder-lock
+  consumers: []
+  path: packages/holder-lock/contracts/internal-route.lock-borrow-vectors.v1.json
+  evidence: []
+  status: live
+- id: holder-lock/internal-route.lock-fd.v1
+  canonical: holder-lock/internal-route.lock-fd.v1
+  aliases: []
+  meaning: Machine-readable contract file internal-route.lock-fd.v1.json owned under packages/holder-lock/contracts/. Provider holder-lock via package (component path prefix did not cover this file).
+  provider: holder-lock
+  consumers: []
+  path: packages/holder-lock/contracts/internal-route.lock-fd.v1.json
+  evidence: []
+  status: live
+- id: holder-lock/internal-route.lock-hold.v1
+  canonical: holder-lock/internal-route.lock-hold.v1
+  aliases: []
+  meaning: Machine-readable contract file internal-route.lock-hold.v1.json owned under packages/holder-lock/contracts/. Provider holder-lock via package (component path prefix did not cover this file).
+  provider: holder-lock
+  consumers: []
+  path: packages/holder-lock/contracts/internal-route.lock-hold.v1.json
+  evidence: []
+  status: live
+- id: holder-lock/internal-route.quiesce-scan.v1
+  canonical: holder-lock/internal-route.quiesce-scan.v1
+  aliases: []
+  meaning: Machine-readable contract file internal-route.quiesce-scan.v1.json owned under packages/holder-lock/contracts/. Provider holder-lock via package (component path prefix did not cover this file).
+  provider: holder-lock
+  consumers: []
+  path: packages/holder-lock/contracts/internal-route.quiesce-scan.v1.json
+  evidence: []
+  status: live
+- id: holder-lock/lock-registry.schema.v1
+  canonical: holder-lock/lock-registry.schema.v1
+  aliases: []
+  meaning: Machine-readable contract file lock-registry.schema.v1.json owned under packages/holder-lock/contracts/. Provider holder-lock via package (component path prefix did not cover this file).
+  provider: holder-lock
+  consumers: []
+  path: packages/holder-lock/contracts/lock-registry.schema.v1.json
+  evidence: []
+  status: live
+- id: holder-lock/lock-registry.v1
+  canonical: holder-lock/lock-registry.v1
+  aliases: []
+  meaning: Machine-readable contract file lock-registry.v1.json owned under packages/holder-lock/contracts/. Provider holder-lock via package (component path prefix did not cover this file).
+  provider: holder-lock
+  consumers: []
+  path: packages/holder-lock/contracts/lock-registry.v1.json
+  evidence: []
+  status: live
+- id: holder-lock/main-checkout-activity.v1
+  canonical: holder-lock/main-checkout-activity.v1
+  aliases: []
+  meaning: Machine-readable contract file main-checkout-activity.v1.json owned under packages/holder-lock/contracts/. Provider holder-lock via package (component path prefix did not cover this file).
+  provider: holder-lock
+  consumers: []
+  path: packages/holder-lock/contracts/main-checkout-activity.v1.json
+  evidence: []
+  status: live
+- id: holder-lock/main-checkout-borrow.v1
+  canonical: holder-lock/main-checkout-borrow.v1
+  aliases: []
+  meaning: Machine-readable contract file main-checkout-borrow.v1.json owned under packages/holder-lock/contracts/. Provider holder-lock via package (component path prefix did not cover this file).
+  provider: holder-lock
+  consumers: []
+  path: packages/holder-lock/contracts/main-checkout-borrow.v1.json
+  evidence: []
+  status: live
+- id: holder-lock/predecessor.v1
+  canonical: holder-lock/predecessor.v1
+  aliases: []
+  meaning: Machine-readable contract file predecessor.v1.json owned under packages/holder-lock/contracts/. Provider holder-lock via package (component path prefix did not cover this file).
+  provider: holder-lock
+  consumers: []
+  path: packages/holder-lock/contracts/predecessor.v1.json
+  evidence: []
+  status: live
+- id: holder-lock/state-root.vectors.v1
+  canonical: holder-lock/state-root.vectors.v1
+  aliases: []
+  meaning: Machine-readable contract file state-root.vectors.v1.json owned under packages/holder-lock/contracts/. Provider holder-lock via package (component path prefix did not cover this file).
+  provider: holder-lock
+  consumers: []
+  path: packages/holder-lock/contracts/state-root.vectors.v1.json
+  evidence: []
+  status: live
+- id: host-runtime/command-manifest
+  canonical: host-runtime/command-manifest
+  aliases: []
+  meaning: Machine-readable contract file command-manifest.json owned under packages/host-runtime/contracts/.
+  provider: host-invocation-routing
+  consumers: []
+  path: packages/host-runtime/contracts/command-manifest.json
+  evidence: []
+  status: live
+- id: host-runtime/command-route-annotations
+  canonical: host-runtime/command-route-annotations
+  aliases: []
+  meaning: Machine-readable contract file command-route-annotations.json owned under packages/host-runtime/contracts/.
+  provider: host-invocation-routing
+  consumers: []
+  path: packages/host-runtime/contracts/command-route-annotations.json
+  evidence: []
+  status: live
+- id: host-runtime/command-routes
+  canonical: host-runtime/command-routes
+  aliases: []
+  meaning: Machine-readable contract file command-routes.json owned under packages/host-runtime/contracts/.
+  provider: host-invocation-routing
+  consumers: []
+  path: packages/host-runtime/contracts/command-routes.json
+  evidence: []
+  status: live
+- id: identity/attempt-writer-id.v1
+  canonical: identity/attempt-writer-id.v1
+  aliases: []
+  meaning: Machine-readable contract file attempt-writer-id.v1.json owned under packages/identity/contracts/. Provider identity via package (component path prefix did not cover this file).
+  provider: identity
+  consumers: []
+  path: packages/identity/contracts/attempt-writer-id.v1.json
+  evidence:
+    - packages/identity/contracts/vectors/**
+  status: live
+- id: identity/identity-event-streams.v1
+  canonical: identity/identity-event-streams.v1
+  aliases: []
+  meaning: Machine-readable contract file identity-event-streams.v1.json owned under packages/identity/contracts/. Provider identity via package (component path prefix did not cover this file).
+  provider: identity
+  consumers: []
+  path: packages/identity/contracts/identity-event-streams.v1.json
+  evidence:
+    - packages/identity/contracts/vectors/**
+  status: live
+- id: identity/identity.read.v1
+  canonical: identity/identity.read.v1
+  aliases: []
+  meaning: Machine-readable contract file identity.read.v1.json owned under packages/identity/contracts/. Provider identity via package (component path prefix did not cover this file).
+  provider: identity
+  consumers: []
+  path: packages/identity/contracts/identity.read.v1.json
+  evidence:
+    - packages/identity/contracts/vectors/**
+  status: live
+- id: identity/identity.write.v1
+  canonical: identity/identity.write.v1
+  aliases: []
+  meaning: Machine-readable contract file identity.write.v1.json owned under packages/identity/contracts/. Provider identity via package (component path prefix did not cover this file).
+  provider: identity
+  consumers: []
+  path: packages/identity/contracts/identity.write.v1.json
+  evidence:
+    - packages/identity/contracts/vectors/**
+  status: live
+- id: identity/identity.writer.golden.v1
+  canonical: identity/identity.writer.golden.v1
+  aliases: []
+  meaning: Machine-readable contract file identity.writer.golden.v1.json owned under packages/identity/contracts/. Provider identity via package (component path prefix did not cover this file).
+  provider: identity
+  consumers: []
+  path: packages/identity/contracts/identity.writer.golden.v1.json
+  evidence:
+    - packages/identity/contracts/vectors/**
+  status: live
+- id: identity/identity.writer.v1
+  canonical: identity/identity.writer.v1
+  aliases: []
+  meaning: Machine-readable contract file identity.writer.v1.json owned under packages/identity/contracts/. Provider identity via package (component path prefix did not cover this file).
+  provider: identity
+  consumers: []
+  path: packages/identity/contracts/identity.writer.v1.json
+  evidence:
+    - packages/identity/contracts/vectors/**
+  status: live
+- id: mailbox/adapters.v1
+  canonical: mailbox/adapters.v1
+  aliases: []
+  meaning: Machine-readable contract file adapters.v1.json owned under packages/mailbox/contracts/.
+  provider: agent-mailbox
+  consumers: []
+  path: packages/mailbox/contracts/adapters.v1.json
+  evidence:
+    - packages/mailbox/contracts/fixtures/**
+  status: live
+- id: mailbox/event-streams.v1
+  canonical: mailbox/event-streams.v1
+  aliases: []
+  meaning: Machine-readable contract file event-streams.v1.json owned under packages/mailbox/contracts/.
+  provider: agent-mailbox
+  consumers: []
+  path: packages/mailbox/contracts/event-streams.v1.json
+  evidence:
+    - packages/mailbox/contracts/fixtures/**
+  status: live
+- id: mailbox/frame.v1
+  canonical: mailbox/frame.v1
+  aliases: []
+  meaning: Machine-readable contract file frame.v1.txt owned under packages/mailbox/contracts/.
+  provider: agent-mailbox
+  consumers: []
+  path: packages/mailbox/contracts/frame.v1.txt
+  evidence:
+    - packages/mailbox/contracts/fixtures/**
+  status: live
+- id: mailbox/limits.v1
+  canonical: mailbox/limits.v1
+  aliases: []
+  meaning: Machine-readable contract file limits.v1.json owned under packages/mailbox/contracts/.
+  provider: agent-mailbox
+  consumers: []
+  path: packages/mailbox/contracts/limits.v1.json
+  evidence:
+    - packages/mailbox/contracts/fixtures/**
+  status: live
+- id: mailbox/remote.v1
+  canonical: mailbox/remote.v1
+  aliases: []
+  meaning: Machine-readable contract file remote.v1.json owned under packages/mailbox/contracts/.
+  provider: agent-mailbox
+  consumers: []
+  path: packages/mailbox/contracts/remote.v1.json
+  evidence:
+    - packages/mailbox/contracts/fixtures/**
+  status: live
+- id: observe/observe-names
+  canonical: observe/observe-names
+  aliases: []
+  meaning: Machine-readable contract file observe-names.json owned under packages/observe/contracts/. Provider observe via package (component path prefix did not cover this file).
+  provider: observe
+  consumers:
+    - host-surface
+    - runner
+    - execution-core
+  path: packages/observe/contracts/observe-names.json
+  evidence: []
+  status: live
+- id: observe/observe.case.v1
+  canonical: observe/observe.case.v1
+  aliases: []
+  meaning: Machine-readable contract file observe.case.v1.json owned under packages/observe/contracts/. Provider observe via package (component path prefix did not cover this file).
+  provider: observe
+  consumers:
+    - host-surface
+    - runner
+    - execution-core
+  path: packages/observe/contracts/observe.case.v1.json
+  evidence: []
+  status: live
+- id: observe/observe.eval.v1
+  canonical: observe/observe.eval.v1
+  aliases: []
+  meaning: Machine-readable contract file observe.eval.v1.json owned under packages/observe/contracts/. Provider observe via package (component path prefix did not cover this file).
+  provider: observe
+  consumers:
+    - host-surface
+    - runner
+    - execution-core
+  path: packages/observe/contracts/observe.eval.v1.json
+  evidence: []
+  status: live
+- id: observe/observe.friction.v1
+  canonical: observe/observe.friction.v1
+  aliases: []
+  meaning: Machine-readable contract file observe.friction.v1.json owned under packages/observe/contracts/. Provider observe via package (component path prefix did not cover this file).
+  provider: observe
+  consumers:
+    - host-surface
+    - runner
+    - execution-core
+  path: packages/observe/contracts/observe.friction.v1.json
+  evidence: []
+  status: live
+- id: observe/observe.observation.v1
+  canonical: observe/observe.observation.v1
+  aliases: []
+  meaning: Machine-readable contract file observe.observation.v1.json owned under packages/observe/contracts/. Provider observe via package (component path prefix did not cover this file).
+  provider: observe
+  consumers:
+    - host-surface
+    - runner
+    - execution-core
+  path: packages/observe/contracts/observe.observation.v1.json
+  evidence: []
+  status: live
+- id: observe/observe.record.v2
+  canonical: observe/observe.record.v2
+  aliases: []
+  meaning: Machine-readable contract file observe.record.v2.json owned under packages/observe/contracts/. Provider observe via package (component path prefix did not cover this file).
+  provider: observe
+  consumers:
+    - host-surface
+    - runner
+    - execution-core
+  path: packages/observe/contracts/observe.record.v2.json
+  evidence: []
+  status: live
+- id: observe/observe.snapshot.v1
+  canonical: observe/observe.snapshot.v1
+  aliases: []
+  meaning: Machine-readable contract file observe.snapshot.v1.json owned under packages/observe/contracts/. Provider observe via package (component path prefix did not cover this file).
+  provider: observe
+  consumers:
+    - host-surface
+    - runner
+    - execution-core
+  path: packages/observe/contracts/observe.snapshot.v1.json
+  evidence: []
+  status: live
+- id: portfolio/backlog-item.schema.v1
+  canonical: portfolio/backlog-item.schema.v1
+  aliases: []
+  meaning: Machine-readable contract file backlog-item.schema.v1.json owned under packages/portfolio/contracts/. Provider supervision via package (component path prefix did not cover this file).
+  provider: supervision
+  consumers: []
+  path: packages/portfolio/contracts/backlog-item.schema.v1.json
+  evidence: []
+  status: live
+- id: portfolio/discussion.schema.v1
+  canonical: portfolio/discussion.schema.v1
+  aliases: []
+  meaning: Machine-readable contract file discussion.schema.v1.json owned under packages/portfolio/contracts/. Provider supervision via package (component path prefix did not cover this file).
+  provider: supervision
+  consumers: []
+  path: packages/portfolio/contracts/discussion.schema.v1.json
+  evidence: []
+  status: live
+- id: portfolio/portfolio-vocabulary.v1
+  canonical: portfolio/portfolio-vocabulary.v1
+  aliases: []
+  meaning: Machine-readable contract file portfolio-vocabulary.v1.json owned under packages/portfolio/contracts/. Provider supervision via package (component path prefix did not cover this file).
+  provider: supervision
+  consumers: []
+  path: packages/portfolio/contracts/portfolio-vocabulary.v1.json
+  evidence: []
+  status: live
+- id: process/containment.port.v1
+  canonical: process/containment.port.v1
+  aliases: []
+  meaning: Machine-readable contract file containment.port.v1.json owned under packages/process/contracts/.
+  provider: containment-port
+  consumers: []
+  path: packages/process/contracts/containment.port.v1.json
+  evidence: []
+  status: live
+- id: process/process-facts.judge.v1
+  canonical: process/process-facts.judge.v1
+  aliases: []
+  meaning: Machine-readable contract file process-facts.judge.v1.json under packages/process/contracts/ (containment-port path owner).
+  provider: containment-port
+  consumers: []
+  path: packages/process/contracts/process-facts.judge.v1.json
+  evidence: []
+  status: live
+- id: questions/question-event-payloads.v1
+  canonical: questions/question-event-payloads.v1
+  aliases: []
+  meaning: Machine-readable contract file question-event-payloads.v1.json owned under packages/questions/contracts/.
+  provider: questions
+  consumers: []
+  path: packages/questions/contracts/question-event-payloads.v1.json
+  evidence: []
+  status: live
+- id: questions/question-event-streams.v1
+  canonical: questions/question-event-streams.v1
+  aliases: []
+  meaning: Machine-readable contract file question-event-streams.v1.json owned under packages/questions/contracts/.
+  provider: questions
+  consumers: []
+  path: packages/questions/contracts/question-event-streams.v1.json
+  evidence: []
+  status: live
+- id: questions/questions-input.v1
+  canonical: questions/questions-input.v1
+  aliases: []
+  meaning: Machine-readable contract file questions-input.v1.json owned under packages/questions/contracts/.
+  provider: questions
+  consumers: []
+  path: packages/questions/contracts/questions-input.v1.json
+  evidence: []
+  status: live
+- id: questions/refusals.v1
+  canonical: questions/refusals.v1
+  aliases: []
+  meaning: Machine-readable contract file refusals.v1.json owned under packages/questions/contracts/.
+  provider: questions
+  consumers: []
+  path: packages/questions/contracts/refusals.v1.json
+  evidence: []
+  status: live
+- id: resource-referee/resource-referee.v1
+  canonical: resource-referee/resource-referee.v1
+  aliases: []
+  meaning: Machine-readable contract file resource-referee.v1.json owned under packages/resource-referee/contracts/.
+  provider: resource-referee
+  consumers: []
+  path: packages/resource-referee/contracts/resource-referee.v1.json
+  evidence: []
+  status: live
+- id: run-result/run-result.read.v1
+  canonical: run-result/run-result.read.v1
+  aliases: []
+  meaning: Machine-readable contract file run-result.read.v1.json owned under packages/run-result/contracts/.
+  provider: run-result
+  consumers:
+    - agent-coordination-engine
+    - team-cognition-engine
+    - observe
+    - work-driver
+    - work-state
+    - group-thinking
+  path: packages/run-result/contracts/run-result.read.v1.json
+  evidence:
+    - packages/run-result/contracts/fixtures/**
+  status: live
+- id: run-result/unit-summary.read.v3
+  canonical: run-result/unit-summary.read.v3
+  aliases: []
+  meaning: Machine-readable contract file unit-summary.read.v3.json owned under packages/run-result/contracts/.
+  provider: run-result
+  consumers:
+    - agent-coordination-engine
+    - team-cognition-engine
+    - observe
+    - work-driver
+    - work-state
+    - group-thinking
+  path: packages/run-result/contracts/unit-summary.read.v3.json
+  evidence:
+    - packages/run-result/contracts/fixtures/**
+  status: live
+- id: run-supervisor/adopting.v1
+  canonical: run-supervisor/adopting.v1
+  aliases: []
+  meaning: Machine-readable contract file adopting.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/adopting.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/attempt-intent.v1
+  canonical: run-supervisor/attempt-intent.v1
+  aliases: []
+  meaning: Machine-readable contract file attempt-intent.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/attempt-intent.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/cancel-requested.v1
+  canonical: run-supervisor/cancel-requested.v1
+  aliases: []
+  meaning: Machine-readable contract file cancel-requested.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/cancel-requested.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/closed.v1
+  canonical: run-supervisor/closed.v1
+  aliases: []
+  meaning: Machine-readable contract file closed.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/closed.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/envelope.v3
+  canonical: run-supervisor/envelope.v3
+  aliases: []
+  meaning: Machine-readable contract file envelope.v3.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/envelope.v3.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/gate-exit.v1
+  canonical: run-supervisor/gate-exit.v1
+  aliases: []
+  meaning: Machine-readable contract file gate-exit.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/gate-exit.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/gate-go.v1
+  canonical: run-supervisor/gate-go.v1
+  aliases: []
+  meaning: Machine-readable contract file gate-go.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/gate-go.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/head-request.v1
+  canonical: run-supervisor/head-request.v1
+  aliases: []
+  meaning: Machine-readable contract file head-request.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/head-request.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/home-marker.v2
+  canonical: run-supervisor/home-marker.v2
+  aliases: []
+  meaning: Machine-readable contract file home-marker.v2.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/home-marker.v2.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/internal-route.run-supervisor.v1
+  canonical: run-supervisor/internal-route.run-supervisor.v1
+  aliases: []
+  meaning: Machine-readable contract file internal-route.run-supervisor.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/internal-route.run-supervisor.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/receipt.v1
+  canonical: run-supervisor/receipt.v1
+  aliases: []
+  meaning: Machine-readable contract file receipt.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/receipt.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/recover-actions.v1
+  canonical: run-supervisor/recover-actions.v1
+  aliases: []
+  meaning: Machine-readable contract file recover-actions.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/recover-actions.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/step-receipt.v1
+  canonical: run-supervisor/step-receipt.v1
+  aliases: []
+  meaning: Machine-readable contract file step-receipt.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/step-receipt.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/stop-requested.v1
+  canonical: run-supervisor/stop-requested.v1
+  aliases: []
+  meaning: Machine-readable contract file stop-requested.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/stop-requested.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/supervisor-binding.v1
+  canonical: run-supervisor/supervisor-binding.v1
+  aliases: []
+  meaning: Machine-readable contract file supervisor-binding.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/supervisor-binding.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/unit-state.v1
+  canonical: run-supervisor/unit-state.v1
+  aliases: []
+  meaning: Machine-readable contract file unit-state.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/unit-state.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: run-supervisor/worker-env-allowlist.v1
+  canonical: run-supervisor/worker-env-allowlist.v1
+  aliases: []
+  meaning: Machine-readable contract file worker-env-allowlist.v1.json owned under packages/run-supervisor/contracts/. Provider run-supervisor via package (component path prefix did not cover this file).
+  provider: run-supervisor
+  consumers: []
+  path: packages/run-supervisor/contracts/worker-env-allowlist.v1.json
+  evidence:
+    - packages/run-supervisor/contracts/controller/**
+    - packages/run-supervisor/contracts/vectors/**
+  status: live
+- id: seat-binding/seat-binding.golden.v1
+  canonical: seat-binding/seat-binding.golden.v1
+  aliases: []
+  meaning: Machine-readable contract file seat-binding.golden.v1.json owned under packages/seat-binding/contracts/. Provider seat-binding via package (component path prefix did not cover this file).
+  provider: seat-binding
+  consumers: []
+  path: packages/seat-binding/contracts/seat-binding.golden.v1.json
+  evidence: []
+  status: live
+- id: seat-binding/seat-binding.tier-ladder.v1
+  canonical: seat-binding/seat-binding.tier-ladder.v1
+  aliases: []
+  meaning: Machine-readable contract file seat-binding.tier-ladder.v1.json owned under packages/seat-binding/contracts/. Provider seat-binding via package (component path prefix did not cover this file).
+  provider: seat-binding
+  consumers: []
+  path: packages/seat-binding/contracts/seat-binding.tier-ladder.v1.json
+  evidence: []
+  status: live
+- id: secrets/declaration.v1.schema
+  canonical: secrets/declaration.v1.schema
+  aliases: []
+  meaning: Machine-readable contract file declaration.v1.schema.json owned under packages/secrets/contracts/.
+  provider: secrets
+  consumers: []
+  path: packages/secrets/contracts/declaration.v1.schema.json
+  evidence: []
+  status: live
+- id: session-host/host-port.v1
+  canonical: session-host/host-port.v1
+  aliases: []
+  meaning: Machine-readable contract file host-port.v1.json owned under packages/session-host/contracts/. Provider session-host via package (component path prefix did not cover this file).
+  provider: session-host
+  consumers: []
+  path: packages/session-host/contracts/host-port.v1.json
+  evidence: []
+  status: live
+- id: session-host/rotation-files.v1
+  canonical: session-host/rotation-files.v1
+  aliases: []
+  meaning: Machine-readable contract file rotation-files.v1.json owned under packages/session-host/contracts/. Provider session-host via package (component path prefix did not cover this file).
+  provider: session-host
+  consumers: []
+  path: packages/session-host/contracts/rotation-files.v1.json
+  evidence: []
+  status: live
+- id: supervision/event-streams.v1
+  canonical: supervision/event-streams.v1
+  aliases: []
+  meaning: Machine-readable contract file event-streams.v1.json owned under packages/supervision/contracts/. Provider supervision via package (component path prefix did not cover this file).
+  provider: supervision
+  consumers: []
+  path: packages/supervision/contracts/event-streams.v1.json
+  evidence: []
+  status: live
+- id: supervision/plan-vocabulary.v1
+  canonical: supervision/plan-vocabulary.v1
+  aliases: []
+  meaning: Machine-readable contract file plan-vocabulary.v1.json owned under packages/supervision/contracts/. Provider supervision via package (component path prefix did not cover this file).
+  provider: supervision
+  consumers: []
+  path: packages/supervision/contracts/plan-vocabulary.v1.json
+  evidence: []
+  status: live
+- id: terminal-control/allocation-record.v1
+  canonical: terminal-control/allocation-record.v1
+  aliases: []
+  meaning: Machine-readable contract file allocation-record.v1.json owned under packages/terminal-control/contracts/. Provider terminal-control via package (component path prefix did not cover this file).
+  provider: terminal-control
+  consumers: []
+  path: packages/terminal-control/contracts/allocation-record.v1.json
+  evidence:
+    - packages/terminal-control/contracts/policy-fixtures/**
+  status: live
+- id: terminal-control/driver-capabilities.v1
+  canonical: terminal-control/driver-capabilities.v1
+  aliases: []
+  meaning: Machine-readable contract file driver-capabilities.v1.json owned under packages/terminal-control/contracts/. Provider terminal-control via package (component path prefix did not cover this file).
+  provider: terminal-control
+  consumers: []
+  path: packages/terminal-control/contracts/driver-capabilities.v1.json
+  evidence:
+    - packages/terminal-control/contracts/policy-fixtures/**
+  status: live
+- id: terminal-control/internal-route.terminal-control.v1
+  canonical: terminal-control/internal-route.terminal-control.v1
+  aliases: []
+  meaning: Machine-readable contract file internal-route.terminal-control.v1.json owned under packages/terminal-control/contracts/. Provider terminal-control via package (component path prefix did not cover this file).
+  provider: terminal-control
+  consumers: []
+  path: packages/terminal-control/contracts/internal-route.terminal-control.v1.json
+  evidence:
+    - packages/terminal-control/contracts/policy-fixtures/**
+  status: live
+- id: terminal-control/placement-policy.v1
+  canonical: terminal-control/placement-policy.v1
+  aliases: []
+  meaning: Machine-readable contract file placement-policy.v1.json owned under packages/terminal-control/contracts/. Provider terminal-control via package (component path prefix did not cover this file).
+  provider: terminal-control
+  consumers: []
+  path: packages/terminal-control/contracts/placement-policy.v1.json
+  evidence:
+    - packages/terminal-control/contracts/policy-fixtures/**
+  status: live
+- id: terminal-control/terminal-control.port.v1
+  canonical: terminal-control/terminal-control.port.v1
+  aliases: []
+  meaning: Machine-readable contract file terminal-control.port.v1.json owned under packages/terminal-control/contracts/. Provider terminal-control via package (component path prefix did not cover this file).
+  provider: terminal-control
+  consumers: []
+  path: packages/terminal-control/contracts/terminal-control.port.v1.json
+  evidence:
+    - packages/terminal-control/contracts/policy-fixtures/**
+  status: live
+- id: work-state/domain-entry-steps
+  canonical: work-state/domain-entry-steps
+  aliases: []
+  meaning: Machine-readable contract file domain-entry-steps.json owned under packages/work-state/contracts/. Provider work-state via package (component path prefix did not cover this file).
+  provider: work-state
+  consumers: []
+  path: packages/work-state/contracts/domain-entry-steps.json
+  evidence: []
+  status: live
+- id: work-state/event-streams.v1
+  canonical: work-state/event-streams.v1
+  aliases: []
+  meaning: Machine-readable contract file event-streams.v1.json owned under packages/work-state/contracts/. Provider work-state via package (component path prefix did not cover this file).
+  provider: work-state
+  consumers: []
+  path: packages/work-state/contracts/event-streams.v1.json
+  evidence: []
+  status: live
+- id: work-state/porting-event-streams.v1
+  canonical: work-state/porting-event-streams.v1
+  aliases: []
+  meaning: Machine-readable contract file porting-event-streams.v1.json owned under packages/work-state/contracts/. Provider work-state via package (component path prefix did not cover this file).
+  provider: work-state
+  consumers: []
+  path: packages/work-state/contracts/porting-event-streams.v1.json
+  evidence: []
+  status: live
+- id: work-state/work-events.read.v1
+  canonical: work-state/work-events.read.v1
+  aliases: []
+  meaning: Machine-readable contract file work-events.read.v1.json owned under packages/work-state/contracts/. Provider work-state via package (component path prefix did not cover this file).
+  provider: work-state
+  consumers: []
+  path: packages/work-state/contracts/work-events.read.v1.json
+  evidence: []
+  status: live
+- id: yaml-doc/limits.v1
+  canonical: yaml-doc/limits.v1
+  aliases: []
+  meaning: Machine-readable contract file limits.v1.json owned under packages/yaml-doc/contracts/.
+  provider: yaml-document
+  consumers: []
+  path: packages/yaml-doc/contracts/limits.v1.json
+  evidence:
+    - packages/yaml-doc/contracts/fixtures/**
+  status: live
+- id: yaml-doc/profiles.v1
+  canonical: yaml-doc/profiles.v1
+  aliases: []
+  meaning: Machine-readable contract file profiles.v1.json owned under packages/yaml-doc/contracts/.
+  provider: yaml-document
+  consumers: []
+  path: packages/yaml-doc/contracts/profiles.v1.json
+  evidence:
+    - packages/yaml-doc/contracts/fixtures/**
+  status: live
+- id: yaml-doc/refusal-rules.v1
+  canonical: yaml-doc/refusal-rules.v1
+  aliases: []
+  meaning: Machine-readable contract file refusal-rules.v1.json owned under packages/yaml-doc/contracts/.
+  provider: yaml-document
+  consumers: []
+  path: packages/yaml-doc/contracts/refusal-rules.v1.json
+  evidence:
+    - packages/yaml-doc/contracts/fixtures/**
+  status: live
+- id: domain-registry/definition-load
+  canonical: domain-registry/definition-load
+  aliases: []
+  meaning: "Work Driver / domain callers ↔ Domain Registry: load legal workflow/stage/operation declarations and workflow definition validation/projection without inventing undeclared domain operations"
+  provider: domain-registry-loader
+  consumers:
+    - work-driver
+    - workflow
+    - coding-domain
+    - domain-components
+  evidence: []
+  status: planned
+  reason: proposal §7 Work Driver -> Domain Registry edge; no dedicated live contract file yet
+- id: group-thinking/protocol-public-request
+  canonical: group-thinking/protocol-public-request
+  aliases: []
+  meaning: "Group-Thinking Protocol Pack ↔ Agent Coordination / Team Cognition: versioned protocol definitions and public request/replay/contribution/aggregation contracts only"
+  provider: group-thinking
+  consumers:
+    - agent-coordination-engine
+    - team-cognition-engine
+    - host-surface
+  evidence: []
+  status: planned
+  reason: proposal §7 Group-Thinking -> ACE/TCE and skill -> host edges; no dedicated live contract file yet

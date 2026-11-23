@@ -1,0 +1,17 @@
+job: canonical JSON bytes
+kind: door
+patterns:
+  - (?:function|fn)\s+(?:canonicalJson|stableStringify|sortedJson|canonical_json|to_canonical_json)\b
+allowed:
+  - packages/canonical-json/rust/src/lib.rs
+  - packages/git/node-addon/src/canonical_json.rs
+  - src/native/door.mjs
+  - packages/run-supervisor/rust/src/envelope.rs
+  - src/runner/dispatch/effective-execution-contract.mjs
+  - src/run-supervisor/trust-store.mjs
+  - path: scripts/build-rust-distribution.mjs
+    reason: producer half of the release-manifest pair kept together with its verifier
+  - packages/distribution/rust/src/verify.rs
+debt: []
+retiredBy: the exceptions the component-boundary row names go when their stated reasons end (the release-manifest pair moves as one; the others when their contracts change)
+reason: RFC 8785 bytes come from one crate; each allowed exception except run-supervisor envelope.rs (its envelope digest, not named in that row) is named with its reason in the component-boundary row for Canonical JSON

@@ -515,8 +515,8 @@ export const COMMAND_REGISTRY = [
   }),
   withSubcommands({
     name: 'authority',
-    invoke: 'fgos authority locate "<sentence>" [--limit N]',
-    description: 'Find the components, decision kinds, doors and contracts of the component authority model that match a description of the work. Run it before writing a function, module or decision, so new code lands under the row that owns it.',
+    invoke: 'fgos authority <locate "<sentence>" [--limit N]|model|render [--check] [--preview-holder <path>]>',
+    description: 'Find the components, decision kinds, doors and contracts of the component authority model that match a description of the work, print the model, or render its ownership views into the platform docs. Run locate before writing a function, module or decision, so new code lands under the row that owns it.',
     subcommands: {
       locate: {
         description: "Rank the model rows that match a sentence: an exact canonical name first, then an alias, then overlap with the row's meaning. Vietnamese diacritics are folded.",
@@ -534,21 +534,50 @@ export const COMMAND_REGISTRY = [
           'fgos authority locate "ghi file nguyên tử" --limit 3',
         ],
       },
+      model: {
+        description: 'Print the loaded, validated component authority model: layers, components, decision kinds, doors with their slugs, and contracts. Read-only; the way Node code reads the model.',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+        examples: ['fgos authority model --json'],
+      },
+      render: {
+        description: 'Render the generated ownership views (component table, owner table, holder table, area map, shared entities, architecture map) from the model into the platform docs. With no flag it writes the views; --check writes nothing and fails on drift; --preview-holder writes only the holder-view preview report.',
+        parameters: {
+          type: 'object',
+          properties: {
+            check: { type: 'boolean', description: 'Report views whose block differs from the model and write nothing; exit 1 on drift.' },
+            'preview-holder': { type: 'string', description: 'Write the holder-view preview report to this path (relative to the project) instead of the views.' },
+          },
+          required: [],
+        },
+        examples: [
+          'fgos authority render',
+          'fgos authority render --check',
+          'fgos authority render --preview-holder .fgos/runtime/tmp/holder-preview.md',
+        ],
+      },
     },
-    examples: ['fgos authority locate "atomic file write" --json'],
+    examples: [
+      'fgos authority locate "atomic file write" --json',
+      'fgos authority model --json',
+      'fgos authority render --check',
+    ],
     guide: {
-      changes: 'Nothing: it reads the model files under packages/component-authority/model/.',
+      changes: 'locate and model read the model files under packages/component-authority/model/ and write nothing; render rewrites the generated blocks inside the platform docs (or, with --check, writes nothing).',
       prerequisites: 'A checkout that holds the component authority model.',
       exitCodes: [
-        '0 answered, with zero or more matches',
+        '0 answered, with zero or more matches; render wrote the views or found no drift',
         '4 refused: unknown sub-command, option or a missing sentence',
-        '1 failed: a model file is missing or invalid',
+        '1 failed: a model file is missing or invalid, or render --check found drift',
       ],
       next: 'Write the new code under the owning row, or declare a new row when none owns it.',
     },
     touchesState: false,
     store: 'none',
-    externalEffect: false,
+    externalEffect: true,
     paginated: false,
     deprecated: null,
     native: true,

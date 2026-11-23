@@ -1,0 +1,31 @@
+job: "process control: signal a process or group"
+kind: door
+patterns:
+  - process\.kill\(
+  - libc::kill(?:pg)?\(
+  - \bkillpg\(
+  - GenerateConsoleCtrlEvent
+  - \bTerminateProcess\(
+  - Command::new\("(?:kill|taskkill|pkill)"\)
+allowed:
+  - packages/process/rust/src/**
+  - packages/run-supervisor/rust/src/gate/unix.rs
+  - packages/run-supervisor/rust/src/gate/windows.rs
+  - packages/run-supervisor/rust/src/steps.rs
+  - packages/holder-lock/rust/src/driver/flock.rs
+  - packages/holder-lock/rust/src/port.rs
+  - src/holder-lock/index.mjs
+  - src/runner/dispatch/provider-credential-probe.mjs
+  - path: scripts/run-rust-dev-host.mjs
+    reason: re-raises the signal that ended its own child on itself
+  - path: scripts/stress-test-files.mjs
+    reason: kills the process group of the test child it just spawned
+  - path: scripts/test-select-coverage-map.mjs
+    reason: kills the process group of the test child it just spawned
+debt:
+  - path: packages/git/rust/src/driver.rs
+    reason: the match is inside a test function, but the test-region brace counter ends the test module early (a brace in a string or char literal), so the check reads it as product code
+  - path: scripts/lib/mailbox-live-confined.mjs
+    reason: frozen V7n measurement module; moves onto the process door when V7n is re-measured (MAIL)
+retiredBy: each Node own-child group kill goes when the code that spawns that child moves to Rust
+reason: signalling by identity goes through fgos-process; the launch gate, holder-lock and two Node modules signal only the group of a child they just spawned

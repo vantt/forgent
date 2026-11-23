@@ -1,0 +1,41 @@
+job: derive executor facts
+kind: door
+patterns:
+  - (?:function|const) (?:withDefaultExecutor|familyOf|lookupExecutor|capabilityConfinementOf|credentialStoreOf|renderedEffortLevels|resolvePostureInvocation|decideExecutorDispatchMechanism|effectiveRigorOf|detectHerdrPresent|validateRunnerConfigShape|validateGeneratedPathsShape|loadMachineBackendRegistry|providerAccountInventory|readLlmAccounts|legacyStateKey|listAgents)\b
+  - \bfn (?:with_default_executor|family_of|lookup_executor|capability_confinement_of|credential_store_of|rendered_effort_levels|resolve_posture_invocation|decide_executor_dispatch_mechanism|effective_rigor_of|detect_herdr_present|validate_runner_config_shape|validate_generated_paths_shape|load_machine_backend_registry|provider_account_inventory|read_llm_accounts|legacy_state_key|list_agents)\b
+allowed:
+  - path: packages/execution/rust/src/executor_model.rs
+    reason: the executor model and its derivations are read here from the contracts under packages/execution/contracts
+  - path: packages/execution/rust/src/accounts.rs
+    reason: the account reads and the provider account inventory are derived here from the contracts under packages/execution/contracts
+  - path: packages/execution/rust/src/runner_check.rs
+    reason: the runner config check is derived here from the contracts under packages/execution/contracts
+  - path: src/native/execution-door.mjs
+    reason: carries fgos-execution's herdr detection (machine_reads::herdr_present) to Node under its Node name; it derives nothing
+  - path: packages/git/node-addon/src/execution.rs
+    reason: the addon's execution namespace carries fgos-execution's account inventory and state key (accounts.rs) to Node under their Node names; it derives nothing
+debt:
+  - path: src/runner/dispatch/config-twin.mjs
+    reason: "twin, same vectors as the contract: withDefaultExecutor, validateRunnerConfigShape and validateGeneratedPathsShape stay for Node launch code and the run snapshot"
+  - path: src/runner/dispatch/provider-adapter.mjs
+    reason: "twin, same vectors as the contract: familyOf and renderedEffortLevels stay for Node launch code"
+  - path: src/runner/dispatch/provider-capacity.mjs
+    reason: "twin, same vectors as the contract: credentialStoreOf and providerAccountInventory stay for Node launch code and the lease"
+  - path: src/runner/dispatch/mechanism.mjs
+    reason: "twin, same vectors as the contract: decideExecutorDispatchMechanism stays for Node dispatch callers that name an executor"
+  - path: src/runner/dispatch/resolve.mjs
+    reason: "twin, same vectors as the contract: lookupExecutor stays for Node launch code"
+  - path: src/runner/dispatch/confinement/policies.mjs
+    reason: "twin, same vectors as the contract: resolvePostureInvocation stays for Node launch code"
+  - path: src/runner/dispatch/confinement/backend-registry.mjs
+    reason: "twin, same vectors as the contract: loadMachineBackendRegistry stays for Node confinement"
+  - path: src/runner/dispatch/llm-accounts.mjs
+    reason: "twin, same vectors as the contract: readLlmAccounts and legacyStateKey stay for Node account state"
+  - path: src/runner/capability-config.mjs
+    reason: "twin, same vectors as the contract: capabilityConfinementOf stays for Node launch confinement"
+  - path: src/runner/execution/seat-resolver.mjs
+    reason: "twin, same vectors as the contract: effectiveRigorOf stays for the Node workflow seat resolver"
+  - path: src/runner/agent-listing.mjs
+    reason: "twin, same vectors as the contract: the agent-type-names-unique row is judged in Rust; listAgents stays only for the vector recorder (scripts/agents-vectors.mjs), its replay test and the npm test judgement of the release source tiers (test/setup/packaged-definitions.test.mjs)"
+retiredBy: "p-24xw2cwdvo: every remaining Node twin is reached only by the dead Node Execution closure and the mailbox live scripts (src/runner/capability-config.mjs keeps product importers, but its capabilityConfinementOf is called only from that closure); they go together"
+reason: the facts about an executor (its family, lookup, confinement, credential store, effort levels, posture, account inventory, config shape) are derived once, in the fgos-execution crate, over executor-model.v1.json and its vectors. launch runs in the host since S6a; each Node definition left is a declared twin proven on the same vectors, kept only until the dead Node Execution closure is deleted

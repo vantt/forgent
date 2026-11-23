@@ -38,10 +38,10 @@ the target structure.
 
 ## 2. Area Registry
 
-Target area docs live at `docs/platform/<area>/`. Owner rows below are generated from `packages/component-authority/model/`; edit the model and run `node scripts/component-authority-render.mjs`.
+Target area docs live at `docs/platform/<area>/`. Owner rows below are generated from `packages/component-authority/model/`; edit the model (the YAML files) and run `fgos authority render`.
 
 <!-- generated:component-authority:readme-owner-table -->
-Component owners, one row per component and subcomponent, sorted by id. <!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
+Component owners, one row per component and subcomponent, sorted by id. <!-- rendered from packages/component-authority/model/ by `fgos authority render`; edit the model, never this block -->
 
 | Component | Parent | Role | Owner doc | Paths |
 | --- | --- | --- | --- | --- |

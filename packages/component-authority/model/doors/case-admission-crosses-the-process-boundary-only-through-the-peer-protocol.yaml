@@ -1,0 +1,22 @@
+job: case admission crosses the process boundary only through the peer protocol
+kind: door
+patterns:
+  - FGOS-ADMISSION-PEER
+  - \bserveAdmissionPeer\b
+  - PeerChannel::(?:new|with_deadline|over_child|over_stdio)\b
+  - \bimpl\s*(?:<[^>]*>)?\s*CaseAdmission\s+for\b
+  - admission-peer\.mjs
+allowed:
+  - path: packages/execution/engine/src/unit_run/peer.rs
+    reason: the one Rust adapter of CaseAdmission over a framed (reader, writer) pair, and the frame prefix
+  - path: apps/fgos/src/wiring/run.rs
+    reason: standalone fgos run starts the admission peer on its first ask and talks to it over the peer's stdin and stdout
+  - path: apps/fgos/src/wiring/execution_routes.rs
+    reason: the run-unit route opens the channel on its own stdin and stdout, to the Node parent that serves the port
+  - path: src/native/execution-door.mjs
+    reason: the one Node server of the protocol, for both directions
+  - path: src/workflow/admission-peer.mjs
+    reason: the payload module the host starts; serves the Workflow port through the door
+debt: []
+retiredBy: "S6b: Workflow admission moves to Rust and the peer entry goes"
+reason: "Workflow's case admission is asked across the host and Node only over pipes, with prefixed JSON lines and one protocol number (packages/execution/contracts/admission-peer/admission-peer.v1.json): one Rust adapter, one Node server, no inherited descriptor above 2 (plan decision P13). A second wire, frame prefix or CaseAdmission adapter must be declared"

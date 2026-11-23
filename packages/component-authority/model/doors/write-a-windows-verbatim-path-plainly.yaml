@@ -1,0 +1,8 @@
+job: write a Windows verbatim path plainly
+kind: door
+patterns:
+  - r#*"\\\\\?\\
+allowed:
+  - packages/process/rust/src/path.rs
+debt: []
+reason: only fgos_process::path turns a Windows verbatim path (\\?\D:\x, \\?\UNC\host\share) into the plain spelling Git, cmd.exe, shells and Node accept; a hand strip names the prefix as a Rust raw-string literal. Rust test code and comments are blanked and tests/ dirs are pruned, so test literals do not match; a prefix built without a raw-string literal is not seen

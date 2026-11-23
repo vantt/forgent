@@ -1,0 +1,13 @@
+job: managed timer
+kind: door
+patterns:
+  - \bsystemctl\b
+  - \blaunchctl\b
+  - "fgos-managed: (?:mailbox-sync|account-probe)-timer"
+  - dev\.fgos\.\$\{?stem
+  - export function (?:checkManagedTimer|fixManagedTimer|unitStem)\b
+  - pub fn (?:check_managed_timer|fix_managed_timer|remove_managed_timer|unit_stem)\b
+allowed:
+  - packages/distribution/rust/src/timer.rs
+debt: []
+reason: the OS timers fgOS writes (systemd user units, launchd plists) are rendered, checked, enabled and removed in one Rust module; the scheduler calls go through the process door's bounded runner

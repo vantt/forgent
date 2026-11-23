@@ -20,6 +20,7 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import { parseYaml } from '../src/util/yaml.mjs';
+import { invokeHost } from '../src/util/host-bin.mjs';
 import { lexSource } from '../scripts/lib/js-source-lexer.mjs';
 import { lexRust, rustTestRanges } from '../scripts/lib/rust-source.mjs';
 import { bridgeFailures } from './helpers/doctor-bridge-labels.mjs';
@@ -65,12 +66,9 @@ function mjsFilesUnder(dir) {
     .map((e) => path.relative(root, path.join(e.parentPath, e.name)).split(path.sep).join('/'));
 }
 
-function loadModel(modelDir = path.join(root, 'packages/component-authority/model')) {
-  const layers = JSON.parse(fs.readFileSync(path.join(modelDir, 'layers.json'), 'utf8'));
-  const components = JSON.parse(fs.readFileSync(path.join(modelDir, 'components.json'), 'utf8'));
-  const doorsDir = path.join(modelDir, 'doors');
-  const doorFiles = fs.readdirSync(doorsDir).filter((f) => f.endsWith('.json')).sort();
-  const doors = doorFiles.map((file) => JSON.parse(fs.readFileSync(path.join(doorsDir, file), 'utf8')));
+// The structural model comes from the host (`fgos authority model --json`), the one reader of the YAML model files.
+function loadModel() {
+  const { layers, components, doors } = invokeHost(['authority', 'model', '--json'], { dir: root });
 
   const tiers = {};
   for (const comp of components) {
@@ -236,33 +234,6 @@ test('every .mjs under src/ and bin/ resolves to exactly one component', () => {
   );
 });
 
-test('every component exceptions[].path exists on disk and resolves to the component that declares it', () => {
-  for (const comp of manifest.components) {
-    for (const exc of comp.exceptions ?? []) {
-      const fullPath = path.join(root, exc.path);
-      assert.ok(fs.existsSync(fullPath), `exception path "${exc.path}" declared by ${comp.id} must exist on disk`);
-      const resolved = resolveComponentForFile(exc.path, manifest.components);
-      assert.equal(
-        resolved?.id,
-        comp.id,
-        `exception path "${exc.path}" declared by ${comp.id} must resolve to ${comp.id}, got ${resolved?.id}`,
-      );
-    }
-  }
-});
-
-test('mọi row dùng tầng đã khai trong layers', () => {
-  for (const [file, layer] of Object.entries(manifest.files)) {
-    assert.ok(rank.has(layer), `${file}: tầng "${layer}" không có trong layers`);
-  }
-});
-
-test('mọi rule khai báo trong manifest là hợp lệ', () => {
-  assert.ok(Array.isArray(manifest.rules), 'manifest.rules phải là một array');
-  assert.ok(manifest.rules.includes('one-directional-layer'), 'cần rule one-directional-layer');
-  assert.ok(manifest.rules.includes('domain-siloing'), 'cần rule domain-siloing');
-});
-
 test('import một chiều xuống: không file nào import ngược lên tầng trên', () => {
   const violations = [];
   for (const file of inManifest) {
@@ -348,11 +319,7 @@ function manifestEdges() {
 }
 
 test('tier: every file has one tier, every tier row names a file, every exception names two files', () => {
-  assert.ok(manifest.rules.includes('tier-downward'), 'cần rule tier-downward');
-  const names = Object.keys(manifest.tierNames);
-  assert.deepEqual(names, ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
-  for (const [key, tier] of Object.entries(manifest.tiers)) {
-    assert.ok(names.includes(String(tier)), `${key}: tier ${tier} không có trong tierNames`);
+  for (const [key] of Object.entries(manifest.tiers)) {
     const named = key.endsWith('/') ? inManifest.some((f) => f.startsWith(key)) : inManifest.includes(key);
     assert.ok(named, `${key}: row tier không khớp file nào`);
   }

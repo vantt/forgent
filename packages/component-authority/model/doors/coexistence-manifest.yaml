@@ -1,0 +1,10 @@
+job: coexistence manifest
+kind: door
+patterns:
+  - export function (?:writeCoexistenceManifest|detectHarnesses)\b
+  - pub fn (?:write_coexistence_manifest|detect_harnesses)\b
+  - <tmpdir>/fgos-worktrees
+allowed:
+  - packages/distribution/rust/src/coexistence.rs
+debt: []
+reason: the .fgos/coexistence.json manifest and the read-only detection of other agent harnesses have one owner

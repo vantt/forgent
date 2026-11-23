@@ -1,0 +1,11 @@
+job: capability rows hold jobs and tool abilities
+kind: door
+patterns:
+  - \bDEFAULT_CAPABILITY_SLOTS\b
+  - \bRUNNER_LOOP_CAPABILITY_USES\b
+  - \bisCapabilityDeclared\b
+  - \bhasPreferPool\b
+allowed: []
+debt: []
+retiredBy: "S7: the kept coding rows get a proper home"
+reason: "core/config-standard/runner.yaml no longer holds a row per business, council or marketing capability: those names are labels that bind as unit seats, and the preference lives in runner.roles, runner.personas and the unit's own tier and rigor. The four names are the code that read the old rows (curated slot catalog, loop uses, declared and prefer-pool lookups) and may not return. The coding rows the Work path routes through (fgos-coding-implement, code:implement, code:review, code:test, code:debug, code:refactor, docs:write, coding:discover) stay in the standard as a stopgap owned by S7, backlog p-nnbfsrxcss; YAML is outside the door walk, so those rows are named here, not checked"

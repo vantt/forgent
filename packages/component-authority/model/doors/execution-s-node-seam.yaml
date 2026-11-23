@@ -1,0 +1,111 @@
+job: Execution's Node seam
+kind: door
+patterns:
+  - (?:from\s+|import\(\s*)['"][^'"]*execution-door\.mjs['"]
+  - "'internal',\\s*'execution'"
+allowed:
+  - path: src/native/execution-door.mjs
+    reason: "the seam itself: spawns `fgos internal execution <op> --protocol 1` and carries the addon `execution` namespace under its Node names"
+  - path: src/workflow/admission-peer.mjs
+    reason: "S6b: the admission peer payload module the host starts for a standalone `fgos run`; serves the case admission port over the peer protocol"
+  - path: src/workflow/case-admission-port.mjs
+    reason: "S6b: imports isCaseId, runDirOf, seatKeyOf, isVerdict, currentDispatchDepth, executionVocabulary"
+  - path: src/workflow/case-bindings.mjs
+    reason: "S6b: imports custodyHeld, worktreeKey, runsRoot, currentDispatchDepth"
+  - path: src/workflow/case-close.mjs
+    reason: "S6b: imports RunnerConfigError, isCaseId, runDirOf, runsRoot, judgeUnitRun, removeUnitRun"
+  - path: src/workflow/case-frame.mjs
+    reason: "S6b: imports RunnerConfigError"
+  - path: src/workflow/case-gate.mjs
+    reason: "S6b: imports executionOp, loadRunnerConfigForDir, verifyCommandOf, verifySeatResult and the refusal classes"
+  - path: src/workflow/case-inherit.mjs
+    reason: "S6b: imports RunnerConfigError, runsRoot"
+  - path: src/workflow/case-lock.mjs
+    reason: "S6b: imports RunnerConfigError, runDirOf"
+  - path: src/workflow/case-projection.mjs
+    reason: "S6b: imports executionVocabulary"
+  - path: src/workflow/case-runtime.mjs
+    reason: "S6b: imports custodyHeld, unitRunFacts, releasedUnitRunSettle, gateAnswerFile, runDirOf"
+  - path: src/workflow/case-start.mjs
+    reason: "S6b: imports loadRunnerConfigForDir, snapshotRunnerConfig, resolveCollaboration, providerAccountInventory, shippedCatalog and the run option parsers"
+  - path: src/workflow/case-verbs.mjs
+    reason: "S6b: imports RunnerConfigError, runDirOf, currentDispatchDepth"
+  - path: src/workflow/checked.mjs
+    reason: "S6b: imports checkDeclaredSeats, assertNoSeatTier, assertNoUnitTier, executionVocabulary"
+  - path: src/workflow/legacy-ledger-read.mjs
+    reason: "S6b: imports infrastructure"
+  - path: src/workflow/loader.mjs
+    reason: "S6b: imports RunnerConfigError"
+  - path: src/workflow/propose-classify.mjs
+    reason: "S6b: imports RunnerConfigError"
+  - path: src/workflow/propose-frame.mjs
+    reason: "S6b: imports resolveCollaboration"
+  - path: src/workflow/propose.mjs
+    reason: "S6b: imports RunnerConfigError, loadRunnerConfigForDir, shippedCatalog"
+  - path: src/workflow/propose-validate.mjs
+    reason: "S6b: imports unservedToolAbilitiesOf"
+  - path: src/workflow/ref-digests.mjs
+    reason: "S6b: imports seatKeyOf, reportDigest"
+  - path: src/workflow/runner.mjs
+    reason: "S6b: imports runUnitInHost (each step) and the refusal classes"
+  - path: src/workflow/seat-providers.mjs
+    reason: "S6b: imports seatKeyOf, legacyFamilyOf"
+  - path: src/workflow/seats.mjs
+    reason: "S6b: imports RunnerConfigError"
+  - path: src/workflow/store.mjs
+    reason: "S6b: imports RunnerConfigError, runDirOf, runsRoot"
+  - path: src/workflow/unit-handoff.mjs
+    reason: "S6b: imports unitRunFacts, handoffRef, reportDigest, foldRunSetting, executionVocabulary"
+  - path: src/workflow/units-source.mjs
+    reason: "S6b: imports RunnerConfigError, validateUnit, assertNoUnitTier"
+  - path: bin/fgos-runner.mjs
+    reason: "S7: the Work runner entry loads the runner config"
+  - path: src/runner/fanout-batch.mjs
+    reason: "S7: Work fanout runs each worker through runUnitInHost"
+  - path: src/runner/loop.mjs
+    reason: "S7: the Work runner loop asks executionOp and runOutcome"
+  - path: src/runner/operation-choice.mjs
+    reason: "S7: a Work operation runs through runUnitInHost"
+  - path: src/runner/work-compat.mjs
+    reason: "S7: Work's capability hints"
+  - path: src/runner/work-dispatch.mjs
+    reason: "S7: a Work dispatch runs through runUnitInHost"
+  - path: src/verbs/state/read.mjs
+    reason: "S7: the Work read verb asks executionOp"
+  - path: src/report/capability-plan-lint.mjs
+    reason: "S7: the Work plan lint reads the unit validation and the unserved tool abilities"
+  - path: src/git/inspect.mjs
+    reason: "S7: a Node verb that names the runner config error class"
+  - path: src/cli/verb-exit.mjs
+    reason: "S7: the Node verb exit table reads the outcome exit codes"
+  - path: bin/fgos.mjs
+    reason: "S7: the Node payload loads the runner config for its remaining verbs"
+  - path: src/runner/agent-definitions.mjs
+    reason: "S7: the Node agent definition reader names the runner config error class"
+  - path: src/session-host/head-start.mjs
+    reason: "S7: the session head start launches its session through launchSessionInHost"
+  - path: src/runner/dispatch/assignment-layout.mjs
+    reason: "plan 261122-0118 tail: a facade for the session-host callers (head request), removed when they import the door"
+  - path: src/runner/dispatch/config.mjs
+    reason: "plan 261122-0118 tail: a facade for the session-host callers (head start), removed when they import the door"
+  - path: src/runner/dispatch/confinement/authority.mjs
+    reason: "plan 261122-0118 tail: a facade for the session rotation, removed when it imports the door"
+  - path: src/runner/execution/unit-run-record.mjs
+    reason: "plan 261122-0118 tail: a facade for the head request, removed when it imports the door"
+  - path: src/runner/execution/unit-summary.mjs
+    reason: "plan 261122-0118 tail: a facade for the head request, removed when it imports the door"
+  - path: src/runner/execution/bind.mjs
+    reason: the Node bind facade (its own row names its callers) reads the runner config error class
+  - path: src/setup/doctor-bridge.mjs
+    reason: "doctor row: the Node rows bridge loads the door for the bridged rows (S6b, S7)"
+  - path: src/setup/registrations.mjs
+    reason: "doctor row: the bodies of the bridged rows (S6b, S7) read the runner config rules"
+  - path: src/setup/seat-binding-checks.mjs
+    reason: doctor row seat-binding-dry-bind, bridge:S6b
+  - path: src/runner/dispatch/runner-config-error.mjs
+    reason: "p-24xw2cwdvo: dead re-export of the runner config error class; only the dead Node closure and tests import it"
+  - path: src/runner/dispatch/session-attempt.mjs
+    reason: "p-24xw2cwdvo: dead Node session attempt (the host launches head sessions); only tests import it"
+debt: []
+retiredBy: S6b for the Workflow callers, S7 for the Work callers; the session-host facades with the tail of plan 261122-0118, the doctor rows with their bridge steps, and the dead Node closure with p-24xw2cwdvo
+reason: "Node above tier 5 reaches Execution only through src/native/execution-door.mjs: host routes over stdin and stdout for long or effectful operations, the addon execution namespace for reads (plan decisions P4, P14). Every importer is named with the step that retires it, so a new Node caller of Execution is a decision, not an accident"
