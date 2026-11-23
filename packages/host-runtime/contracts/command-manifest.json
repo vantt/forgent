@@ -5274,16 +5274,28 @@
           ]
         },
         "index": {
-          "description": "The search index of the corpus. \"run\" is the index worker's entry: locate starts it detached; it indexes docs/ under .fgos/runtime/doc-locate/ and exits after a quiet spell.",
+          "description": "The search index of the corpus under .fgos/runtime/doc-locate/. \"status\" shows its state, the worker and how far embedding is; \"stop\" asks the worker to stop; \"reset\" clears the worker's crash history (refused while a worker runs); \"run\" is the worker's entry, which locate starts detached and which exits after a quiet spell.",
           "parameters": {
             "type": "object",
             "properties": {
               "action": {
                 "type": "string",
-                "description": "Positional: run.",
+                "description": "Positional: status, stop, reset or run.",
                 "enum": [
+                  "status",
+                  "stop",
+                  "reset",
                   "run"
                 ]
+              },
+              "wait": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "status only: seconds to wait for the index to be ready or broken before answering."
+              },
+              "json": {
+                "type": "boolean",
+                "description": "Answer as the fgos.v1 envelope."
               }
             },
             "positional": [
@@ -5294,6 +5306,10 @@
             ]
           },
           "examples": [
+            "fgos doc index status",
+            "fgos doc index status --wait 60 --json",
+            "fgos doc index stop",
+            "fgos doc index reset",
             "fgos doc index run"
           ]
         },
@@ -5314,14 +5330,6 @@
                 "type": "string",
                 "description": "Doc mode (default explanation)."
               },
-              "lifecycle": {
-                "type": "string",
-                "description": "Doc lifecycle (default provisional)."
-              },
-              "aliases": {
-                "type": "string",
-                "description": "Comma-separated aliases."
-              },
               "topic-id": {
                 "type": "string",
                 "description": "Topic id."
@@ -5333,18 +5341,6 @@
               "doc-id": {
                 "type": "string",
                 "description": "Doc id."
-              },
-              "source-captures": {
-                "type": "string",
-                "description": "Comma-separated source capture ids."
-              },
-              "new-path": {
-                "type": "string",
-                "description": "New path (move)."
-              },
-              "superseded-by": {
-                "type": "string",
-                "description": "Doc id that supersedes this one."
               }
             },
             "required": []
@@ -5393,14 +5389,6 @@
               "source-captures": {
                 "type": "string",
                 "description": "Comma-separated source capture ids."
-              },
-              "new-path": {
-                "type": "string",
-                "description": "New path (move)."
-              },
-              "superseded-by": {
-                "type": "string",
-                "description": "Doc id that supersedes this one."
               }
             },
             "required": []
@@ -5418,45 +5406,13 @@
                 "type": "string",
                 "description": "Doc role (also accepted as positional)."
               },
-              "framework": {
-                "type": "string",
-                "description": "Doc framework (default diataxis)."
-              },
-              "mode": {
-                "type": "string",
-                "description": "Doc mode (default explanation)."
-              },
-              "lifecycle": {
-                "type": "string",
-                "description": "Doc lifecycle (default provisional)."
-              },
-              "aliases": {
-                "type": "string",
-                "description": "Comma-separated aliases."
-              },
               "topic-id": {
                 "type": "string",
                 "description": "Topic id."
               },
-              "doc-path": {
-                "type": "string",
-                "description": "Doc path."
-              },
               "doc-id": {
                 "type": "string",
                 "description": "Doc id."
-              },
-              "source-captures": {
-                "type": "string",
-                "description": "Comma-separated source capture ids."
-              },
-              "new-path": {
-                "type": "string",
-                "description": "New path (move)."
-              },
-              "superseded-by": {
-                "type": "string",
-                "description": "Doc id that supersedes this one."
               }
             },
             "required": []
@@ -5474,45 +5430,17 @@
                 "type": "string",
                 "description": "Doc role (also accepted as positional)."
               },
-              "framework": {
-                "type": "string",
-                "description": "Doc framework (default diataxis)."
-              },
-              "mode": {
-                "type": "string",
-                "description": "Doc mode (default explanation)."
-              },
-              "lifecycle": {
-                "type": "string",
-                "description": "Doc lifecycle (default provisional)."
-              },
-              "aliases": {
-                "type": "string",
-                "description": "Comma-separated aliases."
-              },
               "topic-id": {
                 "type": "string",
                 "description": "Topic id."
-              },
-              "doc-path": {
-                "type": "string",
-                "description": "Doc path."
               },
               "doc-id": {
                 "type": "string",
                 "description": "Doc id."
               },
-              "source-captures": {
-                "type": "string",
-                "description": "Comma-separated source capture ids."
-              },
               "new-path": {
                 "type": "string",
                 "description": "New path (move)."
-              },
-              "superseded-by": {
-                "type": "string",
-                "description": "Doc id that supersedes this one."
               }
             },
             "required": []
@@ -5530,22 +5458,6 @@
                 "type": "string",
                 "description": "Doc role (also accepted as positional)."
               },
-              "framework": {
-                "type": "string",
-                "description": "Doc framework (default diataxis)."
-              },
-              "mode": {
-                "type": "string",
-                "description": "Doc mode (default explanation)."
-              },
-              "lifecycle": {
-                "type": "string",
-                "description": "Doc lifecycle (default provisional)."
-              },
-              "aliases": {
-                "type": "string",
-                "description": "Comma-separated aliases."
-              },
               "topic-id": {
                 "type": "string",
                 "description": "Topic id."
@@ -5553,22 +5465,6 @@
               "doc-path": {
                 "type": "string",
                 "description": "Doc path."
-              },
-              "doc-id": {
-                "type": "string",
-                "description": "Doc id."
-              },
-              "source-captures": {
-                "type": "string",
-                "description": "Comma-separated source capture ids."
-              },
-              "new-path": {
-                "type": "string",
-                "description": "New path (move)."
-              },
-              "superseded-by": {
-                "type": "string",
-                "description": "Doc id that supersedes this one."
               }
             },
             "required": []
@@ -5586,45 +5482,13 @@
                 "type": "string",
                 "description": "Doc role (also accepted as positional)."
               },
-              "framework": {
-                "type": "string",
-                "description": "Doc framework (default diataxis)."
-              },
-              "mode": {
-                "type": "string",
-                "description": "Doc mode (default explanation)."
-              },
-              "lifecycle": {
-                "type": "string",
-                "description": "Doc lifecycle (default provisional)."
-              },
-              "aliases": {
-                "type": "string",
-                "description": "Comma-separated aliases."
-              },
               "topic-id": {
                 "type": "string",
                 "description": "Topic id."
               },
-              "doc-path": {
-                "type": "string",
-                "description": "Doc path."
-              },
               "doc-id": {
                 "type": "string",
                 "description": "Doc id."
-              },
-              "source-captures": {
-                "type": "string",
-                "description": "Comma-separated source capture ids."
-              },
-              "new-path": {
-                "type": "string",
-                "description": "New path (move)."
-              },
-              "superseded-by": {
-                "type": "string",
-                "description": "Doc id that supersedes this one."
               }
             },
             "required": []
@@ -5642,41 +5506,13 @@
                 "type": "string",
                 "description": "Doc role (also accepted as positional)."
               },
-              "framework": {
-                "type": "string",
-                "description": "Doc framework (default diataxis)."
-              },
-              "mode": {
-                "type": "string",
-                "description": "Doc mode (default explanation)."
-              },
-              "lifecycle": {
-                "type": "string",
-                "description": "Doc lifecycle (default provisional)."
-              },
-              "aliases": {
-                "type": "string",
-                "description": "Comma-separated aliases."
-              },
               "topic-id": {
                 "type": "string",
                 "description": "Topic id."
               },
-              "doc-path": {
-                "type": "string",
-                "description": "Doc path."
-              },
               "doc-id": {
                 "type": "string",
                 "description": "Doc id."
-              },
-              "source-captures": {
-                "type": "string",
-                "description": "Comma-separated source capture ids."
-              },
-              "new-path": {
-                "type": "string",
-                "description": "New path (move)."
               },
               "superseded-by": {
                 "type": "string",
@@ -5698,45 +5534,13 @@
                 "type": "string",
                 "description": "Doc role (also accepted as positional)."
               },
-              "framework": {
-                "type": "string",
-                "description": "Doc framework (default diataxis)."
-              },
-              "mode": {
-                "type": "string",
-                "description": "Doc mode (default explanation)."
-              },
-              "lifecycle": {
-                "type": "string",
-                "description": "Doc lifecycle (default provisional)."
-              },
-              "aliases": {
-                "type": "string",
-                "description": "Comma-separated aliases."
-              },
               "topic-id": {
                 "type": "string",
                 "description": "Topic id."
               },
-              "doc-path": {
-                "type": "string",
-                "description": "Doc path."
-              },
               "doc-id": {
                 "type": "string",
                 "description": "Doc id."
-              },
-              "source-captures": {
-                "type": "string",
-                "description": "Comma-separated source capture ids."
-              },
-              "new-path": {
-                "type": "string",
-                "description": "New path (move)."
-              },
-              "superseded-by": {
-                "type": "string",
-                "description": "Doc id that supersedes this one."
               }
             },
             "required": []

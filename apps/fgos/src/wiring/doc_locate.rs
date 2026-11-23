@@ -7,8 +7,8 @@
 use super::agents::PayloadRoot;
 use crate::routing::Call;
 use fgos_documentation::locate::locate;
-use fgos_documentation::pkm::{self, EmbedderChoice, LocatePaths, PkmLocator};
-use fgos_documentation::port::{Answer, LocateError, Query, WorkerLauncher};
+use fgos_documentation::pkm::{self, EmbedderChoice, LocatePaths, PkmLocator, ResetOutcome};
+use fgos_documentation::port::{Answer, IndexKind, LocateError, Query, WorkerLauncher};
 use fgos_documentation::profile;
 use fgos_host_runtime::cli_args::{parse_args_repeating, FlagScalar, FlagValue, ParsedArgs};
 use fgos_host_runtime::{
@@ -35,8 +35,9 @@ pub const INDEX_OPERATION_ID: &str = "doc.index";
 
 /// The sub-verbs of `fgos doc` the host serves; the lifecycle sub-verbs (`reserve`, `register`, ...) stay in the payload.
 pub const SUBCOMMANDS: &[&str] = &["index", "locate"];
-/// The words `fgos doc index` takes. `run` is the detached worker's entry.
-pub const INDEX_SUBCOMMANDS: &[&str] = &["run"];
+/// The words `fgos doc index` takes. `run` is the detached worker's entry; `status`, `stop` and `reset` are how a
+/// person sees and repairs the index.
+pub const INDEX_SUBCOMMANDS: &[&str] = &["reset", "run", "status", "stop"];
 
 /// The record kind of one locate call.
 pub const LOCATE_KIND: &str = "fgos.doc.locate";
@@ -47,6 +48,9 @@ const DETAIL_REDACTION_REV: &str = "doc-locate-draft-digests.v1";
 
 /// How long a started worker gets to take the index lock before the locator opens anyway.
 const WORKER_LOCK_WAIT: Duration = Duration::from_secs(5);
+
+/// How long `doc index stop` and `doc index reset` wait for the worker to release the index lock.
+pub const WORKER_STOP_WAIT: Duration = Duration::from_secs(10);
 
 const fn descriptor(
     id: &'static str,
@@ -87,15 +91,32 @@ pub struct DocRequest {
 
 #[derive(Debug, Clone)]
 pub enum DocVerb {
-    Locate { query: Query, json: bool },
+    Locate {
+        query: Query,
+        json: bool,
+    },
     IndexRun,
+    /// `wait`: seconds to wait for the index to be ready or broken before answering.
+    IndexStatus {
+        wait: Option<u64>,
+        json: bool,
+    },
+    IndexStop {
+        json: bool,
+    },
+    IndexReset {
+        json: bool,
+    },
 }
 
 impl DocRequest {
     pub fn operation_id(&self) -> &'static str {
         match self.verb {
             DocVerb::Locate { .. } => LOCATE_OPERATION_ID,
-            DocVerb::IndexRun => INDEX_OPERATION_ID,
+            DocVerb::IndexRun
+            | DocVerb::IndexStatus { .. }
+            | DocVerb::IndexStop { .. }
+            | DocVerb::IndexReset { .. } => INDEX_OPERATION_ID,
         }
     }
 }
@@ -150,6 +171,26 @@ pub fn project_request(args: &[OsString], root: PathBuf) -> Result<DocRequest, C
         }
         Some("index") => match call.parsed().positional.get(1).map(String::as_str) {
             Some("run") => DocVerb::IndexRun,
+            Some("status") => DocVerb::IndexStatus {
+                wait: call
+                    .value("wait")
+                    .map_err(validation)?
+                    .map(|w| {
+                        w.parse::<u64>().map_err(|_| {
+                            validation(format!(
+                                "doc index status --wait takes whole seconds (got \"{w}\")"
+                            ))
+                        })
+                    })
+                    .transpose()?,
+                json: call.switch("json").map_err(validation)?,
+            },
+            Some("stop") => DocVerb::IndexStop {
+                json: call.switch("json").map_err(validation)?,
+            },
+            Some("reset") => DocVerb::IndexReset {
+                json: call.switch("json").map_err(validation)?,
+            },
             other => {
                 return Err(validation(format!(
                     "doc index needs one of: {}{}",
@@ -269,14 +310,7 @@ fn answer_locate(root: &Path, query: &Query) -> Result<Answer, CategorisedRefusa
 fn human(answer: &Answer) -> String {
     let mut out = String::new();
     if answer.partial {
-        let _ = writeln!(
-            out,
-            "partial: index {}",
-            serde_json::to_value(answer.state)
-                .ok()
-                .and_then(|v| v.as_str().map(str::to_owned))
-                .unwrap_or_default()
-        );
+        let _ = writeln!(out, "partial: index {}", kind_name(answer.state));
         if let Some(action) = &answer.action {
             let _ = writeln!(out, "  {action}");
         }
@@ -332,10 +366,7 @@ fn locate_record(query: &Query, answer: &Answer, took: Duration) -> Record {
         cut -= 1;
     }
     detail.truncate(cut);
-    let state = serde_json::to_value(answer.state)
-        .ok()
-        .and_then(|v| v.as_str().map(str::to_owned))
-        .unwrap_or_default();
+    let state = kind_name(answer.state);
     let mut attrs = BTreeMap::new();
     attrs.insert(
         "fgos.doc.locate.partial".to_owned(),
@@ -424,7 +455,83 @@ fn answer(
                 text: Some(String::new()),
             })
         }
+        DocVerb::IndexStatus { wait, json } => {
+            let status =
+                pkm::index_status(&locate_paths(&request.root), wait.map(Duration::from_secs));
+            let text = format!(
+                "index {}{}: {} of {} chunks embedded, {} pending, {} failed{}\n  {}\n",
+                kind_name(status.state),
+                if status.worker_running {
+                    ", worker running"
+                } else {
+                    ""
+                },
+                status.indexed,
+                status.total,
+                status.pending,
+                status.failed,
+                status
+                    .eta_s
+                    .map(|s| format!(", about {s} s left"))
+                    .unwrap_or_default(),
+                status.action
+            );
+            completed(&status, *json, text)
+        }
+        DocVerb::IndexStop { json } => {
+            let stopped = pkm::stop_worker(&locate_paths(&request.root), WORKER_STOP_WAIT)
+                .map_err(|e| CategorisedRefusal::new("precondition", e))?;
+            let text = if stopped {
+                "the index worker stopped\n"
+            } else {
+                "no index worker was running\n"
+            };
+            completed(
+                &serde_json::json!({ "stopped": stopped }),
+                *json,
+                text.to_owned(),
+            )
+        }
+        DocVerb::IndexReset { json } => {
+            let outcome = pkm::reset_index(&locate_paths(&request.root), WORKER_STOP_WAIT)
+                .map_err(CategorisedRefusal::unexpected)?;
+            let text = match outcome {
+                ResetOutcome::Reset { notes } => format!(
+                    "the index worker's crash history is cleared; {notes} documents are queued again\n"
+                ),
+                ResetOutcome::NoIndex => "no search index exists yet\n".to_owned(),
+                ResetOutcome::Busy => {
+                    return Err(CategorisedRefusal::new(
+                        "precondition",
+                        "an index worker is running; run `fgos doc index stop` first [busy]",
+                    ))
+                }
+            };
+            completed(&outcome, *json, text)
+        }
     }
+}
+
+/// A completed answer: the data in the envelope, and `text` unless the call asked for JSON.
+fn completed(
+    data: &impl serde::Serialize,
+    json: bool,
+    text: String,
+) -> Result<VerbAnswer, CategorisedRefusal> {
+    Ok(VerbAnswer {
+        data: serde_json::to_value(data)
+            .map_err(|e| CategorisedRefusal::unexpected(e.to_string()))?,
+        exit: 0,
+        text: (!json).then_some(text),
+    })
+}
+
+/// The wire name of an index state (`model-missing`, ...).
+fn kind_name(kind: IndexKind) -> String {
+    serde_json::to_value(kind)
+        .ok()
+        .and_then(|v| v.as_str().map(str::to_owned))
+        .unwrap_or_default()
 }
 
 /// The provider of `doc.locate` and `doc.index`.
@@ -513,7 +620,7 @@ mod tests {
                 assert_eq!(query.question, vec!["choice"]);
                 assert!(*json);
             }
-            DocVerb::IndexRun => panic!("expected locate"),
+            other => panic!("expected locate, got {other:?}"),
         }
         assert_eq!(request.operation_id(), LOCATE_OPERATION_ID);
     }

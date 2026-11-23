@@ -450,7 +450,8 @@
         "dir",
         "json",
         "help",
-        "action"
+        "action",
+        "wait"
       ],
       "locate": [
         "dir",

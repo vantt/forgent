@@ -92,6 +92,18 @@ const DOC_LIFECYCLE_PROPERTIES = {
   'superseded-by': { type: 'string', description: "Doc id that supersedes this one." },
 };
 
+/** The flags each doc lifecycle sub-verb's handler reads, so `--help` offers no flag a sub-verb ignores. */
+const DOC_LIFECYCLE_FLAGS = {
+  reserve: ['role', 'framework', 'mode', 'topic-id', 'doc-path', 'doc-id'],
+  register: ['role', 'framework', 'mode', 'lifecycle', 'aliases', 'topic-id', 'doc-path', 'doc-id', 'source-captures'],
+  'mark-rendered': ['role', 'topic-id', 'doc-id'],
+  'move-path': ['role', 'topic-id', 'doc-id', 'new-path'],
+  promote: ['role', 'topic-id', 'doc-path'],
+  demote: ['role', 'topic-id', 'doc-id'],
+  supersede: ['role', 'topic-id', 'doc-id', 'superseded-by'],
+  retire: ['role', 'topic-id', 'doc-id'],
+};
+
 function withSubcommands(entry) {
   return {
     ...entry,
@@ -2554,20 +2566,26 @@ export const COMMAND_REGISTRY = [
         ],
       },
       index: {
-        description: 'The search index of the corpus. "run" is the index worker\'s entry: locate starts it detached; it indexes docs/ under .fgos/runtime/doc-locate/ and exits after a quiet spell.',
+        description: 'The search index of the corpus under .fgos/runtime/doc-locate/. "status" shows its state, the worker and how far embedding is; "stop" asks the worker to stop; "reset" clears the worker\'s crash history (refused while a worker runs); "run" is the worker\'s entry, which locate starts detached and which exits after a quiet spell.',
         parameters: {
           type: 'object',
           properties: {
-            action: { type: 'string', description: 'Positional: run.', enum: ['run'] },
+            action: { type: 'string', description: 'Positional: status, stop, reset or run.', enum: ['status', 'stop', 'reset', 'run'] },
+            wait: { type: 'integer', minimum: 0, description: 'status only: seconds to wait for the index to be ready or broken before answering.' },
+            json: { type: 'boolean', description: 'Answer as the fgos.v1 envelope.' },
           },
           positional: ['action'],
           required: ['action'],
         },
-        examples: ['fgos doc index run'],
+        examples: ['fgos doc index status', 'fgos doc index status --wait 60 --json', 'fgos doc index stop', 'fgos doc index reset', 'fgos doc index run'],
       },
-      ...Object.fromEntries(['reserve', 'register', 'mark-rendered', 'move-path', 'promote', 'demote', 'supersede', 'retire'].map((sub) => [sub, {
+      ...Object.fromEntries(Object.entries(DOC_LIFECYCLE_FLAGS).map(([sub, names]) => [sub, {
         description: `Doc lifecycle: ${sub}.`,
-        parameters: { type: 'object', properties: DOC_LIFECYCLE_PROPERTIES, required: [] },
+        parameters: {
+          type: 'object',
+          properties: Object.fromEntries(names.map((name) => [name, DOC_LIFECYCLE_PROPERTIES[name]])),
+          required: [],
+        },
         examples: [`fgos doc ${sub} worktree-reclaim guide`],
       }])),
     },

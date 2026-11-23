@@ -44,6 +44,10 @@ footprint:
   - core/config-schema/docLocate.schema.yaml
   - package.json
   - test/architecture.test.mjs
+  - test/cli/subcommand-flag-drift.test.mjs
+  - test/setup/registrations.test.mjs
+  - packages/config/rust/src/bundle.rs
+  - packages/config/contracts/fixtures/repo-differences.v1.json
   - test/rust-host/release-tree.test.mjs
   - docs/platform/documentation/spec.md
   - docs/platform/documentation/subcomponents/document-identity/spec.md
