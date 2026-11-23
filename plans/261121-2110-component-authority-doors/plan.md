@@ -11,7 +11,6 @@ blockedBy:
   - 261120-0625-work-data-model
   - 261121-1309-git-windows-custody
   - 261121-1456-windows-ci-packaging-reds
-base: df345c11ac158b763278db8b328c1c2ad6bb8e64
 footprint:
   - plans/261121-2110-component-authority-doors/**
   - packages/component-authority/**

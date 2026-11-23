@@ -263,6 +263,13 @@ overlap. The plan turns `ready` once all three are done; reordering them is a pr
 
 ## Owner questions
 
+**Owner order 2026-11-23 08:23 (via the secretary, recorded by head:supervisor-forgent):** component-authority-doors
+has priority. This plan may start alongside it only if their files and footprints do not collide; when a lead slot, account
+or other resource is short it yields until doors is done, then resumes. At 08:23 both conditions held it back: both
+footprints name `packages/host-runtime/contracts/command-manifest.json`, `command-routes.json` and
+`command-route-annotations.json`, and all four lead slots were live (`maxLeads` 4). It stays `draft` and is admitted when
+doors is done or the collision and the slot shortage both clear.
+
 **Paused for doors (owner 2026-11-23 08:15, recorded by lead:SUPERVISOR):** the owner ordered component-authority-doors
 to run before this plan. Both write the shared CLI routing files (`apps/fgos/src/routing.rs`, `cli_projector.rs`,
 `wiring/mod.rs`, `apps/fgos-gateway/src/gateway.rs`, `command-manifest.json`, `command-routes.json`). Its lead was
