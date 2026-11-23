@@ -31,6 +31,28 @@ every phase that reads or writes it. The rows stay the same; only the file forma
 - The generated views (`scripts/component-authority-render.mjs:283-291`) print rows, not model file names, so
   regenerating them leaves no diff when the rows are unchanged.
 
+## Prior art reused, and what was missing
+Owner reminder (2026-11-23, relayed by lead:SUPERVISOR): reuse the shared YAML loader and write no parser.
+- **Rust:** crate `fgos-yaml-doc` (`packages/yaml-doc/rust`). Its `document::parse` and `Document::to_json` read the
+  model, and its `edit` writes it, the latter used in phase 5. The crate is already a dependency of `apps/fgos`,
+  `packages/config/rust`, `packages/execution/rust`, `packages/host-runtime/rust` and the addon. Its authority is
+  `docs/platform/yaml-document/spec.md`.
+- **Node:** `parseYaml` in `src/util/yaml.mjs`, the native door through the addon (RUL108,
+  `docs/platform/packaging-distribution/spec.md:258`). It parses with the `tool` profile and has no JavaScript
+  fallback. `package.json#dependencies` stays empty, so there is no npm `yaml` dependency.
+- **Scripts read from a checkout** the way `scripts/plan-contract-check.mjs` and `scripts/project-agents.mjs` do:
+  they stage the addon first with `ensureAddonForScript` (`scripts/lib/git-addon-stage.mjs:187`).
+- **Guard:** door row `doors/yaml-parser-loads` already makes `npm test` red on any YAML library import or pasted
+  parser outside `packages/yaml-doc/rust/src/backend.rs`.
+- **Missing:** nothing. This phase adds no loader, no helper and no parser option.
+
+## Authority map
+| New thing | Model row | Note |
+|---|---|---|
+| Rust model loader reads YAML | component `yaml-document` (door row `yaml-parser-loads`) | reuse `fgos-yaml-doc`; no parser |
+| Node model readers read YAML | component `yaml-document` (door row `yaml-parser-loads`), Node door `parseYaml` | reuse; RUL108 |
+| Model files become `.yaml` | component `component-authority` (its own model) | same rows; the JSON files are deleted in the same commit (CA-D2, L10) |
+
 ## Files it may write
 packages/component-authority/model/, packages/component-authority/contracts/model.v1.json, packages/component-authority/rust/, Cargo.lock, scripts/component-authority-render.mjs, test/architecture.test.mjs, test/component-authority/, src/report/decision-index.mjs, test/report/decision-index.test.mjs, src/setup/instruction-registry.mjs, test/setup/instruction-registry.test.mjs, docs/platform/component-authority/spec.md, docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
 
@@ -59,7 +81,8 @@ packages/component-authority/model/, packages/component-authority/contracts/mode
    fixtures, and one test proves that a comment in a model file is ignored.
 3. **Node readers.** Each reader below parses through `parseYaml` (no new helper, no `yaml` npm dependency) and
    reads `*.yaml`: the render script, `loadModel` in `test/architecture.test.mjs`, the three
-   `test/component-authority/` tests, `decision-index.mjs`, and `instruction-registry.mjs`. Their fixtures
+   `test/component-authority/` tests, `decision-index.mjs`, and `instruction-registry.mjs`. The render script
+   calls `ensureAddonForScript` before its first read, as `scripts/plan-contract-check.mjs` does. Their fixtures
    write YAML literal text. The door-file filters change from `.json` to `.yaml`.
 4. **Schema and prose.** In `model.v1.json`, only the `description` changes to name the `.yaml` files. Update the
    `.json` model file names in `docs/platform/component-authority/spec.md` and in `setup-doctor-registry.md:164`.

@@ -190,7 +190,9 @@ admission model (independent reviewer within the owner's approved frame, owner a
 plan validation until H2 admission exists; the Git one-door scan's primitive matching
 (`scripts/git-one-door-scan.mjs`); vectors-replay as the cut-over safety net (488d3ab28, 046ee5547). Missing: a
 lookup door, a write door for the model, a plan-time mapping rule, counting inside allowed files, and alias
-matching.
+matching. The YAML model (phase 1b) reuses the shared YAML loader and writes no parser: `fgos-yaml-doc`
+(`packages/yaml-doc/rust`) in Rust, and `parseYaml` in `src/util/yaml.mjs` (the native door through the addon,
+RUL108) in Node. Scripts stage the addon with `ensureAddonForScript`. No npm `yaml` dependency is added.
 
 ## Authority map
 
@@ -198,7 +200,8 @@ matching.
 |---|---|---|
 | `fgos authority locate`, `fgos authority declare` | door rows `component-authority-locate`, `component-authority-declare`, owner `component-authority` | the only lookup and the only write path into the model |
 | Authority-map rule in the plan contract | decision kind `component-authority` | extends the plan contract; the existing footprint "Door check" keeps its job and is renamed "Footprint check" so the two are not confused |
-| Retired twins and copies | each row in `doors/<slug>.json` | survivor: the row's allowed door; retired: the debt file, last SHA in the commit |
+| Model read and written as YAML (phase 1b) | component `yaml-document`, door row `yaml-parser-loads` | reuse `fgos-yaml-doc` (Rust) and `parseYaml` (Node); no parser, no npm `yaml` |
+| Retired twins and copies | each row in `doors/<slug>.yaml` | survivor: the row's allowed door; retired: the debt file, last SHA in the commit |
 
 ## Acceptance criteria
 
