@@ -1,4 +1,4 @@
-# Lead report: phase 1 review passed, landing parked on a git recover
+# Lead report: phase 1 review passed and the branch is on main
 
 ## Outcome
 The review of `head-status-line-ak-layout` (tip `cee8e5470`) found no blocking issue, and all 15 tests of
@@ -39,3 +39,11 @@ Supervision event `6f42143bf10d80ac` is raised. A party that can settle the pend
 then `fgos land head-status-line-ak-land/p01` is rerun. After that, the backlog row p-7nmpo2zr3d is marked done and
 the owner is told. A writer-tied abandoned land that a fresh land ticket can never recover may itself need a
 platform item.
+
+## Update: landed
+A fourth attempt, made right after the lead's own paths land `d2f0cbe66` succeeded, landed the branch as `c447154e1`
+on main (pushed). The diff matches the reviewed branch, and the door updated the mutation census. The worktree was
+removed by the land. The `land-abandoned-writer-mismatch` refusal was therefore transient, not permanent. Event
+`6f42143bf10d80ac` can be closed. Left for the supervisor (outside the lead footprint): mark backlog row
+p-7nmpo2zr3d done, tell the owner, and decide whether the five non-blocking findings above become one follow-up item.
+Pending op `land-2284648-1795396711999066914-1` may still show in `fgos git status`.

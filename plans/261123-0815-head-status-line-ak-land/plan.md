@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Review and land the head status line branch (ak layout and colors)"
-status: running
+status: done
 lead: head:lead-forgent-261123-0815-head-s-1ae27
 base: d2016073d96eef451ef2528623e37893d9c9960b
 priority: P1
@@ -35,7 +35,7 @@ No new status-line fields beyond the branch, no sidecar contract change, no chan
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | Review the branch against the acceptance criteria (read-only review unit), fix findings, land on main | - | apps/fgos/src/wiring/session_rotation_hook.rs, plans/reports/implementation-261123-0720-head-status-line-ak-layout.md | 1 | parked: review clean and tests green, but land refused land-abandoned-writer-mismatch on pending op land-2284648-1795396711999066914-1; needs fgos git recover by its writer (event 6f42143bf10d80ac, reports/lead-261123-0822-head-status-line-ak-land.md) |
+| 1 | Review the branch against the acceptance criteria (read-only review unit), fix findings, land on main | - | apps/fgos/src/wiring/session_rotation_hook.rs, plans/reports/implementation-261123-0720-head-status-line-ak-layout.md | 1 | done: review clean, 15/15 hook tests green, landed on main as c447154e1 (reports/lead-261123-0822-head-status-line-ak-land.md) |
 
 ## Owner questions
 None. A review finding that would change the sidecar contract or the exactness of ctx/quota is escalated, not fixed.

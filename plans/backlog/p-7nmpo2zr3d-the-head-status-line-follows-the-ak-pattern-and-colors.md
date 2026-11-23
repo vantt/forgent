@@ -1,7 +1,7 @@
 ---
 id: p-7nmpo2zr3d
 title: "The head session status line follows the ak status line's layout and colors, and shortens or simplifies what it can (session host, priority P3; source: owner 2026-11-23)"
-status: proposed
+status: done
 priority: P3
 area: session-host
 created: 2026-11-23
