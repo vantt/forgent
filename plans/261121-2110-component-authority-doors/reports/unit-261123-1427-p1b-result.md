@@ -58,3 +58,48 @@ Concerns: Rust code was never compiled or formatted (cargo refused); `test/suite
 Status: DONE_WITH_CONCERNS
 Summary: `fgos authority model --json` is wired as a second subcommand of the authority operation, with a process-level proof; rustfmt drift in model_checks.rs fixed by hand.
 Concerns: nothing compiled or run; generated contracts hand-edited; deviated from the "new catalog row" instruction (single shared operation, so none needed); `invoke` string in the registry still shows only `locate`.
+
+## Step 4: render verb `fgos authority render [--check] [--preview-holder <path>]`
+
+- Port: `scripts/component-authority-render.mjs` became `packages/component-authority/rust/src/render.rs` (`compute_views`,
+  `check_views`, `write_views`, `build_holder_view_preview`, `render_block`, markers), exported as `fgos_component_authority::render`.
+  Same nine views, same cell escaping, sorting, door counting, holder portal/facts derivation, per-file single read and
+  per-view `changed` rule. The only text change in a view is the note: `rendered … by \`fgos authority render\`; edit the model, never this block`.
+  The preview report wording now names `fgos authority render --check`. The old `--stdout` switch of the preview was not carried over
+  (nothing asked for it); the preview is written to the given path, relative to the project.
+- Wiring: `render` is a third subcommand of the existing `authority.locate` operation (`wiring/authority.rs`: `Action::Render`,
+  flags `--check` via `switch`, `--preview-holder` via `value`; `--check` with `--preview-holder` is refused). `answer` now returns
+  `Result<Value, String>`; `--check` with drift is a failure (exit 1) listing each view and file; no drift answers `{"drift": []}`; a write answers
+  `{"written": [...], "skipped": [...]}`. No catalog row, routing, door or projector change was needed.
+- Registry and contracts: `invoke`, `description`, `render` sub-entry, examples and guide updated in `src/cli/command-registry.mjs`;
+  `command-manifest.json` and `command-routes.json` edited by hand to what the generator should emit (`render` flags
+  `dir, json, help, check, preview-holder`; `sub` enum `locate, model, render`). `subcommand-flag-drift.test.mjs`, `command-route-annotations.json`,
+  `catalog.rs` and `version.json` need no edit (the drift test reads the flags by `switch("check")` / `value("preview-holder")`; top-level verbs unchanged).
+- rustfmt: the `for key in [...]` line in `apps/fgos/tests/authority.rs` was wrapped by hand to default style; `render.rs` was hand-formatted, not machine-formatted.
+- Deleted: `scripts/component-authority-render.mjs` and `test/component-authority/render.test.mjs` (the directory is gone). Last SHA that had them: `b98c5d788` (HEAD of this branch before this step; git was refused here, so it is the HEAD at the start, not a `git log` lookup).
+
+| Retired render.test.mjs case | Owning Rust test |
+|---|---|
+| main --check exits 0 on the real repo | `apps/fgos/tests/authority.rs` `authority_render_check_finds_every_view_of_this_repository_in_sync_with_the_model` (fails until the views carry the new note) |
+| checkViews names a view whose block was hand-edited | `render::tests::a_hand_edited_generated_block_is_named_by_check` (also proves check writes nothing) |
+| checkViews names a required view when its markers are removed | `render::tests::a_required_view_whose_markers_are_removed_is_named_by_check` |
+| writeViews twice is byte-identical | `render::tests::writing_twice_is_byte_identical` |
+| area map lists cross-area components | `render::tests::the_area_map_lists_cross_area_components_under_cross_area` |
+| governance-holder-table is required | `render::tests::the_governance_holder_table_is_a_required_view_and_missing_markers_fail_check` |
+| governance holder row uses readFirst/facts overrides | `render::tests::a_holder_row_uses_the_read_first_and_facts_overrides_when_set` |
+| loadModel reads components, kinds, contracts, doors | `render::tests::the_model_loads_components_decision_kinds_contracts_and_door_files_for_rendering` (loader itself is owned by `model.rs` tests) |
+| architecture-map-components lists rows with owns columns | `render::tests::the_architecture_map_components_view_lists_component_rows_with_owns_columns` |
+| architecture-map-contracts prints id/boundary/… /path | `render::tests::the_architecture_map_contracts_view_prints_id_boundary_contract_provider_consumers_status_and_path` |
+
+Added (new behaviour of the port): `every_view_carries_the_render_verb_note`, `text_outside_the_markers_is_never_touched`,
+`a_holder_row_without_overrides_derives_its_portal_and_facts`, `the_holder_preview_reports_each_scope_against_the_hand_written_table`, and the parser cases
+`render_projects_a_write_a_check_and_a_holder_preview` / `render_refuses_a_bare_preview_flag_a_combination_an_argument_and_an_unknown_option`.
+
+Not run (refused or not attempted): `cargo` (build, test, fmt, clippy), `node` (`scripts/export-command-selectors.mjs`, flag-drift test), `git`.
+Lead should run: `cargo fmt --all`, `cargo test -p fgos-component-authority`, `cargo test -p fgos` (unit + `--test authority`),
+`node scripts/export-command-selectors.mjs` (expect no diff from the hand edit), `node --test test/cli/subcommand-flag-drift.test.mjs`, then
+`npm run fgos:dev -- authority render` (views change only in the note line; any other diff is a port bug) and `--check`.
+
+Status: DONE_WITH_CONCERNS
+Summary: `fgos authority render` (write, `--check`, `--preview-holder`) is ported into the crate as `render.rs` with every render test moved to Rust; the `.mjs` renderer and its test are deleted.
+Concerns: nothing compiled or run, so `render.rs` may need compile/rustfmt fixes and byte parity is unproven until the lead regenerates; the shared operation `authority.locate` is catalogued `OperationEffect::Read` although `render` writes docs (catalog.rs is in scope but a new operation id would need a new row, a descriptor and projector wiring, so I left it as one operation, which is a decision for the lead); the real-repo `render --check` test fails until the views are regenerated; the mutation census and doc prose that name the deleted script are outside my scope.

@@ -93,6 +93,13 @@
         "dir",
         "json",
         "help"
+      ],
+      "render": [
+        "dir",
+        "json",
+        "help",
+        "check",
+        "preview-holder"
       ]
     },
     "store": "none"

@@ -78,7 +78,13 @@ fn a_vietnamese_and_an_english_description_of_atomic_writes_both_rank_durable_fi
 #[test]
 fn authority_model_prints_the_loaded_model_with_door_slugs_and_writes_nothing() {
     let data = authority_data(&["model"]);
-    for key in ["layers", "components", "decisionKinds", "doors", "contracts"] {
+    for key in [
+        "layers",
+        "components",
+        "decisionKinds",
+        "doors",
+        "contracts",
+    ] {
         assert!(!data[key].is_null(), "missing {key}: {data}");
     }
     let slugs: Vec<&str> = data["doors"]
@@ -88,4 +94,30 @@ fn authority_model_prints_the_loaded_model_with_door_slugs_and_writes_nothing() 
         .filter_map(|door| door["slug"].as_str())
         .collect();
     assert!(slugs.contains(&"yaml-parser-loads"), "{slugs:?}");
+}
+
+#[test]
+fn authority_render_check_finds_every_view_of_this_repository_in_sync_with_the_model() {
+    let root = repo_root();
+    let output = Command::new(env!("CARGO_BIN_EXE_fgos"))
+        .args(["authority", "render", "--check", "--json", "--dir"])
+        .arg(&root)
+        .env_remove("FGOS_CONFINED")
+        .env_remove("FGOS_HEAD_REQUEST_SOCKET")
+        .current_dir(&root)
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "authority render --check: {}{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let envelope: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(envelope["contract"], "fgos.v1", "{envelope}");
+    assert_eq!(
+        envelope["data"]["drift"],
+        serde_json::json!([]),
+        "{envelope}"
+    );
 }

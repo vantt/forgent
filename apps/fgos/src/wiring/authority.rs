@@ -1,10 +1,15 @@
-//! `fgos authority locate "<sentence>" [--limit N]` and `fgos authority model`: the components, decision kinds,
-//! contracts and doors of the component authority model that match a description of the work, and the whole loaded
-//! model. The model and the ranking are `fgos_component_authority`; this module projects the call, loads the model
-//! of the project the call is aimed at and answers read-only.
+//! `fgos authority locate "<sentence>" [--limit N]`, `fgos authority model` and
+//! `fgos authority render [--check] [--preview-holder <path>]`: the components, decision kinds, contracts and doors
+//! of the component authority model that match a description of the work, the whole loaded model, and the
+//! generated ownership views of the platform docs. The model, the ranking and the renderer are
+//! `fgos_component_authority`; this module projects the call and loads the model of the project the call is aimed
+//! at. `locate` and `model` answer read-only; `render` writes the views unless `--check` asks only for drift.
 
 use crate::routing::Call;
-use fgos_component_authority::{locate, Model, ModelError};
+use fgos_component_authority::render::{
+    build_holder_view_preview, check_views, write_views, ViewRef,
+};
+use fgos_component_authority::{locate, Model};
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome, OperationId,
     OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
@@ -20,7 +25,7 @@ use std::pin::Pin;
 pub const OPERATION_ID: &str = "authority.locate";
 
 /// The sub-commands `fgos authority` serves.
-pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["locate", "model"];
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["locate", "model", "render"];
 
 /// How many matches an answer carries when `--limit` is not given.
 const DEFAULT_LIMIT: usize = 10;
@@ -44,8 +49,16 @@ pub const DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
 /// What an `authority` call asks of the model.
 #[derive(Debug, Clone)]
 pub enum Action {
-    Locate { sentence: String, limit: usize },
+    Locate {
+        sentence: String,
+        limit: usize,
+    },
     Model,
+    /// `check` reports drift and writes nothing; `preview_holder` writes only the preview report at that path.
+    Render {
+        check: bool,
+        preview_holder: Option<String>,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -54,18 +67,23 @@ pub struct AuthorityRequest {
     pub action: Action,
 }
 
-/// Projects `fgos authority locate "<sentence>" [--limit N]` and `fgos authority model`.
+/// Projects `fgos authority locate "<sentence>" [--limit N]`, `fgos authority model` and
+/// `fgos authority render [--check] [--preview-holder <path>]`.
 pub fn project_authority_request(
     args: &[OsString],
     root: Result<PathBuf, String>,
 ) -> Result<AuthorityRequest, String> {
     let call = Call::new(args);
     let sub = match call.sub_word() {
-        Some(sub @ ("locate" | "model")) => sub,
+        Some(sub @ ("locate" | "model" | "render")) => sub,
         Some(other) => return Err(format!("unknown authority subcommand '{other}'")),
         None => return Err("authority requires a subcommand".to_owned()),
     };
-    let allowed: &[&str] = if sub == "locate" { &["limit"] } else { &[] };
+    let allowed: &[&str] = match sub {
+        "locate" => &["limit"],
+        "render" => &["check", "preview-holder"],
+        _ => &[],
+    };
     if let Some(flag) = call.flag_outside(allowed) {
         return Err(format!("unknown authority option '--{flag}'"));
     }
@@ -76,6 +94,23 @@ pub fn project_authority_request(
         return Ok(AuthorityRequest {
             root: root?,
             action: Action::Model,
+        });
+    }
+    if sub == "render" {
+        if !call.arguments().is_empty() {
+            return Err("authority render takes no arguments".to_owned());
+        }
+        let check = call.switch("check")?;
+        let preview_holder = call.value("preview-holder")?;
+        if check && preview_holder.is_some() {
+            return Err("--check and --preview-holder cannot be combined".to_owned());
+        }
+        return Ok(AuthorityRequest {
+            root: root?,
+            action: Action::Render {
+                check,
+                preview_holder,
+            },
         });
     }
     let limit = match call.value("limit")? {
@@ -101,11 +136,20 @@ pub fn project_authority_request(
 
 /// The answer for one request. `locate`: the sentence, how many rows matched, and the best `limit` of them.
 /// `model`: the loaded, validated model itself (layers, components, decision kinds, doors, contracts).
-pub fn answer(request: &AuthorityRequest) -> Result<serde_json::Value, ModelError> {
-    let model = Model::load(&request.root)?;
+/// `render`: the views it wrote, or with `--check` the drift it found (a non-empty drift is a failure);
+/// with `--preview-holder` the path of the preview report it wrote.
+pub fn answer(request: &AuthorityRequest) -> Result<serde_json::Value, String> {
     match &request.action {
-        Action::Model => Ok(json!(model)),
+        Action::Render {
+            check,
+            preview_holder,
+        } => render(&request.root, *check, preview_holder.as_deref()),
+        Action::Model => {
+            let model = Model::load(&request.root).map_err(|error| error.to_string())?;
+            Ok(json!(model))
+        }
         Action::Locate { sentence, limit } => {
+            let model = Model::load(&request.root).map_err(|error| error.to_string())?;
             let found = locate(&model, sentence);
             let total = found.len();
             let matches: Vec<_> = found.into_iter().take(*limit).collect();
@@ -116,6 +160,49 @@ pub fn answer(request: &AuthorityRequest) -> Result<serde_json::Value, ModelErro
             }))
         }
     }
+}
+
+fn view_refs(views: &[ViewRef]) -> Vec<serde_json::Value> {
+    views
+        .iter()
+        .map(|entry| json!({ "view": entry.view, "file": entry.file }))
+        .collect()
+}
+
+fn render(
+    root: &std::path::Path,
+    check: bool,
+    preview_holder: Option<&str>,
+) -> Result<serde_json::Value, String> {
+    if let Some(target) = preview_holder {
+        let content = build_holder_view_preview(root).map_err(|error| error.to_string())?;
+        let path = root.join(target);
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent)
+                .map_err(|error| format!("{}: {error}", parent.display()))?;
+        }
+        std::fs::write(&path, content).map_err(|error| format!("{}: {error}", path.display()))?;
+        return Ok(json!({ "preview": target }));
+    }
+    if check {
+        let drift = check_views(root).map_err(|error| error.to_string())?;
+        if drift.is_empty() {
+            return Ok(json!({ "drift": [] }));
+        }
+        let lines: Vec<String> = drift
+            .iter()
+            .map(|entry| format!("view \"{}\" in {}: {}", entry.view, entry.file, entry.reason))
+            .collect();
+        return Err(format!(
+            "{}\nregenerate with `fgos authority render`.",
+            lines.join("\n")
+        ));
+    }
+    let report = write_views(root).map_err(|error| error.to_string())?;
+    Ok(json!({
+        "written": view_refs(&report.written),
+        "skipped": view_refs(&report.skipped),
+    }))
 }
 
 #[derive(Debug, Clone)]
@@ -211,5 +298,34 @@ mod tests {
         assert!(matches!(request.action, Action::Model));
         assert!(project(&["authority", "model", "extra"]).is_err());
         assert!(project(&["authority", "model", "--limit", "3"]).is_err());
+    }
+
+    #[test]
+    fn render_projects_a_write_a_check_and_a_holder_preview() {
+        let request = project(&["authority", "render"]).unwrap();
+        assert!(matches!(
+            request.action,
+            Action::Render {
+                check: false,
+                preview_holder: None
+            }
+        ));
+        let request = project(&["authority", "render", "--check"]).unwrap();
+        assert!(matches!(request.action, Action::Render { check: true, .. }));
+        let request =
+            project(&["authority", "render", "--preview-holder", "out/preview.md"]).unwrap();
+        let Action::Render { preview_holder, .. } = request.action else {
+            panic!("not a render");
+        };
+        assert_eq!(preview_holder.as_deref(), Some("out/preview.md"));
+    }
+
+    #[test]
+    fn render_refuses_a_bare_preview_flag_a_combination_an_argument_and_an_unknown_option() {
+        assert!(project(&["authority", "render", "--preview-holder"]).is_err());
+        assert!(project(&["authority", "render", "--check", "--preview-holder", "x"]).is_err());
+        assert!(project(&["authority", "render", "extra"]).is_err());
+        assert!(project(&["authority", "render", "--bogus"]).is_err());
+        assert!(project(&["authority", "locate", "x", "--check"]).is_err());
     }
 }
