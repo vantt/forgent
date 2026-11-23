@@ -35,6 +35,8 @@ debt:
     reason: searches PATH for the program of a descriptor-mapped spawn and polls its child
   - path: packages/process/rust/src/platform/windows_spawn.rs
     reason: keeps the PATH search for a name that already has an extension; the extension-less lookup is spawn.rs's resolve_program
+  - path: packages/run-supervisor/rust/src/attempt_step.rs
+    reason: finds node on PATH for the head request hand-over to the Node payload
   - path: packages/run-supervisor/rust/src/controller/launch.rs
     reason: polls the detached supervisor child it started (try_wait) until it publishes its binding or exits; the supervisor outlives the call, so it is not a bounded run
   - path: packages/run-supervisor/rust/src/gate/windows.rs

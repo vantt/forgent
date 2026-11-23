@@ -23,3 +23,6 @@ Concerns/Blockers: uncompiled; unix executable-bit check is new for git and node
 
 ## Fix round 1
 Lead review: the hand-split PATH lookup in driver.rs hid the door pattern instead of retiring it, and `resolve_program` has no absolute-entries-only mode. Reverted only the git lookup block in `GitDriver::build` to the previous `std::env::split_paths` code (absolute entries, `git`/`git.exe`, `is_file`, canonicalize). Kept the test kill change and the attempt_step.rs change. The driver.rs debt entry in `doors/run-bounded-child.yaml` again names both: finds git on PATH (absolute entries only) and bounds its own git children with a deadline loop of its own. Not compiled or tested (cargo not run).
+
+## Fix round 2
+The node move is dropped. The land door's git one-door census scan cannot follow the return of `fgos_process::spawn::resolve_program`, so it could not resolve the program at `Command::new(node_program())` in attempt_step.rs and reported two unresolved-binary sites. `attempt_step.rs` is restored to its content at b76553b29, and its debt entry (finds node on PATH for the head request hand-over to the Node payload) is back in `doors/run-bounded-child.yaml` in its original position. The move waits for the scan to learn that door. Kept: the driver.rs test kill, the process-control-signal.yaml change, the driver.rs reason. Not compiled or tested.
