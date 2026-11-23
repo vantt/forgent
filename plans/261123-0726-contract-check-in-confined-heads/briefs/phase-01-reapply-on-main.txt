@@ -1,0 +1,7 @@
+Re-apply phase 1 (plans/261123-0726-contract-check-in-confined-heads/phase-01-one-reuse-or-build-door.md) on this worktree, which starts at main. The phase was built and reviewed on branch contract-check-in-confined-heads/p01 (tip bb720938a), but it cannot land because main commit 7c1ae9c09 later changed scripts/lib/git-addon-stage.mjs. You may write ONLY scripts/lib/git-addon-stage.mjs, scripts/git-addon.mjs, test/distribution/native-addon.test.mjs.
+
+1. Read the reviewed change with `git diff 854dc523d bb720938a -- scripts/lib/git-addon-stage.mjs scripts/git-addon.mjs test/distribution/native-addon.test.mjs` (854dc523d is the branch's merge base with main).
+2. Apply that change to the three files here. Keep main's additions: the `import { ensureOrtStatic } from '../ort-static.mjs';` line and the `...ensureOrtStatic(cwd)` spread in the cargo env of every cargo build the file still has. Change nothing beyond the reviewed diff plus main's additions.
+3. Do not run git add or git commit; the runner commits.
+
+Verify: node scripts/run-tests.mjs test/distribution/native-addon.test.mjs test/architecture.test.mjs. If the cargo build directory or the staged addon directory is read-only in your sandbox, run node --test on both files with FGOS_HOST_BIN, FGOS_ACTIVE_RELEASE_PATH and FGOS_ACTIVE_MANIFEST_PATH pointing at a staged addon, and say which way you ran. Also run node scripts/plan-contract-check.mjs --plan plans/261123-0726-contract-check-in-confined-heads (expect exit 0). Report the results.

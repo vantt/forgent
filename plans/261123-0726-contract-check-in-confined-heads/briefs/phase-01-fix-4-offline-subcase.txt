@@ -1,0 +1,7 @@
+Fix on phase 1 (plans/261123-0726-contract-check-in-confined-heads/phase-01-one-reuse-or-build-door.md) on this worktree's branch. You may write ONLY test/distribution/native-addon.test.mjs. Do not run git add or git commit; the runner commits.
+
+BLOCKING (review): sub-case 2a in the test "a script reuses a fresh staged addon without cargo and names a stale one it cannot rebuild" (no ort cache, unwritable target) makes scripts/ort-static.mjs `ensure` fetch the 120 MB archive from the network before it fails, because `ensure` downloads before its mkdir (scripts/ort-static.mjs:41-62). A test must not hit the network.
+
+Make sub-case 2a fail fast and offline: before the chmod of the target to 0555, create a DIRECTORY at the archive path `path.join(archiveDirectory(repo), 'libonnxruntime.a')`. Then `verified()` is false, `fs.existsSync(file)` is true and `sha256(file)` throws EISDIR, so the ort child exits non-zero without fetching. Keep 2a's assertions (named stale error, names the staged addon dir, cargo not reached on linux-x64). Before sub-case 2b seeds the real verified cache, remove that directory (with the target chmodded back to 0755 first). Keep 2b and every other assertion unchanged. Add a one-line comment saying why the directory is there (to fail the archive step without the network).
+
+Verify if your sandbox allows: node scripts/run-tests.mjs test/distribution/native-addon.test.mjs. If node is refused, say so plainly.
