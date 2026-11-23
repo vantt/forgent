@@ -26,6 +26,8 @@ jobs:
     timeout-minutes: 240
     env:
       GH_TOKEN: ${{ github.token }}
+      # gh runs from outside the checkout in the publish step, so it is told the repository.
+      GH_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
       - name: ONNX Runtime source
