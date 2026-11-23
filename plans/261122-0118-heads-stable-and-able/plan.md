@@ -123,15 +123,15 @@ the grants, verb by verb.
 |---|---|---|---|---|---|
 | 1 | [Baseline: wake rate and idle alarms](phase-01-baseline-wake-and-idle.md) | - | plans/261122-0118-heads-stable-and-able/reports/baseline-wake-and-idle.md | 1 | done |
 | 2 | [Head verbs through the request socket](phase-02-head-verbs.md) | - | src/session-host/head-grants.mjs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, test/session-host/head-start.test.mjs, apps/fgos/src/routing.rs, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/rust/tests/head_request.rs, docs/platform/session-host/spec.md | 1 | done |
-| 3 | [The land door runs the plan check](phase-03-land-plan-check.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, core/skills/_shared/plan-contract.md, .agents/skills/**, plugins/fgOS/skills/**, .fgos/config.yaml | 1 | done; step 3's land gate `node scripts/plan-contract-check.mjs {plans}` waits: restored only after `node scripts/plan-contract-check.mjs --plan plans/261123-0726-contract-check-in-confined-heads` exits 0 from this confined head. On 2026-11-23 10:59 it exited 1: the staged addon is stale, so the check runs `cargo build`, which cannot take the Cargo build lock in the read-only sandbox. The unconfined session refreshes it with `node scripts/git-addon.mjs` (asked by lead:SUPERVISOR). |
+| 3 | [The land door runs the plan check](phase-03-land-plan-check.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, core/skills/_shared/plan-contract.md, .agents/skills/**, plugins/fgOS/skills/**, .fgos/config.yaml | 1 | done |
 | 4 | [Coordinating heads keep their provider floor](phase-04-provider-floor.md) | 3 | .fgos/config.yaml, test/session-host/head-start.test.mjs | 2 | done |
 | 5 | [A live head's requests run the active release](phase-05-release-pickup.md) | 2, 6 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, docs/platform/run-supervisor/spec.md | 3 | done |
 | 6 | [A rotation whose executor died is resolved](phase-06-orphan-rotation.md) | 2 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/session-host/contracts/rotation-files.v1.json, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/**, docs/platform/session-host/spec.md | 2 | done |
 | 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs, packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs | 2 | done |
-| 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | parked: 24 h question-relay measure from Miu gen 30, ends 2026-11-23 21:06; lead then writes reports/question-relay.md |
-| 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | parked: 24 h measure after the 14:20 tune, ends 2026-11-23 14:20; lead then writes the after report |
-| 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | parked: same window as phase 8, ends 2026-11-23 21:06 |
-| 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md, test/session-host/head-start.test.mjs | 5 | parked: waits on phases 8, 9 and 10; runs after phase 10's report lands, after 21:06 on 2026-11-23 |
+| 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | running |
+| 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | running |
+| 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | running |
+| 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md, test/session-host/head-start.test.mjs | 5 | ready |
 | 12 | [Rotation reliability](phase-12-rotation-reliability.md) | 6 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, docs/platform/session-host/spec.md, apps/fgos/src/wiring/session_rotation_hook.rs | 4 | done |
 
 Each phase names its canonical dispatch capability in its file: `code:implement` for 2 to 7 and 10 and the probe script
@@ -152,6 +152,20 @@ writer, phase 11.
 - `q-dcbq73d2rr`: the owner activates the release carrying 12c (`8883c2a62`) on the host and removes the five finished
   worktrees (p02, p02g, p06, p06f, p12c); lead:SUPERVISOR then reruns the real soft rotation (phase 12 done-when item
   3). The supervisor neither activates a release nor removes a worktree.
+
+### Waits (2026-11-23 11:15, head:lead-forgent-261122-0118-heads-b52f9)
+
+The status column holds only the contract's vocabulary; the waits that sat there are recorded here.
+
+- **Phase 9** (`running`): its 24-hour measure after the 14:20 tune ends at 14:20 on 2026-11-23; the lead then writes
+  `reports/after-wake-and-idle.md`.
+- **Phases 8 and 10** (`running`): their measure window from Miu's gen 30 ends at 21:06 on 2026-11-23; the lead then
+  writes `reports/question-relay.md` and `reports/secretary-wake.md`.
+- **Phase 11** (`ready`): runs after phases 8, 9 and 10 have their reports, after 21:06 on 2026-11-23.
+- **Phase 3** (`done`): step 3's land gate `node scripts/plan-contract-check.mjs {plans}` is restored only after
+  `node scripts/plan-contract-check.mjs --plan plans/261123-0726-contract-check-in-confined-heads` exits 0 from this
+  confined head. At 11:15 the restaged addon (HEAD `a219a04ba`) loads and the check runs, but it exits 1 on that plan's
+  own phase 1, 2 and 3 statuses, which are free text instead of the contract's vocabulary. That plan's lead fixes them.
 
 ### Footprint drops the skill renders and the changelog (2026-11-23 07:45, owner order relayed by lead:SUPERVISOR)
 
