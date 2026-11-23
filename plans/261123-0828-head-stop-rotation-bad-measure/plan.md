@@ -107,6 +107,10 @@ fixed here. `cargo test --workspace` is still not reported. Reds by name and lik
 [phase 1 verify report](reports/lead-261123-2333-head-stop-rotation-bad-measure-verify.md). Phase 1 waits on a green
 `main` (both gates) and then closes from that tree.
 
+Supervisor, 2026-11-24 01:40 +07: `npm test` and `cargo test --workspace` (joined with `;`) are running unconfined
+on `main` `980d1276d`. The supervisor sends the result. The lead then re-reads it and closes phase 1 from that tree
+if both gates are green.
+
 With one phase there is no wave overlap. No integration phase is needed because there is nothing to merge: the
 phase's verify step is the full gate on `main`.
 
