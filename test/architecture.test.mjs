@@ -1959,6 +1959,14 @@ test('no crate the Node addon links, directly or through another crate, is the E
   assert.ok(!closure.has('packages/execution/engine'), `the addon reaches fgos-execution-engine through: ${[...closure].join(', ')}`);
 });
 
+test('neither the Node addon nor fgctl links the documentation crate, so pkm and ONNX Runtime stay out of both', () => {
+  for (const crate of ['packages/git/node-addon', 'apps/fgctl']) {
+    const closure = pathDependencyClosure(crate);
+    assert.ok(closure.size > 1, `the walk reaches the crates ${crate} links`);
+    assert.ok(!closure.has('packages/documentation/rust'), `${crate} reaches fgos-documentation through: ${[...closure].join(', ')}`);
+  }
+});
+
 test('every door row holds: patterns appear only in allowed or debt files, and no entry is stale', () => {
   const files = new Map(doorFiles().map((file) => [file, fs.readFileSync(path.join(root, file), 'utf8')]));
   assert.deepEqual(checkDoors(manifest.doors ?? [], files), []);

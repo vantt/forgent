@@ -45,6 +45,31 @@ The crate knows nothing of fgOS layout: the composition root hands it every path
   with no worker and no index asserts `partial: true`, zero candidates, state `starting`.
 - Spawn decision unit test with an in-memory `WorkerLauncher`.
 
+## As built (2026-11-23)
+
+- **Lock.** The only change to existing packages is rusqlite 0.43.0 → 0.41.1 (libsqlite3-sys 0.40.0 → 0.39.1); 140
+  packages are added. No exact workspace pin (`serde_json`, `libc`, `thiserror`) moved. The engine's omp SQLite
+  tests pass on 0.41.1.
+- **cargo-deny** (`.github/cargo-deny.toml`; outside the plan's footprint, but needed for CI's
+  `rust-workspace` job). Three changes:
+  - `allow-git` names vantt/pkm.
+  - The `unsafe-libyaml` ban stays, now with `wrappers = ["pkm-vault"]`. pkm's vault crate carries its own YAML
+    reader; any fgOS crate that pulls the parser in still fails the ban.
+  - Two unmaintained advisories (not vulnerabilities) are ignored with reasons: RUSTSEC-2024-0436 (`paste`, through
+    Hugging Face `tokenizers` under pkm-embed) and RUSTSEC-2024-0449 (`unsafe-libyaml`). Drop them when pkm's tag no
+    longer carries the crates.
+- **Titles.** pkm titles a document by its file name (`land-door`), not by its H1.
+- **Order for phase 3.** A session opened before the worker holds its lock can read the missing index as `broken`,
+  and `wait_ready` stops at that terminal state. Wiring must start the worker (the use case does) before it opens
+  the session. The test waits for the worker's lock for the same reason.
+- **Home of `platform`.** pkm has one home template per axis (`platform/{value}/`). The adapter maps the `platform`
+  value's home to `docs/`.
+- `eval` (gold paths stripped of `docs/` and results prefixed again) and `worker_running` (over `search::probe`)
+  exist in the adapter. Phase 6 drives `eval`; phase 3 builds the launcher on `worker_running`.
+- **Proof.** `cargo test -p fgos-documentation` (8 tests; the locate test is stable over 3 runs, about 9 s). Clippy
+  is clean. `cargo deny check advisories bans sources` is ok. `fgctl` and the addon trees hold 0 pkm or ort crates.
+  The architecture, ownership and census tests pass (98/98).
+
 ## Validation
 
 ```sh

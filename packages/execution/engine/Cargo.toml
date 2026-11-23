@@ -32,7 +32,7 @@ serde = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order"] }
 thiserror = { workspace = true }
 # The omp login store is a SQLite file; SQLite is compiled in, so no system library is needed at run time.
-rusqlite = { version = "0.43.0", default-features = false, features = ["bundled"] }
+rusqlite = { version = "0.41.1", default-features = false, features = ["bundled"] }
 
 [target.'cfg(unix)'.dependencies]
 libc = { workspace = true }

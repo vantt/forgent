@@ -1,0 +1,22 @@
+[package]
+name = "fgos-documentation"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Document identity: the locate port, its use case and the pkm adapter that answers it."
+
+[dependencies]
+# pkm is linked as a library behind the Locator port; `search` pulls its ONNX Runtime embedder. On Linux x64 the build
+# entry points name a static ONNX Runtime archive (scripts/ort-static.mjs), so the binary stays under the glibc ceiling.
+pkm-core = { git = "https://github.com/vantt/pkm", tag = "v0.7.0", features = ["search"] }
+pkm-lifecycle = { git = "https://github.com/vantt/pkm", tag = "v0.7.0", features = ["search"] }
+serde = { workspace = true }
+serde_json = { workspace = true, features = ["preserve_order"] }
+indexmap = "2"
+
+[dev-dependencies]
+# pkm's deterministic embedder, so the adapter test needs no 130 MB model; production always selects the real one.
+pkm-core = { git = "https://github.com/vantt/pkm", tag = "v0.7.0", features = ["search", "test-embedder"] }
+# The licence export the release copies are proven against; a dev-dependency, so the binary does not carry pkm-cli.
+pkm-cli = { git = "https://github.com/vantt/pkm", tag = "v0.7.0", default-features = false }
+tempfile = "3"
