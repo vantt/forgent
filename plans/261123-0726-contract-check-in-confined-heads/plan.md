@@ -105,8 +105,8 @@ report.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [One reuse-or-build door in the leaf](phase-01-one-reuse-or-build-door.md) | - | scripts/lib/git-addon-stage.mjs, scripts/git-addon.mjs, test/distribution/native-addon.test.mjs | 1 | ready |
-| 3 | [Backlog checks count a migrated item's Original id](phase-03-backlog-checks-count-original-ids.md) | - | scripts/check-backlog-reconciliation.mjs, scripts/identity-ids-unique.mjs, test/scripts/doc-health.test.mjs, docs/history/backlog-execution-reconciliation/RECONCILIATION.md | 1 | ready |
+| 1 | [One reuse-or-build door in the leaf](phase-01-one-reuse-or-build-door.md) | - | scripts/lib/git-addon-stage.mjs, scripts/git-addon.mjs, test/distribution/native-addon.test.mjs | 1 | parked: fix unit refused by runner binding mismatch, see reports/lead-261123-0802-wave1-parked-binding-mismatch.md |
+| 3 | [Backlog checks count a migrated item's Original id](phase-03-backlog-checks-count-original-ids.md) | - | scripts/check-backlog-reconciliation.mjs, scripts/identity-ids-unique.mjs, test/scripts/doc-health.test.mjs, docs/history/backlog-execution-reconciliation/RECONCILIATION.md | 1 | parked: fix unit refused by runner binding mismatch; step 5 waits on q-tvhmli3fns, see reports/lead-261123-0802-wave1-parked-binding-mismatch.md |
 | 2 | [Integration: confined proof and gate hand-off](phase-02-integration-and-gate-handoff.md) | 1, 3 | plans/261123-0726-contract-check-in-confined-heads/reports/ | 2 | draft |
 
 Execution: phases 1 and 3 are independent `code:implement` units, each in its own worktree, in wave 1. Phase 2 is a `code:test` unit plus a supervisor

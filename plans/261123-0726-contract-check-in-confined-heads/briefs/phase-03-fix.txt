@@ -1,0 +1,8 @@
+Fix review findings on phase 3 (plans/261123-0726-contract-check-in-confined-heads/phase-03-backlog-checks-count-original-ids.md) on this worktree's branch. You may write ONLY scripts/check-backlog-reconciliation.mjs, scripts/identity-ids-unique.mjs, test/scripts/doc-health.test.mjs. Make a new commit; do not amend. Keep the shared reader readBacklogItemIdentity in scripts/identity-ids-unique.mjs (packages/portfolio/item.mjs is outside this plan's footprint).
+
+1. The Original id regex in scripts/identity-ids-unique.mjs (/Original id:\s*([^\s.]+)/i) matches prose anywhere in a file body: plans/backlog/p-mtqil2rpyy-*.md contains the prose "count the line `Original id: X.`" and gets originalId "X". Match only a line of its own, case-sensitive, at line start: for example /^Original id:\s*(\S+?)\.?\s*$/m. Add a case to the existing new test proving a prose mention inside a sentence or backticks is not read as an Original id.
+2. Drop the meta.originalId / meta.original_id frontmatter keys; only the body line counts.
+3. Remove the backlog id p-mtqil2rpyy from the test comment (no plan or backlog ids in code comments); describe the behaviour instead.
+4. Report a double section: when one item has a section under its id and another section under its Original id, report it by name.
+
+Verify: node --test test/scripts/doc-health.test.mjs (or node scripts/run-tests.mjs test/scripts/doc-health.test.mjs), and node scripts/check-backlog-reconciliation.mjs no longer lists an item with Original id "X" and does not report tsk-p7-shadow-binders as an unknown id. Report results.

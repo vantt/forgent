@@ -1,0 +1,14 @@
+Fix review findings on phase 1 (plans/261123-0726-contract-check-in-confined-heads/phase-01-one-reuse-or-build-door.md) on this worktree's branch. You may write ONLY scripts/lib/git-addon-stage.mjs, scripts/git-addon.mjs, test/distribution/native-addon.test.mjs. Make a new commit; do not amend.
+
+BLOCKING 1: scripts/run-tests.mjs and scripts/test-select-mutate.mjs import ensureGitAddon from the leaf (scripts/lib/git-addon-stage.mjs) and must stay on the always-build path (phase step 4). You may not edit them. So in the leaf, the name ensureGitAddon must keep meaning always-build, exactly as on main. Give the reuse-or-build function a different exported name (for example ensureStagedOrBuiltGitAddon). ensureAddonForScript uses it. scripts/git-addon.mjs exports it under its own existing name (export { ensureStagedOrBuiltGitAddon as ensureGitAddon }) so its importers keep their behaviour. Remove buildGitAddon if it becomes redundant, and remove the unused alias exports reuseStagedAddon and buildAddon.
+
+BLOCKING 2: the new test in test/distribution/native-addon.test.mjs must not depend on the caller environment. Delete CARGO_TARGET_DIR (and related cargo env vars) from the probe child env, or point it at the read-only directory. In the stale case, the cargo stub must exit non-zero and write to stderr:
+error: failed to open: <the read-only dir>/debug/.cargo-build-lock
+
+Caused by:
+  Read-only file system (os error 30)
+so the test exercises cargo's real read-only error. Skip that case when running as root (chmod cannot block root).
+
+NON-BLOCKING, also do: narrow the unwritable detection. First match "os error 30", "os error 13", EROFS or EACCES in cargo's error output or the thrown error code; use the write probe only as confirmation. An unrecognised probe error must not count as unwritable, and do not match a bare "permission denied" anywhere in stderr. Include the staged addon directory path (gitAddonDirectory) in the named error message. Keep cargo build progress visible (stdout inherited; capture stderr only as needed to detect the error, or tee it), and avoid the execFileSync 1 MB maxBuffer limit on build output.
+
+Verify: node scripts/run-tests.mjs test/distribution/native-addon.test.mjs test/architecture.test.mjs (if the cargo build directory is read-only in your sandbox, set CARGO_TARGET_DIR to a scratch directory for that run), and rg -n GIT_ADDON_SOURCE_DIGEST_FILE scripts shows the read only in the leaf. Report results.
