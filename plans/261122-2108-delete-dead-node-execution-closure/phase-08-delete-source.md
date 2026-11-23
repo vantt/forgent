@@ -6,7 +6,7 @@ Capability: `code:implement`.
 
 - `plans/261122-2108-delete-dead-node-execution-closure/reports/closure.md`: the dead table and the live-kept table.
 - Phases 2 to 7 are merged. Their reports show that no test imports a dead file.
-- `docs/architecture-manifest.json` rows that name `p-24xw2cwdvo` (about 20 places), and `test/architecture.test.mjs`
+- `packages/component-authority/model/` rows that name `p-24xw2cwdvo` (about 20 places), and `test/architecture.test.mjs`
   (5 places).
 - `packages/holder-lock/contracts/lock-registry.v1.json` (its `note` fields name `src/runner/dispatch/*` and
   `src/run-supervisor/trust-store.mjs`) and `packages/run-supervisor/contracts/recover-actions.v1.json` (its
@@ -14,7 +14,7 @@ Capability: `code:implement`.
 
 ## Footprint
 
-`src/runner/dispatch/**`, `src/runner/execution/**`, `src/run-supervisor/**`, `docs/architecture-manifest.json`,
+`src/runner/dispatch/**`, `src/runner/execution/**`, `src/run-supervisor/**`, `packages/component-authority/model/`,
 `test/architecture.test.mjs`, `packages/git/contracts/mutation-census.v1.json`,
 `packages/holder-lock/contracts/lock-registry.v1.json`, `packages/run-supervisor/contracts/recover-actions.v1.json`,
 `scripts/check-decision-citation-drift.baseline.json` (only if it names a deleted file).

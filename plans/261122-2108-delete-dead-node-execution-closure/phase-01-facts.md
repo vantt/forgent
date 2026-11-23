@@ -6,8 +6,8 @@ Capability: `code:test` (an evidence read; changes no code).
 
 - `plan.md` of this plan, sections Decisions and Non-goals.
 - The landed tree of plan `261122-0118-heads-stable-and-able` (check that its `plan.md` says `status: done`).
-- `docs/architecture-manifest.json`: every row whose `retiredBy` or entry reason names `p-24xw2cwdvo`
-  (`git grep -n p-24xw2cwdvo -- docs/architecture-manifest.json test/architecture.test.mjs`).
+- `packages/component-authority/model/`: every row whose `retiredBy` or entry reason names `p-24xw2cwdvo`
+  (`git grep -n p-24xw2cwdvo -- packages/component-authority/model/ test/architecture.test.mjs`).
 - `plans/261118-1341-s6a-execution-tier-rust/reports/close.md` section 1 (the rows and their owners).
 - The `"recorded from src/runner/…"` and `"src/run-supervisor/…"` notes in `packages/execution/contracts/**` and
   `packages/run-supervisor/contracts/**`, which map a Node module to the corpus fixture its Rust test reads.

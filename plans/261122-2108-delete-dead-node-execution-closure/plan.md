@@ -106,7 +106,7 @@ footprint:
   - test/session-identity/attempt-writer-id.test.mjs
   - test/workflow/**
   - test/helpers/**
-  - docs/architecture-manifest.json
+  - packages/component-authority/model/**
   - test/architecture.test.mjs
   - packages/git/contracts/mutation-census.v1.json
   - packages/holder-lock/contracts/lock-registry.v1.json
@@ -184,8 +184,8 @@ longer carries `p-24xw2cwdvo` as a retire condition.
 3. Every deleted or rewired test appears in one `reports/tests-*.md` table with its disposition: the owning Rust
    test (crate, file and test name), or the existing Node test that owns the behaviour, or `behaviour removed`
    with the reason.
-4. `docs/architecture-manifest.json` and `test/architecture.test.mjs` no longer contain `p-24xw2cwdvo`
-   (`git grep -c p-24xw2cwdvo -- docs/architecture-manifest.json test/architecture.test.mjs` prints nothing). Rows
+4. `packages/component-authority/model/` and `test/architecture.test.mjs` no longer contain `p-24xw2cwdvo`
+   (`git grep -c p-24xw2cwdvo -- packages/component-authority/model/ test/architecture.test.mjs` prints nothing). Rows
    whose last entry went are closed. Rows that keep live entries name the step that owns them (S6b, S7 or the
    mailbox lane).
 5. `node scripts/git-one-door-scan.mjs --write-census` leaves the census unchanged after phase 8's regeneration,
@@ -214,7 +214,7 @@ longer carries `p-24xw2cwdvo` as a retire condition.
 - **The frozen mailbox harness keeps its reach.** `scripts/lib/mailbox-live-confined.mjs` and
   `scripts/record-mailbox-hook-fixtures.mjs` import the Node bwrap driver, the confinement resources, the
   credential-expiry reader and the worker-session boot. Those imports keep about 12 closure files alive.
-  `docs/architecture-manifest.json` already rules this harness a frozen measurement input whose bytes do not
+  `packages/component-authority/model/` already rules this harness a frozen measurement input whose bytes do not
   change: the entry at about line 150 reads "frozen live measurement harness … until the mailbox lane re-measures
   it", and the one at about line 445 reads "moves onto the process door when V7n is re-measured (MAIL)". Deleting
   its dependencies would break that harness, and rewiring it would change its bytes. So the files it reaches stay.
@@ -252,7 +252,7 @@ to 7 produce both.
 | 5 | [Retire or rewire the remaining runner tests](phase-05-tests-runner-rest.md) | 1 | test/runner/agent-definitions.test.mjs, test/runner/agent-result-claim-contract.test.mjs, test/runner/cli-spawn-reconciliation.test.mjs, test/runner/config-seat-binding-layers.test.mjs, test/runner/credential-store.test.mjs, test/runner/custody-successor-admission.test.mjs, test/runner/dead-vocabulary-guard.test.mjs, test/runner/default-executor-merge.test.mjs, test/runner/driver-rununit.test.mjs, test/runner/effective-execution-contract.test.mjs, test/runner/egress-governance.test.mjs, test/runner/evidence-attribution.test.mjs, test/runner/herdr-private-home-trust.test.mjs, test/runner/herdr-spawn-adapter.test.mjs, test/runner/loop.test.mjs, test/runner/merge-quoted-paths.test.mjs, test/runner/operation-choice.test.mjs, test/runner/operation-prompt-templates.test.mjs, test/runner/runner-schema-vocabulary.test.mjs, test/runner/spawn-worker.test.mjs, test/runner/tier-cell.test.mjs, test/runner/tier-fallback-config.test.mjs, test/runner/work-unit-for.test.mjs, plans/261122-2108-delete-dead-node-execution-closure/reports/tests-runner-rest.md | 2 | draft |
 | 6 | [Retire or rewire the run-supervisor, golden-recorder, setup and other tests](phase-06-tests-supervisor-setup-misc.md) | 1 | test/run-supervisor/**, test/golden-recorders/**, test/setup/capability-catalog-doctrine.test.mjs, test/setup/gate-kill-grace.test.mjs, test/setup/packaged-definitions.test.mjs, test/setup/seat-binding-dry-bind.test.mjs, test/session-host/head-start.test.mjs, test/seat-binding/client.test.mjs, test/convention/seat-id.test.mjs, test/state/work-size-rigor.test.mjs, test/util/session-identity.test.mjs, test/session-identity/attempt-writer-id.test.mjs, plans/261122-2108-delete-dead-node-execution-closure/reports/tests-supervisor-setup-misc.md | 2 | draft |
 | 7 | [Rewire the workflow tests and the shared helpers](phase-07-tests-workflow-helpers.md) | 1 | test/workflow/**, test/helpers/**, plans/261122-2108-delete-dead-node-execution-closure/reports/tests-workflow-helpers.md | 2 | draft |
-| 8 | [Delete the dead source; close the manifest rows; regenerate the census](phase-08-delete-source.md) | 1, 2, 3, 4, 5, 6, 7 | src/runner/dispatch/**, src/runner/execution/**, src/run-supervisor/**, docs/architecture-manifest.json, test/architecture.test.mjs, packages/git/contracts/mutation-census.v1.json, packages/holder-lock/contracts/lock-registry.v1.json, packages/run-supervisor/contracts/recover-actions.v1.json, scripts/check-decision-citation-drift.baseline.json | 3 | draft |
+| 8 | [Delete the dead source; close the manifest rows; regenerate the census](phase-08-delete-source.md) | 1, 2, 3, 4, 5, 6, 7 | src/runner/dispatch/**, src/runner/execution/**, src/run-supervisor/**, packages/component-authority/model/, test/architecture.test.mjs, packages/git/contracts/mutation-census.v1.json, packages/holder-lock/contracts/lock-registry.v1.json, packages/run-supervisor/contracts/recover-actions.v1.json, scripts/check-decision-citation-drift.baseline.json | 3 | draft |
 | 9 | [Docs, contract notes, comments and skills stop naming deleted files](phase-09-docs-and-notes.md) | 1 | docs/platform/runner/spec.md, docs/platform/runner/contracts/**, docs/platform/runner/architecture/**, docs/platform/runner/subcomponents/**, docs/platform/run-supervisor/spec.md, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/**, docs/platform/agent-coordination/spec.md, docs/platform/agent-protocol/spec.md, docs/platform/config/spec.md, docs/platform/seat-binding/spec.md, docs/platform/secrets/spec.md, docs/platform/terminal-control/spec.md, docs/platform/work-state/spec.md, docs/platform/packaging-distribution/spec.md, docs/platform/resource-referee/spec.md, docs/how-to/configure-and-operate-agent-confinement.md, docs/reading-map.md, packages/execution/contracts/**, packages/agent-protocol/contracts/agent-protocol.v1.json, packages/resource-referee/contracts/resource-referee.v1.json, packages/run-supervisor/contracts/controller/**, packages/run-supervisor/contracts/envelope.v3.json, packages/run-supervisor/contracts/unit-state.v1.json, packages/run-supervisor/contracts/worker-env-allowlist.v1.json, apps/fgos/src/wiring/unit_run_host/**, packages/execution/engine/src/confinement/cleanup/probes/mod.rs, packages/execution/rust/src/decide.rs, packages/run-supervisor/rust/src/controller/**, packages/run-supervisor/rust/tests/controller_cwd_lock.rs, packages/run-supervisor/rust/tests/controller_trust_store.rs, core/skills/fgos-run/SKILL.md, core/skills/_shared/capability-catalog.md, core/skills/_shared/capability-matching.md, .agents/skills/**, plugins/fgOS/skills/** | 2 | draft |
 | 10 | [Integration: merge and run the full gate](phase-10-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9 | plans/261122-2108-delete-dead-node-execution-closure/reports/integration.md | 4 | draft |
 
@@ -264,7 +264,7 @@ Phases 2 to 7 and 9 share wave 2, and their footprints are disjoint. The `test/r
 to 5 are explicit file lists, plus the subdirectories `test/runner/dispatch/**` and `test/runner/execution/**`,
 because the resource door reads a glob such as `test/runner/dispatch*` as its whole directory
 (`fgos resource-check --plan` result: accept, 10 units, 0 findings). Phase 8 deletes source only after every test that imports it is gone or rewired. Phase 9 touches no file
-that phase 8 owns. The hot files have one writer each: `docs/architecture-manifest.json`,
+that phase 8 owns. The hot files have one writer each: `packages/component-authority/model/`,
 `test/architecture.test.mjs` and the census belong to phase 8, the skill renders and `docs/reading-map.md` to
 phase 9. A tree with only wave 2 merged stays green: removing a test, or swapping a test's dead import for a live
 one, cannot break a still-present source file. A tree that also has phase 8 is green, because phases 2 to 7 already

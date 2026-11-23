@@ -28,7 +28,7 @@ hand-edited).
 3. Rust: edit comments only. `git diff -U0 -- '*.rs'` must show changed lines that are all comments.
 4. `docs/platform/runner/spec.md`: add one settled-fact line. It says the Node Execution closure is deleted except
    for the files the frozen mailbox harness reaches, that those files retire when the mailbox lane re-measures, and
-   it cites `docs/architecture-manifest.json`. Remove the `p-24xw2cwdvo` pointers from `docs/platform/runner/spec.md`,
+   it cites `packages/component-authority/model/`. Remove the `p-24xw2cwdvo` pointers from `docs/platform/runner/spec.md`,
    `docs/platform/run-supervisor/spec.md`, `docs/platform/component-boundary.md`, `docs/reading-map.md` and
    `docs/platform/runner/decisions/h-36d872fbb0e5.md`; if the last of these still needs an edit, raise it as a
    footprint-widen question instead of editing it.
