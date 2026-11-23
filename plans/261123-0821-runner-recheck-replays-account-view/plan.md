@@ -157,10 +157,13 @@ Phase notes:
 
 - Phase 1: landed `2b903592c` (branch p01b @ `9447e2cd7`); land gates green;
   [report](reports/lead-261123-1033-phase-01-parked-on-land-recovery.md).
-- Phase 2: units c-72536 (unit-run-1795406601428-f864c2f9) and c-74587 (unit-run-1795406820147-10b05acc) were refused
-  at 11:07 by the binding mismatch because the activated release predated `2b903592c`. Release `df57ddfcd609`
-  carries the fix and is active; the phase resumed at 12:50 as unit c-84280-1795413023678 in worktree
-  `forgent-worktrees/261123-0821-runner-recheck-replays-account-view-p02`.
+- Phase 2: the 11:07 units c-72536 and c-74587 were refused by the binding mismatch on the release that predated
+  `2b903592c`. On release `df57ddfcd609` the live check passed: unit-run-1795414231355-8ed8aba7 bound deepseek/thehive
+  under a gemini quarantine, recorded `accountState`, and committed. The workspace run found a compile break phase 1
+  left in `apps/fgos/src/wiring/unit_run_host/tests/mod.rs`, fixed and landed as `280c484ab`. Acceptance 1, 2, 4, 5
+  and 6 pass. Acceptance 3 (`cargo test --workspace`, `npm test`) is waiting on the supervisor: the lead's sandbox sees
+  the shared cargo build directory as read-only and a private build overflows the 16 GB tmpfs.
+  [report](reports/lead-261123-1322-phase-02-integration-gate.md)
 
 Contract check, done by hand and by `node scripts/plan-contract-check.mjs`: phase 2 sits in a later wave than phase 1,
 which it depends on, and each wave holds one phase, so no two phases share a footprint. Phase 1 is one leader's work,
