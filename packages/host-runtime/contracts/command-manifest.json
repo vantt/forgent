@@ -1076,7 +1076,7 @@
         "next": "Write the new code under the owning row, or declare a new row when none owns it."
       },
       "touchesState": false,
-      "externalEffect": false,
+      "externalEffect": true,
       "paginated": false,
       "deprecated": null
     },

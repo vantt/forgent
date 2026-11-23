@@ -6,6 +6,10 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::sync::atomic::{AtomicUsize, Ordering};
+
+/// Every project gets its own folder: tests run in parallel threads of one process.
+static PROJECTS: AtomicUsize = AtomicUsize::new(0);
 
 fn repo_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -29,8 +33,11 @@ fn copy_dir(from: &Path, to: &Path) {
 
 /// A fresh checkout has no `.fgos`: the verb needs a project, so the test builds one holding a copy of the real model.
 fn temp_project() -> PathBuf {
-    let project =
-        std::env::temp_dir().join(format!("fgos-authority-locate-{}", std::process::id()));
+    let project = std::env::temp_dir().join(format!(
+        "fgos-authority-locate-{}-{}",
+        std::process::id(),
+        PROJECTS.fetch_add(1, Ordering::SeqCst)
+    ));
     let _ = fs::remove_dir_all(&project);
     fs::create_dir_all(project.join(".fgos")).unwrap();
     let model = Path::new("packages/component-authority/model");
@@ -38,18 +45,39 @@ fn temp_project() -> PathBuf {
     project
 }
 
+/// Every file and directory under `dir` with its size and modification time.
+fn listing(dir: &Path) -> Vec<(PathBuf, u64, std::time::SystemTime)> {
+    let mut rows = Vec::new();
+    for entry in fs::read_dir(dir).unwrap() {
+        let entry = entry.unwrap();
+        let meta = entry.metadata().unwrap();
+        rows.push((entry.path(), meta.len(), meta.modified().unwrap()));
+        if meta.is_dir() {
+            rows.extend(listing(&entry.path()));
+        }
+    }
+    rows.sort_by(|a, b| a.0.cmp(&b.0));
+    rows
+}
+
 fn authority_data(args: &[&str]) -> serde_json::Value {
     let project = temp_project();
+    let data = authority_data_in(&project, args);
+    let _ = fs::remove_dir_all(&project);
+    data
+}
+
+/// Runs the verb in `project` and leaves the project in place.
+fn authority_data_in(project: &Path, args: &[&str]) -> serde_json::Value {
     let output = Command::new(env!("CARGO_BIN_EXE_fgos"))
         .arg("authority")
         .args(args)
         .arg("--json")
         .env_remove("FGOS_CONFINED")
         .env_remove("FGOS_HEAD_REQUEST_SOCKET")
-        .current_dir(&project)
+        .current_dir(project)
         .output()
         .unwrap();
-    let _ = fs::remove_dir_all(&project);
     assert!(
         output.status.success(),
         "authority {args:?}: {}{}",
@@ -77,7 +105,12 @@ fn a_vietnamese_and_an_english_description_of_atomic_writes_both_rank_durable_fi
 
 #[test]
 fn authority_model_prints_the_loaded_model_with_door_slugs_and_writes_nothing() {
-    let data = authority_data(&["model"]);
+    let project = temp_project();
+    let before = listing(&project);
+    let data = authority_data_in(&project, &["model"]);
+    let after = listing(&project);
+    let _ = fs::remove_dir_all(&project);
+    assert_eq!(before, after, "authority model changed the project");
     for key in [
         "layers",
         "components",

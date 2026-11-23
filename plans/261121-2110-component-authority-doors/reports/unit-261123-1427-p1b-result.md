@@ -143,3 +143,19 @@ Not run: `cargo`, `rustfmt`, `node`, `git apply`. Lead should run `cargo fmt --c
 Status: DONE_WITH_CONCERNS
 Summary: Node readers load the model through `fgos authority model --json`, model-only cases moved to `model_checks.rs`, prose and view notes name the YAML files and `fgos authority render`, rustfmt diff applied by hand.
 Concerns: nothing compiled or run, so the new Rust tests (including `assert_eq!(layers.layers, LAYERS)`) are unverified and the hand-applied format may differ from `cargo fmt`. The Node tier-exception test reads `{from, to}` but the crate's `TierException` serializes `{path, tier, reason}`; the list is empty today, so nothing fails until the first exception is added.
+
+## Review fixes
+
+1. Parallel temp folders: `temp_project()` in `apps/fgos/tests/authority.rs` names its folder with the pid and a static `AtomicUsize` counter, so parallel tests no longer share one model copy. Proof: the existing locate and model tests, now isolated.
+2. `render --check` after a hand edit: `render_check_fails_naming_the_view_whose_generated_block_was_hand_edited` in `apps/fgos/src/wiring/authority.rs` copies the real model and the seven view documents, checks clean, edits one block, and asserts the error names `component-boundary` and its file and that nothing was written.
+3. Schema vs types: `the_enum_constants_and_the_typed_row_fields_equal_the_schema` in `model_checks.rs` compares the layer, status, tier and id-pattern constants with `model.v1.json`, and for each row type (component, exception, decision kind, door, door path, contract, layers, tier exception) compares the listed fields, required set, serialized field set, missing-field and unknown-field behaviour against the schema. `the_loader_refuses_a_component_row_missing_a_required_field` is the loader fixture.
+4. Exception paths: `resolve_component` reproduces the removed Node resolver (trailing `/` covers a directory, no slash is that exact file, longest wins, a tie is an error naming both) and serves every exception path and the contract-provider check. Proofs: `a_path_without_a_trailing_slash_covers_only_that_file_and_the_longest_path_wins`, `two_components_claiming_the_same_longest_path_are_an_error_naming_both`.
+5. Restored assertions: the shape test asserts decision kinds are non-empty; `authority_model_prints_the_loaded_model_with_door_slugs_and_writes_nothing` compares a size and mtime listing of the project before and after.
+6. Holder preview: a missing and an empty cell compare equal (`unwrap_or("")`); test `the_holder_preview_compares_a_short_hand_written_row_without_failing` in `render.rs`.
+7. `src/cli/command-registry.mjs` authority entry has `externalEffect: true`; `command-manifest.json` flipped to match by hand (only that field changes for `authority`). `command-routes.json` carries no such field and is untouched.
+
+Not run: cargo (test, fmt) and node (`scripts/export-command-selectors.mjs`) were refused in this session; code was formatted by hand to rustfmt defaults. Item 4 now applies exact-file semantics to contract paths too; if a component lists a directory without a trailing `/`, the contract-provider test will show it.
+
+Status: DONE_WITH_CONCERNS
+Summary: All seven fixes written; nothing could be compiled or run here.
+Concerns: Unverified by cargo/node; rustfmt layout and the manifest regeneration need the lead's check.

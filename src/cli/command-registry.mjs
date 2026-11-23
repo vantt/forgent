@@ -577,7 +577,7 @@ export const COMMAND_REGISTRY = [
     },
     touchesState: false,
     store: 'none',
-    externalEffect: false,
+    externalEffect: true,
     paginated: false,
     deprecated: null,
     native: true,

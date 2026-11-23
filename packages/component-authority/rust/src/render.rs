@@ -805,7 +805,10 @@ pub fn build_holder_view_preview(repo_root: &Path) -> Result<String, RenderError
             )),
             (Some(current), Some(generated)) => {
                 let notes: Vec<String> = (0..4)
-                    .filter(|&i| current.get(i) != generated.get(i))
+                    .filter(|&i| {
+                        current.get(i).map(String::as_str).unwrap_or("")
+                            != generated.get(i).map(String::as_str).unwrap_or("")
+                    })
                     .map(|i| format!("col{} differs", i + 1))
                     .collect();
                 diff_lines.push(format!(
@@ -1309,6 +1312,35 @@ mod tests {
             "{preview}"
         );
         assert!(preview.ends_with("\n"), "{preview}");
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn the_holder_preview_compares_a_short_hand_written_row_without_failing() {
+        let root = seed("preview-short-row");
+        put(
+            &root,
+            &format!("{MODEL_DIR}/decision-kinds.yaml"),
+            r#"- id: demo-kind
+  canonical: "decision-kind:demo-kind"
+  aliases:
+    - demo-scope
+  meaning: demo decisions
+  owner: demo
+  narrative: docs/platform/demo/decisions/
+"#,
+        );
+        put(
+            &root,
+            "docs/platform/governance.md",
+            "# gov\n\n## Decision scope to holder table\n\n| Scope | Read first | Facts | Narrative |\n| --- | --- | --- | --- |\n| demo-scope → demo |\n\n## Next\n",
+        );
+        let preview = build_holder_view_preview(&root).unwrap();
+        assert!(
+            preview.contains("| demo-scope → demo | changed | "),
+            "{preview}"
+        );
+        assert!(preview.contains("col3 differs; col4 differs"), "{preview}");
         let _ = fs::remove_dir_all(&root);
     }
 }

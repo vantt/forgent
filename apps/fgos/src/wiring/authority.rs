@@ -325,6 +325,76 @@ mod tests {
         assert_eq!(preview_holder.as_deref(), Some("out/preview.md"));
     }
 
+    /// A temporary repository holding the real model and every generated view document of this checkout.
+    fn seeded_repository(name: &str) -> PathBuf {
+        let checkout = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let root = std::env::temp_dir().join(format!(
+            "fgos-wiring-authority-{name}-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&root);
+        copy_tree(
+            &checkout.join("packages/component-authority/model"),
+            &root.join("packages/component-authority/model"),
+        );
+        for file in [
+            "docs/platform/component-boundary.md",
+            "docs/platform/README.md",
+            "docs/platform/governance.md",
+            "docs/platform/system-overview/spec.md",
+            "docs/platform/observe/spec.md",
+            "docs/platform/workflow/spec.md",
+            "docs/platform/architecture-map.md",
+        ] {
+            let target = root.join(file);
+            std::fs::create_dir_all(target.parent().unwrap()).unwrap();
+            std::fs::copy(checkout.join(file), target).unwrap();
+        }
+        root
+    }
+
+    fn copy_tree(from: &std::path::Path, to: &std::path::Path) {
+        std::fs::create_dir_all(to).unwrap();
+        for entry in std::fs::read_dir(from).unwrap() {
+            let entry = entry.unwrap();
+            let target = to.join(entry.file_name());
+            if entry.file_type().unwrap().is_dir() {
+                copy_tree(&entry.path(), &target);
+            } else {
+                std::fs::copy(entry.path(), target).unwrap();
+            }
+        }
+    }
+
+    #[test]
+    fn render_check_fails_naming_the_view_whose_generated_block_was_hand_edited() {
+        let root = seeded_repository("check-hand-edit");
+        let request = project_authority_request(
+            &["authority", "render", "--check"].map(OsString::from),
+            Ok(root.clone()),
+        )
+        .unwrap();
+        answer(&request).expect("the copied views are in sync with the model");
+
+        let file = root.join("docs/platform/component-boundary.md");
+        let start = format!(
+            "{}\n",
+            fgos_component_authority::render::start_marker("component-boundary")
+        );
+        let before = std::fs::read_to_string(&file).unwrap();
+        let tampered = before.replace(&start, &format!("{start}HAND EDITED\n"));
+        assert_ne!(tampered, before);
+        std::fs::write(&file, &tampered).unwrap();
+
+        let error = answer(&request).unwrap_err();
+        assert!(
+            error.contains("view \"component-boundary\" in docs/platform/component-boundary.md"),
+            "{error}"
+        );
+        assert_eq!(std::fs::read_to_string(&file).unwrap(), tampered);
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
     #[test]
     fn render_refuses_a_bare_preview_flag_a_combination_an_argument_and_an_unknown_option() {
         assert!(project(&["authority", "render", "--preview-holder"]).is_err());

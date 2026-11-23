@@ -6,9 +6,14 @@
 //! a row missing a field, carrying an unnamed field or holding the wrong type cannot be loaded, so the
 //! tests below start from a loaded model.
 
-use fgos_component_authority::{Component, Contract, DoorPath, Model};
+use fgos_component_authority::model::{DoorPathReason, Exception};
+use fgos_component_authority::{
+    Component, Contract, DecisionKind, Door, DoorPath, Layers, Model, TierException,
+};
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 use serde_json::Value;
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -91,6 +96,10 @@ fn every_model_row_obeys_the_enums_ranges_and_non_empty_rules_of_the_schema() {
         }
     }
 
+    assert!(
+        !model.decision_kinds.is_empty(),
+        "decision kinds must not be empty"
+    );
     for (idx, dk) in model.decision_kinds.iter().enumerate() {
         let label = format!("decisionKind[{idx}] ({})", dk.id);
         assert!(!dk.id.is_empty(), "{label} empty id");
@@ -211,7 +220,8 @@ fn every_component_exception_path_exists_on_disk_and_resolves_to_the_component_t
                 exc.path,
                 comp.id
             );
-            let resolved = longest_path_owner(&exc.path, &model.components);
+            let resolved = resolve_component(&exc.path, &model.components)
+                .unwrap_or_else(|error| panic!("{error}"));
             assert_eq!(
                 resolved,
                 Some(comp.id.as_str()),
@@ -450,28 +460,41 @@ fn assert_live_designed_paths_exist(rows: &[Contract], root: &Path) {
     }
 }
 
-/// The component whose longest `paths[]` prefix covers `file_path`, or none.
-fn longest_path_owner<'a>(file_path: &str, components: &'a [Component]) -> Option<&'a str> {
-    let mut best: Option<&str> = None;
+/// The component that owns `file_path`, by the rules of the Node resolver this replaced: a `paths[]` entry
+/// ending in `/` covers every file below it, any other entry covers only that exact file, the longest entry
+/// wins, and two components claiming the same longest entry is an error naming both.
+fn resolve_component<'a>(
+    file_path: &str,
+    components: &'a [Component],
+) -> Result<Option<&'a str>, String> {
     let mut best_len = 0usize;
+    let mut candidates: Vec<&str> = Vec::new();
     for comp in components {
-        for raw in &comp.paths {
-            if raw.is_empty() {
+        for path in &comp.paths {
+            let hit = if path.ends_with('/') {
+                file_path.starts_with(path.as_str())
+            } else {
+                file_path == path.as_str()
+            };
+            if !hit {
                 continue;
             }
-            let normalized = raw.replace('\\', "/");
-            let pref = normalized.trim_end_matches('/');
-            let covers = file_path == pref
-                || file_path
-                    .strip_prefix(pref)
-                    .is_some_and(|rest| rest.starts_with('/'));
-            if covers && (best.is_none() || pref.len() > best_len) {
-                best = Some(comp.id.as_str());
-                best_len = pref.len();
+            if candidates.is_empty() || path.len() > best_len {
+                best_len = path.len();
+                candidates = vec![comp.id.as_str()];
+            } else if path.len() == best_len {
+                candidates.push(comp.id.as_str());
             }
         }
     }
-    best
+    match candidates.as_slice() {
+        [] => Ok(None),
+        [only] => Ok(Some(only)),
+        several => Err(format!(
+            "Multiple components claiming same longest prefix for \"{file_path}\": {}",
+            several.join(", ")
+        )),
+    }
 }
 
 fn base_row(path: Option<&str>) -> Contract {
@@ -614,7 +637,9 @@ fn a_provider_differing_from_the_longest_prefix_path_owner_carries_a_reason() {
         let Some(path) = row.path.as_deref().filter(|p| !p.is_empty()) else {
             continue;
         };
-        let Some(owner) = longest_path_owner(path, &model.components) else {
+        let Some(owner) = resolve_component(path, &model.components)
+            .unwrap_or_else(|error| panic!("{} {error}", row.id))
+        else {
             continue;
         };
         if owner == row.provider {
@@ -688,4 +713,352 @@ fn contract_guards_outside_the_schema_shapes_are_refused() {
     assert!(message.contains("guard must be a string"), "{message}");
     assert_guards(&serde_json::json!(["a", "b"]), "row");
     assert_guards(&serde_json::json!("a"), "row");
+}
+
+// ---- the schema and the typed rows ----
+
+fn schema() -> Value {
+    let path = repo_root().join("packages/component-authority/contracts/model.v1.json");
+    serde_json::from_str(&fs::read_to_string(path).unwrap()).unwrap()
+}
+
+fn string_set(value: &Value) -> BTreeSet<String> {
+    value
+        .as_array()
+        .expect("an array of strings")
+        .iter()
+        .map(|item| item.as_str().expect("a string").to_owned())
+        .collect()
+}
+
+fn names(items: &[&str]) -> BTreeSet<String> {
+    items.iter().map(|item| (*item).to_owned()).collect()
+}
+
+/// The typed row `T` carries exactly the fields of the schema `def`: the listed `properties` are the schema's
+/// properties, the listed `required` are its required fields, a fully populated `sample` loads and serializes
+/// back to the same field names (less `serialized_only`), a row without a required field is refused, a row
+/// without an optional field loads, and a field the schema does not name is refused.
+fn assert_row_matches_schema<T: DeserializeOwned + Serialize>(
+    label: &str,
+    def: &Value,
+    properties: &[&str],
+    required: &[&str],
+    serialized_only: &[&str],
+    sample: Value,
+) {
+    let properties = names(properties);
+    let required = names(required);
+    let schema_properties: BTreeSet<String> = def["properties"]
+        .as_object()
+        .unwrap()
+        .keys()
+        .cloned()
+        .collect();
+    assert_eq!(schema_properties, properties, "{label} schema properties");
+    assert_eq!(string_set(&def["required"]), required, "{label} required");
+
+    let sample_fields: BTreeSet<String> = sample.as_object().unwrap().keys().cloned().collect();
+    assert_eq!(sample_fields, properties, "{label} sample fields");
+    let row: T = serde_json::from_value(sample.clone())
+        .unwrap_or_else(|error| panic!("{label} sample does not load: {error}"));
+    let mut serialized: BTreeSet<String> = serde_json::to_value(&row)
+        .unwrap()
+        .as_object()
+        .unwrap()
+        .keys()
+        .cloned()
+        .collect();
+    for name in serialized_only {
+        serialized.remove(*name);
+    }
+    assert_eq!(serialized, properties, "{label} serialized fields");
+
+    for name in &properties {
+        let mut without = sample.clone();
+        without.as_object_mut().unwrap().remove(name);
+        let loads = serde_json::from_value::<T>(without).is_ok();
+        let must_load = !required.contains(name);
+        assert_eq!(loads, must_load, "{label}: loads without {name}");
+    }
+
+    let mut unknown = sample;
+    unknown
+        .as_object_mut()
+        .unwrap()
+        .insert("surprise".into(), Value::Bool(true));
+    assert!(
+        serde_json::from_value::<T>(unknown).is_err(),
+        "{label}: an unnamed field must be refused"
+    );
+}
+
+#[test]
+fn the_enum_constants_and_the_typed_row_fields_equal_the_schema() {
+    let schema = schema();
+    let defs = &schema["$defs"];
+    let component = &defs["component"]["properties"];
+    let exception = &component["exceptions"]["items"];
+
+    assert_eq!(string_set(&component["layer"]["enum"]), names(&LAYERS));
+    assert_eq!(
+        string_set(&exception["properties"]["layer"]["enum"]),
+        names(&LAYERS)
+    );
+    assert_eq!(
+        string_set(&component["status"]["enum"]),
+        names(&COMPONENT_STATUSES)
+    );
+    assert_eq!(
+        string_set(&defs["contract"]["properties"]["status"]["enum"]),
+        names(&CONTRACT_STATUSES)
+    );
+    assert_eq!(component["tier"]["minimum"], 0);
+    assert_eq!(component["tier"]["maximum"], 9);
+    assert_eq!(component["id"]["pattern"], "^[a-z0-9][a-z0-9-]*$");
+
+    assert_row_matches_schema::<Component>(
+        "component",
+        &defs["component"],
+        &[
+            "id",
+            "canonical",
+            "aliases",
+            "meaning",
+            "parent",
+            "layer",
+            "tier",
+            "paths",
+            "exceptions",
+            "owns",
+            "mustNotOwn",
+            "spec",
+            "source",
+            "status",
+            "reason",
+        ],
+        &[
+            "id",
+            "canonical",
+            "aliases",
+            "meaning",
+            "layer",
+            "tier",
+            "paths",
+            "owns",
+            "mustNotOwn",
+            "spec",
+            "source",
+            "status",
+        ],
+        &[],
+        serde_json::json!({
+            "id": "a", "canonical": "a", "aliases": [], "meaning": "m", "parent": "p",
+            "layer": "kernel", "tier": 0, "paths": [], "exceptions": [], "owns": [],
+            "mustNotOwn": [], "spec": "s", "source": [], "status": "live", "reason": "r"
+        }),
+    );
+    assert_row_matches_schema::<Exception>(
+        "component exception",
+        exception,
+        &["path", "layer", "tier", "reason"],
+        &["path", "reason"],
+        &[],
+        serde_json::json!({ "path": "p", "layer": "kernel", "tier": 1, "reason": "r" }),
+    );
+    assert_row_matches_schema::<DecisionKind>(
+        "decisionKind",
+        &defs["decisionKind"],
+        &[
+            "id",
+            "canonical",
+            "aliases",
+            "meaning",
+            "owner",
+            "narrative",
+            "readFirst",
+            "facts",
+        ],
+        &["id", "canonical", "aliases", "meaning", "owner", "narrative"],
+        &[],
+        serde_json::json!({
+            "id": "k", "canonical": "k", "aliases": [], "meaning": "m", "owner": "o",
+            "narrative": "n", "readFirst": "r", "facts": "f"
+        }),
+    );
+    assert_row_matches_schema::<Door>(
+        "door",
+        &defs["door"],
+        &[
+            "job",
+            "kind",
+            "patterns",
+            "allowed",
+            "debt",
+            "reason",
+            "retiredBy",
+            "owner",
+        ],
+        &["job", "kind", "patterns", "allowed"],
+        &["slug"],
+        serde_json::json!({
+            "job": "j", "kind": "k", "patterns": [], "allowed": [], "debt": [], "reason": "r",
+            "retiredBy": "b", "owner": "o"
+        }),
+    );
+    assert_row_matches_schema::<DoorPathReason>(
+        "door path with a reason",
+        &defs["door"]["properties"]["allowed"]["items"]["anyOf"][1],
+        &["path", "reason"],
+        &["path"],
+        &[],
+        serde_json::json!({ "path": "p", "reason": "r" }),
+    );
+    assert_row_matches_schema::<Contract>(
+        "contract",
+        &defs["contract"],
+        &[
+            "id",
+            "canonical",
+            "aliases",
+            "meaning",
+            "reason",
+            "provider",
+            "consumers",
+            "guards",
+            "version",
+            "path",
+            "evidence",
+            "status",
+        ],
+        &[
+            "id",
+            "canonical",
+            "aliases",
+            "meaning",
+            "provider",
+            "consumers",
+            "evidence",
+            "status",
+        ],
+        &[],
+        serde_json::json!({
+            "id": "c", "canonical": "c", "aliases": [], "meaning": "m", "reason": "r",
+            "provider": "p", "consumers": [], "guards": "g", "version": 1, "path": "p",
+            "evidence": [], "status": "live"
+        }),
+    );
+    assert_row_matches_schema::<Layers>(
+        "layers",
+        &defs["layers"],
+        &[
+            "contract",
+            "layers",
+            "rules",
+            "domains",
+            "tierNames",
+            "tierExceptions",
+        ],
+        &["layers", "rules", "domains", "tierNames"],
+        &[],
+        serde_json::json!({
+            "contract": "c", "layers": [], "rules": [], "domains": [], "tierNames": {},
+            "tierExceptions": []
+        }),
+    );
+    assert_row_matches_schema::<TierException>(
+        "layers tier exception",
+        &defs["layers"]["properties"]["tierExceptions"]["items"],
+        &["path", "tier", "reason"],
+        &["path", "tier", "reason"],
+        &[],
+        serde_json::json!({ "path": "p", "tier": 1, "reason": "r" }),
+    );
+}
+
+fn write_model_file(dir: &Path, name: &str, text: &str) {
+    let path = dir.join(name);
+    fs::create_dir_all(path.parent().unwrap()).unwrap();
+    fs::write(path, text).unwrap();
+}
+
+#[test]
+fn the_loader_refuses_a_component_row_missing_a_required_field() {
+    let dir = std::env::temp_dir().join(format!("fgos-ca-checks-missing-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&dir);
+    write_model_file(
+        &dir,
+        "layers.yaml",
+        "layers:\n  - kernel\nrules: []\ndomains: []\ntierNames:\n  \"0\": leaf\n",
+    );
+    write_model_file(&dir, "decision-kinds.yaml", "[]\n");
+    write_model_file(&dir, "contracts.yaml", "[]\n");
+    write_model_file(
+        &dir,
+        "doors/one.yaml",
+        "job: j\nkind: door\npatterns: []\nallowed: []\n",
+    );
+    let component = |status: &str| {
+        format!(
+            "- id: a\n  canonical: a\n  aliases: []\n  meaning: m\n  layer: kernel\n  tier: 0\n  paths: []\n  owns: []\n  mustNotOwn: []\n  spec: s\n  source: []\n{status}"
+        )
+    };
+
+    write_model_file(&dir, "components.yaml", &component("  status: live\n"));
+    Model::load_dir(&dir).expect("the complete row loads");
+
+    write_model_file(&dir, "components.yaml", &component(""));
+    let error = Model::load_dir(&dir).expect_err("a row without status is refused");
+    assert!(error.to_string().contains("status"), "{error}");
+    assert!(error.to_string().contains("components.yaml"), "{error}");
+    let _ = fs::remove_dir_all(&dir);
+}
+
+fn component_claiming(id: &str, paths: &[&str]) -> Component {
+    serde_json::from_value(serde_json::json!({
+        "id": id, "canonical": id, "aliases": [], "meaning": "m", "layer": "kernel", "tier": 0,
+        "paths": paths, "owns": [], "mustNotOwn": [], "spec": "s", "source": [], "status": "live"
+    }))
+    .unwrap()
+}
+
+#[test]
+fn a_path_without_a_trailing_slash_covers_only_that_file_and_the_longest_path_wins() {
+    let components = [
+        component_claiming("dir", &["src/"]),
+        component_claiming("deeper", &["src/deep/"]),
+        component_claiming("file", &["src/a.mjs"]),
+    ];
+    assert_eq!(resolve_component("src/a.mjs", &components), Ok(Some("file")));
+    assert_eq!(
+        resolve_component("src/a.mjs.bak", &components),
+        Ok(Some("dir"))
+    );
+    assert_eq!(
+        resolve_component("src/deep/b.mjs", &components),
+        Ok(Some("deeper"))
+    );
+    assert_eq!(resolve_component("bin/x.mjs", &components), Ok(None));
+    // `src/a.mjs` has no trailing slash, so it does not cover what lies below it.
+    assert_eq!(
+        resolve_component("src/a.mjs/x", &components),
+        Ok(Some("dir"))
+    );
+}
+
+#[test]
+fn two_components_claiming_the_same_longest_path_are_an_error_naming_both() {
+    let components = [
+        component_claiming("comp-a", &["src/dup/"]),
+        component_claiming("comp-b", &["src/dup/"]),
+    ];
+    let error = resolve_component("src/dup/file.mjs", &components).unwrap_err();
+    assert!(
+        error.contains("Multiple components claiming same longest prefix"),
+        "{error}"
+    );
+    assert!(
+        error.contains("comp-a") && error.contains("comp-b"),
+        "{error}"
+    );
 }
