@@ -1666,7 +1666,6 @@
     "src/setup/mailbox-limits.mjs": "b8ed2c018a71ee1a06582ea90c7a73ec1a7ebe29e3d931f9a2ba89108a763323",
     "src/setup/registrations.mjs": "2434ef9feecd3c7f9ebf93e92aab22791d774b2167426f684b3acdee858e634c",
     "src/setup/seat-binding-checks.mjs": "caf11494333872b9b2e6c516bb5b84e44824e7a9aacbcdd6c0b42d7de2393085",
-    "src/setup/shell-rc.mjs": "260deb1e3dddb3b9f006bb8eab34f39f656f64188b004542effd9fc7072a0bd4",
     "src/setup/skill-wrappers.mjs": "362dfdfb10c62bf90f8f7205db1dcfdc67f013fc62a24501e6e6cec2eb2fffb2",
     "src/setup/workflow-case-checks.mjs": "9b187678986f33683b456a75565026e0d86be858cc8281feb86e8b660a6e4ba1",
     "src/setup/workflow-catalog-reader.mjs": "7056fca651ea1ebafa0445449fb63722509104f09d3527ba4af5ee10f691c379",

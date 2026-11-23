@@ -488,7 +488,6 @@
     "test/setup/run-supervisor-checks.test.mjs": 2.3,
     "test/setup/seat-binding-dry-bind.test.mjs": 10.1,
     "test/setup/session-keep-declared.test.mjs": 0.1,
-    "test/setup/shell-rc.test.mjs": 0.1,
     "test/setup/skill-wrappers.test.mjs": 0.9,
     "test/setup/terminal-control-checks.test.mjs": 1.9,
     "test/setup/visibility-checks.test.mjs": 0.8,
