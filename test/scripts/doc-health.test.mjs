@@ -8,6 +8,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { checkDeadReferences, checkDocuments, checkPlatformLinks, checkPlatformMetadata, checkRuleClaims, checkVerbReferences, governanceBaselineFields } from '../../scripts/doc-health.mjs';
 import { checkIdentityIdsUnique } from '../../scripts/identity-ids-unique.mjs';
+import { checkBacklogReconciliation } from '../../scripts/check-backlog-reconciliation.mjs';
 import { enumerateDocEntries, manifestPathFor } from '../../src/report/enduser-index-generate.mjs';
 import { buildDecisionIndexMarkdown, indexPathFor, narrativeHolderResolver } from '../../src/report/decision-index.mjs';
 
@@ -288,4 +289,138 @@ test('id registry check passes on a clean registry and names each repeated id, t
 test('no backlog id, D-ADR number title or decision file number is repeated in this repository', () => {
   const result = checkIdentityIdsUnique(REPO_ROOT);
   assert.equal(result.passed, true, result.message);
+});
+
+// Owns original-id handling across backlog checks (p-mtqil2rpyy):
+// 1) reconciliation check resolves a section by Original id across all items, and reports
+//    a section whose item is no longer proposed by name with its id and status.
+// 2) identity check counts Original ids, detecting when a new item reuses an old id.
+// 3) proposed-count cross-check verifies that the line scan and parsed proposed items agree,
+//    and catches unparseable items or syntax disagreement.
+// No existing test covers original-id resolution to non-proposed items, duplicate detection
+// across Original ids, or line-scan/parsed count disagreement.
+test('backlog checks see a migrated item by its Original id', () => {
+  const repo = fixtureRoot({
+    'docs/history/backlog-execution-reconciliation/RECONCILIATION.md': [
+      '# Backlog Execution Reconciliation',
+      '',
+      '### tsk-migrated-done — verdict: resolved',
+      'Evidence: cites tsk-migrated-done and src/alive.mjs:10.',
+      '',
+    ].join('\n'),
+  });
+  try {
+    const backlogDir = path.join(repo, 'plans/backlog');
+    fs.mkdirSync(backlogDir, { recursive: true });
+
+    // Item 1: Done item with Original id matching the RECONCILIATION.md section.
+    fs.writeFileSync(
+      path.join(backlogDir, 'p-done000001.md'),
+      [
+        '---',
+        'id: p-done000001',
+        'title: done migrated item',
+        'status: done',
+        'priority: P2',
+        'area: general',
+        'created: 2026-01-01',
+        '---',
+        '',
+        '# Why',
+        '...',
+        '',
+        '# Done when',
+        '...',
+        '',
+        '# Notes',
+        '',
+        'Migrated item. Original id: tsk-migrated-done.',
+      ].join('\n'),
+    );
+
+    // Item 2: Proposed migrated item with an Original id.
+    fs.writeFileSync(
+      path.join(backlogDir, 'p-prop000001.md'),
+      [
+        '---',
+        'id: p-prop000001',
+        'title: proposed item',
+        'status: proposed',
+        'priority: P2',
+        'area: general',
+        'created: 2026-01-02',
+        '---',
+        '',
+        '# Why',
+        '...',
+        '',
+        '# Done when',
+        '...',
+        '',
+        '# Notes',
+        '',
+        'Migrated item. Original id: tsk-reused-id.',
+      ].join('\n'),
+    );
+
+    // Item 3: New item that reuses the migrated item's Original id -> duplicate check detects it.
+    fs.writeFileSync(
+      path.join(backlogDir, 'p-reused-id.md'),
+      [
+        '---',
+        'id: tsk-reused-id',
+        'title: new item reusing old id',
+        'status: proposed',
+        'priority: P2',
+        'area: general',
+        'created: 2026-01-03',
+        '---',
+        '',
+        '# Why',
+        '...',
+        '',
+        '# Done when',
+        '...',
+        '',
+        '# Notes',
+        '...',
+      ].join('\n'),
+    );
+
+    // 1) Duplicate check: detects that tsk-reused-id is used by more than one row.
+    const idResult = checkIdentityIdsUnique(repo);
+    assert.equal(idResult.passed, false);
+    assert.match(idResult.message, /backlog id tsk-reused-id is used by more than one row/);
+
+    // 2) Reconciliation check: asserts the named finding for tsk-migrated-done (item p-done000001 is done, not proposed).
+    const reconResult = checkBacklogReconciliation(repo);
+    assert.equal(reconResult.passed, false);
+    assert.ok(
+      reconResult.failures.some((f) =>
+        f.includes('tsk-migrated-done') && f.includes('p-done000001') && f.includes('done')
+      ),
+      `expected named finding for tsk-migrated-done with item id and status, got: ${JSON.stringify(reconResult.failures)}`
+    );
+
+    // 3) Line-scan / parse disagreement: add an item with broken frontmatter but `status: proposed` line.
+    fs.writeFileSync(
+      path.join(backlogDir, 'p-broken0001.md'),
+      '---\nid: [unclosed\nstatus: proposed\n---\n# broken\n'
+    );
+    assert.throws(
+      () => checkBacklogReconciliation(repo),
+      /id list disagrees with the file count/
+    );
+
+    // CLI execution door check:
+    const cliRun = spawnSync(
+      process.execPath,
+      [path.join(REPO_ROOT, 'scripts/check-backlog-reconciliation.mjs'), '--repo-root', repo],
+      { encoding: 'utf8', env: { ...process.env } }
+    );
+    assert.equal(cliRun.status, 1);
+    assert.match(cliRun.stderr, /id list disagrees with the file count/);
+  } finally {
+    fs.rmSync(repo, { recursive: true, force: true });
+  }
 });

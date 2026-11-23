@@ -7,6 +7,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { readFrontmatter } from '../src/util/yaml.mjs';
+import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
+
+// The YAML door needs the native addon; a missing addon must fail loudly here,
+// never surface as swallowed parse errors.
+ensureAddonForScript();
 
 const MAX_REGISTRY_BYTES = 8 * 1024 * 1024;
 
@@ -17,6 +22,27 @@ function readText(file) {
   } catch {
     return null;
   }
+}
+
+/**
+ * Reads an item's frontmatter id, status, and recorded original id if any.
+ * One shared reader for backlog checks; an item that cannot be parsed throws.
+ */
+export function readBacklogItemIdentity(text, file = 'backlog item') {
+  const { meta, body } = readFrontmatter(text, file);
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) {
+    throw new Error(`${file}: frontmatter is not a mapping`);
+  }
+  const id = typeof meta.id === 'string' && meta.id.trim() ? meta.id.trim() : null;
+  if (!id) {
+    throw new Error(`${file}: missing required frontmatter key 'id'`);
+  }
+  const status = typeof meta.status === 'string' && meta.status.trim() ? meta.status.trim() : null;
+  const origMatch = /Original id:\s*([^\s.]+)/i.exec(body ?? '');
+  const originalId = (typeof meta.originalId === 'string' && meta.originalId.trim())
+    || (typeof meta.original_id === 'string' && meta.original_id.trim())
+    || (origMatch ? origMatch[1].trim() : null);
+  return { id, status, originalId, meta, body };
 }
 
 /**
@@ -47,16 +73,22 @@ function markdownFilesUnder(dir, skip = []) {
 /** The id registries of one checkout: backlog rows, `D-ADR` headings, decision file numbers. */
 function readIdRegistries(root) {
   const backlogIds = [];
-  // The backlog keeps one file per item; its id is the `id:` of the frontmatter.
+  const parseErrors = [];
+  // The backlog keeps one file per item; its id is the frontmatter id and its original id if recorded.
   const itemsDir = path.join(root, 'plans/backlog');
   for (const file of markdownFilesUnder(itemsDir)) {
-    let id;
-    try {
-      id = readFrontmatter(readText(file) ?? '', file).meta.id;
-    } catch {
-      // an unparseable block carries no id
+    const text = readText(file);
+    if (text === null) {
+      parseErrors.push(`${path.relative(root, file)}: could not read file`);
+      continue;
     }
-    if (typeof id === 'string' && id) backlogIds.push(id);
+    try {
+      const item = readBacklogItemIdentity(text, file);
+      if (item.id) backlogIds.push(item.id);
+      if (item.originalId) backlogIds.push(item.originalId);
+    } catch (err) {
+      parseErrors.push(`${path.relative(root, file)}: failed to read backlog item: ${err.message}`);
+    }
   }
   // One decision may be recorded in several area specs; it is the same decision while every
   // heading gives it the same short title, and two titles under one number are two decisions.
@@ -79,7 +111,7 @@ function readIdRegistries(root) {
   } catch {
     // the decision corpus is retired in most checkouts
   }
-  return { backlogIds, adrTitles, fileNumbers };
+  return { backlogIds, adrTitles, fileNumbers, parseErrors };
 }
 
 const duplicates = (values) => [...new Set(values.filter((value, index) => values.indexOf(value) !== index))];
@@ -89,8 +121,9 @@ const duplicates = (values) => [...new Set(values.filter((value, index) => value
  * and no two decision files share a number.
  */
 export function checkIdentityIdsUnique(root) {
-  const { backlogIds, adrTitles, fileNumbers } = readIdRegistries(root);
+  const { backlogIds, adrTitles, fileNumbers, parseErrors } = readIdRegistries(root);
   const problems = [
+    ...(parseErrors ?? []),
     ...duplicates(backlogIds).map((id) => `backlog id ${id} is used by more than one row`),
     ...[...adrTitles].filter(([, titles]) => titles.size > 1).map(([id, titles]) => `${id} is headed with different titles (${[...titles].map((t) => JSON.stringify(t)).join(', ')})`),
     ...duplicates(fileNumbers).map((number) => `decision file number ${number} is used by more than one file`),
