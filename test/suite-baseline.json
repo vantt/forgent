@@ -461,6 +461,7 @@
     "test/seat-binding/route-doctor-check.test.mjs": 0.7,
     "test/session-identity/attempt-writer-id.test.mjs": 0.3,
     "test/setup/agent-cli-trust-check.test.mjs": 0.7,
+    "test/setup/agent-hooks.test.mjs": 24.8,
     "test/setup/agent-wiring.test.mjs": 19.3,
     "test/setup/agy-permissions.test.mjs": 7.9,
     "test/setup/bin-discovery.test.mjs": 0.1,

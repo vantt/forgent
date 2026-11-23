@@ -731,12 +731,7 @@ pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options) 
 
 /// Every fix (only the ones in `only` when it is not empty), in exact registry order; consecutive fixes of one
 /// owner are one call.
-fn run_fixes(
-    registry: &Registry,
-    owners: &Owners,
-    root: &Path,
-    only: &[String],
-) -> Vec<FixResult> {
+fn run_fixes(registry: &Registry, owners: &Owners, root: &Path, only: &[String]) -> Vec<FixResult> {
     let fixes: Vec<&RegistryFix> = registry
         .fixes
         .iter()
@@ -1289,7 +1284,10 @@ mod tests {
             .map(|f| f.id.as_str())
             .collect();
         assert_eq!(fixed, ["fix-alpha", "gateway-token-configured"]);
-        assert!(report.checks.unwrap().len() > 2, "the rows are still judged");
+        assert!(
+            report.checks.unwrap().len() > 2,
+            "the rows are still judged"
+        );
         let unknown = Options {
             fix: true,
             only: vec!["no-such-fix".into()],
