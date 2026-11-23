@@ -22,3 +22,5 @@ Until it lands, the secretary raises \`coordination-help\` for that 21:06 wait a
 # Notes
 
 Owner concern 2026-11-23. Related: `p-4uqiyjwrtd`, `p-5gczifzh7h`, `p-du3gbevrs5`. Order it with the two supervisor rows above, before the 21:06 wait if the owner wants it.
+
+Owner direction 2026-11-23, for the shaper: first survey the existing foundation components that manage a run, an assignment or a session, because each of them already manages worktrees (the worktree door, the run supervisor and its assignments under `.fgos/assignments/`, the session host and its rotation records, the watcher). Extend the one that owns the worktree and the session lifecycle with the sleep record and the workspace hold, and add no second place that tracks worktrees or wakes sessions. The shaper reports what each component owns today, which one the sleep record belongs to, and what is reused versus missing (prior art rule in AGENTS.md).
