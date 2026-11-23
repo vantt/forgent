@@ -16,3 +16,10 @@
 
 ## Note
 - The `session type` text did not submit by itself. A second `--text $'\r'` submitted it.
+
+## Late events (12:50 to 12:55)
+- 317d835b4b698c7d (authority-doors: the vector is missing from the frontmatter footprint) was already fixed by 1bf6a1d7a. Handled. The lead's next round sees it on main.
+- 372dfa95acca188a URGENT and ddda3dd57fc81459 (runner plan land refused): the restored plan-contract-check gate refuses plan lands that go through the release payload (`git-addon-unavailable`). The contract-check lead is fixing it in scripts/lib/git-addon-stage.mjs, inside its footprint, through a branch land. After that fix lands, the runner lead re-lands its uncommitted status-cell edit. My own path lands (1bf6a1d7a, 4703500ca) passed the gate. Handled.
+- 3fd379644286fa79: contract-check phase 2 waits only on the trunk `npm test` verdict. This is the third request to lead:SUPERVISOR (f78c2c28, aa6bb1dc). Handled. If no verdict arrives by the next wake, I ask the owner.
+- 6b44359a71a5f944: lead:SUPERVISOR rotated Miu onto df57ddfc itself. The "unsent input" in head panes is Claude Code's greyed prompt suggestion, not typed text (backlog p-v4bz62azhu). The Miu deferral above is void. Handled.
+- 103031a70197317f, 6c5e970c3ab46375 `session-no-result` (run_unit-run-1795413024078-d44e13a3 producer seats): the owning lead reads the result. 71ea408add5c0b61 `session-idle` names lead:SUPERVISOR. All handled.
