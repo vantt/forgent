@@ -211,6 +211,10 @@ matching.
    test/architecture.test.mjs`, and so does one extra match inside an allowed file. A comment does not fail it.
 6. `rg -l architecture-manifest.json` finds only history. `CHANGELOG.md` `## [Unreleased]` names the new verb.
    `npm test` and `cargo test --workspace` are green.
+7. `locate` and `declare` work on the model of the project they run in. In a temporary project with no model,
+   `locate` answers `authority: inactive` with exit 0, the first `declare` creates an empty schema-valid model and
+   writes its row (still refusing a new component or decision kind without an answered owner question), and
+   `locate` then finds that row. Check: `cargo test -p fgos --test authority` (phase 5, step 6).
 
 ## Non-goals
 
@@ -313,6 +317,11 @@ admits no plan whose footprint overlaps a `running` one):
   each row it plans. Applied 2026-11-23 to phases 2 and 3 (see "Per-row re-cut" above). Phase 4 already lists its
   two rows' callers and stays whole until a unit finds an outside caller. The frozen mailbox rows and the herdr crate edge become their own backlog items or wait for
   their owning lane. The outcome and acceptance criteria stay as they are, and no door row is dropped.
+- Owner order 2026-11-23 12:5x, relayed by lead:SUPERVISOR (scope addition, approved): `locate` and `declare` use
+  the model of the project they run in; the first `declare` in a project without a model creates an empty one; with
+  no model, `locate` and the skills report inactive. Folded into phase 5 as step 6, with acceptance 7. Phase 5
+  already owns the verb, its wiring and its tests, so the footprint does not change, and a separate phase would
+  share all of phase 5's files.
 - q-3iylevstr2 (`locate` in projects without a model): the owner answered A on 2026-11-23. `locate` is a gated
   capability. The skills call it only where the project has `packages/component-authority/model/`, and record
   `authority: inactive` otherwise, as the impact-analysis gate does. `plan-contract-check` skips the Authority-map

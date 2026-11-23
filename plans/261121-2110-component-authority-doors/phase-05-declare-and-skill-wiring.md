@@ -54,8 +54,28 @@ packages/component-authority/rust/, Cargo.lock, apps/fgos/src/main.rs, test/cli/
    `scripts/plan-contract-check.mjs` skips the Authority-map rule when the checked project has no model. Add one
    test case for that skip.
 
+6. The project's own model (owner order 2026-11-23 12:5x, scope addition approved). `locate` and `declare` read
+   and write the model of the project they run in, never fgOS's repository:
+   - The wiring in `apps/fgos/src/wiring/authority.rs` resolves the project root through the invocation-root door
+     (`packages/git/rust/src/invocation_root.rs`) and passes `<root>/packages/component-authority/model/` to the
+     crate. The crate takes the directory as a parameter and resolves no path itself. No second path rule and no
+     convention entry: the model has one location relative to the project.
+   - No model directory: `locate` returns a `fgos.v1` envelope with `authority: "inactive"` and exits 0, the same
+     answer the skills record (step 5). A directory that exists but is missing a file is still refused by the
+     loader, as in phase 1.
+   - The first `declare` in a project with no model creates an empty one there: `layers.json`, `components.json`,
+     `decision-kinds.json`, `contracts.json` and `doors/`, each with no rows and valid against
+     `packages/component-authority/contracts/model.v1.json`. It then writes the declared row. Every write goes
+     through the durable-file door. The `--approved-by` rule of step 1 still holds, so a new component or decision
+     kind still needs an answered owner question; a refused `declare` creates nothing.
+   - Owning proof, in `apps/fgos/tests/authority.rs`: in a temporary project with no model, `locate` answers
+     `inactive`; a `declare --kind component --approved-by <answered q>` creates the model and the row; `locate` then
+     ranks that row first; the five created files load and validate. A crate test covers "refused declare leaves no
+     model". The run in this repository still reads this repository's model, so the phase 1 tests are unchanged.
+
 ## Verify
-- `cargo test -p fgos-component-authority` and `cargo test -p fgos --test authority` are green.
+- `cargo test -p fgos-component-authority` and `cargo test -p fgos --test authority` are green, including the
+  temporary-project case of step 6.
 - `node --test test/scripts/plan-contract-check.test.mjs` is green, including the no-model skip.
 - `npm run build:skills` leaves `git status` clean after commit.
 - `node scripts/plan-contract-check.mjs --all` reports no new error for `running` plans.
