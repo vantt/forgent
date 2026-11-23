@@ -105,9 +105,9 @@ report.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [One reuse-or-build door in the leaf](phase-01-one-reuse-or-build-door.md) | - | scripts/lib/git-addon-stage.mjs, scripts/git-addon.mjs, test/distribution/native-addon.test.mjs | 1 | parked: branch contract-check-in-confined-heads/p01b @3a9ab48bc (reviewed diff re-applied on main plus the ort-static fix) ready to land; lands refused land-target-ahead (other heads' unpushed main commits), then main-checkout-dirty-overlap on plans/261121-2110-component-authority-doors/plan.md (that lead's uncommitted edit in the main checkout, last ticket c-11439-1795405880138); on resume land it again; see reports/lead-261123-1047-phase1-reapply-and-land.md |
+| 1 | [One reuse-or-build door in the leaf](phase-01-one-reuse-or-build-door.md) | - | scripts/lib/git-addon-stage.mjs, scripts/git-addon.mjs, test/distribution/native-addon.test.mjs | 1 | done: landed 577e48efe (re-applied on main as p01b with the ort-static fix; land gates and both named tests green, ticket c-12066-1795405917947) |
 | 3 | [Backlog checks count a migrated item's Original id](phase-03-backlog-checks-count-original-ids.md) | - | scripts/check-backlog-reconciliation.mjs, scripts/identity-ids-unique.mjs, test/scripts/doc-health.test.mjs, docs/history/backlog-execution-reconciliation/RECONCILIATION.md | 1 | done: landed 5eeb2d60a (owner chose option 1 on q-tvhmli3fns: rule kept; the 277 unreconciled items go to a backlog row the secretary files) |
-| 2 | [Integration: confined proof and gate hand-off](phase-02-integration-and-gate-handoff.md) | 1, 3 | plans/261123-0726-contract-check-in-confined-heads/reports/ | 2 | draft |
+| 2 | [Integration: confined proof and gate hand-off](phase-02-integration-and-gate-handoff.md) | 1, 3 | plans/261123-0726-contract-check-in-confined-heads/reports/ | 2 | parked: needs an unconfined session to restage the stale addon (node scripts/git-addon.mjs) and run npm test plus cargo test --workspace; confined check now fails by name; gate restore not back yet; see reports/integration.md |
 
 Execution: phases 1 and 3 are independent `code:implement` units, each in its own worktree, in wave 1. Phase 2 is a `code:test` unit plus a supervisor
 hand-off note. No two phases share a path.
