@@ -418,6 +418,60 @@ fn append_sidecar_record(sidecar: &Path, record: &Value) -> Result<(), std::io::
     Ok(())
 }
 
+/// ANSI wrapper with the same stable prefix and suffix the ak status line uses,
+/// so a color never leaks into the text around it.
+fn paint(text: &str, code: &str, color: bool) -> String {
+    if color {
+        format!("\x1b[22m\x1b[39m{code}{text}\x1b[0m\x1b[22m\x1b[39m")
+    } else {
+        text.to_string()
+    }
+}
+
+/// Renders the head status line in the ak layout: model and context percentage
+/// joined by " - ", then the weekly quota with an hourglass. The model is cyan; the
+/// percentage is green below 70, yellow from 70 and red from 85; the quota is green
+/// and turns red from 85. Segments are separated by two spaces, a missing figure is
+/// left out, and with color off the text alone stays readable.
+fn render_status_line(
+    model: Option<&str>,
+    ctx_pct: Option<f64>,
+    quota_pct: Option<f64>,
+    write_err: Option<&str>,
+    color: bool,
+) -> String {
+    let model = model
+        .filter(|m| !m.trim().is_empty())
+        .unwrap_or("fgOS head");
+    let mut head = format!("\u{1F916} {}", paint(model, "\x1b[36m", color));
+    if let Some(c) = ctx_pct {
+        let code = if c.round() >= 85.0 {
+            "\x1b[31m"
+        } else if c.round() >= 70.0 {
+            "\x1b[33m"
+        } else {
+            "\x1b[32m"
+        };
+        head.push_str(&format!(" - {}", paint(&format!("{c:.0}%"), code, color)));
+    }
+    let mut parts = vec![head];
+    if let Some(q) = quota_pct {
+        let code = if q.round() >= 85.0 {
+            "\x1b[31m"
+        } else {
+            "\x1b[32m"
+        };
+        parts.push(format!(
+            "\u{231B} {}",
+            paint(&format!("wk {q:.0}%"), code, color)
+        ));
+    }
+    if let Some(err) = write_err {
+        parts.push(paint(&format!("({err})"), "\x1b[31m", color));
+    }
+    parts.join("  ")
+}
+
 fn status_line(head_role: Option<&str>, payload: &Value) -> Option<String> {
     if head_role.filter(|r| !r.trim().is_empty()).is_none() {
         return None;
@@ -473,18 +527,17 @@ fn status_line(head_role: Option<&str>, payload: &Value) -> Option<String> {
         .pointer("/quota/weeklyUsed")
         .and_then(Value::as_f64)
         .map(|u| u * 100.0);
-    let normal_line = match (ctx_pct, quota_pct) {
-        (Some(c), Some(q)) => format!("fgOS head · ctx {:.0}% | quota {:.0}%", c, q),
-        (Some(c), None) => format!("fgOS head · ctx {:.0}%", c),
-        (None, Some(q)) => format!("fgOS head · quota {:.0}%", q),
-        (None, None) => "fgOS head".to_string(),
-    };
-    let line = if let Some(err) = write_err {
-        format!("{normal_line} ({err})")
-    } else {
-        normal_line
-    };
-    Some(line)
+    let color = std::env::var_os("NO_COLOR").is_none();
+    let model = payload
+        .pointer("/model/display_name")
+        .and_then(Value::as_str);
+    Some(render_status_line(
+        model,
+        ctx_pct,
+        quota_pct,
+        write_err.as_deref(),
+        color,
+    ))
 }
 
 fn handle_status_line(head_role: Option<&str>, stdin: impl Read) -> Option<String> {
@@ -1035,7 +1088,37 @@ mod tests {
 
         // 1. Head payload -> one record is written beside the transcript
         let line = status_line(Some("secretary"), &payload).unwrap();
-        assert!(line.contains("fgOS head"));
+        assert!(
+            line.contains("fgOS head"),
+            "model falls back to the head label: {line}"
+        );
+        assert!(
+            line.contains("9%") && line.contains("wk 42%"),
+            "figures must match the payload: {line}"
+        );
+        // Exact rendering, ak layout: plain text, then the same text colored.
+        assert_eq!(
+            render_status_line(Some("Opus"), Some(9.27), Some(42.0), None, false),
+            "\u{1F916} Opus - 9%  \u{231B} wk 42%"
+        );
+        assert_eq!(
+            render_status_line(Some("Opus"), Some(72.0), Some(90.0), None, true),
+            "\u{1F916} \x1b[22m\x1b[39m\x1b[36mOpus\x1b[0m\x1b[22m\x1b[39m - \x1b[22m\x1b[39m\x1b[33m72%\x1b[0m\x1b[22m\x1b[39m  \u{231B} \x1b[22m\x1b[39m\x1b[31mwk 90%\x1b[0m\x1b[22m\x1b[39m"
+        );
+        assert_eq!(
+            render_status_line(None, None, None, None, false),
+            "\u{1F916} fgOS head"
+        );
+        assert_eq!(
+            render_status_line(
+                Some("Opus"),
+                Some(85.0),
+                None,
+                Some("sidecar write failed: x"),
+                false
+            ),
+            "\u{1F916} Opus - 85%  (sidecar write failed: x)"
+        );
         let sidecar = transcript_dir.join("test-sid-123.context-sidecar.jsonl");
         assert!(sidecar.exists(), "sidecar must exist beside transcript");
         let text = std::fs::read_to_string(&sidecar).unwrap();
