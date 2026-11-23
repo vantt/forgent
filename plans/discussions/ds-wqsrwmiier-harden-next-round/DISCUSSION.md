@@ -48,13 +48,14 @@ Per the owner's order, Appendix A is copied in as the frame: the hand-off draft,
 O1–O6 from ds-wham5txfkv, §4 carries D1 and D6–D10, and §6 carries the inventory, which step 0 recounts (D9). From now on this
 file is the original.
 
-Round 1's own findings stay as new rows N1–N6 in §3. Where they differ from the seed, the seed is the frame and the row stays
-open for round 2:
+Round 1's own findings stay as new rows N1–N6 in §3. Two of them differed from the seed; at 19:4x the owner took both proposals,
+and they replace the seed on these points:
 
-- **N2 against the seed's phase T2–T3 entry.** The seed opens that phase only once `261122-0118` and `261123-0828` have landed
-  or rebased. Round 1 proposes that its read-only steps 1–3 run earlier, with only the sub-plan waiting.
-- **N3 against the seed's phase T9.** The seed puts the "H7 hook arm" in T9. ds-wham5txfkv O5 had sent
-  `git/main-checkout-delete-guard.mjs` to S1. Round 1 suggested phase T2–T3 for it, since it is T2 logic.
+- **N2 (replaces the seed's phase T2–T3 entry).** Phase T2–T3's read-only steps 1–3 run without waiting for `261122-0118` and
+  `261123-0828`; only its sub-plan waits for them to land.
+- **N3 (replaces the seed's "H7 hook arm" in T9).** `git/main-checkout-delete-guard.mjs` goes to phase T2–T3. The Rust Git crate
+  already judges the main checkout (`main_checkout_root`, `packages/git/rust/src/lib.rs:40`), and the `hook` route already has
+  native subcommands, so the move is cheap there. The council of that phase settles which component is the authority for the verdict.
 
 At 19:34 the owner ordered a triage scan that decides which components need a council (N7, in step 0). At 19:4x the owner set the
 council's first priority: component authority, contracts and one door. At 19:39 the owner made clear the inside is not skipped:
@@ -103,8 +104,8 @@ This discussion edits them in place from here on. O7, the N rows and F1 are new 
 | C5 | The T8 tier name in `layers.json` ("Skill and Domain (no file today)") is stale: the model puts `supervision` at tier 8 and the domains at T7 | input | `layers.json`, `components.json` |
 | O7 | `261122-2108` is `draft`, and its own rule waits for `261122-0118` ("no edit to any file `261122-0118` still edits before it lands"). Step 0 and the hand-off therefore hang on two plans that are not this discussion's to move. | open, blocks step 0 and the hand-off | `plans/261122-2108-delete-dead-node-execution-closure/plan.md` frontmatter and constraints |
 | N1 | Step 0 is one read-only pass. It reruns the ds-wham5txfkv §5 inventory method on the tree after doors and `261122-2108`, runs the two H5 tests alone, and names the owning phase for every §6 row and every H or C carry-over. It writes one report and changes no code. | provisional (round 1) | D9; seed §7 step 0; HARDEN loop step 1 |
-| N2 | Phase T2–T3's steps 1–3 (baseline, council, arbitration, owner ask) are read-only, so they may run while `261122-0118` and `261123-0828` still hold session files. Only its sub-plan (step 4) waits for them to land. | provisional (round 1); the seed waits for "landed or rebased" | owner 2026-11-23 16:24, "nobody waits on a head that is away"; `261122-0118` footprint `src/session-host/head-grants.mjs` and its tests |
-| N3 | Which phase owns `git/main-checkout-delete-guard.mjs` (505 lines of logic, tier 2): the seed's T9 "H7 hook arm", or phase T2–T3 as its tier suggests. S1's other two verdicts (`state/decision-question.mjs`, `runner/hook.mjs`) are T7 code. | open | seed §7 T9; ds-wham5txfkv O5 and H7; `components.yaml` tier 2 `git` |
+| N2 | Phase T2–T3's steps 1–3 (baseline, council, arbitration, owner ask) are read-only, so they may run while `261122-0118` and `261123-0828` still hold session files. Only its sub-plan (step 4) waits for them to land. | owner accepted 19:4x ("N2, N3 theo đề nghị"); replaces the seed's "landed or rebased"; mint next round | owner 2026-11-23 16:24, "nobody waits on a head that is away"; `261122-0118` footprint `src/session-host/head-grants.mjs` and its tests |
+| N3 | Which phase owns `git/main-checkout-delete-guard.mjs` (505 lines of logic, tier 2): the seed's T9 "H7 hook arm", or phase T2–T3 as its tier suggests. S1's other two verdicts (`state/decision-question.mjs`, `runner/hook.mjs`) are T7 code and go with phase T7. **Answer: phase T2–T3**, because the Rust Git crate already exports `main_checkout_root` (`packages/git/rust/src/lib.rs:40`) and the `hook` route already serves native subcommands (`dispatch-decide`, `mailbox`, …) in `command-routes.json`. The phase's council settles the verdict's authority component. | owner accepted 19:4x ("theo đề nghị"); mint next round | seed §7 T9; ds-wham5txfkv O5 and H7; `components.yaml` tier 2 `git`; `packages/git/rust/src/lib.rs:40`; `packages/host-runtime/contracts/command-routes.json` `hook` |
 | N4 | "T8" in D8 is the `supervision` component (`src/portfolio`, 1 file of 19 lines, plus `packages/portfolio/*.mjs`). Skill/Domain closed under HARDEN on 2026-11-09 and is not reopened. With so little code, its council is one shared seat round. | provisional (round 1) | `components.yaml` tier 8; closing report §6 row T8 |
 | N5 | HARDEN step 7 lands "on the three workspaces on the owner machine (forgentX, mdview, mcp-skill-hub) and on the second machine". That list dates from 2026-10-21. Which machines and workspaces run fgOS today? **Owner answer:** each phase's step 7 lands, activates, runs doctor and smokes on this machine (`~/projects/forgent`) first; the owner lands the other machines himself; mdview and mcp-skill-hub are dropped from the list. | clear (owner answer 19:3x); minted next round if it holds | HARDEN plan "The per-layer loop" step 7; owner chat 19:3x |
 | N7 | **Triage scan before any council (owner orders 19:34 and 19:4x).** Step 0 adds one column to the recounted inventory: council weight per component, with its reason. Each layer's step 1 rechecks only its own rows. The scan reads the component-authority model (`components.yaml` owns, mustNotOwn, status and exceptions; `contracts.yaml`; `decision-kinds.yaml`; `doors/`) and the source, and judges the boundary, not the size of the code. **Full** (a council on that component): its authority, contracts or door are not sound. Signs: status still `designed`, per-file layer exceptions, a contract whose evidence still points at Node, door debt, a sign of a `mustNotOwn` breach, or the same job done through more than one door (a Node and a Rust twin, several walkers or copies, as in H2). T7 Work is always full (decision 78). **Light** (no council, an ordinary sub-plan): the boundary is sound and only inside work remains (deleting, thinning). **Skip**: a facade or thin client over a Rust owner, or dead code, deleted with its last caller (D1). The scan decides by these rules without asking; its table rides in the layer's one batched owner ask, where the owner can override a row. Example: `session-host` has status `designed` and four per-file layer exceptions (`head-start`, `head-request`, `head-stop` at tier 5, `head-grants` kernel), so it is full. | provisional (owner direction, round 1b); amends D7's "loop unchanged"; mint next round if it holds | owner chat 19:34 "cần có 1 bước quét để quyết định chổ nào cần council, không thì phí", 19:4x (N8); `packages/component-authority/model/components.yaml` session-host row |
@@ -155,6 +156,9 @@ Copied from ds-wham5txfkv §4. They are owner decisions made there and are not r
 - **2026-11-23 19:39 — owner:** "cần làm rõ N8 là ưu tiên: chốt ranh giới: authority, contract và một cửa. bên trong không phải là
   không làm, nếu lúc quét phát hiện phải đổi thì nên đổi chứ." N8 reworded: the boundary is the first priority, not the only
   scope; inside changes the scan or council finds necessary are made in the same phase; only optional optimisation may wait.
+- **2026-11-23 19:4x — owner:** "N2, N3 theo đề nghị. O7 là gì". N2 accepted. N3: the condition set in chat was checked (the Rust
+  Git crate exports `main_checkout_root`; the `hook` route already has native subcommands), so the delete guard goes to phase
+  T2–T3. O7 explained in chat.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -244,7 +248,8 @@ discussion settled and hand the skeleton to a planner. Owner: this shaper.
 
 ### Phase T2–T3 — session {#task-t2-t3-session}
 Components: session-rotation, session-host (and the dispatch live rest reached only from heads). Inputs: §6 rows 10, 13
-and 14; H6. Opens once `261122-0118` and `261123-0828` have landed or rebased (O2).
+and 14; H6; the main-checkout delete guard (`src/git/main-checkout-delete-guard.mjs`, H7, N3). Steps 1–3 open after step 0
+without waiting; the sub-plan waits for `261122-0118` and `261123-0828` to land (N2, O2).
 
 ### Phase T6 — Workflow {#task-t6-workflow}
 Components: workflow, work-driver; the seat-binding client and the dispatch/execution live rest reached from
@@ -256,7 +261,7 @@ Components: supervision (`src/portfolio`, `packages/portfolio/*.mjs`). Inputs: �
 
 ### Phase T9 — host, surface, packaging, report {#task-t9}
 Components: host-surface (non-Work arms), packaging-distribution, learning-docs-registry, fgos-gateway. Inputs: §6 rows
-1, 19 (non-Work), 20, 22; H2; H3; D2's `setup` pieces; H7 hook arm. The `legacy-node` payload and `native` door can go
+1, 19 (non-Work), 20, 22; H2; H3; D2's `setup` pieces; the `hook` route's remaining Node arms (the delete guard itself moved to T2–T3, N3). The `legacy-node` payload and `native` door can go
 only after T7.
 
 ### Phase T7 — Work, last {#task-t7-work}
