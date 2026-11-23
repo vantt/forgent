@@ -125,3 +125,5 @@ None. The evidence settles the cause and shows the fix is live.
 - Risk: a `bad-measure` line appears after the activation. That would mean a second cause. Stop, record it in the
   phase report, and hand back to the planner.
 - Rollback: revert the land commit of the backlog edit, which sets the row back to `proposed`.
+
+Supervisor, 2026-11-24 01:50 +07 (event 67369ca905e0f96d): the lead is gone and is not restarted while the plan only waits. Parked on the unconfined full-suite run started 01:38 on `main` `980d1276d` (docs-only since): `npm test` then `cargo test --workspace`, logs `.fgos/runtime/tmp/suite-npm.log` and `.fgos/runtime/tmp/suite-cargo.log` (each ends with an `exit N` line). The next supervisor wake that finds both exit lines starts the lead again; the lead reads the logs and closes from them.

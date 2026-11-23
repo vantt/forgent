@@ -619,3 +619,5 @@ None open. Shape choices the planner settled from the evidence:
 ## Outstanding questions
 
 None.
+
+Supervisor, 2026-11-24 01:50 +07 (event 67369ca905e0f96d): the lead is gone and is not restarted while the plan only waits. Parked on the unconfined full-suite run started 01:38 on `main` `980d1276d` (docs-only since): `npm test` then `cargo test --workspace`, logs `.fgos/runtime/tmp/suite-npm.log` and `.fgos/runtime/tmp/suite-cargo.log` (each ends with an `exit N` line). The next supervisor wake that finds both exit lines starts the lead again; the lead reads the logs and closes from them.

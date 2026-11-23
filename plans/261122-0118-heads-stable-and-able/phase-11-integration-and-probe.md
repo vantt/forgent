@@ -127,3 +127,13 @@ steps 2-6. The probe runs from a supervisor and a secretary started after the ne
 - The owner chose "A. Owner pastes the six lines and commits" in this lead's chat. The lead's grant has no
   `questions answer` (`verb-not-granted`), so the owner records it with the answer command and lands the lines from
   `reports/carry-p11-changelog-lines.md`. Step 2 is done once those lines are on main.
+
+### Probe report drafted, waiting on the supervisor (2026-11-24 01:45, head:lead-forgent-261122-0118-heads-b52f9)
+
+- The supervisor will paste the changelog lines and is running the full suite again; it messages this lead with the result.
+- `reports/head-grant-probe.md` is drafted: the supervisor's 30 rows and the folded-rows check. The two rows the probe
+  printed `failed` (`watcher tune`, `config patch`) are domain refusals of harmless arguments, so they count as served;
+  `watcher tune` reports that refusal under `host-failed`, raised to the supervisor for a backlog row.
+- Left: Miu's rows, the suite result, the changelog on main, then phase 11 and the plan `done`.
+
+Supervisor, 2026-11-24 01:50 +07 (event 67369ca905e0f96d): the lead is gone and is not restarted while the plan only waits. Parked on the unconfined full-suite run started 01:38 on `main` `980d1276d` (docs-only since): `npm test` then `cargo test --workspace`, logs `.fgos/runtime/tmp/suite-npm.log` and `.fgos/runtime/tmp/suite-cargo.log` (each ends with an `exit N` line). The next supervisor wake that finds both exit lines starts the lead again; the lead reads the logs and closes from them.
