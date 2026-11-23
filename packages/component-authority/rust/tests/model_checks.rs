@@ -228,7 +228,10 @@ fn every_component_exception_path_exists_on_disk_and_resolves_to_the_component_t
 fn layers_declare_the_layer_names_the_rules_and_the_ten_tier_names_the_model_uses() {
     let model = model();
     let layers = &model.layers;
-    assert_eq!(layers.layers, LAYERS, "layers.yaml layers must list the layer order");
+    assert_eq!(
+        layers.layers, LAYERS,
+        "layers.yaml layers must list the layer order"
+    );
     for rule in ["one-directional-layer", "domain-siloing", "tier-downward"] {
         assert!(
             layers.rules.iter().any(|declared| declared == rule),
