@@ -63,12 +63,20 @@ fn a_ready_index_answers_with_repository_paths_axes_and_the_region_flag() {
     // as production does: the use case starts the worker before it asks the locator.
     let deadline = std::time::Instant::now() + READY_WAIT;
     while !worker_running(&p) {
-        assert!(std::time::Instant::now() < deadline, "the worker never took its lock");
+        assert!(
+            std::time::Instant::now() < deadline,
+            "the worker never took its lock"
+        );
         thread::sleep(Duration::from_millis(50));
     }
     let locator = PkmLocator::open(&p, EmbedderChoice::Fake);
     let ready = locator.wait_ready(READY_WAIT);
-    assert_eq!(ready.kind, IndexKind::Ready, "the fixture index never became ready: {}", ready.action);
+    assert_eq!(
+        ready.kind,
+        IndexKind::Ready,
+        "the fixture index never became ready: {}",
+        ready.action
+    );
 
     let answer = locate(
         &locator,
@@ -82,7 +90,10 @@ fn a_ready_index_answers_with_repository_paths_axes_and_the_region_flag() {
     let top = &answer.parts[0].candidates[0];
     assert_eq!(top.path, "docs/platform/git/decisions/land-door.md");
     assert_eq!(top.rank, 1);
-    assert_eq!(top.title, "land-door", "pkm titles a document by its file name");
+    assert_eq!(
+        top.title, "land-door",
+        "pkm titles a document by its file name"
+    );
     assert_eq!(top.section.last().map(String::as_str), Some("Decision"));
     assert_eq!(top.axes.get("area").map(String::as_str), Some("git"));
     assert_eq!(top.axes.get("question").map(String::as_str), Some("choice"));
