@@ -66,6 +66,16 @@ a deepseek/thehive fallback, but it committed nothing, so it does not prove the 
    (`worktree-dirty-preserved`; only an untracked `.probe` the c-84280 worker left; branch fully landed). Safe to remove.
 6. The land gates do not compile the `fgos` bin's unit tests, which is how the break above reached `main`.
 
-## Unresolved
+## Acceptance 3, closed 14:00
 
-- Acceptance 3 is open until item 4 runs.
+lead:SUPERVISOR ran both suites at `deaedf06d`, which contains `2b903592c` and `280c484ab`
+(`plans/261123-0726-contract-check-in-confined-heads/reports/npm-test-full.md`):
+
+- `cargo test --workspace --no-fail-fast`: 4301 passed, 1 failed. The red is `head_request`
+  `the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks`, red since 4951cf3da, before this plan.
+  `assignment_runner` is green, including the three `rust-owned:` cases.
+- `npm test`: 7923 tests, 7883 passed, 12 failed. Every red is classified there as pre-existing or owned by another
+  lane (DOCOS release workflows, the run-tests fixture, the dev-host consumers case of plan 261123-0726). None touches
+  a path in this plan's footprint.
+
+Acceptance 3 holds for this plan's change. Every acceptance criterion is met; the plan is done.

@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "The mutating-unit recheck replays the bind-time account view instead of re-binding without it"
-status: running
+status: done
 lead: head:lead-forgent-261123-0821-runner-494d8
 priority: P1
 base: 805beabb809bc225727bbb2f587632f1cacdadbb
@@ -151,7 +151,7 @@ refusal codes).
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Record the bind-time account state and replay it in the recheck](phase-01-record-and-replay-account-state.md) | - | packages/execution/engine/src/assignment_runner/, packages/execution/engine/src/unit_run/, packages/execution/engine/src/planning/bind_facade.rs, packages/execution/engine/tests/assignment_runner.rs, packages/execution/engine/tests/unit_run.rs, packages/execution/contracts/assignment-runner/legality.v1.json, apps/fgos/src/wiring/unit_run_host/, docs/platform/runner/contracts/executor-model.md, docs/platform/runner/subcomponents/h-6979005beaf7/spec.md | 1 | done |
-| 2 | [Integration and close](phase-02-integration-and-close.md) | 1 | plans/261123-0821-runner-recheck-replays-account-view/ | 2 | running |
+| 2 | [Integration and close](phase-02-integration-and-close.md) | 1 | plans/261123-0821-runner-recheck-replays-account-view/ | 2 | done |
 
 Phase notes:
 
@@ -161,8 +161,9 @@ Phase notes:
   `2b903592c`. On release `df57ddfcd609` the live check passed: unit-run-1795414231355-8ed8aba7 bound deepseek/thehive
   under a gemini quarantine, recorded `accountState`, and committed. The workspace run found a compile break phase 1
   left in `apps/fgos/src/wiring/unit_run_host/tests/mod.rs`, fixed and landed as `280c484ab`. Acceptance 1, 2, 4, 5
-  and 6 pass. Acceptance 3 (`cargo test --workspace`, `npm test`) is waiting on the supervisor: the lead's sandbox sees
-  the shared cargo build directory as read-only and a private build overflows the 16 GB tmpfs.
+  and 6 pass. Acceptance 3 was run by lead:SUPERVISOR at `deaedf06d` (contains both commits): cargo 4301 passed, 1
+  pre-existing red (`head_request` contract verbs); npm 7883 of 7923 passed, 12 red, none in the runner recheck
+  (`plans/261123-0726-contract-check-in-confined-heads/reports/npm-test-full.md`).
   [report](reports/lead-261123-1322-phase-02-integration-gate.md)
 
 Contract check, done by hand and by `node scripts/plan-contract-check.mjs`: phase 2 sits in a later wave than phase 1,

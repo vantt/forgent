@@ -1,7 +1,7 @@
 ---
 id: p-drfxqdzzon
 title: "The mutating-unit recheck ignores the account view and refuses quarantine-driven bindings (runner, priority high; source: owner via lead:SUPERVISOR, 2026-11-23)"
-status: proposed
+status: done
 priority: P1
 area: runner
 created: 2026-11-23
