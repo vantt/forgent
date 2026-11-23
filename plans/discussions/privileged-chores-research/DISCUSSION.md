@@ -50,6 +50,17 @@ discussion: settled
 
    Planner ghi 0056 vào thứ tự sau plan mới, chỉ ở những file chung.
 
+**Thứ tự (chủ hỏi lúc 00:20).**
+
+Plan 261122-0118 heads-stable-and-able (đang `running`, còn các phase 8, 10 và 11) có footprint chứa gần như mọi file của plan mới: `head-grants.mjs`, `head-request.mjs`, skill secretary và skill supervisor, spec supervision và spec session-host. Hệ quả là plan mới chỉ được `ready` sau khi 0118 xong.
+
+Thứ tự:
+1. Doors (component-authority-doors) và 0118 chạy tiếp. 0118 chỉ còn phase 8 và 10 rồi tới phase 11 (integration và probe).
+2. Plan mới. Planner viết plan ngay đêm nay; supervisor nhận plan khi 0118 xong. T3 chờ thêm doors.
+3. 261122-0056, sau doors và sau plan mới ở những file chung.
+
+Nếu 0118 chưa xong trong đêm thì sáng mai plan mới vẫn chưa chạy. Khi đó, phần duy nhất có thể làm sớm là T4 (driver confinement): nó không nằm trong footprint của 0118, nhưng phải chờ chẩn đoán xong.
+
 **Nguồn:** `p-g5ktat4kej`, `p-v6xinnjoxh`, `p-dw3h5wscns`, `p-ndortdckid`, `p-ia2v33b54u`, `p-btxvtb34u3`, `p-oqs75qwyco`, cùng các quyết định PC-D1 đến PC-D8.
 
 ## 1. Trạng thái hiện tại
