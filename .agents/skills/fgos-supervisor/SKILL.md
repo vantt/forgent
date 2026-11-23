@@ -116,6 +116,11 @@ finish the event without step 4:
   and `fgos metrics prune` clears settled evidence.
 - `fgos run` is for one urgent chore only, never plan work (a lead's).
 - Reach a session by mailbox, SendMessage (peers), or, for a stuck one, the pane.
+- Work your confinement refuses (an account probe, a full-suite run, a host build, a read of a private store) goes to
+  the unconfined `lead:SUPERVISOR` session on the same machine: find it with `fgos identity resolve lead:SUPERVISOR`
+  and send one SendMessage naming the event, the exact command and where to put the result; record that in your report
+  and leave the event open until the result is back. Never leave such an event unanswered for a second wake. When no
+  `lead:SUPERVISOR` is live, ask the owner once with `fgos questions ask`.
 
 ## Never
 
