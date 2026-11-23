@@ -67,6 +67,21 @@ Proposed order to put doors first (for the secretary and supervisor; this shaper
 6. Doors 10 and 11 run, with 2f's row (and 2g's if `p-rypvkc3kai` is still open) left as named debt, `retiredBy` the port.
 7. This discussion is redone: the inventory is recomputed on that tree and each port plan carries an Authority map.
 
+Round 3b (16:24), owner: "heads-stable cũng phải tự điều chỉnh … khi nó quay lại phải tự xử lý sự cố, chứ giờ ngồi
+không bắt người khác đợi là không được." Nobody waits on a head that is away: doors does not wait for `261122-0118`,
+and heads-stable rebases and resolves its own conflicts when it returns. Checked at `ea4806f03`: heads-stable phases 1–7,
+9 and 12 are done. Its open phases 8, 10 and 11 write only `core/skills/fgos-secretary/SKILL.md`, the generated
+`.agents/skills/**` and `plugins/fgOS/skills/**`, its own reports, `test/live/head-grant-probe.live.mjs`,
+`test/session-host/head-start.test.mjs` and `CHANGELOG.md`. They no longer touch `src/cli/command-registry.mjs` or
+`src/session-host/head-request.mjs`; only its frontmatter footprint still lists them. The only real overlap with doors is
+the generated skill directories (doors phase 5), and whoever lands second regenerates them with `npm run build:skills`.
+`261122-2108`'s `blockedBy: 261122-0118` likewise has no remaining file reason: the head-stop and rotate change it
+waited on was in heads-stable's done phases. Question 1 = option (a), recommended in chat and the basis of the order
+below: phase 10 locks everything except the named debt of 2f (and 2g while `p-rypvkc3kai` is open), with `retiredBy`
+the Workflow/Work port. Revised order: (0) a planner re-cuts doors per (a), adds 3a's dead-file deletion, and pins
+`--provider claude`; (1) doors 1b and then its no-wait phases start now; (2) `261122-2108` starts with its blockedBy on
+heads-stable dropped, rebased on the YAML model; (3) doors 3b, 3d, 10, 11; (4) this discussion is redone.
+
 Open owner points (asked in chat, not yet in the store): whether doors closes with 2f as named debt or stays open until
 the port lands; and whether the door guard gets a warn-only mode (see O6).
 
@@ -166,6 +181,7 @@ allowed to run beside any step. F0 through S6a have landed (S6a ended after its 
 
 - **2026-11-23 16:02 — owner:** "anh nghĩ là mọi thứ đã được … harden … chuyển sang rust hết rồi … giải thích plan này đang làm gì" (I thought HARDEN had already moved everything to Rust; explain what this plan does). Explained: HARDEN thinned Node for T0–T5 and deleted none of it; T6, T7, session-host and T9 still hold Node logic.
 - **2026-11-23 16:10 — owner:** component-authority first, then continue; calculate carefully, then patch. Round 3 calculation is recorded in §1; discussion paused.
+- **2026-11-23 16:24 — owner:** heads-stable must not make others wait, and handles its own conflicts on return. Recorded as round 3b in §1.
 - **2026-11-23 16:2x — owner:** asked whether authority has a warn-or-block setting → O6.
 
 ## 6. Thiết kế đã chốt {#design}
