@@ -71,3 +71,7 @@ It was raised to the supervisor.
 - Next unit, once both are cleared: in `-p01b`, re-apply the registry entry and report rounds, then register the
   provider in `apps/fgos/src/main.rs`, list `authority` in `test/cli/subcommand-flag-drift.test.mjs`, and run
   `cargo test -p fgos --test authority`. After that come review and land.
+- 10:53: the footprint lines landed (da5f26065). The final phase-1 unit in `-p01b` (c-43155,
+  unit-run-1795405988455-b81100fb) was refused with the same binding mismatch (deepseek/thehive at bind,
+  gemini/gemini at recheck). It is parked without a pin. The next wake reruns that brief in `-p01b` once
+  261123-0821 lands.
