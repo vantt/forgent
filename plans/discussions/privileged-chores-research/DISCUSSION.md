@@ -46,6 +46,7 @@ Năng lực được giới hạn bằng hàng rào quanh những thứ cần b�
 | P2 | Lead xong hoặc rảnh mà không phát sự kiện | được N1 hấp thụ | `p-iatzcg2gee`, `p-4uqiyjwrtd`, `p-xuazywhh56`, `p-g6heszkdc7`, `p-xpeg4jshiu` trở thành các điều kiện lệch của tick. |
 | P3 | `session type` không submit | ngoài phạm vi | `p-lfwmzs6zsr` |
 | P4 | maxLeads theo năng lực máy | giữ dòng riêng | `p-tyowvhthul`. Đặt maxLeads thì đi qua cửa nâng quyền với `config patch`. |
+| C2 | Xem lại cỡ lồng của Miu và supervisor theo nguyên tắc riêng-nới-lồng, chung-qua-ô-cửa | **đề xuất 23:35, chờ chủ** | Xem §5 23:28. |
 | P5 | Gom 28 verb vào một bộ chuyển tiếp | theo Q2 | Theo L10 và RUL104, phải làm cùng đợt hoặc mở item riêng có tên. |
 
 ## 4. Quyết định đã chốt
@@ -202,6 +203,23 @@ Cả ba chọn **verb `fgos` làm đơn vị quyền, và dữ liệu làm nơi 
 | Lựa chọn thật hoặc chuyển tin | 3 | q-yoxcjqa46z, q-7wfzidusod, q-4lmw3q6la7 | đúng là việc phải hỏi chủ |
 
 Phân bố: khoảng 14 trên 18 việc đặc quyền đã có verb `fgos`. Chỉ 1 là lệnh shell thô. Nhóm thiếu lớn còn lại là 3 lần chạy test trên host, và đó là lỗ năng lực *trong* sandbox, không phải lỗ quyền. Kết quả kiểm đếm ủng hộ hướng lai của hội đồng.
+
+### 2026-11-23 23:28–23:35 — lồng lớn, lồng nhỏ
+
+Chủ hỏi: đã nhốt trong lồng thì sao còn làm ngoài lồng; có lồng lớn lồng nhỏ không? Shaper trả lời: có, mỗi vai một cỡ lồng (`head-grants.mjs`). Thứ dùng chung (`.git` của main, `.fgos`, release) được cố ý đặt ngoài mọi lồng. Lý do không phải vì agent không đáng tin, mà vì mọi phiên cùng sửa chúng, nên chỉ chương trình `fgos` được sửa, có khoá và có ghi sổ. Nguyên tắc đề xuất: **thứ riêng của vai thì nới lồng; thứ dùng chung thì đi qua ô cửa.** Mỗi vai có hai cái núm: cỡ lồng, và bảng ô cửa.
+
+Chủ hỏi có xem lại lồng của Miu và supervisor trong đợt này không. Shaper đề nghị **có**, theo cả hai chiều:
+- **Lồng đang quá chật với việc riêng:**
+  - `p-ndortdckid`: không ghi được friction.
+  - `p-ia2v33b54u`: Miu không gửi được thư.
+  - `p-btxvtb34u3`: `fgos answer` gặp EROFS.
+  - `/tmp` riêng nên supervisor không thấy scratch `par` trên host.
+  - Ba lần chủ phải chạy full test hộ (q-zcileomdpa, q-br5rlczzav, q-pcwf3slkfp). Nguyên nhân sandbox không chạy được chưa được chẩn đoán.
+- **Lồng đang quá rộng:**
+  - `p-oqs75qwyco`: head có grant peers giữ pid namespace của host, nên gửi được signal tới mọi process cùng user.
+  - `p-fimvrao5qk`: dấu hiệu confine chỉ là một biến môi trường, xoá được.
+  - `p-x4qeqdvfl5`: vẫn tới được abstract socket và dịch vụ localhost.
+- **Dùng lại:** probe grant sống của 0118 phase 11 (`test/live/head-grant-probe.live.mjs`) để đo từng điểm trước và sau.
 
 ## 6. Thiết kế đã chốt {#design}
 
