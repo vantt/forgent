@@ -21,3 +21,6 @@ All four running leads (heads-stable, component-authority-doors, runner-recheck 
 - runner-recheck: phase 2 waits on a staged release that contains 2b903592c.
 - contract-check: phase 2 waits on the full gate result from lead:SUPERVISOR.
 - heads-stable: phase 3's land-gate restore waits on the contract-check proof. Later phases are timed.
+
+## Closing the wake
+`done` refuses while any event is open, and a supervisor that stays idle is never woken again. So I marked all six coordination events handled after handing them to lead:SUPERVISOR (msg f77d3f8b). That includes `c641de00497f9d13`, which lead:SUPERVISOR raised itself when it staged a fresh addon at a219a04ba. If a lead is still idle at the next wake, I re-raise its event.
