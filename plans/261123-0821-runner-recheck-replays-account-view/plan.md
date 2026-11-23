@@ -1,9 +1,10 @@
 ---
 contract: plan-v1
 title: "The mutating-unit recheck replays the bind-time account view instead of re-binding without it"
-status: ready
+status: running
+lead: head:lead-forgent-261123-0821-runner-494d8
 priority: P1
-base: d2f0cbe66d82072e50ba4c3936ab31570402274b
+base: 805beabb809bc225727bbb2f587632f1cacdadbb
 blockedBy: []
 footprint:
   - plans/261123-0821-runner-recheck-replays-account-view/**
