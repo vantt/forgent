@@ -65,3 +65,14 @@ Units cannot run node. So unit 2:
    `rg` over `src bin packages core domains apps scripts` and narrow it until it does). No `count` yet.
 3. Lists in the report every row left path-only with one line why.
 The lead then runs the guard, measures each allowed file's total and hands the counts (step 3) to a third unit.
+
+## Unit 3 (counts, 2026-11-24 02:50)
+Unit 2 landed on branch `component-authority-doors/p10b2` (366f4c362): the guard fixes, `names` on 13 rows, no
+`primitives` (every candidate matched outside the row's files; its report lists them for phase 12). The lead ran
+`node --test test/architecture.test.mjs` on it: 93/94, only A4 (red on main). The lead then measured every allowed
+file's total: `reports/p10b-allowed-counts.md` (389 rows: row file, allowed path, count). Unit 3, in the same worktree:
+1. For each table row, turn the matching `allowed` entry of that row file into object form and set `count` to the
+   table's number; keep an existing `reason`. A glob entry (path with `*`) gets no `count` (one count cannot fit many
+   files). An allowed entry absent from the table gets no `count`.
+2. Change nothing else.
+The lead reruns the guard; a count that is off fails it with the exact number.
