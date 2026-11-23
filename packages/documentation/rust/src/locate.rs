@@ -1,14 +1,13 @@
-//! The locate use case: check the question, make sure an index worker runs, ask the locator, keep the ten best.
+//! The locate use case: check the question, make sure an index worker runs, open the locator, keep the ten best.
 
-use crate::port::{
-    Answer, IndexKind, LocateError, Locator, Query, WorkerLauncher, CANDIDATES_MAX, PARTS_MAX,
-};
+use crate::port::{Answer, LocateError, Locator, Query, WorkerLauncher, CANDIDATES_MAX, PARTS_MAX};
 
-/// Answers `query`. Starts the index worker first when none runs and the index is not `broken` (a broken index does
-/// not heal by restarting; its action says what does). A worker that fails to start leaves the answer partial and
-/// names the failure in `action`.
-pub fn locate(
-    locator: &dyn Locator,
+/// Answers `query`. The question is checked before anything starts. When no index worker runs, one is started before
+/// the locator is opened: a locator opened before a worker holds the index reads the missing index as broken. A
+/// broken index is the worker's to refuse (it exits at once), so a start is always tried. A worker that fails to
+/// start leaves the answer partial and names the failure in `action`.
+pub fn locate<L: Locator>(
+    open: impl FnOnce() -> L,
     launcher: &dyn WorkerLauncher,
     query: &Query,
 ) -> Result<Answer, LocateError> {
@@ -30,7 +29,8 @@ pub fn locate(
             parts.len()
         )));
     }
-    let start_failure = ensure_worker(locator, launcher).err();
+    let start_failure = ensure_worker(launcher).err();
+    let locator = open();
     let query = Query {
         parts,
         ..query.clone()
@@ -49,12 +49,9 @@ pub fn locate(
     Ok(answer)
 }
 
-/// Starts a worker when none runs and the index is not broken.
-pub fn ensure_worker(
-    locator: &dyn Locator,
-    launcher: &dyn WorkerLauncher,
-) -> std::io::Result<bool> {
-    if launcher.running() || locator.state().kind == IndexKind::Broken {
+/// Starts a worker when none runs; `Ok(true)` when it started one.
+pub fn ensure_worker(launcher: &dyn WorkerLauncher) -> std::io::Result<bool> {
+    if launcher.running() {
         return Ok(false);
     }
     launcher.start().map(|()| true)
@@ -63,7 +60,7 @@ pub fn ensure_worker(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::port::{Candidate, IndexState, Part};
+    use crate::port::{Candidate, IndexKind, IndexState, Part};
     use std::cell::Cell;
     use std::collections::BTreeMap;
 
@@ -106,31 +103,32 @@ mod tests {
         }
     }
 
-    struct FakeLauncher {
+    /// Records the order of events: `start` and `open`.
+    struct FakeLauncher<'a> {
         running: bool,
         fails: bool,
-        started: Cell<u32>,
+        log: &'a Cell<Vec<&'static str>>,
     }
 
-    impl WorkerLauncher for FakeLauncher {
+    impl FakeLauncher<'_> {
+        fn note(&self, event: &'static str) {
+            let mut log = self.log.take();
+            log.push(event);
+            self.log.set(log);
+        }
+    }
+
+    impl WorkerLauncher for FakeLauncher<'_> {
         fn running(&self) -> bool {
             self.running
         }
         fn start(&self) -> std::io::Result<()> {
-            self.started.set(self.started.get() + 1);
+            self.note("start");
             if self.fails {
                 Err(std::io::Error::other("no fork"))
             } else {
                 Ok(())
             }
-        }
-    }
-
-    fn launcher(running: bool, fails: bool) -> FakeLauncher {
-        FakeLauncher {
-            running,
-            fails,
-            started: Cell::new(0),
         }
     }
 
@@ -141,62 +139,69 @@ mod tests {
         }
     }
 
+    fn run(
+        running: bool,
+        fails: bool,
+        kind: IndexKind,
+        candidates: usize,
+        parts: &[&str],
+    ) -> (Result<Answer, LocateError>, Vec<&'static str>) {
+        let log = Cell::new(Vec::new());
+        let launcher = FakeLauncher {
+            running,
+            fails,
+            log: &log,
+        };
+        let answer = locate(
+            || {
+                launcher.note("open");
+                FakeLocator { kind, candidates }
+            },
+            &launcher,
+            &query(parts),
+        );
+        (answer, log.take())
+    }
+
     #[test]
-    fn a_worker_starts_only_when_none_runs_and_the_index_is_not_broken() {
-        for (kind, running, starts) in [
-            (IndexKind::Starting, false, 1),
-            (IndexKind::ModelMissing, false, 1),
-            (IndexKind::Ready, false, 1),
-            (IndexKind::Indexing, true, 0),
-            (IndexKind::Broken, false, 0),
-        ] {
-            let l = launcher(running, false);
-            locate(
-                &FakeLocator {
-                    kind,
-                    candidates: 1,
-                },
-                &l,
-                &query(&["a draft"]),
-            )
-            .unwrap();
-            assert_eq!(l.started.get(), starts, "{kind:?}, running {running}");
-        }
+    fn a_worker_is_started_before_the_locator_opens_and_only_when_none_runs() {
+        assert_eq!(
+            run(false, false, IndexKind::Starting, 1, &["a draft"]).1,
+            vec!["start", "open"]
+        );
+        assert_eq!(
+            run(true, false, IndexKind::Indexing, 1, &["a draft"]).1,
+            vec!["open"]
+        );
     }
 
     #[test]
     fn a_worker_that_fails_to_start_leaves_a_partial_answer_that_names_the_failure() {
-        let l = launcher(false, true);
-        let a = locate(
-            &FakeLocator {
-                kind: IndexKind::Starting,
-                candidates: 0,
-            },
-            &l,
-            &query(&["a draft"]),
-        )
-        .unwrap();
-        assert!(a.partial);
-        assert!(a.action.unwrap().contains("did not start: no fork"));
+        let (answer, _) = run(false, true, IndexKind::Starting, 0, &["a draft"]);
+        let answer = answer.unwrap();
+        assert!(answer.partial);
+        assert!(answer.action.unwrap().contains("did not start: no fork"));
     }
 
     #[test]
     fn a_question_needs_one_to_eight_non_empty_parts_and_keeps_ten_candidates_each() {
-        let l = launcher(true, false);
-        let ready = FakeLocator {
-            kind: IndexKind::Ready,
-            candidates: 14,
-        };
+        let (empty, log) = run(false, false, IndexKind::Ready, 14, &[" ", ""]);
+        assert!(matches!(empty, Err(LocateError::Invalid(_))));
+        assert!(
+            log.is_empty(),
+            "a refused question starts and opens nothing"
+        );
         assert!(matches!(
-            locate(&ready, &l, &query(&[" ", ""])),
+            run(true, false, IndexKind::Ready, 14, &["x"; 9]).0,
             Err(LocateError::Invalid(_))
         ));
-        assert!(matches!(
-            locate(&ready, &l, &query(&["x"; 9])),
-            Err(LocateError::Invalid(_))
-        ));
-        let a = locate(&ready, &l, &query(&["one", "  ", "two"])).unwrap();
-        assert_eq!(a.parts.len(), 2);
-        assert!(a.parts.iter().all(|p| p.candidates.len() == CANDIDATES_MAX));
+        let answer = run(true, false, IndexKind::Ready, 14, &["one", "  ", "two"])
+            .0
+            .unwrap();
+        assert_eq!(answer.parts.len(), 2);
+        assert!(answer
+            .parts
+            .iter()
+            .all(|p| p.candidates.len() == CANDIDATES_MAX));
     }
 }

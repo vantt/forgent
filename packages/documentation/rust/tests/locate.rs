@@ -79,7 +79,7 @@ fn a_ready_index_answers_with_repository_paths_axes_and_the_region_flag() {
     );
 
     let answer = locate(
-        &locator,
+        || &locator,
         &NoStart(&p),
         &query("the land door rebases and pushes branches to main", &[]),
     )
@@ -107,7 +107,7 @@ fn a_ready_index_answers_with_repository_paths_axes_and_the_region_flag() {
         .all(|c| c.path.starts_with("docs/")));
 
     let guessed = locate(
-        &locator,
+        || &locator,
         &NoStart(&p),
         &query("the runner dispatches each unit to an executor", &["git"]),
     )
@@ -136,7 +136,7 @@ fn a_ready_index_answers_with_repository_paths_axes_and_the_region_flag() {
         .is_some_and(|h| h.starts_with("docs/")));
 
     let two = locate(
-        &locator,
+        || &locator,
         &NoStart(&p),
         &Query {
             parts: vec!["worktree remove verb".into(), "land door".into()],
@@ -162,7 +162,7 @@ fn with_no_worker_and_no_index_the_answer_is_partial_and_empty() {
     profile::write_if_changed(&p.docs_root, &p.profile).unwrap();
     let locator = PkmLocator::open(&p, EmbedderChoice::Fake);
     let answer = locate(
-        &locator,
+        || &locator,
         &NoStart(&p),
         &query("the runner dispatches each unit", &[]),
     )
