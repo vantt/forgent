@@ -14,6 +14,7 @@ footprint:
   - test/session-host/head-start.test.mjs
   - src/session-host/head-grants.mjs
   - test/session-host/head-grants.test.mjs
+  - test/session-host/head-permission-mode.test.mjs
 source:
   - plans/discussions/ds-fvoi45qccq-heads-stable-and-able/DISCUSSION.md
   - p-vquz26ibnn
@@ -103,6 +104,7 @@ the grants, verb by verb.
 | (owner 2026-11-22 16:05) rotation reliability: handoff last message and portfolio, true rotation.log outcome, live soft rotate | phase 12 (12a), phase 11 probe row | folded in by lead:SUPERVISOR 17:47 (`q-msslhlmfkt`) |
 | p-kqs6fjalvh pool login expires inside a long seat | phase 12 (12b) | folded in by lead:SUPERVISOR 17:47; 12b waits on its footprint widen |
 | p-dw3h5wscns heads may write `plans/backlog.md` | phase 13 | owner 2026-11-23 on `q-nudu6zlusf`: fix the grant; folded in by head:supervisor-forgent |
+| head-permission-mode test still demands directory-only grant entries after phase 13 | phase 11 | footprint widened 2026-11-23 23:45 by head:supervisor-forgent: red caused by this plan's own `e900a7e10` |
 
 ## Prior art reused and what was missing
 
@@ -142,7 +144,7 @@ the grants, verb by verb.
 | 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | done |
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | done |
 | 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | done |
-| 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md, test/session-host/head-start.test.mjs | 5 | running |
+| 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md, test/session-host/head-start.test.mjs, test/session-host/head-permission-mode.test.mjs | 5 | running |
 | 12 | [Rotation reliability](phase-12-rotation-reliability.md) | 6 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, docs/platform/session-host/spec.md, apps/fgos/src/wiring/session_rotation_hook.rs | 4 | done |
 | 13 | [Heads may write the backlog index file](phase-13-backlog-index-grant.md) | 2 | src/session-host/head-grants.mjs, test/session-host/head-grants.test.mjs | 4 | done |
 
