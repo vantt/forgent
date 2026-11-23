@@ -9,9 +9,9 @@ The head status line now uses the ak layout and colors. The ctx and quota figure
 | | Line | Columns |
 |---|---|---|
 | Before | `fgOS head · ctx 12% \| quota 7%` | 30 |
-| After | `🤖 Opus - 12%  ⌛ wk 7%` | 25 |
+| After | `🤖 Opus - 12%  ⌛ 5h 20% (1h30m)  wk 7% (4d)  📁 ~/projects/forgentX` | 66 |
 
-The model name is cyan. The percentage is green below 70, yellow from 70 and red from 85. The quota is green and turns red from 85. With `NO_COLOR` set, only the text remains. These are the ak colors and thresholds, with the same ANSI prefix and suffix. The line stays under 30 columns, so a narrow terminal keeps both figures.
+The model name is cyan. The percentage is green below 70, yellow from 70 and red from 85. The quota is green and turns red from 85. With `NO_COLOR` set, only the text remains. These are the ak colors and thresholds, with the same ANSI prefix and suffix. Per the owner's later requests the line is longer than before: it now also carries the 5h window, both reset countdowns and the folder. Without the 5h window, countdowns and folder it is `🤖 Opus - 12%  ⌛ wk 7%`, 25 columns. The folder comes last, so a narrow terminal cuts the path and keeps the figures.
 
 ## Simplifications
 
@@ -21,7 +21,7 @@ The model name is cyan. The percentage is green below 70, yellow from 70 and red
 - There is no progress bar, as the owner asked, and no git segment.
 - The model name replaces the fixed `fgOS head` label. The hook only runs in head sessions, so the label carried no information. It stays as the fallback when the payload has no model name.
 - A missing figure is left out, as in ak.
-- The reset countdown ak shows is not added, because today's line does not show it.
+- The 5h window and the reset countdowns (`1h30m`, `4d`, ak's own format) and the folder (home written as `~`) were added at the owner's request; the added columns are not a simplification.
 
 ## Unchanged
 

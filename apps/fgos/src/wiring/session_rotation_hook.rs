@@ -428,15 +428,54 @@ fn paint(text: &str, code: &str, color: bool) -> String {
     }
 }
 
+/// One quota window of the status line: its label, used percentage and the
+/// seconds left until it resets, when the payload says so.
+struct QuotaWindow {
+    label: &'static str,
+    pct: f64,
+    left_secs: Option<u64>,
+}
+
+/// Time to reset in the ak form: `42m`, `1h30m`, `2h`, `4d`; empty once past.
+fn countdown(secs: u64) -> String {
+    let mins = secs / 60;
+    if secs == 0 {
+        String::new()
+    } else if mins < 60 {
+        format!("{mins}m")
+    } else if mins < 1440 {
+        match mins % 60 {
+            0 => format!("{}h", mins / 60),
+            m => format!("{}h{m}m", mins / 60),
+        }
+    } else {
+        format!("{}d", mins / 1440)
+    }
+}
+
+/// The working directory with the home folder written as `~`, as ak shows it.
+fn tilde(dir: &str, home: Option<&str>) -> String {
+    match home.filter(|h| !h.is_empty()) {
+        Some(h) if dir == h => "~".to_string(),
+        Some(h) => dir
+            .strip_prefix(h)
+            .filter(|rest| rest.starts_with('/'))
+            .map_or_else(|| dir.to_string(), |rest| format!("~{rest}")),
+        None => dir.to_string(),
+    }
+}
+
 /// Renders the head status line in the ak layout: model and context percentage
-/// joined by " - ", then the weekly quota with an hourglass. The model is cyan; the
-/// percentage is green below 70, yellow from 70 and red from 85; the quota is green
-/// and turns red from 85. Segments are separated by two spaces, a missing figure is
+/// joined by " - ", then the quota windows with an hourglass, then the folder, each quota window as
+/// `label pct% (time to reset)`. The model is cyan; the context percentage is green
+/// below 70, yellow from 70 and red from 85; the quota is green and turns red when
+/// any window is at 85 or more. Segments are separated by two spaces, a missing figure is
 /// left out, and with color off the text alone stays readable.
 fn render_status_line(
     model: Option<&str>,
     ctx_pct: Option<f64>,
-    quota_pct: Option<f64>,
+    quota: &[QuotaWindow],
+    dir: Option<&str>,
     write_err: Option<&str>,
     color: bool,
 ) -> String {
@@ -455,16 +494,26 @@ fn render_status_line(
         head.push_str(&format!(" - {}", paint(&format!("{c:.0}%"), code, color)));
     }
     let mut parts = vec![head];
-    if let Some(q) = quota_pct {
-        let code = if q.round() >= 85.0 {
+    if !quota.is_empty() {
+        let code = if quota.iter().any(|w| w.pct.round() >= 85.0) {
             "\x1b[31m"
         } else {
             "\x1b[32m"
         };
-        parts.push(format!(
-            "\u{231B} {}",
-            paint(&format!("wk {q:.0}%"), code, color)
-        ));
+        let text = quota
+            .iter()
+            .map(
+                |w| match w.left_secs.map(countdown).filter(|c| !c.is_empty()) {
+                    Some(c) => format!("{} {:.0}% ({c})", w.label, w.pct),
+                    None => format!("{} {:.0}%", w.label, w.pct),
+                },
+            )
+            .collect::<Vec<_>>()
+            .join("  ");
+        parts.push(format!("\u{231B} {}", paint(&text, code, color)));
+    }
+    if let Some(d) = dir.filter(|d| !d.is_empty()) {
+        parts.push(format!("\u{1F4C1} {}", paint(d, "\x1b[33m", color)));
     }
     if let Some(err) = write_err {
         parts.push(paint(&format!("({err})"), "\x1b[31m", color));
@@ -523,10 +572,42 @@ fn status_line(head_role: Option<&str>, payload: &Value) -> Option<String> {
     let ctx_pct = payload
         .pointer("/context_window/used_percentage")
         .and_then(Value::as_f64);
-    let quota_pct = record
-        .pointer("/quota/weeklyUsed")
-        .and_then(Value::as_f64)
-        .map(|u| u * 100.0);
+    let dir = payload
+        .pointer("/workspace/current_dir")
+        .or_else(|| payload.get("cwd"))
+        .and_then(Value::as_str)
+        .map(|d| tilde(d, std::env::var("HOME").ok().as_deref()));
+    let now_secs = now_ms() / 1000;
+    let window = |label: &'static str, pct: Option<f64>, key: &str| {
+        pct.map(|pct| QuotaWindow {
+            label,
+            pct,
+            left_secs: payload
+                .pointer(&format!("/rate_limits/{key}/resets_at"))
+                .and_then(Value::as_u64)
+                .map(|at| at.saturating_sub(now_secs)),
+        })
+    };
+    let quota: Vec<QuotaWindow> = [
+        window(
+            "5h",
+            payload
+                .pointer("/rate_limits/five_hour/used_percentage")
+                .and_then(Value::as_f64),
+            "five_hour",
+        ),
+        window(
+            "wk",
+            record
+                .pointer("/quota/weeklyUsed")
+                .and_then(Value::as_f64)
+                .map(|u| u * 100.0),
+            "seven_day",
+        ),
+    ]
+    .into_iter()
+    .flatten()
+    .collect();
     let color = std::env::var_os("NO_COLOR").is_none();
     let model = payload
         .pointer("/model/display_name")
@@ -534,7 +615,8 @@ fn status_line(head_role: Option<&str>, payload: &Value) -> Option<String> {
     Some(render_status_line(
         model,
         ctx_pct,
-        quota_pct,
+        &quota,
+        dir.as_deref(),
         write_err.as_deref(),
         color,
     ))
@@ -1097,27 +1179,53 @@ mod tests {
             "figures must match the payload: {line}"
         );
         // Exact rendering, ak layout: plain text, then the same text colored.
+        let windows = [
+            QuotaWindow {
+                label: "5h",
+                pct: 20.0,
+                left_secs: Some(5400),
+            },
+            QuotaWindow {
+                label: "wk",
+                pct: 42.0,
+                left_secs: Some(4 * 86400 + 100),
+            },
+        ];
         assert_eq!(
-            render_status_line(Some("Opus"), Some(9.27), Some(42.0), None, false),
-            "\u{1F916} Opus - 9%  \u{231B} wk 42%"
+            render_status_line(Some("Opus"), Some(9.27), &windows, Some("~/p"), None, false),
+            "\u{1F916} Opus - 9%  \u{231B} 5h 20% (1h30m)  wk 42% (4d)  \u{1F4C1} ~/p"
         );
+        let hot = [QuotaWindow {
+            label: "wk",
+            pct: 90.0,
+            left_secs: None,
+        }];
         assert_eq!(
-            render_status_line(Some("Opus"), Some(72.0), Some(90.0), None, true),
+            render_status_line(Some("Opus"), Some(72.0), &hot, None, None, true),
             "\u{1F916} \x1b[22m\x1b[39m\x1b[36mOpus\x1b[0m\x1b[22m\x1b[39m - \x1b[22m\x1b[39m\x1b[33m72%\x1b[0m\x1b[22m\x1b[39m  \u{231B} \x1b[22m\x1b[39m\x1b[31mwk 90%\x1b[0m\x1b[22m\x1b[39m"
         );
         assert_eq!(
-            render_status_line(None, None, None, None, false),
+            render_status_line(None, None, &[], None, None, false),
             "\u{1F916} fgOS head"
         );
         assert_eq!(
             render_status_line(
                 Some("Opus"),
                 Some(85.0),
+                &[],
                 None,
                 Some("sidecar write failed: x"),
                 false
             ),
             "\u{1F916} Opus - 85%  (sidecar write failed: x)"
+        );
+        assert_eq!(tilde("/home/a/p", Some("/home/a")), "~/p");
+        assert_eq!(tilde("/home/a", Some("/home/a")), "~");
+        assert_eq!(tilde("/home/ab/p", Some("/home/a")), "/home/ab/p");
+        assert_eq!(tilde("/x", None), "/x");
+        assert_eq!(
+            [0, 59, 60, 3540, 3600, 5400, 86399, 86400, 8 * 86400].map(countdown),
+            ["", "0m", "1m", "59m", "1h", "1h30m", "23h59m", "1d", "8d"]
         );
         let sidecar = transcript_dir.join("test-sid-123.context-sidecar.jsonl");
         assert!(sidecar.exists(), "sidecar must exist beside transcript");
