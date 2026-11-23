@@ -1,15 +1,15 @@
 ---
 id: ds-wham5txfkv
 title: "Inventory every live Node area and order the Rust port, one plan per area"
-status: settled
+status: paused
 source:
   - p-vwpnx4gpow
 created: 2026-11-23
 ---
 
-discussion: settled
+discussion: paused
 
-## Hand-off to the planner
+## Hand-off to the planner (suspended 2026-11-23 16:10, owner order: component-authority first; redo on the post-doors tree)
 
 - **Outcome:** every live Node area in `src/` (and `bin/*.mjs`) is retired into Rust through the ten plans of §7, opened
   one at a time in that order. When plan 10 lands, no `legacy-cli` route and no `legacy-node` payload remain.
@@ -28,6 +28,47 @@ discussion: settled
 - **Sources:** `p-vwpnx4gpow`, `plans/261114-2051-rust-verb-migration-program/plan.md`, D1–D5.
 
 ## 1. Trạng thái hiện tại
+
+**Round 3 (2026-11-23 16:02–16:30): paused by owner order.** The owner learned that HARDEN (`261021-1118`, done
+2026-11-18) moved decisions into Rust and thinned Node for T0–T5, but deleted no Node. T6 was hardened inside Node
+(+44, decision 73), T7 Work was never hardened (option B, 2026-11-18: Work waits until after the packaging release),
+T9 added +2,136 lines of Node, and session-host was written in Node afterwards. Of the 160 T0–T5 Node files, 67 have no
+upper caller (62 are already owned by `261122-2108`); 93 are still called by T6+ Node, `bin` or scripts.
+Owner, 16:10: "component-authority-* phải xong trước để kiểm soát authority rồi mới làm tiếp … tính toán kỹ để đẩy nó
+lên trước rồi vá lại." This discussion waits for `261121-2110-component-authority-doors` and is redone on its tree.
+
+What the calculation found (doors plan at `bea353689`, its lead report `reports/lead-261123-0915-wave-1-parked.md`):
+
+- `261121-2109-component-authority` is done. The doors plan has 1 of 22 phases done (phase 1, `locate`).
+  All five `blockedBy` plans are done.
+- Wave 2 (phases 2e, 4 and 5) ended `infra-exec-failed` with nothing changed. The binding chose deepseek and the
+  runner stopped each worker at the 10 MB output limit. The owner's 09:01 order said `--provider claude`.
+- **Three doors phases wait on work that would come after doors:**
+  - 2f (doctor body map) waits on S6b/S7, the very port this discussion orders.
+  - 3b and 3d wait on phase 8 of `261122-2108` (dead closure). That plan is blocked by `261122-0118`, which is running.
+  - 2g waits on backlog `p-rypvkc3kai` (proposed).
+  - Phase 10 ("no debt") needs all three, and phase 11 needs 10. So doors cannot close whole before the port unless
+    2f's row is handed to the port as its one named debt.
+- **File collisions:**
+  - Phases 1b, 2c, 6 and 11 write `src/cli/command-registry.mjs`, and 3a writes `src/session-host/head-request.mjs`.
+    `261122-0118` (running) holds both.
+  - `261122-2108` holds `packages/component-authority/model/**` and `src/runner/dispatch/**`, which phases 1b and 3a write.
+- Four of phase 3a's five Node files are already dead, with no product importer: `dispatch/config-twin.mjs`,
+  `evidence-attribution.mjs`, `settlement.mjs` and `execution/unit.mjs`. Rewiring them would be wasted work; delete them.
+  Only `dispatch/write-scope.mjs` is live (workflow, session-host).
+
+Proposed order to put doors first (for the secretary and supervisor; this shaper edits no plan):
+1. `261122-0118` lands.
+2. Doors 1b (model to YAML) runs.
+3. The doors phases with no wait run, on `--provider claude`: 2a–2e, 3a (the four dead files deleted, not rewired),
+   3c, 3e, 4, 5 (the Authority-map gate on plans, which is the authority control), 6, 7, 8, 9.
+4. `261122-2108` runs, rebased on the YAML model.
+5. Doors 3b and 3d run.
+6. Doors 10 and 11 run, with 2f's row (and 2g's if `p-rypvkc3kai` is still open) left as named debt, `retiredBy` the port.
+7. This discussion is redone: the inventory is recomputed on that tree and each port plan carries an Authority map.
+
+Open owner points (asked in chat, not yet in the store): whether doors closes with 2f as named debt or stays open until
+the port lands; and whether the door guard gets a warn-only mode (see O6).
 
 **Round 2 (2026-11-23 15:57–16:20): settled.** Every check left open in round 1 came back without revising P1–P4, so they
 are minted as D1–D4. Findings:
@@ -95,6 +136,7 @@ allowed to run beside any step. F0 through S6a have landed (S6a ended after its 
 | O1 | S7 entry gate "Work council (decision 78) held". Decision 78 belongs to `261021-1118` (lessons.md:13, :104, :152): the Work council opens after T8 and the non-Work T9 arms. Both are closed, but no council has been held. | open, blocks only plans 5–7 → D5 | `plans/261021-1118-harden-low-layers-bottom-up/plan.md` closedNote |
 | O2 | `session-host` / `session-rotation` are being edited now by `261122-0118` (running) and `261123-0828` (ready) | open, blocks only plans 2–3 starting | footprints read 2026-11-23 |
 | O3 | `src/util/yaml.mjs`: a facade over `fgos-yaml-doc` with 28 product importers; `261121-2110` does not retire it (plan.md:219–222) | clear: facade, dies in plan 10 | file header; importer count |
+| O6 | Owner, 16:2x: does component authority have a warn-only versus blocking switch? Today: no setting. `debt` entries act as a visible "known, not yet fixed" list (no failure, but a stale entry fails). Doors phase 10 removes `debt`, after which any match outside allowed files turns `npm test` red. The phase 5 plan gate is a reviewer reject, inactive only when a project has no model. A switch would be a new config key (`core/config-standard`, `core/config-schema`) and a change to the doors plan | open, owner | `docs/platform/component-authority/spec.md` §4; doors `phase-10-land-checks.md`, `phase-05-*.md` |
 | O5 | Logic leaves inside facade areas: `util/domain-compile.mjs` → plan 1; `git/main-checkout-delete-guard.mjs` → S1; `identity/directory-store.mjs` is dead (no product importer) → plan 1 | clear | round 2 file-by-file header read |
 | O4 | Test counts in §6 are "test files that import the area", so a test can count under several areas. Backlog says 588 test files in all. | clear (method stated) | scratchpad script, method in §5 |
 
@@ -121,6 +163,10 @@ allowed to run beside any step. F0 through S6a have landed (S6a ended after its 
   owner question is open. The only point worth the owner's eye is how "packaging first" is read (P2).
 - **2026-11-23 15:57 — owner:** "em scan xong chưa" (is the scan done yet?). Round 2 ran: the decision 78 lookup, the `yaml.mjs` check, and a file-by-file
   header read of the facade areas. None of P1–P4 was revised, so D1–D5 were minted and the discussion was settled.
+
+- **2026-11-23 16:02 — owner:** "anh nghĩ là mọi thứ đã được … harden … chuyển sang rust hết rồi … giải thích plan này đang làm gì" (I thought HARDEN had already moved everything to Rust; explain what this plan does). Explained: HARDEN thinned Node for T0–T5 and deleted none of it; T6, T7, session-host and T9 still hold Node logic.
+- **2026-11-23 16:10 — owner:** component-authority first, then continue; calculate carefully, then patch. Round 3 calculation is recorded in §1; discussion paused.
+- **2026-11-23 16:2x — owner:** asked whether authority has a warn-or-block setting → O6.
 
 ## 6. Thiết kế đã chốt {#design}
 
