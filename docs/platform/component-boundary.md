@@ -61,10 +61,10 @@ If the boundary changes, update this document or the current detailed source lis
 
 ## 4. Current High-Level Components
 
-This section is generated from the structural model at `packages/component-authority/model/`: one row per component and subcomponent, with what it owns, what it must not own, how many door rows name it, and where to read more. Do not edit the block by hand; edit the model and run `node scripts/component-authority-render.mjs`. The long-form role narrative of each component lives in the area spec the row points at.
+This section is generated from the structural model at `packages/component-authority/model/`: one row per component and subcomponent, with what it owns, what it must not own, how many door rows name it, and where to read more. Do not edit the block by hand; edit the model (the YAML files) and run `fgos authority render`. The long-form role narrative of each component lives in the area spec the row points at.
 
 <!-- generated:component-authority:component-boundary -->
-Ownership rows, one per component and subcomponent, sorted by id. <!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
+Ownership rows, one per component and subcomponent, sorted by id. <!-- rendered from packages/component-authority/model/ by `fgos authority render`; edit the model, never this block -->
 
 | Component | Parent | Layer | Tier | Status | Owns | Must not own | Doors | Owner doc | Source links |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

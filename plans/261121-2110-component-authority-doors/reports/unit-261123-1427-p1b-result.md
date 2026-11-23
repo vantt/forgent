@@ -103,3 +103,43 @@ Lead should run: `cargo fmt --all`, `cargo test -p fgos-component-authority`, `c
 Status: DONE_WITH_CONCERNS
 Summary: `fgos authority render` (write, `--check`, `--preview-holder`) is ported into the crate as `render.rs` with every render test moved to Rust; the `.mjs` renderer and its test are deleted.
 Concerns: nothing compiled or run, so `render.rs` may need compile/rustfmt fixes and byte parity is unproven until the lead regenerates; the shared operation `authority.locate` is catalogued `OperationEffect::Read` although `render` writes docs (catalog.rs is in scope but a new operation id would need a new row, a descriptor and projector wiring, so I left it as one operation, which is a decision for the lead); the real-repo `render --check` test fails until the views are regenerated; the mutation census and doc prose that name the deleted script are outside my scope.
+
+## Steps 6, 7 and the view part of 9
+
+Step 6: Node readers take the model from the host. `loadModel` (`test/architecture.test.mjs`), `narrativeHolderResolver` (`src/report/decision-index.mjs`) and
+`discoverKnownOwners` (`src/setup/instruction-registry.mjs`) call `invokeHost(['authority', 'model', '--json'], { dir })` and read `data`
+(`layers`, `components`, `decisionKinds`, `doors`). The test-only `modelDir` option is gone from `discoverKnownOwners` and `discoverInstructionSources`.
+No Node file parses a model file. `decision-index.test.mjs` and `instruction-registry.test.mjs` build a temporary repository with the YAML files as literal text
+(`writeModel` helper in the registry test); the host binary comes from the test launcher's `FGOS_HOST_BIN`.
+An absent model directory still means "no model" for the resolver and owner discovery (as the old ENOENT path did); a present but invalid model now fails with the host's refusal text.
+
+Retired Node cases and their new owner (all in `packages/component-authority/rust/tests/model_checks.rs`):
+
+| Retired Node case (`test/architecture.test.mjs`) | New owner |
+| --- | --- |
+| every component `exceptions[].path` exists on disk and resolves to the declaring component | `every_component_exception_path_exists_on_disk_and_resolves_to_the_component_that_declares_it` |
+| every row uses a layer declared in `layers` | `layers_declare_the_layer_names_the_rules_and_the_ten_tier_names_the_model_uses` (component layers in `layers.layers`); exception layers by the existing enum check |
+| every rule in the manifest is valid | same test (`one-directional-layer`, `domain-siloing`, `tier-downward`) |
+| the model-only lines of `tier: every file has one tier…` (`tier-downward` present, `tierNames` is `0`-`9`, every tier row's tier is in `tierNames`) | same test (every component tier has a `tierNames` entry); the file-scanning rest of that case stays in Node |
+
+Kept in Node because they scan Node source: component resolution of every `.mjs`, import direction, tier edges, domain siloing, door checks, doctor-registry bridge labels.
+
+Step 7: prose names the YAML files and `fgos authority render` in the `model.v1.json` description, `docs/platform/component-authority/spec.md` (file names, the `files.json` and
+`tiers.json` leftovers, a paragraph saying only the crate reads the YAML and others use `fgos authority model --json`), `setup-doctor-registry.md` (door files `.yaml`),
+`docs/platform/README.md:41` and `docs/platform/component-boundary.md:64`. `test/suite-baseline.json` left alone.
+
+Step 9 views: `node scripts/component-authority-render.mjs` became `fgos authority render` inside the generated-block notes of `docs/platform/README.md`, `architecture-map.md` (2),
+`component-boundary.md`, `governance.md`, `observe/spec.md`, `system-overview/spec.md` (2) and `workflow/spec.md`; nothing else in the blocks changed.
+
+Rustfmt diff: applied by hand to `apps/fgos/src/wiring/authority.rs` and `render.rs` (rustfmt was refused). One hunk quoted `&format!("sonnetdoors/one.yaml")`;
+the file reads `&format!("{model}doors/one.yaml")`, so I formatted that real line the same way.
+
+The search `rg -n "(layers|components|decision-kinds|contracts)\.json|model/doors/[a-z0-9-]+\.json|component-authority-render"` outside `plans/` now finds only
+`packages/git/contracts/mutation-census.v1.json:1364` (the census, the lead's) and `render.rs:1257`, a test asserting the old name is absent from the rendered note.
+
+Not run: `cargo`, `rustfmt`, `node`, `git apply`. Lead should run `cargo fmt --check`, `cargo test -p fgos-component-authority`, `cargo test -p fgos --test authority` and
+`node --test test/architecture.test.mjs test/report/decision-index.test.mjs test/setup/instruction-registry.test.mjs`.
+
+Status: DONE_WITH_CONCERNS
+Summary: Node readers load the model through `fgos authority model --json`, model-only cases moved to `model_checks.rs`, prose and view notes name the YAML files and `fgos authority render`, rustfmt diff applied by hand.
+Concerns: nothing compiled or run, so the new Rust tests (including `assert_eq!(layers.layers, LAYERS)`) are unverified and the hand-applied format may differ from `cargo fmt`. The Node tier-exception test reads `{from, to}` but the crate's `TierException` serializes `{path, tier, reason}`; the list is empty today, so nothing fails until the first exception is added.

@@ -184,7 +184,11 @@ fn owner_table_body(model: &Model) -> String {
 }
 
 fn first_non_empty<'a>(candidates: &[Option<&'a str>]) -> Option<&'a str> {
-    candidates.iter().copied().flatten().find(|text| !text.is_empty())
+    candidates
+        .iter()
+        .copied()
+        .flatten()
+        .find(|text| !text.is_empty())
 }
 
 fn unique_in_order(items: impl Iterator<Item = String>) -> Vec<String> {
@@ -241,9 +245,10 @@ fn holder_portal(
 
 /// The facts cell of one decision kind: its `facts` when set, else the owner's spec and its children's specs.
 fn holder_facts(kind: &DecisionKind, owner: Option<&Component>, model: &Model) -> Vec<String> {
-    let explicit = kind.facts.as_ref().filter(|facts| {
-        !facts.is_null() && facts.as_str() != Some("")
-    });
+    let explicit = kind
+        .facts
+        .as_ref()
+        .filter(|facts| !facts.is_null() && facts.as_str() != Some(""));
     if let Some(facts) = explicit {
         let list: Vec<&serde_json::Value> = match facts {
             serde_json::Value::Array(items) => items.iter().collect(),
@@ -283,7 +288,8 @@ fn governance_holder_body(model: &Model, repo_root: &Path) -> String {
     let mut lines = vec![
         NOTE.to_owned(),
         String::new(),
-        "| Scope (legacy alias retained) | Read first | Facts and RULs | Narrative home |".to_owned(),
+        "| Scope (legacy alias retained) | Read first | Facts and RULs | Narrative home |"
+            .to_owned(),
         "| --- | --- | --- | --- |".to_owned(),
     ];
     for kind in &model.decision_kinds {
@@ -317,7 +323,11 @@ fn governance_holder_body(model: &Model, repo_root: &Path) -> String {
         lines.push(format!(
             "| {} | {} | {} | {} |",
             cell(&scope_parts.join("<br>")),
-            if portal == "—" { portal } else { code(&portal) },
+            if portal == "—" {
+                portal
+            } else {
+                code(&portal)
+            },
             join_or_dash(facts, "; "),
             code(&kind.narrative),
         ));
@@ -335,7 +345,11 @@ fn area_map_body(model: &Model) -> String {
     ];
     let mut by_area: BTreeMap<String, Vec<&Component>> = BTreeMap::new();
     for component in sorted_components(model) {
-        if component.parent.as_deref().is_some_and(|parent| !parent.is_empty()) {
+        if component
+            .parent
+            .as_deref()
+            .is_some_and(|parent| !parent.is_empty())
+        {
             continue;
         }
         let area = area_of(component).unwrap_or("(cross-area)").to_owned();
@@ -689,7 +703,8 @@ pub fn write_views(repo_root: &Path) -> Result<WriteReport, RenderError> {
         if !seen_files.insert(view.file_path.clone()) || !view.file_changed {
             continue;
         }
-        fs::write(&view.file_path, &view.next).map_err(|error| io_error(&view.file_path, &error))?;
+        fs::write(&view.file_path, &view.next)
+            .map_err(|error| io_error(&view.file_path, &error))?;
         for entry in &views {
             if entry.file_path == view.file_path && entry.present && entry.changed {
                 report.written.push(ViewRef {
@@ -750,14 +765,18 @@ fn holder_section(governance: &str) -> String {
 pub fn build_holder_view_preview(repo_root: &Path) -> Result<String, RenderError> {
     let model = Model::load(repo_root)?;
     let generated_body = governance_holder_body(&model, repo_root);
-    let governance_path = repo_root.join("docs").join("platform").join("governance.md");
-    let governance = fs::read_to_string(&governance_path)
-        .map_err(|error| io_error(&governance_path, &error))?;
+    let governance_path = repo_root
+        .join("docs")
+        .join("platform")
+        .join("governance.md");
+    let governance =
+        fs::read_to_string(&governance_path).map_err(|error| io_error(&governance_path, &error))?;
     let current_rows: Vec<Vec<String>> = parse_table(&holder_section(&governance))
         .into_iter()
         .skip(1)
         .collect();
-    let generated_rows: Vec<Vec<String>> = parse_table(&generated_body).into_iter().skip(1).collect();
+    let generated_rows: Vec<Vec<String>> =
+        parse_table(&generated_body).into_iter().skip(1).collect();
     let by_scope = |rows: Vec<Vec<String>>| -> BTreeMap<String, Vec<String>> {
         rows.into_iter().map(|row| (row[0].clone(), row)).collect()
     };
@@ -795,7 +814,11 @@ pub fn build_holder_view_preview(repo_root: &Path) -> Result<String, RenderError
                     if notes.is_empty() { "same" } else { "changed" },
                     cell(&narrative(current)),
                     cell(&narrative(generated)),
-                    if notes.is_empty() { "—".to_owned() } else { notes.join("; ") },
+                    if notes.is_empty() {
+                        "—".to_owned()
+                    } else {
+                        notes.join("; ")
+                    },
                 ));
             }
             (None, None) => {}
@@ -804,11 +827,15 @@ pub fn build_holder_view_preview(repo_root: &Path) -> Result<String, RenderError
     let mut out = vec![
         "# Holder view preview (component-authority)".to_owned(),
         String::new(),
-        "DOCOS keeps the holder table shape (scope → holder file or directory) and wants this".to_owned(),
-        "generated view before the hand-written table in `docs/platform/governance.md` is replaced".to_owned(),
-        "(see `plans/261121-2109-component-authority/reports/docos-boundary-answer.md`).".to_owned(),
+        "DOCOS keeps the holder table shape (scope → holder file or directory) and wants this"
+            .to_owned(),
+        "generated view before the hand-written table in `docs/platform/governance.md` is replaced"
+            .to_owned(),
+        "(see `plans/261121-2109-component-authority/reports/docos-boundary-answer.md`)."
+            .to_owned(),
         String::new(),
-        "The render verb owns the `governance-holder-table` view with `required: true`, so".to_owned(),
+        "The render verb owns the `governance-holder-table` view with `required: true`, so"
+            .to_owned(),
         "`fgos authority render --check` demands its markers once they are".to_owned(),
         "inserted and the block must match the model.".to_owned(),
         String::new(),
@@ -850,7 +877,8 @@ mod tests {
     }
 
     fn scratch(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("fgos-ca-render-{name}-{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("fgos-ca-render-{name}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         dir
@@ -934,18 +962,34 @@ mod tests {
   status: planned
 "#,
         );
-        put(&root, &format!("{model}doors/one.yaml"), "job: j\nkind: door\npatterns: []\nallowed:\n  - packages/demo/x\n");
+        put(
+            &root,
+            &format!("{model}doors/one.yaml"),
+            "job: j\nkind: door\npatterns: []\nallowed:\n  - packages/demo/x\n",
+        );
         put(&root, "packages/demo/contracts/demo.v1.json", "{}\n");
         let docs: [(&str, &[&str]); 7] = [
-            ("docs/platform/component-boundary.md", &["component-boundary"]),
+            (
+                "docs/platform/component-boundary.md",
+                &["component-boundary"],
+            ),
             ("docs/platform/README.md", &["readme-owner-table"]),
             ("docs/platform/governance.md", &["governance-holder-table"]),
             (
                 "docs/platform/system-overview/spec.md",
-                &["system-overview-area-map", "system-overview-shared-entities"],
+                &[
+                    "system-overview-area-map",
+                    "system-overview-shared-entities",
+                ],
             ),
-            ("docs/platform/observe/spec.md", &["observe-shared-entities"]),
-            ("docs/platform/workflow/spec.md", &["workflow-shared-entities"]),
+            (
+                "docs/platform/observe/spec.md",
+                &["observe-shared-entities"],
+            ),
+            (
+                "docs/platform/workflow/spec.md",
+                &["workflow-shared-entities"],
+            ),
             (
                 "docs/platform/architecture-map.md",
                 &["architecture-map-components", "architecture-map-contracts"],
@@ -993,7 +1037,11 @@ mod tests {
     fn a_required_view_whose_markers_are_removed_is_named_by_check() {
         let root = seed("markers-removed");
         write_views(&root).unwrap();
-        put(&root, "docs/platform/README.md", "# seed\n\nno markers left\n");
+        put(
+            &root,
+            "docs/platform/README.md",
+            "# seed\n\nno markers left\n",
+        );
         let drift = check_views(&root).unwrap();
         assert!(
             drift.iter().any(|entry| entry.view == "readme-owner-table"
@@ -1015,7 +1063,11 @@ mod tests {
         let again = write_views(&root).unwrap();
         assert!(again.written.is_empty(), "{again:?}");
         for (rel, before) in VIEW_FILES.iter().zip(first) {
-            assert_eq!(fs::read(root.join(rel)).unwrap(), before, "{rel} changed on second write");
+            assert_eq!(
+                fs::read(root.join(rel)).unwrap(),
+                before,
+                "{rel} changed on second write"
+            );
         }
         let _ = fs::remove_dir_all(&root);
     }
@@ -1043,12 +1095,18 @@ mod tests {
 
         write_views(&root).unwrap();
         assert!(check_views(&root).unwrap().is_empty());
-        put(&root, "docs/platform/governance.md", "# seed\n\nno markers\n");
+        put(
+            &root,
+            "docs/platform/governance.md",
+            "# seed\n\nno markers\n",
+        );
         let drift = check_views(&root).unwrap();
         assert!(
-            drift.iter().any(|entry| entry.view == "governance-holder-table"
-                && entry.reason.contains("governance-holder-table")
-                && entry.reason.starts_with("no ")),
+            drift
+                .iter()
+                .any(|entry| entry.view == "governance-holder-table"
+                    && entry.reason.contains("governance-holder-table")
+                    && entry.reason.starts_with("no ")),
             "{drift:?}"
         );
         let _ = fs::remove_dir_all(&root);
@@ -1072,7 +1130,11 @@ mod tests {
 "#,
         );
         put(&root, "docs/platform/demo/decisions/.keep", "");
-        put(&root, "docs/platform/demo/contracts/special.md", "# special\n");
+        put(
+            &root,
+            "docs/platform/demo/contracts/special.md",
+            "# special\n",
+        );
         put(&root, "docs/platform/demo/spec.md", "# demo\n");
         put(&root, "docs/platform/demo/README.md", "# demo readme\n");
 
@@ -1130,7 +1192,10 @@ mod tests {
             &read(&root, "docs/platform/component-boundary.md"),
             "component-boundary",
         );
-        assert!(table.contains("| `demo` | — | kernel | 0 | designed | demo thing | other thing | 1 |"), "{table}");
+        assert!(
+            table.contains("| `demo` | — | kernel | 0 | designed | demo thing | other thing | 1 |"),
+            "{table}"
+        );
         let _ = fs::remove_dir_all(&root);
     }
 
@@ -1141,7 +1206,9 @@ mod tests {
         let text = read(&root, "docs/platform/architecture-map.md");
         assert!(text.contains(&start_marker("architecture-map-components")));
         assert!(text.contains(&end_marker("architecture-map-components")));
-        assert!(text.contains("| Component | Parent | Layer | Tier | Status | Owns | Must not own | Owner doc |"));
+        assert!(text.contains(
+            "| Component | Parent | Layer | Tier | Status | Owns | Must not own | Owner doc |"
+        ));
         assert!(text.contains("| `demo` |"));
         assert!(text.contains("demo thing"));
         assert!(text.contains("other thing"));
@@ -1149,14 +1216,17 @@ mod tests {
     }
 
     #[test]
-    fn the_architecture_map_contracts_view_prints_id_boundary_contract_provider_consumers_status_and_path() {
+    fn the_architecture_map_contracts_view_prints_id_boundary_contract_provider_consumers_status_and_path(
+    ) {
         let root = seed("map-contracts");
         write_views(&root).unwrap();
         let body = block_of(
             &read(&root, "docs/platform/architecture-map.md"),
             "architecture-map-contracts",
         );
-        assert!(body.contains("| ID | Boundary | Contract | Provider | Consumers | Status | Path |"));
+        assert!(
+            body.contains("| ID | Boundary | Contract | Provider | Consumers | Status | Path |")
+        );
         // Boundary before ": "; the Contract cell is only the text after it.
         assert!(
             body.contains("| `CTR-DEMO` | demo boundary ↔ other | detail that must not appear as boundary | `demo` | `cross` | live | `packages/demo/contracts/demo.v1.json` |"),
@@ -1180,7 +1250,10 @@ mod tests {
         let root = seed("note");
         write_views(&root).unwrap();
         let text = read(&root, "docs/platform/component-boundary.md");
-        assert!(text.contains("by `fgos authority render`; edit the model, never this block"), "{text}");
+        assert!(
+            text.contains("by `fgos authority render`; edit the model, never this block"),
+            "{text}"
+        );
         assert!(!text.contains("component-authority-render.mjs"), "{text}");
         let _ = fs::remove_dir_all(&root);
     }
@@ -1190,7 +1263,11 @@ mod tests {
         let root = seed("outside");
         let path = "docs/platform/component-boundary.md";
         let seeded = read(&root, path);
-        put(&root, path, &format!("author prose\n\n{seeded}\ntrailing prose\n"));
+        put(
+            &root,
+            path,
+            &format!("author prose\n\n{seeded}\ntrailing prose\n"),
+        );
         write_views(&root).unwrap();
         let text = read(&root, path);
         assert!(text.starts_with("author prose\n\n# seed"), "{text}");
@@ -1219,9 +1296,18 @@ mod tests {
             "# gov\n\n## Decision scope to holder table\n\n| Scope | Read first | Facts | Narrative |\n| --- | --- | --- | --- |\n| old-scope → old | `a` | `b` | `docs/old/` |\n\n## Next\n",
         );
         let preview = build_holder_view_preview(&root).unwrap();
-        assert!(preview.starts_with("# Holder view preview (component-authority)\n"), "{preview}");
-        assert!(preview.contains("| demo-scope → demo | added | — |"), "{preview}");
-        assert!(preview.contains("| old-scope → old | missing | `docs/old/` | — |"), "{preview}");
+        assert!(
+            preview.starts_with("# Holder view preview (component-authority)\n"),
+            "{preview}"
+        );
+        assert!(
+            preview.contains("| demo-scope → demo | added | — |"),
+            "{preview}"
+        );
+        assert!(
+            preview.contains("| old-scope → old | missing | `docs/old/` | — |"),
+            "{preview}"
+        );
         assert!(preview.ends_with("\n"), "{preview}");
         let _ = fs::remove_dir_all(&root);
     }

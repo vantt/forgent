@@ -200,6 +200,60 @@ fn every_spec_source_and_decision_kind_narrative_path_exists_on_disk() {
 }
 
 #[test]
+fn every_component_exception_path_exists_on_disk_and_resolves_to_the_component_that_declares_it() {
+    let model = model();
+    let root = repo_root();
+    for comp in &model.components {
+        for exc in &comp.exceptions {
+            assert!(
+                root.join(&exc.path).exists(),
+                "exception path \"{}\" declared by {} must exist on disk",
+                exc.path,
+                comp.id
+            );
+            let resolved = longest_path_owner(&exc.path, &model.components);
+            assert_eq!(
+                resolved,
+                Some(comp.id.as_str()),
+                "exception path \"{}\" declared by {} must resolve to {}",
+                exc.path,
+                comp.id,
+                comp.id
+            );
+        }
+    }
+}
+
+#[test]
+fn layers_declare_the_layer_names_the_rules_and_the_ten_tier_names_the_model_uses() {
+    let model = model();
+    let layers = &model.layers;
+    assert_eq!(layers.layers, LAYERS, "layers.yaml layers must list the layer order");
+    for rule in ["one-directional-layer", "domain-siloing", "tier-downward"] {
+        assert!(
+            layers.rules.iter().any(|declared| declared == rule),
+            "layers.yaml rules must include {rule}"
+        );
+    }
+    let names: Vec<&str> = layers.tier_names.keys().map(String::as_str).collect();
+    assert_eq!(names, ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]);
+    for comp in &model.components {
+        assert!(
+            layers.layers.contains(&comp.layer),
+            "component \"{}\" layer \"{}\" is not declared in layers",
+            comp.id,
+            comp.layer
+        );
+        assert!(
+            layers.tier_names.contains_key(&comp.tier.to_string()),
+            "component \"{}\" tier {} has no tierNames entry",
+            comp.id,
+            comp.tier
+        );
+    }
+}
+
+#[test]
 fn every_component_paths_entry_exists_on_disk() {
     let model = model();
     let root = repo_root();

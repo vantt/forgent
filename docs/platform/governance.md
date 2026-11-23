@@ -545,7 +545,7 @@ strings do not get renamed in historical decisions. The generated
 `docs/decisions/index.md` remains at its retained path.
 
 <!-- generated:component-authority:governance-holder-table -->
-<!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
+<!-- rendered from packages/component-authority/model/ by `fgos authority render`; edit the model, never this block -->
 
 | Scope (legacy alias retained) | Read first | Facts and RULs | Narrative home |
 | --- | --- | --- | --- |

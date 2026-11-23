@@ -191,7 +191,12 @@ fn render(
         }
         let lines: Vec<String> = drift
             .iter()
-            .map(|entry| format!("view \"{}\" in {}: {}", entry.view, entry.file, entry.reason))
+            .map(|entry| {
+                format!(
+                    "view \"{}\" in {}: {}",
+                    entry.view, entry.file, entry.reason
+                )
+            })
             .collect();
         return Err(format!(
             "{}\nregenerate with `fgos authority render`.",

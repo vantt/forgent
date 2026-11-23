@@ -238,22 +238,45 @@ test('buildDecisionIndexMarkdown: a retired docs/specs pointer carried by an eve
   assert.doesNotMatch(md, /docs\/specs\/runner\.md/);
 });
 
-test('narrativeHolderResolver: reads decision-kinds.json by id, canonical or alias, falls back to the platform file carrying the scope name, and returns null otherwise', () => {
+test('narrativeHolderResolver: reads decision-kinds.yaml through the host by id, canonical or alias, falls back to the platform file carrying the scope name, and returns null otherwise', () => {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-holder-'));
   fs.mkdirSync(path.join(repoRoot, 'docs', 'platform', 'system-overview'), { recursive: true });
   fs.mkdirSync(path.join(repoRoot, 'docs', 'platform', 'questions'), { recursive: true });
   fs.mkdirSync(path.join(repoRoot, 'packages', 'component-authority', 'model'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, 'docs', 'platform', 'system-overview', 'spec.md'), '# spec\n');
   fs.writeFileSync(path.join(repoRoot, 'docs', 'platform', 'questions', 'spec.md'), '# questions\n');
-  fs.writeFileSync(path.join(repoRoot, 'packages', 'component-authority', 'model', 'decision-kinds.json'), JSON.stringify([
-    {
-      id: 'packaging-distribution',
-      canonical: 'decision-kind:packaging-distribution',
-      aliases: ['distribution'],
-      owner: 'packaging-distribution',
-      narrative: 'docs/platform/packaging-distribution/decisions/',
-    },
-  ], null, 2));
+  const modelDir = path.join(repoRoot, 'packages', 'component-authority', 'model');
+  fs.mkdirSync(path.join(modelDir, 'doors'), { recursive: true });
+  fs.writeFileSync(path.join(modelDir, 'layers.yaml'), [
+    'layers:', '  - kernel', 'rules: []', 'domains: []', 'tierNames:', '  "0": leaf', '',
+  ].join('\n'));
+  fs.writeFileSync(path.join(modelDir, 'components.yaml'), [
+    '- id: packaging-distribution',
+    '  canonical: packaging-distribution',
+    '  aliases: []',
+    '  meaning: m',
+    '  layer: kernel',
+    '  tier: 0',
+    '  paths: []',
+    '  owns: []',
+    '  mustNotOwn: []',
+    '  spec: docs/platform/packaging-distribution/spec.md',
+    '  source: []',
+    '  status: live',
+    '',
+  ].join('\n'));
+  fs.writeFileSync(path.join(modelDir, 'contracts.yaml'), '[]\n');
+  fs.writeFileSync(path.join(modelDir, 'doors', 'one.yaml'), 'job: j\nkind: door\npatterns: []\nallowed: []\n');
+  fs.writeFileSync(path.join(modelDir, 'decision-kinds.yaml'), [
+    '- id: packaging-distribution',
+    '  canonical: decision-kind:packaging-distribution',
+    '  aliases:',
+    '    - distribution',
+    '  meaning: m',
+    '  owner: packaging-distribution',
+    '  narrative: docs/platform/packaging-distribution/decisions/',
+    '',
+  ].join('\n'));
   const holderFor = narrativeHolderResolver(repoRoot);
   assert.equal(holderFor('distribution'), 'docs/platform/packaging-distribution/decisions/');
   assert.equal(holderFor('packaging-distribution'), 'docs/platform/packaging-distribution/decisions/');

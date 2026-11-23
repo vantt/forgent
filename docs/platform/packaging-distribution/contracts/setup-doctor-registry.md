@@ -161,7 +161,7 @@ Doctor/fix paths may repair environment readiness only; an incident is repaired 
 | The engine derives status, `ok`, `next`, fix sequencing and `--strict` | `packages/distribution/rust/src/doctor.rs` unit tests |
 | Doctor default path is read-only and starts no lifecycle child | `apps/fgos/tests/cli_tests.rs`, `test/setup/doctor-fresh-run.test.mjs` |
 | Doctor fix runs registered fixes in registry order, bridged fixes in one call per consecutive segment | `apps/fgos/src/wiring/doctor/bridge.rs` tests, `test/setup/doctor-bridge.test.mjs` |
-| A bridged row is labelled no earlier than the layers its judge reads | `test/architecture.test.mjs` (import-closure test), `packages/component-authority/model/doors/doctor-readiness-registry.json` and `packages/component-authority/model/doors/node-rows-bridge.json` |
+| A bridged row is labelled no earlier than the layers its judge reads | `test/architecture.test.mjs` (import-closure test), `packages/component-authority/model/doors/doctor-readiness-registry.yaml` and `packages/component-authority/model/doors/node-rows-bridge.yaml` |
 | Project config overrides global config | `src/config/global-config.mjs` (deleted in 38361f01d), `test/config/global-config.test.mjs` (deleted in 38361f01d) |
 
 ## 8. Open Follow-Up

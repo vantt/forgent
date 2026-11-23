@@ -39,7 +39,7 @@ coverage: partial
 ## Area Map
 
 <!-- generated:component-authority:system-overview-area-map -->
-Area rows from the model: one row per area listing its top-level components. Specs outside docs/platform/<area>/ are listed under (cross-area). <!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
+Area rows from the model: one row per area listing its top-level components. Specs outside docs/platform/<area>/ are listed under (cross-area). <!-- rendered from packages/component-authority/model/ by `fgos authority render`; edit the model, never this block -->
 
 | Area | Components | What it owns | Owner doc |
 | --- | --- | --- | --- |
@@ -103,7 +103,7 @@ Hand-written shared entities (Meaning / Touched by) retained from the prior over
 Ownership rows generated from `packages/component-authority/model/`:
 
 <!-- generated:component-authority:system-overview-shared-entities -->
-Ownership rows across every area: each thing a component declares it owns, with that component. <!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
+Ownership rows across every area: each thing a component declares it owns, with that component. <!-- rendered from packages/component-authority/model/ by `fgos authority render`; edit the model, never this block -->
 
 | Entity | Owner | Owner doc |
 | --- | --- | --- |

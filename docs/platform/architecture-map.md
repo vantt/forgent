@@ -395,7 +395,7 @@ mô hình (không còn đếm tay module). `test/{state,runner,cli,e2e}` follow 
 ##### Component registry (from model)
 
 <!-- generated:component-authority:architecture-map-components -->
-Component registry rows from the model, one per component and subcomponent, sorted by id. <!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
+Component registry rows from the model, one per component and subcomponent, sorted by id. <!-- rendered from packages/component-authority/model/ by `fgos authority render`; edit the model, never this block -->
 
 | Component | Parent | Layer | Tier | Status | Owns | Must not own | Owner doc |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -505,7 +505,7 @@ mũi tên nội bộ (frontier, recovery) không cần — đó không phải l�
 Cột Contract lấy từ trường `meaning` của model (phần sau `": "` là nội dung hợp đồng; cột Boundary giữ nhãn ranh giới). Ô Path để trống (`—`) khi model không có file (planned/idea).
 
 <!-- generated:component-authority:architecture-map-contracts -->
-Contract registry rows from the model, one per contract, sorted by id. <!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
+Contract registry rows from the model, one per contract, sorted by id. <!-- rendered from packages/component-authority/model/ by `fgos authority render`; edit the model, never this block -->
 
 | ID | Boundary | Contract | Provider | Consumers | Status | Path |
 | --- | --- | --- | --- | --- | --- | --- |

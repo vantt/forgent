@@ -17,27 +17,28 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { listWork, StoreError } from '../state/store.mjs';
 import { writeFrontmatter } from '../util/yaml.mjs';
+import { invokeHost } from '../util/host-bin.mjs';
 
 export function indexPathFor(repoRoot) {
   return path.join(repoRoot, 'docs', 'decisions', 'index.md');
 }
 
-const DECISION_KINDS_PATH = path.join('packages', 'component-authority', 'model', 'decision-kinds.json');
+const MODEL_DIR = path.join('packages', 'component-authority', 'model');
 const LEGACY_SPEC_PATH = /docs\/specs\/([A-Za-z0-9-]+)\.md/g;
 
 /**
  * Resolve where a decision scope's narrative lives today. Decision kinds in
- * `packages/component-authority/model/decision-kinds.json` name the narrative
- * home per scope (id, canonical, aliases). A scope the model does not list
+ * `packages/component-authority/model/decision-kinds.yaml` name the narrative
+ * home per scope (id, canonical, aliases); the host reads it (`fgos authority model`). A scope the model does not list
  * falls back to the platform file that carries its name
  * (`docs/platform/<name>.md` or `docs/platform/<name>/spec.md`, covering
  * scopes such as `questions`). Returns `(scopeName) => path|null`.
  */
 export function narrativeHolderResolver(repoRoot) {
   const homes = new Map();
-  try {
-    const kinds = JSON.parse(fs.readFileSync(path.join(repoRoot, DECISION_KINDS_PATH), 'utf8'));
-    for (const kind of kinds) {
+  if (fs.existsSync(path.join(repoRoot, MODEL_DIR))) {
+    const { decisionKinds } = invokeHost(['authority', 'model', '--json'], { dir: repoRoot });
+    for (const kind of decisionKinds) {
       const home = kind?.narrative;
       if (!home) continue;
       const names = new Set();
@@ -49,8 +50,6 @@ export function narrativeHolderResolver(repoRoot) {
         if (name) homes.set(name, home);
       }
     }
-  } catch (err) {
-    if (err.code !== 'ENOENT') throw err;
   }
   const exists = (rel) => fs.existsSync(path.join(repoRoot, rel));
   return (name) => homes.get(name)

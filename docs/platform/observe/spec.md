@@ -61,7 +61,7 @@ Bảng trên là subject của hình v1. Ở bản ghi v2, `subject.kind` và ki
 Rows owned by the observe area, generated from `packages/component-authority/model/`:
 
 <!-- generated:component-authority:observe-shared-entities -->
-Ownership rows owned by `observe`: each thing a component declares it owns, with that component. <!-- rendered from packages/component-authority/model/ by `node scripts/component-authority-render.mjs`; edit the model, never this block -->
+Ownership rows owned by `observe`: each thing a component declares it owns, with that component. <!-- rendered from packages/component-authority/model/ by `fgos authority render`; edit the model, never this block -->
 
 | Entity | Owner | Owner doc |
 | --- | --- | --- |
