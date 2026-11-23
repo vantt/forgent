@@ -361,6 +361,10 @@ dispatched with `--provider claude` (`fgos run ... --provider claude`, or `provi
   shell proves it. 2a reran with the six widened paths (q-bioobcr52m A) and stopped at step 3 with nothing changed:
   `fgos wire-agents` cannot install a workspace's hook rows, and `fgos doctor --fix` (the door that can) takes no row.
   2a is `draft` again and waits on q-xs6oex5amb (recommended: `fgos doctor --fix --only <row>`); 2b waits on 2a.
+  The owner answered q-xs6oex5amb option A in the lead's chat (2026-11-23 22:24): `fgos doctor --fix` gains
+  `--only <row-id>`, and the harnesses install workspace hooks through it. 2a then also writes
+  `packages/distribution/rust/src/doctor.rs` and `apps/fgos/src/wiring/doctor/mod.rs`, which are outside the footprint;
+  the supervisor was asked (event 7c1176e2f1795b10) to record the answer and land those two lines. 2a starts once they land.
   For phase 10: the `join-fgos-onto-project-root` pattern misses joins written as `'.fgos/<sub>'`; the
   `subcommand-flag-drift` test fails on main for the `doc` verb (not this plan's). For phase 11:
   `packages/distribution/rust/src/rc_lines.rs:7-8` and `docs/platform/packaging-distribution/spec.md:925` still name
