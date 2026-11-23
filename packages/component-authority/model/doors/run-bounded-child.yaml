@@ -20,7 +20,7 @@ debt:
   - path: packages/distribution/rust/src/init.rs
     reason: resolve_node_path looks for node on PATH for the install preflight
   - path: packages/git/rust/src/driver.rs
-    reason: bounds its own git children with a deadline loop of its own (try_wait)
+    reason: finds git on PATH (absolute entries only) and bounds its own git children with a deadline loop of its own (try_wait)
   - path: packages/holder-lock/rust/src/borrow_windows.rs
     reason: polls a child it started itself (try_wait); not a run-to-completion with a replacement environment
   - path: packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs

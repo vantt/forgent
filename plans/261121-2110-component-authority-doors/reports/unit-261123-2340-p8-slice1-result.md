@@ -20,3 +20,6 @@ Possible compile points: `fgos_process::ProcId` path (defined at lib.rs:30), `Pa
 Status: DONE_WITH_CONCERNS
 Summary: Three moves written; driver.rs run-bounded-child entry stays because `try_wait` remains at driver.rs:1421.
 Concerns/Blockers: uncompiled; unix executable-bit check is new for git and node lookups.
+
+## Fix round 1
+Lead review: the hand-split PATH lookup in driver.rs hid the door pattern instead of retiring it, and `resolve_program` has no absolute-entries-only mode. Reverted only the git lookup block in `GitDriver::build` to the previous `std::env::split_paths` code (absolute entries, `git`/`git.exe`, `is_file`, canonicalize). Kept the test kill change and the attempt_step.rs change. The driver.rs debt entry in `doors/run-bounded-child.yaml` again names both: finds git on PATH (absolute entries only) and bounds its own git children with a deadline loop of its own. Not compiled or tested (cargo not run).
