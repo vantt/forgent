@@ -1,7 +1,7 @@
 ---
 id: p-vwpnx4gpow
 title: "Inventory every remaining live Node area and order the Rust port, one plan per area (core/platform, priority high; source: owner order 2026-11-23 14:21 via lead:SUPERVISOR)"
-status: proposed
+status: done
 priority: P1
 area: platform-foundations
 created: 2026-11-23
