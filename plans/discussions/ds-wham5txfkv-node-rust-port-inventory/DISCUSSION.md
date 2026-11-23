@@ -1,17 +1,50 @@
 ---
 id: ds-wham5txfkv
 title: "Inventory every live Node area and order the Rust port, one plan per area"
-status: open
+status: settled
 source:
   - p-vwpnx4gpow
 created: 2026-11-23
 ---
 
-discussion: open
+discussion: settled
+
+## Hand-off to the planner
+
+- **Outcome:** every live Node area in `src/` (and `bin/*.mjs`) is retired into Rust through the ten plans of §7, opened
+  one at a time in that order. When plan 10 lands, no `legacy-cli` route and no `legacy-node` payload remain.
+- **Constraints:** each plan moves every caller and deletes the Node path and its tests in the same change (L10, design
+  principles 1 and 8). It leaves no twin. It starts only once the running plans holding its files have landed (§7 names the collisions). It changes no behaviour, verb or flag (RUL104).
+  The owner-approved program order of `261114-2051` stands (D4).
+- **Non-goals:** the dead tier-5 closure (`261122-2108` owns it); a plan for any facade row (D1); new Rust features.
+- **Acceptance per plan:** `git ls-files <area paths>` prints nothing (or only the rows §6 hands to a later plan),
+  every retired test is named with its owning Rust test, the area's `doors` rows have no debt left for it, and `npm test` and
+  `cargo test --workspace` are green on the merged tree.
+- **Acceptance of the program:** 56 → 0 `legacy-cli` routes in `packages/host-runtime/contracts/command-routes.json`;
+  `find src -name '*.mjs'` is empty.
+- **Open points that block only some parts:** O1 (Work council must be held before plan 5 starts, owner decision 78);
+  O2 (plans 2 and 3 wait for the session-host and session-rotation plans that are running).
+- **First plan to open:** §7 task 1 (packaging remainder), once `261121-2110-component-authority-doors` has landed.
+- **Sources:** `p-vwpnx4gpow`, `plans/261114-2051-rust-verb-migration-program/plan.md`, D1–D5.
 
 ## 1. Trạng thái hiện tại
 
-Round 1 (2026-11-23 14:21–14:50, shaper head). The scout is done and the full inventory table is in §6. Every
+**Round 2 (2026-11-23 15:57–16:20): settled.** Every check left open in round 1 came back without revising P1–P4, so they
+are minted as D1–D4. Findings:
+
+- **O1:** "decision 78" is a decision of the harden program (`261021-1118`): the Work council opens after T8 and the
+  non-Work arms of T9. Both closed (T8 on 2026-11-09, T9 on 2026-11-14), but no Work council has been held yet. The gate
+  stays (D5) and blocks only plan 5 onward.
+- **O3:** `src/util/yaml.mjs` is already a facade over the `fgos-yaml-doc` crate. The component-authority-doors plan only
+  moves the model's own reads into the crate and does not retire the file. It has 28 product importers, including `bin`, so it dies in plan 10.
+- **Facade check, file by file:** the facade areas hold small pieces of Node-side policy. Examples are the Event Store seal coalescing for Node
+  CLI processes, the `terminal.*` merge rules "only Node can judge", and twins that run Rust's golden vectors
+  (`convention/identifier-rules.mjs`, `util/host-bin-path.mjs`). Each one exists only to serve a Node process, so each one dies with
+  its last Node caller. D1 holds. Two leaves are real logic that serves no Node caller and are assigned to plans:
+  `util/domain-compile.mjs` (`build:domains` plus a doctor row) goes to plan 1, and `git/main-checkout-delete-guard.mjs` goes to S1.
+- `identity/directory-store.mjs` has no product importer, only one test. It is dead and goes into plan 1 as a one-line deletion.
+
+**Round 1** (2026-11-23 14:21–14:50, shaper head). The scout is done and the full inventory table is in §6. Every
 `src/` area has a row: 323 `.mjs` files, about 80k lines, mapped to the component model
 (`packages/component-authority/model/components.json`).
 
@@ -58,16 +91,22 @@ allowed to run beside any step. F0 through S6a have landed (S6a ended after its 
 | P2 | **"Packaging first" = the setup pieces whose layer already lives in Rust or that have no layer.** Those are instruction registry/composition/projections, agent hooks, skill wrappers, agy permissions, bin discovery, shell rc, git hooks and mailbox limits. Doctor rows of a layer still in Node (`seat-binding-checks`, `workflow-case-checks`, `workflow-catalog-reader`, `blind-steps-proven-pools`, and the bridged rows in `registrations.mjs`) stay on `doctor-bridge.mjs` and move with their layer's plan. The bridge is deleted with the last such row. | provisional (round 1) | AGENTS.md install gate: "a row of a layer still in Node is bridged"; S4 plan "Items for the program plan" assigns bridged rows to S5/S6a/S6b/S7 |
 | P3 | **One plan per component of the model**, not per `src/` directory. The `work-state` component spans `src/state` + `src/intake` + `src/evolve`, and `host-surface` spans `src/cli` + `src/verbs` + `bin/`. | provisional (round 1) | `components.json` `paths` |
 | P4 | This inventory sizes the program's remaining rows (S1, S6b, S7) and splits S7 into its components. It does not reorder the owner-approved order. | provisional (round 1) | program plan: "S1-S7 each get their own detailed plan … when they start" |
-| O1 | S7 entry gate "Work council (decision 78) held": status unknown | open, blocks only §7 task-work-state | to check next round |
-| O2 | `session-host` / `session-rotation` are being edited now by `261122-0118`, `261122-2307` (done) and `261123-0828` (ready) | open, blocks only their own plans' start | footprints read 2026-11-23 |
-| O3 | `src/util/yaml.mjs` vs the `yaml-doc` crate: is it being retired by `261121-2110-component-authority-doors` ("Rust crate the only reader of the YAML model")? | open | commit `bea353689` |
+| P1–P4 | See D1–D4 | settled round 2 | held without revision |
+| O1 | S7 entry gate "Work council (decision 78) held". Decision 78 belongs to `261021-1118` (lessons.md:13, :104, :152): the Work council opens after T8 and the non-Work T9 arms. Both are closed, but no council has been held. | open, blocks only plans 5–7 → D5 | `plans/261021-1118-harden-low-layers-bottom-up/plan.md` closedNote |
+| O2 | `session-host` / `session-rotation` are being edited now by `261122-0118` (running) and `261123-0828` (ready) | open, blocks only plans 2–3 starting | footprints read 2026-11-23 |
+| O3 | `src/util/yaml.mjs`: a facade over `fgos-yaml-doc` with 28 product importers; `261121-2110` does not retire it (plan.md:219–222) | clear: facade, dies in plan 10 | file header; importer count |
+| O5 | Logic leaves inside facade areas: `util/domain-compile.mjs` → plan 1; `git/main-checkout-delete-guard.mjs` → S1; `identity/directory-store.mjs` is dead (no product importer) → plan 1 | clear | round 2 file-by-file header read |
 | O4 | Test counts in §6 are "test files that import the area", so a test can count under several areas. Backlog says 588 test files in all. | clear (method stated) | scratchpad script, method in §5 |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Decision | Rounds held | Source |
 |---|---|---|---|
-| (none yet) | | | |
+| D1 | A facade, client, Node-process adapter or golden-vector twin over a Rust crate gets no plan. It is deleted inside the plan that removes its last Node caller, and §6 names that plan. | 2 | L10, design principle 1; round 2 file-by-file check |
+| D2 | "Packaging first" means plan 1 takes the `setup` pieces whose layer already lives in Rust or that have no layer (plus `util/domain-compile.mjs` and the dead `identity/directory-store.mjs`). Doctor rows of a layer still in Node stay on `doctor-bridge.mjs` and move with their layer's plan. The bridge is deleted with the last row. | 2 | AGENTS.md install gate; S4 "Items for the program plan" |
+| D3 | One plan per component of the model, not per `src/` directory | 2 | `components.json` `paths` |
+| D4 | This inventory sizes the program's remaining rows (S1, S6b, S7), splitting S7 into plans 5–7 and adding plans 1–3 and 8–10. It does not reorder the owner-approved order. | 2 | `261114-2051` "S1-S7 each get their own detailed plan … when they start" |
+| D5 | Owner decision 78 stands: the Work council is held before plan 5 opens. Plans 1–4 do not wait for it. | 2 | `261021-1118` lessons.md:104, :152 |
 
 ## 5. Q&A log
 
@@ -78,10 +117,14 @@ allowed to run beside any step. F0 through S6a have landed (S6a ended after its 
   dispatch and execution subdirectories of `src/runner` are split out. Each file's header comment was read to classify
   it as facade or logic. Result: the facade-versus-logic split (§1 finding 1) and provisional calls P1–P4. No owner question
   was needed; P1–P4 follow from L10, design principle 1, and the S4 bridge rule.
+- **2026-11-23 15:19 — owner:** "chổ này đang chờ câu hỏi gì" (what question is this waiting on?). Answer: no
+  owner question is open. The only point worth the owner's eye is how "packaging first" is read (P2).
+- **2026-11-23 15:57 — owner:** "em scan xong chưa" (is the scan done yet?). Round 2 ran: the decision 78 lookup, the `yaml.mjs` check, and a file-by-file
+  header read of the facade areas. None of P1–P4 was revised, so D1–D5 were minted and the discussion was settled.
 
 ## 6. Thiết kế đã chốt {#design}
 
-*Draft, round 1. Not settled until P1–P4 hold a second round.*
+*Settled, round 2 (D1–D5).*
 
 ### Shape
 
@@ -113,11 +156,11 @@ Legend: **kind** L = logic to port, F = facade/client over Rust, D-rest = what t
 | # | Area (`src/`) | Component (tier) | Kind | Files / lines | Tests | What Rust owns today | Live callers | Target Rust component | Retired by |
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | `setup` (17 files) | packaging-distribution (9) | L + bridge | 17 / 5150 | 25 | `packages/distribution` (init, doctor, wire-agents, uninstall native since S4); `apps/fgos/src/wiring/doctor` | scripts (5: `build:skills` and friends), verbs (1), Rust host → `doctor-bridge.mjs` | `packages/distribution` | **plan 1** for non-bridge pieces (P2); bridged rows move with plans 4, 5 and 6; `doctor-bridge.mjs` with the last |
-| 2 | `util` (23) | platform-foundations (0) | F/leaf | 23 / 1130 | 78 | `durable-file`, `canonical-json`, `yaml-doc`, `identity`, host-bin resolution in `apps/fgos` | almost every area | none (leaves die) | each leaf with its last caller; `yaml.mjs` see O3 |
+| 2 | `util` (23) | platform-foundations (0) | F/leaf | 23 / 1130 | 78 | `durable-file`, `canonical-json`, `yaml-doc`, `identity`, host-bin resolution in `apps/fgos` | almost every area | none (leaves die) | each leaf with its last caller; `yaml.mjs` in plan 10; `domain-compile.mjs` in plan 1 |
 | 3 | `native` (8) | process (0) | F | 8 / 1129 | 53 | `packages/process`; the combined addon | workflow 27, dispatch 19, many | none | the last plan (10), since it is the Node→Rust door itself |
 | 4 | `config` (1) | config (1) | F | 1 / 127 | 15 | `packages/config/rust` | 11 areas | none | with its last caller |
 | 5 | `convention` (4) | convention (1) | F | 4 / 146 | 3 | `packages/convention/rust` | workflow, runner, scripts (3) | none | plan 4 or 6; scripts need a Rust verb or a direct crate call |
-| 6 | `identity` (1) | identity (1) | F | 1 / 16 | 0 | `packages/identity/rust` | none found by import | none | possibly dead now; check in round 2 |
+| 6 | `identity` (1) | identity (1) | F | 1 / 16 | 0 | `packages/identity/rust` | none (one test only) | none | dead: deleted in plan 1 |
 | 7 | `holder-lock` (9) | holder-lock (1) | F | 9 / 1789 | 50 | `packages/holder-lock/rust` (policy, Windows `LockFileEx` via `fgos internal lock-hold`) | git (12), runner, dispatch, workflow, state, `.githooks` | none | with its last caller (plan 6 or 10) |
 | 8 | `git` (13) | git (2) | F + one logic file | 13 / 796 | 26 | `packages/git/rust` + node-addon | runner, workflow, state, scripts (11) | `packages/git` | facades with their last caller; `main-checkout-delete-guard.mjs` (505 lines of logic) = **S1** |
 | 9 | `terminal-control` (2) | terminal-control (2) | F | 2 / 284 | 3 | `packages/terminal-control/rust` | dispatch (live rest), scripts | none | with dispatch's live rest |
@@ -140,10 +183,10 @@ and `scripts/*.mjs` callers of `src/` (each plan moves its own script callers).
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-*Draft order. Each entry becomes one plan, opened one at a time.*
+*Settled order (D2–D5). Each entry becomes one plan, opened one at a time.*
 
 ### 1. Packaging remainder {#task-packaging}
-Goal: port the setup pieces in P2 into `packages/distribution`, move their script callers (`build:skills` and friends), and
+Goal: port the setup pieces in D2 and `util/domain-compile.mjs` into `packages/distribution`, move their script callers (`build:skills` and friends), and
 delete them. Collision: `261121-2110-component-authority-doors` holds 6 `src/setup` files, so start after it lands.
 Verify draft: `npm test && cargo test --workspace`; `git ls-files src/setup` lists only the bridge files.
 
@@ -162,7 +205,7 @@ reached from `definition.mjs`; move the Workflow doctor rows off the bridge. Col
 
 ### 5. Work-state = S7 core {#task-work-state}
 Goal: replay first, then writers behind the §11 gates; delete `src/state`, `src/intake`, `src/evolve` and the
-event-store/observe facades. Gate: O1.
+event-store/observe facades. Gate: the Work council is held first (D5).
 
 ### 6. Runner tier 7 {#task-runner}
 Goal: `src/runner/*.mjs` (loop, operation-choice, merge, work-dispatch, ...) and `bin/fgos-runner.mjs`.
