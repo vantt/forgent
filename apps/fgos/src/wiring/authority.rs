@@ -94,18 +94,28 @@ pub fn answer(request: &LocateRequest) -> Result<serde_json::Value, ModelError> 
     }))
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct AuthorityProvider;
+#[derive(Debug, Clone)]
+pub struct AuthorityProvider {
+    descriptor: ProviderDescriptor,
+}
 
 impl AuthorityProvider {
     pub fn new() -> Self {
-        Self
+        Self {
+            descriptor: DESCRIPTOR,
+        }
+    }
+}
+
+impl Default for AuthorityProvider {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 impl OperationProvider for AuthorityProvider {
     fn descriptor(&self) -> &ProviderDescriptor {
-        &DESCRIPTOR
+        &self.descriptor
     }
 
     fn invoke<'a>(
