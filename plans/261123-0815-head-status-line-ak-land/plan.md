@@ -1,7 +1,9 @@
 ---
 contract: plan-v1
 title: "Review and land the head status line branch (ak layout and colors)"
-status: ready
+status: running
+lead: head:lead-forgent-261123-0815-head-s-1ae27
+base: d2016073d96eef451ef2528623e37893d9c9960b
 priority: P1
 blockedBy: []
 footprint:
