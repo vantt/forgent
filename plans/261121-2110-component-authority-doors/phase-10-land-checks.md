@@ -6,6 +6,10 @@
 - The knowledge note on why the `orchestrator` word guard was retired (decision 0031,
   `docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft*/`).
 - `packages/component-authority/model/doors/*.yaml` after phases 2-9, and `contracts/model.v1.json`.
+- Owner answer B to q-aanvfxaopa (2026-11-24), which widens D6: the named list is every door row that still has
+  `debt` when this phase starts, so the component guards from the release on; phase 12 retires them all right after
+  the release. Each named row keeps a `retiredBy`: the row's existing plan, program step or backlog item where it
+  names one, otherwise `261121-2110-component-authority-doors#phase-12`. The D6 rows below keep theirs.
 - Owner decision D6 (discussion `ds-wham5txfkv`, 2026-11-23): the named debt. Row `doctor-readiness-registry` keeps its `debt`, `retiredBy` the Workflow/Work port (S6b/S7 of `261114-2051-rust-verb-migration-program`). Row `installation-shim-location` keeps its `debt`, `retiredBy: p-rypvkc3kai`, while that backlog item is open; if it is done, phase 2g has removed the debt and the row is not named. No warn-only switch exists or is added (O6 closed).
 
 ## Files it may write
@@ -43,8 +47,8 @@ Every writing unit runs with `--provider claude` (owner order, D6 step 0). If cl
 
 ## Verify
 `node --test test/architecture.test.mjs` is green, the five synthetic cases behave as stated, and
-`rg -l '^debt:' packages/component-authority/model/doors` lists only `doctor-readiness-registry.yaml` (and
-`installation-shim-location.yaml` while `p-rypvkc3kai` is open), each with `retiredBy`.
+every file `rg -l '^debt:' packages/component-authority/model/doors` lists is on the named list in `checkDoors`
+and carries `retiredBy`, and the list names no row without `debt`.
 
 ## Rollback
 Revert the phase commit. The previous guard and schema come back. No debt comes back, because the
