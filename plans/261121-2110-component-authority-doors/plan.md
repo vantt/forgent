@@ -9,7 +9,7 @@ blockedBy:
   - 261120-0625-work-data-model
   - 261121-1309-git-windows-custody
   - 261121-1456-windows-ci-packaging-reds
-base: bf061ff358fc3c8669195a5989e0ee5f3b2940ee
+base: df345c11ac158b763278db8b328c1c2ad6bb8e64
 footprint:
   - plans/261121-2110-component-authority-doors/**
   - packages/component-authority/**
@@ -140,16 +140,16 @@ door `debt` entry is gone, and the old copy of each is deleted in the same chang
 The model, spec, contract index and generated views come from the sibling plan
 [`261121-2109-component-authority`](../261121-2109-component-authority/plan.md), which this plan is blocked by.
 
-## Facts (prior art, 2026-11-21, HEAD bf061ff35)
+## Facts (prior art, written 2026-11-21 at bf061ff35, refreshed 2026-11-23 at df345c11a)
 
 - The verb wiring pattern is `fgos convention`: `apps/fgos/src/routing.rs:89`
   (`("convention", fgos_convention::AVAILABLE_SUBCOMMANDS)`), `apps/fgos/Cargo.toml:12`, the
   `packages/host-runtime/contracts/command-*.json` manifests, `invocation_doors.rs` and `cli_projector.rs`.
-- Door debt: 76 entries in 22 rows. Phase 2 of the sibling plan moves each row to
+- Door debt: 75 entries in the same 22 rows (76 at bf061ff35). Every debt file is in a phase footprint. Phase 2 of the sibling plan moves each row to
   `packages/component-authority/model/doors/<slug>.json`, and phases 2-4 and 6-9 here list the slug and debt
   files of each row they retire. A running plan (s6a) may retire some debt first, so every retirement phase
   re-reads its rows before it starts.
-- Today `checkDoors` (`test/architecture.test.mjs:1794-1853`) matches hand-written regexes per job and does not
+- Today `checkDoors` (`test/architecture.test.mjs:1860`) matches hand-written regexes per job and does not
   count matches inside `allowed` files. No row uses `ratchet`.
 - The planning gap: "Door check" (`core/skills/_shared/plan-contract.md:88-90`) is a footprint-overlap check, and
   "Prior art" has no search step. Only `fgos-coding-implement/SKILL.md:76-82` asks for a search before writing a
@@ -225,11 +225,19 @@ outside its footprint stops and reports instead of widening.
 
 **Owner approval (2026-11-21 23:34):** the owner approved this plan as written (option A of the approval question lead:SUPERVISOR put to him). It stays `draft` only for the refresh below. Once that refresh passes, the planner or supervisor sets `ready` with no further owner question.
 
-**Why the plan is `draft`:** its footprint overlaps four running plans (`Cargo.toml`, `Cargo.lock`, the host
-routing and command manifests, `src/cli/command-registry.mjs`, `packages/process`, `packages/run-supervisor`,
-`packages/git`, `packages/convention/contracts`, `scripts/plan-contract-check.mjs`), and it needs the sibling
-plan's model. When every `blockedBy` plan is `done`, a planner wake re-reads the debt rows, refreshes `base`, runs
-`node scripts/plan-contract-check.mjs --plan plans/261121-2110-component-authority-doors`, and sets `status: ready`.
+**Refresh (2026-11-23, planner wake on the settled discussion).** Every `blockedBy` plan is `done`, the debt rows
+were re-read (above), `base` moved to `df345c11a`, and the contract check passes, so the plan is `ready`. Footprint
+overlap that remains is held by admission, not by `blockedBy` (`packages/supervision/rust/src/portfolio.rs:252-265`
+admits no plan whose footprint overlaps a `running` one):
+- `261122-0056-orchestration-skeleton` (running) shares the host routing and command manifests,
+  `apps/fgos/src/cli_projector.rs`, `apps/fgos/src/wiring/mod.rs`, `apps/fgos-gateway/src/gateway.rs`,
+  `scripts/plan-contract-check.mjs` and its test, `core/skills/_shared/plan-contract.md`, the generated skill
+  surfaces and `CHANGELOG.md`. This plan starts after it is done.
+- `261122-1950-owner-communication-standard` (ready) shares `plan-contract.md`, the coding and shaping skills, the
+  generated skill surfaces and `CHANGELOG.md`; `261122-2217-docos-pkm-locate-door` (draft) shares `Cargo.toml`,
+  `Cargo.lock`, the host routing files, `src/cli/command-registry.mjs` and `test/architecture.test.mjs`. Whichever
+  is admitted first holds the other; their order is the secretary's call, not this plan's.
+- Each phase re-reads its files at its own start, because the plans above will have changed them.
 
 ## Owner questions
 
