@@ -68,6 +68,12 @@ jobs:
       # ort-sys links a single libonnxruntime.a as is, so every static library ONNX Runtime needs goes into one
       # archive, the way pyke packages its prebuilt archives. The full protobuf, protoc, upb and test libraries
       # are left out; ONNX Runtime uses protobuf-lite.
+      # A static-only build leaves out the dependencies that only a final link needs; re2 is one (pkm's Windows
+      # build met the same).
+      - name: Build re2
+        run: |
+          B="$RUNNER_TEMP/onnxruntime/build/Linux/Release"
+          find "$B" -name 'libre2.a' | grep -q . || cmake --build "$B" --config Release --target re2 --parallel
       - name: Combine into one libonnxruntime.a
         run: |
           B="$RUNNER_TEMP/onnxruntime/build/Linux/Release"
