@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9a62eaa9c401bcd39c984e1efe3094c4751e97ff3c98f6ae0b594964f5576e9b",
+  "payloadDigest": "1b92faa7d5c856f9f3c65731628e14869d00a1744e6f576e306f9c3aedb71ff0",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1339,7 +1339,7 @@
     "scripts/build-domain-registry.mjs": "da8c79189d94c60af1ed91ed83a137dbbaccc34767585e61988bfc1ef81065aa",
     "scripts/build-rust-distribution.mjs": "7889b3c06dfd048457526689d2c7c3e586053ebf6dfde02a906544c2de558f5d",
     "scripts/build-skill-wrappers.mjs": "8b12a9e8b2c2ab2f6757f795b5370561389d727437a5b1bdc7ba8ab450e3b943",
-    "scripts/check-backlog-reconciliation.mjs": "8c01af47ab2709596e7dda0d6edb1fd9962130b73352697b1ae9442640186b4a",
+    "scripts/check-backlog-reconciliation.mjs": "090f2a2a937be351159558866403c0e62db3c1b038887e7016aafb30fd0ba330",
     "scripts/check-decision-citation-drift.mjs": "79fa2194b1a4f607e7c1b4be211e886055b62f87ea417481cddfa2b0fa7ba8e6",
     "scripts/check-decision-codes.mjs": "c9f0ae0dbb6f6368eec818de11a785428d4517736f180359a344c73ad789571c",
     "scripts/check-decision-supersession.mjs": "47dfad28990d1410d0fd9cda8cf1d8e9efce61a0788f01ccf43bde9c4a0a12e8",
@@ -1374,7 +1374,7 @@
     "scripts/git/p-space.sh": "ab11ec0d8fc8c5a0c32f0dcc1aa08d26c39356db710a4e395513f87af78decd3",
     "scripts/herdr-cockpit-notify.mjs": "f3e1cd7e31438e75a113b2cc2481ca6472c1fadaf94a16ed781204d50ed2ac0e",
     "scripts/herdr-cockpit.sh": "4f5b3176b3aab743d5a8bab7199361474cddae81bb9a074261a034cb07b78c16",
-    "scripts/identity-ids-unique.mjs": "145afb5cd77230369599cf1ae3faf73939ba0f3544a6aa839e9654598b3581b0",
+    "scripts/identity-ids-unique.mjs": "9b9c048ec18aae39a926aeb12f7c58f0c5fda819f36e13ef8ea6f91c1b194fbe",
     "scripts/install-git-hooks.mjs": "b6848878720251759f5cb80bb5b4e3c8389b684c1aaae9c894b7ed913d91422f",
     "scripts/knowledge-bootstrap.mjs": "6ffd1b84d5ebf773b52806cd9d47007e60f4999a0f36b43bca4cc50d0f649543",
     "scripts/knowledge-canary.mjs": "235eeaad5921c9d4cb83bec0ef1504ad74ff5b61486e2727f86d2e5f5e29240d",
