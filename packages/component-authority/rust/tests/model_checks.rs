@@ -900,6 +900,8 @@ fn the_enum_constants_and_the_typed_row_fields_equal_the_schema() {
             "job",
             "kind",
             "patterns",
+            "names",
+            "primitives",
             "allowed",
             "debt",
             "reason",
@@ -909,17 +911,17 @@ fn the_enum_constants_and_the_typed_row_fields_equal_the_schema() {
         &["job", "kind", "patterns", "allowed"],
         &["slug"],
         serde_json::json!({
-            "job": "j", "kind": "k", "patterns": [], "allowed": [], "debt": [], "reason": "r",
-            "retiredBy": "b", "owner": "o"
+            "job": "j", "kind": "k", "patterns": [], "names": ["n"], "primitives": ["p"],
+            "allowed": [], "debt": [], "reason": "r", "retiredBy": "b", "owner": "o"
         }),
     );
     assert_row_matches_schema::<DoorPathReason>(
         "door path with a reason",
         &defs["door"]["properties"]["allowed"]["items"]["anyOf"][1],
-        &["path", "reason"],
+        &["path", "count", "reason"],
         &["path"],
         &[],
-        serde_json::json!({ "path": "p", "reason": "r" }),
+        serde_json::json!({ "path": "p", "count": 2, "reason": "r" }),
     );
     assert_row_matches_schema::<Contract>(
         "contract",
