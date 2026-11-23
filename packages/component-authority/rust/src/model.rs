@@ -1,6 +1,11 @@
 //! Loads every model file into typed rows that follow `contracts/model.v1.json`. A field the schema does not
 //! name is refused, and so is a missing file.
+//!
+//! The model is YAML, read through `fgos-yaml-doc` under the `tool` profile: the shared door decides what the
+//! text means, and the typed rows are decoded from its JSON view. This crate is the only reader of the model;
+//! Node code asks `fgos authority model --json` instead of parsing a model file.
 
+use fgos_yaml_doc::model::Profile;
 use serde::Deserialize;
 use std::collections::BTreeMap;
 use std::fs;
@@ -30,7 +35,7 @@ pub struct Exception {
     pub reason: String,
 }
 
-/// One named exception to the tier downward rule, as `layers.json` `tierExceptions` carries it.
+/// One named exception to the tier downward rule, as `layers.yaml` `tierExceptions` carries it.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TierException {
@@ -93,7 +98,7 @@ pub struct DoorPathReason {
     pub reason: Option<String>,
 }
 
-/// One door row. A door has no id of its own: `slug` is its file name without `.json`.
+/// One door row. A door has no id of its own: `slug` is its file name without `.yaml`.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Door {
@@ -168,12 +173,22 @@ fn io_error(path: &Path, error: &std::io::Error) -> ModelError {
     }
 }
 
+/// Reads one model file: the YAML door decides what the text means (a comment is not part of the value), and
+/// the typed row is decoded from the document's JSON view. A refusal keeps the file and the door's rule.
 fn read<T: for<'de> Deserialize<'de>>(path: &Path) -> Result<T, ModelError> {
     let text = fs::read_to_string(path).map_err(|error| io_error(path, &error))?;
-    serde_json::from_str(&text).map_err(|error| ModelError::Invalid {
+    let name = path
+        .file_name()
+        .map(|name| name.to_string_lossy().into_owned())
+        .unwrap_or_default();
+    let invalid = |reason: String| ModelError::Invalid {
         path: path.to_path_buf(),
-        reason: error.to_string(),
-    })
+        reason,
+    };
+    let value = fgos_yaml_doc::document::parse(text.as_bytes(), Profile::Tool, &name)
+        .and_then(|document| document.to_json())
+        .map_err(|refusal| invalid(refusal.to_string()))?;
+    serde_json::from_value(value).map_err(|error| invalid(error.to_string()))
 }
 
 impl Model {
@@ -182,19 +197,19 @@ impl Model {
         Self::load_dir(&root.join(MODEL_DIR))
     }
 
-    /// Loads a model from its directory: `layers.json`, `components.json`, `decision-kinds.json`,
-    /// `contracts.json` and `doors/*.json`. Doors are ordered by file name.
+    /// Loads a model from its directory: `layers.yaml`, `components.yaml`, `decision-kinds.yaml`,
+    /// `contracts.yaml` and `doors/*.yaml`. Doors are ordered by file name.
     pub fn load_dir(dir: &Path) -> Result<Self, ModelError> {
-        let layers = read(&dir.join("layers.json"))?;
-        let components = read(&dir.join("components.json"))?;
-        let decision_kinds = read(&dir.join("decision-kinds.json"))?;
-        let contracts = read(&dir.join("contracts.json"))?;
+        let layers = read(&dir.join("layers.yaml"))?;
+        let components = read(&dir.join("components.yaml"))?;
+        let decision_kinds = read(&dir.join("decision-kinds.yaml"))?;
+        let contracts = read(&dir.join("contracts.yaml"))?;
         let doors_dir = dir.join("doors");
         let entries = fs::read_dir(&doors_dir).map_err(|error| io_error(&doors_dir, &error))?;
         let mut files: Vec<PathBuf> = entries
             .filter_map(Result::ok)
             .map(|entry| entry.path())
-            .filter(|path| path.extension().is_some_and(|ext| ext == "json"))
+            .filter(|path| path.extension().is_some_and(|ext| ext == "yaml"))
             .collect();
         files.sort();
         let mut doors = Vec::with_capacity(files.len());
@@ -229,20 +244,47 @@ mod tests {
     fn valid_model(dir: &Path) {
         write(
             dir,
-            "layers.json",
-            r#"{"layers":["kernel"],"rules":[],"domains":[],"tierNames":{"0":"leaf"},"tierExceptions":[{"path":"src/a.mjs","tier":2,"reason":"moves down later"}]}"#,
+            "layers.yaml",
+            r#"layers:
+  - kernel
+rules: []
+domains: []
+tierNames:
+  "0": leaf
+tierExceptions:
+  - path: src/a.mjs
+    tier: 2
+    reason: moves down later
+"#,
         );
         write(
             dir,
-            "components.json",
-            r#"[{"id":"a","canonical":"a","aliases":[],"meaning":"m","layer":"kernel","tier":0,"paths":[],"owns":[],"mustNotOwn":[],"spec":"s","source":[],"status":"live"}]"#,
+            "components.yaml",
+            r#"- id: a
+  canonical: a
+  aliases: []
+  meaning: m
+  layer: kernel
+  tier: 0
+  paths: []
+  owns: []
+  mustNotOwn: []
+  spec: s
+  source: []
+  status: live
+"#,
         );
-        write(dir, "decision-kinds.json", "[]");
-        write(dir, "contracts.json", "[]");
+        write(dir, "decision-kinds.yaml", "[]\n");
+        write(dir, "contracts.yaml", "[]\n");
         write(
             dir,
-            "doors/one.json",
-            r#"{"job":"j","kind":"door","patterns":[],"allowed":["x"]}"#,
+            "doors/one.yaml",
+            r#"job: j
+kind: door
+patterns: []
+allowed:
+  - x
+"#,
         );
     }
 
@@ -268,13 +310,38 @@ mod tests {
     }
 
     #[test]
+    fn a_comment_in_a_model_file_is_ignored() {
+        let dir = scratch("comment");
+        valid_model(&dir);
+        write(
+            &dir,
+            "doors/one.yaml",
+            r#"# the door that proves a note does not change the row
+job: j  # inline notes too
+kind: door
+patterns: []
+allowed:
+  # a note between items
+  - x
+"#,
+        );
+        let model = Model::load_dir(&dir).unwrap();
+        assert_eq!(model.doors[0].job, "j");
+        match &model.doors[0].allowed[0] {
+            DoorPath::Plain(path) => assert_eq!(path, "x"),
+            DoorPath::Reasoned(other) => panic!("unexpected reasoned path {other:?}"),
+        }
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
     fn an_unknown_field_is_refused() {
         let dir = scratch("unknown");
         valid_model(&dir);
         write(
             &dir,
-            "doors/one.json",
-            r#"{"job":"j","kind":"door","patterns":[],"allowed":[],"surprise":1}"#,
+            "doors/one.yaml",
+            "job: j\nkind: door\npatterns: []\nallowed: []\nsurprise: 1\n",
         );
         let error = Model::load_dir(&dir).unwrap_err();
         assert!(matches!(error, ModelError::Invalid { .. }), "{error}");
@@ -288,8 +355,19 @@ mod tests {
         valid_model(&dir);
         write(
             &dir,
-            "layers.json",
-            r#"{"layers":["kernel"],"rules":[],"domains":[],"tierNames":{"0":"leaf"},"tierExceptions":[{"path":"src/a.mjs","tier":2,"reason":"moves down later","surprise":1}]}"#,
+            "layers.yaml",
+            r#"layers:
+  - kernel
+rules: []
+domains: []
+tierNames:
+  "0": leaf
+tierExceptions:
+  - path: src/a.mjs
+    tier: 2
+    reason: moves down later
+    surprise: 1
+"#,
         );
         let error = Model::load_dir(&dir).unwrap_err();
         assert!(matches!(error, ModelError::Invalid { .. }), "{error}");
@@ -298,10 +376,24 @@ mod tests {
     }
 
     #[test]
+    fn a_yaml_refusal_keeps_the_file_and_the_doors_rule() {
+        let dir = scratch("yaml-refusal");
+        valid_model(&dir);
+        write(&dir, "contracts.yaml", "id: [unclosed\n");
+        let error = Model::load_dir(&dir).unwrap_err();
+        let ModelError::Invalid { path, reason } = &error else {
+            panic!("{error}");
+        };
+        assert!(path.ends_with("contracts.yaml"), "{error}");
+        assert!(reason.contains("syntax-error"), "{error}");
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
     fn a_missing_file_is_refused() {
         let dir = scratch("missing");
         valid_model(&dir);
-        fs::remove_file(dir.join("contracts.json")).unwrap();
+        fs::remove_file(dir.join("contracts.yaml")).unwrap();
         let error = Model::load_dir(&dir).unwrap_err();
         assert!(matches!(error, ModelError::Missing(_)), "{error}");
         let _ = fs::remove_dir_all(&dir);

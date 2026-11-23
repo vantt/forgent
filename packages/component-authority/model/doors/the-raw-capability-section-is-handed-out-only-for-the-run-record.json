@@ -1,9 +1,0 @@
-{
-  "job": "the raw capability section is handed out only for the run record: ask a per-field function of src/runner/capability-config.mjs",
-  "kind": "door",
-  "patterns": [
-    "\\bcatalogOf\\("
-  ],
-  "allowed": [],
-  "reason": "catalogOf (defined in the port) is the only function that returns the whole section; the run record and its hash are snapshotted by the Rust engine (fgos-execution-engine), so no Node file may ask for it"
-}

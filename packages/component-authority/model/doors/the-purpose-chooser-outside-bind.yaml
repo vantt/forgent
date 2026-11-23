@@ -1,0 +1,7 @@
+job: "the purpose chooser outside bind() is gone: ask purposeSeatOf in src/runner/dispatch/plan.mjs"
+kind: door
+patterns:
+  - \bresolveExecutorAndOverrides\b
+  - capability\.prefer
+allowed: []
+reason: the first-prefer chooser and the string-only reverse prefer match were a second executor chooser beside Seat Binding

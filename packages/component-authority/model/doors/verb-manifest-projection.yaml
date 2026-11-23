@@ -1,0 +1,10 @@
+job: verb manifest projection
+kind: door
+patterns:
+  - \bpublicManifest\(
+allowed:
+  - src/cli/command-registry.mjs
+  - path: scripts/export-command-selectors.mjs
+    reason: the generator writes and drift-checks the committed manifest file from the registry projection
+debt: []
+reason: the registry module owns the one projection of the verb manifest; the generator only calls it

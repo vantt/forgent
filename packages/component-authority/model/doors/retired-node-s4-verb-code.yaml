@@ -1,0 +1,18 @@
+job: retired Node S4 verb code
+kind: door
+patterns:
+  - \bsetupUseCase\b
+  - \bmaterializeSkillsIntoProject\b
+  - \bcreateProjectSkillGuard\b
+  - \binsertSourceLine\b
+  - \bconvertRunnerPatternsConfig\b
+  - \bwireAgentsUseCase\b
+  - \buninstallProject\b
+  - \binitStoreUseCase\b
+  - \bsettleLegacyConfig\b
+  - \bwriteCoexistenceManifest\b
+  - \brunDoctor\b
+  - \binstallAgentHooks\b
+allowed: []
+debt: []
+reason: "`doctor`, `init`, `uninstall` and `wire-agents` run in the host and `setup` is retired: the Node use cases of those verbs, the setup use case, the skill copy into a project, the shell-rc line writer, the runner-config conversion, the Node doctor runner and the Node coexistence writer are gone, and no file may bring one back. `uninstallAgentHooks` and `deleteGuardPrefilter` stay out while `src/setup/agent-hooks.mjs` still ships for the frozen mailbox experiment file sets"

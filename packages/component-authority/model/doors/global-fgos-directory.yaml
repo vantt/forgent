@@ -1,0 +1,26 @@
+job: global fgOS directory
+kind: door
+patterns:
+  - homedir\(\)\s*,\s*['\"]\.fgos['\"]
+  - \b(?:homeDir|home)\s*,\s*['\"]\.fgos['\"]
+  - \bhome\.join\(\"\.fgos\"\)
+  - pub fn home_dir\(
+  - fn global_dir\(
+  - export function globalFgosDir
+  - get\(\"HOME\"\)
+allowed:
+  - packages/config/rust/src/machine.rs
+  - src/config/facade.mjs
+  - path: packages/execution/engine/src/transport_round/round.rs
+    reason: reads the attempt environment's HOME (the agent's source home for its private home and agy trust store, the Node twin's `fullEnv.HOME ?? os.homedir()`); it never joins .fgos, and machine::global_dir answers the machine's ~/.fgos, not an agent's home
+debt:
+  - path: src/runner/dispatch/llm-accounts.mjs
+    reason: machineLoginStores takes a homeDir parameter (default os.homedir()) and joins .fgos itself, so a caller can name a home the global directory door does not know
+  - path: src/runner/dispatch/confinement/probes/harness.mjs
+    reason: the probe harness builds ~/.fgos/private from its own home value
+  - path: apps/fgos-gateway/src/gateway.rs
+    reason: load_gateway_config takes an explicit home_dir (a test seam) where machine::global_dir takes an environment lookup, so the join stays here; one door once the gateway reads the lookup form
+  - path: packages/holder-lock/rust/src/state_root.rs
+    reason: the state root's home rule, HOME first on every platform; Config uses USERPROFILE on Windows, so under Git Bash the two can resolve under different homes; backlog row p-n22bigucgp
+retiredBy: "S7: the Node facade retires with the Node payload"
+reason: where the machine-wide ~/.fgos is is decided once, by fgos-config (machine::global_dir); the Node facade asks the addon. The extra patterns find the places that still join .fgos onto a home themselves

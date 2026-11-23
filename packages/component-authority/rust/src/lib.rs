@@ -1,7 +1,7 @@
 //! The component authority model and the `locate` lookup over it.
 //!
-//! The model is the set of files under `packages/component-authority/model/`; `model` loads them into typed rows
-//! and `locate` ranks rows against a sentence describing work.
+//! The model is the set of YAML files under `packages/component-authority/model/`; `model` loads them through
+//! `fgos-yaml-doc` into typed rows and `locate` ranks rows against a sentence describing work.
 
 pub mod locate;
 pub mod model;

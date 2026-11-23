@@ -1,0 +1,8 @@
+job: take a holder lock from Node
+kind: door
+patterns:
+  - holderLock\.take\(
+allowed:
+  - src/holder-lock/driver.mjs
+debt: []
+reason: the native holder-lock capability is taken once per process, by the driver the facade uses; a second taker is refused at run time by holder-lock-already-taken

@@ -1,0 +1,15 @@
+job: start a detached Event Store child
+kind: door
+patterns:
+  - "['\"]events['\"],\\s*['\"](?:sync|seal)['\"]"
+  - "\"events\"\\.into\\(\\)"
+allowed:
+  - path: src/event-store/maintenance.mjs
+    reason: the Node lifecycle wrapper of Node verbs starts the host binary for the publish and seal children
+  - path: apps/fgos/src/invocation_doors.rs
+    reason: the host lifecycle starts its own executable for the publish child
+  - path: scripts/event-store/forge-probe.sh
+    reason: a manual real-forge probe runs the host's `events sync` in the foreground to push one ref; it starts no detached child
+debt: []
+retiredBy: "S7: the Node lifecycle wrapper retires with the last Node verb"
+reason: a seal or publish child is always the host's native `events` verb, started from the two lifecycle wrappers; a second place that spells the child's argv is a second way to start one (a Node child would be refused by the native verb)

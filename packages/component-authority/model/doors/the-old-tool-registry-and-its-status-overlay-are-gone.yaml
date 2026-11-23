@@ -1,0 +1,13 @@
+job: "the old tool registry and its status overlay are gone: ask fgos dispatch decide --for <capability>"
+kind: door
+patterns:
+  - \btoolsFromExecutors\b
+  - \bqueryTools\b
+  - \bcheckTools\b
+  - \breadLocalStatus\b
+  - \bwriteLocalStatus\b
+  - tool-status\.local
+  - tool-registry\.mjs
+  - \bfgos tool (?:query|check)\b
+allowed: []
+reason: the verb, the registry module and the local status file were a second path to the same answer decide gives from a live probe

@@ -1,0 +1,10 @@
+job: retired native declarations
+kind: door
+patterns:
+  - \bnativeOnly\b
+  - \bnative_kinds\b
+  - \bNATIVE_HOOK_KINDS\b
+  - \bHELP_SELECTORS\b
+allowed: []
+debt: []
+reason: the registry `native` field is the only declaration of what the host serves natively, and the help words are answered before any route lookup; the four old names are retired and no file may bring one back

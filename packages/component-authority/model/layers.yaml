@@ -1,0 +1,26 @@
+contract: architecture-manifest.v1
+layers:
+  - entry
+  - use-case
+  - infra
+  - domain
+  - kernel
+rules:
+  - one-directional-layer
+  - domain-siloing
+  - tier-downward
+domains:
+  - coding
+  - council
+  - marketing
+tierNames:
+  "0": process facts, native door and shared leaves
+  "1": holder-lock, identity, convention, config facade
+  "2": Git, terminal control, worktree and project-root paths
+  "3": agent protocol, Observe, Event Store
+  "4": Run Supervisor
+  "5": "Execution: Dispatch, Execution Core, Seat Binding"
+  "6": Workflow
+  "7": Work lifecycle
+  "8": Skill and Domain (no file today)
+  "9": "host and surface: entry, CLI, verbs, setup, reports"

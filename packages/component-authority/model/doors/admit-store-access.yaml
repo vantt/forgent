@@ -1,0 +1,14 @@
+job: admit store access
+kind: door
+patterns:
+  - disconnected-worktree-store
+  - init-in-worktree
+  - worktree-identity-unreadable
+  - \bisSessionWorktree\b
+allowed:
+  - packages/git/rust/src/store_admission.rs
+  - path: src/runner/worktree.mjs
+    reason: "the adapter names one class itself: with no Git door loaded nothing can tell a linked worktree from the main checkout, so it refuses by `worktree-identity-unreadable` without asking the addon that carries the decision"
+debt: []
+retiredBy: "S7: the Node adapter retires with the Node payload"
+reason: whether a verb may touch the store from where it was called, and the fault class of each refusal, are decided once, in fgos-git
