@@ -1446,6 +1446,66 @@ mod tests {
         }
     }
 
+    impl SubHomes for World {
+        fn home(&self) -> String {
+            self.home.clone()
+        }
+        fn resolve(&self, path: &str) -> String {
+            path.to_owned()
+        }
+        fn is_dir(&self, path: &str) -> bool {
+            self.files.contains_key(Path::new(path))
+        }
+    }
+
+    fn resolved_sub_homes(runner: &Value) -> Vec<String> {
+        let mut found: Vec<String> = find_sub_homes(runner, &World::new())
+            .into_iter()
+            .map(|h| h.resolved)
+            .collect();
+        found.sort();
+        found
+    }
+
+    #[test]
+    fn sub_homes_include_the_agy_stores_of_the_gemini_pool_and_no_other_store_or_pool() {
+        let runner = json!({
+            "executors": {"gemini": {"invocations": [
+                {"id": "agy-1", "command": "agy", "env": {"HOME": "${HOME}/.agy-homes/acc-1"}}]}},
+            "llmAccounts": {
+                "gemini": {
+                    "acc-1": {"credentialStore": {"agy": "${HOME}/.agy-homes/acc-1"}},
+                    "acc-2": {"credentialStore": {
+                        "agy": "${HOME}/.agy-homes/acc-2", "pi": "${HOME}/.pi/accounts/acc-2"}}},
+                "xai": {"vantt": {"credentialStore": {"pi": "${HOME}/.pi/accounts/grok-vantt"}}}}});
+        assert_eq!(
+            resolved_sub_homes(&runner),
+            ["/home/u/.agy-homes/acc-1", "/home/u/.agy-homes/acc-2"],
+            "one entry per home: the agy store of a gemini account, not its pi store and not another pool"
+        );
+    }
+
+    #[test]
+    fn sub_homes_cover_single_and_multi_executor_configs_expand_home_and_skip_duplicates() {
+        let runner = json!({
+            "executor": {"command": "agy", "env": {"HOME": "${HOME}/.agy-homes/single-acc"}},
+            "executors": {
+                "gemini": {"invocations": [
+                    {"id": "agy-1", "command": "agy", "env": {"HOME": "${HOME}/.agy-homes/acc-1"}},
+                    {"id": "agy-1-dup", "command": "agy", "env": {"HOME": "${HOME}/.agy-homes/acc-1"}},
+                    {"id": "agy-2", "command": "agy", "env": {"HOME": "~/.agy-homes/acc-2"}}]},
+                "openai": {"invocations": [
+                    {"id": "codex-1", "command": "codex", "env": {"CODEX_HOME": "${HOME}/.codex-acc"}}]}}});
+        assert_eq!(
+            resolved_sub_homes(&runner),
+            [
+                "/home/u/.agy-homes/acc-1",
+                "/home/u/.agy-homes/acc-2",
+                "/home/u/.agy-homes/single-acc"
+            ]
+        );
+    }
+
     #[test]
     fn two_agent_executors_of_one_family_fail_naming_both() {
         let runner = json!({"executors": {

@@ -1653,7 +1653,6 @@
     "src/session-rotation/handoff-store.mjs": "3c02156e15ebc6503df51d0054e433fd8f49e4bd064781b29b9114b7cfedddbf",
     "src/session-rotation/rotate.mjs": "63e5730be0d499629c43cf0bd4f2a34e3fd8f2245567e903ee7b4e92786f342e",
     "src/setup/agent-hooks.mjs": "850a6660bf2588d850190e9ed5e45369d0d30e467568462b478dd6327fddffac",
-    "src/setup/agy-permissions.mjs": "09951c187dec7082caee5a1695dd81320eda7ea962ca41ff8bb785f103f87397",
     "src/setup/bin-discovery.mjs": "b5302797ac763fecb24608818bdc8bf37850e0cd5d7a9d98ae677e1f3e684633",
     "src/setup/blind-steps-proven-pools.mjs": "4062cad666cced30aeb6dd3d4c44e67bfe716b4d33ac22b486c6fd19bd94e5b3",
     "src/setup/checks.mjs": "3b193399b45a62f7372cde5c6a771a963b3d9f42ecaf9a0d2d6549f6d82434ce",
