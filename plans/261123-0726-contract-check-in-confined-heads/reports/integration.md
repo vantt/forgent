@@ -63,3 +63,63 @@ for acceptance criterion 3 needs a staged addon matching the tip at the moment o
 restages through `scripts/run-tests.mjs`; the lead reruns both scripts right after it, before another Rust land.
 
 Gate hand-off: still not in `land.gates` at e11e047c8 (`plan-contract-check` absent from `.fgos/config.yaml`).
+
+## Unconfined run
+
+lead:SUPERVISOR (claude-b7gj@fg-server2, host, main checkout), 2026-11-23.
+
+- **Gate on `637334ca6`** (does not contain the runner recheck fix 2b903592c). Logs in
+  `/home/vantt/projects/forgent-worktrees/`.
+  - `node scripts/git-addon.mjs`: exit 0 (`host-gate-addon-637334ca6.log`).
+  - `cargo test --workspace --no-fail-fast`: exit 101; 4289 passed, 2 failed (`main-cargo-test-637334ca6.log`).
+    - `fgos-run-supervisor --test head_request`
+      `the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks`: red since 4951cf3da (the contract
+      lists `config patch`, the server does not).
+    - `fgos-execution-engine --test assignment_runner`
+      `every_git_half_refusal_of_a_mutating_unit_run_reads_as_node_stated_it` (`assignment_runner.rs:222`): expected
+      `ok`, got "recomputed binding refused: agent-cli-missing (no agent CLI is installed on this machine ...)". The
+      case depends on which agent CLIs the host has installed.
+  - `npm test`: exit 137, no summary. The kernel OOM killer killed the run at 11:10:00 (`session.slice`), together
+    with `fgos-mailbox-sync` and pipewire, so this run gives no npm verdict. The last tests in the log are
+    `test/workflow/workflow-store-ledger.test.mjs` ("Promise resolution is still pending"), which is a side effect of
+    the kill. No test worktree registration leaked (`git worktree prune --dry-run` was empty).
+- **Restage at HEAD `a219a04ba`** (contains 2b903592c): `node scripts/git-addon.mjs`, exit 0 (`host-addon-a219a04ba.log`).
+- **`node scripts/plan-contract-check.mjs --plan plans/261123-0726-contract-check-in-confined-heads`** on the fresh addon:
+  exit 1 (`host-pcc-a219a04ba.log`). The addon is reused and the check reads the plan. It fails on this plan's own
+  phase rows: the statuses of phases 2 and 3 carry free text, but must be one of draft, ready, running, done or
+  withdrawn. Move the prose to the phase notes.
+- **Not run:** no second full npm run. The host has 30 GB RAM and four leads plus builds, and has had OOM kills at
+  09:17, 09:25 to 09:31 and 11:10. A full npm run needs the lead count lowered first, which is an owner decision.
+
+## Confined run 3 (11:16, trunk 9d9997f7a, addon restaged at a219a04ba)
+
+Lead `head:lead-forgent-261123-0726-contra-e554b`, `FGOS_CONFINED=1`, no FGOS_* env set by hand.
+
+- The plan's phase status cells now hold only the allowed words (1 done, 3 done, 2 running); the prose moved to the
+  plan's Progress section.
+- `node scripts/plan-contract-check.mjs --plan plans/261123-0726-contract-check-in-confined-heads`: **exit 0**,
+  `ok 261123-0726-contract-check-in-confined-heads`. The staged addon was reused with no cargo run. Acceptance
+  criterion 3 is met.
+- `node scripts/check-backlog-reconciliation.mjs`: exit 1, `FAIL: 279 problem(s) reconciling 311 proposed PBI rows`.
+  278 are "proposed under plans/backlog but has no section in RECONCILIATION.md" (the unreconciled items the owner kept
+  red on q-tvhmli3fns; 277 when measured, one proposed row added since). The other is `tsk-p7-shadow-binders:
+  reconciled in RECONCILIATION.md but item p-kqoljdbtbf has status "done"`: the id now resolves through its Original
+  id and is named as no longer proposed, not unknown. This matches phase 3's Verify and acceptance criterion 4's
+  second sentence.
+- `test/scripts/doc-health.test.mjs` passed inside the phase 1 land gate (ticket c-12066-1795405917947).
+
+## Classification of the reds (acceptance criterion 5)
+
+- `head_request` `the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks`: outside this plan's
+  footprint (Rust run-supervisor contract); red since 4951cf3da, before this plan's lands. Pre-existing.
+- `assignment_runner` `every_git_half_refusal_of_a_mutating_unit_run_reads_as_node_stated_it`: outside the footprint;
+  fails on `agent-cli-missing`, which depends on the host's installed agent CLIs. Host-dependent, not caused by
+  this plan (this plan changed no Rust).
+- `npm test`: no verdict (OOM kill at 11:10). Not classifiable until a run completes.
+
+## Still open for phase 2
+
+1. One complete `npm test` run on the trunk. Needs host memory headroom (fewer leads), an owner decision per the
+   supervisor.
+2. The gate restore: `node scripts/plan-contract-check.mjs {plans}` is still absent from `land.gates`; it belongs to
+   heads-stable phase 3.
