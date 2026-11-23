@@ -96,6 +96,28 @@ footprint:
   - docs/platform/resource-referee/spec.md
   - docs/platform/runner/spec.md
   - docs/platform/runner/contracts/routing-handoff.md
+  - docs/platform/session-host/spec.md
+  - src/session-host/head-stop.mjs
+  - src/session-host/head-start.mjs
+  - src/session-host/head-list.mjs
+  - src/session-host/head-request.mjs
+  - src/session-rotation/handoff-store.mjs
+  - src/session-rotation/rotate.mjs
+  - src/cli/command-registry.mjs
+  - bin/fgos.mjs
+  - src/runner/dispatch/confinement/authority-twin.mjs
+  - src/runner/dispatch/provider-capacity.mjs
+  - packages/execution/engine/src/transport_round/session_attempt.rs
+  - packages/execution/engine/tests/transport_round.rs
+  - apps/fgos/src/wiring/unit_run_host/session_attempt.rs
+  - apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs
+  - apps/fgos/tests/sleeping_lead_worktree.rs
+  - core/config-standard/runner.yaml
+  - core/config-schema/runner.schema.yaml
+  - test/session-host/head-stop.test.mjs
+  - test/session-host/head-start.test.mjs
+  - test/session-host/head-list.test.mjs
+  - test/session-rotation/handoff-store.test.mjs
   - CHANGELOG.md
   - .agents/skills/**
   - plugins/fgOS/skills/**
@@ -103,6 +125,7 @@ footprint:
 base: b1c7cb9b5df175c59bd2670c20c6bfe283341646
 source:
   - plans/discussions/ds-yb4uz2p6hz-orchestration-skeleton/DISCUSSION.md
+  - plans/discussions/ds-6psli4i4xl-workspace-ownership-survey-for-sleeping-leads/DISCUSSION.md
   - p-7pjiqfoj7v
   - p-radq263tbx
   - p-f367pplkhu
@@ -113,7 +136,9 @@ created: 2026-11-22
 
 Answers the settled discussion `ds-yb4uz2p6hz-orchestration-skeleton` (owner approved §6 on 2026-11-21, round 42).
 Every choice below cites the decision it honors (SR-D6 to SR-D10, OS-D1 to OS-D21 in that discussion's §4). No
-locked decision is reopened here.
+locked decision is reopened here. Amended 2026-11-23 by the settled discussion
+`ds-6psli4i4xl-workspace-ownership-survey-for-sleeping-leads` (D1 to D3 in its §4, owner: an amendment, not a new
+plan): phases 5 and 6 changed, phases 16 and 17 added.
 
 ## Outcome
 
@@ -131,6 +156,11 @@ fgOS keeps its own rhythm without a person watching (product priority 2, OS-D3):
   only for that judgement; its decision comes back as an event.
 - Sleep ends a session by default; a head talking with a person may sit in its pane up to a configured limit
   (OS-D18). A handoff between steps closes one record and opens the next (OS-D19).
+- A lead that sleeps until a time loses nothing: its worktree and unlanded changes survive through the checkout door's
+  refusals, the woken lead finds its worktree from plan and `git worktree list` (D1), the sleep state lives only in
+  the Session Host's head record `placement.json` with one read-only view `fgos session list` (D2), and the woken lead
+  resumes its kept transcript after a light sleep on the same provider, else starts fresh with the `sleep` handoff
+  (D3).
 - Questions is the one door for asking any person: it gains a recipient `to` (owner, a `role`, or a `party`), an
   outbound notifier port, and verified answers that come back through the raise door (OS-D16).
 - A tool that declares a job invocation is a player through `fgos run` itself (OS-D15). Heavy machine resources are
@@ -163,6 +193,10 @@ Each maps to the discussion's hand-off criteria; the owning proof is named in th
 6. A `review-due` row starts one read-only Unit and its findings become events: `cargo test -p fgos-supervision
    --test watcher` (phase 9).
 7. `npm test` and `cargo test --workspace` are green on the combined tree (phase 15).
+8. A lead slept with an unlanded change survives a land and a cleanup and finds the change in the same worktree on
+   waking; a light sleep resumes, a heavy one and a refused resume get the handoff; `fgos session list` shows a
+   sleeping head: `cargo test -p fgos --test sleeping_lead_worktree` (phase 6), `node --test
+   test/session-host/head-start.test.mjs` (phase 17), `node --test test/session-host/head-list.test.mjs` (phase 16).
 
 ## Non-goals
 
@@ -191,6 +225,9 @@ The discussion left five points open, each blocking part of the plan. OS-D12 and
 | How domains hand records to the keeper | A source port in Supervision with registered sources listed as data in `watcher.schedulingSources` (same pattern as `watcher.definitions`). Plans are a native Rust source over the existing portfolio reader; workflow cases are a source verb `fgos workflow records --json` over the existing case projection. Questions are not a record source: they answer `waitingOn: person`. | Keeps the keeper domain-agnostic (SR-D8) and reuses each domain's existing read door; no second parser of the case ledger (design principle 1). |
 | Machine resources (OS-D14) | A new claim space `resource` in the referee, compared by equality; a resource with capacity N is N named slots (`gpu#1`..`gpu#N`). | The referee compares and never acts; equality over named slots fits its existing rule set with no new comparison kind. |
 | Work projector | Not built. | Work is frozen history (work-data-model); its ~273 open items are triaged under `p-jxwb7vi6a3`. |
+| Where the sleeping-lead amendment goes (ds-6psli4i4xl hand-off (a) to (f)) | Phase 6 keeps the keeper side; the Session Host side is phase 16 (sleep fields, `sleep` handoff, `fgos session list`) and the wake resume is phase 17. | The hand-off names files in three layers (keeper in Rust, Session Host in Node, the head launch in the execution engine); one phase would exceed the one-to-two-day size and share no file boundary. Phase 6 depends on both, so the run order the hand-off implies holds. |
+| Which `until` a sleep writes | The earliest `waitingOn.until` of the head's records; a head waiting only on a person or an event gets the conversation limit. Plan and phase are passed when the record names them, else absent. | The discussion fixes where `wakeAt` is stored (D2), not where it comes from; the keeper already holds the records. Phase stays informative because D1 makes plan and git the truth for the worktree. Labeled assumption, not an owner question: it changes no outcome the owner set. |
+| How a CLI is told to resume | `credentialStore.resumeArgs` in the executor config (`core/config-standard/runner.yaml`), next to `sessionDir`; an executor without it never resumes. | The resume is per CLI (Codex rollouts are not read today, discussion §5 15:56), and the executor config already declares where each CLI keeps its session. |
 | Component declaration before code | The plan's "New things" table below is the plan-time declaration. Phase 15 records each row through `fgos authority declare` when that verb exists on main; otherwise the table stays the record for the sweep of plan `261121-2110-component-authority-doors`. | The `declare` door is itself still a draft plan; blocking on it would stall this plan behind five other plans. |
 
 ## New things (authority map)
@@ -207,6 +244,8 @@ The discussion left five points open, each blocking part of the plan. OS-D12 and
 | Tool job invocation | Execution (`bind()`, `fgos run`) | no second execution door (OS-D15) |
 | `review-due` definition, `fgos.review.done` record | Supervision (watcher) | periodic review (OS-D17) |
 | `fgos supervisor records --json`, `GET /v1/scheduling-records` | Supervision, Gateway | portfolio read (OS-D20 port 2) |
+| Sleep fields of the head record, `session stop --reason sleep`, `fgos session list` | Session Host | D2; Identity's directory unchanged |
+| Wake resume of a kept transcript, `credentialStore.resumeArgs` | Session Host (choice), Execution engine (launch) | D3 |
 
 ## Prior art (reused, and what was missing)
 
@@ -217,6 +256,11 @@ The discussion left five points open, each blocking part of the plan. OS-D12 and
   `fgos workflow propose` and `src/workflow/propose-frame.mjs`; the case projection `src/workflow/case-projection.mjs`;
   the referee's claim spaces; `kind: tool` executors and their invocation list (`packages/execution/rust/src/tools.rs`);
   `supervisor.maxLeads` already in `core/config-standard/supervisor.yaml`.
+- Reused for the sleeping lead (ds-6psli4i4xl §6): the checkout door's refusals (`worktree-dirty-preserved`,
+  `worktree-delivery-unproven`), the lead skill's worktree name `<plan dir name>-p<NN>`, `stopHeadSession` (already
+  writes `retiredAt` and `retiredReason`), `writeHandoff`, the stop trace's measured fraction, `seatSessionDir` and
+  `keepSessionBeforeRemoval` (the transcript is already kept per launch). Missing: sleep fields and `wakeAt`, a
+  `sleep` handoff reason, a view of sleeping heads, and any resume of a kept transcript.
 - Missing: admission in code (the supervisor skill admits today, and `maxLeads` falls back to a hardcoded 4 in the
   wiring, `supervision.rs:1965`); any scheduling record; wake reasons; a webhook route; question recipients; a resource
   claim space; tool job invocations; the review definition; the plan-contract check at takeover; frame intent; a
@@ -231,24 +275,30 @@ The discussion left five points open, each blocking part of the plan. OS-D12 and
 | 10 | [Resource claim space in the referee](phase-10-resource-claims.md) | - | packages/resource-referee/contracts/resource-referee.v1.json, packages/resource-referee/rust/src/catalog.rs, packages/resource-referee/rust/src/facts.rs, packages/resource-referee/rust/tests/referee.rs, apps/fgos/src/wiring/resource_check.rs | 1 | ready |
 | 11 | [Tool as a player through fgos run](phase-11-tool-player.md) | - | packages/execution/rust/src/tools.rs, packages/execution/rust/src/bind.rs, packages/execution/rust/src/executor_model.rs, packages/execution/rust/src/executor_config.rs, packages/execution/rust/src/unit/, packages/execution/rust/src/loops/, packages/execution/contracts/executor-model.v1.json, packages/execution/contracts/bind.v1.json, packages/execution/rust/tests/tool_job.rs | 1 | ready |
 | 12 | [General plan contract, wave optional](phase-12-plan-contract-wave.md) | - | core/skills/_shared/plan-contract.md, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs | 1 | ready |
+| 16 | [Sleep record in the head record; view of live and sleeping agents](phase-16-sleep-record-and-agents-view.md) | - | src/session-host/head-stop.mjs, src/session-host/head-list.mjs, src/session-host/head-request.mjs, src/session-rotation/handoff-store.mjs, src/session-rotation/rotate.mjs, src/cli/command-registry.mjs, bin/fgos.mjs, packages/host-runtime/contracts/command-manifest.json, test/session-host/head-stop.test.mjs, test/session-host/head-list.test.mjs, test/session-rotation/handoff-store.test.mjs | 1 | ready |
 | 2 | [Signal entry: wake reasons and the signed webhook route](phase-02-signal-entry.md) | 1, 3 | apps/fgos/src/wiring/supervision.rs, apps/fgos/src/wiring/questions.rs, apps/fgos-gateway/src/gateway.rs, apps/fgos-gateway/src/webhook.rs, apps/fgos-gateway/src/lib.rs, core/config-standard/gateway.yaml, core/config-schema/gateway.schema.yaml, packages/distribution/contracts/doctor-registry.v1.json, packages/host-runtime/contracts/command-manifest.json | 2 | ready |
 | 4 | [Scheduling record contract and keeper core](phase-04-keeper-core.md) | 1 | packages/supervision/contracts/scheduling-record.v1.json, packages/supervision/contracts/event-streams.v1.json, packages/supervision/rust/src/keeper.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/keeper.rs | 2 | ready |
+| 17 | [Wake resumes the kept transcript or opens fresh with the handoff](phase-17-wake-resume.md) | 16 | src/session-host/head-start.mjs, src/runner/dispatch/confinement/authority-twin.mjs, src/runner/dispatch/provider-capacity.mjs, packages/execution/engine/src/transport_round/session_attempt.rs, packages/execution/engine/tests/transport_round.rs, apps/fgos/src/wiring/unit_run_host/session_attempt.rs, apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs, core/config-standard/runner.yaml, core/config-schema/runner.schema.yaml, test/session-host/head-start.test.mjs | 2 | ready |
 | 13 | [Contract check at takeover; frame intent](phase-13-takeover-check-frame-intent.md) | 12 | src/portfolio/plan-contract.mjs, scripts/plan-contract-check.mjs, src/workflow/propose.mjs, src/workflow/propose-validate.mjs, src/workflow/propose-frame.mjs, src/workflow/case-frame.mjs, test/workflow/propose.test.mjs, test/workflow/propose-frame.test.mjs, test/portfolio/plan-contract.test.mjs | 2 | ready |
 | 9 | [Periodic review](phase-09-periodic-review.md) | 1 | core/watcher/definitions/review-due.query.json, core/watcher/briefs/periodic-review.md, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, packages/supervision/rust/src/watcher.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/definitions.rs, apps/fgos/src/wiring/supervision.rs | 3 | ready |
 | 14 | [Lead runs phases inside cases; one harness](phase-14-lead-in-case.md) | 13 | packages/execution/rust/src/run_request/, packages/execution/rust/tests/run_request_case.rs, core/skills/fgos-lead/SKILL.md | 3 | ready |
-| 5 | [Record sources and need resolution](phase-05-sources-and-needs.md) | 4, 10 | packages/supervision/rust/src/sources.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/sources.rs, apps/fgos/src/wiring/supervision.rs, src/workflow/records.mjs, src/workflow/case-verbs.mjs, test/workflow/records.test.mjs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml | 4 | ready |
-| 6 | [Sleep and wake of players](phase-06-sleep-and-wake.md) | 5 | packages/supervision/rust/src/keeper.rs, packages/supervision/rust/tests/keeper.rs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, apps/fgos/src/wiring/supervision.rs | 5 | ready |
+| 5 | [Record sources and need resolution](phase-05-sources-and-needs.md) | 4, 10, 16 | packages/supervision/rust/src/sources.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/sources.rs, apps/fgos/src/wiring/supervision.rs, src/workflow/records.mjs, src/workflow/case-verbs.mjs, test/workflow/records.test.mjs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml | 4 | ready |
+| 6 | [Sleep and wake of players](phase-06-sleep-and-wake.md) | 5, 16, 17 | packages/supervision/rust/src/keeper.rs, packages/supervision/rust/tests/keeper.rs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, apps/fgos/src/wiring/supervision.rs, core/skills/fgos-lead/SKILL.md, apps/fgos/tests/sleeping_lead_worktree.rs | 5 | ready |
 | 8 | [Scheduling records read port and command port](phase-08-records-read-port.md) | 5, 2 | apps/fgos/src/wiring/scheduling.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/routing.rs, apps/fgos/src/cli_projector.rs, apps/fgos/tests/scheduling_records.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, apps/fgos-gateway/src/gateway.rs | 5 | ready |
 | 7 | [Handoff as close one record, open the next](phase-07-handoff-records.md) | 5, 6 | packages/supervision/rust/src/sources.rs, packages/supervision/rust/src/discussion_source.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/tests/sources.rs, packages/supervision/rust/tests/discussion_source.rs, core/watcher/definitions/discussion-settled.query.json, core/skills/fgos-supervisor/SKILL.md, apps/fgos/src/wiring/supervision.rs | 6 | ready |
-| 15 | [Integration](phase-15-integration.md) | 2, 3, 7, 8, 9, 11, 14 | docs/platform/supervision/spec.md, docs/platform/questions/spec.md, docs/platform/workflow/spec.md, docs/platform/resource-referee/spec.md, docs/platform/runner/spec.md, docs/platform/runner/contracts/routing-handoff.md, CHANGELOG.md, .agents/skills/, plugins/fgOS/skills/, .claude/skills/, plans/261122-0056-orchestration-skeleton/ | 7 | ready |
+| 15 | [Integration](phase-15-integration.md) | 2, 3, 7, 8, 9, 11, 14 | docs/platform/supervision/spec.md, docs/platform/questions/spec.md, docs/platform/workflow/spec.md, docs/platform/resource-referee/spec.md, docs/platform/runner/spec.md, docs/platform/runner/contracts/routing-handoff.md, docs/platform/session-host/spec.md, CHANGELOG.md, .agents/skills/, plugins/fgOS/skills/, .claude/skills/, plans/261122-0056-orchestration-skeleton/ | 7 | ready |
 
 Phase ids follow the discussion's task order (T1, T7.1 to T7.7); waves, not ids, give the run order.
 
-Door check: `fgos resource-check --units` on the draft table answered `accept (15 units, 0 findings)`. Every shared
+Door check: `fgos resource-check --units` on the draft table answered `accept (15 units, 0 findings)`. After the
+2026-11-23 amendment `fgos resource-check --plan` answered `accept (17 units, 0 findings)`; its shared-path lines
+are all pairs in different waves. Every shared
 path sits in different waves. Hot files and their single writer per wave: `apps/fgos/src/wiring/supervision.rs`
 (waves 1, 2, 3, 4, 5, 6: phases 1, 2, 9, 5, 6, 7), `core/config-standard/watcher.yaml` and its schema (waves 3, 4, 5:
 phases 9, 5, 6), `apps/fgos-gateway/src/gateway.rs` and `command-manifest.json` (waves 2, 5: phases 2, 8),
-`packages/supervision/rust/src/lib.rs` (waves 2, 4). Generated skill surfaces (`.agents/skills/`,
+`packages/supervision/rust/src/lib.rs` (waves 2, 4), `command-manifest.json` also in wave 1 (phase 16),
+`core/skills/fgos-lead/SKILL.md` (waves 3, 5: phases 14, 6), `src/session-host/head-start.mjs` (wave 2, phase 17
+only). The 2026-11-23 amendment adds phases 16 (wave 1) and 17 (wave 2) and moves no existing phase's wave. Generated skill surfaces (`.agents/skills/`,
 `plugins/fgOS/skills/`, `.claude/skills/`) are regenerated once, by `npm run build:skills` in phase 15; phases edit
 only skill sources. Specs and `CHANGELOG.md` are written only in phase 15.
 
@@ -302,6 +352,15 @@ p10, p11 and p12 stay for the resumed lead; rebase them on main when this plan r
   owner-communication until this plan is done.
 
 ## Risks and rollback
+
+- A slept lead's work is lost if any remover skips the checkout door. Proof point for validating: phase 6's
+  `sleeping_lead_worktree` drives a real land and cleanup against a slept lead's dirty and undelivered worktree. The
+  two other kept-worktree lists (workflow, runner) are separate backlog rows (`p-kyen4k2k7z`, `p-fdkdy26tba`), not
+  fixed here.
+- A resume replays a transcript the new account cannot accept (signed thinking blocks, discussion §3 row 9,
+  unverified). Phase 17 never assumes the replay: a refused resume falls back to the handoff in the same start, and its
+  owning test uses a refusing fake CLI. Proof point for validating: one real resume of a Claude head across two
+  accounts of the same pool, recorded as evidence, not as a gate.
 
 - The keeper starts players in code: a wrong rule could start too many sessions. Proof point: phase 1 and phase 4
   owning tests drive every cap with fakes before any wiring; `maxLeads` and the lane pool are checked before each

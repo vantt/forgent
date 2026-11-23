@@ -1,6 +1,6 @@
 # Phase 5: Record sources and need resolution
 
-Depends on phase 4. Decisions: SR-D8 (the keeper never reads domain state),
+Depends on phases 4, 10 and 16. Decisions: SR-D8 (the keeper never reads domain state),
 OS-D11 (each need resolves at an existing door), OS-D14 (ask the referee before a start), OS-D16 (`waitingOn:
 person` points at a question), OS-D21 (phases run in guide cases).
 
@@ -12,6 +12,8 @@ person` points at a question), OS-D21 (phases run in guide cases).
 - `fgos run --help` (`--case`, `--activity`: case admission already exists).
 - `docs/platform/session-host/spec.md` §3, §8; `docs/platform/identity/spec.md` (holders, successors).
 - Phase 10's referee entry.
+- Phase 16's sleep fields in the lead head's `.fgos/runtime/session-rotation/<persona>-<name>/placement.json`
+  (D2 of `ds-6psli4i4xl-workspace-ownership-survey-for-sleeping-leads`).
 
 ## Footprint
 
@@ -28,6 +30,9 @@ person` points at a question), OS-D21 (phases run in guide cases).
    never guessed.
 2. Plan source (Rust, over `portfolio.rs`): one record per `running` plan, step `lead`, `needs: { role: lead }`; a
    `ready` plan is already handled by admission (phase 1). A `done` or `withdrawn` plan closes the item.
+   When the plan's `lead` role (`head:<persona>-<name>`) has a `placement.json` with `retiredReason: sleep` and
+   no live holder, the record carries `waitingOn: { until: <wakeAt> }`; the head record is the only store of it (D2).
+   A missing or unreadable `wakeAt` gives no `until` and the record is actionable, never a guessed time.
 3. Workflow-case source: `fgos workflow records --json` in `src/workflow/records.mjs`, folded from the existing case
    projection: one record per open activity of each open case; `needs: { capability }` from the activity's binding;
    `waitingOn: person` with the gate's question id while a gate waits; `outcome` when settled; `maxRounds` from the
@@ -44,7 +49,9 @@ person` points at a question), OS-D21 (phases run in guide cases).
 `cargo test -p fgos-supervision --test sources` and `node --test test/workflow/records.test.mjs`. Pass: a case with
 two parallel open activities yields two records and two `fgos run --case` starts (fake run door); a running plan yields
 one lead record; a gate waiting on `q-…` yields `waitingOn: person` and becomes actionable after the answer; a failing
-source reports `source-unavailable` and the other source still runs; a held resource keeps the record waiting.
+source reports `source-unavailable` and the other source still runs; a held resource keeps the record waiting. A
+running plan whose lead head record says `sleep` with a `wakeAt` yields `waitingOn.until` equal to it; without
+`wakeAt` the record is actionable.
 
 ## Rollback
 
