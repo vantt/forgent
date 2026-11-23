@@ -107,3 +107,17 @@ steps 2-6. The probe runs from a supervisor and a secretary started after the ne
   needs a green suite: confirm the cause and fix them through this plan.
 - The supervisor's probe JSON is on main: `reports/head-grant-probe-supervisor.json` (`b76553b29`). Miu was asked for hers.
 - The CHANGELOG lines wait on owner question `q-2vehh564d2` (no `lead:SUPERVISOR` is live).
+
+### The two phase 13 reds are fixed (2026-11-23 23:50, head:lead-forgent-261122-0118-heads-b52f9)
+
+- Cause confirmed: `e900a7e10` added the exact-file grant entry `plans/backlog.md`, a supported shape (the matcher in
+  `packages/run-supervisor/rust/src/head_request.rs` grants a path named exactly by an entry). Two tests still pinned
+  the old shape. The grant is right, so the fix is in the tests.
+- Landed as `896340551` (branch `heads-stable-and-able/p11d`, units `8bb3814f2` and `69c92c65f`):
+  `head-start.test.mjs` expects `['plans', 'plans/backlog.md', 'plans/backlog/*']`, and `head-permission-mode.test.mjs`
+  lets a plain entry name an existing directory or regular file. A `<dir>/*` entry must still be a directory, and the
+  duplicate and plain-path checks are unchanged. The footprint widen for the second test is `a90e34828` (supervisor).
+- Proof: `head-start.test.mjs` 28/28 in the worktree, and the land gates ran `head-permission-mode.test.mjs` green.
+- Still open for phase 11: a green `npm test` and `cargo test --workspace` on main. The other 16 reds in the owner's run
+  belong to other plans. Also open: Miu's probe JSON, the CHANGELOG lines (owner question `q-2vehh564d2`), and then
+  `reports/head-grant-probe.md` with the folded-rows check.
