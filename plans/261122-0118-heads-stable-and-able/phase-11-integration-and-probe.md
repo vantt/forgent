@@ -22,6 +22,9 @@ Closes acceptance criteria 1, 2 and 5, and the verb-by-verb list of `p-vquz26ibn
 `plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md` and `test/session-host/head-start.test.mjs`
 (step 6 only).
 
+`CHANGELOG.md` is no longer in the plan-level footprint (2026-11-23, owner order): rebase my one CHANGELOG line onto
+main at step 2, and have lead:SUPERVISOR land it if the land door refuses a path outside the footprint.
+
 ## Steps
 
 1. Gate: on main with every phase landed, run `npm test` and `cargo test --workspace`. Fix a regression in the phase

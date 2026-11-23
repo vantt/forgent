@@ -9,11 +9,8 @@ base: aa35c0664447f6d01d214911973c4d0246715e39
 footprint:
   - plans/261122-0118-heads-stable-and-able/**
   - core/skills/fgos-secretary/SKILL.md
-  - .agents/skills/**
-  - plugins/fgOS/skills/**
   - .fgos/config.yaml
   - test/live/head-grant-probe.live.mjs
-  - CHANGELOG.md
   - test/session-host/head-start.test.mjs
 source:
   - plans/discussions/ds-fvoi45qccq-heads-stable-and-able/DISCUSSION.md
@@ -155,6 +152,13 @@ writer, phase 11.
 - `q-dcbq73d2rr`: the owner activates the release carrying 12c (`8883c2a62`) on the host and removes the five finished
   worktrees (p02, p02g, p06, p06f, p12c); lead:SUPERVISOR then reruns the real soft rotation (phase 12 done-when item
   3). The supervisor neither activates a release nor removes a worktree.
+
+### Footprint drops the skill renders and the changelog (2026-11-23 07:45, owner order relayed by lead:SUPERVISOR)
+
+- `.agents/skills/**`, `plugins/fgOS/skills/**` and `CHANGELOG.md` are removed from the plan-level footprint so they no
+  longer hold `261122-0056-orchestration-skeleton`; nobody waits for this plan. Phases 8 to 10 only measure now and
+  write their reports in this plan directory. Phase 11 still adds one `CHANGELOG.md` line in step 2 and rebases that
+  line onto whatever another plan landed first; when it runs, this lead asks lead:SUPERVISOR to land that one line.
 
 ### Footprint narrowed to the open phases (2026-11-23 07:30, owner order relayed by lead:SUPERVISOR)
 
