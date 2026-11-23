@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d54f41c383fe79f1c3672278e0f49786430ed3b2b147de8e6ad2422bda787c83",
+  "payloadDigest": "b55653864b7e592b9940339d3e5dafc47c7468bf5a0b19e42f29da692bf8b941",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1628,9 +1628,9 @@
     "src/runner/loop.mjs": "63c6e05d3f22bd14eed991cef303e830e30a8f666d39b33c29d6ec41b7303707",
     "src/runner/main-checkout-activity.mjs": "d6f7169033c1fbdd46280d2075700aeda87f447ecc6fdb2da516be6ca3c0011f",
     "src/runner/main-checkout-reset-guard.mjs": "24989beae13b117626bee3375c6266532cac9638156902d5b02feeb04bc2a610",
-    "src/runner/merge.mjs": "f00a5c54648d20c9085cb14c18f21cfb4ab33f651459ec5d3605773ec1240ca9",
+    "src/runner/merge.mjs": "e90e3eaafce24c83a6e64742c76fc2f938a11e902a28340be0cd6bd84f81e7dc",
     "src/runner/operation-capability.mjs": "09112f85fe94e2786d5f5a1d5cf1639e718ffe537413bb2a990185f6f5054a9f",
-    "src/runner/operation-choice.mjs": "90462730767093e198080a6e5e3a935853f7e7f5a91fbfeaa7bcc1d8df04da8e",
+    "src/runner/operation-choice.mjs": "1a6a0bff1f17ab732ae345763759a12c19ef5bf6babfa38f970e47f7ff28dcbf",
     "src/runner/paths.mjs": "81afadcf35a2f9411b190e53897a79ea119ec6797908f8884a461640603c9d7d",
     "src/runner/promote-engine.mjs": "36b87e1bd743c7d38bfe48db02fafbcd79a5c9f1d092a32a2be20167ec61cf02",
     "src/runner/promote-preflight.mjs": "26db2c2670fc445a4c170af18880ead88e13c4ff1545846b5c8cf760fbd34e54",
@@ -1641,7 +1641,7 @@
     "src/runner/root-affinity.mjs": "0e074df4c61d29f60a2ce43fb62830ec2a2eaebe0e1998fec0cbacb4cd15e871",
     "src/runner/stray-writes.mjs": "dc597eac4e667dddeef96a8adba939ab301da9d3ed276b3021312bde93307f78",
     "src/runner/work-compat.mjs": "ea23b7a028b033f09d2dbcd1455f521668fd9ba1ab2b44d909cd218a9503ec99",
-    "src/runner/work-dispatch.mjs": "953c671938b0acdb9aef3e8c71c98b06f4f3e1129ff8e0de54b7354ff2313eb0",
+    "src/runner/work-dispatch.mjs": "9f973b94904915862a8efba37fe88226839b0117e1a88f03153a32701a0b60b7",
     "src/runner/worker-log.mjs": "c5b978ff9fa7533a62213c77cf7b6241d7b10e43d9fd5cf07f15209b7335a793",
     "src/runner/worktree.mjs": "463904b6d250fc6d801e660ce8dd94d1b4edd56aca74594d0057107a216d9049",
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
@@ -1692,7 +1692,7 @@
     "src/state/impact.mjs": "c0324c2b1e0498fcee28418c43deb820f8c7e2a36f9035b7b72fad986c446185",
     "src/state/knowledge-registry.mjs": "9dc1c5d5a94dcb09b5de5b86709a23414cbfe62912366e3ba06b5b363c88970a",
     "src/state/plan-pool.mjs": "20c667909048853fa2dddf239b27467c29dbe8551cd7c90fef88c241143483ad",
-    "src/state/porting-store.mjs": "7abcfee9f056ec9b8155daec93bf30b7d52eea8bd41afe0f902466a6189a9507",
+    "src/state/porting-store.mjs": "142c6c9ab68fb3622e2ff45898895d9450de0d8bae54decb07123f00028ea8cd",
     "src/state/porting.mjs": "4191acd3af3ca878dd7ae10bab67d859d545ca870722b3276cd39aeba9d173f3",
     "src/state/priority-formula.mjs": "5ad341b4675045cf7872c796da7ba2b5fc8b3fa68382d7c021509c29619c38b7",
     "src/state/replay.mjs": "538c969ed9b8bde31dc389f67c88be48dd6e3289fe91921b687913d45ced3de2",
@@ -1701,7 +1701,7 @@
     "src/state/runtime-coordination.mjs": "385fdb5f847174e785eca57ba3db0a7f6ef21734d8f1c08fd8edab96ea16feeb",
     "src/state/status-fsm.mjs": "5ce5ea8447ccdc0b4f00f13eca95de69a38effa139b788035fcd5e04b4330a1c",
     "src/state/step-fsm.mjs": "bf1e935a355d2fbb7b8a5f0927138dea21b21c6226fe5a442c22bd1875445625",
-    "src/state/store.mjs": "cad6b8da37e436b77a4666e9f749b8e6717c4164c6cff53bbc94d5c69b38247d",
+    "src/state/store.mjs": "8f44e6c756d1af9dd93b119d1c94660419a0d24c90b3bfab724a3a8f9c1c54ee",
     "src/state/work-event-store.mjs": "84ab83afb7d780b9ead042158b034b60ad4da17a50dc0b11ffa1c67a54e8017a",
     "src/state/work.mjs": "9ef7f45d714d910a464d54d2f6c57a033c67796c50914aecd3923570aa84b858",
     "src/terminal-control/client.mjs": "19de57c7edb3fce0cea998af36dde93f73270daaa37f1f35a1a80b9f0f57fbac",
@@ -4752,14 +4752,14 @@
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 951,
+      "line": 952,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 981,
+      "line": 982,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands))",
       "class": "configured-binary"

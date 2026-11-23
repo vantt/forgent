@@ -14,7 +14,7 @@ import { readEventStoreConfig } from '../event-store/index.mjs';
 import { prepareWorkStore } from './work-event-store.mjs';
 import { withConsumerState } from './consumer-event-gate.mjs';
 import { getMainFgosDir } from './runtime-coordination.mjs';
-import { resolveFgosFile, FGOS_FILE } from '../util/fgos-file-registry.mjs';
+import { resolveFgosFile, FGOS_FILE, fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { hotLockDepth, HotLockError } from './hot-lock.mjs';
 import path from 'node:path';
@@ -136,7 +136,7 @@ export function rebuild(dir) {
 
 /** The consumer registry's rebuild port, using the store the caller already prepared. */
 export function rebuildFromStore({ cwd, repoRoot, store, maxAttempts, heldRanks = [], globalConfigPath }) {
-  const dir = getMainFgosDir(path.join(cwd ?? repoRoot, '.fgos'));
+  const dir = getMainFgosDir(fgosDirFromRoot(cwd ?? repoRoot));
   const config = readEventStoreConfig(path.dirname(dir), globalConfigPath);
   if (maxAttempts !== undefined) config.rebuild.maxAttempts = maxAttempts;
   let tx;

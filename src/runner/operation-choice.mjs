@@ -11,6 +11,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import crypto from 'node:crypto';
 import { DEFAULT_DOMAIN, resolveDomainName, getDomain, operationsForStep } from '../state/domain-registry.mjs';
 import { resolveContentRoot } from '../intake/plan.mjs';
@@ -123,13 +124,13 @@ function planEvidenceMatches(runResult, currentPlanBytes, planRel) {
 // bounds the depth.
 function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'gate-verdict', operation = 'validate-plan' }) {
   if (!work?.id || !repoRoot) return null;
-  const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
+  const assignmentsDir = path.join(fgosDirFromRoot(repoRoot), 'assignments');
   if (!fs.existsSync(assignmentsDir)) return null;
 
   const targetStage = stage ?? work?.workflowStep;
 
   try {
-    const asgnIds = [...new Set([...listAssignmentRuns(path.join(repoRoot, '.fgos'))]
+    const asgnIds = [...new Set([...listAssignmentRuns(fgosDirFromRoot(repoRoot))]
       .filter((run) => run.hasAssignmentJson)
       .map((run) => run.assignmentId))];
     let latestRunResult = null;
@@ -720,7 +721,7 @@ export function chooseStageOperation({
   // branch below can read it as evidence.
   if (lastRunResult && typeof lastRunResult.assignmentId === 'string' && lastRunResult.assignmentId && repoRoot) {
     try {
-      const asgnJsonPath = path.join(repoRoot, '.fgos', 'assignments', lastRunResult.assignmentId, 'assignment.json');
+      const asgnJsonPath = path.join(fgosDirFromRoot(repoRoot), 'assignments', lastRunResult.assignmentId, 'assignment.json');
       const asgn = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8'));
       if (asgn?.provenance?.kind === 'inline') {
         lastRunResult = null;
@@ -1514,7 +1515,7 @@ function consumingRunDirFor(runResult, root) {
     const attempt = runResult.runId.split('_').pop();
     const asgnId = runResult?.assignmentId ?? runResult?.assignment?.assignmentId;
     if (asgnId && /^\d+$/.test(attempt)) {
-      return path.join(root, '.fgos', 'assignments', asgnId, 'runs', attempt);
+      return path.join(fgosDirFromRoot(root), 'assignments', asgnId, 'runs', attempt);
     }
     return null;
   }
@@ -2352,7 +2353,7 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
     }
     let assignment = null;
     try {
-      const dir = assignmentDir(path.join(stateRoot, '.fgos'), runResult.assignmentId);
+      const dir = assignmentDir(fgosDirFromRoot(stateRoot), runResult.assignmentId);
       assignment = dir ? JSON.parse(fs.readFileSync(path.join(dir, 'assignment.json'), 'utf8')) : null;
     } catch {
       assignment = null;
