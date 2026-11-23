@@ -98,3 +98,12 @@ steps 2-6. The probe runs from a supervisor and a secretary started after the ne
   probe in both heads, land each JSON under `reports/`, and land the changelog lines.
 - Left for the lead after that: read the suite result, write `reports/head-grant-probe.md` with the folded-rows check,
   and close the plan.
+
+### Supervisor routing at 23:55 (2026-11-23)
+
+- The owner's unconfined `npm test` on main `5a5dde6e0` is red (18 fails, `plans/261123-0828-head-stop-rotation-bad-measure/reports/lead-261123-2333-head-stop-rotation-bad-measure-verify.md`). Two are attributed to this
+  plan's phase 13 grant `e900a7e10` (`plans/backlog.md` in the secretary and supervisor grants):
+  `test/session-host/head-permission-mode.test.mjs:47` and `test/session-host/head-start.test.mjs:370`. Phase 11
+  needs a green suite: confirm the cause and fix them through this plan.
+- The supervisor's probe JSON is on main: `reports/head-grant-probe-supervisor.json` (`b76553b29`). Miu was asked for hers.
+- The CHANGELOG lines wait on owner question `q-2vehh564d2` (no `lead:SUPERVISOR` is live).

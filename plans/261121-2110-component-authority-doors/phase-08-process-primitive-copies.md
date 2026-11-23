@@ -24,3 +24,10 @@ Every writing unit runs with `--provider claude` (owner order, D6 step 0). If cl
 
 ## Rollback
 Revert the phase commit. That restores each copy and its debt entry together.
+
+### Supervisor routing at 23:55 (2026-11-23)
+
+The owner's unconfined `npm test` on main `5a5dde6e0` has 9 reds attributed to the component-authority model load
+(`2e1c059aa` and the doors lands): `test/setup/instruction-registry.test.mjs` x8 (`model.components is not iterable`
+at `src/setup/instruction-registry.mjs:469`) and `test/report/decision-index.test.mjs:241` (`decisionKinds is not
+iterable`). Detail: `plans/261123-0828-head-stop-rotation-bad-measure/reports/lead-261123-2333-head-stop-rotation-bad-measure-verify.md` group 1. Confirm the cause and fix through this plan when the current step allows.
