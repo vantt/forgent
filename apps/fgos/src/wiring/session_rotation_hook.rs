@@ -465,17 +465,44 @@ fn tilde(dir: &str, home: Option<&str>) -> String {
     }
 }
 
+/// The checked-out branch of the repository holding `dir`, read from the repo's
+/// HEAD file without starting git (a linked worktree's `.git` file is followed). A
+/// detached HEAD shows its first seven characters; outside a repository there is none.
+fn git_branch(dir: &Path) -> Option<String> {
+    for d in dir.ancestors() {
+        let dot = d.join(".git");
+        let git_dir = if dot.is_dir() {
+            dot
+        } else if dot.is_file() {
+            let text = std::fs::read_to_string(&dot).ok()?;
+            let target = Path::new(text.trim().strip_prefix("gitdir:")?.trim());
+            d.join(target)
+        } else {
+            continue;
+        };
+        let head = std::fs::read_to_string(git_dir.join("HEAD")).ok()?;
+        let head = head.trim();
+        return Some(match head.strip_prefix("ref: refs/heads/") {
+            Some(branch) => branch.to_string(),
+            None => head.chars().take(7).collect(),
+        });
+    }
+    None
+}
+
 /// Renders the head status line in the ak layout: model and context percentage
-/// joined by " - ", then the quota windows with an hourglass, then the folder, each quota window as
-/// `label pct% (time to reset)`. The model is cyan; the context percentage is green
-/// below 70, yellow from 70 and red from 85; the quota is green and turns red when
-/// any window is at 85 or more. Segments are separated by two spaces, a missing figure is
-/// left out, and with color off the text alone stays readable.
+/// joined by " - ", then the quota windows with an hourglass, each as
+/// `label pct% (time to reset)`, then the folder and the git branch. The model is
+/// cyan; the context percentage is green below 70, yellow from 70 and red from 85;
+/// the quota is green and turns red when any window is at 85 or more; the folder is
+/// yellow and the branch magenta. Segments are separated by two spaces, a missing
+/// figure is left out, and with color off the text alone stays readable.
 fn render_status_line(
     model: Option<&str>,
     ctx_pct: Option<f64>,
     quota: &[QuotaWindow],
     dir: Option<&str>,
+    branch: Option<&str>,
     write_err: Option<&str>,
     color: bool,
 ) -> String {
@@ -514,6 +541,9 @@ fn render_status_line(
     }
     if let Some(d) = dir.filter(|d| !d.is_empty()) {
         parts.push(format!("\u{1F4C1} {}", paint(d, "\x1b[33m", color)));
+    }
+    if let Some(b) = branch.filter(|b| !b.is_empty()) {
+        parts.push(format!("\u{1F33F} {}", paint(b, "\x1b[35m", color)));
     }
     if let Some(err) = write_err {
         parts.push(paint(&format!("({err})"), "\x1b[31m", color));
@@ -572,11 +602,12 @@ fn status_line(head_role: Option<&str>, payload: &Value) -> Option<String> {
     let ctx_pct = payload
         .pointer("/context_window/used_percentage")
         .and_then(Value::as_f64);
-    let dir = payload
+    let cwd = payload
         .pointer("/workspace/current_dir")
         .or_else(|| payload.get("cwd"))
-        .and_then(Value::as_str)
-        .map(|d| tilde(d, std::env::var("HOME").ok().as_deref()));
+        .and_then(Value::as_str);
+    let dir = cwd.map(|d| tilde(d, std::env::var("HOME").ok().as_deref()));
+    let branch = cwd.and_then(|d| git_branch(Path::new(d)));
     let now_secs = now_ms() / 1000;
     let window = |label: &'static str, pct: Option<f64>, key: &str| {
         pct.map(|pct| QuotaWindow {
@@ -617,6 +648,7 @@ fn status_line(head_role: Option<&str>, payload: &Value) -> Option<String> {
         ctx_pct,
         &quota,
         dir.as_deref(),
+        branch.as_deref(),
         write_err.as_deref(),
         color,
     ))
@@ -1192,8 +1224,16 @@ mod tests {
             },
         ];
         assert_eq!(
-            render_status_line(Some("Opus"), Some(9.27), &windows, Some("~/p"), None, false),
-            "\u{1F916} Opus - 9%  \u{231B} 5h 20% (1h30m)  wk 42% (4d)  \u{1F4C1} ~/p"
+            render_status_line(
+                Some("Opus"),
+                Some(9.27),
+                &windows,
+                Some("~/p"),
+                Some("main"),
+                None,
+                false
+            ),
+            "\u{1F916} Opus - 9%  \u{231B} 5h 20% (1h30m)  wk 42% (4d)  \u{1F4C1} ~/p  \u{1F33F} main"
         );
         let hot = [QuotaWindow {
             label: "wk",
@@ -1201,11 +1241,11 @@ mod tests {
             left_secs: None,
         }];
         assert_eq!(
-            render_status_line(Some("Opus"), Some(72.0), &hot, None, None, true),
-            "\u{1F916} \x1b[22m\x1b[39m\x1b[36mOpus\x1b[0m\x1b[22m\x1b[39m - \x1b[22m\x1b[39m\x1b[33m72%\x1b[0m\x1b[22m\x1b[39m  \u{231B} \x1b[22m\x1b[39m\x1b[31mwk 90%\x1b[0m\x1b[22m\x1b[39m"
+            render_status_line(Some("Opus"), Some(72.0), &hot, None, Some("main"), None, true),
+            "\u{1F916} \x1b[22m\x1b[39m\x1b[36mOpus\x1b[0m\x1b[22m\x1b[39m - \x1b[22m\x1b[39m\x1b[33m72%\x1b[0m\x1b[22m\x1b[39m  \u{231B} \x1b[22m\x1b[39m\x1b[31mwk 90%\x1b[0m\x1b[22m\x1b[39m  \u{1F33F} \x1b[22m\x1b[39m\x1b[35mmain\x1b[0m\x1b[22m\x1b[39m"
         );
         assert_eq!(
-            render_status_line(None, None, &[], None, None, false),
+            render_status_line(None, None, &[], None, None, None, false),
             "\u{1F916} fgOS head"
         );
         assert_eq!(
@@ -1214,11 +1254,29 @@ mod tests {
                 Some(85.0),
                 &[],
                 None,
+                None,
                 Some("sidecar write failed: x"),
                 false
             ),
             "\u{1F916} Opus - 85%  (sidecar write failed: x)"
         );
+        // Branch: a plain repository, a linked worktree (file pointing at its own
+        // git dir, detached HEAD) and a folder outside any repository.
+        let (branch_fgos_dir, _) = fgos("branch");
+        let base = branch_fgos_dir.parent().unwrap().to_path_buf();
+        std::fs::create_dir_all(base.join("repo/.git")).unwrap();
+        std::fs::create_dir_all(base.join("repo/sub/dir")).unwrap();
+        std::fs::write(base.join("repo/.git/HEAD"), "ref: refs/heads/feat/x\n").unwrap();
+        assert_eq!(
+            git_branch(&base.join("repo/sub/dir")),
+            Some("feat/x".to_string())
+        );
+        std::fs::create_dir_all(base.join("wt")).unwrap();
+        std::fs::create_dir_all(base.join("gitdirs/wt")).unwrap();
+        std::fs::write(base.join("wt/.git"), "gitdir: ../gitdirs/wt\n").unwrap();
+        std::fs::write(base.join("gitdirs/wt/HEAD"), "0123456789abcdef\n").unwrap();
+        assert_eq!(git_branch(&base.join("wt")), Some("0123456".to_string()));
+        assert_eq!(git_branch(Path::new("/proc")), None);
         assert_eq!(tilde("/home/a/p", Some("/home/a")), "~/p");
         assert_eq!(tilde("/home/a", Some("/home/a")), "~");
         assert_eq!(tilde("/home/ab/p", Some("/home/a")), "/home/ab/p");
