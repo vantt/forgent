@@ -2,7 +2,12 @@ job: execution doctor judgments
 kind: door
 patterns:
   - (?:export )?(?:async )?function (?:checkRunnerGeneratedPathsConfig|checkToolRegistryConfigured|checkCapabilityServesValid|checkExecutorConfinement|checkInvocationGitWriteGrants|checkOmpNativesPresent|checkAgySubHomesConfigured|findAgySubHomes)\b
+  - \bfn (?:find_agy_sub_homes|check_agy_sub_homes_configured)\b
   - \bfn (?:runner_generated_paths|executor_confinement|invocation_git_write_grants|capability_serves_valid|omp_natives_present|agy_sub_homes_configured|tool_registry_configured|find_sub_homes)\b
 allowed:
   - packages/execution/rust/src/checks.rs
+debt:
+  - path: packages/distribution/rust/src/agent_config.rs
+    reason: a dead copy of the agy sub-home finder and its check (find_agy_sub_homes, check_agy_sub_homes_configured); only its own tests call it since the host judges the row over fgos-execution checks.rs
+retiredBy: "261121-2110-component-authority-doors#phase-12: the dead copy is deleted"
 reason: seven executor-model doctor rows (runner-generated-paths, executor-confinement, invocation-git-write-grants, capability-serves-valid, omp-natives-present, agy-sub-homes-configured, tool-registry-configured) are judged in process by the host over fgos-execution checks.rs (the host adapter apps/fgos/src/wiring/doctor/execution.rs only reads and wires them and defines none of these names; the executor, account, agent-definition and template rows are judged in checks.rs too), never by a Node body that asks the host back; the Node judge names are retired, and a second judge of the same row must be declared. seat-binding-route is judged in Rust too, by probing the route the Node client calls

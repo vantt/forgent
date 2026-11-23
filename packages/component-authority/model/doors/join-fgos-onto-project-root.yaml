@@ -2,6 +2,7 @@ job: join .fgos onto a project root
 kind: door
 patterns:
   - path\.join\((?!\s*(?:home|homeDir|os\.homedir\(\))\b)(?:[^()]|\([^()]*\))*'\.fgos'
+  - path\.join\((?!\s*(?:home|homeDir|os\.homedir\(\))\b)(?:[^()]|\([^()]*\))*['"]\.fgos/
   - "`[^`]*\\$\\{[^}]+\\}/\\.fgos\\b"
 allowed:
   - src/util/fgos-file-registry.mjs

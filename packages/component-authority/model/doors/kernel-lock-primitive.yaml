@@ -14,4 +14,5 @@ allowed:
 debt:
   - path: packages/git/node-addon/src/single_load.rs
     reason: takes a kernel lock of its own (Windows mutex, Unix flock) for the single-load marker instead of a holder-lock resource
+retiredBy: "261121-2110-component-authority-doors#phase-12: the single-load marker moves onto a holder-lock resource"
 reason: a kernel lock is taken only inside the holder-lock drivers; every other lock goes through its Resource. The patterns cannot see std file.lock(), try_lock() or lock_shared(), whose names are too common to match without false hits

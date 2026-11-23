@@ -156,6 +156,16 @@
           "type": "array",
           "items": { "type": "string" }
         },
+        "names": {
+          "description": "Canonical name plus aliases of the job; matched as whole identifiers on code tokens only.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "primitives": {
+          "description": "Regex sources of the calls or imports that do the job; matched on code tokens only.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
         "allowed": {
           "type": "array",
           "items": {
@@ -166,6 +176,7 @@
                 "required": ["path"],
                 "properties": {
                   "path": { "type": "string" },
+                  "count": { "type": "integer", "minimum": 0, "description": "Most matches the file may hold; one more fails." },
                   "reason": { "type": "string" }
                 },
                 "additionalProperties": false
