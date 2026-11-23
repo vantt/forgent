@@ -75,3 +75,12 @@ It was raised to the supervisor.
   unit-run-1795405988455-b81100fb) was refused with the same binding mismatch (deepseek/thehive at bind,
   gemini/gemini at recheck). It is parked without a pin. The next wake reruns that brief in `-p01b` once
   261123-0821 lands.
+- 11:55: the final unit (c-48323, unit-run-1795408708927-8c256f08) got past the recheck after the quarantine ended.
+  Both gemini accounts then hit provider-limit, and the run fell back to deepseek, which did the work and ended
+  `policy-refusal` with nothing committed. In `-p01b` it left these uncommitted: the registry entry, the `main.rs`
+  registration, the drift test (with `authority`, plus `migrate`, which was already failing on main), and the
+  report's final round. Its checks: route 19/19, drift 25/25, crate 8/8, host-runtime green, fmt clean. The verb
+  test still fails at caller admission, because `authority.locate` has no row in
+  `packages/host-runtime/rust/src/catalog.rs`. A temporary patch of that row made it pass, and it was reverted
+  because the file is out of scope. Question **q-klz3vkxjee** asks to add that file. Next: once answered, replay the
+  saved `-p01b` diff and the catalog row in a clean worktree off p01 (97e066738), run the checks, review, and land.
