@@ -183,19 +183,23 @@ mod tests {
                 strings(&expect["assignmentRuns"]),
                 "assignment runs: {name}"
             );
-            // The open-attempt rows of these two trees are the retired Node lister's own rules (it read through a
-            // symlinked assignments root and had no depth limit); the engine's layout is the rule now.
-            let node_lister_only = [
+            // The engine's layout is the rule for open attempts. For these two trees the fixture's open-attempt rows
+            // still record the retired Node lister's rules (it read through a symlinked assignments root and had no
+            // depth limit); neither tree has a closed attempt, so the engine's open attempts are its attempt runs.
+            let node_lister_rows = [
                 "a symlinked assignments root is never read",
                 "the depth limit stops the recovery lister at 16 levels and not the attempt lister",
             ];
-            if !node_lister_only.contains(&name.as_str().unwrap()) {
-                assert_eq!(
-                    tree.relative(unclosed_attempt_dirs(&fgos)),
-                    strings(&expect["openAttempts"]),
-                    "open attempts: {name}"
-                );
-            }
+            let open = if node_lister_rows.contains(&name.as_str().unwrap()) {
+                &expect["assignmentRuns"]
+            } else {
+                &expect["openAttempts"]
+            };
+            assert_eq!(
+                tree.relative(unclosed_attempt_dirs(&fgos)),
+                strings(open),
+                "open attempts: {name}"
+            );
         }
     }
 

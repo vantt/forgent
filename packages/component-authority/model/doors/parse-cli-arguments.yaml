@@ -12,9 +12,10 @@ allowed:
     reason: reads the `--flag` part of a store-declaration shape from the registry, not a call
   - path: packages/observe/rust/src/invocation_fault.rs
     reason: judges whether a recorded token has the shape of a flag name; it parses no call
-  - path: packages/holder-lock/rust/src/route.rs
-    reason: reads typed execution-root flags (`--dir`, `--worktree`, `--cwd`, `-C`, and their `--name=value` spelling) out of a worker's argv to judge workspace containment; it judges another program's arguments, not a call to the host, and the host grammar has neither the `=` spelling nor `-C`
   - path: apps/fgctl/src/help.rs
     reason: fgctl is a separate CLI whose flag grammar takes `--name=value`, which the host grammar does not; its verb tables and help words are its own
 retiredBy: "S7: the Node twin retires with the last Node verb"
+debt:
+  - path: packages/holder-lock/rust/src/route.rs
+    reason: "its own route flag reader (`Flags::parse` and the `--protocol` loop in `main`) is the job the run-supervisor reader moved onto `fgos_host_runtime::cli_args`; `workspace_argument` in the same file judges a worker's argv (`-C` and the `--name=value` spelling, which the host grammar lacks) and stays when the reader moves"
 reason: "one parser per language while both CLIs run, proven equal by test/rust-host/fixtures/parse-args-vectors.json. Other readers of `--flag` tokens are debt: each predates the parser and reads its own grammar"

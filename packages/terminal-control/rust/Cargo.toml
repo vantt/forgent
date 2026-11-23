@@ -10,7 +10,7 @@ fgos-process = { path = "../../process/rust" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
 # The one argument reader of the CLI; the route reads `<op> --protocol 1 --json` through it.
 fgos-host-runtime = { path = "../../host-runtime/rust" }
-serde ={ workspace = true }
+serde = { workspace = true }
 serde_json = { workspace = true }
 
 [target.'cfg(unix)'.dependencies]
