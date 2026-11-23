@@ -7,8 +7,8 @@ Builds PC-D5 (one help channel, Miu takes over) and PC-D8 (leads and planners ma
 ## Inputs
 
 - The discussion, §4 PC-D1, PC-D5, PC-D8; §5 23:40 and 23:50; §6 "Kênh liên lạc".
-- `packages/session-host/contracts/head-permissions.v1.json` and `src/session-host/head-grants.mjs` as phase 2 left
-  them.
+- `packages/session-host/contracts/head-permissions.v1.json` and `packages/session-host/rust/src/permissions.rs`
+  (the `args` limit on a flag's value) as phase 2 left them; this phase only adds rows, no Rust logic.
 - `packages/run-supervisor/contracts/head-request.v1.json`: `supervisor raise` already accepts `coordination-help`.
 - `core/skills/fgos-secretary/SKILL.md` "Start ritual" (the 15-minute tick) and `core/skills/fgos-supervisor/SKILL.md`,
   as phase 1 left them.
@@ -18,8 +18,8 @@ Builds PC-D5 (one help channel, Miu takes over) and PC-D8 (leads and planners ma
 
 ## Footprint
 
-`packages/session-host/contracts/head-permissions.v1.json`, `src/session-host/head-grants.mjs`,
-`test/session-host/head-grants.test.mjs`, `test/session-host/head-request.test.mjs`,
+`packages/session-host/contracts/head-permissions.v1.json`, `packages/session-host/rust/tests/permissions.rs`,
+`packages/session-host/rust/tests/forwarder.rs`,
 `core/config-standard/secretary.yaml`, `core/config-schema/secretary.schema.yaml`,
 `core/skills/fgos-secretary/SKILL.md`, `core/skills/fgos-supervisor/SKILL.md`, regenerated `.agents/skills/**`,
 `plugins/fgOS/skills/**`, `.claude/skills/**`, `docs/platform/supervision/spec.md`.
@@ -28,15 +28,15 @@ Builds PC-D5 (one help channel, Miu takes over) and PC-D8 (leads and planners ma
 
 - A recipient limit cannot be enforced where the sandbox writes the mail record itself. So lead and planner do **not**
   get the writable mailbox binding for sending: their send goes through the window as the argv
-  `fgos mailbox send --to <role>` with a table row that allows it only when `--to` is a `head:secretary-*` or
-  `head:supervisor-*` role (any other recipient: `deny`, code `recipient-not-allowed`). Receiving keeps today's
+  `fgos mailbox send --to <role>` with a table row whose `args` limit allows it only when `--to` is a
+  `head:secretary-*` or `head:supervisor-*` role (any other recipient: `deny`, code `recipient-not-allowed`). Receiving keeps today's
   delivery path; if a lead or planner cannot read its inbox without the writable binding, bind the inbox read-only and
   say so in the commit. The `mailbox: true` flag stays only for the personas that already hold it.
 
 ## Steps
 
-1. Table rows: `supervisor raise` for the `head` base persona, so every persona inherits it; the forwarder (or the
-   kept argument check) limits it to the `coordination-help` kind for personas below the supervisor. The mail row for
+1. Table rows: `supervisor raise` for the `head` base persona, so every persona inherits it; an `args` limit holds
+   it to the `coordination-help` kind for personas below the supervisor. The mail row for
    lead and planner as decided above.
 2. Config: add `secretary.help.staleMinutes` (minutes a `coordination-help` event may stay unhandled before Miu takes
    over; default 30, minimum 5) to `core/config-standard/secretary.yaml` and its schema. No default anywhere else.
@@ -49,15 +49,16 @@ Builds PC-D5 (one help channel, Miu takes over) and PC-D8 (leads and planners ma
 4. Supervisor skill: help events are an input of every wake; how to answer one (act through the window, or file an
    owner question when the table says `ask`).
 5. `docs/platform/supervision/spec.md`: one line in the charter section that the threshold key exists.
-6. Tests: extend `head-grants.test.mjs` (every persona holds `supervisor raise`; lead and planner mail rows) and
-   `head-request.test.mjs` (a planner's `coordination-help` raise is forwarded; another kind from a planner is
-   refused; a lead's mail to `head:supervisor-x` passes and to `head:lead-y` is refused `recipient-not-allowed`).
+6. Tests: extend `packages/session-host/rust/tests/permissions.rs` (every persona holds `supervisor raise`; lead and
+   planner mail rows) and `tests/forwarder.rs` (a planner's `coordination-help` raise is allowed; another kind from a
+   planner is refused; a lead's mail to `head:supervisor-x` is allowed and to `head:lead-y` is refused
+   `recipient-not-allowed`).
 7. `npm run build:skills`.
 
 ## Verify
 
 ```bash
-node --test test/session-host/head-grants.test.mjs test/session-host/head-request.test.mjs
+cargo test -p fgos-session-host
 npm run build:skills
 node --test test/config
 ```

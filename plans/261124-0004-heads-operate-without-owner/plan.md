@@ -22,14 +22,28 @@ footprint:
   - .agents/skills/**
   - plugins/fgOS/skills/**
   - .claude/skills/**
+  - packages/session-host/rust/src/lib.rs
+  - packages/session-host/rust/src/permissions.rs
+  - packages/session-host/rust/src/forwarder.rs
+  - packages/session-host/rust/src/release.rs
+  - packages/session-host/rust/tests/permissions.rs
+  - packages/session-host/rust/tests/forwarder.rs
+  - packages/session-host/rust/tests/release.rs
+  - packages/session-host/rust/Cargo.toml
+  - packages/session-host/contracts/head-permissions.v1.json
+  - packages/git/node-addon/src/session_host.rs
+  - packages/git/node-addon/src/lib.rs
+  - packages/git/node-addon/Cargo.toml
+  - src/native/door.mjs
   - src/session-host/head-grants.mjs
+  - src/session-host/head-start.mjs
   - src/session-host/head-request.mjs
   - src/session-host/head-request-client.mjs
-  - src/session-host/head-release.mjs
-  - packages/session-host/contracts/head-permissions.v1.json
   - packages/run-supervisor/contracts/head-request.v1.json
+  - packages/run-supervisor/contracts/envelope.v3.json
   - packages/run-supervisor/rust/src/head_request.rs
   - packages/run-supervisor/rust/tests/head_request.rs
+  - Cargo.lock
   - src/cli/command-registry.mjs
   - packages/host-runtime/contracts/command-manifest.json
   - packages/host-runtime/contracts/command-routes.json
@@ -37,7 +51,7 @@ footprint:
   - apps/fgos/src/routing.rs
   - test/session-host/head-grants.test.mjs
   - test/session-host/head-request.test.mjs
-  - test/session-host/head-release.test.mjs
+  - test/session-host/head-start.test.mjs
   - test/live/head-grant-probe.live.mjs
   - src/runner/dispatch/confinement/drivers/bwrap.mjs
   - src/runner/dispatch/confinement/workspace-paths.mjs
@@ -64,7 +78,11 @@ created: 2026-11-24
 # Heads operate without the owner
 
 Mode: standard. Decisions cited by their discussion ids (PC-D1 to PC-D10) from
-`plans/discussions/privileged-chores-research/DISCUSSION.md`; none is reopened here.
+`plans/discussions/privileged-chores-research/DISCUSSION.md`; none is reopened here. The discussion's later decision
+(commit `2b3336dae`, "Chồng lấn với việc chuyển Node sang Rust") is honored: the new table, forwarder, `can-i` and
+release code are Rust in `packages/session-host/rust`, the first slice of plan 3 of the Node-to-Rust inventory
+(`plans/discussions/ds-wham5txfkv-node-rust-port-inventory/DISCUSSION.md`); the rest of session-host is not ported
+here.
 
 ## Outcome
 
@@ -76,10 +94,11 @@ runs by hand today, and every head has one channel to ask for help:
   descriptions and grant comments, and no sentence says the opposite.
 - Anything that touches shared state (`.git` of main, `.fgos`, config, worktrees, the release) goes through one
   window: the head sends an `fgos` argv over its request socket, the run supervisor looks it up in one data table
-  `persona x fgos verb prefix -> allow | ask | deny` with inheritance (head < supervisor < secretary), and `allow` runs
-  it with no shell, `ask` becomes an owner question carrying the exact argv, `deny` refuses with a reason (PC-D3,
-  PC-D6). `fgos can-i <argv>` answers before acting. The 28 hand-written branches that only forward are gone, and
-  `SUCCESSOR_READ_VERBS` is a column of the same table.
+  `persona x fgos verb prefix -> allow | ask | deny` with inheritance (head < supervisor < secretary), held and read
+  only by the Rust session-host crate, and `allow` execs the verb from Rust with no shell and no Node hop, `ask` becomes an owner question carrying the exact argv, `deny` refuses with a reason (PC-D3,
+  PC-D6). `fgos can-i <argv>` answers before acting. The 28 hand-written branches that only forward are gone, `SUCCESSOR_READ_VERBS` is a column of the same table, and the
+  cage sizes (`writes`, `mailbox`, `peers`) are rows of it too; `GRANTS` in `head-grants.mjs` is no longer a source of
+  authority, only a thin port the Node launch reads through.
 - Every persona may `supervisor raise` a `coordination-help` event; leads and planners may mail the two hands and only
   them; Miu's 15-minute tick also asks "is a supervisor alive?" and "is a help request older than the threshold?" and
   takes over when either is true (PC-D5, PC-D8).
@@ -140,26 +159,26 @@ declared.
 
 | New thing | Model row | Note |
 |---|---|---|
-| Permission table `persona x verb prefix -> allow/ask/deny` as data | `declare: contract session-host-head-permissions-v1` | Read only by `grantOf`; overlaps the verb lists in `GRANTS`, survivor: `declare: contract session-host-head-permissions-v1`; retired: `src/session-host/head-grants.mjs` verb arrays |
-| Argv forwarder replacing the forward-only branches | `session-host`, `run-supervisor/head-request.v1` | Overlaps the 28 `case` branches, survivor: `run-supervisor/head-request.v1` forwarder; retired: forward-only branches of `runHeadRequest` in `src/session-host/head-request.mjs` |
+| Permission table `persona x verb prefix -> allow/ask/deny` as data | `declare: contract session-host-head-permissions-v1` | Read only by the Rust crate `packages/session-host/rust`; overlaps `GRANTS`, survivor: `declare: contract session-host-head-permissions-v1`; retired: the `GRANTS` table and verb arrays of `src/session-host/head-grants.mjs` (its `grantOf` becomes a thin port over the addon) |
+| Argv forwarder replacing the forward-only branches (Rust) | `session-host`, `run-supervisor/head-request.v1` | Overlaps the 28 `case` branches, survivor: `session-host` forwarder called by `head_request.rs`; retired: forward-only branches of `runHeadRequest` in `src/session-host/head-request.mjs` |
 | `SUCCESSOR_READ_VERBS` as a table column | `run-supervisor` | Overlaps the Rust constant, survivor: `declare: contract session-host-head-permissions-v1` read flag; retired: `SUCCESSOR_READ_VERBS` in `packages/run-supervisor/rust/src/head_request.rs` |
 | `fgos can-i <argv>` | `session-host` | Answered from the envelope's rules by the run supervisor, like `session bind session` |
 | Help channel and Miu takeover threshold | `supervision`, `config` | `secretary.help.staleMinutes`, new key in `core/config-standard/secretary.yaml` |
 | Lead and planner mail limited to the two hands | `agent-mailbox`, `session-host` | |
 | Cage changes (verify commands, pid namespace) | `agent-confinement` | |
 | Release recipe as project data | `declare: contract config-release-v1` | Keys in `core/config-standard/release.yaml`; domain-free |
-| Release policy branch of the window | `session-host`, `packaging-distribution` | Applies through `fgctl upgrade` and rolls back through `fgctl repair`, both existing doors |
+| Release policy branch of the window (Rust) | `session-host`, `packaging-distribution` | Applies through `fgctl upgrade` and rolls back through `fgctl repair`, both existing doors |
 
 ## Phases
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Role charter for the two hands](phase-01-role-charter.md) | - | docs/platform/supervision/spec.md, docs/platform/session-host/spec.md, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, core/agents/secretary.yaml, core/agents/supervisor.yaml, .claude/agents/secretary.md, .claude/agents/supervisor.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 1 | draft |
-| 2 | [The fgos argv window and its permission table](phase-02-argv-window.md) | - | src/session-host/head-grants.mjs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, packages/session-host/contracts/head-permissions.v1.json, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, apps/fgos/src/routing.rs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, test/live/head-grant-probe.live.mjs, docs/platform/run-supervisor/spec.md | 1 | draft |
-| 3 | [Help channel and mail to the two hands](phase-03-help-and-mail.md) | 1, 2 | packages/session-host/contracts/head-permissions.v1.json, src/session-host/head-grants.mjs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, core/config-standard/secretary.yaml, core/config-schema/secretary.schema.yaml, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/**, docs/platform/supervision/spec.md | 2 | draft |
+| 2 | [The fgos argv window and its permission table, in Rust](phase-02-argv-window.md) | - | packages/session-host/rust/src/lib.rs, packages/session-host/rust/src/permissions.rs, packages/session-host/rust/src/forwarder.rs, packages/session-host/rust/tests/permissions.rs, packages/session-host/rust/tests/forwarder.rs, packages/session-host/rust/Cargo.toml, packages/session-host/contracts/head-permissions.v1.json, packages/git/node-addon/src/session_host.rs, packages/git/node-addon/src/lib.rs, packages/git/node-addon/Cargo.toml, src/native/door.mjs, Cargo.lock, src/session-host/head-grants.mjs, src/session-host/head-start.mjs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/contracts/envelope.v3.json, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, apps/fgos/src/routing.rs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, test/session-host/head-start.test.mjs, test/live/head-grant-probe.live.mjs, docs/platform/run-supervisor/spec.md | 1 | draft |
+| 3 | [Help channel and mail to the two hands](phase-03-help-and-mail.md) | 1, 2 | packages/session-host/contracts/head-permissions.v1.json, packages/session-host/rust/tests/permissions.rs, packages/session-host/rust/tests/forwarder.rs, core/config-standard/secretary.yaml, core/config-schema/secretary.schema.yaml, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/**, docs/platform/supervision/spec.md | 2 | draft |
 | 4 | [Cage: the role's own work runs inside](phase-04-cage-loosen.md) | 2 | src/runner/dispatch/confinement/workspace-paths.mjs, src/runner/dispatch/confinement/resources.mjs, test/runner/dispatch-confinement-policies.test.mjs, plans/261124-0004-heads-operate-without-owner/reports/cage-before-after.md | 2 | draft |
 | 5 | [Cage: a peers head keeps its own pid namespace](phase-05-cage-tighten.md) | 4 | src/runner/dispatch/confinement/drivers/bwrap.mjs, src/runner/dispatch/confinement/resources.mjs, test/runner/dispatch-confinement-machine-private.test.mjs, docs/platform/agent-confinement/spec.md, plans/261124-0004-heads-operate-without-owner/reports/cage-pid-namespace.md | 3 | draft |
-| 6 | [Domain-free release rule and the forgent recipe](phase-06-release-rule.md) | 3 | src/session-host/head-release.mjs, src/session-host/head-request.mjs, packages/session-host/contracts/head-permissions.v1.json, packages/run-supervisor/contracts/head-request.v1.json, test/session-host/head-release.test.mjs, core/config-standard/release.yaml, core/config-schema/release.schema.yaml, .fgos/config.yaml, core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 3 | draft |
+| 6 | [Domain-free release rule and the forgent recipe](phase-06-release-rule.md) | 3 | packages/session-host/rust/src/release.rs, packages/session-host/rust/src/lib.rs, packages/session-host/rust/tests/release.rs, packages/session-host/contracts/head-permissions.v1.json, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, core/config-standard/release.yaml, core/config-schema/release.schema.yaml, .fgos/config.yaml, core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 3 | draft |
 | 7 | [Integration, full suite and live probe](phase-07-integration.md) | 1, 2, 3, 4, 5, 6 | CHANGELOG.md, plans/261124-0004-heads-operate-without-owner/reports/head-grant-probe.md, plans/261124-0004-heads-operate-without-owner/reports/integration.md | 4 | draft |
 
 Wave reading (checked with `node scripts/plan-contract-check.mjs` and `fgos resource-check --plan`): wave 1 holds

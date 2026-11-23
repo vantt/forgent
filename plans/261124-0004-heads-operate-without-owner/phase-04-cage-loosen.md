@@ -17,6 +17,12 @@ the release to a grant (`validateWorkspacePaths`).
   owns `bwrap.mjs`).
 - `test/live/head-grant-probe.live.mjs` and `test/runner/dispatch-confinement-policies.test.mjs`.
 
+Owner of the driver: `src/runner/dispatch/confinement/**` is live Node that the Node-to-Rust inventory
+(`plans/discussions/ds-wham5txfkv-node-rust-port-inventory/DISCUSSION.md`, row 14) leaves to its later session-host
+and setup plans, none of which has a plan directory yet, and `261122-2108` (draft) lists `src/runner/dispatch/**`.
+So a fix here is made in place in these Node files; if `261122-2108` is active by the time this phase runs, the lead
+stops and asks the supervisor to order the two.
+
 ## Footprint
 
 `src/runner/dispatch/confinement/workspace-paths.mjs`, `src/runner/dispatch/confinement/resources.mjs`,

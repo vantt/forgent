@@ -1,101 +1,123 @@
-# Phase 2: The fgos argv window and its permission table
+# Phase 2: The fgos argv window and its permission table, in Rust
 
 Capability: `code:implement`.
 
 Builds PC-D6 (discussion §4) and the window part of PC-D3: one argv forwarder plus one data table, replacing the
-hand-written forward-only branches in the same change (L10, RUL104).
+hand-written forward-only branches in the same change (L10, RUL104). Per the discussion's Rust decision (commit
+`2b3336dae`), the table, the forwarder and `can-i` are Rust in `packages/session-host/rust`; this is the first slice of
+plan 3 of the Node-to-Rust inventory, and nothing else of session-host is ported here.
 
 ## Inputs
 
-- The discussion, §4 PC-D3 and PC-D6, §5 23:20 (the three holes to close), §6 "Lồng và ô cửa".
-- `src/session-host/head-grants.mjs`: `GRANTS`, `HEAD_VERBS`, `QUESTION_VERBS`, `LAND_VERBS`, `COORDINATION_VERBS`,
-  `PORTFOLIO_READ_VERBS`, `LEAD_VERBS`, `grantOf`. Its comment on Miu says she "never closes an event, types into a
-  pane, reads a session or tunes the watcher": rewrite it to PC-D1 here.
-- `src/session-host/head-request.mjs` `runHeadRequest` (about line 728): 28 `case` branches. The ones that only
-  check argument shapes and call `hostCall` are forward-only (`supervisor handled`, `supervisor raise`, `watcher tune`,
-  `session read`, `session type`, `metrics prune`, `friction record`, `config patch`, `supervisor queue|plans|wake`,
-  `slots`, `questions list`). Policy branches keep their code: `land`, `run`, `request result`, `session start`,
-  `session stop`, `session write`, the `questions ask|ack|cancel|answer` route, `session rotate|answered|restore role`,
-  `worktree create`, `supervisor done` (it stops the caller), `metrics record` (the `fgos.coordination.*` kind rule).
-- `src/session-host/head-request-client.mjs`: the per-verb client constants.
-- `packages/run-supervisor/contracts/head-request.v1.json`: `verbs`, `refusalCodes`, `envelope`.
-- `packages/run-supervisor/rust/src/head_request.rs`: `SUCCESSOR_READ_VERBS` (line 79), the check of
-  `envelope.session.verbs`.
-- `test/live/head-grant-probe.live.mjs`: reads the contract's `verbs`; it must read the new table instead.
+- The discussion, §4 PC-D3 and PC-D6, §5 23:20 (the three holes to close), §6 "Lồng và ô cửa", and the paragraph
+  "Chồng lấn với việc chuyển Node sang Rust".
+- `src/session-host/head-grants.mjs`: `GRANTS`, the verb arrays, `grantOf` (`{ writes, verbs, mailbox, peers }`). Its
+  comment on Miu says she "never closes an event, types into a pane, reads a session or tunes the watcher": the
+  replacement text follows PC-D1.
+- `src/session-host/head-start.mjs`: calls `grantOf` at launch and writes `session.verbs` and `session.writes` into the
+  envelope.
+- `src/session-host/head-request.mjs` `runHeadRequest` (about line 728): 28 `case` branches. Forward-only (they check
+  argument shapes and call `hostCall`): `supervisor handled`, `supervisor raise`, `watcher tune`, `session read`,
+  `session type`, `metrics prune`, `friction record`, `config patch`, `supervisor queue|plans|wake`, `slots`,
+  `questions list`. Policy branches that stay in Node until inventory plan 3 ports them: `land`, `run`,
+  `request result`, `session start`, `session stop`, the `questions ask|ack|cancel|answer` route,
+  `session rotate|answered|restore role`, `worktree create`, `supervisor done` (it stops the caller), `metrics record`
+  (the `fgos.coordination.*` kind rule). `session write` is already Rust.
+- `packages/run-supervisor/rust/src/head_request.rs`: the transport, the check of `envelope.session.verbs`,
+  `SUCCESSOR_READ_VERBS` (line 79), the hand-over to Node through `fgos internal head-request`.
+- `packages/run-supervisor/contracts/head-request.v1.json`, `envelope.v3.json`.
+- `packages/session-host/rust/src/` (the crate; `fgos-run-supervisor` already depends on it under `supervise`).
+- `packages/git/node-addon/src/` (the one Node addon; `writeScope` is the pattern of a small door) and
+  `src/native/door.mjs` (its version gate).
+- `test/live/head-grant-probe.live.mjs`: reads the contract's `verbs`; it must read the table instead.
 
 ## Footprint
 
-`src/session-host/head-grants.mjs`, `src/session-host/head-request.mjs`, `src/session-host/head-request-client.mjs`,
-`packages/session-host/contracts/head-permissions.v1.json` (new), `packages/run-supervisor/contracts/head-request.v1.json`,
+Rust: `packages/session-host/rust/src/lib.rs`, `packages/session-host/rust/src/permissions.rs` (new),
+`packages/session-host/rust/src/forwarder.rs` (new), `packages/session-host/rust/tests/permissions.rs` (new),
+`packages/session-host/rust/tests/forwarder.rs` (new), `packages/session-host/rust/Cargo.toml`, `Cargo.lock`,
 `packages/run-supervisor/rust/src/head_request.rs`, `packages/run-supervisor/rust/tests/head_request.rs`,
-`src/cli/command-registry.mjs`, `packages/host-runtime/contracts/command-manifest.json`,
+`packages/git/node-addon/src/session_host.rs` (new), `packages/git/node-addon/src/lib.rs`,
+`packages/git/node-addon/Cargo.toml`.
+Data and contracts: `packages/session-host/contracts/head-permissions.v1.json` (new),
+`packages/run-supervisor/contracts/head-request.v1.json`, `packages/run-supervisor/contracts/envelope.v3.json`.
+Node: `src/native/door.mjs`, `src/session-host/head-grants.mjs`, `src/session-host/head-start.mjs`,
+`src/session-host/head-request.mjs`, `src/session-host/head-request-client.mjs`, `test/session-host/head-grants.test.mjs`,
+`test/session-host/head-request.test.mjs`, `test/session-host/head-start.test.mjs`, `test/live/head-grant-probe.live.mjs`.
+CLI registration of `can-i`: `src/cli/command-registry.mjs`, `packages/host-runtime/contracts/command-manifest.json`,
 `packages/host-runtime/contracts/command-routes.json`, `packages/host-runtime/contracts/command-route-annotations.json`,
-`apps/fgos/src/routing.rs`, `test/session-host/head-grants.test.mjs`, `test/session-host/head-request.test.mjs`,
-`test/live/head-grant-probe.live.mjs`, `docs/platform/run-supervisor/spec.md`.
+`apps/fgos/src/routing.rs`. Docs: `docs/platform/run-supervisor/spec.md`.
 
-## Decisions taken in this phase (planner's, within PC-D6)
+## Decisions taken in this phase (planner's, within PC-D6 and the Rust decision)
 
-- **Where the table lives:** `packages/session-host/contracts/head-permissions.v1.json`, shipped in the release and
-  read only by `grantOf`. It is not a config key, so `config patch` can never widen it; it changes only through a
-  landed code change.
-- **Table shape:** rows `{ persona, prefix, decision: allow|ask|deny, read?: true }`; personas inherit
-  `head < supervisor < secretary` (lead, planner and shaper are `head` plus their own rows). The most specific prefix
-  wins; on a tie the strictest decision wins (`deny` > `ask` > `allow`). An argv no row matches is `ask`.
-  `read: true` marks the verbs a rotation successor may use before it holds the role (replaces
-  `SUCCESSOR_READ_VERBS`).
-- **Who decides:** `grantOf` resolves the persona's rows into the envelope at launch (digest-protected, as
-  `session.verbs` is today); the Rust run supervisor matches the request argv against them, so a sandbox cannot change
-  the answer. `fgos can-i <argv...>` is answered by the run supervisor itself from the same rows, with no route child,
+- **Where the table lives:** `packages/session-host/contracts/head-permissions.v1.json`, compiled into the crate
+  (`include_str!`) and read only by `permissions.rs`. It is not a config key, so `config patch` can never widen it; it
+  changes only through a landed code change.
+- **Table shape:** per persona: `writes`, `mailbox`, `peers` (the cage size), and rules
+  `{ prefix, decision: allow|ask|deny, read?: true, args?: {...} }`. Personas inherit `head < supervisor < secretary`
+  (lead, planner and shaper are `head` plus their own rows; a lead's `writes` stays its plan dir, filled in by the
+  caller as today). The most specific prefix wins; on a tie the strictest decision wins (`deny` > `ask` > `allow`). An
+  argv no rule matches is `ask`. `read: true` marks the verbs a rotation successor may use before it holds the role.
+  `args` limits a flag's value (used by phase 3 for `--kind` and `--to`).
+- **Who decides:** the run supervisor resolves the caller's persona from `envelope.session.role` (digest-protected)
+  and asks `permissions.rs`; the sandbox cannot change the answer. `envelope.session.verbs` is retired in the same
+  change. `fgos can-i <argv...>` is answered by the run supervisor itself from the same function, with no route child,
   like `session bind session`.
-- **`ask`:** the route files one five-part question with `fgos questions ask` (form of
+- **`allow`:** `forwarder.rs` validates the argv and the run supervisor execs the host's own `fgos` (envelope hostBin)
+  with that argv plus `--json`, from the project root, no shell, no Node hop. A verb whose rule says `policy: node`
+  (the kept Node branches) still goes to `fgos internal head-request` as today.
+- **`ask`:** the run supervisor files one five-part question (`fgos questions ask`, form of
   `core/skills/_shared/decision-question.md`) whose body carries the exact argv, and replies `asked` with the `q-` id.
-- **Arguments the forwarder refuses for every persona (`deny`, code `argv-not-allowed`):** any flag that changes the
-  project root, cwd or environment (`-C`, `--cwd`, `--root`, `--project`, `--env`, and an argv element that is not a
-  plain string); `fgctl` and `fgos release activate` style activation (phase 6 replaces this deny with its policy
-  branch); `config patch` whose edits touch a key under the grant, confinement or `release` prefixes (the patch file
-  is read on the host side before the call; the exact key prefix list is a constant beside the table and named in the
+- **Refused for every persona (`deny`, code `argv-not-allowed`):** any flag that changes the project root, cwd or
+  environment (`-C`, `--cwd`, `--root`, `--project`, `--env`) and any argv element that is not a plain string; an argv
+  that is not an `fgos` verb (raw shell is never a row); activation of a release (phase 6 replaces this with its
+  policy branch); `config patch` whose edits touch a key under the grant, confinement or `release` prefixes (the
+  forwarder reads the patch file before the call; the key prefix list is a constant in `permissions.rs`, named in the
   contract).
+- **Node reads the cage size through a thin port:** `grantOf` keeps its signature and becomes a call to the addon's
+  `sessionHost.grantOf` (new door, gated in `door.mjs`), until inventory plan 3 ports the launch.
 
 ## Steps
 
-1. Write `head-permissions.v1.json` with the rows that reproduce today's grants exactly (one row per verb a persona
-   holds), then add for the supervisor and, through inheritance, the secretary: `config patch` (allow, with the key
-   deny above), `worktree remove --delivered-to` (allow; refused by the verb itself when not landed),
-   `git recover` (allow), `dispatch probe-account` (allow), `session write plans/backlog.md` (already in source).
-   Raw shell is not a row: an argv must start with an `fgos` verb.
-2. Change `grantOf` to read the table; keep its signature (`{ writes, verbs, mailbox, peers }`) and add `rules`.
-   Delete the verb arrays that the table now holds.
-3. Replace the forward-only `case` branches of `runHeadRequest` with one forwarder: validate argv elements (strings,
-   no leading-dash values where the verb takes a value, bounded lengths as today), run the host verb with
-   `execFile`-style argv (no shell) through the existing `hostCall`, with `--json` appended. Keep the policy branches.
-4. In `head_request.rs`, match the request argv against `envelope.session.rules`; delete `SUCCESSOR_READ_VERBS` and
-   read the `read` flag. Serve `can-i` from the rules.
-5. Update `head-request.v1.json`: the forwarder frame (`verb: "fgos"`, `args.argv`), the decision and refusal codes
-   (`argv-not-allowed`, `asked`), the `can-i` reply; remove the per-verb entries of the deleted branches. Register
-   `can-i` in `src/cli/command-registry.mjs`, the host-runtime contracts and `apps/fgos/src/routing.rs`. Update
+1. Write `head-permissions.v1.json` with rows that reproduce today's grants exactly (cage size and verbs per persona),
+   then add for the supervisor and, through inheritance, the secretary: `config patch` (allow, with the key deny
+   above), `worktree remove --delivered-to` (allow; the verb refuses itself when not landed), `git recover` (allow),
+   `dispatch probe-account` (allow). `session write plans/backlog.md` is already a write grant in source.
+2. Write `permissions.rs` (load, inherit, match, decide, cage size) and `forwarder.rs` (argv validation, the deny rules,
+   the exec description), exported from `lib.rs`. Owning proofs in `tests/permissions.rs` (inheritance, most specific
+   prefix, strictest tie, default `ask`, the successor `read` flag, the parity of today's grants) and
+   `tests/forwarder.rs` (one test per deny rule: grant/confinement/release key in `config patch`, a cwd/root/env flag,
+   a non-`fgos` argv, activation).
+3. In `head_request.rs`: decide with `permissions.rs`; for `allow` exec through the forwarder; for `ask` file the
+   question; for `deny` refuse; serve `can-i`. Delete `SUCCESSOR_READ_VERBS` and the `session.verbs` check. Wiring proof
+   in `packages/run-supervisor/rust/tests/head_request.rs`: one allowed forward, one ask, one deny, one `can-i`.
+4. Delete the forward-only `case` branches of `runHeadRequest` and their argument tests in
+   `test/session-host/head-request.test.mjs`, naming in the commit the Rust test that now owns each behaviour. Update
    `head-request-client.mjs` so every head-side verb sends the forwarder frame.
-6. Point `test/live/head-grant-probe.live.mjs` at the table: expected outcomes come from the persona's rules, and it
-   adds one `can-i` call per row class.
-7. Tests (extend the owning files, no copies): `head-grants.test.mjs` owns the table resolution (inheritance, most
-   specific prefix, strictest tie, default `ask`); `head-request.test.mjs` owns the forwarder (allow runs with no
-   shell, ask files a question carrying the argv, one test per deny rule: grant/confinement/release key in
-   `config patch`, a cwd/root/env flag, activation); `packages/run-supervisor/rust/tests/head_request.rs` owns the
-   Rust match and the successor `read` flag. Retire the per-branch argument tests whose branch is deleted, naming in
-   the commit the forwarder test that now owns each behaviour.
+5. Add the addon door `sessionHost.grantOf` and gate it in `door.mjs`; make `grantOf` in `head-grants.mjs` call it and
+   delete `GRANTS` and the verb arrays; drop `session.verbs` from the envelope in `head-start.mjs` and
+   `envelope.v3.json`. `test/session-host/head-grants.test.mjs` keeps one wiring proof (the port answers a persona's
+   cage size); `head-start.test.mjs` drops its `session.verbs` expectation.
+6. Contracts: `head-request.v1.json` gets the forwarder frame (`verb: "fgos"`, `args.argv`), the decisions and refusal
+   codes (`argv-not-allowed`, `asked`) and `can-i`, and loses the per-verb entries of deleted branches. Register
+   `can-i` in the CLI registry, the host-runtime contracts and `apps/fgos/src/routing.rs`.
+7. Point `test/live/head-grant-probe.live.mjs` at the table: expected outcomes come from the persona's rules, and it
+   adds one `can-i` call per decision.
 8. Update `docs/platform/run-supervisor/spec.md` for the new frame and decisions.
 
 ## Verify
 
 ```bash
-node --test test/session-host/head-request.test.mjs test/session-host/head-grants.test.mjs
+cargo test -p fgos-session-host
 cargo test -p fgos-run-supervisor
+node --test test/session-host/head-request.test.mjs test/session-host/head-grants.test.mjs test/session-host/head-start.test.mjs
 node --test test/cli/subcommand-flag-drift.test.mjs
 ```
 
-Pass: all green; `rg -n "SUCCESSOR_READ_VERBS" packages src` finds nothing; `rg -c "case HEAD_" src/session-host/head-request.mjs`
-counts only the policy branches listed above.
+Pass: all green; `rg -n "SUCCESSOR_READ_VERBS|const GRANTS" packages src` finds nothing; `rg -c "case HEAD_" src/session-host/head-request.mjs`
+counts only the kept Node policy branches listed above.
 
 ## Rollback
 
-`git revert` the phase's commits; the old branches and constant come back together, since they were removed in the
-same commits.
+`git revert` the phase's commits; the Node table, branches and constant come back together, since they were removed in
+the same commits. Rebuild the addon.

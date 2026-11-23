@@ -13,6 +13,12 @@ Builds the tightening half of PC-D7 for `p-oqs75qwyco`: a peers-granted head (se
 - `docs/platform/agent-confinement/spec.md` §9.1, grant `peer-sessions`.
 - `test/runner/dispatch-confinement-machine-private.test.mjs`.
 
+Owner of the driver: `src/runner/dispatch/confinement/**` is live Node that the Node-to-Rust inventory
+(`plans/discussions/ds-wham5txfkv-node-rust-port-inventory/DISCUSSION.md`, row 14) leaves to its later session-host
+and setup plans, none of which has a plan directory yet, and `261122-2108` (draft) lists `src/runner/dispatch/**`.
+So a fix here is made in place in these Node files; if `261122-2108` is active by the time this phase runs, the lead
+stops and asks the supervisor to order the two.
+
 ## Footprint
 
 `src/runner/dispatch/confinement/drivers/bwrap.mjs`, `src/runner/dispatch/confinement/resources.mjs`,
