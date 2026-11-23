@@ -6,7 +6,7 @@
 - `9815769ef0cee17b` (coordination-help, raised by me): the heads-stable lead was idle with unfinished phases. The routing message I typed earlier was still unsent in its input box.
 
 ## Actions
-- `fgos session type` puts text in the pane but never presses Enter, so typed routing never reaches an idle head. Recorded as friction against `verb:session-type`.
+- `fgos session type` puts text in the pane but never presses Enter, so typed routing never reaches an idle head. `fgos friction record` refused both subjects I tried (`verb:session-type`, `component:session-host`) with `friction-invalid-input`, so this defect is not recorded yet.
 - Landed `da9a0b376`: the main npm reds are routed into `heads-stable-and-able/phase-11` (2 reds from the phase 13 grant) and `component-authority-doors/phase-08` (9 reds from the model load).
 - Replaced the heads-stable lead (stop, then start). The new holder is `worker-nz7v@fg-server2`.
 
