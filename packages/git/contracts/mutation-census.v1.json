@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3a9c293aa1dffb5c88e97cc77e91ba7b551f73013d96c2f97264ac8fa368b2fd",
+  "payloadDigest": "b806502c320de706c6eb1a47b4386ed8efe72b60e527696f8578f76f9c79d83c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1377,7 +1377,7 @@
     "scripts/executor-model-vectors.mjs": "0f8a88edb85c94d4e36cf0813f7d5f28ed0dffed9f836c3fc99742cf1fa02c72",
     "scripts/explain-command-route.mjs": "db546d74676a1c91c3309241dcb618dc438fbae79448f4e2253319657dbbee24",
     "scripts/export-command-selectors.mjs": "8347ac6f9232df87b1e4b3ab8ec20063872796b36119ffb3b3d9c0ba10a4e521",
-    "scripts/fgos-session-start-hook.mjs": "60c25568df0462e4c0ef7a27f68c2ad450c53c17f4fe81eb5f5c6944b4febc68",
+    "scripts/fgos-session-start-hook.mjs": "102b8a95b9d4ff0097fbb72e550854d3a05805d446c610c5ac6a01c8f304fe12",
     "scripts/fgos-shell-integration.sh": "657a8a83677992b9890a4400e1f5eb3423947904cd41bb5e84bf2dfb2286bad4",
     "scripts/git-addon.mjs": "f004d096788be529a044c9185ce884559a4c9d91db0958523fff500371d55016",
     "scripts/git/e1-power-cut.mjs": "73da033846ea409abd7a8b36827aaf0a2caa6e6cd822878b5d332c536169ec9d",
@@ -1666,7 +1666,6 @@
     "src/setup/mailbox-limits.mjs": "b8ed2c018a71ee1a06582ea90c7a73ec1a7ebe29e3d931f9a2ba89108a763323",
     "src/setup/registrations.mjs": "2434ef9feecd3c7f9ebf93e92aab22791d774b2167426f684b3acdee858e634c",
     "src/setup/seat-binding-checks.mjs": "caf11494333872b9b2e6c516bb5b84e44824e7a9aacbcdd6c0b42d7de2393085",
-    "src/setup/shell-rc.mjs": "260deb1e3dddb3b9f006bb8eab34f39f656f64188b004542effd9fc7072a0bd4",
     "src/setup/skill-wrappers.mjs": "362dfdfb10c62bf90f8f7205db1dcfdc67f013fc62a24501e6e6cec2eb2fffb2",
     "src/setup/workflow-case-checks.mjs": "9b187678986f33683b456a75565026e0d86be858cc8281feb86e8b660a6e4ba1",
     "src/setup/workflow-catalog-reader.mjs": "7056fca651ea1ebafa0445449fb63722509104f09d3527ba4af5ee10f691c379",

@@ -8,9 +8,7 @@
 // resolution failure (not a git repo, no HEAD yet) degrades to silence
 // rather than blocking or noising up every session opened in this repo.
 
-import os from 'node:os';
 import { resolveMainCheckoutRoot, resolveLogsDir, resolveSkillRoot } from '../src/runner/paths.mjs';
-import { detectRcFiles } from '../src/setup/shell-rc.mjs';
 import { fgosDirFromRoot } from '../src/util/fgos-file-registry.mjs';
 
 function main() {
@@ -18,7 +16,6 @@ function main() {
   const fgosDir = fgosDirFromRoot(repoRoot);
   const logsDir = resolveLogsDir(fgosDir);
   const skillRoot = resolveSkillRoot();
-  const profileFiles = detectRcFiles(os.homedir());
 
   const lines = [
     'fgOS canonical paths:',
@@ -26,7 +23,6 @@ function main() {
     `- logs: ${logsDir}`,
   ];
   if (skillRoot) lines.push(`- skill root: ${skillRoot}`);
-  if (profileFiles.length > 0) lines.push(`- shell profile(s): ${profileFiles.join(', ')}`);
 
   console.log(lines.join('\n'));
 }
