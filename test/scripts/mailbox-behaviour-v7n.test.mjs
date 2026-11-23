@@ -22,7 +22,9 @@ const shaOf = (rel) => crypto.createHash('sha256').update(fs.readFileSync(path.j
 const m = v7j.MEASURES.v7n;
 const line = (cell, n, outcome, extra = {}) => ({ runId: `${cell.id.replaceAll('/', '.')}.${n}`, cell: cell.id, cli: 'claude', arm: 'T', variant: cell.variant, outcome, acted: outcome === 'acted', stage: 'A', ...extra });
 
-test('the frozen V7n addendum binds V6\'s pre-registration, names instruction version 3 by hash, sends Claude Code\'s socket frame by its hash, and matches what the runner would freeze', () => {
+// The addendum stays the record of what was measured in 2026-10; the harness bytes it froze changed when the Node hook
+// table was retired, so it is no longer compared with a rebuild. The re-measurement owns a new frozen set.
+test('the frozen V7n addendum binds V6\'s pre-registration, names instruction version 3 by hash and sends Claude Code\'s socket frame by its hash', () => {
   const frozen = JSON.parse(fs.readFileSync(path.join(REPO, v7.addendumFile('v7n')), 'utf8'));
   assert.equal(frozen.addendumTo.sha256, '484eb1c0a5a8781cc637380f6b0b84010c1676d33a5314419b8c8a19313cfb16');
   assert.equal(frozen.addendumTo.sha256, shaOf(v7.PREREGISTRATION_FILE));
@@ -33,8 +35,6 @@ test('the frozen V7n addendum binds V6\'s pre-registration, names instruction ve
   assert.equal(crypto.createHash('sha256').update(frozen.turn2).digest('hex'), v7g.FRAME_SHA256);
   assert.equal(frozen.channel, 'NS');
   assert.deepEqual(frozen.clis, [{ cli: 'claude', model: 'haiku', effort: 'medium', account: 'owner' }]);
-  const rebuilt = m.build({ repo: REPO, preregistrationSha256: frozen.addendumTo.sha256, versions: frozen.versions, seed: frozen.seed });
-  assert.deepEqual(v7.addendumProblems(frozen, rebuilt), [], 'a change to a frozen module after the freeze is a new measurement');
 });
 
 test('V7n plans 24 runs with the harmful cells first at 4 each, holds its own ceiling of 30 apart from the 2A total, and has no sibling stop', () => {
