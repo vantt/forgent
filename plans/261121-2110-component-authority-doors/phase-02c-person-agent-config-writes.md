@@ -1,11 +1,11 @@
 # Phase 2c: Retire the wire-agents settings wording in the Node registry (door row `person-agent-config-writes`)
 
 ## Inputs
-- Row `packages/component-authority/model/doors/person-agent-config-writes.json`. Survivors: `packages/distribution/rust/src/agent_config.rs`, `apps/fgos/src/wiring/wire_agents.rs`. Debt: `src/cli/command-registry.mjs`, whose wire-agents description names settings the verb never sets.
+- Row `packages/component-authority/model/doors/person-agent-config-writes.yaml`. Survivors: `packages/distribution/rust/src/agent_config.rs`, `apps/fgos/src/wiring/wire_agents.rs`. Debt: `src/cli/command-registry.mjs`, whose wire-agents description names settings the verb never sets.
 - The same description is mirrored in `packages/host-runtime/contracts/command-manifest.json` (entry `wire-agents`), exported by `scripts/export-command-selectors.mjs`.
 
 ## Files it may write
-src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/component-authority/model/doors/person-agent-config-writes.json
+src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/component-authority/model/doors/person-agent-config-writes.yaml
 
 ## Rules every retirement step follows
 - No twin (CA-D2, discussion §3 row 3d): every caller moves to the survivor and the copy is deleted in the same commit. The commit message names the survivor, the deleted path and the last SHA that still had it. The owning area spec's "Lịch sử quyết định" line goes in the phase report for phase 11 to place.

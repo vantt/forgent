@@ -4,11 +4,11 @@
 Phase 2a, which deletes `src/setup/agent-hooks.mjs`, the only debt file of this row. The phase stays `draft` until 2a is `done`.
 
 ## Inputs
-- Row `packages/component-authority/model/doors/delete-guard-keyword-list.json`. Survivor: `packages/distribution/rust/src/agent_hooks.rs`. Debt: `src/setup/agent-hooks.mjs` (its own literal keyword list).
+- Row `packages/component-authority/model/doors/delete-guard-keyword-list.yaml`. Survivor: `packages/distribution/rust/src/agent_hooks.rs`. Debt: `src/setup/agent-hooks.mjs` (its own literal keyword list).
 - `test/setup/agent-hooks.test.mjs` pinned the Node literal list equal to the data file; phase 2a deletes that test.
 
 ## Files it may write
-packages/distribution/rust/src/agent_hooks.rs, packages/component-authority/model/doors/delete-guard-keyword-list.json
+packages/distribution/rust/src/agent_hooks.rs, packages/component-authority/model/doors/delete-guard-keyword-list.yaml
 
 ## Rules every retirement step follows
 - No twin (CA-D2, discussion §3 row 3d): every caller moves to the survivor and the copy is deleted in the same commit. The commit message names the survivor, the deleted path and the last SHA that still had it. The owning area spec's "Lịch sử quyết định" line goes in the phase report for phase 11 to place.

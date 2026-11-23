@@ -4,10 +4,10 @@
 Phase 8 of `261122-2108-delete-dead-node-execution-closure`, which owns deleting `src/runner/dispatch/plan.mjs` and rewiring its two test importers (`test/state/work-size-rigor.test.mjs`, `test/setup/capability-catalog-doctrine.test.mjs`; both in that plan's files). The phase stays `draft` until that phase lands.
 
 ## Inputs
-- Row `packages/component-authority/model/doors/decide-a-dispatch.json`. Survivor: `packages/execution/rust/src/decide.rs`. Debt: `src/runner/dispatch/plan.mjs`.
+- Row `packages/component-authority/model/doors/decide-a-dispatch.yaml`. Survivor: `packages/execution/rust/src/decide.rs`. Debt: `src/runner/dispatch/plan.mjs`.
 
 ## Files it may write
-packages/component-authority/model/doors/decide-a-dispatch.json
+packages/component-authority/model/doors/decide-a-dispatch.yaml
 
 ## Rules every retirement step follows
 - No twin (CA-D2, discussion §3 row 3d): every caller moves to the survivor and the copy is deleted in the same commit. The commit message names the survivor, the deleted path and the last SHA that still had it. The owning area spec's "Lịch sử quyết định" line goes in the phase report for phase 11 to place.

@@ -6,10 +6,10 @@
 The phase stays `draft` until both land. The row's `apps/fgos-gateway/src/gateway.rs` entry is phase 9's.
 
 ## Inputs
-- Row `packages/component-authority/model/doors/global-fgos-directory.json`. Survivors: `packages/config/rust/src/machine.rs`, `src/config/facade.mjs`. Debt for this phase: the three files above.
+- Row `packages/component-authority/model/doors/global-fgos-directory.yaml`. Survivors: `packages/config/rust/src/machine.rs`, `src/config/facade.mjs`. Debt for this phase: the three files above.
 
 ## Files it may write
-packages/component-authority/model/doors/global-fgos-directory.json
+packages/component-authority/model/doors/global-fgos-directory.yaml
 
 ## Rules every retirement step follows
 - No twin (CA-D2, discussion §3 row 3d): every caller moves to the survivor and the copy is deleted in the same commit. The commit message names the survivor, the deleted path and the last SHA that still had it. The owning area spec's "Lịch sử quyết định" line goes in the phase report for phase 11 to place.

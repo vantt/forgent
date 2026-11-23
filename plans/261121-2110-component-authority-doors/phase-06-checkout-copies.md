@@ -7,7 +7,7 @@
 - Discussion §3 row 3e(1): two native worktree doors live side by side (the `GitWorktree` port and the `fgos-checkout` crate, both used in src/runner/merge.mjs). This row's `allowed` names the survivor. If the row does not settle which of the two survives, stop and report (Status NEEDS_CONTEXT) with both call-site counts. That choice moves a decision kind, so it needs a plan that names the survivor.
 
 ## Files it may write
-src/cli/command-registry.mjs, src/runner/repo-locks.mjs, src/workflow/unit-handoff.mjs, src/runner/merge.mjs, scripts/lib/git-ports.mjs, test/runner/repo-locks*, test/workflow/unit-handoff*, test/runner/merge*, packages/component-authority/model/doors/checkout-make-provision-remove.json
+src/cli/command-registry.mjs, src/runner/repo-locks.mjs, src/workflow/unit-handoff.mjs, src/runner/merge.mjs, scripts/lib/git-ports.mjs, test/runner/repo-locks*, test/workflow/unit-handoff*, test/runner/merge*, packages/component-authority/model/doors/checkout-make-provision-remove.yaml
 
 ## Steps
 1. For each row and each debt file, find the behaviour the copy gives its callers. Find the test that owns that behaviour; if none does, record vectors from the copy and add a replay test on the survivor, in the survivor's own test file (design principle 8).

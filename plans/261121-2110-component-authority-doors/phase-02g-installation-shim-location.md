@@ -4,10 +4,10 @@
 Backlog item `p-rypvkc3kai` (the herdr driver resolves the installation shim path on its own). Moving `packages/herdr-fgos-common/rust/src/fgos.rs` onto the distribution crate adds a crate edge; the owner placed that edge in its own item (q-swxkda2x5r A). The phase stays `draft` until that item lands.
 
 ## Inputs
-- Row `packages/component-authority/model/doors/installation-shim-location.json`. Survivors: the row's `allowed` (`packages/distribution/rust/src/shim.rs` and the others). Debt: `packages/herdr-fgos-common/rust/src/fgos.rs` (builds `.fgos/installation/bin/fgos` itself, about lines 375 and 387).
+- Row `packages/component-authority/model/doors/installation-shim-location.yaml`. Survivors: the row's `allowed` (`packages/distribution/rust/src/shim.rs` and the others). Debt: `packages/herdr-fgos-common/rust/src/fgos.rs` (builds `.fgos/installation/bin/fgos` itself, about lines 375 and 387).
 
 ## Files it may write
-packages/component-authority/model/doors/installation-shim-location.json
+packages/component-authority/model/doors/installation-shim-location.yaml
 
 ## Rules every retirement step follows
 - No twin (CA-D2, discussion §3 row 3d): every caller moves to the survivor and the copy is deleted in the same commit. The commit message names the survivor, the deleted path and the last SHA that still had it. The owning area spec's "Lịch sử quyết định" line goes in the phase report for phase 11 to place.

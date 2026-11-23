@@ -7,7 +7,7 @@
 - The survivor is the `packages/process` entry point that phase 8 settled. Read phase 8's report first.
 
 ## Files it may write
-the files named in plan.md row 9, and packages/component-authority/model/doors/global-fgos-directory.json only for the gateway entry
+the files named in plan.md row 9, and packages/component-authority/model/doors/global-fgos-directory.yaml only for the gateway entry
 
 ## Steps
 1. For each row and each debt file, find the behaviour the copy gives its callers. Find the test that owns that behaviour; if none does, record vectors from the copy and add a replay test on the survivor, in the survivor's own test file (design principle 8).

@@ -1,12 +1,12 @@
 # Phase 2d: Retire the Node shell-rc detector (door row `shell-rc-fgos-lines`)
 
 ## Inputs
-- Row `packages/component-authority/model/doors/shell-rc-fgos-lines.json`. Survivor: `packages/distribution/rust/src/rc_lines.rs` (`detect_rc_files`). Debt: `src/setup/shell-rc.mjs`.
+- Row `packages/component-authority/model/doors/shell-rc-fgos-lines.yaml`. Survivor: `packages/distribution/rust/src/rc_lines.rs` (`detect_rc_files`). Debt: `src/setup/shell-rc.mjs`.
 - Only caller: `scripts/fgos-session-start-hook.mjs:13` (`detectRcFiles`), the repository's own SessionStart hook (`.claude/settings.json`). It prints the rc file names as one convenience context line. No verb exposes `detect_rc_files`, and adding one would be a new door (RUL104). The shell profiles a user needs are already named by `fgctl uninstall` and doctor through `rc_lines.rs`.
 - Shape choice settled here: the hook drops the `shell profile(s)` line instead of gaining a new verb.
 
 ## Files it may write
-src/setup/shell-rc.mjs, scripts/fgos-session-start-hook.mjs, test/setup/shell-rc.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/shell-rc-fgos-lines.json
+src/setup/shell-rc.mjs, scripts/fgos-session-start-hook.mjs, test/setup/shell-rc.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/shell-rc-fgos-lines.yaml
 
 ## Rules every retirement step follows
 - No twin (CA-D2, discussion §3 row 3d): every caller moves to the survivor and the copy is deleted in the same commit. The commit message names the survivor, the deleted path and the last SHA that still had it. The owning area spec's "Lịch sử quyết định" line goes in the phase report for phase 11 to place.

@@ -5,7 +5,7 @@
 - `scripts/git-one-door-scan.mjs` (primitive matching).
 - The knowledge note on why the `orchestrator` word guard was retired (decision 0031,
   `docs/knowledge/why-the-launcher-vocabulary-word-guard-was-retired-right-aft*/`).
-- `packages/component-authority/model/doors/*.json` after phases 2-9, and `contracts/model.v1.json`.
+- `packages/component-authority/model/doors/*.yaml` after phases 2-9, and `contracts/model.v1.json`.
 
 ## Files it may write
 test/architecture.test.mjs, packages/component-authority/model/doors/, packages/component-authority/contracts/model.v1.json, docs/platform/component-authority/spec.md

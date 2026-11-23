@@ -4,11 +4,11 @@
 The mailbox lane's re-measurement of its frozen experiment sets without the Node hook table (the row's `retiredBy`). Until then `src/setup/agent-hooks.mjs` and `scripts/lib/mailbox-live-confined.mjs` are frozen measurement inputs: their bytes are hashed by `test/live/mailbox-behaviour.v7e/v7h/v7i/v7j-addendum.json` and asserted by `test/scripts/mailbox-behaviour-v7*.test.mjs` (unit report reports/unit-261123-0819-p02-result.md). No backlog item owns that re-measurement yet; the supervisor asks the secretary for one. The phase stays `draft` until it lands.
 
 ## Inputs
-- Row `packages/component-authority/model/doors/agent-hook-table.json`. Survivor: `packages/distribution/rust/src/agent_hooks.rs`. Debt: `src/setup/agent-hooks.mjs`, `scripts/lib/mailbox-live-confined.mjs`.
+- Row `packages/component-authority/model/doors/agent-hook-table.yaml`. Survivor: `packages/distribution/rust/src/agent_hooks.rs`. Debt: `src/setup/agent-hooks.mjs`, `scripts/lib/mailbox-live-confined.mjs`.
 - Callers today: `test/live/mailbox-claude.live.mjs`, `test/live/mailbox-behaviour.live.mjs`, `scripts/lib/mailbox-behaviour-run.mjs`, `scripts/lib/mailbox-behaviour-ack.mjs`, `test/scripts/mailbox-live-confined.test.mjs`, `test/setup/agent-hooks.test.mjs`. After the re-measurement the mailbox lane's files no longer import either debt file; re-check with `rg`.
 
 ## Files it may write
-src/setup/agent-hooks.mjs, scripts/lib/mailbox-live-confined.mjs, test/setup/agent-hooks.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/agent-hook-table.json
+src/setup/agent-hooks.mjs, scripts/lib/mailbox-live-confined.mjs, test/setup/agent-hooks.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/agent-hook-table.yaml
 
 ## Rules every retirement step follows
 - No twin (CA-D2, discussion §3 row 3d): every caller moves to the survivor and the copy is deleted in the same commit. The commit message names the survivor, the deleted path and the last SHA that still had it. The owning area spec's "Lịch sử quyết định" line goes in the phase report for phase 11 to place.

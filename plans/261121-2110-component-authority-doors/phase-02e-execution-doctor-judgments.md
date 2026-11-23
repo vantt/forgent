@@ -1,12 +1,12 @@
 # Phase 2e: Retire the dead Node agy sub-home finder (door row `execution-doctor-judgments`)
 
 ## Inputs
-- Row `packages/component-authority/model/doors/execution-doctor-judgments.json`. Survivor: `find_sub_homes` in `packages/execution/rust/src/checks.rs`. Debt: `src/setup/agy-permissions.mjs` (`findAgySubHomes`), last changed in 6b37add13.
+- Row `packages/component-authority/model/doors/execution-doctor-judgments.yaml`. Survivor: `find_sub_homes` in `packages/execution/rust/src/checks.rs`. Debt: `src/setup/agy-permissions.mjs` (`findAgySubHomes`), last changed in 6b37add13.
 - No product code imports it. References: `test/setup/agy-permissions.test.mjs` (two `findAgySubHomes` cases, one of them the gemini pool of `runner.llmAccounts`), and a synthetic path in the guard test at `test/architecture.test.mjs:2149`.
 - This file is outside `261122-2108-delete-dead-node-execution-closure`'s directories, so this phase retires it and does not wait for that plan.
 
 ## Files it may write
-src/setup/agy-permissions.mjs, test/setup/agy-permissions.test.mjs, packages/execution/rust/src/checks.rs, test/architecture.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/execution-doctor-judgments.json
+src/setup/agy-permissions.mjs, test/setup/agy-permissions.test.mjs, packages/execution/rust/src/checks.rs, test/architecture.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/execution-doctor-judgments.yaml
 
 ## Rules every retirement step follows
 - No twin (CA-D2, discussion §3 row 3d): every caller moves to the survivor and the copy is deleted in the same commit. The commit message names the survivor, the deleted path and the last SHA that still had it. The owning area spec's "Lịch sử quyết định" line goes in the phase report for phase 11 to place.

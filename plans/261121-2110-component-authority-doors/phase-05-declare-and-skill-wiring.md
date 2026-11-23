@@ -1,7 +1,7 @@
 # Phase 5: `declare`, the Authority-map rule and the skill wiring
 
 ## Inputs
-- Phase 1's crate and verb.
+- Phase 1's crate and verb, and phase 1b's YAML model (`*.yaml` files read through `fgos-yaml-doc`).
 - `docs/platform/component-authority/spec.md` (doors, and who calls them).
 - `docs/platform/documentation/subcomponents/admission/spec.md:28-30,158` (the admission model).
 - `packages/questions/rust/` (read API for a question's state).
@@ -24,8 +24,9 @@ packages/component-authority/rust/, Cargo.lock, apps/fgos/src/main.rs, test/cli/
    - `--move` of a decision kind's owner requires `--plan` naming an existing plan dir whose `plan.md` Authority map
      names the survivor.
 
-   On success, write the row into the model file in the working tree (atomic write through the durable-file door,
-   never a private rename) and print it. The commit that lands it is the caller's. Add crate and verb tests for each refusal.
+   On success, write the row into the model's YAML file in the working tree and print it. The new text comes from
+   the YAML door's comment-keeping editor (`fgos-yaml-doc` `edit`), never hand-built YAML, so people's annotations
+   on other rows survive. The write is atomic through the durable-file door, never a private rename. The commit that lands it is the caller's. Add crate and verb tests for each refusal.
 2. `plan-contract.md`:
    - Add body section **Authority map**, between Non-goals and Phases: a table "New thing | Model row | Note".
      Each new decision, function, module, verb or contract maps to a row id from `fgos authority locate`, or to
@@ -70,8 +71,8 @@ packages/component-authority/rust/, Cargo.lock, apps/fgos/src/main.rs, test/cli/
      answer the skills record (step 5). A directory that exists but is missing a file is still refused by the
      loader, as in phase 1.
    - The first `declare` in a project with no model creates an empty one at the resolved path (in a project other
-     than fgOS, under `.fgos/authority/model/`): `layers.json`, `components.json`,
-     `decision-kinds.json`, `contracts.json` and `doors/`, each with no rows and valid against
+     than fgOS, under `.fgos/authority/model/`): `layers.yaml`, `components.yaml`,
+     `decision-kinds.yaml`, `contracts.yaml` and `doors/` (YAML, as phase 1b made the model), each with no rows and valid against
      `packages/component-authority/contracts/model.v1.json`. It then writes the declared row. Every write goes
      through the durable-file door. The `--approved-by` rule of step 1 still holds, so a new component or decision
      kind still needs an answered owner question; a refused `declare` creates nothing.

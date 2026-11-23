@@ -4,10 +4,10 @@
 Phase 8 of `261122-2108-delete-dead-node-execution-closure`, which owns deleting `src/runner/dispatch/tool-providers.mjs` and the tests that import it (the row's `retiredBy`, `p-24xw2cwdvo`). The phase stays `draft` until that phase lands.
 
 ## Inputs
-- Row `packages/component-authority/model/doors/tool-lookup-by-capability.json`. Survivor: `packages/execution/rust/src/tools.rs`. Debt: `src/runner/dispatch/tool-providers.mjs` (created as a twin in 5a7045242).
+- Row `packages/component-authority/model/doors/tool-lookup-by-capability.yaml`. Survivor: `packages/execution/rust/src/tools.rs`. Debt: `src/runner/dispatch/tool-providers.mjs` (created as a twin in 5a7045242).
 
 ## Files it may write
-packages/component-authority/model/doors/tool-lookup-by-capability.json
+packages/component-authority/model/doors/tool-lookup-by-capability.yaml
 
 ## Rules every retirement step follows
 - No twin (CA-D2, discussion §3 row 3d): every caller moves to the survivor and the copy is deleted in the same commit. The commit message names the survivor, the deleted path and the last SHA that still had it. The owning area spec's "Lịch sử quyết định" line goes in the phase report for phase 11 to place.
