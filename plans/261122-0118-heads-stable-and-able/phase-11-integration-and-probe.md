@@ -121,3 +121,9 @@ steps 2-6. The probe runs from a supervisor and a secretary started after the ne
 - Still open for phase 11: a green `npm test` and `cargo test --workspace` on main. The other 16 reds in the owner's run
   belong to other plans. Also open: Miu's probe JSON, the CHANGELOG lines (owner question `q-2vehh564d2`), and then
   `reports/head-grant-probe.md` with the folded-rows check.
+
+### Owner picks A on q-2vehh564d2 (2026-11-24 00:15, said to head:lead-forgent-261122-0118-heads-b52f9)
+
+- The owner chose "A. Owner pastes the six lines and commits" in this lead's chat. The lead's grant has no
+  `questions answer` (`verb-not-granted`), so the owner records it with the answer command and lands the lines from
+  `reports/carry-p11-changelog-lines.md`. Step 2 is done once those lines are on main.
