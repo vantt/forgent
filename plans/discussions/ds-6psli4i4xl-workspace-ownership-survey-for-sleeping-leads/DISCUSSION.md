@@ -69,6 +69,23 @@ amendment to the existing skeleton plan (owner, 2026-11-23 15:05).
 - 2026-11-23 15:26, owner: many systems give the transcript on wake, why not here, what are the trade-offs. Shaper
   revised the "never" stance: resume is right for a light sleep, handoff for a full context; parked as Q2 `q-jwnker2n4y`.
 
+- 2026-11-23 15:48, owner: what about using both 1a and 1b; what does 1b break; under 2a what happens when the account
+  changes. Shaper analysis:
+  - 1b (sleep state in Identity's directory) breaks five things: the locked I3b rule (a dead head is never resolved,
+    listed, and is pruned at the 512 cap, on role take and `list --prune`), so sleeping entries need a new exempt state
+    and can fill the cap; `startHeadSession` fronts the role holder by `ids.terminal.key`, whose pane is gone; the
+    mailbox would resolve `head:lead-X` to a session no hook will ever run in, so mail sits until expiry instead of a
+    clear `unknown-name`; the shared directory would publish a sleeping session to other machines; and Identity
+    (infra, owns who a session is) would learn plan, phase and wake time, which design principle 2 forbids.
+  - Both 1a and 1b as stores: one fact in two places, which drifts. Proposed instead: 1a is the only store, and the
+    existing listing of sessions joins the head records read-only so one view shows live and sleeping agents.
+  - 2a with an account change: a confined head runs in a private home per launch; finalize-home copies the session
+    transcript into the run directory (`seatSessionDir`, `src/runner/dispatch/confinement/authority-twin.mjs`) before
+    the home is removed. So the transcript survives any account change; resume copies it into the new launch's
+    private home and resumes there. Same provider, other account: works in principle, the prompt cache is lost anyway
+    (it is per account), and whether signed thinking blocks replay under another account is not yet verified, so
+    the wake falls back to the handoff on a refused resume. Other provider (Claude to Codex): no resume, handoff.
+
 ## 6. Thiết kế đã chốt {#design}
 
 Provisional until Q1 settles.
