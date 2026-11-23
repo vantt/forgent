@@ -307,6 +307,12 @@ unit-261123-0819-p03-result.md). Phases 6, 8 and 9 now depend on the single rows
 
 **Waits (each such phase stays `draft` until its wait clears; details are in the phase file):**
 - Phase 1 is done (207b6459d). Phase 1b can run now, and every other phase waits for it.
+- Parked 2026-11-23 15:33 (supervisor, event d492b9bc8c9e776f): phase 1b waits for runner capacity. Gemini is at its
+  provider limit, and the deepseek and thehive fallbacks failed three units on infrastructure (the 10 MB output limit,
+  a request deadline, an invalid snapshot). Branch `component-authority-doors/p1b` keeps unit 1 (30aea9d42). It resumes
+  when lead:SUPERVISOR reports capacity and closes the release window. Owner orders that wait for the lead to apply here:
+  the phase 10 split (event 8d551d5b), the router rule for the routing phases (d63021bb), and phase 1 of
+  `261122-2108` going first (1c09e852). lead:SUPERVISOR relays them.
 - 2a and 2b do not wait for the mailbox lane (owner decision 2026-11-23, via Miu). 2a deletes the Node hook table and
   retires or re-points the frozen v7e/v7h/v7i/v7j sets (and v7k/v7m/v7n, whose frozen confinement module it
   changes) in the same change. Backlog `p-irt4weqipe` owns the mailbox re-measurement afterwards, and it blocks
