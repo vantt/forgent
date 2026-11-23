@@ -7,9 +7,6 @@ name: ort-static
 # scripts/ort-static.mjs downloads and verifies by sha256.
 on:
   workflow_dispatch:
-  push:
-    branches: [docos/ort-static]
-    paths: [.github/workflows/ort-static.yml]
 permissions:
   contents: write
 defaults:
