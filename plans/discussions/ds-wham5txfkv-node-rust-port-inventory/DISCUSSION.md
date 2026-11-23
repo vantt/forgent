@@ -313,3 +313,103 @@ Goal: `src/runner/*.mjs` (loop, operation-choice, merge, work-dispatch, ...) and
 
 S1 (hook verdicts: `main-checkout-delete-guard.mjs`, `state/decision-question.mjs`, `runner/hook.mjs`) may run beside any of
 these, as the program allows.
+
+## Appendix A — seed for the discussion "HARDEN next round" (added 2026-11-23 19:2x)
+
+This appendix is input for the new discussion that the secretary opens (closing note, D10). It is not a decision of this
+discussion. It holds the parts the new discussion needs that §3 and §4 above do not already carry. These are a draft
+hand-off, the problem statement, the phase shape and the phase list. The new discussion takes H1–H7, C5 and O1–O6 from §3,
+D1 and D6–D10 from §4, and the inventory from §6 (recount it first, D9). Once the new discussion holds this content, it
+is the source of truth, and this appendix is history.
+
+### Hand-off to the planner (draft; released only when the wait below clears)
+
+- **Wait:** `261121-2110-component-authority-doors` and `261122-2108-delete-dead-node-execution-closure` have landed
+  (D6, round 3b order). Before the hand-off, the §6 inventory is recomputed on that tree (§7 step 0).
+- **Outcome:** one skeleton plan, "HARDEN next round", with one phase per layer in the D8 order. Each phase runs the
+  HARDEN per-layer loop (D7) and opens its own sub-plan. When the last phase closes, every layer has a settled target
+  shape in its spec, net size ≤ 0 or paid for, and no Node logic is left. No `legacy-cli` route and no `legacy-node`
+  payload remain.
+- **Constraints:** the loop of `261021-1118` "The per-layer loop", steps 1–9, unchanged: a council opens only after the
+  layer below closes, and the owner is asked once per layer, in a batch. RUL104 (better, not bigger). L10 and design
+  principles 1 and 8: a mechanism that moves takes every caller with it, its old path and tests go in the same change,
+  and no twin is left. D1 holds inside each layer. Every sub-plan carries an Authority map (doors phase 5). Work (T7)
+  goes last (D8).
+- **Non-goals:** T0, T1, T4 and T5 are not re-run; HARDEN closed them, and their Node facades go with their last caller
+  (D1). The dead tier-5 closure belongs to `261122-2108`. No new feature (RUL104 "proposed additions" go to the owner per layer).
+- **Acceptance per phase:** the HARDEN close conditions. Before/after table on the same machine and load class; no
+  High-or-above finding left unreproduced; net Δ ≤ 0 or every increase names its paying deletion; doctor and smoke green
+  on the activated release on every workspace and the second machine; `npm test` and `cargo test --workspace` green.
+- **Acceptance of the program:** 56 → 0 `legacy-cli` routes in `packages/host-runtime/contracts/command-routes.json`;
+  `git ls-files 'src/*.mjs' 'bin/*.mjs'` is empty; every HARDEN carry-over in §3 is closed or explicitly declined by the owner.
+- **Sources:** `p-vwpnx4gpow`, `261021-1118` (plan, lessons, closing report §6–§7), D1, D6, D7–D9.
+
+### 2. Mục tiêu & đề bài
+
+HARDEN (`261021-1118`, closed 2026-11-18) ran a per-layer closed loop from T0 to T9. It moved each layer's decisions into
+Rust and shrank Node to thin clients. It finished T0–T5 and T8 as intended. T6 Workflow was hardened inside Node (Node +44,
+tests +695, decision 73). T9 closed with misses (Node +2,136, entry still 211 modules, doctor 15 s against 12 s). Packaging
+closed with 14 MUST fails open, each with an owner. T7 Work was never started: decision 78 holds a council first, and the
+owner's option B of 2026-11-18 puts Work after the packaging release. Since then, session-host and session-rotation (T2–T3)
+were written in Node, and 56 of 86 verbs still run through the Node payload. The owner wants the same loop applied to every
+layer that is not finished, bottom-up, Work last. The result should be layers that are settled, smaller and measured, with Node retired along the way,
+not a line-by-line translation. Backlog `p-vwpnx4gpow` asked for the Node inventory; that inventory (§6) now becomes the
+measured input to each layer's step 1 instead of a list of port plans.
+
+### 6. Thiết kế đã chốt
+
+*Round 4 (D1, D6–D9). The shape is settled; the numbers are recomputed at §7 step 0.*
+
+#### Shape
+
+"HARDEN, next round" is one skeleton plan with one phase per unfinished layer. It reuses the loop and close rules of
+`261021-1118` unchanged. Each phase opens with its own baseline, runs its council, and asks the owner once. It then lands its own
+sub-plan, re-measures and closes. Only then does the next phase's council open. Inside a phase, each component gets a
+target shape (authority, contract and ports, Rust/Node boundary and Node budget, delete list, doctor rows kept, size
+target), written into its spec. Node facades of T0–T5 have no phase; each is deleted by the phase whose migration table
+removes its last Node caller (D1). Work comes last and starts from its decision 78 council, under the owner's frame:
+a flexible storage core, plus the human touch points of lifecycle, gate and question, and artifact.
+
+```mermaid
+flowchart BT
+  pre["Before: doors (D6) + dead closure 261122-2108"] --> s0["Step 0: recount §6 on that tree"]
+  s0 --> T23["Phase T2-T3 session: session-rotation, session-host"]
+  T23 --> T6["Phase T6 Workflow"]
+  T6 --> T8["Phase T8 supervision"]
+  T8 --> T9["Phase T9 host + surface + packaging + report"]
+  T9 --> T7["Phase T7 Work: decision 78 council, after the packaging release"]
+  subgraph loop["Each phase: HARDEN loop"]
+    a[1 baseline] --> b[2 council A shape / B review] --> c[3 arbitrate + one owner ask] --> d[4 sub-plan] --> e[5-6 implement + verify] --> f[7 land + activate] --> g[8 re-measure] --> h[9 close: net ≤ 0]
+  end
+```
+
+### 7. Danh mục hạng mục / task
+
+*One skeleton plan, phases in D8 order. Each phase opens its own sub-plan from its council, as HARDEN's layer phases did.*
+
+#### Step 0 — recount before hand-off
+After doors and `261122-2108` land: rerun the §5 inventory method, check H5 (the two reds), and update §6. Then mark this
+discussion settled and hand the skeleton to a planner. Owner: this shaper.
+
+#### Phase T2–T3 — session
+Components: session-rotation, session-host (and the dispatch live rest reached only from heads). Inputs: §6 rows 10, 13
+and 14; H6. Opens once `261122-0118` and `261123-0828` have landed or rebased (O2).
+
+#### Phase T6 — Workflow
+Components: workflow, work-driver; the seat-binding client and the dispatch/execution live rest reached from
+`definition.mjs`. Inputs: §6 rows 15, 16; H1; the Workflow doctor rows on the bridge. Note the draft
+`261122-0056-orchestration-skeleton` (6 workflow files).
+
+#### Phase T8 — supervision
+Components: supervision (`src/portfolio`, `packages/portfolio/*.mjs`). Inputs: §6 row 21; C5 (stale tier name).
+
+#### Phase T9 — host, surface, packaging, report
+Components: host-surface (non-Work arms), packaging-distribution, learning-docs-registry, fgos-gateway. Inputs: §6 rows
+1, 19 (non-Work), 20, 22; H2; H3; D2's `setup` pieces; H7 hook arm. The `legacy-node` payload and `native` door can go
+only after T7.
+
+#### Phase T7 — Work, last
+Components: work-state, runner (tier 7), the domain components, the Work arms of host-surface. It opens with the decision 78
+council, after the packaging release (option B), under the owner's frame. Inputs: §6 rows 11, 12, 17, 18, 19 (Work
+arms); H4 WORK ledger rows; the doctor debt 2f handed over by doors (D6). Closing this phase removes the last `legacy-cli`
+route and the `legacy-node` payload.
