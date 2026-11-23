@@ -1,4 +1,13 @@
 # Audit the locked dependency graph, including the combined addon toolchain.
+[advisories]
+# Unmaintained, not vulnerable, and reached only through pkm (fgos-documentation): `paste` through Hugging Face's
+# `tokenizers` under pkm-embed, `unsafe-libyaml` through pkm-vault. Drop an entry when pkm's pinned tag no longer
+# carries the crate.
+ignore = [
+    { id = "RUSTSEC-2024-0436", reason = "paste: unmaintained proc macro under tokenizers, reached only through pkm" },
+    { id = "RUSTSEC-2024-0449", reason = "unsafe-libyaml: unmaintained, reached only through pkm-vault" },
+]
+
 [bans]
 multiple-versions = "warn"
 # Existing workspace path dependencies omit publish=false; --locked pins the external graph.
@@ -10,10 +19,13 @@ deny = [
     { crate = "serde_yaml_ng" },
     { crate = "yaml-rust" },
     { crate = "yaml-rust2" },
-    { crate = "unsafe-libyaml" },
+    # pkm is a linked library with its own YAML reader; only its vault crate may carry this parser, no fgOS crate.
+    { crate = "unsafe-libyaml", wrappers = ["pkm-vault"] },
 ]
 
 [sources]
 unknown-registry = "deny"
 unknown-git = "deny"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+# pkm is linked from its own repository at a pinned tag (fgos-documentation); no other git source is allowed.
+allow-git = ["https://github.com/vantt/pkm"]
