@@ -81,7 +81,7 @@ the Workflow/Work port. Revised order: (0) a planner re-cuts doors per (a), adds
 `--provider claude`; (1) doors 1b and then its no-wait phases start now; (2) `261122-2108` starts with its blockedBy on
 heads-stable dropped, rebased on the YAML model; (3) doors 3b, 3d, 10, 11; (4) this discussion is redone.
 
-Open owner point (asked in chat, not yet in the store): whether the door guard gets a warn-only mode (see O6).
+No open owner point (O6 closed 16:32).
 
 **Round 2 (2026-11-23 15:57–16:20): settled.** Every check left open in round 1 came back without revising P1–P4, so they
 are minted as D1–D4. Findings:
@@ -149,7 +149,7 @@ allowed to run beside any step. F0 through S6a have landed (S6a ended after its 
 | O1 | S7 entry gate "Work council (decision 78) held". Decision 78 belongs to `261021-1118` (lessons.md:13, :104, :152): the Work council opens after T8 and the non-Work T9 arms. Both are closed, but no council has been held. | open, blocks only plans 5–7 → D5 | `plans/261021-1118-harden-low-layers-bottom-up/plan.md` closedNote |
 | O2 | `session-host` / `session-rotation` are being edited now by `261122-0118` (running) and `261123-0828` (ready) | open, blocks only plans 2–3 starting | footprints read 2026-11-23 |
 | O3 | `src/util/yaml.mjs`: a facade over `fgos-yaml-doc` with 28 product importers; `261121-2110` does not retire it (plan.md:219–222) | clear: facade, dies in plan 10 | file header; importer count |
-| O6 | Owner, 16:2x: does component authority have a warn-only versus blocking switch? Today: no setting. `debt` entries act as a visible "known, not yet fixed" list (no failure, but a stale entry fails). Doors phase 10 removes `debt`, after which any match outside allowed files turns `npm test` red. The phase 5 plan gate is a reviewer reject, inactive only when a project has no model. A switch would be a new config key (`core/config-standard`, `core/config-schema`) and a change to the doors plan | open, owner | `docs/platform/component-authority/spec.md` §4; doors `phase-10-land-checks.md`, `phase-05-*.md` |
+| O6 | Owner, 16:2x: does component authority have a warn-only versus blocking switch? Today: no setting. `debt` entries act as a visible "known, not yet fixed" list (no failure, but a stale entry fails). Doors phase 10 removes `debt`, after which any match outside allowed files turns `npm test` red. The phase 5 plan gate is a reviewer reject, inactive only when a project has no model. A switch would be a new config key (`core/config-standard`, `core/config-schema`) and a change to the doors plan | closed 16:32: owner needs no switch; `debt` already serves as the warn list | `docs/platform/component-authority/spec.md` §4; doors `phase-10-land-checks.md`, `phase-05-*.md` |
 | O5 | Logic leaves inside facade areas: `util/domain-compile.mjs` → plan 1; `git/main-checkout-delete-guard.mjs` → S1; `identity/directory-store.mjs` is dead (no product importer) → plan 1 | clear | round 2 file-by-file header read |
 | O4 | Test counts in §6 are "test files that import the area", so a test can count under several areas. Backlog says 588 test files in all. | clear (method stated) | scratchpad script, method in §5 |
 
@@ -181,6 +181,7 @@ allowed to run beside any step. F0 through S6a have landed (S6a ended after its 
 - **2026-11-23 16:02 — owner:** "anh nghĩ là mọi thứ đã được … harden … chuyển sang rust hết rồi … giải thích plan này đang làm gì" (I thought HARDEN had already moved everything to Rust; explain what this plan does). Explained: HARDEN thinned Node for T0–T5 and deleted none of it; T6, T7, session-host and T9 still hold Node logic.
 - **2026-11-23 16:10 — owner:** component-authority first, then continue; calculate carefully, then patch. Round 3 calculation is recorded in §1; discussion paused.
 - **2026-11-23 16:24 — owner:** heads-stable must not make others wait, and handles its own conflicts on return. Recorded as round 3b in §1.
+- **2026-11-23 16:32 — owner:** no warn-only switch needed (O6 closed).
 - **2026-11-23 16:3x — owner:** "ok, đồng ý phương án a" → D6.
 - **2026-11-23 16:2x — owner:** asked whether authority has a warn-or-block setting → O6.
 
