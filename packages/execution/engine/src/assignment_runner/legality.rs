@@ -368,13 +368,6 @@ pub fn assert_inline_mutating_assignment_authorized(
         facts.machine,
     )
     .map_err(|e| refuse(format!("executeAssignment: mutating unit-run assignment \"{id}\" recomputed binding failed: {e}")))?;
-    if let Some(refused) = recomputed.get("refused").filter(|r| !r.is_null()) {
-        return Err(refuse(format!(
-            "executeAssignment: mutating unit-run assignment \"{id}\" recomputed binding refused: {} ({})",
-            quoted(refused.get("reason")),
-            quoted(refused.get("detail"))
-        )));
-    }
     let digest_of = |binding: &Value| {
         binding
             .pointer("/bindingInput/accountViewDigest")
@@ -386,12 +379,12 @@ pub fn assert_inline_mutating_assignment_authorized(
         if digest_of(&recomputed).as_deref() != Some(recorded_view.as_str()) {
             let (what, code) = if account_state.is_some() {
                 (
-                    "the recorded account state no longer reproduces the account view it was bound from",
+                    "was bound from an account view its recorded account state no longer reproduces",
                     "binding-replay-account-view-mismatch",
                 )
             } else {
                 (
-                    "it was bound from account state that was not recorded",
+                    "was bound from account state that was not recorded",
                     "binding-replay-account-view-missing",
                 )
             };
@@ -400,6 +393,13 @@ pub fn assert_inline_mutating_assignment_authorized(
                 code,
             ));
         }
+    }
+    if let Some(refused) = recomputed.get("refused").filter(|r| !r.is_null()) {
+        return Err(refuse(format!(
+            "executeAssignment: mutating unit-run assignment \"{id}\" recomputed binding refused: {} ({})",
+            quoted(refused.get("reason")),
+            quoted(refused.get("detail"))
+        )));
     }
 
     let field = |value: &Value, key: &str| -> Value {
