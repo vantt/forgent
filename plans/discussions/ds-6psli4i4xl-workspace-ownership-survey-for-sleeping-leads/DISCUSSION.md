@@ -44,7 +44,7 @@ amendment to the existing skeleton plan (owner, 2026-11-23 15:05).
 | 5 | Locks and tickets a sleeping lead holds | Clear: none survive, by design | `dispatch-cwd` custody is a kernel lease that dies with its holder (`packages/run-supervisor/rust/src/controller/cwd_lock.rs`); a unit still running belongs to the run supervisor, not the lead |
 | Q1 | Must the sleep record name the workspace, or does the fresh lead derive it from the plan and git | **Answered A (derive)** by the owner 2026-11-23 15:10, `q-n2o2nbs2or`; D-ID once it holds another round | The scheduling record (`{item, step, waitingOn, needs, outcome}`, skeleton phase 4) refuses unknown fields; the phase worktree is named `<plan dir>-p<NN>` by the lead skill (`core/skills/fgos-lead/SKILL.md` step 1) and `git worktree list` is the truth |
 | 7 | Where the sleep state lives (asleep or active, wake time) | Proposed, owner to confirm: extend the head's existing placement record, no new store | Owner 15:10: no new book, extend the one that already tracks every agent. Identity's session directory (`<stateRoot>/identity/sessions/`, `docs/platform/identity/spec.md` local directory) holds only live sessions by rule (a dead head is never resolved or listed, dead entries are pruned), so a sleeping lead cannot stay in it. The Session Host's per-head record `.fgos/runtime/session-rotation/<role>/placement.json` (`writeHeadPlacement`, `src/session-host/head-start.mjs`) already outlives the session (`gen`, `startedAt`, `retiredAt`, `retiredReason`); adding `retiredReason: sleep`, `wakeAt` and plan/phase makes it the one place, and the skeleton's plan source (phase 5) reads `waitingOn.until` from it |
-| 8 | What the waking lead gets of its previous session (transcript or not) | Proposed, owner to confirm: never the transcript; the lineage's latest handoff, written at sleep time by the rotation handoff writer with reason `sleep`, plus plan files; the transcript path only as a pointer | Today no successor gets a transcript: rotation hands over a redacted handoff (`<lineage>/<yymmdd-hhmm>-<sid8>.md`, `latest.json`) plus the old session's last assistant message read from the transcript (at most 8000 characters), printed at SessionStart (`docs/platform/session-host/spec.md`, rotation and hook sections). Skeleton phase 6 step 3 says the successor "receives the handoff" but no step writes one when the keeper stops a head with reason `sleep`: gap. No prior art for resuming the old CLI session (`git log --grep resume` on session-host) |
+| 8 | What the waking lead gets of its previous session (transcript or not) | **Open**, Q2 `q-jwnker2n4y` (recommended: resume the old CLI session when below sessionRotation soft and the same CLI binds, else fresh with the handoff) | Today no successor gets a transcript: rotation hands over a redacted handoff (`<lineage>/<yymmdd-hhmm>-<sid8>.md`, `latest.json`) plus the old session's last assistant message read from the transcript (at most 8000 characters), printed at SessionStart (`docs/platform/session-host/spec.md`, rotation and hook sections). Skeleton phase 6 step 3 says the successor "receives the handoff" but no step writes one when the keeper stops a head with reason `sleep`: gap. No prior art for resuming the old CLI session (`git log --grep resume` on session-host) |
 | 6 | Ignored bytes (cargo `target/`) of a sleeping lead's worktree | Clear: lost only once the branch has landed and the tree is clean, which loses no work | land door `--discard-ignored` path, `apps/fgos/src/wiring/supervision.rs` `run_land` |
 
 ## 4. Quyết định đã chốt
@@ -65,6 +65,9 @@ amendment to the existing skeleton plan (owner, 2026-11-23 15:05).
   Shaper: Identity's directory is live-only by rule, so the head's placement record is proposed instead (§3 row 7).
 - 2026-11-23 15:18, owner: "agent transcript thì sao? khi nào một agent sẽ được cung cấp transcript của lần run trước,
   khi nào thì rotate mới không cần?" Shaper: §3 row 8.
+- 2026-11-23 15:26, owner answered Q1 through the store: derive from plan and git; `q-n2o2nbs2or` acked.
+- 2026-11-23 15:26, owner: many systems give the transcript on wake, why not here, what are the trade-offs. Shaper
+  revised the "never" stance: resume is right for a light sleep, handoff for a full context; parked as Q2 `q-jwnker2n4y`.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -108,8 +111,8 @@ the lead skill's worktree naming; (b) a step saying the successor brief names pl
 worktree `<plan dir>-p<NN>`, or the Q1 alternative if the owner chooses it; (c) Verify adds the owning test below;
 (d) footprint adds that test's file; (e) the sleep state (`retiredReason: sleep`, `wakeAt`, plan, phase) is written
 to the head's placement record (`src/session-host/head-start.mjs` `writeHeadPlacement`) and the plan source of phase 5
-reads `waitingOn.until` from it, so no sleep-record store is added (§3 row 7); (f) sleeping goes through the rotation handoff writer (reason
-`sleep`), so the waking lead gets the lineage's latest handoff at SessionStart, never the transcript (§3 row 8). D-IDs: none yet (waits on Q1). Draft verify: `cargo test -p fgos-supervision --test keeper` plus one owning test that sleeps a lead with an unlanded
+reads `waitingOn.until` from it, so no sleep-record store is added (§3 row 7); (f) how the woken lead gets its previous session, per Q2 (§3 row 8); in every branch sleep writes a handoff
+through the rotation handoff writer (reason `sleep`), which phase 6 step 3 assumes but no step writes today. D-IDs: none yet (waits on Q1). Draft verify: `cargo test -p fgos-supervision --test keeper` plus one owning test that sleeps a lead with an unlanded
 change, lands another branch, runs the cleanup, wakes and finds the change in the same worktree.
 
 ### Overlap: a second worktree creator beside the checkout door {#task-overlap-workflow-create}
