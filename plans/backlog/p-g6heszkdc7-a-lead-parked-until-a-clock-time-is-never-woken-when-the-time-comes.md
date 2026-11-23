@@ -13,7 +13,9 @@ The lead of plan `261122-0118-heads-stable-and-able` waits for 21:06 on 2026-11-
 
 # Done when
 
-A lead that parks itself until a stated time leaves that time where the system can read it (plan Waits, or an event with a due time). At that time a wake reaches the lead or the supervisor without anyone raising it by hand. One owning test drives a parked lead past its due time and shows the wake. Until it lands, the secretary raises `coordination-help` for the 21:06 wait of plan `261122-0118-heads-stable-and-able` at that time.
+Owner direction 2026-11-23: a lead that has nothing to do until a time must not stay live holding memory. It writes one durable sleep record (who, plan, due time, what to do on waking), then its session ends. The watcher reads the records on each tick and, when one is due, wakes the supervisor, which starts a fresh lead that continues from the plan files and the record; the record is then marked woken. This reuses the existing watcher tick and the lead start door; the only new thing is the record, and prior art shows no timed-wake record before this (the only park today is an item awaiting a human answer). One owning test drives a sleep record past its due time and shows the wake and the fresh lead; a record not yet due wakes nobody. The lead of plan \`261122-0118-heads-stable-and-able\` is the first user, for its 21:06 wait.
+
+Until it lands, the secretary raises \`coordination-help\` for that 21:06 wait at that time.
 
 # Notes
 
