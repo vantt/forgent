@@ -1126,14 +1126,14 @@ test('the order the bodies register in is the order the registry runs them in', 
   assert.deepEqual(REGISTERED_FIX_IDS, fixes.map((fix) => fix.id).filter((id) => !FIXES_RUN_IN_RUST.includes(id)));
 });
 
-test('the registry gives 104 rows and 29 fixes to Rust and 13 rows and 1 fix to the bridge, as measured', () => {
+test('the registry gives 106 rows and 30 fixes to Rust and 13 rows and 1 fix to the bridge, as measured', () => {
   const { rows, fixes } = registryEntries();
   const bridged = (list) => list.filter((entry) => entry.owner.startsWith('bridge:'));
   const byStep = (step) => bridged(rows).filter((row) => row.owner === `bridge:${step}`).length;
   assert.deepEqual(['S6a', 'S6b', 'S7'].map(byStep), [0, 6, 7]);
-  assert.equal(rows.length - bridged(rows).length, 104);
+  assert.equal(rows.length - bridged(rows).length, 106);
   assert.equal(bridged(fixes).length, 1);
-  assert.equal(fixes.length - bridged(fixes).length, 29);
+  assert.equal(fixes.length - bridged(fixes).length, 30);
 });
 
 // A body whose helper was deleted with another row (a ReferenceError, a missing import) fails only when it runs, and

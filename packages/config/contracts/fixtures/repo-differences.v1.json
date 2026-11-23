@@ -445,6 +445,9 @@
    "dispatch"
   ],
   [
+   "docLocate"
+  ],
+  [
    "eventStore",
    "seal"
   ],

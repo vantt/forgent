@@ -10,6 +10,8 @@ description = "Document identity: the locate port, its use case and the pkm adap
 # entry points name a static ONNX Runtime archive (scripts/ort-static.mjs), so the binary stays under the glibc ceiling.
 pkm-core = { git = "https://github.com/vantt/pkm", tag = "v0.7.0", features = ["search"] }
 pkm-lifecycle = { git = "https://github.com/vantt/pkm", tag = "v0.7.0", features = ["search"] }
+# The embedding model's manifest (files, sizes, sha256), which the model row and the fetch read.
+pkm-embed = { git = "https://github.com/vantt/pkm", tag = "v0.7.0" }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order"] }
 indexmap = "2"

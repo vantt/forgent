@@ -3,7 +3,7 @@
 //! root hands over. Paths cross the boundary with a `docs/` prefix added or stripped, so callers see repository paths.
 
 use std::collections::BTreeMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use indexmap::IndexMap;
@@ -11,9 +11,12 @@ use pkm_core::search::{self, SearchOptions, StateKind, WorkerChoice, NOT_READY};
 use pkm_core::service::{Session, SessionConfig};
 use pkm_core::structure::eval::{parse_gold, Case};
 use pkm_core::structure::locate::Request;
+use pkm_lifecycle::install::model;
+use serde::Serialize;
 use serde_json::Value;
 
 pub use pkm_core::search::EmbedderChoice;
+pub use pkm_lifecycle::install::ModelSource;
 
 use crate::port::{
     Answer, Candidate, Group, IndexKind, IndexState, LocateError, Locator, Part, Place, Query,
@@ -79,6 +82,131 @@ pub fn stop_worker(paths: &LocatePaths, wait: Duration) -> Result<bool, String> 
             wait.as_secs()
         )),
     }
+}
+
+/// The search index as `fgos doc index status` reports it.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct IndexStatus {
+    pub state: IndexKind,
+    pub worker_running: bool,
+    /// Chunks with a meaning vector, chunks still waiting for one, all chunks, chunks whose embedding failed.
+    pub indexed: u64,
+    pub pending: u64,
+    pub total: u64,
+    pub failed: u64,
+    /// Seconds left by the worker's estimate; only while indexing.
+    pub eta_s: Option<u64>,
+    pub action: String,
+}
+
+/// The search index of `paths` now, or after waiting up to `wait` for it to be ready or broken. Reads only; starts
+/// no worker and loads no model.
+pub fn index_status(paths: &LocatePaths, wait: Option<Duration>) -> IndexStatus {
+    let s = search::Search::open(
+        &paths.docs_root,
+        &search_options(paths, EmbedderChoice::Model),
+    );
+    let st = match wait {
+        Some(wait) => s.wait_ready(wait),
+        None => s.state(),
+    };
+    s.close();
+    IndexStatus {
+        state: index_state(&st).kind,
+        worker_running: st.worker_running,
+        indexed: st.indexed,
+        pending: st.pending,
+        total: st.total,
+        failed: st.failed,
+        eta_s: st.eta_s,
+        action: st.action,
+    }
+}
+
+/// What `fgos doc index reset` did.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(tag = "result", rename_all = "kebab-case")]
+pub enum ResetOutcome {
+    /// The worker's crash history is cleared; `notes` documents that once crashed it are queued again.
+    Reset { notes: usize },
+    /// No search index exists yet.
+    NoIndex,
+    /// A worker holds the index: stop it first.
+    Busy,
+}
+
+/// Clears the index worker's crash history (the `broken` state after repeated crashes and its back-off) and queues
+/// the documents that crashed it again. Needs no worker running; waits up to `wait` for the index lock.
+pub fn reset_index(paths: &LocatePaths, wait: Duration) -> Result<ResetOutcome, String> {
+    Ok(
+        match search::reset_worker(
+            &paths.docs_root,
+            &search_options(paths, EmbedderChoice::Model),
+            wait,
+        )? {
+            search::ResetResult::Reset { notes } => ResetOutcome::Reset { notes },
+            search::ResetResult::NoIndex => ResetOutcome::NoIndex,
+            search::ResetResult::Busy => ResetOutcome::Busy,
+        },
+    )
+}
+
+/// The embedding model under the machine model folder, as the doctor row sees it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModelCheck {
+    /// `<model id>@<commit>`.
+    pub version: String,
+    pub dir: PathBuf,
+    pub missing: Vec<String>,
+    pub corrupt: Vec<String>,
+}
+
+impl ModelCheck {
+    pub fn usable(&self) -> bool {
+        self.missing.is_empty() && self.corrupt.is_empty()
+    }
+}
+
+/// Checks every file of the embedding model under `model_dir` against its size and sha256. Reads only.
+pub fn check_model(model_dir: &Path) -> ModelCheck {
+    let p = model::probe(model_dir, &pkm_embed::model::E5_SMALL);
+    ModelCheck {
+        version: p.version,
+        dir: p.dir,
+        missing: p.missing,
+        corrupt: p.corrupt,
+    }
+}
+
+/// Reads a model source: `huggingface`, an `https://` mirror root, or a local folder for an offline install.
+pub fn parse_model_source(text: &str) -> Result<ModelSource, String> {
+    ModelSource::parse(text)
+}
+
+/// Makes the embedding model under `model_dir` complete and correct: a correct file stays, a wrong one is fetched
+/// again, each file lands under a temporary name and is renamed only after its sha256 matches. Downloads with `curl`;
+/// `progress` hears one line per file. Returns the model folder.
+pub fn fetch_model(
+    model_dir: &Path,
+    source: &ModelSource,
+    progress: &mut dyn FnMut(String),
+) -> Result<PathBuf, String> {
+    model::ensure(
+        model_dir,
+        &pkm_embed::model::E5_SMALL,
+        source,
+        None,
+        &pkm_lifecycle::install::fetch::curl,
+        &mut |event| match event {
+            model::Progress::Ready => progress("the model is already complete".into()),
+            model::Progress::Imported(files) => progress(format!("copied {}", files.join(", "))),
+            model::Progress::Fetching { path, size } => {
+                progress(format!("fetching {path} ({size} bytes)"))
+            }
+            model::Progress::Fetched { path } => progress(format!("fetched {path}")),
+        },
+    )
 }
 
 /// A locator over one corpus.

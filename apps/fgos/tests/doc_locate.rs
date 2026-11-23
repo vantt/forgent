@@ -193,9 +193,27 @@ fn locate_answers_partial_starts_the_worker_finds_text_candidates_and_logs_every
         "{area:?}"
     );
 
+    // The index verbs: status sees the running worker and its state, stop ends it, reset needs it stopped.
+    let status = scene.data(&["doc", "index", "status", "--json"]);
+    assert_eq!(status["state"], "model-missing", "{status}");
+    assert_eq!(status["workerRunning"], true, "{status}");
+    let busy = scene.run(&["doc", "index", "reset"]);
     assert_eq!(
-        pkm::stop_worker(&scene.paths(), Duration::from_secs(30)),
-        Ok(true)
+        busy.status.code(),
+        Some(2),
+        "a running worker refuses reset: {busy:?}"
     );
+    assert_eq!(
+        scene.data(&["doc", "index", "stop", "--json"]),
+        serde_json::json!({ "stopped": true })
+    );
+    let status = scene.data(&["doc", "index", "status", "--json"]);
+    assert_eq!(status["workerRunning"], false, "{status}");
     assert!(!pkm::worker_running(&scene.paths()), "no worker remains");
+    assert_eq!(
+        scene.data(&["doc", "index", "stop", "--json"]),
+        serde_json::json!({ "stopped": false })
+    );
+    let reset = scene.data(&["doc", "index", "reset", "--json"]);
+    assert_eq!(reset["result"], "reset", "{reset}");
 }

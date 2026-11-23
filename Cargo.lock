@@ -662,6 +662,7 @@ dependencies = [
  "indexmap",
  "pkm-cli",
  "pkm-core",
+ "pkm-embed",
  "pkm-lifecycle",
  "serde",
  "serde_json",

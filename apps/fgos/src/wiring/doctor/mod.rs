@@ -6,6 +6,7 @@
 pub mod bridge;
 pub mod config;
 pub mod confinement;
+pub mod documentation;
 pub mod event_store;
 pub mod execution;
 pub mod git;
@@ -198,6 +199,7 @@ pub struct Rows {
 const GROUPS: &[&Rows] = &[
     &config::GROUP,
     &confinement::GROUP,
+    &documentation::GROUP,
     &git::GROUP,
     &event_store::GROUP,
     &execution::GROUP,
@@ -536,13 +538,13 @@ mod tests {
                 .filter(|row| row.owner.kind == OwnerKind::Bridge && row.owner.label == step)
                 .count()
         };
-        assert_eq!(registry.rows.len(), 117);
+        assert_eq!(registry.rows.len(), 119);
         assert_eq!(
             (count("S5"), count("S6a"), count("S6b"), count("S7")),
             (0, 0, 6, 7)
         );
-        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 104);
-        assert_eq!(registry.fixes.len(), 30);
+        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 106);
+        assert_eq!(registry.fixes.len(), 31);
         assert_eq!(registry.fix_ids(OwnerKind::Bridge).len(), 1);
     }
 

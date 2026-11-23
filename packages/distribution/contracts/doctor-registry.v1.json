@@ -122,7 +122,9 @@
       "confined-pane-accounts",
       "non-claude-trust-stores-readable",
       "agent-cli-project-trusted",
-      "seat-binding-route"
+      "seat-binding-route",
+      "doc-locate-model",
+      "doc-locate-index"
     ],
     "fixes": [
       "lock-dirs",
@@ -153,7 +155,8 @@
       "confinement-backend-registry-readable",
       "confinement-orphaned-resources-reaped",
       "credential-copies-retained",
-      "runtime-socket-dir"
+      "runtime-socket-dir",
+      "doc-locate-model-fetch"
     ]
   },
   "layers": {
@@ -736,6 +739,17 @@
       "judge": [
         "src/workflow/case-bindings.mjs"
       ]
+    },
+    {
+      "id": "doc-locate-model",
+      "description": "documentation: the embedding model fgos doc locate uses is complete under the machine model folder, every file at its pinned size and sha256; missing or corrupt files warn (locate still answers from text alone) and fgos doctor --fix fetches them from docLocate.modelSource",
+      "owner": "rust:documentation"
+    },
+    {
+      "id": "doc-locate-index",
+      "description": "documentation: the state of the fgos doc locate search index of this project; a pointer to fgos doc index status that warns when the index is not ready and never fails",
+      "owner": "rust:documentation",
+      "pointer": true
     }
   ],
   "fixes": [
@@ -834,6 +848,13 @@
       "owner": "rust:git",
       "repairs": [
         "git-repository-config"
+      ]
+    },
+    {
+      "id": "doc-locate-model-fetch",
+      "owner": "rust:documentation",
+      "repairs": [
+        "doc-locate-model"
       ]
     }
   ]
