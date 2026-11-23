@@ -34,15 +34,19 @@ jobs:
       - name: ONNX Runtime source
         run: |
           # microsoft/onnxruntime answers 404 since 2026-11-19. The tag's commit is fetched by its id from the first
-          # source that serves it; the id is the tag's target in microsoft/onnxruntime as archived by Software
-          # Heritage (snapshot bb4b98ed9243ab978ad058879a237a24445f4a90, 2026-11-14), so any fork yields the same tree.
+          # source that serves it, our mirror vantt/onnxruntime first; the id is the tag's target in
+          # microsoft/onnxruntime as archived by Software Heritage (snapshot bb4b98ed9243ab978ad058879a237a24445f4a90,
+          # 2026-11-14), so every source yields the same tree. The onnx submodule comes from our mirror vantt/onnx,
+          # checked out at the commit the tag pins.
           D="$RUNNER_TEMP/onnxruntime"; git init -q "$D"
-          for src in https://github.com/microsoft/onnxruntime.git https://github.com/intel/onnxruntime.git https://github.com/ROCm/onnxruntime.git; do
+          for src in https://github.com/vantt/onnxruntime.git https://github.com/microsoft/onnxruntime.git https://github.com/intel/onnxruntime.git https://github.com/ROCm/onnxruntime.git; do
             if git -C "$D" fetch -q --depth 1 "$src" "$ORT_COMMIT"; then echo "source: $src"; break; fi
           done
           git -C "$D" checkout -q FETCH_HEAD
           test "$(git -C "$D" rev-parse HEAD)" = "$ORT_COMMIT"
-          git -C "$D" submodule update -q --init --depth 1 cmake/external/onnx
+          git -C "$D" submodule init -q cmake/external/onnx
+          git -C "$D" config submodule.cmake/external/onnx.url https://github.com/vantt/onnx.git
+          git -C "$D" submodule update -q --depth 1 cmake/external/onnx
           git -C "$D" rev-parse HEAD | tee "$RUNNER_TEMP/ort-commit.txt"
       - uses: actions/cache/restore@v4
         id: ortcache
