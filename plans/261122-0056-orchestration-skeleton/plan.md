@@ -284,6 +284,9 @@ overlap. The plan turns `ready` once all three are done; reordering them is a pr
   is done. `261121-2110-component-authority-doors` stays behind component-authority.
 - 2026-11-23: `261121-2109-component-authority` is done (commit `c52ffa192`, every phase done), so every
   `blockedBy` entry is done and the plan is `ready`.
+- `q-7wfzidusod` (answered by the owner, 2026-11-23 07:45): this plan runs first, then
+  `261122-1950-owner-communication-standard`. The supervisor admitted this plan at `c92bdd283` and holds
+  owner-communication until this plan is done.
 
 ## Risks and rollback
 
