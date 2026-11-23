@@ -39,6 +39,17 @@ discussion: settled
 
 **R1 đã chốt (PC-D9):** supervisor release theo quy trình cố định, xem T6. Lần build và activate đầu tiên (sáng 2026-11-24) vẫn do chủ làm tay.
 
+**Chỗ đặt plan (chủ hỏi lúc 00:15; shaper quyết theo phân tích, chủ có thể phủ quyết):** viết **một plan riêng**, không gộp vào 261122-0056. Có bốn lý do:
+1. Hai plan lo hai việc khác nhau. Plan 0056 lo nhịp: ai làm tiếp, và khi nào. Plan này lo năng lực và kênh liên lạc: lồng, ô cửa, kênh xin trợ giúp, thư, quy tắc release.
+2. Plan 0056 là draft 17 phase mà chủ đã duyệt phạm vi ở vòng 42. Gộp thêm vào thì nó to ra (RUL104) và phải mở lại phạm vi đã duyệt.
+3. Plan 0056 đang bị chặn bởi doors. Gộp vào thì các task này cũng bị chặn theo, và mất cơ hội làm trong đêm.
+4. Va chạm file có thể xếp lịch được:
+   - T3 chạm `src/session-host/head-request.mjs`. File này nằm trong footprint của doors (đang chạy; phase 3a đã xong) và của phase 16 của 0056. Vì vậy T3 chờ doors xong.
+   - T1 chạm skill và spec của supervisor, cũng nằm trong footprint của 0056 (draft). Plan mới chạy trước. Khi 0056 chạy lại thì rebase lên.
+   - T2, T4, T5 và T6 không va doors.
+
+   Planner ghi 0056 vào thứ tự sau plan mới, chỉ ở những file chung.
+
 **Nguồn:** `p-g5ktat4kej`, `p-v6xinnjoxh`, `p-dw3h5wscns`, `p-ndortdckid`, `p-ia2v33b54u`, `p-btxvtb34u3`, `p-oqs75qwyco`, cùng các quyết định PC-D1 đến PC-D8.
 
 ## 1. Trạng thái hiện tại
