@@ -5,7 +5,9 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
-import {ensureHostBin, ensureGitAddon as buildAddon, gitAddonSourceDigest, GIT_ADDON_SOURCE_DIGEST_FILE} from '../../scripts/lib/git-addon-stage.mjs';
+import {ensureHostBin, ensureGitAddon as buildAddon, gitAddonDirectory, gitAddonSourceDigest, GIT_ADDON_SOURCE_DIGEST_FILE} from '../../scripts/lib/git-addon-stage.mjs';
+import {archiveDirectory, ARCHIVE_SHA256} from '../../scripts/ort-static.mjs';
+import {devHostManifest} from '../../scripts/lib/dev-host-manifest.mjs';
 import {pathToFileURL} from 'node:url';
 import {ensureGitAddon, root} from '../helpers/git-addon.mjs';
 import {buildRustDistribution, nativeAddonLibraryName, nativeAddonComponent, computeArtifactDigest, gitCapabilitiesForHost} from '../../scripts/build-rust-distribution.mjs';
@@ -188,4 +190,135 @@ test('only registered Linux and Windows releases advertise C5 and fence-backed G
   assert.deepEqual(gitCapabilitiesForHost('linux', 'x64'), ['git-wal-v1']);
   assert.deepEqual(gitCapabilitiesForHost('win32', 'x64'), ['git-wal-v1']);
   assert.deepEqual(gitCapabilitiesForHost('darwin', 'arm64'), []);
+});
+
+test('a script reuses a fresh staged addon without cargo and names a stale one it cannot rebuild', {skip: process.platform === 'win32' || process.getuid?.() === 0}, () => {
+  // No existing test covers this: the test above exercises only the build path (buildAddon with a builder stub).
+  // This proof verifies that ensureAddonForScript reuses a fresh staged addon without invoking cargo,
+  // and when the addon is stale and target/ is unwritable, throws an error naming the stale addon and recovery command.
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-script-reuse-'));
+  try {
+    const repo = path.join(temp, 'checkout');
+    fs.mkdirSync(repo);
+    fs.copyFileSync(path.join(root, 'Cargo.toml'), path.join(repo, 'Cargo.toml'));
+    fs.copyFileSync(path.join(root, 'Cargo.lock'), path.join(repo, 'Cargo.lock'));
+    fs.symlinkSync(path.join(root, 'packages'), path.join(repo, 'packages'), 'dir');
+    fs.symlinkSync(path.join(root, 'apps'), path.join(repo, 'apps'), 'dir');
+    fs.symlinkSync(path.join(root, 'bin'), path.join(repo, 'bin'), 'dir');
+    fs.symlinkSync(path.join(root, 'scripts'), path.join(repo, 'scripts'), 'dir');
+    fs.symlinkSync(path.join(root, 'src'), path.join(repo, 'src'), 'dir');
+
+    // A stub cargo in PATH that records any execution
+    const cargoRecord = path.join(temp, 'cargo-called.log');
+    const cargoStub = path.join(temp, 'cargo');
+    const targetDir = path.join(repo, 'target');
+    // The stub fails the way cargo does on a read-only target directory.
+    fs.writeFileSync(cargoStub, `#!${process.execPath}
+const fs = require('node:fs');
+fs.appendFileSync(${JSON.stringify(cargoRecord)}, 'cargo called\\n');
+process.stderr.write(${JSON.stringify(`error: failed to open: ${targetDir}/debug/.cargo-build-lock\n\nCaused by:\n  Read-only file system (os error 30)\n`)});
+process.exit(101);
+`, {mode: 0o755});
+
+    // Stage a fresh addon for repo
+    const addonDir = gitAddonDirectory(repo);
+    fs.mkdirSync(addonDir, {recursive: true});
+    const addon = path.join(addonDir, 'fgos.node');
+    fs.copyFileSync(built.addon, addon);
+    const hostBin = path.join(addonDir, 'fgos');
+    fs.copyFileSync(built.hostBin, hostBin);
+    fs.chmodSync(hostBin, 0o755);
+    const manifest = path.join(addonDir, 'manifest.json');
+    const manifestContent = `${JSON.stringify(devHostManifest({checkoutRoot: repo, fgosBin: hostBin, addonFile: addon}), null, 2)}\n`;
+    fs.writeFileSync(manifest, manifestContent);
+    const digestFile = path.join(addonDir, GIT_ADDON_SOURCE_DIGEST_FILE);
+    fs.writeFileSync(digestFile, gitAddonSourceDigest(repo));
+
+    const runProbe = (mode) => {
+      const probe = `
+import assert from 'node:assert/strict';
+import { ensureAddonForScript } from './scripts/lib/git-addon-stage.mjs';
+
+const env = { ...process.env };
+delete env.FGOS_ACTIVE_MANIFEST_PATH;
+delete env.FGOS_HOST_BIN;
+delete env.FGOS_ACTIVE_RELEASE_PATH;
+
+if (process.argv[1] === 'fresh') {
+  ensureAddonForScript(env, ${JSON.stringify(repo)});
+  console.log(JSON.stringify({
+    FGOS_HOST_BIN: env.FGOS_HOST_BIN,
+    FGOS_ACTIVE_RELEASE_PATH: env.FGOS_ACTIVE_RELEASE_PATH,
+    FGOS_ACTIVE_MANIFEST_PATH: env.FGOS_ACTIVE_MANIFEST_PATH,
+  }));
+} else if (process.argv[1] === 'stale') {
+  try {
+    ensureAddonForScript(env, ${JSON.stringify(repo)});
+    assert.fail('should have thrown');
+  } catch (err) {
+    console.log(JSON.stringify({ message: err.message }));
+  }
+}
+`;
+      // The caller's cargo settings must not steer the probe: the target is always the read-only directory.
+      const childEnv = {...process.env, PATH: `${temp}${path.delimiter}${process.env.PATH}`, CARGO_TARGET_DIR: targetDir};
+      delete childEnv.CARGO_BUILD_TARGET_DIR;
+      return execFileSync(process.execPath, ['--input-type=module', '-e', probe, mode], {
+        cwd: repo,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+        env: childEnv,
+      });
+    };
+
+    // 1. Fresh case: stub cargo is not called, env trio is set
+    const freshOut = JSON.parse(runProbe('fresh'));
+    assert.equal(freshOut.FGOS_HOST_BIN, hostBin);
+    assert.equal(freshOut.FGOS_ACTIVE_RELEASE_PATH, repo);
+    assert.equal(freshOut.FGOS_ACTIVE_MANIFEST_PATH, manifest);
+    assert.equal(fs.existsSync(cargoRecord), false, 'cargo stub was not called for fresh staged addon');
+
+    // 2. Stale case with an unwritable target directory: named error thrown
+    fs.writeFileSync(digestFile, 'stale-source-digest');
+    fs.mkdirSync(targetDir, {recursive: true});
+    // A directory at the archive path makes the archive step fail without touching the network.
+    fs.mkdirSync(path.join(archiveDirectory(repo), 'libonnxruntime.a'), {recursive: true});
+    fs.chmodSync(targetDir, 0o555);
+
+    // 2a. No ort cache and an unwritable target: the pre-cargo archive step fails, still the named error
+    try {
+      const noCacheOut = JSON.parse(runProbe('stale'));
+      assert.match(noCacheOut.message, /staged addon for this checkout is missing or stale/i);
+      assert.ok(noCacheOut.message.includes(gitAddonDirectory(repo)), 'the error names the staged addon directory');
+      if (process.platform === 'linux' && process.arch === 'x64') {
+        assert.equal(fs.existsSync(cargoRecord), false, 'cargo was not reached without an ort cache');
+      } else {
+        fs.rmSync(cargoRecord, {force: true});
+      }
+    } finally {
+      fs.chmodSync(targetDir, 0o755);
+    }
+
+    // 2b. Verified ort cache present: cargo runs once and fails read-only
+    const ortDir = archiveDirectory(repo);
+    const ortFile = path.join(ortDir, 'libonnxruntime.a');
+    fs.rmSync(ortFile, {recursive: true, force: true});
+    fs.mkdirSync(ortDir, {recursive: true});
+    fs.writeFileSync(ortFile, 'seeded archive');
+    const ortStat = fs.statSync(ortFile);
+    fs.writeFileSync(`${ortFile}.verified`, `${ARCHIVE_SHA256} ${ortStat.size} ${ortStat.mtimeMs}\n`);
+    fs.chmodSync(targetDir, 0o555);
+
+    try {
+      const staleOut = JSON.parse(runProbe('stale'));
+      assert.match(staleOut.message, /staged addon for this checkout is missing or stale/i);
+      assert.match(staleOut.message, /node scripts\/git-addon\.mjs/);
+      assert.ok(staleOut.message.includes(gitAddonDirectory(repo)), 'the error names the staged addon directory');
+      assert.equal(fs.readFileSync(cargoRecord, 'utf8'), 'cargo called\n', 'cargo ran once and failed read-only');
+    } finally {
+      fs.chmodSync(targetDir, 0o755);
+    }
+  } finally {
+    fs.rmSync(temp, {recursive: true, force: true});
+  }
 });

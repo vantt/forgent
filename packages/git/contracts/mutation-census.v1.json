@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b4d6e525d1ba25694668fbc966d15ddd5b9b792994ef4a54ddc70658edadd834",
+  "payloadDigest": "79eee5f1821592b8b719cf5123c6dafb80ecad5035e63f41e9b3945938bd0370",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1371,7 +1371,7 @@
     "scripts/export-command-selectors.mjs": "8347ac6f9232df87b1e4b3ab8ec20063872796b36119ffb3b3d9c0ba10a4e521",
     "scripts/fgos-session-start-hook.mjs": "60c25568df0462e4c0ef7a27f68c2ad450c53c17f4fe81eb5f5c6944b4febc68",
     "scripts/fgos-shell-integration.sh": "657a8a83677992b9890a4400e1f5eb3423947904cd41bb5e84bf2dfb2286bad4",
-    "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",
+    "scripts/git-addon.mjs": "f004d096788be529a044c9185ce884559a4c9d91db0958523fff500371d55016",
     "scripts/git/e1-power-cut.mjs": "73da033846ea409abd7a8b36827aaf0a2caa6e6cd822878b5d332c536169ec9d",
     "scripts/git/e1-power-cut.sh": "be0500b7f99580694cf1ca7418c17ddf6bd70583f3a06686aaab923118e2d1fa",
     "scripts/git/e3-bench.mjs": "9bb89e56eba0d8e5219e7cbf9f6643997a9e337c7d61f2e2ff8d4f6d10b33749",
@@ -1388,7 +1388,7 @@
     "scripts/lib/dev-host-manifest.mjs": "9928ceb97e807bcb02a7fed73153cf21de09d6cc9b6d56492166cb94e48c44bb",
     "scripts/lib/doc-links.mjs": "a4f2720a80234e2f3d5000877efdf2be95dd7c5ca11eda519f025d65df711cd1",
     "scripts/lib/full-suite-queue.mjs": "da176b9ad8a796ec13ede755dd2c2b12e6e29d5b5b12874ca8e6ae06803e3aba",
-    "scripts/lib/git-addon-stage.mjs": "1d62c3e84effeffb5ec919e01d94f9e9af5f75fe1a979f095d04ded68743cbf9",
+    "scripts/lib/git-addon-stage.mjs": "642a4f8d70679311126bf21238ca77e54333458c2b95b2ea35aaf5bc02d93927",
     "scripts/lib/git-dir-layout.mjs": "cdc573ff49e7c12af30c284ea84060ff476390b26769a0cb82f63dc357df04eb",
     "scripts/lib/git-ports.mjs": "2050baedb9873aa02de331465cb110fff9bf942a3666dbaca6438770998d6fc0",
     "scripts/lib/git-spawn-match.mjs": "45403263d2d8bbd51068f6db07866fe3cb15efd6bbf61bccb4a074322dfbceae",
@@ -4281,13 +4281,6 @@
       "class": "configured-binary"
     },
     {
-      "path": "scripts/git-addon.mjs",
-      "line": 16,
-      "spawn": "loadNativeAddon -> src/git/native.mjs:11",
-      "binary": "(configuration file data)",
-      "class": "configured-binary"
-    },
-    {
       "path": "scripts/git/e1-power-cut.mjs",
       "line": 108,
       "spawn": "createGitScopedCommit -> src/git/scoped-commit.mjs:7",
@@ -4464,7 +4457,14 @@
     },
     {
       "path": "scripts/lib/git-addon-stage.mjs",
-      "line": 107,
+      "line": 49,
+      "spawn": "loadNativeAddon -> src/git/index.mjs:10",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "scripts/lib/git-addon-stage.mjs",
+      "line": 202,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
