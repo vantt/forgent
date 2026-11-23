@@ -52,7 +52,7 @@ pub struct SuperviseArgs {
     pub envelope: PathBuf,
 }
 
-pub fn parse_args(args: &[String]) -> Result<SuperviseArgs, crate::route::ArgsError> {
+pub fn read_supervise_args(args: &[String]) -> Result<SuperviseArgs, crate::route::ArgsError> {
     let flags = Flags::parse(args, &["envelope"], 0)?;
     Ok(SuperviseArgs {
         envelope: PathBuf::from(flags.require("envelope")?),
@@ -492,7 +492,7 @@ impl CaptureTail {
 /// Run the supervisor; the return value is the process exit code.
 /// `publisher` is the port a head's `session write` is published through.
 pub fn run(args: &[String], publisher: &WritePublisher) -> i32 {
-    let args = match parse_args(args) {
+    let args = match read_supervise_args(args) {
         Ok(args) => args,
         Err(err) => return refuse("supervise", err),
     };
@@ -1049,21 +1049,21 @@ mod tests {
     fn argv_needs_protocol_one_and_an_envelope() {
         let argv = |items: &[&str]| items.iter().map(|s| s.to_string()).collect::<Vec<_>>();
         assert_eq!(
-            parse_args(&argv(&["--protocol", "1", "--envelope", "/e.json"]))
+            read_supervise_args(&argv(&["--protocol", "1", "--envelope", "/e.json"]))
                 .unwrap()
                 .envelope,
             PathBuf::from("/e.json")
         );
         assert_eq!(
-            parse_args(&argv(&["--envelope", "/e"])),
+            read_supervise_args(&argv(&["--envelope", "/e"])),
             Err(crate::route::ArgsError::VersionMismatch)
         );
         assert!(matches!(
-            parse_args(&argv(&["--protocol", "1"])),
+            read_supervise_args(&argv(&["--protocol", "1"])),
             Err(crate::route::ArgsError::Usage(_))
         ));
         assert!(matches!(
-            parse_args(&argv(&["--protocol", "1", "--envelope", "/e", "--x", "1"])),
+            read_supervise_args(&argv(&["--protocol", "1", "--envelope", "/e", "--x", "1"])),
             Err(crate::route::ArgsError::Usage(_))
         ));
     }

@@ -47,7 +47,7 @@ pub enum Target {
     Scan,
 }
 
-pub fn parse_args(args: &[String]) -> Result<AdoptArgs, ArgsError> {
+pub fn read_adopt_args(args: &[String]) -> Result<AdoptArgs, ArgsError> {
     let flags = Flags::parse_with_switches(
         args,
         &["run-dir", "kill-wait-ms"],
@@ -147,7 +147,7 @@ impl Verdict {
 }
 
 pub fn run(args: &[String]) -> i32 {
-    let args = match parse_args(args) {
+    let args = match read_adopt_args(args) {
         Ok(args) => args,
         Err(err) => return refuse("adopt", err),
     };
@@ -706,7 +706,7 @@ mod tests {
 
     #[test]
     fn argv_names_one_target_and_needs_protocol_one() {
-        let parsed = parse_args(&argv(&[
+        let parsed = read_adopt_args(&argv(&[
             "--protocol",
             "1",
             "--run-dir",
@@ -723,7 +723,7 @@ mod tests {
             }
         );
         assert_eq!(
-            parse_args(&argv(&[
+            read_adopt_args(&argv(&[
                 "--protocol",
                 "1",
                 "--scan",
@@ -735,15 +735,15 @@ mod tests {
             50
         );
         assert!(matches!(
-            parse_args(&argv(&["--protocol", "1"])),
+            read_adopt_args(&argv(&["--protocol", "1"])),
             Err(ArgsError::Usage(_))
         ));
         assert!(matches!(
-            parse_args(&argv(&["--protocol", "1", "--scan", "--run-dir", "/a"])),
+            read_adopt_args(&argv(&["--protocol", "1", "--scan", "--run-dir", "/a"])),
             Err(ArgsError::Usage(_))
         ));
         assert_eq!(
-            parse_args(&argv(&["--scan"])),
+            read_adopt_args(&argv(&["--scan"])),
             Err(ArgsError::VersionMismatch)
         );
     }

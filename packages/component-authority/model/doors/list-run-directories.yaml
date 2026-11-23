@@ -4,7 +4,7 @@ patterns:
   - export function (?:scanAssignmentLayout|listOpenAttemptDirs)\b
   - export const runsRoot\b
   - "['\"`]workflow-runs['\"`]\\)"
-  - \bfn (?:workflow_run_dirs|assignment_run_dirs|open_attempt_dirs|scan_assignment_layout|list_assignment_runs|assignment_runs|walk_assignments|scan_assignment_runs)\b
+  - \bfn (?:workflow_run_dirs|assignment_run_dirs|(?:list_)?open_attempt_dirs|scan_assignment_layout|list_assignment_runs|assignment_runs|walk_assignments|scan_assignment_runs)\b
 allowed:
   - path: src/runner/dispatch/assignment-layout-twin.mjs
     reason: the runner's assignment layout lister (its twin is run_dirs.rs)
@@ -19,9 +19,9 @@ allowed:
   - path: packages/git/node-addon/src/execution.rs
     reason: carries assignment_layout::list_assignment_runs of fgos-execution to Node under its Node name (the addon's execution namespace); it walks nothing itself
 debt:
-  - path: apps/fgos/src/wiring/run_dirs.rs
-    reason: "twin: the host lists run directories for the lock report with its own walk; both sides read test/rust-host/fixtures/run-dirs-vectors.json until the host asks the engine's assignment layout"
   - path: packages/run-result/rust/src/lib.rs
     reason: "twin: the run-result doctor scan walks the assignment tree with its own symlink and depth barriers (walk_assignments, scan_assignment_runs); fgos-run-result sits below the engine and cannot ask assignment/layout.rs until the walk moves to a crate both can use"
-retiredBy: p-24xw2cwdvo for the two Node listers, which only the dead Node Execution closure imports; the host's run_dirs.rs and the fgos-run-result walk move onto fgos-execution's assignment layout (packages/execution/rust/src/assignment_layout.rs), the owner of the walk, once fgos-run-result can depend on it
-reason: the lock report needs the run directories the runner lays out, one layer above the lock crate; until the layouts move the host lists them with a twin of each Node lister, pinned by one fixture
+  - path: packages/run-supervisor/rust/src/controller/adopt_scan.rs
+    reason: "twin: list_open_attempt_dirs, used by the live sweep and doctor's run-attempts-stuck, keeps the retired Node lister's rules (reads through a symlinked assignments root, no depth limit), so it can disagree with the host's lock report, which asks the engine's assignment layout; one of the two must become the survivor (a backlog item)"
+retiredBy: p-24xw2cwdvo for the two Node listers, which only the dead Node Execution closure imports; the fgos-run-result walk moves onto fgos-execution's assignment layout (packages/execution/rust/src/assignment_layout.rs), the owner of the walk, once fgos-run-result can depend on it (fgos-execution depends on fgos-run-result today)
+reason: the lock report needs the run directories the runner lays out, one layer above the lock crate; the host asks fgos-execution's case runs root and assignment layout for them, pinned by one fixture

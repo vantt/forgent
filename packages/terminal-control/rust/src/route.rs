@@ -11,8 +11,10 @@ use crate::driver::herdr::{HerdrConfig, HerdrDriver};
 use crate::identity;
 use crate::policy::{policy_by_name, Limits, PlacementPolicy, DEFAULT_POLICY, POLICY_NAMES};
 use crate::port::*;
+use fgos_host_runtime::cli_args::{parse_args, FlagScalar, FlagValue};
 use serde::de::DeserializeOwned;
 use serde_json::{json, Map, Value};
+use std::ffi::OsString;
 use std::io::Read;
 use std::time::{Duration, Instant};
 
@@ -480,30 +482,72 @@ pub fn read_stdin() -> Result<Value, String> {
     serde_json::from_slice(&buf).map_err(|e| format!("stdin is not JSON: {e}"))
 }
 
+/// What every one-operation route reads from its arguments: `<op> --protocol 1 --json`.
+#[derive(Debug, Default, PartialEq, Eq)]
+pub struct OpArgs {
+    pub protocol: Option<String>,
+    pub json: bool,
+    pub op: Option<String>,
+    /// The first argument the route does not take, named for the usage line.
+    pub stray: Option<String>,
+}
+
+/// Reads a one-operation route's arguments with the CLI's argument reader. `--json` takes no value, so the token the
+/// reader hands it is the operation.
+pub fn read_op_args(args: &[String]) -> OpArgs {
+    let tokens: Vec<OsString> = args.iter().map(OsString::from).collect();
+    let mut out = OpArgs::default();
+    let parsed = match parse_args(&tokens) {
+        Ok(parsed) => parsed,
+        Err(err) => {
+            out.stray = Some(err.to_string());
+            return out;
+        }
+    };
+    let mut positional = parsed.positional;
+    for (name, value) in parsed.flags {
+        let scalar = match value {
+            FlagValue::One(scalar) => scalar,
+            FlagValue::Many(mut all) => all.pop().unwrap_or(FlagScalar::Bool),
+        };
+        match (name.as_str(), scalar) {
+            ("protocol", FlagScalar::Str(text)) => out.protocol = Some(text),
+            ("protocol", FlagScalar::Bool) => {}
+            ("json", scalar) => {
+                out.json = true;
+                if let FlagScalar::Str(token) = scalar {
+                    positional.push(token);
+                }
+            }
+            (other, _) => {
+                out.stray
+                    .get_or_insert_with(|| format!("unknown argument --{other}"));
+            }
+        }
+    }
+    let mut rest = positional.into_iter();
+    out.op = rest.next();
+    if let Some(extra) = rest.next() {
+        out.stray
+            .get_or_insert_with(|| format!("unexpected argument {extra}"));
+    }
+    out
+}
+
 /// `fgos internal terminal-control ...`; `args` are the arguments after the
 /// route name. Returns the process exit code and prints one JSON line.
 pub fn main(args: &[String]) -> i32 {
     let started = Instant::now();
-    let mut protocol: Option<&str> = None;
-    let mut json_flag = false;
-    let mut op: Option<&str> = None;
-    // Reported after the protocol check: a caller of another release learns
-    // the version mismatch first.
-    let mut stray: Option<String> = None;
-    let mut it = args.iter();
-    while let Some(arg) = it.next() {
-        match arg.as_str() {
-            "--protocol" => protocol = it.next().map(String::as_str),
-            "--json" => json_flag = true,
-            other if other.starts_with("--") => {
-                stray.get_or_insert_with(|| format!("unknown argument {other}"));
-            }
-            other if op.is_none() => op = Some(other),
-            other => {
-                stray.get_or_insert_with(|| format!("unexpected argument {other}"));
-            }
-        }
-    }
+    // `stray` is reported after the protocol check: a caller of another
+    // release learns the version mismatch first.
+    let OpArgs {
+        protocol,
+        json: json_flag,
+        op,
+        stray,
+    } = read_op_args(args);
+    let protocol = protocol.as_deref();
+    let op = op.as_deref();
     if protocol != Some("1") {
         let message = format!(
             "this host speaks internal protocol {PROTOCOL}; the call asked for {}",

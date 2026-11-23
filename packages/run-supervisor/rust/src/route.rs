@@ -1,6 +1,8 @@
 //! What every `fgos internal <route>` of this crate shares: the exit codes of
 //! `internal-route.run-supervisor.v1.json`, flag parsing and machine output.
 
+use fgos_host_runtime::cli_args::{parse_args, FlagScalar, FlagValue};
+use std::ffi::OsString;
 use std::io::Write;
 use std::path::Path;
 use std::sync::Arc;
@@ -87,26 +89,37 @@ impl Flags {
         switches: &[&str],
         positional: usize,
     ) -> Result<Flags, ArgsError> {
-        let mut flags = Flags::default();
-        let mut iter = args.iter();
-        while let Some(arg) = iter.next() {
-            if let Some(name) = arg.strip_prefix("--") {
-                if switches.contains(&name) {
-                    flags.values.push((name.to_string(), "true".to_string()));
-                    continue;
+        let tokens: Vec<OsString> = args.iter().map(OsString::from).collect();
+        let parsed = parse_args(&tokens).map_err(|err| ArgsError::Usage(err.to_string()))?;
+        let mut flags = Flags {
+            positional: parsed.positional,
+            values: Vec::new(),
+        };
+        for (name, value) in parsed.flags {
+            let scalar = match value {
+                FlagValue::One(scalar) => scalar,
+                FlagValue::Many(mut all) => all.pop().unwrap_or(FlagScalar::Bool),
+            };
+            if switches.contains(&name.as_str()) {
+                flags.values.push((name, "true".to_string()));
+                // The shared reader hands a switch the next bare token as its value; that token is a positional.
+                if let FlagScalar::Str(token) = scalar {
+                    flags.positional.push(token);
                 }
-                if name != "protocol" && !allowed.contains(&name) {
-                    return Err(ArgsError::Usage(format!("unknown flag {arg}")));
-                }
-                let value = iter
-                    .next()
-                    .ok_or_else(|| ArgsError::Usage(format!("{arg} needs a value")))?;
-                flags.values.push((name.to_string(), value.clone()));
-            } else if flags.positional.len() < positional {
-                flags.positional.push(arg.clone());
-            } else {
-                return Err(ArgsError::Usage(format!("unexpected argument {arg}")));
+                continue;
             }
+            if name != "protocol" && !allowed.contains(&name.as_str()) {
+                return Err(ArgsError::Usage(format!("unknown flag --{name}")));
+            }
+            match scalar {
+                FlagScalar::Str(text) => flags.values.push((name, text)),
+                FlagScalar::Bool => {
+                    return Err(ArgsError::Usage(format!("--{name} needs a value")));
+                }
+            }
+        }
+        if let Some(extra) = flags.positional.get(positional) {
+            return Err(ArgsError::Usage(format!("unexpected argument {extra}")));
         }
         if flags.get("protocol") != Some("1") {
             return Err(ArgsError::VersionMismatch);
