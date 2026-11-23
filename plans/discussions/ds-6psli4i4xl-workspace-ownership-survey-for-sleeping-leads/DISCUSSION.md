@@ -1,28 +1,60 @@
 ---
 id: ds-6psli4i4xl
 title: "Which low-level component owns the workspace, worktree and git state of a run, an assignment and a session, and where a sleeping lead's workspace hold belongs"
-status: open
+status: settled
 source:
   - p-g6heszkdc7
   - p-6sd4fslxv7
 created: 2026-11-23
 ---
 
-discussion: open
+discussion: settled
+
+## Hand-off {#handoff}
+
+**To:** the planner of plan `261122-0056-orchestration-skeleton`, as an amendment to phase 6 (and the phase 5 plan
+source). **Not a new plan** (owner, 2026-11-23 15:05).
+
+**Outcome.** A lead that sleeps until a time loses nothing: its worktree and unlanded changes survive, the sleep state
+lives in one existing record, and the woken lead continues in the same worktree with as much of its previous session
+as is safe to carry.
+
+**Constraints.** No new store of worktrees and no new sleep-record book (owner); git is the truth for worktrees
+(D1); the sleep state lives in the Session Host's head record (D2); the sleep and wake mechanism stays the keeper of
+phases 4 to 6 (L10); Identity's directory stays live-only (its locked I3b rule).
+
+**Non-goals.** Changing the checkout door's refusal rules, rotation thresholds or the handoff format of ordinary
+rotations; the two overlaps in §7, which are separate backlog rows for Miu.
+
+**Amendments to `phase-06-sleep-and-wake.md` (acceptance criteria).**
+
+- (a) Inputs add the checkout door (`packages/execution/checkout/src/work_remove.rs`), the lead skill's worktree
+  naming (`core/skills/fgos-lead/SKILL.md` step 1) and `src/session-host/head-start.mjs` (`writeHeadPlacement`).
+- (b) Step: the woken lead's brief names plan and phase; the lead reuses worktree `<plan dir>-p<NN>` found through
+  `git worktree list` (D1).
+- (c) Step: the keeper's stop with reason `sleep` is a Session Host retire that writes `retiredReason: sleep`,
+  `wakeAt`, plan, phase, the context fraction and the CLI session id into the head's
+  `.fgos/runtime/session-rotation/<role>/placement.json`; the phase 5 plan source reads `waitingOn.until` from it (D2).
+- (d) Step: one read-only view, owned by the Session Host, lists live and sleeping agents by joining Identity's
+  directory (live sessions) with the head records; it writes nothing (D2).
+- (e) Step: every sleep writes a handoff through the rotation handoff writer (reason `sleep`); phase 6 step 3 assumes
+  it and no step writes it today. On wake: below `sessionRotation` soft and the same provider binds, resume the kept
+  transcript in the new launch's private home with a wake line to re-read plan and git first; otherwise, or when the
+  transcript was not kept or the resume is refused, a fresh session with the handoff (D3).
+- (f) Verify adds owning tests: a lead slept with an unlanded change survives a land and a cleanup and finds the change
+  in the same worktree on waking; a light sleep resumes, a heavy one and a refused resume get the handoff; the view
+  shows a sleeping head. Footprint adds those test files and the Session Host files above.
+
+**Open points.** Whether a signed thinking block replays under another account of the same provider is unverified;
+(e)'s fallback covers it, and the planner's test should prove the fallback, not assume the replay.
 
 ## 1. Trạng thái hiện tại
 
-Round 2 (2026-11-23 15:10): Q1 answered A (derive). Owner added: no new sleep book; the sleep state goes into the
-existing record of agents (§3 row 7, proposal: the head's placement record). Round 1 (2026-11-23 15:00, shaper ds-6psli4i4xl): the survey is done (§6). Finding: one component already owns
-worktree make and remove, the checkout door `fgos-checkout` (`packages/execution/checkout`) over the git component.
-Every remover goes through it, and it already refuses the two cases that would lose a sleeping lead's work. What the
-hold still lacks is a proof, not a mechanism. One question is open: whether the sleep record must name the workspace
-(the owner's wording) or whether the fresh lead finds it from the plan and git (the owner's "no second place" rule).
-That is Q1 (§3), parked as `q-n2o2nbs2or`; the overlap rows do not wait on it. Two overlaps were found and are listed in §7 as candidate backlog rows.
-
-Owner constraint 2026-11-23 15:05: the exit of this discussion is **not a new plan**. It only supplies what was
-discussed, as amendments that make plan `261122-0056-orchestration-skeleton` more exact (phase 6 requirement, footprint
-and verify). The hand-off goes to that plan's planner as an amendment request (§7 `#task-phase6-workspace-hold`).
+Settled 2026-11-23 15:56. Three decisions (§4): the woken lead finds its worktree from plan and git (D1); the sleep
+state goes into the Session Host's existing head record, with one read-only view of live and sleeping agents (D2); a
+woken lead resumes its kept transcript when the sleep was light and the provider matches, else gets the handoff (D3).
+The result goes to the skeleton plan's planner as phase 6 amendments (hand-off above), not as a new plan. Two
+overlaps found in the survey wait for Miu as separate backlog rows (§7).
 
 ## 2. Mục tiêu & đề bài
 
@@ -38,20 +70,23 @@ amendment to the existing skeleton plan (owner, 2026-11-23 15:05).
 | # | Point | State | Evidence / note |
 |---|-------|-------|-----------------|
 | 1 | Who makes and removes a linked worktree | Clear | `fgos-checkout` only; door rule `packages/component-authority/model/doors/checkout-make-provision-remove.json` |
-| 2 | Is committed but unlanded work safe from every remover | Clear in code, unproven for the sleep case | `packages/git/rust/src/worktree.rs` refuses `worktree-delivery-unproven` (tip not in `--delivered-to`) |
-| 3 | Is uncommitted work safe from every remover | Clear in code, unproven for the sleep case | `worktree.rs` refuses `worktree-dirty-preserved`; `packages/execution/checkout/src/orphan.rs` refuses uncommitted |
+| 2 | Is committed but unlanded work safe from every remover | Clear in code, proof owed by (f) | `packages/git/rust/src/worktree.rs` refuses `worktree-delivery-unproven` (tip not in `--delivered-to`) |
+| 3 | Is uncommitted work safe from every remover | Clear in code, proof owed by (f) | `worktree.rs` refuses `worktree-dirty-preserved`; `packages/execution/checkout/src/orphan.rs` refuses uncommitted |
 | 4 | Is a branch with unlanded commits safe from deletion | Clear | `src/runner/loop.mjs` deletes only 0-ahead branches not checked out; `src/runner/merge.mjs` deletes after merge |
 | 5 | Locks and tickets a sleeping lead holds | Clear: none survive, by design | `dispatch-cwd` custody is a kernel lease that dies with its holder (`packages/run-supervisor/rust/src/controller/cwd_lock.rs`); a unit still running belongs to the run supervisor, not the lead |
-| Q1 | Must the sleep record name the workspace, or does the fresh lead derive it from the plan and git | **Answered A (derive)** by the owner 2026-11-23 15:10, `q-n2o2nbs2or`; D-ID once it holds another round | The scheduling record (`{item, step, waitingOn, needs, outcome}`, skeleton phase 4) refuses unknown fields; the phase worktree is named `<plan dir>-p<NN>` by the lead skill (`core/skills/fgos-lead/SKILL.md` step 1) and `git worktree list` is the truth |
-| 7 | Where the sleep state lives (asleep or active, wake time) | Proposed, owner to confirm: extend the head's existing placement record, no new store | Owner 15:10: no new book, extend the one that already tracks every agent. Identity's session directory (`<stateRoot>/identity/sessions/`, `docs/platform/identity/spec.md` local directory) holds only live sessions by rule (a dead head is never resolved or listed, dead entries are pruned), so a sleeping lead cannot stay in it. The Session Host's per-head record `.fgos/runtime/session-rotation/<role>/placement.json` (`writeHeadPlacement`, `src/session-host/head-start.mjs`) already outlives the session (`gen`, `startedAt`, `retiredAt`, `retiredReason`); adding `retiredReason: sleep`, `wakeAt` and plan/phase makes it the one place, and the skeleton's plan source (phase 5) reads `waitingOn.until` from it |
-| 8 | What the waking lead gets of its previous session (transcript or not) | **Open**, Q2 `q-jwnker2n4y` (recommended: resume the old CLI session when below sessionRotation soft and the same CLI binds, else fresh with the handoff) | Today no successor gets a transcript: rotation hands over a redacted handoff (`<lineage>/<yymmdd-hhmm>-<sid8>.md`, `latest.json`) plus the old session's last assistant message read from the transcript (at most 8000 characters), printed at SessionStart (`docs/platform/session-host/spec.md`, rotation and hook sections). Skeleton phase 6 step 3 says the successor "receives the handoff" but no step writes one when the keeper stops a head with reason `sleep`: gap. No prior art for resuming the old CLI session (`git log --grep resume` on session-host) |
 | 6 | Ignored bytes (cargo `target/`) of a sleeping lead's worktree | Clear: lost only once the branch has landed and the tree is clean, which loses no work | land door `--discard-ignored` path, `apps/fgos/src/wiring/supervision.rs` `run_land` |
+| Q1 | Must the sleep record name the workspace, or does the fresh lead derive it | Settled D1 | `q-n2o2nbs2or` answered and acked |
+| 7 | Where the sleep state lives | Settled D2 | Session Host is canonical for the placement port (`retire`) and the head lineage files (`docs/platform/session-host/spec.md`); Identity's directory is live-only by its locked rule |
+| 8 | What the woken lead gets of its previous session | Settled D3 | owner 15:56; `q-jwnker2n4y` cancelled as answered in chat |
+| 9 | Does a signed thinking block replay under another account | Open, does not block | covered by the fallback in (e) |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Decision | Date | Source |
 |------|----------|------|--------|
-| (none yet) | No point has held across more than one round. | | |
+| D1 | The woken lead finds its worktree from plan and git (`<plan dir>-p<NN>`, `git worktree list`); nothing stores a copy. Safety stays in the checkout door's refusals. | 2026-11-23 | owner 15:10 in chat, 15:26 through `q-n2o2nbs2or` |
+| D2 | The sleep state (`retiredReason: sleep`, `wakeAt`, plan, phase, context fraction, CLI session id) lives in the Session Host's head record `placement.json`, the only store. One read-only view owned by the Session Host joins Identity's live sessions with the head records. Identity's directory is unchanged. | 2026-11-23 | owner 15:10 (no new book), 15:56 ("đồng ý 1a cộng một màn hình xem chung") |
+| D3 | Every sleep writes a handoff (reason `sleep`). On wake: resume the kept transcript when the context was below `sessionRotation` soft and the same provider binds, with a re-read line; else, or when the transcript was not kept or the resume is refused, a fresh session with the handoff. | 2026-11-23 | owner 15:26 (question), 15:56 ("2a vẫn đảm bảo") |
 
 ## 5. Q&A log
 
@@ -68,7 +103,6 @@ amendment to the existing skeleton plan (owner, 2026-11-23 15:05).
 - 2026-11-23 15:26, owner answered Q1 through the store: derive from plan and git; `q-n2o2nbs2or` acked.
 - 2026-11-23 15:26, owner: many systems give the transcript on wake, why not here, what are the trade-offs. Shaper
   revised the "never" stance: resume is right for a light sleep, handoff for a full context; parked as Q2 `q-jwnker2n4y`.
-
 - 2026-11-23 15:48, owner: what about using both 1a and 1b; what does 1b break; under 2a what happens when the account
   changes. Shaper analysis:
   - 1b (sleep state in Identity's directory) breaks five things: the locked I3b rule (a dead head is never resolved,
@@ -85,61 +119,68 @@ amendment to the existing skeleton plan (owner, 2026-11-23 15:05).
     private home and resumes there. Same provider, other account: works in principle, the prompt cache is lost anyway
     (it is per account), and whether signed thinking blocks replay under another account is not yet verified, so
     the wake falls back to the handoff on a refused resume. Other provider (Claude to Codex): no resume, handoff.
+- 2026-11-23 15:56, owner: agrees "1a cộng một màn hình xem chung (chỉ đọc)" and asks which component and authority
+  own it; on 2: every agent has its own home so the transcript exists, it is only how the new session is organised, so
+  2a holds. Shaper: the Session Host owns it (canonical for the placement port and head lineage files; the view reads
+  Identity, a lower layer, never the reverse). 2a holds with one nuance: the kept copy can be missing (warnings
+  `session-dir-undeclared`, `session-not-written`, `session-copy-failed` in `keepSessionBeforeRemoval`) and a Codex
+  rollout is not read today, so the handoff fallback stays. D1 to D3 minted; `q-jwnker2n4y` cancelled; settled.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Provisional until Q1 settles.
-
 **Who owns what today.**
 
-| Component | Owns for a workspace | Path / symbol |
-|-----------|----------------------|---------------|
+| Component | Owns for a workspace or a sleeping head | Path / symbol |
+|-----------|------------------------------------------|---------------|
 | git | the Git worktree port: create, remove, prune, refusal of dirty or undelivered trees, custody lease | `packages/git/rust/src/worktree.rs` `remove_worktree`; `refs.rs` `acquire_checkout_custody` |
 | checkout door (execution) | the only caller of that port: make, provision, remove under custody, orphan reclaim | `packages/execution/checkout/src/work_remove.rs`, `orphan.rs`; verb `fgos worktree` (`apps/fgos/src/wiring/worktree.rs`) |
 | run supervisor | the `dispatch-cwd` lease while a unit writes in a tree (process-bound) | `packages/run-supervisor/rust/src/controller/cwd_lock.rs`; `src/runner/execution/custody-door.mjs` |
-| execution core | the unit's declared writes and commit; `.fgos/assignments/<unitRunId>/` keeps the run record, not a hold | `src/runner/execution/unit.mjs` |
+| execution core | the unit's declared writes and commit; `.fgos/assignments/<unitRunId>/` keeps the run record and the kept transcript, not a hold | `src/runner/execution/unit.mjs`; `seatSessionDir` |
 | land door (supervision wiring) | removes the landed branch's worktree through the checkout door, reports kept ones | `apps/fgos/src/wiring/supervision.rs` `run_land` (commit `49c4081c5`, the main part of `p-6sd4fslxv7`) |
-| session host / rotation | the session only; no worktree or branch field | `src/session-host/`, `src/session-rotation/` |
-| keeper (skeleton plan) | sleep and wake of a head by its scheduling records | plan `261122-0056` phases 4 and 6 |
+| Identity | who a live session is; live-only by its locked rule | `docs/platform/identity/spec.md` local directory |
+| Session Host | placing and retiring a head; the head record and lineage files; after D2 also the sleep state and the read-only view | `src/session-host/head-start.mjs` `writeHeadPlacement`; `docs/platform/session-host/spec.md` |
+| keeper (skeleton plan) | deciding sleep and wake from scheduling records | plan `261122-0056` phases 4 to 6 |
 
-**Where the hold belongs.** In the checkout door, which already refuses every removal that would lose a sleeping
-lead's work. Nothing new needs to be stored to *keep* the work. To *hand it back*, the fresh lead needs the phase's
-worktree; the lead skill already names it `<plan dir>-p<NN>` and reuses one per phase, so the keeper's successor
-brief can point at it. What is missing is the proof the owner asked for: one owning test in phase 6 that sleeps a lead
-with an unlanded change, runs a land and a cleanup, wakes it and shows the change is still in the same worktree.
+**The design.** Work stays safe because every remover goes through the checkout door, which refuses a dirty or
+undelivered worktree; nothing extra is stored for that (D1). When the keeper puts a lead to sleep, the Session Host
+retires the head with reason `sleep` and writes the wake time and the facts the wake needs into the head's existing
+record; the plan source reads the wake time from there, and one read-only view shows live and sleeping agents (D2).
+The sleep also writes a handoff. On wake the keeper starts the successor through the existing start path: it resumes
+the kept transcript when that is light and the provider matches, else it opens fresh with the handoff, and in both
+cases the lead re-reads plan and git and reuses its phase worktree (D3).
 
 ```mermaid
 flowchart LR
-  K[keeper phase 6: sleep / wake] -->|successor brief: plan + phase| L[fresh lead]
-  L -->|git worktree list, name plan-pNN| W[(phase worktree)]
-  Land[land door] -->|remove| C[checkout door]
-  Orphan[runner / merge / workflow cleanup] -->|remove| C
-  C -->|refuses dirty or undelivered| W
+  K[keeper: sleep decision] -->|retire reason sleep| SH[Session Host]
+  SH -->|retiredReason, wakeAt, plan, phase, ctx, cli session| P[(head placement.json)]
+  SH -->|handoff reason sleep| H[(lineage handoff)]
+  P -->|waitingOn.until| PS[phase 5 plan source] --> K
+  K -->|until passed: start successor| SH
+  SH -->|light + same provider| R[resume kept transcript]
+  SH -->|else| F[fresh session + handoff]
+  R & F -->|git worktree list, plan-pNN| W[(phase worktree)]
+  C[checkout door] -->|refuses dirty or undelivered| W
+  V[read-only view] -.reads.-> P
+  V -.reads.-> I[(Identity live sessions)]
 ```
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-### Workspace hold as a phase 6 requirement {#task-phase6-workspace-hold}
+### Phase 6 amendments of the orchestration skeleton plan {#task-phase6-workspace-hold}
 
-Goal: the owner's hold, delivered inside skeleton phase 6, with no new store. Form: an amendment to the existing plan
-`261122-0056-orchestration-skeleton`, never a new plan (owner, 2026-11-23 15:05). Proposed amendments to
-`phase-06-sleep-and-wake.md`: (a) Inputs add the checkout door (`packages/execution/checkout/src/work_remove.rs`) and
-the lead skill's worktree naming; (b) a step saying the successor brief names plan and phase so the fresh lead reuses
-worktree `<plan dir>-p<NN>`, or the Q1 alternative if the owner chooses it; (c) Verify adds the owning test below;
-(d) footprint adds that test's file; (e) the sleep state (`retiredReason: sleep`, `wakeAt`, plan, phase) is written
-to the head's placement record (`src/session-host/head-start.mjs` `writeHeadPlacement`) and the plan source of phase 5
-reads `waitingOn.until` from it, so no sleep-record store is added (§3 row 7); (f) how the woken lead gets its previous session, per Q2 (§3 row 8); in every branch sleep writes a handoff
-through the rotation handoff writer (reason `sleep`), which phase 6 step 3 assumes but no step writes today. D-IDs: none yet (waits on Q1). Draft verify: `cargo test -p fgos-supervision --test keeper` plus one owning test that sleeps a lead with an unlanded
-change, lands another branch, runs the cleanup, wakes and finds the change in the same worktree.
+Goal: the hand-off block above, applied by the skeleton plan's planner to `phase-06-sleep-and-wake.md` (and the phase
+5 plan source). D-IDs: D1, D2, D3. Siblings: none; it is not a new plan. Draft verify:
+`cargo test -p fgos-supervision --test keeper` plus the owning tests of (f).
 
 ### Overlap: a second worktree creator beside the checkout door {#task-overlap-workflow-create}
 
 `createWorktreeCheckoutSync` (`src/runner/repo-locks.mjs`) calls the Git worktree port directly; its one importer is
 `src/workflow/unit-handoff.mjs`. The door rule says only `fgos-checkout` makes a linked checkout. Candidate backlog
-row, separate from this topic.
+row for Miu, separate from this topic.
 
 ### Overlap: three places judge "removable" with their own bookkeeping {#task-overlap-kept-lists}
 
 The land door (`worktreesKept`), the workflow (`cleanupWorkflowWorktree` and its kept list in
 `src/workflow/unit-handoff.mjs`) and the runner (`listLeftovers`, `kept` in `src/runner/loop.mjs`) each keep their
-own kept-worktree list over the same door. Candidate backlog row, to check whether one report belongs in the door.
+own kept-worktree list over the same door. Candidate backlog row for Miu, to check whether one report belongs in the
+door.
