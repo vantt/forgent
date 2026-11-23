@@ -14,3 +14,7 @@
 
 ## Sent to lead:SUPERVISOR (forgent-a3, msg f78c2c28)
 Asked it to commit the gate restore and submit the pending heads-stable input with the sha, submit the runner lead's resume input, and run one full `npm test` for the contract-check plan when memory allows. Waiting on its reply. Next wake: check for the sha, check runner phase 2 progress, and if it is still idle, raise `coordination-help` for the runner lead.
+
+## Late events
+- 26a07331d041dffd `coordination-help` (authority-doors phase 1, question q-75yeaifwzn): decided inside the approved frame. The generated test/rust-host/vectors/envelope/version.json joins the phase 1 footprint. Precedent: 93cc5bebc and a890846df regenerated it for new verbs. No other running plan touches it. The footprint line was landed through `fgos land`, which also pushes. q-75yeaifwzn and q-klz3vkxjee are the asker's to cancel.
+- 0bb18da027fe1607 `session-idle` names lead:SUPERVISOR (forgent-a3). It is not a lead, and its inbox holds msg f78c2c28. Handled.
