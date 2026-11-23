@@ -321,6 +321,9 @@ test('an overlap line in the Authority map must carry a survivor', () => {
   assert.ok(mapErrors(MODEL, bad).some((e) => e.includes('an overlap names no survivor')));
   const good = withMap('ready', '| hash | `durable-file` | overlaps the old writer; survivor: durable-file; retired: src/a.mjs |');
   assert.deepEqual(mapErrors(MODEL, good), []);
+  // Prose under the table, and the word "overlap" alone, do not ask for a survivor.
+  const prose = planText({ fm: { status: 'ready', ...NEW }, tail: SECTIONS + mapSection('| hash | `durable-file` | no overlap with existing rows |') + 'This overlaps nothing.\n' });
+  assert.deepEqual(mapErrors(MODEL, prose), []);
 });
 
 test('running, done and withdrawn plans are not checked for an Authority map', () => {

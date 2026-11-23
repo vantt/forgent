@@ -229,8 +229,8 @@ function checkAuthorityMap(body, errors) {
     }
     if (!tokens.some(Boolean)) errors.push(`authority map: the row for "${plain(row[0] ?? '')}" names no model row`);
   }
-  for (const line of lines) {
-    if (/\boverlaps?\b/i.test(line) && !/survivor:/i.test(line)) errors.push(`authority map: an overlap names no survivor (write "survivor: <id>; retired: <path>"): ${plain(line).slice(0, 80)}`);
+  for (const line of lines.filter((l) => l.trimStart().startsWith('|'))) {
+    if (/\boverlaps\b/i.test(line) && !/survivor:/i.test(line)) errors.push(`authority map: an overlap names no survivor (write "survivor: <id>; retired: <path>"): ${plain(line).slice(0, 80)}`);
   }
 }
 

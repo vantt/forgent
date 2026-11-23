@@ -28,6 +28,8 @@ const DOORS_KEEP: &str = ".gitkeep";
 const LAYER_NAMES: &[&str] = &["entry", "use-case", "infra", "domain", "kernel"];
 const COMPONENT_STATUSES: &[&str] = &["live", "designed", "planned", "draft", "retired"];
 const CONTRACT_STATUSES: &[&str] = &["live", "designed", "planned"];
+const ID_PATTERN: &str = "^[a-z0-9][a-z0-9-]*$";
+const TIER_RANGE: std::ops::RangeInclusive<i64> = 0..=9;
 
 /// The text of the model files a new project starts from: no rows, valid against the schema.
 const EMPTY_LAYERS: &str = "layers:\n  - entry\n  - use-case\n  - infra\n  - domain\n  - kernel\nrules: []\ndomains: []\ntierNames: {}\n";
@@ -558,15 +560,20 @@ fn plan_component(
     let component: Component = decode(row)?;
     if !is_id(&component.id) {
         return Err(invalid(format!(
-            "id \"{}\" does not match ^[a-z0-9][a-z0-9-]*$",
+            "id \"{}\" does not match {ID_PATTERN}",
             component.id
         )));
     }
     non_empty("meaning", &component.meaning)?;
     one_of("layer", &component.layer, LAYER_NAMES)?;
     one_of("status", &component.status, COMPONENT_STATUSES)?;
-    if !(0..=9).contains(&component.tier) {
-        return Err(invalid(format!("tier {} is outside 0..9", component.tier)));
+    if !TIER_RANGE.contains(&component.tier) {
+        return Err(invalid(format!(
+            "tier {} is outside {}..{}",
+            component.tier,
+            TIER_RANGE.start(),
+            TIER_RANGE.end()
+        )));
     }
     for exception in &component.exceptions {
         non_empty("exception path", &exception.path)?;
@@ -764,7 +771,7 @@ fn plan_door(
     };
     if !is_id(&slug) {
         return Err(invalid(format!(
-            "slug \"{slug}\" does not match ^[a-z0-9][a-z0-9-]*$"
+            "slug \"{slug}\" does not match {ID_PATTERN}"
         )));
     }
     let body = serde_json::Value::Object(fields);
@@ -1015,6 +1022,45 @@ mod tests {
         result.expect_err("the declare must be refused").code
     }
 
+    /// The checks above restate the schema's enums, id pattern and tier range; this keeps them equal to
+    /// `contracts/model.v1.json`, the one source, so a schema change that the checks miss turns this red.
+    #[test]
+    fn the_row_checks_use_the_enums_pattern_and_tier_range_of_the_model_schema() {
+        let schema: serde_json::Value =
+            serde_json::from_str(include_str!("../../contracts/model.v1.json")).unwrap();
+        let defs = &schema["$defs"];
+        let strings = |value: &serde_json::Value| -> Vec<String> {
+            value
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|v| v.as_str().unwrap().to_owned())
+                .collect()
+        };
+        let component = &defs["component"]["properties"];
+        assert_eq!(strings(&component["layer"]["enum"]), LAYER_NAMES);
+        assert_eq!(
+            strings(&component["exceptions"]["items"]["properties"]["layer"]["enum"]),
+            LAYER_NAMES
+        );
+        assert_eq!(strings(&component["status"]["enum"]), COMPONENT_STATUSES);
+        assert_eq!(
+            strings(&defs["contract"]["properties"]["status"]["enum"]),
+            CONTRACT_STATUSES
+        );
+        assert_eq!(component["id"]["pattern"], ID_PATTERN);
+        assert_eq!(component["tier"]["minimum"], *TIER_RANGE.start());
+        assert_eq!(component["tier"]["maximum"], *TIER_RANGE.end());
+        let empty =
+            fgos_yaml_doc::document::parse(EMPTY_LAYERS.as_bytes(), Profile::Tool, "layers.yaml")
+                .and_then(|document| document.to_json())
+                .unwrap();
+        assert_eq!(
+            strings(&empty["layers"]),
+            LAYER_NAMES,
+            "a new model starts with the schema's layers"
+        );
+    }
     #[test]
     fn a_new_component_without_an_approving_question_is_refused() {
         let (root, model) = project("no-approval");

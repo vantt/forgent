@@ -6,7 +6,7 @@ rust-version.workspace = true
 
 [dependencies]
 fgos-durable-file = { path = "../../durable-file/rust" }
-fgos-yaml-doc ={ path = "../../yaml-doc/rust" }
+fgos-yaml-doc = { path = "../../yaml-doc/rust" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
