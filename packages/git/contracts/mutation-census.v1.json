@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2b2baa996d7158d83ef83b102c545c2781526cbd0e728ee60c0a49391bc4e153",
+  "payloadDigest": "f33364b219982c57734be4879536ee9b33b2524636eea2c420a7423e85c0bd80",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1393,7 +1393,7 @@
     "scripts/lib/dev-host-manifest.mjs": "9928ceb97e807bcb02a7fed73153cf21de09d6cc9b6d56492166cb94e48c44bb",
     "scripts/lib/doc-links.mjs": "a4f2720a80234e2f3d5000877efdf2be95dd7c5ca11eda519f025d65df711cd1",
     "scripts/lib/full-suite-queue.mjs": "da176b9ad8a796ec13ede755dd2c2b12e6e29d5b5b12874ca8e6ae06803e3aba",
-    "scripts/lib/git-addon-stage.mjs": "642a4f8d70679311126bf21238ca77e54333458c2b95b2ea35aaf5bc02d93927",
+    "scripts/lib/git-addon-stage.mjs": "8a0eb28b6700bedaaa34cd965ec204cb9375950b34a0e4ed988071f47ed22a3c",
     "scripts/lib/git-dir-layout.mjs": "cdc573ff49e7c12af30c284ea84060ff476390b26769a0cb82f63dc357df04eb",
     "scripts/lib/git-ports.mjs": "2050baedb9873aa02de331465cb110fff9bf942a3666dbaca6438770998d6fc0",
     "scripts/lib/git-spawn-match.mjs": "45403263d2d8bbd51068f6db07866fe3cb15efd6bbf61bccb4a074322dfbceae",
@@ -4469,7 +4469,7 @@
     },
     {
       "path": "scripts/lib/git-addon-stage.mjs",
-      "line": 202,
+      "line": 220,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

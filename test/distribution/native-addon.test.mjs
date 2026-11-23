@@ -13,6 +13,17 @@ import {ensureGitAddon, root} from '../helpers/git-addon.mjs';
 import {buildRustDistribution, nativeAddonLibraryName, nativeAddonComponent, computeArtifactDigest, gitCapabilitiesForHost} from '../../scripts/build-rust-distribution.mjs';
 const built = ensureGitAddon();
 
+// A verified ort archive cache, so a script's ensureOrtStatic never downloads the archive.
+function seedVerifiedOrtCache(repo) {
+  const ortDir = archiveDirectory(repo);
+  const ortFile = path.join(ortDir, 'libonnxruntime.a');
+  fs.rmSync(ortFile, {recursive: true, force: true});
+  fs.mkdirSync(ortDir, {recursive: true});
+  fs.writeFileSync(ortFile, 'seeded archive');
+  const ortStat = fs.statSync(ortFile);
+  fs.writeFileSync(`${ortFile}.verified`, `${ARCHIVE_SHA256} ${ortStat.size} ${ortStat.mtimeMs}\n`);
+}
+
 test('test addon descriptor uses the release capability producer', () => {
   const manifest = JSON.parse(fs.readFileSync(built.manifest));
   assert.deepEqual(manifest.components.nativeAddon.capabilities, gitCapabilitiesForHost());
@@ -160,13 +171,14 @@ test('development host carries and loads the addon from its per-invocation manif
     const repo = path.join(temp, 'checkout');
     fs.cpSync(path.join(root, 'src'), path.join(repo, 'src'), {recursive: true});
     // The distribution builder and the libraries it imports (its one-door census step among them).
-    for (const file of ['scripts/run-rust-dev-host.mjs', 'scripts/lib/dev-host-manifest.mjs', 'scripts/lib/git-addon-stage.mjs', 'scripts/build-rust-distribution.mjs', 'scripts/git-one-door-scan.mjs', 'scripts/lib/js-source-lexer.mjs', 'scripts/lib/rust-source.mjs', 'scripts/lib/git-spawn-match.mjs', 'scripts/lib/git-dir-layout.mjs', 'Cargo.lock']) {
+    for (const file of ['scripts/run-rust-dev-host.mjs', 'scripts/lib/dev-host-manifest.mjs', 'scripts/lib/git-addon-stage.mjs', 'scripts/ort-static.mjs', 'scripts/build-rust-distribution.mjs', 'scripts/git-one-door-scan.mjs', 'scripts/lib/js-source-lexer.mjs', 'scripts/lib/rust-source.mjs', 'scripts/lib/git-spawn-match.mjs', 'scripts/lib/git-dir-layout.mjs', 'Cargo.lock']) {
       fs.mkdirSync(path.dirname(path.join(repo, file)), {recursive: true});
       fs.copyFileSync(path.join(root, file), path.join(repo, file));
     }
     fs.writeFileSync(path.join(repo, 'package.json'), '{"type":"module"}');
     fs.mkdirSync(path.join(repo, 'bin'));
     fs.writeFileSync(path.join(repo, 'bin/fgos.mjs'), `import fs from 'node:fs'; import {loadNativeAddon} from '../src/git/native.mjs'; const m=JSON.parse(fs.readFileSync(process.env.FGOS_ACTIVE_MANIFEST_PATH)); console.log(JSON.stringify({versions:loadNativeAddon().versions(),component:m.components.nativeAddon,files:m.files}));`);
+    seedVerifiedOrtCache(repo);
     const cargo = path.join(temp, 'cargo');
     fs.writeFileSync(cargo, `#!${process.execPath}
 const fs=require('node:fs'),path=require('node:path');
@@ -234,7 +246,7 @@ process.exit(101);
     const digestFile = path.join(addonDir, GIT_ADDON_SOURCE_DIGEST_FILE);
     fs.writeFileSync(digestFile, gitAddonSourceDigest(repo));
 
-    const runProbe = (mode) => {
+    const runProbe = (mode, extraEnv = {}) => {
       const probe = `
 import assert from 'node:assert/strict';
 import { ensureAddonForScript } from './scripts/lib/git-addon-stage.mjs';
@@ -243,8 +255,13 @@ const env = { ...process.env };
 delete env.FGOS_ACTIVE_MANIFEST_PATH;
 delete env.FGOS_HOST_BIN;
 delete env.FGOS_ACTIVE_RELEASE_PATH;
+if (process.argv[1] === 'inherited') {
+  env.FGOS_HOST_BIN = process.env.PROBE_HOST_BIN;
+  env.FGOS_ACTIVE_RELEASE_PATH = process.env.PROBE_RELEASE_PATH;
+  env.FGOS_ACTIVE_MANIFEST_PATH = process.env.PROBE_MANIFEST_PATH;
+}
 
-if (process.argv[1] === 'fresh') {
+if (process.argv[1] === 'fresh' || process.argv[1] === 'inherited') {
   ensureAddonForScript(env, ${JSON.stringify(repo)});
   console.log(JSON.stringify({
     FGOS_HOST_BIN: env.FGOS_HOST_BIN,
@@ -261,7 +278,7 @@ if (process.argv[1] === 'fresh') {
 }
 `;
       // The caller's cargo settings must not steer the probe: the target is always the read-only directory.
-      const childEnv = {...process.env, PATH: `${temp}${path.delimiter}${process.env.PATH}`, CARGO_TARGET_DIR: targetDir};
+      const childEnv = {...process.env, PATH: `${temp}${path.delimiter}${process.env.PATH}`, CARGO_TARGET_DIR: targetDir, ...extraEnv};
       delete childEnv.CARGO_BUILD_TARGET_DIR;
       return execFileSync(process.execPath, ['--input-type=module', '-e', probe, mode], {
         cwd: repo,
@@ -277,6 +294,23 @@ if (process.argv[1] === 'fresh') {
     assert.equal(freshOut.FGOS_ACTIVE_RELEASE_PATH, repo);
     assert.equal(freshOut.FGOS_ACTIVE_MANIFEST_PATH, manifest);
     assert.equal(fs.existsSync(cargoRecord), false, 'cargo stub was not called for fresh staged addon');
+
+    // 1b. An inherited release whose payload is another directory cannot serve this checkout: the staged addon wins
+    const foreign = path.join(temp, 'foreign-release');
+    fs.mkdirSync(path.join(foreign, 'payload'), {recursive: true});
+    const foreignManifest = path.join(foreign, 'manifest.json');
+    fs.writeFileSync(foreignManifest, JSON.stringify({components: {legacyNode: {root: 'payload'}}}));
+    const foreignOut = JSON.parse(runProbe('inherited', {PROBE_HOST_BIN: path.join(foreign, 'fgos'), PROBE_RELEASE_PATH: foreign, PROBE_MANIFEST_PATH: foreignManifest}));
+    assert.equal(foreignOut.FGOS_HOST_BIN, hostBin);
+    assert.equal(foreignOut.FGOS_ACTIVE_RELEASE_PATH, repo);
+    assert.equal(foreignOut.FGOS_ACTIVE_MANIFEST_PATH, manifest);
+    assert.equal(fs.existsSync(cargoRecord), false, 'cargo stub was not called with a foreign inherited release');
+
+    // 1c. An inherited manifest that serves this checkout is left untouched
+    const servingOut = JSON.parse(runProbe('inherited', {PROBE_HOST_BIN: '/inherited/fgos', PROBE_RELEASE_PATH: repo, PROBE_MANIFEST_PATH: manifest}));
+    assert.equal(servingOut.FGOS_HOST_BIN, '/inherited/fgos');
+    assert.equal(servingOut.FGOS_ACTIVE_RELEASE_PATH, repo);
+    assert.equal(servingOut.FGOS_ACTIVE_MANIFEST_PATH, manifest);
 
     // 2. Stale case with an unwritable target directory: named error thrown
     fs.writeFileSync(digestFile, 'stale-source-digest');
@@ -300,13 +334,7 @@ if (process.argv[1] === 'fresh') {
     }
 
     // 2b. Verified ort cache present: cargo runs once and fails read-only
-    const ortDir = archiveDirectory(repo);
-    const ortFile = path.join(ortDir, 'libonnxruntime.a');
-    fs.rmSync(ortFile, {recursive: true, force: true});
-    fs.mkdirSync(ortDir, {recursive: true});
-    fs.writeFileSync(ortFile, 'seeded archive');
-    const ortStat = fs.statSync(ortFile);
-    fs.writeFileSync(`${ortFile}.verified`, `${ARCHIVE_SHA256} ${ortStat.size} ${ortStat.mtimeMs}\n`);
+    seedVerifiedOrtCache(repo);
     fs.chmodSync(targetDir, 0o555);
 
     try {
