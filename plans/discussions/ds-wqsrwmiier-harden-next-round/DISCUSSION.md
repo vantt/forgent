@@ -58,7 +58,8 @@ open for round 2:
 
 At 19:34 the owner ordered a triage scan that decides which components need a council (N7, in step 0). At 19:4x the owner set the
 council's focus: component authority, contracts and one door; the inside can be optimised freely later (N8). The scan therefore
-judges the boundary from the component-authority model, not the size of the code.
+judges the boundary from the component-authority model, not the size of the code. The one-door check runs once over the whole
+system, not per layer (N9).
 No owner question is open. The owner answered N5 at 19:3x: step 7 lands and activates on this machine only; the owner lands
 the other machines himself, and mdview and mcp-skill-hub leave the list.
 The hand-off still waits on doors and `261122-2108` (O7), and `261122-2108` is still `draft`.
@@ -107,6 +108,7 @@ This discussion edits them in place from here on. O7, the N rows and F1 are new 
 | N5 | HARDEN step 7 lands "on the three workspaces on the owner machine (forgentX, mdview, mcp-skill-hub) and on the second machine". That list dates from 2026-10-21. Which machines and workspaces run fgOS today? **Owner answer:** each phase's step 7 lands, activates, runs doctor and smokes on this machine (`~/projects/forgent`) first; the owner lands the other machines himself; mdview and mcp-skill-hub are dropped from the list. | clear (owner answer 19:3x); minted next round if it holds | HARDEN plan "The per-layer loop" step 7; owner chat 19:3x |
 | N7 | **Triage scan before any council (owner orders 19:34 and 19:4x).** Step 0 adds one column to the recounted inventory: council weight per component, with its reason. Each layer's step 1 rechecks only its own rows. The scan reads the component-authority model (`components.yaml` owns, mustNotOwn, status and exceptions; `contracts.yaml`; `decision-kinds.yaml`; `doors/`) and the source, and judges the boundary, not the size of the code. **Full** (a council on that component): its authority, contracts or door are not sound. Signs: status still `designed`, per-file layer exceptions, a contract whose evidence still points at Node, door debt, a sign of a `mustNotOwn` breach, or the same job done through more than one door (a Node and a Rust twin, several walkers or copies, as in H2). T7 Work is always full (decision 78). **Light** (no council, an ordinary sub-plan): the boundary is sound and only inside work remains (deleting, thinning). **Skip**: a facade or thin client over a Rust owner, or dead code, deleted with its last caller (D1). The scan decides by these rules without asking; its table rides in the layer's one batched owner ask, where the owner can override a row. Example: `session-host` has status `designed` and four per-file layer exceptions (`head-start`, `head-request`, `head-stop` at tier 5, `head-grants` kernel), so it is full. | provisional (owner direction, round 1b); amends D7's "loop unchanged"; mint next round if it holds | owner chat 19:34 "cần có 1 bước quét để quyết định chổ nào cần council, không thì phí", 19:4x (N8); `packages/component-authority/model/components.yaml` session-host row |
 | N8 | **The council settles the boundary only: authority, contracts and one door.** Per component it decides what it is the authority for (and must not own), its contracts and ports, its Rust/Node boundary, that each job has exactly one door, and the delete list that follows. The settled shape is written into the component's spec and the model. HARDEN's Part B (inside review on axes A–G) is no longer required: once the boundary is right, the inside may be optimised freely later. The close conditions (net Δ ≤ 0, no High left unreproduced) still hold. | provisional (owner direction, round 1b); amends D7's council step; mint next round if it holds | owner chat 19:4x "council chủ yếu với anh sẽ ưu tiên về component-authority và contracts … tối ưu bên trong kiểu gì cũng được", "à thêm là 1 cửa"; design principle 1 |
+| N9 | **The one-door check is system-wide, never per layer.** HARDEN's earlier one-door search looked only inside the layer being worked, so two doors for one job in different layers slipped through (a Rust crate at T2 and a Node PATH walker at T9, as in H2). Step 0 runs one scan over the whole repo, Node and Rust (`src`, `bin`, `scripts`, `apps`, `packages`, hooks), and writes one map: job → every door that does it. For each job with more than one door, the door kept is the one in the lowest layer that needs it (design principle 2), and each extra door is assigned to the phase holding it for deletion. Every layer's council reads this map instead of searching its own layer; each layer's close refreshes the map so a door added meanwhile is caught. | provisional (owner direction, round 1b); mint next round if it holds | owner chat 19:4x "lần dò 1 cửa trước đây là dò cục bộ trong tầng đang làm, trong khi một cửa là xuyên suốt hệ thống"; design principles 1 and 2 |
 | N6 | H5's first red looks resolved: `test/cli/fgos-workflow.test.mjs` no longer names `--plan` (commit `0a3f46ac5`, 2026-11-18). The instruction-projections red was not rechecked. Step 0 confirms both. | first likely resolved; second not rechecked | `git log` on both test files |
 | F1 | Model tiers today: T2 `git`, `terminal-control`, `session-rotation`; T3 `session-host`; T5 `seat-binding`, `execution-core`, `dispatch-transport`; T6 `workflow`, `work-driver`; T7 `work-state`, `runner`; T8 `supervision`; T9 `packaging-distribution`, `host-surface`, `learning-docs-registry`. The model is YAML now (doors 1b has landed). | clear | `packages/component-authority/model/components.yaml`, `layers.yaml` |
 
@@ -145,6 +147,8 @@ Copied from ds-wham5txfkv §4. They are owner decisions made there and are not r
 - **2026-11-23 19:4x — owner:** "council chủ yếu với anh sẽ ưu tiên về component-authority và contracts. với anh tốt chổ này thì
   sau này tối ưu bên trong kiểu gì cũng được", then "à thêm là 1 cửa". Recorded as N8. N7's weights now judge authority, contracts
   and one door from the model instead of code size.
+- **2026-11-23 19:4x — owner:** "lưu ý: lần dò 1 cửa trước đây là dò cục bộ trong tầng đang làm, trong khi một cửa là xuyên suốt hệ
+  thống". Recorded as N9: one system-wide job → doors map built in step 0, read by every council, refreshed at each layer close.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -228,7 +232,8 @@ and `scripts/*.mjs` callers of `src/` (each plan moves its own script callers).
 
 ### Step 0 — recount before hand-off {#task-step-0}
 After doors and `261122-2108` land: rerun the §5 inventory method, check H5 (the two reds), update §6, and fill the triage
-column (skip / light / full council, with its reason, N7) for every component. Then mark this
+column (skip / light / full council, with its reason, N7) for every component, and build the system-wide job → doors map (N9).
+Then mark this
 discussion settled and hand the skeleton to a planner. Owner: this shaper.
 
 ### Phase T2–T3 — session {#task-t2-t3-session}
