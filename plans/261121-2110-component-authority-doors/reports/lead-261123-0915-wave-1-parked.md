@@ -97,3 +97,18 @@ It was raised to the supervisor.
   `main-checkout-dirty-overlap`, `land-remote-diverged`, `merge-slot-busy`, `land-target-changed`). The sync-only
   form `fgos run --sync <ref> --writes <p> --worktree <w>` was refused `bad-args` ("run takes one prompt"), even in
   the exact shape the help shows. Worktrees `-p01` and `-p01b` hold superseded, uncommitted copies of this work.
+
+## Wave 1 and 2 of the re-cut plan (13:15-14:05)
+
+- I started phases 2f, 2g, 3b and 3d before reading their `## Waits` sections. That was my mistake. Each one
+  stopped without changing anything, because its wait has not cleared:
+  - 2f waits on S6b/S7 of the Rust migration program.
+  - 2g waits on backlog item p-rypvkc3kai.
+  - 3b and 3d wait on phase 8 of 261122-2108.
+  They stay `draft`. Their worktrees `-p2f`, `-p2g`, `-p3b` and `-p3d` hold only the unit reports.
+- Phases 2e, 4 and 5 have no waits. They ran in parallel (c-90965, c-91168, c-90984) and all three ended
+  `execution-failure` / `infra-exec-failed` with nothing changed. The binding chose deepseek/thehive (capacity
+  selection `unknown-or-low-confidence`), and the runner stopped each worker for `output-limit` once its stdout
+  passed 10 MB, after 13-20 minutes. The first 2e run (c-88060) had already failed on deepseek with `infra-no-report`.
+- Ordering held for the file collisions: 2d after 2e (both write the mutation census and the suite baseline), and
+  2c after 5 (both write the command manifest).
