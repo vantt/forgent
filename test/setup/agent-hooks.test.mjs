@@ -223,6 +223,9 @@ for (const cli of ['omp', 'pi']) {
 
     writeMailboxOptIn(repoRoot, true);
     installThroughHost(repoRoot, cli);
+    // The doctor run that installs also probes each shim call once; only the handlers' calls count below.
+    fs.rmSync(`${log}.argv`, { force: true });
+    fs.rmSync(`${log}.stdin`, { force: true });
     const content = fs.readFileSync(extensionFile(repoRoot, cli), 'utf8');
     for (const [, spec] of content.matchAll(/^import .* from '([^']+)';$/gm)) assert.match(spec, /^node:/, `only node builtins: ${spec}`);
     const handlers = await loadedHandlers(repoRoot, cli);
