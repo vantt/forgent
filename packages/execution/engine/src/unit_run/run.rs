@@ -10,7 +10,8 @@
 //! What it writes: `unit.json` (through the durable-file door, Node's bytes) and nothing else of its own; every
 //! other file is the door's that owns it.
 
-use std::cell::OnceCell;
+use std::cell::{OnceCell, RefCell};
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicUsize, Ordering as AtomicOrdering};
 use std::sync::{Mutex, MutexGuard, PoisonError};
@@ -38,7 +39,7 @@ use super::git_port::{
     foreign_index_detail, partition_paths, CommitArgs, Preflight, ResumeCommit, UnitGit,
 };
 use super::history::{outcome_of_run_result, read_unit_run_history};
-use super::host::{SeatDispatch, UnitRunHost};
+use super::host::{AccountRead, SeatDispatch, UnitRunHost};
 use super::partial_writes::{writes_since, WorktreeSnapshot};
 use super::provider_limit::{
     answer_provider_limit, is_lease_conflict, launched_from, present, LimitAsk,
@@ -415,6 +416,8 @@ struct Ctx<'h, 'c, H: UnitRunHost> {
     options: &'h Value,
     /// The config read live, once (Node's `liveConfig`).
     live: OnceCell<Value>,
+    /// The account state each seat attempt's bind read, by assignment id, until the attempt is recorded.
+    account_reads: RefCell<HashMap<String, AccountRead>>,
     main_root: PathBuf,
     assignments_dir: PathBuf,
     unit_dir: PathBuf,
@@ -466,6 +469,7 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
             host,
             options: base.options,
             live: base.live.clone(),
+            account_reads: RefCell::new(HashMap::new()),
             main_root: base.main_root.clone(),
             assignments_dir: base.assignments_dir.clone(),
             unit_dir,
@@ -1244,13 +1248,23 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
             "runtimeDir": self.options.get("providerCapacityRuntimeDir"),
             "assignmentId": self.assignment_id(role, n),
         });
-        self.host.bind(
+        let assignment_id = self.assignment_id(role, n);
+        let bound = self.host.bind(
             &ask,
             &self.with_accounts(&self.snapshot_runner())?,
             &role.session,
             &accounts,
             walk,
-        )
+        )?;
+        match bound.account_read {
+            Some(read) => {
+                self.account_reads.borrow_mut().insert(assignment_id, read);
+            }
+            None => {
+                self.account_reads.borrow_mut().remove(&assignment_id);
+            }
+        }
+        Ok(bound.binding)
     }
 
     /// The seat's first binding: an earlier round's executor is kept, a recorded attempt keeps its binding.
@@ -1743,6 +1757,15 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
                 "boundAt".into(),
                 json!(crate::transport::visibility_session::iso_now()),
             );
+            // An empty overlay is the config alone, so only a bind that read account state leaves a record.
+            if let Some(read) = self.account_reads.borrow_mut().remove(&assignment_id) {
+                if read.overlay.as_object().is_some_and(|o| !o.is_empty()) {
+                    attempt.insert(
+                        "accountState".into(),
+                        json!({ "at": read.at, "overlay": read.overlay }),
+                    );
+                }
+            }
             attempt.insert(
                 "configHash".into(),
                 self.record

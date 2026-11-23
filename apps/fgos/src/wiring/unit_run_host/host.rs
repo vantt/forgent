@@ -13,7 +13,7 @@ use fgos_execution_engine::assignment_runner::execute::{
     execute_assignment, ExecuteError, ExecuteOptions,
 };
 use fgos_execution_engine::unit_run::host::{
-    AttemptRef, ControlHeld, GitRoots, SeatDispatch, UnitControl, UnitRunHost,
+    AttemptRef, BoundSeat, ControlHeld, GitRoots, SeatDispatch, UnitControl, UnitRunHost,
 };
 use fgos_execution_engine::unit_run::run_unit_contract::RunUnitError;
 use fgos_execution_engine::unit_run::verify::Verified;
@@ -392,7 +392,7 @@ impl<A: CaseAdmission + Sync> UnitRunHost for HostUnitRun<A> {
         session: &Value,
         accounts_ask: &Value,
         walk: &Value,
-    ) -> Result<Value, RunUnitError> {
+    ) -> Result<BoundSeat, RunUnitError> {
         accounts::bind(ask, runner, session, accounts_ask, walk)
     }
     fn runner_config_for_binding(&self, runner: &Value, bound: &Value) -> Value {
