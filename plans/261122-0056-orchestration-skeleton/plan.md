@@ -1,7 +1,8 @@
 ---
 contract: plan-v1
 title: "Orchestration skeleton: a code keeper that admits, starts and wakes players from domain scheduling records, one raise door for every entry, and one harness for plans"
-status: ready
+status: running
+lead: head:lead-forgent-261122-0056-orches-18a8f
 priority: P1
 blockedBy:
   - 261118-1341-s6a-execution-tier-rust
@@ -99,7 +100,7 @@ footprint:
   - .agents/skills/**
   - plugins/fgOS/skills/**
   - .claude/skills/**
-base: 0e527ffa28de6cbb0a1e39d9d7098f6ba6454481
+base: b1c7cb9b5df175c59bd2670c20c6bfe283341646
 source:
   - plans/discussions/ds-yb4uz2p6hz-orchestration-skeleton/DISCUSSION.md
   - p-7pjiqfoj7v
