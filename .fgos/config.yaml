@@ -363,3 +363,8 @@ watcher:
     # @fgos:doc The action for this row kind. Values: wake-supervisor | notify | none.
     # @fgos:why [3199073] watcher tune: actions.session-idle=none
     session-idle: none
+# @fgos:doc The project supervisor head and its lead pool.
+supervisor:
+  # @fgos:doc Most leads the supervisor runs at once; it equals the default lane count and is not derived at read time. In leads. Minimum: 1. Default: 4.
+  # @fgos:why [39631fb7-af40-41d5-8e8b-18afb8376e42] owner 2026-11-23 12:38: run at most 2 leads at once until the RAM shortage (OOM kills 09:17, 09:25-09:31, 11:10) is over
+  maxLeads: 2
