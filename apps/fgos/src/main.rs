@@ -185,6 +185,7 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::supervision::LAND_DESCRIPTOR,
     wiring::supervision::SLOTS_DESCRIPTOR,
     wiring::migrate::DESCRIPTOR,
+    wiring::authority::DESCRIPTOR,
 ];
 
 /// The legacy payload root of the running release, for the verbs that read what it ships (its skills, its scripts).
@@ -383,6 +384,7 @@ fn main() {
         )));
     }
     service.register_provider(Arc::new(fgos_convention::ConventionProvider::new()));
+    service.register_provider(Arc::new(wiring::authority::AuthorityProvider::new()));
     for descriptor in [
         fgos_identity::IDENTITY_DESCRIPTOR,
         fgos_identity::IDENTITY_READ_DESCRIPTOR,

@@ -596,6 +596,17 @@ pub const CATALOG: &[OperationDescriptor] = &[
         allowed_host_kinds: &["cli"],
         streaming_mode: StreamingMode::None,
     },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("authority.locate"),
+        owning_component_id: Cow::Borrowed("component-authority"),
+        request_contract: ContractRef::from_static("authority.locate.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("authority.locate.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("authority.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
 ];
 
 #[cfg(test)]
@@ -605,8 +616,8 @@ mod tests {
     #[test]
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
-        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run, the init run, the migrate portfolio run, the dispatch decide and explain, the dispatch Run show, watch and recover, the dispatch runtime inspect and reconcile, the dispatch account and session probes, the unit run, the agents list, the supervision tick, supervisor read and write, land and slots, and the resource-check run.
-        assert_eq!(CATALOG.len(), 53);
+        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run, the init run, the migrate portfolio run, the dispatch decide and explain, the dispatch Run show, watch and recover, the dispatch runtime inspect and reconcile, the dispatch account and session probes, the unit run, the agents list, the supervision tick, supervisor read and write, land and slots, the resource-check run, and the authority locate.
+        assert_eq!(CATALOG.len(), 54);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -669,6 +680,7 @@ mod tests {
         ] {
             assert!(ids.contains(&id));
         }
+        assert!(ids.contains(&"authority.locate"));
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips

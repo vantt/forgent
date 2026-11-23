@@ -10,6 +10,7 @@ fgos-distribution = { path = "../../packages/distribution/rust" }
 fgos-work-state = { path = "../../packages/work-state/rust" }
 fgos-observe = { path = "../../packages/observe/rust" }
 fgos-convention = { path = "../../packages/convention/rust" }
+fgos-component-authority = { path = "../../packages/component-authority/rust" }
 fgos-identity = { path = "../../packages/identity/rust" }
 fgos-event-store = { path = "../../packages/event-store/rust" }
 fgos-canonical-json = { path = "../../packages/canonical-json/rust" }

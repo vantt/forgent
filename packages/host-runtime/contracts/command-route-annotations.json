@@ -4,6 +4,11 @@
     "owner_path": "packages/execution/rust",
     "subcommands": true
   },
+  "authority": {
+    "operation_id": "authority.locate",
+    "owner_path": "packages/component-authority/rust",
+    "subcommands": true
+  },
   "config": {
     "operation_id": "config.read",
     "owner_path": "packages/config/rust",
