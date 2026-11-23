@@ -16,3 +16,6 @@
 - `fgos session type` fills the prompt but does not submit it. It took a separate `--text $'\r'` to submit.
 - The first `fgos supervisor plans` read showed the skeleton plan as not admissible after every blocker was done. A re-read a few minutes later showed it admissible, so the cause is unknown.
 - `fgos questions show` fails in a confined head with `git-floor-probe-failed: Read-only file system`.
+
+## Closed after the first draft
+- `b7299ed93ffcda0d` is closed. lead:SUPERVISOR answered (`f2673c95791f1868`) that no probe is needed: Miu has leased from the claude pool since `132b52f92`. `q-rfxqncjrax` is recorded in phase 12 at `df345c11a` and acked. The wake ended with `fgos supervisor done`.
