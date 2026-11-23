@@ -24,6 +24,8 @@ ensureAddonForScript();
 export const CONTRACT_MARKER = 'plan-v1';
 // Plans already under the contract before this rule cite no backlog id; only plans created from this date on must.
 export const BACKLOG_SOURCE_REQUIRED_FROM = '2026-11-22';
+// Plans written before the Authority-map rule carry no map; only plans created from this date on must.
+export const AUTHORITY_MAP_REQUIRED_FROM = '2026-11-24';
 // The plan vocabulary has one source, shared with the Rust portfolio reader and the head-name resolver.
 const VOCABULARY = JSON.parse(fs.readFileSync(new URL('../packages/supervision/contracts/plan-vocabulary.v1.json', import.meta.url), 'utf8'));
 export const STATUSES = VOCABULARY.statuses;
@@ -205,7 +207,7 @@ function authorityMapLines(body) {
 /**
  * The Authority-map rule for a `draft` or `ready` plan (plan-contract.md §3): the section exists, each row of its
  * table names a row of the model or a `declare: <kind> <id>` line, and a line that says `overlaps` carries
- * `survivor:`. Skipped where the project has no model.
+ * `survivor:`. Skipped where the project has no model, and for plans created before AUTHORITY_MAP_REQUIRED_FROM.
  */
 function checkAuthorityMap(body, errors) {
   let model;
@@ -298,7 +300,8 @@ export function checkPlanDir(dir, { plansRoot = path.dirname(path.resolve(dir)) 
   }
   for (const [name] of PLAN_SECTIONS) if (!hasSection(body, name)) errors.push(`missing section: ${name}`);
   checkPhaseTable(body, errors, meta.status);
-  if (meta.status === 'draft' || meta.status === 'ready') checkAuthorityMap(body, errors);
+  const mapRequired = typeof meta.created === 'string' && meta.created >= AUTHORITY_MAP_REQUIRED_FROM;
+  if ((meta.status === 'draft' || meta.status === 'ready') && mapRequired) checkAuthorityMap(body, errors);
   const warnings = [];
   return { dir, legacy: false, meta, errors, warnings };
 }

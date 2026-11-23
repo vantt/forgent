@@ -342,7 +342,10 @@ mod project_without_a_model {
         assert!(asked.status.success(), "ask: {asked:?}");
         let question = String::from_utf8(asked.stdout).unwrap().trim().to_owned();
         let open = scene.declare(ROW, Some(&question));
-        assert!(!open.status.success(), "an open question approves nothing: {open:?}");
+        assert!(
+            !open.status.success(),
+            "an open question approves nothing: {open:?}"
+        );
         assert!(
             String::from_utf8_lossy(&open.stderr).contains("approval-not-answered"),
             "{}",

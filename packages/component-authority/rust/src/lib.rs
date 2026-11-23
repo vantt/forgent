@@ -9,9 +9,7 @@ pub mod locate;
 pub mod model;
 pub mod render;
 
-pub use declare::{
-    declare, Approvals, DeclareRequest, Declared, Kind, QuestionState, Refusal,
-};
+pub use declare::{declare, Approvals, DeclareRequest, Declared, Kind, QuestionState, Refusal};
 pub use locate::{fold, locate, Match, MatchKind, MatchedOn};
 pub use model::{
     Component, Contract, DecisionKind, Door, DoorPath, Layers, Model, ModelError, TierException,

@@ -142,7 +142,7 @@ The phase table has exactly these columns (order free):
   in the map; a new component or decision kind still needs the owner's answered question (`fgos authority
   declare --approved-by <q-id>`). The check for `draft` and `ready` plans fails a missing `Authority map`
   heading, a row id that is not in the model and is not a `declare:` line, and an `overlaps` line without
-  `survivor:`; it skips the rule where the project has no model.
+  `survivor:`; it skips the rule where the project has no model, and for plans created before 2026-11-24.
 - No plan ids, phase numbers, audit labels or finding codes in code comments, test names,
   migration names or commit messages: describe the behavior.
 - A planner ends its reply with the status block:

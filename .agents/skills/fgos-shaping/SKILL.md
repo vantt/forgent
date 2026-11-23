@@ -102,6 +102,13 @@ S04.
    cite it. Hold the conversation as open prose: propose framings, name
    trade-offs, disagree when the evidence warrants it, let the person revise.
    Update §1/§3/§5 after every exchange that changes them.
+   When the discussion names a component, contract, door or decision kind
+   (or a spec creates one), run `fgos authority locate "<one sentence>"` first and
+   use the name of the row that owns it; when no row owns it, record in
+   the discussion that a `fgos authority declare` is needed (a new component or
+   decision kind needs the owner's answered question) and run it once the shape
+   is settled. Where the project has no model, `locate` answers
+   `authority: inactive`: note `authority: inactive` in the discussion and go on.
 3. **Mint a D-ID only once a point is stable** (held across more than one
    round). A point still in flux stays in §3/§5.
 4. **Regenerate §6** after a shape-changing decision.

@@ -8,6 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   AUTHORITY,
+  AUTHORITY_MAP_REQUIRED_FROM,
   BACKLOG_SOURCE_REQUIRED_FROM,
   STATUSES,
   activeOverlaps,
@@ -295,11 +296,13 @@ const withModel = (answer, fn) => {
   try { return fn(); } finally { AUTHORITY.read = before; }
 };
 const mapErrors = (answer, text) => withModel(answer, () => errorsOf(text));
-const withMap = (status, ...rows) => planText({ fm: { status }, tail: SECTIONS + mapSection(...rows) });
+// A plan created on or after the rule's date, with the backlog source such a plan needs.
+const NEW = { created: AUTHORITY_MAP_REQUIRED_FROM, source: '["DISCUSSION.md", "p-abcdef2345"]' };
+const withMap = (status, ...rows) => planText({ fm: { status, ...NEW }, tail: SECTIONS + mapSection(...rows) });
 
 test('a draft or ready plan without an Authority map section is an error where the project has a model', () => {
   for (const status of ['draft', 'ready']) {
-    assert.ok(mapErrors(MODEL, planText({ fm: { status } })).includes('missing section: authority map'), status);
+    assert.ok(mapErrors(MODEL, planText({ fm: { status, ...NEW } })).includes('missing section: authority map'), status);
   }
   assert.deepEqual(mapErrors(MODEL, withMap('ready', '| a new lock | `durable-file` | reuse |')), []);
 });
@@ -323,18 +326,23 @@ test('an overlap line in the Authority map must carry a survivor', () => {
 test('running, done and withdrawn plans are not checked for an Authority map', () => {
   for (const status of ['running', 'done', 'withdrawn']) {
     const fm = status === 'running' ? { status, lead: 'lead:S6A' } : { status };
-    assert.deepEqual(mapErrors(MODEL, planText({ fm })), [], status);
+    assert.deepEqual(mapErrors(MODEL, planText({ fm: { ...fm, ...NEW } })), [], status);
   }
 });
 
 test('where the project has no model the Authority-map rule is skipped', () => {
-  assert.deepEqual(mapErrors({ authority: 'inactive' }, planText({ fm: { status: 'ready' } })), []);
+  assert.deepEqual(mapErrors({ authority: 'inactive' }, planText({ fm: { status: 'ready', ...NEW } })), []);
 });
 
 test('a model the host cannot answer is an error for a plan that needs a map, never a silent pass', () => {
-  const errors = mapErrors(() => { throw new Error('Rust host binary unavailable'); }, planText());
+  const errors = mapErrors(() => { throw new Error('Rust host binary unavailable'); }, planText({ fm: NEW }));
   assert.ok(errors.some((e) => e.startsWith('cannot read the authority model: Rust host binary unavailable')));
-  assert.deepEqual(mapErrors(() => { throw new Error('x'); }, planText({ fm: { status: 'running', lead: 'lead:S6A' } })), []);
+  assert.deepEqual(mapErrors(() => { throw new Error('x'); }, planText({ fm: { status: 'running', lead: 'lead:S6A', ...NEW } })), []);
+});
+
+test('a plan created before the Authority-map rule is not checked for a map', () => {
+  assert.deepEqual(mapErrors(MODEL, planText({ fm: { ...NEW, status: 'ready', created: '2026-11-23' } })), []);
+  assert.ok(mapErrors(MODEL, planText({ fm: { status: 'ready', ...NEW } })).includes('missing section: authority map'));
 });
 
 test('the script gets the model from the host verb and opens no model file', () => {

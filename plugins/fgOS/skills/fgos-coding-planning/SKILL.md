@@ -103,6 +103,14 @@ each choice honors. A medium/high risk needs a proof point at validating,
 not a guess here. Full mechanics (impact-analysis posture, the `consult`
 escape hatch): `references/approach-and-shape.md`.
 
+For each new decision, function, module, verb or contract the approach
+introduces, run `fgos authority locate "<one sentence>"` and write the plan's
+**Authority map** (`../../../core/skills/_shared/plan-contract.md` §3): the
+model row that owns it, or `declare: <kind> <id>` when none does, and
+`survivor: <id>; retired: <path>` where it overlaps something that exists.
+Where the project has no model, `locate` answers `authority: inactive`: record
+`authority: inactive` in the plan and go on.
+
 ### Step 3: Shape
 Write (or enrich) `plan.md` scaled to the mode — a direct note for
 `tiny`, a fuller map for `high-risk`. End with the exact `## Outstanding
@@ -146,7 +154,8 @@ item steps (bootstrap, `Mode:` lane, split specs, verify sync) and:
 
 1. Read the settled discussion (`plans/discussions/<dir>/`) or the shaping report its marker names.
 2. Write `plans/<dir>/plan.md` and its phase files per `../../../core/skills/_shared/plan-contract.md`; take `<dir>`
-   from `fgos convention path --kind plan`.
+   from `fgos convention path --kind plan`. Before the phase table, run `fgos authority locate` for each new
+   thing and write the Authority map (Step 2); `authority: inactive` where the project has no model.
 3. Run `node scripts/plan-contract-check.mjs --plan plans/<dir>` and fix every error.
 4. Land the plan directory with `fgos land --paths plans/<dir> --message "..."`, with `status: draft`, then set
    `status: ready` last with a second `fgos land --paths` of `plan.md` alone. The `ready` flip is what wakes the

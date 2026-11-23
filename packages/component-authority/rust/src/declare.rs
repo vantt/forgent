@@ -214,7 +214,7 @@ pub fn declare(
         match request.kind {
             Kind::Component => plan_component(&model, dir, root, request.row, present)?,
             Kind::DecisionKind => plan_decision_kind(&model, dir, root, request.row, present)?,
-            Kind::Door => plan_door(&model, dir, root, request.row, present)?,
+            Kind::Door => plan_door(&model, dir, root, request.row)?,
             Kind::Contract => plan_contract(&model, dir, root, request.row, present)?,
         }
     };
@@ -232,14 +232,17 @@ pub fn declare(
         .collect();
     writes.push(planned.write);
     for write in &writes {
-        fs::create_dir_all(&write.dir)
-            .map_err(|error| Refusal::new("write-failed", format!("{}: {error}", write.dir.display())))?;
-        fgos_durable_file::replace_durably(&write.dir, &write.name, &write.bytes).map_err(|error| {
-            Refusal::new(
-                "write-failed",
-                format!("{}: {error}", write.dir.join(&write.name).display()),
-            )
+        fs::create_dir_all(&write.dir).map_err(|error| {
+            Refusal::new("write-failed", format!("{}: {error}", write.dir.display()))
         })?;
+        fgos_durable_file::replace_durably(&write.dir, &write.name, &write.bytes).map_err(
+            |error| {
+                Refusal::new(
+                    "write-failed",
+                    format!("{}: {error}", write.dir.join(&write.name).display()),
+                )
+            },
+        )?;
     }
     Ok(Declared {
         kind: request.kind,
@@ -332,7 +335,8 @@ fn require_answered(approvals: &dyn Approvals, question: Option<&str>) -> Result
 // Row checks
 
 fn decode<T: DeserializeOwned>(row: &serde_json::Value) -> Result<T, Refusal> {
-    serde_json::from_value(row.clone()).map_err(|error| Refusal::new("row-invalid", error.to_string()))
+    serde_json::from_value(row.clone())
+        .map_err(|error| Refusal::new("row-invalid", error.to_string()))
 }
 
 fn invalid(detail: impl Into<String>) -> Refusal {
@@ -377,7 +381,8 @@ fn path_text(item: &crate::model::DoorPath) -> &str {
 /// `root`. A glob is checked by the directory in front of its first wildcard.
 fn path_exists(root: &Path, text: &str) -> bool {
     let base = text.split('#').next().unwrap_or("");
-    if base.is_empty() || Path::new(base).is_absolute() || base.split('/').any(|part| part == "..") {
+    if base.is_empty() || Path::new(base).is_absolute() || base.split('/').any(|part| part == "..")
+    {
         return false;
     }
     let literal = match base.find(['*', '?', '[']) {
@@ -490,7 +495,8 @@ fn refused_yaml(name: &str, refusal: impl std::fmt::Display) -> Refusal {
 /// a list with rows keeps every byte of the old text and adds the item's own block, which the door emits and
 /// which is read back to prove the document now holds exactly the old rows plus the new one.
 fn append_item(text: &str, name: &str, item: Value) -> Result<Vec<u8>, Refusal> {
-    let mut document = parse(text.as_bytes(), Profile::Tool, name).map_err(|r| refused_yaml(name, r))?;
+    let mut document =
+        parse(text.as_bytes(), Profile::Tool, name).map_err(|r| refused_yaml(name, r))?;
     let old = match document.value() {
         Value::Seq(rows) => rows.clone(),
         _ => return Err(refused_yaml(name, "the model file is not a list")),
@@ -551,7 +557,10 @@ fn plan_component(
 ) -> Result<Planned, Refusal> {
     let component: Component = decode(row)?;
     if !is_id(&component.id) {
-        return Err(invalid(format!("id \"{}\" does not match ^[a-z0-9][a-z0-9-]*$", component.id)));
+        return Err(invalid(format!(
+            "id \"{}\" does not match ^[a-z0-9][a-z0-9-]*$",
+            component.id
+        )));
     }
     non_empty("meaning", &component.meaning)?;
     one_of("layer", &component.layer, LAYER_NAMES)?;
@@ -582,7 +591,10 @@ fn plan_component(
     require_paths(
         root,
         "exception path",
-        component.exceptions.iter().map(|exception| exception.path.as_str()),
+        component
+            .exceptions
+            .iter()
+            .map(|exception| exception.path.as_str()),
     )?;
     list_planned(
         dir,
@@ -623,7 +635,11 @@ fn plan_decision_kind(
     if let Some(facts) = &kind.facts {
         check_facts(facts)?;
     }
-    if model.decision_kinds.iter().any(|existing| existing.id == kind.id) {
+    if model
+        .decision_kinds
+        .iter()
+        .any(|existing| existing.id == kind.id)
+    {
         return Err(Refusal::new(
             "id-taken",
             format!("decision kind \"{}\" already exists", kind.id),
@@ -635,7 +651,9 @@ fn plan_decision_kind(
     named.extend(kind.read_first.as_deref());
     match &kind.facts {
         Some(serde_json::Value::String(text)) => named.push(text),
-        Some(serde_json::Value::Array(items)) => named.extend(items.iter().filter_map(|item| item.as_str())),
+        Some(serde_json::Value::Array(items)) => {
+            named.extend(items.iter().filter_map(|item| item.as_str()))
+        }
         _ => {}
     }
     require_paths(root, "narrative, readFirst or facts", named)?;
@@ -674,7 +692,11 @@ fn plan_contract(
             return Err(invalid("version is a string or an integer"));
         }
     }
-    if model.contracts.iter().any(|existing| existing.id == contract.id) {
+    if model
+        .contracts
+        .iter()
+        .any(|existing| existing.id == contract.id)
+    {
         return Err(Refusal::new(
             "id-taken",
             format!("contract \"{}\" already exists", contract.id),
@@ -707,7 +729,11 @@ fn plan_contract(
             ));
         }
     }
-    require_paths(root, "evidence", contract.evidence.iter().map(String::as_str))?;
+    require_paths(
+        root,
+        "evidence",
+        contract.evidence.iter().map(String::as_str),
+    )?;
     list_planned(
         dir,
         present,
@@ -723,7 +749,6 @@ fn plan_door(
     dir: &Path,
     root: &Path,
     row: &serde_json::Value,
-    present: bool,
 ) -> Result<Planned, Refusal> {
     let mut fields = row
         .as_object()
@@ -731,10 +756,16 @@ fn plan_door(
         .ok_or_else(|| invalid("a door row is an object"))?;
     let slug = match fields.remove("slug") {
         Some(serde_json::Value::String(slug)) => slug,
-        _ => return Err(invalid("a door row names its file in a string field \"slug\"")),
+        _ => {
+            return Err(invalid(
+                "a door row names its file in a string field \"slug\"",
+            ))
+        }
     };
     if !is_id(&slug) {
-        return Err(invalid(format!("slug \"{slug}\" does not match ^[a-z0-9][a-z0-9-]*$")));
+        return Err(invalid(format!(
+            "slug \"{slug}\" does not match ^[a-z0-9][a-z0-9-]*$"
+        )));
     }
     let body = serde_json::Value::Object(fields);
     let door: Door = decode(&body)?;
@@ -814,7 +845,9 @@ fn plan_move(
         .as_object()
         .ok_or_else(|| invalid("a move row is an object with \"id\" and \"owner\""))?;
     if object.len() != 2 || !object.contains_key("id") || !object.contains_key("owner") {
-        return Err(invalid("a move row carries exactly \"id\" and the new \"owner\""));
+        return Err(invalid(
+            "a move row carries exactly \"id\" and the new \"owner\"",
+        ));
     }
     let (id, owner) = match (object["id"].as_str(), object["owner"].as_str()) {
         (Some(id), Some(owner)) => (id, owner),
@@ -861,8 +894,8 @@ fn plan_move(
         ));
     }
     let text = current_text(dir, DECISION_KINDS, present)?;
-    let mut document =
-        parse(text.as_bytes(), Profile::Tool, DECISION_KINDS).map_err(|r| refused_yaml(DECISION_KINDS, r))?;
+    let mut document = parse(text.as_bytes(), Profile::Tool, DECISION_KINDS)
+        .map_err(|r| refused_yaml(DECISION_KINDS, r))?;
     document
         .set(
             &[Segment::Index(index), Segment::Key("owner".to_owned())],
@@ -901,7 +934,8 @@ mod tests {
     const ANSWERED: Answer = Answer(QuestionState::Answered);
 
     fn scratch(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("fgos-ca-declare-{name}-{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("fgos-ca-declare-{name}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         dir
@@ -985,7 +1019,10 @@ mod tests {
     fn a_new_component_without_an_approving_question_is_refused() {
         let (root, model) = project("no-approval");
         let row = component_row("b");
-        assert_eq!(code(run(&model, &root, Kind::Component, &row, None)), "approval-required");
+        assert_eq!(
+            code(run(&model, &root, Kind::Component, &row, None)),
+            "approval-required"
+        );
         let open = declare(
             &model,
             &root,
@@ -1012,7 +1049,9 @@ mod tests {
             &Answer(QuestionState::Unknown),
         );
         assert_eq!(code(unknown), "approval-not-answered");
-        assert!(!fs::read_to_string(model.join("components.yaml")).unwrap().contains("b-canon"));
+        assert!(!fs::read_to_string(model.join("components.yaml"))
+            .unwrap()
+            .contains("b-canon"));
     }
 
     #[test]
@@ -1020,13 +1059,22 @@ mod tests {
         let (root, model) = project("names");
         let mut row = component_row("b");
         row["canonical"] = json!("ALPHA");
-        assert_eq!(code(run(&model, &root, Kind::Component, &row, Some("q"))), "name-taken");
+        assert_eq!(
+            code(run(&model, &root, Kind::Component, &row, Some("q"))),
+            "name-taken"
+        );
         let mut row = component_row("b");
         row["aliases"] = json!(["decision-kind:dk"]);
-        assert_eq!(code(run(&model, &root, Kind::Component, &row, Some("q"))), "name-taken");
+        assert_eq!(
+            code(run(&model, &root, Kind::Component, &row, Some("q"))),
+            "name-taken"
+        );
         let mut row = component_row("a");
         row["canonical"] = json!("fresh");
-        assert_eq!(code(run(&model, &root, Kind::Component, &row, Some("q"))), "id-taken");
+        assert_eq!(
+            code(run(&model, &root, Kind::Component, &row, Some("q"))),
+            "id-taken"
+        );
     }
 
     #[test]
@@ -1034,22 +1082,40 @@ mod tests {
         let (root, model) = project("references");
         let mut row = component_row("b");
         row["parent"] = json!("ghost");
-        assert_eq!(code(run(&model, &root, Kind::Component, &row, Some("q"))), "reference-missing");
+        assert_eq!(
+            code(run(&model, &root, Kind::Component, &row, Some("q"))),
+            "reference-missing"
+        );
         let kind = json!({"id":"d2","canonical":"decision-kind:d2","aliases":[],"meaning":"m","owner":"ghost","narrative":"docs/a.md"});
-        assert_eq!(code(run(&model, &root, Kind::DecisionKind, &kind, Some("q"))), "reference-missing");
+        assert_eq!(
+            code(run(&model, &root, Kind::DecisionKind, &kind, Some("q"))),
+            "reference-missing"
+        );
         let contract = json!({"id":"C2","canonical":"C2","aliases":[],"meaning":"m","provider":"ghost","consumers":["a"],"evidence":[],"status":"live"});
-        assert_eq!(code(run(&model, &root, Kind::Contract, &contract, None)), "reference-missing");
+        assert_eq!(
+            code(run(&model, &root, Kind::Contract, &contract, None)),
+            "reference-missing"
+        );
         let contract = json!({"id":"C2","canonical":"C2","aliases":[],"meaning":"m","provider":"a","consumers":["ghost"],"evidence":[],"status":"live"});
-        assert_eq!(code(run(&model, &root, Kind::Contract, &contract, None)), "reference-missing");
+        assert_eq!(
+            code(run(&model, &root, Kind::Contract, &contract, None)),
+            "reference-missing"
+        );
         let door = json!({"slug":"two","job":"j","kind":"door","patterns":[],"allowed":[]});
-        assert_eq!(code(run(&model, &root, Kind::Door, &door, None)), "reference-missing");
+        assert_eq!(
+            code(run(&model, &root, Kind::Door, &door, None)),
+            "reference-missing"
+        );
     }
 
     #[test]
     fn a_contract_path_that_already_has_a_provider_is_refused() {
         let (root, model) = project("provider");
         let contract = json!({"id":"C2","canonical":"C2","aliases":[],"meaning":"m","provider":"a","consumers":["a"],"path":"docs/a.md","evidence":[],"status":"live"});
-        assert_eq!(code(run(&model, &root, Kind::Contract, &contract, None)), "provider-taken");
+        assert_eq!(
+            code(run(&model, &root, Kind::Contract, &contract, None)),
+            "provider-taken"
+        );
     }
 
     #[test]
@@ -1057,9 +1123,15 @@ mod tests {
         let (root, model) = project("paths");
         let mut row = component_row("b");
         row["spec"] = json!("docs/ghost.md#anchor");
-        assert_eq!(code(run(&model, &root, Kind::Component, &row, Some("q"))), "path-missing");
+        assert_eq!(
+            code(run(&model, &root, Kind::Component, &row, Some("q"))),
+            "path-missing"
+        );
         let door = json!({"slug":"two","job":"j","kind":"door","patterns":[],"allowed":["src/ghost/**"],"owner":"a"});
-        assert_eq!(code(run(&model, &root, Kind::Door, &door, None)), "path-missing");
+        assert_eq!(
+            code(run(&model, &root, Kind::Door, &door, None)),
+            "path-missing"
+        );
     }
 
     #[test]
@@ -1067,13 +1139,22 @@ mod tests {
         let (root, model) = project("schema");
         let mut row = component_row("b");
         row["surprise"] = json!(1);
-        assert_eq!(code(run(&model, &root, Kind::Component, &row, Some("q"))), "row-invalid");
+        assert_eq!(
+            code(run(&model, &root, Kind::Component, &row, Some("q"))),
+            "row-invalid"
+        );
         let mut row = component_row("b");
         row["layer"] = json!("basement");
-        assert_eq!(code(run(&model, &root, Kind::Component, &row, Some("q"))), "row-invalid");
+        assert_eq!(
+            code(run(&model, &root, Kind::Component, &row, Some("q"))),
+            "row-invalid"
+        );
         let mut row = component_row("B!");
         row["canonical"] = json!("x");
-        assert_eq!(code(run(&model, &root, Kind::Component, &row, Some("q"))), "row-invalid");
+        assert_eq!(
+            code(run(&model, &root, Kind::Component, &row, Some("q"))),
+            "row-invalid"
+        );
     }
 
     #[test]
@@ -1095,8 +1176,15 @@ mod tests {
         assert_eq!(refused.code, "move-needs-plan");
         write(&root, "plans/p/plan.md", "## Authority map\n\n| x | y |\n| a | survivor: c; retired: z |\n\n## Phases\nsurvivor: b\n");
         let refused = declare(&model, &root, &request(Some(plan)), &ANSWERED).unwrap_err();
-        assert_eq!(refused.code, "move-needs-plan", "a survivor outside the map does not count");
-        write(&root, "plans/p/plan.md", "## Authority map\n\n| x | y |\n| a | survivor: b; retired: z |\n");
+        assert_eq!(
+            refused.code, "move-needs-plan",
+            "a survivor outside the map does not count"
+        );
+        write(
+            &root,
+            "plans/p/plan.md",
+            "## Authority map\n\n| x | y |\n| a | survivor: b; retired: z |\n",
+        );
         let moved = declare(&model, &root, &request(Some(plan)), &ANSWERED).unwrap();
         assert_eq!(moved.id, "dk");
         let loaded = Model::load_dir(&model).unwrap();
@@ -1104,7 +1192,10 @@ mod tests {
         let refused = declare(
             &model,
             &root,
-            &DeclareRequest { kind: Kind::Door, ..request(Some(plan)) },
+            &DeclareRequest {
+                kind: Kind::Door,
+                ..request(Some(plan))
+            },
             &ANSWERED,
         )
         .unwrap_err();
@@ -1114,19 +1205,42 @@ mod tests {
     #[test]
     fn a_declared_component_lands_in_the_yaml_and_keeps_the_notes_on_other_rows() {
         let (root, model) = project("write");
-        let declared = run(&model, &root, Kind::Component, &component_row("b"), Some("q")).unwrap();
+        let declared = run(
+            &model,
+            &root,
+            Kind::Component,
+            &component_row("b"),
+            Some("q"),
+        )
+        .unwrap();
         assert_eq!(declared.id, "b");
         assert!(!declared.created_model);
         let text = fs::read_to_string(model.join("components.yaml")).unwrap();
-        assert!(text.starts_with("# the first component\n- id: a\n"), "{text}");
+        assert!(
+            text.starts_with("# the first component\n- id: a\n"),
+            "{text}"
+        );
         let loaded = Model::load_dir(&model).unwrap();
         assert_eq!(
-            loaded.components.iter().map(|c| c.id.as_str()).collect::<Vec<_>>(),
+            loaded
+                .components
+                .iter()
+                .map(|c| c.id.as_str())
+                .collect::<Vec<_>>(),
             ["a", "b"]
         );
         assert_eq!(loaded.components[1].canonical, "b-canon");
-        // the same row cannot be declared twice
-        assert_eq!(code(run(&model, &root, Kind::Component, &component_row("b"), Some("q"))), "name-taken");
+        // the same row cannot be declared twice; its id is checked before its names
+        assert_eq!(
+            code(run(
+                &model,
+                &root,
+                Kind::Component,
+                &component_row("b"),
+                Some("q")
+            )),
+            "id-taken"
+        );
     }
 
     #[test]
@@ -1139,8 +1253,14 @@ mod tests {
         assert!(declared.files[0].ends_with("doors/two.yaml"));
         let loaded = Model::load_dir(&model).unwrap();
         assert_eq!(loaded.contracts.len(), 2);
-        assert!(loaded.doors.iter().any(|d| d.slug == "two" && d.job == "j2"));
-        assert_eq!(code(run(&model, &root, Kind::Door, &door, None)), "id-taken");
+        assert!(loaded
+            .doors
+            .iter()
+            .any(|d| d.slug == "two" && d.job == "j2"));
+        assert_eq!(
+            code(run(&model, &root, Kind::Door, &door, None)),
+            "id-taken"
+        );
     }
 
     #[test]
@@ -1149,11 +1269,26 @@ mod tests {
         write(&root, "src/a/lib.rs", "");
         write(&root, "docs/b.md", "# b\n");
         let model = root.join(".fgos/authority/model");
-        assert_eq!(code(run(&model, &root, Kind::Component, &component_row("b"), None)), "approval-required");
+        assert_eq!(
+            code(run(
+                &model,
+                &root,
+                Kind::Component,
+                &component_row("b"),
+                None
+            )),
+            "approval-required"
+        );
         let mut row = component_row("b");
         row["spec"] = json!("docs/ghost.md");
-        assert_eq!(code(run(&model, &root, Kind::Component, &row, Some("q"))), "path-missing");
-        assert!(!root.join(".fgos").exists(), "a refused declare left a model behind");
+        assert_eq!(
+            code(run(&model, &root, Kind::Component, &row, Some("q"))),
+            "path-missing"
+        );
+        assert!(
+            !root.join(".fgos").exists(),
+            "a refused declare left a model behind"
+        );
     }
 
     #[test]
@@ -1167,12 +1302,22 @@ mod tests {
         row.as_object_mut().unwrap().remove("parent");
         let declared = run(&model, &root, Kind::Component, &row, Some("q")).unwrap();
         assert!(declared.created_model);
-        for name in ["layers.yaml", "components.yaml", "decision-kinds.yaml", "contracts.yaml", "doors/.gitkeep"] {
+        for name in [
+            "layers.yaml",
+            "components.yaml",
+            "decision-kinds.yaml",
+            "contracts.yaml",
+            "doors/.gitkeep",
+        ] {
             assert!(model.join(name).exists(), "{name}");
         }
         let loaded = Model::load_dir(&model).unwrap();
         assert_eq!(loaded.components.len(), 1);
-        assert!(loaded.decision_kinds.is_empty() && loaded.contracts.is_empty() && loaded.doors.is_empty());
+        assert!(
+            loaded.decision_kinds.is_empty()
+                && loaded.contracts.is_empty()
+                && loaded.doors.is_empty()
+        );
     }
 
     #[test]
@@ -1181,7 +1326,10 @@ mod tests {
         write(&root, "src/a.rs", "");
         let model = root.join(".fgos/authority/model");
         let door = json!({"slug":"one","job":"j","kind":"door","patterns":[],"allowed":["src/a.rs"],"owner":"a"});
-        assert_eq!(code(run(&model, &root, Kind::Door, &door, None)), "reference-missing");
+        assert_eq!(
+            code(run(&model, &root, Kind::Door, &door, None)),
+            "reference-missing"
+        );
         assert!(!model.exists());
     }
 }

@@ -16,12 +16,12 @@ use fgos_component_authority::{
     declare, locate, Approvals, DeclareRequest, Kind, Model, QuestionState, MODEL_DIR,
 };
 use fgos_git::invocation_root::{resolve_invocation_root, RootPolicy, RootRequest};
-use fgos_questions::store::{LogOpener, QuestionLog};
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome, OperationId,
     OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
     ProviderOutcome,
 };
+use fgos_questions::store::LogOpener;
 use serde_json::json;
 use std::borrow::Cow;
 use std::ffi::OsString;
@@ -499,10 +499,26 @@ mod tests {
         assert!(project(&["authority", "declare", "--kind", "thing", "--row", row]).is_err());
         assert!(project(&["authority", "declare", "--kind", "door"]).is_err());
         assert!(project(&["authority", "declare", "--kind", "door", "--row", "{nope"]).is_err());
-        assert!(project(&["authority", "declare", "--kind", "door", "--row", row, "extra"]).is_err());
-        assert!(
-            project(&["authority", "declare", "--kind", "door", "--row", row, "--bogus"]).is_err()
-        );
+        assert!(project(&[
+            "authority",
+            "declare",
+            "--kind",
+            "door",
+            "--row",
+            row,
+            "extra"
+        ])
+        .is_err());
+        assert!(project(&[
+            "authority",
+            "declare",
+            "--kind",
+            "door",
+            "--row",
+            row,
+            "--bogus"
+        ])
+        .is_err());
     }
 
     #[test]
@@ -515,7 +531,8 @@ mod tests {
         assert_eq!(model_dir(&own).unwrap(), own.join(MODEL_DIR));
         let _ = std::fs::remove_dir_all(&own);
 
-        let other = std::env::temp_dir().join(format!("fgos-model-dir-other-{}", std::process::id()));
+        let other =
+            std::env::temp_dir().join(format!("fgos-model-dir-other-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&other);
         std::fs::create_dir_all(other.join(".fgos")).unwrap();
         let dir = model_dir(&other).unwrap();
