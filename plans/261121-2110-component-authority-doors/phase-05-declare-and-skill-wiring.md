@@ -10,7 +10,7 @@
 - Skill sources: `domains/coding/skills/fgos-coding-planning/`, `fgos-coding-implement/` (search step at SKILL.md:76-82), `fgos-coding-validating/`, `fgos-coding-shaping/`, and `core/skills/fgos-shaping/`.
 
 ## Files it may write
-packages/component-authority/rust/, Cargo.lock, apps/fgos/src/routing.rs, apps/fgos/src/invocation_doors.rs, apps/fgos/src/cli_projector.rs, apps/fgos/src/wiring/authority.rs, apps/fgos/tests/authority.rs, the three host-runtime command contracts, core/skills/_shared/plan-contract.md, core/skills/fgos-shaping/, domains/coding/skills/fgos-coding-{planning,implement,validating,shaping}/, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, .agents/skills/, plugins/fgOS/skills/, .claude/skills/ (regenerated only)
+packages/component-authority/rust/, Cargo.lock, apps/fgos/src/main.rs, test/cli/subcommand-flag-drift.test.mjs, apps/fgos/src/routing.rs, apps/fgos/src/invocation_doors.rs, apps/fgos/src/cli_projector.rs, apps/fgos/src/wiring/authority.rs, apps/fgos/tests/authority.rs, the three host-runtime command contracts, core/skills/_shared/plan-contract.md, core/skills/fgos-shaping/, domains/coding/skills/fgos-coding-{planning,implement,validating,shaping}/, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, .agents/skills/, plugins/fgOS/skills/, .claude/skills/ (regenerated only)
 
 ## Steps
 1. Add `declare.rs` and the subcommand `fgos authority declare --kind component|decision-kind|door|contract --row <json> [--approved-by <q-id>] [--plan <dir>] [--move]` (writes):
@@ -47,10 +47,16 @@ packages/component-authority/rust/, Cargo.lock, apps/fgos/src/routing.rs, apps/f
      component or contract, and `declare` when a spec creates one.
 
    Run `npm run build:skills`.
+5. Gate (owner answer q-3iylevstr2 A, 2026-11-23). `locate` and `declare` are a gated capability. Every skill
+   requirement in step 4 and the plan-contract rule in step 2 apply only where the project has
+   `packages/component-authority/model/`. Where it does not, the skill records `authority: inactive` in the plan
+   or verify note and goes on, in the same shape as the impact-analysis gate in AGENTS.md. In step 3,
+   `scripts/plan-contract-check.mjs` skips the Authority-map rule when the checked project has no model. Add one
+   test case for that skip.
 
 ## Verify
 - `cargo test -p fgos-component-authority` and `cargo test -p fgos --test authority` are green.
-- `node --test test/scripts/plan-contract-check.test.mjs` is green.
+- `node --test test/scripts/plan-contract-check.test.mjs` is green, including the no-model skip.
 - `npm run build:skills` leaves `git status` clean after commit.
 - `node scripts/plan-contract-check.mjs --all` reports no new error for `running` plans.
 
