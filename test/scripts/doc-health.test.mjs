@@ -307,6 +307,12 @@ test('backlog checks see a migrated item by its Original id', () => {
       '### tsk-migrated-done — verdict: resolved',
       'Evidence: cites tsk-migrated-done and src/alive.mjs:10.',
       '',
+      '### p-prop000001 — verdict: resolved',
+      'Evidence: cites src/alive.mjs:10.',
+      '',
+      '### tsk-reused-id — verdict: resolved',
+      'Evidence: cites src/alive.mjs:10.',
+      '',
     ].join('\n'),
   });
   try {
@@ -334,8 +340,7 @@ test('backlog checks see a migrated item by its Original id', () => {
         '',
         '# Notes',
         '',
-        'Migrated item.',
-        'Original id: tsk-migrated-done.',
+        'Migrated from the done/declined section of the legacy backlog. Original status: done. Original id: tsk-migrated-done.',
       ].join('\n'),
     );
 
@@ -360,8 +365,7 @@ test('backlog checks see a migrated item by its Original id', () => {
         '',
         '# Notes',
         '',
-        'Migrated item.',
-        'Original id: tsk-reused-id.',
+        'Migrated from the legacy backlog. Original status: proposed. Original id: tsk-reused-id.',
         '',
         'Prose that says the line `Original id: tsk-prose-only.` is not an Original id.',
       ].join('\n'),
@@ -412,6 +416,12 @@ test('backlog checks see a migrated item by its Original id', () => {
         f.includes('tsk-migrated-done') && f.includes('p-done000001') && f.includes('done')
       ),
       `expected named finding for tsk-migrated-done with item id and status, got: ${JSON.stringify(reconResult.failures)}`
+    );
+
+    // A proposed item with one section under its id and another under its Original id is named.
+    assert.ok(
+      reconResult.failures.some((f) => f.includes('p-prop000001') && f.includes('another under its Original id tsk-reused-id')),
+      `expected double-section finding, got: ${JSON.stringify(reconResult.failures)}`,
     );
 
     // 3) Line-scan / parse disagreement: add an item with broken frontmatter but `status: proposed` line.
