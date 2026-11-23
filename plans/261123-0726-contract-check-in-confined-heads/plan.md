@@ -11,7 +11,7 @@ footprint:
   - scripts/git-addon.mjs
   - test/distribution/native-addon.test.mjs
 source:
-  - p-5nob3xpcfw
+  - p-b5jixi4mov
   - plans/reports/planner-261123-0724-contract-check-blind-in-confined-heads.md
 created: 2026-11-23
 ---
