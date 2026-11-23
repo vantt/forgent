@@ -64,7 +64,14 @@ Missing: nothing. Found by `git log -S checkMeasure` and `git log -S 'private::N
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Verify on main and close the row](phase-01-verify-and-close.md) | - | plans/261123-0828-head-stop-rotation-bad-measure/reports/, plans/backlog.md, plans/backlog/p-vbv57yc4d5-every-head-stop-rotation-request-is-refused-bad-measure.md | 1 | ready |
+| 1 | [Verify on main and close the row](phase-01-verify-and-close.md) | - | plans/261123-0828-head-stop-rotation-bad-measure/reports/, plans/backlog.md, plans/backlog/p-vbv57yc4d5-every-head-stop-rotation-request-is-refused-bad-measure.md | 1 | running |
+
+Phase 1 is parked, with status `running`, since 2026-11-23 21:12 +07: run ticket `c-1493-1795442268950` (unit-run `unit-run-1795442269420-67ac68f8`,
+worktree `/home/vantt/projects/forgent-worktrees/261123-0828-head-stop-rotation-bad-measure-p01`, branch
+`head-stop-rotation-bad-measure/p01`) was still `running` after 12 result waits, on producer fallback attempt
+`fb2`. The next wake resumes it with `fgos request result c-1493-1795442268950`; it must not start a second run. The lead
+checked the live evidence on its own: no `bad-measure` line after activation `2026-11-23T08:56:33Z` (the last one is
+from 2026-11-22 21:52 +07), and 11 `at-or-above-soft` stops with outcome `started`.
 
 With one phase there is no wave overlap. No integration phase is needed because there is nothing to merge: the
 phase's verify step is the full gate on `main`.
