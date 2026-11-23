@@ -61,6 +61,27 @@ Thứ tự:
 
 Nếu 0118 chưa xong trong đêm thì sáng mai plan mới vẫn chưa chạy. Khi đó, phần duy nhất có thể làm sớm là T4 (driver confinement): nó không nằm trong footprint của 0118, nhưng phải chờ chẩn đoán xong.
 
+**Chồng lấn với việc chuyển Node sang Rust (chủ hỏi lúc 00:05).** Shaper kiểm và thấy có chồng lấn trực tiếp.
+- Discussion đã settle `ds-wham5txfkv-node-rust-port-inventory` xếp thứ tự các plan chuyển:
+  - Plan 1: packaging setup, chạy sau doors.
+  - Plan 2: session-rotation.
+  - Plan 3: session-host. Plan này đưa "logic head request, start, stop, plan và grants vào `packages/session-host`". Đó đúng là các file mà T3 sửa.
+- Dòng `p-kkkgpg6dzc` ghi luật của chủ: code mới đi vào Rust.
+- Ba plan trên chưa có thư mục plan.
+- Phía Rust đã có sẵn transport: `packages/run-supervisor/rust/src/head_request.rs` nhận yêu cầu, kiểm verb theo envelope, tự làm `session write`, rồi chuyển phần còn lại sang Node bằng `fgos internal head-request`.
+
+**Quyết định của shaper (chủ có thể phủ quyết sáng mai):** code mới của plan này viết bằng Rust, và đây là lát đầu của plan 3 trong inventory. Không port cả session-host trong đợt này, vì như vậy plan to ra và phải chờ plan 1 và plan 2. Cụ thể:
+- Bảng quyền `persona × verb → allow, ask hoặc deny`, có kế thừa, cùng `can-i` và forwarder argv `fgos`, nằm ở `packages/session-host/rust`. Transport `head_request.rs` gọi forwarder và exec verb ngay ở Rust, không đi qua Node.
+- Các nhánh chỉ chuyển tiếp trong `runHeadRequest` (Node) bị xoá. Node chỉ giữ các nhánh có chính sách thật (`land`, `run`, `session start/stop/write`, `questions`), và plan 3 sẽ port chúng sau.
+- `GRANTS` trong `head-grants.mjs` không còn là nguồn quyền. Cỡ lồng (`writes`, `mailbox`, `peers`) cũng chuyển sang bảng Rust, và launch Node đọc nó qua một cổng mỏng cho tới khi plan 3 port launch.
+- T2 (raise cho mọi persona), T5 (mailbox) và việc ghi backlog chỉ còn là dòng trong bảng.
+- Quy tắc release chung của T6, nếu cần code, viết bằng Rust.
+- T1 chỉ đụng docs và skill. T4: phần chẩn đoán làm trước; nếu phải sửa driver confinement (`bwrap.mjs` đang là Node) thì tra bảng inventory xem driver này thuộc plan nào, và sửa đúng chỗ đó.
+
+**Lợi ích:** plan 3 của inventory nhỏ đi, vì 28 nhánh không phải port nữa. Không phải viết logic ở Node rồi port lại. Đúng luật code mới đi Rust.
+
+**Cái giá:** viết Rust chậm hơn viết Node, nên đêm nay làm được ít hơn. Nhưng T3 vốn đã phải chờ doors và 0118, nên cái giá này không làm trễ thêm.
+
 **Nguồn:** `p-g5ktat4kej`, `p-v6xinnjoxh`, `p-dw3h5wscns`, `p-ndortdckid`, `p-ia2v33b54u`, `p-btxvtb34u3`, `p-oqs75qwyco`, cùng các quyết định PC-D1 đến PC-D8.
 
 ## 1. Trạng thái hiện tại
