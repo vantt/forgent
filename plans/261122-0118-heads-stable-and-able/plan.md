@@ -7,65 +7,14 @@ priority: P1
 blockedBy: []
 base: aa35c0664447f6d01d214911973c4d0246715e39
 footprint:
-  - packages/execution/engine/tests/credentials.rs
-  - packages/execution/engine/src/credentials/renew.rs
-  - packages/execution/engine/src/credentials/mod.rs
-  - apps/fgos/src/wiring/dispatch_subs/probes.rs
-  - apps/fgos/src/wiring/session_write_publish.rs
-  - apps/fgos/src/wiring/supervision.rs
-  - scripts/lib/git-one-door-declarations.v1.json
-  - packages/run-supervisor/rust/src/attempt_step.rs
-  - packages/supervision/rust/observe-kinds.json
-  - src/cli/command-registry.mjs
   - plans/261122-0118-heads-stable-and-able/**
-  - src/session-host/head-grants.mjs
-  - src/session-host/head-request.mjs
-  - src/session-host/head-request-client.mjs
-  - test/session-host/head-grants.test.mjs
-  - test/session-host/head-request.test.mjs
-  - test/session-host/head-start.test.mjs
-  - apps/fgos/src/routing.rs
-  - packages/run-supervisor/contracts/head-request.v1.json
-  - packages/run-supervisor/rust/src/head_request.rs
-  - packages/run-supervisor/rust/src/supervise/terminal.rs
-  - packages/run-supervisor/rust/tests/head_request.rs
-  - packages/supervision/rust/src/land.rs
-  - packages/supervision/rust/tests/land.rs
-  - scripts/plan-contract-check.mjs
-  - test/scripts/plan-contract-check.test.mjs
-  - src/session-rotation/rotate.mjs
-  - test/session-rotation/rotate.test.mjs
-  - packages/session-host/contracts/rotation-files.v1.json
-  - packages/distribution/contracts/doctor-registry.v1.json
-  - apps/fgos/src/wiring/doctor/**
-  - core/skills/_shared/plan-contract.md
-  - core/skills/_shared/friction-capture.md
-  - core/skills/fgos-supervisor/SKILL.md
-  - core/skills/fgos-lead/SKILL.md
   - core/skills/fgos-secretary/SKILL.md
   - .agents/skills/**
   - plugins/fgOS/skills/**
   - .fgos/config.yaml
-  - docs/platform/session-host/spec.md
-  - docs/platform/run-supervisor/spec.md
-  - docs/platform/supervision/spec.md
-  - test/skills/fgos-supervisor-idle-lead.test.mjs
   - test/live/head-grant-probe.live.mjs
   - CHANGELOG.md
-  - packages/config/rust/src/provider.rs
-  - packages/config/rust/src/provider/unix_verbs.rs
-  - packages/config/contracts/fixtures/scope.v1.json
-  - packages/config/rust/tests/golden_scope.rs
-  - apps/fgos/src/cli_projector.rs
-  - packages/host-runtime/contracts/command-manifest.json
-  - docs/platform/config/spec.md
-  - packages/host-runtime/rust/src/activation.rs
-  - packages/host-runtime/rust/src/lib.rs
-  - packages/distribution/rust/src/lib.rs
-  - packages/run-supervisor/rust/Cargo.toml
-  - Cargo.lock
-  - test/setup/registrations.test.mjs
-  - apps/fgos/src/wiring/session_rotation_hook.rs
+  - test/session-host/head-start.test.mjs
 source:
   - plans/discussions/ds-fvoi45qccq-heads-stable-and-able/DISCUSSION.md
   - p-vquz26ibnn
@@ -206,6 +155,13 @@ writer, phase 11.
 - `q-dcbq73d2rr`: the owner activates the release carrying 12c (`8883c2a62`) on the host and removes the five finished
   worktrees (p02, p02g, p06, p06f, p12c); lead:SUPERVISOR then reruns the real soft rotation (phase 12 done-when item
   3). The supervisor neither activates a release nor removes a worktree.
+
+### Footprint narrowed to the open phases (2026-11-23 07:30, owner order relayed by lead:SUPERVISOR)
+
+- The plan-level footprint is now exactly the union of open phases 8, 9, 10 and 11 plus this plan directory, so a path
+  only a done phase wrote (for example `apps/fgos/src/routing.rs` or `apps/fgos/src/wiring/supervision.rs`) no longer
+  holds `261122-0056-orchestration-skeleton` or any other plan. If phase 11's gate finds a regression in a done phase's
+  path, this lead asks lead:SUPERVISOR to widen the footprint by that path before fixing it.
 
 ### Footprint narrowed (2026-11-23 00:05, owner order via Miu 23:21, relayed by lead:SUPERVISOR)
 
