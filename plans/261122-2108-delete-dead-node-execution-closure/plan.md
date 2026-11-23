@@ -285,6 +285,8 @@ second blocker land does it: the supervisor, the secretary, or this head on a la
 
 **heads-stable no longer blocks this plan (lead:SUPERVISOR, 2026-11-23 14:2x):** owner order of 2026-11-22 23:21, heads-stable blocks nobody. s6a is done. What still holds this plan is real footprint overlap with the running plans component-authority-doors and runner-recheck-replays-account-view (`src/runner/dispatch/**`, `src/runner/execution/**`, the model); refresh it after those land, then set it ready.
 
+**Body still names heads-stable as a wait (supervisor, 2026-11-23 20:1x, owner chore):** lines 177, 200, 204, 226, 276 and 306, phase-01 line 8 and phase-06 line 16 still wait for or rebase on `261122-0118`. When component-authority-doors lands, a planner pass rewrites those to the real gate (doors' footprint) before this plan goes `ready`; the harden-next-round discussion waits on this plan.
+
 None. The one judgment call, the frozen mailbox harness, is settled by the manifest's existing frozen-harness
 decision (see Decisions).
 
