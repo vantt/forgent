@@ -73,6 +73,26 @@ worktree `/home/vantt/projects/forgent-worktrees/261123-0828-head-stop-rotation-
 checked the live evidence on its own: no `bad-measure` line after activation `2026-11-23T08:56:33Z` (the last one is
 from 2026-11-22 21:52 +07), and 11 `at-or-above-soft` stops with outcome `started`.
 
+Supervisor order, 2026-11-23 21:22 +07: do not wait on that ticket. Its full-gate runs used sandbox workarounds
+(`FGOS_FULL_SUITE_QUEUE=off`, a temporary `FGOS_STATE_HOME`), so they are invalid proof for criterion 5. The lead was
+to run the gate itself outside the sandbox. Result: blocked. The lead session is confined too (`FGOS_CONFINED=1`):
+the worktree, `/proc` and `~/.local/state/fgos` are read-only to it, so it cannot build, install `node_modules` or run
+`npm test` / `cargo test --workspace`. The status stays `running` because the plan contract has no parked status.
+
+Phase 1 evidence so far:
+- Criterion 2 is green: `cargo test -p fgos-run-supervisor --test head_request a_rotation_frame_preserves_decimal_exponent_and_integer_numbers_for_the_route`
+  reported 1 passed, run by the unit at `d265faf28`.
+- Criterion 3 is green: `cargo test -p fgos a_stop_hook_that_fails_before_the_node_route_runs_leaves_one_incident_line_in_the_lineage`
+  reported 1 passed, run by the unit at `d265faf28`.
+- Criterion 4 is green: the lead checked it itself, as noted above.
+- Criterion 5 is open. In the sandbox, 12 or more `apps/fgos` tests under `wiring::doctor::confinement` and
+  `wiring::doctor::git` failed. They need the host's `/proc` and state home, so they say nothing about `main`.
+- Criterion 6 waits on criterion 5. The row stays `in-flight`.
+
+Needed to close: an unconfined run of `npm test` and `cargo test --workspace` on current `main`. A clean verify
+worktree is ready at `/home/vantt/projects/forgent-worktrees/261123-0828-head-stop-rotation-bad-measure-p01v`
+(branch `head-stop-rotation-bad-measure/p01v`, tip `5a5dde6e0`, `node_modules` not installed).
+
 With one phase there is no wave overlap. No integration phase is needed because there is nothing to merge: the
 phase's verify step is the full gate on `main`.
 
