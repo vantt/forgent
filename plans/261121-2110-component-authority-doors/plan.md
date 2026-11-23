@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Component authority doors: locate and declare, the plan-time mapping rule, twin and debt retirement, and primitive-and-alias land checks"
-status: draft
+status: ready
 priority: P1
 blockedBy:
   - 261121-2109-component-authority
