@@ -3,8 +3,8 @@
 Capability: `code:implement`.
 
 Builds PC-D6 (discussion §4) and the window part of PC-D3: one argv forwarder plus one data table, replacing the
-hand-written forward-only branches in the same change (L10, RUL104). Per the discussion's Rust decision (commit
-`2b3336dae`), the table, the forwarder and `can-i` are Rust in `packages/session-host/rust`; this is the first slice of
+hand-written forward-only branches in the same change (L10, RUL104). Per PC-D11 (owner, 2026-11-24
+00:14), the table, the forwarder and `can-i` are Rust in `packages/session-host/rust`; this is the first slice of
 plan 3 of the Node-to-Rust inventory, and nothing else of session-host is ported here.
 
 ## Inputs
@@ -48,7 +48,7 @@ CLI registration of `can-i`: `src/cli/command-registry.mjs`, `packages/host-runt
 `packages/host-runtime/contracts/command-routes.json`, `packages/host-runtime/contracts/command-route-annotations.json`,
 `apps/fgos/src/routing.rs`. Docs: `docs/platform/run-supervisor/spec.md`.
 
-## Decisions taken in this phase (planner's, within PC-D6 and the Rust decision)
+## Decisions taken in this phase (planner's, within PC-D6 and PC-D11)
 
 - **Where the table lives:** `packages/session-host/contracts/head-permissions.v1.json`, compiled into the crate
   (`include_str!`) and read only by `permissions.rs`. It is not a config key, so `config patch` can never widen it; it

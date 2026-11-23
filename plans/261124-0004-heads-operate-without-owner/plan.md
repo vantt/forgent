@@ -77,10 +77,10 @@ created: 2026-11-24
 
 # Heads operate without the owner
 
-Mode: standard. Decisions cited by their discussion ids (PC-D1 to PC-D10) from
-`plans/discussions/privileged-chores-research/DISCUSSION.md`; none is reopened here. The discussion's later decision
-(commit `2b3336dae`, "Chồng lấn với việc chuyển Node sang Rust") is honored: the new table, forwarder, `can-i` and
-release code are Rust in `packages/session-host/rust`, the first slice of plan 3 of the Node-to-Rust inventory
+Mode: standard. Decisions cited by their discussion ids (PC-D1 to PC-D11) from
+`plans/discussions/privileged-chores-research/DISCUSSION.md`; none is reopened here. PC-D11 (owner, 2026-11-24
+00:14) fixes three things this plan follows: it is a separate plan, it runs after the doors plan and 0118 and before
+0056, and its new code is Rust: the table, forwarder, `can-i` and release code live in `packages/session-host/rust`, the first slice of plan 3 of the Node-to-Rust inventory
 (`plans/discussions/ds-wham5txfkv-node-rust-port-inventory/DISCUSSION.md`); the rest of session-host is not ported
 here.
 
@@ -198,6 +198,11 @@ Order against other plans:
   `draft` until both are `done`; the planner (or the supervisor on its wake) then flips `status: ready` once the check
   passes with no cross-plan overlap. The discussion's reading that phases T2, T4, T5 and T6 avoid the doors plan does
   not hold: every one of them regenerates the skill surfaces or edits the confinement files that plan owns.
+- PC-D11 orders this plan after both the doors plan and 0118; the discussion's earlier note in its hand-off ("Thứ tự", 00:20) that only
+  phase 2 waits for the doors plan is superseded, and it could not hold anyway, since every phase overlaps that plan's
+  footprint. The one piece that can start now without a ready plan is the read-only diagnosis of phase 4, steps 1 and
+  2 (why the declared verify commands fail inside the cage). Its report can be written ahead into
+  `reports/cage-before-after.md` by this plan's lead or the supervisor, and it changes no code.
 - `261122-0056-orchestration-skeleton` (draft) shares `src/session-host/head-request.mjs`,
   `core/skills/fgos-supervisor/SKILL.md`, `docs/platform/supervision/spec.md`, `docs/platform/session-host/spec.md`,
   the generated skill surfaces and `CHANGELOG.md`. This plan runs first (discussion hand-off); 0056 rebases onto it on

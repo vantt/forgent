@@ -3,7 +3,7 @@
 Capability: `code:implement`.
 
 Builds PC-D9 and PC-D10: the supervisor skill carries only the general rule; the recipe is project data; the window
-gains one policy branch that runs it, written in Rust (the discussion's Rust decision, commit `2b3336dae`).
+gains one policy branch that runs it, written in Rust (PC-D11).
 
 ## Inputs
 
