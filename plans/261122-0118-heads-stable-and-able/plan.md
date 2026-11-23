@@ -142,7 +142,7 @@ the grants, verb by verb.
 | 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | done |
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | done |
 | 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | done |
-| 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md, test/session-host/head-start.test.mjs | 5 | ready |
+| 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md, test/session-host/head-start.test.mjs | 5 | running |
 | 12 | [Rotation reliability](phase-12-rotation-reliability.md) | 6 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, docs/platform/session-host/spec.md, apps/fgos/src/wiring/session_rotation_hook.rs | 4 | done |
 | 13 | [Heads may write the backlog index file](phase-13-backlog-index-grant.md) | 2 | src/session-host/head-grants.mjs, test/session-host/head-grants.test.mjs | 4 | done |
 
@@ -171,6 +171,20 @@ writer, phase 11.
   its item file) on the first wake after the release carrying `5ebc25616` is activated. At 19:45 `fgos session write
   plans/backlog.md` was still refused `path-not-granted`, so the row is pending activation. Scope: this one row and item
   file; no grant or release change outside phase 13.
+
+### Phase 11 waits on host steps and the changelog land (2026-11-23 21:50, head:lead-forgent-261122-0118-heads-b52f9)
+
+- Every dependency is `done`. Steps 3 and 6 landed earlier (`6765c56df`).
+- **Steps 1 and 4 are parked on owner question `q-vbh2knqpnu`.** It asks for three things only an unconfined hand can
+  do. First, activate a release built from main at or after `0174ac6dd`: the active release (activated 08:56Z) does not
+  carry `5ebc25616`, so `session write plans/backlog.md` and the probe's phase 13 row cannot pass yet. Second, run
+  `npm test` and `cargo test --workspace` on it. Third, remove worktrees `-p13` (abandoned edit) and `-p11c` (empty).
+  This lead's `fgos worktree remove` fails on `EROFS` before any check.
+- **Step 2 is handed to the supervisor.** The run door refuses `CHANGELOG.md` (`write-outside-footprint`), so the six
+  lines are in `reports/carry-p11-changelog-lines.md` for lead:SUPERVISOR to land verbatim (owner order of 07:45).
+- **After activation:** the supervisor and Miu each run `node test/live/head-grant-probe.live.mjs` once they have
+  rotated onto the new release, and land their JSON under `reports/`. The lead then writes `reports/head-grant-probe.md`
+  with the folded-rows check, and sets the phase and the plan `done`.
 
 ### Phases 8 and 10 are `done` (2026-11-23 21:35, head:lead-forgent-261122-0118-heads-b52f9)
 
