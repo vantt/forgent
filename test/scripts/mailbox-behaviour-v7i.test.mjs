@@ -29,7 +29,7 @@ test('V7i has its own harness home apart from V6\'s and every earlier addendum\'
 test('the V7i addendum binds V6\'s hash, pins omp with a Gemini model on the gemini-tetnu login at V7e\'s thinking, eleven cells within what is left of owner Q2 A, and freezes the modules that launch and log in the run', () => {
   const repo = scratch('v7i-repo-');
   const files = ['test/live/mailbox-behaviour', 'packages/mailbox/contracts/frame.v1.txt', 'packages/mailbox/contracts/limits.v1.json', 'packages/mailbox/contracts/adapters.v1.json', 'scripts/lib/mailbox-behaviour-score.mjs',
-    'scripts/lib/mailbox-behaviour-v7.mjs', 'scripts/lib/mailbox-behaviour-v7e.mjs', 'scripts/lib/mailbox-behaviour-v7i.mjs', 'scripts/lib/mailbox-behaviour-run.mjs', 'scripts/lib/mailbox-live-confined.mjs', 'src/setup/agent-hooks.mjs'];
+    'scripts/lib/mailbox-behaviour-v7.mjs', 'scripts/lib/mailbox-behaviour-v7e.mjs', 'scripts/lib/mailbox-behaviour-v7i.mjs', 'scripts/lib/mailbox-behaviour-run.mjs', 'scripts/lib/mailbox-live-confined.mjs'];
   for (const rel of files) fs.cpSync(path.join(REPO, rel), path.join(repo, rel), { recursive: true });
   const frozen = preregistration({ repo, versions: { claude: '2.1.309', codex: '0.161.0' }, seed: 'fixed' });
   const addendum = v7i.addendumV7i({ repo, preregistrationSha256: 'f'.repeat(64), versions: { omp: '18.12.6' }, seed: 'fixed' });

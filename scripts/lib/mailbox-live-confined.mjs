@@ -36,7 +36,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { prepareBwrapSync } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
 import { DEFAULT_REFRESH_AHEAD_MIN_THRESHOLD_MS, readCredentialExpiry } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
-import { installClaudeHook, installCodexHook, installOmpHook, installPiHook } from '../../src/setup/agent-hooks.mjs';
+import { invokeHost } from '../../src/util/host-bin.mjs';
 import { writeProjectConfig } from '../../test/helpers/config-fixture.mjs';
 import { loginDigest, setAsideChangedCopy } from './codex-auth-guard.mjs';
 import { sandboxGit } from './sandbox-git.mjs';
@@ -145,6 +145,20 @@ export function layOutRunProject(paths, { cli, release, shim, config = { mailbox
   return installRunRows(paths, cli);
 }
 
+/** The doctor fix (and row) that wires each CLI's hooks in a project; Claude Code's is named for its dispatch-decide hook. */
+export const HOOK_FIX = Object.freeze({ claude: 'dispatch-decide-hook-wired', codex: 'codex-hook-wired', omp: 'omp-hook-wired', pi: 'pi-hook-wired' });
+
+/**
+ * Wires `cli`'s hooks in the workspace `ws` through the product's one door, `fgos doctor --fix --only <fix>`,
+ * answered by the host of the workspace's activation. Throws when the fix did not change the project.
+ */
+export function installHookThroughDoctor(ws, cli) {
+  const id = HOOK_FIX[cli];
+  const report = invokeHost(['doctor', '--fix', '--only', id], { dir: ws });
+  const fix = (report.fixed ?? []).find((entry) => entry.id === id);
+  if (!fix || fix.changed === false) throw new ConfinedLaunchError(`the ${id} fix did not wire the ${cli} hooks in ${ws}: ${fix?.message ?? 'the host reported no fix'}`);
+}
+
 /**
  * The product installer's hook rows for `cli` in the run's project, without its PreToolUse
  * guards (they need the legacy-node payload the private release does not stage). Claude
@@ -155,7 +169,7 @@ export function layOutRunProject(paths, { cli, release, shim, config = { mailbox
  */
 export function installRunRows(paths, cli) {
   if (cli === 'pi' || cli === 'omp') {
-    (cli === 'pi' ? installPiHook : installOmpHook)(paths.ws);
+    installHookThroughDoctor(paths.ws, cli);
     fs.mkdirSync(path.dirname(paths.extension), { recursive: true });
     fs.copyFileSync(path.join(paths.ws, `.${cli}`, 'extensions', 'fgos-hooks.ts'), paths.extension);
     fs.chmodSync(paths.extension, 0o444);
@@ -163,7 +177,7 @@ export function installRunRows(paths, cli) {
     return paths.extension;
   }
   if (cli === 'claude') {
-    installClaudeHook(paths.ws);
+    installHookThroughDoctor(paths.ws, 'claude');
     const file = path.join(paths.ws, '.claude', 'settings.json');
     const settings = readJson(file);
     delete settings.hooks.PreToolUse;
@@ -171,7 +185,7 @@ export function installRunRows(paths, cli) {
     fs.rmSync(path.join(paths.ws, '.claude'), { recursive: true });
     return settings.hooks;
   }
-  installCodexHook(paths.ws);
+  installHookThroughDoctor(paths.ws, 'codex');
   const hooks = readJson(path.join(paths.ws, '.codex', 'hooks.json')).hooks;
   delete hooks.PreToolUse;
   fs.rmSync(path.join(paths.ws, '.codex'), { recursive: true });

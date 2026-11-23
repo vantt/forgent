@@ -1,4 +1,4 @@
-//! pi and omp: the payload the generated extension (`src/setup/agent-hooks.mjs`)
+//! pi and omp: the payload the generated extension (`packages/distribution/rust/src/agent_hooks.rs`)
 //! writes, recorded on pi 1.4.0 and omp 18.12.6
 //! (`contracts/fixtures/hooks/{pi,omp}/`). Both ends are ours: the extension
 //! names the event in `hook_event_name` as Claude Code and Codex do, the

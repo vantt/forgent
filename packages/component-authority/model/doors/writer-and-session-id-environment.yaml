@@ -13,8 +13,6 @@ allowed:
   - packages/identity/rust/src/session.rs
   - src/util/session-identity.mjs
   - src/cli/command-registry.mjs
-  - path: src/setup/agent-hooks.mjs
-    reason: the generated pi/omp extension runs in the agent process and cannot import the addon; its attempt-id prefix is pinned to the crate's by a test
   - path: packages/distribution/rust/src/agent_hooks.rs
     reason: the generated pi/omp extension runs in the agent process and cannot import the identity crate; its attempt-id prefix is data in agent-hooks.v1.json, which a test pins to the crate's prefix
   - path: apps/fgos/examples/mailbox-ident-cost.rs

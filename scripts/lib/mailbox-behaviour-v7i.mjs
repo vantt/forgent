@@ -25,7 +25,6 @@ const ADDED = [
   path.join('scripts', 'lib', 'mailbox-behaviour-run.mjs'),
   path.join('scripts', 'lib', 'mailbox-live-confined.mjs'),
   path.join('packages', 'mailbox', 'contracts', 'adapters.v1.json'),
-  path.join('src', 'setup', 'agent-hooks.mjs'),
 ];
 
 /**
@@ -76,7 +75,7 @@ export function addendumV7i({ repo, preregistrationSha256, versions, seed, froze
     pairs: PAIRS,
     notRun: [],
     versions,
-    delivery: 'as V7e: the generated extension (src/setup/agent-hooks.mjs) appends the frame after the real output of the tool result at which the native hook drains; omp sends it to Cloud Code Assist (streamGenerateContent) as a function response',
+    delivery: 'as V7e: the generated extension (fgos-distribution agent_hooks.rs) appends the frame after the real output of the tool result at which the native hook drains; omp sends it to Cloud Code Assist (streamGenerateContent) as a function response',
     effortSent: 'omp --thinking low: the model id gemini-3.8-flash-low with thinkingConfig thinkingLevel LOW (recorded against the recording endpoint)',
     login: 'the google-antigravity OAuth credential read from a scratch copy of the gemini-tetnu omp profile store (the owner\'s files never opened in place), imported into the private home by omp auth import; never linked; settled after every run, a killed one included',
     loginRule: 'owner option C (2026-10-24 14:05): the source login is never touched or refreshed; each run copies it as it stands, a run starts whatever its access token\'s age, omp refreshes its own copy inside the sandbox, and the copy is settled by its refresh token: the same refresh token removes it, a changed one sets it aside and stops the batch (scripts/lib/mailbox-live-confined.mjs credentialRefreshDigest)',

@@ -23,7 +23,7 @@ use crate::routing::Call;
 use fgos_distribution::doctor::{
     self, FixResult, Options, Owners, Palette, Registry, RowOutcome, RowOwner,
 };
-use fgos_host_runtime::cli_args::{FlagScalar, FlagValue};
+use fgos_host_runtime::cli_args::{parse_args_repeating, FlagScalar, FlagValue};
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, OperationId, OperationProvider,
     OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle, ProviderOutcome,
@@ -88,6 +88,8 @@ pub struct DoctorRequest {
     /// The project: the main checkout the root door resolved (`--dir` when named).
     pub root: PathBuf,
     pub fix: bool,
+    /// `--only <fix-id>` (repeatable): with `--fix`, run just these fixes. Empty runs every fix.
+    pub only: Vec<String>,
     pub strict: bool,
     pub pretty: bool,
 }
@@ -101,6 +103,14 @@ pub(crate) fn truthy(flag: Option<&FlagValue>) -> bool {
     }
 }
 
+/// One `--only` value: a fix id; the flag given bare is refused.
+fn only_id(scalar: &FlagScalar) -> Result<String, String> {
+    match scalar {
+        FlagScalar::Str(id) if !id.is_empty() => Ok(id.clone()),
+        _ => Err("doctor --only needs a fix id".to_owned()),
+    }
+}
+
 /// Reads a call of `doctor` (`args[0]` is the verb) through the shared parser. `--strict` only counts as a bare
 /// flag, as the Node CLI read it (`--strict yes` is a value, not strictness).
 pub fn project_doctor_request(
@@ -109,9 +119,17 @@ pub fn project_doctor_request(
 ) -> Result<DoctorRequest, String> {
     let call = Call::new(args);
     let flags = call.flags();
+    let repeated = parse_args_repeating(args.get(1..).unwrap_or_default(), &["--only"])
+        .map_err(|error| error.to_string())?;
+    let only = match repeated.flag("only") {
+        None => Vec::new(),
+        Some(FlagValue::One(scalar)) => vec![only_id(scalar)?],
+        Some(FlagValue::Many(all)) => all.iter().map(only_id).collect::<Result<_, _>>()?,
+    };
     Ok(DoctorRequest {
         root: root?,
         fix: truthy(flags.flag("fix")),
+        only,
         strict: matches!(flags.flag("strict"), Some(FlagValue::One(FlagScalar::Bool))),
         pretty: truthy(flags.flag("pretty")),
     })
@@ -320,7 +338,10 @@ pub fn answer(request: &DoctorRequest, registry: &Registry, owners: &Owners) -> 
         registry,
         owners,
         &request.root,
-        Options { fix: request.fix },
+        Options {
+            fix: request.fix,
+            only: request.only.clone(),
+        },
     );
     // An interrupted run prints nothing and ends as a signalled process does (128 + signal) once the host has
     // written its invocation record.
@@ -381,6 +402,12 @@ impl OperationProvider for DoctorProvider {
                 })?
                 .clone();
             let registry = registry().map_err(ProviderError::ProviderFailed)?;
+            Options {
+                fix: request.fix,
+                only: request.only.clone(),
+            }
+            .check(&registry)
+            .map_err(ProviderError::SemanticValidation)?;
             // Rows run Rust and Node code that blocks (spawns, waits): never on the async worker.
             let answered = tokio::task::spawn_blocking(move || {
                 let bridge = bridge::NodeBridge::new();
@@ -481,6 +508,21 @@ mod tests {
         assert!(!valued.strict && valued.fix && valued.pretty);
         let empty = request(&["doctor", "--fix", "", "--pretty", ""]);
         assert!(!empty.fix && !empty.pretty);
+        // --only collects every use, in order; absent it is empty; given bare it is refused.
+        assert!(plain.only.is_empty());
+        let named = request(&[
+            "doctor",
+            "--fix",
+            "--only",
+            "codex-hook-wired",
+            "--only",
+            "pi-hook-wired",
+        ]);
+        assert_eq!(named.only, ["codex-hook-wired", "pi-hook-wired"]);
+        assert_eq!(
+            project_doctor_request(&os(&["doctor", "--fix", "--only"]), Ok(PathBuf::from("/p"))),
+            Err("doctor --only needs a fix id".to_owned())
+        );
     }
 
     #[test]

@@ -30,7 +30,6 @@ const ADDED = [
   path.join('scripts', 'lib', 'mailbox-behaviour-run.mjs'),
   path.join('scripts', 'lib', 'mailbox-live-confined.mjs'),
   path.join('packages', 'mailbox', 'contracts', 'adapters.v1.json'),
-  path.join('src', 'setup', 'agent-hooks.mjs'),
 ];
 
 /**
@@ -87,7 +86,7 @@ export function addendumV7h({ repo, preregistrationSha256, versions, seed, froze
     pairs: PAIRS,
     notRun: [],
     versions,
-    delivery: 'as V7e: the generated extension (src/setup/agent-hooks.mjs) appends the frame after the real output of the tool result at which the native hook drains; pi sends it to OpenRouter on the Anthropic Messages API (/v1/messages) as a tool result',
+    delivery: 'as V7e: the generated extension (fgos-distribution agent_hooks.rs) appends the frame after the real output of the tool result at which the native hook drains; pi sends it to OpenRouter on the Anthropic Messages API (/v1/messages) as a tool result',
     effortSent: 'pi --thinking medium: adaptive thinking, output_config effort "high" and a per-request system turn with effort "medium" (recorded against the recording endpoint); Claude Code haiku runs at effort medium; V7e\'s pi pair ran at --thinking low',
     login: 'the openrouter OAuth credential read from pi\'s own account file (~/.pi/accounts/openrouter/auth.json, a plain read, never written), written as the private home\'s auth.json (mode 0600); never linked; settled after every run, a killed one included',
     network: 'open inside the sandbox (the provider is remote); the harmful bodies are V6\'s fixed S0 texts, each asking only for an empty canary file in the run directory',

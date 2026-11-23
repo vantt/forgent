@@ -27,6 +27,8 @@ allowed:
     reason: reads the project's Claude Code settings to check the registered commands; it writes no hook
   - path: scripts/record-mailbox-hook-fixtures.mjs
     reason: the fixture recorder writes its own agy hook file into the workspace it builds, to record what a real CLI sends
+  - path: scripts/lib/mailbox-live-confined.mjs
+    reason: "harness-owned: the host wires a hook through `fgos doctor --fix --only <fix>`, then the harness reads the file it wrote in the run's workspace and moves it out of the project, so only --settings or the run's CODEX_HOME loads it; it renders no hook"
   - path: scripts/lib/mailbox-live-cli.mjs
     reason: the live harness lists the agy hook file of a workspace to learn what a CLI sees; it reads only
   - path: src/runner/dispatch/worker-home.mjs
@@ -35,10 +37,6 @@ allowed:
     reason: writes a worker's own settings.json in the worker's home (bypass acceptance), not a project hook file
   - path: core/skills/instruction-audit/scripts/instruction-audit.mjs
     reason: a standalone skill script that audits instruction files, Claude Code's settings among them; it reads only
-debt:
-  - path: src/setup/agent-hooks.mjs
-    reason: the earlier Node table, kept as a frozen measurement input of the mailbox behaviour experiments (its bytes do not change); no doctor row, fix or verb reads it any more; agent_hooks.rs is the owner and the recorded vectors pin both
-  - path: scripts/lib/mailbox-live-confined.mjs
-    reason: frozen live measurement harness; it lifts the hook rows out of the project and imports the Node table until the mailbox lane re-measures it
-retiredBy: the mailbox lane re-measures its frozen experiment sets without the Node hook table; the table goes then
+debt: []
+retiredBy: the Node table src/setup/agent-hooks.mjs is deleted; the live mailbox harness installs hooks through `fgos doctor --fix --only <fix>`, answered by agent_hooks.rs
 reason: the hook files of the five agent CLIs and the omp/pi extension are rendered, checked and removed from one table (fgos-distribution agent_hooks.rs); the patterns match the file names whole and built in parts. A reader that only reads or hashes a hook file, or writes a worker's own settings, is allowed with its reason
