@@ -66,3 +66,21 @@ observed outcome differs from the expected one, or each such row is explained an
 ## Rollback
 
 Revert the changelog and probe commits. The reports stay as evidence.
+
+## Owner answer to q-vbh2knqpnu (2026-11-23 22:26 +07)
+
+The owner answered "Do all three now" through the secretary. That allows three host steps: activate a release built
+from main at or after `0174ac6dd`, run `npm test` and `cargo test --workspace` on it, and remove exactly the worktrees
+`forgent-worktrees/261122-0118-heads-stable-and-able-p13` (discard its abandoned edit; the work landed as `5ebc25616`)
+and `-p11c` (empty). It forbids any code change and any change to other plans' worktrees.
+
+The lead checked state at 22:35. None of the three steps had run yet:
+
+- The active release (`sha256:edf91f57…`, activated 15:56 +07) predates `5ebc25616`. Its `head-grants.mjs` lacks
+  `plans/backlog.md` in the secretary and supervisor writes.
+- Both worktrees are still registered.
+- The lead's sandbox is read-only for `.fgos/runtime` and `.agents`, so the lead cannot run the suite or remove the
+  worktrees itself.
+
+Phase 11 is parked on these host steps. When they are done, the lead resumes at step 1 (read the suite result), then
+steps 2-6. The probe runs from a supervisor and a secretary started after the new activation.
