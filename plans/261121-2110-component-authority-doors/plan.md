@@ -19,6 +19,7 @@ footprint:
   - Cargo.lock
   - apps/fgos/Cargo.toml
   - apps/fgos/src/main.rs
+  - packages/host-runtime/rust/src/catalog.rs
   - test/cli/subcommand-flag-drift.test.mjs
   - apps/fgos/src/routing.rs
   - apps/fgos/src/invocation_doors.rs
@@ -244,6 +245,9 @@ admits no plan whose footprint overlaps a `running` one):
 - Each phase re-reads its files at its own start, because the plans above will have changed them.
 
 ## Owner questions
+
+**q-klz3vkxjee (lead:SUPERVISOR, 2026-11-23 12:2x, within the approved frame):** `packages/host-runtime/rust/src/catalog.rs` joins the footprint for the one `authority.locate` OperationDescriptor row phase 1 needs; no running plan lists it.
+
 
 - q-sieckdvccb (add `apps/fgos/src/main.rs` and `test/cli/subcommand-flag-drift.test.mjs` to the footprint so the authority verb can be registered and listed): option A, decided by lead:SUPERVISOR 2026-11-23 10:3x within the approved frame. No running plan lists either file (checked against 0726, 0821, 0118 and 0828).
 - q-swxkda2x5r (phases 2-3 need callers outside the footprint): the owner answered A on 2026-11-23. A planner re-cuts
