@@ -119,12 +119,13 @@ footprint:
   - CHANGELOG.md
 source:
   - plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md
-  - p-esa3lau6kd
-  - p-7nja6ilwkr
 created: 2026-11-21
 ---
 
 # Component authority doors
+
+Provenance: follows from backlog rows `p-esa3lau6kd` and `p-7nja6ilwkr`, both done with `261121-2109-component-authority`
+(their Done-when were met there); they left `source` on 2026-11-23 because a running plan may not cite a done row.
 
 ## Outcome
 
