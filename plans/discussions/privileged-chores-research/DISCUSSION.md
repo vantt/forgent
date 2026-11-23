@@ -8,21 +8,54 @@ created: 2026-11-23
 
 # Heads that keep work moving without the owner: motivation and capability — DISCUSSION
 
-discussion: open
+discussion: settled
+
+## Hand-off cho planner (2026-11-23 23:55)
+
+**Outcome.** Miu và supervisor có đủ năng lực vận hành mà không cần chủ chạy tay, và mọi head có một kênh xin trợ giúp:
+- Supervisor (tay trái) trông mọi agent không có lead.
+- Miu (tay phải) để năng lực ngủ, chỉ dùng khi không còn supervisor, và khi đó khôi phục bộ máy.
+- Việc chạm vào thứ dùng chung đi qua một ô cửa: bộ chuyển tiếp argv `fgos` cộng một bảng quyền dạng dữ liệu.
+- Việc riêng của vai thì nới lồng.
+
+**Constraints.**
+- RUL104 và L10: đổi contract thì chuyển mọi caller và xoá đường cũ trong cùng đợt.
+- Không ghi gì vào `.fgos` qua grant (`validateWorkspacePaths`).
+- Shell thô chạy ngoài lồng không bao giờ là `allow`; nó thành câu hỏi gửi chủ, kèm đúng argv.
+- Bám footprint của plan đang chạy 261121-2110-component-authority-doors và của draft 261122-0056. Cả hai đều chạm `src/session-host/head-request.mjs` và routing.
+
+**Non-goals** (mỗi mục đã có chủ riêng):
+- Nhịp và keeper: plan 0056.
+- Wake-on-mail: plan 261030-0323.
+- Gate door `decide`: plan 261030-1029. Khi gate door xong, nó chuyển `ask` thành tự chạy nếu việc nằm trong khung.
+- Luật theo mẫu shell.
+- maxLeads theo năng lực máy: `p-tyowvhthul`.
+- `session type` không submit: `p-lfwmzs6zsr`.
+- Tự động activate release (R1).
+
+**Acceptance criteria.**
+1. Mỗi task ở §7 qua lệnh verify của nó.
+2. `npm test` và `cargo test --workspace` xanh.
+3. Bản sửa đã vào release đang chạy, và probe sống `node test/live/head-grant-probe.live.mjs` chứng minh từng verb hoặc grant đã đổi. Chủ build và activate vào sáng 2026-11-24, rồi chạy probe.
+
+**Điểm mở chỉ chặn một phần:** R1, tức ai tự đưa release lên. Cho tới khi có câu trả lời, chủ làm tay. Điểm này không chặn task nào ở §7.
+
+**Nguồn:** `p-g5ktat4kej`, `p-v6xinnjoxh`, `p-dw3h5wscns`, `p-ndortdckid`, `p-ia2v33b54u`, `p-btxvtb34u3`, `p-oqs75qwyco`, cùng các quyết định PC-D1 đến PC-D8.
 
 ## 1. Trạng thái hiện tại
 
-**Vòng 2 xong 2026-11-23 20:40.** Chủ và shaper đã thống nhất cách gọi tên vấn đề (§2). Shaper đã quét code, plan và backlog (§5, vòng 2) để khớp hướng mới vào những gì đang có, không quay đầu 180 độ (chủ dặn lúc 20:30).
+**Settled 2026-11-23 23:55**, giao cho planner. Chủ đi ngủ và muốn đội làm xong phần implement trong đêm; sáng 2026-11-24 chủ build và activate.
 
-**Đã thống nhất trong cuộc trao đổi (chưa thành D-ID, cần thêm một vòng):**
-- Vấn đề không nằm ở việc thiếu một vài cửa. Cả Miu lẫn supervisor đều không tự có động lực, và bên có quyền vận hành (supervisor) lại thiếu năng lực. Vì vậy chủ đang phải làm thay cả hai thứ đó.
-- Gốc rễ là thay phán đoán sống bằng danh sách liệt kê trước: danh sách sự kiện đáng thức dậy và danh sách verb được làm. Danh sách loại này không bao giờ đủ, nên ba ngày qua chỉ là vá từng lỗ.
-- Năng lực (chủ xác nhận "2 đúng"): rào quanh thứ cần bảo vệ, cộng một cửa nâng quyền chung, thay cho việc liệt kê từng verb.
-- Nhịp: Miu thức theo tin dành cho chủ, supervisor thức theo đồng hồ. Đã trình bày, chủ chưa xác nhận riêng.
+**Đã chốt:**
+- PC-D1, PC-D2: vai trò của Miu và supervisor.
+- PC-D3: hàng rào cộng ô cửa.
+- PC-D4: bật lại supervisor manual tạm thời. Hiện chưa có phiên manual nào chạy.
+- PC-D5: kênh xin trợ giúp.
+- PC-D6, PC-D7, PC-D8: shaper chốt theo yêu cầu "làm trước" của chủ, dựa trên hội đồng và bảng kiểm đếm. Chủ có thể phủ quyết sáng mai.
 
-**Đã huỷ:** Q1 `q-werrxi4i7i` (bảng verb dạng dữ liệu). Bảng đó vẫn là liệt kê.
+**Đã rút lại:** tick riêng cho supervisor (giao cho keeper của 0056) và luật theo mẫu shell.
 
-**Đang chờ chủ:** xác nhận cách khớp vào hiện trạng (§6), sau đó gửi bộ câu hỏi Q2 và Q3 (§3).
+**Còn mở:** R1.
 
 ## 2. Mục tiêu & đề bài
 
@@ -60,6 +93,9 @@ Năng lực được giới hạn bằng hàng rào quanh những thứ cần b�
 | PC-D2 | **Supervisor là tay trái, trông coi mọi agent đang hoạt động không có lead trông.** Phạm vi gồm lead, shaper, planner, và bất kỳ pane hay agent nào được bật lên mà không có lead. Worker thuộc một lead thì do lead đó lo. Supervisor có đủ tay chân vận hành qua một cửa nâng quyền có hàng rào. Nhịp theo đồng hồ: mỗi nhịp đối chiếu những gì đang sống với những gì phải có, không phụ thuộc có ai báo. | Chủ 20:35, xác nhận 20:38 | 2026-11-23 |
 | PC-D4 | **Bật lại phiên lead:SUPERVISOR thủ công, không confine, như một biện pháp tạm.** Phiên này chạy cho tới khi điều kiện nghỉ hưu ở `docs/platform/supervision/spec.md:223` đạt: supervisor head tự chạy trọn một plan, không lệnh nào do lead:SUPERVISOR gõ. Đây là quyết định vận hành của chủ, không phải thiết kế, và không làm điều kiện nghỉ hưu nhẹ đi. | Chủ 20:43, trả lời trực tiếp câu shaper nêu | 2026-11-23 |
 | PC-D5 | **Một kênh xin trợ giúp cho mọi head.** Mọi persona được `supervisor raise` (loại coordination-help). Yêu cầu vào hàng đợi và đánh thức supervisor. Thời bình, head không nói chuyện thẳng với Miu; việc cần chủ quyết đi qua question store, và Miu trình lên chủ. Khi không có supervisor, hoặc yêu cầu trợ giúp nằm chưa xử lý quá ngưỡng, vòng soát của Miu nhận việc và khôi phục bộ máy (PC-D1). Mailbox chỉ dùng để trao đổi. | Chủ "đồng ý", 23:40, cho đề xuất H1 | 2026-11-23 |
+| PC-D6 | Ô cửa theo hướng lai. Đơn vị quyền là argv `fgos`, chạy không qua shell. Quyết định nằm trong một bảng dữ liệu `persona × tiền tố verb fgos → allow, ask hoặc deny`, có kế thừa (head < supervisor < Miu), có `can-i`, và mỗi luật có test. Các nhánh chỉ chuyển tiếp thì xoá. Các nhánh có chính sách thật giữ code riêng: `land`, `run`, `session start/stop/write`, `questions`. `SUCCESSOR_READ_VERBS` gộp vào bảng. Ba thứ luôn bị từ chối: khoá grant và confinement (chống tự nâng quyền), đối số đổi cwd, root hoặc env, và activate release. Verb chưa tự bảo vệ giữ ở `ask`. | Hội đồng ba góc nhìn đồng thuận (23:20); kiểm đếm cho thấy khoảng 14 trên 18 việc đặc quyền đã có verb `fgos`; chủ dặn "làm trước" (23:50) | 2026-11-23 |
+| PC-D7 | Xem lại lồng của Miu và supervisor trong đợt này. Nới cho việc riêng: friction, gửi thư, `fgos answer`, và chẩn đoán vì sao full test không chạy được trong lồng. Siết chỗ đang quá rộng: peers giữ pid namespace của host. Đo trước và sau bằng probe sống. | Đề xuất 23:35; chủ không phản đối và dặn "làm trước" | 2026-11-23 |
+| PC-D8 | Mọi head gửi được thư cho Miu và supervisor: lead và planner được bật mailbox, nhưng chỉ gửi tới hai tay. Đánh thức bằng thư thuộc plan 0323. | Đề xuất 23:40; chủ không phản đối | 2026-11-23 |
 | PC-D3 | **Năng lực được giới hạn bằng hàng rào quanh thứ cần bảo vệ, cộng một cửa nâng quyền chung, không bằng danh sách verb.** | Chủ 20:30 ("2 là đúng"), giữ nguyên qua 20:35 | 2026-11-23 |
 
 ## 5. Q&A log
@@ -271,51 +307,95 @@ Chủ hỏi supervisor có được ghi backlog không. Shaper kiểm:
 
 ## 6. Thiết kế đã chốt {#design}
 
-*Chưa chốt. Đây là bản khớp vào hiện trạng để chủ xem; mỗi dòng ghi rõ dùng lại gì.*
+**Vai trò (PC-D1, PC-D2, PC-D5).**
+- Supervisor là tay trái. Nó trông mọi agent đang chạy mà không có lead: lead, shaper, planner và pane bật tay. Nhịp của nó đến từ keeper của 0056, không thuộc đợt này. Nó nhận yêu cầu trợ giúp qua hàng đợi.
+- Miu là tay phải. Thời bình, Miu chỉ trao đổi với chủ. Vòng soát 15 phút của Miu thêm hai câu hỏi:
+  - Supervisor còn sống không?
+  - Có yêu cầu trợ giúp nào nằm quá ngưỡng không?
+- Nếu có chuyện ở một trong hai câu đó, Miu dùng năng lực đang ngủ (cùng bảng quyền với supervisor, cộng thêm phần riêng) để tự làm và đánh thức lại bộ máy.
 
-**6.1 Động lực: RÚT LẠI 20:50. Phần này giao cho keeper của plan 0056, xem §5 20:50. Đoạn dưới chỉ giữ để làm lịch sử.**
-- Watcher vẫn tick 60 giây bằng code như hiện nay. Mỗi tick, các definition kiểm *điều kiện lệch* trên toàn portfolio:
-  - plan ready trong khi còn slot;
-  - lead không còn sống mà plan chưa xong;
-  - plan không đổi quá ngưỡng;
-  - câu hỏi đã trả lời mà người hỏi đang im;
-  - worktree đã land mà chưa dọn.
-- Sự kiện được khoá theo *trạng thái* (`kind|subject|state`) chứ không theo thời điểm. Còn lệch thì vẫn còn sự kiện mở, và khi đã xử lý mà lệch vẫn còn thì raise lại. Nhờ vậy PS-9 và OS-D8 ("mọi việc vào qua sự kiện") vẫn đúng, không quay đầu.
-- LLM chỉ thức khi có lệch, nên không đốt token vô ích. Định nghĩa `supervisor-idle-burn` vẫn giữ nguyên.
-- Đây là lát đầu của keeper trong plan 0056. Làm lát này không tạo cơ chế thứ hai.
-- Thành thừa: các kiểu sự kiện cạnh dễ lọt (`session-idle` đếm bản ghi, `lead-ended` chỉ bắt `retired`) và việc tinh chỉnh từng ngưỡng.
+**Lồng và ô cửa (PC-D3, PC-D6, PC-D7).**
+- Mỗi persona có hai núm:
+  - **Cỡ lồng:** các thư mục được ghi, dành cho việc riêng. Không bao giờ gồm `.fgos`, `.git` hay release.
+  - **Bảng ô cửa:** những verb `fgos` được nhờ chạy ngoài lồng, mỗi verb gắn `allow`, `ask` hoặc `deny`.
+- Luồng một yêu cầu qua ô cửa:
+  1. Head gửi argv `fgos` qua request socket.
+  2. Forwarder kiểm argv: không có cờ đổi cwd, root hay env. Sau đó tra bảng theo persona.
+  3. `allow`: host chạy bằng execFile dưới identity của head. Verb tự giữ khoá và tự ghi Event Store.
+  4. `ask`: gửi chủ một câu hỏi năm phần qua `questions ask`, kèm đúng argv.
+  5. `deny`: từ chối, kèm lý do.
+- `can-i <argv>` cho head biết kết quả trước khi làm.
+- Khi gate door (1029) được build, `ask` đổi thành `decide` theo khung đã duyệt.
 
-**6.2 Năng lực: một cửa nâng quyền dựng trên gate door.**
-- Head gửi một verb `fgos` kèm lý do qua request socket. Socket gọi `decide` của gate door (261030-1029), dựa trên dữ kiện và khung đã duyệt, rồi xử lý theo kết quả:
-  - `auto`: host chạy verb và ghi log.
-  - `ask`: tự sinh câu hỏi năm phần gửi chủ, kèm đúng lệnh.
-  - `deny`: từ chối.
-- Hàng rào là những gì confinement và các cửa tự bảo vệ đã giữ sẵn. Cửa này không mở thêm đường ghi nào vào `.fgos`.
-- `can-i` chính là `decide` chạy thử.
-- Theo thời gian, 28 nhánh viết tay co về bộ chuyển tiếp này (RUL104: code nhỏ đi).
+**Kênh liên lạc (PC-D5, PC-D8).**
+- Xin trợ giúp: `supervisor raise`. Mọi head đều có.
+- Trao đổi: mailbox. Mọi head gửi được tới hai tay.
+- Việc cần chủ quyết: question store.
 
-**6.3 Miu: giữ `/loop` 15 phút.** Danh sách Miu nhìn mỗi vòng gồm: câu hỏi mới hoặc đã trả lời, thư, và kết quả cần báo chủ.
+**Land.**
+- Land là cửa duy nhất đưa thay đổi lên main, chạy dưới merge slot, với gate và kiểm footprint.
+- Có hai dạng:
+  - **Branch land:** đưa một nhánh lên main bằng fast-forward hoặc squash.
+  - **Paths land:** commit đúng các đường dẫn được kê ra.
+- Sau cải tổ, supervisor vẫn chỉ được paths land trên file portfolio thuộc grant của nó (plans, backlog, reports). Supervisor không land code. Code do lead land (PS-6, PS-14).
+- `land` giữ code riêng trong forwarder vì có chính sách thật (footprint, grant).
 
 ```mermaid
 flowchart LR
-  T[Watcher tick 60s, code] --> D{Điều kiện lệch?<br/>khoá theo trạng thái}
-  D -- không --> T
-  D -- có --> Q[Supervision queue] --> W[Supervisor wake: LLM đối chiếu toàn portfolio]
-  W -- "verb fgos + lý do" --> S[Request socket]
-  S --> G{gate decide}
-  G -- auto --> X[Host chạy cửa tự bảo vệ, ghi log]
-  G -- ask --> O[Câu hỏi năm phần cho chủ]
-  M[Miu /loop 15'] --> MQ[Câu hỏi, thư, kết quả cho chủ]
+  H[Mọi head] -- "supervisor raise" --> Q[Supervision queue] --> S[Supervisor: tay trái]
+  H -- mailbox --> S
+  H -- mailbox --> M
+  H -- "questions ask" --> QS[(Question store)] --> M[Miu: tay phải] --> O[Chủ]
+  M -- "vòng 15': supervisor sống? help quá hạn?" --> R{Thời chiến?}
+  R -- có --> MW[Miu tự làm và khôi phục]
+  S -- argv fgos --> F[Forwarder + bảng persona x verb]
+  MW -- argv fgos --> F
+  F -- allow --> X[Verb fgos tự bảo vệ, Event Store]
+  F -- ask --> QS
+  F -- deny --> N[Từ chối có lý do]
 ```
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-*Điền sau khi chủ trả lời Q2 và Q3.* Bảng giữ, hấp thụ hoặc thành thừa (bản nháp):
-- **Giữ:** 0118 phase 8 và 11 (đo đạc), 0828, các plan xoay vòng đã xong, `/loop` của Miu, `p-tyowvhthul`, `p-lfwmzs6zsr`.
-- **Hấp thụ:**
-  - 0056 keeper: §6.1 là lát đầu của nó.
-  - 261030-1029 gate door: phần `decide` của §6.2.
-  - Mẫu verb của 1731 supervision-powers-doors: co về bộ chuyển tiếp.
-  - Các dòng sự kiện lọt (`p-iatzcg2gee`, `p-4uqiyjwrtd`, `p-xuazywhh56`, `p-g6heszkdc7`, `p-xpeg4jshiu`) và sự kiện thừa (`p-du3gbevrs5`, `p-ogziciqtrb`).
-  - `p-g5ktat4kej`: phải viết lại "done when", bỏ cụm "fixed verb list".
-- **Thành thừa:** tinh chỉnh ngưỡng `session-idle`, luật thuần chữ của 261121-0722.
+Cả năm task nằm trong `src/session-host/`, skill và spec của nó. T3 chạm `head-request.mjs` nên va footprint của doors (đang chạy) và 0056 (draft). Planner quyết thứ tự, hoặc chờ doors xong.
+
+### T1 — Điều lệ vai trò {#task-role-charter}
+- **Mục tiêu:** ghi PC-D1, PC-D2 và PC-D5 vào:
+  - `docs/platform/supervision/spec.md`
+  - `docs/platform/session-host/spec.md`
+  - `core/skills/fgos-secretary/SKILL.md`
+  - `core/skills/fgos-supervisor/SKILL.md`
+
+  Sửa các câu đang nói ngược lại (skill secretary dòng 18 và 85, chú thích về Miu trong `head-grants.mjs`).
+- **Verify:** `npm run build:skills`, rồi kiểm bằng rg rằng không còn câu nào bảo Miu không được dùng năng lực khôi phục.
+
+### T2 — Kênh xin trợ giúp và Miu tiếp quản {#task-help-channel}
+- **Mục tiêu:**
+  - Mọi persona có `supervisor raise` (loại `coordination-help`).
+  - Vòng soát của Miu thêm hai câu hỏi ở §6. Ngưỡng nằm trong `core/config-standard`, kèm schema.
+  - Skill nói rõ Miu tiếp quản thế nào.
+- **Verify:** `node --test test/session-host/head-grants.test.mjs test/session-host/head-request.test.mjs`, cộng probe sống trong đó shaper và planner gọi raise.
+
+### T3 — Ô cửa: forwarder argv fgos và bảng quyền {#task-window}
+- **Mục tiêu:** làm theo PC-D6.
+  - Thay `GRANTS.verbs` và các nhánh chỉ chuyển tiếp trong `runHeadRequest` bằng forwarder cộng bảng.
+  - Thêm verb `can-i`.
+  - Gộp `SUCCESSOR_READ_VERBS` (`packages/run-supervisor/rust/src/head_request.rs`).
+  - Cập nhật contract `head-request.v1.json` và xoá đường cũ.
+  - Mở cho supervisor, và cho Miu trong cùng bảng: `config patch`, `worktree remove --delivered-to`, `git recover`, `dispatch probe-account`, và `session write plans/backlog.md`.
+- **Verify:**
+  - `node --test test/session-host/head-request.test.mjs test/session-host/head-grants.test.mjs`
+  - `cargo test -p fgos-run-supervisor`
+  - Mỗi luật deny một test: khoá grant, cờ cwd, activate.
+  - Probe sống từng verb.
+
+### T4 — Xem lại lồng {#task-cage}
+- **Mục tiêu:** làm theo PC-D7.
+  - Chẩn đoán vì sao full `npm test` và `cargo test` không chạy được trong lồng (q-zcileomdpa, q-br5rlczzav, q-pcwf3slkfp), rồi nới đúng chỗ đó mà không mở `.fgos`.
+  - Đóng `p-ndortdckid`, `p-ia2v33b54u` (kiểm lại trước khi sửa) và `p-btxvtb34u3`.
+  - Siết `p-oqs75qwyco`.
+- **Verify:** probe sống trước và sau, ghi vào report của plan; cộng test của confinement driver.
+
+### T5 — Mailbox cho lead và planner {#task-mail}
+- **Mục tiêu:** làm theo PC-D8. Lead và planner có `mailbox: true`, nhưng chỉ gửi được tới vai secretary và supervisor.
+- **Verify:** `node --test test/session-host/head-grants.test.mjs`, cộng probe sống gửi thư từ một lead.
