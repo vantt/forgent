@@ -7,7 +7,6 @@ base: 4ad3bfaf8b6ac875f0f6693600df8532588260af
 blockedBy:
   - 261122-0118-heads-stable-and-able
   - 261118-1341-s6a-execution-tier-rust
-  - 261122-1950-owner-communication-standard
 footprint:
   - plans/261122-2108-delete-dead-node-execution-closure/**
   - src/runner/dispatch/**

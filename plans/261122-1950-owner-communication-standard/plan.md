@@ -8,6 +8,7 @@ blockedBy:
   - 261121-2109-component-authority
   - 261121-2110-component-authority-doors
   - 261122-0056-orchestration-skeleton
+  - 261122-2108-delete-dead-node-execution-closure
 footprint:
   - plans/261122-1950-owner-communication-standard/**
   - core/skills/_shared/owner-communication.md
