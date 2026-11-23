@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { ensureOrtStatic } from './ort-static.mjs';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
@@ -54,6 +55,7 @@ function main() {
   execFileSync('cargo', ['build', '-p', 'fgos'], {
     cwd: REPO_ROOT,
     stdio: 'inherit',
+    env: { ...process.env, ...ensureOrtStatic(REPO_ROOT) },
   });
 
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'observe-fixture-'));

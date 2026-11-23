@@ -20,6 +20,7 @@ import path from 'node:path';
 import { spawn as spawnAsync, spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
+import { ensureOrtStatic } from './ort-static.mjs';
 import { CPU_LOG_ENV, readTestFileCpu, waitedCpuSeconds } from './lib/test-file-cpu.mjs';
 import { acquireFullSuiteQueue, QUEUE_HELD_ENV, QUEUE_SWITCH_ENV } from './lib/full-suite-queue.mjs';
 import { configEntries, repositoryDirs, worktreeRegistrationsUnder } from './lib/git-dir-layout.mjs';
@@ -42,7 +43,7 @@ export function ensureReleaseArtifacts(env = process.env, cwd = REPO_ROOT) {
   const targetDir = path.resolve(cwd, env.CARGO_TARGET_DIR || 'target');
   execFileSync('cargo', ['build', '--locked', '--release', '-p', 'fgos', '-p', 'fgctl', '-p', 'fgos-node-addon'], {
     cwd,
-    env: { ...env, CARGO_TARGET_DIR: targetDir },
+    env: { ...env, CARGO_TARGET_DIR: targetDir, ...ensureOrtStatic(cwd) },
     stdio: 'inherit',
   });
 }

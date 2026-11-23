@@ -36,6 +36,38 @@ not a root file, so the root guard does not apply), `.github/workflows/ci.yml`, 
 7. Proof link, kept out of the repo: in a scratch dir, build pkm's own `pkm` binary at v0.7.0 with the
    static lib, run `scripts/check-glibc-ceiling.sh` on it, `ldd` it, run one `pkm VAULT search` over a small vault.
 
+## As built (2026-11-23)
+
+- **Source.** microsoft/onnxruntime answers 404. The workflow fetches tag v1.31.1's commit
+  `6af1a932e2286d5c58166085d24c68783033edee` by id, as Software Heritage archived it. It tries our mirror
+  vantt/onnxruntime first, then microsoft, intel and ROCm. The onnx submodule comes from vantt/onnx.
+- **Archive.** It merges 97 static libraries, including a separately built re2. The proof run is green:
+  ort-probe needs at most GLIBC_2.34, `ldd` lists no ONNX Runtime, and token ids match 22/22.
+- **Step 3.** ort-sys rc.15 reads only `ORT_LIB_LOCATION`, `ORT_LIB_PATH`, `ORT_LIB_PROFILE`,
+  `ORT_PREFER_DYNAMIC_LINK` and `ORT_VCPKG_TARGET`; there is no per-target form. Its build script's
+  `rerun-if-env-changed` lines show this. A `.cargo/config.toml` `[env]` entry cannot be removed for the macOS and
+  Windows jobs. So `ensureOrtStatic()` in `scripts/ort-static.mjs` returns `ORT_LIB_LOCATION` on Linux x64 and
+  each build entry passes it to cargo. `.cargo/config.toml` carries only `[net]`.
+- **Step 6, build entries.** These call `ensureOrtStatic()`:
+  - `scripts/run-rust-dev-host.mjs` (`npm run fgos:dev`);
+  - `scripts/run-tests.mjs` `ensureReleaseArtifacts`;
+  - both cargo builds in `scripts/lib/git-addon-stage.mjs` (addon and host, used by `scripts/git-addon.mjs` and
+    the tests);
+  - `scripts/regenerate-observe-fixtures.mjs`.
+
+  CI jobs call `.github/actions/pkm-build-env` before their first cargo step. The reusable workflows now receive
+  `secrets: inherit`.
+
+  The other scripts run no cargo build of their own. `scripts/measure-p08-performance.mjs` and `scripts/test-*` use
+  binaries that are already built. `scripts/build-rust-distribution.mjs` and `scripts/package-release-assets.mjs`
+  package what cargo already built.
+
+  A hand-typed `cargo build` on Linux needs `npm run ort:static` and `ORT_LIB_LOCATION`.
+- **Left for phase 2.**
+  - The macOS clang runtime link (only `MACOSX_DEPLOYMENT_TARGET=13.4` is set here).
+  - Adding the vantt/pkm git source to `.github/cargo-deny.toml` `sources`.
+  - The first CI job that actually fetches pkm proves `PKM_READ_TOKEN`.
+
 ## Validation
 
 ```sh

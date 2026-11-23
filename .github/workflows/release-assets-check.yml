@@ -23,6 +23,7 @@ concurrency:
 jobs:
   assets:
     uses: ./.github/workflows/release-assets.yml
+    secrets: inherit
 
   # The tests that cover the Windows-specific code paths (install.ps1, the cmd launchers, the
   # release target table, the Windows release tree), run natively on both operating systems.
@@ -62,6 +63,9 @@ jobs:
           rustup show
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
 
+      - uses: ./.github/actions/pkm-build-env
+        with:
+          pkm-read-token: ${{ secrets.PKM_READ_TOKEN }}
       - name: Build workspace (release)
         run: cargo build --release --workspace
 
@@ -132,6 +136,9 @@ jobs:
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
 
       # The host binary links the fgos-execution-engine crate.
+      - uses: ./.github/actions/pkm-build-env
+        with:
+          pkm-read-token: ${{ secrets.PKM_READ_TOKEN }}
       - name: Build the host (release)
         run: cargo build --release -p fgos
 
@@ -155,6 +162,9 @@ jobs:
           rustup show
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
 
+      - uses: ./.github/actions/pkm-build-env
+        with:
+          pkm-read-token: ${{ secrets.PKM_READ_TOKEN }}
       - name: The supervisor declares its job through the controller's cwd lease channel
         run: cargo test --release -p fgos --test windows_cwd_lease_owner -- --nocapture
 
@@ -196,6 +206,9 @@ jobs:
           rustup show
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
 
+      - uses: ./.github/actions/pkm-build-env
+        with:
+          pkm-read-token: ${{ secrets.PKM_READ_TOKEN }}
       - name: LockFileEx across duplicated and inherited handles
         run: cargo test --release -p fgos-holder-lock --test windows_lockfileex -- --nocapture
 

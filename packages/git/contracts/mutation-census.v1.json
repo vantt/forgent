@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1b92faa7d5c856f9f3c65731628e14869d00a1744e6f576e306f9c3aedb71ff0",
+  "payloadDigest": "f8c5100c63f92e1be6426c27dd1acf4bab4af6fcaeb235805a4993b2bc1efcb9",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1382,7 +1382,7 @@
     "scripts/lib/dev-host-manifest.mjs": "9928ceb97e807bcb02a7fed73153cf21de09d6cc9b6d56492166cb94e48c44bb",
     "scripts/lib/doc-links.mjs": "a4f2720a80234e2f3d5000877efdf2be95dd7c5ca11eda519f025d65df711cd1",
     "scripts/lib/full-suite-queue.mjs": "da176b9ad8a796ec13ede755dd2c2b12e6e29d5b5b12874ca8e6ae06803e3aba",
-    "scripts/lib/git-addon-stage.mjs": "b3f9dcd4424fb3f806573c2a56f4f996967aec74b90341c12cbc3464e0940730",
+    "scripts/lib/git-addon-stage.mjs": "1d62c3e84effeffb5ec919e01d94f9e9af5f75fe1a979f095d04ded68743cbf9",
     "scripts/lib/git-dir-layout.mjs": "cdc573ff49e7c12af30c284ea84060ff476390b26769a0cb82f63dc357df04eb",
     "scripts/lib/git-ports.mjs": "2050baedb9873aa02de331465cb110fff9bf942a3666dbaca6438770998d6fc0",
     "scripts/lib/git-spawn-match.mjs": "45403263d2d8bbd51068f6db07866fe3cb15efd6bbf61bccb4a074322dfbceae",
@@ -1413,6 +1413,7 @@
     "scripts/measure-p08-performance.mjs": "2ab686e2e3f880f584a2f9278a6bbb27a49d71effcdb65215f1cbd3865099e3e",
     "scripts/measure-verify-cost.mjs": "97768198548908742f0687b069fbe77dfc35839a88e4906f3813afbdd5918abc",
     "scripts/merge-test-shards.mjs": "bd5868bb24fd51a042ddabca60d8a3d5bca12c33b4837e54fb19fbfe10001c77",
+    "scripts/ort-static.mjs": "3fcebda77506beba18037d3f770146a276a9473482787a470422911cc5664d6b",
     "scripts/package-release-assets.mjs": "60efb629a7ebfe1143445557c55abfa4b3269286a0498754a28dddb662a70fd0",
     "scripts/plan-contract-check.mjs": "cd0e4536c43ab9a857e345abe152210f6f9acfff5d67a9afe93ff40bdf515e87",
     "scripts/prepare-release.mjs": "0bd2e6e7514ba4de781ad480889a8f701729a1d4b9d80d5f5af7b2f1de1160aa",
@@ -1420,10 +1421,10 @@
     "scripts/probe-storytelling-material.mjs": "b2991c1c14879193953d901e9122a9e511136a91907949643b7f1af008590df4",
     "scripts/project-agents.mjs": "eea69eb0e5017c1e1ad44079b061192f10c1734668ad7cfb4a8591a9318c47f0",
     "scripts/record-mailbox-hook-fixtures.mjs": "f1a1f57799f537c46cf582310a1b00deecb2befeba3eab73b33789b8822a1cf3",
-    "scripts/regenerate-observe-fixtures.mjs": "4b86877f44846a10c1daa7fe0d1870d03ad446aab1ce61422310a1b50a84d47d",
-    "scripts/run-rust-dev-host.mjs": "55e143c5eeda4af4e7a9ba754b476299a24c796d875a70bd3313eaba8181bb94",
+    "scripts/regenerate-observe-fixtures.mjs": "cbcacdba250f2b4daf2022f86129f44309f861a3dc8d56ddb02bbb2fb37b0791",
+    "scripts/run-rust-dev-host.mjs": "a5863e49844363875319dddb2f1ba1448587a0602d6d8a2ad60aa9dd286f7309",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "27a33f8eb50b482c9742e5116cbd9c54a701a2d8118d8fb8d20e1227fe74fc4d",
+    "scripts/run-tests.mjs": "be01e68722799ad45ff1d6c8e783c3d71b0c13cf43720d0c20c60e4524c1e2f9",
     "scripts/stress-test-files.mjs": "1c9298587bae21b5971c2e1eba5effd3c2a0c85ba94372936fa5e0c1d70d4f4e",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
     "scripts/test-proof-inventory.mjs": "fb8d24de073f628cd1cea540af8d39b55ec55d4199543ddf9cb062941a243e70",
@@ -4457,7 +4458,7 @@
     },
     {
       "path": "scripts/lib/git-addon-stage.mjs",
-      "line": 106,
+      "line": 107,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
@@ -4505,7 +4506,7 @@
     },
     {
       "path": "scripts/run-tests.mjs",
-      "line": 140,
+      "line": 141,
       "spawn": "loadNativeAddon -> src/git/index.mjs:10",
       "binary": "(configuration file data)",
       "class": "configured-binary"

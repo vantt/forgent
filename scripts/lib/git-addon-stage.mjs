@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { nativeAddonLibraryName } from '../build-rust-distribution.mjs';
 import { devHostEnv, devHostManifest } from './dev-host-manifest.mjs';
+import { ensureOrtStatic } from '../ort-static.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -36,7 +37,7 @@ export function gitAddonDirectory(cwd = REPO_ROOT) {
 
 export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true) {
   const dir = path.resolve(cwd, env.CARGO_TARGET_DIR || 'target');
-  const cargoEnv = { ...env, CARGO_TARGET_DIR: dir };
+  const cargoEnv = { ...env, CARGO_TARGET_DIR: dir, ...ensureOrtStatic(cwd) };
   execFileSync('cargo', ['build', ...(locked ? ['--locked'] : []), '-p', 'fgos-node-addon'], { cwd, env: cargoEnv, stdio: 'inherit' });
   const library = nativeAddonLibraryName();
   const addonDir = gitAddonDirectory(cwd);
@@ -125,7 +126,7 @@ export function ensureHostBin(env = process.env, cwd = REPO_ROOT) {
 
   execFileSync('cargo', ['build', '-p', 'fgos'], {
     cwd,
-    env: { ...env, CARGO_TARGET_DIR: targetDir },
+    env: { ...env, CARGO_TARGET_DIR: targetDir, ...ensureOrtStatic(cwd) },
     stdio: 'inherit',
   });
 

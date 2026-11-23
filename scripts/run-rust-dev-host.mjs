@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { nativeAddonLibraryName } from './build-rust-distribution.mjs';
 import { devHostEnv, devHostManifest } from './lib/dev-host-manifest.mjs';
 import { gitAddonDirectory } from './lib/git-addon-stage.mjs';
+import { ensureOrtStatic } from './ort-static.mjs';
 import { processesInside } from '../src/native/stop-processes-inside.mjs';
 import { scan } from '../src/native/process-identity.mjs';
 import { refuseSymlink } from '../src/util/refuse-symlink.mjs';
@@ -130,7 +131,7 @@ function main() {
   const build = spawnSync('cargo', ['build', '--locked', '--package', 'fgos', '--package', 'fgos-node-addon'], {
     cwd: checkoutRoot,
     stdio: 'inherit',
-    env: process.env,
+    env: { ...process.env, ...ensureOrtStatic(checkoutRoot) },
   });
   const buildStatus = forwardResult(build, 'Failed to run cargo build');
   if (buildStatus !== 0) return buildStatus;
