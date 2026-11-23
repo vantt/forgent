@@ -116,6 +116,30 @@ footprint:
   - test/report/decision-index.test.mjs
   - src/setup/instruction-registry.mjs
   - docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
+  - docs/platform/README.md
+  - docs/platform/component-boundary.md
+  - docs/platform/governance.md
+  - docs/platform/architecture-map.md
+  - docs/platform/system-overview/spec.md
+  - docs/platform/observe/spec.md
+  - docs/platform/workflow/spec.md
+  - scripts/lib/mailbox-behaviour-v7e.mjs
+  - scripts/lib/mailbox-behaviour-v7h.mjs
+  - scripts/lib/mailbox-behaviour-v7i.mjs
+  - scripts/lib/mailbox-behaviour-v7j.mjs
+  - test/live/mailbox-behaviour.v7e-addendum.json
+  - test/live/mailbox-behaviour.v7h-addendum.json
+  - test/live/mailbox-behaviour.v7i-addendum.json
+  - test/live/mailbox-behaviour.v7j-addendum.json
+  - test/live/mailbox-behaviour.v7k-addendum.json
+  - test/live/mailbox-behaviour.v7m-addendum.json
+  - test/live/mailbox-behaviour.v7n-addendum.json
+  - test/scripts/mailbox-behaviour-v7e.test.mjs
+  - test/scripts/mailbox-behaviour-v7h.test.mjs
+  - test/scripts/mailbox-behaviour-v7i.test.mjs
+  - test/scripts/mailbox-behaviour-v7j.test.mjs
+  - test/scripts/mailbox-live-confined.test.mjs
+  - packages/mailbox/rust/store/src/adapters/extension.rs
   - test/setup/**
   - test/runner/dispatch/**
   - test/runner/dispatch-*
@@ -161,8 +185,10 @@ names the survivor. `scripts/plan-contract-check.mjs` and the validating reviewe
 door `debt` entry is gone, and the old copy of each is deleted in the same change, with its last SHA recorded
 (CA-D2). The door guard matches by primitive and by canonical name plus aliases, never by bare words (decision
 0031), and counts matches inside allowed files. A new-named copy of an owned primitive turns `npm test` red.
-The structural model is YAML, which people can read and annotate like the config standard. Both the Rust loader
-and the Node readers parse it through the existing YAML door, and no JSON model file remains (phase 1b).
+The structural model is YAML, which people can read and annotate like the config standard. Only the Rust crate
+`packages/component-authority/rust` reads and writes it, through `fgos-yaml-doc`. The renderer is the crate verb
+`fgos authority render`, and Node code gets model data only from `fgos authority model --json`. No JSON model file
+and no JavaScript reader of the model remain (phase 1b).
 
 The model, spec, contract index and generated views come from the sibling plan
 [`261121-2109-component-authority`](../261121-2109-component-authority/plan.md), which this plan is blocked by.
@@ -190,9 +216,11 @@ admission model (independent reviewer within the owner's approved frame, owner a
 plan validation until H2 admission exists; the Git one-door scan's primitive matching
 (`scripts/git-one-door-scan.mjs`); vectors-replay as the cut-over safety net (488d3ab28, 046ee5547). Missing: a
 lookup door, a write door for the model, a plan-time mapping rule, counting inside allowed files, and alias
-matching. The YAML model (phase 1b) reuses the shared YAML loader and writes no parser: `fgos-yaml-doc`
-(`packages/yaml-doc/rust`) in Rust, and `parseYaml` in `src/util/yaml.mjs` (the native door through the addon,
-RUL108) in Node. Scripts stage the addon with `ensureAddonForScript`. No npm `yaml` dependency is added.
+matching. The YAML model (phase 1b) reuses the shared YAML loader and writes no parser. `fgos-yaml-doc`
+(`packages/yaml-doc/rust`) is the only reader and writer of the model, inside the crate. Node code reaches the
+model through `invokeHost` (`src/util/host-bin.mjs`) calling `fgos authority model --json`, never through
+`parseYaml`. No npm `yaml` dependency is added. `scripts/component-authority-render.mjs` is ported into the crate
+and deleted (owner correction 2026-11-23 14:15).
 
 ## Authority map
 
@@ -200,7 +228,8 @@ RUL108) in Node. Scripts stage the addon with `ensureAddonForScript`. No npm `ya
 |---|---|---|
 | `fgos authority locate`, `fgos authority declare` | door rows `component-authority-locate`, `component-authority-declare`, owner `component-authority` | the only lookup and the only write path into the model |
 | Authority-map rule in the plan contract | decision kind `component-authority` | extends the plan contract; the existing footprint "Door check" keeps its job and is renamed "Footprint check" so the two are not confused |
-| Model read and written as YAML (phase 1b) | component `yaml-document`, door row `yaml-parser-loads` | reuse `fgos-yaml-doc` (Rust) and `parseYaml` (Node); no parser, no npm `yaml` |
+| Model read and written as YAML, by the crate only (phase 1b) | component `yaml-document`, door row `yaml-parser-loads` | reuse `fgos-yaml-doc`; no parser, no npm `yaml`, no JavaScript reader |
+| `fgos authority render`, `fgos authority model --json` (phase 1b) | component `component-authority`; `render` is the survivor of `scripts/component-authority-render.mjs` | the `.mjs` is deleted in the same commit; Node readers use `invokeHost` |
 | Retired twins and copies | each row in `doors/<slug>.yaml` | survivor: the row's allowed door; retired: the debt file, last SHA in the commit |
 
 ## Acceptance criteria
@@ -228,10 +257,12 @@ RUL108) in Node. Scripts stage the addon with `ensureAddonForScript`. No npm `ya
    `.fgos/authority/model/` (fgOS's own repository keeps `packages/component-authority/model/`) and writes its row (still refusing a new component or decision kind without an answered owner question), and
    `locate` then finds that row. Check: `cargo test -p fgos --test authority` (phase 5, step 6).
 8. Every model file under `packages/component-authority/model/` (and the model `declare` creates under
-   `.fgos/authority/model/`) is YAML with the same rows. No `*.json` model file is left, and no reader falls back
-   to one. The Rust loader parses through `fgos-yaml-doc` and the Node readers through `parseYaml`, both with the
-   `tool` profile, and neither adds a parser or an npm `yaml` dependency. A comment in a model file is ignored.
-   `node scripts/component-authority-render.mjs` and `npm run build:skills` leave no diff. Check: phase 1b's Verify.
+   `.fgos/authority/model/`) is YAML with the same rows. No `*.json` model file is left. Only
+   `packages/component-authority/rust` reads or writes the model, through `fgos-yaml-doc` with no new parser and no
+   npm `yaml` dependency. `scripts/component-authority-render.mjs` is gone, and its views come from
+   `fgos authority render`. No `.mjs` opens a model file: Node tests and readers use `fgos authority model --json`.
+   A comment in a model file is ignored. `fgos authority render --check` and `npm run build:skills` leave no diff.
+   Check: phase 1b's Verify.
 
 ## Non-goals
 
@@ -246,8 +277,8 @@ RUL108) in Node. Scripts stage the addon with `ensureAddonForScript`. No npm `ya
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Crate and `fgos authority locate`](phase-01-crate-and-locate.md) | - | packages/component-authority/rust/, Cargo.toml, Cargo.lock, apps/fgos/Cargo.toml, apps/fgos/src/main.rs, test/cli/subcommand-flag-drift.test.mjs, apps/fgos/src/routing.rs, apps/fgos/src/invocation_doors.rs, apps/fgos/src/cli_projector.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/wiring/authority.rs, apps/fgos/tests/authority.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, src/cli/command-registry.mjs (lent by phase 2 while it is parked), test/rust-host/vectors/envelope/version.json (generated verb list, regenerated for the new verb) | 1 | done |
-| 1b | [The structural model moves from JSON to YAML](phase-01b-model-to-yaml.md) | 1 | packages/component-authority/model/, packages/component-authority/contracts/model.v1.json, packages/component-authority/rust/, Cargo.lock, scripts/component-authority-render.mjs, test/architecture.test.mjs, test/component-authority/, src/report/decision-index.mjs, test/report/decision-index.test.mjs, src/setup/instruction-registry.mjs, test/setup/instruction-registry.test.mjs, docs/platform/component-authority/spec.md, docs/platform/packaging-distribution/contracts/setup-doctor-registry.md | 2 | draft |
-| 2a | [Retire the Node agent hook table](phase-02a-agent-hook-table.md) | 1b | src/setup/agent-hooks.mjs, scripts/lib/mailbox-live-confined.mjs, test/setup/agent-hooks.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/agent-hook-table.yaml | 5 | draft |
+| 1b | [The structural model moves to YAML, read only by the Rust crate](phase-01b-model-to-yaml.md) | 1 | packages/component-authority/model/, packages/component-authority/contracts/model.v1.json, packages/component-authority/rust/, Cargo.lock, apps/fgos/src/wiring/authority.rs, apps/fgos/src/routing.rs, apps/fgos/src/invocation_doors.rs, apps/fgos/src/cli_projector.rs, apps/fgos/tests/authority.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, packages/host-runtime/rust/src/catalog.rs, src/cli/command-registry.mjs, test/cli/subcommand-flag-drift.test.mjs, test/rust-host/vectors/envelope/version.json, scripts/component-authority-render.mjs, test/component-authority/, test/architecture.test.mjs, src/report/decision-index.mjs, test/report/decision-index.test.mjs, src/setup/instruction-registry.mjs, test/setup/instruction-registry.test.mjs, packages/git/contracts/mutation-census.v1.json, test/suite-baseline.json, docs/platform/component-authority/spec.md, docs/platform/packaging-distribution/contracts/setup-doctor-registry.md, docs/platform/README.md, docs/platform/component-boundary.md, docs/platform/governance.md, docs/platform/architecture-map.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 2 | draft |
+| 2a | [Retire the Node agent hook table](phase-02a-agent-hook-table.md) | 1b | src/setup/agent-hooks.mjs, scripts/lib/mailbox-live-confined.mjs, test/setup/agent-hooks.test.mjs, test/scripts/mailbox-live-confined.test.mjs, scripts/lib/mailbox-behaviour-v7e.mjs, scripts/lib/mailbox-behaviour-v7h.mjs, scripts/lib/mailbox-behaviour-v7i.mjs, scripts/lib/mailbox-behaviour-v7j.mjs, test/live/mailbox-behaviour.v7e-addendum.json, test/live/mailbox-behaviour.v7h-addendum.json, test/live/mailbox-behaviour.v7i-addendum.json, test/live/mailbox-behaviour.v7j-addendum.json, test/live/mailbox-behaviour.v7k-addendum.json, test/live/mailbox-behaviour.v7m-addendum.json, test/live/mailbox-behaviour.v7n-addendum.json, test/scripts/mailbox-behaviour-v7e.test.mjs, test/scripts/mailbox-behaviour-v7h.test.mjs, test/scripts/mailbox-behaviour-v7i.test.mjs, test/scripts/mailbox-behaviour-v7j.test.mjs, packages/mailbox/rust/store/src/adapters/extension.rs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/agent-hook-table.yaml | 5 | draft |
 | 2b | [Close the delete-guard keyword list twin](phase-02b-delete-guard-keyword-list.md) | 2a | packages/distribution/rust/src/agent_hooks.rs, packages/component-authority/model/doors/delete-guard-keyword-list.yaml | 6 | draft |
 | 2c | [Retire the wire-agents settings wording](phase-02c-person-agent-config-writes.md) | 1b | src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/component-authority/model/doors/person-agent-config-writes.yaml | 5 | draft |
 | 2d | [Retire the Node shell-rc detector](phase-02d-shell-rc-fgos-lines.md) | 1b | src/setup/shell-rc.mjs, scripts/fgos-session-start-hook.mjs, test/setup/shell-rc.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/shell-rc-fgos-lines.yaml | 4 | draft |
@@ -276,8 +307,10 @@ unit-261123-0819-p03-result.md). Phases 6, 8 and 9 now depend on the single rows
 
 **Waits (each such phase stays `draft` until its wait clears; details are in the phase file):**
 - Phase 1 is done (207b6459d). Phase 1b can run now, and every other phase waits for it.
-- 2a and 2b wait for the mailbox lane to re-measure its frozen experiment sets without the Node hook table. No backlog
-  item owns that yet; the supervisor asks the secretary for one.
+- 2a and 2b do not wait for the mailbox lane (owner decision 2026-11-23, via Miu). 2a deletes the Node hook table and
+  retires or re-points the frozen v7e/v7h/v7i/v7j sets (and v7k/v7m/v7n, whose frozen confinement module it
+  changes) in the same change. Backlog `p-irt4weqipe` owns the mailbox re-measurement afterwards, and it blocks
+  nothing here. 2b waits only for 2a.
 - 2f waits for Rust migration steps S6b and S7 (`261114-2051-rust-verb-migration-program`), which move the last
   Node-owned doctor bodies.
 - 2g waits for backlog item `p-rypvkc3kai` (the herdr crate edge, kept out of this plan by the owner's answer).
@@ -355,6 +388,20 @@ admits no plan whose footprint overlaps a `running` one):
   `test/component-authority/**`, `src/report/decision-index.mjs`, `test/report/decision-index.test.mjs`,
   `src/setup/instruction-registry.mjs` and `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`.
   The other plans checked were the eight other `running` plans as of this edit.
+- Owner reminder 2026-11-23, relayed by lead:SUPERVISOR: reuse the shared YAML loader and write no parser. Phase 1b's
+  Prior art and Authority map name `fgos-yaml-doc` (landed 33f1e9f4f).
+- Owner correction 2026-11-23 14:15, relayed by lead:SUPERVISOR: no JavaScript reads or writes the model. Phase 1b
+  is rewritten so that only the crate touches the YAML. The renderer becomes the crate verb `fgos authority render`
+  and the `.mjs` is deleted in the same change. Node tests and readers (`test/architecture.test.mjs`,
+  `decision-index.mjs`, `instruction-registry.mjs`) get model data from `fgos authority model --json` through
+  `invokeHost`. Model-validity cases of `test/component-authority/**` move to crate tests. Phase 5's checker asks
+  the same verb and no longer applies the path rule in Node. Footprint additions: the seven generated view docs,
+  plus phase 1 verb-wiring files that are already in the plan footprint. No running plan lists the docs.
+- Owner decision 2026-11-23 (via Miu, relayed by lead:SUPERVISOR 14:15): 2a and 2b do not wait for the mailbox
+  re-measurement. The wait is dropped. 2a retires or re-points the frozen sets and their tests in the same change,
+  and names `p-irt4weqipe` as the owner of the re-measurement. 2a's footprint gains its freeze files, builders,
+  tests and `packages/mailbox/rust/store/src/adapters/extension.rs`. Only `261122-0118-heads-stable-and-able` lists
+  any `test/live/` path among running plans, `test/live/head-grant-probe.live.mjs`, which is not one of them.
 
 None. Shape choices the planner settled from the evidence:
 - Verb name `fgos authority` with subcommands `locate` and `declare`, after the `fgos convention` pattern.

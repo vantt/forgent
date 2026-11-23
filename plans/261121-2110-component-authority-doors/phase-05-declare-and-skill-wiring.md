@@ -36,7 +36,9 @@ packages/component-authority/rust/, Cargo.lock, apps/fgos/src/main.rs, test/cli/
      admission exists, that review is the independent admission step for each `declare` in the map.
 3. `scripts/plan-contract-check.mjs`, for `draft` and `ready` plans only:
    - the `Authority map` heading is required;
-   - each row id must exist in the model (read the model JSON files directly, as the plan footprint does) or be a `declare:` line;
+   - each row id must exist in the model, or be a `declare:` line. The checker gets the model from
+     `invokeHost(['authority', 'model', '--json'])` (phase 1b) and never opens a model file: no JavaScript reads the
+     model (owner correction 2026-11-23 14:15);
    - a line that says `overlaps` must also carry `survivor:`.
 
    Extend `test/scripts/plan-contract-check.test.mjs` with one case per rule, plus a `running` plan that is not checked.
@@ -52,8 +54,9 @@ packages/component-authority/rust/, Cargo.lock, apps/fgos/src/main.rs, test/cli/
    requirement in step 4 and the plan-contract rule in step 2 apply only where the project has a model at the path
    step 6 resolves (`packages/component-authority/model/` in fgOS's repository, `.fgos/authority/model/` elsewhere). Where it does not, the skill records `authority: inactive` in the plan
    or verify note and goes on, in the same shape as the impact-analysis gate in AGENTS.md. In step 3,
-   `scripts/plan-contract-check.mjs` skips the Authority-map rule when the checked project has no model at either
-   path, and reads the model from the same path rule as step 6. Add one
+   `scripts/plan-contract-check.mjs` skips the Authority-map rule when `fgos authority model --json` answers
+   `authority: "inactive"`. That verb applies step 6's path rule in Rust, so the rule lives in one function and
+   Node never reimplements it. `model` follows the same path rule and inactive answer as `locate`. Add one
    test case for that skip.
 
 6. The project's own model (owner order 2026-11-23 12:5x, scope addition approved). `locate` and `declare` read
