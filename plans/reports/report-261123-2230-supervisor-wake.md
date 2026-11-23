@@ -22,3 +22,12 @@
 - head-stop-rotation-bad-measure: parked on `q-pcwf3slkfp`, which can ride the same suite run.
 
 No admission: 3 of 3 leads live.
+
+## Late answers (22:26)
+
+- `q-vbh2knqpnu` (heads-stable lead): lead was idle, so stopped and restarted with `--for-question`; it writes the
+  answer back and acks.
+- `q-pcwf3slkfp` (mine): "Fold into q-vbh2knqpnu's suite run"; written into the head-stop-rotation plan, acked.
+- `q-q6peavqy7b` (mine): A, the owner's same host trip lands the six heads-stable CHANGELOG lines and the
+  `p-dgs2lsfudr` backlog index row; nothing else in CHANGELOG or the backlog. Recorded here rather than in the
+  heads-stable plan, whose restarted lead is writing it now; acked.
