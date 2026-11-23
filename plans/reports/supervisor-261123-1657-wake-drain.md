@@ -21,3 +21,9 @@ No owner question was pending. There were two events in the queue.
 - Watching planners and shapers is not yet a standing step of `fgos-supervisor`; the skill covers only leads. Making it standing is a skill change, so it needs a backlog row of its own.
 - She decides whether `head:shaper-node-rust-port-inventory` opens the "HARDEN vòng tiếp" discussion or is stopped.
 - Plan `261123-0828` waits for a lead slot. Raising `maxLeads` is a config decision; it is not made here.
+
+## Late event
+
+- `5332f6719030e068` (coordination-chore): Miu asked me to add the index line for `p-v6xinnjoxh` to `plans/backlog.md`. `fgos session write plans/backlog.md` was refused `path-not-granted` for me as it was for her. The grant in `src/session-host/head-grants.mjs:61,73` covers `plans/backlog/*` but not the index file. I did not route the write around that refusal. I asked the owner in `q-nudu6zlusf`, and my recommendation is to fix the grant. The line to add is:
+  `| [p-v6xinnjoxh](backlog/p-v6xinnjoxh-supervisor-looks-after-every-head-and-someone-owns-shaper-planner-sessions.md) | The supervisor looks after every head session, and someone owns shaper and planner sessions once they finish (supervisor, priority P1; source: owner order to the secretary, 2026-11-23) | proposed | P1 | supervisor | - |`
+- `2c791068ca6a5b9d` (session-idle) named `lead:SUPERVISOR`, the owner's own unconfined session, which is not a head. Closed without action.
