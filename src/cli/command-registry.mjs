@@ -4,7 +4,7 @@
 // deliverable b).
 //
 // Pure data only — no imports of verb logic (src/state, src/runner, etc.), so
-// this module sits at the `kernel` layer in docs/architecture-manifest.json:
+// this module sits at the `kernel` layer in packages/component-authority/model/:
 // `bin/fgos.mjs` (entry) importing it is a downward import, and this file can
 // never import back up into anything that would create a cycle.
 //

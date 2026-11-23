@@ -9,7 +9,7 @@ Canonical: Yes
 Owner: Component authority
 Source: packages/component-authority/
 Contracts: packages/component-authority/contracts/
-Last reviewed: 2026-11-21
+Last reviewed: 2026-11-24
 Related:
 - docs/platform/component-boundary.md
 - docs/platform/architecture-map.md
@@ -20,7 +20,7 @@ Related:
 - docs/platform/documentation/subcomponents/admission/spec.md
 - docs/platform/agent-confinement/spec.md
 - docs/platform/system-overview/spec.md
-Implementation: In progress
+Implementation: Implemented
 Provenance: Created from plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md and plan plans/261121-2109-component-authority/plan.md
 Writer type: Agent draft writer
 Canonical for: Who owns what: components, subcomponents, decision kinds, doors, contract index, file-to-component mappings, and the locate and declare doors
@@ -235,3 +235,17 @@ With the establishment of Component Authority, previous disparate ownership ledg
 - **Lời chủ dự án**: "ok duyệt."
 - **Nguồn**: `plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md` §4 decision 5, §6
 - **Nội dung**: Phê duyệt toàn bộ thiết kế kiến trúc và vận hành của `component-authority`: hai cửa `locate`/`declare`, các điểm kiểm tra tại planning/land, tự động sinh các bản đọc cho người và thu hồi các sổ cũ; quản lý contract theo chỉ mục; subcomponent là hàng có `parent`; quy tắc kinh doanh và bản ghi quyết định nằm ngoài mô hình.
+
+### Quyết định 6 — Hai cửa `locate`/`declare` và quy tắc Authority map vào vận hành
+
+- **Ngày**: 2026-11-24
+- **Lời chủ dự án**: câu trả lời phương án A cho việc plan contract bắt buộc có Authority map.
+- **Nguồn**: `plans/261121-2110-component-authority-doors/plan.md`
+- **Nội dung**: `declare` là đường ghi duy nhất vào mô hình của một project: kiểm tra trước, rồi ghi YAML qua các cửa YAML và durable-file. `locate` và `model` trả `authority: inactive` (exit 0) ở project chưa có mô hình. Mô hình nằm ở `packages/component-authority/model/` trong repo fgOS và ở `.fgos/authority/model/` ở project khác. Thành phần mới hoặc decision kind mới luôn cần một câu hỏi chủ dự án đã được trả lời. Plan contract thêm mục **Authority map**: mỗi quyết định, hàm hoặc module mới ánh xạ tới một hàng của mô hình hoặc tới một `declare`, và plan chồng lên thứ đã có phải nêu bên sống sót. `scripts/plan-contract-check.mjs` kiểm tra mục này với plan `draft`/`ready` tạo từ 2026-11-24 trở đi, nên các plan cũ vẫn land được. Các skill planning, implement, validating, shaping và tài liệu gọi `locate` trước khi viết và `declare` khi tạo.
+
+### Quyết định 7 — Mỗi hàng cửa đóng bằng cách xoá bản cũ; nợ có tên là ngoại lệ duy nhất
+
+- **Ngày**: 2026-11-24
+- **Lời chủ dự án**: phương án B (2026-11-24): mọi nợ còn lại được gọi tên và gỡ ngay sau bản phát hành; không có công tắc chỉ-cảnh-báo cho door guard (2026-11-23).
+- **Nguồn**: `plans/261121-2110-component-authority-doors/plan.md`; các báo cáo `unit-*-result.md` của plan
+- **Nội dung**: Mỗi hàng cửa đóng bằng cách chuyển mọi caller sang bên sống sót và xoá bản cũ trong cùng đợt (quyết định 2); SHA cuối còn bản cũ được ghi ở đây hoặc ở spec chủ của nó. Đã đóng: năm lần ghép `.fgos` của tầng Work chuyển sang `fgosDirFromRoot` (không xoá file nào); mô tả `wire-agents` không còn nêu thiết lập mà verb không ghi (bên sống sót `packages/distribution/rust/src/agent_config.rs`); bộ dò rc của shell chỉ còn `rc_lines.rs` (`src/setup/shell-rc.mjs`, SHA cuối `12f8a187a`); bảng hook Node `src/setup/agent-hooks.mjs` (SHA cuối `871a77074`) đã xoá và `agent_hooks.rs` là bảng duy nhất; `findAgySubHomes` của `src/setup/agy-permissions.mjs` (SHA cuối `6b37add13`) đã xoá, `find_sub_homes` trong `packages/execution/rust/src/checks.rs` là bên duy nhất; hai nơi gọi write-scope còn sống (`src/session-host/head-request.mjs`, `src/workflow/definition.mjs`) đọc qua gói write-scope Rust; bộ đọc argv của route run-supervisor, terminal-control, session-host và `scripts/write-test-marker.mjs` đọc qua bộ phân tích đối số của CLI, còn lister thư mục run của host hỏi bố cục assignment của `fgos-execution` (SHA cuối của mã đã sao `f10347332`). Door guard khớp theo primitive và theo tên chuẩn cùng alias, đếm số khớp trong file được phép, và chỉ cho `debt` trên danh sách nợ có tên (17 hàng, mỗi hàng có `retiredBy`); bước gỡ toàn bộ chạy ngay sau bản phát hành. `doctor-readiness-registry` và `installation-shim-location` (khi `p-rypvkc3kai` còn mở) giữ nợ cho tới khi cổng Workflow/Work hoặc mục backlog đó xoá thân hàm cuối cùng.
