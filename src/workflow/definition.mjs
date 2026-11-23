@@ -1,8 +1,8 @@
 // src/workflow/definition.mjs — Workflow definition contract and schema validator
-// Architecture guard: MUST NOT import src/state/** or src/runner/** (kernel layer). The exceptions are three
-// pure leaves (writes are read through the native write-scope door, so a workflow and a unit read them one way):
-// src/runner/dispatch/run-timeout.mjs, so they check a unit's timeoutMs one way, and
+// Architecture guard: MUST NOT import src/state/** or src/runner/** (kernel layer). The exceptions are two
+// pure leaves: src/runner/dispatch/run-timeout.mjs, so they check a unit's timeoutMs one way, and
 // src/runner/execution/outcome.mjs, so which outcomes are verdicts is Execution's answer, not a second list.
+// Writes are read through the native writeScope door in src/native/door.mjs, so a workflow and a unit read them one way.
 
 import path from 'node:path';
 import { nativeDoor } from '../native/door.mjs';
@@ -80,8 +80,10 @@ function normalizeWriteScope(raw, label) {
   if (raw === undefined) return [];
   try {
     if (!Array.isArray(raw)) throw new Error('writes must be an array of repo-relative paths.');
+    if (raw.length === 0) return [];
     return nativeDoor().writeScope('canonicalizeAll', { scope: raw });
   } catch (err) {
+    if (String(err?.code ?? '').startsWith('git-addon-')) throw err;
     return fail(`${label}.writes: ${err.message}`);
   }
 }

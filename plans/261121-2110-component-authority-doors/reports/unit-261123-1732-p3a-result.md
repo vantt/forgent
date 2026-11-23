@@ -26,3 +26,11 @@ Footprint write-scope: `head-request` and workflow `definition` read write entri
 Status: DONE_WITH_CONCERNS
 Summary: Both live callers now use the nativeDoor writeScope operations; no reference to dispatch/write-scope remains in either file.
 Concerns: node/cargo were refused so no test was run; error-message wording from the native canonicalizeAll is unverified.
+
+## Fix round
+- `head-request.mjs`: the two `../native/door.mjs` imports are one (`installOnce, nativeDoor, replaceDurably`); the write-scope wrappers sit below all imports. `covered()` rethrows errors whose code starts `git-addon-` (missing/unsafe addon) and only turns write-scope refusals into `false`.
+- `definition.mjs`: header says two pure leaves and names the native writeScope door; `normalizeWriteScope` returns `[]` for an empty array without calling the door and rethrows `git-addon-` errors unchanged instead of wrapping them as a writes error.
+- Not run: no tests executed.
+
+Status: DONE
+Summary: Merged imports, addon-unavailable errors propagate in both callers, empty writes skip the door, header comment corrected.

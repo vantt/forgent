@@ -23,14 +23,13 @@ import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
 import { judge, observe, selfRecord } from '../native/process-identity.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { assignmentDir } from '../runner/dispatch/assignment-layout.mjs';
-import { nativeDoor } from '../native/door.mjs';
+import { readStoredUnitSummary } from '../runner/execution/unit-summary.mjs';
+import { unitRunFacts } from '../runner/execution/unit-run-record.mjs';
+import { installOnce, nativeDoor, replaceDurably } from '../native/door.mjs';
+import { markSuccessorAnswered, requestRotation, rotationHolds } from '../session-rotation/rotate.mjs';
 
 const canonicalizeWriteEntry = (raw) => nativeDoor().writeScope('canonicalize', { raw });
 const matchesWriteScope = (candidate, scope) => nativeDoor().writeScope('matches', { path: candidate, scope });
-import { readStoredUnitSummary } from '../runner/execution/unit-summary.mjs';
-import { unitRunFacts } from '../runner/execution/unit-run-record.mjs';
-import { installOnce, replaceDurably } from '../native/door.mjs';
-import { markSuccessorAnswered, requestRotation, rotationHolds } from '../session-rotation/rotate.mjs';
 
 const confined = (env) => env[CONFINED_MARKER_ENV] === '1';
 // `projectRoot` is a path or a function that finds it; only the unconfined branch resolves it, because the lookup probes
@@ -158,7 +157,11 @@ function entryWithin(e, f) {
 /** Whether the footprint covers a requested write entry (a path, a directory or a glob). */
 const covered = (p, footprint) => {
   if (!plainEntry(p)) return false;
-  try { return footprint.some((f) => entryWithin(p, f)); } catch { return false; }
+  try { return footprint.some((f) => entryWithin(p, f)); } catch (err) {
+    // A missing addon is an install fault, not a refused entry: let it name itself.
+    if (String(err?.code ?? '').startsWith('git-addon-')) throw err;
+    return false;
+  }
 };
 
 const planOfCaller = (envelope, projectRoot, ports) => (ports.planOf ?? ((root, persona, name) => planOfHead(root, persona, name, ports.plan ?? {})))(projectRoot, personaOf(envelope), envelope.session.name);
