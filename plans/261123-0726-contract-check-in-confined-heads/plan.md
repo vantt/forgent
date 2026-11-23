@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Repo scripts load the staged addon in a confined head: one reuse-or-build door, so planners can run the plan contract check"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 base: c953e546b43870cddd4465961e1ae7178280387b
@@ -90,7 +90,7 @@ report.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [One reuse-or-build door in the leaf](phase-01-one-reuse-or-build-door.md) | - | scripts/lib/git-addon-stage.mjs, scripts/git-addon.mjs, test/distribution/native-addon.test.mjs | 1 | draft |
+| 1 | [One reuse-or-build door in the leaf](phase-01-one-reuse-or-build-door.md) | - | scripts/lib/git-addon-stage.mjs, scripts/git-addon.mjs, test/distribution/native-addon.test.mjs | 1 | ready |
 | 2 | [Integration: confined proof and gate hand-off](phase-02-integration-and-gate-handoff.md) | 1 | plans/261123-0726-contract-check-in-confined-heads/reports/ | 2 | draft |
 
 Execution: phase 1 is one `code:implement` unit in its own worktree. Phase 2 is a `code:test` unit plus a supervisor
