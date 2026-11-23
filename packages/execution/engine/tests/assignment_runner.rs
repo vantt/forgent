@@ -9,6 +9,9 @@ use std::path::{Path, PathBuf};
 use fgos_execution::bind::{seat_config_digest, BindSession};
 use fgos_execution::decide::CheckoutFacts;
 use fgos_execution::ports::Machine;
+use fgos_execution::seat_resolver::bind_seat_of;
+use fgos_execution_engine::accounts::rotation::walk_state_of;
+use fgos_execution_engine::planning::bind_facade::{bind, AccountStateSource, BindContext};
 use fgos_execution_engine::assignment_runner::attempt::*;
 use fgos_execution_engine::assignment_runner::execute::*;
 use fgos_execution_engine::assignment_runner::inputs::*;
@@ -94,11 +97,80 @@ impl Machine for NoMachine {
     }
 }
 
+/// A machine that has every agent CLI the Rust-owned cases name and a bwrap backend, so a bind reaches its ranking.
+struct FullMachine;
+impl Machine for FullMachine {
+    fn on_path(&self, _: &str) -> bool {
+        true
+    }
+    fn posture_backend(&self, _: &str) -> Option<fgos_execution::ports::Backend> {
+        Some(fgos_execution::ports::Backend {
+            enabled: true,
+            kind: "bwrap".into(),
+            executable: None,
+        })
+    }
+    fn herdr_present(&self) -> bool {
+        false
+    }
+    fn home_dir(&self) -> Option<String> {
+        None
+    }
+}
+
+/// The lease state a Rust-owned case records, handed to the bind as the run's bind read it.
+struct RecordedState(Value);
+impl AccountStateSource for RecordedState {
+    fn overlay(&self, _: u64) -> Value {
+        self.0.clone()
+    }
+}
+
+/// What the real bind computes from the state a Rust-owned case records: the config digest and the account view
+/// digest the record must carry for the recheck to reproduce it.
+fn bound_digests(case: &Value, unit_record: &Value, config: &Value) -> (String, String) {
+    let attempt = &unit_record["bindings"]["producer/1"][0];
+    let id = attempt["assignmentId"].as_str().unwrap();
+    let state = attempt.get("accountState");
+    let replayed = state.map(|s| RecordedState(s["overlay"].clone()));
+    let at = state.and_then(|s| s["at"].as_u64()).unwrap_or(0);
+    let mut ask = bind_seat_of(unit_record, "producer");
+    ask["unit"] = unit_record["unit"].clone();
+    ask["readOnly"] = json!(false);
+    ask["overrides"] = json!([]);
+    let walk = walk_state_of(unit_record, "producer", "1", id);
+    let context = BindContext {
+        runner_config: config,
+        session: BindSession::default(),
+        machine: &FullMachine,
+        accounts: replayed.as_ref().map(|r| r as &dyn AccountStateSource),
+    };
+    let bound = bind(&ask, &context, &walk, false, at)
+        .unwrap_or_else(|e| panic!("{}: the bind failed: {e}", case["name"]));
+    let digest = |key: &str| {
+        bound["bindingInput"][key]
+            .as_str()
+            .unwrap_or_else(|| panic!("{}: the bind carries no {key}", case["name"]))
+            .to_string()
+    };
+    (digest("configDigest"), digest("accountViewDigest"))
+}
+
 fn check(
     assignment: &Value,
     options: &LegalityOptions<'_>,
     checkout: &dyn CheckoutFacts,
     config: &Value,
+) -> Result<(), RunnerConfigError> {
+    check_on(assignment, options, checkout, config, &NoMachine)
+}
+
+fn check_on(
+    assignment: &Value,
+    options: &LegalityOptions<'_>,
+    checkout: &dyn CheckoutFacts,
+    config: &Value,
+    machine: &dyn Machine,
 ) -> Result<(), RunnerConfigError> {
     let load = |_: &Path| Ok(config.clone());
     let fgos_dir = |root: &Path| root.join(".fgos");
@@ -107,7 +179,7 @@ fn check(
         options,
         &LegalityFacts {
             checkout,
-            machine: &NoMachine,
+            machine,
             load_runner_config: &load,
             fgos_dir_of_root: &fgos_dir,
         },
@@ -198,7 +270,36 @@ fn every_git_half_refusal_of_a_mutating_unit_run_reads_as_node_stated_it() {
             main_checkout_root: facts["mainCheckoutRoot"].as_str().map(str::to_string),
         };
         let repo_root = PathBuf::from(options["repoRoot"].as_str().unwrap());
-        let result = check(
+        // A Rust-owned case is recorded by hand, not by Node: its digests must be what the real bind computes
+        // from the state it records, and it replays on a machine that lets the bind reach its ranking.
+        let rust_owned = name.starts_with("rust-owned:");
+        if rust_owned {
+            let unit_record = rooted(&case["unitJson"], &root);
+            let recorded = &unit_record["bindings"]["producer/1"][0];
+            let (config_digest, view_digest) =
+                bound_digests(case, &unit_record, &options["committedRunnerConfig"]);
+            assert_eq!(
+                recorded["binding"]["bindingInput"]["configDigest"],
+                json!(config_digest),
+                "{name}: the recorded config digest"
+            );
+            let recorded_view = &recorded["binding"]["bindingInput"]["accountViewDigest"];
+            if case["result"].get("ok").is_some() {
+                assert_eq!(
+                    recorded_view,
+                    &json!(view_digest),
+                    "{name}: the recorded account view digest"
+                );
+            } else if recorded.get("accountState").is_some() {
+                assert_ne!(
+                    recorded_view,
+                    &json!(view_digest),
+                    "{name}: the recorded account view digest must not reproduce from the recorded state"
+                );
+            }
+        }
+        let machine: &dyn Machine = if rust_owned { &FullMachine } else { &NoMachine };
+        let result = check_on(
             &assignment,
             &LegalityOptions {
                 is_read_only_mode: options["isReadOnlyMode"].as_bool(),
@@ -210,6 +311,7 @@ fn every_git_half_refusal_of_a_mutating_unit_run_reads_as_node_stated_it() {
             },
             &checkout,
             &json!({}),
+            machine,
         );
         let got = match result {
             Ok(()) => json!({ "ok": null }),
