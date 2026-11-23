@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e3887bd1035f68b906a32ee6aa0edc5dda133fa07c312c059ba318f7113d3b7b",
+  "payloadDigest": "b2f1ecd0bb1ef9de5598d5b1e2d959676cbd71ae73a3bc9b85a7b2dbf7bc5670",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -318,9 +318,9 @@
     "packages/component-authority/rust/src/declare.rs": "8563ea7a058a6debe136f7dd6d640d684247657cfde81108cdcfc4ccf7e5069b",
     "packages/component-authority/rust/src/lib.rs": "d94aebb3e459ae082513ca70d2d4022d7b2c4cba128777eb55693b79bc73a18c",
     "packages/component-authority/rust/src/locate.rs": "098f3ee4ac17c2f068b04dc93880dcf2e5385999ace69f89fe18488a868ddff9",
-    "packages/component-authority/rust/src/model.rs": "cda36f6d635a8f544317d8474f8059ead37b1e0290dd8caff3709bda5548b526",
+    "packages/component-authority/rust/src/model.rs": "64bd01f98910072457d037fafea95db177d191cc297f8b32652b6bf338d96f39",
     "packages/component-authority/rust/src/render.rs": "24e9a58909370d7e0405b7ed3b7d522ab42c51585bc57abab409f44a5e4def2b",
-    "packages/component-authority/rust/tests/model_checks.rs": "a7c2618d0b46600e37bcc72d80f0f3dee733a63dee5854c32fc10d50821cadbb",
+    "packages/component-authority/rust/tests/model_checks.rs": "b99416eee445bc523d07a27f44a36c474ef11720552181459617e3341ecc9b03",
     "packages/config/rust/src/bundle.rs": "e0e8be75c39467ed79fdf232bc22848ca94e082ec38c94944006cddb2699680d",
     "packages/config/rust/src/cache.rs": "a7f20461334a2ead32208e1cb89b573688f142e62320360f592c4ca2d795c4b2",
     "packages/config/rust/src/detect.rs": "e0342fdde6d040aebd93d00acc5ea4af45a6245f92e61f0bfa47c4b7fec628bf",

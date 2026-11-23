@@ -20,4 +20,5 @@ debt:
     reason: walks up from cwd for .fgos/installation/activation.json with no Git ceiling and no home exclusion, a root decision of its own for finding the host binary; it is the bootstrap reader, running before any door can load, and retires with the Node payload (S7)
   - path: src/runner/worktree.mjs
     reason: isMainWorktree asks 'is this the main checkout' in Node while fgos-git store_admission asks it in Rust; six other Node callers (resolveMainCheckoutRoot and friends) keep it until their verbs move
+retiredBy: "S7 and the mailbox-verb move (apps/fgos/src/wiring/mailbox_verbs.rs): mailbox_root.rs joins the invocation-root door when the mailbox verbs move, host-bin-path.mjs and worktree.mjs retire with the Node payload"
 reason: which project and which .fgos a call acts on is decided once, in fgos-git, for Node (through the addon) and the host. Patterns name the definitions of a root decision, not their callers (narrowed from the call names, to cover the same job exactly)

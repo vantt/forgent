@@ -95,6 +95,8 @@ pub enum DoorPath {
 pub struct DoorPathReason {
     pub path: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub count: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
 }
 
@@ -107,6 +109,10 @@ pub struct Door {
     pub job: String,
     pub kind: String,
     pub patterns: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub names: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub primitives: Vec<String>,
     pub allowed: Vec<DoorPath>,
     #[serde(default)]
     pub debt: Vec<DoorPath>,

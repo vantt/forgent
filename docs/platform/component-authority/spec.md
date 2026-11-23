@@ -103,11 +103,15 @@ Defined under `doors/` (one YAML file per door job; the file name is the door's 
 - `job`: Description of the single-door job being protected.
 - `kind`: Door kind identifier (`door`).
 - `patterns`: Regular expression patterns matching both primitive operations and canonical/alias symbols.
-- `allowed`: Allowed caller files, either plain strings or objects with `{path, reason}`.
-- `debt`: Transitional callers awaiting retirement, each with `{path, reason}`.
+- `primitives`: Regular expression sources of the calls or imports that do the job (for example the rename and fsync pair of an atomic write, `process.kill`, `/proc/`, `Command::new`). Matched on code tokens only.
+- `names`: The canonical name plus its aliases, matched as whole identifiers on code tokens only. Comments and string contents never match, and a bare word in prose is never a door (decision 0031).
+- `allowed`: Allowed caller files, either plain strings or objects with `{path, count, reason}`. In an allowed file, more matches than `count` fails; outside allowed files any match fails.
+- `debt`: Transitional callers awaiting retirement, each with `{path, reason}`. Allowed only on the rows of the named debt list in `checkDoors` (`NAMED_DOOR_DEBT` in `test/architecture.test.mjs`), each with a `retiredBy`; a named row without debt, a named row without `retiredBy` and debt on any other row each fail, and a debt entry whose file no longer matches fails, so the list cannot go stale.
 - `reason`: Explanation of why this door exists and how callers are bounded.
-- `retiredBy`: Phase, plan, or condition under which debt entries are eliminated.
+- `retiredBy`: Plan, program step or backlog item under which debt entries are eliminated; required wherever `debt` is.
 - `owner`: Optional component ID owning the guarded mechanism.
+
+Named debt (the owner's decisions of 2026-11-23, discussion ds-wham5txfkv: no warn-only switch, two rows keep named debt; and 2026-11-24, q-aanvfxaopa option B: all remaining debt is named and retired right after the release): every door row that still holds `debt` when the guard locks is on the list, so the guard runs from the release on, and `261121-2110-component-authority-doors#phase-12` retires them all. Rows `doctor-readiness-registry` (retiredBy S7, the last Node-owned row moves to Rust) and `installation-shim-location` (retiredBy `p-rypvkc3kai`) are the first two named rows; the others keep their own `retiredBy` (`p-24xw2cwdvo`, S7, `p-nwife3i4kc`, the mailbox-verb move, or phase 12). `primitives`, `names` and `count` are checked by the guard and the crate now loads them; no model row writes them until a release carries that crate, after which phase 10b fills them.
 
 ### 2.5 Contract index
 

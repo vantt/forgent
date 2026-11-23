@@ -27,4 +27,5 @@ debt:
     reason: Land removes its own candidate checkout through the Git port; it moves with Land
   - path: scripts/lib/git-ports.mjs
     reason: the test launcher prunes registrations of checkouts a test run left behind
+retiredBy: "p-nwife3i4kc: the checkout crate gains create at branch/path/base, prune of a missing checkout and remove under held custody; the four Node copies then move onto it"
 reason: "only fgos-checkout makes, provisions and removes a linked checkout: it registers and removes through the Git worktree port under the worktree-admin hold, installs dependencies, runs the project's `worktreeSetup.commands` and keeps the provisioning record. A Node or Rust caller reaches it through the addon namespace `checkout` or the `worktree` verb, never by calling the Git create, remove or prune port beside it. Rust test code and comments are blanked and tests/ dirs are pruned; a call split across lines is not seen"

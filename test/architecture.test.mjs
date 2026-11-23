@@ -88,6 +88,9 @@ function loadModel() {
     }
   }
 
+  const baseTiers = { ...tiers };
+  for (const exc of layers.tierExceptions ?? []) tiers[exc.path] = exc.tier;
+
   const allMjs = [...mjsFilesUnder('src'), ...mjsFilesUnder('bin')].sort();
   const files = {};
   for (const file of allMjs) {
@@ -114,6 +117,7 @@ function loadModel() {
     domains: layers.domains,
     tierNames: layers.tierNames,
     tiers,
+    baseTiers,
     tierExceptions: layers.tierExceptions ?? [],
     doors,
     files,
@@ -298,13 +302,13 @@ export function tierOf(file, tiers) {
 }
 
 /**
- * Edges that import a higher tier and are not a named exception, as `from -> to` text. `edges` are
- * `[from, to]` pairs of manifest files; `exceptions` are `{ from, to }`.
+ * Edges that import a higher tier, as `from -> to` text. `edges` are `[from, to]` pairs of manifest files.
+ * A named exception is a `{path, tier, reason}` row of the model: `loadModel` folds it into `tiers`
+ * (the file takes that tier), so this function needs no list of its own.
  */
-export function findTierViolations(edges, tiers, exceptions = []) {
-  const allowed = new Set(exceptions.map((e) => `${e.from} -> ${e.to}`));
+export function findTierViolations(edges, tiers) {
   return edges
-    .filter(([from, to]) => tierOf(from, tiers) < tierOf(to, tiers) && !allowed.has(`${from} -> ${to}`))
+    .filter(([from, to]) => tierOf(from, tiers) < tierOf(to, tiers))
     .map(([from, to]) => `${from} (T${tierOf(from, tiers)}) -> ${to} (T${tierOf(to, tiers)})`);
 }
 
@@ -325,20 +329,17 @@ test('tier: every file has one tier, every tier row names a file, every exceptio
   }
   const untiered = inManifest.filter((file) => tierOf(file, manifest.tiers) === null);
   assert.deepEqual(untiered, [], 'file không có tier');
-  for (const { from, to, reason } of manifest.tierExceptions) {
-    assert.ok(from in manifest.files && to in manifest.files, `${from} -> ${to}: ngoại lệ trỏ file không có trong manifest`);
-    assert.ok(typeof reason === 'string' && reason.length > 20, `${from} -> ${to}: ngoại lệ phải ghi lý do`);
+  for (const { path: file, tier, reason } of manifest.tierExceptions) {
+    assert.ok(file in manifest.files, `${file}: ngoại lệ trỏ file không có trong manifest`);
+    assert.ok(Number.isInteger(tier), `${file}: ngoại lệ phải ghi tier`);
+    assert.ok(typeof reason === 'string' && reason.length > 20, `${file}: ngoại lệ phải ghi lý do`);
   }
 });
 
-test('tier: no file imports a higher tier, and every named exception is still a real upward import', () => {
-  const edges = manifestEdges();
-  assert.deepEqual(findTierViolations(edges, manifest.tiers, manifest.tierExceptions), []);
-  for (const { from, to } of manifest.tierExceptions) {
-    assert.ok(
-      edges.some(([a, b]) => a === from && b === to) && tierOf(from, manifest.tiers) < tierOf(to, manifest.tiers),
-      `${from} -> ${to}: no longer an upward import, drop it from tierExceptions`,
-    );
+test('tier: no file imports a higher tier, and every named exception still changes its file tier', () => {
+  assert.deepEqual(findTierViolations(manifestEdges(), manifest.tiers), []);
+  for (const { path: file, tier } of manifest.tierExceptions) {
+    assert.notEqual(tierOf(file, manifest.baseTiers), tier, `${file}: its component already gives tier ${tier}, drop it from tierExceptions`);
   }
 });
 
@@ -348,9 +349,10 @@ test('tier rule catches an upward import, takes a same-tier or downward one, and
   assert.deepEqual(findTierViolations([['src/b/y.mjs', 'src/a/x.mjs'], ['src/a/x.mjs', 'src/a/z.mjs']], tiers), []);
   // A file row beats its directory row: low.mjs is T0, so a T1 file may import it.
   assert.deepEqual(findTierViolations([['src/a/x.mjs', 'src/b/low.mjs']], tiers), []);
-  const port = [{ from: 'src/a/x.mjs', to: 'src/b/y.mjs', reason: 'a named port' }];
-  assert.deepEqual(findTierViolations([['src/a/x.mjs', 'src/b/y.mjs']], tiers, port), []);
-  assert.equal(findTierViolations([['src/a/x.mjs', 'src/b/other.mjs']], tiers, port).length, 1);
+  // A named exception gives one file its own tier, so only that file's imports change.
+  const withPort = { ...tiers, 'src/a/x.mjs': 3 };
+  assert.deepEqual(findTierViolations([['src/a/x.mjs', 'src/b/y.mjs']], withPort), []);
+  assert.equal(findTierViolations([['src/a/z.mjs', 'src/b/y.mjs']], withPort).length, 1);
   assert.equal(tierOf('src/c/none.mjs', tiers), null);
 });
 
@@ -1757,7 +1759,9 @@ test('the shell entry loads dispatch depth, the Land release and the decision ci
 
 // ─── One door per job: manifest.doors ──────────────────────────────────────────────────────────────
 // Each row names a job, the regex patterns that mark code doing it, and the files that own it. A hit
-// anywhere else fails; `debt` lists known leaks (visible, never failing, but stale once fixed);
+// anywhere else fails; `names` (canonical plus aliases, whole identifiers) and `primitives` (regexes) match on code
+// tokens only, never in comments or strings; an allowed entry's `count` bounds its matches; `debt` lists known leaks
+// (stale once fixed) and is allowed only on the rows of NAMED_DOOR_DEBT, each with a `retiredBy`;
 // `allowed: []` retires a name; a `ratchet` row bounds a verb-wide pattern by a per-file match ceiling
 // that may only fall (a count below the ceiling is stale, so a fall lowers the ceiling in the same change).
 // The Git-spawn job is owned by scripts/git-one-door-scan.mjs and its census: no regex row duplicates it.
@@ -1799,6 +1803,50 @@ function doorFiles() {
   return out.sort();
 }
 
+/**
+ * The door rows that may carry `debt`, by job: the named debt. A later phase of the component-authority-doors
+ * plan retires each and empties this list. A row with `debt` that is not here fails, and so does a row here
+ * that holds none, so the list cannot go stale.
+ */
+export const NAMED_DOOR_DEBT = new Set([
+  'decide a dispatch',
+  'derive executor facts',
+  'doctor readiness registry',
+  'execution doctor judgments',
+  'global fgOS directory',
+  'installation shim and activation record location',
+  'kernel lock primitive',
+  'list run directories (twin)',
+  'make, provision and remove a checkout',
+  'no Node from the native packaging verbs',
+  'parse CLI arguments (twin)',
+  'process control: signal a process or group',
+  'process facts: read /proc',
+  'resolve the invocation root',
+  'run a bounded child and find a program on the search path',
+  'the footprint and write-scope overlap rule',
+  'tool lookup by capability: ask fgos dispatch decide --for (packages/execution/rust/src/tools.rs)',
+]);
+
+/** Blank the inside of Rust string literals (raw ones too) in comment-blanked `code`, keeping length and newlines. */
+function blankRustLiterals(code) {
+  const blank = (match) => match.replace(/[^\n]/g, ' ');
+  return code
+    .replace(/b?r(#*)"[\s\S]*?"\1/g, blank)
+    .replace(/"(?:\\[\s\S]|[^"\\])*"/g, blank);
+}
+
+/**
+ * `source` as code tokens only: comments and the inside of string literals blanked (and Rust test code), same
+ * length and line numbers. `names` and `primitives` match on this view, so a word in prose never matches.
+ */
+export function doorCodeText(file, source) {
+  const ext = path.extname(file);
+  if (ext === '.mjs' || ext === '.js' || ext === '.cjs') return lexSource(source).shape;
+  const text = doorText(file, source);
+  return ext === '.rs' ? blankRustLiterals(text) : text;
+}
+
 /** `source` with comments (and Rust test code) blanked, same length and line numbers as the input. */
 export function doorText(file, source) {
   const ext = path.extname(file);
@@ -1824,15 +1872,22 @@ const entryOf = (raw) => (typeof raw === 'string' ? { path: raw } : raw);
  * Failures of `rows` over `files` (a Map of repo path to file text). Pure: reads nothing itself.
  * Every message names the row's job, and the file and line where there is one.
  */
-export function checkDoors(rows, files) {
+export function checkDoors(rows, files, namedDebt = NAMED_DOOR_DEBT) {
   const failures = [];
   const texts = new Map([...files].map(([name, text]) => [name, doorText(name, text)]));
+  const codeTexts = new Map([...files].map(([name, text]) => [name, doorCodeText(name, text)]));
   for (const row of rows) {
     const job = row.job;
     const fail = (message) => failures.push(`[${job}] ${message}`);
     const regexes = [];
     for (const source of row.patterns ?? []) {
       try { regexes.push(new RegExp(source, 'g')); } catch (err) { fail(`pattern ${JSON.stringify(source)} does not compile: ${err.message}`); }
+    }
+    // `names` (canonical plus aliases) match as whole identifiers and `primitives` as regexes, both on code tokens only.
+    const tokenRegexes = [];
+    for (const name of row.names ?? []) tokenRegexes.push(new RegExp(`(?<![\\w$])${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\w$])`, 'g'));
+    for (const source of row.primitives ?? []) {
+      try { tokenRegexes.push(new RegExp(source, 'g')); } catch (err) { fail(`primitive ${JSON.stringify(source)} does not compile: ${err.message}`); }
     }
     const ratchet = row.kind === 'ratchet';
     const allowed = (row.allowed ?? []).map(entryOf);
@@ -1846,6 +1901,10 @@ export function checkDoors(rows, files) {
       if (typeof entry.path !== 'string' || !entry.path) fail('an entry has no path');
     }
     for (const entry of debt) if (!entry.reason?.trim()) fail(`debt entry ${entry.path} has no reason`);
+    if (debt.length && !namedDebt.has(job)) fail('has debt but is not on the named debt list');
+    if (debt.length && !row.retiredBy?.trim()) fail('has debt but names no retiredBy');
+    if (!debt.length && namedDebt.has(job)) fail('is on the named debt list but holds no debt: drop it from the list');
+    for (const entry of allowed) if (entry.count !== undefined && !(Number.isInteger(entry.count) && entry.count >= 0)) fail(`allowed entry ${entry.path} has a count that is not a whole number`);
     for (const entry of allowed) {
       if (entry.path.startsWith('scripts/') && !entry.reason?.trim()) fail(`allowed scripts entry ${entry.path} has no reason`);
       if (ratchet && !Number.isInteger(entry.max)) fail(`ratchet entry ${entry.path} has no integer max`);
@@ -1856,9 +1915,11 @@ export function checkDoors(rows, files) {
     const allowedExts = new Set();
     for (const [name, text] of texts) {
       const hits = [];
+      const codeLines = codeTexts.get(name).split('\n');
       text.split('\n').forEach((line, index) => {
         let count = 0;
         for (const re of regexes) { re.lastIndex = 0; count += [...line.matchAll(re)].length; }
+        for (const re of tokenRegexes) { re.lastIndex = 0; count += [...(codeLines[index] ?? '').matchAll(re)].length; }
         if (count) hits.push({ line: index + 1, count });
       });
       if (!hits.length) continue;
@@ -1868,6 +1929,7 @@ export function checkDoors(rows, files) {
       if (a) {
         used.add(a);
         allowedExts.add(path.extname(name));
+        if (Number.isInteger(a.entry.count) && total > a.entry.count) fail(`${name}:${hits[0].line} ${total} matches, the allowed count is ${a.entry.count}`);
         if (ratchet && Number.isInteger(a.entry.max)) {
           if (total > a.entry.max) fail(`${name}:${hits[0].line} ${total} matches, ceiling is ${a.entry.max}`);
           else if (total < a.entry.max) fail(`${name} has ${total} matches, below the ceiling ${a.entry.max}: lower the ceiling (stale)`);
@@ -1940,10 +2002,11 @@ test('every door row holds: patterns appear only in allowed or debt files, and n
 });
 
 test('door check: a match outside allowed fails, in debt passes, and a retired name fails anywhere', () => {
-  const row = { job: 'j', kind: 'door', patterns: ['\\bfoo\\('], allowed: ['src/a.mjs'], debt: [{ path: 'src/b.mjs', reason: 'still leaks' }] };
+  const row = { job: 'j', kind: 'door', patterns: ['\\bfoo\\('], allowed: ['src/a.mjs'], debt: [{ path: 'src/b.mjs', reason: 'still leaks' }], retiredBy: 'a later step' };
+  const named = new Set(['j']);
   const a = 'foo(1);\n';
-  assert.equal(checkDoors([row], new Map([['src/a.mjs', a], ['src/b.mjs', a]])).length, 0);
-  const out = checkDoors([row], new Map([['src/a.mjs', a], ['src/b.mjs', a], ['src/c.mjs', 'x\nfoo(2);\n']]));
+  assert.equal(checkDoors([row], new Map([['src/a.mjs', a], ['src/b.mjs', a]]), named).length, 0);
+  const out = checkDoors([row], new Map([['src/a.mjs', a], ['src/b.mjs', a], ['src/c.mjs', 'x\nfoo(2);\n']]), named);
   assert.equal(out.length, 1);
   assert.match(out[0], /\[j\] src\/c\.mjs:2/);
   const retired = { job: 'old', kind: 'door', patterns: ['oldName'], allowed: [] };
@@ -2113,7 +2176,9 @@ test('door check: the execution doctor judges live in checks.rs, their Node name
     assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', `fn ${name}() {}\n`).length, 1, name);
     assert.deepEqual(doorHits(row, 'packages/execution/rust/src/checks.rs', `fn ${name}() {}\n`), [], name);
   }
-  assert.ok(!row.debt?.length, 'the row holds no debt once the Node agy sub-HOME reader is gone');
+  // The only debt is the dead Rust copy of the finder in the distribution crate; the Node agy sub-HOME reader is gone.
+  assert.deepEqual(row.debt.map((e) => e.path), ['packages/distribution/rust/src/agent_config.rs']);
+  assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'fn find_agy_sub_homes() {}\n').length, 1);
   for (const file of ['src/setup/agy-permissions.mjs', 'src/setup/seeded.mjs']) {
     assert.equal(doorHits(row, file, 'export function findAgySubHomes() {}\n').length, 1, file);
   }
@@ -2317,12 +2382,60 @@ test('door check: a pattern that does not compile fails', () => {
   assert.match(checkDoors([{ job: 'bad', kind: 'door', patterns: ['('], allowed: [] }], new Map()).join('\n'), /\[bad\] pattern "\(" does not compile/);
 });
 
+test('door check: the named debt list names only existing rows, each with debt and a retiredBy', () => {
+  const jobs = new Set(manifest.doors.map((row) => row.job));
+  for (const job of NAMED_DOOR_DEBT) assert.ok(jobs.has(job), `${job}: the named debt list names no door row`);
+  for (const row of manifest.doors) {
+    assert.equal((row.debt ?? []).length > 0, NAMED_DOOR_DEBT.has(row.job), `${row.job}: debt and the named debt list disagree`);
+    if (NAMED_DOOR_DEBT.has(row.job)) assert.ok(row.retiredBy?.trim(), `${row.job}: named debt carries no retiredBy`);
+  }
+});
+
+// The five synthetic cases of the primitive-and-alias guard. `durable-file` stands for a row whose
+// primitives are the calls that do an atomic write, and `ids` for a row with declared aliases.
+const atomicWriteRow = { job: 'durable file', kind: 'door', patterns: [], primitives: ['\\brenameSync\\(', '\\bfsyncSync\\('], names: ['writeDurable', 'atomicWrite'], allowed: [{ path: 'src/util/durable-file.mjs', count: 3, reason: 'the door' }] };
+const atomicWriteText = 'function writeDurable(p) {\n  fsyncSync(fd);\n  renameSync(a, b);\n}\n';
+
+test('door check: a new-named rename and fsync helper outside the door fails by its primitives', () => {
+  const failures = checkDoors([atomicWriteRow], new Map([['src/util/durable-file.mjs', atomicWriteText], ['src/state/save.mjs', 'function saveFile(p) {\n  fsyncSync(fd);\n  renameSync(a, b);\n}\n']]));
+  assert.equal(failures.length, 1);
+  assert.match(failures[0], /src\/state\/save\.mjs:2 does the job outside its door/);
+});
+
+test('door check: one match more than the allowed count in an allowed file fails', () => {
+  assert.deepEqual(checkDoors([atomicWriteRow], new Map([['src/util/durable-file.mjs', atomicWriteText]])), []);
+  const failures = checkDoors([atomicWriteRow], new Map([['src/util/durable-file.mjs', `${atomicWriteText}fsyncSync(fd2);\n`]]));
+  assert.equal(failures.length, 1);
+  assert.match(failures[0], /src\/util\/durable-file\.mjs:\d+ 4 matches, the allowed count is 3/);
+});
+
+test('door check: the same text in a comment or a string passes', () => {
+  const text = '// fsyncSync(fd); renameSync(a, b); atomicWrite(p)\n/* writeDurable(p) */\nconst note = "renameSync( and atomicWrite";\n';
+  assert.deepEqual(checkDoors([atomicWriteRow], new Map([['src/util/durable-file.mjs', atomicWriteText], ['src/state/notes.mjs', text], ['src/state/notes.rs', `${text.replace(/\/\*|\*\//g, '//')}`]])), []);
+});
+
+test('door check: a declared alias used as a new function name fails outside the door', () => {
+  const failures = checkDoors([atomicWriteRow], new Map([['src/util/durable-file.mjs', atomicWriteText], ['src/state/other.mjs', 'export function atomicWrite(p, text) { return text; }\n']]));
+  assert.equal(failures.length, 1);
+  assert.match(failures[0], /src\/state\/other\.mjs:1 does the job outside its door/);
+  assert.deepEqual(checkDoors([atomicWriteRow], new Map([['src/util/durable-file.mjs', atomicWriteText], ['src/state/other.mjs', 'export function atomicWriteLater() {}\n']])), []);
+});
+
+test('door check: debt on a row outside the named list fails, and so does a named row without retiredBy', () => {
+  const row = { job: 'j', kind: 'door', patterns: ['\\bfoo\\('], allowed: ['src/a.mjs'], debt: [{ path: 'src/b.mjs', reason: 'still leaks' }] };
+  const files = new Map([['src/a.mjs', 'foo(1);\n'], ['src/b.mjs', 'foo(2);\n']]);
+  assert.match(checkDoors([{ ...row, retiredBy: 'a later step' }], files, new Set()).join('\n'), /has debt but is not on the named debt list/);
+  assert.match(checkDoors([row], files, new Set(['j'])).join('\n'), /has debt but names no retiredBy/);
+  assert.deepEqual(checkDoors([{ ...row, retiredBy: 'a later step' }], files, new Set(['j'])), []);
+  assert.match(checkDoors([{ ...row, debt: [] }], new Map([['src/a.mjs', 'foo(1);\n']]), new Set(['j'])).join('\n'), /on the named debt list but holds no debt/);
+});
+
 // The process, lock, canonical-JSON and YAML rows keep what their retired one-off guards proved: the deleted
 // test/process/one-door.test.mjs (any `/proc/` text, process signals, the second lock taker) and the old YAML
 // rule (no src/util/third-party/js-yaml.mjs, no `loadAll` definition outside the door). Each case
 // runs the real manifest row over a fixture file that does the job outside its door (or names it harmlessly).
 const doorRow = (job) => manifest.doors.find((row) => row.job === job);
-const outsideDoor = (job, file, text) => checkDoors([{ ...doorRow(job), allowed: [], debt: [] }], new Map([[file, text]]));
+const outsideDoor = (job, file, text) => checkDoors([{ ...doorRow(job), allowed: [], debt: [] }], new Map([[file, text]]), new Set());
 
 test('door rows catch a process signal, a /proc read and a second lock taker, and skip comments', () => {
   assert.equal(outsideDoor('process control: signal a process or group', 'src/x.mjs', 'process.kill(-child.pid, 15);\n').length, 1);
