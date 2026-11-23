@@ -103,3 +103,7 @@ appends `--dir`.
 
 Revert the phase commit. Rotation then resolves the directory once and logs every placement failure as
 `start-refused`; renewal again skips for a live seat until expiry.
+
+## Owner question q-rfxqncjrax (closed 2026-11-23)
+
+The question asked who runs the account probe for Miu's quota, since a confined supervisor cannot see accounts. The owner (via Miu, 07:49) answered that it is no longer needed. Since 2026-11-22 20:55 Miu leases from the shared claude pool (`132b52f92`), so `claude-miu/vantt` is no longer her pool, and gen 34 runs on a pool account with fresh weekly quota. No probe was run. The question does not block anything in this phase.
