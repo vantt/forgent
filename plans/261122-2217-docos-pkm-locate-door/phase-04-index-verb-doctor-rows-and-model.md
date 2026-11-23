@@ -55,3 +55,24 @@ config before every active release knows it: do not set it in `.fgos/config.json
 ## Rollback
 
 Revert; remove `docLocate` from any config first; the model folder is a cache.
+
+## As built (2026-11-23)
+
+- `fgos doc index status [--wait <s>] | stop | reset` (`--json` gives the envelope). Status opens the search index
+  read-only and loads no model; stop answers `{stopped}`; reset refuses `[busy]` (exit 2) while a worker runs.
+- Crate (`packages/documentation/rust/src/pkm.rs`): `index_status`, `reset_index`, `check_model`, `parse_model_source`,
+  `fetch_model` over pkm's `search` and `install::model` (the manifest comes from `pkm-embed`, already in the lock).
+- Config `docLocate.modelSource` (default `huggingface`), registered in `packages/config/rust/src/bundle.rs`; the
+  repository config does not set it (recorded as standard-only in `repo-differences.v1.json`).
+- Doctor group `apps/fgos/src/wiring/doctor/documentation.rs`: `doc-locate-model` (warn, lists missing and corrupt
+  files), `doc-locate-index` (pointer; ok with no `docs/` or no index yet, so it writes nothing), fix
+  `doc-locate-model-fetch` (reads the config key, downloads with `curl`, a failure is the fix's message). The
+  contract doc's Data Dictionary #7/#7b and the measured counts in two tests name the new entries.
+- Uninstall: no change. `fgos uninstall` keeps `.fgos` whole, so it never removes `.fgos/runtime`; the worker exits on
+  its own after a quiet spell.
+- Measured on design-lap: the model row takes 84 to 86 ms with the model present (every file hashed), 0 ms with it
+  absent; the first `doctor --fix` fetched 130 MB in about 24 s, the second fetched nothing. The `ok` case is proven on
+  the real model here, not by a test.
+- Also fixed: since the locate verb split `doc` into sub-verbs, `test/cli/subcommand-flag-drift.test.mjs` failed on
+  main, because every lifecycle sub-verb declared the same eleven flags. Each now declares only the flags its handler
+  reads.
