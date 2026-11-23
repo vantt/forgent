@@ -2814,7 +2814,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'wire-agents',
     invoke: 'fgos wire-agents [--yes] [--json]',
-    description: 'The one opt-in command that changes your own agent config outside the project (fgos init and doctor --fix write only the project and ~/.fgos). Acts only on agent CLIs found on this machine. Without --yes it prints every change and every file it would touch and writes nothing; with --yes it first copies each existing file to <file>.pre-wire-agents-<time>, then applies the changes (today: registers the fgOS Claude Code plugin marketplace and installs the plugin through the claude CLI). It never sets a permission that widens what an agent may do (agy toolPermission "always-proceed", Claude crossSessionInbound "accept"): it shows the file, the value and why, and you decide. Prints text; --json prints the envelope.',
+    description: 'The one opt-in command that changes your own agent config outside the project (fgos init and doctor --fix write only the project and ~/.fgos). Acts only on agent CLIs found on this machine. Without --yes it prints every change and every file it would touch and writes nothing; with --yes it first copies each existing file to <file>.pre-wire-agents-<time>, then applies the changes (today: registers the fgOS Claude Code plugin marketplace and installs the plugin through the claude CLI). It never writes a setting that widens what an agent may do: where one would help it shows the file, the value and why, and you decide. Prints text; --json prints the envelope.',
     parameters: {
       type: 'object',
       properties: {
