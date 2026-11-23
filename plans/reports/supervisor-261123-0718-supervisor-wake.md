@@ -13,3 +13,4 @@
 ## Owner questions
 
 - `q-rfxqncjrax` (who runs the account probe for Miu's quota) is still open, 10 h old; it blocks only Miu's account move.
+- `d3b74a8f3e03e5e2` session-idle for `39631fb7…` (claude-b7gj): the owner's interactive backlog-original-id session, not a head; left alone, marked handled.
