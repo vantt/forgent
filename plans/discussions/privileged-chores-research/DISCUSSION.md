@@ -47,6 +47,7 @@ Năng lực được giới hạn bằng hàng rào quanh những thứ cần b�
 | P3 | `session type` không submit | ngoài phạm vi | `p-lfwmzs6zsr` |
 | P4 | maxLeads theo năng lực máy | giữ dòng riêng | `p-tyowvhthul`. Đặt maxLeads thì đi qua cửa nâng quyền với `config patch`. |
 | C2 | Xem lại cỡ lồng của Miu và supervisor theo nguyên tắc riêng-nới-lồng, chung-qua-ô-cửa | **đề xuất 23:35, chờ chủ** | Xem §5 23:28. |
+| M1 | Mọi head gửi thư được cho Miu và supervisor; thư đánh thức người nhận đang rảnh | **đề xuất 23:40** | §5 23:40. Lead và planner hiện có `mailbox: false`. |
 | P5 | Gom 28 verb vào một bộ chuyển tiếp | theo Q2 | Theo L10 và RUL104, phải làm cùng đợt hoặc mở item riêng có tên. |
 
 ## 4. Quyết định đã chốt
@@ -220,6 +221,27 @@ Chủ hỏi có xem lại lồng của Miu và supervisor trong đợt này khô
   - `p-fimvrao5qk`: dấu hiệu confine chỉ là một biến môi trường, xoá được.
   - `p-x4qeqdvfl5`: vẫn tới được abstract socket và dịch vụ localhost.
 - **Dùng lại:** probe grant sống của 0118 phase 11 (`test/live/head-grant-probe.live.mjs`) để đo từng điểm trước và sau.
+
+### 2026-11-23 23:40 — head có gửi thư được cho Miu và supervisor không
+
+Chủ thấy các head không gửi thư được cho Miu, và không rõ có gửi được cho supervisor không. Shaper kiểm:
+
+**Grant.** `src/session-host/head-grants.mjs`: chỉ secretary, shaper và supervisor có `mailbox: true`. **Lead và planner có `mailbox: false`**, tức là không gửi thư được cho ai. Lead chỉ có `supervisor raise` để báo supervisor. Planner không có đường nào khác ngoài `questions ask`.
+
+**Thử thật từ head shaper (23:40).** Gửi `fgos mailbox send --to head:secretary-miu` và `--to head:supervisor-forgent` đều được ghi và "delivered to the current holder" (claude-5vp4, claude-s2vh). Nội dung chỉ là một dòng báo kiểm tra.
+
+**Nhưng "delivered" chưa có nghĩa là đã đọc.** Bên nhận chỉ thấy thư ở lần gọi tool tiếp theo, nên head đang rảnh không thấy cho tới khi bị đánh thức. `fgos mailbox status`:
+- thời gian từ ghi tới khi được đưa: p50 khoảng 2 phút, p95 khoảng 1 giờ, max khoảng 6 giờ;
+- 27 trên 53 thư đã đưa nhưng không ai trả lời;
+- 92 lần bị từ chối `unknown-name`;
+- danh sách có 161 head, phần lớn là `forgent-claude-*` cũ.
+
+Plan wake-on-mail `261030-0323-mailbox-v9-wake-on-mail` chưa được làm.
+
+**Cách khớp vào hướng của đợt này:**
+- Mọi head phải với tới được hai tay. Theo PC-D1 và PC-D2, đó là đường báo cáo duy nhất của các head còn lại. Cách làm là một dòng grant.
+- Thư phải đánh thức được người nhận đang rảnh. Phần này dùng lại 261030-0323. Trong lúc chờ, vòng 15 phút của Miu và nhịp của supervisor sẽ vớt thư.
+- Các dòng liên quan: `p-ia2v33b54u` (Miu không gửi được thư lúc 2026-11-22, cần kiểm lại), `p-bifjfd5rix`, `p-whvn2fgyep`, `p-5igcekysul`.
 
 ## 6. Thiết kế đã chốt {#design}
 
