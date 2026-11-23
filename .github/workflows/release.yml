@@ -30,9 +30,9 @@ jobs:
     name: assets
     needs: check-version
     uses: ./.github/workflows/release-assets.yml
-    secrets: inherit
     with:
       version: ${{ github.ref_name }}
+    secrets: inherit
 
   # A release publishes only from a tree whose whole suite is green. ci.yml's compare job
   # declares issues: write, which a called workflow may only use if its caller grants it;
@@ -44,9 +44,9 @@ jobs:
       contents: read
       issues: write
     uses: ./.github/workflows/ci.yml
-    secrets: inherit
     with:
       release-gate: true
+    secrets: inherit
 
   publish:
     name: publish

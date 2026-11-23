@@ -43,7 +43,7 @@ export function ensureReleaseArtifacts(env = process.env, cwd = REPO_ROOT) {
   const targetDir = path.resolve(cwd, env.CARGO_TARGET_DIR || 'target');
   execFileSync('cargo', ['build', '--locked', '--release', '-p', 'fgos', '-p', 'fgctl', '-p', 'fgos-node-addon'], {
     cwd,
-    env: { ...env, CARGO_TARGET_DIR: targetDir, ...ensureOrtStatic(cwd) },
+    env: { ...env, CARGO_TARGET_DIR: targetDir, ...ensureOrtStatic(env) },
     stdio: 'inherit',
   });
 }

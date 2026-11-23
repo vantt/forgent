@@ -3,19 +3,21 @@ name: ort-static
 # The prebuilt static archive that ort-sys downloads needs glibc 2.38, above the release ceiling of 2.35
 # (scripts/check-glibc-ceiling.sh), so fgOS builds its own on the oldest supported image. ort 2.0.0-rc.15 pairs
 # with ONNX Runtime 1.31. The archive is proved by linking pkm's ort-probe against it, checking the glibc ceiling
-# and the embedding parity with pkm's golden vectors, and only then published as a pinned release asset that
-# scripts/ort-static.mjs downloads and verifies by sha256.
+# and the embedding parity with pkm's golden vectors, and uploaded as the `ort-static` artifact. The workflow
+# publishes nothing: only release.yml publishes (test/scripts/release-packaging.test.mjs). A maintainer downloads a
+# proved artifact (`gh run download <run> -n ort-static`) and publishes it once, by hand, as the prerelease
+# ort-static-1.31.1-linux-x64-glibc2.35 whose libonnxruntime.a scripts/ort-static.mjs downloads and verifies by
+# sha256; a published asset never changes, a new build gets a new tag and a new pin.
 on:
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 defaults:
   run:
     shell: bash
 env:
   ORT_TAG: v1.31.1
   ORT_COMMIT: 6af1a932e2286d5c58166085d24c68783033edee
-  RELEASE_TAG: ort-static-1.31.1-linux-x64-glibc2.35
   # vantt/pkm-release (public) holds ort-probe, the same probe pkm used to choose its ONNX Runtime linking.
   PROBE_REPO: vantt/pkm-release
   PROBE_COMMIT: 19f4502736be314b6a6368b6ae2c75a0a23c881a
@@ -24,10 +26,6 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     timeout-minutes: 240
-    env:
-      GH_TOKEN: ${{ github.token }}
-      # gh runs from outside the checkout in the publish step, so it is told the repository.
-      GH_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
       - name: ONNX Runtime source
@@ -140,14 +138,3 @@ jobs:
         with:
           name: ort-static
           path: ${{ runner.temp }}/ort-lib/
-      # A published asset never changes: a later run finds the tag and stops, and the pin in
-      # scripts/ort-static.mjs names the digest of the first one.
-      - name: Publish the release asset
-        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
-        run: |
-          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then echo "$RELEASE_TAG exists; not replaced"; exit 0; fi
-          cd "$RUNNER_TEMP/ort-lib"
-          gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --prerelease --latest=false \
-            --title "ONNX Runtime 1.31.1 static, linux-x64, glibc 2.35" \
-            --notes "Built by .github/workflows/ort-static.yml from microsoft/onnxruntime $(cat ort-commit.txt) on ubuntu-22.04. sha256 $(cut -d' ' -f1 libonnxruntime.a.sha256)." \
-            libonnxruntime.a libonnxruntime.a.sha256 probe-result.json ldd.txt ort-combined.txt
