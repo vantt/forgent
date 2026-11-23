@@ -297,16 +297,17 @@ impl GitDriver {
         check_hooks(&hooks)?;
         let git = GIT
             .get_or_init(|| {
-                std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default())
-                    .filter(|p| p.is_absolute())
-                    .map(|p| p.join(if cfg!(windows) { "git.exe" } else { "git" }))
-                    .find_map(|p| {
-                        if p.is_file() {
-                            fs::canonicalize(p).ok()
-                        } else {
-                            None
-                        }
-                    })
+                // Absolute search-path entries only: a relative entry never names the git this driver runs.
+                let sep = if cfg!(windows) { ';' } else { ':' };
+                let path_env = std::env::var_os("PATH")
+                    .unwrap_or_default()
+                    .to_string_lossy()
+                    .split(sep)
+                    .filter(|dir| Path::new(dir.trim_matches('"')).is_absolute())
+                    .collect::<Vec<_>>()
+                    .join(&sep.to_string());
+                fgos_process::spawn::resolve_program("git", &path_env, ".EXE", cfg!(windows))
+                    .and_then(|p| fs::canonicalize(p).ok())
             })
             .clone()
             .ok_or_else(|| failure("git-unavailable"))?;
@@ -4527,8 +4528,13 @@ mod tests {
 
         if let Ok(pid_text) = fs::read_to_string(&pid_file) {
             if let Ok(pid) = pid_text.trim().parse::<u32>() {
-                // SAFETY: terminating background process started by this test.
-                unsafe { libc::kill(pid as libc::pid_t, libc::SIGKILL) };
+                // Terminate the background process this test started, by identity so a reused pid is never hit.
+                if let Some(tuple) = fgos_process::facts::identity_of(fgos_process::ProcId(pid)) {
+                    fgos_process::control::signal_by_identity(
+                        &tuple,
+                        fgos_process::control::Signal::Kill,
+                    );
+                }
             }
         }
     }

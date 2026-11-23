@@ -163,9 +163,7 @@ fn active_request_payload(envelope: &serde_json::Value) -> Result<(PathBuf, Path
 #[cfg(unix)]
 fn node_program() -> PathBuf {
     let path = std::env::var_os("PATH").unwrap_or_else(|| "/usr/local/bin:/usr/bin:/bin".into());
-    std::env::split_paths(&path)
-        .map(|dir| dir.join("node"))
-        .find(|candidate| candidate.is_file())
+    fgos_process::spawn::resolve_program("node", &path.to_string_lossy(), "", false)
         .unwrap_or_else(|| PathBuf::from("node"))
 }
 
