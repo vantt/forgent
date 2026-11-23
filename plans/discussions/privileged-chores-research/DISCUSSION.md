@@ -96,6 +96,7 @@ Năng lực được giới hạn bằng hàng rào quanh những thứ cần b�
 | PC-D7 | Xem lại lồng của Miu và supervisor trong đợt này. Nới cho việc riêng: friction, gửi thư, `fgos answer`, và chẩn đoán vì sao full test không chạy được trong lồng. Siết chỗ đang quá rộng: peers giữ pid namespace của host. Đo trước và sau bằng probe sống. | Đề xuất 23:35; chủ không phản đối và dặn "làm trước" | 2026-11-23 |
 | PC-D8 | Mọi head gửi được thư cho Miu và supervisor: lead và planner được bật mailbox, nhưng chỉ gửi tới hai tay. Đánh thức bằng thư thuộc plan 0323. | Đề xuất 23:40; chủ không phản đối | 2026-11-23 |
 | PC-D9 | Supervisor release theo quy trình cố định. Quy trình chỉ chạy khi main có bản sửa head mới đã land và full test xanh, và lúc đó không có lead nào đang land. Các bước: chạy `fgctl upgrade`; ngay sau đó chạy probe sống `test/live/head-grant-probe.live.mjs`; nếu probe hỏng thì tự quay về release trước (`previousArtifactDigest`); gửi chủ một báo cáo, không gửi câu hỏi. Nếu bản mới làm hỏng chính supervisor thì Miu là người quay về (vai thời chiến của PC-D1). Quyết định này sửa luật deny activate trong PC-D6: activate thành một nhánh có chính sách riêng, chỉ supervisor và Miu được dùng, và không bao giờ là pass-through. | Chủ "đồng ý A", 23:58 | 2026-11-23 |
+| PC-D10 | Miu và supervisor giữ nguyên tính domain-free (SP-D1). Không đưa coding domain, hay riêng repo fgOS (mission #3), vào phần điều phối cấp cao. Quy trình release của PC-D9 có hai phần. Phần chung nằm trong skill supervisor: điều kiện, áp dụng, probe, rollback, báo cáo. Công thức cụ thể là dữ liệu do project khai báo: kiểm gì, chạy lệnh nào, probe gì, quay về bằng gì. Với repo forgent, công thức đó là `land.gates` xanh, rồi `fgctl upgrade`, rồi `test/live/head-grant-probe.live.mjs`, rồi `previousArtifactDigest`. Một project hay workflow khác khai báo công thức của riêng nó, hoặc không khai báo thì không có bước rollout. Theo cùng cách đó, "lồng chạy được full test" (T4) có nghĩa là lồng chạy được các lệnh verify mà project khai báo, và "lead land code" có nghĩa là lead land sản phẩm của plan. | Chủ nhắc 00:00 "coi chừng lại đưa coding domain vào high-level orchestration"; shaper rà lại và sửa | 2026-11-24 |
 | PC-D3 | **Năng lực được giới hạn bằng hàng rào quanh thứ cần bảo vệ, cộng một cửa nâng quyền chung, không bằng danh sách verb.** | Chủ 20:30 ("2 là đúng"), giữ nguyên qua 20:35 | 2026-11-23 |
 
 ## 5. Q&A log
@@ -337,7 +338,7 @@ Chủ hỏi supervisor có được ghi backlog không. Shaper kiểm:
 - Có hai dạng:
   - **Branch land:** đưa một nhánh lên main bằng fast-forward hoặc squash.
   - **Paths land:** commit đúng các đường dẫn được kê ra.
-- Sau cải tổ, supervisor vẫn chỉ được paths land trên file portfolio thuộc grant của nó (plans, backlog, reports). Supervisor không land code. Code do lead land (PS-6, PS-14).
+- Sau cải tổ, supervisor vẫn chỉ được paths land trên file portfolio thuộc grant của nó (plans, backlog, reports). Supervisor không land sản phẩm của plan (với coding thì đó là code); sản phẩm do lead land (PS-6, PS-14). Mọi câu chữ về vai đều domain-free (PC-D10).
 - `land` giữ code riêng trong forwarder vì có chính sách thật (footprint, grant).
 
 ```mermaid
@@ -391,7 +392,7 @@ Cả năm task nằm trong `src/session-host/`, skill và spec của nó. T3 ch�
 
 ### T4 — Xem lại lồng {#task-cage}
 - **Mục tiêu:** làm theo PC-D7.
-  - Chẩn đoán vì sao full `npm test` và `cargo test` không chạy được trong lồng (q-zcileomdpa, q-br5rlczzav, q-pcwf3slkfp), rồi nới đúng chỗ đó mà không mở `.fgos`.
+  - Chẩn đoán vì sao các lệnh verify do project khai báo (ở forgent là full `npm test` và `cargo test`) không chạy được trong lồng (q-zcileomdpa, q-br5rlczzav, q-pcwf3slkfp), rồi nới đúng chỗ đó mà không mở `.fgos`.
   - Đóng `p-ndortdckid`, `p-ia2v33b54u` (kiểm lại trước khi sửa) và `p-btxvtb34u3`.
   - Siết `p-oqs75qwyco`.
 - **Verify:** probe sống trước và sau, ghi vào report của plan; cộng test của confinement driver.
@@ -401,7 +402,7 @@ Cả năm task nằm trong `src/session-host/`, skill và spec của nó. T3 ch�
 - **Verify:** `node --test test/session-host/head-grants.test.mjs`, cộng probe sống gửi thư từ một lead.
 
 ### T6 — Supervisor release theo quy trình {#task-release}
-- **Mục tiêu:** làm theo PC-D9. Thêm một nhánh có chính sách riêng trong ô cửa, gồm:
+- **Mục tiêu:** làm theo PC-D9 và PC-D10. Skill supervisor chỉ mang phần chung: điều kiện, áp dụng, probe, rollback, báo cáo. Công thức là dữ liệu của project, chẳng hạn một khoá config hoặc doctrine của domain, không phải câu chữ trong skill. Công thức của forgent ghi ở phía project. Thêm một nhánh có chính sách riêng trong ô cửa, gồm:
   - kiểm điều kiện trước khi release: main có bản sửa head mới đã land, full test xanh, không lead nào đang land;
   - chạy `fgctl upgrade`;
   - chạy probe sống;
