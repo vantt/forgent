@@ -12,7 +12,8 @@ discussion: open
 
 ## 1. Trạng thái hiện tại
 
-Round 1 (2026-11-23 15:00, shaper ds-6psli4i4xl): the survey is done (§6). Finding: one component already owns
+Round 2 (2026-11-23 15:10): Q1 answered A (derive). Owner added: no new sleep book; the sleep state goes into the
+existing record of agents (§3 row 7, proposal: the head's placement record). Round 1 (2026-11-23 15:00, shaper ds-6psli4i4xl): the survey is done (§6). Finding: one component already owns
 worktree make and remove, the checkout door `fgos-checkout` (`packages/execution/checkout`) over the git component.
 Every remover goes through it, and it already refuses the two cases that would lose a sleeping lead's work. What the
 hold still lacks is a proof, not a mechanism. One question is open: whether the sleep record must name the workspace
@@ -41,7 +42,8 @@ amendment to the existing skeleton plan (owner, 2026-11-23 15:05).
 | 3 | Is uncommitted work safe from every remover | Clear in code, unproven for the sleep case | `worktree.rs` refuses `worktree-dirty-preserved`; `packages/execution/checkout/src/orphan.rs` refuses uncommitted |
 | 4 | Is a branch with unlanded commits safe from deletion | Clear | `src/runner/loop.mjs` deletes only 0-ahead branches not checked out; `src/runner/merge.mjs` deletes after merge |
 | 5 | Locks and tickets a sleeping lead holds | Clear: none survive, by design | `dispatch-cwd` custody is a kernel lease that dies with its holder (`packages/run-supervisor/rust/src/controller/cwd_lock.rs`); a unit still running belongs to the run supervisor, not the lead |
-| Q1 | Must the sleep record name the workspace, or does the fresh lead derive it from the plan and git | **Open**, `q-n2o2nbs2or` (recommended: derive) | The scheduling record (`{item, step, waitingOn, needs, outcome}`, skeleton phase 4) refuses unknown fields; the phase worktree is named `<plan dir>-p<NN>` by the lead skill (`core/skills/fgos-lead/SKILL.md` step 1) and `git worktree list` is the truth |
+| Q1 | Must the sleep record name the workspace, or does the fresh lead derive it from the plan and git | **Answered A (derive)** by the owner 2026-11-23 15:10, `q-n2o2nbs2or`; D-ID once it holds another round | The scheduling record (`{item, step, waitingOn, needs, outcome}`, skeleton phase 4) refuses unknown fields; the phase worktree is named `<plan dir>-p<NN>` by the lead skill (`core/skills/fgos-lead/SKILL.md` step 1) and `git worktree list` is the truth |
+| 7 | Where the sleep state lives (asleep or active, wake time) | Proposed, owner to confirm: extend the head's existing placement record, no new store | Owner 15:10: no new book, extend the one that already tracks every agent. Identity's session directory (`<stateRoot>/identity/sessions/`, `docs/platform/identity/spec.md` local directory) holds only live sessions by rule (a dead head is never resolved or listed, dead entries are pruned), so a sleeping lead cannot stay in it. The Session Host's per-head record `.fgos/runtime/session-rotation/<role>/placement.json` (`writeHeadPlacement`, `src/session-host/head-start.mjs`) already outlives the session (`gen`, `startedAt`, `retiredAt`, `retiredReason`); adding `retiredReason: sleep`, `wakeAt` and plan/phase makes it the one place, and the skeleton's plan source (phase 5) reads `waitingOn.until` from it |
 | 6 | Ignored bytes (cargo `target/`) of a sleeping lead's worktree | Clear: lost only once the branch has landed and the tree is clean, which loses no work | land door `--discard-ignored` path, `apps/fgos/src/wiring/supervision.rs` `run_land` |
 
 ## 4. Quyết định đã chốt
@@ -57,6 +59,9 @@ amendment to the existing skeleton plan (owner, 2026-11-23 15:05).
 - 2026-11-23 15:00, shaper: survey written to §6; Q1 raised to the owner.
 - 2026-11-23 15:05, owner: "orchestrate-skeleton đã có plan, vì vậy sau thảo luận này, đừng làm plan mới, chỉ cần cung
   cấp thông tin được thảo luận hoặc điều chỉnh để plan chính xác hơn." Recorded in §1, §2 and §7.
+- 2026-11-23 15:10, owner: chose A for `q-n2o2nbs2or` (derive the workspace from plan and git). Added: no new
+  sleep-record book; extend the existing book of running agents with asleep/active and wake time, one place only.
+  Shaper: Identity's directory is live-only by rule, so the head's placement record is proposed instead (§3 row 7).
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -98,7 +103,9 @@ Goal: the owner's hold, delivered inside skeleton phase 6, with no new store. Fo
 `phase-06-sleep-and-wake.md`: (a) Inputs add the checkout door (`packages/execution/checkout/src/work_remove.rs`) and
 the lead skill's worktree naming; (b) a step saying the successor brief names plan and phase so the fresh lead reuses
 worktree `<plan dir>-p<NN>`, or the Q1 alternative if the owner chooses it; (c) Verify adds the owning test below;
-(d) footprint adds that test's file. D-IDs: none yet (waits on Q1). Draft verify: `cargo test -p fgos-supervision --test keeper` plus one owning test that sleeps a lead with an unlanded
+(d) footprint adds that test's file; (e) the sleep state (`retiredReason: sleep`, `wakeAt`, plan, phase) is written
+to the head's placement record (`src/session-host/head-start.mjs` `writeHeadPlacement`) and the plan source of phase 5
+reads `waitingOn.until` from it, so no sleep-record store is added (§3 row 7). D-IDs: none yet (waits on Q1). Draft verify: `cargo test -p fgos-supervision --test keeper` plus one owning test that sleeps a lead with an unlanded
 change, lands another branch, runs the cleanup, wakes and finds the change in the same worktree.
 
 ### Overlap: a second worktree creator beside the checkout door {#task-overlap-workflow-create}
