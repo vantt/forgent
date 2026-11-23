@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Orchestration skeleton: a code keeper that admits, starts and wakes players from domain scheduling records, one raise door for every entry, and one harness for plans"
-status: draft
+status: ready
 priority: P1
 blockedBy:
   - 261118-1341-s6a-execution-tier-rust
@@ -281,6 +281,8 @@ overlap. The plan turns `ready` once all three are done; reordering them is a pr
   `docs/platform/workflow/spec.md` with this plan's footprint (phase 15 writes it), so the footprints are not
   disjoint and `261121-2109-component-authority` stays in `blockedBy`. The plan stays `draft` until component-authority
   is done. `261121-2110-component-authority-doors` stays behind component-authority.
+- 2026-11-23: `261121-2109-component-authority` is done (commit `c52ffa192`, every phase done), so every
+  `blockedBy` entry is done and the plan is `ready`.
 
 ## Risks and rollback
 
