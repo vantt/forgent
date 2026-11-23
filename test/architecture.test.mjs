@@ -2104,7 +2104,7 @@ test('door check: the decider has one Rust owner and one declared Node twin', ()
   assert.deepEqual(doorHits(row, 'src/runner/dispatch/plan.mjs', 'export function purposeSeatOf() {}\n'), []);
 });
 
-test('door check: the execution doctor judges live in checks.rs, their Node names are retired, and the agy sub-HOME reader is declared debt', () => {
+test('door check: the execution doctor judges live in checks.rs, their Node names are retired, and the retired agy sub-HOME reader path stays governed', () => {
   const row = execRow('execution doctor judgments');
   for (const name of ['checkRunnerGeneratedPathsConfig', 'checkToolRegistryConfigured', 'checkCapabilityServesValid', 'checkExecutorConfinement', 'checkInvocationGitWriteGrants', 'checkOmpNativesPresent', 'checkAgySubHomesConfigured']) {
     assert.equal(doorHits(row, 'src/setup/seeded.mjs', `export function ${name}() {}\n`).length, 1, name);
@@ -2113,8 +2113,10 @@ test('door check: the execution doctor judges live in checks.rs, their Node name
     assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', `fn ${name}() {}\n`).length, 1, name);
     assert.deepEqual(doorHits(row, 'packages/execution/rust/src/checks.rs', `fn ${name}() {}\n`), [], name);
   }
-  assert.deepEqual(doorHits(row, 'src/setup/agy-permissions.mjs', 'export function findAgySubHomes() {}\n'), []);
-  assert.equal(doorHits(row, 'src/setup/seeded.mjs', 'export function findAgySubHomes() {}\n').length, 1);
+  assert.ok(!row.debt?.length, 'the row holds no debt once the Node agy sub-HOME reader is gone');
+  for (const file of ['src/setup/agy-permissions.mjs', 'src/setup/seeded.mjs']) {
+    assert.equal(doorHits(row, file, 'export function findAgySubHomes() {}\n').length, 1, file);
+  }
 });
 
 test('door check: the retired capability-row names and the retired Node S5 names fail wherever a file brings them back', () => {

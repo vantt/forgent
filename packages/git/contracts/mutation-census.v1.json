@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "cf0441fa32c09d72d4a84f5bc4e3e95495ddb5f05a8f9215deaa5c9756b9e6d2",
+  "payloadDigest": "5083ed3d3504cf0e66ab9bc2e9448f088579cc3ee3cda45e0461e8bab706031a",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -682,7 +682,7 @@
     "packages/execution/rust/src/bind.rs": "fc2cfddc64673f0630bf206d0618ffba345489b5cb50b34a5c6e25cdbe7f23d7",
     "packages/execution/rust/src/capability_resolve.rs": "95f3c8061ece46614845a8e6085f9a2dfb0a7fe5f859bafbc6cfd75483b3dd79",
     "packages/execution/rust/src/case_paths/mod.rs": "5a429dc82b93623492c48073112cd979d11400e4a951a2fd70d27d25d94ddb2b",
-    "packages/execution/rust/src/checks.rs": "f19d96b1f2affd3a9d3a95ee5bfdf131cacf3992d680382073e40c025468a4bf",
+    "packages/execution/rust/src/checks.rs": "71664079c1e78fd5f8cf7f3226beec38932bc5830b891c3c43b7390ba758f990",
     "packages/execution/rust/src/custody.rs": "49d5e7f1257cb8637586f61bfcd3428fe060e78d037ddcaf7b2cd672e2b4100f",
     "packages/execution/rust/src/decide.rs": "5c048023ac0f8ddf9e66d410e1a2b5d3ef5a62d4453c91280974e64678d6d22b",
     "packages/execution/rust/src/declared_stamp.rs": "2b4f19b0bf982ce6e709edda77b2d07b87ebd040f1bf1a233c1f5b6e9297d066",
@@ -1655,7 +1655,6 @@
     "src/session-rotation/handoff-store.mjs": "3c02156e15ebc6503df51d0054e433fd8f49e4bd064781b29b9114b7cfedddbf",
     "src/session-rotation/rotate.mjs": "63e5730be0d499629c43cf0bd4f2a34e3fd8f2245567e903ee7b4e92786f342e",
     "src/setup/agent-hooks.mjs": "850a6660bf2588d850190e9ed5e45369d0d30e467568462b478dd6327fddffac",
-    "src/setup/agy-permissions.mjs": "09951c187dec7082caee5a1695dd81320eda7ea962ca41ff8bb785f103f87397",
     "src/setup/bin-discovery.mjs": "b5302797ac763fecb24608818bdc8bf37850e0cd5d7a9d98ae677e1f3e684633",
     "src/setup/blind-steps-proven-pools.mjs": "4062cad666cced30aeb6dd3d4c44e67bfe716b4d33ac22b486c6fd19bd94e5b3",
     "src/setup/checks.mjs": "3b193399b45a62f7372cde5c6a771a963b3d9f42ecaf9a0d2d6549f6d82434ce",
