@@ -72,6 +72,25 @@
     ],
     "store": "none"
   },
+  "authority": {
+    "selector": "authority",
+    "route_kind": "native",
+    "operation_id": "authority.locate",
+    "owner_path": "packages/component-authority/rust",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ],
+    "subcommands": true,
+    "subcommand_flags": {
+      "locate": [
+        "dir",
+        "json",
+        "help",
+        "limit"
+      ]
+    },
+    "store": "none"
+  },
   "catchup": {
     "selector": "catchup",
     "route_kind": "legacy-cli",

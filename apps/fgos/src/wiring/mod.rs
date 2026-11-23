@@ -2,6 +2,7 @@
 
 pub mod agents;
 pub mod attempt_step;
+pub mod authority;
 pub mod dispatch_decide;
 pub mod dispatch_subs;
 pub mod doctor;

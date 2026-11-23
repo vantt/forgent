@@ -83,6 +83,7 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
         fgos_observe::friction_cli::AVAILABLE_SUBCOMMANDS,
     ),
     ("convention", fgos_convention::AVAILABLE_SUBCOMMANDS),
+    ("authority", wiring::authority::AVAILABLE_SUBCOMMANDS),
     ("mailbox", wiring::mailbox_verbs::AVAILABLE_SUBCOMMANDS),
     ("config", fgos_config::provider::AVAILABLE_SUBCOMMANDS),
     ("gateway", wiring::gateway_control::AVAILABLE_SUBCOMMANDS),

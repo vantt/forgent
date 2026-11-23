@@ -240,6 +240,7 @@ version = "0.2.0"
 dependencies = [
  "fgos-canonical-json",
  "fgos-checkout",
+ "fgos-component-authority",
  "fgos-config",
  "fgos-convention",
  "fgos-distribution",
@@ -306,6 +307,15 @@ dependencies = [
  "serde_json",
  "sha2",
  "windows-sys",
+]
+
+[[package]]
+name = "fgos-component-authority"
+version = "0.2.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]
