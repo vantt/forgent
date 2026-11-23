@@ -84,3 +84,9 @@ It was raised to the supervisor.
   `packages/host-runtime/rust/src/catalog.rs`. A temporary patch of that row made it pass, and it was reverted
   because the file is out of scope. Question **q-klz3vkxjee** asks to add that file. Next: once answered, replay the
   saved `-p01b` diff and the catalog row in a clean worktree off p01 (97e066738), run the checks, review, and land.
+- 12:45: the closing unit (c-53368, unit-run-1795412080966-bc860a13) passed and committed 49454bd22 on
+  `component-authority-doors/p01c`. The lead re-ran its checks: verb test 1/1, crate 8/8, route and drift 44/44.
+  The second review found one blocker: the generated `test/rust-host/vectors/envelope/version.json` still holds the
+  old verb list. `envelope-contract.test.mjs` fails 3 tests, and `fgos-distribution` `test_vector_parity_version`
+  fails. The file is outside the footprint, so question **q-75yeaifwzn** asks to add it. Next: a unit in `-p01c`
+  with `--sync main` runs `node test/rust-host/generate-vectors.mjs`, re-runs the checks, and then the branch lands.
