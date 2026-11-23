@@ -129,7 +129,7 @@ the grants, verb by verb.
 | 6 | [A rotation whose executor died is resolved](phase-06-orphan-rotation.md) | 2 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/session-host/contracts/rotation-files.v1.json, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/**, docs/platform/session-host/spec.md | 2 | done |
 | 7 | [Supervisor and lead rules, retire condition](phase-07-supervisor-lead-rules.md) | 2, 3 | core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, core/skills/_shared/friction-capture.md, .agents/skills/**, plugins/fgOS/skills/**, docs/platform/supervision/spec.md, test/skills/fgos-supervisor-idle-lead.test.mjs, packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs | 2 | done |
 | 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | running |
-| 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | running |
+| 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | done |
 | 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | running |
 | 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md, test/session-host/head-start.test.mjs | 5 | ready |
 | 12 | [Rotation reliability](phase-12-rotation-reliability.md) | 6 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, docs/platform/session-host/spec.md, apps/fgos/src/wiring/session_rotation_hook.rs | 4 | done |
@@ -153,12 +153,20 @@ writer, phase 11.
   worktrees (p02, p02g, p06, p06f, p12c); lead:SUPERVISOR then reruns the real soft rotation (phase 12 done-when item
   3). The supervisor neither activates a release nor removes a worktree.
 
+### Lead progress (2026-11-23 14:50, head:lead-forgent-261122-0118-heads-b52f9)
+
+- **Phase 9 is `done`.** The after report is `reports/after-wake-and-idle.md`, measured with phase 1's commands over
+  2026-11-22 07:20Z to 2026-11-23 07:20Z. The change did not lower wakes: 13.9/h before, 15.3/h after. `session-idle`
+  rows: 688 before, 319 after, all false, none true, none missed. The cause is `packages/supervision/rust/src/watcher.rs`
+  lines 352-358: when no new row routes to a wake, the tick wakes on the oldest unhandled event of any kind and ignores
+  `watcher.actions`. A `session-idle` row with action `none` still wakes the supervisor one tick later (146 wakes in the
+  window). The change is kept, because no true idle was missed and it is half of the fix. The fallback fix is outside
+  this plan, so it was raised to the supervisor as `coordination-help` for a backlog row.
+
 ### Waits (2026-11-23 11:15, head:lead-forgent-261122-0118-heads-b52f9)
 
 The status column holds only the contract's vocabulary; the waits that sat there are recorded here.
 
-- **Phase 9** (`running`): its 24-hour measure after the 14:20 tune ends at 14:20 on 2026-11-23; the lead then writes
-  `reports/after-wake-and-idle.md`.
 - **Phases 8 and 10** (`running`): their measure window from Miu's gen 30 ends at 21:06 on 2026-11-23; the lead then
   writes `reports/question-relay.md` and `reports/secretary-wake.md`.
 - **Phase 11** (`ready`): runs after phases 8, 9 and 10 have their reports, after 21:06 on 2026-11-23.
