@@ -311,7 +311,7 @@ and deleted (owner correction 2026-11-23 14:15).
 | 9 | [Retire the remaining bounded-child copies](phase-09-bounded-child-copies.md) | 3e, 8 | apps/fgos-gateway/src/gateway.rs, apps/fgos/src/wiring/run.rs, packages/config/rust/src/detect.rs, packages/config/rust/Cargo.toml, packages/distribution/rust/src/init.rs, packages/distribution/rust/Cargo.toml, packages/holder-lock/rust/src/borrow_windows.rs, packages/holder-lock/rust/Cargo.toml, packages/mailbox/rust/store/src/adapters/version.rs, packages/mailbox/rust/store/src/nudge.rs, packages/mailbox/rust/store/Cargo.toml, packages/terminal-control/rust/src/driver/herdr.rs, packages/terminal-control/rust/Cargo.toml, Cargo.lock, packages/component-authority/model/doors/run-bounded-child.yaml, packages/component-authority/model/doors/global-fgos-directory.yaml | 7 | draft |
 | 10 | [Door guard by primitive and aliases, counted, no debt but the named debt](phase-10-land-checks.md) | 2a, 2b, 2c, 2d, 2e, 4, 6, 7, 8 | test/architecture.test.mjs, packages/component-authority/model/doors/, packages/component-authority/contracts/model.v1.json, docs/platform/component-authority/spec.md | 9 | done |
 | 10b | Fill `names`, `primitives` and allowed `count` on every door row, and fix the guard's Rust char-literal blanking | 10 | packages/component-authority/model/doors/, test/architecture.test.mjs | 11 | draft |
-| 11 | [Sweep and integration](phase-11-sweep-and-integration.md) | 5, 10 | packages/convention/contracts/convention.rules.v1.json, docs/platform/packaging-distribution/spec.md, src/cli/command-registry.mjs, CHANGELOG.md, docs/platform/component-authority/spec.md, plans/261121-2110-component-authority-doors/ | 10 | running |
+| 11 | [Sweep and integration](phase-11-sweep-and-integration.md) | 5, 10 | packages/convention/contracts/convention.rules.v1.json, docs/platform/packaging-distribution/spec.md, src/cli/command-registry.mjs, CHANGELOG.md, docs/platform/component-authority/spec.md, plans/261121-2110-component-authority-doors/ | 10 | draft |
 | 12 | Retire every named debt right after the release (owner answer B to q-aanvfxaopa, 2026-11-24) | 11 | to be cut by the planner: the rows phase 10 names, including the process-tier survivors (winpid reader, single-instance lock, own-child polls), which need footprint outside this plan's | 11 | draft |
 
 **Per-row re-cut (q-swxkda2x5r A, applied 2026-11-23 by the planner).** The old phases 2 and 3 are replaced by one
@@ -437,7 +437,22 @@ dispatched with `--provider claude` (`fgos run ... --provider claude`, or `provi
   token counted twice, a count above the real total never reported stale, and the stale `cặp cổng` header comment
   at `test/architecture.test.mjs:13`. Criterion 4's `rg -l '^debt:'` also lists the 56 `debt: []` files; it means
   non-empty debt.
-- 11 started 2026-11-24 00:3x (worktree `-p11`).
+- 11 steps 1-5a landed as 9db8081b4 (claude unit; report unit-261124-0035-p11-result.md, which records the named-debt
+  hand-off row by row). The convention rule `doc-architecture-manifest-1` became `component-authority-model-1`, the
+  packaging spec and the command-registry comment are repointed, decision-history lines placed, CHANGELOG has three
+  lines (authority locate|declare with the Authority-map rule, `doctor --fix --only`, the door guard and its named
+  debt), and the spec says Implemented. Lead proofs: `cargo test -p fgos-convention` green; the land gate ran
+  convention-conformance, convention-client and definition-files green; criterion 6's `rg` lists only lines marked
+  "(retired; last commit 00dddf7ae)". 11 is `draft` again for step 6 only: `npm test` and `cargo test --workspace` on
+  the combined tree, which the confined lead cannot run (its cargo build directory and `.fgos/runtime` are
+  read-only); asked of the supervisor. Out-of-footprint follow-ups, for the secretary: `docs/reading-map.md:190`,
+  `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` (`doctor --fix --only`),
+  `packages/distribution/rust/src/rc_lines.rs:7-8`, `docs/platform/secrets/spec.md:68`,
+  `docs/explanation/agy-permission-denylist-not-allowlist.md:61`, `retired-node-s4-verb-code.yaml` patterns,
+  `test/rust-host/fixtures/run-dirs-vectors.json` Node-only rows (p-24xw2cwdvo), the `parseArgs` import name in
+  `test/scripts/write-test-marker.test.mjs`, and the seat-binding and agent-mailbox decision-history lines.
+- What is left of the plan: 11 step 6 (a full suite run), 10b (after a release carrying 888bb3563 is activated),
+  and 12 (after the release; the planner cuts it). 2f, 2g, 3a2, 3b-3e and 9 fold into 12.
 - 5c started 2026-11-23 23:58 (claude unit c-189804, worktree `-p5c`): the supervisor's 9 main reds
   (instruction-registry x8, decision-index:241). Cause confirmed by the lead: `model_dir` reads a root as the fgOS
   repository only when it carries `packages/component-authority/contracts/model.v1.json`. The test fixtures lack
