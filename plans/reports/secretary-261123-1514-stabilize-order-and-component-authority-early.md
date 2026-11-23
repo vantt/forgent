@@ -9,7 +9,7 @@ Read from `plans/261121-2110-component-authority-doors/plan.md` (running; only p
 - Today the plan only lets an agent *find* the existing door. Nothing stops a new second door at plan time or at land time, so doors keep appearing while the retirement phases run.
 - The mechanism that stops new doors is split across two phases: phase 5 (`declare`, the plan-time mapping rule, skill wiring), which needs only phase 1b, and phase 10 (the land check), which waits for 17 other phases (all retirements).
 - Proposal: run 1b then 5 first, then land a first version of the phase 10 check that blocks every NEW copy and counts the existing ones as named debt. The retirement phases (2a to 4, 6 to 9) then shrink that debt, and phase 10's final form (zero debt) stays last. After that, no new door can appear while the cleanup runs.
-- This is a plan change, so it is the supervisor's and the owner's call; Rust only, no new Node. The router (node/rust/wasm) is untouched: nothing in phases 1b to 5 changes it, and phase 10 must be written to check it stays.
+- Correction (owner, 15:2x): my first draft said these phases do not touch the router. That was not verified and is wrong: the plan footprints of phases 1, 2c, 5, 6, 7 and 11 include routing files (command registry, command-routes, command-manifest, `route.rs`, `routing.rs`). Rule instead: the router stays one set over node, rust, wasm and external CLIs; moving Node to Rust never removes it; each such phase proves all four caller kinds still route.
 
 ## 2. Suggested order
 
