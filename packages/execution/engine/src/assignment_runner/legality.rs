@@ -26,7 +26,65 @@ use crate::assignment::normalizer::stamp_declared_assignment;
 use crate::contract::validate::{
     extract_protocol_operation_stamp, resolve_mutating_cwd_posture, MutatingCwdPosture,
 };
-use crate::planning::bind_facade::{bind, BindContext};
+use crate::planning::bind_facade::{bind, AccountStateSource, BindContext};
+
+/// The lease state a bind read, kept on its attempt and handed back to the recheck's bind unchanged.
+struct RecordedOverlay {
+    overlay: Value,
+}
+
+impl AccountStateSource for RecordedOverlay {
+    fn overlay(&self, _now_ms: u64) -> Value {
+        self.overlay.clone()
+    }
+}
+
+/// The bind the recheck recomputes for a seat: the ask the unit record states, the committed config, and the
+/// account state the original bind read (when it recorded one) replayed at the time it read it; a record without
+/// one binds from the config alone, as a bind that read no account state did. The one place that builds this ask.
+#[allow(clippy::too_many_arguments)]
+pub fn replay_bind(
+    unit_record: &Value,
+    seat: &str,
+    round: &str,
+    assignment_id: &str,
+    committed: &Value,
+    account_state: Option<&Value>,
+    session: BindSession,
+    machine: &dyn Machine,
+) -> Result<Value, crate::planning::bind_facade::BindError> {
+    let mut ask = bind_seat_of(unit_record, seat);
+    if let Some(map) = ask.as_object_mut() {
+        map.insert(
+            "unit".into(),
+            unit_record.get("unit").cloned().unwrap_or(Value::Null),
+        );
+        map.insert("readOnly".into(), json!(false));
+        map.insert(
+            "overrides".into(),
+            unit_record
+                .get("overrides")
+                .filter(|o| o.is_array())
+                .cloned()
+                .unwrap_or_else(|| json!([])),
+        );
+    }
+    let walk = walk_state_of(unit_record, seat, round, assignment_id);
+    let replayed = account_state.map(|state| RecordedOverlay {
+        overlay: state.get("overlay").cloned().unwrap_or_else(|| json!({})),
+    });
+    let at = account_state
+        .and_then(|state| state.get("at"))
+        .and_then(Value::as_u64)
+        .unwrap_or(0);
+    let context = BindContext {
+        runner_config: committed,
+        session,
+        machine,
+        accounts: replayed.as_ref().map(|o| o as &dyn AccountStateSource),
+    };
+    bind(&ask, &context, &walk, false, at)
+}
 
 /// What the caller states beside the assignment.
 #[derive(Default)]
@@ -298,37 +356,50 @@ pub fn assert_inline_mutating_assignment_authorized(
         ));
     }
 
-    let mut ask = bind_seat_of(&unit_record, &seat);
-    if let Some(map) = ask.as_object_mut() {
-        map.insert(
-            "unit".into(),
-            unit_record.get("unit").cloned().unwrap_or(Value::Null),
-        );
-        map.insert("readOnly".into(), json!(false));
-        map.insert(
-            "overrides".into(),
-            unit_record
-                .get("overrides")
-                .filter(|o| o.is_array())
-                .cloned()
-                .unwrap_or_else(|| json!([])),
-        );
-    }
-    let walk = walk_state_of(&unit_record, &seat, &round, id);
-    let context = BindContext {
-        runner_config: &committed,
-        session: options.session,
-        machine: facts.machine,
-        accounts: None,
-    };
-    let recomputed = bind(&ask, &context, &walk, false, 0)
-        .map_err(|e| refuse(format!("executeAssignment: mutating unit-run assignment \"{id}\" recomputed binding failed: {e}")))?;
+    let account_state = recorded.and_then(|r| r.get("accountState")).filter(|s| s.is_object());
+    let recomputed = replay_bind(
+        &unit_record,
+        &seat,
+        &round,
+        id,
+        &committed,
+        account_state,
+        options.session,
+        facts.machine,
+    )
+    .map_err(|e| refuse(format!("executeAssignment: mutating unit-run assignment \"{id}\" recomputed binding failed: {e}")))?;
     if let Some(refused) = recomputed.get("refused").filter(|r| !r.is_null()) {
         return Err(refuse(format!(
             "executeAssignment: mutating unit-run assignment \"{id}\" recomputed binding refused: {} ({})",
             quoted(refused.get("reason")),
             quoted(refused.get("detail"))
         )));
+    }
+    let digest_of = |binding: &Value| {
+        binding
+            .pointer("/bindingInput/accountViewDigest")
+            .and_then(Value::as_str)
+            .map(str::to_string)
+    };
+    let recorded_view = recorded.and_then(|r| r.get("binding")).and_then(digest_of);
+    if let Some(recorded_view) = recorded_view {
+        if digest_of(&recomputed).as_deref() != Some(recorded_view.as_str()) {
+            let (what, code) = if account_state.is_some() {
+                (
+                    "the recorded account state no longer reproduces the account view it was bound from",
+                    "binding-replay-account-view-mismatch",
+                )
+            } else {
+                (
+                    "it was bound from account state that was not recorded",
+                    "binding-replay-account-view-missing",
+                )
+            };
+            return Err(RunnerConfigError::coded(
+                format!("executeAssignment: mutating unit-run assignment \"{id}\" {what} -- refused"),
+                code,
+            ));
+        }
     }
 
     let field = |value: &Value, key: &str| -> Value {

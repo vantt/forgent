@@ -1343,6 +1343,8 @@ mod run_loop {
         agent: Box<Agent>,
         dispatched: Mutex<Vec<String>>,
         created: Mutex<Vec<String>>,
+        /// What every bind reports having read; `None` is a bind that read no account state.
+        account_read: Option<AccountRead>,
     }
 
     fn passed(changed: &[&str]) -> Value {
@@ -1369,6 +1371,7 @@ mod run_loop {
                 agent,
                 dispatched: Mutex::default(),
                 created: Mutex::default(),
+                account_read: None,
             }
         }
 
@@ -1512,10 +1515,11 @@ mod run_loop {
             _: &Value,
             _: &Value,
             _: &Value,
-        ) -> Result<Value, RunUnitError> {
-            Ok(
-                json!({ "executor": format!("exec-{}", ask["seat"].as_str().unwrap()), "invocation": "cli", "transport": "process" }),
-            )
+        ) -> Result<BoundSeat, RunUnitError> {
+            Ok(BoundSeat {
+                binding: json!({ "executor": format!("exec-{}", ask["seat"].as_str().unwrap()), "invocation": "cli", "transport": "process" }),
+                account_read: self.account_read.clone(),
+            })
         }
         fn runner_config_for_binding(&self, runner: &Value, _: &Value) -> Value {
             runner.clone()
@@ -1711,6 +1715,38 @@ mod run_loop {
             0,
             "a standalone run holds no reservation"
         );
+        assert!(
+            record["bindings"]["producer/1"][0]
+                .get("accountState")
+                .is_none(),
+            "a bind that read no account state records none"
+        );
+
+        // A bind that read an overlay records it with the time it read it at, for the write gate to replay; an
+        // empty overlay is the config alone and records nothing.
+        let overlay = json!({ "gemini": { "quarantinedUntil": 1_900_000_000_000_u64 } });
+        for (read_overlay, recorded) in [(overlay.clone(), Some(overlay)), (json!({}), None)] {
+            let repo = Repo::new();
+            let mut host = Host::new(
+                &repo,
+                Some(Port::free()),
+                json!({ "loop": "reviewed", "params": { "maxRounds": 3 } }),
+                Box::new(producer_writes_only_b),
+            );
+            host.account_read = Some(AccountRead {
+                at: 1_800_000_000_000,
+                overlay: read_overlay,
+            });
+            let result = run_unit(&host.options(writing_unit()), &host).unwrap();
+            let record = record_of(&repo, &result);
+            assert_eq!(
+                record["bindings"]["producer/1"][0].get("accountState"),
+                recorded
+                    .map(|overlay| json!({ "at": 1_800_000_000_000_u64, "overlay": overlay }))
+                    .as_ref(),
+                "{record:#}"
+            );
+        }
     }
 
     #[test]
@@ -2331,9 +2367,12 @@ mod run_unit_runs {
             _: &Value,
             _: &Value,
             _: &Value,
-        ) -> Result<Value, RunUnitError> {
+        ) -> Result<BoundSeat, RunUnitError> {
             let at = self.binds.fetch_add(1, Ordering::Relaxed);
-            Ok(self.host["bind"][at].clone())
+            Ok(BoundSeat {
+                binding: self.host["bind"][at].clone(),
+                account_read: None,
+            })
         }
         fn runner_config_for_binding(&self, runner: &Value, _: &Value) -> Value {
             runner.clone()

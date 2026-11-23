@@ -26,6 +26,21 @@ pub struct GitRoots {
     pub not_a_repository: bool,
 }
 
+/// The account state one bind read, and the time (epoch ms) it read it at: what the write gate replays.
+#[derive(Debug, Clone, PartialEq)]
+pub struct AccountRead {
+    pub at: u64,
+    pub overlay: Value,
+}
+
+/// What `Host::bind` answers: the binding (or `{ refused }`), and the account state it was decided from, `None`
+/// when the bind read none.
+#[derive(Debug, Clone, PartialEq)]
+pub struct BoundSeat {
+    pub binding: Value,
+    pub account_read: Option<AccountRead>,
+}
+
 /// The one controller of a unit run (`acquireUnitControl`), released once the run ends.
 pub trait UnitControl: Send {
     fn release(&mut self) -> Result<(), String>;
@@ -179,7 +194,8 @@ pub trait UnitRunHost {
     ) -> Result<(), RunUnitError>;
 
     // ---- the seats ----------------------------------------------------------------------------------
-    /// `bind(ask, ctx, walk)`: the binding, or `{ refused }`. `accounts` is `{ runtimeDir, assignmentId }`.
+    /// `bind(ask, ctx, walk)`: the binding, or `{ refused }`, with the account state it read. `accounts` is
+    /// `{ runtimeDir, assignmentId }`.
     fn bind(
         &self,
         ask: &Value,
@@ -187,7 +203,7 @@ pub trait UnitRunHost {
         session: &Value,
         accounts: &Value,
         walk: &Value,
-    ) -> Result<Value, RunUnitError>;
+    ) -> Result<BoundSeat, RunUnitError>;
     /// `runnerConfigForBinding`: a pinned account leases from an inventory holding only that account.
     fn runner_config_for_binding(&self, runner: &Value, bound: &Value) -> Value;
     /// Build the seat's assignment and execute it through the assignment runner; the settled Run Result.

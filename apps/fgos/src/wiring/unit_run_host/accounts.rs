@@ -3,6 +3,7 @@
 //! accounts module's and the bind facade's; the machine (PATH, herdr, the home directory) is the seat-binding
 //! route's [`HostMachine`], so a run binds exactly as `fgos internal seat-binding` does.
 
+use std::cell::RefCell;
 use std::path::{Path, PathBuf};
 
 use fgos_execution::accounts::provider_account_inventory;
@@ -10,6 +11,7 @@ use fgos_execution::bind::BindSession;
 use fgos_execution_engine::accounts::pin::{assert_pinned_accounts_usable, AccountPin};
 use fgos_execution_engine::accounts::rotation::{inspect_account_rotation, Rotation};
 use fgos_execution_engine::accounts::{Accounts, SystemHost};
+use fgos_execution_engine::unit_run::host::{AccountRead, BoundSeat};
 use fgos_execution_engine::planning::bind_facade::{
     bind as facade_bind, preflight_of, AccountStateSource, BindContext, PreflightRequest,
 };
@@ -88,7 +90,7 @@ pub fn bind(
     session: &Value,
     accounts: &Value,
     walk: &Value,
-) -> Result<Value, RunUnitError> {
+) -> Result<BoundSeat, RunUnitError> {
     let (session, machine) = session_and_machine(session);
     let host = SystemHost::new();
     let store = if accounts.is_object() {
@@ -100,12 +102,15 @@ pub fn bind(
     } else {
         None
     };
-    let overlay = store.as_ref().map(|accounts_store| LeaseOverlay {
-        accounts: accounts_store,
-        assignment_id: accounts
-            .get("assignmentId")
-            .and_then(Value::as_str)
-            .map(str::to_string),
+    let overlay = store.as_ref().map(|accounts_store| RecordingOverlay {
+        lease: LeaseOverlay {
+            accounts: accounts_store,
+            assignment_id: accounts
+                .get("assignmentId")
+                .and_then(Value::as_str)
+                .map(str::to_string),
+        },
+        read: RefCell::new(None),
     });
     let ctx = BindContext {
         runner_config: runner,
@@ -113,8 +118,31 @@ pub fn bind(
         machine: &machine,
         accounts: overlay.as_ref().map(|o| o as &dyn AccountStateSource),
     };
-    facade_bind(ask, &ctx, walk, false, now_ms())
-        .map_err(|e| bind_refusal(&e.name, e.code.as_deref(), &e.message))
+    let binding = facade_bind(ask, &ctx, walk, false, now_ms())
+        .map_err(|e| bind_refusal(&e.name, e.code.as_deref(), &e.message))?;
+    let account_read = overlay.and_then(|o| o.read.into_inner());
+    Ok(BoundSeat {
+        binding,
+        account_read,
+    })
+}
+
+/// The lease overlay of one bind, keeping what it read and when, so the run can record the bind's account input
+/// without reading the lease state a second time.
+struct RecordingOverlay<'a, 'h> {
+    lease: LeaseOverlay<'a, 'h>,
+    read: RefCell<Option<AccountRead>>,
+}
+
+impl AccountStateSource for RecordingOverlay<'_, '_> {
+    fn overlay(&self, now_ms: u64) -> Value {
+        let overlay = self.lease.overlay(now_ms);
+        *self.read.borrow_mut() = Some(AccountRead {
+            at: now_ms,
+            overlay: overlay.clone(),
+        });
+        overlay
+    }
 }
 
 /// `assertPinnedAccountsUsable` (`src/runner/execution/account-pin.mjs:44`): refuse a seat pinned to an account

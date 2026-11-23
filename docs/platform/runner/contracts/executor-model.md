@@ -137,8 +137,13 @@ A bind is asked for one seat by `{ ask, ctx, walk }`.
   `independentOf`, `preferIndependentOf`, overrides (tier, executor, invocation, effort, account, timeout, scope) and
   `raiseAuthorized`.
 - `ctx`: the runner config, the session facts (`headless`, `herdrPresent`, `hasNativeAgent`, `pathEnv`,
-  `postureAtLaunch`) and optionally the lease state (without it the account view is the config alone, which is what a
-  replay and `explain` read). Node reads the lease state itself from its location and assignment id; the Rust bind
+  `postureAtLaunch`) and optionally the lease state (without it the account view is the config alone, which is what
+  `explain` reads). The write gate does not bind from the config alone: a unit run records on each attempt the lease
+  state its bind read and the time it read it at (`accountState: { at, overlay }`, only when the overlay is not empty),
+  and the gate binds again from that overlay at that time, never from the live lease state. When the recomputed
+  `bindingInput.accountViewDigest` differs from the recorded one, the gate refuses by name:
+  `binding-replay-account-view-mismatch` when the attempt recorded account state, `binding-replay-account-view-missing`
+  when it did not. Node reads the lease state itself from its location and assignment id; the Rust bind
   takes it as data: Dispatch's adapter (`readAccountStateOverlay`) reads it once, keyed by the lease document's own
   provider keys, and the bind maps each pool to its key, so no caller derives the pool set. Machine facts (PATH, the
   backend registry, herdr presence, home) reach the Rust bind through its `Machine` port.
