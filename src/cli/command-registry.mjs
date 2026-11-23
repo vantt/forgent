@@ -2539,6 +2539,7 @@ export const COMMAND_REGISTRY = [
       ...Object.fromEntries(['reserve', 'register', 'mark-rendered', 'move-path', 'promote', 'demote', 'supersede', 'retire'].map((sub) => [sub, {
         description: `Doc lifecycle: ${sub}.`,
         parameters: { type: 'object', properties: DOC_LIFECYCLE_PROPERTIES, required: [] },
+        examples: [`fgos doc ${sub} worktree-reclaim guide`],
       }])),
     },
     examples: [

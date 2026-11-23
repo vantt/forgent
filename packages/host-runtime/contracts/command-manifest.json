@@ -5311,7 +5311,10 @@
               }
             },
             "required": []
-          }
+          },
+          "examples": [
+            "fgos doc reserve worktree-reclaim guide"
+          ]
         },
         "register": {
           "description": "Doc lifecycle: register.",
@@ -5364,7 +5367,10 @@
               }
             },
             "required": []
-          }
+          },
+          "examples": [
+            "fgos doc register worktree-reclaim guide"
+          ]
         },
         "mark-rendered": {
           "description": "Doc lifecycle: mark-rendered.",
@@ -5417,7 +5423,10 @@
               }
             },
             "required": []
-          }
+          },
+          "examples": [
+            "fgos doc mark-rendered worktree-reclaim guide"
+          ]
         },
         "move-path": {
           "description": "Doc lifecycle: move-path.",
@@ -5470,7 +5479,10 @@
               }
             },
             "required": []
-          }
+          },
+          "examples": [
+            "fgos doc move-path worktree-reclaim guide"
+          ]
         },
         "promote": {
           "description": "Doc lifecycle: promote.",
@@ -5523,7 +5535,10 @@
               }
             },
             "required": []
-          }
+          },
+          "examples": [
+            "fgos doc promote worktree-reclaim guide"
+          ]
         },
         "demote": {
           "description": "Doc lifecycle: demote.",
@@ -5576,7 +5591,10 @@
               }
             },
             "required": []
-          }
+          },
+          "examples": [
+            "fgos doc demote worktree-reclaim guide"
+          ]
         },
         "supersede": {
           "description": "Doc lifecycle: supersede.",
@@ -5629,7 +5647,10 @@
               }
             },
             "required": []
-          }
+          },
+          "examples": [
+            "fgos doc supersede worktree-reclaim guide"
+          ]
         },
         "retire": {
           "description": "Doc lifecycle: retire.",
@@ -5682,7 +5703,10 @@
               }
             },
             "required": []
-          }
+          },
+          "examples": [
+            "fgos doc retire worktree-reclaim guide"
+          ]
         }
       },
       "touchesState": true,
