@@ -100,13 +100,15 @@ test('all COMMAND_REGISTRY selectors appear exactly once in generated output', (
 test('a verb whose registry native list names first positionals routes to the legacy payload and names them as native_subcommands', () => {
   const routes = JSON.parse(fs.readFileSync(DEFAULT_ROUTES_PATH, 'utf8'));
   const listed = COMMAND_REGISTRY.filter((e) => Array.isArray(e.native));
-  assert.deepEqual(listed.map((e) => e.name).sort(), ['hook', 'session']);
+  assert.deepEqual(listed.map((e) => e.name).sort(), ['doc', 'hook', 'session']);
   assert.deepEqual(routes.session.native_subcommands, ['read', 'type']);
+  assert.deepEqual(routes.doc.native_subcommands, ['index', 'locate']);
+  assert.equal(routes.doc.route_kind, 'legacy-cli', 'the doc lifecycle sub-verbs still reach the legacy payload');
   assert.equal(routes.session.route_kind, 'legacy-cli', 'session start, rotate, stop and write still reach the legacy payload');
   assert.deepEqual(routes.hook.native_subcommands, ['dispatch-decide', 'mailbox', 'mailbox-sync', 'questions', 'session-rotation']);
   assert.equal(routes.hook.route_kind, 'legacy-cli', 'every other hook kind still reaches the legacy payload');
   const withNativeSubs = Object.values(routes).filter((r) => r.native_subcommands !== undefined).map((r) => r.selector);
-  assert.deepEqual([...withNativeSubs].sort(), ['hook', 'session']);
+  assert.deepEqual([...withNativeSubs].sort(), ['doc', 'hook', 'session']);
   const nativeRoutes = COMMAND_REGISTRY.filter((e) => e.native === true).map((e) => e.name).sort();
   assert.deepEqual(Object.values(routes).filter((r) => r.route_kind === 'native').map((r) => r.selector).sort(), nativeRoutes, 'route_kind native is exactly the registry native: true set');
   const sample = (patch) => [{ ...COMMAND_REGISTRY.find((e) => e.name === 'list'), ...patch }];

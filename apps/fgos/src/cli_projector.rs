@@ -236,6 +236,11 @@ pub fn project_cli_invocation(
                 root?,
             )?),
         ),
+        crate::wiring::doc_locate::LOCATE_OPERATION_ID
+        | crate::wiring::doc_locate::INDEX_OPERATION_ID => (
+            ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
+            Box::new(crate::wiring::doc_locate::project_request(args, root?)?),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
@@ -321,6 +326,10 @@ pub fn native_operation_id(
             args,
             std::path::PathBuf::new(),
         )?;
+        return Ok(request.operation_id().to_string());
+    }
+    if route_operation == crate::wiring::doc_locate::LOCATE_OPERATION_ID {
+        let request = crate::wiring::doc_locate::project_request(args, std::path::PathBuf::new())?;
         return Ok(request.operation_id().to_string());
     }
     Ok(route_operation.to_string())

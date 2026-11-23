@@ -530,6 +530,7 @@ dependencies = [
  "fgos-config",
  "fgos-convention",
  "fgos-distribution",
+ "fgos-documentation",
  "fgos-durable-file",
  "fgos-event-store",
  "fgos-execution",

@@ -36,6 +36,8 @@ fgos-supervision = { path = "../../packages/supervision/rust" }
 fgos-write-scope = { path = "../../packages/write-scope" }
 fgos-graph = { path = "../../packages/graph/rust" }
 fgos-resource-referee = { path = "../../packages/resource-referee/rust" }
+# `fgos doc locate|index`: the locate use case and its pkm adapter (pkm and ONNX Runtime are linked into the host).
+fgos-documentation = { path = "../../packages/documentation/rust" }
 # The YAML door: the skill guard reads a skill file's frontmatter version through it.
 fgos-yaml-doc = { path = "../../packages/yaml-doc/rust" }
 tokio = { workspace = true }

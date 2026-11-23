@@ -607,6 +607,30 @@ pub const CATALOG: &[OperationDescriptor] = &[
         allowed_host_kinds: &["cli"],
         streaming_mode: StreamingMode::None,
     },
+    // `doc locate` reads the corpus; the index files it may start a worker for and its call record are runtime
+    // state, not project state, so the call counts as a read.
+    OperationDescriptor {
+        operation_id: OperationId::from_static("doc.locate"),
+        owning_component_id: Cow::Borrowed("documentation"),
+        request_contract: ContractRef::from_static("doc.locate.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("doc.locate.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("documentation.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("doc.index"),
+        owning_component_id: Cow::Borrowed("documentation"),
+        request_contract: ContractRef::from_static("doc.index.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("doc.index.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("documentation.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
 ];
 
 #[cfg(test)]
@@ -616,8 +640,8 @@ mod tests {
     #[test]
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
-        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run, the init run, the migrate portfolio run, the dispatch decide and explain, the dispatch Run show, watch and recover, the dispatch runtime inspect and reconcile, the dispatch account and session probes, the unit run, the agents list, the supervision tick, supervisor read and write, land and slots, the resource-check run, and the authority locate.
-        assert_eq!(CATALOG.len(), 54);
+        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run, the init run, the migrate portfolio run, the dispatch decide and explain, the dispatch Run show, watch and recover, the dispatch runtime inspect and reconcile, the dispatch account and session probes, the unit run, the agents list, the supervision tick, supervisor read and write, land and slots, the resource-check run, the authority locate, and the doc locate and index.
+        assert_eq!(CATALOG.len(), 56);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
