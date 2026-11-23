@@ -879,7 +879,14 @@ fn the_enum_constants_and_the_typed_row_fields_equal_the_schema() {
             "readFirst",
             "facts",
         ],
-        &["id", "canonical", "aliases", "meaning", "owner", "narrative"],
+        &[
+            "id",
+            "canonical",
+            "aliases",
+            "meaning",
+            "owner",
+            "narrative",
+        ],
         &[],
         serde_json::json!({
             "id": "k", "canonical": "k", "aliases": [], "meaning": "m", "owner": "o",
@@ -1029,7 +1036,10 @@ fn a_path_without_a_trailing_slash_covers_only_that_file_and_the_longest_path_wi
         component_claiming("deeper", &["src/deep/"]),
         component_claiming("file", &["src/a.mjs"]),
     ];
-    assert_eq!(resolve_component("src/a.mjs", &components), Ok(Some("file")));
+    assert_eq!(
+        resolve_component("src/a.mjs", &components),
+        Ok(Some("file"))
+    );
     assert_eq!(
         resolve_component("src/a.mjs.bak", &components),
         Ok(Some("dir"))

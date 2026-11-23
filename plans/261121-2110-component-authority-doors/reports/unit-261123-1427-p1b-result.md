@@ -159,3 +159,7 @@ Not run: cargo (test, fmt) and node (`scripts/export-command-selectors.mjs`) wer
 Status: DONE_WITH_CONCERNS
 Summary: All seven fixes written; nothing could be compiled or run here.
 Concerns: Unverified by cargo/node; rustfmt layout and the manifest regeneration need the lead's check.
+
+Fix round 2: the hand-edit render test now renders the seeded views first, then asserts check passes, then tampers; rustfmt diff applied to model_checks.rs.
+Status: DONE_WITH_CONCERNS
+Summary: Both edits written; cargo test was not permitted to run here, so unverified.

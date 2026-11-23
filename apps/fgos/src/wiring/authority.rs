@@ -369,6 +369,12 @@ mod tests {
     #[test]
     fn render_check_fails_naming_the_view_whose_generated_block_was_hand_edited() {
         let root = seeded_repository("check-hand-edit");
+        let write = project_authority_request(
+            &["authority", "render"].map(OsString::from),
+            Ok(root.clone()),
+        )
+        .unwrap();
+        answer(&write).expect("the seeded views render from the seeded model");
         let request = project_authority_request(
             &["authority", "render", "--check"].map(OsString::from),
             Ok(root.clone()),
