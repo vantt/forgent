@@ -162,10 +162,9 @@ The status column holds only the contract's vocabulary; the waits that sat there
 - **Phases 8 and 10** (`running`): their measure window from Miu's gen 30 ends at 21:06 on 2026-11-23; the lead then
   writes `reports/question-relay.md` and `reports/secretary-wake.md`.
 - **Phase 11** (`ready`): runs after phases 8, 9 and 10 have their reports, after 21:06 on 2026-11-23.
-- **Phase 3** (`done`): step 3's land gate `node scripts/plan-contract-check.mjs {plans}` is restored only after
-  `node scripts/plan-contract-check.mjs --plan plans/261123-0726-contract-check-in-confined-heads` exits 0 from this
-  confined head. At 11:15 the restaged addon (HEAD `a219a04ba`) loads and the check runs, but it exits 1 on that plan's
-  own phase 1, 2 and 3 statuses, which are free text instead of the contract's vocabulary. That plan's lead fixes them.
+- **Phase 3** (`done`): step 3's land gate was restored as `0dd71aa83`, refused every plan land inside the land door
+  (`git-addon-unavailable: addon not shipped on this channel`), and was held again as `6d0f6b92c`. It comes back when
+  plan 261123-0726 makes the check run in the land door's context. Evidence: `reports/land-gate-restore.md`.
 
 ### Footprint drops the skill renders and the changelog (2026-11-23 07:45, owner order relayed by lead:SUPERVISOR)
 
