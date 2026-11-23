@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Head Stop-hook rotation requests reach the host with a valid measure: confirm the landed fix and close the row"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 base: 805beabb809bc225727bbb2f587632f1cacdadbb
@@ -63,7 +63,7 @@ Missing: nothing. Found by `git log -S checkMeasure` and `git log -S 'private::N
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Verify on main and close the row](phase-01-verify-and-close.md) | - | plans/261123-0828-head-stop-rotation-bad-measure/reports/, plans/backlog.md, plans/backlog/p-vbv57yc4d5-every-head-stop-rotation-request-is-refused-bad-measure.md | 1 | draft |
+| 1 | [Verify on main and close the row](phase-01-verify-and-close.md) | - | plans/261123-0828-head-stop-rotation-bad-measure/reports/, plans/backlog.md, plans/backlog/p-vbv57yc4d5-every-head-stop-rotation-request-is-refused-bad-measure.md | 1 | ready |
 
 With one phase there is no wave overlap. No integration phase is needed because there is nothing to merge: the
 phase's verify step is the full gate on `main`.
