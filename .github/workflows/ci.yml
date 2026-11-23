@@ -86,6 +86,9 @@ jobs:
       - if: ${{ !inputs.release-gate }}
         uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
 
+      - uses: ./.github/actions/pkm-build-env
+        with:
+          pkm-read-token: ${{ secrets.PKM_READ_TOKEN }}
       - name: Build Rust release binaries for npm tests
         run: cargo build --locked --release --workspace
 
@@ -262,6 +265,9 @@ jobs:
           rustup show
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
 
+      - uses: ./.github/actions/pkm-build-env
+        with:
+          pkm-read-token: ${{ secrets.PKM_READ_TOKEN }}
       - name: Build Rust host binary for tests
         run: cargo build --locked -p fgos
 
@@ -402,6 +408,9 @@ jobs:
       - name: cargo fmt
         run: cargo fmt --all -- --check
 
+      - uses: ./.github/actions/pkm-build-env
+        with:
+          pkm-read-token: ${{ secrets.PKM_READ_TOKEN }}
       - name: cargo clippy
         run: cargo clippy --locked --workspace --all-targets -- -D warnings
 
@@ -440,6 +449,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - uses: ./.github/actions/pkm-build-env
+        with:
+          pkm-read-token: ${{ secrets.PKM_READ_TOKEN }}
       - name: Build workspace (release)
         run: cargo build --locked --release --workspace
 
@@ -460,6 +472,7 @@ jobs:
   addon-reproducibility:
     name: addon reproducibility
     uses: ./.github/workflows/release-assets.yml
+    secrets: inherit
     # A release runs this suite next to its own assets job; a prefix of its own keeps these
     # assets-check artifacts out of the release's publish download.
     with:

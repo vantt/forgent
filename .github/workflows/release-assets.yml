@@ -120,6 +120,9 @@ jobs:
         if: runner.os == 'Windows'
         run: echo 'RUSTFLAGS=-C link-arg=/Brepro' >> "$GITHUB_ENV"
 
+      - uses: ./.github/actions/pkm-build-env
+        with:
+          pkm-read-token: ${{ secrets.PKM_READ_TOKEN }}
       - name: Build workspace (release)
         run: cargo build --locked --release --workspace
 
@@ -218,6 +221,9 @@ jobs:
         if: runner.os == 'Windows'
         run: echo 'RUSTFLAGS=-C link-arg=/Brepro' >> "$GITHUB_ENV"
       # Same workspace feature graph, independent machine and Cargo outputs; no cache.
+      - uses: ./.github/actions/pkm-build-env
+        with:
+          pkm-read-token: ${{ secrets.PKM_READ_TOKEN }}
       - run: cargo build --locked --release --workspace
       - name: Record independent digest
         run: node --input-type=module -e "import fs from 'node:fs'; import {hashFile,nativeAddonLibraryName} from './scripts/build-rust-distribution.mjs'; fs.writeFileSync('addon-digest.txt',hashFile('target/release/'+nativeAddonLibraryName())+'\n');"

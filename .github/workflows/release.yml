@@ -30,6 +30,7 @@ jobs:
     name: assets
     needs: check-version
     uses: ./.github/workflows/release-assets.yml
+    secrets: inherit
     with:
       version: ${{ github.ref_name }}
 
@@ -43,6 +44,7 @@ jobs:
       contents: read
       issues: write
     uses: ./.github/workflows/ci.yml
+    secrets: inherit
     with:
       release-gate: true
 

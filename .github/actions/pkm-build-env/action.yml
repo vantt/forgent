@@ -1,0 +1,32 @@
+name: pkm build environment
+description: >-
+  Prepares a job to build a workspace that links pkm. On every OS, cargo fetches the private vantt/pkm through the
+  git CLI with a read-only token. On Linux x64, the static ONNX Runtime archive built by ort-static.yml is fetched,
+  checked against the pin in scripts/ort-static.mjs and named to ort-sys as ORT_LIB_LOCATION; ort-sys's own prebuilt
+  archive needs glibc 2.38, above the 2.35 release ceiling. On macOS, the deployment target is the one pkm's own
+  macOS build uses with ONNX Runtime's prebuilt archive.
+inputs:
+  pkm-read-token:
+    description: The PKM_READ_TOKEN secret (read access to vantt/pkm). Empty on forks; the rewrite is then skipped.
+    required: false
+    default: ''
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        PKM_READ_TOKEN: ${{ inputs.pkm-read-token }}
+      run: |
+        echo "CARGO_NET_GIT_FETCH_WITH_CLI=true" >> "$GITHUB_ENV"
+        if [ -n "$PKM_READ_TOKEN" ]; then
+          git config --global url."https://x-access-token:${PKM_READ_TOKEN}@github.com/vantt/pkm".insteadOf "https://github.com/vantt/pkm"
+        fi
+        case "$RUNNER_OS/$RUNNER_ARCH" in
+          Linux/X64)
+            node scripts/ort-static.mjs ensure
+            echo "ORT_LIB_LOCATION=$(node -e 'import("./scripts/ort-static.mjs").then((m) => console.log(m.archiveDirectory()))')" >> "$GITHUB_ENV"
+            ;;
+          macOS/*)
+            echo "MACOSX_DEPLOYMENT_TARGET=13.4" >> "$GITHUB_ENV"
+            ;;
+        esac

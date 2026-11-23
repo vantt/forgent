@@ -1,0 +1,4 @@
+# cargo fetches git dependencies (the private vantt/pkm) through the git CLI, so the credentials git already
+# has, a helper locally or the read-token rewrite in CI (.github/actions/pkm-build-env), apply.
+[net]
+git-fetch-with-cli = true
