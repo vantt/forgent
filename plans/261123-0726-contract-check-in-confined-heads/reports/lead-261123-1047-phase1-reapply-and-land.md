@@ -40,6 +40,10 @@ Date: 2026-11-23, lead `head:lead-forgent-261123-0726-contra-e554b`.
 ("docs(plan): park component-authority-doors phase 1 ...", 10:46) is not on the remote tip 4c0524b64. That commit
 belongs to the component-authority-doors lead; this lead may not push or reset it. Raised to the supervisor.
 
+After the lead's paths land pushed main, retries hit a second `land-target-ahead` (6ca604ff3, another head) and then
+`main-checkout-dirty-overlap` four times: `plans/261121-2110-component-authority-doors/plan.md` is modified, uncommitted,
+in the main checkout by that plan's lead, and the land would write it. Not this lead's file; raised to the supervisor.
+
 ## Follow-ups (not this plan)
 
 - The head's `fgos run` client drops `--sync` and refuses `--unit` and the sync-only form.
