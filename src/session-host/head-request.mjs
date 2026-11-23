@@ -23,7 +23,10 @@ import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
 import { judge, observe, selfRecord } from '../native/process-identity.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { assignmentDir } from '../runner/dispatch/assignment-layout.mjs';
-import { canonicalizeWriteEntry, matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
+import { nativeDoor } from '../native/door.mjs';
+
+const canonicalizeWriteEntry = (raw) => nativeDoor().writeScope('canonicalize', { raw });
+const matchesWriteScope = (candidate, scope) => nativeDoor().writeScope('matches', { path: candidate, scope });
 import { readStoredUnitSummary } from '../runner/execution/unit-summary.mjs';
 import { unitRunFacts } from '../runner/execution/unit-run-record.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
