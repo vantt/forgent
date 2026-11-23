@@ -1,10 +1,11 @@
 ---
 contract: plan-v1
 title: "Head Stop-hook rotation requests reach the host with a valid measure: confirm the landed fix and close the row"
-status: ready
+status: running
+lead: head:lead-forgent-261123-0828-head-s-62d31
 priority: P1
 blockedBy: []
-base: 805beabb809bc225727bbb2f587632f1cacdadbb
+base: fa7f61288083289bbb39d84ff0d7a11c3f2a1bda
 footprint:
   - plans/261123-0828-head-stop-rotation-bad-measure/**
   - plans/backlog.md
