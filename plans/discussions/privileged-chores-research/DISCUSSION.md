@@ -48,6 +48,7 @@ Năng lực được giới hạn bằng hàng rào quanh những thứ cần b�
 | P4 | maxLeads theo năng lực máy | giữ dòng riêng | `p-tyowvhthul`. Đặt maxLeads thì đi qua cửa nâng quyền với `config patch`. |
 | C2 | Xem lại cỡ lồng của Miu và supervisor theo nguyên tắc riêng-nới-lồng, chung-qua-ô-cửa | **đề xuất 23:35, chờ chủ** | Xem §5 23:28. |
 | M1 | Mọi head gửi thư được cho Miu và supervisor; thư đánh thức người nhận đang rảnh | **đề xuất 23:40** | §5 23:40. Lead và planner hiện có `mailbox: false`. |
+| H1 | Kênh xin trợ giúp: mọi head raise lên supervisor; tự chuyển sang Miu khi không có supervisor | **đã chốt PC-D5** | §5 23:50 |
 | P5 | Gom 28 verb vào một bộ chuyển tiếp | theo Q2 | Theo L10 và RUL104, phải làm cùng đợt hoặc mở item riêng có tên. |
 
 ## 4. Quyết định đã chốt
@@ -57,6 +58,7 @@ Năng lực được giới hạn bằng hàng rào quanh những thứ cần b�
 | PC-D1 | **Miu là tay phải, luôn thức cạnh chủ, và là người khôi phục bộ máy.** Quyền của Miu cao nhất sau chủ; việc gì supervisor làm được thì Miu cũng có quyền làm. Năng lực đó để ngủ và chỉ dùng khi không còn ai làm được. Thời bình, Miu trao đổi với chủ, làm rõ và sắp xếp mục tiêu, giảm tải cho chủ, không nhúng tay vào vận hành. Khi supervisor chết hoặc bất lực, Miu tự làm việc vận hành và đánh thức mọi thứ cho tới khi bộ máy chạy lại. Mỗi vòng soát, Miu xem bộ máy còn sống không. Mở rộng SP-D1 (ds-nmk2mz6vkk, 2026-11-19). | Chủ 20:35, xác nhận 20:38 sau hai lần phát biểu lại | 2026-11-23 |
 | PC-D2 | **Supervisor là tay trái, trông coi mọi agent đang hoạt động không có lead trông.** Phạm vi gồm lead, shaper, planner, và bất kỳ pane hay agent nào được bật lên mà không có lead. Worker thuộc một lead thì do lead đó lo. Supervisor có đủ tay chân vận hành qua một cửa nâng quyền có hàng rào. Nhịp theo đồng hồ: mỗi nhịp đối chiếu những gì đang sống với những gì phải có, không phụ thuộc có ai báo. | Chủ 20:35, xác nhận 20:38 | 2026-11-23 |
 | PC-D4 | **Bật lại phiên lead:SUPERVISOR thủ công, không confine, như một biện pháp tạm.** Phiên này chạy cho tới khi điều kiện nghỉ hưu ở `docs/platform/supervision/spec.md:223` đạt: supervisor head tự chạy trọn một plan, không lệnh nào do lead:SUPERVISOR gõ. Đây là quyết định vận hành của chủ, không phải thiết kế, và không làm điều kiện nghỉ hưu nhẹ đi. | Chủ 20:43, trả lời trực tiếp câu shaper nêu | 2026-11-23 |
+| PC-D5 | **Một kênh xin trợ giúp cho mọi head.** Mọi persona được `supervisor raise` (loại coordination-help). Yêu cầu vào hàng đợi và đánh thức supervisor. Thời bình, head không nói chuyện thẳng với Miu; việc cần chủ quyết đi qua question store, và Miu trình lên chủ. Khi không có supervisor, hoặc yêu cầu trợ giúp nằm chưa xử lý quá ngưỡng, vòng soát của Miu nhận việc và khôi phục bộ máy (PC-D1). Mailbox chỉ dùng để trao đổi. | Chủ "đồng ý", 23:40, cho đề xuất H1 | 2026-11-23 |
 | PC-D3 | **Năng lực được giới hạn bằng hàng rào quanh thứ cần bảo vệ, cộng một cửa nâng quyền chung, không bằng danh sách verb.** | Chủ 20:30 ("2 là đúng"), giữ nguyên qua 20:35 | 2026-11-23 |
 
 ## 5. Q&A log
@@ -242,6 +244,17 @@ Plan wake-on-mail `261030-0323-mailbox-v9-wake-on-mail` chưa được làm.
 - Mọi head phải với tới được hai tay. Theo PC-D1 và PC-D2, đó là đường báo cáo duy nhất của các head còn lại. Cách làm là một dòng grant.
 - Thư phải đánh thức được người nhận đang rảnh. Phần này dùng lại 261030-0323. Trong lúc chờ, vòng 15 phút của Miu và nhịp của supervisor sẽ vớt thư.
 - Các dòng liên quan: `p-ia2v33b54u` (Miu không gửi được thư lúc 2026-11-22, cần kiểm lại), `p-bifjfd5rix`, `p-whvn2fgyep`, `p-5igcekysul`.
+
+### 2026-11-23 23:50 — kênh xin trợ giúp của head
+
+Chủ: các head gần như không có kênh xin trợ giúp. Supervisor quản head là chắc chắn, nên head phải nói chuyện được với supervisor. Chưa rõ head có được nói chuyện với Miu không.
+
+**Scout (`head-grants.mjs`):** `supervisor raise` là cách duy nhất vừa nằm trên hàng đợi vừa đánh thức được supervisor qua watcher. Hiện chỉ secretary, supervisor và lead có verb này. **Shaper và planner không có.** Planner còn không có cả mailbox (§5 23:40).
+
+**Đề xuất của shaper:**
+- **Một kênh xin trợ giúp cho mọi head, gửi tới vai "supervisor".** Đó là `supervisor raise` (loại `coordination-help`), mở cho mọi persona. Nó vào hàng đợi, đánh thức supervisor, và không bị lọt như thư. Mailbox chỉ dùng để trao đổi qua lại, không dùng để xin cứu.
+- **Head không nói chuyện thẳng với Miu trong thời bình.** Như vậy Miu giữ đúng vai PC-D1: ở cạnh chủ và giảm tải cho chủ. Việc cần chủ quyết đã có sẵn kênh câu hỏi (question store), và Miu chuyển những câu đó lên chủ.
+- **Tự chuyển sang Miu khi không có supervisor.** Head không phải tự chọn người nhận. Nếu một yêu cầu trợ giúp nằm chưa xử lý quá ngưỡng, hoặc watcher báo `supervisor-wake-failed` hay không có supervisor sống, thì vòng soát của Miu thấy và Miu khôi phục bộ máy (PC-D1). Đây đúng là "thời chiến" mà chủ mô tả.
 
 ## 6. Thiết kế đã chốt {#design}
 
