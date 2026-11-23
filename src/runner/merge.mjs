@@ -676,7 +676,7 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
   let checkout = checkoutPathForBranch(repoRoot, ownBranch);
   const created = !checkout;
   if (!checkout) {
-    const parent = path.join(options.trustedMain, '.fgos/runtime/git-catchups');
+    const parent = path.join(fgosDirFromRoot(options.trustedMain), 'runtime', 'git-catchups');
     fs.mkdirSync(parent, { recursive: true });
     checkout = path.join(parent, crypto.randomUUID());
     worktrees.create({ path: checkout, branch: ownBranch, base: resolveRefSha(repoRoot, ownBranch), operationId: crypto.randomUUID() });
