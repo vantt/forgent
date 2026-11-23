@@ -94,6 +94,8 @@ Nếu 0118 chưa xong trong đêm thì sáng mai plan mới vẫn chưa chạy. 
 - PC-D4: bật lại supervisor manual tạm thời. Hiện chưa có phiên manual nào chạy.
 - PC-D5: kênh xin trợ giúp.
 - PC-D6, PC-D7, PC-D8: shaper chốt theo yêu cầu "làm trước" của chủ, dựa trên hội đồng và bảng kiểm đếm. Chủ có thể phủ quyết sáng mai.
+- PC-D9, PC-D10: quy trình release. Công thức là của coding domain; quy tắc chung không gắn domain nào.
+- PC-D11: plan riêng, chạy sau doors và 0118, viết bằng Rust (chủ chốt lúc 00:14).
 
 **Đã rút lại:** tick riêng cho supervisor (giao cho keeper của 0056) và luật theo mẫu shell.
 
@@ -140,6 +142,7 @@ Năng lực được giới hạn bằng hàng rào quanh những thứ cần b�
 | PC-D8 | Mọi head gửi được thư cho Miu và supervisor: lead và planner được bật mailbox, nhưng chỉ gửi tới hai tay. Đánh thức bằng thư thuộc plan 0323. | Đề xuất 23:40; chủ không phản đối | 2026-11-23 |
 | PC-D9 | **Release của coding domain (không phải quy trình của fgOS).** Repo forgent phát triển fgOS bằng coding domain, nên công thức release của nó là công thức của coding domain. Công thức: main có bản sửa mới đã land, các lệnh verify mà project khai báo đều xanh, và không lead nào đang land; khi đó chạy `fgctl upgrade`, rồi chạy probe sống; nếu probe hỏng thì tự quay về release trước (`previousArtifactDigest`); cuối cùng gửi báo cáo, không hỏi. Release này đảo ngược được, nên theo PC-D10 supervisor tự làm. Nếu bản mới làm hỏng chính supervisor, Miu quay về. Công thức nằm phía coding domain hoặc trong dữ liệu của project, không nằm trong skill supervisor. Supervisor dùng nó qua quy tắc chung của PC-D10. | Chủ "đồng ý A" 23:58; chủ yêu cầu ghi rõ là của coding domain lúc 00:10 | 2026-11-23 |
 | PC-D10 | Miu và supervisor giữ nguyên tính domain-free (SP-D1). Không đưa coding domain, hay riêng repo fgOS (mission #3), vào phần điều phối cấp cao. Quy trình release của PC-D9 có hai phần. Phần chung nằm trong skill supervisor: điều kiện, áp dụng, probe, rollback, báo cáo. Công thức cụ thể là dữ liệu do project khai báo: kiểm gì, chạy lệnh nào, probe gì, quay về bằng gì. Với repo forgent, công thức đó là `land.gates` xanh, rồi `fgctl upgrade`, rồi `test/live/head-grant-probe.live.mjs`, rồi `previousArtifactDigest`. Một project hay workflow khác khai báo công thức của riêng nó, hoặc không khai báo thì không có bước rollout. Theo cùng cách đó, "lồng chạy được full test" (T4) có nghĩa là lồng chạy được các lệnh verify mà project khai báo, và "lead land code" có nghĩa là lead land sản phẩm của plan. | Chủ nhắc 00:00 "coi chừng lại đưa coding domain vào high-level orchestration"; shaper rà lại và sửa | 2026-11-24 |
+| PC-D11 | Plan riêng, không gộp vào 261122-0056. Thứ tự: doors và 0118, rồi plan này, rồi 0056. Code mới viết bằng Rust và là lát đầu của plan 3 (session-host) trong `ds-wham5txfkv`. Bảng quyền, `can-i` và forwarder nằm trong `packages/session-host/rust`. Verb chuyển tiếp được exec thẳng từ `head_request.rs`. Các nhánh chỉ chuyển tiếp ở Node bị xoá; Node chỉ giữ các nhánh có chính sách riêng. | Chủ "ok chốt", 00:14 | 2026-11-24 |
 | PC-D3 | **Năng lực được giới hạn bằng hàng rào quanh thứ cần bảo vệ, cộng một cửa nâng quyền chung, không bằng danh sách verb.** | Chủ 20:30 ("2 là đúng"), giữ nguyên qua 20:35 | 2026-11-23 |
 
 ## 5. Q&A log
