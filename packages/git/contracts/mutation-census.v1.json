@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "caa7d57f73f32321ec84563ef91f1fb9b499e3f9e44c2ce2c1a6569d7483c92e",
+  "payloadDigest": "fe95c60dc08d51acbf8bfa4c48cb3f47a7226a0f723ce03473ad5c960fb0e41d",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1649,7 +1649,7 @@
     "src/session-host/head-grants.mjs": "396773b86a1d62d67b9a0bebca971659a0ebd54f4486cbd46007012f5e3787d0",
     "src/session-host/head-plan.mjs": "634ba6bd771661549baef7c50d3a8102a487ec00b0b6c67349d289c44941fa13",
     "src/session-host/head-request-client.mjs": "3ae89878a0c3b33bb383474c20d33b5aa610febcdb5a5a5d04f2f6e693fab499",
-    "src/session-host/head-request.mjs": "3ae6b7dcf51ed8c2b1c83d0c009beabbc1309d89cffd9c512ad4248d21435746",
+    "src/session-host/head-request.mjs": "f1375bca902a35317e15017b21eaf13270158c4dc971c346d01c15216afc5071",
     "src/session-host/head-start.mjs": "6f612253b81d30ea2ce500f884c3696f96d417856cac83dc2144025af75a48ff",
     "src/session-host/head-stop.mjs": "4284bc2638e3ac4a71d151763c981d220a017c4f948cefc829115be5a6221ad3",
     "src/session-rotation/handoff-store.mjs": "3c02156e15ebc6503df51d0054e433fd8f49e4bd064781b29b9114b7cfedddbf",
@@ -1757,7 +1757,7 @@
     "src/workflow/case-start.mjs": "f5d98e12b609f367dbdeb7a404449f74c65dabe3b48ca5cb0799b0cdcd5b23e2",
     "src/workflow/case-verbs.mjs": "32d02bdf47a1394d732bddb84c8393e92a098086e6c1a17510f711ef70b3d9b3",
     "src/workflow/checked.mjs": "edb02d57d66bd87d36b0a94d8f68023f1e94f6c19e2a372679f9ccc44ec0b8f6",
-    "src/workflow/definition.mjs": "c8a1dd80ecb76b321b69be295985a6d89d4d66b9080b3fcadc575c1ac77a3844",
+    "src/workflow/definition.mjs": "7ac5e93c33a3a68baa00f17b7cc7dcedc0d10cc687e097fce51ca02d98ba9dfe",
     "src/workflow/dir-guard.mjs": "d8224116ef0781fe57fef08bf706c1d51f25619a2b0a641c696432bdd2973044",
     "src/workflow/guide-schema.mjs": "219f32c91c2f21bd21391ac35b0108f5fb5f953417f09755c50362475e55eaf7",
     "src/workflow/index.mjs": "8444bb260e66b4f02c26980b8e81f3791f6a52d00a05ce24dbe8da1a810a3614",
@@ -4801,113 +4801,113 @@
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 761,
-      "spawn": "hostCall -> src/session-host/head-request.mjs:185",
+      "line": 767,
+      "spawn": "hostCall -> src/session-host/head-request.mjs:191",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 770,
-      "spawn": "callHeadQuestions -> src/session-host/head-request.mjs:94",
+      "line": 776,
+      "spawn": "callHeadQuestions -> src/session-host/head-request.mjs:96",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 783,
-      "spawn": "worktreeCreate -> src/session-host/head-request.mjs:514",
+      "line": 789,
+      "spawn": "worktreeCreate -> src/session-host/head-request.mjs:520",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 786,
-      "spawn": "stopVerb -> src/session-host/head-request.mjs:546",
-      "binary": "(configuration file data)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/session-host/head-request.mjs",
-      "line": 793,
-      "spawn": "hostCall -> src/session-host/head-request.mjs:185",
-      "binary": "(configuration file data)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/session-host/head-request.mjs",
-      "line": 796,
-      "spawn": "raiseVerb -> src/session-host/head-request.mjs:577",
+      "line": 792,
+      "spawn": "stopVerb -> src/session-host/head-request.mjs:552",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
       "line": 799,
-      "spawn": "tuneVerb -> src/session-host/head-request.mjs:590",
+      "spawn": "hostCall -> src/session-host/head-request.mjs:191",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
       "line": 802,
-      "spawn": "sessionReadVerb -> src/session-host/head-request.mjs:597",
+      "spawn": "raiseVerb -> src/session-host/head-request.mjs:583",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
       "line": 805,
-      "spawn": "sessionTypeVerb -> src/session-host/head-request.mjs:605",
+      "spawn": "tuneVerb -> src/session-host/head-request.mjs:596",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
       "line": 808,
-      "spawn": "metricsRecordVerb -> src/session-host/head-request.mjs:618",
+      "spawn": "sessionReadVerb -> src/session-host/head-request.mjs:603",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
       "line": 811,
-      "spawn": "metricsPruneVerb -> src/session-host/head-request.mjs:627",
+      "spawn": "sessionTypeVerb -> src/session-host/head-request.mjs:611",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
       "line": 814,
-      "spawn": "frictionRecordVerb -> src/session-host/head-request.mjs:681",
+      "spawn": "metricsRecordVerb -> src/session-host/head-request.mjs:624",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
       "line": 817,
-      "spawn": "configPatchVerb -> src/session-host/head-request.mjs:699",
+      "spawn": "metricsPruneVerb -> src/session-host/head-request.mjs:633",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 824,
-      "spawn": "hostCall -> src/session-host/head-request.mjs:185",
+      "line": 820,
+      "spawn": "frictionRecordVerb -> src/session-host/head-request.mjs:687",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 828,
-      "spawn": "hostCall -> src/session-host/head-request.mjs:185",
+      "line": 823,
+      "spawn": "configPatchVerb -> src/session-host/head-request.mjs:705",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 886,
-      "spawn": "runHeadRequest -> src/session-host/head-request.mjs:786",
+      "line": 830,
+      "spawn": "hostCall -> src/session-host/head-request.mjs:191",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/head-request.mjs",
+      "line": 834,
+      "spawn": "hostCall -> src/session-host/head-request.mjs:191",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/head-request.mjs",
+      "line": 892,
+      "spawn": "runHeadRequest -> src/session-host/head-request.mjs:792",
       "binary": "(env FGOS_HEAD_REQUEST_HOST_BIN)",
       "class": "configured-binary"
     },
