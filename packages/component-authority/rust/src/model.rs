@@ -198,6 +198,15 @@ impl Model {
         Self::load_dir(&root.join(MODEL_DIR))
     }
 
+    /// Loads the model at `dir`, or answers `None` when `dir` is not a directory: a project that has no model
+    /// has no authority to ask. A directory that exists but is missing a file is still refused.
+    pub fn load_dir_if_present(dir: &Path) -> Result<Option<Self>, ModelError> {
+        if !dir.is_dir() {
+            return Ok(None);
+        }
+        Self::load_dir(dir).map(Some)
+    }
+
     /// Loads a model from its directory: `layers.yaml`, `components.yaml`, `decision-kinds.yaml`,
     /// `contracts.yaml` and `doors/*.yaml`. Doors are ordered by file name.
     pub fn load_dir(dir: &Path) -> Result<Self, ModelError> {

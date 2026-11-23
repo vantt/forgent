@@ -1,7 +1,9 @@
 //! `fgos authority locate` as a process, over the real model of this checkout: a Vietnamese and an English
-//! description of the same work both rank the `durable-file` component first, in a `fgos.v1` envelope. The
-//! loader and the ranking rules are owned by the crate's tests (`packages/component-authority/rust/`); this
-//! file proves the wiring of the binary over them.
+//! description of the same work both rank the `durable-file` component first, in a `fgos.v1` envelope. In a
+//! project that is not this repository the verb reads and writes `.fgos/authority/model/`: with no model
+//! `locate` answers `inactive`, and the first approved `declare` creates the model. The loader, the ranking
+//! rules and every refusal of `declare` are owned by the crate's tests (`packages/component-authority/rust/`);
+//! this file proves the wiring of the binary over them.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -42,6 +44,10 @@ fn temp_project() -> PathBuf {
     fs::create_dir_all(project.join(".fgos")).unwrap();
     let model = Path::new("packages/component-authority/model");
     copy_dir(&repo_root().join(model), &project.join(model));
+    // The contract file is what marks a root as the fgOS repository, which keeps its model in the tree.
+    let contract = Path::new("packages/component-authority/contracts/model.v1.json");
+    fs::create_dir_all(project.join(contract).parent().unwrap()).unwrap();
+    fs::copy(repo_root().join(contract), project.join(contract)).unwrap();
     project
 }
 
@@ -153,4 +159,232 @@ fn authority_render_check_finds_every_view_of_this_repository_in_sync_with_the_m
         serde_json::json!([]),
         "{envelope}"
     );
+}
+
+/// A project that is not this repository: its own Git repository with an event store, a state root and a
+/// release, so `fgos questions` can ask and answer in it.
+#[cfg(target_os = "linux")]
+mod project_without_a_model {
+    use super::*;
+    use sha2::{Digest, Sha256};
+    use std::io::Write;
+    use std::process::{Output, Stdio};
+
+    const SESSION: &str = "00000000-0000-4000-8000-0000000000aa";
+
+    const QUESTION: &str = r#"{"stage":"planning","headline":"May the model gain a component?","blocks":"plan p","parts":{"what":"declare a component","cause":"the project has none","options":[{"label":"A","does":"d","gain":"g","harm":"h","cost":"c","recommended":true},{"label":"B","does":"d","gain":"g","harm":"h","cost":"c"}],"recommendation":"A","scope":{"allows":"one component","forbids":"others"}}}"#;
+
+    fn git(dir: &Path, args: &[&str]) {
+        let out = Command::new("git")
+            .arg("-C")
+            .arg(dir)
+            .args(["-c", "user.name=t", "-c", "user.email=t@example.invalid"])
+            .args(args)
+            .env("GIT_CONFIG_GLOBAL", "/dev/null")
+            .env("GIT_CONFIG_NOSYSTEM", "1")
+            .output()
+            .unwrap();
+        assert!(out.status.success(), "git {args:?}: {out:?}");
+    }
+
+    fn digest(bytes: &[u8]) -> String {
+        format!("sha256:{:x}", Sha256::digest(bytes))
+    }
+
+    fn release(root: &Path) {
+        let release = root.join("release");
+        fs::create_dir_all(release.join("bin")).unwrap();
+        let entry = b"process.exit(0);\n";
+        fs::write(release.join("bin/fgos.mjs"), entry).unwrap();
+        let mut manifest = serde_json::json!({
+            "schemaVersion": 1,
+            "entries": { "fgos": "target/debug/fgos" },
+            "components": { "legacyNode": { "root": ".", "entry": "bin/fgos.mjs", "digest": digest(entry) } },
+            "requires": { "node": ">=18" },
+            "target": { "os": "linux", "arch": "x64" },
+            "stateSchemas": { "read": ["2"], "write": ["2"], "migrations": [] },
+            "files": [serde_json::json!({
+                "path": "bin/fgos.mjs", "kind": "file", "digest": digest(entry), "mode": "755", "class": "legacy-node",
+            })],
+        });
+        let canonical = fgos_distribution::verify::to_canonical_json(&manifest);
+        manifest["artifactDigest"] = serde_json::json!(digest(canonical.as_bytes()));
+        fs::write(
+            release.join("manifest.json"),
+            serde_json::to_string_pretty(&manifest).unwrap(),
+        )
+        .unwrap();
+    }
+
+    struct Scene {
+        root: PathBuf,
+    }
+
+    impl Scene {
+        fn new() -> Self {
+            let root = std::env::temp_dir().join(format!(
+                "fgos-authority-project-{}-{}",
+                std::process::id(),
+                PROJECTS.fetch_add(1, Ordering::SeqCst)
+            ));
+            let _ = fs::remove_dir_all(&root);
+            fs::create_dir_all(root.join("home")).unwrap();
+            fs::create_dir_all(root.join("state")).unwrap();
+            let root = fs::canonicalize(root).unwrap();
+            let project = root.join("project");
+            fs::create_dir_all(project.join("plans/p")).unwrap();
+            git(&root, &["init", "-q", "-b", "work", "project"]);
+            git(&project, &["config", "fgos.machineid", "m-test"]);
+            fs::write(project.join("plans/p/plan.md"), "plan\n").unwrap();
+            git(&project, &["add", "."]);
+            git(&project, &["commit", "-q", "-m", "init"]);
+            // What an initialised project holds before its first append.
+            let fence = project.join(".fgos/locks/activation.lock");
+            fs::create_dir_all(&fence).unwrap();
+            fs::write(
+                fence.join("TOMBSTONE"),
+                "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n",
+            )
+            .unwrap();
+            let locks = project.join(".git/fgos/events/locks");
+            fs::create_dir_all(&locks).unwrap();
+            {
+                use std::os::unix::fs::PermissionsExt;
+                for dir in [root.join("state"), project.join(".git/fgos"), locks] {
+                    fs::set_permissions(dir, fs::Permissions::from_mode(0o700)).unwrap();
+                }
+            }
+            fgos_identity::machine::mint_here(&root.join("state")).unwrap();
+            release(&root);
+            Self { root }
+        }
+
+        fn project(&self) -> PathBuf {
+            self.root.join("project")
+        }
+
+        fn model(&self) -> PathBuf {
+            self.project().join(".fgos/authority/model")
+        }
+
+        fn run(&self, args: &[&str], stdin: &[u8]) -> Output {
+            let mut child = Command::new(env!("CARGO_BIN_EXE_fgos"))
+                .current_dir(self.project())
+                .env_clear()
+                .env("HOME", self.root.join("home"))
+                .env("PATH", std::env::var_os("PATH").unwrap_or_default())
+                .env("FGOS_STATE_ROOT", self.root.join("state"))
+                .env("FGOS_SESSION_ID", SESSION)
+                .env("FGOS_ACTIVE_RELEASE_PATH", self.root.join("release"))
+                .args(args)
+                .stdin(Stdio::piped())
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn()
+                .unwrap();
+            let _ = child.stdin.take().unwrap().write_all(stdin);
+            child.wait_with_output().unwrap()
+        }
+
+        fn data(&self, args: &[&str]) -> serde_json::Value {
+            let mut all = vec!["authority"];
+            all.extend_from_slice(args);
+            all.push("--json");
+            let out = self.run(&all, b"");
+            assert!(
+                out.status.success(),
+                "{all:?}: {}{}",
+                String::from_utf8_lossy(&out.stdout),
+                String::from_utf8_lossy(&out.stderr)
+            );
+            let envelope: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+            assert_eq!(envelope["contract"], "fgos.v1", "{envelope}");
+            envelope["data"].clone()
+        }
+
+        fn declare(&self, row: &str, approved_by: Option<&str>) -> Output {
+            let mut args = vec!["authority", "declare", "--kind", "component", "--row", row];
+            if let Some(question) = approved_by {
+                args.extend(["--approved-by", question]);
+            }
+            self.run(&args, b"")
+        }
+    }
+
+    impl Drop for Scene {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.root);
+        }
+    }
+
+    const ROW: &str = r#"{"id":"billing","canonical":"billing","aliases":["invoicing"],"meaning":"charges customers","layer":"domain","tier":3,"paths":["plans/"],"owns":[],"mustNotOwn":[],"spec":"plans/p/plan.md","source":[],"status":"designed"}"#;
+
+    fn under_an_agent() -> bool {
+        let tree = fgos_identity::os_process_tree();
+        fgos_identity::resolve::agent_in_ancestry(tree.as_ref(), Some(std::process::id())).is_some()
+    }
+
+    #[test]
+    fn locate_answers_inactive_and_an_approved_declare_creates_the_model_under_dot_fgos() {
+        let scene = Scene::new();
+
+        let inactive = scene.data(&["locate", "billing"]);
+        assert_eq!(inactive["authority"], "inactive", "{inactive}");
+        assert_eq!(scene.data(&["model"])["authority"], "inactive");
+
+        let refused = scene.declare(ROW, None);
+        assert!(!refused.status.success(), "{refused:?}");
+
+        let asked = scene.run(
+            &["questions", "ask", "--ref", "plan:p", "--input", "-"],
+            QUESTION.as_bytes(),
+        );
+        assert!(asked.status.success(), "ask: {asked:?}");
+        let question = String::from_utf8(asked.stdout).unwrap().trim().to_owned();
+        let open = scene.declare(ROW, Some(&question));
+        assert!(!open.status.success(), "an open question approves nothing: {open:?}");
+        assert!(
+            String::from_utf8_lossy(&open.stderr).contains("approval-not-answered"),
+            "{}",
+            String::from_utf8_lossy(&open.stderr)
+        );
+        assert!(
+            !scene.project().join(".fgos/authority").exists(),
+            "a refused declare created a model"
+        );
+
+        let answered = scene.run(&["questions", "answer", &question, "--option", "A"], b"");
+        if under_an_agent() {
+            // The owner rule of `answer` refuses an agent caller; the approved half runs from a person's shell.
+            assert_eq!(answered.status.code(), Some(2), "{answered:?}");
+            return;
+        }
+        assert!(answered.status.success(), "answer: {answered:?}");
+
+        let declared = scene.data(&[
+            "declare",
+            "--kind",
+            "component",
+            "--row",
+            ROW,
+            "--approved-by",
+            &question,
+        ]);
+        assert_eq!(declared["declared"]["id"], "billing", "{declared}");
+        assert_eq!(declared["declared"]["createdModel"], true, "{declared}");
+        assert!(
+            !scene.project().join("packages").exists(),
+            "the model of another project must not land under packages/"
+        );
+        let model = fgos_component_authority::Model::load_dir(&scene.model())
+            .expect("the five created files load and validate");
+        assert_eq!(model.components.len(), 1);
+        assert!(
+            model.decision_kinds.is_empty() && model.contracts.is_empty() && model.doors.is_empty()
+        );
+
+        let found = scene.data(&["locate", "invoicing"]);
+        assert_eq!(found["matches"][0]["id"], "billing", "{found}");
+        assert_ne!(found["authority"], "inactive", "{found}");
+    }
 }

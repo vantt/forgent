@@ -94,6 +94,16 @@
         "json",
         "help"
       ],
+      "declare": [
+        "dir",
+        "json",
+        "help",
+        "kind",
+        "row",
+        "approved-by",
+        "plan",
+        "move"
+      ],
       "render": [
         "dir",
         "json",

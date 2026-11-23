@@ -1,15 +1,22 @@
-//! `fgos authority locate "<sentence>" [--limit N]`, `fgos authority model` and
+//! `fgos authority locate "<sentence>" [--limit N]`, `fgos authority model`,
+//! `fgos authority declare --kind <kind> --row <json|file> [--approved-by <q-id>] [--plan <dir>] [--move]` and
 //! `fgos authority render [--check] [--preview-holder <path>]`: the components, decision kinds, contracts and doors
-//! of the component authority model that match a description of the work, the whole loaded model, and the
-//! generated ownership views of the platform docs. The model, the ranking and the renderer are
-//! `fgos_component_authority`; this module projects the call and loads the model of the project the call is aimed
-//! at. `locate` and `model` answer read-only; `render` writes the views unless `--check` asks only for drift.
+//! of the component authority model that match a description of the work, the whole loaded model, a new or moved
+//! row written into it, and the generated ownership views of the platform docs. The model, the ranking, the
+//! write path and the renderer are `fgos_component_authority`; this module projects the call, picks the model
+//! directory of the project the call is aimed at (one rule, `model_dir`) and wires the owner question store.
+//! `locate` and `model` answer read-only, and answer `authority: "inactive"` where the project has no model;
+//! `declare` writes the model's YAML; `render` writes the views unless `--check` asks only for drift.
 
 use crate::routing::Call;
 use fgos_component_authority::render::{
     build_holder_view_preview, check_views, write_views, ViewRef,
 };
-use fgos_component_authority::{locate, Model};
+use fgos_component_authority::{
+    declare, locate, Approvals, DeclareRequest, Kind, Model, QuestionState, MODEL_DIR,
+};
+use fgos_git::invocation_root::{resolve_invocation_root, RootPolicy, RootRequest};
+use fgos_questions::store::{LogOpener, QuestionLog};
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome, OperationId,
     OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
@@ -19,13 +26,19 @@ use serde_json::json;
 use std::borrow::Cow;
 use std::ffi::OsString;
 use std::future::Future;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::pin::Pin;
 
 pub const OPERATION_ID: &str = "authority.locate";
 
 /// The sub-commands `fgos authority` serves.
-pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["locate", "model", "render"];
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["locate", "model", "declare", "render"];
+
+/// The component's own contract: a root that carries it is the fgOS repository, which keeps its model in the tree.
+const OWN_CONTRACT: &str = "packages/component-authority/contracts/model.v1.json";
+
+/// Where a project other than the fgOS repository keeps its model, below its `.fgos` directory.
+const PROJECT_MODEL: &str = "authority/model";
 
 /// How many matches an answer carries when `--limit` is not given.
 const DEFAULT_LIMIT: usize = 10;
@@ -54,6 +67,14 @@ pub enum Action {
         limit: usize,
     },
     Model,
+    /// Adds a row (or, with `move_owner`, moves a decision kind's owner).
+    Declare {
+        kind: Kind,
+        row: serde_json::Value,
+        approved_by: Option<String>,
+        plan: Option<PathBuf>,
+        move_owner: bool,
+    },
     /// `check` reports drift and writes nothing; `preview_holder` writes only the preview report at that path.
     Render {
         check: bool,
@@ -67,7 +88,8 @@ pub struct AuthorityRequest {
     pub action: Action,
 }
 
-/// Projects `fgos authority locate "<sentence>" [--limit N]`, `fgos authority model` and
+/// Projects `fgos authority locate "<sentence>" [--limit N]`, `fgos authority model`,
+/// `fgos authority declare --kind <kind> --row <json|file> [--approved-by <q-id>] [--plan <dir>] [--move]` and
 /// `fgos authority render [--check] [--preview-holder <path>]`.
 pub fn project_authority_request(
     args: &[OsString],
@@ -75,13 +97,14 @@ pub fn project_authority_request(
 ) -> Result<AuthorityRequest, String> {
     let call = Call::new(args);
     let sub = match call.sub_word() {
-        Some(sub @ ("locate" | "model" | "render")) => sub,
+        Some(sub @ ("locate" | "model" | "declare" | "render")) => sub,
         Some(other) => return Err(format!("unknown authority subcommand '{other}'")),
         None => return Err("authority requires a subcommand".to_owned()),
     };
     let allowed: &[&str] = match sub {
         "locate" => &["limit"],
         "render" => &["check", "preview-holder"],
+        "declare" => &["kind", "row", "approved-by", "plan", "move"],
         _ => &[],
     };
     if let Some(flag) = call.flag_outside(allowed) {
@@ -95,6 +118,9 @@ pub fn project_authority_request(
             root: root?,
             action: Action::Model,
         });
+    }
+    if sub == "declare" {
+        return project_declare(&call, root?);
     }
     if sub == "render" {
         if !call.arguments().is_empty() {
@@ -134,22 +160,158 @@ pub fn project_authority_request(
     })
 }
 
+/// `declare`: the kind, the row (inline JSON, or the path of a file holding it), the approving question and,
+/// for a move, the plan.
+fn project_declare(call: &Call, root: PathBuf) -> Result<AuthorityRequest, String> {
+    if !call.arguments().is_empty() {
+        return Err("authority declare takes no arguments".to_owned());
+    }
+    let kind_word = call
+        .value("kind")?
+        .ok_or("authority declare requires --kind component|decision-kind|door|contract")?;
+    let kind = Kind::parse(&kind_word).ok_or_else(|| {
+        format!("--kind takes component, decision-kind, door or contract, got '{kind_word}'")
+    })?;
+    let row_text = call
+        .value("row")?
+        .ok_or("authority declare requires --row <json|file>")?;
+    let row_text = if row_text.trim_start().starts_with('{') {
+        row_text
+    } else {
+        std::fs::read_to_string(&row_text).map_err(|error| format!("--row {row_text}: {error}"))?
+    };
+    let row =
+        serde_json::from_str(&row_text).map_err(|error| format!("--row is not JSON: {error}"))?;
+    Ok(AuthorityRequest {
+        root,
+        action: Action::Declare {
+            kind,
+            row,
+            approved_by: call.value("approved-by")?,
+            plan: call.value("plan")?.map(PathBuf::from),
+            move_owner: call.switch("move")?,
+        },
+    })
+}
+
+/// The directory of the model of the project at `root`, by one rule: the fgOS repository (its root carries the
+/// component's own contract) keeps `packages/component-authority/model/`; every other project keeps
+/// `.fgos/authority/model/`, joined through the invocation-root door's `.fgos` directory.
+pub fn model_dir(root: &Path) -> Result<PathBuf, String> {
+    if root.join(OWN_CONTRACT).is_file() {
+        return Ok(root.join(MODEL_DIR));
+    }
+    let dir = root
+        .to_str()
+        .ok_or_else(|| format!("{}: the project path is not UTF-8", root.display()))?;
+    let found = resolve_invocation_root(&RootRequest {
+        cwd: root,
+        dir: Some(dir),
+        policy: RootPolicy::CallerTree,
+        home: None,
+    })
+    .map_err(|refusal| refusal.message)?;
+    Ok(found.fgos_dir.join(PROJECT_MODEL))
+}
+
+/// The question store, read as `declare`'s owner-answer check.
+struct StoreApprovals<'a> {
+    root: &'a Path,
+}
+
+impl Approvals for StoreApprovals<'_> {
+    fn state(&self, question: &str) -> Result<QuestionState, String> {
+        use fgos_questions::store::State;
+        let log = super::questions::HostLogOpener::reader()
+            .open(self.root)
+            .map_err(|refusal| refusal.to_string())?
+            .ok_or("there is no repository to hold the question store")?;
+        let events = log.read().map_err(|refusal| refusal.to_string())?;
+        Ok(match fgos_questions::store::fold(&events).get(question) {
+            None => QuestionState::Unknown,
+            Some(found) => match found.state {
+                State::Open => QuestionState::Open,
+                State::Answered | State::Acked => QuestionState::Answered,
+                State::Cancelled => QuestionState::Cancelled,
+            },
+        })
+    }
+}
+
+/// The answer where the project has no model: nothing to ask, nothing wrong.
+fn inactive(mut data: serde_json::Value) -> serde_json::Value {
+    data["authority"] = json!("inactive");
+    data
+}
+
 /// The answer for one request. `locate`: the sentence, how many rows matched, and the best `limit` of them.
 /// `model`: the loaded, validated model itself (layers, components, decision kinds, doors, contracts).
-/// `render`: the views it wrote, or with `--check` the drift it found (a non-empty drift is a failure);
-/// with `--preview-holder` the path of the preview report it wrote.
+/// `locate` and `model` answer `{"authority": "inactive"}` (plus an empty match list) where the project has no
+/// model. `declare`: the row it wrote and the files it wrote it to. `render`: the views it wrote, or with
+/// `--check` the drift it found (a non-empty drift is a failure); with `--preview-holder` the path of the
+/// preview report it wrote.
 pub fn answer(request: &AuthorityRequest) -> Result<serde_json::Value, String> {
     match &request.action {
         Action::Render {
             check,
             preview_holder,
         } => render(&request.root, *check, preview_holder.as_deref()),
+        Action::Declare {
+            kind,
+            row,
+            approved_by,
+            plan,
+            move_owner,
+        } => {
+            let dir = model_dir(&request.root)?;
+            let declared = declare(
+                &dir,
+                &request.root,
+                &DeclareRequest {
+                    kind: *kind,
+                    row,
+                    approved_by: approved_by.as_deref(),
+                    plan: plan.as_deref(),
+                    move_owner: *move_owner,
+                },
+                &StoreApprovals {
+                    root: &request.root,
+                },
+            )
+            .map_err(|refusal| refusal.to_string())?;
+            let files: Vec<String> = declared
+                .files
+                .iter()
+                .map(|file| file.to_string_lossy().into_owned())
+                .collect();
+            Ok(json!({
+                "declared": {
+                    "kind": declared.kind.word(),
+                    "id": declared.id,
+                    "row": declared.row,
+                    "files": files,
+                    "createdModel": declared.created_model,
+                },
+            }))
+        }
         Action::Model => {
-            let model = Model::load(&request.root).map_err(|error| error.to_string())?;
-            Ok(json!(model))
+            let dir = model_dir(&request.root)?;
+            match Model::load_dir_if_present(&dir).map_err(|error| error.to_string())? {
+                Some(model) => Ok(json!(model)),
+                None => Ok(inactive(json!({}))),
+            }
         }
         Action::Locate { sentence, limit } => {
-            let model = Model::load(&request.root).map_err(|error| error.to_string())?;
+            let dir = model_dir(&request.root)?;
+            let Some(model) =
+                Model::load_dir_if_present(&dir).map_err(|error| error.to_string())?
+            else {
+                return Ok(inactive(json!({
+                    "sentence": sentence,
+                    "total": 0,
+                    "matches": [],
+                })));
+            };
             let found = locate(&model, sentence);
             let total = found.len();
             let matches: Vec<_> = found.into_iter().take(*limit).collect();
@@ -298,6 +460,71 @@ mod tests {
     }
 
     #[test]
+    fn declare_projects_the_kind_the_row_the_approval_and_a_move() {
+        let request = project(&[
+            "authority",
+            "declare",
+            "--kind",
+            "decision-kind",
+            "--row",
+            r#"{"id":"d","owner":"o"}"#,
+            "--approved-by",
+            "q-1",
+            "--plan",
+            "plans/p",
+            "--move",
+        ])
+        .unwrap();
+        let Action::Declare {
+            kind,
+            row,
+            approved_by,
+            plan,
+            move_owner,
+        } = request.action
+        else {
+            panic!("not a declare");
+        };
+        assert_eq!(kind, Kind::DecisionKind);
+        assert_eq!(row["owner"], "o");
+        assert_eq!(approved_by.as_deref(), Some("q-1"));
+        assert_eq!(plan, Some(PathBuf::from("plans/p")));
+        assert!(move_owner);
+    }
+
+    #[test]
+    fn declare_refuses_a_missing_or_unknown_kind_a_missing_or_bad_row_and_an_argument() {
+        let row = r#"{"id":"d"}"#;
+        assert!(project(&["authority", "declare", "--row", row]).is_err());
+        assert!(project(&["authority", "declare", "--kind", "thing", "--row", row]).is_err());
+        assert!(project(&["authority", "declare", "--kind", "door"]).is_err());
+        assert!(project(&["authority", "declare", "--kind", "door", "--row", "{nope"]).is_err());
+        assert!(project(&["authority", "declare", "--kind", "door", "--row", row, "extra"]).is_err());
+        assert!(
+            project(&["authority", "declare", "--kind", "door", "--row", row, "--bogus"]).is_err()
+        );
+    }
+
+    #[test]
+    fn the_fgos_repository_keeps_its_model_in_the_tree_and_every_other_project_under_dot_fgos() {
+        let own = std::env::temp_dir().join(format!("fgos-model-dir-own-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&own);
+        let contract = own.join(OWN_CONTRACT);
+        std::fs::create_dir_all(contract.parent().unwrap()).unwrap();
+        std::fs::write(&contract, "{}").unwrap();
+        assert_eq!(model_dir(&own).unwrap(), own.join(MODEL_DIR));
+        let _ = std::fs::remove_dir_all(&own);
+
+        let other = std::env::temp_dir().join(format!("fgos-model-dir-other-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&other);
+        std::fs::create_dir_all(other.join(".fgos")).unwrap();
+        let dir = model_dir(&other).unwrap();
+        assert!(dir.ends_with(".fgos/authority/model"), "{}", dir.display());
+        assert!(!dir.starts_with(other.join(MODEL_DIR)));
+        let _ = std::fs::remove_dir_all(&other);
+    }
+
+    #[test]
     fn model_projects_with_no_arguments_and_refuses_any_option() {
         let request = project(&["authority", "model"]).unwrap();
         assert!(matches!(request.action, Action::Model));
@@ -338,6 +565,7 @@ mod tests {
             &root.join("packages/component-authority/model"),
         );
         for file in [
+            OWN_CONTRACT,
             "docs/platform/component-boundary.md",
             "docs/platform/README.md",
             "docs/platform/governance.md",
