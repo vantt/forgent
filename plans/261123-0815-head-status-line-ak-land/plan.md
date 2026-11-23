@@ -35,7 +35,7 @@ No new status-line fields beyond the branch, no sidecar contract change, no chan
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | Review the branch against the acceptance criteria (read-only review unit), fix findings, land on main | - | apps/fgos/src/wiring/session_rotation_hook.rs, plans/reports/implementation-261123-0720-head-status-line-ak-layout.md | 1 | ready |
+| 1 | Review the branch against the acceptance criteria (read-only review unit), fix findings, land on main | - | apps/fgos/src/wiring/session_rotation_hook.rs, plans/reports/implementation-261123-0720-head-status-line-ak-layout.md | 1 | parked: review clean and tests green, but land refused land-abandoned-writer-mismatch on pending op land-2284648-1795396711999066914-1; needs fgos git recover by its writer (event 6f42143bf10d80ac, reports/lead-261123-0822-head-status-line-ak-land.md) |
 
 ## Owner questions
 None. A review finding that would change the sidecar contract or the exactness of ctx/quota is escalated, not fixed.
