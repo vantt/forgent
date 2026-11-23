@@ -9,9 +9,6 @@ use std::path::{Path, PathBuf};
 use fgos_execution::bind::{seat_config_digest, BindSession};
 use fgos_execution::decide::CheckoutFacts;
 use fgos_execution::ports::Machine;
-use fgos_execution::seat_resolver::bind_seat_of;
-use fgos_execution_engine::accounts::rotation::walk_state_of;
-use fgos_execution_engine::planning::bind_facade::{bind, AccountStateSource, BindContext};
 use fgos_execution_engine::assignment_runner::attempt::*;
 use fgos_execution_engine::assignment_runner::execute::*;
 use fgos_execution_engine::assignment_runner::inputs::*;
@@ -118,35 +115,23 @@ impl Machine for FullMachine {
     }
 }
 
-/// The lease state a Rust-owned case records, handed to the bind as the run's bind read it.
-struct RecordedState(Value);
-impl AccountStateSource for RecordedState {
-    fn overlay(&self, _: u64) -> Value {
-        self.0.clone()
-    }
-}
-
 /// What the real bind computes from the state a Rust-owned case records: the config digest and the account view
 /// digest the record must carry for the recheck to reproduce it.
 fn bound_digests(case: &Value, unit_record: &Value, config: &Value) -> (String, String) {
     let attempt = &unit_record["bindings"]["producer/1"][0];
     let id = attempt["assignmentId"].as_str().unwrap();
     let state = attempt.get("accountState");
-    let replayed = state.map(|s| RecordedState(s["overlay"].clone()));
-    let at = state.and_then(|s| s["at"].as_u64()).unwrap_or(0);
-    let mut ask = bind_seat_of(unit_record, "producer");
-    ask["unit"] = unit_record["unit"].clone();
-    ask["readOnly"] = json!(false);
-    ask["overrides"] = json!([]);
-    let walk = walk_state_of(unit_record, "producer", "1", id);
-    let context = BindContext {
-        runner_config: config,
-        session: BindSession::default(),
-        machine: &FullMachine,
-        accounts: replayed.as_ref().map(|r| r as &dyn AccountStateSource),
-    };
-    let bound = bind(&ask, &context, &walk, false, at)
-        .unwrap_or_else(|e| panic!("{}: the bind failed: {e}", case["name"]));
+    let bound = replay_bind(
+        unit_record,
+        "producer",
+        "1",
+        id,
+        config,
+        state,
+        BindSession::default(),
+        &FullMachine,
+    )
+    .unwrap_or_else(|e| panic!("{}: the bind failed: {e}", case["name"]));
     let digest = |key: &str| {
         bound["bindingInput"][key]
             .as_str()
