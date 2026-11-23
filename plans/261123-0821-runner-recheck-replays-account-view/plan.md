@@ -176,6 +176,10 @@ and when it deletes the recorder it must keep the Rust-owned legality cases this
 None. The discussion settled the direction, and the evidence settled the remaining choices (what to record, and the
 Node twin).
 
+- `q-7x7b33ekew` (phase 01, land blocked by a foreign pending Land `land-3689269-1795400075015143607-2`): closed on the
+  owner's order 2026-11-23 11:01, handled and no longer needed. lead:SUPERVISOR ran `fgos git recover`, lands settled,
+  and phase 1 then landed as `2b903592c` (`plans/reports/supervisor-261123-1050-land-stranded-local-main-recovered.md`).
+
 ## Risks and rollback
 
 - **The digest might not reproduce for an honest record.** The bind's `now` and the overlay's `now` could differ, or
