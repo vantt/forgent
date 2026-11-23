@@ -19,8 +19,6 @@ allowed:
   - path: packages/execution/rust/src/checks.rs
     reason: names `worktreeSetup` in a check message; it provisions nothing
 debt:
-  - path: src/cli/command-registry.mjs
-    reason: names `worktreeSetup` in the description text of the `worktree` verb
   - path: src/runner/repo-locks.mjs
     reason: its creation helpers register a checkout through the Git port; their one production caller is unit-handoff, and they are deleted when it moves to the checkout door
   - path: src/workflow/unit-handoff.mjs

@@ -155,7 +155,7 @@ export const COMMAND_REGISTRY = [
     name: 'worktree', invoke: 'fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--bare] | fgos worktree remove <path> --delivered-to <ref> [--discard-ignored]',
     description: 'Create a registered worker checkout under worktree-admin, provisioned by default, or remove one after proving it clean, idle and delivered.',
     subcommands: { create: {
-      description: 'Create a named branch or a detached checkout (the default), then provision it: dependency install when its package.json declares dependencies, the project\'s worktreeSetup.commands, and the ignored skill directories of the main checkout. A failing setup command fails the verb and leaves the checkout in place.',
+      description: 'Create a named branch or a detached checkout (the default), then provision it: dependency install when its package.json declares dependencies, the project\'s worktree setup commands, and the ignored skill directories of the main checkout. A failing setup command fails the verb and leaves the checkout in place.',
       parameters: { type: 'object', properties: { path: { type: 'string' }, branch: { type: 'string' }, detach: { type: 'boolean' }, base: { type: 'string' }, bare: { type: 'boolean', description: 'Make the checkout without provisioning (no dependency install, setup commands or skill roots).' } }, positional: ['path'], required: ['path'] },
       examples: ['fgos worktree create ../worker --branch task/example', 'fgos worktree create ../scratch --detach', 'fgos worktree create ../scratch --detach --bare'],
     }, remove: {

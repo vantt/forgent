@@ -31,7 +31,7 @@
       ],
       "subcommands": {
         "create": {
-          "description": "Create a named branch or a detached checkout (the default), then provision it: dependency install when its package.json declares dependencies, the project's worktreeSetup.commands, and the ignored skill directories of the main checkout. A failing setup command fails the verb and leaves the checkout in place.",
+          "description": "Create a named branch or a detached checkout (the default), then provision it: dependency install when its package.json declares dependencies, the project's worktree setup commands, and the ignored skill directories of the main checkout. A failing setup command fails the verb and leaves the checkout in place.",
           "parameters": {
             "type": "object",
             "properties": {
