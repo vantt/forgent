@@ -1,7 +1,7 @@
 ---
 id: p-ekqtvofdoh
 title: "The supervisor's admission marks a plan running without `base` or `lead`, so plan-contract-check fails (supervision, priority medium; source: supervisor, 2026-11-20, plan 261119-1730-supervision-powers-cores admitted in 2bc1ed73f)"
-status: proposed
+status: done
 priority: P2
 area: supervision
 created: 2026-11-20

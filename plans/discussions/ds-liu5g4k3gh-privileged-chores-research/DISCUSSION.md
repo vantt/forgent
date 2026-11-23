@@ -1,5 +1,5 @@
 ---
-id: ds-privileged-chores
+id: ds-liu5g4k3gh
 title: "Heads that keep work moving without the owner: motivation and capability — DISCUSSION"
 status: open
 source: [p-g5ktat4kej]

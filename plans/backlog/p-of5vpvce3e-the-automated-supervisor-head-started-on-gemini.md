@@ -1,7 +1,7 @@
 ---
 id: p-of5vpvce3e
 title: "The automated supervisor head started on Gemini, which is too weak to coordinate (supervisor, priority high; source: owner via Miu, 2026-11-21)"
-status: proposed
+status: done
 priority: P1
 area: supervisor
 created: 2026-11-21

@@ -1,7 +1,7 @@
 ---
 id: p-ndortdckid
 title: "Heads cannot record friction, so troubles of the secretary and supervisor are never captured (observe, priority high; source: owner via Miu, 2026-11-21)"
-status: proposed
+status: done
 priority: P1
 area: observe
 created: 2026-11-21

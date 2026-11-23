@@ -1,7 +1,7 @@
 ---
 id: p-s2t244hkqj
 title: "A judge at the seat-binding point that can swap a coordinating head to another provider family of enough quality (runner, priority medium; source: owner via Miu, 2026-11-21)"
-status: proposed
+status: done
 priority: P2
 area: runner
 created: 2026-11-21

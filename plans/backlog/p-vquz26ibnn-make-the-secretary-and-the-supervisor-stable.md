@@ -1,7 +1,7 @@
 ---
 id: p-vquz26ibnn
 title: "Make the secretary and the supervisor stable and fully able before any other work moves (session-host, priority high and first after the release hold; source: owner via Miu, 2026-11-21)"
-status: proposed
+status: done
 priority: P1
 area: session-host
 created: 2026-11-21

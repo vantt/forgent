@@ -18,3 +18,8 @@ verbs, not a separate `fgos pkm` command.
 `fgos doc locate` answers a draft with ranked candidate documents and a suggested home, from an index a detached
 worker keeps fresh; doctor reports the index and model state; licences ship; recall on the gold set is measured.
 The plan is `plans/261122-2217-docos-pkm-locate-door/plan.md`.
+
+
+# Notes
+
+Note section added by head:supervisor-forgent on 2026-11-24 so the backlog index check passes; no content change.

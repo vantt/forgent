@@ -1,7 +1,7 @@
 ---
 id: p-4uqiyjwrtd
 title: "A live idle lead raises no event, so nobody notices it has stopped (supervisor, priority high; source: owner via Miu, 2026-11-22)"
-status: proposed
+status: done
 priority: P1
 area: supervisor
 created: 2026-11-22

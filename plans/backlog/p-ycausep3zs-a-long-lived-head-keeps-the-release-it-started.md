@@ -1,7 +1,7 @@
 ---
 id: p-ycausep3zs
 title: "A long-lived head keeps the release it started with, so a route fix never reaches it (session-host, priority high; source: lead:SUPERVISION, 2026-11-19, plan 261119-1142 phase 1 rerun)"
-status: proposed
+status: done
 priority: P1
 area: session-host
 created: 2026-11-19

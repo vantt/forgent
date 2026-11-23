@@ -137,3 +137,21 @@ steps 2-6. The probe runs from a supervisor and a secretary started after the ne
 - Left: Miu's rows, the suite result, the changelog on main, then phase 11 and the plan `done`.
 
 Supervisor, 2026-11-24 01:50 +07 (event 67369ca905e0f96d): the lead is gone and is not restarted while the plan only waits. Parked on the unconfined full-suite run started 01:38 on `main` `980d1276d` (docs-only since): `npm test` then `cargo test --workspace`, logs `.fgos/runtime/tmp/suite-npm.log` and `.fgos/runtime/tmp/suite-cargo.log` (each ends with an `exit N` line). The next supervisor wake that finds both exit lines starts the lead again; the lead reads the logs and closes from them.
+
+### Phase 11 is `done` by owner order, with three items carried (2026-11-24 02:20, head:lead-forgent-261122-0118-heads-b52f9)
+
+- The owner, through the manual supervisor session, ordered: paste the six CHANGELOG lines, write
+  `reports/head-grant-probe.md`, close phase 11 and the plan, and name whatever of Miu's probe is missing.
+- Step 1 (suite): read from `plans/reports/report-261124-0215-manual-supervisor-suite-and-release.md` (`292290ffe`). The
+  suite is not green. One cargo red is this plan's own: `head_request`
+  `the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks`. Phase 2's `31dcaab69` added `config patch`
+  to the contract but not to the test's expected list (`packages/run-supervisor/rust/tests/head_request.rs:883`). The fix
+  is one line in the test, a path outside the current footprint. **Carried to the supervisor.**
+- Step 2 (changelog): **not landed by this lead.** `CHANGELOG.md` is read-only in this lead's sandbox (`touch`: Read-only
+  file system), and the run door refuses it (`write-outside-footprint`). The six lines are still verbatim in
+  `reports/carry-p11-changelog-lines.md`. **Carried to the supervisor** or to an unconfined hand.
+- Step 4-5 (probe report): `reports/head-grant-probe.md` is final. It has the supervisor's 30 rows and the folded-rows
+  check. **Miu's rows are missing**: no `reports/head-grant-probe-secretary.json` exists, so the secretary's verbs, its
+  `plans/backlog.md` write and its `TMPDIR` stay unproven from a live secretary. **Carried to the supervisor.**
+- Acceptance 1 is met for the supervisor only, and acceptance 5 is not met. Both are closed by owner order with the
+  gaps above named.

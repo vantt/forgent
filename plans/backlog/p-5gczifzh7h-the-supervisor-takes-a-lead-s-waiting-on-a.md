@@ -1,7 +1,7 @@
 ---
 id: p-5gczifzh7h
 title: "The supervisor takes a lead's \"waiting on a background shell\" at its word and never checks that the wait is still going (supervisor, priority high; source: owner, 2026-11-21 22:29, \"rất nhiều pane idle mà không ai quan tâm, watcher không để ý à\")"
-status: proposed
+status: done
 priority: P1
 area: supervisor
 created: 2026-11-21

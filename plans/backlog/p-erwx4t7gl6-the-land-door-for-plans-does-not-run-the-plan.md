@@ -1,7 +1,7 @@
 ---
 id: p-erwx4t7gl6
 title: "The land door for `plans/` does not run the plan check, and the secretary cannot run it (session-host, priority high; source: owner via Miu, 2026-11-20)"
-status: proposed
+status: done
 priority: P1
 area: session-host
 created: 2026-11-20

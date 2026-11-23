@@ -1,7 +1,7 @@
 ---
 id: p-d3ub553ogh
 title: The secretary head's sandbox has no TMPDIR (agent confinement, priority low)
-status: proposed
+status: done
 priority: P3
 area: agent-confinement
 created: 2026-11-19

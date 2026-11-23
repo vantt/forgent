@@ -4,11 +4,12 @@ title: "HARDEN vòng tiếp: làm cứng từng tầng còn Node theo vòng lặ
 status: paused
 source:
   - p-2qle2tjflb
-  - ds-wham5txfkv (Appendix A at commit 97a1fba58; §3, §4, §6)
 created: 2026-11-23
 ---
 
 discussion: paused
+
+Builds on discussion ds-wham5txfkv (Appendix A at commit 97a1fba58; §3, §4, §6).
 
 Opened by the secretary for backlog row `plans/backlog/p-2qle2tjflb-harden-next-round-per-layer-loop-for-the-remaining-node-layers.md`.
 This file is the source of truth for "HARDEN next round". Its seed was Appendix A of

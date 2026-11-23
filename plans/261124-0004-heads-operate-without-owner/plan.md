@@ -64,7 +64,7 @@ footprint:
   - .fgos/config.yaml
   - CHANGELOG.md
 source:
-  - plans/discussions/privileged-chores-research/DISCUSSION.md
+  - plans/discussions/ds-liu5g4k3gh-privileged-chores-research/DISCUSSION.md
   - p-g5ktat4kej
   - p-v6xinnjoxh
   - p-dw3h5wscns
@@ -78,7 +78,7 @@ created: 2026-11-24
 # Heads operate without the owner
 
 Mode: standard. Decisions cited by their discussion ids (PC-D1 to PC-D11) from
-`plans/discussions/privileged-chores-research/DISCUSSION.md`; none is reopened here. PC-D11 (owner, 2026-11-24
+`plans/discussions/ds-liu5g4k3gh-privileged-chores-research/DISCUSSION.md`; none is reopened here. PC-D11 (owner, 2026-11-24
 00:14) fixes three things this plan follows: it is a separate plan, it runs after the doors plan and 0118 and before
 0056, and its new code is Rust: the table, forwarder, `can-i` and release code live in `packages/session-host/rust`, the first slice of plan 3 of the Node-to-Rust inventory
 (`plans/discussions/ds-wham5txfkv-node-rust-port-inventory/DISCUSSION.md`); the rest of session-host is not ported

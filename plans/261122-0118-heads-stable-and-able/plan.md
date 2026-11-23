@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Make the secretary and the supervisor heads stable and fully able: head verbs, plan check at the land door, provider floor, release pickup, rotation recovery, idle and wake tuning, live grant probe"
-status: running
+status: done
 lead: head:lead-forgent-261122-0118-heads-b52f9
 priority: P1
 blockedBy: []
@@ -125,6 +125,16 @@ the grants, verb by verb.
 
 ## Phases
 
+### Plan `done` by owner order, three items carried (2026-11-24 02:20, head:lead-forgent-261122-0118-heads-b52f9)
+
+- Every phase is `done`. Phase 11 closed on the owner's order relayed by the manual supervisor session. Details are in
+  `phase-11-integration-and-probe.md` and `reports/head-grant-probe.md`.
+- Carried to the supervisor, none of which this lead can do from its sandbox or footprint:
+  1. **A red this plan caused.** Add `"config patch"` to the expected verb list in
+     `packages/run-supervisor/rust/tests/head_request.rs:883`. Phase 2's `31dcaab69` put it in the contract only.
+  2. Land the six lines of `reports/carry-p11-changelog-lines.md` under `## [Unreleased]` in `CHANGELOG.md`.
+  3. Miu's live probe (`reports/head-grant-probe-secretary.json`) never ran. The secretary rows are unproven.
+
 ### Owner answer (2026-11-23 17:15, recorded by head:supervisor-forgent)
 
 - `q-nudu6zlusf`: fix the grant. The secretary and supervisor rows of `GRANTS` gain `plans/backlog.md` and nothing
@@ -144,7 +154,7 @@ the grants, verb by verb.
 | 8 | [Question relay is recorded and measured](phase-08-question-relay-measure.md) | 7 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/question-relay.md | 3 | done |
 | 9 | [One watcher tuning change, measured after](phase-09-watcher-tuning.md) | 1, 4, 7 | .fgos/config.yaml, plans/261122-0118-heads-stable-and-able/reports/after-wake-and-idle.md | 3 | done |
 | 10 | [The secretary wakes on new questions or mail](phase-10-secretary-wake.md) | 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, plans/261122-0118-heads-stable-and-able/reports/secretary-wake.md | 4 | done |
-| 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md, test/session-host/head-start.test.mjs, test/session-host/head-permission-mode.test.mjs | 5 | running |
+| 11 | [Integration gate and live grant probe](phase-11-integration-and-probe.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13 | test/live/head-grant-probe.live.mjs, CHANGELOG.md, plans/261122-0118-heads-stable-and-able/reports/head-grant-probe.md, test/session-host/head-start.test.mjs, test/session-host/head-permission-mode.test.mjs | 5 | done |
 | 12 | [Rotation reliability](phase-12-rotation-reliability.md) | 6 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, packages/session-host/contracts/rotation-files.v1.json, docs/platform/session-host/spec.md, apps/fgos/src/wiring/session_rotation_hook.rs | 4 | done |
 | 13 | [Heads may write the backlog index file](phase-13-backlog-index-grant.md) | 2 | src/session-host/head-grants.mjs, test/session-host/head-grants.test.mjs | 4 | done |
 

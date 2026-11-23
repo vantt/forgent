@@ -1,7 +1,7 @@
 ---
 id: p-bakpfrvigb
 title: "A head rotation whose detached executor dies after starting the successor leaves the successor running and `rotation.json` behind (session-host, priority medium; source: review of the rotation executor, 2026-11-18)"
-status: proposed
+status: done
 priority: P2
 area: session-host
 created: 2026-11-18

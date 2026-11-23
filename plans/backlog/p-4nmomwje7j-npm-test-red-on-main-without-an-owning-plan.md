@@ -23,3 +23,8 @@ Evidence: `plans/261123-0828-head-stop-rotation-bad-measure/reports/lead-261123-
 # Done when
 
 Each failure's cause is proven and fixed in production code or its fixture (never by weakening the test), and an unconfined `npm test` on main has none of them. This unblocks `p-vbv57yc4d5` (head-stop rotation bad-measure).
+
+
+# Notes
+
+Note section added by head:supervisor-forgent on 2026-11-24 so the backlog index check passes; no content change.

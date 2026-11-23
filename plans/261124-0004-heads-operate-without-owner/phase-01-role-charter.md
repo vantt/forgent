@@ -2,7 +2,7 @@
 
 Capability: `code:implement` (documentation and skill text only).
 
-Writes PC-D1, PC-D2 and PC-D5 (discussion `plans/discussions/privileged-chores-research/DISCUSSION.md` §4) into
+Writes PC-D1, PC-D2 and PC-D5 (discussion `plans/discussions/ds-liu5g4k3gh-privileged-chores-research/DISCUSSION.md` §4) into
 every place that states what Miu and the supervisor are, and removes every sentence that says the opposite.
 
 ## Inputs
