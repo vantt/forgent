@@ -150,6 +150,18 @@ fn a_ready_index_answers_with_repository_paths_axes_and_the_region_flag() {
         "a call with two parts carries a group hint"
     );
 
+    // A gold set written in repository paths is measured on vault paths and reported back in repository paths.
+    let measured = locator
+        .eval(
+            "cases:\n  - id: land\n    text: \"the land door rebases and pushes branches to main\"\n    expect:\n      - {path: docs/platform/git/decisions/land-door.md, section: [\"Decision\"]}\n",
+        )
+        .unwrap();
+    assert_eq!(measured["recall@3"], 1.0, "{measured}");
+    assert_eq!(
+        measured["results"][0]["top"][0], "docs/platform/git/decisions/land-door.md",
+        "{measured}"
+    );
+
     let stop = pkm_core::search::stop_worker(&p.docs_root, &opts, Duration::from_secs(30));
     assert!(stop.is_ok(), "{stop:?}");
     assert_eq!(worker.join().unwrap(), 0);

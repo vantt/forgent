@@ -2577,12 +2577,14 @@ export const COMMAND_REGISTRY = [
             'draft-file': { type: 'string', description: 'A file holding one draft part (repeatable).' },
             area: { type: 'string', description: 'Guessed area value (repeatable): a folder under docs/platform/ with a spec.md, or "platform".' },
             question: { type: 'string', description: 'Guessed question value (repeatable): current-truth, obligation, rationale, choice, direction, procedure, pitfall, lookup, proof, navigation or past-state.' },
+            eval: { type: 'string', description: 'Measure locate over a gold set in pkm\'s gold format (repository paths) instead of answering a draft: recall@3, recall@10, right section first and the misses. Refused unless the index is ready.' },
           },
           required: [],
         },
         examples: [
           'fgos doc locate --draft "A worktree with live uncommitted work must not be reclaimed." --json',
           'fgos doc locate --draft-file draft.md --area git --question current-truth',
+          'fgos doc locate --eval docs/platform/documentation/subcomponents/document-identity/verification/recall/locate-gold-short.yaml --json',
         ],
       },
       index: {

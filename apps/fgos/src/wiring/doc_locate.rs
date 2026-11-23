@@ -6,7 +6,7 @@
 
 use super::agents::PayloadRoot;
 use crate::routing::Call;
-use fgos_documentation::locate::locate;
+use fgos_documentation::locate::{ensure_worker, locate};
 use fgos_documentation::pkm::{self, EmbedderChoice, LocatePaths, PkmLocator, ResetOutcome};
 use fgos_documentation::port::{Answer, IndexKind, LocateError, Query, WorkerLauncher};
 use fgos_documentation::profile;
@@ -95,6 +95,11 @@ pub enum DocVerb {
         query: Query,
         json: bool,
     },
+    /// `doc locate --eval <gold>`: the gold set's text, in pkm's gold format with repository paths.
+    LocateEval {
+        gold: String,
+        json: bool,
+    },
     IndexRun,
     /// `wait`: seconds to wait for the index to be ready or broken before answering.
     IndexStatus {
@@ -112,7 +117,7 @@ pub enum DocVerb {
 impl DocRequest {
     pub fn operation_id(&self) -> &'static str {
         match self.verb {
-            DocVerb::Locate { .. } => LOCATE_OPERATION_ID,
+            DocVerb::Locate { .. } | DocVerb::LocateEval { .. } => LOCATE_OPERATION_ID,
             DocVerb::IndexRun
             | DocVerb::IndexStatus { .. }
             | DocVerb::IndexStop { .. }
@@ -141,24 +146,33 @@ fn values(parsed: &ParsedArgs, name: &str, sub: &str) -> Result<Vec<String>, Cat
     }
 }
 
-/// Reads `doc locate --draft <text>... --draft-file <path>... [--area <v>]... [--question <v>]... [--json]` and
-/// `doc index run`. A draft file is read here, so an unreadable one is the caller's error.
+/// Reads `doc locate --draft <text>... --draft-file <path>... [--area <v>]... [--question <v>]... [--json]`,
+/// `doc locate --eval <gold> [--json]` and `doc index ...`. A draft or gold file is read here, so an unreadable one is
+/// the caller's error.
 pub fn project_request(args: &[OsString], root: PathBuf) -> Result<DocRequest, CategorisedRefusal> {
     let call = Call::new(args);
     let verb = match call.sub_word() {
         Some("locate") => {
             let repeated = parse_args_repeating(args.get(1..).unwrap_or_default(), REPEATED_FLAGS)
                 .map_err(|e| validation(e.to_string()))?;
+            let json = call.switch("json").map_err(validation)?;
             let mut parts = values(&repeated, "draft", "locate")?;
             for file in values(&repeated, "draft-file", "locate")? {
-                let path = if Path::new(&file).is_absolute() {
-                    PathBuf::from(&file)
-                } else {
-                    std::env::current_dir().unwrap_or_default().join(&file)
-                };
-                let text = std::fs::read_to_string(&path)
-                    .map_err(|e| validation(format!("doc locate --draft-file {file}: {e}")))?;
-                parts.push(text);
+                parts.push(read_caller_file(&file, "draft-file")?);
+            }
+            if let Some(file) = call.value("eval").map_err(validation)? {
+                if !parts.is_empty() {
+                    return Err(validation(
+                        "doc locate --eval measures a gold set; it takes no --draft or --draft-file",
+                    ));
+                }
+                return Ok(DocRequest {
+                    root,
+                    verb: DocVerb::LocateEval {
+                        gold: read_caller_file(&file, "eval")?,
+                        json,
+                    },
+                });
             }
             DocVerb::Locate {
                 query: Query {
@@ -166,7 +180,7 @@ pub fn project_request(args: &[OsString], root: PathBuf) -> Result<DocRequest, C
                     area: values(&repeated, "area", "locate")?,
                     question: values(&repeated, "question", "locate")?,
                 },
-                json: call.switch("json").map_err(validation)?,
+                json,
             }
         }
         Some("index") => match call.parsed().positional.get(1).map(String::as_str) {
@@ -207,6 +221,17 @@ pub fn project_request(args: &[OsString], root: PathBuf) -> Result<DocRequest, C
         }
     };
     Ok(DocRequest { root, verb })
+}
+
+/// A file the caller named, relative to the working directory; an unreadable one is the caller's error.
+fn read_caller_file(file: &str, flag: &str) -> Result<String, CategorisedRefusal> {
+    let path = if Path::new(file).is_absolute() {
+        PathBuf::from(file)
+    } else {
+        std::env::current_dir().unwrap_or_default().join(file)
+    };
+    std::fs::read_to_string(&path)
+        .map_err(|e| validation(format!("doc locate --{flag} {file}: {e}")))
 }
 
 /// The adapter's paths for the project at `root`.
@@ -304,6 +329,70 @@ fn answer_locate(root: &Path, query: &Query) -> Result<Answer, CategorisedRefusa
         LocateError::Invalid(message) => validation(message),
         LocateError::Failed(message) => CategorisedRefusal::unexpected(message),
     })
+}
+
+/// The locate measurement over a gold set, only on a ready index: a partial index would measure the text branch
+/// alone. When the index is not ready the worker is started, so a later call finds it ready.
+fn answer_eval(root: &Path, gold: &str) -> Result<serde_json::Value, CategorisedRefusal> {
+    let paths = locate_paths(root);
+    if !paths.docs_root.is_dir() {
+        return Err(CategorisedRefusal::new(
+            "precondition",
+            format!(
+                "no corpus to measure: {} is not a directory [no-docs]",
+                paths.docs_root.display()
+            ),
+        ));
+    }
+    profile::write_if_changed(&paths.docs_root, &paths.profile).map_err(|e| {
+        CategorisedRefusal::unexpected(format!("cannot write the locate profile: {e}"))
+    })?;
+    let launcher = ProcessLauncher {
+        root,
+        paths: &paths,
+    };
+    let status = pkm::index_status(&paths, None);
+    if status.state != IndexKind::Ready {
+        let started = ensure_worker(&launcher).unwrap_or(false);
+        return Err(CategorisedRefusal::new(
+            "precondition",
+            format!(
+                "the locate index is {}{}{}; run `fgos doc index status --wait 900` and measure again [index-not-ready]",
+                kind_name(status.state),
+                status
+                    .eta_s
+                    .map(|s| format!(", about {s} s left"))
+                    .unwrap_or_default(),
+                if started { "; the index worker was started" } else { "" }
+            ),
+        ));
+    }
+    PkmLocator::open(&paths, EmbedderChoice::Model)
+        .eval(gold)
+        .map_err(|e| {
+            let error = e["error"]
+                .as_str()
+                .map_or_else(|| e.to_string(), str::to_owned);
+            if e.get("state").is_some() {
+                CategorisedRefusal::new("precondition", format!("{error} [index-not-ready]"))
+            } else {
+                validation(error)
+            }
+        })
+}
+
+/// The measurement as a person reads it.
+fn eval_text(out: &serde_json::Value) -> String {
+    format!(
+        "{} cases, {} with an owner: recall@3 {}, recall@10 {}; right section first {} of {}; {} misses\n",
+        out["cases"],
+        out["owned"],
+        out["recall@3"],
+        out["recall@10"],
+        out["section"]["first"],
+        out["section"]["cases"],
+        out["misses"].as_array().map_or(0, Vec::len)
+    )
 }
 
 /// The answer as a person reads it: the state when partial, then each part's candidates.
@@ -446,6 +535,11 @@ fn answer(
                 data,
                 exit: 0,
             })
+        }
+        DocVerb::LocateEval { gold, json } => {
+            let out = answer_eval(&request.root, gold)?;
+            let text = eval_text(&out);
+            completed(&out, *json, text)
         }
         DocVerb::IndexRun => {
             let code = pkm::run_worker(&locate_paths(&request.root), EmbedderChoice::Model);
