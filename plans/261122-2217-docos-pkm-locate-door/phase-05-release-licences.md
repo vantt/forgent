@@ -35,3 +35,11 @@ ORT's own ThirdPartyNotices is referenced by pkm's notice, not copied (same as p
 ## Rollback
 
 Revert the commit.
+
+## As built (2026-11-23)
+
+- `packages/documentation/third-party/pkm/third-party.json` and `LICENSE`: byte copies from pkm v0.7.0 (LICENSE sha256
+  ba86d89c...501a, with the heading `Grant to fgOS`).
+- `packages/documentation/rust/tests/third_party.rs` proves both copies (sha2 added as a dev-dependency).
+- `package.json` `files` gains `packages/documentation/third-party`; `test/rust-host/release-tree.test.mjs` asserts both
+  files are in the staged payload. That test passed 3/3 on a release build of this tree.
