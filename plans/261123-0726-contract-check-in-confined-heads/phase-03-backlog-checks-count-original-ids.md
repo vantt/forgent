@@ -1,8 +1,8 @@
 # Phase 3: Backlog checks count a migrated item's Original id
 
 Capability: `code:implement`. Folds `p-mtqil2rpyy` into this plan (owner approval 2026-11-23, relayed by the
-supervisor). The owner question named in plan.md "Owner questions" decides how much of the red run this phase clears.
-Steps 1-4 hold under every option; step 5 depends on the answer.
+supervisor). The owner answered `q-tvhmli3fns` on 2026-11-23: **fix ids, keep the rule, file the 277** (option 1).
+This phase keeps the "every proposed item has a section" rule and does not reconcile the 277 items.
 
 ## Inputs
 
@@ -28,7 +28,7 @@ Steps 1-4 hold under every option; step 5 depends on the answer.
 ## Files it may write
 
 `scripts/check-backlog-reconciliation.mjs`, `scripts/identity-ids-unique.mjs`, `test/scripts/doc-health.test.mjs`.
-With option 2 of the owner question, also `docs/history/backlog-execution-reconciliation/RECONCILIATION.md`.
+Not `docs/history/backlog-execution-reconciliation/RECONCILIATION.md`: under the owner's answer it stays unchanged.
 
 ## Steps
 
@@ -44,10 +44,9 @@ With option 2 of the owner question, also `docs/history/backlog-execution-reconc
 4. Keep both safeguards that the rejected commits broke. The proposed-count cross-check stays an independent
    whole-file line scan (`/^status:\s*proposed\s*$/m`), never derived from the parsed list. A missing addon fails
    loudly through `ensureAddonForScript` in both scripts, never inside a `try/catch` that swallows it.
-5. The answer to the owner question decides this step. Option 1 (recommended): keep the "every proposed item has a
-   section" rule; the 277 unreconciled items go to a separate backlog row that the secretary files. Option 2: the
-   check asserts only that each section names a known item and carries its evidence, and RECONCILIATION.md states
-   that the per-item promise is retired. Option 3: out of this phase; a new phase gets planned.
+5. Keep the rule that every proposed item has a section in RECONCILIATION.md (owner answer to `q-tvhmli3fns`,
+   2026-11-23). Do not narrow the check and do not reconcile items in this phase. The 277 proposed items without a
+   section stay reported; they are a separate backlog row that the secretary files (see plan.md "Owner questions").
 6. One owning proof in `test/scripts/doc-health.test.mjs`, named for the behaviour, for example "backlog checks see a
    migrated item by its Original id". It uses a fixture backlog where a section names an Original id of a done item, a
    new item reuses an old id, and a line-scan/parse disagreement exists. It asserts the named finding, the duplicate,
@@ -56,9 +55,10 @@ With option 2 of the owner question, also `docs/history/backlog-execution-reconc
 ## Verify
 
 - `node scripts/run-tests.mjs test/scripts/doc-health.test.mjs` passes.
-- `node scripts/check-backlog-reconciliation.mjs` no longer reports `tsk-p7-shadow-binders` as an unknown id. With
-  option 1 it reports only the 277 unreconciled items (or fewer, if more items have been reconciled by then). With
-  option 2 it exits 0.
+- `node scripts/check-backlog-reconciliation.mjs` no longer reports `tsk-p7-shadow-binders` as an unknown id; it
+  reports that section as a named finding with the item's id and status. Its remaining findings are only the proposed
+  items without a section (277 on 2026-11-23, fewer if more have been reconciled by then). It still exits non-zero;
+  that is expected until the separate row lands.
 - `rg -n "Original id" scripts` shows the pattern in one place.
 
 ## Rollback

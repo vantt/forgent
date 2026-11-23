@@ -83,8 +83,9 @@ report.
    `plans/261123-0726-contract-check-in-confined-heads/reports/`.
 4. `node scripts/run-tests.mjs test/scripts/doc-health.test.mjs` passes, with one owning proof that the backlog checks
    see a migrated item by its Original id, keep the line-scan cross-check, and fail loudly without the addon.
-   `node scripts/check-backlog-reconciliation.mjs` no longer reports `tsk-p7-shadow-binders` as an unknown id. How
-   much else of its red run clears is set by the owner question below (phase 3 step 5).
+   `node scripts/check-backlog-reconciliation.mjs` no longer reports `tsk-p7-shadow-binders` as an unknown id and
+   still requires a section for every proposed item, so its remaining findings are the unreconciled items only (owner
+   answer to `q-tvhmli3fns`).
 5. `npm test` and `cargo test --workspace` are green on the combined tree (L5).
 
 ## Non-goals
@@ -109,15 +110,14 @@ report.
 | 2 | [Integration: confined proof and gate hand-off](phase-02-integration-and-gate-handoff.md) | 1, 3 | plans/261123-0726-contract-check-in-confined-heads/reports/ | 2 | draft |
 
 Execution: phases 1 and 3 are independent `code:implement` units, each in its own worktree, in wave 1. Phase 2 is a `code:test` unit plus a supervisor
-hand-off note. No two phases share a path. Phase 3 waits on the owner question below; phase 1 does not.
+hand-off note. No two phases share a path.
 
 ## Owner questions
 
-- `q-tvhmli3fns`: Backlog reconciliation is red for 278 reasons, not one: what should the folded original-id phase
-  make true? It blocks phase 3 step 5 only. Phases 1 and 3 are `ready`: phase 3's lead does steps 1-4 and 6, then reads
-  the answer before step 5 and parks only that step if it is still open. The plan is `ready` rather than `draft`
-  because admission starts only `ready` plans (`packages/supervision/rust/src/portfolio.rs:259`). A `draft` plan
-  would hold phase 1, which the question does not touch.
+- `q-tvhmli3fns` (answered 2026-11-23): **fix ids, keep the rule, file the 277.** Phase 3 counts Original ids through
+  one reader, names a section whose item is no longer proposed, and keeps the per-item rule and both safeguards.
+  **For the secretary:** file one backlog row for the 277 proposed items with no RECONCILIATION.md section (measured
+  2026-11-23 on main); `check-backlog-reconciliation.mjs` stays red on them until that row is done.
 
 The owner chose the confined-check fix (option A, 2026-11-23). The supervisor accepted keeping the gate restore in its
 owning plan (heads-stable phase 3) and hands it to that lead after phase 1 lands.
