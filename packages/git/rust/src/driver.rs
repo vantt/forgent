@@ -4527,8 +4527,13 @@ mod tests {
 
         if let Ok(pid_text) = fs::read_to_string(&pid_file) {
             if let Ok(pid) = pid_text.trim().parse::<u32>() {
-                // SAFETY: terminating background process started by this test.
-                unsafe { libc::kill(pid as libc::pid_t, libc::SIGKILL) };
+                // Terminate the background process this test started, by identity so a reused pid is never hit.
+                if let Some(tuple) = fgos_process::facts::identity_of(fgos_process::ProcId(pid)) {
+                    fgos_process::control::signal_by_identity(
+                        &tuple,
+                        fgos_process::control::Signal::Kill,
+                    );
+                }
             }
         }
     }
