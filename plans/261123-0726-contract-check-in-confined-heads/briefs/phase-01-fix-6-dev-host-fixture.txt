@@ -1,0 +1,9 @@
+Fix on phase 1 (plans/261123-0726-contract-check-in-confined-heads/phase-01-one-reuse-or-build-door.md) on this worktree's branch. You may write ONLY test/distribution/native-addon.test.mjs. Do not run git add or git commit; the runner commits.
+
+BLOCKING (land gate, c-22106-1795415214366): the test "development host carries and loads the addon from its per-invocation manifest" (test/distribution/native-addon.test.mjs around line 156) fails with ERR_MODULE_NOT_FOUND: <temp>/checkout/scripts/ort-static.mjs, imported from checkout/scripts/lib/git-addon-stage.mjs. Main commit 7c1ae9c09 made scripts/run-rust-dev-host.mjs (line 9, used at line 134 as ensureOrtStatic(checkoutRoot)) and scripts/lib/git-addon-stage.mjs import scripts/ort-static.mjs, but the fixture's copy list was never updated.
+
+1. Add 'scripts/ort-static.mjs' to that test's list of copied files.
+2. So that the dev host's ensureOrtStatic(checkoutRoot) does not download the 120 MB archive inside the fixture, seed a verified ort cache in the fixture checkout before running the dev host. Seed it the same way the stale-addon test's sub-case 2b already does: write libonnxruntime.a under archiveDirectory(repo) and a `.verified` stamp of `${ARCHIVE_SHA256} ${size} ${mtimeMs}\n`. Reuse the existing archiveDirectory and ARCHIVE_SHA256 import. If both tests then need the same seeding code, extract one small local helper in the test file and call it from both places.
+3. Change nothing else in the test's assertions.
+
+Verify if your sandbox allows: node scripts/run-tests.mjs test/distribution/native-addon.test.mjs. If node is refused, say so plainly.

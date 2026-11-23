@@ -156,3 +156,23 @@ Lead `head:lead-forgent-261123-0726-contra-e554b`, `FGOS_CONFINED=1`, no FGOS_* 
 1. Land p01c when the host has memory headroom, then lift the gate hold (lead:SUPERVISOR's config, not this plan's
    footprint) and confirm the next plan land passes the gate.
 2. One complete trunk `npm test` verdict (lead:SUPERVISOR; needs fewer concurrent leads).
+
+## Gate fix landed (13:3x, deaedf06d)
+
+- Land c-22106-1795415214366 (memory free) failed on one real red: "development host carries and loads the addon from
+  its per-invocation manifest" hit ERR_MODULE_NOT_FOUND for `scripts/ort-static.mjs`. Main commit 7c1ae9c09 made
+  `run-rust-dev-host.mjs` and `git-addon-stage.mjs` import it, but the test fixture's copy list never got it. Fix unit
+  (brief `briefs/phase-01-fix-6-dev-host-fixture.txt`): the file is copied, and one local helper seeds a verified ort
+  cache in both fixtures that need it, so no test downloads the archive.
+- Land c-23512-1795415523790: done, main deaedf06d, gates and `test/distribution/native-addon.test.mjs` green; worktree
+  removed.
+- Check from this head with the activated release's environment (`FGOS_ACTIVE_MANIFEST_PATH`, `FGOS_HOST_BIN`,
+  `FGOS_ACTIVE_RELEASE_PATH` of release df57ddfc…): the script no longer trusts the foreign manifest. It goes to the
+  reuse-or-build door, finds the staged addon stale (digest c499fd3b… vs current 6a39480c…, Rust changed after the
+  a219a04ba restage), and in confinement stops with the named error. In the unconfined land door the same path rebuilds.
+- The gate hold (6d0f6b92c) is lead:SUPERVISOR's to lift. The next plan land after the lift proves the gate.
+
+## Still open for phase 2
+
+1. lead:SUPERVISOR lifts the gate hold, and a plan land passes the gate.
+2. lead:SUPERVISOR's full `cargo test --workspace` and `npm test` on deaedf06d or later (acceptance criterion 5).
