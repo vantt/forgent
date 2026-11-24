@@ -25,3 +25,7 @@ Request came by mail from the manual supervisor. Confirmed by the owner to be op
 - Proposed direction (a), not chosen by the owner yet: `plan-contract-check --plan` treats a legacy plan like `--all` (warn, do not block) when the commit neither adds nor changes the marker. A plan that has the marker, and any commit that touches the marker, stay strictly checked.
 - Numbers: 166 plans, 115 legacy (77 done, 24 draft, 7 running, 3 ready, 4 withdrawn).
 - The 3 legacy plans in `ready` are `261023-1619-collaboration-degree-spec`, `261030-0323-mailbox-v9-wake-on-mail` and `261030-1029-harden-gate-door-two-levels`.
+
+# Decision
+
+On 2026-11-24 the owner chose direction (a): the land gate only warns, as `--all` does, for an old plan that has no `plan-v1` marker. Two guards stay: a plan that has the marker is still checked strictly, and a commit that adds or changes the marker is checked in full. Migrating each plan when it is touched is not chosen. The work is ready for a planner; the row's status stays `proposed` because the backlog uses only `proposed`, `done` and `dropped`.
