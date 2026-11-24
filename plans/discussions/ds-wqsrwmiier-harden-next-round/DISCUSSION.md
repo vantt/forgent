@@ -1,13 +1,13 @@
 ---
 id: ds-wqsrwmiier
 title: "HARDEN vòng tiếp: làm cứng từng tầng còn Node theo vòng lặp của HARDEN, Work để cuối"
-status: paused
+status: settled
 source:
   - p-2qle2tjflb
 created: 2026-11-23
 ---
 
-discussion: paused
+discussion: settled
 
 Builds on discussion ds-wham5txfkv (Appendix A at commit 97a1fba58; §3, §4, §6).
 
@@ -17,30 +17,55 @@ This file is the source of truth for "HARDEN next round". Its seed was Appendix 
 This discussion must block neither `261121-2110-component-authority-doors` nor `261122-0118-heads-stable-and-able`. It enters
 the supervision queue only once it is settled.
 
-## Hand-off to the planner (draft; released only when the wait below clears)
+## Hand-off to the planner (released 2026-11-24 10:2x by owner order)
 
-- **Wait:** `261121-2110-component-authority-doors` and `261122-2108-delete-dead-node-execution-closure` have landed
-  (D6, round 3b order). Before the hand-off, the §6 inventory is recomputed on that tree (§7 step 0).
-- **Outcome:** one skeleton plan, "HARDEN next round", with one phase per layer in the D8 order. Each phase runs the
-  HARDEN per-layer loop (D7) and opens its own sub-plan. When the last phase closes, every layer has a settled target
-  shape in its spec, net size ≤ 0 or paid for, and no Node logic is left. No `legacy-cli` route and no `legacy-node`
-  payload remain.
-- **Constraints:** the loop of `261021-1118` "The per-layer loop", steps 1–9, with council weight set per component by the
-  triage scan (N7) and step 7 on this machine only (N5): a council opens only after the
-  layer below closes, and the owner is asked once per layer, in a batch. RUL104 (better, not bigger). L10 and design
-  principles 1 and 8: a mechanism that moves takes every caller with it, its old path and tests go in the same change,
-  and no twin is left. D1 holds inside each layer. Debt order and the unit of repayment follow D24 and D25. Every sub-plan carries an Authority map (doors phase 5). Work (T7)
-  goes last (D8), and opens only after discussion `ds-ubqlutna6r` (D19) has settled and its plan has landed.
-- **Non-goals:** the domain-agnostic item component (D19, its own discussion `ds-ubqlutna6r`). T0, T1, T4 and T5 are not re-run; HARDEN closed them, and their Node facades go with their last caller
-  (D1). The dead tier-5 closure belongs to `261122-2108`. No new feature (RUL104 "proposed additions" go to the owner per layer).
+- **Outcome:** one skeleton plan, "HARDEN next round". Phase 0 (step 0, D27) comes first, then one phase per layer in the D17
+  order: T2–T3 session, T8 supervision, T6 Workflow (= program step S6b, D18), T9 host, surface, packaging and report, and
+  T7 Work last (= S7, D18). Each layer phase runs the HARDEN per-layer loop (D7) and opens its own sub-plan. When the last
+  phase closes, every layer has a settled target shape in its spec, net size ≤ 0 or paid for, and no Node logic is left.
+  No `legacy-cli` route and no `legacy-node` payload remain.
+- **Gates (open points that block only some parts):**
+  - Phase 0 runs only after doors `261121-2110` has closed (12a, 12b, 12d) and `261122-2108` has landed with doors 12c
+    folded in (O7, D6, D22). The planner can write the skeleton now.
+  - Phase T2–T3 takes its baseline after the control-group bug rows have landed (D20). Its read-only steps 1–3 need no
+    other wait (D12).
+  - Phase T7 opens only after discussion `ds-ubqlutna6r` has settled and its plan has landed (D19). It starts with the
+    decision 78 council (O1), whose first question is keep, shrink or delete Work (D18).
+- **Phase 0 (D27):** rerun the ds-wham5txfkv §5 inventory method on the tree after the gate, and update §6. Run the two H5
+  tests alone (N6). Fill the council weight (full, light or skip) per component from the component-authority model (D13).
+  Build the system-wide job → doors map on the model (D15). Assign each door row whose `retiredBy` names S6b or S7 to phase
+  T6, T7 or T9 (D21). Confirm that T8 is the `supervision` component (N4). Write one report; change no code.
+- **Constraints:** the loop of `261021-1118` "The per-layer loop", steps 1–9. The triage sets the council weight (D13). The
+  council settles the boundary first: authority, contracts and one door. Inside changes it finds necessary go in the same
+  phase (D14). Step 7 runs on this machine only (D11). A council opens only after the layer below closes, and the owner is
+  asked once per layer, in a batch. RUL104 (better, not bigger). L10 and design principles 1 and 8: a mechanism that moves
+  takes every caller with it, its old path and tests go in the same change, and no twin is left. D1 holds inside each layer.
+  The main-checkout delete guard and `p-rypvkc3kai` belong to phase T2–T3 (D12, D23). Debt order follows severity, and a
+  phase is the unit of repayment (D24, D25). A debt repaid alone skips steps 2–3 (D26). Every sub-plan carries an Authority
+  map (doors phase 5).
+- **Non-goals:** the domain-agnostic item component (D19, discussion `ds-ubqlutna6r`). T0, T1, T4 and T5 are not re-run;
+  HARDEN closed them, and their Node facades go with their last caller (D1). The dead tier-5 closure belongs to
+  `261122-2108`. `p-nwife3i4kc` gets its own small plan (D23). The control-group bug rows run on the fast track outside this
+  plan (D20). Debt coordination stays with the secretary and the supervisor; no plan manages it (D23). No new feature
+  (RUL104: "proposed additions" go to the owner per layer).
 - **Acceptance per phase:** the HARDEN close conditions. Before/after table on the same machine and load class; no
-  High-or-above finding left unreproduced; net Δ ≤ 0 or every increase names its paying deletion; doctor and smoke green
-  on the activated release on this machine (the owner lands the other machines; mdview and mcp-skill-hub are out, N5); `npm test` and `cargo test --workspace` green.
-- **Acceptance of the program:** every door row whose `retiredBy` names S6b or S7 is closed (D21); 56 → 0 `legacy-cli` routes in `packages/host-runtime/contracts/command-routes.json`;
-  `git ls-files 'src/*.mjs' 'bin/*.mjs'` is empty; every HARDEN carry-over in §3 is closed or explicitly declined by the owner.
-- **Sources:** `p-vwpnx4gpow`, `261021-1118` (plan, lessons, closing report §6–§7), D1, D6, D7–D9.
+  High-or-above finding left unreproduced; net Δ ≤ 0, or every increase names the deletion that pays for it; doctor and smoke
+  green on the activated release on this machine (D11); `npm test` and `cargo test --workspace` green.
+- **Acceptance of the program:** every door row whose `retiredBy` names S6b or S7 is closed (D21); 56 → 0 `legacy-cli` routes
+  in `packages/host-runtime/contracts/command-routes.json`; `git ls-files 'src/*.mjs' 'bin/*.mjs'` is empty; every HARDEN
+  carry-over in §3 is closed or explicitly declined by the owner.
+- **Sources:** backlog `p-2qle2tjflb`, `p-vwpnx4gpow`; plan `261021-1118` (plan, lessons, closing report §6–§7); program
+  `261114-2051` (rows S6b and S7, D18); D1, D6–D27 in §4.
+
+discussion: settled
 
 ## 1. Trạng thái hiện tại
+
+**Settled 2026-11-24 10:2x by owner order.** Miu confirmed the asks by mail. Asks 1, 2 and 4 are on the supervision queue
+(`0cb8383e9246455c`, `ccc2f09c8d34fef7`, `6a7a2ab4415d29be`, the last of which also carries the S6b/S7 repoint), and the shaper for
+`ds-ubqlutna6r` is running. The owner chose to settle now instead of after step 0. Step 0 therefore becomes phase 0 of the
+skeleton plan (D27), gated on doors closing and `261122-2108` landing, and the hand-off block above is released to a planner.
+No owner question is open.
 
 **Round 14 (2026-11-24 10:0x).** The owner accepted N20, minted as D26. The owner's addition, "step 1 must add: resume
 component-authority", was first read as a model check at every baseline. The owner corrected it ("ý là resume door"): it
@@ -209,7 +234,7 @@ This discussion edits them in place from here on. O7, the N rows and F1 are new 
 | H7 | **S1 hook verdicts** (`git/main-checkout-delete-guard.mjs`, `state/decision-question.mjs`, `runner/hook.mjs`): which layer phase owns them | input | program `261114-2051` row S1 |
 | C5 | The T8 tier name in `layers.json` ("Skill and Domain (no file today)") is stale: the model puts `supervision` at tier 8 and the domains at T7 | input | `layers.json`, `components.json` |
 | O7 | `261122-2108` is `draft`, and its own rule waits for `261122-0118` ("no edit to any file `261122-0118` still edits before it lands"). Step 0 and the hand-off therefore hang on two plans that are not this discussion's to move. | open, blocks step 0 and the hand-off. 2026-11-24: `261122-0118` is `done`, so only `261122-2108` itself (still `draft`, not run by anyone) blocks; doors phase 12c also waits for its phase 8 | `plans/261122-2108-delete-dead-node-execution-closure/plan.md` frontmatter and constraints; doors plan.md phase table |
-| N1 | Step 0 is one read-only pass. It reruns the ds-wham5txfkv §5 inventory method on the tree after doors and `261122-2108`, runs the two H5 tests alone, and names the owning phase for every §6 row and every H or C carry-over. It writes one report and changes no code. | provisional (round 1) | D9; seed §7 step 0; HARDEN loop step 1 |
+| N1 | Step 0 is one read-only pass (minted D27 as phase 0 of the plan). It reruns the ds-wham5txfkv §5 inventory method on the tree after doors and `261122-2108`, runs the two H5 tests alone, and names the owning phase for every §6 row and every H or C carry-over. It writes one report and changes no code. | minted D27 | D9; seed §7 step 0; HARDEN loop step 1 |
 | N2 | Phase T2–T3's steps 1–3 (baseline, council, arbitration, owner ask) are read-only, so they may run while `261122-0118` and `261123-0828` still hold session files. Only its sub-plan (step 4) waits for them to land. | minted D12 | owner 2026-11-23 16:24, "nobody waits on a head that is away"; `261122-0118` footprint `src/session-host/head-grants.mjs` and its tests |
 | N3 | Which phase owns `git/main-checkout-delete-guard.mjs` (505 lines of logic, tier 2): the seed's T9 "H7 hook arm", or phase T2–T3 as its tier suggests. S1's other two verdicts (`state/decision-question.mjs`, `runner/hook.mjs`) are T7 code and go with phase T7. **Answer: phase T2–T3**, because the Rust Git crate already exports `main_checkout_root` (`packages/git/rust/src/lib.rs:40`) and the `hook` route already serves native subcommands (`dispatch-decide`, `mailbox`, …) in `command-routes.json`. The phase's council settles the verdict's authority component. | minted D12 | seed §7 T9; ds-wham5txfkv O5 and H7; `components.yaml` tier 2 `git`; `packages/git/rust/src/lib.rs:40`; `packages/host-runtime/contracts/command-routes.json` `hook` |
 | N4 | "T8" in D8 is the `supervision` component (`src/portfolio`, 1 file of 19 lines, plus `packages/portfolio/*.mjs`). Skill/Domain closed under HARDEN on 2026-11-09 and is not reopened. With so little code, its council is one shared seat round. | provisional (round 1) | `components.yaml` tier 8; closing report §6 row T8 |
@@ -258,6 +283,7 @@ Copied from ds-wham5txfkv §4. They are owner decisions made there and are not r
 | D24 | Each door row records a one-word severity (high: a live twin deciding a live answer that can disagree; medium: a live Node side that only asks the Rust owner; low: a twin reached only by dead code). The model's owner sets it once, and anyone can read it by query. Repayment order: severity first, then the owner's order rule; a plan that unblocks other work may jump. The field is a small change to the component-authority model contract, owned by that component. | owner answer | N18; chat 09:52 "đồng ý N18 chọn (a)" |
 | D25 | The unit of repayment is a phase. A debt whose surviving door already exists and is settled may be repaid alone, ahead of its plan, in a small phase or row of its own, picked by severity and run beside other work when files do not overlap. A debt that depends on an unsettled boundary waits for its layer phase, whose sub-plan orders its debts by severity. Layer phases go one at a time (D8, D17). A debt is done when its guard entry goes. | owner answer | N19; chat 10:00 "đồng ý" |
 | D26 | Repaying a debt inside a layer phase runs that phase's 9-step loop (a council only where the triage says full). A debt repaid alone skips steps 2 and 3 and runs steps 1 and 4–9 (the D20 fast track); if a boundary question appears, it stops and waits for its layer phase. | owner answer | N20; chat 10:0x "đồng ý nhé" |
+| D27 | Step 0 becomes phase 0 of the skeleton plan, run by its lead rather than by this shaper, because the owner settled the discussion before the gate cleared. Phase 0 is gated on doors closing (12a, 12b, 12d) and `261122-2108` landing with 12c. It is read-only and writes one report (scope in the hand-off block). | owner answer | N1; chat 10:2x "đánh dấu thảo luận là settled và chuyển hand-off cho planner" |
 | D16 | Appendix A of ds-wham5txfkv (`97a1fba58`) is history; this discussion is the source of truth for "HARDEN next round". | owner answer | chat 19:23 |
 
 ## 5. Q&A log
@@ -340,6 +366,12 @@ Copied from ds-wham5txfkv §4. They are owner decisions made there and are not r
   the loop table in §6 now starts with the model check.
 - **2026-11-24 10:0x — owner:** "à ý là resume dooor". Correction: the addition meant item 1 of the secretary list, resume the doors
   plan, not a model check at step 1. The step 1 row and D26 were put back; the list in §1 now starts with resuming doors.
+- **2026-11-24 10:2x — owner:** "vậy anh cần gửi cho miu cái gì. thảo luận này còn gì cần chốt?" Answer: nothing more to send,
+  and no decision open; only O7 and step 0 checks remained.
+- **2026-11-24 10:2x — Miu (mail `afee97b365538424`):** asks 1, 2 and 4 raised on the supervision queue and the supervisor woken;
+  the shaper for `ds-ubqlutna6r` was already started.
+- **2026-11-24 10:2x — owner:** "miu nhận rồi, đánh dấu thảo luận là settled và chuyển hand-off cho planner". Minted D27 (step 0
+  becomes the plan's gated phase 0). Marked settled; hand-off released.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -420,11 +452,12 @@ and `scripts/*.mjs` callers of `src/` (each plan moves its own script callers).
 
 *One skeleton plan, phases in D8 order. Each phase opens its own sub-plan from its council, as HARDEN's layer phases did.*
 
-### Step 0 — recount before hand-off {#task-step-0}
+### Phase 0 — recount, gated (D27) {#task-step-0}
 After doors and `261122-2108` land: rerun the §5 inventory method, check H5 (the two reds), update §6, and fill the triage
 column (skip / light / full council, with its reason, N7) for every component, and build the system-wide job → doors map (N9).
-Then mark this
-discussion settled and hand the skeleton to a planner. Owner: this shaper.
+Also assign each
+S6b/S7 door row to phase T6, T7 or T9 (D21), and confirm N4 and N6. Gate: doors closed and `261122-2108` landed. Owner: the
+skeleton plan's lead (D27); read-only, one report.
 
 ### Phase T2–T3 — session {#task-t2-t3-session}
 Components: session-rotation, session-host (and the dispatch live rest reached only from heads). Inputs: §6 rows 10, 13
