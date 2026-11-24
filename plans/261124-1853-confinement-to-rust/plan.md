@@ -126,7 +126,10 @@ Order against other plans: `261122-2108` (draft) owns `src/runner/dispatch/**` a
 sees only live code. If 2108's result leaves a live caller of the three files outside this footprint, the lead of
 phase 2 stops and asks the supervisor rather than widening the footprint itself. `261124-0004` no longer names any
 confinement path, so the two plans do not overlap; 0004's `CHANGELOG.md` line is the one shared hot file, written by
-each plan's last phase.
+each plan's last phase. `261124-1433-authority-declare-update` (running) also
+writes `CHANGELOG.md`, and the cross-plan check fails a `ready` plan on that overlap, so this plan stays `draft` until
+1433 is `done`; the planner or the supervisor then flips `status: ready` once the check passes. Nothing is lost: 2108,
+which this plan waits on, is still ahead.
 
 ## Owner questions
 
