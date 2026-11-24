@@ -633,16 +633,28 @@ pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options) 
             ..Report::default()
         };
     }
-    let kinds: Vec<OwnerKind> = registry
+    // With `--fix --only`, only the rows the named fixes repair are judged.
+    let named_repairs: std::collections::HashSet<&str> = registry
+        .fixes
+        .iter()
+        .filter(|fix| options.only.contains(&fix.id))
+        .flat_map(|fix| fix.repairs.iter().map(String::as_str))
+        .collect();
+    let selected: Vec<&RegistryRow> = registry
         .rows
+        .iter()
+        .filter(|entry| {
+            !options.fix || options.only.is_empty() || named_repairs.contains(entry.id.as_str())
+        })
+        .collect();
+    let kinds: Vec<OwnerKind> = selected
         .iter()
         .map(|entry| owners.kind_of_row(registry, entry))
         .collect();
     let mut judged: HashMap<OwnerKind, std::vec::IntoIter<RowOutcome>> = HashMap::new();
     // The bridge answers first: what its Node reports (its version) is a fact a native row judges.
     for kind in [OwnerKind::Bridge, OwnerKind::Native] {
-        let ids: Vec<&str> = registry
-            .rows
+        let ids: Vec<&str> = selected
             .iter()
             .zip(&kinds)
             .filter(|(_, row_kind)| **row_kind == kind)
@@ -666,9 +678,9 @@ pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options) 
         .iter()
         .flat_map(|fix| fix.repairs.iter().map(String::as_str))
         .collect();
-    let mut rows = Vec::with_capacity(registry.rows.len());
+    let mut rows = Vec::with_capacity(selected.len());
     let mut next: Vec<String> = Vec::new();
-    for (entry, kind) in registry.rows.iter().zip(&kinds) {
+    for (entry, kind) in selected.iter().zip(&kinds) {
         let outcome = judged
             .get_mut(kind)
             .and_then(Iterator::next)
@@ -846,7 +858,7 @@ mod tests {
       ],
       "fixes": [
         { "id": "fix-beta", "owner": "bridge:S7", "repairs": ["beta"] },
-        { "id": "fix-alpha", "owner": "rust:identity" },
+        { "id": "fix-alpha", "owner": "rust:identity", "repairs": ["alpha"] },
         { "id": "fix-beta-too", "owner": "bridge:S7", "repairs": ["beta"] },
         { "group": "config" }
       ]
@@ -961,7 +973,7 @@ mod tests {
             fixes,
             [
                 ("fix-beta", vec!["beta"]),
-                ("fix-alpha", vec!["fix-alpha"]),
+                ("fix-alpha", vec!["alpha"]),
                 ("fix-beta-too", vec!["beta"]),
                 ("config-refresh-docs", vec!["config-doc-drift"]),
                 ("gateway-token-configured", vec!["gateway-token-configured"]),
@@ -1284,10 +1296,69 @@ mod tests {
             .map(|f| f.id.as_str())
             .collect();
         assert_eq!(fixed, ["fix-alpha", "gateway-token-configured"]);
-        assert!(
-            report.checks.unwrap().len() > 2,
-            "the rows are still judged"
+        let judged_ids: Vec<String> = report
+            .checks
+            .unwrap()
+            .into_iter()
+            .filter_map(|row| row.id)
+            .collect();
+        assert_eq!(
+            judged_ids,
+            ["alpha", "gateway-token-configured"],
+            "only the rows the named fixes repair are judged, in registry order"
         );
+        assert_eq!(*native.calls.borrow(), ["fix fix-alpha", "judge alpha"]);
+        assert_eq!(
+            *bridge.calls.borrow(),
+            [
+                "fix gateway-token-configured",
+                "judge gateway-token-configured"
+            ]
+        );
+        // Naming only a native fix never calls the bridge to judge.
+        let native_only = Scripted::new(vec![]);
+        let bridge_idle = Scripted::bridge(vec![]);
+        run(
+            &registry(),
+            &Owners {
+                native: &native_only,
+                bridge: &bridge_idle,
+            },
+            Path::new("/p"),
+            Options {
+                fix: true,
+                only: vec!["fix-alpha".into()],
+            },
+        );
+        assert_eq!(
+            *native_only.calls.borrow(),
+            ["fix fix-alpha", "judge alpha"]
+        );
+        assert!(bridge_idle.calls.borrow().is_empty());
+        // A fix whose repaired row has another id judges that row, not nothing.
+        let native_none = Scripted::new(vec![]);
+        let bridge_beta = Scripted::bridge(vec![]);
+        let report = run(
+            &registry(),
+            &Owners {
+                native: &native_none,
+                bridge: &bridge_beta,
+            },
+            Path::new("/p"),
+            Options {
+                fix: true,
+                only: vec!["fix-beta".into()],
+            },
+        );
+        let ids: Vec<String> = report
+            .checks
+            .unwrap()
+            .into_iter()
+            .filter_map(|row| row.id)
+            .collect();
+        assert_eq!(ids, ["beta"]);
+        assert_eq!(*bridge_beta.calls.borrow(), ["fix fix-beta", "judge beta"]);
+        assert!(native_none.calls.borrow().is_empty());
         let unknown = Options {
             fix: true,
             only: vec!["no-such-fix".into()],
