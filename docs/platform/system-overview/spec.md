@@ -148,6 +148,12 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | porting lifecycle and reference analysis | `distillery` | `docs/platform/distillery/spec.md` |
 | doc health checks and body rules | `doc-checks` | `docs/platform/documentation/subcomponents/doc-checks/spec.md` |
 | document axis model, locate before write, and claim units | `document-identity` | `docs/platform/documentation/subcomponents/document-identity/spec.md` |
+| locate port and its pkm adapter (packages/documentation/rust, third-party/pkm) | `document-identity` | `docs/platform/documentation/subcomponents/document-identity/spec.md` |
+| fgos doc locate and fgos doc index sub-verbs (wiring apps/fgos/src/wiring/doc_locate.rs, doctor rows apps/fgos/src/wiring/doctor/documentation.rs) | `document-identity` | `docs/platform/documentation/subcomponents/document-identity/spec.md` |
+| index worker process (fgos doc index run), started only through the process door, so the parent's code execution boundary stays with that door | `document-identity` | `docs/platform/documentation/subcomponents/document-identity/spec.md` |
+| rebuildable locate cache .fgos/runtime/doc-locate/ and the machine embedding model folder; derived views rebuilt from the docs, never source state, so the parent's runtime state mutation boundary holds | `document-identity` | `docs/platform/documentation/subcomponents/document-identity/spec.md` |
+| Observe kind fgos.doc.locate (packages/documentation/rust/observe-kinds.json) | `document-identity` | `docs/platform/documentation/subcomponents/document-identity/spec.md` |
+| docLocate config namespace (core/config-standard/docLocate.yaml, core/config-schema/docLocate.schema.yaml) | `document-identity` | `docs/platform/documentation/subcomponents/document-identity/spec.md` |
 | documentation architecture and maintained corpus | `documentation` | `docs/platform/documentation/spec.md` |
 | domain-specific workflows, skills, task specs, and doctrine | `domain-components` | `docs/platform/component-boundary.md` |
 | runtime definition registry, domain and workflow loader, workflow definition validation | `domain-registry-loader` | `docs/platform/component-boundary.md` |
