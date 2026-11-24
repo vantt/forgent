@@ -32,5 +32,5 @@ allowed:
 debt:
   - path: packages/distribution/rust/src/init.rs
     reason: fgctl's preflight asks the Node on PATH for its version (the release requires Node until the runner moves)
-retiredBy: the step that removes requires.node from the release manifest
+retiredBy: "261124-1026-harden-next-round#T9: the release manifest drops requires.node and fgctl's preflight stops asking the Node on PATH for its version"
 reason: "the one named allowance is agent_hooks.rs, the hook rows' shim probe, which runs the project shim's `hook` route (dispatch-decide, main-checkout-delete-guard, mailbox), a legacy-cli route until the hook verdicts are native: nothing else under wiring/doctor or in a packaging module may spawn a verb. doctor, init, uninstall and wire-agents never call back into Node for a layer that already moved: only the bridge starts Node, and a row adapter or a packaging module that needs a fact asks the Rust component that owns it"

@@ -9,5 +9,5 @@ allowed:
     count: 1
     reason: "legacy marker of the dispatch hook entry: the name of the old hook script, so an install removes an entry an earlier install wrote"
 debt: []
-retiredBy: the legacy markers go when no install that wrote the old hook entry remains
+retiredBy: "261124-1026-harden-next-round#T9: the packaging council decides when no install that wrote the old dispatch hook entry remains, and the legacy marker goes"
 reason: scripts/dispatch-decide-hook.mjs is deleted; the name remains only as a legacy marker that lets the hook table recognise and replace an entry an earlier install wrote. Any other mention is a live reference to a script that does not exist

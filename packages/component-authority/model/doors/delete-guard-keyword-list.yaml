@@ -10,5 +10,5 @@ allowed:
   - path: packages/distribution/rust/src/agent_hooks.rs
     count: 3
 debt: []
-retiredBy: the Node twin src/setup/agent-hooks.mjs is deleted; agent_hooks.rs is the only owner of the list
+retiredBy: "261124-1026-harden-next-round#T2-T3: the Node main-checkout delete guard moves to Rust and its test matcher over the prefilter data goes with it; the Node twin src/setup/agent-hooks.mjs is already deleted"
 reason: the keywords the main-checkout delete guard's prefilter looks for are data (packages/distribution/contracts/delete-guard-prefilter.v1.json), rendered by agent_hooks.rs. test/git/main-checkout-delete-guard.test.mjs:11-12 keeps its own matcher over the same data to prove every refusal passes the prefilter; tests are outside the door walk, so that copy is named here, not checked

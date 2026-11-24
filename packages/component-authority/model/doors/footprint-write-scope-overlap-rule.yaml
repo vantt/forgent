@@ -36,5 +36,5 @@ allowed:
 debt:
   - path: src/runner/dispatch/write-scope.mjs
     reason: the JS port of the write-scope rule that dispatch keeps for now (plan decision 6), pinned to the Rust rule by test/git/write-scope-parity.test.mjs; globsMeet and writeScopesOverlap are its overlap functions
-retiredBy: dispatch moves onto the write-scope package
+retiredBy: "261122-2108-delete-dead-node-execution-closure#phase-11: dispatch moves onto the write-scope package and src/runner/dispatch/write-scope.mjs goes"
 reason: whether two footprints or write scopes may touch the same path is the write-scope package's rule (packages/write-scope); a second definition cannot disagree about a pair

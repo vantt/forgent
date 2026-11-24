@@ -20,5 +20,5 @@ allowed:
     count: 11
     reason: the client of the door, and the writer of the record in withStateTx
 debt: []
-retiredBy: the Node record writer in src/state/hot-lock.mjs moves with the Work state store
+retiredBy: "261124-1026-harden-next-round#T7: the Node record writer in src/state/hot-lock.mjs moves with the Work state store"
 reason: the hot record's reader and compare-and-clear are the holder-lock crate's (hot_record.rs); Node's functions call it, so a second reader or cleaner of the record cannot disagree about a torn record or clear a record that changed

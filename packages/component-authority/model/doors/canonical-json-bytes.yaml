@@ -22,5 +22,5 @@ allowed:
   - path: packages/distribution/rust/src/verify.rs
     count: 1
 debt: []
-retiredBy: the exceptions the component-boundary row names go when their stated reasons end (the release-manifest pair moves as one; the others when their contracts change)
+retiredBy: "261124-1026-harden-next-round#T9: the release-manifest pair moves to Rust as one, and the other Node exceptions the component-boundary row names go with the Node modules that hold them"
 reason: RFC 8785 bytes come from one crate; each allowed exception except run-supervisor envelope.rs (its envelope digest, not named in that row) is named with its reason in the component-boundary row for Canonical JSON

@@ -14,5 +14,5 @@ allowed:
     count: 1
     reason: description text
 debt: []
-retiredBy: the pre-commit hook and the commit gate move to Rust
+retiredBy: "261124-1026-harden-next-round#T2-T3: the pre-commit hook's writer and the commit gate's reader (src/runner/main-checkout-activity.mjs) move to Rust with the main-checkout hook verdicts"
 reason: the beacon file has one writer and two kinds of reader, all checked by the rows of packages/holder-lock/contracts/main-checkout-activity.v1.json; a third path to the file would read a different shape
