@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "The leak check of run-tests ignores live runtime directories"
-status: draft
+status: ready
 priority: P2
 blockedBy: []
 footprint:
