@@ -4,7 +4,7 @@
 //! hit ranks above an exact alias phrase hit, which ranks above token overlap with the meaning sentence. Ties
 //! break by kind, then id. Meaning search beyond this waits for the documentation search door.
 
-use crate::model::Model;
+use crate::model::{Model, Severity};
 use serde::Serialize;
 use std::collections::BTreeSet;
 
@@ -36,6 +36,9 @@ pub struct Match {
     pub canonical: String,
     pub matched_on: MatchedOn,
     pub score: u32,
+    /// The door row's severity; absent for every other kind of match.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub severity: Option<Severity>,
 }
 
 /// Lowercases and folds Vietnamese diacritics (`đ` to `d`, combining marks dropped).
@@ -102,6 +105,7 @@ struct Row<'a> {
     canonical: &'a str,
     aliases: &'a [String],
     meaning: &'a str,
+    severity: Option<Severity>,
 }
 
 fn score(sentence: &[String], row: &Row<'_>) -> Option<(MatchedOn, u32)> {
@@ -146,6 +150,7 @@ pub fn locate(model: &Model, sentence: &str) -> Vec<Match> {
         canonical: &row.canonical,
         aliases: &row.aliases,
         meaning: &row.meaning,
+        severity: None,
     }));
     rows.extend(model.decision_kinds.iter().map(|row| Row {
         kind: MatchKind::DecisionKind,
@@ -153,6 +158,7 @@ pub fn locate(model: &Model, sentence: &str) -> Vec<Match> {
         canonical: &row.canonical,
         aliases: &row.aliases,
         meaning: &row.meaning,
+        severity: None,
     }));
     rows.extend(model.contracts.iter().map(|row| Row {
         kind: MatchKind::Contract,
@@ -160,6 +166,7 @@ pub fn locate(model: &Model, sentence: &str) -> Vec<Match> {
         canonical: &row.canonical,
         aliases: &row.aliases,
         meaning: &row.meaning,
+        severity: None,
     }));
     rows.extend(model.doors.iter().map(|row| Row {
         kind: MatchKind::Door,
@@ -167,6 +174,7 @@ pub fn locate(model: &Model, sentence: &str) -> Vec<Match> {
         canonical: &row.job,
         aliases: &[],
         meaning: row.reason.as_deref().unwrap_or(""),
+        severity: Some(row.severity),
     }));
     let mut found: Vec<Match> = rows
         .iter()
@@ -177,6 +185,7 @@ pub fn locate(model: &Model, sentence: &str) -> Vec<Match> {
                 canonical: row.canonical.to_owned(),
                 matched_on,
                 score,
+                severity: row.severity,
             })
         })
         .collect();
@@ -274,6 +283,32 @@ mod tests {
         ]);
         let ids: Vec<_> = locate(&m, "same").into_iter().map(|f| f.id).collect();
         assert_eq!(ids, ["a", "b"]);
+    }
+
+    #[test]
+    fn a_door_match_carries_its_severity_and_other_matches_carry_none() {
+        let mut m = model(vec![component("c", "write-file", &[], "x")]);
+        m.doors.push(crate::model::Door {
+            slug: "write-file-door".into(),
+            job: "write file".into(),
+            kind: "door".into(),
+            severity: Severity::High,
+            patterns: vec![],
+            names: vec![],
+            primitives: vec![],
+            allowed: vec![],
+            debt: vec![],
+            reason: None,
+            retired_by: None,
+            owner: None,
+        });
+        let found = locate(&m, "write file");
+        let door = found.iter().find(|f| f.kind == MatchKind::Door).unwrap();
+        assert_eq!(door.severity, Some(Severity::High));
+        let json = serde_json::to_value(&found).unwrap();
+        assert_eq!(json[0]["kind"], "component");
+        assert!(json[0].get("severity").is_none());
+        assert_eq!(json[1]["severity"], "high");
     }
 
     #[test]

@@ -1,5 +1,6 @@
 job: release source payload selection
 kind: door
+severity: low
 patterns:
   - (?:function|fn)\s+(?:collectSourceFiles|listLegacyNodeSourceFiles|list_source_files)\b
 names:

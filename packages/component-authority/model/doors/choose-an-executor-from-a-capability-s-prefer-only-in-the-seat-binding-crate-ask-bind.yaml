@@ -1,5 +1,6 @@
 job: choose an executor from a capability's prefer only in the seat-binding crate; ask bind() (or purposeSeatOf in src/runner/dispatch/plan.mjs)
 kind: door
+severity: low
 patterns:
   - \bpreferOf\(
   - \bnormalizePreferCandidates\(

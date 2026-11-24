@@ -1,5 +1,6 @@
 job: "tool lookup by capability: ask fgos dispatch decide --for (packages/execution/rust/src/tools.rs)"
 kind: door
+severity: low
 patterns:
   - (?<!\b(?:flags|opts|Symbol)\??)\.for\b(?!\s*\\?\()
   - (?<=[\w\])])\[\s*['"]for['"]\s*\]

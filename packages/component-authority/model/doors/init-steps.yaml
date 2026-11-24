@@ -1,5 +1,6 @@
 job: init steps
 kind: door
+severity: low
 patterns:
   - \bWORK_STORE_NOTE\b
   - \bGLOBAL_MOVED_NOTE\b

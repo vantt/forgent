@@ -1,5 +1,6 @@
 job: decide a dispatch
 kind: door
+severity: low
 patterns:
   - (?:function|const) (?:compileDispatchPlan|purposeSeatOf|decideExecutorCli)\b
   - \bfn (?:compile_dispatch_plan|purpose_seat|decide_executor_cli)\b

@@ -1,5 +1,6 @@
 job: start a detached Event Store child
 kind: door
+severity: low
 patterns:
   - "['\"]events['\"],\\s*['\"](?:sync|seal)['\"]"
   - "\"events\"\\.into\\(\\)"

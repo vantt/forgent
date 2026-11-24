@@ -1,5 +1,6 @@
 job: write a YAML frontmatter fence
 kind: door
+severity: low
 patterns:
   - (?<!strip_prefix\()(['"`])---(?:\\r)?\\n
   - "`---$"

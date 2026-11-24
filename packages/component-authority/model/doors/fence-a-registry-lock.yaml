@@ -1,5 +1,6 @@
 job: fence a registry lock
 kind: door
+severity: low
 patterns:
   - export function fenceLock\b
   - \bconst TERM_WAIT_MS\b

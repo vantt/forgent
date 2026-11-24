@@ -1,5 +1,6 @@
 job: compose Git status and recovery
 kind: door
+severity: low
 patterns:
   - export function (?:readGitStatus|recoverGitOperations)\b
   - fn (?:read_git_status|recover_git_operations)\b

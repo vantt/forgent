@@ -1,5 +1,6 @@
 job: managed timer
 kind: door
+severity: low
 patterns:
   - \bsystemctl\b
   - \blaunchctl\b

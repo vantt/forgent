@@ -1,5 +1,6 @@
 job: agent hook table
 kind: door
+severity: low
 patterns:
   - \.claude/settings\.json
   - \.codex/hooks\.json

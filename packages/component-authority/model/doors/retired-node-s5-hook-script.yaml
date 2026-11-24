@@ -1,5 +1,6 @@
 job: retired Node S5 hook script
 kind: door
+severity: low
 patterns:
   - scripts/dispatch-decide-hook\.mjs
   - "['\"]dispatch-decide-hook\\.mjs['\"]"

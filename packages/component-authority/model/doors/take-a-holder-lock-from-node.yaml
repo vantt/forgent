@@ -1,5 +1,6 @@
 job: take a holder lock from Node
 kind: door
+severity: low
 patterns:
   - holderLock\.take\(
 allowed:

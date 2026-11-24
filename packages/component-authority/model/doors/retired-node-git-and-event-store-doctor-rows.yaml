@@ -1,5 +1,6 @@
 job: retired Node Git and Event Store doctor rows
 kind: door
+severity: low
 patterns:
   - \bcheckGit\b
   - \bcheckEventStore\b

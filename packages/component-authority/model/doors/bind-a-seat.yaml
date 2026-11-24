@@ -1,5 +1,6 @@
 job: bind a seat
 kind: door
+severity: low
 patterns:
   - (?:function|const) (?:executorFacts|launchViewOf|accountViewOf|seatConfigOf|familyKeyed|resolvePersona)\b
   - \bfn (?:executor_facts|launch_view_of|account_view_of|seat_config_of|family_keyed|resolve_persona)\b

@@ -1,5 +1,6 @@
 job: "the raw capability section is handed out only for the run record: ask a per-field function of src/runner/capability-config.mjs"
 kind: door
+severity: low
 patterns:
   - \bcatalogOf\(
 allowed: []

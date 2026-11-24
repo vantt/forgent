@@ -1,5 +1,6 @@
 job: main checkout activity beacon
 kind: door
+severity: low
 patterns:
   - main-checkout-activity\.json
 allowed:
