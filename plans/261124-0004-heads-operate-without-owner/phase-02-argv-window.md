@@ -46,7 +46,10 @@ Node: `src/native/door.mjs`, `src/session-host/head-grants.mjs`, `src/session-ho
 `test/session-host/head-request.test.mjs`, `test/session-host/head-start.test.mjs`, `test/live/head-grant-probe.live.mjs`.
 CLI registration of `can-i`: `src/cli/command-registry.mjs`, `packages/host-runtime/contracts/command-manifest.json`,
 `packages/host-runtime/contracts/command-routes.json`, `packages/host-runtime/contracts/command-route-annotations.json`,
-`apps/fgos/src/routing.rs`. Docs: `docs/platform/run-supervisor/spec.md`.
+`apps/fgos/src/routing.rs`. Docs: `docs/platform/run-supervisor/spec.md`. Authority model door rows (debt paid):
+`packages/component-authority/model/doors/execution-s-node-seam.yaml`,
+`packages/component-authority/model/doors/the-node-bind-facade-has-only-its-named-callers.yaml`,
+`packages/component-authority/model/doors/node-callers-reach-execution-only-through-its-seam-never-into-the-node-execution-closure.yaml`.
 
 ## Decisions taken in this phase (planner's, within PC-D6 and PC-D11)
 
@@ -104,6 +107,13 @@ CLI registration of `can-i`: `src/cli/command-registry.mjs`, `packages/host-runt
 7. Point `test/live/head-grant-probe.live.mjs` at the table: expected outcomes come from the persona's rules, and it
    adds one `can-i` call per decision.
 8. Update `docs/platform/run-supervisor/spec.md` for the new frame and decisions.
+9. Pay the authority debt of the two files this phase rewrites, in place (owner's split, 2026-11-24): the three door
+   lines of `src/session-host/head-start.mjs` (`execution-s-node-seam`, `the-node-bind-facade-has-only-its-named-callers`,
+   `node-callers-reach-execution-only-through-its-seam-never-into-the-node-execution-closure`) and the one line of
+   `src/session-host/head-request.mjs` (`node-callers-reach-execution-only-through-its-seam-never-into-the-node-execution-closure`).
+   Move each import the allowance covers to the door the row names (or drop it where step 4 deleted the branch that
+   used it), then delete the allowance line. If one line cannot be paid without a new mechanism, stop and ask the
+   supervisor; never raise a count.
 
 ## Verify
 
@@ -115,7 +125,8 @@ node --test test/cli/subcommand-flag-drift.test.mjs
 ```
 
 Pass: all green; `rg -n "SUCCESSOR_READ_VERBS|const GRANTS" packages src` finds nothing; `rg -c "case HEAD_" src/session-host/head-request.mjs`
-counts only the kept Node policy branches listed above.
+counts only the kept Node policy branches listed above; `rg -n "session-host/head-(start|request).mjs" packages/component-authority/model/doors`
+finds nothing; `node --test test/architecture.test.mjs` is green.
 
 ## Rollback
 
