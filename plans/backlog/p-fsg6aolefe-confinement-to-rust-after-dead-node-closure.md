@@ -13,7 +13,7 @@ Phases 4 and 5 of plan `261124-0004-heads-operate-without-owner` would edit Node
 
 # Done when
 
-A new plan exists, blocked by `261122-2108-delete-dead-node-execution-closure`, that: loosens the cage so a role's own work runs inside it (including `npm test` and `cargo test --workspace`, the old PC-D7 rule); gives a peers head its own pid namespace; ports `workspace-paths.mjs`, `resources.mjs` and `drivers/bwrap.mjs` to Rust; and pays the authority debt of `bwrap.mjs`. Plan 0004 no longer touches `src/runner/dispatch/confinement/**` or `test/runner/dispatch-confinement-*.test.mjs`.
+A new plan exists, blocked by `261122-2108-delete-dead-node-execution-closure`, that: loosens the cage so a role's own work runs inside it (including `npm test` and `cargo test --workspace`, the old rule that kept test commands outside the cage); gives a peers head its own pid namespace; ports `workspace-paths.mjs`, `resources.mjs` and `drivers/bwrap.mjs` to Rust; and pays the authority debt of `bwrap.mjs`. Plan 0004 no longer touches `src/runner/dispatch/confinement/**` or `test/runner/dispatch-confinement-*.test.mjs`.
 
 # Notes
 

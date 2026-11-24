@@ -9,7 +9,7 @@ created: 2026-11-24
 
 # Why
 
-The door row `run-bounded-child` and the two rows of its group retire when one `spawn.rs` extension lands. Today their `retiredBy` points to a report, not an owner. The report calls it a feature idea that waits for the owner (RUL104).
+The door row `run-bounded-child` and the two rows of its group retire when one `spawn.rs` extension lands. Today their `retiredBy` points to a report, not an owner. The report calls it a feature idea that waits for the owner (RUL104 (tốt hơn, không to hơn)).
 
 # Done when
 
