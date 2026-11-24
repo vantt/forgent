@@ -5,14 +5,14 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Map the Knowledge and Documentation Engine (horizon H2): which subcomponent owns which part of writing, locating, admitting and checking maintained documentation, how a write flows through them, and in which order they are built
 Design status: Draft. On 2026-11-12 the owner split the area into subcomponents; this spec became the map and its detailed sections moved to the subcomponent specs. Not signed.
-Implementation: doc-checks is built (2026-11-22, see its section 12); the other new subcomponents follow their own specs; the registry, Convention placement rules, doc-health and the decision index they extend are implemented
+Implementation: doc-checks is built (2026-11-22, see its section 12); build step 1, locate through pkm, is built (landed 2026-11-24, see document identity section 14); the other new subcomponents follow their own specs; the registry, Convention placement rules, doc-health and the decision index they extend are implemented
 Canonical: No (becomes canonical when signed)
 Provenance: First committed 2026-11-06 by the DOCOS lead from the H2 scout report plans/reports/scout-261106-1430-docos-h2-knowledge-documentation-engine-facts.md and the proposal docs/platform/proposals/documentation-system-unification.md; reduced to a map on 2026-11-12
 Writer type: Agent draft writer
 Canonical for: Nothing yet; once signed, the documentation area's subcomponent map, the end-to-end write flow, the build order and the area-wide rules
 Use this when: Finding which documentation subcomponent owns a question, or reviewing the order H2 is built in
 Do not use this for: The detail of any subcomponent; follow the map. Until signed, governance.md, the Convention spec and the knowledge-registry contract hold the current rules
-Last reviewed: 2026-11-12
+Last reviewed: 2026-11-24
 Related:
 - docs/platform/proposals/documentation-system-unification.md
 - docs/platform/documentation/subcomponents/document-identity/spec.md
@@ -78,11 +78,11 @@ A writer never changes structure to get past a refusal; structure changes come o
 
 Each step is one phase that ships something checkable on its own. Revised on 2026-11-22: locate goes first, because the retrospective writer can add evidence to the unit that already carries its claim only after finding that unit, and every later writer (admission, write door) uses the same door; doing the writer first would need a grep finder (50% right decisions against pkm's 73%) to be replaced afterwards.
 
-1. **Locate through pkm**: link `pkm-core` (tag `v0.5.0`: search, `WriteGuard` for read-only, unit-level `in_force` with `amended_by`) into the `fgos` host behind a locate port, with ONNX Runtime linked statically so a release ships no runtime library of its own, run pkm's index worker as a process and fetch its model at setup, the `fgos doc locate` door (translation, top 10, log), doctor rows for index freshness and the model, and the recall regression set as a repeatable measurement.
-2. **Retrospective writer adds evidence to claim units** (stop 1 of document identity; item `p-ixrbglli5o`), finding the unit through `fgos doc locate`, with the cleanup gate accepting the evidence or the admission handoff. Cuts the main source of new documents.
+1. **Locate through pkm** (built; landed on main in `efb1f5af3` on 2026-11-24): link `pkm-core` (tag `v0.7.0`: search, `WriteGuard` for read-only, unit-level `in_force` with `amended_by`) into the `fgos` host behind a locate port, with ONNX Runtime linked statically so a release ships no runtime library of its own, run pkm's index worker as a detached process and fetch its model through `fgos doctor --fix`, the `fgos doc locate` door (translation, top 10, log) and the repair verb `fgos doc index status|stop|reset`, doctor rows for the index and the model, and the recall regression set as a repeatable measurement (`fgos doc locate --eval`). What was built, and the measured recall, are in [document identity](subcomponents/document-identity/spec.md) sections 8.2, 14 and 15.
+2. **A core write door, with the retrospective writer as its first caller** (stop 1 of document identity; item `p-ixrbglli5o`): a general write door in the core finds the unit through `fgos doc locate` and adds the evidence to the unit that already carries the claim; the retrospective writer is the first caller of that door, and an always-loaded pointer line points agents at it. Creating a new file files an admission request, which waits for admission's decision. The cleanup gate accepts the evidence or the admission handoff. Cuts the main source of new documents (owner, 2026-11-24).
 3. **doc-checks**: path input, the verb and rule-claim rules, staged reads and the pre-commit gate (item `p-cd2ejz7wa5`); the 6 documents with invalid YAML frontmatter (already quoted in `51f39d252`).
 4. **Admission**: effect checks at the doors, the reviewer run, the frame and its weekly ceiling, refusal texts.
-5. **Write door**: the skill, the pointer seed, live templates.
+5. **Write door, rest of it**: the skill and live templates on the core door that step 2 builds (the pointer line ships with step 2).
 6. **Observer**: pkm's structural proposals into fgOS work items; merging the 479 story documents into claim units over time.
 7. **Reading surfaces**: its spec first, then the surfaces.
 
@@ -136,7 +136,7 @@ D-tsk28x-8 (2026-08-25) set one engine with two tiers, a human tier that accepts
 | `platform-docs` registry profile, typed graph | path identity from Convention | a graph derived, never stored (tsk-1lv ruling) | a check needs identity beyond sections and rule ids |
 | Skill-name check | none | one listing of skill names across core and domains | a dead skill reference is found that review missed |
 | Agent Context Engine (H3, PF-I007) | none | rule claims and sections keyed so a reducer can select them | H3 opens |
-| Embeddings | full-text search in the view | the view's section table can carry vectors later | document identity's recall measurement shows full text misses |
+| Embeddings | moved out of deferred on 2026-11-24: build step 1 searches through pkm's hybrid search (BM25 plus `multilingual-e5-small` embeddings), document identity section 8.2 | — | — |
 | Migration tooling retirement (proposal 9.2 step 5) | done in `159971615` | — | — |
 
 ## 9. Related Files
@@ -161,3 +161,6 @@ D-tsk28x-8 (2026-08-25) set one engine with two tiers, a human tier that accepts
 - 2026-11-12, owner: a dedicated spec for document identity (axes, locate, search view in Rust, three tiers, self-improvement); the area is split into subcomponents (document identity, doc-checks, admission, write door, later reading surfaces) and this spec becomes their map; admission moves to an independent reviewer inside an approved frame; the build order of section 4.
 - 2026-11-12, owner: the four subcomponent specs are signed; the build order puts the retrospective writer's claim-and-evidence change first; pkm is split into its own repository `vantt/pkm`.
 - 2026-11-22, owner: the build order is revised to put locate through pkm first and the retrospective writer second (the writer finds the unit through locate, so a grep finder is never built and then replaced); ONNX Runtime is linked statically, so a release ships no runtime library.
+- 2026-11-22, coordinator, while planning step 1: the pkm pin moves from `v0.5.0` to `v0.7.0` (tag commit `d488fe09`) before any fgOS code linked pkm, so the move cost no migration; step 1 uses none of the tag's breaking changes (document identity, section 17).
+- 2026-11-24: step 1 is built and landed on main (`efb1f5af3`) on pkm `v0.7.0`. Its recall gate passes on the pinned 2026-11-12 corpus (document identity, section 15).
+- 2026-11-24, owner: step 2 builds a general write door in the core, not a writer-specific path; the retrospective writer is its first caller, an always-loaded pointer line points agents at the door, and creating a new file files an admission request that waits for admission's decision.

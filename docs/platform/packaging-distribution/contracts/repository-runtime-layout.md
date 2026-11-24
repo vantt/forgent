@@ -78,6 +78,7 @@ machineReleaseStore:
     <activationId>.json
   locks/
     install.lock            # kernel lock (holder-lock), machine scope
+  models/                   # machine cache: the fgos doc locate embedding model, one copy per machine
   quarantine/
 ```
 
@@ -93,6 +94,7 @@ The workspace activation lock is the kernel lock `.fgos/locks/activation.lock` (
 - Workspace `.fgos/installation/projections/ledger.json` records host-visible projections for that workspace only.
 - `workHistoryRoot(workStateId)` owns durable workflow history, not packaging.
 - `runtimeCoordinationRoot(workStateId)` owns claims, sessions, leases, and locks, and must not share a namespace with release or activation records.
+- `machineReleaseStore/models/` is a machine cache, not release payload: it holds the embedding model `fgos doc locate` uses (about 130 MB), shared by every project and linked worktree on the machine, fetched by the doctor fix `doc-locate-model-fetch` and checked by the row `doc-locate-model`. Its resolver is `machine_model_root` in `packages/distribution/rust/src/store.rs`. Deleting it loses nothing; the project's locate index is a separate rebuildable cache under the workspace's `.fgos/runtime/doc-locate/`.
 - Config, event history, coordination, cache, activation, release payload, and projections are distinct state classes.
 
 ## 4. Worker Workspace Capsule
