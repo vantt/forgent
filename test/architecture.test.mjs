@@ -1760,7 +1760,7 @@ test('the shell entry loads dispatch depth, the Land release and the decision ci
 // ─── One door per job: manifest.doors ──────────────────────────────────────────────────────────────
 // Each row names a job, the regex patterns that mark code doing it, and the files that own it. A hit
 // anywhere else fails; `names` (canonical plus aliases, whole identifiers) and `primitives` (regexes) match on code
-// tokens only, never in comments or strings; an allowed entry's `count` bounds its matches; `debt` lists known leaks
+// tokens only, never in comments or strings; an allowed entry's `count` is exact (more matches fail, fewer are stale); `debt` lists known leaks
 // (stale once fixed) and is allowed only on the rows of NAMED_DOOR_DEBT, each with a `retiredBy`;
 // `allowed: []` retires a name; a `ratchet` row bounds a verb-wide pattern by a per-file match ceiling
 // that may only fall (a count below the ceiling is stale, so a fall lowers the ceiling in the same change).
@@ -1771,7 +1771,7 @@ test('the shell entry loads dispatch depth, the Land release and the decision ci
 // `.mjs/.js/.cjs` text is lexed (lexSource): comments are blanked, string contents stay so an import
 // specifier can be a pattern. `.rs` text has comments blanked (lexRust) and each `#[cfg(test)]` mod/fn
 // blanked (rustTestRanges), whose brace count is fooled by a brace inside a string literal in that
-// region. `.sh/.ps1` drop lines that start with `#` (names and primitives also see quoted strings blanked). A pattern that does not compile fails the check.
+// region. `.sh/.ps1` drop lines that start with `#` (names and primitives also see quoted strings blanked: PowerShell backtick escapes and code inside quoted shell strings are blanked too). A pattern that does not compile fails the check.
 
 const DOOR_ROOTS = ['bin', 'src', 'scripts', 'apps', 'packages', '.githooks', 'core', 'domains'];
 const DOOR_EXTENSIONS = new Set(['.mjs', '.js', '.cjs', '.rs', '.sh', '.ps1']);
@@ -1912,6 +1912,7 @@ export function checkDoors(rows, files, namedDebt = NAMED_DOOR_DEBT) {
     if (debt.length && !namedDebt.has(job)) fail('has debt but is not on the named debt list');
     if (debt.length && !row.retiredBy?.trim()) fail('has debt but names no retiredBy');
     if (!debt.length && namedDebt.has(job)) fail('is on the named debt list but holds no debt: drop it from the list');
+    for (const entry of allowed) if (entry.count !== undefined && entry.path.includes('*')) fail(`allowed entry ${entry.path}: a glob entry cannot carry count`);
     for (const entry of allowed) if (entry.count !== undefined && !(Number.isInteger(entry.count) && entry.count >= 0)) fail(`allowed entry ${entry.path} has a count that is not a whole number`);
     for (const entry of allowed) {
       if (entry.path.startsWith('scripts/') && !entry.reason?.trim()) fail(`allowed scripts entry ${entry.path} has no reason`);
@@ -1925,15 +1926,16 @@ export function checkDoors(rows, files, namedDebt = NAMED_DOOR_DEBT) {
       const hits = [];
       const codeLines = codeTexts.get(name).split('\n');
       text.split('\n').forEach((line, index) => {
-        // A token that a pattern and a primitive (or name) both hit counts once: the match spans merge per line.
-        const spans = [];
-        const collect = (re, subject) => { re.lastIndex = 0; for (const m of subject.matchAll(re)) spans.push([m.index, m.index + Math.max(m[0].length, 1)]); };
-        for (const re of regexes) collect(re, line);
-        for (const re of tokenRegexes) collect(re, codeLines[index] ?? '');
-        spans.sort((x, y) => x[0] - y[0]);
-        let count = 0;
+        // Pattern matches always count. A name or primitive match inside a pattern match's span is that same hit and is
+        // dropped; name/primitive matches that overlap each other count once; every other match counts.
+        const collect = (re, subject) => { re.lastIndex = 0; return [...subject.matchAll(re)].map((m) => [m.index, m.index + Math.max(m[0].length, 1)]); };
+        const patternSpans = regexes.flatMap((re) => collect(re, line));
+        const tokenSpans = tokenRegexes.flatMap((re) => collect(re, codeLines[index] ?? ''))
+          .filter(([from, to]) => !patternSpans.some(([pf, pt]) => pf <= from && to <= pt))
+          .sort((x, y) => x[0] - y[0]);
+        let count = patternSpans.length;
         let end = -1;
-        for (const [from, to] of spans) {
+        for (const [from, to] of tokenSpans) {
           if (from >= end) count++;
           end = Math.max(end, to);
         }
@@ -2440,6 +2442,15 @@ test('door check: an allowed count above the real total is reported as stale', (
 test('door check: a token that a pattern and a primitive both hit counts once', () => {
   const row = { job: 'j', kind: 'door', patterns: ['\\brenameSync\\('], primitives: ['\\brenameSync\\('], names: ['renameSync'], allowed: [{ path: 'src/a.mjs', count: 1, reason: 'the door' }] };
   assert.deepEqual(checkDoors([row], new Map([['src/a.mjs', 'renameSync(a, b);\n']])), []);
+});
+
+test('door check: a pattern match that covers only one name does not swallow the other names on the line', () => {
+  const row = { job: 'j', kind: 'door', patterns: ['use fgos_seat_binding::\\{executor_facts'], names: ['executor_facts', 'launch_view_of', 'bind'], allowed: [{ path: 'src/a.rs', count: 1, reason: 'the door' }] };
+  const failures = checkDoors([row], new Map([['src/a.rs', 'use fgos_seat_binding::{executor_facts, launch_view_of, bind};\n']]));
+  assert.equal(failures.length, 1);
+  assert.match(failures[0], /3 matches, the allowed count is 1/);
+  const glob = { ...row, allowed: [{ path: 'src/*.rs', count: 3, reason: 'x' }] };
+  assert.match(checkDoors([glob], new Map([['src/a.rs', 'bind(1);\n']])).join('\n'), /a glob entry cannot carry count/);
 });
 
 test('door check: a Rust char literal holding a quote does not blank the code after it, and a string in a shell file is not code', () => {
