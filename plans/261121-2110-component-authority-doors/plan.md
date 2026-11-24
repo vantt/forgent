@@ -702,6 +702,14 @@ None open. Shape choices the planner settled from the evidence:
 
 None.
 
+DOCOS lead, 2026-11-24 17:00: plan `261124-0837-docos-documentation-in-component-authority` phase 1 found that
+`fgos authority declare` refuses an existing component, so `document-identity` could not gain the locate paths. The
+owner sent it to the component-authority lane as backlog `p-2lpsdtxnrd`; plan `261124-1433-authority-declare-update`
+delivered `declare --update` (landed 49f0f47dc, phase 4 at 03d5fd4a9), and release 71dd6eb7 carries it. With that
+release, `fgos authority render --check --json` on main answers `"drift": []` (the 9 door-count cells are gone), and in
+a disposable linked worktree the installed host writes `component-boundary.md` there, not in the main checkout (main's
+checksum unchanged). Plan 261124-0837 resumes at phase 2 through `declare --update`.
+
 Lead, 2026-11-24 09:40: 12a is done, landed as d8790385c (branch p12a3; one squash of the reviewed p12a/p12a2 work
 onto a fresh base, every file byte-identical to the tested branch).
 - Step 1: the dead agy sub-HOME copy is deleted from `packages/distribution/rust/src/agent_config.rs` (last commit
