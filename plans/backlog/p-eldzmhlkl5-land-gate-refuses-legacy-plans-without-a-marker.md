@@ -18,3 +18,10 @@ The owner picks one behaviour and it is implemented: (a) `--plan` treats a legac
 # Notes
 
 Request came by mail from the manual supervisor. Confirmed by the owner to be opened as a backlog row on 2026-11-24.
+
+# Consequence met, and the direction proposed
+
+- Consequence: the running plan `261114-2051-rust-verb-migration-program` cannot get two cells (S6b and S7) that point to phases T6 and T7 of the frame plan `261124-1026-harden-next-round`. Only the forward link exists today (phases 3 and 5 of the frame plan name themselves S6b and S7); the backward link is missing. The two-sentence patch was dropped.
+- Proposed direction (a), not chosen by the owner yet: `plan-contract-check --plan` treats a legacy plan like `--all` (warn, do not block) when the commit neither adds nor changes the marker. A plan that has the marker, and any commit that touches the marker, stay strictly checked.
+- Numbers: 166 plans, 115 legacy (77 done, 24 draft, 7 running, 3 ready, 4 withdrawn).
+- The 3 legacy plans in `ready` are `261023-1619-collaboration-degree-spec`, `261030-0323-mailbox-v9-wake-on-mail` and `261030-1029-harden-gate-door-two-levels`.
