@@ -71,12 +71,23 @@ rows. The replacement inside the script: survivor `LIVE_FGOS_DIRS`; retired
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Skip live runtime directories in the leak check](phase-01-skip-live-runtime-dirs.md) | - | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs | 1 | draft |
+| 1 | [Skip live runtime directories in the leak check](phase-01-skip-live-runtime-dirs.md) | - | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs | 1 | running |
 
 One phase, one wave: the whole change is one constant, one walk filter and one test file.
 No integration phase is needed because there is only one branch; the phase's own verify
 is the full gate for its footprint. Checked with `node scripts/plan-contract-check.mjs`
 and `fgos resource-check --plan`.
+
+## Progress
+
+- 2026-11-24 21:46: phase 1 parked (status stays `running`; the plan contract has no parked status). Worktree
+  `/home/vantt/projects/forgent-worktrees/261124-1945-run-tests-fgos-leak-check-p01`
+  (branch `run-tests-fgos-leak-check/p01`) was created. Implement unit ticket
+  `c-1500-1795530727458` (unit run `unit-run-1795530727883-115cc050`, executor `gemini`,
+  chosen by `dispatch decide --for code:implement`) stayed `running` through 12+ waits.
+  Its run record shows `phase: admitted`, `delivery: not-sent`, empty stdout/stderr and no
+  writes since 21:32:08, and the worktree has no changes. A restarted lead resumes it with
+  `fgos request result c-1500-1795530727458` before starting a new unit.
 
 ## Owner questions
 
