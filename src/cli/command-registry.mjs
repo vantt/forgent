@@ -542,8 +542,8 @@ export const COMMAND_REGISTRY = [
   }),
   withSubcommands({
     name: 'authority',
-    invoke: "fgos authority <locate \"<sentence>\" [--limit N]|model|declare --kind component|decision-kind|door|contract --row <json|file> [--approved-by <q-id>] [--plan <dir>] [--move]|render [--check] [--preview-holder <path>]>",
-    description: "Find the components, decision kinds, doors and contracts of the component authority model that match a description of the work, print the model, add or move a model row, or render its ownership views into the platform docs. Run locate before writing a function, module or decision, so new code lands under the row that owns it; run declare when no row owns it.",
+    invoke: "fgos authority <locate \"<sentence>\" [--limit N]|model|declare --kind component|decision-kind|door|contract --row <json|file> [--approved-by <q-id>] [--plan <dir>] [--move] [--update]|render [--check] [--preview-holder <path>]>",
+    description: "Find the components, decision kinds, doors and contracts of the component authority model that match a description of the work, print the model, add, move or update a model row, or render its ownership views into the platform docs. Run locate before writing a function, module or decision, so new code lands under the row that owns it; run declare when no row owns it.",
     subcommands: {
       locate: {
         description: "Rank the model rows that match a sentence: an exact canonical name first, then an alias, then overlap with the row's meaning. Vietnamese diacritics are folded.",
@@ -580,11 +580,13 @@ export const COMMAND_REGISTRY = [
             "approved-by": { type: "string", description: "The id of the answered owner question that approves a new component or decision kind." },
             plan: { type: "string", description: "The plan directory whose plan.md Authority map names the survivor of a --move." },
             move: { type: "boolean", description: "Move the owner of an existing decision kind: the row carries only id and the new owner." },
+            update: { type: "boolean", description: "Update an existing component row: the row carries its id and the fields to change; id and parent cannot change. Needs no --approved-by." },
           },
           required: ['kind', 'row'],
         },
         examples: [
           "fgos authority declare --kind component --row component.json --approved-by q-abc123",
+          "fgos authority declare --kind component --update --row <file>",
           "fgos authority declare --kind decision-kind --move --row '{\"id\":\"observe\",\"owner\":\"observe\"}' --plan plans/261121-2110-component-authority-doors",
         ],
       },
