@@ -5,3 +5,4 @@
 - Running plan `261121-2110-component-authority-doors`: the lead is live and busy. The session read shows it redoing 12a on a fresh worktree with the route fix and both lockfile updates, then running the full 12a verify. The lead got request c-125709-1795486717558 back done, exit 0. Left alone.
 - The unit report `unit-261124-0905-p12a-s2-result.md` (kernel-lock step stopped, options A/B) is the lead's to decide. If B is chosen, the behaviour change needs an owner ruling, and the lead raises it.
 - Admission: no admissible plans; leadsLive 1 of 3, lanes free 4.
+- Event e7d78cdf34c411f5 `lane-freed`: no admissible plan to start. Marked handled.
