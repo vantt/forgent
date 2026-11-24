@@ -161,6 +161,165 @@ fn authority_render_check_finds_every_view_of_this_repository_in_sync_with_the_m
     );
 }
 
+fn seeded_repo(name: &str) -> PathBuf {
+    let project = std::env::temp_dir().join(format!(
+        "fgos-authority-seeded-{}-{}-{}",
+        name,
+        std::process::id(),
+        PROJECTS.fetch_add(1, Ordering::SeqCst)
+    ));
+    let _ = fs::remove_dir_all(&project);
+    fs::create_dir_all(&project).unwrap();
+    let model = Path::new("packages/component-authority/model");
+    copy_dir(&repo_root().join(model), &project.join(model));
+    let contract = Path::new("packages/component-authority/contracts/model.v1.json");
+    fs::create_dir_all(project.join(contract).parent().unwrap()).unwrap();
+    fs::copy(repo_root().join(contract), project.join(contract)).unwrap();
+    for file in [
+        "docs/platform/component-boundary.md",
+        "docs/platform/README.md",
+        "docs/platform/governance.md",
+        "docs/platform/system-overview/spec.md",
+        "docs/platform/observe/spec.md",
+        "docs/platform/workflow/spec.md",
+        "docs/platform/architecture-map.md",
+    ] {
+        let target = project.join(file);
+        fs::create_dir_all(target.parent().unwrap()).unwrap();
+        fs::copy(repo_root().join(file), target).unwrap();
+    }
+    project
+}
+
+#[test]
+fn authority_render_in_linked_worktree_with_dir_main_renders_the_worktree_and_leaves_main_unchanged() {
+    let base = std::env::temp_dir().join(format!(
+        "fgos-authority-wt-test-{}-{}",
+        std::process::id(),
+        PROJECTS.fetch_add(1, Ordering::SeqCst)
+    ));
+    let _ = fs::remove_dir_all(&base);
+    fs::create_dir_all(&base).unwrap();
+    let main = base.join("main");
+    let wt = base.join("wt");
+
+    let seeded = seeded_repo("wiring-wt");
+    copy_dir(&seeded, &main);
+    let _ = fs::remove_dir_all(&seeded);
+
+    let git = |args: &[&str], cwd: &Path| {
+        let out = Command::new("git")
+            .args(args)
+            .current_dir(cwd)
+            .env("GIT_CONFIG_GLOBAL", "/dev/null")
+            .env("GIT_CONFIG_NOSYSTEM", "1")
+            .output()
+            .unwrap();
+        assert!(out.status.success(), "git {args:?}: {out:?}");
+    };
+
+    git(&["init", "-q", "-b", "main"], &main);
+    git(&["add", "."], &main);
+    git(
+        &[
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@example.invalid",
+            "commit",
+            "-m",
+            "init",
+        ],
+        &main,
+    );
+    git(
+        &[
+            "worktree",
+            "add",
+            "-q",
+            "-b",
+            "wt-branch",
+            wt.to_str().unwrap(),
+        ],
+        &main,
+    );
+
+    // Initial render in main so main is completely in sync with the model
+    let output = Command::new(env!("CARGO_BIN_EXE_fgos"))
+        .args(["authority", "render", "--json", "--dir"])
+        .arg(&main)
+        .env_remove("FGOS_CONFINED")
+        .env_remove("FGOS_HEAD_REQUEST_SOCKET")
+        .current_dir(&main)
+        .output()
+        .unwrap();
+    assert!(output.status.success(), "initial render on main: {output:?}");
+
+    // Record main's component-boundary.md bytes
+    let main_file = main.join("docs/platform/component-boundary.md");
+    let main_bytes_before = fs::read(&main_file).unwrap();
+
+    // Hand-edit component-boundary.md in wt
+    let wt_file = wt.join("docs/platform/component-boundary.md");
+    let marker = "<!-- generated:component-authority:component-boundary -->";
+    let wt_content_before = fs::read_to_string(&wt_file).unwrap();
+    assert!(
+        wt_content_before.contains(marker),
+        "marker not found in wt view file"
+    );
+    let tampered = wt_content_before.replace(marker, &format!("{marker}\nHAND EDITED ROW\n"));
+    assert_ne!(tampered, wt_content_before);
+    fs::write(&wt_file, &tampered).unwrap();
+
+    // Run fgos authority render --json --dir <main> with cwd inside wt
+    let output = Command::new(env!("CARGO_BIN_EXE_fgos"))
+        .args(["authority", "render", "--json", "--dir"])
+        .arg(&main)
+        .env_remove("FGOS_CONFINED")
+        .env_remove("FGOS_HEAD_REQUEST_SOCKET")
+        .current_dir(&wt)
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "authority render in wt: {}{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    let envelope: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(envelope["contract"], "fgos.v1", "{envelope}");
+    let data = &envelope["data"];
+    assert_eq!(
+        data["root"],
+        wt.canonicalize().unwrap().to_str().unwrap(),
+        "{data}"
+    );
+
+    let written = data["written"].as_array().expect("written is an array");
+    assert!(
+        written.iter().any(|entry| {
+            entry["view"] == "component-boundary"
+                && entry["file"] == "docs/platform/component-boundary.md"
+        }),
+        "written must name component-boundary: {data}"
+    );
+
+    // wt view was re-rendered (tampered content is gone)
+    let wt_content_after = fs::read_to_string(&wt_file).unwrap();
+    assert!(
+        !wt_content_after.contains("HAND EDITED ROW"),
+        "wt was not re-rendered"
+    );
+    assert_eq!(wt_content_after, wt_content_before);
+
+    // main view is byte-identical
+    let main_bytes_after = fs::read(&main_file).unwrap();
+    assert_eq!(main_bytes_after, main_bytes_before, "main file was modified");
+
+    let _ = fs::remove_dir_all(&base);
+}
+
 /// A project that is not this repository: its own Git repository with an event store, a state root and a
 /// release, so `fgos questions` can ask and answer in it.
 #[cfg(target_os = "linux")]
