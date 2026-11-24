@@ -1,0 +1,191 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index ae180e3bd..b91f69fab 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
+ ## [Unreleased]
+ 
+ - Added: `fgos authority locate "<sentence>"` returns the components, decision kinds, doors and contracts that match a description of the work, and `fgos authority declare` adds or moves a model row through admission, always asking the owner before it adds a new component or decision kind; in a project with no model `locate` answers `authority: inactive` and the first `declare` creates one under `.fgos/authority/model/`. The plan contract now requires an **Authority map** (each new decision, function or module maps to a model row or to a `declare`, and a plan that overlaps something existing names the survivor), which `scripts/plan-contract-check.mjs` and the validating reviewer enforce for `draft` and `ready` plans created on or after 2026-11-24.
+-- Added: `fgos doctor --fix --only <fix-id>` applies one registered fix instead of every fix, so a harness can install a workspace's agent hook rows without touching the rest.
++- Added: `fgos doctor --fix --only <fix-id>` applies one registered fix instead of every fix and judges only the rows the named fixes repair, so a harness can install a workspace's agent hook rows without touching the rest.
+ - Changed: the door guard in `npm test` now matches a guarded door by primitive and by canonical name plus aliases (never by a bare word), counts matches inside allowed files, and fails a new-named copy of an owned primitive; it allows `debt` only on the named debt, 17 door rows each with a `retiredBy`, which are retired right after this release.
+ - Changed: a running session cron or background task no longer blocks head session rotation (a cron never blocks and goes into the successor's handoff to recreate; a background task holds soft rotation only, rotating at hard and listing the running task in the handoff).
+ - Added: a head session rotates at hard when its account's weekly quota usage reaches `sessionRotation.quota` (default 0.9) and quarantines the predecessor's account until the reported reset time; a status-line hook writer (`fgos hook session-rotation --event status-line`) captures Claude Code context and weekly rate limits beside the transcript.
+diff --git a/apps/fgos/src/wiring/doctor/mod.rs b/apps/fgos/src/wiring/doctor/mod.rs
+index a5224257b..b026b0128 100644
+--- a/apps/fgos/src/wiring/doctor/mod.rs
++++ b/apps/fgos/src/wiring/doctor/mod.rs
+@@ -89,7 +89,7 @@ pub struct DoctorRequest {
+     /// The project: the main checkout the root door resolved (`--dir` when named).
+     pub root: PathBuf,
+     pub fix: bool,
+-    /// `--only <fix-id>` (repeatable): with `--fix`, run just these fixes. Empty runs every fix.
++    /// `--only <fix-id>` (repeatable): with `--fix`, run just these fixes and judge just the rows the named fixes repair. Empty runs every fix and judges every row.
+     pub only: Vec<String>,
+     pub strict: bool,
+     pub pretty: bool,
+diff --git a/docs/platform/packaging-distribution/contracts/setup-doctor-registry.md b/docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
+index 8d7e7d3d0..9f20675d5 100644
+--- a/docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
++++ b/docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
+@@ -61,7 +61,7 @@ The registries are independent. A module may register only a check, only a fix,
+ - should tell the user what command or fix path applies when a check fails;
+ - answers readiness only. A live incident is read and repaired through its component's own verb; doctor keeps at most one read-only pointer row for it (below).
+ 
+-`--fix` runs readiness fixes only: no registered fix repairs an incident.
++`--fix` runs readiness fixes only: no registered fix repairs an incident. `--fix --only <fix-id>` (repeatable) runs just the named fixes and then judges only the rows the named fixes repair (each fix's `repairs`, group-expanded; for a hook fix that is its own id), so `checks`, `ok`, `--strict` and `next` follow from those rows and an owner none of them belongs to is never called; without `--only` every row is judged.
+ 
+ ### Pointer rows
+ 
+diff --git a/packages/distribution/rust/src/doctor.rs b/packages/distribution/rust/src/doctor.rs
+index 8f55beebe..4e1b24542 100644
+--- a/packages/distribution/rust/src/doctor.rs
++++ b/packages/distribution/rust/src/doctor.rs
+@@ -633,16 +633,28 @@ pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options)
+             ..Report::default()
+         };
+     }
+-    let kinds: Vec<OwnerKind> = registry
++    // With `--fix --only`, only the rows the named fixes repair are judged.
++    let named_repairs: std::collections::HashSet<&str> = registry
++        .fixes
++        .iter()
++        .filter(|fix| options.only.contains(&fix.id))
++        .flat_map(|fix| fix.repairs.iter().map(String::as_str))
++        .collect();
++    let selected: Vec<&RegistryRow> = registry
+         .rows
++        .iter()
++        .filter(|entry| {
++            !options.fix || options.only.is_empty() || named_repairs.contains(entry.id.as_str())
++        })
++        .collect();
++    let kinds: Vec<OwnerKind> = selected
+         .iter()
+         .map(|entry| owners.kind_of_row(registry, entry))
+         .collect();
+     let mut judged: HashMap<OwnerKind, std::vec::IntoIter<RowOutcome>> = HashMap::new();
+     // The bridge answers first: what its Node reports (its version) is a fact a native row judges.
+     for kind in [OwnerKind::Bridge, OwnerKind::Native] {
+-        let ids: Vec<&str> = registry
+-            .rows
++        let ids: Vec<&str> = selected
+             .iter()
+             .zip(&kinds)
+             .filter(|(_, row_kind)| **row_kind == kind)
+@@ -666,9 +678,9 @@ pub fn run(registry: &Registry, owners: &Owners, root: &Path, options: Options)
+         .iter()
+         .flat_map(|fix| fix.repairs.iter().map(String::as_str))
+         .collect();
+-    let mut rows = Vec::with_capacity(registry.rows.len());
++    let mut rows = Vec::with_capacity(selected.len());
+     let mut next: Vec<String> = Vec::new();
+-    for (entry, kind) in registry.rows.iter().zip(&kinds) {
++    for (entry, kind) in selected.iter().zip(&kinds) {
+         let outcome = judged
+             .get_mut(kind)
+             .and_then(Iterator::next)
+@@ -846,7 +858,7 @@ mod tests {
+       ],
+       "fixes": [
+         { "id": "fix-beta", "owner": "bridge:S7", "repairs": ["beta"] },
+-        { "id": "fix-alpha", "owner": "rust:identity" },
++        { "id": "fix-alpha", "owner": "rust:identity", "repairs": ["alpha"] },
+         { "id": "fix-beta-too", "owner": "bridge:S7", "repairs": ["beta"] },
+         { "group": "config" }
+       ]
+@@ -961,7 +973,7 @@ mod tests {
+             fixes,
+             [
+                 ("fix-beta", vec!["beta"]),
+-                ("fix-alpha", vec!["fix-alpha"]),
++                ("fix-alpha", vec!["alpha"]),
+                 ("fix-beta-too", vec!["beta"]),
+                 ("config-refresh-docs", vec!["config-doc-drift"]),
+                 ("gateway-token-configured", vec!["gateway-token-configured"]),
+@@ -1284,10 +1296,69 @@ mod tests {
+             .map(|f| f.id.as_str())
+             .collect();
+         assert_eq!(fixed, ["fix-alpha", "gateway-token-configured"]);
+-        assert!(
+-            report.checks.unwrap().len() > 2,
+-            "the rows are still judged"
++        let judged_ids: Vec<String> = report
++            .checks
++            .unwrap()
++            .into_iter()
++            .filter_map(|row| row.id)
++            .collect();
++        assert_eq!(
++            judged_ids,
++            ["alpha", "gateway-token-configured"],
++            "only the rows the named fixes repair are judged, in registry order"
++        );
++        assert_eq!(*native.calls.borrow(), ["fix fix-alpha", "judge alpha"]);
++        assert_eq!(
++            *bridge.calls.borrow(),
++            [
++                "fix gateway-token-configured",
++                "judge gateway-token-configured"
++            ]
++        );
++        // Naming only a native fix never calls the bridge to judge.
++        let native_only = Scripted::new(vec![]);
++        let bridge_idle = Scripted::bridge(vec![]);
++        run(
++            &registry(),
++            &Owners {
++                native: &native_only,
++                bridge: &bridge_idle,
++            },
++            Path::new("/p"),
++            Options {
++                fix: true,
++                only: vec!["fix-alpha".into()],
++            },
++        );
++        assert_eq!(
++            *native_only.calls.borrow(),
++            ["fix fix-alpha", "judge alpha"]
++        );
++        assert!(bridge_idle.calls.borrow().is_empty());
++        // A fix whose repaired row has another id judges that row, not nothing.
++        let native_none = Scripted::new(vec![]);
++        let bridge_beta = Scripted::bridge(vec![]);
++        let report = run(
++            &registry(),
++            &Owners {
++                native: &native_none,
++                bridge: &bridge_beta,
++            },
++            Path::new("/p"),
++            Options {
++                fix: true,
++                only: vec!["fix-beta".into()],
++            },
+         );
++        let ids: Vec<String> = report
++            .checks
++            .unwrap()
++            .into_iter()
++            .filter_map(|row| row.id)
++            .collect();
++        assert_eq!(ids, ["beta"]);
++        assert_eq!(*bridge_beta.calls.borrow(), ["fix fix-beta", "judge beta"]);
++        assert!(native_none.calls.borrow().is_empty());
+         let unknown = Options {
+             fix: true,
+             only: vec!["no-such-fix".into()],
+diff --git a/src/cli/command-registry.mjs b/src/cli/command-registry.mjs
+index 6c0c15c58..bb7fd41e4 100644
+--- a/src/cli/command-registry.mjs
++++ b/src/cli/command-registry.mjs
+@@ -2916,7 +2916,7 @@ export const COMMAND_REGISTRY = [
+         pretty: { type: 'boolean', description: 'Render colored human-readable text instead of the JSON envelope.' },
+         fix: { type: 'boolean', description: 'Run every registered fix against the current cwd before reporting checks. Omit to keep doctor read-only (default, unchanged behavior).' },
+         strict: { type: 'boolean', description: 'Exit 1 when any check fails (after the fixes ran, with --fix). Omit to keep the default exit 0 whatever the checks say.' },
+-        only: { type: 'array', items: { type: 'string' }, description: 'Repeatable, with --fix: run only the fix with this id (a row id from `fgos doctor --json`, e.g. codex-hook-wired) instead of every fix. An id no fix has is refused by name; --only without --fix is refused.' },
++        only: { type: 'array', items: { type: 'string' }, description: 'Repeatable, with --fix: run only the fix with this id (e.g. codex-hook-wired) instead of every fix, then judge only the rows the named fixes repair. An id no fix has is refused by name; --only without --fix is refused.' },
+       },
+       required: [],
+     },
