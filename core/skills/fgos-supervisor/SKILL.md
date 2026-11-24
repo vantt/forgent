@@ -112,16 +112,15 @@ finish the event without step 4:
 
 ## Help queue (coordination-help)
 
-Event `coordination-help`: supervisor raise is granted to secretary, supervisor and lead today; the charter's target is
-every head. Check the target session (`ref`), read its recent screen (`fgos session read <ref>`), type a wait or unstick
-check if stuck (`fgos session type <ref> --text "..."`), restart or replace the head if stuck without progress, or
-escalate an unresolved design or product decision to the owner via `fgos questions ask`. Mark the event handled once
-resolved.
+Event `coordination-help` (role charter: `docs/platform/supervision/spec.md` §1.1): `ref` may name a plan or item, not a
+session. The supervisor resolves the asking head's session from the event (its asker role, or the lead of the plan
+named in ref) before going on site, and that `session type` needs an open event naming that session. Read its recent
+screen (`fgos session read <session>`), type a wait or unstick check if stuck (`fgos session type <session> --text "..."`),
+restart or replace the head if stuck without progress, or escalate an unresolved design or product decision to the
+owner via `fgos questions ask`. Mark the event handled once resolved.
 
 ## On site and the drone
 
-- Look after every running agent with no lead: leads, shapers, planners, and any agent started without a lead.
-  Workers of a lead are that lead's.
 - `fgos session read` reads the recent screen of a session read-only, to see what a stuck or silent session is doing.
 - `fgos session type` types into a pane only when an open coordination or drone event names that session (refused
   `target-not-stuck` otherwise).

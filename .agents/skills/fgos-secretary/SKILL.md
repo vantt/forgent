@@ -87,7 +87,7 @@ The table below lists only the rows with a live result from a run inside the sec
 | `land`, `request result` | socket, routed natively by the host | not audited |
 
 Dormant recovery verbs (`supervisor handled`, `supervisor done`, `session read`, `session type`, `watcher tune`,
-`metrics prune`, `worktree create`): these powers are hers, held dormant and used only in takeover when no supervisor
+`metrics prune`, `config patch`): these powers are hers, held dormant and used only in takeover when no supervisor
 is alive or able to act, or a help request is overdue. In peace time she does not invoke them; until her grant row
 lists those verbs a call answers `verb-not-granted`.
 
