@@ -243,6 +243,17 @@ morning (discussion §1). The planner's own shape choices are written as decisio
   uncommitted tree in worktree `261124-0004-heads-operate-without-owner-p02` that must not land as is. Its footprint
   misses `src/runner/dispatch/session-attempt.mjs`, `apps/fgos/src/wiring/unit_run_host/session_attempt.rs` and its
   tests, and the unit sandbox refused cargo and node. Owner question `q-nog2h4wfjm`; supervisor event `c60b8e801d6eae98`.
+- 2026-11-24 22:26, phase 1 reviewed and still parked on the land: two fix units (`c-5846-1795532878036`,
+  `c-4376-1795533319699`) cleared every blocking review finding; branch tip `1c139c298`, acceptance `rg` finds nothing.
+  Land `c-5470-1795533764158` is refused `main-checkout-dirty-overlap` on the uncommitted
+  `plans/261124-1945-run-tests-fgos-leak-check/phase-01-skip-live-runtime-dirs.md` in the main checkout. The branch base
+  `f999c4018` is 46 commits behind main, and main's commits since then touch that file, so the land counts it as
+  written. Two ways clear it: that file gets committed by its owner (owner question `q-3rhc6lroqc`), or the branch is
+  synced with main. A sync-only `fgos run --sync main --writes ... --worktree ...` (the form in `run --help`) is
+  refused `bad-args` "run takes one prompt", and a prompt plus `--sync main` unit (`c-6366-1795533799302`) ended
+  `execution-failure` (`verdict-inconclusive`, exit-11) without merging. Next wake: land again once the file is clean,
+  else retry the sync with a fresh unit.
+- 2026-11-24 22:26, phase 2 still parked on owner question `q-nog2h4wfjm` (open).
 
 ## Outstanding questions
 
