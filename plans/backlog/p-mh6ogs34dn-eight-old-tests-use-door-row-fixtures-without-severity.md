@@ -1,7 +1,7 @@
 ---
 id: p-mh6ogs34dn
 title: "Eight old tests build door-row fixtures without the `severity` field and fail (tests, priority P2; source: supervisor, log `.fgos/runtime/tmp/suite1433-npm.log`, 2026-11-24)"
-status: proposed
+status: done
 priority: P2
 area: tests
 created: 2026-11-24
