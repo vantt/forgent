@@ -1,7 +1,7 @@
 ---
 id: p-2lpsdtxnrd
 title: "`fgos authority declare` must update an existing component row, and three authority render defects (component-authority, priority high; source: DOCOS lead 2026-11-24, blocks plan 261124-0837)"
-status: proposed
+status: done
 priority: P1
 area: component-authority
 created: 2026-11-24
@@ -18,3 +18,5 @@ declare (or a sibling verb) updates an existing row (add `paths`, add `owns`, ch
 # Notes
 
 Full request: `plans/reports/secretary-261124-1425-docos-authority-declare-update.md`. Id minted by the DOCOS lead; not re-minted.
+
+Closed 2026-11-24 by the DOCOS lead: delivered by plan `261124-1433-authority-declare-update`, closed on the owner's word (998a55353); `declare --update` is in release 71dd6eb7.
