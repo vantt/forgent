@@ -1,12 +1,13 @@
 ---
 contract: plan-v1
 title: "Heads operate without the owner: role charter for the two hands, one fgos argv window with a permission table, one help channel and mail to the two hands, and a domain-free release rule"
-status: ready
+status: running
+lead: head:lead-forgent-261124-0004-heads-1bb1c
 priority: P1
 blockedBy:
   - 261121-2110-component-authority-doors
   - 261122-0118-heads-stable-and-able
-base: e250e79a7e853af443edf91f225d94d1815db6e6
+base: 77d9cab4dffce6c5da3df8d5948f4783a2f648e2
 footprint:
   - plans/261124-0004-heads-operate-without-owner/**
   - docs/platform/supervision/spec.md
