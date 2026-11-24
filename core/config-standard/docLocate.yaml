@@ -2,5 +2,5 @@
 # see: fgos config standard
 # @fgos:doc Where `fgos doc locate` gets its embedding model.
 docLocate:
-  # @fgos:doc Where `fgos doctor --fix` fetches the embedding model from: `huggingface`, an `https://` mirror root with the same file layout, or a local folder holding the model files for an offline install. Default: huggingface.
+  # @fgos:doc Where `fgos doctor --fix` fetches the embedding model from, `huggingface`, an `https://` mirror root with the same file layout, or a local folder holding the model files for an offline install. Default: huggingface.
   modelSource: huggingface
