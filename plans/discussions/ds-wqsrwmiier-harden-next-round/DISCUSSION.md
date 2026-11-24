@@ -42,11 +42,11 @@ the supervision queue only once it is settled.
 
 ## 1. Trạng thái hiện tại
 
-**Round 14 (2026-11-24 10:0x).** The owner accepted N20 and added that step 1 must first return to component-authority. Minted
-as D26. Read here as: every baseline, for a layer phase or a debt repaid alone, starts by re-reading the component-authority
-model for what it touches (the component rows, its door rows with debt, severity and `retiredBy`, `fgos authority locate`
-for each job) and checking that the model still matches the code. A gap goes to the model's owner first (as in D15). Still
-paused on O7.
+**Round 14 (2026-11-24 10:0x).** The owner accepted N20, minted as D26. The owner's addition, "step 1 must add: resume
+component-authority", was first read as a model check at every baseline. The owner corrected it ("ý là resume door"): it
+means item 1 of the list for the secretary, resume the doors plan. That item now reads: (1) resume doors, run 12a, 12b and
+12d (12d also adds the severity field, D24), then close doors and move 12c into `261122-2108`; (2) run `261122-2108`; (3) a
+shaper for `ds-ubqlutna6r`; (4) a small plan of its own for `p-nwife3i4kc`. Still paused on O7.
 
 **Round 13 (2026-11-24 10:00).** The owner accepted N19, minted as D25: the phase is the unit of repayment. Still paused on
 O7. For the secretary, via the owner: (1) cut doors to close after 12a, 12b and 12d, and move 12c into `261122-2108`;
@@ -257,7 +257,7 @@ Copied from ds-wham5txfkv §4. They are owner decisions made there and are not r
 | D23 | After doors closes, no plan manages the debt. The ledger and guard belong to the `component-authority` component; each debt belongs to the plan its `retiredBy` names; the secretary and the supervisor coordinate repayment by reading the debt per plan, with no new verb. `p-nwife3i4kc` (checkout crate, P1) gets a small plan of its own and does not wait for step 0; `p-rypvkc3kai` (herdr shim, P3) folds into phase T2–T3. | owner answer | N17; chat 09:5x "đồng ý N17 theo đề nghị của em … điều phối trả nợ là miu và supervisor, không cần plan quản" |
 | D24 | Each door row records a one-word severity (high: a live twin deciding a live answer that can disagree; medium: a live Node side that only asks the Rust owner; low: a twin reached only by dead code). The model's owner sets it once, and anyone can read it by query. Repayment order: severity first, then the owner's order rule; a plan that unblocks other work may jump. The field is a small change to the component-authority model contract, owned by that component. | owner answer | N18; chat 09:52 "đồng ý N18 chọn (a)" |
 | D25 | The unit of repayment is a phase. A debt whose surviving door already exists and is settled may be repaid alone, ahead of its plan, in a small phase or row of its own, picked by severity and run beside other work when files do not overlap. A debt that depends on an unsettled boundary waits for its layer phase, whose sub-plan orders its debts by severity. Layer phases go one at a time (D8, D17). A debt is done when its guard entry goes. | owner answer | N19; chat 10:00 "đồng ý" |
-| D26 | Repaying a debt inside a layer phase runs that phase's 9-step loop (a council only where the triage says full). A debt repaid alone skips steps 2 and 3 and runs steps 1 and 4–9 (the D20 fast track); if a boundary question appears, it stops and waits for its layer phase. In every path, step 1 starts by going back to component-authority: re-read the model rows for what the work touches and confirm they match the code before measuring. | owner answer | N20; chat 10:0x "đồng ý nhé. bước 1 phải thêm: resume trở lại component-authtority" |
+| D26 | Repaying a debt inside a layer phase runs that phase's 9-step loop (a council only where the triage says full). A debt repaid alone skips steps 2 and 3 and runs steps 1 and 4–9 (the D20 fast track); if a boundary question appears, it stops and waits for its layer phase. | owner answer | N20; chat 10:0x "đồng ý nhé" |
 | D16 | Appendix A of ds-wham5txfkv (`97a1fba58`) is history; this discussion is the source of truth for "HARDEN next round". | owner answer | chat 19:23 |
 
 ## 5. Q&A log
@@ -338,6 +338,8 @@ Copied from ds-wham5txfkv §4. They are owner decisions made there and are not r
 - **2026-11-24 10:0x — owner:** "trả nợ có đi qua 9 phase như cách tiếp cận của harden-next đang tiếp cận." Proposed N20.
 - **2026-11-24 10:0x — owner:** "đồng ý nhé. bước 1 phải thêm: resume trở lại component-authtority". Minted D26; the step 1 row of
   the loop table in §6 now starts with the model check.
+- **2026-11-24 10:0x — owner:** "à ý là resume dooor". Correction: the addition meant item 1 of the secretary list, resume the doors
+  plan, not a model check at step 1. The step 1 row and D26 were put back; the list in §1 now starts with resuming doors.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -372,7 +374,7 @@ flowchart BT
 
 | Step | Output |
 |---|---|
-| 1 Baseline | **first, back to component-authority (D26):** re-read the model rows the phase touches (components, door rows with debt, severity and `retiredBy`; `fgos authority locate` per job) and confirm they match the code, sending any gap to the model's owner; then owned routes p50/p95 cold and warm, tests and wall time, LOC Node/Rust/test, open backlog rows, doctor rows and setup steps; main SHA |
+| 1 Baseline | owned routes p50/p95 cold and warm, tests and wall time, LOC Node/Rust/test, open backlog rows, doctor rows and setup steps; main SHA |
 | 2 Council | only for components the triage marks full (N7). It settles the boundary: authority and mustNotOwn, contracts and ports, one door per job, the Rust/Node boundary and the delete list, written into the spec and the model (N8), first. Then whatever inside must change (bugs, High findings, correctness or stability, dead code, twins) joins the same tables. Migration, delete, doctor and tests tables. Optional inside optimisation may wait |
 | 3 Arbitration and owner ask | one batched ask: Part A shapes, Critical items, proposed additions, landing slot |
 | 4 Sub-plan | `ak-plan --hard`; Create / Modify / Delete / Tests to retire; a net-size line per phase; an Authority map |
