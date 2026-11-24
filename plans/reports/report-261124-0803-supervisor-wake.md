@@ -4,3 +4,4 @@
 - `lane-freed` on fg-server2: no admissible plan (all non-running plans are draft, done or withdrawn). Handled with no start.
 - Plans: one running (261121-2110-component-authority-doors, leadLive true, phase 10b running). leadsLive 1/3, lanes free 4/4.
 - Open owner questions (6, unchanged): q-lnjt5zzbfq, q-aanvfxaopa, q-t5anmlcb7q, q-j4yeougr72, q-ddj673fmju, q-e62q73d2au. No new question asked.
+- Late events: lane-freed d9b9cc9e (no ready plan) and session-no-result bd5723b1 (unit run_unit-run-1795482122400-5b38029b, the lead's own follow-up; lead busy polling). Both handled.
