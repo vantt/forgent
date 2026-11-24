@@ -9,7 +9,7 @@ footprint:
   - scripts/run-tests.mjs
   - test/scripts/run-tests.test.mjs
   - plans/261124-1945-run-tests-fgos-leak-check/
-base: c99af30a34d17b943ead207c3ed79e692cce5f8d
+base: 0add9d884fca927195de47bd83729cb6d8bc6250
 source:
   - plans/discussions/ds-ti2vip43kp-run-tests-fgos-leak-check/DISCUSSION.md
   - p-s6te2445rb
