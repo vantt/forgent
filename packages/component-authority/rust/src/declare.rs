@@ -653,7 +653,12 @@ fn plan_component_update(
         .and_then(|v| v.as_str())
         .ok_or_else(|| invalid("an update row names its component in a string field \"id\""))?;
     let index = present
-        .then(|| model.components.iter().position(|component| component.id == id))
+        .then(|| {
+            model
+                .components
+                .iter()
+                .position(|component| component.id == id)
+        })
         .flatten()
         .ok_or_else(|| {
             Refusal::new(
@@ -682,7 +687,14 @@ fn plan_component_update(
         .as_object_mut()
         .ok_or_else(|| invalid("merged component is not an object"))?;
     for (key, value) in object {
-        merged_object.insert(key.clone(), value.clone());
+        if !COMPONENT_ORDER.contains(&key.as_str()) {
+            return Err(invalid(format!("unknown field \"{key}\"")));
+        }
+        if value.is_null() {
+            merged_object.remove(key);
+        } else {
+            merged_object.insert(key.clone(), value.clone());
+        }
     }
     let merged_component: Component = decode(&merged)?;
 
@@ -694,56 +706,70 @@ fn plan_component_update(
         serde_json::to_value(&merged_component).map_err(|e| invalid(e.to_string()))?;
 
     let text = current_text(dir, COMPONENTS, present)?;
-    let mut document =
-        parse(text.as_bytes(), Profile::Tool, COMPONENTS).map_err(|r| refused_yaml(COMPONENTS, r))?;
+    let mut document = parse(text.as_bytes(), Profile::Tool, COMPONENTS)
+        .map_err(|r| refused_yaml(COMPONENTS, r))?;
     let old = match document.value() {
         Value::Seq(rows) => rows.clone(),
         _ => return Err(refused_yaml(COMPONENTS, "the model file is not a list")),
     };
 
-    let mut set_fields_ok = true;
     for (field, val) in object {
         if field == "id" {
             continue;
         }
-        if field == "parent" && current.parent.is_none() && val.is_null() {
-            continue;
-        }
-        let yaml_val = Value::from_json(val);
-        if document
-            .set(
-                &[Segment::Index(index), Segment::Key(field.clone())],
-                yaml_val,
-                CommentLoss::Refuse,
-            )
-            .is_err()
-        {
-            set_fields_ok = false;
-            break;
+        if val.is_null() {
+            let key_exists = match document.value() {
+                Value::Seq(rows) => match rows.get(index) {
+                    Some(Value::Map(entries)) => entries.iter().any(|(k, _)| k == field),
+                    _ => false,
+                },
+                _ => false,
+            };
+            if key_exists {
+                document
+                    .remove(
+                        &[Segment::Index(index), Segment::Key(field.clone())],
+                        CommentLoss::Refuse,
+                    )
+                    .map_err(|r| refused_yaml(COMPONENTS, r))?;
+            }
+        } else {
+            let yaml_val = Value::from_json(val);
+            document
+                .set(
+                    &[Segment::Index(index), Segment::Key(field.clone())],
+                    yaml_val,
+                    CommentLoss::Refuse,
+                )
+                .map_err(|r| refused_yaml(COMPONENTS, r))?;
         }
     }
 
-    let (bytes, expected) = if set_fields_ok {
-        let expected = document.value().clone();
-        (document.to_bytes(), expected)
-    } else {
-        let mut fallback_doc = parse(text.as_bytes(), Profile::Tool, COMPONENTS)
-            .map_err(|r| refused_yaml(COMPONENTS, r))?;
-        let replacement = ordered(&clean_merged, COMPONENT_ORDER);
-        fallback_doc
-            .set(&[Segment::Index(index)], replacement.clone(), CommentLoss::Refuse)
-            .map_err(|r| refused_yaml(COMPONENTS, r))?;
-        let mut expected = old;
-        expected[index] = replacement;
-        (fallback_doc.to_bytes(), Value::Seq(expected))
-    };
-
+    let bytes = document.to_bytes();
     let after =
         parse(&bytes, Profile::Tool, COMPONENTS).map_err(|r| refused_yaml(COMPONENTS, r))?;
-    if after.value() != &expected {
+    let new_rows = match after.value() {
+        Value::Seq(rows) => rows,
+        _ => return Err(refused_yaml(COMPONENTS, "the updated file is not a list")),
+    };
+    if new_rows.len() != old.len()
+        || new_rows
+            .iter()
+            .enumerate()
+            .any(|(i, row)| i != index && row != &old[i])
+    {
         return Err(refused_yaml(
             COMPONENTS,
             "the updated file does not match the expected rows",
+        ));
+    }
+
+    let decoded: Component =
+        decode(&new_rows[index].to_json()).map_err(|r| refused_yaml(COMPONENTS, r))?;
+    if serde_json::to_value(&decoded).map_err(|e| invalid(e.to_string()))? != clean_merged {
+        return Err(refused_yaml(
+            COMPONENTS,
+            "the updated row does not match the merged component",
         ));
     }
 
@@ -1590,7 +1616,10 @@ mod tests {
         .unwrap();
         assert_eq!(declared.id, "a");
         let loaded = Model::load_dir(&model).unwrap();
-        assert_eq!(loaded.components[0].reason.as_deref(), Some("updated reason"));
+        assert_eq!(
+            loaded.components[0].reason.as_deref(),
+            Some("updated reason")
+        );
     }
 
     fn read_tree(dir: &Path) -> BTreeMap<PathBuf, Vec<u8>> {
@@ -1739,6 +1768,77 @@ mod tests {
             &json!({"id": "a", "canonical": "alpha", "aliases": ["first"], "status": "designed"}),
         );
         assert!(keep_own_names.is_ok());
+        let loaded = Model::load_dir(&model).unwrap();
+        assert_eq!(loaded.components[0].status, "designed");
+    }
+
+    #[test]
+    fn an_update_with_reason_null_removes_the_key_and_the_model_reloads() {
+        let (root, model) = project("update-remove-reason");
+        let update_with_reason = json!({
+            "id": "a",
+            "reason": "initial reason"
+        });
+        run_update(&model, &root, Kind::Component, &update_with_reason).unwrap();
+        let loaded = Model::load_dir(&model).unwrap();
+        assert_eq!(
+            loaded.components[0].reason.as_deref(),
+            Some("initial reason")
+        );
+        let yaml_text = fs::read_to_string(model.join("components.yaml")).unwrap();
+        assert!(yaml_text.contains("reason: initial reason"));
+
+        let update_remove_reason = json!({
+            "id": "a",
+            "reason": null
+        });
+        let declared = run_update(&model, &root, Kind::Component, &update_remove_reason).unwrap();
+        assert_eq!(declared.id, "a");
+        assert!(!declared.row.as_object().unwrap().contains_key("reason"));
+
+        let yaml_after = fs::read_to_string(model.join("components.yaml")).unwrap();
+        assert!(!yaml_after.contains("reason"));
+        assert!(yaml_after.starts_with("# the first component\n- id: a\n"));
+
+        let reloaded = Model::load_dir(&model).unwrap();
+        assert_eq!(reloaded.components[0].reason, None);
+    }
+
+    #[test]
+    fn an_update_naming_the_same_parent_is_accepted_and_removing_parent_is_refused() {
+        let (root, model) = project("update-parent");
+        let mut b_row = component_row("b");
+        b_row["canonical"] = json!("beta");
+        b_row["parent"] = json!("a");
+        run(&model, &root, Kind::Component, &b_row, Some("q")).unwrap();
+
+        // An update naming the same parent is accepted
+        let same_parent = run_update(
+            &model,
+            &root,
+            Kind::Component,
+            &json!({"id": "b", "parent": "a", "status": "designed"}),
+        );
+        assert!(same_parent.is_ok());
+        let loaded = Model::load_dir(&model).unwrap();
+        assert_eq!(loaded.components[1].parent.as_deref(), Some("a"));
+        assert_eq!(loaded.components[1].status, "designed");
+
+        // An update removing the parent (null) is refused with update-changes-parent
+        let before = read_tree(&model);
+        let remove_parent = run_update(
+            &model,
+            &root,
+            Kind::Component,
+            &json!({"id": "b", "parent": null}),
+        );
+        let err = remove_parent.unwrap_err();
+        assert_eq!(err.code, "update-changes-parent");
+        assert_eq!(
+            err.detail,
+            "changing a component's parent is an owner question"
+        );
+        assert_eq!(read_tree(&model), before);
     }
 
     #[test]
