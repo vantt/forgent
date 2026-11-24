@@ -115,7 +115,7 @@ test('a program found through resolve_program is judged by the name it looks up,
     fs.mkdirSync(path.dirname(lib), { recursive: true });
     fs.writeFileSync(lib, [
       'use std::process::Command;',
-      'use fgos_process::spawn::resolve_program;',
+      'use fgos_process::spawn::{resolve_program, resolve_program_in};',
       '',
       'pub fn switch_main(dir: &str, path_env: &str) -> std::io::Result<std::process::Output> {',
       '    let git = resolve_program("git", path_env, "", false).ok_or(std::io::ErrorKind::NotFound)?;',
@@ -125,6 +125,11 @@ test('a program found through resolve_program is judged by the name it looks up,
       'pub fn node_version(path_env: &str) -> Option<std::process::Output> {',
       '    let node = resolve_program("node", path_env, "", false)?;',
       '    Command::new(node).arg("--version").output().ok()',
+      '}',
+      '',
+      'pub fn git_log(path_env: &str) -> Option<std::process::Output> {',
+      '    let git = resolve_program_in("git", path_env, "", false, true).and_then(|p| Some(p))?;',
+      '    Command::new(git).arg("log").output().ok()',
       '}',
       '',
       'fn run_named(name: &str, path_env: &str) -> Option<std::process::Output> {',
@@ -140,7 +145,7 @@ test('a program found through resolve_program is judged by the name it looks up,
     const { sites } = scan({ root });
     const rust = sites.filter((s) => s.path === 'packages/demo/rust/src/lib.rs' && s.family === 'rust');
     // `git` found through the door is a Git spawn at its own call and at the caller that names it; `node` is not.
-    assert.equal(rust.length, 2, JSON.stringify(sites));
+    assert.equal(rust.length, 3, JSON.stringify(sites));
     assert.ok(rust.every((s) => s.binary === 'git'));
     assert.ok(!sites.some((s) => s.family === 'unresolved-binary'), `resolve_program left a binary unresolved (got ${JSON.stringify(sites)})`);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }

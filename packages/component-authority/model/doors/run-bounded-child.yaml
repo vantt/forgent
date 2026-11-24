@@ -43,7 +43,7 @@ allowed:
     reason: in the door's own crate; the containment driver polls the contained child it started
   - path: packages/process/rust/src/mapped.rs
     count: 2
-    reason: in the door's own crate; the descriptor-mapped spawn searches PATH for its program and polls the child it started
+    reason: in the door's own crate; the descriptor-mapped spawn searches PATH for its program and polls the child it started; its PATH search joins relative entries to the spawn cwd, checks access(X_OK) and returns EACCES, so it cannot move onto resolve_program without a behaviour change
   - path: packages/distribution/rust/src/init.rs
     count: 1
     reason: a PATH membership test (split_paths) for the launcher directory, not a program lookup

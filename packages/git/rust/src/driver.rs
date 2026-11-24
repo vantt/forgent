@@ -297,7 +297,9 @@ impl GitDriver {
         check_hooks(&hooks)?;
         let git = GIT
             .get_or_init(|| {
-                let path = std::env::var("PATH").unwrap_or_default();
+                let path = std::env::var_os("PATH")
+                    .map(|p| p.to_string_lossy().into_owned())
+                    .unwrap_or_default();
                 fgos_process::spawn::resolve_program_in("git", &path, ".EXE", cfg!(windows), true)
                     .and_then(|p| fs::canonicalize(p).ok())
             })

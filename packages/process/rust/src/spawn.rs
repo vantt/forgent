@@ -253,8 +253,8 @@ pub fn run_bounded_command<G>(
 ///
 /// `path_env` is split on `;` when `windows` and on `:` otherwise; an empty entry is skipped. A name holding
 /// a path separator is taken as the path itself. On Windows only the extensions of `pathext` are tried
-/// (`DEFAULT_PATHEXT` when it is empty), never the bare name: npm installs an extensionless `sh` script
-/// beside `claude.cmd` that CreateProcess cannot run. Elsewhere the file must be executable. The answer is the
+/// (`DEFAULT_PATHEXT` when it is empty), never the bare name (except a name that already has an extension,
+/// below): npm installs an extensionless `sh` script beside `claude.cmd` that CreateProcess cannot run. Elsewhere the file must be executable. The answer is the
 /// first hit in search order. Pure over its inputs apart from reading the file system, so it runs the same
 /// on any host.
 ///
@@ -271,7 +271,7 @@ pub fn resolve_program(
 
 /// [`resolve_program`] with `absolute_only` choosing the entries searched: when true, a relative `PATH`
 /// entry and a name with a relative directory part are skipped, so the answer never depends on the
-/// working directory.
+/// working directory. "Absolute" follows the host's `Path::is_absolute`.
 pub fn resolve_program_in(
     name: &str,
     path_env: &str,
@@ -446,27 +446,46 @@ mod resolve_tests {
     #[test]
     fn absolute_only_skips_relative_path_entries_and_relative_directory_names() {
         let dir = scratch("absonly");
-        std::fs::write(dir.join("tool"), "#!/bin/sh\n").unwrap();
+        make_executable(&dir.join("tool"), true);
+        // The scratch directory seen from the working directory: up to the root, then down.
+        let cwd = std::env::current_dir().unwrap();
+        let mut rel = PathBuf::new();
+        for _ in cwd
+            .components()
+            .filter(|c| matches!(c, std::path::Component::Normal(_)))
         {
-            use std::os::unix::fs::PermissionsExt;
-            std::fs::set_permissions(dir.join("tool"), std::fs::Permissions::from_mode(0o755))
-                .unwrap();
+            rel.push("..");
         }
-        // A relative entry is never searched, whatever the working directory holds.
-        assert_eq!(resolve_program_in("tool", ".", "", false, true), None);
+        for c in dir.components() {
+            if let std::path::Component::Normal(n) = c {
+                rel.push(n);
+            }
+        }
+        assert!(rel.is_relative());
+        let rel_dir = rel.display().to_string();
+        let abs_dir = dir.display().to_string();
+        // A relative entry is searched by the default door and skipped when absolute-only.
         assert_eq!(
-            resolve_program_in("tool", "bin:sub/dir", "", false, true),
+            resolve_program_in("tool", &rel_dir, "", false, false),
+            Some(rel.join("tool"))
+        );
+        assert_eq!(resolve_program_in("tool", &rel_dir, "", false, true), None);
+        // A name with a relative directory part behaves the same.
+        let relative_name = format!("{rel_dir}/tool");
+        assert_eq!(
+            resolve_program_in(&relative_name, "", "", false, false),
+            Some(rel.join("tool"))
+        );
+        assert_eq!(
+            resolve_program_in(&relative_name, "", "", false, true),
             None
         );
-        // A relative directory part is refused; the absolute one resolves.
-        assert_eq!(resolve_program_in("./tool", "", "", false, true), None);
-        let path = format!("relative:{}", dir.display());
+        // An absolute entry to the same directory is found, after a skipped relative one.
+        let path = format!("{rel_dir}:{abs_dir}");
         assert_eq!(
             resolve_program_in("tool", &path, "", false, true),
             Some(dir.join("tool"))
         );
-        // The default door still searches the same relative entry.
-        assert_eq!(resolve_program("./absent", "", "", false), None);
     }
 
     #[test]

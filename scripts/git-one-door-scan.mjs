@@ -1838,7 +1838,7 @@ function rustModel(name, source, root) {
     // search path: the program it returns is the program `name` evaluates to, so the spawn counts as resolved
     // where `name` is a literal, and is followed to its callers where `name` is a parameter. The scan follows
     // it by name, through a module path or not, before it could mistake the door's own body for the value.
-    const resolverCall = /^(?:[a-z_][a-z0-9_]*::)*resolve_program\s*\(/.exec(expr);
+    const resolverCall = /^(?:[a-z_][a-z0-9_]*::)*resolve_program(?:_in)?\s*\(/.exec(expr);
     if (resolverCall) {
       const open = resolverCall[0].length - 1;
       let nest = 0;
@@ -1848,7 +1848,7 @@ function rustModel(name, source, root) {
       const rest = expr.slice(close + 1).trim();
       // The Option the door returns, unwrapped: a fallback `unwrap_or(..)` names a second program.
       const fallback = /^\.unwrap_or(?:_else)?\(\s*(?:\|\s*\|\s*)?([\s\S]*)\)$/.exec(rest);
-      if (name !== undefined && (!rest || fallback || /^\.(?:ok_or(?:_else)?|expect)\([\s\S]*\)$/.test(rest))) {
+      if (name !== undefined && (!rest || fallback || /^\.(?:ok_or(?:_else)?|expect|and_then)\([\s\S]*\)$/.test(rest))) {
         return [...evalRust(name, index, depth + 1), ...(fallback ? evalRust(fallback[1], index, depth + 1) : [])];
       }
     }
