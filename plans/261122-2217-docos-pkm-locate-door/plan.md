@@ -2,7 +2,7 @@
 contract: plan-v1
 title: "Documentation build step 1: locate through pkm (pkm-core v0.7.0 linked, static ONNX Runtime, index worker process, fgos doc locate, doctor rows, licences, recall measurement)"
 description: "Link pkm-core v0.7.0 into the fgos host behind a locate port, run its index worker as a detached process, ship fgos doc locate with doctor rows and licences, and measure recall on the gold set."
-status: draft
+status: done
 priority: P1
 effort: 34h
 branch: main
