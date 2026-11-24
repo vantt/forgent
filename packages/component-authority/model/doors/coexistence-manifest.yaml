@@ -1,5 +1,6 @@
 job: coexistence manifest
 kind: door
+severity: low
 patterns:
   - export function (?:writeCoexistenceManifest|detectHarnesses)\b
   - pub fn (?:write_coexistence_manifest|detect_harnesses)\b

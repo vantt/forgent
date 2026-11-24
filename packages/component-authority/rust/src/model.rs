@@ -100,6 +100,17 @@ pub struct DoorPathReason {
     pub reason: Option<String>,
 }
 
+/// How much a door row's debt can hurt: `High` is a live twin or copy that decides a live answer which can
+/// disagree, `Medium` a live side that only asks the owner or live named debt that decides nothing differently,
+/// `Low` a twin reached only by dead code or a row with no debt and no twin.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Severity {
+    High,
+    Medium,
+    Low,
+}
+
 /// One door row. A door has no id of its own: `slug` is its file name without `.yaml`.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -108,6 +119,7 @@ pub struct Door {
     pub slug: String,
     pub job: String,
     pub kind: String,
+    pub severity: Severity,
     pub patterns: Vec<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub names: Vec<String>,
@@ -297,6 +309,7 @@ tierExceptions:
             "doors/one.yaml",
             r#"job: j
 kind: door
+severity: low
 patterns: []
 allowed:
   - x
@@ -335,6 +348,7 @@ allowed:
             r#"# the door that proves a note does not change the row
 job: j  # inline notes too
 kind: door
+severity: low
 patterns: []
 allowed:
   # a note between items
@@ -357,7 +371,7 @@ allowed:
         write(
             &dir,
             "doors/one.yaml",
-            "job: j\nkind: door\npatterns: []\nallowed: []\nsurprise: 1\n",
+            "job: j\nkind: door\nseverity: low\npatterns: []\nallowed: []\nsurprise: 1\n",
         );
         let error = Model::load_dir(&dir).unwrap_err();
         assert!(matches!(error, ModelError::Invalid { .. }), "{error}");

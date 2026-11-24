@@ -66,6 +66,7 @@ const DECISION_KIND_ORDER: &[&str] = &[
 const DOOR_ORDER: &[&str] = &[
     "job",
     "kind",
+    "severity",
     "patterns",
     "allowed",
     "debt",
@@ -984,7 +985,7 @@ mod tests {
         write(
             &model,
             "doors/one.yaml",
-            "job: j\nkind: door\npatterns: []\nallowed: []\n",
+            "job: j\nkind: door\nseverity: low\npatterns: []\nallowed: []\n",
         );
         (root, model)
     }
@@ -1147,7 +1148,7 @@ mod tests {
             code(run(&model, &root, Kind::Contract, &contract, None)),
             "reference-missing"
         );
-        let door = json!({"slug":"two","job":"j","kind":"door","patterns":[],"allowed":[]});
+        let door = json!({"slug":"two","job":"j","kind":"door","severity":"low","patterns":[],"allowed":[]});
         assert_eq!(
             code(run(&model, &root, Kind::Door, &door, None)),
             "reference-missing"
@@ -1173,7 +1174,7 @@ mod tests {
             code(run(&model, &root, Kind::Component, &row, Some("q"))),
             "path-missing"
         );
-        let door = json!({"slug":"two","job":"j","kind":"door","patterns":[],"allowed":["src/ghost/**"],"owner":"a"});
+        let door = json!({"slug":"two","job":"j","kind":"door","severity":"low","patterns":[],"allowed":["src/ghost/**"],"owner":"a"});
         assert_eq!(
             code(run(&model, &root, Kind::Door, &door, None)),
             "path-missing"
@@ -1294,7 +1295,7 @@ mod tests {
         let (root, model) = project("contract-door");
         let contract = json!({"id":"C2","canonical":"C2","aliases":["two"],"meaning":"m","provider":"a","consumers":["a"],"path":"docs/b.md","evidence":["docs/b.md"],"status":"designed"});
         run(&model, &root, Kind::Contract, &contract, None).unwrap();
-        let door = json!({"slug":"two","job":"j2","kind":"door","patterns":["x"],"allowed":["src/a/**",{"path":"docs/a.md","reason":"r"}],"owner":"a"});
+        let door = json!({"slug":"two","job":"j2","kind":"door","severity":"low","patterns":["x"],"allowed":["src/a/**",{"path":"docs/a.md","reason":"r"}],"owner":"a"});
         let declared = run(&model, &root, Kind::Door, &door, None).unwrap();
         assert!(declared.files[0].ends_with("doors/two.yaml"));
         let loaded = Model::load_dir(&model).unwrap();
@@ -1371,7 +1372,7 @@ mod tests {
         let root = scratch("bootstrap-door");
         write(&root, "src/a.rs", "");
         let model = root.join(".fgos/authority/model");
-        let door = json!({"slug":"one","job":"j","kind":"door","patterns":[],"allowed":["src/a.rs"],"owner":"a"});
+        let door = json!({"slug":"one","job":"j","kind":"door","severity":"low","patterns":[],"allowed":["src/a.rs"],"owner":"a"});
         assert_eq!(
             code(run(&model, &root, Kind::Door, &door, None)),
             "reference-missing"

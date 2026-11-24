@@ -1,5 +1,6 @@
 job: derive executor facts
 kind: door
+severity: low
 patterns:
   - (?:function|const) (?:withDefaultExecutor|familyOf|lookupExecutor|capabilityConfinementOf|credentialStoreOf|renderedEffortLevels|resolvePostureInvocation|decideExecutorDispatchMechanism|effectiveRigorOf|detectHerdrPresent|validateRunnerConfigShape|validateGeneratedPathsShape|loadMachineBackendRegistry|providerAccountInventory|readLlmAccounts|legacyStateKey|listAgents)\b
   - \bfn (?:with_default_executor|family_of|lookup_executor|capability_confinement_of|credential_store_of|rendered_effort_levels|resolve_posture_invocation|decide_executor_dispatch_mechanism|effective_rigor_of|detect_herdr_present|validate_runner_config_shape|validate_generated_paths_shape|load_machine_backend_registry|provider_account_inventory|read_llm_accounts|legacy_state_key|list_agents)\b

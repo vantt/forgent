@@ -1,5 +1,6 @@
 job: parse CLI arguments (twin)
 kind: door
+severity: low
 patterns:
   - export function parseArgs
   - pub fn parse_args

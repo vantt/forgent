@@ -1,5 +1,6 @@
 job: retired Node S3 verb code
 kind: door
+severity: low
 patterns:
   - \bsyncUseCase\b
   - \bstatusUseCase\b

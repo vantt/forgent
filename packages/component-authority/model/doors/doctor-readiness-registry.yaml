@@ -1,5 +1,6 @@
 job: doctor readiness registry
 kind: door
+severity: medium
 patterns:
   - \bregisterCheck\(
   - \bregisterFix\(

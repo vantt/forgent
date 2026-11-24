@@ -1,5 +1,6 @@
 job: global fgOS directory
 kind: door
+severity: medium
 patterns:
   - homedir\(\)\s*,\s*['\"]\.fgos['\"]
   - \b(?:homeDir|home)\s*,\s*['\"]\.fgos['\"]

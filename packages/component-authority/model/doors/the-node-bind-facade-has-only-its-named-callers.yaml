@@ -1,5 +1,6 @@
 job: the Node bind facade has only its named callers
 kind: door
+severity: low
 patterns:
   - from '[^']*execution/bind\.mjs'
   - import\('[^']*execution/bind\.mjs'

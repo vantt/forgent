@@ -1,5 +1,6 @@
 job: retired Node help renderer
 kind: door
+severity: low
 patterns:
   - \brenderHelpText\b
   - \brenderGuide\b

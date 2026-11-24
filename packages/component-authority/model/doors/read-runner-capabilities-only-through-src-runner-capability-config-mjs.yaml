@@ -1,5 +1,6 @@
 job: read runner.capabilities only through src/runner/capability-config.mjs (one function per field) or bind()'s result
 kind: door
+severity: low
 patterns:
   - (?<!\b(?:contract|payload|fanOutPayload|manifestWithoutDigest|manifest|report|entry|provider|self|a)\??)\.capabilities\b\s*(?:\?\?|\|\||&&|\?\.|\[|\)|;|,|===|!==)
   - \[\s*[\'"]capabilities[\'"]\s*\]

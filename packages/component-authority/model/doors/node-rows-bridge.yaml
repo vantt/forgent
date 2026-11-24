@@ -1,5 +1,6 @@
 job: Node rows bridge
 kind: door
+severity: low
 patterns:
   - doctor-bridge
   - \brunBridged\b

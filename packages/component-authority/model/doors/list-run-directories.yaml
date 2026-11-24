@@ -1,5 +1,6 @@
 job: list run directories (twin)
 kind: door
+severity: high
 patterns:
   - export function (?:scanAssignmentLayout|listOpenAttemptDirs)\b
   - export const runsRoot\b

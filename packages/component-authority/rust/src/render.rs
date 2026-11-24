@@ -968,7 +968,7 @@ mod tests {
         put(
             &root,
             &format!("{model}doors/one.yaml"),
-            "job: j\nkind: door\npatterns: []\nallowed:\n  - packages/demo/x\n",
+            "job: j\nkind: door\nseverity: low\npatterns: []\nallowed:\n  - packages/demo/x\n",
         );
         put(&root, "packages/demo/contracts/demo.v1.json", "{}\n");
         let docs: [(&str, &[&str]); 7] = [

@@ -1005,7 +1005,7 @@ fn the_loader_refuses_a_component_row_missing_a_required_field() {
     write_model_file(
         &dir,
         "doors/one.yaml",
-        "job: j\nkind: door\npatterns: []\nallowed: []\n",
+        "job: j\nkind: door\nseverity: low\npatterns: []\nallowed: []\n",
     );
     let component = |status: &str| {
         format!(

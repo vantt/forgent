@@ -1,5 +1,6 @@
 job: Event Store maintain policy
 kind: door
+severity: low
 patterns:
   - \bsyncDue\b
   - fn sync_due

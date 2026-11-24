@@ -1,5 +1,6 @@
 job: "the purpose chooser outside bind() is gone: ask purposeSeatOf in src/runner/dispatch/plan.mjs"
 kind: door
+severity: low
 patterns:
   - \bresolveExecutorAndOverrides\b
   - capability\.prefer
