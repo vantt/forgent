@@ -130,7 +130,7 @@ a handoff. This plan is the safety net under that rule.
 | 1 | [Diagnose why an ended lead raised no event](phase-01-diagnosis.md) | - | plans/261124-2143-head-lifecycle-events/reports/diagnosis.md | 1 | ready |
 | 3 | [Close finished planners and leads through one door](phase-03-close-finished-heads.md) | - | packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, core/watcher/definitions/plan-drafted.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/plan-drafted/**, src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs | 1 | ready |
 | 2 | [Host-side end signal for a head](phase-02-host-end-signal.md) | 1, 3 | apps/fgos/src/wiring/observe_sources/head_state.rs, apps/fgos/src/wiring/observe_sources/tests/mod.rs, apps/fgos/observe-kinds.json, core/watcher/definitions/lead-ended.query.json, core/watcher/definitions/session-gone.query.json, core/attention/definitions/head-gone.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/fixtures/definitions/** | 2 | ready |
-| 4 | [A lead waiting outside does not hold a working slot](phase-04-waiting-lead-slot.md) | 3 | packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs | 2 | draft |
+| 4 | [A lead waiting outside does not hold a working slot](phase-04-waiting-lead-slot.md) | 3 | packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs | 2 | ready |
 | 5 | [Spec, skill and generated skills](phase-05-spec-and-skill.md) | 2, 3, 4 | docs/platform/supervision/spec.md, docs/platform/observe/spec.md, docs/platform/session-host/spec.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 3 | draft |
 | 6 | [Integration, full gates and closing the rows](phase-06-integration.md) | 1, 2, 3, 4, 5 | CHANGELOG.md, plans/backlog.md, plans/backlog/p-pv7ha3l5ss-head-lifecycle-events-end-of-work-stop-rule-and-lead-slots.md, plans/backlog/p-iatzcg2gee-*.md, plans/backlog/p-6hqvgokerb-*.md, plans/backlog/p-tyowvhthul-*.md, plans/261124-2143-head-lifecycle-events/reports/integration.md | 4 | draft |
 
@@ -138,7 +138,7 @@ Phase 3 depends on nothing: closing finished heads does not wait for the diagnos
 because both add rows to `packages/supervision/rust/tests/definitions.rs` fixtures through the shared
 definitions directory, and phase 2's shape depends on the diagnosis. Phase 4 follows phase 3 because both write
 `apps/fgos/src/wiring/supervision.rs` and `packages/supervision/rust/tests/wake.rs`. Phases 2 and 4 share wave 2
-with disjoint footprints. Phase 4 is blocked on the owner question below; phases 5 and 6 wait for it. Hot files:
+with disjoint footprints. Phase 4 follows the owner's answer below. Hot files:
 `core/skills/fgos-supervisor/SKILL.md` and the three supervision/observe/session-host specs belong to phase 5 alone;
 generated skill copies are regenerated there with `npm run build:skills`, never hand-merged; `CHANGELOG.md` and the
 backlog belong to phase 6.
@@ -152,9 +152,9 @@ overlaps plan 0004 on `docs/platform/supervision/spec.md`, `docs/platform/sessio
 ## Owner questions
 
 - q-eoxlvo7i4r: Lead slots: count a lead waiting outside as free, or raise the lane count from measured capacity?
-  The owner picked "a waiting lead does not hold a working slot" in chat on 2026-11-24, and added that a head left
-  waiting a long time should be shut down and woken when needed (plan `261122-0056-orchestration-skeleton` phase 6).
-  Phase 4 stays `draft` until the answer is recorded in the question store; phases 1-3 are `ready`.
+  Answered 2026-11-24: "a waiting lead does not hold a working slot". The owner added that a head left waiting a
+  long time should be shut down and woken when needed (plan `261122-0056-orchestration-skeleton` phase 6), so this
+  rule is the interim. No question is open.
 
 ## Risks and rollback
 

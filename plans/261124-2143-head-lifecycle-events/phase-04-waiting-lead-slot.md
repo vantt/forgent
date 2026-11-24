@@ -1,7 +1,7 @@
 # Phase 4: A lead waiting outside does not hold a working slot
 
-Closes `p-tyowvhthul` in code. The owner picked "a waiting lead does not hold a working slot" in chat on
-2026-11-24 (question `q-eoxlvo7i4r`); start once the answer is recorded in the question store.
+Closes `p-tyowvhthul` in code. The owner answered question `q-eoxlvo7i4r` on 2026-11-24: "a waiting lead
+does not hold a working slot".
 
 This rule is the interim. The owner's direction is that a head with nothing to do for a long time is shut down and
 woken at the right moment: plan `261122-0056-orchestration-skeleton` phase 6 (sleep and wake, with phases 16 and 17)
@@ -37,7 +37,6 @@ meaning of "waits" and adds nothing that phase 6 would have to migrate.
 2. `plans` counts a live lead of such a plan in a new `leadsWaiting` count and not in `leadsLive`; admission
    compares `leadsLive` with `maxLeads` as today. The JSON view carries `leadsWaiting`.
 3. When the lead unparks a phase, its plan counts as working again at the next wake; nothing is stopped to make room.
-
 4. Read the plan source of `261122-0056-orchestration-skeleton` phase 5 (`waitingOn` from a parked phase) before
    writing step 1; if that phase has landed, call its reader instead of writing a second one.
 
