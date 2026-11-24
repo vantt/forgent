@@ -16,3 +16,8 @@
 
 ## Owner questions
 - q-trgzaa34ua is still open but moot: 261124-1433 closed on the owner's word (8f313d7b4). The secretary or the owner should cancel it.
+
+## Late events (queued during this wake)
+- 483f33046c7fb0f6 `lead-ended` head:lead-forgent-261124-0837-docos-d50e2: its placement record shows `retiredReason: "owner gives 0837 to DOCOS"`. That confirms the hold above. 86df39c873781e95 `plan-became-ready` and fa6474470218f96b `plan-ready-waiting` for 0837 were handled without admitting it: the plan belongs to the DOCOS lane by the owner's order.
+- 714b79a18a8e148d `session-no-result`: unit-run-1795529276588-41202652 is plan 0004 phase 2 (ticket c-2817-1795529276141). Its live lead is busy polling that ticket. No action.
+- de436c9178a501c6 `lane-freed`: no admissible plan takes it (0837 is held for DOCOS). No action.
