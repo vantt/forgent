@@ -2,9 +2,14 @@ job: release source payload selection
 kind: door
 patterns:
   - (?:function|fn)\s+(?:collectSourceFiles|listLegacyNodeSourceFiles|list_source_files)\b
+names:
+  - collectSourceFiles
+  - listLegacyNodeSourceFiles
 allowed:
-  - packages/distribution/rust/src/source_payload.rs
+  - path: packages/distribution/rust/src/source_payload.rs
+    count: 1
   - path: scripts/build-rust-distribution.mjs
+    count: 2
     reason: the release builder's one function asks the host for the list (fgos internal source-payload); it selects nothing itself
 debt: []
 retiredBy: "S7: the release builder moves to Rust and its Node half goes"

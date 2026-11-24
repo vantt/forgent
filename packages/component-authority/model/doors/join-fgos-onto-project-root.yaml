@@ -5,8 +5,10 @@ patterns:
   - path\.join\((?!\s*(?:home|homeDir|os\.homedir\(\))\b)(?:[^()]|\([^()]*\))*['"]\.fgos/
   - "`[^`]*\\$\\{[^}]+\\}/\\.fgos\\b"
 allowed:
-  - src/util/fgos-file-registry.mjs
+  - path: src/util/fgos-file-registry.mjs
+    count: 1
   - path: src/util/host-bin-path.mjs
+    count: 2
     reason: "bootstrap: finds the activation before any door can load; the Git one-door scan needs the literal shim path"
   - path: scripts/**
     reason: repo tooling and harnesses build their own fixture projects; not payload

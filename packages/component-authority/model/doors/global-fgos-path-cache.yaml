@@ -4,10 +4,13 @@ patterns:
   - bin-cache\.json
   - globalFgosPath
 allowed:
-  - packages/distribution/rust/src/bin_cache.rs
+  - path: packages/distribution/rust/src/bin_cache.rs
+    count: 3
   - path: src/setup/bin-discovery.mjs
+    count: 2
     reason: "the Node reader: the cached path is tried first and a live PATH probe follows when it is gone; reads only"
   - path: scripts/fgos-shell-integration.sh
+    count: 2
     reason: the shell integration the user sources reads the cached path before it probes PATH; reads only
 debt: []
 retiredBy: "S7: the Node reader retires with the Node payload"

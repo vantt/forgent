@@ -9,9 +9,12 @@ patterns:
   - export function globalFgosDir
   - get\(\"HOME\"\)
 allowed:
-  - packages/config/rust/src/machine.rs
-  - src/config/facade.mjs
+  - path: packages/config/rust/src/machine.rs
+    count: 3
+  - path: src/config/facade.mjs
+    count: 1
   - path: packages/execution/engine/src/transport_round/round.rs
+    count: 2
     reason: reads the attempt environment's HOME (the agent's source home for its private home and agy trust store, the Node twin's `fullEnv.HOME ?? os.homedir()`); it never joins .fgos, and machine::global_dir answers the machine's ~/.fgos, not an agent's home
 debt:
   - path: src/runner/dispatch/llm-accounts.mjs

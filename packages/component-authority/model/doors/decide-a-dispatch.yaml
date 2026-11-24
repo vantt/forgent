@@ -3,8 +3,13 @@ kind: door
 patterns:
   - (?:function|const) (?:compileDispatchPlan|purposeSeatOf|decideExecutorCli)\b
   - \bfn (?:compile_dispatch_plan|purpose_seat|decide_executor_cli)\b
+names:
+  - purpose_seat
+  - decide_executor_cli
+  - compile_dispatch_plan
 allowed:
   - path: packages/execution/rust/src/decide.rs
+    count: 5
     reason: "the decider: executor id, assignment, Work hint and purpose selectors, purpose seats through bind"
 debt:
   - path: src/runner/dispatch/plan.mjs

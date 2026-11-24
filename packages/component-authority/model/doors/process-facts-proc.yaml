@@ -5,33 +5,51 @@ patterns:
   - "[\"']/proc[\"']"
   - "[\"'`]/proc/"
 allowed:
-  - packages/process/rust/src/platform/linux.rs
-  - packages/process/rust/src/containment/linux.rs
-  - packages/holder-lock/rust/src/driver/flock.rs
-  - packages/git/rust/src/wal.rs
-  - packages/mailbox/rust/store/examples/mailbox-record-cost.rs
-  - src/run-supervisor/runtime-dir.mjs
-  - src/runner/dispatch/confinement/drivers/bwrap.mjs
-  - src/runner/dispatch/confinement/probes/harness.mjs
+  - path: packages/process/rust/src/platform/linux.rs
+    count: 33
+  - path: packages/process/rust/src/containment/linux.rs
+    count: 7
+  - path: packages/holder-lock/rust/src/driver/flock.rs
+    count: 7
+  - path: packages/git/rust/src/wal.rs
+    count: 6
+  - path: packages/mailbox/rust/store/examples/mailbox-record-cost.rs
+    count: 2
+  - path: src/run-supervisor/runtime-dir.mjs
+    count: 2
+  - path: src/runner/dispatch/confinement/drivers/bwrap.mjs
+    count: 2
+  - path: src/runner/dispatch/confinement/probes/harness.mjs
+    count: 11
   - path: packages/execution/engine/src/confinement/driver/bwrap.rs
+    count: 2
     reason: "Rust twin of drivers/bwrap.mjs: mounts /proc in the sandbox and passes the fd-closer script that lists /proc/$$/fd inside it, bwrap arguments and not reads of process facts"
   - path: packages/execution/engine/src/confinement/cleanup/probes/sandbox.rs
+    count: 1
     reason: "Rust twin of probes/harness.mjs: the base bwrap arguments mount a fresh /proc inside the probe sandbox, bwrap arguments and not reads of process facts"
   - path: packages/execution/engine/src/confinement/cleanup/probes/basic.rs
+    count: 3
     reason: "Rust twin of probes/harness.mjs: the fd-closer script lists /proc/$$/fd inside the probe sandbox, a sandboxed shell script and not a host read of process facts"
   - path: packages/execution/engine/src/confinement/cleanup/probes/peer.rs
+    count: 1
     reason: "Rust twin of probes/harness.mjs: the blind-read probe's sandboxed script tries /proc/<peer>/cmdline to prove a peer process is hidden, a sandboxed shell script and not a host read of process facts"
   - path: scripts/ci-setup-bwrap.sh
+    count: 1
     reason: reads the AppArmor user-namespace switch to set up the sandbox on CI
   - path: scripts/lib/test-file-cpu.mjs
+    count: 2
     reason: reads /proc/self/stat for waited CPU seconds of the test run, a measurement and not a process judgement
   - path: scripts/lib/mailbox-live-cli.mjs
+    count: 5
     reason: live probe reads /proc/meminfo and scans /proc/*/cmdline for the heavy-gate check, machine measurements and not process judgements
   - path: scripts/record-mailbox-hook-fixtures.mjs
+    count: 20
     reason: fixture recorder reads /proc/<pid> files and the pid namespace link of the CLI it records
   - path: scripts/git/e3-bench.mjs
+    count: 2
     reason: bench counts visible processes in /proc, a measurement and not a process judgement
   - path: scripts/git/p-space-resource.mjs
+    count: 5
     reason: bench counts its own open descriptors in /proc/self/fd and its thread count in /proc/self/status, measurements and not process judgements
 debt:
   - path: packages/holder-lock/rust/src/borrow_vectors.rs

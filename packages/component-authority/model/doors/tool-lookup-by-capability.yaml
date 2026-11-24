@@ -10,6 +10,7 @@ patterns:
   - \bfn index_is_stale\b
 allowed:
   - path: packages/execution/rust/src/tools.rs
+    count: 1
     reason: the tool probe and the staleness check behind decide, explain and the tool-registry-configured doctor row
 debt:
   - path: src/runner/dispatch/tool-providers.mjs

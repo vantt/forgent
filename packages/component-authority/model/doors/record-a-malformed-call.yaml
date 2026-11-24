@@ -7,10 +7,14 @@ patterns:
   - export function appendFaultRecord
   - fn append_capped
 allowed:
-  - packages/observe/rust/src/invocation_fault.rs
-  - src/observe/invocation-fault-log.mjs
-  - src/util/capped-jsonl-log.mjs
-  - src/util/fgos-file-registry.mjs
+  - path: packages/observe/rust/src/invocation_fault.rs
+    count: 3
+  - path: src/observe/invocation-fault-log.mjs
+    count: 2
+  - path: src/util/capped-jsonl-log.mjs
+    count: 1
+  - path: src/util/fgos-file-registry.mjs
+    count: 1
 debt: []
 retiredBy: "S7: the Node twin retires with the last Node verb"
 reason: "the fault record has a Rust writer for the host and a Node writer for the Node CLI, which must also record a missing host; one vector file (test/rust-host/fixtures/invocation-fault-vectors.json) is read by both. The capped append has the same two owners (two other Node callers: approve-fault-log moves with S7, and provider-capacity goes with the dead Node Execution closure, p-24xw2cwdvo). Known gap kept visible: the Node writer does not redact `message` (an unknown-flag message quotes the typed token, value included), which the Rust writer does"

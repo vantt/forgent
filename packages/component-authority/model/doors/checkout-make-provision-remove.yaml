@@ -10,13 +10,18 @@ patterns:
   - \bworktreeSetup\b
 allowed:
   - packages/execution/checkout/**
-  - apps/fgos/src/wiring/worktree.rs
-  - packages/git/node-addon/src/checkout.rs
+  - path: apps/fgos/src/wiring/worktree.rs
+    count: 4
+  - path: packages/git/node-addon/src/checkout.rs
+    count: 1
   - path: packages/git/node-addon/src/git/worktree.rs
+    count: 3
     reason: "carries the Git worktree port to Node: its create, remove and prune entries call the driver and decide nothing"
   - path: packages/config/rust/src/bundle.rs
+    count: 2
     reason: names the `worktreeSetup` config section in the bundle's section list; it runs nothing
   - path: packages/execution/rust/src/checks.rs
+    count: 2
     reason: names `worktreeSetup` in a check message; it provisions nothing
 debt:
   - path: src/runner/repo-locks.mjs

@@ -5,9 +5,13 @@ patterns:
   - generated thin wrapper \(tsk-1qi
   - export function (?:generatedSkillDirs|ownedSkillNames)\b
   - pub fn (?:generated_skill_dirs|owned_skill_names)\b
+names:
+  - generatedSkillDirs
 allowed:
-  - packages/distribution/rust/src/skill_stamp.rs
+  - path: packages/distribution/rust/src/skill_stamp.rs
+    count: 2
   - path: src/setup/skill-wrappers.mjs
+    count: 3
     reason: "writer and reader: the render is repository tooling that stamps every file it assembles and prunes only stamped entries; the owned-name rule it holds is a declared twin of skill_stamp.rs, tied by the vectors of skill-stamp.v1.json"
 debt: []
 retiredBy: "the render moves to Rust (no step owns that: the render is repository tooling)"

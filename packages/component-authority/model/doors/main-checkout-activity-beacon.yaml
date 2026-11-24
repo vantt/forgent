@@ -4,10 +4,13 @@ patterns:
   - main-checkout-activity\.json
 allowed:
   - path: src/runner/main-checkout-activity.mjs
+    count: 1
     reason: the pre-commit hook's writer and the commit gate's reader
   - path: packages/holder-lock/rust/src/status.rs
+    count: 1
     reason: the reader of the lock report
   - path: src/cli/command-registry.mjs
+    count: 1
     reason: description text
 debt: []
 retiredBy: the pre-commit hook and the commit gate move to Rust

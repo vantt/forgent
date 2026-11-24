@@ -9,8 +9,10 @@ patterns:
   - File::lock\(
   - \.try_lock_(?:shared|exclusive)\(
 allowed:
-  - packages/holder-lock/rust/src/driver/flock.rs
-  - packages/holder-lock/rust/src/driver/windows.rs
+  - path: packages/holder-lock/rust/src/driver/flock.rs
+    count: 2
+  - path: packages/holder-lock/rust/src/driver/windows.rs
+    count: 3
 debt:
   - path: packages/git/node-addon/src/single_load.rs
     reason: takes a kernel lock of its own (Windows mutex, Unix flock) for the single-load marker instead of a holder-lock resource

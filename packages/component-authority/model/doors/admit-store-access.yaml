@@ -6,8 +6,10 @@ patterns:
   - worktree-identity-unreadable
   - \bisSessionWorktree\b
 allowed:
-  - packages/git/rust/src/store_admission.rs
+  - path: packages/git/rust/src/store_admission.rs
+    count: 3
   - path: src/runner/worktree.mjs
+    count: 1
     reason: "the adapter names one class itself: with no Git door loaded nothing can tell a linked worktree from the main checkout, so it refuses by `worktree-identity-unreadable` without asking the addon that carries the decision"
 debt: []
 retiredBy: "S7: the Node adapter retires with the Node payload"

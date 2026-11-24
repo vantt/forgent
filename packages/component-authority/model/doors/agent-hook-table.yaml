@@ -14,28 +14,40 @@ patterns:
   - \["\.agents", "hooks\.json"\]
   - "['\"]hooks\\.json['\"]"
 allowed:
-  - packages/distribution/rust/src/agent_hooks.rs
+  - path: packages/distribution/rust/src/agent_hooks.rs
+    count: 24
   - path: src/run-supervisor/trust-store.mjs
+    count: 2
     reason: reads and hashes the Codex hook file's bytes to trust its entries; it writes no hook
   - path: packages/run-supervisor/rust/src/controller/trust_store.rs
+    count: 1
     reason: "the Rust twin of trust-store.mjs: reads and hashes the Codex hook file's bytes to trust its entries; it writes no hook. The hook table lives in fgos-distribution (tier 9), which the run supervisor (tier 4) cannot depend on"
   - path: scripts/lib/mailbox-behaviour-v7f.mjs
+    count: 1
     reason: "harness-owned frozen experiment: names the hooks.json of the Codex home it builds for a simulated session; not a project hook file"
   - path: scripts/lib/mailbox-behaviour-run.mjs
+    count: 1
     reason: "harness-owned: writes the hooks.json of a Codex home it builds for a simulated session, like worker-home.mjs does for a worker; not a project hook file"
   - path: scripts/check-hook-registrations-guarded.mjs
+    count: 3
     reason: reads the project's Claude Code settings to check the registered commands; it writes no hook
   - path: scripts/record-mailbox-hook-fixtures.mjs
+    count: 2
     reason: the fixture recorder writes its own agy hook file into the workspace it builds, to record what a real CLI sends
   - path: scripts/lib/mailbox-live-confined.mjs
+    count: 6
     reason: "harness-owned: the host wires a hook through `fgos doctor --fix --only <fix>`, then the harness reads the file it wrote in the run's workspace and moves it out of the project, so only --settings or the run's CODEX_HOME loads it; it renders no hook"
   - path: scripts/lib/mailbox-live-cli.mjs
+    count: 4
     reason: the live harness lists the agy hook file of a workspace to learn what a CLI sees; it reads only
   - path: src/runner/dispatch/worker-home.mjs
+    count: 1
     reason: writes a worker's own settings.json in the worker's home (bypass acceptance), not a project hook file
   - path: packages/execution/engine/src/transport/worker_home.rs
+    count: 1
     reason: writes a worker's own settings.json in the worker's home (bypass acceptance), not a project hook file
   - path: core/skills/instruction-audit/scripts/instruction-audit.mjs
+    count: 2
     reason: a standalone skill script that audits instruction files, Claude Code's settings among them; it reads only
 debt: []
 retiredBy: the Node table src/setup/agent-hooks.mjs is deleted; the live mailbox harness installs hooks through `fgos doctor --fix --only <fix>`, answered by agent_hooks.rs

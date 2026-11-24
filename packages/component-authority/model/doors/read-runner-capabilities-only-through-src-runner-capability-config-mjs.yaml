@@ -5,5 +5,6 @@ patterns:
   - \[\s*[\'"]capabilities[\'"]\s*\]
   - \{[^{}]*\bcapabilities\b[^{}]*\}\s*=(?!=)(?!\s*report\b)
 allowed:
-  - src/runner/capability-config.mjs
+  - path: src/runner/capability-config.mjs
+    count: 4
 reason: the port is the one Node reader of the capabilities section and hands out answers per field, never an entry; the Rust owner is the fgos-execution crate (executor model, bind and decide read the section through the host's config door), which these JS-shaped patterns do not match, and the seat-binding crate is the authority over binding fields

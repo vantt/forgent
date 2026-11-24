@@ -4,16 +4,22 @@ patterns:
   - "['\"`]config\\.ya?ml['\"`]"
   - "['\"`]config\\.json['\"`]"
 allowed:
-  - src/config/facade.mjs
+  - path: src/config/facade.mjs
+    count: 2
   - path: src/runner/dispatch/config-twin.mjs
+    count: 3
     reason: names the file in the display of a finding's origin; reads nothing
   - path: packages/execution/rust/src/runner_config/mod.rs
+    count: 1
     reason: "the Rust twin of src/runner/dispatch/config.mjs: names the global file a refusal shows when its origin carries none; reads nothing (the pure crate cannot depend on fgos-config)"
   - path: packages/execution/rust/src/runner_config/origins.rs
+    count: 2
     reason: "the Rust twin of src/runner/dispatch/config.mjs: names the file in the display of a finding's origin; reads nothing (the pure crate cannot depend on fgos-config)"
   - path: packages/config/rust/src/files.rs
+    count: 2
     reason: the fgos-config crate owns the file names
   - path: packages/config/rust/src/machine.rs
+    count: 2
     reason: the fgos-config crate lists the machine files it reads
 debt: []
 retiredBy: "S7: the Node facade retires with the Node payload"

@@ -10,6 +10,7 @@ patterns:
   - \bpub fn render_pretty\b
 allowed:
   - path: packages/distribution/rust/src/doctor.rs
+    count: 2
     reason: "the doctor engine: the one fix command, the one report renderer"
   - path: apps/fgos/src/wiring/doctor/**
     reason: the host's registry reader and the in-process row adapters

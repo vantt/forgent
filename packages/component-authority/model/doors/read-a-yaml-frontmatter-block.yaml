@@ -6,10 +6,13 @@ patterns:
   - report/frontmatter\.mjs
   - \^---(?:\\r\?)?(?:\\n|\\s|\$)
 allowed:
-  - src/util/yaml.mjs
+  - path: src/util/yaml.mjs
+    count: 1
   - path: core/skills/distill/scripts/distill.mjs
+    count: 6
     reason: standalone shipped skill script; runs in user projects without the fgOS addon
   - path: core/skills/instruction-audit/scripts/instruction-audit.mjs
+    count: 1
     reason: standalone shipped skill script; runs in user projects without the fgOS addon
 debt: []
 reason: "only src/util/yaml.mjs readFrontmatter cuts and parses a frontmatter block; a second cutter or parser names one of the retired helpers or carries a fence regex (`^---` followed by an optional CR and a newline, whitespace or end of line). Per-line match on code and string text: a cut written another way (split on a fence) is not seen"

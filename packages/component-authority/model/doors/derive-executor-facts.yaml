@@ -5,14 +5,19 @@ patterns:
   - \bfn (?:with_default_executor|family_of|lookup_executor|capability_confinement_of|credential_store_of|rendered_effort_levels|resolve_posture_invocation|decide_executor_dispatch_mechanism|effective_rigor_of|detect_herdr_present|validate_runner_config_shape|validate_generated_paths_shape|load_machine_backend_registry|provider_account_inventory|read_llm_accounts|legacy_state_key|list_agents)\b
 allowed:
   - path: packages/execution/rust/src/executor_model.rs
+    count: 6
     reason: the executor model and its derivations are read here from the contracts under packages/execution/contracts
   - path: packages/execution/rust/src/accounts.rs
+    count: 3
     reason: the account reads and the provider account inventory are derived here from the contracts under packages/execution/contracts
   - path: packages/execution/rust/src/runner_check.rs
+    count: 1
     reason: the runner config check is derived here from the contracts under packages/execution/contracts
   - path: src/native/execution-door.mjs
+    count: 3
     reason: carries fgos-execution's herdr detection (machine_reads::herdr_present) to Node under its Node name; it derives nothing
   - path: packages/git/node-addon/src/execution.rs
+    count: 2
     reason: the addon's execution namespace carries fgos-execution's account inventory and state key (accounts.rs) to Node under their Node names; it derives nothing
 debt:
   - path: src/runner/dispatch/config-twin.mjs

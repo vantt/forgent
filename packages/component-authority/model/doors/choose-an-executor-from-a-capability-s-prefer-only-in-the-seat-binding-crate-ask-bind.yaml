@@ -5,6 +5,8 @@ patterns:
   - \bnormalizePreferCandidates\(
   - \bbindingTasteOf\(
 allowed:
-  - src/runner/dispatch/config-twin.mjs
-  - src/setup/seat-binding-checks.mjs
+  - path: src/runner/dispatch/config-twin.mjs
+    count: 3
+  - path: src/setup/seat-binding-checks.mjs
+    count: 1
 reason: "reading prefer here never picks an executor: the load validator checks the named executors exist, and the seat-binding checks decide which capabilities to dry-bind and then ask bind(). The chooser is the seat-binding crate's ranking, composed by packages/execution/rust/src/bind.rs; the Node seat-policy module is gone"

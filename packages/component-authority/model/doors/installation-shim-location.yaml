@@ -7,34 +7,52 @@ patterns:
   - "['\"]\\.fgos['\"],\\s*['\"]installation['\"]"
   - \.join\("installation"\)
 allowed:
-  - src/util/host-bin-path.mjs
-  - packages/distribution/rust/src/init.rs
-  - packages/distribution/rust/src/lib.rs
+  - path: src/util/host-bin-path.mjs
+    count: 9
+  - path: packages/distribution/rust/src/init.rs
+    count: 17
+  - path: packages/distribution/rust/src/lib.rs
+    count: 2
   - path: packages/host-runtime/rust/src/activation.rs
+    count: 2
     reason: the shared pure activation-to-host read, used by distribution and live head requests
-  - packages/distribution/rust/src/shim.rs
-  - packages/distribution/rust/src/uninstall.rs
-  - packages/distribution/rust/src/fgctl_refresh.rs
+  - path: packages/distribution/rust/src/shim.rs
+    count: 8
+  - path: packages/distribution/rust/src/uninstall.rs
+    count: 2
+  - path: packages/distribution/rust/src/fgctl_refresh.rs
+    count: 1
   - path: packages/distribution/rust/src/timer.rs
+    count: 1
     reason: names the project shim, or the activated release host, that a managed timer runs; never a checkout script or a PATH lookup
-  - apps/fgctl/src/help.rs
+  - path: apps/fgctl/src/help.rs
+    count: 1
   - path: packages/distribution/rust/src/launcher.sh
+    count: 2
     reason: "the launcher body the launcher module writes beside fgctl: it reads the nearest activation record from the shell"
   - path: bin/fgos.mjs
+    count: 1
     reason: an error message tells the user the shim path to run; it never builds or reads the path
   - path: scripts/check-hook-registrations-guarded.mjs
+    count: 1
     reason: the check looks for the shim text inside hook commands, which is the string the hooks carry
   - path: scripts/ci-external-consumer.sh
+    count: 16
     reason: the external-consumer proof runs the installed shim the way a consumer's shell does, outside any Node module
   - path: scripts/ci-external-consumer.ps1
+    count: 4
     reason: the external-consumer proof asserts the record is absent after a refused install, outside any Node module
   - path: scripts/fgos-shell-integration.sh
+    count: 4
     reason: "a shell script the user sources: tests for the shim in the project before it names fgos"
   - path: scripts/lib/mailbox-behaviour-run.mjs
+    count: 2
     reason: the behaviour harness spawns the shim of the workspace it builds
   - path: scripts/lib/mailbox-live-confined.mjs
+    count: 2
     reason: the live harness writes the activation record of the confined workspace it builds
   - path: scripts/record-mailbox-hook-fixtures.mjs
+    count: 8
     reason: the fixture recorder spawns the shim of the workspace it builds
 debt:
   - path: packages/herdr-fgos-common/rust/src/fgos.rs
