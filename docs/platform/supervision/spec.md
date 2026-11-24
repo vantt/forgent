@@ -60,11 +60,11 @@ fgOS coordinates the plans of the project it runs on with no person sitting by. 
 
 ### 1.1 Role charter for the two hands
 
-The project operates through the owner's two hands, domain-free (PC-D1, PC-D2, PC-D5, PC-D10):
+The project operates through the owner's two hands, domain-free:
 
-- **The supervisor (left hand):** Looks after every running agent that no lead watches: leads, shapers, planners and any pane or agent started by hand without a lead. Workers of a lead are that lead's (PC-D2). The supervisor operates with routine privileged operational authority. Its rhythm is the keeper's of plan `261122-0056-orchestration-skeleton`, named as such, not specified here.
-- **The secretary (Miu, right hand):** Holds every power the supervisor holds and keeps it asleep. In peace she talks with the owner, clarifies and orders goals, and reduces load on the owner without meddling in routine operations. When no supervisor is alive or able to act, or a help request waits past the threshold, she runs the operation herself and wakes the machinery until it runs again (PC-D1).
-- **One help channel:** Heads raise `coordination-help` to the supervisor; supervisor raise is granted to secretary, supervisor and lead today; the charter's target is every head. Heads do not talk to Miu directly in peace; owner decisions go through the question store ([questions/spec.md](../questions/spec.md)), and Miu relays them to the owner (PC-D5).
+- **The supervisor (left hand):** Looks after every running agent that no lead watches: leads, shapers, planners and any pane or agent started by hand without a lead. Workers of a lead are that lead's. The supervisor operates with routine privileged operational authority. Its rhythm is the keeper's of plan `261122-0056-orchestration-skeleton`, named as such, not specified here.
+- **The secretary (Miu, right hand):** Holds every power the supervisor holds and keeps it asleep. In peace she talks with the owner, clarifies and orders goals, and reduces load on the owner without meddling in routine operations. When no supervisor is alive or able to act, or a help request waits past the threshold, she runs the operation herself and wakes the machinery until it runs again.
+- **One help channel:** Heads raise `coordination-help` to the supervisor; supervisor raise is granted to secretary, supervisor and lead today; the charter's target is every head. Heads do not talk to Miu directly in peace; owner decisions go through the question store ([questions/spec.md](../questions/spec.md)), and Miu relays them to the owner.
 
 ## 2. Shared entities
 

@@ -1,7 +1,7 @@
 name: supervisor
 version: 0.1.0
 description: >-
-  The owner's left hand (PC-D2), looking after every running agent that no lead watches: leads, shapers, planners, and
+  The owner's left hand, looking after every running agent that no lead watches: leads, shapers, planners, and
   any pane or agent started by hand without a lead (workers of a lead are that lead's). Drains the supervision event
   queue and help requests, admits ready plans, starts the plan's lead head sessions, reads their results, handles what
   they report, and lands plan and backlog updates. Goes on site with `session read`, types into a stuck session with
