@@ -1101,6 +1101,41 @@ mod tests {
     }
 
     #[test]
+    fn a_fix_without_repairs_repairs_the_row_of_its_own_id() {
+        let registry = Registry::parse(
+            r#"{
+              "version": 1,
+              "rows": [
+                { "id": "delta", "description": "delta is fine", "owner": "bridge:S7" },
+                { "id": "epsilon", "description": "epsilon is fine", "owner": "bridge:S7" }
+              ],
+              "fixes": [ { "id": "delta", "owner": "bridge:S7" } ]
+            }"#,
+            &[],
+        )
+        .unwrap();
+        assert_eq!(registry.fixes[0].repairs, ["delta"]);
+        let native = Scripted::new(vec![]);
+        let bridge = Scripted::bridge(vec![]);
+        let report = run(
+            &registry,
+            &Owners {
+                native: &native,
+                bridge: &bridge,
+            },
+            Path::new("/p"),
+            Options {
+                fix: true,
+                only: vec!["delta".into()],
+            },
+        );
+        assert_eq!(*bridge.calls.borrow(), ["fix delta", "judge delta"]);
+        let rows = report.checks.unwrap();
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].id.as_deref(), Some("delta"));
+    }
+
+    #[test]
     fn fixes_run_in_exact_registry_order_one_call_per_run_of_one_owner() {
         let native = Scripted::new(vec![]);
         let bridge = Scripted::bridge(vec![]);
