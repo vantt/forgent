@@ -9,19 +9,29 @@ patterns:
 names:
   - pathsOverlap
 allowed:
-  - packages/write-scope/src/lib.rs
+  - path: packages/write-scope/src/lib.rs
+    count: 1
   - path: packages/git/rust/src/land.rs
+    count: 1
     reason: asks the package which landed paths fall inside a footprint
-  - src/state/graph-metrics.mjs
-  - src/state/graph-harness.mjs
-  - src/state/store.mjs
-  - src/intake/plan.mjs
+  - path: src/state/graph-metrics.mjs
+    count: 3
+  - path: src/state/graph-harness.mjs
+    count: 2
+  - path: src/state/store.mjs
+    count: 2
+  - path: src/intake/plan.mjs
+    count: 2
   - path: scripts/verify-fanout-overlap.mjs
+    count: 2
     reason: "importer of the Work adapter surface: the verifier excludes children whose footprints conflict"
   - path: packages/git/node-addon/src/git/write_scope.rs
+    count: 1
     reason: binds the write-scope package's overlap and glob answers to Node (the writeScope namespace); it matches nothing itself
-  - src/workflow/propose-classify.mjs
-  - src/workflow/propose-validate.mjs
+  - path: src/workflow/propose-classify.mjs
+    count: 4
+  - path: src/workflow/propose-validate.mjs
+    count: 5
 debt:
   - path: src/runner/dispatch/write-scope.mjs
     reason: the JS port of the write-scope rule that dispatch keeps for now (plan decision 6), pinned to the Rust rule by test/git/write-scope-parity.test.mjs; globsMeet and writeScopesOverlap are its overlap functions

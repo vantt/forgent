@@ -5,6 +5,7 @@ patterns:
   - "['\"]dispatch-decide-hook\\.mjs['\"]"
 allowed:
   - path: packages/distribution/rust/src/agent_hooks.rs
+    count: 1
     reason: "legacy marker of the dispatch hook entry: the name of the old hook script, so an install removes an entry an earlier install wrote"
 debt: []
 retiredBy: the legacy markers go when no install that wrote the old hook entry remains

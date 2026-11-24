@@ -9,6 +9,7 @@ names:
   - compile_dispatch_plan
 allowed:
   - path: packages/execution/rust/src/decide.rs
+    count: 5
     reason: "the decider: executor id, assignment, Work hint and purpose selectors, purpose seats through bind"
 debt:
   - path: src/runner/dispatch/plan.mjs

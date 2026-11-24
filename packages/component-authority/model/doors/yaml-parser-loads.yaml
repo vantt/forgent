@@ -7,6 +7,7 @@ patterns:
   - "serde_yaml::"
   - "yaml_rust::"
 allowed:
-  - packages/yaml-doc/rust/src/backend.rs
+  - path: packages/yaml-doc/rust/src/backend.rs
+    count: 1
 debt: []
 reason: "only fgos-yaml-doc decides what YAML means; no file loads a YAML library by import, import(), require() or createRequire, and no pasted copy of a parser (found by its loadAll entry point) exists. Per-line match: an alias bound to createRequire on another line, or a load split over lines, is not seen"

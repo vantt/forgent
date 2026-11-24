@@ -5,10 +5,13 @@ patterns:
   - "\"events\"\\.into\\(\\)"
 allowed:
   - path: src/event-store/maintenance.mjs
+    count: 2
     reason: the Node lifecycle wrapper of Node verbs starts the host binary for the publish and seal children
   - path: apps/fgos/src/invocation_doors.rs
+    count: 1
     reason: the host lifecycle starts its own executable for the publish child
   - path: scripts/event-store/forge-probe.sh
+    count: 1
     reason: a manual real-forge probe runs the host's `events sync` in the foreground to push one ref; it starts no detached child
 debt: []
 retiredBy: "S7: the Node lifecycle wrapper retires with the last Node verb"

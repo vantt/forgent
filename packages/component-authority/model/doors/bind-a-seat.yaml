@@ -20,8 +20,10 @@ names:
   - resolvePersona
 allowed:
   - path: packages/execution/rust/src/bind.rs
+    count: 10
     reason: "composes one seat: the persona and launch views, the family-keyed config and the account view, then calls the ranking function of the seat-binding crate (the only call of it outside that crate)"
   - path: packages/execution/rust/src/executor_model.rs
+    count: 2
     reason: derives the executor facts every seat composition reads, from the executor-model contract
 debt: []
 reason: one seat composition, in Rust (packages/execution/rust/src/bind.rs) over the ranking of packages/seat-binding/rust; Node callers ask the host route through src/seat-binding/client.mjs and re-derive nothing. The names are the composition steps and the single call of the ranking function; a second composition under the same names, or a second caller of the ranking function, fails here

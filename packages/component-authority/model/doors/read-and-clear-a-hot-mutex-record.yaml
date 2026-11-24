@@ -10,10 +10,13 @@ names:
   - reclaimDeadHolder
   - unlinkRecordIfUnchanged
 allowed:
-  - packages/holder-lock/rust/src/hot_record.rs
+  - path: packages/holder-lock/rust/src/hot_record.rs
+    count: 2
   - path: packages/git/node-addon/src/holder_lock.rs
+    count: 3
     reason: carries the door to Node
   - path: src/state/hot-lock.mjs
+    count: 11
     reason: the client of the door, and the writer of the record in withStateTx
 debt: []
 retiredBy: the Node record writer in src/state/hot-lock.mjs moves with the Work state store

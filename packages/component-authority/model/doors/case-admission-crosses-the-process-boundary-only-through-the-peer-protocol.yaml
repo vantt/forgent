@@ -8,14 +8,19 @@ patterns:
   - admission-peer\.mjs
 allowed:
   - path: packages/execution/engine/src/unit_run/peer.rs
+    count: 2
     reason: the one Rust adapter of CaseAdmission over a framed (reader, writer) pair, and the frame prefix
   - path: apps/fgos/src/wiring/run.rs
+    count: 3
     reason: standalone fgos run starts the admission peer on its first ask and talks to it over the peer's stdin and stdout
   - path: apps/fgos/src/wiring/execution_routes.rs
+    count: 2
     reason: the run-unit route opens the channel on its own stdin and stdout, to the Node parent that serves the port
   - path: src/native/execution-door.mjs
+    count: 2
     reason: the one Node server of the protocol, for both directions
   - path: src/workflow/admission-peer.mjs
+    count: 2
     reason: the payload module the host starts; serves the Workflow port through the door
 debt: []
 retiredBy: "S6b: Workflow admission moves to Rust and the peer entry goes"

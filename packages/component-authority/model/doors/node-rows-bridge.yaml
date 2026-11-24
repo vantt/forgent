@@ -5,12 +5,16 @@ patterns:
   - \brunBridged\b
 allowed:
   - path: apps/fgos/src/wiring/doctor/bridge.rs
+    count: 1
     reason: "the host side: starts the payload module and reads its result lines"
   - path: src/setup/doctor-bridge.mjs
+    count: 6
     reason: "the payload side: runs the bodies the host asks for"
   - path: src/setup/registrations.mjs
+    count: 1
     reason: defines the body map the bridge runs
   - path: src/setup/checks.mjs
+    count: 1
     reason: re-exports it for the bridge
 debt: []
 retiredBy: "S7: the last Node-owned doctor row and init's Work-store step move to Rust, and the bridge module and its host caller are deleted"

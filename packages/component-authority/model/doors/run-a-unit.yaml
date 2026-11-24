@@ -9,12 +9,16 @@ allowed:
   - path: packages/execution/engine/src/unit_run/**
     reason: "the run loop: admission, seats, rounds, verify, commit and settle of one Unit"
   - path: apps/fgos/src/wiring/unit_run_host/host.rs
+    count: 2
     reason: the host's one call of the engine's run_unit, with the machine ports injected
   - path: apps/fgos/src/wiring/run.rs
+    count: 1
     reason: "fgos run: builds the Unit from argv and asks the host"
   - path: apps/fgos/src/wiring/execution_routes.rs
+    count: 3
     reason: the run-unit route Workflow and Work reach through src/native/execution-door.mjs
   - path: apps/fgos/src/wiring/dispatch_subs/probes.rs
+    count: 1
     reason: fgos dispatch probe-session runs its probe as one Unit through the same host
 debt: []
 reason: one Rust door runs a Unit end to end (fgos-execution-engine unit_run); the host composes it once and every caller (fgos run, the run-unit route, the session probe) asks that composition. A second run loop, or a Node runUnit, must be declared

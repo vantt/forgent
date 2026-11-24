@@ -6,13 +6,18 @@ patterns:
   - (?:starts_with|strip_prefix)\(\"--\"\)
   - \"--dir\" \| \"--worktree\"
 allowed:
-  - src/cli/parse-args.mjs
-  - packages/host-runtime/rust/src/cli_args.rs
+  - path: src/cli/parse-args.mjs
+    count: 1
+  - path: packages/host-runtime/rust/src/cli_args.rs
+    count: 5
   - path: apps/fgos/src/routing.rs
+    count: 1
     reason: reads the `--flag` part of a store-declaration shape from the registry, not a call
   - path: packages/observe/rust/src/invocation_fault.rs
+    count: 1
     reason: judges whether a recorded token has the shape of a flag name; it parses no call
   - path: apps/fgctl/src/help.rs
+    count: 1
     reason: fgctl is a separate CLI whose flag grammar takes `--name=value`, which the host grammar does not; its verb tables and help words are its own
 retiredBy: "S7: the Node twin retires with the last Node verb"
 debt:

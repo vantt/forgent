@@ -4,7 +4,9 @@ patterns:
   - export function (?:readGitStatus|recoverGitOperations)\b
   - fn (?:read_git_status|recover_git_operations)\b
 allowed:
-  - packages/git/rust/src/incidents.rs
+  - path: packages/git/rust/src/incidents.rs
+    count: 2
   - path: packages/git/node-addon/src/git.rs
+    count: 2
     reason: "carries the door to Node: its two snake_case entries (read_git_status, recover_git_operations) match the Rust pattern and call incidents.rs, composing nothing"
 reason: the open Git incidents of a repository (journal, pending and retained operations, worktree findings, native locks, a merge in progress) and the recovery pass are composed once, in fgos-git, for the host verbs `git status|recover` and for `fgos init`; the row catches a second definition by name only, not a copy under another name

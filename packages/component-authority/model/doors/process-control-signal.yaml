@@ -9,18 +9,28 @@ patterns:
   - Command::new\("(?:kill|taskkill|pkill)"\)
 allowed:
   - packages/process/rust/src/**
-  - packages/run-supervisor/rust/src/gate/unix.rs
-  - packages/run-supervisor/rust/src/gate/windows.rs
-  - packages/run-supervisor/rust/src/steps.rs
-  - packages/holder-lock/rust/src/driver/flock.rs
-  - packages/holder-lock/rust/src/port.rs
-  - src/holder-lock/index.mjs
-  - src/runner/dispatch/provider-credential-probe.mjs
+  - path: packages/run-supervisor/rust/src/gate/unix.rs
+    count: 4
+  - path: packages/run-supervisor/rust/src/gate/windows.rs
+    count: 2
+  - path: packages/run-supervisor/rust/src/steps.rs
+    count: 2
+  - path: packages/holder-lock/rust/src/driver/flock.rs
+    count: 1
+  - path: packages/holder-lock/rust/src/port.rs
+    count: 1
+  - path: src/holder-lock/index.mjs
+    count: 1
+  - path: src/runner/dispatch/provider-credential-probe.mjs
+    count: 1
   - path: scripts/run-rust-dev-host.mjs
+    count: 1
     reason: re-raises the signal that ended its own child on itself
   - path: scripts/stress-test-files.mjs
+    count: 1
     reason: kills the process group of the test child it just spawned
   - path: scripts/test-select-coverage-map.mjs
+    count: 1
     reason: kills the process group of the test child it just spawned
 debt:
   - path: scripts/lib/mailbox-live-confined.mjs

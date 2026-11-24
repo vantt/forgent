@@ -8,14 +8,19 @@ patterns:
   - \bagentsDir\b
   - join\((?![^)]*\.claude)[^)]*,\s*['"]agents['"]\s*[,)]
 allowed:
-  - src/runner/agent-definitions.mjs
+  - path: src/runner/agent-definitions.mjs
+    count: 9
   - path: src/util/domain-dirs.mjs
+    count: 2
     reason: defines the domain layout (a domain's agents/ folder) that the door reads
   - path: src/cli/command-registry.mjs
+    count: 7
     reason: help text naming the tiers a persona is looked up in; no directory is read
   - path: packages/execution/rust/src/agents.rs
+    count: 1
     reason: the listing's judgement names the core tier folder in the masked answer; the host still reads the directories
   - path: apps/fgos/src/wiring/agents.rs
+    count: 5
     reason: the host adapter reads the tier directories beneath the project and the payload and hands the files to the listing in the execution crate
 debt: []
 retiredBy: "S7: src/runner/agent-definitions.mjs retires when its last importers (the session head start, the agent roster and scripts/project-agents.mjs) read the tiers through the host"

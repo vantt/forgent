@@ -8,28 +8,42 @@ patterns:
   - PI_SESSION_FILE
   - CLAUDE_CODE_SESSION_ID
 allowed:
-  - packages/identity/rust/src/launcher.rs
-  - packages/identity/rust/src/resolve.rs
-  - packages/identity/rust/src/session.rs
-  - src/util/session-identity.mjs
-  - src/cli/command-registry.mjs
+  - path: packages/identity/rust/src/launcher.rs
+    count: 8
+  - path: packages/identity/rust/src/resolve.rs
+    count: 4
+  - path: packages/identity/rust/src/session.rs
+    count: 2
+  - path: src/util/session-identity.mjs
+    count: 4
+  - path: src/cli/command-registry.mjs
+    count: 4
   - path: packages/distribution/rust/src/agent_hooks.rs
+    count: 1
     reason: the generated pi/omp extension runs in the agent process and cannot import the identity crate; its attempt-id prefix is data in agent-hooks.v1.json, which a test pins to the crate's prefix
   - path: apps/fgos/examples/mailbox-ident-cost.rs
+    count: 1
     reason: a cost probe example names one source variable as its input; it decides nothing
   - path: scripts/event-store/settle-host-proof.mjs
+    count: 1
     reason: a proof script sets its own writer id for the process it runs
   - path: scripts/event-store/v-spawn-bench.mjs
+    count: 6
     reason: a benchmark clears inherited session ids and sets its own writer ids for the commands it times
   - path: scripts/lib/mailbox-behaviour-run.mjs
+    count: 1
     reason: a test harness gives each simulated sender its own writer id
   - path: scripts/lib/mailbox-live-cli.mjs
+    count: 3
     reason: the live mailbox harness lists the variables it clears to run as a chosen sender
   - path: scripts/record-mailbox-hook-fixtures.mjs
+    count: 6
     reason: the fixture recorder captures which of these variables a real hook sees
   - path: scripts/regenerate-observe-fixtures.mjs
+    count: 1
     reason: the fixture generator pins one session id for a reproducible recording
   - path: scripts/stress-test-files.mjs
+    count: 1
     reason: the stress runner removes the harness session id from the env of the tests it starts
 debt: []
 retiredBy: "S7: the Node facade and its Node readers retire with the Node payload"

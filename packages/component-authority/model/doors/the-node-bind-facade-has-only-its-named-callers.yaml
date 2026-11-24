@@ -7,18 +7,25 @@ patterns:
   - import\('\./bind\.mjs'
 allowed:
   - path: src/runner/dispatch/plan.mjs
+    count: 1
     reason: "p-24xw2cwdvo: dead Node dispatch plan (only the dead assignment runner and tests import it); it asked bind for the Work seat"
   - path: src/runner/dispatch/assignment-runner.mjs
+    count: 1
     reason: "p-24xw2cwdvo: dead Node assignment runner (the host runs every round); it bound each round's seat"
   - path: src/runner/execution/account-rotation.mjs
+    count: 1
     reason: "p-24xw2cwdvo: dead Node account rotation (only the dead assignment runner imports it); it compared binding identities"
   - path: src/session-host/head-start.mjs
+    count: 1
     reason: "S7: the session head start binds its seat until head start runs in the host"
   - path: src/runner/loop.mjs
+    count: 1
     reason: "S7: the Work runner loop binds the seat of each Work item"
   - path: src/setup/seat-binding-checks.mjs
+    count: 1
     reason: doctor row seat-binding-dry-bind, bridge:S6b; the seat-binding-route row is judged in Rust
   - path: src/setup/blind-steps-proven-pools.mjs
+    count: 1
     reason: doctor row blind-steps-use-proven-pools, bridge:S6b
 debt: []
 retiredBy: "p-24xw2cwdvo for the dead dispatch callers, S6b for the two doctor rows, S7 for the Work loop and the session head start: each caller moves with its step and asks the Rust bind directly; the facade goes with the last one"

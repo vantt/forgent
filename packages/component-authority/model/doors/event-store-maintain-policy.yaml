@@ -5,10 +5,13 @@ patterns:
   - fn sync_due
   - fn maintain\(
 allowed:
-  - packages/event-store/rust/src/lifecycle.rs
+  - path: packages/event-store/rust/src/lifecycle.rs
+    count: 2
   - path: packages/git/node-addon/src/event_store.rs
+    count: 1
     reason: the addon entry that answers the crate's outcome to Node
   - path: src/event-store/maintenance.mjs
+    count: 1
     reason: starts the detached publish child when the crate says a publish is due
 debt: []
 retiredBy: "S7: the Node adapter retires with the Node payload"

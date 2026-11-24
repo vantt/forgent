@@ -7,26 +7,37 @@ patterns:
   - FlushFileBuffers
   - RENAME_EXCHANGE
 allowed:
-  - packages/durable-file/rust/src/lib.rs
+  - path: packages/durable-file/rust/src/lib.rs
+    count: 4
   - path: packages/git/rust/src/restore.rs
+    count: 3
     reason: Git writes the restored worktree files with Git's own durability, behind the Git door
   - path: packages/git/rust/src/native_lock.rs
+    count: 2
     reason: Git's own lock file, behind the Git door
   - path: packages/git/rust/src/sequence.rs
+    count: 1
     reason: Git's own sequence file, behind the Git door
   - path: packages/git/rust/src/repository_config.rs
+    count: 2
     reason: Git's own repository config file, behind the Git door
   - path: packages/event-store/rust/src/rotate.rs
+    count: 1
     reason: renames an existing segment; Durable File has no move primitive, and the directory sync goes through the door
   - path: packages/event-store/rust/src/identity.rs
+    count: 2
     reason: syncs the ancestors of the store directory before the store identity is installed (the door leaves ancestors to its caller); Event Store keeps its own directory-sync calls at the same points
   - path: packages/event-store/rust/src/fsio.rs
+    count: 1
     reason: the trait default of sync_file fsyncs an appended segment through an injectable seam; the door installs whole files
   - path: packages/holder-lock/rust/src/tombstone.rs
+    count: 5
     reason: exchanges two directories with RENAME_EXCHANGE; holder-lock is not a Durable File client and the door has no exchange
   - path: packages/observe/rust/src/shard.rs
+    count: 1
     reason: appends lines to an existing shard file and syncs it; the door installs whole files
   - path: packages/run-supervisor/rust/src/gate.rs
+    count: 1
     reason: rewrites an existing gate-exit file in place because a file bind-mounted read-only into the sandbox cannot be renamed; the door installs by rename
 debt: []
 reason: fgos-durable-file orders temp, fsync, install and directory fsync; each other file does a different job, named in its reason

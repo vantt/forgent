@@ -10,8 +10,10 @@ patterns:
   - for \(let dir = path\.resolve\(cwd\); ; dir = path\.dirname\(dir\)\)
   - join\("\.fgos"\)\.is_dir\(\)
 allowed:
-  - packages/git/rust/src/invocation_root.rs
+  - path: packages/git/rust/src/invocation_root.rs
+    count: 6
   - path: packages/git/node-addon/src/git.rs
+    count: 1
     reason: the addon entry that carries the door to Node; it decides nothing
 debt:
   - path: apps/fgos/src/wiring/mailbox_root.rs

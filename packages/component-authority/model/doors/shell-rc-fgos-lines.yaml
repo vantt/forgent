@@ -12,6 +12,7 @@ names:
   - deadSourceLines
   - insertSourceLine
 allowed:
-  - packages/distribution/rust/src/rc_lines.rs
+  - path: packages/distribution/rust/src/rc_lines.rs
+    count: 6
 retiredBy: "S7: the Node payload retires"
 reason: "which shell rc files hold an fgOS integration source line, and which of those lines are dead, is read in Rust (read-only: deleting a line from a person's profile stays a human act)"

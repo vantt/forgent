@@ -7,16 +7,22 @@ patterns:
   - \bfn (?:workflow_run_dirs|assignment_run_dirs|(?:list_)?open_attempt_dirs|scan_assignment_layout|list_assignment_runs|assignment_runs|walk_assignments|scan_assignment_runs)\b
 allowed:
   - path: src/runner/dispatch/assignment-layout-twin.mjs
+    count: 1
     reason: the runner's assignment layout lister (its twin is run_dirs.rs)
   - path: src/run-supervisor/client.mjs
+    count: 1
     reason: the run supervisor's open attempt lister (its twin is run_dirs.rs)
   - path: src/native/execution-door.mjs
+    count: 1
     reason: carries case_paths::runs_root of fgos-execution to Node under its Node name (the addon's execution namespace); it lists nothing
   - path: packages/execution/rust/src/case_paths/mod.rs
+    count: 1
     reason: the Rust port of case-run-paths.mjs on the same vectors; the execution crate's one spelling of the case runs root, which hand-off naming asks instead of repeating it
   - path: packages/execution/rust/src/assignment_layout.rs
+    count: 2
     reason: the Rust owner of the assignment layout walk (port of assignment-layout.mjs on packages/execution/contracts/assignment/layout.json and corpus.json); every engine reader of the assignment tree asks it, and the addon carries it to Node
   - path: packages/git/node-addon/src/execution.rs
+    count: 1
     reason: carries assignment_layout::list_assignment_runs of fgos-execution to Node under its Node name (the addon's execution namespace); it walks nothing itself
 debt:
   - path: packages/run-result/rust/src/lib.rs
