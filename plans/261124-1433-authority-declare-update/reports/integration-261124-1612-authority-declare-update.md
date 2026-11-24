@@ -147,3 +147,14 @@ Record the activated release identity through the owner's normal release evidenc
 - Markdown preview was attempted with `mdview open` on this report, but failed before returning a URL: `database error: attempt to write a readonly database` (SQLite error 8). No preview server was started by this worker. Local relative links were checked directly; the owning doc-health guard still needs an unconstrained rerun.
 
 Rollback: revert only these documentation/report changes; the landed implementation and model remain untouched.
+
+## Lead re-check, 2026-11-24 18:20 (+07)
+
+Run by the lead from the main checkout at 9d791d391, still inside a confined session (home state, `.git`, the main checkout and the worktrees directory are read-only).
+
+- Activated release `sha256:a34524b3…` (activated 2026-11-24T10:24:42Z) carries the plan: `fgos authority declare --help` lists `--update`, and `fgos authority render --check --json` answers `"root": "/home/vantt/projects/forgent", "drift": []` (criteria 3 and 4 on the installed host).
+- `cargo test -p fgos-component-authority`: 67 passed, 0 failed (criterion 1).
+- `cargo test -p fgos --test authority`: 6 passed, 0 failed, including `authority_declare_update_changes_a_component_row_and_rerenders_the_views` and `authority_render_in_linked_worktree_with_dir_main_renders_the_worktree_and_leaves_main_unchanged` (criteria 2, 4 and the automated proof of 5).
+- `node scripts/export-command-selectors.mjs --check`: exit 0. `node --test test/cli/subcommand-flag-drift.test.mjs`: 26 passed. `node scripts/plan-contract-check.mjs --plan plans/261124-1433-authority-declare-update`: ok.
+- The 17 unexplained `cargo test --workspace` failures are in `apps/fgos/src/wiring/doctor/{confinement,event_store,git}.rs` and `apps/fgos/src/wiring/events.rs`. None of the plan's four commits touches those files or the authority wiring they could reach, so they are not a regression of this plan; whether they pass outside confinement is still unproven.
+- Still not runnable here: the full `npm test`, a complete `cargo test --workspace`, and the hand check of criterion 5 (it needs a writable linked worktree). Both remain with the owner, as answered on q-vdefxq4upy.
