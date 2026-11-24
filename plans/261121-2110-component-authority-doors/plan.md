@@ -170,6 +170,30 @@ footprint:
   - CHANGELOG.md
   - packages/distribution/rust/src/doctor.rs
   - apps/fgos/src/wiring/doctor/mod.rs
+  - apps/fgos/src/wiring/doctor/mailbox.rs
+  - apps/fgos/src/wiring/init.rs
+  - apps/fgos/src/wiring/migrate.rs
+  - apps/fgos/src/wiring/observe_sources/plan_history.rs
+  - apps/fgos/src/wiring/uninstall.rs
+  - docs/platform/git/spec.md
+  - docs/platform/holder-lock/spec.md
+  - docs/platform/process/spec.md
+  - docs/platform/runner/spec.md
+  - docs/platform/write-scope/spec.md
+  - packages/convention/rust/Cargo.toml
+  - packages/convention/rust/src/operations.rs
+  - packages/distribution/rust/src/agent_config.rs
+  - packages/distribution/rust/src/lib.rs
+  - packages/execution/rust/Cargo.toml
+  - packages/execution/rust/src/unit_record/timestamp.rs
+  - packages/git/node-addon/Cargo.toml
+  - packages/holder-lock/contracts/lock-registry.v1.json
+  - packages/host-runtime/rust/Cargo.toml
+  - packages/process/rust/src/spawn.rs
+  - packages/write-scope/
+  - scripts/git-one-door-scan.mjs
+  - test/git/one-door.test.mjs
+  - test/rust-host/fixtures/run-dirs-vectors.json
 source:
   - plans/discussions/ds-at6x3xj2ng-component-authority/DISCUSSION.md
 created: 2026-11-21
@@ -294,25 +318,63 @@ and deleted (owner correction 2026-11-23 14:15).
 | 2c | [Retire the wire-agents settings wording](phase-02c-person-agent-config-writes.md) | 1b | src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/component-authority/model/doors/person-agent-config-writes.yaml | 5 | done |
 | 2d | [Retire the Node shell-rc detector](phase-02d-shell-rc-fgos-lines.md) | 1b | src/setup/shell-rc.mjs, scripts/fgos-session-start-hook.mjs, test/setup/shell-rc.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/shell-rc-fgos-lines.yaml | 4 | done |
 | 2e | [Retire the dead Node agy sub-home finder](phase-02e-execution-doctor-judgments.md) | 1b | src/setup/agy-permissions.mjs, test/setup/agy-permissions.test.mjs, packages/execution/rust/src/checks.rs, test/architecture.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/execution-doctor-judgments.yaml | 3 | done |
-| 2f | [Close the Node doctor body map](phase-02f-doctor-readiness-registry.md) | 1b | packages/component-authority/model/doors/doctor-readiness-registry.yaml | 3 | draft |
-| 2g | [Close the herdr driver's own shim path](phase-02g-installation-shim-location.md) | 1b | packages/component-authority/model/doors/installation-shim-location.yaml | 3 | draft |
+| 2f | [Close the Node doctor body map](phase-02f-doctor-readiness-registry.md) | 1b | packages/component-authority/model/doors/doctor-readiness-registry.yaml | 3 | withdrawn |
+| 2g | [Close the herdr driver's own shim path](phase-02g-installation-shim-location.md) | 1b | packages/component-authority/model/doors/installation-shim-location.yaml | 3 | withdrawn |
 | 3a | [Move the live write-scope callers onto the Rust rule](phase-03a-footprint-write-scope-overlap-rule.md) | 1b | src/session-host/head-request.mjs, src/workflow/definition.mjs | 3 | done |
-| 3a2 | [Delete the JS write-scope port](phase-03a2-delete-write-scope-port.md) | 3a | src/runner/dispatch/write-scope.mjs, test/runner/write-scope.test.mjs, test/git/write-scope-parity.test.mjs, test/state/domain-registry-compiled.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/footprint-write-scope-overlap-rule.yaml | 7 | draft |
-| 3b | [Close the Node tool-provider twin](phase-03b-tool-lookup-by-capability.md) | 1b | packages/component-authority/model/doors/tool-lookup-by-capability.yaml | 3 | draft |
-| 3c | [Retire the Node executor-fact twins](phase-03c-derive-executor-facts.md) | 1b | src/runner/capability-config.mjs, test/runner/capability-config.test.mjs, src/runner/agent-listing.mjs, test/runner/agent-listing.test.mjs, scripts/agents-vectors.mjs, test/helpers/agents-vectors.helper.mjs, test/helpers/executor-model-vectors.helper.mjs, test/setup/packaged-definitions.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/derive-executor-facts.yaml | 8 | draft |
-| 3d | [Close the Node dispatch decider twin](phase-03d-decide-a-dispatch.md) | 1b | packages/component-authority/model/doors/decide-a-dispatch.yaml | 3 | draft |
-| 3e | [Close the Node and holder-lock global-directory copies](phase-03e-global-fgos-directory.md) | 1b | packages/component-authority/model/doors/global-fgos-directory.yaml | 4 | draft |
+| 3a2 | [Delete the JS write-scope port](phase-03a2-delete-write-scope-port.md) | 3a | src/runner/dispatch/write-scope.mjs, test/runner/write-scope.test.mjs, test/git/write-scope-parity.test.mjs, test/state/domain-registry-compiled.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/footprint-write-scope-overlap-rule.yaml | 7 | withdrawn |
+| 3b | [Close the Node tool-provider twin](phase-03b-tool-lookup-by-capability.md) | 1b | packages/component-authority/model/doors/tool-lookup-by-capability.yaml | 3 | withdrawn |
+| 3c | [Retire the Node executor-fact twins](phase-03c-derive-executor-facts.md) | 1b | src/runner/capability-config.mjs, test/runner/capability-config.test.mjs, src/runner/agent-listing.mjs, test/runner/agent-listing.test.mjs, scripts/agents-vectors.mjs, test/helpers/agents-vectors.helper.mjs, test/helpers/executor-model-vectors.helper.mjs, test/setup/packaged-definitions.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/derive-executor-facts.yaml | 8 | withdrawn |
+| 3d | [Close the Node dispatch decider twin](phase-03d-decide-a-dispatch.md) | 1b | packages/component-authority/model/doors/decide-a-dispatch.yaml | 3 | withdrawn |
+| 3e | [Close the Node and holder-lock global-directory copies](phase-03e-global-fgos-directory.md) | 1b | packages/component-authority/model/doors/global-fgos-directory.yaml | 4 | withdrawn |
 | 4 | [Retire the invocation-root and .fgos-join copies](phase-04-path-root-copies.md) | 1b | apps/fgos/src/wiring/mailbox_root.rs, src/util/host-bin-path.mjs, src/runner/worktree.mjs, src/runner/merge.mjs, src/runner/operation-choice.mjs, src/runner/work-dispatch.mjs, src/state/porting-store.mjs, src/state/store.mjs, test/util/, test/runner/merge*, test/runner/worktree*, test/runner/operation-choice*, test/runner/work-dispatch*, test/state/store*, test/state/porting*, packages/component-authority/model/doors/resolve-invocation-root.yaml, packages/component-authority/model/doors/join-fgos-onto-project-root.yaml | 4 | done |
 | 5 | [`declare`, the Authority-map rule and the skill wiring](phase-05-declare-and-skill-wiring.md) | 1b | packages/component-authority/rust/, Cargo.lock, apps/fgos/src/main.rs, test/cli/subcommand-flag-drift.test.mjs, apps/fgos/src/routing.rs, apps/fgos/src/invocation_doors.rs, apps/fgos/src/cli_projector.rs, apps/fgos/src/wiring/authority.rs, apps/fgos/tests/authority.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, core/skills/_shared/plan-contract.md, core/skills/fgos-shaping/, domains/coding/skills/fgos-coding-planning/, domains/coding/skills/fgos-coding-implement/, domains/coding/skills/fgos-coding-validating/, domains/coding/skills/fgos-coding-shaping/, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, .agents/skills/, plugins/fgOS/skills/, .claude/skills/ | 4 | done |
 | 6 | [Retire the checkout copies](phase-06-checkout-copies.md) | 2c, 4 | src/cli/command-registry.mjs, src/runner/repo-locks.mjs, src/workflow/unit-handoff.mjs, src/runner/merge.mjs, scripts/lib/git-ports.mjs, test/runner/repo-locks*, test/workflow/unit-handoff*, test/runner/merge*, packages/component-authority/model/doors/checkout-make-provision-remove.yaml | 6 | done |
 | 7 | [Retire the Rust argument-parser, run-dirs and packaging copies](phase-07-rust-parse-rundirs-packaging.md) | 5 | packages/holder-lock/rust/src/route.rs, packages/holder-lock/rust/Cargo.toml, packages/run-supervisor/rust/src/route.rs, packages/run-supervisor/rust/src/adopt.rs, packages/run-supervisor/rust/src/supervise.rs, packages/run-supervisor/rust/Cargo.toml, packages/terminal-control/rust/src/route.rs, packages/terminal-control/rust/Cargo.toml, packages/session-host/rust/src/route.rs, packages/session-host/rust/Cargo.toml, apps/fgctl/src/help.rs, scripts/write-test-marker.mjs, apps/fgos/src/wiring/run_dirs.rs, packages/run-result/rust/src/lib.rs, packages/distribution/rust/src/init.rs, Cargo.lock, packages/component-authority/model/doors/parse-cli-arguments.yaml, packages/component-authority/model/doors/list-run-directories.yaml, packages/component-authority/model/doors/no-node-from-native-packaging.yaml | 5 | done |
 | 8 | [Retire process-control, /proc, kernel-lock and bounded-child copies in the process tier](phase-08-process-primitive-copies.md) | 2a, 7 | packages/git/rust/src/driver.rs, scripts/lib/mailbox-live-confined.mjs, packages/holder-lock/rust/src/borrow_vectors.rs, packages/git/node-addon/src/single_load.rs, packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs, packages/process/rust/src/containment/linux.rs, packages/process/rust/src/mapped.rs, packages/process/rust/src/platform/windows_spawn.rs, packages/run-supervisor/rust/src/attempt_step.rs, packages/run-supervisor/rust/src/controller/launch.rs, packages/run-supervisor/rust/src/gate/windows.rs, packages/run-supervisor/rust/src/steps.rs, packages/run-supervisor/rust/src/supervise.rs, packages/run-supervisor/rust/src/supervise/windows.rs, packages/run-supervisor/rust/Cargo.toml, Cargo.lock, packages/component-authority/model/doors/process-control-signal.yaml, packages/component-authority/model/doors/process-facts-proc.yaml, packages/component-authority/model/doors/kernel-lock-primitive.yaml, packages/component-authority/model/doors/run-bounded-child.yaml | 6 | done |
 | 5c | Node model readers in temp projects (fix of 5's project model rule, reported by the supervisor in phase 8's file) | 5 | src/setup/instruction-registry.mjs, src/report/decision-index.mjs, test/setup/instruction-registry.test.mjs, test/report/decision-index.test.mjs | 7 | done |
-| 9 | [Retire the remaining bounded-child copies](phase-09-bounded-child-copies.md) | 3e, 8 | apps/fgos-gateway/src/gateway.rs, apps/fgos/src/wiring/run.rs, packages/config/rust/src/detect.rs, packages/config/rust/Cargo.toml, packages/distribution/rust/src/init.rs, packages/distribution/rust/Cargo.toml, packages/holder-lock/rust/src/borrow_windows.rs, packages/holder-lock/rust/Cargo.toml, packages/mailbox/rust/store/src/adapters/version.rs, packages/mailbox/rust/store/src/nudge.rs, packages/mailbox/rust/store/Cargo.toml, packages/terminal-control/rust/src/driver/herdr.rs, packages/terminal-control/rust/Cargo.toml, Cargo.lock, packages/component-authority/model/doors/run-bounded-child.yaml, packages/component-authority/model/doors/global-fgos-directory.yaml | 7 | draft |
+| 9 | [Retire the remaining bounded-child copies](phase-09-bounded-child-copies.md) | 3e, 8 | apps/fgos-gateway/src/gateway.rs, apps/fgos/src/wiring/run.rs, packages/config/rust/src/detect.rs, packages/config/rust/Cargo.toml, packages/distribution/rust/src/init.rs, packages/distribution/rust/Cargo.toml, packages/holder-lock/rust/src/borrow_windows.rs, packages/holder-lock/rust/Cargo.toml, packages/mailbox/rust/store/src/adapters/version.rs, packages/mailbox/rust/store/src/nudge.rs, packages/mailbox/rust/store/Cargo.toml, packages/terminal-control/rust/src/driver/herdr.rs, packages/terminal-control/rust/Cargo.toml, Cargo.lock, packages/component-authority/model/doors/run-bounded-child.yaml, packages/component-authority/model/doors/global-fgos-directory.yaml | 7 | withdrawn |
 | 10 | [Door guard by primitive and aliases, counted, no debt but the named debt](phase-10-land-checks.md) | 2a, 2b, 2c, 2d, 2e, 4, 6, 7, 8 | test/architecture.test.mjs, packages/component-authority/model/doors/, packages/component-authority/contracts/model.v1.json, docs/platform/component-authority/spec.md | 9 | done |
-| 10b | [Fill `names`, `primitives` and allowed `count` on every door row, and fix the guard's latent notes](phase-10b-fill-door-names-primitives-count.md) | 10 | packages/component-authority/model/doors/, test/architecture.test.mjs | 11 | running |
-| 11 | [Sweep and integration](phase-11-sweep-and-integration.md) | 5, 10 | packages/convention/contracts/convention.rules.v1.json, docs/platform/packaging-distribution/spec.md, src/cli/command-registry.mjs, CHANGELOG.md, docs/platform/component-authority/spec.md, plans/261121-2110-component-authority-doors/ | 10 | draft |
-| 12 | Retire every named debt right after the release (owner answer B to q-aanvfxaopa, 2026-11-24) | 11 | to be cut by the planner: the rows phase 10 names, including the process-tier survivors (winpid reader, single-instance lock, own-child polls), which need footprint outside this plan's | 11 | draft |
+| 10b | [Fill `names`, `primitives` and allowed `count` on every door row, and fix the guard's latent notes](phase-10b-fill-door-names-primitives-count.md) | 10 | packages/component-authority/model/doors/, test/architecture.test.mjs | 11 | done |
+| 11 | [Sweep and integration](phase-11-sweep-and-integration.md) | 5, 10 | packages/convention/contracts/convention.rules.v1.json, docs/platform/packaging-distribution/spec.md, src/cli/command-registry.mjs, CHANGELOG.md, docs/platform/component-authority/spec.md, plans/261121-2110-component-authority-doors/ | 10 | done |
+| 12a | [Retire the small Rust debts: dead agy copy, single-load lock, winpid fixture, holder-lock flag reader, gateway home seam](phase-12a-small-rust-debt.md) | 11 | packages/distribution/rust/src/agent_config.rs, packages/distribution/rust/src/lib.rs, packages/git/node-addon/src/single_load.rs, packages/git/node-addon/Cargo.toml, packages/holder-lock/contracts/lock-registry.v1.json, packages/holder-lock/rust/src/borrow_vectors.rs, packages/holder-lock/rust/src/route.rs, packages/holder-lock/rust/Cargo.toml, apps/fgos-gateway/src/gateway.rs, Cargo.lock, packages/component-authority/model/doors/execution-doctor-judgments.yaml, packages/component-authority/model/doors/kernel-lock-primitive.yaml, packages/component-authority/model/doors/process-facts-proc.yaml, packages/component-authority/model/doors/parse-cli-arguments.yaml, packages/component-authority/model/doors/global-fgos-directory.yaml, test/architecture.test.mjs, docs/platform/packaging-distribution/spec.md, docs/platform/git/spec.md, docs/platform/holder-lock/spec.md | 12 | ready |
+| 12b | [Close the bounded-child and search-path debt](phase-12b-bounded-child-and-path-search.md) | 12a | packages/process/rust/src/spawn.rs, packages/process/rust/src/mapped.rs, packages/process/rust/src/containment/linux.rs, packages/process/rust/src/platform/windows_spawn.rs, packages/config/rust/src/detect.rs, packages/config/rust/Cargo.toml, packages/distribution/rust/src/init.rs, packages/distribution/rust/Cargo.toml, packages/git/rust/src/driver.rs, packages/mailbox/rust/store/src/adapters/version.rs, packages/mailbox/rust/store/src/nudge.rs, packages/mailbox/rust/store/Cargo.toml, packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs, packages/host-runtime/rust/Cargo.toml, packages/run-supervisor/rust/src/attempt_step.rs, packages/run-supervisor/rust/src/steps.rs, packages/run-supervisor/rust/src/gate/windows.rs, Cargo.lock, scripts/git-one-door-scan.mjs, packages/git/contracts/mutation-census.v1.json, test/git/one-door.test.mjs, packages/component-authority/model/doors/run-bounded-child.yaml, test/architecture.test.mjs, docs/platform/process/spec.md | 13 | ready |
+| 12d | [Retire the second copies 10b found, and name the unprobed rows](phase-12d-second-copies-and-unprobed-rows.md) | 12b | apps/fgos/src/wiring/migrate.rs, apps/fgos/src/wiring/observe_sources/plan_history.rs, packages/convention/rust/src/operations.rs, packages/execution/rust/src/unit_record/timestamp.rs, apps/fgos/src/wiring/doctor/mailbox.rs, apps/fgos/src/wiring/uninstall.rs, apps/fgos/src/wiring/init.rs, packages/convention/rust/Cargo.toml, packages/execution/rust/Cargo.toml, packages/distribution/rust/src/doctor.rs, Cargo.lock, packages/component-authority/model/doors/, test/architecture.test.mjs, docs/platform/component-authority/spec.md | 14 | ready |
+| 12c | [Close the Node-twin debt once the dead Node Execution closure is deleted](phase-12c-node-twins-after-dead-closure.md) (waits for `261122-2108` phase 8 `done`) | 12d | src/runner/dispatch/write-scope.mjs, test/runner/write-scope.test.mjs, test/git/write-scope-parity.test.mjs, test/state/domain-registry-compiled.test.mjs, packages/write-scope/, src/runner/capability-config.mjs, test/runner/capability-config.test.mjs, src/runner/agent-listing.mjs, test/runner/agent-listing.test.mjs, scripts/agents-vectors.mjs, test/helpers/agents-vectors.helper.mjs, test/helpers/executor-model-vectors.helper.mjs, test/setup/packaged-definitions.test.mjs, test/rust-host/fixtures/run-dirs-vectors.json, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/decide-a-dispatch.yaml, packages/component-authority/model/doors/derive-executor-facts.yaml, packages/component-authority/model/doors/tool-lookup-by-capability.yaml, packages/component-authority/model/doors/list-run-directories.yaml, packages/component-authority/model/doors/footprint-write-scope-overlap-rule.yaml, packages/component-authority/model/doors/global-fgos-directory.yaml, test/architecture.test.mjs, docs/platform/write-scope/spec.md, docs/platform/runner/spec.md | 15 | draft |
+
+**Phase 12 cut (planner, 2026-11-24, from owner answer B to q-aanvfxaopa).** The parked row 12 is replaced by four
+serial phases, one per kind of debt. They are serial because every one of them edits `NAMED_DOOR_DEBT` in
+`test/architecture.test.mjs` and door rows. 12a takes the five small Rust debts whose survivor already exists. 12b
+takes the 19-file bounded-child row, including the own-child polls; the census scan learns `resolve_program` first,
+as phase 8 asked. 12d takes the real second copies and the unprobed rows from
+`reports/unit-261124-0235-p10b2-result.md`. 12c closes the Node twins after `261122-2108-delete-dead-node-execution-closure`
+phase 8 deletes them, so those files never have two deleters. The parked phases fold in and are `withdrawn`: 3a2, 3b,
+3c, 3d and 3e's Node part go to 12c, 3e's gateway part to 12a, and 9 to 12b.
+
+Shape choices, from the evidence. These decide no product question.
+- Long-lived children a caller started (a service, a detached supervisor, an admission peer) call std
+  `Child::try_wait`, and no algorithm is copied. They move from `debt` to `allowed`, and the row says watching such a
+  child is outside it. No wrapper type is added (RUL104).
+- The winpid shell snippet in `borrow_vectors.rs` is the only way Git Bash can learn its own job's Windows pid, so it
+  is `allowed` with that reason, not debt.
+- `resolve_program` grows an absolute-entries-only mode in place. This extends the survivor (L10) and adds no
+  `declare`, because no new row, decision kind or door is created.
+- A survivor that lacks a needed feature makes the unit stop on that file and report it. That is a RUL104 feature
+  idea for the owner, not an addition made here.
+
+Rows that stay named debt after 12, each owned by a live item the lead already recorded under answer B:
+- `doctor readiness registry` (S7; 2f withdrawn).
+- `installation shim and activation record location` (`p-rypvkc3kai`; 2g withdrawn).
+- `make, provision and remove a checkout` (`p-nwife3i4kc`, which adds checkout-crate capabilities).
+- `no Node from the native packaging verbs` (removing `requires.node`).
+- `resolve the invocation root` (S7 and the mailbox-verb move).
+- `global fgOS directory` for `state_root.rs` (`p-n22bigucgp` picks the home rule).
+- `process control: signal a process or group`, and the V7n entry of `process facts: read /proc` (`p-irt4weqipe`
+  re-measures the mailbox).
+- The two Rust run-directory walks (12c step 4 mints their row).
+Retiring those here would pull feature work and the S7 program step into this plan. RUL104 forbids that without an
+owner choice. Phase 12 needs footprint outside this plan; the supervisor widens it (raised as coordination-help). The
+supervisor sets 12a, 12b and 12d to `ready` in the same commit that widens it. 12c stays `draft` until 2108 phase 8 is
+`done`.
 
 **Per-row re-cut (q-swxkda2x5r A, applied 2026-11-23 by the planner).** The old phases 2 and 3 are replaced by one
 phase per door row (2a-2g, 3a-3e). Each retires one row's twin and moves only that row's callers. The old phase
@@ -597,6 +659,19 @@ admits no plan whose footprint overlaps a `running` one):
   switch; 3a's dead files are not rewired; every writing unit pins `--provider claude`. Applied in the re-cut above,
   phases 3a, 3a2, 2f, 2g, 10 and 11, and acceptance 4. Footprint unchanged: every path of 3a and 3a2 was already in it.
 
+- q-e62q73d2au (git recover of the dead p02a-fix land journal, phase 10): the owner answered A on 2026-11-24 01:18
+  via the secretary: the owner runs `fgos git recover` on main. Scope: that one pending land operation only. p02a-fix2
+  then landed on origin as fe3a5dd61; its local publish is pending Land `land-1432789-1795483008986534253-2`, whose
+  recover is also the owner's under this answer.
+- q-j4yeougr72 (release carrying the 888bb3563 crate so 10b and 12 can run): the owner answered A on 2026-11-24 01:19
+  via the secretary: the owner builds, stages and activates the release after the green suite. 10b has since landed
+  (4f38d6db0).
+- q-lnjt5zzbfq (phase 6) and q-aanvfxaopa (phase 8): the owner answered B to both on 2026-11-24 01:19, keep the
+  copies as named debt. Phase 12 retires every named debt after the release; the planner cuts it and the supervisor
+  widens the footprint it names.
+- q-t5anmlcb7q (remove the kept -p5c and -p8 worktrees): the owner answered A on 2026-11-24 01:19, the owner removes
+  both with `--discard`. Neither is in `git worktree list` any more.
+
 None open. Shape choices the planner settled from the evidence:
 - Verb name `fgos authority` with subcommands `locate` and `declare`, after the `fgos convention` pattern.
 - Until H2 exists, `declare` checks the owner answer through the question store (`--approved-by`), and the
@@ -619,6 +694,33 @@ None open. Shape choices the planner settled from the evidence:
 ## Outstanding questions
 
 None.
+
+Lead, 2026-11-24 08:30:
+- The question store now records the owner's answers given earlier in chat: q-lnjt5zzbfq B (phase 6: keep the checkout
+  copies as named debt) and q-aanvfxaopa B (phase 8: everything left is named debt). Both already applied above
+  (phases 6, 8 and 10 done, debt retired in phase 12); acknowledged.
+- 10b is done: landed as 4f38d6db0 (branch p10b3). The guard's five latent notes are fixed (Rust char literals, shell
+  strings blanked, a name/primitive inside a pattern match counts once while patterns count separately, a count above
+  the real total is stale, glob entries cannot carry count, header comments). `names` are on 13 rows; no row got
+  `primitives`, because every candidate also matched files outside the row (the list, including real second copies
+  such as `civil_from_days`/`days_from_civil`, `read_git_status`, `fence_lock`, `check_managed_timer`, is in
+  reports/unit-261124-0235-p10b2-result.md, for phase 12). Every allowed file carries its measured `count`.
+  Lead proof: `node --test test/architecture.test.mjs` with the activated host 94/95, only A4 (red on main too);
+  `fgos authority model --json` loads. Independent review: one blocking finding (span merge swallowed names), fixed.
+  Units could not run node or cargo, so they were five short units; the lead measured and verified each.
+- Phase 2a regression found from the suite: `mailbox-live-confined` (2 tests) timed out because `doctor --fix --only`
+  still judged all 119 rows (2.3 s; over 5 s confined under load). Fix: `--only` judges only the rows the named fixes
+  repair (0.16 s, one row). Landed on origin as fe3a5dd61 (land component-authority-doors/p02a-fix2); the local publish
+  needs `fgos git recover` (raised). Lead proof: `cargo test -p fgos-distribution` 248 green; review found the
+  repair-id gap, fixed. Open nit for phase 12: the fixture now gives `fix-alpha` explicit `repairs`, so "a fix without
+  `repairs` repairs its own id" has no direct unit assertion. The mailbox tests themselves pass only once a release
+  carries fe3a5dd61.
+- 11 is done: step 6 closes from the unconfined full suite of 2026-11-24 02:15
+  (plans/reports/report-261124-0215-manual-supervisor-suite-and-release.md and
+  plans/reports/triage-261124-0200-main-red-triage.md). The only reds of this plan were the two mailbox tests above,
+  now fixed; every other red is triaged to another owner.
+- 12 is cut into 12a, 12b, 12d and 12c (planner, 2026-11-24; see "Phase 12 cut" under the table). They wait for the
+  supervisor to widen the footprint.
 
 Lead, 2026-11-24 02:20: the supervisor's run cleared both waits. Release 9e5ae72c (main 728212c1f, carries 888bb3563) is activated, so 10b runs now (phase file written). Phase 11 step 6 is read from `plans/reports/report-261124-0215-manual-supervisor-suite-and-release.md` and its triage; see the phase 11 note below the table.
 
