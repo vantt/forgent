@@ -147,7 +147,7 @@
     },
     "door": {
       "type": "object",
-      "required": ["job", "kind", "patterns", "allowed"],
+      "required": ["job", "kind", "severity", "patterns", "allowed"],
       "additionalProperties": false,
       "properties": {
         "job": { "type": "string" },

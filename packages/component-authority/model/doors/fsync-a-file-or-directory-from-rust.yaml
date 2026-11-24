@@ -1,5 +1,6 @@
 job: fsync a file or directory from Rust
 kind: door
+severity: low
 patterns:
   - \bsync_(?:all|data)\b
   - \blibc::f(?:data)?sync\b

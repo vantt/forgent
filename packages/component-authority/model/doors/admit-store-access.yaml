@@ -1,5 +1,6 @@
 job: admit store access
 kind: door
+severity: low
 patterns:
   - disconnected-worktree-store
   - init-in-worktree

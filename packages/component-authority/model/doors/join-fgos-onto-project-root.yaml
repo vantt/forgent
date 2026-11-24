@@ -1,5 +1,6 @@
 job: join .fgos onto a project root
 kind: door
+severity: low
 patterns:
   - path\.join\((?!\s*(?:home|homeDir|os\.homedir\(\))\b)(?:[^()]|\([^()]*\))*'\.fgos'
   - path\.join\((?!\s*(?:home|homeDir|os\.homedir\(\))\b)(?:[^()]|\([^()]*\))*['"]\.fgos/

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e9d9eb6976794cf745006c4302e4e3caefca1c2ebb217c8ebb2d74d3ae96b2d5",
+  "payloadDigest": "a3d978260dcd5097a92b55203853ebeb67a77d5ec37b2b7cf62048d9f9ed3ff7",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -317,10 +317,10 @@
     "packages/canonical-json/rust/src/lib.rs": "e390b41a00319d727bd0f0d44ad7f6fda85218a53bae914186699f91a27b7944",
     "packages/component-authority/rust/src/declare.rs": "423d8c1fd068158cfae651f72c3c424a7d432afc928075981352deb219a69ead",
     "packages/component-authority/rust/src/lib.rs": "d94aebb3e459ae082513ca70d2d4022d7b2c4cba128777eb55693b79bc73a18c",
-    "packages/component-authority/rust/src/locate.rs": "098f3ee4ac17c2f068b04dc93880dcf2e5385999ace69f89fe18488a868ddff9",
-    "packages/component-authority/rust/src/model.rs": "b99f243ff189e34f6fd4aca2b55190052425423c2a97a1868b03381882d414dd",
+    "packages/component-authority/rust/src/locate.rs": "a9712698c1c7468e3e9a667e479d15671119ccf3a9da12a88e198eb997db77e7",
+    "packages/component-authority/rust/src/model.rs": "cf3e26ea844ad5ce19e92e606e14fd0fb2d14a0c0d4c77300a317a53dd0d80df",
     "packages/component-authority/rust/src/render.rs": "cb2e0d02c525e252df6a72e686f7507485a18c749002dc1641ef34480ebaa9b5",
-    "packages/component-authority/rust/tests/model_checks.rs": "6d491655999a8aedc76c51918acb93c396c7d103ec4828d63ab0a81a80511daa",
+    "packages/component-authority/rust/tests/model_checks.rs": "fd8843b27436c4701bb5fc3fc16cb286b2df3bf796204e978d7b029db88caa6b",
     "packages/config/rust/src/bundle.rs": "e0e8be75c39467ed79fdf232bc22848ca94e082ec38c94944006cddb2699680d",
     "packages/config/rust/src/cache.rs": "a7f20461334a2ead32208e1cb89b573688f142e62320360f592c4ca2d795c4b2",
     "packages/config/rust/src/detect.rs": "504804d0f9b67f8de221d169f79da458199e69babeabcba6ec60706b23cb9e2c",

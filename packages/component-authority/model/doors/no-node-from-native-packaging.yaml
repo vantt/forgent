@@ -1,5 +1,6 @@
 job: no Node from the native packaging verbs
 kind: door
+severity: medium
 patterns:
   - Command::new\("node"\)
   - run_bounded(?:_command)?\(\s*"node"

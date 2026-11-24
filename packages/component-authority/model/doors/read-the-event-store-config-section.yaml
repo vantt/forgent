@@ -1,5 +1,6 @@
 job: read the Event Store config section
 kind: door
+severity: low
 patterns:
   - export function (?:readEventStoreConfig|eventStoreConfig)\b
   - \.get\(\"eventStore\"\)

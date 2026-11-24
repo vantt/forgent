@@ -1,5 +1,6 @@
 job: agent definition tier directories
 kind: door
+severity: low
 patterns:
   - "['\"]core['\"],\\s*['\"]agents['\"]"
   - "['\"]fgos['\"],\\s*['\"]agents['\"]"

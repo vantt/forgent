@@ -1,5 +1,6 @@
 job: YAML parser loads
 kind: door
+severity: low
 patterns:
   - (?:\bfrom\s*|(?<![\w$.])import\s*\(?\s*|\brequire\(\s*|\bcreateRequire\([^)]*\)\s*\(\s*)(['"`])(?:(?:js-)?yaml(?:/[^'"`]*)?|(?:[^'"`]*/)?third-party/js-yaml\.mjs)\1
   - \bfunction\s+loadAll\s*\(

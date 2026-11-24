@@ -920,7 +920,7 @@ fn the_enum_constants_and_the_typed_row_fields_equal_the_schema() {
             "retiredBy",
             "owner",
         ],
-        &["job", "kind", "patterns", "allowed"],
+        &["job", "kind", "severity", "patterns", "allowed"],
         &["slug"],
         serde_json::json!({
             "job": "j", "kind": "k", "severity": "high", "patterns": [], "names": ["n"], "primitives": ["p"],

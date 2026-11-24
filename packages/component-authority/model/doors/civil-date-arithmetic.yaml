@@ -1,5 +1,6 @@
 job: civil date arithmetic
 kind: door
+severity: low
 patterns:
   - 719_?468
   - \bfn (?:civil_from_days|days_from_civil)\b
