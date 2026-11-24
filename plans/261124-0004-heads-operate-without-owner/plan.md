@@ -271,6 +271,18 @@ morning (discussion §1). The planner's own shape choices are written as decisio
   (`c-2368-1795534729073`) shows the window forwarded the argv without `--sync`, `--plan` and `--phase`, so no merge
   ran (`execution-failure`, `verdict-inconclusive`). Phase 1 stays parked until the shaper commits that discussion
   file, or the window forwards `--sync`. Branch tip `1c139c298`, reviewed, acceptance `rg` finds nothing.
+- 2026-11-24 23:00, phase 1: after the supervisor reported the discussion file committed (`e005444fb`), land
+  `c-6002-1795535270324` passed every `land.gates` test (170 of 171) and failed only on `--test test/skills`, which
+  the gate cannot import as a directory; the test files must be named one by one. The retry naming them
+  (`c-6384-1795535457992`) was refused `main-checkout-dirty-overlap` again: the shaper re-dirtied
+  `plans/discussions/ds-ubqlutna6r-domain-agnostic-item-component/DISCUSSION.md` and it stayed dirty for the whole
+  9-minute retry window. Still parked on that file, or on a sync of the branch with main.
+- 2026-11-24 23:00, phase 2: the planner's widening landed (`4cce55f61`). Rerun unit `c-7867-1795535626766`
+  (claude, `code:implement`, in the p02 worktree) came back `blocked`: the worker's sandbox (bwrap) refuses `cargo`
+  with "This command requires approval" (node works), so it changed nothing. No `fgos run` flag widens the worker
+  sandbox, so the "allow cargo" half of the owner's answer has no door the lead can use. The p02 worktree is also on
+  base `f999c4018` and lacks the planner's phase-file edits, and the window drops `--sync`. Parked on whoever owns
+  the worker sandbox's approval list.
 
 ## Outstanding questions
 
