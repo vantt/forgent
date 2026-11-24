@@ -1,14 +1,15 @@
 ---
 contract: plan-v1
 title: "The leak check of run-tests ignores live runtime directories"
-status: ready
+status: running
+lead: head:lead-forgent-261124-1945-run-te-f3bee
 priority: P2
 blockedBy: []
 footprint:
   - scripts/run-tests.mjs
   - test/scripts/run-tests.test.mjs
   - plans/261124-1945-run-tests-fgos-leak-check/
-base: d63657180011c633a806048e63aa7f576ef3bece
+base: c99af30a34d17b943ead207c3ed79e692cce5f8d
 source:
   - plans/discussions/ds-ti2vip43kp-run-tests-fgos-leak-check/DISCUSSION.md
   - p-s6te2445rb
