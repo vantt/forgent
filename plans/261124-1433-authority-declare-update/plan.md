@@ -141,12 +141,12 @@ views.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Update mode in the declare crate](phase-01-update-mode-in-the-declare-crate.md) | - | packages/component-authority/rust/src/declare.rs, packages/component-authority/rust/src/lib.rs | 1 | ready |
-| 2 | [Authority acts on the caller's checkout](phase-02-authority-acts-on-the-callers-checkout.md) | - | apps/fgos/src/wiring/authority.rs, apps/fgos/tests/authority.rs | 1 | ready |
+| 1 | [Update mode in the declare crate](phase-01-update-mode-in-the-declare-crate.md) | - | packages/component-authority/rust/src/declare.rs, packages/component-authority/rust/src/lib.rs | 1 | done |
+| 2 | [Authority acts on the caller's checkout](phase-02-authority-acts-on-the-callers-checkout.md) | - | apps/fgos/src/wiring/authority.rs, apps/fgos/tests/authority.rs | 1 | done |
 | 3 | [Wire update and re-render on declare](phase-03-wire-update-and-rerender-on-declare.md) | 1, 2 | apps/fgos/src/wiring/authority.rs, apps/fgos/tests/authority.rs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, test/cli/subcommand-flag-drift.test.mjs | 2 | ready |
 | 4 | [Integrate, document and report back](phase-04-integrate-document-and-report-back.md) | 3 | docs/platform/component-authority/spec.md, CHANGELOG.md, plans/261124-1433-authority-declare-update/reports/ | 3 | ready |
 
-Phases 1 and 2 have disjoint footprints and run at once. Phase 3 owns the generated command contracts (hot files),
+Phases 1 and 2 have disjoint footprints and run at once. Phase 1 landed at 1d129c0b9 and phase 2 at c0299bcff. Phase 3 owns the generated command contracts (hot files),
 and phase 4 alone owns `CHANGELOG.md` and the spec. The footprint check is `node scripts/plan-contract-check.mjs` and
 `fgos resource-check --plan`, run before landing.
 
