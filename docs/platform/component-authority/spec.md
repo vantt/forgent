@@ -146,18 +146,22 @@ Component Authority provides two operational doors (specified for implementation
 
 ### 3.2 `declare`
 
-`declare` registers a new structural row (component, decision kind, door, or contract) or relocates an existing row.
+`declare` registers a new structural row (component, decision kind, door, or contract), relocates a decision kind, or updates an existing component row with `--update`.
 
 - Reuses the admission model from Documentation H2 (`docs/platform/documentation/subcomponents/admission/spec.md`): an independent reviewer verifies the declaration within an approved frame.
 - **A new component or new decision kind always requires project owner approval.**
 - Moving a decision kind between components requires an approved plan naming the surviving owner.
 - When new synonyms are identified, they are recorded as aliases on the existing row to prevent duplicate implementations.
+- With `--kind component --update`, the row carries the existing `id` and the fields to change. Each supplied field replaces that field; omitted fields stay unchanged. The merged row passes the same checks as a new component row and needs no owner question or `--approved-by`. The `id` is the lookup key, not a rename target; an unknown id is refused, and changing `parent` is refused. Other row kinds do not support `--update`.
+- In the fgOS repository, a successful declaration also re-renders the generated ownership views. If that render fails after the model write, the answer reports the model write and the render failure separately.
+- `declare` and `render` act on the caller's own checkout, including a linked worktree when the shell helper appends `--dir` naming its main checkout. An explicit `--dir` targeting another project still selects that project. Their answers name the `root` they write; `render` lists the files written and `declare` includes the view result.
 
-CLI verb shapes (sibling plan `plans/261121-2110-component-authority-doors/plan.md`):
+CLI verb shapes:
 
 ```text
 fgos authority locate "<sentence>"
-fgos authority declare --kind <kind> --row <file>
+fgos authority declare --kind <kind> --row <json|file>
+fgos authority declare --kind component --update --row <json|file>
 ```
 
 ## 4. Callers and enforcement points
@@ -201,6 +205,12 @@ With the establishment of Component Authority, previous disparate ownership ledg
 6. The proposal map `docs/platform/proposals/component-authority-boundary-map.md` was retired; its rows and contract matrix were carried into `packages/component-authority/model/` (evidence `plans/261121-2109-component-authority/reports/proposal-map-coverage.md`), last commit `e0d208e38`.
 
 ## 7. Lịch sử quyết định
+
+### Cập nhật component qua cửa `declare` duy nhất
+
+- **Ngày**: 2026-11-24
+- **Nguồn**: [plan 261124-1433-authority-declare-update](../../../plans/261124-1433-authority-declare-update/plan.md)
+- **Nội dung**: Chọn cờ `--update` trên `declare`, không thêm verb anh em, vì `declare` là đường ghi duy nhất vào mô hình (quyết định 6). Hàng gửi vào mang `id` và các trường thay thế; kiểm tra hàng sau ghép như hàng mới, không cho đổi `id` hay `parent`, nên không cần hỏi lại chủ dự án. Không chọn bộ cờ riêng cho từng trường vì nó làm phình giao diện mà vẫn cần cùng bộ kiểm tra. Trong repo fgOS, `declare` gọi bộ render hiện có ngay sau ghi để không để mô hình và bản đọc lệch nhau. `declare` và `render` chọn checkout của người gọi; không đổi shell helper vì đổi nó sẽ đổi root của mọi verb, và không bỏ qua `--dir` vì vẫn phải phục vụ project khác. Bằng chứng thuộc `packages/component-authority/rust/src/declare.rs` và `apps/fgos/tests/authority.rs`; phép thử release đã kích hoạt được ghi riêng trong báo cáo tích hợp của plan.
 
 ### Quyết định 1 — Authority, boundary và contract là yếu tố hạng nhất của toàn hệ thống
 
