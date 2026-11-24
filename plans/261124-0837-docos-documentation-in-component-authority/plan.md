@@ -82,8 +82,10 @@ new row is declared.
 
 ## Owner questions
 
-None before phase 1. Phase 2 step 3 asks the owner, in the decision-question template, only if `fgos authority
-declare` refuses or the parent's `mustNotOwn` list must change.
+Answered 2026-11-24. Phase 1 found that `fgos authority declare` refuses an existing component, so it cannot update
+`document-identity`. The owner chose to have the component-authority lead add an update path (backlog
+`p-2lpsdtxnrd`), not a hand edit of the model and not a workaround row. **This plan waits at phase 2 until that item
+lands.** Phase 2 step 3 still asks the owner if the parent's `mustNotOwn` list must change.
 
 ## Risks
 

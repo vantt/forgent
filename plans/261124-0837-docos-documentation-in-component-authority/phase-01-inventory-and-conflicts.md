@@ -26,3 +26,24 @@ The inventory lists every F5 path; each conflict names the rule of the spec it m
 ## Risk
 
 The views may already be unclean on main because of the other lead's work: report it to that lead, do not fix it.
+
+## As built (2026-11-24)
+
+- **Views on main are not clean before this plan.** `fgos authority render --check` (dev host, origin/main at
+  `430cb42ba`) refuses: `component-boundary.md` differs from the model. `fgos authority render` changes 9 rows, all in
+  the door-count column (for example `convention` 0 → 1, `executor-model` 9 → 10, `fgos-gateway` 0 → 1): door rows
+  were added without a render. This belongs to the component-authority-doors lead. The render reports
+  `written: []` even when it rewrites the file. Phase 3 renders anyway, so the drift is regenerated there.
+- **Plain `fgos authority render` from a linked worktree writes into the main checkout**, because the installed host
+  resolves the project from the activation. Phase 3 runs it through `npm run fgos:dev` inside the worktree.
+
+| Path (F5) | Owner today | Owner wanted | Conflict | Row change needed |
+|---|---|---|---|---|
+| `packages/documentation/` (crate `rust/`, `third-party/pkm/`) | none; `locate` matches `documentation` by name only | `document-identity` | none; other crates are paths of their row (F4) | add the path to `document-identity` |
+| `apps/fgos/src/wiring/doc_locate.rs`, `apps/fgos/src/wiring/doctor/documentation.rs` | none | none | no row maps `apps/fgos/` wiring today | none; named in `owns` text only |
+| `core/config-standard/docLocate.yaml`, `core/config-schema/docLocate.schema.yaml` | none | none | no row maps `core/config-standard/` | none; `docLocate` namespace named in `owns` |
+| Index worker (`fgos doc index run`), cache `.fgos/runtime/doc-locate/`, machine model folder, Observe kind `fgos.doc.locate` | none | `document-identity` (`owns`) | parent `documentation` `mustNotOwn: runtime state mutation, code execution`; the spec and code treat `mustNotOwn` as prose, with no rule for how a child meets it | `owns` lines; status `designed` → `live` |
+
+**Blocker:** `fgos authority declare` adds rows only. A component that already exists is refused ("component
+\"document-identity\" already exists", `packages/component-authority/rust/src/declare.rs`), and no verb updates the
+paths, owns or status of an existing row. Phase 2 stops here and asks the owner (phase 2, step 3).

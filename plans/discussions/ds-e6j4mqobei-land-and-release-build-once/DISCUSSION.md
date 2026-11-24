@@ -9,7 +9,8 @@ authority: chưa tra; sẽ chạy `fgos authority locate` khi bàn tới compone
 
 Vòng 1 (2026-11-24): đã đo hiện trạng trên design-lap, chia vấn đề thành 7 mảng, liệt kê các hướng. Owner định nghĩa
 "rẻ" theo hai chiều: build không quá lâu, và không ăn đĩa nhanh. Owner đồng ý thước đo (hàng T của §3). Vòng 2: đã
-so các hướng với thước đo (§6); đang hỏi owner thứ tự lead đề xuất.
+so các hướng với thước đo (§6). Vòng 3 (14:00): owner chọn sửa cổng land trước; D1 và D2 đã chốt, hạng mục ở §7.
+Bước kế tiếp: giao planner viết plan cho A rồi B + G.
 
 ## 2. Mục tiêu & đề bài
 
@@ -38,8 +39,8 @@ chỉ tiện cho repo này.
 
 | D-ID | Quyết định | Ngày |
 |---|---|---|
-
-(chưa có)
+| D1 | Thước đo "rẻ" là hàng T của §3: land không đổi Rust < 2 phút và ghi < 0,5 GB; có đổi Rust < 5 phút và < 1,5 GB; cache build cả máy tối đa khoảng 25 GB, tự dọn; không máy nào build release; không lần land nào hỏng vì cache hay timeout khi load < 8 (owner đồng ý 09:33, giữ qua vòng 2 và vòng 3) | 2026-11-24 |
+| D2 | Thứ tự: sửa cổng land trước. A (ghi thời gian từng bước), rồi B cùng G (không biên dịch khi đầu vào Rust không đổi; thử lại không làm lại mọi thứ, dùng chung một băm đầu vào), rồi C và D (một target cố định theo máy; cổng land không dùng sccache). E (CI build release) đi sau, các lỗi CI do chủ từng khu sửa; F theo p-7ww4jlg745 (owner chọn 14:00 sau khi lần land 10:55 hỏng `land-retries-exhausted`) | 2026-11-24 |
 
 ## 5. Q&A log
 
@@ -56,6 +57,9 @@ chỉ tiện cho repo này.
   `land-retries-exhausted`: "the remote moved on every one of 4 attempts". origin/main nhận 50 commit trong 2 giờ
   trước đó (khoảng 2,4 phút một commit), ngắn hơn thời gian một lần thử (sinh lại 6-7 phút cộng cổng), nên khi main
   đông một nhánh có đổi Rust gần như không thể land. Đây là hỏng vì thiết kế thử lại, không phải vì cache hay timeout.
+- 2026-11-24 11:54, lead: lần land kế tiếp thành công sau 35 phút (`efb1f5af3`); release `648d59dc` của forgentx-38
+  gặp git-timeout ở bước distribution khi load 13, thử lại thì chạy được.
+- 2026-11-24 14:00, owner: chọn thứ tự (1), sửa cổng land trước (D2). Thước đo giữ nguyên qua ba vòng (D1).
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -86,4 +90,13 @@ Hướng lead đề xuất (chưa chốt): A trước (nhỏ, để có số th�
 nhưng do chủ các khu sửa CI, lead chỉ sửa phần của plan locate (đã làm (1)); F theo p-7ww4jlg745.
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Chưa tách.
+Thứ tự theo D2. Chưa có D-ID cho cách làm chi tiết của B, C và G; phần đó do planner đề xuất rồi đưa lại owner.
+
+1. **A. Đo từng bước của land** {#task-land-step-timing}: log land ghi thời gian mỗi lệnh sinh lại và mỗi cổng.
+   Nhỏ, làm trước để có số thật cho B, G và C.
+2. **B + G. Không biên dịch lại khi không cần** {#task-land-skip-rebuild}: một băm đầu vào Rust tin được; land
+   không đổi Rust dùng addon và host của release đang kích hoạt; lần thử lại chỉ chạy lại phần commit mới của main
+   có thể ảnh hưởng.
+3. **C + D. Một target theo máy, cổng không dùng sccache** {#task-land-shared-target}: một target cố định cho mọi
+   candidate, dọn theo ngân sách của D1; cổng đặt `RUSTC_WRAPPER=` trong môi trường của chính nó.
+4. **E. CI build release** {#task-ci-builds-release}: sau 1-3; chủ từng khu sửa lỗi CI ở V4.
