@@ -84,8 +84,11 @@ new row is declared.
 
 Answered 2026-11-24. Phase 1 found that `fgos authority declare` refuses an existing component, so it cannot update
 `document-identity`. The owner chose to have the component-authority lead add an update path (backlog
-`p-2lpsdtxnrd`), not a hand edit of the model and not a workaround row. **This plan waits at phase 2 until that item
-lands.** Phase 2 step 3 still asks the owner if the parent's `mustNotOwn` list must change.
+`p-2lpsdtxnrd`), not a hand edit of the model and not a workaround row. Plan `261124-1433-authority-declare-update`
+delivered it: `declare --update` landed at 49f0f47dc, and the design-lap release 71dd6eb7 carries it (checked
+2026-11-24 18:35 with `fgos authority declare --help`). Phase 2 runs through that verb from a release that carries
+49f0f47dc or later; `blockedBy` stays empty because the closing checks of 261124-1433 do not gate this use. Phase 2
+step 3 still asks the owner if the parent's `mustNotOwn` list must change.
 
 ## Risks
 

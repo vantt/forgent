@@ -158,3 +158,39 @@ Run by the lead from the main checkout at 9d791d391, still inside a confined ses
 - `node scripts/export-command-selectors.mjs --check`: exit 0. `node --test test/cli/subcommand-flag-drift.test.mjs`: 26 passed. `node scripts/plan-contract-check.mjs --plan plans/261124-1433-authority-declare-update`: ok.
 - The 17 unexplained `cargo test --workspace` failures are in `apps/fgos/src/wiring/doctor/{confinement,event_store,git}.rs` and `apps/fgos/src/wiring/events.rs`. None of the plan's four commits touches those files or the authority wiring they could reach, so they are not a regression of this plan; whether they pass outside confinement is still unproven.
 - Still not runnable here: the full `npm test`, a complete `cargo test --workspace`, and the hand check of criterion 5 (it needs a writable linked worktree). Both remain with the owner, as answered on q-vdefxq4upy.
+
+## Run outside the sandbox, 2026-11-24 17:00-20:00 (+07), design-lap
+
+Run by the DOCOS lead at the owner's request (q-vdefxq4upy, q-trgzaa34ua), in the main checkout at `49f0f47dc` (main
+later carries only docs commits on top), release `sha256:71dd6eb7` active.
+
+**Criterion 5 passes.** The commands of "Pending owner action" above ran as written, with `MAIN=/home/vantt/projects/forgentX`
+and `W=/home/vantt/projects/forgentX-worktrees/authority-declare-update-release-check`. `render --check --json` on main:
+`root` main, `"drift": []`. In `$W`, after the disposable drift line, `render --check` exited 1 naming the drift;
+`render --json` answered `root` = `$W` and `written` = `docs/platform/component-boundary.md`; the next `render --check`
+answered `root` = `$W`, `"drift": []`; `git diff --exit-code` on the file was clean; main's sha256 of
+`component-boundary.md` was unchanged (`e0698133…`); `fgos worktree remove` answered `removed: true`.
+
+**Criterion 6 is not green on main, and no red traces to this plan.**
+
+- `node scripts/export-command-selectors.mjs --check`: exit 0.
+- `cargo test --workspace --no-fail-fast` needs `ORT_LIB_LOCATION` (from `node scripts/ort-static.mjs ensure`), as the
+  build entry points pass it; without it the locate crate does not link. With it: exit 101, three failures.
+  `fgos-config registry_defaults` (docLocate doc line) and `fgos-supervision portfolio` (the locate plan's phase table)
+  were DOCOS faults, fixed in b667be495 and d67e00bcb; both targets pass. `fgos mailbox_routes` failed once with
+  `lock-busy` and passes alone (52/52). The 17 doctor and events failures the lead saw under confinement do not occur here.
+- `npm test`, run twice (load about 50, then starting at 2.5): 7225 passed, 121 failed, 17 files killed at the 600 s
+  file timeout. A rerun of only the 54 red files gave 627 passed, 50 failed, the same files timed out. Five of the timed
+  out files run alone through `scripts/run-tests.mjs` pass every case (`intake/plan` 93, `cli/fgos-return` 57,
+  `rust-host/fgctl-init` 9, `runner/worktree` 44, `direct/merge-gate` 25); they hang only beside other files. Their
+  exit 1 is the leak check: the live `fgos hook mailbox-sync` of this machine's sessions rewrites
+  `.fgos/runtime/mailbox/mail-taken` during the run.
+- Named causes outside this plan: deb11953c (component-authority-doors, door `severity` required) leaves test model
+  fixtures without `severity`, so `report/decision-index` and the `discoverKnownOwners`/`discoverInstructionSources`
+  cases of `setup/instruction-registry` fail with `missing field severity`. `setup/instruction-projections` hit the
+  5 s host timeout. The rest (event-store seal and triggers, agent-hooks extensions, guide-schema, domain-registry
+  compiled, doc-health, test-select, merge mutex, spawn-worker idle timeout, worktree-admin multiprocess, help-routes)
+  are not classified; none reads the authority declare or render code.
+
+Logs: `/tmp/claude-1000/-home-vantt-projects-forgentX/f3456e8e-44f8-4048-8d93-95c0ef5a5a34/scratchpad/` on design-lap
+(`suite2-cargo.log`, `suite2-npm.log`, `rerun-npm.log`, `one-*.log`, `relcheck.log`).
