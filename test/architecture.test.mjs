@@ -1812,14 +1812,12 @@ export const NAMED_DOOR_DEBT = new Set([
   'decide a dispatch',
   'derive executor facts',
   'doctor readiness registry',
-  'execution doctor judgments',
   'global fgOS directory',
   'installation shim and activation record location',
   'kernel lock primitive',
   'list run directories (twin)',
   'make, provision and remove a checkout',
   'no Node from the native packaging verbs',
-  'parse CLI arguments (twin)',
   'process control: signal a process or group',
   'process facts: read /proc',
   'resolve the invocation root',
@@ -2200,8 +2198,10 @@ test('door check: the execution doctor judges live in checks.rs, their Node name
     assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', `fn ${name}() {}\n`).length, 1, name);
     assert.deepEqual(doorHits(row, 'packages/execution/rust/src/checks.rs', `fn ${name}() {}\n`), [], name);
   }
-  // The only debt is the dead Rust copy of the finder in the distribution crate; the Node agy sub-HOME reader is gone.
-  assert.deepEqual(row.debt.map((e) => e.path), ['packages/distribution/rust/src/agent_config.rs']);
+  // The dead Rust copy of the finder in the distribution crate is deleted: the row holds no debt, and the name fails
+  // there if it comes back.
+  assert.deepEqual(row.debt ?? [], []);
+  assert.equal(doorHits(row, 'packages/distribution/rust/src/agent_config.rs', 'pub fn find_agy_sub_homes() {}\n').length, 1);
   assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'fn find_agy_sub_homes() {}\n').length, 1);
   for (const file of ['src/setup/agy-permissions.mjs', 'src/setup/seeded.mjs']) {
     assert.equal(doorHits(row, file, 'export function findAgySubHomes() {}\n').length, 1, file);

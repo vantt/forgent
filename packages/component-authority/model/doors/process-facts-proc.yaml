@@ -51,9 +51,10 @@ allowed:
   - path: scripts/git/p-space-resource.mjs
     count: 5
     reason: bench counts its own open descriptors in /proc/self/fd and its thread count in /proc/self/status, measurements and not process judgements
-debt:
   - path: packages/holder-lock/rust/src/borrow_vectors.rs
-    reason: a vector module compiled into the crate whose shell snippet reads /proc/$!/winpid to learn a Windows pid
+    count: 1
+    reason: a shell snippet reads /proc/$!/winpid under Git for Windows' sh; only that shell can learn the Windows pid of its own background job, so no Rust door can take the read over
+debt:
   - path: scripts/lib/mailbox-live-confined.mjs
     reason: frozen V7n measurement module; moves onto the process door when V7n is re-measured (MAIL)
 retiredBy: "p-24xw2cwdvo: the run-supervisor directory and the confinement probes run in Rust; their Node copies are reached only by the dead Node Execution closure and the mailbox live scripts, and go with them"

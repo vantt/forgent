@@ -18,6 +18,7 @@ use std::time::Instant;
 
 use crate::port::{
     self, Acquire, BorrowSpec, BorrowStdio, BorrowedCheck, HelperExe, Mode, Probe, Resource, Wait,
+    DEFAULT_KILL_WAIT_MS,
 };
 
 /// The four vectors, in run order.
@@ -27,9 +28,6 @@ pub const VECTORS: [&str; 4] = [
     "hook-background",
     "gc-auto-loose-objects",
 ];
-
-/// Kill wait used for the leftovers of a vector.
-const KILL_WAIT_MS: u64 = 2000;
 
 /// One vector's outcome.
 #[derive(Debug, Clone, PartialEq)]
@@ -281,7 +279,12 @@ impl Borrowing<'_> {
     /// Take the lock, run each git argv through `run_borrowed`, release,
     /// then probe. Returns (leftovers killed, probe after release, notes).
     fn run(&self, calls: &[Vec<&str>]) -> Result<(u32, Probe, Vec<String>), String> {
-        let handle = match port::acquire(&self.resource, Mode::Ex, Wait::Ms(2000), KILL_WAIT_MS) {
+        let handle = match port::acquire(
+            &self.resource,
+            Mode::Ex,
+            Wait::Ms(2000),
+            DEFAULT_KILL_WAIT_MS,
+        ) {
             Acquire::Acquired(h) => h,
             other => return Err(format!("owner could not take the vector lock: {other:?}")),
         };
@@ -474,7 +477,7 @@ fn background_pids_ended(_pidfile: &Path) -> Result<usize, String> {
 /// the job variable, without being in the job) is refused.
 fn sibling(dir: &Path) -> (bool, String) {
     let resource = Resource::new("borrow-vectors", dir.join("sibling.lock"));
-    let handle = match port::acquire(&resource, Mode::Ex, Wait::Ms(2000), KILL_WAIT_MS) {
+    let handle = match port::acquire(&resource, Mode::Ex, Wait::Ms(2000), DEFAULT_KILL_WAIT_MS) {
         Acquire::Acquired(h) => h,
         other => {
             return (
