@@ -2,10 +2,11 @@
 contract: plan-v1
 title: "Authority declare updates an existing component row, and render writes the caller's own checkout"
 description: "Add an --update mode to fgos authority declare that changes an existing component row under the new-row checks, re-render the ownership views on every declare, and make declare and render act on the checkout the caller stands in."
-status: ready
+status: running
+lead: head:lead-forgent-261124-1433-author-636d2
 priority: P1
 blockedBy: []
-base: 2bcd2a820ac91d49b2a8d4ef2ef13df2af538c09
+base: 9680efe1afe0c6a81a860fa6cb45362b72eb7ce0
 source:
   - plans/discussions/ds-p4ne2byuez-authority-declare-update/DISCUSSION.md
   - p-2lpsdtxnrd
