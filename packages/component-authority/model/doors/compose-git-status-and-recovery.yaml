@@ -6,8 +6,6 @@ patterns:
 names:
   - read_git_status
   - recover_git_operations
-  - readGitStatus
-  - recoverGitOperations
 allowed:
   - path: packages/git/rust/src/incidents.rs
     count: 2
@@ -22,8 +20,5 @@ allowed:
     reason: calls the door
   - path: packages/git/node-addon/src/lib.rs
     count: 2
-    reason: calls the door
-  - path: scripts/git/e3-bench.mjs
-    count: 4
     reason: calls the door
 reason: the open Git incidents of a repository (journal, pending and retained operations, worktree findings, native locks, a merge in progress) and the recovery pass are composed once, in fgos-git, for the host verbs `git status|recover` and for `fgos init`; the row catches a second definition by name only, not a copy under another name

@@ -7,6 +7,7 @@ patterns:
 names:
   - detect_harnesses
   - detectHarnesses
+  - write_coexistence_manifest
   - writeCoexistenceManifest
 allowed:
   - path: packages/distribution/rust/src/coexistence.rs
