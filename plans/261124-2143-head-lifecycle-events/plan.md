@@ -90,6 +90,8 @@ a handoff. This plan is the safety net under that rule.
 - Any change to how a plan is approved as `ready`.
 - A live idle lead whose plan is not done: `p-4uqiyjwrtd` and the existing `session-idle`/`plan-no-progress` rules
   own it.
+- Putting a waiting head to sleep and waking or resuming it on time: plan `261122-0056-orchestration-skeleton`
+  phases 6, 16 and 17 own it (`p-g6heszkdc7`). Phase 4 here is the interim slot rule until that lands.
 
 ## Prior art
 
@@ -119,7 +121,7 @@ a handoff. This plan is the safety net under that rule.
 | `plan-drafted` watcher row (a plan landed as `draft`) | `supervision` | One new definition file beside `plan-became-ready` |
 | Wake door closes a planner whose plan landed and a lead whose plan is `done` | `supervision` | Through the existing `StopSession` port; no new verb |
 | `session stop` accepts a lead's short `lead:<LANE>` role | `session-host` | Extends `stopHeadSession`; same door |
-| Admission counts a lead waiting outside as not holding a working slot | `admission`, `supervision` | Pending owner question; shape set in phase 4 |
+| Admission counts a lead waiting outside as not holding a working slot | `admission`, `supervision` | Owner pick `q-eoxlvo7i4r`; interim, retired by the sleep rule of plan `261122-0056-orchestration-skeleton` phase 6 |
 
 ## Phases
 
@@ -149,7 +151,10 @@ overlaps plan 0004 on `docs/platform/supervision/spec.md`, `docs/platform/sessio
 
 ## Owner questions
 
-- q-eoxlvo7i4r: Lead slots: count a lead waiting outside as free, or raise the lane count from measured capacity? Blocks phase 4 (and phases 5-6); phases 1-3 are `ready`.
+- q-eoxlvo7i4r: Lead slots: count a lead waiting outside as free, or raise the lane count from measured capacity?
+  The owner picked "a waiting lead does not hold a working slot" in chat on 2026-11-24, and added that a head left
+  waiting a long time should be shut down and woken when needed (plan `261122-0056-orchestration-skeleton` phase 6).
+  Phase 4 stays `draft` until the answer is recorded in the question store; phases 1-3 are `ready`.
 
 ## Risks and rollback
 
@@ -160,4 +165,7 @@ overlaps plan 0004 on `docs/platform/supervision/spec.md`, `docs/platform/sessio
   `closed.json` of the old attempt is no longer read. Proof point: a rotated-head case in phase 2.
 - A gone record's instant moved to fix the window drop must stay one id per incident, or a handled incident is
   raised again on every tick. Proof point: phase 2 asserts the same event id on two ticks.
+- Shared files with plan `261122-0056-orchestration-skeleton` phase 1 (`wake.rs`, `portfolio.rs`, `supervisor.rs`,
+  `apps/fgos/src/wiring/supervision.rs`, `tests/wake.rs`): both plans are `draft`. Whichever is set `ready` second
+  takes the other in `blockedBy`; this plan is smaller and P1, so it should go first and 0056 phase 1 rebases on it.
 - Rollback: revert the plan's merge commit; no data migration, no new config key, no state file is added.
