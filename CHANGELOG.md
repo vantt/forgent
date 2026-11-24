@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Added: `fgos authority declare --kind component --update --row <json|file>` updates an existing component without changing its id or parent or asking for new approval; declare also re-renders ownership views in the fgOS repository, and authority declare/render write the caller's own checkout, including linked worktrees through the shell helper.
+
 - **Changed**: every door row of the component authority model now needs `severity` (`high`, `medium` or `low`); `fgos authority declare --kind door` refuses a row without it, and `fgos authority locate` returns it on a door match. A project that declared door rows earlier adds the field to each.
 - Added: `fgos doc locate` returns the ten documents most likely to already hold a draft's claim (path, title, best section, axis values, an `outside-region` flag, and `partial: true` while the index or the model is not ready), and `fgos doc locate --eval <cases>` measures its recall over a case set. `fgos doc index status [--wait <s>] | stop | reset` reports and repairs the locate index; `status --wait` starts the index worker when none runs, then waits. The doctor rows `doc-locate-model` and `doc-locate-index` report the model and the index; `fgos doctor --fix` fetches the embedding model (about 130 MB) once per machine into the machine model folder, and the config key `docLocate.modelSource` points it at a mirror or an offline folder. Locate reads `docs/` and leaves out `history`, `proposals` and `docs/distillery/`.
 
