@@ -8,8 +8,8 @@ authority: chưa tra; sẽ chạy `fgos authority locate` khi bàn tới compone
 ## 1. Trạng thái hiện tại
 
 Vòng 1 (2026-11-24): đã đo hiện trạng trên design-lap, chia vấn đề thành 7 mảng, liệt kê các hướng. Owner định nghĩa
-"rẻ" theo hai chiều: build không quá lâu, và không ăn đĩa nhanh. Chưa có quyết định nào. Đang mở: con số cụ thể cho hai
-chiều đó (thời gian land, GB ghi mỗi lần land, GB cache tối đa mỗi máy).
+"rẻ" theo hai chiều: build không quá lâu, và không ăn đĩa nhanh. Owner đồng ý thước đo (hàng T của §3). Đang làm: so
+từng hướng ở §6 với thước đo, có số đo hoặc mã nguồn làm chứng.
 
 ## 2. Mục tiêu & đề bài
 
@@ -25,6 +25,7 @@ chỉ tiện cho repo này.
 
 | # | Mảng | Đã đo (2026-11-24, design-lap) | Chưa rõ |
 |---|---|---|---|
+| T | Thước đo (owner đồng ý 2026-11-24 09:33; chờ thêm một vòng mới đánh D-ID) | Thời gian: land không đổi Rust < 2 phút, có đổi Rust < 5 phút. Ghi đĩa mỗi lần land: < 0,5 GB không đổi Rust, < 1,5 GB có đổi (nay 4,6 GB). Cache build cả máy tối đa khoảng 25 GB, tự dọn, không bao giờ dọn tay (nay khoảng 60 GB). Không máy nào build release; chuyển main mới bằng tải về. Không lần land nào hỏng vì cache hay timeout khi load < 8 | — |
 | V1 | Cổng land biên dịch lại từ đầu | Candidate là worktree mới dưới `.fgos/runtime/git-candidates/`; `scripts/run-tests.mjs` build addon vào `target/` của candidate (`CARGO_TARGET_DIR` mặc định `target`). Log land: 260-290 crate được biên dịch mỗi lần có build; ngay bước sinh lại census đã biên dịch `proc-macro2`, `serde`... 9 lần land gần nhất: 38 s đến 568 s (lần treo 1.589 s). Ổ đĩa: target của mỗi worktree 3-8 GB, main 41 GB, còn trống 57 GB | Bao nhiêu phút là biên dịch, bao nhiêu là test node và quét git: log không ghi thời gian từng cổng |
 | V2 | sccache dùng chung treo | `~/.cargo/config.toml` đặt `rustc-wrapper` cho cả máy (cache 8 GiB tại `~/.cache/sccache`, chỉ cache crate phụ thuộc). Hai build treo cùng lúc 08:15: 754 yêu cầu, 509 thực thi, 0 trúng; chạy được khi để trống wrapper | Nguyên nhân treo (server, khoá, TMPDIR); chưa ai chứng minh |
 | V3 | Release build tại máy sau mỗi land | forgentx-38 build `cargo build --release --workspace` sau mỗi land rồi kích hoạt; máy khác muốn main mới cũng phải build. `release.yml` (theo tag) build trên CI và publish kèm `SHA256SUMS`; `fgctl upgrade` tải và kiểm checksum. Release gắn tag gần nhất `v0.2.0-rc.12` (2026-11-18) | Thời gian một lần build release cục bộ (cần forgentx-38 cho số) |
@@ -47,6 +48,8 @@ chỉ tiện cho repo này.
 - 2026-11-24 09:10, lead: vòng 1, số đo ở §3; các hướng ở §6 (nháp).
 - 2026-11-24 09:12, lead hỏi thước đo "đủ rẻ" (đề xuất: land không đổi Rust < 2 phút, có đổi Rust < 5 phút, không hỏng vì cache hay timeout khi load < 8, không máy nào build release).
 - 2026-11-24 09:14, owner: "rẻ là không bị build quá lâu và không làm tốn đĩa nhanh". Lead đo thêm đĩa (V7).
+- 2026-11-24 09:20, lead đề xuất con số cho hai chiều (hàng T của §3).
+- 2026-11-24 09:33, owner: "ok".
 
 ## 6. Thiết kế đã chốt {#design}
 
