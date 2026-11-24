@@ -36,11 +36,30 @@ the supervision queue only once it is settled.
 - **Acceptance per phase:** the HARDEN close conditions. Before/after table on the same machine and load class; no
   High-or-above finding left unreproduced; net Δ ≤ 0 or every increase names its paying deletion; doctor and smoke green
   on the activated release on this machine (the owner lands the other machines; mdview and mcp-skill-hub are out, N5); `npm test` and `cargo test --workspace` green.
-- **Acceptance of the program:** 56 → 0 `legacy-cli` routes in `packages/host-runtime/contracts/command-routes.json`;
+- **Acceptance of the program:** every door row whose `retiredBy` names S6b or S7 is closed (N13, provisional); 56 → 0 `legacy-cli` routes in `packages/host-runtime/contracts/command-routes.json`;
   `git ls-files 'src/*.mjs' 'bin/*.mjs'` is empty; every HARDEN carry-over in §3 is closed or explicitly declined by the owner.
 - **Sources:** `p-vwpnx4gpow`, `261021-1118` (plan, lessons, closing report §6–§7), D1, D6, D7–D9.
 
 ## 1. Trạng thái hiện tại
+
+**Round 2 (2026-11-24 09:2x): the owner set a new portfolio order in the secretary's chat, and this discussion lines up with it.**
+Source: `plans/reports/report-261124-0920-miu-phase12-overlap-excerpt.md` (`cb0a01b51`). The owner accepted option A for doors
+(the named debt groups stay, each with its owner in `retiredBy`). The owner also set a rule: lower layers first, then the group
+that keeps supervisor, orchestrator and day-to-day operation steady ("release con người" means being safe to step away).
+Miu's order, which the owner called good: control-group bug rows first → doors 12a/12b/12d → `261122-2108` → S6b, then S7
+→ HARDEN next round last. Miu also proposed two speeds: a concrete bug row goes through the normal fix flow plus HARDEN steps 1
+and 6–9, and only a layer's structure (T2–T3, T8) gets the full loop. Four findings follow (N10–N13 in §3):
+- **N10:** S6b and S7 of `261114-2051` are not separate from this discussion. They are phases T6 and T7 here (D7 made the
+  remaining port run as the HARDEN loop). Miu's order lists them twice. Recommendation: one owner. S6b and S7 run as phases T6 and T7 of the
+  skeleton, and the program rows point here. Changing `261114-2051` is the secretary's or a planner's job, not this file's.
+- **N11 (provisional):** supervision (T8) moves up to just after T2–T3, ahead of T6. Its Node part imports no Workflow code,
+  so bottom-up does not block it, and the owner's new rule puts the control group first. This amends D8. The owner can object.
+- **N12:** the control-group bug rows land first. Phase T2–T3 takes its baseline after them and treats any row still open as an
+  input. Miu's two speeds match N7: those bug rows are not council work.
+- **N13:** under option A, 25 door rows name S6b or S7 in `retiredBy`. Closing them becomes part of the acceptance for phases
+  T6, T7 and T9.
+Still paused: the wait in O7 has not changed. No owner question is parked. N11 is put to the owner in chat, so if the
+owner objects, the D8 order stays.
 
 **Resume check 2026-11-24 09:1x: still paused, the wait has not cleared.** `fgos questions` shows no open owner question.
 Doors (`261121-2110`) is `running`: phases 1–11 are done or withdrawn, 12a is running, 12b and 12d are ready, and 12c is
@@ -135,6 +154,10 @@ This discussion edits them in place from here on. O7, the N rows and F1 are new 
 | N8 | **The council's first priority is the boundary: authority, contracts and one door.** Per component it decides what it is the authority for (and must not own), its contracts and ports, its Rust/Node boundary, that each job has exactly one door, and the delete list that follows. The settled shape is written into the component's spec and the model. The boundary is settled before anything else. The inside is still done, not skipped: when the scan or the council finds something inside that must change (a bug, a High finding, a correctness or stability problem, dead code, a twin), it goes into the same phase's sub-plan and is changed. What the boundary-first rule lets wait is only optional inside optimisation, which can happen freely later once the boundary is right. The close conditions (net Δ ≤ 0, no High left unreproduced) still hold. | provisional minted D14 | owner chat 19:4x "council chủ yếu với anh sẽ ưu tiên về component-authority và contracts … tối ưu bên trong kiểu gì cũng được", "à thêm là 1 cửa"; design principle 1 |
 | N9 | **The one-door check is system-wide, never per layer.** HARDEN's earlier one-door search looked only inside the layer being worked, so two doors for one job in different layers slipped through (a Rust crate at T2 and a Node PATH walker at T9, as in H2). Step 0 runs one scan over the whole repo, Node and Rust (`src`, `bin`, `scripts`, `apps`, `packages`, hooks), and writes one map: job → every door that does it. For each job with more than one door, the door kept is the one in the lowest layer that needs it (design principle 2), and each extra door is assigned to the phase holding it for deletion. Every layer's council reads this map instead of searching its own layer; each layer's close refreshes the map so a door added meanwhile is caught. **The map is built on the component-authority model**, which is why doors goes first (D6, D9): the jobs come from the model (`owns`, `mustNotOwn`, `decision-kinds.yaml`, `contracts.yaml`, `doors/`, looked up with `fgos locate`); a source search only finds extra doors outside it. A job the model lacks is not added here; it goes to the model's owner first, and councils use it once it is in the model. | minted D15 | owner chat 19:4x "lần dò 1 cửa trước đây là dò cục bộ trong tầng đang làm, trong khi một cửa là xuyên suốt hệ thống"; design principles 1 and 2 |
 | N6 | H5's first red looks resolved: `test/cli/fgos-workflow.test.mjs` no longer names `--plan` (commit `0a3f46ac5`, 2026-11-18). The instruction-projections red was not rechecked. Step 0 confirms both. | first likely resolved; second not rechecked | `git log` on both test files |
+| N10 | **S6b and S7 = phases T6 and T7.** Program `261114-2051` still lists S6b (Workflow) and S7 (Work) as its own steps. D7 made the remaining port of those layers run as the HARDEN loop, and ds-wham5txfkv D4 had already mapped them (inventory rows 16–19 "= S6b", "= S7"). Miu's order, "S6b → S7, then HARDEN next round", counts the same work twice. If S6b and S7 ran first as plain ports, that would undo D7 and run T7 ahead of T8 and T9 against D8. **Answer:** one owner. The skeleton's phases T6 and T7 are S6b and S7, with S1's T7 verdicts in T7. The program rows should point to this skeleton; that edit goes to the secretary or a planner. | follows from D7 and D8; tell the secretary | `plans/261114-2051-rust-verb-migration-program/plan.md:64,83-84`; ds-wham5txfkv §6 rows 16–19; excerpt 01:56, 01:58 |
+| N11 | **T8 supervision moves up to just after T2–T3** (new order: T2–T3 → T8 → T6 → T9 → T7). The owner's rule of 2026-11-24 01:57 puts the control group (supervisor, orchestrator, operations) right after the lower layers. The Node part of supervision (`src/portfolio/plan-sections.mjs`, `packages/portfolio/*.mjs`) imports only `util` leaves, never Workflow, so nothing below it in T6 has to close first. Its council is small (N4). This amends D8. | provisional (round 2); owner may object in chat | `components.yaml` supervision row (tier 8, owns orchestration and plan lane pool); imports of `src/portfolio`, `packages/portfolio`; excerpt 01:57, 01:59 |
+| N12 | **Control-group bug rows go first, on the fast track** (`p-fel4zoytbn`, `p-kghvlvmj6s`, `p-auypprszfz`, `p-kqs6fjalvh`, `p-vwaujnak4j`, `p-gfdhojihyf`, `p-uqanurjt42`, `p-btxvtb34u3`, `p-kihregmfxm`, `p-g3btj3bpqc`, per Miu's list). They are not this skeleton's work. Phase T2–T3 takes its baseline (step 1) after they land; a row still open then is an input to its tables (D14). Miu's two speeds (a bug row runs the fix flow plus steps 1 and 6–9; a layer's structure runs the full loop) agree with N7 and need no change here. | provisional (round 2) | excerpt 01:58, 02:00; Miu's row list is unverified |
+| N13 | **Option A's named debt is an acceptance input.** 25 door rows in `packages/component-authority/model/doors/` name S6b or S7 in `retiredBy` (for example `doctor-readiness-registry`, `node-rows-bridge`, `resolve-invocation-root`, `parse-cli-arguments`, `global-fgos-directory`). Step 0 assigns each one to phase T6, T7 or T9, and the program's acceptance adds "every door row whose `retiredBy` names S6b or S7 is closed". | provisional (round 2) | `grep -lE '^retiredBy:.*\b(S7\|S6b)\b' packages/component-authority/model/doors/*.yaml` = 25; excerpt 01:50 |
 | F1 | Model tiers today: T2 `git`, `terminal-control`, `session-rotation`; T3 `session-host`; T5 `seat-binding`, `execution-core`, `dispatch-transport`; T6 `workflow`, `work-driver`; T7 `work-state`, `runner`; T8 `supervision`; T9 `packaging-distribution`, `host-surface`, `learning-docs-registry`. The model is YAML now (doors 1b has landed). | clear | `packages/component-authority/model/components.yaml`, `layers.yaml` |
 
 ## 4. Quyết định đã chốt
@@ -193,6 +216,9 @@ Copied from ds-wham5txfkv §4. They are owner decisions made there and are not r
 - **2026-11-24 09:1x — resume check.** No open owner question. Doors is running (12a), its 12c waits for `261122-2108` phase 8;
   `261122-2108` is still `draft`. `261122-0118` and `261123-0828` are `done`, so O2 closed and O7 narrowed to `261122-2108`
   alone. Still paused.
+- **2026-11-24 09:18 — owner:** "đây là thảo luận đang dang dở, em đọc trước: plans/reports/report-261124-0920-miu-phase12-overlap-excerpt.md (cb0a01b51)".
+  Read it, then checked it against `261114-2051` (S6b and S7 rows), `components.yaml` (supervision) and the door model (25 rows
+  retired by S6b or S7). Result: N10–N13. N11 (T8 ahead of T6) put to the owner in chat; still paused on O7.
 
 ## 6. Thiết kế đã chốt {#design}
 
