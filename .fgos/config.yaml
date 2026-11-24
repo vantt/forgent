@@ -251,14 +251,18 @@ runner:
     # @fgos:doc The tier, executors and account pool one persona prefers. Only a persona may name a pool; a role entry refuses the key by name.
     # @fgos:why [f381c6d2-3f10-4128-aeac-d0f158513f83] owner 2026-11-21: shaper heads run Claude Opus (tier flagship on claude)
     shaper:
+      # @fgos:doc One tier of the model ladder. Values: nano | mini | standard | advanced | flagship | frontier.
       tier: flagship
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider.
       prefer:
         - executor: claude
           invocation: claude-herdr-bypass-bwrap
     # @fgos:doc The tier, executors and account pool one persona prefers. Only a persona may name a pool; a role entry refuses the key by name.
     # @fgos:why [4172003] owner 2026-11-21: planners run Claude Opus
     planner:
+      # @fgos:doc One tier of the model ladder. Values: nano | mini | standard | advanced | flagship | frontier.
       tier: flagship
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider.
       prefer:
         - executor: claude
           invocation: claude-herdr-bypass-bwrap
@@ -370,5 +374,19 @@ watcher:
 # @fgos:doc The project supervisor head and its lead pool.
 supervisor:
   # @fgos:doc Most leads the supervisor runs at once; it equals the default lane count and is not derived at read time. In leads. Minimum: 1. Default: 4.
-  # @fgos:why [39631fb7-af40-41d5-8e8b-18afb8376e42] owner 2026-11-23 12:38: run at most 2 leads at once until the RAM shortage (OOM kills 09:17, 09:25-09:31, 11:10) is over
-  maxLeads: 2
+  # @fgos:why [2250466] too slow delivery
+  maxLeads: 3
+# @fgos:doc When a long-running head session is rotated into a fresh one, and what the successor rereads.
+sessionRotation:
+  # @fgos:doc Per-persona overrides of soft and hard, and the portfolio paths its successor rereads, by bare persona name.
+  personas:
+    # @fgos:doc One persona's thresholds and reload paths.
+    secretary:
+      # @fgos:doc This persona's soft fraction; the global value when absent. Minimum: 0. Default: 0.15.
+      # @fgos:why [2f2aff97-7ef0-4ca6-9496-8e89b501e067] owner 2026-11-24: raise secretary soft rotation 0.15 to 0.30
+      soft: 0.3
+    # @fgos:doc One persona's thresholds and reload paths.
+    supervisor:
+      # @fgos:doc This persona's soft fraction; the global value when absent. Minimum: 0. Default: 0.15.
+      # @fgos:why [2f2aff97-7ef0-4ca6-9496-8e89b501e067] owner 2026-11-24: raise supervisor soft rotation to 0.30 like the secretary
+      soft: 0.3
