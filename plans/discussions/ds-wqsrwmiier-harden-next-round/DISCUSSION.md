@@ -42,6 +42,14 @@ the supervision queue only once it is settled.
 
 ## 1. Trạng thái hiện tại
 
+**Round 3 (2026-11-24 09:3x).** The owner accepted N11 (a), minted as D17: the order is T2–T3 → T8 → T6 → T9 → T7, and
+§6 and §7 are regenerated to match. On N10 the owner asked two things. First, can Workflow and Work stay separate, with
+Work held back until Workflow is complete, since Work might be removed entirely? Second, can Work's item management and
+triage be split out into a domain-agnostic item-data component? Scouting gave two answers. First, T6 and T7 are already
+separate phases with T7 last, so N10 (a) does not merge Workflow with Work. It only makes S6b the same thing as T6 and S7 the
+same thing as T7, and if Work may be deleted, that is one more reason not to port S7 first. Second, most of the split already
+exists (D-ADR0082, the `questions` component), but the model has gaps (N14). Open in chat: confirm N10 (a), and the N14 direction.
+
 **Round 2 (2026-11-24 09:2x): the owner set a new portfolio order in the secretary's chat, and this discussion lines up with it.**
 Source: `plans/reports/report-261124-0920-miu-phase12-overlap-excerpt.md` (`cb0a01b51`). The owner accepted option A for doors
 (the named debt groups stay, each with its owner in `retiredBy`). The owner also set a rule: lower layers first, then the group
@@ -158,6 +166,7 @@ This discussion edits them in place from here on. O7, the N rows and F1 are new 
 | N11 | **T8 supervision moves up to just after T2–T3** (new order: T2–T3 → T8 → T6 → T9 → T7). The owner's rule of 2026-11-24 01:57 puts the control group (supervisor, orchestrator, operations) right after the lower layers. The Node part of supervision (`src/portfolio/plan-sections.mjs`, `packages/portfolio/*.mjs`) imports only `util` leaves, never Workflow, so nothing below it in T6 has to close first. Its council is small (N4). This amends D8. | provisional (round 2); owner may object in chat | `components.yaml` supervision row (tier 8, owns orchestration and plan lane pool); imports of `src/portfolio`, `packages/portfolio`; excerpt 01:57, 01:59 |
 | N12 | **Control-group bug rows go first, on the fast track** (`p-fel4zoytbn`, `p-kghvlvmj6s`, `p-auypprszfz`, `p-kqs6fjalvh`, `p-vwaujnak4j`, `p-gfdhojihyf`, `p-uqanurjt42`, `p-btxvtb34u3`, `p-kihregmfxm`, `p-g3btj3bpqc`, per Miu's list). They are not this skeleton's work. Phase T2–T3 takes its baseline (step 1) after they land; a row still open then is an input to its tables (D14). Miu's two speeds (a bug row runs the fix flow plus steps 1 and 6–9; a layer's structure runs the full loop) agree with N7 and need no change here. | provisional (round 2) | excerpt 01:58, 02:00; Miu's row list is unverified |
 | N13 | **Option A's named debt is an acceptance input.** 25 door rows in `packages/component-authority/model/doors/` name S6b or S7 in `retiredBy` (for example `doctor-readiness-registry`, `node-rows-bridge`, `resolve-invocation-root`, `parse-cli-arguments`, `global-fgos-directory`). Step 0 assigns each one to phase T6, T7 or T9, and the program's acceptance adds "every door row whose `retiredBy` names S6b or S7 is closed". | provisional (round 2) | `grep -lE '^retiredBy:.*\b(S7\|S6b)\b' packages/component-authority/model/doors/*.yaml` = 25; excerpt 01:50 |
+| N14 | **A domain-agnostic item-data component, apart from Work.** What already exists: D-ADR0079 and D-ADR0082 (2026-11-19) made the portfolio files under `plans/` (backlog items, discussions, plans) the source of truth, domain-agnostic. They made Work a replaceable UX layer on hold, and froze the old Work store; triage of the open Work items is its own backlog row. Owner questions and gates are already the `questions` component (tier 3, Rust). The supervision crate reads the portfolio (`portfolio.rs`, `discussion_source.rs`). **Gaps in the model:** (1) no component owns the portfolio item data. `fgos authority locate` falls back to `work-state` with a weak match, and supervision owns only "portfolio status and plan lane pool"; (2) `packages/portfolio/*.mjs` (item parsing, backlog index, check) is in no component's `paths`; (3) `work-state` still owns "questions, human gates" while `questions` owns "owner question shape" and "workflow gates", so two components own one job. What stays inside Work: work-item lifecycle (`tsk-` ids, stage, claim and return), its events, and `src/intake` (classification, risk keywords; the keywords are coding-specific). **Proposal:** declare one item-data component (items, ids, statuses, links, one write door, one check, per D-ADR0082), with domain-agnostic triage in it and domain rules left in `domains/`. Its boundary is settled in phase T8's council (D17 moves T8 forward), because supervision and the secretary are its main users. Phase T7 then opens with "keep, shrink or delete Work". A new component needs the owner's answer (`fgos authority declare`). | provisional (round 3) | `plans/discussions/ds-an5r4pyyto-work-data-model/DISCUSSION.md` §2, §3 row 7, D-ADR0082; `components.yaml` rows work-state, questions, supervision; `fgos authority locate` 2026-11-24 |
 | F1 | Model tiers today: T2 `git`, `terminal-control`, `session-rotation`; T3 `session-host`; T5 `seat-binding`, `execution-core`, `dispatch-transport`; T6 `workflow`, `work-driver`; T7 `work-state`, `runner`; T8 `supervision`; T9 `packaging-distribution`, `host-surface`, `learning-docs-registry`. The model is YAML now (doors 1b has landed). | clear | `packages/component-authority/model/components.yaml`, `layers.yaml` |
 
 ## 4. Quyết định đã chốt
@@ -177,6 +186,7 @@ Copied from ds-wham5txfkv §4. They are owner decisions made there and are not r
 | D13 | A triage scan in step 0 sets each component's council weight (full, light, skip) by the soundness of its boundary in the component-authority model, not by code size; each layer's step 1 rechecks its own rows; the owner can override a row in the layer's batched ask. Amends D7's "loop unchanged". | owner answer | N7; chat 19:34 |
 | D14 | The council's first priority is the boundary: authority, contracts and one door. Inside changes the scan or council finds necessary are made in the same phase; only optional optimisation may wait. Amends D7's council step. | owner answer | N8; chat 19:4x, 19:39 |
 | D15 | The one-door check is system-wide: step 0 builds one job → doors map over the whole repo on the component-authority model, every council reads it, each layer close refreshes it; a job the model lacks goes to the model's owner first. This is why doors goes first. | owner answer | N9; chat 19:4x, 19:5x |
+| D17 | Order of phases: T2–T3 → T8 supervision → T6 Workflow → T9 → T7 Work last. Supervision has no code dependency on Workflow, and the owner's rule of 2026-11-24 puts the control group right after the lower layers. Amends D8. | owner answer | N11; chat 09:2x "N11 đồng ý (a)" |
 | D16 | Appendix A of ds-wham5txfkv (`97a1fba58`) is history; this discussion is the source of truth for "HARDEN next round". | owner answer | chat 19:23 |
 
 ## 5. Q&A log
@@ -219,6 +229,14 @@ Copied from ds-wham5txfkv §4. They are owner decisions made there and are not r
 - **2026-11-24 09:18 — owner:** "đây là thảo luận đang dang dở, em đọc trước: plans/reports/report-261124-0920-miu-phase12-overlap-excerpt.md (cb0a01b51)".
   Read it, then checked it against `261114-2051` (S6b and S7 rows), `components.yaml` (supervision) and the door model (25 rows
   retired by S6b or S7). Result: N10–N13. N11 (T8 ahead of T6) put to the owner in chat; still paused on O7.
+- **2026-11-24 09:23 — owner:** "đúng rồi dựa vào tín hiệu ở phase 12 để xử lý các plan liên quan node-to-rust, ưu tiên là tầng
+  thấp hoặc các tầng thuộc nhóm điều khiển/release con người. thứ tự đang đề nghị là tạm ổn. Nói rõ hơn N11 và N10 có tác động gì
+  để anh quyết." The order is accepted as provisional. N10 and N11 were explained with their effects in chat. Checked: the
+  supervision crate (`packages/supervision/rust/src`, 4,383 lines) never names workflow, so N11 has no code dependency on T6.
+- **2026-11-24 09:2x — owner:** "N11 đồng ý (a). N10: liệu có thể tách Workflow và Work riêng không, anh vẫn muốn delay work cho đến
+  khi workflow hoàn chỉnh, vì biết đâu có thể loại bỏ luôn work. hiện work có phần quản lý item, triage, có thể cô lập nó ra thành
+  1 bộ component độc lập khỏi work không, kiểu lớp quản lý item data mà domain agnostic." N11 minted D17; §6 and §7 regenerated.
+  Scouted ds-an5r4pyyto (D-ADR0082), the model rows and `fgos authority locate`, giving N14.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -239,10 +257,10 @@ a flexible storage core, plus the human touch points of lifecycle, gate and ques
 flowchart BT
   pre["Before: doors (D6) + dead closure 261122-2108"] --> s0["Step 0: recount §6 on that tree"]
   s0 --> T23["Phase T2-T3 session: session-rotation, session-host"]
-  T23 --> T6["Phase T6 Workflow"]
-  T6 --> T8["Phase T8 supervision"]
-  T8 --> T9["Phase T9 host + surface + packaging + report"]
-  T9 --> T7["Phase T7 Work: decision 78 council, after the packaging release"]
+  T23 --> T8["Phase T8 supervision (+ item-data boundary, N14)"]
+  T8 --> T6["Phase T6 Workflow = program step S6b"]
+  T6 --> T9["Phase T9 host + surface + packaging + report"]
+  T9 --> T7["Phase T7 Work = S7: decision 78 council (keep, shrink or delete), after the packaging release"]
   subgraph loop["Each phase: HARDEN loop"]
     a[1 baseline] --> b[2 council: boundary first, then inside that must change] --> c[3 arbitrate + one owner ask] --> d[4 sub-plan] --> e[5-6 implement + verify] --> f[7 land + activate] --> g[8 re-measure] --> h[9 close: net ≤ 0]
   end
@@ -309,13 +327,13 @@ Components: session-rotation, session-host (and the dispatch live rest reached o
 and 14; H6; the main-checkout delete guard (`src/git/main-checkout-delete-guard.mjs`, H7, N3). Steps 1–3 open after step 0
 without waiting; the sub-plan waits for `261122-0118` and `261123-0828` to land (N2, O2).
 
+### Phase T8 — supervision {#task-t8-supervision}
+Components: supervision (`src/portfolio`, `packages/portfolio/*.mjs`). Inputs: §6 row 21; C5 (stale tier name); N14 (the item-data boundary and its gaps). Placed second by D17.
+
 ### Phase T6 — Workflow {#task-t6-workflow}
 Components: workflow, work-driver; the seat-binding client and the dispatch/execution live rest reached from
 `definition.mjs`. Inputs: §6 rows 15, 16; H1; the Workflow doctor rows on the bridge. Note the draft
 `261122-0056-orchestration-skeleton` (6 workflow files).
-
-### Phase T8 — supervision {#task-t8-supervision}
-Components: supervision (`src/portfolio`, `packages/portfolio/*.mjs`). Inputs: §6 row 21; C5 (stale tier name).
 
 ### Phase T9 — host, surface, packaging, report {#task-t9}
 Components: host-surface (non-Work arms), packaging-distribution, learning-docs-registry, fgos-gateway. Inputs: §6 rows
