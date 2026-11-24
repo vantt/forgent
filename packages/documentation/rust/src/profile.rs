@@ -83,6 +83,29 @@ pub fn check_region(docs_root: &Path, area: &[String], question: &[String]) -> R
 /// Deepest folder level a folder name is looked for at (`platform/<area>/subcomponents/<name>/history/...` is 5).
 const FOLDER_DEPTH: usize = 6;
 
+/// Folders that hold reading about other projects (the reference-learning area), never a unit of this project's own
+/// claims.
+const REFERENCE_FOLDERS: &[&str] = &["distillery"];
+
+/// Folders the vault leaves out because they never answer a locate for a write: those whose documents record what was
+/// true before (`past-state`; document-identity spec section 5.4: past-state content is never a locate target) and the
+/// reference folders.
+fn excluded_globs() -> Vec<String> {
+    QUESTION_BY_FOLDER
+        .iter()
+        .filter(|(_, value)| {
+            QUESTION_VALUES
+                .iter()
+                .any(|(v, target)| v == value && !target)
+        })
+        .map(|(folder, _)| *folder)
+        .chain(REFERENCE_FOLDERS.iter().copied())
+        .flat_map(|folder| {
+            (0..FOLDER_DEPTH).map(move |depth| format!("\"{}{folder}/**\"", "*/".repeat(depth)))
+        })
+        .collect()
+}
+
 /// The `area` values of the corpus at `docs_root`: directories under `platform/` with a `spec.md`, sorted.
 pub fn areas(docs_root: &Path) -> io::Result<Vec<String>> {
     let platform = docs_root.join(PLATFORM);
@@ -125,6 +148,7 @@ pub fn render(docs_root: &Path) -> io::Result<String> {
     y.push_str("profile: fgos-docs\nversion: 1\nformat: 1\nrequires: {schema: \">=4\"}\n");
     y.push_str("vault:\n");
     y.push_str("  include: [\"**/*.md\"]\n");
+    y.push_str(&format!("  exclude: [{}]\n", excluded_globs().join(", ")));
     y.push_str("  read: {body_edges: true}\n");
     y.push_str("  header: {fence: txt}\n");
     y.push_str("  types: [{path: \"**\", type: document}]\n");

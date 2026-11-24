@@ -10,8 +10,7 @@ section; the component boundary is updated when ownership changes. F25 lists the
 `docs/platform/documentation/spec.md`, `docs/platform/documentation/subcomponents/document-identity/spec.md`,
 `docs/platform/packaging-distribution/spec.md`,
 `docs/platform/packaging-distribution/contracts/repository-runtime-layout.md`,
-`docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`, `docs/platform/component-boundary.md`,
-`CHANGELOG.md`.
+`docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`, `CHANGELOG.md`.
 
 ## Steps
 
@@ -28,7 +27,10 @@ section; the component boundary is updated when ownership changes. F25 lists the
 3. Packaging spec: release binary size growth, the model folder, the doctor rows and fix, building from source needs
    pkm access (dev checkout channel 3.3), the static ORT asset. Layout contract: `<machineReleaseStore>/models/`.
    Setup-doctor registry: the new pointer row in the pointer table and the inventory.
-4. Component boundary: the rows in plan.md "Component boundary".
+4. Component boundary: moved to its own plan,
+   [`261124-0837-docos-documentation-in-component-authority`](../261124-0837-docos-documentation-in-component-authority/plan.md)
+   (owner, 2026-11-24). `component-boundary.md` is rendered from the component authority model by `fgos authority
+   render`, never edited by hand.
 5. `CHANGELOG.md` `## [Unreleased]`: "Added: `fgos doc locate` returns the ten documents most likely to already hold a
    draft's claim ...; `fgos doc index status|stop|reset`; doctor rows `doc-locate-model` and `doc-locate-index`;
    `fgctl init` fetches the embedding model (about 130 MB) once per machine; config `docLocate.modelSource` for a mirror
@@ -44,8 +46,7 @@ git diff --stat   # only the files above
 
 ## Risk
 
-`component-boundary.md` is also in the draft component-authority plan's footprint: land serially and note it on the
-program board's shared-file list.
+The documentation spec is also edited by the component-authority plan above: land this phase first.
 
 ## Rollback
 

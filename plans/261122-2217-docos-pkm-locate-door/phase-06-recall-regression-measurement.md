@@ -41,3 +41,19 @@ A real drop below the gate stops the plan and goes to the owner with the case li
 ## Rollback
 
 Revert the flag; the report stays as a record.
+
+## As built (2026-11-24)
+
+- `fgos doc locate --eval <gold> [--json]` measures on a ready index and refuses `[index-not-ready]` otherwise, starting
+  the worker; `fgos doc index status --wait` now starts the worker it waits for, and every index state names an fgos
+  verb instead of a `pkm` command.
+- The rendered profile leaves out `past-state` folders (`history`, `proposals`) and `docs/distillery/` (spec 5.4,
+  owner 2026-11-24); a crate test proves neither is ever a candidate.
+- Gold labels already carried no `#` marks; the 88 `#` in `locate-gold-short.yaml` are inside query text.
+- Measured ([report](../reports/measurement-261124-0511-docos-pkm-v0-7-locate-recall.md)): on the pinned 2026-11-12
+  corpus the engine reproduces the baseline exactly (91.7% / 95.8%, 14 of 23 sections, 67.0% / 92.0%), so the gate
+  passes. On the live corpus translated notes reach 83.3% / 91.7%; the cases and causes are in the report. The owner
+  moved the gate to the pinned corpus on 2026-11-24.
+- pkm's index worker ignores `vault.exclude` and embeds the excluded folders anyway (42,169 against 23,100 chunks);
+  filed as [vantt/pkm#2](https://github.com/vantt/pkm/issues/2).
+

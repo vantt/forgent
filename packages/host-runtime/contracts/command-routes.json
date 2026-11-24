@@ -470,7 +470,8 @@
         "draft",
         "draft-file",
         "area",
-        "question"
+        "question",
+        "eval"
       ]
     },
     "store": "require",
