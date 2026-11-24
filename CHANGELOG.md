@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Added: `fgos doc locate` returns the ten documents most likely to already hold a draft's claim (path, title, best section, axis values, an `outside-region` flag, and `partial: true` while the index or the model is not ready), and `fgos doc locate --eval <cases>` measures its recall over a case set. `fgos doc index status [--wait <s>] | stop | reset` reports and repairs the locate index; `status --wait` starts the index worker when none runs, then waits. The doctor rows `doc-locate-model` and `doc-locate-index` report the model and the index; `fgos doctor --fix` fetches the embedding model (about 130 MB) once per machine into the machine model folder, and the config key `docLocate.modelSource` points it at a mirror or an offline folder. Locate reads `docs/` and leaves out `history`, `proposals` and `docs/distillery/`.
+
 - Added: confined head sessions record friction (`fgos friction record`) through their request socket, the supervisor head patches project config (`fgos config patch`), a lead head raises a coordination event (`fgos supervisor raise`), and the secretary and supervisor heads may replace `plans/backlog.md` with `fgos session write`. A live head's grant stays the one set when it started; a grant change reaches it at its next rotation or restart.
 - Changed: a head's request routes run the active release on every request, so a long-lived head picks up a newly activated release without a restart.
 - Added: the land door runs the plan contract check on landed plan directories (gate placeholder `{plans}`) and removes a landed branch's clean worktree after a branch land.
