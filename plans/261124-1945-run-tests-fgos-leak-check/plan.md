@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "The leak check of run-tests ignores live runtime directories"
-status: running
+status: done
 lead: head:lead-forgent-261124-1945-run-te-f3bee
 priority: P2
 blockedBy: []
@@ -71,7 +71,7 @@ rows. The replacement inside the script: survivor `LIVE_FGOS_DIRS`; retired
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Skip live runtime directories in the leak check](phase-01-skip-live-runtime-dirs.md) | - | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs | 1 | running |
+| 1 | [Skip live runtime directories in the leak check](phase-01-skip-live-runtime-dirs.md) | - | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs | 1 | done |
 
 One phase, one wave: the whole change is one constant, one walk filter and one test file.
 No integration phase is needed because there is only one branch; the phase's own verify
@@ -107,9 +107,17 @@ and `fgos resource-check --plan`.
   the branch by the supervisor; then retry
   `fgos land run-tests-fgos-leak-check/p01 --test test/scripts/run-tests.test.mjs`.
 
+- 2026-11-24 22:00: phase 1 done. Branch `run-tests-fgos-leak-check/p01` landed as main
+  `ee1d9ca00` (ticket `c-9444-1795532219301`, after transient `merge-slot-busy`,
+  `land-target-changed` and a `main-checkout-dirty-overlap` that cleared once the shaper
+  landed its discussion). Land gates passed, including
+  `node scripts/run-tests.mjs ... test/scripts/run-tests.test.mjs` (AC1-AC3). The door removed
+  the phase worktree; none kept. Plan done.
+
 ## Owner questions
 
-None.
+- **q-3rhc6lroqc, who repairs the backlog index files: answered "Secretary repairs them"** (owner,
+  2026-11-24 22:32). The secretary repairs the backlog index files; this plan does not.
 
 ## Risks and rollback
 

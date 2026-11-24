@@ -1,7 +1,7 @@
 ---
 id: p-s6te2445rb
 title: "The leak check of `scripts/run-tests.mjs` for files left in `.fgos` fails a clean run while another head is working (tests, priority high; source: owner via the manual supervisor, 2026-11-24)"
-status: proposed
+status: done
 priority: P1
 area: tests
 created: 2026-11-24
