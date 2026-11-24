@@ -24,7 +24,8 @@ packages/convention/rust/src/operations.rs, packages/execution/rust/src/unit_rec
 apps/fgos/src/wiring/doctor/mailbox.rs, apps/fgos/src/wiring/uninstall.rs, apps/fgos/src/wiring/init.rs,
 packages/convention/rust/Cargo.toml, packages/execution/rust/Cargo.toml, packages/distribution/rust/src/doctor.rs,
 Cargo.lock, packages/component-authority/model/doors/, test/architecture.test.mjs,
-docs/platform/component-authority/spec.md
+docs/platform/component-authority/spec.md, packages/component-authority/contracts/model.v1.json,
+packages/component-authority/rust/
 
 ## Execution
 `--provider claude` (owner order, D6 step 0). Run one unit per row group. The unit needs node and cargo. If they are
@@ -54,12 +55,19 @@ proof.
    `packages/distribution/rust/src/doctor.rs`.
 4. Write one decision-history line in `docs/platform/component-authority/spec.md` that names the copies deleted here
    and their last SHAs.
+5. Add the one-word `severity` field to every door row and to the model contract (owner decision D24 in
+   `plans/discussions/ds-wqsrwmiier-harden-next-round/DISCUSSION.md`, row N18). Values: `high`, a live twin that decides a
+   live answer which can disagree; `medium`, a live side that only asks the owner; `low`, a twin reached only by dead
+   code. A row with no `debt` and no twin gets `low`. Declare the field in `packages/component-authority/contracts/model.v1.json`
+   and in the crate's model types (`packages/component-authority/rust/`), so `fgos authority model --json` and
+   `locate` return it; name it in the spec's door-row field list. One commit, separate from the copy moves.
 
 ## Verify
 - `node --test test/architecture.test.mjs` passes except A4, which is red on main too, and every allowed file carries
   its measured `count`.
 - `cargo test -p fgos -p fgos-convention -p fgos-execution -p fgos-distribution` is green. Take the exact package
   names from each `Cargo.toml`.
+- Every file in `packages/component-authority/model/doors/` has `severity`, and `fgos authority model --json` loads.
 - Re-running p10b2 §3's `rg -w` sweep for each cleared name finds hits only in the row's `allowed` or `debt` files.
 
 ## Rollback
