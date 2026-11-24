@@ -2,7 +2,7 @@
 contract: plan-v1
 title: "The component authority model owns the documentation code that locate added"
 description: "Map every file the locate door added to a component authority row through fgos authority declare, resolve the documentation row's mustNotOwn conflict, and render the boundary views from the model."
-status: draft
+status: ready
 priority: P1
 effort: 6h
 branch: main
