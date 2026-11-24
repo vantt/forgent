@@ -15,11 +15,11 @@ arranges one, and a backlog row of its own if one is wanted.
 
 ## 1. Trạng thái hiện tại
 
-**Round 3 (2026-11-24).** The owner corrected the shaper: a Workflow's lifecycle is needed. It lists possible
-and forbidden routes that an organization sets, and those routes are its competitive edge (I11). Item, Workflow and view
-stay as three layers (I9, I10). Open now: I12, whether routes live only in the guide (the D-ADR0070 design, which
-retires the step graph at the coding cutover) or the step graph stays as a second route list. After that comes the
-no-fgOS item contract (ids). Open rows: I4–I6, I9, I12.
+**Round 4 (2026-11-24 10:05).** At the owner's request the shaper cross-checked the Workflow against I10 and I11
+(I13). The owner's frame concept matches the spec, which uses *khung* more narrowly. The "listed and forbidden routes"
+idea exists twice, with different defaults: the Work lifecycle forbids an unlisted edge, and the guide allows an
+unlisted route with a reason unless `listedRoutesOnly`. One definition file can carry three route models. Open: I12
+(which route model or models an organization authors), then the no-fgOS item contract. Open rows: I4–I6, I9, I12.
 
 ## 2. Mục tiêu & đề bài
 
@@ -47,6 +47,7 @@ and Workflow attach to it without the component knowing them.
 | I10 | **Owner framing (2026-11-24 10:00).** (a) A Workflow has two parts: a *frame* for one line of work (open: a set of possibilities and constraints that must not be exceeded, never a fixed path), taken from fgOS core experience or customized by an organization; and a *guide* that lets capable agents drive the work inside that frame. Workflow drives tasks by the guide today. (b) Work, in the owner's revised vision (or a system that replaces it), shows items and their stages and statuses so that a person can understand and control them easily. (c) The portfolio and work-item approach exists so that tasks and plans stay as generic as possible: a system without fgOS can still work with them, and with fgOS it works better. | owner statement, provisional (held 1 round) | chat 2026-11-24 10:00; matches `src/workflow/guide-schema.mjs` header and the guide part of `domains/coding/workflows/feature.yaml` |
 | I11 | **Owner correction (2026-11-24 10:0x).** The lifecycle is still needed. It is not a hard path: it lists possibilities (many routes) and may list forbidden routes. Without routes being listed, an organization loses the chance to set its own routes, and those routes are where an organization competes. The earlier design was meant this way. | owner statement, provisional (held 1 round) | chat 2026-11-24 |
 | I12 | **Where the routes live: guide or a separate step graph.** In the approved design (D-ADR0070, owner 2026-10-19, `docs/platform/workflow/spec.md`), routes are listed in the *guide*. Each decision point at a milestone names a SHOULD with its reason and the routes allowed instead (`mayInstead`). An unlisted route is allowed with a recorded reason, unless the point carries `listedRoutesOnly` (RUL-WF-5); MUST rows name absolute bans as guards; and `kind: playbook` makes every point `listedRoutesOnly`. The same spec keeps the YAML's lifecycle part (`steps`/`transitions`) only until the coding cutover and deletes it in that same change (RUL-WF-23; N12/N16, row "Work tuỳ chọn; `feature.yaml` giữ phần lifecycle tới cutover"). Read together with I11: the owner's concept (listed routes, forbidden routes, set by the organization) is what the guide carries. The open point is whether the step/transition graph also stays as a second, coarser route list (which supersedes N12/N16) or is retired at the cutover as planned, with Work's stages drawn from milestones for display. | open; needs the owner (touches an owner-approved decision) | `docs/platform/workflow/spec.md` lines 127, 269, 324, 473, 675; `domains/coding/workflows/feature.yaml` lines 111–175 |
+| I13 | **Cross-check of the Workflow against the owner's statements I10 and I11 (round 4, at the owner's request).** (1) *The frame is open possibilities and constraints, from fgOS core or an organization:* matches. Workflow spec §1: a Workflow guides and constrains and is not a script; (a) operating guide, (b) MUST, SHOULD with a reason, MAY instead, (c) order chosen by the agent. An organization's own definitions override shipped ids (owner decision 83, `workflowCatalog`, project before payload). Vocabulary gap: in the spec, *khung* (approved frame) means only the scope and budget set at approval (`frameDefaults`); the owner uses *khung* for the whole definition. (2) *The lifecycle lists many routes and forbidden routes:* matches in **two** places with different defaults. (a) The Work lifecycle (work-state spec §6, base-workflow vision §2: one base cycle Init, Clarify, Divide, Execute, Compound, and each domain adds its own stages): a domain declares its stages, maps each onto a base step, and lists its legal `transitions`. An unlisted edge is forbidden. Domains may label Work's status FSM but never change its edges. (b) The guide: routes listed at decision points; an unlisted route is allowed with a reason unless the point carries `listedRoutesOnly`; MUST rows are absolute bans. (3) *Workflow drives tasks by the guide today:* partly. Playbooks (7 council workflows, `marketing/content-publish`) run their `steps` through the playbook runner, with every point `listedRoutesOnly`. The conductor door reads the guide: `src/workflow/propose.mjs` defaults to `coding/feature`, and admission and projection read `decisions`/`milestones`. The comment in `feature.yaml` ("nothing reads this part until the coding cutover") is therefore stale. Coding items in Work still walk the step FSM, and `wf-coding-cutover` is not done (spec line 10). **So a definition file can carry three route models:** Work lifecycle `steps`/`transitions` (coding), playbook `steps` with `units`/`dependsOn` (council, marketing), and the guide. | settled fact (cross-check) | `docs/platform/workflow/spec.md` §1, §2.2, §17 (decision 83, N9, N12, N16); `docs/platform/work-state/spec.md` §5, §6; `git show 97dd62aa7^:docs/work-item-lifecycle-vision.md` §2; the 10 files under `domains/*/workflows/`; `src/workflow/propose.mjs:32` |
 
 ## 4. Quyết định đã chốt
 
@@ -81,6 +82,10 @@ and Workflow attach to it without the component knowing them.
   earlier design was meant this way. The shaper withdrew the "lifecycle part is redundant" claim from I8, recorded I11,
   and opened I12 with the D-ADR0070 evidence that the guide already lists routes and that the step graph was due to be
   retired at the coding cutover.
+
+- **2026-11-24 10:05 — owner:** asked the shaper to re-check the Workflow against the owner's statements. The
+  shaper read the Workflow spec, the work-state spec §5 and §6, the retired base-lifecycle vision and all 10 definition
+  files, and recorded the result as I13.
 
 ## 6. Thiết kế đã chốt {#design}
 
