@@ -36,5 +36,5 @@ allowed:
 debt:
   - path: scripts/lib/mailbox-live-confined.mjs
     reason: frozen V7n measurement module; moves onto the process door when V7n is re-measured (MAIL)
-retiredBy: each Node own-child group kill goes when the code that spawns that child moves to Rust
+retiredBy: "261124-1026-harden-next-round#T9: the frozen mailbox measurement module moves onto the process door; each allowed Node own-child group kill goes in the sub-plan of the layer phase that moves its spawner to Rust"
 reason: signalling by identity goes through fgos-process; the launch gate, holder-lock and two Node modules signal only the group of a child they just spawned
