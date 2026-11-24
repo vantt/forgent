@@ -42,6 +42,10 @@ the supervision queue only once it is settled.
 
 ## 1. Trạng thái hiện tại
 
+**Round 7 (2026-11-24 09:4x).** The owner asked what `261122-2108` is, and how plans should be split and managed so that the
+rest of doors does not drag on: retiring door debt should also trigger the matching Node-to-Rust move, since the named debt is
+its own group yet carries the debt signal of many other plans. The scout gave N16; its direction is put to the owner in chat.
+
 **Round 6 (2026-11-24 09:5x).** The owner accepted N12 and N13, minted as D20 and D21. Still paused on O7 (`261122-2108`
 is `draft` and not running). No owner question is open. On resume, step 0 runs as written (§7).
 
@@ -185,6 +189,7 @@ This discussion edits them in place from here on. O7, the N rows and F1 are new 
 | N13 | **Option A's named debt is an acceptance input.** 25 door rows in `packages/component-authority/model/doors/` name S6b or S7 in `retiredBy` (for example `doctor-readiness-registry`, `node-rows-bridge`, `resolve-invocation-root`, `parse-cli-arguments`, `global-fgos-directory`). Step 0 assigns each one to phase T6, T7 or T9, and the program's acceptance adds "every door row whose `retiredBy` names S6b or S7 is closed". | minted D21 | `grep -lE '^retiredBy:.*\b(S7\|S6b)\b' packages/component-authority/model/doors/*.yaml` = 25; excerpt 01:50 |
 | N14 | A domain-agnostic item-data component, apart from Work. | moved out (D19) | details and evidence now in `plans/discussions/ds-ubqlutna6r-domain-agnostic-item-component/DISCUSSION.md` §3 row I1 |
 | N15 | The sensitive part: two item models and Work's mapping layer. | moved out (D19) | details and evidence now in `plans/discussions/ds-ubqlutna6r-domain-agnostic-item-component/DISCUSSION.md` §3 row I2 |
+| N16 | **Debt as the signal that drives the Node-to-Rust plans.** Today `NAMED_DOOR_DEBT` (`test/architecture.test.mjs`) holds 15 jobs, and each door row's `retiredBy` names who retires it, as free text. By retirer: `261122-2108` (`p-24xw2cwdvo`) holds 5 (decide a dispatch, derive executor facts, list run directories, `/proc` process facts, tool lookup by capability), and doors 12c's write-scope rule sits inside its footprint (`src/runner/dispatch/**`). S7 holds 3 (doctor readiness registry, global fgOS directory, resolve invocation root). Two have their own backlog rows (`p-rypvkc3kai` herdr shim, `p-nwife3i4kc` checkout crate). Doors 12 holds 2 (kernel lock in 12a, bounded child in 12b). Three name no plan, only a condition (no Node from the native packaging verbs, process-control signal, the write-scope rule). **Proposed shape:** (1) doors closes after 12a, 12b and 12d (the internal Rust debt; option A keeps the rest named with an owner). (2) 12c moves into `261122-2108`, which already deletes the files 12c needs gone, so that plan carries its own debt; it is tier 5 (a low layer) and the next plan to run. (3) Each named debt's `retiredBy` names exactly one plan, phase or backlog id, so one query lists which plan holds which debt. The three conditions get an owner: the packaging row → phase T9, process-control signal → each phase that moves a spawner, the write-scope rule → `261122-2108`. (4) The owning plan's acceptance includes closing its rows (D21 extended to every retirer), and the debt count per plan is the signal for which Node-to-Rust plan to pick next, under the order rule (lower layers, then the control group). The edits to doors and `261122-2108` belong to the secretary and a planner. | proposed (round 7), put to the owner | `test/architecture.test.mjs` `NAMED_DOOR_DEBT`; `packages/component-authority/model/doors/*.yaml` `retiredBy`; doors plan.md phases 12a–12d; `261122-2108` plan.md acceptance 4 |
 | F1 | Model tiers today: T2 `git`, `terminal-control`, `session-rotation`; T3 `session-host`; T5 `seat-binding`, `execution-core`, `dispatch-transport`; T6 `workflow`, `work-driver`; T7 `work-state`, `runner`; T8 `supervision`; T9 `packaging-distribution`, `host-surface`, `learning-docs-registry`. The model is YAML now (doors 1b has landed). | clear | `packages/component-authority/model/components.yaml`, `layers.yaml` |
 
 ## 4. Quyết định đã chốt
@@ -268,6 +273,10 @@ Copied from ds-wham5txfkv §4. They are owner decisions made there and are not r
   (now its I1 and I2) as its premise; pointer rows stay here. The mailbox showed no live secretary head, so the hand-over goes
   through the owner.
 - **2026-11-24 09:5x — owner:** "đồng ý N12 và N13." Minted D20 and D21. Still paused on O7.
+- **2026-11-24 09:42 — owner:** "1) 261122-2108 là việc gì? 2) vấn đề lớn bấy giờ sẽ là tách và quản lý plan như thế nào? anh muốn
+  move các phần còn lại của component-authtority phải kéo dây dưa 2 nhóm việc: vừa bỏ nợ authority debt đồng thời kích hoạt việc
+  move node-rust tương ứng. hiện này debt là nhóm riêng nhưng nó chứa tín hiệu debt của một loạt plan khác." Read the
+  `261122-2108` plan and mapped the 15 named debts to their retirers, giving N16.
 
 ## 6. Thiết kế đã chốt {#design}
 
