@@ -69,6 +69,22 @@ single source; the views are generated) and the `fgos authority` verb.
 4. The `mustNotOwn` conflict is resolved in the model with the reason recorded, or asked of the owner in the
    decision-question template when the model's rules leave a real choice.
 
+## Authority map
+
+Every path this plan maps goes to rows the model already has (checked with `fgos authority locate`, 2026-11-24); no
+new row is declared.
+
+| New thing | Model row | Note |
+|---|---|---|
+| Locate crate, pkm adapter, `fgos doc locate` and `fgos doc index` wiring, index worker, cache, `docLocate` config | `document-identity` | Paths and owns are added to the existing row (phase 2); status moves from designed to live |
+| The parent's `mustNotOwn` conflict | `documentation` | Resolved in phase 2 step 3 or asked of the owner |
+| The declare and render doors this plan writes through | `component-authority` | Used as they are; a defect becomes an item for that lead |
+
+## Owner questions
+
+None before phase 1. Phase 2 step 3 asks the owner, in the decision-question template, only if `fgos authority
+declare` refuses or the parent's `mustNotOwn` list must change.
+
 ## Risks
 
 - `fgos authority declare` may refuse a move or ask for `--approved-by`: phase 2 stops there and asks.
