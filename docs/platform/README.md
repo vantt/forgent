@@ -63,7 +63,7 @@ Component owners, one row per component and subcomponent, sorted by id. <!-- ren
 | `dispatch-transport` | — | Supervised attempt dispatch, execution planning, isolation request, and executor adapters. | `docs/platform/runner/spec.md` | `src/runner/dispatch/` |
 | `distillery` | — | Porting lifecycle and state consumer for external repository extraction. | `docs/platform/distillery/spec.md` | — |
 | `doc-checks` | `documentation` | Defines the command checking maintained documentation, body rules, and commit gate. | `docs/platform/documentation/subcomponents/doc-checks/spec.md` | `docs/platform/documentation/subcomponents/doc-checks/` |
-| `document-identity` | `documentation` | Defines how maintained documentation is placed in axes so writers find before create. | `docs/platform/documentation/subcomponents/document-identity/spec.md` | `docs/platform/documentation/subcomponents/document-identity/` |
+| `document-identity` | `documentation` | Defines how maintained documentation is placed in axes so writers find before create. | `docs/platform/documentation/subcomponents/document-identity/spec.md` | `docs/platform/documentation/subcomponents/document-identity/`, `packages/documentation/` |
 | `documentation` | — | Platform documentation umbrella, architecture docs, and maintained doc tree. | `docs/platform/documentation/spec.md` | `docs/platform/documentation/` |
 | `domain-components` | — | Domain-specific behavior, workflows, skills, task specs, and doctrine. | `docs/platform/component-boundary.md` | — |
 | `domain-registry-loader` | — | General runtime definition registry and config loader for domains, workflows, and declarations. | `docs/platform/component-boundary.md` | — |

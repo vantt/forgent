@@ -2,7 +2,7 @@
 contract: plan-v1
 title: "The component authority model owns the documentation code that locate added"
 description: "Map every file the locate door added to a component authority row through fgos authority declare, resolve the documentation row's mustNotOwn conflict, and render the boundary views from the model."
-status: draft
+status: done
 priority: P1
 effort: 6h
 branch: main
@@ -61,7 +61,7 @@ single source; the views are generated) and the `fgos authority` verb.
 |---|---|---|---|---|---|
 | 1 | [Inventory and conflicts](phase-01-inventory-and-conflicts.md) | - | plans/261124-0837-docos-documentation-in-component-authority/phase-01-inventory-and-conflicts.md | 1 | done |
 | 2 | [Declare the rows](phase-02-declare-the-rows.md) | 1 | packages/component-authority/model/components.yaml | 2 | done |
-| 3 | [Render and land](phase-03-render-and-land.md) | 2 | docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/system-overview/spec.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/documentation/spec.md, docs/platform/documentation/subcomponents/document-identity/spec.md | 3 | ready |
+| 3 | [Render and land](phase-03-render-and-land.md) | 2 | docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/system-overview/spec.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/documentation/spec.md, docs/platform/documentation/subcomponents/document-identity/spec.md | 3 | done |
 
 The phases run in series: each needs the one before it. Footprint check (`node scripts/plan-contract-check.mjs`
 and `fgos resource-check --plan`, 2026-11-24): no two phases share a file. The declare verb writes a component row
