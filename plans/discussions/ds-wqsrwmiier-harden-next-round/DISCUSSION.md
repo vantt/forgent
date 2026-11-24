@@ -42,6 +42,14 @@ the supervision queue only once it is settled.
 
 ## 1. Trạng thái hiện tại
 
+**Resume check 2026-11-24 09:1x: still paused, the wait has not cleared.** `fgos questions` shows no open owner question.
+Doors (`261121-2110`) is `running`: phases 1–11 are done or withdrawn, 12a is running, 12b and 12d are ready, and 12c is
+`draft`. 12c waits for `261122-2108` phase 8, so doors itself cannot close before the dead-closure plan. `261122-2108` is
+still `draft`, and no session runs it. That plan is now the one thing step 0 waits on (O7). Two waits cleared:
+`261122-0118` and `261123-0828` are both `done`. So O2 is closed, the T2–T3 sub-plan no longer waits on them (D12), and
+`261122-2108`'s own rule against editing files that `261122-0118` still edits no longer holds it back. Nothing new to shape
+before step 0. The question of who starts `261122-2108` belongs to the secretary, not to this discussion.
+
 **Paused 2026-11-23 19:5x by owner order ("nếu xong rồi thì báo cáo rồi đóng").** Everything that can be shaped before step 0
 is shaped. The owner decided seven points this session, minted as D11–D16 in §4. What is left needs a tree that does not exist
 yet, so the discussion pauses instead of settling.
@@ -104,7 +112,7 @@ This discussion edits them in place from here on. O7, the N rows and F1 are new 
 | # | Point | State | Evidence / note |
 |---|---|---|---|
 | O1 | S7 entry gate "Work council (decision 78) held". Decision 78 belongs to `261021-1118` (lessons.md:13, :104, :152): the Work council opens after T8 and the non-Work T9 arms. Both are closed, but no council has been held. | open, blocks only plans 5–7 → D5 | `plans/261021-1118-harden-low-layers-bottom-up/plan.md` closedNote |
-| O2 | `session-host` / `session-rotation` are being edited now by `261122-0118` (running) and `261123-0828` (ready) | open, blocks only plans 2–3 starting | footprints read 2026-11-23 |
+| O2 | `session-host` / `session-rotation` are being edited now by `261122-0118` (running) and `261123-0828` (ready) | closed 2026-11-24: both plans are `done` | plan frontmatter read 2026-11-24 |
 | O3 | `src/util/yaml.mjs`: a facade over `fgos-yaml-doc` with 28 product importers; `261121-2110` does not retire it (plan.md:219–222) | clear: facade, dies in plan 10 | file header; importer count |
 | O4 | Test counts in §6 are "test files that import the area", so a test can count under several areas. Backlog says 588 test files in all. | clear (method stated) | scratchpad script, method in §5 |
 | O5 | Logic leaves inside facade areas: `util/domain-compile.mjs` → plan 1; `git/main-checkout-delete-guard.mjs` → S1; `identity/directory-store.mjs` is dead (no product importer) → plan 1 | clear | round 2 file-by-file header read |
@@ -117,7 +125,7 @@ This discussion edits them in place from here on. O7, the N rows and F1 are new 
 | H6 | **New since HARDEN:** session-host (7 files, 2,127 lines) and session-rotation (2 files, 811 lines) are Node and never went through a council | input | §6 rows 10, 13 |
 | H7 | **S1 hook verdicts** (`git/main-checkout-delete-guard.mjs`, `state/decision-question.mjs`, `runner/hook.mjs`): which layer phase owns them | input | program `261114-2051` row S1 |
 | C5 | The T8 tier name in `layers.json` ("Skill and Domain (no file today)") is stale: the model puts `supervision` at tier 8 and the domains at T7 | input | `layers.json`, `components.json` |
-| O7 | `261122-2108` is `draft`, and its own rule waits for `261122-0118` ("no edit to any file `261122-0118` still edits before it lands"). Step 0 and the hand-off therefore hang on two plans that are not this discussion's to move. | open, blocks step 0 and the hand-off | `plans/261122-2108-delete-dead-node-execution-closure/plan.md` frontmatter and constraints |
+| O7 | `261122-2108` is `draft`, and its own rule waits for `261122-0118` ("no edit to any file `261122-0118` still edits before it lands"). Step 0 and the hand-off therefore hang on two plans that are not this discussion's to move. | open, blocks step 0 and the hand-off. 2026-11-24: `261122-0118` is `done`, so only `261122-2108` itself (still `draft`, not run by anyone) blocks; doors phase 12c also waits for its phase 8 | `plans/261122-2108-delete-dead-node-execution-closure/plan.md` frontmatter and constraints; doors plan.md phase table |
 | N1 | Step 0 is one read-only pass. It reruns the ds-wham5txfkv §5 inventory method on the tree after doors and `261122-2108`, runs the two H5 tests alone, and names the owning phase for every §6 row and every H or C carry-over. It writes one report and changes no code. | provisional (round 1) | D9; seed §7 step 0; HARDEN loop step 1 |
 | N2 | Phase T2–T3's steps 1–3 (baseline, council, arbitration, owner ask) are read-only, so they may run while `261122-0118` and `261123-0828` still hold session files. Only its sub-plan (step 4) waits for them to land. | minted D12 | owner 2026-11-23 16:24, "nobody waits on a head that is away"; `261122-0118` footprint `src/session-host/head-grants.mjs` and its tests |
 | N3 | Which phase owns `git/main-checkout-delete-guard.mjs` (505 lines of logic, tier 2): the seed's T9 "H7 hook arm", or phase T2–T3 as its tier suggests. S1's other two verdicts (`state/decision-question.mjs`, `runner/hook.mjs`) are T7 code and go with phase T7. **Answer: phase T2–T3**, because the Rust Git crate already exports `main_checkout_root` (`packages/git/rust/src/lib.rs:40`) and the `hook` route already serves native subcommands (`dispatch-decide`, `mailbox`, …) in `command-routes.json`. The phase's council settles the verdict's authority component. | minted D12 | seed §7 T9; ds-wham5txfkv O5 and H7; `components.yaml` tier 2 `git`; `packages/git/rust/src/lib.rs:40`; `packages/host-runtime/contracts/command-routes.json` `hook` |
@@ -182,6 +190,9 @@ Copied from ds-wham5txfkv §4. They are owner decisions made there and are not r
   T2–T3. O7 explained in chat.
 - **2026-11-23 19:56 — owner:** "nếu xong rồi thì báo cáo rồi đóng". Step 0 cannot run before doors and `261122-2108` land, so the
   discussion pauses rather than settles. The owner's decisions N2, N3, N5, N7, N8, N9 and the Appendix A hand-over were minted D11–D16.
+- **2026-11-24 09:1x — resume check.** No open owner question. Doors is running (12a), its 12c waits for `261122-2108` phase 8;
+  `261122-2108` is still `draft`. `261122-0118` and `261123-0828` are `done`, so O2 closed and O7 narrowed to `261122-2108`
+  alone. Still paused.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -258,8 +269,6 @@ Out of `src/` but in scope because the same plans touch them: `packages/portfoli
 and `scripts/*.mjs` callers of `src/` (each plan moves its own script callers).
 
 ## 7. Danh mục hạng mục / task {#tasks}
-
-*One skeleton plan, phases in D8 order. Each phase opens its own sub-plan from its council, as HARDEN's layer phases did.*
 
 *One skeleton plan, phases in D8 order. Each phase opens its own sub-plan from its council, as HARDEN's layer phases did.*
 
