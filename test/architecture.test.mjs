@@ -2105,7 +2105,7 @@ test('door check: every name of the retired Node init code fails when a file dec
 
 test('door check: the init steps live in init.rs only: a second composition under the same names fails, a comment does not', () => {
   const row = manifest.doors.find((r) => r.job === 'init steps');
-  assert.deepEqual(row.allowed, ['apps/fgos/src/wiring/init.rs']);
+  assert.deepEqual(row.allowed.map((e) => e.path ?? e), ['apps/fgos/src/wiring/init.rs']);
   for (const text of ['const WORK_STORE_NOTE: &str = "x";\n', 'pub const GLOBAL_MOVED_NOTE: &str = "x";\n', 'pub fn run(steps: &dyn Steps) {}\n']) {
     const owner = ['apps/fgos/src/wiring/init.rs', text];
     assert.equal(checkDoors([row], new Map([owner, ['apps/fgos/src/wiring/other.rs', text]])).length, 1, text);
@@ -2135,7 +2135,9 @@ const execRow = (job) => {
   return row;
 };
 // A seeded file stands alone, so the row's other entries look stale; only a hit outside the door counts here.
-const doorHits = (row, file, text) => checkDoors([row], new Map([[file, text]])).filter((failure) => !failure.includes('no longer matches (stale)'));
+// Counts are proven on the real files by 'every door row holds'; a one-line synthetic text is judged by path alone.
+const withoutCounts = (row) => ({ ...row, allowed: (row.allowed ?? []).map((e) => (typeof e === 'string' ? e : (({ count, ...rest }) => rest)(e))) });
+const doorHits = (row, file, text) => checkDoors([withoutCounts(row)], new Map([[file, text]])).filter((failure) => !failure.includes('no longer matches (stale)'));
 
 test('door check: a seat composition or a second call of the ranking function outside the Rust bind fails; the crate passes; a comment does not', () => {
   const row = execRow('bind a seat');
@@ -2340,7 +2342,7 @@ test('doctor registry: a label before a layer, a layer with no step, a row with 
 });
 
 test('door rows of the doctor registry, the Node rows bridge and Node from the packaging verbs reject a second path and accept their own', () => {
-  const hits = (job, file, text) => checkDoors([doorRow(job)], new Map([[file, text]])).filter((failure) => failure.includes(file));
+  const hits = (job, file, text) => checkDoors([withoutCounts(doorRow(job))], new Map([[file, text]])).filter((failure) => failure.includes(file));
   // The doctor registry: a body registered anywhere else, and the registry file read anywhere else.
   assert.equal(hits('doctor readiness registry', 'src/setup/second-checks.mjs', "registerCheck({ id: 'x', check: () => ({}) });\n").length, 1);
   assert.equal(hits('doctor readiness registry', 'src/setup/second-checks.mjs', 'const rows = DOCTOR_CHECKS.length;\n').length, 1);
