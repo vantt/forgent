@@ -1,7 +1,7 @@
 ---
 id: p-hia45sd2zc
 title: "fgos doc locate tells a writer which documents already hold a draft and where new content belongs, through pkm linked into the host (documentation, priority P1; owner decision 2026-11-12)"
-status: proposed
+status: done
 priority: P1
 area: documentation
 created: 2026-11-23
@@ -23,3 +23,5 @@ The plan is `plans/261122-2217-docos-pkm-locate-door/plan.md`.
 # Notes
 
 Note section added by head:supervisor-forgent on 2026-11-24 so the backlog index check passes; no content change.
+
+Closed 2026-11-24 by the DOCOS lead: delivered by plan `261122-2217-docos-pkm-locate-door` (status done), landed on main in efb1f5af3 and 430cb42ba.
