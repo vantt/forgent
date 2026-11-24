@@ -33,6 +33,15 @@ fn copy_dir(from: &Path, to: &Path) {
     }
 }
 
+fn seed_model(project: &Path) {
+    let model = Path::new("packages/component-authority/model");
+    copy_dir(&repo_root().join(model), &project.join(model));
+    // The contract file is what marks a root as the fgOS repository, which keeps its model in the tree.
+    let contract = Path::new("packages/component-authority/contracts/model.v1.json");
+    fs::create_dir_all(project.join(contract).parent().unwrap()).unwrap();
+    fs::copy(repo_root().join(contract), project.join(contract)).unwrap();
+}
+
 /// A fresh checkout has no `.fgos`: the verb needs a project, so the test builds one holding a copy of the real model.
 fn temp_project() -> PathBuf {
     let project = std::env::temp_dir().join(format!(
@@ -42,12 +51,7 @@ fn temp_project() -> PathBuf {
     ));
     let _ = fs::remove_dir_all(&project);
     fs::create_dir_all(project.join(".fgos")).unwrap();
-    let model = Path::new("packages/component-authority/model");
-    copy_dir(&repo_root().join(model), &project.join(model));
-    // The contract file is what marks a root as the fgOS repository, which keeps its model in the tree.
-    let contract = Path::new("packages/component-authority/contracts/model.v1.json");
-    fs::create_dir_all(project.join(contract).parent().unwrap()).unwrap();
-    fs::copy(repo_root().join(contract), project.join(contract)).unwrap();
+    seed_model(&project);
     project
 }
 
@@ -161,20 +165,9 @@ fn authority_render_check_finds_every_view_of_this_repository_in_sync_with_the_m
     );
 }
 
-fn seeded_repo(name: &str) -> PathBuf {
-    let project = std::env::temp_dir().join(format!(
-        "fgos-authority-seeded-{}-{}-{}",
-        name,
-        std::process::id(),
-        PROJECTS.fetch_add(1, Ordering::SeqCst)
-    ));
-    let _ = fs::remove_dir_all(&project);
-    fs::create_dir_all(&project).unwrap();
-    let model = Path::new("packages/component-authority/model");
-    copy_dir(&repo_root().join(model), &project.join(model));
-    let contract = Path::new("packages/component-authority/contracts/model.v1.json");
-    fs::create_dir_all(project.join(contract).parent().unwrap()).unwrap();
-    fs::copy(repo_root().join(contract), project.join(contract)).unwrap();
+fn seeded_repo(dir: &Path) {
+    fs::create_dir_all(dir).unwrap();
+    seed_model(dir);
     for file in [
         "docs/platform/component-boundary.md",
         "docs/platform/README.md",
@@ -184,15 +177,15 @@ fn seeded_repo(name: &str) -> PathBuf {
         "docs/platform/workflow/spec.md",
         "docs/platform/architecture-map.md",
     ] {
-        let target = project.join(file);
+        let target = dir.join(file);
         fs::create_dir_all(target.parent().unwrap()).unwrap();
         fs::copy(repo_root().join(file), target).unwrap();
     }
-    project
 }
 
 #[test]
-fn authority_render_in_linked_worktree_with_dir_main_renders_the_worktree_and_leaves_main_unchanged() {
+fn authority_render_in_linked_worktree_with_dir_main_renders_the_worktree_and_leaves_main_unchanged(
+) {
     let base = std::env::temp_dir().join(format!(
         "fgos-authority-wt-test-{}-{}",
         std::process::id(),
@@ -203,9 +196,7 @@ fn authority_render_in_linked_worktree_with_dir_main_renders_the_worktree_and_le
     let main = base.join("main");
     let wt = base.join("wt");
 
-    let seeded = seeded_repo("wiring-wt");
-    copy_dir(&seeded, &main);
-    let _ = fs::remove_dir_all(&seeded);
+    seeded_repo(&main);
 
     let git = |args: &[&str], cwd: &Path| {
         let out = Command::new("git")
@@ -253,7 +244,10 @@ fn authority_render_in_linked_worktree_with_dir_main_renders_the_worktree_and_le
         .current_dir(&main)
         .output()
         .unwrap();
-    assert!(output.status.success(), "initial render on main: {output:?}");
+    assert!(
+        output.status.success(),
+        "initial render on main: {output:?}"
+    );
 
     // Record main's component-boundary.md bytes
     let main_file = main.join("docs/platform/component-boundary.md");
@@ -315,7 +309,10 @@ fn authority_render_in_linked_worktree_with_dir_main_renders_the_worktree_and_le
 
     // main view is byte-identical
     let main_bytes_after = fs::read(&main_file).unwrap();
-    assert_eq!(main_bytes_after, main_bytes_before, "main file was modified");
+    assert_eq!(
+        main_bytes_after, main_bytes_before,
+        "main file was modified"
+    );
 
     let _ = fs::remove_dir_all(&base);
 }

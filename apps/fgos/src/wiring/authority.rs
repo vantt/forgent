@@ -15,7 +15,9 @@ use fgos_component_authority::render::{
 use fgos_component_authority::{
     declare, locate, Approvals, DeclareRequest, Kind, Model, QuestionState, MODEL_DIR,
 };
-use fgos_git::invocation_root::{read_repo_facts, resolve_invocation_root, RepoFacts, RootPolicy, RootRequest};
+use fgos_git::invocation_root::{
+    read_repo_facts, resolve_invocation_root, RepoFacts, RootPolicy, RootRequest,
+};
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome, OperationId,
     OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
@@ -748,16 +750,16 @@ mod tests {
             &main,
         );
 
-        // 1. cwd inside linked worktree of main -> returns worktree
+        // When cwd is inside a linked worktree of main, return the worktree.
         assert_eq!(source_tree(&main, &wt), real(&wt));
         let sub = wt.join("subdir");
         std::fs::create_dir_all(&sub).unwrap();
         assert_eq!(source_tree(&main, &sub), real(&wt));
 
-        // 2. cwd is main checkout itself -> returns root
+        // When cwd is the main checkout itself, return root.
         assert_eq!(source_tree(&main, &main), main);
 
-        // 3. cwd is an unrelated directory -> returns root
+        // When cwd is an unrelated directory, return root.
         assert_eq!(source_tree(&main, &unrelated), main);
 
         let _ = std::fs::remove_dir_all(&dir);
