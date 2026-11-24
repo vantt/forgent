@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Heads operate without the owner: role charter for the two hands, one fgos argv window with a permission table, one help channel and mail to the two hands, and a domain-free release rule"
-status: draft
+status: ready
 priority: P1
 blockedBy:
   - 261121-2110-component-authority-doors
