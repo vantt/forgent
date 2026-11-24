@@ -7,9 +7,9 @@ authority: chưa tra; sẽ chạy `fgos authority locate` khi bàn tới compone
 
 ## 1. Trạng thái hiện tại
 
-Vòng 1 (2026-11-24 09:10): đã đo hiện trạng trên design-lap, chia vấn đề thành 6 mảng, liệt kê các hướng. Chưa có
-quyết định nào. Câu hỏi đang mở: mục tiêu đo được (thời gian land, ai build release) để mọi phương án so trên cùng một
-thước.
+Vòng 1 (2026-11-24): đã đo hiện trạng trên design-lap, chia vấn đề thành 7 mảng, liệt kê các hướng. Owner định nghĩa
+"rẻ" theo hai chiều: build không quá lâu, và không ăn đĩa nhanh. Chưa có quyết định nào. Đang mở: con số cụ thể cho hai
+chiều đó (thời gian land, GB ghi mỗi lần land, GB cache tối đa mỗi máy).
 
 ## 2. Mục tiêu & đề bài
 
@@ -30,6 +30,7 @@ chỉ tiện cho repo này.
 | V3 | Release build tại máy sau mỗi land | forgentx-38 build `cargo build --release --workspace` sau mỗi land rồi kích hoạt; máy khác muốn main mới cũng phải build. `release.yml` (theo tag) build trên CI và publish kèm `SHA256SUMS`; `fgctl upgrade` tải và kiểm checksum. Release gắn tag gần nhất `v0.2.0-rc.12` (2026-11-18) | Thời gian một lần build release cục bộ (cần forgentx-38 cho số) |
 | V4 | CI đỏ | 40 lần chạy `ci.yml` gần nhất: 0 thành công (22 failure, 18 cancelled); mỗi lần 24-56 phút; lần đỏ gần nhất: test shard 1, 2, 5, `cargo (workspace)`, herdr-dashboard, audit locked dependencies | Lỗi nào thật, lỗi nào do môi trường CI; ai sở hữu |
 | V5 | Land hỏng ở bước cuối vì git-timeout | Ba lần land 2026-11-24 hỏng ở `fast-forward main: git-timeout` khi load 10-15; hạn 30 s cố định (p-7ww4jlg745) | Bước nào thật sự chờ |
+| V7 | Đĩa | Mỗi lần land ghi khoảng 4,6 GB vào `target/` của candidate rồi xoá (đo trên candidate đang chạy); ổ của design-lap là QLC, ghi lớn làm bão hoà IO. Phần nằm lại: `target/` của main 41 GB, mỗi worktree 3-8 GB, sccache 8,1 GB (chạm trần 8 GiB), dev-host 623 MB; còn trống 57 GB | Bao nhiêu GB một máy có thể dành cho cache build mà không phải dọn tay |
 | V6 | Công cụ phụ cũng build cả workspace | `plan-contract-check.mjs` trong một worktree mới biên dịch cả workspace (4,1 GB) chỉ để kiểm một file plan | Còn script nào như vậy |
 
 ## 4. Quyết định đã chốt
@@ -44,6 +45,8 @@ chỉ tiện cho repo này.
 - 2026-11-24 09:02, owner: đồng ý tạo item, "build có vẻ bắt đầu tốn kém và nặng rồi, việc này giúp đẩy nhanh, nhưng
   cần phải brainstorm kỹ".
 - 2026-11-24 09:10, lead: vòng 1, số đo ở §3; các hướng ở §6 (nháp).
+- 2026-11-24 09:12, lead hỏi thước đo "đủ rẻ" (đề xuất: land không đổi Rust < 2 phút, có đổi Rust < 5 phút, không hỏng vì cache hay timeout khi load < 8, không máy nào build release).
+- 2026-11-24 09:14, owner: "rẻ là không bị build quá lâu và không làm tốn đĩa nhanh". Lead đo thêm đĩa (V7).
 
 ## 6. Thiết kế đã chốt {#design}
 
