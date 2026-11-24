@@ -1,6 +1,6 @@
 # Head grant probe: secretary and supervisor
 
-Status: **final, with two gaps** (2026-11-24 02:20 +07, head:lead-forgent-261122-0118-heads-b52f9). The owner, through the
+Status: **final, with one gap** (the secretary rows were closed on 2026-11-24 08:10 +07; see below) (2026-11-24 02:20 +07, head:lead-forgent-261122-0118-heads-b52f9). The owner, through the
 manual supervisor session, ordered the plan closed with any missing part named. Missing: the secretary's live rows (no
 `head-grant-probe-secretary.json` exists), and a green `cargo test --workspace` (one red belongs to this plan, below).
 
@@ -9,7 +9,7 @@ Probe: `node test/live/head-grant-probe.live.mjs`, run inside each confined head
 observed outcome comes from the head's own CLI call through its request socket.
 
 - Supervisor: `reports/head-grant-probe-supervisor.json` (`b76553b29`), role `head:supervisor-forgent`.
-- Secretary: **missing**. `reports/head-grant-probe-secretary.json` was asked of Miu by the supervisor and never landed.
+- Secretary: `reports/head-grant-probe-secretary.json`, role `head:secretary-miu`.
 
 `TMPDIR` in the supervisor head is `/tmp` and writable, which re-confirms `p-d3ub553ogh` live.
 
@@ -57,12 +57,17 @@ outside this plan and goes to the supervisor for a backlog row.
 
 ## Secretary: verb by verb
 
-**Missing.** Miu never ran the probe on release `ef959860` or `9e5ae72c`, so no secretary row is proven live. What stays
-unproven from a confined secretary: every secretary verb of `grantOf('secretary')`, its `session write plans/backlog.md`
-(phase 13), and its `TMPDIR`. Phase 13's grant is proven live only from the supervisor (`de15263ae`), and the secretary's
-`TMPDIR` only by `test/session-host/head-start.test.mjs`. The command for whoever closes it: run
-`node test/live/head-grant-probe.live.mjs` inside Miu on the active release and land the JSON as
-`reports/head-grant-probe-secretary.json`.
+**Proven live** (2026-11-24 08:10 +07, supervisor session, after Miu was rotated to generation 46 on release
+`sha256:9e5ae72c...`). Miu ran `node test/live/head-grant-probe.live.mjs` inside her own sandbox and mailed the output; it is
+saved verbatim as `reports/head-grant-probe-secretary.json` (role `head:secretary-miu`, 30 contract verbs).
+
+- 17 verbs were called and served, 7 were called and refused `verb-not-granted` as the grant says, and no row differs from
+  `grantOf('secretary')`.
+- 6 verbs were not called by design: `session rotate`, `session restore role`, `session bind session`, `session answered`
+  and `supervisor done` act on the caller, and `supervisor wake` always records a wake and may start a supervisor head.
+- `TMPDIR` in the secretary head is `/tmp` and writable, which closes the secretary's `TMPDIR` row live.
+- The secretary's granted verbs include `land`, `run`, `supervisor wake` and `session write`, and exclude `config patch`,
+  `metrics prune` and `session type`.
 
 ## Suite (acceptance criterion 5)
 
