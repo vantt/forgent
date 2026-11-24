@@ -287,6 +287,9 @@ morning (discussion §1). The planner's own shape choices are written as decisio
 - 2026-11-24 23:06, phase 1 done: the watcher landed `heads-operate-without-owner/p01` as `719331230` (ticket
   `c-10969-1795536197308`, every `test/skills` file named) after two `land-target-changed` retries; the worktree was
   removed by the land. Phase 2 waits on owner question `q-qzcq5xti2k` (cargo and node for claude workers).
+- 2026-11-25 00:15, supervisor wake: phase 2 stays parked on owner question `q-owq4jhwng7` (open; supersedes
+  `q-qzcq5xti2k`, see `phase-02-argv-window.md`); the lead is idle on that verified wait, so it is left live, not
+  replaced. Phases 3, 6 and 7 wait behind phase 2.
 
 ## Outstanding questions
 
