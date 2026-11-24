@@ -30,7 +30,9 @@ removes their last callers; this phase removes every non-Work `legacy-cli` route
 ## Verify
 
 `reports/phase-04-close.md` holds the phase 1 close evidence, plus: each H2 and H3 row closed or declined by the owner,
-every door row assigned to T9 closed, and the remaining `legacy-cli` count (Work routes only).
+every door row assigned to T9 closed (`no-node-from-native-packaging`, `process-control-signal`,
+`canonical-json-bytes`, `retired-node-s5-hook-script`, and the S6b/S7 rows phase 0 assigns here; proof:
+`grep -l '^retiredBy: "261124-1026-harden-next-round#T9' packages/component-authority/model/doors/*.yaml` prints nothing), and the remaining `legacy-cli` count (Work routes only).
 
 ## Rollback
 

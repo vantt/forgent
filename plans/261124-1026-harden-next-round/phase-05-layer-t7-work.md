@@ -39,7 +39,9 @@ All must hold:
 
 ## Verify
 
-`reports/phase-05-close.md` holds the phase 1 close evidence, plus: every door row assigned to T7 closed,
+`reports/phase-05-close.md` holds the phase 1 close evidence, plus: every door row assigned to T7 closed (`kernel-lock-primitive`, `read-and-clear-a-hot-mutex-record`, and the
+S6b/S7 rows phase 0 assigns here; proof: `grep -l '^retiredBy: "261124-1026-harden-next-round#T7' packages/component-authority/model/doors/*.yaml`
+prints nothing),
 `grep -c '"legacy-cli"' packages/host-runtime/contracts/command-routes.json` is 0, and
 `git ls-files 'src/*.mjs' 'bin/*.mjs'` prints nothing.
 

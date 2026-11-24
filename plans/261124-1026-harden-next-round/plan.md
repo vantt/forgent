@@ -9,10 +9,23 @@ blockedBy:
 base: c9f44c83e8f7526dce369961b146b426fe449cc2
 footprint:
   - plans/261124-1026-harden-next-round/**
+  - packages/component-authority/model/doors/skill-generated-stamp.yaml
+  - packages/component-authority/model/doors/footprint-write-scope-overlap-rule.yaml
+  - packages/component-authority/model/doors/kernel-lock-primitive.yaml
+  - packages/component-authority/model/doors/run-bounded-child.yaml
+  - packages/component-authority/model/doors/no-node-from-native-packaging.yaml
+  - packages/component-authority/model/doors/process-control-signal.yaml
+  - packages/component-authority/model/doors/main-checkout-activity-beacon.yaml
+  - packages/component-authority/model/doors/delete-guard-keyword-list.yaml
+  - packages/component-authority/model/doors/agent-hook-table.yaml
+  - packages/component-authority/model/doors/read-and-clear-a-hot-mutex-record.yaml
+  - packages/component-authority/model/doors/canonical-json-bytes.yaml
+  - packages/component-authority/model/doors/retired-node-s5-hook-script.yaml
 source:
   - plans/discussions/ds-wqsrwmiier-harden-next-round/DISCUSSION.md
   - p-2qle2tjflb
   - p-vwpnx4gpow
+  - p-gikx34d7bh
 created: 2026-11-24
 ---
 
@@ -54,6 +67,16 @@ For the program (phase 6):
 8. `git ls-files 'src/*.mjs' 'bin/*.mjs'` prints nothing (322 files at `base`).
 9. Every HARDEN carry-over in the discussion's §3 (H1–H7, C5) is closed or declined by the owner, each with its
    source, in `reports/program-close.md`.
+
+Door-row owners (phase 0 step 0, backlog `p-gikx34d7bh`, D21, D22):
+
+10. Every door row names exactly one owner first, none points to a closed plan or a report, and the guard is green:
+    - `grep -h '^retiredBy' packages/component-authority/model/doors/*.yaml | grep -vE '^retiredBy: "?(p-[a-z0-9]{10}|[0-9]{6}-[0-9]{4}-[a-z0-9-]+#|S6b|S7)'`
+      prints nothing (`S6b` and `S7` are phases T6 and T7 of this plan, D18; step 5 of phase 0 gives each its phase);
+    - `grep -hE '^retiredBy:.*(261121-2110|reports/)' packages/component-authority/model/doors/*.yaml` prints nothing;
+    - `node --test test/architecture.test.mjs` passes (the `NAMED_DOOR_DEBT` guard).
+    Each owner closes its rows in its own acceptance: phases 1, 4 and 5 here name theirs; `261122-2108` phases 8 and
+    11 and backlog rows `p-6ectcp6jyg` and `p-tvwy24txpj` remove theirs in their own done-when.
 
 ## Non-goals
 
@@ -98,7 +121,7 @@ with `fgos authority locate`, 2026-11-24). Each sub-plan writes its own Authorit
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 0 | [Recount, triage and one-door map (gated)](phase-00-recount-triage-door-map.md) | - | plans/261124-1026-harden-next-round/reports/phase-00 | 1 | draft |
+| 0 | [Recount, triage and one-door map (gated); step 0 door-row owners (no gate)](phase-00-recount-triage-door-map.md) | - | plans/261124-1026-harden-next-round/reports/phase-00, packages/component-authority/model/doors/ (the twelve `retiredBy` lines of step 0) | 1 | draft |
 | 1 | [Layer T2–T3 session](phase-01-layer-t2-t3-session.md) | 0 | plans/261124-1026-harden-next-round/reports/phase-01 | 2 | draft |
 | 2 | [Layer T8 supervision](phase-02-layer-t8-supervision.md) | 1 | plans/261124-1026-harden-next-round/reports/phase-02 | 3 | draft |
 | 3 | [Layer T6 Workflow (program step S6b)](phase-03-layer-t6-workflow.md) | 2 | plans/261124-1026-harden-next-round/reports/phase-03 | 4 | draft |
@@ -120,6 +143,12 @@ which are sized there. This is the HARDEN precedent (`261021-1118` phases 01–0
 
 Gates that hold only some phases:
 
+- Phase 0 step 0 (one owner on twelve door rows) has no gate and runs first, the two high rows leading. This planner
+  cannot write the model, and the plan is not admitted until the owner approves it, so step 0 runs as one supervisor
+  chore (`fgos run` with `--writes` on the twelve files, in a linked worktree), the table in the phase file being
+  its whole brief. Its files sit inside `261122-2108`'s footprint (`packages/component-authority/model/**`), and
+  `261122-2108` phases 8 and 11 rewrite `retiredBy` lines of the same model: step 0 changes only the twelve lines
+  named, so whichever lands second rebases a one-line conflict at most.
 - Phase 0 waits for doors `261121-2110` to close (12a, 12b, 12d) and `261122-2108` to land with 12c folded in (O7,
   D6, D22, D27). That is the plan's `blockedBy`.
 - Phase 1 takes its baseline after the D20 control-group bug rows have landed; a row still open becomes an input.

@@ -45,6 +45,11 @@ model change only through the sub-plan, which has its own footprint.
 `reports/phase-01-close.md` holds the before/after table, the net Δ line, the High-findings status, doctor and smoke
 results on this machine, `npm test` and `cargo test --workspace` green on main, and the refreshed map rows.
 
+Door rows this phase owns (their `retiredBy` starts with `261124-1026-harden-next-round#T2-T3`; phase 0 step 0):
+`main-checkout-activity-beacon` and `delete-guard-keyword-list`. Each is closed: the row is removed, or its Node
+entries and `retiredBy` are gone. Proof: `grep -l '^retiredBy: "261124-1026-harden-next-round#T2-T3' packages/component-authority/model/doors/*.yaml`
+prints nothing.
+
 ## Rollback
 
 Code reverts through the sub-plan. This phase's own reports are deleted and its row set back to `ready`.
