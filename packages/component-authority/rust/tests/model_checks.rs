@@ -897,7 +897,11 @@ fn the_enum_constants_and_the_typed_row_fields_equal_the_schema() {
         string_set(&defs["door"]["properties"]["severity"]["enum"]),
         [Severity::High, Severity::Medium, Severity::Low]
             .iter()
-            .map(|s| serde_json::to_value(s).unwrap().as_str().unwrap().to_owned())
+            .map(|s| serde_json::to_value(s)
+                .unwrap()
+                .as_str()
+                .unwrap()
+                .to_owned())
             .collect::<BTreeSet<String>>()
     );
     assert_row_matches_schema::<Door>(
