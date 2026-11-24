@@ -146,7 +146,7 @@ views.
 | 3 | [Wire update and re-render on declare](phase-03-wire-update-and-rerender-on-declare.md) | 1, 2 | apps/fgos/src/wiring/authority.rs, apps/fgos/tests/authority.rs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, test/cli/subcommand-flag-drift.test.mjs | 2 | ready |
 | 4 | [Integrate, document and report back](phase-04-integrate-document-and-report-back.md) | 3 | docs/platform/component-authority/spec.md, CHANGELOG.md, plans/261124-1433-authority-declare-update/reports/ | 3 | ready |
 
-Phases 1 and 2 have disjoint footprints and run at once. Phase 1 landed at 1d129c0b9 and phase 2 at c0299bcff. Phase 3 owns the generated command contracts (hot files),
+Phases 1 and 2 have disjoint footprints and run at once. Phase 1 landed at 1d129c0b9 and phase 2 at c0299bcff. Phase 3 is parked: its unit (ticket c-27643-1795509086791, unit run unit-run-1795509087287-0effc08f, gemini) was still running after 22 waits, about 20 minutes, with no change in its worktree /home/vantt/projects/forgent-worktrees/261124-1433-authority-declare-update-p03. A restarted lead resumes that ticket with `fgos request result c-27643-1795509086791` before starting the phase again. Separately, `cargo clippy -p fgos -- -D warnings` fails on main at apps/fgos/src/wiring/session_rotation_hook.rs:555 (clippy::question_mark). That file is outside this plan's footprint. Phase 3 owns the generated command contracts (hot files),
 and phase 4 alone owns `CHANGELOG.md` and the spec. The footprint check is `node scripts/plan-contract-check.mjs` and
 `fgos resource-check --plan`, run before landing.
 
