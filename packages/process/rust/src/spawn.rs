@@ -257,11 +257,27 @@ pub fn run_bounded_command<G>(
 /// beside `claude.cmd` that CreateProcess cannot run. Elsewhere the file must be executable. The answer is the
 /// first hit in search order. Pure over its inputs apart from reading the file system, so it runs the same
 /// on any host.
+///
+/// On Windows a name that already has an extension (`tool.exe`) is taken as it is, with no extension
+/// appended: appending would never find it.
 pub fn resolve_program(
     name: &str,
     path_env: &str,
     pathext: &str,
     windows: bool,
+) -> Option<PathBuf> {
+    resolve_program_in(name, path_env, pathext, windows, false)
+}
+
+/// [`resolve_program`] with `absolute_only` choosing the entries searched: when true, a relative `PATH`
+/// entry and a name with a relative directory part are skipped, so the answer never depends on the
+/// working directory.
+pub fn resolve_program_in(
+    name: &str,
+    path_env: &str,
+    pathext: &str,
+    windows: bool,
+    absolute_only: bool,
 ) -> Option<PathBuf> {
     if name.is_empty() {
         return None;
@@ -271,7 +287,9 @@ pub fn resolve_program(
     } else {
         pathext
     };
-    let extensions: Vec<&str> = if windows {
+    let extensions: Vec<&str> = if windows && Path::new(name).extension().is_some() {
+        vec![""]
+    } else if windows {
         pathext.split(';').filter(|ext| !ext.is_empty()).collect()
     } else {
         vec![""]
@@ -284,6 +302,9 @@ pub fn resolve_program(
             .find(|candidate| usable(candidate))
     };
     if name.contains('/') || (windows && name.contains(['\\', ':'])) {
+        if absolute_only && !Path::new(name).is_absolute() {
+            return None;
+        }
         return first_in(&|ext| PathBuf::from(format!("{name}{ext}")));
     }
     let separator = if windows { ';' } else { ':' };
@@ -291,6 +312,7 @@ pub fn resolve_program(
         .split(separator)
         .map(|dir| if windows { dir.trim_matches('"') } else { dir })
         .filter(|dir| !dir.is_empty())
+        .filter(|dir| !absolute_only || Path::new(dir).is_absolute())
         .find_map(|dir| first_in(&|ext| Path::new(dir).join(format!("{name}{ext}"))))
 }
 
@@ -418,6 +440,48 @@ mod resolve_tests {
             resolve_program("tool", &quoted, ".EXE", true),
             Some(dir.join("tool.EXE"))
         );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn absolute_only_skips_relative_path_entries_and_relative_directory_names() {
+        let dir = scratch("absonly");
+        std::fs::write(dir.join("tool"), "#!/bin/sh\n").unwrap();
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(dir.join("tool"), std::fs::Permissions::from_mode(0o755))
+                .unwrap();
+        }
+        // A relative entry is never searched, whatever the working directory holds.
+        assert_eq!(resolve_program_in("tool", ".", "", false, true), None);
+        assert_eq!(
+            resolve_program_in("tool", "bin:sub/dir", "", false, true),
+            None
+        );
+        // A relative directory part is refused; the absolute one resolves.
+        assert_eq!(resolve_program_in("./tool", "", "", false, true), None);
+        let path = format!("relative:{}", dir.display());
+        assert_eq!(
+            resolve_program_in("tool", &path, "", false, true),
+            Some(dir.join("tool"))
+        );
+        // The default door still searches the same relative entry.
+        assert_eq!(resolve_program("./absent", "", "", false), None);
+    }
+
+    #[test]
+    fn a_windows_name_that_already_has_an_extension_is_taken_as_it_is() {
+        let dir = scratch("hasext");
+        std::fs::write(dir.join("tool.exe"), "").unwrap();
+        std::fs::write(dir.join("tool.exe.EXE"), "").unwrap();
+        let path = dir.display().to_string();
+        assert_eq!(
+            resolve_program("tool.exe", &path, ".EXE", true),
+            Some(dir.join("tool.exe"))
+        );
+        // No fallback to an appended extension when the named file is absent.
+        std::fs::remove_file(dir.join("tool.exe")).unwrap();
+        assert_eq!(resolve_program("tool.exe", &path, ".EXE", true), None);
     }
 
     #[test]

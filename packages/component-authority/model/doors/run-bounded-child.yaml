@@ -11,44 +11,48 @@ patterns:
 allowed:
   - path: packages/process/rust/src/spawn.rs
     count: 4
-debt:
   - path: apps/fgos-gateway/src/gateway.rs
-    reason: watches its own gateway child (try_wait) for liveness; a service, not a bounded run
+    count: 1
+    reason: watches the gateway child it started (try_wait) for liveness; a long-lived service, not a bounded run
   - path: apps/fgos/src/wiring/run.rs
-    reason: polls the admission peer it started (try_wait) for a short grace once the run closed its channel; the peer lives as long as the run, not a bounded run
-  - path: packages/config/rust/src/detect.rs
-    reason: searches PATH (absolute entries only) for the detection candidates of the contract
-  - path: packages/distribution/rust/src/init.rs
-    reason: resolve_node_path looks for node on PATH for the install preflight
-  - path: packages/git/rust/src/driver.rs
-    reason: finds git on PATH (absolute entries only) and bounds its own git children with a deadline loop of its own (try_wait)
+    count: 1
+    reason: watches the admission peer it started (try_wait) for a short grace once the run closed its channel; the peer lives as long as the run
   - path: packages/holder-lock/rust/src/borrow_windows.rs
-    reason: polls a child it started itself (try_wait); not a run-to-completion with a replacement environment
-  - path: packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs
-    reason: the external-process provider's bounded invocation, with its own output limit and cancellation
-  - path: packages/mailbox/rust/store/src/adapters/version.rs
-    reason: probes a CLI version with its own deadline
-  - path: packages/mailbox/rust/store/src/nudge.rs
-    reason: runs the nudge child with its own deadline
-  - path: packages/process/rust/src/containment/linux.rs
-    reason: polls a contained child in the containment driver
-  - path: packages/process/rust/src/mapped.rs
-    reason: searches PATH for the program of a descriptor-mapped spawn and polls its child
-  - path: packages/process/rust/src/platform/windows_spawn.rs
-    reason: keeps the PATH search for a name that already has an extension; the extension-less lookup is spawn.rs's resolve_program
-  - path: packages/run-supervisor/rust/src/attempt_step.rs
-    reason: finds node on PATH for the head request hand-over to the Node payload
+    count: 1
+    reason: watches a long-lived child it started itself (try_wait); not a run-to-completion
   - path: packages/run-supervisor/rust/src/controller/launch.rs
-    reason: polls the detached supervisor child it started (try_wait) until it publishes its binding or exits; the supervisor outlives the call, so it is not a bounded run
-  - path: packages/run-supervisor/rust/src/gate/windows.rs
-    reason: the supervisor's own gate child, ended through its Job Object
-  - path: packages/run-supervisor/rust/src/steps.rs
-    reason: a supervised step led in its own group with the stepTimeoutMs of its envelope
+    count: 3
+    reason: watches the detached supervisor child it started (try_wait) until it publishes its binding or exits; the supervisor outlives the call
   - path: packages/run-supervisor/rust/src/supervise.rs
-    reason: polls a child it started itself (try_wait); not a run-to-completion with a replacement environment
+    count: 2
+    reason: watches the long-lived child it supervises (try_wait); not a run-to-completion
   - path: packages/run-supervisor/rust/src/supervise/windows.rs
-    reason: polls a child it started itself (try_wait); not a run-to-completion with a replacement environment
+    count: 1
+    reason: watches the long-lived child it supervises (try_wait); not a run-to-completion
   - path: packages/terminal-control/rust/src/driver/herdr.rs
-    reason: polls a child it started itself (try_wait); not a run-to-completion with a replacement environment
-retiredBy: each Rust caller moves onto spawn.rs when its crate next changes how it spawns
-reason: "guards the definitions of run_bounded, resolve_program and firstOnPath, and flags a PATH split or a try_wait child poll outside spawn.rs, so a second bounded spawn or program lookup must be declared. Not covered, by design of a pattern check: an inline Command::new with a deadline loop that polls by some other means. Debt lists the existing own-child polls and PATH searches that predate the door"
+    count: 1
+    reason: watches a long-lived child it started itself (try_wait); not a run-to-completion
+  - path: packages/run-supervisor/rust/src/gate/windows.rs
+    count: 1
+    reason: watches the supervisor gate child it started, ended through its Job Object; a long-lived child, not a bounded run
+  - path: packages/host-runtime/rust/src/providers/external_process/bound_invocation_supervisor.rs
+    count: 4
+    reason: watches the long-lived external-process invocation it started, with its own output limit and cancellation
+  - path: packages/process/rust/src/containment/linux.rs
+    count: 1
+    reason: in the door's own crate; the containment driver polls the contained child it started
+  - path: packages/process/rust/src/mapped.rs
+    count: 2
+    reason: in the door's own crate; the descriptor-mapped spawn searches PATH for its program and polls the child it started
+  - path: packages/distribution/rust/src/init.rs
+    count: 1
+    reason: a PATH membership test (split_paths) for the launcher directory, not a program lookup
+debt:
+  - path: packages/git/rust/src/driver.rs
+    reason: bounds its own git children with a deadline loop (try_wait); needs a containment hook and an output cap that spawn.rs does not offer
+  - path: packages/mailbox/rust/store/src/nudge.rs
+    reason: runs the nudge child with its own deadline; needs a descriptor-closing spawn
+  - path: packages/run-supervisor/rust/src/steps.rs
+    reason: a supervised step led in its own group with the stepTimeoutMs of its envelope; needs a caller-owned Job Object and an output cap
+retiredBy: "plans/261121-2110-component-authority-doors/reports/unit-261124-1035-p12b-bounded-child-stop.md; these three retire when one spawn.rs extension (caller-owned containment, output cap, descriptor closing) lands as an owner-chosen feature"
+reason: "guards the definitions of run_bounded, resolve_program and firstOnPath, and flags a PATH split or a try_wait child poll outside spawn.rs, so a second bounded spawn or program lookup must be declared. Not covered, by design of a pattern check: an inline Command::new with a deadline loop that polls by some other means. Watching a long-lived child you started (try_wait on a service, supervisor or contained child) is outside this door, so those files are allowed with their measured count. Debt lists the three bounded spawns that need a spawn.rs extension"

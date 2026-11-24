@@ -108,6 +108,44 @@ test('the scan judges every file its root declares as product, whatever the dire
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
 
+test('a program found through resolve_program is judged by the name it looks up, as a literal and through a parameter', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-one-door-resolve-'));
+  try {
+    const lib = path.join(root, 'packages/demo/rust/src/lib.rs');
+    fs.mkdirSync(path.dirname(lib), { recursive: true });
+    fs.writeFileSync(lib, [
+      'use std::process::Command;',
+      'use fgos_process::spawn::resolve_program;',
+      '',
+      'pub fn switch_main(dir: &str, path_env: &str) -> std::io::Result<std::process::Output> {',
+      '    let git = resolve_program("git", path_env, "", false).ok_or(std::io::ErrorKind::NotFound)?;',
+      '    Command::new(git).arg("-C").arg(dir).arg("checkout").arg("main").output()',
+      '}',
+      '',
+      'pub fn node_version(path_env: &str) -> Option<std::process::Output> {',
+      '    let node = resolve_program("node", path_env, "", false)?;',
+      '    Command::new(node).arg("--version").output().ok()',
+      '}',
+      '',
+      'fn run_named(name: &str, path_env: &str) -> Option<std::process::Output> {',
+      '    let program = resolve_program(name, path_env, "", false)?;',
+      '    Command::new(program).output().ok()',
+      '}',
+      '',
+      'pub fn reset_hard(path_env: &str) -> Option<std::process::Output> {',
+      '    run_named("git", path_env)',
+      '}',
+      '',
+    ].join('\n'));
+    const { sites } = scan({ root });
+    const rust = sites.filter((s) => s.path === 'packages/demo/rust/src/lib.rs' && s.family === 'rust');
+    // `git` found through the door is a Git spawn at its own call and at the caller that names it; `node` is not.
+    assert.equal(rust.length, 2, JSON.stringify(sites));
+    assert.ok(rust.every((s) => s.binary === 'git'));
+    assert.ok(!sites.some((s) => s.family === 'unresolved-binary'), `resolve_program left a binary unresolved (got ${JSON.stringify(sites)})`);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+});
+
 test('a Rust file in a crate-root examples or benches target is test code, a product directory called examples is not', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-one-door-examples-'));
   try {
