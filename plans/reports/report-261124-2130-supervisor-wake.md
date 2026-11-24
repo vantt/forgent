@@ -18,3 +18,7 @@
 ## Owner questions
 - q-trgzaa34ua is moot since 1433 closed on the owner's word; the supervisor never acks or cancels a
   question, so it stays open for its asker or the owner to cancel.
+
+## Admitted
+- 261124-1945-run-tests-fgos-leak-check (P2) admitted at base c99af30a3 (0add9d884); lead head:lead-forgent-261124-1945-run-te-f3bee started.
+- 261121-2110 closed again on the board (c99af30a3).
