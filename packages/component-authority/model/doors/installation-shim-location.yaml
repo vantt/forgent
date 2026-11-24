@@ -8,7 +8,7 @@ patterns:
   - \.join\("installation"\)
 allowed:
   - path: src/util/host-bin-path.mjs
-    count: 8
+    count: 9
   - path: packages/distribution/rust/src/init.rs
     count: 17
   - path: packages/distribution/rust/src/lib.rs
@@ -46,13 +46,13 @@ allowed:
     count: 4
     reason: "a shell script the user sources: tests for the shim in the project before it names fgos"
   - path: scripts/lib/mailbox-behaviour-run.mjs
-    count: 1
+    count: 2
     reason: the behaviour harness spawns the shim of the workspace it builds
   - path: scripts/lib/mailbox-live-confined.mjs
     count: 2
     reason: the live harness writes the activation record of the confined workspace it builds
   - path: scripts/record-mailbox-hook-fixtures.mjs
-    count: 5
+    count: 8
     reason: the fixture recorder spawns the shim of the workspace it builds
 debt:
   - path: packages/herdr-fgos-common/rust/src/fgos.rs

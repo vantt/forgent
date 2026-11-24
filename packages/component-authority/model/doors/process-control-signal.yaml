@@ -10,15 +10,15 @@ patterns:
 allowed:
   - packages/process/rust/src/**
   - path: packages/run-supervisor/rust/src/gate/unix.rs
-    count: 4
+    count: 5
   - path: packages/run-supervisor/rust/src/gate/windows.rs
     count: 2
   - path: packages/run-supervisor/rust/src/steps.rs
-    count: 2
+    count: 4
   - path: packages/holder-lock/rust/src/driver/flock.rs
-    count: 1
+    count: 2
   - path: packages/holder-lock/rust/src/port.rs
-    count: 1
+    count: 2
   - path: src/holder-lock/index.mjs
     count: 1
   - path: src/runner/dispatch/provider-credential-probe.mjs

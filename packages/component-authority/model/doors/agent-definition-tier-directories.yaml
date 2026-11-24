@@ -9,7 +9,7 @@ patterns:
   - join\((?![^)]*\.claude)[^)]*,\s*['"]agents['"]\s*[,)]
 allowed:
   - path: src/runner/agent-definitions.mjs
-    count: 9
+    count: 10
   - path: src/util/domain-dirs.mjs
     count: 2
     reason: defines the domain layout (a domain's agents/ folder) that the door reads

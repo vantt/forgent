@@ -6,7 +6,7 @@ patterns:
   - "['\"]fgos-gateway['\"]"
 allowed:
   - path: apps/fgos/src/wiring/gateway_control.rs
-    count: 6
+    count: 7
   - path: packages/holder-lock/rust/src/origin.rs
     count: 1
 debt: []

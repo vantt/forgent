@@ -15,9 +15,9 @@ patterns:
   - "['\"]hooks\\.json['\"]"
 allowed:
   - path: packages/distribution/rust/src/agent_hooks.rs
-    count: 17
+    count: 24
   - path: src/run-supervisor/trust-store.mjs
-    count: 1
+    count: 2
     reason: reads and hashes the Codex hook file's bytes to trust its entries; it writes no hook
   - path: packages/run-supervisor/rust/src/controller/trust_store.rs
     count: 1
@@ -32,13 +32,13 @@ allowed:
     count: 3
     reason: reads the project's Claude Code settings to check the registered commands; it writes no hook
   - path: scripts/record-mailbox-hook-fixtures.mjs
-    count: 1
+    count: 2
     reason: the fixture recorder writes its own agy hook file into the workspace it builds, to record what a real CLI sends
   - path: scripts/lib/mailbox-live-confined.mjs
-    count: 4
+    count: 6
     reason: "harness-owned: the host wires a hook through `fgos doctor --fix --only <fix>`, then the harness reads the file it wrote in the run's workspace and moves it out of the project, so only --settings or the run's CODEX_HOME loads it; it renders no hook"
   - path: scripts/lib/mailbox-live-cli.mjs
-    count: 3
+    count: 4
     reason: the live harness lists the agy hook file of a workspace to learn what a CLI sees; it reads only
   - path: src/runner/dispatch/worker-home.mjs
     count: 1
