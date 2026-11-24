@@ -46,7 +46,10 @@ Node: `src/native/door.mjs`, `src/session-host/head-grants.mjs`, `src/session-ho
 `test/session-host/head-request.test.mjs`, `test/session-host/head-start.test.mjs`, `test/live/head-grant-probe.live.mjs`.
 CLI registration of `can-i`: `src/cli/command-registry.mjs`, `packages/host-runtime/contracts/command-manifest.json`,
 `packages/host-runtime/contracts/command-routes.json`, `packages/host-runtime/contracts/command-route-annotations.json`,
-`apps/fgos/src/routing.rs`. Docs: `docs/platform/run-supervisor/spec.md`. Authority model door rows (debt paid):
+`apps/fgos/src/routing.rs`. Envelope readers that drop `session.verbs` (owner answer `q-nog2h4wfjm`; these three
+are also inside the footprint of draft plan `261122-2108-delete-dead-node-execution-closure`, which rebases onto this
+phase): `src/runner/dispatch/session-attempt.mjs`, `apps/fgos/src/wiring/unit_run_host/session_attempt.rs`,
+`apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs`. Docs: `docs/platform/run-supervisor/spec.md`. Authority model door rows (debt paid):
 `packages/component-authority/model/doors/execution-s-node-seam.yaml`,
 `packages/component-authority/model/doors/the-node-bind-facade-has-only-its-named-callers.yaml`,
 `packages/component-authority/model/doors/node-callers-reach-execution-only-through-its-seam-never-into-the-node-execution-closure.yaml`.
@@ -59,6 +62,10 @@ rebases on this change), `apps/fgos/src/wiring/unit_run_host/session_attempt.rs`
 `apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs`. A planner adds them to the plan and phase 2 footprint
 and records the overlap with 2108; cargo and node run in the phase unit's sandbox; the lead reruns phase 2 in the same
 worktree. The answer allows only that footprint edit and the rerun; nothing else of scope or decision changes.
+
+**Unit sandbox.** The phase 2 unit's sandbox must allow `cargo` and `node`: the verify commands below
+(`cargo test -p fgos-session-host`, `cargo test -p fgos-run-supervisor`, `node --test ...`) run inside the unit, and
+the first run came back blocked because the sandbox refused both. Start the rerun with a unit that can run them.
 
 ## Decisions taken in this phase (planner's, within PC-D6 and PC-D11)
 
