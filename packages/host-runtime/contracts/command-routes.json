@@ -90,7 +90,8 @@
         "row",
         "approved-by",
         "plan",
-        "move"
+        "move",
+        "update"
       ],
       "locate": [
         "dir",

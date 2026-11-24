@@ -1,12 +1,13 @@
 //! `fgos authority locate "<sentence>" [--limit N]`, `fgos authority model`,
-//! `fgos authority declare --kind <kind> --row <json|file> [--approved-by <q-id>] [--plan <dir>] [--move]` and
+//! `fgos authority declare --kind <kind> --row <json|file> [--approved-by <q-id>] [--plan <dir>] [--move] [--update]` and
 //! `fgos authority render [--check] [--preview-holder <path>]`: the components, decision kinds, contracts and doors
-//! of the component authority model that match a description of the work, the whole loaded model, a new or moved
+//! of the component authority model that match a description of the work, the whole loaded model, a new, moved or updated
 //! row written into it, and the generated ownership views of the platform docs. The model, the ranking, the
 //! write path and the renderer are `fgos_component_authority`; this module projects the call, picks the model
 //! directory of the project the call is aimed at (one rule, `model_dir`) and wires the owner question store.
 //! `locate` and `model` answer read-only, and answer `authority: "inactive"` where the project has no model;
-//! `declare` writes the model's YAML; `render` writes the views unless `--check` asks only for drift.
+//! `declare` writes the model's YAML (`--update` changes an existing component row) and, in the fgOS repository,
+//! re-renders the views in the same call; `render` writes the views unless `--check` asks only for drift.
 
 use crate::routing::Call;
 use fgos_component_authority::render::{
@@ -69,13 +70,14 @@ pub enum Action {
         limit: usize,
     },
     Model,
-    /// Adds a row (or, with `move_owner`, moves a decision kind's owner).
+    /// Adds a row, moves a decision kind's owner, or updates an existing component.
     Declare {
         kind: Kind,
         row: serde_json::Value,
         approved_by: Option<String>,
         plan: Option<PathBuf>,
         move_owner: bool,
+        update: bool,
     },
     /// `check` reports drift and writes nothing; `preview_holder` writes only the preview report at that path.
     Render {
@@ -121,7 +123,7 @@ pub fn source_tree(root: &Path, cwd: &Path) -> PathBuf {
 }
 
 /// Projects `fgos authority locate "<sentence>" [--limit N]`, `fgos authority model`,
-/// `fgos authority declare --kind <kind> --row <json|file> [--approved-by <q-id>] [--plan <dir>] [--move]` and
+/// `fgos authority declare --kind <kind> --row <json|file> [--approved-by <q-id>] [--plan <dir>] [--move] [--update]` and
 /// `fgos authority render [--check] [--preview-holder <path>]`.
 pub fn project_authority_request(
     args: &[OsString],
@@ -136,7 +138,7 @@ pub fn project_authority_request(
     let allowed: &[&str] = match sub {
         "locate" => &["limit"],
         "render" => &["check", "preview-holder"],
-        "declare" => &["kind", "row", "approved-by", "plan", "move"],
+        "declare" => &["kind", "row", "approved-by", "plan", "move", "update"],
         _ => &[],
     };
     if let Some(flag) = call.flag_outside(allowed) {
@@ -229,15 +231,20 @@ fn project_declare(call: &Call, root: PathBuf, tree: PathBuf) -> Result<Authorit
             approved_by: call.value("approved-by")?,
             plan: call.value("plan")?.map(PathBuf::from),
             move_owner: call.switch("move")?,
+            update: call.switch("update")?,
         },
     })
+}
+
+fn is_own_repo(tree: &Path) -> bool {
+    tree.join(OWN_CONTRACT).is_file()
 }
 
 /// The directory of the model of the project at `root`, by one rule: the fgOS repository (its root carries the
 /// component's own contract) keeps `packages/component-authority/model/`; every other project keeps
 /// `.fgos/authority/model/`, joined through the invocation-root door's `.fgos` directory.
 pub fn model_dir(root: &Path) -> Result<PathBuf, String> {
-    if root.join(OWN_CONTRACT).is_file() {
+    if is_own_repo(root) {
         return Ok(root.join(MODEL_DIR));
     }
     let dir = root
@@ -286,7 +293,8 @@ fn inactive(mut data: serde_json::Value) -> serde_json::Value {
 /// The answer for one request. `locate`: the sentence, how many rows matched, and the best `limit` of them.
 /// `model`: the loaded, validated model itself (layers, components, decision kinds, doors, contracts).
 /// `locate` and `model` answer `{"authority": "inactive"}` (plus an empty match list) where the project has no
-/// model. `declare`: the row it wrote, the files it wrote it to, and the `root` it wrote into. `render`: the
+/// model. `declare`: the row it wrote, the files it wrote it to, the `root` it wrote into, and, in the fgOS
+/// repository, the views it re-rendered. `render`: the
 /// `root` it wrote into and the views it wrote, or with `--check` the drift it found (a non-empty drift is a
 /// failure); with `--preview-holder` the `root` and the path of the preview report it wrote.
 pub fn answer(request: &AuthorityRequest) -> Result<serde_json::Value, String> {
@@ -301,6 +309,7 @@ pub fn answer(request: &AuthorityRequest) -> Result<serde_json::Value, String> {
             approved_by,
             plan,
             move_owner,
+            update,
         } => {
             let dir = model_dir(&request.tree)?;
             let declared = declare(
@@ -312,7 +321,7 @@ pub fn answer(request: &AuthorityRequest) -> Result<serde_json::Value, String> {
                     approved_by: approved_by.as_deref(),
                     plan: plan.as_deref(),
                     move_owner: *move_owner,
-                    update: false,
+                    update: *update,
                 },
                 &StoreApprovals {
                     root: &request.root,
@@ -324,7 +333,7 @@ pub fn answer(request: &AuthorityRequest) -> Result<serde_json::Value, String> {
                 .iter()
                 .map(|file| file.to_string_lossy().into_owned())
                 .collect();
-            Ok(json!({
+            let mut answer = json!({
                 "root": request.tree,
                 "declared": {
                     "kind": declared.kind.word(),
@@ -333,7 +342,20 @@ pub fn answer(request: &AuthorityRequest) -> Result<serde_json::Value, String> {
                     "files": files,
                     "createdModel": declared.created_model,
                 },
-            }))
+            });
+            if is_own_repo(&request.tree) {
+                let report = write_views(&request.tree).map_err(|error| {
+                    format!(
+                        "the row was written to {} and the views were not: {error}\nrepair with `fgos authority render`.",
+                        files.join(", ")
+                    )
+                })?;
+                answer["views"] = json!({
+                    "written": view_refs(&report.written),
+                    "skipped": view_refs(&report.skipped),
+                });
+            }
+            Ok(answer)
         }
         Action::Model => {
             let dir = model_dir(&request.tree)?;
@@ -502,7 +524,7 @@ mod tests {
     }
 
     #[test]
-    fn declare_projects_the_kind_the_row_the_approval_and_a_move() {
+    fn declare_projects_the_kind_the_row_the_approval_and_the_move_and_update_switches() {
         let request = project(&[
             "authority",
             "declare",
@@ -515,6 +537,7 @@ mod tests {
             "--plan",
             "plans/p",
             "--move",
+            "--update",
         ])
         .unwrap();
         let Action::Declare {
@@ -523,6 +546,7 @@ mod tests {
             approved_by,
             plan,
             move_owner,
+            update,
         } = request.action
         else {
             panic!("not a declare");
@@ -532,6 +556,7 @@ mod tests {
         assert_eq!(approved_by.as_deref(), Some("q-1"));
         assert_eq!(plan, Some(PathBuf::from("plans/p")));
         assert!(move_owner);
+        assert!(update);
     }
 
     #[test]

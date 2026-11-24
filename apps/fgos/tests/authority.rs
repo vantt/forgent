@@ -317,6 +317,52 @@ fn authority_render_in_linked_worktree_with_dir_main_renders_the_worktree_and_le
     let _ = fs::remove_dir_all(&base);
 }
 
+#[test]
+fn authority_declare_update_changes_a_component_row_and_rerenders_the_views() {
+    let project = std::env::temp_dir().join(format!(
+        "fgos-authority-update-{}-{}",
+        std::process::id(),
+        PROJECTS.fetch_add(1, Ordering::SeqCst)
+    ));
+    let _ = fs::remove_dir_all(&project);
+    seeded_repo(&project);
+    fs::create_dir_all(project.join(".fgos")).unwrap();
+    // Updates revalidate the full row, including its existing source paths.
+    fs::create_dir_all(project.join("packages/durable-file/rust")).unwrap();
+    authority_data_in(&project, &["render"]);
+    let view_file = project.join("docs/platform/component-boundary.md");
+    let before = fs::read_to_string(&view_file).unwrap();
+    assert!(before.contains("| `durable-file` | — | kernel | 0 | live |"));
+
+    let data = authority_data_in(
+        &project,
+        &[
+            "declare",
+            "--kind",
+            "component",
+            "--update",
+            "--row",
+            r#"{"id":"durable-file","status":"designed"}"#,
+        ],
+    );
+    assert_eq!(data["declared"]["id"], "durable-file", "{data}");
+    assert_eq!(data["declared"]["row"]["status"], "designed", "{data}");
+    let written = data["views"]["written"].as_array().expect("views.written");
+    assert!(
+        written
+            .iter()
+            .any(|entry| entry["view"] == "component-boundary"),
+        "the declare must re-render component-boundary: {data}"
+    );
+
+    let after = fs::read_to_string(&view_file).unwrap();
+    assert_ne!(before, after, "the update must change the rendered view");
+    assert!(after.contains("| `durable-file` | — | kernel | 0 | designed |"));
+    let check = authority_data_in(&project, &["render", "--check"]);
+    assert_eq!(check["drift"], serde_json::json!([]), "{check}");
+    let _ = fs::remove_dir_all(&project);
+}
+
 /// A project that is not this repository: its own Git repository with an event store, a state root and a
 /// release, so `fgos questions` can ask and answer in it.
 #[cfg(target_os = "linux")]
@@ -531,6 +577,7 @@ mod project_without_a_model {
         ]);
         assert_eq!(declared["declared"]["id"], "billing", "{declared}");
         assert_eq!(declared["declared"]["createdModel"], true, "{declared}");
+        assert!(declared.get("views").is_none(), "{declared}");
         assert!(
             !scene.project().join("packages").exists(),
             "the model of another project must not land under packages/"
