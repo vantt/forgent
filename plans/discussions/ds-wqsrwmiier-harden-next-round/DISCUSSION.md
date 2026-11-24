@@ -30,8 +30,8 @@ the supervision queue only once it is settled.
   layer below closes, and the owner is asked once per layer, in a batch. RUL104 (better, not bigger). L10 and design
   principles 1 and 8: a mechanism that moves takes every caller with it, its old path and tests go in the same change,
   and no twin is left. D1 holds inside each layer. Every sub-plan carries an Authority map (doors phase 5). Work (T7)
-  goes last (D8).
-- **Non-goals:** T0, T1, T4 and T5 are not re-run; HARDEN closed them, and their Node facades go with their last caller
+  goes last (D8), and opens only after discussion `ds-ubqlutna6r` (D19) has settled and its plan has landed.
+- **Non-goals:** the domain-agnostic item component (D19, its own discussion `ds-ubqlutna6r`). T0, T1, T4 and T5 are not re-run; HARDEN closed them, and their Node facades go with their last caller
   (D1). The dead tier-5 closure belongs to `261122-2108`. No new feature (RUL104 "proposed additions" go to the owner per layer).
 - **Acceptance per phase:** the HARDEN close conditions. Before/after table on the same machine and load class; no
   High-or-above finding left unreproduced; net Δ ≤ 0 or every increase names its paying deletion; doctor and smoke green
@@ -41,6 +41,13 @@ the supervision queue only once it is settled.
 - **Sources:** `p-vwpnx4gpow`, `261021-1118` (plan, lessons, closing report §6–§7), D1, D6, D7–D9.
 
 ## 1. Trạng thái hiện tại
+
+**Round 5 (2026-11-24 09:37–09:4x). The owner moved the item-data topic out of this discussion (D19).** The domain-agnostic
+item component becomes its own discussion, `ds-ubqlutna6r` (`plans/discussions/ds-ubqlutna6r-domain-agnostic-item-component/DISCUSSION.md`), and it must come before Work: phase T7 opens only
+after that discussion is settled and its plan has landed. At the owner's order (09:4x), the details of N14 and N15 moved there
+as its premise. Only pointer rows stay here. A shaper for it, and a backlog row of its own if one is wanted, are the
+secretary's to arrange. The mailbox shows no live secretary head, so the owner passes this on to Miu. This discussion is still
+paused on O7. No owner question is open here.
 
 **Round 4 (2026-11-24 09:3x).** The owner chose N10 (a), minted D18. On N14 the owner confirmed the reading (split item
 storage into its own domain-agnostic item component, apart from Work). The owner also flagged the sensitive part: Work already
@@ -173,8 +180,8 @@ This discussion edits them in place from here on. O7, the N rows and F1 are new 
 | N11 | **T8 supervision moves up to just after T2–T3** (new order: T2–T3 → T8 → T6 → T9 → T7). The owner's rule of 2026-11-24 01:57 puts the control group (supervisor, orchestrator, operations) right after the lower layers. The Node part of supervision (`src/portfolio/plan-sections.mjs`, `packages/portfolio/*.mjs`) imports only `util` leaves, never Workflow, so nothing below it in T6 has to close first. Its council is small (N4). This amends D8. | provisional (round 2); owner may object in chat | `components.yaml` supervision row (tier 8, owns orchestration and plan lane pool); imports of `src/portfolio`, `packages/portfolio`; excerpt 01:57, 01:59 |
 | N12 | **Control-group bug rows go first, on the fast track** (`p-fel4zoytbn`, `p-kghvlvmj6s`, `p-auypprszfz`, `p-kqs6fjalvh`, `p-vwaujnak4j`, `p-gfdhojihyf`, `p-uqanurjt42`, `p-btxvtb34u3`, `p-kihregmfxm`, `p-g3btj3bpqc`, per Miu's list). They are not this skeleton's work. Phase T2–T3 takes its baseline (step 1) after they land; a row still open then is an input to its tables (D14). Miu's two speeds (a bug row runs the fix flow plus steps 1 and 6–9; a layer's structure runs the full loop) agree with N7 and need no change here. | provisional (round 2) | excerpt 01:58, 02:00; Miu's row list is unverified |
 | N13 | **Option A's named debt is an acceptance input.** 25 door rows in `packages/component-authority/model/doors/` name S6b or S7 in `retiredBy` (for example `doctor-readiness-registry`, `node-rows-bridge`, `resolve-invocation-root`, `parse-cli-arguments`, `global-fgos-directory`). Step 0 assigns each one to phase T6, T7 or T9, and the program's acceptance adds "every door row whose `retiredBy` names S6b or S7 is closed". | provisional (round 2) | `grep -lE '^retiredBy:.*\b(S7\|S6b)\b' packages/component-authority/model/doors/*.yaml` = 25; excerpt 01:50 |
-| N14 | **A domain-agnostic item-data component, apart from Work.** What already exists: D-ADR0079 and D-ADR0082 (2026-11-19) made the portfolio files under `plans/` (backlog items, discussions, plans) the source of truth, domain-agnostic. They made Work a replaceable UX layer on hold, and froze the old Work store; triage of the open Work items is its own backlog row. Owner questions and gates are already the `questions` component (tier 3, Rust). The supervision crate reads the portfolio (`portfolio.rs`, `discussion_source.rs`). **Gaps in the model:** (1) no component owns the portfolio item data. `fgos authority locate` falls back to `work-state` with a weak match, and supervision owns only "portfolio status and plan lane pool"; (2) `packages/portfolio/*.mjs` (item parsing, backlog index, check) is in no component's `paths`; (3) `work-state` still owns "questions, human gates" while `questions` owns "owner question shape" and "workflow gates", so two components own one job. What stays inside Work: work-item lifecycle (`tsk-` ids, stage, claim and return), its events, and `src/intake` (classification, risk keywords; the keywords are coding-specific). **Proposal:** declare one item-data component (items, ids, statuses, links, one write door, one check, per D-ADR0082), with domain-agnostic triage in it and domain rules left in `domains/`. Its boundary is settled in phase T8's council (D17 moves T8 forward), because supervision and the secretary are its main users. Phase T7 then opens with "keep, shrink or delete Work". A new component needs the owner's answer (`fgos authority declare`). | provisional (round 3) | `plans/discussions/ds-an5r4pyyto-work-data-model/DISCUSSION.md` §2, §3 row 7, D-ADR0082; `components.yaml` rows work-state, questions, supervision; `fgos authority locate` 2026-11-24 |
-| N15 | **The sensitive part: two item models and Work's mapping layer.** Today there are two item stores. (1) Portfolio (D-ADR0082, live): `p-` item files with `id, title, status, priority, area, created`, five statuses (`proposed, parked, in-flight, done, dropped`), plus discussions (`open, paused, settled`) and plans (`draft, ready, running, done, withdrawn`). It has no domain and no step. (2) Work (on hold, store frozen): `tsk-` items with about 26 fields, Event Store truth, and a fixed 10-status base FSM (`fsm.mjs`; no domain may change an edge, and the four tail statuses are shared). On top of that sits the **mapping layer that keeps Work domain-agnostic**. Each domain declares its steps and maps each one onto one of the five base-workflow steps (Init, Clarify, Decompose, Execute, Compound), along with its transitions, a skill per step, `worktreeBacked`, category labels for its head statuses, and valid `kind` and `risk` values. The core never reads a domain's step names; the engines ask the registry "which step of this domain is Clarify". Part of this layer has already moved: an item carries `workflowStep` instead of `stage`, and the steps, transitions and aliases live in Workflow definitions (`domains/<domain>/workflows/*.yaml`, `src/workflow/definition.mjs`), read through `src/state/domain-registry.mjs`. **Proposed direction for N14:** one item model, not two (one door). It starts from the portfolio model, since D-ADR0082 made it the truth and froze Work's store. It takes from Work only the fields a council proves are needed (for example status category, parent and deps, refs). The item component stores the step only as an opaque reference and never interprets it. Workflow owns step meaning and the mapping onto base steps, and `domains/` owns labels and value sets. Where the base status FSM belongs (item component or Workflow) is the T8 council's question, together with the boundary (D14). | provisional (round 4) | `docs/platform/work-state/spec.md` §3 row 4, §5 "Workflow Step Replaces Stage", §6 Domain Model; `packages/portfolio/contracts/portfolio-vocabulary.v1.json`; D-ADR0082; decision 78 frame (§6 Shape) |
+| N14 | A domain-agnostic item-data component, apart from Work. | moved out (D19) | details and evidence now in `plans/discussions/ds-ubqlutna6r-domain-agnostic-item-component/DISCUSSION.md` §3 row I1 |
+| N15 | The sensitive part: two item models and Work's mapping layer. | moved out (D19) | details and evidence now in `plans/discussions/ds-ubqlutna6r-domain-agnostic-item-component/DISCUSSION.md` §3 row I2 |
 | F1 | Model tiers today: T2 `git`, `terminal-control`, `session-rotation`; T3 `session-host`; T5 `seat-binding`, `execution-core`, `dispatch-transport`; T6 `workflow`, `work-driver`; T7 `work-state`, `runner`; T8 `supervision`; T9 `packaging-distribution`, `host-surface`, `learning-docs-registry`. The model is YAML now (doors 1b has landed). | clear | `packages/component-authority/model/components.yaml`, `layers.yaml` |
 
 ## 4. Quyết định đã chốt
@@ -196,6 +203,7 @@ Copied from ds-wham5txfkv §4. They are owner decisions made there and are not r
 | D15 | The one-door check is system-wide: step 0 builds one job → doors map over the whole repo on the component-authority model, every council reads it, each layer close refreshes it; a job the model lacks goes to the model's owner first. This is why doors goes first. | owner answer | N9; chat 19:4x, 19:5x |
 | D17 | Order of phases: T2–T3 → T8 supervision → T6 Workflow → T9 → T7 Work last. Supervision has no code dependency on Workflow, and the owner's rule of 2026-11-24 puts the control group right after the lower layers. Amends D8. | owner answer | N11; chat 09:2x "N11 đồng ý (a)" |
 | D18 | Program steps S6b and S7 of `261114-2051` are phases T6 and T7 of this skeleton, with one owner. Workflow and Work stay separate phases, and Work stays last; phase T7 opens with keep, shrink or delete Work. The secretary or a planner points the program rows here. | owner answer | N10; chat 09:31 "N10 chọn (a)" |
+| D19 | The domain-agnostic item component (items, fields, statuses, a step reference, triage; split from Work) is shaped in its own discussion, `ds-ubqlutna6r`, not here. It must come before Work: phase T7 opens only after that discussion is settled and its plan has landed. N14 and N15 moved there as its premise. | owner answer | chat 09:37 "thôi tách việc này thành 1 discussion riêng phải làm trước Work"; 09:4x "move các chi tiết liên quan làm tiền đề cho thảo luận đó" |
 | D16 | Appendix A of ds-wham5txfkv (`97a1fba58`) is history; this discussion is the source of truth for "HARDEN next round". | owner answer | chat 19:23 |
 
 ## 5. Q&A log
@@ -250,6 +258,10 @@ Copied from ds-wham5txfkv §4. They are owner decisions made there and are not r
   một component quản lý item riêng, domain agnostic và tách khỏi Work ? trước đây cụm dữ liệu này có một chổ khác nhạy cảm là nó
   đã tổ chức lưu trứ field/properties/status/stage và phương pháp mapping gì đó để domain agnostic." N10 minted D18. Scouted the
   work-state spec (§3, §5, §6) and the portfolio vocabulary contract, giving N15.
+- **2026-11-24 09:37 — owner:** "thôi tách việc này thành 1 discussion riêng phải làm trước Work." Minted D19; phase T7 waits for it.
+- **2026-11-24 09:4x — owner:** "move các chi tiết liên quan làm tiền đề cho thảo luận đó". Opened `plans/discussions/ds-ubqlutna6r-domain-agnostic-item-component/DISCUSSION.md` with N14 and N15
+  (now its I1 and I2) as its premise; pointer rows stay here. The mailbox showed no live secretary head, so the hand-over goes
+  through the owner.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -270,9 +282,10 @@ a flexible storage core, plus the human touch points of lifecycle, gate and ques
 flowchart BT
   pre["Before: doors (D6) + dead closure 261122-2108"] --> s0["Step 0: recount §6 on that tree"]
   s0 --> T23["Phase T2-T3 session: session-rotation, session-host"]
-  T23 --> T8["Phase T8 supervision (+ item-data boundary, N14)"]
+  T23 --> T8["Phase T8 supervision"]
   T8 --> T6["Phase T6 Workflow = program step S6b"]
   T6 --> T9["Phase T9 host + surface + packaging + report"]
+  item["Item-data discussion ds-ubqlutna6r and its plan (D19)"] --> T7
   T9 --> T7["Phase T7 Work = S7: decision 78 council (keep, shrink or delete), after the packaging release"]
   subgraph loop["Each phase: HARDEN loop"]
     a[1 baseline] --> b[2 council: boundary first, then inside that must change] --> c[3 arbitrate + one owner ask] --> d[4 sub-plan] --> e[5-6 implement + verify] --> f[7 land + activate] --> g[8 re-measure] --> h[9 close: net ≤ 0]
@@ -341,7 +354,7 @@ and 14; H6; the main-checkout delete guard (`src/git/main-checkout-delete-guard.
 without waiting; the sub-plan waits for `261122-0118` and `261123-0828` to land (N2, O2).
 
 ### Phase T8 — supervision {#task-t8-supervision}
-Components: supervision (`src/portfolio`, `packages/portfolio/*.mjs`). Inputs: §6 row 21; C5 (stale tier name); N14 (the item-data boundary and its gaps). Placed second by D17.
+Components: supervision (`src/portfolio`, `packages/portfolio/*.mjs`). Inputs: §6 row 21; C5 (stale tier name). Placed second by D17.
 
 ### Phase T6 — Workflow {#task-t6-workflow}
 Components: workflow, work-driver; the seat-binding client and the dispatch/execution live rest reached from
@@ -354,7 +367,7 @@ Components: host-surface (non-Work arms), packaging-distribution, learning-docs-
 only after T7.
 
 ### Phase T7 — Work, last {#task-t7-work}
-Components: work-state, runner (tier 7), the domain components, the Work arms of host-surface. It opens with the decision 78
-council, after the packaging release (option B), under the owner's frame. Inputs: §6 rows 11, 12, 17, 18, 19 (Work
+Components: work-state, runner (tier 7), the domain components, the Work arms of host-surface. It opens only after discussion `ds-ubqlutna6r` (D19) has settled and its plan has landed, then
+starts with the decision 78 council, after the packaging release (option B), under the owner's frame. Inputs: §6 rows 11, 12, 17, 18, 19 (Work
 arms); H4 WORK ledger rows; the doctor debt 2f handed over by doors (D6). Closing this phase removes the last `legacy-cli`
 route and the `legacy-node` payload.
