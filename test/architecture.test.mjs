@@ -2108,10 +2108,10 @@ test('door check: the init steps live in init.rs only: a second composition unde
   assert.deepEqual(row.allowed.map((e) => e.path ?? e), ['apps/fgos/src/wiring/init.rs']);
   for (const text of ['const WORK_STORE_NOTE: &str = "x";\n', 'pub const GLOBAL_MOVED_NOTE: &str = "x";\n', 'pub fn run(steps: &dyn Steps) {}\n']) {
     const owner = ['apps/fgos/src/wiring/init.rs', text];
-    assert.equal(checkDoors([row], new Map([owner, ['apps/fgos/src/wiring/other.rs', text]])).length, 1, text);
-    assert.deepEqual(checkDoors([row], new Map([owner])), [], text);
+    assert.equal(checkDoors([withoutCounts(row)], new Map([owner, ['apps/fgos/src/wiring/other.rs', text]])).length, 1, text);
+    assert.deepEqual(checkDoors([withoutCounts(row)], new Map([owner])), [], text);
   }
-  assert.deepEqual(checkDoors([row], new Map([['apps/fgos/src/wiring/init.rs', 'const WORK_STORE_NOTE: &str = "x";\n'], ['apps/fgos/src/wiring/other.rs', '// the WORK_STORE_NOTE is init.rs\n']])), []);
+  assert.deepEqual(checkDoors([withoutCounts(row)], new Map([['apps/fgos/src/wiring/init.rs', 'const WORK_STORE_NOTE: &str = "x";\n'], ['apps/fgos/src/wiring/other.rs', '// the WORK_STORE_NOTE is init.rs\n']])), []);
 });
 
 test('door check: every name of the retired Node Git and Event Store doctor rows fails when a file declares it again', () => {
