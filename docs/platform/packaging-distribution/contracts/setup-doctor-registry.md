@@ -61,7 +61,7 @@ The registries are independent. A module may register only a check, only a fix, 
 - should tell the user what command or fix path applies when a check fails;
 - answers readiness only. A live incident is read and repaired through its component's own verb; doctor keeps at most one read-only pointer row for it (below).
 
-`--fix` runs readiness fixes only: no registered fix repairs an incident.
+`--fix` runs readiness fixes only: no registered fix repairs an incident. `--fix --only <fix-id>` (repeatable) runs just the named fixes and then judges only the rows the named fixes repair (each fix's `repairs`, group-expanded; for a hook fix that is its own id), so `checks`, `ok`, `--strict` and `next` follow from those rows and an owner none of them belongs to is never called; without `--only` every row is judged.
 
 ### Pointer rows
 

@@ -89,7 +89,7 @@ pub struct DoctorRequest {
     /// The project: the main checkout the root door resolved (`--dir` when named).
     pub root: PathBuf,
     pub fix: bool,
-    /// `--only <fix-id>` (repeatable): with `--fix`, run just these fixes. Empty runs every fix.
+    /// `--only <fix-id>` (repeatable): with `--fix`, run just these fixes and judge just the rows the named fixes repair. Empty runs every fix and judges every row.
     pub only: Vec<String>,
     pub strict: bool,
     pub pretty: bool,
