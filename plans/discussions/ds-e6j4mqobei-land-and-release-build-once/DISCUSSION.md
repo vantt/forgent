@@ -52,6 +52,10 @@ chỉ tiện cho repo này.
 - 2026-11-24 09:33, owner: "ok".
 - 2026-11-24 09:40, lead: đo thêm V1 (bước sinh lại biên dịch 6-7 phút; mỗi lần thử lại làm lại tất cả). Giao một agent đọc nguyên nhân CI đỏ (V4).
 - 2026-11-24 09:50, lead: kết quả CI (V4); sửa lỗi của chính plan locate trong job audit (`58275b870`); vòng 2 so hướng với thước đo (§6).
+- 2026-11-24 10:55, lead: số đo N2 thực tế. Lần land phase 6 của plan locate (load 3,3, không sccache) hỏng
+  `land-retries-exhausted`: "the remote moved on every one of 4 attempts". origin/main nhận 50 commit trong 2 giờ
+  trước đó (khoảng 2,4 phút một commit), ngắn hơn thời gian một lần thử (sinh lại 6-7 phút cộng cổng), nên khi main
+  đông một nhánh có đổi Rust gần như không thể land. Đây là hỏng vì thiết kế thử lại, không phải vì cache hay timeout.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -75,6 +79,7 @@ Nguyên nhân gốc, xếp theo cỡ:
 | **D. Cổng land không dùng sccache** sau khi có C | N4 cho land | không hỏng vì cache | nhỏ; cấu hình máy dùng chung không đổi, chỉ đặt `RUSTC_WRAPPER=` trong môi trường cổng |
 | **E. CI build release, máy tải về** (H4) | N5 | không máy nào build release | lớn và nhiều chủ: 5 nguyên nhân CI đỏ thuộc khu khác; Windows chạm trần 45 phút; gắn tag tự động; luồng release của forgentx-38 đổi sang `fgctl upgrade` |
 | **F. git-timeout dưới tải** (H6, p-7ww4jlg745) | V5 | không hỏng vì timeout | chẩn đoán trước |
+| **G. Thử lại không làm lại mọi thứ** (thêm 10:55, sau lần hỏng `land-retries-exhausted`): khi main nhích lên trong lúc chạy cổng, lần thử sau chỉ chạy lại phần cổng mà commit mới của main có thể ảnh hưởng (ví dụ main mới không đổi đầu vào Rust thì không sinh lại, không biên dịch lại) | N2 | land được cả khi main nhận một commit mỗi 2-3 phút | trung bình; cần quy tắc "commit mới chạm gì thì cổng nào chạy lại" đủ chặt để không bỏ sót; dùng chung băm đầu vào với B |
 | H5. Cache dùng chung từ xa | — | — | chưa cần nếu B và C đủ |
 
 Hướng lead đề xuất (chưa chốt): A trước (nhỏ, để có số thật), rồi B và C cho land, D đi kèm C; E chạy song song
