@@ -8,7 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { parseEtime, parsePs, treeOf, findOverdue, reapRunDirs } from '../../scripts/lib/test-file-watchdog.mjs';
-import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runChosenTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, LIVE_FGOS_DIRS, leftoverTempPrefixes, describeLeftoverTemps, strayFgosAbove } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runChosenTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, leftoverTempPrefixes, describeLeftoverTemps, strayFgosAbove } from '../../scripts/run-tests.mjs';
 import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 function tmpFixtureRoot() {
@@ -1265,15 +1265,7 @@ for (const signal of ['SIGTERM', 'SIGINT', 'SIGHUP']) {
     const dirsFile = path.join(root, 'dirs.json');
     const runnerPidFile = path.join(root, 'runner.pid');
     // A live run's dir that this gate does not own: it must survive.
-    const neighbourParent = (() => {
-      try {
-        fs.accessSync('/var/tmp', fs.constants.W_OK);
-        return '/var/tmp';
-      } catch {
-        return os.tmpdir();
-      }
-    })();
-    const neighbour = fs.mkdtempSync(path.join(neighbourParent, 'fgos-test-fixtures-'));
+    const neighbour = fs.mkdtempSync('/var/tmp/fgos-test-fixtures-');
     const alive = (pid) => { try { process.kill(pid, 0); return true; } catch { return false; } };
     let gatePid;
     t.after(() => {
