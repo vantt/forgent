@@ -150,24 +150,28 @@ fn a_ready_index_answers_with_repository_paths_axes_and_the_region_flag() {
         "a call with two parts carries a group hint"
     );
 
-    // A history document is never a candidate, even for a draft that only it matches.
-    let past = locate(
-        || &locator,
-        &NoStart(&p),
-        &query(
+    // A history document, or a reference note about another project, is never a candidate, even for a draft that
+    // only it matches.
+    for (draft, folder) in [
+        (
             "the runner once polled the backlog with a background watch daemon every minute",
-            &[],
+            "/history/",
         ),
-    )
-    .unwrap();
-    assert!(
-        past.parts[0]
-            .candidates
-            .iter()
-            .all(|c| !c.path.contains("/history/")),
-        "{:?}",
-        past.parts[0].candidates
-    );
+        (
+            "the other project's pollers read a queue of chores in the greenhouse every hour",
+            "docs/distillery/",
+        ),
+    ] {
+        let answer = locate(|| &locator, &NoStart(&p), &query(draft, &[])).unwrap();
+        assert!(
+            answer.parts[0]
+                .candidates
+                .iter()
+                .all(|c| !c.path.contains(folder)),
+            "{folder}: {:?}",
+            answer.parts[0].candidates
+        );
+    }
 
     // A gold set written in repository paths is measured on vault paths and reported back in repository paths.
     let measured = locator

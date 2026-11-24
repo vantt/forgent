@@ -52,9 +52,30 @@ The two recall misses of the baseline (`vi-en-10`, `vi-en-13`) are unchanged in 
 ## 5. What follows
 
 1. **pkm:** the search worker should index only the profile's vault scope (`include`/`exclude`). Until it does, every fgOS install embeds its history for nothing (about 19,000 extra chunks and 16 minutes on this corpus) and history still crowds answers.
-2. **Corpus scope:** whether `docs/distillery/` belongs in locate's corpus is a scope decision; its reports describe other projects, and three of today's misses come from it.
+2. **Corpus scope:** `docs/distillery/` describes other projects; three of today's misses come from it (decided in section 6).
 3. **Gate:** the gold set was cut on the 2026-11-12 snapshot; a regression gate that must stay repeatable needs a pinned corpus (run B's recipe) next to the live-corpus figure.
 
-## 6. Unresolved
+## 6. Owner decisions (2026-11-24)
 
-- Owner decision on the gate and on distillery's place in the corpus (asked 2026-11-24).
+- The gate runs on the pinned 2026-11-12 corpus (run B); the live-corpus figure is reported, not gated.
+- `docs/distillery/` leaves locate's corpus with the `past-state` folders (rendered profile, document-identity spec 5.4).
+- The pkm worker's scope bug is filed as [vantt/pkm#2](https://github.com/vantt/pkm/issues/2).
+
+## 7. Rerunning the gate
+
+From a checkout with a built host (`W` is the checkout, `S` a scratch folder):
+
+```sh
+mkdir -p "$S/raw" "$S/proj/docs" "$S/proj/.fgos"
+git -C "$W" archive 977e3f9e97ededecc52fa78f3b4ba66babe572e7 docs | tar -x -C "$S/raw"
+(cd "$S/raw/docs" && find platform knowledge explanation how-to tutorials reference -name '*.md' \
+   | grep -v '/history/\|/verification/' > "$S/list.txt" && rsync -a --files-from="$S/list.txt" . "$S/proj/docs/")
+cd "$S/proj" && git init -q .
+G="$W/docs/platform/documentation/subcomponents/document-identity/verification/recall"
+fgos doc index status --wait 1800 --json     # repeat until state is ready
+fgos doc locate --eval "$G/locate-gold-vi-en.yaml" --json
+fgos doc locate --eval "$G/locate-gold-short.yaml" --json
+fgos doc index stop
+```
+
+692 documents; expect 91.7% / 95.8% and 67.0% / 92.0%.
