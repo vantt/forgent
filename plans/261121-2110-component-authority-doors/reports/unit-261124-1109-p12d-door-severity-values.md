@@ -5,6 +5,12 @@ Judged by unit `unit-run-1795493026528-cf454d7b` (commit 9a3b667d0 on branch `co
 ## Reasons for high and medium, from the unit
 High: checkout-make-provision-remove (Node repo-locks/unit-handoff/merge/git-ports copies make or remove checkouts beside the crate), resolve-invocation-root (mailbox_root.rs, host-bin-path.mjs, worktree.mjs decide a root separately), list-run-directories (adopt_scan.rs and run-result lister can disagree with the engine layout), footprint-write-scope-overlap-rule (live JS port in dispatch/write-scope.mjs beside the Rust rule), installation-shim-location (herdr fgos.rs builds the shim path itself). Medium: global-fgos-directory (Node facade asks the addon; state_root.rs HOME rule is named debt), no-node-from-native-packaging (init.rs Node version ask), doctor-readiness-registry (Node row bodies keyed by id), kernel-lock-primitive (single_load.rs own kernel lock), run-bounded-child (three bounded spawns outside spawn.rs), process-control-signal and process-facts-proc (frozen mailbox-live-confined.mjs measurement module). Rows judged low with debt: decide-a-dispatch, derive-executor-facts, tool-lookup-by-capability (twins reached only by the dead Node Execution closure).
 
+## Lead correction after review
+
+`skill-generated-stamp` is `high`, not `low`. Its Node twin `ownedSkillNames` in `src/setup/skill-wrappers.mjs` is live:
+`src/setup/registrations.mjs` calls it during setup, and it decides the owned skill names, which can disagree with
+`skill_stamp.rs`. That makes 6 high, 7 medium and 70 low.
+
 ## Values
 
 | Door row file | severity |
@@ -77,7 +83,7 @@ High: checkout-make-provision-remove (Node repo-locks/unit-handoff/merge/git-por
 | `run-a-unit.yaml` | low |
 | `run-bounded-child.yaml` | medium |
 | `shell-rc-fgos-lines.yaml` | low |
-| `skill-generated-stamp.yaml` | low |
+| `skill-generated-stamp.yaml` | high |
 | `start-a-detached-event-store-child.yaml` | low |
 | `take-a-holder-lock-from-node.yaml` | low |
 | `temp-file-name-of-a-node-write-then-rename.yaml` | low |

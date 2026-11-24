@@ -14,8 +14,8 @@ A release that carries phase 12d's crate change, staged and activated in the mai
 `fgos authority model --json` loads a door row that has `severity: low`.
 
 ## Inputs
-- `reports/unit-261124-1109-p12d-door-severity-values.md`: the value for each of the 83 rows (5 high, 7 medium,
-  71 low) and the reasons for high and medium.
+- `reports/unit-261124-1109-p12d-door-severity-values.md`: the value for each of the 83 rows (6 high, 7 medium,
+  70 low, after the lead's correction) and the reasons for high and medium.
 - A row added or changed since then gets its value from the N18 rules in that report's header.
 
 ## Files it may write
@@ -26,7 +26,9 @@ packages/component-authority/rust/, docs/platform/component-authority/spec.md
 1. Write `severity: <value>` right after `kind` in every door row, from the report.
 2. Make `severity` required: add it to `required` in the door schema of `model.v1.json`, make the `Door` field
    non-optional in `model.rs`, and move it to the required list in `tests/model_checks.rs`.
-3. In `docs/platform/component-authority/spec.md`, say that the field is required, and append to the 12d
+3. Return `severity` from `fgos authority locate` for a door match: add it to `Match` in
+   `packages/component-authority/rust/src/locate.rs`, omitted when the row has none, and assert it in that file's tests.
+4. In `docs/platform/component-authority/spec.md`, say that the field is required, and append to the 12d
    decision-history line.
 
 ## Verify
