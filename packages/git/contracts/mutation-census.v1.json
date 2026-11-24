@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1f797f5b84d04669ceaece61a8c3ab05bc7b8167572a3fc183016909e3ea9dbc",
+  "payloadDigest": "84851a584db46cb9e48229bdcd6cf5e0f536d7b71adc726ba0aad0c40fa15dab",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1441,7 +1441,7 @@
     "scripts/regenerate-observe-fixtures.mjs": "582d85470927ceb64440c2cbb8da86c837ef942b8eba035a0c1039ae5d516e7d",
     "scripts/run-rust-dev-host.mjs": "4f2e65268fe8302d51e43be84d9d00a022595c7143275bde6b045dd7f367de35",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "5503e683e73f8f6ffeeb65974da232eb4fa690745d137d11f1a4d2612a6ae11a",
+    "scripts/run-tests.mjs": "adf38410f3d2a00dc0583b729786f2ff8865cd2b14089b389fc85623fa60ad92",
     "scripts/stress-test-files.mjs": "1c9298587bae21b5971c2e1eba5effd3c2a0c85ba94372936fa5e0c1d70d4f4e",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
     "scripts/test-proof-inventory.mjs": "fb8d24de073f628cd1cea540af8d39b55ec55d4199543ddf9cb062941a243e70",
