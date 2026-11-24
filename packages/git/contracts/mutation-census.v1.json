@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a3d978260dcd5097a92b55203853ebeb67a77d5ec37b2b7cf62048d9f9ed3ff7",
+  "payloadDigest": "b5ac91d8fcee0a5d9bdf7c91fa0f3ca3aa5116799d0e14c18db0c2ceae5415a0",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -101,7 +101,7 @@
     "apps/fgos/src/routing.rs": "3afe1c4e856efab35b0d4d867eda39f05f52455f3cea8c7da44fad8570c51fea",
     "apps/fgos/src/wiring/agents.rs": "d40cd43facea6c5d1e5a7b3363b8e69567f3ad7aa33b628eb269c935a88f06e4",
     "apps/fgos/src/wiring/attempt_step.rs": "5dade9079e7e99ca3f9bc2cf18d226583f96be2bf6cc590398ac93fded4b141f",
-    "apps/fgos/src/wiring/authority.rs": "c17ee07e0278057b333c518e7265b30fd50d43721472bfc55df62f2ea4a21298",
+    "apps/fgos/src/wiring/authority.rs": "3f92bd22a225c8c1c57ac3ad40fae7b9328fce8897ee1ba0c2f3dffbe55e07a0",
     "apps/fgos/src/wiring/dispatch_decide.rs": "ec4cb3297b19bf0bc17e23a8c81b8a3a08bc12938ad3290ac58e42ceba8023d8",
     "apps/fgos/src/wiring/dispatch_subs.rs": "b78b49e4cec08080e575c452dba231cf2cdd0e49a8c01752ad3888e703c5ef9c",
     "apps/fgos/src/wiring/dispatch_subs/inspect.rs": "836869d09596d6379195ea4ba643e02e6b058b95499149e471eb3debdf2cf9b7",
@@ -315,7 +315,7 @@
     "packages/agent-protocol/rust/tests/direct_vectors.rs": "46795640958ad1107609cc05c9c19fe6d26721dd45b11891000d51b0f6ab5e9d",
     "packages/agent-protocol/rust/tests/terminal_vectors.rs": "7ed4e55299dfa80d204c94783cddf6270494abf601b74d3ba2532d28f29b3644",
     "packages/canonical-json/rust/src/lib.rs": "e390b41a00319d727bd0f0d44ad7f6fda85218a53bae914186699f91a27b7944",
-    "packages/component-authority/rust/src/declare.rs": "423d8c1fd068158cfae651f72c3c424a7d432afc928075981352deb219a69ead",
+    "packages/component-authority/rust/src/declare.rs": "e6bc8fe36ac2a84eec8a422cc8ffc89663889d4a11d3c625b1c0b6ef0948194f",
     "packages/component-authority/rust/src/lib.rs": "d94aebb3e459ae082513ca70d2d4022d7b2c4cba128777eb55693b79bc73a18c",
     "packages/component-authority/rust/src/locate.rs": "a9712698c1c7468e3e9a667e479d15671119ccf3a9da12a88e198eb997db77e7",
     "packages/component-authority/rust/src/model.rs": "cf3e26ea844ad5ce19e92e606e14fd0fb2d14a0c0d4c77300a317a53dd0d80df",

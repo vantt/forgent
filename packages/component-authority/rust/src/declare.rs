@@ -173,6 +173,8 @@ pub struct DeclareRequest<'a> {
     pub plan: Option<&'a Path>,
     /// Moves the owner of an existing decision kind: the row carries only `id` and the new `owner`.
     pub move_owner: bool,
+    /// Updates an existing component row; the row carries `id` and the fields to change, and each given field replaces the row's field.
+    pub update: bool,
 }
 
 /// What a successful declare wrote.
@@ -205,6 +207,18 @@ pub fn declare(
     } else {
         empty_model()
     };
+    if request.update && request.move_owner {
+        return Err(Refusal::new(
+            "update-unsupported",
+            "--update and --move cannot be used together",
+        ));
+    }
+    if request.update && request.kind != Kind::Component {
+        return Err(Refusal::new(
+            "update-unsupported",
+            "--update applies to component rows only",
+        ));
+    }
     if request.move_owner && request.kind != Kind::DecisionKind {
         return Err(Refusal::new(
             "move-unsupported",
@@ -213,6 +227,8 @@ pub fn declare(
     }
     let planned = if request.move_owner {
         plan_move(&model, dir, root, request, present)?
+    } else if request.update {
+        plan_component_update(&model, dir, root, request.row, present)?
     } else {
         match request.kind {
             Kind::Component => plan_component(&model, dir, root, request.row, present)?,
@@ -221,7 +237,10 @@ pub fn declare(
             Kind::Contract => plan_contract(&model, dir, root, request.row, present)?,
         }
     };
-    if matches!(request.kind, Kind::Component | Kind::DecisionKind) && !request.move_owner {
+    if matches!(request.kind, Kind::Component | Kind::DecisionKind)
+        && !request.move_owner
+        && !request.update
+    {
         require_answered(approvals, request.approved_by)?;
     }
     let mut writes = Vec::new();
@@ -551,14 +570,7 @@ fn list_planned(
     })
 }
 
-fn plan_component(
-    model: &Model,
-    dir: &Path,
-    root: &Path,
-    row: &serde_json::Value,
-    present: bool,
-) -> Result<Planned, Refusal> {
-    let component: Component = decode(row)?;
+fn check_component(model: &Model, root: &Path, component: &Component) -> Result<(), Refusal> {
     if !is_id(&component.id) {
         return Err(invalid(format!(
             "id \"{}\" does not match {ID_PATTERN}",
@@ -583,12 +595,6 @@ fn plan_component(
             one_of("exception layer", layer, LAYER_NAMES)?;
         }
     }
-    if component_exists(model, &component.id) {
-        return Err(Refusal::new(
-            "id-taken",
-            format!("component \"{}\" already exists", component.id),
-        ));
-    }
     require_new_names(model, &component.canonical, &component.aliases)?;
     if let Some(parent) = &component.parent {
         require_component(model, "parent", parent)?;
@@ -604,6 +610,24 @@ fn plan_component(
             .iter()
             .map(|exception| exception.path.as_str()),
     )?;
+    Ok(())
+}
+
+fn plan_component(
+    model: &Model,
+    dir: &Path,
+    root: &Path,
+    row: &serde_json::Value,
+    present: bool,
+) -> Result<Planned, Refusal> {
+    let component: Component = decode(row)?;
+    if component_exists(model, &component.id) {
+        return Err(Refusal::new(
+            "id-taken",
+            format!("component \"{}\" already exists", component.id),
+        ));
+    }
+    check_component(model, root, &component)?;
     list_planned(
         dir,
         present,
@@ -612,6 +636,153 @@ fn plan_component(
         row.clone(),
         ordered(row, COMPONENT_ORDER),
     )
+}
+
+fn plan_component_update(
+    model: &Model,
+    dir: &Path,
+    root: &Path,
+    row: &serde_json::Value,
+    present: bool,
+) -> Result<Planned, Refusal> {
+    let object = row
+        .as_object()
+        .ok_or_else(|| invalid("an update row is an object"))?;
+    let id = object
+        .get("id")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| invalid("an update row names its component in a string field \"id\""))?;
+    let index = present
+        .then(|| {
+            model
+                .components
+                .iter()
+                .position(|component| component.id == id)
+        })
+        .flatten()
+        .ok_or_else(|| {
+            Refusal::new(
+                "reference-missing",
+                format!("component \"{id}\" is not in the model"),
+            )
+        })?;
+    let current = &model.components[index];
+
+    if let Some(parent_val) = object.get("parent") {
+        let requested_parent: Option<&str> = match parent_val {
+            serde_json::Value::Null => None,
+            serde_json::Value::String(s) => Some(s.as_str()),
+            _ => return Err(invalid("parent is a string or null")),
+        };
+        if requested_parent != current.parent.as_deref() {
+            return Err(Refusal::new(
+                "update-changes-parent",
+                "changing a component's parent is an owner question",
+            ));
+        }
+    }
+
+    let mut merged = serde_json::to_value(current).map_err(|error| invalid(error.to_string()))?;
+    let merged_object = merged
+        .as_object_mut()
+        .ok_or_else(|| invalid("merged component is not an object"))?;
+    for (key, value) in object {
+        if !COMPONENT_ORDER.contains(&key.as_str()) {
+            return Err(invalid(format!("unknown field \"{key}\"")));
+        }
+        if value.is_null() {
+            merged_object.remove(key);
+        } else {
+            merged_object.insert(key.clone(), value.clone());
+        }
+    }
+    let merged_component: Component = decode(&merged)?;
+
+    let mut model_without = model.clone();
+    model_without.components.remove(index);
+    check_component(&model_without, root, &merged_component)?;
+
+    let clean_merged =
+        serde_json::to_value(&merged_component).map_err(|e| invalid(e.to_string()))?;
+
+    let text = current_text(dir, COMPONENTS, present)?;
+    let mut document = parse(text.as_bytes(), Profile::Tool, COMPONENTS)
+        .map_err(|r| refused_yaml(COMPONENTS, r))?;
+    let old = match document.value() {
+        Value::Seq(rows) => rows.clone(),
+        _ => return Err(refused_yaml(COMPONENTS, "the model file is not a list")),
+    };
+
+    for (field, val) in object {
+        if field == "id" {
+            continue;
+        }
+        if val.is_null() {
+            let key_exists = match document.value() {
+                Value::Seq(rows) => match rows.get(index) {
+                    Some(Value::Map(entries)) => entries.iter().any(|(k, _)| k == field),
+                    _ => false,
+                },
+                _ => false,
+            };
+            if key_exists {
+                document
+                    .remove(
+                        &[Segment::Index(index), Segment::Key(field.clone())],
+                        CommentLoss::Refuse,
+                    )
+                    .map_err(|r| refused_yaml(COMPONENTS, r))?;
+            }
+        } else {
+            let yaml_val = Value::from_json(val);
+            document
+                .set(
+                    &[Segment::Index(index), Segment::Key(field.clone())],
+                    yaml_val,
+                    CommentLoss::Refuse,
+                )
+                .map_err(|r| refused_yaml(COMPONENTS, r))?;
+        }
+    }
+
+    let bytes = document.to_bytes();
+    let after =
+        parse(&bytes, Profile::Tool, COMPONENTS).map_err(|r| refused_yaml(COMPONENTS, r))?;
+    let new_rows = match after.value() {
+        Value::Seq(rows) => rows,
+        _ => return Err(refused_yaml(COMPONENTS, "the updated file is not a list")),
+    };
+    if new_rows.len() != old.len()
+        || new_rows
+            .iter()
+            .enumerate()
+            .any(|(i, row)| i != index && row != &old[i])
+    {
+        return Err(refused_yaml(
+            COMPONENTS,
+            "the updated file does not match the expected rows",
+        ));
+    }
+
+    let decoded: Component =
+        decode(&new_rows[index].to_json()).map_err(|r| refused_yaml(COMPONENTS, r))?;
+    if serde_json::to_value(&decoded).map_err(|e| invalid(e.to_string()))? != clean_merged {
+        return Err(refused_yaml(
+            COMPONENTS,
+            "the updated row does not match the merged component",
+        ));
+    }
+
+    Ok(Planned {
+        id: id.to_owned(),
+        row: clean_merged,
+        target: COMPONENTS.to_owned(),
+        write: FileWrite {
+            dir: dir.to_path_buf(),
+            name: COMPONENTS.to_owned(),
+            bytes,
+        },
+    })
 }
 
 fn check_facts(facts: &serde_json::Value) -> Result<(), Refusal> {
@@ -1014,6 +1185,7 @@ mod tests {
                 approved_by: approved,
                 plan: None,
                 move_owner: false,
+                update: false,
             },
             &ANSWERED,
         )
@@ -1079,6 +1251,7 @@ mod tests {
                 approved_by: Some("q-1"),
                 plan: None,
                 move_owner: false,
+                update: false,
             },
             &Answer(QuestionState::Open),
         );
@@ -1092,6 +1265,7 @@ mod tests {
                 approved_by: Some("q-1"),
                 plan: None,
                 move_owner: false,
+                update: false,
             },
             &Answer(QuestionState::Unknown),
         );
@@ -1218,6 +1392,7 @@ mod tests {
             approved_by: None,
             plan,
             move_owner: true,
+            update: false,
         };
         let refused = declare(&model, &root, &request(None), &ANSWERED).unwrap_err();
         assert_eq!(refused.code, "move-needs-plan");
@@ -1378,5 +1553,317 @@ mod tests {
             "reference-missing"
         );
         assert!(!model.exists());
+    }
+
+    #[test]
+    fn an_update_changes_paths_owns_and_status_of_an_existing_row() {
+        let (root, model) = project("update-fields");
+        write(&root, "docs/c.md", "# c\n");
+        let update_row = json!({
+            "id": "a",
+            "paths": ["src/a/", "docs/c.md"],
+            "owns": ["governance"],
+            "status": "planned"
+        });
+        let declared = declare(
+            &model,
+            &root,
+            &DeclareRequest {
+                kind: Kind::Component,
+                row: &update_row,
+                approved_by: None,
+                plan: None,
+                move_owner: false,
+                update: true,
+            },
+            &ANSWERED,
+        )
+        .unwrap();
+        assert_eq!(declared.id, "a");
+        assert!(!declared.created_model);
+        let loaded = Model::load_dir(&model).unwrap();
+        let component = &loaded.components[0];
+        assert_eq!(component.paths, ["src/a/", "docs/c.md"]);
+        assert_eq!(component.owns, ["governance"]);
+        assert_eq!(component.status, "planned");
+        let text = fs::read_to_string(model.join("components.yaml")).unwrap();
+        assert!(
+            text.starts_with("# the first component\n- id: a\n"),
+            "{text}"
+        );
+    }
+
+    #[test]
+    fn an_update_that_sets_a_field_the_row_did_not_have_loads_with_the_model() {
+        let (root, model) = project("update-new-field");
+        let update_row = json!({
+            "id": "a",
+            "reason": "updated reason"
+        });
+        let declared = declare(
+            &model,
+            &root,
+            &DeclareRequest {
+                kind: Kind::Component,
+                row: &update_row,
+                approved_by: None,
+                plan: None,
+                move_owner: false,
+                update: true,
+            },
+            &ANSWERED,
+        )
+        .unwrap();
+        assert_eq!(declared.id, "a");
+        let loaded = Model::load_dir(&model).unwrap();
+        assert_eq!(
+            loaded.components[0].reason.as_deref(),
+            Some("updated reason")
+        );
+    }
+
+    fn read_tree(dir: &Path) -> BTreeMap<PathBuf, Vec<u8>> {
+        let mut map = BTreeMap::new();
+        if !dir.exists() {
+            return map;
+        }
+        let mut stack = vec![dir.to_path_buf()];
+        while let Some(current) = stack.pop() {
+            for entry in fs::read_dir(&current).unwrap() {
+                let entry = entry.unwrap();
+                let path = entry.path();
+                if path.is_dir() {
+                    stack.push(path);
+                } else if path.is_file() {
+                    let rel = path.strip_prefix(dir).unwrap().to_path_buf();
+                    map.insert(rel, fs::read(&path).unwrap());
+                }
+            }
+        }
+        map
+    }
+
+    fn run_update(
+        model: &Path,
+        root: &Path,
+        kind: Kind,
+        row: &serde_json::Value,
+    ) -> Result<Declared, Refusal> {
+        declare(
+            model,
+            root,
+            &DeclareRequest {
+                kind,
+                row,
+                approved_by: None,
+                plan: None,
+                move_owner: false,
+                update: true,
+            },
+            &ANSWERED,
+        )
+    }
+
+    #[test]
+    fn an_update_is_refused_by_code_for_invalid_cases_and_leaves_files_identical() {
+        let (root, model) = project("update-refusals");
+        let before = read_tree(&model);
+
+        // Unknown id -> reference-missing
+        let unknown = run_update(
+            &model,
+            &root,
+            Kind::Component,
+            &json!({"id": "ghost", "status": "planned"}),
+        );
+        assert_eq!(code(unknown), "reference-missing");
+        assert_eq!(read_tree(&model), before);
+
+        // Changed parent -> update-changes-parent
+        let changed_parent = run_update(
+            &model,
+            &root,
+            Kind::Component,
+            &json!({"id": "a", "parent": "ghost"}),
+        );
+        let err = changed_parent.unwrap_err();
+        assert_eq!(err.code, "update-changes-parent");
+        assert_eq!(
+            err.detail,
+            "changing a component's parent is an owner question"
+        );
+        assert_eq!(read_tree(&model), before);
+
+        // Kind other than component -> update-unsupported
+        let bad_kind_dk = run_update(&model, &root, Kind::DecisionKind, &json!({"id": "dk"}));
+        assert_eq!(code(bad_kind_dk), "update-unsupported");
+        assert_eq!(read_tree(&model), before);
+
+        let bad_kind_door = run_update(&model, &root, Kind::Door, &json!({"slug": "one"}));
+        assert_eq!(code(bad_kind_door), "update-unsupported");
+        assert_eq!(read_tree(&model), before);
+
+        let bad_kind_contract = run_update(&model, &root, Kind::Contract, &json!({"id": "C1"}));
+        assert_eq!(code(bad_kind_contract), "update-unsupported");
+        assert_eq!(read_tree(&model), before);
+
+        // Update with move_owner -> update-unsupported
+        let update_and_move = declare(
+            &model,
+            &root,
+            &DeclareRequest {
+                kind: Kind::Component,
+                row: &json!({"id": "a"}),
+                approved_by: None,
+                plan: None,
+                move_owner: true,
+                update: true,
+            },
+            &ANSWERED,
+        );
+        assert_eq!(code(update_and_move), "update-unsupported");
+        assert_eq!(read_tree(&model), before);
+
+        // Bad status -> row-invalid
+        let bad_status = run_update(
+            &model,
+            &root,
+            Kind::Component,
+            &json!({"id": "a", "status": "bogus"}),
+        );
+        assert_eq!(code(bad_status), "row-invalid");
+        assert_eq!(read_tree(&model), before);
+
+        // Missing path -> path-missing
+        let missing_path = run_update(
+            &model,
+            &root,
+            Kind::Component,
+            &json!({"id": "a", "paths": ["src/ghost/"]}),
+        );
+        assert_eq!(code(missing_path), "path-missing");
+        assert_eq!(read_tree(&model), before);
+
+        // Alias another row uses -> name-taken
+        let mut b_row = component_row("b");
+        b_row["canonical"] = json!("beta");
+        run(&model, &root, Kind::Component, &b_row, Some("q")).unwrap();
+        let after_b = read_tree(&model);
+
+        // Row 'a' has alias "first". Try to update row 'b' with alias "first".
+        let alias_taken = run_update(
+            &model,
+            &root,
+            Kind::Component,
+            &json!({"id": "b", "aliases": ["first"]}),
+        );
+        assert_eq!(code(alias_taken), "name-taken");
+        assert_eq!(read_tree(&model), after_b);
+
+        // An update that keeps the row's own canonical name and aliases is accepted
+        let keep_own_names = run_update(
+            &model,
+            &root,
+            Kind::Component,
+            &json!({"id": "a", "canonical": "alpha", "aliases": ["first"], "status": "designed"}),
+        );
+        assert!(keep_own_names.is_ok());
+        let loaded = Model::load_dir(&model).unwrap();
+        assert_eq!(loaded.components[0].status, "designed");
+    }
+
+    #[test]
+    fn an_update_with_reason_null_removes_the_key_and_the_model_reloads() {
+        let (root, model) = project("update-remove-reason");
+        let update_with_reason = json!({
+            "id": "a",
+            "reason": "initial reason"
+        });
+        run_update(&model, &root, Kind::Component, &update_with_reason).unwrap();
+        let loaded = Model::load_dir(&model).unwrap();
+        assert_eq!(
+            loaded.components[0].reason.as_deref(),
+            Some("initial reason")
+        );
+        let yaml_text = fs::read_to_string(model.join("components.yaml")).unwrap();
+        assert!(yaml_text.contains("reason: initial reason"));
+
+        let update_remove_reason = json!({
+            "id": "a",
+            "reason": null
+        });
+        let declared = run_update(&model, &root, Kind::Component, &update_remove_reason).unwrap();
+        assert_eq!(declared.id, "a");
+        assert!(!declared.row.as_object().unwrap().contains_key("reason"));
+
+        let yaml_after = fs::read_to_string(model.join("components.yaml")).unwrap();
+        assert!(!yaml_after.contains("reason"));
+        assert!(yaml_after.starts_with("# the first component\n- id: a\n"));
+
+        let reloaded = Model::load_dir(&model).unwrap();
+        assert_eq!(reloaded.components[0].reason, None);
+    }
+
+    #[test]
+    fn an_update_naming_the_same_parent_is_accepted_and_removing_parent_is_refused() {
+        let (root, model) = project("update-parent");
+        let mut b_row = component_row("b");
+        b_row["canonical"] = json!("beta");
+        b_row["parent"] = json!("a");
+        run(&model, &root, Kind::Component, &b_row, Some("q")).unwrap();
+
+        // An update naming the same parent is accepted
+        let same_parent = run_update(
+            &model,
+            &root,
+            Kind::Component,
+            &json!({"id": "b", "parent": "a", "status": "designed"}),
+        );
+        assert!(same_parent.is_ok());
+        let loaded = Model::load_dir(&model).unwrap();
+        assert_eq!(loaded.components[1].parent.as_deref(), Some("a"));
+        assert_eq!(loaded.components[1].status, "designed");
+
+        // An update removing the parent (null) is refused with update-changes-parent
+        let before = read_tree(&model);
+        let remove_parent = run_update(
+            &model,
+            &root,
+            Kind::Component,
+            &json!({"id": "b", "parent": null}),
+        );
+        let err = remove_parent.unwrap_err();
+        assert_eq!(err.code, "update-changes-parent");
+        assert_eq!(
+            err.detail,
+            "changing a component's parent is an owner question"
+        );
+        assert_eq!(read_tree(&model), before);
+    }
+
+    #[test]
+    fn an_update_needs_no_approving_question() {
+        let (root, model) = project("update-no-approval");
+        let update_row = json!({
+            "id": "a",
+            "status": "planned"
+        });
+        let declared = declare(
+            &model,
+            &root,
+            &DeclareRequest {
+                kind: Kind::Component,
+                row: &update_row,
+                approved_by: None,
+                plan: None,
+                move_owner: false,
+                update: true,
+            },
+            &Answer(QuestionState::Unknown),
+        )
+        .unwrap();
+        assert_eq!(declared.id, "a");
+        let loaded = Model::load_dir(&model).unwrap();
+        assert_eq!(loaded.components[0].status, "planned");
     }
 }

@@ -273,6 +273,7 @@ pub fn answer(request: &AuthorityRequest) -> Result<serde_json::Value, String> {
                     approved_by: approved_by.as_deref(),
                     plan: plan.as_deref(),
                     move_owner: *move_owner,
+                    update: false,
                 },
                 &StoreApprovals {
                     root: &request.root,
