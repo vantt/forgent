@@ -89,6 +89,24 @@ and `fgos resource-check --plan`.
   writes since 21:32:08, and the worktree has no changes. A restarted lead resumes it with
   `fgos request result c-1500-1795530727458` before starting a new unit.
 
+- 2026-11-24 21:55: the gemini unit settled `pass` at 21:48 with commit `91ce789b5`, which
+  also carried out-of-scope sandbox workarounds (git-addon reuse, a `/var/tmp` fallback). Fix
+  unit `c-4812-1795531733577` (claude) committed `07965d1f2`, and the branch diff is now only
+  the phase's change. Review (general-purpose reviewer, dispatch `in-process`): no blocking
+  findings, and AC1-AC3 plus every phase step are met. Not fixable through the land door: the
+  branch has two commits (rollback = revert both), and neither message records that the
+  `cache/other.json` failure case was retired on purpose because the owner's list excludes all
+  of `cache`. This note records it. The lead could not run the verify itself: its sandbox
+  cannot write `target/`.
+- 2026-11-24 21:55: land of `run-tests-fgos-leak-check/p01` blocked. `fgos land` refuses
+  `main-checkout-dirty-overlap` on
+  `plans/discussions/ds-ubqlutna6r-domain-agnostic-item-component/DISCUSSION.md`, which a
+  shaper is editing uncommitted in the main checkout. Main has moved on since the branch base
+  `1d742126f`. `fgos run --sync main` through the request route drops `--sync`, so the lead
+  cannot catch the branch up to main. Needs the shaper to land its discussion, or a sync of
+  the branch by the supervisor; then retry
+  `fgos land run-tests-fgos-leak-check/p01 --test test/scripts/run-tests.test.mjs`.
+
 ## Owner questions
 
 None.
