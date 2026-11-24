@@ -15,11 +15,15 @@ arranges one, and a backlog row of its own if one is wanted.
 
 ## 1. Trạng thái hiện tại
 
-**Round 6 (2026-11-24 10:2x).** Settled A4: the item holds what the work is, Workflow drives transitions, and Work
-only visualizes and coordinates through a mapping. The code scan (I15) shows Work today owns two FSMs (W1 fixed, W2 per
-domain) that A4 takes away from it. Names are proposed (I14: *bản đồ tác nghiệp*), awaiting the owner. Open: I17, where
-the Work↔Workflow mapping is declared; I12, folded into A4 (routes live in Workflow) except for what the W2 stage list
-becomes; then the no-fgOS item contract (ids, I4–I6).
+**Round 7 (2026-11-24 14:2x), consolidation at the owner's request (the talk had drifted from the item component).**
+Settled: A1–A4; owner statements held: routes are listed, possible and forbidden, set by the organisation (I11); two
+levels: the keeper cares for heads, a head divides its work through Workflow (I20 correction). Settled facts: I7, I8, I13,
+I15, I18–I20. **Proposed scope cut (awaiting the owner):** this discussion closes only what the item component itself
+needs: (a) the fields it holds (I4); (b) the fate of `tsk-` items (I5); (c) authority and the questions overlap (I6);
+(d) the id contract without fgOS; (e) the item's status shape (stage × state, I21) and the link a case keeps to its item;
+(f) one portfolio reader, ordered against the orchestration skeleton (I19). Handed out as interfaces only: route storage
+and names (I12, I14) and heads outside cases (I20 a, b) to Workflow and the skeleton; the board mapping (I17) and
+retiring Work's FSMs (I20 c) to Work's phase T7.
 
 ## 2. Mục tiêu & đề bài
 
