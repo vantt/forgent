@@ -60,7 +60,7 @@ single source; the views are generated) and the `fgos authority` verb.
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Inventory and conflicts](phase-01-inventory-and-conflicts.md) | - | plans/261124-0837-docos-documentation-in-component-authority/phase-01-inventory-and-conflicts.md | 1 | done |
-| 2 | [Declare the rows](phase-02-declare-the-rows.md) | 1 | packages/component-authority/model/components.yaml | 2 | ready |
+| 2 | [Declare the rows](phase-02-declare-the-rows.md) | 1 | packages/component-authority/model/components.yaml | 2 | done |
 | 3 | [Render and land](phase-03-render-and-land.md) | 2 | docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/system-overview/spec.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/documentation/spec.md, docs/platform/documentation/subcomponents/document-identity/spec.md | 3 | ready |
 
 The phases run in series: each needs the one before it. Footprint check (`node scripts/plan-contract-check.mjs`
