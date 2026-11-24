@@ -14,7 +14,7 @@
 // exact same invocation works unchanged on every OS's default shell.
 
 import fs from 'node:fs';
-import { REPO_ROOT, ensureGitAddon, ensureHostBin, gitAddonDirectory } from './lib/git-addon-stage.mjs';
+import { REPO_ROOT, ensureGitAddon, ensureHostBin, gitAddonDirectory, reuseGitAddon } from './lib/git-addon-stage.mjs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn as spawnAsync, spawnSync, execFileSync } from 'node:child_process';
@@ -125,7 +125,13 @@ let stagedDoor = null;
 function stageDoorManifest(childEnv) {
   const manifest = path.join(gitAddonDirectory(REPO_ROOT), 'manifest.json');
   if (childEnv.FGOS_ACTIVE_MANIFEST_PATH !== manifest || !fs.existsSync(manifest)) {
-    stagedDoor ??= (() => { const staged = { ...childEnv }; ensureGitAddon(staged, REPO_ROOT); return staged; })();
+    stagedDoor ??= (() => {
+      const staged = { ...childEnv };
+      if (!reuseGitAddon(staged, REPO_ROOT)) {
+        ensureGitAddon(staged, REPO_ROOT);
+      }
+      return staged;
+    })();
     Object.assign(childEnv, { FGOS_HOST_BIN: stagedDoor.FGOS_HOST_BIN, FGOS_ACTIVE_RELEASE_PATH: stagedDoor.FGOS_ACTIVE_RELEASE_PATH, FGOS_ACTIVE_MANIFEST_PATH: stagedDoor.FGOS_ACTIVE_MANIFEST_PATH });
   }
 }
@@ -191,11 +197,11 @@ export function buildTestEnv(env = process.env) {
     }
   }
   try {
+    stageDoorManifest(childEnv);
     const hostBin = ensureHostBin(childEnv, REPO_ROOT);
     if (hostBin) {
       childEnv.FGOS_HOST_BIN = hostBin;
     }
-    stageDoorManifest(childEnv);
   } catch (err) {
     // If cargo is missing or build fails, let tests that require host fail with clear diagnostic
     console.error(`run-tests: warning: failed to ensure host binary: ${err.message}`);
@@ -421,17 +427,20 @@ export function describeLeftoverTemps(root) {
 
 export const SENSITIVE_FGOS_FILES = new Set(['secrets.local.env', 'secrets.env']);
 
-// Derived files that any read of the live store may rewrite: the state view is a cache folded
-// from the event log. A test that reads the store therefore refreshes it without leaking
-// anything; test-written state still shows up as added or changed event, observe and work
-// files, which stay guarded.
-export const DERIVED_FGOS_FILES = new Set([
-  path.join('cache', 'state.json'),
+// Live runtime directories that other heads, background tasks, and the running land write into
+// while a run is going: other heads and the running land write these while a run is going, so a
+// change there is not a test leak; cache also holds the derived state view.
+export const LIVE_FGOS_DIRS = new Set([
+  path.join('runtime', 'land'),
+  path.join('runtime', 'mailbox'),
+  path.join('observe', 'records'),
+  'logs',
+  'cache',
 ]);
 
 /**
  * Recursively snapshots the repository's `.fgos` store before/after test runs.
- * Excludes sensitive secret files.
+ * Excludes sensitive secret files and live runtime directories.
  * Captures relative paths, file sizes, and mtimeMs.
  */
 export function snapshotFgos(repoRoot) {
@@ -451,6 +460,7 @@ export function snapshotFgos(repoRoot) {
       const fullPath = path.join(currentDir, entry.name);
       const relPath = path.relative(fgosDir, fullPath);
       if (entry.isDirectory()) {
+        if (LIVE_FGOS_DIRS.has(relPath)) continue;
         walk(fullPath);
       } else if (entry.isFile() || entry.isSymbolicLink()) {
         try {
@@ -514,7 +524,7 @@ export function runSelectedTests(files, {
   env = process.env,
   stdio = 'inherit',
   log = (msg) => console.error(msg),
-  allowedFgosMutations = DERIVED_FGOS_FILES,
+  allowedFgosMutations = new Set(),
   fileTimeoutMs = Number(env[FILE_TIMEOUT_ENV]) || DEFAULT_FILE_TIMEOUT_MS,
   watchdogPollMs = DEFAULT_WATCHDOG_POLL_MS,
   // Only a real spawnSync has child processes to supervise.
@@ -550,9 +560,17 @@ export function runSelectedTests(files, {
   // Fixtures that confined workers must reach live outside /tmp. A per-run root removed here also
   // covers a test file the watchdog killed, which never runs its own exit cleanup.
   let fixtureRoot = null;
-  if (fs.existsSync('/var/tmp') && env[KEEP_TMP_ENV] !== '1') {
+  if (env[KEEP_TMP_ENV] !== '1') {
+    const fixtureParent = (() => {
+      try {
+        fs.accessSync('/var/tmp', fs.constants.W_OK);
+        return '/var/tmp';
+      } catch {
+        return os.tmpdir();
+      }
+    })();
     try {
-      fixtureRoot = fs.mkdtempSync('/var/tmp/fgos-test-fixtures-');
+      fixtureRoot = fs.mkdtempSync(path.join(fixtureParent, 'fgos-test-fixtures-'));
       childEnv.FGOS_TEST_FIXTURE_ROOT = fixtureRoot;
     } catch {
       fixtureRoot = null;
@@ -753,7 +771,7 @@ export function runTests({
   cwd = REPO_ROOT,
   stdio = 'inherit',
   queue = null,
-  allowedFgosMutations = DERIVED_FGOS_FILES,
+  allowedFgosMutations = new Set(),
   // `{ index, total }`: run only that shard of the discovered files, split by `weights` (repo-relative path -> seconds).
   shard = null,
   weights = {},
