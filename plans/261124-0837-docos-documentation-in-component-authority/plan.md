@@ -8,12 +8,14 @@ effort: 6h
 branch: main
 tags: [documentation, document-identity, component-authority]
 created: 2026-11-24
-blockedBy: []
+blockedBy:
+  - 261121-2110-component-authority-doors
+base: f999c4018f626754eb15bf3bd930e011546830a6
 source:
   - p-jz2d2oid2m
 footprint:
   - plans/261124-0837-docos-documentation-in-component-authority/**
-  - packages/component-authority/model/**
+  - packages/component-authority/model/components.yaml
   - docs/platform/component-boundary.md
   - docs/platform/architecture-map.md
   - docs/platform/system-overview/spec.md
@@ -55,11 +57,22 @@ single source; the views are generated) and the `fgos authority` verb.
 
 ## Phases
 
-| # | Phase | Status |
-|---|---|---|
-| 1 | [Inventory and conflicts](phase-01-inventory-and-conflicts.md) | todo |
-| 2 | [Declare the rows](phase-02-declare-the-rows.md) | todo |
-| 3 | [Render and land](phase-03-render-and-land.md) | todo |
+| id | title | depends-on | footprint | wave | status |
+|---|---|---|---|---|---|
+| 1 | [Inventory and conflicts](phase-01-inventory-and-conflicts.md) | - | plans/261124-0837-docos-documentation-in-component-authority/phase-01-inventory-and-conflicts.md | 1 | done |
+| 2 | [Declare the rows](phase-02-declare-the-rows.md) | 1 | packages/component-authority/model/components.yaml | 2 | ready |
+| 3 | [Render and land](phase-03-render-and-land.md) | 2 | docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/system-overview/spec.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/documentation/spec.md, docs/platform/documentation/subcomponents/document-identity/spec.md | 3 | ready |
+
+The phases run in series: each needs the one before it. Footprint check (`node scripts/plan-contract-check.mjs`
+and `fgos resource-check --plan`, 2026-11-24): no two phases share a file. The declare verb writes a component row
+into `components.yaml` only, so the plan no longer claims all of `packages/component-authority/model/**`. That also
+keeps it clear of plan `261124-0004-heads-operate-without-owner`, whose footprint holds three files under
+`model/doors/`; this plan reads those door files when it renders but never writes them.
+
+Cross-plan overlap: phase 3 regenerates five views that the running plan `261121-2110-component-authority-doors`
+also regenerates (`component-boundary.md`, `architecture-map.md`, `system-overview/spec.md`, `docs/platform/README.md`,
+`governance.md`). Both plans must write them, because each render rewrites the whole view from the model, so this
+plan is `blockedBy` that plan rather than narrowed.
 
 ## Acceptance criteria
 
@@ -82,18 +95,15 @@ new row is declared.
 
 ## Owner questions
 
-Answered 2026-11-24. Phase 1 found that `fgos authority declare` refuses an existing component, so it cannot update
-`document-identity`. The owner chose to have the component-authority lead add an update path (backlog
-`p-2lpsdtxnrd`), not a hand edit of the model and not a workaround row. Plan `261124-1433-authority-declare-update`
-delivered it: `declare --update` landed at 49f0f47dc, and the design-lap release 71dd6eb7 carries it (checked
-2026-11-24 18:35 with `fgos authority declare --help`). Phase 2 runs through that verb from a release that carries
-49f0f47dc or later; `blockedBy` stays empty because the closing checks of 261124-1433 do not gate this use. Phase 2
-step 3 still asks the owner if the parent's `mustNotOwn` list must change.
+None open. Phase 1 found that `fgos authority declare` could not update an existing component; the owner chose an
+update path in the declare verb, and `fgos authority declare --update` now exists (`fgos authority declare --help`,
+2026-11-24). Phase 2 uses it. Phase 2 step 3 asks the owner only if the parent's `mustNotOwn` list must change.
 
 ## Risks
 
 - `fgos authority declare` may refuse a move or ask for `--approved-by`: phase 2 stops there and asks.
-- The other lead's phases rewrite the same files: rebase before each land, land serially, message that lead first.
+- The component-authority-doors plan rewrites the same views: this plan waits for it through `blockedBy`, then renders
+  once on top of its result.
 
 ## Component boundary
 
