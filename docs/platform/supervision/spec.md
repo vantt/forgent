@@ -36,7 +36,7 @@ Planned/live legend: every verb, key, lock, file and crate named below is **plan
 fgOS coordinates the plans of the project it runs on with no person sitting by. Five parts, each with one job:
 
 - **Watcher** (Rust, no LLM, a third per-project OS timer). Each tick fetches the trunk, runs the detection definitions listed in `watcher.definitions`, records each raised event once in the Event Store, and runs the configured action per row kind: wake the supervisor (default), notify through the mailbox, or none. It decides, starts and stops nothing.
-- **Supervisor** (an LLM head session, persona `supervisor`, one per project). Woken through one door, `fgos supervisor wake`. It drains the event queue, admits `ready` plans by priority while leads are below `supervisor.maxLeads` and a lane is free, starts one lead per plan, restarts, parks or asks about a gone or stuck lead, resumes the asker of an answered owner question, closes done plans and starts the one planner of a settled discussion. It asks the owner only through `fgos questions ask` (five-part form, see [questions/spec.md](../questions/spec.md)).
+- **Supervisor** (an LLM head session, persona `supervisor`, one per project). Woken through one door, `fgos supervisor wake`. The left hand: looks after every running agent that no lead watches (leads, shapers, planners, and any agent started without a lead; workers of a lead belong to that lead). It drains the event queue (including `coordination-help` requests from heads), admits `ready` plans by priority while leads are below `supervisor.maxLeads` and a lane is free, starts one lead per plan, restarts, parks or asks about a gone or stuck lead, resumes the asker of an answered owner question, closes done plans and starts the one planner of a settled discussion. It asks the owner only through `fgos questions ask` (five-part form, see [questions/spec.md](../questions/spec.md)).
 - **Lead** (persona `lead`, confined). Drives one plan's waves through `fgos run`, reviews each phase, lands it with `fgos land`.
 - **Lane pool** (worker seats pooled per machine). A lane is a held machine-scope lock taken where a top-level worker seat starts.
 - **Landing door** (`fgos land`). The one Rust door that replaces the hand-run landing script and the hand census fix.
@@ -57,6 +57,14 @@ fgOS coordinates the plans of the project it runs on with no person sitting by. 
 - Config storage. Keys live in `core/config-standard` and `core/config-schema`.
 - The owner-question store and its answers ([questions/spec.md](../questions/spec.md)); this area only runs its `question-answered` definition and resumes the asker.
 - Measurement. Observe records; this area registers kinds through `observe-kinds.json`.
+
+### 1.1 Role charter for the two hands
+
+The project operates through the owner's two hands, domain-free:
+
+- **The supervisor (left hand):** Looks after every running agent that no lead watches: leads, shapers, planners and any pane or agent started by hand without a lead. Workers of a lead are that lead's. Its rhythm is owned by the keeper (the orchestration skeleton) and is not specified in this section.
+- **The secretary (Miu, right hand):** Holds every power the supervisor holds and keeps it asleep. In peace she talks with the owner, clarifies and orders goals, and reduces load on the owner without meddling in routine operations. When no supervisor is alive or able to act, or a help request waits past the threshold, she runs the operation herself and wakes the machinery until it runs again.
+- **One help channel:** Heads raise `coordination-help` to the supervisor; supervisor raise is granted to secretary, supervisor and lead today; the charter's target is every head. Heads do not talk to Miu directly in peace; owner decisions go through the question store ([questions/spec.md](../questions/spec.md)), and Miu relays them to the owner.
 
 ## 2. Shared entities
 
@@ -114,7 +122,7 @@ The owner's two hands (the secretary Miu and the supervisor) coordinate through 
 | `fgos watcher tune [<definition>] [--arm\|--disarm] [--set key=value]` | Arm or disarm a detection definition and change its thresholds. | A new definition kind stays a code change; `enabled`, `definitions`, `defaultAction`, `actions` (except through `--arm\|--disarm`) and `notifyTo` are never tunable; values are held to the config schema, which for the session thresholds states a minimum only. |
 | `fgos run` by the supervisor | One urgent chore as one unit. | Same door and ceilings as the secretary's own run (`secretary.run.maxMinutes`, `secretary.run.tier` in `core/config-standard/secretary.yaml`; a request may ask for less, never more); read-only unless `--writes` names paths inside a linked worktree. |
 
-Trust: every verb above is granted per persona and checked again by the route child, which treats its arguments as coming from the sandbox. Reach is every Identity session of the project to observe, ask and help, but a stop (`session stop`) reaches heads only: a session that holds no head grant (a hand-started one) is refused `stop-target-not-head`, and goes to Miu, who asks the owner. When both act on the same thing the owner wins over a direct Miu order, which wins over the supervisor's own choice. A power is granted only once its proof passes from the sandbox: proof pending live audit for the powers added here (screen read and type, tune from a confined caller, the `--override` tier of a run, wake from inside a sandbox).
+Trust: every verb above is granted per persona and checked again by the route child, which treats its arguments as coming from the sandbox. Reach is every Identity session of the project to observe, ask and help, but a stop (`session stop`) reaches heads only: a session that holds no head grant (a hand-started one) is refused `stop-target-not-head`, and goes to the supervisor, which asks the owner through the question store. When both act on the same thing the owner wins over a direct Miu order, which wins over the supervisor's own choice. A power is granted only once its proof passes from the sandbox: proof pending live audit for the powers added here (screen read and type, tune from a confined caller, the `--override` tier of a run, wake from inside a sandbox).
 
 ## 5. Flows
 
