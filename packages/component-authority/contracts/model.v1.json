@@ -152,6 +152,10 @@
       "properties": {
         "job": { "type": "string" },
         "kind": { "type": "string" },
+        "severity": {
+          "description": "high: a live twin or copy that decides a live answer which can disagree; medium: a live side that only asks the owner, or live named debt that decides nothing differently; low: a twin reached only by dead code, or a row with no debt and no twin.",
+          "enum": ["high", "medium", "low"]
+        },
         "patterns": {
           "type": "array",
           "items": { "type": "string" }

@@ -3,10 +3,22 @@ kind: door
 patterns:
   - export function (?:readGitStatus|recoverGitOperations)\b
   - fn (?:read_git_status|recover_git_operations)\b
+names:
+  - read_git_status
+  - recover_git_operations
 allowed:
   - path: packages/git/rust/src/incidents.rs
     count: 2
   - path: packages/git/node-addon/src/git.rs
+    count: 4
+    reason: "carries the door to Node: its two snake_case entries (read_git_status, recover_git_operations) match the Rust pattern, and each calls incidents.rs, composing nothing"
+  - path: apps/fgos/src/wiring/git_incidents.rs
+    count: 4
+    reason: calls the door
+  - path: apps/fgos/src/wiring/init.rs
+    count: 1
+    reason: calls the door
+  - path: packages/git/node-addon/src/lib.rs
     count: 2
-    reason: "carries the door to Node: its two snake_case entries (read_git_status, recover_git_operations) match the Rust pattern and call incidents.rs, composing nothing"
+    reason: calls the door
 reason: the open Git incidents of a repository (journal, pending and retained operations, worktree findings, native locks, a merge in progress) and the recovery pass are composed once, in fgos-git, for the host verbs `git status|recover` and for `fgos init`; the row catches a second definition by name only, not a copy under another name
