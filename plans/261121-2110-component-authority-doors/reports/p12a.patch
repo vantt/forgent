@@ -1,0 +1,1122 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 3432cdb1b..92a9b2ab2 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -774,6 +774,7 @@ dependencies = [
+ name = "fgos-holder-lock"
+ version = "0.2.0"
+ dependencies = [
++ "fgos-host-runtime",
+  "fgos-process",
+  "libc",
+  "serde_json",
+diff --git a/apps/fgos-gateway/Cargo.lock b/apps/fgos-gateway/Cargo.lock
+index 8e5eab3d3..9bb648c20 100644
+--- a/apps/fgos-gateway/Cargo.lock
++++ b/apps/fgos-gateway/Cargo.lock
+@@ -640,12 +640,14 @@ dependencies = [
+  "serde",
+  "serde_json",
+  "sha2 0.10.9",
++ "windows-sys 0.61.2",
+ ]
+ 
+ [[package]]
+ name = "fgos-holder-lock"
+ version = "0.2.0"
+ dependencies = [
++ "fgos-host-runtime",
+  "fgos-process",
+  "libc",
+  "serde_json",
+diff --git a/apps/fgos-gateway/src/gateway.rs b/apps/fgos-gateway/src/gateway.rs
+index 7aff15198..25c8dbd53 100644
+--- a/apps/fgos-gateway/src/gateway.rs
++++ b/apps/fgos-gateway/src/gateway.rs
+@@ -102,14 +102,11 @@ fn describe(error: fgos_config::snapshot::SnapshotError) -> String {
+ /// `~/.fgos/private/gateway-token`. Never creates or writes either: setup and `fgos doctor --fix`
+ /// do; a missing token file is a refusal to start, not a self-provisioned default (that would also
+ /// defeat D4's point) and never a fallback to a `gateway.token` key in a config file.
+-pub fn load_gateway_config(home_dir: Option<&Path>) -> Result<GatewayConfig, GatewayConfigError> {
++pub fn load_gateway_config(
++    lookup: impl Fn(&str) -> Option<String>,
++) -> Result<GatewayConfig, GatewayConfigError> {
+     use fgos_config::{detect::NoDetectors, machine, snapshot::SessionClass};
+-    let home = match home_dir {
+-        Some(p) => p.to_path_buf(),
+-        None => machine::home_dir(|key| std::env::var(key).ok())
+-            .ok_or(GatewayConfigError::NoHomeDir)?,
+-    };
+-    let global = home.join(".fgos");
++    let global = machine::global_dir(lookup).ok_or(GatewayConfigError::NoHomeDir)?;
+     let ctx = machine::context(&NoDetectors).map_err(|r| GatewayConfigError::Config(r.to_string()))?;
+     let snapshot = machine::snapshot(&ctx, &global, SessionClass::Unconfined)
+         .map_err(|e| GatewayConfigError::Config(describe(e)))?;
+@@ -1395,7 +1392,7 @@ pub fn with_static_serving(router: Router, enabled: bool) -> Router {
+ /// pays the async-runtime startup cost (`main.rs`'s dispatch, D1: one
+ /// process, gateway mode chosen at launch rather than the TUI's default).
+ pub fn run(root: PathBuf) -> std::io::Result<()> {
+-    let config = load_gateway_config(None).map_err(std::io::Error::other)?;
++    let config = load_gateway_config(|key| std::env::var(key).ok()).map_err(std::io::Error::other)?;
+     // D7: warn, don't refuse, when the resolved bind is not loopback --
+     // reaching the gateway from the LAN or Tailscale is an explicit
+     // `gateway.bind` choice, not a misconfiguration. `eprintln!` matches this function's own
+@@ -1892,9 +1889,9 @@ mod tests {
+     /// A home whose global config carries `gateway: {<gateway_body>}` and whose token file holds
+     /// `test-token` with mode 0600.
+     fn write_test_home_config(home: &Path, gateway_body: &str) {
+-        std::fs::create_dir_all(home.join(".fgos")).unwrap();
++        std::fs::create_dir_all(test_global_dir(home)).unwrap();
+         std::fs::write(
+-            home.join(".fgos").join("config.json"),
++            test_global_dir(home).join("config.json"),
+             format!(r#"{{"gateway":{{{gateway_body}}}}}"#),
+         )
+         .unwrap();
+@@ -1903,7 +1900,7 @@ mod tests {
+ 
+     fn write_test_token(home: &Path, mode: u32) {
+         use std::os::unix::fs::PermissionsExt;
+-        let dir = home.join(".fgos").join("private");
++        let dir = test_global_dir(home).join("private");
+         std::fs::create_dir_all(&dir).unwrap();
+         std::fs::set_permissions(&dir, std::fs::Permissions::from_mode(0o700)).unwrap();
+         let file = dir.join("gateway-token");
+@@ -1911,6 +1908,17 @@ mod tests {
+         std::fs::set_permissions(&file, std::fs::Permissions::from_mode(mode)).unwrap();
+     }
+ 
++    /// The environment the global-directory door reads, with the home set to `home`.
++    fn home_env(home: &Path) -> impl Fn(&str) -> Option<String> {
++        let home = home.to_string_lossy().into_owned();
++        move |key| (key == fgos_config::machine::HOME_VAR).then(|| home.clone())
++    }
++
++    /// The global directory the door answers for `home`.
++    fn test_global_dir(home: &Path) -> PathBuf {
++        fgos_config::machine::global_dir(home_env(home)).expect("the test home is set")
++    }
++
+     fn test_home(tag: &str) -> PathBuf {
+         let home = std::env::temp_dir().join(format!("fgos-gateway-{tag}-{}", std::process::id()));
+         std::fs::remove_dir_all(&home).ok();
+@@ -1922,7 +1930,7 @@ mod tests {
+     fn load_gateway_config_reads_the_token_from_the_token_file() {
+         let home = test_home("token-file");
+         write_test_home_config(&home, "");
+-        let config = load_gateway_config(Some(&home)).expect("a token file and no gateway keys must load");
++        let config = load_gateway_config(home_env(&home)).expect("a token file and no gateway keys must load");
+         assert_eq!(config.token, "test-token");
+         assert_eq!(config.port, 4170);
+         std::fs::remove_dir_all(&home).ok();
+@@ -1933,12 +1941,12 @@ mod tests {
+     fn load_gateway_config_refuses_a_missing_token_file_even_with_an_old_config_key() {
+         let home = test_home("token-missing");
+         write_test_home_config(&home, r#""token":"old-key""#);
+-        std::fs::remove_file(home.join(".fgos/private/gateway-token")).unwrap();
+-        let err = load_gateway_config(Some(&home)).expect_err("the old key must not be a token");
++        std::fs::remove_file(test_global_dir(&home).join("private/gateway-token")).unwrap();
++        let err = load_gateway_config(home_env(&home)).expect_err("the old key must not be a token");
+         assert!(!err.to_string().contains("old-key"), "{err}");
+         // With the file back, the file wins over the stray key.
+         write_test_token(&home, 0o600);
+-        let config = load_gateway_config(Some(&home)).expect("the token file wins");
++        let config = load_gateway_config(home_env(&home)).expect("the token file wins");
+         assert_eq!(config.token, "test-token");
+         std::fs::remove_dir_all(&home).ok();
+     }
+@@ -1946,11 +1954,11 @@ mod tests {
+     #[test]
+     fn load_gateway_config_names_the_token_file_when_it_is_absent_or_too_open() {
+         let home = test_home("token-mode");
+-        std::fs::create_dir_all(home.join(".fgos")).unwrap();
+-        let err = load_gateway_config(Some(&home)).expect_err("no token file");
++        std::fs::create_dir_all(test_global_dir(&home)).unwrap();
++        let err = load_gateway_config(home_env(&home)).expect_err("no token file");
+         assert!(matches!(&err, GatewayConfigError::Token(p, why) if p.ends_with("private/gateway-token") && why == "missing"), "{err}");
+         write_test_token(&home, 0o644);
+-        let err = load_gateway_config(Some(&home)).expect_err("a world-readable token file");
++        let err = load_gateway_config(home_env(&home)).expect_err("a world-readable token file");
+         assert!(matches!(&err, GatewayConfigError::Token(_, why) if why.contains("mode")), "{err}");
+         std::fs::remove_dir_all(&home).ok();
+     }
+@@ -1961,7 +1969,7 @@ mod tests {
+     fn load_gateway_config_resolves_loopback_bind_when_absent() {
+         let home = std::env::temp_dir().join(format!("fgos-gateway-bind-default-{}", std::process::id()));
+         write_test_home_config(&home, "");
+-        let config = load_gateway_config(Some(&home)).expect("a token-only config must still load");
++        let config = load_gateway_config(home_env(&home)).expect("a token-only config must still load");
+         assert_eq!(config.bind, IpAddr::V4(Ipv4Addr::LOCALHOST));
+         std::fs::remove_dir_all(&home).ok();
+     }
+@@ -1971,7 +1979,7 @@ mod tests {
+     fn load_gateway_config_resolves_explicit_bind_override() {
+         let home = std::env::temp_dir().join(format!("fgos-gateway-bind-override-{}", std::process::id()));
+         write_test_home_config(&home, r#""bind":"0.0.0.0""#);
+-        let config = load_gateway_config(Some(&home)).expect("a valid bind override must load");
++        let config = load_gateway_config(home_env(&home)).expect("a valid bind override must load");
+         assert_eq!(config.bind, IpAddr::V4(Ipv4Addr::UNSPECIFIED));
+         std::fs::remove_dir_all(&home).ok();
+     }
+@@ -1982,7 +1990,7 @@ mod tests {
+     fn load_gateway_config_rejects_invalid_bind() {
+         let home = std::env::temp_dir().join(format!("fgos-gateway-bind-invalid-{}", std::process::id()));
+         write_test_home_config(&home, r#""bind":"not-an-ip""#);
+-        let err = load_gateway_config(Some(&home)).expect_err("a malformed bind value must not silently resolve");
++        let err = load_gateway_config(home_env(&home)).expect_err("a malformed bind value must not silently resolve");
+         assert!(matches!(err, GatewayConfigError::InvalidBind(ref raw) if raw == "not-an-ip"));
+         std::fs::remove_dir_all(&home).ok();
+     }
+@@ -1994,7 +2002,7 @@ mod tests {
+     fn load_gateway_config_resolves_no_cf_access_when_absent() {
+         let home = std::env::temp_dir().join(format!("fgos-gateway-cfaccess-absent-{}", std::process::id()));
+         write_test_home_config(&home, "");
+-        let config = load_gateway_config(Some(&home)).expect("a token-only config must still load");
++        let config = load_gateway_config(home_env(&home)).expect("a token-only config must still load");
+         assert!(config.cf_access.is_none());
+         std::fs::remove_dir_all(&home).ok();
+     }
+@@ -2007,7 +2015,7 @@ mod tests {
+             &home,
+             r#""cfAccessTeamDomain":"https://team.cloudflareaccess.com","cfAccessAud":"aud-tag-123""#,
+         );
+-        let config = load_gateway_config(Some(&home)).expect("a full cf-access config must load");
++        let config = load_gateway_config(home_env(&home)).expect("a full cf-access config must load");
+         assert!(config.cf_access.is_some());
+         std::fs::remove_dir_all(&home).ok();
+     }
+@@ -2018,7 +2026,7 @@ mod tests {
+     fn load_gateway_config_rejects_partial_cf_access_team_domain_only() {
+         let home = std::env::temp_dir().join(format!("fgos-gateway-cfaccess-partial-a-{}", std::process::id()));
+         write_test_home_config(&home, r#""cfAccessTeamDomain":"https://team.cloudflareaccess.com""#);
+-        let err = load_gateway_config(Some(&home)).expect_err("team_domain without aud must not silently resolve to None");
++        let err = load_gateway_config(home_env(&home)).expect_err("team_domain without aud must not silently resolve to None");
+         assert!(matches!(err, GatewayConfigError::PartialCfAccess));
+         std::fs::remove_dir_all(&home).ok();
+     }
+@@ -2027,7 +2035,7 @@ mod tests {
+     fn load_gateway_config_rejects_partial_cf_access_aud_only() {
+         let home = std::env::temp_dir().join(format!("fgos-gateway-cfaccess-partial-b-{}", std::process::id()));
+         write_test_home_config(&home, r#""cfAccessAud":"aud-tag-123""#);
+-        let err = load_gateway_config(Some(&home)).expect_err("aud without team_domain must not silently resolve to None");
++        let err = load_gateway_config(home_env(&home)).expect_err("aud without team_domain must not silently resolve to None");
+         assert!(matches!(err, GatewayConfigError::PartialCfAccess));
+         std::fs::remove_dir_all(&home).ok();
+     }
+diff --git a/docs/platform/holder-lock/spec.md b/docs/platform/holder-lock/spec.md
+index 46ba3aac0..c8f629c61 100644
+--- a/docs/platform/holder-lock/spec.md
++++ b/docs/platform/holder-lock/spec.md
+@@ -377,6 +377,7 @@ The documentation-cutover write lease, its `fgos docs-lease` verb, the `document
+ 
+ ## 20. Lịch sử quyết định
+ 
++- **2026-11-24 — the borrow-vector module keeps its winpid read and drops its kill-wait copy.** `borrow_vectors.rs` backgrounds `sleep` under Git for Windows' `sh` and reads `/proc/$!/winpid` there, because only that shell can learn the Windows pid of its own background job; no Rust door can take the read over, so the file is an allowed entry (count 1) of the `process facts: read /proc` door, not debt. Its private `KILL_WAIT_MS` (2000) was a copy of `DEFAULT_KILL_WAIT_MS` in `port.rs` and now uses that constant; the module holds no `fence_lock` and no `TERM_WAIT_MS` (the fence state machine and its waits stay in `fence.rs`).
+ - **2026-11-15 — `lock-status` and `lock fence` run in the host; the hot record and the beacon have one owner each.** (1) The hot record's reader and compare-and-clear are `hot_record.rs`; Node's functions call it and the writer stays Node until the Work state store moves (S7). Reused: `judge_here` of the process crate; `clearHotRecord` and the addon `hotRecordClear` binding were deleted when the fence moved, since nothing in Node cleans a record any more. (2) `lock-status` lists each row's instances by the registry's own path template (no table of lock files), and the host lists the three run-scoped layouts (workflow runs, assignment runs, open attempts) itself and passes them in, because the holder-lock crate may not know Execution layouts and the run supervisor already depends on it; the host twin is `apps/fgos/src/wiring/run_dirs.rs` with one fixture shared by the Node listers, and retires with the Execution port (S6a). (3) `lock fence` is `fence.rs`; without `--yes` it lists and refuses (`lock-fence-not-confirmed`, exit 2), on a terminal too (owner decision S23-Q3 = b); the terminal question is gone. A missing or unknown `lock` sub-command and a `--flag=value` spelling are refused as every host-served verb refuses them. (4) The beacon's record and vectors are the contract `main-checkout-activity.v1.json`, read by `status.rs` and by the commit gate's Node reader. Accepted differences from the Node verbs: a lock file whose registry placeholder is empty (`merge-slot--.lock`) is no instance; a refused signal names the holders already signalled; an unreadable beacon file answers the host's error text; `fence dispatch-cwd --param cwd=` on Windows (section 19). Evidence: the parity runs of the step against the base release (lock-status 29 cases, lock 35, git 25) and the owner tests named in the step's phase reports.
+ - **2026-11-04 — documentation-cutover lease retired after the cutover landed; mechanism, verb, hook, lock row and doctor check removed.** The rank-10 `documentation-cutover` row, its band note and the section 19 lease contract are gone; the 2026-10-22 registration entry below stays as history.
+ - **2026-10-22 — documentation lease registration, hardening lane:** Register `documentation-cutover` as a rank-10 repo lease, owner `documentation`, fence `none`, no legacy path, public acquire only; the main-ref sidecar owns persistent freeze and the kernel lock serializes transitions (sections 7 and 19).
+diff --git a/docs/platform/packaging-distribution/spec.md b/docs/platform/packaging-distribution/spec.md
+index 1dd52f56f..6e6f9d73d 100644
+--- a/docs/platform/packaging-distribution/spec.md
++++ b/docs/platform/packaging-distribution/spec.md
+@@ -783,6 +783,8 @@ of it).
+ 
+ #### Lịch sử quyết định
+ 
++- **2026-11-24 — The dead Rust copy of the agy sub-HOME finder is deleted (component-authority door row `execution doctor judgments`).** `find_agy_sub_homes`, `check_agy_sub_homes_configured` and their helpers and tests are gone from `packages/distribution/rust/src/agent_config.rs` (last commit touching them: c9395bf8b). The host judges row `agy-sub-homes-configured` over `fgos-execution` `checks.rs`, whose tests own the behaviour; only the copy's own tests called the deleted code. The row no longer carries debt, and the name fails the door check if a file brings it back.
++
+ - **2026-11-24 — The Node agent hook table and the Node shell-rc detector are deleted; Rust is the only owner of both (component-authority door rows `agent-hook-table`, `delete-guard-keyword-list` and `shell-rc-fgos-lines`).** `src/setup/agent-hooks.mjs` (last commit 871a77074) is gone: `packages/distribution/rust/src/agent_hooks.rs` is the one hook table and the one owner of the delete-guard prefilter keyword list, which it pins to `packages/distribution/contracts/delete-guard-prefilter.v1.json`. Workspace hook rows are installed through `fgos doctor --fix --only <fix-id>`, the door the live mailbox harnesses now call; `fgos wire-agents` still cannot install a workspace's hook rows and its help text no longer names settings the verb never writes (the survivor for a person's agent config is `packages/distribution/rust/src/agent_config.rs` with `apps/fgos/src/wiring/wire_agents.rs`). `src/setup/shell-rc.mjs` (last commit 12f8a187a) is gone: `packages/distribution/rust/src/rc_lines.rs` detects the rc files and fgOS's own `source` lines read-only, `fgos uninstall` and doctor name the profiles, and the repository session-start hook prints no shell-profile line. The mailbox behaviour addenda v7e, v7h, v7i, v7j, v7k and v7m were measured on hook bytes that no longer exist and are retired; v7n stays as its measured record, no longer compared with a rebuild, and backlog `p-irt4weqipe` owns the re-measurement. Rejected: keeping the Node table beside the Rust one (a twin; decision 2 of `docs/platform/component-authority/spec.md`). Guard: the three door rows named above in `packages/component-authority/model/doors/`.
+ 
+ - **2026-11-21 — Pinned MSVC toolchain for reproducible windows-msvc addon link.** The reproducibility claim for `x86_64-pc-windows-msvc` holds for one pinned toolchain (full version 14.52.37025 is pinned). Windows addon builds diverge across runner images (evidence: runner images 20261103.629 (MSVC 14.51) and 20261111.635 (MSVC 14.52), byte-identical builds on one image in CI 44883964974). When a runner image drops the pinned toolset or SDK, both Windows jobs fail by name, and someone changes the one value `MSVC_TOOLSET_VERSION` or `WINDOWS_SDK_VERSION` in `.github/workflows/release-assets.yml` (the `env` block at the top).
+diff --git a/herdr-dashboard/Cargo.lock b/herdr-dashboard/Cargo.lock
+index 85f2bd12a..4c90f37a4 100644
+--- a/herdr-dashboard/Cargo.lock
++++ b/herdr-dashboard/Cargo.lock
+@@ -463,18 +463,32 @@ dependencies = [
+  "serde",
+  "serde_json",
+  "sha2",
++ "windows-sys",
+ ]
+ 
+ [[package]]
+ name = "fgos-holder-lock"
+ version = "0.2.0"
+ dependencies = [
++ "fgos-host-runtime",
+  "fgos-process",
+  "libc",
+  "serde_json",
+  "windows-sys",
+ ]
+ 
++[[package]]
++name = "fgos-host-runtime"
++version = "0.2.0"
++dependencies = [
++ "fgos-yaml-doc",
++ "serde",
++ "serde_json",
++ "sha2",
++ "thiserror 2.0.20",
++ "tokio",
++]
++
+ [[package]]
+ name = "fgos-identity"
+ version = "0.2.0"
+@@ -1834,6 +1848,27 @@ version = "0.1.9"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "9e1c906769ad99c88eaa54e728060edef082f8e358ff32030cb7c7d315e81109"
+ 
++[[package]]
++name = "tokio"
++version = "1.53.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "ce3335fa71841cda333a58d7615b03901380ecf09d59b3296d21f8bbac0dde4e"
++dependencies = [
++ "pin-project-lite",
++ "tokio-macros",
++]
++
++[[package]]
++name = "tokio-macros"
++version = "2.7.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "78773a2a397f451582ce068015985c33193cf6dea8b74d2a639fe457b2f07b0e"
++dependencies = [
++ "proc-macro2",
++ "quote",
++ "syn 3.0.3",
++]
++
+ [[package]]
+ name = "typenum"
+ version = "1.20.1"
+diff --git a/packages/component-authority/model/doors/execution-doctor-judgments.yaml b/packages/component-authority/model/doors/execution-doctor-judgments.yaml
+index 7e003015f..9b0be86e5 100644
+--- a/packages/component-authority/model/doors/execution-doctor-judgments.yaml
++++ b/packages/component-authority/model/doors/execution-doctor-judgments.yaml
+@@ -7,8 +7,4 @@ patterns:
+ allowed:
+   - path: packages/execution/rust/src/checks.rs
+     count: 8
+-debt:
+-  - path: packages/distribution/rust/src/agent_config.rs
+-    reason: a dead copy of the agy sub-home finder and its check (find_agy_sub_homes, check_agy_sub_homes_configured); only its own tests call it since the host judges the row over fgos-execution checks.rs
+-retiredBy: "261121-2110-component-authority-doors#phase-12: the dead copy is deleted"
+ reason: seven executor-model doctor rows (runner-generated-paths, executor-confinement, invocation-git-write-grants, capability-serves-valid, omp-natives-present, agy-sub-homes-configured, tool-registry-configured) are judged in process by the host over fgos-execution checks.rs (the host adapter apps/fgos/src/wiring/doctor/execution.rs only reads and wires them and defines none of these names; the executor, account, agent-definition and template rows are judged in checks.rs too), never by a Node body that asks the host back; the Node judge names are retired, and a second judge of the same row must be declared. seat-binding-route is judged in Rust too, by probing the route the Node client calls
+diff --git a/packages/component-authority/model/doors/global-fgos-directory.yaml b/packages/component-authority/model/doors/global-fgos-directory.yaml
+index 80319033c..8b0a0289c 100644
+--- a/packages/component-authority/model/doors/global-fgos-directory.yaml
++++ b/packages/component-authority/model/doors/global-fgos-directory.yaml
+@@ -21,8 +21,6 @@ debt:
+     reason: machineLoginStores takes a homeDir parameter (default os.homedir()) and joins .fgos itself, so a caller can name a home the global directory door does not know
+   - path: src/runner/dispatch/confinement/probes/harness.mjs
+     reason: the probe harness builds ~/.fgos/private from its own home value
+-  - path: apps/fgos-gateway/src/gateway.rs
+-    reason: load_gateway_config takes an explicit home_dir (a test seam) where machine::global_dir takes an environment lookup, so the join stays here; one door once the gateway reads the lookup form
+   - path: packages/holder-lock/rust/src/state_root.rs
+     reason: the state root's home rule, HOME first on every platform; Config uses USERPROFILE on Windows, so under Git Bash the two can resolve under different homes; backlog row p-n22bigucgp
+ retiredBy: "S7: the Node facade retires with the Node payload"
+diff --git a/packages/component-authority/model/doors/parse-cli-arguments.yaml b/packages/component-authority/model/doors/parse-cli-arguments.yaml
+index 8addc18d9..b292cba2f 100644
+--- a/packages/component-authority/model/doors/parse-cli-arguments.yaml
++++ b/packages/component-authority/model/doors/parse-cli-arguments.yaml
+@@ -19,8 +19,8 @@ allowed:
+   - path: apps/fgctl/src/help.rs
+     count: 1
+     reason: fgctl is a separate CLI whose flag grammar takes `--name=value`, which the host grammar does not; its verb tables and help words are its own
+-retiredBy: "S7: the Node twin retires with the last Node verb"
+-debt:
+   - path: packages/holder-lock/rust/src/route.rs
+-    reason: "its own route flag reader (`Flags::parse` and the `--protocol` loop in `main`) is the job the run-supervisor reader moved onto `fgos_host_runtime::cli_args`; `workspace_argument` in the same file judges a worker's argv (`-C` and the `--name=value` spelling, which the host grammar lacks) and stays when the reader moves"
++    count: 2
++    reason: "`workspace_argument` judges a worker's argv (`-C` and the `--name=value` spelling, which the host grammar lacks); the route's own flags are read by `fgos_host_runtime::cli_args`"
++retiredBy: "S7: the Node twin retires with the last Node verb"
+ reason: "one parser per language while both CLIs run, proven equal by test/rust-host/fixtures/parse-args-vectors.json. Other readers of `--flag` tokens are debt: each predates the parser and reads its own grammar"
+diff --git a/packages/component-authority/model/doors/process-facts-proc.yaml b/packages/component-authority/model/doors/process-facts-proc.yaml
+index c70b3886b..c23254209 100644
+--- a/packages/component-authority/model/doors/process-facts-proc.yaml
++++ b/packages/component-authority/model/doors/process-facts-proc.yaml
+@@ -51,9 +51,10 @@ allowed:
+   - path: scripts/git/p-space-resource.mjs
+     count: 5
+     reason: bench counts its own open descriptors in /proc/self/fd and its thread count in /proc/self/status, measurements and not process judgements
+-debt:
+   - path: packages/holder-lock/rust/src/borrow_vectors.rs
+-    reason: a vector module compiled into the crate whose shell snippet reads /proc/$!/winpid to learn a Windows pid
++    count: 1
++    reason: a shell snippet reads /proc/$!/winpid under Git for Windows' sh; only that shell can learn the Windows pid of its own background job, so no Rust door can take the read over
++debt:
+   - path: scripts/lib/mailbox-live-confined.mjs
+     reason: frozen V7n measurement module; moves onto the process door when V7n is re-measured (MAIL)
+ retiredBy: "p-24xw2cwdvo: the run-supervisor directory and the confinement probes run in Rust; their Node copies are reached only by the dead Node Execution closure and the mailbox live scripts, and go with them"
+diff --git a/packages/distribution/rust/src/agent_config.rs b/packages/distribution/rust/src/agent_config.rs
+index e4e71bdd0..aef8eb67b 100644
+--- a/packages/distribution/rust/src/agent_config.rs
++++ b/packages/distribution/rust/src/agent_config.rs
+@@ -18,9 +18,6 @@ use serde_json::{json, Value};
+ 
+ use crate::agent_hooks::{mailbox_opt_in, AgentHooksError, Env, MailboxOptIn, ProcessRunner};
+ 
+-/// The environment key an executor's home is read from.
+-const HOME_KEY: &str = "HOME";
+-
+ pub const WIRE_AGENTS_COMMAND: &str = "fgos wire-agents";
+ pub const CLAUDE_PLUGIN_MARKETPLACE_NAME: &str = "fgos-plugins";
+ /// The marketplace is added by its GitHub source, never a local path: an installed payload does not ship
+@@ -397,248 +394,6 @@ pub fn check_agy_permissions_configured(home: &Path, agy_present: bool) -> AgyPe
+     }
+ }
+ 
+-/// Resolves a raw HOME path (`${HOME}/.agy-homes/x`, `$HOME/x` or `~/x`) with `home`.
+-pub fn resolve_sub_home_path(raw: &str, home: &str) -> String {
+-    let mut text = raw.replace("${HOME}", home);
+-    // `$HOME` followed by a word boundary
+-    let mut out = String::new();
+-    let mut rest = text.as_str();
+-    while let Some(at) = rest.find("$HOME") {
+-        out.push_str(&rest[..at]);
+-        let after = &rest[at + 5..];
+-        if after
+-            .chars()
+-            .next()
+-            .is_some_and(|c| c.is_alphanumeric() || c == '_')
+-        {
+-            out.push_str("$HOME");
+-        } else {
+-            out.push_str(home);
+-        }
+-        rest = after;
+-    }
+-    out.push_str(rest);
+-    text = out;
+-    match text.strip_prefix('~') {
+-        Some(tail) if tail.is_empty() || tail.starts_with('/') => format!("{home}{tail}"),
+-        _ => text,
+-    }
+-}
+-
+-/// One agy sub-HOME an executor config names.
+-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+-#[serde(rename_all = "camelCase")]
+-pub struct AgySubHome {
+-    pub raw_path: String,
+-    pub resolved_path: PathBuf,
+-    pub executor_id: Option<String>,
+-    pub invocation_id: Option<String>,
+-}
+-
+-fn clean(path: &Path) -> PathBuf {
+-    let mut out = PathBuf::new();
+-    for part in path.components() {
+-        match part {
+-            std::path::Component::ParentDir => {
+-                out.pop();
+-            }
+-            std::path::Component::CurDir => {}
+-            other => out.push(other),
+-        }
+-    }
+-    out
+-}
+-
+-/// The agy sub-HOMEs the `runner` section names: `env.HOME` of agy invocations, or of any executor pointing at
+-/// `agy-homes`, and the credential homes of the declared gemini accounts. A config the door refuses names no
+-/// sub-home (`fgos doctor` reports the refusal itself). `config` is a section already read.
+-pub fn find_agy_sub_homes(
+-    cwd: &Path,
+-    home: &str,
+-    env: Env,
+-    config: Option<&Value>,
+-) -> Result<Vec<AgySubHome>, AgentHooksError> {
+-    let read;
+-    let config = match config {
+-        Some(c) => c,
+-        None => match runner_section(cwd, env)? {
+-            Some(section) => {
+-                read = section;
+-                &read
+-            }
+-            None => return Ok(Vec::new()),
+-        },
+-    };
+-    let mut found = SubHomes {
+-        home,
+-        results: Vec::new(),
+-    };
+-    let Some(runner) = config.get("runner") else {
+-        return Ok(found.results);
+-    };
+-    if let Some(exec) = runner.get("executor").filter(|e| e.is_object()) {
+-        found.executor(exec, "executor");
+-    }
+-    if let Some(Value::Object(executors)) = runner.get("executors") {
+-        for (id, exec) in executors.iter().filter(|(_, e)| e.is_object()) {
+-            found.executor(exec, id);
+-        }
+-    }
+-    // The credential homes of the accounts of the `gemini` pool of `runner.llmAccounts`: a confined invocation runs
+-    // as the account the capacity layer picks, so these homes matter as much as the HOME an invocation names.
+-    if let Some(Value::Object(accounts)) = runner.get("llmAccounts").and_then(|p| p.get("gemini")) {
+-        for (id, account) in accounts {
+-            let raw = account
+-                .get("credentialStore")
+-                .and_then(|store| store.get("agy"))
+-                .and_then(Value::as_str)
+-                .map(str::trim);
+-            if let Some(raw) = raw.filter(|r| !r.is_empty()) {
+-                found.add(raw, "gemini", Some(format!("account:{id}")));
+-            }
+-        }
+-    }
+-    Ok(found.results)
+-}
+-
+-/// The sub-HOMEs found so far, each resolved path once.
+-struct SubHomes<'a> {
+-    home: &'a str,
+-    results: Vec<AgySubHome>,
+-}
+-
+-impl SubHomes<'_> {
+-    fn add(&mut self, raw: &str, executor: &str, invocation: Option<String>) {
+-        let resolved = clean(&absolute(Path::new(&resolve_sub_home_path(raw, self.home))));
+-        if self.results.iter().all(|r| r.resolved_path != resolved) {
+-            self.results.push(AgySubHome {
+-                raw_path: raw.to_string(),
+-                resolved_path: resolved,
+-                executor_id: Some(executor.to_string()),
+-                invocation_id: invocation,
+-            });
+-        }
+-    }
+-
+-    /// One `env.HOME`: an agy one when the command, the executor, the invocation or the path says so.
+-    fn env_home(
+-        &mut self,
+-        env_value: &Value,
+-        executor: &str,
+-        invocation: Option<&str>,
+-        command: Option<&str>,
+-    ) {
+-        let Some(raw) = env_value
+-            .get(HOME_KEY)
+-            .and_then(Value::as_str)
+-            .map(str::trim)
+-        else {
+-            return;
+-        };
+-        let is_agy = command == Some("agy")
+-            || executor == "agy"
+-            || invocation.is_some_and(|i| i.contains("agy"))
+-            || raw.contains("agy-homes");
+-        if !raw.is_empty() && is_agy {
+-            self.add(raw, executor, invocation.map(str::to_string));
+-        }
+-    }
+-
+-    fn executor(&mut self, exec: &Value, executor: &str) {
+-        let command = exec.get("command").and_then(Value::as_str);
+-        if let Some(env_value) = exec.get("env") {
+-            self.env_home(env_value, executor, None, command);
+-        }
+-        let Some(Value::Array(invocations)) = exec.get("invocations") else {
+-            return;
+-        };
+-        for inv in invocations.iter().filter(|i| i.is_object()) {
+-            if let Some(env_value) = inv.get("env") {
+-                let id = inv.get("id").and_then(Value::as_str);
+-                let cmd = inv.get("command").and_then(Value::as_str).or(command);
+-                self.env_home(env_value, executor, id, cmd);
+-            }
+-        }
+-    }
+-}
+-
+-fn absolute(path: &Path) -> PathBuf {
+-    if path.is_absolute() {
+-        path.to_path_buf()
+-    } else {
+-        std::env::current_dir().map_or_else(|_| path.to_path_buf(), |cwd| cwd.join(path))
+-    }
+-}
+-
+-/// The project's effective config (every section; the caller reads `runner`), or `None` when the door refuses it.
+-fn runner_section(cwd: &Path, env: Env) -> Result<Option<Value>, AgentHooksError> {
+-    let root = std::fs::canonicalize(cwd).map_err(|source| AgentHooksError::Io {
+-        path: cwd.to_path_buf(),
+-        source,
+-    })?;
+-    match fgos_config::machine::project_snapshot(&root, |key| env(key)) {
+-        Ok(snapshot) => Ok(Some(snapshot.value)),
+-        Err(fgos_config::snapshot::SnapshotError::Refused(list)) => {
+-            let code = list.first().map_or("config-refused", |r| r.code);
+-            if [
+-                "config-request-invalid",
+-                "config-io",
+-                "config-trusted-root-unresolved",
+-                "config-internal-error",
+-            ]
+-            .contains(&code)
+-            {
+-                return Err(AgentHooksError::Config(code.to_string()));
+-            }
+-            Ok(None)
+-        }
+-        Err(fgos_config::snapshot::SnapshotError::Io(e)) => {
+-            Err(AgentHooksError::Config(e.to_string()))
+-        }
+-    }
+-}
+-
+-/// Row `agy-sub-homes-configured`: each agy sub-HOME an executor config or a `gemini` account names exists as a
+-/// directory. A run passes its settings (always-proceed and the deny list) to agy as a session-only `--settings`,
+-/// so no sub-HOME's own settings file is read on a run and none is demanded here.
+-pub fn check_agy_sub_homes_configured(
+-    cwd: &Path,
+-    home: &str,
+-    env: Env,
+-    config: Option<&Value>,
+-) -> Result<Verdict, AgentHooksError> {
+-    let sub_homes = find_agy_sub_homes(cwd, home, env, config)?;
+-    if sub_homes.is_empty() {
+-        return Ok(verdict(
+-            true,
+-            "no agy sub-HOMEs referenced in executor configs or the gemini accounts \u{2014} nothing to check",
+-        ));
+-    }
+-    let missing: Vec<String> = sub_homes
+-        .iter()
+-        .filter(|sub| !sub.resolved_path.is_dir())
+-        .map(|sub| format!("{} ({})", sub.raw_path, sub.resolved_path.display()))
+-        .collect();
+-    if !missing.is_empty() {
+-        return Ok(verdict(
+-            false,
+-            format!(
+-                "agy sub-HOME check failed (not a directory: {}) \u{2014} each sub-HOME an executor or a gemini account names must exist",
+-                missing.join(", ")
+-            ),
+-        ));
+-    }
+-    let named: Vec<&str> = sub_homes.iter().map(|sub| sub.raw_path.as_str()).collect();
+-    Ok(verdict(
+-        true,
+-        format!(
+-            "all {} agy sub-HOME(s) exist ({})",
+-            sub_homes.len(),
+-            named.join(", ")
+-        ),
+-    ))
+-}
+-
+ // ---------------------------------------------------------------------------------------------------------
+ // The wire-agents plan
+ // ---------------------------------------------------------------------------------------------------------
+@@ -1200,97 +955,6 @@ mod tests {
+         );
+     }
+ 
+-    #[test]
+-    fn sub_home_paths_expand_the_home_forms() {
+-        assert_eq!(
+-            resolve_sub_home_path("${HOME}/.agy-homes/a", "/h"),
+-            "/h/.agy-homes/a"
+-        );
+-        assert_eq!(resolve_sub_home_path("$HOME/x", "/h"), "/h/x");
+-        assert_eq!(resolve_sub_home_path("$HOMEWORK/x", "/h"), "$HOMEWORK/x");
+-        assert_eq!(resolve_sub_home_path("~/x", "/h"), "/h/x");
+-        assert_eq!(resolve_sub_home_path("~", "/h"), "/h");
+-        assert_eq!(resolve_sub_home_path("~other/x", "/h"), "~other/x");
+-    }
+-
+-    #[test]
+-    fn sub_homes_come_from_agy_invocations_and_gemini_accounts_and_are_checked_one_by_one() {
+-        let sb = Sandbox::new("subhomes");
+-        let home = sb.home.to_string_lossy().into_owned();
+-        let env = |k: &str| (k == "HOME").then(|| home.clone());
+-        let config = json!({ "runner": {
+-            "executor": { "command": "agy", "env": { "HOME": "${HOME}/.agy-homes/one" } },
+-            "executors": {
+-                "other": { "command": "x", "env": { "HOME": "/not/agy" }, "invocations": [
+-                    { "id": "agy-fast", "env": { "HOME": "~/.agy-homes/two" } },
+-                    { "id": "plain", "env": { "HOME": "/plain" } } ] },
+-                "agy": { "env": { "HOME": "${HOME}/.agy-homes/one" } }
+-            },
+-            "llmAccounts": { "gemini": {
+-                "a1": { "credentialStore": { "agy": "~/gem/one" } },
+-                "a2": { "credentialStore": { "agy": "~/gem/two" } } } }
+-        }});
+-        let found = find_agy_sub_homes(&sb.project, &home, &env, Some(&config)).unwrap();
+-        let resolved: Vec<_> = found.iter().map(|s| s.resolved_path.clone()).collect();
+-        assert_eq!(
+-            resolved,
+-            vec![
+-                sb.home.join(".agy-homes/one"),
+-                sb.home.join(".agy-homes/two"),
+-                sb.home.join("gem/one"),
+-                sb.home.join("gem/two")
+-            ]
+-        );
+-        assert_eq!(found[2].invocation_id.as_deref(), Some("account:a1"));
+-        let verdict_missing =
+-            check_agy_sub_homes_configured(&sb.project, &home, &env, Some(&config)).unwrap();
+-        assert!(!verdict_missing.passed);
+-        assert!(
+-            verdict_missing
+-                .message
+-                .starts_with("agy sub-HOME check failed (not a directory: "),
+-            "{verdict_missing:?}"
+-        );
+-        for sub in &found {
+-            std::fs::create_dir_all(&sub.resolved_path).unwrap();
+-        }
+-        let ok = check_agy_sub_homes_configured(&sb.project, &home, &env, Some(&config)).unwrap();
+-        assert!(
+-            ok.passed
+-                && ok
+-                    .message
+-                    .starts_with("all 4 agy sub-HOME(s) exist (${HOME}/.agy-homes/one, "),
+-            "{ok:?}"
+-        );
+-        let none =
+-            check_agy_sub_homes_configured(&sb.project, &home, &env, Some(&json!({}))).unwrap();
+-        assert_eq!(
+-            none.message,
+-            "no agy sub-HOMEs referenced in executor configs or the gemini accounts \u{2014} nothing to check"
+-        );
+-    }
+-
+-    #[test]
+-    fn a_project_config_the_door_refuses_names_no_sub_home() {
+-        let sb = Sandbox::new("refused");
+-        std::fs::create_dir_all(sb.project.join(".fgos")).unwrap();
+-        std::fs::write(
+-            sb.project.join(".fgos").join("config.yaml"),
+-            "# @fgos:v1\n\n{\"mailbox\": {\"enabled\": \"yes\"}}\n",
+-        )
+-        .unwrap();
+-        let home = sb.home.to_string_lossy().into_owned();
+-        let env = |k: &str| (k == "HOME").then(|| home.clone());
+-        assert!(find_agy_sub_homes(&sb.project, &home, &env, None)
+-            .unwrap()
+-            .is_empty());
+-        let none = find_agy_sub_homes(&sb.dir.join("missing"), &home, &env, None);
+-        assert!(
+-            none.is_err(),
+-            "a root that cannot be read is the module's failure, not a refusal"
+-        );
+-    }
+-
+     #[test]
+     fn a_step_that_changes_claude_runs_with_its_argv_and_says_why_it_failed() {
+         let sb = Sandbox::new("step");
+diff --git a/packages/holder-lock/rust/Cargo.toml b/packages/holder-lock/rust/Cargo.toml
+index fd454e4ea..d05832746 100644
+--- a/packages/holder-lock/rust/Cargo.toml
++++ b/packages/holder-lock/rust/Cargo.toml
+@@ -5,6 +5,7 @@ edition.workspace = true
+ rust-version.workspace = true
+ 
+ [dependencies]
++fgos-host-runtime = { path = "../../host-runtime/rust" }
+ fgos-process = { path = "../../process/rust" }
+ # preserve_order: lock-status keeps the registry's and the records' key order, which the parity runner compares byte for
+ # byte (it normalises the envelope's data_hash away, so the hash itself is not what this proves).
+diff --git a/packages/holder-lock/rust/src/borrow_vectors.rs b/packages/holder-lock/rust/src/borrow_vectors.rs
+index f20f7ced2..4e88007ef 100644
+--- a/packages/holder-lock/rust/src/borrow_vectors.rs
++++ b/packages/holder-lock/rust/src/borrow_vectors.rs
+@@ -18,6 +18,7 @@ use std::time::Instant;
+ 
+ use crate::port::{
+     self, Acquire, BorrowSpec, BorrowStdio, BorrowedCheck, HelperExe, Mode, Probe, Resource, Wait,
++    DEFAULT_KILL_WAIT_MS,
+ };
+ 
+ /// The four vectors, in run order.
+@@ -28,9 +29,6 @@ pub const VECTORS: [&str; 4] = [
+     "gc-auto-loose-objects",
+ ];
+ 
+-/// Kill wait used for the leftovers of a vector.
+-const KILL_WAIT_MS: u64 = 2000;
+-
+ /// One vector's outcome.
+ #[derive(Debug, Clone, PartialEq)]
+ pub struct VectorResult {
+@@ -281,7 +279,12 @@ impl Borrowing<'_> {
+     /// Take the lock, run each git argv through `run_borrowed`, release,
+     /// then probe. Returns (leftovers killed, probe after release, notes).
+     fn run(&self, calls: &[Vec<&str>]) -> Result<(u32, Probe, Vec<String>), String> {
+-        let handle = match port::acquire(&self.resource, Mode::Ex, Wait::Ms(2000), KILL_WAIT_MS) {
++        let handle = match port::acquire(
++            &self.resource,
++            Mode::Ex,
++            Wait::Ms(2000),
++            DEFAULT_KILL_WAIT_MS,
++        ) {
+             Acquire::Acquired(h) => h,
+             other => return Err(format!("owner could not take the vector lock: {other:?}")),
+         };
+@@ -474,7 +477,7 @@ fn background_pids_ended(_pidfile: &Path) -> Result<usize, String> {
+ /// the job variable, without being in the job) is refused.
+ fn sibling(dir: &Path) -> (bool, String) {
+     let resource = Resource::new("borrow-vectors", dir.join("sibling.lock"));
+-    let handle = match port::acquire(&resource, Mode::Ex, Wait::Ms(2000), KILL_WAIT_MS) {
++    let handle = match port::acquire(&resource, Mode::Ex, Wait::Ms(2000), DEFAULT_KILL_WAIT_MS) {
+         Acquire::Acquired(h) => h,
+         other => {
+             return (
+diff --git a/packages/holder-lock/rust/src/route.rs b/packages/holder-lock/rust/src/route.rs
+index e46bd9db3..e59313508 100644
+--- a/packages/holder-lock/rust/src/route.rs
++++ b/packages/holder-lock/rust/src/route.rs
+@@ -10,6 +10,7 @@ use std::ffi::OsString;
+ use std::fs::{File, OpenOptions};
+ use std::path::{Path, PathBuf};
+ 
++use fgos_host_runtime::cli_args::{parse_args_repeating, FlagScalar, FlagValue, ParsedArgs};
+ use serde_json::{json, Map, Value};
+ 
+ use crate::borrow_vectors::{self, RunError};
+@@ -41,6 +42,26 @@ fn protocol_of(route: &str) -> u64 {
+     }
+ }
+ 
++/// Every flag a route reads: each keeps all its uses so a route can refuse a repeat.
++const ROUTE_FLAGS: [&str; 16] = [
++    "--borrowed-check",
++    "--shared-try-path",
++    "--shared-try",
++    "--path",
++    "--mode",
++    "--work",
++    "--wait-ms",
++    "--kill-wait-ms",
++    "--predecessor-kinds",
++    "--try",
++    "--vector",
++    "--keep-repo",
++    "--root",
++    "--dir",
++    "--exclude-pid",
++    "--workspace-only",
++];
++
+ const EXIT_OK: i32 = 0;
+ const EXIT_USAGE: i32 = 2;
+ const EXIT_MISMATCH: i32 = 3;
+@@ -119,17 +140,40 @@ struct Flags {
+ }
+ 
+ impl Flags {
+-    fn parse(args: &[String], takes_value: &[&str], switches: &[&str]) -> Result<Flags, String> {
++    /// Reads the host's parsed call against one route's grammar: a flag in
++    /// `takes_value` needs a value, one in `switches` takes none, and any other
++    /// flag or a positional is refused. Every use of a flag is kept.
++    fn parse(
++        parsed: &ParsedArgs,
++        takes_value: &[&str],
++        switches: &[&str],
++    ) -> Result<Flags, String> {
++        if let Some(positional) = parsed.positional.first() {
++            return Err(format!("unknown argument {positional}"));
++        }
+         let mut items = Vec::new();
+-        let mut it = args.iter();
+-        while let Some(arg) = it.next() {
+-            if takes_value.contains(&arg.as_str()) {
+-                let value = it.next().ok_or_else(|| format!("{arg} needs a value"))?;
+-                items.push((arg.clone(), Some(value.clone())));
+-            } else if switches.contains(&arg.as_str()) {
+-                items.push((arg.clone(), None));
+-            } else {
+-                return Err(format!("unknown argument {arg}"));
++        for (name, value) in &parsed.flags {
++            let flag = format!("--{name}");
++            let uses = match value {
++                FlagValue::One(one) => std::slice::from_ref(one),
++                FlagValue::Many(many) => many.as_slice(),
++            };
++            for scalar in uses {
++                match scalar {
++                    FlagScalar::Str(text) if takes_value.contains(&flag.as_str()) => {
++                        items.push((flag.clone(), Some(text.clone())));
++                    }
++                    FlagScalar::Bool if takes_value.contains(&flag.as_str()) => {
++                        return Err(format!("{flag} needs a value"));
++                    }
++                    FlagScalar::Bool if switches.contains(&flag.as_str()) => {
++                        items.push((flag.clone(), None));
++                    }
++                    FlagScalar::Str(text) if switches.contains(&flag.as_str()) => {
++                        return Err(format!("unknown argument {text}"));
++                    }
++                    _ => return Err(format!("unknown argument {flag}")),
++                }
+             }
+         }
+         Ok(Flags { items })
+@@ -175,36 +219,37 @@ pub fn main(args: &[OsString]) -> i32 {
+             None => return usage("arguments must be UTF-8"),
+         }
+     }
+-    let Some((route, rest)) = strings.split_first() else {
++    let Some((route, _)) = strings.split_first() else {
+         return usage(
+             "fgos internal <lock-fd|lock-hold|quiesce-scan|lock-borrow-vectors> --protocol 2 ...",
+         );
+     };
++    // Every flag any route reads keeps all its uses, so a route can refuse a
++    // flag given twice; `--protocol` keeps its last use.
++    let mut parsed = match parse_args_repeating(&args[1..], &ROUTE_FLAGS) {
++        Ok(parsed) => parsed,
++        Err(err) => return usage(&err.to_string()),
++    };
+     // The protocol is checked before anything else about the call, so a
+     // payload of another release always learns that first.
+-    let mut protocol: Option<&str> = None;
+-    let mut others = Vec::with_capacity(rest.len());
+-    let mut it = rest.iter();
+-    while let Some(arg) = it.next() {
+-        if arg == "--protocol" {
+-            protocol = it.next().map(String::as_str);
+-        } else {
+-            others.push(arg.clone());
+-        }
+-    }
++    let protocol = match parsed.flag("protocol") {
++        Some(FlagValue::One(FlagScalar::Str(text))) => Some(text.clone()),
++        _ => None,
++    };
++    parsed.flags.retain(|(name, _)| name != "protocol");
+     let spoken = protocol_of(route);
+-    if protocol != Some(spoken.to_string().as_str()) {
++    if protocol.as_deref() != Some(spoken.to_string().as_str()) {
+         let message = format!(
+             "this host speaks internal protocol {spoken} on {route}; the call asked for {}",
+-            protocol.unwrap_or("none")
++            protocol.as_deref().unwrap_or("none")
+         );
+         return error_as(spoken, "host-version-mismatch", &message, EXIT_MISMATCH);
+     }
+     match route.as_str() {
+-        "lock-fd" => lock_fd(&others),
+-        "lock-hold" => lock_hold(&others),
+-        "quiesce-scan" => quiesce_scan(&others),
+-        "lock-borrow-vectors" => lock_borrow_vectors(&others),
++        "lock-fd" => lock_fd(&parsed),
++        "lock-hold" => lock_hold(&parsed),
++        "quiesce-scan" => quiesce_scan(&parsed),
++        "lock-borrow-vectors" => lock_borrow_vectors(&parsed),
+         other => usage(&format!("unknown internal route {other}")),
+     }
+ }
+@@ -221,9 +266,9 @@ fn take_slot3() -> std::io::Result<File> {
+ /// lock attempt on the description at fd 3, so it never waits and never
+ /// obstructs a holder. Every other lock operation runs in the caller's process
+ /// through the addon's `holderLock`.
+-fn lock_fd(args: &[String]) -> i32 {
++fn lock_fd(parsed: &ParsedArgs) -> i32 {
+     let flags = match Flags::parse(
+-        args,
++        parsed,
+         &["--borrowed-check", "--shared-try-path"],
+         &["--shared-try"],
+     ) {
+@@ -373,9 +418,9 @@ fn shared_probe(file: &File) -> Answer {
+ 
+ /// `lock-hold --path <lockFile> --mode ex|sh --work <dir> (--try | --wait-ms N)
+ /// [--kill-wait-ms K]`: the Windows helper that holds one lock for Node.
+-fn lock_hold(args: &[String]) -> i32 {
++fn lock_hold(parsed: &ParsedArgs) -> i32 {
+     let flags = match Flags::parse(
+-        args,
++        parsed,
+         &[
+             "--path",
+             "--mode",
+@@ -447,8 +492,8 @@ fn lock_hold(args: &[String]) -> i32 {
+     }
+ }
+ 
+-fn lock_borrow_vectors(args: &[String]) -> i32 {
+-    let flags = match Flags::parse(args, &["--vector"], &["--keep-repo"]) {
++fn lock_borrow_vectors(parsed: &ParsedArgs) -> i32 {
++    let flags = match Flags::parse(parsed, &["--vector"], &["--keep-repo"]) {
+         Ok(flags) => flags,
+         Err(message) => return usage(&message),
+     };
+@@ -505,9 +550,9 @@ fn lock_borrow_vectors(args: &[String]) -> i32 {
+     )
+ }
+ 
+-fn quiesce_scan(args: &[String]) -> i32 {
++fn quiesce_scan(parsed: &ParsedArgs) -> i32 {
+     let flags = match Flags::parse(
+-        args,
++        parsed,
+         &["--root", "--dir", "--exclude-pid"],
+         &["--workspace-only"],
+     ) {
+@@ -1222,3 +1267,45 @@ mod quiesce {
+         }
+     }
+ }
++
++#[cfg(test)]
++mod tests {
++    use super::{Flags, ROUTE_FLAGS};
++    use fgos_host_runtime::cli_args::parse_args_repeating;
++    use std::ffi::OsString;
++
++    fn parse(parts: &[&str], takes_value: &[&str], switches: &[&str]) -> Result<Flags, String> {
++        let args: Vec<OsString> = parts.iter().map(OsString::from).collect();
++        let parsed = parse_args_repeating(&args, &ROUTE_FLAGS).map_err(|err| err.to_string())?;
++        Flags::parse(&parsed, takes_value, switches)
++    }
++
++    #[test]
++    fn route_argv_edges_are_refused_by_name() {
++        let takes_value = ["--root"];
++        let switches = ["--workspace-only"];
++        let refused = |parts: &[&str]| parse(parts, &takes_value, &switches).err();
++        // A value that starts with `--` is the next flag, so the value flag has none.
++        assert_eq!(
++            refused(&["--root", "--workspace-only"]).as_deref(),
++            Some("--root needs a value")
++        );
++        // A switch takes no value: the bare word after it is named.
++        assert_eq!(
++            refused(&["--workspace-only", "junk"]).as_deref(),
++            Some("unknown argument junk")
++        );
++        // A value flag given twice parses, and reading it as one value refuses.
++        let twice = parse(&["--root", "/a", "--root", "/b"], &takes_value, &switches)
++            .expect("both uses are kept");
++        assert_eq!(
++            twice.one("--root").err().as_deref(),
++            Some("--root given more than once")
++        );
++        // A repeated switch keeps every use, so the stray word between them is still refused.
++        assert_eq!(
++            refused(&["--workspace-only", "junk", "--workspace-only"]).as_deref(),
++            Some("unknown argument junk")
++        );
++    }
++}
+diff --git a/plans/261121-2110-component-authority-doors/reports/unit-261124-0900-p12a-s1-result.md b/plans/261121-2110-component-authority-doors/reports/unit-261124-0900-p12a-s1-result.md
+new file mode 100644
+index 000000000..891eac679
+--- /dev/null
++++ b/plans/261121-2110-component-authority-doors/reports/unit-261124-0900-p12a-s1-result.md
+@@ -0,0 +1,15 @@
++# Phase 12a step 1: execution doctor judgments
++
++Deleted `find_agy_sub_homes`, `check_agy_sub_homes_configured` and their private helpers (`resolve_sub_home_path`,
++`AgySubHome`, `SubHomes`, `clean`, `absolute`, `runner_section`, `HOME_KEY`) from
++`packages/distribution/rust/src/agent_config.rs`, plus the three tests that owned them. No caller outside the file used
++them (checked with grep over `apps` and `packages`). `lib.rs` is unchanged: the module still holds the wire-agents plan.
++Last commit that touched the deleted functions: `c9395bf8b`.
++
++Also done: debt and `retiredBy` removed from `execution-doctor-judgments.yaml`; the row is gone from `NAMED_DOOR_DEBT`;
++the door test now asserts the row holds no debt and that `find_agy_sub_homes` fails in `agent_config.rs`; one
++decision-history line added to `docs/platform/packaging-distribution/spec.md`.
++
++Not run (cargo and node unavailable in the sandbox): `cargo test -p fgos-distribution` and
++`node --test test/architecture.test.mjs`. The lead should check that the crate builds with no unused-import warning, and
++that the door test accepts a row with no `debt` key.
+diff --git a/plans/261121-2110-component-authority-doors/reports/unit-261124-0910-p12a-s3-result.md b/plans/261121-2110-component-authority-doors/reports/unit-261124-0910-p12a-s3-result.md
+new file mode 100644
+index 000000000..ff5551826
+--- /dev/null
++++ b/plans/261121-2110-component-authority-doors/reports/unit-261124-0910-p12a-s3-result.md
+@@ -0,0 +1,16 @@
++# Phase 12a step 3 result
++
++## Done
++- `process-facts-proc.yaml`: the `borrow_vectors.rs` entry moved from `debt` to `allowed`, `count: 1`, reason: only Git for Windows' `sh` can learn the Windows pid of its own background job (`/proc/$!/winpid`), so no Rust door can take the read over. The row keeps `debt` for `scripts/lib/mailbox-live-confined.mjs`, so `NAMED_DOOR_DEBT` is unchanged.
++- `borrow_vectors.rs`: the private `const KILL_WAIT_MS: u64 = 2000` is gone; both `port::acquire` calls use `DEFAULT_KILL_WAIT_MS` (imported from `crate::port`, value 2000, so the vectors' behaviour is identical).
++- `docs/platform/holder-lock/spec.md`: one decision-history line.
++
++## Count
++Patterns run per line over comment-stripped text with strings intact (`doorText`). In `borrow_vectors.rs` the only match is line `format!("sleep 30 ... cat /proc/$!/winpid ...")`: pattern 1 (`/proc/(?:...|\$|...)`) matches once; pattern 2 (`"/proc"`) and 3 (`"/proc/` at a string start) match nothing; the doc comment mentioning `/proc/$!/winpid` is stripped. Total 1. The lead should confirm with `node --test test/architecture.test.mjs`.
++
++## Not as the phase assumed
++- `fence_lock` and `TERM_WAIT_MS` no longer exist in `borrow_vectors.rs` (grep: only the `KILL_WAIT_MS` copy remained), so there was nothing to move for them. `fence-a-registry-lock.yaml` therefore needs no change: its `= 3000` pattern never matched the module's 2000 copy and now no copy exists. Left unedited.
++- `test/architecture.test.mjs` unchanged (row stays in `NAMED_DOOR_DEBT`).
++
++## Not run
++cargo and node: the lead verifies (`cargo test -p fgos-holder-lock`, architecture test).
+diff --git a/plans/261121-2110-component-authority-doors/reports/unit-261124-0920-p12a-s4-result.md b/plans/261121-2110-component-authority-doors/reports/unit-261124-0920-p12a-s4-result.md
+new file mode 100644
+index 000000000..5f077a813
+--- /dev/null
++++ b/plans/261121-2110-component-authority-doors/reports/unit-261124-0920-p12a-s4-result.md
+@@ -0,0 +1,16 @@
++# p12a step 4 result: holder-lock flag reader
++
++Status: done, not compiled or run here (cargo and node cannot run in this sandbox); the lead verifies.
++
++## A. rustfmt
++`borrow_vectors.rs` line 282 `port::acquire(...)` is wrapped as rustfmt prints it. The other call (line 475) is 97 columns, under 100, so it stays on one line.
++
++## B. Flag reader
++Crate edge `fgos-holder-lock` -> `fgos-host-runtime` is allowed: `layers.yaml` tiers are checked on `.mjs` imports only, `fgos-identity` and `fgos-convention` (same tier 1) already link `fgos-host-runtime`, and `fgos-host-runtime` has no path back to holder-lock (no cycle).
++
++- `route.rs`: `main` reads the call with `parse_args_repeating` (all route flags in `ROUTE_FLAGS` keep every use); `--protocol` is read from the parsed flags (last use) and removed before routing. `Flags::parse` now validates a `ParsedArgs` against a route grammar (needs a value / switch / unknown argument / positional refused) and keeps the same error texts. Route fns take `&ParsedArgs`. `workspace_argument` untouched.
++- Behaviour shifts of the host grammar: a value starting with `--` is no longer taken as a flag's value (reported as "needs a value"); a switch followed by a bare word reports that word as an unknown argument, as before.
++- `Cargo.toml` and `Cargo.lock`: added the `fgos-host-runtime` edge.
++- `parse-cli-arguments.yaml`: debt entry removed; `route.rs` is an allowed entry, `count: 2` (the two `"--dir" | "--worktree"` alternations in `workspace_argument`), with that reason. `NAMED_DOOR_DEBT` no longer lists `parse CLI arguments (twin)`.
++
++Lead to verify: `cargo fmt --check`, `cargo test -p fgos-holder-lock`, `node --test test/architecture.test.mjs` (the count of 2 is by reading, not run).
+diff --git a/plans/261121-2110-component-authority-doors/reports/unit-261124-0930-p12a-s5-result.md b/plans/261121-2110-component-authority-doors/reports/unit-261124-0930-p12a-s5-result.md
+new file mode 100644
+index 000000000..65c12ad1c
+--- /dev/null
++++ b/plans/261121-2110-component-authority-doors/reports/unit-261124-0930-p12a-s5-result.md
+@@ -0,0 +1,9 @@
++# p12a step 5: gateway home seam
++
++- `load_gateway_config` takes the environment lookup (`impl Fn(&str) -> Option<String>`) and resolves the global
++  directory with `fgos_config::machine::global_dir`: no own `.fgos` join, no `home_dir` argument. `run` passes
++  `|key| std::env::var(key).ok()`.
++- Tests pass the home as that lookup (`home_env`) and build paths through the door (`test_global_dir`).
++- `global-fgos-directory.yaml`: the `apps/fgos-gateway/src/gateway.rs` debt entry is removed.
++- No Cargo change: `fgos-config` is already a dependency of `apps/fgos-gateway`.
++- Not run (no cargo/node in the sandbox): `cargo test -p fgos-gateway` and the architecture test need the lead.
+diff --git a/test/architecture.test.mjs b/test/architecture.test.mjs
+index 9df501dce..889051f33 100644
+--- a/test/architecture.test.mjs
++++ b/test/architecture.test.mjs
+@@ -1812,14 +1812,12 @@ export const NAMED_DOOR_DEBT = new Set([
+   'decide a dispatch',
+   'derive executor facts',
+   'doctor readiness registry',
+-  'execution doctor judgments',
+   'global fgOS directory',
+   'installation shim and activation record location',
+   'kernel lock primitive',
+   'list run directories (twin)',
+   'make, provision and remove a checkout',
+   'no Node from the native packaging verbs',
+-  'parse CLI arguments (twin)',
+   'process control: signal a process or group',
+   'process facts: read /proc',
+   'resolve the invocation root',
+@@ -2200,8 +2198,10 @@ test('door check: the execution doctor judges live in checks.rs, their Node name
+     assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', `fn ${name}() {}\n`).length, 1, name);
+     assert.deepEqual(doorHits(row, 'packages/execution/rust/src/checks.rs', `fn ${name}() {}\n`), [], name);
+   }
+-  // The only debt is the dead Rust copy of the finder in the distribution crate; the Node agy sub-HOME reader is gone.
+-  assert.deepEqual(row.debt.map((e) => e.path), ['packages/distribution/rust/src/agent_config.rs']);
++  // The dead Rust copy of the finder in the distribution crate is deleted: the row holds no debt, and the name fails
++  // there if it comes back.
++  assert.deepEqual(row.debt ?? [], []);
++  assert.equal(doorHits(row, 'packages/distribution/rust/src/agent_config.rs', 'pub fn find_agy_sub_homes() {}\n').length, 1);
+   assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'fn find_agy_sub_homes() {}\n').length, 1);
+   for (const file of ['src/setup/agy-permissions.mjs', 'src/setup/seeded.mjs']) {
+     assert.equal(doorHits(row, file, 'export function findAgySubHomes() {}\n').length, 1, file);
