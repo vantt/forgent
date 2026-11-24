@@ -306,9 +306,11 @@ mod tests {
         let door = found.iter().find(|f| f.kind == MatchKind::Door).unwrap();
         assert_eq!(door.severity, Some(Severity::High));
         let json = serde_json::to_value(&found).unwrap();
-        assert_eq!(json[0]["kind"], "component");
-        assert!(json[0].get("severity").is_none());
-        assert_eq!(json[1]["severity"], "high");
+        let entries = json.as_array().unwrap();
+        let component = entries.iter().find(|e| e["kind"] == "component").unwrap();
+        assert!(component.get("severity").is_none());
+        let door = entries.iter().find(|e| e["kind"] == "door").unwrap();
+        assert_eq!(door["severity"], "high");
     }
 
     #[test]
