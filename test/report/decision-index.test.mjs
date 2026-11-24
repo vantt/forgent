@@ -270,7 +270,7 @@ test('narrativeHolderResolver: reads decision-kinds.yaml through the host by id,
     '',
   ].join('\n'));
   fs.writeFileSync(path.join(modelDir, 'contracts.yaml'), '[]\n');
-  fs.writeFileSync(path.join(modelDir, 'doors', 'one.yaml'), 'job: j\nkind: door\npatterns: []\nallowed: []\n');
+  fs.writeFileSync(path.join(modelDir, 'doors', 'one.yaml'), 'job: j\nkind: door\nseverity: low\npatterns: []\nallowed: []\n');
   fs.writeFileSync(path.join(modelDir, 'decision-kinds.yaml'), [
     '- id: packaging-distribution',
     '  canonical: decision-kind:packaging-distribution',
