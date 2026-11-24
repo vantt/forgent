@@ -67,6 +67,15 @@ worktree. The answer allows only that footprint edit and the rerun; nothing else
 (`cargo test -p fgos-session-host`, `cargo test -p fgos-run-supervisor`, `node --test ...`) run inside the unit, and
 the first run came back blocked because the sandbox refused both. Start the rerun with a unit that can run them.
 
+## Owner answer q-qzcq5xti2k (2026-11-24 23:04)
+
+Option "Allow cargo and node for claude workers in project config": add `--allowedTools 'Bash(cargo:*)' 'Bash(node:*)'
+'Bash(npm test:*)'` to the `claude-cli-bwrap` invocation. Applying it was refused: `runner.executors.<id>.invocations[].args`
+is `x-fgos-scope: global-only` (`core/config-schema/runner.schema.yaml`), and lists are leaves, so `fgos config patch`
+of `runner.executors.claude.invocations` into `.fgos/config.yaml` returns `config-key-out-of-scope belongs-in=global`.
+The answer's scope covered the project file only, so the supervisor wrote nothing and asked follow-up `q-owq4jhwng7`
+(supersedes it). Phase 2 stays parked on it.
+
 ## Decisions taken in this phase (planner's, within PC-D6 and PC-D11)
 
 - **Where the table lives:** `packages/session-host/contracts/head-permissions.v1.json`, compiled into the crate
