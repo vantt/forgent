@@ -1,6 +1,5 @@
 job: project wiring reversal
 kind: door
-severity: low
 patterns:
   - \.pre-uninstall-(?:\$\{|\{)
   - export function (?:uninstallProject|uninstallGitHooks)\b

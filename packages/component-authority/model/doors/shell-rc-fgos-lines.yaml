@@ -1,6 +1,5 @@
 job: shell rc fgOS lines
 kind: door
-severity: low
 patterns:
   - export function (?:detectRcFiles|hasSourceLine|deadSourceLines|insertSourceLine)\b
   - pub fn (?:detect_rc_files|has_source_line|dead_source_lines|rc_files_sourcing)\b

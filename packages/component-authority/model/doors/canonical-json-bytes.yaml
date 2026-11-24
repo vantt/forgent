@@ -1,6 +1,5 @@
 job: canonical JSON bytes
 kind: door
-severity: low
 patterns:
   - (?:function|fn)\s+(?:canonicalJson|stableStringify|sortedJson|canonical_json|to_canonical_json)\b
 allowed:

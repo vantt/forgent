@@ -1,6 +1,5 @@
 job: delete-guard keyword list
 kind: door
-severity: low
 patterns:
   - \bPREFILTER_(?:SUBSTRINGS|WORDS)\b
   - \bDELETE_GUARD_PREFILTER\b

@@ -1,6 +1,5 @@
 job: capability rows hold jobs and tool abilities
 kind: door
-severity: low
 patterns:
   - \bDEFAULT_CAPABILITY_SLOTS\b
   - \bRUNNER_LOOP_CAPABILITY_USES\b

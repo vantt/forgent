@@ -1,6 +1,5 @@
 job: write a Windows verbatim path plainly
 kind: door
-severity: low
 patterns:
   - r#*"\\\\\?\\
 allowed:

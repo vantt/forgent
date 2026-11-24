@@ -1,6 +1,5 @@
 job: retired Node S2 verb code
 kind: door
-severity: low
 patterns:
   - \bcollectLockStatus\b
   - \bfenceLock\b

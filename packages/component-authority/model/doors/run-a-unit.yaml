@@ -1,6 +1,5 @@
 job: run a unit
 kind: door
-severity: low
 patterns:
   - \brun_unit(?:_result)?\(
   - export (?:async )?function runUnit\b

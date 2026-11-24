@@ -1,6 +1,5 @@
 job: temp file name of a Node write-then-rename
 kind: door
-severity: low
 patterns:
   - \}\.tmp-\$\{process\.pid\}
   - \$\{process\.pid\}\.tmp

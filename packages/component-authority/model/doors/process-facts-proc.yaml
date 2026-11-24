@@ -1,6 +1,5 @@
 job: "process facts: read /proc"
 kind: door
-severity: medium
 patterns:
   - /proc/(?:self|sys|net|\{|\$|\d|loadavg|meminfo)
   - "[\"']/proc[\"']"

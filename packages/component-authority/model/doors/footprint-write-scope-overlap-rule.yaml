@@ -1,6 +1,5 @@
 job: the footprint and write-scope overlap rule
 kind: door
-severity: high
 patterns:
   - export function pathsOverlap\b
   - \bfootprintOverlapAmong\b

@@ -1,6 +1,5 @@
 job: Execution's Node seam
 kind: door
-severity: low
 patterns:
   - (?:from\s+|import\(\s*)['"][^'"]*execution-door\.mjs['"]
   - "'internal',\\s*'execution'"

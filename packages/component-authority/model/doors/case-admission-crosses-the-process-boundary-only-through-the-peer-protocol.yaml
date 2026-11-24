@@ -1,6 +1,5 @@
 job: case admission crosses the process boundary only through the peer protocol
 kind: door
-severity: low
 patterns:
   - FGOS-ADMISSION-PEER
   - \bserveAdmissionPeer\b

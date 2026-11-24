@@ -1,6 +1,5 @@
 job: "process identity: start time of a process"
 kind: door
-severity: low
 patterns:
   - GetProcessTimes
   - \bOpenProcess\(

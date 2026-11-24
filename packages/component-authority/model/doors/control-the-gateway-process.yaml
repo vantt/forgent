@@ -1,6 +1,5 @@
 job: control the gateway process
 kind: door
-severity: low
 patterns:
   - gateway\.json
   - "['\"]--bin['\"],\\s*['\"]fgos-gateway['\"]"

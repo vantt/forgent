@@ -1,6 +1,5 @@
 job: kernel lock primitive
 kind: door
-severity: medium
 patterns:
   - libc::flock
   - \bLockFileEx\b

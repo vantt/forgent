@@ -1,6 +1,5 @@
 job: report the registry locks
 kind: door
-severity: low
 patterns:
   - \bLOCK_FILES\b
   - \bexistingInstances\b

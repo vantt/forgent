@@ -1,6 +1,5 @@
 job: installation shim and activation record location
 kind: door
-severity: high
 patterns:
   - activation\.json
   - "['\"]installation['\"],\\s*['\"]bin['\"]"

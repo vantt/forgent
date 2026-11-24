@@ -1,6 +1,5 @@
 job: resolve the invocation root
 kind: door
-severity: high
 patterns:
   - \bnearestStoreRoot\b
   - \bresolve_target_root\b

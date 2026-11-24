@@ -1,6 +1,5 @@
 job: retired native declarations
 kind: door
-severity: low
 patterns:
   - \bnativeOnly\b
   - \bnative_kinds\b

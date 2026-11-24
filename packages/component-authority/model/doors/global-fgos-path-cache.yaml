@@ -1,6 +1,5 @@
 job: global fgos path cache
 kind: door
-severity: low
 patterns:
   - bin-cache\.json
   - globalFgosPath

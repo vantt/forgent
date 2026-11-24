@@ -1,6 +1,5 @@
 job: record a malformed call (twin)
 kind: door
-severity: low
 patterns:
   - invocation-faults\.jsonl
   - \bargvShape\b

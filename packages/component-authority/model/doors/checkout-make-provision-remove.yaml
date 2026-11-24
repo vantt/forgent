@@ -1,6 +1,5 @@
 job: make, provision and remove a checkout
 kind: door
-severity: high
 patterns:
   - \bfgos_checkout\b
   - \.create_worktree\(

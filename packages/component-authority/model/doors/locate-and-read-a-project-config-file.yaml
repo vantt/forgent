@@ -1,6 +1,5 @@
 job: locate and read a project config file
 kind: door
-severity: low
 patterns:
   - "['\"`]config\\.ya?ml['\"`]"
   - "['\"`]config\\.json['\"`]"

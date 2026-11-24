@@ -1,6 +1,5 @@
 job: retired Node S5 code
 kind: door
-severity: low
 patterns:
   - \bdecideDispatchHook\b
   - \bexplainCapability\b

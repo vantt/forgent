@@ -6,7 +6,7 @@
 //! a row missing a field, carrying an unnamed field or holding the wrong type cannot be loaded, so the
 //! tests below start from a loaded model.
 
-use fgos_component_authority::model::{DoorPathReason, Exception};
+use fgos_component_authority::model::{DoorPathReason, Exception, Severity};
 use fgos_component_authority::{
     Component, Contract, DecisionKind, Door, DoorPath, Layers, Model, TierException,
 };
@@ -893,12 +893,20 @@ fn the_enum_constants_and_the_typed_row_fields_equal_the_schema() {
             "narrative": "n", "readFirst": "r", "facts": "f"
         }),
     );
+    assert_eq!(
+        string_set(&defs["door"]["properties"]["severity"]["enum"]),
+        [Severity::High, Severity::Medium, Severity::Low]
+            .iter()
+            .map(|s| serde_json::to_value(s).unwrap().as_str().unwrap().to_owned())
+            .collect::<BTreeSet<String>>()
+    );
     assert_row_matches_schema::<Door>(
         "door",
         &defs["door"],
         &[
             "job",
             "kind",
+            "severity",
             "patterns",
             "names",
             "primitives",
@@ -911,7 +919,7 @@ fn the_enum_constants_and_the_typed_row_fields_equal_the_schema() {
         &["job", "kind", "patterns", "allowed"],
         &["slug"],
         serde_json::json!({
-            "job": "j", "kind": "k", "patterns": [], "names": ["n"], "primitives": ["p"],
+            "job": "j", "kind": "k", "severity": "high", "patterns": [], "names": ["n"], "primitives": ["p"],
             "allowed": [], "debt": [], "reason": "r", "retiredBy": "b", "owner": "o"
         }),
     );

@@ -1,6 +1,5 @@
 job: writer and session id environment
 kind: door
-severity: low
 patterns:
   - FGOS_SESSION_ID
   - FGOS_PARENT_WRITER_ID

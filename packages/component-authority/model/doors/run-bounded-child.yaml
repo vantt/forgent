@@ -1,6 +1,5 @@
 job: run a bounded child and find a program on the search path
 kind: door
-severity: medium
 patterns:
   - pub fn run_bounded\b
   - pub fn run_bounded_command\b

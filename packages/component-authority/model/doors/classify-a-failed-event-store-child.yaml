@@ -1,6 +1,5 @@
 job: classify a failed Event Store child
 kind: door
-severity: low
 patterns:
   - event-store-child
 allowed:

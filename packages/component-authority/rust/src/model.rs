@@ -119,7 +119,8 @@ pub struct Door {
     pub slug: String,
     pub job: String,
     pub kind: String,
-    pub severity: Severity,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub severity: Option<Severity>,
     pub patterns: Vec<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub names: Vec<String>,

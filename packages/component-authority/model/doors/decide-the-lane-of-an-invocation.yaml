@@ -1,6 +1,5 @@
 job: decide the lane of an invocation
 kind: door
-severity: low
 patterns:
   - \bnative_subcommands\b
 allowed:

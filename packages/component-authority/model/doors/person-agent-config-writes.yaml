@@ -1,6 +1,5 @@
 job: person's agent config writes
 kind: door
-severity: low
 patterns:
   - pre-wire-agents
   - "['\"]marketplace['\"],\\s*['\"]add['\"]"

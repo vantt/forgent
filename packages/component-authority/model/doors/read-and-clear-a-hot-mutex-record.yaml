@@ -1,6 +1,5 @@
 job: read and clear a hot mutex record
 kind: door
-severity: low
 patterns:
   - export function (?:readHotRecord|reclaimDeadHolder|unlinkRecordIfUnchanged)\b
   - \.reclaim\.lock

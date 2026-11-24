@@ -1,6 +1,5 @@
 job: retired Node S4 verb code
 kind: door
-severity: low
 patterns:
   - \bsetupUseCase\b
   - \bmaterializeSkillsIntoProject\b

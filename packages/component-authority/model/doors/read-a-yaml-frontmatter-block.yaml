@@ -1,6 +1,5 @@
 job: read a YAML frontmatter block
 kind: door
-severity: low
 patterns:
   - \b(?:parseFrontmatter|renderFrontmatter|extractFrontmatter)\b
   - \bFRONTMATTER_PATTERN\b

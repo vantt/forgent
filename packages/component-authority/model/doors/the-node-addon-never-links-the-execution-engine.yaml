@@ -1,6 +1,5 @@
 job: the Node addon never links the Execution engine
 kind: door
-severity: low
 patterns:
   - \bfgos_execution_engine\b
 allowed:

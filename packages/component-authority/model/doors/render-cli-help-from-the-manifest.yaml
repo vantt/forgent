@@ -1,6 +1,5 @@
 job: render CLI help from the manifest
 kind: door
-severity: low
 patterns:
   - command-manifest\.json
 allowed:

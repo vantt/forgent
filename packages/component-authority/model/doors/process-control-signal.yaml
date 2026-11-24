@@ -1,6 +1,5 @@
 job: "process control: signal a process or group"
 kind: door
-severity: medium
 patterns:
   - process\.kill\(
   - libc::kill(?:pg)?\(

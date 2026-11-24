@@ -1,6 +1,5 @@
 job: "the old tool registry and its status overlay are gone: ask fgos dispatch decide --for <capability>"
 kind: door
-severity: low
 patterns:
   - \btoolsFromExecutors\b
   - \bqueryTools\b

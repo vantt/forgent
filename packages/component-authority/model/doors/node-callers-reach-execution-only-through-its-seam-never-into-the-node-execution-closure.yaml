@@ -1,6 +1,5 @@
 job: Node callers reach Execution only through its seam, never into the Node Execution closure
 kind: door
-severity: low
 patterns:
   - (?:from\s+|import\(\s*)['"](?:[^'"]*(?:runner/(?:dispatch|execution)|run-supervisor)/|\./(?:dispatch|execution)/)[^'"]*['"]
 allowed:

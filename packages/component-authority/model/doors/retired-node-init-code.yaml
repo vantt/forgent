@@ -1,6 +1,5 @@
 job: retired Node init code
 kind: door
-severity: low
 patterns:
   - \binitStoreUseCase\b
   - \bsettleLegacyConfig\b

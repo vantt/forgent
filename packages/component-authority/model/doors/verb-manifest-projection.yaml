@@ -1,6 +1,5 @@
 job: verb manifest projection
 kind: door
-severity: low
 patterns:
   - \bpublicManifest\(
 names:

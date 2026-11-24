@@ -1,6 +1,5 @@
 job: execution doctor judgments
 kind: door
-severity: low
 patterns:
   - (?:export )?(?:async )?function (?:checkRunnerGeneratedPathsConfig|checkToolRegistryConfigured|checkCapabilityServesValid|checkExecutorConfinement|checkInvocationGitWriteGrants|checkOmpNativesPresent|checkAgySubHomesConfigured|findAgySubHomes)\b
   - \bfn (?:find_agy_sub_homes|check_agy_sub_homes_configured)\b

@@ -1,6 +1,5 @@
 job: retired Node config, identity and observe doctor rows
 kind: door
-severity: low
 patterns:
   - \bCONFIG_CHECKS\b
   - \bCONFIG_FIXES\b
