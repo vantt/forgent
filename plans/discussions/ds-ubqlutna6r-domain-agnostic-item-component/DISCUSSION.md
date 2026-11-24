@@ -18,12 +18,7 @@ arranges one, and a backlog row of its own if one is wanted.
 **Round 7 (2026-11-24 14:2x), consolidation at the owner's request (the talk had drifted from the item component).**
 Settled: A1–A4; owner statements held: routes are listed, possible and forbidden, set by the organisation (I11); two
 levels: the keeper cares for heads, a head divides its work through Workflow (I20 correction). Settled facts: I7, I8, I13,
-I15, I18–I20. **Proposed scope cut (awaiting the owner):** this discussion closes only what the item component itself
-needs: (a) the fields it holds (I4); (b) the fate of `tsk-` items (I5); (c) authority and the questions overlap (I6);
-(d) the id contract without fgOS; (e) the item's status shape (stage × state, I21) and the link a case keeps to its item;
-(f) one portfolio reader, ordered against the orchestration skeleton (I19). Handed out as interfaces only: route storage
-and names (I12, I14) and heads outside cases (I20 a, b) to Workflow and the skeleton; the board mapping (I17) and
-retiring Work's FSMs (I20 c) to Work's phase T7.
+I15, I18–I20. **Scope (owner 2026-11-24 14:39):** no cut. The wide view is on purpose: it shows what the item should be and how the parts around it behave. Next: re-explain I19's effect on I18 plainly, then continue from I21.
 
 ## 2. Mục tiêu & đề bài
 
@@ -140,6 +135,7 @@ and Workflow attach to it without the component knowing them.
 - **2026-11-24 13:44, owner:** "giải thích rõ V2 còn thiếu gì". Recorded I20: four gaps (no item link on a case, coarse status written by hand through `land`, no route list for the item's own lifecycle, work outside a plan runs outside cases).
 - **2026-11-24 14:2x, owner:** supervisor cares for heads and leads, not workers or children; the lead governs children by the same rule through the Workflow engine; a head holds the big work and divides it, and Workflow governs the dividing down and running. Shaper confirmed with that nuance (Workflow frames, admits and records; the head chooses order; execution runs through the two doors) and restated gap 4 in I20.
 - **2026-11-24 14:21, owner:** "bảng liệt kê bên trên cũng hơi đúng rồi; có gì sót, có gì tổng quát hơn không". Recorded I21: five kinds of gaps in the table and a two-axis (stage × state) model that repeats per level, with Work's old W2 × W1 as prior art.
+- **2026-11-24 14:39, owner:** declined the scope cut; the wide discussion is on course. Asked for a plain re-explanation of I19's effect on I18 (V2, V6, V4, the two portfolio readers).
 
 ## 6. Thiết kế đã chốt {#design}
 
