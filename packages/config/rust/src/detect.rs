@@ -2,7 +2,6 @@
 //! `PATH`. The crate reads no environment itself; the caller's detectors answer, and only for the
 //! paths whose schema says `x-fgos-absent: detected`.
 use std::ffi::OsString;
-use std::path::Path;
 
 use fgos_yaml_doc::{Segment, Value};
 
@@ -63,21 +62,6 @@ pub(crate) fn paths(s: &Schemas) -> Vec<Vec<Segment>> {
     out
 }
 
-/// Whether `dir/name` is a regular file with an execute bit. Windows has no such bit: gate G4.
-fn executable(dir: &Path, name: &str) -> bool {
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::metadata(dir.join(name))
-            .is_ok_and(|m| m.is_file() && m.permissions().mode() & 0o111 != 0)
-    }
-    #[cfg(not(unix))]
-    {
-        let _ = (dir, name);
-        false
-    }
-}
-
 /// Finds the default executor on the `PATH` the caller passes (the crate reads no environment). The
 /// candidates in order and the template of each come from `contracts/detected.v1.json`: the first
 /// candidate found decides, and one with no template (no verified argv) yields no executor.
@@ -89,14 +73,16 @@ impl PathDetectors {
     /// The first candidate of the contract that is an executable file in an absolute `PATH` entry (a
     /// relative entry would make the answer depend on the working directory).
     fn first_found(&self) -> Option<&'static str> {
-        let dirs: Vec<_> = std::env::split_paths(self.path.as_deref()?)
-            .filter(|d| d.is_absolute())
-            .collect();
+        // Windows has no execute bit, so nothing is detected there: gate G4.
+        if !cfg!(unix) {
+            return None;
+        }
+        let path = self.path.as_deref()?.to_string_lossy();
         let names = contract!("detected.v1.json")["candidates"].as_array()?;
         let found = names.iter().filter_map(|n| n.as_str());
-        found
-            .into_iter()
-            .find(|name| dirs.iter().any(|dir| executable(dir, name)))
+        found.into_iter().find(|name| {
+            fgos_process::spawn::resolve_program_in(name, &path, "", false, true).is_some()
+        })
     }
 }
 

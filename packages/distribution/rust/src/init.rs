@@ -369,17 +369,10 @@ pub fn format_iso8601_utc(time: SystemTime) -> String {
 
 /// Resolves path to `node` executable on PATH.
 pub fn resolve_node_path() -> String {
-    if let Ok(path_var) = std::env::var("PATH") {
-        for dir in std::env::split_paths(&path_var) {
-            for name in ["node", "node.exe"] {
-                let candidate = dir.join(name);
-                if candidate.is_file() {
-                    return candidate.to_string_lossy().to_string();
-                }
-            }
-        }
-    }
-    "node".to_string()
+    let path_var = std::env::var("PATH").unwrap_or_default();
+    let pathext = std::env::var("PATHEXT").unwrap_or_default();
+    fgos_process::spawn::resolve_program("node", &path_var, &pathext, cfg!(windows))
+        .map_or_else(|| "node".to_string(), |p| p.to_string_lossy().to_string())
 }
 
 /// Checks if current `node --version` satisfies the manifest's requires.node specification.

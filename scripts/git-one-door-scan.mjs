@@ -1834,6 +1834,24 @@ function rustModel(name, source, root) {
     // `cond.then(|| v)` is `v` or `None`.
     const then = /^[\s\S]+\.then\(\s*(?:move\s*)?\|\s*\|\s*([\s\S]+)\)$/.exec(expr);
     if (then && rustBalanced(then[1])) return evalRust(then[1], index, depth + 1);
+    // `resolve_program(name, ..)` (packages/process/rust/src/spawn.rs) finds the file `name` names on the
+    // search path: the program it returns is the program `name` evaluates to, so the spawn counts as resolved
+    // where `name` is a literal, and is followed to its callers where `name` is a parameter. The scan follows
+    // it by name, through a module path or not, before it could mistake the door's own body for the value.
+    const resolverCall = /^(?:[a-z_][a-z0-9_]*::)*resolve_program(?:_in)?\s*\(/.exec(expr);
+    if (resolverCall) {
+      const open = resolverCall[0].length - 1;
+      let nest = 0;
+      let close = open;
+      for (; close < expr.length; close++) { if ('([{'.includes(expr[close])) nest++; else if (')]}'.includes(expr[close]) && --nest === 0) break; }
+      const [name] = rustSplit(expr.slice(open + 1, close));
+      const rest = expr.slice(close + 1).trim();
+      // The Option the door returns, unwrapped: a fallback `unwrap_or(..)` names a second program.
+      const fallback = /^\.unwrap_or(?:_else)?\(\s*(?:\|\s*\|\s*)?([\s\S]*)\)$/.exec(rest);
+      if (name !== undefined && (!rest || fallback || /^\.(?:ok_or(?:_else)?|expect|and_then)\([\s\S]*\)$/.test(rest))) {
+        return [...evalRust(name, index, depth + 1), ...(fallback ? evalRust(fallback[1], index, depth + 1) : [])];
+      }
+    }
     // `LIST.iter().map(PathBuf::from).find(..)`, on one line or split by rustfmt: an element of the list.
     const pick = /^([\s\S]+?)\s*\.(?:iter|into_iter)\(\)(?:\s*\.(?:map\(\s*(?:\w+::)*\w+\s*\)|copied\(\)|cloned\(\)))*\s*\.(?:find\([\s\S]*\)|next\(\)|last\(\))$/.exec(expr);
     if (pick) return rustElements(pick[1], index, depth + 1);

@@ -20,7 +20,7 @@ use std::fs::File;
 use std::io;
 use std::os::windows::ffi::OsStrExt;
 use std::os::windows::io::{AsRawHandle, FromRawHandle, OwnedHandle, RawHandle};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use windows_sys::Win32::Foundation::{
     DuplicateHandle, SetHandleInformation, DUPLICATE_SAME_ACCESS, HANDLE, HANDLE_FLAG_INHERIT,
@@ -219,26 +219,14 @@ fn environment_block(vars: &[(OsString, OsString)]) -> Vec<u16> {
 /// else searched on `PATH`); one without is looked up by the crate's one lookup with the `.EXE` extension
 /// only, never in the working directory.
 fn resolve_program(program: &OsStr, path_var: Option<&OsStr>) -> io::Result<PathBuf> {
-    let direct = Path::new(program);
-    let has_directory = program.to_string_lossy().contains(['\\', '/', ':']);
-    let found = if direct.extension().is_none() {
-        crate::spawn::resolve_program(
-            &program.to_string_lossy(),
-            &path_var
-                .map(|p| p.to_string_lossy().into_owned())
-                .unwrap_or_default(),
-            ".EXE",
-            true,
-        )
-    } else if has_directory {
-        direct.is_file().then(|| direct.to_path_buf())
-    } else {
-        path_var.and_then(|paths| {
-            std::env::split_paths(paths)
-                .map(|dir| dir.join(program))
-                .find(|candidate| candidate.is_file())
-        })
-    };
+    let found = crate::spawn::resolve_program(
+        &program.to_string_lossy(),
+        &path_var
+            .map(|p| p.to_string_lossy().into_owned())
+            .unwrap_or_default(),
+        ".EXE",
+        true,
+    );
     let found = found.ok_or_else(|| {
         io::Error::new(
             io::ErrorKind::NotFound,

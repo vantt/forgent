@@ -297,16 +297,11 @@ impl GitDriver {
         check_hooks(&hooks)?;
         let git = GIT
             .get_or_init(|| {
-                std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default())
-                    .filter(|p| p.is_absolute())
-                    .map(|p| p.join(if cfg!(windows) { "git.exe" } else { "git" }))
-                    .find_map(|p| {
-                        if p.is_file() {
-                            fs::canonicalize(p).ok()
-                        } else {
-                            None
-                        }
-                    })
+                let path = std::env::var_os("PATH")
+                    .map(|p| p.to_string_lossy().into_owned())
+                    .unwrap_or_default();
+                fgos_process::spawn::resolve_program_in("git", &path, ".EXE", cfg!(windows), true)
+                    .and_then(|p| fs::canonicalize(p).ok())
             })
             .clone()
             .ok_or_else(|| failure("git-unavailable"))?;

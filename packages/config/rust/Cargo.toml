@@ -5,6 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+fgos-process = { path = "../../process/rust" }
 fgos-yaml-doc = { path = "../../yaml-doc/rust" }
 fgos-durable-file = { path = "../../durable-file/rust" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
