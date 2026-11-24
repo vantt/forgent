@@ -66,7 +66,6 @@ source:
   - plans/discussions/ds-liu5g4k3gh-privileged-chores-research/DISCUSSION.md
   - p-g5ktat4kej
   - p-v6xinnjoxh
-  - p-dw3h5wscns
   - plans/discussions/ds-4qpcunq7n7-confinement-to-rust/DISCUSSION.md
 created: 2026-11-24
 ---

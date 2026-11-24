@@ -1,3 +1,13 @@
+---
+id: ds-e6j4mqobei
+title: "Land and release: build once, not again on every machine"
+status: open
+source:
+  - p-vyzy7isj3z
+  - p-7ww4jlg745
+created: 2026-11-24
+---
+
 # Land và release: build một lần, không build lại trên mọi máy
 
 discussion: open

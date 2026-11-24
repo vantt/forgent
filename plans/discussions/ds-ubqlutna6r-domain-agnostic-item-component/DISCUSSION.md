@@ -3,7 +3,7 @@ id: ds-ubqlutna6r
 title: "A domain-agnostic item component, split from Work, settled before Work"
 status: open
 source:
-  - ds-wqsrwmiier
+  - p-2qle2tjflb
 created: 2026-11-24
 ---
 

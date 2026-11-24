@@ -14,3 +14,6 @@ A door row now needs a `severity` field, and these old tests still build rows wi
 # Done when
 
 The eight tests pass because their fixtures carry the field, or because the code reading the rows is fixed if the field should not be required there. A cause is proven first; no test is weakened.
+
+# Notes
+

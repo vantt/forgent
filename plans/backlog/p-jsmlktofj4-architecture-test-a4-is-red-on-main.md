@@ -14,3 +14,6 @@ The doors plan reports 94 of 95 architecture cases passing, with A4 red on main 
 # Done when
 
 The cause of A4 is proven and the test is green on main by a fix to production code or the fixture, not by weakening the case.
+
+# Notes
+

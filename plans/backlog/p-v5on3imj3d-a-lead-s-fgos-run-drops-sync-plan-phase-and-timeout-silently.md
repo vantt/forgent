@@ -18,3 +18,6 @@ Effects: a lead cannot set a deadline for a long unit, so it gets the runner's d
 # Done when
 
 The owner picks one: (a) a lead may pass a timeout (capped by the configured ceiling) plus plan and phase for provenance; or (b) the route refuses each unsupported flag with an error code that names the flag. `--sync` likely stays refused, because the head route always returns a ticket, but the message must say why. Either way no flag is dropped without a word.
+
+# Notes
+
