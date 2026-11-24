@@ -2,7 +2,8 @@
 contract: plan-v1
 title: "The component authority model owns the documentation code that locate added"
 description: "Map every file the locate door added to a component authority row through fgos authority declare, resolve the documentation row's mustNotOwn conflict, and render the boundary views from the model."
-status: ready
+status: running
+lead: head:lead-forgent-261124-0837-docos-d50e2
 priority: P1
 effort: 6h
 branch: main
@@ -10,7 +11,7 @@ tags: [documentation, document-identity, component-authority]
 created: 2026-11-24
 blockedBy:
   - 261121-2110-component-authority-doors
-base: f999c4018f626754eb15bf3bd930e011546830a6
+base: 35de238b1f5d2365c7637159d9da59f64c74fe9b
 source:
   - p-jz2d2oid2m
 footprint:
