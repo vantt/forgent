@@ -253,6 +253,17 @@ morning (discussion §1). The planner's own shape choices are written as decisio
   `execution-failure` (`verdict-inconclusive`, exit-11) without merging. Next wake: land again once the file is clean,
   else retry the sync with a fresh unit.
 - 2026-11-24 22:26, phase 2 still parked on owner question `q-nog2h4wfjm` (open).
+- 2026-11-24 22:40, phase 2: owner answered `q-nog2h4wfjm` "Widen footprint, allow cargo" (written into
+  `phase-02-argv-window.md`). Still parked: the footprint edit (three session-attempt files) is a planner's edit, and
+  the lead's own `land --paths` may not touch `footprint`. Raised to the supervisor to start a planner; the rerun
+  follows in worktree `261124-0004-heads-operate-without-owner-p02`.
+- 2026-11-24 22:40, phase 1: land `c-1789-1795534639461` refused `main-checkout-dirty-overlap` again, now on
+  `plans/discussions/ds-ubqlutna6r-domain-agnostic-item-component/DISCUSSION.md`, because the branch base is 56
+  commits behind main. The sync-only `fgos run --sync main --writes ... --worktree ...` (the form in `run --help`) is
+  still refused `bad-args` "run takes one prompt" through the request window, and a prompt plus `--sync main` unit
+  (`c-2368-1795534729073`) shows the window forwarded the argv without `--sync`, `--plan` and `--phase`, so no merge
+  ran (`execution-failure`, `verdict-inconclusive`). Phase 1 stays parked until the shaper commits that discussion
+  file, or the window forwards `--sync`. Branch tip `1c139c298`, reviewed, acceptance `rg` finds nothing.
 
 ## Outstanding questions
 

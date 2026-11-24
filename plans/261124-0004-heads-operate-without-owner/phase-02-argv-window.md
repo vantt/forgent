@@ -51,6 +51,15 @@ CLI registration of `can-i`: `src/cli/command-registry.mjs`, `packages/host-runt
 `packages/component-authority/model/doors/the-node-bind-facade-has-only-its-named-callers.yaml`,
 `packages/component-authority/model/doors/node-callers-reach-execution-only-through-its-seam-never-into-the-node-execution-closure.yaml`.
 
+## Owner answer q-nog2h4wfjm (2026-11-24 22:32)
+
+Option "Widen footprint, allow cargo". Retiring `envelope.session.verbs` needs three files outside the footprint:
+`src/runner/dispatch/session-attempt.mjs` (owned by draft plan `261122-2108-delete-dead-node-execution-closure`, which
+rebases on this change), `apps/fgos/src/wiring/unit_run_host/session_attempt.rs` and
+`apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs`. A planner adds them to the plan and phase 2 footprint
+and records the overlap with 2108; cargo and node run in the phase unit's sandbox; the lead reruns phase 2 in the same
+worktree. The answer allows only that footprint edit and the rerun; nothing else of scope or decision changes.
+
 ## Decisions taken in this phase (planner's, within PC-D6 and PC-D11)
 
 - **Where the table lives:** `packages/session-host/contracts/head-permissions.v1.json`, compiled into the crate
