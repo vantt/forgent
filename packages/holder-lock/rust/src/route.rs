@@ -10,6 +10,7 @@ use std::ffi::OsString;
 use std::fs::{File, OpenOptions};
 use std::path::{Path, PathBuf};
 
+use fgos_host_runtime::cli_args::{parse_args_repeating, FlagScalar, FlagValue, ParsedArgs};
 use serde_json::{json, Map, Value};
 
 use crate::borrow_vectors::{self, RunError};
@@ -40,6 +41,26 @@ fn protocol_of(route: &str) -> u64 {
         PROTOCOL
     }
 }
+
+/// Every flag a route reads: each keeps all its uses so a route can refuse a repeat.
+const ROUTE_FLAGS: [&str; 16] = [
+    "--borrowed-check",
+    "--shared-try-path",
+    "--shared-try",
+    "--path",
+    "--mode",
+    "--work",
+    "--wait-ms",
+    "--kill-wait-ms",
+    "--predecessor-kinds",
+    "--try",
+    "--vector",
+    "--keep-repo",
+    "--root",
+    "--dir",
+    "--exclude-pid",
+    "--workspace-only",
+];
 
 const EXIT_OK: i32 = 0;
 const EXIT_USAGE: i32 = 2;
@@ -119,17 +140,40 @@ struct Flags {
 }
 
 impl Flags {
-    fn parse(args: &[String], takes_value: &[&str], switches: &[&str]) -> Result<Flags, String> {
+    /// Reads the host's parsed call against one route's grammar: a flag in
+    /// `takes_value` needs a value, one in `switches` takes none, and any other
+    /// flag or a positional is refused. Every use of a flag is kept.
+    fn parse(
+        parsed: &ParsedArgs,
+        takes_value: &[&str],
+        switches: &[&str],
+    ) -> Result<Flags, String> {
+        if let Some(positional) = parsed.positional.first() {
+            return Err(format!("unknown argument {positional}"));
+        }
         let mut items = Vec::new();
-        let mut it = args.iter();
-        while let Some(arg) = it.next() {
-            if takes_value.contains(&arg.as_str()) {
-                let value = it.next().ok_or_else(|| format!("{arg} needs a value"))?;
-                items.push((arg.clone(), Some(value.clone())));
-            } else if switches.contains(&arg.as_str()) {
-                items.push((arg.clone(), None));
-            } else {
-                return Err(format!("unknown argument {arg}"));
+        for (name, value) in &parsed.flags {
+            let flag = format!("--{name}");
+            let uses = match value {
+                FlagValue::One(one) => std::slice::from_ref(one),
+                FlagValue::Many(many) => many.as_slice(),
+            };
+            for scalar in uses {
+                match scalar {
+                    FlagScalar::Str(text) if takes_value.contains(&flag.as_str()) => {
+                        items.push((flag.clone(), Some(text.clone())));
+                    }
+                    FlagScalar::Bool if takes_value.contains(&flag.as_str()) => {
+                        return Err(format!("{flag} needs a value"));
+                    }
+                    FlagScalar::Bool if switches.contains(&flag.as_str()) => {
+                        items.push((flag.clone(), None));
+                    }
+                    FlagScalar::Str(text) if switches.contains(&flag.as_str()) => {
+                        return Err(format!("unknown argument {text}"));
+                    }
+                    _ => return Err(format!("unknown argument {flag}")),
+                }
             }
         }
         Ok(Flags { items })
@@ -175,36 +219,37 @@ pub fn main(args: &[OsString]) -> i32 {
             None => return usage("arguments must be UTF-8"),
         }
     }
-    let Some((route, rest)) = strings.split_first() else {
+    let Some((route, _)) = strings.split_first() else {
         return usage(
             "fgos internal <lock-fd|lock-hold|quiesce-scan|lock-borrow-vectors> --protocol 2 ...",
         );
     };
+    // Every flag any route reads keeps all its uses, so a route can refuse a
+    // flag given twice; `--protocol` keeps its last use.
+    let mut parsed = match parse_args_repeating(&args[1..], &ROUTE_FLAGS) {
+        Ok(parsed) => parsed,
+        Err(err) => return usage(&err.to_string()),
+    };
     // The protocol is checked before anything else about the call, so a
     // payload of another release always learns that first.
-    let mut protocol: Option<&str> = None;
-    let mut others = Vec::with_capacity(rest.len());
-    let mut it = rest.iter();
-    while let Some(arg) = it.next() {
-        if arg == "--protocol" {
-            protocol = it.next().map(String::as_str);
-        } else {
-            others.push(arg.clone());
-        }
-    }
+    let protocol = match parsed.flag("protocol") {
+        Some(FlagValue::One(FlagScalar::Str(text))) => Some(text.clone()),
+        _ => None,
+    };
+    parsed.flags.retain(|(name, _)| name != "protocol");
     let spoken = protocol_of(route);
-    if protocol != Some(spoken.to_string().as_str()) {
+    if protocol.as_deref() != Some(spoken.to_string().as_str()) {
         let message = format!(
             "this host speaks internal protocol {spoken} on {route}; the call asked for {}",
-            protocol.unwrap_or("none")
+            protocol.as_deref().unwrap_or("none")
         );
         return error_as(spoken, "host-version-mismatch", &message, EXIT_MISMATCH);
     }
     match route.as_str() {
-        "lock-fd" => lock_fd(&others),
-        "lock-hold" => lock_hold(&others),
-        "quiesce-scan" => quiesce_scan(&others),
-        "lock-borrow-vectors" => lock_borrow_vectors(&others),
+        "lock-fd" => lock_fd(&parsed),
+        "lock-hold" => lock_hold(&parsed),
+        "quiesce-scan" => quiesce_scan(&parsed),
+        "lock-borrow-vectors" => lock_borrow_vectors(&parsed),
         other => usage(&format!("unknown internal route {other}")),
     }
 }
@@ -221,9 +266,9 @@ fn take_slot3() -> std::io::Result<File> {
 /// lock attempt on the description at fd 3, so it never waits and never
 /// obstructs a holder. Every other lock operation runs in the caller's process
 /// through the addon's `holderLock`.
-fn lock_fd(args: &[String]) -> i32 {
+fn lock_fd(parsed: &ParsedArgs) -> i32 {
     let flags = match Flags::parse(
-        args,
+        parsed,
         &["--borrowed-check", "--shared-try-path"],
         &["--shared-try"],
     ) {
@@ -373,9 +418,9 @@ fn shared_probe(file: &File) -> Answer {
 
 /// `lock-hold --path <lockFile> --mode ex|sh --work <dir> (--try | --wait-ms N)
 /// [--kill-wait-ms K]`: the Windows helper that holds one lock for Node.
-fn lock_hold(args: &[String]) -> i32 {
+fn lock_hold(parsed: &ParsedArgs) -> i32 {
     let flags = match Flags::parse(
-        args,
+        parsed,
         &[
             "--path",
             "--mode",
@@ -447,8 +492,8 @@ fn lock_hold(args: &[String]) -> i32 {
     }
 }
 
-fn lock_borrow_vectors(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--vector"], &["--keep-repo"]) {
+fn lock_borrow_vectors(parsed: &ParsedArgs) -> i32 {
+    let flags = match Flags::parse(parsed, &["--vector"], &["--keep-repo"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
@@ -505,9 +550,9 @@ fn lock_borrow_vectors(args: &[String]) -> i32 {
     )
 }
 
-fn quiesce_scan(args: &[String]) -> i32 {
+fn quiesce_scan(parsed: &ParsedArgs) -> i32 {
     let flags = match Flags::parse(
-        args,
+        parsed,
         &["--root", "--dir", "--exclude-pid"],
         &["--workspace-only"],
     ) {
@@ -1220,5 +1265,47 @@ mod quiesce {
                 );
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Flags, ROUTE_FLAGS};
+    use fgos_host_runtime::cli_args::parse_args_repeating;
+    use std::ffi::OsString;
+
+    fn parse(parts: &[&str], takes_value: &[&str], switches: &[&str]) -> Result<Flags, String> {
+        let args: Vec<OsString> = parts.iter().map(OsString::from).collect();
+        let parsed = parse_args_repeating(&args, &ROUTE_FLAGS).map_err(|err| err.to_string())?;
+        Flags::parse(&parsed, takes_value, switches)
+    }
+
+    #[test]
+    fn route_argv_edges_are_refused_by_name() {
+        let takes_value = ["--root"];
+        let switches = ["--workspace-only"];
+        let refused = |parts: &[&str]| parse(parts, &takes_value, &switches).err();
+        // A value that starts with `--` is the next flag, so the value flag has none.
+        assert_eq!(
+            refused(&["--root", "--workspace-only"]).as_deref(),
+            Some("--root needs a value")
+        );
+        // A switch takes no value: the bare word after it is named.
+        assert_eq!(
+            refused(&["--workspace-only", "junk"]).as_deref(),
+            Some("unknown argument junk")
+        );
+        // A value flag given twice parses, and reading it as one value refuses.
+        let twice = parse(&["--root", "/a", "--root", "/b"], &takes_value, &switches)
+            .expect("both uses are kept");
+        assert_eq!(
+            twice.one("--root").err().as_deref(),
+            Some("--root given more than once")
+        );
+        // A repeated switch keeps every use, so the stray word between them is still refused.
+        assert_eq!(
+            refused(&["--workspace-only", "junk", "--workspace-only"]).as_deref(),
+            Some("unknown argument junk")
+        );
     }
 }

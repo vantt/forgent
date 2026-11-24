@@ -19,8 +19,8 @@ allowed:
   - path: apps/fgctl/src/help.rs
     count: 1
     reason: fgctl is a separate CLI whose flag grammar takes `--name=value`, which the host grammar does not; its verb tables and help words are its own
-retiredBy: "S7: the Node twin retires with the last Node verb"
-debt:
   - path: packages/holder-lock/rust/src/route.rs
-    reason: "its own route flag reader (`Flags::parse` and the `--protocol` loop in `main`) is the job the run-supervisor reader moved onto `fgos_host_runtime::cli_args`; `workspace_argument` in the same file judges a worker's argv (`-C` and the `--name=value` spelling, which the host grammar lacks) and stays when the reader moves"
+    count: 2
+    reason: "`workspace_argument` judges a worker's argv (`-C` and the `--name=value` spelling, which the host grammar lacks); the route's own flags are read by `fgos_host_runtime::cli_args`"
+retiredBy: "S7: the Node twin retires with the last Node verb"
 reason: "one parser per language while both CLIs run, proven equal by test/rust-host/fixtures/parse-args-vectors.json. Other readers of `--flag` tokens are debt: each predates the parser and reads its own grammar"

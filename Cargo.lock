@@ -774,6 +774,7 @@ dependencies = [
 name = "fgos-holder-lock"
 version = "0.2.0"
 dependencies = [
+ "fgos-host-runtime",
  "fgos-process",
  "libc",
  "serde_json",

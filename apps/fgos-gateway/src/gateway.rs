@@ -102,14 +102,11 @@ fn describe(error: fgos_config::snapshot::SnapshotError) -> String {
 /// `~/.fgos/private/gateway-token`. Never creates or writes either: setup and `fgos doctor --fix`
 /// do; a missing token file is a refusal to start, not a self-provisioned default (that would also
 /// defeat D4's point) and never a fallback to a `gateway.token` key in a config file.
-pub fn load_gateway_config(home_dir: Option<&Path>) -> Result<GatewayConfig, GatewayConfigError> {
+pub fn load_gateway_config(
+    lookup: impl Fn(&str) -> Option<String>,
+) -> Result<GatewayConfig, GatewayConfigError> {
     use fgos_config::{detect::NoDetectors, machine, snapshot::SessionClass};
-    let home = match home_dir {
-        Some(p) => p.to_path_buf(),
-        None => machine::home_dir(|key| std::env::var(key).ok())
-            .ok_or(GatewayConfigError::NoHomeDir)?,
-    };
-    let global = home.join(".fgos");
+    let global = machine::global_dir(lookup).ok_or(GatewayConfigError::NoHomeDir)?;
     let ctx = machine::context(&NoDetectors).map_err(|r| GatewayConfigError::Config(r.to_string()))?;
     let snapshot = machine::snapshot(&ctx, &global, SessionClass::Unconfined)
         .map_err(|e| GatewayConfigError::Config(describe(e)))?;
@@ -1395,7 +1392,7 @@ pub fn with_static_serving(router: Router, enabled: bool) -> Router {
 /// pays the async-runtime startup cost (`main.rs`'s dispatch, D1: one
 /// process, gateway mode chosen at launch rather than the TUI's default).
 pub fn run(root: PathBuf) -> std::io::Result<()> {
-    let config = load_gateway_config(None).map_err(std::io::Error::other)?;
+    let config = load_gateway_config(|key| std::env::var(key).ok()).map_err(std::io::Error::other)?;
     // D7: warn, don't refuse, when the resolved bind is not loopback --
     // reaching the gateway from the LAN or Tailscale is an explicit
     // `gateway.bind` choice, not a misconfiguration. `eprintln!` matches this function's own
@@ -1892,9 +1889,9 @@ mod tests {
     /// A home whose global config carries `gateway: {<gateway_body>}` and whose token file holds
     /// `test-token` with mode 0600.
     fn write_test_home_config(home: &Path, gateway_body: &str) {
-        std::fs::create_dir_all(home.join(".fgos")).unwrap();
+        std::fs::create_dir_all(test_global_dir(home)).unwrap();
         std::fs::write(
-            home.join(".fgos").join("config.json"),
+            test_global_dir(home).join("config.json"),
             format!(r#"{{"gateway":{{{gateway_body}}}}}"#),
         )
         .unwrap();
@@ -1903,12 +1900,23 @@ mod tests {
 
     fn write_test_token(home: &Path, mode: u32) {
         use std::os::unix::fs::PermissionsExt;
-        let dir = home.join(".fgos").join("private");
+        let dir = test_global_dir(home).join("private");
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::set_permissions(&dir, std::fs::Permissions::from_mode(0o700)).unwrap();
         let file = dir.join("gateway-token");
         std::fs::write(&file, "test-token\n").unwrap();
         std::fs::set_permissions(&file, std::fs::Permissions::from_mode(mode)).unwrap();
+    }
+
+    /// The environment the global-directory door reads, with the home set to `home`.
+    fn home_env(home: &Path) -> impl Fn(&str) -> Option<String> {
+        let home = home.to_string_lossy().into_owned();
+        move |key| (key == fgos_config::machine::HOME_VAR).then(|| home.clone())
+    }
+
+    /// The global directory the door answers for `home`.
+    fn test_global_dir(home: &Path) -> PathBuf {
+        fgos_config::machine::global_dir(home_env(home)).expect("the test home is set")
     }
 
     fn test_home(tag: &str) -> PathBuf {
@@ -1922,7 +1930,7 @@ mod tests {
     fn load_gateway_config_reads_the_token_from_the_token_file() {
         let home = test_home("token-file");
         write_test_home_config(&home, "");
-        let config = load_gateway_config(Some(&home)).expect("a token file and no gateway keys must load");
+        let config = load_gateway_config(home_env(&home)).expect("a token file and no gateway keys must load");
         assert_eq!(config.token, "test-token");
         assert_eq!(config.port, 4170);
         std::fs::remove_dir_all(&home).ok();
@@ -1933,12 +1941,12 @@ mod tests {
     fn load_gateway_config_refuses_a_missing_token_file_even_with_an_old_config_key() {
         let home = test_home("token-missing");
         write_test_home_config(&home, r#""token":"old-key""#);
-        std::fs::remove_file(home.join(".fgos/private/gateway-token")).unwrap();
-        let err = load_gateway_config(Some(&home)).expect_err("the old key must not be a token");
+        std::fs::remove_file(test_global_dir(&home).join("private/gateway-token")).unwrap();
+        let err = load_gateway_config(home_env(&home)).expect_err("the old key must not be a token");
         assert!(!err.to_string().contains("old-key"), "{err}");
         // With the file back, the file wins over the stray key.
         write_test_token(&home, 0o600);
-        let config = load_gateway_config(Some(&home)).expect("the token file wins");
+        let config = load_gateway_config(home_env(&home)).expect("the token file wins");
         assert_eq!(config.token, "test-token");
         std::fs::remove_dir_all(&home).ok();
     }
@@ -1946,11 +1954,11 @@ mod tests {
     #[test]
     fn load_gateway_config_names_the_token_file_when_it_is_absent_or_too_open() {
         let home = test_home("token-mode");
-        std::fs::create_dir_all(home.join(".fgos")).unwrap();
-        let err = load_gateway_config(Some(&home)).expect_err("no token file");
+        std::fs::create_dir_all(test_global_dir(&home)).unwrap();
+        let err = load_gateway_config(home_env(&home)).expect_err("no token file");
         assert!(matches!(&err, GatewayConfigError::Token(p, why) if p.ends_with("private/gateway-token") && why == "missing"), "{err}");
         write_test_token(&home, 0o644);
-        let err = load_gateway_config(Some(&home)).expect_err("a world-readable token file");
+        let err = load_gateway_config(home_env(&home)).expect_err("a world-readable token file");
         assert!(matches!(&err, GatewayConfigError::Token(_, why) if why.contains("mode")), "{err}");
         std::fs::remove_dir_all(&home).ok();
     }
@@ -1961,7 +1969,7 @@ mod tests {
     fn load_gateway_config_resolves_loopback_bind_when_absent() {
         let home = std::env::temp_dir().join(format!("fgos-gateway-bind-default-{}", std::process::id()));
         write_test_home_config(&home, "");
-        let config = load_gateway_config(Some(&home)).expect("a token-only config must still load");
+        let config = load_gateway_config(home_env(&home)).expect("a token-only config must still load");
         assert_eq!(config.bind, IpAddr::V4(Ipv4Addr::LOCALHOST));
         std::fs::remove_dir_all(&home).ok();
     }
@@ -1971,7 +1979,7 @@ mod tests {
     fn load_gateway_config_resolves_explicit_bind_override() {
         let home = std::env::temp_dir().join(format!("fgos-gateway-bind-override-{}", std::process::id()));
         write_test_home_config(&home, r#""bind":"0.0.0.0""#);
-        let config = load_gateway_config(Some(&home)).expect("a valid bind override must load");
+        let config = load_gateway_config(home_env(&home)).expect("a valid bind override must load");
         assert_eq!(config.bind, IpAddr::V4(Ipv4Addr::UNSPECIFIED));
         std::fs::remove_dir_all(&home).ok();
     }
@@ -1982,7 +1990,7 @@ mod tests {
     fn load_gateway_config_rejects_invalid_bind() {
         let home = std::env::temp_dir().join(format!("fgos-gateway-bind-invalid-{}", std::process::id()));
         write_test_home_config(&home, r#""bind":"not-an-ip""#);
-        let err = load_gateway_config(Some(&home)).expect_err("a malformed bind value must not silently resolve");
+        let err = load_gateway_config(home_env(&home)).expect_err("a malformed bind value must not silently resolve");
         assert!(matches!(err, GatewayConfigError::InvalidBind(ref raw) if raw == "not-an-ip"));
         std::fs::remove_dir_all(&home).ok();
     }
@@ -1994,7 +2002,7 @@ mod tests {
     fn load_gateway_config_resolves_no_cf_access_when_absent() {
         let home = std::env::temp_dir().join(format!("fgos-gateway-cfaccess-absent-{}", std::process::id()));
         write_test_home_config(&home, "");
-        let config = load_gateway_config(Some(&home)).expect("a token-only config must still load");
+        let config = load_gateway_config(home_env(&home)).expect("a token-only config must still load");
         assert!(config.cf_access.is_none());
         std::fs::remove_dir_all(&home).ok();
     }
@@ -2007,7 +2015,7 @@ mod tests {
             &home,
             r#""cfAccessTeamDomain":"https://team.cloudflareaccess.com","cfAccessAud":"aud-tag-123""#,
         );
-        let config = load_gateway_config(Some(&home)).expect("a full cf-access config must load");
+        let config = load_gateway_config(home_env(&home)).expect("a full cf-access config must load");
         assert!(config.cf_access.is_some());
         std::fs::remove_dir_all(&home).ok();
     }
@@ -2018,7 +2026,7 @@ mod tests {
     fn load_gateway_config_rejects_partial_cf_access_team_domain_only() {
         let home = std::env::temp_dir().join(format!("fgos-gateway-cfaccess-partial-a-{}", std::process::id()));
         write_test_home_config(&home, r#""cfAccessTeamDomain":"https://team.cloudflareaccess.com""#);
-        let err = load_gateway_config(Some(&home)).expect_err("team_domain without aud must not silently resolve to None");
+        let err = load_gateway_config(home_env(&home)).expect_err("team_domain without aud must not silently resolve to None");
         assert!(matches!(err, GatewayConfigError::PartialCfAccess));
         std::fs::remove_dir_all(&home).ok();
     }
@@ -2027,7 +2035,7 @@ mod tests {
     fn load_gateway_config_rejects_partial_cf_access_aud_only() {
         let home = std::env::temp_dir().join(format!("fgos-gateway-cfaccess-partial-b-{}", std::process::id()));
         write_test_home_config(&home, r#""cfAccessAud":"aud-tag-123""#);
-        let err = load_gateway_config(Some(&home)).expect_err("aud without team_domain must not silently resolve to None");
+        let err = load_gateway_config(home_env(&home)).expect_err("aud without team_domain must not silently resolve to None");
         assert!(matches!(err, GatewayConfigError::PartialCfAccess));
         std::fs::remove_dir_all(&home).ok();
     }
