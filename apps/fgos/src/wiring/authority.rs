@@ -15,7 +15,9 @@ use fgos_component_authority::render::{
 use fgos_component_authority::{
     declare, locate, Approvals, DeclareRequest, Kind, Model, QuestionState, MODEL_DIR,
 };
-use fgos_git::invocation_root::{resolve_invocation_root, RootPolicy, RootRequest};
+use fgos_git::invocation_root::{
+    read_repo_facts, resolve_invocation_root, RepoFacts, RootPolicy, RootRequest,
+};
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome, OperationId,
     OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
@@ -85,7 +87,37 @@ pub enum Action {
 #[derive(Debug, Clone)]
 pub struct AuthorityRequest {
     pub root: PathBuf,
+    pub tree: PathBuf,
     pub action: Action,
+}
+
+/// A path as the caller sees it once links are resolved, without Windows' verbatim prefix.
+fn real(path: &Path) -> PathBuf {
+    let resolved = std::fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf());
+    fgos_process::path::plain_path(&resolved)
+}
+
+/// The worktree root and the trusted main checkout of `cwd`, read through the Git door; `None` outside a repository.
+fn checkout_roots(cwd: &Path) -> Option<(PathBuf, PathBuf)> {
+    match read_repo_facts(cwd).ok()? {
+        RepoFacts::Repository {
+            work_tree: Some(work_tree),
+            trusted_main: Some(trusted_main),
+        } => Some((real(&work_tree), real(&trusted_main))),
+        _ => None,
+    }
+}
+
+/// The work tree `cwd` stands in when `cwd` is inside a linked worktree whose trusted main root equals `root`
+/// (comparing real paths). Otherwise `root` itself.
+pub fn source_tree(root: &Path, cwd: &Path) -> PathBuf {
+    let real_root = real(root);
+    if let Some((worktree, trusted_main)) = checkout_roots(cwd) {
+        if worktree != trusted_main && trusted_main == real_root {
+            return worktree;
+        }
+    }
+    root.to_path_buf()
 }
 
 /// Projects `fgos authority locate "<sentence>" [--limit N]`, `fgos authority model`,
@@ -110,17 +142,21 @@ pub fn project_authority_request(
     if let Some(flag) = call.flag_outside(allowed) {
         return Err(format!("unknown authority option '--{flag}'"));
     }
+    let root = root?;
+    let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+    let tree = source_tree(&root, &cwd);
     if sub == "model" {
         if !call.arguments().is_empty() {
             return Err("authority model takes no arguments".to_owned());
         }
         return Ok(AuthorityRequest {
-            root: root?,
+            root,
+            tree,
             action: Action::Model,
         });
     }
     if sub == "declare" {
-        return project_declare(&call, root?);
+        return project_declare(&call, root, tree);
     }
     if sub == "render" {
         if !call.arguments().is_empty() {
@@ -132,7 +168,8 @@ pub fn project_authority_request(
             return Err("--check and --preview-holder cannot be combined".to_owned());
         }
         return Ok(AuthorityRequest {
-            root: root?,
+            root,
+            tree,
             action: Action::Render {
                 check,
                 preview_holder,
@@ -152,7 +189,8 @@ pub fn project_authority_request(
         return Err("authority locate requires a sentence".to_owned());
     }
     Ok(AuthorityRequest {
-        root: root?,
+        root,
+        tree,
         action: Action::Locate {
             sentence: words.join(" "),
             limit,
@@ -162,7 +200,7 @@ pub fn project_authority_request(
 
 /// `declare`: the kind, the row (inline JSON, or the path of a file holding it), the approving question and,
 /// for a move, the plan.
-fn project_declare(call: &Call, root: PathBuf) -> Result<AuthorityRequest, String> {
+fn project_declare(call: &Call, root: PathBuf, tree: PathBuf) -> Result<AuthorityRequest, String> {
     if !call.arguments().is_empty() {
         return Err("authority declare takes no arguments".to_owned());
     }
@@ -184,6 +222,7 @@ fn project_declare(call: &Call, root: PathBuf) -> Result<AuthorityRequest, Strin
         serde_json::from_str(&row_text).map_err(|error| format!("--row is not JSON: {error}"))?;
     Ok(AuthorityRequest {
         root,
+        tree,
         action: Action::Declare {
             kind,
             row,
@@ -247,15 +286,15 @@ fn inactive(mut data: serde_json::Value) -> serde_json::Value {
 /// The answer for one request. `locate`: the sentence, how many rows matched, and the best `limit` of them.
 /// `model`: the loaded, validated model itself (layers, components, decision kinds, doors, contracts).
 /// `locate` and `model` answer `{"authority": "inactive"}` (plus an empty match list) where the project has no
-/// model. `declare`: the row it wrote and the files it wrote it to. `render`: the views it wrote, or with
-/// `--check` the drift it found (a non-empty drift is a failure); with `--preview-holder` the path of the
-/// preview report it wrote.
+/// model. `declare`: the row it wrote, the files it wrote it to, and the `root` it wrote into. `render`: the
+/// `root` it wrote into and the views it wrote, or with `--check` the drift it found (a non-empty drift is a
+/// failure); with `--preview-holder` the `root` and the path of the preview report it wrote.
 pub fn answer(request: &AuthorityRequest) -> Result<serde_json::Value, String> {
     match &request.action {
         Action::Render {
             check,
             preview_holder,
-        } => render(&request.root, *check, preview_holder.as_deref()),
+        } => render(&request.tree, *check, preview_holder.as_deref()),
         Action::Declare {
             kind,
             row,
@@ -263,10 +302,10 @@ pub fn answer(request: &AuthorityRequest) -> Result<serde_json::Value, String> {
             plan,
             move_owner,
         } => {
-            let dir = model_dir(&request.root)?;
+            let dir = model_dir(&request.tree)?;
             let declared = declare(
                 &dir,
-                &request.root,
+                &request.tree,
                 &DeclareRequest {
                     kind: *kind,
                     row,
@@ -286,6 +325,7 @@ pub fn answer(request: &AuthorityRequest) -> Result<serde_json::Value, String> {
                 .map(|file| file.to_string_lossy().into_owned())
                 .collect();
             Ok(json!({
+                "root": request.tree,
                 "declared": {
                     "kind": declared.kind.word(),
                     "id": declared.id,
@@ -296,14 +336,14 @@ pub fn answer(request: &AuthorityRequest) -> Result<serde_json::Value, String> {
             }))
         }
         Action::Model => {
-            let dir = model_dir(&request.root)?;
+            let dir = model_dir(&request.tree)?;
             match Model::load_dir_if_present(&dir).map_err(|error| error.to_string())? {
                 Some(model) => Ok(json!(model)),
                 None => Ok(inactive(json!({}))),
             }
         }
         Action::Locate { sentence, limit } => {
-            let dir = model_dir(&request.root)?;
+            let dir = model_dir(&request.tree)?;
             let Some(model) =
                 Model::load_dir_if_present(&dir).map_err(|error| error.to_string())?
             else {
@@ -345,12 +385,12 @@ fn render(
                 .map_err(|error| format!("{}: {error}", parent.display()))?;
         }
         std::fs::write(&path, content).map_err(|error| format!("{}: {error}", path.display()))?;
-        return Ok(json!({ "preview": target }));
+        return Ok(json!({ "root": root, "preview": target }));
     }
     if check {
         let drift = check_views(root).map_err(|error| error.to_string())?;
         if drift.is_empty() {
-            return Ok(json!({ "drift": [] }));
+            return Ok(json!({ "root": root, "drift": [] }));
         }
         let lines: Vec<String> = drift
             .iter()
@@ -368,6 +408,7 @@ fn render(
     }
     let report = write_views(root).map_err(|error| error.to_string())?;
     Ok(json!({
+        "root": root,
         "written": view_refs(&report.written),
         "skipped": view_refs(&report.skipped),
     }))
@@ -654,5 +695,74 @@ mod tests {
         assert!(project(&["authority", "render", "extra"]).is_err());
         assert!(project(&["authority", "render", "--bogus"]).is_err());
         assert!(project(&["authority", "locate", "x", "--check"]).is_err());
+    }
+
+    #[test]
+    fn source_tree_returns_the_worktree_when_root_is_main_and_returns_root_otherwise() {
+        let dir = std::env::temp_dir().join(format!(
+            "fgos-authority-source-tree-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let _ = std::fs::remove_dir_all(&dir);
+        let main = dir.join("main");
+        let wt = dir.join("wt");
+        let unrelated = dir.join("unrelated");
+        std::fs::create_dir_all(&main).unwrap();
+        std::fs::create_dir_all(&unrelated).unwrap();
+
+        let git = |args: &[&str], cwd: &Path| {
+            let out = std::process::Command::new("git")
+                .args(args)
+                .current_dir(cwd)
+                .env("GIT_CONFIG_GLOBAL", "/dev/null")
+                .env("GIT_CONFIG_NOSYSTEM", "1")
+                .output()
+                .unwrap();
+            assert!(out.status.success(), "git {args:?}: {out:?}");
+        };
+
+        git(&["init", "-q", "-b", "main"], &main);
+        git(
+            &[
+                "-c",
+                "user.name=t",
+                "-c",
+                "user.email=t@example.invalid",
+                "commit",
+                "--allow-empty",
+                "-m",
+                "init",
+            ],
+            &main,
+        );
+        git(
+            &[
+                "worktree",
+                "add",
+                "-q",
+                "-b",
+                "wt-branch",
+                wt.to_str().unwrap(),
+            ],
+            &main,
+        );
+
+        // When cwd is inside a linked worktree of main, return the worktree.
+        assert_eq!(source_tree(&main, &wt), real(&wt));
+        let sub = wt.join("subdir");
+        std::fs::create_dir_all(&sub).unwrap();
+        assert_eq!(source_tree(&main, &sub), real(&wt));
+
+        // When cwd is the main checkout itself, return root.
+        assert_eq!(source_tree(&main, &main), main);
+
+        // When cwd is an unrelated directory, return root.
+        assert_eq!(source_tree(&main, &unrelated), main);
+
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

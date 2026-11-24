@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b5ac91d8fcee0a5d9bdf7c91fa0f3ca3aa5116799d0e14c18db0c2ceae5415a0",
+  "payloadDigest": "b477096635c18facb755a1ea388c13b327278cc98cee9ebd848e88ed973f14bd",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -101,7 +101,7 @@
     "apps/fgos/src/routing.rs": "3afe1c4e856efab35b0d4d867eda39f05f52455f3cea8c7da44fad8570c51fea",
     "apps/fgos/src/wiring/agents.rs": "d40cd43facea6c5d1e5a7b3363b8e69567f3ad7aa33b628eb269c935a88f06e4",
     "apps/fgos/src/wiring/attempt_step.rs": "5dade9079e7e99ca3f9bc2cf18d226583f96be2bf6cc590398ac93fded4b141f",
-    "apps/fgos/src/wiring/authority.rs": "3f92bd22a225c8c1c57ac3ad40fae7b9328fce8897ee1ba0c2f3dffbe55e07a0",
+    "apps/fgos/src/wiring/authority.rs": "2a9ff49a0c188ef053df349dd2687e26bad79dd94d178ec8d713e6bea48cc5e1",
     "apps/fgos/src/wiring/dispatch_decide.rs": "ec4cb3297b19bf0bc17e23a8c81b8a3a08bc12938ad3290ac58e42ceba8023d8",
     "apps/fgos/src/wiring/dispatch_subs.rs": "b78b49e4cec08080e575c452dba231cf2cdd0e49a8c01752ad3888e703c5ef9c",
     "apps/fgos/src/wiring/dispatch_subs/inspect.rs": "836869d09596d6379195ea4ba643e02e6b058b95499149e471eb3debdf2cf9b7",
@@ -196,7 +196,7 @@
     "apps/fgos/src/wiring/wire_agents.rs": "a434308907a3e7d87c880ebf95a957e1342b77e83ebe1ee0272002335b7a248c",
     "apps/fgos/src/wiring/worktree.rs": "d783eec09a03bcc50b77659f23bf860137daeef4afd699b7781bcb119676545a",
     "apps/fgos/tests/attention_definitions.rs": "81db902eb0d8bf5515f7574bcf4b13f61db680dc0d569f4db55b4271e4df9a54",
-    "apps/fgos/tests/authority.rs": "f99dc78c16d13c4e547e705c2b8167198530fc1006f5fa664586f587ae5b654e",
+    "apps/fgos/tests/authority.rs": "8d5ed7add1b6fc3a1a4bd1845ccfc1f45384fb398aa27048c376d1fc18e87844",
     "apps/fgos/tests/cli_tests.rs": "8b7c32078e828bb11e095e98b62bd65ecef6d4590e1ce6d8b1ec8eb5240ef988",
     "apps/fgos/tests/doc_locate.rs": "96f6b44203e68a196cddac862580f335317265d316b111625c9736e8dbdeacc1",
     "apps/fgos/tests/driving_definitions.rs": "fa31e9456150a2e8038d54916be5b2373b434cb3521a2d97afb02219815c20a5",
@@ -2325,6 +2325,13 @@
       "class": "rust-test"
     },
     {
+      "path": "apps/fgos/src/wiring/authority.rs",
+      "line": 718,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
       "path": "apps/fgos/src/wiring/doctor/bridge.rs",
       "line": 496,
       "spawn": "Command::new",
@@ -2444,7 +2451,14 @@
     },
     {
       "path": "apps/fgos/tests/authority.rs",
-      "line": 178,
+      "line": 202,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/authority.rs",
+      "line": 334,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
