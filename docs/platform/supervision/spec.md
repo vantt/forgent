@@ -41,14 +41,6 @@ fgOS coordinates the plans of the project it runs on with no person sitting by. 
 - **Lane pool** (worker seats pooled per machine). A lane is a held machine-scope lock taken where a top-level worker seat starts.
 - **Landing door** (`fgos land`). The one Rust door that replaces the hand-run landing script and the hand census fix.
 
-### 1.1 Role charter for the two hands
-
-The project operates through the owner's two hands, domain-free (PC-D1, PC-D2, PC-D5, PC-D10):
-
-- **The supervisor (left hand):** Looks after every running agent that no lead watches: leads, shapers, planners and any pane or agent started by hand without a lead. Workers of a lead are that lead's (PC-D2). The supervisor operates with routine privileged operational authority through the fenced escalation window. Its rhythm is the keeper's of plan `261122-0056-orchestration-skeleton`, named as such, not specified here.
-- **The secretary (Miu, right hand):** Holds every power the supervisor holds and keeps it asleep. In peace she talks with the owner, clarifies and orders goals, and reduces load on the owner without meddling in routine operations. When no supervisor is alive, or a help request waits past the threshold, she runs the operation herself and wakes the machinery until it runs again (PC-D1).
-- **One help channel:** Every head raises `coordination-help` to the supervisor; heads do not talk to Miu directly in peace; owner decisions go through the question store ([questions/spec.md](../questions/spec.md)), and Miu relays them to the owner (PC-D5).
-
 ### Owns
 - The portfolio reader: plans as read from frontmatter on the trunk tip (status, priority, blockedBy, footprint, source). Plan frontmatter itself is owned by the plan contract.
 - The event queue and its `handled` flag, over the Event Store.
@@ -65,6 +57,14 @@ The project operates through the owner's two hands, domain-free (PC-D1, PC-D2, P
 - Config storage. Keys live in `core/config-standard` and `core/config-schema`.
 - The owner-question store and its answers ([questions/spec.md](../questions/spec.md)); this area only runs its `question-answered` definition and resumes the asker.
 - Measurement. Observe records; this area registers kinds through `observe-kinds.json`.
+
+### 1.1 Role charter for the two hands
+
+The project operates through the owner's two hands, domain-free (PC-D1, PC-D2, PC-D5, PC-D10):
+
+- **The supervisor (left hand):** Looks after every running agent that no lead watches: leads, shapers, planners and any pane or agent started by hand without a lead. Workers of a lead are that lead's (PC-D2). The supervisor operates with routine privileged operational authority. Its rhythm is the keeper's of plan `261122-0056-orchestration-skeleton`, named as such, not specified here.
+- **The secretary (Miu, right hand):** Holds every power the supervisor holds and keeps it asleep. In peace she talks with the owner, clarifies and orders goals, and reduces load on the owner without meddling in routine operations. When no supervisor is alive or able to act, or a help request waits past the threshold, she runs the operation herself and wakes the machinery until it runs again (PC-D1).
+- **One help channel:** Heads raise `coordination-help` to the supervisor; supervisor raise is granted to secretary, supervisor and lead today; the charter's target is every head. Heads do not talk to Miu directly in peace; owner decisions go through the question store ([questions/spec.md](../questions/spec.md)), and Miu relays them to the owner (PC-D5).
 
 ## 2. Shared entities
 

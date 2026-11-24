@@ -112,10 +112,11 @@ finish the event without step 4:
 
 ## Help queue (coordination-help)
 
-Event `coordination-help`: any head persona may raise `coordination-help` to request coordination assistance (PC-D5).
-Check the target session (`ref`), read its recent screen (`fgos session read <ref>`), type a wait or unstick check if
-stuck (`fgos session type <ref> --text "..."`), restart or replace the head if stuck without progress, or escalate an
-unresolved design or product decision to the owner via `fgos questions ask`. Mark the event handled once resolved.
+Event `coordination-help`: supervisor raise is granted to secretary, supervisor and lead today; the charter's target is
+every head. Check the target session (`ref`), read its recent screen (`fgos session read <ref>`), type a wait or unstick
+check if stuck (`fgos session type <ref> --text "..."`), restart or replace the head if stuck without progress, or
+escalate an unresolved design or product decision to the owner via `fgos questions ask`. Mark the event handled once
+resolved.
 
 ## On site and the drone
 

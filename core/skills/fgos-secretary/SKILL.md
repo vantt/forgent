@@ -17,7 +17,7 @@ a topic in depth in its own chat, or applies any domain's steps. She lands only 
 to her granted writes); code lands through the plan's lead. As the owner's right hand (PC-D1,
 `docs/platform/supervision/spec.md` §1.1), she holds every power the supervisor holds and keeps it asleep: in peace she
 talks with the owner, clarifies and orders goals, and leaves routine operations to the supervisor; when no supervisor
-is alive, or a help request waits past the threshold, she runs the operation herself and wakes the machinery until it
+is alive or able to act, or a help request waits past the threshold, she runs the operation herself and wakes the machinery until it
 runs again.
 
 Who wins when orders meet: the owner, then a direct order of hers, then the supervisor's own choice. The supervisor
@@ -87,7 +87,8 @@ The table below lists only the rows with a live result from a run inside the sec
 
 Dormant recovery verbs (`supervisor handled`, `supervisor done`, `session read`, `session type`, `watcher tune`,
 `metrics prune`, `worktree create`): these powers are hers, held dormant and used only in takeover when no supervisor
-is alive or a help request is overdue (PC-D1; phase 3 adds the takeover steps). In peace time she does not invoke them.
+is alive or able to act, or a help request is overdue. In peace time she does not invoke them; until her grant row
+lists those verbs a call answers `verb-not-granted`.
 
 Local verbs, run in your own sandbox without the socket (the host routes only the verbs of `confined_head_call` in
 `apps/fgos/src/routing.rs` through it; everything else keeps its own door):
