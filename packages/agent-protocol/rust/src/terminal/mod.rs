@@ -51,6 +51,25 @@ pub enum TerminalOutcome {
     NeedsHuman,
 }
 
+/// The input box state of a CLI: empty and ready for a typed wake line, containing half-typed
+/// text or an unsubmitted draft, or unknown (busy, dialog open, setup, or unrecognised screen).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ComposerState {
+    Empty,
+    NotEmpty,
+    Unknown,
+}
+
+impl ComposerState {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            ComposerState::Empty => "empty",
+            ComposerState::NotEmpty => "not-empty",
+            ComposerState::Unknown => "unknown",
+        }
+    }
+}
+
 impl TerminalOutcome {
     /// The receipt's `reason` for an outcome that ends the run early; `None` for a step that went well.
     pub fn receipt_reason(&self) -> Option<String> {
@@ -235,6 +254,8 @@ fn read_result(_dir: &Path, path: &Path) -> Option<(Vec<u8>, SystemTime)> {
 /// What differs between CLIs; everything else is shared.
 pub struct Profile {
     pub cli: &'static str,
+    pub pinned_version: &'static str,
+    pub version_marker: Option<&'static str>,
     pub exit: ExitCommand,
     /// Gap between typing the brief and pressing Enter. A CLI that reads a
     /// quick text-then-Enter as one paste turns the Enter into a newline.
@@ -250,6 +271,8 @@ pub struct Profile {
     /// Lowercase wordings of a setup screen only a person can finish (a first-run wizard). Never
     /// answered with a key and never a login: the same profile needs the person, not another account.
     pub setup_markers: &'static [&'static str],
+    /// Inspects whether the CLI's input box is empty, not empty, or unknown.
+    pub composer_state: fn(&str, &Inspection) -> ComposerState,
 }
 
 /// A start banner and the key that closes it.
@@ -312,8 +335,42 @@ impl Terminal {
         self.profile.cli
     }
 
+    pub fn pinned_version(&self) -> &'static str {
+        self.profile.pinned_version
+    }
+
     pub fn exit_command(&self) -> ExitCommand {
         self.profile.exit
+    }
+
+    /// Whether the CLI's input box is empty, so a typed wake never merges with a person's
+    /// half-typed text or an unsent draft. Busy panes, dialogs, setups, and screens whose
+    /// detected version differs from [`Terminal::pinned_version`] evaluate to [`ComposerState::Unknown`].
+    ///
+    /// # Contract
+    /// The predicate checks the version only when the banner is on screen; a caller must check
+    /// the CLI version itself (the session-level version) and treat a mismatch as Unknown.
+    pub fn composer_state(&self, screen: &str, inspection: &Inspection) -> ComposerState {
+        if self.classify_blocked(screen).is_some() || self.setup_line(screen).is_some() {
+            return ComposerState::Unknown;
+        }
+        if inspection.visible_blocker || inspection.state.as_deref() == Some("blocked") {
+            return ComposerState::Unknown;
+        }
+        if inspection.visible_working || inspection.state.as_deref() == Some("working") {
+            return ComposerState::Unknown;
+        }
+        if has_working_tail(&bottom_lines(screen, 6)) {
+            return ComposerState::Unknown;
+        }
+        if let Some(marker) = self.profile.version_marker {
+            if let Some(screen_ver) = extract_screen_version(marker, screen) {
+                if screen_ver != self.profile.pinned_version {
+                    return ComposerState::Unknown;
+                }
+            }
+        }
+        (self.profile.composer_state)(screen, inspection)
     }
 
     /// A dialog or error on screen that only a person can clear: a trust dialog or a dead login.

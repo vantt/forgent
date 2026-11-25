@@ -228,3 +228,17 @@ fn holds_a_window(message: &[char], bottom: &str) -> bool {
         .count()
         >= MIN_LINES
 }
+
+/// Extract the CLI version string from a screen, if the CLI banner/header with `marker` is visible.
+pub fn extract_screen_version(marker: &str, screen: &str) -> Option<String> {
+    if marker.is_empty() {
+        return None;
+    }
+    let lower = screen.to_ascii_lowercase();
+    let idx = lower.find(&marker.to_ascii_lowercase())?;
+    let ver: String = lower[idx + marker.len()..]
+        .chars()
+        .take_while(|c| c.is_ascii_digit() || *c == '.' || *c == '-')
+        .collect();
+    (!ver.is_empty()).then_some(ver)
+}

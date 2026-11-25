@@ -274,8 +274,27 @@ fn terminal_every_cli_vector_resolves_as_recorded() {
                     ExitCommand::Text(text) => json!({ "outcome": "exit", "text": text }),
                     ExitCommand::Keys(keys) => json!({ "outcome": "exit", "keys": keys }),
                 },
+                "composer-state" => {
+                    let state =
+                        adapter.composer_state(&pane.frame().screen, &pane.frame().inspection);
+                    if expect.get("composerState").is_some() {
+                        json!({ "composerState": state.as_str() })
+                    } else {
+                        json!({ "outcome": state.as_str() })
+                    }
+                }
                 other => panic!("{name}: unknown step {other}"),
             };
+            if let Some(v) = vector.get("version").and_then(Value::as_str) {
+                if v != adapter.pinned_version() {
+                    assert_eq!(
+                        got.get("composerState").or_else(|| got.get("outcome")),
+                        Some(&json!("unknown")),
+                        "{name}: fixture version {v} differs from pinned {} and must yield unknown",
+                        adapter.pinned_version()
+                    );
+                }
+            }
             let mut want = expect.clone();
             if let Some(map) = want.as_object_mut() {
                 for key in [

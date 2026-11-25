@@ -105,7 +105,7 @@
         "frames": [
           {
             "at": 0,
-            "screen": "header\nERROR: Not logged in\n❯",
+            "screen": "header\nERROR: Not logged in\n\u276f",
             "inspection": {
               "state": "idle",
               "visibleIdle": true,
@@ -149,7 +149,7 @@
             "at": 200,
             "inspection": {
               "state": "idle",
-              "promptText": "❯ [Pasted text #1 +42 lines]"
+              "promptText": "\u276f [Pasted text #1 +42 lines]"
             }
           },
           {
@@ -673,7 +673,7 @@
         "frames": [
           {
             "at": 0,
-            "screen": "working...\n■ You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 11:40 PM."
+            "screen": "working...\n\u25a0 You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 11:40 PM."
           }
         ]
       },
@@ -690,7 +690,7 @@
         "frames": [
           {
             "at": 0,
-            "screen": "working...\n■ You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 11:40 PM.",
+            "screen": "working...\n\u25a0 You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 11:40 PM.",
             "inspection": {
               "state": "idle"
             }
@@ -745,6 +745,217 @@
         "outcome": "none"
       },
       "source": "synthesized: the agent quoting the sentence while it works"
+    },
+    {
+      "name": "composer-state-empty-ready",
+      "step": "composer-state",
+      "version": "0.163.0",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "empty"
+      }
+    },
+    {
+      "name": "composer-state-empty-turn-finished",
+      "step": "composer-state",
+      "version": "0.163.0",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "turn-finished"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "empty"
+      }
+    },
+    {
+      "name": "composer-state-half-typed",
+      "step": "composer-state",
+      "version": "0.163.0",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "half-typed"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
+      "name": "composer-state-blank-first-line-draft",
+      "step": "composer-state",
+      "version": "0.163.0",
+      "source": "synthesized: short multiline draft below a blank prompt, before the model footer",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "›\n  please review the diff\n  and report back\n\n  GPT-6.1-Sol medium · ~/project\n  ← for agents · ? for shortcuts\n",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": true,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
+      "name": "composer-state-draft-ending-in-bare-greater-than",
+      "step": "composer-state",
+      "version": "0.163.0",
+      "source": "synthesized: a draft continuation is not the prompt line",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "› please\n  >\n\n  GPT-6.1-Sol medium · ~/project\n",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": true,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
+      "name": "composer-state-empty-with-another-model-name",
+      "step": "composer-state",
+      "version": "0.163.0",
+      "source": "synthesized: an empty ready screen with a non-GPT model status",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "›\n\n  other-model medium · ~/project\n  ← for agents · ? for shortcuts\n",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": true,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "empty"
+      }
+    },
+    {
+      "name": "composer-state-draft-in-composer",
+      "step": "composer-state",
+      "version": "0.163.0",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "draft-in-composer"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
+      "name": "composer-state-draft-expanded-composer",
+      "step": "composer-state",
+      "version": "0.163.0",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "draft-expanded-composer"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
+      "name": "composer-state-dialog-blocked",
+      "step": "composer-state",
+      "version": "0.163.0",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "trust-dialog"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
+    },
+    {
+      "name": "composer-state-hooks-review",
+      "step": "composer-state",
+      "version": "0.163.0",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "hooks-review"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
+    },
+    {
+      "name": "composer-state-busy-working",
+      "step": "composer-state",
+      "version": "0.163.0",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "working"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
+    },
+    {
+      "name": "composer-state-version-bump-yields-unknown",
+      "step": "composer-state",
+      "version": "0.999.0",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready",
+            "screen": "OpenAI Codex (v0.999.0)\n\u203a Ask Codex to do anything\n\n  GPT-6.1-Sol medium\n"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
     }
   ]
 }
