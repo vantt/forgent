@@ -150,7 +150,7 @@ needed.
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Diagnose confined mail](phase-01-diagnose-confined-mail.md) | - | plans/261125-2313-head-communication-agent-to-agent/reports/diagnose-confined-mail.md | 1 | done |
-| 2 | [Queued mail follows a rotation](phase-02-mail-follows-rotation.md) | - | packages/mailbox/rust/core/src/**, packages/mailbox/rust/core/tests/**, packages/mailbox/rust/store/src/record/**, packages/mailbox/rust/store/src/hook/**, packages/mailbox/rust/store/tests/record_*.rs | 1 | ready |
+| 2 | [Queued mail follows a rotation](phase-02-mail-follows-rotation.md) | - | packages/mailbox/rust/core/src/**, packages/mailbox/rust/core/tests/**, packages/mailbox/rust/store/src/record/**, packages/mailbox/rust/store/src/hook/**, packages/mailbox/rust/store/tests/record_*.rs, apps/fgos/src/wiring/mailbox_verbs.rs, apps/fgos/src/wiring/mailbox_hook.rs, apps/fgos/tests/mailbox_routes.rs | 1 | ready |
 | 3 | [Composer state per CLI](phase-03-composer-state.md) | - | packages/agent-protocol/rust/src/terminal/**, packages/agent-protocol/rust/tests/terminal_vectors.rs, packages/agent-protocol/contracts/fixtures/terminal/** | 1 | ready |
 | 4 | [Mail through the request socket](phase-04-mail-through-socket.md) | 1 | packages/session-host/contracts/head-permissions.v1.json, packages/session-host/rust/src/forwarder.rs, packages/session-host/rust/src/permissions.rs, packages/session-host/rust/tests/forwarder.rs, packages/session-host/rust/tests/permissions.rs, packages/run-supervisor/rust/src/head_client.rs, packages/run-supervisor/rust/src/head_request.rs, apps/fgos/src/wiring/mailbox_root.rs, apps/fgos/src/wiring/mailbox_hook.rs, apps/fgos/src/wiring/mailbox_verbs.rs, apps/fgos/tests/mailbox_routes.rs | 2 | ready |
 | 5 | [The send door wakes the recipient](phase-05-send-door-wakes.md) | 2, 3, 4 | packages/mailbox/rust/store/src/nudge.rs, packages/mailbox/rust/store/src/verbs.rs, packages/mailbox/rust/store/src/adapters/**, packages/mailbox/rust/store/tests/nudge_*.rs, packages/mailbox/rust/core/src/report.rs, packages/mailbox/contracts/adapters.v1.json, packages/mailbox/contracts/frame.v1.txt, packages/session-host/rust/src/pane_io.rs, packages/session-host/rust/tests/typed_wake.rs, packages/identity/rust/src/directory.rs, apps/fgos/src/wiring/mailbox_verbs.rs, apps/fgos/src/wiring/mailbox_verbs/**, apps/fgos/tests/mailbox_routes.rs | 3 | ready |
@@ -161,7 +161,7 @@ Waves: phases 1, 2 and 3 run at once (disjoint: a report, the mailbox record and
 waits for the diagnosis. Phase 5 needs the rotation-aware record, the composer predicate and the socket path.
 Phase 6 writes the spec once the shape is landed; phase 7 is the one wiring proof above the lower tests and the
 merge gate. Hot files: `apps/fgos/src/wiring/mailbox_verbs.rs` and `apps/fgos/tests/mailbox_routes.rs` have one
-writer per wave (4, then 5).
+writer at a time (2, then 4, then 5; phase 2 took them on 2026-11-26, see its brief).
 
 Cross-plan check: the running plans `261124-2143-head-lifecycle-events` and `261125-1631-agent-context-engine` own
 `apps/fgos/src/wiring/supervision.rs`, `apps/fgos/src/wiring/mod.rs`, `apps/fgos/Cargo.toml`, `CHANGELOG.md`, the skill

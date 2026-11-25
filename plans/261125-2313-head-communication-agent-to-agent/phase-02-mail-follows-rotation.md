@@ -17,7 +17,16 @@ Mail queued for a head's old generation is offered to its successor exactly once
 
 `packages/mailbox/rust/core/src/**`, `packages/mailbox/rust/core/tests/**`,
 `packages/mailbox/rust/store/src/record/**`, `packages/mailbox/rust/store/src/hook/**`,
-`packages/mailbox/rust/store/tests/record_*.rs`.
+`packages/mailbox/rust/store/tests/record_*.rs`, `apps/fgos/src/wiring/mailbox_verbs.rs`,
+`apps/fgos/src/wiring/mailbox_hook.rs`, `apps/fgos/tests/mailbox_routes.rs`.
+
+Corrected 2026-11-26 after a first run proved the record cannot do this alone
+(`reports/phase-02-blocker.md`): the host turns role mail and fixed-handle mail into the same
+`Recipient::Key` (`apps/fgos/src/wiring/mailbox_verbs.rs:695-701`), and the hook drain gets no Identity fact of
+who holds the role (`packages/mailbox/rust/store/src/hook/drain.rs:67-77`). The host wiring files join this phase;
+phase 4 writes the same two host files afterwards, so they still have one writer at a time.
+`apps/fgos/src/wiring/mailbox_identity.rs` is outside the plan footprint: call its public functions (`address`,
+`identified`) and do not edit it; if an edit there is unavoidable, stop and report `needsWrites`.
 
 ## Steps
 
@@ -26,15 +35,20 @@ Mail queued for a head's old generation is offered to its successor exactly once
 2. Write the failing case first: mail recorded for role R at generation N; the head rotates to N+1 (same role,
    new process); the drain of N+1 is offered the mail once; a second drain is offered nothing; N (if still alive
    during the handover) is not offered it again.
-3. Change the record so pending mail addressed to a role (not to a fixed handle) is matched to the role's live
+3. Identity stays the only authority on who holds a role (session-host spec §8.2: the predecessor keeps the role
+   until the successor answers). Keep role-vs-handle addressing from the send through to the record, and pass
+   Identity's role-holder fact to the drain through the existing hook boundary (`mailbox_hook.rs`). No mailbox-owned
+   role registry.
+4. Change the record so pending mail addressed to a role (not to a fixed handle) is matched to the role's live
    generation at drain time, and marked offered once. Mail addressed to one exact handle that is gone keeps
    today's notice.
-4. Keep the snapshot schema compatible, or bump it with a migration in the same change.
+5. Keep the snapshot schema compatible (older readers deny unknown fields), or bump it with a migration in the same change.
 
 ## Verify
 
-`cargo test -p fgos-mailbox-core && cargo test -p fgos-mailbox --test record_snapshot`. Pass: the new case and every
-existing record test green.
+`cargo test -p fgos-mailbox-core && cargo test -p fgos-mailbox --test record_snapshot && cargo test -p fgos --test
+mailbox_routes`. Pass: the new case and every existing record test green; one wiring case in `mailbox_routes.rs` shows
+role-addressed mail survives a handover and handle-addressed mail does not (cases stay in the core test).
 
 ## Rollback
 
