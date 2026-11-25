@@ -1,13 +1,15 @@
 # Phase 7: The rotation handoff is the first contributor
 
 The live door of ASC-D6. It also fixes the double delivery: today a Claude successor gets the handoff whole at
-SessionStart and again through the ritual's pointer to the file.
+SessionStart (`fgos hook session-rotation --event session-start`, Claude rows only) and again through the ritual's
+pointer to the file (`openingText`, `src/session-host/head-start.mjs:122-124`, until phase 5 moves it).
 
 ## Inputs
 
-- `packages/session-host/rust/src/rotation/handoff.rs` (about line 190) and
-  `apps/fgos/src/wiring/session_rotation_hook.rs` (about line 265, `session_start_context`).
-- `src/session-rotation/rotate.mjs` (`buildHandoff`, and the call into `placeHead` at about line 442).
+- `packages/session-host/rust/src/rotation/handoff.rs` (`session_start_context` line 190, `CONTEXT_LIMIT` 10,000
+  characters at line 9) and `apps/fgos/src/wiring/session_rotation_hook.rs` (the call at line 340).
+- `src/session-rotation/handoff-store.mjs` (`buildHandoff` line 66, `writeHandoff`, `readLatestHandoff`) and
+  `src/session-rotation/rotate.mjs` (the call into `placeHead` at line 571).
 - The `Contributor` port and the `start-contributors.v1.json` row schema, from phases 2 and 3.
 
 ## Footprint
@@ -15,13 +17,13 @@ SessionStart and again through the ritual's pointer to the file.
 `packages/session-host/rust/src/rotation/**`, `packages/session-host/rust/tests/**`,
 `apps/fgos/src/wiring/session_rotation_hook.rs`, `apps/fgos/src/wiring/start_context/**`,
 `packages/agent-start-context/contracts/start-contributors.v1.json`, `src/session-rotation/rotate.mjs`,
-`test/session-rotation/rotate.test.mjs`.
+`src/session-rotation/handoff-store.mjs`, `test/session-rotation/rotate.test.mjs`.
 
 ## Steps
 
 1. Session-host (tier 3) implements `Contributor` for the handoff. It returns the handoff block when the facts show
    a rotation successor. Register it in `start-contributors.v1.json` with owner `session-host`, `when: {kind: [head]}`,
-   and a byte budget equal to today's cap of 10k characters and a timeout.
+   a byte budget equal to today's `CONTEXT_LIMIT`, and a timeout.
 2. The host wires the adapter in `apps/fgos/src/wiring/start_context/`.
 3. Remove the separate handoff text in `session_rotation_hook.rs` and the ritual's pointer that delivers it a second
    time. Rotation passes the handoff only as a contributor input.

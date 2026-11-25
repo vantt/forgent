@@ -7,9 +7,11 @@ the empty `domains/<domain>`.
 
 - The discussion's P10 row: the domain is decided at intake (`fgos submit --domain`, `fgos-clarifying` step 3) and
   stored as `work.domain`.
-- `src/session-host/head-plan.mjs` (`taskOfHead`, about line 213) and `src/session-host/head-start.mjs` after
-  phase 5.
+- `src/session-host/head-plan.mjs` (`taskOfHead`, line 213) and `src/session-host/head-start.mjs` after phase 5.
 - `src/state/domain-registry.mjs` (the vocabulary).
+- Portfolio items carry no domain today: 0 of 534 backlog row files and 0 plans have a `domain:` key (checked on
+  `2c27d499a`). Where an item's domain will live may be settled by the open discussion `ds-ubqlutna6r` (a
+  domain-agnostic item component); read its current state first and follow its field name if it is settled.
 
 ## Footprint
 
