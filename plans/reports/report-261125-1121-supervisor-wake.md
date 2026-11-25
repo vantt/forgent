@@ -24,3 +24,15 @@
 
 - `q-nii67wdhv3`: who stages the release from main (>= 29dd50475) and runs the full suites. The question is already
   asked. `fgos identity resolve lead:SUPERVISOR` still finds no live session, so the question was not asked again.
+
+## Events that arrived during the wake
+
+- `f087877f80766914` session-no-result for `unit-run-1795579468245-bf36df66`, the phase 3 unit of the delete-dead
+  plan. The unit has since settled with outcome `pass` (gemini, 963 s). The event came from empty stdout before the
+  result was written. The delete-dead lead is busy polling its worker units, so the event was marked handled.
+- `2dab22f5e7e1e112` lane-freed. No plan is admissible and `leadsLive` is at `maxLeads`, so nothing was admitted.
+- `984552620558d2b1` coordination-help from the heads lead: phase 2 is parked on fix-unit ticket
+  `c-29218-1795579848109`. That `fgos run` process (pid 3761217) is alive and running, so the wait is real. When the
+  ticket ends, a lane-freed wake fires. That wake must check the heads lead: if the lead is idle with phase 2 still
+  running, raise coordination-help on it and type the wait check into its session so it re-reviews and lands phase 2.
+  The event was marked handled on that basis.
