@@ -98,6 +98,8 @@ pub struct WakeSpan {
     pub subject: String,
     pub trigger: String,
     pub outcome: &'static str,
+    /// The host's code when the outcome is a refusal (`stop-failed`); empty otherwise.
+    pub error: String,
 }
 pub trait Telemetry {
     fn emit(&self, span: &WakeSpan);
@@ -204,6 +206,7 @@ pub fn stop_stuck(ports: &Ports, trigger: Trigger) -> StuckOutcome {
         subject: trigger.subject.to_owned(),
         trigger: trigger.trigger.to_owned(),
         outcome: "stopped-stuck",
+        error: String::new(),
     });
     StuckOutcome::Stopped
 }
@@ -221,9 +224,20 @@ fn discussion_dir(source: &str) -> Option<&str> {
 fn lead_target(role: &str) -> Option<(&str, &str)> {
     match role.strip_prefix("head:lead-") {
         Some(name) if !name.is_empty() => Some(("lead", name)),
-        _ if role.starts_with("lead:") && role.len() > "lead:".len() => Some(("lead", role)),
+        _ if is_short_lead_role(role) => Some(("lead", role)),
         _ => None,
     }
+}
+
+/// A hand-started lead's short role: `lead:` and 1-64 of `[A-Za-z0-9_-]`. The host's `session stop` accepts the same
+/// pattern (`SHORT_LEAD_ROLE` in `src/session-host/head-stop.mjs`).
+pub fn is_short_lead_role(role: &str) -> bool {
+    role.strip_prefix("lead:").is_some_and(|lane| {
+        (1..=64).contains(&lane.len())
+            && lane
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
+    })
 }
 
 /// Stop the planners and leads whose work is finished: the planner of a discussion whose plan has
@@ -266,14 +280,18 @@ fn close_finished(ports: &Ports, trigger: Trigger) {
         if ports.stop.activity(&persona, &name) != Activity::Idle {
             continue;
         }
-        if ports.stop.stop(&persona, &name).is_ok() {
-            ports.telemetry.emit(&WakeSpan {
-                name: "fgos.supervisor.wake",
-                subject: trigger.subject.to_owned(),
-                trigger: trigger.trigger.to_owned(),
-                outcome: "stopped-finished",
-            });
-        }
+        // The span names the stopped head, not the trigger row; a refusal is recorded with its code.
+        let (outcome, error) = match ports.stop.stop(&persona, &name) {
+            Ok(()) => ("stopped-finished", String::new()),
+            Err(code) => ("stop-failed", code),
+        };
+        ports.telemetry.emit(&WakeSpan {
+            name: "fgos.supervisor.wake",
+            subject: role,
+            trigger: trigger.trigger.to_owned(),
+            outcome,
+            error,
+        });
     }
 }
 
@@ -286,6 +304,7 @@ pub fn wake(ports: &Ports, settings: &Settings, trigger: Trigger) -> WakeOutcome
         subject: trigger.subject.to_owned(),
         trigger: trigger.trigger.to_owned(),
         outcome: outcome.as_str(),
+        error: String::new(),
     });
     outcome
 }

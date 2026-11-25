@@ -354,7 +354,8 @@ fn wake_with_no_live_supervisor_and_an_unhandled_event_starts_one_through_sessio
 }
 
 #[test]
-fn a_wake_reads_the_activity_of_a_finished_lead_and_leaves_a_busy_one_while_it_still_starts_the_supervisor() {
+fn a_wake_reads_the_activity_of_a_finished_lead_and_leaves_a_busy_one_while_it_still_starts_the_supervisor(
+) {
     let scene = Scene::new("finished-lead", WATCHER_CONFIG);
     let project = scene.project();
     let plan = project.join(format!("plans/{PLAN}/plan.md"));
@@ -381,8 +382,121 @@ fn a_wake_reads_the_activity_of_a_finished_lead_and_leaves_a_busy_one_while_it_s
     let calls = scene.payload_calls();
     assert_eq!(
         calls,
-        vec![serde_json::json!(["session", "start", "supervisor", "--name", "demo", "--json"])],
+        vec![serde_json::json!([
+            "session",
+            "start",
+            "supervisor",
+            "--name",
+            "demo",
+            "--json"
+        ])],
         "the busy lead is not stopped and the supervisor is still started"
+    );
+}
+
+/// A fake herdr (the run-supervisor crate's stand-in CLI, answering from files) whose one allocated slot `key` reads as
+/// an idle agent; the returned listener is the fake server's socket and stays open while the test runs.
+struct IdleHerdr {
+    env: Vec<(String, String)>,
+    _server: UnixListener,
+}
+
+fn idle_herdr(scene: &Scene, key: &str) -> IdleHerdr {
+    use fgos_terminal_control::{
+        core::{Core, CoreConfig},
+        driver::herdr::{HerdrConfig, HerdrDriver},
+        policy::{policy_by_name, Limits},
+        port::{AllocateRequest, Display},
+    };
+    let bin = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../packages/run-supervisor/rust/tests/fixtures/fake-herdr-pane.py");
+    let dir = scene.root.join("herdr");
+    fs::create_dir_all(&dir).unwrap();
+    let socket = scene.root.join("herdr.sock");
+    let server = UnixListener::bind(&socket).unwrap();
+    fs::write(
+        dir.join("explain.json"),
+        r#"{"agent":"claude","state":"idle","visible_idle":true,"visible_working":false,"visible_blocker":false}"#,
+    )
+    .unwrap();
+
+    let mut herdr = HerdrConfig::new(bin.to_string_lossy().into_owned());
+    herdr.socket_path = Some(socket.to_string_lossy().into_owned());
+    herdr
+        .env
+        .push(("FAKE_HERDR_DIR".into(), dir.to_string_lossy().into_owned()));
+    let driver = HerdrDriver::new(herdr);
+    let policy = policy_by_name(None).unwrap();
+    let core = Core::new(
+        &driver,
+        policy.as_ref(),
+        CoreConfig {
+            state_root: scene.root.join("state"),
+            limits: Limits {
+                min_cols: 1,
+                min_rows: 1,
+                max_panes_per_tab: 8,
+            },
+            allocation_grace_ms: 60_000,
+            launch_identify_timeout_ms: 5_000,
+            shell_ready_timeout_ms: 10_000,
+        },
+    );
+    core.allocate(&AllocateRequest {
+        key: key.into(),
+        group_key: "g".into(),
+        display: Display {
+            title: Some(key.into()),
+            ..Default::default()
+        },
+        group_size: None,
+        cwd: None,
+        env: Default::default(),
+    })
+    .expect("allocate the lead's slot");
+    IdleHerdr {
+        env: vec![
+            ("FGOS_HERDR_BIN".into(), bin.to_string_lossy().into_owned()),
+            ("FAKE_HERDR_DIR".into(), dir.to_string_lossy().into_owned()),
+            (
+                "HERDR_SOCKET_PATH".into(),
+                socket.to_string_lossy().into_owned(),
+            ),
+        ],
+        _server: server,
+    }
+}
+
+#[test]
+fn a_wake_stops_an_idle_finished_lead_through_the_real_adapter_and_session_stop_names_its_role() {
+    let scene = Scene::new("idle-lead", WATCHER_CONFIG);
+    let project = scene.project();
+    let plan = project.join(format!("plans/{PLAN}/plan.md"));
+    let body = fs::read_to_string(&plan).unwrap();
+    fs::write(
+        &plan,
+        body.replace("status: ready\n", "status: done\nlead: lead:S1\n"),
+    )
+    .unwrap();
+    git(&project, &["add", "-f", "."]);
+    git(&project, &["commit", "-q", "-m", "finish plan"]);
+    git(&project, &["push", "-q", "origin", "main"]);
+    let herdr = idle_herdr(&scene, "slot-s1");
+    register_lead_session(&scene, "lead:S1", "idle-lead-session", "slot-s1");
+
+    let mut wake = scene.command(&["supervisor", "wake", "--json"]);
+    for (k, v) in &herdr.env {
+        wake.env(k, v);
+    }
+    let out = wake.output().unwrap();
+    assert!(out.status.success(), "{}", text(&out));
+    assert_eq!(
+        scene.payload_calls(),
+        vec![serde_json::json!([
+            "session", "stop", "--role", "lead:S1", "--json"
+        ])],
+        "the idle finished lead is stopped by its role: {}",
+        text(&out)
     );
 }
 
@@ -638,6 +752,15 @@ fn a_confined_land_that_names_the_footprint_is_refused_before_the_socket() {
 
 /// A live session of this project holding `role`, with a terminal pane in Identity; returns its handle.
 fn register_session(scene: &Scene, role: &str, value: &str) -> String {
+    register_session_at(scene, role, value, None)
+}
+
+/// [`register_session`] whose terminal group names the slot `key`, as a lead's supervisor records it.
+fn register_lead_session(scene: &Scene, role: &str, value: &str, key: &str) -> String {
+    register_session_at(scene, role, value, Some(key))
+}
+
+fn register_session_at(scene: &Scene, role: &str, value: &str, key: Option<&str>) -> String {
     let state = scene.root.join("state");
     let info = fgos_identity::session_for(
         &state,
@@ -661,7 +784,7 @@ fn register_session(scene: &Scene, role: &str, value: &str) -> String {
     entry.ids = Some(fgos_identity::directory::Ids {
         terminal: Some(fgos_identity::directory::TerminalIds {
             driver: "herdr".to_string(),
-            key: None,
+            key: key.map(str::to_owned),
             pane_id: "p-test".to_string(),
             tab_id: None,
             workspace_id: None,

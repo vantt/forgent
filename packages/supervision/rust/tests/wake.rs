@@ -535,5 +535,54 @@ fn a_failed_close_never_blocks_the_start_decision() {
     let f = f.with_event("plan-done");
     *f.stop_error.borrow_mut() = Some("stop-refused".into());
     assert_eq!(f.wake(), WakeOutcome::Started);
-    assert!(f.spans.borrow().iter().all(|s| s.outcome != "stopped-finished"));
+    let spans = f.spans.borrow();
+    assert!(spans.iter().all(|s| s.outcome != "stopped-finished"));
+    let failed: Vec<_> = spans
+        .iter()
+        .filter(|s| s.outcome == "stop-failed")
+        .map(|s| (s.subject.as_str(), s.error.as_str()))
+        .collect();
+    assert_eq!(
+        failed,
+        [
+            (
+                &*format!("head:planner-{}", head_name(HANDLE, "ds-1-topic")),
+                "stop-refused"
+            ),
+            ("head:lead-alpha", "stop-refused"),
+            ("lead:S1", "stop-refused"),
+        ]
+    );
+}
+
+#[test]
+fn a_stopped_head_is_the_subject_of_its_span() {
+    let (f, planner) = closing_fixture();
+    f.wake();
+    let subjects: Vec<_> = f
+        .spans
+        .borrow()
+        .iter()
+        .filter(|s| s.outcome == "stopped-finished")
+        .map(|s| s.subject.clone())
+        .collect();
+    assert_eq!(
+        subjects,
+        [
+            format!("head:planner-{planner}"),
+            "head:lead-alpha".into(),
+            "lead:S1".into()
+        ]
+    );
+}
+
+#[test]
+fn a_short_lead_role_is_one_to_sixty_four_safe_characters() {
+    use fgos_supervision::wake::is_short_lead_role;
+    assert!(is_short_lead_role("lead:S1"));
+    assert!(is_short_lead_role(&format!("lead:{}", "a".repeat(64))));
+    assert!(!is_short_lead_role(&format!("lead:{}", "a".repeat(65))));
+    assert!(!is_short_lead_role("lead:"));
+    assert!(!is_short_lead_role("lead:a b"));
+    assert!(!is_short_lead_role("lead:a;b"));
 }
