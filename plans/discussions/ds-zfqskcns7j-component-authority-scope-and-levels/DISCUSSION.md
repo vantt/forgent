@@ -1,18 +1,18 @@
 ---
 id: ds-zfqskcns7j
 title: "Component authority: what it covers and whether the model needs a module level"
-status: open
+status: paused
 source:
   - p-adv35azsca
 created: 2026-11-25
 ---
 
-discussion: open
+discussion: paused
 
 # Component authority: phạm vi, module và các góc nhìn tầng
 
 ```txt
-discussion: open
+discussion: paused
 topic: backlog row p-adv35azsca; nối tiếp ds-at6x3xj2ng (component-authority, settled 2026-11-21)
 shaper: head:shaper-component-authority
 opened: 2026-11-25 (chủ dự án qua thư ký); round 1 ghi 2026-11-25 14:15
@@ -21,6 +21,8 @@ open owner questions: chưa đặt vào question store (đang thảo luận tr�
 ```
 
 ## 1. Trạng thái hiện tại
+
+2026-11-25 15:40 **tạm dừng** (chủ dự án mệt). Đã chốt: CAS-D1 module, CAS-D2 bốn layering, CAS-D3 giữ `domain`, CAS-D4 luật `import` + hai loại port. Tạm chốt: Q4 A trước, B sau (§3 hàng 14). Khi tiếp tục, hỏi theo thứ tự: (1) `product` suy từ `tier` hay trường riêng (§3 hàng 12); (2) ring có phải layering thứ năm hay là cách cắt khác của `product` (§3 hàng 15); (3) Q2 ranh giới sở hữu (gắn với B).
 
 2026-11-25 15:32 round 14 (checkpoint, land): chốt CAS-D2 (bốn layering, tên chung `layering`), CAS-D3 (giữ chữ `domain`), CAS-D4 (năm luật `import` + hai loại port). Tạm chốt: component-authority chưa quản được nhiều layering (§3 hàng 13); chủ dự án chọn A trước (mô hình khai `layerings`, test đọc luật từ mô hình), B sau (`fgos authority check` giữ phép kiểm) (§3 hàng 14). Còn mở: `product` là dải tên trên tier (§3 hàng 12); Q2 ranh giới sở hữu (gắn với B).
 
@@ -61,6 +63,7 @@ Mô hình `packages/component-authority/model/` là nơi duy nhất trả lời 
 | 12 | **Layering `product` gắn vào `stack` thế nào (round 12).** Sự thật: tier thật của dữ liệu: Execution (`execution-core`, `dispatch-transport`, `seat-binding`) t5; `workflow` t6, `work-driver` t6; `work-state`, `runner` t7; Domain (`domain-components`, `coding-domain`) cũng **t7**; `tierNames` ghi t8 'Skill and Domain (no file today)' nhưng không component nào ở t8 ngoài `supervision`. Tức là xung đột Work/Domain (§3 hàng 6a) chỉ có trên giấy `tierNames`; trong dữ liệu Work và Domain cùng t7, chưa phân trên dưới. Đề xuất shaper: `product` **không thêm trường** cho component mà là các **dải tên đặt trên tier của `stack`** (nền t0-4, Execution t5, Workflow t6, Domain, Work, mặt tiền t9); luật của `product` là luật `tier-downward` sẵn có, cộng một kiểm nhất quán: dải Domain phải nằm dưới dải Work. Tách Domain và Work thành hai tier khác nhau đi cùng coding cutover như vision.md đã ghi. Phép thử 'Workflow không mang tên nghiệp vụ' không thành guard chữ (bài học quyết định 0031); phần import đã có `domain-siloing` chặn. Lợi: một nguồn độ sâu (`stack`), `product` chỉ là tên đọc cho người. | `components.yaml` (tier từng hàng); `layers.yaml` `tierNames`; `docs/platform/vision.md` §6 Known gaps | Mở, chờ chủ dự án |
 | 13 | **Component-authority có quản được nhiều layering chưa? (chủ dự án nêu là câu quan trọng nhất, round 13, 15:24).** Trả lời: **chưa.** (1) Mỗi hàng component có đúng **một** trường `layer` và **một** trường `tier`; số layering bị đóng cứng ở hai. (2) Danh sách hạng `layer` viết cứng ở **ba nơi**: `layers.yaml` `layers`, enum của `contracts/model.v1.json` (dòng 72, 89) và hằng `LAYER_NAMES` trong `rust/src/declare.rs:28`; dải tier cứng ở `TIER_RANGE` (`declare.rs:32`). Thêm hay đổi một hạng phải sửa cả ba. (3) `rules` trong `layers.yaml` chỉ là **danh sách tên**: Rust không đọc để kiểm, và `test/architecture.test.mjs` không đọc `manifest.rules` (0 lần); phép kiểm của từng luật viết tay trong test Node. Tức là component-authority **giữ dữ liệu, không giữ luật**; thứ thực thi luật nằm ngoài component. (4) `scope` suy từ `paths` ngay trong test; `product` không có; port và adapter không có khái niệm. Hệ quả: mọi quyết định §3 hàng 9-12 hiện chỉ ghi được bằng sửa code ở ba chỗ cộng test, không phải bằng khai báo. | `packages/component-authority/contracts/model.v1.json`; `rust/src/declare.rs:28,32,581-595`; `rust/src/model.rs:160-171`; `test/architecture.test.mjs:71-129` | Rõ (sự thật); hướng xử lý thuộc Q4 |
 | 14 | **Q4 — component-authority quản layering đến đâu (round 14).** A: mô hình khai `layerings` (tên, câu hỏi, hạng theo thứ tự, nguồn dữ liệu: trường riêng, suy từ `tier`, suy từ `paths`, tên luật); schema và Rust đọc hạng từ đó, hết viết cứng ba nơi; phép kiểm vẫn ở `test/architecture.test.mjs` nhưng đọc luật từ mô hình. B: như A, cộng `fgos authority check` giữ mọi phép kiểm trong component, test và land gate gọi nó. C: giữ nguyên. **Chủ dự án (15:30): A trước, B làm bước sau.** B gắn với Q2 (component-authority sở hữu những gì). | §3 hàng 13 | Tạm chốt |
+| 15 | **Trục 'ring' chủ dự án nhớ (round 15).** Bốn decision ring, đặt ở `orchestration-vocabulary-map` 2026-08-27 §4 (nay là bản lịch sử): **Strategic** = Orchestrator (chọn việc nào chạy trong N việc), **Activation** = Launcher (kích hoạt một việc), **Flow** = Router + Driver (định tuyến domain/workflow, lái một việc qua các stage), **Execution** = Dispatcher (môi giới thực thi một lần chạy). 2026-09-02 chủ dự án lo bốn ring chỉ là từ vựng thì code sẽ trôi (`docs/platform/proposals/step-10-coding-domain-adoption.md:750-757`). Trạng thái hiện tại (`docs/platform/agent-coordination/vocabulary/concept-relationships.md:95-112`, Accepted): chủ dự án **chấp nhận ring là mô hình trách nhiệm**, không phải thực thể; không cần class Orchestrator, Launcher, Router, Driver, Dispatcher; chủ cụ thể là Workflow runner (trình tự), Execution Core binding và patterns (chạy Unit), dispatch adapters (lần chạy), Work verbs (vòng đời giao việc). Nhận xét shaper (chưa bàn): ring trả lời 'quyết định này ở phạm vi nào' (N việc, một việc, một luồng, một lần chạy), khác với bốn layering đã có; nó gần `product` (Execution, Workflow, Work) nhưng cắt theo phạm vi quyết định. Ứng viên layering thứ năm hoặc một cách đặt tên khác cho `product`; chưa quyết. | `docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md:524-560`; `concept-relationships.md:95-112` | Mở |
 
 ## 4. Quyết định đã chốt
 
@@ -95,6 +98,7 @@ Mô hình `packages/component-authority/model/` là nơi duy nhất trả lời 
 - 2026-11-25 15:22 — Chủ dự án: "như vậy chiều này hình dạng cuối cùng sẽ làm gì". Shaper tóm tắt, viết nháp §6.
 - 2026-11-25 15:24 — Chủ dự án: "thật ra quan trọng nhất cần thảo luận trước khi quay lại các chiều là component-authority có thể quản lý được layering theo nhiều chiều hay chưa?" Shaper dò (§3 hàng 13): chưa.
 - 2026-11-25 15:30 — Shaper đặt Q4 với ba hướng A, B, C, nghiêng A trước. Chủ dự án: "A trước, B làm bước sau".
+- 2026-11-25 15:34 — Chủ dự án: "hơi mệt, chưa trả lời được chỗ này [product]. riêng về chiều, anh nhớ còn một chiều đã từng chốt nó là cái gì mà gọi là ring, liên quan đến router và driver." Shaper tìm thấy bốn decision ring (§3 hàng 15). Discussion tạm dừng.
 
 ## 6. Thiết kế đã chốt {#design}
 
