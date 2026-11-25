@@ -147,10 +147,14 @@ fn run(args: &[OsString]) {
         gate: gate.clone(),
     };
     let gate_idle = gate;
-    let outcome = shell::run(
+    let holder = |binding: &fgos_mailbox_core::Binding, role: &str| {
+        super::mailbox_verbs::holds_role(identity_root.as_deref(), &fgos_dir, binding, role)
+    };
+    let outcome = shell::run_with_roles(
         input,
         &mut std::io::stdin().lock(),
         &mut std::io::stdout().lock(),
+        &holder,
     );
     outcome_log::record(&paths, adapter, event, &outcome, now());
     // The mailbox lock is released here; the child is started past it and

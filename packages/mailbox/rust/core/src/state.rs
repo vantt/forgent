@@ -27,11 +27,12 @@ use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::{BTreeMap, VecDeque};
 
 /// The version of the snapshot shape this core reads and writes.
-pub const SNAPSHOT_SCHEMA_VERSION: u32 = 2;
+pub const SNAPSHOT_SCHEMA_VERSION: u32 = 3;
 
 /// The oldest version this core still reads; it is read as the current one
-/// and written back as the current one (version 2 only added the `remote`
-/// section and a header's `origin`, both empty in a version 1 snapshot).
+/// and written back as the current one. Version 2 added remote state;
+/// version 3 adds role intent. Legacy headers remain fixed addresses,
+/// because their original role intent cannot be recovered safely.
 const OLDEST_READABLE_VERSION: u32 = 1;
 
 /// The version field alone, read before the whole snapshot.

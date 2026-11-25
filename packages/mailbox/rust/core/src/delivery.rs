@@ -7,7 +7,7 @@ use crate::ids::{AttemptToken, Cli, Generation, IdSource, MessageId, ShortName, 
 use crate::limits::Limits;
 use crate::names::{self, ResolveRefusal};
 use crate::notices::{Notice, NoticeReason, NoticeState};
-use crate::registry::Liveness;
+use crate::registry::{Binding, Liveness};
 use crate::state::MailboxState;
 use crate::time::Timestamp;
 use crate::wake::{WakeDrop, WakeParties, WakeSender};
@@ -71,6 +71,8 @@ pub enum Recipient {
     /// its exact key only, never as a name or a prefix, so no short name can
     /// ever be taken for it.
     Key(WriterKey),
+    /// Role intent resolved by Identity, whose holder is supplied at drain.
+    Role { role: String, key: WriterKey },
     /// An alias the caller could not turn into exactly one head of this
     /// record: refused with it in place of resolution.
     Refused(AliasRefusal),
@@ -482,7 +484,9 @@ impl MailboxState {
                         .resolve_skipping(query, &req.dead_keys)
                         .ok()
                         .map(|b| b.key.clone()),
-                    Recipient::Key(key) => self.binding(key).map(|b| b.key.clone()),
+                    Recipient::Key(key) | Recipient::Role { key, .. } => {
+                        self.binding(key).map(|b| b.key.clone())
+                    }
                     Recipient::Refused(_) => None,
                 };
                 let to = recipient.map_or_else(
@@ -541,6 +545,10 @@ impl MailboxState {
             from: req.from,
             to: admitted.to,
             to_generation: admitted.to_generation,
+            to_role: match req.to {
+                Recipient::Role { role, .. } => Some(role),
+                _ => None,
+            },
             reply_to: parent,
             reply_to_hint: req.reply_to,
             depth: admitted.depth,
@@ -620,8 +628,57 @@ impl MailboxState {
         limits: &Limits,
         ids: &mut dyn IdSource,
     ) -> Claim {
-        if self.current_generation(key) != Some(generation) || !self.has_pending(key, generation) {
+        self.claim_with_roles(key, generation, checkpoint, now, limits, ids, &|_, _| false)
+    }
+
+    /// Identity supplies current role holders for this drain, never a
+    /// mailbox-owned registry. A live claim is not stolen at handover.
+    pub fn claim_with_roles(
+        &mut self,
+        key: &WriterKey,
+        generation: Generation,
+        checkpoint: Checkpoint,
+        now: Timestamp,
+        limits: &Limits,
+        ids: &mut dyn IdSource,
+        holds_role: &dyn Fn(&Binding, &str) -> bool,
+    ) -> Claim {
+        if self.current_generation(key) != Some(generation) {
             return Claim::empty(false, 0);
+        }
+        let roles: BTreeSet<String> = self
+            .messages
+            .iter()
+            .filter(|h| crate::policy::pending(h))
+            .filter_map(|h| h.to_role.clone())
+            .collect::<BTreeSet<_>>()
+            .into_iter()
+            .filter(|role| {
+                self.binding(key)
+                    .is_some_and(|binding| holds_role(binding, role))
+            })
+            .collect();
+        let routed = self.messages.iter().any(|h| {
+            (h.state == MessageState::Recorded
+                || matches!(h.state, MessageState::InFlight { deadline, .. } if now.max(self.last_now) > deadline))
+                && h.to_role.as_ref().is_some_and(|r| roles.contains(r))
+                && (&h.to != key || h.to_generation != generation)
+        });
+        if routed {
+            self.sweep(now, limits, ids);
+            for h in &mut self.messages {
+                if h.state == MessageState::Recorded
+                    && h.to_role.as_ref().is_some_and(|r| roles.contains(r))
+                    && (&h.to != key || h.to_generation != generation)
+                {
+                    h.to = key.clone();
+                    h.to_generation = generation;
+                    h.changed_at = self.last_now;
+                }
+            }
+        }
+        if !self.has_pending(key, generation, &roles) {
+            return Claim::empty(routed, 0);
         }
         // A bounded step that would take nothing but a pointer, already
         // stamped since the newest pending item, changes nothing: a pointer
@@ -630,9 +687,10 @@ impl MailboxState {
         // the sweep must run, so the full path is taken.
         if matches!(checkpoint, Checkpoint::BoundedStep(_))
             && !self.time_rule_due(now, limits)
-            && self.drained_since_newest(key, generation)
+            && !routed
+            && self.drained_since_newest(key, generation, &roles)
         {
-            let (picks, too_large) = self.select(key, generation, checkpoint, limits);
+            let (picks, too_large) = self.select(key, generation, checkpoint, limits, &roles);
             if picks.is_empty() && too_large > 0 {
                 return Claim::empty(false, too_large);
             }
@@ -642,7 +700,7 @@ impl MailboxState {
         if let Some(binding) = self.bindings.get_mut(key) {
             binding.last_drain_at = Some(now);
         }
-        let (picks, too_large) = self.select(key, generation, checkpoint, limits);
+        let (picks, too_large) = self.select(key, generation, checkpoint, limits, &roles);
         if picks.is_empty() {
             return Claim::empty(true, too_large);
         }
@@ -670,12 +728,18 @@ impl MailboxState {
 
     /// Whether `key`'s last drain is at or after the newest item pending
     /// for `generation`.
-    fn drained_since_newest(&self, key: &WriterKey, generation: Generation) -> bool {
+    fn drained_since_newest(
+        &self,
+        key: &WriterKey,
+        generation: Generation,
+        roles: &BTreeSet<String>,
+    ) -> bool {
         let mail = self
             .messages
             .iter()
             .filter(|h| {
-                &h.to == key
+                h.to_role.as_ref().is_none_or(|r| roles.contains(r))
+                    && &h.to == key
                     && h.to_generation == generation
                     && matches!(
                         h.state,
@@ -707,12 +771,16 @@ impl MailboxState {
         generation: Generation,
         checkpoint: Checkpoint,
         limits: &Limits,
+        roles: &BTreeSet<String>,
     ) -> (Vec<Pick>, u32) {
         let eligible = self
             .messages
             .iter()
             .enumerate()
-            .filter(|(_, h)| eligible(h, key, generation, checkpoint))
+            .filter(|(_, h)| {
+                h.to_role.as_ref().is_none_or(|r| roles.contains(r))
+                    && eligible(h, key, generation, checkpoint)
+            })
             .map(|(i, _)| Pick::Message(i))
             .chain(
                 self.notices
@@ -991,9 +1059,15 @@ impl MailboxState {
     /// Whether `key` has mail or notices pending for `generation`: the only
     /// case in which a drain sweeps and stamps `last_drain_at`, so a drain
     /// of an empty address writes nothing.
-    fn has_pending(&self, key: &WriterKey, generation: Generation) -> bool {
+    fn has_pending(
+        &self,
+        key: &WriterKey,
+        generation: Generation,
+        roles: &BTreeSet<String>,
+    ) -> bool {
         let mail = self.messages.iter().any(|h| {
-            &h.to == key
+            h.to_role.as_ref().is_none_or(|r| roles.contains(r))
+                && &h.to == key
                 && h.to_generation == generation
                 && matches!(
                     h.state,

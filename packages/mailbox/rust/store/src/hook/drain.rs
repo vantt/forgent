@@ -33,11 +33,17 @@ use super::{Adapter, HookEvent, HookLimits};
 use crate::adapters::{Shape, TestedClis};
 use crate::head::{head_text, is_complete, judge_stored, record_of_head_text};
 use fgos_mailbox_core::{
-    render, too_large_pointer, AttemptToken, Checkpoint, ClaimedItem, ClaimedWhat, Cli, Finished,
-    Generation, IdSource, Limits, MailboxState, MessageId, RegisterRefusal, RegisterRequest,
-    Registered, Timestamp, WriterKey, FRAME_SEPARATOR,
+    render, too_large_pointer, AttemptToken, Binding, Checkpoint, ClaimedItem, ClaimedWhat, Cli,
+    Finished, Generation, IdSource, Limits, MailboxState, MessageId, RegisterRefusal,
+    RegisterRequest, Registered, Timestamp, WriterKey, FRAME_SEPARATOR,
 };
 use fgos_process::facts::Record;
+
+/// Decode the process facts of a bound head for the host's Identity
+/// adapter, using the store's single reader of its opaque head text.
+pub fn bound_head_record(binding: &fgos_mailbox_core::Binding) -> Record {
+    record_of_head_text(&binding.head)
+}
 
 /// The head process of the calling CLI, as the shell found it.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -158,7 +164,8 @@ pub enum Begun {
         state_changed: bool,
         /// The generation this call created or replaced the binding with;
         /// `None` when the head was already bound (or nothing registered).
-        /// A registering call is always quiet: a new generation has no mail.
+        /// A new generation has no fixed-address mail; role mail may be
+        /// claimed immediately when Identity already names this head.
         registered: Option<Generation>,
     },
     /// A claim to render, write and finish; a claim always changes the
@@ -237,6 +244,21 @@ pub fn begin(
     hook: &HookLimits,
     tested: &TestedClis,
     ids: &mut dyn IdSource,
+) -> Begun {
+    begin_with_roles(state, call, now, limits, hook, tested, ids, &|_, _| false)
+}
+
+/// The same drain with Identity's current role-holder judgement. Missing
+/// or ambiguous facts fail closed; registering a head transfers no role.
+pub fn begin_with_roles(
+    state: &mut MailboxState,
+    call: &HookCall<'_>,
+    now: Timestamp,
+    limits: &Limits,
+    hook: &HookLimits,
+    tested: &TestedClis,
+    ids: &mut dyn IdSource,
+    holds_role: &dyn Fn(&Binding, &str) -> bool,
 ) -> Begun {
     let payload = match call.adapter.parse(call.event, call.stdin) {
         Ok(payload) => payload,
@@ -322,7 +344,7 @@ pub fn begin(
             None => return after(QuietReason::NoStepBound, changed),
         },
     };
-    let claim = state.claim(key, generation, checkpoint, now, limits, ids);
+    let claim = state.claim_with_roles(key, generation, checkpoint, now, limits, ids, holds_role);
     changed |= claim.changed;
     let Some(token) = claim.token else {
         if claim.too_large > 0 {
@@ -398,7 +420,7 @@ pub fn finish(state: &mut MailboxState, ticket: &FinishTicket, now: Timestamp) -
 /// What `inbox --claim` found for one caller.
 #[cfg(unix)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum InboxClaim {
+pub enum InboxClaim {
     /// The caller has no binding.
     NoAddress,
     /// Nothing pending.
@@ -418,10 +440,31 @@ pub(crate) fn claim_inbox(
     limits: &Limits,
     ids: &mut dyn IdSource,
 ) -> (InboxClaim, bool) {
+    claim_inbox_with_roles(state, key, now, limits, ids, &|_, _| false)
+}
+
+/// An explicit inbox drain with the same Identity facts as the hook.
+#[cfg(unix)]
+pub fn claim_inbox_with_roles(
+    state: &mut MailboxState,
+    key: &WriterKey,
+    now: Timestamp,
+    limits: &Limits,
+    ids: &mut dyn IdSource,
+    holds_role: &dyn Fn(&Binding, &str) -> bool,
+) -> (InboxClaim, bool) {
     let Some(generation) = state.binding(key).map(|b| b.generation) else {
         return (InboxClaim::NoAddress, false);
     };
-    let claim = state.claim(key, generation, Checkpoint::Step, now, limits, ids);
+    let claim = state.claim_with_roles(
+        key,
+        generation,
+        Checkpoint::Step,
+        now,
+        limits,
+        ids,
+        holds_role,
+    );
     let Some(token) = claim.token else {
         return (InboxClaim::Empty, claim.changed);
     };

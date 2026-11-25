@@ -72,6 +72,104 @@ fn claim_then_finish_with_the_same_token_and_generation_offers_the_message() {
 }
 
 #[test]
+fn role_mail_follows_the_identity_holder_and_is_offered_once() {
+    for successor_key in ["b", "c"] {
+        let mut pair = Pair::new(t(100));
+        let role = "head:supervisor-main";
+        let mut request = plain("a", B_NAME, "queued for the role");
+        request.to = fgos_mailbox_core::Recipient::Role {
+            role: role.into(),
+            key: key("b"),
+        };
+        let id = pair.try_send(request, t(100)).unwrap().id;
+        let fixed = pair.send("a", B_NAME, "fixed handle", t(100));
+        let successor = if successor_key == "b" {
+            pair.take_over("b", "codex", t(101))
+        } else {
+            common::register_new(
+                &mut pair.state,
+                common::request("c", "codex", None, "head-c"),
+                t(101),
+                &pair.limits,
+                &mut pair.ids,
+            );
+            G1
+        };
+        let claim = |pair: &mut Pair, who: &str, generation, holder: Option<&str>, now| {
+            pair.state.claim_with_roles(
+                &key(who),
+                generation,
+                Checkpoint::Step,
+                t(now),
+                &pair.limits,
+                &mut pair.ids,
+                &|binding, r| r == role && holder.is_some_and(|h| binding.key == key(h)),
+            )
+        };
+        assert!(
+            claim(&mut pair, successor_key, successor, None, 102)
+                .items
+                .is_empty(),
+            "unavailable or ambiguous Identity fails closed"
+        );
+        if successor_key != "b" {
+            assert!(
+                claim(&mut pair, successor_key, successor, Some("b"), 102)
+                    .items
+                    .is_empty(),
+                "registration alone does not move the role"
+            );
+        }
+        let offered = claim(
+            &mut pair,
+            successor_key,
+            successor,
+            Some(successor_key),
+            103,
+        );
+        assert_eq!(
+            offered
+                .items
+                .iter()
+                .map(|i| i.id.clone())
+                .collect::<Vec<_>>(),
+            vec![id.clone()]
+        );
+        assert_eq!(pair.state.message(&fixed).unwrap().to, key("b"));
+        assert_eq!(pair.state.message(&fixed).unwrap().to_generation, G1);
+        let finished = pair.state.finish(
+            &key(successor_key),
+            successor,
+            &offered.token.unwrap(),
+            t(104),
+        );
+        assert_eq!(finished.offered, vec![id.clone()]);
+        assert!(claim(
+            &mut pair,
+            successor_key,
+            successor,
+            Some(successor_key),
+            105
+        )
+        .items
+        .is_empty());
+        let old = claim(&mut pair, "b", G1, Some(successor_key), 105);
+        assert!(
+            !old.items.iter().any(|i| i.id == id),
+            "a living predecessor never gets the role mail again"
+        );
+        if successor_key == "b" {
+            assert!(old.items.is_empty(), "an obsolete generation never drains");
+        } else {
+            assert_eq!(
+                old.items[0].id, fixed,
+                "fixed mail remains the predecessor's"
+            );
+        }
+    }
+}
+
+#[test]
 fn a_finish_with_a_wrong_token_is_ignored_and_changes_nothing() {
     let mut pair = Pair::new(t(100));
     pair.send("a", B_NAME, "hello", t(100));
@@ -113,15 +211,70 @@ fn a_finish_after_the_deadline_sweep_and_a_second_claim_is_ignored() {
 
 #[test]
 fn a_lost_finish_yields_a_duplicate_offer_with_attempt_2() {
-    let mut pair = Pair::new(t(100));
-    let id = pair.send("a", B_NAME, "hello", t(100));
-    pair.claim("b", G1, t(100));
-
-    let again = pair.claim("b", G1, t(100 + pair.limits.in_flight_ttl_sec + 1));
-
-    assert_eq!(again.items.len(), 1);
-    assert_eq!(again.items[0].id, id);
-    assert_eq!(again.items[0].attempt, 2);
+    for role in [None, Some("head:supervisor-main")] {
+        let mut pair = Pair::new(t(100));
+        let mut request = plain("a", B_NAME, "hello");
+        if let Some(role) = role {
+            request.to = fgos_mailbox_core::Recipient::Role {
+                role: role.into(),
+                key: key("b"),
+            };
+        }
+        let id = pair.try_send(request, t(100)).unwrap().id;
+        let claim = |pair: &mut Pair, who: &str, now| {
+            pair.state.claim_with_roles(
+                &key(who),
+                G1,
+                Checkpoint::Step,
+                now,
+                &pair.limits,
+                &mut pair.ids,
+                &|binding, r| Some(r) == role && binding.key == key(who),
+            )
+        };
+        let first = claim(&mut pair, "b", t(100)).token.unwrap();
+        let next = if role.is_some() {
+            common::register_new(
+                &mut pair.state,
+                common::request("c", "codex", None, "head-c"),
+                t(101),
+                &pair.limits,
+                &mut pair.ids,
+            );
+            let before = pair.state.clone();
+            let premature = claim(&mut pair, "c", t(102));
+            assert!(
+                premature.items.is_empty(),
+                "handover must not steal a live claim"
+            );
+            assert!(
+                !premature.changed,
+                "waiting for a claim deadline is write-free"
+            );
+            assert_eq!(pair.state, before);
+            "c"
+        } else {
+            "b"
+        };
+        let expired = t(100 + pair.limits.in_flight_ttl_sec + 1);
+        let again = claim(&mut pair, next, expired);
+        assert_eq!(again.items.len(), 1);
+        assert_eq!(again.items[0].id, id);
+        assert_eq!(again.items[0].attempt, 2);
+        assert!(
+            pair.state
+                .finish(&key("b"), G1, &first, expired)
+                .offered
+                .is_empty(),
+            "the old token cannot finish a reissued claim"
+        );
+        assert_eq!(
+            pair.state
+                .finish(&key(next), G1, &again.token.unwrap(), expired)
+                .offered,
+            vec![id]
+        );
+    }
 }
 
 #[test]

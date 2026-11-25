@@ -52,29 +52,54 @@ fn an_in_flight_message_whose_deadline_passes_at_the_last_allowed_offer_is_refus
 
 #[test]
 fn a_recorded_message_older_than_the_record_ttl_is_refused_with_a_notice() {
-    let mut pair = Pair::new(t(0));
-    let id = pair.send("a", B_NAME, "hello", t(10));
-
-    pair.sweep(t(10).plus_secs(pair.limits.record.ttl_sec));
-    assert_eq!(
-        pair.state.message(&id).unwrap().state,
-        MessageState::Recorded
-    );
-
-    pair.sweep(Pair::after(t(10), pair.limits.record.ttl_sec));
-    let header = pair.state.message(&id).unwrap();
-    assert!(matches!(
-        header.state,
-        MessageState::Refused {
-            reason: RefusalReason::RecordTtl,
-            ..
+    for role in [None, Some("head:supervisor-main")] {
+        let mut pair = Pair::new(t(0));
+        let mut request = common::plain("a", B_NAME, "hello");
+        if let Some(role) = role {
+            request.to = fgos_mailbox_core::Recipient::Role {
+                role: role.into(),
+                key: key("b"),
+            };
         }
-    ));
-    assert_eq!(
-        notices_to(&pair, "a"),
-        vec![(NoticeReason::RecordTtl, id.as_str().to_string())]
-    );
-    assert_eq!(pair.state.counters().total(CounterReason::RecordTtl), 1);
+        let id = pair.try_send(request, t(10)).unwrap().id;
+        pair.sweep(t(10).plus_secs(pair.limits.record.ttl_sec));
+        assert_eq!(
+            pair.state.message(&id).unwrap().state,
+            MessageState::Recorded
+        );
+        let expired = Pair::after(t(10), pair.limits.record.ttl_sec);
+        if role.is_some() {
+            let successor = pair.take_over("b", "codex", t(11));
+            let claim = pair.state.claim_with_roles(
+                &key("b"),
+                successor,
+                fgos_mailbox_core::Checkpoint::Step,
+                expired,
+                &pair.limits,
+                &mut pair.ids,
+                &|_, r| Some(r) == role,
+            );
+            assert!(
+                claim.items.is_empty(),
+                "rotation cannot resurrect expired role mail"
+            );
+        } else {
+            pair.sweep(expired);
+        }
+        let header = pair.state.message(&id).unwrap();
+        assert!(matches!(
+            header.state,
+            MessageState::Refused {
+                reason: RefusalReason::RecordTtl,
+                ..
+            }
+        ));
+        assert_eq!(
+            notices_to(&pair, "a"),
+            vec![(NoticeReason::RecordTtl, id.as_str().to_string())]
+        );
+        assert_eq!(pair.state.counters().total(CounterReason::RecordTtl), 1);
+    }
 }
 
 #[test]

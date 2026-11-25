@@ -23,6 +23,18 @@ fn the_shared_senders_full_ceiling_population_reads_under_the_snapshot_cap() {
         key
     };
     let (one, two, sender) = (long('a'), long('b'), long('s'));
+    // Role intent can require six JSON bytes per character. Use the
+    // largest encoding accepted by the core; fixed headers are smaller.
+    let roles = [
+        format!(
+            "{}a",
+            "\u{0000}".repeat(limits.frame.max_header_chars as usize - 1)
+        ),
+        format!(
+            "{}b",
+            "\u{0000}".repeat(limits.frame.max_header_chars as usize - 1)
+        ),
+    ];
     let step = limits.human.fallback_window_sec + 1;
     let windows = limits
         .header_horizon_sec()
@@ -38,23 +50,23 @@ fn the_shared_senders_full_ceiling_population_reads_under_the_snapshot_cap() {
             for window in 0..windows {
                 let now = T0.plus_secs(window * step);
                 for i in 0..limits.session.budget as usize {
-                    state
-                        .send(
-                            rec::send_req(&sender, &names[i % 2], "m"),
-                            now,
-                            &limits,
-                            ids,
-                        )
-                        .unwrap();
+                    let recipient = i % 2;
+                    let mut req = rec::send_req(&sender, &names[recipient], "m");
+                    req.to = fgos_mailbox_core::Recipient::Role {
+                        role: roles[recipient].clone(),
+                        key: rec::key([&one, &two][recipient]),
+                    };
+                    state.send(req, now, &limits, ids).unwrap();
                 }
-                for recipient in [&one, &two] {
-                    let claim = state.claim(
+                for (i, recipient) in [&one, &two].into_iter().enumerate() {
+                    let claim = state.claim_with_roles(
                         &rec::key(recipient),
                         Generation::FIRST,
                         Checkpoint::Step,
                         now,
                         &limits,
                         ids,
+                        &|binding, role| role == roles[i] && binding.key == rec::key(recipient),
                     );
                     state.finish(
                         &rec::key(recipient),
@@ -218,16 +230,25 @@ fn a_full_record_refuses_sends_and_keeps_draining() {
             .unwrap();
         assert!(finished.wrote);
     }
-    let registered = record
-        .hold(Wait::Try, later, &limits, |state, ids| {
-            rec::register(state, "a-new-head", later, &limits, ids)
-        })
-        .unwrap();
-    assert!(registered.wrote);
-    let size = std::fs::metadata(fgos.paths().snapshot()).unwrap().len();
+    // The exact gap left below the cap depends on the header schema.
+    // Cross it with real registrations rather than assuming one binding
+    // outweighs that gap (finishing a claim can shrink a header).
+    let mut size = 0;
+    for i in 0..heads.len() {
+        let registered = record
+            .hold(Wait::Try, later, &limits, |state, ids| {
+                rec::register(state, &format!("a-new-head-{i}"), later, &limits, ids)
+            })
+            .unwrap();
+        assert!(registered.wrote);
+        size = std::fs::metadata(fgos.paths().snapshot()).unwrap().len();
+        if size > write_cap as u64 {
+            break;
+        }
+    }
     assert!(
         size > write_cap as u64,
-        "the drains grew the record past the write cap"
+        "non-send holds grew the record past the write cap"
     );
     assert!(size <= snapshot_read_cap(&limits));
     rec::read_state(&record);

@@ -10,7 +10,9 @@
 //! Straight-line: root, config and limits, then one or two `Record` holds
 //! (a send to an Identity alias reads the record's heads in one more,
 //! read-only hold first, `mailbox_identity`); this process takes the mailbox
-//! lock with no other lock held, and reads Identity's directory outside it.
+//! lock with no other lock held. A role drain reads Identity's directory
+//! under the hold, against the binding that is about to claim; it takes no
+//! Identity write lock.
 //!
 //! `inbox --claim` writes its frames to stdout itself, through the store's
 //! write-then-finish function, and finishes only after a successful flush;
@@ -45,6 +47,100 @@ use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
 use std::time::{SystemTime, UNIX_EPOCH};
+
+/// Ask Identity whether the head being drained holds this role. Use the
+/// binding under the current hold, including a just-registered successor,
+/// rather than rereading the previous snapshot. Identity alone resolves
+/// the role, including ambiguity and the two-step handover.
+pub(super) fn holds_role(
+    root: Option<&Path>,
+    fgos_dir: &Path,
+    binding: &fgos_mailbox_core::Binding,
+    role: &str,
+) -> bool {
+    let liveness = fgos_mailbox::head::stored_liveness(binding);
+    if liveness == Liveness::Dead || fgos_identity::is_attempt_writer_id(binding.key.as_str()) {
+        return false;
+    }
+    let head = verbs::HeadView {
+        key: binding.key.clone(),
+        name: binding.name.clone(),
+        cli: binding.cli.clone(),
+        liveness,
+        head: fgos_mailbox::hook::bound_head_record(binding),
+    };
+    matches!(address(root, fgos_dir, role, &[head]),
+        Addressed::Head { key, role_holder: Some(_) } if key == binding.key)
+}
+
+/// Compose Identity-aware claiming with the existing hook emit/finish door.
+fn claim_role_inbox(
+    record: &Record,
+    key: &WriterKey,
+    wait: Wait,
+    limits: &fgos_mailbox_core::Limits,
+    handle_of: &fgos_mailbox::hook::HandleOf<'_>,
+    holder: &dyn Fn(&fgos_mailbox_core::Binding, &str) -> bool,
+    stdout: &mut dyn std::io::Write,
+) -> Result<verbs::InboxClaimed, String> {
+    use fgos_mailbox::hook::shell::{claimed_sizes, emit_and_finish, Emit, WriteGate};
+    use fgos_mailbox::hook::{claim_inbox_with_roles, InboxClaim};
+    use fgos_mailbox::record::Reported;
+    if fgos_identity::is_attempt_writer_id(key.as_str()) {
+        return verbs::inbox_claim(record, key, wait, &now, limits, handle_of, stdout);
+    }
+    let at = now();
+    let held = record
+        .hold(wait, at, limits, |state, ids| {
+            let (claim, changed) = claim_inbox_with_roles(state, key, at, limits, ids, holder);
+            let sizes = match &claim {
+                InboxClaim::Claimed(claimed) => claimed_sizes(state, claimed),
+                _ => Default::default(),
+            };
+            Reported {
+                value: (claim, sizes),
+                changed,
+            }
+        })
+        .map_err(|error| record_error_text(error.code()))?;
+    let (claim, sizes) = held.value.value;
+    let claimed = match claim {
+        InboxClaim::Claimed(claimed) => claimed,
+        other => {
+            let text = fgos_mailbox_core::inbox_text(
+                match other {
+                    InboxClaim::NoAddress => None,
+                    _ => Some(&[]),
+                },
+                limits,
+            );
+            return Ok(verbs::InboxClaimed {
+                written: writeln!(stdout, "{text}")
+                    .and_then(|()| stdout.flush())
+                    .is_ok(),
+                ..Default::default()
+            });
+        }
+    };
+    let emitted = emit_and_finish(
+        &Emit {
+            record,
+            wait,
+            limits,
+            clock: &now,
+            gate: &WriteGate::new(),
+            handle_of,
+        },
+        &claimed,
+        &sizes,
+        stdout,
+    );
+    Ok(verbs::InboxClaimed {
+        claimed: claimed.items.iter().map(|item| item.id.clone()).collect(),
+        written: emitted.stdout_written,
+        finished: emitted.finished,
+    })
+}
 
 pub use super::mailbox_surface::{
     MailboxAnswer, AVAILABLE_SUBCOMMANDS, INBOX_CLAIM_DESCRIPTOR, INBOX_CLAIM_OPERATION_ID,
@@ -698,7 +794,16 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                     Err(text) => return failed(text, *json, warning),
                 };
                 match address(state_root().as_deref(), &fgos_dir, to, &heads) {
-                    Addressed::Head { key, role_holder } => (Recipient::Key(key), role_holder),
+                    Addressed::Head { key, role_holder } => {
+                        let recipient = match &role_holder {
+                            Some((role, _)) => Recipient::Role {
+                                role: role.clone(),
+                                key,
+                            },
+                            None => Recipient::Key(key),
+                        };
+                        (recipient, role_holder)
+                    }
                     Addressed::Refused(refusal) => {
                         // No head of this record answers: a session of another
                         // machine may, when mail crosses machines here.
@@ -750,7 +855,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
             };
             let candidates = match &recipient {
                 Recipient::Refused(refusal) => Some(typed_candidates(refusal)),
-                Recipient::Name(_) | Recipient::Key(_) => None,
+                Recipient::Name(_) | Recipient::Key(_) | Recipient::Role { .. } => None,
             };
             let req = SendRequest {
                 from,
@@ -820,7 +925,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
             }
         }
         MailboxRequest::Inbox { claim: true, json } => {
-            let (_, record, loaded, warning) = match open(*json) {
+            let (fgos_dir, record, loaded, warning) = match open(*json) {
                 Ok(opened) => opened,
                 Err(answer) => return *answer,
             };
@@ -835,13 +940,16 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                     session_of(root.as_deref()?, key, cli, head).map(|info| info.handle)
                 };
             let mut stdout = std::io::stdout().lock();
-            match verbs::inbox_claim(
+            let holder = |binding: &fgos_mailbox_core::Binding, role: &str| {
+                holds_role(root.as_deref(), &fgos_dir, binding, role)
+            };
+            match claim_role_inbox(
                 &record,
                 &key,
                 Wait::Ms(loaded.hook.verbs.lock_wait_ms),
-                &now,
                 &loaded.limits,
                 &handle_of,
+                &holder,
                 &mut stdout,
             ) {
                 Ok(done) => MailboxAnswer {

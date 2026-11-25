@@ -54,6 +54,9 @@ pub struct Header {
     pub from_generation: Option<Generation>,
     pub to: WriterKey,
     pub to_generation: Generation,
+    /// Identity role intent; legacy snapshots and fixed addresses have none.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub to_role: Option<String>,
     /// The derived parent (spec §5.4); only this link feeds the guards.
     pub reply_to: Option<MessageId>,
     /// The caller's `--reply-to`, validated and kept for display only.

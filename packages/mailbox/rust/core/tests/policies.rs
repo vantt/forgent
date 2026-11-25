@@ -279,12 +279,36 @@ fn a_full_queue_refuses_the_newest_message_and_keeps_the_old_ones_one_sender_can
         .collect();
     assert_eq!(kept, oldest);
 
-    // A new process at b does not inherit the old queue.
+    // A new process at b does not inherit the old fixed-address queue.
     pair.take_over("b", "codex", t(2));
     assert_eq!(
         code(&pair.try_send(plain("late", B_NAME, "m"), t(2))),
         "recorded"
     );
+
+    // Role backlog is different: rotating cannot reset either queue cap
+    // before the successor's first drain reroutes its pending messages.
+    for (cap, share, expected) in [(1, 2, "queue-full"), (2, 1, "sender-share-full")] {
+        let mut pair = Pair::new(t(0));
+        pair.limits.queue.cap = cap;
+        pair.limits.queue.per_sender = share;
+        let request = |to| {
+            let mut req = plain("a", B_NAME, "m");
+            req.to = fgos_mailbox_core::Recipient::Role {
+                role: "head:supervisor-main".into(),
+                key: key(to),
+            };
+            req
+        };
+        assert_eq!(code(&pair.try_send(request("b"), t(1))), "recorded");
+        pair.add_head("c", t(2));
+        assert_eq!(code(&pair.try_send(request("c"), t(2))), expected);
+        assert_eq!(
+            pair.state.messages().count(),
+            1,
+            "the oldest role mail is never evicted"
+        );
+    }
 }
 
 #[test]
