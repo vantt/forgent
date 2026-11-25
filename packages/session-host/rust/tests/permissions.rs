@@ -79,15 +79,24 @@ fn a_flag_before_a_verb_word_cannot_hide_the_verb_from_its_deny_row() {
     let planner = decide("planner", &argv("questions --option A answer q-abc")).unwrap();
     assert_eq!(planner.decision, Decision::Deny);
     // A flag takes the next word as its value, as the host reads it: `--all answer` leaves `questions q-abc`.
-    assert_eq!(decision("planner", "questions --all answer q-abc"), Decision::Allow);
-    assert_eq!(decision("planner", "--x questions answer q-abc"), Decision::Ask);
+    assert_eq!(
+        decision("planner", "questions --all answer q-abc"),
+        Decision::Allow
+    );
+    assert_eq!(
+        decision("planner", "--x questions answer q-abc"),
+        Decision::Ask
+    );
     // A cancel with a flag before the sub-verb is not the allowed `questions cancel` of the lead either.
     assert_eq!(
         decision("lead", "questions --reason x cancel q-abc"),
         Decision::Deny
     );
     // A flag after the verb words is the verb's own and does not change the verdict.
-    assert_eq!(decision("lead", "questions cancel q-abc --reason x"), Decision::Allow);
+    assert_eq!(
+        decision("lead", "questions cancel q-abc --reason x"),
+        Decision::Allow
+    );
 }
 
 #[test]
@@ -316,7 +325,12 @@ fn command_paths(
         }
     }
     for key in ["allOf", "anyOf", "oneOf"] {
-        for child in obj.get(key).and_then(|v| v.as_array()).into_iter().flatten() {
+        for child in obj
+            .get(key)
+            .and_then(|v| v.as_array())
+            .into_iter()
+            .flatten()
+        {
             command_paths(child, defs, path, out, depth + 1);
         }
     }
@@ -366,7 +380,10 @@ fn every_command_sensitive_config_key_is_a_protected_config_path() {
             }
         }
     }
-    assert!(found >= 8, "the walk found only {found} command-sensitive keys");
+    assert!(
+        found >= 8,
+        "the walk found only {found} command-sensitive keys"
+    );
     assert!(
         uncovered.is_empty(),
         "command-sensitive config keys with no protectedConfigPaths entry: {uncovered:#?}"

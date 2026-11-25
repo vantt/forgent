@@ -89,10 +89,12 @@ fn protected(edit: &str, guard: &str) -> bool {
     let (Ok(edit), Ok(guard)) = (parse_path(edit), parse_path(guard)) else {
         return true;
     };
-    edit.iter().zip(guard.iter()).all(|(have, want)| match want {
-        Segment::Key(key) if key == "*" => true,
-        _ => have == want,
-    })
+    edit.iter()
+        .zip(guard.iter())
+        .all(|(have, want)| match want {
+            Segment::Key(key) if key == "*" => true,
+            _ => have == want,
+        })
 }
 
 /// The one shape of an allowed `config patch`: `config patch <file> [--reason <text>]`. Returns the file word.
@@ -156,7 +158,10 @@ fn read_patch_file(root: &Path, file: &str) -> Result<Vec<u8>, Refused> {
     if !plain_relative(file) {
         return refuse("the config patch file must be a plain project-relative path");
     }
-    if Path::new(file).components().any(|c| c.as_os_str() == ".fgos") {
+    if Path::new(file)
+        .components()
+        .any(|c| c.as_os_str() == ".fgos")
+    {
         return refuse("the config patch file may not live under .fgos");
     }
     let unreadable = || Refused("the config patch file cannot be read by the window".into());
@@ -174,8 +179,8 @@ fn read_patch_file(root: &Path, file: &str) -> Result<Vec<u8>, Refused> {
         dir = open_at(&dir, part, libc::O_DIRECTORY)
             .map_err(|e| no_follow_refusal(&e, unreadable()))?;
     }
-    let opened = open_at(&dir, last, libc::O_NONBLOCK)
-        .map_err(|e| no_follow_refusal(&e, unreadable()))?;
+    let opened =
+        open_at(&dir, last, libc::O_NONBLOCK).map_err(|e| no_follow_refusal(&e, unreadable()))?;
     if !opened.metadata().map_err(|_| unreadable())?.is_file() {
         return refuse("the config patch file is not a regular file");
     }

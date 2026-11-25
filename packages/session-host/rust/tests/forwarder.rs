@@ -47,7 +47,10 @@ fn an_allowed_argv_runs_on_the_host_with_json_added() {
 #[test]
 fn a_json_flag_the_caller_already_passed_is_not_added_twice() {
     let planned = run("supervisor", json!(["slots", "--json"]), Path::new("/p")).unwrap();
-    assert_eq!(planned, Planned::Run(["slots", "--json"].map(String::from).to_vec()));
+    assert_eq!(
+        planned,
+        Planned::Run(["slots", "--json"].map(String::from).to_vec())
+    );
 }
 
 #[test]
@@ -243,11 +246,22 @@ fn a_harmless_config_patch_runs_project_only_and_the_scope_flags_are_the_hosts()
 #[test]
 fn a_config_patch_names_exactly_one_file_at_the_third_word() {
     let root = scratch("shape", "- set: watcher.activeIntervalSec\n  value: 30\n");
-    std::fs::write(root.join("evil.yaml"), "- set: runner.executors.x\n  value: 1\n").unwrap();
+    std::fs::write(
+        root.join("evil.yaml"),
+        "- set: runner.executors.x\n  value: 1\n",
+    )
+    .unwrap();
     for argv in [
         // A second file after `--reason` would be the one the host applies.
         json!(["config", "patch", "--reason", "ok", "evil.yaml"]),
-        json!(["config", "patch", "patch.yaml", "--reason", "ok", "evil.yaml"]),
+        json!([
+            "config",
+            "patch",
+            "patch.yaml",
+            "--reason",
+            "ok",
+            "evil.yaml"
+        ]),
         json!(["config", "patch", "patch.yaml", "evil.yaml"]),
         json!(["config", "patch", "patch.yaml", "--reason"]),
         json!(["config", "patch"]),
@@ -298,7 +312,11 @@ fn a_config_patch_changed_after_the_window_read_it_does_not_reach_the_host() {
         &stage,
     )
     .unwrap();
-    std::fs::write(root.join("patch.yaml"), "- set: runner.executors.x\n  value: 1\n").unwrap();
+    std::fs::write(
+        root.join("patch.yaml"),
+        "- set: runner.executors.x\n  value: 1\n",
+    )
+    .unwrap();
     assert_eq!(
         std::fs::read_to_string(&stage).unwrap(),
         "- set: watcher.activeIntervalSec\n  value: 30\n"
@@ -308,18 +326,42 @@ fn a_config_patch_changed_after_the_window_read_it_does_not_reach_the_host() {
 #[test]
 fn a_raise_names_only_the_coordination_event_kinds() {
     for persona in ["lead", "supervisor"] {
-        for kind in ["coordination-help", "coordination-handoff", "coordination-chore"] {
+        for kind in [
+            "coordination-help",
+            "coordination-handoff",
+            "coordination-chore",
+        ] {
             assert!(run(
                 persona,
-                json!(["supervisor", "raise", "--kind", kind, "--ref", "plan:x", "--reason", "r"]),
+                json!([
+                    "supervisor",
+                    "raise",
+                    "--kind",
+                    kind,
+                    "--ref",
+                    "plan:x",
+                    "--reason",
+                    "r"
+                ]),
                 Path::new("/p")
             )
             .is_ok());
         }
-        for kind in ["head-gone", "session-idle", "coordination", "coordination-help-x"] {
+        for kind in [
+            "head-gone",
+            "session-idle",
+            "coordination",
+            "coordination-help-x",
+        ] {
             let refused = run(
                 persona,
-                json!(["supervisor", "raise", &format!("--kind={kind}"), "--ref", "plan:x"]),
+                json!([
+                    "supervisor",
+                    "raise",
+                    &format!("--kind={kind}"),
+                    "--ref",
+                    "plan:x"
+                ]),
                 Path::new("/p"),
             )
             .unwrap_err();
@@ -336,7 +378,10 @@ fn a_worktree_is_removed_only_once_delivered_to_main() {
         Path::new("/p"),
     );
     assert!(ok.is_ok());
-    for refs in [json!(["--delivered-to", "feature"]), json!(["--delivered-to=HEAD~1"])] {
+    for refs in [
+        json!(["--delivered-to", "feature"]),
+        json!(["--delivered-to=HEAD~1"]),
+    ] {
         let mut argv = vec![json!("worktree"), json!("remove"), json!("w1")];
         argv.extend(refs.as_array().unwrap().iter().cloned());
         let refused = run("supervisor", Value::Array(argv), Path::new("/p")).unwrap_err();
@@ -361,7 +406,10 @@ fn a_session_read_or_type_names_a_plain_target_and_a_bounded_line_count() {
             Path::new("/p"),
         )
         .unwrap_err();
-        assert!(refused.contains("whole number up to 1000"), "{lines}: {refused}");
+        assert!(
+            refused.contains("whole number up to 1000"),
+            "{lines}: {refused}"
+        );
     }
     for target in ["--lines", "-x", "a b", "a;b", "$(x)", &"a".repeat(129)] {
         for verb in ["read", "type"] {
@@ -371,7 +419,10 @@ fn a_session_read_or_type_names_a_plain_target_and_a_bounded_line_count() {
                 Path::new("/p"),
             )
             .unwrap_err();
-            assert!(refused.contains("session target"), "{verb} {target}: {refused}");
+            assert!(
+                refused.contains("session target"),
+                "{verb} {target}: {refused}"
+            );
         }
     }
     assert!(run(
