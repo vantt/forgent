@@ -18,6 +18,7 @@ import {
   QUEUE_SWITCH_ENV,
 } from '../../scripts/lib/full-suite-queue.mjs';
 import { queueAfterStaging, runTests } from '../../scripts/run-tests.mjs';
+import { asWitnessedSpawn } from '../../scripts/lib/fgos-write-witness.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const QUEUE_URL = pathToFileURL(path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs')).href;
@@ -183,7 +184,7 @@ test('runTests takes the queue only when there are files to run, marks the child
     cwd: dir,
     queue,
     env: {},
-    spawn: (_exec, _argv, opts) => { childEnvSeen = opts.env; return { status: 0 }; },
+    spawn: asWitnessedSpawn((_exec, _argv, opts) => { childEnvSeen = opts.env; return { status: 0 }; }),
   });
   assert.equal(result.status, 0);
   assert.equal(acquired, 1);

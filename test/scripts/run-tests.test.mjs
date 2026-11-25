@@ -8,8 +8,17 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { parseEtime, parsePs, treeOf, findOverdue, reapRunDirs } from '../../scripts/lib/test-file-watchdog.mjs';
-import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests, runChosenTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES, leftoverTempPrefixes, describeLeftoverTemps, strayFgosAbove } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, FGOS_WRITE_WITNESS_PATH,snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests as runTestsRaw, runChosenTests as runChosenTestsRaw, runSelectedTests as runSelectedTestsRaw, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, diffFgosWrites, SENSITIVE_FGOS_FILES, leftoverTempPrefixes, describeLeftoverTemps, strayFgosAbove } from '../../scripts/run-tests.mjs';
+import { asWitnessedSpawn } from '../../scripts/lib/fgos-write-witness.mjs';
 import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
+
+// A fake `spawn` stands for a test process that loaded the `.fgos` write witness (its argv preloads it):
+// it leaves the load record the real preload writes, so the run is not failed for a missing witness.
+// The leak-check section drives the real preload and a spawn that never loads it through the raw runners.
+const withWitnessedSpawn = (options = {}) => (options.spawn ? { ...options, spawn: asWitnessedSpawn(options.spawn) } : options);
+const runTests = (options) => runTestsRaw(withWitnessedSpawn(options));
+const runChosenTests = (files, options) => runChosenTestsRaw(files, withWitnessedSpawn(options));
+const runSelectedTests = (files, options) => runSelectedTestsRaw(files, withWitnessedSpawn(options));
 
 function tmpFixtureRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-fixture-'));
@@ -123,16 +132,17 @@ test('DEFAULT_TEST_ROOT resolves to <repo>/test', () => {
 
 const GUARD_ARG = `--import=${pathToFileURL(GIT_CONFIG_GUARD_PATH).href}`;
 const SPY_ARG = `--import=${pathToFileURL(GIT_SPAWN_SPY_PATH).href}`;
+const WITNESS_ARG = `--import=${pathToFileURL(FGOS_WRITE_WITNESS_PATH).href}`;
 
 // --- buildTestArgv: ordering ------------------------------------------------
 
 test('buildTestArgv places forwarded flags before the full file list, both after --test', () => {
   const argv = buildTestArgv(['test/a.test.mjs', 'test/b.test.mjs'], ['--test-reporter=tap', '--test-concurrency=1']);
-  assert.deepEqual(argv, ['--test', GUARD_ARG, SPY_ARG, '--test-reporter=tap', '--test-concurrency=1', 'test/a.test.mjs', 'test/b.test.mjs']);
+  assert.deepEqual(argv, ['--test', GUARD_ARG, SPY_ARG, WITNESS_ARG, '--test-reporter=tap', '--test-concurrency=1', 'test/a.test.mjs', 'test/b.test.mjs']);
 });
 
 test('buildTestArgv with no forwarded args is just --test plus the files', () => {
-  assert.deepEqual(buildTestArgv(['x.test.mjs']), ['--test', GUARD_ARG, SPY_ARG, 'x.test.mjs']);
+  assert.deepEqual(buildTestArgv(['x.test.mjs']), ['--test', GUARD_ARG, SPY_ARG, WITNESS_ARG, 'x.test.mjs']);
 });
 
 // --- runTests: env merge, argv shape, zero-file refusal ---------------------
@@ -172,7 +182,7 @@ test('runTests spawns node --test with the discovered files as argv elements and
 
   assert.equal(result.status, 0);
   assert.equal(captured.execPath, '/fake/node');
-  assert.deepEqual(captured.argv, ['--test', GUARD_ARG, SPY_ARG, path.relative(root, f)]);
+  assert.deepEqual(captured.argv, ['--test', GUARD_ARG, SPY_ARG, WITNESS_ARG, path.relative(root, f)]);
   assert.equal(captured.opts.env.PATH, '/usr/bin');
   assert.equal('UNRELATED' in captured.opts.env, false);
 });
@@ -219,7 +229,7 @@ test('chosen test files run alone in the staged environment, and a path that is 
     spawn: (execPath, argv, opts) => { captured = { argv, env: opts.env }; return { status: 0 }; },
   });
   assert.equal(ran.status, 0);
-  assert.deepEqual(captured.argv, ['--test', GUARD_ARG, SPY_ARG, '--test-reporter=tap', path.relative(root, f)]);
+  assert.deepEqual(captured.argv, ['--test', GUARD_ARG, SPY_ARG, WITNESS_ARG, '--test-reporter=tap', path.relative(root, f)]);
   assert.ok(captured.env.FGOS_ACTIVE_MANIFEST_PATH && fs.existsSync(captured.env.FGOS_ACTIVE_MANIFEST_PATH), 'the addon manifest is staged for the child');
   assert.ok(captured.env.FGOS_HOST_BIN, 'the host binary is staged for the child');
 
@@ -805,49 +815,53 @@ test('runSelectedTests gives the suite a fixture root and removes it with whatev
 
 // ─── .fgos Store Leak Guardrail Tests ─────────────────────────────────────────
 
-test('snapshotFgos captures files in .fgos including observe/, excluding secrets', () => {
+// The leak check judges only the `.fgos` paths the witnessed test processes touched. These cases own
+// that behavior: the classification of one touched path, then the runner end to end, with a real node
+// child that loads the real witness, a writer the witness never saw, and a run with no witness at all.
+
+/** Runs one real `node --test` file (the argv and env the runner builds) in `base` through the raw runner. */
+function runRealTestFile(base, source, options = {}) {
+  fs.writeFileSync(path.join(base, 'a.test.mjs'), source);
+  const logs = [];
+  const result = runSelectedTestsRaw([path.join(base, 'a.test.mjs')], {
+    cwd: base,
+    stdio: 'pipe',
+    log: (msg) => logs.push(msg),
+    spawn: (execPath, argv, opts) => spawnSync(execPath, argv, { ...opts, encoding: 'utf8' }),
+    ...options,
+  });
+  return { result, logs: logs.join('\n') };
+}
+
+test('a touched .fgos path is added, modified or deleted only when it differs from its state at first touch, secrets and allowed paths aside', () => {
   const base = tempBase();
   const fgosDir = path.join(base, '.fgos');
-  fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });
-  fs.mkdirSync(path.join(fgosDir, 'observe', 'records'), { recursive: true });
-  fs.mkdirSync(path.join(fgosDir, 'coordination'), { recursive: true });
-  writeRawProjectConfig(base, '{"runner":{}}');
-  fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'data.json'), '{"friction":1}');
-  fs.writeFileSync(path.join(fgosDir, 'observe', 'records', 'data.json'), '{"record":1}');
-  fs.writeFileSync(path.join(fgosDir, 'secrets.local.env'), 'SECRET_TOKEN=abc');
-  fs.writeFileSync(path.join(fgosDir, 'secrets.env'), 'SECRET_KEY=xyz');
-
-  const snap = snapshotFgos(base);
-  assert.equal(snap.has('config.yaml'), true);
-  assert.equal(snap.has(path.join('observe', 'friction', 'data.json')), true);
-  assert.equal(snap.has(path.join('observe', 'records', 'data.json')), false, 'observe/records must be excluded from snapshot');
-  assert.equal(snap.has('secrets.local.env'), false, 'secrets.local.env must be excluded from snapshot');
-  assert.equal(snap.has('secrets.env'), false, 'secrets.env must be excluded from snapshot');
-  assert.equal(snap.get('config.yaml').size, 13);
-
-  fs.rmSync(base, { recursive: true, force: true });
-});
-
-test('diffFgosSnapshots correctly computes added, modified, deleted, and respects allowedMutations', () => {
-  const before = new Map([
-    ['config.yaml', { mtimeMs: 1000, size: 20 }],
-    ['state.json', { mtimeMs: 1000, size: 50 }],
-    ['to-delete.json', { mtimeMs: 1000, size: 30 }],
+  fs.mkdirSync(path.join(fgosDir, 'keep-dir'), { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, 'same.json'), 'one');
+  fs.writeFileSync(path.join(fgosDir, 'grown.json'), 'one');
+  fs.writeFileSync(path.join(fgosDir, 'secrets.env'), 'KEY=xyz');
+  fs.writeFileSync(path.join(fgosDir, 'allowed.log'), 'ok');
+  const sizeOf = (rel) => ({ exists: true, isDir: false, size: fs.statSync(path.join(fgosDir, rel)).size, mtimeMs: fs.statSync(path.join(fgosDir, rel)).mtimeMs });
+  const touched = new Map([
+    ['same.json', sizeOf('same.json')],
+    ['grown.json', { ...sizeOf('grown.json'), size: 1 }], // was smaller at first touch
+    ['new-run.json', { exists: false }], // created by the test and still there
+    ['made-and-removed.json', { exists: false }], // created by the test and removed again
+    ['gone.json', { exists: true, isDir: false, size: 3, mtimeMs: 1 }], // removed by the test
+    ['keep-dir', { exists: true, isDir: true, size: 0, mtimeMs: 1 }], // a directory stays a directory
+    ['secrets.env', { exists: false }], // secret file: never reported
+    ['allowed.log', { exists: false }], // allowed path: never reported
   ]);
-  const after = new Map([
-    ['config.yaml', { mtimeMs: 1000, size: 20 }], // unchanged
-    ['state.json', { mtimeMs: 2000, size: 60 }], // modified
-    ['new-run.json', { mtimeMs: 2000, size: 100 }], // added
-    ['allowed-new.json', { mtimeMs: 2000, size: 10 }], // allowed added
-  ]);
+  fs.writeFileSync(path.join(fgosDir, 'new-run.json'), '{}');
 
-  const allowed = new Set(['allowed-new.json']);
-  const diff = diffFgosSnapshots(before, after, allowed);
+  const diff = diffFgosWrites(touched, fgosDir, new Set(['allowed.log']));
 
   assert.equal(diff.leaked, true);
   assert.deepEqual(diff.added, ['new-run.json']);
-  assert.deepEqual(diff.modified, ['state.json']);
-  assert.deepEqual(diff.deleted, ['to-delete.json']);
+  assert.deepEqual(diff.modified, ['grown.json']);
+  assert.deepEqual(diff.deleted, ['gone.json']);
+  assert.equal(SENSITIVE_FGOS_FILES.has('secrets.env'), true);
+  fs.rmSync(base, { recursive: true, force: true });
 });
 
 test('runSelectedTests passes cleanly with status 0 when no .fgos store leak occurs', () => {
@@ -869,102 +883,96 @@ test('runSelectedTests passes cleanly with status 0 when no .fgos store leak occ
   fs.rmSync(base, { recursive: true, force: true });
 });
 
-test('runSelectedTests fails with exit 1 and reports error when test suite leaks a file into .fgos', () => {
+test('a file a test process leaves in .fgos fails the run and is named, wherever in .fgos it sits; one it writes and removes again passes', () => {
   const base = tempBase();
-  const fgosDir = path.join(base, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
-  writeRawProjectConfig(base, '{"runner":{}}');
-
-  const logs = [];
-  const result = runSelectedTests(['a.test.mjs'], {
-    cwd: base,
-    spawn: () => {
-      // Simulate a test leaking a file into .fgos/dispatch-runs/claude/123/run.json
-      const leakDir = path.join(fgosDir, 'dispatch-runs', 'claude', '123');
-      fs.mkdirSync(leakDir, { recursive: true });
-      fs.writeFileSync(path.join(leakDir, 'run.json'), '{"leaked":true}');
-      return { status: 0 }; // test claimed it passed
-    },
-    log: (msg) => logs.push(msg),
-  });
-
-  assert.equal(result.status, 1, 'suite MUST fail if test leaked into .fgos');
-  assert.equal(result.fgosDiff.leaked, true);
-  assert.equal(result.fgosDiff.added.includes(path.join('dispatch-runs', 'claude', '123', 'run.json')), true);
-  assert.match(logs.join('\n'), /leaked unexpected files/);
-  assert.match(logs.join('\n'), /dispatch-runs.*run\.json/);
-
-  fs.rmSync(base, { recursive: true, force: true });
-});
-
-test('runSelectedTests fails when a test leaks into .fgos/observe/ store', () => {
-  const base = tempBase();
-  const fgosDir = path.join(base, '.fgos');
+  const fgosDir = path.join(fs.realpathSync(base), '.fgos');
+  fs.mkdirSync(path.join(fgosDir, 'runtime'), { recursive: true });
   fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });
+  const dir = JSON.stringify(fgosDir);
 
-  const logs = [];
-  const result = runSelectedTests(['observe.test.mjs'], {
-    cwd: base,
-    spawn: () => {
-      // Simulate leaking into .fgos/observe/friction/leak.json
-      fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'leak.json'), '{"bad":true}');
-      return { status: 0 };
-    },
-    log: (msg) => logs.push(msg),
-  });
+  const leaking = runRealTestFile(base, [
+    "import fs from 'node:fs';",
+    "import path from 'node:path';",
+    `const fgos = ${dir};`,
+    "fs.mkdirSync(path.join(fgos, 'runtime', 'x'), { recursive: true });",
+    "fs.writeFileSync(path.join(fgos, 'runtime', 'x', 'leak.json'), '{}');",
+    "fs.mkdirSync(path.join(fgos, 'other'), { recursive: true });",
+    "fs.writeFileSync(path.join(fgos, 'other', 'leak.json'), '{}');",
+    "fs.writeFileSync(path.join(fgos, 'observe', 'friction', 'leak.json'), '{}');",
+    "fs.writeFileSync(path.join(fgos, 'secrets.env'), 'KEY=1');",
+  ].join('\n'));
 
-  assert.equal(result.status, 1, 'suite MUST fail if test leaked into .fgos/observe/');
-  assert.equal(result.fgosDiff.leaked, true);
-  assert.equal(result.fgosDiff.added.includes(path.join('observe', 'friction', 'leak.json')), true);
-  assert.match(logs.join('\n'), /observe.*leak\.json/);
+  assert.equal(leaking.result.status, 1, 'the suite fails when a test leaves a file in .fgos');
+  assert.equal(leaking.result.fgosDiff.leaked, true);
+  for (const rel of [path.join('runtime', 'x', 'leak.json'), path.join('other', 'leak.json'), path.join('observe', 'friction', 'leak.json')]) {
+    assert.ok(leaking.result.fgosDiff.added.includes(rel), `${rel} is reported as added`);
+    assert.match(leaking.logs, new RegExp(`\\+ \\.fgos/${rel.replace(/[.\\/]/g, '\\$&')}`));
+  }
+  assert.equal(leaking.result.fgosDiff.added.includes('secrets.env'), false, 'a secret file is never reported');
+  assert.match(leaking.logs, /leaked unexpected files/);
+
+  fs.rmSync(path.join(fgosDir, 'runtime', 'x'), { recursive: true, force: true });
+  fs.rmSync(path.join(fgosDir, 'other'), { recursive: true, force: true });
+  fs.rmSync(path.join(fgosDir, 'observe', 'friction', 'leak.json'), { force: true });
+  fs.rmSync(path.join(fgosDir, 'secrets.env'), { force: true });
+
+  const tidy = runRealTestFile(base, [
+    "import fs from 'node:fs';",
+    "import path from 'node:path';",
+    `const file = path.join(${dir}, 'runtime', 'scratch.json');`,
+    "fs.writeFileSync(file, '{}');",
+    'fs.rmSync(file);',
+  ].join('\n'));
+  assert.equal(tidy.result.status, 0, tidy.logs);
+  assert.equal(tidy.result.fgosDiff.leaked, false);
 
   fs.rmSync(base, { recursive: true, force: true });
 });
 
-test('runSelectedTests permits allowed mutations without failing the suite', () => {
+test('a path a test process was allowed to change in .fgos does not fail the run', () => {
   const base = tempBase();
-  const fgosDir = path.join(base, '.fgos');
+  const fgosDir = path.join(fs.realpathSync(base), '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
 
-  const allowed = new Set(['allowed.log']);
-  const result = runSelectedTests(['a.test.mjs'], {
-    cwd: base,
-    allowedFgosMutations: allowed,
-    spawn: () => {
-      fs.writeFileSync(path.join(fgosDir, 'allowed.log'), 'ok');
-      return { status: 0 };
-    },
-  });
+  const { result, logs } = runRealTestFile(base, [
+    "import fs from 'node:fs';",
+    "import path from 'node:path';",
+    `fs.writeFileSync(path.join(${JSON.stringify(fgosDir)}, 'allowed.log'), 'ok');`,
+  ].join('\n'), { allowedFgosMutations: new Set(['allowed.log']) });
 
-  assert.equal(result.status, 0);
+  assert.equal(result.status, 0, logs);
   assert.equal(result.fgosDiff.leaked, false);
   fs.rmSync(base, { recursive: true, force: true });
 });
 
-test('the leak check ignores live runtime directories other sessions write but still fails a file left elsewhere', () => {
+test('a run whose test processes never load the .fgos write witness fails closed and names the witness', () => {
+  const base = tempBase();
+  fs.mkdirSync(path.join(base, '.fgos'), { recursive: true });
+  const logs = [];
+
+  const result = runSelectedTestsRaw(['a.test.mjs'], { cwd: base, spawn: () => ({ status: 0 }), log: (msg) => logs.push(msg) });
+
+  assert.equal(result.status, 1);
+  assert.equal(result.fgosDiff.leaked, true);
+  assert.match(logs.join('\n'), /the \.fgos write witness did not load in the test processes/);
+  assert.match(logs.join('\n'), /scripts\/lib\/fgos-write-witness\.mjs/);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('a write into any .fgos path by a process that is not one of the witnessed test processes does not fail the run', () => {
   const base = tempBase();
   const fgosDir = path.join(base, '.fgos');
-  fs.mkdirSync(path.join(fgosDir, 'runtime', 'land'), { recursive: true });
-  fs.mkdirSync(path.join(fgosDir, 'runtime', 'mailbox'), { recursive: true });
-  fs.mkdirSync(path.join(fgosDir, 'observe', 'records'), { recursive: true });
-  fs.mkdirSync(path.join(fgosDir, 'logs'), { recursive: true });
   fs.mkdirSync(path.join(fgosDir, 'cache'), { recursive: true });
   fs.writeFileSync(path.join(fgosDir, 'cache', 'state.json'), '{}');
 
+  // The fake spawn writes from the runner's own process: a live head, the watcher or the land, not a test.
   const result = runSelectedTests(['a.test.mjs'], {
     cwd: base,
     spawn: () => {
-      // Simulate live activity in the excluded runtime directories
-      fs.writeFileSync(path.join(fgosDir, 'runtime', 'land', 'land-1-2-3.log.partial'), 'landing in progress\n');
-      fs.writeFileSync(path.join(fgosDir, 'runtime', 'mailbox', 'mail-taken'), 'taken\n');
-      fs.mkdirSync(path.join(fgosDir, 'runtime', 'watcher'), { recursive: true });
-      fs.writeFileSync(path.join(fgosDir, 'runtime', 'watcher', 'state.json'), '{"tick":1}');
-      fs.mkdirSync(path.join(fgosDir, 'assignments', 'unit-run-1'), { recursive: true });
-      fs.writeFileSync(path.join(fgosDir, 'assignments', 'unit-run-1', 'closed.json'), '{}');
-      fs.mkdirSync(path.join(fgosDir, 'locks'), { recursive: true });
-      fs.writeFileSync(path.join(fgosDir, 'locks', 'dispatch.lock'), 'held\n');
-      fs.writeFileSync(path.join(fgosDir, 'observe', 'records', 'event.json'), '{"event":1}');
-      fs.writeFileSync(path.join(fgosDir, 'logs', 'invocation-faults.jsonl'), '{"fault":1}\n');
+      for (const dir of ['runtime/watcher', 'runtime/head-tickets', 'assignments/unit-run-1', 'locks', 'observe/friction', 'observe/records', 'logs', 'other']) {
+        fs.mkdirSync(path.join(fgosDir, dir), { recursive: true });
+        fs.writeFileSync(path.join(fgosDir, dir, 'live.json'), '{"tick":1}');
+      }
       fs.writeFileSync(path.join(fgosDir, 'cache', 'state.json'), '{"refreshed":true}');
       return { status: 0 };
     },
@@ -975,21 +983,6 @@ test('the leak check ignores live runtime directories other sessions write but s
   assert.deepEqual(result.fgosDiff.added, []);
   assert.deepEqual(result.fgosDiff.modified, []);
   assert.deepEqual(result.fgosDiff.deleted, []);
-
-  const leaked = runSelectedTests(['a.test.mjs'], {
-    cwd: base,
-    log: () => {},
-    spawn: () => {
-      fs.mkdirSync(path.join(fgosDir, 'other'), { recursive: true });
-      fs.writeFileSync(path.join(fgosDir, 'other', 'leak.json'), '{}');
-      return { status: 0 };
-    },
-  });
-
-  assert.equal(leaked.status, 1);
-  assert.equal(leaked.fgosDiff.leaked, true);
-  assert.deepEqual(leaked.fgosDiff.added, [path.join('other', 'leak.json')]);
-
   fs.rmSync(base, { recursive: true, force: true });
 });
 
