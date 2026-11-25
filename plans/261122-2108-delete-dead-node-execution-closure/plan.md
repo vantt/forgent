@@ -357,11 +357,21 @@ order: phase 8 first, then 9, then 2 to 7.
   (`docs/platform/agent-coordination/contracts/assignment-run-runresult.md:303`,
   `docs/platform/agent-mailbox/spec.md:458`), so it stays parked on `q-ms5ifcqex6`. The old `…-p02` branch and
   worktree are superseded by `p02r`.
+- 2026-11-25 12:58: owner answered `q-ms5ifcqex6` (widen by the 7 files). Phases 2, 4, 5 and 7 are parked until the
+  supervisor lands the footprint widening; phases 6 and 9 still wait for `261124-0004` (running).
 
 ## Outstanding questions
 
-- `q-ms5ifcqex6`: widen the footprint by 7 files (out-of-footprint doc mentions of deleted tests, the decision-codes
-  baseline, the executor-model vector recorder).
+- `q-ms5ifcqex6` (answered by the owner 2026-11-25 12:54, acked): **widen the footprint by these 7 files**:
+  `docs/platform/agent-mailbox/spec.md`, `docs/platform/observe/spec.md`,
+  `docs/platform/agent-coordination/contracts/assignment-run-runresult.md`,
+  `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`,
+  `docs/platform/proposals/documentation-system-unification.md`, `scripts/check-decision-codes.baseline.json`,
+  `scripts/executor-model-vectors.mjs`. Scope of the answer: edit only the lines that name a deleted test (repoint
+  to the owning Rust test) and retire the recorder script; no other footprint change, no src or Rust change there,
+  nothing owned by `261124-0004`. A lead's paths land refuses a footprint change (`footprint-change-refused`), so
+  the supervisor or a planner adds the 7 paths to `footprint:` (supervisor event raised by the lead). Once they
+  are in, phases 2 (`p02r`), 4 and 5 repoint their out-of-footprint mentions and land, then phase 7 is redone.
 
 None
 
