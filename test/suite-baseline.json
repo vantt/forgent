@@ -270,7 +270,6 @@
     "test/runner/dispatch-worker-session-boot.test.mjs": 1.3,
     "test/runner/dispatch-worker-session.test.mjs": 0.1,
     "test/runner/dispatch.test.mjs": 25,
-    "test/runner/dispatch/executor-model-vectors.test.mjs": 3.6,
     "test/runner/dispatch/provider-session-probe.test.mjs": 0.5,
     "test/runner/dispatch/tool-providers.test.mjs": 0.5,
     "test/runner/dispatch/worker-env-case-context.test.mjs": 5.4,

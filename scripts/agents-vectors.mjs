@@ -3,8 +3,8 @@
 //
 // A vector's inputs (name, project, install) are written by hand; its `expect` is whatever the Node agent listing
 // answers today. This script rewrites only the `expect` values, through the evaluator the replay test uses
-// (test/helpers/agents-vectors.helper.mjs), and keeps the file's one layout (the serializer of
-// scripts/executor-model-vectors.mjs). A new vector is added with `"expect": null` and recorded by running it.
+// (test/helpers/agents-vectors.helper.mjs), and keeps the file's one layout: a vector is a line per key. A new
+// vector is added with `"expect": null` and recorded by running it.
 //
 //   node scripts/agents-vectors.mjs           rewrite the `expect` values
 //   node scripts/agents-vectors.mjs --check   exit 1 when any `expect` has drifted, naming the vectors
@@ -19,9 +19,26 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 import { isMainModule } from './lib/is-main-module.mjs';
-import { adoptTestEnvironment, serialize } from './executor-model-vectors.mjs';
 
 export const CONTRACT_URL = new URL('../packages/execution/contracts/agents.v1.json', import.meta.url);
+
+/** Replace this process's environment by the replay test's, the one `buildTestEnv` gives every test run. */
+export async function adoptTestEnvironment() {
+  const { buildTestEnv } = await import('./run-tests.mjs');
+  const testEnv = buildTestEnv(process.env);
+  for (const key of Object.keys(process.env)) if (!(key in testEnv)) delete process.env[key];
+  Object.assign(process.env, testEnv);
+  await import('../test/helpers/process-tmp-root.mjs');
+}
+
+const line = (value) => JSON.stringify(value);
+
+/** The file text of a contract: header keys one per line, each vector one key per line. */
+export function serialize({ vectors, ...head }) {
+  const header = Object.entries(head).map(([key, value]) => ` ${line(key)}: ${line(value)}`).join(',\n');
+  const body = vectors.map((vector) => `  {\n${Object.entries(vector).map(([key, value]) => `   ${line(key)}: ${line(value ?? null)}`).join(',\n')}\n  }`).join(',\n');
+  return `{\n${header},\n "vectors": [\n${body}\n ]\n}\n`;
+}
 
 /** The contract with every `expect` recomputed from today's Node listing. */
 export async function recorded(contract) {

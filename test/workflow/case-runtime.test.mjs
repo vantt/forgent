@@ -1,6 +1,7 @@
 // test/workflow/case-runtime.test.mjs — gate answers as rounds nobody rewrites, settle-pending, and the one drain
 
 import '../helpers/process-tmp-root.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -12,12 +13,25 @@ import { createWorkflowRun, readWorkflowEvents } from '../../src/workflow/store.
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { applySettle, drainCaseInbox, recordGateAnswerRound, unconsumedGateRounds, writeSettlePending } from '../../src/workflow/case-runtime.mjs';
 import { bindWorktree, readBinding } from '../../src/workflow/case-bindings.mjs';
-import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
+import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { digestSubject, digestText, digestContextRefs } from '../../src/workflow/ref-digests.mjs';
 import { handoffRef } from '../../src/native/execution-door.mjs';
 import { readFrontmatter } from '../../src/util/yaml.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { appendAll, append, eventsOf, FRAME, openCase, projectionOf, settle, withHold } from '../helpers/workflow-case-fixture.mjs';
+
+ensureScriptAddon();
+
+// Tests assume the top-level process is not a confined dispatched worker.
+delete process.env.FGOS_DISPATCH_DEPTH;
+delete process.env.FGOS_CONFINED;
+
+/** Hold the live dispatch-cwd lock the runtime reads as worktree custody. */
+function acquireDispatchCwdLock(fgosDir, cwd) {
+  const res = acquireSync(createLockScope('dispatch-cwd'), 'dispatch-cwd', { fgosDir, cwd });
+  if (res.result !== 'acquired') throw new Error(`dispatch-cwd not acquired: ${res.result}`);
+  return res.handle;
+}
 
 function gatedRun() {
   const repoRoot = makeFixtureDir('fgos-rounds-');

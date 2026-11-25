@@ -1,6 +1,7 @@
 // test/workflow/seats.test.mjs — rebuilding a registered base with one panel seat per lens
 
 import '../helpers/process-tmp-root.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
@@ -8,8 +9,9 @@ import path from 'node:path';
 import { loadWorkflow } from '../../src/workflow/loader.mjs';
 import { validateWorkflow } from '../../src/workflow/definition.mjs';
 import { expandWorkflowSeats as rawExpandWorkflowSeats, normalizeSeats, seatTask } from '../../src/workflow/seats.mjs';
-import { loopOf } from '../../src/native/execution-door.mjs';
-import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
+import { loopOf, shippedCatalog } from '../../src/native/execution-door.mjs';
+
+ensureScriptAddon();
 
 const defaultLoopOf = (name) => loopOf(name, { effective: shippedCatalog() });
 function expandWorkflowSeats(b, raw, options = {}) {

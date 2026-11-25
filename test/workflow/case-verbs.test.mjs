@@ -1,18 +1,18 @@
 // test/workflow/case-verbs.test.mjs — start, status, resume and close on both kinds of case
 
 import '../helpers/process-tmp-root.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 
 import { validateWorkflow } from '../../src/workflow/definition.mjs';
 import { startWorkflow, resumeWorkflow, answerWorkflow, statusWorkflow, closeWorkflow, gateWorkflow } from '../../src/workflow/index.mjs';
 import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { acquireAdvanceLock, tryAcquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
-import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
+import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { readBinding } from '../../src/workflow/case-bindings.mjs';
 import { handoffRef } from '../../src/native/execution-door.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
@@ -21,6 +21,18 @@ import { capabilityServedBy, readProjectConfig, writeProjectConfig } from '../he
 import { appendAll, conductorWorkflow, settle, verifyReceipt } from '../helpers/workflow-case-fixture.mjs';
 
 ensureScriptAddon();
+
+// Tests assume the top-level process is not a confined dispatched worker.
+delete process.env.FGOS_DISPATCH_DEPTH;
+delete process.env.FGOS_CONFINED;
+
+/** Hold the live dispatch-cwd lock case verbs read as worktree custody. */
+function acquireDispatchCwdLock(fgosDir, cwd) {
+  const res = acquireSync(createLockScope('dispatch-cwd'), 'dispatch-cwd', { fgosDir, cwd });
+  if (res.result !== 'acquired') throw new Error(`dispatch-cwd not acquired: ${res.result}`);
+  return res.handle;
+}
+
 seedFileLocalBwrapRegistry();
 
 function setupRepo() {

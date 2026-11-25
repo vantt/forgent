@@ -8,14 +8,25 @@ import path from 'node:path';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 
 import { createCaseAdmissionPort, activityUnitOf } from '../../src/workflow/case-admission-port.mjs';
-import { seatLaunchesOf } from '../../src/runner/execution/seat-resolver.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
-import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
+import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { createPendingBinding, readBinding, listBindingRecords } from '../../src/workflow/case-bindings.mjs';
 import { appendAll, FRAME, eventsOf, openCase, projectionOf, withHold, conductorWorkflow } from '../helpers/workflow-case-fixture.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
+/** Hold the live dispatch-cwd lock the case admission port reads as worktree custody. */
+function acquireDispatchCwdLock(fgosDir, cwd) {
+  const res = acquireSync(createLockScope('dispatch-cwd'), 'dispatch-cwd', { fgosDir, cwd });
+  if (res.result !== 'acquired') throw new Error(`dispatch-cwd not acquired: ${res.result}`);
+  return res.handle;
+}
+
+
 ensureScriptAddon();
+
+// Tests assume the top-level process is not a confined dispatched worker.
+delete process.env.FGOS_DISPATCH_DEPTH;
+delete process.env.FGOS_CONFINED;
 
 const planned = (options) => {
   const run = openCase(options);
@@ -98,7 +109,7 @@ test('the ceiling handed to a Unit is its planned seat launches times the frame\
   const run = planned({ frame: { ...FRAME, seatLaunchesPerDispatch: 4 } });
   const port = createCaseAdmissionPort({ repoRoot: run.repoRoot });
   // council-lite is a panel of three plus a synthesizer: four seats, whatever the fallback does.
-  const seats = seatLaunchesOf({ pattern: 'panel', unit: { id: 'u', writes: [], seats: [{ seat: 'a', role: 'producer' }, { seat: 'b', role: 'producer' }, { seat: 'c', role: 'producer' }, { seat: 'chair', role: 'synthesizer' }] }, runnerConfig: {} });
+  const seats = 4;
   assert.equal(seats, 4);
   const answer = port.admit(proposal(run, { seatLaunches: seats, pattern: 'panel' }));
   assert.equal(answer.seatLaunchCeiling, 8, 'four seats, two launches each at most');

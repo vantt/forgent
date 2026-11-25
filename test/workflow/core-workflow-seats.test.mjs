@@ -1,6 +1,7 @@
 // Every shipped panel and debate unit declares explicit seats, loads, and dry-binds through the one seat resolver.
 
 import '../helpers/process-tmp-root.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -12,9 +13,9 @@ import { validateWorkflowChecked } from '../../src/workflow/checked.mjs';
 import { translateUnitsToWorkflow } from '../../src/workflow/units-source.mjs';
 import { expandWorkflowSeats } from '../../src/workflow/seats.mjs';
 import { simulateUnitBindings } from '../../src/seat-binding/client.mjs';
-import { resolveSeats } from '../../src/runner/execution/seat-resolver.mjs';
-import { loopOf } from '../../src/native/execution-door.mjs';
-import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
+import { loopOf, shippedCatalog } from '../../src/native/execution-door.mjs';
+
+ensureScriptAddon();
 
 const dir = new URL('../../domains/council/workflows/', import.meta.url);
 const workflows = fs.readdirSync(dir).filter((name) => name.endsWith('.yaml')).map((name) => {
@@ -92,9 +93,10 @@ test('every core workflow loads and dry-binds each of its units through the reso
         id: u.id, objective: template.objective ?? 'x', capability: template.capability, rigor: template.rigor, writes: template.writes ?? [],
         pattern: template.params ? { pattern: template.pattern, params: template.params } : template.pattern, seats: template.seats, blind: template.blind,
       };
-      const planned = resolveSeats({ pattern: unit.pattern, unit, runnerConfig });
+      // Declared multi-seat units list the seats the live dry-bind must fill (Rust owns resolveSeats).
+      const planned = unit.seats.map((s) => s.seat);
       const { seats } = await simulateUnitBindings(unit, runnerConfig);
-      assert.deepEqual([...new Set(seats.map((s) => s.seat))], planned.map((s) => s.seat), `${workflow.id}/${u.id} binds exactly the seats the resolver lists`);
+      assert.deepEqual([...new Set(seats.map((s) => s.seat))], planned, `${workflow.id}/${u.id} binds exactly the seats the unit declares`);
       for (const seat of seats) assert.equal(seat.refused, undefined, `${workflow.id}/${u.id}/${seat.seat} binds`);
     }
   }

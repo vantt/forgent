@@ -2,6 +2,7 @@
 // and the commands after a yes. Reads are injected, so no repository is needed; one test runs the real reads.
 
 import '../helpers/process-tmp-root.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -9,7 +10,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import { readStandardValue } from '../../src/config/facade.mjs';
-import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
+import { shippedCatalog } from '../../src/native/execution-door.mjs';
 import { loadSliceTable } from '../../src/workflow/propose-classify.mjs';
 import { createProposePorts, planCaseSlug, proposeFromRequest, proposeFromSlices, readPassRigor, renderProposalText } from '../../src/workflow/propose.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
@@ -17,6 +18,8 @@ import { FRAME, append, conductorWorkflow, openCase, settle, withHold } from '..
 import { createWorkflowRun } from '../../src/workflow/store.mjs';
 import { guideSha256 } from '../../src/workflow/case-start.mjs';
 import { digestText } from '../../src/workflow/ref-digests.mjs';
+
+ensureScriptAddon();
 
 const runnerConfig = readStandardValue('runner').value;
 const shipped = shippedCatalog();

@@ -4,14 +4,24 @@
 // project supplies stay on their doctor rows (src/setup/registrations.mjs).
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import { effectiveSection, allAgentYamlFiles, readAgentSkills } from '../../src/setup/registrations.mjs';
 import { INSTALL_ROOT } from '../../src/runner/agent-definitions.mjs';
-import { POLICY_PATCH_FIELDS } from '../../src/runner/dispatch/execution-contract.mjs';
 import { RIGOR_VALUES } from '../../src/runner/rigor.mjs';
 import { resolveTaskSpecPath } from '../../src/runner/paths.mjs';
 import { DOMAINS } from '../../src/state/domain-registry.mjs';
 import { stepById } from '../../src/workflow/steps.mjs';
+
+ensureScriptAddon();
+
+// Live owner: packages/execution/contracts/execution-contract/contract.json (Rust POLICY_PATCH_FIELDS mirrors it).
+const POLICY_PATCH_FIELDS = new Set(
+  JSON.parse(fs.readFileSync(fileURLToPath(new URL('../../packages/execution/contracts/execution-contract/contract.json', import.meta.url)), 'utf8'))
+    .constants.policyPatchFields,
+);
+
 
 // tsk-2t9c (multi-role team harness, D6/D9 task-spec A-lite convention;
 // AGENTS.md's install/setup/doctor gate): every operation a domain's Workflow
