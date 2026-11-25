@@ -295,12 +295,26 @@ async function typedOperationRows(root, state, index, loader, samples, observer 
   // immutable history fixture is materialized only inside the experiment root;
   // it is never a production import or a second shipped writer.
   const baselinePath = 'src/runner/execution/commit-unit-work.mjs';
-  const [found] = checkoutInspect({ index, loader }, state).pathsAtRevision({ revision: '512e8cd2a68300848bf13859d46872f7fbe94951', paths: [[...Buffer.from(baselinePath)]], maxBlobBytes: 1 << 20 });
+  const baselineRevision = '512e8cd2a68300848bf13859d46872f7fbe94951';
+  const inspect = checkoutInspect({ index, loader }, state);
+  const [found] = inspect.pathsAtRevision({ revision: baselineRevision, paths: [[...Buffer.from(baselinePath)]], maxBlobBytes: 1 << 20 });
   if (found.value.kind !== 'present') throw new Error(`e3-bench: ${baselinePath} at the baseline commit: ${found.value.kind}`);
   const baseline = Buffer.from(found.value.bytes).toString('utf8');
   const baselineFile = path.join(root, 'legacy-unit-commit-baseline.mjs');
-  fs.writeFileSync(baselineFile, baseline.replace(/from '([^']+)'/g, (all, specifier) =>
-    specifier.startsWith('.') ? `from '${pathToFileURL(path.resolve(CHECKOUT, path.dirname(baselinePath), specifier)).href}'` : all));
+  const baselineDir = path.dirname(baselinePath);
+  fs.writeFileSync(baselineFile, baseline.replace(/from '([^']+)'/g, (all, specifier) => {
+    if (!specifier.startsWith('.')) return all;
+    const checkoutTarget = path.resolve(CHECKOUT, baselineDir, specifier);
+    if (fs.existsSync(checkoutTarget)) return `from '${pathToFileURL(checkoutTarget).href}'`;
+    const repoRelative = path.relative(CHECKOUT, checkoutTarget).split(path.sep).join('/');
+    const [dep] = inspect.pathsAtRevision({ revision: baselineRevision, paths: [[...Buffer.from(repoRelative)]], maxBlobBytes: 1 << 20 });
+    if (dep?.value.kind !== 'present') {
+      throw new Error(`e3-bench: ${repoRelative} missing in checkout and absent at the baseline commit: ${dep?.value.kind ?? 'no answer'}`);
+    }
+    const depFile = path.join(root, path.basename(checkoutTarget));
+    fs.writeFileSync(depFile, Buffer.from(dep.value.bytes));
+    return `from '${pathToFileURL(depFile).href}'`;
+  }));
   const { commitUnitWork } = await import(pathToFileURL(baselineFile).href);
   const { landRunnerItem } = await import('../../src/runner/merge.mjs');
   const make = label => {
