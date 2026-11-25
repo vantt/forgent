@@ -11,9 +11,10 @@ use fgos_observe::{ObserveRequest, RecordSource};
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 
-const RAISED: [&str; 12] = [
+const RAISED: [&str; 13] = [
     "plan-became-ready",
     "plan-done",
+    "plan-drafted",
     "plan-priority-changed",
     "plan-ready-waiting",
     "lane-freed",
