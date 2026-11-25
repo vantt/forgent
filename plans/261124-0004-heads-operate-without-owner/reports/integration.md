@@ -65,10 +65,23 @@ The supervisor updates the backlog.
 
 ## Left for phase 7 to be done
 
-Asked as owner question `q-l3rskjibl3` (recommended: the owner builds, activates and runs the suites).
+State on 2026-11-25 20:30 (Asia/Saigon).
 
-1. The owner builds and activates a release containing `e36f10cfa`.
-2. An unconfined run of `npm test` and `cargo test --workspace` on main at or after `e36f10cfa`.
-3. On the new release: the five-persona probe again (the supervisor starts the probe heads; the lead runs its own),
-   expecting no `failed` row; then `release run` once from the supervisor (after the owner writes the recipe) and its
-   report line recorded here.
+The seven `cargo test --workspace` failures this plan caused have fixes on main. They came from stale tests and
+records; the owner widened the footprint (`q-xcuwpxa4kn`).
+
+- `1737ae3e9` fixed six of them: `supervision_verbs` x2, `questions_head`, `registry_defaults`, `model_checks` and
+  the distribution vector. A reviewer ran each of those tests on its own on the branch.
+- `7ee37cd44` fixed `authoring_equivalence`: it records `release` in the `standard-only` list of
+  `packages/config/contracts/fixtures/repo-differences.v1.json`. All 9 tests of that file pass.
+
+Release `33f462be` is active and contains `e36f10cfa`. The lead's re-probe on it has no `failed` row (see
+`head-grant-probe.md`).
+
+Still open, each done by the supervisor:
+
+1. An unconfined `npm test`, then `cargo test --workspace`, on main at or after `7ee37cd44`, one after the other.
+   The expected `cargo` result has no failure in this plan's files. The `npm test` failures are not this plan's
+   (supervisor report `plans/reports/supervisor-261125-1838-npm-test-24-failures-on-main.md`).
+2. The supervisor, secretary, planner and shaper re-probe on `33f462be`, expecting no `failed` row.
+3. `release run` once from the supervisor, with its report line recorded here.

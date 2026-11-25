@@ -308,6 +308,17 @@ Source: `reports/head-grant-probe-after-shaper.txt`.
 | friction record | allow | served | failed | host-failed |
 | config patch | deny | refused as expected | refused as expected | verb-not-granted |
 
+## Re-probe on release `sha256:33f462be...` (contains `e36f10cfa`)
+
+### lead (`head:lead-forgent-261124-0004-heads-1bb1c`), 2026-11-25 20:30
+
+Source: `reports/head-grant-probe-after2-lead.json` (`node test/live/head-grant-probe.live.mjs --plan-dir
+261124-0004-heads-operate-without-owner`, exit 0, 31 contract verbs). No `failed` row: 9 served, 4 refused as
+expected, 12 asked (not called), 6 not called. The two rows that failed in every persona on `3beba73a` now pass for
+the lead: `release run` is refused as expected (`deny`), and `friction record` is served (was `host-failed`).
+
+The supervisor, secretary, planner and shaper re-probe rows are still to come; the supervisor starts those probe heads.
+
 ## Gaps between the permission table and real use (owner order, 2026-11-25)
 
 1. `release run` is `allow` for the supervisor and the secretary, and the `release.*` recipe is now in

@@ -1,0 +1,634 @@
+{
+  "contract": "run-supervisor-head-request",
+  "contractVersion": 1,
+  "dryRun": false,
+  "verbCount": 31,
+  "caller": {
+    "role": "head:lead-forgent-261124-0004-heads-1bb1c",
+    "persona": "lead",
+    "name": "forgent-261124-0004-heads-1bb1c"
+  },
+  "tmpdir": {
+    "path": "/tmp",
+    "writable": true,
+    "error": null
+  },
+  "stopTraceLastLine": {
+    "at": "2026-11-25T13:19:45.924Z",
+    "fraction": 0.143339,
+    "source": "sidecar",
+    "stale": false,
+    "decision": "below-soft",
+    "reason": "none",
+    "outcome": "below-threshold"
+  },
+  "verbs": [
+    {
+      "verb": "session start",
+      "expected": "asked",
+      "observed": "asked (not called): a real call would file an owner question",
+      "action": "can-i only",
+      "command": [
+        "can-i",
+        "session",
+        "start",
+        "no-such-persona",
+        "--name",
+        "probe-dry"
+      ],
+      "canI": {
+        "decision": "ask",
+        "reason": "session start no-such-persona --name probe-dry: no row matches, so the owner is asked"
+      },
+      "evidence": "session start no-such-persona --name probe-dry: no row matches, so the owner is asked"
+    },
+    {
+      "verb": "session rotate",
+      "expected": "not called",
+      "observed": "not called: acts on the caller",
+      "action": "not called: acts on the caller",
+      "reason": "acts on the caller",
+      "evidence": "fgos internal supervise: head-request hook-31459-1795612785858 session rotate done -",
+      "logLine": "fgos internal supervise: head-request hook-31459-1795612785858 session rotate done -"
+    },
+    {
+      "verb": "session restore role",
+      "expected": "not called",
+      "observed": "not called: acts on the caller",
+      "action": "not called: acts on the caller",
+      "reason": "acts on the caller",
+      "evidence": "no use in the window",
+      "logLine": "no use in the window"
+    },
+    {
+      "verb": "questions ask",
+      "expected": "served",
+      "observed": "served",
+      "action": "call",
+      "canI": {
+        "decision": "allow",
+        "reason": "questions ask --input -: allowed by the row \"questions ask\""
+      },
+      "command": [
+        "fgos",
+        "questions",
+        "ask",
+        "--input",
+        "-",
+        "--json"
+      ],
+      "exitStatus": 4,
+      "code": "parts-incomplete",
+      "detail": "[parts-incomplete]",
+      "reply": null,
+      "evidence": "[parts-incomplete]"
+    },
+    {
+      "verb": "questions ack",
+      "expected": "served",
+      "observed": "served",
+      "action": "call",
+      "canI": {
+        "decision": "allow",
+        "reason": "questions ack no-such-question-id: allowed by the row \"questions ack\""
+      },
+      "command": [
+        "fgos",
+        "questions",
+        "ack",
+        "no-such-question-id",
+        "--json"
+      ],
+      "exitStatus": 4,
+      "code": "question-unknown",
+      "detail": "[question-unknown]",
+      "reply": null,
+      "evidence": "[question-unknown]"
+    },
+    {
+      "verb": "questions cancel",
+      "expected": "served",
+      "observed": "served",
+      "action": "call",
+      "canI": {
+        "decision": "allow",
+        "reason": "questions cancel no-such-question-id --reason probe: allowed by the row \"questions cancel\""
+      },
+      "command": [
+        "fgos",
+        "questions",
+        "cancel",
+        "no-such-question-id",
+        "--reason",
+        "probe",
+        "--json"
+      ],
+      "exitStatus": 4,
+      "code": "question-unknown",
+      "detail": "[question-unknown]",
+      "reply": null,
+      "evidence": "[question-unknown]"
+    },
+    {
+      "verb": "questions answer",
+      "expected": "refused as expected",
+      "observed": "refused as expected",
+      "action": "call",
+      "canI": {
+        "decision": "deny",
+        "reason": "questions answer no-such-question-id --text probe: denied by the row \"questions answer\""
+      },
+      "command": [
+        "fgos",
+        "questions",
+        "answer",
+        "no-such-question-id",
+        "--text",
+        "probe",
+        "--json"
+      ],
+      "exitStatus": 1,
+      "code": "verb-not-granted",
+      "detail": "[verb-not-granted]",
+      "reply": null,
+      "evidence": "[verb-not-granted]"
+    },
+    {
+      "verb": "session bind session",
+      "expected": "not called",
+      "observed": "not called: acts on the caller",
+      "action": "not called: acts on the caller",
+      "reason": "acts on the caller",
+      "evidence": "no use in the window",
+      "logLine": "no use in the window"
+    },
+    {
+      "verb": "session write",
+      "expected": "asked",
+      "observed": "asked (not called): a real call would file an owner question",
+      "action": "can-i only",
+      "command": [
+        "can-i",
+        "session",
+        "write",
+        "outside-grant/probe.txt"
+      ],
+      "canI": {
+        "decision": "ask",
+        "reason": "session write outside-grant/probe.txt: no row matches, so the owner is asked"
+      },
+      "evidence": "session write outside-grant/probe.txt: no row matches, so the owner is asked"
+    },
+    {
+      "verb": "session answered",
+      "expected": "not called",
+      "observed": "not called: acts on the caller",
+      "action": "not called: acts on the caller",
+      "reason": "acts on the caller",
+      "evidence": "no use in the window",
+      "logLine": "no use in the window"
+    },
+    {
+      "verb": "land",
+      "expected": "served",
+      "observed": "served",
+      "action": "call",
+      "canI": {
+        "decision": "allow",
+        "reason": "land --paths outside-grant/probe.txt --message probe: allowed by the row \"land\""
+      },
+      "command": [
+        "fgos",
+        "land",
+        "--paths",
+        "outside-grant/probe.txt",
+        "--message",
+        "probe",
+        "--json"
+      ],
+      "exitStatus": 1,
+      "code": "path-outside-grant",
+      "detail": "path-outside-grant: \"outside-grant/probe.txt\" lies outside the paths this role may write",
+      "reply": {
+        "ok": false,
+        "code": "path-outside-grant",
+        "detail": "path-outside-grant: \"outside-grant/probe.txt\" lies outside the paths this role may write"
+      },
+      "evidence": "path-outside-grant: \"outside-grant/probe.txt\" lies outside the paths this role may write"
+    },
+    {
+      "verb": "run",
+      "expected": "served",
+      "observed": "served",
+      "action": "call",
+      "canI": {
+        "decision": "allow",
+        "reason": "run echo probe --writes outside-grant/probe.txt: allowed by the row \"run\""
+      },
+      "command": [
+        "fgos",
+        "run",
+        "echo probe",
+        "--writes",
+        "outside-grant/probe.txt",
+        "--json"
+      ],
+      "exitStatus": 1,
+      "code": "write-outside-footprint",
+      "detail": "write-outside-footprint: \"outside-grant/probe.txt\" is outside the footprint of plan 261124-0004-heads-operate-without-owner",
+      "reply": {
+        "ok": false,
+        "code": "write-outside-footprint",
+        "detail": "write-outside-footprint: \"outside-grant/probe.txt\" is outside the footprint of plan 261124-0004-heads-operate-without-owner"
+      },
+      "evidence": "write-outside-footprint: \"outside-grant/probe.txt\" is outside the footprint of plan 261124-0004-heads-operate-without-owner"
+    },
+    {
+      "verb": "release run",
+      "expected": "refused as expected",
+      "observed": "refused as expected",
+      "action": "call",
+      "canI": {
+        "decision": "deny",
+        "reason": "release run --rollback: denied by the row \"release run\""
+      },
+      "command": [
+        "fgos",
+        "release",
+        "run",
+        "--rollback",
+        "--json"
+      ],
+      "exitStatus": 1,
+      "code": "verb-not-granted",
+      "detail": "release run is not in the grant of head:lead-forgent-261124-0004-heads-1bb1c (lead)",
+      "reply": {
+        "ok": false,
+        "code": "verb-not-granted",
+        "detail": "release run is not in the grant of head:lead-forgent-261124-0004-heads-1bb1c (lead)"
+      },
+      "evidence": "release run is not in the grant of head:lead-forgent-261124-0004-heads-1bb1c (lead)"
+    },
+    {
+      "verb": "request result",
+      "expected": "served",
+      "observed": "served",
+      "action": "call",
+      "canI": {
+        "decision": "allow",
+        "reason": "request result no-such-ticket: allowed by the row \"request result\""
+      },
+      "command": [
+        "fgos",
+        "request",
+        "result",
+        "no-such-ticket",
+        "--json"
+      ],
+      "exitStatus": 1,
+      "code": "ticket-unknown",
+      "detail": "ticket-unknown: this role has no ticket \"no-such-ticket\"",
+      "reply": {
+        "ok": false,
+        "code": "ticket-unknown",
+        "detail": "ticket-unknown: this role has no ticket \"no-such-ticket\""
+      },
+      "evidence": "ticket-unknown: this role has no ticket \"no-such-ticket\""
+    },
+    {
+      "verb": "worktree create",
+      "expected": "served",
+      "observed": "served",
+      "action": "call",
+      "canI": {
+        "decision": "allow",
+        "reason": "worktree create /dev/null/probe --branch probe-branch: allowed by the row \"worktree create\""
+      },
+      "command": [
+        "fgos",
+        "worktree",
+        "create",
+        "/dev/null/probe",
+        "--branch",
+        "probe-branch",
+        "--json"
+      ],
+      "exitStatus": 1,
+      "code": "worktree-create-failed",
+      "detail": "worktree-create-failed: Not a directory (os error 20)",
+      "reply": {
+        "ok": false,
+        "code": "worktree-create-failed",
+        "detail": "worktree-create-failed: Not a directory (os error 20)"
+      },
+      "evidence": "worktree-create-failed: Not a directory (os error 20)"
+    },
+    {
+      "verb": "session stop",
+      "expected": "asked",
+      "observed": "asked (not called): a real call would file an owner question",
+      "action": "can-i only",
+      "command": [
+        "can-i",
+        "session",
+        "stop",
+        "no-such-persona",
+        "--name",
+        "probe-dry"
+      ],
+      "canI": {
+        "decision": "ask",
+        "reason": "session stop no-such-persona --name probe-dry: no row matches, so the owner is asked"
+      },
+      "evidence": "session stop no-such-persona --name probe-dry: no row matches, so the owner is asked"
+    },
+    {
+      "verb": "supervisor done",
+      "expected": "not called",
+      "observed": "not called: acts on the caller",
+      "action": "not called: acts on the caller",
+      "reason": "acts on the caller",
+      "evidence": "no use in the window",
+      "logLine": "no use in the window"
+    },
+    {
+      "verb": "metrics record",
+      "expected": "asked",
+      "observed": "asked (not called): a real call would file an owner question",
+      "action": "can-i only",
+      "command": [
+        "can-i",
+        "metrics",
+        "record",
+        "-"
+      ],
+      "canI": {
+        "decision": "ask",
+        "reason": "metrics record -: no row matches, so the owner is asked"
+      },
+      "evidence": "metrics record -: no row matches, so the owner is asked"
+    },
+    {
+      "verb": "questions list",
+      "expected": "served",
+      "observed": "served",
+      "action": "call",
+      "canI": {
+        "decision": "allow",
+        "reason": "questions: allowed by the row \"questions\""
+      },
+      "command": [
+        "fgos",
+        "questions",
+        "--json"
+      ],
+      "exitStatus": 0,
+      "code": "done",
+      "detail": "route completed successfully",
+      "reply": {
+        "needsYou": 0,
+        "questions": [],
+        "work": {
+          "gates": [],
+          "asks": []
+        }
+      },
+      "evidence": "route completed successfully"
+    },
+    {
+      "verb": "supervisor handled",
+      "expected": "asked",
+      "observed": "asked (not called): a real call would file an owner question",
+      "action": "can-i only",
+      "command": [
+        "can-i",
+        "supervisor",
+        "handled",
+        "no-such-event-id"
+      ],
+      "canI": {
+        "decision": "ask",
+        "reason": "supervisor handled no-such-event-id: no row matches, so the owner is asked"
+      },
+      "evidence": "supervisor handled no-such-event-id: no row matches, so the owner is asked"
+    },
+    {
+      "verb": "supervisor queue",
+      "expected": "asked",
+      "observed": "asked (not called): a real call would file an owner question",
+      "action": "can-i only",
+      "command": [
+        "can-i",
+        "supervisor",
+        "queue"
+      ],
+      "canI": {
+        "decision": "ask",
+        "reason": "supervisor queue: no row matches, so the owner is asked"
+      },
+      "evidence": "supervisor queue: no row matches, so the owner is asked"
+    },
+    {
+      "verb": "supervisor plans",
+      "expected": "asked",
+      "observed": "asked (not called): a real call would file an owner question",
+      "action": "can-i only",
+      "command": [
+        "can-i",
+        "supervisor",
+        "plans"
+      ],
+      "canI": {
+        "decision": "ask",
+        "reason": "supervisor plans: no row matches, so the owner is asked"
+      },
+      "evidence": "supervisor plans: no row matches, so the owner is asked"
+    },
+    {
+      "verb": "slots",
+      "expected": "asked",
+      "observed": "asked (not called): a real call would file an owner question",
+      "action": "can-i only",
+      "command": [
+        "can-i",
+        "slots"
+      ],
+      "canI": {
+        "decision": "ask",
+        "reason": "slots: no row matches, so the owner is asked"
+      },
+      "evidence": "slots: no row matches, so the owner is asked"
+    },
+    {
+      "verb": "supervisor wake",
+      "expected": "not called",
+      "observed": "not called: unsafe: takes no args, always records a wake, may mark events handled and may start a supervisor head",
+      "action": "not called: unsafe: takes no args, always records a wake, may mark events handled and may start a supervisor head",
+      "reason": "unsafe: takes no args, always records a wake, may mark events handled and may start a supervisor head",
+      "evidence": "no use in the window",
+      "logLine": "no use in the window"
+    },
+    {
+      "verb": "supervisor raise",
+      "expected": "refused as expected",
+      "observed": "refused as expected",
+      "action": "call",
+      "canI": {
+        "decision": "deny",
+        "reason": "--kind takes one of coordination-help, coordination-handoff, coordination-chore"
+      },
+      "command": [
+        "fgos",
+        "supervisor",
+        "raise",
+        "--kind",
+        "invalid-kind",
+        "--ref",
+        "probe",
+        "--reason",
+        "probe",
+        "--json"
+      ],
+      "exitStatus": 1,
+      "code": "verb-not-granted",
+      "detail": "--kind takes one of coordination-help, coordination-handoff, coordination-chore",
+      "reply": {
+        "ok": false,
+        "code": "argv-not-allowed",
+        "detail": "--kind takes one of coordination-help, coordination-handoff, coordination-chore"
+      },
+      "evidence": "--kind takes one of coordination-help, coordination-handoff, coordination-chore"
+    },
+    {
+      "verb": "watcher tune",
+      "expected": "asked",
+      "observed": "asked (not called): a real call would file an owner question",
+      "action": "can-i only",
+      "command": [
+        "can-i",
+        "watcher",
+        "tune",
+        "--set",
+        "enabled=1"
+      ],
+      "canI": {
+        "decision": "ask",
+        "reason": "watcher tune --set enabled=1: no row matches, so the owner is asked"
+      },
+      "evidence": "watcher tune --set enabled=1: no row matches, so the owner is asked"
+    },
+    {
+      "verb": "session read",
+      "expected": "asked",
+      "observed": "asked (not called): a real call would file an owner question",
+      "action": "can-i only",
+      "command": [
+        "can-i",
+        "session",
+        "read",
+        "no-such-session"
+      ],
+      "canI": {
+        "decision": "ask",
+        "reason": "session read no-such-session: no row matches, so the owner is asked"
+      },
+      "evidence": "session read no-such-session: no row matches, so the owner is asked"
+    },
+    {
+      "verb": "session type",
+      "expected": "asked",
+      "observed": "asked (not called): a real call would file an owner question",
+      "action": "can-i only",
+      "command": [
+        "can-i",
+        "session",
+        "type",
+        "no-such-session",
+        "--text",
+        "probe"
+      ],
+      "canI": {
+        "decision": "ask",
+        "reason": "session type no-such-session --text probe: no row matches, so the owner is asked"
+      },
+      "evidence": "session type no-such-session --text probe: no row matches, so the owner is asked"
+    },
+    {
+      "verb": "metrics prune",
+      "expected": "asked",
+      "observed": "asked (not called): a real call would file an owner question",
+      "action": "can-i only",
+      "command": [
+        "can-i",
+        "metrics",
+        "prune"
+      ],
+      "canI": {
+        "decision": "ask",
+        "reason": "metrics prune: no row matches, so the owner is asked"
+      },
+      "evidence": "metrics prune: no row matches, so the owner is asked"
+    },
+    {
+      "verb": "friction record",
+      "expected": "served",
+      "observed": "served",
+      "action": "call",
+      "canI": {
+        "decision": "allow",
+        "reason": "friction record --subject session:probe --layer runner --error-class probe --disposition invalid-disp --producer probe: allowed by the row \"friction record\""
+      },
+      "command": [
+        "fgos",
+        "friction",
+        "record",
+        "--subject",
+        "session:probe",
+        "--layer",
+        "runner",
+        "--error-class",
+        "probe",
+        "--disposition",
+        "invalid-disp",
+        "--producer",
+        "probe",
+        "--json"
+      ],
+      "exitStatus": 1,
+      "code": "friction-invalid-input",
+      "detail": "friction-invalid-input: invalid disposition \"invalid-disp\". Allowed dispositions: advisory, blocked, parked, halted",
+      "reply": {
+        "ok": false,
+        "code": "friction-invalid-input",
+        "detail": "friction-invalid-input: invalid disposition \"invalid-disp\". Allowed dispositions: advisory, blocked, parked, halted"
+      },
+      "evidence": "friction-invalid-input: invalid disposition \"invalid-disp\". Allowed dispositions: advisory, blocked, parked, halted"
+    },
+    {
+      "verb": "config patch",
+      "expected": "refused as expected",
+      "observed": "refused as expected",
+      "action": "call",
+      "canI": {
+        "decision": "deny",
+        "reason": "the config patch file must be a plain project-relative path"
+      },
+      "command": [
+        "fgos",
+        "config",
+        "patch",
+        "/dev/null/no-such-file",
+        "--json"
+      ],
+      "exitStatus": 1,
+      "code": "verb-not-granted",
+      "detail": "the config patch file must be a plain project-relative path",
+      "reply": {
+        "ok": false,
+        "code": "argv-not-allowed",
+        "detail": "the config patch file must be a plain project-relative path"
+      },
+      "evidence": "the config patch file must be a plain project-relative path"
+    }
+  ]
+}
