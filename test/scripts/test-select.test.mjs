@@ -14,6 +14,7 @@ import {
   runSelected,
   runShadow,
 } from '../../scripts/test-select.mjs';
+import { asWitnessedSpawn } from '../../scripts/lib/fgos-write-witness.mjs';
 
 // -- fixture helpers ----------------------------------------------------
 
@@ -457,10 +458,10 @@ test('runSelected: an unknown changed path drives a real full-suite spawn exactl
     testRoot: path.join(root, 'test'),
     manifest: [],
     fullTriggers: [],
-    spawn: () => {
+    spawn: asWitnessedSpawn(() => {
       spawnCalls += 1;
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(result.decision, 'full');
   assert.equal(spawnCalls, 1);
@@ -486,10 +487,10 @@ test('runSelected: an all-matched change set runs runSelectedTests with exactly 
     testRoot: path.join(root, 'test'),
     manifest,
     fullTriggers: [],
-    spawn: (execPath, argv) => {
+    spawn: asWitnessedSpawn((execPath, argv) => {
       captured = argv;
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(result.decision, 'related');
   assert.ok(captured.some((a) => a.replaceAll('\\', '/').endsWith('/a.test.mjs') || a.replaceAll('\\', '/') === 'test/a.test.mjs'));
@@ -516,10 +517,10 @@ test('promoted test:related semantics: a related decision runs the narrow subset
     testRoot: path.join(root, 'test'),
     manifest,
     fullTriggers: [],
-    spawn: () => {
+    spawn: asWitnessedSpawn(() => {
       spawnCalls += 1;
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(spawnCalls, 1, 'test:related must spawn exactly once (the narrow subset) -- never a second, hidden full-suite run');
   assert.equal(result.status, 0, "the narrow subset's own status is authoritative");
@@ -544,10 +545,10 @@ test('promoted test:related semantics: a red narrow subset is authoritative on i
     testRoot: path.join(root, 'test'),
     manifest,
     fullTriggers: [],
-    spawn: () => {
+    spawn: asWitnessedSpawn(() => {
       spawnCalls += 1;
       return { status: 1 };
-    },
+    }),
   });
   assert.equal(spawnCalls, 1);
   assert.equal(result.status, 1);
@@ -565,10 +566,10 @@ test('runSelected: zero changes refuses without spawning', () => {
     testRoot: path.join(root, 'test'),
     manifest: [],
     fullTriggers: [],
-    spawn: () => {
+    spawn: asWitnessedSpawn(() => {
       spawnCalls += 1;
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(result.status, 1);
   assert.equal(result.decision, 'refuse');
@@ -585,10 +586,10 @@ test('runSelected: an invalid --base is reported as invalid-base and never spawn
     cwd: root,
     repoRoot: root,
     testRoot: path.join(root, 'test'),
-    spawn: () => {
+    spawn: asWitnessedSpawn(() => {
       spawnCalls += 1;
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(result.status, 1);
   assert.match(result.reason, /invalid-base/);
@@ -650,10 +651,10 @@ test('runShadow: related green + full green -- runs both, agree=true, patchRelat
     testRoot: path.join(root, 'test'),
     manifest,
     fullTriggers: [],
-    spawn: (execPath, argv) => {
+    spawn: asWitnessedSpawn((execPath, argv) => {
       calls.push(argv);
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(result.status, 0);
   assert.equal(result.comparison.decision, 'related');
@@ -684,10 +685,10 @@ test('runShadow: patch-related miss -- related predicts green, full suite actual
     testRoot: path.join(root, 'test'),
     manifest,
     fullTriggers: [],
-    spawn: () => {
+    spawn: asWitnessedSpawn(() => {
       callIndex += 1;
       return { status: callIndex === 1 ? 0 : 1 }; // related (1st call) green, full (2nd call) red
-    },
+    }),
   });
   assert.equal(result.status, 1, 'the full (authoritative) status wins, never the related one');
   assert.equal(result.comparison.relatedStatus, 0);
@@ -712,10 +713,10 @@ test('runShadow: an escalated (full) decision skips the separate related run -- 
     testRoot: path.join(root, 'test'),
     manifest: [],
     fullTriggers: [],
-    spawn: () => {
+    spawn: asWitnessedSpawn(() => {
       calls += 1;
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(result.comparison.decision, 'full');
   assert.equal(result.comparison.relatedRan, false);
@@ -735,10 +736,10 @@ test('runShadow: zero changed paths refuses without spawning anything', () => {
     testRoot: path.join(root, 'test'),
     manifest: [],
     fullTriggers: [],
-    spawn: () => {
+    spawn: asWitnessedSpawn(() => {
       calls += 1;
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(result.status, 1);
   assert.equal(result.comparison, null);

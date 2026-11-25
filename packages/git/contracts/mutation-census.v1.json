@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c5f11d4a0da36ad0090149205d67769584f8b9ddfa9152a3622f85a3e7a5e2ab",
+  "payloadDigest": "c124c55541e7d25c6d1b4b4e95a1e2da76edd2f98f23d4eb3f4e87a91fc9f681",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1403,6 +1403,7 @@
     "scripts/lib/codex-auth-guard.mjs": "e7d0ec136014ece7375a545789734203f6c3840cb64aec76a80ecd9f1af198ee",
     "scripts/lib/dev-host-manifest.mjs": "9928ceb97e807bcb02a7fed73153cf21de09d6cc9b6d56492166cb94e48c44bb",
     "scripts/lib/doc-links.mjs": "a4f2720a80234e2f3d5000877efdf2be95dd7c5ca11eda519f025d65df711cd1",
+    "scripts/lib/fgos-write-witness.mjs": "e3504685ec7c5a7ebc142d4ea3ddc4e9839fcd306825d3d34b00064a9b5fd80d",
     "scripts/lib/full-suite-queue.mjs": "da176b9ad8a796ec13ede755dd2c2b12e6e29d5b5b12874ca8e6ae06803e3aba",
     "scripts/lib/git-addon-stage.mjs": "3844d3d8b57fc5c1d5ddd26e051109fb590cf1210639c220f8195508713da977",
     "scripts/lib/git-dir-layout.mjs": "cdc573ff49e7c12af30c284ea84060ff476390b26769a0cb82f63dc357df04eb",
@@ -1447,7 +1448,7 @@
     "scripts/render-doctor-howto-tables.mjs": "242fc6e77cf5824e4d52cb003b19f67f35fb1cdc4f0f6d63cfb58090cf9a0456",
     "scripts/run-rust-dev-host.mjs": "4f2e65268fe8302d51e43be84d9d00a022595c7143275bde6b045dd7f367de35",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "8f009e764bf665130a72b1c4d0d4f024d9d5feb2acf1b79c32480f25b167b8e5",
+    "scripts/run-tests.mjs": "9c078b489772c7414664b6f1779a1c28e2d2da52277094b30c7a012b1279d2c9",
     "scripts/stress-test-files.mjs": "1c9298587bae21b5971c2e1eba5effd3c2a0c85ba94372936fa5e0c1d70d4f4e",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
     "scripts/test-proof-inventory.mjs": "fb8d24de073f628cd1cea540af8d39b55ec55d4199543ddf9cb062941a243e70",
@@ -4554,7 +4555,7 @@
     },
     {
       "path": "scripts/run-tests.mjs",
-      "line": 141,
+      "line": 145,
       "spawn": "loadNativeAddon -> src/git/index.mjs:10",
       "binary": "(configuration file data)",
       "class": "configured-binary"

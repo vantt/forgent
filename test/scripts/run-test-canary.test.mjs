@@ -13,6 +13,7 @@ import {
   resolveCanaryFiles,
   runCanary,
 } from '../../scripts/run-test-canary.mjs';
+import { asWitnessedSpawn } from '../../scripts/lib/fgos-write-witness.mjs';
 
 function tmpFixtureRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-test-canary-fixture-'));
@@ -63,10 +64,10 @@ test('an empty canary set (no positional args, no --from-file) refuses without s
     rawArgs: [],
     testRoot: root,
     cwd: root,
-    spawn: () => {
+    spawn: asWitnessedSpawn(() => {
       spawnCalled = true;
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(result.status, 1);
   assert.equal(result.fullSuiteRan, false);
@@ -81,10 +82,10 @@ test('a --from-file pointing at a missing file also refuses without spawning (em
     rawArgs: ['--from-file', path.join(root, 'does-not-exist.txt')],
     testRoot: root,
     cwd: root,
-    spawn: () => {
+    spawn: asWitnessedSpawn(() => {
       spawnCalled = true;
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(result.status, 1);
   assert.equal(spawnCalled, false);
@@ -146,10 +147,10 @@ test('one invalid path among several refuses the WHOLE set, not just the bad one
     rawArgs: [good, path.join(root, 'missing.test.mjs')],
     testRoot: root,
     cwd: root,
-    spawn: () => {
+    spawn: asWitnessedSpawn(() => {
       spawnCalled = true;
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(result.status, 1);
   assert.equal(spawnCalled, false);
@@ -193,10 +194,10 @@ test('a red canary returns its own status and NEVER invokes the full-suite spawn
     rawArgs: [f],
     testRoot: root,
     cwd: root,
-    spawn: () => {
+    spawn: asWitnessedSpawn(() => {
       spawnCallCount += 1;
       return { status: 1 }; // canary fails
-    },
+    }),
   });
   assert.equal(result.status, 1);
   assert.equal(result.fullSuiteRan, false);
@@ -215,10 +216,10 @@ test('a green canary invokes the full-suite spawn exactly once, not twice, not z
     rawArgs: [f],
     testRoot: root,
     cwd: root,
-    spawn: (execPath, argv) => {
+    spawn: asWitnessedSpawn((execPath, argv) => {
       calls.push(argv);
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(result.status, 0);
   assert.equal(result.fullSuiteRan, true);
@@ -238,10 +239,10 @@ test('canary files are intentionally re-run inside the full suite (documented, n
     rawArgs: [f],
     testRoot: root,
     cwd: root,
-    spawn: (execPath, argv) => {
+    spawn: asWitnessedSpawn((execPath, argv) => {
       calls.push(argv);
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(calls[0].some((a) => a.endsWith('a.test.mjs')), true, 'canary run includes a.test.mjs');
   assert.equal(calls[1].some((a) => a.endsWith('a.test.mjs')), true, 'full run includes it again');
@@ -258,10 +259,10 @@ test('a forwarded flag never becomes a canary file, and never leaks into the ful
     rawArgs: [f, '--test-reporter=tap'],
     testRoot: root,
     cwd: root,
-    spawn: (execPath, argv) => {
+    spawn: asWitnessedSpawn((execPath, argv) => {
       calls.push(argv);
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(result.canaryFiles.length, 1, 'the reporter flag did not become a second canary file');
   assert.ok(calls[0].includes('--test-reporter=tap'), 'canary run received the forwarded flag');
@@ -278,10 +279,10 @@ test('spawn always receives argv as a literal array, never a shell command strin
     rawArgs: [f],
     testRoot: root,
     cwd: root,
-    spawn: (execPath, argv) => {
+    spawn: asWitnessedSpawn((execPath, argv) => {
       if (!Array.isArray(argv)) sawArrayArgv = false;
       return { status: 0 };
-    },
+    }),
   });
   assert.equal(sawArrayArgv, true);
 });
@@ -292,7 +293,7 @@ test('once this process has proved the host, the canary wrapper starts no proces
   const root = tmpFixtureRoot();
   const f = write(root, 'a.test.mjs');
   write(root, 'unrelated.test.mjs');
-  const call = () => runCanary({ rawArgs: [f], testRoot: root, cwd: root, spawn: () => ({ status: 0 }), stdio: 'ignore' });
+  const call = () => runCanary({ rawArgs: [f], testRoot: root, cwd: root, spawn: asWitnessedSpawn(() => ({ status: 0 })), stdio: 'ignore' });
   call(); // the first call proves the host (one check for both phases); count a warm one
   // runCanary imports these functions as bindings; patching the built-in and syncing reaches them.
   const names = ['spawnSync', 'execFileSync', 'execSync', 'spawn', 'execFile', 'exec', 'fork'];
@@ -324,11 +325,11 @@ test('a failing canary demonstrably returns before a full-suite run would even s
     rawArgs: [f],
     testRoot: root,
     cwd: root,
-    spawn: (execPath, argv) => {
+    spawn: asWitnessedSpawn((execPath, argv) => {
       // A real full-suite invocation would include more than just the canary file.
       if (argv.filter((arg) => arg.endsWith('.test.mjs')).length > 1) fullSuiteSpawnHappened = true;
       return { status: 1 };
-    },
+    }),
   });
   assert.equal(result.status, 1);
   assert.equal(fullSuiteSpawnHappened, false);

@@ -96,12 +96,16 @@ export const GIT_CONFIG_GUARD_PATH = path.join(REPO_ROOT, 'scripts', 'lib', 'tes
 
 export const GIT_SPAWN_SPY_PATH = path.join(REPO_ROOT, 'test', 'helpers', 'git-spawn-spy.mjs');
 export const GIT_SPAWN_SPY_LOG_ENV = 'FGOS_GIT_SPAWN_SPY_LOG';
+export const FGOS_WRITE_WITNESS_PATH = path.join(REPO_ROOT, 'scripts', 'lib', 'fgos-write-witness.mjs');
+export const FGOS_WRITE_WITNESS_LOG_ENV = 'FGOS_TEST_FGOS_WRITE_WITNESS_LOG';
+export const FGOS_WRITE_WITNESS_DIR_ENV = 'FGOS_TEST_FGOS_WRITE_WITNESS_DIR';
 
 export function buildTestArgv(files, forwardedArgs = []) {
   // The guard is preloaded into every test file's process: a `git config` write that would land in
   // this checkout's own repository is refused there, before it can rewrite the owner's identity.
   // The spy records every `git` or hook spawn product code (src, bin, scripts) starts (one-door gate).
-  return ['--test', `--import=${pathToFileURL(GIT_CONFIG_GUARD_PATH).href}`, `--import=${pathToFileURL(GIT_SPAWN_SPY_PATH).href}`, ...forwardedArgs, ...files];
+  // The witness records which `.fgos` paths the test processes write, so the leak check judges only those.
+  return ['--test', `--import=${pathToFileURL(GIT_CONFIG_GUARD_PATH).href}`, `--import=${pathToFileURL(GIT_SPAWN_SPY_PATH).href}`, `--import=${pathToFileURL(FGOS_WRITE_WITNESS_PATH).href}`, ...forwardedArgs, ...files];
 }
 
 /** The product Git/hook spawns the spy recorded during a run, one entry per distinct site. */
@@ -421,94 +425,63 @@ export function describeLeftoverTemps(root) {
 
 export const SENSITIVE_FGOS_FILES = new Set(['secrets.local.env', 'secrets.env']);
 
-// Live runtime directories: other heads, the watcher and the running land write them while a run is
-// going (watcher state, head tickets, unit-run assignments, session rotation, locks), so a change
-// there is not a test leak; cache also holds the derived state view.
-export const LIVE_FGOS_DIRS = new Set([
-  'runtime',
-  'assignments',
-  'locks',
-  path.join('observe', 'records'),
-  'logs',
-  'cache',
-]);
-
-/**
- * Recursively snapshots the repository's `.fgos` store before/after test runs.
- * Excludes sensitive secret files and live runtime directories.
- * Captures relative paths, file sizes, and mtimeMs.
- */
-export function snapshotFgos(repoRoot) {
-  const fgosDir = path.join(repoRoot, '.fgos');
-  const map = new Map();
-  if (!fs.existsSync(fgosDir)) return map;
-
-  function walk(currentDir) {
-    let entries;
-    try {
-      entries = fs.readdirSync(currentDir, { withFileTypes: true });
-    } catch {
-      return;
-    }
-    for (const entry of entries) {
-      if (SENSITIVE_FGOS_FILES.has(entry.name)) continue;
-      const fullPath = path.join(currentDir, entry.name);
-      const relPath = path.relative(fgosDir, fullPath);
-      if (entry.isDirectory()) {
-        if (LIVE_FGOS_DIRS.has(relPath)) continue;
-        walk(fullPath);
-      } else if (entry.isFile() || entry.isSymbolicLink()) {
-        try {
-          const stat = fs.statSync(fullPath);
-          map.set(relPath, { mtimeMs: stat.mtimeMs, size: stat.size });
-        } catch {
-          // File deleted while walking; safe to ignore
-        }
-      }
-    }
+/** The records the `.fgos` write witness left: how many processes loaded it, and each path first touched. */
+export function readFgosWriteWitness(file) {
+  let text = '';
+  try { text = fs.readFileSync(file, 'utf8'); } catch { return { loads: 0, touched: new Map() }; }
+  let loads = 0;
+  const touched = new Map();
+  for (const line of text.split('\n').filter(Boolean)) {
+    let entry;
+    try { entry = JSON.parse(line); } catch { continue; }
+    if (entry.kind === 'load') loads += 1;
+    else if (entry.kind === 'write' && entry.path && !touched.has(entry.path)) touched.set(entry.path, entry.before ?? { exists: false });
   }
+  return { loads, touched };
+}
 
-  walk(fgosDir);
-  return map;
+function directoryHoldsFiles(dir) {
+  try {
+    return fs.readdirSync(dir, { withFileTypes: true }).some((entry) => (entry.isDirectory() ? directoryHoldsFiles(path.join(dir, entry.name)) : true));
+  } catch { return false; }
 }
 
 /**
- * Compares two `.fgos` snapshots and reports any added, modified, or deleted files.
+ * Compares each `.fgos` path a test process touched, as it was just before the first touch, with what
+ * it is now: added (absent, present now), deleted (present, gone now) or modified (size or mtime
+ * differ; a directory that stays a directory is unchanged). A path a test wrote and removed again
+ * is unchanged. Secret files and `allowedMutations` are skipped.
  */
-export function diffFgosSnapshots(before, after, allowedMutations = new Set()) {
+export function diffFgosWrites(touched, fgosDir, allowedMutations = new Set()) {
   const added = [];
   const modified = [];
   const deleted = [];
-
-  for (const [relPath, info] of after) {
-    if (allowedMutations.has(relPath)) continue;
-    if (!before.has(relPath)) {
-      added.push(relPath);
-    } else {
-      const prev = before.get(relPath);
-      if (prev.mtimeMs !== info.mtimeMs || prev.size !== info.size) {
-        modified.push(relPath);
-      }
+  for (const [relPath, before] of touched) {
+    if (allowedMutations.has(relPath) || SENSITIVE_FGOS_FILES.has(path.basename(relPath))) continue;
+    let now = null;
+    try {
+      const stat = fs.lstatSync(path.join(fgosDir, relPath));
+      now = { isDir: stat.isDirectory(), size: stat.size, mtimeMs: stat.mtimeMs };
+    } catch { /* gone */ }
+    if (!before.exists && now) {
+      if (!now.isDir || directoryHoldsFiles(path.join(fgosDir, relPath))) added.push(relPath);
+    }
+    else if (before.exists && !now) deleted.push(relPath);
+    else if (before.exists && now) {
+      const same = before.isDir && now.isDir ? true : !before.isDir && !now.isDir && before.size === now.size && before.mtimeMs === now.mtimeMs;
+      if (!same) modified.push(relPath);
     }
   }
-
-  for (const [relPath] of before) {
-    if (allowedMutations.has(relPath)) continue;
-    if (!after.has(relPath)) {
-      deleted.push(relPath);
-    }
-  }
-
   added.sort();
   modified.sort();
   deleted.sort();
+  return { added, modified, deleted, leaked: added.length > 0 || modified.length > 0 || deleted.length > 0 };
+}
 
-  return {
-    added,
-    modified,
-    deleted,
-    leaked: added.length > 0 || modified.length > 0 || deleted.length > 0,
-  };
+function fgosDirOf(cwd) {
+  const dir = path.join(cwd, '.fgos');
+  try { return fs.realpathSync(dir); } catch { /* not there yet */ }
+  try { return path.join(fs.realpathSync(cwd), '.fgos'); } catch { return dir; }
 }
 
 export function runSelectedTests(files, {
@@ -564,7 +537,7 @@ export function runSelectedTests(files, {
     }
   }
 
-  const fgosBefore = snapshotFgos(cwd);
+  const fgosDir = fgosDirOf(cwd);
   const identityBefore = snapshotGitIdentity(cwd);
 
   let result;
@@ -581,6 +554,12 @@ export function runSelectedTests(files, {
   childEnv[GIT_SPAWN_SPY_LOG_ENV] = spawnLog;
   const cpuLog = path.join(path.dirname(spawnLog), 'test-file-cpu.jsonl');
   childEnv[CPU_LOG_ENV] = cpuLog;
+  const witnessLog = path.join(path.dirname(spawnLog), 'write-witness.jsonl');
+  childEnv[FGOS_WRITE_WITNESS_LOG_ENV] = witnessLog;
+  childEnv[FGOS_WRITE_WITNESS_DIR_ENV] = fgosDir;
+  let witness = null;
+  let spawned = false;
+  let spawnFailed = false;
   let gitSpawns = [];
   try {
     if (supervisor?.failure()) {
@@ -591,6 +570,8 @@ export function runSelectedTests(files, {
       const cpuBefore = waitedCpuSeconds();
       const spawnResult = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
       const cpuAfter = waitedCpuSeconds();
+      spawned = true;
+      spawnFailed = Boolean(spawnResult.error);
       result = {
         status: spawnResult.status ?? 1, files: relFiles, runTemp, wallSeconds: (Date.now() - started) / 1000,
         cpuSeconds: cpuBefore === null || cpuAfter === null ? null : cpuAfter - cpuBefore,
@@ -608,6 +589,8 @@ export function runSelectedTests(files, {
     strayWorktrees = worktreeRegistrationsUnder(cwd, [runTemp, fixtureRoot]);
     // The per-file supervisor is still exiting from its SIGTERM; it is this run's own, not a test's.
     ({ strays: strayProcesses, refusals: strayRefusals } = stopStrays([runTemp, fixtureRoot], { env: childEnv, exclude: supervisor?.pid ? [supervisor.pid] : [], stop: stopInside }));
+    // Read after the strays are stopped (a late write by a witnessed stray counts) and before the log's dir goes.
+    if (spawned) witness = readFgosWriteWitness(witnessLog);
     if (fixtureRoot) {
       try {
         fs.rmSync(fixtureRoot, { recursive: true, force: true, maxRetries: 3 });
@@ -694,11 +677,17 @@ export function runSelectedTests(files, {
     result.status = result.status !== 0 ? result.status : 1;
   }
 
-  const fgosAfter = snapshotFgos(cwd);
-  const fgosDiff = diffFgosSnapshots(fgosBefore, fgosAfter, allowedFgosMutations);
+  // A run refused before any test started has no witness record to read; it has nothing to attribute.
+  const fgosDiff = witness ? diffFgosWrites(witness.touched, fgosDir, allowedFgosMutations) : { added: [], modified: [], deleted: [], leaked: false };
   result.fgosDiff = fgosDiff;
+  if (witness && relFiles.length && witness.loads === 0 && !spawnFailed) {
+    fgosDiff.leaked = true;
+    log('run-tests: ERROR: the .fgos write witness did not load in the test processes, so no .fgos write could be attributed to this run:');
+    log(`  scripts/lib/fgos-write-witness.mjs is preloaded with --import; check that it loads and that its log path (${FGOS_WRITE_WITNESS_LOG_ENV}) is writable.`);
+    result.status = result.status !== 0 ? result.status : 1;
+  }
 
-  if (fgosDiff.leaked) {
+  if (fgosDiff.added.length || fgosDiff.modified.length || fgosDiff.deleted.length) {
     log('run-tests: ERROR: test suite leaked unexpected files or modifications into .fgos store:');
     if (fgosDiff.added.length) {
       log(`  Added (${fgosDiff.added.length}):`);
