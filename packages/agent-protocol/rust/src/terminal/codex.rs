@@ -30,20 +30,17 @@ fn composer_state(screen: &str, inspection: &Inspection) -> ComposerState {
     // lines, including a long draft whose prompt has scrolled above the tail.
     let composer_end = lines
         .iter()
-        .rposition(|line| line.trim_start().starts_with("GPT-") && line.contains(" · "))
+        .rposition(|line| line.contains(" · ") && !line.contains("· ? for shortcuts"))
+        .or_else(|| {
+            lines
+                .iter()
+                .rposition(|line| line.contains("· ? for shortcuts"))
+        })
         .unwrap_or(lines.len());
     for (index, line) in lines[..composer_end].iter().enumerate().rev() {
         let trimmed = line.trim();
-        if line.contains('›')
-            || (trimmed.starts_with('>')
-                && !trimmed.starts_with(">_")
-                && !trimmed.starts_with(">="))
-        {
-            let cleaned: String = line
-                .chars()
-                .filter(|c| *c != '›' && *c != '>' && *c != '\u{a0}')
-                .collect();
-            let prompt_text = cleaned.trim();
+        if let Some(prompt_text) = trimmed.strip_prefix('›') {
+            let prompt_text = prompt_text.trim();
             if prompt_text.is_empty()
                 || prompt_text.eq_ignore_ascii_case("ask codex to do anything")
             {

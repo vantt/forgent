@@ -629,6 +629,19 @@
       "expect": { "composerState": "not-empty" }
     },
     {
+      "name": "composer-state-screen-only-draft-ending-in-bare-greater-than",
+      "step": "composer-state",
+      "version": "2.1.302",
+      "source": "synthesized: a draft continuation is not the prompt line when prompt inspection is unavailable",
+      "script": {
+        "frames": [{
+          "screen": "❯ please\n>\n────────\n",
+          "inspection": { "state": "idle", "visibleIdle": true, "promptText": "" }
+        }]
+      },
+      "expect": { "composerState": "not-empty" }
+    },
+    {
       "name": "composer-state-typed-prompt-symbol-is-not-empty",
       "step": "composer-state",
       "version": "2.1.302",

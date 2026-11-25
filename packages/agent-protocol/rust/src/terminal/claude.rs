@@ -49,7 +49,7 @@ fn composer_state(screen: &str, inspection: &Inspection) -> ComposerState {
     }
     let lines: Vec<&str> = screen.lines().collect();
     for (index, line) in lines.iter().enumerate().rev() {
-        if line.contains('❯') || line.trim_start().starts_with('>') {
+        if line.trim_start().starts_with('❯') {
             let state = classify_prompt_line(line);
             if state != ComposerState::Empty {
                 return state;

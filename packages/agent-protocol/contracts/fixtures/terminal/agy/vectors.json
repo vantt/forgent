@@ -824,6 +824,28 @@
       }
     },
     {
+      "name": "composer-state-blank-first-line-draft",
+      "step": "composer-state",
+      "version": "1.4.2",
+      "source": "synthesized: short multiline draft below a blank prompt, between composer separators",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "────────\n>\n  please review the diff\n────────\n",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": true,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
       "name": "composer-state-draft-in-composer",
       "step": "composer-state",
       "version": "1.4.2",

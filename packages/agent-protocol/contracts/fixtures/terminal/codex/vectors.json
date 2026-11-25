@@ -817,6 +817,50 @@
       }
     },
     {
+      "name": "composer-state-draft-ending-in-bare-greater-than",
+      "step": "composer-state",
+      "version": "0.163.0",
+      "source": "synthesized: a draft continuation is not the prompt line",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "› please\n  >\n\n  GPT-6.1-Sol medium · ~/project\n",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": true,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
+      "name": "composer-state-empty-with-another-model-name",
+      "step": "composer-state",
+      "version": "0.163.0",
+      "source": "synthesized: an empty ready screen with a non-GPT model status",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "›\n\n  other-model medium · ~/project\n  ← for agents · ? for shortcuts\n",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": true,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "empty"
+      }
+    },
+    {
       "name": "composer-state-draft-in-composer",
       "step": "composer-state",
       "version": "0.163.0",
