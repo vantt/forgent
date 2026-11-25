@@ -137,22 +137,24 @@ Read with `git log -S` on `discoverInstructionSources`, `evaluateInstructionComp
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Area spec and v1 contracts](phase-01-spec-and-contracts.md) | - | docs/platform/agent-context-engine/**, packages/agent-context-engine/contracts/** | 1 | draft |
-| 2 | [pkm fit probe](phase-02-pkm-fit-probe.md) | 1 | plans/261125-1631-agent-context-engine/reports/pkm-fit.md | 2 | draft |
+| 2 | [pkm fit probe](phase-02-pkm-fit-probe.md) | - | plans/261125-1631-agent-context-engine/reports/pkm-fit.md | 1 | draft |
 | 3 | [The crate on pkm, the compile door, registration; the Node registry moves out](phase-03-crate-store-and-registry-move.md) | 1, 2 | packages/agent-context-engine/rust/**, packages/agent-context-engine/pkm/**, Cargo.toml, Cargo.lock, apps/fgos/Cargo.toml, apps/fgos/src/wiring/context_engine.rs, apps/fgos/src/wiring/context_engine/**, apps/fgos/src/wiring/mod.rs, apps/fgos/src/routing.rs, apps/fgos/tests/context_engine.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/component-authority/model/**, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/reading-map.md, docs/platform/packaging-distribution/spec.md, docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md, docs/platform/proposals/documentation-system-unification.md, src/setup/instruction-registry.mjs, src/setup/instruction-composition.mjs, src/setup/instruction-projections.mjs, src/setup/skill-wrappers.mjs, test/setup/instruction-*.test.mjs, test/rust-host/release-tree.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, .fgos/instructions/effective/**, core/instructions/**, components/*/instructions/**, domains/*/instructions/** | 3 | draft |
 | 4 | [Refuse a bad rule when it is written](phase-04-write-time-check.md) | 3 | packages/agent-context-engine/rust/src/check/**, packages/agent-context-engine/rust/tests/check*.rs, apps/fgos/src/wiring/context_engine/**, apps/fgos/tests/context_engine.rs, .githooks/pre-commit | 4 | draft |
 | 6 | [Integration gate, changelog](phase-06-integration.md) | 1, 2, 3, 4 | CHANGELOG.md, plans/261125-1631-agent-context-engine/reports/** | 5 | draft |
 
 Phase 1 is parked (owner, 2026-11-25 22:58): another machine does it; the lead waits for that land on main, then marks
-phase 1 done and goes on with phase 2. The duplicate local run's branch `agent-context-engine/p01` is not landed
+phase 1 done; phase 2 does not wait for that land (next paragraph). The duplicate local run's branch `agent-context-engine/p01` is not landed
 (cleanup is owner question `q-ubi34e6xd3`).
 
-Phase 5 left this plan for `261125-2041` (owner, 2026-11-25 20:4x). Phase 2 now depends on phase 1: the owner ordered
-"ACE phase 1 runs first and alone", so nothing else, the probe included, runs during it.
+Phase 5 left this plan for `261125-2041` (owner, 2026-11-25 20:4x). Phase 2 runs beside phase 1 (owner, 2026-11-25
+21:4x, recut question C): the two share no file, and the probe maps the rule shape of ACE-D1 and ACE-D5 onto pkm, so
+phase 1 can take the probe's findings into `rule-unit.v1.json` instead of the probe waiting for it. Phase 3 waits for
+both.
 
 ### Join points with the other two plans (owner, 2026-11-25 20:4x)
 
-ACE 1 runs first and alone. After it, this plan, ASC (`261122-1946-agent-start-context`) and later the gathering
-(`261125-2041`) run in parallel, joined only at:
+The owner first set these join points (20:4x), then chose to run the three plans in sequence (21:0x, see "Parallel
+admission" below). The joins stay as the data edges between the plans:
 
 | join | waits | why (data edge) |
 |---|---|---|
@@ -209,7 +211,8 @@ share only `Cargo.toml` and `Cargo.lock` (ACE 3 with ASC 3); the recut report li
 1. **Approval id for the component declaration** (shared with ASC owner question 2). `fgos authority declare --kind
    component` needs `--approved-by` with an answered owner question. ACE-D3 was settled in chat. One question that
    records ACE-D3 and ASC-D1 lets both declarations run. Detail in
-   `plans/reports/planner-261125-1631-agent-context-engine-plan.md` Q1. Still open.
+   `plans/reports/planner-261125-1631-agent-context-engine-plan.md` Q1. Asked in the question store as
+   `q-5sog3pzmqn` (2026-11-25); phase 3 passes that id to `--approved-by` once it is answered.
 2. **Nearest-rule check without the embedding model** (phase 4). Detail in the same report, Q4. Still open.
 3. Answered: the gathering became its own plan (old Q5, owner 2026-11-25 20:4x). The old questions on the order with
    `261122-1950` (Q2) and the scope of "every rule" (Q3) moved to plan `261125-2041` with the phase they govern.
@@ -234,8 +237,8 @@ share only `Cargo.toml` and `Cargo.lock` (ACE 3 with ASC 3); the recut report li
   #1); phase 3 updates the release-tree probe that imported `instruction-registry.mjs`.
 - **Parallel admission.** The supervisor admits only whole `ready` plans whose footprint overlaps no `running` plan
   (`packages/supervision/rust/src/portfolio.rs:252-268`). This plan's footprint overlaps ASC's and the gathering's,
-  so the owner ordered the plans in sequence (2026-11-25 21:0x): this plan runs first and alone, and the gathering
-  and ASC wait for it through `blockedBy`.
+  so the owner ordered the plans in sequence (2026-11-25 21:0x): this plan runs first, and the gathering and ASC
+  wait for it through `blockedBy`.
 - **Rollback.** Each phase lands as its own commits through `fgos land`, and each deletes the old path in the same
   commit that adds the new one. Reverting phase 3 restores the Node registry and composer together with
   `repo.json`.
