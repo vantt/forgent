@@ -619,17 +619,26 @@ pub fn by_handle(root: &Path, handle: &str, judge: Judge) -> Option<Listed> {
         .map(|row| Listed::of(&row.entry, row.verdict, judge))
 }
 
-/// Whether the session `id` is registered here and proven gone: its agent head
-/// judges dead and no process recorded for its CLI session is alive. A session
-/// the directory no longer holds, one with no liveness record, or any
-/// unreadable fact is not proven dead, so a caller keeps whatever it guards.
+/// Whether the writer `id` is proven gone.
+///
+/// What counts as proof depends on the writer's shape:
+/// - A registered session id: its entry must exist in the directory, its agent
+///   head must judge dead, and any CLI process recorded for it must also judge
+///   dead. A session the directory no longer holds, one with no liveness record,
+///   or any unreadable fact is not proven dead.
+/// - A bare decimal PID writer (`WriterId::Pid` form, e.g. `"12345"`, with no
+///   directory entry): judged directly via `judge` on `Record { pid, ..default }`.
+///   Proven dead only on `Verdict::Dead` (the OS process is absent or zombie).
+///   A live pid (evaluating to `Verdict::Alive` or `Verdict::Unknown`), `"0"`,
+///   malformed strings, or an unregistered session id remain not proven dead.
 pub fn session_proven_dead(root: &Path, id: &str, judge: Judge) -> bool {
     let Ok(Scan { rows, .. }) = scan(root, judge) else {
         return false;
     };
-    rows.iter().any(|row| {
-        row.entry.id == id
-            && row.verdict == Verdict::Dead
+    let mut has_row = false;
+    for row in rows.iter().filter(|row| row.entry.id == id) {
+        has_row = true;
+        if row.verdict == Verdict::Dead
             && !row
                 .entry
                 .ids
@@ -643,7 +652,28 @@ pub fn session_proven_dead(root: &Path, id: &str, judge: Judge) -> bool {
                     })
                 })
                 .is_some_and(|record| judge(&record) != Verdict::Dead)
-    })
+        {
+            return true;
+        }
+    }
+    if has_row {
+        return false;
+    }
+    let Some(pid) = bare_pid(id) else {
+        return false;
+    };
+    let record = Record {
+        pid: Some(ProcId(pid)),
+        ..Record::default()
+    };
+    judge(&record) == Verdict::Dead
+}
+
+fn bare_pid(id: &str) -> Option<u32> {
+    if id.is_empty() || id.starts_with('0') || !id.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
+    }
+    id.parse::<u32>().ok()
 }
 
 /// The one entry file named after `handle`, judged; `None` when it is missing

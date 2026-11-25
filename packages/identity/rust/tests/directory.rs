@@ -1904,6 +1904,36 @@ fn a_session_is_proven_dead_only_when_registered_with_a_dead_head() {
     assert!(!dead("live"), "a live head is not proof");
     assert!(!dead("none"), "no liveness record is unknown, not dead");
     assert!(!dead("absent"), "a session the directory lacks is unknown");
+
+    let dead_raw = |id: &str| directory::session_proven_dead(&root, id, &after_death);
+    assert!(dead_raw("10"), "absent pid is proven dead");
+    assert!(!dead_raw("20"), "live pid is not proven");
+    assert!(!dead_raw("0"), "\"0\" is not a bare pid");
+    assert!(!dead_raw("012"), "\"012\" is not a bare pid");
+    assert!(!dead_raw("12ab"), "\"12ab\" is not a bare pid");
+    assert!(
+        !dead_raw("fg-abc234/missing"),
+        "a session id with no row is not proven"
+    );
+
+    assert!(
+        !directory::session_proven_dead(
+            &root,
+            &std::process::id().to_string(),
+            &fgos_process::facts::judge_here,
+        ),
+        "the real OS judge never proves the running test process dead"
+    );
+
+    let live_unknown_start = |record: &Record| match record.pid {
+        Some(pid) if pid.0 == 20 => Verdict::Unknown,
+        Some(pid) if pid.0 == 10 => Verdict::Dead,
+        _ => Verdict::Alive,
+    };
+    assert!(
+        !directory::session_proven_dead(&root, "20", &live_unknown_start),
+        "a live pid with unknown start time is not proven dead"
+    );
 }
 
 /// Holds the `identity-directory` lock the way a registration does, until dropped.

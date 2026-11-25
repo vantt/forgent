@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "4e2f1a27b6803640e5e4c04319ffc8466dd9e12f690d741fd43be1cb3a52ef07",
+  "payloadDigest": "72e1f727d749778ee21c365d853fbce50b2468afffad796e9445be1f5b10fe07",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -906,7 +906,7 @@
     "packages/identity/rust/src/attempt.rs": "3e336905780b0528eb5a8deffdaf54fe2c4cf5220f47f1254daeedfcd50a49c9",
     "packages/identity/rust/src/cli_dirs.rs": "f3baccf0ed5fec6df7ea23c7f19753bec14483162e41db43664629c794fa2afb",
     "packages/identity/rust/src/current.rs": "27511387a8fa04af7bd8187852396c4c7750517eeb626488761dd2990edb2759",
-    "packages/identity/rust/src/directory.rs": "f6e13b604886dd1ac8c1b641df01d451c4cd2ad08d0b5b844708b7e5c66aa191",
+    "packages/identity/rust/src/directory.rs": "bdffa2857e972c9be081d581b5c57b66aa3926f01de1fb54f8df941f457f28ff",
     "packages/identity/rust/src/errors.rs": "2a7c34f15a605f6f14f9f24484d8b980c1ca51791a4f08b4a3da1131eba4adf1",
     "packages/identity/rust/src/launcher.rs": "e84d9ed6e37f4e634371a5d988dec1e7c71194b400808e385343a87723d0398a",
     "packages/identity/rust/src/lib.rs": "12acc1c2aae56f238693a637da7fcd8a8084b7115b35041feeb8efd37818f2fb",
@@ -923,7 +923,7 @@
     "packages/identity/rust/src/signing.rs": "65a7416bd747708cd5994b485017f982b723fa2534d0532a847661f04cbac173",
     "packages/identity/rust/src/text.rs": "15f0c4a6239d61df0a2e284608fd506e58450d405026eb09c5f9cb6d4605831a",
     "packages/identity/rust/tests/attempt_writer_id.rs": "4379502e1aef260e9f08c09e892b9dfe4a741528751aea8c340e76aadaf55b81",
-    "packages/identity/rust/tests/directory.rs": "07ff3cd2c417e8b3755184ef4b0158003ab4a8efb6030b20cbd6451f9797620e",
+    "packages/identity/rust/tests/directory.rs": "5d4d0fac43a9c0fc141a86d7257b6906dbeafcd7f9eddf53cd97b11e39c1f75a",
     "packages/identity/rust/tests/golden.rs": "42e7257988117fa5157033dd00b07430534efd5349ecbbb122a1b236e00e7ff5",
     "packages/identity/rust/tests/machine.rs": "8198639cd6b66d41b7976e8ae68835530c79b25db1f84f1a235609fc59c3d4c7",
     "packages/identity/rust/tests/mint.rs": "ee8af52bd44ef79881624a5b13b481b704ffae46afc375a9908a8963d48c9bff",
