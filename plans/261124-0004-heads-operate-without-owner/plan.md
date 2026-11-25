@@ -307,6 +307,11 @@ morning (discussion §1). The planner's own shape choices are written as decisio
   the source. Fix unit `c-29218-1795579848109` (claude, in the p02 worktree, started 11:10) was still `running` after 12
   waits. Next wake: read that ticket, re-review the branch, then land it, naming the phase's tests.
 
+- 2026-11-25 11:45, phase 2 parked on owner question `q-hwtikojjei`: fix unit `c-29218-1795579848109` passed but its
+  commit was refused by the pre-commit doc check (`fgos can-i` is not in the active release's command listing, which
+  cannot have it until this branch ships). Its 9 paths are uncommitted in the p02 worktree, and no rerun can commit them.
+  The fix is under review. On the owner's commit, the lead reviews the branch tip and lands it.
+
 ## Outstanding questions
 
-None open for this plan.
+- `q-hwtikojjei` (phase 2): commit the deny-rule fix by hand after rewording one spec line.
