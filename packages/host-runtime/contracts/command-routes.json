@@ -1391,6 +1391,22 @@
     "store": "require",
     "mutates_store": true
   },
+  "release": {
+    "selector": "release",
+    "route_kind": "native",
+    "operation_id": "release.run",
+    "owner_path": "apps/fgos",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ],
+    "accepted_flags": [
+      "dir",
+      "json",
+      "help",
+      "rollback"
+    ],
+    "store": "none"
+  },
   "report": {
     "selector": "report",
     "route_kind": "legacy-cli",

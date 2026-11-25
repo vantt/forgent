@@ -1536,6 +1536,25 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
     native: true,
   },
+  {
+    name: 'release',
+    invoke: 'fgos release run [--rollback]',
+    description: 'Run the project release recipe (`release.*` config) through the head\'s own run supervisor, from inside a head session only (a session with FGOS_HEAD_REQUEST_SOCKET); outside one it refuses. Answers at once with a ticket id, and the run goes on in the supervisor; read the outcome with `fgos request result`. Granted to the supervisor and, by inheritance, the secretary. `--rollback` runs only the recipe\'s rollback, refused `no-release-in-flight` unless a release step never ended. Not paginated.',
+    parameters: {
+      type: 'object',
+      properties: {
+        rollback: { type: 'boolean', description: 'Run only the recipe\'s rollback (for a release whose step never ended).' },
+      },
+      required: [],
+    },
+    examples: ['fgos release run', 'fgos release run --rollback'],
+    touchesState: false,
+    store: 'none',
+    externalEffect: true,
+    paginated: false,
+    deprecated: null,
+    native: true,
+  },
   withSubcommands({
     name: 'watcher',
     invoke: 'fgos watcher <tick|tune>',

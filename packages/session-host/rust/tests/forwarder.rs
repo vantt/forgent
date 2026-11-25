@@ -557,6 +557,20 @@ fn the_hosts_answer_is_its_data_or_its_own_refusal() {
         read_answer(false, "", "", Some(3)).unwrap_err().0,
         "host-failed"
     );
+    let wrapped = "fgos: error: invocation failed: provider failed: friction-invalid-input: invalid disposition \"x\"\n";
+    assert_eq!(
+        read_answer(false, "", wrapped, Some(1)).unwrap_err(),
+        (
+            "friction-invalid-input".to_string(),
+            "invalid disposition \"x\"".to_string()
+        )
+    );
+    let in_document =
+        "{\"message\": \"invocation failed: provider failed: watcher-bad-setting: no such key\"}";
+    assert_eq!(
+        read_answer(false, in_document, "", Some(1)).unwrap_err(),
+        ("watcher-bad-setting".to_string(), "no such key".to_string())
+    );
     let big = format!("{{\"data\": {{\"x\": \"{}\"}}}}", "y".repeat(70_000));
     assert_eq!(
         read_answer(true, &big, "", Some(0)).unwrap_err().0,
