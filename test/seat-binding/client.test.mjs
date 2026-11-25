@@ -18,8 +18,10 @@ import {
 import { bind as facadeBind, explainSeat } from '../../src/runner/execution/bind.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
-import { MODEL_POLICY_TIERS } from '../../src/runner/dispatch/config-twin.mjs';
+import { executionVocabulary } from '../../src/native/execution-door.mjs';
 import { enterHotLock } from '../../src/holder-lock/hot-guard.mjs';
+
+const { MODEL_POLICY_TIERS } = executionVocabulary();
 
 seedFileLocalBwrapRegistry();
 seedStubAgentClis('pi');

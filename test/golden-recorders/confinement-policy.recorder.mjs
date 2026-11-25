@@ -1,16 +1,14 @@
 #!/usr/bin/env node
-// Golden-vector recorder for the confinement policy module: runs the Node originals
-// (src/runner/dispatch/confinement/{policies,resources,workspace-paths,bypass-pairing}.mjs)
-// over fixed inputs and writes what they answer, so the Rust port
-// (packages/execution/engine/src/confinement/policy) is held to the same answers.
+// Golden-vector recorder for live confinement resource modules:
+// src/runner/dispatch/confinement/{resources,workspace-paths}.mjs
+// Dead sources (policies.mjs, bypass-pairing.mjs) were dropped; policy.v1.json stays and is owned by
+// packages/execution/engine/tests/confinement_policy.rs.
 //
 // Usage: node test/golden-recorders/confinement-policy.recorder.mjs [--out <dir>]
-// Default out: packages/execution/contracts/confinement-policy. The vectors are committed;
-// run this again only when the Node originals change on purpose.
+// Default out: packages/execution/contracts/confinement-policy.
 //
 // Machine-touching cases build their fixture in a fresh temp directory. Paths in inputs and outputs are
-// written with the placeholder `$ROOT`, which the reader swaps for its own fixture root; nothing else of the
-// machine (home, env, uid) leaks into a vector, every fact is passed in.
+// written with the placeholder `$ROOT`, which the reader swaps for its own fixture root.
 
 import fs from 'node:fs';
 import os from 'node:os';
@@ -21,16 +19,15 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.resolve(here, '..', '..');
 const confinement = path.join(repo, 'src/runner/dispatch/confinement');
-const policies = await import(path.join(confinement, 'policies.mjs'));
 const resources = await import(path.join(confinement, 'resources.mjs'));
 const workspacePaths = await import(path.join(confinement, 'workspace-paths.mjs'));
-const bypass = await import(path.join(confinement, 'bypass-pairing.mjs'));
 
 let outDir = path.join(repo, 'packages/execution/contracts/confinement-policy');
 const argv = process.argv.slice(2);
 if (argv[0] === '--out') outDir = path.resolve(argv[1]);
 
 const uid = process.getuid();
+
 const clone = (value) => (value === undefined ? undefined : JSON.parse(JSON.stringify(value)));
 function deepFreeze(value) {
   if (value && typeof value === 'object') {
@@ -48,270 +45,6 @@ function observe(fn) {
   } catch (err) {
     return { error: err.message, ...(err.code ? { code: err.code } : {}) };
   }
-}
-
-// ---------------------------------------------------------------- policy shape vectors
-
-const hostWriteDenied = clone(policies.BUILTIN_POLICIES['host-write-denied']);
-const filteredPolicy = (filter, extra = {}) => ({
-  contract: 'confinement-policy.v1',
-  controls: { ...hostWriteDenied.controls, networkEgress: 'filtered' },
-  grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }],
-  networkFilter: filter,
-  ...extra,
-});
-const rule = (over = {}) => ({ protocol: 'tcp', destination: { kind: 'dns', value: 'api.example.com' }, ports: [443], ...over });
-
-const filterInputs = [
-  ['canonical dns rule', { defaultAction: 'deny', allow: [rule()] }],
-  ['empty allow list', { defaultAction: 'deny', allow: [] }],
-  ['ipv4 cidr is canonicalised', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'cidr', value: '10.1.2.3/8' } })] }],
-  ['ipv4 cidr prefix 0', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'cidr', value: '10.1.2.3/0' } })] }],
-  ['ipv4 cidr prefix 32', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'cidr', value: '10.1.2.3/32' } })] }],
-  ['ipv4 prefix out of range', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'cidr', value: '10.0.0.0/33' } })] }],
-  ['ipv4 octet out of range', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'cidr', value: '10.0.0.300/8' } })] }],
-  ['ipv6 cidr is lowercased', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'cidr', value: 'FE80::1/64' } })] }],
-  ['ipv6 prefix out of range', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'cidr', value: 'fe80::1/129' } })] }],
-  ['cidr without a slash', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'cidr', value: '10.0.0.0' } })] }],
-  ['cidr with two slashes', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'cidr', value: '10.0.0.0/8/8' } })] }],
-  ['cidr prefix not digits', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'cidr', value: '10.0.0.0/x' } })] }],
-  ['cidr that is not an address', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'cidr', value: 'host/8' } })] }],
-  ['not an object', 'deny'],
-  ['an array', []],
-  ['unknown key', { defaultAction: 'deny', allow: [], extra: 1 }],
-  ['default action allow', { defaultAction: 'allow', allow: [] }],
-  ['allow not an array', { defaultAction: 'deny', allow: {} }],
-  ['rule not an object', { defaultAction: 'deny', allow: [3] }],
-  ['rule unknown key', { defaultAction: 'deny', allow: [rule({ extra: 1 })] }],
-  ['protocol icmp', { defaultAction: 'deny', allow: [rule({ protocol: 'icmp' })] }],
-  ['destination not an object', { defaultAction: 'deny', allow: [rule({ destination: 'x' })] }],
-  ['destination unknown key', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'dns', value: 'a', extra: 1 } })] }],
-  ['destination kind url', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'url', value: 'a' } })] }],
-  ['destination value blank', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'dns', value: '  ' } })] }],
-  ['dns wildcard', { defaultAction: 'deny', allow: [rule({ destination: { kind: 'dns', value: '*.example.com' } })] }],
-  ['ports empty', { defaultAction: 'deny', allow: [rule({ ports: [] })] }],
-  ['port zero', { defaultAction: 'deny', allow: [rule({ ports: [0] })] }],
-  ['port too large', { defaultAction: 'deny', allow: [rule({ ports: [65536] })] }],
-  ['port fractional', { defaultAction: 'deny', allow: [rule({ ports: [1.5] })] }],
-  ['port a string', { defaultAction: 'deny', allow: [rule({ ports: ['80'] })] }],
-  ['duplicate port', { defaultAction: 'deny', allow: [rule({ ports: [80, 80] })] }],
-  ['duplicate rule regardless of port order', { defaultAction: 'deny', allow: [rule({ ports: [80, 443] }), rule({ ports: [443, 80] })] }],
-];
-
-const policyInputs = [
-  ['host-write-denied built-in', clone(hostWriteDenied)],
-  ['workspace-write built-in', clone(policies.BUILTIN_POLICIES['workspace-write'])],
-  ['not an object', 4],
-  ['an array', []],
-  ['unknown top-level key', { ...clone(hostWriteDenied), backend: 'x' }],
-  ['wrong contract', { ...clone(hostWriteDenied), contract: 'confinement-policy.v2' }],
-  ['controls missing', { contract: 'confinement-policy.v1', grants: [] }],
-  ['controls an array', { contract: 'confinement-policy.v1', controls: [], grants: [] }],
-  ['unknown control', { ...clone(hostWriteDenied), controls: { ...hostWriteDenied.controls, extra: 'x' } }],
-  ['missing control', { ...clone(hostWriteDenied), controls: { hostWrite: 'deny' } }],
-  ['illegal control value', { ...clone(hostWriteDenied), controls: { ...hostWriteDenied.controls, hostRead: 'maybe' } }],
-  ['grants not an array', { ...clone(hostWriteDenied), grants: {} }],
-  ['grant not an object', { ...clone(hostWriteDenied), grants: ['x'] }],
-  ['grant unknown key', { ...clone(hostWriteDenied), grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch', paths: ['a'] }] }],
-  ['grant resource blank', { ...clone(hostWriteDenied), grants: [{ resource: ' ', access: 'write', scope: 'dispatch' }] }],
-  ['duplicate grant', { ...clone(hostWriteDenied), grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }, { resource: 'run-output', access: 'read', scope: 'dispatch' }] }],
-  ['grant access illegal', { ...clone(hostWriteDenied), grants: [{ resource: 'run-output', access: 'rw', scope: 'dispatch' }] }],
-  ['grant scope illegal', { ...clone(hostWriteDenied), grants: [{ resource: 'run-output', access: 'write', scope: 'machine' }] }],
-  ['grant optional not a boolean', { ...clone(hostWriteDenied), grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch', optional: 'yes' }] }],
-  ['grant optional boolean', { ...clone(hostWriteDenied), grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch', optional: true }] }],
-  ['workspace-paths grant', { ...clone(hostWriteDenied), grants: [{ resource: 'workspace-paths', access: 'read-write', scope: 'dispatch', paths: ['plans', 'docs/backlog.md'] }] }],
-  ['workspace-paths grant without paths', { ...clone(hostWriteDenied), grants: [{ resource: 'workspace-paths', access: 'read-write', scope: 'dispatch' }] }],
-  ['workspace-paths under .fgos', { ...clone(hostWriteDenied), grants: [{ resource: 'workspace-paths', access: 'read-write', scope: 'dispatch', paths: ['.fgos/x'] }] }],
-  ['filtered without a filter', { ...filteredPolicy(undefined), networkFilter: undefined }],
-  ['filtered with a filter', filteredPolicy({ defaultAction: 'deny', allow: [rule()] })],
-  ['filter without filtered egress', { ...clone(hostWriteDenied), networkFilter: { defaultAction: 'deny', allow: [] } }],
-  ['filtered with a bad filter', filteredPolicy({ defaultAction: 'allow', allow: [] })],
-  ['filtered with a non-canonical cidr', filteredPolicy({ defaultAction: 'deny', allow: [rule({ destination: { kind: 'cidr', value: '10.1.2.3/8' } })] })],
-];
-
-const workspacePathInputs = [
-  ['named directory and file', ['plans', 'docs/backlog.md']],
-  ['dot-relative', ['./plans']],
-  ['not an array', 'plans'],
-  ['empty array', []],
-  ['entry not a string', [3]],
-  ['entry blank', ['  ']],
-  ['absolute posix', ['/etc']],
-  ['absolute windows drive', ['C:\\x']],
-  ['climbs with ..', ['a/../b']],
-  ['climbs with backslash ..', ['a\\..\\b']],
-  ['under .fgos', ['.fgos/runtime']],
-  ['under .FGOS upper case', ['.FGOS/runtime']],
-  ['under ./.fgos', ['./.fgos']],
-  ['only mentions .fgos deeper down', ['docs/.fgos']],
-  ['glob star', ['plans/*']],
-  ['glob question', ['a?']],
-  ['glob bracket', ['a[1]']],
-  ['glob brace', ['a{b}']],
-];
-
-const capabilityInputs = [
-  ['required with policy', { mode: 'required', policy: 'host-write-denied' }],
-  ['preferred with override flag', { mode: 'preferred', policy: 'workspace-write', allowInvocationOverride: true }],
-  ['unconfined', { mode: 'unconfined' }],
-  ['unconfined with override false', { mode: 'unconfined', allowInvocationOverride: false }],
-  ['unconfined with override true', { mode: 'unconfined', allowInvocationOverride: true }],
-  ['unconfined with policy', { mode: 'unconfined', policy: 'x' }],
-  ['unconfined with unknown key', { mode: 'unconfined', backend: 'x' }],
-  ['not an object', 'required'],
-  ['mode illegal', { mode: 'strict', policy: 'x' }],
-  ['required without policy', { mode: 'required' }],
-  ['required with blank policy', { mode: 'required', policy: ' ' }],
-  ['required with unknown key', { mode: 'required', policy: 'x', backend: 'b' }],
-  ['override flag not a boolean', { mode: 'required', policy: 'x', allowInvocationOverride: 'yes' }],
-];
-
-const overrideCases = [
-  ['harden a control', { controls: { networkEgress: 'deny' } }, 'host-write-denied', 'preferred'],
-  ['equal control', { controls: { hostWrite: 'deny' } }, 'host-write-denied', 'preferred'],
-  ['downgrade a control', { controls: { hostWrite: 'allow' } }, 'host-write-denied', 'preferred'],
-  ['unknown axis', { controls: { bogus: 'deny' } }, 'host-write-denied', 'preferred'],
-  ['illegal value', { controls: { hostRead: 'maybe' } }, 'host-write-denied', 'preferred'],
-  ['controls not an object', { controls: [] }, 'host-write-denied', 'preferred'],
-  ['controls without a base policy', { controls: { hostWrite: 'deny' } }, null, 'preferred'],
-  ['mode hardened', { mode: 'required' }, null, 'preferred'],
-  ['mode illegal', { mode: 'unconfined' }, null, 'preferred'],
-  ['mode downgrade', { mode: 'preferred' }, null, 'required'],
-  ['unknown key', { backend: 'x' }, null, 'preferred'],
-  ['not an object', 5, null, 'preferred'],
-  ['grant narrowed', { grants: [{ resource: 'private-home', access: 'read', scope: 'dispatch' }] }, 'host-write-denied', 'preferred'],
-  ['grant equal', { grants: [{ resource: 'private-home', access: 'read-write', scope: 'dispatch' }] }, 'host-write-denied', 'preferred'],
-  ['grant widened', { grants: [{ resource: 'run-output', access: 'read-write', scope: 'dispatch' }] }, 'host-write-denied', 'preferred'],
-  ['grant not in base', { grants: [{ resource: 'workspace', access: 'read', scope: 'dispatch' }] }, 'host-write-denied', 'preferred'],
-  ['grant without a base policy', { grants: [{ resource: 'run-output', access: 'read', scope: 'dispatch' }] }, null, 'preferred'],
-  ['grants not an array', { grants: {} }, 'host-write-denied', 'preferred'],
-  ['grant not an object', { grants: [1] }, 'host-write-denied', 'preferred'],
-  ['grant unknown key', { grants: [{ resource: 'run-output', access: 'read', scope: 'dispatch', optional: true }] }, 'host-write-denied', 'preferred'],
-  ['grant resource blank', { grants: [{ resource: '', access: 'read', scope: 'dispatch' }] }, 'host-write-denied', 'preferred'],
-  ['grant duplicate', { grants: [{ resource: 'run-output', access: 'read', scope: 'dispatch' }, { resource: 'run-output', access: 'read', scope: 'dispatch' }] }, 'host-write-denied', 'preferred'],
-  ['grant access illegal', { grants: [{ resource: 'run-output', access: 'x', scope: 'dispatch' }] }, 'host-write-denied', 'preferred'],
-  ['grant scope illegal', { grants: [{ resource: 'run-output', access: 'read', scope: 'x' }] }, 'host-write-denied', 'preferred'],
-  ['filtered override needs a filter', { controls: { networkEgress: 'filtered' } }, 'host-write-denied', 'preferred'],
-  ['filtered override with a filter', { controls: { networkEgress: 'filtered' }, networkFilter: { defaultAction: 'deny', allow: [rule()] } }, 'host-write-denied', 'preferred'],
-  ['filter without filtered egress', { networkFilter: { defaultAction: 'deny', allow: [] } }, 'host-write-denied', 'preferred'],
-  ['filter narrowing a filtered base', { networkFilter: { defaultAction: 'deny', allow: [rule({ ports: [443] })] } }, 'filtered', 'preferred'],
-  ['filter adding a port to a filtered base', { networkFilter: { defaultAction: 'deny', allow: [rule({ ports: [443, 80] })] } }, 'filtered', 'preferred'],
-  ['filter adding a destination to a filtered base', { networkFilter: { defaultAction: 'deny', allow: [rule({ destination: { kind: 'dns', value: 'other.example.com' } })] } }, 'filtered', 'preferred'],
-  ['filter with the wrong protocol for a filtered base', { networkFilter: { defaultAction: 'deny', allow: [rule({ protocol: 'udp' })] } }, 'filtered', 'preferred'],
-  ['filter that is itself bad', { networkFilter: { defaultAction: 'allow', allow: [] } }, 'filtered', 'preferred'],
-];
-const overrideBases = {
-  'host-write-denied': clone(hostWriteDenied),
-  filtered: filteredPolicy({ defaultAction: 'deny', allow: [rule({ ports: [443, 8443] })] }),
-};
-
-const legacyInputs = [
-  ['null', null],
-  ['an array', []],
-  ['empty object', {}],
-  ['legacy flags all on', { privateHome: true, isolatedSession: true, ownWorktree: true }],
-  ['legacy flags all off but present', { privateHome: false, isolatedSession: false, ownWorktree: false }],
-  ['legacy private home only', { privateHome: true }],
-  ['legacy with a backend', { privateHome: true, backend: 'bwrap-main' }],
-  ['legacy via home/session/workspace words', { home: 'private', session: 'isolated', workspace: 'own' }],
-  ['legacy words that do not match', { home: 'host', session: 'shared', workspace: 'shared' }],
-  ['legacy flag with controls', { ownWorktree: true, controls: { home: 'private', session: 'isolated', workspace: 'shared' } }],
-  ['already a v1 policy', clone(hostWriteDenied)],
-  ['v1 contract without controls', { contract: 'confinement-policy.v1' }],
-  ['controls only', { controls: { hostWrite: 'deny' } }],
-  ['controls with private home', { controls: { home: 'private', hostRead: 'blind' }, backend: 'b', networkFilter: { defaultAction: 'deny', allow: [] } }],
-  ['controls with grants', { controls: { workspace: 'own' }, grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }] }],
-  ['controls not an object', { controls: 4 }],
-];
-
-const resolveCases = [
-  ['built-in id', 'host-write-denied', {}],
-  ['built-in id wins over custom', 'workspace-write', { 'workspace-write': { contract: 'x' } }],
-  ['custom id', 'mine', { mine: clone(hostWriteDenied) }],
-  ['unknown id', 'nope', { mine: {} }],
-  ['blank id', '  ', {}],
-  ['not a string', 7, {}],
-  ['custom map missing', 'mine', null],
-];
-
-const postureCases = [
-  ['workspace-write', { posture: 'workspace-write' }, {}],
-  ['read-only', { posture: 'read-only' }, {}],
-  ['anything else is read-only', { posture: 'bogus' }, {}],
-  ['no binding', undefined, {}],
-  ['custom policies do not shadow the built-ins', { posture: 'workspace-write' }, { runnerConfig: { confinementPolicies: { 'workspace-write': { contract: 'x' } } } }],
-];
-
-// resolvePostureInvocation is owned by the executor model (packages/execution/contracts/executor-model.v1.json,
-// fact "posture"); it is not recorded again here.
-
-const bypassCases = [];
-for (const isBypass of [false, true]) for (const hasOwnWorktree of [false, true]) for (const hasPrivateHome of [false, true]) for (const hasIsolatedSession of [false, true]) {
-  bypassCases.push({ input: { isBypass, hasOwnWorktree, hasPrivateHome, hasIsolatedSession } });
-}
-const policyWith = (hostWrite) => ({ controls: { hostWrite } });
-const deliveryCases = [];
-for (const launchKind of ['session', 'worker', undefined]) {
-  for (const requirement of [
-    undefined,
-    null,
-    { mode: 'required', policy: policyWith('deny') },
-    { mode: 'required', policy: policyWith('allow') },
-    { mode: 'required' },
-    { mode: 'preferred', policy: policyWith('deny') },
-    { mode: 'unconfined' },
-  ]) {
-    for (const backend of [undefined, null, '', 'bwrap-main', { id: 'b' }]) {
-      deliveryCases.push({ input: { launchKind, requirement, backend } });
-    }
-  }
-}
-
-function policyVectors() {
-  const stamp = (cases, run) => cases.map((c) => ({ ...c, ...run(c) }));
-  return {
-    contract: 'confinement-policy-vectors.v1',
-    constants: {
-      builtinPolicies: clone(policies.BUILTIN_POLICIES),
-      builtinPolicyIds: [...policies.BUILTIN_POLICY_IDS],
-      confinementModes: [...policies.CONFINEMENT_MODES],
-      controlAxes: clone(policies.CONTROL_AXES),
-      controlOrder: clone(policies.CONTROL_ORDER),
-      grantAccessLevels: clone(policies.GRANT_ACCESS_LEVELS),
-      workspacePathsResource: workspacePaths.WORKSPACE_PATHS_RESOURCE,
-      mailboxRecordResource: workspacePaths.MAILBOX_RECORD_RESOURCE,
-      peerSessionsResource: workspacePaths.PEER_SESSIONS_RESOURCE,
-      blindHiddenRoots: [...policies.BLIND_HIDDEN_ROOTS],
-      machinePrivateRoots: [...policies.MACHINE_PRIVATE_ROOTS],
-      defaultSeatTimeoutMs: resources.DEFAULT_SEAT_TIMEOUT_MS,
-      sessionSocketDir: resources.SESSION_SOCKET_DIR,
-    },
-    networkFilter: [false, true].flatMap((frozen) => filterInputs.map(([name, input]) => {
-      const copy = clone(input);
-      if (frozen) deepFreeze(copy);
-      const answer = observe(() => policies.validateNetworkFilterShape(copy, 'networkFilter'));
-      return { name: `${name}${frozen ? ' (frozen)' : ''}`, frozen, input, ...answer, after: answer.error ? undefined : clone(copy) };
-    })),
-    policyShape: [false, true].flatMap((frozen) => policyInputs.map(([name, input]) => {
-      const copy = clone(input);
-      if (frozen) deepFreeze(copy);
-      const answer = observe(() => policies.validateConfinementPolicyShape(copy, 'policy'));
-      return { name: `${name}${frozen ? ' (frozen)' : ''}`, frozen, input, ...answer, after: answer.error ? undefined : clone(copy) };
-    })),
-    workspacePaths: stamp(workspacePathInputs.map(([name, input]) => ({ name, input })), ({ input }) => observe(() => workspacePaths.validateWorkspacePaths(input, 'grant'))),
-    capabilityShape: stamp(capabilityInputs.map(([name, input]) => ({ name, input })), ({ input }) => observe(() => policies.validateCapabilityConfinementShape(input, 'cap'))),
-    overrideShape: overrideCases.map(([name, override, base, baseMode]) => {
-      const copy = clone(override);
-      const answer = observe(() => policies.validateOverrideConfinementShape(copy, base ? clone(overrideBases[base]) : null, 'override', baseMode));
-      return { name, override, base, baseMode, ...answer, after: answer.error ? undefined : clone(copy) };
-    }),
-    overrideBases,
-    legacyNormalization: stamp(legacyInputs.map(([name, input]) => ({ name, input })), ({ input }) => observe(() => policies.normalizeLegacyConfinement(clone(input), 'confinement'))),
-    resolvePolicy: stamp(resolveCases.map(([name, id, custom]) => ({ name, id, custom })), ({ id, custom }) => observe(() => policies.resolveConfinementPolicy(id, custom === null ? undefined : custom))),
-    posture: stamp(postureCases.map(([name, binding, ctx]) => ({ name, binding, ctx })), ({ binding, ctx }) => observe(() => policies.resolvePosture(binding, clone(ctx)))),
-    bypassPairing: bypassCases.map((c) => ({ ...c, ...observe(() => bypass.evaluateBypassPairing(c.input)) })),
-    controlDelivery: deliveryCases.map((c) => ({ ...c, ...observe(() => bypass.controlDelivery(c.input)) })),
-  };
 }
 
 // ---------------------------------------------------------------- resource vectors
@@ -553,7 +286,7 @@ const resolveResourceCases = [
   ['blind where the own directory is missing', { dirs: ['fgos', 'repo', 'homes'] }, resolveInput({ blind: true, context: launchContext({ runDir: '$ROOT/fgos/run-x' }) })],
   ['blind with a run directory of its own (no assignment)', { dirs: ['fgos/dispatch-runs/r1', 'repo', 'homes'] }, resolveInput({ blind: true, context: launchContext({ runDir: '$ROOT/fgos/dispatch-runs/r1' }) }), true],
   ['blind without a state directory', { dirs: baseDirs }, resolveInput({ blind: true, context: launchContext({ fgosDir: undefined }) })],
-  ['every grant of the workspace-write policy but git metadata', { dirs: [...baseDirs, 'creds', 'home/.fgos/private', 'sockbase'] }, resolveInput({ grants: policies.BUILTIN_POLICIES['workspace-write'].grants.filter((g) => g.resource !== 'workspace-git-metadata').map(clone), providerSources: { credentialsPath: '$ROOT/creds' } }), true],
+  ['every grant of the workspace-write policy but git metadata', { dirs: [...baseDirs, 'creds', 'home/.fgos/private', 'sockbase'] }, resolveInput({ grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }, { resource: 'private-home', access: 'read-write', scope: 'dispatch' }, { resource: 'executor-credentials', access: 'read', scope: 'dispatch' }, { resource: 'workspace', access: 'read-write', scope: 'dispatch' }].map(clone), providerSources: { credentialsPath: '$ROOT/creds' } }), true],
 ];
 
 function runResolve(input, root) {
@@ -653,9 +386,7 @@ function resourceVectors() {
 
 fs.mkdirSync(outDir, { recursive: true });
 const write = (file, value) => fs.writeFileSync(path.join(outDir, file), `${JSON.stringify(value, null, 2)}\n`);
-const p = policyVectors();
 const r = resourceVectors();
-write('policy.v1.json', p);
 write('resources.v1.json', r);
 const count = (v) => Object.values(v).reduce((n, x) => n + (Array.isArray(x) ? x.length : 0), 0);
-console.log(`policy.v1.json: ${count(p)} cases; resources.v1.json: ${count(r)} cases -> ${outDir}`);
+console.log(`resources.v1.json: ${count(r)} cases -> ${outDir}`);

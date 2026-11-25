@@ -20,7 +20,7 @@
     "test('session start inside a .fgos/-less linked worktree still succeeds (D10 symlink actor exempt from the requiresExistingStore guard)', () => {",
     "test('rollup renders stageEffective on the root and on each child independently, mixing explicit and defaulted stages (tsk-4zj D6)', () => {",
     "test('triage --all appends done items after the ranked open rows, each with blocks:0 (tsk-5oa D1)', () => {",
-    "test('add stamps stage \"clarify\" by default (D1/D2, add-stage-default-gap) — parity with submit, no longer the old implicit \"executing\"', () => {",
+    "test('add stamps stage \"clarify\" by default (D1/D2, add-stage-default-gap) \u2014 parity with submit, no longer the old implicit \"executing\"', () => {",
     "test('discover on a clear verdict moves the submitted item to stage discovery with the caller-supplied verify (tsk-4b2 D3: retargeted from decompose)', () => {",
     "test('discover on a decompose-stage item errors instead of silently dispatching to resolveDecompose (tsk-2b0 D1: hard split, no fallback)', () => {",
     "test('decompose on a clarify-stage item errors instead of silently dispatching to resolveDiscovery (tsk-2b0 D1: hard split, no fallback)', () => {",
@@ -33,21 +33,21 @@
     "test('pick on a leaf item whose root DOES have a live fgw/<rootId> branch forks the leaf worktree from that branch tip, not from repoRoot HEAD (claim-port.mjs D3 leaf-vs-root split, positive path)', () => {",
     "test('pick on a leaf item refuses the claim when a dep is not yet status:done, instead of forking a worktree that could be missing that dep\\'s content (claim-port.mjs D2 sibling-merge-ordering guard, tsk-3t4)', () => {",
     "test('return (verify passes, main-source): a live main-checkout.lock recorded under THIS session\\'s own identity is released early, instead of waiting out the TTL (tsk-45z D1/D2)', () => {",
-    "test('return (verify FAILS, main-source): a live own-identity lock is released too — settling to blocked is just as much \"done with the checkout\" as proposed (tsk-45z D1/D2)', () => {",
-    "test('return (main-source) never touches a DIFFERENT session\\'s live lock — never a blind unlink (tsk-45z D2)', () => {",
+    "test('return (verify FAILS, main-source): a live own-identity lock is released too \u2014 settling to blocked is just as much \"done with the checkout\" as proposed (tsk-45z D1/D2)', () => {",
+    "test('return (main-source) never touches a DIFFERENT session\\'s live lock \u2014 never a blind unlink (tsk-45z D2)', () => {",
     "test('return: a changed file outside the item\\'s footprint surfaces a footprintDiffHits advisory even when it matches no frozenJudgeHits pattern, never blocks (tsk-4hl)', () => {",
     "test('return: footprintDiffHits is empty when the item declares NO footprint at all (D5 absent-footprint exemption, same as footprintDiffHits\\' own unit tests)', () => {",
     "test('return: a .fgos/* change bundled into the item\\'s own commit (git add -A sweeping in take\\'s own event-log write) is exempt from footprintDiffHits (tsk-x5r self-exempt)', () => {",
     "test('return: a .fgos/gate-bypass.json change bundled into the item\\'s own commit DOES surface in footprintDiffHits, unlike events.jsonl (tsk-5iv D2: exemption narrowed to noise only)', () => {",
     "test('return: the item\\'s own docs/history/<id>/iron-law-evidence.md is exempt from footprintDiffHits (tsk-4hl self-exempt, avoids self-flagging every Iron-Law-gated item)', () => {",
-    "test('return succeeds when a dirty file on cwd is UNRELATED to the item\\'s own committed progress (tsk-598 D1/D2) — own-file-set scoping, not a whole-tree gate', () => {",
-    "test('return still refuses when the SAME path the item committed is dirty again — a real conflict, tsk-598 D2, exit 4, item stays doing', () => {",
+    "test('return succeeds when a dirty file on cwd is UNRELATED to the item\\'s own committed progress (tsk-598 D1/D2) \u2014 own-file-set scoping, not a whole-tree gate', () => {",
+    "test('return still refuses when the SAME path the item committed is dirty again \u2014 a real conflict, tsk-598 D2, exit 4, item stays doing', () => {",
     "test('return with a declared footprint still refuses on an uncommitted footprint path (tsk-598 D3) even though it was never committed', () => {",
-    "test('return --no-new-commits-ok closes out a main-source claim whose HEAD already reflects fully-done, verify-passing work before this claim (tsk-4on) — succeeds, records aheadCount:0', () => {",
-    "test('return --no-new-commits-ok never bypasses verify itself for a main-source claim — still parks doing -> blocked + friction when verify fails (tsk-4on)', () => {",
+    "test('return --no-new-commits-ok closes out a main-source claim whose HEAD already reflects fully-done, verify-passing work before this claim (tsk-4on) \u2014 succeeds, records aheadCount:0', () => {",
+    "test('return --no-new-commits-ok never bypasses verify itself for a main-source claim \u2014 still parks doing -> blocked + friction when verify fails (tsk-4on)', () => {",
     "test('approve of a runner item (happy path): merges fgw/<id> into main, verifies, awaiting-approval -> delivered with role human, and the branch SURVIVES (tsk-1p9: cleanup deferred to the cleanup verb)', () => {",
-    "test('approve of a runner item succeeds when a dirty file on main is UNRELATED to the item (tsk-598 D1/D2) — own-file-set scoping, not a whole-tree gate', () => {",
-    "test('approve of a runner item still refuses when the SAME path the item touched is dirty again on main — a real conflict, tsk-598 D2, exit 4, item stays proposed', () => {",
+    "test('approve of a runner item succeeds when a dirty file on main is UNRELATED to the item (tsk-598 D1/D2) \u2014 own-file-set scoping, not a whole-tree gate', () => {",
+    "test('approve of a runner item still refuses when the SAME path the item touched is dirty again on main \u2014 a real conflict, tsk-598 D2, exit 4, item stays proposed', () => {",
     "test('approve of a runner item with a declared footprint still refuses on an uncommitted footprint path (tsk-598 D3) even though it was never committed to the branch', () => {",
     "test('approve of a leaf item with a clean merge lands the work on fgw/<root> (not main) via an ephemeral worktree, leaf -> delivered, fgw/<leaf> SURVIVES the approve (tsk-1p9: teardown deferred to the cleanup verb), fgw/<root> survives', () => {",
     "test('approve of the same self-modifying diff PROCEEDS with --acknowledge-iron-law: merges, verifies, awaiting-approval -> delivered, branch SURVIVES (tsk-1p9: cleanup deferred to the cleanup verb)', () => {",
@@ -55,29 +55,29 @@
     "test('sync-root on a no-parent root refuses when the shared main checkout carries an uncommitted change on a path the root itself touches, exit 4, no merge lands (tsk-66t)', () => {",
     "test('promote-to-component happy path (D1 new-item): creates a fresh root, merges both members into it, sets parent only after real success, records one decision', () => {",
     "test('promote-to-component happy path (D1 reuse-member): promotes an existing member to root, root itself is skipped not merged', () => {",
-    "test('return on a branch-source take whose branch declares a real npm dependency: verify passes because the disposable detached worktree gets its own node_modules provisioned first (tsk-2vd — reproduces the real failure that blocked tsk-32n\\'s own return)', () => {",
-    "test('return on a branch-source take never touches a live main-checkout.lock (tsk-45z D1 scope: only the main-source path releases early — worktree commits never contend for this shared lock)', () => {",
+    "test('return on a branch-source take whose branch declares a real npm dependency: verify passes because the disposable detached worktree gets its own node_modules provisioned first (tsk-2vd \u2014 reproduces the real failure that blocked tsk-32n\\'s own return)', () => {",
+    "test('return on a branch-source take never touches a live main-checkout.lock (tsk-45z D1 scope: only the main-source path releases early \u2014 worktree commits never contend for this shared lock)', () => {",
     "test('return without --no-new-commits-ok still refuses a branch-source claim with zero commits since take, even when the branch already satisfies verify (tsk-4on default-unchanged)', () => {",
-    "test('return --no-new-commits-ok closes out a branch-source claim whose branch already reflects fully-done, verify-passing work before this claim (tsk-4on) — succeeds, records aheadCount:0', () => {",
-    "test('return --no-new-commits-ok refuses a branch-source claim that was already blocked by a real verify-fail — the flag closes out work never returned, never rescues a failed retry (tsk-4on D2)', () => {",
-    "test('return --no-new-commits-ok never bypasses verify itself — a genuinely-fresh branch-source claim whose branch tip still fails verify still parks doing -> blocked + friction (tsk-4on)', () => {",
+    "test('return --no-new-commits-ok closes out a branch-source claim whose branch already reflects fully-done, verify-passing work before this claim (tsk-4on) \u2014 succeeds, records aheadCount:0', () => {",
+    "test('return --no-new-commits-ok refuses a branch-source claim that was already blocked by a real verify-fail \u2014 the flag closes out work never returned, never rescues a failed retry (tsk-4on D2)', () => {",
+    "test('return --no-new-commits-ok never bypasses verify itself \u2014 a genuinely-fresh branch-source claim whose branch tip still fails verify still parks doing -> blocked + friction (tsk-4on)', () => {",
     "test('merge next with nothing ready and no blockedOnSync candidate: unchanged shape, no syncRoot key at all (zero behavior change, D1)', () => {",
     "test('merge next auto-syncs a blockedOnSync root before giving up: drift clears, the now-ready item merges to delivered (tsk-173 D1)', () => {",
     "test('merge next on a blockedOnSync root whose sync-root attempt hits a genuine conflict: picked is the root id (never null), blocked, main untouched (tsk-173 D1/D2)', () => {",
     "test('merge next on a blockedOnSync root whose sync-root attempt hits a dirty main checkout: picked is the root id (never null), blocked: dirty-tree, main untouched (tsk-66t)', () => {",
     "test('take (default, no flags) retries through a lock whose remainingTtlMs is short, and succeeds once it clears -- D3\\'s default-ON behavior', () => {",
     "test('take --wait rejects a value above the 900000ms (15 min) cap -- tsk-2rf D3', () => {",
-    "test('cleanup is a no-op — writes zero work.move events and stays at cleanup — when only TTL has not elapsed and the D8 checks pass', () => {",
+    "test('cleanup is a no-op \u2014 writes zero work.move events and stays at cleanup \u2014 when only TTL has not elapsed and the D8 checks pass', () => {",
     "test('cleanup of a LEAF item deletes its own branch even though the ROOT branch is still unmerged into main (tsk-1p9 D7/D8)', () => {"
   ],
   "test/cli/take-pick-claim-eligibility.test.mjs": [
-    "test('take with no --id still only opens the frontier head — the relaxation applies to the explicit --id branch alone (D1 unchanged)', () => {"
+    "test('take with no --id still only opens the frontier head \u2014 the relaxation applies to the explicit --id branch alone (D1 unchanged)', () => {"
   ],
   "test/e2e/compound-learn-lifecycle.test.mjs": [
-    "test('e2e approve no longer requires the compound-learn stage — the retired RUL50 gate does not block reaching delivered', () => {"
+    "test('e2e approve no longer requires the compound-learn stage \u2014 the retired RUL50 gate does not block reaching delivered', () => {"
   ],
   "test/e2e/fixture-marketing-domain.test.mjs": [
-    "test('adding \"fixture-marketing\" leaves DOMAINS.coding completely unchanged (RUL11 — purely additive)', () => {"
+    "test('adding \"fixture-marketing\" leaves DOMAINS.coding completely unchanged (RUL11 \u2014 purely additive)', () => {"
   ],
   "test/e2e/main-checkout-lock-hook-worktree-commit.test.mjs": [
     "test('tsk-sir: a worktree commit is wrongly refused while another session holds the main-checkout lock', () => {"
@@ -100,23 +100,23 @@
     "test('resolveDecompose gates to awaiting-human when tentative children declare overlapping footprint, writing no children (tsk-5e97 D1)', () => {",
     "test('resolveDecompose self-resolves the footprint-overlap gate once the next call proposes non-overlapping children (no bypass constant needed, tsk-5e97 D1)', () => {",
     "test('resolveDecompose --force never overrides a MECHANICAL disagreement (tsk-12t D6) -- still parks', () => {",
-    "test('resolveDecompose never skips past mode \"standard\"/\"high-risk\" — role \"session\" refuses, role \"runner\" no-ops (D16, skip never applies past tiny/small)', () => {",
+    "test('resolveDecompose never skips past mode \"standard\"/\"high-risk\" \u2014 role \"session\" refuses, role \"runner\" no-ops (D16, skip never applies past tiny/small)', () => {",
     "test('resolveDecompose skips (advances via trust signal) when plan.md is only reachable via process.cwd() (D1 branch 1, real end-to-end)', () => {",
     "test('resolveContentRoot finds a real committed plan.md via git worktree list when cwd does not hold it (D1 branch 2, crash-recovery case)', () => {",
     "test('resolveDecompose skips when plan.md is only reachable via a real registered worktree (D1 branch 2, real end-to-end)', () => {",
     "test('resolveContentRoot falls back to stateRoot when neither cwd nor any registered worktree hold the content (D1 branch 3, unchanged behavior)', () => {",
-    "test('resolveDecompose still gates a caller-supplied decompose verdict to awaiting-human on overlapping footprint (D3 — gates apply regardless of verdict origin)', () => {",
-    "test('resolveDecompose still routes a caller-supplied verdict through the heavy-risk gate (D3 — gates apply regardless of verdict origin)', () => {",
+    "test('resolveDecompose still gates a caller-supplied decompose verdict to awaiting-human on overlapping footprint (D3 \u2014 gates apply regardless of verdict origin)', () => {",
+    "test('resolveDecompose still routes a caller-supplied verdict through the heavy-risk gate (D3 \u2014 gates apply regardless of verdict origin)', () => {",
     "test('resolveDecompose caller-supplied verdict takes precedence over the plan.md tiny/small mode skip-and-advance heuristic (D2)', () => {",
     "test('findUncoveredLockedDecisions: a root dotfile keeps its leading dot and is checked at the real path (tsk-gio regression, the tsk-2ta case)', () => {",
     "test('findUncoveredLockedDecisions: a directory-shaped footprint entry covers every real path underneath it (tsk-gio fix)', () => {",
-    "test('resolveDecompose caller-supplied decompose verdict: an uncovered locked-decision path logs an advisory decision but still writes children (D1 — never blocks)', () => {"
+    "test('resolveDecompose caller-supplied decompose verdict: an uncovered locked-decision path logs an advisory decision but still writes children (D1 \u2014 never blocks)', () => {"
   ],
   "test/intake/discovery.test.mjs": [
     "test('resolveDiscovery with no callerVerdict, no locked CONTEXT.md, and role \"runner\" no-ops instead of spawning a subprocess judge (D16)', () => {",
     "test('resolveDiscovery with no callerVerdict, no locked CONTEXT.md, and role \"session\" refuses loudly instead of guessing (D1/D9)', () => {",
     "test('resolveDiscovery advances to discovery when docsRef points at a real, non-empty CONTEXT.md, with no verdict required (tsk-4b2 D3)', () => {",
-    "test('resolveDiscovery skip path applies identically for role \"runner\" (RUL19 sweep) as for role \"session\" — content-based, no role branch', () => {",
+    "test('resolveDiscovery skip path applies identically for role \"runner\" (RUL19 sweep) as for role \"session\" \u2014 content-based, no role branch', () => {",
     "test('resolveDiscovery skip path preserves an existing real work.verify instead of falling back to FALLBACK_VERIFY (D2)', () => {",
     "test('resolveDiscovery skip path finds CONTEXT.md via process.cwd() when the state root does not hold it (D1 branch 1, real end-to-end)', () => {",
     "test('resolveDiscovery skip path finds CONTEXT.md via a real registered worktree when cwd does not hold it (D1 branch 2, crash-recovery case)', () => {",
@@ -129,7 +129,7 @@
     "test('resolveDiscovery refuses a caller-supplied clear verdict when work.status is already awaiting-human from an earlier park (tsk-60r D1)', () => {",
     "test('resolveDiscovery still advances normally on a caller-supplied clear verdict when work.status is not awaiting-human (tsk-60r D1, unchanged behavior)', () => {",
     "test('resolveDiscovery preserves an existing real work.verify instead of overwriting it with the caller-supplied guess (D2, tsk-5e97/tsk-3sw shape)', () => {",
-    "test('resolveDiscovery still updates priority on a legacy-invalid item shape — editWork\\'s scoped validation (tsk-1ne) grandfathers the untouched field instead of blocking the patch', () => {"
+    "test('resolveDiscovery still updates priority on a legacy-invalid item shape \u2014 editWork\\'s scoped validation (tsk-1ne) grandfathers the untouched field instead of blocking the patch', () => {"
   ],
   "test/intake/judge-verify-second-pass-stability.test.mjs": [
     "test('rejects known-bad node --test reporter pattern (tsk-1x3 D17: mechanical-only signature)', () => {",
@@ -140,7 +140,7 @@
   ],
   "test/runner/claim-port.test.mjs": [
     "test('claimWork reads the event log 6 times per call, not 7 (tsk-3jh dedupe of the listWork + readRawEvents pair)', () => {",
-    "test('claimWork on a claim-lock §3b-marked release preserves the ORIGINAL branchHeadAtTake on reclaim, instead of recomputing to the tip that already includes the pre-release commit (tsk-2zv)', () => {",
+    "test('claimWork on a claim-lock \u00a73b-marked release preserves the ORIGINAL branchHeadAtTake on reclaim, instead of recomputing to the tip that already includes the pre-release commit (tsk-2zv)', () => {",
     "test('claimWork on an UNMARKED todo-with-branch reclaim (e.g. reject) still recomputes branchHeadAtTake fresh, never preserving a stale value (tsk-2zv D3)', () => {",
     "test('claimWork isolates a leaf whose dep is \"wontfix\" without throwing deps-not-merged (D1: wontfix satisfies the merge-guard, same as done)', () => {",
     "test('claimWork still refuses to isolate a leaf whose dep is only \"blocked\" (D1 does not over-broaden the merge-guard past done/wontfix)', () => {",
@@ -173,8 +173,8 @@
   "test/runner/merge.test.mjs": [
     "test('reviewDiff succeeds on a diff larger than Node\\'s old 1 MiB execFileSync default (tsk-648 regression)', () => {",
     "test('isWorkingTreeClean(repoRoot) with no ownFileSet argument reproduces the strict pre-tsk-598 default', () => {",
-    "test('isFgosOnlyStatusLine: omitted ownFileSet (default null) still blocks any non-.fgos path — fail-safe, unchanged from before tsk-598', () => {",
-    "test('abortMergeIfPossible is a no-op when there is no MERGE_HEAD (the tsk-2j9 no-op-merge case) — never throws \"no merge to abort\"', () => {"
+    "test('isFgosOnlyStatusLine: omitted ownFileSet (default null) still blocks any non-.fgos path \u2014 fail-safe, unchanged from before tsk-598', () => {",
+    "test('abortMergeIfPossible is a no-op when there is no MERGE_HEAD (the tsk-2j9 no-op-merge case) \u2014 never throws \"no merge to abort\"', () => {"
   ],
   "test/runner/promote-engine.test.mjs": [
     "test('resolveIntegrationBranch creates a fresh ref from trunk when rootId has no branch yet (D1 new-item path)', () => {",
@@ -209,7 +209,7 @@
     "test('a new module can register a config-default independently of any check (D2)', () => {"
   ],
   "test/setup/self-uninstall-spike.test.mjs": [
-    "test('SPIKE: fgos uninstall --yes --remove-package removes a real npm -g installed package on this platform', { skip: isWin && 'spike is scoped to Linux/macOS only (D1) — Windows self-deletion is a separate, still-unresolved risk' }, () => {"
+    "test('SPIKE: fgos uninstall --yes --remove-package removes a real npm -g installed package on this platform', { skip: isWin && 'spike is scoped to Linux/macOS only (D1) \u2014 Windows self-deletion is a separate, still-unresolved risk' }, () => {"
   ],
   "test/skills/fgos-coding-compounding-doc-write-path.test.mjs": [
     "test('fgos-coding-compounding writes the document before it stores the tag (D1/D3 order)', () => {",
@@ -267,12 +267,12 @@
     "test('wontfix IS reachable from awaiting-human (tsk-2ub): a park-for-question state with no committed work, same shape as todo/doing -- requires the usual awaiting-human exit answer', () => {"
   ],
   "test/state/gate-bypass.test.mjs": [
-    "test('canAutoApprove: D4 floor — hard-gate keyword in title blocks approval at level heavy', () => {",
-    "test('canAutoApprove: D4 floor — hard-gate keyword in description blocks approval at level heavy', () => {",
+    "test('canAutoApprove: D4 floor \u2014 hard-gate keyword in title blocks approval at level heavy', () => {",
+    "test('canAutoApprove: D4 floor \u2014 hard-gate keyword in description blocks approval at level heavy', () => {",
     "test('canAutoApprove: \"auth\" inside \"authoring\" is not a hard-gate hit (tsk-1gj)', () => {",
     "test('canAutoApprove: \"audit\" inside \"audited\" is not a hard-gate hit (tsk-1gj)', () => {",
-    "test('canAutoApproveValidate: D4 floor — hard-gate keyword in title blocks approval at level heavy, verdict READY', () => {",
-    "test('canAutoApproveValidate: D4 floor — hard-gate keyword in description blocks approval at level heavy, verdict READY', () => {",
+    "test('canAutoApproveValidate: D4 floor \u2014 hard-gate keyword in title blocks approval at level heavy, verdict READY', () => {",
+    "test('canAutoApproveValidate: D4 floor \u2014 hard-gate keyword in description blocks approval at level heavy, verdict READY', () => {",
     "test('canAutoApproveValidate: \"auth\" inside \"authoring\" is not a hard-gate hit (tsk-1gj)', () => {",
     "test('canAutoApproveValidate: \"audit\" inside \"audited\" is not a hard-gate hit (tsk-1gj)', () => {"
   ],
@@ -302,17 +302,17 @@
     "test('concurrent editWork calls on DIFFERENT ids never lose a write to state.json (tsk-1q5)', async () => {"
   ],
   "test/state/work.test.mjs": [
-    "test('STAGES includes \"decompose\" between clarify and executing — compound-learn is retired (D11); \"discovery\"/\"exploring\" now sit between clarify and decompose (tsk-1w7 D10)', () => {",
+    "test('STAGES includes \"decompose\" between clarify and executing \u2014 compound-learn is retired (D11); \"discovery\"/\"exploring\" now sit between clarify and decompose (tsk-1w7 D10)', () => {",
     "test('checkAcceptanceEvidenceTraceable rejects a clause whose evidence cites no real path (the confirmed tsk-d3c failure shape)', () => {",
     "test('checkAcceptanceEvidenceTraceable leaves a text-only clause (no evidence yet) completely unaffected, preserving RUL58 D4', () => {"
   ],
   "test/state/workflow-stage-graphs.test.mjs": [
     "test('DOMAINS has exactly four entries: \"coding\", \"synthetic\", \"triage\", and \"fixture-marketing\" (tsk-38t-7 capstone fixture)', () => {",
     "test('DOMAINS.triage (tsk-3xo regression fixture) maps Clarify/Divide/Execute under non-coding-literal stage names', () => {",
-    "test('DOMAINS.coding.stages adds \"discovery\" and \"exploring\" between clarify and decompose (tsk-1w7 D10) — compound-learn stays retired (D11)', () => {",
+    "test('DOMAINS.coding.stages adds \"discovery\" and \"exploring\" between clarify and decompose (tsk-1w7 D10) \u2014 compound-learn stays retired (D11)', () => {",
     "test('DOMAINS.coding.transitions keeps the three pre-existing edges byte-for-byte (discovery.mjs/decompose.mjs are untouched by tsk-1w7, still fire them) and adds the three new D10 edges, plus tsk-puz D12\\'s direct clarify->exploring migration jump', () => {",
-    "test('DOMAINS.coding.stepMap maps every stage to a base-workflow step (vision §2 vocabulary) — compound-learn retired (D11); discovery/exploring carry NO step entry (tsk-1w7 D10, same \"outside the 5-step vocabulary\" treatment Init/Compound-learn already get)', () => {",
-    "test(\"DOMAINS.coding.skillMap.retrospective is 'fgos-compounding' (0027 D5 — zero regression, coding's synthesis skill does not change)\", () => {"
+    "test('DOMAINS.coding.stepMap maps every stage to a base-workflow step (vision \u00a72 vocabulary) \u2014 compound-learn retired (D11); discovery/exploring carry NO step entry (tsk-1w7 D10, same \"outside the 5-step vocabulary\" treatment Init/Compound-learn already get)', () => {",
+    "test(\"DOMAINS.coding.skillMap.retrospective is 'fgos-compounding' (0027 D5 \u2014 zero regression, coding's synthesis skill does not change)\", () => {"
   ],
   "test/state/working-tree-clean-unified.test.mjs": [
     "test(\"isWorkingTreeClean scope:'subtree' still threads ownFileSet through exactly like scope:'whole-repo' (tsk-598)\", () => {"

@@ -10,7 +10,6 @@ import path from 'node:path';
 
 import { seatIdProblem, isSeatId, assertSeatId, reservedSeatIds } from '../../src/convention/seat-id.mjs';
 import { handoffRef, RunnerConfigError } from '../../src/native/execution-door.mjs';
-import { checkDeclaredSeats } from '../../src/runner/execution/seat-resolver.mjs';
 
 const golden = JSON.parse(fs.readFileSync(new URL('../../packages/convention/contracts/convention.golden.v1.json', import.meta.url), 'utf8'));
 
@@ -33,8 +32,9 @@ test('reserved names are exactly the contract list and cover the names the run l
 });
 
 test('the workflow-facing seat declaration refuses traversal and reserved ids', () => {
+  // Same seat-id rule checkDeclaredSeats applied; convention owns the rule (assertSeatId).
   for (const bad of ['../x', 'a/b', '..', 'runs', 'Bad', '']) {
-    assert.throws(() => checkDeclaredSeats([{ seat: bad, role: 'producer' }]), /seat/, bad);
+    assert.throws(() => assertSeatId(bad), /seat/, bad);
   }
 });
 
