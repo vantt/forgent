@@ -18,3 +18,5 @@ A lead calls `fgos supervisor raise --kind coordination-help ...` and `fgos fric
 # Notes
 
 This may share a cause with p-5a6z5fuoq2 (the shell `fgos` function appends `--dir`), but that refusal reads `argv-not-allowed`, not `verb-not-granted`. Check that first.
+
+Update 2026-11-25 18:10: after the supervisor restarted the leads of 261122-2108 and 261125-1556, both raised events with `fgos supervisor raise` successfully. The refusal may affect only sessions started before the release activation of 2026-11-25. Reproduce it in a fresh session before working on this row; close it if it does not reproduce.
