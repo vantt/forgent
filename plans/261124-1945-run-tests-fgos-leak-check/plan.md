@@ -1,50 +1,75 @@
 ---
 contract: plan-v1
-title: "The leak check of run-tests ignores live runtime directories"
-status: done
-lead: head:lead-forgent-261124-1945-run-te-f3bee
-priority: P2
+title: "The leak check of run-tests judges only what the test run wrote"
+status: draft
+priority: P1
 blockedBy: []
 footprint:
   - scripts/run-tests.mjs
   - test/scripts/run-tests.test.mjs
+  - test/helpers/fgos-write-witness.mjs
+  - packages/git/contracts/mutation-census.v1.json
   - plans/261124-1945-run-tests-fgos-leak-check/
-base: 0add9d884fca927195de47bd83729cb6d8bc6250
+base: e402520442c7f124576f3403d6e8f380477b436c
 source:
   - plans/discussions/ds-ti2vip43kp-run-tests-fgos-leak-check/DISCUSSION.md
   - p-s6te2445rb
+  - plans/discussions/ds-lvxt3vde7k-land-gate-live-writes/DISCUSSION.md
+  - p-427ymxp33q
 created: 2026-11-24
 ---
 
-# The leak check of run-tests ignores live runtime directories
+# The leak check of run-tests judges only what the test run wrote
 
 ## Outcome
 
-The `.fgos` leak check in `scripts/run-tests.mjs` (`snapshotFgos` before and after a run,
-compared by `diffFgosSnapshots`) no longer fails a run because of files that other heads
-write into live runtime directories while the run is going, and still fails a run when a
-test really leaves a file anywhere else in `.fgos`.
+Phase 1 (done, `ee1d9ca00`) stopped the `.fgos` leak check in `scripts/run-tests.mjs`
+failing on a fixed list of live runtime directories, after three lands went red with 0 test
+failures. The list did not hold: on 2026-11-25, 9 of the last 30 land gate logs failed with
+all 170 tests green, on writes into `runtime/watcher`, `runtime/head-tickets`,
+`runtime/supervision`, `runtime/session-rotation`, `assignments/*` and `locks` (backlog
+p-427ymxp33q). The owner widened the list by hand in `b4581336d` (`runtime`, `assignments`,
+`locks`) as a stopgap.
 
-Why: three lands went red with 0 test failures, each only because of live files in
-`observe/records`, `runtime/mailbox/mail-taken`, `logs/invocation-faults.jsonl` and
-`runtime/land/land-*.log.partial` (discussion, Evidence).
+Phase 2 replaces the list with attribution (discussion ds-lvxt3vde7k). The check fails a run
+only for a `.fgos` path that a process of the test run itself wrote and that differs at the
+end of the run from what it was when that process first touched it. A write by any other
+session (a live head, the watcher, the land that runs the gate) into any `.fgos` path does
+not fail the run; a file a test leaves in `.fgos` still does.
 
 ## Acceptance criteria
 
-1. With a live file added during a run under each of `runtime/land` (including a
-   `land-*.log.partial`), `runtime/mailbox`, `observe/records`, `logs` and `cache`, the
-   run's `fgosDiff.leaked` is `false` and its status is 0. Proof: a test in
-   `test/scripts/run-tests.test.mjs`.
-2. A file a test leaves in any other `.fgos` path (for example `observe/friction/`,
-   `dispatch-runs/`, `runtime/other/`) still fails the run with status 1 and is named in
-   the log. Proof: the existing leak tests in the same file, still green.
-3. `node scripts/run-tests.mjs test/scripts/run-tests.test.mjs` exits 0.
+Phase 1's criteria are met (see Progress). Phase 2:
+
+1. A write by another process into any `.fgos` path during a run (including
+   `runtime/watcher/state.json`, `assignments/<run>/closed.json`, `locks/*`,
+   `observe/friction/*` and a new top-level `other/`) leaves `fgosDiff.leaked` false and the
+   status 0. Proof: the leak-check section of `test/scripts/run-tests.test.mjs`, where the
+   other writer is a write that no witnessed test process made.
+2. A file a test process writes and leaves in `.fgos`, in any path including the old
+   stopgap ones (`runtime/`, `assignments/`, `locks/`), fails the run with status 1 and is
+   named in the log; a file a test writes and removes again does not fail it. Proof: same
+   section, driven through a real `node` child that loads the witness.
+3. A run whose test processes left no witness record fails closed with status 1 and a
+   message naming the witness, instead of passing with nothing attributed. Proof: same
+   section.
+4. One owning proof: the leak cases stay in the one existing leak-check section of
+   `test/scripts/run-tests.test.mjs`; the stopgap test "the leak check ignores live runtime
+   directories ..." is replaced, not kept beside the new cases.
+5. `LIVE_FGOS_DIRS` is gone: `rg -n LIVE_FGOS_DIRS scripts test` prints nothing.
+6. `node scripts/run-tests.mjs test/scripts/run-tests.test.mjs test/setup/git-mutation-census.test.mjs`
+   exits 0, after the census is regenerated with
+   `node scripts/git-one-door-scan.mjs --write-census`.
 
 ## Non-goals
 
-- Changing which tests run, or the land gates.
-- Touching any script other than `scripts/run-tests.mjs`.
-- Any env switch or flag that turns the check off (AGENTS.md, L5 question 5).
+- Changing which tests run, or the land gates (both discussions, Non-goals).
+- Any env switch or flag that turns the check off (AGENTS.md, L5 question 5). The witness
+  log path the runner hands its test processes is where the record goes, not a switch: a
+  missing record fails the run.
+- Attributing writes made outside Node's `fs` (the Rust host binary, a shell, the native
+  addon); see Risks.
+- Changing `SENSITIVE_FGOS_FILES` or the `allowedFgosMutations` parameter.
 
 ## Prior art
 
@@ -55,6 +80,25 @@ extends it from one exact file to a fixed list of live directories. Because the 
 list excludes all of `cache`, the single-file exemption becomes redundant and is retired
 in the same change (L10): one exclusion list, not two.
 
+Phase 2:
+
+- Reused from phase 1 and `b4581336d`: the diff result shape
+  (`{added, modified, deleted, leaked}` on `result.fgosDiff`) and its log lines. Retired:
+  `LIVE_FGOS_DIRS` and the whole-store walk. With no exclusion list the walk would read
+  every file twice; `.fgos` holds about 238,000 files on this machine, 153,000 under
+  `runtime` and 72,000 under `assignments`.
+- Reused as the pattern: `test/helpers/git-spawn-spy.mjs`, the per-process attribution this
+  runner already has. `buildTestArgv` preloads it with `--import`; it spreads to child Node
+  processes through `NODE_OPTIONS`, patches builtins and calls
+  `module.syncBuiltinESMExports()` so named ESM imports see the patch, and appends JSONL to a
+  log in the run's temp dir that `runSelectedTests` reads back. The witness is a second
+  preload of the same shape, not a change to the spy: the spy watches spawns, the witness
+  watches file writes.
+- Rejected: running the tests against a store the live system does not write to (a mount
+  namespace or overlay over `.fgos`). `unshare -rm` is refused with "Operation not
+  permitted" in the confined sessions that run lands. Running the gate in another checkout
+  would change the land gates (non-goal).
+
 ## Authority map
 
 `fgos authority locate` returns no model row that owns `scripts/run-tests.mjs`: it is
@@ -64,6 +108,13 @@ decision kind; it replaces one constant inside an existing script, so the table 
 rows. The replacement inside the script: survivor `LIVE_FGOS_DIRS`; retired
 `DERIVED_FGOS_FILES`, both in `scripts/run-tests.mjs`.
 
+Phase 2: `fgos authority locate` for "a preload module that records which .fgos files the
+test processes write during a run" returns only unrelated low-score doors
+(`agent-hook-table`, `control-the-gateway-process`); test preloads have no row, like
+`test/helpers/git-spawn-spy.mjs`. No component, door, contract or decision kind is added.
+survivor: `test/helpers/fgos-write-witness.mjs` read back in `runSelectedTests`; retired:
+`LIVE_FGOS_DIRS` and `snapshotFgos`'s whole-store walk in `scripts/run-tests.mjs`.
+
 | New thing | Model row | Note |
 |---|---|---|
 
@@ -72,11 +123,17 @@ rows. The replacement inside the script: survivor `LIVE_FGOS_DIRS`; retired
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Skip live runtime directories in the leak check](phase-01-skip-live-runtime-dirs.md) | - | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs | 1 | done |
+| 2 | [Attribute .fgos writes to the test run](phase-02-attribute-fgos-writes-to-the-test-run.md) | 1 | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs, test/helpers/fgos-write-witness.mjs, packages/git/contracts/mutation-census.v1.json | 2 | ready |
 
-One phase, one wave: the whole change is one constant, one walk filter and one test file.
-No integration phase is needed because there is only one branch; the phase's own verify
-is the full gate for its footprint. Checked with `node scripts/plan-contract-check.mjs`
-and `fgos resource-check --plan`.
+Phase 1: one phase, one wave: one constant, one walk filter and one test file.
+
+Phase 2 is one phase: the witness, its reader and its proof land together (a reader without
+the witness fails every run closed). No integration phase: there is one branch, and its
+verify is the full gate for its footprint. The census is a generated hot file that other
+plans also regenerate; the phase regenerates it last, on the rebased tree, and never
+hand-merges it. The footprint adds one file to the three the discussion named: the witness
+module, a new file the attribution needs; no other plan touches it. Checked with
+`node scripts/plan-contract-check.mjs` and `fgos resource-check --plan`.
 
 ## Progress
 
@@ -121,18 +178,42 @@ and `fgos resource-check --plan`.
 
 ## Risks and rollback
 
+Phase 1 (kept for history; its first risk is removed by phase 2):
+
 - **A real leak into an excluded directory now passes.** A test that writes into
   `cache`, `logs`, `observe/records`, `runtime/land` or `runtime/mailbox` of the real
   checkout is no longer caught. This is the trade the owner chose; the existing test
   "tolerates a rewrite of the derived state view but still fails other cache changes"
   loses its second half (`cache/other.json` failing) because that behavior is removed by
-  the owner's list, not weakened. Tests still run with a per-run temp root, so their own
-  fixtures do not reach the real `.fgos`.
-- **Prefix match too wide.** Matching `logs` by name could skip a nested directory called
-  `logs` elsewhere. Mitigation: match the relative path from `.fgos` root exactly
-  (`runtime/land`, not any `land`), proven by the test's "other path still fails" case
-  using `runtime/other/`.
+  the owner's list, not weakened. Phase 2 removes the exclusions, so a test's own write
+  there fails again.
 - **Rollback:** revert the phase's single commit.
+
+Phase 2:
+
+- **Writes the witness cannot see (medium).** The witness sees file calls made through
+  Node's `fs` in a test file process or a Node child that inherits `NODE_OPTIONS`. It does
+  not see the Rust host binary, a shell, a child handed an env without `NODE_OPTIONS`, or
+  the native addon writing from inside a Node process. A test that leaks into the real
+  `.fgos` only that way now passes, where phase 1's walk caught it outside the excluded
+  directories. Proof point for validating, run once by the phase (step 7): on a tree with no
+  live heads writing, run the full suite with the witness and with the old whole-store walk
+  side by side (a throwaway local script, not committed), and compare. A test-made change the
+  walk saw and the witness missed is named in Progress, and the phase stops and reports it
+  rather than landing a check that misses a known leak; none found is recorded as the
+  evidence. Extending attribution to the Rust host is a later backlog item, outside this
+  footprint.
+- **A test and a live head touch the same path.** The witness records the path's state at
+  the test's first touch; if a live head changes it later too, the run fails on a path the
+  test did write. The test wrote into the real `.fgos`, so the failure is right.
+- **Fail closed.** The test file process always loads the witness through `--import`, so a
+  run with test files and no witness record means the preload broke; the run fails with a
+  message naming the witness rather than passing with nothing attributed.
+- **Census conflicts.** `packages/git/contracts/mutation-census.v1.json` is regenerated by
+  every plan that touches `scripts/`; a land that meets a newer census regenerates it on the
+  rebased tree, never merges it by hand.
+- **Rollback:** revert the phase 2 commit(s); the stopgap list from `b4581336d` returns with
+  them. Regenerate the census on the reverted tree.
 
 ## Outstanding questions
 
