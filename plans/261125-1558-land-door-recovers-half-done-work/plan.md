@@ -1,7 +1,8 @@
 ---
 contract: plan-v1
 title: "The land door finishes or recovers its own half-done work"
-status: draft
+status: ready
+base: ebd19c364eb46cedcbb3837d44bd9a905d6250c0
 priority: P1
 blockedBy: []
 footprint:
@@ -16,12 +17,10 @@ footprint:
   - packages/git/rust/src/scoped_commit.rs
   - packages/git/rust/tests/land_push_catch_up.rs
   - packages/git/rust/tests/incidents.rs
-  - packages/git/contracts/mutation-census.v1.json
   - packages/identity/rust/src/directory.rs
   - packages/identity/rust/tests/directory.rs
   - docs/platform/git/spec.md
   - docs/platform/identity/spec.md
-  - CHANGELOG.md
 source:
   - plans/discussions/ds-d4d2sp5qg2-land-door-recovers-half-done-work/DISCUSSION.md
   - p-q2dn2cnzlq
@@ -84,8 +83,8 @@ for session writers Identity knows; this plan closes the pid case it missed.
    writer's chain is still kept.
 5. `fgos git status` / recover text for a kept chain names `fgos git recover` and says why it was kept
    (writer alive, or not provable), checked in `packages/git/rust/src/incidents.rs` unit tests.
-6. `npm test` and `cargo test --workspace` green on the merged tree; `CHANGELOG.md` `[Unreleased]` has one
-   line per row.
+6. `npm test` and `cargo test --workspace` green on the merged tree; one `CHANGELOG.md` `[Unreleased]` line per
+   row, landed as phase 4 says (the file is held by running plan 261124-0004 today).
 7. The cause report `plans/261125-1558-land-door-recovers-half-done-work/reports/cause.md` names the door and
    step for each of the three 2026-11-25 incidents from the journal.
 
@@ -114,12 +113,18 @@ for session writers Identity knows; this plan closes the pid case it missed.
 |---|---|---|---|---|---|
 | 1 | [Catch-up finishes an unpublished land-door commit](phase-01-catch-up-finishes-unpublished-commit.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, packages/git/rust/src/inspect.rs, plans/261125-1558-land-door-recovers-half-done-work/reports/ | 1 | ready |
 | 2 | [A bare pid writer is proven dead from OS state](phase-02-pid-writer-proven-dead.md) | - | packages/identity/rust/src/directory.rs, packages/identity/rust/tests/directory.rs | 1 | ready |
-| 3 | [Recover settles a dead writer's pending chains](phase-03-recover-dead-writer-chains.md) | - | packages/git/rust/src/incidents.rs, packages/git/rust/src/recovery.rs, packages/git/rust/src/land.rs, packages/git/rust/src/refs.rs, packages/git/rust/src/scoped_commit.rs, packages/git/rust/tests/incidents.rs, packages/git/contracts/mutation-census.v1.json | 1 | ready |
-| 4 | [Integrate, docs and changelog](phase-04-integrate-docs-changelog.md) | 1, 2, 3 | packages/git/rust/tests/land_push_catch_up.rs, docs/platform/git/spec.md, docs/platform/identity/spec.md, CHANGELOG.md | 2 | ready |
+| 3 | [Recover settles a dead writer's pending chains](phase-03-recover-dead-writer-chains.md) | - | packages/git/rust/src/incidents.rs, packages/git/rust/src/recovery.rs, packages/git/rust/src/land.rs, packages/git/rust/src/refs.rs, packages/git/rust/src/scoped_commit.rs, packages/git/rust/tests/incidents.rs | 1 | ready |
+| 4 | [Integrate, docs and changelog](phase-04-integrate-docs-changelog.md) | 1, 2, 3 | packages/git/rust/tests/land_push_catch_up.rs, docs/platform/git/spec.md, docs/platform/identity/spec.md | 2 | ready |
 
 Each phase dispatches with capability `code:implement`. Phases 1-3 have disjoint footprints and run at once;
 phase 3 takes `writer_is_dead` as the parameter it already is, so its fixtures inject the proof and do not wait
-on phase 2. Phase 4 merges, runs the full gate, and owns every shared doc and CHANGELOG. Checked with
+on phase 2. Phase 4 merges, runs the full gate, and owns the shared docs.
+
+Cross-plan overlap, resolved by narrowing: `packages/git/contracts/mutation-census.v1.json` (running plan
+261122-2108) is left out, since recovery adds no new mutation, only a recorder on an existing one; if phase 3
+finds the census must change, it stops `BLOCKED` for the lead. `CHANGELOG.md` (running plan 261124-0004,
+phases 6 and 7 left) is left out; phase 4 writes the lines to `reports/changelog-lines.md`, and the lead adds
+`CHANGELOG.md` to this plan's footprint and lands the lines once 261124-0004 is done. Checked with
 `node scripts/plan-contract-check.mjs --plan plans/261125-1558-land-door-recovers-half-done-work`.
 
 Order (from the discussion): admit after the backlog-index and shaper-worktree plans; needs a free lead slot.

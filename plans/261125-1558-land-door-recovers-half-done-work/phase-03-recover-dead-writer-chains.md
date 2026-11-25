@@ -19,7 +19,6 @@ Capability: `code:implement`. Source row: p-o4juyw2ntg.
 
 - `packages/git/rust/src/incidents.rs`, `recovery.rs`, `land.rs`, `refs.rs`, `scoped_commit.rs`
 - `packages/git/rust/tests/incidents.rs`
-- `packages/git/contracts/mutation-census.v1.json`
 
 ## Steps
 
@@ -32,7 +31,8 @@ Capability: `code:implement`. Source row: p-o4juyw2ntg.
 3. Record who recovered: the settling record carries the recoverer. Before choosing the field, check how old
    readers treat it under `deny_unknown_fields`; if adding a field would break a reader of an older release,
    record the recoverer in the outcome's existing free-text/diagnostic slot instead, and say which in the commit.
-   Update `mutation-census.v1.json` if a mutation's description changes.
+   Do not edit `packages/git/contracts/mutation-census.v1.json` (running plan 261122-2108 holds it); if a
+   census change turns out to be required, stop `BLOCKED` and name it.
 4. `free_retained_land` already frees a dead writer's finished Land: leave it; it now also frees pid writers
    through phase 2's proof.
 5. `kept_text`: for an authority-mismatch kept chain, say "writer <w> is alive or not provably dead; once it is

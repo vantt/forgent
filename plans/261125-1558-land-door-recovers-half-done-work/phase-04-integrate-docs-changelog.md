@@ -14,7 +14,7 @@ Capability: `code:implement`. Depends on phases 1, 2 and 3.
 - `packages/git/rust/tests/land_push_catch_up.rs`
 - `docs/platform/git/spec.md`
 - `docs/platform/identity/spec.md`
-- `CHANGELOG.md`
+- `plans/261125-1558-land-door-recovers-half-done-work/reports/changelog-lines.md`
 
 ## Steps
 
@@ -26,8 +26,9 @@ Capability: `code:implement`. Depends on phases 1, 2 and 3.
    is refused" and "recover settles a pending chain of a proven-dead writer and records the recoverer". Identity
    spec: "a bare pid writer is proven dead only when its pid is absent". Decision narrative in each spec's
    decision-history section.
-4. `CHANGELOG.md` `[Unreleased]`: one line per row (no more hand push after a dead land; `fgos git recover` frees a
-   dead pid writer's chains and candidates).
+4. Write the `[Unreleased]` lines to `reports/changelog-lines.md`, one per row (no more hand push after a dead land; `fgos git recover` frees a
+   dead pid writer's chains and candidates). `CHANGELOG.md` is held by running plan 261124-0004; once that plan
+   is `done`, add `CHANGELOG.md` to this plan's and this phase's footprint and land the lines into it.
 5. Run the full gate on the merged tree.
 
 ## Verify
