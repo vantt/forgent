@@ -421,11 +421,13 @@ export function describeLeftoverTemps(root) {
 
 export const SENSITIVE_FGOS_FILES = new Set(['secrets.local.env', 'secrets.env']);
 
-// Live runtime directories: other heads and the running land write them while a run is going, so
-// a change there is not a test leak; cache also holds the derived state view.
+// Live runtime directories: other heads, the watcher and the running land write them while a run is
+// going (watcher state, head tickets, unit-run assignments, session rotation, locks), so a change
+// there is not a test leak; cache also holds the derived state view.
 export const LIVE_FGOS_DIRS = new Set([
-  path.join('runtime', 'land'),
-  path.join('runtime', 'mailbox'),
+  'runtime',
+  'assignments',
+  'locks',
   path.join('observe', 'records'),
   'logs',
   'cache',
