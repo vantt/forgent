@@ -89,6 +89,10 @@ carries the edited standard is staged and activated.
 - 2026-11-25: phase 2 parked on the owner or the unconfined supervisor. They stage and activate a release from main
   at or after `29dd50475`, and run the full `npm test` and `cargo test --workspace` there. Then the live cargo probe
   can run.
+- 2026-11-25: owner answered q-nii67wdhv3 with option 1: the owner opens one unconfined `lead:SUPERVISOR`
+  session. Once `fgos identity resolve lead:SUPERVISOR` finds it, the supervisor sends it the release build, stage
+  and activate from main (>= `29dd50475`), `npm test`, `cargo test --workspace`, and then starts the live cargo
+  probe. At 11:27 no such session was live yet; phase 2 stays parked on it.
 
 Checks made under the table: `node scripts/plan-contract-check.mjs --plan plans/261124-2320-claude-worker-allowed-tools`
 and `fgos resource-check --plan plans/261124-2320-claude-worker-allowed-tools`. The two phases sit in different waves,
