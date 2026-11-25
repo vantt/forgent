@@ -1,10 +1,11 @@
 ---
 contract: plan-v1
 title: "Event-store io errors keep the path and the operation in the invocation-fault log"
-status: ready
+status: running
 priority: P1
 blockedBy: []
-base: ebd19c364eb46cedcbb3837d44bd9a905d6250c0
+base: c3e132e943e1d9fb37053e75849141fc6522aea7
+lead: head:lead-forgent-261125-1556-event-3bf82
 footprint:
   - plans/261125-1556-event-store-io-errors-keep-path/**
   - packages/event-store/rust/src/lifecycle.rs
