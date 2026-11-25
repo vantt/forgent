@@ -255,6 +255,24 @@ hand. The governance holder table, the system-overview area map and shared entit
 `architecture-map.md` §6-7 and `docs/platform/README.md` are generated from the component authority model; phase 3
 changes them only through `fgos authority declare` / `fgos authority render`.
 
+## Authority map
+
+Rows checked against `packages/component-authority/model/` on 2026-11-25. The rule store, the `when:` key registry
+and the effective rule set are not this plan's: the ACE plan (`261125-1631`) declares component
+`agent-context-engine`, and this plan only reads its contracts.
+
+| New or moved thing | Model row | Note |
+|---|---|---|
+| The composer `compose`, its ports (`RuleSet`, `FactRegistry`, contributors, `RecordSink`), the host door `fgos internal start-context compose`; contracts `start-request`, `start-context`, `start-contributors`, `refusals` (each declared with `--kind contract`, provider `agent-start-context`, in phase 3) | `declare: component agent-start-context` | ASC-D1, tier 3. `fgos authority locate` finds no row for it (2026-11-25). |
+| Persona, ritual, on-wake and opening text of heads (`FIRST_STEPS`, `renderOnWake`, `openingText` in `src/session-host/head-start.mjs`) | `session-host` | The text producer overlaps the new component; survivor: `agent-start-context` for start text; retired: the text producers in `src/session-host/head-start.mjs`. Session-host keeps starting and binding heads, and passes facts to `compose`. |
+| Persona rendering of workers (`persona_section` in `apps/fgos/src/wiring/unit_run_host/persona.rs`, `renderPersonaSection`) and the duplicate claim render | `execution-core` | The persona render overlaps the new component; survivor: `agent-start-context`; retired: `persona_section`, `renderPersonaSection`, the second caller of `render_agent_result_claim_instructions`. Execution keeps the assignment block and `PromptPort`, and passes the block to `compose` as a payload. |
+| Persona definitions in `core/agents/*.yaml`, the agent listing | `runner`, `execution/agents.v1` | Unchanged owner: ASC reads the definitions; `scripts/project-agents.mjs` keeps writing `.claude/agents/**` but takes its text from `compose`. |
+| Rule selection for the setup-time AGENTS.md block | `docs.packaging-distribution/instruction-composition-and-projection` | The selection half of the row overlaps the new component; survivor: `agent-start-context` for selection by facts (ASC-D8); retired: ACE's interim filter in `src/setup/instruction-projections.mjs`. Packaging-distribution keeps writing the host file. |
+| The rotation handoff reaching a successor | `session-rotation`, `session-host/rotation-files.v1` | Unchanged owner of the handoff store and files; the handoff enters the start text only through a registered contributor (ASC-D6). |
+| SessionStart hook rows for hand-opened sessions | `distribution/agent-hooks.v1` | Unchanged owner (`packaging-distribution`); phase 10 adds rows that call the host door. |
+| The `start-context` record kind | `observe` | Unchanged owner of the record door; the kind is declared through `apps/fgos/src/wiring/observe_declarations.rs`. |
+| The `startContext.entryPersona` key | `config` | New key in `core/config-standard` and `core/config-schema` (phase 10). |
+
 ## Owner questions
 
 1. **Phase 6 scope (owner note 3, 2026-11-22): resolved by ACE-D5 and ASC-D9.** The owner settled that ACE owns the
