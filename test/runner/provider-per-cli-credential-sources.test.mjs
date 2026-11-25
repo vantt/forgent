@@ -23,7 +23,6 @@ import {
   writeBackRenewedCredential,
 } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
 import { prepareBwrap } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
-import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
 
 // One provider account used through several CLIs: each CLI keeps its own login store, and a launch
@@ -119,13 +118,15 @@ function planFor(tempRoot, dispatchId) {
 
 async function provisionFor(w, command, selection, dispatchId) {
   const plan = planFor(w.tempRoot, dispatchId);
-  const request = buildConfinementRequest({
+  const request = {
+    contract: 'confinement-request.v1',
     capability: 'code:review',
     executorId: 'openai',
     invocation: { command, args: [], env: {}, credentialStore: { use: path.basename(command), homeEnv: 'AGENT_HOME' } },
     context: { cwd: w.tmp, runDir: path.join(w.tmp, 'run') },
+    requirement: { mode: 'required', policyId: 'host-write-denied' },
     providerCapacity: selection,
-  });
+  };
   const prepared = await prepareBwrap(plan, { ...request, dispatchId }, { id: 'bwrap', type: 'bwrap', config: {} });
   return { home: plan.resources[0].hostTarget, prepared };
 }

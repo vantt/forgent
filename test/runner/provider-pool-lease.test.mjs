@@ -19,7 +19,7 @@ import {
   quarantineProviderAccount,
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { deriveLegacyInventory, legacyStateKey, readLlmAccounts } from '../../src/runner/dispatch/llm-accounts.mjs';
-import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config-twin.mjs';
+import { loadRunnerConfigForDir } from '../../src/native/execution-door.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { writeAccountsFile as writeAccountsFileIn, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
