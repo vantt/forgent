@@ -95,8 +95,8 @@ constraint).
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Trigger error keeps the detail](phase-01-trigger-error-keeps-detail.md) | - | packages/event-store/rust/src/lifecycle.rs, packages/event-store/rust/tests/lifecycle.rs, packages/git/node-addon/src/event_store.rs, src/event-store/maintenance.mjs, test/event-store/triggers.test.mjs, test/event-store/lifecycle.test.mjs, docs/platform/event-store/spec.md | 1 | ready |
-| 2 | [decision-index tests print child stderr](phase-02-decision-index-stderr.md) | - | test/report/decision-index.test.mjs | 1 | ready |
+| 1 | [Trigger error keeps the detail](phase-01-trigger-error-keeps-detail.md) | - | packages/event-store/rust/src/lifecycle.rs, packages/event-store/rust/tests/lifecycle.rs, packages/git/node-addon/src/event_store.rs, src/event-store/maintenance.mjs, test/event-store/triggers.test.mjs, test/event-store/lifecycle.test.mjs, docs/platform/event-store/spec.md | 1 | done |
+| 2 | [decision-index tests print child stderr](phase-02-decision-index-stderr.md) | - | test/report/decision-index.test.mjs | 1 | done |
 | 3 | [Integration](phase-03-integration.md) | 1, 2 | plans/261125-1556-event-store-io-errors-keep-path/reports/ | 2 | ready |
 
 Contract check: phases 1 and 2 share wave 1 with disjoint footprints; phase 3 depends on both and sits in wave 2. The
