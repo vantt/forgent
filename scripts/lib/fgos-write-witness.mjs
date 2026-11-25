@@ -59,21 +59,43 @@ function install(logFile, fgosDir) {
     return null;
   };
 
+  // Records one absolute path inside `.fgos` (the directory itself under '.') with the state it is in now.
+  const noteAbs = (abs) => {
+    const rel = path.relative(fgosDir, abs);
+    if (rel.startsWith('..') || path.isAbsolute(rel)) return;
+    const key = rel || '.';
+    if (touched.has(key)) return;
+    touched.add(key);
+    let before = { exists: false };
+    try {
+      const stat = lstatSync(abs);
+      before = { exists: true, isDir: stat.isDirectory(), size: stat.size, mtimeMs: stat.mtimeMs };
+    } catch { /* absent now */ }
+    append({ kind: 'write', path: key, before });
+  };
+
   const note = (value) => {
     try {
       const raw = toPath(value);
-      if (raw === null) return;
-      const abs = path.resolve(raw);
-      const rel = path.relative(fgosDir, abs);
-      if (!rel || rel.startsWith('..') || path.isAbsolute(rel) || touched.has(rel)) return;
-      touched.add(rel);
-      let before = { exists: false };
-      try {
-        const stat = lstatSync(abs);
-        before = { exists: true, isDir: stat.isDirectory(), size: stat.size, mtimeMs: stat.mtimeMs };
-      } catch { /* absent now */ }
-      append({ kind: 'write', path: rel, before });
+      if (raw !== null) noteAbs(path.resolve(raw));
     } catch { /* the witness never throws into the caller */ }
+  };
+
+  // A recursive mkdir also creates every absent ancestor: record the topmost one inside `.fgos`, so
+  // removing that ancestor later is seen as undoing this process's own directory.
+  const noteCreatedAncestor = (value, options) => {
+    try {
+      if (!options || typeof options !== 'object' || !options.recursive) return;
+      const raw = toPath(value);
+      if (raw === null) return;
+      let top = null;
+      for (let dir = path.resolve(raw); ; dir = path.dirname(dir)) {
+        const rel = path.relative(fgosDir, dir);
+        if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) break;
+        try { lstatSync(dir); break; } catch { top = dir; }
+      }
+      if (top !== null) noteAbs(top);
+    } catch { /* never throws */ }
   };
 
   const wrap = (target, name, positionsOf) => {
@@ -81,6 +103,7 @@ function install(logFile, fgosDir) {
     if (typeof original !== 'function') return;
     target[name] = function witnessed(...args) {
       try { for (const position of positionsOf(args)) note(args[position]); } catch { /* never throws */ }
+      if (name === 'mkdir' || name === 'mkdirSync') noteCreatedAncestor(args[0], args[1]);
       return original.apply(this, args);
     };
     // Keep what callers read off the function (promisify.custom and the like).

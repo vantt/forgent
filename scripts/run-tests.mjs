@@ -440,6 +440,12 @@ export function readFgosWriteWitness(file) {
   return { loads, touched };
 }
 
+function directoryHoldsFiles(dir) {
+  try {
+    return fs.readdirSync(dir, { withFileTypes: true }).some((entry) => (entry.isDirectory() ? directoryHoldsFiles(path.join(dir, entry.name)) : true));
+  } catch { return false; }
+}
+
 /**
  * Compares each `.fgos` path a test process touched, as it was just before the first touch, with what
  * it is now: added (absent, present now), deleted (present, gone now) or modified (size or mtime
@@ -457,7 +463,9 @@ export function diffFgosWrites(touched, fgosDir, allowedMutations = new Set()) {
       const stat = fs.lstatSync(path.join(fgosDir, relPath));
       now = { isDir: stat.isDirectory(), size: stat.size, mtimeMs: stat.mtimeMs };
     } catch { /* gone */ }
-    if (!before.exists && now) added.push(relPath);
+    if (!before.exists && now) {
+      if (!now.isDir || directoryHoldsFiles(path.join(fgosDir, relPath))) added.push(relPath);
+    }
     else if (before.exists && !now) deleted.push(relPath);
     else if (before.exists && now) {
       const same = before.isDir && now.isDir ? true : !before.isDir && !now.isDir && before.size === now.size && before.mtimeMs === now.mtimeMs;
@@ -550,6 +558,8 @@ export function runSelectedTests(files, {
   childEnv[FGOS_WRITE_WITNESS_LOG_ENV] = witnessLog;
   childEnv[FGOS_WRITE_WITNESS_DIR_ENV] = fgosDir;
   let witness = null;
+  let spawned = false;
+  let spawnFailed = false;
   let gitSpawns = [];
   try {
     if (supervisor?.failure()) {
@@ -560,13 +570,14 @@ export function runSelectedTests(files, {
       const cpuBefore = waitedCpuSeconds();
       const spawnResult = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
       const cpuAfter = waitedCpuSeconds();
+      spawned = true;
+      spawnFailed = Boolean(spawnResult.error);
       result = {
         status: spawnResult.status ?? 1, files: relFiles, runTemp, wallSeconds: (Date.now() - started) / 1000,
         cpuSeconds: cpuBefore === null || cpuAfter === null ? null : cpuAfter - cpuBefore,
         fileCpu: readTestFileCpu(cpuLog, cwd, relFiles),
       };
       gitSpawns = readGitSpawnLog(spawnLog);
-      witness = readFgosWriteWitness(witnessLog);
     }
   } finally {
     if (supervisor) timedOut = supervisor.stop();
@@ -578,6 +589,8 @@ export function runSelectedTests(files, {
     strayWorktrees = worktreeRegistrationsUnder(cwd, [runTemp, fixtureRoot]);
     // The per-file supervisor is still exiting from its SIGTERM; it is this run's own, not a test's.
     ({ strays: strayProcesses, refusals: strayRefusals } = stopStrays([runTemp, fixtureRoot], { env: childEnv, exclude: supervisor?.pid ? [supervisor.pid] : [], stop: stopInside }));
+    // Read after the strays are stopped (a late write by a witnessed stray counts) and before the log's dir goes.
+    if (spawned) witness = readFgosWriteWitness(witnessLog);
     if (fixtureRoot) {
       try {
         fs.rmSync(fixtureRoot, { recursive: true, force: true, maxRetries: 3 });
@@ -667,14 +680,14 @@ export function runSelectedTests(files, {
   // A run refused before any test started has no witness record to read; it has nothing to attribute.
   const fgosDiff = witness ? diffFgosWrites(witness.touched, fgosDir, allowedFgosMutations) : { added: [], modified: [], deleted: [], leaked: false };
   result.fgosDiff = fgosDiff;
-  if (witness && relFiles.length && witness.loads === 0) {
+  if (witness && relFiles.length && witness.loads === 0 && !spawnFailed) {
     fgosDiff.leaked = true;
     log('run-tests: ERROR: the .fgos write witness did not load in the test processes, so no .fgos write could be attributed to this run:');
     log(`  scripts/lib/fgos-write-witness.mjs is preloaded with --import; check that it loads and that its log path (${FGOS_WRITE_WITNESS_LOG_ENV}) is writable.`);
     result.status = result.status !== 0 ? result.status : 1;
   }
 
-  if (fgosDiff.leaked) {
+  if (fgosDiff.added.length || fgosDiff.modified.length || fgosDiff.deleted.length) {
     log('run-tests: ERROR: test suite leaked unexpected files or modifications into .fgos store:');
     if (fgosDiff.added.length) {
       log(`  Added (${fgosDiff.added.length}):`);

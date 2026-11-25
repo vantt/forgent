@@ -8,7 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { parseEtime, parsePs, treeOf, findOverdue, reapRunDirs } from '../../scripts/lib/test-file-watchdog.mjs';
-import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, FGOS_WRITE_WITNESS_PATH,snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests as runTestsRaw, runChosenTests as runChosenTestsRaw, runSelectedTests as runSelectedTestsRaw, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, diffFgosWrites, SENSITIVE_FGOS_FILES, leftoverTempPrefixes, describeLeftoverTemps, strayFgosAbove } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, GIT_CONFIG_GUARD_PATH, GIT_SPAWN_SPY_PATH, FGOS_WRITE_WITNESS_PATH, snapshotGitIdentity, diffGitIdentity, buildTestEnv, runTests as runTestsRaw, runChosenTests as runChosenTestsRaw, runSelectedTests as runSelectedTestsRaw, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, diffFgosWrites, SENSITIVE_FGOS_FILES, leftoverTempPrefixes, describeLeftoverTemps, strayFgosAbove } from '../../scripts/run-tests.mjs';
 import { asWitnessedSpawn } from '../../scripts/lib/fgos-write-witness.mjs';
 import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -926,6 +926,82 @@ test('a file a test process leaves in .fgos fails the run and is named, wherever
   assert.equal(tidy.result.status, 0, tidy.logs);
   assert.equal(tidy.result.fgosDiff.leaked, false);
 
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('a test process that removes a directory which existed in .fgos before the run fails the run and names it', () => {
+  const base = tempBase();
+  const fgosDir = path.join(fs.realpathSync(base), '.fgos');
+  fs.mkdirSync(path.join(fgosDir, 'cache', 'sub'), { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, 'cache', 'sub', 'state.json'), '{}');
+
+  const { result, logs } = runRealTestFile(base, [
+    "import fs from 'node:fs';",
+    "import path from 'node:path';",
+    `fs.rmSync(path.join(${JSON.stringify(fgosDir)}, 'cache'), { recursive: true, force: true });`,
+  ].join('\n'));
+
+  assert.equal(result.status, 1, logs);
+  assert.ok(result.fgosDiff.deleted.includes('cache'));
+  assert.match(logs, /- \.fgos\/cache/);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('a test process that removes the whole .fgos store fails the run', () => {
+  const base = tempBase();
+  const fgosDir = path.join(fs.realpathSync(base), '.fgos');
+  fs.mkdirSync(path.join(fgosDir, 'runtime'), { recursive: true });
+
+  const { result, logs } = runRealTestFile(base, [
+    "import fs from 'node:fs';",
+    `fs.rmSync(${JSON.stringify(fgosDir)}, { recursive: true, force: true });`,
+  ].join('\n'));
+
+  assert.equal(result.status, 1, logs);
+  assert.deepEqual(result.fgosDiff.deleted, ['.']);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('a directory tree a test process creates in .fgos and removes again passes, even when the tree was made with one recursive mkdir', () => {
+  const base = tempBase();
+  const fgosDir = path.join(fs.realpathSync(base), '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+
+  const { result, logs } = runRealTestFile(base, [
+    "import fs from 'node:fs';",
+    "import path from 'node:path';",
+    `const fgos = ${JSON.stringify(fgosDir)};`,
+    "fs.mkdirSync(path.join(fgos, 'a', 'b'), { recursive: true });",
+    "fs.rmSync(path.join(fgos, 'a'), { recursive: true });",
+  ].join('\n'));
+
+  assert.equal(result.status, 0, logs);
+  assert.equal(result.fgosDiff.leaked, false);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('an empty directory a test process leaves in .fgos passes, while a directory holding a file fails the run', () => {
+  const base = tempBase();
+  const fgosDir = path.join(fs.realpathSync(base), '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  const dir = JSON.stringify(fgosDir);
+
+  const empty = runRealTestFile(base, [
+    "import fs from 'node:fs';",
+    "import path from 'node:path';",
+    `fs.mkdirSync(path.join(${dir}, 'runtime', 'tmp'), { recursive: true });`,
+  ].join('\n'));
+  assert.equal(empty.result.status, 0, empty.logs);
+  assert.equal(empty.result.fgosDiff.leaked, false);
+
+  const holding = runRealTestFile(base, [
+    "import fs from 'node:fs';",
+    "import path from 'node:path';",
+    `fs.mkdirSync(path.join(${dir}, 'fresh', 'inner'), { recursive: true });`,
+    `fs.writeFileSync(path.join(${dir}, 'fresh', 'inner', 'f.json'), '{}');`,
+  ].join('\n'));
+  assert.equal(holding.result.status, 1, holding.logs);
+  assert.ok(holding.result.fgosDiff.added.includes('fresh'), 'the added directory that holds a file is named');
   fs.rmSync(base, { recursive: true, force: true });
 });
 
