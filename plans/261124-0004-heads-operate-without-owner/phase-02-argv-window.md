@@ -76,6 +76,15 @@ of `runner.executors.claude.invocations` into `.fgos/config.yaml` returns `confi
 The answer's scope covered the project file only, so the supervisor wrote nothing and asked follow-up `q-owq4jhwng7`
 (supersedes it). Phase 2 stays parked on it.
 
+## Owner answer q-owq4jhwng7 (2026-11-25 09:33)
+
+Option "Lead pins the existing full-confinement bypass invocation". The lead reruns the phase 2 unit once, pinned to
+the standard invocation `claude-herdr-bypass-bwrap` (bwrap with private home, isolated session, own worktree;
+permission bypass) through `fgos run --override`, so `cargo` and `node` run inside the unit. No config change. If
+`--override` cannot pin an invocation, the lead asks again (fallback: the owner's one global config patch). The answer
+allows only that one rerun; it forbids any change to confinement policies, project executor args, git write grants for
+workers, other phases or the plan's scope. Phase 2 is unparked.
+
 ## Decisions taken in this phase (planner's, within PC-D6 and PC-D11)
 
 - **Where the table lives:** `packages/session-host/contracts/head-permissions.v1.json`, compiled into the crate
