@@ -16,7 +16,6 @@ import { fgosProcess } from '../../helpers/cli-entry.mjs';
 
 export const FAKE_HERDR = path.resolve('packages/run-supervisor/rust/tests/fixtures/fake-herdr-pane.py');
 const AGENT = path.resolve('test/run-supervisor/fixtures/terminal-agent.mjs');
-const CONTROLLER = path.resolve('test/run-supervisor/fixtures/terminal-controller.mjs');
 
 // One poll loop for both harnesses (direct-harness owns it); the pane tests wait longer and look less often.
 export { sleep };
@@ -126,15 +125,49 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
       };
     },
 
-    /** The controller as a process: `fgos run`'s own door (`executeAssignment`) for one herdr-spawn seat. */
+    /** The controller as a process: `fgos run` for one herdr-spawn seat (live door; no dead assignment-runner fixture). */
     startController({ env: extraEnv = {}, ...job } = {}) {
-      // The Assignment is built from this checkout's task specs, so the controller starts in it; the work
-      // happens in `repoDir` (the job's cwd).
-      const child = spawn(process.execPath, [CONTROLLER], {
-        cwd: process.cwd(),
-        env: { ...project.env(), ...extraEnv, TERMINAL_CONTROLLER_JOB: JSON.stringify({ repoDir, workId: job.workId ?? `tsk-${name}`, executor: project.executor(), ...job }) },
-        stdio: ['ignore', 'pipe', 'pipe'],
+      const configDir = path.join(repoDir, '.fgos');
+      fs.mkdirSync(configDir, { recursive: true });
+      const executor = job.executor ?? project.executor();
+      const timeoutMs = job.timeoutMs ?? 60_000;
+      writeProjectConfig(repoDir, {
+        runner: {
+          defaultExecutor: 'seat',
+          defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
+          timeoutMs,
+          ...(job.idleTimeoutMs ? { idleTimeoutMs: job.idleTimeoutMs } : {}),
+          executors: {
+            seat: {
+              kind: 'agent',
+              allowCrossProvider: true,
+              providerModel: 'claude',
+              invocations: [{
+                id: 'seat-herdr',
+                via: 'cli',
+                adapter: 'herdr-spawn',
+                command: executor.command,
+                args: executor.args ?? ['{prompt}'],
+                env: executor.env ?? { TERMINAL_AGENT_DIR: agentDir },
+                interactiveMode: executor.interactiveMode ?? { exitCommand: '/exit', kind: 'claude' },
+                ...(executor.confinement ? { confinement: executor.confinement } : {}),
+              }],
+            },
+          },
+          modelPolicies: job.modelPolicies ?? { claude: { standard: 'sonnet' }, seat: { standard: 'sonnet' } },
+          tierFallback: Object.fromEntries(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier'].map((tier) => [tier, ['seat']])),
+          capabilities: { 'docs:write': capabilityServedBy(['seat'], 'docs:write') },
+        },
       });
+      const unitFile = path.join(repoDir, `unit-${job.workId ?? name}.json`);
+      fs.writeFileSync(unitFile, JSON.stringify({
+        id: job.workId ?? `u-${name}`,
+        objective: job.description ?? 'terminal mode test',
+        capability: 'docs:write',
+        writes: [],
+      }));
+      const call = fgosProcess(path.resolve('bin/fgos.mjs'), ['run', '--unit', unitFile, '--dir', repoDir], { ...project.env(), ...extraEnv });
+      const child = spawn(call.command, call.args, { cwd: repoDir, env: call.env, stdio: ['ignore', 'pipe', 'pipe'] });
       let stdout = '';
       let stderr = '';
       child.stdout.on('data', (chunk) => { stdout += chunk; });
@@ -143,8 +176,14 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
       const run = {
         child, exited,
         output: () => ({ stdout, stderr }),
-        /** The one JSON line the controller prints when it settles. */
-        answer: () => { try { return JSON.parse(stdout.trim().split('\n').filter((l) => l.startsWith('{')).pop()); } catch { return null; } },
+        /** Settled attempt result shaped like the old controller JSON line. */
+        answer: () => {
+          const dir = project.attemptDir();
+          if (!dir) return null;
+          const result = readJson(path.join(dir, 'result.json'));
+          if (!result) return null;
+          return { ok: true, result };
+        },
       };
       project.children.push(child);
       return run;
