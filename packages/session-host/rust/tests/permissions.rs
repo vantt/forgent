@@ -46,6 +46,23 @@ fn a_row_of_the_child_replaces_the_inherited_row_of_the_same_prefix() {
 }
 
 #[test]
+fn a_lead_and_a_planner_hold_mailbox_send_and_a_planner_may_mail_a_supervisor() {
+    for persona in ["lead", "planner"] {
+        assert_eq!(
+            decision(persona, "mailbox send --to head:supervisor-x hello"),
+            Decision::Allow,
+            "{persona}"
+        );
+    }
+    let verdict = decide(
+        "planner",
+        &argv("mailbox send --to head:supervisor-x hello"),
+    )
+    .unwrap();
+    assert_eq!(verdict.rule.unwrap().prefix.join(" "), "mailbox send");
+}
+
+#[test]
 fn the_most_specific_prefix_wins() {
     // `questions` reads and is allowed; `questions answer` is a longer prefix and is denied to a planner.
     assert_eq!(decision("planner", "questions --all"), Decision::Allow);

@@ -10,7 +10,7 @@ use std::path::{Component, Path};
 
 use serde_json::Value;
 
-use crate::permissions::{self, Decision, Policy};
+use crate::permissions::{self, Decision, Policy, Rule};
 
 /// Most words one argv may hold, and the longest one word.
 const MAX_WORDS: usize = 64;
@@ -326,12 +326,50 @@ fn screen(
     Ok((words, verdict, patch))
 }
 
+/// What an allowing row puts on the argv's own flags: the flags the host sets, the values a flag may take, the session
+/// target and the limits. `plan` and `can_i` both decide through it, so the answer and the run cannot disagree.
+fn check_row_args(words: &[String], rule: &Rule) -> Result<(), Refused> {
+    if let Some(flag) = rule
+        .refuse_flags
+        .iter()
+        .find(|flag| words.iter().any(|w| permissions::spells(w, flag)))
+    {
+        return refuse(format!("{flag} is the host's to set, not a head's"));
+    }
+    for (flag, allowed) in &rule.args {
+        let mut values = flag_values(words, flag);
+        if values.any(|v| !value_allowed(allowed, v)) {
+            let lead = if flag == "--to" { RECIPIENT_REASON } else { "" };
+            return refuse(format!("{lead}{flag} takes one of {}", allowed.join(", ")));
+        }
+    }
+    if let Some(at) = rule.target_at {
+        if !words.get(at).is_some_and(|w| is_target(w)) {
+            return refuse(
+                "the session target must be a role, handle or slot key (letters, digits and : @ . _ / -, 1 to 128 bytes)",
+            );
+        }
+    }
+    for (flag, most) in &rule.limits {
+        let mut values = flag_values(words, flag);
+        if values.any(|v| v.parse::<u64>().map_or(true, |n| n > *most)) {
+            return refuse(format!("{flag} takes a whole number up to {most}"));
+        }
+    }
+    Ok(())
+}
+
 /// What the table says about `argv` for `persona` (the answer of `fgos can-i`): `allow` or `ask` as the table has it,
 /// and `deny` with the reason for a refusal no persona can lift or a denying row. It runs and files nothing.
 pub fn can_i(persona: &str, argv: &Value, root: &Path) -> (Decision, String) {
     match screen(persona, argv, root) {
         Err(Refused(why)) => (Decision::Deny, why),
         Ok((words, verdict, _)) => {
+            if let (Decision::Allow, Some(rule)) = (verdict.decision, &verdict.rule) {
+                if let Err(Refused(why)) = check_row_args(&words, rule) {
+                    return (Decision::Deny, why);
+                }
+            }
             let line = words.join(" ");
             let why = match (verdict.decision, &verdict.rule) {
                 (Decision::Allow, Some(rule)) => {
@@ -372,33 +410,7 @@ pub fn plan(
                     rule.prefix.join(" ")
                 ));
             }
-            if let Some(flag) = rule
-                .refuse_flags
-                .iter()
-                .find(|flag| words.iter().any(|w| permissions::spells(w, flag)))
-            {
-                return refuse(format!("{flag} is the host's to set, not a head's"));
-            }
-            for (flag, allowed) in &rule.args {
-                let mut values = flag_values(&words, flag);
-                if values.any(|v| !value_allowed(allowed, v)) {
-                    let lead = if flag == "--to" { RECIPIENT_REASON } else { "" };
-                    return refuse(format!("{lead}{flag} takes one of {}", allowed.join(", ")));
-                }
-            }
-            if let Some(at) = rule.target_at {
-                if !words.get(at).is_some_and(|w| is_target(w)) {
-                    return refuse(
-                        "the session target must be a role, handle or slot key (letters, digits and : @ . _ / -, 1 to 128 bytes)",
-                    );
-                }
-            }
-            for (flag, most) in &rule.limits {
-                let mut values = flag_values(&words, flag);
-                if values.any(|v| v.parse::<u64>().map_or(true, |n| n > *most)) {
-                    return refuse(format!("{flag} takes a whole number up to {most}"));
-                }
-            }
+            check_row_args(&words, &rule)?;
             if let Some(bytes) = patch {
                 stage_patch(patch_stage, &bytes)?;
                 words[2] = patch_stage.to_string_lossy().into_owned();

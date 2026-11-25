@@ -78,6 +78,20 @@ fn mail_to_any_other_head_is_refused_recipient_not_allowed() {
 }
 
 #[test]
+fn can_i_answers_from_the_same_check_plan_runs() {
+    use fgos_session_host::forwarder::can_i;
+    use fgos_session_host::permissions::Decision;
+    let ask = |persona: &str, argv: Value| can_i(persona, &argv, Path::new("/p")).0;
+    let mail = |to: &str| json!(["mailbox", "send", "--to", to, "hello"]);
+    assert_eq!(ask("planner", mail("head:lead-y")), Decision::Deny);
+    assert_eq!(ask("planner", mail("head:supervisor-x")), Decision::Allow);
+    assert_eq!(ask("secretary", mail("head:lead-y")), Decision::Allow);
+    let read = |lines: &str| json!(["session", "read", "s1", "--lines", lines]);
+    assert_eq!(ask("supervisor", read("99999")), Decision::Deny);
+    assert_eq!(ask("supervisor", read("50")), Decision::Allow);
+}
+
+#[test]
 fn an_exact_args_value_still_matches_only_exactly() {
     let raise = |kind: &str| {
         plan(

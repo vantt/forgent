@@ -61,6 +61,7 @@
       "mailbox": true,
       "peers": false,
       "rules": [
+        { "prefix": "mailbox send", "decision": "allow" },
         { "prefix": "land", "decision": "allow", "policy": "node" },
         { "prefix": "request result", "decision": "allow", "policy": "node" }
       ]
@@ -71,6 +72,7 @@
       "mailbox": true,
       "peers": true,
       "rules": [
+        { "prefix": "mailbox send", "decision": "allow" },
         { "prefix": "session start", "decision": "allow", "policy": "node" },
         { "prefix": "session stop", "decision": "allow", "policy": "node" },
         { "prefix": "session write", "decision": "allow", "policy": "native" },
