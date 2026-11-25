@@ -43,3 +43,18 @@ plan matches its expected outcome.
 ## Rollback
 
 Revert the CHANGELOG lines; the reports stay as history.
+
+## Owner answers
+
+- `q-xcuwpxa4kn` (owner via the secretary, 2026-11-25 19:57): **widen the footprint by the 5 files.** Seven of the eight
+  `cargo test --workspace` failures on release `33f462be` are this plan's stale tests and records
+  (`plans/reports/supervisor-261125-1838-npm-test-24-failures-on-main.md`). The plan footprint gains exactly
+  `apps/fgos/tests/supervision_verbs.rs`, `apps/fgos/tests/questions_head.rs`,
+  `packages/config/contracts/fixtures/authoring-source.config.json`,
+  `packages/component-authority/model/contracts.yaml` and `test/rust-host/vectors/envelope/version.json`. A planner
+  makes that footprint edit, because the lead's `land --paths` may not change `footprint`. Then one fix unit in a
+  phase-7 worktree changes those 5 files plus `core/config-standard/release.yaml`. The tests assert the fgos argv
+  frame, the negative control uses a table deny, the vector is regenerated with `generate-vectors.mjs`, the fixture and
+  the authority row are added, and the release doc line is rendered from its schema. The lead reviews and lands the
+  unit, and the owner reruns both suites unconfined, one after the other. Out of scope: the other 17 npm failures and
+  the load-sensitive holder-lock test, which belong to other owners.
