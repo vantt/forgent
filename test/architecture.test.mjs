@@ -715,13 +715,8 @@ test('R8 EXECUTOR_ADAPTERS execute-handle lookups do not exist in src/**: every 
     'direct EXECUTOR_ADAPTERS[...] lookup reintroduced in production dispatch code',
   );
 
-  // Only the adapter table's definition, the transport that registers it and the config
-  // metadata reader may reference EXECUTOR_ADAPTERS at all.
-  const allowedReferences = new Set([
-    'src/runner/dispatch/adapters.mjs',
-    'src/runner/dispatch/transport.mjs',
-    'src/runner/dispatch/config-twin.mjs',
-  ]);
+  // No production file may reference EXECUTOR_ADAPTERS: the Node adapter table is gone.
+  const allowedReferences = new Set([]);
   const invalidRefFiles = [];
   for (const file of mjsFilesUnder('src')) {
     const source = fs.readFileSync(path.join(root, file), 'utf8');
@@ -737,19 +732,14 @@ test('R8 EXECUTOR_ADAPTERS execute-handle lookups do not exist in src/**: every 
   );
 });
 
-test('R8 cycle cut: src/runner/dispatch/config.mjs does not import src/runner/dispatch/transport.mjs', () => {
-  const configSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/config-twin.mjs'), 'utf8');
-  const imports = extractImports(configSource);
-  const importsTransport = imports.some((spec) => spec.includes('transport.mjs'));
-  assert.equal(
-    importsTransport,
-    false,
-    'config.mjs must not import transport.mjs (import cycle cut via adapters.mjs leaf)',
-  );
+test('R8 cycle cut between retired Node config and transport modules is gone with those modules', () => {
+  assert.ok(!fs.existsSync(path.join(root, 'src/runner/dispatch/config-twin.mjs')));
+  assert.ok(!fs.existsSync(path.join(root, 'src/runner/dispatch/transport.mjs')));
+  assert.ok(!fs.existsSync(path.join(root, 'src/runner/dispatch/config.mjs')));
 });
 
 test('R8 posture check actually catches an EXECUTOR_ADAPTERS direct call site violation', () => {
-  for (const file of ['src/runner/dispatch/cli.mjs', 'src/runner/dispatch/transport.mjs', 'src/runner/dispatch/confinement/authority-twin.mjs']) {
+  for (const file of ['src/runner/dispatch/worker-session.mjs', 'src/runner/dispatch/provider-adapter.mjs', 'src/runner/loop.mjs']) {
     assert.ok(
       checkExecutorAdapterCallSitePostures([{ file, line: 1, callText: 'EXECUTOR_ADAPTERS[name]()' }]).length > 0,
       `a direct EXECUTOR_ADAPTERS[...] lookup in ${file} must be flagged as a violation`,
@@ -1062,9 +1052,12 @@ test('A4 Work-layer guard catches a dynamic import(), a require() and a re-expor
   }
 });
 
-test('A4 boundary guard: dispatch, execution, the dispatch barrel and src/workflow/** name no domain or Workflow step literal', () => {
+test('A4 boundary guard: dispatch, execution, the dispatch barrel and src/workflow/** name no domain or Workflow step literal', async () => {
   // Domains and step ids are data in domains/*/registry.yaml and domains/*/workflows/*.yaml.
   // Discover them from disk so the guard needs no list of its own to keep in step.
+  // Stage the checkout's native addon so parseYaml can read those files without an activated release.
+  const { ensureGitAddon } = await import('../scripts/lib/git-addon-stage.mjs');
+  ensureGitAddon(process.env, root, true);
   const domainsDir = path.join(root, 'domains');
   const domainNames = fs.readdirSync(domainsDir).filter((d) => fs.statSync(path.join(domainsDir, d)).isDirectory());
   // Work steps are the ones a workflow declares a `phase` for.
@@ -1628,14 +1621,12 @@ test('pattern vocabulary rename is complete with no live retired aliases or dele
   assert.deepEqual(violations, []);
 
   assert.ok(!fs.existsSync(path.join(root, 'src/runner/execution/patterns/presets.mjs')), 'presets.mjs must not exist');
-  assert.ok(!fs.readFileSync(path.join(root, 'src/runner/execution/loops/history-outcome.mjs'), 'utf8').includes('patternName'), 'history-outcome.mjs must not accept patternName');
+  assert.ok(!fs.existsSync(path.join(root, 'src/runner/execution/loops/history-outcome.mjs')), 'history-outcome.mjs must not exist');
 });
 
 test('retired pattern literals appear only in permitted refusal and decoder paths', () => {
   const allowed = new Set([
-    'src/runner/dispatch/config-twin.mjs',
     'src/runner/execution/legacy-seat-read.mjs',
-    'src/runner/execution/patterns/retired-keys.mjs',
   ]);
 
   const targetPattern = /\b(?:research-fan-out-gated|unknown-checker-seat)\b/;
@@ -1809,7 +1800,6 @@ function doorFiles() {
  * that holds none, so the list cannot go stale.
  */
 export const NAMED_DOOR_DEBT = new Set([
-  'decide a dispatch',
   'derive executor facts',
   'doctor readiness registry',
   'global fgOS directory',
@@ -1822,8 +1812,6 @@ export const NAMED_DOOR_DEBT = new Set([
   'process facts: read /proc',
   'resolve the invocation root',
   'run a bounded child and find a program on the search path',
-  'the footprint and write-scope overlap rule',
-  'tool lookup by capability: ask fgos dispatch decide --for (packages/execution/rust/src/tools.rs)',
 ]);
 
 /**
@@ -2157,8 +2145,9 @@ test('door check: a seat composition or a second call of the ranking function ou
 test('door check: a new importer of the Node bind facade fails, each named caller passes, and a dynamic import counts', () => {
   const row = execRow('the Node bind facade has only its named callers');
   const callers = row.allowed.map((e) => e.path);
-  assert.ok(callers.includes('src/runner/loop.mjs') && callers.includes('src/runner/dispatch/plan.mjs'));
-  for (const e of row.allowed) assert.match(e.reason, /^(p-24xw2cwdvo|S6b|S7|doctor row)/, `${e.path} names its owner step`);
+  assert.ok(callers.includes('src/runner/loop.mjs') && callers.includes('src/session-host/head-start.mjs'));
+  assert.ok(!callers.includes('src/runner/dispatch/plan.mjs'));
+  for (const e of row.allowed) assert.match(e.reason, /^(S6b|S7|doctor row)/, `${e.path} names its owner step`);
   for (const text of ["import { bind } from '../runner/execution/bind.mjs';\n", "const m = await import('../runner/execution/bind.mjs');\n", "import { bind } from './bind.mjs';\n"]) {
     assert.equal(doorHits(row, 'src/verbs/seeded.mjs', text).length, 1, text);
     assert.deepEqual(doorHits(row, 'src/runner/loop.mjs', text), [], text);
@@ -2168,7 +2157,7 @@ test('door check: a new importer of the Node bind facade fails, each named calle
 
 test('door check: a Node or Rust twin of an executor derivation fails outside its owner, passes as declared debt, and passes in the crate', () => {
   const row = execRow('derive executor facts');
-  assert.match(row.retiredBy, /^p-24xw2cwdvo:/);
+  assert.match(row.retiredBy, /mailbox lane|S7|capability-config|agent-listing/);
   for (const d of row.debt) assert.match(d.reason, /^twin, same vectors as the contract/, d.path);
   for (const text of ['export function familyOf() {}\n', 'export const lookupExecutor = () => 1;\n', 'function readLlmAccounts() {}\n', 'function detectHerdrPresent() {}\n']) {
     assert.equal(doorHits(row, 'src/runner/seeded.mjs', text).length, 1, text);
@@ -2178,15 +2167,13 @@ test('door check: a Node or Rust twin of an executor derivation fails outside it
   assert.deepEqual(doorHits(row, 'src/runner/dispatch/provider-adapter.mjs', 'export function familyOf() {}\n'), []);
 });
 
-test('door check: the decider has one Rust owner and one declared Node twin', () => {
+test('door check: the decider has one Rust owner and no Node twin', () => {
   const row = execRow('decide a dispatch');
   assert.deepEqual(row.allowed.map((e) => e.path), ['packages/execution/rust/src/decide.rs']);
-  assert.deepEqual(row.debt.map((e) => e.path), ['src/runner/dispatch/plan.mjs']);
-  assert.match(row.retiredBy, /^p-24xw2cwdvo:/);
+  assert.deepEqual(row.debt ?? [], []);
   assert.equal(doorHits(row, 'src/runner/dispatch/other.mjs', 'export function compileDispatchPlan() {}\n').length, 1);
   assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'fn purpose_seat() {}\n').length, 1);
   assert.deepEqual(doorHits(row, 'packages/execution/rust/src/decide.rs', 'fn purpose_seat() {}\n'), []);
-  assert.deepEqual(doorHits(row, 'src/runner/dispatch/plan.mjs', 'export function purposeSeatOf() {}\n'), []);
 });
 
 test('door check: the execution doctor judges live in checks.rs, their Node names are retired, and the retired agy sub-HOME reader path stays governed', () => {
@@ -2231,10 +2218,10 @@ test('door check: the old dispatch hook script name appears only as a legacy mar
   assert.deepEqual(doorHits(row, 'packages/distribution/rust/src/agent_hooks.rs', '.legacy(&["dispatch-decide-hook.mjs"])\n'), []);
 });
 
-test('door check: the tool lookup row names tools.rs as the Rust owner and tool-providers.mjs as debt', () => {
+test('door check: the tool lookup row names tools.rs as the Rust owner and holds no Node twin', () => {
   const row = execRow('tool lookup by capability: ask fgos dispatch decide --for (packages/execution/rust/src/tools.rs)');
   assert.deepEqual(row.allowed.map((e) => e.path), ['packages/execution/rust/src/tools.rs']);
-  assert.deepEqual(row.debt.map((e) => e.path), ['src/runner/dispatch/tool-providers.mjs']);
+  assert.deepEqual(row.debt ?? [], []);
   assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'fn index_is_stale() {}\n').length, 1);
   assert.deepEqual(doorHits(row, 'packages/execution/rust/src/tools.rs', 'fn index_is_stale() {}\n'), []);
 });
@@ -2276,19 +2263,19 @@ test('door check: case admission crosses processes only through the peer adapter
 
 test('door check: a Node import past the Execution seam into the old Execution directories fails outside the named callers', () => {
   const row = execRow('Node callers reach Execution only through its seam, never into the Node Execution closure');
-  assert.equal(row.retiredBy.startsWith('p-24xw2cwdvo'), true);
-  for (const text of ["import { bind } from '../runner/execution/bind.mjs';\n", "const m = await import('../../src/runner/dispatch/config.mjs');\n", "import { requestCancel } from '../run-supervisor/cancel-registry.mjs';\n"]) {
+  assert.match(row.retiredBy, /mailbox lane|S6b|S7|261122-0118/);
+  for (const text of ["import { bind } from '../runner/execution/bind.mjs';\n", "const m = await import('../../src/runner/dispatch/run-timeout.mjs');\n", "import { requestCancel } from '../run-supervisor/cancel-registry.mjs';\n"]) {
     assert.equal(doorHits(row, 'src/verbs/seeded.mjs', text).length, 1, text);
   }
-  assert.equal(doorHits(row, 'src/runner/seeded.mjs', "import { x } from './dispatch/plan.mjs';\n").length, 1, 'a sibling of the closure under src/runner');
+  assert.equal(doorHits(row, 'src/runner/seeded.mjs', "import { x } from './dispatch/run-timeout.mjs';\n").length, 1, 'a sibling of the closure under src/runner');
   assert.deepEqual(doorHits(row, 'src/runner/loop.mjs', "import { bind } from './execution/bind.mjs';\n"), []);
-  assert.deepEqual(doorHits(row, 'src/runner/dispatch/seeded.mjs', "import { x } from '../../run-supervisor/client.mjs';\n"), [], 'inside the closure');
+  assert.deepEqual(doorHits(row, 'src/runner/dispatch/seeded.mjs', "import { x } from '../../run-supervisor/cancel-registry.mjs';\n"), [], 'inside the closure');
   assert.deepEqual(doorHits(row, 'src/verbs/seeded.mjs', "import { x } from '../native/execution-door.mjs';\n"), [], 'the seam itself');
 });
 
 test('door check: a new importer of the Execution seam or a second spawn of its host route fails; each named caller passes', () => {
   const row = execRow("Execution's Node seam");
-  for (const e of row.allowed) assert.match(e.reason, /^(S6b|S7|p-24xw2cwdvo|plan 261122-0118|doctor row|the seam itself|the Node bind facade)/, `${e.path} names its owner step`);
+  for (const e of row.allowed) assert.match(e.reason, /^(S6b|S7|plan 261122-0118|doctor row|the seam itself|the Node bind facade)/, `${e.path} names its owner step`);
   for (const text of ["import { runUnitInHost } from '../native/execution-door.mjs';\n", "const door = await import('../../native/execution-door.mjs');\n", "spawn(bin, ['internal', 'execution', op]);\n"]) {
     assert.equal(doorHits(row, 'src/verbs/seeded.mjs', text).length, 1, text);
   }
