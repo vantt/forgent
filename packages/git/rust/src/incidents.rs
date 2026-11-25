@@ -467,13 +467,8 @@ fn kept_text(kept: &Kept) -> String {
         if kept.cause == "land-authority-mismatch" && kept.dead {
             format!("; only its writer{writer_clause} can recover an attempted Land")
         } else {
-            let writer_desc = if writer.is_empty() {
-                "its writer".to_owned()
-            } else {
-                format!("writer {writer}")
-            };
             format!(
-                "; {writer_desc} is alive or not provably dead; only its writer, or `fgos git recover` once it is gone, can recover it{settled_by}"
+                "; only its writer{writer_clause} (alive or not provably dead) or, once it is gone, `fgos git recover` can recover it{settled_by}"
             )
         }
     } else {
@@ -730,9 +725,18 @@ mod tests {
         assert_eq!(
             message,
             "recovered interrupted Git operations: done-1; warning: Git operations kept for recovery: \
-             land-1 (land-authority-mismatch; writer w-a is alive or not provably dead; only its writer, or `fgos git recover` once it is gone, can recover it); \
-             push-1 (remote-authority-mismatch; writer w-b is alive or not provably dead; only its writer, or `fgos git recover` once it is gone, can recover it, and the next event sync settles it); \
+             land-1 (land-authority-mismatch; only its writer w-a (alive or not provably dead) or, once it is gone, `fgos git recover` can recover it); \
+             push-1 (remote-authority-mismatch; only its writer w-b (alive or not provably dead) or, once it is gone, `fgos git recover` can recover it, and the next event sync settles it); \
              commit-1 (checkout-custody-busy)"
+        );
+        assert_eq!(
+            kept_text(&Kept {
+                operation_id: "c-1".to_owned(),
+                cause: "commit-authority-mismatch".to_owned(),
+                writer: None,
+                dead: false,
+            }),
+            "c-1 (commit-authority-mismatch; only its writer (alive or not provably dead) or, once it is gone, `fgos git recover` can recover it)"
         );
     }
 }
