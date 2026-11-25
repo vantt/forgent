@@ -1,7 +1,8 @@
 ---
 contract: plan-v1
 title: "The leak check of run-tests judges only what the test run wrote"
-status: ready
+status: running
+lead: head:lead-forgent-261124-1945-run-te-f3bee
 priority: P1
 blockedBy: []
 footprint:
@@ -9,7 +10,7 @@ footprint:
   - test/scripts/run-tests.test.mjs
   - scripts/lib/fgos-write-witness.mjs
   - plans/261124-1945-run-tests-fgos-leak-check/
-base: e402520442c7f124576f3403d6e8f380477b436c
+base: ab5b3b1bf700e4f092545905b2b8dc0bb6af6433
 source:
   - plans/discussions/ds-ti2vip43kp-run-tests-fgos-leak-check/DISCUSSION.md
   - p-s6te2445rb
