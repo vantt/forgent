@@ -49,7 +49,7 @@
       "rank": 80,
       "v3Path": "<fgosDir>/locks/reconcile.lock",
       "owner": "4.2",
-      "note": "v1 source (retired Node module reconciliation-planner.mjs localLock); recover/reconcile now live in the run-supervisor and host routes"
+      "note": "v1 source (retired Node module reconciliation-planner.mjs localLock); Rust owner apps/fgos/src/wiring/dispatch_subs/reconcile.rs"
     },
     {
       "name": "recovery",

@@ -532,12 +532,10 @@ export function checkExecuteAssignmentCallSitePostures(sites) {
 // The symbols that run a worker or commit its work. Each may be called only from
 // the files named below; any other caller has to come through runUnit.
 const RUN_DOOR_CALLERS = {
-  executeAssignment: [],
   commitUnitWork: ['scripts/git/e3-bench.mjs'], // Paired E3 baseline calls the real legacy writer.
 };
 // Where each symbol is defined. Its home and the dispatch barrel may define or re-export it; calling it still counts.
 const RUN_DOOR_HOMES = {
-  executeAssignment: 'src/runner/dispatch/assignment-runner.mjs',
   commitUnitWork: 'src/runner/execution/commit-unit-work.mjs',
 };
 
@@ -600,7 +598,7 @@ function runDoorUses() {
   return uses;
 }
 
-test('run-door call sites: executeAssignment and commitUnitWork are called only from their named files', () => {
+test('run-door call sites: commitUnitWork is called only from its named files', () => {
   const uses = runDoorUses();
   assert.deepEqual(checkRunDoorCallers(uses), []);
   // Each named caller still calls it: a door nobody uses any more leaves this table.
@@ -630,16 +628,15 @@ test('run-door call-site guard catches an aliased import, a dynamic import(), a 
   assert.equal(usesSymbol("import * as d from './dispatch.mjs'; d['executeAssignment'](a);", 'executeAssignment'), true);
   assert.equal(usesSymbol("import * as d from './dispatch.mjs'; d.\\u0065xecuteAssignment(a);", 'executeAssignment'), true);
   assert.equal(usesSymbol("if (x) {}\n/'/.test(y); executeAssignment(a); //'", 'executeAssignment'), true);
-  assert.deepEqual(findStarRelaysOfRunDoors('src/runner/relay.mjs', "export * from './dispatch/assignment-runner.mjs';"),
-    ['src/runner/relay.mjs: export * from ./dispatch/assignment-runner.mjs']);
+  assert.deepEqual(findStarRelaysOfRunDoors('src/runner/relay.mjs', "export * from './dispatch/assignment-runner.mjs';"), []);
   assert.equal(findStarRelaysOfRunDoors('src/runner/relay.mjs', "export * as d from './execution/commit-unit-work.mjs';").length, 1);
   assert.deepEqual(findStarRelaysOfRunDoors('src/runner/relay.mjs', "export * from './dispatch/config.mjs';"), []);
-  assert.ok(checkRunDoorCallers({ executeAssignment: ['src/runner/dispatch/cli.mjs', 'src/runner/new.mjs'] })
+  assert.ok(checkRunDoorCallers({ commitUnitWork: ['scripts/git/e3-bench.mjs', 'src/runner/new.mjs'] })
     .some((v) => v.includes('src/runner/new.mjs')));
   assert.ok(checkRunDoorCallers({ commitUnitWork: ['scripts/git/e3-bench.mjs', 'src/runner/loop.mjs'] })
     .some((v) => v.includes('unexpected caller src/runner/loop.mjs')));
   // Work runs on runUnit now: the Work driver calling a run door again is an unexpected caller.
-  assert.ok(checkRunDoorCallers({ executeAssignment: ['src/runner/dispatch/cli.mjs', 'src/runner/operation-choice.mjs'] })
+  assert.ok(checkRunDoorCallers({ commitUnitWork: ['scripts/git/e3-bench.mjs', 'src/runner/operation-choice.mjs'] })
     .some((v) => v.includes('unexpected caller src/runner/operation-choice.mjs')));
 });
 
@@ -732,11 +729,6 @@ test('R8 EXECUTOR_ADAPTERS execute-handle lookups do not exist in src/**: every 
   );
 });
 
-test('R8 cycle cut between retired Node config and transport modules is gone with those modules', () => {
-  assert.ok(!fs.existsSync(path.join(root, 'src/runner/dispatch/config-twin.mjs')));
-  assert.ok(!fs.existsSync(path.join(root, 'src/runner/dispatch/transport.mjs')));
-  assert.ok(!fs.existsSync(path.join(root, 'src/runner/dispatch/config.mjs')));
-});
 
 test('R8 posture check actually catches an EXECUTOR_ADAPTERS direct call site violation', () => {
   for (const file of ['src/runner/dispatch/worker-session.mjs', 'src/runner/dispatch/provider-adapter.mjs', 'src/runner/loop.mjs']) {
@@ -1094,10 +1086,8 @@ test('A4 boundary guard: dispatch, execution, the dispatch barrel and src/workfl
 const WORK_SHAPED_TOKEN = /(?<![\w$])(work|workItem|docsRef)(?![\w$])|(?<![\w$])resolveContentRoot\s*\(/g;
 const WORK_SHAPED_LITERAL = /(['"`])(work|workItem|docsRef)\1/g;
 // A string that is exactly one of those names is allowed only where pinned here, one by one.
-const WORK_SHAPED_LITERAL_ALLOWLIST = {
-  'src/runner/dispatch/plan.mjs': { reason: "the `--work` selector's type name in the DispatchPlan output", literals: ["'work'"] },
-  'src/runner/dispatch/work-item-input.mjs': { reason: 'the option names refuseWorkItemInput refuses', literals: ["'work'", "'workItem'"] },
-};
+// Former plan.mjs / work-item-input.mjs pins retired with those modules; no live pin remains.
+const WORK_SHAPED_LITERAL_ALLOWLIST = {};
 
 /**
  * Identifier escapes (`w`, `\u{77}`, `\x77`) that spell a name character, decoded so an
@@ -1228,10 +1218,10 @@ test('Work-shaped input guard catches each way a Work item can come in, and igno
     "const m = 'the work item';",
   ];
   for (const source of ignored) assert.deepEqual(findWorkShapedInputs('x.mjs', source), [], source);
-  // A pinned literal is allowed once where pinned, and only there.
-  assert.deepEqual(checkWorkShapedInputs('src/runner/dispatch/plan.mjs', "const s = { type: 'work' };"), []);
-  assert.equal(checkWorkShapedInputs('src/runner/dispatch/plan.mjs', "const s = { type: 'work' }; const t = o['work'];").length, 1);
-  assert.equal(checkWorkShapedInputs('src/runner/dispatch/cli.mjs', "const s = { type: 'work' };").length, 1);
+  // No live guarded file pins a Work-shaped literal any more; each hit stays a violation.
+  assert.equal(checkWorkShapedInputs('src/runner/dispatch/assignment-layout.mjs', "const s = { type: 'work' };").length, 1);
+  assert.equal(checkWorkShapedInputs('src/runner/dispatch/assignment-layout.mjs', "const s = { type: 'work' }; const t = o['work'];").length, 2);
+  assert.equal(checkWorkShapedInputs('src/runner/execution/bind.mjs', "const s = { type: 'work' };").length, 1);
 });
 
 test('A4 dynamic-load guard: no computed import()/require(), createRequire or eval in the guarded files beyond the named allowlist', () => {
@@ -1618,7 +1608,7 @@ test('pattern vocabulary rename is complete with no live retired aliases or dele
   assert.deepEqual(violations, []);
 
   assert.ok(!fs.existsSync(path.join(root, 'src/runner/execution/patterns/presets.mjs')), 'presets.mjs must not exist');
-  assert.ok(!fs.existsSync(path.join(root, 'src/runner/execution/loops/history-outcome.mjs')), 'history-outcome.mjs must not exist');
+  // behaviour removed: history-outcome.mjs patternName refusal (module deleted)
 });
 
 test('retired pattern literals appear only in permitted refusal and decoder paths', () => {

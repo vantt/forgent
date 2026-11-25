@@ -1558,6 +1558,7 @@
     "src/runner/dispatch/tier-cell.mjs": "91024f5f01c60fba321325214d08b4773535d538374f6cfad4b2ccb16b1c2436",
     "src/runner/dispatch/worker-session-boot.mjs": "a5fe30cc68b1e796e8ed8c3b9209094f4771ec2b7066be414b989289e6511f8d",
     "src/runner/dispatch/worker-session.mjs": "e7618015166c418f3646b77fca8909ad7e3d8c0012386e91682b68a223b9f4b4",
+    "src/runner/dispatch/write-scope.mjs": "03d78f9de5475f92177906c29c7aba66c339550f8171ed216a2dfe9df143bf06",
     "src/runner/execution/bind.mjs": "e893b0c6f28d11b325559413721712c379425ac721a7d23fc80fe23a5df3f562",
     "src/runner/execution/legacy-seat-read.mjs": "8126d8b92841f992d7347190cd11f2566ffcf60fb23d12b75caf318ebefef754",
     "src/runner/execution/outcome.mjs": "24f6999ee97bc39be66e7b0680dfcced385115f65e6a2e6427627b102dab9794",
@@ -1716,8 +1717,7 @@
     "src/workflow/store.mjs": "91fbf26c7db7db2cf7ef52da45716cd6d171709c5ff23c90dfd5f67632332a3e",
     "src/workflow/unit-handoff.mjs": "392a8b552e60644b8367cc3c63686b0652d08fd8e1effe428ec64ed5e83b28b9",
     "src/workflow/units-source.mjs": "0441a2cd2c2cd8ae37d20b6b5bdd0988e919cb6652defe9a9c104a26f6b2dd4e",
-    "scripts/lib/git-one-door-declarations.v1.json": "81255a361023e7f7e7992f3e311f570f815d50626352815b77ded93b5c2f572d",
-    "src/runner/dispatch/write-scope.mjs": "03d78f9de5475f92177906c29c7aba66c339550f8171ed216a2dfe9df143bf06"
+    "scripts/lib/git-one-door-declarations.v1.json": "81255a361023e7f7e7992f3e311f570f815d50626352815b77ded93b5c2f572d"
   },
   "sites": [],
   "classes": [

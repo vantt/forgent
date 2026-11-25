@@ -64,25 +64,43 @@ Kept for phase 11 (not deleted here): `src/runner/dispatch/write-scope.mjs` — 
 - `footprint-write-scope-overlap-rule.yaml` — keeps the `src/runner/dispatch/write-scope.mjs` debt entry and phase-11 `retiredBy` (restored; phase 11 retires it).
 - `components.yaml` — removed empty `src/run-supervisor/steps/` exception; kept `write-scope.mjs` kernel exception; `collaboration-patterns` paths cleared and `status: retired`.
 - `test/architecture.test.mjs` — `NAMED_DOOR_DEBT` drops decide/tool-lookup; keeps `the footprint and write-scope overlap rule`; seeded cases and R8/pattern guards updated for deleted modules; A4 domain-literal scan stays sync (no test-only addon staging).
+- Second fix on this branch:
+  - `test/runner/assignment-enumerator-guard.test.mjs` — `LAYOUT_OWNER` → `src/runner/dispatch/assignment-layout.mjs`; ALLOWED drops deleted unit-run-history / unit-summary-twin / assignment / run-admission / client listings; `scripts/run-tests.mjs` entry retargeted to live `directoryHoldsFiles: readdirSync(dir)` (same stale key failed on main).
+  - `test/architecture.test.mjs` — dropped `RUN_DOOR_HOMES`/`RUN_DOOR_CALLERS` `executeAssignment` (Node home deleted); emptied `WORK_SHAPED_LITERAL_ALLOWLIST` and reseeded cases on live `assignment-layout.mjs` / `bind.mjs`.
+  - **behaviour removed**: R8 cycle-cut test that only asserted absence of deleted `config-twin.mjs` / `transport.mjs` / `config.mjs`; history-outcome.mjs absence assertion inside the pattern-vocabulary rename test.
+  - `test/runner/run-result-source-scan.test.mjs` — removed exemption for deleted `src/runner/dispatch/run-result.mjs`.
+  - `packages/holder-lock/contracts/lock-registry.v1.json` — reconcile note names Rust owner `apps/fgos/src/wiring/dispatch_subs/reconcile.rs`.
 - No `p-24xw2cwdvo` remains under `packages/component-authority/model/` or `test/architecture.test.mjs`.
 
 ### Contract notes
 
-- `packages/holder-lock/contracts/lock-registry.v1.json` — notes for reconcile / trust-store / live twins rewritten (Rust owner or “v1 source (retired Node module …)”; live mailbox twins still named).
+- `packages/holder-lock/contracts/lock-registry.v1.json` — notes for reconcile / trust-store / live twins rewritten; reconcile note names Rust owner `apps/fgos/src/wiring/dispatch_subs/reconcile.rs` (v1 source retired Node reconciliation-planner.mjs); live mailbox twins still named.
 - `packages/run-supervisor/contracts/recover-actions.v1.json` — description names Rust `adopt.rs`; retired Node recovery-planner noted as v1 source.
 
 ### Census
 
-- `packages/git/contracts/mutation-census.v1.json` lists `src/runner/dispatch/write-scope.mjs` again (digest `03d78f9de5475f92177906c29c7aba66c339550f8171ed216a2dfe9df143bf06`). Full `node scripts/git-one-door-scan.mjs --write-census` could not finish in this confined sandbox (`git-floor-probe-failed: git-driver-io: Read-only file system`); the write-scope file row and payloadDigest were restored against the on-disk file bytes. Decision-citation baseline had no keys for deleted paths; not regenerated.
+- `packages/git/contracts/mutation-census.v1.json` regenerated with `node scripts/git-one-door-scan.mjs --write-census` (payloadDigest `0f0c3d076536d8e1b079641b4cc2f9ede40f2ac17a933e9f7f89a77aa1cf9426`). `src/runner/dispatch/write-scope.mjs` digest remains `03d78f9de5475f92177906c29c7aba66c339550f8171ed216a2dfe9df143bf06` (matches on-disk bytes).
 
 ## Verify
 
 | Command | Result |
 |---|---|
-| `timeout 600 node --test test/runner/write-scope.test.mjs test/git/write-scope-parity.test.mjs test/setup/git-mutation-census.test.mjs` | **pass** |
-| `timeout 600 node --test test/architecture.test.mjs` (no host) | **fail at load**: `host-unavailable` in confined sandbox; not worked around |
-| same suite with existing `FGOS_HOST_BIN=$PWD/target/debug/fgos` only (no addon staging) | **150 pass / 1 fail**: A4 domain-literal scan hits `git-addon-unavailable` / `git-addon-not-shipped` via `parseYaml`. Test left sync as on main; no `ensureGitAddon` workaround. |
-| Live import dangle check over remaining three-dir files | **0 dangling imports** |
-| `git grep p-24xw2cwdvo -- packages/component-authority/model test/architecture.test.mjs` | **empty** |
+| `timeout 600 node --test test/runner/write-scope.test.mjs test/git/write-scope-parity.test.mjs test/setup/git-mutation-census.test.mjs` | **pass** (prior) |
+| `timeout 600 node --test test/runner/assignment-enumerator-guard.test.mjs test/runner/run-result-source-scan.test.mjs` | **pass** (8/8) |
+| architecture subset (`run-door*`, `Work-shaped*`, `Work stays a consumer`, `pattern vocabulary rename`, `R8 posture`, `executeAssignment` posture) with `FGOS_HOST_BIN=$PWD/target/debug/fgos` | **pass** |
+| full `test/architecture.test.mjs` with host, no addon staging | **93 pass / 1 fail**: A4 domain-literal scan hits `git-addon-unavailable` / `git-addon-not-shipped` via `parseYaml` (pre-existing; no staging workaround) |
+| `node scripts/git-one-door-scan.mjs --write-census` | **ok** (census rewritten) |
+| Live import dangle check over remaining three-dir files | **0 dangling imports** (prior) |
+| `git grep p-24xw2cwdvo -- packages/component-authority/model test/architecture.test.mjs` | **empty** (prior) |
 
-`npm test` full suite not run here (phase brief: run alone after this pair); lead owns that outside this unit.
+`npm test` full suite not run here; lead owns that outside this unit.
+
+## Behaviour removed
+
+- R8 cycle cut between retired Node `config` / `transport` modules (test reduced to file-absence checks after the modules were deleted).
+- `history-outcome.mjs` must-not-exist / must-not-accept-`patternName` assertion (module deleted with the dead execution closure).
+
+## Left for others
+
+- `test/holder-lock/driver-unavailable.test.mjs` (outside this footprint) still imports deleted `src/runner/dispatch/adapters.mjs` for `workerBaseEnv`; Rust owner is `packages/execution/engine/src/transport/worker_home.rs`.
+- `spawnWithLocks` in `src/holder-lock/index.mjs` lost its only production caller (`src/run-supervisor/direct-launch.mjs` deleted). `test/holder-lock/facade-multiprocess.test.mjs` still calls it.
