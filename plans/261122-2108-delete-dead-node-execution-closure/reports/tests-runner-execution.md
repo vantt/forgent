@@ -61,3 +61,10 @@ The closure report (`plans/261122-2108-delete-dead-node-execution-closure/report
 3. **Rewired file re-run:**
    Ran `node --test test/runner/execution/bind.test.mjs` through `scripts/run-tests.mjs` in the staged test environment:
    `2 pass, 0 fail`. The dead-module grep over the file is empty.
+
+---
+
+## Owner check
+
+Every backticked Rust test name in this report was checked with `rg 'fn <name>'` on the synced tree and exists: `the_contract_constants_are_the_ones_node_exports`, `an_inline_contract_is_validated_field_by_field_as_node_did`, `the_retired_saved_policy_tier_is_normalised_at_the_load_boundary_as_node_did`, `rotation_and_the_walk_state_follow_the_attempt_chain_as_node_read_it`, `seat_rules_replay`, `bind_facade_builds_the_ask_of_a_seat_from_the_ledger`, `node_era_unit_records_read_through_the_rust_readers`, `loop_helpers_replay`, `retired_pattern_keys_are_found_and_worded_as_node_does`, `record_rules_replay`, `unit_summaries_replay`, `validate_unit_answers_as_node_does_for_every_recorded_input`. `bind.test.mjs` was restored and rewired because `src/runner/execution/bind.mjs` is live.
+
