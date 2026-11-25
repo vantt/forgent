@@ -1504,13 +1504,14 @@ impl GitDriver {
     /// old tip records a loss (the CAS never ran; a retry uses a new id). A ref at the new tip
     /// finishes the tree update only from an index still exactly at the old tree, the same
     /// `read-tree -m -u` the door runs, and reads the result back. Anything else stays pending.
-    pub(crate) fn recover_main_checkout_catch_up(
+    pub(crate) fn recover_main_checkout_catch_up<'a>(
         &self,
         repo: &RepoHandle,
         held: Vec<BorrowedHandle<'_>>,
-        writer: &str,
+        authority: impl Into<crate::recovery::RecoveryAuthority<'a>>,
         id: &str,
     ) -> Result<Outcome> {
+        let authority = authority.into();
         let main = match self.resolve_repo(repo.trusted_main_root(), repo.trusted_main_root())? {
             ResolveRepo::Repository(r) => r,
             ResolveRepo::NotARepository => return Err(failure("land-main-handle-required")),
@@ -1529,7 +1530,7 @@ impl GitDriver {
         let i = chain.intent();
         let main_root = repo.trusted_main_root().to_string_lossy().into_owned();
         if !matches!(&i.kind, OperationKind::RefUpdate { worktree: Some(p) } if *p == main_root)
-            || i.writer_identity != writer
+            || i.writer_identity != authority.authority
             || i.repo_identity != wal.repository_identity()
             || i.authority_binding != catch_up_binding(wal.repository_identity(), repo)?
         {
@@ -1890,13 +1891,14 @@ impl GitDriver {
     }
     /// Observe the existing WAL operation under its original resource authority.
     /// No target CAS, merge, candidate reconstruction or reflog adoption occurs.
-    pub fn recover_land(
+    pub fn recover_land<'a>(
         &self,
         repo: &RepoHandle,
         held_locks: Vec<BorrowedHandle<'_>>,
-        writer: &str,
+        authority: impl Into<crate::recovery::RecoveryAuthority<'a>>,
         id: &str,
     ) -> Result<Receipt> {
+        let authority = authority.into();
         let caller = LockScope::seeded(held_locks).map_err(failure)?;
         if caller
             .holding()
@@ -1922,7 +1924,7 @@ impl GitDriver {
             None
         };
         let intent = if let Some(c) = &compact {
-            compact_land_intent(&wal, c, repo, writer)?
+            compact_land_intent(&wal, c, repo, authority.authority)?
         } else {
             initial.as_ref().unwrap().intent().clone()
         };
@@ -1937,7 +1939,7 @@ impl GitDriver {
                 .iter()
                 .any(|r| matches!(r.phase, Phase::TargetAttempt { .. }))
         });
-        if (!pre_attempt && intent.writer_identity != writer)
+        if (!pre_attempt && intent.writer_identity != authority.authority)
             || intent.authority_binding != binding
             || intent.repo_identity != wal.repository_identity()
         {
@@ -1961,7 +1963,7 @@ impl GitDriver {
                 held(&slot)?,
                 &push_branch,
                 &pushed_candidate,
-                writer,
+                authority.authority,
                 &format!("{id}-pushsrc-drop"),
             );
         }
@@ -1994,7 +1996,10 @@ impl GitDriver {
             .records()
             .iter()
             .any(|r| matches!(r.phase, Phase::TargetAttempt { .. }));
-        if attempted && chain.intent().writer_identity != writer {
+        if attempted
+            && (chain.intent().writer_identity != authority.authority
+                || authority.recorder.is_some())
+        {
             return Err(failure("land-authority-mismatch"));
         }
         if let Some(outcome) = chain.outcome() {

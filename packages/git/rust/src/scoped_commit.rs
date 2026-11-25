@@ -797,14 +797,15 @@ impl GitDriver {
     }
     /// Explicit observe-only recovery. Custody excludes a live cooperative
     /// performer; native index residue or ambiguous HEAD preserves the attempt.
-    pub fn recover_scoped_commit(
+    pub fn recover_scoped_commit<'a>(
         &self,
         repo: &RepoHandle,
         held: Vec<BorrowedHandle<'_>>,
-        writer: &str,
+        authority: impl Into<crate::recovery::RecoveryAuthority<'a>>,
         id: &str,
         filesystem: &dyn wal::FileSystem,
     ) -> Result<Outcome> {
+        let authority = authority.into();
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
         let mut scope = scope(repo, held)?;
@@ -814,7 +815,7 @@ impl GitDriver {
             let intent = Intent::of(
                 &wal,
                 repo,
-                writer,
+                authority.authority,
                 (
                     OperationKind::ScopedCommit(Box::new(wal::ScopedCommitIntent {
                         worktree: root(repo)?.to_string_lossy().into(),
@@ -848,7 +849,7 @@ impl GitDriver {
             repo,
             &scope,
             chain.intent(),
-            (Some(&payload.worktree), Some(writer)),
+            (Some(&payload.worktree), Some(authority.authority)),
             "commit-authority-mismatch",
         )?;
         if let Some(outcome) = chain.outcome() {
@@ -915,9 +916,12 @@ impl GitDriver {
                 if payload.paths.matches(&ours)? {
                     self.stage_paths(repo, &scope, &["reset", "-q", "HEAD"], &ours)?;
                 }
-                Outcome::CommitRejected {
-                    cause: "commit-effect-unknown".into(),
-                }
+                let cause = if let Some(rec) = authority.recorder {
+                    format!("recovered by {rec}; commit-effect-unknown")
+                } else {
+                    "commit-effect-unknown".into()
+                };
+                Outcome::CommitRejected { cause }
             } else {
                 return Err(recovery("commit-effect-unknown"));
             }

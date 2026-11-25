@@ -178,21 +178,22 @@ impl GitDriver {
     }
     /// Publication delegates through its caller-held seal; it cannot be inferred
     /// from a supervisor lock. No network request is replayed here.
-    pub fn reconcile_operation(
+    pub fn reconcile_operation<'a>(
         &self,
         repo: &RepoHandle,
         held: Vec<BorrowedHandle<'_>>,
-        writer: &str,
+        authority: impl Into<RecoveryAuthority<'a>>,
         id: &str,
         publication: Option<&PublicationPort<'_>>,
     ) -> Result<Value> {
+        let authority = authority.into();
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
         if let Some(c) = wal.compacted(id)? {
             return value(c.outcome()?);
         }
         let c = wal.inspect(id)?;
         match &c.intent().kind {
-            OperationKind::Land(_) => value(self.recover_land(repo, held, writer, id)?),
+            OperationKind::Land(_) => value(self.recover_land(repo, held, authority, id)?),
             OperationKind::ScopedCommit(payload) => {
                 let checkout = self.scoped_commit_checkout(repo, &payload.worktree)?;
                 let custody = scoped_commit_custody(&checkout, &held)?;
@@ -201,14 +202,18 @@ impl GitDriver {
                     held.push(BorrowedHandle::new(own).map_err(|e| failure(format!("{e:?}")))?);
                 }
                 let outcome =
-                    self.recover_scoped_commit(&checkout, held, writer, id, &wal::OsFileSystem);
+                    self.recover_scoped_commit(&checkout, held, authority, id, &wal::OsFileSystem);
                 if let Some(own) = custody {
                     let _ = fgos_holder_lock::release(own);
                 }
                 value(outcome?)
             }
-            OperationKind::Sync(_) => value(self.inspect_sync(repo, held, writer, id)?),
-            OperationKind::Restore(_) => value(self.recover_restore(repo, held, writer, id)?),
+            OperationKind::Sync(_) => {
+                value(self.inspect_sync(repo, held, authority.authority, id)?)
+            }
+            OperationKind::Restore(_) => {
+                value(self.recover_restore(repo, held, authority.authority, id)?)
+            }
             OperationKind::WorktreeCreate { .. }
             | OperationKind::WorktreeMove { .. }
             | OperationKind::WorktreeRemove { .. } => {
@@ -227,10 +232,10 @@ impl GitDriver {
                 }
             }
             OperationKind::RefUpdate { .. } | OperationKind::RefDelete => {
-                value(self.recover_ref_operation(repo, held, writer, id)?)
+                value(self.recover_ref_operation(repo, held, authority, id)?)
             }
             OperationKind::RemoteFetch { .. } | OperationKind::RemotePush { .. } => {
-                value(self.recover_transfer(repo, held, writer, id)?)
+                value(self.recover_transfer(repo, held, authority.authority, id)?)
             }
             OperationKind::PublicationCas => value(
                 publication
@@ -238,6 +243,42 @@ impl GitDriver {
                     .recover(repo, id)?,
             ),
         }
+    }
+}
+
+/// Recovery authority pairing the operation writer identity with an optional
+/// settling recorder (when a dead writer's chain is settled by another writer).
+#[derive(Debug, Clone, Copy)]
+pub struct RecoveryAuthority<'a> {
+    pub authority: &'a str,
+    pub recorder: Option<&'a str>,
+}
+
+impl<'a> RecoveryAuthority<'a> {
+    pub fn direct(authority: &'a str) -> Self {
+        Self {
+            authority,
+            recorder: None,
+        }
+    }
+
+    pub fn recovered_by(authority: &'a str, recorder: &'a str) -> Self {
+        Self {
+            authority,
+            recorder: Some(recorder),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for RecoveryAuthority<'a> {
+    fn from(s: &'a str) -> Self {
+        Self::direct(s)
+    }
+}
+
+impl<'a> From<&'a String> for RecoveryAuthority<'a> {
+    fn from(s: &'a String) -> Self {
+        Self::direct(s.as_str())
     }
 }
 
