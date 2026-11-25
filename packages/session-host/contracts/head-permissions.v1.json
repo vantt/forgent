@@ -6,9 +6,9 @@
     "ask": "one five-part owner question carrying the exact argv is filed and the reply is `asked` with the question id",
     "deny": "refused with `argv-not-allowed` (or `verb-not-granted` for a policy verb the persona lacks)"
   },
-  "matching": "Rows are { prefix, decision, policy?, read?, args?, append?, refuseFlags? }; `prefix` is the verb words (`session read`). A row matches an argv whose leading words equal the prefix. The longest matching prefix wins; on a tie the strictest decision wins (deny over ask over allow). An argv no row matches is `ask`. A persona inherits the rows and the cage of its `inherits` persona; a row with the same prefix in the child replaces the inherited one. `policy` is `forward` (default), `node` or `native`. `read: true` marks a verb a rotation successor may use before it holds the role (it changes no store and no file). `append` is argv the forwarder adds after the caller's own; `refuseFlags` are flags the caller may not pass. `args` maps a flag to the values it may take.",
-  "refusedFlags": ["-C", "--cwd", "--root", "--project", "--env"],
-  "protectedConfigPrefixes": ["grant", "confinement", "release"],
+  "matching": "Rows are { prefix, decision, policy?, read?, args?, append?, refuseFlags? }; `prefix` is the verb words (`session read`). A row matches an argv whose leading words equal the prefix. The longest matching prefix wins; on a tie the strictest decision wins (deny over ask over allow). An argv no row matches is `ask`. A persona inherits the rows and the cage of its `inherits` persona; a row with the same prefix in the child replaces the inherited one. `policy` is `forward` (default), `node` or `native`. `read: true` marks a verb a rotation successor may use before it holds the role (it changes no store and no file). `append` is argv the forwarder adds after the caller's own; `refuseFlags` are flags the caller may not pass. `args` maps a flag to the values it may take; `limits` maps a flag to the largest whole number it may take; `targetAt` is the argv index of a session target (a role, handle or slot key) the forwarder checks. `config patch` takes exactly `<file> [--reason <text>]`: the window reads the file (a plain project-relative path outside `.fgos`, no symlink), refuses it when an edit lies on one branch with a `protectedConfigPaths` path (`*` is any one key), and gives the host a private copy of the bytes it checked.",
+  "refusedFlags": ["-C", "--cwd", "--root", "--project", "--env", "--dir"],
+  "protectedConfigPaths": ["runner.confinement", "runner.confinementPolicies", "runner.capabilities.*.confinement", "runner.executors", "gateBypass", "secretary.run", "land", "release"],
   "personas": {
     "head": {
       "writes": [],
@@ -35,7 +35,7 @@
       "mailbox": false,
       "peers": false,
       "rules": [
-        { "prefix": "supervisor raise", "decision": "allow" },
+        { "prefix": "supervisor raise", "decision": "allow", "args": { "--kind": ["coordination-help", "coordination-handoff", "coordination-chore"] } },
         { "prefix": "run", "decision": "allow", "policy": "node" },
         { "prefix": "land", "decision": "allow", "policy": "node" },
         { "prefix": "worktree create", "decision": "allow", "policy": "node" },
@@ -78,16 +78,16 @@
         { "prefix": "slots", "decision": "allow" },
         { "prefix": "supervisor handled", "decision": "allow" },
         { "prefix": "supervisor done", "decision": "allow", "policy": "node" },
-        { "prefix": "supervisor raise", "decision": "allow" },
+        { "prefix": "supervisor raise", "decision": "allow", "args": { "--kind": ["coordination-help", "coordination-handoff", "coordination-chore"] } },
         { "prefix": "supervisor wake", "decision": "allow" },
-        { "prefix": "session read", "decision": "allow" },
-        { "prefix": "session type", "decision": "allow" },
+        { "prefix": "session read", "decision": "allow", "targetAt": 2, "limits": { "--lines": 1000 } },
+        { "prefix": "session type", "decision": "allow", "targetAt": 2 },
         { "prefix": "watcher tune", "decision": "allow" },
         { "prefix": "run", "decision": "allow", "policy": "node" },
         { "prefix": "metrics record", "decision": "allow", "policy": "node" },
         { "prefix": "metrics prune", "decision": "allow" },
         { "prefix": "config patch", "decision": "allow", "append": ["--project-only"], "refuseFlags": ["--global", "--project-only"] },
-        { "prefix": "worktree remove --delivered-to", "decision": "allow" },
+        { "prefix": "worktree remove --delivered-to", "decision": "allow", "args": { "--delivered-to": ["main"] } },
         { "prefix": "git recover", "decision": "allow" },
         { "prefix": "dispatch probe-account", "decision": "allow" }
       ]

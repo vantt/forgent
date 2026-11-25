@@ -1486,14 +1486,28 @@ fn forward(cfg: &Config, request: &Request) -> Outcome {
     let Some(argv) = argv_args(&request.args) else {
         return bad_argv_args();
     };
-    match plan(&cfg.persona, argv, &cfg.cwd) {
+    // A `config patch` runs on a private copy of the bytes the window checked, under the run directory; the name is
+    // unique per request and the copy is removed once the host has answered.
+    let stage = cfg.run_dir.join(format!(
+        "config-patch-{}-{}.yaml",
+        std::process::id(),
+        request
+            .id
+            .chars()
+            .filter(char::is_ascii_alphanumeric)
+            .collect::<String>()
+    ));
+    let planned = plan(&cfg.persona, argv, &cfg.cwd, &stage);
+    let outcome = match planned {
         Err(Refused(why)) => Outcome::Refused {
             code: "argv-not-allowed",
             detail: Some(why),
         },
         Ok(Planned::Run(words)) => forward_exec(cfg, request, &words),
         Ok(Planned::Ask(words)) => ask_owner(cfg, request, &words),
-    }
+    };
+    let _ = std::fs::remove_file(&stage);
+    outcome
 }
 
 /// The host the route children run: the active release's host when the head follows activation, else its start host.

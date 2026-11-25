@@ -56,6 +56,10 @@ pub struct Rule {
     pub refuse_flags: Vec<String>,
     /// A flag's allowed values; a flag not named is unrestricted.
     pub args: BTreeMap<String, Vec<String>>,
+    /// A flag's largest whole-number value.
+    pub limits: BTreeMap<String, u64>,
+    /// The argv index of a session target (a role, handle or slot key) the forwarder checks.
+    pub target_at: Option<usize>,
 }
 
 /// The cage size of a persona: project paths it may write, and whether it binds the mailbox or the peer sessions.
@@ -82,7 +86,7 @@ struct Persona {
 struct Table {
     personas: BTreeMap<String, Persona>,
     refused_flags: Vec<String>,
-    protected_config_prefixes: Vec<String>,
+    protected_config_paths: Vec<String>,
 }
 
 fn strings(value: &Value) -> Vec<String> {
@@ -125,6 +129,16 @@ fn rule_of(row: &Value) -> Rule {
             .as_object()
             .map(|flags| flags.iter().map(|(k, v)| (k.clone(), strings(v))).collect())
             .unwrap_or_default(),
+        limits: row["limits"]
+            .as_object()
+            .map(|flags| {
+                flags
+                    .iter()
+                    .filter_map(|(k, v)| Some((k.clone(), v.as_u64()?)))
+                    .collect()
+            })
+            .unwrap_or_default(),
+        target_at: row["targetAt"].as_u64().map(|at| at as usize),
     }
 }
 
@@ -164,7 +178,7 @@ fn table() -> &'static Table {
         Table {
             personas,
             refused_flags: strings(&doc["refusedFlags"]),
-            protected_config_prefixes: strings(&doc["protectedConfigPrefixes"]),
+            protected_config_paths: strings(&doc["protectedConfigPaths"]),
         }
     })
 }
@@ -197,9 +211,10 @@ pub fn refused_flags() -> &'static [String] {
     &table().refused_flags
 }
 
-/// The config key prefixes `config patch` may never touch through the window.
-pub fn protected_config_prefixes() -> &'static [String] {
-    &table().protected_config_prefixes
+/// The config key paths `config patch` may never touch through the window: a `*` segment is any one key, and an edit
+/// above or below a listed path is refused alike.
+pub fn protected_config_paths() -> &'static [String] {
+    &table().protected_config_paths
 }
 
 /// Whether `word` is a long flag word (`--name`): the window reads the `--name=value` spelling too, which the host's own

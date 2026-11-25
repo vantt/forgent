@@ -80,35 +80,97 @@ fn plain_relative(path: &str) -> bool {
             .all(|c| matches!(c, Component::Normal(_)))
 }
 
-/// The config key a patch item edits sits under a protected prefix: equal to it, or below it as `prefix.key` or `prefix[...]`.
-fn protected(key: &str) -> bool {
-    permissions::protected_config_prefixes()
-        .iter()
-        .any(|prefix| {
-            key == prefix
-                || key
-                    .strip_prefix(prefix.as_str())
-                    .is_some_and(|rest| rest.starts_with('.') || rest.starts_with('['))
-        })
+/// Whether the config key `edit` and the protected path `guard` (a `*` segment stands for any one key) lie on one
+/// branch: one is the other or a prefix of it, so a whole-object edit (`runner`) is caught as well as a leaf
+/// (`runner.executors.x`). A key that does not parse is protected: the window cannot tell what it names.
+fn protected(edit: &str, guard: &str) -> bool {
+    use fgos_yaml_doc::path::parse_path;
+    use fgos_yaml_doc::Segment;
+    let (Ok(edit), Ok(guard)) = (parse_path(edit), parse_path(guard)) else {
+        return true;
+    };
+    edit.iter().zip(guard.iter()).all(|(have, want)| match want {
+        Segment::Key(key) if key == "*" => true,
+        _ => have == want,
+    })
 }
 
-/// Reads the patch file of a `config patch` and refuses it when one edit touches a protected key. The file is read
-/// from `root` before the call, so a head cannot name a key the window does not see; a file the window cannot read or
-/// understand is refused rather than passed on blind.
-fn check_config_patch(argv: &[String], root: &Path) -> Result<(), Refused> {
-    use std::io::Read;
-    let Some(file) = argv.iter().skip(2).find(|w| !w.starts_with('-')) else {
-        return refuse("config patch names no patch file");
+/// The one shape of an allowed `config patch`: `config patch <file> [--reason <text>]`. Returns the file word.
+fn patch_file_of(argv: &[String]) -> Result<&str, Refused> {
+    let shape = "config patch takes exactly <file> [--reason <text>]";
+    let Some(file) = argv.get(2).filter(|w| !w.starts_with('-')) else {
+        return refuse(shape);
     };
+    let tail_ok = match &argv[3..] {
+        [] => true,
+        [flag, _] => flag == "--reason",
+        [one] => one.starts_with("--reason="),
+        _ => false,
+    };
+    if tail_ok {
+        Ok(file)
+    } else {
+        refuse(shape)
+    }
+}
+
+/// Opens `file` under `root` the way a head may name it: a plain project-relative path outside `.fgos`, no symlink on
+/// any component, a regular file. Reads at most [`MAX_PATCH_BYTES`].
+fn read_patch_file(root: &Path, file: &str) -> Result<Vec<u8>, Refused> {
+    use std::io::Read;
+    use std::os::unix::fs::OpenOptionsExt;
     if !plain_relative(file) {
         return refuse("the config patch file must be a plain project-relative path");
     }
-    let mut bytes = Vec::new();
-    let read = std::fs::File::open(root.join(file))
-        .and_then(|f| f.take(MAX_PATCH_BYTES + 1).read_to_end(&mut bytes));
-    if read.is_err() || bytes.len() as u64 > MAX_PATCH_BYTES {
-        return refuse("the config patch file cannot be read by the window");
+    if Path::new(file).components().any(|c| c.as_os_str() == ".fgos") {
+        return refuse("the config patch file may not live under .fgos");
     }
+    let unreadable = || Refused("the config patch file cannot be read by the window".into());
+    let mut walk = root.to_path_buf();
+    for part in Path::new(file).components() {
+        walk.push(part);
+        let meta = std::fs::symlink_metadata(&walk).map_err(|_| unreadable())?;
+        if meta.file_type().is_symlink() {
+            return refuse("the config patch file may not go through a symlink");
+        }
+    }
+    let opened = std::fs::OpenOptions::new()
+        .read(true)
+        .custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK)
+        .open(&walk)
+        .map_err(|_| unreadable())?;
+    if !opened.metadata().map_err(|_| unreadable())?.is_file() {
+        return refuse("the config patch file is not a regular file");
+    }
+    let mut bytes = Vec::new();
+    opened
+        .take(MAX_PATCH_BYTES + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|_| unreadable())?;
+    if bytes.len() as u64 > MAX_PATCH_BYTES {
+        return refuse("the config patch file is over the size the window reads");
+    }
+    Ok(bytes)
+}
+
+/// Copies the checked patch bytes into a new private file at `stage` (owner-only, never overwriting).
+fn stage_patch(stage: &Path, bytes: &[u8]) -> Result<(), Refused> {
+    use std::io::Write;
+    use std::os::unix::fs::OpenOptionsExt;
+    std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .mode(0o600)
+        .open(stage)
+        .and_then(|mut f| f.write_all(bytes))
+        .map_err(|_| Refused("the window could not stage the config patch for the host".into()))
+}
+
+/// Reads the patch file of a `config patch` and refuses it when one edit touches a protected key. Returns the bytes
+/// the window checked: the host is given a private copy of exactly these, never the caller's path, so what is checked
+/// is what is applied. A file the window cannot read or understand is refused rather than passed on blind.
+fn check_config_patch(argv: &[String], root: &Path) -> Result<Vec<u8>, Refused> {
+    let bytes = read_patch_file(root, patch_file_of(argv)?)?;
     let list = fgos_yaml_doc::parse(&bytes, fgos_yaml_doc::Profile::StrictConfig, "patch")
         .and_then(|doc| doc.to_json())
         .map_err(|_| Refused("the config patch file does not parse".into()))?;
@@ -121,16 +183,39 @@ fn check_config_patch(argv: &[String], root: &Path) -> Result<(), Refused> {
             .or_else(|| item.get("unset"))
             .and_then(Value::as_str);
         match key {
-            Some(key) if protected(key) => {
+            Some(key)
+                if permissions::protected_config_paths()
+                    .iter()
+                    .any(|guard| protected(key, guard)) =>
+            {
                 return refuse(format!(
-                    "config key {key} is under a grant, confinement or release prefix"
+                    "config key {key} widens a head's grant, confinement, gates or release"
                 ))
             }
             Some(_) => {}
             None => return refuse("a config patch edit names no key"),
         }
     }
-    Ok(())
+    Ok(bytes)
+}
+
+/// Every value the argv gives `flag`, in `--flag value` and `--flag=value` spelling (a trailing bare flag has none).
+fn flag_values<'a>(words: &'a [String], flag: &'a str) -> impl Iterator<Item = &'a str> {
+    words.iter().enumerate().filter_map(move |(at, w)| {
+        if w == flag {
+            words.get(at + 1).map(String::as_str)
+        } else {
+            w.strip_prefix(flag).and_then(|rest| rest.strip_prefix('='))
+        }
+    })
+}
+
+/// A session target: a role, handle or slot key, as `fgos session read|type` take it.
+fn is_target(word: &str) -> bool {
+    let mut bytes = word.bytes();
+    word.len() <= 128
+        && bytes.next().is_some_and(|b| b.is_ascii_alphanumeric())
+        && bytes.all(|b| b.is_ascii_alphanumeric() || b":@._/-".contains(&b))
 }
 
 /// The refusals no persona can lift, then the table's verdict: the argv's words and the row that decided.
@@ -138,7 +223,7 @@ fn screen(
     persona: &str,
     argv: &Value,
     root: &Path,
-) -> Result<(Vec<String>, permissions::Verdict), Refused> {
+) -> Result<(Vec<String>, permissions::Verdict, Option<Vec<u8>>), Refused> {
     let words = words_of(argv)?;
     if let Some(flag) = permissions::refused_flags().iter().find(|flag| {
         words.iter().any(|w| {
@@ -158,15 +243,17 @@ fn screen(
             words[0]
         ));
     }
-    if words[0] == "config" && words.get(1).map(String::as_str) == Some("patch") {
-        check_config_patch(&words, root)?;
-    }
+    let patch = if words[0] == "config" && words.get(1).map(String::as_str) == Some("patch") {
+        Some(check_config_patch(&words, root)?)
+    } else {
+        None
+    };
     let Some(verdict) = permissions::decide(persona, &words) else {
         return refuse(format!(
             "{persona:?} is not a persona of the permission table"
         ));
     };
-    Ok((words, verdict))
+    Ok((words, verdict, patch))
 }
 
 /// What the table says about `argv` for `persona` (the answer of `fgos can-i`): `allow` or `ask` as the table has it,
@@ -174,7 +261,7 @@ fn screen(
 pub fn can_i(persona: &str, argv: &Value, root: &Path) -> (Decision, String) {
     match screen(persona, argv, root) {
         Err(Refused(why)) => (Decision::Deny, why),
-        Ok((words, verdict)) => {
+        Ok((words, verdict, _)) => {
             let line = words.join(" ");
             let why = match (verdict.decision, &verdict.rule) {
                 (Decision::Allow, Some(rule)) => {
@@ -194,8 +281,16 @@ pub fn can_i(persona: &str, argv: &Value, root: &Path) -> (Decision, String) {
 }
 
 /// Decides one argv from `persona` (a project at `root`): the whole window in one call.
-pub fn plan(persona: &str, argv: &Value, root: &Path) -> Result<Planned, Refused> {
-    let (words, verdict) = screen(persona, argv, root)?;
+///
+/// A `config patch` runs on a private copy of the bytes the window checked, written to `patch_stage` (a path the caller
+/// picks inside its own run directory, and removes after the call); the host never sees the caller's path.
+pub fn plan(
+    persona: &str,
+    argv: &Value,
+    root: &Path,
+    patch_stage: &Path,
+) -> Result<Planned, Refused> {
+    let (mut words, verdict, patch) = screen(persona, argv, root)?;
     match verdict.decision {
         Decision::Deny => refuse(format!("{} is denied to {persona}", words.join(" "))),
         Decision::Ask => Ok(Planned::Ask(words)),
@@ -215,17 +310,27 @@ pub fn plan(persona: &str, argv: &Value, root: &Path) -> Result<Planned, Refused
                 return refuse(format!("{flag} is the host's to set, not a head's"));
             }
             for (flag, allowed) in &rule.args {
-                let value = words.iter().enumerate().find_map(|(at, w)| {
-                    if w == flag {
-                        words.get(at + 1).map(String::as_str)
-                    } else {
-                        w.strip_prefix(flag.as_str())
-                            .and_then(|rest| rest.strip_prefix('='))
-                    }
-                });
-                if value.is_some_and(|v| !allowed.iter().any(|a| a == v)) {
+                let mut values = flag_values(&words, flag);
+                if values.any(|v| !allowed.iter().any(|a| a == v)) {
                     return refuse(format!("{flag} takes one of {}", allowed.join(", ")));
                 }
+            }
+            if let Some(at) = rule.target_at {
+                if !words.get(at).is_some_and(|w| is_target(w)) {
+                    return refuse(
+                        "the session target must be a role, handle or slot key (letters, digits and : @ . _ / -, 1 to 128 bytes)",
+                    );
+                }
+            }
+            for (flag, most) in &rule.limits {
+                let mut values = flag_values(&words, flag);
+                if values.any(|v| v.parse::<u64>().map_or(true, |n| n > *most)) {
+                    return refuse(format!("{flag} takes a whole number up to {most}"));
+                }
+            }
+            if let Some(bytes) = patch {
+                stage_patch(patch_stage, &bytes)?;
+                words[2] = patch_stage.to_string_lossy().into_owned();
             }
             let mut run = words;
             run.extend(rule.append.iter().cloned());
