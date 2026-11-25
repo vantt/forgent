@@ -1,7 +1,8 @@
 ---
 contract: plan-v1
 title: "Agent Context Engine: one checked store of every fgOS rule, built on pkm, handing ASC one effective set with a digest"
-status: draft
+status: running
+lead: lead:ace
 priority: P1
 blockedBy:
   - 261122-2108-delete-dead-node-execution-closure
