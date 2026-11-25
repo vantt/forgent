@@ -26,9 +26,27 @@ made the window refuse every verb a head typed in its shell; and a refused forwa
 3. Live probe: before tables (supervisor, secretary) and after tables (supervisor, secretary, lead, planner, shaper)
    on `3beba73a` are in `head-grant-probe.md`. On that release `release run` fails in all five personas and
    `friction record` / `watcher tune` show `host-failed`; both are fixed by `e36f10cfa`. They are proven only on a
-   release that contains `e36f10cfa`, whose build and activation is the owner's by hand (the recipe is not yet in
-   `.fgos/config.yaml`, so `release run` answers `no-recipe`).
+   release that contains `e36f10cfa`, whose build and activation is the owner's by hand (the recipe is now in
+   `.fgos/config.yaml`).
 4. The `rg` of criterion 4 finds nothing (phase 1).
+
+## Gaps between the permission table and real use (owner order, 2026-11-25)
+
+1. `release run` is `allow` for the supervisor and the secretary, and the `release.*` recipe is now in
+   `.fgos/config.yaml` (`apply` `fgctl upgrade`, `probe` `node test/live/head-grant-probe.live.mjs`, `rollback`
+   `fgctl repair`, `reversible: true`; `checks` `npm test`, `cargo test --workspace`). On release `3beba73a` every fresh
+   head answers `fgos: unknown verb "release"` (exit 4), so no supervisor can release yet. **Fixed in this plan:**
+   `e36f10cfa` registers the `release` route so a head's call reaches its request socket (evidence: the five after tables in `head-grant-probe.md`). It takes effect on the first release that contains `e36f10cfa`, which must be built
+   and activated by hand (owner question `q-l3rskjibl3`), because the release door itself is the broken path.
+2. `session stop` is `allow` for the supervisor, but when the stopped head's request socket is already gone it ends
+   `stop-not-ended` (`src/session-host/head-stop.mjs:58`, "did not end within ... of its stop request"), and the head
+   ends only by SIGTERM from the unconfined session (owner report, 2026-11-25, the probe heads; the supervisor's
+   requests are `supervisor.log` lines 110, 137 and 145 of `head-supervisor-forgent-706`). **Filed as backlog row
+   `p-nyhaakrsvz`** (id minted; the supervisor writes the row, event below). `git recover` is `allow`, but only the
+   writer that started a chain can settle it (`land-authority-mismatch`, "only its writer can recover"): **already
+   filed as `p-o4juyw2ntg`**, whose 2026-11-25 update carries the evidence (9 dead-writer land candidates, 46 GB, disk
+   full at about 14:08). Neither is in this plan's footprint: `session stop` is session-host's stop door and
+   `git recover` is the git component's.
 
 ## Backlog rows
 
@@ -39,6 +57,8 @@ made the window refuse every verb a head typed in its shell; and a refused forwa
 - `p-v6xinnjoxh` (the supervisor looks after every head; someone owns shaper and planner sessions): the charter part
   is done (phase 1); the part left to plan `261122-0056-orchestration-skeleton`'s keeper is closing a shaper or planner
   when it finishes (hand its output on, stop the session, free its seat).
+- `p-nyhaakrsvz` (new): `session stop` cannot end a head whose request socket is gone (gap 2 above).
+- `p-o4juyw2ntg` (existing): `git recover` settles a chain only for its own writer (gap 2 above).
 - `p-7vhbq46shs` (follow-up of phase 2: retire `session.verbs` in the engine, `can-i` outside a head) stays open.
 
 The supervisor updates the backlog.
