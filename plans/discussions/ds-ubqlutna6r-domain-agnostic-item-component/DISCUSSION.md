@@ -32,7 +32,7 @@ discussion: settled
 > - the read port answers "all cards" and "changed since V";
 > - `npm test` and `cargo test --workspace` are green.
 >
-> *Open, blocking only part:* q-s4oy6tinfr (owner approval for `fgos authority declare`; blocks only task-declare-portfolio).
+> *Owner approval:* q-s4oy6tinfr answered 2026-11-25 22:0x: the `portfolio` component declare is approved as settled (A7); nothing blocks the plan.
 > *Raise as backlog items:* T2 deep design; I12 and I14 (Workflow route graph and names).
 > *Sources:* p-2qle2tjflb, ds-wqsrwmiier (N14, N15, D19), ds-an5r4pyyto (D-ADR0082).
 
@@ -45,7 +45,7 @@ arranges one, and a backlog row of its own if one is wanted.
 **Settled 2026-11-25.**
 - A1–A8 hold the design, and §6 is the synthesis.
 - The rows still marked open in §3 are either superseded by a decision (named in each row) or moved out of this topic: I12 and I14 are Workflow's own questions, and T2's deep design is a separate topic.
-- One owner question is open, q-s4oy6tinfr (approval to declare the component). It blocks only the first task.
+- No owner question is open: q-s4oy6tinfr (approval to declare the component) was answered 2026-11-25 22:0x, approved as settled.
 - Next: a planner takes §7.
 
 ## 2. Mục tiêu & đề bài
@@ -236,6 +236,7 @@ and Workflow attach to it without the component knowing them.
 - **2026-11-25 21:27, owner:** the initiative needs a `domain` field. Shaper agreed (domain is known at Init before a workflow is chosen; one domain has several workflows); I4 updated: `domain` required, `workflow` optional until chosen and must belong to the domain.
 - **2026-11-25 21:3x, owner:** better to keep `kind` and derive the workflow, since a kind may later change workflow? Shaper agreed: the mapping already exists (`workflowFor`, `defaultWorkflow`, `resolveWorkflow`); added pinning at leaving Init so a mapping change never moves an initiative in flight. I4 updated.
 - **2026-11-25 21:4x, owner:** ok (kind-derived workflow with pinning). Shaper minted A8, closed or moved out the remaining §3 rows, wrote §6 and §7, raised q-s4oy6tinfr for the component declare, and settled the discussion.
+- **2026-11-25 22:0x, owner (q-s4oy6tinfr):** approve as settled. The `portfolio` component declare (A7) is approved; `task-declare-portfolio` cites this question for `--approved-by`. No owner question remains open.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -341,7 +342,7 @@ Goal:
 - work-state's "status board" is the view only;
 - the work-state/questions overlap on human gates is fixed (I6).
 
-Needs the answer to q-s4oy6tinfr for `--approved-by`, and the plan's Authority map for `--move`. D-IDs: A7, A4. Verify: `fgos authority model` shows the row; `node --test test/architecture.test.mjs` passes.
+Uses the answered q-s4oy6tinfr (approved 2026-11-25) for `--approved-by`, and the plan's Authority map for `--move`. D-IDs: A7, A4. Verify: `fgos authority model` shows the row; `node --test test/architecture.test.mjs` passes.
 
 ### Portfolio file contract v2 {#task-file-contract}
 Goal: version 2 of `packages/portfolio/contracts/portfolio-vocabulary`, with:
