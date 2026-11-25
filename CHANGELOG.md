@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Added: a claude worker started through the standard `claude-cli-bwrap` invocation may now run `cargo`, `node` and `npm test` without an approval prompt.
 - Added: `fgos authority declare --kind component --update --row <json|file>` updates an existing component without changing its id or parent or asking for new approval; declare also re-renders ownership views in the fgOS repository, and authority declare/render write the caller's own checkout, including linked worktrees through the shell helper.
 
 - **Changed**: every door row of the component authority model now needs `severity` (`high`, `medium` or `low`); `fgos authority declare --kind door` refuses a row without it, and `fgos authority locate` returns it on a door match. A project that declared door rows earlier adds the field to each.

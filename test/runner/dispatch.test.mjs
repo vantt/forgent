@@ -28,6 +28,8 @@ import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { dispatchCwdHolder } from '../../src/run-supervisor/cwd-lock.mjs';
 import { moveMachineKeysTo, writeGlobalConfig, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
+import { resolveInvocationRoot } from '../../src/runner/paths.mjs';
+import { parseYaml } from '../../src/util/yaml.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time. No real agent CLI is
@@ -472,16 +474,29 @@ test('the committed .fgos/config.json runner section wires the consolidated gemi
   assert.ok(cfg.modelPolicies.gemini.nano.length > 0);
 });
 
-test('the committed .fgos/config.json runner section grants the worker acceptEdits plus test commands only — no git write grant (the runner commits)', () => {
+test('the worker grant, from the machine default and from the standard confined invocation, is test commands only with no git write grant', () => {
   const cfg = committedRunnerConfig();
   const { args } = cfg.executor;
   assert.ok(args.includes('--permission-mode'));
   assert.equal(args[args.indexOf('--permission-mode') + 1], 'acceptEdits');
   const allowed = args.includes('--allowedTools') ? args[args.indexOf('--allowedTools') + 1].split(',') : [];
-  const testCommand = /^(Skill|Bash\((rtk (proxy )?)?(cargo (build|check|test|clippy|fmt)|node --test|cargo|node):\*\))$/;
+  const testCommand = /^(Skill|Bash\((rtk (proxy )?)?(cargo (build|check|test|clippy|fmt)|node --test|npm test|cargo|node):\*\))$/;
   for (const tool of allowed) assert.match(tool, testCommand, `allowlist grants only test commands, found ${tool}`);
   assert.ok(!args.some((arg) => /git (add|commit)/.test(arg)), 'no git add/commit grant on the default executor');
   assert.ok(!args.includes('--dangerously-skip-permissions'));
+
+  const { root } = resolveInvocationRoot({ cwd: process.cwd() });
+  const standardFilename = path.join(root, 'core', 'config-standard', 'runner.yaml');
+  const standard = parseYaml(fs.readFileSync(standardFilename, 'utf8'), { filename: standardFilename });
+  const bwrapInvocation = standard.runner?.executors?.claude?.invocations?.find((inv) => inv.id === 'claude-cli-bwrap');
+  assert.ok(bwrapInvocation, 'claude-cli-bwrap invocation found');
+  const bwrapArgs = bwrapInvocation.args;
+  assert.ok(bwrapArgs.includes('--allowedTools'));
+  assert.deepEqual(bwrapArgs[bwrapArgs.indexOf('--allowedTools') + 1].split(','), ['Bash(cargo:*)', 'Bash(node:*)', 'Bash(npm test:*)']);
+  assert.ok(bwrapArgs.includes('--permission-mode'));
+  assert.equal(bwrapArgs[bwrapArgs.indexOf('--permission-mode') + 1], 'acceptEdits');
+  assert.ok(!bwrapArgs.some((arg) => /git (add|commit)/.test(arg)), 'no git add/commit grant in claude-cli-bwrap');
+  assert.ok(!bwrapArgs.includes('--dangerously-skip-permissions'));
 });
 
 test('the committed .fgos/config.json runner section no longer declares a coding-classify-intake executor (tsk-49u): tsk-4ns already stripped its only consumer (fgos-submit-assist\'s dispatch-fallback branch), leaving the config entry orphaned, so it was removed via the same ADR0020 hand-commit-to-main path its own rename (tsk-3fj) originally used', () => {
