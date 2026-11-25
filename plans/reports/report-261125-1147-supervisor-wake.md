@@ -27,3 +27,10 @@ the owner's to answer, so nothing was resumed.
 - A `coordination-handoff` from `lead:SUPERVISOR` on plan 2320. Its release also unblocks claude workers for the
   delete-dead lead.
 - After the owner answers `q-hwtikojjei`, route the `question-answered` event to the heads lead.
+
+## Late events
+
+- `4395dd8a2bde015b` (`session-no-result`): the delete-dead lead's xai sync unit for phase 3
+  (`unit-run-1795581954428-615c7d63`, grok-4.5) ended `verdict-inconclusive`. That means no change, which the lead
+  already reads that way. Handled.
+- `11d3fb71155ac6fa`, `603a4a5db74828e1` (`lane-freed`): still 3 of 3 leads and nothing admissible. Handled.
