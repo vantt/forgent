@@ -22,6 +22,8 @@ open owner questions: chưa đặt vào question store (đang thảo luận tr�
 
 ## 1. Trạng thái hiện tại
 
+2026-11-25 14:30 round 4: Q1 chốt thành CAS-D1 (module = đóng gói, component = sở hữu). Q3: chủ dự án chọn nhiều layering có tên riêng, tên chung `layering`, bốn thành viên `import`, `stack`, `product`, `scope` (§3 hàng 9, tạm chốt). Phát hiện: ba luật sẵn có của mô hình khớp đúng ba layering, chỉ `product` chưa có luật (§3 hàng 9a). Đang hỏi: tên mới cho hạng `domain` của `import` (§3 hàng 10). Q2 chưa bàn.
+
 2026-11-25 14:20 round 2: chủ dự án chọn A cho Q1 (component = sở hữu, module = đóng gói vật lý, không thêm hàng module; §3 hàng 7), tạm chốt, chưa mint D-ID. Đang bàn Q3 (các trục tầng). Q2 chưa bàn.
 
 2026-11-25 14:15 round 1: chủ dự án hỏi mô hình đang quản những gì, rồi mở thêm hai hướng: (a) module có phải là cách đóng gói component, (b) "tầng" có nhiều góc nhìn chứ không chỉ một lát cắt, có lần từng bàn tầng chỉ có 3 lớp. Shaper đã dò mô hình và tài liệu (§3 hàng 1-6). Chưa chốt gì. Đề xuất đang chờ chủ dự án phản hồi: tách nghĩa chữ "module" khỏi "component" nhưng chưa thêm hàng module (§3 hàng 3); đặt tên riêng cho từng trục tầng (§3 hàng 9). Mở: Q1 module, Q2 ranh giới sở hữu, Q3 các trục tầng.
@@ -42,14 +44,15 @@ Mô hình `packages/component-authority/model/` là nơi duy nhất trả lời 
 | 6 | **Xung đột giữa các trục (đã ghi sẵn ở vision.md "Known gaps").** (a) Tier đặt Work ở 7, Domain ở 8, tức Domain trên Work; trục (iii) đặt Work trên Domain. Vision ghi đây là khoảng trống, sửa cùng coding cutover. (b) Chữ `domain` ở trục (i) không cùng nghĩa với tầng Domain ở trục (iii): ca "cùng chữ, khác nghĩa". | `vision.md` §6 Known gaps | Rõ là xung đột; cách xử lý thuộc Q3 |
 | 7 | **Q1 — cấp module.** Có cần (a) tách nghĩa chữ, (b) hàng riêng cho đơn vị đóng gói (crate, package) hay `paths` đủ? Ba hướng: A tách nghĩa, không thêm hàng; B thêm hàng module; C giữ nguyên. | hàng 3 | **Chủ dự án chọn A (round 2, 14:15).** Component = đơn vị sở hữu; module = đơn vị đóng gói vật lý (crate, package, thư mục); luật "mỗi module thuộc đúng một component" vào spec và kiểm bằng test qua `paths`; sửa chỗ gộp "component/module" ở `component-boundary.md` §4; không thêm hàng module. Mở lại sang B chỉ khi có câu hỏi thật mà `paths` không trả lời được (vd. một crate cần chủ khác thư mục chứa nó). Tạm chốt; mint D-ID khi giữ nguyên qua round sau. Chưa quyết: nghĩa "module = một file code" ở design principles đổi chữ thế nào (vd. "file" hay "source module"). |
 | 8 | **Q2 — ranh giới sở hữu của component-authority.** Hiện tại có đúng không; có cần xử lý hàng 2 (a), (b) không. | hàng 1-2 | Mở, chưa bàn |
-| 9 | **Q3 — nhiều trục tầng.** Mô hình nên giữ nhiều trục có tên riêng (vd. trục phụ thuộc code, trục tier, trục tầng sản phẩm, trục core/domain), mỗi component khai vị trí trên từng trục; hay giữ một trục và ánh xạ các trục kia sang? Trục (iii) có nên vào mô hình để có phép kiểm đặt chỗ không? | hàng 4-6 | Mở; **đề xuất shaper, chưa chốt:** mỗi trục một tên riêng, bỏ chữ "layer" chung chung, đổi tên hạng `domain` của trục (i) để hết trùng nghĩa |
+| 9 | **Q3 — nhiều trục tầng.** Mô hình nên giữ nhiều trục có tên riêng (vd. trục phụ thuộc code, trục tier, trục tầng sản phẩm, trục core/domain), mỗi component khai vị trí trên từng trục; hay giữ một trục và ánh xạ các trục kia sang? Trục (iii) có nên vào mô hình để có phép kiểm đặt chỗ không? | hàng 4-6 | **Chủ dự án chọn A (round 3, 14:22) với tên chung `layering` (round 4, 14:28).** Bốn layering: `import` (file được import file nào: entry, use-case, infra, `domain`→cần tên mới, kernel), `stack` (component trên/dưới: tier 0-9), `product` (tầng sản phẩm: Execution, Workflow, Domain, Work), `scope` (core hay `domains/<name>`). Chữ "layer" không đứng một mình, luôn kèm tên layering. Tránh `view` (đã nghĩa bản chiếu), `lens` (đã nghĩa mối quan tâm của ghế panel). Phép kiểm đặt chỗ của `product` chờ coding cutover; `scope` suy từ `paths`. Tạm chốt; mint D-ID khi giữ qua round sau. Còn mở: tên mới cho hạng `domain` của `import` (hàng 10). |
+| 9a | **Ba luật sẵn có khớp đúng ba layering (round 4).** `layers.yaml` `rules`: `one-directional-layer` = luật của `import`; `tier-downward` = luật của `stack`; `domain-siloing` (core không import domain cụ thể, domain không import domain khác; `test/architecture.test.mjs:384`) cùng danh sách `domains` = luật của `scope`. Tức là mô hình đã ngầm có ba layering, chỉ thiếu tên; `product` là layering duy nhất chưa có luật nào. | `packages/component-authority/model/layers.yaml:8-15`; `test/architecture.test.mjs:10,384,409` | Rõ |
+| 10 | **Tên mới cho hạng `domain` của layering `import`.** 23 component đang ghi `layer: domain`. Nghĩa (hexagonal): logic thuần của component, không I/O. Không được dùng `core` (đã là thành viên của `scope`), tránh `model` (đã nghĩa mô hình authority và model LLM). Ứng viên: `logic`, `pure`; 0 lần dùng trong mô hình. | `layers.yaml:6`; `components.yaml` | Mở |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Quyết định | Ngày | Nguồn |
 |---|---|---|---|
-
-Chưa có.
+| CAS-D1 | **Module là đơn vị đóng gói, component là đơn vị sở hữu.** Module = đơn vị đóng gói vật lý (crate, package, thư mục); mỗi module thuộc đúng một component, ghi vào spec và kiểm bằng test qua `paths`; không thêm hàng module vào mô hình; sửa chỗ gộp "component/module" ở `docs/platform/component-boundary.md` §4. Mở lại chỉ khi có câu hỏi thật mà `paths` không trả lời được. | 2026-11-25 | Chủ dự án chọn A round 2, giữ nguyên qua round 3-4; §3 hàng 7 |
 
 ## 5. Q&A log
 
@@ -59,6 +62,8 @@ Chưa có.
 - 2026-11-25 14:10 — Chủ dự án: "module có phải là cách đóng gói component?" Shaper: theo `component-boundary.md` §4 thì đúng, nhưng repo còn dùng "module" nghĩa một file code; thực tế component = sở hữu, package/crate/thư mục = đóng gói (§3 hàng 3).
 - 2026-11-25 14:15 — Chủ dự án: "ok, ghi vào ds-zfqskcns7j đi em."
 - 2026-11-25 14:15 — Shaper đặt Q1 với ba hướng A (tách nghĩa, không thêm hàng), B (thêm hàng module), C (giữ nguyên), nghiêng A. Chủ dự án: "A".
+- 2026-11-25 14:20 — Shaper đặt Q3 với ba hướng A (nhiều trục có tên riêng trong mô hình), B (một trục chính, các trục kia ánh xạ sang), C (chỉ đặt tên lại), nghiêng A. Chủ dự án: "nghiêng về A, nhưng cần một tên chung cho các trục không thì sẽ không nhớ nổi trục này". Shaper dò chữ: `view` đã dùng 2579 lần (nghĩa bản chiếu, L3 "db là view"), `lens` đã là một mối quan tâm của ghế panel, `axis` 519 lần nghĩa chung chung; đề xuất tên chung (§3 hàng 9).
+- 2026-11-25 14:25 — Shaper đề xuất tên chung `layering` (hoặc giữ `layer` kèm tên bắt buộc), nghiêng `layering`. Chủ dự án: "ok layering".
 
 ## 6. Thiết kế đã chốt {#design}
 
