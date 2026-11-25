@@ -551,7 +551,7 @@ The situation: commit `df7b73490` made `fgos workflow propose` read each closed 
 
 | Step | Input or result |
 |---|---|
-| Touched code | `src/workflow/case-inherit.mjs`, `src/workflow/propose-classify.mjs`, `src/runner/dispatch/write-scope.mjs` |
+| Touched code | `src/workflow/case-inherit.mjs`, `src/workflow/propose-classify.mjs`, `src/runner/dispatch/write-scope.mjs` (retired; last at `74b608ad8`) |
 | Locating values | `area = workflow`, `question = current-truth` (both from the writer) |
 | Narrowing values | `cli-verb:fgos workflow propose` (3 sections, weight 7.54), `path:src/runner/dispatch/write-scope.mjs` (6 sections, 6.85); `globsMeet`, `inheritableMilestones` and the two workflow paths appear in no section yet |
 | Region | 3105 sections; 3 share a value |
@@ -563,7 +563,7 @@ Ranking:
 | 7.54 | `docs/platform/workflow/spec.md`, 7.8 "Cửa vào của conductor" | `fgos workflow propose` |
 | 7.54 | same spec, 8 "Tác động lên `fgos run` và `fgos workflow start`" | `fgos workflow propose` |
 | 7.54 | same spec, 9 "Component, hợp đồng và ngân sách Node" | `fgos workflow propose` |
-| 6.85, outside the region | `docs/platform/git/spec.md`, 6 "N7 and RUL84 (one write-scope matcher)" | `src/runner/dispatch/write-scope.mjs` |
+| 6.85, outside the region | `docs/platform/git/spec.md`, 6 "N7 and RUL84 (one write-scope matcher)" | `src/runner/dispatch/write-scope.mjs` (retired; last at `74b608ad8`) |
 
 What it shows:
 
