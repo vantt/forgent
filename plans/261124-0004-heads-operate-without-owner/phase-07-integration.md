@@ -46,6 +46,9 @@ Revert the CHANGELOG lines; the reports stay as history.
 
 ## Owner answers
 
+- `q-uxrx52jm2q` (owner, 2026-11-25 20:40): **accept three personas.** Phase 7 closes on the lead, supervisor and
+  secretary probes. No planner or shaper head was live, and starting one needs a discussion. The planner and shaper
+  rows are probed the next time one of those heads starts for real work; this plan does not wait for them.
 - `q-xcuwpxa4kn` (owner via the secretary, 2026-11-25 19:57): **widen the footprint by the 5 files.** Seven of the eight
   `cargo test --workspace` failures on release `33f462be` are this plan's stale tests and records
   (`plans/reports/supervisor-261125-1838-npm-test-24-failures-on-main.md`). The plan footprint gains exactly
