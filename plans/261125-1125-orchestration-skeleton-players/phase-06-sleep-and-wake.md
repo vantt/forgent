@@ -1,6 +1,6 @@
 # Phase 6: Sleep and wake of players
 
-Depends on phases 5, 16 and 17. Decisions: OS-D18 (sleep ends the session by default; a head talking with a person
+Depends on phase 17, and on phases 5 and 16 of plan `261122-0056-orchestration-skeleton` (the keeper plan, done before this plan starts). Decisions: OS-D18 (sleep ends the session by default; a head talking with a person
 may sit in its pane and be woken by mailbox or wake, up to a configured limit, then falls back to the default). The
 limit is decided in plan.md: `watcher.conversationSleepMaxSec`, default 43200. Amended 2026-11-23 by the settled
 discussion `ds-6psli4i4xl-workspace-ownership-survey-for-sleeping-leads` (D1 to D3, its hand-off items (a) to (f)): a

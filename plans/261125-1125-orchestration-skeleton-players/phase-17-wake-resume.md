@@ -1,6 +1,6 @@
 # Phase 17: A woken head resumes its kept transcript, or opens fresh with the handoff
 
-Depends on phase 16. Decision: D3 of the settled discussion
+Depends on phase 16 of plan `261122-0056-orchestration-skeleton` (the keeper plan, done before this plan starts). Decision: D3 of the settled discussion
 `ds-6psli4i4xl-workspace-ownership-survey-for-sleeping-leads` (§4, owner 15:56): on wake, resume the kept transcript
 in the new launch's private home when the context was below `sessionRotation` soft and the same provider binds, with a
 wake line to re-read plan and git first; otherwise, or when the transcript was not kept or the resume is refused, a

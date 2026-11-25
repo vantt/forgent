@@ -1,6 +1,6 @@
 # Phase 8: Scheduling records read port and command port
 
-Depends on phase 5. Decision: OS-D20 ports 2 and 3 (portfolio read of
+Depends on phase 2 (both write `command-manifest.json` and `gateway.rs`), and on phase 5 of plan `261122-0056-orchestration-skeleton` (the keeper plan, done before this plan starts). Decision: OS-D20 ports 2 and 3 (portfolio read of
 scheduling records through CLI `--json` and gateway REST; the command port uses existing verbs).
 
 ## Inputs

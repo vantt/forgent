@@ -1,6 +1,9 @@
 # Phase 16: Sleep record in the head record; one read-only view of live and sleeping agents
 
-No dependency. Decisions: D2 and D3 (first half) of the settled discussion
+No dependency inside this plan. It runs after plan `261124-2143-head-lifecycle-events` (owner order 2026-11-25:
+both write `src/session-host/head-stop.mjs`); re-read `head-stop.mjs` and its test at this phase's base and build on
+2143's lifecycle events, never around them. Phase 6, which calls this phase from the keeper, is now in plan
+`261125-1125-orchestration-skeleton-players`. Decisions: D2 and D3 (first half) of the settled discussion
 `ds-6psli4i4xl-workspace-ownership-survey-for-sleeping-leads` (§4): the sleep state lives only in the Session Host's
 head record `placement.json`; one read-only view, owned by the Session Host, joins Identity's live sessions with the
 head records; every sleep writes a handoff with reason `sleep`. Identity's directory is not changed (its locked I3b

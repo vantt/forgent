@@ -1,5 +1,7 @@
 # Phase 2: Signal entry: wake reasons and the signed webhook route
 
+Needs phases 1 and 3 of plan `261122-0056-orchestration-skeleton` (the keeper plan, done before this plan starts): admission's wake door and the Questions `answer_external` use case.
+
 Decisions: OS-D8 (one raise door; wake carries `--trigger <kind> --ref <id>`; the gateway has one signed webhook
 route that only calls the raise door; event id from source plus delivery id; payload is untrusted), OS-D16 (an
 outside answer enters through the raise door), OS-D20 port 1.

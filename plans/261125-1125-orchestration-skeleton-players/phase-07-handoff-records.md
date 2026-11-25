@@ -1,6 +1,6 @@
 # Phase 7: Handoff as close one record, open the next
 
-Owner confirmed OS-D12 and OS-D19 as final on 2026-11-22 (`q-e2bpqz65c2`). Depends on phases 5 and 6. Decision: OS-D19 (a
+Owner confirmed OS-D12 and OS-D19 as final on 2026-11-22 (`q-e2bpqz65c2`). Depends on phase 6, and on phase 5 of plan `261122-0056-orchestration-skeleton` (the keeper plan, done before this plan starts). Decision: OS-D19 (a
 handoff between steps closes one record with `outcome: done` and the domain opens the next with `needs`; the payload
 and trust boundary stay per `routing-handoff.md`). The three paths of today converge on this shape.
 
