@@ -200,3 +200,25 @@ cd /home/vantt/projects/forgent && fgos run "Implement phase 2 of plan plans/261
   across every step, the latest at 10:25. It was still `running` after the lead's 12 waits, so phase 2 is parked on this
   ticket. On wake the lead reads `fgos request result c-4030-1795576677441`, reviews `git diff origin/main...HEAD` of
   `261124-0004-heads-operate-without-owner/p02` against this brief, and lands it.
+- 2026-11-25 10:55 (lead): ticket `c-4030-1795576677441` settled at 10:39 as `execution-failure`,
+  `commit-failed:git-error`. The producer (claude, sonnet, 21.6 min) passed. It reports steps 1-8 done, green
+  `cargo test -p fgos-session-host` and `-p fgos-run-supervisor`, clippy clean, and the three session-host node tests green.
+  Its work is uncommitted in the p02 worktree: 32 paths, all inside `--writes`, none outside.
+  What the lead found about the commit:
+  - The native scoped commit (operation `77035353-68e4-41c3-8049-dabd4d24013f`) ran `git commit`; git refused it and the
+    door rolled the index back (p02 reflog `reset: moving to HEAD` at 10:39:40). The WAL keeps only the cause
+    `commit-rejected`. That is the cause the driver gives (`checkout_commit_failure`, `packages/git/rust/src/driver.rs`)
+    when git fails and the pre-commit replay does not report `hook-refused`. Git's stderr reached neither the unit record
+    nor the WAL, so the exact git message is lost. The doc-health check of the staged
+    `docs/platform/run-supervisor/spec.md` remains a suspect; the lead cannot run it inside its sandbox (it needs a cargo build).
+  - Separately, the runner could never have committed the whole phase. The commit baseline listed 9 paths that were
+    already dirty before the round (the earlier half-done start: `permissions.rs`, `forwarder.rs`, both tests,
+    `lib.rs`, `Cargo.toml`, the contract, `head_request.rs` and its test), and the scoped commit excludes baseline-dirty
+    paths (`scoped_commit.rs`, `excluded`). Every rerun in this worktree now has all 32 paths as baseline-dirty and would
+    commit nothing.
+  Worker's open items: the step 9 `rg` pass check still finds 4 allowance lines (head-start's seam import; `bind` and
+  `readAccountStateOverlay` have no door; head-request's three imports need a seam-row entry). It also says
+  `packages/execution/engine/src/transport_round/session_attempt.rs` with `tests/transport_round.rs` and `bin/fgos.mjs`
+  (`can-i` outside a head) need edits outside the plan footprint, and that the `CHANGELOG.md` line belongs to phase 7.
+  The commit by hand, from outside any confined head:
+  `git -C /home/vantt/projects/forgent-worktrees/261124-0004-heads-operate-without-owner-p02 add -- Cargo.lock apps/fgos/src/routing.rs apps/fgos/src/wiring/unit_run_host/session_attempt.rs apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs docs/platform/run-supervisor/spec.md packages/git/node-addon/Cargo.toml packages/git/node-addon/src/lib.rs packages/host-runtime/contracts/command-manifest.json packages/host-runtime/contracts/command-routes.json packages/run-supervisor/contracts/envelope.v3.json packages/run-supervisor/contracts/head-request.v1.json packages/run-supervisor/rust/src/head_request.rs packages/run-supervisor/rust/tests/head_request.rs packages/session-host/rust/Cargo.toml packages/session-host/rust/src/lib.rs src/cli/command-registry.mjs src/native/door.mjs src/runner/dispatch/session-attempt.mjs src/session-host/head-grants.mjs src/session-host/head-request-client.mjs src/session-host/head-request.mjs src/session-host/head-start.mjs test/live/head-grant-probe.live.mjs test/session-host/head-grants.test.mjs test/session-host/head-request.test.mjs test/session-host/head-start.test.mjs packages/git/node-addon/src/session_host.rs packages/session-host/contracts/head-permissions.v1.json packages/session-host/rust/src/forwarder.rs packages/session-host/rust/src/permissions.rs packages/session-host/rust/tests/forwarder.rs packages/session-host/rust/tests/permissions.rs  && git -C /home/vantt/projects/forgent-worktrees/261124-0004-heads-operate-without-owner-p02 commit -m "feat(session-host): one argv window and one permission table in Rust for head requests"`
