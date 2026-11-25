@@ -13,7 +13,7 @@ import {
   acquireAttemptLocks, attemptStepEnv, readLaunchSettings, resolveAttemptHost, terminalSocketPath,
 } from '../../run-supervisor/direct-launch.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
-import { HEAD_REQUEST_SOCKET_ENV } from '../../session-host/head-grants.mjs';
+import { HEAD_REQUEST_SOCKET_ENV, holdsHeadTable } from '../../session-host/head-grants.mjs';
 import { withDefaultExecutor } from './config-twin.mjs';
 import { createCredentialRenewal } from './provider-credential-renewal.mjs';
 import { BUILTIN_POLICIES } from './confinement/policies.mjs';
@@ -69,7 +69,7 @@ export { headOf };
 /**
  * Starts the session attempt of `key` and returns once the supervisor has bound it; it never waits for the session to
  * end. `binding` is `bind()`'s answer for the seat (executor, invocation, model, tier, account); `grant` is
- * `grantOf(role)`; `opening` is typed verbatim; `ceilingMs` bounds the session; `env` is added to the agent's launch
+ * `grantOf(role)` (`{ writes, mailbox, peers }`); `opening` is typed verbatim; `ceilingMs` bounds the session; `env` is added to the agent's launch
  * environment. The attempt directory is `.fgos/assignments/<key>/runs/01`, so the account lease lives exactly as long as
  * the attempt. Returns `{ placement: { host: 'terminal', key }, runDir, attemptId }`. A refusal before the handover gives
  * back what was taken (pane, private home, lease, locks) and throws `SessionLaunchError`.
@@ -114,8 +114,8 @@ export async function launchSessionAttempt({ binding, runnerConfig, key, role, g
       throw new SessionLaunchError('lease-refused', `no account could be leased for ${role}: ${lease.selection.reason}${lease.selection.detail ? ` (${lease.selection.detail})` : ''}`, { refusal: lease.selection });
     }
     attempt.lease = lease.selection;
-    // A role whose grant has no verbs gets no socket at all; one with verbs gets the socket its supervisor listens on.
-    const requestSocketPath = grant.verbs.length > 0 ? terminalSocketPath(`${attemptId}-req`) : null;
+    // A persona the head permission table does not name gets no socket at all; one it names gets the socket its supervisor listens on.
+    const requestSocketPath = holdsHeadTable(headOf(env).persona) ? terminalSocketPath(`${attemptId}-req`) : null;
     const confinementRequirement = requirementOf(grant);
     const providerCapacity = await renewLeasedLogin(attempt.lease, { cfg, opts: launchOpts, executorId, pinnedInvocationId, confinementRequirement });
 
@@ -137,7 +137,7 @@ export async function launchSessionAttempt({ binding, runnerConfig, key, role, g
       dispatchBatchKey: beside ?? attemptId,
       mutating: false,
       settings: readLaunchSettings(projectRoot),
-      session: { role, verbs: [...grant.verbs], writes: [...grant.writes], ...(requestSocketPath ? { requestSocketPath } : {}), ...headOf(env) },
+      session: { role, writes: [...grant.writes], ...(requestSocketPath ? { requestSocketPath } : {}), ...headOf(env) },
       requestSocket: requestSocketPath ?? undefined,
       ceilingMs,
       opening,

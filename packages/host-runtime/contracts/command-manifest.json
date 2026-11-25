@@ -3079,6 +3079,24 @@
       "deprecated": null
     },
     {
+      "name": "can-i",
+      "invoke": "fgos can-i <verb> [args...]",
+      "description": "Ask what the head permission table decides for an `fgos` argv, without running it. Answered by the head's own run supervisor through its request socket, so it works only inside a head session (a session with FGOS_HEAD_REQUEST_SOCKET); the table is `packages/session-host/contracts/head-permissions.v1.json`, read with the persona of the session's digest-protected envelope. Answers {decision: allow|ask|deny, reason}: `allow` runs when sent, `ask` files one owner question carrying the argv, `deny` is refused. Not paginated.",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "examples": [
+        "fgos can-i session read head:planner-x",
+        "fgos can-i config patch patch.yaml"
+      ],
+      "touchesState": false,
+      "externalEffect": false,
+      "paginated": false,
+      "deprecated": null
+    },
+    {
       "name": "watcher",
       "invoke": "fgos watcher <tick|tune>",
       "description": "The project watcher (docs/platform/supervision): `tick` runs one pass, served natively by the Rust host under the `watcher` repo lock. `tune` arms or disarms a definition and changes its thresholds or pace within the config bounds. It runs the configured watcher definitions, raises one supervision event per fired row (a duplicate of a still-open row is counted, not raised), sends the notify kinds through the mailbox and wakes the supervisor when a trigger is unhandled. An overrunning tick makes the next one `skipped-busy`, never concurrent.",

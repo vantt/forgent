@@ -128,8 +128,23 @@ impl SessionRequest {
                 Some(_) => Err(format!("grant.{key} must be a boolean")),
             }
         };
+        // The grant is the cage size (writes, mailbox, peers); what the persona may ask is the permission table's.
+        // The engine still gates the request socket on a non-empty verb list, so the table's allowed rows of the
+        // head's persona stand in until the engine reads the persona itself.
+        let persona = optional(request, "env")
+            .and_then(|env| env.get("FGOS_HEAD_PERSONA"))
+            .and_then(Value::as_str)
+            .or_else(|| {
+                request
+                    .get("role")
+                    .and_then(Value::as_str)
+                    .and_then(fgos_session_host::permissions::persona_of_role)
+            })
+            .filter(|persona| fgos_session_host::permissions::personas().contains(persona));
         let grant = HeadGrant {
-            verbs: strings(grant.get("verbs"), "grant.verbs")?,
+            verbs: persona
+                .map(fgos_session_host::permissions::allowed_verbs)
+                .unwrap_or_default(),
             writes: strings(grant.get("writes"), "grant.writes")?,
             mailbox: flag("mailbox")?,
             peers: flag("peers")?,

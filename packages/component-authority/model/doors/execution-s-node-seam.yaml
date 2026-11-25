@@ -123,8 +123,11 @@ allowed:
     count: 1
     reason: "S7: the Node agent definition reader names the runner config error class"
   - path: src/session-host/head-start.mjs
+    count: 2
+    reason: "S7: the session head start launches its session through launchSessionInHost and reads the assignment runs and the runner config"
+  - path: src/session-host/head-request.mjs
     count: 1
-    reason: "S7: the session head start launches its session through launchSessionInHost"
+    reason: "S7: the head request reads the assignment directory, the stored unit summary and the unit-run facts"
   - path: src/runner/dispatch/assignment-layout.mjs
     count: 1
     reason: "plan 261122-0118 tail: a facade for the session-host callers (head request), removed when they import the door"

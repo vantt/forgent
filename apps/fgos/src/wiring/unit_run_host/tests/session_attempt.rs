@@ -51,7 +51,7 @@ fn session_launch() {
         "runnerConfig": runner(&bin),
         "key": "head-planner-p-1",
         "role": "head:planner-p",
-        "grant": { "verbs": ["questions"], "writes": [] },
+        "grant": { "writes": [] },
         "opening": "read the portfolio",
         "ceilingMs": 3_600_000,
         "env": { "FGOS_HEAD_PERSONA": "planner", "FGOS_HEAD_NAME": "p", "FGOS_HEAD_GEN": "1" },
@@ -80,7 +80,6 @@ fn session_launch() {
     let envelope = read(&assignment.join("seen-envelope.json"));
     assert_eq!(envelope["attemptId"], placed.attempt_id.as_str());
     assert_eq!(envelope["session"]["role"], "head:planner-p");
-    assert_eq!(envelope["session"]["verbs"], json!(["questions"]));
     assert_eq!(envelope["session"]["persona"], "planner");
     assert!(envelope["session"]["requestSocketPath"].is_string());
     assert!(

@@ -2,20 +2,21 @@
 /**
  * test/live/head-grant-probe.live.mjs
  *
- * Live grant probe script for confined head sessions (Phase 11 step 3,
- * plans/261122-0118-heads-stable-and-able/phase-11-integration-and-probe.md).
+ * Live permission probe for confined head sessions.
  *
- * Runs inside a confined head (supervisor, secretary, planner, shaper, lead):
- * for every verb of `packages/run-supervisor/contracts/head-request.v1.json` 'verbs'
- * it makes one fgos CLI call with arguments chosen so the call cannot change state,
- * and classifies the reply as:
- *   - served: the route ran and answered done, or a domain refusal that proves the grant
- *             and the route passed.
- *   - refused as expected: verb-not-granted for a verb the caller's grant does not hold.
+ * Runs inside a confined head (supervisor, secretary, planner, shaper, lead): for every policy verb of
+ * `packages/run-supervisor/contracts/head-request.v1.json` 'verbs' and every verb the argv window forwards, it asks
+ * `fgos can-i <argv>` what the head permission table decides for the caller's persona
+ * (`packages/session-host/contracts/head-permissions.v1.json`), then makes one fgos CLI call with arguments chosen so
+ * the call cannot change state, and classifies the reply as:
+ *   - served: the route ran and answered done, or a domain refusal that proves the row and the route passed.
+ *   - refused as expected: verb-not-granted (a policy verb) or argv-not-allowed (the window) for an argv the table
+ *             does not allow.
+ *   - asked (not called): the table asks the owner about the argv; a real call would file an owner question, so the
+ *             probe only reports the `can-i` answer.
  *   - failed: transport or route failure.
  *
- * The expected outcome comes from `grantOf` in `src/session-host/head-grants.mjs` for the
- * caller's role; the observed outcome never comes from it.
+ * The expected outcome comes from the persona's rules, through `can-i`; the observed outcome never does.
  * Verbs that act on the caller itself (`supervisor done`, `session rotate`, `session answered`,
  * `session restore role`, `session bind session`) are not called; their row says
  * 'not called: acts on the caller' and cites the head's own request-log line from its last
@@ -41,7 +42,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { grantOf, HEAD_REQUEST_SOCKET_ENV } from '../../src/session-host/head-grants.mjs';
+import { HEAD_REQUEST_SOCKET_ENV } from '../../src/session-host/head-grants.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(SCRIPT), '..', '..');
@@ -123,6 +124,18 @@ export const GENERIC_FAILURE_CODES = new Set([
   'host-version-mismatch',
   'verb-failed',
 ]);
+
+/** The verbs the argv window forwards: the contract names them as the one `fgos` frame, not one by one. */
+export const WINDOW_VERBS = [
+  'questions list', 'supervisor handled', 'supervisor queue', 'supervisor plans', 'slots', 'supervisor wake', 'supervisor raise',
+  'watcher tune', 'session read', 'session type', 'metrics prune', 'friction record', 'config patch',
+];
+
+/** The verbs of the contract that are policy frames of their own (the window frames `fgos` and `can-i` are probed through them). */
+export const FRAME_VERBS = new Set(['fgos', 'can-i']);
+
+/** The argv `can-i` is asked about for a planned call: its words without `--json`, `questions` for the questions list. */
+export const argvOf = (plan) => plan.args.filter((word) => word !== '--json');
 
 /** Returns CLI arguments and optional stdin for each callable verb, chosen so the call cannot change state. */
 export function planForVerb(verb) {
@@ -353,7 +366,7 @@ export function classifyOutcome(verb, isGranted, res) {
   }
 
   // 1. Refused as expected: verb-not-granted when the grant lacks the verb
-  const isVerbNotGranted = code === 'verb-not-granted' ||
+  const isVerbNotGranted = code === 'verb-not-granted' || code === 'argv-not-allowed' ||
     rawOut.includes('verb-not-granted') ||
     rawErr.includes('verb-not-granted');
 
@@ -362,7 +375,7 @@ export function classifyOutcome(verb, isGranted, res) {
       return {
         observed: 'refused as expected',
         code: 'verb-not-granted',
-        detail: detail || 'verb not in envelope.session.verbs',
+        detail: detail || 'verb not allowed by the permission table',
         reply,
       };
     }
@@ -455,6 +468,16 @@ export function classifyOutcome(verb, isGranted, res) {
   };
 }
 
+/** `fgos can-i <argv>` from inside the head: `{ decision, reason }`, or `{ decision: 'unknown', reason }` when the call fails. */
+function askCanI(argv) {
+  const res = spawnSync(FGOS_BIN, ['can-i', ...argv, '--json'], { encoding: 'utf8', env: process.env });
+  try {
+    const reply = JSON.parse((res.stdout || '').trim());
+    if (typeof reply?.decision === 'string') return { decision: reply.decision, reason: reply.reason ?? null };
+  } catch { /* fall through */ }
+  return { decision: 'unknown', reason: (res.stderr || res.stdout || `exit ${res.status}`).trim().slice(0, 300) };
+}
+
 export function main() {
   const argv = process.argv.slice(2);
   const dryRun = argv.includes('--dry-run');
@@ -505,18 +528,8 @@ export function main() {
     return hyphen > 0 ? match[1].slice(hyphen + 1) : 'probe';
   })() : null);
 
-  let grant = null;
-  if (role) {
-    try {
-      grant = grantOf(role, persona, { planDir: planDirArg });
-    } catch (err) {
-      process.stderr.write(`head-grant-probe: grantOf failed for role ${JSON.stringify(role)}: ${err.message} [${err.code || 'grant-error'}]\n`);
-      process.exit(1);
-    }
-  }
-
   const contract = JSON.parse(fs.readFileSync(CONTRACT_PATH, 'utf8'));
-  const contractVerbs = Object.keys(contract.verbs);
+  const contractVerbs = [...Object.keys(contract.verbs).filter((verb) => !FRAME_VERBS.has(verb)), ...WINDOW_VERBS];
 
   // Probe TMPDIR and verify writability
   const tmpdir = process.env.TMPDIR || os.tmpdir() || '/tmp';
@@ -538,15 +551,18 @@ export function main() {
   const results = [];
 
   for (const verb of contractVerbs) {
-    const isGranted = Array.isArray(grant?.verbs) && grant.verbs.includes(verb);
-    const expected = isGranted ? 'served' : 'refused as expected';
+    const plan = planForVerb(verb);
+    // One can-i call per decision: the table's answer for this caller's persona, from the supervisor's own function.
+    const canI = !plan || dryRun ? null : askCanI(argvOf(plan));
+    const isGranted = canI?.decision === 'allow';
+    const expected = canI?.decision === 'ask' ? 'asked' : isGranted || (dryRun && plan) ? 'served' : 'refused as expected';
 
     if (NOT_CALLED_VERBS.has(verb)) {
       const reason = NOT_CALLED_VERBS.get(verb);
       const logLine = readSupervisorLogLine(REPO_ROOT, persona, name, verb);
       results.push({
         verb,
-        expected,
+        expected: 'not called',
         observed: `not called: ${reason}`,
         action: `not called: ${reason}`,
         reason,
@@ -556,7 +572,6 @@ export function main() {
       continue;
     }
 
-    const plan = planForVerb(verb);
     if (!plan) {
       results.push({
         verb,
@@ -569,6 +584,11 @@ export function main() {
     }
 
     const plannedCommand = [FGOS_BIN, ...plan.args];
+
+    if (canI?.decision === 'ask') {
+      results.push({ verb, expected, observed: 'asked (not called): a real call would file an owner question', action: 'can-i only', command: ['can-i', ...argvOf(plan)], canI, evidence: canI.reason });
+      continue;
+    }
 
     if (dryRun) {
       results.push({
@@ -594,6 +614,7 @@ export function main() {
       expected,
       observed: outcome.observed,
       action: 'call',
+      canI,
       command: plannedCommand,
       exitStatus: res.status,
       code: outcome.code,
@@ -612,7 +633,6 @@ export function main() {
       role,
       persona,
       name,
-      grantedVerbs: grant?.verbs || [],
     },
     tmpdir: {
       path: tmpdir,

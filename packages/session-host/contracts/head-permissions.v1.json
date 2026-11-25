@@ -1,0 +1,106 @@
+{
+  "contract": { "id": "session-host-head-permissions", "version": 1 },
+  "description": "What a head session's persona may ask of the host, as data: one row per persona and `fgos` verb prefix, decided allow | ask | deny. Compiled into the crate `packages/session-host/rust` (`permissions.rs`) and read only there; it is not a config key, so `config patch` can never widen it, and it changes only through a landed code change. The run supervisor resolves the caller's persona from the digest-protected envelope (`session.persona`, else the persona of `session.role`) and asks `permissions::decide`; the sandbox cannot change the answer.",
+  "decision": {
+    "allow": "the verb runs: a `forward` row is exec'd by the run supervisor from Rust (host `fgos` of the envelope, argv plus --json, project root, no shell, no Node hop); a `node` row is the policy branch of `fgos internal head-request`; a `native` row is answered by the supervisor itself",
+    "ask": "one five-part owner question carrying the exact argv is filed and the reply is `asked` with the question id",
+    "deny": "refused with `argv-not-allowed` (or `verb-not-granted` for a policy verb the persona lacks)"
+  },
+  "matching": "Rows are { prefix, decision, policy?, read?, args?, append?, refuseFlags? }; `prefix` is the verb words (`session read`). A row matches an argv whose leading words equal the prefix. The longest matching prefix wins; on a tie the strictest decision wins (deny over ask over allow). An argv no row matches is `ask`. A persona inherits the rows and the cage of its `inherits` persona; a row with the same prefix in the child replaces the inherited one. `policy` is `forward` (default), `node` or `native`. `read: true` marks a verb a rotation successor may use before it holds the role (it changes no store and no file). `append` is argv the forwarder adds after the caller's own; `refuseFlags` are flags the caller may not pass. `args` maps a flag to the values it may take; `limits` maps a flag to the largest whole number it may take; `targetAt` is the argv index of a session target (a role, handle or slot key) the forwarder checks. `config patch` takes exactly `<file> [--reason <text>]`: the window reads the file (a plain project-relative path outside `.fgos`, no symlink), refuses it when an edit lies on one branch with a `protectedConfigPaths` path (`*` is any one key), and gives the host a private copy of the bytes it checked.",
+  "refusedFlags": ["-C", "--cwd", "--root", "--project", "--env", "--dir", "--repo-root"],
+  "protectedConfigPaths": ["runner.confinement", "runner.confinementPolicies", "runner.capabilities.*.confinement", "runner.capabilities.*.verify", "runner.executor", "runner.executors", "invariantChecks", "worktreeSetup", "gateBypass", "secretary.run", "land", "release"],
+  "personas": {
+    "head": {
+      "writes": [],
+      "mailbox": false,
+      "peers": false,
+      "rules": [
+        { "prefix": "session bind session", "decision": "allow", "policy": "native" },
+        { "prefix": "session rotate", "decision": "allow", "policy": "node" },
+        { "prefix": "session answered", "decision": "allow", "policy": "node" },
+        { "prefix": "session restore role", "decision": "allow", "policy": "node" },
+        { "prefix": "friction record", "decision": "allow" },
+        { "prefix": "questions", "decision": "allow", "read": true },
+        { "prefix": "questions ask", "decision": "allow", "policy": "node" },
+        { "prefix": "questions ack", "decision": "allow", "policy": "node" },
+        { "prefix": "questions cancel", "decision": "allow", "policy": "node" },
+        { "prefix": "questions answer", "decision": "deny", "policy": "node" },
+        { "prefix": "activate", "decision": "deny" },
+        { "prefix": "release activate", "decision": "deny" }
+      ]
+    },
+    "lead": {
+      "inherits": "head",
+      "writes": [],
+      "mailbox": false,
+      "peers": false,
+      "rules": [
+        { "prefix": "supervisor raise", "decision": "allow", "args": { "--kind": ["coordination-help", "coordination-handoff", "coordination-chore"] } },
+        { "prefix": "run", "decision": "allow", "policy": "node" },
+        { "prefix": "land", "decision": "allow", "policy": "node" },
+        { "prefix": "worktree create", "decision": "allow", "policy": "node" },
+        { "prefix": "request result", "decision": "allow", "policy": "node" }
+      ]
+    },
+    "planner": {
+      "inherits": "head",
+      "writes": ["plans"],
+      "mailbox": false,
+      "peers": false,
+      "rules": [
+        { "prefix": "land", "decision": "allow", "policy": "node" },
+        { "prefix": "request result", "decision": "allow", "policy": "node" }
+      ]
+    },
+    "shaper": {
+      "inherits": "head",
+      "writes": ["plans/discussions"],
+      "mailbox": true,
+      "peers": false,
+      "rules": [
+        { "prefix": "land", "decision": "allow", "policy": "node" },
+        { "prefix": "request result", "decision": "allow", "policy": "node" }
+      ]
+    },
+    "supervisor": {
+      "inherits": "head",
+      "writes": ["plans", "plans/backlog.md", "plans/backlog/*"],
+      "mailbox": true,
+      "peers": true,
+      "rules": [
+        { "prefix": "session start", "decision": "allow", "policy": "node" },
+        { "prefix": "session stop", "decision": "allow", "policy": "node" },
+        { "prefix": "session write", "decision": "allow", "policy": "native" },
+        { "prefix": "land", "decision": "allow", "policy": "node" },
+        { "prefix": "request result", "decision": "allow", "policy": "node" },
+        { "prefix": "supervisor plans", "decision": "allow" },
+        { "prefix": "supervisor queue", "decision": "allow" },
+        { "prefix": "slots", "decision": "allow" },
+        { "prefix": "supervisor handled", "decision": "allow" },
+        { "prefix": "supervisor done", "decision": "allow", "policy": "node" },
+        { "prefix": "supervisor raise", "decision": "allow", "args": { "--kind": ["coordination-help", "coordination-handoff", "coordination-chore"] } },
+        { "prefix": "supervisor wake", "decision": "allow" },
+        { "prefix": "session read", "decision": "allow", "targetAt": 2, "limits": { "--lines": 1000 } },
+        { "prefix": "session type", "decision": "allow", "targetAt": 2 },
+        { "prefix": "watcher tune", "decision": "allow" },
+        { "prefix": "run", "decision": "allow", "policy": "node" },
+        { "prefix": "metrics record", "decision": "allow", "policy": "node" },
+        { "prefix": "metrics prune", "decision": "allow" },
+        { "prefix": "config patch", "decision": "allow", "append": ["--project-only"], "refuseFlags": ["--global", "--project-only"] },
+        { "prefix": "worktree remove --delivered-to", "decision": "allow", "args": { "--delivered-to": ["main"] } },
+        { "prefix": "git recover", "decision": "allow" },
+        { "prefix": "dispatch probe-account", "decision": "allow" }
+      ]
+    },
+    "secretary": {
+      "inherits": "supervisor",
+      "writes": ["plans", "plans/backlog.md", "plans/backlog/*"],
+      "mailbox": true,
+      "peers": true,
+      "rules": [
+        { "prefix": "questions answer", "decision": "allow", "policy": "node" },
+        { "prefix": "supervisor done", "decision": "deny", "policy": "node" }
+      ]
+    }
+  }
+}

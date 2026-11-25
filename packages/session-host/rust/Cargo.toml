@@ -9,6 +9,9 @@ fgos-agent-protocol = { path = "../../agent-protocol/rust" }
 fgos-terminal-control = { path = "../../terminal-control/rust" }
 serde = { workspace = true }
 serde_json = { workspace = true }
+libc = { workspace = true }
 thiserror = { workspace = true }
 # The one civil-time door: sidecar timestamps are parsed there, never by a second parser.
 fgos-host-runtime = { path = "../../host-runtime/rust" }
+# `config patch` files are read by the argv window before the call.
+fgos-yaml-doc = { path = "../../yaml-doc/rust" }

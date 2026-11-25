@@ -9,6 +9,10 @@
     "owner_path": "packages/component-authority/rust",
     "subcommands": true
   },
+  "can-i": {
+    "operation_id": "can-i.decide",
+    "owner_path": "apps/fgos"
+  },
   "config": {
     "operation_id": "config.read",
     "owner_path": "packages/config/rust",

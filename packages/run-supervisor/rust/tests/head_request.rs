@@ -170,7 +170,8 @@ fn serve_config(
     script_body: &str,
     holds: Result<bool, String>,
     identity: Identity,
-    verbs: &[&str],
+    // What a test once granted by list; the persona of the table decides now (a secretary here).
+    _verbs: &[&str],
     timeout: Duration,
     configure: impl FnOnce(Config) -> Config,
 ) -> Served {
@@ -201,7 +202,7 @@ fn serve_config(
         request_host_bin: None,
         cwd: dir.clone(),
         env: BTreeMap::from([("OUT".to_string(), dir.to_string_lossy().into_owned())]),
-        verbs: verbs.iter().map(|v| v.to_string()).collect(),
+        persona: "secretary".to_string(),
         role: "head:secretary-miu".to_string(),
         writes: GRANTED_WRITES.iter().map(|w| w.to_string()).collect(),
         verb_timeout: timeout,
@@ -517,6 +518,22 @@ fn ask(socket: &Path, verb: &str) -> Value {
     )
 }
 
+/// One `fgos` argv frame, the head's window to the host.
+fn ask_argv(socket: &Path, argv: &[&str]) -> Value {
+    request(
+        socket,
+        &json!({"type": "REQUEST", "id": "r1", "verb": "fgos", "args": {"argv": argv}}),
+    )
+}
+
+/// One `can-i` frame: what the table says about an argv.
+fn can_i(socket: &Path, argv: &[&str]) -> Value {
+    request(
+        socket,
+        &json!({"type": "REQUEST", "id": "r1", "verb": "can-i", "args": {"argv": argv}}),
+    )
+}
+
 fn wait_for_log(served: &Served, needle: &str) -> Vec<String> {
     let until = Instant::now() + Duration::from_secs(5);
     loop {
@@ -646,9 +663,10 @@ fn a_role_identity_does_not_give_this_session_is_refused_before_the_verb_is_look
 #[test]
 fn a_verb_the_envelope_does_not_grant_is_refused() {
     let served = granted("verb", DONE_LINE);
-    let reply = ask(&served.socket, "land");
+    // Only a lead creates a worktree; the table has no such row for the secretary.
+    let reply = ask(&served.socket, "worktree create");
     assert_eq!(reply["code"], "verb-not-granted");
-    let detail = "land is not in the grant of head:secretary-miu (granted: session start)";
+    let detail = "worktree create is not in the grant of head:secretary-miu (secretary)";
     assert_eq!(
         reply["detail"], detail,
         "names the verb and the role: {reply}"
@@ -657,7 +675,7 @@ fn a_verb_the_envelope_does_not_grant_is_refused() {
     assert_eq!(
         wait_for_log(&served, "refused"),
         vec![format!(
-            "head-request r1 land refused verb-not-granted: {detail}"
+            "head-request r1 worktree create refused verb-not-granted: {detail}"
         )]
     );
 }
@@ -802,28 +820,57 @@ fn a_refused_request_logs_its_detail_and_the_routes_message_on_one_line() {
 }
 
 #[test]
-fn a_successors_read_allowance_names_only_the_routes_read_verbs() {
-    let contract: Value =
-        serde_json::from_str(include_str!("../../contracts/head-request.v1.json")).unwrap();
-    let verbs = contract["verbs"].as_object().unwrap();
-    let reads: Vec<&str> = verbs
-        .iter()
-        .filter(|(_, v)| v["read"] == json!(true))
-        .map(|(k, _)| k.as_str())
-        .collect();
-    assert!(!reads.is_empty(), "the contract marks no read verb");
-    for verb in &reads {
-        assert!(
-            verb.starts_with("questions "),
-            "read verb {verb} is not a question store verb"
-        );
+fn the_window_forwards_an_allowed_argv_asks_for_an_unmatched_one_refuses_a_denied_one_and_answers_can_i(
+) {
+    // The host stands in as a script: an `internal head-questions` call answers a question id, any other argv is
+    // echoed to a file and answers one JSON document.
+    let body = r#"cat > "$OUT/stdin.json"; echo "$@" >> "$OUT/argv"; case "$1" in internal) echo '{"v":1,"protocol":1,"result":"done","data":{"id":"q-asked1"}}';; *) echo '{"data":{"ran":true}}';; esac"#;
+    let served = serve("window", body, Ok(true), &[], Duration::from_secs(5));
+    // allow: the secretary may read a session; the host ran it with --json, once.
+    let allowed = ask_argv(&served.socket, &["session", "read", "s1"]);
+    assert_eq!(allowed["result"], "done", "{allowed}");
+    assert_eq!(allowed["data"], json!({"ran": true}));
+    assert_eq!(
+        fs::read_to_string(served.dir.join("argv")).unwrap().trim(),
+        "session read s1 --json"
+    );
+    // ask: no row decides it, so the owner is asked and the argv did not run.
+    let asked = ask_argv(&served.socket, &["deploy", "production"]);
+    assert_eq!(asked["code"], "asked", "{asked}");
+    assert_eq!(asked["detail"], "q-asked1");
+    let ran = fs::read_to_string(served.dir.join("argv")).unwrap();
+    assert!(!ran.contains("deploy"), "{ran}");
+    assert!(ran.contains("internal head-questions"), "{ran}");
+    // deny: activation is refused to every persona, and a cwd flag is refused before the table is asked.
+    let denied = ask_argv(&served.socket, &["release", "activate"]);
+    assert_eq!(denied["code"], "argv-not-allowed", "{denied}");
+    let moved = ask_argv(&served.socket, &["slots", "--cwd", "/tmp"]);
+    assert_eq!(moved["code"], "argv-not-allowed", "{moved}");
+    // can-i answers from the same table and runs nothing.
+    let before = fs::read_to_string(served.dir.join("argv")).unwrap();
+    for (argv, decision) in [
+        (&["session", "read", "s1"][..], "allow"),
+        (&["deploy", "production"][..], "ask"),
+        (&["release", "activate"][..], "deny"),
+    ] {
+        let answer = can_i(&served.socket, argv);
+        assert_eq!(answer["data"]["decision"], decision, "{argv:?}: {answer}");
     }
-    for verb in fgos_run_supervisor::head_request::SUCCESSOR_READ_VERBS {
-        assert!(
-            reads.contains(verb),
-            "SUCCESSOR_READ_VERBS names {verb}, which the contract does not mark as a read"
-        );
-    }
+    assert_eq!(fs::read_to_string(served.dir.join("argv")).unwrap(), before);
+}
+
+#[test]
+fn a_verb_that_only_forwards_is_not_a_verb_of_its_own_any_more() {
+    let served = serve(
+        "window-legacy",
+        DONE_LINE,
+        Ok(true),
+        &[],
+        Duration::from_secs(5),
+    );
+    let reply = ask(&served.socket, "supervisor raise");
+    assert_eq!(reply["code"], "verb-not-granted", "{reply}");
+    assert!(!served.dir.join("argv").exists(), "no route child ran");
 }
 
 #[test]
@@ -840,6 +887,8 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
     assert_eq!(
         codes,
         [
+            "argv-not-allowed",
+            "asked",
             "bad-args",
             "bad-frame",
             "busy",
@@ -883,35 +932,24 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
     assert_eq!(
         verbs,
         [
-            "config patch",
-            "friction record",
+            "can-i",
+            "fgos",
             "land",
-            "metrics prune",
             "metrics record",
             "questions ack",
             "questions answer",
             "questions ask",
             "questions cancel",
-            "questions list",
             "request result",
             "run",
             "session answered",
             "session bind session",
-            "session read",
             "session restore role",
             "session rotate",
             "session start",
             "session stop",
-            "session type",
             "session write",
-            "slots",
             "supervisor done",
-            "supervisor handled",
-            "supervisor plans",
-            "supervisor queue",
-            "supervisor raise",
-            "supervisor wake",
-            "watcher tune",
             "worktree create"
         ]
     );
@@ -1011,7 +1049,7 @@ fn session_envelope(dir: &Path, script: &Path) -> Value {
         "hostBin": script,
         "cwd": dir,
         "identity": {"writerId": "att-own"},
-        "session": {"role": "head:planner-x", "verbs": ["session start"], "requestSocketPath": dir.join("req.sock")},
+        "session": {"role": "head:supervisor-x", "requestSocketPath": dir.join("req.sock")},
         "steps": [
             {"stepId": "release-slot", "builtin": true},
             {"stepId": "finalize-home", "env": {"OUT": dir, "FOO": "first"}},
@@ -1038,18 +1076,20 @@ fn an_envelope_that_cannot_serve_a_socket_is_envelope_invalid_and_one_without_a_
         assert_eq!(err.code, "envelope-invalid");
         assert!(err.why.contains(needle), "{}", err.why);
     };
-    invalid(
+    assert!(
         build(&|e| {
             e["session"]
                 .as_object_mut()
                 .unwrap()
                 .remove("requestSocketPath");
-        }),
-        "requestSocketPath is missing",
+        })
+        .unwrap()
+        .is_none(),
+        "no socket path, no socket"
     );
     invalid(
-        build(&|e| e["session"]["verbs"] = json!([])),
-        "verbs is empty",
+        build(&|e| e["session"]["role"] = json!("head:nobody-x")),
+        "head permission table",
     );
     invalid(
         build(&|e| e["session"]["writes"] = json!("docs/backlog.md")),
@@ -1072,11 +1112,11 @@ fn an_envelope_that_cannot_serve_a_socket_is_envelope_invalid_and_one_without_a_
     assert!(build(&|e| e["session"] = Value::Null).unwrap().is_none());
     assert!(
         build(&|e| {
-            e["session"] = json!({"role": "head:planner-x", "verbs": []});
+            e["session"] = json!({"role": "head:planner-x"});
         })
         .unwrap()
         .is_none(),
-        "no verbs, no socket"
+        "no request socket path, no socket"
     );
     let _ = fs::remove_dir_all(&dir);
 }
@@ -1106,7 +1146,7 @@ echo '{"v":1,"protocol":1,"result":"done","data":{"ok":true}}'
     let root = state_root("env-ok", true);
     let envelope = session_envelope(&dir, &script);
     // The attempt's own session holds the role in the real Identity, so the whole check runs unstubbed.
-    register(&root, "att-own", &["head:planner-x"]);
+    register(&root, "att-own", &["head:supervisor-x"]);
     let (path, server) = HeadRequests::from_envelope(&envelope, &dir, &root, &no_publisher())
         .unwrap()
         .expect("a socket");
@@ -1348,7 +1388,7 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_r
         request_host_bin: None,
         cwd: dir.clone(),
         env: BTreeMap::new(),
-        verbs: vec![BIND_VERB.to_string()],
+        persona: "planner".to_string(),
         role: role.to_string(),
         writes: Vec::new(),
         verb_timeout: Duration::from_secs(5),
@@ -1947,16 +1987,22 @@ fn head_write_refuses_a_file_that_appears_under_a_directory_grant_while_the_writ
 
 #[test]
 fn head_write_needs_the_role_and_the_verb_in_the_grant_before_any_file_is_touched() {
-    for (holds, verbs, code) in [
-        (Ok(false), &[WRITE_VERB][..], "role-not-held"),
-        (Ok(true), &["session start"][..], "verb-not-granted"),
+    // A secretary holds `session write`; a lead's rows do not name it.
+    for (holds, persona, code) in [
+        (Ok(false), "secretary", "role-not-held"),
+        (Ok(true), "lead", "verb-not-granted"),
     ] {
-        let served = serve(
+        let served = serve_config(
             "write-gate",
             DONE_LINE,
             holds,
-            verbs,
+            Identity::default(),
+            &[],
             Duration::from_secs(5),
+            |mut cfg| {
+                cfg.persona = persona.to_string();
+                cfg
+            },
         );
         write_project(&served.dir);
         let reply = write_request(
@@ -2205,7 +2251,7 @@ fn a_pending_successor_reads_the_question_store_but_its_write_verbs_keep_waiting
         Some("planner-x generation 1 still holds the role"),
         false,
     );
-    let read = ask(&served.socket, "questions list");
+    let read = ask_argv(&served.socket, &["questions"]);
     assert_eq!(
         read["code"],
         serde_json::Value::Null,
@@ -2226,7 +2272,7 @@ fn a_pending_successor_reads_the_question_store_but_its_write_verbs_keep_waiting
 #[test]
 fn a_caller_that_is_no_successor_of_the_role_gets_no_read_either() {
     let served = serve_pending("not-a-successor-read", None, false);
-    let read = ask(&served.socket, "questions list");
+    let read = ask_argv(&served.socket, &["questions"]);
     assert_eq!(read["code"], "role-not-held");
     assert!(!served.dir.join("argv").exists(), "no route child ran");
 }
@@ -2234,8 +2280,8 @@ fn a_caller_that_is_no_successor_of_the_role_gets_no_read_either() {
 #[test]
 fn a_successor_that_holds_the_role_after_the_hand_over_gets_reads_and_writes_alike() {
     let served = serve_pending("handed-over-read", None, true);
-    for verb in ["questions list", "session start"] {
-        let reply = ask(&served.socket, verb);
-        assert_eq!(reply["code"], serde_json::Value::Null, "{verb}: {reply}");
-    }
+    let read = ask_argv(&served.socket, &["questions"]);
+    assert_eq!(read["code"], serde_json::Value::Null, "{read}");
+    let write = ask(&served.socket, "session start");
+    assert_eq!(write["code"], serde_json::Value::Null, "{write}");
 }
