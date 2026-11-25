@@ -1575,6 +1575,15 @@
   path: packages/secrets/contracts/declaration.v1.schema.json
   evidence: []
   status: live
+- id: session-host/head-permissions.v1
+  canonical: session-host/head-permissions.v1
+  aliases: []
+  meaning: Machine-readable contract file head-permissions.v1.json owned under packages/session-host/contracts/. The permission table of a head session as data (persona and verb prefix decided allow, ask or deny), compiled into and read only by the session-host crate. Provider session-host via package (component path prefix did not cover this file).
+  provider: session-host
+  consumers: []
+  path: packages/session-host/contracts/head-permissions.v1.json
+  evidence: []
+  status: live
 - id: session-host/host-port.v1
   canonical: session-host/host-port.v1
   aliases: []

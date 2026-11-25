@@ -533,8 +533,11 @@ fn a_confined_queue_read_and_a_multi_id_handled_go_through_the_request_socket() 
         .unwrap();
     assert!(out.status.success(), "{}", text(&out));
     let request = server.join().unwrap();
-    assert_eq!(request["verb"], "supervisor queue");
-    assert_eq!(request["args"], serde_json::json!({}));
+    assert_eq!(request["verb"], "fgos");
+    assert_eq!(
+        request["args"],
+        serde_json::json!({"argv": ["supervisor", "queue"]})
+    );
     let printed: Value = serde_json::from_slice(&out.stdout).unwrap();
     assert_eq!(printed["events"][0]["id"], "e1");
     assert!(scene.payload_calls().is_empty());
@@ -552,10 +555,10 @@ fn a_confined_queue_read_and_a_multi_id_handled_go_through_the_request_socket() 
         .unwrap();
     assert!(out.status.success(), "{}", text(&out));
     let request = server.join().unwrap();
-    assert_eq!(request["verb"], "supervisor handled");
+    assert_eq!(request["verb"], "fgos");
     assert_eq!(
         request["args"],
-        serde_json::json!({"events": ["a1", "b2", "c3"]})
+        serde_json::json!({"argv": ["supervisor", "handled", "a1", "b2", "c3"]})
     );
 }
 
@@ -888,10 +891,10 @@ fn a_confined_head_sends_the_coordination_verbs_through_the_request_socket() {
         ],
         None,
     );
-    assert_eq!(raise["verb"], "supervisor raise");
+    assert_eq!(raise["verb"], "fgos");
     assert_eq!(
         raise["args"],
-        serde_json::json!({"kind": "coordination-help", "ref": "r", "reason": "why"})
+        serde_json::json!({"argv": ["supervisor", "raise", "--kind", "coordination-help", "--ref", "r", "--reason", "why"]})
     );
     let tune = ask(
         &[
@@ -905,19 +908,19 @@ fn a_confined_head_sends_the_coordination_verbs_through_the_request_socket() {
         ],
         None,
     );
-    assert_eq!(tune["verb"], "watcher tune");
+    assert_eq!(tune["verb"], "fgos");
     assert_eq!(
         tune["args"],
-        serde_json::json!({"definition": "session-idle", "arm": true, "set": ["sessionIdleLimit=2"]})
+        serde_json::json!({"argv": ["watcher", "tune", "session-idle", "--set", "sessionIdleLimit=2", "--arm"]})
     );
     let read = ask(
         &["session", "read", "head:lead-x", "--lines", "30", "--json"],
         None,
     );
-    assert_eq!(read["verb"], "session read");
+    assert_eq!(read["verb"], "fgos");
     assert_eq!(
         read["args"],
-        serde_json::json!({"target": "head:lead-x", "lines": 30})
+        serde_json::json!({"argv": ["session", "read", "head:lead-x", "--lines", "30"]})
     );
     let typed = ask(
         &[
@@ -930,10 +933,10 @@ fn a_confined_head_sends_the_coordination_verbs_through_the_request_socket() {
         ],
         None,
     );
-    assert_eq!(typed["verb"], "session type");
+    assert_eq!(typed["verb"], "fgos");
     assert_eq!(
         typed["args"],
-        serde_json::json!({"target": "head:lead-x", "text": "go on"})
+        serde_json::json!({"argv": ["session", "type", "head:lead-x", "--text", "go on"]})
     );
     let prune = ask(
         &[
@@ -946,10 +949,10 @@ fn a_confined_head_sends_the_coordination_verbs_through_the_request_socket() {
         ],
         None,
     );
-    assert_eq!(prune["verb"], "metrics prune");
+    assert_eq!(prune["verb"], "fgos");
     assert_eq!(
         prune["args"],
-        serde_json::json!({"apply": true, "settled": ["session:a"]})
+        serde_json::json!({"argv": ["metrics", "prune", "--apply", "--settled", "session:a"]})
     );
     let record = ask(
         &["metrics", "record", "--json", "-"],

@@ -690,25 +690,32 @@ fn a_head_sandbox_answers_the_start_ritual_and_the_supervisor_reads_through_the_
     }
 }
 
-/// The negative control of the proof above: a head whose grant lacks `questions list` is refused at the socket, so the
-/// proof's answers come from the grant and the host, not from the sandbox letting everything through.
+/// The negative control of the proof above: the grant is the permission table, not the envelope's verb list. The table
+/// denies a supervisor head `questions answer` (only the secretary holds it) and allows `questions` (the list), so the
+/// same socket answers `deny` for one and `allow` for the other: the answers come from the table, not from a socket
+/// that lets everything through.
 #[test]
 fn a_head_sandbox_refuses_questions_when_the_grant_lacks_questions_list() {
-    let verbs: Vec<&str> = SUPERVISOR_VERBS
-        .iter()
-        .copied()
-        .filter(|v| *v != "questions list")
-        .collect();
-    let Some(outputs) = run_in_head_sandbox(
-        "head-sandbox-ungranted",
-        &verbs,
-        &[&["questions", "--json"]],
-    ) else {
-        return;
+    let scene = Scene::new("head-table-deny");
+    let socket = scene.root.join("req.sock");
+    let mut served = ServedSupervisor::start(&scene, &socket, SUPERVISOR_VERBS);
+    let can_i = |argv: &[&str]| -> Value {
+        let mut args = vec!["can-i"];
+        args.extend_from_slice(argv);
+        args.push("--json");
+        let out = scene.fgos_with(
+            &args,
+            b"",
+            &[
+                ("FGOS_CONFINED", Path::new("1")),
+                ("FGOS_HEAD_REQUEST_SOCKET", &socket),
+            ],
+        );
+        serde_json::from_slice(&out.stdout).unwrap_or_else(|e| panic!("{e}: {out:?}"))
     };
-    let out = &outputs[0];
-    assert!(!out.status.success(), "{out:?}");
-    let reply: Value =
-        serde_json::from_slice(&out.stdout).unwrap_or_else(|e| panic!("{e}: {out:?}"));
-    assert_eq!(reply["code"], "verb-not-granted", "{out:?}");
+    let denied = can_i(&["questions", "answer", "q-none"]);
+    let allowed = can_i(&["questions"]);
+    served.finish();
+    assert_eq!(denied["decision"], "deny", "{denied}");
+    assert_eq!(allowed["decision"], "allow", "{allowed}");
 }
