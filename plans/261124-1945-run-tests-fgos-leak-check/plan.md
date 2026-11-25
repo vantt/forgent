@@ -144,6 +144,11 @@ listed is left out of the footprint: the land door regenerates it (Risks). Check
 
 ## Progress
 
+- 2026-11-25 18:10: owner answered q-dzh2ojhcvc "You paste the request into it". The supervisor typed the
+  owed step 7 (full `npm test` with the witness against a throwaway whole-store walk, no code changes) into
+  the unconfined `lead:SUPERVISOR` session (`claude-xonu@fg-server2`), under events `c5f179128332d27b` and
+  `be5ecfc7302fff72`. That session writes the step 7 outcome as its own Progress line.
+
 - 2026-11-25 15:10: phase 2 done; plan done. Branch `run-tests-fgos-leak-check/p02s` (commits
   `ffcf08a35` witness and reader, `5f44a1cb2` review fixes: whole-store root, recursive mkdir
   ancestors, late stray writes, empty added directories, fail-closed logging) landed as main
