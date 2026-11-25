@@ -256,3 +256,101 @@ fn a_role_names_its_longest_persona() {
     assert_eq!(persona_of_role("worker:planner-x"), None);
     assert_eq!(persona_of_role("head:planner"), None);
 }
+
+/// Every config key path the schemas mark `x-fgos-sensitivity: command` (the host runs its value as shell outside the
+/// sandbox), `*` for a map's free key; array items add no segment, so a command inside a list names the list.
+fn command_paths(
+    node: &serde_json::Value,
+    defs: &serde_json::Value,
+    path: &mut Vec<String>,
+    out: &mut Vec<String>,
+    depth: usize,
+) {
+    if depth > 12 {
+        return;
+    }
+    let Some(obj) = node.as_object() else { return };
+    if obj.get("x-fgos-sensitivity").and_then(|v| v.as_str()) == Some("command") {
+        out.push(path.join("."));
+    }
+    if let Some(target) = obj
+        .get("$ref")
+        .and_then(|v| v.as_str())
+        .and_then(|r| r.strip_prefix("#/$defs/"))
+    {
+        command_paths(&defs[target], defs, path, out, depth + 1);
+    }
+    if let Some(props) = obj.get("properties").and_then(|v| v.as_object()) {
+        for (key, child) in props {
+            path.push(key.clone());
+            command_paths(child, defs, path, out, depth + 1);
+            path.pop();
+        }
+    }
+    if let Some(child) = obj.get("additionalProperties").filter(|v| v.is_object()) {
+        path.push("*".into());
+        command_paths(child, defs, path, out, depth + 1);
+        path.pop();
+    }
+    for key in ["items", "then", "else"] {
+        if let Some(child) = obj.get(key) {
+            command_paths(child, defs, path, out, depth + 1);
+        }
+    }
+    for key in ["allOf", "anyOf", "oneOf"] {
+        for child in obj.get(key).and_then(|v| v.as_array()).into_iter().flatten() {
+            command_paths(child, defs, path, out, depth + 1);
+        }
+    }
+}
+
+#[test]
+fn every_command_sensitive_config_key_is_a_protected_config_path() {
+    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../core/config-schema");
+    let guards: Vec<Vec<&str>> = fgos_session_host::permissions::protected_config_paths()
+        .iter()
+        .map(|g| g.split('.').collect())
+        .collect();
+    let mut found = 0;
+    let mut uncovered = Vec::new();
+    for entry in std::fs::read_dir(&dir).expect("core/config-schema") {
+        let file = entry.unwrap().path();
+        if !file.to_string_lossy().ends_with(".schema.yaml") {
+            continue;
+        }
+        let stem = file
+            .file_name()
+            .unwrap()
+            .to_string_lossy()
+            .replace(".schema.yaml", "");
+        let bytes = std::fs::read(&file).unwrap();
+        let schema = fgos_yaml_doc::parse(&bytes, fgos_yaml_doc::Profile::StrictConfig, "schema")
+            .and_then(|doc| doc.to_json())
+            .unwrap_or_else(|e| panic!("{} does not parse: {e:?}", file.display()));
+        let defs = schema.get("$defs").cloned().unwrap_or_default();
+        let mut paths = Vec::new();
+        if let Some(props) = schema.get("properties").and_then(|v| v.as_object()) {
+            for (key, child) in props {
+                // A schema file is one top-level config key: its file stem.
+                let mut path = vec![stem.clone(), key.clone()];
+                command_paths(child, &defs, &mut path, &mut paths, 0);
+            }
+        }
+        for path in paths {
+            found += 1;
+            let have: Vec<&str> = path.split('.').collect();
+            let covered = guards.iter().any(|guard| {
+                guard.len() <= have.len()
+                    && guard.iter().zip(&have).all(|(g, h)| *g == "*" || g == h)
+            });
+            if !covered {
+                uncovered.push(format!("{}: {path}", file.display()));
+            }
+        }
+    }
+    assert!(found >= 8, "the walk found only {found} command-sensitive keys");
+    assert!(
+        uncovered.is_empty(),
+        "command-sensitive config keys with no protectedConfigPaths entry: {uncovered:#?}"
+    );
+}

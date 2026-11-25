@@ -114,11 +114,45 @@ fn patch_file_of(argv: &[String]) -> Result<&str, Refused> {
     }
 }
 
+/// `openat` of `name` under `dir`, read-only and never following a symlink; `extra` adds flags.
+fn open_at(
+    dir: &std::fs::File,
+    name: &std::ffi::OsStr,
+    extra: libc::c_int,
+) -> std::io::Result<std::fs::File> {
+    use std::os::fd::{AsRawFd, FromRawFd};
+    use std::os::unix::ffi::OsStrExt;
+    let c = std::ffi::CString::new(name.as_bytes())
+        .map_err(|_| std::io::Error::from(std::io::ErrorKind::InvalidInput))?;
+    // SAFETY: `c` is a NUL-terminated name and `dir` is an open descriptor for the whole call.
+    let fd = unsafe {
+        libc::openat(
+            dir.as_raw_fd(),
+            c.as_ptr(),
+            libc::O_RDONLY | libc::O_NOFOLLOW | libc::O_CLOEXEC | extra,
+        )
+    };
+    if fd < 0 {
+        Err(std::io::Error::last_os_error())
+    } else {
+        // SAFETY: `fd` is a fresh descriptor this call owns.
+        Ok(unsafe { std::fs::File::from_raw_fd(fd) })
+    }
+}
+
+/// A symlink on a component (`ELOOP`, or `ENOTDIR` where a directory was required) is refused by name.
+fn no_follow_refusal(err: &std::io::Error, other: Refused) -> Refused {
+    if matches!(err.raw_os_error(), Some(libc::ELOOP | libc::ENOTDIR)) {
+        Refused("the config patch file may not go through a symlink".into())
+    } else {
+        other
+    }
+}
+
 /// Opens `file` under `root` the way a head may name it: a plain project-relative path outside `.fgos`, no symlink on
 /// any component, a regular file. Reads at most [`MAX_PATCH_BYTES`].
 fn read_patch_file(root: &Path, file: &str) -> Result<Vec<u8>, Refused> {
     use std::io::Read;
-    use std::os::unix::fs::OpenOptionsExt;
     if !plain_relative(file) {
         return refuse("the config patch file must be a plain project-relative path");
     }
@@ -126,19 +160,22 @@ fn read_patch_file(root: &Path, file: &str) -> Result<Vec<u8>, Refused> {
         return refuse("the config patch file may not live under .fgos");
     }
     let unreadable = || Refused("the config patch file cannot be read by the window".into());
-    let mut walk = root.to_path_buf();
-    for part in Path::new(file).components() {
-        walk.push(part);
-        let meta = std::fs::symlink_metadata(&walk).map_err(|_| unreadable())?;
-        if meta.file_type().is_symlink() {
-            return refuse("the config patch file may not go through a symlink");
-        }
+    // Each component is opened relative to the one before with no-follow, so a symlink swapped in on any component
+    // after a check cannot redirect the read: the kernel refuses it instead of the window racing a stat.
+    let mut dir = std::fs::File::open(root).map_err(|_| unreadable())?;
+    let parts: Vec<&std::ffi::OsStr> = Path::new(file)
+        .components()
+        .map(Component::as_os_str)
+        .collect();
+    let Some((last, parents)) = parts.split_last() else {
+        return refuse("the config patch file must be a plain project-relative path");
+    };
+    for part in parents {
+        dir = open_at(&dir, part, libc::O_DIRECTORY)
+            .map_err(|e| no_follow_refusal(&e, unreadable()))?;
     }
-    let opened = std::fs::OpenOptions::new()
-        .read(true)
-        .custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK)
-        .open(&walk)
-        .map_err(|_| unreadable())?;
+    let opened = open_at(&dir, last, libc::O_NONBLOCK)
+        .map_err(|e| no_follow_refusal(&e, unreadable()))?;
     if !opened.metadata().map_err(|_| unreadable())?.is_file() {
         return refuse("the config patch file is not a regular file");
     }
@@ -157,13 +194,18 @@ fn read_patch_file(root: &Path, file: &str) -> Result<Vec<u8>, Refused> {
 fn stage_patch(stage: &Path, bytes: &[u8]) -> Result<(), Refused> {
     use std::io::Write;
     use std::os::unix::fs::OpenOptionsExt;
-    std::fs::OpenOptions::new()
+    let refused = || Refused("the window could not stage the config patch for the host".into());
+    let mut file = std::fs::OpenOptions::new()
         .write(true)
         .create_new(true)
         .mode(0o600)
         .open(stage)
-        .and_then(|mut f| f.write_all(bytes))
-        .map_err(|_| Refused("the window could not stage the config patch for the host".into()))
+        .map_err(|_| refused())?;
+    // Only a file this call created is removed on failure; a path that already existed is never touched.
+    file.write_all(bytes).map_err(|_| {
+        let _ = std::fs::remove_file(stage);
+        refused()
+    })
 }
 
 /// Reads the patch file of a `config patch` and refuses it when one edit touches a protected key. Returns the bytes

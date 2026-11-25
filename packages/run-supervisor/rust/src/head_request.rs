@@ -1503,10 +1503,17 @@ fn forward(cfg: &Config, request: &Request) -> Outcome {
             code: "argv-not-allowed",
             detail: Some(why),
         },
-        Ok(Planned::Run(words)) => forward_exec(cfg, request, &words),
+        Ok(Planned::Run(words)) => {
+            let outcome = forward_exec(cfg, request, &words);
+            // `plan` created the copy (create_new succeeded) exactly when the argv it returns carries the stage
+            // path; a path this request did not create is never removed.
+            if words.get(2).map(std::path::Path::new) == Some(stage.as_path()) {
+                let _ = std::fs::remove_file(&stage);
+            }
+            outcome
+        }
         Ok(Planned::Ask(words)) => ask_owner(cfg, request, &words),
     };
-    let _ = std::fs::remove_file(&stage);
     outcome
 }
 
