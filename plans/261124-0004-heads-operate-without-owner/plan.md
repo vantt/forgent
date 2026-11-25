@@ -297,6 +297,16 @@ morning (discussion §1). The planner's own shape choices are written as decisio
   `blocked` with no change. The recommended option is the owner running the pinned command written in
   `phase-02-argv-window.md` (Lead notes). Phases 3, 6 and 7 wait behind phase 2.
 
+- 2026-11-25 11:22, phase 2 parked on fix ticket `c-29218-1795579848109`: the owner's answers `q-3svd4ttdn7` (commit by
+  hand, done as `8c51967e4` on `heads-operate-without-owner/p02`) and `q-ulx4nkztpq` (follow-up item; backlog row
+  raised to the supervisor as event `3ff87a2e006f375f`) are written into `phase-02-argv-window.md` and acked. A reviewer
+  confirmed the table's parity with `GRANTS`, the decision logic and the Node cleanup, but found three blocking holes in
+  the window's deny rules: `--dir` is not refused; `protectedConfigPrefixes` (`grant`, `confinement`, `release`) match
+  no real config key; and `config patch` can check one file and apply another. It also found two smaller regressions:
+  the `supervisor raise` kind limit and the `--delivered-to` ref were lost. The lead verified the first two holes in
+  the source. Fix unit `c-29218-1795579848109` (claude, in the p02 worktree, started 11:10) was still `running` after 12
+  waits. Next wake: read that ticket, re-review the branch, then land it, naming the phase's tests.
+
 ## Outstanding questions
 
-- `q-nt7ptsq2nd` (phase 2): how the pinned rerun is made, given the window drops `--override`.
+None open for this plan.
