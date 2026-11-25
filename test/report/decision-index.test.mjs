@@ -42,7 +42,8 @@ function run(cwd, args) {
 
 function initCwd() {
   const cwd = tmpRepoRoot();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const init = run(cwd, ['init']);
+  assert.equal(init.status, 0, init.stderr);
   return cwd;
 }
 
@@ -163,51 +164,46 @@ test('generateDecisionIndex: an empty-to-empty regenerate (nothing was ever reco
 
 test('CLI: decision-index generates docs/decisions/index.md from a scope-carrying decision', () => {
   const cwd = initCwd();
-  assert.equal(
-    run(cwd, ['decision', '--text', 'D1: repo-wide thing', '--rationale', 'r', '--relation', 'none', '--scope', 'repo']).status,
-    0,
-  );
+  const decision = run(cwd, ['decision', '--text', 'D1: repo-wide thing', '--rationale', 'r', '--relation', 'none', '--scope', 'repo']);
+  assert.equal(decision.status, 0, decision.stderr);
   const result = run(cwd, ['decision-index']);
-  assert.equal(result.status, 0);
+  assert.equal(result.status, 0, result.stderr);
   const content = fs.readFileSync(path.join(cwd, 'docs', 'decisions', 'index.md'), 'utf8');
   assert.match(content, /D1: repo-wide thing/);
 });
 
 test('CLI: decision-index --check exits 0 and writes nothing when the on-disk index already matches', () => {
   const cwd = initCwd();
-  assert.equal(
-    run(cwd, ['decision', '--text', 'D1: repo-wide thing', '--rationale', 'r', '--relation', 'none', '--scope', 'repo']).status,
-    0,
-  );
-  assert.equal(run(cwd, ['decision-index']).status, 0);
+  const decision = run(cwd, ['decision', '--text', 'D1: repo-wide thing', '--rationale', 'r', '--relation', 'none', '--scope', 'repo']);
+  assert.equal(decision.status, 0, decision.stderr);
+  const index = run(cwd, ['decision-index']);
+  assert.equal(index.status, 0, index.stderr);
   const before = fs.readFileSync(path.join(cwd, 'docs', 'decisions', 'index.md'), 'utf8');
 
   const result = run(cwd, ['decision-index', '--check']);
-  assert.equal(result.status, 0);
+  assert.equal(result.status, 0, result.stderr);
   const after = fs.readFileSync(path.join(cwd, 'docs', 'decisions', 'index.md'), 'utf8');
   assert.equal(before, after);
 });
 
 test('CLI: decision-index --check is refused (validation, exit 4) when the on-disk index is stale (a new scoped decision landed since the last generate)', () => {
   const cwd = initCwd();
-  assert.equal(run(cwd, ['decision-index']).status, 0, 'generate once against an empty log -- the placeholder content');
-  assert.equal(
-    run(cwd, ['decision', '--text', 'D1: repo-wide thing', '--rationale', 'r', '--relation', 'none', '--scope', 'repo']).status,
-    0,
-  );
+  const index = run(cwd, ['decision-index']);
+  assert.equal(index.status, 0, index.stderr);
+  const decision = run(cwd, ['decision', '--text', 'D1: repo-wide thing', '--rationale', 'r', '--relation', 'none', '--scope', 'repo']);
+  assert.equal(decision.status, 0, decision.stderr);
   const result = run(cwd, ['decision-index', '--check']);
-  assert.equal(result.status, 4);
+  assert.equal(result.status, 4, result.stderr);
   assert.match(result.stderr, /stale/);
 });
 
 test('CLI: decision-index --check never writes even when it refuses', () => {
   const cwd = initCwd();
-  assert.equal(run(cwd, ['decision-index']).status, 0);
+  const index = run(cwd, ['decision-index']);
+  assert.equal(index.status, 0, index.stderr);
   const beforeAll = fs.readFileSync(path.join(cwd, 'docs', 'decisions', 'index.md'), 'utf8');
-  assert.equal(
-    run(cwd, ['decision', '--text', 'D1: repo-wide thing', '--rationale', 'r', '--relation', 'none', '--scope', 'repo']).status,
-    0,
-  );
+  const decision = run(cwd, ['decision', '--text', 'D1: repo-wide thing', '--rationale', 'r', '--relation', 'none', '--scope', 'repo']);
+  assert.equal(decision.status, 0, decision.stderr);
   run(cwd, ['decision-index', '--check']);
   const afterRefusal = fs.readFileSync(path.join(cwd, 'docs', 'decisions', 'index.md'), 'utf8');
   assert.equal(beforeAll, afterRefusal, '--check must never write, even when it detects and reports drift');
@@ -371,14 +367,19 @@ test('CLI: decision --valid-from is projected by decision-index into the holder,
   const holder = path.join(cwd, 'docs', 'platform', 'repo.md');
   fs.writeFileSync(holder, '# Repo\n\n### D-ADR0012 — flat items\n\nText.\n');
   const decide = (relation, extra = []) => run(cwd, ['decision', '--text', 'D-ADR0012: flat items', '--rationale', 'r', '--relation', relation, '--scope', 'repo', ...extra]);
-  assert.equal(decide('none', ['--valid-from', '2026-31-01']).status, 4, 'an impossible date is refused');
-  assert.equal(decide('supersedes:ADR0002', ['--valid-from', '2026-07-14']).status, 0);
-  assert.equal(run(cwd, ['decision-index']).status, 0);
+  const badDate = decide('none', ['--valid-from', '2026-31-01']);
+  assert.equal(badDate.status, 4, badDate.stderr);
+  const supersedes = decide('supersedes:ADR0002', ['--valid-from', '2026-07-14']);
+  assert.equal(supersedes.status, 0, supersedes.stderr);
+  const index = run(cwd, ['decision-index']);
+  assert.equal(index.status, 0, index.stderr);
   assert.match(fs.readFileSync(holder, 'utf8'), /### D-ADR0012 — flat items\n\n\[valid_from:: 2026-07-14\] \[replaces:: D-ADR0002\]\n/);
-  assert.equal(run(cwd, ['decision-index', '--check']).status, 0);
-  assert.equal(decide('amends:D-ADR0002').status, 0);
+  const check = run(cwd, ['decision-index', '--check']);
+  assert.equal(check.status, 0, check.stderr);
+  const amends = decide('amends:D-ADR0002');
+  assert.equal(amends.status, 0, amends.stderr);
   const stale = run(cwd, ['decision-index', '--check']);
-  assert.equal(stale.status, 4);
+  assert.equal(stale.status, 4, stale.stderr);
   assert.match(stale.stderr, /docs\/platform\/repo\.md/);
   assert.match(fs.readFileSync(holder, 'utf8'), /\[replaces:: D-ADR0002\]/, '--check never writes');
 });
