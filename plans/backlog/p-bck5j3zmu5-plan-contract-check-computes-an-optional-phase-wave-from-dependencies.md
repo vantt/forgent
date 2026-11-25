@@ -19,4 +19,6 @@ A phase with an empty `wave` passes the contract check and gets a wave computed 
 
 # Notes
 
+This item is phase 12 of plan `261122-0056-orchestration-skeleton` ("General plan contract, wave optional", `phase-12-plan-contract-wave.md`); that plan owns the work and this row only records the unlanded commit so it is not lost. Do not plan it a second time.
+
 Found while sweeping old worktrees. The commit has been unmerged for two days and main's checker has changed since (same-wave overlap rule, `dfb8cdb85`), so rebase the commit on main before reviewing it. Keep the worktree until this item is picked up or dropped.
