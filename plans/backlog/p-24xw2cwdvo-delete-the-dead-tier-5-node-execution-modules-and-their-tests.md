@@ -1,7 +1,7 @@
 ---
 id: p-24xw2cwdvo
 title: "Delete the dead tier-5 Node execution modules and their tests left after plan s6a phase 21 (execution, priority high; source: owner decision 2026-11-22 18:23, option B)"
-status: proposed
+status: done
 priority: P1
 area: execution
 created: 2026-11-22
