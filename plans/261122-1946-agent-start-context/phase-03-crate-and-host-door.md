@@ -1,61 +1,55 @@
-# Phase 3: The crate, its ports and the host door
+# Phase 3: The pure composer crate and its ports
 
-This phase builds the pure composer (ASC-D1, ASC-D5) and its one host door. No caller uses it yet.
+This phase builds the pure composer (ASC-D1, ASC-D5 as amended by ASC-D9) and nothing else: no host adapter, no door,
+no registration. It needs only ACE phase 1's contracts, so it runs while ACE phase 3 is still being built (owner
+order of 2026-11-25 20:4x: ASC joins ACE only after ACE 1, at ASC 6 after ACE 3, and at ASC 9 after the gathering).
+Everything that needs ACE's code (its reader, its `ValueSource`) and every shared host file moved to phase 6, which
+waits for ACE 3.
 
 ## Inputs
 
 - `docs/platform/agent-start-context/spec.md` and `packages/agent-start-context/contracts/**`, from phase 2.
-- The instruction registry, whose rules the `UnitSource` adapter must match: `src/setup/instruction-registry.mjs`
-  (roots, owner check, frontmatter, scope specificity) and `src/setup/instruction-composition.mjs` (authority
-  order, `supersedes`/`conflicts`).
-- A host door to copy: `fgos internal execution <op> --protocol 1` (`apps/fgos/src/wiring/execution_routes.rs`), and
-  how internal verbs are registered (`apps/fgos/src/routing.rs`,
-  `packages/host-runtime/contracts/command-manifest.json`).
-- Tiering: `docs/architecture-manifest.json` and design principle 2.
+- ACE's contracts from ACE phase 1: `packages/agent-context-engine/contracts/when-keys.v1.json` (the keys and their
+  value types) and `effective-rules.v1.json` (the rule-set shape, with vectors). They are read as data; this phase
+  does not link ACE's crate.
+- Tiers: `packages/component-authority/model/layers.yaml` (`tierNames`, tier 3) and design principle 2.
 
 ## Footprint
 
-`packages/agent-start-context/rust/**`, `Cargo.toml`, `Cargo.lock`, `apps/fgos/Cargo.toml`,
-`apps/fgos/src/wiring/start_context.rs`, `apps/fgos/src/wiring/start_context/**`, `apps/fgos/src/wiring/mod.rs`,
-`apps/fgos/src/routing.rs`, `apps/fgos/tests/start_context.rs`,
-`packages/host-runtime/contracts/command-manifest.json`, `docs/architecture-manifest.json`.
+`packages/agent-start-context/rust/**`, `Cargo.toml`, `Cargo.lock`.
 
 ## Steps
 
 1. Create the crate `fgos-agent-start-context` at `packages/agent-start-context/rust/` and add it to the workspace
-   members. It may depend only on crates at tier 3 or below (canonical-json, yaml-doc, durable-file, and similar).
+   members. It may depend only on crates at tier 3 or below (canonical-json, yaml-doc, durable-file, and similar). It
+   does not depend on `fgos-agent-context-engine` yet; phase 6 adds that dependency with `default-features = false`.
 2. Types: generate them from, or check them against, the v1 schemas. That covers `StartRequest`, `Facts`
    (`FactKey`, `FactValue`), the closed `Payload` enum, `Delivery`, `StartContext`, `Block` and `Refusal`.
-3. Write `compose(&StartRequest, &Ports) -> Result<StartContext, Refusal>`. It:
-   - validates facts against the registry (unknown key, invalid value, missing required key);
-   - selects units whose `when:` matches;
-   - orders the blocks by authority and specificity, and applies `supersedes` and `conflicts`;
+3. Define the ports `RuleSet` (an already verified rule set in composition order, each rule with id, owner, body and
+   `when:`), `FactRegistry` (keys with their value types, and an allowed-value lookup), `RecordSink` and
+   `Contributor` as traits. The crate itself does no I/O.
+4. Write `compose(&StartRequest, &Ports) -> Result<StartContext, Refusal>`. It:
+   - validates facts against `FactRegistry` (unknown key, value of the wrong type or not allowed, missing required
+     key);
+   - selects the rules whose `when:` matches, keeping the order `RuleSet` hands over (ACE resolved supersession,
+     conflicts and overrides when the rules were written);
    - places the payloads unchanged;
    - calls the contributors whose `when:` matches, within their timeout and budget, and on failure leaves the block
      out and records it;
    - applies the delivery's byte budget, dropping the optional blocks with the lowest priority and recording each
      drop;
-   - appends the record through `RecordSink`.
-4. Define the ports `UnitSource`, `FactRegistry`, `RecordSink` and `Contributor` as traits. The crate itself does no
-   I/O.
-5. Put the host adapters in `apps/fgos/src/wiring/start_context/`:
-   - a `UnitSource` over the three instruction roots, with owners checked against the architecture manifest;
-   - a `FactRegistry` that reads the live values (executor ids from config, personas through the agent-definition
-     layers, domains from `domains/*`, workflows and stages from the domain workflow files);
-   - a `RecordSink` that appends JSONL under the project's `.fgos/` observe area (L1, L3: truth stays in the JSONL).
-     Resolve the path through the existing `.fgos` path door, never by hand.
-6. Add the door `fgos internal start-context compose --input -`: a JSON `StartRequest` goes in on stdin, and a JSON
-   `StartContext` or `Refusal` comes out with a non-zero exit. Register it in the routing table and the command
-   manifest.
-7. Declare the new crate's tier (3) wherever the manifest and spec declare Rust crate tiers.
+   - hands the record to `RecordSink`.
+5. Tests drive `compose` through in-crate test adapters of the ports, fed by phase 2's vectors and ACE phase 1's
+   `when-keys` and `effective-rules` vectors. These adapters live under `tests/` only; production adapters are
+   phase 6's.
 
 ## Verify
 
-- `cargo test -p fgos-agent-start-context` passes. This covers the schema vectors from phase 2, one test per refusal,
-  the order and budget, and a failing contributor that is left out and recorded.
-- `cargo test -p fgos --test start_context` passes: the door round-trips one vector and records one line.
-- `node scripts/run-tests.mjs test/architecture.test.mjs` passes.
+- `cargo test -p fgos-agent-start-context` passes. This covers phase 2's vectors, one test per refusal this phase
+  owns (`start-fact-unknown`, `start-fact-value-invalid`, `start-fact-missing`, `start-payload-invalid`,
+  `start-delivery-unsupported`), the order and budget, and a failing contributor that is left out and recorded.
+- `cargo tree -p fgos-agent-start-context` lists no `pkm-core` and no `fgos-agent-context-engine`.
 
 ## Rollback
 
-Revert the commit. Nothing calls the crate yet.
+Revert the commit. Nothing calls the crate.

@@ -4,7 +4,7 @@
 
 - All phase branches, already landed on main.
 - `reports/before-bytes.md` from phase 4.
-- The per-start records under the observe area (phase 3).
+- The per-start records (Observe kind `start-context`, phase 3).
 
 ## Footprint
 
@@ -17,9 +17,13 @@
 2. Start one head per persona and one worker per role task through the real doors on this tree, for example
    `npm run fgos:dev -- session start <persona>` and `npm run fgos:dev -- run "<probe>" --capability <role>`. Read
    the per-start records.
-3. Write `reports/start-token-table.md`: before (phase 4) against after (the records), in tokens, for each head
-   persona and each worker operation, plus the change in always-loaded AGENTS.md bytes.
-4. Add a line to `## [Unreleased]` in `CHANGELOG.md` covering two things: agents get their start context from one
+3. Write `reports/start-token-table.md`: before (phase 4 and the phase-5 worker goldens) against after (the records),
+   in tokens, for each head persona and each worker operation. Count each start as its opening plus the always-loaded
+   text the CLI reads (AGENTS.md, CLAUDE.md), so the table shows the net change per start and not only the opening.
+   Report the external blocks (AgentKit, GitNexus, MDView, `.claude/rules`) as an unchanged line of their own.
+4. Add a line to `## [Unreleased]` in `CHANGELOG.md`, after the lines of ACE phase 6 (the checked rule store) and of the gathering plan's
+   phase 2,
+   covering two things: agents get their start context from one
    composer, and hand-opened sessions get context through a SessionStart hook with the configurable
    `startContext.entryPersona`.
 5. Run `rg -n "openingText|FIRST_STEPS|renderOnWake|renderPersonaSection" src scripts` and the one-producer test once

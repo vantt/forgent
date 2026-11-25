@@ -5,38 +5,47 @@ composer. There is one SessionStart verb for every case: a rotation successor, a
 
 ## Inputs
 
-- `apps/fgos/src/wiring/session_rotation_hook.rs` after phase 7.
-- The hook table: `packages/distribution/contracts/agent-hooks.v1.json`, `packages/distribution/rust/src/agent_hooks.rs`
-  and `src/setup/agent-hooks.mjs`. The hook script: `scripts/fgos-session-start-hook.mjs`.
+- The native verb `fgos hook session-rotation --event session-start` (`apps/fgos/src/wiring/session_rotation_hook.rs`
+  after phase 7; described in `packages/host-runtime/contracts/command-manifest.json` around line 2005).
+- The hook table, Rust only since `4259868c5` retired the Node table (`src/setup/agent-hooks.mjs` is gone):
+  `packages/distribution/contracts/agent-hooks.v1.json` (rows exist only under `rowsMailboxOn`, for projects that
+  opted into the mailbox; SessionStart rows today: claude `identity session --register` and `hook session-rotation`,
+  codex and agy `identity session --register`), `packages/distribution/rust/src/agent_hooks.rs` and
+  `packages/distribution/rust/tests/goldens/agent-hooks-vectors.json`. Hooks are installed by
+  `fgos doctor --fix --only <cli>-hook-wired`. `test/setup/agent-hooks.test.mjs` runs the installed hook code.
+- `scripts/fgos-session-start-hook.mjs` is not part of this: it injects canonical paths and is wired only by this
+  repository's own `.claude/settings.json`, which this plan does not touch.
 - The AGENTS.md install gate: a new config key goes into `core/config-standard` and `core/config-schema`, and nowhere
   else.
 
 ## Footprint
 
 `apps/fgos/src/wiring/session_rotation_hook.rs`, `apps/fgos/src/wiring/start_context/**`,
-`packages/distribution/contracts/agent-hooks.v1.json`, `packages/distribution/rust/src/agent_hooks.rs`,
-`packages/distribution/rust/tests/goldens/agent-hooks-vectors.json`, `src/setup/agent-hooks.mjs`,
-`test/setup/agent-hooks.test.mjs`, `scripts/fgos-session-start-hook.mjs`, `core/config-standard/startContext.yaml`,
-`core/config-schema/**`.
+`packages/host-runtime/contracts/command-manifest.json`, `packages/distribution/contracts/agent-hooks.v1.json`,
+`packages/distribution/rust/src/agent_hooks.rs`, `packages/distribution/rust/tests/goldens/agent-hooks-vectors.json`,
+`test/setup/agent-hooks.test.mjs`, `core/config-standard/startContext.yaml`,
+`core/config-schema/startContext.schema.yaml`.
 
 ## Steps
 
 1. Add the config key `startContext.entryPersona` (default `secretary`) and, if phase 3 made the per-delivery byte
-   budgets configurable, those keys too. Each key goes in `core/config-standard/startContext.yaml` and its schema.
+   budgets configurable, those keys too. Each key goes in `core/config-standard/startContext.yaml` and
+   `core/config-schema/startContext.schema.yaml`.
 2. Extend the SessionStart verb:
    - When the session is a head (it has a head identity), compose with `kind=head` and its persona, as today.
    - Otherwise compose with `kind=hand-opened`, `cli` and `project`. The persona is the configured entry persona;
      no seat or grant is created, and the P13 UX flow is out of scope.
-   - Deliver the result as `hook-context`.
+   - Deliver the result as `hook-context`. Update the verb's manifest description.
 3. Register the hook for claude, codex and agy in the hook table, with golden vectors to match. omp and pi have no
-   rows.
+   rows. Say in the commit whether the rows join `rowsMailboxOn` or get an opt-in of their own; a new opt-in is a
+   config key under step 1.
 4. A refusal or an unreadable config must not block the session. The hook prints nothing and records the refusal.
 
 ## Verify
 
 - `cargo test -p fgos-distribution` passes, and so does `node scripts/run-tests.mjs test/setup/agent-hooks.test.mjs`.
-- `echo '{}' | fgos internal session-start ...` (the verb's real invocation, as registered) prints the composed
-  context for a plain directory with fgOS set up.
+- `echo '{}' | fgos hook session-rotation --event session-start` (or the verb's new name, as registered) prints the
+  composed context in a plain directory with fgOS set up and the hook installed.
 
 ## Rollback
 
