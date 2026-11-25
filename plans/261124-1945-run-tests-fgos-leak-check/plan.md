@@ -1,14 +1,13 @@
 ---
 contract: plan-v1
 title: "The leak check of run-tests judges only what the test run wrote"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 footprint:
   - scripts/run-tests.mjs
   - test/scripts/run-tests.test.mjs
-  - test/helpers/fgos-write-witness.mjs
-  - packages/git/contracts/mutation-census.v1.json
+  - scripts/lib/fgos-write-witness.mjs
   - plans/261124-1945-run-tests-fgos-leak-check/
 base: e402520442c7f124576f3403d6e8f380477b436c
 source:
@@ -58,8 +57,10 @@ Phase 1's criteria are met (see Progress). Phase 2:
    directories ..." is replaced, not kept beside the new cases.
 5. `LIVE_FGOS_DIRS` is gone: `rg -n LIVE_FGOS_DIRS scripts test` prints nothing.
 6. `node scripts/run-tests.mjs test/scripts/run-tests.test.mjs test/setup/git-mutation-census.test.mjs`
-   exits 0, after the census is regenerated with
-   `node scripts/git-one-door-scan.mjs --write-census`.
+   exits 0 in the phase worktree with the census regenerated there for the run
+   (`node scripts/git-one-door-scan.mjs --write-census`), and the branch carries no census
+   edit: the land door regenerates it before its gates (`land.regenerate` in
+   `.fgos/config.yaml`).
 
 ## Non-goals
 
@@ -112,7 +113,7 @@ Phase 2: `fgos authority locate` for "a preload module that records which .fgos 
 test processes write during a run" returns only unrelated low-score doors
 (`agent-hook-table`, `control-the-gateway-process`); test preloads have no row, like
 `test/helpers/git-spawn-spy.mjs`. No component, door, contract or decision kind is added.
-survivor: `test/helpers/fgos-write-witness.mjs` read back in `runSelectedTests`; retired:
+survivor: `scripts/lib/fgos-write-witness.mjs` read back in `runSelectedTests`; retired:
 `LIVE_FGOS_DIRS` and `snapshotFgos`'s whole-store walk in `scripts/run-tests.mjs`.
 
 | New thing | Model row | Note |
@@ -123,19 +124,24 @@ survivor: `test/helpers/fgos-write-witness.mjs` read back in `runSelectedTests`;
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Skip live runtime directories in the leak check](phase-01-skip-live-runtime-dirs.md) | - | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs | 1 | done |
-| 2 | [Attribute .fgos writes to the test run](phase-02-attribute-fgos-writes-to-the-test-run.md) | 1 | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs, test/helpers/fgos-write-witness.mjs, packages/git/contracts/mutation-census.v1.json | 2 | ready |
+| 2 | [Attribute .fgos writes to the test run](phase-02-attribute-fgos-writes-to-the-test-run.md) | 1 | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs, scripts/lib/fgos-write-witness.mjs | 2 | ready |
 
 Phase 1: one phase, one wave: one constant, one walk filter and one test file.
 
 Phase 2 is one phase: the witness, its reader and its proof land together (a reader without
 the witness fails every run closed). No integration phase: there is one branch, and its
-verify is the full gate for its footprint. The census is a generated hot file that other
-plans also regenerate; the phase regenerates it last, on the rebased tree, and never
-hand-merges it. The footprint adds one file to the three the discussion named: the witness
-module, a new file the attribution needs; no other plan touches it. Checked with
+verify is the full gate for its footprint. The footprint adds one file to the two code files
+the discussion named: the witness module, a new file the attribution needs. It lives in
+`scripts/lib/`, next to the other preload `buildTestArgv` loads from there
+(`scripts/lib/test-git-config-guard.mjs`), not in `test/helpers/`, which the running plan
+`261122-2108-delete-dead-node-execution-closure` claims whole. The census the discussion
+listed is left out of the footprint: the land door regenerates it (Risks). Checked with
 `node scripts/plan-contract-check.mjs` and `fgos resource-check --plan`.
 
 ## Progress
+
+- 2026-11-25 13:10: owner answered q-zw4htizjz2. Footprint narrowed (census dropped, witness
+  at `scripts/lib/fgos-write-witness.mjs`); plan set `ready` for admission.
 
 - 2026-11-24 21:46: phase 1 parked (status stays `running`; the plan contract has no parked status). Worktree
   `/home/vantt/projects/forgent-worktrees/261124-1945-run-tests-fgos-leak-check-p01`
@@ -175,6 +181,14 @@ module, a new file the attribution needs; no other plan touches it. Checked with
 
 - **q-3rhc6lroqc, who repairs the backlog index files: answered "Secretary repairs them"** (owner,
   2026-11-24 22:32). The secretary repairs the backlog index files; this plan does not.
+- **q-zw4htizjz2, the census footprint clash: answered "Exempt regenerated census"** (owner,
+  2026-11-25 12:54). The exemption is its own plan,
+  [261125-1259-plan-check-regenerated-census](../261125-1259-plan-check-regenerated-census/plan.md)
+  (backlog p-qvgaqip4tj). This plan does not wait for it: the census came out of the footprint
+  because the land door already regenerates it (Risks), and the witness moved from
+  `test/helpers/` to `scripts/lib/`, because the running dead-node plan also claims
+  `test/helpers/**`, a clash the exemption alone would not have cleared. Phase 2's mechanism is
+  unchanged; only its file path and census step changed.
 
 ## Risks and rollback
 
@@ -209,17 +223,15 @@ Phase 2:
 - **Fail closed.** The test file process always loads the witness through `--import`, so a
   run with test files and no witness record means the preload broke; the run fails with a
   message naming the witness rather than passing with nothing attributed.
-- **Census conflicts.** `packages/git/contracts/mutation-census.v1.json` is regenerated by
-  every plan that touches `scripts/`; a land that meets a newer census regenerates it on the
-  rebased tree, never merges it by hand.
+- **Census.** The branch never commits `packages/git/contracts/mutation-census.v1.json`. The
+  land door regenerates it in the candidate before its gates run (`land.regenerate` in
+  `.fgos/config.yaml`; `packages/supervision/rust/src/land.rs`: a regenerated file is exempt
+  only through the regeneration the land performs), so a census edit on the branch would be
+  refused `land-outside-footprint`. The phase regenerates it in its worktree only to run the
+  census test, then restores it.
 - **Rollback:** revert the phase 2 commit(s); the stopgap list from `b4581336d` returns with
-  them. Regenerate the census on the reverted tree.
+  them. The land of the revert regenerates the census.
 
 ## Outstanding questions
 
-- **q-zw4htizjz2**: Stop the plan check counting the regenerated Git census as a footprint
-  clash, so the land-gate fix can go ready? The plan stays `draft` until it is answered:
-  `node scripts/plan-contract-check.mjs` refuses `ready` because
-  `packages/git/contracts/mutation-census.v1.json` is also claimed by the running plan
-  `261122-2108-delete-dead-node-execution-closure` (and three other running plans). The
-  phase design does not depend on the answer; only admission does.
+None.

@@ -27,15 +27,14 @@ Capability: `code:implement`.
 
 ## Files it may write
 
-- `test/helpers/fgos-write-witness.mjs` (new)
+- `scripts/lib/fgos-write-witness.mjs` (new)
 - `scripts/run-tests.mjs`
 - `test/scripts/run-tests.test.mjs`
-- `packages/git/contracts/mutation-census.v1.json` (regenerated only)
 - `plans/261124-1945-run-tests-fgos-leak-check/plan.md` (Progress lines only)
 
 ## Steps
 
-1. Write `test/helpers/fgos-write-witness.mjs`, a preload of the same shape as
+1. Write `scripts/lib/fgos-write-witness.mjs`, a preload of the same shape as
    `git-spawn-spy.mjs`. It reads two env values the runner sets: the log file path and the
    checkout's `.fgos` directory (both under the `FGOS_TEST_` prefix, so `buildTestEnv`
    keeps them). On load it appends one `{"kind":"load","pid":...}` line. It wraps the
@@ -65,7 +64,7 @@ Capability: `code:implement`.
 4. Fail closed: when at least one test file ran and the witness log holds no `load` line,
    set `result.fgosDiff.leaked = true`, log
    `run-tests: ERROR: the .fgos write witness did not load in the test processes ...`
-   naming `test/helpers/fgos-write-witness.mjs`, and fail the run with status 1. A run
+   naming `scripts/lib/fgos-write-witness.mjs`, and fail the run with status 1. A run
    refused before any test started (the existing `supervisor.failure()` path) is not a
    witness failure.
 5. In `test/scripts/run-tests.test.mjs`, in the existing leak-check section, replace the
@@ -83,8 +82,13 @@ Capability: `code:implement`.
      (AC3).
    Keep the secrets-exclusion and `allowedFgosMutations` cases, retargeted at the new
    comparison. Do not add a second leak section anywhere else (AC4).
-6. Regenerate the census last, on the final tree:
-   `node scripts/git-one-door-scan.mjs --write-census`. Never edit the JSON by hand.
+6. Do not commit the census. The land door regenerates
+   `packages/git/contracts/mutation-census.v1.json` before its gates (`land.regenerate` in
+   `.fgos/config.yaml`), and a census edit on the branch is outside this footprint. To run
+   the census test in Verify, regenerate it in the worktree last, on the final tree
+   (`node scripts/git-one-door-scan.mjs --write-census`), run Verify, then restore it with
+   `git -C <worktree> checkout -- packages/git/contracts/mutation-census.v1.json`. Never
+   edit the JSON by hand.
 7. Run the validating proof point from plan.md Risks once: on a quiet tree, compare the
    witness result of the full suite (`npm test`) with a whole-store walk taken before and
    after the same run by a throwaway script under `.fgos/runtime/tmp/` (not committed).
@@ -99,11 +103,13 @@ node scripts/run-tests.mjs test/scripts/run-tests.test.mjs test/setup/git-mutati
 npm test
 ```
 
+Run the two run-tests commands with the census regenerated in the worktree (step 6), then
+restore it.
+
 Pass: `rg` prints nothing; both run-tests commands exit 0 with no `.fgos` leak line; the
 leak-check section holds the AC1-AC3 cases; the Progress line for step 7 is written.
 
 ## Rollback
 
 Revert the phase's commit(s). That restores `LIVE_FGOS_DIRS` from `b4581336d` and the walk;
-regenerate the census on the reverted tree with
-`node scripts/git-one-door-scan.mjs --write-census`.
+the land of the revert regenerates the census.
