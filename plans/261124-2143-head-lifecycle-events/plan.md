@@ -1,11 +1,12 @@
 ---
 contract: plan-v1
 title: "Head lifecycle events: the host reports the end of a lead, finished planners and leads are closed, and a waiting lead does not hold a working slot"
-status: ready
+status: running
+lead: head:lead-forgent-261124-2143-head-l-84936
 priority: P1
 blockedBy:
   - 261124-0004-heads-operate-without-owner
-base: bf3025d01676c5f67004a715925f236aca7700ad
+base: ae9f98741330ec92fef41d3b05bdcf78ab19bfaa
 footprint:
   - plans/261124-2143-head-lifecycle-events/**
   - apps/fgos/src/wiring/observe_sources/head_state.rs
