@@ -4,7 +4,7 @@
 //! only read: progress from the capture files, the answer from the `result.json` the settle step writes.
 //! The controller never settles, never signals the agent and never owns a process of the attempt.
 //!
-//! Port of `src/run-supervisor/direct-launch.mjs`. The lane facts are read from `crate::lanes` (the pool is
+//! Port of (retired Node module `src/run-supervisor/direct-launch.mjs`; last at `85760c6f2`). The lane facts are read from `crate::lanes` (the pool is
 //! Rust's already); the host binary and payload root come in as an [`AttemptHost`] (the payload root is
 //! resolved by its own module, not here).
 

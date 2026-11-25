@@ -28,7 +28,7 @@ The coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079
 Current Unit collaboration is selected by CollaborationPattern; executable
 Workflow nodes call the Unit execution core. This is a current-owner map,
 not an assertion that the retired coordination engine is a current prerequisite or entity.
-Evidence: src/runner/execution/loops/index.mjs:34-46; src/workflow/runner.mjs:419-428.
+Evidence: src/runner/execution/loops/index.mjs (retired; last at `85760c6f2`):34-46; src/workflow/runner.mjs:419-428.
 
 Current execution owners are:
 

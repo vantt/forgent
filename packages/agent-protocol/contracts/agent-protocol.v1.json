@@ -1,6 +1,6 @@
 {
   "contract": { "id": "agent-protocol", "version": 1 },
-  "description": "Agent protocol (L3, crate fgos-agent-protocol): one pure state machine per CLI x launch mode. It reads what the agent shows and names what happened; it never opens a tab, picks a model, changes a timeout or decides a retry. It does not build argv: argv comes from the executor configuration through resolveExecutorCommand (src/runner/dispatch/transport.mjs) and is written into the envelope (owner decision 2026-10-16).",
+  "description": "Agent protocol (L3, crate fgos-agent-protocol): one pure state machine per CLI x launch mode. It reads what the agent shows and names what happened; it never opens a tab, picks a model, changes a timeout or decides a retry. It does not build argv: argv comes from the executor configuration through resolveExecutorCommand (src/runner/dispatch/transport.mjs) and is written into the envelope (owner decision 2026-10-16). (last at `85760c6f2`)",
   "io": {
     "description": "Port the supervisor wires to the adapter: terminal-control by key (terminal, 6.3). The direct mode reads no port: its adapter is handed the exit and the capture tail.",
     "send": { "input": { "text": "string or null", "keys": "string[] or null", "submit": "boolean" }, "modes": ["terminal"] },

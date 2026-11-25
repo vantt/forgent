@@ -2,7 +2,7 @@
 //! the confinement homes, the folder-trust entry, the pane the Session Host opens for the attempt's key), prepared
 //! by the engine's round (`prepare_terminal_attempt`) over the terminal control of the herdr session the seat lives
 //! in. The host side of `prepareTerminalAttempt` as `executeAssignment` calls it
-//! (`src/runner/dispatch/assignment-runner.mjs:1062`, `src/runner/dispatch/herdr-round.mjs:462`).
+//! ((retired Node module `src/runner/dispatch/assignment-runner.mjs`; last at `85760c6f2`), (retired Node module `src/runner/dispatch/herdr-round.mjs`; last at `85760c6f2`)).
 //!
 //! The pane is opened through the session the seat is confined to: until the round names an isolated worker
 //! session, that is the controller's own herdr endpoint, and from then on the worker session's (Node builds its

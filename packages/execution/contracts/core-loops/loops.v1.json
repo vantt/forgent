@@ -1,6 +1,6 @@
 {
  "version": "core-loops-loops.v1",
- "about": "Loop rules, recorded from src/runner/execution/loops/*.mjs. `cases` are plain functions ({ id, fn, args, expected }). `runs` play a loop with a table of answers: each role call is answered by results[\"<seat>/<round or 1>\"], the n-th verify call by verify[n]; expected holds the loop result and the calls in order (a verify call is { verify: true }; a call lists the seat id, the objective it was told, and the optional round, preferIndependentOf, independentOf, inputs as { seat, round, outcome } and the size of its batch). `history` cases are patternHistoryOutcome calls.",
+ "about": "Loop rules, recorded from the retired Node module src/runner/execution/loops/*.mjs. `cases` are plain functions ({ id, fn, args, expected }). `runs` play a loop with a table of answers: each role call is answered by results[\"<seat>/<round or 1>\"], the n-th verify call by verify[n]; expected holds the loop result and the calls in order (a verify call is { verify: true }; a call lists the seat id, the objective it was told, and the optional round, preferIndependentOf, independentOf, inputs as { seat, round, outcome } and the size of its batch). `history` cases are patternHistoryOutcome calls. (last at `85760c6f2`)",
  "paramTables": {
   "solo": {
    "seats": {

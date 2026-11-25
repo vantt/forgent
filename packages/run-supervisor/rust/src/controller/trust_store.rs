@@ -1,4 +1,4 @@
-//! The one door onto an agent CLI's folder-trust store, ported from `src/run-supervisor/trust-store.mjs`
+//! The one door onto an agent CLI's folder-trust store, ported from (retired Node module `src/run-supervisor/trust-store.mjs`; last at `85760c6f2`)
 //! with its behaviour unchanged.
 //!
 //! Trust is derived, never invented: an entry is only written for a path whose repo root is already

@@ -45,7 +45,7 @@ including executor-id consolidation. The legacy reviewer ids no longer exist
 as registered executors; `EXECUTOR_KINDS` is now `agent|tool`. These facts
 come from code and the completed plan, without reading live configuration.
 Evidence: `src/runner/dispatch/transport.mjs:176`, (retired; last at `85760c6f2`)
-`src/runner/dispatch/assignment-policy.mjs:88-98` (deleted in 3133ed474) (former module; removed from main before source capture, not a current owner),
+src/runner/dispatch/assignment-policy.mjs (retired; last at `85760c6f2`):88-98` (deleted in 3133ed474) (former module; removed from main before source capture, not a current owner),
 `src/runner/dispatch/config.mjs:457`, and (retired; last at `85760c6f2`)
 `archive/plans/260917-executor-profile-schema-migration/plan.md:1-14,733-741`.
 
@@ -86,4 +86,4 @@ executors and the former separate ids as removed. The assignment-policy
 module confirms retirement of its legacy-id alias seam. The doctor warning
 check remains a migration diagnostic, not evidence that Phase E is pending.
 Evidence: `archive/plans/260917-executor-profile-schema-migration/plan.md:733-741`
-and `src/runner/dispatch/assignment-policy.mjs:88-98` (deleted in 3133ed474) (former module; removed from main before source capture, not a current owner).
+and src/runner/dispatch/assignment-policy.mjs (retired; last at `85760c6f2`):88-98` (deleted in 3133ed474) (former module; removed from main before source capture, not a current owner).

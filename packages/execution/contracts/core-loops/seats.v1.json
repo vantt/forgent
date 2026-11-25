@@ -1,6 +1,6 @@
 {
  "version": "core-loops-seats.v1",
- "about": "Seat resolution, recorded from src/runner/execution/seat-resolver.mjs. A case is { id, fn, args, expected }; resolveSeats takes the options object with unit, runnerConfig, params, floors and shippedCheckersByRigor as given.",
+ "about": "Seat resolution, recorded from the retired Node module src/runner/execution/seat-resolver.mjs. A case is { id, fn, args, expected }; resolveSeats takes the options object with unit, runnerConfig, params, floors and shippedCheckersByRigor as given. (last at `85760c6f2`)",
  "tables": {
   "roles": [
    "producer",

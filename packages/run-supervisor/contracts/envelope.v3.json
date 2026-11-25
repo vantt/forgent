@@ -61,7 +61,7 @@
     "cwd": "absolute working directory of the agent",
     "mutation": { "enum": ["mutating", "read-only"], "meaning": "mutating attempts also hold the dispatch-cwd lease (rank 30) handed to the supervisor at fd 4. Windows: a LockFileEx lock is never inherited, so the supervisor takes the attempt lock and, when mutating, the lease itself; see optionalFields.cwdLeaseFile" },
     "launch": {
-      "command": "string, absolute executable path of the agent CLI (resolved by resolveExecutorCommand in src/runner/dispatch/transport.mjs); absent when origin is adopt-not-started",
+      "command": "string, absolute executable path of the agent CLI (resolved by resolveExecutorCommand in packages/execution/engine/src/transport_round/executor_command.rs (retired Node src/runner/dispatch/transport.mjs, last at `85760c6f2`)); absent when origin is adopt-not-started",
       "args": "string[]",
       "env": "object string -> string; the non-secret environment of the agent. Secret values are absent here and present in sideFile.env; the gate merges sideFile.env over this map",
       "stdinPolicy": { "enum": ["brief-file", "null"], "meaning": "brief-file: the gate opens briefPath read-only as stdin; null: stdin is /dev/null (NUL on Windows)" },

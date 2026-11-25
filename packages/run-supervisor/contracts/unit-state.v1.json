@@ -10,13 +10,13 @@
       "failed": "unit-summary.json exists with a failing outcome"
     },
     "liveController": {
-      "record": "<unitDir>/unit-control/: the run-control ledger (src/runner/execution/unit-control.mjs over src/run-supervisor/run-lock.mjs) whose holder is the controller driving the unit; taken when the unit starts and by a resuming controller",
+      "record": "<unitDir>/unit-control/: the run-control ledger (src/runner/execution/unit-control.mjs (retired; last at `85760c6f2`) over src/run-supervisor/run-lock.mjs (retired; last at `85760c6f2`)) whose holder is the controller driving the unit; taken when the unit starts and by a resuming controller",
       "judge": "inspectRunControl over that ledger: the holder is judged with the same dead-holder proof every run control uses (packages/process/contracts/process-facts.judge.v1.json); only a holder proven dead counts as no controller. alive and unknown both keep the unit `running` (unknown = keep). A unit with no ledger has no controller"
     }
   },
   "attemptState": {
     "enum": ["running", "being-adopted", "closed", "legacy-run", "abandoned-not-started", "abandoned-before-brief", "abandoned-legacy", "superseded"],
-    "source": "the adopt probe (src/run-supervisor/client.mjs adoptRun/adoptScan, read-only) over <attemptDir>; abandoned-legacy is the one exception: an earlier release's doctor fix wrote it into run.json, the probe never reports it and nothing writes it any more",
+    "source": "the adopt probe (src/run-supervisor/client.mjs (retired; last at `85760c6f2`) adoptRun/adoptScan, read-only) over <attemptDir>; abandoned-legacy is the one exception: an earlier release's doctor fix wrote it into run.json, the probe never reports it and nothing writes it any more (last at `85760c6f2`)",
     "rules": {
       "running": "attempt.lock is held and no adopting.json: a supervisor owns it",
       "being-adopted": "attempt.lock is held and adopting.json names the holder: an adopter owns it",
@@ -46,7 +46,7 @@
       "type": "integer, milliseconds",
       "default": "15000, the standard value in core/config-standard/dispatch.yaml",
       "min": 1000,
-      "reader": "project over global over standard through the config door, the same reader as dispatch.gateKillGraceMs (src/run-supervisor/gate-kill-grace.mjs)",
+      "reader": "project over global over standard through the config door, the same reader as dispatch.gateKillGraceMs (src/run-supervisor/gate-kill-grace.mjs (retired; last at `85760c6f2`))",
       "setup": "setup never writes the key into a config file; an absent key takes the standard value. Setup and doctor registration is added together with the doctor check for stuck attempts"
     }
   },

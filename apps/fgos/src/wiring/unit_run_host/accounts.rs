@@ -145,7 +145,7 @@ impl AccountStateSource for RecordingOverlay<'_, '_> {
     }
 }
 
-/// `assertPinnedAccountsUsable` (`src/runner/execution/account-pin.mjs:44`): refuse a seat pinned to an account
+/// `assertPinnedAccountsUsable` (retired Node module `src/runner/execution/account-pin.mjs`; last at `85760c6f2`): refuse a seat pinned to an account
 /// Seat Binding's account view holds quarantined now, naming until when it waits. `runtime_dir` is the account store
 /// the caller names (`providerCapacityRuntimeDir`), else the machine's.
 pub fn pinned_accounts_usable(
@@ -203,7 +203,7 @@ pub fn pinned_accounts_usable(
         .map_err(|message| RunUnitError::config(message, None, None))
 }
 
-/// `inspectAccountRotation` (`src/runner/execution/account-rotation.mjs:21`): what rotation in `pool` has to work
+/// `inspectAccountRotation` (retired Node module `src/runner/execution/account-rotation.mjs`; last at `85760c6f2`): what rotation in `pool` has to work
 /// with, from the inventory the runner config declares and the live account state; `None` when the pool has no
 /// enabled account or the state cannot be read.
 pub fn account_rotation(
@@ -245,20 +245,20 @@ pub fn drop_assignment_record(assignment_id: &str, runtime_dir: Option<&Path>) {
     }
 }
 
-/// `runnerConfigForBinding` (`src/runner/execution/account-pin.mjs:33`): a binding pinned to an account leases from
+/// `runnerConfigForBinding` (retired Node module `src/runner/execution/account-pin.mjs`; last at `85760c6f2`): a binding pinned to an account leases from
 /// an inventory holding only that account.
 pub fn runner_config_for_binding(runner: &Value, bound: &Value) -> Value {
     fgos_execution_engine::accounts::pin::runner_config_for_binding(runner, bound)
 }
 
-/// The modes a caller may pin an account in (`ACCOUNT_PIN_MODES`, `src/runner/execution/unit-run-start.mjs:207`).
+/// The modes a caller may pin an account in (`ACCOUNT_PIN_MODES`, (retired Node module `src/runner/execution/unit-run-start.mjs`; last at `85760c6f2`)).
 const ACCOUNT_PIN_MODES: [&str; 2] = ["strict", "where-served"];
 
 fn pre_admission(message: String, code: Option<&str>) -> RunUnitError {
     RunUnitError::config(message, code, Some("pre-admission"))
 }
 
-/// `assertDoorChoicesBeforeRun` (`src/runner/execution/unit-run-start.mjs:216`): refuse, before a unit run exists, a
+/// `assertDoorChoicesBeforeRun` (retired Node module `src/runner/execution/unit-run-start.mjs`; last at `85760c6f2`): refuse, before a unit run exists, a
 /// machine on which no agent CLI can start, an unknown `accountPin` mode, a dependence or a raised tier the calling
 /// door has no authority for, and a pinned account no seat takes (unless `accountPin` is `where-served`), that a
 /// seat refuses, or that is quarantined now. The seats are bound dry, exactly as the run will bind them.

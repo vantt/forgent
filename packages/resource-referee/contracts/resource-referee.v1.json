@@ -24,7 +24,7 @@
     "An empty `claims` list means 'unknown', never 'disjoint', unless the node is `readOnly: true`. A node must declare claims or `readOnly: true`."
   ],
   "unitsFile": {
-    "description": "The shape of the planner door's `--units <file.json>`. A neutral shape, not the `Unit` file schema: a real Unit treats empty `writes` as read-only because dispatch enforces it (src/runner/execution/unit.mjs:125), which is why this shape names read-only explicitly.",
+    "description": "The shape of the planner door's `--units <file.json>`. A neutral shape, not the `Unit` file schema: a real Unit treats empty `writes` as read-only because dispatch enforces it (src/runner/execution/unit.mjs:125), which is why this shape names read-only explicitly. (last at `85760c6f2`)",
     "fields": {
       "v": "1 (required)",
       "units": "list of unit objects (required)"

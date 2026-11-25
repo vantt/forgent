@@ -32,7 +32,7 @@ fn from_refusal(r: Refusal) -> RunUnitError {
     refused(r.name, r.message, r.code.as_deref(), r.phase.as_deref())
 }
 
-/// `validateUnit` (`src/runner/execution/unit.mjs:168`): the normalized unit, or the refusal that names what is
+/// `validateUnit` (retired Node module `src/runner/execution/unit.mjs`; last at `85760c6f2`): the normalized unit, or the refusal that names what is
 /// wrong with it.
 pub fn validate_unit(raw: &Value) -> Result<Value, RunUnitError> {
     validate(raw, &CrateUnitHost)
@@ -40,7 +40,7 @@ pub fn validate_unit(raw: &Value) -> Result<Value, RunUnitError> {
         .map_err(from_refusal)
 }
 
-/// `assertRunTimeoutMs(value, 'override timeoutMs')` (`src/runner/execution/unit-run-start.mjs:419`).
+/// `assertRunTimeoutMs(value, 'override timeoutMs')` (retired Node module `src/runner/execution/unit-run-start.mjs`; last at `85760c6f2`).
 pub fn assert_run_timeout(value: &Value) -> Result<(), RunUnitError> {
     match fgos_execution::bind::run_timeout_problem(value, "override timeoutMs") {
         Some(problem) => Err(RunUnitError::config(problem, None, None)),
@@ -52,7 +52,7 @@ pub fn assert_run_timeout(value: &Value) -> Result<(), RunUnitError> {
 
 pub(crate) use fgos_execution_engine::unit_run::machine_reads::is_plan_directory;
 
-/// `existingPlanRef` (`src/runner/execution/run-request.mjs:174`): a unit file's plan gets the check `--plan` gets.
+/// `existingPlanRef` (retired Node module `src/runner/execution/run-request.mjs`; last at `85760c6f2`): a unit file's plan gets the check `--plan` gets.
 pub fn existing_plan_ref(plan: Option<&Value>, main_root: &Path) -> Result<(), RunUnitError> {
     let Some(plan) = plan.filter(|p| !p.is_null()) else {
         return Ok(());
@@ -111,7 +111,7 @@ pub fn resolve_collaboration(
 // ---- the declared operation -------------------------------------------------------------------------------
 
 /// `declaredOperationFields({ domain, workflow, stage, operation, operations, taskSpecRoot })`
-/// (`src/runner/dispatch/assignment.mjs:259`): the operation fields a unit carrying a declared operation stamps on
+/// (retired Node module `src/runner/dispatch/assignment.mjs`; last at `85760c6f2`): the operation fields a unit carrying a declared operation stamps on
 /// its producer assignment, refused when the step does not declare the operation or its task spec is missing.
 pub fn declared_operation_fields(
     declared: &Value,

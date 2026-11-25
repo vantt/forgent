@@ -1,5 +1,5 @@
 {
-  "note": "recorded from src/runner/dispatch/runtime-inspection.mjs; every case reads the same fixture tree (`files`, relative to the project root, `<root>` stands for it in the output) at observedAt",
+  "note": "recorded from the retired Node module src/runner/dispatch/runtime-inspection.mjs; every case reads the same fixture tree (`files`, relative to the project root, `<root>` stands for it in the output) at observedAt (last at `85760c6f2`)",
   "files": {
     ".fgos/assignments/a1/assignment.json": "{\"assignmentId\":\"a1\"}\n",
     ".fgos/assignments/a1/runs/01/run.json": "{\"runId\":\"r1\",\"assignmentId\":\"a1\",\"status\":\"bound\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000}\n",

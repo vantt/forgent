@@ -1,6 +1,6 @@
 //! The composed machine of one unit run: [`HostUnitRun`] answers every port of engine `unit_run` from the adapters
 //! of this module, and dispatches a bound seat through the assignment runner on [`HostExecution`]
-//! (`dispatchBound`, `src/runner/execution/run.mjs:994`).
+//! (`dispatchBound`, (retired Node module `src/runner/execution/run.mjs`; last at `85760c6f2`)).
 
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -121,7 +121,7 @@ impl Drop for CancelHold {
     }
 }
 
-/// `holdCancelOnSignal(options)` (`src/runner/execution/run.mjs:259`): a process that asked for it
+/// `holdCancelOnSignal(options)` (retired Node module `src/runner/execution/run.mjs`; last at `85760c6f2`): a process that asked for it
 /// (`enable_cancel_on_signal`) has Ctrl-C and SIGTERM (Ctrl-Break on a Windows console) cancel every attempt it
 /// delivered; one handler serves all its
 /// units, installed with the first with the project's `dispatch.cancelWaitMs` and removed with the last.
@@ -154,7 +154,7 @@ pub fn hold_cancel_on_signal(options: &Value) -> Result<CancelHold, RunUnitError
 }
 
 impl<A: CaseAdmission + Sync> HostUnitRun<A> {
-    /// `runUnit(options)` (`src/runner/execution/run.mjs:177`): engine `run_unit` over this host, holding the
+    /// `runUnit(options)` (retired Node module `src/runner/execution/run.mjs`; last at `85760c6f2`): engine `run_unit` over this host, holding the
     /// cancel handlers for as long as the run lasts.
     pub fn run_unit(&self, options: &Value) -> Result<Value, RunUnitError> {
         // A cancelled controller starts nothing: the engine refuses before any handler is held.
@@ -166,7 +166,7 @@ impl<A: CaseAdmission + Sync> HostUnitRun<A> {
         fgos_execution_engine::unit_run::run::run_unit(options, self)
     }
 
-    /// `contextRefsOf` (`src/runner/execution/run.mjs:973`): the unit's resolved inputs and the reports earlier seats
+    /// `contextRefsOf` (retired Node module `src/runner/execution/run.mjs`; last at `85760c6f2`): the unit's resolved inputs and the reports earlier seats
     /// handed this one; a blind seat gets what lies in the run state as copies in its own directory, and an own-seat
     /// input is copied in whether the unit is blind or not.
     fn context_refs(&self, seat: &SeatDispatch<'_>) -> Result<Vec<String>, RunUnitError> {

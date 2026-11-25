@@ -94,7 +94,7 @@ executor (`kind: "agent"`) that Seat Binding places for the capability's own
 `prefer` pool, or a tool provider (`kind: "tool"`, e.g. `impact-analysis` →
 `gitnexus` via `invocations: [{ via: "mcp", ... }]`, or `pane-labeling` →
 `herdr`) that names the capability in its `for` and is probed live. The two
-are separate paths (`purposeSeatOf` in `src/runner/dispatch/plan.mjs`): a
+are separate paths (`purposeSeatOf` in `packages/execution/rust/src/decide.rs` (`purpose_seat_of`; retired Node `src/runner/dispatch/plan.mjs`, last at `85760c6f2`)): a
 capability served by a tool never reads its own `prefer`. A caller must never
 assume a capability implies an Agent/Task-tool hand-off; read the
 resolved `mechanism` and, when relevant, the executor's own `kind`/`via`

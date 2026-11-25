@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "source": "src/run-supervisor/cwd-lock.mjs",
+  "source": "src/run-supervisor/cwd-lock.mjs (last at `85760c6f2`)",
   "lockPathShape": "locks/dispatch-cwd--<cwdDevIno>.lock",
   "inFlight": [
     {

@@ -1,5 +1,5 @@
 {
-  "note": "recorded from src/run-supervisor/run-lock.mjs; tokens normalised to <t1>..<t3>; a holder with dead:true is the one the recorder judges dead",
+  "note": "recorded from the retired Node module src/run-supervisor/run-lock.mjs; tokens normalised to <t1>..<t3>; a holder with dead:true is the one the recorder judges dead (last at `85760c6f2`)",
   "holders": {
     "A": {
       "id": "a",

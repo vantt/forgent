@@ -1,5 +1,5 @@
 {
-  "note": "recorded from src/runner/dispatch/attention-view.mjs; mtimes pins the modification time of each result file (the time of a result with no settledAt); viewOf maps a run id to the attempt view its caller injects; definitionsCalls are what the host call was asked",
+  "note": "recorded from the retired Node module src/runner/dispatch/attention-view.mjs; mtimes pins the modification time of each result file (the time of a result with no settledAt); viewOf maps a run id to the attempt view its caller injects; definitionsCalls are what the host call was asked (last at `85760c6f2`)",
   "files": {
     ".fgos/assignments/a1/assignment.json": "{\"assignmentId\":\"a1\"}\n",
     ".fgos/assignments/a1/runs/01/run.json": "{\"runId\":\"r1\",\"assignmentId\":\"a1\",\"status\":\"bound\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000}\n",

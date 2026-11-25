@@ -22,7 +22,7 @@ use serde_json::{json, Value};
 
 // ---- the unit source --------------------------------------------------------------------------------------
 
-/// `readUnitSource` (`src/runner/execution/unit-run-start.mjs:273`): `unitData` as given, else the file
+/// `readUnitSource` (retired Node module `src/runner/execution/unit-run-start.mjs`; last at `85760c6f2`): `unitData` as given, else the file
 /// `unitPath` names (`-` is stdin), parsed as JSON first and as YAML (the YAML door, `tool` profile) otherwise.
 pub fn read_unit_source(options: &Value) -> Result<Value, RunUnitError> {
     if let Some(data) = options.get("unitData").filter(|d| truthy(d)) {
@@ -72,7 +72,7 @@ pub fn read_unit_source(options: &Value) -> Result<Value, RunUnitError> {
     .map_err(refused)
 }
 
-/// The tier checks a unit file gets before it is validated (`src/runner/execution/unit-run-start.mjs:371-374`): a
+/// The tier checks a unit file gets before it is validated (retired Node module `src/runner/execution/unit-run-start.mjs`; last at `85760c6f2`): a
 /// seat's or a unit's tier is a recommendation only a registered workflow may make, never a unit file.
 pub fn check_unit_file(raw: &Value) -> Result<(), RunUnitError> {
     let refused = |e: seat_resolver::SeatResolutionError| {
@@ -165,7 +165,7 @@ impl UnitControl for HeldControl {
     }
 }
 
-/// `acquireUnitControl` (`src/runner/execution/unit-control.mjs:18`): take the controller seat of a unit run in its
+/// `acquireUnitControl` (retired Node module `src/runner/execution/unit-control.mjs`; last at `85760c6f2`): take the controller seat of a unit run in its
 /// `unit-control` run control ledger; a dead controller is taken over by the ledger's own proof, a live one keeps
 /// it. A ledger that cannot be read refuses as held, with no holder named.
 pub fn acquire_unit_control(
@@ -202,7 +202,7 @@ pub fn acquire_unit_control(
 
 // ---- the admission ledger and the adopt door ----------------------------------------------------------------
 
-/// `listGenerations(dir).map(g => g.record)` (`src/run-supervisor/run-lock.mjs:118`): the records of an admission
+/// `listGenerations(dir).map(g => g.record)` (retired Node module `src/run-supervisor/run-lock.mjs`; last at `85760c6f2`): the records of an admission
 /// ledger, oldest first; a missing ledger has none, and any other failure to read it is the caller's error.
 pub fn admission_generations(dir: &Path) -> Result<Vec<Value>, RunUnitError> {
     list_generations(dir)
@@ -210,7 +210,7 @@ pub fn admission_generations(dir: &Path) -> Result<Vec<Value>, RunUnitError> {
         .map_err(|e| node_fs_error(&e, "scandir", Some(dir)))
 }
 
-/// `currentAttemptOf` (`src/runner/execution/unit-state.mjs:17`): the newest attempt directory the admission
+/// `currentAttemptOf` (retired Node module `src/runner/execution/unit-state.mjs`; last at `85760c6f2`): the newest attempt directory the admission
 /// ledger committed for `assignment_id`, with its run id; `None` while nothing was admitted or the directory was
 /// never made. A ledger that cannot be read is the caller's error, as Node's `listGenerations` throws it.
 pub fn current_attempt(
@@ -236,7 +236,7 @@ pub fn current_attempt(
     }))
 }
 
-/// `adoptRun(runDir, { probeOnly: true }).state` (`src/run-supervisor/client.mjs:67`): the adopt door's judgement
+/// `adoptRun(runDir, { probeOnly: true }).state` (retired Node module `src/run-supervisor/client.mjs`; last at `85760c6f2`): the adopt door's judgement
 /// of one attempt directory, read-only.
 pub fn adopt_state(run_dir: &Path) -> String {
     adopt_one(
@@ -290,7 +290,7 @@ fn seat_json(seat: &SeatRound) -> Value {
 }
 
 /// A published attempt without its terminal result: any `<seat>/<round>/runs/<run>` with `run.json` and no
-/// `result.json` (`unitHasActiveRun`'s scan, `src/runner/execution/unit-summary.mjs:54`).
+/// `result.json` (`unitHasActiveRun`'s scan, (retired Node module `src/runner/execution/unit-summary.mjs`; last at `85760c6f2`)).
 fn attempt_left_open(unit_dir: &Path) -> bool {
     let dirs = |dir: &Path| -> Vec<(String, std::path::PathBuf)> {
         std::fs::read_dir(dir)
@@ -319,7 +319,7 @@ fn attempt_left_open(unit_dir: &Path) -> bool {
     })
 }
 
-/// `writeUnitSummary(unitDir)` (`src/runner/execution/unit-summary.mjs:208`): build the derived summary from
+/// `writeUnitSummary(unitDir)` (retired Node module `src/runner/execution/unit-summary.mjs`; last at `85760c6f2`): build the derived summary from
 /// `unit.json` and the settled seats, and publish `unit-summary.json` through the durable-file door when it can be
 /// published (no attempt open, an outcome and a settlement time known) and its bytes changed.
 pub fn publish_unit_summary(unit_dir: &Path, shipped: &Value) -> Result<(), String> {

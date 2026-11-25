@@ -3,7 +3,7 @@
     "id": "worker-env-allowlist",
     "version": 1
   },
-  "description": "The ambient environment variable names a seat may start with; every other name of its controller's environment stays behind. Read by workerBaseEnv (src/runner/dispatch/adapters.mjs); a launcher that builds a seat's environment elsewhere reads this same file. FGOS_STATE_ROOT is pinned by workerBaseEnv itself, not listed. A provider variable reaches a seat through the executor's declared env or its credential store, never the ambient environment.",
+  "description": "The ambient environment variable names a seat may start with; every other name of its controller's environment stays behind. Read by workerBaseEnv (src/runner/dispatch/adapters.mjs); a launcher that builds a seat's environment elsewhere reads this same file. FGOS_STATE_ROOT is pinned by workerBaseEnv itself, not listed. A provider variable reaches a seat through the executor's declared env or its credential store, never the ambient environment. (last at `85760c6f2`)",
   "names": [
     {
       "name": "PATH",

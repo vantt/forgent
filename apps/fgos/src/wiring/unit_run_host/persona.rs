@@ -238,7 +238,7 @@ pub fn resolve_agent_definition(
     )))
 }
 
-/// `unitPersonaPin` over `pinPersona` (`src/runner/execution/unit-run-start.mjs:44`): `{ name, digest, text,
+/// `unitPersonaPin` over `pinPersona` (retired Node module `src/runner/execution/unit-run-start.mjs`; last at `85760c6f2`): `{ name, digest, text,
 /// identity }` of the unit's persona; `None` for a name no layer defines (it renders by name).
 pub fn persona_pin(
     persona: &str,

@@ -25,7 +25,7 @@ Supersedes: The mapped source location at atomic cutover
 Superseded by: None
 ```
 
-> Source carriage: Split companions are listed in the area portal; original section numbers are retained. Implementation corrections: only identified false current sentences corrected; evidence: src/runner/dispatch/adapters.mjs:20-33; src/runner/dispatch/confinement/backend-registry.mjs:52-58; packages/execution/engine/tests/transport_round.rs (`declared_confinement_is_refused_or_reported_as_the_node_round_did`); migration commit 5a42bc376; review-8-specs-ui-truth.md U24 (committed live-config evidence, no configuration read this turn).
+> Source carriage: Split companions are listed in the area portal; original section numbers are retained. Implementation corrections: only identified false current sentences corrected; evidence: src/runner/dispatch/adapters.mjs (retired; last at `85760c6f2`):20-33; src/runner/dispatch/confinement/backend-registry.mjs (retired; last at `85760c6f2`):52-58; packages/execution/engine/tests/transport_round.rs (`declared_confinement_is_refused_or_reported_as_the_node_round_did`); migration commit 5a42bc376; review-8-specs-ui-truth.md U24 (committed live-config evidence, no configuration read this turn).
 
 
 > **Trạng thái:** IMPLEMENTED. Đã được hiện thực hoá hoàn chỉnh qua track `confinement-authority-implementation` (P00-P07).
