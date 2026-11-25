@@ -5,7 +5,8 @@
 //! the Terminal Control surface the terminal adapter needs is `panes::Panes`, the screenless
 //! adapter's process door is `direct::Screenless`, and `host::SessionHost` decides. `pane_io::PaneIo`
 //! is the agent protocol's port over a pane by key, `permissions` is the head permission table (data,
-//! `contracts/head-permissions.v1.json`) and `forwarder` the one validator of the `fgos` argv a head sends over its
+//! `contracts/head-permissions.v1.json`), `release` the release rule behind `release run` (a port for every external
+//! call) and `forwarder` the one validator of the `fgos` argv a head sends over its
 //! request socket, so one delivery step types every opening text
 //! and every worker brief. `route` is the `fgos internal session-host` door.
 
@@ -14,6 +15,7 @@ pub mod host;
 pub mod pane_io;
 pub mod panes;
 pub mod permissions;
+pub mod release;
 pub mod rotation;
 pub mod route;
 pub mod types;

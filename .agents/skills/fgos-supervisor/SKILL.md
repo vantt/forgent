@@ -91,6 +91,22 @@ whole answer to `plan-no-progress`.
 Close a `done` plan with one board line (plan program board rules in AGENTS.md) and a backlog update, landed with
 `fgos land --paths` (write `plans/backlog.md` with `fgos session write plans/backlog.md < new`; it is a read-only file grant). `fgos session stop lead --name <headName> --reason "plan done"` if its lead is still live.
 
+## Release
+
+After a lead lands a change, and when no lead is landing, run `fgos release run`. It answers at once with a ticket; read
+the outcome with `fgos request result <id> --wait 30`. You never know what the project's recipe runs and never name it:
+the recipe is project data (`release.*` config), and the window runs it. Read the answer and act on it:
+
+- `released`: report it once. If the project's persona proofs are yours to run after a release, run them now.
+- `asked`: the recipe is not reversible and the owner holds the exact apply command in a question (Apply or Do not
+  apply); wait for the answer.
+- `nothing-new` (the trunk tip is the commit the last release recorded), `land-in-progress`, `no-recipe`: nothing to
+  do now. A `land-in-progress` is retried at a later wake.
+  A `release-in-progress` refusal (a release is already running, yours or the secretary's rollback) is retried the
+  same way.
+- `checks-failed`, `rolled-back`, `rollback-failed`, `recipe-invalid`: raise `fgos supervisor raise --kind coordination-help`
+  with the ticket id and the code, and stop releasing until it is handled. Never retry the same failing release in a loop.
+
 ## Settled discussion
 
 Event `discussion-settled`: start the one planner with `fgos session start planner --name <headName of the discussion>`,

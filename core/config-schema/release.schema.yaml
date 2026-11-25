@@ -1,0 +1,52 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:release:v1
+$comment: "owner: session-host"
+description: "The project's release recipe that `fgos release run` follows: checks, the rollout command, its probe and its rollback."
+type: object
+properties:
+  reversible:
+    description: Whether the release can be undone by the rollback command; an irreversible release never applies by itself.
+    type: boolean
+    x-fgos-scope: project-only
+  checks:
+    $comment: "justification: a head cannot change this key (it is a protected config path); only a landed change or the owner sets it"
+    description: Commands that must all exit 0 before the release applies, each a list of words run with no shell from the project root.
+    type: array
+    x-fgos-scope: project-only
+    x-fgos-sensitivity: command
+    items:
+      type: array
+      minItems: 1
+      items:
+        type: string
+        minLength: 1
+  apply:
+    $comment: "justification: a head cannot change this key (it is a protected config path); only a landed change or the owner sets it"
+    description: The rollout command, a list of words run with no shell from the project root; null means the project declares no release.
+    type: [array, "null"]
+    minItems: 1
+    items:
+      type: string
+      minLength: 1
+    x-fgos-scope: project-only
+    x-fgos-sensitivity: command
+  probe:
+    $comment: "justification: a head cannot change this key (it is a protected config path); only a landed change or the owner sets it"
+    description: The command that proves the new release works after apply, a list of words; a non-zero exit runs the rollback.
+    type: [array, "null"]
+    minItems: 1
+    items:
+      type: string
+      minLength: 1
+    x-fgos-scope: project-only
+    x-fgos-sensitivity: command
+  rollback:
+    $comment: "justification: a head cannot change this key (it is a protected config path); only a landed change or the owner sets it"
+    description: The command that returns to the previous release, a list of words; required when reversible is true.
+    type: [array, "null"]
+    minItems: 1
+    items:
+      type: string
+      minLength: 1
+    x-fgos-scope: project-only
+    x-fgos-sensitivity: command

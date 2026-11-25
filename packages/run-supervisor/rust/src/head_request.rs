@@ -82,6 +82,9 @@ pub const FGOS_VERB: &str = "fgos";
 /// The frame verb that asks what the table says about an argv without running it: `args` is `{argv: [string]}`, the
 /// answer `{decision, reason}`. Answered by the supervisor itself, from the same function that decides a real call.
 pub const CAN_I_VERB: &str = "can-i";
+/// The policy verb that runs the project's release recipe (`fgos_session_host::release`), answered by the supervisor
+/// itself: it answers at once with a ticket and runs the steps detached; `request result` reads the outcome.
+pub const RELEASE_VERB: &str = "release run";
 
 /// Verbs of a session that does not (yet) hold its role: the role check is "registered", and after the route reports
 /// done the supervisor registers the role for the attempt's session. The flag is Identity's `take`.
@@ -1063,7 +1066,7 @@ impl Drop for Busy<'_> {
     }
 }
 
-fn serve(cfg: &Config, busy: &AtomicBool, large: &AtomicBool, mut stream: UnixStream) {
+fn serve(cfg: &Arc<Config>, busy: &AtomicBool, large: &AtomicBool, mut stream: UnixStream) {
     let _ = stream.set_nonblocking(false);
     let _ = stream.set_write_timeout(Some(READ_DEADLINE));
     // SAFETY: getuid has no failure mode.
@@ -1315,7 +1318,7 @@ impl<'de> serde::de::Visitor<'de> for Bounded<'_> {
 }
 
 /// The checks in contract order, then the verb.
-fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>) -> Outcome {
+fn decide(cfg: &Arc<Config>, busy: &AtomicBool, request: &Request, peer: Option<u32>) -> Outcome {
     let moves = role_move(&request.verb);
     let binds = request.verb == BIND_VERB;
     let window = request.verb == FGOS_VERB || request.verb == CAN_I_VERB;
@@ -1405,6 +1408,9 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>)
     }
     if request.verb == FGOS_VERB {
         return forward(cfg, request);
+    }
+    if request.verb == RELEASE_VERB {
+        return release_run(cfg, request);
     }
     let outcome = route_request(cfg, request);
     if let (Some(take), Outcome::Done(_)) = (moves, &outcome) {
@@ -1593,6 +1599,18 @@ fn ask_owner(cfg: &Config, request: &Request, words: &[String]) -> Outcome {
             "scope": {"allows": "Answering this one argv for this one request.", "forbids": "Any other argv, any persona's table, or a standing grant."}
         }
     });
+    match file_question(cfg, request, input) {
+        Ok(id) => Outcome::Refused {
+            code: "asked",
+            detail: Some(id),
+        },
+        Err(outcome) => outcome,
+    }
+}
+
+/// Files one owner question through the host route that takes the asker from this attempt's envelope
+/// (`fgos internal head-questions`): the question's id, or the refusal to answer with.
+fn file_question(cfg: &Config, request: &Request, input: Value) -> Result<String, Outcome> {
     let words: Vec<OsString> = vec![
         "internal".into(),
         "head-questions".into(),
@@ -1602,12 +1620,12 @@ fn ask_owner(cfg: &Config, request: &Request, words: &[String]) -> Outcome {
     let body = json!({"v": 1, "verb": "questions ask", "args": {"input": input}}).to_string();
     let output = match run_verb(cfg, request, &words, Some(body.as_bytes())) {
         Ok(BoundedOutcome::Exited(output)) => output,
-        Ok(BoundedOutcome::TimedOut { .. }) => return refused("verb-timeout"),
+        Ok(BoundedOutcome::TimedOut { .. }) => return Err(refused("verb-timeout")),
         Err(e) => {
-            return Outcome::Refused {
+            return Err(Outcome::Refused {
                 code: "verb-failed",
                 detail: Some(format!("the question route did not run: {e}")),
-            }
+            })
         }
     };
     let text = String::from_utf8_lossy(&output.stdout).into_owned();
@@ -1617,19 +1635,436 @@ fn ask_owner(cfg: &Config, request: &Request, words: &[String]) -> Outcome {
             .filter(Value::is_object)
     });
     match line {
-        Some(line) if line["result"] == "done" => Outcome::Refused {
-            code: "asked",
-            detail: line["data"]["id"].as_str().map(String::from),
-        },
-        Some(line) if line["code"].is_string() => Outcome::RouteRefused {
+        Some(line) if line["result"] == "done" => Ok(line["data"]["id"]
+            .as_str()
+            .map(String::from)
+            .unwrap_or_default()),
+        Some(line) if line["code"].is_string() => Err(Outcome::RouteRefused {
             code: line["code"].as_str().unwrap_or_default().to_string(),
             message: line["message"].as_str().map(loggable_detail),
-        },
-        _ => Outcome::Refused {
+        }),
+        _ => Err(Outcome::Refused {
             code: "verb-failed",
             detail: Some("the question route printed no answer".to_string()),
-        },
+        }),
     }
+}
+
+/// The longest one release step (a check, the apply, the probe, the rollback) may run.
+const RELEASE_STEP_TIMEOUT: Duration = Duration::from_secs(30 * 60);
+
+/// `YYYY-MM-DDTHH:MM:SS.mmmZ` for now (UTC), the form the ticket files carry.
+fn utc_now_iso() -> String {
+    fgos_host_runtime::civil_time::format_system_time_utc(std::time::SystemTime::now())
+}
+
+/// The real ports of a release run: the host for config and lock reads, git for the trunk tip, a plain process for
+/// each recipe argv, the owner question store for the question and the report.
+struct HostRelease {
+    cfg: Arc<Config>,
+    request: Request,
+    /// Where the recipe argvs write their output.
+    log_file: PathBuf,
+}
+
+impl HostRelease {
+    /// The release record the rule keeps: `{released: <trunk commit>, step: applying|probing}`, both optional.
+    fn state(&self) -> Result<Value, String> {
+        match std::fs::read_to_string(release_state_file(&self.cfg.cwd)) {
+            Ok(text) => serde_json::from_str::<Value>(&text)
+                .ok()
+                .filter(Value::is_object)
+                .ok_or_else(|| "the release record is not a JSON object".to_string()),
+            Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(json!({})),
+            Err(e) => Err(format!("the release record is not readable: {e}")),
+        }
+    }
+
+    /// Whole or not at all: a synced temp file moved onto the name.
+    fn write_state(&self, state: &Value) -> Result<(), String> {
+        let file = release_state_file(&self.cfg.cwd);
+        write_ticket(&file, state, false)
+            .map_err(|e| format!("the release record was not written: {e}"))
+    }
+
+    /// The `data` of the one envelope a host verb prints with `--json` (pretty-printed over many lines).
+    fn host_json(&self, words: &[&str]) -> Result<Value, String> {
+        let words: Vec<OsString> = words.iter().map(OsString::from).collect();
+        match run_verb(&self.cfg, &self.request, &words, None) {
+            Ok(BoundedOutcome::Exited(output)) if output.status.success() => {
+                fgos_session_host::release::envelope_data(&String::from_utf8_lossy(&output.stdout))
+            }
+            Ok(BoundedOutcome::Exited(output)) => Err(format!(
+                "the host ended {}",
+                output
+                    .status
+                    .code()
+                    .map_or("by a signal".into(), |c| format!("with exit {c}"))
+            )),
+            Ok(BoundedOutcome::TimedOut { .. }) => Err("the host timed out".to_string()),
+            Err(e) => Err(format!("the host did not run: {e}")),
+        }
+    }
+
+    /// A recipe argv (a check, the apply, the probe, the rollback). It dies with the supervisor, so the release
+    /// lock, the runner and every recipe child share one lifetime (`fgctl upgrade` publishes the activation by
+    /// temp file and rename, so a killed upgrade leaves the old or the new release, never a half one). Its output
+    /// goes to the run's log file, since a pipe whose reader is gone would end the child with SIGPIPE.
+    fn recipe_command(
+        &self,
+        program: &str,
+        args: &[String],
+    ) -> io::Result<(Command, std::fs::File)> {
+        use std::os::fd::AsRawFd;
+        let log = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .mode_0600()
+            .open(&self.log_file)?;
+        let fd = log.as_raw_fd();
+        let mut cmd = Command::new(program);
+        cmd.args(args)
+            .env_clear()
+            .envs(self.cfg.env.iter())
+            .current_dir(&self.cfg.cwd);
+        // SAFETY: prctl and dup2 are async-signal-safe; dup2 runs after the pipes are set up, so the log replaces
+        // them, and the child dies with the supervisor that started it.
+        unsafe {
+            cmd.pre_exec(move || {
+                #[cfg(target_os = "linux")]
+                fgos_process::control::arm_parent_death_signal()?;
+                if libc::dup2(fd, 1) < 0 || libc::dup2(fd, 2) < 0 {
+                    return Err(io::Error::last_os_error());
+                }
+                Ok(())
+            });
+        }
+        Ok((cmd, log))
+    }
+
+    fn question(
+        &self,
+        ref_tail: &str,
+        headline: &str,
+        blocks: &str,
+        parts: Value,
+    ) -> Result<String, String> {
+        let input = json!({
+            "stage": "window",
+            "ref": format!("case:release-{ref_tail}"),
+            "headline": loggable(headline).chars().take(120).collect::<String>(),
+            "blocks": blocks,
+            "parts": parts,
+        });
+        file_question(&self.cfg, &self.request, input).map_err(|outcome| match outcome {
+            Outcome::RouteRefused { code, message } => {
+                format!("{code}: {}", message.unwrap_or_default())
+            }
+            Outcome::Refused { code, detail } => format!("{code}: {}", detail.unwrap_or_default()),
+            Outcome::Done(_) => String::new(),
+        })
+    }
+}
+
+impl fgos_session_host::release::ReleasePorts for HostRelease {
+    fn recipe(&self) -> Result<Value, String> {
+        self.host_json(&["config", "show", "--path", "release", "--json"])
+            .map(|answer| fgos_session_host::release::release_subtree(&answer))
+    }
+
+    /// The trunk tip is the head commit of the project root.
+    fn trunk_tip(&self) -> Result<String, String> {
+        let (driver, repo) = fgos_git::GitDriver::open_at(&self.cfg.cwd)
+            .map_err(|e| format!("git did not run: {e:?}"))?
+            .ok_or_else(|| "the project root is not a git repository".to_string())?;
+        match driver.resolve_commit_ref(&repo, "HEAD") {
+            Ok(Some(oid)) => Ok(oid.as_str().to_string()),
+            Ok(None) => Err("git HEAD did not answer".to_string()),
+            Err(e) => Err(format!("git did not run: {e:?}")),
+        }
+    }
+
+    fn released_commit(&self) -> Result<Option<String>, String> {
+        Ok(self.state()?["released"].as_str().map(String::from))
+    }
+
+    fn record_released(&self, commit: &str) -> Result<(), String> {
+        let mut state = self.state()?;
+        state["released"] = json!(commit);
+        self.write_state(&state)
+    }
+
+    fn step(&self) -> Result<Option<String>, String> {
+        Ok(self.state()?["step"].as_str().map(String::from))
+    }
+
+    fn set_step(&self, step: Option<&str>) -> Result<(), String> {
+        let mut state = self.state()?;
+        match step {
+            Some(step) => state["step"] = json!(step),
+            None => {
+                if state
+                    .as_object_mut()
+                    .and_then(|o| o.remove("step"))
+                    .is_none()
+                {
+                    return Ok(());
+                }
+            }
+        }
+        self.write_state(&state)
+    }
+
+    fn land_in_progress(&self) -> Result<Option<String>, String> {
+        self.host_json(&["lock-status", "--json"])
+            .map(|report| fgos_session_host::release::merge_slot_hold(&report))
+    }
+
+    fn run(&self, argv: &[String]) -> Result<i32, String> {
+        let Some((program, args)) = argv.split_first() else {
+            return Err("an empty argv".to_string());
+        };
+        let (command, _log) = self
+            .recipe_command(program, args)
+            .map_err(|e| format!("the run log is not writable: {e}"))?;
+        match run_bounded_command(command, None, RELEASE_STEP_TIMEOUT, |_| ()) {
+            Ok(BoundedOutcome::Exited(output)) => Ok(output.status.code().unwrap_or(-1)),
+            Ok(BoundedOutcome::TimedOut { .. }) => Err("timed out".to_string()),
+            Err(e) => Err(e.to_string()),
+        }
+    }
+
+    fn ask_owner(&self, apply: &[String]) -> Result<String, String> {
+        let line = apply.join(" ");
+        self.question(
+            &self.request.id,
+            &format!("Apply the release: {line}"),
+            "the release waits for this answer before it goes on",
+            json!({
+                "what": format!("Every check of the release passed. The recipe is not reversible, so `{line}` waits for the owner."),
+                "cause": "release.reversible is false, so no head applies the release by itself.",
+                "options": [
+                    {"label": "Apply", "does": format!("The owner has `{line}` run; the release goes on."), "gain": "The checked trunk is the active release.", "harm": "No rollback is declared: the change cannot be undone by the recipe.", "cost": "The apply's own run time.", "recommended": true},
+                    {"label": "Do not apply", "does": "Nothing is applied; the active release stays as it is.", "gain": "No irreversible change is made.", "harm": "The landed work stays unreleased.", "cost": "None; a later release run asks again."}
+                ],
+                "recommendation": "Apply: every check passed, and the owner alone decides because the recipe cannot undo it.",
+                "scope": {"allows": "Applying this one release.", "forbids": "Any other release, or a standing grant."}
+            }),
+        )
+    }
+
+    fn log(&self, line: &str) {
+        (self.cfg.log)(&format!(
+            "head-request {} {}",
+            self.request.id,
+            loggable_detail(line)
+        ));
+    }
+
+    fn report(&self, line: &str) {
+        let tail = format!("{}-report", self.request.id);
+        if let Err(why) = self.question(
+            &tail,
+            line,
+            "nothing: the release run has ended, and this is a report",
+            json!({
+                "what": line.chars().take(600).collect::<String>(),
+                "cause": "A release run ended and reports its outcome.",
+                "options": [
+                    {"label": "Noted", "does": "The owner reads the line.", "gain": "The owner knows where the release stands.", "harm": "None.", "cost": "A reading.", "recommended": true},
+                    {"label": "Look into it", "does": "The owner inspects the release by hand.", "gain": "A finding the line did not give.", "harm": "None to the release, which has already ended.", "cost": "Some minutes."}
+                ],
+                "recommendation": "Noted, unless the line says something failed.",
+                "scope": {"allows": "Reading this one release report.", "forbids": "Any other release, or a standing grant."}
+            }),
+        ) {
+            (self.cfg.log)(&format!(
+                "head-request {} release report: {}",
+                self.request.id,
+                loggable_detail(&why)
+            ));
+        }
+    }
+}
+
+/// Writes the ticket whole or not at all through the durable-file door (`exclusive` installs without replacing,
+/// so an existing ticket is `AlreadyExists` and left alone).
+fn write_ticket(file: &Path, ticket: &Value, exclusive: bool) -> io::Result<()> {
+    let invalid = |why: &str| io::Error::new(io::ErrorKind::InvalidInput, why.to_string());
+    let dir = file
+        .parent()
+        .ok_or_else(|| invalid("ticket path has no parent"))?;
+    let name = file
+        .file_name()
+        .and_then(|n| n.to_str())
+        .ok_or_else(|| invalid("ticket name is not UTF-8"))?;
+    let bytes = format!("{ticket}\n");
+    let placed = if exclusive {
+        fgos_durable_file::install_once_with_mode(dir, name, bytes.as_bytes(), 0o600)
+    } else {
+        fgos_durable_file::replace_durably_with_mode(dir, name, bytes.as_bytes(), 0o600)
+    };
+    match placed {
+        Ok(fgos_durable_file::Installed::AlreadyExists) => {
+            Err(io::Error::from(io::ErrorKind::AlreadyExists))
+        }
+        Ok(_) => Ok(()),
+        Err(e) => Err(io::Error::new(e.source.kind(), e.to_string())),
+    }
+}
+
+/// The release rule's own record under the project root: the trunk commit the last release put in place and the step
+/// in progress.
+fn release_state_file(root: &Path) -> PathBuf {
+    root.join(".fgos/runtime/release/state.json")
+}
+
+/// One release at a time across both personas: an exclusive, non-blocking holder lock on
+/// `.fgos/runtime/release/lock`, held by this supervisor for the whole detached run. The kernel drops it when the
+/// supervisor dies, so there is no stale lock to reclaim and no file that can wedge it.
+struct ReleaseLock {
+    _handle: fgos_holder_lock::Handle,
+}
+
+impl ReleaseLock {
+    fn take(root: &Path) -> io::Result<Option<ReleaseLock>> {
+        use fgos_holder_lock::{acquire, Acquire, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
+        let dir = root.join(".fgos/runtime/release");
+        std::fs::create_dir_all(&dir)?;
+        let resource = Resource::new("release-run", dir.join("lock"));
+        match acquire(&resource, Mode::Ex, Wait::Try, DEFAULT_KILL_WAIT_MS) {
+            Acquire::Acquired(handle) => Ok(Some(ReleaseLock { _handle: handle })),
+            Acquire::Held { .. } | Acquire::Timeout { .. } => Ok(None),
+            Acquire::Unavailable { detail, .. } => Err(io::Error::other(detail)),
+        }
+    }
+}
+
+trait Mode0600 {
+    fn mode_0600(&mut self) -> &mut Self;
+}
+
+impl Mode0600 for std::fs::OpenOptions {
+    fn mode_0600(&mut self) -> &mut Self {
+        use std::os::unix::fs::OpenOptionsExt;
+        self.mode(0o600)
+    }
+}
+
+/// [`RELEASE_VERB`]: writes the ticket where `request result` reads it (`.fgos/runtime/head-tickets/<role>/<id>.json`,
+/// the id the request's) and answers at once; a detached thread runs the release rule (`{rollback: true}` runs only
+/// the recipe's rollback) and rewrites the ticket `done` or `failed` with the outcome as its result.
+fn release_run(cfg: &Arc<Config>, request: &Request) -> Outcome {
+    let args = request.args.as_object();
+    let rollback = match args {
+        Some(map) if map.is_empty() => false,
+        Some(map) if map.len() == 1 && map.get("rollback").is_some_and(Value::is_boolean) => {
+            map["rollback"] == true
+        }
+        _ => {
+            return Outcome::Refused {
+                code: "bad-args",
+                detail: Some("args is {} or {rollback: boolean} and nothing else".to_string()),
+            }
+        }
+    };
+    let name = cfg.role.strip_prefix("head:").unwrap_or_default();
+    if name.is_empty()
+        || !name
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+    {
+        return Outcome::Refused {
+            code: "verb-failed",
+            detail: Some("the role is not a head role".to_string()),
+        };
+    }
+    // This process is the runner: its identity is on the ticket, so a supervisor that ends mid-run reads
+    // `runner-gone`; the kernel frees the release lock with it.
+    let Some(runner) = fgos_process::facts::self_identity().map(|t| t.to_record().to_json()) else {
+        return Outcome::Refused {
+            code: "verb-failed",
+            detail: Some("the supervisor's own process identity is not readable".to_string()),
+        };
+    };
+    let lock = match ReleaseLock::take(&cfg.cwd) {
+        Ok(Some(lock)) => lock,
+        Ok(None) => return refused("release-in-progress"),
+        Err(e) => {
+            return Outcome::Refused {
+                code: "verb-failed",
+                detail: Some(format!("the release lock is not writable: {e}")),
+            }
+        }
+    };
+    let dir = cfg.cwd.join(".fgos/runtime/head-tickets").join(name);
+    if let Err(e) = std::fs::create_dir_all(&dir) {
+        return Outcome::Refused {
+            code: "verb-failed",
+            detail: Some(format!("the ticket directory is not writable: {e}")),
+        };
+    }
+    let file = dir.join(format!("{}.json", request.id));
+    let mut ticket = json!({
+        "id": request.id, "verb": RELEASE_VERB, "state": "running", "runner": runner,
+        "startedAt": utc_now_iso(), "cwd": cfg.cwd,
+    });
+    if let Err(e) = write_ticket(&file, &ticket, true) {
+        return if e.kind() == io::ErrorKind::AlreadyExists {
+            refused("ticket-used")
+        } else {
+            Outcome::Refused {
+                code: "verb-failed",
+                detail: Some(format!("the ticket was not written: {e}")),
+            }
+        };
+    }
+    let ports = HostRelease {
+        cfg: cfg.clone(),
+        request: Request {
+            id: request.id.clone(),
+            verb: request.verb.clone(),
+            args: json!({}),
+        },
+        log_file: dir.join(format!("{}.log", request.id)),
+    };
+    let log = cfg.clone();
+    let id = request.id.clone();
+    let spawned = std::thread::Builder::new()
+        .name("release-run".to_string())
+        .spawn(move || {
+            use fgos_session_host::release::{run, run_rollback};
+            // Held for the whole run, the secretary's rollback included.
+            let _lock = lock;
+            let outcome = if rollback {
+                run_rollback(&ports)
+            } else {
+                run(&ports)
+            };
+            ticket["state"] = json!(if outcome.is_answer() {
+                "done"
+            } else {
+                "failed"
+            });
+            ticket["endedAt"] = json!(utc_now_iso());
+            ticket["result"] = outcome.to_value();
+            if !outcome.is_answer() {
+                ticket["code"] = json!(outcome.code());
+                if let Some(detail) = outcome.to_value()["detail"].as_str() {
+                    ticket["message"] = json!(loggable_detail(detail));
+                }
+            }
+            if let Err(e) = write_ticket(&file, &ticket, false) {
+                (log.log)(&format!("head-request {id} release ticket: {e}"));
+            }
+        });
+    if let Err(e) = spawned {
+        return Outcome::Refused {
+            code: "verb-failed",
+            detail: Some(format!("the release did not start: {e}")),
+        };
+    }
+    Outcome::Done(json!({"ticket": request.id, "state": "running"}))
 }
 
 /// The one place the host is spawned: resolves the host the route children run (the active release's host when the

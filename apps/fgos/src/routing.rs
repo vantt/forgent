@@ -628,6 +628,8 @@ pub(crate) fn confined_head_call_with_reader<R: std::io::Read>(
         ("session", Some("stop")) => "session stop",
         // A confined worker has no socket and keeps the local route of this one; only a head asks through its own.
         ("metrics", Some("record")) if head_socket => "metrics record",
+        // The release recipe runs from the window (the permission table lets the supervisor and secretary ask).
+        ("release", Some("run")) if head_socket => "release run",
         ("supervisor", Some("done")) => "supervisor done",
         _ => return None,
     };
@@ -735,6 +737,17 @@ pub(crate) fn confined_head_call_with_reader<R: std::io::Read>(
                 args.insert("persona".to_owned(), json!(persona));
                 text(&mut args, "name", "name")?;
                 text(&mut args, "reason", "reason")?;
+            }
+            // `--rollback` runs only the recipe's rollback; the recipe itself is never named by the caller.
+            "release run" => {
+                if !words.is_empty() {
+                    return Err(
+                        "bad-args: release run takes no argument besides --rollback".to_owned()
+                    );
+                }
+                if call.flags().flag("rollback").is_some() {
+                    args.insert("rollback".to_owned(), json!(true));
+                }
             }
             // The records themselves are read from stdin by the socket sender, which holds the stream.
             "metrics record" => {
@@ -1453,6 +1466,22 @@ mod confined_tests {
         assert!(confined(&["supervisor", "tick"]).is_none());
         assert!(confined(&["config", "show"]).is_none());
         assert!(confined(&["config", "set", "a", "b"]).is_none());
+    }
+
+    #[test]
+    fn release_run_is_a_frame_of_its_own_only_from_a_head_with_a_socket_and_takes_only_rollback() {
+        let call = |words: &[&str], socket: bool| {
+            let words: Vec<OsString> = words.iter().map(OsString::from).collect();
+            confined_head_call(&words, socket)
+        };
+        assert!(call(&["release", "run"], false).is_none());
+        let plain = call(&["release", "run"], true).unwrap().unwrap();
+        assert_eq!((plain.verb, plain.args), ("release run", json!({})));
+        let rollback = call(&["release", "run", "--rollback"], true)
+            .unwrap()
+            .unwrap();
+        assert_eq!(rollback.args, json!({"rollback": true}));
+        assert!(call(&["release", "run", "deploy"], true).unwrap().is_err());
     }
 
     #[test]

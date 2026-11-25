@@ -27,7 +27,8 @@
         { "prefix": "questions cancel", "decision": "allow", "policy": "node" },
         { "prefix": "questions answer", "decision": "deny", "policy": "node" },
         { "prefix": "activate", "decision": "deny" },
-        { "prefix": "release activate", "decision": "deny" }
+        { "prefix": "release activate", "decision": "deny" },
+        { "prefix": "release run", "decision": "deny", "policy": "native" }
       ]
     },
     "lead": {
@@ -78,6 +79,7 @@
         { "prefix": "session write", "decision": "allow", "policy": "native" },
         { "prefix": "land", "decision": "allow", "policy": "node" },
         { "prefix": "request result", "decision": "allow", "policy": "node" },
+        { "prefix": "release run", "decision": "allow", "policy": "native" },
         { "prefix": "supervisor plans", "decision": "allow" },
         { "prefix": "supervisor queue", "decision": "allow" },
         { "prefix": "slots", "decision": "allow" },

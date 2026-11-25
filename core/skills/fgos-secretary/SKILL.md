@@ -78,6 +78,17 @@ help queue has nothing past the threshold; then the supervisor owns the queue ag
 4. **Order.** Order the topics by the product priority in AGENTS.md (Ship Faster, Release con nguoi, DoD, Polish Sau
    DoD). A real tie goes to the owner as a question.
 
+A release the supervisor started and did not come back from is the secretary's to undo. You cannot read the
+supervisor's ticket (`request result` reads only your own role's tickets), so judge it from what you can see: the
+supervisor is not alive (its liveness check shows it gone) or has not drained the supervision queue past its release
+step, and no release report has reached the owner. Then run `fgos release run --rollback`, which runs only the
+recipe's rollback through the window and never names what it runs. The window decides whether a release was in
+flight: it refuses `no-release-in-flight` unless the release record shows a step that began and never ended and the
+run that wrote it is dead, so a refusal of that name means there is nothing to undo. Read your own ticket with
+`fgos request result <id> --wait 30`, then wake the supervisor with `fgos supervisor wake`. One release runs at a time
+for both of you: a `release-in-progress` refusal means one is still running, so look again at a later wake. If the
+rollback itself fails (`rollback-failed`), ask the owner once in the five-part form.
+
 ## What your grant covers
 
 The secretary row of `GRANTS` in `src/session-host/head-grants.mjs` is the one source and the full verb list; read it
