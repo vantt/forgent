@@ -652,7 +652,8 @@ mod tests {
     #[test]
     fn spellings_of_one_directory_collapse_and_the_form_is_a_fixed_point() {
         for raw in [
-            "./docs", "docs/", "docs//", "docs", " docs ", "././docs", ".//docs", "docs/.", "docs/./",
+            "./docs", "docs/", "docs//", "docs", " docs ", "././docs", ".//docs", "docs/.",
+            "docs/./",
         ] {
             assert_eq!(canonicalize(raw).unwrap(), "docs", "{raw:?}");
         }
@@ -663,7 +664,8 @@ mod tests {
             assert_eq!(canonicalize(&once).unwrap(), once, "{raw:?}");
         }
         for bad in [
-            "   ", "./", "//x", "a/..", "a/../b", "..", ":(top)x", ":!x", "./:x", "**.md", "a/***/b",
+            "   ", "./", "//x", "a/..", "a/../b", "..", ":(top)x", ":!x", "./:x", "**.md",
+            "a/***/b",
         ] {
             assert!(canonicalize(bad).is_err(), "{bad:?}");
         }
@@ -671,14 +673,25 @@ mod tests {
     #[test]
     fn only_star_and_double_star_are_glob_and_other_punctuation_is_literal() {
         for raw in [
-            "app/[slug]/page.tsx", "app/(group)/[id]/route.ts", "a?b", "{a,b}", "!x", "**", "a/**/b", "docs/*.md",
+            "app/[slug]/page.tsx",
+            "app/(group)/[id]/route.ts",
+            "a?b",
+            "{a,b}",
+            "!x",
+            "**",
+            "a/**/b",
+            "docs/*.md",
         ] {
             assert_eq!(canonicalize(raw).unwrap(), raw);
         }
         for (path, scope, want) in [
             ("app/[slug]/page.tsx", "app/[slug]/page.tsx", true),
             ("app/s/page.tsx", "app/[slug]/page.tsx", false),
-            ("app/(group)/[id]/route.ts", "app/(group)/[id]/route.ts", true),
+            (
+                "app/(group)/[id]/route.ts",
+                "app/(group)/[id]/route.ts",
+                true,
+            ),
             ("app/group/1/route.ts", "app/(group)/[id]/route.ts", false),
             ("a?b", "a?b", true),
             ("axb", "a?b", false),
@@ -728,7 +741,10 @@ mod tests {
     }
     #[test]
     fn matching_stays_fast_on_deep_paths_with_stacked_double_stars() {
-        let deep = (0..60).map(|i| format!("s{i}")).collect::<Vec<_>>().join("/");
+        let deep = (0..60)
+            .map(|i| format!("s{i}"))
+            .collect::<Vec<_>>()
+            .join("/");
         let scope = ["**/*/**/*/**/*/**/*/**/y"];
         let started = std::time::Instant::now();
         assert!(!hit(&format!("{deep}/x"), &scope));
@@ -746,7 +762,11 @@ mod tests {
     }
     #[test]
     fn expand_pulls_in_render_targets_of_a_touched_generated_source() {
-        let targets = [".agents/skills/**", "plugins/fgOS/skills/**", ".claude/skills/**"];
+        let targets = [
+            ".agents/skills/**",
+            "plugins/fgOS/skills/**",
+            ".claude/skills/**",
+        ];
         let generated = vec![("core/skills/**".to_string(), v(&targets))];
         let with = |first: &str| {
             let mut want = vec![first.to_string()];
@@ -782,8 +802,16 @@ mod tests {
             (&["a//b", "c"], &["a/b/**"], true),
             (&["x/y"], &["x/z", "w"], false),
         ] {
-            assert_eq!(scopes_overlap(&v(a), &v(b)).unwrap(), want, "{a:?} vs {b:?}");
-            assert_eq!(scopes_overlap(&v(b), &v(a)).unwrap(), want, "{b:?} vs {a:?}");
+            assert_eq!(
+                scopes_overlap(&v(a), &v(b)).unwrap(),
+                want,
+                "{a:?} vs {b:?}"
+            );
+            assert_eq!(
+                scopes_overlap(&v(b), &v(a)).unwrap(),
+                want,
+                "{b:?} vs {a:?}"
+            );
         }
         for bad in [".", "", "../x", "/x", "a\\b", "ab**", ":(top)x"] {
             assert!(scopes_overlap(&v(&[bad]), &v(&["x"])).is_err(), "{bad:?}");
