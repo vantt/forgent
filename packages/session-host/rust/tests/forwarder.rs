@@ -53,6 +53,59 @@ fn a_json_flag_the_caller_already_passed_is_not_added_twice() {
     );
 }
 
+fn mail(persona: &str, to: &str) -> Result<Planned, fgos_session_host::forwarder::Refused> {
+    plan(
+        persona,
+        &json!(["mailbox", "send", "--to", to, "hello"]),
+        Path::new("/p"),
+        &stage_path(),
+    )
+}
+
+#[test]
+fn a_lead_may_mail_a_supervisor_or_a_secretary_by_prefix() {
+    for to in ["head:supervisor-x", "head:secretary-y"] {
+        assert!(matches!(mail("lead", to), Ok(Planned::Run(_))), "{to}");
+    }
+}
+
+#[test]
+fn mail_to_any_other_head_is_refused_recipient_not_allowed() {
+    for (persona, to) in [("lead", "head:lead-y"), ("planner", "head:planner-z")] {
+        let refused = mail(persona, to).unwrap_err();
+        assert_eq!(refused.code(), "recipient-not-allowed", "{persona} {to}");
+    }
+}
+
+#[test]
+fn can_i_answers_from_the_same_check_plan_runs() {
+    use fgos_session_host::forwarder::can_i;
+    use fgos_session_host::permissions::Decision;
+    let ask = |persona: &str, argv: Value| can_i(persona, &argv, Path::new("/p")).0;
+    let mail = |to: &str| json!(["mailbox", "send", "--to", to, "hello"]);
+    assert_eq!(ask("planner", mail("head:lead-y")), Decision::Deny);
+    assert_eq!(ask("planner", mail("head:supervisor-x")), Decision::Allow);
+    assert_eq!(ask("secretary", mail("head:lead-y")), Decision::Allow);
+    let read = |lines: &str| json!(["session", "read", "s1", "--lines", lines]);
+    assert_eq!(ask("supervisor", read("99999")), Decision::Deny);
+    assert_eq!(ask("supervisor", read("50")), Decision::Allow);
+}
+
+#[test]
+fn an_exact_args_value_still_matches_only_exactly() {
+    let raise = |kind: &str| {
+        plan(
+            "head",
+            &json!(["supervisor", "raise", "--kind", kind]),
+            Path::new("/p"),
+            &stage_path(),
+        )
+    };
+    assert!(matches!(raise("coordination-help"), Ok(Planned::Run(_))));
+    let refused = raise("coordination-help-extra").unwrap_err();
+    assert_eq!(refused.code(), "argv-not-allowed");
+}
+
 #[test]
 fn an_argv_no_row_matches_is_asked_with_the_callers_own_words() {
     let planned = run("planner", json!(["deploy", "production"]), Path::new("/p")).unwrap();
@@ -362,6 +415,36 @@ fn a_raise_names_only_the_coordination_event_kinds() {
                     "--ref",
                     "plan:x"
                 ]),
+                Path::new("/p"),
+            )
+            .unwrap_err();
+            assert!(refused.contains("--kind takes one of"), "{kind}: {refused}");
+        }
+    }
+}
+
+#[test]
+fn a_planner_or_shaper_raises_only_a_help_event() {
+    for persona in ["planner", "shaper"] {
+        assert!(run(
+            persona,
+            json!([
+                "supervisor",
+                "raise",
+                "--kind",
+                "coordination-help",
+                "--ref",
+                "plan:x",
+                "--reason",
+                "r"
+            ]),
+            Path::new("/p")
+        )
+        .is_ok());
+        for kind in ["coordination-handoff", "coordination-chore", "head-gone"] {
+            let refused = run(
+                persona,
+                json!(["supervisor", "raise", "--kind", kind, "--ref", "plan:x"]),
                 Path::new("/p"),
             )
             .unwrap_err();

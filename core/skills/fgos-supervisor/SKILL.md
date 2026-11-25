@@ -119,6 +119,12 @@ screen (`fgos session read <session>`), type a wait or unstick check if stuck (`
 restart or replace the head if stuck without progress, or escalate an unresolved design or product decision to the
 owner via `fgos questions ask`. Mark the event handled once resolved.
 
+Help events are an input of every wake, not only of a wake the event caused: every persona may raise one, so read the
+whole help queue each time. Answer one by acting through the window (an allowed verb runs at once). When the permission
+table says `ask` for the verb the help needs, or the need is a product decision, file one owner question with
+`fgos questions ask` in the five-part form carrying the exact argv, and mark the event handled. An event left unhandled
+past `secretary.help.staleMinutes` makes the secretary take the work over.
+
 ## On site and the drone
 
 - `fgos session read` reads the recent screen of a session read-only, to see what a stuck or silent session is doing.

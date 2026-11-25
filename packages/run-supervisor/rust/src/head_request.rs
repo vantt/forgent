@@ -1500,9 +1500,9 @@ fn forward(cfg: &Config, request: &Request) -> Outcome {
     ));
     let planned = plan(&cfg.persona, argv, &cfg.cwd, &stage);
     let outcome = match planned {
-        Err(Refused(why)) => Outcome::Refused {
-            code: "argv-not-allowed",
-            detail: Some(why),
+        Err(refused) => Outcome::Refused {
+            code: refused.code(),
+            detail: Some(refused.0),
         },
         Ok(Planned::Run(words)) => {
             let outcome = forward_exec(cfg, request, &words);

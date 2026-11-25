@@ -860,6 +860,33 @@ fn the_window_forwards_an_allowed_argv_asks_for_an_unmatched_one_refuses_a_denie
 }
 
 #[test]
+fn a_planner_mailing_a_head_outside_its_row_is_refused_recipient_not_allowed() {
+    let served = serve_config(
+        "window-mail",
+        DONE_LINE,
+        Ok(true),
+        Identity::default(),
+        &[],
+        Duration::from_secs(5),
+        |mut cfg| {
+            cfg.persona = "planner".to_string();
+            cfg
+        },
+    );
+    let refused = ask_argv(
+        &served.socket,
+        &["mailbox", "send", "--to", "head:lead-y", "hello"],
+    );
+    assert_eq!(refused["code"], "recipient-not-allowed", "{refused}");
+    assert!(!served.dir.join("argv").exists(), "the host never ran it");
+    let allowed = ask_argv(
+        &served.socket,
+        &["mailbox", "send", "--to", "head:supervisor-x", "hello"],
+    );
+    assert_eq!(allowed["result"], "done", "{allowed}");
+}
+
+#[test]
 fn a_verb_that_only_forwards_is_not_a_verb_of_its_own_any_more() {
     let served = serve(
         "window-legacy",
@@ -901,6 +928,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "path-outside-grant",
             "path-symlink",
             "peer-uid",
+            "recipient-not-allowed",
             "reply-too-large",
             "role-not-held",
             "role-pending-rotation",

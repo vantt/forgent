@@ -10,7 +10,7 @@ use std::path::{Component, Path};
 
 use serde_json::Value;
 
-use crate::permissions::{self, Decision, Policy};
+use crate::permissions::{self, Decision, Policy, Rule};
 
 /// Most words one argv may hold, and the longest one word.
 const MAX_WORDS: usize = 64;
@@ -38,9 +38,32 @@ pub enum Planned {
     Ask(Vec<String>),
 }
 
-/// Why an argv is refused: always the contract's `argv-not-allowed`, with the reason.
+/// Why an argv is refused: the contract's `argv-not-allowed`, or `recipient-not-allowed` for a `--to` outside the
+/// values the persona's row allows, with the reason.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Refused(pub String);
+
+/// Opens the reason of a refusal whose code is `recipient-not-allowed`.
+const RECIPIENT_REASON: &str = "recipient-not-allowed: ";
+
+impl Refused {
+    /// The contract's refusal code for this refusal.
+    pub fn code(&self) -> &'static str {
+        if self.0.starts_with(RECIPIENT_REASON) {
+            "recipient-not-allowed"
+        } else {
+            "argv-not-allowed"
+        }
+    }
+}
+
+/// Whether `value` is one of `allowed`: an exact match, or, for an allowed value ending in `*`, any value with that prefix.
+fn value_allowed(allowed: &[String], value: &str) -> bool {
+    allowed.iter().any(|a| match a.strip_suffix('*') {
+        Some(prefix) => value.starts_with(prefix),
+        None => a == value,
+    })
+}
 
 fn refuse<T>(why: impl Into<String>) -> Result<T, Refused> {
     Err(Refused(why.into()))
@@ -303,12 +326,50 @@ fn screen(
     Ok((words, verdict, patch))
 }
 
+/// What an allowing row puts on the argv's own flags: the flags the host sets, the values a flag may take, the session
+/// target and the limits. `plan` and `can_i` both decide through it, so the answer and the run cannot disagree.
+fn check_row_args(words: &[String], rule: &Rule) -> Result<(), Refused> {
+    if let Some(flag) = rule
+        .refuse_flags
+        .iter()
+        .find(|flag| words.iter().any(|w| permissions::spells(w, flag)))
+    {
+        return refuse(format!("{flag} is the host's to set, not a head's"));
+    }
+    for (flag, allowed) in &rule.args {
+        let mut values = flag_values(words, flag);
+        if values.any(|v| !value_allowed(allowed, v)) {
+            let lead = if flag == "--to" { RECIPIENT_REASON } else { "" };
+            return refuse(format!("{lead}{flag} takes one of {}", allowed.join(", ")));
+        }
+    }
+    if let Some(at) = rule.target_at {
+        if !words.get(at).is_some_and(|w| is_target(w)) {
+            return refuse(
+                "the session target must be a role, handle or slot key (letters, digits and : @ . _ / -, 1 to 128 bytes)",
+            );
+        }
+    }
+    for (flag, most) in &rule.limits {
+        let mut values = flag_values(words, flag);
+        if values.any(|v| v.parse::<u64>().map_or(true, |n| n > *most)) {
+            return refuse(format!("{flag} takes a whole number up to {most}"));
+        }
+    }
+    Ok(())
+}
+
 /// What the table says about `argv` for `persona` (the answer of `fgos can-i`): `allow` or `ask` as the table has it,
 /// and `deny` with the reason for a refusal no persona can lift or a denying row. It runs and files nothing.
 pub fn can_i(persona: &str, argv: &Value, root: &Path) -> (Decision, String) {
     match screen(persona, argv, root) {
         Err(Refused(why)) => (Decision::Deny, why),
         Ok((words, verdict, _)) => {
+            if let (Decision::Allow, Some(rule)) = (verdict.decision, &verdict.rule) {
+                if let Err(Refused(why)) = check_row_args(&words, rule) {
+                    return (Decision::Deny, why);
+                }
+            }
             let line = words.join(" ");
             let why = match (verdict.decision, &verdict.rule) {
                 (Decision::Allow, Some(rule)) => {
@@ -349,32 +410,7 @@ pub fn plan(
                     rule.prefix.join(" ")
                 ));
             }
-            if let Some(flag) = rule
-                .refuse_flags
-                .iter()
-                .find(|flag| words.iter().any(|w| permissions::spells(w, flag)))
-            {
-                return refuse(format!("{flag} is the host's to set, not a head's"));
-            }
-            for (flag, allowed) in &rule.args {
-                let mut values = flag_values(&words, flag);
-                if values.any(|v| !allowed.iter().any(|a| a == v)) {
-                    return refuse(format!("{flag} takes one of {}", allowed.join(", ")));
-                }
-            }
-            if let Some(at) = rule.target_at {
-                if !words.get(at).is_some_and(|w| is_target(w)) {
-                    return refuse(
-                        "the session target must be a role, handle or slot key (letters, digits and : @ . _ / -, 1 to 128 bytes)",
-                    );
-                }
-            }
-            for (flag, most) in &rule.limits {
-                let mut values = flag_values(&words, flag);
-                if values.any(|v| v.parse::<u64>().map_or(true, |n| n > *most)) {
-                    return refuse(format!("{flag} takes a whole number up to {most}"));
-                }
-            }
+            check_row_args(&words, &rule)?;
             if let Some(bytes) = patch {
                 stage_patch(patch_stage, &bytes)?;
                 words[2] = patch_stage.to_string_lossy().into_owned();

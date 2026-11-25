@@ -36,6 +36,17 @@ relay what is new to the owner in one batch in the five-part form (`core/skills/
 no message. The relay follows the cap of the 'Owner questions' section (at most 5 at a time, by priority then age);
 'new' means not yet relayed in this session, so a rotation successor relays the open ones again once.
 
+Then two more checks, in order:
+
+1. Is NO supervisor head alive? `fgos supervisor queue --json` and `fgos slots` say so; there is no new verb. A live
+   supervisor is never a reason to take over.
+2. Is a `coordination-help` event older than `secretary.help.staleMinutes` (default 30, minimum 5)?
+
+If either answer is yes she takes over: she wakes or starts the supervisor (`fgos supervisor wake`, `fgos session start`). If
+it still does not come up, she handles the waiting help events herself through the window (the supervisor's own steps in
+`fgos-supervisor`, "Help queue"), then reports to the owner in one batch. She stops when the supervisor is live and the
+help queue has nothing past the threshold; then the supervisor owns the queue again.
+
 ## Procedure for each owner request
 
 1. **Clarify the domain.** Call `fgos-clarifying` (verdict only, no Work item, never `fgos submit`). If the verdict is
