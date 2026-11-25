@@ -303,7 +303,8 @@ and the effective rule set are not this plan's: the ACE plan (`261125-1631`) dec
 2. **Approval id for the component declaration** (shared with ACE owner question 1). `fgos authority declare --kind
    component` needs `--approved-by` naming an answered owner question
    (`packages/host-runtime/contracts/command-manifest.json:1048`). ASC-D1 was relayed as supervisor event
-   `16707082c8c40dac`, not as a question. One answered question that records ASC-D1 and ACE-D3 serves both plans.
+   `16707082c8c40dac`, not as a question. One answered question that records ASC-D1 and ACE-D3 serves both plans:
+   asked as `q-5sog3pzmqn` (2026-11-25); phase 6 passes that id to `--approved-by` once it is answered.
 3. **Where the RUL102 amendment lands: resolved.** ACE-D3 moves the registry out of packaging-distribution, so the
    RUL102 successor belongs to ACE phase 3, which records all three roles (ACE-D2). This plan no longer edits
    `docs/platform/packaging-distribution/spec.md`.
