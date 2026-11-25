@@ -12,6 +12,7 @@
 //! session` and `can-i`. Contract: `packages/run-supervisor/contracts/head-request.v1.json`.
 
 use std::collections::BTreeMap;
+use std::ffi::OsString;
 use std::io::{self, Read};
 use std::os::unix::net::{UnixListener, UnixStream};
 #[cfg(target_os = "linux")]
@@ -1405,7 +1406,7 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>)
     if request.verb == FGOS_VERB {
         return forward(cfg, request);
     }
-    let outcome = run_verb(cfg, request);
+    let outcome = route_request(cfg, request);
     if let (Some(take), Outcome::Done(_)) = (moves, &outcome) {
         if let Err(why) = (cfg.take_role)(take) {
             (cfg.log)(&format!(
@@ -1520,36 +1521,11 @@ fn forward(cfg: &Config, request: &Request) -> Outcome {
     outcome
 }
 
-/// The host the route children run: the active release's host when the head follows activation, else its start host.
-fn host_of(cfg: &Config, request: &Request) -> PathBuf {
-    match cfg.request_host_bin.as_ref().map(|read| read()) {
-        Some(Ok(host)) => host,
-        Some(Err(why)) => {
-            (cfg.log)(&format!(
-                "head-request {} release-fallback: {}",
-                request.id,
-                loggable_detail(&why)
-            ));
-            PathBuf::from(&cfg.host_bin)
-        }
-        None => PathBuf::from(&cfg.host_bin),
-    }
-}
-
 /// Runs the host `fgos` with `words` (no shell, the project root as cwd, the step environment), inside the verb
 /// timeout and in its own process group, and reads its answer: its `data`, or its own refusal.
 fn forward_exec(cfg: &Config, request: &Request, words: &[String]) -> Outcome {
-    let mut cmd = Command::new(host_of(cfg, request));
-    cmd.args(words)
-        .env_clear()
-        .envs(cfg.env.iter())
-        .current_dir(&cfg.cwd);
-    // SAFETY: prctl is async-signal-safe; the child dies with the supervisor that started it.
-    #[cfg(target_os = "linux")]
-    unsafe {
-        cmd.pre_exec(fgos_process::control::arm_parent_death_signal);
-    }
-    let output = match run_bounded_command(cmd, None, cfg.verb_timeout, |_| ()) {
+    let words: Vec<OsString> = words.iter().map(OsString::from).collect();
+    let output = match run_verb(cfg, request, &words, None) {
         Ok(BoundedOutcome::Exited(output)) => output,
         Ok(BoundedOutcome::TimedOut { .. }) => return refused("verb-timeout"),
         Err(e) => {
@@ -1617,19 +1593,14 @@ fn ask_owner(cfg: &Config, request: &Request, words: &[String]) -> Outcome {
             "scope": {"allows": "Answering this one argv for this one request.", "forbids": "Any other argv, any persona's table, or a standing grant."}
         }
     });
-    let mut cmd = Command::new(host_of(cfg, request));
-    cmd.args(["internal", "head-questions", "--run-dir"])
-        .arg(&cfg.run_dir)
-        .env_clear()
-        .envs(cfg.env.iter())
-        .current_dir(&cfg.cwd);
-    // SAFETY: prctl is async-signal-safe; the child dies with the supervisor that started it.
-    #[cfg(target_os = "linux")]
-    unsafe {
-        cmd.pre_exec(fgos_process::control::arm_parent_death_signal);
-    }
+    let words: Vec<OsString> = vec![
+        "internal".into(),
+        "head-questions".into(),
+        "--run-dir".into(),
+        cfg.run_dir.clone().into_os_string(),
+    ];
     let body = json!({"v": 1, "verb": "questions ask", "args": {"input": input}}).to_string();
-    let output = match run_bounded_command(cmd, Some(body.as_bytes()), cfg.verb_timeout, |_| ()) {
+    let output = match run_verb(cfg, request, &words, Some(body.as_bytes())) {
         Ok(BoundedOutcome::Exited(output)) => output,
         Ok(BoundedOutcome::TimedOut { .. }) => return refused("verb-timeout"),
         Err(e) => {
@@ -1661,14 +1632,16 @@ fn ask_owner(cfg: &Config, request: &Request, words: &[String]) -> Outcome {
     }
 }
 
-/// Run `<host> internal head-request --protocol 1 --run-dir <dir>` with the request on stdin and the step
-/// environment, through the process door's bounded run (its own group, killed with its descendants at the
-/// timeout), armed to die with the supervisor on Linux.
-fn run_verb(cfg: &Config, request: &Request) -> Outcome {
-    let failed = |detail: String| Outcome::Refused {
-        code: "verb-failed",
-        detail: Some(detail),
-    };
+/// The one place the host is spawned: resolves the host the route children run (the active release's host when the
+/// head follows activation, else its start host), runs it with `words` and the optional stdin `body` in the step
+/// environment and the project root, through the process door's bounded run (its own group, killed with its
+/// descendants at the timeout), armed to die with the supervisor on Linux.
+fn run_verb(
+    cfg: &Config,
+    request: &Request,
+    words: &[OsString],
+    body: Option<&[u8]>,
+) -> io::Result<BoundedOutcome> {
     let host = match cfg.request_host_bin.as_ref().map(|read| read()) {
         Some(Ok(host)) => host,
         Some(Err(why)) => {
@@ -1682,8 +1655,7 @@ fn run_verb(cfg: &Config, request: &Request) -> Outcome {
         None => PathBuf::from(&cfg.host_bin),
     };
     let mut cmd = Command::new(&host);
-    cmd.args(["internal", "head-request", "--protocol", "1", "--run-dir"])
-        .arg(&cfg.run_dir)
+    cmd.args(words)
         .env_clear()
         .envs(cfg.env.iter())
         .current_dir(&cfg.cwd);
@@ -1692,8 +1664,26 @@ fn run_verb(cfg: &Config, request: &Request) -> Outcome {
     unsafe {
         cmd.pre_exec(fgos_process::control::arm_parent_death_signal);
     }
+    run_bounded_command(cmd, body, cfg.verb_timeout, |_| ())
+}
+
+/// Sends the internal head-request frame (`<host> internal head-request --protocol 1 --run-dir <dir>`, the request on
+/// stdin) and reads the route's answer.
+fn route_request(cfg: &Config, request: &Request) -> Outcome {
+    let failed = |detail: String| Outcome::Refused {
+        code: "verb-failed",
+        detail: Some(detail),
+    };
+    let words: Vec<OsString> = vec![
+        "internal".into(),
+        "head-request".into(),
+        "--protocol".into(),
+        "1".into(),
+        "--run-dir".into(),
+        cfg.run_dir.clone().into_os_string(),
+    ];
     let body = json!({"id": request.id, "verb": request.verb, "args": request.args}).to_string();
-    let output = match run_bounded_command(cmd, Some(body.as_bytes()), cfg.verb_timeout, |_| ()) {
+    let output = match run_verb(cfg, request, &words, Some(body.as_bytes())) {
         Ok(BoundedOutcome::Exited(output)) => output,
         Ok(BoundedOutcome::TimedOut { .. }) => return refused("verb-timeout"),
         Err(e) => return failed(format!("the route did not run: {e}")),
