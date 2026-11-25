@@ -18,3 +18,7 @@ A seal child that cannot start leaves a record like the publish child does; a re
 # Notes
 
 Migrated from the legacy backlog table. Original status: proposed.
+
+# Update 2026-11-25 (supervisor)
+
+The trace stays partial because `p-cg4w6nn5l6` drops the path and the operation. The failure fires at the end of every verb (`questions`, `supervisor`, `watcher`, `land`), 2740 times in the fault log, and nothing shows it blocking a verb. A disk-full window on 2026-11-25 around 14:08 may explain the recent ones but not the count from 2026-11-24. Raise to P1 only after `p-cg4w6nn5l6` lands and the first real cause is read.

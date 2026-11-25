@@ -18,3 +18,7 @@ An event-store io error names the operation and the path; the `decision-index` t
 # Notes
 
 Migrated from the legacy backlog table. Original status: proposed.
+
+# Update 2026-11-25 (supervisor)
+
+This is why the 2740 `event-store-end-trigger: event-store-io` faults in `.fgos/logs/invocation-faults.jsonl` carry no path and no operation: the message is only `event-store-io`. 21 of them hit the `land` verb after 14:35 today. The disk reached 100% at about 14:08, so `No space left on device` is one candidate cause, but the fault log cannot confirm it. Fix this row first: with the path and the operation in the error the other row (`p-duxnm52lzh`) becomes traceable.
