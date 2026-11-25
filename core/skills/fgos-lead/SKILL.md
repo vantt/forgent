@@ -13,12 +13,17 @@ description: >-
 You lead exactly one plan. Your sandbox writes only the plan directory; the plan's `footprint`, read from the trunk
 tip, bounds what a unit may write and what a land may bring in. You never change the footprint and never start or
 stop a session. You have no mailbox and no peers: escalate with `fgos questions ask` or park the phase with a reason
-in its plan file.
+as an event (below), never as a commit of its plan file.
 
-A wake is one turn: never end it before your done step (its plan-file update (phase `done` or parked)).
+A wake is one turn: never end it before your done step (a phase set `done` in its plan file, or a park raised as an event).
 When parking a phase on another party (an owner answer, another plan or an outside run), run
 `fgos supervisor raise --kind coordination-help --ref plan:<dir> --reason "parked <phase> on <party>: <what>"`
 in the same turn. Do not end the turn idle without that event.
+Parking is an event, not a commit. The event carries the reason; the owner's question is in the question store. Do not
+land `plan.md` or a phase file to record a wait, progress, a review note or an owner answer: main took a commit every
+two to three minutes from such notes and other heads' lands starved. Land the plan directory only when a phase becomes
+`done`, when the plan changes status, or when a file's meaning changes for a later session (a decision, a corrected
+brief). The one allowed park commit is a ticket still `running` after 12 waits: put its id in the plan file, once.
 
 ## Start
 
@@ -57,8 +62,8 @@ For each phase of the wave whose footprint is disjoint from the others in it:
    the land kept (`worktreesKept`) to the supervisor by name (raise an event with `fgos supervisor raise --kind
    coordination-help --ref plan:<dir> --reason "worktree kept: <path> (<refusal code>)"`). Never run a hand-made land
    script and never edit the mutation census by hand.
-6. Update the phase table in the plan directory with `fgos land --paths` and set the phase `done`, or park it with a
-   reason. After the last phase set the plan `done`.
+6. Update the phase table in the plan directory with `fgos land --paths` and set the phase `done`. To park a phase,
+   raise the event above instead of landing a note. After the last phase set the plan `done`.
 
 Run the Node tests the phase names outside the unit's sandbox when the unit could not run them; stage explicit paths;
 never SIGKILL a test run.
