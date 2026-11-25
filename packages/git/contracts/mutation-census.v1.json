@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c124c55541e7d25c6d1b4b4e95a1e2da76edd2f98f23d4eb3f4e87a91fc9f681",
+  "payloadDigest": "929e24d406782902631a59f6a9efaa66667fc8a383fad6492cf2bf2342f963bb",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
