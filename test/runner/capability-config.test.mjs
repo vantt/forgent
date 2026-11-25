@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import {
   catalogOf, capabilityNamesOf, hasCapabilityEntry, registeredCapabilityOf,
   capabilityPersonaOf, capabilityRigorOf, minCheckersOf, ownMinCheckersOf, capabilityVerifyOf,
-  capabilityConfinementOf, capabilityDescriptionOf, preferOf,
+  capabilityDescriptionOf, preferOf,
   hasOwnPreferPool, bindingTasteOf,
 } from '../../src/runner/capability-config.mjs';
 
@@ -66,7 +66,6 @@ test('a config wrapped as runner.capabilities holds no catalog: every read, look
   assert.equal(minCheckersOf(wrapped, 'code:x'), null);
   assert.equal(capabilityPersonaOf(wrapped, 'code:implement'), null);
   assert.equal(capabilityVerifyOf(wrapped, 'code:implement'), undefined);
-  assert.equal(capabilityConfinementOf(wrapped, 'review'), undefined);
   assert.equal(preferOf(wrapped, 'review'), undefined);
   assert.equal(hasCapabilityEntry(wrapped, 'review'), false);
   assert.deepEqual(capabilityNamesOf(wrapped), []);
@@ -89,7 +88,6 @@ test('a name from Object.prototype is never declared', () => {
     assert.equal(hasCapabilityEntry(runner, name), false, name);
     assert.equal(registeredCapabilityOf(runner, name), undefined, name);
     assert.equal(capabilityVerifyOf(runner, name), undefined, name);
-    assert.equal(capabilityConfinementOf(runner, name), undefined, name);
     assert.equal(preferOf(runner, name), undefined, name);
     assert.equal(capabilityRigorOf(runner, name), undefined, name);
   }
@@ -130,10 +128,9 @@ test('an empty minCheckers list is defined and clears; the own read ignores the 
   assert.deepEqual(ownMinCheckersOf(runner, 'code:debug'), []);
 });
 
-test('verify, confinement and description are read raw from the exact entry', () => {
+test('verify and description are read raw from the exact entry', () => {
   assert.equal(capabilityVerifyOf(runner, 'code:implement'), 'npm test');
   assert.equal(capabilityVerifyOf(runner, 'code:review'), undefined, 'no prefix fallback');
-  assert.deepEqual(capabilityConfinementOf(runner, 'review'), { mode: 'required' });
   assert.equal(capabilityDescriptionOf(runner, 'code:implement'), 'implement');
   assert.equal(capabilityDescriptionOf(runner, 'code:debug'), 'code work', 'the prefix entry describes a name whose own entry has none');
   assert.equal(capabilityDescriptionOf(runner, 'review'), null);

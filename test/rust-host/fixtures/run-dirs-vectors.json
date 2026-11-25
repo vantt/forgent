@@ -1,5 +1,5 @@
 {
-  "description": "Directory trees under a project's .fgos and what each of the three run-directory listers yields, paths relative to .fgos. The Node listers (src/runner/dispatch/assignment-layout.mjs scanAssignmentLayout, src/run-supervisor/client.mjs listOpenAttemptDirs) and the host listers (apps/fgos/src/wiring/run_dirs.rs) both read this file; the three listers apply three rules, so a tree can yield a different list from each.",
+  "description": "Directory trees under a project's .fgos and what each of the three run-directory listers yields, paths relative to .fgos. The host listers (apps/fgos/src/wiring/run_dirs.rs) read this file; open attempts are the engine's assignment runs whose closed.json does not exist.",
   "vectors": [
     {
       "name": "workflow-runs: every real directory counts, files and symlinks do not",
@@ -172,9 +172,7 @@
       "expect": {
         "workflowRuns": [],
         "assignmentRuns": [],
-        "openAttempts": [
-          "assignments/work-1/runs/01"
-        ]
+        "openAttempts": []
       }
     },
     {
@@ -232,7 +230,6 @@
           "assignments/a1/a2/a3/a4/a5/a6/a7/a8/a9/a10/a11/a12/a13/a14/a15/a16/runs/01"
         ],
         "openAttempts": [
-          "assignments/a1/a2/a3/a4/a5/a6/a7/a8/a9/a10/a11/a12/a13/a14/a15/a16/a17/runs/01",
           "assignments/a1/a2/a3/a4/a5/a6/a7/a8/a9/a10/a11/a12/a13/a14/a15/a16/runs/01"
         ]
       }

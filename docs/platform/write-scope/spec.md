@@ -56,8 +56,7 @@ decides whether a collision is acceptable; that belongs to the caller and, for v
 
 ## 3. Grammar
 
-An entry is canonicalized by `canonicalize` (`packages/write-scope/src/lib.rs`, mirrored by
-`canonicalizeWriteEntry` in `src/runner/dispatch/write-scope.mjs`). The rules, all taken from the code
+An entry is canonicalized by `canonicalize` (`packages/write-scope/src/lib.rs`). The rules, all taken from the code
 that runs today:
 
 - Leading and trailing whitespace is removed, using the ECMAScript whitespace set (it includes U+FEFF and
@@ -102,8 +101,7 @@ everything. Two scopes may overlap when any entry of one may overlap any entry o
 | `**` | anything | yes | empty prefix |
 
 This is the rule `fgos_write_scope::overlaps` applies to the prefixes of two entries
-(`packages/write-scope/src/lib.rs:149`) and `writeScopesOverlap` applies to two scopes
-(`src/runner/dispatch/write-scope.mjs:186`). It is the meaning dispatch admission already uses
+(`packages/write-scope/src/lib.rs:149`) and `scopes_overlap` applies to two scopes. It is the meaning dispatch admission already uses
 (`src/workflow/case-admission.mjs:171`). It is chosen because it is the only one of the meanings found in
 the repository (section 5.3) that is both sound and cheap enough to hold on a set.
 
@@ -140,11 +138,11 @@ or recorded as debt.
 |---|---|---|---|---|
 | 1 | Equal strings only | `footprintOverlapAmong`, `src/state/graph-metrics.mjs:599` | `lib` and `lib/a.mjs` do not collide; globs compared as strings. Not sound | Replaced by the chosen meaning in the Work adapter (door plan) |
 | 2 | Containment, character cut | `overlaps`, `scripts/plan-contract-check.mjs:34`; `overlaps`, `packages/supervision/rust/src/portfolio.rs:200` | Cuts the entry at the first `*` character, not at a segment, and does not canonicalize: `lib/fo*` becomes `lib/fo`, which does not contain `lib/foo.mjs`; `./src` is not `lib`. Not sound. Both readers also delete every `*` before the rule sees it (`portfolio.rs:318`, `plan-contract-check.mjs:42`) | Replaced (door plan) |
-| 3 | Containment, segment cut | `fgos_write_scope::overlaps`; `writeScopesOverlap` | The chosen meaning | **Chosen** |
+| 3 | Containment, segment cut | `fgos_write_scope::overlaps`; `scopes_overlap` | The chosen meaning | **Chosen** |
 | 4 | Regex glob | `pathsOverlap`, `src/report/capability-plan-lint.mjs:99` | Tests one entry as a regex against the other's text: `lib/a*` and `lib/*b` come out disjoint although `lib/ab` matches both. Not sound | Replaced (door plan) |
-| 5 | Glob intersection | `globsMeet`, `src/runner/dispatch/write-scope.mjs:142` (built on `segmentsMeet`, line 111) | Segment-wise intersection of two patterns, used by propose and classify. Answers a different question (can two patterns name a file, plain entries as exact paths, not subtrees) | Recorded debt, not a target: allow-listed with a `retiredBy` by the door plan |
+| 5 | Glob intersection | `globs_meet`, `packages/write-scope/src/lib.rs` | Segment-wise intersection of two patterns, used by propose and classify. Answers a different question (can two patterns name a file, plain entries as exact paths, not subtrees) | Recorded debt, not a target: allow-listed with a `retiredBy` by the door plan |
 
-The seven sites are: the Rust crate and the JS port (meaning 3, two sites), the plan-check script and the
+The sites are: the Rust crate (meaning 3; its JS port is deleted), the plan-check script and the
 supervisor reader (meaning 2, two sites), `footprintOverlapAmong` (1), `pathsOverlap` (4) and `globsMeet` (5).
 
 ## 6. Colliding pairs
@@ -169,8 +167,8 @@ Output:
 - The function is a pairwise comparison of canonicalized entries. It builds no index and measures no
   threshold; if one timing recorded at the door plan's landing shows it is too slow, an index becomes a
   separate item (plan decision 19). It is proven against a naive pairwise oracle in Rust.
-- A JavaScript copy of this function does not exist and none is added. The JS port stays a pinned copy of
-  the single-scope functions only (section 9).
+- A JavaScript copy of this function does not exist and none is added; the single-scope JS port is deleted too
+  (section 9).
 
 ## 7. Error policy
 
@@ -225,16 +223,13 @@ dependency-free status do not change.
 **What stays elsewhere.** Execution owns which paths a run is granted; Git enforces a grant at commit. This
 component only reads and compares spellings.
 
-**The JS port.** `src/runner/dispatch/write-scope.mjs` is a second implementation of the single-scope
-functions, not the thin facade that RUL84 (one write-scope matcher) asked for; the facade switch was never made. Until dispatch moves,
-the port stays and is pinned to the Rust rule by `test/git/write-scope-parity.test.mjs`, which runs the
-golden suite `test/runner/write-scope.test.mjs` through the addon as well as through Node. Plan phase 3 adds
-whole-scope `overlaps` cases to that one golden suite so both sides run them; no second parity file exists.
+**No JS port.** The Node copy of the single-scope functions is deleted; Node callers reach the rule through the
+addon's `writeScope` namespace. The cases of its golden suite now live in the crate's Rust tests
+(`packages/write-scope/src/lib.rs`), the one owner of the rule.
 
 **Guard against a new copy.** The door plan adds a `door` entry to `packages/component-authority/model/` whose
 patterns match only definitions of the rule (`export function pathsOverlap`, `footprintOverlapAmong`,
-`fn overlaps(` in `.rs` files under `packages/`), with the pinned JS port and `globsMeet` listed as debt with
-a `retiredBy`.
+`fn overlaps(` in `.rs` files under `packages/`); the row carries no debt.
 
 ## 10. Non-goals
 
@@ -251,7 +246,7 @@ a `retiredBy`.
 |---|---|---|
 | plan decision 1 | `packages/write-scope` leaves `packages/git/` | section 9 |
 | plan decision 2 | Claims to colliding pairs is a set-level function of this component, not a layer of its own | section 6 |
-| plan decision 6 | Dispatch keeps its JS `write-scope.mjs`; a conformance test pins it to the Rust rule until dispatch moves | section 9 |
+| plan decision 6 | Dispatch kept its JS `write-scope.mjs` pinned to the Rust rule until dispatch moved; superseded 2026-11-25: `src/runner/dispatch/write-scope.mjs` (last at `74b608ad8`), `test/runner/write-scope.test.mjs` (`cb0469244`) and `test/git/write-scope-parity.test.mjs` (`9e166f430`) are deleted, their cases moved into the crate's Rust tests | section 9 |
 | plan decision 7 | Only this function can truncate; per-item limits are item-level findings | sections 7, 8 |
 | plan decision 15 | No new external crate; result types stay plain | section 6 |
 | plan decision 17 | An entry that does not canonicalize, and an empty scope, are reported, never dropped | section 7 |

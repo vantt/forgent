@@ -33,8 +33,6 @@ allowed:
     count: 4
   - path: src/workflow/propose-validate.mjs
     count: 5
-debt:
-  - path: src/runner/dispatch/write-scope.mjs
-    reason: the JS port of the write-scope rule that dispatch keeps for now (plan decision 6), pinned to the Rust rule by test/git/write-scope-parity.test.mjs; globsMeet and writeScopesOverlap are its overlap functions
-retiredBy: "261122-2108-delete-dead-node-execution-closure#phase-11: dispatch moves onto the write-scope package and src/runner/dispatch/write-scope.mjs goes"
+debt: []
+retiredBy: "S7: the Node callers of the rule under src/state, src/intake and src/workflow (allowed above, each a consumer of the rule, not a second definition) retire with the Node payload; no twin is left"
 reason: whether two footprints or write scopes may touch the same path is the write-scope package's rule (packages/write-scope); a second definition cannot disagree about a pair

@@ -643,4 +643,151 @@ mod tests {
             assert_eq!(matches(p.as_bytes(), &[s.into()]).unwrap(), want);
         }
     }
+    fn v(items: &[&str]) -> Vec<String> {
+        items.iter().map(|x| x.to_string()).collect()
+    }
+    fn hit(path: &str, scope: &[&str]) -> bool {
+        matches(path.as_bytes(), &v(scope)).unwrap()
+    }
+    #[test]
+    fn spellings_of_one_directory_collapse_and_the_form_is_a_fixed_point() {
+        for raw in [
+            "./docs", "docs/", "docs//", "docs", " docs ", "././docs", ".//docs", "docs/.", "docs/./",
+        ] {
+            assert_eq!(canonicalize(raw).unwrap(), "docs", "{raw:?}");
+        }
+        assert_eq!(canonicalize("a//b/./c/").unwrap(), "a/b/c");
+        assert_eq!(canonicalize("a/**/**/**/b").unwrap(), "a/**/b");
+        for raw in ["docs /", " ./a/ b ", "docs/", "a/**/**/b", "tài liệu/"] {
+            let once = canonicalize(raw).unwrap();
+            assert_eq!(canonicalize(&once).unwrap(), once, "{raw:?}");
+        }
+        for bad in [
+            "   ", "./", "//x", "a/..", "..", ":(top)x", ":!x", "./:x", "**.md", "a/***/b",
+        ] {
+            assert!(canonicalize(bad).is_err(), "{bad:?}");
+        }
+    }
+    #[test]
+    fn only_star_and_double_star_are_glob_and_other_punctuation_is_literal() {
+        for raw in [
+            "app/[slug]/page.tsx", "app/(group)/[id]/route.ts", "a?b", "{a,b}", "!x", "**", "a/**/b", "docs/*.md",
+        ] {
+            assert_eq!(canonicalize(raw).unwrap(), raw);
+        }
+        for (path, scope, want) in [
+            ("app/[slug]/page.tsx", "app/[slug]/page.tsx", true),
+            ("app/s/page.tsx", "app/[slug]/page.tsx", false),
+            ("app/(group)/[id]/route.ts", "app/(group)/[id]/route.ts", true),
+            ("app/group/1/route.ts", "app/(group)/[id]/route.ts", false),
+            ("a?b", "a?b", true),
+            ("axb", "a?b", false),
+            ("{a,b}", "{a,b}", true),
+            ("a", "{a,b}", false),
+            ("!x", "!x", true),
+            ("y", "!x", false),
+        ] {
+            assert_eq!(hit(path, &[scope]), want, "{path} in {scope}");
+        }
+    }
+    #[test]
+    fn a_plain_entry_covers_its_subtree_and_a_glob_stays_inside_its_segments() {
+        for (path, scope, want) in [
+            ("docs/a.md", "docs", true),
+            ("docs", "docs", true),
+            ("docs/x/y/z.md", "docs", true),
+            ("docs-old/a.md", "docs", false),
+            ("plans/x/reports/a/b.md", "plans/*/reports/**", true),
+            ("plans/x/reports/a.md", "plans/*/reports/**", true),
+            ("plans/x/y/reports/a.md", "plans/*/reports/**", false),
+            ("a.md", "*.md", true),
+            ("d/a.md", "*.md", false),
+            ("src/deep/file.mjs", "**", true),
+            ("docs/tài liệu/ghi chú.md", "docs/tài liệu", true),
+            ("docs/tài liệu/ghi chú.md", "docs/*/ghi chú.md", true),
+            ("docs/tai lieu/ghi chú.md", "docs/tài liệu", false),
+            ("docs/a.md", "docs/", true),
+            ("docs/a.md", "./docs", true),
+        ] {
+            assert_eq!(hit(path, &[scope]), want, "{path} in {scope}");
+        }
+        assert!(matches(b"docs/a.md", &v(&["../docs"])).is_err());
+    }
+    #[test]
+    fn the_store_and_escaping_paths_never_match() {
+        for scope in [["**"], [".fgos"], [".fgos/**"], ["*/**"]] {
+            assert!(!hit(".fgos/state.json", &scope), "{scope:?}");
+            assert!(!hit(".fgos", &scope), "{scope:?}");
+        }
+        assert!(!hit("docs/../.fgos/state.json", &["docs"]));
+        assert!(!hit("docs/../src/a.mjs", &["**"]));
+        assert!(!hit("/docs/a.md", &["docs"]));
+        assert!(!hit("docs\\a.md", &["docs"]));
+        assert!(!hit("docs/a\0.md", &["docs"]));
+        assert!(hit("docs/./a.md", &["docs"]));
+    }
+    #[test]
+    fn matching_stays_fast_on_deep_paths_with_stacked_double_stars() {
+        let deep = (0..60).map(|i| format!("s{i}")).collect::<Vec<_>>().join("/");
+        let scope = ["**/*/**/*/**/*/**/*/**/y"];
+        let started = std::time::Instant::now();
+        assert!(!hit(&format!("{deep}/x"), &scope));
+        assert!(hit(&format!("{deep}/y"), &scope));
+        assert!(started.elapsed().as_millis() < 500);
+    }
+    #[test]
+    fn canonicalize_all_dedupes_in_first_seen_order_and_refuses_a_bad_entry() {
+        assert_eq!(
+            canonicalize_all(&v(&["./src", "docs/", "src", "docs//", "b"])).unwrap(),
+            v(&["src", "docs", "b"])
+        );
+        assert!(canonicalize_all(&[]).unwrap().is_empty());
+        assert!(canonicalize_all(&v(&["ok", "."])).is_err());
+    }
+    #[test]
+    fn expand_pulls_in_render_targets_of_a_touched_generated_source() {
+        let targets = [".agents/skills/**", "plugins/fgOS/skills/**", ".claude/skills/**"];
+        let generated = vec![("core/skills/**".to_string(), v(&targets))];
+        let with = |first: &str| {
+            let mut want = vec![first.to_string()];
+            want.extend(v(&targets));
+            want
+        };
+        assert_eq!(
+            expand(&v(&["core/skills/x/SKILL.md"]), &generated).unwrap(),
+            with("core/skills/x/SKILL.md")
+        );
+        assert_eq!(expand(&v(&["core"]), &generated).unwrap(), with("core"));
+        assert_eq!(expand(&v(&["docs/"]), &generated).unwrap(), v(&["docs"]));
+        assert_eq!(
+            expand(&v(&["core/skills-old/a.md"]), &generated).unwrap(),
+            v(&["core/skills-old/a.md"])
+        );
+        assert!(expand(&[], &generated).unwrap().is_empty());
+        assert_eq!(expand(&v(&["docs"]), &[]).unwrap(), v(&["docs"]));
+    }
+    #[test]
+    fn whole_scopes_overlap_by_literal_leading_segments_in_both_directions() {
+        for (a, b, want) in [
+            (&["lib"][..], &["lib/a.mjs"][..], true),
+            (&["lib/fo*"], &["lib/foo.mjs"], true),
+            (&["lib/a/**"], &["lib/b/**"], false),
+            (&["docs"], &["docs-old/x"], false),
+            (&["lib/a*"], &["lib/b*"], true),
+            (&["**"], &["anything/x"], true),
+            (&["./lib/", "zzz"], &[" lib/x "], true),
+            (&["a/**/**/b"], &["a/c"], true),
+            (&["\u{feff}docs"], &["docs/x"], true),
+            (&["\u{3000}src\u{3000}"], &["src/y"], true),
+            (&["a//b", "c"], &["a/b/**"], true),
+            (&["x/y"], &["x/z", "w"], false),
+        ] {
+            assert_eq!(scopes_overlap(&v(a), &v(b)).unwrap(), want, "{a:?} vs {b:?}");
+            assert_eq!(scopes_overlap(&v(b), &v(a)).unwrap(), want, "{b:?} vs {a:?}");
+        }
+        for bad in [".", "", "../x", "/x", "a\\b", "ab**", ":(top)x"] {
+            assert!(scopes_overlap(&v(&[bad]), &v(&["x"])).is_err(), "{bad:?}");
+            assert!(scopes_overlap(&v(&["x"]), &v(&[bad])).is_err(), "{bad:?}");
+        }
+    }
 }

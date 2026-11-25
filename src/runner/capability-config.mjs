@@ -91,9 +91,6 @@ export const ownMinCheckersOf = (runner, name) => exactEntryOf(runner, name)?.mi
 /** The exact entry's `verify`, raw. */
 export const capabilityVerifyOf = (runner, capability) => exactEntryOf(runner, capability)?.verify;
 
-/** The exact entry's `confinement`, raw. */
-export const capabilityConfinementOf = (runner, capability) => exactEntryOf(runner, capability)?.confinement;
-
 /** The exact entry's `prefer`, raw (a string, a list or undefined). */
 export const preferOf = (runner, capability) => exactEntryOf(runner, capability)?.prefer;
 
