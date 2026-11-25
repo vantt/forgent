@@ -27,10 +27,10 @@ Related:
 ## 1. Purpose and scope
 
 ACE (Agent Context Engine) is the one place that organizes, stores and manages every fgOS-owned rule, and keeps them
-free of duplicates and conflicts (ACE-D1). Scope is fgOS-owned rule text only; AgentKit, GitNexus and MDView text is
+free of duplicates and conflicts. Scope is fgOS-owned rule text only; AgentKit, GitNexus and MDView text is
 outside it. ACE knows no agent, writes no host file and selects nothing for a start.
 
-Three roles (ACE-D2), dependency order ACE ← ASC ← packaging-distribution:
+Three roles, dependency order ACE ← ASC ← packaging-distribution:
 
 | Role | Owns | Does not |
 |---|---|---|
@@ -38,12 +38,12 @@ Three roles (ACE-D2), dependency order ACE ← ASC ← packaging-distribution:
 | ASC (agent start context) | taking start facts, selecting rules from ACE, gathering contributor context, ordering blocks | write a host file, own the keys |
 | packaging-distribution | which file for which CLI, block markers, other tools' blocks, doctor drift rows | select a rule |
 
-ACE never depends on ASC or on the documentation component. ACE links pkm directly (ACE-D6) and keeps its own rule
+ACE never depends on ASC or on the documentation component. ACE links pkm directly and keeps its own rule
 schema, apart from document identity.
 
 ## 2. Owner and tier
 
-Owner: the agent-context-engine component, tier 3 (ACE-D3). Allowed dependencies: tier 3 or below, plus pkm. Its
+Owner: the agent-context-engine component, tier 3. Allowed dependencies: tier 3 or below, plus pkm. Its
 component row and the four contract rows are declared in the authority model when the crate lands; the id
 `agent-context-engine` is free today. The pkm store adapter sits behind a cargo feature so a reader links without it.
 
@@ -66,7 +66,7 @@ roles `id` (`id_scope: vault`), `lifecycle`, `valid_from`, `valid_to`, `supersed
 `when:` maps a key to a list of allowed values (any-of); several keys all must match; empty or absent means always.
 Keys are the registry [when-keys.v1.json](../../../packages/agent-context-engine/contracts/when-keys.v1.json): `kind`,
 `cli`, `project`, `persona`, `role`, `domain`, `workflow`, `stage`, each with a value type and a live value source
-(ACE-D5 (3)). Which keys a start supplies is ASC's start request, not here.
+(decided 2026-11-25: ACE owns the `when:` key registry). Which keys a start supplies is ASC's start request, not here.
 
 Decision on the component-scoped unit (`components/packaging-distribution/instructions/verification.md`): there is no
 `component` key. The unit is owned by its component through `owner`, with `scope: component` and an empty `when:`; its
@@ -119,12 +119,12 @@ supported. A reader never re-checks rules; checking is the writer's job.
 
 ## 9. Lịch sử quyết định
 
-| ID | Decision | Date | Source |
+| Topic | Decision | Date | Source |
 |---|---|---|---|
-| ACE-D1 | ACE is the one place that organizes, stores and manages every rule and keeps them free of duplicates and conflicts; ASC is the one place that sets an agent's context at start. Two components joined by a contract. | 2026-11-25 | [ds-e26zcar63f](../../../plans/discussions/ds-e26zcar63f-agent-context-engine/DISCUSSION.md) |
-| ACE-D2 | Three roles: ACE owns the store, ASC owns selection, packaging-distribution owns writing files. Order ACE ← ASC ← packaging-distribution. | 2026-11-25 | same |
-| ACE-D3 | ACE becomes its own component with its own spec and authority row; the registry and checks leave packaging-distribution. | 2026-11-25 | same |
-| ACE-D4 | The 14 measured conflicts are resolved when the rules are gathered, not one by one now. | 2026-11-25 | same |
-| ACE-D5 | ACE hands ASC one checked effective set with a digest; refuses bad rules when written; owns the `when:` key registry. | 2026-11-25 | same; ASC-D9 in [ds-2d55ty37zz](../../../plans/discussions/ds-2d55ty37zz-agent-start-door-and-context-seam/DISCUSSION.md) |
-| ACE-D6 | pkm is the engine of the rule store (typed graph, lifecycle classes, effective set, search); ACE links it directly and keeps its own schema; readers need no pkm. | 2026-11-25 | same |
-| RUL102 | Composition belongs to ACE, delivery stays in packaging-distribution, with a weight guard: the seed moves to its own module when the first budget or tiering slice lands. ACE-D3 is that move; a successor decision is recorded when the component is registered. | 2026-10-17 | [packaging-distribution spec](../packaging-distribution/spec.md) |
+| One place for rules and one for start context | ACE is the one place that organizes, stores and manages every rule and keeps them free of duplicates and conflicts; ASC is the one place that sets an agent's context at start. Two components joined by a contract. | 2026-11-25 | [ds-e26zcar63f](../../../plans/discussions/ds-e26zcar63f-agent-context-engine/DISCUSSION.md) |
+| Three roles | Three roles: ACE owns the store, ASC owns selection, packaging-distribution owns writing files. Order ACE ← ASC ← packaging-distribution. | 2026-11-25 | same |
+| Own component | ACE becomes its own component with its own spec and authority row; the registry and checks leave packaging-distribution. | 2026-11-25 | same |
+| Conflicts resolved at gathering | The 14 measured conflicts are resolved when the rules are gathered, not one by one now. | 2026-11-25 | same |
+| Checked effective set and key registry | ACE hands ASC one checked effective set with a digest; refuses bad rules when written; owns the `when:` key registry. | 2026-11-25 | same; the start-door decision in [ds-2d55ty37zz](../../../plans/discussions/ds-2d55ty37zz-agent-start-door-and-context-seam/DISCUSSION.md) |
+| pkm as rule-store engine | pkm is the engine of the rule store (typed graph, lifecycle classes, effective set, search); ACE links it directly and keeps its own schema; readers need no pkm. | 2026-11-25 | same |
+| RUL102 (composition belongs to ACE, delivery stays in packaging-distribution) | Composition belongs to ACE, delivery stays in packaging-distribution, with a weight guard: the seed moves to its own module when the first budget or tiering slice lands. The own-component decision of 2026-11-25 is that move; a successor decision is recorded when the component is registered. | 2026-10-17 | [packaging-distribution spec](../packaging-distribution/spec.md) |
