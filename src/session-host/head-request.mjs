@@ -14,8 +14,9 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { CONFINED_MARKER_ENV, readConfig } from '../config/facade.mjs';
-import { HEAD_PERSONAS, HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
-import { HEAD_ANSWERED_VERB, HEAD_FRICTION_RECORD_VERB, HEAD_LAND_VERB, HEAD_METRICS_PRUNE_VERB, HEAD_METRICS_RECORD_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_QUESTIONS_LIST_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_SESSION_READ_VERB, HEAD_SESSION_TYPE_VERB, HEAD_START_VERB, HEAD_SLOTS_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_SUPERVISOR_HANDLED_VERB, HEAD_SUPERVISOR_PLANS_VERB, HEAD_SUPERVISOR_QUEUE_VERB, HEAD_SUPERVISOR_RAISE_VERB, HEAD_SUPERVISOR_WAKE_VERB, HEAD_WATCHER_TUNE_VERB, HEAD_WORKTREE_CREATE_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
+import { HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
+import { headPersonas } from './head-grants.mjs';
+import { HEAD_ANSWERED_VERB, HEAD_LAND_VERB, HEAD_METRICS_RECORD_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_START_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_WORKTREE_CREATE_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
 import { assertHeadArgs, headRoleOf, startHeadSession } from './head-start.mjs';
 import { HeadPlanError, isPlanHeadName, planOfHead } from './head-plan.mjs';
 import { stopHeadSession } from './head-stop.mjs';
@@ -108,8 +109,6 @@ function callHeadQuestions({ hostBin, runDir, cwd, request }) {
 
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
 const REF_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$/;
-/** A friction subject or ref is `kind:id`, so it also allows ':' and '@'. */
-const FRICTION_REF_PATTERN = /^[A-Za-z0-9][A-Za-z0-9:@._/-]{0,199}$/;
 const SELF_PATH = fileURLToPath(import.meta.url);
 const HOST_VERB_TIMEOUT_MS = 55_000;
 /** A reply frame holds 65536 bytes with its own envelope; a host answer over this is refused rather than lost. */
@@ -118,7 +117,6 @@ const RESULT_WAIT_MAX_S = 50;
 const RESULT_POLL_MS = 200;
 const RESULT_MAX_CHARS = 20_000;
 const LIST_MAX = 50;
-const HANDLED_MAX = 50;
 const RUNNER_TIMEOUT_MS = 2 * 60 * 60 * 1000;
 const STOP_WAIT_MS = 15_000;
 const STOP_GRACE_MS = 1_000;
@@ -546,8 +544,9 @@ async function stopVerb({ args, envelope, projectRoot, ports }) {
   };
   // The two coordinators may end any head; this door ends heads only, so a persona that holds no head grant is not theirs.
   const coordinator = COORDINATORS.has(personaOf(envelope));
-  if (coordinator && !HEAD_PERSONAS.includes(args.persona)) {
-    throw Object.assign(new Error(`${role} is not a head: "${args.persona}" is no head persona (${HEAD_PERSONAS.join(', ')}), so this door cannot stop it`), { code: 'stop-target-not-head' });
+  const heads = headPersonas();
+  if (coordinator && !heads.includes(args.persona)) {
+    throw Object.assign(new Error(`${role} is not a head: "${args.persona}" is no head persona (${heads.join(', ')}), so this door cannot stop it`), { code: 'stop-target-not-head' });
   }
   const allowed = coordinator || role === envelope.session.role || planHead() || askerAnswered({ envelope, projectRoot, role, ports });
   if (!allowed) throw roleErr(`${role} is not a lead or planner of this project, the asker of an answered question, or this session's own role`);
@@ -556,60 +555,8 @@ async function stopVerb({ args, envelope, projectRoot, ports }) {
 
 // -- coordination verbs: raise, tune, read and type on site, record and prune evidence
 
-const TEXT_MAX = { ref: 200, reason: 500, next: 200 };
-const DEFINITION_PATTERN = /^[a-z][a-z0-9-]*$/;
-const SETTING_PATTERN = /^[A-Za-z0-9]+=-?[0-9]+$/;
-const TARGET_PATTERN = /^[A-Za-z0-9][A-Za-z0-9:@._/-]{0,127}$/;
-const SETTLED_PATTERN = /^[a-z][a-z0-9-]*:[A-Za-z0-9][A-Za-z0-9:@._/-]{0,127}$/;
 const COORDINATION_KIND_PREFIX = 'fgos.coordination.';
 const RECORDS_MAX = 10;
-const READ_LINES_MAX = 1000;
-const TYPE_TEXT_MAX = 4096;
-const SETTINGS_MAX = 16;
-
-const boundedText = (key, value, max, { optional = false } = {}) => {
-  if (value === undefined && optional) return;
-  if (typeof value !== 'string' || value === '' || value.length > max || /[\r\n]/.test(value)) throw badArgs(`${key} must be one line of 1 to ${max} characters`);
-  noDash(key, value);
-};
-
-function raiseVerb({ args, envelope, projectRoot, ports }) {
-  exactKeys(args, ['kind', 'ref', 'reason', 'next']);
-  if (typeof args.kind !== 'string' || !/^coordination-[a-z]+$/.test(args.kind)) throw badArgs('kind must be a coordination event kind');
-  boundedText('ref', args.ref, TEXT_MAX.ref);
-  boundedText('reason', args.reason, TEXT_MAX.reason);
-  boundedText('next', args.next, TEXT_MAX.next, { optional: true });
-  const argv = ['supervisor', 'raise', '--kind', args.kind, '--ref', args.ref, '--reason', args.reason, ...(args.next === undefined ? [] : ['--next', args.next]), '--json'];
-  return hostCall({ envelope, projectRoot, argv }, ports);
-}
-
-function tuneVerb({ args, envelope, projectRoot, ports }) {
-  exactKeys(args, ['definition', 'arm', 'disarm', 'set']);
-  if (args.definition !== undefined && !(typeof args.definition === 'string' && DEFINITION_PATTERN.test(args.definition))) throw badArgs('definition must be a definition name (lowercase letters, digits and hyphens)');
-  for (const key of ['arm', 'disarm']) if (args[key] !== undefined && typeof args[key] !== 'boolean') throw badArgs(`${key} must be a boolean`);
-  const settings = args.set ?? [];
-  if (!Array.isArray(settings) || settings.length > SETTINGS_MAX || !settings.every((x) => typeof x === 'string' && SETTING_PATTERN.test(x))) throw badArgs(`set must be at most ${SETTINGS_MAX} key=value entries with a whole number value`);
-  const argv = ['watcher', 'tune', ...(args.definition === undefined ? [] : [args.definition]), ...settings.flatMap((x) => ['--set', x])];
-  if (args.arm) argv.push('--arm');
-  if (args.disarm) argv.push('--disarm');
-  argv.push('--json');
-  return hostCall({ envelope, projectRoot, argv }, ports);
-}
-
-function sessionReadVerb({ args, envelope, projectRoot, ports }) {
-  exactKeys(args, ['target', 'lines']);
-  if (typeof args.target !== 'string' || !TARGET_PATTERN.test(args.target)) throw badArgs('target must be a role, handle or slot key');
-  if (args.lines !== undefined && !(Number.isInteger(args.lines) && args.lines >= 1 && args.lines <= READ_LINES_MAX)) throw badArgs(`lines must be a whole number from 1 to ${READ_LINES_MAX}`);
-  return hostCall({ envelope, projectRoot, argv: ['session', 'read', args.target, ...(args.lines === undefined ? [] : ['--lines', String(args.lines)]), '--json'] }, ports);
-}
-
-function sessionTypeVerb({ args, envelope, projectRoot, ports }) {
-  exactKeys(args, ['target', 'text']);
-  if (typeof args.target !== 'string' || !TARGET_PATTERN.test(args.target)) throw badArgs('target must be a role, handle or slot key');
-  if (typeof args.text !== 'string' || args.text === '' || Buffer.byteLength(args.text) > TYPE_TEXT_MAX) throw badArgs(`text must be 1 to ${TYPE_TEXT_MAX} bytes`);
-  noDash('text', args.text);
-  return hostCall({ envelope, projectRoot, argv: ['session', 'type', args.target, '--text', args.text, '--json'] }, ports);
-}
 
 /** `metrics record` of this door writes coordination evidence only: every record's kind must be `fgos.coordination.*`. */
 function metricsRecordVerb({ args, envelope, projectRoot, ports }) {
@@ -622,87 +569,6 @@ function metricsRecordVerb({ args, envelope, projectRoot, ports }) {
     }
   }
   return hostCall({ envelope, projectRoot, argv: ['metrics', 'record', '--json', '-'], input: JSON.stringify(args.records) }, ports);
-}
-
-function metricsPruneVerb({ args, envelope, projectRoot, ports }) {
-  exactKeys(args, ['apply', 'settled']);
-  if (args.apply !== undefined && typeof args.apply !== 'boolean') throw badArgs('apply must be a boolean');
-  const settled = args.settled ?? [];
-  if (!Array.isArray(settled) || settled.length > 50 || !settled.every((x) => typeof x === 'string' && SETTLED_PATTERN.test(x))) throw badArgs('settled must be at most 50 <kind>:<id> subjects');
-  const argv = ['metrics', 'prune', ...settled.flatMap((x) => ['--settled', x]), ...(args.apply ? ['--apply'] : []), '--json'];
-  return hostCall({ envelope, projectRoot, argv }, ports);
-}
-
-function frictionRecordVerb({ args, envelope, projectRoot, ports }) {
-  exactKeys(args, ['subject', 'kind', 'ref', 'layer', 'error-class', 'disposition', 'producer', 'attempts', 'doc-type', 'detail', 'detail-stdin']);
-  if (args['detail-stdin'] !== undefined) {
-    throw badArgs('detail-stdin is not supported over the request socket; pass detail');
-  }
-  const str = (key, value) => {
-    if (value === undefined) return;
-    if (typeof value !== 'string') throw badArgs(`${key} must be a string`);
-    if (Buffer.byteLength(value) > TYPE_TEXT_MAX) throw badArgs(`${key} must be at most ${TYPE_TEXT_MAX} bytes`);
-    noDash(key, value);
-  };
-  if (args.subject !== undefined) {
-    str('subject', args.subject);
-    if (!FRICTION_REF_PATTERN.test(args.subject)) throw badArgs('subject must be a valid ref (kind:id)');
-  }
-  str('kind', args.kind);
-  str('layer', args.layer);
-  const errorClass = args['error-class'];
-  str('error-class', errorClass);
-  str('disposition', args.disposition);
-  str('producer', args.producer);
-  const docType = args['doc-type'];
-  str('doc-type', docType);
-  str('detail', args.detail);
-  if (args.attempts !== undefined) {
-    if (typeof args.attempts === 'string') {
-      noDash('attempts', args.attempts);
-      if (!/^[0-9]+$/.test(args.attempts)) throw badArgs('attempts must be a non-negative integer');
-    } else if (!Number.isInteger(args.attempts) || args.attempts < 0) {
-      throw badArgs('attempts must be a non-negative integer');
-    }
-  }
-  const argv = ['friction', 'record'];
-  if (args.subject !== undefined) argv.push('--subject', args.subject);
-  if (args.kind !== undefined) argv.push('--kind', args.kind);
-  if (args.layer !== undefined) argv.push('--layer', args.layer);
-  if (errorClass !== undefined) argv.push('--error-class', errorClass);
-  if (args.disposition !== undefined) argv.push('--disposition', args.disposition);
-  if (args.producer !== undefined) argv.push('--producer', args.producer);
-  if (docType !== undefined) argv.push('--doc-type', docType);
-  if (args.attempts !== undefined) argv.push('--attempts', String(args.attempts));
-  if (args.ref !== undefined) {
-    const refs = Array.isArray(args.ref) ? args.ref : [args.ref];
-    for (const r of refs) {
-      str('ref', r);
-      if (!FRICTION_REF_PATTERN.test(r)) throw badArgs('ref must be a valid ref (kind:id)');
-      argv.push('--ref', r);
-    }
-  }
-  if (args.detail !== undefined) argv.push('--detail', args.detail);
-  argv.push('--json');
-  return hostCall({ envelope, projectRoot, argv }, ports);
-}
-
-export const HEAD_CONFIG_PATCH_VERB = 'config patch';
-
-function configPatchVerb({ args, envelope, projectRoot, ports }) {
-  exactKeys(args, ['file', 'reason']);
-  if (typeof args.file !== 'string' || args.file === '') throw badArgs('file must be a non-empty string');
-  if (Buffer.byteLength(args.file) > TYPE_TEXT_MAX) throw badArgs(`file must be at most ${TYPE_TEXT_MAX} bytes`);
-  noDash('file', args.file);
-  if (args.reason !== undefined) {
-    if (typeof args.reason !== 'string' || args.reason === '') throw badArgs('reason must be a non-empty string');
-    if (Buffer.byteLength(args.reason) > TYPE_TEXT_MAX) throw badArgs(`reason must be at most ${TYPE_TEXT_MAX} bytes`);
-    noDash('reason', args.reason);
-  }
-  const argv = ['config', 'patch', args.file, '--project-only'];
-  if (args.reason !== undefined) argv.push('--reason', args.reason);
-  argv.push('--json');
-  return hostCall({ envelope, projectRoot, argv }, ports);
 }
 
 /** The detached stop of the caller's own session: waits until the route that started it has exited, so the reply is out first. */
@@ -718,8 +584,11 @@ export async function runStopSelf({ persona, name, projectRoot, waitPid }, ports
 
 /**
  * Runs the verb of one request for the attempt in `runDir`, in this attempt's project: `session start`, `session rotate`,
- * `session answered`, `session restore role` (which only checks its arguments: the supervisor registers the role) or a
- * `questions *` verb (served by the host route, `ports.questions` replacing it in a test). Returns `{ exit, line }`: the one JSON line to print, `{result: 'done', data}` or
+ * `session answered`, `session restore role` (which only checks its arguments: the supervisor registers the role), a
+ * `questions ask|ack|cancel|answer` verb (served by the host route, `ports.questions` replacing it in a test), or one of the
+ * policy verbs `land`, `run`, `request result`, `worktree create`, `session stop`, `supervisor done` and `metrics record`.
+ * The verbs that only forward an `fgos` argv are not here: the run supervisor decides and runs them itself
+ * (`packages/session-host/rust`, the `fgos` frame of `head-request.v1.json`). Returns `{ exit, line }`: the one JSON line to print, `{result: 'done', data}` or
  * `{result: 'error', code, message}`, and the exit code (0 done, 70 error). Who may ask and for what was decided by
  * the supervisor before it ran this; the verb arguments are re-checked here because they come from the sandbox.
  * `session rotate` returns at once (the rotation runs detached); `session answered` is the one verb of a successor that does
@@ -759,14 +628,6 @@ export async function runHeadRequest({ runDir, request, requestHostBin }, ports 
         ownLineage(args, envelope);
         data = {};
         break;
-      case HEAD_QUESTIONS_LIST_VERB: {
-        exactKeys(args, ['which']);
-        const flags = { open: [], answered: ['--answered'], all: ['--all'] };
-        const which = args.which ?? 'open';
-        if (!Object.hasOwn(flags, which)) throw badArgs('which must be open, answered or all');
-        data = hostCall({ envelope, projectRoot, argv: ['questions', ...flags[which], '--json'] }, ports);
-        break;
-      }
       case HEAD_QUESTIONS_ASK_VERB:
       case HEAD_QUESTIONS_ACK_VERB:
       case HEAD_QUESTIONS_CANCEL_VERB:
@@ -791,43 +652,8 @@ export async function runHeadRequest({ runDir, request, requestHostBin }, ports 
       case HEAD_STOP_VERB:
         data = await stopVerb({ args, envelope, projectRoot, ports });
         break;
-      case HEAD_SUPERVISOR_HANDLED_VERB:
-        exactKeys(args, ['events']);
-        if (!Array.isArray(args.events) || args.events.length < 1 || args.events.length > HANDLED_MAX || !args.events.every((id) => typeof id === 'string' && ID_PATTERN.test(id))) {
-          throw badArgs(`events must be 1 to ${HANDLED_MAX} event ids`);
-        }
-        data = hostCall({ envelope, projectRoot, argv: ['supervisor', 'handled', ...args.events, '--json'] }, ports);
-        break;
-      case HEAD_SUPERVISOR_RAISE_VERB:
-        data = raiseVerb({ args, envelope, projectRoot, ports });
-        break;
-      case HEAD_WATCHER_TUNE_VERB:
-        data = tuneVerb({ args, envelope, projectRoot, ports });
-        break;
-      case HEAD_SESSION_READ_VERB:
-        data = sessionReadVerb({ args, envelope, projectRoot, ports });
-        break;
-      case HEAD_SESSION_TYPE_VERB:
-        data = sessionTypeVerb({ args, envelope, projectRoot, ports });
-        break;
       case HEAD_METRICS_RECORD_VERB:
         data = metricsRecordVerb({ args, envelope, projectRoot, ports });
-        break;
-      case HEAD_METRICS_PRUNE_VERB:
-        data = metricsPruneVerb({ args, envelope, projectRoot, ports });
-        break;
-      case HEAD_FRICTION_RECORD_VERB:
-        data = frictionRecordVerb({ args, envelope, projectRoot, ports });
-        break;
-      case HEAD_CONFIG_PATCH_VERB:
-        data = configPatchVerb({ args, envelope, projectRoot, ports });
-        break;
-      case HEAD_SUPERVISOR_QUEUE_VERB:
-      case HEAD_SUPERVISOR_PLANS_VERB:
-      case HEAD_SLOTS_VERB:
-      case HEAD_SUPERVISOR_WAKE_VERB:
-        exactKeys(args, []);
-        data = hostCall({ envelope, projectRoot, argv: [...request.verb.split(' '), '--json'] }, ports);
         break;
       case HEAD_SUPERVISOR_DONE_VERB:
         exactKeys(args, []);

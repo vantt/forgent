@@ -19,7 +19,6 @@ export const HEAD_ROTATE_VERB = 'session rotate';
 export const HEAD_ANSWERED_VERB = 'session answered';
 export const HEAD_RESTORE_VERB = 'session restore role';
 export const HEAD_WRITE_VERB = 'session write';
-export const HEAD_QUESTIONS_LIST_VERB = 'questions list';
 export const HEAD_QUESTIONS_ASK_VERB = 'questions ask';
 export const HEAD_QUESTIONS_ACK_VERB = 'questions ack';
 export const HEAD_QUESTIONS_CANCEL_VERB = 'questions cancel';
@@ -30,21 +29,18 @@ export const HEAD_RUN_VERB = 'run';
 export const HEAD_REQUEST_RESULT_VERB = 'request result';
 export const HEAD_WORKTREE_CREATE_VERB = 'worktree create';
 export const HEAD_STOP_VERB = 'session stop';
-export const HEAD_SUPERVISOR_HANDLED_VERB = 'supervisor handled';
 export const HEAD_SUPERVISOR_DONE_VERB = 'supervisor done';
-/** Reads the sandbox cannot make itself (the event store, Identity and the lock root are masked): not tickets, they answer at once. */
-export const HEAD_SUPERVISOR_QUEUE_VERB = 'supervisor queue';
-export const HEAD_SUPERVISOR_PLANS_VERB = 'supervisor plans';
-export const HEAD_SLOTS_VERB = 'slots';
-export const HEAD_SUPERVISOR_WAKE_VERB = 'supervisor wake';
-/** Coordination verbs: raise an event, read or type into a session, tune the drone, record and prune coordination evidence. */
-export const HEAD_SUPERVISOR_RAISE_VERB = 'supervisor raise';
-export const HEAD_SESSION_READ_VERB = 'session read';
-export const HEAD_SESSION_TYPE_VERB = 'session type';
-export const HEAD_WATCHER_TUNE_VERB = 'watcher tune';
+/** Coordination evidence: the one policy verb that keeps the `fgos.coordination.*` kind rule in Node. */
 export const HEAD_METRICS_RECORD_VERB = 'metrics record';
-export const HEAD_METRICS_PRUNE_VERB = 'metrics prune';
-export const HEAD_FRICTION_RECORD_VERB = 'friction record';
+/**
+ * The argv window: every verb that only forwards an `fgos` argv (reads of the event store, Identity or the lock root,
+ * `session read|type`, `watcher tune`, `supervisor raise|handled|wake`, `friction record`, `config patch`, ...) is one `fgos`
+ * frame carrying the caller's own words. The run supervisor decides it with the head permission table
+ * (`packages/session-host/contracts/head-permissions.v1.json`) and runs the host `fgos` itself; `can-i` asks the same
+ * table without running anything.
+ */
+export const HEAD_FGOS_VERB = 'fgos';
+export const HEAD_CAN_I_VERB = 'can-i';
 /** A reply may take as long as the supervisor lets the verb run (60 s) plus its own overhead. */
 const DEFAULT_REPLY_TIMEOUT_MS = 70_000;
 /** A write is also published (fetch, gates, commit, push), which waits on the target's merge slot and the network. */
@@ -166,6 +162,11 @@ function requestHeadOnce(verb, args, { socketPath = process.env[HEAD_REQUEST_SOC
     socket.on('close', () => finish(reject, new HeadRequestError('bad-reply', 'the supervisor closed the connection without a reply')));
   });
 }
+
+/** One `fgos` argv (the verb words and flags, no program name) through the window: the host's JSON data, or `argv-not-allowed`, or `asked` with the question id as `detail`. */
+export const requestHeadFgos = (argv, options) => requestHead(HEAD_FGOS_VERB, { argv }, options);
+/** What the head permission table decides for `argv`: `{ decision: 'allow' | 'ask' | 'deny', reason }`. Runs and files nothing. */
+export const requestHeadCanI = (argv, options) => requestHead(HEAD_CAN_I_VERB, { argv }, options);
 
 /** `session start` over the socket. */
 export const requestHeadStart = (args, options) => requestHead(HEAD_START_VERB, args, options);

@@ -1,56 +1,21 @@
-// The verb list of each coordinating persona, asserted from one expected table (the source is head-grants.mjs).
+// The wiring proof of the cage-size port: `grantOf` answers a persona's writes, mailbox and peers from the addon's
+// `sessionHost` door. The table itself (rows, inheritance, parity of the cage sizes) is proven in
+// packages/session-host/rust/tests/permissions.rs; this only proves the port reaches it.
+import '../helpers/process-tmp-root.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { grantOf } from '../../src/session-host/head-grants.mjs';
+import { ensureGitAddon } from '../helpers/git-addon.mjs';
+import { grantOf, headPersonas, holdsHeadTable } from '../../src/session-host/head-grants.mjs';
 
-const HEAD = ['session bind session', 'session rotate', 'session answered', 'session restore role', 'friction record'];
-const QUESTIONS = ['questions list', 'questions ask', 'questions ack', 'questions cancel'];
-const LAND = ['land', 'request result'];
-const PORTFOLIO_READ = ['supervisor plans', 'supervisor queue', 'slots'];
-const COORDINATION = ['supervisor raise', 'supervisor wake', 'run', 'metrics record'];
+ensureGitAddon();
 
-const EXPECTED = {
-  secretary: {
-    writes: ['plans', 'plans/backlog.md', 'plans/backlog/*'],
-    verbs: ['session start', 'session stop', 'session write', ...HEAD, ...QUESTIONS, 'questions answer', ...LAND, ...PORTFOLIO_READ, ...COORDINATION],
-    mailbox: true,
-    peers: true,
-  },
-  supervisor: {
-    writes: ['plans', 'plans/backlog.md', 'plans/backlog/*'],
-    verbs: ['session start', 'session stop', 'session write', ...HEAD, ...QUESTIONS, ...LAND, ...PORTFOLIO_READ, 'supervisor handled', 'supervisor done', 'session read', 'session type', 'watcher tune', ...COORDINATION, 'metrics prune', 'config patch'],
-    mailbox: true,
-    peers: true,
-  },
-};
-
-for (const [persona, expected] of Object.entries(EXPECTED)) {
-  test(`the ${persona} grant is exactly the settled table: writes, verbs, mailbox and peers`, () => {
-    assert.deepEqual(grantOf(`head:${persona}-x`, persona), expected);
-  });
-
-  test(`no verb is named twice in the ${persona} grant`, () => {
-    const { verbs } = grantOf(`head:${persona}-x`, persona);
-    assert.equal(new Set(verbs).size, verbs.length);
-  });
-}
-
-test('Miu never holds the supervisor-only verbs: handled, session type, session read, watcher tune (nor done, prune or config patch)', () => {
-  const { verbs } = grantOf('head:secretary-miu', 'secretary');
-  for (const verb of ['supervisor handled', 'supervisor done', 'session type', 'session read', 'watcher tune', 'metrics prune', 'config patch']) {
-    assert.ok(!verbs.includes(verb), `${verb} is the supervisor's, not Miu's`);
-  }
-});
-
-test('only the supervisor holds config patch', () => {
-  assert.ok(grantOf('head:supervisor-x', 'supervisor').verbs.includes('config patch'));
-  assert.ok(!grantOf('head:secretary-x', 'secretary').verbs.includes('config patch'));
-  assert.ok(!grantOf('head:shaper-x', 'shaper').verbs.includes('config patch'));
-  assert.ok(!grantOf('head:planner-x', 'planner').verbs.includes('config patch'));
-  assert.ok(!grantOf('head:lead-x', 'lead', { planDir: '261122-0118-test' }).verbs.includes('config patch'));
-});
-
-test('the supervisor never answers an owner question', () => {
-  assert.ok(!grantOf('head:supervisor-x', 'supervisor').verbs.includes('questions answer'));
+test('the port answers a persona its cage size from the permission table, and a persona the table does not name holds nothing', () => {
+  assert.deepEqual(grantOf('head:secretary-x', 'secretary'), { writes: ['plans', 'plans/backlog.md', 'plans/backlog/*'], mailbox: true, peers: true });
+  assert.deepEqual(grantOf('head:planner-x', 'planner'), { writes: ['plans'], mailbox: false, peers: false });
+  assert.deepEqual(grantOf('head:lead-x', 'lead', { planDir: '261122-0118-test' }), { writes: ['plans/261122-0118-test'], mailbox: false, peers: false });
+  assert.deepEqual(grantOf('head:nobody-x', 'nobody'), { writes: [], mailbox: false, peers: false });
+  assert.deepEqual([...headPersonas()].sort(), ['lead', 'planner', 'secretary', 'shaper', 'supervisor']);
+  assert.equal(holdsHeadTable('planner'), true);
+  assert.equal(holdsHeadTable('head'), false, 'the shared base of the table is not a persona');
 });

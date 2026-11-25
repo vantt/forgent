@@ -3,10 +3,13 @@
 //! A head's sandbox masks herdr and the user runtime directory, so it cannot start another session itself. Its own
 //! run supervisor listens on one socket (`envelope.session.requestSocketPath`), the sandbox gets it read-only, and
 //! each request is checked and performed outside. This module is only transport and enforcement: it decides
-//! nothing about who holds a role (Identity does) or what a verb means (the Node payload behind
-//! `fgos internal head-request` does), and it learns what the role may ask for and write from the envelope, never
-//! from a table. One verb it performs itself: `session write`, the only way a head changes a granted file, because the
-//! sandbox keeps every granted file read-only. Contract: `packages/run-supervisor/contracts/head-request.v1.json`.
+//! nothing about who holds a role (Identity does) or what a policy verb means (the Node payload behind
+//! `fgos internal head-request` does). What a persona may ask for is the permission table of the session-host crate
+//! (`fgos_session_host::permissions`), read with the persona of the digest-protected envelope; what it may write comes
+//! from the envelope. An `fgos` argv ([`FGOS_VERB`]) is screened and decided by that table: `allow` runs the host
+//! `fgos` from here, `ask` files an owner question, `deny` refuses. Verbs it performs itself: `session write`, the
+//! only way a head changes a granted file, because the sandbox keeps every granted file read-only, `session bind
+//! session` and `can-i`. Contract: `packages/run-supervisor/contracts/head-request.v1.json`.
 
 use std::collections::BTreeMap;
 use std::io::{self, Read};
@@ -71,12 +74,13 @@ pub const BIND_VERB: &str = "session bind session";
 /// `<dir>/*` entry, which may create it) and be a regular file reached without a symlink, and the new content is installed atomically through the durable-file door ([`install_granted`]), then published through [`WritePublisher`].
 pub const WRITE_VERB: &str = "session write";
 
-/// The role-gated verbs that only read, which a rotation successor may use before the role moves to it (its first turn
-/// reads the question store). Every verb outside this list keeps waiting for the role (`role-pending-rotation`).
-/// Mirrors the grant lists in `src/session-host/head-grants.mjs` (`QUESTION_VERBS`); each entry must be a verb the
-/// contract marks `"read": true`.
-/// `questions show` is not a socket verb (reads of one question go straight to the store), so only the list is here.
-pub const SUCCESSOR_READ_VERBS: &[&str] = &["questions list"];
+/// The frame verb that carries an `fgos` argv: `args` is `{argv: [string]}`. The argv is decided by the permission
+/// table of `fgos_session_host::permissions` for the caller's persona and, when allowed, run by the host with no shell
+/// and no Node hop (`fgos_session_host::forwarder`).
+pub const FGOS_VERB: &str = "fgos";
+/// The frame verb that asks what the table says about an argv without running it: `args` is `{argv: [string]}`, the
+/// answer `{decision, reason}`. Answered by the supervisor itself, from the same function that decides a real call.
+pub const CAN_I_VERB: &str = "can-i";
 
 /// Verbs of a session that does not (yet) hold its role: the role check is "registered", and after the route reports
 /// done the supervisor registers the role for the attempt's session. The flag is Identity's `take`.
@@ -161,8 +165,9 @@ pub struct Config {
     pub cwd: PathBuf,
     /// The step environment: the route child starts with exactly this.
     pub env: BTreeMap<String, String>,
-    /// Verbs `envelope.session.verbs` allows.
-    pub verbs: Vec<String>,
+    /// The caller's persona (`envelope.session.persona`, else the persona its role spells): the key the permission
+    /// table is read with. The sandbox cannot change it; the envelope is digest-protected.
+    pub persona: String,
     /// `envelope.session.role` (`head:<persona>-<name>`): named in the refusal of a verb its grant lacks.
     pub role: String,
     /// Project-relative paths `envelope.session.writes` grants; [`WRITE_VERB`] writes only a regular file one names
@@ -257,15 +262,8 @@ impl HeadRequests {
         publisher: &WritePublisher,
     ) -> Result<Option<(PathBuf, HeadRequests)>, EnvelopeError> {
         let session = &envelope["session"];
-        let has_verbs = session["verbs"].as_array().is_some_and(|v| !v.is_empty());
         let Some(path) = session["requestSocketPath"].as_str() else {
-            return if has_verbs {
-                Err(invalid(
-                    "session.verbs is not empty but session.requestSocketPath is missing",
-                ))
-            } else {
-                Ok(None)
-            };
+            return Ok(None);
         };
         let text = |v: &Value, what: &str| {
             v.as_str()
@@ -273,20 +271,6 @@ impl HeadRequests {
                 .map(String::from)
                 .ok_or_else(|| invalid(format!("envelope field {what} missing")))
         };
-        let verbs: Vec<String> = session["verbs"]
-            .as_array()
-            .map(|v| {
-                v.iter()
-                    .filter_map(Value::as_str)
-                    .map(String::from)
-                    .collect()
-            })
-            .unwrap_or_default();
-        if verbs.is_empty() {
-            return Err(invalid(
-                "session.requestSocketPath is set but session.verbs is empty",
-            ));
-        }
         let writes: Vec<String> = match &session["writes"] {
             Value::Null => Vec::new(),
             Value::Array(list) => list
@@ -297,6 +281,14 @@ impl HeadRequests {
             _ => return Err(invalid("session.writes is not an array")),
         };
         let role = text(&session["role"], "session.role")?;
+        let persona = session["persona"]
+            .as_str()
+            .map(String::from)
+            .or_else(|| fgos_session_host::permissions::persona_of_role(&role).map(String::from))
+            .filter(|persona| fgos_session_host::permissions::knows(persona))
+            .ok_or_else(|| {
+                invalid("session.persona names no persona of the head permission table")
+            })?;
         let writer_id = text(&envelope["identity"]["writerId"], "identity.writerId")?;
         let state_root = state_root.to_path_buf();
         let gate: Arc<Mutex<Option<HeadRef>>> = Arc::new(Mutex::new(None));
@@ -333,7 +325,7 @@ impl HeadRequests {
             request_host_bin: None,
             cwd: cwd.clone(),
             env: step_env,
-            verbs,
+            persona,
             role: role.clone(),
             writes,
             verb_timeout: VERB_TIMEOUT,
@@ -1325,6 +1317,7 @@ impl<'de> serde::de::Visitor<'de> for Bounded<'_> {
 fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>) -> Outcome {
     let moves = role_move(&request.verb);
     let binds = request.verb == BIND_VERB;
+    let window = request.verb == FGOS_VERB || request.verb == CAN_I_VERB;
     let (check, not_so) = if moves.is_some() || binds {
         (&cfg.registered, "session-not-registered")
     } else {
@@ -1336,7 +1329,7 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>)
             let mut pending_read = false;
             if not_so == "role-not-held" {
                 if let Ok(Some(detail)) = (cfg.pending_rotation)() {
-                    if SUCCESSOR_READ_VERBS.contains(&request.verb.as_str()) {
+                    if reads_only(cfg, request) {
                         pending_read = true;
                     } else {
                         return Outcome::Refused {
@@ -1361,16 +1354,16 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>)
             };
         }
     }
-    if !cfg.verbs.contains(&request.verb) {
-        return Outcome::Refused {
-            code: "verb-not-granted",
-            detail: Some(format!(
-                "{} is not in the grant of {} (granted: {})",
-                request.verb,
-                cfg.role,
-                cfg.verbs.join(", ")
-            )),
-        };
+    if !window {
+        if let Some(why) = policy_refusal(cfg, &request.verb) {
+            return Outcome::Refused {
+                code: "verb-not-granted",
+                detail: Some(why),
+            };
+        }
+    }
+    if request.verb == CAN_I_VERB {
+        return can_i(cfg, &request.args);
     }
     if request.verb == WRITE_VERB {
         if let Err(why) = (cfg.caller_under_gate)(peer) {
@@ -1409,6 +1402,9 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>)
     if request.verb == WRITE_VERB {
         return write_and_publish(cfg, &request.args);
     }
+    if request.verb == FGOS_VERB {
+        return forward(cfg, request);
+    }
     let outcome = run_verb(cfg, request);
     if let (Some(take), Outcome::Done(_)) = (moves, &outcome) {
         if let Err(why) = (cfg.take_role)(take) {
@@ -1423,6 +1419,222 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>)
         }
     }
     outcome
+}
+
+/// Why `verb` (a verb of a policy frame, not an `fgos` argv) is not this persona's to send, or `None` when the table
+/// allows it as a policy verb (a `node` or `native` row).
+fn policy_refusal(cfg: &Config, verb: &str) -> Option<String> {
+    use fgos_session_host::permissions::{decide, Decision, Policy};
+    let argv: Vec<String> = verb.split(' ').map(String::from).collect();
+    match decide(&cfg.persona, &argv).and_then(|v| v.rule.map(|rule| (v.decision, rule))) {
+        Some((Decision::Allow, rule)) if rule.prefix == argv && rule.policy != Policy::Forward => {
+            None
+        }
+        Some((Decision::Allow, rule)) if rule.prefix == argv => Some(format!(
+            "{verb} is sent as an fgos argv ({FGOS_VERB}), not as a verb of its own"
+        )),
+        _ => Some(format!(
+            "{verb} is not in the grant of {} ({})",
+            cfg.role, cfg.persona
+        )),
+    }
+}
+
+/// Whether the request only reads, so a rotation successor may make it before it holds the role: a forwarded argv
+/// whose row is flagged `read`, or `can-i`, which changes nothing.
+fn reads_only(cfg: &Config, request: &Request) -> bool {
+    use fgos_session_host::forwarder::words_of;
+    use fgos_session_host::permissions::{decide, Policy};
+    match request.verb.as_str() {
+        CAN_I_VERB => true,
+        FGOS_VERB => words_of(&request.args["argv"])
+            .ok()
+            .and_then(|argv| decide(&cfg.persona, &argv))
+            .and_then(|verdict| verdict.rule)
+            .is_some_and(|rule| rule.read && rule.policy == Policy::Forward),
+        _ => false,
+    }
+}
+
+/// The `argv` of a window frame: `args` holds that key and no other.
+fn argv_args(args: &Value) -> Option<&Value> {
+    let object = args.as_object()?;
+    (object.len() == 1).then(|| object.get("argv")).flatten()
+}
+
+fn bad_argv_args() -> Outcome {
+    Outcome::Refused {
+        code: "bad-args",
+        detail: Some("args must be {argv: [string]} and nothing else".to_string()),
+    }
+}
+
+/// [`CAN_I_VERB`]: the table's answer for an argv, `{decision, reason}`. Takes no busy slot and runs nothing.
+fn can_i(cfg: &Config, args: &Value) -> Outcome {
+    let Some(argv) = argv_args(args) else {
+        return bad_argv_args();
+    };
+    let (decision, reason) = fgos_session_host::forwarder::can_i(&cfg.persona, argv, &cfg.cwd);
+    Outcome::Done(json!({"decision": decision.as_str(), "reason": reason}))
+}
+
+/// [`FGOS_VERB`]: the argv is screened and decided by the permission table; `allow` runs the host `fgos` with it,
+/// `ask` files one owner question carrying it (refused `asked`, the question id in the detail), anything else is
+/// refused `argv-not-allowed` with the reason.
+fn forward(cfg: &Config, request: &Request) -> Outcome {
+    use fgos_session_host::forwarder::{plan, Planned, Refused};
+    let Some(argv) = argv_args(&request.args) else {
+        return bad_argv_args();
+    };
+    match plan(&cfg.persona, argv, &cfg.cwd) {
+        Err(Refused(why)) => Outcome::Refused {
+            code: "argv-not-allowed",
+            detail: Some(why),
+        },
+        Ok(Planned::Run(words)) => forward_exec(cfg, request, &words),
+        Ok(Planned::Ask(words)) => ask_owner(cfg, request, &words),
+    }
+}
+
+/// The host the route children run: the active release's host when the head follows activation, else its start host.
+fn host_of(cfg: &Config, request: &Request) -> PathBuf {
+    match cfg.request_host_bin.as_ref().map(|read| read()) {
+        Some(Ok(host)) => host,
+        Some(Err(why)) => {
+            (cfg.log)(&format!(
+                "head-request {} release-fallback: {}",
+                request.id,
+                loggable_detail(&why)
+            ));
+            PathBuf::from(&cfg.host_bin)
+        }
+        None => PathBuf::from(&cfg.host_bin),
+    }
+}
+
+/// Runs the host `fgos` with `words` (no shell, the project root as cwd, the step environment), inside the verb
+/// timeout and in its own process group, and reads its answer: its `data`, or its own refusal.
+fn forward_exec(cfg: &Config, request: &Request, words: &[String]) -> Outcome {
+    let mut cmd = Command::new(host_of(cfg, request));
+    cmd.args(words)
+        .env_clear()
+        .envs(cfg.env.iter())
+        .current_dir(&cfg.cwd);
+    // SAFETY: prctl is async-signal-safe; the child dies with the supervisor that started it.
+    #[cfg(target_os = "linux")]
+    unsafe {
+        cmd.pre_exec(fgos_process::control::arm_parent_death_signal);
+    }
+    let output = match run_bounded_command(cmd, None, cfg.verb_timeout, |_| ()) {
+        Ok(BoundedOutcome::Exited(output)) => output,
+        Ok(BoundedOutcome::TimedOut { .. }) => return refused("verb-timeout"),
+        Err(e) => {
+            return Outcome::Refused {
+                code: "verb-failed",
+                detail: Some(format!("the host did not run: {e}")),
+            }
+        }
+    };
+    let text = |bytes: &[u8]| {
+        String::from_utf8_lossy(&bytes[..bytes.len().min(4 * STDOUT_LIMIT as usize)]).into_owned()
+    };
+    match fgos_session_host::forwarder::read_answer(
+        output.status.success(),
+        &text(&output.stdout),
+        &text(&output.stderr),
+        output.status.code(),
+    ) {
+        Ok(data) => Outcome::Done(data),
+        Err((code, message)) => {
+            (cfg.log)(&format!(
+                "head-request {} host {}: {}",
+                request.id,
+                loggable(&code),
+                loggable_detail(&message)
+            ));
+            Outcome::RouteRefused {
+                code,
+                message: Some(loggable_detail(&message)),
+            }
+        }
+    }
+}
+
+/// An `ask` decision: files one five-part owner question carrying the exact argv, through the host route that takes
+/// the asker from this attempt's envelope (`fgos internal head-questions`), and refuses `asked` with its id. The
+/// argv did not run.
+fn ask_owner(cfg: &Config, request: &Request, words: &[String]) -> Outcome {
+    let line = words.join(" ");
+    let headline: String = format!("May {} run: fgos {line}", cfg.persona)
+        .chars()
+        .take(120)
+        .map(|c| if c.is_control() { ' ' } else { c })
+        .collect();
+    let what: String = format!(
+        "{} asked the host to run `fgos {line}`, and no row of the head permission table decides it for {}.",
+        cfg.role, cfg.persona
+    )
+    .chars()
+    .take(600)
+    .collect();
+    let input = json!({
+        "stage": "window",
+        "ref": format!("case:head-window-{}", request.id),
+        "headline": headline,
+        "blocks": format!("{} waits for this argv before it goes on", cfg.role),
+        "parts": {
+            "what": what,
+            "cause": "The permission table (packages/session-host/contracts/head-permissions.v1.json) has no allow or deny row for this verb and persona, so the window asks instead of guessing.",
+            "options": [
+                {"label": "Do not run it", "does": "The argv is not run; the head goes on without it.", "gain": "Nothing outside the head's cage changes.", "harm": "The head's chore stays undone.", "cost": "None.", "recommended": true},
+                {"label": "Run it by hand", "does": "The owner runs the same argv outside the cage.", "gain": "The chore is done once.", "harm": "The owner is the one who waits and acts.", "cost": "One command."}
+            ],
+            "recommendation": "Do not run it here; if the chore recurs, add a row to the permission table in a landed change.",
+            "scope": {"allows": "Answering this one argv for this one request.", "forbids": "Any other argv, any persona's table, or a standing grant."}
+        }
+    });
+    let mut cmd = Command::new(host_of(cfg, request));
+    cmd.args(["internal", "head-questions", "--run-dir"])
+        .arg(&cfg.run_dir)
+        .env_clear()
+        .envs(cfg.env.iter())
+        .current_dir(&cfg.cwd);
+    // SAFETY: prctl is async-signal-safe; the child dies with the supervisor that started it.
+    #[cfg(target_os = "linux")]
+    unsafe {
+        cmd.pre_exec(fgos_process::control::arm_parent_death_signal);
+    }
+    let body = json!({"v": 1, "verb": "questions ask", "args": {"input": input}}).to_string();
+    let output = match run_bounded_command(cmd, Some(body.as_bytes()), cfg.verb_timeout, |_| ()) {
+        Ok(BoundedOutcome::Exited(output)) => output,
+        Ok(BoundedOutcome::TimedOut { .. }) => return refused("verb-timeout"),
+        Err(e) => {
+            return Outcome::Refused {
+                code: "verb-failed",
+                detail: Some(format!("the question route did not run: {e}")),
+            }
+        }
+    };
+    let text = String::from_utf8_lossy(&output.stdout).into_owned();
+    let line = text.lines().rev().find_map(|l| {
+        serde_json::from_str::<Value>(l.trim())
+            .ok()
+            .filter(Value::is_object)
+    });
+    match line {
+        Some(line) if line["result"] == "done" => Outcome::Refused {
+            code: "asked",
+            detail: line["data"]["id"].as_str().map(String::from),
+        },
+        Some(line) if line["code"].is_string() => Outcome::RouteRefused {
+            code: line["code"].as_str().unwrap_or_default().to_string(),
+            message: line["message"].as_str().map(loggable_detail),
+        },
+        _ => Outcome::Refused {
+            code: "verb-failed",
+            detail: Some("the question route printed no answer".to_string()),
+        },
+    }
 }
 
 /// Run `<host> internal head-request --protocol 1 --run-dir <dir>` with the request on stdin and the step

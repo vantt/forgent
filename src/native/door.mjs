@@ -71,6 +71,8 @@ export function loadNativeAddon({ hostBin, descriptor } = {}) {
     const v = addon.versions(); // Enforce the process marker before exposing any crate.
     const short = abiShortfall(v, entry.napiVersion);
     if (short !== null) throw unavailable(`combined addon ABI mismatch: ${short} is missing or too old`);
+    // `sessionHost` (the head permission table's cage size) is gated by its entries, not by a `versions()` field.
+    if (typeof addon.sessionHost?.grantOf !== 'function' || typeof addon.sessionHost?.personas !== 'function') throw unavailable('combined addon ABI mismatch: sessionHost is missing or too old');
     loaded = { file, addon };
     return addon;
   } catch (err) {

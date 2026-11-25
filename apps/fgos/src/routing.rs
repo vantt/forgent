@@ -513,11 +513,63 @@ fn detail_from_stdin<R: std::io::Read>(reader: &mut R) -> Result<String, String>
         .map_err(|e| format!("bad-args: friction record: stdin detail is not UTF-8: {e}"))
 }
 
+/// The frame verbs of the argv window (`head-request.v1.json`): the caller's own words, decided by the permission
+/// table of the session-host crate in its supervisor, and the same words asked about without running them.
+const FGOS_FRAME: &str = "fgos";
+const CAN_I_FRAME: &str = "can-i";
+/// `fgos can-i <argv...>`: what the head's permission table says about an argv; answered by the supervisor.
+const CAN_I_SELECTOR: &str = "can-i";
+
+/// One window frame: `{argv: [...]}` with the caller's words. `--json` is the window's own (the host verb always
+/// runs with it) and `questions list` is the host's `questions`; `friction record --detail-stdin` is read here
+/// because the host verb runs with no stdin.
+fn window_call<R: std::io::Read>(
+    words: &[OsString],
+    frame: &'static str,
+    stdin: &mut R,
+) -> Result<ConfinedCall, String> {
+    let mut argv = words
+        .iter()
+        .map(|w| {
+            w.to_str()
+                .map(str::to_owned)
+                .ok_or_else(|| "bad-args: an argument is not UTF-8".to_owned())
+        })
+        .collect::<Result<Vec<String>, String>>()?;
+    argv.retain(|w| w != "--json");
+    if argv.first().map(String::as_str) == Some("questions")
+        && argv.get(1).map(String::as_str) == Some("list")
+    {
+        argv.remove(1);
+    }
+    if frame == FGOS_FRAME && argv.len() > 1 && argv[0] == "friction" {
+        if let Some(at) = argv.iter().position(|w| w == "--detail-stdin") {
+            if argv
+                .iter()
+                .any(|w| w == "--detail" || w.starts_with("--detail="))
+            {
+                return Err(
+                    "bad-args: choose either --detail or --detail-stdin, not both".to_owned(),
+                );
+            }
+            argv.remove(at);
+            argv.push("--detail".to_owned());
+            argv.push(detail_from_stdin(stdin)?);
+        }
+    }
+    Ok(ConfinedCall {
+        verb: frame,
+        args: serde_json::json!({ "argv": argv }),
+    })
+}
+
 /// The call as the head request contract reads it, or why the call cannot be one. `None`: the call is not of a
 /// verb the contract names, so it takes the route its selector has. This is the one confined rule of the host
 /// (PS-20): a confined caller reaches `land`, `worktree create`, `request result`, `session stop`,
-/// `supervisor handled|raise|done`, `watcher tune`, `session read|type`, `friction record`, `config patch` and `metrics record|prune` only through its
-/// supervisor's request socket. `run` goes there only from a head with a grant (`head_socket`: it has a request
+/// `supervisor done` and `metrics record` (the policy verbs, each a frame of its own name), and `supervisor
+/// handled|raise|queue|plans|wake`, `slots`, `questions`, `watcher tune`, `session read|type`, `friction record`,
+/// `config patch` and `metrics prune` (the argv window: one `fgos` frame carrying its own words), and asks
+/// `can-i <argv>` of the table, only through its supervisor's request socket. `run` goes there only from a head with a grant (`head_socket`: it has a request
 /// socket, as for `metrics record|prune`); a confined worker without one takes the native `run` verb, which refuses its writing run before admission
 /// and lets a read-only one go on, as the Node arm did. The marker is the caller's to check; this reads the words and
 /// that one fact.
@@ -545,28 +597,36 @@ pub(crate) fn confined_head_call_with_reader<R: std::io::Read>(
     use serde_json::{json, Map, Value};
     let selector = cli_args.first()?.to_string_lossy().into_owned();
     let call = Call::new(cli_args);
+    // The verbs the permission table decides as plain argv (the forward rows) travel as the caller's own words in one
+    // window frame; the table, not this client, says whether the persona may run them. A confined worker has no
+    // socket and keeps the local route of the verbs that need one; only a head asks through its own.
+    let window = match (selector.as_str(), call.sub_word()) {
+        ("session", Some("read" | "type")) | ("watcher", Some("tune")) | ("slots", _) => true,
+        ("supervisor", Some("raise" | "handled" | "queue" | "plans" | "wake")) => true,
+        ("questions", None | Some("list")) => true,
+        ("metrics", Some("prune")) | ("friction", Some("record")) | ("config", Some("patch")) => {
+            head_socket
+        }
+        ("git", Some("recover")) | ("dispatch", Some("probe-account")) => head_socket,
+        // Only the delivered-to form is a row of the table; any other `worktree remove` keeps its local route.
+        ("worktree", Some("remove")) => head_socket && call.flags().flag("delivered-to").is_some(),
+        _ => false,
+    };
+    if window {
+        return Some(window_call(cli_args, FGOS_FRAME, stdin));
+    }
+    if selector == CAN_I_SELECTOR && head_socket {
+        return Some(window_call(&cli_args[1..], CAN_I_FRAME, stdin));
+    }
     let verb: &'static str = match (selector.as_str(), call.sub_word()) {
         ("land", _) => "land",
         ("run", _) if head_socket => "run",
         ("worktree", Some("create")) => "worktree create",
         ("request", Some("result")) => "request result",
         ("session", Some("stop")) => "session stop",
-        ("session", Some("read")) => "session read",
-        ("session", Some("type")) => "session type",
-        ("watcher", Some("tune")) => "watcher tune",
-        // A confined worker has no socket and keeps the local route of these two; only a head asks through its own.
+        // A confined worker has no socket and keeps the local route of this one; only a head asks through its own.
         ("metrics", Some("record")) if head_socket => "metrics record",
-        ("metrics", Some("prune")) if head_socket => "metrics prune",
-        ("friction", Some("record")) if head_socket => "friction record",
-        ("config", Some("patch")) if head_socket => "config patch",
-        ("supervisor", Some("raise")) => "supervisor raise",
-        ("supervisor", Some("handled")) => "supervisor handled",
         ("supervisor", Some("done")) => "supervisor done",
-        ("supervisor", Some("queue")) => "supervisor queue",
-        ("supervisor", Some("plans")) => "supervisor plans",
-        ("supervisor", Some("wake")) => "supervisor wake",
-        ("slots", _) => "slots",
-        ("questions", None | Some("list")) => "questions list",
         _ => return None,
     };
     let built = (|| -> Result<Value, String> {
@@ -674,144 +734,11 @@ pub(crate) fn confined_head_call_with_reader<R: std::io::Read>(
                 text(&mut args, "name", "name")?;
                 text(&mut args, "reason", "reason")?;
             }
-            "supervisor raise" => {
-                if !words.is_empty() {
-                    return Err("bad-args: supervisor raise takes no arguments".to_owned());
-                }
-                text(&mut args, "kind", "kind")?;
-                text(&mut args, "ref", "ref")?;
-                text(&mut args, "reason", "reason")?;
-                text(&mut args, "next", "next")?;
-            }
-            "watcher tune" => {
-                match words.as_slice() {
-                    [] => {}
-                    [definition] => {
-                        args.insert("definition".to_owned(), json!(definition));
-                    }
-                    _ => {
-                        return Err("bad-args: watcher tune takes at most one definition".to_owned())
-                    }
-                }
-                for flag in ["arm", "disarm"] {
-                    if call.switch(flag)? {
-                        args.insert(flag.to_owned(), json!(true));
-                    }
-                }
-                if let Some(sets) = list("set")? {
-                    args.insert("set".to_owned(), json!(sets));
-                }
-            }
-            "session read" | "session type" => {
-                let [target] = words.as_slice() else {
-                    return Err(format!("bad-args: {verb} takes one target"));
-                };
-                args.insert("target".to_owned(), json!(target));
-                if verb == "session read" {
-                    if let Some(lines) = call.value("lines")? {
-                        let lines: u64 = lines.parse().map_err(|_| {
-                            format!("bad-args: --lines needs a number, got {lines}")
-                        })?;
-                        args.insert("lines".to_owned(), json!(lines));
-                    }
-                } else {
-                    text(&mut args, "text", "text")?;
-                }
-            }
-            "metrics prune" => {
-                if !words.is_empty() {
-                    return Err("bad-args: metrics prune takes no arguments".to_owned());
-                }
-                if call.switch("apply")? {
-                    args.insert("apply".to_owned(), json!(true));
-                }
-                if let Some(settled) = list("settled")? {
-                    args.insert("settled".to_owned(), json!(settled));
-                }
-            }
             // The records themselves are read from stdin by the socket sender, which holds the stream.
             "metrics record" => {
                 if !words.is_empty() {
                     return Err("bad-args: metrics record sends its records on stdin".to_owned());
                 }
-            }
-            "friction record" => {
-                if !words.is_empty() {
-                    return Err("bad-args: friction record takes no arguments".to_owned());
-                }
-                text(&mut args, "subject", "subject")?;
-                text(&mut args, "kind", "kind")?;
-                text(&mut args, "layer", "layer")?;
-                text(&mut args, "error-class", "error-class")?;
-                text(&mut args, "disposition", "disposition")?;
-                text(&mut args, "producer", "producer")?;
-                text(&mut args, "doc-type", "doc-type")?;
-                text(&mut args, "detail", "detail")?;
-                if let Some(attempts) = call.value("attempts")? {
-                    let attempts: u32 = attempts.parse().map_err(|_| {
-                        format!("bad-args: --attempts needs a number, got {attempts}")
-                    })?;
-                    args.insert("attempts".to_owned(), json!(attempts));
-                }
-                if let Some(refs) = list("ref")? {
-                    args.insert("ref".to_owned(), json!(refs));
-                }
-                if call.switch("detail-stdin")? {
-                    if args.contains_key("detail") {
-                        return Err(
-                            "bad-args: choose either --detail or --detail-stdin, not both"
-                                .to_owned(),
-                        );
-                    }
-                    let detail = detail_from_stdin(stdin)?;
-                    args.insert("detail".to_owned(), json!(detail));
-                }
-            }
-            "config patch" => {
-                if let Some(flag) = ["global", "project-only"]
-                    .iter()
-                    .find(|f| call.flags().flag(f).is_some())
-                {
-                    return Err(format!(
-                        "bad-args: --{flag} is the host's to set, not a confined caller's"
-                    ));
-                }
-                let [file] = words.as_slice() else {
-                    return Err("bad-args: config patch takes one file".to_owned());
-                };
-                args.insert("file".to_owned(), json!(file));
-                text(&mut args, "reason", "reason")?;
-            }
-            "supervisor handled" => {
-                if words.is_empty() {
-                    return Err(
-                        "bad-args: supervisor handled takes one or more event ids".to_owned()
-                    );
-                }
-                args.insert("events".to_owned(), json!(words));
-            }
-            "supervisor queue" | "supervisor plans" | "supervisor wake" | "slots"
-                if !words.is_empty() =>
-            {
-                return Err(format!("bad-args: {verb} takes no arguments"));
-            }
-            "questions list" => {
-                // `questions` or `questions list`; the flags are the list's own (`--all`, `--answered`).
-                if !words.is_empty() {
-                    return Err("bad-args: questions list takes no arguments".to_owned());
-                }
-                let which = match (
-                    call.flags().flag("all").is_some(),
-                    call.flags().flag("answered").is_some(),
-                ) {
-                    (true, true) => {
-                        return Err("bad-args: --all and --answered exclude each other".to_owned())
-                    }
-                    (true, false) => "all",
-                    (false, true) => "answered",
-                    (false, false) => "open",
-                };
-                args.insert("which".to_owned(), json!(which));
             }
             _ => {}
         }
@@ -1320,27 +1247,26 @@ mod confined_tests {
     }
 
     #[test]
-    fn a_confined_questions_list_maps_its_which_flag_and_leaves_the_other_sub_commands_alone() {
-        for (words, which) in [
-            (&["questions"][..], "open"),
-            (&["questions", "--json"][..], "open"),
-            (&["questions", "list", "--json"][..], "open"),
-            (&["questions", "--answered", "--json"][..], "answered"),
-            (&["questions", "--all"][..], "all"),
+    fn a_confined_questions_list_is_one_window_frame_and_the_other_sub_commands_are_left_alone() {
+        for (words, argv) in [
+            (&["questions"][..], &["questions"][..]),
+            (&["questions", "--json"][..], &["questions"][..]),
+            (&["questions", "list", "--json"][..], &["questions"][..]),
+            (
+                &["questions", "--answered", "--json"][..],
+                &["questions", "--answered"][..],
+            ),
+            (&["questions", "--all"][..], &["questions", "--all"][..]),
         ] {
             assert_eq!(
                 built(words),
                 ConfinedCall {
-                    verb: "questions list",
-                    args: json!({ "which": which })
+                    verb: "fgos",
+                    args: json!({ "argv": argv })
                 },
                 "{words:?}"
             );
         }
-        assert!(confined(&["questions", "--all", "--answered"])
-            .unwrap()
-            .is_err());
-        assert!(confined(&["questions", "list", "extra"]).unwrap().is_err());
         for sub in ["ask", "ack", "cancel", "answer", "show"] {
             assert!(confined(&["questions", sub, "q1"]).is_none(), "{sub}");
         }
@@ -1348,27 +1274,44 @@ mod confined_tests {
 
     #[test]
     fn the_other_contract_verbs_map_their_words_and_flags() {
-        assert_eq!(
-            built(&["supervisor", "handled", "ab12", "cd34", "--json"]).args,
-            json!({"events": ["ab12", "cd34"]})
-        );
-        assert!(confined(&["supervisor", "handled"]).unwrap().is_err());
         assert_eq!(built(&["supervisor", "done"]).verb, "supervisor done");
-        for (words, verb) in [
-            (&["supervisor", "queue", "--json"][..], "supervisor queue"),
-            (&["supervisor", "plans", "--json"][..], "supervisor plans"),
-            (&["supervisor", "wake", "--json"][..], "supervisor wake"),
-            (&["slots", "--json"][..], "slots"),
+        // The forward rows travel as the caller's own words; the table, not this client, judges them.
+        for words in [
+            &["supervisor", "handled", "ab12", "cd34"][..],
+            &[
+                "supervisor",
+                "raise",
+                "--kind",
+                "coordination-help",
+                "--ref",
+                "r",
+                "--reason",
+                "x",
+            ][..],
+            &["supervisor", "queue"][..],
+            &["supervisor", "plans"][..],
+            &["supervisor", "wake"][..],
+            &["slots"][..],
+            &["session", "read", "head:planner-x", "--lines", "20"][..],
+            &["session", "type", "head:planner-x", "--text", "go"][..],
+            &["watcher", "tune", "stuck", "--set", "k=1", "--arm"][..],
+            &["metrics", "prune", "--apply"][..],
+            &["git", "recover"][..],
+            &["dispatch", "probe-account", "acct"][..],
+            &["worktree", "remove", "../w", "--delivered-to", "main"][..],
+            &["config", "patch", "patch.yaml", "--reason", "tune watcher"][..],
         ] {
+            let mut with_json = words.to_vec();
+            with_json.push("--json");
             assert_eq!(
-                built(words),
+                built(&with_json),
                 ConfinedCall {
-                    verb,
-                    args: json!({})
-                }
+                    verb: "fgos",
+                    args: json!({ "argv": words })
+                },
+                "{words:?}"
             );
         }
-        assert!(confined(&["supervisor", "queue", "x"]).unwrap().is_err());
         assert_eq!(
             built(&["session", "stop", "lead", "--name", "p-x", "--reason", "done"]).args,
             json!({"persona": "lead", "name": "p-x", "reason": "done"})
@@ -1396,71 +1339,25 @@ mod confined_tests {
                 "record",
                 "--subject",
                 "work:w1",
-                "--kind",
-                "bug",
-                "--layer",
-                "runner",
-                "--error-class",
-                "tool-missing",
-                "--disposition",
-                "advisory",
-                "--producer",
-                "agent",
-                "--attempts",
-                "3",
-                "--doc-type",
-                "reference",
                 "--detail",
-                "desc",
-                "--ref",
-                "run:r1",
+                "desc"
             ])
             .args,
-            json!({
-                "subject": "work:w1",
-                "kind": "bug",
-                "layer": "runner",
-                "error-class": "tool-missing",
-                "disposition": "advisory",
-                "producer": "agent",
-                "attempts": 3,
-                "doc-type": "reference",
-                "detail": "desc",
-                "ref": ["run:r1"]
-            })
-        );
-        assert!(confined(&["friction", "record", "extra"]).unwrap().is_err());
-        assert_eq!(
-            built(&["config", "patch", "patch.yaml"]).args,
-            json!({"file": "patch.yaml"})
-        );
-        assert_eq!(
-            built(&["config", "patch", "patch.yaml", "--reason", "tune watcher"]).args,
-            json!({"file": "patch.yaml", "reason": "tune watcher"})
-        );
-        assert!(confined(&["config", "patch"]).unwrap().is_err());
-        assert!(confined(&["config", "patch", "a.yaml", "b.yaml"])
-            .unwrap()
-            .is_err());
-        assert!(confined(&["config", "patch", "patch.yaml", "--global"])
-            .unwrap()
-            .is_err());
-        assert!(
-            confined(&["config", "patch", "patch.yaml", "--project-only"])
-                .unwrap()
-                .is_err()
+            json!({"argv": ["friction", "record", "--subject", "work:w1", "--detail", "desc"]})
         );
     }
 
     #[test]
-    fn a_confined_caller_cannot_choose_the_scope_of_config_patch() {
-        for flag in ["--global", "--project-only"] {
-            let refused = confined(&["config", "patch", "patch.yaml", flag])
-                .unwrap()
-                .unwrap_err();
-            assert!(refused.starts_with("bad-args"), "{refused}");
-            assert!(refused.contains(flag), "expected {refused} to name {flag}");
-        }
+    fn can_i_sends_the_words_after_it_as_one_frame_from_a_head_that_has_a_socket() {
+        assert_eq!(
+            built(&["can-i", "session", "read", "s1", "--json"]),
+            ConfinedCall {
+                verb: "can-i",
+                args: json!({ "argv": ["session", "read", "s1"] })
+            }
+        );
+        let os: Vec<OsString> = ["can-i", "slots"].iter().map(OsString::from).collect();
+        assert!(confined_head_call(&os, false).is_none());
     }
 
     #[test]
@@ -1486,13 +1383,14 @@ mod confined_tests {
         .collect();
         let mut input = Cursor::new(b"friction detail text from stdin");
         let call = confined_head_call_with_reader(&os, true, &mut input)
-            .expect("friction record is a contract verb")
+            .expect("friction record is a window verb")
             .expect("valid call");
+        let argv = call.args["argv"].as_array().expect("an argv");
         assert_eq!(
-            call.args.get("detail"),
-            Some(&json!("friction detail text from stdin"))
+            argv[argv.len() - 2..],
+            [json!("--detail"), json!("friction detail text from stdin")]
         );
-        assert!(call.args.get("detail-stdin").is_none());
+        assert!(!argv.contains(&json!("--detail-stdin")));
 
         // Choosing both --detail and --detail-stdin is refused
         let both_os: Vec<OsString> = [

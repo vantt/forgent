@@ -1,6 +1,6 @@
 {
   "contract": { "id": "run-supervisor-head-request", "version": 1 },
-  "description": "The request socket of one head session. A confined head cannot reach herdr, so it asks its own run supervisor, over one AF_UNIX socket the sandbox gets read-only, to perform a granted verb outside. The supervisor only transports and enforces: Identity decides who holds the role, `grantOf` (src/session-host/head-grants.mjs) is the only reader of the grant table and its answer reaches the supervisor in the digest-protected envelope (`session.verbs`, `session.writes`), and a verb entry with `read: true` only reads (it changes no store and no file) and is the one list `SUCCESSOR_READ_VERBS` (head_request.rs) is checked against, and every verb but `session bind session` and `session write` is the Node payload behind `fgos internal head-request` (internal-route.run-supervisor.v1.json).",
+  "description": "The request socket of one head session. A confined head cannot reach herdr, so it asks its own run supervisor, over one AF_UNIX socket the sandbox gets read-only, to perform a granted verb outside. The supervisor only transports and enforces: Identity decides who holds the role; what a persona may ask is the permission table of the session-host crate (`packages/session-host/contracts/head-permissions.v1.json`, read through `fgos_session_host::permissions` with the persona of the digest-protected envelope), and what it may write is `session.writes` of that envelope. An `fgos` argv is one frame (`fgos`): the table decides it (allow, ask or deny) and the supervisor execs the host's own `fgos` itself. `can-i` answers what the table would decide. `session bind session`, `session write`, `fgos` and `can-i` are answered by the supervisor; every other verb is a policy branch of the Node payload behind `fgos internal head-request` (internal-route.run-supervisor.v1.json).",
   "framing": {
     "frame": "as gate-go.v1.json: 4-byte unsigned big-endian length N, then N bytes of UTF-8 JSON (one object)",
     "maxRequestBytes": 4194304,
@@ -16,7 +16,7 @@
     "kind": "AF_UNIX SOCK_STREAM, listening, created by the supervisor before it asks terminal-control to launch the pane",
     "path": "envelope.session.requestSocketPath: a socket directly in the run supervisor's socket directory, at most 107 bytes (the same rules, the same bind helper and the same bind-back check as the GO socket)",
     "sandbox": "the launch binds this one socket read-only into the head's sandbox (confinement request field requestSocket); the directory around it stays masked. Its path is also in the agent's environment as FGOS_HEAD_REQUEST_SOCKET",
-    "absentWhen": "the role's grant has no verbs: no socket is created, no path is in the envelope, no variable is set",
+    "absentWhen": "the persona has no head permission table entry: no socket is created, no path is in the envelope, no variable is set",
     "lifetime": "listening from before the pane launch until the gate is gone; the supervisor then unlinks the path. A client that finds the file gone reports request-socket-unavailable",
     "peerCheck": "the peer uid must equal the supervisor's own (SO_PEERCRED, getpeereid elsewhere); pids are never compared. A wrong uid is answered REPLY refused peer-uid without reading a frame"
   },
@@ -25,6 +25,19 @@
     "REPLY": { "direction": "supervisor -> client", "fields": { "type": "REPLY", "id": "the request's id, null when no valid id was read", "result": { "enum": ["done", "refused"] }, "data": "object, present when done: the verb's own result", "code": "refusal code, present when refused", "detail": "string, optional", "message": "string, optional: present only on a verb-failed refusal, the route child's own text (the reason behind its code, for example the persona names a persona-not-found lists), control characters replaced and cut to 300 characters; it may contain local paths of the same user's machine, so a client shows it only to that user" } }
   },
   "verbs": {
+    "fgos": {
+      "args": { "argv": "array of strings, required, 1 to 64 words of at most 8192 bytes, none empty and none holding NUL: the `fgos` verb words and flags without the program name; no other key (bad-args)" },
+      "does": "the argv window, answered by the supervisor itself with no Node hop. `fgos_session_host::forwarder` screens the argv (a flag that moves the root, the cwd or the environment (`-C`, `--cwd`, `--root`, `--project`, `--env`), a first word that is not an `fgos` verb word or names a shell, interpreter or raw command, and a `config patch` whose patch file touches a key under the grant, confinement or release prefix are refused `argv-not-allowed` for every persona) and asks the permission table (`packages/session-host/contracts/head-permissions.v1.json`) with the persona of the envelope (`session.persona`, else the persona `session.role` spells). `allow` on a forward row: the supervisor execs the envelope's host `fgos` with the argv plus `--json` (and the row's `append`), from envelope.cwd, with exactly the step environment, no shell, inside the verb timeout, and returns the host's JSON `data`, or the host's own refusal code with its message. `allow` on a `node` or `native` row: refused `argv-not-allowed` (that verb is sent as the frame of its own name, which keeps its policy branch). `ask`, including an argv no row matches: one five-part owner question carrying the exact argv is filed through `fgos internal head-questions` and the reply is refused `asked` with the question id as detail; nothing ran. `deny`: refused `argv-not-allowed` with the reason in detail",
+      "data": "the host verb's JSON data",
+      "identity": "held (the successor's read rows only: the rows the table marks `read: true`, which a rotation successor may use before it holds the role)",
+      "rule": "refusals: argv-not-allowed, asked, bad-args, verb-timeout, reply-too-large, and the host verb's own code carried as it is (for example event-store-no-repository, session-not-found)"
+    },
+    "can-i": {
+      "args": { "argv": "array of strings, required, as for fgos" },
+      "does": "answered by the supervisor itself: the decision the table and the forwarder's refusals give the argv for this caller's persona, from the same function a real call uses. It runs nothing, files nothing and takes no busy slot; a rotation successor may ask it before it holds the role",
+      "data": "{decision: allow | ask | deny, reason: one line naming the row or the refusal}",
+      "identity": "held (or the successor's read allowance)"
+    },
     "session start": {
       "args": { "persona": "string, required", "name": "string, required", "beside": "string, optional: the live key of the session whose tab the new one opens next to", "forQuestion": "string, optional: the id of an owner question the new head continues (1 to 64 characters of letters, digits, '.', '_' and '-'); the opening text gains one line naming it, and the successor, which holds the asker's own head role, writes the answer back and acks or cancels it" },
       "does": "startHeadSession (src/session-host/head-start.mjs) in the project of the attempt's envelope (envelope.cwd); a live head of the same role is fronted instead of started",
@@ -42,14 +55,6 @@
       "data": "{}",
       "identity": "registered-then-register",
       "rule": "same role step as session answered (this attempt's own session is registered and live, session-not-registered otherwise); a refused registration is role-take-failed with Identity's code in detail. The executor reaches this socket as the same user (peer uid)"
-    },
-    "questions list": {
-      "read": true,
-      "args": { "which": "string, optional: open (default), answered or all" },
-      "does": "a read, not a ticket verb: the route child runs the host verb `fgos questions [--answered|--all] --json` (envelope hostBin) and returns its JSON, because the confined caller cannot open the event store it is read from. Answers within the 60 s verb bound. Granted to every head with the other `questions *` verbs; the confined `fgos questions` prints this reply's data",
-      "data": "the host verb's JSON data (the question rows)",
-      "identity": "held",
-      "rule": "refusals (verb-failed detail): the host verb's own code (for example event-store-no-repository); an unknown `which` is bad-args"
     },
     "questions ask": {
       "args": {
@@ -172,93 +177,12 @@
       "identity": "held",
       "rule": "refusals (verb-failed detail): role-mismatch, stop-not-ended, retire-refused, bad-persona, bad-name, stop-target-not-head"
     },
-    "supervisor handled": {
-      "args": {
-        "events": "array of strings, required, 1 to 50: the ids of the events to mark handled, each one an event id"
-      },
-      "does": "the route child runs the host verb `fgos supervisor handled <id>... --json` the way the questions verbs run theirs (envelope hostBin) and returns its JSON; the verb itself is the supervision component's, and it marks every id given",
-      "data": "the host verb's JSON data ({handled: <how many this call closed>})",
-      "identity": "held",
-      "rule": "refusals (verb-failed detail): bad-args and the host verb's own code"
-    },
-    "supervisor queue": {
-      "args": {},
-      "does": "a read, not a ticket verb: the route child runs the host verb `fgos supervisor queue --json` (envelope hostBin) and returns its JSON, because the confined caller cannot open the event store it is read from. Answers within the 60 s verb bound",
-      "data": "the host verb's JSON data ({events: [...]})",
-      "identity": "held",
-      "rule": "refusals (verb-failed detail): the host verb's own code (for example event-store-no-repository)"
-    },
-    "supervisor plans": {
-      "args": {},
-      "does": "as supervisor queue, running `fgos supervisor plans --json`: the plans of the trunk tip with their status, admissibility and lead head names, which needs Identity's project handle and live role holders that the sandbox cannot read",
-      "data": "the host verb's JSON data ({plans: [...], unreadable: [first 10 plans that break their contract], unreadableCount: <all of them>, leadsLive, maxLeads}); the list is capped so the answer fits one reply frame",
-      "identity": "held",
-      "rule": "refusals (verb-failed detail): the host verb's own code"
-    },
-    "slots": {
-      "args": {},
-      "does": "as supervisor queue, running `fgos slots --json`: the lane view (ceiling, live, free, seats) read from the machine's lock root, which the sandbox cannot read",
-      "data": "the host verb's JSON data ({lanes: {ceiling, live, free, seats}})",
-      "identity": "held",
-      "rule": "refusals (verb-failed detail): the host verb's own code"
-    },
-    "supervisor wake": {
-      "args": {},
-      "does": "as supervisor queue, running `fgos supervisor wake --json`: starts the supervisor head when an event is unhandled and none is live, and records the wake",
-      "data": "the host verb's JSON data ({outcome: <wake outcome>, code: <only when the start failed>})",
-      "identity": "held",
-      "rule": "refusals (verb-failed detail): the host verb's own code"
-    },
     "supervisor done": {
       "args": {},
       "does": "as supervisor handled, running `fgos supervisor done --json`; when the answer is {done: true} the route, after its line is written, starts a detached `session stop` of the caller's own role and adds stopping: true",
       "data": "the host verb's JSON data, with stopping: true when the caller's own stop was started",
       "identity": "held",
       "rule": "refusals (verb-failed detail): the host verb's own code (events still unhandled)"
-    },
-    "supervisor raise": {
-      "args": {
-        "kind": "string, required: coordination-handoff, coordination-chore or coordination-help",
-        "ref": "string, required, one line of at most 200 characters: what the event is about (a plan, a portfolio file, a session)",
-        "reason": "string, required, one line of at most 500 characters",
-        "next": "string, optional, one line of at most 200 characters: the command the supervisor runs next"
-      },
-      "does": "as supervisor handled, running `fgos supervisor raise --kind <kind> --ref <ref> --reason <reason> [--next <next>] --json`: puts one coordination event on the supervision queue through the queue's one raise path (the id is derived from kind, ref and the instant) and records a `fgos.coordination.act` record. The supervisor closes it with `supervisor handled`. Granted to the secretary, supervisor, and lead (LEAD_VERBS)",
-      "data": "the host verb's JSON data ({id, raised: true|false})",
-      "identity": "held",
-      "rule": "refusals (verb-failed detail): bad-args, bad-event (an unknown kind or an empty ref) and the host verb's own code"
-    },
-    "watcher tune": {
-      "args": {
-        "definition": "string, optional: a definition (row kind) name to arm or disarm, lowercase letters, digits and hyphens",
-        "arm": "boolean, optional: route the definition's rows to the supervisor",
-        "disarm": "boolean, optional: stop acting on the definition's rows",
-        "set": "array of strings, optional, at most 16: `key=value` entries with a whole number value, a watcher threshold or pace setting"
-      },
-      "does": "as supervisor handled, running `fgos watcher tune [<definition>] [--set key=value]... [--arm|--disarm] --json`: writes `watcher.actions.<definition>` (wake-supervisor when armed, none when disarmed) and `watcher.<key>` through the config door into the project's config, each inside the bounds of the config schema, and records a `fgos.coordination.act` record (act tune). A new definition kind stays a code change: only the settings the schema declares can be set, and `enabled`, `definitions`, `defaultAction`, `actions` and `notifyTo` never can",
-      "data": "the host verb's JSON data ({applied: [\"key=value\", ...]})",
-      "identity": "held",
-      "rule": "refusals (verb-failed detail): bad-args and the host verb's own code (a refused value names the key and the settings already applied)"
-    },
-    "session read": {
-      "args": {
-        "target": "string, required: a role (head:<persona>-<name>, lead:<LANE>), handle or slot key that Identity resolves to one live session; never a raw pane id",
-        "lines": "integer, optional, 1 to 1000: how many trailing lines (default 50)"
-      },
-      "does": "as supervisor queue, running `fgos session read <target> [--lines N] --json`: resolves the target through Identity, reads the trailing lines of the session's screen through the terminal-control port (`read_recent`, which refuses a driver without the capability and never answers an empty read), and answers the last 48 KiB of it at most. It changes nothing",
-      "data": "{session: <handle>, lines, truncated, text}",
-      "identity": "held",
-      "rule": "refusals (verb-failed detail): bad-args, session-not-found, ambiguous, session-has-no-pane, terminal-refused"
-    },
-    "session type": {
-      "args": {
-        "target": "string, required: as session read",
-        "text": "string, required, at most 4096 bytes, must not start with '-'"
-      },
-      "does": "as supervisor queue, running `fgos session type <target> --text <text> --json`: types the text into the session's pane through the terminal-control port (`type_text`) exactly once, and records a `fgos.coordination.act` record (act type). It is for a stuck session only: refused target-not-stuck unless an open supervision event names the target session (by id, handle, a role it holds or its slot key)",
-      "data": "{session: <handle>, typed: true}",
-      "identity": "held",
-      "rule": "refusals (verb-failed detail): bad-args, session-not-found, ambiguous, target-not-stuck, session-has-no-pane, terminal-refused"
     },
     "metrics record": {
       "args": {
@@ -268,45 +192,6 @@
       "data": "the host verb's JSON data ({written, duplicate, rejected, failed, outcomes})",
       "identity": "held",
       "rule": "refusals (verb-failed detail): bad-args, kind-not-allowed (a record's kind is not fgos.coordination.*)"
-    },
-    "metrics prune": {
-      "args": {
-        "apply": "boolean, optional: remove the eligible records; without it nothing changes",
-        "settled": "array of strings, optional, at most 50: `<kind>:<id>` subjects whose finding is settled"
-      },
-      "does": "as supervisor handled, running `fgos metrics prune [--settled <kind:id>]... [--apply] --json`: the Observe prune door. Only records of kinds declared prunable are eligible, those older than their retention or whose subject is settled; a dry run (the default) reports what would go",
-      "data": "the host verb's JSON data ({applied, scanned, prunableFound, pruned, ids})",
-      "identity": "held",
-      "rule": "refusals (verb-failed detail): bad-args and the host verb's own code"
-    },
-    "friction record": {
-      "args": {
-        "subject": "string, required: kind:id (e.g. plan:<dir>, session:<handle>, work:<id>)",
-        "kind": "string, optional: bug, instability, missing, awkward or doc",
-        "ref": "string or array of strings, optional: kind:id references",
-        "layer": "string, required: platform component layer (e.g. runner, skill, config, ...)",
-        "error-class": "string, required: a short lowercase-hyphenated signature naming the obstacle",
-        "disposition": "string, required: advisory, blocked, parked or halted",
-        "producer": "string, required: who observed it (e.g. head role, role, agent)",
-        "attempts": "integer, optional: whole number of attempts",
-        "doc-type": "string, optional: tutorial, how-to, reference, explanation",
-        "detail": "string, optional",
-        "detail-stdin": "boolean, optional: handled on CLI by reading stdin into detail; refused over socket (pass detail)"
-      },
-      "does": "the route child runs `fgos friction record ... --json` (envelope hostBin) outside the sandbox through hostCall: records one friction against a subject as a v2 record. Granted to every head (HEAD_VERBS); a confined head's `fgos friction record` sends its flags through this verb. Fail-open: returns its code and exits non-zero if refused or failed",
-      "data": "the host verb's JSON data ({ok, outcome, id, ...})",
-      "identity": "held",
-      "rule": "refusals (verb-failed detail): bad-args, and the host verb's own code (e.g. friction-invalid-input)"
-    },
-    "config patch": {
-      "args": {
-        "file": "string, required: the patch file (YAML or JSON list of edits)",
-        "reason": "string, optional: why the values change"
-      },
-      "does": "the route child runs `fgos config patch <file> --project-only --json` (envelope hostBin) outside the sandbox through hostCall. Granted to the supervisor only. A relative patch-file path is read from the project root. The host's own validation stays the authority; the host's --project-only flag ensures every edit targets the project config file",
-      "data": "the host verb's JSON data",
-      "identity": "held",
-      "rule": "refusals (verb-failed detail): bad-args, and the host verb's own code (e.g. patch-project-only, config-comment-reason-required, config-unknown-key)"
     }
   },
   "questionsRoute": {
@@ -318,11 +203,11 @@
   "order": [
     "peer uid",
     "one request frame",
-    "role: Identity resolves the role to the live session it names and that session must be this attempt's own (role-not-held otherwise, including when Identity cannot answer: the request fails closed; role-pending-rotation instead when the live holder is this head's own earlier generation; a read-only verb of the constant `SUCCESSOR_READ_VERBS` (`questions list`) from such a successor is answered instead, from the same Identity fact and nothing in the request, while every other verb keeps role-pending-rotation). For `session answered`, `session restore role` and `session bind session` the step is instead: this attempt's own session is registered and live (session-not-registered, failing closed the same way)",
-    "verb: must be one of envelope.session.verbs (verb-not-granted)",
+    "role: Identity resolves the role to the live session it names and that session must be this attempt's own (role-not-held otherwise, including when Identity cannot answer: the request fails closed; role-pending-rotation instead when the live holder is this head's own earlier generation; a read row of the permission table or `can-i` from such a successor is answered instead, from the same Identity fact and nothing in the request, while every other verb keeps role-pending-rotation). For `session answered`, `session restore role` and `session bind session` the step is instead: this attempt's own session is registered and live (session-not-registered, failing closed the same way)",
+    "verb: a policy verb must be a `node` or `native` row the persona's rules allow (verb-not-granted); `fgos` and `can-i` ask the table about the argv instead (argv-not-allowed, asked)",
     "peer (session write only): the connecting process runs under the gate (caller-not-under-gate)",
     "busy: at most one request runs at a time (busy)",
-    "run: `<hostBin> internal head-request --protocol 1 --run-dir <attemptDir>`, request on stdin; `session bind session` and `session write` are answered by the supervisor itself instead"
+    "run: `<hostBin> internal head-request --protocol 1 --run-dir <attemptDir>`, request on stdin; `session bind session`, `session write`, `fgos` and `can-i` are answered by the supervisor itself instead"
   ],
   "run": {
     "child": "started with exactly the step environment of the envelope, the envelope's cwd, its own process group, and the parent-death signal on Linux; stdout is its one JSON line, stderr goes to supervisor.log",
@@ -335,8 +220,10 @@
     "peer-uid": "the connection is not from the supervisor's own user",
     "bad-frame": "oversize, not one JSON object, no REQUEST type, an id outside the rule, a verb that is not a string or args that is not an object",
     "role-not-held": "Identity does not give this attempt's session the envelope's role; when Identity could not answer the detail is its refusal code only (its text goes to supervisor.log, never to the client)",
-    "role-pending-rotation": "a role-gated verb from a rotation successor (same persona and name as the live holder, a higher generation) whose role its live predecessor still holds, the move of `session answered` or `session restore role` not done yet; detail names the predecessor. Retryable: every client (the JS `requestHead` and the Rust `head_client::request_head`) waits with doubling backoff (0.5 s up to 4 s) for at most 60 s, then reports the code; the rotation stop hook passes no wait. The read-only verbs listed in `SUCCESSOR_READ_VERBS` (`questions list`) are exempt: a pending successor gets them answered (they still need the grant); every write verb keeps this refusal. Any other caller without the role stays role-not-held",
-    "verb-not-granted": "the verb is not in envelope.session.verbs",
+    "role-pending-rotation": "a role-gated verb from a rotation successor (same persona and name as the live holder, a higher generation) whose role its live predecessor still holds, the move of `session answered` or `session restore role` not done yet; detail names the predecessor. Retryable: every client (the JS `requestHead` and the Rust `head_client::request_head`) waits with doubling backoff (0.5 s up to 4 s) for at most 60 s, then reports the code; the rotation stop hook passes no wait. The read rows of the permission table (`read: true`, `questions`) and `can-i` are exempt: a pending successor gets them answered; every write verb keeps this refusal. Any other caller without the role stays role-not-held",
+    "verb-not-granted": "a policy verb (a frame of its own name) that the persona's rows of the permission table do not allow; detail names the verb, the role and the persona",
+    "argv-not-allowed": "fgos only: the argv is refused: a flag that moves the root, the cwd or the environment, a first word that is not an fgos verb, a config patch touching a grant, confinement or release key, a row that denies it, a verb that belongs to a policy frame, a flag value outside the row's `args`, or a persona the table does not name; detail is the reason",
+    "asked": "fgos only: no row decides the argv, so one owner question carrying it was filed and nothing ran; detail is the question id",
     "busy": "another request is running, or another large request (over maxReplyBytes) is being read or run",
     "session-not-registered": "session answered only: Identity does not list this attempt's own session as live; when Identity could not answer the detail is its refusal code only",
     "session-bind-failed": "session bind session only: Identity refused to bind the session; detail is its code",
@@ -367,7 +254,7 @@
   "envelope": {
     "refusal": "envelope-invalid (the supervisor refuses the attempt before the pane is launched)",
     "rules": [
-      "session.verbs not empty and session.requestSocketPath absent, or the path present with no verbs",
+      "session.persona (else the persona session.role spells) names no persona of the head permission table while session.requestSocketPath is present",
       "session.writes present and not an array of strings",
       "the socket path lies in the very directory of the attempt's GO socket (envelope.terminal.socketPath): the same rule the sandbox bind-back applies on its side",
       "identity.writerId, session.role and hostBin are non-empty strings",
@@ -376,5 +263,5 @@
   },
   "trust": "the route reads the attempt's own run directory and its envelope as trusted because the sandbox only ever sees it read-only. The guard is the paths grant: a workspace-paths entry under `.fgos` is refused by name (confinement shape, validateWorkspacePaths), so no grant can make that directory writable",
   "log": "one line per request in supervisor.log: `head-request <id> <verb> <done|refused> <code|->`; arguments are never logged and client text is cut to 32 plain characters",
-  "client": "src/session-host/head-request.mjs: `requestHeadStart` connects to FGOS_HEAD_REQUEST_SOCKET after checking the socket file is owned by its own uid; `requestHead(verb, args)` is the one client; `startHead` and `rotateHead` are the one branch per verb (FGOS_CONFINED=1 asks through the socket, refused no-request-socket when the variable is unset, otherwise startHeadSession or requestRotation directly); `requestHeadAnswered` is the successor's call; every other verb goes through the generic `requestHead(verb, args)` with the constants of head-request-client.mjs. A long verb (`land`, `run`) answers a ticket at once, because the socket serves one request at a time and caps a verb at verbTimeoutMs; its detached runner outlives the route child"
+  "client": "src/session-host/head-request.mjs: `requestHeadStart` connects to FGOS_HEAD_REQUEST_SOCKET after checking the socket file is owned by its own uid; `requestHead(verb, args)` is the one client; `startHead` and `rotateHead` are the one branch per verb (FGOS_CONFINED=1 asks through the socket, refused no-request-socket when the variable is unset, otherwise startHeadSession or requestRotation directly); `requestHeadAnswered` is the successor's call; every other policy verb goes through the generic `requestHead(verb, args)` with the constants of head-request-client.mjs; every forward-only verb (`session read|type`, `watcher tune`, `supervisor raise|handled|queue|plans|wake`, `slots`, `questions` list, `metrics prune`, `friction record`, `config patch`) and `can-i` are sent by the Rust `fgos` as one `fgos` or `can-i` frame carrying the caller's own argv. A long verb (`land`, `run`) answers a ticket at once, because the socket serves one request at a time and caps a verb at verbTimeoutMs; its detached runner outlives the route child"
 }

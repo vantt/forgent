@@ -20,6 +20,7 @@ pub mod holder_lock;
 pub mod marshal;
 pub mod process;
 pub mod run_result;
+pub mod session_host;
 pub mod session_identity;
 mod single_load;
 pub mod yaml;

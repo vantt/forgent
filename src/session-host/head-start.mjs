@@ -5,7 +5,7 @@
 // otherwise bind a seat at the persona's tier and launch it as a confined supervised attempt (the same door a
 // worker attempt goes through) with the opening text typed visibly into the composer, and remember where it is.
 // Identity owns who holds the role: the run supervisor registers the session there, so this module never writes
-// it. What the role may write comes from the grant table (`grantOf`). Everything it needs from a layer above
+// it. What the role may write comes from the permission table's cage size (`grantOf`). Everything it needs from a layer above
 // (binding, the launch, the opening text) comes in through `ports`, whose defaults load the runner lazily; the
 // rotation lock is the rotation executor's, so it arrives as `ports.rotationHolds`.
 
@@ -14,7 +14,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { replaceDurably } from '../native/door.mjs';
 import { createSessionHost } from './client.mjs';
-import { grantOf, HEAD_PERSONAS } from './head-grants.mjs';
+import { grantOf, headPersonas } from './head-grants.mjs';
 import { subjectOfDir, taskOfHead } from './head-plan.mjs';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
@@ -197,7 +197,8 @@ export function nextHeadGeneration(projectRoot, persona, name) {
 /** The persona names with the ones that hold a head grant first: the refusal message is cut, and these are the ones the caller wanted. */
 export function personasHeadsFirst(names) {
   const sorted = [...new Set(names)].sort();
-  return [...sorted.filter((name) => HEAD_PERSONAS.includes(name)), ...sorted.filter((name) => !HEAD_PERSONAS.includes(name))];
+  const heads = headPersonas();
+  return [...sorted.filter((name) => heads.includes(name)), ...sorted.filter((name) => !heads.includes(name))];
 }
 
 async function defaultPin({ persona, projectRoot }) {

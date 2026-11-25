@@ -4,6 +4,7 @@
 // turns one request into the one result line. What `session start` does stays in head-start.test.mjs; the supervisor's
 // side of the wire is proven in packages/run-supervisor/rust/tests/head_request.rs.
 import '../helpers/process-tmp-root.mjs';
+import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
@@ -11,12 +12,14 @@ import fs from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
-import { HeadRequestError, MAX_FRAME_BYTES, MAX_REQUEST_BYTES, requestHead, requestHeadStart, requestHeadWrite } from '../../src/session-host/head-request-client.mjs';
+import { HeadRequestError, MAX_FRAME_BYTES, MAX_REQUEST_BYTES, requestHead, requestHeadCanI, requestHeadFgos, requestHeadStart, requestHeadWrite } from '../../src/session-host/head-request-client.mjs';
 import { rotateHead, runHeadRequest, runStopSelf, runTicket, startHead } from '../../src/session-host/head-request.mjs';
 import { parseArgs } from '../../src/cli/parse-args.mjs';
 import { lineageDirOf, openingText, writeHeadPlacement } from '../../src/session-host/head-start.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from '../../src/session-host/head-grants.mjs';
+
+ensureGitAddon();
 
 const scratch = (t) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-head-req-'));
@@ -139,7 +142,7 @@ test('confined asks through its socket, a confined worker without one is refused
 
 test('the payload entry runs session start in the project of its envelope and reports one line', async (t) => {
   const runDir = scratch(t);
-  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: '/the/project', session: { role: 'head:secretary-miu', verbs: ['session start'], requestSocketPath: '/run/s.sock' } }));
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: '/the/project', session: { role: 'head:secretary-miu', requestSocketPath: '/run/s.sock' } }));
   const calls = [];
   const ports = {
     host: { front: (placement) => { calls.push(placement); return { result: 'fronted' }; } },
@@ -184,6 +187,17 @@ test('rotateHead is one branch: confined asks for session rotate through the soc
   assert.equal(asked.length, 1, 'an unconfined caller never goes through the socket');
 });
 
+test('the argv window frames carry the callers own words: fgos asks the table to decide them and can-i asks without running', async (t) => {
+  const dir = scratch(t);
+  const socketPath = path.join(dir, 'req.sock');
+  const seen = serveOnce(t, socketPath, (request) => ({ type: 'REPLY', id: request.id, result: 'done', data: { decision: 'allow', reason: 'x' } }));
+  await listening();
+  await requestHeadFgos(['session', 'read', 's1'], { socketPath });
+  const decision = await requestHeadCanI(['session', 'read', 's1'], { socketPath });
+  assert.deepEqual(seen.map((f) => [f.verb, f.args]), [['fgos', { argv: ['session', 'read', 's1'] }], ['can-i', { argv: ['session', 'read', 's1'] }]]);
+  assert.equal(decision.decision, 'allow');
+});
+
 test('the client names any verb it is given in the REQUEST frame', async (t) => {
   const socketPath = path.join(scratch(t), 'req.sock');
   const seen = serveOnce(t, socketPath, (request) => ({ type: 'REPLY', id: request.id, result: 'done', data: {} }));
@@ -196,7 +210,7 @@ test('the payload entry runs session rotate and session answered for the envelop
   const project = scratch(t);
   const runDir = scratch(t);
   const role = 'head:planner-x';
-  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, unitRunId: 'head-planner-x-2', session: { role, verbs: ['session rotate', 'session answered'], requestSocketPath: '/run/s.sock' } }));
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, unitRunId: 'head-planner-x-2', session: { role, requestSocketPath: '/run/s.sock' } }));
   const spawned = [];
   const ports = { rotation: { holds: () => false, spawn: (spec) => { spawned.push(spec); return { pid: 99 }; } } };
 
@@ -226,7 +240,7 @@ test('the payload entry runs session rotate and session answered for the envelop
 test('the payload entry hands each questions verb to the host route with the envelope\'s own run directory and returns its answer or its refusal code', async (t) => {
   const runDir = scratch(t);
   const project = scratch(t);
-  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, hostBin: '/the/fgos', session: { role: 'head:secretary-miu', verbs: ['questions ask'], requestSocketPath: '/run/s.sock' } }));
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, hostBin: '/the/fgos', session: { role: 'head:secretary-miu', requestSocketPath: '/run/s.sock' } }));
   const calls = [];
   const ports = { questions: (call) => { calls.push(call); if (call.request.verb === 'questions cancel') throw Object.assign(new Error('not yours'), { code: 'not-asker' }); return { id: 'q-1' }; } };
   for (const verb of ['questions ask', 'questions ack', 'questions answer']) {
@@ -245,7 +259,7 @@ test('the default host call runs `internal head-questions --run-dir` with the re
   const project = scratch(t);
   const bin = path.join(scratch(t), 'fake-fgos');
   fs.writeFileSync(bin, '#!/bin/sh\ncat > "$0.stdin"\necho "$@" > "$0.argv"\nif [ -f "$0.fail" ]; then echo \'{"result":"error","code":"answer-not-owner","message":"no"}\'; exit 70; fi\necho \'{"result":"done","data":{"id":"q-9"}}\'\n', { mode: 0o755 });
-  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, hostBin: bin, session: { role: 'head:secretary-miu', verbs: [], requestSocketPath: '/run/s.sock' } }));
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, hostBin: bin, session: { role: 'head:secretary-miu', requestSocketPath: '/run/s.sock' } }));
   const done = await runHeadRequest({ runDir, request: { verb: 'questions ack', args: { id: 'q-9' } } });
   assert.deepEqual(done, { exit: 0, line: { result: 'done', data: { id: 'q-9' } } });
   assert.equal(fs.readFileSync(`${bin}.argv`, 'utf8').trim(), `internal head-questions --run-dir ${runDir}`);
@@ -295,7 +309,7 @@ const PLAN = { dir: 'p', footprint: ['src/a/**', 'docs/x.md'] };
 function headCase(t, { persona = 'lead', name = 'proj-p', writes = ['plans/p'] } = {}) {
   const runDir = scratch(t);
   const project = scratch(t);
-  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, hostBin: '/the/fgos', unitRunId: 'head-x-1', session: { role: `head:${persona}-${name}`, persona, name, verbs: [], writes, requestSocketPath: '/run/s.sock' } }));
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, hostBin: '/the/fgos', unitRunId: 'head-x-1', session: { role: `head:${persona}-${name}`, persona, name, writes, requestSocketPath: '/run/s.sock' } }));
   const spawned = [];
   const ports = { planOf: async () => PLAN, spawnRunner: (call) => { spawned.push(call); return { pid: 4242 }; }, observe: () => null };
   const ask = (verb, args, id = 't1', extra = {}) => runHeadRequest({ runDir, request: { id, verb, args } }, { ...ports, ...extra });
@@ -339,7 +353,7 @@ test('the request release supplies nested host calls, questions and tickets with
     hostCall: (call) => { seen.push(call.hostBin); return { status: 0, stdout: '{"data":{}}' }; },
     questions: (call) => { seen.push(call.hostBin); assert.equal(call.runDir, runDir); return {}; },
   });
-  assert.equal((await ask('supervisor queue', {}, 'q')).exit, 0);
+  assert.equal((await ask('worktree create', { path: '/new/wt', branch: 'b' }, 'q')).exit, 0);
   assert.equal((await ask('questions ask', { input: {} }, 'a')).exit, 0);
   assert.equal((await ask('run', { prompt: 'do it' }, 't1')).exit, 0);
   const ticket = JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8'));
@@ -629,52 +643,25 @@ test('supervisor done on an empty queue answers stopping and starts the stop of 
 
 const echoArgv = { hostCall: (call) => ({ status: 0, stdout: `{"data":{"argv":${JSON.stringify(call.argv)}}}\n` }) };
 
-test('the confined reads and the wake (supervisor queue, plans, wake and slots) run the host verb and return its JSON', async (t) => {
-  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
-  assert.deepEqual((await ask('supervisor queue', {}, 'q1', echoArgv)).line.data.argv, ['supervisor', 'queue', '--json']);
-  assert.deepEqual((await ask('supervisor plans', {}, 'q2', echoArgv)).line.data.argv, ['supervisor', 'plans', '--json']);
-  assert.deepEqual((await ask('slots', {}, 'q3', echoArgv)).line.data.argv, ['slots', '--json']);
-  assert.deepEqual((await ask('supervisor wake', {}, 'q7', echoArgv)).line.data.argv, ['supervisor', 'wake', '--json']);
-  assert.equal((await ask('supervisor wake', { x: 1 }, 'q10', echoArgv)).line.code, 'bad-args');
-  assert.equal((await ask('slots', { x: 1 }, 'q4', echoArgv)).line.code, 'bad-args');
-});
-
-test('the confined questions list runs the host list for the open, answered or all questions and refuses another which', async (t) => {
-  const { ask } = headCase(t, { persona: 'shaper', name: 'x', writes: [] });
-  assert.deepEqual((await ask('questions list', {}, 'l1', echoArgv)).line.data.argv, ['questions', '--json']);
-  assert.deepEqual((await ask('questions list', { which: 'answered' }, 'l2', echoArgv)).line.data.argv, ['questions', '--answered', '--json']);
-  assert.deepEqual((await ask('questions list', { which: 'all' }, 'l3', echoArgv)).line.data.argv, ['questions', '--all', '--json']);
-  assert.equal((await ask('questions list', { which: 'constructor' }, 'l4', echoArgv)).line.code, 'bad-args');
-  assert.equal((await ask('questions list', { x: 1 }, 'l5', echoArgv)).line.code, 'bad-args');
-});
-
 test('a host refusal keeps its code, from the JSON line or from stderr', async (t) => {
   const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
-  const json = await ask('supervisor queue', {}, 'q5', { hostCall: () => ({ status: 1, stdout: '{"code":"event-store-no-repository","message":"none"}\n' }) });
+  const json = await ask('supervisor done', {}, 'q5', { hostCall: () => ({ status: 1, stdout: '{"code":"event-store-no-repository","message":"none"}\n' }) });
   assert.equal(json.line.code, 'event-store-no-repository');
-  const stderr = await ask('supervisor handled', { events: ['nope'] }, 'q7', { hostCall: () => ({ status: 4, stdout: '', stderr: 'fgos: no event raised with id nope [event-unknown]\n' }) });
+  const stderr = await ask('supervisor done', {}, 'q7', { hostCall: () => ({ status: 4, stdout: '', stderr: 'fgos: no event raised with id nope [event-unknown]\n' }) });
   assert.equal(stderr.line.code, 'event-unknown');
 });
 
 test('the host answer is read as one indented document, and an answer that is no JSON or too large is refused by name', async (t) => {
   const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
-  const pretty = await ask('supervisor queue', {}, 'q6', { hostCall: () => ({ status: 0, stdout: JSON.stringify({ contract: 'fgos.v1', data: { events: [{ id: 'e1' }] } }, null, 2) }) });
-  assert.deepEqual(pretty.line.data, { events: [{ id: 'e1' }] });
-  const text = await ask('supervisor queue', {}, 'q8', { hostCall: () => ({ status: 0, stdout: 'queue: 2 events\n' }) });
+  const pretty = await ask('supervisor done', {}, 'q6', { hostCall: () => ({ status: 0, stdout: JSON.stringify({ contract: 'fgos.v1', data: { done: false } }, null, 2) }) });
+  assert.deepEqual(pretty.line.data, { done: false });
+  const text = await ask('supervisor done', {}, 'q8', { hostCall: () => ({ status: 0, stdout: 'queue: 2 events\n' }) });
   assert.equal(text.line.code, 'host-output-unreadable');
-  const empty = await ask('supervisor queue', {}, 'q9', { hostCall: () => ({ status: 0, stdout: '' }) });
+  const empty = await ask('supervisor done', {}, 'q9', { hostCall: () => ({ status: 0, stdout: '' }) });
   assert.equal(empty.line.code, 'host-output-unreadable');
-  const big = await ask('supervisor plans', {}, 'q10', { hostCall: () => ({ status: 0, stdout: JSON.stringify({ data: { plans: 'x'.repeat(61_000) } }) }) });
+  const big = await ask('supervisor done', {}, 'q10', { hostCall: () => ({ status: 0, stdout: JSON.stringify({ data: { plans: 'x'.repeat(61_000) } }) }) });
   assert.equal(big.line.code, 'reply-too-large');
   assert.match(big.line.message, /\d{5} bytes/);
-});
-
-test('supervisor handled sends every id to the host verb and refuses a bad id list', async (t) => {
-  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
-  const handled = await ask('supervisor handled', { events: ['ev-1', 'ev-2', 'ev-3'] }, 'h1', echoArgv);
-  assert.deepEqual(handled.line.data.argv, ['supervisor', 'handled', 'ev-1', 'ev-2', 'ev-3', '--json']);
-  for (const events of [[], ['-x'], 'ev-1', [1]]) assert.equal((await ask('supervisor handled', { events }, 'h2', echoArgv)).line.code, 'bad-args');
-  assert.equal((await ask('supervisor handled', { event: 'ev-1' }, 'h3', echoArgv)).line.code, 'bad-args', 'the single-id key is gone');
 });
 
 test('supervisor done reports stopping only when the detached stop process started', async (t) => {
@@ -771,51 +758,9 @@ test('session start passes forQuestion down to the opening, and the opening carr
   await assert.rejects(startHead({ persona: 'planner', name: 'q', forQuestion: 'bad id!', projectRoot: project }, { env: {}, ports }), (err) => err.code === 'bad-question');
 });
 
-// ---- coordination verbs: raise, tune, read and type on site, evidence, the stop rule and the secretary run -------
+// ---- coordination verbs: evidence, the stop rule and the secretary run -------
 
 const hostEcho = (calls) => (call) => { calls.push(call); return { status: 0, stdout: `{"data":{"argv":${JSON.stringify(call.argv)}}}\n` }; };
-
-test('supervisor raise passes a coordination event to the host verb and refuses a multi-line or dash-led field', async (t) => {
-  const { ask } = headCase(t, { persona: 'secretary', name: 'miu', writes: [] });
-  const calls = [];
-  const done = await ask('supervisor raise', { kind: 'coordination-handoff', ref: 'plans/p', reason: 'ready for a lead', next: 'fgos supervisor plans' }, 'r1', { hostCall: hostEcho(calls) });
-  assert.deepEqual(done.line.data.argv, ['supervisor', 'raise', '--kind', 'coordination-handoff', '--ref', 'plans/p', '--reason', 'ready for a lead', '--next', 'fgos supervisor plans', '--json']);
-  for (const bad of [{ kind: 'handoff', ref: 'r', reason: 'x' }, { kind: 'coordination-help', ref: 'r', reason: 'two\nlines' }, { kind: 'coordination-help', ref: '-r', reason: 'x' }, { kind: 'coordination-help', ref: 'r' }]) {
-    assert.equal((await ask('supervisor raise', bad, 'r2', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
-  }
-  assert.equal(calls.length, 1, 'a refused request never reaches the host');
-});
-
-test('watcher tune sends a definition with arm or disarm and whole-number settings, and refuses anything else', async (t) => {
-  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
-  const calls = [];
-  const done = await ask('watcher tune', { definition: 'session-idle', arm: true, set: ['sessionIdleLimit=3', 'activeIntervalSec=30'] }, 'w1', { hostCall: hostEcho(calls) });
-  assert.deepEqual(done.line.data.argv, ['watcher', 'tune', 'session-idle', '--set', 'sessionIdleLimit=3', '--set', 'activeIntervalSec=30', '--arm', '--json']);
-  for (const bad of [{ definition: 'Bad Name' }, { set: ['limit=abc'] }, { set: ['a=1;rm'] }, { arm: 'yes' }, { other: 1 }]) {
-    assert.equal((await ask('watcher tune', bad, 'w2', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
-  }
-  assert.equal(calls.length, 1);
-});
-
-test('session read and session type name their target as given and refuse a text that reads as an option', async (t) => {
-  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
-  const calls = [];
-  const read = await ask('session read', { target: 'head:lead-proj-p', lines: 80 }, 'a1', { hostCall: hostEcho(calls) });
-  assert.deepEqual(read.line.data.argv, ['session', 'read', 'head:lead-proj-p', '--lines', '80', '--json']);
-  const typed = await ask('session type', { target: 'lead:S6A', text: 'continue please' }, 'a2', { hostCall: hostEcho(calls) });
-  assert.deepEqual(typed.line.data.argv, ['session', 'type', 'lead:S6A', '--text', 'continue please', '--json']);
-  assert.equal((await ask('session type', { target: 'lead:S6A', text: '--yes' }, 'a2b', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
-  assert.equal((await ask('session read', { target: '--evil' }, 'a3', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
-  assert.equal((await ask('session read', { target: 'x', lines: 5000 }, 'a4', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
-  assert.equal((await ask('session type', { target: 'x', text: '' }, 'a5', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
-  assert.equal(calls.length, 2);
-});
-
-test('the refusal of the host verb, target-not-stuck, comes back as the code of the reply', async (t) => {
-  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
-  const refused = await ask('session type', { target: 'lead:S6A', text: 'go' }, 'a6', { hostCall: () => ({ status: 2, stdout: '', stderr: 'fgos: no open supervision event names it [target-not-stuck]\n' }) });
-  assert.equal(refused.line.code, 'target-not-stuck');
-});
 
 test('metrics record writes coordination kinds only: the records go to the host verb on stdin and any other kind refuses the whole call', async (t) => {
   const { ask } = headCase(t, { persona: 'secretary', name: 'miu', writes: [] });
@@ -829,14 +774,6 @@ test('metrics record writes coordination kinds only: the records go to the host 
   assert.equal(refused.line.code, 'kind-not-allowed');
   assert.equal((await ask('metrics record', { records: [] }, 'm3', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
   assert.equal(calls.length, 1, 'a refused call writes nothing');
-});
-
-test('metrics prune is a dry run unless apply is set, and settled subjects are kind:id', async (t) => {
-  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
-  const calls = [];
-  assert.deepEqual((await ask('metrics prune', {}, 'p1', { hostCall: hostEcho(calls) })).line.data.argv, ['metrics', 'prune', '--json']);
-  assert.deepEqual((await ask('metrics prune', { apply: true, settled: ['session:abc'] }, 'p2', { hostCall: hostEcho(calls) })).line.data.argv, ['metrics', 'prune', '--settled', 'session:abc', '--apply', '--json']);
-  assert.equal((await ask('metrics prune', { settled: ['nokind'] }, 'p3', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
 });
 
 test('the coordinators stop any head but never a persona that holds no head grant', async (t) => {
@@ -895,152 +832,3 @@ test('a secretary run that writes needs a linked worktree', async (t) => {
   assert.deepEqual(ticketArgv(ticketFile('v4')).slice(-5), ['--writes', 'docs/a.md', '--worktree', worktree, '--json']);
 });
 
-test('friction record runs the host verb with its flags and refuses bad args', async (t) => {
-  const { ask } = headCase(t, { persona: 'planner', name: 'x', writes: [] });
-  const calls = [];
-  const done = await ask('friction record', {
-    subject: 'work:tsk-1',
-    kind: 'bug',
-    layer: 'verification',
-    'error-class': 'verify-miss',
-    disposition: 'advisory',
-    producer: 'test',
-    attempts: 2,
-    'doc-type': 'reference',
-    ref: ['work:tsk-0'],
-    detail: 'something went wrong',
-  }, 'f1', { hostCall: hostEcho(calls) });
-  assert.equal(done.exit, 0);
-  assert.deepEqual(calls[0].argv, [
-    'friction', 'record',
-    '--subject', 'work:tsk-1',
-    '--kind', 'bug',
-    '--layer', 'verification',
-    '--error-class', 'verify-miss',
-    '--disposition', 'advisory',
-    '--producer', 'test',
-    '--doc-type', 'reference',
-    '--attempts', '2',
-    '--ref', 'work:tsk-0',
-    '--detail', 'something went wrong',
-    '--json',
-  ]);
-
-  for (const bad of [
-    { subject: '--bad' },
-    { subject: 'invalid ref with spaces' },
-    { layer: '-x' },
-    { 'error-class': '--bad' },
-    { errorClass: 'verify-miss' },
-    { docType: 'reference' },
-    { attempts: -1 },
-    { attempts: 'abc' },
-    { 'detail-stdin': true },
-    { 'detail-stdin': 'yes' },
-    { ref: ['bad ref with spaces!'] },
-    { detail: 'x'.repeat(4097) },
-    { unknown: 1 },
-  ]) {
-    assert.equal((await ask('friction record', bad, 'f2', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
-  }
-});
-
-test('config patch runs the host verb with --project-only and refuses bad args', async (t) => {
-  const { ask } = headCase(t, { persona: 'supervisor', name: 'x', writes: [] });
-  const calls = [];
-  const done = await ask('config patch', {
-    file: 'patch.yaml',
-    reason: 'tune watcher',
-  }, 'cp1', { hostCall: hostEcho(calls) });
-  assert.equal(done.exit, 0);
-  assert.deepEqual(calls[0].argv, [
-    'config', 'patch',
-    'patch.yaml',
-    '--project-only',
-    '--reason', 'tune watcher',
-    '--json',
-  ]);
-
-  const calls2 = [];
-  const done2 = await ask('config patch', {
-    file: 'changes.json',
-  }, 'cp2', { hostCall: hostEcho(calls2) });
-  assert.equal(done2.exit, 0);
-  assert.deepEqual(calls2[0].argv, [
-    'config', 'patch',
-    'changes.json',
-    '--project-only',
-    '--json',
-  ]);
-
-  for (const bad of [
-    {},
-    { file: '' },
-    { file: '--bad' },
-    { file: 123 },
-    { file: 'x'.repeat(4097) },
-    { file: 'patch.yaml', reason: '--bad' },
-    { file: 'patch.yaml', reason: 123 },
-    { file: 'patch.yaml', reason: '' },
-    { file: 'patch.yaml', reason: 'x'.repeat(4097) },
-    { file: 'patch.yaml', global: true },
-    { file: 'patch.yaml', 'project-only': true },
-    { file: 'patch.yaml', unknown: 1 },
-  ]) {
-    assert.equal((await ask('config patch', bad, 'cp-bad', { hostCall: hostEcho(calls) })).line.code, 'bad-args');
-  }
-});
-
-test('a confined head records a friction via --detail-stdin that reads stdin and friction list shows', async (t) => {
-  const dir = scratch(t);
-  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-  const socketPath = path.join(dir, 'req.sock');
-  const bin = process.env.FGOS_HOST_BIN;
-  const runDir = scratch(t);
-  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({
-    v: 3,
-    cwd: dir,
-    hostBin: bin,
-    session: {
-      role: 'head:planner-x',
-      persona: 'planner',
-      name: 'x',
-      verbs: ['friction record'],
-      writes: [],
-      requestSocketPath: socketPath,
-    },
-  }));
-
-  const seen = serveOnce(t, socketPath, async (request) => {
-    const res = await runHeadRequest({ runDir, request });
-    return { type: 'REPLY', id: request.id, result: res.line.result, data: res.line.data };
-  });
-  await listening();
-
-  const child = spawn(bin, [
-    'friction', 'record',
-    '--subject', 'work:tsk-confined-stdin',
-    '--layer', 'verification',
-    '--error-class', 'verify-miss',
-    '--disposition', 'advisory',
-    '--producer', 'test',
-    '--detail-stdin',
-    '--json',
-  ], {
-    cwd: dir,
-    env: { ...process.env, FGOS_CONFINED: '1', [HEAD_REQUEST_SOCKET_ENV]: socketPath },
-  });
-  const detail = 'confined test friction from stdin';
-  child.stdin.write(detail);
-  child.stdin.end();
-  const exitCode = await new Promise((resolve) => child.on('close', resolve));
-  assert.equal(exitCode, 0);
-  assert.equal(seen.length, 1);
-  assert.equal(seen[0].verb, 'friction record');
-  assert.equal(seen[0].args.detail, detail);
-
-  const list = spawnSync(bin, ['friction', 'list', '--json'], { cwd: dir, encoding: 'utf8' });
-  assert.equal(list.status, 0);
-  const items = JSON.parse(list.stdout).data;
-  assert.ok(items.some((item) => item.subject?.id === 'tsk-confined-stdin' && item.detail === 'confined test friction from stdin'));
-});
