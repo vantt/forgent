@@ -515,10 +515,10 @@ fn legacy_snapshots_still_read_as_fixed_addresses() {
     std::fs::write(fgos.paths().snapshot(), &fixture).unwrap();
     let state = rec::read_state(&record);
     // Read as the current version: the one section a version 1 snapshot lacks
-    // is empty, the version is the current one and the retired binding field
+    // is empty, the version stays compatible at 2 and the retired binding field
     // is gone; nothing else changes.
     let mut upgraded = expected.clone();
-    upgraded["schema_version"] = fgos_mailbox_core::SNAPSHOT_SCHEMA_VERSION.into();
+    upgraded["schema_version"] = 2.into();
     // A binding's retired `handle` is read and dropped: the session's identifiers live in Identity.
     for binding in upgraded["bindings"].as_object_mut().unwrap().values_mut() {
         binding.as_object_mut().unwrap().remove("handle");

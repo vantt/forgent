@@ -23,18 +23,6 @@ fn the_shared_senders_full_ceiling_population_reads_under_the_snapshot_cap() {
         key
     };
     let (one, two, sender) = (long('a'), long('b'), long('s'));
-    // Role intent can require six JSON bytes per character. Use the
-    // largest encoding accepted by the core; fixed headers are smaller.
-    let roles = [
-        format!(
-            "{}a",
-            "\u{0000}".repeat(limits.frame.max_header_chars as usize - 1)
-        ),
-        format!(
-            "{}b",
-            "\u{0000}".repeat(limits.frame.max_header_chars as usize - 1)
-        ),
-    ];
     let step = limits.human.fallback_window_sec + 1;
     let windows = limits
         .header_horizon_sec()
@@ -50,23 +38,23 @@ fn the_shared_senders_full_ceiling_population_reads_under_the_snapshot_cap() {
             for window in 0..windows {
                 let now = T0.plus_secs(window * step);
                 for i in 0..limits.session.budget as usize {
-                    let recipient = i % 2;
-                    let mut req = rec::send_req(&sender, &names[recipient], "m");
-                    req.to = fgos_mailbox_core::Recipient::Role {
-                        role: roles[recipient].clone(),
-                        key: rec::key([&one, &two][recipient]),
-                    };
-                    state.send(req, now, &limits, ids).unwrap();
+                    state
+                        .send(
+                            rec::send_req(&sender, &names[i % 2], "m"),
+                            now,
+                            &limits,
+                            ids,
+                        )
+                        .unwrap();
                 }
-                for (i, recipient) in [&one, &two].into_iter().enumerate() {
-                    let claim = state.claim_with_roles(
+                for recipient in [&one, &two] {
+                    let claim = state.claim(
                         &rec::key(recipient),
                         Generation::FIRST,
                         Checkpoint::Step,
                         now,
                         &limits,
                         ids,
-                        &|binding, role| role == roles[i] && binding.key == rec::key(recipient),
                     );
                     state.finish(
                         &rec::key(recipient),

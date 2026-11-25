@@ -58,88 +58,11 @@ pub(super) fn holds_role(
     binding: &fgos_mailbox_core::Binding,
     role: &str,
 ) -> bool {
-    let liveness = fgos_mailbox::head::stored_liveness(binding);
-    if liveness == Liveness::Dead || fgos_identity::is_attempt_writer_id(binding.key.as_str()) {
+    let Some(head) = verbs::head_view(binding) else {
         return false;
-    }
-    let head = verbs::HeadView {
-        key: binding.key.clone(),
-        name: binding.name.clone(),
-        cli: binding.cli.clone(),
-        liveness,
-        head: fgos_mailbox::hook::bound_head_record(binding),
     };
     matches!(address(root, fgos_dir, role, &[head]),
         Addressed::Head { key, role_holder: Some(_) } if key == binding.key)
-}
-
-/// Compose Identity-aware claiming with the existing hook emit/finish door.
-fn claim_role_inbox(
-    record: &Record,
-    key: &WriterKey,
-    wait: Wait,
-    limits: &fgos_mailbox_core::Limits,
-    handle_of: &fgos_mailbox::hook::HandleOf<'_>,
-    holder: &dyn Fn(&fgos_mailbox_core::Binding, &str) -> bool,
-    stdout: &mut dyn std::io::Write,
-) -> Result<verbs::InboxClaimed, String> {
-    use fgos_mailbox::hook::shell::{claimed_sizes, emit_and_finish, Emit, WriteGate};
-    use fgos_mailbox::hook::{claim_inbox_with_roles, InboxClaim};
-    use fgos_mailbox::record::Reported;
-    if fgos_identity::is_attempt_writer_id(key.as_str()) {
-        return verbs::inbox_claim(record, key, wait, &now, limits, handle_of, stdout);
-    }
-    let at = now();
-    let held = record
-        .hold(wait, at, limits, |state, ids| {
-            let (claim, changed) = claim_inbox_with_roles(state, key, at, limits, ids, holder);
-            let sizes = match &claim {
-                InboxClaim::Claimed(claimed) => claimed_sizes(state, claimed),
-                _ => Default::default(),
-            };
-            Reported {
-                value: (claim, sizes),
-                changed,
-            }
-        })
-        .map_err(|error| record_error_text(error.code()))?;
-    let (claim, sizes) = held.value.value;
-    let claimed = match claim {
-        InboxClaim::Claimed(claimed) => claimed,
-        other => {
-            let text = fgos_mailbox_core::inbox_text(
-                match other {
-                    InboxClaim::NoAddress => None,
-                    _ => Some(&[]),
-                },
-                limits,
-            );
-            return Ok(verbs::InboxClaimed {
-                written: writeln!(stdout, "{text}")
-                    .and_then(|()| stdout.flush())
-                    .is_ok(),
-                ..Default::default()
-            });
-        }
-    };
-    let emitted = emit_and_finish(
-        &Emit {
-            record,
-            wait,
-            limits,
-            clock: &now,
-            gate: &WriteGate::new(),
-            handle_of,
-        },
-        &claimed,
-        &sizes,
-        stdout,
-    );
-    Ok(verbs::InboxClaimed {
-        claimed: claimed.items.iter().map(|item| item.id.clone()).collect(),
-        written: emitted.stdout_written,
-        finished: emitted.finished,
-    })
 }
 
 pub use super::mailbox_surface::{
@@ -943,10 +866,11 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
             let holder = |binding: &fgos_mailbox_core::Binding, role: &str| {
                 holds_role(root.as_deref(), &fgos_dir, binding, role)
             };
-            match claim_role_inbox(
+            match verbs::inbox_claim_with_roles(
                 &record,
                 &key,
                 Wait::Ms(loaded.hook.verbs.lock_wait_ms),
+                &now,
                 &loaded.limits,
                 &handle_of,
                 &holder,

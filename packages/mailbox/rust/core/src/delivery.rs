@@ -650,6 +650,7 @@ impl MailboxState {
             .messages
             .iter()
             .filter(|h| crate::policy::pending(h))
+            .filter(|h| &h.to != key || h.to_generation != generation)
             .filter_map(|h| h.to_role.clone())
             .collect::<BTreeSet<_>>()
             .into_iter()
@@ -677,7 +678,7 @@ impl MailboxState {
                 }
             }
         }
-        if !self.has_pending(key, generation, &roles) {
+        if !self.has_pending(key, generation) {
             return Claim::empty(routed, 0);
         }
         // A bounded step that would take nothing but a pointer, already
@@ -688,9 +689,9 @@ impl MailboxState {
         if matches!(checkpoint, Checkpoint::BoundedStep(_))
             && !self.time_rule_due(now, limits)
             && !routed
-            && self.drained_since_newest(key, generation, &roles)
+            && self.drained_since_newest(key, generation)
         {
-            let (picks, too_large) = self.select(key, generation, checkpoint, limits, &roles);
+            let (picks, too_large) = self.select(key, generation, checkpoint, limits);
             if picks.is_empty() && too_large > 0 {
                 return Claim::empty(false, too_large);
             }
@@ -700,7 +701,7 @@ impl MailboxState {
         if let Some(binding) = self.bindings.get_mut(key) {
             binding.last_drain_at = Some(now);
         }
-        let (picks, too_large) = self.select(key, generation, checkpoint, limits, &roles);
+        let (picks, too_large) = self.select(key, generation, checkpoint, limits);
         if picks.is_empty() {
             return Claim::empty(true, too_large);
         }
@@ -728,18 +729,12 @@ impl MailboxState {
 
     /// Whether `key`'s last drain is at or after the newest item pending
     /// for `generation`.
-    fn drained_since_newest(
-        &self,
-        key: &WriterKey,
-        generation: Generation,
-        roles: &BTreeSet<String>,
-    ) -> bool {
+    fn drained_since_newest(&self, key: &WriterKey, generation: Generation) -> bool {
         let mail = self
             .messages
             .iter()
             .filter(|h| {
-                h.to_role.as_ref().is_none_or(|r| roles.contains(r))
-                    && &h.to == key
+                &h.to == key
                     && h.to_generation == generation
                     && matches!(
                         h.state,
@@ -771,16 +766,12 @@ impl MailboxState {
         generation: Generation,
         checkpoint: Checkpoint,
         limits: &Limits,
-        roles: &BTreeSet<String>,
     ) -> (Vec<Pick>, u32) {
         let eligible = self
             .messages
             .iter()
             .enumerate()
-            .filter(|(_, h)| {
-                h.to_role.as_ref().is_none_or(|r| roles.contains(r))
-                    && eligible(h, key, generation, checkpoint)
-            })
+            .filter(|(_, h)| eligible(h, key, generation, checkpoint))
             .map(|(i, _)| Pick::Message(i))
             .chain(
                 self.notices
@@ -1059,15 +1050,9 @@ impl MailboxState {
     /// Whether `key` has mail or notices pending for `generation`: the only
     /// case in which a drain sweeps and stamps `last_drain_at`, so a drain
     /// of an empty address writes nothing.
-    fn has_pending(
-        &self,
-        key: &WriterKey,
-        generation: Generation,
-        roles: &BTreeSet<String>,
-    ) -> bool {
+    fn has_pending(&self, key: &WriterKey, generation: Generation) -> bool {
         let mail = self.messages.iter().any(|h| {
-            h.to_role.as_ref().is_none_or(|r| roles.contains(r))
-                && &h.to == key
+            &h.to == key
                 && h.to_generation == generation
                 && matches!(
                     h.state,

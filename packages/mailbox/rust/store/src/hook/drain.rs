@@ -39,12 +39,6 @@ use fgos_mailbox_core::{
 };
 use fgos_process::facts::Record;
 
-/// Decode the process facts of a bound head for the host's Identity
-/// adapter, using the store's single reader of its opaque head text.
-pub fn bound_head_record(binding: &fgos_mailbox_core::Binding) -> Record {
-    record_of_head_text(&binding.head)
-}
-
 /// The head process of the calling CLI, as the shell found it.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct HeadFacts {
@@ -420,7 +414,7 @@ pub fn finish(state: &mut MailboxState, ticket: &FinishTicket, now: Timestamp) -
 /// What `inbox --claim` found for one caller.
 #[cfg(unix)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum InboxClaim {
+pub(crate) enum InboxClaim {
     /// The caller has no binding.
     NoAddress,
     /// Nothing pending.
@@ -433,19 +427,7 @@ pub enum InboxClaim {
 /// current generation, unbounded (a tool's stdout has no inline limit),
 /// claimed like a step drain. Returns whether the state changed.
 #[cfg(unix)]
-pub(crate) fn claim_inbox(
-    state: &mut MailboxState,
-    key: &WriterKey,
-    now: Timestamp,
-    limits: &Limits,
-    ids: &mut dyn IdSource,
-) -> (InboxClaim, bool) {
-    claim_inbox_with_roles(state, key, now, limits, ids, &|_, _| false)
-}
-
-/// An explicit inbox drain with the same Identity facts as the hook.
-#[cfg(unix)]
-pub fn claim_inbox_with_roles(
+pub(crate) fn claim_inbox_with_roles(
     state: &mut MailboxState,
     key: &WriterKey,
     now: Timestamp,

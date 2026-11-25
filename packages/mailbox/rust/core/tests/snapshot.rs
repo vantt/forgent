@@ -168,7 +168,17 @@ fn the_snapshot_version_check_refuses_a_newer_version_refuses_an_older_one_as_un
 ) {
     let current = serde_json::to_string(&populated_state()).unwrap();
     let version: SnapshotVersion = serde_json::from_str(&current).unwrap();
-    assert_eq!(version.schema_version, SNAPSHOT_SCHEMA_VERSION);
+    assert_eq!(
+        version.schema_version, 2,
+        "no role intent needs no version bump"
+    );
+    assert_eq!(
+        SnapshotVersion {
+            schema_version: SNAPSHOT_SCHEMA_VERSION
+        }
+        .check(),
+        Ok(())
+    );
     assert_eq!(version.check(), Ok(()));
 
     let mut newer = serde_json::to_value(populated_state()).unwrap();
@@ -210,7 +220,7 @@ fn a_snapshot_of_another_version_does_not_deserialize_even_when_the_caller_skips
 
 /// A snapshot written before mail could cross machines (no `remote` section,
 /// no header origin) reads as the current version, empty where it is new, and
-/// is written back as the current one.
+/// is written back as version 2 while no header carries role intent.
 #[test]
 fn a_version_1_snapshot_reads_as_the_current_version_with_no_remote_state() {
     let mut old = serde_json::to_value(populated_state()).unwrap();
@@ -220,7 +230,42 @@ fn a_version_1_snapshot_reads_as_the_current_version_with_no_remote_state() {
     assert!(!state.remote_baselined());
     assert!(state.remote_cursor().is_empty());
     let written = serde_json::to_value(&state).unwrap();
-    assert_eq!(written["schema_version"], SNAPSHOT_SCHEMA_VERSION);
+    assert_eq!(written["schema_version"], 2);
+}
+
+/// The shape's owning proof: role intent alone requires the new version,
+/// including after delivery; stripping that intent needs only version 2 again.
+#[test]
+fn snapshots_use_version_two_until_a_header_carries_role_intent() {
+    let mut pair = common::Pair::new(t(100));
+    assert_eq!(
+        serde_json::to_value(&pair.state).unwrap()["schema_version"],
+        2
+    );
+    pair.send("a", common::B_NAME, "fixed", t(101));
+    assert_eq!(
+        serde_json::to_value(&pair.state).unwrap()["schema_version"],
+        2
+    );
+    let mut request = plain("a", common::B_NAME, "role");
+    request.to = fgos_mailbox_core::Recipient::Role {
+        role: "head:supervisor-main".into(),
+        key: key("b"),
+    };
+    pair.try_send(request, t(102)).unwrap();
+    pair.deliver("b", t(103));
+    let mut value = serde_json::to_value(&pair.state).unwrap();
+    assert_eq!(value["schema_version"], 3);
+    let reread: MailboxState = serde_json::from_value(value.clone()).unwrap();
+    assert_eq!(reread, pair.state);
+    for header in value["messages"].as_array_mut().unwrap() {
+        header.as_object_mut().unwrap().remove("to_role");
+    }
+    let without_roles: MailboxState = serde_json::from_value(value).unwrap();
+    assert_eq!(
+        serde_json::to_value(without_roles).unwrap()["schema_version"],
+        2
+    );
 }
 
 /// A binding no longer keeps the head's native handle (a Codex thread id; the

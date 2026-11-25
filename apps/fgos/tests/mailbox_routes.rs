@@ -1863,6 +1863,39 @@ fn a_role_and_a_handle_reach_the_head_identity_resolved_among_two_heads_and_the_
         vec!["offered", "offered", "recorded"],
         "role mail follows Identity's holder; exact-handle mail stays with the predecessor"
     );
+
+    // Queue another role delivery, then move the role back through Identity
+    // before an explicit tool drain. This must re-route, not merely claim
+    // mail already addressed to the draining key and generation.
+    let sent = send_to(&scene, "lead:PROBE", false);
+    assert_eq!(sent.status.code(), Some(0), "{sent:?}");
+    let entry = fgos_identity::directory::Entry::new(
+        info.id,
+        info.handle,
+        "codex".into(),
+        None,
+        None,
+        vec!["lead:PROBE".into(), "work:probe-run".into()],
+        fgos_identity::current::os_record(codex.pid()),
+    );
+    fgos_identity::directory::register(&root, entry, true, &fgos_process::facts::judge_here)
+        .unwrap();
+    let claimed = scene.run(
+        &scene.main(),
+        Some(holder_key),
+        &["mailbox", "inbox", "--claim"],
+        b"",
+    );
+    assert_eq!(claimed.status.code(), Some(0), "{claimed:?}");
+    assert!(
+        String::from_utf8_lossy(&claimed.stdout).contains("<mailbox-message"),
+        "{claimed:?}"
+    );
+    assert_eq!(
+        scene.message_states(),
+        vec!["offered", "offered", "offered", "offered"],
+        "the explicit role-aware drain offers redirected role mail and its own fixed-handle mail"
+    );
 }
 
 /// A Codex key whose Identity handle suffix equals `victim`'s: what a

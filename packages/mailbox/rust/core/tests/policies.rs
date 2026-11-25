@@ -413,6 +413,44 @@ fn a_sender_key_longer_than_the_header_bound_is_refused_before_any_other_check_a
     assert_eq!(code(&at_bound), "recorded");
 }
 
+// Admission owns the role alphabet/size invariant; no earlier test covers
+// role text from a direct core caller rather than Identity's host adapter.
+#[test]
+fn role_admission_bounds_kind_and_name_without_json_escaping() {
+    let bound = Pair::new(t(0)).limits.frame.max_header_chars as usize;
+    let at_bound = format!("head:{}", "a".repeat(bound - 5));
+    for (role, accepted) in [
+        ("head:supervisor-main".to_owned(), true),
+        ("lead:PROBE".to_owned(), true),
+        ("work:probe-run".to_owned(), true),
+        (at_bound.clone(), true),
+        (format!("{at_bound}a"), false),
+        (String::new(), false),
+        ("head".into(), false),
+        (":name".into(), false),
+        ("head:".into(), false),
+        ("head:a:b".into(), false),
+        ("head:a\"b".into(), false),
+        ("head:a\\b".into(), false),
+        ("head:a\nb".into(), false),
+        ("head:a\0b".into(), false),
+        ("head:é".into(), false),
+    ] {
+        let mut pair = Pair::new(t(0));
+        let mut req = plain("a", B_NAME, "hi");
+        req.to = fgos_mailbox_core::Recipient::Role {
+            role: role.clone(),
+            key: key("b"),
+        };
+        let outcome = pair.try_send(req, t(1));
+        assert_eq!(outcome.is_ok(), accepted, "{role:?}: {outcome:?}");
+        assert_eq!(pair.state.messages().count(), usize::from(accepted));
+        if !accepted {
+            assert_eq!(code(&outcome), "unknown-name");
+        }
+    }
+}
+
 #[test]
 fn a_new_sender_generation_inherits_no_reply_link_and_cannot_hint_at_mail_offered_to_the_old_one() {
     let mut pair = Pair::new(t(0));

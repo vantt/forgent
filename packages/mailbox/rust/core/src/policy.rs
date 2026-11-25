@@ -209,8 +209,17 @@ impl MailboxState {
         check_sender_key(&req.from, limits)?;
         let role = match &req.to {
             Recipient::Role { role, .. } => {
-                if role.is_empty() || role.chars().count() > limits.frame.max_header_chars as usize
-                {
+                // Identity owns role resolution; admission only accepts its bounded
+                // kind:name alphabet so no JSON escaping can inflate a header.
+                let valid = role.split_once(':').is_some_and(|(kind, name)| {
+                    !kind.is_empty()
+                        && kind.bytes().all(|b| b.is_ascii_lowercase())
+                        && !name.is_empty()
+                        && name
+                            .bytes()
+                            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-'))
+                });
+                if !valid || role.len() > limits.frame.max_header_chars as usize {
                     return Err(Refusal::Alias(crate::delivery::AliasRefusal::Unknown {
                         candidates: Vec::new(),
                     }));

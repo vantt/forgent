@@ -12,14 +12,12 @@ pub mod resolve;
 #[cfg(unix)]
 pub mod shell;
 
-#[cfg(unix)]
-pub(crate) use drain::claim_inbox;
 pub use drain::{
-    begin, begin_with_roles, bound_head_record, finish, render_reply, Begun, Claimed, FinishTicket,
-    HandleOf, HeadFacts, HookCall, HookReply, PointerOnly, QuietReason,
+    begin, begin_with_roles, finish, render_reply, Begun, Claimed, FinishTicket, HandleOf,
+    HeadFacts, HookCall, HookReply, PointerOnly, QuietReason,
 };
 #[cfg(unix)]
-pub use drain::{claim_inbox_with_roles, InboxClaim};
+pub(crate) use drain::{claim_inbox_with_roles, InboxClaim};
 pub use limits::{BreakerLimits, HookCallLimits, HookLimits, StopBlockLimits, VerbLimits};
 
 use fgos_mailbox_core::Cli;

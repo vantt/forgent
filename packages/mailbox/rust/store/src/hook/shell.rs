@@ -351,7 +351,7 @@ fn drive(
 }
 
 /// What [`emit_and_finish`] needs besides the claim.
-pub struct Emit<'a> {
+pub(crate) struct Emit<'a> {
     pub record: &'a Record,
     pub wait: Wait,
     pub limits: &'a Limits,
@@ -361,7 +361,7 @@ pub struct Emit<'a> {
 }
 
 /// What the write and the finish did.
-pub struct Emitted {
+pub(crate) struct Emitted {
     pub stdout_written: bool,
     pub finished: bool,
     pub warnings: Vec<String>,
@@ -371,7 +371,7 @@ pub struct Emitted {
 /// and flush stdout, and only after a successful write take hold 2 to
 /// finish. A failed write never finishes. The one write-then-finish order,
 /// shared by the hook and `inbox --claim`.
-pub fn emit_and_finish(
+pub(crate) fn emit_and_finish(
     emit: &Emit<'_>,
     claimed: &Claimed,
     sizes: &BTreeMap<MessageId, u64>,
@@ -420,7 +420,7 @@ pub fn emit_and_finish(
 
 /// The sizes of the claimed bodies, read in the hold that claimed them
 /// (spec §6.4).
-pub fn claimed_sizes(
+pub(crate) fn claimed_sizes(
     state: &fgos_mailbox_core::MailboxState,
     claimed: &Claimed,
 ) -> BTreeMap<MessageId, u64> {

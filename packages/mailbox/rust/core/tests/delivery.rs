@@ -83,6 +83,34 @@ fn role_mail_follows_the_identity_holder_and_is_offered_once() {
         };
         let id = pair.try_send(request, t(100)).unwrap().id;
         let fixed = pair.send("a", B_NAME, "fixed handle", t(100));
+        // Ordinary delivery to the recorded key/generation needs no role
+        // lookup, even when that mail was originally sent through an alias.
+        let mut direct = pair.state.clone();
+        let claim = direct.claim_with_roles(
+            &key("b"),
+            G1,
+            Checkpoint::Step,
+            t(100),
+            &pair.limits,
+            &mut pair.ids,
+            &|_, _| panic!("already eligible mail must not read Identity"),
+        );
+        assert_eq!(
+            claim.items.iter().map(|i| i.id.clone()).collect::<Vec<_>>(),
+            vec![id.clone(), fixed.clone()]
+        );
+        direct.finish(&key("b"), G1, &claim.token.unwrap(), t(100));
+        let empty = direct.claim_with_roles(
+            &key("b"),
+            G1,
+            Checkpoint::Step,
+            t(100),
+            &pair.limits,
+            &mut pair.ids,
+            &|_, _| panic!("no pending role mail must not read Identity"),
+        );
+        assert!(empty.items.is_empty());
+        assert!(!empty.changed);
         let successor = if successor_key == "b" {
             pair.take_over("b", "codex", t(101))
         } else {
