@@ -95,6 +95,7 @@ export const EXPECTED_DOMAIN_CODES = {
   'slots': new Set(['done']),
   'supervisor raise': new Set(['bad-args', 'bad-event', 'kind-not-allowed']),
   'watcher tune': new Set(['bad-args', 'watcher-key-forbidden']),
+  'release run': new Set(['no-release-in-flight']),
   'session read': new Set(['session-not-found', 'target-not-found', 'session-unknown', 'target-unknown', 'ambiguous', 'session-has-no-pane', 'terminal-refused']),
   'session type': new Set(['session-not-found', 'target-not-found', 'session-unknown', 'target-unknown', 'ambiguous', 'target-not-stuck', 'session-has-no-pane', 'terminal-refused']),
   'metrics record': new Set(['kind-not-allowed']),
@@ -370,6 +371,16 @@ export function classifyOutcome(verb, isGranted, res) {
     }
   }
 
+  // A forwarded host verb's refusal can arrive under a wrapper code with its domain code only in the text:
+  // `provider failed: <code>: <message>`, or `<code>: <message>` for one of the verb's own codes.
+  if (!code || code === 'error' || code === 'host-failed' || (code === 'verb-failed' && !/^[a-z][a-z0-9-]*$/.test(reply?.detail || ''))) {
+    const text = [detail, rawErr, rawOut].filter(Boolean).join('\n');
+    const wrapped = /provider failed:\s*([a-z][a-z0-9-]*):/.exec(text);
+    const own = [...(EXPECTED_DOMAIN_CODES[verb] || [])].find((c) => text.includes(`${c}:`));
+    if (wrapped) code = wrapped[1];
+    else if (own) code = own;
+  }
+
   // 1. Refused as expected: verb-not-granted when the grant lacks the verb
   const isVerbNotGranted = code === 'verb-not-granted' || code === 'argv-not-allowed' ||
     rawOut.includes('verb-not-granted') ||
@@ -424,21 +435,10 @@ export function classifyOutcome(verb, isGranted, res) {
     };
   }
 
-  // The friction host verb reports its domain code only in the message text.
-  // Over the request socket, the reply is {ok:false, code:"error", detail:"... friction-invalid-input: invalid disposition ..."}
-  // without a structured domain code. For 'friction record' only, when the reply code is 'error'
-  // and the detail carries 'friction-invalid-input' together with 'disposition', the domain refusal
-  // proves the grant and the route passed.
-  if (verb === 'friction record' && code === 'error') {
-    const detailText = String(detail || rawErr || rawOut || '');
-    if (detailText.includes('friction-invalid-input') && detailText.toLowerCase().includes('disposition')) {
-      return {
-        observed: 'served',
-        code: 'friction-invalid-input',
-        detail: detail || 'domain refusal: friction-invalid-input',
-        reply,
-      };
-    }
+  const refusalText = `${detail || ''}\n${rawErr}\n${rawOut}`;
+  // watcher tune refuses a non-tunable key with the host's generic validation category.
+  if (verb === 'watcher tune' && code === 'validation' && refusalText.includes('is not tunable')) {
+    return { observed: 'served', code, detail: detail || 'domain refusal: key is not tunable', reply };
   }
 
   // 5. Domain refusal that proves the route ran
