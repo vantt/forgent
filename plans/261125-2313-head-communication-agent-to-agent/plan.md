@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Head to head mail from inside the cage: one send, the door picks the path and wakes the recipient, every refusal names its cause"
-status: ready
+status: running
 priority: P1
 blockedBy: []
 footprint:
@@ -37,7 +37,8 @@ footprint:
   - packages/identity/rust/src/directory.rs
   - docs/platform/agent-mailbox/spec.md
   - test/live/mailbox-heads.live.mjs
-base: 333cd72c81eabdab3bfda652dfc9633710e1da02
+base: 17a914d8acb4c1b16e9949dc8d60f5d433a3b0c2
+lead: head:lead-forgent-261125-2313-head-c-cdfd0
 source:
   - plans/discussions/ds-h3fvnp6qbt-head-communication-and-requests/DISCUSSION.md
   - p-rchuoa2v3k
