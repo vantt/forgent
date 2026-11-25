@@ -17,7 +17,11 @@ AGENTS.md asks a head that closes a lane to add one line at the top of
 land touching it is refused, while the same kind of land passed on 2026-11-24 (commit c99af30a3). The closing line for
 plan 261124-2320-claude-worker-allowed-tools went to the wake report instead.
 
-# Done means
+# Done when
 
 A head can land one board log line through `fgos land --paths` (either the gate skips the board's log, or the board
 carries a marker the check accepts), and the AGENTS.md board rule and the gate agree.
+
+# Notes
+
+Supervisor wake 2026-11-25 12:46 recorded the case; the board rule is in AGENTS.md.

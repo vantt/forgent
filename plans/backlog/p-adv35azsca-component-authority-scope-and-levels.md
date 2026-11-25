@@ -14,3 +14,7 @@ The owner wants to discuss component-authority further. Starting question: it ke
 # Done when
 
 The discussion settles with the owner's decisions and a hand-off for a planner, or ends with no change.
+
+# Notes
+
+Shaper discussion ds-zfqskcns7j carries the rounds; this row stays proposed until it settles.
