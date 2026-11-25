@@ -17,7 +17,8 @@ pointer to the file (`openingText`, `src/session-host/head-start.mjs:122-124`, u
 `packages/session-host/rust/src/rotation/**`, `packages/session-host/rust/tests/**`,
 `apps/fgos/src/wiring/session_rotation_hook.rs`, `apps/fgos/src/wiring/start_context/**`,
 `packages/agent-start-context/contracts/start-contributors.v1.json`, `src/session-rotation/rotate.mjs`,
-`src/session-rotation/handoff-store.mjs`, `test/session-rotation/rotate.test.mjs`.
+`src/session-rotation/handoff-store.mjs`, `test/session-rotation/rotate.test.mjs`,
+`packages/agent-start-context/goldens/**` (the successor golden).
 
 ## Steps
 

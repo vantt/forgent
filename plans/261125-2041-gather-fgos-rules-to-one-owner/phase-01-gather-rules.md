@@ -1,11 +1,12 @@
-# Phase 5: Gather every fgOS rule to one owner
+# Phase 1: Gather every fgOS rule to one owner
 
 ACE-D4: the 14 conflicts and drift are fixed when ACE gathers the rules, each rule moving to one owner, and the
 gathering is not done until all 14 are resolved. This phase owns every move of rule text out of AGENTS.md and out of
-the duplicate copies (plan.md, "Who moves which text"). It starts after phase 4 (so each new unit passes the
-write-time check) and after the plans listed for phase 5 in plan.md "Waits on other plans". It does not wait for
-ASC: the ritual and `FIRST_STEPS` live in code outside the P2 corpus, and ASC phase 5 moves them later, through the
-write-time check.
+the duplicate copies (ACE plan, "Who moves which text"). It was phase 5 of plan `261125-1631-agent-context-engine`;
+the owner made it its own plan on 2026-11-25 20:4x. It starts when plan `261125-1631` is `done` (so each new unit
+passes the write-time check) and after the plans listed in plan.md "Waits on other plans". It does not wait for ASC.
+If ASC phase 5 has already landed, its ritual and first-step units are part of the corpus: a gathered rule they
+restate becomes one owner unit and the other a pointer, like any other cluster.
 
 ## Context
 
@@ -16,7 +17,7 @@ write-time check.
   MDView blocks).
 - The anchor tests: `test/docs/rul11-anchor-phrase.test.mjs`, `test/docs/rul104-anchor-phrase.test.mjs`,
   `test/docs/agents-doctrine-anchors.test.mjs`, `test/docs/run-doors-doctrine.test.mjs`.
-- Owner question 3 (scope of "every rule") decides whether single-location skill rules move too. This file assumes
+- Owner question 2 in plan.md (scope of "every rule") decides whether single-location skill rules move too. This file assumes
   the recommended answer: rules stated in more than one place, and every hand-written AGENTS.md rule, move to units;
   a rule stated in exactly one skill stays in that skill, which is its one owner.
 
@@ -32,11 +33,11 @@ write-time check.
 
 ## Files
 
-See the phase table in `plan.md`, row 5.
+See the phase table in `plan.md`, row 1.
 
 ## Steps
 
-1. Build the move table in `plans/261125-1631-agent-context-engine/reports/gather-table.md`: for every cluster and
+1. Build the move table in `plans/261125-2041-gather-fgos-rules-to-one-owner/reports/gather-table.md`: for every cluster and
    every AGENTS.md rule section, its owner unit id and path, and each copy with its replacement pointer.
 2. Resolve C1-C14 in the owner units. The six Medium or above first (C1 to C6), since they sit in dispatch doctrine
    that agents act on.
@@ -44,7 +45,10 @@ See the phase table in `plan.md`, row 5.
    `domains/coding/skills/**`, and cut the moved sections from AGENTS.md.
 4. Point each anchor test at the unit that now holds its phrase. Do not weaken any.
 5. Run `npm run build:skills` to regenerate the skill surfaces and the projection block, and
-   `fgos internal context-engine compile`.
+   `fgos internal context-engine compile`. If `core/agents/*.yaml` changed, regenerate `.claude/agents/**` with
+   `scripts/project-agents.mjs`; if ASC phase 5 has landed and an opening's persona text changed, regenerate the
+   touched goldens in `packages/agent-start-context/goldens/` with the golden test's update mode and name this
+   change in their `NOTES.md`.
 
 ## Validation
 
@@ -52,7 +56,7 @@ See the phase table in `plan.md`, row 5.
 - Every rule id in the move table is in `rules.json`, and its text is in the rendered AGENTS.md.
 - `node scripts/run-tests.mjs test/docs test/setup` passes.
 - The P2 method, rerun on this tree by an independent agent with the same corpus definition, finds no duplicate
-  cluster outside pointers and none of C1-C14. Its report goes to `plans/261125-1631-agent-context-engine/reports/`.
+  cluster outside pointers and none of C1-C14. Its report goes to `plans/261125-2041-gather-fgos-rules-to-one-owner/reports/`.
 
 ## Risk
 

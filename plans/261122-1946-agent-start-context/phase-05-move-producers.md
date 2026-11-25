@@ -2,17 +2,20 @@
 
 Slice 1's move (ASC-D1, ASC-D7). Every persona and opening producer moves in this one change, so there is never a
 window with three renderers. The largest phase in the plan. It starts only after plans
-`261122-2108-delete-dead-node-execution-closure`, `261124-0004-heads-operate-without-owner` and
-`261125-1631-agent-context-engine` are `done`.
+`261122-2108-delete-dead-node-execution-closure` and `261124-0004-heads-operate-without-owner` are `done`, and after
+this plan's phase 6, which is where ASC joins ACE phase 3 (owner, 2026-11-25 20:4x). It does not wait for ACE phase 4
+or for the gathering plan.
 
 ## Inputs
 
 - The discussion's "Start text is formed in about 12 places" (`#scan-deep`) and the scan tables (`#scan`), as
   re-checked on `2c27d499a` in `plans/reports/planner-261125-1109-asc-plan-refresh-against-main.md`.
-- The goldens and `NOTES.md` from phase 4. The crate and the `fgos internal start-context compose` door from
-  phase 3.
-- ACE's rule-unit schema and write-time check (ACE phases 3 and 4), and the gathered rules (ACE phase 5): the
-  ritual and first-step units written here must pass `fgos internal context-engine check`.
+- The goldens and `NOTES.md` from phase 4. The crate from phase 3; the `fgos internal start-context compose` door,
+  its host adapters and the reading of ACE's rule set from phase 6.
+- ACE's rule-unit schema and `fgos internal context-engine check` (ACE phase 3, reached through phase 6): the ritual
+  and first-step units written here must pass it. If ACE phase 4 has landed, its pre-commit check also runs; if the
+  gathering plan has landed, a ritual sentence that restates a gathered rule is refused and points to it instead. If
+  the gathering lands later, it treats these units like any other part of its corpus.
 - Callers to switch:
   - `src/session-host/head-start.mjs` (`openingText`, `FIRST_STEPS`, the start ritual, `defaultOpening`, and the
     `launchSessionInHost` call in `defaultLaunch`);

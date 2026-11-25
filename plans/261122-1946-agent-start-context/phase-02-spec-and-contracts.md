@@ -2,7 +2,7 @@
 
 The spec comes before the code (L5 question 2). It names the crate's owner, its tier, its ports and its contracts.
 This phase writes only new files. Registering the component in the model, the generated views and the reading-map
-row are phase 3 (they sit in files a running plan holds). The RUL102 successor is ACE phase 3's, not this plan's
+row are phase 6 (they sit in files that ACE phase 3 and running plans also write). The RUL102 successor is ACE phase 3's, not this plan's
 (ACE-D3). It waits for ACE phase 1, whose contracts this spec cites.
 
 ## Inputs

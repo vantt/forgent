@@ -16,7 +16,8 @@ the empty `domains/<domain>`.
 ## Footprint
 
 `src/session-host/head-plan.mjs`, `test/session-host/head-plan.test.mjs`, `src/session-host/head-start.mjs`,
-`test/session-host/head-start.test.mjs`.
+`test/session-host/head-start.test.mjs`, `packages/agent-start-context/goldens/**` (the domain fix in the head
+goldens). It runs after phase 7, because both update goldens.
 
 ## Steps
 

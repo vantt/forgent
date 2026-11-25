@@ -22,7 +22,7 @@ and no wording.
   `refines`, `depends_on`, `conflicts_with` (which then fails structurally until one side is retired), or `related`
   meaning "checked, distinct". No new edge type is added for this.
 - Each refusal names the rule, the nearest rule with its score, and the fix.
-- Behaviour without the model follows owner question 4 (recommended: refuse with `rule-search-unavailable` and the
+- Behaviour without the model follows owner question 2 in plan.md (recommended: refuse with `rule-search-unavailable` and the
   `doc-locate-model-fetch` fix).
 
 ## Files

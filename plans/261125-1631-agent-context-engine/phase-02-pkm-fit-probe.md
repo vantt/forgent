@@ -4,6 +4,9 @@ ACE-D6 makes pkm the engine. This phase proves, with running code, what pkm v0.7
 gap, before the crate depends on it. It writes no repository code: the probe is a throwaway Cargo project under
 `.fgos/runtime/tmp/ace-pkm-probe/`, and the only tracked output is the report.
 
+It starts after phase 1 has landed: the owner ordered on 2026-11-25 that phase 1 runs first and alone. The probe
+uses phase 1's `rule-unit.v1.json` as the shape it maps onto pkm.
+
 ## Context
 
 What the plan read in the source (`/home/vantt/.cargo/git/checkouts/pkm-c7040410687dc811/d488fe0/`), to be

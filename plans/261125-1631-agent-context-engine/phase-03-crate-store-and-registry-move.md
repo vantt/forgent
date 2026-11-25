@@ -37,7 +37,7 @@ phase 2 shows no blocking pkm gap.
   `.fgos/runtime/context-engine/rules.db` (L3: the unit files are the truth), rebuilt when stale.
 - Host adapters in `apps/fgos/src/wiring/context_engine/`: `OwnerRegistry` over the component authority model (the
   reader `fgos authority model` uses) and `ValueSource` over live values (executor ids from config, personas through
-  the agent-definition layers, `domains/*`, workflows and stages from domain workflow files). ASC phase 3 reuses this
+  the agent-definition layers, `domains/*`, workflows and stages from domain workflow files). ASC phase 6 reuses this
   `ValueSource`; there is one.
 - Door `fgos internal context-engine <op> --protocol 1`, ops `compile` (build the index, check, write the set) and
   `check` (check only, JSON findings, non-zero on refusal).

@@ -6,7 +6,6 @@ priority: P1
 blockedBy:
   - 261122-2108-delete-dead-node-execution-closure
   - 261124-0004-heads-operate-without-owner
-  - 261125-1631-agent-context-engine
 base: 4f44bb780d5e65ac42d6f554d4bbe3731565bf5c
 footprint:
   - plans/261122-1946-agent-start-context/**
@@ -123,7 +122,7 @@ Prior art, read in the discussion and checked again on `2c27d499a` (refresh repo
    with golden vectors; fact keys are ACE's (`packages/agent-context-engine/contracts/when-keys.v1.json`), and
    `start-request.v1.json` says which of them each start kind must supply. The component and its contracts are rows
    of `packages/component-authority/model/`. Proof: `cargo test -p fgos-agent-start-context` and
-   `fgos authority render --check` (phases 2 and 3).
+   `fgos authority render --check` (phases 2, 3 and 6).
 2. The dead Node dispatch mirror is gone: plan `261122-2108-delete-dead-node-execution-closure` is `done` (its
    acceptance criteria 1 and 2) before phase 5 starts.
 3. `rg -n "openingText|FIRST_STEPS|renderOnWake|renderPersonaSection" src scripts` prints nothing. The persona
@@ -139,10 +138,11 @@ Prior art, read in the discussion and checked again on `2c27d499a` (refresh repo
 6. Each `compose` call writes one Observe record (a declared `start-context` kind) that lists its facts, the rule
    set digest, the matched rule ids and the bytes per block. `plans/261122-1946-agent-start-context/reports/start-token-table.md`
    gives the before and after tokens per start for each head persona and each worker operation, including the
-   always-loaded AGENTS.md bytes (phases 3, 4 and 11).
-7. `compose` refuses a start request with a fact key that is not in ACE's registry or a value its live source does not
-   allow, and refuses a rule set whose digest or version does not verify (`cargo test -p fgos-agent-start-context`,
-   phase 3). Refusing a bad `when:` in a rule unit is ACE's criterion 4, not this plan's.
+   always-loaded AGENTS.md bytes (phases 4, 6 and 11).
+7. `compose` refuses a start request with a fact key that is not in ACE's registry or a value of the wrong type
+   (phase 3, against ACE phase 1's `when-keys` vectors), a value the live source does not allow, and a rule set whose
+   digest or version does not verify (phase 6, through ACE's reader and `ValueSource`)
+   (`cargo test -p fgos-agent-start-context`). Refusing a bad `when:` in a rule unit is ACE's criterion 4.
 8. The setup-time projection (`src/setup/instruction-projections.mjs`) gets its rules from `compose` with standing
    facts and the file delivery, and ACE's interim filter is gone (phase 6).
 9. The rotation handoff reaches a successor through one channel only, the session-host contributor. The successor
@@ -156,7 +156,7 @@ Prior art, read in the discussion and checked again on `2c27d499a` (refresh repo
 
 - External text: the AgentKit, GitNexus and MDView blocks, and AgentKit's `.claude/rules` (ASC-D2).
 - The rule store, rule checks, the `when:` key registry, and resolving duplicate or conflicting rules: ACE's
-  (ACE-D2, ACE-D4, ACE-D5; plan `261125-1631`).
+  (ACE-D2, ACE-D4, ACE-D5; plans `261125-1631` and `261125-2041` for the gathering).
 - Changing what any persona or doctrine says. Text moves without being rewritten. The only exceptions are the three
   fixes in criterion 5.
 - The decision component for fixed-option judgments (P12) and the entry-persona UX flow (P13). Both are separate
@@ -176,84 +176,101 @@ Prior art, read in the discussion and checked again on `2c27d499a` (refresh repo
 |---|---|---|---|---|---|
 | 2 | [Area spec and v1 contracts](phase-02-spec-and-contracts.md) | - | docs/platform/agent-start-context/**, packages/agent-start-context/contracts/** | 1 | draft |
 | 4 | [Golden openings and before-bytes from today's code](phase-04-golden-openings.md) | - | packages/agent-start-context/goldens/**, plans/261122-1946-agent-start-context/reports/before-bytes.md | 1 | draft |
-| 3 | [The crate, its ports, the host door and its registration](phase-03-crate-and-host-door.md) | 2 | packages/agent-start-context/rust/**, Cargo.toml, Cargo.lock, apps/fgos/Cargo.toml, apps/fgos/src/wiring/start_context.rs, apps/fgos/src/wiring/start_context/**, apps/fgos/src/wiring/mod.rs, apps/fgos/src/wiring/observe_declarations.rs, apps/fgos/src/routing.rs, apps/fgos/tests/start_context.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/component-authority/model/**, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/reading-map.md | 2 | draft |
-| 5 | [Every start-text producer moves to the composer](phase-05-move-producers.md) | 3, 4 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, src/native/execution-door.mjs, test/native/execution-door.test.mjs, src/runner/agent-definitions.mjs, test/runner/agent-definitions.test.mjs, scripts/project-agents.mjs, .claude/agents/**, core/instructions/**, .fgos/instructions/effective/**, packages/execution/contracts/execution-routes/**, packages/execution/engine/src/assignment/**, packages/execution/engine/src/transport_round/session_attempt.rs, packages/execution/engine/tests/**, apps/fgos/src/wiring/execution_routes.rs, apps/fgos/src/wiring/unit_run_host/**, test/architecture.test.mjs, packages/component-authority/model/doors/**, packages/agent-start-context/goldens/**, packages/agent-start-context/rust/tests/** | 3 | draft |
-| 6 | [The setup projection selects through `compose`; one matcher](phase-06-when-facts-one-matcher.md) | 5 | src/setup/instruction-projections.mjs, test/setup/instruction-projections.test.mjs | 4 | draft |
-| 7 | [The rotation handoff is the first contributor](phase-07-handoff-contributor.md) | 5 | packages/session-host/rust/src/rotation/**, packages/session-host/rust/tests/**, apps/fgos/src/wiring/session_rotation_hook.rs, apps/fgos/src/wiring/start_context/**, packages/agent-start-context/contracts/start-contributors.v1.json, src/session-rotation/rotate.mjs, src/session-rotation/handoff-store.mjs, test/session-rotation/rotate.test.mjs | 4 | draft |
-| 8 | [A head's domain fact comes from its bound item](phase-08-head-domain-fact.md) | 5 | src/session-host/head-plan.mjs, test/session-host/head-plan.test.mjs, src/session-host/head-start.mjs, test/session-host/head-start.test.mjs | 4 | draft |
-| 9 | [AGENTS.md cut to the standing sheet (L8)](phase-09-agents-md-cut.md) | 6 | AGENTS.md, core/instructions/**, components/*/instructions/**, domains/*/instructions/**, .fgos/instructions/effective/**, test/docs/** | 5 | draft |
-| 10 | [SessionStart hook for hand-opened sessions](phase-10-hand-opened-hook.md) | 7 | apps/fgos/src/wiring/session_rotation_hook.rs, apps/fgos/src/wiring/start_context/**, packages/host-runtime/contracts/command-manifest.json, packages/distribution/contracts/agent-hooks.v1.json, packages/distribution/rust/src/agent_hooks.rs, packages/distribution/rust/tests/goldens/agent-hooks-vectors.json, test/setup/agent-hooks.test.mjs, core/config-standard/startContext.yaml, core/config-schema/startContext.schema.yaml | 5 | draft |
-| 11 | [Integration gate, token table, changelog](phase-11-integration.md) | 2, 3, 4, 5, 6, 7, 8, 9, 10 | CHANGELOG.md, plans/261122-1946-agent-start-context/reports/** | 6 | draft |
+| 3 | [The pure composer crate and its ports](phase-03-crate-and-host-door.md) | 2 | packages/agent-start-context/rust/**, Cargo.toml, Cargo.lock | 2 | draft |
+| 6 | [Join ACE: host door, rule set and fact values, registration, projection through `compose`](phase-06-when-facts-one-matcher.md) | 3 | packages/agent-start-context/rust/**, Cargo.lock, apps/fgos/Cargo.toml, apps/fgos/src/wiring/start_context.rs, apps/fgos/src/wiring/start_context/**, apps/fgos/src/wiring/mod.rs, apps/fgos/src/wiring/observe_declarations.rs, apps/fgos/src/routing.rs, apps/fgos/tests/start_context.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/component-authority/model/**, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/reading-map.md, src/setup/instruction-projections.mjs, test/setup/instruction-projections.test.mjs | 3 | draft |
+| 5 | [Every start-text producer moves to the composer](phase-05-move-producers.md) | 4, 6 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, src/native/execution-door.mjs, test/native/execution-door.test.mjs, src/runner/agent-definitions.mjs, test/runner/agent-definitions.test.mjs, scripts/project-agents.mjs, .claude/agents/**, core/instructions/**, .fgos/instructions/effective/**, packages/execution/contracts/execution-routes/**, packages/execution/engine/src/assignment/**, packages/execution/engine/src/transport_round/session_attempt.rs, packages/execution/engine/tests/**, apps/fgos/src/wiring/execution_routes.rs, apps/fgos/src/wiring/unit_run_host/**, test/architecture.test.mjs, packages/component-authority/model/doors/**, docs/platform/component-boundary.md, packages/agent-start-context/goldens/**, packages/agent-start-context/rust/tests/** | 4 | draft |
+| 7 | [The rotation handoff is the first contributor](phase-07-handoff-contributor.md) | 5 | packages/session-host/rust/src/rotation/**, packages/session-host/rust/tests/**, apps/fgos/src/wiring/session_rotation_hook.rs, apps/fgos/src/wiring/start_context/**, packages/agent-start-context/contracts/start-contributors.v1.json, src/session-rotation/rotate.mjs, src/session-rotation/handoff-store.mjs, test/session-rotation/rotate.test.mjs, packages/agent-start-context/goldens/** | 5 | draft |
+| 9 | [AGENTS.md cut to the standing sheet (L8)](phase-09-agents-md-cut.md) | 5, 6 | AGENTS.md, core/instructions/**, components/*/instructions/**, domains/*/instructions/**, .fgos/instructions/effective/**, test/docs/** | 5 | draft |
+| 8 | [A head's domain fact comes from its bound item](phase-08-head-domain-fact.md) | 7 | src/session-host/head-plan.mjs, test/session-host/head-plan.test.mjs, src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, packages/agent-start-context/goldens/** | 6 | draft |
+| 10 | [SessionStart hook for hand-opened sessions](phase-10-hand-opened-hook.md) | 7 | apps/fgos/src/wiring/session_rotation_hook.rs, apps/fgos/src/wiring/start_context/**, packages/host-runtime/contracts/command-manifest.json, packages/distribution/contracts/agent-hooks.v1.json, packages/distribution/rust/src/agent_hooks.rs, packages/distribution/rust/tests/goldens/agent-hooks-vectors.json, test/setup/agent-hooks.test.mjs, core/config-standard/startContext.yaml, core/config-schema/startContext.schema.yaml | 6 | draft |
+| 11 | [Integration gate, token table, changelog](phase-11-integration.md) | 2, 3, 4, 5, 6, 7, 8, 9, 10 | CHANGELOG.md, plans/261122-1946-agent-start-context/reports/** | 7 | draft |
 
 The old phase 1 (delete the dead Node dispatch mirror) is removed: plan `261122-2108-delete-dead-node-execution-closure`
 does it (criterion 2). Phase ids keep their numbers so links from the discussion and reports stay valid. All phases
 are `draft`: none is admitted until the owner's deep discussion of this plan (team-lead, 2026-11-25).
 
-### Dependencies on the ACE plan (`261125-1631-agent-context-engine`)
+Phase 6 now runs before phase 5 (ids kept): phase 6 is the one place ASC joins ACE phase 3, so the producers move
+onto a composer that already reads ACE's rules. Phase 8 runs after phase 7 because both update the goldens.
 
-The phase table lists only in-plan ids. These are the data edges to ACE phases:
+### Join points with ACE and the gathering (owner, 2026-11-25 20:4x)
 
-| ASC phase | needs ACE phase | why |
+ACE phase 1 runs first and alone. Then ASC, ACE and later the gathering run in parallel, joined only at three points.
+The phase table lists only in-plan ids; these are the cross-plan waits:
+
+| ASC phase | waits for | data it needs |
 |---|---|---|
-| 2 | 1 | the spec and `start-request.v1.json` cite ACE's `when-keys.v1.json` and `effective-rules.v1.json` |
-| 3 | 3 | the `RuleSet` port reads ACE's compiled set through ACE's reader; `FactRegistry` takes keys from ACE and values through ACE's `ValueSource` |
-| 5 | 3, 4, 5 | the ritual and first-step text moves once, straight into ACE units with `when:`, checked against the gathered rules |
-| 6 | 3 | it deletes ACE phase 3's interim "rules without `when:`" filter in the projection |
-| 9 | 5 | ACE phase 5 has already moved every AGENTS.md rule section into a unit; phase 9 only sets `when:` |
-| 11 | 6 | both write `CHANGELOG.md` |
+| 2 (and 4) | ACE phase 1 | the spec and `start-request.v1.json` cite ACE's `when-keys.v1.json` and `effective-rules.v1.json`; phase 4 needs nothing from ACE but starts after ACE 1 because ACE 1 runs alone |
+| 6 | ACE phase 3 | ACE's reader, `when_keys` and host `ValueSource`, `rules.json`, and the interim filter to delete |
+| 9 | plan `261125-2041-gather-fgos-rules-to-one-owner` (`done`) | every AGENTS.md rule section is already a unit; phase 9 only sets `when:` by L8 |
 
-The two footprints share `Cargo.lock`, the model, the host manifest, the unit roots and `AGENTS.md`, and the plan
-contract does not admit two active plans with overlapping footprints. So this plan lists `261125-1631` in
-`blockedBy`: phases 3 and later start when the ACE plan is `done`. Phases 2 and 4 write only new directories and
-may be marked `ready` while ACE runs (phase 2 once ACE phase 1 has landed). ACE owner question 5 asks whether to move
-the ACE gathering into its own plan, so that this plan waits only for ACE phases 1 to 4.
+Every other ASC need on ACE fits these three points, checked edge by edge:
 
-Who moves which text, so that each piece moves once: ACE phase 5 moves AGENTS.md's rule sections and every duplicate
-copy; this plan's phase 5 moves the ritual and `FIRST_STEPS` out of code; this plan's phase 9 moves no text and only
-scopes units by L8.
+| ASC phase | earlier data edge | now |
+|---|---|---|
+| 3 | ACE 3 (reader, `ValueSource`) | needs ACE 1 only: the crate is tested with ACE 1's vectors; the reader, `ValueSource`, host door and registration moved to phase 6 |
+| 5 | ACE 3, 4, 5 | ACE 3 through in-plan phase 6 (5 depends on 6). ACE 4 is not needed: phase 5 runs ACE 3's `check` op itself, and ACE 4's pre-commit check, when landed, only adds the nearest-rule refusal. The gathering is not needed: it takes the ritual units as part of its corpus if they land first |
+| 6 | ACE 3 | owner join point |
+| 9 | ACE 5 (now the gathering) | owner join point |
+| 11 | ACE 6 (`CHANGELOG.md`) | ACE 6 is before the gathering (its `blockedBy`), and the gathering before phase 9, so it is already ordered |
+
+No extra join point is needed for data. The shared files of phases that can now run at the same time are listed under
+"Hot files"; their resolution, and the plan-admission limit on running overlapping plans side by side, are in the
+recut report `plans/reports/planner-261125-2038-ace-asc-plan-recut.md` (owner questions A and B).
+
+Who moves which text, so that each piece moves once: the gathering plan moves AGENTS.md's rule sections and every
+duplicate copy; this plan's phase 5 moves the ritual and `FIRST_STEPS` out of code into ACE units; this plan's phase 9
+moves no text and only scopes units by L8.
 
 ### Waits on other plans
 
-The plan stays `draft`: the owner wants a deep discussion of it before anything starts (team-lead, 2026-11-25), and
-its footprint overlaps two running plans. Phase 4 writes only new files and overlaps no running plan (checked on
-`4f44bb780`); phase 2 overlaps none either but waits for ACE phase 1. Each other phase waits for the plans below to be
-`done`:
+The plan stays `draft`: the owner wants a deep discussion of it before anything starts (team-lead, 2026-11-25).
 
 | phase | waits for | shared files |
 |---|---|---|
-| 2 | ACE phase 1 | (paths cited, no shared file) |
-| 3 | `261122-2108` | `packages/component-authority/model/**`, `docs/reading-map.md`, `docs/platform/component-boundary.md`, `docs/platform/architecture-map.md` |
-| 3 | `261124-0004` | `apps/fgos/src/routing.rs`, `packages/host-runtime/contracts/command-manifest.json`, `command-routes.json`, `Cargo.lock`, three `model/doors/*.yaml` |
-| 3, 5-11 | `261125-1631` (ACE) | host, model and Cargo files, the ACE reader, unit roots, `AGENTS.md`, `CHANGELOG.md` (data edges in the section above) |
+| 2, 4 | ACE phase 1 | (paths cited, no shared file) |
+| 6 | ACE phase 3 | the ACE crate, `rules.json`, `context_engine/**`, `instruction-projections.mjs` |
+| 9 | `261125-2041` (gathering) | `AGENTS.md`, unit roots, `.fgos/instructions/effective/**`, `test/docs/**` |
+| 6 | `261122-2108` | `packages/component-authority/model/**`, `docs/reading-map.md`, `docs/platform/component-boundary.md`, `docs/platform/architecture-map.md` |
+| 6 | `261124-0004` | `apps/fgos/src/routing.rs`, `packages/host-runtime/contracts/command-manifest.json`, `command-routes.json`, `Cargo.lock`, three `model/doors/*.yaml` |
 | 5 | `261122-2108` | `apps/fgos/src/wiring/unit_run_host/**`, `packages/execution/contracts/**`, `test/session-host/head-start.test.mjs`, `test/runner/agent-definitions.test.mjs`, `test/architecture.test.mjs`, `model/**` |
 | 5 | `261124-0004` | `src/session-host/head-start.mjs`, `test/session-host/head-start.test.mjs`, `.claude/agents/{secretary,supervisor}.md`, `unit_run_host/session_attempt.rs` |
-| 6-11 | phase 5 | (inside this plan) |
+| 7-11 | phase 5 | (inside this plan) |
 
-Two running plans without a frontmatter footprint also edit shared files at row level, so a later phase rebases over
-them: `261114-2051-rust-verb-migration-program` phase 11 (`AGENTS.md` legacy-Node paragraph, `docs/reading-map.md`
-line 144) and the draft `261122-2110-coach-agent-and-observe-views` (`core/agents/**`, `routing.rs`, `wiring/mod.rs`;
-whichever starts second rebases). `261124-2320` is `done`, so its old `CHANGELOG.md` wait is gone.
+`blockedBy` names `261122-2108` and `261124-0004` because phases 5 and 6 cannot start before them; it does not name
+the ACE or gathering plan, since the owner set phase-level waits on those. Two running plans without a frontmatter
+footprint also edit shared files at row level, so a later phase rebases over them: `261114-2051-rust-verb-migration-program`
+phase 11 (`AGENTS.md` legacy-Node paragraph, `docs/reading-map.md` line 144) and the draft
+`261122-2110-coach-agent-and-observe-views` (`core/agents/**`, `routing.rs`, `wiring/mod.rs`; whichever starts second
+rebases).
 
 ### Hot files, one writer per wave
 
-Across both plans (see the ACE plan for its side):
-- `packages/component-authority/model/**`: ACE 3, then phase 3 (wave 2), then phase 5 (wave 3, `doors/**` only).
-- `Cargo.toml`, `Cargo.lock`, `apps/fgos/Cargo.toml`, `wiring/mod.rs`, `routing.rs`, the command manifest and routes:
-  ACE 3, then phase 3; the manifest again in phase 10.
+Inside this plan:
+- `packages/agent-start-context/rust/**`: phase 3 (wave 2), phase 6 (wave 3), phase 5 (wave 4, `tests/**`).
+- `Cargo.lock`: phase 3 (wave 2), phase 6 (wave 3).
+- `packages/component-authority/model/**` and `docs/platform/component-boundary.md`: phase 6 (wave 3), phase 5
+  (wave 4, `doors/**` and the re-rendered boundary table).
 - `test/architecture.test.mjs`: phase 5 only.
-- `apps/fgos/src/wiring/start_context/**`: phase 3 (wave 2), phase 7 (wave 4), phase 10 (wave 5).
-- `apps/fgos/src/wiring/session_rotation_hook.rs`: phase 7 (wave 4), phase 10 (wave 5).
-- `src/session-host/head-start.mjs` and its test: phase 5 (wave 3), phase 8 (wave 4).
-- `core/instructions/**` and `.fgos/instructions/effective/**`: ACE 3, ACE 5, phase 5, phase 9.
-- `src/setup/instruction-projections.mjs`: ACE 3, then phase 6.
-- `AGENTS.md`, `test/docs/**`: ACE 5, then phase 9.
-- `packages/agent-start-context/goldens/**`: phase 4 (wave 1), phase 5 (wave 3).
-- `CHANGELOG.md`: ACE 6, then phase 11.
+- `apps/fgos/src/wiring/start_context/**`: phase 6 (wave 3), phase 7 (wave 5), phase 10 (wave 6).
+- `packages/host-runtime/contracts/command-manifest.json`: phase 6 (wave 3), phase 10 (wave 6).
+- `apps/fgos/src/wiring/session_rotation_hook.rs`: phase 7 (wave 5), phase 10 (wave 6).
+- `src/session-host/head-start.mjs` and its test: phase 5 (wave 4), phase 8 (wave 6).
+- `packages/agent-start-context/goldens/**`: phase 4 (wave 1), phase 5 (wave 4), phase 7 (wave 5), phase 8 (wave 6).
+- `core/instructions/**`, `.fgos/instructions/effective/**`: phase 5 (wave 4), phase 9 (after the gathering).
+- `CHANGELOG.md`: phase 11 only.
+
+Across plans, the phases that can run at the same time and share a file:
+
+| ASC phase | other phase | shared files | resolution |
+|---|---|---|---|
+| 3 | ACE 3 | `Cargo.toml` (one `members` line), `Cargo.lock` | the second to land rebases, re-adds its `members` line and regenerates `Cargo.lock` with cargo; never merged by hand (owner question A) |
+| 5 | gathering phase 1 | `core/instructions/**` (new ritual and first-step files only), `.fgos/instructions/effective/**`, `.claude/agents/**`, `packages/agent-start-context/goldens/**` | different files or generated files; the second to land regenerates the set, the agent files and the touched goldens; a restated rule is refused by ACE's check for the second lander (owner question A) |
+| 7, 8 | gathering phase 1 | `packages/agent-start-context/goldens/**` | as above |
 
 `.claude/agents/**` is generated by `scripts/project-agents.mjs`. It is regenerated in phase 5, never merged by
 hand. The governance holder table, the system-overview area map and shared entities, `component-boundary.md`,
-`architecture-map.md` §6-7 and `docs/platform/README.md` are generated from the component authority model; phase 3
-changes them only through `fgos authority declare` / `fgos authority render`.
+`architecture-map.md` §6-7 and `docs/platform/README.md` are generated from the component authority model; phases 5
+and 6 change them only through `fgos authority declare` / `fgos authority render`.
 
 ## Authority map
 
@@ -264,7 +281,7 @@ and the effective rule set are not this plan's: the ACE plan (`261125-1631`) dec
 | New or moved thing | Model row | Note |
 |---|---|---|
 | The composer `compose`, its ports (`RuleSet`, `FactRegistry`, contributors, `RecordSink`), the host door `fgos internal start-context compose`; contracts `start-request`, `start-context`, `start-contributors`, `refusals` (each declared with `--kind contract`, provider `agent-start-context`, in phase 3) | `declare: component agent-start-context` | ASC-D1, tier 3. `fgos authority locate` finds no row for it (2026-11-25). |
-| Persona, ritual, on-wake and opening text of heads (`FIRST_STEPS`, `renderOnWake`, `openingText` in `src/session-host/head-start.mjs`) | `session-host` | The text producer overlaps the new component; survivor: `agent-start-context` for start text; retired: the text producers in `src/session-host/head-start.mjs`. Session-host keeps starting and binding heads, and passes facts to `compose`. |
+| Persona, ritual, on-wake and opening text of heads (`FIRST_STEPS`, `renderOnWake`, `openingText` in `src/session-host/head-start.mjs`) | `session-host` | The text producer overlaps the new component; survivor: `agent-start-context` for start text; retired: the text producers in `src/session-host/head-start.mjs`. Session-host keeps starting and binding heads, and passes facts to `compose`. The ritual and first-step wording become ACE rule units in phase 5 (owner of the store: `agent-context-engine`, declared by plan `261125-1631`). |
 | Persona rendering of workers (`persona_section` in `apps/fgos/src/wiring/unit_run_host/persona.rs`, `renderPersonaSection`) and the duplicate claim render | `execution-core` | The persona render overlaps the new component; survivor: `agent-start-context`; retired: `persona_section`, `renderPersonaSection`, the second caller of `render_agent_result_claim_instructions`. Execution keeps the assignment block and `PromptPort`, and passes the block to `compose` as a payload. |
 | Persona definitions in `core/agents/*.yaml`, the agent listing | `runner`, `execution/agents.v1` | Unchanged owner: ASC reads the definitions; `scripts/project-agents.mjs` keeps writing `.claude/agents/**` but takes its text from `compose`. |
 | Rule selection for the setup-time AGENTS.md block | `docs.packaging-distribution/instruction-composition-and-projection` | The selection half of the row overlaps the new component; survivor: `agent-start-context` for selection by facts (ASC-D8); retired: ACE's interim filter in `src/setup/instruction-projections.mjs`. Packaging-distribution keeps writing the host file. |
@@ -276,8 +293,8 @@ and the effective rule set are not this plan's: the ACE plan (`261125-1631`) dec
 ## Owner questions
 
 1. **Phase 6 scope (owner note 3, 2026-11-22): resolved by ACE-D5 and ASC-D9.** The owner settled that ACE owns the
-   `when:` keys and that ASC fills the values and matches. Phase 6 is now only the projection selecting through
-   `compose`; the key list is fixed in ACE phase 1, and DOCOS is told when it lands (approval point 4).
+   `when:` keys and that ASC fills the values and matches. The key list is fixed in ACE phase 1, and DOCOS is told
+   when it lands (approval point 4). Phase 6 is now ASC's join with ACE phase 3 (owner, 2026-11-25 20:4x).
 2. **Approval id for the component declaration** (shared with ACE owner question 1). `fgos authority declare --kind
    component` needs `--approved-by` naming an answered owner question
    (`packages/host-runtime/contracts/command-manifest.json:1048`). ASC-D1 was relayed as supervisor event
@@ -285,6 +302,12 @@ and the effective rule set are not this plan's: the ACE plan (`261125-1631`) dec
 3. **Where the RUL102 amendment lands: resolved.** ACE-D3 moves the registry out of packaging-distribution, so the
    RUL102 successor belongs to ACE phase 3, which records all three roles (ACE-D2). This plan no longer edits
    `docs/platform/packaging-distribution/spec.md`.
+4. **Running the three plans side by side** (recut report owner question A, 2026-11-25). The supervisor admits only a
+   whole `ready` plan whose footprint overlaps no `running` plan (`packages/supervision/rust/src/portfolio.rs:252-268`).
+   This plan's footprint overlaps ACE's and the gathering's, so the owner's parallel order needs a decision on how
+   they are admitted. Still open.
+5. **Shared files of phases that run at the same time** (recut report owner question B). Still open; the plan
+   assumes the recommended "second lander regenerates" rule in "Hot files".
 
 The other product decisions this plan needs are settled in ASC-D1 to ASC-D9 and ACE-D1 to ACE-D6. P10 (the domain
 field on items) belongs to the secretary's item; phase 8 reads the domain wherever the bound item already carries it
@@ -298,7 +321,7 @@ and leaves the fact absent otherwise. No classifier is added here (ASC-D4).
   (ACE-D5). The golden openings for each persona are the owning proof (phases 4 and 5). Validating must name one
   proof point: a live `npm run fgos:dev -- session start planner` on the phase-5 tree.
 - **No pkm at start.** The composer reads the compiled `rules.json` through ACE's reader, built without ACE's `store`
-  feature; phase 3 checks that `cargo tree -p fgos-agent-start-context` lists no `pkm-core` (ACE-D6).
+  feature; phases 3 and 6 check that `cargo tree -p fgos-agent-start-context` lists no `pkm-core` (ACE-D6).
 - **Producers moved partway would mean three renderers again.** Phase 5 moves every persona and opening producer in
   one change (ASC-D7), and the one-producer architecture test lands with it.
 - **Text drift during the move.** Head and agent-file goldens are captured from today's code in phase 4; worker
@@ -314,22 +337,21 @@ and leaves the fact absent otherwise. No classifier is added here (ASC-D4).
   sheet must hold for them (phase 9 checks it against L8).
 - **Hook rows are opt-in today.** `agent-hooks.v1.json` carries rows only for projects that opted into the mailbox
   (`rowsMailboxOn`). Phase 10 says whether the start-context row joins that set or gets its own opt-in.
-- **Cross-plan order.** Phases 3 and later wait for the whole ACE plan, including its gathering, which may park on
-  conflict questions. ACE phases 1 and 2 and this plan's phases 2 and 4 can run first. ACE owner question 5 proposes
-  the split that removes the gathering from this wait.
+- **Cross-plan order.** Only phase 9 waits for the gathering, which may park on conflict questions; phases 2 to 8, 10
+  and the composer's whole start path do not (owner, 2026-11-25 20:4x). Phase 6 waits for ACE phase 3 only.
 - **Footprint admission.** The plan stays `draft` until the owner discussion and until `261122-2108`, `261124-0004`
-  and the needed ACE phases finish. A ready flip before then fails the plan check with "footprint overlaps another
-  active plan".
+  and the needed ACE phases finish. A ready flip while ACE or the gathering runs fails the plan check with "footprint
+  overlaps another active plan", and the supervisor would not admit it (owner question 4).
 - **Rollback.** Each phase lands as its own commits through `fgos land`. Reverting a phase's commits restores the old
   producer, because each phase deletes its old path in the same commit that adds the new one. Phase 5 is the one
   large revert. Reverting it restores Node `openingText`, `persona.rs` rendering and `project-agents.mjs`, and
   `launch-session` takes `opening` again. Reverting phase 6 restores ACE's interim filter, not the Node composer.
 
-Checks on this revision (`4f44bb780`): `node scripts/plan-contract-check.mjs --plan plans/261122-1946-agent-start-context`
-(result in the planner report `plans/reports/planner-261125-1631-agent-context-engine-plan.md`). Rerun
-`fgos resource-check --plan <this dir>` from the main checkout before any ready flip; the critical path across both
-plans is ACE 1 → ACE 3 → ACE 4 → ACE 5 → ACE 6 → ASC 3 → ASC 5 → ASC 6 → ASC 9 → ASC 11.
+Checks on this revision: `node scripts/plan-contract-check.mjs` and `fgos plan-lint` on this plan, and the
+Authority map proven on a copy dated today; outputs in `plans/reports/planner-261125-2038-ace-asc-plan-recut.md`.
+Critical path across the three plans: ACE 1 → ACE 2 → ACE 3 → ACE 4 → ACE 6 → gathering 1 → gathering 2 → ASC 9 →
+ASC 11; ASC 2 → 3 → 6 → 5 → 7 → 8/10 runs beside it after ACE 1 (ASC 6 joining after ACE 3).
 
 ## Outstanding questions
 
-See "Owner questions" 2. Questions 1 and 3 are resolved by ACE-D3 and ACE-D5.
+See "Owner questions" 2, 4 and 5. Questions 1 and 3 are resolved by ACE-D3 and ACE-D5.

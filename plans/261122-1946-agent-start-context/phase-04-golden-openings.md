@@ -2,7 +2,8 @@
 
 This phase captures what heads and agent files receive today, before anything moves. Phase 5 must reproduce this
 text, except for the three named fixes. These goldens are the owning proof for start text (design principle 8).
-It writes only new files and can start now.
+It writes only new files. It starts after ACE phase 1 has landed (owner, 2026-11-25 20:4x: ACE phase 1 runs
+first and alone), and needs nothing from ACE.
 
 Worker prompts are not captured here: they are rendered only inside the `fgos` binary (`apps/fgos` has no library
 target; `persona.rs` and `HostPrompt` are private to it), and no host op renders a prompt without running a unit

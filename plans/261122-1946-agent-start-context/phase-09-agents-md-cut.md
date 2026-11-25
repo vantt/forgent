@@ -3,7 +3,8 @@
 Slice 3, first half (ASC-D2, ASC-D7). Only fgOS-owned text is affected. The AgentKit, GitNexus and MDView blocks stay
 untouched. This is the phase that lowers the always-loaded bytes every CLI reads.
 
-This phase moves no text. ACE phase 5 (plan `261125-1631`) has already moved every hand-written fgOS rule section of
+This phase moves no text. It starts only when plan `261125-2041-gather-fgos-rules-to-one-owner` is `done` (owner join
+point, 2026-11-25 20:4x). That plan has already moved every hand-written fgOS rule section of
 AGENTS.md into an ACE unit with no `when:` restriction, so the rendered block still carries all of them. Here each of
 those units gets its L8 verdict: a standing rule keeps no `when:` and stays in AGENTS.md; any other rule gets `when:`
 facts and reaches agents only through `compose` at start. Selecting by facts is ASC's (ACE-D2); writing the `when:`
@@ -13,11 +14,11 @@ line in a unit is an ordinary rule edit that ACE's write-time check validates (A
 
 - The discussion's `#advice` ("Proposed AGENTS.md split").
 - L8, the placement test: `docs/platform/platform-foundations.md:284-306`.
-- ACE phase 5's move table (`plans/261125-1631-agent-context-engine/reports/gather-table.md`): which unit holds each
+- The gathering plan's move table (`plans/261125-2041-gather-fgos-rules-to-one-owner/reports/gather-table.md`): which unit holds each
   former AGENTS.md section.
 - `reports/before-bytes.md` from phase 4.
 - The anchor tests: `test/docs/rul11-anchor-phrase.test.mjs`, `test/docs/rul104-anchor-phrase.test.mjs`,
-  `test/docs/agents-doctrine-anchors.test.mjs` and `test/docs/run-doors-doctrine.test.mjs` (ACE phase 5 already
+  `test/docs/agents-doctrine-anchors.test.mjs` and `test/docs/run-doors-doctrine.test.mjs` (the gathering plan already
   pointed them at the units).
 
 ## Footprint

@@ -1,9 +1,8 @@
-# Phase 6: Integration gate, sweep rerun, changelog
+# Phase 6: Integration gate, changelog
 
 ## Context
 
 - All phase branches, landed on main.
-- Phase 5's rerun report and move table.
 
 ## Requirements
 
