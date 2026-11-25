@@ -31,7 +31,7 @@ fn driver() -> Result<GitDriver, String> {
         .map_err(|e| e.cause)
 }
 
-/// `resolveGitRoots` (`src/runner/execution/run.mjs:71`): the worktree and the trusted main checkout of `cwd`, read
+/// `resolveGitRoots` (retired Node module `src/runner/execution/run.mjs`; last at `85760c6f2`): the worktree and the trusted main checkout of `cwd`, read
 /// through the Git door. A read-only caller in a directory that is no repository gets that directory as its own
 /// project root; anything else outside a repository is refused with the sentence Node's `RunnerConfigError` carries.
 pub fn git_roots(cwd: &Path, allow_no_repository: bool) -> Result<GitRoots, String> {
@@ -77,7 +77,7 @@ pub fn fgos_dir(main_root: &Path) -> PathBuf {
     PathBuf::from(fgos_dir_from_root(&main_root.to_string_lossy()))
 }
 
-/// `detectHerdrPresent` (`src/runner/execution/run.mjs:64`): herdr as the process environment shows it, the
+/// `detectHerdrPresent` (retired Node module `src/runner/execution/run.mjs`; last at `85760c6f2`): herdr as the process environment shows it, the
 /// machine fact the seat-binding route reads.
 pub fn herdr_present() -> bool {
     HostMachine::new(None, None).herdr_present()
@@ -88,7 +88,7 @@ pub fn git_writer() -> String {
     fgos_identity::resolve_current().id.to_string()
 }
 
-/// `process.env.USER || 'system'` (`src/runner/execution/unit-run-start.mjs`, the record's `createdBy`).
+/// `process.env.USER || 'system'` ((retired Node module `src/runner/execution/unit-run-start.mjs`; last at `85760c6f2`), the record's `createdBy`).
 pub fn created_by() -> String {
     std::env::var("USER")
         .ok()
@@ -117,7 +117,7 @@ pub fn git(worktree: &Path, main_root: &Path) -> Result<(GitDriver, RepoHandle),
     }
 }
 
-/// `resolveMutatingCwdPosture(cwd).reason === 'main-checkout'` (`src/runner/dispatch/execution-contract.mjs:149`):
+/// `resolveMutatingCwdPosture(cwd).reason === 'main-checkout'` (retired Node module `src/runner/dispatch/execution-contract.mjs`; last at `85760c6f2`):
 /// the repository root of `worktree` is its main checkout. Outside a repository, or a root that does not resolve,
 /// is not the main checkout (the run refuses those elsewhere).
 pub fn is_main_checkout(worktree: &Path) -> bool {
@@ -131,7 +131,7 @@ pub fn is_main_checkout(worktree: &Path) -> bool {
     }
 }
 
-/// `sweepAttempts` (`src/run-supervisor/client.mjs:118`) as `run.mjs:303` calls it: adopt judges every attempt
+/// `sweepAttempts` (retired Node module `src/run-supervisor/client.mjs`; last at `85760c6f2`) as `run.mjs:303` calls it: adopt judges every attempt
 /// directory under `assignments_root` that is not closed and finishes what a dead supervisor left, then the attempt
 /// sockets no supervisor holds are removed. Best effort: what adopt judged comes back (the `sweep-attempts`
 /// internal op reports it; a unit run ignores it).
@@ -158,14 +158,14 @@ fn runner_refusal(refusal: &Value) -> RunUnitError {
     error
 }
 
-/// `loadRunnerConfigForDir` (`src/runner/dispatch/config.mjs:316`): the project's runner section through the config
+/// `loadRunnerConfigForDir` (retired Node module `src/runner/dispatch/config.mjs`; last at `85760c6f2`): the project's runner section through the config
 /// door (project over global over the standard, the detected executor filled in, nothing written), checked and its
 /// confinement normalised by `fgos-execution`'s one composition. A refusal keeps the door's code.
 pub fn load_runner_config(main_root: &Path) -> Result<Value, RunUnitError> {
     load_runner_config_with_origins(main_root).map(|(config, _)| config)
 }
 
-/// [`load_runner_config`] with the origins of its values (`runnerOriginsOf`, `src/runner/dispatch/config.mjs:82`),
+/// [`load_runner_config`] with the origins of its values (`runnerOriginsOf`, (retired Node module `src/runner/dispatch/config.mjs`; last at `85760c6f2`)),
 /// which name the config layer a collaboration's pattern came from.
 pub fn load_runner_config_with_origins(main_root: &Path) -> Result<(Value, Value), RunUnitError> {
     let root = main_root.to_string_lossy();

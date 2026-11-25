@@ -9,7 +9,7 @@ description: >-
 
 # fgos-run — Single Execution Driver
 
-`fgos-run` is the thin driver for executing work across all domains. It does not own scheduling, merging, or execution mechanics directly — it delegates completely to the **Workflow runner** (`src/workflow/runner.mjs`) and the **P1 Execution Core** (`src/runner/execution/run.mjs`).
+`fgos-run` is the thin driver for executing work across all domains. It does not own scheduling, merging, or execution mechanics directly — it delegates completely to the **Workflow runner** (`src/workflow/runner.mjs`) and the **P1 Execution Core** (`packages/execution/engine/src/unit_run/` (unit run door; retired Node `src/runner/execution/run.mjs`, last at `85760c6f2`)).
 
 ---
 
@@ -25,7 +25,7 @@ When the user gives a natural language task or ad-hoc request:
    ```
    Without `--writes` the Unit is read-only (sandboxed). `--writes` needs a linked worktree (create one with `fgos worktree create <path> --branch <name>` or `fgos worktree create <path> --detach`); from the main checkout it is refused before anything runs. `--provider` is a soft preference that `bind()` tries first and fails over from; `--capability` defaults to `execute`. `--input` hands the Unit repo-relative files to read. `--verify` runs after each producing round of the `reviewed` loop and once in the `solo` loop; it is refused on the `panel` and `debate` loops (`verify-command-unsupported`). Without a command, a reviewed run says it verified nothing and a solo run leaves no verify receipt.
    Choose `--pattern` from `runner.patterns` in the effective Config (`fgos config show --path runner.patterns`); `core/config-standard/runner.yaml` declares the shipped patterns: `solo`, `reviewed`, `panel`, `debate`, `code-change`, `consult`, `rfc` and `research-fan-out`. Project and global Config may declare more names over the four loops. Use `--params '<json object>'` for typed request parameters, including lists and maps, or repeatable `--param key=value` for scalars typed by the loop's schema (for example `--param maxRounds=1`); repeated `--param` keys and keys shared with `--params` are refused. In a case, omit selectors to inherit the activity's `unit`; a params request or an explicit swap away from its pattern requires `--reason`, but standalone params do not. Repeating the same selector is not automatically a swap. The result's pin records the effective pattern, loop, params and request reason. A Unit file and `--pattern` must not name different patterns (`selector-conflict`); resume uses the pin and takes no new params.
-3. **Several tasks → `--units`.** Formulate the **Unit** objects (schema: `src/runner/execution/unit.mjs`):
+3. **Several tasks → `--units`.** Formulate the **Unit** objects (schema: `packages/execution/rust/src/unit/mod.rs` (retired Node `src/runner/execution/unit.mjs`, last at `85760c6f2`)):
    - `id`: descriptive kebab-case identifier (a safe branch-name segment)
    - `objective`: concise semantic description of what must be done
    - `capability`: domain:verb (e.g. `docs:write`, `code:implement`)

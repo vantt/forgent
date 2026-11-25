@@ -1,5 +1,5 @@
 //! The machine the assignment runner executes one seat on: the host side of `ExecutePorts` and `SeatPorts`
-//! (`executeAssignment`, `src/runner/dispatch/assignment-runner.mjs:1289`), the falsification probe of a bwrap
+//! (`executeAssignment`, (retired Node module `src/runner/dispatch/assignment-runner.mjs`; last at `85760c6f2`)), the falsification probe of a bwrap
 //! backend and the prompt seams. Each port is the door that owns the fact: the checkout and config doors, the
 //! seat-binding machine, the Git door, the run supervisor's adopt door, launch settings and step environment, the
 //! accounts module, the dispatch plan, the operation prompt templates, the executor command and the Confinement
@@ -89,7 +89,7 @@ pub struct HostExecution {
 
 impl HostExecution {
     /// `attempt_host` is the host binary the supervisor runs as and the payload beside it (`resolveAttemptHost`,
-    /// `src/run-supervisor/direct-launch.mjs:44`); the session's `pathEnv` and `herdrPresent` name the machine.
+    /// (retired Node module `src/run-supervisor/direct-launch.mjs`; last at `85760c6f2`)); the session's `pathEnv` and `herdrPresent` name the machine.
     pub fn new(attempt_host: AttemptHost, session: &Value) -> Result<Self, String> {
         let state_root = fgos_holder_lock::state_root::state_root().0;
         Ok(Self {
@@ -499,7 +499,7 @@ impl ExecutePorts for HostExecution {
         )
     }
     /// `resolvePosture(binding, { runnerConfig }).requirement`
-    /// (`src/runner/dispatch/confinement/policies.mjs:653`).
+    /// (retired Node module `src/runner/dispatch/confinement/policies.mjs`; last at `85760c6f2`).
     fn posture_requirement(&self, binding: &Value, cfg: &Value) -> Value {
         resolve_posture(
             binding.get("posture").and_then(Value::as_str),
@@ -545,11 +545,11 @@ impl ExecutePorts for HostExecution {
     fn retain_failed_pane_ms(&self, root: &Path) -> Value {
         crate::wiring::doctor::terminal::project_retain_failed_pane_ms(root)
     }
-    /// `createCredentialRenewal()` (`src/runner/execution/run.mjs:1012`).
+    /// `createCredentialRenewal()` (retired Node module `src/runner/execution/run.mjs`; last at `85760c6f2`).
     fn renewal(&self) -> Option<&dyn CredentialRenewal> {
         Some(&HostRenewal)
     }
-    /// `createCredentialProbe()` (`src/runner/execution/run.mjs:1011`).
+    /// `createCredentialProbe()` (retired Node module `src/runner/execution/run.mjs`; last at `85760c6f2`).
     fn credential_probe(&self) -> Option<CredentialProbe<'_>> {
         Some(&probe_account_credential)
     }
@@ -563,7 +563,7 @@ impl ExecutePorts for HostExecution {
 
 impl SeatPorts for HostExecution {
     /// `resolveExecutorCommand(cfg, { prompt, model, requestedModel, reasoningEffort, tier, executorId, fgosDir,
-    /// attestRoot, invocationId })` (`src/runner/dispatch/transport.mjs:144`).
+    /// attestRoot, invocationId })` (retired Node module `src/runner/dispatch/transport.mjs`; last at `85760c6f2`).
     fn resolve_command(&self, ask: &CommandAsk<'_>) -> Result<Value, RunnerConfigError> {
         let executor = fgos_execution::executor_config::resolve_executor_config(
             ask.cfg,
@@ -642,8 +642,8 @@ impl SeatPorts for HostExecution {
         })
     }
 
-    /// A terminal attempt's pane (`prepareTerminalAttempt`, `src/runner/dispatch/herdr-round.mjs:462`, as
-    /// `src/runner/dispatch/assignment-runner.mjs:1062` calls it) over the herdr route of this machine and the
+    /// A terminal attempt's pane (`prepareTerminalAttempt`, (retired Node module `src/runner/dispatch/herdr-round.mjs`; last at `85760c6f2`), as
+    /// (retired Node module `src/runner/dispatch/assignment-runner.mjs`; last at `85760c6f2`) calls it) over the herdr route of this machine and the
     /// project's `terminal.*` layout settings (`terminalRouteConfig(projectRoot)`).
     fn prepare_pane(
         &self,

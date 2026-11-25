@@ -1,5 +1,5 @@
 //! `DispatchError` and `RunSupervisorError` of the Node controller: a coded refusal with a message and
-//! free-form detail (`src/run-supervisor/dispatch-error.mjs`, `client.mjs`). A failure of the holder-lock driver on
+//! free-form detail ((retired Node module `src/run-supervisor/dispatch-error.mjs`; last at `85760c6f2`), `client.mjs`). A failure of the holder-lock driver on
 //! the way (`HolderLockError` in Node, `src/holder-lock/protocol.mjs`) rides the same type, marked as such, so a
 //! caller tells a refusal of the controller from a lock that could not be taken at all.
 

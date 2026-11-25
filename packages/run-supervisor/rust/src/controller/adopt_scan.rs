@@ -1,6 +1,6 @@
 //! The attempt directories not yet closed, and one judgement of each. The judgement itself is
 //! `crate::adopt::adopt_one`, called in process: this module lists and calls, never decides.
-//! (Node: `listOpenAttemptDirs`, `adoptScan` of `src/run-supervisor/client.mjs`.)
+//! (Node: `listOpenAttemptDirs`, `adoptScan` of (retired Node module `src/run-supervisor/client.mjs`; last at `85760c6f2`).)
 
 use crate::adopt::{adopt_one, AdoptArgs, Target, Verdict};
 use fgos_holder_lock::DEFAULT_KILL_WAIT_MS;

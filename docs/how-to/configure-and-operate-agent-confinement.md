@@ -61,7 +61,7 @@ To inspect or configure `~/.fgos/confinement-backends.json` manually:
 ```
 
 Fields:
-- `contract`: Must be the literal string `"confinement-backend-registry.v1"`. `confinementBackends` is the only other top-level key the schema accepts (`validateBackendRegistryShape`, `src/runner/dispatch/confinement/backend-registry.mjs`).
+- `contract`: Must be the literal string `"confinement-backend-registry.v1"`. `confinementBackends` is the only other top-level key the schema accepts (`validateBackendRegistryShape`, `packages/execution/engine` confinement registry (retired Node `src/runner/dispatch/confinement/backend-registry.mjs`, last at `85760c6f2`) (retired; last at `85760c6f2`)).
 - `type`: Driver implementation (`bwrap` is the built-in local Linux driver; other allowed values are `container` and `remote`, each with their own key set).
 - `executable`: Path to the Bubblewrap binary.
 - `enabled`: `true` to allow dispatch through this backend; `false` causes required dispatches to fail closed with `confinement-backend-disabled`.
@@ -143,7 +143,7 @@ You can define custom policies in `runner.confinementPolicies`:
 }
 ```
 
-A custom policy's `controls` block must give an explicit value for all 7 axes (`hostWrite`, `hostRead`, `networkEgress`, `process`, `home`, `session`, `workspace`) — there is no default or partial form. `grants` is a required array (each entry: `resource`, `access` one of `read`/`write`/`read-write`, `scope: "dispatch"`, optional `optional: boolean`); `networkFilter` is required when — and only permitted when — `networkEgress` is `"filtered"`. The only top-level keys accepted are `contract`, `controls`, `grants`, `networkFilter` (`validateConfinementPolicyShape`, `src/runner/dispatch/confinement/policies.mjs`).
+A custom policy's `controls` block must give an explicit value for all 7 axes (`hostWrite`, `hostRead`, `networkEgress`, `process`, `home`, `session`, `workspace`) — there is no default or partial form. `grants` is a required array (each entry: `resource`, `access` one of `read`/`write`/`read-write`, `scope: "dispatch"`, optional `optional: boolean`); `networkFilter` is required when — and only permitted when — `networkEgress` is `"filtered"`. The only top-level keys accepted are `contract`, `controls`, `grants`, `networkFilter` (`validateConfinementPolicyShape`, `packages/execution/engine/src/confinement/policy/` (retired Node `src/runner/dispatch/confinement/policies.mjs`, last at `85760c6f2`) (retired; last at `85760c6f2`)).
 
 ---
 

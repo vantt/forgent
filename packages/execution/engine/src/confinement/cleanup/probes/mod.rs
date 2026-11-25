@@ -2,7 +2,7 @@
 //! confinement policy promises, and each has a RED FALSIFIER, a deliberately broken sandbox the same probe must
 //! catch and fail on.
 //!
-//! Twin of `src/runner/dispatch/confinement/probes/harness.mjs`. The programs that run inside the sandbox are
+//! Twin of (retired Node module `src/runner/dispatch/confinement/probes/harness.mjs`; last at `85760c6f2`). The programs that run inside the sandbox are
 //! POSIX `sh` scripts (the Node twin ran `node -e`), so a probe needs nothing on the machine but the sandbox and
 //! a shell. Process runs go through `fgos-process`.
 //!

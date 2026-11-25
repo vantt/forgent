@@ -1,5 +1,5 @@
 {
-  "note": "recorded from src/runner/dispatch/herdr-round.mjs and normalizeAgentName of src/native/proof-helpers.mjs; HOME of the trust cases is /home/u",
+  "note": "recorded from the retired Node module src/runner/dispatch/herdr-round.mjs and normalizeAgentName of src/native/proof-helpers.mjs; HOME of the trust cases is /home/u (last at `85760c6f2`)",
   "home": "/home/u",
   "constants": {
     "PANE_IDLE_TIMEOUT_MS": 1200000,

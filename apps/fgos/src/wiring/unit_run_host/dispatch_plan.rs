@@ -1,5 +1,5 @@
 //! The dispatch plan of an assignment the assignment runner executes: `compileDispatchPlan(cfg, { assignment,
-//! assignmentItem, hasLiveTaskAccess, binding, cliOverride, options })` (`src/runner/dispatch/plan.mjs:508`) on its
+//! assignmentItem, hasLiveTaskAccess, binding, cliOverride, options })` (retired Node module `src/runner/dispatch/plan.mjs`; last at `85760c6f2`) on its
 //! assignment selector, the only one an execution compiles. Every decision is a crate's: the effective dispatch
 //! policy (engine `planning::policy`), the registry lookup, the mechanism and the executor resolution with its
 //! governance (`fgos-execution`); this module orders them into the plan Node wrote.

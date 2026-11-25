@@ -1,5 +1,5 @@
 //! The verify command of a unit run, run as a borrower of the custody the run holds over its worktree
-//! (`runVerify`, `src/runner/execution/custody-door.mjs:79`, over `runCommand`, `src/runner/goal-check.mjs:51`).
+//! (`runVerify`, (retired Node module `src/runner/execution/custody-door.mjs`; last at `85760c6f2`), over `runCommand`, `src/runner/goal-check.mjs:51`).
 //! The verdict is the engine's ([`classify`]); this module only runs the command: through the holder-lock borrow
 //! when the run holds custody, through the engine's bounded shell otherwise.
 

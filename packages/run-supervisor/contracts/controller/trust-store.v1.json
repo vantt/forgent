@@ -1,5 +1,5 @@
 {
-  "recordedFrom": "src/run-supervisor/trust-store.mjs",
+  "recordedFrom": "src/run-supervisor/trust-store.mjs (last at `85760c6f2`)",
   "cases": [
     {
       "name": "claude read: trusted",

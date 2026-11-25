@@ -63,7 +63,7 @@ Evidence is split by class: read from source, read from a machine file by name o
 | An interactive zsh hook in `~/.zshrc` walks up from the working directory and exports every variable of the file into the shell. Every child process, including an agent's Bash tool, inherits it | machine file | `~/.zshrc`, block "fgos project secrets" |
 | A key is hard-coded in the `glm2` function of `~/.zshrc` (value not reproduced here) | machine file | `~/.zshrc` |
 | A copy of the key sits in `~/.pi/accounts/openrouter/auth.json`, mode 0600, created by hand as an interim measure; `auth.json` entries were added to `~/.fgos/config.json` and `.fgos/config.json` | machine file, names and mode only | `ls -l`, `grep -n auth.json` |
-| One function expands `${VAR}` and replaces a missing variable with an empty string, so a typo yields an empty key and a later opaque failure (a second one in the provider adapter module went with that module's adapter classes) | source | `src/runner/dispatch/adapters.mjs` (`resolveExecutorEnv`) |
+| One function expands `${VAR}` and replaces a missing variable with an empty string, so a typo yields an empty key and a later opaque failure (a second one in the provider adapter module went with that module's adapter classes) | source | `src/runner/dispatch/adapters.mjs` (retired; last at `85760c6f2`) (`resolveExecutorEnv`) |
 | Three further functions expand `${HOME}` only | source | `src/setup/agy-permissions.mjs` line 153, `src/runner/dispatch/provider-credential-probe.mjs` line 34, `src/setup/registrations.mjs` line 4459 |
 | The OpenRouter key variable left the committed pi invocation env because pi reads the key from its login store `auth.json`; a test pins it | source | `git show 4f6fc44d7`; `test/runner/herdr-claude-invocations.test.mjs` line 37 |
 | The privacy hook patterns cover `.env`, `.env.*`, `credentials`, `secrets.yaml`, `*.pem`, `*.key`, `id_rsa`, `id_ed25519`. They do not match `secrets.local.env` or `auth.json` | source | `.claude/hooks/lib/privacy-checker.cjs` lines 43 to 52 |
@@ -312,7 +312,7 @@ An adapter passes these before it is enabled; the core passes the first four wit
 5. **One name for the shared key.** Answered 2026-10-20: `OPENROUTER_API_KEY`.
 6. **Scope of the expansion function.** Does it also take over the three `${HOME}`-only expansions of section 2, or stay for secrets and environment references only?
 7. **Resolver order.** Answered 2026-10-20: environment, then project file, then global file.
-8. **herdr argv.** `76d8539d1` recorded the accepted risk; the comment is no longer in `src/runner/dispatch/transport.mjs` and a search for `--env` there finds nothing. Does the risk still apply, and where?
+8. **herdr argv.** `76d8539d1` recorded the accepted risk; the comment is no longer in retired Node `src/runner/dispatch/transport.mjs` (last at `85760c6f2`) (retired; last at `85760c6f2`) and a search for `--env` there finds nothing. Does the risk still apply, and where?
 
 ## 16. Decision history
 

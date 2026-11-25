@@ -1,5 +1,5 @@
 {
-  "note": "recorded from src/runner/dispatch/transport.mjs and config.mjs; `executor` is resolveExecutorConfig of the same request, the input of the Rust function",
+  "note": "recorded from the retired Node module src/runner/dispatch/transport.mjs and config.mjs; `executor` is resolveExecutorConfig of the same request, the input of the Rust function (last at `85760c6f2`)",
   "cfg": {
     "executor": {
       "kind": "agent",

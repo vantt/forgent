@@ -1,5 +1,5 @@
 {
-  "note": "recorded from src/runner/dispatch/worker-home.mjs; the source home holds a credential and a claude.json whose /repo trust is the case",
+  "note": "recorded from the retired Node module src/runner/dispatch/worker-home.mjs; the source home holds a credential and a claude.json whose /repo trust is the case (last at `85760c6f2`)",
   "bypassAcceptance": {
     "skipDangerousModePermissionPrompt": true
   },

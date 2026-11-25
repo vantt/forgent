@@ -1,5 +1,5 @@
 {
-  "note": "recorded from src/runner/dispatch/confinement/backend-registry.mjs; the parse detail of invalid JSON is not pinned",
+  "note": "recorded from the retired Node module src/runner/dispatch/confinement/backend-registry.mjs; the parse detail of invalid JSON is not pinned (last at `85760c6f2`)",
   "allowedDriverTypes": [
     "bwrap",
     "container",

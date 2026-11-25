@@ -1,4 +1,4 @@
-//! Replays the vectors recorded from `src/run-supervisor/trust-store.mjs`
+//! Replays the vectors recorded from (retired Node module `src/run-supervisor/trust-store.mjs`; last at `85760c6f2`)
 //! (`packages/run-supervisor/contracts/controller/trust-store.v1.json`): every call must answer, write and
 //! refuse exactly as the Node module did, byte for byte in the stores it rewrites.
 

@@ -1,5 +1,5 @@
 //! The per-directory dispatch lock: one writer per working directory, keyed by directory identity.
-//! Vectors recorded from `src/run-supervisor/cwd-lock.mjs`.
+//! Vectors recorded from (retired Node module `src/run-supervisor/cwd-lock.mjs`; last at `85760c6f2`).
 #![cfg(unix)]
 
 use fgos_holder_lock::LockScope;

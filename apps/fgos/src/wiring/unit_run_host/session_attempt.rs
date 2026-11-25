@@ -1,5 +1,5 @@
 //! A head session's launch through the host: engine `launch_session_attempt` over [`HostSessionDriver`], the
-//! host's [`AttemptDriver`] (`launchSessionAttempt`, `src/runner/dispatch/session-attempt.mjs`). Each step is the one
+//! host's [`AttemptDriver`] (`launchSessionAttempt`, (retired Node module `src/runner/dispatch/session-attempt.mjs`; last at `85760c6f2`)). Each step is the one
 //! a worker attempt takes (`execute_assignment` in engine `assignment_runner`), over the same machine
 //! ([`HostExecution`]): open the attempt, take its lock (read-only, no dispatch-cwd lease), publish its intent, lease
 //! the account the binding names, renew its login, prepare the seat (a terminal pane typed the opening verbatim) and

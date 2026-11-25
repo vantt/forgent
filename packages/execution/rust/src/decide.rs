@@ -2,7 +2,7 @@
 //! config without running anything. The PreToolUse hook asks the same question for every Agent/Task call
 //! ([`crate::hook`]).
 //!
-//! The order of resolution is the one `compileDispatchPlan` (`src/runner/dispatch/plan.mjs`) applies: an explicit
+//! The order of resolution is the one `compileDispatchPlan` (retired Node module `src/runner/dispatch/plan.mjs`; last at `85760c6f2`) applies: an explicit
 //! executor id, then an assignment record, then a Work hint, then a purpose, then a need-soul default. A purpose is
 //! answered by the one door from a name to what serves it ([`purpose_seat`]): an executor registered under that
 //! name, else the tools serving it (a live probe), else Seat Binding for a capability with a `prefer` pool of its

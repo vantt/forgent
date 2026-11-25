@@ -1,5 +1,5 @@
 {
-  "note": "recorded from src/run-supervisor/direct-launch.mjs; envelope clock fields are offsets from createdAt in whole seconds",
+  "note": "recorded from the retired Node module src/run-supervisor/direct-launch.mjs; envelope clock fields are offsets from createdAt in whole seconds (last at `85760c6f2`)",
   "paths": {
     "runDir": "/r/run",
     "sideFile": "/r/run/protected/attempt-secrets.json",

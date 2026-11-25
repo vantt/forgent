@@ -31,4 +31,4 @@ Total size is under 1 MB. JSON shape, field names, ids, timestamps, digests and 
   retired role names without `seatSchema` exists here.
 - **Run result v2**: absent. All 382 `result.json` files have `contract.version` 3. `"version": 2` seen in them is the
   nested agent-claim contract, not the run result. The v2 reader is covered only by the Node source
-  (`RUN_RESULT_CONTRACT_V2` in `src/runner/dispatch/run-result.mjs`) and its tests.
+  (`RUN_RESULT_CONTRACT_V2` in `src/runner/dispatch/run-result.mjs`) and its tests. (last at `85760c6f2`)

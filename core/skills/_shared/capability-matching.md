@@ -20,7 +20,7 @@ Every task prompt passes through three sequential questions. An agent must never
 
 ## Understanding intent and writing Units
 
-Instead of declaring ambiguous runtime heuristics, an agent inspects user intent and structural task requirements directly. When structuring work into plans or executable tracks, the agent expresses work as concrete execution Units (`src/runner/execution/unit.mjs`):
+Instead of declaring ambiguous runtime heuristics, an agent inspects user intent and structural task requirements directly. When structuring work into plans or executable tracks, the agent expresses work as concrete execution Units (`packages/execution/rust/src/unit/mod.rs` (retired Node `src/runner/execution/unit.mjs`, last at `85760c6f2`)):
 
 - **Canonical Capability:** Each unit declares exactly one canonical capability (e.g. `code:implement`, `code:review`, `advise`, `execute`) derived directly from the task's required behavior.
 - **Unit Boundaries:** A unit defines clear `objective`, inputs (`reads`), outputs (`writes`), and acceptance criteria.
