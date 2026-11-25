@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Event-store io errors keep the path and the operation in the invocation-fault log"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 base: ebd19c364eb46cedcbb3837d44bd9a905d6250c0
@@ -15,7 +15,6 @@ footprint:
   - test/event-store/lifecycle.test.mjs
   - test/report/decision-index.test.mjs
   - docs/platform/event-store/spec.md
-  - CHANGELOG.md
 source:
   - plans/discussions/ds-bevhflpkmn-event-store-io-errors-keep-path/DISCUSSION.md
   - p-cg4w6nn5l6
@@ -74,8 +73,9 @@ constraint).
 3. `node --test test/report/decision-index.test.mjs` passes, and every `status` assertion on a child run carries the
    child's stderr as its message (read the file: no bare `assert.equal(run(...).status, N)` remains).
 4. `npm test` and `cargo test --workspace` green on the combined tree (phase 3).
-5. `docs/platform/event-store/spec.md` has a dated line saying a trigger's error is the code and its detail;
-   `CHANGELOG.md` `## [Unreleased]` has one line.
+5. `docs/platform/event-store/spec.md` has a dated line saying a trigger's error is the code and its detail. No
+   `CHANGELOG.md` line: the change adds text to a local diagnostic log and changes no command, config or output
+   contract, and `CHANGELOG.md` is held by the running plan `261124-0004-heads-operate-without-owner`.
 
 ## Non-goals
 
@@ -94,12 +94,12 @@ constraint).
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Trigger error keeps the detail](phase-01-trigger-error-keeps-detail.md) | - | packages/event-store/rust/src/lifecycle.rs, packages/event-store/rust/tests/lifecycle.rs, packages/git/node-addon/src/event_store.rs, src/event-store/maintenance.mjs, test/event-store/triggers.test.mjs, test/event-store/lifecycle.test.mjs, docs/platform/event-store/spec.md, CHANGELOG.md | 1 | ready |
+| 1 | [Trigger error keeps the detail](phase-01-trigger-error-keeps-detail.md) | - | packages/event-store/rust/src/lifecycle.rs, packages/event-store/rust/tests/lifecycle.rs, packages/git/node-addon/src/event_store.rs, src/event-store/maintenance.mjs, test/event-store/triggers.test.mjs, test/event-store/lifecycle.test.mjs, docs/platform/event-store/spec.md | 1 | ready |
 | 2 | [decision-index tests print child stderr](phase-02-decision-index-stderr.md) | - | test/report/decision-index.test.mjs | 1 | ready |
 | 3 | [Integration](phase-03-integration.md) | 1, 2 | plans/261125-1556-event-store-io-errors-keep-path/reports/ | 2 | ready |
 
 Contract check: phases 1 and 2 share wave 1 with disjoint footprints; phase 3 depends on both and sits in wave 2. The
-hot files (`CHANGELOG.md`, the event-store spec) belong to phase 1 only. Capability for every phase: `code:implement`
+hot file (the event-store spec) belongs to phase 1 only; `CHANGELOG.md` is left out (acceptance criterion 5). Capability for every phase: `code:implement`
 (phase 3: `code:test`).
 
 ## Owner questions

@@ -19,7 +19,7 @@ Capability: `code:implement`.
 - `packages/git/node-addon/src/event_store.rs` (doc comment of `maintain_event_store` only)
 - `src/event-store/maintenance.mjs` (doc comment of `maintainEventStore` only, if it states "code")
 - `test/event-store/triggers.test.mjs`, `test/event-store/lifecycle.test.mjs`
-- `docs/platform/event-store/spec.md`, `CHANGELOG.md`
+- `docs/platform/event-store/spec.md`
 
 ## Steps
 
@@ -40,7 +40,7 @@ Capability: `code:implement`.
 5. Update the two doc comments (addon, `maintenance.mjs`) where they say "the code".
 6. Add one dated line under the event-store spec's clarifications: a trigger's error, and so the
    `event-store-start-trigger`/`event-store-end-trigger` fault message, is the code followed by its detail (for an io
-   error: the kind, the operation and the path). Add one `CHANGELOG.md` `## [Unreleased]` line.
+   error: the kind, the operation and the path).
 7. Before the focused Node tests, rebuild the host and addon as `scripts/run-tests.mjs:44` does
    (`cargo build --locked --release -p fgos -p fgctl -p fgos-node-addon`).
 
