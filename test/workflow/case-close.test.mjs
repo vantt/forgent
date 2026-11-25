@@ -6,15 +6,37 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 
 import { pruneFinishedCases } from '../../src/workflow/case-close.mjs';
 import { bindingsDir } from '../../src/workflow/case-bindings.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
-import { acquireUnitControl } from '../../src/runner/execution/unit-control.mjs';
+import { selfRecord } from '../../src/native/process-identity.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { isCaseId } from '../../src/native/execution-door.mjs';
 import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { append, openCase, withHold } from '../helpers/workflow-case-fixture.mjs';
+
+ensureScriptAddon();
+
+/** Plant a live unit-control generation so prune reads controller-held (Rust owns the ledger). */
+function acquireUnitControl(unitDir, unitRunId) {
+  const genDir = path.join(unitDir, 'unit-control', 'control', 'generations');
+  fs.mkdirSync(genDir, { recursive: true });
+  const self = selfRecord();
+  fs.writeFileSync(path.join(genDir, '0000000001.json'), JSON.stringify({
+    controlToken: 'test-control-token',
+    holder: { id: `${unitRunId}:controller:${self.pid}`, ...self, processStartTime: self.startTime },
+    purpose: 'unit-controller',
+    acquiredAt: Date.now(),
+  }));
+  return {
+    release() {
+      fs.rmSync(path.join(unitDir, 'unit-control'), { recursive: true, force: true });
+    },
+  };
+}
+
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = Date.now();

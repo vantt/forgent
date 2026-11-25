@@ -1,6 +1,7 @@
 // test/workflow/propose-validate.test.mjs — a proposal checked against the repository: what it refuses, and what it adds
 
 import '../helpers/process-tmp-root.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -16,8 +17,10 @@ import {
 import { classifySlice } from '../../src/workflow/propose-classify.mjs';
 import { nativeDoor } from '../../src/native/door.mjs';
 import { proposeFrame } from '../../src/workflow/propose-frame.mjs';
-import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
+import { shippedCatalog } from '../../src/native/execution-door.mjs';
 import { readStandardValue } from '../../src/config/facade.mjs';
+
+ensureScriptAddon();
 
 // A repository in memory: file path -> text. Directories exist because a file lies below them.
 function memoryPorts(files, { links = [] } = {}) {

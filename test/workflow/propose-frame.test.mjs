@@ -1,10 +1,13 @@
 import '../helpers/process-tmp-root.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { proposeFrame, ProposeFrameError, FRAME_ALLOWANCE } from '../../src/workflow/propose-frame.mjs';
 import { resolveFrame, parseFrameFlag } from '../../src/workflow/case-start.mjs';
-import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
+import { shippedCatalog } from '../../src/native/execution-door.mjs';
+
+ensureScriptAddon();
 
 const catalog = () => ({ runnerConfig: {}, shipped: shippedCatalog() });
 const frameDefaults = { fallbackPerSeat: 2, deviationsBeforeAsk: 2 };

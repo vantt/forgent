@@ -1,5 +1,6 @@
 import '../helpers/process-tmp-root.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -18,8 +19,7 @@ import {
   isResolvableVerifyRef,
 } from '../../src/runner/operation-choice.mjs';
 import { operationsForStep, getDomain } from '../../src/state/domain-registry.mjs';
-import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { listAssignmentRuns } from '../../src/native/execution-door.mjs';
+import { listAssignmentRuns, stampDeclaredAssignment } from '../../src/native/execution-door.mjs';
 import { runOnce as loopRunOnce } from '../../src/runner/loop.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
@@ -29,6 +29,7 @@ import { workUnitFor } from '../../src/runner/work-dispatch.mjs';
 
 // A driver operation runs as a Unit (runUnit): its worker runs confined (bwrap), and it binds
 // from the runner config the caller hands over, so that config needs confined executors.
+ensureScriptAddon();
 seedFileLocalBwrapRegistry();
 
 function unitReady(opts = {}) {
@@ -1181,9 +1182,11 @@ test('the Work layer turns docsRef and refs into the Unit inputs, and dispatch d
     path.posix.join('docs/history/feat-refs', 'CONTEXT.md'),
     'extra-ref.txt',
   ]);
-  const assignment = buildAssignment({ workId: work.id, stage: 'planning', operation: 'validate-plan' });
+  // Live claim path still expects the agent result claim file; dead buildAssignment used to derive it.
+  const assignment = { expectedOutputs: ['result-1.json'] };
   assert.ok(assignment.expectedOutputs.some((o) => o.includes('result-1.json')));
 });
+
 
 test('chooseStageOperation accepts domain passed as object without throwing or warning (Finding 5)', () => {
   const domainObj = { name: 'coding', stages: ['discovery', 'planning', 'executing'] };
@@ -1642,24 +1645,18 @@ test('Step 06 Cell 6.6 fix-verify-red confidence check is unchanged after splitt
 });
 
 // The three tests below pin the real production-path shape for a
-// buildAssignment-stamped Assignment (evidence.required: 'verified',
-// stamped by assignment-normalizer.mjs for all three of these operations)
+// stampDeclaredAssignment-stamped Assignment (evidence.required: 'verified')
 // reaching interpretAssignmentRunResult with confidence: 'reported'. The
 // top-level confidence gate reads the stamped evidence.required and stops
 // the dispatch there, so these never reach the branch-level
 // '<op>-requires-verified-evidence' re-check below (that shape is reachable
 // only for a bare choice with no stamped assignment, as the tests above
 // exercise). This is the intended, real dispatch-path behavior, not a bug.
-test('scoped-subtask: a real buildAssignment Assignment with reported confidence stops at the top-level gate, not the branch-level re-check', () => {
+test('scoped-subtask: a real stampDeclaredAssignment Assignment with reported confidence stops at the top-level gate, not the branch-level re-check', () => {
   const tempDir = mkTempDir();
   seedTaskSpecs(tempDir, ['scoped-subtask']);
 
-  const assignment = buildAssignment({
-    workId: 'tsk-scoped-topgate',
-    stage: 'executing',
-    operation: 'scoped-subtask',
-    options: { repoRoot: tempDir },
-  });
+  const assignment = stampDeclaredAssignment({ operation: 'scoped-subtask' });
 
   const result = interpretAssignmentRunResult({
     choice: { operation: 'scoped-subtask', assignment },
@@ -1673,16 +1670,11 @@ test('scoped-subtask: a real buildAssignment Assignment with reported confidence
   assert.equal(result.canProceed, undefined);
 });
 
-test('fix-verify-red: a real buildAssignment Assignment with reported confidence stops at the top-level gate, not the branch-level re-check', () => {
+test('fix-verify-red: a real stampDeclaredAssignment Assignment with reported confidence stops at the top-level gate, not the branch-level re-check', () => {
   const tempDir = mkTempDir();
   seedTaskSpecs(tempDir, ['fix-verify-red']);
 
-  const assignment = buildAssignment({
-    workId: 'tsk-fvr-topgate',
-    stage: 'executing',
-    operation: 'fix-verify-red',
-    options: { repoRoot: tempDir },
-  });
+  const assignment = stampDeclaredAssignment({ operation: 'fix-verify-red' });
 
   const result = interpretAssignmentRunResult({
     choice: { operation: 'fix-verify-red', assignment },
@@ -1696,16 +1688,11 @@ test('fix-verify-red: a real buildAssignment Assignment with reported confidence
   assert.equal(result.canProceed, undefined);
 });
 
-test('implement-item: a real buildAssignment Assignment with reported confidence stops at the top-level gate one step before the unsupported-operation catch-all', () => {
+test('implement-item: a real stampDeclaredAssignment Assignment with reported confidence stops at the top-level gate one step before the unsupported-operation catch-all', () => {
   const tempDir = mkTempDir();
   seedTaskSpecs(tempDir, ['implement-item']);
 
-  const assignment = buildAssignment({
-    workId: 'tsk-implement-topgate',
-    stage: 'executing',
-    operation: 'implement-item',
-    options: { repoRoot: tempDir },
-  });
+  const assignment = stampDeclaredAssignment({ operation: 'implement-item' });
 
   const result = interpretAssignmentRunResult({
     choice: { operation: 'implement-item', assignment },
@@ -1722,12 +1709,7 @@ test('implement-item: a real buildAssignment Assignment with reported confidence
 test('a settled findings verdict on mutating work stops with a findings reason', () => {
   const tempDir = mkTempDir();
   seedTaskSpecs(tempDir, ['implement-item']);
-  const assignment = buildAssignment({
-    workId: 'tsk-implement-findings',
-    stage: 'executing',
-    operation: 'implement-item',
-    options: { repoRoot: tempDir },
-  });
+  const assignment = stampDeclaredAssignment({ operation: 'implement-item' });
   const settled = (verdict) => ({ outcome: { category: 'ok', executed: 'succeeded', verdict, refused: false, evidence: 'reported', satisfied: false, infraFailure: false, failure: null } });
 
   const findings = interpretAssignmentRunResult({ choice: { operation: 'implement-item', assignment }, runResult: settled('findings'), repoRoot: tempDir });

@@ -1,5 +1,6 @@
 // test/runner/work-unit-for.test.mjs — workUnitFor: the one place a Work item becomes Unit data.
 import '../helpers/process-tmp-root.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -10,8 +11,10 @@ import { execFileSync } from 'node:child_process';
 import { workUnitFor, workRigorFor } from '../../src/runner/work-dispatch.mjs';
 import { buildPrompt } from '../../src/runner/work-compat.mjs';
 import { validateUnit, RunnerConfigError } from '../../src/native/execution-door.mjs';
-import { bindable } from '../helpers/work-seat-config.mjs';
+// Configs already name executors and capabilities; dead work-seat-config only layered default-executor/tierFallback.
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+
+ensureScriptAddon();
 
 seedStubAgentClis('claude');
 
@@ -149,12 +152,12 @@ test('work refs that are not safe repo-relative paths are skipped with a warning
 test('prefer names the step executor only when it is configured', async () => {
   const none = await workUnitFor(item(), { cfg: {}, worktree: '/wt' });
   assert.equal(none.unitData.prefer, undefined);
-  const boundCfg = bindable({
+  const boundCfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { claude: { kind: 'agent', providerModel: 'claude', invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] } },
     modelPolicies: { claude: { standard: 'sonnet' } },
     capabilities: { 'fgos-coding-implement': { prefer: 'claude' } },
-  });
+  };
   const viaCapability = await workUnitFor(item(), { cfg: boundCfg, worktree: '/wt' });
   assert.deepEqual(viaCapability.unitData.prefer, ['claude'], 'the soft prefer is the executor Seat Binding binds for the step');
   const direct = await workUnitFor(item(), {
@@ -165,12 +168,12 @@ test('prefer names the step executor only when it is configured', async () => {
 });
 
 test('a step purpose Seat Binding refuses leaves the Unit with no soft prefer, to be refused where it runs', async () => {
-  const refusedCfg = bindable({
+  const refusedCfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { claude: { kind: 'agent', providerModel: 'claude', invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] } },
     modelPolicies: { claude: { standard: 'sonnet' } },
     capabilities: { 'fgos-coding-implement': { prefer: 'not-registered' } },
-  });
+  };
   const { unitData } = await workUnitFor(item(), { cfg: refusedCfg, worktree: '/wt' });
   assert.equal(unitData.prefer, undefined);
 });

@@ -1,6 +1,7 @@
 // test/workflow/case-bindings.test.mjs — one record file per worktree identity; crash-safe; masked views are never "unbound"
 
 import '../helpers/process-tmp-root.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -18,10 +19,19 @@ import {
   unbindWorktree,
   SENTINEL_NAME,
 } from '../../src/workflow/case-bindings.mjs';
-import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
+import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { appendWorkflowEvent } from '../../src/workflow/store.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { conductorWorkflow, eventsOf, openCase, withHold } from '../helpers/workflow-case-fixture.mjs';
+
+ensureScriptAddon();
+
+/** Hold the live dispatch-cwd lock the binding layer reads as attempt custody. */
+function acquireDispatchCwdLock(fgosDir, cwd) {
+  const res = acquireSync(createLockScope('dispatch-cwd'), 'dispatch-cwd', { fgosDir, cwd });
+  if (res.result !== 'acquired') throw new Error(`dispatch-cwd not acquired: ${res.result}`);
+  return res.handle;
+}
 
 const SRC = (name) => path.resolve('src/workflow', name);
 

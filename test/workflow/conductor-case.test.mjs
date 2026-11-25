@@ -2,6 +2,7 @@
 // settle under advance; a nested case or wave spends the parent's frame and gives it back when it cannot open
 
 import '../helpers/process-tmp-root.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -13,11 +14,24 @@ import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { createCaseAdmissionPort } from '../../src/workflow/case-admission-port.mjs';
 import { createPendingBinding, commitBinding } from '../../src/workflow/case-bindings.mjs';
 import { runUnitInHost, CaseAdmissionRefusedError } from '../../src/native/execution-door.mjs';
-import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
+import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { appendAll, conductorWorkflow, FRAME, openCase, projectionOf, eventsOf } from '../helpers/workflow-case-fixture.mjs';
+
+ensureScriptAddon();
+
+// Tests assume the top-level process is not a confined dispatched worker.
+delete process.env.FGOS_DISPATCH_DEPTH;
+delete process.env.FGOS_CONFINED;
+
+/** Hold the live dispatch-cwd lock a running Unit holds as worktree custody. */
+function acquireDispatchCwdLock(fgosDir, cwd) {
+  const res = acquireSync(createLockScope('dispatch-cwd'), 'dispatch-cwd', { fgosDir, cwd });
+  if (res.result !== 'acquired') throw new Error(`dispatch-cwd not acquired: ${res.result}`);
+  return res.handle;
+}
 
 // A unit run through the host, the caller's admission port served beside the request.
 const runUnit = ({ caseAdmission, ...request }) => runUnitInHost(request, { caseAdmission });
