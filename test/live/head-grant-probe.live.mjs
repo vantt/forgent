@@ -473,7 +473,66 @@ export function classifyOutcome(verb, isGranted, res) {
   };
 }
 
-/** `fgos can-i <argv>` from inside the head: `{ decision, reason }`, or `{ decision: 'unknown', reason }` when the call fails. */
+/** The JSON document a verb printed, or null. */
+function parseReply(res) {
+  for (const raw of [(res?.stdout || '').trim(), (res?.stderr || '').trim()]) {
+    if (!raw) continue;
+    try { return JSON.parse(raw); } catch {}
+  }
+  return null;
+}
+
+/** The id of a ticket document ({"ticket":"<id>","state":"running"}) a long-running verb answered at once, or null. */
+export function ticketIdOf(res) {
+  const reply = parseReply(res);
+  const doc = reply && typeof reply.ticket === 'string' ? reply : reply?.data;
+  return doc && typeof doc.ticket === 'string' && doc.ticket && res.status === 0 ? doc.ticket : null;
+}
+
+export const TICKET_WAIT_SECONDS = 50;
+export const TICKET_MAX_WAITS = 6;
+
+/**
+ * Follows a ticket to its end with `request result <id> --wait`, repeating while it runs.
+ * Returns `{ res, ticket }`: `res` is shaped for classifyOutcome (a failed ticket carries its code, a done ticket
+ * reads as done), `ticket` is the `{ id, state, code?, waits }` evidence.
+ */
+export function followTicket(id, run) {
+  let settled = null;
+  let last = null;
+  let waits = 0;
+  while (waits < TICKET_MAX_WAITS) {
+    waits += 1;
+    last = run(['request', 'result', id, '--wait', String(TICKET_WAIT_SECONDS), '--json']);
+    if (last.error) return { res: last, ticket: { id, state: 'unknown', waits } };
+    const reply = parseReply(last);
+    const doc = reply && typeof reply.state === 'string' ? reply : reply?.data;
+    if (!doc || typeof doc.state !== 'string') {
+      // Not a ticket document: request result itself refused; classify that refusal.
+      return { res: last, ticket: { id, state: 'unknown', waits } };
+    }
+    settled = doc;
+    if (doc.state !== 'running') break;
+  }
+  if (settled.state === 'running') {
+    return {
+      res: { status: 1, stdout: JSON.stringify({ code: 'ticket-still-running', detail: `ticket ${id} still running after ${waits} waits of ${TICKET_WAIT_SECONDS}s` }), stderr: '' },
+      ticket: { id, state: 'running', waits },
+    };
+  }
+  if (settled.state === 'failed') {
+    return {
+      res: { status: 1, stdout: JSON.stringify({ code: settled.code || 'ticket-failed', detail: settled.message || `ticket ${id} failed` }), stderr: '' },
+      ticket: { id, state: 'failed', code: settled.code, waits },
+    };
+  }
+  return {
+    res: { status: 0, stdout: JSON.stringify({ result: 'done', detail: `ticket ${id} done` }), stderr: '' },
+    ticket: { id, state: settled.state, waits },
+  };
+}
+
+/** `fgos can-i <argv>` from inside the head:`{ decision, reason }`, or `{ decision: 'unknown', reason }` when the call fails. */
 function askCanI(argv) {
   const res = spawnSync(FGOS_BIN, ['can-i', ...argv, '--json'], { encoding: 'utf8', env: process.env });
   try {
@@ -607,11 +666,19 @@ export function main() {
       continue;
     }
 
-    const res = spawnSync(FGOS_BIN, plan.args, {
+    const firstRes = spawnSync(FGOS_BIN, plan.args, {
       input: plan.stdin || undefined,
       encoding: 'utf8',
       env: process.env,
     });
+    let res = firstRes;
+    let ticket = null;
+    const ticketId = ticketIdOf(firstRes);
+    if (ticketId) {
+      const followed = followTicket(ticketId, (a) => spawnSync(FGOS_BIN, a, { encoding: 'utf8', env: process.env }));
+      res = followed.res;
+      ticket = followed.ticket;
+    }
 
     const outcome = classifyOutcome(verb, isGranted, res);
     results.push({
@@ -625,7 +692,10 @@ export function main() {
       code: outcome.code,
       detail: outcome.detail,
       reply: outcome.reply,
-      evidence: outcome.detail || outcome.code,
+      evidence: ticket
+        ? `ticket ${ticket.id} settled ${ticket.state}${ticket.code ? ` (${ticket.code})` : ''}: ${outcome.detail || outcome.code}`
+        : outcome.detail || outcome.code,
+      ...(ticket ? { ticket } : {}),
     });
   }
 
