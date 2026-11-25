@@ -1,7 +1,7 @@
 ---
 id: p-jz2d2oid2m
 title: "The component authority model owns the documentation code that locate added, and the boundary views are rendered from it (documentation, priority P1; owner decision 2026-11-24)"
-status: proposed
+status: done
 priority: P1
 area: documentation
 created: 2026-11-24
@@ -26,3 +26,5 @@ views name the locate port, the pkm adapter, the `fgos doc locate|index` verbs, 
 # Notes
 
 Split out of phase 7 of `plans/261122-2217-docos-pkm-locate-door/`.
+
+Done 2026-11-25: plan `261124-0837-docos-documentation-in-component-authority` landed at `b941eb3d2` (commits `d57959ca7`, `1b087b12f`); `document-identity` row declared live with the locate paths, aliases and owns lines, views re-rendered.
