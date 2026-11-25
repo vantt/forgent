@@ -809,15 +809,18 @@ test('snapshotFgos captures files in .fgos including observe/, excluding secrets
   const base = tempBase();
   const fgosDir = path.join(base, '.fgos');
   fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });
+  fs.mkdirSync(path.join(fgosDir, 'observe', 'records'), { recursive: true });
   fs.mkdirSync(path.join(fgosDir, 'coordination'), { recursive: true });
   writeRawProjectConfig(base, '{"runner":{}}');
   fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'data.json'), '{"friction":1}');
+  fs.writeFileSync(path.join(fgosDir, 'observe', 'records', 'data.json'), '{"record":1}');
   fs.writeFileSync(path.join(fgosDir, 'secrets.local.env'), 'SECRET_TOKEN=abc');
   fs.writeFileSync(path.join(fgosDir, 'secrets.env'), 'SECRET_KEY=xyz');
 
   const snap = snapshotFgos(base);
   assert.equal(snap.has('config.yaml'), true);
   assert.equal(snap.has(path.join('observe', 'friction', 'data.json')), true);
+  assert.equal(snap.has(path.join('observe', 'records', 'data.json')), false, 'observe/records must be excluded from snapshot');
   assert.equal(snap.has('secrets.local.env'), false, 'secrets.local.env must be excluded from snapshot');
   assert.equal(snap.has('secrets.env'), false, 'secrets.env must be excluded from snapshot');
   assert.equal(snap.get('config.yaml').size, 13);
@@ -938,32 +941,49 @@ test('runSelectedTests permits allowed mutations without failing the suite', () 
   fs.rmSync(base, { recursive: true, force: true });
 });
 
-test('runSelectedTests tolerates a rewrite of the derived state view but still fails other cache changes', () => {
+test('the leak check ignores live runtime directories other sessions write but still fails a file left elsewhere', () => {
   const base = tempBase();
   const fgosDir = path.join(base, '.fgos');
+  fs.mkdirSync(path.join(fgosDir, 'runtime', 'land'), { recursive: true });
+  fs.mkdirSync(path.join(fgosDir, 'runtime', 'mailbox'), { recursive: true });
+  fs.mkdirSync(path.join(fgosDir, 'observe', 'records'), { recursive: true });
+  fs.mkdirSync(path.join(fgosDir, 'logs'), { recursive: true });
   fs.mkdirSync(path.join(fgosDir, 'cache'), { recursive: true });
   fs.writeFileSync(path.join(fgosDir, 'cache', 'state.json'), '{}');
 
-  const refreshed = runSelectedTests(['a.test.mjs'], {
+  const result = runSelectedTests(['a.test.mjs'], {
     cwd: base,
     spawn: () => {
+      // Simulate live activity in the excluded runtime directories
+      fs.writeFileSync(path.join(fgosDir, 'runtime', 'land', 'land-1-2-3.log.partial'), 'landing in progress\n');
+      fs.writeFileSync(path.join(fgosDir, 'runtime', 'mailbox', 'mail-taken'), 'taken\n');
+      fs.writeFileSync(path.join(fgosDir, 'observe', 'records', 'event.json'), '{"event":1}');
+      fs.writeFileSync(path.join(fgosDir, 'logs', 'invocation-faults.jsonl'), '{"fault":1}\n');
       fs.writeFileSync(path.join(fgosDir, 'cache', 'state.json'), '{"refreshed":true}');
       return { status: 0 };
     },
   });
-  assert.equal(refreshed.status, 0);
-  assert.equal(refreshed.fgosDiff.leaked, false);
+
+  assert.equal(result.status, 0);
+  assert.equal(result.fgosDiff.leaked, false);
+  assert.deepEqual(result.fgosDiff.added, []);
+  assert.deepEqual(result.fgosDiff.modified, []);
+  assert.deepEqual(result.fgosDiff.deleted, []);
 
   const leaked = runSelectedTests(['a.test.mjs'], {
     cwd: base,
     log: () => {},
     spawn: () => {
-      fs.writeFileSync(path.join(fgosDir, 'cache', 'other.json'), '{}');
+      fs.mkdirSync(path.join(fgosDir, 'runtime', 'other'), { recursive: true });
+      fs.writeFileSync(path.join(fgosDir, 'runtime', 'other', 'leak.json'), '{}');
       return { status: 0 };
     },
   });
+
   assert.equal(leaked.status, 1);
-  assert.deepEqual(leaked.fgosDiff.added, [path.join('cache', 'other.json')]);
+  assert.equal(leaked.fgosDiff.leaked, true);
+  assert.deepEqual(leaked.fgosDiff.added, [path.join('runtime', 'other', 'leak.json')]);
+
   fs.rmSync(base, { recursive: true, force: true });
 });
 

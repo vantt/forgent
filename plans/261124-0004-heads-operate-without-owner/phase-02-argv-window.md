@@ -46,10 +46,44 @@ Node: `src/native/door.mjs`, `src/session-host/head-grants.mjs`, `src/session-ho
 `test/session-host/head-request.test.mjs`, `test/session-host/head-start.test.mjs`, `test/live/head-grant-probe.live.mjs`.
 CLI registration of `can-i`: `src/cli/command-registry.mjs`, `packages/host-runtime/contracts/command-manifest.json`,
 `packages/host-runtime/contracts/command-routes.json`, `packages/host-runtime/contracts/command-route-annotations.json`,
-`apps/fgos/src/routing.rs`. Docs: `docs/platform/run-supervisor/spec.md`. Authority model door rows (debt paid):
+`apps/fgos/src/routing.rs`. Envelope readers that drop `session.verbs` (owner answer `q-nog2h4wfjm`; these three
+are also inside the footprint of draft plan `261122-2108-delete-dead-node-execution-closure`, which rebases onto this
+phase): `src/runner/dispatch/session-attempt.mjs`, `apps/fgos/src/wiring/unit_run_host/session_attempt.rs`,
+`apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs`. Docs: `docs/platform/run-supervisor/spec.md`. Authority model door rows (debt paid):
 `packages/component-authority/model/doors/execution-s-node-seam.yaml`,
 `packages/component-authority/model/doors/the-node-bind-facade-has-only-its-named-callers.yaml`,
 `packages/component-authority/model/doors/node-callers-reach-execution-only-through-its-seam-never-into-the-node-execution-closure.yaml`.
+
+## Owner answer q-nog2h4wfjm (2026-11-24 22:32)
+
+Option "Widen footprint, allow cargo". Retiring `envelope.session.verbs` needs three files outside the footprint:
+`src/runner/dispatch/session-attempt.mjs` (owned by draft plan `261122-2108-delete-dead-node-execution-closure`, which
+rebases on this change), `apps/fgos/src/wiring/unit_run_host/session_attempt.rs` and
+`apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs`. A planner adds them to the plan and phase 2 footprint
+and records the overlap with 2108; cargo and node run in the phase unit's sandbox; the lead reruns phase 2 in the same
+worktree. The answer allows only that footprint edit and the rerun; nothing else of scope or decision changes.
+
+**Unit sandbox.** The phase 2 unit's sandbox must allow `cargo` and `node`: the verify commands below
+(`cargo test -p fgos-session-host`, `cargo test -p fgos-run-supervisor`, `node --test ...`) run inside the unit, and
+the first run came back blocked because the sandbox refused both. Start the rerun with a unit that can run them.
+
+## Owner answer q-qzcq5xti2k (2026-11-24 23:04)
+
+Option "Allow cargo and node for claude workers in project config": add `--allowedTools 'Bash(cargo:*)' 'Bash(node:*)'
+'Bash(npm test:*)'` to the `claude-cli-bwrap` invocation. Applying it was refused: `runner.executors.<id>.invocations[].args`
+is `x-fgos-scope: global-only` (`core/config-schema/runner.schema.yaml`), and lists are leaves, so `fgos config patch`
+of `runner.executors.claude.invocations` into `.fgos/config.yaml` returns `config-key-out-of-scope belongs-in=global`.
+The answer's scope covered the project file only, so the supervisor wrote nothing and asked follow-up `q-owq4jhwng7`
+(supersedes it). Phase 2 stays parked on it.
+
+## Owner answer q-owq4jhwng7 (2026-11-25 09:33)
+
+Option "Lead pins the existing full-confinement bypass invocation". The lead reruns the phase 2 unit once, pinned to
+the standard invocation `claude-herdr-bypass-bwrap` (bwrap with private home, isolated session, own worktree;
+permission bypass) through `fgos run --override`, so `cargo` and `node` run inside the unit. No config change. If
+`--override` cannot pin an invocation, the lead asks again (fallback: the owner's one global config patch). The answer
+allows only that one rerun; it forbids any change to confinement policies, project executor args, git write grants for
+workers, other phases or the plan's scope. Phase 2 is unparked.
 
 ## Decisions taken in this phase (planner's, within PC-D6 and PC-D11)
 
@@ -132,3 +166,16 @@ finds nothing; `node --test test/architecture.test.mjs` is green.
 
 `git revert` the phase's commits; the Node table, branches and constant come back together, since they were removed in
 the same commits. Rebuild the addon.
+
+## Lead notes
+
+- 2026-11-25 09:39: the pinned rerun allowed by `q-owq4jhwng7` did not happen. Ticket `c-1632-1795574308428`
+  (unit run `unit-run-1795574308869-401c052f`) ended `blocked` after 19 s on the default `claude-cli-bwrap`: the
+  request window forwarded `run` without `--override` and `--timeout`, and the worker could not read this brief
+  in the main checkout (the p02 worktree is still on base `f999c4018`; `--sync` is dropped too). No file changed.
+  Asked the owner `q-nt7ptsq2nd`. The command of its recommended option, to be run by the owner from the main
+  checkout (outside the window, so every flag passes):
+
+```bash
+cd /home/vantt/projects/forgent && fgos run "Implement phase 2 of plan plans/261124-0004-heads-operate-without-owner from its brief plans/261124-0004-heads-operate-without-owner/phase-02-argv-window.md and plans/261124-0004-heads-operate-without-owner/plan.md (merged into this worktree by --sync). The worktree holds a half-done, uncommitted start (permissions.rs, forwarder.rs, the contract, head_request.rs edits); review it against the brief, keep what is right and finish steps 1-9. Run the phase's Verify commands and rg pass checks and make them green. Write only inside the listed paths." --provider claude --capability execute --plan plans/261124-0004-heads-operate-without-owner --phase 2 --sync main --worktree /home/vantt/projects/forgent-worktrees/261124-0004-heads-operate-without-owner-p02 --writes "packages/session-host/rust/src/lib.rs,packages/session-host/rust/src/permissions.rs,packages/session-host/rust/src/forwarder.rs,packages/session-host/rust/tests/permissions.rs,packages/session-host/rust/tests/forwarder.rs,packages/session-host/rust/Cargo.toml,packages/session-host/contracts/head-permissions.v1.json,packages/git/node-addon/src/session_host.rs,packages/git/node-addon/src/lib.rs,packages/git/node-addon/Cargo.toml,src/native/door.mjs,Cargo.lock,src/session-host/head-grants.mjs,src/session-host/head-start.mjs,src/session-host/head-request.mjs,src/session-host/head-request-client.mjs,packages/run-supervisor/contracts/head-request.v1.json,packages/run-supervisor/contracts/envelope.v3.json,packages/run-supervisor/rust/src/head_request.rs,packages/run-supervisor/rust/tests/head_request.rs,src/cli/command-registry.mjs,packages/host-runtime/contracts/command-manifest.json,packages/host-runtime/contracts/command-routes.json,packages/host-runtime/contracts/command-route-annotations.json,apps/fgos/src/routing.rs,src/runner/dispatch/session-attempt.mjs,apps/fgos/src/wiring/unit_run_host/session_attempt.rs,apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs,test/session-host/head-grants.test.mjs,test/session-host/head-request.test.mjs,test/session-host/head-start.test.mjs,test/live/head-grant-probe.live.mjs,docs/platform/run-supervisor/spec.md,packages/component-authority/model/doors/execution-s-node-seam.yaml,packages/component-authority/model/doors/the-node-bind-facade-has-only-its-named-callers.yaml,packages/component-authority/model/doors/node-callers-reach-execution-only-through-its-seam-never-into-the-node-execution-closure.yaml" --override '{"executor":"claude","invocation":"claude-herdr-bypass-bwrap"}' --timeout 3h --json
+```

@@ -70,7 +70,7 @@ function writeModel(root, { components = [], domains = [] } = {}) {
   fs.writeFileSync(path.join(dir, 'components.yaml'), rows.length ? `${rows.join('\n')}\n` : '[]\n', 'utf8');
   fs.writeFileSync(path.join(dir, 'decision-kinds.yaml'), '[]\n', 'utf8');
   fs.writeFileSync(path.join(dir, 'contracts.yaml'), '[]\n', 'utf8');
-  fs.writeFileSync(path.join(dir, 'doors', 'fixture.yaml'), 'job: fixture\nkind: door\npatterns: []\nallowed: []\n', 'utf8');
+  fs.writeFileSync(path.join(dir, 'doors', 'fixture.yaml'), 'job: fixture\nkind: door\nseverity: low\npatterns: []\nallowed: []\n', 'utf8');
 }
 
 function writeRecordedDecisionIndex(projectRoot, {

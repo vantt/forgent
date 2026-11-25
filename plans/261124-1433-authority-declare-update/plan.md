@@ -154,6 +154,10 @@ and phase 4 alone owns `CHANGELOG.md` and the spec. Owner question q-2dncwfeoy4 
 
 None. The discussion settled the outcome, and the shape choice was left to the planner.
 
+- **q-trgzaa34ua, how phase 4 closes: answered "Close on focused tests"** (owner, 2026-11-24 22:32). Phase 4
+  closes on its focused test results; the plan was already closed done on the owner's word at 20:50, so nothing
+  else changes.
+
 ## Outstanding questions
 
 None

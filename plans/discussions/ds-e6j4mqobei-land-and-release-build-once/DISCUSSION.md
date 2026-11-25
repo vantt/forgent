@@ -1,3 +1,13 @@
+---
+id: ds-e6j4mqobei
+title: "Land and release: build once, not again on every machine"
+status: open
+source:
+  - p-vyzy7isj3z
+  - p-7ww4jlg745
+created: 2026-11-24
+---
+
 # Land và release: build một lần, không build lại trên mọi máy
 
 discussion: open
@@ -60,6 +70,15 @@ chỉ tiện cho repo này.
 - 2026-11-24 11:54, lead: lần land kế tiếp thành công sau 35 phút (`efb1f5af3`); release `648d59dc` của forgentx-38
   gặp git-timeout ở bước distribution khi load 13, thử lại thì chạy được.
 - 2026-11-24 14:00, owner: chọn thứ tự (1), sửa cổng land trước (D2). Thước đo giữ nguyên qua ba vòng (D1).
+- 2026-11-25 00:20, lead: thêm số đo cho A và G, lấy từ lần land nhánh `docos/authority-declare-rows` (plan 0837; chỉ
+  đổi model và bốn view, không đổi Rust) do forgentx-0b chạy. Lần 1 (khoảng 22:50): hỏng ở bước sinh lại,
+  `git-one-door-scan --write-census` gặp `git-timeout` (`retryable: false`) ở `git status` trong candidate, load khoảng
+  10 (log `land-2729968-1795535871139229792-4.log`). Lần 2: cổng qua hết, nhưng hỏng `land-retries-exhausted` cả 4
+  lần, vì origin/main nhận 25 commit trong 60 phút (2-3 phút một commit, toàn `docs(discussion)` và `docs(report)`,
+  không chung file nào với nhánh), còn mỗi lượt cổng hơn 10 phút. Mỗi lần dựng candidate ghi khoảng 6 GB khi đĩa đã đầy
+  97% (còn 17 GB). Lần 3 chỉ qua nhờ owner tạm dừng các commit discussion lên main (`b941eb3d2`). Bài học cho G: khi
+  main nhích lên bằng các commit không chung file với nhánh, việc chạy lại toàn bộ cổng không thêm bằng chứng nào; còn
+  `retryable: false` cho một timeout do load là phân loại sai.
 
 ## 6. Thiết kế đã chốt {#design}
 

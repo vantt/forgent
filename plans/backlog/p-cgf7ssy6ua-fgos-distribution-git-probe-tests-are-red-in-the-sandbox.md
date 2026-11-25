@@ -14,3 +14,6 @@ The doors plan's lead found the `fgos-distribution` git-probe tests red on an un
 # Done when
 
 The cause is proven (sandbox only, or real) and either the tests are green wherever they must run, or the row records that they only need an unconfined run.
+
+# Notes
+

@@ -421,17 +421,19 @@ export function describeLeftoverTemps(root) {
 
 export const SENSITIVE_FGOS_FILES = new Set(['secrets.local.env', 'secrets.env']);
 
-// Derived files that any read of the live store may rewrite: the state view is a cache folded
-// from the event log. A test that reads the store therefore refreshes it without leaking
-// anything; test-written state still shows up as added or changed event, observe and work
-// files, which stay guarded.
-export const DERIVED_FGOS_FILES = new Set([
-  path.join('cache', 'state.json'),
+// Live runtime directories: other heads and the running land write them while a run is going, so
+// a change there is not a test leak; cache also holds the derived state view.
+export const LIVE_FGOS_DIRS = new Set([
+  path.join('runtime', 'land'),
+  path.join('runtime', 'mailbox'),
+  path.join('observe', 'records'),
+  'logs',
+  'cache',
 ]);
 
 /**
  * Recursively snapshots the repository's `.fgos` store before/after test runs.
- * Excludes sensitive secret files.
+ * Excludes sensitive secret files and live runtime directories.
  * Captures relative paths, file sizes, and mtimeMs.
  */
 export function snapshotFgos(repoRoot) {
@@ -451,6 +453,7 @@ export function snapshotFgos(repoRoot) {
       const fullPath = path.join(currentDir, entry.name);
       const relPath = path.relative(fgosDir, fullPath);
       if (entry.isDirectory()) {
+        if (LIVE_FGOS_DIRS.has(relPath)) continue;
         walk(fullPath);
       } else if (entry.isFile() || entry.isSymbolicLink()) {
         try {
@@ -514,7 +517,7 @@ export function runSelectedTests(files, {
   env = process.env,
   stdio = 'inherit',
   log = (msg) => console.error(msg),
-  allowedFgosMutations = DERIVED_FGOS_FILES,
+  allowedFgosMutations = new Set(),
   fileTimeoutMs = Number(env[FILE_TIMEOUT_ENV]) || DEFAULT_FILE_TIMEOUT_MS,
   watchdogPollMs = DEFAULT_WATCHDOG_POLL_MS,
   // Only a real spawnSync has child processes to supervise.
@@ -753,7 +756,7 @@ export function runTests({
   cwd = REPO_ROOT,
   stdio = 'inherit',
   queue = null,
-  allowedFgosMutations = DERIVED_FGOS_FILES,
+  allowedFgosMutations = new Set(),
   // `{ index, total }`: run only that shard of the discovered files, split by `weights` (repo-relative path -> seconds).
   shard = null,
   weights = {},

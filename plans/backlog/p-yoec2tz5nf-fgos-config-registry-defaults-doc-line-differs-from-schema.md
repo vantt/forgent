@@ -14,3 +14,6 @@ The `@fgos:doc` line of `core/config-standard/docLocate.yaml` uses a colon where
 # Done when
 
 The doc line equals the schema description and the `registry_defaults` test passes.
+
+# Notes
+

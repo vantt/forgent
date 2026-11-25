@@ -44,6 +44,6 @@ The views may already be unclean on main because of the other lead's work: repor
 | `core/config-standard/docLocate.yaml`, `core/config-schema/docLocate.schema.yaml` | none | none | no row maps `core/config-standard/` | none; `docLocate` namespace named in `owns` |
 | Index worker (`fgos doc index run`), cache `.fgos/runtime/doc-locate/`, machine model folder, Observe kind `fgos.doc.locate` | none | `document-identity` (`owns`) | parent `documentation` `mustNotOwn: runtime state mutation, code execution`; the spec and code treat `mustNotOwn` as prose, with no rule for how a child meets it | `owns` lines; status `designed` → `live` |
 
-**Blocker:** `fgos authority declare` adds rows only. A component that already exists is refused ("component
-\"document-identity\" already exists", `packages/component-authority/rust/src/declare.rs`), and no verb updates the
-paths, owns or status of an existing row. Phase 2 stops here and asks the owner (phase 2, step 3).
+**Found and since resolved:** at the time of this inventory `fgos authority declare` added rows only and refused an
+existing component ("component \"document-identity\" already exists"). The verb now takes `--update` for an
+existing component row, so phase 2 has its door.

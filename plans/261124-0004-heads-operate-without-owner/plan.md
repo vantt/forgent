@@ -49,6 +49,9 @@ footprint:
   - packages/host-runtime/contracts/command-routes.json
   - packages/host-runtime/contracts/command-route-annotations.json
   - apps/fgos/src/routing.rs
+  - src/runner/dispatch/session-attempt.mjs
+  - apps/fgos/src/wiring/unit_run_host/session_attempt.rs
+  - apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs
   - test/session-host/head-grants.test.mjs
   - test/session-host/head-request.test.mjs
   - test/session-host/head-start.test.mjs
@@ -66,7 +69,6 @@ source:
   - plans/discussions/ds-liu5g4k3gh-privileged-chores-research/DISCUSSION.md
   - p-g5ktat4kej
   - p-v6xinnjoxh
-  - p-dw3h5wscns
   - plans/discussions/ds-4qpcunq7n7-confinement-to-rust/DISCUSSION.md
 created: 2026-11-24
 ---
@@ -177,8 +179,8 @@ declared.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Role charter for the two hands](phase-01-role-charter.md) | - | docs/platform/supervision/spec.md, docs/platform/session-host/spec.md, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, core/agents/secretary.yaml, core/agents/supervisor.yaml, .claude/agents/secretary.md, .claude/agents/supervisor.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 1 | draft |
-| 2 | [The fgos argv window and its permission table, in Rust](phase-02-argv-window.md) | - | packages/session-host/rust/src/lib.rs, packages/session-host/rust/src/permissions.rs, packages/session-host/rust/src/forwarder.rs, packages/session-host/rust/tests/permissions.rs, packages/session-host/rust/tests/forwarder.rs, packages/session-host/rust/Cargo.toml, packages/session-host/contracts/head-permissions.v1.json, packages/git/node-addon/src/session_host.rs, packages/git/node-addon/src/lib.rs, packages/git/node-addon/Cargo.toml, src/native/door.mjs, Cargo.lock, src/session-host/head-grants.mjs, src/session-host/head-start.mjs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/contracts/envelope.v3.json, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, apps/fgos/src/routing.rs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, test/session-host/head-start.test.mjs, test/live/head-grant-probe.live.mjs, docs/platform/run-supervisor/spec.md, packages/component-authority/model/doors/execution-s-node-seam.yaml, packages/component-authority/model/doors/the-node-bind-facade-has-only-its-named-callers.yaml, packages/component-authority/model/doors/node-callers-reach-execution-only-through-its-seam-never-into-the-node-execution-closure.yaml | 1 | draft |
+| 1 | [Role charter for the two hands](phase-01-role-charter.md) | - | docs/platform/supervision/spec.md, docs/platform/session-host/spec.md, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, core/agents/secretary.yaml, core/agents/supervisor.yaml, .claude/agents/secretary.md, .claude/agents/supervisor.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 1 | done |
+| 2 | [The fgos argv window and its permission table, in Rust](phase-02-argv-window.md) | - | packages/session-host/rust/src/lib.rs, packages/session-host/rust/src/permissions.rs, packages/session-host/rust/src/forwarder.rs, packages/session-host/rust/tests/permissions.rs, packages/session-host/rust/tests/forwarder.rs, packages/session-host/rust/Cargo.toml, packages/session-host/contracts/head-permissions.v1.json, packages/git/node-addon/src/session_host.rs, packages/git/node-addon/src/lib.rs, packages/git/node-addon/Cargo.toml, src/native/door.mjs, Cargo.lock, src/session-host/head-grants.mjs, src/session-host/head-start.mjs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/contracts/envelope.v3.json, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, apps/fgos/src/routing.rs, src/runner/dispatch/session-attempt.mjs, apps/fgos/src/wiring/unit_run_host/session_attempt.rs, apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, test/session-host/head-start.test.mjs, test/live/head-grant-probe.live.mjs, docs/platform/run-supervisor/spec.md, packages/component-authority/model/doors/execution-s-node-seam.yaml, packages/component-authority/model/doors/the-node-bind-facade-has-only-its-named-callers.yaml, packages/component-authority/model/doors/node-callers-reach-execution-only-through-its-seam-never-into-the-node-execution-closure.yaml | 1 | running |
 | 3 | [Help channel and mail to the two hands](phase-03-help-and-mail.md) | 1, 2 | packages/session-host/contracts/head-permissions.v1.json, packages/session-host/rust/tests/permissions.rs, packages/session-host/rust/tests/forwarder.rs, core/config-standard/secretary.yaml, core/config-schema/secretary.schema.yaml, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/**, docs/platform/supervision/spec.md | 2 | draft |
 | 6 | [Domain-free release rule and the forgent recipe](phase-06-release-rule.md) | 3 | packages/session-host/rust/src/release.rs, packages/session-host/rust/src/lib.rs, packages/session-host/rust/tests/release.rs, packages/session-host/contracts/head-permissions.v1.json, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, core/config-standard/release.yaml, core/config-schema/release.schema.yaml, .fgos/config.yaml, core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 3 | draft |
 | 7 | [Integration, full suite and live probe](phase-07-integration.md) | 1, 2, 3, 6 | CHANGELOG.md, plans/261124-0004-heads-operate-without-owner/reports/head-grant-probe.md, plans/261124-0004-heads-operate-without-owner/reports/integration.md | 4 | draft |
@@ -203,8 +205,12 @@ Order against other plans:
 - PC-D11 orders this plan after both the doors plan and 0118; the discussion's earlier note in its hand-off ("Thứ tự", 00:20) that only
   phase 2 waits for the doors plan is superseded, and it could not hold anyway, since every phase overlaps that plan's
   footprint.
-- `261122-2108-delete-dead-node-execution-closure` (draft) owns `src/runner/dispatch/**`; since the split this plan
-  names no path under it, so the two do not overlap. `261124-1853-confinement-to-rust` holds the confinement work and
+- `261122-2108-delete-dead-node-execution-closure` (draft) owns `src/runner/dispatch/**` and
+  `apps/fgos/src/wiring/unit_run_host/**`. Phase 2 of this plan writes three files inside those globs:
+  `src/runner/dispatch/session-attempt.mjs`, `apps/fgos/src/wiring/unit_run_host/session_attempt.rs` and
+  `apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs`, because retiring `envelope.session.verbs` reaches them
+  (owner answer `q-nog2h4wfjm`, 2026-11-24). This plan runs first; 2108 rebases onto it on those three files. 2108 is
+  `draft`, so the overlap is not an admission error now; it cannot turn `ready` while this plan is active. `261124-1853-confinement-to-rust` holds the confinement work and
   shares only `CHANGELOG.md` with this plan, each written by its plan's last phase.
 - `261122-0056-orchestration-skeleton` (draft) shares `src/session-host/head-request.mjs`,
   `core/skills/fgos-supervisor/SKILL.md`, `docs/platform/supervision/spec.md`, `docs/platform/session-host/spec.md`,
@@ -232,6 +238,65 @@ morning (discussion §1). The planner's own shape choices are written as decisio
   commits, then a release by the rule (or by the owner before phase 6 lands). The plan as a whole reverts the same way
   in reverse phase order.
 
+## Lead notes
+
+- 2026-11-24 22:05, phase 1 parked: built on branch `heads-operate-without-owner/p01` (3 commits; the acceptance
+  `rg` finds nothing). Every land since 21:50 is refused `main-checkout-dirty-overlap` by other sessions' uncommitted
+  edits in the main checkout (`plans/261124-1945-run-tests-fgos-leak-check/phase-01-skip-live-runtime-dirs.md`,
+  earlier `plans/discussions/ds-ubqlutna6r-domain-agnostic-item-component/DISCUSSION.md`); last ticket
+  `c-2200-1795532684711`. Supervisor event `60c3b2166d595c39`. Next wake: re-review the branch with a reviewer, then land.
+- 2026-11-24 22:05, phase 2 parked: the unit came back blocked (ticket `c-14984-1795531913411`), leaving a half-done,
+  uncommitted tree in worktree `261124-0004-heads-operate-without-owner-p02` that must not land as is. Its footprint
+  misses `src/runner/dispatch/session-attempt.mjs`, `apps/fgos/src/wiring/unit_run_host/session_attempt.rs` and its
+  tests, and the unit sandbox refused cargo and node. Owner question `q-nog2h4wfjm`; supervisor event `c60b8e801d6eae98`.
+- 2026-11-24 22:26, phase 1 reviewed and still parked on the land: two fix units (`c-5846-1795532878036`,
+  `c-4376-1795533319699`) cleared every blocking review finding; branch tip `1c139c298`, acceptance `rg` finds nothing.
+  Land `c-5470-1795533764158` is refused `main-checkout-dirty-overlap` on the uncommitted
+  `plans/261124-1945-run-tests-fgos-leak-check/phase-01-skip-live-runtime-dirs.md` in the main checkout. The branch base
+  `f999c4018` is 46 commits behind main, and main's commits since then touch that file, so the land counts it as
+  written. Two ways clear it: that file gets committed by its owner (owner question `q-3rhc6lroqc`), or the branch is
+  synced with main. A sync-only `fgos run --sync main --writes ... --worktree ...` (the form in `run --help`) is
+  refused `bad-args` "run takes one prompt", and a prompt plus `--sync main` unit (`c-6366-1795533799302`) ended
+  `execution-failure` (`verdict-inconclusive`, exit-11) without merging. Next wake: land again once the file is clean,
+  else retry the sync with a fresh unit.
+- 2026-11-24 22:26, phase 2 still parked on owner question `q-nog2h4wfjm` (open).
+- 2026-11-24 22:40, phase 2: owner answered `q-nog2h4wfjm` "Widen footprint, allow cargo" (written into
+  `phase-02-argv-window.md`). Still parked: the footprint edit (three session-attempt files) is a planner's edit, and
+  the lead's own `land --paths` may not touch `footprint`. Raised to the supervisor to start a planner; the rerun
+  follows in worktree `261124-0004-heads-operate-without-owner-p02`.
+- 2026-11-24 22:40, phase 1: land `c-1789-1795534639461` refused `main-checkout-dirty-overlap` again, now on
+  `plans/discussions/ds-ubqlutna6r-domain-agnostic-item-component/DISCUSSION.md`, because the branch base is 56
+  commits behind main. The sync-only `fgos run --sync main --writes ... --worktree ...` (the form in `run --help`) is
+  still refused `bad-args` "run takes one prompt" through the request window, and a prompt plus `--sync main` unit
+  (`c-2368-1795534729073`) shows the window forwarded the argv without `--sync`, `--plan` and `--phase`, so no merge
+  ran (`execution-failure`, `verdict-inconclusive`). Phase 1 stays parked until the shaper commits that discussion
+  file, or the window forwards `--sync`. Branch tip `1c139c298`, reviewed, acceptance `rg` finds nothing.
+- 2026-11-24 23:00, phase 1: after the supervisor reported the discussion file committed (`e005444fb`), land
+  `c-6002-1795535270324` passed every `land.gates` test (170 of 171) and failed only on `--test test/skills`, which
+  the gate cannot import as a directory; the test files must be named one by one. The retry naming them
+  (`c-6384-1795535457992`) was refused `main-checkout-dirty-overlap` again: the shaper re-dirtied
+  `plans/discussions/ds-ubqlutna6r-domain-agnostic-item-component/DISCUSSION.md` and it stayed dirty for the whole
+  9-minute retry window. Still parked on that file, or on a sync of the branch with main.
+- 2026-11-24 23:00, phase 2: the planner's widening landed (`4cce55f61`). Rerun unit `c-7867-1795535626766`
+  (claude, `code:implement`, in the p02 worktree) came back `blocked`: the worker's sandbox (bwrap) refuses `cargo`
+  with "This command requires approval" (node works), so it changed nothing. No `fgos run` flag widens the worker
+  sandbox, so the "allow cargo" half of the owner's answer has no door the lead can use. The p02 worktree is also on
+  base `f999c4018` and lacks the planner's phase-file edits, and the window drops `--sync`. Parked on whoever owns
+  the worker sandbox's approval list.
+
+- 2026-11-24 23:06, phase 1 done: the watcher landed `heads-operate-without-owner/p01` as `719331230` (ticket
+  `c-10969-1795536197308`, every `test/skills` file named) after two `land-target-changed` retries; the worktree was
+  removed by the land. Phase 2 waits on owner question `q-qzcq5xti2k` (cargo and node for claude workers).
+- 2026-11-25 00:15, supervisor wake: phase 2 stays parked on owner question `q-owq4jhwng7` (open; supersedes
+  `q-qzcq5xti2k`, see `phase-02-argv-window.md`); the lead is idle on that verified wait, so it is left live, not
+  replaced. Phases 3, 6 and 7 wait behind phase 2.
+
+- 2026-11-25 09:39, phase 2 parked again on owner question `q-nt7ptsq2nd`: the pinned rerun (`q-owq4jhwng7`)
+  could not be made, because the request window forwards `run` without `--override` (and without `--timeout`,
+  `--sync`, `--plan`, `--phase`); ticket `c-1632-1795574308428` ran on the default `claude-cli-bwrap` and came back
+  `blocked` with no change. The recommended option is the owner running the pinned command written in
+  `phase-02-argv-window.md` (Lead notes). Phases 3, 6 and 7 wait behind phase 2.
+
 ## Outstanding questions
 
-None
+- `q-nt7ptsq2nd` (phase 2): how the pinned rerun is made, given the window drops `--override`.

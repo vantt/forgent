@@ -1141,21 +1141,35 @@
     - danh tính tài liệu
     - document-identity-axes
     - locate-before-write-search
+    - doc locate
+    - doc index
+    - docLocate
+    - locate port
+    - locate crate
+    - pkm adapter
   meaning: Defines how maintained documentation is placed in axes so writers find before create.
   layer: domain
   tier: 9
   paths:
     - docs/platform/documentation/subcomponents/document-identity/
+    - packages/documentation/
   exceptions: []
   owns:
     - document axis model, locate before write, and claim units
+    - locate port and its pkm adapter (packages/documentation/rust, third-party/pkm)
+    - fgos doc locate and fgos doc index sub-verbs (wiring apps/fgos/src/wiring/doc_locate.rs, doctor rows apps/fgos/src/wiring/doctor/documentation.rs)
+    - index worker process (fgos doc index run), started only through the process door, so the parent's code execution boundary stays with that door
+    - rebuildable locate cache .fgos/runtime/doc-locate/ and the machine embedding model folder; derived views rebuilt from the docs, never source state, so the parent's runtime state mutation boundary holds
+    - Observe kind fgos.doc.locate (packages/documentation/rust/observe-kinds.json)
+    - docLocate config namespace (core/config-standard/docLocate.yaml, core/config-schema/docLocate.schema.yaml)
   mustNotOwn:
     - convention placement
     - doc checks
   spec: docs/platform/documentation/subcomponents/document-identity/spec.md
   source:
     - docs/platform/documentation/subcomponents/document-identity/
-  status: designed
+    - packages/documentation/
+  status: live
 - id: write-door
   parent: documentation
   canonical: write-door

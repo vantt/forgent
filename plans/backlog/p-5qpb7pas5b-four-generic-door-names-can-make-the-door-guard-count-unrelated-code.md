@@ -14,3 +14,6 @@ The door guard in `test/architecture.test.mjs` counts how often each name in a d
 # Done when
 
 The four names are replaced by more specific ones (the full name of the owning function) or by narrower primitives. Small; do it when the two rows are touched again, or fold it into `p-tvwy24txpj`'s neighbourhood of door work.
+
+# Notes
+
