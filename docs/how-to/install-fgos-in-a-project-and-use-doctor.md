@@ -202,11 +202,18 @@ Who fixes it:
 - **wire-agents**: your own agent config outside the project (the Claude config dir, `~/.gemini`). `fgos init` and `doctor --fix` never write it. Run `fgos wire-agents` to see what it would change, then `fgos wire-agents --yes`: it acts only on agent CLIs on this machine and backs up each file first as `<file>.pre-wire-agents-<time>`. A setting that widens an agent's permissions it only shows; you decide and edit it yourself.
 - **info**: informational, or only reports. No action required unless you care.
 
-`fgos doctor --json` lists every row of the machine you run it on, with its id,
-message and, where one exists, its fix; the tables below explain the rows a
-project owner meets most. The registered checks come from
-`packages/distribution/contracts/doctor-registry.v1.json` (the one registry: every row and fix in run order, with the component that judges it). Some read-only checks list the failing
-file or key in their message; the message always names the exact target.
+Section 4.7 lists every row the doctor runs and the fix that repairs it. It is
+generated from `packages/distribution/contracts/doctor-registry.v1.json` (the one
+registry: every row and fix in run order, with the component that judges it; the
+`config-*` rows come from the config crate's contract that registry names), so it
+cannot lag the code: `test/setup/registrations.test.mjs` fails when it differs, and
+`node scripts/render-doctor-howto-tables.mjs` rewrites it. A fix named there runs
+alone with `fgos doctor --fix --only <fix-id>`; "none registered" means only a
+person can repair the row. `fgos doctor --json` also lists each row's message and
+the exact command it names. Sections 4.1 to 4.6 are hand-written: the rows a project
+owner meets most, with the typical failing message and what to do by hand. A test
+fails when one of them names an id the registry no longer has. Some read-only checks
+list the failing file or key in their message; the message always names the exact target.
 
 ### 4.1. Machine and installation
 
@@ -214,13 +221,11 @@ file or key in their message; the message always names the exact target.
 |---|---|---|---|---|
 | `node-version-and-git` | Node 18 or newer and git on `PATH` | `node v16.x -- need >=18` | you | Install Node 18+ or git |
 | `cli-version-visible` | `fgos version` resolves this build's version and verbs | `fgos version did not resolve a packageVersion...` | you | No fix is registered: repair the runtime (`fgctl repair`) or reinstall |
-| `bin-discovery-cache` | (fix only, no check) refreshes the cached global `fgos` path | none | tool | `fgos doctor --fix` |
 | `rust-host-binary-present` | The active release's `bin/fgos` exists and is executable | `no active fgos rust host release or dev checkout found` | you | `fgctl repair` |
 | `rust-host-target-supported` | The OS and CPU are an approved Rust host target | names the unsupported platform | you | Use `x86_64-unknown-linux-gnu` or `x86_64-pc-windows-msvc`; no other target is shipped |
 | `legacy-node-payload-present` | The legacy Node payload named by the release manifest exists | `no active fgos rust host release or dev checkout found` | you | `fgctl repair` |
 | `active-release-matches-checkout` | Activated Node payload matches doctor's source working tree; staged dependencies excluded | changed/missing/extra counts, up to five paths, digest and activation time | you | Use `npm run fgos:dev -- <verb>` for working-tree code, or rebuild/stage/upgrade to update plain `fgos`; no automatic fix. Skips outside source checkouts, absent activation, same-checkout dev manifests and linked worktrees whose activation belongs to main. Does not certify Rust host freshness |
 | `activation-matches-pin` | The active release is the one the committed `.fgos/distribution.json` pin names | a `warning:` (it never fails) `active <digest12> != pin <digest12> (override: <reason> or none)` | you | `fgctl init` to follow the pin, or `fgctl upgrade` and commit the moved pin when you are ahead on purpose; skips without a pin or an activation. `fgctl status` and `fgctl verify` print the same line |
-| `config-awareness` | Which config level is active (project or global) and whether the other exists | never fails | info | none |
 | `claude-plugin-marketplace` | The fgOS Claude Code plugin marketplace is registered and the plugin enabled | a `warning:` (it never fails) `fgOS Claude Code plugin not installed/enabled ... run fgos wire-agents` | wire-agents | `fgos wire-agents --yes` (needs the `claude` CLI on `PATH`) |
 
 ### 4.2. Project config (written by `fgos init` or `--fix`)
@@ -237,10 +242,7 @@ file or key in their message; the message always names the exact target.
 | `workflow-capabilities-configured` | No Workflow unit names a tool ability (a capability a `kind: tool` executor lists in `for`) whose tool is not present; any other capability is a label and passes | `Workflow units name tool abilities whose tool is not present: ...` | you | Install the tool the executor names, or fix that executor's invocation |
 | `capability-serves-valid` | The `serves` sets are distinct and include `review` (their shape is `fgos config check`'s) | `fgos doctor --pretty` names the key | you | Edit the key the message names, then `fgos config check` |
 | `worker-slots-ceiling-usable` | `workerSlots.ceiling` is a positive integer or explicit `null` | `fgos doctor --pretty` names the key | you | Edit the key the message names, then `fgos config check` |
-| `worktree-setup-configured` | `worktreeSetup.commands` is a list of non-empty shell commands | names the bad entry | you | Edit `worktreeSetup.commands` |
-| `gate-bypass-configured` | `gateBypass.level` is one of off, light, standard, heavy | `gateBypass.level missing or not a recognized level ... -- run fgos doctor --fix` | tool | `fgos doctor --fix` |
-| `iron-law-configured` | `ironLaw.level` is ask or warn | `ironLaw.level missing ... -- run fgos doctor --fix` | tool | `fgos doctor --fix` |
-| `gateway-token-configured` | the machine files under `~/.fgos/private/` (accounts file, `gateway-token`) exist and are valid | the row names the missing or invalid file | tool | `fgos doctor --fix` (never rotates an existing token) |
+| `gateway-token-configured` | the gateway token file `~/.fgos/private/gateway-token` exists, is 0600 and holds one line | the row names the problem | tool | `fgos doctor --fix` (never rotates an existing token) |
 | `main-checkout-hook-wired` | `core.hooksPath` points at `.githooks` (the main-checkout lock hook) | `core.hooksPath not wired to .githooks ... run npm run setup:hooks` | you | `npm run setup:hooks` in the fgOS source checkout (never re-points a custom hooks path). Only meaningful when the project carries `.githooks` |
 | `dispatch-decide-hook-wired` | `.claude/settings.json` has the PreToolUse hook that forces `dispatch decide` before Agent/Task calls | `.claude/settings.json has no PreToolUse dispatch-decide hook wired ... run fgos doctor --fix` | tool | `fgos doctor --fix` |
 
@@ -322,7 +324,6 @@ This table is selective for the Event Store: it lists the one row a project owne
 | `delivered-not-on-trunk` | Every handed-over item's branch is reachable from the trunk | names the item | you | Merge or catch up the named item |
 | `event-store-legacy-layout` | No tracked event file (`.fgos/events.jsonl`, `.fgos/events/`) is left in the main checkout | `event-store-migration-required: run fgos events migrate in the main checkout with writers stopped` | you | `fgos events migrate --check`, then `fgos events migrate`, with every writer stopped |
 | `git-incidents` | Pointer: open Git incidents (pending operations, native locks, a merge in progress) | `warning: 1 pending Git operation(s); run \`fgos git status\` ...` | you | Never fails. `fgos git status` lists every incident; `fgos git recover` settles interrupted operations; for a stuck merge review `git status`, then `fgos main-checkout-reset --sha <sha> --confirm` |
-| `runner-coordination-orgPolicy-shape` | `runner.coordination.orgPolicy.dischargeOn` is an array of strings | `... dischargeOn must be an array of strings` | tool | `fgos doctor --fix` resets it to the default |
 | `operation-prompt-templates-valid` | Operation prompt templates in `.fgos/prompt-templates` validate | names the template | you | Fix the named template. The release's own templates are judged by `npm test` |
 | `observe-dir-writable` | `.fgos/observe` is writable | names the path | you | Fix directory permissions |
 | `observe-friction-migrated` | Legacy friction records are migrated to `.fgos/observe/friction` | `N legacy work.friction record(s) newer than cursor (not migrated) -- run: <host binary> friction migrate --dir <project>` | you | Run the named command. `friction` is a Rust host verb (`.fgos/installation/bin/fgos`, or `FGOS_HOST_BIN`); the Node `fgos` entry has no such verb and no registered fix does it |
@@ -337,6 +338,134 @@ to see the registry lints (`doc-alias-broken`, `doc-active-duplicate`,
 `doc-source-conservation`) as `findings`, `fgos doc-registry --check` to see
 whether `docs/doc-registry.md` and `.json` are current, and `fgos doc-registry`
 to refresh them.
+
+### 4.7. Every row and its registered fix
+
+<!-- doctor-catalog:begin -->
+119 rows, in the order the doctor runs them.
+
+| Id | Checks | Fix |
+|---|---|---|
+| `node-version-and-git` | Node >=18 and git available | none registered |
+| `cli-version-visible` | the running fgOS's own package version and git commit resolve cleanly | none registered |
+| `project-fgos-launcher` | a release install has a single fgos on PATH that runs each project's own activated fgos | `fgos doctor --fix --only project-fgos-launcher` |
+| `runner-generated-paths` | runner.generatedPaths maps generated sources to render targets with well-formed write-scope entries | none registered |
+| `runner-patterns-config` | project and global runner patterns configuration is present, well-formed, and cumulative | none registered |
+| `executor-family-unique` | each agent family (providerModel) is served by exactly one executor; its transports are invocations of that executor | none registered |
+| `executor-skills-installed` | every skill an executor declares in supports.skills exists in the skill directory of each CLI the executor invokes, in the main checkout; fails naming the missing path | none registered |
+| `tier-fallback` | every family runner.tierFallback lists for a tier has a modelPolicies cell at that tier and an agent executor; warns otherwise | none registered |
+| `model-policy-pools` | every pool a runner.modelPolicies cell names (model@pool) is declared in runner.llmAccounts, since a pool with no account is skipped by the walk; warns otherwise | none registered |
+| `llm-accounts-shape` | runner.llmAccounts is global-only and well formed: pool names without "@" or a family alias, every account with a credentialStore directory per CLI | none registered |
+| `llm-accounts-default-login-home` | warns when a runner.llmAccounts credentialStore is its CLI's own default login home (a pane renewing a copy of that login can log out the real sessions); never fails, no fix | none registered |
+| `domain-registry-compiled` | every compiled.json of the running fgOS's domains (the form the Work lifecycle reads) exists, parses, carries the contract this fgOS reads and matches its registry and workflow YAML | none registered |
+| `agent-type-names-unique` | agent definition names are unique in the project's own tiers (the workspace tier, and the core tier when the project ships one); a higher tier replaces a lower one whole, and workspace-tier files have the shape the renderer needs; the installed fgOS's own domain and core tiers are judged by npm test | none registered |
+| `main-checkout-hook-wired` | core.hooksPath wired to .githooks (main-checkout kernel lock check, borrowed through the description, and source-checkout new-root-file guards) | none registered |
+| `dispatch-decide-hook-wired` | .claude/settings.json hooks: PreToolUse enforces fgos dispatch decide on every Agent/Task call, the decision-question template and the main-checkout delete guard on every Bash call; the mailbox, session-rotation and questions (receipt of an answered owner question) hooks sit on Stop, UserPromptSubmit and the other events | `fgos doctor --fix --only dispatch-decide-hook-wired` |
+| `codex-hook-wired` | .codex/hooks.json PreToolUse hooks enforce fgos dispatch decide, the decision-question template and the main-checkout delete guard | `fgos doctor --fix --only codex-hook-wired` |
+| `agy-hook-wired` | .agents/hooks.json PreToolUse hooks enforce fgos dispatch decide, the decision-question template and the main-checkout delete guard | `fgos doctor --fix --only agy-hook-wired` |
+| `omp-hook-wired` | .omp/extensions/fgos-hooks.ts in-process extension enforces fgos dispatch decide, the decision-question template and the main-checkout delete guard | `fgos doctor --fix --only omp-hook-wired` |
+| `pi-hook-wired` | .pi/extensions/fgos-hooks.ts in-process extension enforces fgos dispatch decide, the decision-question template and the main-checkout delete guard | `fgos doctor --fix --only pi-hook-wired` |
+| `tool-registry-configured` | tool registry posture — inactive/degraded/full | none registered |
+| `agy-permissions-configured` | when agy is on PATH, the person's own agy settings.json lets headless agy run commands under a deny list; report only, fgOS never widens it (fgos wire-agents shows the edit) | none registered |
+| `agy-sub-homes-configured` | each agy sub-HOME an executor config or a gemini account of runner.llmAccounts names exists as a directory | none registered |
+| `curl-available` | curl resolves on PATH (fgctl init downloads releases through it); a missing curl only blocks the download paths | none registered |
+| `bwrap-available` | bwrap binary resolves on PATH and minimal smoke test (bwrap --ro-bind / / -- true) exits 0 | none registered |
+| `work-classification-vocabulary` | every open item's risk/kind matches its domain's declared classification vocabulary | none registered |
+| `work-step-vocabulary` | every open item sits at a step its own domain's Workflow still registers — no item stranded on a retired step | none registered |
+| `work-recorded-conflicts` | the Work view holds no recorded cross-machine conflicts: acknowledged changes a concurrent change from another machine kept from applying (warns, never fails) | none registered |
+| `root-drift` | every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge | none registered |
+| `delivered-not-on-trunk` | every item whose status says its work was handed over has its fgw/<id> branch reachable from the trunk | none registered |
+| `provider-capacity-state` | provider-capacity account leases/quarantine state is reportable; doctor never auto-clears quarantine | none registered |
+| `lock-kernel-semantics` | the holder-lock driver gives kernel lock exclusion on <fgosDir>/locks and <lockRoot>, proven by a two-process probe on each mount | none registered |
+| `lock-borrow-vectors` | a lock description borrowed by a git child never leaks to a background process (fgos internal lock-borrow-vectors) | none registered |
+| `lock-holders` | read-only pointer: foreign lock holders, predecessor domains still running and hot records that need a person are read by fgos lock-status | none registered |
+| `run-supervisor-route` | the host binary serves supervise, gate, adopt and attempt-step at protocol 1 and names the containment driver agents run in and its level (kernel or best-effort) | none registered |
+| `runtime-socket-dir` | the runtime socket directory exists, is owned by this user and is 0700 | `fgos doctor --fix --only runtime-socket-dir` |
+| `run-attempts-stuck` | read-only pointer: attempts with no closed.json and no lock holder, an attempt whose release was removed named with what to restore; the next fgos run adopts them, or run fgos dispatch recover (a warning, never a failure) | none registered |
+| `session-rotation-orphans` | read-only pointer: pending rotations with a dead executor, resolved on the lineage's next session rotate or session answered (a warning, never a failure) | none registered |
+| `run-supervisor-config` | dispatch.gateKillGraceMs and dispatch.cancelWaitMs read through the config door (each at least 1000 ms) and the cancel wait is not shorter than the grace | none registered |
+| `mailbox-hook` | agent mailbox: whether this project opted in to the mailbox hook rows (mailbox.enabled), and when it did, the record verdict from fgos mailbox status | none registered |
+| `mailbox-claude-accept` | agent mailbox: whether the Claude Code user settings accept cross-session input (crossSessionInbound), which decides if mail wakes an idle Claude session; report only, fgOS never sets it | none registered |
+| `mailbox-sync-timer` | agent mailbox: when cross-machine mail is on, an OS timer runs the mailbox sync child every eventStore.sync.intervalSec, so mail is taken on a machine where no session runs a tool | `fgos doctor --fix --only mailbox-sync-timer` |
+| `account-probe-timer` | account health: when dispatch.probeAccount.intervalSec is set, an OS timer runs fgos dispatch probe-account --all --record --leg direct every that many seconds, so an exhausted or logged-out account is found between runs; off (0) by default | `fgos doctor --fix --only account-probe-timer` |
+| `watcher-timer` | project supervision: when watcher.enabled is true, an OS timer runs fgos watcher tick every watcher.activeIntervalSec and keeps a head it starts alive after the timer's run ends; off by default; a platform without a timer scheduler only warns | `fgos doctor --fix --only watcher-timer` |
+| `supervisor-events-unhandled` | project supervision: how many events the watcher raised are still unhandled; a pointer to fgos supervisor queue that warns and never fails | none registered |
+| `supervision-pace` | project supervision: runs the read-only pace definitions watcher-overdue and supervisor-idle-burn and warns with their rows, since a stopped watcher cannot report itself | none registered |
+| `land-gates-configured` | project supervision: when watcher.enabled is true, land.gates is not empty (every fgos land refuses land-gate-missing otherwise) | none registered |
+| `workflow-capabilities-configured` | no core/domain Workflow unit names a tool ability (a capability a kind: tool executor lists in for) whose tool is not present; any other capability is a label and passes | none registered |
+| `capability-serves-valid` | runner.capabilities' "serves" attribute sets are mutually distinct (I19); the schema states their shape | none registered |
+| `worker-slots-ceiling-usable` | workerSlots.ceiling is a positive integer, the number of worker seats per machine (a null or non-positive value leaves the seat pool without a usable size) | none registered |
+| `config-parse` | A config file does not parse or breaks strict-config. | none registered |
+| `config-schema` | The value a source gives, alone or merged with the others, breaks a section schema, or a key sits in a scope that does not allow it. | none registered |
+| `config-legacy-shadowed` | config.yaml and config.json both exist in one scope. | none registered |
+| `config-format-legacy-json` | A project or global file is still legacy JSON; run fgos config migrate (the global file: fgos config migrate --global --convert --machine-checked, after both key stages). Fails: every reader is on Config and no project keeps legacy JSON. | none registered |
+| `config-doc-drift` | A @fgos:doc line differs from the schema and standard render. doctor warns, fgos config check fails. | `fgos doctor --fix --only config-refresh-docs` |
+| `config-comment-missing-doc` | A described key carries no @fgos:doc line. | `fgos doctor --fix --only config-refresh-docs` |
+| `config-comment-missing-why` | A value in a file carries no @fgos:why line. | none registered |
+| `config-comment-migrated-why` | A value still carries the [migrate] reason; replace it with the real one. | none registered |
+| `config-unknown-key` | A key no schema describes. | none registered |
+| `config-redundant-value` | A value equal to the standard; it holds nothing. | `fgos doctor --fix --only config-remove-redundant` |
+| `config-key-in-wrong-file` | An account pool or the gateway token sits in a config file. The destination decides: equal there is the state after the copy stage (the finishing verb removes the source); only the legacy global JSON file has a fix (the relocation reads that file); a project file has none. | `fgos doctor --fix --only config-copy-to-destination` |
+| `config-global-permissions` | The global, accounts or token file or ~/.fgos/private is wider than its mode. | `fgos doctor --fix --only config-chmod` |
+| `config-secret-outside-private` | A file directly under ~/.fgos outside private/ holds an account pool or a token. | `fgos doctor --fix --only config-move-under-private` |
+| `config-capability-taste-moved` | A project or global file holds runner.capabilities.<x>.roles, .personas or .seats, which moved: roles and personas to runner.roles and runner.personas, seats to the workflow (a seat has no place in the config now). In the project file the fix moves each role and persona with its reason text (widened to every capability: runner.roles applies to all of them, and agreeing values from several capabilities merge) and drops the seats; the global file cannot hold the new tables, so there the fix only removes the keys and the finding says the taste belongs in the project file. When two places give one target different values, or the target holds another value, nothing is changed, no fix is offered and the finding names both paths for one fgos config patch (one transaction that unsets both old blocks and sets runner.roles.<role>; a single set or unset is refused while other retired keys remain). | `fgos doctor --fix --only config-move-capability-taste` |
+| `config-empty-provider-accounts` | The accounts file holds runner.providers.<provider>.accounts as an empty mapping, a leftover of the retired account inventory (the accounts live in runner.llmAccounts). The fix removes each empty accounts key, the provider entry when that was all it held, and runner.providers when no provider is left; a provider that still lists accounts is not touched here (the runner config refuses it by name). | `fgos doctor --fix --only config-remove-empty-provider-accounts` |
+| `config-migrate-backup-stale` | A migration backup is older than the stale age and can be deleted. | none registered |
+| `gateway-token-configured` | the gateway token file ~/.fgos/private/gateway-token exists, is 0600 and holds one line | `fgos doctor --fix --only gateway-token-configured` |
+| `claude-plugin-marketplace` | fgOS Claude Code plugin marketplace is registered and the fgOS plugin is installed/enabled; report only, fgos wire-agents installs it | none registered |
+| `operation-prompt-templates-valid` | every operation prompt template in the project tier (.fgos/prompt-templates) validates against bounded variables and schema; the release's domain and core templates are judged by npm test | none registered |
+| `terminal-control` | the terminal-control driver (herdr) answers, which capabilities it declares and which server it talks to, and terminal.* after the config merge with each value and its source; a bad FGOS_HERDR_ANCHOR_PANE or terminal.* value fails, a missing herdr only warns | none registered |
+| `terminal-allocations` | terminal slots past allocationGraceMs that never launched and retained panes past their time; reports only, closes nothing | none registered |
+| `omp-natives-present` | omp's native addon for its installed version is in the natives directory omp resolves (a confined omp cannot extract it); fails only when an executor runs omp, warns when omp is missing or unused; readiness only, no repair | none registered |
+| `herdr-executor-kinds` | every executor dispatched through a herdr pane names an agent kind herdr can start, and none depends on an outdated herdr integration hook | none registered |
+| `executor-profile-warnings` | legacy executor entries hardcoding policy-shaped flags or account-pool-like env, each named with its documented migration target | none registered |
+| `session-keep-declared` | read-only pointer: confined agent invocations that declare no session directory keep no seat transcript; fgos dispatch probe-session <executorId> shows where the CLI writes it (a warning, never a failure; doctor never runs the probe) | none registered |
+| `trust-store-readable` | the agent folder-trust store is readable and carries a usable "projects" object, so a dispatch into a fresh worktree can be pre-trusted instead of stopping at a dialog | none registered |
+| `confined-pane-accounts` | every confined invocation that reads a login store has an account in the global provider inventory with at least one of that store's credential files, so its agent starts logged in | none registered |
+| `non-claude-trust-stores-readable` | every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, the same read a live dispatch will do | none registered |
+| `agent-cli-project-trusted` | the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a "Trust this folder?" prompt | none registered |
+| `seat-binding-dry-bind` | every seat of every Workflow unit, and every core capability (execute, code:implement, any capability declaring an agent pool) as a writing producer, binds under the committed config in a fixed headless session (no lease, nothing started); a policy refusal or a pool with no executor able to carry the confinement posture fails, no pool, account state, tier caps and shared families are information | none registered |
+| `blind-steps-use-proven-pools` | every blind Workflow unit can only bind executors whose provider family and transport were proven to keep a worker blind (read-only, no model call) | none registered |
+| `executor-confinement` | no executor declares "permissionMode": "bypass" without privateHome, isolatedSession and ownWorktree all true | none registered |
+| `invocation-git-write-grants` | warns when an executor or invocation still grants git add/git commit to a worker through --allowedTools (the runner commits; workers hold no git write grant) | none registered |
+| `rust-host-binary-present` | the active release's entries.fgos binary exists and is executable | none registered |
+| `rust-host-target-supported` | current OS and architecture is an approved target for the fgos rust host (x86_64-unknown-linux-gnu, x86_64-pc-windows-msvc) | none registered |
+| `legacy-node-payload-present` | the legacy node payload components.legacyNode.root/entry resolves to a real file | none registered |
+| `active-release-matches-checkout` | activated legacy Node payload matches this source checkout working tree (not Rust freshness) | none registered |
+| `activation-matches-pin` | the active release is the one the committed .fgos/distribution.json pin names (warns when it differs) | none registered |
+| `confinement-policies-declared` | confinement policies referenced by capabilities exist in built-ins or runner.confinementPolicies | none registered |
+| `confinement-backend-registry-readable` | machine backend registry file exists and conforms to confinement-backend-registry.v1 schema | `fgos doctor --fix --only confinement-backend-registry-readable` |
+| `confinement-orphaned-resources-reaped` | confinement temp roots are owner-only and no dispatch home is left behind by a dead process | `fgos doctor --fix --only confinement-orphaned-resources-reaped` |
+| `credential-copies-retained` | no login copy (pending, scratch, or a kept private home) that may hold the only valid refresh token is left unapplied | `fgos doctor --fix --only credential-copies-retained` |
+| `confinement-bwrap-platform` | bwrap backend instance configured in machine registry is enabled and its executable is verified on Linux | none registered |
+| `confinement-probe-freshness` | confinement probe freshness status (runs the falsification probe harness against the registered bwrap backend) | none registered |
+| `confinement-blind-read` | a blind unit can be enforced: the registered bwrap backend hides peer run state, homes and processes from a worker | none registered |
+| `confinement-strict-readiness` | strict confinement readiness (all capabilities declared with known policies, bwrap ready) | none registered |
+| `confinement-herdr-maturity` | herdr confinement convergence maturity status (partial: pre-adapter checks under Authority, session/home lifecycle adapter-managed) | none registered |
+| `observe-dir-writable` | .fgos/observe directory is writable | none registered |
+| `observe-host-resolvable` | Rust host binary resolves and reads the friction store (friction rank) | none registered |
+| `observe-write-health` | read-only pointer: records the Observe write door refused or dropped in the last 7 days (per-writer health counters), read by fgos metrics query --kind fgos.observe.health; warns, never fails, no fix | none registered |
+| `observe-friction-migrated` | read-only pointer: old friction shard lines the v2 records store does not hold yet; warns until fgos friction migrate --to-records has copied them, never fails, no fix | none registered |
+| `writer-identity-resolvable` | the writer identity resolves through the Rust host, both for the running host and for the activation a plain git commit hook uses | none registered |
+| `identity-machine-id` | this machine has an id minted by the Identity component (the base of every machine and session handle); absent only warns, `fgos doctor --fix` mints it | `fgos doctor --fix --only identity-machine-id` |
+| `identity-machine-key` | this machine has an ed25519 signing key minted by the Identity component (what signs for MAIL and the shared directory); absent only warns, `fgos doctor --fix` mints it once and never replaces it | `fgos doctor --fix --only identity-machine-key` |
+| `identity-ssh-keygen` | ssh-keygen from OpenSSH 8.1 or later is installed: the Identity component signs and verifies through it (no crypto library of its own); no fix, install OpenSSH | none registered |
+| `identity-project-id` | this repository carries one project id in the tracked file .fgos/project.json, the same in every clone; absent only warns, and there is no fix: run `fgos identity project --init` once on one machine, commit, pull elsewhere | none registered |
+| `identity-shared-directory` | the shared directory of other machines' sessions, read from its cache (.fgos/cache/identity-directory.json): passes with the counts; warns on entries dropped for a bad signature or a changed key (naming the machine id), on entries of another project than this clone's, and on a machine handle two machines share; no fix, the owner decides | none registered |
+| `seat-binding-route` | the host Seat Binding runs answers ladder on the internal seat-binding route at protocol 2, the protocol the Node client speaks (its message names the protocol it sent) | none registered |
+| `event-store-open-root` | Event Store open-root | none registered |
+| `event-store-machine-id` | Event Store machine-id | none registered |
+| `event-store-legacy-layout` | Event Store legacy-layout | none registered |
+| `event-store-incidents` | Event Store incidents | none registered |
+| `git-component-compatible` | Combined addon contracts and Git feature floor, with the repository layout and measured durability | none registered |
+| `git-repository-config` | Repository transport settings refused by Publication/Remote, and the Event Store mirror fetch mappings | `fgos doctor --fix --only git-publication-refspecs` |
+| `git-operation-journal` | Readable Git WAL under the controller activation fence (`git-fence-missing` when the fence is gone); open operations are `git-incidents` | `fgos doctor --fix --only git-wal-dir` |
+| `git-incidents` | read-only pointer: open Git incidents, read and recovered through fgos git status / fgos git recover | none registered |
+| `workflow-case-binding-sentinel` | the worktree binding directory carries the host sentinel that tells a reader it is not a masked view | none registered |
+| `workflow-case-bindings` | every worktree binding record matches the ledger of its case, and every bound open case has its record | `fgos doctor --fix --only workflow-case-bindings` |
+| `doc-locate-model` | documentation: the embedding model fgos doc locate uses is complete under the machine model folder, every file at its pinned size and sha256; missing or corrupt files warn (locate still answers from text alone) and fgos doctor --fix fetches them from docLocate.modelSource | `fgos doctor --fix --only doc-locate-model-fetch` |
+| `doc-locate-index` | documentation: the state of the fgos doc locate search index of this project; a pointer to fgos doc index status that warns when the index is not ready and never fails | none registered |
+<!-- doctor-catalog:end -->
 
 ## 5. Before your first Workflow run
 

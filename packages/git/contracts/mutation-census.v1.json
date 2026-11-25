@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ef02487988a6f1d9d1afb780b2afe50029a9360aae458b7647bfb9b712e9e1f7",
+  "payloadDigest": "41e9d17e93be16b0cacbb7e0850672fcc3c405b4c834a0b97a70d2b1e2721f5b",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1439,6 +1439,7 @@
     "scripts/project-agents.mjs": "eea69eb0e5017c1e1ad44079b061192f10c1734668ad7cfb4a8591a9318c47f0",
     "scripts/record-mailbox-hook-fixtures.mjs": "f1a1f57799f537c46cf582310a1b00deecb2befeba3eab73b33789b8822a1cf3",
     "scripts/regenerate-observe-fixtures.mjs": "582d85470927ceb64440c2cbb8da86c837ef942b8eba035a0c1039ae5d516e7d",
+    "scripts/render-doctor-howto-tables.mjs": "242fc6e77cf5824e4d52cb003b19f67f35fb1cdc4f0f6d63cfb58090cf9a0456",
     "scripts/run-rust-dev-host.mjs": "4f2e65268fe8302d51e43be84d9d00a022595c7143275bde6b045dd7f367de35",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
     "scripts/run-tests.mjs": "8f009e764bf665130a72b1c4d0d4f024d9d5feb2acf1b79c32480f25b167b8e5",
