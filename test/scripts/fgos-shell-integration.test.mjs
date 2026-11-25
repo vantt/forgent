@@ -104,6 +104,22 @@ test('fgos resolves and invokes bin/fgos.mjs from the repo root', () => {
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
+test('inside a confined head the fgos function passes the call through without adding --dir, and outside one it still adds it', () => {
+  const repoRoot = setupRepo();
+
+  const inHead = execFileSync('bash', ['-c', `source "${scriptPath}"; fgos --x`], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    env: { ...SHELL_ENV, FGOS_HEAD_REQUEST_SOCKET: '/nonexistent/head-request.sock' },
+  });
+  const outsideHead = runBash(repoRoot, `source "${scriptPath}"; fgos --x`);
+
+  assert.match(inHead, /FGOS_MARKER \["--x"\]/);
+  assert.doesNotMatch(inHead, /--dir/);
+  assert.match(outsideHead, /--dir/);
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
 test('fgos-runner resolves and invokes bin/fgos-runner.mjs from the repo root', () => {
   const repoRoot = setupRepo();
 

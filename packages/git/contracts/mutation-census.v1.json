@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8db86489c8f7370dbe0d97d1b48320469b04e995c226c4e4c66fa45bbe6b2b17",
+  "payloadDigest": "2bf10a143619fdc862eaac4c428db3afee286195d534198119e04b07e60d88d0",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1387,7 +1387,7 @@
     "scripts/explain-command-route.mjs": "db546d74676a1c91c3309241dcb618dc438fbae79448f4e2253319657dbbee24",
     "scripts/export-command-selectors.mjs": "8347ac6f9232df87b1e4b3ab8ec20063872796b36119ffb3b3d9c0ba10a4e521",
     "scripts/fgos-session-start-hook.mjs": "102b8a95b9d4ff0097fbb72e550854d3a05805d446c610c5ac6a01c8f304fe12",
-    "scripts/fgos-shell-integration.sh": "657a8a83677992b9890a4400e1f5eb3423947904cd41bb5e84bf2dfb2286bad4",
+    "scripts/fgos-shell-integration.sh": "4ac765e1fd4beeff0a72ca9a1bf95f8d1765602b7f4f19ee386b9f8ef6963b5f",
     "scripts/git-addon.mjs": "f004d096788be529a044c9185ce884559a4c9d91db0958523fff500371d55016",
     "scripts/git/e1-power-cut.mjs": "73da033846ea409abd7a8b36827aaf0a2caa6e6cd822878b5d332c536169ec9d",
     "scripts/git/e1-power-cut.sh": "be0500b7f99580694cf1ca7418c17ddf6bd70583f3a06686aaab923118e2d1fa",

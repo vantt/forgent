@@ -92,6 +92,12 @@ fgos() {
       --dir) has_dir=1; break ;;
     esac
   done
+  # A confined head reaches the host through its request socket and its argv
+  # window refuses `--dir` (it changes the project root of the call), so inside
+  # a head the function passes the call through exactly as written.
+  if [ -n "${FGOS_HEAD_REQUEST_SOCKET:-}" ]; then
+    has_dir=1
+  fi
   if [ -x "$root/.fgos/installation/bin/fgos" ]; then
     # `-x` follows a symlink chain transparently -- confirm the REAL target
     # (not just the lexical path) still lives under the installation root
