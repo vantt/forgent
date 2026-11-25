@@ -21,4 +21,4 @@ Related rows that each hold one piece and none holds the whole: `p-rchuoa2v3k` (
 
 # Notes
 
-Gather the six related rows into this one shape (RUL11) rather than adding a seventh mechanism; a shaper settles the design with the owner first.
+Gather the six related rows into this one shape, RUL11 (mess, not weight: gather what is scattered in scope until it is done), rather than adding a seventh mechanism; a shaper settles the design with the owner first.
