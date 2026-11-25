@@ -55,7 +55,8 @@ pub struct Request<'a> {
 
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct Outcome {
-    /// The code of the first step that failed, else its detail; later steps still ran.
+    /// The code of the first step that failed, followed by `": "` and its detail when it has one (for an io error: the
+    /// kind, the operation and the path); later steps still ran.
     pub error: Option<String>,
     /// A publish is due and the caller starts the one detached child. Only ever set when `end` and not `dispatched`.
     pub sync_due: bool,
@@ -76,8 +77,13 @@ pub fn sync_due(timers: &Timers, last_attempt: Option<(u64, &str)>, now_sec: f64
     }
 }
 
-fn code_of(error: &Error) -> String {
-    error.code.to_string()
+/// The error's own display (`"{code}: {detail}"`) so the code leads and the detail follows; the bare code when there is no detail.
+fn describe(error: &Error) -> String {
+    if error.detail.is_empty() {
+        error.code.to_string()
+    } else {
+        error.to_string()
+    }
 }
 
 /// Run the trigger for the store of `cwd`. Every step is attempted on its own and the first failure is the outcome's
@@ -93,14 +99,14 @@ pub fn maintain(request: &Request) -> Outcome {
     }
     if let Err(e) = crate::locks::validate_seal_context(request.held_ranks, request.hot_lock_depth)
     {
-        fail(code_of(&e));
+        fail(describe(&e));
         return outcome;
     }
     let resolved = match resolve(request.cwd, request.state_root, request.trusted_main, false) {
         Ok(resolved) => resolved,
         Err(e) => {
             fail(match &e {
-                ResolveError::Machine(e) => code_of(e),
+                ResolveError::Machine(e) => describe(e),
                 other => other.code(),
             });
             return outcome;
@@ -109,21 +115,21 @@ pub fn maintain(request: &Request) -> Outcome {
     let layout = match Layout::from_common_dir(Some(resolved.repo.common_dir())) {
         Ok(layout) => layout,
         Err(e) => {
-            fail(code_of(&e));
+            fail(describe(&e));
             return outcome;
         }
     };
     let streams = match layout.streams() {
         Ok(streams) => streams,
         Err(e) => {
-            fail(code_of(&e));
+            fail(describe(&e));
             return outcome;
         }
     };
     let attempt = match sync_status(&layout) {
         Ok(record) => (record.time > 0).then_some((record.time, record.remote)),
         Err(e) => {
-            fail(code_of(&e));
+            fail(describe(&e));
             return outcome;
         }
     };
@@ -138,12 +144,12 @@ pub fn maintain(request: &Request) -> Outcome {
             request.held_ranks,
             request.hot_lock_depth,
         ) {
-            fail(code_of(&e));
+            fail(describe(&e));
         }
     } else {
         for stream in &streams {
             if let Err(e) = seal_one_if_due(request, &resolved, &layout, stream) {
-                fail(code_of(&e));
+                fail(describe(&e));
             }
         }
     }

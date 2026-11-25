@@ -215,7 +215,7 @@ test('a failing end trigger leaves a record, and the command it ended still succ
     return found.some((record) => record.faultClass === 'event-store-child') ? found : null;
   });
   assert.deepEqual(records.map((record) => record.faultClass).sort(), ['event-store-child', 'event-store-end-trigger']);
-  assert.equal(records.find((record) => record.faultClass === 'event-store-end-trigger').message, 'event-store-lock-dir-invalid');
+  assert.match(records.find((record) => record.faultClass === 'event-store-end-trigger').message, /^event-store-lock-dir-invalid(: |$)/);
 });
 
 test('a failing start trigger of a dispatched worker leaves a record before the verb runs, and the command still succeeds', (t) => {
@@ -225,10 +225,9 @@ test('a failing start trigger of a dispatched worker leaves a record before the 
   const env = { ...process.env, FGOS_DISPATCH_DEPTH: '1' };
   const list = spawnSync(process.execPath, [BIN, 'list', '--dir', dir], { cwd: repo, encoding: 'utf8', env });
   assert.equal(list.status, 0, list.stderr);
-  assert.deepEqual(
-    faultRecords(repo, dir).map((record) => [record.faultClass, record.message]),
-    [['event-store-start-trigger', 'event-store-lock-dir-invalid'], ['event-store-end-trigger', 'event-store-lock-dir-invalid']],
-  );
+  const records = faultRecords(repo, dir);
+  assert.deepEqual(records.map((record) => record.faultClass), ['event-store-start-trigger', 'event-store-end-trigger']);
+  for (const record of records) assert.match(record.message, /^event-store-lock-dir-invalid(: |$)/);
 });
 
 test('a detached seal or sync child that fails leaves a record and exits non-zero', (t) => {

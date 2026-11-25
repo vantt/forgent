@@ -37,7 +37,7 @@ function handSyncToChild(root, childHost) {
  *   command (or its child) skips instead of waiting.
  *
  * `trustedMain` is the main checkout's root, or a function returning it. A trigger never fails its caller: every step is attempted on its own and the first failure is returned as
- * `{ error }` (its code, else its message). Durable open batches stay on disk and doctor reports the store, so the
+ * `{ error }` (its code and detail, else its message). Durable open batches stay on disk and doctor reports the store, so the
  * next trigger simply retries.
  */
 export function maintainEventStore(cwd, { trustedMain = cwd, shutdown = false, end = false, dispatched = false, childHost = resolveHostBin } = {}) {

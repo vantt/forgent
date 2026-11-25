@@ -570,7 +570,7 @@ fn seconds(value: f64, what: &str) -> Result<u64> {
 }
 
 /// The lifecycle trigger of one store: seals what is due (everything on shutdown) and says whether a publish is due.
-/// `{ error, syncDue }`; `error` is the code of the first step that failed, and the caller starts the publish child.
+/// `{ error, syncDue }`; `error` is the code of the first step that failed, followed by its detail when it has one, and the caller starts the publish child.
 #[napi]
 pub fn maintain_event_store(request: MaintainRequest) -> Result<Value> {
     check()?;
