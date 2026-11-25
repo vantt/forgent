@@ -1909,10 +1909,20 @@ fn a_session_is_proven_dead_only_when_registered_with_a_dead_head() {
     assert!(dead_raw("10"), "absent pid is proven dead");
     assert!(!dead_raw("20"), "live pid is not proven");
     assert!(!dead_raw("0"), "\"0\" is not a bare pid");
+    assert!(!dead_raw("012"), "\"012\" is not a bare pid");
     assert!(!dead_raw("12ab"), "\"12ab\" is not a bare pid");
     assert!(
         !dead_raw("fg-abc234/missing"),
         "a session id with no row is not proven"
+    );
+
+    assert!(
+        !directory::session_proven_dead(
+            &root,
+            &std::process::id().to_string(),
+            &fgos_process::facts::judge_here,
+        ),
+        "the real OS judge never proves the running test process dead"
     );
 
     let live_unknown_start = |record: &Record| match record.pid {
