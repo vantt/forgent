@@ -85,6 +85,24 @@ permission bypass) through `fgos run --override`, so `cargo` and `node` run insi
 allows only that one rerun; it forbids any change to confinement policies, project executor args, git write grants for
 workers, other phases or the plan's scope. Phase 2 is unparked.
 
+## Owner answer q-3svd4ttdn7 (2026-11-25 10:59)
+
+Option "Commit by hand". The 32 finished but uncommitted paths in worktree
+`261124-0004-heads-operate-without-owner-p02` are committed outside any head, on branch
+`heads-operate-without-owner/p02` only. The answer allows that one commit of exactly those paths and forbids pushing,
+landing on main or touching other files; the lead then reviews and lands the branch through `fgos land`. Done:
+commit `8c51967e4` "feat(session-host): one argv window and one permission table in Rust for head requests", tree clean.
+
+## Owner answer q-ulx4nkztpq (2026-11-25 10:59)
+
+Option "Follow-up item". Phase 2 lands as is and is marked done with step 9 recorded as partly met. One new backlog
+item takes the leftovers: the execution engine's `session.verbs` writes and gate
+(`packages/execution/engine/src/transport_round/session_attempt.rs`, `tests/transport_round.rs`), the
+`bin/fgos.mjs` "unknown verb" answer for `fgos can-i` outside a head, and the 4 door-row allowance lines step 9 could
+not pay (head-start's seam import; `bind` and `readAccountStateOverlay` with no door; head-request's three imports
+without a seam-row entry). The answer forbids editing the engine files or `bin/fgos.mjs` inside this plan. The lead
+writes only its plan directory, so the backlog row is raised to the supervisor.
+
 ## Decisions taken in this phase (planner's, within PC-D6 and PC-D11)
 
 - **Where the table lives:** `packages/session-host/contracts/head-permissions.v1.json`, compiled into the crate
