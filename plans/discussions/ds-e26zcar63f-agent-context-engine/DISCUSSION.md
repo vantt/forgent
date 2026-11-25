@@ -11,6 +11,8 @@ discussion: open
 
 ## 1. Trạng thái hiện tại
 
+2026-11-25 16:30 — Owner settled P1 (ACE becomes its own component, ACE-D3) and chose to wait on the 14 conflicts until ACE gathers the rules (ACE-D4). Next: P3, the contract between ACE and ASC.
+
 2026-11-25 16:10 — P2 measured ([report](../../reports/research-261125-1601-fgos-rule-duplicates-and-conflicts.md)). Word matching finds almost nothing (16 near-verbatim pairs, mostly boilerplate), but reading by meaning finds 31 clusters of one rule restated in other words (about 14% of the rule statements) and 14 conflicts or drift, 6 of them medium or above, mostly in the dispatch rules; the worst is `AGENTS.md:216` (decide before every Agent call) against `core/skills/fgos-researching/SKILL.md:69-75` (research branches skip decide). Almost every conflict is between rules that share no id and no wording, so ACE needs detection by content, not only by id. Open: P1, P3, and what to do with the 14 conflicts.
 
 2026-11-25 — Opened by DOCOS (lead:DOCOS, session forgentx-d5) in the chat with the owner. Two decisions are settled: what ACE and ASC each are (ACE-D1), and the three roles ACE, ASC and packaging-distribution (ACE-D2). Under way: measuring duplicate and conflicting rules by content in the fgOS-owned rule text (P2), which decides how much duplicate and conflict detection ACE needs now. Open: P1 (does ACE become its own component, out of packaging-distribution) and P3 (the contract between ACE and ASC).
@@ -23,7 +25,7 @@ The owner's original idea was ACE alone: one place that organizes, stores and ma
 
 | P | Point | State | Notes |
 |---|---|---|---|
-| P1 | Does ACE become its own component, with its own spec, taking the registry out of packaging-distribution? | open | DOCOS leans yes: ACE-D1 makes ACE its own authority. The split can come after ASC, since ASC needs only the contract. `fgos authority locate` finds no row that owns "the one store of every rule" (2026-11-25), so the component row is new. |
+| P1 | Does ACE become its own component, with its own spec, taking the registry out of packaging-distribution? | settled (ACE-D3) | DOCOS leans yes: ACE-D1 makes ACE its own authority. The split can come after ASC, since ASC needs only the contract. `fgos authority locate` finds no row that owns "the one store of every rule" (2026-11-25), so the component row is new. |
 | P2 | How many fgOS-owned rules are duplicated or in conflict by content? | measured | 519 normative statements from 84 files: 31 duplicate clusters (about 20.7 KB of 149.7 KB, ±30%), 14 conflicts or drift, 6 medium or above ([report](../../reports/research-261125-1601-fgos-rule-duplicates-and-conflicts.md)). Detection by content is needed; the report suggests one owner per rule with pointers elsewhere, and a write-time check against the nearest existing rules, with a full sweep as a scheduled audit. |
 | P3 | The contract between ACE and ASC | open | Sketch: ASC asks ACE for the rules whose `when:` facts match; ACE guarantees each rule has one owner, no duplicate and no conflict. `when:` is metadata stored in ACE; the matcher belongs to ASC. |
 | P4 | Proposal §4.7.2 places task-scoped selection, budgets and reading plans in ACE | settled by ACE-D2 | Those belong to ASC, which alone knows what the agent is about to do. §4.7.2 is amended to say so. |
@@ -34,6 +36,8 @@ The owner's original idea was ACE alone: one place that organizes, stores and ma
 |------|----------|------|--------|
 | ACE-D1 | **ACE** (Agent Context Engine) is the one place that organizes, stores and manages every rule in the system, keeping them free of duplicates and conflicts; it does not know which agent is starting. **ASC** (Agent Start Context) is the one place that, when an agent starts, recognizes what it is about to do and sets the context that fits, and the one place where every other module supplies context at start; rules from ACE are one of its inputs, contributors the other. They are two components joined by a contract, not one component in slices. | 2026-11-25 | owner in chat with DOCOS, 14:53, held at 15:51 |
 | ACE-D2 | Three roles. ACE owns the rule store: units, owners, `when:` metadata, duplicate and conflict detection; it writes no file and knows no agent. ASC owns selection: it takes the start facts, selects rules from ACE, gathers contributor context and returns ordered blocks; it writes no host file and spawns nothing. Packaging-distribution owns writing files: which file for which CLI, block markers, keeping other tools' blocks, doctor drift rows and their repair; it selects no rule. `fgos setup` calls ASC `compose` with standing facts and the file delivery, then writes the blocks. Dependency order ACE ← ASC ← packaging-distribution. | 2026-11-25 | owner agreed 15:51 ("đồng ý, ghi quyết định") |
+| ACE-D3 | ACE becomes its own component with its own spec and authority row. The instruction registry and the duplicate and conflict checks move out of packaging-distribution into it; packaging-distribution keeps only writing host files (ACE-D2). | 2026-11-25 | owner 16:30, after the P2 measurement |
+| ACE-D4 | The 14 conflicts and drift found in P2 are not fixed one by one now. They are fixed when ACE gathers the rules, each rule moving to one owner, and the gathering is not done until all 14 are resolved. | 2026-11-25 | owner 16:30 ("đợi"), against DOCOS's advice to fix the six worst now |
 
 ## 5. Q&A log
 
@@ -43,6 +47,7 @@ The owner's original idea was ACE alone: one place that organizes, stores and ma
 - 2026-11-25 15:04 — Owner: is ACE still tied to packaging-distribution, is it done? DOCOS: not done; only the registry core exists, inside packaging-distribution, managing 7 rule files.
 - 2026-11-25 15:51 — Owner: so packaging-distribution uses ACE to render what it needs? DOCOS: through ASC, so there is one selector; the three roles as in ACE-D2. Owner agreed and asked to record the decisions and measure duplicate rules.
 - 2026-11-25 16:10 — Measurement done: 31 duplicate clusters, 14 conflicts or drift. DOCOS read the cited lines of the three worst conflicts (`AGENTS.md:216` and `:229`, `fgos-researching/SKILL.md:69-75`, `fgos-lead/SKILL.md:51`) and they hold.
+- 2026-11-25 16:30 — Owner: wait on the conflicts; yes, split ACE out. Recorded as ACE-D3 and ACE-D4.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -68,3 +73,9 @@ ACE is the lowest layer and knows nothing above it. ASC is the only selector: ev
 - **Goal:** count rules duplicated or in conflict by content across the fgOS-owned rule text, with each pair cited by file and line.
 - **D-IDs:** ACE-D1.
 - **Verify:** the report under `plans/reports/` lists each pair and the method; a reader can rerun the method.
+
+### Gather every fgOS rule into ACE and resolve the measured conflicts {#task-gather-rules}
+
+- **Goal:** move every fgOS-owned rule to one owner in ACE, with other places pointing to it; resolve the 31 duplicate clusters and the 14 conflicts of the [P2 report](../../reports/research-261125-1601-fgos-rule-duplicates-and-conflicts.md).
+- **D-IDs:** ACE-D1, ACE-D3, ACE-D4.
+- **Verify:** a rerun of the P2 sweep finds no conflict and no duplicate cluster outside pointers.
