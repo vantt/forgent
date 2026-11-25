@@ -234,27 +234,17 @@ pub fn spells(word: &str, want: &str) -> bool {
                 .is_some_and(|rest| rest.starts_with('=')))
 }
 
-/// The positional words the host reads from `argv`: a `--flag` and the value after it (when that is not itself a
-/// `--` word) are not positional, exactly as the host's own argument parser reads them. A verb word is decided on
-/// what the host will run, wherever flags stand.
-fn host_positionals(argv: &[String]) -> Vec<&str> {
-    let mut words = Vec::new();
-    let mut at = 0;
-    while at < argv.len() {
-        if argv[at].starts_with("--") {
-            at += 1;
-            if argv.get(at).is_some_and(|next| !next.starts_with("--")) {
-                at += 1;
-            }
-        } else {
-            words.push(argv[at].as_str());
-            at += 1;
-        }
-    }
-    words
+/// The positional words the host reads from `argv`, read by the host's own argument parser, so a verb word is decided
+/// on what the host will run, wherever flags stand.
+fn host_positionals(argv: &[String]) -> Vec<String> {
+    let tokens: Vec<std::ffi::OsString> = argv.iter().map(std::ffi::OsString::from).collect();
+    // Every token is a `String`, so the parser's only refusal (a non-UTF-8 token) cannot occur.
+    fgos_host_runtime::cli_args::parse_args(&tokens)
+        .map(|parsed| parsed.positional)
+        .unwrap_or_default()
 }
 
-fn matches(rule: &Rule, argv: &[String], positional: &[&str]) -> bool {
+fn matches(rule: &Rule, argv: &[String], positional: &[String]) -> bool {
     if rule.prefix.is_empty() {
         return false;
     }
@@ -265,7 +255,7 @@ fn matches(rule: &Rule, argv: &[String], positional: &[&str]) -> bool {
                 return false;
             }
         } else {
-            if positional.get(verb) != Some(&want.as_str()) {
+            if positional.get(verb).map(String::as_str) != Some(want.as_str()) {
                 return false;
             }
             verb += 1;
@@ -292,7 +282,7 @@ pub fn decide(persona: &str, argv: &[String]) -> Option<Verdict> {
     Some(match winner {
         Some(rule) => {
             let verb_words = rule.prefix.iter().filter(|w| !is_long_flag(w)).count();
-            let flag_first = argv.iter().take(verb_words).any(|w| w.starts_with("--"));
+            let flag_first = argv.iter().take(verb_words).any(|w| is_long_flag(w));
             Verdict {
                 decision: if flag_first {
                     Decision::Deny
