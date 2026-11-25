@@ -282,21 +282,6 @@ impl<'a> From<&'a String> for RecoveryAuthority<'a> {
     }
 }
 
-impl<'a> From<(&'a str, Option<&'a str>)> for RecoveryAuthority<'a> {
-    fn from((authority, recorder): (&'a str, Option<&'a str>)) -> Self {
-        Self {
-            authority,
-            recorder,
-        }
-    }
-}
-
-impl<'a> From<(&'a str, &'a str)> for RecoveryAuthority<'a> {
-    fn from((authority, recorder): (&'a str, &'a str)) -> Self {
-        Self::recovered_by(authority, recorder)
-    }
-}
-
 /// A linked checkout's custody for its scoped commit's recovery, taken once and
 /// never waited for, so a checkout a live writer holds is named busy and kept.
 /// None for the main checkout, whose `main-checkout` lock the recovery takes

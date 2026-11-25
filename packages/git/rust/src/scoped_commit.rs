@@ -456,7 +456,8 @@ pub(crate) fn require_no_native_state(
 /// What a terminal rejection answers: an unknown effect needs recovery, any
 /// other cause is a plain refusal.
 fn rejected(cause: &str) -> OperationError {
-    if cause.ends_with("effect-unknown") {
+    let token = cause.split(':').next().unwrap_or(cause).trim();
+    if token.ends_with("effect-unknown") {
         recovery(cause)
     } else {
         failure(cause)

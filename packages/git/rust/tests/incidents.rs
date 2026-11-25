@@ -306,9 +306,35 @@ fn recovery_never_touches_the_candidate_of_an_attempted_land_even_when_its_write
         .publish_land(&f.repo, &mut x, &e, &StopAt("land-before-read-tree"), 0)
         .is_err());
     drop(x);
+
+    // Not-dead control for Land: an attempted Land of a live writer stays kept with the alive notice.
+    let kept = recover_proving(&f, &|_| false);
+    assert_eq!(kept["freed"], json!([]), "{kept}");
+    assert_eq!(kept["recovered"], json!([]), "{kept}");
+    assert_eq!(kept["kept"][0]["operationId"], "attempted");
+    assert_eq!(kept["kept"][0]["cause"], "land-authority-mismatch");
+    let alive_msg = kept["message"].as_str().unwrap();
+    assert!(
+        alive_msg.contains("only its writer gone-session is alive or not provably dead; only its writer, or `fgos git recover` once it is gone, can recover it"),
+        "expected alive notice, got: {alive_msg}"
+    );
+
+    // When the writer is provably dead, the attempted Land is still refused land-authority-mismatch,
+    // but gets accurate, minimal text without the 'alive or not provably dead' notice (N2).
     let recovered = recover_proving(&f, &|_| true);
     assert_eq!(recovered["freed"], json!([]), "{recovered}");
     assert_eq!(recovered["recovered"], json!([]), "{recovered}");
+    assert_eq!(recovered["kept"][0]["operationId"], "attempted");
+    assert_eq!(recovered["kept"][0]["cause"], "land-authority-mismatch");
+    let dead_msg = recovered["message"].as_str().unwrap();
+    assert!(
+        !dead_msg.contains("alive or not provably dead"),
+        "dead writer attempted Land must not get alive notice: {dead_msg}"
+    );
+    assert!(
+        dead_msg.contains("only its writer gone-session can recover an attempted Land"),
+        "expected accurate minimal text, got: {dead_msg}"
+    );
     assert!(worktree.exists());
     assert!(pin_present(&f, "attempted"));
 }
@@ -428,6 +454,11 @@ fn recovery_settles_pending_pre_attempt_land_of_dead_writer_and_clears_mismatch(
     let f = Fixture::new();
     let _worktree = interrupt_land_as(&f, "dead-land", "dead-session");
 
+    // Note (N1): Pre-attempt Land is legitimately settleable by another writer without proof that
+    // the writer is dead (it leaves no target ref changes and settles as AbandonedBeforeAttempt).
+    // The not-dead control that proves the dead check matters is exercised on attempted Land in
+    // `recovery_never_touches_the_candidate_of_an_attempted_land_even_when_its_writer_is_dead`.
+
     // Verify prepare_land by another writer fails with land-abandoned-writer-mismatch
     let err = match f.driver.prepare_land(
         &f.repo,
@@ -452,6 +483,11 @@ fn recovery_settles_pending_pre_attempt_land_of_dead_writer_and_clears_mismatch(
             .iter()
             .any(|id| id == "dead-land"),
         "{recovered}"
+    );
+    let msg = recovered["message"].as_str().unwrap();
+    assert!(
+        msg.contains("dead-land (recovered by fixture for dead writer dead-session)"),
+        "expected recoverer attribution in message, got: {msg}"
     );
 
     // Verify prepare_land by the other writer now succeeds
@@ -526,6 +562,13 @@ fn recovery_settles_scoped_commit_of_dead_writer_and_records_recoverer() {
     let f = Fixture::new();
     interrupt_scoped_commit_as(&f, "dead-commit", "dead-session");
 
+    // Not-dead control (N1): when the writer is not provably dead, the chain stays kept.
+    let kept = recover_proving(&f, &|_| false);
+    assert_eq!(kept["recovered"], json!([]));
+    assert_eq!(kept["kept"][0]["operationId"], "dead-commit");
+    assert_eq!(kept["kept"][0]["cause"], "commit-authority-mismatch");
+    assert_eq!(kept["kept"][0]["writer"], "dead-session");
+
     let recovered = recover_proving(&f, &|w| w == "dead-session");
     assert!(
         recovered["recovered"]
@@ -534,6 +577,11 @@ fn recovery_settles_scoped_commit_of_dead_writer_and_records_recoverer() {
             .iter()
             .any(|id| id == "dead-commit"),
         "{recovered}"
+    );
+    let msg = recovered["message"].as_str().unwrap();
+    assert!(
+        msg.contains("dead-commit (recovered by fixture for dead writer dead-session)"),
+        "expected recoverer attribution in message, got: {msg}"
     );
 
     let wal = wal::Wal::open(&f.repo).unwrap();
@@ -556,6 +604,33 @@ fn recovery_settles_scoped_commit_of_dead_writer_and_records_recoverer() {
         wal::Outcome::AbandonedBeforeAttempt => {}
         other => panic!("unexpected outcome: {other:?}"),
     }
+
+    // B1: replay assertion proving a replay after a recorded recovery still answers recovery-required
+    let baseline = f.driver.preflight_commit(&f.repo, vec![], None).unwrap();
+    let request = CommitRequest {
+        writes: vec!["a".into()],
+        message: "interrupted commit".into(),
+    };
+    let error = f
+        .driver
+        .scoped_commit(
+            &f.repo,
+            vec![],
+            &baseline,
+            &request,
+            "dead-session",
+            "dead-commit",
+            &fgos_git::wal::OsFileSystem,
+        )
+        .unwrap_err();
+    assert_eq!(error.code, fgos_git::ResultCode::RecoveryRequired);
+    assert!(
+        error
+            .cause
+            .contains("commit-effect-unknown: recovered by fixture"),
+        "expected cause to match recorded rejection, got: {}",
+        error.cause
+    );
 }
 
 #[test]
@@ -582,6 +657,13 @@ fn recovery_settles_main_checkout_catch_up_of_dead_writer() {
         &StopAt("catch-up-before-cas"),
     );
 
+    // Not-dead control (N1): when the writer is not provably dead, the catch-up stays kept.
+    let kept = recover_proving(&f, &|_| false);
+    assert_eq!(kept["recovered"], json!([]));
+    assert_eq!(kept["kept"][0]["operationId"], "dead-catch-up");
+    assert_eq!(kept["kept"][0]["cause"], "ref-authority-mismatch");
+    assert_eq!(kept["kept"][0]["writer"], "dead-session");
+
     let recovered = recover_proving(&f, &|w| w == "dead-session");
     assert!(
         recovered["recovered"]
@@ -590,6 +672,11 @@ fn recovery_settles_main_checkout_catch_up_of_dead_writer() {
             .iter()
             .any(|id| id == "dead-catch-up"),
         "{recovered}"
+    );
+    let msg = recovered["message"].as_str().unwrap();
+    assert!(
+        msg.contains("dead-catch-up (recovered by fixture for dead writer dead-session)"),
+        "expected recoverer attribution in message, got: {msg}"
     );
 }
 
@@ -610,7 +697,7 @@ fn recovery_keeps_live_writers_interrupted_chain_with_updated_notice() {
     assert_eq!(kept["writer"], "live-session");
     let msg = recovered["message"].as_str().unwrap();
     assert!(
-        msg.contains("writer live-session is alive or not provably dead; once it is gone, `fgos git recover` settles it"),
+        msg.contains("only its writer live-session is alive or not provably dead; only its writer, or `fgos git recover` once it is gone, can recover it"),
         "expected updated kept text in message, got: {msg}"
     );
 }

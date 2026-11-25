@@ -430,6 +430,8 @@ pub struct Kept {
     pub cause: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub writer: Option<String>,
+    #[serde(default, skip_serializing)]
+    pub dead: bool,
 }
 
 /// What one recovery pass did. `merge_in_progress` and `next` appear only when a merge is pending: the command
@@ -457,7 +459,18 @@ fn kept_text(kept: &Kept) -> String {
         ""
     };
     let only = if authority {
-        format!("; writer {writer} is alive or not provably dead; once it is gone, `fgos git recover` settles it{settled_by}")
+        let writer_clause = if writer.is_empty() {
+            String::new()
+        } else {
+            format!(" {writer}")
+        };
+        if kept.cause == "land-authority-mismatch" && kept.dead {
+            format!("; only its writer{writer_clause} can recover an attempted Land")
+        } else {
+            format!(
+                "; only its writer{writer_clause} is alive or not provably dead; only its writer, or `fgos git recover` once it is gone, can recover it{settled_by}"
+            )
+        }
     } else {
         String::new()
     };
@@ -477,7 +490,13 @@ pub fn recover_git_operations(
 ) -> Result<GitRecovered, FactError> {
     let main = main_checkout_of(cwd);
     let Some((driver, repo)) = open(state_root, cwd, &main)? else {
-        return Ok(recovered(Vec::new(), Vec::new(), Vec::new(), None));
+        return Ok(recovered(
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            None,
+        ));
     };
     let operations: Vec<Value> = pending(&driver, &repo)?
         .into_iter()
@@ -489,6 +508,7 @@ pub fn recover_git_operations(
         })
         .collect();
     let mut settled = Vec::new();
+    let mut settled_messages = Vec::new();
     let mut kept = Vec::new();
     let writer = std::cell::OnceCell::new();
     let own_writer = || {
@@ -503,27 +523,43 @@ pub fn recover_git_operations(
             let chain_writer = operation["intent"]["writerIdentity"]
                 .as_str()
                 .unwrap_or_default();
-            let auth = if chain_writer == caller_writer {
-                crate::recovery::RecoveryAuthority::direct(&caller_writer)
-            } else if writer_is_dead(chain_writer) {
+            let is_other_writer = !chain_writer.is_empty() && chain_writer != caller_writer;
+            let dead = is_other_writer && writer_is_dead(chain_writer);
+            let auth = if is_other_writer && dead {
                 crate::recovery::RecoveryAuthority::recovered_by(chain_writer, &caller_writer)
             } else {
                 crate::recovery::RecoveryAuthority::direct(&caller_writer)
             };
             match driver.reconcile_operation(&repo, Vec::new(), auth, id, None) {
-                Ok(_) => settled.push(id.to_owned()),
+                Ok(_) => {
+                    settled.push(id.to_owned());
+                    if is_other_writer && dead {
+                        settled_messages.push(format!(
+                            "{id} (recovered by {caller_writer} for dead writer {chain_writer})"
+                        ));
+                    } else {
+                        settled_messages.push(id.to_owned());
+                    }
+                }
                 Err(error) => kept.push(Kept {
                     operation_id: id.to_owned(),
                     cause: error.cause,
                     writer: operation["intent"]["writerIdentity"]
                         .as_str()
                         .map(str::to_owned),
+                    dead,
                 }),
             }
         }
     }
     let freed = free_retained_land(&driver, &repo, &own_writer, writer_is_dead, &mut kept)?;
-    Ok(recovered(settled, freed, kept, merge_head(&driver, &repo)))
+    Ok(recovered(
+        settled,
+        settled_messages,
+        freed,
+        kept,
+        merge_head(&driver, &repo),
+    ))
 }
 
 /// Releases the candidate worktree and pins of every finished Land chain the caller's writer started, the same
@@ -572,11 +608,13 @@ fn free_retained_land(
                 operation_id: id.to_owned(),
                 cause: deferred.join("; "),
                 writer: None,
+                dead: false,
             }),
             Err(error) => kept.push(Kept {
                 operation_id: id.to_owned(),
                 cause: error.cause,
                 writer: (!own).then(|| owner.to_owned()),
+                dead: false,
             }),
         }
     }
@@ -594,6 +632,7 @@ fn is_main_checkout_catch_up(operation: &Value, repo: &RepoHandle) -> bool {
 
 fn recovered(
     settled: Vec<String>,
+    settled_messages: Vec<String>,
     freed: Vec<String>,
     kept: Vec<Kept>,
     merge: Option<String>,
@@ -602,10 +641,10 @@ fn recovered(
         "no interrupted Land, ScopedCommit or remote transfer operation".to_owned()
     } else {
         let mut parts = Vec::new();
-        if !settled.is_empty() {
+        if !settled_messages.is_empty() {
             parts.push(format!(
                 "recovered interrupted Git operations: {}",
-                settled.join(", ")
+                settled_messages.join(", ")
             ));
         }
         if !freed.is_empty() {
@@ -643,18 +682,20 @@ mod tests {
             operation_id: id.to_owned(),
             cause: cause.to_owned(),
             writer: Some(writer.to_owned()),
+            dead: false,
         }
     }
 
     #[test]
     fn nothing_to_recover_says_so_and_a_merge_names_the_command_that_ends_it() {
-        let nothing = recovered(Vec::new(), Vec::new(), Vec::new(), None);
+        let nothing = recovered(Vec::new(), Vec::new(), Vec::new(), Vec::new(), None);
         assert_eq!(
             nothing.message,
             "no interrupted Land, ScopedCommit or remote transfer operation"
         );
         assert_eq!((nothing.merge_in_progress, nothing.next), (None, None));
         let merging = recovered(
+            Vec::new(),
             Vec::new(),
             Vec::new(),
             Vec::new(),
@@ -671,6 +712,7 @@ mod tests {
     fn a_kept_operation_names_its_cause_and_the_writer_only_when_authority_is_the_cause() {
         let message = recovered(
             vec!["done-1".to_owned()],
+            vec!["done-1".to_owned()],
             Vec::new(),
             vec![
                 kept("land-1", "land-authority-mismatch", "w-a"),
@@ -683,8 +725,8 @@ mod tests {
         assert_eq!(
             message,
             "recovered interrupted Git operations: done-1; warning: Git operations kept for recovery: \
-             land-1 (land-authority-mismatch; writer w-a is alive or not provably dead; once it is gone, `fgos git recover` settles it); \
-             push-1 (remote-authority-mismatch; writer w-b is alive or not provably dead; once it is gone, `fgos git recover` settles it, and the next event sync settles it); \
+             land-1 (land-authority-mismatch; only its writer w-a is alive or not provably dead; only its writer, or `fgos git recover` once it is gone, can recover it); \
+             push-1 (remote-authority-mismatch; only its writer w-b is alive or not provably dead; only its writer, or `fgos git recover` once it is gone, can recover it, and the next event sync settles it); \
              commit-1 (checkout-custody-busy)"
         );
     }
