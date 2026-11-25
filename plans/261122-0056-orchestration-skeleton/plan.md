@@ -1,6 +1,6 @@
 ---
 contract: plan-v1
-title: "Orchestration skeleton, keeper: admission in code, scheduling records from domain sources, question recipients, resource claims, the sleep record and periodic review"
+title: "Keeper: admission in code, scheduling records from domain sources, question recipients, resource claims, the sleep record and periodic review"
 status: draft
 priority: P1
 blockedBy:
