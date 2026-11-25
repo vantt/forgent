@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9ae4555d462cf05998f7c8903dc878fc067840d827a4873d628a6d57ec3ab729",
+  "payloadDigest": "4e2f1a27b6803640e5e4c04319ffc8466dd9e12f690d741fd43be1cb3a52ef07",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -453,7 +453,7 @@
     "packages/event-store/rust/src/legacy.rs": "acd6ea10650e7f962a3f008ba313e3f9c48fb761a96ed40d575839c3cdc68e83",
     "packages/event-store/rust/src/legacy_import.rs": "8a2910c54b33ed62508b7ff5a1a31835aa7c3ff8ca1b60a8bf0814ac14f6c43a",
     "packages/event-store/rust/src/lib.rs": "a8b1df7da6fd5b7a437c77b356cfae946e75ee4139ae5a6d8675cc5cdec5366e",
-    "packages/event-store/rust/src/lifecycle.rs": "e1b88c61a07546e609943fc50f62e5cc4afea1d543b6ce8a99a7431f952535d5",
+    "packages/event-store/rust/src/lifecycle.rs": "31cf1f3b03d5669f732881b106852a0da043113239a46448e4adac67fd9de9a7",
     "packages/event-store/rust/src/locks.rs": "7a4089a680d9d5f8df68f5ab3101c9af4e327976a67102cabce964b2538ea217",
     "packages/event-store/rust/src/open_read.rs": "02717d942623ead2a4838efa949f15169932400161dd494f472589505f5c50a2",
     "packages/event-store/rust/src/order.rs": "3f474bd2d008e33692e0a3064ce169a4b4ec0797ebb99664a809e644b73a022c",
@@ -482,7 +482,7 @@
     "packages/event-store/rust/tests/kill_append.rs": "cb2994d5e7c635094828133334a6e16e7e535426491a00e0be7ebc75d793adf7",
     "packages/event-store/rust/tests/legacy_import.rs": "12dadfe4495157350690fe0db21afe73f85fc9dfd892abdfda0c52d178e747e7",
     "packages/event-store/rust/tests/legacy_reader.rs": "b60b9170f66d26eac2c8b8037f5fead896625504bed65881c57833d6ce428ff9",
-    "packages/event-store/rust/tests/lifecycle.rs": "3d104ecd480a577dedaaf83fabe0c6a31c622515f7de512f977a6afbfe9cfccb",
+    "packages/event-store/rust/tests/lifecycle.rs": "a6475c63f71282f012995464773d16cb1035854f4ef7523aa42883ac71b548bd",
     "packages/event-store/rust/tests/offline_sync.rs": "e4d0e7bce0836e4a6a97c1b0c579c95b2e2b6ada20786daf6005ccec84eeda60",
     "packages/event-store/rust/tests/order_kahn.rs": "c2b1004b8772de30aace61b1f8279c2131b1678a3be45f64b15b171c1728b6e1",
     "packages/event-store/rust/tests/p02_review.rs": "5a560dd163330beb32cac8881bc37b3cd558471d1aa7ffead138b7b686e23fe3",
@@ -765,7 +765,7 @@
     "packages/git/node-addon/src/checkout.rs": "aa03a64201172d60a9f05ff1ca9e5c2e6a5b7352b6a366476599013a451406db",
     "packages/git/node-addon/src/config.rs": "f6b5bc3fb11821a6626b6fc9a92864731c3fc0a7e9bafab8046d4d139f2a2625",
     "packages/git/node-addon/src/durable_file.rs": "92d33582a588824a105683b230a694f3b103657b1b1520fc0b86bac079c490e1",
-    "packages/git/node-addon/src/event_store.rs": "189480768df880251eaa5ae181f680e13f8d1a782f098787e87cca21ca8a85ae",
+    "packages/git/node-addon/src/event_store.rs": "89d6b6d33fcbc89b86b699ee38c2f346afd7fe7d220c6896344e5898313ec9c9",
     "packages/git/node-addon/src/execution.rs": "492a078f39785c87f80bada860e48745b3bda04b38de5f343e7a27a0761ece0a",
     "packages/git/node-addon/src/git.rs": "2187d710fa8475eeb8b0712b38e2fd09691e6e9313ba8eea883033291907748b",
     "packages/git/node-addon/src/git/config.rs": "a4f4d6497b6c1f9b3110101b7e39d773ac9a4fab05c096cac8ba6adb31c5648f",
@@ -1477,7 +1477,7 @@
     "src/event-store/config.mjs": "e7edfd4464d84ac17b23023f3251cc9bb02c6302a28fa84e23d7330a72ac643c",
     "src/event-store/consumers.mjs": "68155859dc4f7de73ea0d34e72b06381fc0a8cd557542711da91356d6b084639",
     "src/event-store/index.mjs": "c2af3fb3e121a67a672bb61d0b8b831aae094b9386f28cb4950d90e374a1adbb",
-    "src/event-store/maintenance.mjs": "e869f457fb63cb3ba736bbcdb27ce569a0f0a931f1d880492c981b75df86ed53",
+    "src/event-store/maintenance.mjs": "b454fcad0045292112abceb28729fea67d90e179c1d9c9e9ed1ea14dd928d084",
     "src/event-store/native.mjs": "133d25efef11ec1ab265fa694ecd2321789b220c0cffcdf9ed8a26ba399a0756",
     "src/event-store/seal-coalescing.mjs": "84eae01cdf29251f7e50e06ffbac46ea949457adb7b3f4ed20bda542448bd2c3",
     "src/evolve/iron-law.mjs": "c3dce0c23705a8fd1ec463a782fba000ee67f21889f47e7ff350043f7a7ff8d7",
@@ -3022,7 +3022,7 @@
     },
     {
       "path": "packages/event-store/rust/tests/lifecycle.rs",
-      "line": 304,
+      "line": 327,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

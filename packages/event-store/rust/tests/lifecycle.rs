@@ -248,12 +248,11 @@ fn a_store_that_cannot_be_opened_is_a_code_and_never_a_publish() {
         now_sec: 0.0,
     });
     fs::remove_dir_all(&outside).unwrap();
-    assert_eq!(
-        outcome,
-        Outcome {
-            error: Some("event-store-no-repository".into()),
-            sync_due: false
-        }
+    assert!(!outcome.sync_due);
+    let error = outcome.error.expect("a store that cannot be opened fails");
+    assert!(
+        error == "event-store-no-repository" || error.starts_with("event-store-no-repository: "),
+        "the code leads the message: {error}"
     );
 }
 
@@ -270,9 +269,11 @@ fn a_trigger_inside_a_hot_lock_is_refused_by_code() {
         hot_lock_depth: 1,
         now_sec: 0.0,
     });
-    assert_eq!(
-        outcome.error.as_deref(),
-        Some("event-store-seal-under-state")
+    let error = outcome.error.expect("a hot-lock trigger is refused");
+    assert!(
+        error == "event-store-seal-under-state"
+            || error.starts_with("event-store-seal-under-state: "),
+        "the code leads the message: {error}"
     );
 }
 
@@ -289,12 +290,34 @@ fn a_failing_seal_does_not_stop_the_publish_decision() {
             ..TRIGGER
         },
     );
-    assert_eq!(outcome.error.as_deref(), Some("event-store-integrity"));
+    let error = outcome.error.expect("a broken active file fails the seal");
+    assert!(
+        error == "event-store-integrity" || error.starts_with("event-store-integrity: "),
+        "the code leads the message: {error}"
+    );
     assert!(outcome.sync_due, "the step after the failed seal still ran");
     assert!(
         sync_status(&w.repo.layout).unwrap().time == 0,
         "the trigger itself never publishes"
     );
+}
+
+/// The existing tests pin only the code of a failed step; this one proves an io failure also reaches the trigger's
+/// outcome with its kind, its operation and its path, which is what makes a fault record traceable.
+#[test]
+fn a_trigger_io_failure_names_the_operation_and_the_path() {
+    let w = World::new();
+    w.add_at(3600);
+    let active = w.repo.layout.stream(&w.repo.stream).active();
+    fs::remove_file(&active).unwrap();
+    fs::create_dir(&active).unwrap();
+    let outcome = w.run(&timers(300, 0), TRIGGER);
+    let error = outcome
+        .error
+        .expect("an unreadable active file fails the seal");
+    assert!(error.starts_with("event-store-io: "), "{error}");
+    assert!(error.contains("during "), "{error}");
+    assert!(error.contains(&active.display().to_string()), "{error}");
 }
 
 #[test]
