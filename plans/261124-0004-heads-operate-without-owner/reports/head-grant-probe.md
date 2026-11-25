@@ -317,7 +317,27 @@ Source: `reports/head-grant-probe-after2-lead.json` (`node test/live/head-grant-
 expected, 12 asked (not called), 6 not called. The two rows that failed in every persona on `3beba73a` now pass for
 the lead: `release run` is refused as expected (`deny`), and `friction record` is served (was `host-failed`).
 
-The supervisor, secretary, planner and shaper re-probe rows are still to come; the supervisor starts those probe heads.
+### supervisor (`head:supervisor-forgent`, gen 716), 2026-11-25 21:42
+
+Source: `reports/head-grant-probe-after2-supervisor.txt` (copied from
+`.fgos/assignments/head-supervisor-forgent-716/runs/01/outbox/`). 31 contract verbs, no `failed` row: 21 served,
+3 refused as expected, 1 asked (not called: `worktree create`), 5 not called (act on the caller), 1 not called
+(`supervisor wake`, unsafe). `release run` is served (domain refusal `no-release-in-flight` for the rollback form) and
+`watcher tune` is served (domain refusal: `watcher.enabled` is not tunable).
+
+### secretary (`head:secretary-miu`, gen 54), 2026-11-25 22:06
+
+Source: `reports/head-grant-probe-after2-secretary.txt` (copied from
+`.fgos/assignments/head-secretary-miu-54/runs/01/outbox/`). 31 contract verbs, no `failed` row: 22 served, 2 refused
+as expected, 1 asked (not called: `worktree create`), 5 not called (act on the caller), 1 not called
+(`supervisor wake`, unsafe).
+
+### planner and shaper
+
+Not re-probed on `33f462be`. By owner answer `q-uxrx52jm2q` (2026-11-25 20:40), phase 7 closes on the lead,
+supervisor and secretary probes. The planner and shaper rows are probed the next time one of those heads starts for
+real work. Their rows on `3beba73a` (above) failed only `release run` and `friction record`, both fixed by
+`e36f10cfa` and served for the three probed personas here.
 
 ## Gaps between the permission table and real use (owner order, 2026-11-25)
 

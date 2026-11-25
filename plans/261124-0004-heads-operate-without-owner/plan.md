@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Heads operate without the owner: role charter for the two hands, one fgos argv window with a permission table, one help channel and mail to the two hands, and a domain-free release rule"
-status: running
+status: done
 lead: head:lead-forgent-261124-0004-heads-1bb1c
 priority: P1
 blockedBy:
@@ -190,7 +190,7 @@ declared.
 | 2 | [The fgos argv window and its permission table, in Rust](phase-02-argv-window.md) | - | packages/session-host/rust/src/lib.rs, packages/session-host/rust/src/permissions.rs, packages/session-host/rust/src/forwarder.rs, packages/session-host/rust/tests/permissions.rs, packages/session-host/rust/tests/forwarder.rs, packages/session-host/rust/Cargo.toml, packages/session-host/contracts/head-permissions.v1.json, packages/git/node-addon/src/session_host.rs, packages/git/node-addon/src/lib.rs, packages/git/node-addon/Cargo.toml, src/native/door.mjs, Cargo.lock, src/session-host/head-grants.mjs, src/session-host/head-start.mjs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/contracts/envelope.v3.json, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, apps/fgos/src/routing.rs, src/runner/dispatch/session-attempt.mjs, apps/fgos/src/wiring/unit_run_host/session_attempt.rs, apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs, test/session-host/head-grants.test.mjs, test/session-host/head-request.test.mjs, test/session-host/head-start.test.mjs, test/live/head-grant-probe.live.mjs, docs/platform/run-supervisor/spec.md, packages/component-authority/model/doors/execution-s-node-seam.yaml, packages/component-authority/model/doors/the-node-bind-facade-has-only-its-named-callers.yaml, packages/component-authority/model/doors/node-callers-reach-execution-only-through-its-seam-never-into-the-node-execution-closure.yaml | 1 | done |
 | 3 | [Help channel and mail to the two hands](phase-03-help-and-mail.md) | 1, 2 | packages/session-host/contracts/head-permissions.v1.json, packages/session-host/rust/tests/permissions.rs, packages/session-host/rust/tests/forwarder.rs, core/config-standard/secretary.yaml, core/config-schema/secretary.schema.yaml, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/**, docs/platform/supervision/spec.md | 2 | done |
 | 6 | [Domain-free release rule and the forgent recipe](phase-06-release-rule.md) | 3 | packages/session-host/rust/src/release.rs, packages/session-host/rust/src/lib.rs, packages/session-host/rust/tests/release.rs, packages/session-host/contracts/head-permissions.v1.json, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, core/config-standard/release.yaml, core/config-schema/release.schema.yaml, packages/config/rust/src/bundle.rs, .fgos/config.yaml, core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-secretary/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 3 | done |
-| 7 | [Integration, full suite and live probe](phase-07-integration.md) | 1, 2, 3, 6 | CHANGELOG.md, plans/261124-0004-heads-operate-without-owner/reports/head-grant-probe.md, plans/261124-0004-heads-operate-without-owner/reports/integration.md, apps/fgos/tests/supervision_verbs.rs, apps/fgos/tests/questions_head.rs, packages/config/contracts/fixtures/authoring-source.config.json, packages/component-authority/model/contracts.yaml, test/rust-host/vectors/envelope/version.json, packages/config/contracts/fixtures/repo-differences.v1.json | 4 | draft |
+| 7 | [Integration, full suite and live probe](phase-07-integration.md) | 1, 2, 3, 6 | CHANGELOG.md, plans/261124-0004-heads-operate-without-owner/reports/head-grant-probe.md, plans/261124-0004-heads-operate-without-owner/reports/integration.md, apps/fgos/tests/supervision_verbs.rs, apps/fgos/tests/questions_head.rs, packages/config/contracts/fixtures/authoring-source.config.json, packages/component-authority/model/contracts.yaml, test/rust-host/vectors/envelope/version.json, packages/config/contracts/fixtures/repo-differences.v1.json | 4 | done |
 
 Wave reading (checked with `node scripts/plan-contract-check.mjs` and `fgos resource-check --plan`): wave 1 holds
 the charter (docs, skills, agent sources) and the window (session-host code, contracts, routing), whose footprints
@@ -335,6 +335,12 @@ morning (discussion §1). The planner's own shape choices are written as decisio
   Owner answer `q-dhhezn67em`: forgent's recipe `checks` are the DoD suite; step 3 (writing the recipe into
   `.fgos/config.yaml`) is the owner's one `fgos config patch`, so `release run` answers `no-recipe` until then.
   Wave 4 (phase 7) is next: it needs the owner's first manual build and activation (PC-D9).
+
+- 2026-11-25 22:07, phase 7 done and the plan done. Every fix is on main (`e36f10cfa`, `1737ae3e9`, `7ee37cd44`,
+  the probe fixes `62f96f61c`, `9f90a8c5d`, `1c1b112f2`). The lead, supervisor and secretary re-probes on `33f462be`
+  have no `failed` row; planner and shaper wait for their next real start (owner `q-uxrx52jm2q`). The unconfined
+  suites have no failure in this plan's files. `release run` refused on main's red `npm test`, as the rule requires.
+  See `reports/integration.md`.
 
 ## Outstanding questions
 

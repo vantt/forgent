@@ -1,7 +1,7 @@
 ---
 id: p-g5ktat4kej
 title: "Confined heads have no safe hand for routine privileged chores, so the owner relays messages and runs commands by hand (supervisor, priority high; source: owner via Miu, 2026-11-23 20:05)"
-status: proposed
+status: done
 priority: P1
 area: supervisor
 created: 2026-11-23

@@ -1,7 +1,7 @@
 ---
 id: p-v6xinnjoxh
 title: "The supervisor looks after every head session, and someone owns shaper and planner sessions once they finish (supervisor, priority P1; source: owner order to the secretary, 2026-11-23)"
-status: proposed
+status: done
 priority: P1
 area: supervisor
 created: 2026-11-23

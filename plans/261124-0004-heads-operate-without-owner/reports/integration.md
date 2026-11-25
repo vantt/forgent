@@ -78,10 +78,18 @@ records; the owner widened the footprint (`q-xcuwpxa4kn`).
 Release `33f462be` is active and contains `e36f10cfa`. The lead's re-probe on it has no `failed` row (see
 `head-grant-probe.md`).
 
-Still open, each done by the supervisor:
+Closed on 2026-11-25 22:07 (Asia/Saigon):
 
-1. An unconfined `npm test`, then `cargo test --workspace`, on main at or after `7ee37cd44`, one after the other.
-   The expected `cargo` result has no failure in this plan's files. The `npm test` failures are not this plan's
-   (supervisor report `plans/reports/supervisor-261125-1838-npm-test-24-failures-on-main.md`).
-2. The supervisor, secretary, planner and shaper re-probe on `33f462be`, expecting no `failed` row.
-3. `release run` once from the supervisor, with its report line recorded here.
+1. Unconfined suites, run by the supervisor on release `33f462be`. `npm test` on main `87abd4c89`: 6617 tests,
+   19 failures, none in this plan's files. The failures are `terminal-cutover` x8, `terminal-crash-matrix`,
+   `one-door` x2, `scoped-commit`, the `dev-host` symlink, `provider-per-cli-credential-sources` x2, `guide-schema` x2,
+   `install-packaging` and `convention-conformance`, all owned by other plans (scoped out by `q-xcuwpxa4kn`).
+   `cargo test --workspace` on main `482ffa59e`: 4470 pass, 2 fail, both `authority.rs`. They are component-boundary
+   view drift from `60a8c30e7` (plan `261122-2108`, phase 9). This plan's seven earlier cargo failures stay fixed.
+   Details: `plans/reports/supervisor-261125-1838-npm-test-24-failures-on-main.md`. Acceptance criterion 2 holds
+   for this plan's files only: main is red from other owners' failures.
+2. Re-probe on `33f462be`, no `failed` row in the lead, supervisor (gen 716) or secretary (gen 54); see
+   `head-grant-probe.md`. Planner and shaper are left for their next real start (owner `q-uxrx52jm2q`).
+3. `release run` from the supervisor (ticket `c-2778617-1795616029739`, 21:13 to 21:24): `checks-failed` on
+   `npm test` (exit 1). The rule refused to apply a release over a red check, which is the expected outcome while
+   main's `npm test` is red. A successful apply waits for main's suite to turn green.
