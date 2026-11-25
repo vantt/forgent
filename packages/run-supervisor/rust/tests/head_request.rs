@@ -831,15 +831,61 @@ fn envelope(data: &Value) -> String {
     .unwrap()
 }
 
-/// A host script standing in for `config show --path release`, `version`, `lock-status` and the question route
+/// The real `data` of `fgos config show --path release --json`: `{path, present, value, provenance, ...}`.
+fn config_data(recipe: &Value) -> Value {
+    if recipe.is_null() {
+        json!({"path": "release", "present": false, "value": null, "provenance": null})
+    } else {
+        json!({"path": "release", "present": true, "value": recipe, "provenance": {"layer": "project"}})
+    }
+}
+
+/// The real `data` of `fgos lock-status --json`: rows `{name, status, instances: [{status}]}`.
+fn lock_data(merge_slot: &str) -> Value {
+    json!({"locks": [
+        {"name": "merge-slot", "status": merge_slot, "instances": [{"status": merge_slot}]},
+        {"name": "main-checkout", "status": "free", "instances": []}
+    ]})
+}
+
+/// A host script standing in for `config show --path release`, `lock-status` and the question route
 /// (which keeps each question body in `$OUT/questions`).
-fn release_host(recipe: &Value, git_commit: &str, locks: Value) -> String {
-    let config = envelope(&json!({"release": recipe}));
-    let version = envelope(&json!({"version": "0.2.0", "gitCommit": git_commit}));
-    let locks = envelope(&locks);
+fn release_host(recipe: &Value, merge_slot: &str) -> String {
+    let config = envelope(&config_data(recipe));
+    let locks = envelope(&lock_data(merge_slot));
     format!(
-        "cat >> \"$OUT/questions\"; case \"$1\" in\nconfig) cat <<'EOF'\n{config}\nEOF\n;;\nversion) cat <<'EOF'\n{version}\nEOF\n;;\nlock-status) cat <<'EOF'\n{locks}\nEOF\n;;\ninternal) echo '{{\"v\":1,\"protocol\":1,\"result\":\"done\",\"data\":{{\"id\":\"q-report\"}}}}';;\nesac"
+        "cat >> \"$OUT/questions\"; case \"$1\" in\nconfig) cat <<'EOF'\n{config}\nEOF\n;;\nlock-status) cat <<'EOF'\n{locks}\nEOF\n;;\ninternal) echo '{{\"v\":1,\"protocol\":1,\"result\":\"done\",\"data\":{{\"id\":\"q-report\"}}}}';;\nesac"
     )
+}
+
+/// The release record the rule keeps under the project root.
+fn write_release_state(dir: &Path, state: &Value) {
+    let file = dir.join(".fgos/runtime/release/state.json");
+    fs::create_dir_all(file.parent().unwrap()).unwrap();
+    fs::write(file, state.to_string()).unwrap();
+}
+
+fn read_release_state(dir: &Path) -> Value {
+    serde_json::from_str(&fs::read_to_string(dir.join(".fgos/runtime/release/state.json")).unwrap())
+        .unwrap()
+}
+
+/// Holds the release flock the way a live run does; the lock frees when the returned file drops.
+fn hold_release_flock(dir: &Path) -> fs::File {
+    use std::os::fd::AsRawFd;
+    let file = dir.join(".fgos/runtime/release/lock");
+    fs::create_dir_all(file.parent().unwrap()).unwrap();
+    let held = fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(file)
+        .unwrap();
+    assert_eq!(
+        unsafe { libc::flock(held.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) },
+        0
+    );
+    held
 }
 
 /// The project root becomes a git repository with one commit, the trunk tip the release run compares.
@@ -888,14 +934,14 @@ fn settled_ticket(ticket: &Path) -> Value {
 }
 
 #[test]
-fn release_run_reads_the_commit_and_the_merge_slot_out_of_the_hosts_pretty_envelopes() {
-    // The active release is the trunk tip: nothing new. The commit is a short hash, compared by prefix.
+fn release_run_reads_the_merge_slot_out_of_the_hosts_pretty_envelopes_and_the_released_commit_out_of_its_own_record(
+) {
+    // The trunk tip is the commit the last release recorded: nothing new, whatever any host version says.
     let recipe = json!({"reversible": false, "apply": ["touch", "applied"]});
-    let body = release_host(&recipe, "PLACEHOLDER", json!({"locks": []}));
+    let body = release_host(&recipe, "free");
     let served = serve("release-same", &body, Ok(true), &[], Duration::from_secs(5));
     let tip = commit_in(&served.dir);
-    let body = body.replace("PLACEHOLDER", &tip[..9]);
-    fs::write(served.dir.join("host.sh"), format!("#!/bin/sh\n{body}\n")).unwrap();
+    write_release_state(&served.dir, &json!({"released": tip}));
     let reply = request(
         &served.socket,
         &json!({"type": "REQUEST", "id": "same1", "verb": "release run", "args": {}}),
@@ -908,10 +954,10 @@ fn release_run_reads_the_commit_and_the_merge_slot_out_of_the_hosts_pretty_envel
     );
     assert_eq!(settled["result"]["outcome"], "nothing-new", "{settled}");
 
-    // A held merge slot, and one whose status is unknown, both refuse the release.
+    // A held merge slot, and one whose status is unknown, both refuse the release (a trunk with no record is new).
+    write_release_state(&served.dir, &json!({}));
     for (id, status) in [("held1", "held"), ("unk1", "unknown")] {
-        let locks = json!({"locks": [{"name": "merge-slot", "instances": [{"status": status}]}]});
-        let body = release_host(&recipe, "0000000", locks);
+        let body = release_host(&recipe, status);
         fs::write(served.dir.join("host.sh"), format!("#!/bin/sh\n{body}\n")).unwrap();
         request(
             &served.socket,
@@ -926,10 +972,9 @@ fn release_run_reads_the_commit_and_the_merge_slot_out_of_the_hosts_pretty_envel
 }
 
 #[test]
-fn an_irreversible_recipe_without_a_known_commit_asks_apply_or_not_and_says_the_commit_is_unknown()
-{
+fn an_irreversible_recipe_asks_apply_or_not_and_applies_nothing() {
     let recipe = json!({"reversible": false, "apply": ["touch", "applied"]});
-    let body = release_host(&recipe, "", json!({"locks": []}));
+    let body = release_host(&recipe, "free");
     let served = serve("release-ask", &body, Ok(true), &[], Duration::from_secs(5));
     commit_in(&served.dir);
     request(
@@ -943,10 +988,6 @@ fn an_irreversible_recipe_without_a_known_commit_asks_apply_or_not_and_says_the_
     );
     assert_eq!(settled["state"], "done", "{settled}");
     assert_eq!(settled["result"]["outcome"], "asked", "{settled}");
-    assert!(settled["result"]["note"]
-        .as_str()
-        .unwrap()
-        .contains("not known"));
     let questions = fs::read_to_string(served.dir.join("questions")).unwrap();
     assert!(questions.contains("\"label\":\"Apply\""), "{questions}");
     assert!(
@@ -957,16 +998,79 @@ fn an_irreversible_recipe_without_a_known_commit_asks_apply_or_not_and_says_the_
 }
 
 #[test]
-fn one_release_runs_at_a_time_and_a_lock_of_a_dead_holder_is_reclaimed() {
+fn an_unset_recipe_ends_no_recipe() {
+    let body = release_host(&Value::Null, "free");
+    let served = serve(
+        "release-unset",
+        &body,
+        Ok(true),
+        &[],
+        Duration::from_secs(5),
+    );
+    commit_in(&served.dir);
+    request(
+        &served.socket,
+        &json!({"type": "REQUEST", "id": "unset1", "verb": "release run", "args": {}}),
+    );
+    let settled = settled_ticket(
+        &served
+            .dir
+            .join(".fgos/runtime/head-tickets/secretary-miu/unset1.json"),
+    );
+    assert_eq!(settled["code"], "no-recipe", "{settled}");
+}
+
+#[test]
+fn the_rollback_refuses_without_a_step_in_flight_and_runs_when_a_dead_run_left_one() {
+    let recipe = json!({"reversible": true, "apply": ["touch", "applied"], "rollback": ["touch", "rolled-back"]});
+    let body = release_host(&recipe, "free");
+    let served = serve(
+        "release-rollback",
+        &body,
+        Ok(true),
+        &[],
+        Duration::from_secs(5),
+    );
+    commit_in(&served.dir);
+    let tickets = served.dir.join(".fgos/runtime/head-tickets/secretary-miu");
+    request(
+        &served.socket,
+        &json!({"type": "REQUEST", "id": "rb1", "verb": "release run", "args": {"rollback": true}}),
+    );
+    let settled = settled_ticket(&tickets.join("rb1.json"));
+    assert_eq!(settled["code"], "no-release-in-flight", "{settled}");
+    assert!(!served.dir.join("rolled-back").exists());
+
+    // The run that wrote the step is dead (the flock is free): the rollback runs and retires the step.
+    write_release_state(&served.dir, &json!({"step": "probing", "released": "abc"}));
+    request(
+        &served.socket,
+        &json!({"type": "REQUEST", "id": "rb2", "verb": "release run", "args": {"rollback": true}}),
+    );
+    let settled = settled_ticket(&tickets.join("rb2.json"));
+    assert_eq!(settled["code"], "rolled-back", "{settled}");
+    assert!(served.dir.join("rolled-back").exists());
+    assert_eq!(read_release_state(&served.dir), json!({"released": "abc"}));
+
+    // A live run holds the flock: the rollback is refused, whatever the record says.
+    write_release_state(&served.dir, &json!({"step": "applying"}));
+    let held = hold_release_flock(&served.dir);
+    let busy = request(
+        &served.socket,
+        &json!({"type": "REQUEST", "id": "rb3", "verb": "release run", "args": {"rollback": true}}),
+    );
+    assert_eq!(busy["code"], "release-in-progress", "{busy}");
+    drop(held);
+}
+
+#[test]
+fn one_release_runs_at_a_time_through_a_kernel_lock_the_death_of_its_holder_frees() {
     let recipe = json!({"reversible": false, "apply": ["touch", "applied"]});
-    let body = release_host(&recipe, "", json!({"locks": []}));
+    let body = release_host(&recipe, "free");
     let served = serve("release-lock", &body, Ok(true), &[], Duration::from_secs(5));
     commit_in(&served.dir);
-    let lock = served.dir.join(".fgos/runtime/release.lock");
-    fs::create_dir_all(lock.parent().unwrap()).unwrap();
-    // Held by this live process: refused.
-    let me = facts::self_identity().unwrap().to_record().to_json();
-    fs::write(&lock, format!("{me}\n")).unwrap();
+    // An empty lock file nobody holds wedges nothing.
+    let held = hold_release_flock(&served.dir);
     let busy = request(
         &served.socket,
         &json!({"type": "REQUEST", "id": "busy1", "verb": "release run", "args": {}}),
@@ -977,9 +1081,8 @@ fn one_release_runs_at_a_time_and_a_lock_of_a_dead_holder_is_reclaimed() {
         &json!({"type": "REQUEST", "id": "busy2", "verb": "release run", "args": {"rollback": true}}),
     );
     assert_eq!(rollback["code"], "release-in-progress", "{rollback}");
-    // Held by a process that is gone: taken over.
-    let dead = json!({"host": me["host"], "pidNs": me["pidNs"], "bootId": me["bootId"], "pid": 2_000_000_000u64, "startTime": "1"});
-    fs::write(&lock, format!("{dead}\n")).unwrap();
+    // The holder lets go (or dies): the next request takes the lock.
+    drop(held);
     let free = request(
         &served.socket,
         &json!({"type": "REQUEST", "id": "free1", "verb": "release run", "args": {}}),
@@ -990,11 +1093,7 @@ fn one_release_runs_at_a_time_and_a_lock_of_a_dead_holder_is_reclaimed() {
 #[test]
 fn release_run_answers_with_a_ticket_and_the_detached_run_rolls_back_on_a_failed_probe() {
     let recipe = json!({"reversible": true, "checks": [["true"]], "apply": ["touch", "applied"], "probe": ["false"], "rollback": ["touch", "rolled-back"]});
-    let body = release_host(
-        &recipe,
-        "0000000",
-        json!({"locks": [{"name": "merge-slot", "instances": []}]}),
-    );
+    let body = release_host(&recipe, "free");
     let served = serve("release", &body, Ok(true), &[], Duration::from_secs(5));
     commit_in(&served.dir);
     let reply = request(
@@ -1014,8 +1113,10 @@ fn release_run_answers_with_a_ticket_and_the_detached_run_rolls_back_on_a_failed
     assert_eq!(settled["code"], "rolled-back", "{settled}");
     assert!(served.dir.join("applied").exists());
     assert!(served.dir.join("rolled-back").exists());
-    // The release lock is gone with the run, and the run's report was filed (the route answered each question).
-    assert!(!served.dir.join(".fgos/runtime/release.lock").exists());
+    // The in-flight step is cleared, nothing was recorded as released, the flock is free again, and the run's
+    // report was filed (the route answered each question).
+    assert_eq!(read_release_state(&served.dir), json!({}));
+    drop(hold_release_flock(&served.dir));
     assert!(fs::read_to_string(served.dir.join("questions"))
         .unwrap()
         .contains("release rolled back"),);

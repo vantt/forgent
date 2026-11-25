@@ -2,9 +2,9 @@
 //! about what the recipe runs. The recipe is project data: `reversible` (boolean, default false), `checks` (argv
 //! lists), `apply`, `probe`, `rollback` (argv lists). An unset `apply` means the project declares no release.
 //!
-//! Every external call (the config read, the git and lock reads, running an argv, the owner question and the report)
-//! is behind [`ReleasePorts`], so the proof drives fixtures; the run supervisor owns the real adapters. An argv runs
-//! with no shell, from the project root.
+//! Every external call (the config read, the git and lock reads, the release record, running an argv, the owner
+//! question and the report) is behind [`ReleasePorts`], so the proof drives fixtures; the run supervisor owns the
+//! real adapters. An argv runs with no shell, from the project root.
 
 use serde_json::{json, Map, Value};
 
@@ -73,9 +73,9 @@ impl Recipe {
     }
 }
 
-/// The `release` subtree inside the JSON `fgos config show --path release --json` prints: the first object that holds
-/// a recipe key, with a leaf given as `{value: x}` (a value with its provenance) reduced to `x`. `Null` when the
-/// answer holds no recipe key.
+/// The `release` subtree inside the `data` of `fgos config show --path release --json` (`{path, present, value,
+/// provenance, ...}`): in its `value`, the first object that holds a recipe key, with a leaf given as `{value: x}`
+/// (a value with its provenance) reduced to `x`. `Null` when the answer holds no recipe key.
 pub fn release_subtree(answer: &Value) -> Value {
     const KEYS: [&str; 5] = ["reversible", "checks", "apply", "probe", "rollback"];
     fn leaf(value: &Value) -> Value {
@@ -102,7 +102,7 @@ pub fn release_subtree(answer: &Value) -> Value {
             _ => None,
         }
     }
-    find(answer).unwrap_or(Value::Null)
+    find(answer.get("value").unwrap_or(answer)).unwrap_or(Value::Null)
 }
 
 /// Why the lock report (`fgos lock-status --json`, its `data`) holds the merge slot: a `merge-slot` row, or one of
@@ -151,30 +151,20 @@ pub fn envelope_data(stdout: &str) -> Result<Value, String> {
     }
 }
 
-/// Whether the active release's `gitCommit` (`fgos version --json`, a short hash) names the trunk tip (a full or
-/// short hash): the shorter hash is a prefix of the longer. Under seven characters nothing is compared.
-pub fn same_commit(active: &str, tip: &str) -> bool {
-    let (active, tip) = (active.trim(), tip.trim());
-    active.len() >= 7 && tip.len() >= 7 && (tip.starts_with(active) || active.starts_with(tip))
-}
-
-/// The trunk tip against the active release.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Newness {
-    /// The active release was built from the trunk tip.
-    NothingNew,
-    /// The trunk tip is past the active release.
-    Landed,
-    /// The active release's commit is not known (the reason), so the tip cannot be compared.
-    Unknown(String),
-}
-
 /// The external calls of a release run.
 pub trait ReleasePorts {
     /// The `release` subtree of the effective config (`Null` when nothing is set).
     fn recipe(&self) -> Result<Value, String>;
-    /// What the trunk tip holds against the active release.
-    fn newness(&self) -> Result<Newness, String>;
+    /// The trunk tip's commit.
+    fn trunk_tip(&self) -> Result<String, String>;
+    /// The trunk commit the last `released` outcome recorded (`None` when no release was ever recorded).
+    fn released_commit(&self) -> Result<Option<String>, String>;
+    /// Records the trunk commit a release put in place.
+    fn record_released(&self, commit: &str) -> Result<(), String>;
+    /// The step (`applying` or `probing`) the record shows as begun and never ended, if any.
+    fn step(&self) -> Result<Option<String>, String>;
+    /// Writes (`Some`) or clears (`None`) the step in the record.
+    fn set_step(&self, step: Option<&str>) -> Result<(), String>;
     /// Why a land holds the merge slot (`Some`), or `None` when none does.
     fn land_in_progress(&self) -> Result<Option<String>, String>;
     /// Runs one argv (no shell, project root) and returns its exit code.
@@ -183,6 +173,8 @@ pub trait ReleasePorts {
     fn ask_owner(&self, apply: &[String]) -> Result<String, String>;
     /// Writes one report line to the owner (information, not a choice).
     fn report(&self, line: &str);
+    /// Writes one line to the run's log, for what cannot go through the owner's question store.
+    fn log(&self, line: &str);
 }
 
 /// How a release run ended.
@@ -190,6 +182,7 @@ pub trait ReleasePorts {
 pub enum Outcome {
     /// The recipe names no `apply`: the project declares no release.
     NoRecipe,
+    /// The trunk tip is the commit the last release recorded.
     NothingNew,
     LandInProgress {
         reason: String,
@@ -198,16 +191,12 @@ pub enum Outcome {
         argv: Vec<String>,
         exit: i32,
     },
-    /// The recipe is irreversible: the owner was asked, nothing was applied. `note` is set when the active
-    /// release's commit was not known, so the trunk was treated as new.
+    /// The recipe is irreversible: the owner was asked, nothing was applied.
     Asked {
         question: String,
-        note: Option<String>,
     },
-    Released {
-        note: Option<String>,
-    },
-    /// `apply` or `probe` failed and `rollback` ran and passed.
+    Released,
+    /// `apply` or `probe` failed and `rollback` ran and passed (or `--rollback` ran it).
     RolledBack {
         reason: String,
     },
@@ -226,7 +215,7 @@ impl Outcome {
             Outcome::LandInProgress { .. } => "land-in-progress",
             Outcome::ChecksFailed { .. } => "checks-failed",
             Outcome::Asked { .. } => "asked",
-            Outcome::Released { .. } => "released",
+            Outcome::Released => "released",
             Outcome::RolledBack { .. } => "rolled-back",
             Outcome::Failed { code, .. } => code,
         }
@@ -234,21 +223,20 @@ impl Outcome {
 
     /// `asked` and `released` are answers; every other outcome is a refusal.
     pub fn is_answer(&self) -> bool {
-        matches!(self, Outcome::Asked { .. } | Outcome::Released { .. })
+        matches!(self, Outcome::Asked { .. } | Outcome::Released)
     }
 
     /// The one line the owner is told when this outcome ends a run. A run that changed or refused nothing (no
-    /// recipe, nothing new, a land in progress) is silent, and an `asked` run's question is its own report.
+    /// recipe, nothing new) is silent, an `asked` run's question is its own report, and an `ask-failed` run has no
+    /// question route to report through (it goes to the log).
     pub fn report_line(&self) -> Option<String> {
         match self {
-            Outcome::NoRecipe
-            | Outcome::NothingNew
-            | Outcome::LandInProgress { .. }
-            | Outcome::Asked { .. } => None,
-            Outcome::Released { note } => Some(match note {
-                Some(note) => format!("release applied ({note})"),
-                None => "release applied".to_string(),
-            }),
+            Outcome::NoRecipe | Outcome::NothingNew | Outcome::Asked { .. } => None,
+            Outcome::Failed {
+                code: "ask-failed", ..
+            } => None,
+            Outcome::Released => Some("release applied".to_string()),
+            Outcome::LandInProgress { reason } => Some(format!("release not started: {reason}")),
             Outcome::RolledBack { reason } => Some(format!("release rolled back: {reason}")),
             Outcome::ChecksFailed { argv, exit } => Some(format!(
                 "release refused: check `{}` exited {exit}",
@@ -266,13 +254,7 @@ impl Outcome {
                 out["exit"] = json!(exit);
             }
             Outcome::LandInProgress { reason } => out["reason"] = json!(reason),
-            Outcome::Asked { question, note } => {
-                out["question"] = json!(question);
-                if let Some(note) = note {
-                    out["note"] = json!(note);
-                }
-            }
-            Outcome::Released { note: Some(note) } => out["note"] = json!(note),
+            Outcome::Asked { question } => out["question"] = json!(question),
             Outcome::RolledBack { reason } => out["reason"] = json!(reason),
             Outcome::Failed { detail, .. } => out["detail"] = json!(detail),
             _ => {}
@@ -289,13 +271,46 @@ fn line_of(argv: &[String]) -> String {
     argv.join(" ")
 }
 
-/// The release steps, in order: no recipe, nothing new, land in progress, each check, the irreversible stop (the
-/// owner is asked with the exact apply argv), land in progress again, apply, probe, rollback on a failure. The
-/// owner gets one report line for every outcome that changed or refused something.
+/// The release steps, in order: no recipe, nothing new (the trunk tip is the commit the last release recorded; with
+/// no record the trunk counts as new), land in progress, each check, the irreversible stop (the owner is asked with
+/// the exact apply argv), land in progress again, apply, probe, rollback on a failure. The step in progress is
+/// recorded before apply and probe and cleared on every terminal outcome of this run; a `released` outcome records
+/// the trunk commit it put in place. The owner gets one report line for every outcome that changed or refused
+/// something.
 pub fn run(ports: &dyn ReleasePorts) -> Outcome {
-    let outcome = steps(ports);
-    if let Some(line) = outcome.report_line() {
-        ports.report(&line);
+    let mut marked = false;
+    let outcome = steps(ports, &mut marked);
+    finish(ports, outcome, marked)
+}
+
+fn finish(ports: &dyn ReleasePorts, outcome: Outcome, clear_step: bool) -> Outcome {
+    let cleared = if clear_step {
+        ports.set_step(None)
+    } else {
+        Ok(())
+    };
+    let outcome = match cleared {
+        Err(why) => failed(
+            "state-unwritable",
+            format!(
+                "{}; the in-flight step was not cleared: {why}",
+                outcome.code()
+            ),
+        ),
+        Ok(()) => outcome,
+    };
+    match &outcome {
+        Outcome::Failed {
+            code: "ask-failed",
+            detail,
+        } => ports.log(&format!(
+            "release ask-failed: the owner question was not filed, so nothing waits for the owner: {detail}"
+        )),
+        _ => {
+            if let Some(line) = outcome.report_line() {
+                ports.report(&line);
+            }
+        }
     }
     outcome
 }
@@ -308,7 +323,17 @@ fn land_check(ports: &dyn ReleasePorts) -> Result<(), Outcome> {
     }
 }
 
-fn steps(ports: &dyn ReleasePorts) -> Outcome {
+fn mark(ports: &dyn ReleasePorts, marked: &mut bool, step: &str) -> Result<(), Outcome> {
+    *marked = true;
+    ports.set_step(Some(step)).map_err(|why| {
+        failed(
+            "state-unwritable",
+            format!("the {step} step was not recorded: {why}"),
+        )
+    })
+}
+
+fn steps(ports: &dyn ReleasePorts, marked: &mut bool) -> Outcome {
     let recipe = match ports.recipe().and_then(|value| Recipe::from_value(&value)) {
         Ok(recipe) => recipe,
         Err(why) => return failed("recipe-invalid", why),
@@ -316,14 +341,15 @@ fn steps(ports: &dyn ReleasePorts) -> Outcome {
     let Some(apply) = recipe.apply.clone() else {
         return Outcome::NoRecipe;
     };
-    let note = match ports.newness() {
-        Ok(Newness::NothingNew) => return Outcome::NothingNew,
-        Ok(Newness::Landed) => None,
-        Ok(Newness::Unknown(why)) => Some(format!(
-            "the active release's commit is not known ({why}), so the trunk was treated as new"
-        )),
+    let tip = match ports.trunk_tip() {
+        Ok(tip) => tip.trim().to_string(),
         Err(why) => return failed("trunk-unreadable", why),
     };
+    match ports.released_commit() {
+        Ok(Some(released)) if released.trim() == tip => return Outcome::NothingNew,
+        Ok(_) => {}
+        Err(why) => return failed("state-unreadable", why),
+    }
     if let Err(outcome) = land_check(ports) {
         return outcome;
     }
@@ -341,7 +367,7 @@ fn steps(ports: &dyn ReleasePorts) -> Outcome {
     }
     if !recipe.reversible {
         return match ports.ask_owner(&apply) {
-            Ok(question) => Outcome::Asked { question, note },
+            Ok(question) => Outcome::Asked { question },
             Err(why) => failed("ask-failed", why),
         };
     }
@@ -360,39 +386,62 @@ fn steps(ports: &dyn ReleasePorts) -> Outcome {
             Err(why) => failed("rollback-failed", format!("{reason}; rollback: {why}")),
         }
     };
+    if let Err(outcome) = mark(ports, marked, "applying") {
+        return outcome;
+    }
     match ports.run(&apply) {
         Ok(0) => {}
         Ok(exit) => return undo(format!("apply exited {exit}")),
         Err(why) => return undo(format!("apply did not run: {why}")),
     }
     if let Some(probe) = &recipe.probe {
+        if let Err(outcome) = mark(ports, marked, "probing") {
+            return outcome;
+        }
         match ports.run(probe) {
             Ok(0) => {}
             Ok(exit) => return undo(format!("probe exited {exit}")),
             Err(why) => return undo(format!("probe did not run: {why}")),
         }
     }
-    Outcome::Released { note }
+    match ports.record_released(&tip) {
+        Ok(()) => Outcome::Released,
+        Err(why) => failed(
+            "state-unwritable",
+            format!("the release was applied but its commit was not recorded: {why}"),
+        ),
+    }
 }
 
 /// The rollback path alone (the secretary's, when the supervisor does not come back after a release): runs the
-/// recipe's `rollback` and reports it, whatever it ends in.
+/// recipe's `rollback` and reports it, whatever it ends in. It refuses `no-release-in-flight` unless the record
+/// shows a step that never ended; the caller holds the release lock, so the run that wrote it is dead. Once the
+/// rollback has run, its outcome, whatever it is, retires that step.
 pub fn run_rollback(ports: &dyn ReleasePorts) -> Outcome {
-    let outcome = rollback_steps(ports);
-    if let Some(line) = outcome.report_line() {
-        ports.report(&line);
-    }
-    outcome
+    let mut ran = false;
+    let outcome = rollback_steps(ports, &mut ran);
+    finish(ports, outcome, ran)
 }
 
-fn rollback_steps(ports: &dyn ReleasePorts) -> Outcome {
+fn rollback_steps(ports: &dyn ReleasePorts, ran: &mut bool) -> Outcome {
     let recipe = match ports.recipe().and_then(|value| Recipe::from_value(&value)) {
         Ok(recipe) => recipe,
         Err(why) => return failed("recipe-invalid", why),
     };
+    match ports.step() {
+        Ok(Some(_)) => {}
+        Ok(None) => {
+            return failed(
+                "no-release-in-flight",
+                "no release step is recorded as begun and unended".into(),
+            )
+        }
+        Err(why) => return failed("state-unreadable", why),
+    }
     let Some(rollback) = recipe.rollback else {
         return Outcome::NoRecipe;
     };
+    *ran = true;
     match ports.run(&rollback) {
         Ok(0) => Outcome::RolledBack {
             reason: "rollback requested".into(),

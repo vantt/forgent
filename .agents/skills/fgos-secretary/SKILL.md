@@ -83,7 +83,9 @@ A release the supervisor started and did not come back from is the secretary's t
 supervisor's ticket (`request result` reads only your own role's tickets), so judge it from what you can see: the
 supervisor is not alive (its liveness check shows it gone) or has not drained the supervision queue past its release
 step, and no release report has reached the owner. Then run `fgos release run --rollback`, which runs only the
-recipe's rollback through the window and never names what it runs, read your own ticket with
+recipe's rollback through the window and never names what it runs. The window decides whether a release was in
+flight: it refuses `no-release-in-flight` unless the release record shows a step that began and never ended and the
+run that wrote it is dead, so a refusal of that name means there is nothing to undo. Read your own ticket with
 `fgos request result <id> --wait 30`, then wake the supervisor with `fgos supervisor wake`. One release runs at a time
 for both of you: a `release-in-progress` refusal means one is still running, so look again at a later wake. If the
 rollback itself fails (`rollback-failed`), ask the owner once in the five-part form.

@@ -30,7 +30,6 @@ use fgos_identity::resolve::{HeadRef, WriterKey, ENV_ORDER};
 use fgos_identity::session::cli_of;
 use fgos_process::facts::judge_here;
 use fgos_process::spawn::{run_bounded_command, Outcome as BoundedOutcome};
-use fgos_session_host::release::Newness;
 use serde_json::{json, Value};
 
 use fgos_durable_file::{open_dir_beneath, BeneathError, BeneathRefusal, Dir};
@@ -1689,6 +1688,25 @@ struct HostRelease {
 }
 
 impl HostRelease {
+    /// The release record the rule keeps: `{released: <trunk commit>, step: applying|probing}`, both optional.
+    fn state(&self) -> Result<Value, String> {
+        match std::fs::read_to_string(release_state_file(&self.cfg.cwd)) {
+            Ok(text) => serde_json::from_str::<Value>(&text)
+                .ok()
+                .filter(Value::is_object)
+                .ok_or_else(|| "the release record is not a JSON object".to_string()),
+            Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(json!({})),
+            Err(e) => Err(format!("the release record is not readable: {e}")),
+        }
+    }
+
+    /// Whole or not at all: a synced temp file moved onto the name.
+    fn write_state(&self, state: &Value) -> Result<(), String> {
+        let file = release_state_file(&self.cfg.cwd);
+        write_ticket(&file, state, false)
+            .map_err(|e| format!("the release record was not written: {e}"))
+    }
+
     /// The `data` of the one envelope a host verb prints with `--json` (pretty-printed over many lines).
     fn host_json(&self, words: &[&str]) -> Result<Value, String> {
         let words: Vec<OsString> = words.iter().map(OsString::from).collect();
@@ -1723,10 +1741,10 @@ impl HostRelease {
         cmd
     }
 
-    /// A recipe argv (a check, the apply, the probe, the rollback). It does NOT die with the supervisor: a release
-    /// cut off halfway (a `fgctl upgrade` or `repair` killed partway) is worse than one that finishes, and the
-    /// ticket already reads `runner-gone` for the run that lost its supervisor. Its output goes to the run's log
-    /// file, since a pipe whose reader is gone would end the child with SIGPIPE.
+    /// A recipe argv (a check, the apply, the probe, the rollback). It dies with the supervisor, so the release
+    /// lock, the runner and every recipe child share one lifetime (`fgctl upgrade` publishes the activation by
+    /// temp file and rename, so a killed upgrade leaves the old or the new release, never a half one). Its output
+    /// goes to the run's log file, since a pipe whose reader is gone would end the child with SIGPIPE.
     fn recipe_command(
         &self,
         program: &str,
@@ -1744,9 +1762,12 @@ impl HostRelease {
             .env_clear()
             .envs(self.cfg.env.iter())
             .current_dir(&self.cfg.cwd);
-        // SAFETY: dup2 is async-signal-safe; it runs after the pipes are set up, so the log replaces them.
+        // SAFETY: prctl and dup2 are async-signal-safe; dup2 runs after the pipes are set up, so the log replaces
+        // them, and the child dies with the supervisor that started it.
         unsafe {
             cmd.pre_exec(move || {
+                #[cfg(target_os = "linux")]
+                fgos_process::control::arm_parent_death_signal()?;
                 if libc::dup2(fd, 1) < 0 || libc::dup2(fd, 2) < 0 {
                     return Err(io::Error::last_os_error());
                 }
@@ -1786,38 +1807,47 @@ impl fgos_session_host::release::ReleasePorts for HostRelease {
             .map(|answer| fgos_session_host::release::release_subtree(&answer))
     }
 
-    /// The trunk tip is the head commit of the project root; the active release's commit is the `gitCommit` of the
-    /// host's own version record (`fgos version --json`, a short hash), compared by prefix. A host that names no
-    /// commit leaves the answer `Unknown`, which the rule says in its outcome.
-    fn newness(&self) -> Result<Newness, String> {
-        let active = match self.host_json(&["version", "--json"]) {
-            Ok(version) => match version["gitCommit"].as_str().filter(|c| !c.is_empty()) {
-                Some(commit) => commit.to_string(),
-                None => {
-                    return Ok(Newness::Unknown(
-                        "the host's version names no gitCommit".into(),
-                    ))
-                }
-            },
-            Err(why) => {
-                return Ok(Newness::Unknown(format!(
-                    "the version record was not read: {why}"
-                )))
-            }
-        };
+    /// The trunk tip is the head commit of the project root.
+    fn trunk_tip(&self) -> Result<String, String> {
         let git = self.command("git", &["rev-parse".to_string(), "HEAD".to_string()]);
         match run_bounded_command(git, None, self.cfg.verb_timeout, |_| ()) {
             Ok(BoundedOutcome::Exited(output)) if output.status.success() => {
-                let tip = String::from_utf8_lossy(&output.stdout).into_owned();
-                Ok(if fgos_session_host::release::same_commit(&active, &tip) {
-                    Newness::NothingNew
-                } else {
-                    Newness::Landed
-                })
+                Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
             }
             Ok(_) => Err("git rev-parse HEAD did not answer".to_string()),
             Err(e) => Err(format!("git did not run: {e}")),
         }
+    }
+
+    fn released_commit(&self) -> Result<Option<String>, String> {
+        Ok(self.state()?["released"].as_str().map(String::from))
+    }
+
+    fn record_released(&self, commit: &str) -> Result<(), String> {
+        let mut state = self.state()?;
+        state["released"] = json!(commit);
+        self.write_state(&state)
+    }
+
+    fn step(&self) -> Result<Option<String>, String> {
+        Ok(self.state()?["step"].as_str().map(String::from))
+    }
+
+    fn set_step(&self, step: Option<&str>) -> Result<(), String> {
+        let mut state = self.state()?;
+        match step {
+            Some(step) => state["step"] = json!(step),
+            None => {
+                if state
+                    .as_object_mut()
+                    .and_then(|o| o.remove("step"))
+                    .is_none()
+                {
+                    return Ok(());
+                }
+            }
+        }
+        self.write_state(&state)
     }
 
     fn land_in_progress(&self) -> Result<Option<String>, String> {
@@ -1856,6 +1886,14 @@ impl fgos_session_host::release::ReleasePorts for HostRelease {
                 "scope": {"allows": "Applying this one release.", "forbids": "Any other release, or a standing grant."}
             }),
         )
+    }
+
+    fn log(&self, line: &str) {
+        (self.cfg.log)(&format!(
+            "head-request {} {}",
+            self.request.id,
+            loggable_detail(line)
+        ));
     }
 
     fn report(&self, line: &str) {
@@ -1910,53 +1948,40 @@ fn write_ticket(file: &Path, ticket: &Value, exclusive: bool) -> io::Result<()> 
     placed
 }
 
-/// One release at a time across both personas: a lock file under `.fgos/runtime` that names its holder's process
-/// identity and goes with the guard. A holder judged dead is reclaimed; one that is alive or cannot be judged keeps it.
+/// The release rule's own record under the project root: the trunk commit the last release put in place and the step
+/// in progress.
+fn release_state_file(root: &Path) -> PathBuf {
+    root.join(".fgos/runtime/release/state.json")
+}
+
+/// One release at a time across both personas: a kernel `flock` (exclusive, non-blocking, close-on-exec) on
+/// `.fgos/runtime/release/lock`, held by this supervisor for the whole detached run. The kernel drops it when the
+/// supervisor dies, so there is no holder to judge, no stale lock to reclaim and no file that can wedge it.
 struct ReleaseLock {
-    file: PathBuf,
+    _file: std::fs::File,
 }
 
 impl ReleaseLock {
-    fn take(root: &Path, identity: &Value) -> io::Result<Option<ReleaseLock>> {
-        use std::io::Write;
-        let dir = root.join(".fgos/runtime");
+    fn take(root: &Path) -> io::Result<Option<ReleaseLock>> {
+        use std::os::fd::AsRawFd;
+        let dir = root.join(".fgos/runtime/release");
         std::fs::create_dir_all(&dir)?;
-        let file = dir.join("release.lock");
-        for _ in 0..2 {
-            match std::fs::OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .mode_0600()
-                .open(&file)
-            {
-                Ok(mut out) => {
-                    writeln!(out, "{identity}")?;
-                    return Ok(Some(ReleaseLock { file }));
-                }
-                Err(e) if e.kind() == io::ErrorKind::AlreadyExists => {
-                    let holder = std::fs::read_to_string(&file)
-                        .ok()
-                        .and_then(|text| serde_json::from_str::<Value>(&text).ok())
-                        .map(|value| fgos_process::facts::Record::from_json(&value));
-                    match holder {
-                        Some(record)
-                            if judge_here(&record) == fgos_process::facts::Verdict::Dead =>
-                        {
-                            let _ = std::fs::remove_file(&file);
-                        }
-                        _ => return Ok(None),
-                    }
-                }
-                Err(e) => return Err(e),
-            }
+        let file = std::fs::OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(false)
+            .mode_0600()
+            .open(dir.join("lock"))?;
+        // SAFETY: flock on a descriptor this function owns; std opens it close-on-exec, so no child inherits it.
+        if unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) } == 0 {
+            return Ok(Some(ReleaseLock { _file: file }));
         }
-        Ok(None)
-    }
-}
-
-impl Drop for ReleaseLock {
-    fn drop(&mut self) {
-        let _ = std::fs::remove_file(&self.file);
+        let e = io::Error::last_os_error();
+        if e.kind() == io::ErrorKind::WouldBlock {
+            Ok(None)
+        } else {
+            Err(e)
+        }
     }
 }
 
@@ -1999,15 +2024,15 @@ fn release_run(cfg: &Arc<Config>, request: &Request) -> Outcome {
             detail: Some("the role is not a head role".to_string()),
         };
     }
-    // This process is the runner: its identity is on the ticket and on the lock, so a supervisor that ends mid-run
-    // reads `runner-gone` and frees the lock for the next release.
+    // This process is the runner: its identity is on the ticket, so a supervisor that ends mid-run reads
+    // `runner-gone`; the kernel frees the release lock with it.
     let Some(runner) = fgos_process::facts::self_identity().map(|t| t.to_record().to_json()) else {
         return Outcome::Refused {
             code: "verb-failed",
             detail: Some("the supervisor's own process identity is not readable".to_string()),
         };
     };
-    let lock = match ReleaseLock::take(&cfg.cwd, &runner) {
+    let lock = match ReleaseLock::take(&cfg.cwd) {
         Ok(Some(lock)) => lock,
         Ok(None) => return refused("release-in-progress"),
         Err(e) => {
