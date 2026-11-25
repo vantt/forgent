@@ -129,7 +129,7 @@ Holder identity is `{hostId, bootId, pid, processStartTime}` of the process doin
 control, not a guessed Rust parent. Unknown liveness is not dead. A dead holder
 may leave a remotely queued command: successor first reconciles pending control.
 
-Implemented (Phase 02 H1, `src/run-supervisor/run-lock.mjs`): holder identity
+Implemented (Phase 02 H1, `src/run-supervisor/run-lock.mjs`): holder identity (retired; last at `85760c6f2`)
 is `{id, pid, bootId, processStartTime, host}` (`buildRunControlHolder`,
 `host` in place of this section's `hostId`), and `resolveHolderLiveness`
 encodes the reclaim decision above as a table — a live pid, a pid whose
@@ -284,7 +284,7 @@ The current Herdr launch identity uses normalized
 runId alone. The standalone reassign action is a fenced controller-epoch
 record with a checked authority input; it does not launch a replacement
 worker or execute the retired session `driver-replaced` continuation door.
-Evidence: `src/runner/dispatch/assignment-runner.mjs:2118` creates the random
+Evidence: `src/runner/dispatch/assignment-runner.mjs:2118` creates the random (retired; last at `85760c6f2`)
 launch command; `src/runner/dispatch/confinement/authority.mjs:1608-1629`
 normalizes and persists its identity. Replacement authority is checked in
 `packages/execution/engine/src/planning/recovery.rs`; reassign records

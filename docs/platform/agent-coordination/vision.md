@@ -173,7 +173,7 @@ at least:
 
 A Workflow operation/TaskSpec, Unit or validated inline contract supplies the
 applicable execution contract. Inline validation is implemented in
-`src/runner/dispatch/execution-contract.mjs:180-240,295-340`; it is not still an
+`src/runner/dispatch/execution-contract.mjs:180-240,295-340`; it is not still an (retired; last at `85760c6f2`)
 undecided schema. Unit and generic inline admission are distinct current paths.
 
 ### V-005: Agents Own Adaptive Reasoning; The Foundation Owns Authority

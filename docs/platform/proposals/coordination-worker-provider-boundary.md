@@ -57,14 +57,14 @@ capability; it does not choose cognitive steps or execute arbitrary worker tools
 
 ## New evidence since the first capability audit
 
-[Transport](../../../src/runner/dispatch/transport.mjs), cliSpawnAdapter, launches
+`src/runner/dispatch/transport.mjs`, cliSpawnAdapter, launches (retired; last at `85760c6f2`)
 with `{ ...process.env, ...resolvedEnv, FGOS_DISPATCH_DEPTH: ... }`. The herdr path
 also constructs a merged fullEnv. Environment overrides therefore do not form an
 allowlist. This is static evidence of inheritance, not a claim that a real secret
 was leaked. An environment depth counter is a cooperative limit; a hostile child
 can change its own environment, so it cannot own authoritative budget accounting.
 
-[Assignment runner](../../../src/runner/dispatch/assignment-runner.mjs) renders an
+`src/runner/dispatch/assignment-runner.mjs` renders an (retired; last at `85760c6f2`)
 absolute runDir for worker report/result submission. That directory also contains
 runtime-authored dispatch-plan.json, run.json, and subsequent evidence/result
 files. A writable bind of the entire directory would grant more than submission

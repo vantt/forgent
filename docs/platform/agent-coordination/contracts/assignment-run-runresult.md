@@ -66,9 +66,9 @@ Current construction has three provenance kinds:
 
 [ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)
 distinguishes their shapes. Declared/inline builders stamp policy/normalizer
-versions (`src/runner/dispatch/assignment.mjs:443-444,626-628`; constants in
-`src/runner/dispatch/execution-contract.mjs:47` and
-`src/runner/dispatch/assignment-normalizer.mjs:44`); Unit-run provenance is
+versions (`src/runner/dispatch/assignment.mjs:443-444,626-628`; constants in (retired; last at `85760c6f2`)
+`src/runner/dispatch/execution-contract.mjs:47` and (retired; last at `85760c6f2`)
+`src/runner/dispatch/assignment-normalizer.mjs:44`); Unit-run provenance is (retired; last at `85760c6f2`)
 written by `execution/run.mjs:569-576`.
 Mutation/evidence normalization is current implementation, not an assumption
 that the retired session stamp-producing door still exists.
@@ -146,7 +146,7 @@ Three guarantees, kept distinct:
   exactly-once external effect; a stopped worker does not mean its effects
   are absent.
 
-Current admission uses deterministic Run identities, attempt numbering and existing-result refusal in `src/runner/dispatch/assignment-runner.mjs:697-940`. Run control is epoch/token-fenced in `run-lock.mjs:306-412`; corrupt settlement refuses rather than relaunching. `runtime-inspection.mjs:160-175` recognizes phase observations including bound/delivered; that is not proof that every proposed RunHandle transition/schema below has been implemented.
+Current admission uses deterministic Run identities, attempt numbering and existing-result refusal in `src/runner/dispatch/assignment-runner.mjs:697-940`. Run control is epoch/token-fenced in `run-lock.mjs:306-412`; corrupt settlement refuses rather than relaunching. `runtime-inspection.mjs:160-175` recognizes phase observations including bound/delivered; that is not proof that every proposed RunHandle transition/schema below has been implemented. (retired; last at `85760c6f2`)
 
 The former session `run-retried` event-order and result-link fencing rules are preserved in history. The current standalone Run record writes the implemented `assignment-run.v2` subset (`assignment-runner.mjs:1563-1590`). The admissionKey/admitRun/authorityRef/writerRuntime interface and stronger proposed supersession contract below remain design targets, not asserted runtime APIs.
 

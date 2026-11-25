@@ -101,7 +101,7 @@ là shape không hợp lệ. Mỗi phần tử là đường dẫn tương đố
 rỗng, tuyệt đối (kể cả `C:`), chứa đoạn `..` hoặc ký tự glob (`* ? [ ] { }`) bị từ chối theo tên ở shape
 (`ConfinementPolicyError`). Resolver từ chối thêm path không tồn tại (`workspace-path-missing`), symlink và path
 thoát root (`confinement-grant-invalid`). Mỗi path thành một resolved resource riêng, `delivery: mount`,
-`collect: none`. Một check duy nhất: `validateWorkspacePaths` (`src/runner/dispatch/confinement/policies.mjs`),
+`collect: none`. Một check duy nhất: `validateWorkspacePaths` (`src/runner/dispatch/confinement/policies.mjs`), (retired; last at `85760c6f2`)
 cả shape và resolver gọi nó.
 
 Thứ tự mức bảo vệ cố định theo từng control: `hostWrite deny > allow`,
@@ -454,7 +454,7 @@ interface SessionLaunchContextV1 {
 không có run control vì không có gì để settle, và một head sống duy nhất của persona và tên được rào bằng việc
 Identity đăng ký role, không phải bằng control epoch. `kind` khác hai giá trị trên bị từ chối
 (`confinement-launch-context-invalid`). Code: `validateAssignmentLaunchContext`
-(`src/runner/dispatch/confinement/request.mjs`).
+(`src/runner/dispatch/confinement/request.mjs`). (retired; last at `85760c6f2`)
 
 Mọi path phải absolute sau normalize. `runDir` bắt buộc với dispatch agent;
 không backend nào được tự suy nó từ `.fgos/assignments` hay current working

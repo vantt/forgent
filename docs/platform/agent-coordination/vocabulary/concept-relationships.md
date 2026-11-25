@@ -108,5 +108,5 @@ The rings are responsibility boundaries, not necessarily one process or module
 per ring.
 
 Adopted responsibility model: Concrete responsibility owners remain
-`src/workflow/runner.mjs`, `src/runner/execution/patterns` and
+`src/workflow/runner.mjs`, `src/runner/execution/patterns` and (retired; last at `85760c6f2`)
 `src/runner/dispatch`; this does not revive the retired session engine.

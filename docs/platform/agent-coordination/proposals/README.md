@@ -48,7 +48,7 @@ declare those contracts canonical or the engine delivered in the current release
 
 1. [Step 07: CoordinationSession, AdhocTask, And Planning Boundary](../history/retired-engine/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot)
    records the old session/planning discussion. Current inline validation is
-   implemented in `src/runner/dispatch/execution-contract.mjs`; it is not waiting
+   implemented in `src/runner/dispatch/execution-contract.mjs`; it is not waiting (retired; last at `85760c6f2`)
    for acceptance of that retired proposal.
 2. [Step 08: Standalone Coordination And Optional Protocols](../history/retired-engine/proposals/step-08-standalone-coordination-protocols.md#literal-snapshot)
    records the former coordination door and optional-protocol design, retired

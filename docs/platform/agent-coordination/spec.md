@@ -32,10 +32,10 @@ Evidence: src/runner/execution/loops/index.mjs:34-46; src/workflow/runner.mjs:41
 
 Current execution owners are:
 
-- CollaborationPattern for Unit runs: `src/runner/execution/loops/index.mjs`.
+- CollaborationPattern for Unit runs: `src/runner/execution/loops/index.mjs`. (retired; last at `85760c6f2`)
 - The Workflow runner: `src/workflow/runner.mjs`.
 - Their current contract: [docs/platform/runner/spec.md](../runner/spec.md#spec-runner-vòng-tự-hành), not the retired CoordinationSession engine.
-- Assignment/Run dispatch: `src/runner/dispatch/assignment.mjs`, `plan.mjs`, `assignment-runner.mjs` and `run-result.mjs`; the current [dispatch contract](contracts/assignment-run-runresult.md) and [control-plane owner](architecture/dispatch-control-plane.md) retain that boundary.
+- Assignment/Run dispatch: `src/runner/dispatch/assignment.mjs`, `plan.mjs`, `assignment-runner.mjs` and `run-result.mjs`; the current [dispatch contract](contracts/assignment-run-runresult.md) and [control-plane owner](architecture/dispatch-control-plane.md) retain that boundary. (retired; last at `85760c6f2`)
 
 ## Scope
 
@@ -57,18 +57,18 @@ This area does not own:
 
 | Surface | Current owner |
 |---|---|
-| Unit execution | `packages/execution/engine/src/unit_run/run.rs` and `src/runner/execution/loops/index.mjs` |
+| Unit execution | `packages/execution/engine/src/unit_run/run.rs` and `src/runner/execution/loops/index.mjs` (retired; last at `85760c6f2`) |
 | Workflow execution | `src/workflow/runner.mjs` |
-| Assignment/Run dispatch and normalization | `src/runner/dispatch/assignment.mjs`, `plan.mjs`, `assignment-runner.mjs`, `run-result.mjs` |
+| Assignment/Run dispatch and normalization | `src/runner/dispatch/assignment.mjs`, `plan.mjs`, `assignment-runner.mjs`, `run-result.mjs` (retired; last at `85760c6f2`) |
 | Retired coordination CLI | [Historical snapshot](history/retired-engine/spec.md#literal-snapshot), not a current public door |
 
 ## Core Entities
 
-Current entities include [Unit](../../../src/runner/execution/unit.mjs), [CollaborationPattern](../../../src/runner/execution/loops/index.mjs), Workflow definitions/runs, Assignment, Run, RunResult and the compiled DispatchPlan. Unit/Workflow execution uses the pattern/Workflow runners; Assignment construction, plan compilation, attempt admission and result normalization retain their dispatch-module owners listed above. This is not an exclusive three-entity list. The retired engine schemas are preserved verbatim in the linked historical snapshot, not current runtime prerequisites.
+Current entities include `src/runner/execution/unit.mjs`, `src/runner/execution/loops/index.mjs`, Workflow definitions/runs, Assignment, Run, RunResult and the compiled DispatchPlan. Unit/Workflow execution uses the pattern/Workflow runners; Assignment construction, plan compilation, attempt admission and result normalization retain their dispatch-module owners listed above. This is not an exclusive three-entity list. The retired engine schemas are preserved verbatim in the linked historical snapshot, not current runtime prerequisites. (retired; last at `85760c6f2`)
 
 ## Operations And Flows
 
-Current sequencing and collaboration belong to the [Workflow runner](../../../src/workflow/runner.mjs) and [CollaborationPattern](../../../src/runner/execution/loops/index.mjs). The former engine flow/status table is [preserved history](history/retired-engine/spec.md#literal-snapshot), not evidence that those flows are shipped.
+Current sequencing and collaboration belong to the [Workflow runner](../../../src/workflow/runner.mjs) and `src/runner/execution/loops/index.mjs`. The former engine flow/status table is [preserved history](history/retired-engine/spec.md#literal-snapshot), not evidence that those flows are shipped. (retired; last at `85760c6f2`)
 
 ## Contracts Owned
 

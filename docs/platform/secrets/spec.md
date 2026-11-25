@@ -21,7 +21,6 @@ Related:
 - docs/platform/agent-confinement/spec.md (hostRead, "secret, not blind" limit)
 - docs/history/glm-openrouter-executor/plan.md (decision that the key lives in an untracked file)
 - src/runner/dispatch/provider-capacity.mjs (credentialSource, per-run private home)
-- src/runner/dispatch/adapters.mjs (variable expansion)
 - src/config/facade.mjs (global and project config merge)
 - src/setup/checks.mjs, src/setup/registrations.mjs (doctor checks, setup registrations)
 - .claude/settings.json (PreToolUse registration of the privacy hook; the hook scripts are untracked per-machine files)

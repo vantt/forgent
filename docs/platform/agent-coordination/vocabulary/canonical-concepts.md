@@ -68,7 +68,7 @@ criteria for an operation.
 
 A registered TaskSpec is optional when the request supplies a validated inline
 contract. Inline field validation and normalization are implemented in
-`src/runner/dispatch/execution-contract.mjs:180-200,295-340`; the representation
+`src/runner/dispatch/execution-contract.mjs:180-200,295-340`; the representation (retired; last at `85760c6f2`)
 is not merely an unresolved design. Both paths retain execution governance.
 
 ### Skill
@@ -101,7 +101,7 @@ not three private dispatch engines.
 
 An abstract behavior promise. The legacy dispatch capability catalog supports
 `prefer` and `rigor`, with executor `for[]` declarations; capability `overrides`
-is rejected (`src/runner/dispatch/config.mjs:1007-1017,1223-1235`).
+is rejected (`src/runner/dispatch/config.mjs:1007-1017,1223-1235`). (retired; last at `85760c6f2`)
 Capability and executor-id are the conceptual target identities described in
 [Dispatch Control Plane](../architecture/dispatch-control-plane.md).
 `purpose` and `--for` are its compatibility terminology. Execution Core Unit
@@ -171,7 +171,7 @@ A behavioral viewpoint supplied to a Unit template or advisory seat, not a persi
 
 ### Stance
 
-A temporary argumentative viewpoint. Passive panelist stance measurement is implemented: `stanceOptions` elicits an optional choice/confidence claim, and the Unit summary validates it (`src/runner/execution/loops/role-tasks.mjs:61-70`, `unit-summary.mjs:17-28`); it does not affect pass/fail. A broader cognitive/session-state stance entity or routing identity remains design vocabulary, not a shipped SessionActor model.
+A temporary argumentative viewpoint. Passive panelist stance measurement is implemented: `stanceOptions` elicits an optional choice/confidence claim, and the Unit summary validates it (`src/runner/execution/loops/role-tasks.mjs:61-70`, `unit-summary.mjs:17-28`); it does not affect pass/fail. A broader cognitive/session-state stance entity or routing identity remains design vocabulary, not a shipped SessionActor model. (retired; last at `85760c6f2`)
 
 ### TaskCandidate
 

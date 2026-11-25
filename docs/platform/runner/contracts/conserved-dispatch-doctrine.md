@@ -63,7 +63,7 @@ The still-maintained operation-template contract is not the retired FlowDefiniti
 // Any placeholder outside this bounded set fails loudly with 'template-invalid'.
 ```
 
-Discovery and rendering remain owned by `src/runner/dispatch/operation-prompt-templates.mjs`: fixed project > domain > core precedence, deterministic selection, bounded substitution from validated Assignment/ExecutionContract inputs only, no widening of authority, and template id/source/content digest recorded as provenance. Unknown variables, ambiguity and path escape fail by name. The historical FlowDefinition operation primitive supplies design provenance only; this contract does not revive FlowDefinition/CoordinationProtocol or the retired coordination engine.
+Discovery and rendering remain owned by `src/runner/dispatch/operation-prompt-templates.mjs`: fixed project > domain > core precedence, deterministic selection, bounded substitution from validated Assignment/ExecutionContract inputs only, no widening of authority, and template id/source/content digest recorded as provenance. Unknown variables, ambiguity and path escape fail by name. The historical FlowDefinition operation primitive supplies design provenance only; this contract does not revive FlowDefinition/CoordinationProtocol or the retired coordination engine. (retired; last at `85760c6f2`)
 
 ## Retired Provider-Policy Pointer
 

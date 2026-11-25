@@ -118,7 +118,7 @@ its own eligible admission. No current session graph grants fallback authority.
 ## 4. One Attempt History, Explicit Caps
 
 Current durable Run admission and attempt accounting are implemented in
-`src/runner/dispatch/assignment-runner.mjs:672-783`. Retry attempts retain the
+`src/runner/dispatch/assignment-runner.mjs:672-783`. Retry attempts retain the (retired; last at `85760c6f2`)
 Assignment and previous evidence; observer restarts are not a fresh semantic
 request. Exact admission caps must come from that implementation/effective
 contract, not a retired session retry declaration.

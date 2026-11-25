@@ -632,7 +632,7 @@ capabilities, never tools" — US-027). Registry không còn là một kho riên
   `cli`/`binary` tìm trên PATH; `mcp`/`skill` quét `scanTarget` trên đĩa (hai
   kind này không nằm trên PATH), `stale` khi `meta.json` của chính tool có
   `lastCommit` lùi sau `HEAD`; không khai probe nào thì `unknown`.
-- **Một người đọc:** `toolProvidersOf` (`src/runner/dispatch/tool-providers.mjs`)
+- **Một người đọc:** `toolProvidersOf` (`src/runner/dispatch/tool-providers.mjs`) (retired; last at `85760c6f2`)
   là nơi duy nhất đọc `for` của executor và là lần probe duy nhất; `decide`, hàng
   doctor `tool-registry-configured` và cảnh báo của `executor-profile-warnings`
   đều hỏi nó. Hàng `doors` trong `packages/component-authority/model/` chặn đường thứ hai.

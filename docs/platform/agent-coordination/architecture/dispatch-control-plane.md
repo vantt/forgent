@@ -85,8 +85,8 @@ executor-id  — explicit concrete implementation override, naming a
 
 `purpose` is not a third identity. It is compatibility terminology for
 capability. The `--for <purpose>` CLI flag and the `purpose`/`for` parameter
-names threaded through `src/runner/dispatch/plan.mjs` (`purposeSeatOf`) and
-`src/runner/dispatch/resolve.mjs` (`lookupExecutor`) name capability
+names threaded through `src/runner/dispatch/plan.mjs` (`purposeSeatOf`) and (retired; last at `85760c6f2`)
+`src/runner/dispatch/resolve.mjs` (`lookupExecutor`) name capability (retired; last at `85760c6f2`)
 values. `resolveExecutorIdForPurpose` is not a current exported resolver.
 `compileDispatchPlan()`'s `selector.type: 'purpose'` is the compatibility
 selector label. It does not create a third conceptual route identity.
@@ -250,7 +250,7 @@ semantic third identity.
 ## Executor Kinds
 
 An executor is not assumed to be an agent. `runner.executors.<id>.kind` is
-one of `agent | tool` (`src/runner/dispatch/config.mjs`,
+one of `agent | tool` (`src/runner/dispatch/config.mjs`, (retired; last at `85760c6f2`)
 `EXECUTOR_KINDS`) — orthogonal to the invocation mechanism
 (`invocations[].via`, one of `cli | task | mcp | api`). A `tool`/MCP-only
 executor (e.g. `gitnexus`, `invocations: [{via: "mcp"}]`) is never spawned

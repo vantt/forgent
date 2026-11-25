@@ -128,7 +128,7 @@ Source anchors:
   definition; classifySessionQuorum, closeSessionByQuorum, assertWithinWallTimeBudget.
 - Store: assertDriverIdentity,
   createSessionAssignment aggregate counters.
-- [Runner](../../../../../src/runner/dispatch/assignment-runner.mjs): documented
+- `src/runner/dispatch/assignment-runner.mjs`: documented (retired; last at `85760c6f2`)
   same-user trust boundary.
 - Recovery test source:
   constructed crash-state fixtures and fake subprocess executors; not rerun here.

@@ -30,7 +30,7 @@ config/doctor warnings (`executor-profile-warnings` check,
 judged in Rust by `apps/fgos/src/wiring/doctor/execution.rs`) have a named migration target to
 point at. The **Invocation** half of this vocabulary was already real config
 before this section existed (`executors.<id>.invocations[]`, each entry's
-own `via`/`command`/`args`/`adapter` — `src/runner/dispatch/config.mjs`'s
+own `via`/`command`/`args`/`adapter` — `src/runner/dispatch/config.mjs`'s (retired; last at `85760c6f2`)
 `validateInvocationShape`). Phase C (`archive/plans/260917-executor-profile-schema-migration/plan.md`)
 made the **ExecutorProfile** half real too: `executors.<id>.identity`
 (all four fields required together when declared) and `executors.<id>.supports`
@@ -44,9 +44,9 @@ statement is stale. The archived migration plan records Phases A–E merged,
 including executor-id consolidation. The legacy reviewer ids no longer exist
 as registered executors; `EXECUTOR_KINDS` is now `agent|tool`. These facts
 come from code and the completed plan, without reading live configuration.
-Evidence: `src/runner/dispatch/transport.mjs:176`,
+Evidence: `src/runner/dispatch/transport.mjs:176`, (retired; last at `85760c6f2`)
 `src/runner/dispatch/assignment-policy.mjs:88-98` (deleted in 3133ed474) (former module; removed from main before source capture, not a current owner),
-`src/runner/dispatch/config.mjs:457`, and
+`src/runner/dispatch/config.mjs:457`, and (retired; last at `85760c6f2`)
 `archive/plans/260917-executor-profile-schema-migration/plan.md:1-14,733-741`.
 
 **ExecutorProfile** answers "which principal/backend/trust boundary is
