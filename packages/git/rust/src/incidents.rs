@@ -19,10 +19,11 @@ const SCAN_BOUND: usize = 100_000;
 const RECOVERABLE_KINDS: [&str; 3] = ["Land", "ScopedCommit", "RemoteTransfer"];
 
 /// Causes that mean a writer other than the caller started the chain.
-const AUTHORITY_MISMATCH_CAUSES: [&str; 3] = [
+const AUTHORITY_MISMATCH_CAUSES: [&str; 4] = [
     "land-authority-mismatch",
     "commit-authority-mismatch",
     "remote-authority-mismatch",
+    "ref-authority-mismatch",
 ];
 
 /// Why a fact could not be read: the driver's structured refusal, or the text of a plain failure.
@@ -456,7 +457,7 @@ fn kept_text(kept: &Kept) -> String {
         ""
     };
     let only = if authority {
-        format!("; only its writer {writer} can recover it{settled_by}")
+        format!("; writer {writer} is alive or not provably dead; once it is gone, `fgos git recover` settles it{settled_by}")
     } else {
         String::new()
     };
@@ -496,10 +497,20 @@ pub fn recover_git_operations(
             .clone()
     };
     if !operations.is_empty() {
-        let writer = own_writer();
+        let caller_writer = own_writer();
         for operation in &operations {
             let id = operation["operationId"].as_str().unwrap_or_default();
-            match driver.reconcile_operation(&repo, Vec::new(), &writer, id, None) {
+            let chain_writer = operation["intent"]["writerIdentity"]
+                .as_str()
+                .unwrap_or_default();
+            let auth = if chain_writer == caller_writer {
+                crate::recovery::RecoveryAuthority::direct(&caller_writer)
+            } else if writer_is_dead(chain_writer) {
+                crate::recovery::RecoveryAuthority::recovered_by(chain_writer, &caller_writer)
+            } else {
+                crate::recovery::RecoveryAuthority::direct(&caller_writer)
+            };
+            match driver.reconcile_operation(&repo, Vec::new(), auth, id, None) {
                 Ok(_) => settled.push(id.to_owned()),
                 Err(error) => kept.push(Kept {
                     operation_id: id.to_owned(),
@@ -672,8 +683,8 @@ mod tests {
         assert_eq!(
             message,
             "recovered interrupted Git operations: done-1; warning: Git operations kept for recovery: \
-             land-1 (land-authority-mismatch; only its writer w-a can recover it); \
-             push-1 (remote-authority-mismatch; only its writer w-b can recover it, and the next event sync settles it); \
+             land-1 (land-authority-mismatch; writer w-a is alive or not provably dead; once it is gone, `fgos git recover` settles it); \
+             push-1 (remote-authority-mismatch; writer w-b is alive or not provably dead; once it is gone, `fgos git recover` settles it, and the next event sync settles it); \
              commit-1 (checkout-custody-busy)"
         );
     }

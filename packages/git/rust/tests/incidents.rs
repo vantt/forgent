@@ -422,3 +422,195 @@ fn a_status_that_cannot_open_the_repository_answers_every_part_in_place_with_no_
     }
     assert_eq!(status["mergeInProgress"], Value::Null);
 }
+
+#[test]
+fn recovery_settles_pending_pre_attempt_land_of_dead_writer_and_clears_mismatch() {
+    let f = Fixture::new();
+    let _worktree = interrupt_land_as(&f, "dead-land", "dead-session");
+
+    // Verify prepare_land by another writer fails with land-abandoned-writer-mismatch
+    let err = match f.driver.prepare_land(
+        &f.repo,
+        vec![],
+        &f.request,
+        WRITER,
+        "probe-prepare",
+        &wal::OsFileSystem,
+        0,
+    ) {
+        Err(e) => e,
+        Ok(_) => panic!("expected prepare_land to fail"),
+    };
+    assert_eq!(err.cause, "land-abandoned-writer-mismatch");
+
+    // Run recover_git_operations with writer_is_dead proving "dead-session" dead
+    let recovered = recover_proving(&f, &|w| w == "dead-session");
+    assert!(
+        recovered["recovered"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|id| id == "dead-land"),
+        "{recovered}"
+    );
+
+    // Verify prepare_land by the other writer now succeeds
+    let session = f
+        .driver
+        .prepare_land(
+            &f.repo,
+            vec![],
+            &f.request,
+            WRITER,
+            "probe-prepare",
+            &wal::OsFileSystem,
+            0,
+        )
+        .unwrap();
+    drop(session);
+}
+
+fn interrupt_scoped_commit_as(f: &Fixture, id: &str, writer: &str) {
+    use fgos_git::wal::*;
+    let baseline = f.driver.preflight_commit(&f.repo, vec![], None).unwrap();
+    let request = CommitRequest {
+        writes: vec!["a".into()],
+        message: "interrupted commit".into(),
+    };
+    let wal = Wal::open(&f.repo).unwrap();
+    let kind = OperationKind::ScopedCommit(Box::new(ScopedCommitIntent {
+        worktree: baseline.worktree.clone(),
+        baseline: serde_json::to_string(&baseline).unwrap(),
+        request: serde_json::to_string(&request).unwrap(),
+        paths: vec!["a".into()].into(),
+        tree: baseline.head.clone(),
+        retired_cutover_grant: None,
+    }));
+    let resources = vec![format!("worktree:{}", baseline.worktree)];
+    let authority_binding = baseline.authority.clone();
+    struct AnyAuthority;
+    impl PublicationAuthority for AnyAuthority {
+        fn validate_publication_borrow(&self, _i: &Intent) -> WalResult<()> {
+            Ok(())
+        }
+    }
+    let intent = Intent {
+        request_digest: canonical_digest(&(&baseline, &request, writer)).unwrap(),
+        kind,
+        repo_identity: wal.repository_identity().into(),
+        resource_set: resources,
+        authority_binding,
+        writer_identity: writer.into(),
+        object_format: f.repo.object_format(),
+        expected: Tip::Oid(baseline.head.clone()),
+        next: Tip::Oid(baseline.head.clone()),
+    };
+    let Begin::Created(chain) = wal.begin(id, intent, &AnyAuthority).unwrap() else {
+        panic!("wal begin failed");
+    };
+    let chain = wal.append(&chain, Phase::Prepared).unwrap();
+    let _chain = wal
+        .append(
+            &chain,
+            Phase::TargetAttempt {
+                prior_target_attempt: None,
+                expected: chain.intent().expected.clone(),
+                next: chain.intent().next.clone(),
+            },
+        )
+        .unwrap();
+}
+
+#[test]
+fn recovery_settles_scoped_commit_of_dead_writer_and_records_recoverer() {
+    let f = Fixture::new();
+    interrupt_scoped_commit_as(&f, "dead-commit", "dead-session");
+
+    let recovered = recover_proving(&f, &|w| w == "dead-session");
+    assert!(
+        recovered["recovered"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|id| id == "dead-commit"),
+        "{recovered}"
+    );
+
+    let wal = wal::Wal::open(&f.repo).unwrap();
+    let outcome = if let Some(c) = wal.compacted("dead-commit").unwrap() {
+        c.outcome().unwrap()
+    } else {
+        wal.inspect("dead-commit")
+            .unwrap()
+            .outcome()
+            .expect("outcome recorded")
+            .clone()
+    };
+    match outcome {
+        wal::Outcome::CommitRejected { cause } => {
+            assert!(
+                cause.contains("recovered by fixture"),
+                "expected cause to name recoverer, got {cause}"
+            );
+        }
+        wal::Outcome::AbandonedBeforeAttempt => {}
+        other => panic!("unexpected outcome: {other:?}"),
+    }
+}
+
+#[test]
+fn recovery_settles_main_checkout_catch_up_of_dead_writer() {
+    let f = Fixture::new();
+    git(&f.main, &["checkout", "-qb", "ahead"]);
+    fs::write(f.main.join("remote-file"), "ahead\n").unwrap();
+    git(&f.main, &["add", "remote-file"]);
+    git(&f.main, &["commit", "-qm", "ahead"]);
+    let next = git(&f.main, &["rev-parse", "HEAD"]);
+    git(&f.main, &["checkout", "-q", "trunk"]);
+    git(&f.main, &["update-ref", "refs/remotes/origin/trunk", &next]);
+    let dest = RefName::parse("refs/heads/trunk").unwrap();
+    let origin = RefName::parse("refs/remotes/origin/trunk").unwrap();
+    let old = Oid::parse(&f.request.target, f.repo.object_format()).unwrap();
+    let _ = f.driver.catch_up_main_checkout(
+        &f.repo,
+        vec![],
+        &dest,
+        &old,
+        &origin,
+        "dead-session",
+        "dead-catch-up",
+        &StopAt("catch-up-before-cas"),
+    );
+
+    let recovered = recover_proving(&f, &|w| w == "dead-session");
+    assert!(
+        recovered["recovered"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|id| id == "dead-catch-up"),
+        "{recovered}"
+    );
+}
+
+#[test]
+fn recovery_keeps_live_writers_interrupted_chain_with_updated_notice() {
+    let f = Fixture::new();
+    interrupt_scoped_commit_as(&f, "live-commit", "live-session");
+
+    let recovered = recover_proving(&f, &|_| false);
+    assert_eq!(recovered["recovered"], json!([]));
+    assert!(
+        !recovered["kept"].as_array().unwrap().is_empty(),
+        "expected at least one kept operation: {recovered}"
+    );
+    let kept = &recovered["kept"][0];
+    assert_eq!(kept["operationId"], "live-commit");
+    assert_eq!(kept["cause"], "commit-authority-mismatch");
+    assert_eq!(kept["writer"], "live-session");
+    let msg = recovered["message"].as_str().unwrap();
+    assert!(
+        msg.contains("writer live-session is alive or not provably dead; once it is gone, `fgos git recover` settles it"),
+        "expected updated kept text in message, got: {msg}"
+    );
+}

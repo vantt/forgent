@@ -1181,20 +1181,21 @@ pub(crate) fn branch_in_use(
 
 impl GitDriver {
     /// Observe one interrupted ref mutation; never repeat its CAS or checkout.
-    pub fn recover_ref_operation(
+    pub fn recover_ref_operation<'a>(
         &self,
         repo: &RepoHandle,
         held: Vec<BorrowedHandle<'_>>,
-        writer: &str,
+        authority: impl Into<crate::recovery::RecoveryAuthority<'a>>,
         id: &str,
     ) -> Result<Outcome> {
+        let authority = authority.into();
         // A main-checkout catch-up journals as RefUpdate under its own binding; its recovery
         // holds the main-checkout authority, not a linked checkout's lease.
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
         if wal.inspect(id)?.intent().authority_binding
             == crate::land::catch_up_binding(wal.repository_identity(), repo)?
         {
-            return self.recover_main_checkout_catch_up(repo, held, writer, id);
+            return self.recover_main_checkout_catch_up(repo, held, authority, id);
         }
         let mut scope = acquire_worktree_admin(repo, held, Wait::Ms(5000))?;
         crate::recovery::leaf(&mut scope, repo)?;
@@ -1206,7 +1207,7 @@ impl GitDriver {
         ) {
             return Err(failure("not-ref-operation"));
         }
-        if i.writer_identity != writer
+        if i.writer_identity != authority.authority
             || i.repo_identity != wal.repository_identity()
             || i.authority_binding
                 != wal::canonical_digest(&(
