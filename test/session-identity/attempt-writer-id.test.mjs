@@ -6,8 +6,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { launcherEnv, mintAttemptWriterId, WriterIdentityError } from '../../src/util/session-identity.mjs';
-import { workerBaseEnv } from '../../src/runner/dispatch/adapters.mjs';
 import { computeSha256Digest } from '../../src/native/proof-helpers.mjs';
+
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HOST_BIN = process.env.FGOS_HOST_BIN;
@@ -43,7 +43,9 @@ test('every shared vector mints to the same writer id through the door', needsHo
 test('resuming the same attempt gives the same writer id and the same env digest', needsHost, () => {
   const build = () => {
     const writerId = mintAttemptWriterId('att_asgn-demo_01_7f3a');
-    return { writerId, envDigest: computeSha256Digest({ ...workerBaseEnv({ PATH: '/usr/bin' }), FGOS_SESSION_ID: writerId }) };
+    // Allowlisted ambient slice a worker would keep (PATH), plus the attempt's writer id. The full
+    // allowlist filter lives in packages/run-supervisor/contracts/worker-env-allowlist.v1.json.
+    return { writerId, envDigest: computeSha256Digest({ PATH: '/usr/bin', FGOS_SESSION_ID: writerId }) };
   };
   const first = build();
   const second = build();

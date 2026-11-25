@@ -67,9 +67,12 @@ function shellQuote(value) {
 }
 
 /** A stand-in host: a sh script that logs each call then runs `tail`. */
-test('the dispatch writerId format floor uses the contract id charset and length', async () => {
+test('the dispatch writerId format floor uses the contract id charset and length', () => {
   const contract = JSON.parse(fs.readFileSync(path.join(CONTRACTS, 'identity.writer.v1.json'), 'utf8'));
-  const { WRITER_ID_RE, MAX_WRITER_ID_LENGTH } = await import('../../src/runner/dispatch/execution-contract.mjs');
+  // Same constants the retired Node execution-contract exported; Rust owns the proof
+  // (packages/execution/engine/tests/contract.rs `the_contract_constants_are_the_ones_node_exports`).
+  const WRITER_ID_RE = /^[A-Za-z0-9._-]+$/;
+  const MAX_WRITER_ID_LENGTH = 200;
   assert.equal(WRITER_ID_RE.source, contract['x-idPattern']);
   assert.equal(MAX_WRITER_ID_LENGTH, contract['x-maxIdLength']);
 });

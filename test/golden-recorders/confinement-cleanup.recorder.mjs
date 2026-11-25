@@ -1,14 +1,14 @@
 // Records the golden vectors of the Rust confinement cleanup (packages/execution/engine/src/confinement/cleanup/) by
-// running the Node modules it ports: confinement/cleanup.mjs and the fingerprint half of probes/harness.mjs.
+// running the live Node module it ports: confinement/cleanup.mjs.
 // Run: node test/golden-recorders/confinement-cleanup.recorder.mjs
-// Writes packages/execution/contracts/confinement-cleanup/{cleanup,fingerprint}.v1.json.
+// Writes packages/execution/contracts/confinement-cleanup/cleanup.v1.json.
+// fingerprint.v1.json is a fixed corpus: its Rust reader owns it (packages/execution/engine/tests/confinement_cleanup.rs).
 //
 // A cleanup vector is `{name, fixture, op, args, out, tree}`: `fixture` is the tree built under a scratch root,
 // `op` runs on it, `out` is what the op returned (the scratch root written `<root>`), `tree` is what is left.
 // Fixture contents may name `$SELF` (the pid of the process that built it, a live owner) and `$DEAD` (a pid no
 // process has), so a vector is the same on every machine.
 
-import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -49,7 +49,6 @@ process.umask(0o022);
   (await import('node:module')).register(`data:text/javascript,${encodeURIComponent(hooks)}`);
 }
 const cleanup = await import('../../src/runner/dispatch/confinement/cleanup.mjs');
-const harness = await import('../../src/runner/dispatch/confinement/probes/harness.mjs');
 
 const attempt = (call) => {
   try {
@@ -289,24 +288,4 @@ record('describe-home-absent', [fx.dir('x')], 'describe-home', { home: 'h' });
 record('describe-home-limit', [...Array.from({ length: 70 }, (_, i) => fx.file(`h/f${String(i).padStart(2, '0')}`, 'x'))], 'describe-home', { home: 'h' });
 
 fs.writeFileSync(path.join(outDir, 'cleanup.v1.json'), `${JSON.stringify({ contract: 'confinement-cleanup-vectors.v1', now: NOW, deadPid: DEAD_PID, cases }, null, 2)}\n`);
-
-// ---- probe fingerprint -----------------------------------------------------------------------------------------
-const sha = (text) => crypto.createHash('sha256').update(text).digest('hex');
-const fingerprints = [
-  ['default', {}],
-  ['blind', { blind: true }],
-  ['policy-and-config', { policy: 'workspace-write', backendConfig: { tempRoot: '/srv/t' }, driverVersion: 'local-bwrap-v9' }],
-].map(([name, input]) => {
-  const fp = harness.computeProbeFingerprint({ ...input, bwrapExecutable: '/nonexistent/bwrap' });
-  const { platformDigest, ...rest } = fp;
-  return { name, input, out: rest, platformDigestIsHex: /^[0-9a-f]{64}$/.test(platformDigest) };
-});
-const platformPayload = 'linux:6.1.0:x64:bubblewrap 0.8.0';
-fs.writeFileSync(path.join(outDir, 'fingerprint.v1.json'), `${JSON.stringify({
-  contract: 'confinement-probe-fingerprint-vectors.v1',
-  proofProfile: harness.PROOF_PROFILE,
-  platform: { payload: platformPayload, digest: sha(platformPayload) },
-  fingerprints,
-  falsifiers: harness.MACHINE_PRIVATE_FALSIFIERS,
-}, null, 2)}\n`);
-console.log(`recorded ${cases.length} cleanup vectors and ${fingerprints.length} fingerprints`);
+console.log(`recorded ${cases.length} cleanup vectors`);

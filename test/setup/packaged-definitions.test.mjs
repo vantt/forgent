@@ -4,9 +4,6 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
 
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import {
@@ -15,7 +12,7 @@ import {
 } from '../../src/setup/registrations.mjs';
 import { INSTALL_ROOT } from '../../src/runner/agent-definitions.mjs';
 import { listAgents } from '../../src/runner/agent-listing.mjs';
-import { discoverOperationPromptTemplates } from '../../src/runner/dispatch/operation-prompt-templates.mjs';
+
 import { checkTaskSpecsResolve } from '../helpers/packaged-definitions.mjs';
 
 const doctorRow = (id) => DOCTOR_CHECKS.find((check) => check.id === id);
@@ -44,16 +41,10 @@ test('agent-type names are unique in every tier of the release source, including
   assert.deepEqual(listing.agents.filter((agent) => agent.problems.length > 0).map((agent) => `${agent.source}: ${agent.problems.join('; ')}`), []);
 });
 
-test('the packaged domain and core operation prompt templates validate', () => {
-  const emptyProject = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-packaged-templates-'));
-  try {
-    const entries = discoverOperationPromptTemplates({ cwd: emptyProject });
-    assert.ok(entries.length > 0, 'the release ships operation prompt templates');
-    assert.ok(entries.every((entry) => entry.tier !== 'project'));
-  } finally {
-    fs.rmSync(emptyProject, { recursive: true, force: true });
-  }
-});
+// Packaged operation prompt templates: owned by packages/execution/engine/tests/contract.rs
+// (`template_discovery_and_lookup_answer_as_node_did_over_every_tier_and_refusal`) over
+// packages/execution/contracts/execution-contract/templates.json.
+
 
 test('the domain registry row judges the running payload\'s compiled domains, in the release source too', () => {
   const result = doctorRow('domain-registry-compiled').check(INSTALL_ROOT);

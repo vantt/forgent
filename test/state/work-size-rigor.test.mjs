@@ -7,22 +7,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {
-  validateWork,
-  WorkValidationError,
-  SIZES,
-  DEFAULTS,
-} from '../../src/state/work.mjs';
-import { RIGOR_VALUES } from '../../src/runner/rigor.mjs';
 import { foldEvents } from '../../src/state/replay.mjs';
-import { rebuild, initStore, addWork, editWork, currentEffectiveView } from '../../src/state/store.mjs';
+import { rebuild, initStore } from '../../src/state/store.mjs';
 import { parseEditFlags } from '../../src/verbs/state/edit.mjs';
-import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
-import { bindable } from '../helpers/work-seat-config.mjs';
-import { workRigorFor } from '../../src/runner/work-dispatch.mjs';
-import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 
-seedStubAgentClis('claude');
 
 function mkTempDir() {
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-work-size-rigor-test-'));
@@ -140,82 +128,6 @@ test('--tier bị từ chối kèm hướng dẫn trên parseEditFlags', () => {
   );
 });
 
-test('Work dispatch: rigor: high is recorded as the demand and the tier stays the config\'s (rigor no longer maps to a tier)', () => {
-  const runnerConfig = bindable({
-    executor: { command: 'claude', args: ['{prompt}'] },
-    modelPolicies: {
-      claude: {
-        nano: 'haiku',
-        standard: 'sonnet',
-        flagship: 'opus',
-        frontier: 'opus-next',
-      },
-    },
-  });
-
-  const work = {
-    id: 'tsk-high',
-    title: 'High rigor task',
-    size: 'heavy',
-    rigor: 'high',
-  };
-
-  // The Work layer folds the item's rigor into the assignment; dispatch never reads the item.
-  const rigor = workRigorFor(work);
-  const assignment = {
-    operation: 'exec',
-    policy: {},
-    ...(rigor !== undefined ? { rigor } : {}),
-  };
-
-  const policy = effectiveDispatchPolicy({
-    assignment,
-    runnerConfig,
-    cliOverride: {},
-  });
-
-  assert.equal(policy.tier, 'standard');
-  assert.equal(policy.model, 'sonnet');
-  assert.equal(policy.provenance.rigor.value, 'high');
-  assert.equal(policy.provenance.tier.value, 'standard');
-});
-
-test('Work dispatch: không có rigor -> standard, size: heavy không ảnh hưởng model', () => {
-  const runnerConfig = bindable({
-    executor: { command: 'claude', args: ['{prompt}'] },
-    modelPolicies: {
-      claude: {
-        nano: 'haiku',
-        standard: 'sonnet',
-        flagship: 'opus',
-        frontier: 'opus-next',
-      },
-    },
-  });
-
-  const work = {
-    id: 'tsk-heavy-size',
-    title: 'Heavy size but no rigor',
-    size: 'heavy',
-    // no rigor declared
-  };
-
-  // The Work layer folds the item's rigor into the assignment; dispatch never reads the item.
-  const rigor = workRigorFor(work);
-  const assignment = {
-    operation: 'exec',
-    policy: {},
-    ...(rigor !== undefined ? { rigor } : {}),
-  };
-
-  const policy = effectiveDispatchPolicy({
-    assignment,
-    runnerConfig,
-    cliOverride: {},
-  });
-
-  assert.equal(policy.tier, 'standard', 'default tier must be standard');
-  assert.equal(policy.model, 'sonnet', 'model must be standard tier model, NOT frontier/heavy');
-  assert.equal(policy.provenance.rigor.value, 'standard');
-  assert.equal(policy.provenance.tier.value, 'standard');
-});
+// Work dispatch policy/rigor → tier is owned by
+// packages/execution/engine/tests/planning.rs (`dispatch_policy_resolves_each_field_with_where_it_came_from`)
+// over packages/execution/contracts/planning/policy.json.

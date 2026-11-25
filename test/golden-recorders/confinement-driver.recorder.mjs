@@ -1,7 +1,8 @@
 // Records the golden vectors of the Rust confinement driver (packages/execution/engine/src/confinement/driver/) by
-// running the Node modules it ports: drivers/bwrap.mjs, backend-registry.mjs and attestation-store.mjs.
+// running the live Node modules it ports: drivers/bwrap.mjs and attestation-store.mjs.
 // Run: node test/golden-recorders/confinement-driver.recorder.mjs
-// Each section writes one file under packages/execution/contracts/confinement-driver/.
+// Each live section writes one file under packages/execution/contracts/confinement-driver/.
+// registry.v1.json is a fixed corpus: its Rust reader owns it (packages/execution/engine/tests/confinement_driver.rs).
 // Paths are fixed absolute strings that need not exist, so a vector is the same on every machine.
 
 import fs from 'node:fs';
@@ -32,7 +33,6 @@ fs.mkdirSync(outDir, { recursive: true });
   (await import('node:module')).register(`data:text/javascript,${encodeURIComponent(hooks)}`);
 }
 const bwrap = await import('../../src/runner/dispatch/confinement/drivers/bwrap.mjs');
-const registry = await import('../../src/runner/dispatch/confinement/backend-registry.mjs');
 const attest = await import('../../src/runner/dispatch/confinement/attestation-store.mjs');
 
 export function write(name, body) {
@@ -48,98 +48,7 @@ const attempt = (call) => {
 };
 const scratch = (prefix) => fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 
-// SECTION: registry
-{
-  const ok = { type: 'bwrap', enabled: true, executable: '/usr/bin/bwrap', tempRoot: '/srv/t', privateHomeRoot: '/srv/h' };
-  const instanceCases = [
-    ['bwrap-full', 'a', ok],
-    ['bwrap-minimal', 'a', { type: 'bwrap' }],
-    ['bwrap-unknown-key', 'a', { type: 'bwrap', shell: 'x' }],
-    ['bwrap-blank-executable', 'a', { type: 'bwrap', executable: '  ' }],
-    ['bwrap-enabled-not-bool', 'a', { type: 'bwrap', enabled: 'yes' }],
-    ['bwrap-blank-temp-root', 'a', { type: 'bwrap', tempRoot: '' }],
-    ['bwrap-numeric-home-root', 'a', { type: 'bwrap', privateHomeRoot: 3 }],
-    ['container-ok', 'c', { type: 'container', runtime: 'podman', image: 'img', pullPolicy: 'never' }],
-    ['container-bad-runtime', 'c', { type: 'container', runtime: 'lxc', image: 'img' }],
-    ['container-missing-image', 'c', { type: 'container', runtime: 'docker' }],
-    ['container-bad-pull', 'c', { type: 'container', runtime: 'docker', image: 'i', pullPolicy: 'sometimes' }],
-    ['container-unknown-key', 'c', { type: 'container', runtime: 'docker', image: 'i', mount: 1 }],
-    ['remote-ok', 'r', { type: 'remote', endpoint: 'https://x', credentialRef: 'ref' }],
-    ['remote-missing-endpoint', 'r', { type: 'remote', credentialRef: 'ref' }],
-    ['remote-missing-credential', 'r', { type: 'remote', endpoint: 'https://x' }],
-    ['remote-unknown-key', 'r', { type: 'remote', endpoint: 'e', credentialRef: 'c', token: 't' }],
-    ['unknown-type', 'u', { type: 'vm' }],
-    ['not-an-object', 'u', ['bwrap']],
-    ['null-config', 'u', null],
-  ].map(([name, id, config]) => ({ name, id, config, out: attempt(() => { registry.validateBackendInstanceConfigShape(id, config); return true; }) }));
-
-  const docCases = [
-    ['valid', { contract: 'confinement-backend-registry.v1', confinementBackends: { bwrap: { type: 'bwrap' } } }],
-    ['empty-backends', { contract: 'confinement-backend-registry.v1', confinementBackends: {} }],
-    ['wrong-contract', { contract: 'x', confinementBackends: {} }],
-    ['unknown-doc-key', { contract: 'confinement-backend-registry.v1', confinementBackends: {}, extra: 1 }],
-    ['backends-array', { contract: 'confinement-backend-registry.v1', confinementBackends: [] }],
-    ['backends-missing', { contract: 'confinement-backend-registry.v1' }],
-    ['blank-instance-id', { contract: 'confinement-backend-registry.v1', confinementBackends: { ' ': { type: 'bwrap' } } }],
-    ['bad-instance', { contract: 'confinement-backend-registry.v1', confinementBackends: { b: { type: 'bwrap', nope: 1 } } }],
-    ['array-doc', []],
-  ].map(([name, doc]) => ({ name, doc, out: attempt(() => { registry.validateBackendRegistryShape(doc, 'doc'); return true; }) }));
-
-  const overrideCases = [
-    ['none', {}],
-    ['null', null],
-    ['top-level', { confinementBackends: {} }],
-    ['under-runner', { runner: { confinementBackends: {} } }],
-    ['unrelated', { runner: { other: 1 } }],
-  ].map(([name, cfg]) => ({ name, cfg, out: attempt(() => { registry.rejectProjectBackendOverride(cfg, 'project'); return true; }) }));
-
-  const snapDoc = {
-    contract: 'confinement-backend-registry.v1',
-    confinementBackends: { on: { type: 'bwrap', executable: '/opt/bwrap' }, off: { type: 'bwrap', enabled: false }, imp: { type: 'bwrap', enabled: true } },
-  };
-  const snap = registry.createBackendRegistrySnapshot(snapDoc);
-  const resolves = ['on', 'off', 'imp', 'missing', '', ' ', 7].map((id) => ({ id, out: snap.resolve(id) }));
-
-  const dir = scratch('cd-registry-');
-  const load = [];
-  const loadFile = (name, text) => {
-    const file = path.join(dir, `${name}.json`);
-    if (text !== null) fs.writeFileSync(file, text);
-    const out = attempt(() => registry.loadMachineBackendRegistry(file));
-    if (out.error) out.error = out.error.replaceAll(dir, '<dir>').replace(/(is not valid JSON: ).*/, '$1<parse detail>');
-    load.push({ name, text, out });
-  };
-  loadFile('absent', null);
-  loadFile('valid', JSON.stringify(snapDoc));
-  loadFile('not-json', '{nope');
-  loadFile('wrong-shape', JSON.stringify({ contract: 'confinement-backend-registry.v1', confinementBackends: { a: { type: 'vm' } } }));
-
-  const ensure = [];
-  const ensureFile = (name, text) => {
-    const file = path.join(dir, `ensure-${name}.json`);
-    if (text !== null) fs.writeFileSync(file, text);
-    const out = registry.ensureMachineBackendRegistryDefaults(file);
-    const after = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null;
-    ensure.push({ name, before: text, out: { ...out, path: '<file>', message: out.message.replaceAll(file, '<file>').replace(/(cannot parse machine backend registry at "<file>": ).*/, '$1<parse detail>') }, after });
-  };
-  ensureFile('absent', null);
-  ensureFile('current', `${JSON.stringify(registry.DEFAULT_MACHINE_BACKEND_REGISTRY, null, 2)}\n`);
-  ensureFile('empty-backends', JSON.stringify({ contract: 'confinement-backend-registry.v1', confinementBackends: {} }));
-  ensureFile('custom-only', JSON.stringify({ contract: 'confinement-backend-registry.v1', confinementBackends: { mine: { type: 'bwrap', executable: '/x/bwrap' } } }));
-  ensureFile('old-contract', JSON.stringify({ contract: 'old', confinementBackends: { mine: { type: 'bwrap' } } }));
-  ensureFile('extra-key', JSON.stringify({ contract: 'confinement-backend-registry.v1', confinementBackends: { mine: { type: 'bwrap' } }, junk: 1 }));
-  ensureFile('unparseable', '{nope');
-  ensureFile('repair-invalid', JSON.stringify({ contract: 'confinement-backend-registry.v1', confinementBackends: { bad: { type: 'vm' } }, junk: 1 }));
-
-  const drivers = ['bwrap', 'container', 'remote', 'vm', 7].map((t) => ({ type: t, out: attempt(() => registry.getBackendDriver(t).type) }));
-  fs.rmSync(dir, { recursive: true, force: true });
-  write('registry.v1.json', {
-    note: 'recorded from src/runner/dispatch/confinement/backend-registry.mjs; the parse detail of invalid JSON is not pinned',
-    allowedDriverTypes: registry.ALLOWED_DRIVER_TYPES,
-    defaultRegistry: registry.DEFAULT_MACHINE_BACKEND_REGISTRY,
-    instanceCases, docCases, overrideCases, snapDoc, resolves, load, ensure, drivers,
-  });
-}
+// SECTION: registry — retired with dead backend-registry.mjs; fixtures stay under registry.v1.json.
 
 // SECTION: attestation
 {

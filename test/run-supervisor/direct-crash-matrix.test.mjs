@@ -9,9 +9,16 @@ import crypto from 'node:crypto';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { execFileSync } from 'node:child_process';
 import { lockHolders, probe } from '../../src/holder-lock/index.mjs';
-import { adoptRun } from '../../src/run-supervisor/client.mjs';
-import { dispatchCwdHolder } from '../../src/run-supervisor/cwd-lock.mjs';
 import { bwrapUsable, createProject, killToken, pidsWithToken, readJson, sleep, startRun, waitUntil } from './support/direct-harness.mjs';
+
+/** First holder of the dispatch-cwd lease, or null when free (holder-lock door). */
+function dispatchCwdHolder(fgosDir, cwd) {
+  if (!fs.existsSync(cwd)) return null;
+  const params = { fgosDir, cwd };
+  const listed = lockHolders('dispatch-cwd', params);
+  if (listed.kind === 'list') return listed.holders.length > 0 ? { pid: listed.holders[0].pid } : null;
+  return probe('dispatch-cwd', params).result === 'free' ? null : { pid: null };
+}
 
 seedFileLocalBwrapRegistry();
 

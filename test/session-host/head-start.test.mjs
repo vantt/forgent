@@ -14,7 +14,7 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 import { bindHeadSeat, headKeyOf, taskBriefOf, headRoleOf, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, openingText, personasHeadsFirst, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
 import { grantOf } from '../../src/session-host/head-grants.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
-import { headOf } from '../../src/runner/dispatch/session-attempt.mjs';
+import { headOf } from '../../src/native/execution-door.mjs';
 import { resolveInvocationRoot } from '../../src/runner/paths.mjs';
 import { parseYaml } from '../../src/util/yaml.mjs';
 import { quarantineProviderAccount } from '../../src/runner/dispatch/provider-capacity.mjs';

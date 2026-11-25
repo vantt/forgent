@@ -11,9 +11,8 @@ import path from 'node:path';
 import { test } from 'node:test';
 
 import { readStandardValue } from '../../src/config/facade.mjs';
-import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
-import { bindable } from '../helpers/work-seat-config.mjs';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+
 
 seedStubAgentClis('claude');
 
@@ -63,49 +62,12 @@ test('the standard\'s job and coding rows declare the "serves" attribute set cap
 // The shape of `serves` (keys, scalar or list values, non-empty strings, booleans) is the runner schema's; the
 // bundled-schema cases in packages/config/rust/tests/golden_validate.rs own it.
 
-// ─── Capability may resolve to a tool/MCP provider, not only an agent ───
-
-test('decide --for resolves an unconfigured capability to unavailable (the fallback path)', () => {
-  const cfg = { capabilities: {}, executors: {} };
-  const plan = compileDispatchPlan(cfg, { for: 'code:review' });
-  assert.equal(plan.mechanism, 'unavailable');
-  assert.equal(plan.configured, false);
-});
-
-test('decide --for resolves a capability to an agent executor when configured, in-process with live task access', () => {
-  const cfg = bindable({
-    capabilities: { 'code:review': { prefer: 'reviewer-agent' } },
-    executors: { 'reviewer-agent': { kind: 'agent', providerModel: 'claude' } },
-    modelPolicies: { claude: { standard: 'sonnet' } },
-  });
-  const plan = compileDispatchPlan(cfg, { for: 'code:review', hasLiveTaskAccess: true });
-  assert.equal(plan.mechanism, 'in-process');
-  assert.equal(plan.executorId, 'reviewer-agent');
-  assert.equal(plan.configured, true);
-});
-
-test('decide --for resolves a capability to a tool/MCP provider, never assuming an agent-shaped hand-off (mirrors impact-analysis -> gitnexus)', () => {
-  const cfg = {
-    capabilities: { 'code:review': {} },
-    executors: {
-      'review-tool': {
-        kind: 'tool',
-        for: ['code:review'],
-        scanTarget: '.',
-        invocations: [{ via: 'mcp', command: 'mcp:review-tool', tools: { 'code:review': 'mcp__review_tool__review' } }],
-      },
-    },
-  };
-  const plan = compileDispatchPlan(cfg, { for: 'code:review', repoRoot });
-  assert.equal(plan.executorId, 'review-tool');
-  assert.equal(plan.configured, true);
-  // The resolved mechanism is in-process (the caller calls the MCP tool
-  // directly), even though the executor is "tool"-kind, not "agent".
-  assert.equal(plan.mechanism, 'in-process');
-  assert.equal(plan.mcpTool, 'mcp__review_tool__review');
-});
+// Capability → tool/MCP provider resolve is owned by
+// packages/execution/rust/tests/golden_decide.rs (`every_decide_and_hook_vector_has_the_answer_the_contract_records`)
+// over packages/execution/contracts/decide.v1.json (purpose/tool/mcp vectors).
 
 // ─── Shared awareness cluster: catalog + planning fragment + cross-refs ───
+
 
 test('shared capability catalog exists, lists the registered vocabulary, and never registers a "research" capability', () => {
   const content = fs.readFileSync(CATALOG_PATH, 'utf8');
