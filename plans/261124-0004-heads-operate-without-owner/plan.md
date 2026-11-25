@@ -66,6 +66,11 @@ footprint:
   - packages/config/rust/src/bundle.rs
   - .fgos/config.yaml
   - CHANGELOG.md
+  - apps/fgos/tests/supervision_verbs.rs
+  - apps/fgos/tests/questions_head.rs
+  - packages/config/contracts/fixtures/authoring-source.config.json
+  - packages/component-authority/model/contracts.yaml
+  - test/rust-host/vectors/envelope/version.json
 source:
   - plans/discussions/ds-liu5g4k3gh-privileged-chores-research/DISCUSSION.md
   - p-g5ktat4kej
