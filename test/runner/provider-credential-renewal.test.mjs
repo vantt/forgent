@@ -42,11 +42,9 @@ import {
   listLiveSeatHomes,
   resolveConfinementTempRoot,
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
-import { renewLeasedLogin } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { selfRecord } from '../../src/native/process-identity.mjs';
 import { prepareBwrap, prepareBwrapSync } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
-import { finalizeAttemptHome } from '../../src/runner/dispatch/confinement/authority-twin.mjs';
 import { CREDENTIAL_KEEP_MAX_ATTEMPTS, CREDENTIAL_KEEP_MIN_INTERVAL_MS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { rewriteOwnershipMarker } from '../helpers/ownership-marker.mjs';
 
@@ -2253,66 +2251,6 @@ test('a renewed login whose account differs from the leased account is never app
   } finally { w.cleanup(); }
 });
 
-// The only case that kept a held home forbids settling it (the owner recovers it by hand). A home is held only
-// because staging failed while its login was the only good pair; once the login can be staged and applied
-// there is nothing left to hold it for, so a repair settles it instead of leaving the owner a chore.
-test('a held home settles by itself once its login is safe', () => {
-  const w = workspace();
-  const realNow = Date.now;
-  const realHome = process.env.HOME;
-  const realWrite = process.stderr.write;
-  const dispatchId = 'disp_held';
-  // A temp root of the test's own: the machine's real held homes are never looked at.
-  const tempRoot = path.join(w.tmp, 'fgos-confinement');
-  try {
-    // The resolver reads the machine's config and backend registry from HOME: a scratch home keeps it off the real one.
-    process.env.HOME = w.tmp;
-    writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
-    const runDir = path.join(w.tmp, 'run');
-    fs.mkdirSync(runDir, { recursive: true });
-    const resources = resolveConfinementResources({ dispatchId, context: {}, grants: [{ resource: 'private-home', access: 'read-write', scope: 'dispatch' }], backendConfig: { tempRoot } });
-    const plan = { contract: 'confinement-plan.v1', dispatchId, decision: 'execute', coverage: {}, resources };
-    const request = {
-      dispatchId,
-      attemptId: 'att-held',
-      executorId: 'omp-bwrap',
-      invocation: { command: 'agent-cli', args: [], env: {}, credentialStore: { use: 'agent-cli', homeEnv: 'AGENT_HOME' } },
-      providerCapacity: { provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), credentialWriteBack: { runtimeDir: w.runtimeDir } },
-      context: { cwd: os.tmpdir(), runDir },
-    };
-    const prepared = prepareBwrapSync(plan, request, { id: 'bwrap', type: 'bwrap', config: {} });
-    const home = resources[0].hostTarget;
-    assert.ok(prepared.credentialWriteBack, 'the attempt home opted in to write-back');
-    const descriptors = path.join(runDir, 'protected', 'confinement-finalization');
-    fs.mkdirSync(descriptors, { recursive: true });
-    fs.writeFileSync(path.join(descriptors, 'att-held.json'), JSON.stringify({
-      contract: 'confinement-finalization.v1', launchCommandId: 'att-held', resources: [{ pathRef: home, resourceId: 'private-home', credentialWriteBack: prepared.credentialWriteBack }], cleanupState: 'pending', cleanupResult: null,
-    }));
-    renewHome('pi', home);
-
-    // Staging is impossible (a file where the pending directory belongs) until the budget of retries is spent.
-    fs.mkdirSync(w.accountDir, { recursive: true });
-    fs.writeFileSync(path.join(w.accountDir, 'pending'), 'in the way');
-    process.stderr.write = () => true;
-    const start = realNow();
-    let state;
-    for (let attempt = 1; attempt <= CREDENTIAL_KEEP_MAX_ATTEMPTS; attempt += 1) {
-      Date.now = () => start + attempt * 2 * CREDENTIAL_KEEP_MIN_INTERVAL_MS;
-      state = finalizeAttemptHome({ runDir, attemptId: 'att-held' }).state;
-    }
-    Date.now = realNow;
-    process.stderr.write = realWrite;
-    assert.equal(state, 'credential-home-held', 'the home is held after the retry budget');
-    assert.equal(fs.existsSync(path.join(home, 'auth.json')), true);
-  } finally {
-    Date.now = realNow;
-    process.stderr.write = realWrite;
-    if (realHome === undefined) delete process.env.HOME; else process.env.HOME = realHome;
-    fs.rmSync(path.join(tempRoot, dispatchId), { recursive: true, force: true });
-    w.cleanup();
-  }
-});
-
 // ---------------------------------------------------------------------------------------------------
 // Logins held by seats that still run
 // ---------------------------------------------------------------------------------------------------
@@ -2410,28 +2348,6 @@ test('a seat login whose call fails is not installed, and the seat start is stil
   } finally { w.cleanup(); }
 });
 
-test('a seat lease renews through the login a running seat on the same account holds', async () => {
-  const w = workspace();
-  try {
-    const now = Date.now();
-    writeClaude(w.home, claudeDoc(now - 60 * 1000));
-    const root = resolveConfinementTempRoot();
-    const selection = { status: 'selected', provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home) };
-    const home = seatHome(root, { name: `lease-${process.pid}`, target: claudeTarget(w), login: claudeDoc(now + 7 * HOUR, { refresh: FAKE.newRefresh }) });
-    try {
-      const probe = answers();
-      const opts = { providerCredentialRenew: createCredentialRenewal({ spawnFn: probe.spawnFn }), providerCapacityRuntimeDir: w.runtimeDir };
-      const leased = await renewLeasedLogin(selection, { cfg: { executors: { x: {} } }, opts, executorId: 'x', pinnedInvocationId: null, confinementRequirement: { mode: 'required' } });
-      assert.equal(leased.credentialWriteBack.runtimeDir, w.runtimeDir);
-      assert.equal(readClaude(w.home).claudeAiOauth.refreshToken, FAKE.newRefresh);
-      assert.equal(loginLifeProblem(claudeSource(w.home), { timeoutMs: SEAT_TIMEOUT_MS }), null);
-    } finally {
-      fs.rmSync(path.dirname(home), { recursive: true, force: true });
-      fs.rmSync(path.join(root, `run-lease-${process.pid}`), { recursive: true, force: true });
-    }
-  } finally { w.cleanup(); }
-});
-
 test('a running seat login near its own expiry is never probed: the probe would renew it and spend the seat\'s refresh token', async () => {
   const w = workspace();
   try {
@@ -2445,61 +2361,6 @@ test('a running seat login near its own expiry is never probed: the probe would 
     assert.ok(probe.starts.every((start) => path.basename(start.homeDir).startsWith('scratch-')), 'no call ran on a copy of the seat login');
     assert.equal(readClaude(w.home).claudeAiOauth.refreshToken, FAKE.oldRefresh, 'the seat login is not installed');
   } finally { w.cleanup(); }
-});
-
-test('a login that cannot outlive the seat is renewed before its life check, unless a running seat owns its renewal or no fresh token could cover the seat; a refusal names what refresh-ahead did', async () => {
-  const w = workspace();
-  const root = resolveConfinementTempRoot();
-  const seatName = `seat-window-${process.pid}`;
-  try {
-    const seatMs = 90 * 60 * 1000;
-    // 72 minutes left: outside the plain window, shorter than the seat may run.
-    writeClaude(w.home, claudeDoc(Date.now() + 72 * 60 * 1000));
-    const selection = { status: 'selected', provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home) };
-    const lease = (spawnFn, timeoutMs) => renewLeasedLogin(selection, {
-      cfg: { executors: { x: {} } }, opts: { providerCredentialRenew: createCredentialRenewal({ spawnFn }), providerCapacityRuntimeDir: w.runtimeDir },
-      executorId: 'x', pinnedInvocationId: null, confinementRequirement: { mode: 'required' }, timeoutMs,
-    });
-    const life = (leased) => loginLifeProblem(claudeSource(w.home), { timeoutMs: seatMs, refreshAhead: leased.refreshAhead[0] });
-
-    // Without the seat's timeout the window is the plain one: the login looks fresh, and the refusal says so.
-    const plain = await refreshAhead({ provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home), runtimeDir: w.runtimeDir, spawnFn: fakeSpawn({ layoutName: 'claude' }).spawnFn });
-    assert.deepEqual(plain, { status: 'fresh', reason: 'outside-window' });
-    assert.match(loginLifeProblem(claudeSource(w.home), { timeoutMs: seatMs, refreshAhead: plain }), /^login-expires-before-seat-timeout: .*; refresh-ahead: fresh outside-window$/);
-
-    // A running seat sharing the store's refresh token still owns its renewal, however long the new seat.
-    const seat = seatHome(root, { name: seatName, target: claudeTarget(w), login: readClaude(w.home) });
-    const held = fakeSpawn({ layoutName: 'claude' });
-    const owned = await lease(held.spawnFn, seatMs);
-    assert.deepEqual(owned.refreshAhead, [{ cli: null, status: 'skipped', reason: 'live-seat-owns-renewal' }]);
-    assert.equal(held.starts.length, 0, 'the shared refresh token is not spent');
-    assert.match(life(owned), /; refresh-ahead: skipped live-seat-owns-renewal$/);
-    fs.rmSync(path.dirname(seat), { recursive: true, force: true });
-    fs.rmSync(path.join(root, `run-${seatName}`), { recursive: true, force: true });
-
-    // A seat that even a token issued at the end of one renewal call could not cover: no renewal is spent, and the
-    // refusal says why.
-    const atCutoffMs = CLAUDE_TOKEN_LIFETIME_MS - DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS;
-    const futile = fakeSpawn({ layoutName: 'claude' });
-    const atCutoff = await lease(futile.spawnFn, atCutoffMs);
-    assert.deepEqual(atCutoff.refreshAhead, [{ cli: null, status: 'skipped', reason: 'seat-longer-than-token-lifetime' }]);
-    assert.equal(futile.starts.length, 0, 'no renewal is spent on a seat no token can cover');
-    assert.match(loginLifeProblem(claudeSource(w.home), { timeoutMs: atCutoffMs, refreshAhead: atCutoff.refreshAhead[0] }), /^login-expires-before-seat-timeout: .*; refresh-ahead: skipped seat-longer-than-token-lifetime$/);
-
-    // Just under that cutoff, though the window's margin keeps the window open, the login is renewed (to a whole
-    // token's life) and the seat is admitted.
-    const justUnderMs = atCutoffMs - 60 * 1000;
-    const renewing = fakeSpawn({ layoutName: 'claude', behaviour: (dir) => renewHome('claude', dir, { expiresMs: Date.now() + CLAUDE_TOKEN_LIFETIME_MS }) });
-    const renewed = await lease(renewing.spawnFn, justUnderMs);
-    assert.deepEqual(renewed.refreshAhead, [{ cli: null, status: 'renewed', reason: 'applied' }]);
-    assert.equal(renewing.starts.length, 1);
-    assert.equal(loginLifeProblem(claudeSource(w.home), { timeoutMs: justUnderMs, refreshAhead: renewed.refreshAhead[0] }), null);
-    assert.equal(FAKE_FRAGMENTS.some((value) => JSON.stringify([owned, atCutoff, renewed].map((l) => l.refreshAhead)).includes(value)), false, 'no credential value in an outcome');
-  } finally {
-    fs.rmSync(path.join(root, `disp_${seatName}`), { recursive: true, force: true });
-    fs.rmSync(path.join(root, `run-${seatName}`), { recursive: true, force: true });
-    w.cleanup();
-  }
 });
 
 test('a renewal that gets a shorter token than the assumed lifetime is noticed', () => {

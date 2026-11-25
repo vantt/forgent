@@ -101,7 +101,7 @@ failure says nothing about that. Each lives in the test that owns it, run by
 | The source repository conforms to the packaged naming and placement rules | `test/scripts/convention-conformance.test.mjs` (body: `scripts/convention-conformance.mjs`) |
 | `CHANGELOG.md` has entries to release | `scripts/prepare-release.mjs`, `test/scripts/prepare-release.test.mjs` |
 | The definitions a release ships (task specs, domain registry, agent types, operation prompt templates, workflow operations) are valid | `test/setup/packaged-definitions.test.mjs`; doctor judges only the tiers a project supplies |
-| Host and Node agree on which run directories are admissible | the shared run-layout fixture: `test/runner/assignment-layout.test.mjs`, `packages/run-result/rust/tests/layout_fixture.rs`, and the Observe crate's `metrics coverage` accounting |
+| Host and Node agree on which run directories are admissible | the shared run-layout fixture: `packages/execution/engine/tests/assignment.rs` (`the_assignment_tree_lists_run_directories_and_stops_at_every_barrier`, `the_node_era_corpus_is_listed_and_found_by_run_id_as_node_did`), `packages/run-result/rust/tests/layout_fixture.rs`, and the Observe crate's `metrics coverage` accounting |
 
 A project refreshes its end-user docs index and decisions index with
 `fgos docs-index` and `fgos decision-index`; doctor no longer regenerates them.
