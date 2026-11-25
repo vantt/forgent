@@ -78,6 +78,12 @@ help queue has nothing past the threshold; then the supervisor owns the queue ag
 4. **Order.** Order the topics by the product priority in AGENTS.md (Ship Faster, Release con nguoi, DoD, Polish Sau
    DoD). A real tie goes to the owner as a question.
 
+A release that the supervisor started and did not come back from (no `released`, `asked` or `rolled-back` ticket, its
+report overdue) is the secretary's to undo: run `fgos release run --rollback`, which runs only the recipe's rollback
+through the window and never names what it runs, read the ticket with `fgos request result <id> --wait 30`, then wake the
+supervisor with `fgos supervisor wake`. If the rollback itself fails (`rollback-failed`), ask the owner once in the
+five-part form.
+
 ## What your grant covers
 
 The secretary row of `GRANTS` in `src/session-host/head-grants.mjs` is the one source and the full verb list; read it

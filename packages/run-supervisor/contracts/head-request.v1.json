@@ -145,6 +145,14 @@
       "identity": "held",
       "rule": "refusals (verb-failed detail): bad-args, role-mismatch (not a lead), write-outside-footprint, ticket-used, plan-not-found, plan-ambiguous; the secretary also: run-one-unit (a unit or units key), run-ceiling-exceeded (maxMinutes or tier above secretary.run.*), writes-need-linked-worktree"
     },
+    "release run": {
+      "args": { "rollback": "boolean, optional: true runs only the recipe's `rollback` (the secretary's path when the supervisor does not come back after a release); no other key (bad-args)" },
+      "does": "answered by the supervisor itself, no route child: writes the ticket where `request result` reads it (`.fgos/runtime/head-tickets/<role>/<id>.json`, the id the request's; a second ticket with the id is ticket-used) and answers at once; a detached thread then runs `fgos_session_host::release` against the project's `release.*` recipe and rewrites the ticket. In order: no `apply` is `no-recipe`; nothing landed since the active release is `nothing-new`; a land holding the merge slot is `land-in-progress`; each `checks` argv, the first non-zero is `checks-failed`; a recipe that is not `reversible` files one owner question with the exact `apply` argv and ends `asked` without applying; otherwise `apply`, then `probe`, and a failed apply or probe runs `rollback` and ends `rolled-back` (`rollback-failed` when that fails too); one report line goes to the owner through the question store. Argv run with no shell, from the project root. The host is asked for `config show --path release` and `lock-status`; the recipe is project data (`core/config-standard/release.yaml`) and never read by the skills",
+      "data": { "ticket": "the request id", "state": "running" },
+      "result": "`request result <id>` reads the ticket: state done (`released`, `asked`) or failed with code `no-recipe`, `nothing-new`, `land-in-progress`, `checks-failed`, `rolled-back`, `recipe-invalid`, `rollback-failed` or another step code, and `result` holding the outcome",
+      "identity": "held",
+      "grant": "the supervisor and, by inheritance, the secretary; every other persona is refused verb-not-granted"
+    },
     "request result": {
       "args": {
         "id": "string, optional: a ticket of this role",

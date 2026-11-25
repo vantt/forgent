@@ -820,6 +820,48 @@ fn a_refused_request_logs_its_detail_and_the_routes_message_on_one_line() {
 }
 
 #[test]
+fn release_run_answers_with_a_ticket_and_the_detached_run_rolls_back_on_a_failed_probe() {
+    // The host stands in for `config show` (the recipe), `lock-status` (a free merge slot) and the question route.
+    let body = r#"cat > /dev/null; case "$1" in config) echo '{"data":{"value":{"reversible":true,"checks":[["true"]],"apply":["touch","applied"],"probe":["false"],"rollback":["touch","rolled-back"]}}}';; lock-status) echo '{"locks":[{"name":"merge-slot","instances":[]}]}';; internal) echo '{"v":1,"protocol":1,"result":"done","data":{"id":"q-report"}}';; esac"#;
+    let served = serve("release", body, Ok(true), &[], Duration::from_secs(5));
+    let reply = request(
+        &served.socket,
+        &json!({"type": "REQUEST", "id": "rel1", "verb": "release run", "args": {}}),
+    );
+    assert_eq!(reply["result"], "done", "{reply}");
+    assert_eq!(reply["data"], json!({"ticket": "rel1", "state": "running"}));
+    let ticket = served
+        .dir
+        .join(".fgos/runtime/head-tickets/secretary-miu/rel1.json");
+    let until = Instant::now() + Duration::from_secs(20);
+    let settled = loop {
+        let read: Option<Value> = fs::read_to_string(&ticket)
+            .ok()
+            .and_then(|text| serde_json::from_str(&text).ok());
+        match read {
+            Some(t) if t["state"] != "running" => break t,
+            _ if Instant::now() > until => panic!("the release run did not settle"),
+            _ => std::thread::sleep(Duration::from_millis(50)),
+        }
+    };
+    assert_eq!(settled["state"], "failed", "{settled}");
+    assert_eq!(settled["code"], "rolled-back", "{settled}");
+    assert!(served.dir.join("applied").exists());
+    assert!(served.dir.join("rolled-back").exists());
+    // The same id is a used ticket, and an arg outside the verb's two is refused.
+    let again = request(
+        &served.socket,
+        &json!({"type": "REQUEST", "id": "rel1", "verb": "release run", "args": {}}),
+    );
+    assert_eq!(again["code"], "ticket-used", "{again}");
+    let bad = request(
+        &served.socket,
+        &json!({"type": "REQUEST", "id": "rel2", "verb": "release run", "args": {"apply": ["x"]}}),
+    );
+    assert_eq!(bad["code"], "bad-args", "{bad}");
+}
+
+#[test]
 fn the_window_forwards_an_allowed_argv_asks_for_an_unmatched_one_refuses_a_denied_one_and_answers_can_i(
 ) {
     // The host stands in as a script: an `internal head-questions` call answers a question id, any other argv is
@@ -968,6 +1010,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "questions answer",
             "questions ask",
             "questions cancel",
+            "release run",
             "request result",
             "run",
             "session answered",
