@@ -11,3 +11,4 @@
 - Running plans: only 261124-0004 (lead live, idle on the verified owner wait, so left alone). No admissible plans;
   leadsLive 1/3, lanes free 4.
 - Note: `fgos questions show` fails in this confinement (git-floor-probe EROFS, event-store-unavailable); `ask` works.
+- Event 40d33ed187aaa263 (question-answered q-nt7ptsq2nd): lead was live and idle; stopped and restarted with --for-question; it reads the phase-02 note that the rerun waits on the owner's patch apply (Q-aucsjasc25).
