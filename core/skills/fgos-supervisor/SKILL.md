@@ -97,8 +97,11 @@ the outcome with `fgos request result <id> --wait 30`. You never know what the p
 the recipe is project data (`release.*` config), and the window runs it. Read the answer and act on it:
 
 - `released`: report it once. If the project's persona proofs are yours to run after a release, run them now.
-- `asked`: the recipe is not reversible and the owner holds the exact apply command in a question; wait for the answer.
+- `asked`: the recipe is not reversible and the owner holds the exact apply command in a question (Apply or Do not
+  apply); wait for the answer.
 - `nothing-new`, `land-in-progress`, `no-recipe`: nothing to do now. A `land-in-progress` is retried at a later wake.
+  A `release-in-progress` refusal (a release is already running, yours or the secretary's rollback) is retried the
+  same way.
 - `checks-failed`, `rolled-back`, `rollback-failed`, `recipe-invalid`: raise `fgos supervisor raise --kind coordination-help`
   with the ticket id and the code, and stop releasing until it is handled. Never retry the same failing release in a loop.
 

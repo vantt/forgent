@@ -30,6 +30,7 @@ use fgos_identity::resolve::{HeadRef, WriterKey, ENV_ORDER};
 use fgos_identity::session::cli_of;
 use fgos_process::facts::judge_here;
 use fgos_process::spawn::{run_bounded_command, Outcome as BoundedOutcome};
+use fgos_session_host::release::Newness;
 use serde_json::{json, Value};
 
 use fgos_durable_file::{open_dir_beneath, BeneathError, BeneathRefusal, Dir};
@@ -1683,18 +1684,17 @@ fn utc_now_iso() -> String {
 struct HostRelease {
     cfg: Arc<Config>,
     request: Request,
+    /// Where the recipe argvs write their output.
+    log_file: PathBuf,
 }
 
 impl HostRelease {
+    /// The `data` of the one envelope a host verb prints with `--json` (pretty-printed over many lines).
     fn host_json(&self, words: &[&str]) -> Result<Value, String> {
         let words: Vec<OsString> = words.iter().map(OsString::from).collect();
         match run_verb(&self.cfg, &self.request, &words, None) {
             Ok(BoundedOutcome::Exited(output)) if output.status.success() => {
-                let text = String::from_utf8_lossy(&output.stdout).into_owned();
-                text.lines()
-                    .rev()
-                    .find_map(|l| serde_json::from_str::<Value>(l.trim()).ok())
-                    .ok_or_else(|| "the host printed no JSON answer".to_string())
+                fgos_session_host::release::envelope_data(&String::from_utf8_lossy(&output.stdout))
             }
             Ok(BoundedOutcome::Exited(output)) => Err(format!(
                 "the host ended {}",
@@ -1708,6 +1708,7 @@ impl HostRelease {
         }
     }
 
+    /// A read-only child (git): dies with the supervisor that started it.
     fn command(&self, program: &str, args: &[String]) -> Command {
         let mut cmd = Command::new(program);
         cmd.args(args)
@@ -1722,28 +1723,52 @@ impl HostRelease {
         cmd
     }
 
+    /// A recipe argv (a check, the apply, the probe, the rollback). It does NOT die with the supervisor: a release
+    /// cut off halfway (a `fgctl upgrade` or `repair` killed partway) is worse than one that finishes, and the
+    /// ticket already reads `runner-gone` for the run that lost its supervisor. Its output goes to the run's log
+    /// file, since a pipe whose reader is gone would end the child with SIGPIPE.
+    fn recipe_command(
+        &self,
+        program: &str,
+        args: &[String],
+    ) -> io::Result<(Command, std::fs::File)> {
+        use std::os::fd::AsRawFd;
+        let log = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .mode_0600()
+            .open(&self.log_file)?;
+        let fd = log.as_raw_fd();
+        let mut cmd = Command::new(program);
+        cmd.args(args)
+            .env_clear()
+            .envs(self.cfg.env.iter())
+            .current_dir(&self.cfg.cwd);
+        // SAFETY: dup2 is async-signal-safe; it runs after the pipes are set up, so the log replaces them.
+        unsafe {
+            cmd.pre_exec(move || {
+                if libc::dup2(fd, 1) < 0 || libc::dup2(fd, 2) < 0 {
+                    return Err(io::Error::last_os_error());
+                }
+                Ok(())
+            });
+        }
+        Ok((cmd, log))
+    }
+
     fn question(
         &self,
         ref_tail: &str,
         headline: &str,
-        what: &str,
-        cause: &str,
+        blocks: &str,
+        parts: Value,
     ) -> Result<String, String> {
         let input = json!({
             "stage": "window",
             "ref": format!("case:release-{ref_tail}"),
             "headline": loggable(headline).chars().take(120).collect::<String>(),
-            "blocks": "the release waits for this answer before it goes on",
-            "parts": {
-                "what": what.chars().take(600).collect::<String>(),
-                "cause": cause,
-                "options": [
-                    {"label": "Acknowledge", "does": "The owner reads the line and lets the release stand as reported.", "gain": "The owner knows the state of the release.", "harm": "None.", "cost": "A reading.", "recommended": true},
-                    {"label": "Look into it", "does": "The owner inspects the release by hand.", "gain": "A finding the line did not give.", "harm": "The owner waits and acts.", "cost": "Some minutes."}
-                ],
-                "recommendation": "Acknowledge unless the line says something failed.",
-                "scope": {"allows": "Reading this one release report.", "forbids": "Any other release, or a standing grant."}
-            }
+            "blocks": blocks,
+            "parts": parts,
         });
         file_question(&self.cfg, &self.request, input).map_err(|outcome| match outcome {
             Outcome::RouteRefused { code, message } => {
@@ -1755,62 +1780,59 @@ impl HostRelease {
     }
 }
 
-/// The commit the active release was built from, when its activation record names one under a `gitCommit`,
-/// `sourceCommit` or `commit` key; `None` when it names none.
-fn activation_commit(value: &Value) -> Option<String> {
-    match value {
-        Value::Object(object) => ["gitCommit", "sourceCommit", "commit"]
-            .iter()
-            .find_map(|key| object.get(*key).and_then(Value::as_str))
-            .map(String::from)
-            .or_else(|| object.values().find_map(activation_commit)),
-        Value::Array(list) => list.iter().find_map(activation_commit),
-        _ => None,
-    }
-}
-
 impl fgos_session_host::release::ReleasePorts for HostRelease {
     fn recipe(&self) -> Result<Value, String> {
         self.host_json(&["config", "show", "--path", "release", "--json"])
             .map(|answer| fgos_session_host::release::release_subtree(&answer))
     }
 
-    /// The trunk tip is the head commit of the project root; the active release's commit is read from its activation
-    /// record. A release whose record names no commit cannot be compared, so it is never `nothing-new`.
-    fn nothing_new(&self) -> Result<bool, String> {
-        let record = self.cfg.cwd.join(".fgos/installation/activation.json");
-        let Some(active) = std::fs::read_to_string(&record)
-            .ok()
-            .and_then(|text| serde_json::from_str::<Value>(&text).ok())
-            .and_then(|value| activation_commit(&value))
-        else {
-            return Ok(false);
+    /// The trunk tip is the head commit of the project root; the active release's commit is the `gitCommit` of the
+    /// host's own version record (`fgos version --json`, a short hash), compared by prefix. A host that names no
+    /// commit leaves the answer `Unknown`, which the rule says in its outcome.
+    fn newness(&self) -> Result<Newness, String> {
+        let active = match self.host_json(&["version", "--json"]) {
+            Ok(version) => match version["gitCommit"].as_str().filter(|c| !c.is_empty()) {
+                Some(commit) => commit.to_string(),
+                None => {
+                    return Ok(Newness::Unknown(
+                        "the host's version names no gitCommit".into(),
+                    ))
+                }
+            },
+            Err(why) => {
+                return Ok(Newness::Unknown(format!(
+                    "the version record was not read: {why}"
+                )))
+            }
         };
         let git = self.command("git", &["rev-parse".to_string(), "HEAD".to_string()]);
         match run_bounded_command(git, None, self.cfg.verb_timeout, |_| ()) {
             Ok(BoundedOutcome::Exited(output)) if output.status.success() => {
-                Ok(String::from_utf8_lossy(&output.stdout).trim() == active)
+                let tip = String::from_utf8_lossy(&output.stdout).into_owned();
+                Ok(if fgos_session_host::release::same_commit(&active, &tip) {
+                    Newness::NothingNew
+                } else {
+                    Newness::Landed
+                })
             }
             Ok(_) => Err("git rev-parse HEAD did not answer".to_string()),
             Err(e) => Err(format!("git did not run: {e}")),
         }
     }
 
-    fn land_in_progress(&self) -> Result<bool, String> {
+    fn land_in_progress(&self) -> Result<Option<String>, String> {
         self.host_json(&["lock-status", "--json"])
-            .map(|report| fgos_session_host::release::merge_slot_held(&report))
+            .map(|report| fgos_session_host::release::merge_slot_hold(&report))
     }
 
     fn run(&self, argv: &[String]) -> Result<i32, String> {
         let Some((program, args)) = argv.split_first() else {
             return Err("an empty argv".to_string());
         };
-        match run_bounded_command(
-            self.command(program, args),
-            None,
-            RELEASE_STEP_TIMEOUT,
-            |_| (),
-        ) {
+        let (command, _log) = self
+            .recipe_command(program, args)
+            .map_err(|e| format!("the run log is not writable: {e}"))?;
+        match run_bounded_command(command, None, RELEASE_STEP_TIMEOUT, |_| ()) {
             Ok(BoundedOutcome::Exited(output)) => Ok(output.status.code().unwrap_or(-1)),
             Ok(BoundedOutcome::TimedOut { .. }) => Err("timed out".to_string()),
             Err(e) => Err(e.to_string()),
@@ -1822,8 +1844,17 @@ impl fgos_session_host::release::ReleasePorts for HostRelease {
         self.question(
             &self.request.id,
             &format!("Apply the release: {line}"),
-            &format!("Every check of the release passed. The recipe is not reversible, so `{line}` waits for the owner."),
-            "release.reversible is false, so no head applies the release by itself.",
+            "the release waits for this answer before it goes on",
+            json!({
+                "what": format!("Every check of the release passed. The recipe is not reversible, so `{line}` waits for the owner."),
+                "cause": "release.reversible is false, so no head applies the release by itself.",
+                "options": [
+                    {"label": "Apply", "does": format!("The owner has `{line}` run; the release goes on."), "gain": "The checked trunk is the active release.", "harm": "No rollback is declared: the change cannot be undone by the recipe.", "cost": "The apply's own run time.", "recommended": true},
+                    {"label": "Do not apply", "does": "Nothing is applied; the active release stays as it is.", "gain": "No irreversible change is made.", "harm": "The landed work stays unreleased.", "cost": "None; a later release run asks again."}
+                ],
+                "recommendation": "Apply: every check passed, and the owner alone decides because the recipe cannot undo it.",
+                "scope": {"allows": "Applying this one release.", "forbids": "Any other release, or a standing grant."}
+            }),
         )
     }
 
@@ -1832,8 +1863,17 @@ impl fgos_session_host::release::ReleasePorts for HostRelease {
         if let Err(why) = self.question(
             &tail,
             line,
-            line,
-            "A release run ended and reports its outcome.",
+            "nothing: the release run has ended, and this is a report",
+            json!({
+                "what": line.chars().take(600).collect::<String>(),
+                "cause": "A release run ended and reports its outcome.",
+                "options": [
+                    {"label": "Noted", "does": "The owner reads the line.", "gain": "The owner knows where the release stands.", "harm": "None.", "cost": "A reading.", "recommended": true},
+                    {"label": "Look into it", "does": "The owner inspects the release by hand.", "gain": "A finding the line did not give.", "harm": "None to the release, which has already ended.", "cost": "Some minutes."}
+                ],
+                "recommendation": "Noted, unless the line says something failed.",
+                "scope": {"allows": "Reading this one release report.", "forbids": "Any other release, or a standing grant."}
+            }),
         ) {
             (self.cfg.log)(&format!(
                 "head-request {} release report: {}",
@@ -1844,17 +1884,80 @@ impl fgos_session_host::release::ReleasePorts for HostRelease {
     }
 }
 
+/// Writes the ticket whole or not at all: a temp file in the same directory, synced, then moved onto the name
+/// (`exclusive` links it there instead, so an existing ticket is `AlreadyExists` and left alone).
 fn write_ticket(file: &Path, ticket: &Value, exclusive: bool) -> io::Result<()> {
     use std::io::Write;
-    let mut options = std::fs::OpenOptions::new();
-    options.write(true).mode_0600();
-    if exclusive {
-        options.create_new(true);
-    } else {
-        options.create(true).truncate(true);
+    let temp = file.with_extension(format!("json.tmp-{}", std::process::id()));
+    let mut out = std::fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .mode_0600()
+        .open(&temp)?;
+    let written = writeln!(out, "{ticket}").and_then(|()| out.sync_all());
+    drop(out);
+    let placed = written.and_then(|()| {
+        if exclusive {
+            std::fs::hard_link(&temp, file)
+        } else {
+            std::fs::rename(&temp, file)
+        }
+    });
+    if exclusive || placed.is_err() {
+        let _ = std::fs::remove_file(&temp);
     }
-    let mut out = options.open(file)?;
-    writeln!(out, "{ticket}")
+    placed
+}
+
+/// One release at a time across both personas: a lock file under `.fgos/runtime` that names its holder's process
+/// identity and goes with the guard. A holder judged dead is reclaimed; one that is alive or cannot be judged keeps it.
+struct ReleaseLock {
+    file: PathBuf,
+}
+
+impl ReleaseLock {
+    fn take(root: &Path, identity: &Value) -> io::Result<Option<ReleaseLock>> {
+        use std::io::Write;
+        let dir = root.join(".fgos/runtime");
+        std::fs::create_dir_all(&dir)?;
+        let file = dir.join("release.lock");
+        for _ in 0..2 {
+            match std::fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .mode_0600()
+                .open(&file)
+            {
+                Ok(mut out) => {
+                    writeln!(out, "{identity}")?;
+                    return Ok(Some(ReleaseLock { file }));
+                }
+                Err(e) if e.kind() == io::ErrorKind::AlreadyExists => {
+                    let holder = std::fs::read_to_string(&file)
+                        .ok()
+                        .and_then(|text| serde_json::from_str::<Value>(&text).ok())
+                        .map(|value| fgos_process::facts::Record::from_json(&value));
+                    match holder {
+                        Some(record)
+                            if judge_here(&record) == fgos_process::facts::Verdict::Dead =>
+                        {
+                            let _ = std::fs::remove_file(&file);
+                        }
+                        _ => return Ok(None),
+                    }
+                }
+                Err(e) => return Err(e),
+            }
+        }
+        Ok(None)
+    }
+}
+
+impl Drop for ReleaseLock {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_file(&self.file);
+    }
 }
 
 trait Mode0600 {
@@ -1896,6 +1999,24 @@ fn release_run(cfg: &Arc<Config>, request: &Request) -> Outcome {
             detail: Some("the role is not a head role".to_string()),
         };
     }
+    // This process is the runner: its identity is on the ticket and on the lock, so a supervisor that ends mid-run
+    // reads `runner-gone` and frees the lock for the next release.
+    let Some(runner) = fgos_process::facts::self_identity().map(|t| t.to_record().to_json()) else {
+        return Outcome::Refused {
+            code: "verb-failed",
+            detail: Some("the supervisor's own process identity is not readable".to_string()),
+        };
+    };
+    let lock = match ReleaseLock::take(&cfg.cwd, &runner) {
+        Ok(Some(lock)) => lock,
+        Ok(None) => return refused("release-in-progress"),
+        Err(e) => {
+            return Outcome::Refused {
+                code: "verb-failed",
+                detail: Some(format!("the release lock is not writable: {e}")),
+            }
+        }
+    };
     let dir = cfg.cwd.join(".fgos/runtime/head-tickets").join(name);
     if let Err(e) = std::fs::create_dir_all(&dir) {
         return Outcome::Refused {
@@ -1905,7 +2026,7 @@ fn release_run(cfg: &Arc<Config>, request: &Request) -> Outcome {
     }
     let file = dir.join(format!("{}.json", request.id));
     let mut ticket = json!({
-        "id": request.id, "verb": RELEASE_VERB, "state": "running", "runner": null,
+        "id": request.id, "verb": RELEASE_VERB, "state": "running", "runner": runner,
         "startedAt": utc_now_iso(), "cwd": cfg.cwd,
     });
     if let Err(e) = write_ticket(&file, &ticket, true) {
@@ -1925,6 +2046,7 @@ fn release_run(cfg: &Arc<Config>, request: &Request) -> Outcome {
             verb: request.verb.clone(),
             args: json!({}),
         },
+        log_file: dir.join(format!("{}.log", request.id)),
     };
     let log = cfg.clone();
     let id = request.id.clone();
@@ -1932,6 +2054,8 @@ fn release_run(cfg: &Arc<Config>, request: &Request) -> Outcome {
         .name("release-run".to_string())
         .spawn(move || {
             use fgos_session_host::release::{run, run_rollback};
+            // Held for the whole run, the secretary's rollback included.
+            let _lock = lock;
             let outcome = if rollback {
                 run_rollback(&ports)
             } else {

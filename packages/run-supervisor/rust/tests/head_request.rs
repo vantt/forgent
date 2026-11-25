@@ -819,11 +819,184 @@ fn a_refused_request_logs_its_detail_and_the_routes_message_on_one_line() {
     );
 }
 
+/// One host answer as the real host prints it: the pretty multi-line `{contract, generated_at, data_hash, data}`
+/// envelope of `--json`, which a parser that reads only a last line cannot take.
+fn envelope(data: &Value) -> String {
+    serde_json::to_string_pretty(&json!({
+        "contract": "fgos.v1",
+        "generated_at": "2026-11-25T00:00:00Z",
+        "data_hash": "sha256:0",
+        "data": data,
+    }))
+    .unwrap()
+}
+
+/// A host script standing in for `config show --path release`, `version`, `lock-status` and the question route
+/// (which keeps each question body in `$OUT/questions`).
+fn release_host(recipe: &Value, git_commit: &str, locks: Value) -> String {
+    let config = envelope(&json!({"release": recipe}));
+    let version = envelope(&json!({"version": "0.2.0", "gitCommit": git_commit}));
+    let locks = envelope(&locks);
+    format!(
+        "cat >> \"$OUT/questions\"; case \"$1\" in\nconfig) cat <<'EOF'\n{config}\nEOF\n;;\nversion) cat <<'EOF'\n{version}\nEOF\n;;\nlock-status) cat <<'EOF'\n{locks}\nEOF\n;;\ninternal) echo '{{\"v\":1,\"protocol\":1,\"result\":\"done\",\"data\":{{\"id\":\"q-report\"}}}}';;\nesac"
+    )
+}
+
+/// The project root becomes a git repository with one commit, the trunk tip the release run compares.
+fn commit_in(dir: &Path) -> String {
+    for args in [
+        &["init", "-q"][..],
+        &[
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@t",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            "x",
+        ][..],
+    ] {
+        let status = std::process::Command::new("git")
+            .args(args)
+            .current_dir(dir)
+            .status()
+            .unwrap();
+        assert!(status.success());
+    }
+    let out = std::process::Command::new("git")
+        .args(["rev-parse", "HEAD"])
+        .current_dir(dir)
+        .output()
+        .unwrap();
+    String::from_utf8(out.stdout).unwrap().trim().to_string()
+}
+
+fn settled_ticket(ticket: &Path) -> Value {
+    let until = Instant::now() + Duration::from_secs(20);
+    loop {
+        let read: Option<Value> = fs::read_to_string(ticket)
+            .ok()
+            .and_then(|text| serde_json::from_str(&text).ok());
+        match read {
+            Some(t) if t["state"] != "running" => return t,
+            _ if Instant::now() > until => panic!("the release run did not settle"),
+            _ => std::thread::sleep(Duration::from_millis(50)),
+        }
+    }
+}
+
+#[test]
+fn release_run_reads_the_commit_and_the_merge_slot_out_of_the_hosts_pretty_envelopes() {
+    // The active release is the trunk tip: nothing new. The commit is a short hash, compared by prefix.
+    let recipe = json!({"reversible": false, "apply": ["touch", "applied"]});
+    let body = release_host(&recipe, "PLACEHOLDER", json!({"locks": []}));
+    let served = serve("release-same", &body, Ok(true), &[], Duration::from_secs(5));
+    let tip = commit_in(&served.dir);
+    let body = body.replace("PLACEHOLDER", &tip[..9]);
+    fs::write(served.dir.join("host.sh"), format!("#!/bin/sh\n{body}\n")).unwrap();
+    let reply = request(
+        &served.socket,
+        &json!({"type": "REQUEST", "id": "same1", "verb": "release run", "args": {}}),
+    );
+    assert_eq!(reply["result"], "done", "{reply}");
+    let settled = settled_ticket(
+        &served
+            .dir
+            .join(".fgos/runtime/head-tickets/secretary-miu/same1.json"),
+    );
+    assert_eq!(settled["result"]["outcome"], "nothing-new", "{settled}");
+
+    // A held merge slot, and one whose status is unknown, both refuse the release.
+    for (id, status) in [("held1", "held"), ("unk1", "unknown")] {
+        let locks = json!({"locks": [{"name": "merge-slot", "instances": [{"status": status}]}]});
+        let body = release_host(&recipe, "0000000", locks);
+        fs::write(served.dir.join("host.sh"), format!("#!/bin/sh\n{body}\n")).unwrap();
+        request(
+            &served.socket,
+            &json!({"type": "REQUEST", "id": id, "verb": "release run", "args": {}}),
+        );
+        let settled = settled_ticket(&served.dir.join(format!(
+            ".fgos/runtime/head-tickets/secretary-miu/{id}.json"
+        )));
+        assert_eq!(settled["code"], "land-in-progress", "{settled}");
+    }
+    assert!(!served.dir.join("applied").exists());
+}
+
+#[test]
+fn an_irreversible_recipe_without_a_known_commit_asks_apply_or_not_and_says_the_commit_is_unknown()
+{
+    let recipe = json!({"reversible": false, "apply": ["touch", "applied"]});
+    let body = release_host(&recipe, "", json!({"locks": []}));
+    let served = serve("release-ask", &body, Ok(true), &[], Duration::from_secs(5));
+    commit_in(&served.dir);
+    request(
+        &served.socket,
+        &json!({"type": "REQUEST", "id": "ask1", "verb": "release run", "args": {}}),
+    );
+    let settled = settled_ticket(
+        &served
+            .dir
+            .join(".fgos/runtime/head-tickets/secretary-miu/ask1.json"),
+    );
+    assert_eq!(settled["state"], "done", "{settled}");
+    assert_eq!(settled["result"]["outcome"], "asked", "{settled}");
+    assert!(settled["result"]["note"]
+        .as_str()
+        .unwrap()
+        .contains("not known"));
+    let questions = fs::read_to_string(served.dir.join("questions")).unwrap();
+    assert!(questions.contains("\"label\":\"Apply\""), "{questions}");
+    assert!(
+        questions.contains("\"label\":\"Do not apply\""),
+        "{questions}"
+    );
+    assert!(!served.dir.join("applied").exists());
+}
+
+#[test]
+fn one_release_runs_at_a_time_and_a_lock_of_a_dead_holder_is_reclaimed() {
+    let recipe = json!({"reversible": false, "apply": ["touch", "applied"]});
+    let body = release_host(&recipe, "", json!({"locks": []}));
+    let served = serve("release-lock", &body, Ok(true), &[], Duration::from_secs(5));
+    commit_in(&served.dir);
+    let lock = served.dir.join(".fgos/runtime/release.lock");
+    fs::create_dir_all(lock.parent().unwrap()).unwrap();
+    // Held by this live process: refused.
+    let me = facts::self_identity().unwrap().to_record().to_json();
+    fs::write(&lock, format!("{me}\n")).unwrap();
+    let busy = request(
+        &served.socket,
+        &json!({"type": "REQUEST", "id": "busy1", "verb": "release run", "args": {}}),
+    );
+    assert_eq!(busy["code"], "release-in-progress", "{busy}");
+    let rollback = request(
+        &served.socket,
+        &json!({"type": "REQUEST", "id": "busy2", "verb": "release run", "args": {"rollback": true}}),
+    );
+    assert_eq!(rollback["code"], "release-in-progress", "{rollback}");
+    // Held by a process that is gone: taken over.
+    let dead = json!({"host": me["host"], "pidNs": me["pidNs"], "bootId": me["bootId"], "pid": 2_000_000_000u64, "startTime": "1"});
+    fs::write(&lock, format!("{dead}\n")).unwrap();
+    let free = request(
+        &served.socket,
+        &json!({"type": "REQUEST", "id": "free1", "verb": "release run", "args": {}}),
+    );
+    assert_eq!(free["result"], "done", "{free}");
+}
+
 #[test]
 fn release_run_answers_with_a_ticket_and_the_detached_run_rolls_back_on_a_failed_probe() {
-    // The host stands in for `config show` (the recipe), `lock-status` (a free merge slot) and the question route.
-    let body = r#"cat > /dev/null; case "$1" in config) echo '{"data":{"value":{"reversible":true,"checks":[["true"]],"apply":["touch","applied"],"probe":["false"],"rollback":["touch","rolled-back"]}}}';; lock-status) echo '{"locks":[{"name":"merge-slot","instances":[]}]}';; internal) echo '{"v":1,"protocol":1,"result":"done","data":{"id":"q-report"}}';; esac"#;
-    let served = serve("release", body, Ok(true), &[], Duration::from_secs(5));
+    let recipe = json!({"reversible": true, "checks": [["true"]], "apply": ["touch", "applied"], "probe": ["false"], "rollback": ["touch", "rolled-back"]});
+    let body = release_host(
+        &recipe,
+        "0000000",
+        json!({"locks": [{"name": "merge-slot", "instances": []}]}),
+    );
+    let served = serve("release", &body, Ok(true), &[], Duration::from_secs(5));
+    commit_in(&served.dir);
     let reply = request(
         &served.socket,
         &json!({"type": "REQUEST", "id": "rel1", "verb": "release run", "args": {}}),
@@ -833,21 +1006,19 @@ fn release_run_answers_with_a_ticket_and_the_detached_run_rolls_back_on_a_failed
     let ticket = served
         .dir
         .join(".fgos/runtime/head-tickets/secretary-miu/rel1.json");
-    let until = Instant::now() + Duration::from_secs(20);
-    let settled = loop {
-        let read: Option<Value> = fs::read_to_string(&ticket)
-            .ok()
-            .and_then(|text| serde_json::from_str(&text).ok());
-        match read {
-            Some(t) if t["state"] != "running" => break t,
-            _ if Instant::now() > until => panic!("the release run did not settle"),
-            _ => std::thread::sleep(Duration::from_millis(50)),
-        }
-    };
+    // The ticket carries the supervisor's own process identity before the reply, so a dead runner can be judged.
+    let first: Value = serde_json::from_str(&fs::read_to_string(&ticket).unwrap()).unwrap();
+    assert_eq!(first["runner"]["pid"], std::process::id(), "{first}");
+    let settled = settled_ticket(&ticket);
     assert_eq!(settled["state"], "failed", "{settled}");
     assert_eq!(settled["code"], "rolled-back", "{settled}");
     assert!(served.dir.join("applied").exists());
     assert!(served.dir.join("rolled-back").exists());
+    // The release lock is gone with the run, and the run's report was filed (the route answered each question).
+    assert!(!served.dir.join(".fgos/runtime/release.lock").exists());
+    assert!(fs::read_to_string(served.dir.join("questions"))
+        .unwrap()
+        .contains("release rolled back"),);
     // The same id is a used ticket, and an arg outside the verb's two is refused.
     let again = request(
         &served.socket,
@@ -971,6 +1142,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "path-symlink",
             "peer-uid",
             "recipient-not-allowed",
+            "release-in-progress",
             "reply-too-large",
             "role-not-held",
             "role-pending-rotation",
