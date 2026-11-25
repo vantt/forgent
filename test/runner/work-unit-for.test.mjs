@@ -9,8 +9,7 @@ import { execFileSync } from 'node:child_process';
 
 import { workUnitFor, workRigorFor } from '../../src/runner/work-dispatch.mjs';
 import { buildPrompt } from '../../src/runner/work-compat.mjs';
-import { validateUnit } from '../../src/runner/execution/unit.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
+import { validateUnit, RunnerConfigError } from '../../src/native/execution-door.mjs';
 import { bindable } from '../helpers/work-seat-config.mjs';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 

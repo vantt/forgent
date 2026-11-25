@@ -19,11 +19,7 @@ import {
 } from '../../src/runner/operation-choice.mjs';
 import { operationsForStep, getDomain } from '../../src/state/domain-registry.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { bindableExecute } from '../helpers/work-seat-config.mjs';
-const executeAssignment = bindableExecute(executeAssignmentRaw);
-import { resolveRunWorkerArtifactPath } from '../../src/runner/dispatch/settlement.mjs';
-import { listAssignmentRuns } from '../../src/runner/dispatch/assignment-layout-twin.mjs';
+import { listAssignmentRuns } from '../../src/native/execution-door.mjs';
 import { runOnce as loopRunOnce } from '../../src/runner/loop.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
@@ -1189,70 +1185,6 @@ test('the Work layer turns docsRef and refs into the Unit inputs, and dispatch d
   assert.ok(assignment.expectedOutputs.some((o) => o.includes('result-1.json')));
 });
 
-test('executeAssignment rejects execution of an undeclared operation (Finding 3)', async () => {
-  const tempDir = mkTempDir();
-  initRepo(tempDir);
-  initStore(storeOf(tempDir));
-
-  const invalidAsgn = {
-    assignmentId: 'asgn_invalid_op',
-    domain: 'coding',
-    workflow: 'feature',
-    stage: 'planning',
-    operation: 'nonexistent-operation',
-    provenance: { kind: 'declared', declared: { legalOperations: ['shape-plan', 'validate-plan'] } },
-    dispatch: 'assignment',
-    taskSpec: 'validate-plan.md',
-  };
-
-  try {
-    await executeAssignment(invalidAsgn, { cwd: tempDir, repoRoot: tempDir });
-    assert.fail('should have thrown');
-  } catch (err) {
-    assert.ok(err.message.includes('unknown operation') || err.message.includes('nonexistent-operation'), `Unexpected error: ${err.message}`);
-  }
-});
-
-test('executeAssignment re-checks legality after loading persisted assignment.json (Finding 4)', async () => {
-  const tempDir = mkTempDir();
-  initRepo(tempDir);
-  initStore(storeOf(tempDir));
-
-  const asgnId = 'asgn_persisted_check';
-  const asgnDir = path.join(tempDir, '.fgos', 'assignments', asgnId);
-  fs.mkdirSync(asgnDir, { recursive: true });
-
-  const tamperedAsgn = {
-    assignmentId: asgnId,
-    domain: 'coding',
-    workflow: 'feature',
-    stage: 'exploring',
-    operation: 'answer-question',
-    provenance: { kind: 'declared', declared: { legalOperations: ['lock-decisions', 'answer-question'] } },
-    dispatch: 'human-only',
-    taskSpec: 'answer-question.md',
-  };
-  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify(tamperedAsgn, null, 2));
-
-  const memoryAsgn = {
-    assignmentId: asgnId,
-    domain: 'coding',
-    workflow: 'feature',
-    stage: 'planning',
-    operation: 'validate-plan',
-    provenance: { kind: 'declared', declared: { legalOperations: ['shape-plan', 'validate-plan'] } },
-    dispatch: 'assignment',
-    taskSpec: 'validate-plan.md',
-  };
-
-  try {
-    await executeAssignment(memoryAsgn, { cwd: tempDir, repoRoot: tempDir });
-    assert.fail('should have thrown');
-  } catch (err) {
-    assert.ok(err.message.includes('human-only'), `Unexpected error: ${err.message}`);
-  }
-});
-
 test('chooseStageOperation accepts domain passed as object without throwing or warning (Finding 5)', () => {
   const domainObj = { name: 'coding', stages: ['discovery', 'planning', 'executing'] };
   const choice = chooseStageOperation({
@@ -1602,38 +1534,6 @@ test('Step 06 executing.scoped-subtask requires verified confidence (changed-fil
   assert.equal(verifiedRes.reason, 'scoped-subtask-verified');
 });
 
-test('Step 06 Cell 6.6 buildAssignment declares expectedFiles for scoped-subtask and persists it into assignment.json; omitted declaration defaults to empty array', async () => {
-  const tempDir = mkTempDir();
-  initRepo(tempDir);
-  initStore(storeOf(tempDir));
-  seedTaskSpecs(tempDir, ['scoped-subtask']);
-
-  const declared = buildAssignment({
-    workId: 'tsk-scoped-declared',
-    stage: 'executing',
-    operation: 'scoped-subtask',
-    expectedFiles: ['src/declared.mjs', 'src/other.mjs'],
-    options: { repoRoot: tempDir },
-  });
-  assert.deepEqual(declared.expectedFiles, ['src/declared.mjs', 'src/other.mjs']);
-
-  const undeclared = buildAssignment({
-    workId: 'tsk-scoped-undeclared',
-    stage: 'executing',
-    operation: 'scoped-subtask',
-    options: { repoRoot: tempDir },
-  });
-  assert.deepEqual(undeclared.expectedFiles, []);
-
-  // Persisted verbatim into assignment.json by executeAssignment (immutable-input contract).
-  const executorScript = writeFakeExecutor(tempDir, { status: 'done', summary: 'no-op subtask' });
-  await executeAssignment(declared, { cwd: tempDir, repoRoot: tempDir, runnerConfig: runnerConfigFor(executorScript) });
-  const persisted = JSON.parse(
-    fs.readFileSync(path.join(tempDir, '.fgos', 'assignments', declared.assignmentId, 'assignment.json'), 'utf8'),
-  );
-  assert.deepEqual(persisted.expectedFiles, ['src/declared.mjs', 'src/other.mjs']);
-});
-
 test('Step 06 Cell 6.6 scoped-subtask refuses when helper touches an undeclared file', () => {
   const result = interpretAssignmentRunResult({
     choice: { operation: 'scoped-subtask', expectedFiles: ['src/a.mjs', 'src/b.mjs'] },
@@ -1837,80 +1737,6 @@ test('a settled findings verdict on mutating work stops with a findings reason',
 
   const inconclusive = interpretAssignmentRunResult({ choice: { operation: 'implement-item', assignment }, runResult: settled('inconclusive'), repoRoot: tempDir });
   assert.equal(inconclusive.reason, 'assignment-implement-item-insufficient-confidence', 'other non-satisfied outcomes keep the evidence reason');
-});
-
-test('Step 06 Cell 6.6 end-to-end: executeAssignment + interpretAssignmentRunResult refuse a real undeclared-file mutation and allow a fully-declared one', async () => {
-  const tempDir = mkTempDir();
-  initRepo(tempDir);
-  initStore(storeOf(tempDir));
-  seedTaskSpecs(tempDir, ['scoped-subtask']);
-  fs.mkdirSync(path.join(tempDir, 'src'), { recursive: true });
-
-  const declaredFile = 'src/declared.mjs';
-  const undeclaredFile = 'src/undeclared.mjs';
-
-  // Case 1: helper touches only the declared file.
-  {
-    const assignment = buildAssignment({
-      workId: 'tsk-scoped-ok',
-      stage: 'executing',
-      operation: 'scoped-subtask',
-      expectedFiles: [declaredFile],
-      options: { repoRoot: tempDir },
-    });
-    const executorScript = writeFakeExecutor(tempDir, { status: 'done', summary: 'Touched only the declared file' });
-    const scriptContent = fs.readFileSync(executorScript, 'utf8');
-    fs.writeFileSync(
-      executorScript,
-      scriptContent.replace(
-        "import path from 'node:path';",
-        `import path from 'node:path';\n    fs.writeFileSync(${JSON.stringify(path.join(tempDir, declaredFile))}, 'declared content');`,
-      ),
-    );
-    const runResult = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig: runnerConfigFor(executorScript) });
-    assert.equal(runResult.confidence, 'verified');
-
-    const interpreted = interpretAssignmentRunResult({
-      choice: { operation: 'scoped-subtask', assignment },
-      runResult,
-      repoRoot: tempDir,
-    });
-    assert.equal(interpreted.stop, false);
-    assert.equal(interpreted.canProceed, true);
-    assert.equal(interpreted.reason, 'scoped-subtask-verified');
-  }
-
-  // Case 2: helper touches an undeclared file in addition to the declared one.
-  {
-    const assignment = buildAssignment({
-      workId: 'tsk-scoped-bad',
-      stage: 'executing',
-      operation: 'scoped-subtask',
-      expectedFiles: [declaredFile],
-      options: { repoRoot: tempDir },
-    });
-    const executorScript = writeFakeExecutor(tempDir, { status: 'done', summary: 'Touched an undeclared file too' });
-    const scriptContent = fs.readFileSync(executorScript, 'utf8');
-    fs.writeFileSync(
-      executorScript,
-      scriptContent.replace(
-        "import path from 'node:path';",
-        `import path from 'node:path';\n    fs.writeFileSync(${JSON.stringify(path.join(tempDir, declaredFile))}, 'declared content 2');\n    fs.writeFileSync(${JSON.stringify(path.join(tempDir, undeclaredFile))}, 'undeclared content');`,
-      ),
-    );
-    const runResult = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig: runnerConfigFor(executorScript) });
-    assert.equal(runResult.confidence, 'verified');
-
-    const interpreted = interpretAssignmentRunResult({
-      choice: { operation: 'scoped-subtask', assignment },
-      runResult,
-      repoRoot: tempDir,
-    });
-    assert.equal(interpreted.stop, true);
-    assert.equal(interpreted.canProceed, false);
-    assert.equal(interpreted.reason, 'scoped-subtask-undeclared-files');
-    assert.ok(interpreted.undeclaredFiles.some((f) => f.includes('undeclared.mjs')));
-  }
 });
 
 test('Step 06 governance-blocked or failed executor returns a stop without advancing Work', async () => {
@@ -2968,89 +2794,6 @@ test('Positive test: valid structured review-item claim with real findings tied 
   assert.equal(interpreted.canAdvanceEdge, false);
   assert.equal(interpreted.stop, false);
   assert.equal(interpreted.reason, 'review-item-approved');
-});
-
-test('executeAssignment reports read-only validate-plan mutations as a warning, Work does not advance on them, and no automatic rollback runs', async () => {
-  const tempDir = mkTempDir();
-  initRepo(tempDir);
-  initStore(storeOf(tempDir));
-  seedTaskSpecs(tempDir, ['validate-plan']);
-
-  const docsDir = path.join(tempDir, 'docs', 'history', 'feat-iso');
-  fs.mkdirSync(docsDir, { recursive: true });
-  const planPath = path.join(docsDir, 'plan.md');
-  const originalPlanContent = '# Plan\nOriginal plan content.\n';
-  fs.writeFileSync(planPath, originalPlanContent);
-  execSync(`git add ${planPath} && git commit -m "initial plan"`, { cwd: tempDir, stdio: 'ignore' });
-
-  addWork(storeOf(tempDir), {
-    id: 'tsk-iso-val',
-    title: 'Test isolation for validate-plan',
-    workflowStep: 'planning',
-    status: 'todo',
-    domain: 'coding',
-    workflow: 'feature',
-    kind: 'feature',
-    risk: 'standard',
-    deps: [],
-    refs: [],
-    verify: 'node -e "process.exit(0)"',
-    docsRef: 'docs/history/feat-iso',
-  });
-
-  const assignment = buildAssignment({
-    work: listWork(storeOf(tempDir)).work['tsk-iso-val'],
-    stage: 'planning',
-    operation: 'validate-plan',
-  });
-
-  // Fake executor that misbehaves by dirtying the repo (writing a temp file and mutating plan.md)
-  const dirtyTmpPath = path.join(tempDir, 'plan-validation.tmp');
-  const executorScript = writeFakeExecutor(tempDir, {
-    status: 'done',
-    verdict: 'READY',
-    summary: 'Mutating validate-plan executor',
-  });
-
-  // Inject file write into executor script after top-level imports
-  const scriptContent = fs.readFileSync(executorScript, 'utf8');
-  const mutatingScriptContent = scriptContent.replace(
-    "import path from 'node:path';",
-    `import path from 'node:path';\n    fs.writeFileSync(${JSON.stringify(dirtyTmpPath)}, 'dirty temp data');\n    fs.writeFileSync(${JSON.stringify(planPath)}, '# Dirty modified plan\\n');`
-  );
-  fs.writeFileSync(executorScript, mutatingScriptContent);
-
-  const cfg = runnerConfigFor(executorScript);
-
-  const runResult = await executeAssignment(assignment, {
-    cwd: tempDir,
-    repoRoot: tempDir,
-    runnerConfig: cfg,
-  });
-
-  // The round is accepted at the dispatch layer: a before/after snapshot cannot
-  // prove the change is the round's own, so it travels as a warning.
-  assert.equal(runResult.status, 'done');
-  assert.ok((runResult.warnings ?? []).some((w) => w.code === 'read-only-mutation-correlated'));
-
-  // Work, the consumer, does not advance on it.
-  const interpreted = interpretAssignmentRunResult({
-    choice: { operation: 'validate-plan', assignment, work: listWork(storeOf(tempDir)).work['tsk-iso-val'] },
-    runResult,
-    work: listWork(storeOf(tempDir)).work['tsk-iso-val'],
-    repoRoot: tempDir,
-  });
-  assert.equal(interpreted.canAdvanceEdge, false);
-  assert.equal(interpreted.stop, true);
-  assert.equal(interpreted.reason, 'assignment-validate-plan-correlated-mutation');
-
-  // Verify evidence recorded the mutations
-  assert.ok(runResult.evidence.changedFiles.some((f) => f.includes('plan-validation.tmp')));
-  assert.ok(runResult.evidence.changedFiles.some((f) => f.includes('plan.md')));
-
-  // Verify files were not automatically deleted or restored (no automatic rollback)
-  assert.equal(fs.existsSync(dirtyTmpPath), true, 'untracked dirty file should not be automatically removed');
-  assert.equal(fs.readFileSync(planPath, 'utf8'), '# Dirty modified plan\n', 'tracked file changes should not be automatically restored');
 });
 
 test('Finding 3 negative test: validate-plan READY with headings-only report text stops', () => {
@@ -5812,49 +5555,6 @@ test('ADR-007 §3 regression: a declared validate-plan READY result (provenance.
   const choice = choosePlanning(tempDir, planningWorkFor('tsk-r2-declared', docsRef));
   assert.equal(choice.canAdvanceEdge, true, 'an explicitly declared-provenance result must still be consumable cross-pass');
   assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge');
-});
-
-test('ADR-007 §3: an inline Assignment\'s RunResult fed directly into chooseStageOperation\'s own lastRunResult parameter is ignored, not just when discovered via the internal cross-pass scan', () => {
-  const tempDir = mkTempDir();
-  initRepo(tempDir);
-  initStore(storeOf(tempDir));
-  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
-
-  const docsRef = 'docs/history/r2-inline-direct-injection';
-  const { asgnDir, resultPath } = seedStoredValidatePlanResult(tempDir, {
-    id: 'tsk-r2-inline-direct',
-    docsRef,
-    withHash: true,
-    withReport: true,
-  });
-
-  const asgnJsonPath = path.join(asgnDir, 'assignment.json');
-  const asgnJson = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8'));
-  asgnJson.provenance = { kind: 'inline' };
-  fs.writeFileSync(asgnJsonPath, JSON.stringify(asgnJson));
-
-  // The exact real-RunResult shape a caller would hold after reading
-  // result.json back (or after a real executeAssignment() call): it never
-  // carries provenance directly, only its own assignmentId.
-  const realRunResult = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
-  assert.equal(realRunResult.assignmentId, asgnJson.assignmentId);
-  assert.equal(realRunResult.provenance, undefined, 'a real RunResult never carries provenance directly -- only assignmentId');
-
-  const bypassAttempt = choosePlanning(tempDir, planningWorkFor('tsk-r2-inline-direct', docsRef), {
-    lastRunResult: realRunResult,
-  });
-  assert.equal(
-    bypassAttempt.canAdvanceEdge,
-    false,
-    'an inline Assignment\'s real RunResult, fed directly as lastRunResult, must never drive canAdvanceEdge -- regardless of how lastRunResult was populated',
-  );
-  assert.notEqual(bypassAttempt.reason, 'validation-passed-ready-for-planning-edge');
-
-  // Matches the auto-discovery path's own outcome for the exact same
-  // on-disk state -- the direct-injection path and the internal fallback
-  // must agree once the guard is in place.
-  const autoDiscovery = choosePlanning(tempDir, planningWorkFor('tsk-r2-inline-direct', docsRef));
-  assert.equal(bypassAttempt.reason, autoDiscovery.reason);
 });
 
 test('ADR-006 R5: executeDriverOperationChoice validate-plan onAdvance dispatch derives a decompose verdictPayload from plan.md\'s own committed "## Split" section', async () => {

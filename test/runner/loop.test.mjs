@@ -20,7 +20,7 @@ import { leaveOpenWorkEvent } from '../helpers/open-work-event.mjs';
 import { confinedRunnerConfig, persistRunnerConfig, countWorkerRuns, priorUnitRunsSource, unitRuns } from './loop-worker-fixture.helper.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { confinedUnitConfig } from './driver-unit-fixture.helper.mjs';
-import { resolveRunWorkerArtifactPath } from '../../src/runner/dispatch/settlement.mjs';
+import { resolveWorkerArtifactPath } from '../../src/native/execution-door.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { resolveDiscovery } from '../../src/intake/discovery.mjs';
 import { createMissBreaker } from '../../src/runner/anti-loop.mjs';
@@ -2661,7 +2661,7 @@ test('Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assig
 
   const [asgnId] = validatePlanDispatches(repoRoot).asgnIds;
   assert.ok(asgnId, 'executor was called');
-  const report = fs.readFileSync(resolveRunWorkerArtifactPath(path.join(repoRoot, '.fgos', 'assignments', asgnId, 'runs', '01'), /^report-(\d+)\.md$/, 'report-1.md'), 'utf8');
+  const report = fs.readFileSync(resolveWorkerArtifactPath(path.join(repoRoot, '.fgos', 'assignments', asgnId, 'runs', '01'), 'report-', '.md', 'report-1.md'), 'utf8');
   const executedCwd = /^cwd: (.*)$/m.exec(report)?.[1] ?? '';
   assert.ok(executedCwd, 'executor was called');
   assert.equal(fs.existsSync(path.join(executedCwd, docsRef, 'plan.md')), true, 'cwd was content root containing plan.md');
@@ -2852,9 +2852,9 @@ test('Cell 6.1 happy path: run evidence is complete and the verdict artifact is 
     assert.ok(fs.existsSync(path.join(runDir, f)), `runs/01 must contain ${f}`);
   }
   // The worker's own artifacts: a confined worker writes only its run's outbox.
-  const claimPath = resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'result-1.json');
+  const claimPath = resolveWorkerArtifactPath(runDir, 'result-', '.json', 'result-1.json');
   assert.ok(fs.existsSync(claimPath), 'runs/01 must hold result-1.json');
-  assert.ok(fs.existsSync(resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'report-1.md')), 'runs/01 must hold report-1.md');
+  assert.ok(fs.existsSync(resolveWorkerArtifactPath(runDir, 'report-', '.md', 'report-1.md')), 'runs/01 must hold report-1.md');
 
   const evidence = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
   assert.equal(evidence.operationMutability, 'read-only');
@@ -3420,7 +3420,7 @@ test('Cell 6.2 read-back tamper: a deleted report-1.md is never consumed cross-p
 
   await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
   const { runsDir } = cell62RunDirs(repoRoot);
-  fs.rmSync(resolveRunWorkerArtifactPath(path.join(runsDir, '01'), /^report-(\d+)\.md$/, 'report-1.md'));
+  fs.rmSync(resolveWorkerArtifactPath(path.join(runsDir, '01'), 'report-', '.md', 'report-1.md'));
 
   const secondLogs = [];
   await runOnce({ repoRoot, config: cfg, worktreeDir, log: (l) => secondLogs.push(l) });

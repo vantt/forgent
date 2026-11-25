@@ -161,10 +161,8 @@
   ],
   "test/runner/loop.test.mjs": [
     "test('runOnce\\'s executor.dispatch audit event records the REAL spawned command even when a executor declares a different provider label (tsk-33w D9: the audit must not lie when the two diverge)', async () => {",
-    "test('runOnce: an item already advanced to decompose (via an explicit prior discover call, the only live path left post-tsk-5mj) still gets swept to executing and dispatched in the SAME runOnce pass; the clarify-pass settlement recorded at that prior call reads role \"session\"', async () => {",
     "test('startup reap: a zero-ahead root branch with an open (non-done/wontfix) leaf descendant is kept, not pruned (tsk-577)', async () => {",
-    "test('startup reap: a zero-ahead root branch whose only descendant is already done/wontfix is still pruned normally (tsk-577 regression guard)', async () => {",
-    "test('tsk-535 D4: a fgos-discovered block with no description falls back to the block\\'s own title, not undefined', async () => {"
+    "test('startup reap: a zero-ahead root branch whose only descendant is already done/wontfix is still pruned normally (tsk-577 regression guard)', async () => {"
   ],
   "test/runner/main-checkout-lock.test.mjs": [
     "test('deterministic: the create path never makes lockPath observable via fs.openSync(path, \"wx\") before its content is fully written (tsk-2tm)', () => {",

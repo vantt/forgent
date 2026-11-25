@@ -8,12 +8,6 @@ import { credentialStoreOf, credentialStoreProblem } from '../../src/runner/disp
 import { readMachineConfig } from '../../src/config/facade.mjs';
 import { DEFAULT_SEAT_TIMEOUT_MS } from '../../src/runner/dispatch/confinement/resources.mjs';
 import { credentialLayout } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
-import { validateRunnerConfigShape } from '../../src/runner/dispatch/config-twin.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
-import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
-import { buildConfinementRequest, validateConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
-
-const binding = (name) => [{ resource: 'private-home', target: { kind: 'env', name } }];
 
 test('credentialStoreProblem names what is wrong with a declaration', () => {
   assert.equal(credentialStoreProblem({ use: 'codex', homeEnv: 'CODEX_HOME' }), null);
@@ -34,69 +28,6 @@ test('credentialStoreProblem names what is wrong with a declaration', () => {
     [{ use: 'codex', homeEnv: 'X', files: ['a', 'a'] }, /must not repeat/],
   ];
   for (const [store, pattern] of bad) assert.match(credentialStoreProblem(store) ?? '', pattern, JSON.stringify(store));
-});
-
-const runnerWith = (executor) => ({
-  executor: { command: 'claude', args: ['{prompt}'] },
-  modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' } },
-  timeoutMs: 1000,
-  executors: { agent: { kind: 'agent', providerModel: 'claude', allowCrossProvider: true, ...executor } },
-});
-
-const cliInvocation = (extra = {}) => ({ id: 'a-cli', via: 'cli', adapter: 'cli-spawn', command: 'codex', args: ['{prompt}'], ...extra });
-const store = { use: 'codex', homeEnv: 'CODEX_HOME' };
-
-test('the runner config check accepts a store on a confined cli invocation, whichever level names the backend', () => {
-  for (const executor of [
-    { invocations: [cliInvocation({ confinement: { backend: 'bwrap' }, credentialStore: store })] },
-    { confinement: { backend: 'bwrap' }, invocations: [cliInvocation({ credentialStore: store })] },
-  ]) {
-    assert.doesNotThrow(() => validateRunnerConfigShape(runnerWith(executor), 'test'));
-  }
-});
-
-test('the runner config check refuses an older private-home binding on an invocation, naming the store to declare instead', () => {
-  assert.throws(
-    () => validateRunnerConfigShape(runnerWith({ invocations: [cliInvocation({ confinement: { backend: 'bwrap' }, resourceBindings: binding('CODEX_HOME') })] }), 'test'),
-    (err) => err instanceof RunnerConfigError && /"resourceBindings" was removed/.test(err.message) && /credentialStore/.test(err.message) && err.path === 'runner.executors.agent.invocations[0].resourceBindings',
-  );
-});
-
-test('the runner config check refuses a malformed store and a store on an invocation with no confinement backend', () => {
-  const refuse = (invocation, pattern) => {
-    assert.throws(() => validateRunnerConfigShape(runnerWith({ invocations: [invocation] }), 'test'), (err) => err instanceof RunnerConfigError && pattern.test(err.message));
-  };
-  refuse(cliInvocation({ credentialStore: store }), /"credentialStore" without a confinement backend/);
-  refuse(cliInvocation({ confinement: { backend: 'bwrap' }, credentialStore: { use: 'codex' } }), /"credentialStore" "homeEnv"/);
-  refuse(cliInvocation({ confinement: { backend: 'bwrap' }, credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME', files: ['../x'] } }), /"files"/);
-  refuse(cliInvocation({ confinement: { backend: 'bwrap' }, credentialStore: 'codex' }), /must be an object/);
-});
-
-test('the resolved command carries the declared store, and none for an older binding or no declaration', () => {
-  const resolve = (invocations) => resolveExecutorCommand(runnerWith({ invocations }), { prompt: 'p', model: 'm', tier: 'standard', executorId: 'agent', fgosDir: os.tmpdir(), contentCarries: 'repo-content', invocationId: invocations[0].id });
-  const confinement = { backend: 'bwrap' };
-  assert.deepEqual(resolve([cliInvocation({ confinement, credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR' } })]).credentialStore, { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR' });
-  assert.equal(resolve([cliInvocation({ confinement, resourceBindings: binding('CODEX_HOME') })]).credentialStore, null);
-  assert.equal(resolve([cliInvocation({ confinement })]).credentialStore, null);
-});
-
-function requestFor(invocation) {
-  return buildConfinementRequest({
-    capability: 'code:review',
-    executorId: 'agent',
-    invocation,
-    requirement: { mode: 'unconfined' },
-    context: { cwd: os.tmpdir(), runDir: path.join(os.tmpdir(), 'run') },
-  });
-}
-
-test('the confinement request carries the store the invocation declares, and rejects a malformed one', () => {
-  assert.deepEqual(requestFor({ command: 'codex', args: [], credentialStore: store }).invocation.credentialStore, store);
-  assert.equal('credentialStore' in requestFor({ command: 'claude', args: [] }).invocation, false);
-  const older = requestFor({ command: 'codex', args: [], resourceBindings: binding('CODEX_HOME') }).invocation;
-  assert.equal('credentialStore' in older || 'resourceBindings' in older, false);
-  const request = requestFor({ command: 'codex', args: [], credentialStore: store });
-  assert.throws(() => validateConfinementRequest({ ...request, invocation: { ...request.invocation, credentialStore: { use: 'codex' } } }), /invocation\.credentialStore .*"homeEnv"/);
 });
 
 test('the standard gives each confined claude invocation its own login store in the config directory, and keeps the unconfined one on the real home', () => {

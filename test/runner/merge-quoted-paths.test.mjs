@@ -14,7 +14,20 @@ import {
   buildOwnFileSet,
   isIgnorableStatusPath,
 } from '../../src/runner/merge.mjs';
-import { safeGitStatusFiles } from '../../src/runner/dispatch/settlement.mjs';
+import { createGitInspect, gitPortOptions } from '../../src/git/inspect.mjs';
+import { inspectEntries, inspectPath } from '../../src/util/git-paths.mjs';
+
+function safeGitStatusFiles(dir) {
+  if (!dir) return [];
+  try {
+    const inspect = createGitInspect(gitPortOptions(dir));
+    const paths = inspectEntries((page) => inspect.status({ ...page, untracked: 'all', ignoreSubmodules: 'dirty' }))
+      .map((entry) => inspectPath(entry.path).replace(/\/$/, ''));
+    return [...new Set(paths)].filter((filePath) => filePath && filePath !== '.fgos' && !filePath.startsWith('.fgos/'));
+  } catch {
+    return [];
+  }
+}
 
 const VIET = 'tài liệu/ghi chú.md';
 const EDGE = ' lề .md';

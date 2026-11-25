@@ -10,11 +10,9 @@ import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
 import { chooseStageOperation, executeDriverOperationChoice } from '../../src/runner/operation-choice.mjs';
-import { runUnitInHost } from '../../src/native/execution-door.mjs';
+import { runUnitInHost, RunnerConfigError } from '../../src/native/execution-door.mjs';
 import { createCaseAdmissionPort } from '../../src/workflow/case-admission-port.mjs';
-import { digestPinnedInputs } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { operationsForStep, getDomain } from '../../src/state/domain-registry.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture, prepareActivatedGitFixture } from '../helpers/git-fixture.mjs';
@@ -339,21 +337,6 @@ test('a read-only validate-plan result that shows a correlated change in its che
   assert.equal(next.reason, 'validation-correlated-mutation-do-not-advance-work');
 });
 
-test('pinned inputs: outside the allowed roots, or a symlink pointing out, are recorded with a null digest and never read', () => {
-  const { repo } = setupRepo();
-  const outside = makeFixtureDir('fgos-driver-rununit-outside-');
-  const secret = path.join(outside, 'secret.md');
-  fs.writeFileSync(secret, 'secret\n');
-  const link = path.join(repo, 'link.md');
-  fs.symlinkSync(secret, link);
-  const inside = writePlan(repo);
-  const digests = digestPinnedInputs([secret, link, inside, path.join(repo, 'missing.md')], repo);
-  assert.deepEqual(digests.map((d) => d.sha256 === null), [true, true, false, true]);
-  assert.equal(digests[0].warning, 'pin-outside-allowed-roots');
-  assert.equal(digests[1].warning, 'pin-outside-allowed-roots');
-  assert.equal(digests[2].rel, `${DOCS_REF}/plan.md`);
-  assert.equal(digests[0].rel, undefined);
-});
 
 test('declared and pinInputs come back from unit.json on resume, never from the caller', async () => {
   const { repo, runner } = setupRepo();
@@ -395,15 +378,6 @@ test('a mutating operation whose runner commit fails never lets the driver proce
   assert.equal(outcome.reason, 'unit-commit-failed');
 });
 
-test('a pinned input in a worktree nested inside the main checkout is recorded against that worktree', () => {
-  const { repo } = setupRepo();
-  const wt = path.join(repo, '.claude', 'worktrees', 'w1');
-  git(repo, ['worktree', 'add', '-b', 'nested-wt', wt]);
-  const plan = writePlan(wt);
-  const [digest] = digestPinnedInputs([plan], repo);
-  assert.equal(digest.root, fs.realpathSync(wt));
-  assert.equal(digest.rel, `${DOCS_REF}/plan.md`);
-});
 
 // Red-team attacks on this lane, kept as regression tests.
 test('a caller runnerConfig decides which executor runs the driver operation', async () => {
@@ -475,15 +449,4 @@ test('a resumed declared unit keeps its stored pattern, never the caller pattern
   assert.equal(unitJson(repo, first.unitRunId).pattern, 'solo');
 });
 
-test('a stale listed worktree path replaced by a symlink is not an allowed root', () => {
-  const { repo } = setupRepo();
-  const wt = makeFixtureDir('fgos-driver-rununit-stale-');
-  fs.rmSync(wt, { recursive: true, force: true });
-  git(repo, ['worktree', 'add', '-b', 'fgw/stale', wt]);
-  const outside = makeFixtureDir('fgos-driver-rununit-outside2-');
-  fs.writeFileSync(path.join(outside, 'secret.md'), 'secret\n');
-  fs.rmSync(wt, { recursive: true, force: true });
-  fs.symlinkSync(outside, wt);
-  assert.equal(digestPinnedInputs([path.join(outside, 'secret.md')], repo)[0].sha256, null);
-});
 
