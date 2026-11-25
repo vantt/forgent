@@ -436,8 +436,8 @@ export function classifyOutcome(verb, isGranted, res) {
   }
 
   const refusalText = `${detail || ''}\n${rawErr}\n${rawOut}`;
-  // watcher tune refuses a non-tunable key with the host's generic validation category.
-  if (verb === 'watcher tune' && code === 'validation' && refusalText.includes('is not tunable')) {
+  // watcher tune refuses a non-tunable key as validation, or as host-failed when the forwarder got no host code.
+  if (verb === 'watcher tune' && (code === 'validation' || code === 'host-failed') &&refusalText.includes('is not tunable')) {
     return { observed: 'served', code, detail: detail || 'domain refusal: key is not tunable', reply };
   }
 
