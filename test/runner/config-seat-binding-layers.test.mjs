@@ -10,7 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { globalConfigPath, projectConfigPath, writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
-import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config-twin.mjs';
+import { loadRunnerConfigForDir } from '../../src/native/execution-door.mjs';
 
 const GLOBAL_RUNNER = () => ({
   capabilities: {

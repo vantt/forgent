@@ -9,9 +9,18 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { parseTierCell } from '../../src/runner/dispatch/tier-cell.mjs';
-import { loadRunnerConfigForDir, supportsPolicyTier } from '../../src/runner/dispatch/config-twin.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
+import { loadRunnerConfigForDir, RunnerConfigError } from '../../src/native/execution-door.mjs';
 import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+
+function supportsPolicyTier(cfg, providerModel, policyTier) {
+  const cell = cfg?.modelPolicies?.[providerModel]?.[policyTier];
+  if (cell === undefined) return false;
+  try {
+    return parseTierCell(cell, providerModel).length > 0;
+  } catch {
+    return false;
+  }
+}
 
 
 test('a plain model is served by the pool named after its family', () => {

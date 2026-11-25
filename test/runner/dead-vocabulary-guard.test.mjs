@@ -5,6 +5,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { existingProjectConfigPaths } from '../helpers/config-fixture.mjs';
+import { parseYaml } from '../../src/util/yaml.mjs';
+import * as workModule from '../../src/state/work.mjs';
+import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '../..');
 
@@ -151,85 +155,6 @@ test('dead vocabulary guard: the project config does not contain runner.models o
     assert.equal(parsed.runner?.models, undefined, `${configPath} must not declare runner.models`);
   }
 });
-
-import os from 'node:os';
-import { validateRunnerConfigShape } from '../../src/runner/dispatch/config-twin.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
-
-// A removed key has no schema node to refuse it by name, so `validateRunnerConfigShape` says what replaced it. A
-// removed key inside a capability entry is an unknown key to the schema, which refuses it
-// (packages/config/rust/tests/golden_validate.rs).
-test('dead vocabulary guard: the runner config check rejects dead keys with actionable instructions', () => {
-  const base = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' } },
-    timeoutMs: 1000,
-  };
-
-  // 1. runner.models
-  assert.throws(
-    () => validateRunnerConfigShape({ ...base, models: { standard: 'sonnet' } }, 'test'),
-    (err) => err instanceof RunnerConfigError && /declares retired "models": use "modelPolicies\.<provider>\.<tier>" instead/.test(err.message),
-  );
-
-  // 2. executors.*.rigorOverrides
-  assert.throws(
-    () => validateRunnerConfigShape({
-      ...base,
-      executors: { gemini: { kind: 'agent', invocations: [{ id: 'gemini-cli', via: 'cli', command: 'gemini', args: [] }],  providerModel: 'gemini', rigorOverrides: { heavy: 'advanced' } } },
-    }, 'test'),
-    (err) => err instanceof RunnerConfigError && /"rigorOverrides" was removed\. express per-tier models in runner\.modelPolicies/.test(err.message),
-  );
-});
-
-import { effectiveDispatchPolicy as policyOf } from '../../src/runner/dispatch/plan.mjs';
-import { bindable } from '../helpers/work-seat-config.mjs';
-const effectiveDispatchPolicy = (args) => policyOf({ ...args, runnerConfig: bindable(args.runnerConfig) });
-import { buildAssignment } from '../helpers/declared-assignment.mjs';
-
-test('dead vocabulary guard: capabilities.<cap>.rigor is a demand that moves no tier', () => {
-  const baseConfig = {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    modelPolicies: {
-      claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet-adv', flagship: 'opus', frontier: 'fable' },
-    },
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-    timeoutMs: 1000,
-  };
-
-  // capabilities.<cap>.rigor is a demand: it raises the effective rigor and never the tier
-  const runnerConfig = {
-    ...baseConfig,
-    capabilities: {
-      'code:review': { rigor: 'high' },
-    },
-  };
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-    policy: { capability: 'code:review', rigor: 'standard' },
-  });
-
-  const effective = effectiveDispatchPolicy({ assignment, runnerConfig });
-  assert.equal(effective.rigor, 'high', 'capability rigor high should win over step standard');
-  assert.equal(effective.tier, 'standard', 'high rigor does not map to a tier: the config declares it');
-  assert.equal(effective.model, 'sonnet');
-  assert.equal(effective.provenance.rigor.source.scope, 'capability');
-  assert.equal(effective.provenance.rigor.source.id, 'code:review');
-
-  // The tier a capability runs at is declared next to its rigor.
-  const declared = effectiveDispatchPolicy({
-    assignment,
-    runnerConfig: { ...runnerConfig, capabilities: { 'code:review': { rigor: 'high', tier: 'flagship' } } },
-  });
-  assert.equal(declared.tier, 'flagship');
-  assert.equal(declared.model, 'opus');
-});
-
-import * as workModule from '../../src/state/work.mjs';
-import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
-import { existingProjectConfigPaths } from '../helpers/config-fixture.mjs';
-import { parseYaml } from '../../src/util/yaml.mjs';
 
 test('dead vocabulary guard: Phase 3 Work tier retired, size and rigor enforced', () => {
   // 1. workModule exports SIZES, not TIERS

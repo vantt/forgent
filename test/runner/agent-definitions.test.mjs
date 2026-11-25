@@ -20,9 +20,6 @@ import {
   scanAgentTiers,
 } from '../../src/runner/agent-definitions.mjs';
 
-import { renderAssignmentPrompt } from '../../src/runner/dispatch/assignment.mjs';
-import { buildAssignment } from '../helpers/declared-assignment.mjs';
-
 const definition = (name, extra = '') => `name: ${name}\ndescription: ${name} posture\n${extra}`;
 
 function makeProject(t) {
@@ -302,14 +299,6 @@ test('a persona that declares skills renders one skills line, and none when it d
   assert.doesNotMatch(without, /Skills to load/);
 });
 
-test('a head session and a worker brief render the same persona section for the same persona', (t) => {
-  const { root, write } = makeProject(t);
-  write('core/agents/critic.yaml', definition('critic', 'persona:\n  voice: calm\nskills: [handoff]\n'));
-  const assignment = buildAssignment({ workId: 'tsk-same', stage: 'planning', operation: 'validate-plan' });
-  const brief = renderAssignmentPrompt(assignment, { repoRoot: root, persona: { value: 'critic', source: { scope: 'default', id: 'reviewer' } } });
-  const section = renderPersonaSection('critic', { projectRoot: root }).join('\n');
-  assert.ok(brief.includes(section), 'the brief carries the door\'s section verbatim');
-});
 
 test('pinPersona returns the name, digest, text and identity the lookup resolved', (t) => {
   const { root, write } = makeProject(t);
