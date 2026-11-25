@@ -26,62 +26,69 @@ Opened by the secretary (Miu) on the owner's order, 2026-11-25. Owner: Miu and t
 
 ## 1. Trạng thái hiện tại
 
-Round 1 (2026-11-25 22:10, shaper). Domain: coding (fgOS platform, session-host and agent-mailbox). Authority: `fgos authority locate` names `agent-mailbox` and `questions` as the owning components; no new component is needed so far.
+Round 2 (2026-11-25 22:25, shaper, owner live in chat). Domain: coding (fgOS platform). Authority: `fgos authority locate` names `agent-mailbox` and `questions` as owners; no new component so far.
 
-The scouting changes the shape of the seed. Two of the three doors the item asks for already exist and are granted to every head; the third (peer to peer) is the one that is broken:
+Settled direction this round (owner, provisional until it holds one more round):
 
-- **Owner channel exists.** Every head persona inherits `questions ask|ack|cancel` and `supervisor raise --kind coordination-help` from the base `head` row of `packages/session-host/contracts/head-permissions.v1.json`. The `unknown-name` Miu hit was the mailbox, which is not the owner door; supervision spec 1.1 already says owner decisions go through the question store.
-- **Grant request exists for unmatched verbs.** An argv that no row of the permission table matches is decided `ask`: `ask_owner` in `packages/run-supervisor/rust/src/head_request.rs:1572` files a five-part owner question carrying the exact argv and answers `asked` with the question id. What is missing: a `deny` row and an `args`-limited row (e.g. a lead's `mailbox send --to` outside `head:secretary-*|head:supervisor-*`) refuse flat, and the refusal text does not tell the head that it can file a request or how.
-- **Peer channel is broken inside the cage.** Mail send from a confined head fails (`host-failed` with no reason, p-nnaksnxtwu; `event-store-unavailable` read-only FS, p-ia2v33b54u); mail read fails `lock-unavailable` (p-rchuoa2v3k); mail is lost across a rotation (p-bifjfd5rix). `session type` only works on a target named by an open supervision event, by design.
-- **Bare `host-failed`** is the fallback code of `packages/session-host/rust/src/forwarder.rs:509` when the host verb's output carries no code the forwarder can parse.
+- **The real gap is know-how, not only mechanism.** A channel always exists; the sending head lacks the capability to use all of it (Miu stopped after `session type` and `mailbox send` failed, though `supervisor raise` and `questions ask` worked).
+- **Communication has exactly two scopes: same machine and cross machine.** Same machine is the mailbox (`agent-mailbox/spec.md`: one machine, one project, live heads only). Cross machine is the Event Store (question store, supervision queue), synced through git.
+- **Principle: use the fastest available channel first, then step down to the next.** Communication is a ladder ordered by delivery speed, each rung gated by whether it is available for this message right now, not one fixed door.
 
-Open: which door is the guaranteed peer channel (q- id below, parked). Everything else is shaped provisionally in §3 and can move without that answer.
-
-Parked owner questions: `q-ng4ojyph5r` (§3 row 1, [Q1](#Q1)).
+Open: who walks the ladder, the head itself (taught by a shared skill and by refusals) or the send door automatically. Parked as `q-hcnhbtf74z` (§3 row 1, [Q2](#Q2)). `q-ng4ojyph5r` (mailbox or queue as the one peer door) is superseded by the ladder principle.
 
 ## 2. Mục tiêu & đề bài
 
-A head (secretary, supervisor, lead, planner, shaper) runs inside a confinement cage and talks to the world only through its request socket and the permission table. When it lacks a verb or a route, today it often cannot say so: the refusal is flat, sometimes reasonless (`host-failed`), and the mailbox it would use to tell a peer is itself broken inside the cage. The goal is that no head is ever both stuck and silent: it always has one working door to the owner, one working door to a peer head, every refusal names its cause and the next step, and a refusal for a missing grant turns into a request the owner (through Miu) can answer, without the head needing the very thing it lacks. This gathers six existing backlog rows into one shape instead of adding a seventh mechanism (RUL11), and it does not widen any head's powers: answering a request stays the owner's.
+A head (secretary, supervisor, lead, planner, shaper) runs inside a confinement cage and talks to the world only through its request socket and the permission table. Today it can be stuck and silent: the refusal is flat or reasonless (`host-failed`), the mailbox is broken inside the cage, and the head does not know which other channel still works. The goal is that no head is ever both stuck and silent. Communication has two scopes, same machine and cross machine; for every message the head (or its door) uses the fastest channel available for that scope first and steps down until one delivers, every refusal names its cause and the next rung, and a refusal for a missing grant becomes a request the owner (through Miu) can answer without the head needing what it lacks. This gathers six backlog rows into one shape instead of a seventh mechanism (RUL11) and widens no head's powers.
 
 ## 3. Vấn đề rõ / chưa rõ
 
 | # | Point | State | Current view | Evidence |
 |---|---|---|---|---|
-| 1 | Which door is the guaranteed peer channel (head to head) | open, owner question `q-ng4ojyph5r` | Recommend: fix the mailbox inside the cage (send and read through the request socket) and keep it the one peer door; the supervision queue stays the help door, not a chat. | p-rchuoa2v3k, p-ia2v33b54u, p-bifjfd5rix; supervision spec 1.1 |
-| 2 | Which door is the guaranteed owner channel | provisional | The question store (`questions ask`), already granted to every head; no new verb. The mailbox does not reach the owner and should not. | head-permissions.v1.json `head` row; supervision spec 1.1 |
-| 3 | How a head requests a missing grant | provisional | Reuse the existing `ask` decision (`ask_owner`). Extend only the refusal: a `deny`, `argv-not-allowed` or `recipient-not-allowed` refusal names the row that refused and the exact next step (`fgos questions ask` with the argv), so the head can file it itself. `deny` rows stay hard. | forwarder.rs:41-55, head_request.rs:1572 |
-| 4 | Who receives a grant request | provisional | The owner, through the question store; Miu relays as today. No separate secretary inbox. | supervision spec 1.1; ds-cfsfcbknl6 |
-| 5 | Bare `host-failed` | clear (fix) | Every forwarded refusal carries a domain code; `host-failed` with no parseable code becomes a defect with the host's own stderr tail attached, and the case Miu hit gets its real code. | forwarder.rs:509, head-request.mjs:197 |
-| 6 | Mail lost across rotation | clear (fix, belongs to the peer door) | Folded in under row 1 whichever door wins, if the mailbox wins. | p-bifjfd5rix |
-| 7 | Mailbox head finder beside Identity | open, scope | Likely out of this shape (it is an identity-boundary cleanup, not a communication gap); keep as its own row unless the confined-read fix touches it. | p-5igcekysul |
-| 8 | Mailbox latency and reliability measurement | open, scope | Measure-first item; a later step once the cage door works, not a blocker. | p-whvn2fgyep |
-| 9 | Owner-side wording | settled elsewhere | ds-cfsfcbknl6 owns the owner-facing form; this discussion uses it. | p-wb6rkwpjsg |
+| 1 | Who walks the ladder: the head (skill + refusal hints) or the send door (one send tries rungs in order) | open, owner question `q-hcnhbtf74z` ([Q2](#Q2)) | Recommend the door: a deterministic walk the head cannot get wrong, which is the owner's own diagnosis (heads lack the capability). | owner round 2; design principle 5 |
+| 2 | The ladder order | provisional (owner principle) | Same machine, recipient live: mailbox (seconds). Otherwise or when it fails: Event Store, a supervision event naming the recipient (minutes, crosses machines). Last: question store to the owner (human latency). `session type` is not a rung: it is the supervisor's hands-on act on a stuck session. | `agent-mailbox/spec.md` §1 scope; `questions/spec.md` machine field |
+| 3 | "Available" | provisional | Decided per message from live facts: is the recipient a live head on this machine (Identity), is the mailbox breaker closed, does the head's table allow the rung. Never from a cached guess. | design principle 5 |
+| 4 | Mailbox inside the cage | clear (fix) | Send and read go through the request socket so the host writes the record; the cause of today's send failure is not proven yet, so the plan diagnoses first. | p-rchuoa2v3k, p-ia2v33b54u |
+| 5 | Mail across rotation | clear (fix) | Mail is addressed to the role, follows a rotation, offered once. | p-bifjfd5rix |
+| 6 | Every refusal names cause and next rung | clear (fix) | No bare `host-failed`; a refusal names the row or rung that refused and the next rung this head may use, read from the permission table so it never drifts. | forwarder.rs:509, head-request.mjs:197 |
+| 7 | Missing-grant request | provisional | Reuse the existing `ask` decision (`ask_owner`); `deny` rows stay hard but their refusal names the request step. | head_request.rs:1572 |
+| 8 | Shared know-how | provisional | One `_shared` file on the two scopes and the ladder, referenced by every head skill; the three private copies (secretary, supervisor, lead skills) move into it. | `core/skills/fgos-{secretary,supervisor,lead}/SKILL.md` |
+| 9 | Does the supervision queue cross machines for a peer message | open, not verified | To check before planning: questions are acted on only by the asker's machine; whether a supervision event raised on A is seen by the supervisor on B is unread. | `questions/spec.md` machine rule |
+| 10 | Mailbox head finder beside Identity | out of scope | Own row. | p-5igcekysul |
+| 11 | Mailbox latency measurement | later | After the ladder works. | p-whvn2fgyep |
+| 12 | Owner-side wording | settled elsewhere | ds-cfsfcbknl6. | p-wb6rkwpjsg |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Decision | Date | Basis |
 |---|---|---|---|
 
-(None yet; no point has held across more than one round.)
+(None yet; the three owner points of round 2 are minted once they hold through the next round.)
 
 ## 5. Q&A log
 
-- **2026-11-25 22:10, shaper, round 1.** Scouted the permission table, the forwarder refusal path and `ask_owner`. Finding: the owner door and the unmatched-verb grant request already exist; the peer door (mailbox inside the cage) and reasonless refusals are the real gaps. Parked one owner question on the peer door (§3 row 1): `q-ng4ojyph5r`.
+- **2026-11-25 22:10, shaper, round 1.** Scouted the permission table, the forwarder refusal path and `ask_owner`. Finding: the owner door and the unmatched-verb grant request already exist; the peer door (mailbox inside the cage) and reasonless refusals are the real gaps. Parked `q-ng4ojyph5r` (mailbox or queue as the peer door).
+- **2026-11-25 22:15, owner (chat).** Asked for the goal and the current state; shaper restated both.
+- **2026-11-25 22:17, owner.** Agreed to the six fix steps (mailbox through the socket, grants unchanged, mail by role, sender always knows the result, a guaranteed fallback, a live probe per persona).
+- **2026-11-25 22:18, owner.** "luôn có khả năng trao đổi nhưng người gửi không có đủ năng lực để sử dụng hết khả năng." Shaper added step 7: shared know-how, self-teaching refusals, a probe that breaks the mailbox and checks the head falls back.
+- **2026-11-25 22:19, owner.** "về trao đổi thực chất chỉ có 2 phạm vi, xuyên máy hoặc cùng máy." Shaper mapped same machine to the mailbox and cross machine to the Event Store.
+- **2026-11-25 22:20, owner.** "nguyên tắc là phải sử dụng kênh khả dụng cho kết quả truyền tải nhanh nhất trước, sau đó thử xuống các kênh khác." Supersedes the single-door framing of `q-ng4ojyph5r`; new open point §3 row 1.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Not yet settled. Provisional shape: three doors, each already in the code, made reliable rather than added to.
+Not yet settled; provisional shape after round 2.
+
+Communication is a ladder in two scopes. For each message the fastest rung available for it is tried first; a rung that is not available or fails yields to the next, and the sender always learns which rung delivered or why none did. Rungs, fastest first: the mailbox (same machine, recipient a live head), a supervision event naming the recipient on the Event Store (crosses machines), and the owner question store (human). Every rung is reached from inside the cage through the request socket, so no head needs a write it lacks. A refusal names its cause and the next rung. A missing grant is asked through the existing `ask` path. Heads learn the ladder from one shared skill file, and the refusal text repeats the next step at the moment it is needed.
 
 ```mermaid
-flowchart LR
-  H[Confined head] -->|request socket| T{Permission table}
-  T -->|allow| V[Verb runs]
-  T -->|no row: ask| Q[Question store: owner]
-  T -->|deny / args refused| R[Refusal naming row + next step]
-  R -->|head files| Q
-  H -->|questions ask| Q
-  H -->|supervisor raise coordination-help| S[Supervision queue]
-  H -->|mailbox send/read via socket| P[Peer head]
+flowchart TD
+  M[Head has a message] --> A{Recipient a live head on this machine?}
+  A -- yes --> MB[Rung 1: mailbox via request socket]
+  A -- no / unknown --> EV[Rung 2: supervision event naming recipient, Event Store]
+  MB -- delivered --> OK[Sender told: delivered by mailbox]
+  MB -- refused, cause named --> EV
+  EV -- recorded --> OK2[Sender told: queued on Event Store]
+  EV -- refused, cause named --> Q[Rung 3: owner question store]
+  Q --> OK3[Sender told: asked q-id]
 ```
 
 ## 7. Danh mục hạng mục / task {#tasks}
@@ -90,4 +97,8 @@ Draft only; filled once §3 row 1 is answered.
 
 ## Q1 {#Q1}
 
-Which door is the one guaranteed head-to-head channel? Recommended: fix the mailbox inside the cage (send and read through the request socket, mail follows a rotation, refusals name their cause) and keep it the one peer door; the alternative is to carry peer messages on the supervision queue. Five-part form in the question store; id: `q-ng4ojyph5r`.
+Which door is the one guaranteed head-to-head channel? Superseded on 2026-11-25 22:20 by the owner's ladder principle (fastest available first, then step down); `q-ng4ojyph5r` superseded by `q-hcnhbtf74z`.
+
+## Q2 {#Q2}
+
+Who walks the ladder: each head by itself, taught by a shared skill and by refusals that name the next rung, or one send door that tries the rungs in order and reports which delivered? Recommended: the door. Five-part form in the question store; id: `q-hcnhbtf74z`.
