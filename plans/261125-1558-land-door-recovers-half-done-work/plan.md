@@ -1,8 +1,9 @@
 ---
 contract: plan-v1
 title: "The land door finishes or recovers its own half-done work"
-status: ready
-base: ebd19c364eb46cedcbb3837d44bd9a905d6250c0
+status: running
+lead: head:lead-forgent-261125-1558-land-d-ea1cc
+base: a5e9f9b40052194d625012f4d2c24cf21a2189ec
 priority: P1
 blockedBy: []
 footprint:
