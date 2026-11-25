@@ -264,3 +264,7 @@ git -C /home/vantt/projects/forgent-worktrees/261124-0004-heads-operate-without-
   schema's `x-fgos-sensitivity: command` marker (one source) or adds those four paths. It also points the contract prose
   in `head-request.v1.json` at the table instead of copying the list (`runner.confinementPolicies` is missing there),
   removes the stage file only on a successful `create_new`, and opens intermediate path components with no-follow.
+- 2026-11-25 12:58 (lead): the owner answered `q-hwtikojjei` "Reword and commit by hand" and did it: line 377 of
+  `docs/platform/run-supervisor/spec.md` now says "khung `can-i`", committed as `5fbed1872` on
+  `heads-operate-without-owner/p02`; the p02 worktree is clean (71 commits behind main). Next: the schema-derived
+  `protectedConfigPaths` fix unit (see 11:40), then re-review and land.
