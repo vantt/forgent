@@ -70,6 +70,8 @@ Kept for phase 11 (not deleted here): `src/runner/dispatch/write-scope.mjs` — 
   - **behaviour removed**: R8 cycle-cut test that only asserted absence of deleted `config-twin.mjs` / `transport.mjs` / `config.mjs`; history-outcome.mjs absence assertion inside the pattern-vocabulary rename test.
   - `test/runner/run-result-source-scan.test.mjs` — removed exemption for deleted `src/runner/dispatch/run-result.mjs`.
   - `packages/holder-lock/contracts/lock-registry.v1.json` — reconcile note names Rust owner `apps/fgos/src/wiring/dispatch_subs/reconcile.rs`.
+  - `test/holder-lock/driver-unavailable.test.mjs` — dropped the dead `src/runner/dispatch/adapters.mjs` case (`ADAPTERS_URL`, `workerBaseEnv` import/`out.workerEnv`, and the `out.workerEnv` assertion); owner is `packages/execution/engine/src/transport/worker_home.rs`.
+
 - No `p-24xw2cwdvo` remains under `packages/component-authority/model/` or `test/architecture.test.mjs`.
 
 ### Contract notes
@@ -102,5 +104,4 @@ Kept for phase 11 (not deleted here): `src/runner/dispatch/write-scope.mjs` — 
 
 ## Left for others
 
-- `test/holder-lock/driver-unavailable.test.mjs` (outside this footprint) still imports deleted `src/runner/dispatch/adapters.mjs` for `workerBaseEnv`; Rust owner is `packages/execution/engine/src/transport/worker_home.rs`.
 - `spawnWithLocks` in `src/holder-lock/index.mjs` lost its only production caller (`src/run-supervisor/direct-launch.mjs` deleted). `test/holder-lock/facade-multiprocess.test.mjs` still calls it.
