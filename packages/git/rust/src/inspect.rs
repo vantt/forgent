@@ -1565,4 +1565,66 @@ impl GitDriver {
             .collect::<Result<Vec<_>>>()?;
         page(entries, &bytes, cursor, max)
     }
+    /// All commits reachable from `tip` that are not reachable from `base` (`base..tip`).
+    pub fn commits_between(&self, repo: &RepoHandle, base: &Oid, tip: &Oid) -> Result<Vec<Oid>> {
+        self.require_commit(repo, base)?;
+        self.require_commit(repo, tip)?;
+        let range = format!("{}..{}", base.as_str(), tip.as_str());
+        let bytes = self.checked(repo, &["rev-list", &range, "--"], Policy::Inspect)?;
+        bytes
+            .split(|b| *b == b'\n')
+            .filter(|l| !l.is_empty())
+            .map(|l| oid(repo, l))
+            .collect()
+    }
+    /// For a list of commit oids on the main checkout's branch, returns which of them
+    /// were made by a ScopedCommit chain of the main checkout from retained journal records.
+    /// Unknown provenance or compacted history answers "not ours". Stops at the first foreign commit.
+    pub fn main_checkout_scoped_commits(
+        &self,
+        repo: &RepoHandle,
+        commits: &[Oid],
+    ) -> Result<Vec<Oid>> {
+        if commits.is_empty() {
+            return Ok(Vec::new());
+        }
+        let wal = match crate::wal::Wal::open_existing(repo.common_dir(), crate::wal::OsFileSystem)
+        {
+            Ok(w) => w,
+            Err(_) => return Ok(Vec::new()),
+        };
+        let chains = match wal.retained(100_000) {
+            Ok(c) => c,
+            Err(_) => return Ok(Vec::new()),
+        };
+        let main_root = repo.trusted_main_root();
+        let mut retained_ours: std::collections::HashSet<String> = std::collections::HashSet::new();
+
+        for chain in chains {
+            if let crate::wal::OperationKind::ScopedCommit(ref payload) = chain.intent().kind {
+                let is_main = std::path::Path::new(&payload.worktree) == main_root
+                    || std::fs::canonicalize(&payload.worktree).ok()
+                        == std::fs::canonicalize(main_root).ok();
+                if is_main {
+                    if let Some(crate::wal::Outcome::Commit {
+                        ref observed,
+                        contract_violation: false,
+                    }) = chain.outcome()
+                    {
+                        retained_ours.insert(observed.clone());
+                    }
+                }
+            }
+        }
+
+        let mut ours = Vec::new();
+        for commit in commits {
+            if retained_ours.contains(commit.as_str()) {
+                ours.push(commit.clone());
+            } else {
+                break;
+            }
+        }
+        Ok(ours)
+    }
 }
