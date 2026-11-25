@@ -1,7 +1,7 @@
 ---
 id: p-cd2ejz7wa5
 title: The documentation commit gate can pass what it claims to refuse
-status: proposed
+status: done
 priority: P2
 area: documentation
 created: 2026-11-06
@@ -18,3 +18,5 @@ doc-health checks the staged blob of each path it is given; the hook selects `AC
 # Notes
 
 Migrated from the legacy backlog table. Original status: proposed.
+
+Done 2026-11-25, checked against main: staged-blob gate that refuses on findings (`d8bc63a7f`, wiring proof in `test/e2e/root-file-guard-hook.test.mjs`), hook selects `ACMRD` (`.githooks/pre-commit`), named paths and verbs checked (`db6e366cf`), classify takes many paths in one call (`72057b258`), provisional aging parses the time and the topic limit is read from config with `topicMaxDocs` in `core/config-schema/docRegistry.schema.yaml` (`4696edbb7`, proof in `test/report/knowledge-lints.test.mjs`).
