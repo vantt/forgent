@@ -1,9 +1,9 @@
 {
-  "sha": "26d264e49d1646a111dda4718fd8a0f5f857058f",
-  "files": 610,
-  "tests": 7714,
-  "rustTests": 4410,
-  "wallSeconds": 625,
+  "sha": "482ffa59e93092ce6f12c2f57c03d97bf4438d73",
+  "files": 504,
+  "tests": 6143,
+  "rustTests": 4762,
+  "wallSeconds": 585,
   "cpuSeconds": 6199,
   "fileCpu": {
     "test/architecture.test.mjs": 33.6,
