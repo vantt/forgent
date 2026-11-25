@@ -19,9 +19,15 @@ Coordination data already has a home outside main: the Event Store (`docs/platfo
 
 Plan frontmatter keeps changing only when the plan changes state for real (draft, ready, running, done).
 
+# Discussions
+
+A discussion is the same pattern: the shaping skill says to commit `DISCUSSION.md` at the end of every round, so every owner reply was a commit on main. On 2026-11-25 from 10:00 to 11:45, 9 of 83 commits were rounds of one discussion (`ds-ubqlutna6r`). Worse, the shaper edits `DISCUSSION.md` in the main checkout and lands later, so the file sits dirty on main while the shaper waits for the owner; at 11:08 that dirty file made lead 2108's sync refuse. Two discussion files and one new discussion folder were dirty at 13:50.
+
+Owner order 2026-11-25 (agreed to proposals 1 and 2): a shaper works in a worktree or branch of its own for the discussion and commits each round there; the discussion lands on main once, when it is settled or a decision is final. No round is landed on main by itself, and the main checkout never holds a discussion edit.
+
 # Done when
 
-Main receives code, settled decisions and plan status changes only. A wake record and a lead's running-state note are events of a registered Event Store stream, read by the supervisor and later by the keeper from there; no phase file or report file is landed per wake. A design principle says every periodic writer names where it writes and how often.
+Main receives code, settled decisions (a discussion arrives once, settled) and plan status changes only. A wake record and a lead's running-state note are events of a registered Event Store stream, read by the supervisor and later by the keeper from there; no phase file or report file is landed per wake. A design principle says every periodic writer names where it writes and how often.
 
 # Notes
 
