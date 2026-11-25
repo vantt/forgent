@@ -217,4 +217,9 @@ Phase 2:
 
 ## Outstanding questions
 
-None
+- **q-zw4htizjz2**: Stop the plan check counting the regenerated Git census as a footprint
+  clash, so the land-gate fix can go ready? The plan stays `draft` until it is answered:
+  `node scripts/plan-contract-check.mjs` refuses `ready` because
+  `packages/git/contracts/mutation-census.v1.json` is also claimed by the running plan
+  `261122-2108-delete-dead-node-execution-closure` (and three other running plans). The
+  phase design does not depend on the answer; only admission does.
