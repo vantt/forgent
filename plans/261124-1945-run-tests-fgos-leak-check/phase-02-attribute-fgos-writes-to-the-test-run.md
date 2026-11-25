@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: Attribute .fgos writes to the test run
-status: ready
+status: done
 ---
 
 # Phase 2: Attribute .fgos writes to the test run

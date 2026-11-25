@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "The leak check of run-tests judges only what the test run wrote"
-status: running
+status: done
 lead: head:lead-forgent-261124-1945-run-te-f3bee
 priority: P1
 blockedBy: []
@@ -128,7 +128,7 @@ survivor: `scripts/lib/fgos-write-witness.mjs` read back in `runSelectedTests`; 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Skip live runtime directories in the leak check](phase-01-skip-live-runtime-dirs.md) | - | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs | 1 | done |
-| 2 | [Attribute .fgos writes to the test run](phase-02-attribute-fgos-writes-to-the-test-run.md) | 1 | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs, scripts/lib/fgos-write-witness.mjs, test/scripts/full-suite-queue.test.mjs, test/scripts/test-select.test.mjs, test/scripts/run-test-canary.test.mjs | 2 | running |
+| 2 | [Attribute .fgos writes to the test run](phase-02-attribute-fgos-writes-to-the-test-run.md) | 1 | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs, scripts/lib/fgos-write-witness.mjs, test/scripts/full-suite-queue.test.mjs, test/scripts/test-select.test.mjs, test/scripts/run-test-canary.test.mjs | 2 | done |
 
 Phase 1: one phase, one wave: one constant, one walk filter and one test file.
 
@@ -143,6 +143,19 @@ listed is left out of the footprint: the land door regenerates it (Risks). Check
 `node scripts/plan-contract-check.mjs` and `fgos resource-check --plan`.
 
 ## Progress
+
+- 2026-11-25 15:10: phase 2 done; plan done. Branch `run-tests-fgos-leak-check/p02s` (commits
+  `ffcf08a35` witness and reader, `5f44a1cb2` review fixes: whole-store root, recursive mkdir
+  ancestors, late stray writes, empty added directories, fail-closed logging) landed as main
+  `9306c5df7` (ticket `c-38193-1795592028795`). Land gates passed, among them the census test and
+  `test/scripts/run-test-canary.test.mjs`; `rg LIVE_FGOS_DIRS` is empty (AC1-AC6). The door
+  removed the p02s worktree. Review: reviewer findings 1-7 were fixed by unit `c-32672-1795591114959`
+  before the land. Step 7 is weak, not done: the verification unit `c-2670-1795593697937` could not
+  run `npm test` or a subset, because run-tests takes `~/.local/state/fgos/locks/full-suite.lock`
+  first and that path is read-only in unit sandboxes (EROFS), so no test ran. The only evidence is
+  the 13:30 subset walk (0 `.fgos` changes the witness missed). The full-suite walk-vs-witness
+  comparison is handed to the supervisor. The carry patch is removed. Worktrees kept and handed to
+  the supervisor: `-p02` (superseded uncommitted copy of the change) and `-p02r` (clean, merged).
 
 - 2026-11-25 13:45: owner answered q-4aalqblcof "Widen footprint by the three files" (acked). A lead's
   paths land refuses a footprint change (`footprint-change-refused`), so phase 2 stays parked (status

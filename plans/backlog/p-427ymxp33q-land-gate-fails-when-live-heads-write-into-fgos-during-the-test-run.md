@@ -1,7 +1,7 @@
 ---
 id: p-427ymxp33q
 title: "The land gate fails at random when a live head writes into .fgos while the gate's tests run (land; source: owner, 2026-11-25)"
-status: proposed
+status: done
 priority: P1
 area: land
 created: 2026-11-25
