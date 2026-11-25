@@ -1,6 +1,6 @@
 ---
 id: p-pbebee63t6
-title: The suite's `.fgos` witness reports the cleanup of a `fgos:dev` run directory as a leak, so every full run exits 1 (tests; source: owner order via lead:SUPERVISOR, 2026-11-25)
+title: "The suite's `.fgos` witness reports the cleanup of a `fgos:dev` run directory as a leak, so every full run exits 1 (tests; source: owner order via lead:SUPERVISOR, 2026-11-25)"
 status: proposed
 priority: P2
 area: tests

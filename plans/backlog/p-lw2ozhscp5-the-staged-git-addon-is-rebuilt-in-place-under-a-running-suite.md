@@ -1,6 +1,6 @@
 ---
 id: p-lw2ozhscp5
-title: The staged git addon of the main checkout is rebuilt in place, so a source change during a full suite makes its tests fail with `git-addon-unavailable: digest mismatch` (tests; source: owner order via lead:SUPERVISOR, 2026-11-25)
+title: "The staged git addon of the main checkout is rebuilt in place, so a source change during a full suite makes its tests fail with `git-addon-unavailable: digest mismatch` (tests; source: owner order via lead:SUPERVISOR, 2026-11-25)"
 status: proposed
 priority: P2
 area: tests
