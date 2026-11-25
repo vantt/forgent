@@ -21,7 +21,8 @@
    in tokens, for each head persona and each worker operation. Count each start as its opening plus the always-loaded
    text the CLI reads (AGENTS.md, CLAUDE.md), so the table shows the net change per start and not only the opening.
    Report the external blocks (AgentKit, GitNexus, MDView, `.claude/rules`) as an unchanged line of their own.
-4. Add a line to `## [Unreleased]` in `CHANGELOG.md` covering two things: agents get their start context from one
+4. Add a line to `## [Unreleased]` in `CHANGELOG.md`, after ACE phase 6's line (which covers the checked rule store),
+   covering two things: agents get their start context from one
    composer, and hand-opened sessions get context through a SessionStart hook with the configurable
    `startContext.entryPersona`.
 5. Run `rg -n "openingText|FIRST_STEPS|renderOnWake|renderPersonaSection" src scripts` and the one-producer test once

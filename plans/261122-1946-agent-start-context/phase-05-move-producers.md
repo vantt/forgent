@@ -2,7 +2,8 @@
 
 Slice 1's move (ASC-D1, ASC-D7). Every persona and opening producer moves in this one change, so there is never a
 window with three renderers. The largest phase in the plan. It starts only after plans
-`261122-2108-delete-dead-node-execution-closure` and `261124-0004-heads-operate-without-owner` are `done`.
+`261122-2108-delete-dead-node-execution-closure`, `261124-0004-heads-operate-without-owner` and
+`261125-1631-agent-context-engine` are `done`.
 
 ## Inputs
 
@@ -10,6 +11,8 @@ window with three renderers. The largest phase in the plan. It starts only after
   re-checked on `2c27d499a` in `plans/reports/planner-261125-1109-asc-plan-refresh-against-main.md`.
 - The goldens and `NOTES.md` from phase 4. The crate and the `fgos internal start-context compose` door from
   phase 3.
+- ACE's rule-unit schema and write-time check (ACE phases 3 and 4), and the gathered rules (ACE phase 5): the
+  ritual and first-step units written here must pass `fgos internal context-engine check`.
 - Callers to switch:
   - `src/session-host/head-start.mjs` (`openingText`, `FIRST_STEPS`, the start ritual, `defaultOpening`, and the
     `launchSessionInHost` call in `defaultLaunch`);
@@ -36,8 +39,11 @@ See the phase table in `plan.md`, row 5.
    `HostPrompt`, and writes or checks `packages/agent-start-context/goldens/worker/<case>.txt`. Re-run the phase-4
    recorder on this base: recapture any head or agent-file golden whose persona file changed since phase 4, naming
    the commit that changed it in `NOTES.md`.
-2. Persona data: move the start ritual and each persona's first step (today in `FIRST_STEPS` and the hardcoded
-   ritual) into `core/agents/*.yaml` as unit or persona fields, without changing the wording.
+2. Rules: move the start ritual and each persona's first step (today in `FIRST_STEPS` and the hardcoded ritual) into
+   ACE rule units under `core/instructions/`, scoped by `when:` (`kind: [head]` for the ritual, `persona: [<id>]` for
+   each first step), without changing the wording. This is their only move: they become rules in ACE, not persona
+   fields, so ACE's gathering never moves them again. Recompile the rule set. `core/agents/*.yaml` stays persona
+   data and is not edited here.
 3. Heads: `launch-session` takes a `StartRequest` (facts `kind=head`, `persona`, `cli`, `project`, and the payloads
    `task`, `for-question` and `handoff`, with delivery `opening`) instead of a finished `opening` string. The host
    calls the composer and writes the joined blocks to `brief.md` as it does today. Delete `openingText`,
