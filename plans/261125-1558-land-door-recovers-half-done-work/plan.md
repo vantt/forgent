@@ -112,9 +112,9 @@ for session writers Identity knows; this plan closes the pid case it missed.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Catch-up finishes an unpublished land-door commit](phase-01-catch-up-finishes-unpublished-commit.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, packages/git/rust/src/inspect.rs, plans/261125-1558-land-door-recovers-half-done-work/reports/ | 1 | ready |
-| 2 | [A bare pid writer is proven dead from OS state](phase-02-pid-writer-proven-dead.md) | - | packages/identity/rust/src/directory.rs, packages/identity/rust/tests/directory.rs | 1 | ready |
-| 3 | [Recover settles a dead writer's pending chains](phase-03-recover-dead-writer-chains.md) | - | packages/git/rust/src/incidents.rs, packages/git/rust/src/recovery.rs, packages/git/rust/src/land.rs, packages/git/rust/src/refs.rs, packages/git/rust/src/scoped_commit.rs, packages/git/rust/tests/incidents.rs | 1 | ready |
+| 1 | [Catch-up finishes an unpublished land-door commit](phase-01-catch-up-finishes-unpublished-commit.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, packages/git/rust/src/inspect.rs, plans/261125-1558-land-door-recovers-half-done-work/reports/ | 1 | done |
+| 2 | [A bare pid writer is proven dead from OS state](phase-02-pid-writer-proven-dead.md) | - | packages/identity/rust/src/directory.rs, packages/identity/rust/tests/directory.rs | 1 | done |
+| 3 | [Recover settles a dead writer's pending chains](phase-03-recover-dead-writer-chains.md) | - | packages/git/rust/src/incidents.rs, packages/git/rust/src/recovery.rs, packages/git/rust/src/land.rs, packages/git/rust/src/refs.rs, packages/git/rust/src/scoped_commit.rs, packages/git/rust/tests/incidents.rs | 1 | done |
 | 4 | [Integrate, docs and changelog](phase-04-integrate-docs-changelog.md) | 1, 2, 3 | packages/git/rust/tests/land_push_catch_up.rs, docs/platform/git/spec.md, docs/platform/identity/spec.md | 2 | ready |
 
 Each phase dispatches with capability `code:implement`. Phases 1-3 have disjoint footprints and run at once;
