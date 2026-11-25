@@ -253,3 +253,14 @@ cd /home/vantt/projects/forgent && fgos run "Implement phase 2 of plan plans/261
 sed -i '377s/`fgos can-i` hỏi cùng hàm đó/khung `can-i` hỏi cùng hàm đó/' /home/vantt/projects/forgent-worktrees/261124-0004-heads-operate-without-owner-p02/docs/platform/run-supervisor/spec.md
 git -C /home/vantt/projects/forgent-worktrees/261124-0004-heads-operate-without-owner-p02 add -- Cargo.lock docs/platform/run-supervisor/spec.md packages/run-supervisor/contracts/head-request.v1.json packages/run-supervisor/rust/src/head_request.rs packages/session-host/contracts/head-permissions.v1.json packages/session-host/rust/Cargo.toml packages/session-host/rust/src/forwarder.rs packages/session-host/rust/src/permissions.rs packages/session-host/rust/tests/forwarder.rs && git -C /home/vantt/projects/forgent-worktrees/261124-0004-heads-operate-without-owner-p02 commit -m "fix(session-host): close the argv window's deny-rule holes for --dir, real protected config paths and the patch file"
 ```
+- 2026-11-25 11:40 (lead): review of the uncommitted fix (both crates' tests green). Closed: `--dir` and the other
+  root flags in both forms, segment comparison through `fgos_yaml_doc::path::parse_path`, the `config patch` shape and
+  private copy, the `supervisor raise --kind` and `--delivered-to main` limits, and the value checks (the host owns
+  `--text` 4096, `watcher tune --set` and `metrics prune --settled`). One blocking gap, verified by the lead in
+  `core/config-schema/`: `protectedConfigPaths` misses keys marked `x-fgos-sensitivity: command` with scope `both`
+  (`worktreeSetup.commands`, `invariantChecks.commands`, `runner.capabilities.*.verify`, `runner.executor`), so a
+  supervisor's `config patch` could plant shell the host runs outside the sandbox. Next, after the owner's commit
+  (`q-hwtikojjei`): one more fix unit in p02, which commits normally from a clean baseline. It derives the guard from the
+  schema's `x-fgos-sensitivity: command` marker (one source) or adds those four paths. It also points the contract prose
+  in `head-request.v1.json` at the table instead of copying the list (`runner.confinementPolicies` is missing there),
+  removes the stage file only on a successful `create_new`, and opens intermediate path components with no-follow.
