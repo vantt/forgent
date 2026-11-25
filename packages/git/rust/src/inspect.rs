@@ -1588,7 +1588,8 @@ impl GitDriver {
         if commits.is_empty() {
             return Ok(Vec::new());
         }
-        let wal = match crate::wal::Wal::open_existing(repo.common_dir(), crate::wal::OsFileSystem) {
+        let wal = match crate::wal::Wal::open_existing(repo.common_dir(), crate::wal::OsFileSystem)
+        {
             Ok(w) => w,
             Err(_) => return Ok(Vec::new()),
         };

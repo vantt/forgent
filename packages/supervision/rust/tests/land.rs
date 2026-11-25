@@ -768,9 +768,7 @@ fn a_paths_land_finishes_an_unpublished_land_door_commit_without_a_hand_push() {
         message: "second landed commit".into(),
         ..paths(&["b"])
     };
-    let out = f
-        .land(&cmd, &config(vec![gate("true")]))
-        .unwrap();
+    let out = f.land(&cmd, &config(vec![gate("true")])).unwrap();
 
     assert_eq!(out.main_sha, f.remote_tip());
     let log = git(&f.remote, &["log", "--oneline", "refs/heads/trunk"]);
@@ -808,7 +806,10 @@ fn a_linked_worktree_commit_fast_forwarded_to_main_still_refuses_land_target_ahe
     let remote_before = f.remote_tip();
 
     let wt = f.temp.join("linked-wt");
-    git(&f.main, &["worktree", "add", "-qb", "feature", wt.to_str().unwrap()]);
+    git(
+        &f.main,
+        &["worktree", "add", "-qb", "feature", wt.to_str().unwrap()],
+    );
 
     let m = fs::metadata(&wt).unwrap();
     let birth = m

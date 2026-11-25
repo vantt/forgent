@@ -767,7 +767,10 @@ impl Lander<'_> {
                         .map_err(from_git)?;
                     let foreign: Vec<&Oid> = ahead.iter().filter(|c| !ours.contains(c)).collect();
                     let holds_slot = held()
-                        .map(|h| h.iter().any(|handle| handle.as_ref().name() == "merge-slot"))
+                        .map(|h| {
+                            h.iter()
+                                .any(|handle| handle.as_ref().name() == "merge-slot")
+                        })
                         .unwrap_or(false);
                     if foreign.is_empty() && holds_slot {
                         if !self.push_local(branch, held()?)? {
