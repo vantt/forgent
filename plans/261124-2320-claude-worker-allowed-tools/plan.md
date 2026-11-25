@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Claude worker units may run cargo, node and npm test through the standard claude-cli-bwrap invocation"
-status: running
+status: done
 lead: head:lead-forgent-261124-2320-claude-f6d5c
 priority: P1
 blockedBy: []
@@ -78,7 +78,7 @@ carries the edited standard is staged and activated.
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Grant in the standard invocation, its proof and the changelog line](phase-01-standard-grant.md) | - | core/config-standard/runner.yaml, test/runner/dispatch.test.mjs, CHANGELOG.md | 1 | done |
-| 2 | [Release and live cargo probe](phase-02-release-and-live-probe.md) | 1 | plans/261124-2320-claude-worker-allowed-tools/reports/live-cargo-probe.md | 2 | draft |
+| 2 | [Release and live cargo probe](phase-02-release-and-live-probe.md) | 1 | plans/261124-2320-claude-worker-allowed-tools/reports/live-cargo-probe.md | 2 | done |
 
 ## Progress
 
@@ -97,6 +97,10 @@ carries the edited standard is staged and activated.
   held by `head:supervisor-manual`, which also holds `lead:SUPERVISOR` (release tree built, `cargo test --workspace` green
   with 4390 tests, `npm test` shows 8 failures in files phase 1 did not touch, checked against the earlier state before the
   release is activated). The supervisor raises a handoff event when the probe report lands; then the plan closes.
+- 2026-11-25 12:45: phase 2 `done` and the plan closed by the supervisor on the manual supervisor's handoff. Release
+  `efa4694e` (from main `e40252044`) is active; the live probe passed ([report](reports/live-cargo-probe.md), landed
+  `444c23c15`). Criterion 4 is met for `cargo test --workspace` (4390 passed) but not for `npm test`: six reds remain in
+  files phase 1 did not touch, already owned by backlog rows p-4nmomwje7j and p-vnsigyw6h7.
 
 Checks made under the table: `node scripts/plan-contract-check.mjs --plan plans/261124-2320-claude-worker-allowed-tools`
 and `fgos resource-check --plan plans/261124-2320-claude-worker-allowed-tools`. The two phases sit in different waves,

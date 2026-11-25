@@ -1,7 +1,7 @@
 ---
 id: p-ayxhxswso6
 title: "Claude worker units may run cargo, node and npm test: add allowedTools to the claude-cli-bwrap invocation in the standard runner config (runner; source: owner answer to q-qzcq5xti2k, 2026-11-24 23:16)"
-status: proposed
+status: done
 priority: P1
 area: runner
 created: 2026-11-24
