@@ -26,13 +26,15 @@ Opened by the secretary (Miu) on the owner's order, 2026-11-25. Owner: Miu and t
 
 ## 1. Trạng thái hiện tại
 
-Round 4 (2026-11-25 22:46, shaper, owner live in chat). Domain: coding (fgOS platform). Authority: `agent-mailbox` owns the channel; no new component.
+Round 5 (2026-11-25 23:06, shaper, owner live in chat). Domain: coding (fgOS platform). Authority: `agent-mailbox` owns the channel; no new component.
 
 **Scope now:** agent to agent only (owner, 22:39). The owner channel (ds-cfsfcbknl6) and the missing-grant request are set aside, to be taken up after.
 
 **Settled this session:** HC-D1 (a channel always exists; the sender lacks the capability to use all of it, so the door must carry the know-how), HC-D2 (fastest available channel first, then step down), HC-D3 (the mailbox carries the content in both scopes, same machine and cross machine). Provisional, one round old: typing into the recipient's pane is the wake layer and types only one labelled wake line, never the message (owner "đồng ý", 22:46).
 
-**Open:** who walks the ladder, `q-hcnhbtf74z` ([Q2](#Q2)); with typing inside the send door it leans to the door, and the shaper asks the owner to confirm. Not verified: the confined send failure's cause (diagnose first in the plan).
+**Answered 23:05:** the send door walks the ladder (owner chose B; `q-hcnhbtf74z` cancelled as answered in chat). The head sends once and reads one answer naming the path taken.
+
+**Next:** §7 task list drafted; one more round to confirm the typed-wake shape and the door choice, then the agent-to-agent part settles. Not verified: the confined send failure's cause (diagnose first in the plan).
 
 ## 2. Mục tiêu & đề bài
 
@@ -42,7 +44,7 @@ Agents (heads: secretary, supervisor, lead, planner, shaper) must always be able
 
 | # | Point | State | Current view | Evidence |
 |---|---|---|---|---|
-| 1 | Who walks the ladder | open, `q-hcnhbtf74z` ([Q2](#Q2)) | The send door: the mailbox already picks local before remote; adding the typed wake inside it keeps the walk deterministic (HC-D1). | `mailbox_remote.rs` header; HC-D1 |
+| 1 | Who walks the ladder | provisional, owner chose B (23:05) | The send door: the head sends once; the door picks local or remote, wakes the recipient and answers which path it took. The head never chooses a channel. | `mailbox_remote.rs` header; HC-D1 |
 | 2 | The four cases | provisional | See §6 table. | spec §6.2, §7, §15.2; `mailbox_remote.rs`, `mailbox_sync.rs` |
 | 3 | Typed wake line | provisional (owner agreed once) | Only the fixed labelled line, only under the §15.8 rules (idle and empty composer, no dialog, no focus change, one outstanding nudge, fall back on unknown). The door types it, so no head needs `session type` for this. | spec §15.8, §8.1 |
 | 4 | Claude Code `SendMessage` as a rung | decided by analysis, report to owner | Not a rung: it has no record, framing or delivery report (K1, spec §7.2), and the typed wake already gives every same-machine CLI a seconds-level wake. | spec §7.2 |
@@ -53,6 +55,7 @@ Agents (heads: secretary, supervisor, lead, planner, shaper) must always be able
 | 9 | agy not drained | known limit | Typed wake plus `inbox` is its path. | spec §7.3 |
 | 10 | Spec staleness | fix in the plan | `agent-mailbox/spec.md` header and §15.2 still call cross-machine mail later and built on a branch; code on main has it. | `apps/fgos/src/wiring/mailbox_*.rs` |
 | 11 | Shared know-how | provisional | One `_shared` file, short: "send once, read the answer"; the three private copies in the secretary, supervisor and lead skills move into it. | HC-D1 |
+| 14 | Reading one's own mail from the cage | clear (gap found) | No row of the permission table names `mailbox inbox`, so a confined head's explicit read is decided `ask` today and its hook drain fails `lock-unavailable`. Reading one's own inbox is needed for the door to work; it is one base `head` row, not a wider power over others. | `packages/session-host/contracts/head-permissions.v1.json` (no `mailbox inbox` row) |
 | 12 | Owner channel, missing-grant request | deferred (owner 22:39) | Next discussion step after agent-to-agent. | p-wb6rkwpjsg, head_request.rs:1572 |
 | 13 | Mailbox head finder beside Identity; latency measurement | out of scope / later | Own rows. | p-5igcekysul, p-whvn2fgyep |
 
@@ -76,12 +79,14 @@ Agents (heads: secretary, supervisor, lead, planner, shaper) must always be able
 - **2026-11-25 22:45, owner.** "type in là một phương pháp hiệu quả đặc biệt không được nhắc tới." Scout: typing into the recipient's pane is the one wake channel that works for every CLI in a terminal on the same machine, idle or not, without hooks (p-rchuoa2v3k: mail typed to the lead by `session type` arrives while the confined read fails; `agent-mailbox/spec.md` §7 measured agy woken by a typed line in 19.1 s). The design already exists and was shelved on 2026-10-20 for lack of a consumer: §15.8 typed-signal rules (idle and empty composer only, no open dialog, one short labelled line, no focus change, one outstanding nudge, fall back when unknown). Risks it answers: typed text reaches the model as user input (§8.1 says peer text never carries user authority), it can merge with the owner's half-typed line or answer a dialog, and it cannot cross machines. Today only the supervisor and secretary may type, and only into a session an open supervision event names (`target-not-stuck`).
 
 - **2026-11-25 22:46, owner.** "đồng ý" to the typed wake being one labelled line only, the content staying in the mailbox. Shaper decided by analysis, to report: Claude Code `SendMessage` is not a rung (§3 row 4). HC-D1, HC-D2, HC-D3 minted.
+- **2026-11-25 23:04, owner.** "đi thang là sao". Shaper explained with tonight's case: A, the head tries channels itself (Miu stopped after two); B, one `mailbox send` tries them and answers which path it took.
+- **2026-11-25 23:05, owner.** "chọn B". `q-hcnhbtf74z` cancelled with that reason. Shaper drafted §7.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Provisional after round 4; HC-D1 to HC-D3 are settled, the typed-wake shape and who walks the ladder are not yet.
+Provisional after round 5; HC-D1 to HC-D3 are settled; the typed-wake shape and the send door walking the ladder (owner B, 23:05) are one round old.
 
-A head sends a message once, through its request socket, to the mailbox send door. The door walks the ladder for it (pending Q2): if the recipient is a live head on this machine the message is recorded locally; otherwise it is signed onto the Event Store for the recipient's machine. On the machine that holds the recipient, the fastest wake its CLI allows is used: Claude Code sessions started to accept get a socket push; any other idle recipient in a terminal gets one typed, labelled wake line under the §15.8 rules; otherwise the message is seen at the recipient's next tool call. The sender's answer always names which path was taken (recorded locally and woken, recorded and waiting for the next tool call, recorded for another machine) or the real cause of a refusal.
+A head sends a message once, through its request socket, to the mailbox send door. The door walks the ladder for it: if the recipient is a live head on this machine the message is recorded locally; otherwise it is signed onto the Event Store for the recipient's machine. On the machine that holds the recipient, the fastest wake its CLI allows is used: Claude Code sessions started to accept get a socket push; any other idle recipient in a terminal gets one typed, labelled wake line under the §15.8 rules; otherwise the message is seen at the recipient's next tool call. The sender's answer always names which path was taken (recorded locally and woken, recorded and waiting for the next tool call, recorded for another machine) or the real cause of a refusal.
 
 | Case | Transport | Wake on the recipient's machine | Expected time |
 |---|---|---|---|
@@ -108,7 +113,38 @@ flowchart TD
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Draft only; filled once Q2 is answered.
+Draft, agent-to-agent part only. Order is dependency order; each task owns one behaviour proof at the lowest layer, and task-live-probe is the one wiring proof above them.
+
+### Diagnose confined mail {#task-diagnose-confined-mail}
+- Goal: prove why a confined head's `mailbox send` fails (`host-failed` tonight, `event-store-unavailable` read-only FS on 2026-11-22) and why its read fails `lock-unavailable`, before changing anything.
+- §6: "A head sends a message once, through its request socket".
+- D-IDs: HC-D1. Sources: p-rchuoa2v3k, p-ia2v33b54u.
+- Verify (draft): a reproduced failure from a confined head with the real cause named in the report.
+
+### Mail through the request socket {#task-mail-through-socket}
+- Goal: every head persona sends and reads its own mail through the request socket; the host writes the record and the lock; no confined process opens either. Adds the base `head` row for reading one's own inbox (§3 row 14); recipient limits of lead and planner stay.
+- Refusals: every forwarded refusal carries its real code; bare `host-failed` is gone (`packages/session-host/rust/src/forwarder.rs:509`).
+- Depends on: task-diagnose-confined-mail.
+- Verify (draft): the session-host forwarder and mailbox verb tests for send and inbox from a confined persona.
+
+### Mail follows a rotation {#task-mail-follows-rotation}
+- Goal: mail queued for a head's old generation is offered to its successor exactly once.
+- Sources: p-bifjfd5rix.
+- Verify (draft): mailbox record test across a generation bump.
+
+### The send door wakes the recipient {#task-typed-wake}
+- Goal: after recording, `mailbox send` wakes an idle recipient on its machine by the fastest channel: CLI push where accepted, else one typed labelled wake line under the §15.8 rules, else next tool call. The door types; no head needs `session type` for this. The answer names the path taken.
+- Builds the shelved design of `agent-mailbox/spec.md` §15.8 (composer state with fixtures, focus-neutral typing, one outstanding nudge, the open attach-record question 17).
+- D-IDs: HC-D2, HC-D3. Depends on: task-mail-through-socket.
+- Verify (draft): agent-protocol composer fixtures per CLI plus a mailbox nudge test; live case: an idle head of each drained CLI wakes within the bound without focus change or merging with half-typed input.
+
+### One shared know-how file and the spec {#task-knowhow-and-spec}
+- Goal: one `core/skills/_shared` file saying "send once, read the answer, here is what each answer means"; the secretary, supervisor and lead skills point to it instead of their own copies. `agent-mailbox/spec.md` header and §15.2 updated to what main holds; §15.8 moves from later to built.
+- D-IDs: HC-D1.
+
+### Live probe from every confined persona {#task-live-probe}
+- Goal: secretary, supervisor, lead, planner and shaper each send to a peer and read a reply from inside the cage, on the same machine; one cross-machine send is recorded and read after a fetch. This is the wiring proof, not a copy of the lower tests.
+- Depends on: all tasks above.
 
 ## Q1 {#Q1}
 
@@ -116,4 +152,4 @@ Which door is the one guaranteed head-to-head channel? Superseded on 2026-11-25 
 
 ## Q2 {#Q2}
 
-Who walks the ladder: each head by itself, taught by a shared skill and by refusals that name the next rung, or one send door that tries the rungs in order and reports which delivered? Recommended: the door. Five-part form in the question store; id: `q-hcnhbtf74z`.
+Who walks the ladder: each head by itself, taught by a shared skill and by refusals that name the next rung, or one send door that tries the rungs in order and reports which delivered? Recommended: the door. Five-part form in the question store; id: `q-hcnhbtf74z`. Answered by the owner in chat on 2026-11-25 23:05: B, the door walks it; the question was cancelled with that reason.
