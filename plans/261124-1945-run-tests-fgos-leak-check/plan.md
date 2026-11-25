@@ -9,6 +9,9 @@ footprint:
   - scripts/run-tests.mjs
   - test/scripts/run-tests.test.mjs
   - scripts/lib/fgos-write-witness.mjs
+  - test/scripts/full-suite-queue.test.mjs
+  - test/scripts/test-select.test.mjs
+  - test/scripts/run-test-canary.test.mjs
   - plans/261124-1945-run-tests-fgos-leak-check/
 base: ab5b3b1bf700e4f092545905b2b8dc0bb6af6433
 source:
@@ -125,7 +128,7 @@ survivor: `scripts/lib/fgos-write-witness.mjs` read back in `runSelectedTests`; 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Skip live runtime directories in the leak check](phase-01-skip-live-runtime-dirs.md) | - | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs | 1 | done |
-| 2 | [Attribute .fgos writes to the test run](phase-02-attribute-fgos-writes-to-the-test-run.md) | 1 | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs, scripts/lib/fgos-write-witness.mjs | 2 | running |
+| 2 | [Attribute .fgos writes to the test run](phase-02-attribute-fgos-writes-to-the-test-run.md) | 1 | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs, scripts/lib/fgos-write-witness.mjs, test/scripts/full-suite-queue.test.mjs, test/scripts/test-select.test.mjs, test/scripts/run-test-canary.test.mjs | 2 | running |
 
 Phase 1: one phase, one wave: one constant, one walk filter and one test file.
 
@@ -140,6 +143,16 @@ listed is left out of the footprint: the land door regenerates it (Risks). Check
 `node scripts/plan-contract-check.mjs` and `fgos resource-check --plan`.
 
 ## Progress
+
+- 2026-11-25 13:45: owner answered q-4aalqblcof "Widen footprint by the three files" (acked). A lead's
+  paths land refuses a footprint change (`footprint-change-refused`), so phase 2 stays parked (status
+  `running`) until the supervisor or a planner lands this edit to `footprint:` in one `fgos land --paths`
+  commit of this `plan.md`: add `test/scripts/full-suite-queue.test.mjs`, `test/scripts/test-select.test.mjs`
+  and `test/scripts/run-test-canary.test.mjs`, and the same three paths to phase 2's footprint cell in the
+  phase table. No other change. No running plan claims these files. Once it lands, the lead runs one fix unit
+  in the existing p02 worktree that wraps those files' fake spawns like `asWitnessedSpawn` (no assertion
+  changes, no switch), then the reviewer, the owed step 7 (full `npm test` comparison) and the land. The p02
+  worktree still holds the uncommitted change; the census there is restored. Supervisor event raised.
 
 - 2026-11-25 13:30: phase 2 parked on owner question q-4aalqblcof (status stays `running`). Worktree
   `/home/vantt/projects/forgent-worktrees/261124-1945-run-tests-fgos-leak-check-p02` (branch
@@ -194,6 +207,12 @@ listed is left out of the footprint: the land door regenerates it (Risks). Check
 
 ## Owner questions
 
+- **q-4aalqblcof, the three fake-spawn test files outside the footprint: answered "Widen footprint by
+  the three files"** (owner, 2026-11-25 13:36). Allows adding exactly `test/scripts/full-suite-queue.test.mjs`,
+  `test/scripts/test-select.test.mjs` and `test/scripts/run-test-canary.test.mjs` to the footprint, and a fix
+  unit that edits only their fake spawns so they write the witness load line. Forbids any other footprint
+  change, changing those tests' assertions, or any flag or env switch that skips the leak check. AC3
+  (fail closed) stays as planned.
 - **q-3rhc6lroqc, who repairs the backlog index files: answered "Secretary repairs them"** (owner,
   2026-11-24 22:32). The secretary repairs the backlog index files; this plan does not.
 - **q-zw4htizjz2, the census footprint clash: answered "Exempt regenerated census"** (owner,
