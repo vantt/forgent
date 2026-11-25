@@ -9,7 +9,7 @@ created: 2026-11-25
 
 # Why
 
-The owner's definition (2026-11-25, ACE-D1 in [ds-e26zcar63f](../discussions/ds-e26zcar63f-agent-context-engine/DISCUSSION.md)): ACE is the one place that organizes, stores and manages every rule in the system and keeps them free of duplicates and conflicts. Today only a small core exists: the Node instruction registry inside packaging-distribution, which manages 7 rule files, catches duplicates by id only and conflicts only when an author declares them. Most fgOS rules live outside it. ASC (`p-25q7tz6jtt`) selects from ACE at agent start; packaging-distribution writes files through ASC (ACE-D2).
+The owner's definition (2026-11-25, in [ds-e26zcar63f](../discussions/ds-e26zcar63f-agent-context-engine/DISCUSSION.md)): ACE is the one place that organizes, stores and manages every rule in the system and keeps them free of duplicates and conflicts. Today only a small core exists: the Node instruction registry inside packaging-distribution, which manages 7 rule files, catches duplicates by id only and conflicts only when an author declares them. Most fgOS rules live outside it. ASC (`p-25q7tz6jtt`) selects from ACE at agent start; packaging-distribution writes files through ASC.
 
 # Done when
 
