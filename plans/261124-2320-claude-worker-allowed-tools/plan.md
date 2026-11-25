@@ -93,6 +93,10 @@ carries the edited standard is staged and activated.
   session. Once `fgos identity resolve lead:SUPERVISOR` finds it, the supervisor sends it the release build, stage
   and activate from main (>= `29dd50475`), `npm test`, `cargo test --workspace`, and then starts the live cargo
   probe. At 11:27 no such session was live yet; phase 2 stays parked on it.
+- 2026-11-25 12:36: the owner stopped this plan's lead to free a lead slot. The lead is not to be restarted: phase 2 is
+  held by `head:supervisor-manual`, which also holds `lead:SUPERVISOR` (release tree built, `cargo test --workspace` green
+  with 4390 tests, `npm test` shows 8 failures in files phase 1 did not touch, checked against the earlier state before the
+  release is activated). The supervisor raises a handoff event when the probe report lands; then the plan closes.
 
 Checks made under the table: `node scripts/plan-contract-check.mjs --plan plans/261124-2320-claude-worker-allowed-tools`
 and `fgos resource-check --plan plans/261124-2320-claude-worker-allowed-tools`. The two phases sit in different waves,
