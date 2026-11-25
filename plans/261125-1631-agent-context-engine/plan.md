@@ -142,6 +142,10 @@ Read with `git log -S` on `discoverInstructionSources`, `evaluateInstructionComp
 | 4 | [Refuse a bad rule when it is written](phase-04-write-time-check.md) | 3 | packages/agent-context-engine/rust/src/check/**, packages/agent-context-engine/rust/tests/check*.rs, apps/fgos/src/wiring/context_engine/**, apps/fgos/tests/context_engine.rs, .githooks/pre-commit | 4 | draft |
 | 6 | [Integration gate, changelog](phase-06-integration.md) | 1, 2, 3, 4 | CHANGELOG.md, plans/261125-1631-agent-context-engine/reports/** | 5 | draft |
 
+Phase 1 is parked (owner, 2026-11-25 22:58): another machine does it; the lead waits for that land on main, then marks
+phase 1 done and goes on with phase 2. The duplicate local run's branch `agent-context-engine/p01` is not landed
+(cleanup is owner question `q-ubi34e6xd3`).
+
 Phase 5 left this plan for `261125-2041` (owner, 2026-11-25 20:4x). Phase 2 now depends on phase 1: the owner ordered
 "ACE phase 1 runs first and alone", so nothing else, the probe included, runs during it.
 
