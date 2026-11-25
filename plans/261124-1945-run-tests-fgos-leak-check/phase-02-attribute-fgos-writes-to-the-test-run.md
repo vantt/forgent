@@ -94,6 +94,10 @@ Capability: `code:implement`.
    after the same run by a throwaway script under `.fgos/runtime/tmp/` (not committed).
    Record the outcome as one Progress line in `plan.md`. If the walk shows a test-made
    change the witness missed, stop and report it with the writer named; do not land.
+   Owed after landing (owner, 2026-11-25, q-vfansuhg7y): the unconfined `lead:SUPERVISOR`
+   session runs this step on a quiet tree and writes the Progress line; scope is one full
+   `npm test` plus the throwaway walk script, no code changes, and a miss becomes a new
+   backlog item rather than a fix here.
 
 ## Verify
 
