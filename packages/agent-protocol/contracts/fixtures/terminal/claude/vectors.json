@@ -577,6 +577,45 @@
       }
     },
     {
+      "name": "composer-state-blank-first-line-draft",
+      "step": "composer-state",
+      "version": "2.1.302",
+      "source": "synthesized: short multiline draft with no prompt inspection, before the closing separator",
+      "script": {
+        "frames": [{
+          "screen": "❯ \n  please review the diff\n────────\n  status footer\n",
+          "inspection": { "state": "idle", "visibleIdle": true, "promptText": "" }
+        }]
+      },
+      "expect": { "composerState": "not-empty" }
+    },
+    {
+      "name": "composer-state-another-quoted-try-placeholder-is-unknown",
+      "step": "composer-state",
+      "version": "2.1.302",
+      "source": "synthesized: placeholder wording can vary",
+      "script": {
+        "frames": [{
+          "screen": "❯ Try \"fix the tests\"\n",
+          "inspection": { "state": "idle", "visibleIdle": true, "promptText": "❯ Try \"fix the tests\"" }
+        }]
+      },
+      "expect": { "composerState": "unknown" }
+    },
+    {
+      "name": "composer-state-screen-only-quoted-try-placeholder-is-unknown",
+      "step": "composer-state",
+      "version": "2.1.302",
+      "source": "synthesized: placeholder wording can vary without prompt inspection",
+      "script": {
+        "frames": [{
+          "screen": "❯ Try \"explain this code\"\n",
+          "inspection": { "state": "idle", "visibleIdle": true, "promptText": "" }
+        }]
+      },
+      "expect": { "composerState": "unknown" }
+    },
+    {
       "name": "composer-state-screen-only-half-typed-try-line",
       "step": "composer-state",
       "version": "2.1.302",

@@ -25,8 +25,14 @@ fn composer_state(screen: &str, inspection: &Inspection) -> ComposerState {
     if has_paste_chip(&inspection.prompt_text) || has_paste_chip(&bottom_lines(screen, 6)) {
         return ComposerState::NotEmpty;
     }
-    let lines: Vec<&str> = screen.lines().filter(|l| !l.trim().is_empty()).collect();
-    for line in lines.iter().rev().take(15) {
+    let lines: Vec<&str> = screen.lines().collect();
+    // The model/status footer is outside the composer. Keep all preceding
+    // lines, including a long draft whose prompt has scrolled above the tail.
+    let composer_end = lines
+        .iter()
+        .rposition(|line| line.trim_start().starts_with("GPT-") && line.contains(" · "))
+        .unwrap_or(lines.len());
+    for (index, line) in lines[..composer_end].iter().enumerate().rev() {
         let trimmed = line.trim();
         if line.contains('›')
             || (trimmed.starts_with('>')
@@ -41,7 +47,14 @@ fn composer_state(screen: &str, inspection: &Inspection) -> ComposerState {
             if prompt_text.is_empty()
                 || prompt_text.eq_ignore_ascii_case("ask codex to do anything")
             {
-                return ComposerState::Empty;
+                return if lines[index + 1..composer_end]
+                    .iter()
+                    .all(|line| line.trim().is_empty())
+                {
+                    ComposerState::Empty
+                } else {
+                    ComposerState::NotEmpty
+                };
             }
             return ComposerState::NotEmpty;
         }

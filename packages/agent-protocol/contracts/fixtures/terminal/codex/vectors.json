@@ -795,6 +795,28 @@
       }
     },
     {
+      "name": "composer-state-blank-first-line-draft",
+      "step": "composer-state",
+      "version": "0.163.0",
+      "source": "synthesized: short multiline draft below a blank prompt, before the model footer",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "›\n  please review the diff\n  and report back\n\n  GPT-6.1-Sol medium · ~/project\n  ← for agents · ? for shortcuts\n",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": true,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
       "name": "composer-state-draft-in-composer",
       "step": "composer-state",
       "version": "0.163.0",
@@ -807,7 +829,7 @@
         ]
       },
       "expect": {
-        "composerState": "unknown"
+        "composerState": "not-empty"
       }
     },
     {
@@ -823,7 +845,7 @@
         ]
       },
       "expect": {
-        "composerState": "unknown"
+        "composerState": "not-empty"
       }
     },
     {

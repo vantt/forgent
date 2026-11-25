@@ -1,4 +1,4 @@
-use super::{bottom_lines, common::has_paste_chip, ComposerState, ExitCommand, Profile};
+use super::{common::has_paste_chip, ComposerState, ExitCommand, Profile};
 use crate::Inspection;
 
 /// `/exit` leaves in under a second. The folder-trust dialog asks whether the
@@ -33,7 +33,7 @@ fn classify_prompt_line(line: &str) -> ComposerState {
         return ComposerState::Empty;
     }
     // Screen text alone cannot distinguish the placeholder from an identical draft.
-    if trimmed == "Try \"refactor <filepath>\"" {
+    if trimmed.starts_with("Try \"") && trimmed.ends_with('"') {
         return ComposerState::Unknown;
     }
     ComposerState::NotEmpty
@@ -42,12 +42,29 @@ fn classify_prompt_line(line: &str) -> ComposerState {
 fn composer_state(screen: &str, inspection: &Inspection) -> ComposerState {
     let pt = inspection.prompt_text.trim();
     if !pt.is_empty() {
-        return classify_prompt_line(pt);
+        let state = classify_prompt_line(pt);
+        if state != ComposerState::Empty {
+            return state;
+        }
     }
-    let bottom = bottom_lines(screen, 8);
-    for line in bottom.lines().rev() {
+    let lines: Vec<&str> = screen.lines().collect();
+    for (index, line) in lines.iter().enumerate().rev() {
         if line.contains('❯') || line.trim_start().starts_with('>') {
-            return classify_prompt_line(line);
+            let state = classify_prompt_line(line);
+            if state != ComposerState::Empty {
+                return state;
+            }
+            // The closing separator ends the composer; status below it is
+            // not draft text. A blank first line alone does not mean empty.
+            return if lines[index + 1..]
+                .iter()
+                .take_while(|line| !line.contains("──────"))
+                .all(|line| line.trim().is_empty())
+            {
+                ComposerState::Empty
+            } else {
+                ComposerState::NotEmpty
+            };
         }
     }
     ComposerState::Unknown
