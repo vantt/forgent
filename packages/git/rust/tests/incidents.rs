@@ -315,7 +315,7 @@ fn recovery_never_touches_the_candidate_of_an_attempted_land_even_when_its_write
     assert_eq!(kept["kept"][0]["cause"], "land-authority-mismatch");
     let alive_msg = kept["message"].as_str().unwrap();
     assert!(
-        alive_msg.contains("only its writer gone-session is alive or not provably dead; only its writer, or `fgos git recover` once it is gone, can recover it"),
+        alive_msg.contains("writer gone-session is alive or not provably dead; only its writer, or `fgos git recover` once it is gone, can recover it"),
         "expected alive notice, got: {alive_msg}"
     );
 
@@ -627,7 +627,7 @@ fn recovery_settles_scoped_commit_of_dead_writer_and_records_recoverer() {
     assert!(
         error
             .cause
-            .contains("commit-effect-unknown: recovered by fixture"),
+            .contains("recovered by fixture; commit-effect-unknown"),
         "expected cause to match recorded rejection, got: {}",
         error.cause
     );
@@ -697,7 +697,7 @@ fn recovery_keeps_live_writers_interrupted_chain_with_updated_notice() {
     assert_eq!(kept["writer"], "live-session");
     let msg = recovered["message"].as_str().unwrap();
     assert!(
-        msg.contains("only its writer live-session is alive or not provably dead; only its writer, or `fgos git recover` once it is gone, can recover it"),
+        msg.contains("writer live-session is alive or not provably dead; only its writer, or `fgos git recover` once it is gone, can recover it"),
         "expected updated kept text in message, got: {msg}"
     );
 }
