@@ -33,7 +33,7 @@ The implementation column below bounds the retained text. Proposed typed interfa
 | Run Phases And Admission | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:932 admission-run-in-flight, :784 expectedRunId refusal, :1941 result-corrupt, :1016/2024 publishMutableProjection/publishMarkerOnce; run-lock.mjs acquireRunControl/buildRunControlHolder/resolveHolderLiveness (assignment-runner.mjs:70-81); runtime-inspection.mjs:160 VALID_PHASES; git grep run-retried src -> none |
 | Proposed Runtime Recovery Amendment | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:1563-1582 writes contract 'assignment-run.v2' with phase/delivery/supersedesRunId/retryId/payloadDigest; launchCommandId at :2118; recovery-planner.mjs:251-327 (snapshotHash, expectedControlEpoch, actionKey); admission-* refusal codes at :917-940; admitRun/admissionKey/authorityRef/writerRuntime not in src |
 | RunResult | Current contract/invariant | src/runner/dispatch/run-result.mjs (normalizeRunResultV3 fields, runOutcome); packages/run-result/rust/src/lib.rs derive_outcome (the outcome rules, reached from Node through the addon's `runResult.deriveOutcome`); test/fixtures/run-outcome/legacy-derivation.json (shared vectors) |
-| Dispatch Operability Addendum | Current contract/invariant | src/runner/dispatch/run-result.mjs:7,22-23 (legacy-derived, contract-corrupt); agent-result-claim-contract.mjs:5 (claim v2); runtime-inspection.mjs:255; test/runner/dispatch-operability-production-door.test.mjs |
+| Dispatch Operability Addendum | Current contract/invariant | src/runner/dispatch/run-result.mjs:7,22-23 (legacy-derived, contract-corrupt); agent-result-claim-contract.mjs:5 (claim v2); runtime-inspection.mjs:255; packages/execution/engine/tests/assignment_runner.rs (`every_legality_refusal_reads_as_node_stated_it`) |
 | Confidence | Current contract/invariant | src/runner/dispatch/run-result.mjs:1276-1285; packages/run-result/rust/src/lib.rs:129 CONFIDENCE_LEVELS; assignment-normalizer.mjs:67-69 |
 | Evidence Freshness | Current contract/invariant | src/runner/dispatch/evidence-attribution.mjs:10 (levels proven/correlated/excluded/unattributed), :69,:197; test/runner/evidence-attribution.test.mjs |
 | Work Boundary | Current contract/invariant | docs/platform/runner/decisions/h-36d872fbb0e5.md (0049, Work Boundary: Work adapters stay above the Execution Core); no src/state import in src/runner/dispatch or src/runner/execution |
@@ -300,7 +300,8 @@ The archived design record is
 `archive/plans/260914-dispatch-operability-evidence-attribution/contracts/run-result-and-observation.md`;
 it is historical design evidence, not a second live authority overriding code.
 The implementation proof for this slice is
-`test/runner/dispatch-operability-production-door.test.mjs`, which exercises
+`packages/execution/engine/tests/assignment_runner.rs`
+(`every_legality_refusal_reads_as_node_stated_it`), which exercises
 the production Assignment door, public inspect CLI, historical/replayed result
 interpretation, and negative reconciliation routes. Reconciliation remains
 guard/projection repair only; it does not recover, retry, relaunch, resume,
