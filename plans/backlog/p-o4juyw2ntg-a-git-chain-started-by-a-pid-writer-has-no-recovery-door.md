@@ -24,3 +24,7 @@ Likely root cause (lead:OPC, 2026-11-22 18:35): both dead chains of the day (lan
 # Update 2026-11-25 (supervisor, owner order to fix landing)
 
 Today 9 dead-writer land candidates kept 46 GB of checkouts under `.fgos/runtime/git-candidates`, and `fgos git recover` kept all of them with `land-authority-mismatch` ("only its writer can recover"); the writers were gone, so nothing could release them and the disk filled to 100% at about 14:08. The recovery door must let an unconfined session settle a chain whose writer is dead. Plan it together with `p-q2dn2cnzlq`.
+
+# Update 2026-11-25 (supervisor, from plan 261124-0004 phase 7)
+
+The head permission table grants `git recover` as `allow` to the supervisor, but the grant is unusable by any head that is not the chain's writer: recover refuses with `land-authority-mismatch` ("only its writer can recover"). Evidence: `plans/261124-0004-heads-operate-without-owner/reports/integration.md`, gap 2. Sibling gap: `p-nyhaakrsvz` (`session stop` cannot end a head whose request socket is gone).
