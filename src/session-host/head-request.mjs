@@ -23,9 +23,7 @@ import { stopHeadSession } from './head-stop.mjs';
 import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
 import { judge, observe, selfRecord } from '../native/process-identity.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
-import { assignmentDir } from '../runner/dispatch/assignment-layout.mjs';
-import { readStoredUnitSummary } from '../runner/execution/unit-summary.mjs';
-import { unitRunFacts } from '../runner/execution/unit-run-record.mjs';
+import { assignmentDir, readStoredUnitSummary, unitRunFacts } from '../native/execution-door.mjs';
 import { installOnce, nativeDoor, replaceDurably } from '../native/door.mjs';
 import { markSuccessorAnswered, requestRotation, rotationHolds } from '../session-rotation/rotate.mjs';
 

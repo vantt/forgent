@@ -1505,9 +1505,12 @@ fn forward(cfg: &Config, request: &Request) -> Outcome {
         },
         Ok(Planned::Run(words)) => {
             let outcome = forward_exec(cfg, request, &words);
-            // `plan` created the copy (create_new succeeded) exactly when the argv it returns carries the stage
-            // path; a path this request did not create is never removed.
-            if words.get(2).map(std::path::Path::new) == Some(stage.as_path()) {
+            // `plan` created the copy (create_new succeeded) exactly for the config patch frame it returns with
+            // the stage path as its file; a path this request did not create is never removed.
+            let staged_patch = words.first().map(String::as_str) == Some("config")
+                && words.get(1).map(String::as_str) == Some("patch")
+                && words.get(2).map(std::path::Path::new) == Some(stage.as_path());
+            if staged_patch {
                 let _ = std::fs::remove_file(&stage);
             }
             outcome

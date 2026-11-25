@@ -234,35 +234,74 @@ pub fn spells(word: &str, want: &str) -> bool {
                 .is_some_and(|rest| rest.starts_with('=')))
 }
 
-fn matches(rule: &Rule, argv: &[String]) -> bool {
-    !rule.prefix.is_empty()
-        && argv.len() >= rule.prefix.len()
-        && rule.prefix.iter().enumerate().all(|(at, want)| {
-            if is_long_flag(want) {
-                // A flag word may stand anywhere after the leading words.
-                argv.iter()
-                    .skip(at.min(argv.len()))
-                    .any(|w| spells(w, want))
-            } else {
-                argv.get(at).is_some_and(|w| w == want)
+/// The positional words the host reads from `argv`: a `--flag` and the value after it (when that is not itself a
+/// `--` word) are not positional, exactly as the host's own argument parser reads them. A verb word is decided on
+/// what the host will run, wherever flags stand.
+fn host_positionals(argv: &[String]) -> Vec<&str> {
+    let mut words = Vec::new();
+    let mut at = 0;
+    while at < argv.len() {
+        if argv[at].starts_with("--") {
+            at += 1;
+            if argv.get(at).is_some_and(|next| !next.starts_with("--")) {
+                at += 1;
             }
-        })
+        } else {
+            words.push(argv[at].as_str());
+            at += 1;
+        }
+    }
+    words
+}
+
+fn matches(rule: &Rule, argv: &[String], positional: &[&str]) -> bool {
+    if rule.prefix.is_empty() {
+        return false;
+    }
+    let mut verb = 0;
+    for want in &rule.prefix {
+        if is_long_flag(want) {
+            if !argv.iter().any(|w| spells(w, want)) {
+                return false;
+            }
+        } else {
+            if positional.get(verb) != Some(&want.as_str()) {
+                return false;
+            }
+            verb += 1;
+        }
+    }
+    true
 }
 
 /// The decision for `argv` (the verb words and flags without `fgos`) by `persona`; `None` for an unknown persona.
+/// Verb words are the host's positional words. An argv whose winning row has a flag standing before its last verb
+/// word is denied: the forwarder and the policy verbs read verb words and targets by argv position.
 pub fn decide(persona: &str, argv: &[String]) -> Option<Verdict> {
     let rules = &table().personas.get(persona)?.rules;
-    let found: Vec<&Rule> = rules.iter().filter(|rule| matches(rule, argv)).collect();
+    let positional = host_positionals(argv);
+    let found: Vec<&Rule> = rules
+        .iter()
+        .filter(|rule| matches(rule, argv, &positional))
+        .collect();
     let longest = found.iter().map(|rule| rule.prefix.len()).max();
     let winner = found
         .into_iter()
         .filter(|rule| Some(rule.prefix.len()) == longest)
         .max_by_key(|rule| rule.decision);
     Some(match winner {
-        Some(rule) => Verdict {
-            decision: rule.decision,
-            rule: Some(rule.clone()),
-        },
+        Some(rule) => {
+            let verb_words = rule.prefix.iter().filter(|w| !is_long_flag(w)).count();
+            let flag_first = argv.iter().take(verb_words).any(|w| w.starts_with("--"));
+            Verdict {
+                decision: if flag_first {
+                    Decision::Deny
+                } else {
+                    rule.decision
+                },
+                rule: Some(rule.clone()),
+            }
+        }
         None => Verdict {
             decision: Decision::Ask,
             rule: None,

@@ -73,6 +73,24 @@ fn an_argv_no_row_matches_is_ask() {
 }
 
 #[test]
+fn a_flag_before_a_verb_word_cannot_hide_the_verb_from_its_deny_row() {
+    // The host takes sub-verbs as the leading positional words wherever flags stand, so these run `questions answer`
+    // and `questions cancel` and must be decided as such, never by the broad `questions` row.
+    let planner = decide("planner", &argv("questions --option A answer q-abc")).unwrap();
+    assert_eq!(planner.decision, Decision::Deny);
+    // A flag takes the next word as its value, as the host reads it: `--all answer` leaves `questions q-abc`.
+    assert_eq!(decision("planner", "questions --all answer q-abc"), Decision::Allow);
+    assert_eq!(decision("planner", "--x questions answer q-abc"), Decision::Ask);
+    // A cancel with a flag before the sub-verb is not the allowed `questions cancel` of the lead either.
+    assert_eq!(
+        decision("lead", "questions --reason x cancel q-abc"),
+        Decision::Deny
+    );
+    // A flag after the verb words is the verb's own and does not change the verdict.
+    assert_eq!(decision("lead", "questions cancel q-abc --reason x"), Decision::Allow);
+}
+
+#[test]
 fn a_persona_the_table_does_not_name_has_no_verdict() {
     assert!(decide("stranger", &argv("slots")).is_none());
     assert!(cage_of("stranger").is_none());

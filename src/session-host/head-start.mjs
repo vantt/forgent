@@ -18,7 +18,7 @@ import { grantOf, headPersonas } from './head-grants.mjs';
 import { subjectOfDir, taskOfHead } from './head-plan.mjs';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
-import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
+import { listAssignmentRuns, loadRunnerConfigForDir } from '../native/execution-door.mjs';
 
 const PERSONA_PATTERN = /^[a-z][a-z0-9-]{0,63}$/;
 const NAME_PATTERN = /^[a-z0-9-]{1,32}$/;
@@ -162,7 +162,6 @@ async function defaultLaunch(request) {
 }
 
 async function defaultRunnerConfig(projectRoot) {
-  const { loadRunnerConfigForDir } = await import('../runner/dispatch/config.mjs');
   return loadRunnerConfigForDir(projectRoot);
 }
 

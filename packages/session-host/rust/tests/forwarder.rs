@@ -68,6 +68,8 @@ fn a_flag_that_changes_the_root_the_cwd_or_the_environment_is_refused() {
         "--project",
         "--env",
         "--dir",
+        "--repo-root",
+        "--repo-root=/tmp",
         "--dir=/tmp",
         "--cwd=/tmp",
         "--env=A=b",
