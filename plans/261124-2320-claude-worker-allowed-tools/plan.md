@@ -77,8 +77,18 @@ carries the edited standard is staged and activated.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Grant in the standard invocation, its proof and the changelog line](phase-01-standard-grant.md) | - | core/config-standard/runner.yaml, test/runner/dispatch.test.mjs, CHANGELOG.md | 1 | ready |
+| 1 | [Grant in the standard invocation, its proof and the changelog line](phase-01-standard-grant.md) | - | core/config-standard/runner.yaml, test/runner/dispatch.test.mjs, CHANGELOG.md | 1 | done |
 | 2 | [Release and live cargo probe](phase-02-release-and-live-probe.md) | 1 | plans/261124-2320-claude-worker-allowed-tools/reports/live-cargo-probe.md | 2 | draft |
+
+## Progress
+
+- 2026-11-25: phase 1 `done`, landed on main at `29dd50475`
+  ([report](reports/lead-261125-1111-claude-worker-grant-phase-01.md)). The full `npm test` and
+  `cargo test --workspace` were not run, because the lead's confinement cannot build the addon or the workspace.
+  The owning dispatch test, the land gate and the `fgos-config` crate tests pass.
+- 2026-11-25: phase 2 parked on the owner or the unconfined supervisor. They stage and activate a release from main
+  at or after `29dd50475`, and run the full `npm test` and `cargo test --workspace` there. Then the live cargo probe
+  can run.
 
 Checks made under the table: `node scripts/plan-contract-check.mjs --plan plans/261124-2320-claude-worker-allowed-tools`
 and `fgos resource-check --plan plans/261124-2320-claude-worker-allowed-tools`. The two phases sit in different waves,
