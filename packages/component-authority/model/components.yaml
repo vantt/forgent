@@ -828,9 +828,6 @@
   paths:
     - src/runner/dispatch/
   exceptions:
-    - path: src/runner/dispatch/write-scope.mjs
-      reason: per-file layer carried over from the manifest; the directory mixes layers
-      layer: kernel
     - path: src/runner/dispatch/run-timeout.mjs
       reason: per-file layer carried over from the manifest; the directory mixes layers
       layer: kernel

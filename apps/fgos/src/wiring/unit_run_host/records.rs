@@ -85,7 +85,7 @@ pub fn check_unit_file(raw: &Value) -> Result<(), RunUnitError> {
     seat_resolver::assert_no_unit_tier(raw, "a unit file").map_err(refused)
 }
 
-/// `expandGenerated(writes, generatedPaths)` (`src/runner/dispatch/write-scope.mjs:90`): the write scope widened with
+/// `expandGenerated(writes, generatedPaths)` (`packages/write-scope/src/lib.rs`, `expand`): the write scope widened with
 /// the render targets of the generated sources it touches. The writes were checked by the unit validation and the
 /// mappings by the config door; an entry neither door would have passed leaves the scope as declared.
 pub fn expand_generated(writes: &Value, generated: &Value) -> Value {
