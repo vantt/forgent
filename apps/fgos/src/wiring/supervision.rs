@@ -784,14 +784,53 @@ fn host_pane_activity(placement: &fgos_session_host::Placement, run_dir: &Path) 
     pane_activity(live, seen.activity.as_ref().map(|a| a.state.as_str()))
 }
 
+/// A lead started by hand holds a short role (`lead:<LANE>`) and has no head lineage; the wake door names it by that
+/// role, in the place of a head name.
+fn is_short_role(name: &str) -> bool {
+    name.starts_with("lead:")
+}
+
+/// The argv of `session stop` for a head, or for the lead that holds the short role `name`.
+fn stop_argv<'a>(persona: &'a str, name: &'a str) -> Vec<&'a str> {
+    if is_short_role(name) {
+        vec!["session", "stop", "--role", name, "--json"]
+    } else {
+        vec!["session", "stop", persona, "--name", name, "--json"]
+    }
+}
+
+/// The activity of the lead holding the short `role`: the pane of the terminal slot its Identity record names. A role
+/// nobody holds, or a holder with no slot, is `Unknown`, never `Idle`.
+fn short_role_activity(role: &str, pane: impl FnOnce(&fgos_session_host::Placement) -> wake::Activity) -> wake::Activity {
+    let Ok(sessions) = role_holders() else {
+        return wake::Activity::Unknown;
+    };
+    let key = sessions
+        .iter()
+        .find(|s| s.roles.iter().any(|r| r == role))
+        .and_then(|s| s.ids.as_ref())
+        .and_then(|ids| ids.terminal.as_ref())
+        .and_then(|t| t.key.clone());
+    let Some(key) = key else {
+        return wake::Activity::Unknown;
+    };
+    match serde_json::from_value::<fgos_session_host::Placement>(json!({"host": "terminal", "key": key})) {
+        Ok(placement) => pane(&placement),
+        Err(_) => wake::Activity::Unknown,
+    }
+}
+
 impl wake::StopSession for HostStop {
     fn activity(&self, persona: &str, name: &str) -> wake::Activity {
+        if is_short_role(name) {
+            return short_role_activity(name, |p| host_pane_activity(p, Path::new("")));
+        }
         head_activity(&self.root, &format!("{persona}-{name}"), host_pane_activity)
     }
 
     fn stop(&self, persona: &str, name: &str) -> Result<(), String> {
         let out = Command::new(host_binary())
-            .args(["session", "stop", persona, "--name", name, "--json"])
+            .args(stop_argv(persona, name))
             .current_dir(&self.root)
             .stdin(Stdio::null())
             .output()
@@ -2179,6 +2218,24 @@ mod tests {
             head_activity(&root, "supervisor-x", idle_pane),
             wake::Activity::Unknown
         );
+    }
+
+    #[test]
+    fn a_short_role_lead_is_stopped_by_role_and_a_head_lead_by_persona_and_name() {
+        assert_eq!(
+            stop_argv("lead", "lead:S1"),
+            ["session", "stop", "--role", "lead:S1", "--json"]
+        );
+        assert_eq!(
+            stop_argv("lead", "demo-x"),
+            ["session", "stop", "lead", "--name", "demo-x", "--json"]
+        );
+    }
+
+    #[test]
+    fn a_short_role_nobody_holds_is_unknown_never_idle() {
+        let activity = short_role_activity("lead:NOBODY-HOLDS-THIS", |_| wake::Activity::Idle);
+        assert_eq!(activity, wake::Activity::Unknown);
     }
 
     #[test]

@@ -80,3 +80,35 @@ test('a role no live session holds stops nothing, whether or not a placement is 
   assert.deepEqual(host.closes, []);
   assert.equal(readHeadPlacement(dir).retiredAt, undefined);
 });
+
+test('a lead holding the short role lead:<LANE> is resolved through Identity and its pane retired, with no stamp when it has no head placement', async (t) => {
+  const { projectRoot, dir } = lineage(t);
+  const host = hostOf();
+  const asked = [];
+  const identity = ({ role }) => { asked.push(role); return { live: true, record: { ids: { terminal: { key: 'slot-winci' } } } }; };
+  const answer = await stopHeadSession({ role: 'lead:WINCI', projectRoot, reason: 'plan done' }, { host, identity, ...endedHead() });
+  assert.deepEqual(answer, { stopped: true, retiredAt: null });
+  assert.deepEqual(asked, ['lead:WINCI']);
+  assert.deepEqual(host.closes, [{ key: 'slot-winci', how: 'close', groupKey: 'slot-winci' }]);
+  assert.equal(readHeadPlacement(dir).retiredAt, undefined, 'an unrelated lineage is never stamped');
+});
+
+test('a short-role lead whose Identity record names a head lineage ends through that head supervisor and gets the stamp', async (t) => {
+  const { projectRoot, dir } = lineage(t);
+  const host = hostOf();
+  const order = [];
+  const identity = () => ({ live: true, record: { ids: { head: { persona: 'lead', name: 'x', gen: 2 } } } });
+  const answer = await stopHeadSession({ role: 'lead:WINCI', projectRoot }, { host, identity, ...endedHead(order), now: () => new Date('2026-11-19T01:02:03Z') });
+  assert.deepEqual(answer, { stopped: true });
+  assert.deepEqual(order, ['end:/run/2']);
+  assert.equal(readHeadPlacement(dir).retiredAt, '2026-11-19T01:02:03.000Z');
+});
+
+test('a short role nobody holds stops nothing, a holder naming no placement is reported, and a role that is not a lead short role is refused', async (t) => {
+  const { projectRoot } = lineage(t);
+  const host = hostOf();
+  assert.deepEqual(await stopHeadSession({ role: 'lead:GONE', projectRoot }, { host, identity: () => ({ live: false }) }), { stopped: false, reason: 'not-live' });
+  assert.deepEqual(await stopHeadSession({ role: 'lead:WINCI', projectRoot }, { host, identity: () => ({ live: true, record: {} }) }), { stopped: false, reason: 'no-placement' });
+  await assert.rejects(stopHeadSession({ role: 'supervisor:x', projectRoot }, { host, identity: () => ({ live: true }) }), (err) => err.code === 'bad-role');
+  assert.deepEqual(host.closes, []);
+});

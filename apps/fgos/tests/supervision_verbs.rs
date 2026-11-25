@@ -354,6 +354,39 @@ fn wake_with_no_live_supervisor_and_an_unhandled_event_starts_one_through_sessio
 }
 
 #[test]
+fn a_wake_reads_the_activity_of_a_finished_lead_and_leaves_a_busy_one_while_it_still_starts_the_supervisor() {
+    let scene = Scene::new("finished-lead", WATCHER_CONFIG);
+    let project = scene.project();
+    let plan = project.join(format!("plans/{PLAN}/plan.md"));
+    let text = fs::read_to_string(&plan).unwrap();
+    fs::write(
+        &plan,
+        text.replace(
+            "status: ready\n",
+            "status: done\nlead: head:lead-demo-fin\n",
+        ),
+    )
+    .unwrap();
+    git(&project, &["add", "-f", "."]);
+    git(&project, &["commit", "-q", "-m", "finish plan"]);
+    git(&project, &["push", "-q", "origin", "main"]);
+    register_session(&scene, "head:lead-demo-fin", "finished-lead-session");
+    // A request ticket still running: the lead is mid-turn whatever its pane says.
+    let tickets = project.join(".fgos/runtime/head-tickets/lead-demo-fin");
+    fs::create_dir_all(&tickets).unwrap();
+    fs::write(tickets.join("a.json"), r#"{"state":"running"}"#).unwrap();
+
+    let report = first_tick(&scene);
+    assert_eq!(report["wakes"], 1, "{report}");
+    let calls = scene.payload_calls();
+    assert_eq!(
+        calls,
+        vec![serde_json::json!(["session", "start", "supervisor", "--name", "demo", "--json"])],
+        "the busy lead is not stopped and the supervisor is still started"
+    );
+}
+
+#[test]
 fn plans_lists_the_trunk_portfolio_with_what_the_supervisor_may_start() {
     let scene = Scene::new("plans", WATCHER_CONFIG);
     let view = scene.data(&["supervisor", "plans", "--json"]);

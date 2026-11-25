@@ -2,7 +2,7 @@
 //! a head only when none is live, leaves a live one alone, and never reads unknown identity as
 //! not-live. Every call records one `fgos.supervisor.wake` span.
 use crate::{
-    portfolio::{admissible, supervisor_name, Plan},
+    portfolio::{admissible, head_name, supervisor_name, Plan},
     queue::{Queue, QueueError, RaisedEvent},
 };
 
@@ -208,8 +208,78 @@ pub fn stop_stuck(ports: &Ports, trigger: Trigger) -> StuckOutcome {
     StuckOutcome::Stopped
 }
 
+/// The discussion directory a plan's `source` entry names (`plans/discussions/<dir>/...`).
+fn discussion_dir(source: &str) -> Option<&str> {
+    let mut parts = source.split('/');
+    parts.by_ref().find(|p| *p == "discussions")?;
+    parts.next().filter(|d| !d.is_empty())
+}
+
+/// The persona and name a finished lead is stopped under: a `head:lead-<name>` role is the head
+/// `lead` `<name>`; a short `lead:<LANE>` role has no head name, so the role itself is the name
+/// (the host's `session stop` resolves it through Identity).
+fn lead_target(role: &str) -> Option<(&str, &str)> {
+    match role.strip_prefix("head:lead-") {
+        Some(name) if !name.is_empty() => Some(("lead", name)),
+        _ if role.starts_with("lead:") && role.len() > "lead:".len() => Some(("lead", role)),
+        _ => None,
+    }
+}
+
+/// Stop the planners and leads whose work is finished: the planner of a discussion whose plan has
+/// landed (`draft` or `ready`), and the lead of a `done` plan. Only a live head of this project
+/// that is `Idle` is stopped; `Busy`, `Unknown` and a failed stop leave it for the next wake. Never
+/// blocks the start decision.
+fn close_finished(ports: &Ports, trigger: Trigger) {
+    let Some(project) = ports.project.project() else {
+        return;
+    };
+    let (Ok(plans), Ok(done)) = (ports.portfolio.plans(), ports.portfolio.done_dirs()) else {
+        return;
+    };
+    let mut targets: Vec<(String, String, String)> = Vec::new();
+    for plan in &plans {
+        if plan.status == "done" || done.contains(&plan.dir) {
+            if let Some(role) = &plan.lead {
+                if let Some((persona, name)) = lead_target(role) {
+                    targets.push((role.clone(), persona.to_owned(), name.to_owned()));
+                }
+            }
+        }
+        if plan.status == "draft" || plan.status == "ready" {
+            for dir in plan.source.iter().filter_map(|s| discussion_dir(s)) {
+                let name = head_name(&project.handle, dir);
+                targets.push((format!("head:planner-{name}"), "planner".to_owned(), name));
+            }
+        }
+    }
+    let mut seen: Vec<String> = Vec::new();
+    for (role, persona, name) in targets {
+        if seen.contains(&role) {
+            continue;
+        }
+        seen.push(role.clone());
+        match ports.identity.holder(&role) {
+            Holder::Live { project_id } if project_id == project.id => {}
+            _ => continue,
+        }
+        if ports.stop.activity(&persona, &name) != Activity::Idle {
+            continue;
+        }
+        if ports.stop.stop(&persona, &name).is_ok() {
+            ports.telemetry.emit(&WakeSpan {
+                name: "fgos.supervisor.wake",
+                subject: trigger.subject.to_owned(),
+                trigger: trigger.trigger.to_owned(),
+                outcome: "stopped-finished",
+            });
+        }
+    }
+}
+
 /// Start the supervisor if there is work for it and none is live.
 pub fn wake(ports: &Ports, settings: &Settings, trigger: Trigger) -> WakeOutcome {
+    close_finished(ports, trigger);
     let outcome = decide(ports, settings);
     ports.telemetry.emit(&WakeSpan {
         name: "fgos.supervisor.wake",

@@ -1,6 +1,6 @@
 //! The wake door and the supervisor verbs over fake ports, one behaviour per test.
 use fgos_supervision::{
-    portfolio::{read_plan, supervisor_name, Plan},
+    portfolio::{head_name, read_plan, supervisor_name, Plan},
     queue::{QueueError, RaisedEvent},
     supervisor::{self, Asker, Askers},
     wake::{
@@ -26,6 +26,9 @@ struct Fake {
     started: RefCell<Vec<(String, String)>>,
     start_error: RefCell<Option<String>>,
     activity: Cell<Option<Activity>>,
+    /// Roles that are live in this project whatever `holder` says; `activity_by_name` overrides `activity` per head name.
+    live_roles: RefCell<Vec<String>>,
+    activity_by_name: RefCell<Vec<(String, Activity)>>,
     stop_error: RefCell<Option<String>>,
     stopped: RefCell<Vec<(String, String)>>,
     state: Cell<WakeState>,
@@ -99,6 +102,11 @@ impl Project for Fake {
 impl Identity for Fake {
     fn holder(&self, role: &str) -> Holder {
         self.holder_roles.borrow_mut().push(role.into());
+        if self.live_roles.borrow().iter().any(|r| r == role) {
+            return Holder::Live {
+                project_id: "p1".into(),
+            };
+        }
         self.holder.borrow().clone().unwrap()
     }
 }
@@ -111,7 +119,11 @@ impl StartSession for Fake {
     }
 }
 impl StopSession for Fake {
-    fn activity(&self, _persona: &str, _name: &str) -> Activity {
+    fn activity(&self, _persona: &str, name: &str) -> Activity {
+        let by_name = self.activity_by_name.borrow();
+        if let Some((_, a)) = by_name.iter().find(|(n, _)| n == name) {
+            return *a;
+        }
         self.activity.get().unwrap_or(Activity::Unknown)
     }
     fn stop(&self, persona: &str, name: &str) -> Result<(), String> {
@@ -442,4 +454,86 @@ fn a_refused_stop_reports_the_hosts_code_and_records_no_span() {
     *f.stop_error.borrow_mut() = Some("stop-refused".into());
     assert_eq!(stuck(&f), StuckOutcome::Failed("stop-refused".into()));
     assert!(f.spans.borrow().is_empty());
+}
+
+fn finished(dir: &str, status: &str, lead: Option<&str>, source: Option<&str>) -> Plan {
+    let lead = lead.map(|l| format!("lead: {l}\n")).unwrap_or_default();
+    let source = source
+        .map(|s| format!("source:\n  - {s}\n"))
+        .unwrap_or_default();
+    let text = format!(
+        "---\ntitle: {dir}\nstatus: {status}\npriority: P2\ncreated: 2026-11-01\n{lead}{source}footprint:\n  - {dir}/\n---\n\n| ID | Title | DependsOn | Footprint | Wave | Status |\n|---|---|---|---|---|---|\n| 1 | t | - | `{dir}/` | 1 | todo |\n"
+    );
+    read_plan(dir, &text).unwrap()
+}
+
+/// A project whose planner and leads below are all live; the lead named `busy` is mid-turn.
+fn closing_fixture() -> (Fake, String) {
+    let planner = head_name(HANDLE, "ds-1-topic");
+    let mut f = Fake::new();
+    f.plans = vec![
+        finished(
+            "drafted",
+            "draft",
+            None,
+            Some("plans/discussions/ds-1-topic/DISCUSSION.md"),
+        ),
+        finished("done-a", "done", Some("head:lead-alpha"), None),
+        finished("done-b", "done", Some("lead:S1"), None),
+        finished("done-c", "done", Some("head:lead-busy"), None),
+        finished("working", "running", Some("lead:WORKING"), None),
+    ];
+    *f.live_roles.borrow_mut() = vec![
+        format!("head:planner-{planner}"),
+        "head:lead-alpha".into(),
+        "lead:S1".into(),
+        "head:lead-busy".into(),
+        "lead:WORKING".into(),
+    ];
+    f.activity_by_name
+        .borrow_mut()
+        .push(("busy".to_owned(), Activity::Busy));
+    f.activity.set(Some(Activity::Idle));
+    (f, planner)
+}
+
+#[test]
+fn one_wake_stops_the_idle_heads_of_landed_and_done_work_and_leaves_a_busy_one() {
+    let (f, planner) = closing_fixture();
+    assert_eq!(f.wake(), WakeOutcome::NothingUnhandled);
+    assert_eq!(
+        *f.stopped.borrow(),
+        vec![
+            ("planner".to_owned(), planner),
+            ("lead".to_owned(), "alpha".to_owned()),
+            ("lead".to_owned(), "lead:S1".to_owned()),
+        ]
+    );
+    let outcomes: Vec<_> = f.spans.borrow().iter().map(|s| s.outcome).collect();
+    assert_eq!(
+        outcomes,
+        [
+            "stopped-finished",
+            "stopped-finished",
+            "stopped-finished",
+            "nothing-unhandled"
+        ]
+    );
+}
+
+#[test]
+fn a_head_of_finished_work_whose_activity_is_unknown_is_left_alone() {
+    let (f, _) = closing_fixture();
+    f.activity.set(Some(Activity::Unknown));
+    f.wake();
+    assert!(f.stopped.borrow().is_empty());
+}
+
+#[test]
+fn a_failed_close_never_blocks_the_start_decision() {
+    let (f, _) = closing_fixture();
+    let f = f.with_event("plan-done");
+    *f.stop_error.borrow_mut() = Some("stop-refused".into());
+    assert_eq!(f.wake(), WakeOutcome::Started);
+    assert!(f.spans.borrow().iter().all(|s| s.outcome != "stopped-finished"));
 }
