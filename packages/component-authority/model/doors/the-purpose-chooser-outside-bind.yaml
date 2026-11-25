@@ -1,4 +1,4 @@
-job: "the purpose chooser outside bind() is gone: ask purposeSeatOf in src/runner/dispatch/plan.mjs"
+job: "the purpose chooser outside bind() is gone: ask purpose_seat_of in packages/execution/rust/src/decide.rs"
 kind: door
 severity: low
 patterns:

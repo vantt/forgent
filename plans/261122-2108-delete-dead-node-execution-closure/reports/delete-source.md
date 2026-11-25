@@ -70,7 +70,11 @@ Kept for phase 11 (not deleted here): `src/runner/dispatch/write-scope.mjs` — 
   - **behaviour removed**: R8 cycle-cut test that only asserted absence of deleted `config-twin.mjs` / `transport.mjs` / `config.mjs`; history-outcome.mjs absence assertion inside the pattern-vocabulary rename test.
   - `test/runner/run-result-source-scan.test.mjs` — removed exemption for deleted `src/runner/dispatch/run-result.mjs`.
   - `packages/holder-lock/contracts/lock-registry.v1.json` — reconcile note names Rust owner `apps/fgos/src/wiring/dispatch_subs/reconcile.rs`.
-  - `test/holder-lock/driver-unavailable.test.mjs` — dropped the dead `src/runner/dispatch/adapters.mjs` case (`ADAPTERS_URL`, `workerBaseEnv` import/`out.workerEnv`, and the `out.workerEnv` assertion); owner is `packages/execution/engine/src/transport/worker_home.rs`.
+  - `test/holder-lock/driver-unavailable.test.mjs` — dropped the dead `src/runner/dispatch/adapters.mjs` case (`ADAPTERS_URL`, `workerBaseEnv` import/`out.workerEnv`, and the `out.workerEnv` assertion); owner is `packages/execution/engine/tests/transport.rs` `worker_environment_is_the_allowlist_alone_and_pins_the_state_root_when_known` (function `worker_base_env` in `packages/execution/engine/src/transport/adapters.rs`).
+  - Third fix:
+    - `packages/component-authority/model/components.yaml` — dropped `execution-core` exceptions for deleted `seat-ledger.mjs` / `seat-resolver.mjs`.
+    - `packages/component-authority/model/contracts.yaml` — `assignment-run-runresult` evidence keeps only the docs line (dropped deleted `assignment.mjs` / `plan.mjs` / `assignment-runner.mjs`).
+    - `packages/component-authority/model/doors/the-purpose-chooser-outside-bind.yaml` — job points at `purpose_seat_of` in `packages/execution/rust/src/decide.rs`.
 
 - No `p-24xw2cwdvo` remains under `packages/component-authority/model/` or `test/architecture.test.mjs`.
 
