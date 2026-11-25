@@ -18,3 +18,5 @@ A written ownership contract between fgOS and other kit installers: each tool ow
 # Notes
 
 Migrated from the legacy backlog table. Original status: proposed.
+
+2026-11-25: the owner chose to handle the rules loaded three times here, apart from the ASC plan (`plans/261122-1946-agent-start-context`, which keeps external blocks out of scope by ASC-D2). Measured at d72117393: the `AGENTKIT-OMP:engineer` block in `AGENTS.md` is 16,953 B (lines 453-818), and the project and global `.claude/rules` copies are about 18 KB each, so a Claude Code start carries about 35 KB (about 9k tokens) of repeated rule text. The same problem is the observed problem of the Agent Context Engine in `docs/platform/proposals/documentation-system-unification.md` §4.7.2. The fix touches only fgOS-owned surfaces, never AgentKit's installer or the global files. Also found: a stray `<!-- mdview:START -->` at `AGENTS.md:232` with no matching end, before the fgOS impact-analysis gate, so an MDView reinstall that rewrites from the first start marker could replace that gate.
