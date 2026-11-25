@@ -1,4 +1,5 @@
-use super::{ExitCommand, Profile};
+use super::{bottom_lines, common::has_paste_chip, ComposerState, ExitCommand, Profile};
+use crate::Inspection;
 
 /// `/quit` leaves (the thread stays in codex's daemon). Text then Enter sent
 /// back to back reads as a paste, so the gap before Enter is longer here. A
@@ -6,6 +7,7 @@ use super::{ExitCommand, Profile};
 /// brief goes through the prompt door (bracketed paste plus submit) instead.
 pub const PROFILE: Profile = Profile {
     cli: "codex",
+    pinned_version: "0.163.0",
     exit: ExitCommand::Text("/quit"),
     enter_gap_ms: 600,
     submit_by_prompt_door: true,
@@ -15,4 +17,40 @@ pub const PROFILE: Profile = Profile {
     ],
     start_banners: &[],
     setup_markers: &["hooks need review"],
+    composer_state,
 };
+
+fn composer_state(screen: &str, inspection: &Inspection) -> ComposerState {
+    if has_paste_chip(&inspection.prompt_text) || has_paste_chip(&bottom_lines(screen, 6)) {
+        return ComposerState::NotEmpty;
+    }
+    let lines: Vec<&str> = screen.lines().filter(|l| !l.trim().is_empty()).collect();
+    for line in lines.iter().rev().take(15) {
+        let trimmed = line.trim();
+        if line.contains('›')
+            || (trimmed.starts_with('>')
+                && !trimmed.starts_with(">_")
+                && !trimmed.starts_with(">="))
+        {
+            let cleaned: String = line
+                .chars()
+                .filter(|c| *c != '›' && *c != '>' && *c != '\u{a0}')
+                .collect();
+            let prompt_text = cleaned.trim();
+            if prompt_text.is_empty()
+                || prompt_text.eq_ignore_ascii_case("ask codex to do anything")
+            {
+                return ComposerState::Empty;
+            }
+            return ComposerState::NotEmpty;
+        }
+    }
+    // Draft in composer without a prompt line above status footer
+    let bottom = bottom_lines(screen, 6);
+    if bottom.lines().any(|l| {
+        l.contains("line ") || l.contains("{\"contract\":") || l.contains("Write these two files")
+    }) {
+        return ComposerState::NotEmpty;
+    }
+    ComposerState::Unknown
+}

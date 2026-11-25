@@ -105,7 +105,7 @@
         "frames": [
           {
             "at": 0,
-            "screen": "header\nInvalid API key · Please run /login\n❯",
+            "screen": "header\nInvalid API key \u00b7 Please run /login\n\u276f",
             "inspection": {
               "state": "idle",
               "visibleIdle": true,
@@ -149,7 +149,7 @@
             "at": 200,
             "inspection": {
               "state": "idle",
-              "promptText": "❯ [Pasted text #1 +42 lines]"
+              "promptText": "\u276f [Pasted text #1 +42 lines]"
             }
           },
           {
@@ -432,7 +432,7 @@
         "frames": [
           {
             "at": 0,
-            "screen": "working...\nNot logged in · Please run /login"
+            "screen": "working...\nNot logged in \u00b7 Please run /login"
           }
         ]
       },
@@ -457,6 +457,119 @@
         "outcome": "none"
       },
       "source": "synthesized: the agent's own words while it works"
+    },
+    {
+      "name": "composer-state-empty-ready",
+      "step": "composer-state",
+      "version": "2.1.302",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "empty"
+      }
+    },
+    {
+      "name": "composer-state-empty-turn-finished",
+      "step": "composer-state",
+      "version": "2.1.302",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "turn-finished"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "empty"
+      }
+    },
+    {
+      "name": "composer-state-half-typed",
+      "step": "composer-state",
+      "version": "2.1.302",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "half-typed"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
+      "name": "composer-state-draft-in-composer",
+      "step": "composer-state",
+      "version": "2.1.302",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "draft-in-composer"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
+      "name": "composer-state-dialog-blocked",
+      "step": "composer-state",
+      "version": "2.1.302",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "trust-dialog"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
+    },
+    {
+      "name": "composer-state-busy-working",
+      "step": "composer-state",
+      "version": "2.1.302",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "working"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
+    },
+    {
+      "name": "composer-state-version-bump-yields-unknown",
+      "step": "composer-state",
+      "version": "2.9.999",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready",
+            "screen": "Claude Code v2.9.999\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\u276f Try \"refactor <filepath>\"\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
     }
   ]
 }

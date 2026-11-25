@@ -4,9 +4,9 @@ use std::path::{Path, PathBuf};
 use std::rc::Rc;
 
 use fgos_agent_protocol::terminal::{
-    adapter_for, ExitCommand, FsOutbox, Outbox, Readiness, TerminalOutcome, MAX_RESULT_BYTES,
-    REASON_AGENT_NOT_STARTED, REASON_COMPLETED_NO_EXIT, REASON_FOREGROUND_NOT_AGENT,
-    REASON_NEEDS_SETUP, REASON_RESULT_UNREADABLE,
+    adapter_for, ComposerState, ExitCommand, FsOutbox, Outbox, Readiness, TerminalOutcome,
+    MAX_RESULT_BYTES, REASON_AGENT_NOT_STARTED, REASON_COMPLETED_NO_EXIT,
+    REASON_FOREGROUND_NOT_AGENT, REASON_NEEDS_SETUP, REASON_RESULT_UNREADABLE,
 };
 use fgos_agent_protocol::{AgentIo, BlockedReason, Inspection, IoError, SendInput};
 use serde_json::{json, Value};
@@ -274,8 +274,27 @@ fn terminal_every_cli_vector_resolves_as_recorded() {
                     ExitCommand::Text(text) => json!({ "outcome": "exit", "text": text }),
                     ExitCommand::Keys(keys) => json!({ "outcome": "exit", "keys": keys }),
                 },
+                "composer-state" => {
+                    let state =
+                        adapter.composer_state(&pane.frame().screen, &pane.frame().inspection);
+                    if expect.get("composerState").is_some() {
+                        json!({ "composerState": state.as_str() })
+                    } else {
+                        json!({ "outcome": state.as_str() })
+                    }
+                }
                 other => panic!("{name}: unknown step {other}"),
             };
+            if let Some(v) = vector.get("version").and_then(Value::as_str) {
+                if v != adapter.pinned_version() {
+                    assert_eq!(
+                        got.get("composerState").or_else(|| got.get("outcome")),
+                        Some(&json!("unknown")),
+                        "{name}: fixture version {v} differs from pinned {} and must yield unknown",
+                        adapter.pinned_version()
+                    );
+                }
+            }
             let mut want = expect.clone();
             if let Some(map) = want.as_object_mut() {
                 for key in [
@@ -821,3 +840,39 @@ fn terminal_delivery_into_an_attempt_that_is_already_ending_types_nothing() {
         assert!(pane.accepted.is_empty(), "{cli}: nothing reaches the pane");
     }
 }
+
+#[test]
+fn terminal_composer_state_fixture_version_mismatch_is_reported() {
+    for cli in ["claude", "codex", "agy"] {
+        let adapter = adapter_for(cli).unwrap();
+        let dir = fixture_dir(cli);
+        let ready_screen = fs::read_to_string(dir.join("ready.txt")).unwrap();
+        let ready_insp = inspection_from(
+            &serde_json::from_str(&fs::read_to_string(dir.join("ready.insp.json")).unwrap())
+                .unwrap(),
+        );
+
+        // Pinned version gives Empty
+        assert_eq!(
+            adapter.composer_state(&ready_screen, &ready_insp),
+            ComposerState::Empty,
+            "{cli}: ready screen on pinned version {} must be Empty",
+            adapter.pinned_version()
+        );
+
+        // Bumped version screen gives Unknown, not silently matched as Empty
+        let bumped_screen = match cli {
+            "claude" => ready_screen.replace("Claude Code v2.1.302", "Claude Code v2.9.999"),
+            "codex" => ready_screen.replace("OpenAI Codex (v0.163.0)", "OpenAI Codex (v0.999.0)"),
+            "agy" => ready_screen.replace("Antigravity CLI 1.4.2", "Antigravity CLI 1.9.999"),
+            _ => unreachable!(),
+        };
+        assert_eq!(
+            adapter.composer_state(&bumped_screen, &ready_insp),
+            ComposerState::Unknown,
+            "{cli}: fixture whose version differs from pinned {} must yield Unknown",
+            adapter.pinned_version()
+        );
+    }
+}
+

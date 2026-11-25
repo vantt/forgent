@@ -126,7 +126,7 @@
         "frames": [
           {
             "at": 0,
-            "screen": "header\nAuthentication required\n❯",
+            "screen": "header\nAuthentication required\n\u276f",
             "inspection": {
               "state": "idle",
               "visibleIdle": false,
@@ -171,7 +171,7 @@
             "at": 200,
             "inspection": {
               "state": "idle",
-              "promptText": "❯ [Pasted text #1 +42 lines]"
+              "promptText": "\u276f [Pasted text #1 +42 lines]"
             }
           },
           {
@@ -564,15 +564,15 @@
           },
           {
             "at": 1000,
-            "screen": "agy\n\n\n      ▄▀▀▄        Antigravity CLI 1.4.2\n     ▀▀▀▀▀▀       user@example.com (Google AI Pro)\n    ▀▀▀▀▀▀▀▀      Gemini 3.8 Flash (Medium)\n   ▄▀▀    ▀▀▄     /work/project\n  ▄▀▀      ▀▀▄\n\n\n ┃ Meet Gemini 4 Argon\n ┃ A new model is available. Pick it any time in /model.\n ┃ esc to dismiss\n  (1)\n"
+            "screen": "agy\n\n\n      \u2584\u2580\u2580\u2584        Antigravity CLI 1.4.2\n     \u2580\u2580\u2580\u2580\u2580\u2580       user@example.com (Google AI Pro)\n    \u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580      Gemini 3.8 Flash (Medium)\n   \u2584\u2580\u2580    \u2580\u2580\u2584     /work/project\n  \u2584\u2580\u2580      \u2580\u2580\u2584\n\n\n \u2503 Meet Gemini 4 Argon\n \u2503 A new model is available. Pick it any time in /model.\n \u2503 esc to dismiss\n  (1)\n"
           },
           {
             "at": 2000,
-            "screen": "agy\n\n\n      ▄▀▀▄        Antigravity CLI 1.4.2\n     ▀▀▀▀▀▀       user@example.com (Google AI Pro)\n    ▀▀▀▀▀▀▀▀      Gemini 3.8 Flash (Medium)\n   ▄▀▀    ▀▀▄     /work/project\n  ▄▀▀      ▀▀▄\n\n\n ┃ Meet Gemini 4 Argon\n ┃ A new model is available. Pick it any time in /model.\n ┃ esc to dismiss\n  (2)\n"
+            "screen": "agy\n\n\n      \u2584\u2580\u2580\u2584        Antigravity CLI 1.4.2\n     \u2580\u2580\u2580\u2580\u2580\u2580       user@example.com (Google AI Pro)\n    \u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580      Gemini 3.8 Flash (Medium)\n   \u2584\u2580\u2580    \u2580\u2580\u2584     /work/project\n  \u2584\u2580\u2580      \u2580\u2580\u2584\n\n\n \u2503 Meet Gemini 4 Argon\n \u2503 A new model is available. Pick it any time in /model.\n \u2503 esc to dismiss\n  (2)\n"
           },
           {
             "at": 3000,
-            "screen": "agy\n\n\n      ▄▀▀▄        Antigravity CLI 1.4.2\n     ▀▀▀▀▀▀       user@example.com (Google AI Pro)\n    ▀▀▀▀▀▀▀▀      Gemini 3.8 Flash (Medium)\n   ▄▀▀    ▀▀▄     /work/project\n  ▄▀▀      ▀▀▄\n\n\n ┃ Meet Gemini 4 Argon\n ┃ A new model is available. Pick it any time in /model.\n ┃ esc to dismiss\n  (3)\n"
+            "screen": "agy\n\n\n      \u2584\u2580\u2580\u2584        Antigravity CLI 1.4.2\n     \u2580\u2580\u2580\u2580\u2580\u2580       user@example.com (Google AI Pro)\n    \u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580      Gemini 3.8 Flash (Medium)\n   \u2584\u2580\u2580    \u2580\u2580\u2584     /work/project\n  \u2584\u2580\u2580      \u2580\u2580\u2584\n\n\n \u2503 Meet Gemini 4 Argon\n \u2503 A new model is available. Pick it any time in /model.\n \u2503 esc to dismiss\n  (3)\n"
           }
         ]
       },
@@ -681,7 +681,7 @@
           {
             "at": 0,
             "file": "trust-dialog",
-            "screen": "Accessing workspace:\n\n/tmp/claude-1000/-home-vantt-projects-forgentX--claude-worktrees-tm-p04/4cfd083d-fa66-4c45-94d2-e2af16990f78/scratchpad/cap/agy\n\nDo you trust the contents of this project?\n\nAntigravity CLI requires permission to read, edit, and execute files here.\n\n> Yes, I trust this folder\n  No, exit\n\n  ↑/↓ Navigate · enter Confirm\n                                                                                                                                                                                                                                                                                                                                      Gemini 3.8 Flash · medium\n\n Meet Gemini 4 Argon\n"
+            "screen": "Accessing workspace:\n\n/tmp/claude-1000/-home-vantt-projects-forgentX--claude-worktrees-tm-p04/4cfd083d-fa66-4c45-94d2-e2af16990f78/scratchpad/cap/agy\n\nDo you trust the contents of this project?\n\nAntigravity CLI requires permission to read, edit, and execute files here.\n\n> Yes, I trust this folder\n  No, exit\n\n  \u2191/\u2193 Navigate \u00b7 enter Confirm\n                                                                                                                                                                                                                                                                                                                                      Gemini 3.8 Flash \u00b7 medium\n\n Meet Gemini 4 Argon\n"
           }
         ]
       },
@@ -744,7 +744,7 @@
           },
           {
             "at": 300,
-            "screen": "agy\n\n\n      ▄▀▀▄        Antigravity CLI 1.5.2\n     ▀▀▀▀▀▀       user@example.com (Google AI Pro)\n    ▀▀▀▀▀▀▀▀      Gemini 3.8 Flash (Medium)\n   ▄▀▀    ▀▀▄     /work/project\n  ▄▀▀      ▀▀▄\n\n\n────────────────────────────────────────────────────────────────────────────────\n>\n────────────────────────────────────────────────────────────────────────────────\n? for shortcuts                                                                 Gemini 3.8 Flash · medium\n"
+            "screen": "agy\n\n\n      \u2584\u2580\u2580\u2584        Antigravity CLI 1.5.2\n     \u2580\u2580\u2580\u2580\u2580\u2580       user@example.com (Google AI Pro)\n    \u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580      Gemini 3.8 Flash (Medium)\n   \u2584\u2580\u2580    \u2580\u2580\u2584     /work/project\n  \u2584\u2580\u2580      \u2580\u2580\u2584\n\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n>\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n? for shortcuts                                                                 Gemini 3.8 Flash \u00b7 medium\n"
           },
           {
             "at": 4000,
@@ -790,6 +790,119 @@
         "sentKeys": []
       },
       "source": "real ready screen; matched-rule verdict added to model a CLI whose detector has a rule"
+    },
+    {
+      "name": "composer-state-empty-ready",
+      "step": "composer-state",
+      "version": "1.4.2",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "empty"
+      }
+    },
+    {
+      "name": "composer-state-half-typed",
+      "step": "composer-state",
+      "version": "1.4.2",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "half-typed"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
+      "name": "composer-state-draft-in-composer",
+      "step": "composer-state",
+      "version": "1.4.2",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "draft-in-composer"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
+      "name": "composer-state-start-banner",
+      "step": "composer-state",
+      "version": "1.4.2",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "start-banner"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
+    },
+    {
+      "name": "composer-state-dialog-blocked",
+      "step": "composer-state",
+      "version": "1.4.2",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "trust-dialog"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
+    },
+    {
+      "name": "composer-state-busy-working",
+      "step": "composer-state",
+      "version": "1.4.2",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "working"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
+    },
+    {
+      "name": "composer-state-version-bump-yields-unknown",
+      "step": "composer-state",
+      "version": "1.9.999",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "ready",
+            "screen": "Antigravity CLI 1.9.999\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n>\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
     }
   ]
 }

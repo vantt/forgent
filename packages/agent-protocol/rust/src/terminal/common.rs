@@ -228,3 +228,39 @@ fn holds_a_window(message: &[char], bottom: &str) -> bool {
         .count()
         >= MIN_LINES
 }
+
+/// Extract the CLI version string from a screen, if the CLI banner/header is visible.
+pub fn extract_screen_version(cli: &str, screen: &str) -> Option<String> {
+    let lower = screen.to_lowercase();
+    match cli {
+        "claude" => {
+            let idx = lower.find("claude code v")?;
+            let rest = &screen[idx + "claude code v".len()..];
+            let ver: String = rest
+                .chars()
+                .take_while(|c| c.is_ascii_digit() || *c == '.' || *c == '-')
+                .collect();
+            (!ver.is_empty()).then_some(ver)
+        }
+        "codex" => {
+            let idx = lower.find("codex (v")?;
+            let rest = &screen[idx + "codex (v".len()..];
+            let ver: String = rest
+                .chars()
+                .take_while(|c| c.is_ascii_digit() || *c == '.' || *c == '-')
+                .collect();
+            (!ver.is_empty()).then_some(ver)
+        }
+        "agy" => {
+            let idx = lower.find("antigravity cli ")?;
+            let rest = &screen[idx + "antigravity cli ".len()..];
+            let ver: String = rest
+                .chars()
+                .take_while(|c| c.is_ascii_digit() || *c == '.' || *c == '-')
+                .collect();
+            (!ver.is_empty()).then_some(ver)
+        }
+        _ => None,
+    }
+}
+
