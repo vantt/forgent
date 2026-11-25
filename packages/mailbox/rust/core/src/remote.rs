@@ -208,8 +208,8 @@ impl MailboxState {
                 recipient.head.clone(),
             );
             self.check_loop(&account, &to, now, limits)?;
-            self.check_queue(&to, generation, limits)?;
-            self.check_share(&account, &to, generation, limits)?;
+            self.check_queue(&to, generation, None, limits)?;
+            self.check_share(&account, &to, generation, None, limits)?;
             Ok((to, generation, cli, head))
         })();
         let (to, to_generation, to_cli, to_head) = match recorded {
@@ -255,6 +255,7 @@ impl MailboxState {
             from_generation: None,
             to,
             to_generation,
+            to_role: None,
             reply_to: None,
             reply_to_hint: None,
             depth: 0,

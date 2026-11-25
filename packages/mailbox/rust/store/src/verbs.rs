@@ -8,7 +8,7 @@ use crate::adapters::version::{recipient_version, VersionSources};
 use crate::adapters::TestedClis;
 use crate::head::stored_liveness;
 use crate::hook::shell::{claimed_sizes, emit_and_finish, Emit, WriteGate};
-use crate::hook::{claim_inbox, HandleOf, InboxClaim};
+use crate::hook::{claim_inbox_with_roles, HandleOf, InboxClaim};
 use crate::nudge::Nudge;
 use crate::record::{Record, Reported, Wait};
 use fgos_mailbox_core::{
@@ -132,18 +132,23 @@ pub fn heads(fgos_dir: &std::path::Path, limits: &Limits) -> Result<Vec<HeadView
 /// The one rule of which bindings count as heads, shared by `list` and
 /// `status`: not a runner attempt's key, not judged dead.
 fn live_heads(state: &fgos_mailbox_core::MailboxState) -> Vec<HeadView> {
-    state
-        .bindings()
-        .filter(|b| !fgos_identity::is_attempt_writer_id(b.key.as_str()))
-        .map(|b| HeadView {
-            key: b.key.clone(),
-            name: b.name.clone(),
-            cli: b.cli.clone(),
-            liveness: stored_liveness(b),
-            head: crate::head::record_of_head_text(&b.head),
-        })
-        .filter(|h| h.liveness != Liveness::Dead)
-        .collect()
+    state.bindings().filter_map(head_view).collect()
+}
+
+/// A binding is a head only when it is not an attempt and is not judged dead.
+/// Also accepts a just-registered binding under a record hold.
+pub fn head_view(binding: &fgos_mailbox_core::Binding) -> Option<HeadView> {
+    if fgos_identity::is_attempt_writer_id(binding.key.as_str()) {
+        return None;
+    }
+    let liveness = stored_liveness(binding);
+    (liveness != Liveness::Dead).then(|| HeadView {
+        key: binding.key.clone(),
+        name: binding.name.clone(),
+        cli: binding.cli.clone(),
+        liveness,
+        head: crate::head::record_of_head_text(&binding.head),
+    })
 }
 
 /// The nudge a recorded send came to, or `None` when it asked for none that
@@ -260,6 +265,30 @@ pub fn inbox_claim(
     handle_of: &HandleOf<'_>,
     stdout: &mut dyn Write,
 ) -> Result<InboxClaimed, String> {
+    inbox_claim_with_roles(
+        record,
+        key,
+        wait,
+        clock,
+        limits,
+        handle_of,
+        &|_, _| false,
+        stdout,
+    )
+}
+
+/// The explicit inbox uses the same current-role-holder fact as the hook.
+/// Callers without role facts use `inbox_claim` for fixed-binding claims.
+pub fn inbox_claim_with_roles(
+    record: &Record,
+    key: &WriterKey,
+    wait: Wait,
+    clock: &dyn Fn() -> Timestamp,
+    limits: &Limits,
+    handle_of: &HandleOf<'_>,
+    holds_role: &dyn Fn(&fgos_mailbox_core::Binding, &str) -> bool,
+    stdout: &mut dyn Write,
+) -> Result<InboxClaimed, String> {
     let line = |stdout: &mut dyn Write, text: String| InboxClaimed {
         written: writeln!(stdout, "{text}")
             .and_then(|()| stdout.flush())
@@ -272,7 +301,7 @@ pub fn inbox_claim(
     let now = clock();
     let held = record
         .hold(wait, now, limits, |state, ids| {
-            let (claim, changed) = claim_inbox(state, key, now, limits, ids);
+            let (claim, changed) = claim_inbox_with_roles(state, key, now, limits, ids, holds_role);
             let sizes = match &claim {
                 InboxClaim::Claimed(claimed) => claimed_sizes(state, claimed),
                 InboxClaim::NoAddress | InboxClaim::Empty => BTreeMap::new(),

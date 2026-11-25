@@ -217,6 +217,7 @@ fn largest_header_bytes(limits: &Limits) -> u64 {
                 "state": state,
                 "to": key,
                 "to_generation": u32::MAX,
+                "to_role": "r".repeat(limits.frame.max_header_chars as usize),
                 "wake": true,
             });
             encoded_len::<Header>(value)

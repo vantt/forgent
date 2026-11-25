@@ -218,16 +218,25 @@ fn a_full_record_refuses_sends_and_keeps_draining() {
             .unwrap();
         assert!(finished.wrote);
     }
-    let registered = record
-        .hold(Wait::Try, later, &limits, |state, ids| {
-            rec::register(state, "a-new-head", later, &limits, ids)
-        })
-        .unwrap();
-    assert!(registered.wrote);
-    let size = std::fs::metadata(fgos.paths().snapshot()).unwrap().len();
+    // The exact gap left below the cap depends on the header schema.
+    // Cross it with real registrations rather than assuming one binding
+    // outweighs that gap (finishing a claim can shrink a header).
+    let mut size = 0;
+    for i in 0..heads.len() {
+        let registered = record
+            .hold(Wait::Try, later, &limits, |state, ids| {
+                rec::register(state, &format!("a-new-head-{i}"), later, &limits, ids)
+            })
+            .unwrap();
+        assert!(registered.wrote);
+        size = std::fs::metadata(fgos.paths().snapshot()).unwrap().len();
+        if size > write_cap as u64 {
+            break;
+        }
+    }
     assert!(
         size > write_cap as u64,
-        "the drains grew the record past the write cap"
+        "non-send holds grew the record past the write cap"
     );
     assert!(size <= snapshot_read_cap(&limits));
     rec::read_state(&record);

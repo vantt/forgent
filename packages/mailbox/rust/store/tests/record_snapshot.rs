@@ -222,38 +222,76 @@ fn each_core_answer_writes_exactly_when_it_changed_the_state() {
         .name
         .as_str()
         .to_string();
-    record
-        .send(
-            rec::send_req("cli-sender", &to, "hi"),
-            Wait::Try,
-            T0,
-            &limits,
-        )
-        .unwrap();
-    let claim = record
+    let role = "head:supervisor-main";
+    let mut request = rec::send_req("cli-sender", &to, "hi");
+    request.to = fgos_mailbox_core::Recipient::Role {
+        role: role.into(),
+        key: rec::key("head-a"),
+    };
+    let id = record
+        .send(request, Wait::Try, T0, &limits)
+        .unwrap()
+        .value
+        .unwrap()
+        .id;
+    assert_eq!(
+        rec::read_state(&record)
+            .message(&id)
+            .unwrap()
+            .to_role
+            .as_deref(),
+        Some(role),
+        "role intent survives the record, not just the in-memory claim"
+    );
+    let replacement = record
         .hold(Wait::Try, T0, &limits, |state, ids| {
-            state.claim(
-                &rec::key("head-a"),
-                Generation::FIRST,
-                Checkpoint::Step,
+            state.register(
+                RegisterRequest {
+                    head: "successor-head".into(),
+                    ..rec::register_request("head-a", &rec::own_head_record())
+                },
+                Some(StoredHead {
+                    same_head: false,
+                    liveness: Liveness::Dead,
+                }),
                 T0,
                 &limits,
                 ids,
             )
         })
         .unwrap()
+        .value
+        .unwrap();
+    let Registered::Replaced { generation, .. } = replacement else {
+        panic!("expected a successor")
+    };
+    let claim = record
+        .hold(Wait::Try, T0, &limits, |state, ids| {
+            state.claim_with_roles(
+                &rec::key("head-a"),
+                generation,
+                Checkpoint::Step,
+                T0,
+                &limits,
+                ids,
+                &|binding, r| r == role && binding.key == rec::key("head-a"),
+            )
+        })
+        .unwrap()
         .value;
     let held = record
         .hold(Wait::Try, T0, &limits, |state, _| {
-            state.finish(
-                &rec::key("head-a"),
-                Generation::FIRST,
-                &claim.token.unwrap(),
-                T0,
-            )
+            state.finish(&rec::key("head-a"), generation, &claim.token.unwrap(), T0)
         })
         .unwrap();
     wrote(held.wrote, "a finish of a real claim", true);
+    let persisted = rec::read_state(&record);
+    let header = persisted.message(&id).unwrap();
+    assert_eq!(header.to_generation, generation);
+    assert!(matches!(
+        header.state,
+        fgos_mailbox_core::MessageState::Offered { .. }
+    ));
 }
 
 #[test]
@@ -449,7 +487,7 @@ fn an_untrusted_record_directory_is_refused_before_any_write() {
 }
 
 #[test]
-fn the_frozen_version_1_snapshot_still_reads() {
+fn legacy_snapshots_still_read_as_fixed_addresses() {
     let fgos = TempFgos::new("frozen-v1");
     let fixture = std::fs::read(common::snapshot_fixture()).unwrap();
     let expected: serde_json::Value = serde_json::from_slice(&fixture).unwrap();
@@ -477,10 +515,10 @@ fn the_frozen_version_1_snapshot_still_reads() {
     std::fs::write(fgos.paths().snapshot(), &fixture).unwrap();
     let state = rec::read_state(&record);
     // Read as the current version: the one section a version 1 snapshot lacks
-    // is empty, the version is the current one and the retired binding field
+    // is empty, the version stays compatible at 2 and the retired binding field
     // is gone; nothing else changes.
     let mut upgraded = expected.clone();
-    upgraded["schema_version"] = fgos_mailbox_core::SNAPSHOT_SCHEMA_VERSION.into();
+    upgraded["schema_version"] = 2.into();
     // A binding's retired `handle` is read and dropped: the session's identifiers live in Identity.
     for binding in upgraded["bindings"].as_object_mut().unwrap().values_mut() {
         binding.as_object_mut().unwrap().remove("handle");
@@ -488,6 +526,20 @@ fn the_frozen_version_1_snapshot_still_reads() {
     upgraded["remote"] =
         serde_json::json!({ "baselined": false, "cursor": {}, "seen": {}, "refusals": [] });
     assert_eq!(serde_json::to_value(&state).unwrap(), upgraded);
+    assert!(
+        state.messages().all(|header| header.to_role.is_none()),
+        "legacy role intent is unknowable"
+    );
+    let mut version_two = upgraded.clone();
+    version_two["schema_version"] = 2.into();
+    std::fs::write(
+        fgos.paths().snapshot(),
+        serde_json::to_vec(&version_two).unwrap(),
+    )
+    .unwrap();
+    let migrated = rec::read_state(&record);
+    assert_eq!(serde_json::to_value(&migrated).unwrap(), upgraded);
+    assert!(migrated.messages().all(|header| header.to_role.is_none()));
 }
 
 #[test]

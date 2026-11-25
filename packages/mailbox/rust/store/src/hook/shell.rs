@@ -13,13 +13,13 @@
 //! duplicate window of spec §5.2), instead of being marked offered and lost.
 use super::breaker::Breaker;
 use super::{
-    begin, finish, render_reply, Adapter, Begun, Claimed, HandleOf, HeadFacts, HookCall, HookEvent,
-    HookLimits, QuietReason,
+    begin_with_roles, finish, render_reply, Adapter, Begun, Claimed, HandleOf, HeadFacts, HookCall,
+    HookEvent, HookLimits, QuietReason,
 };
 use crate::adapters::TestedClis;
 use crate::head::{caller_is_head, Ancestry, NoHead};
 use crate::record::{Paths, Record, RecordError, Reported, Wait};
-use fgos_mailbox_core::{Limits, MessageId, Timestamp, WriterKey};
+use fgos_mailbox_core::{Binding, Limits, MessageId, Timestamp, WriterKey};
 use std::collections::BTreeMap;
 use std::io::{Read, Write};
 use std::panic::{catch_unwind, AssertUnwindSafe};
@@ -184,6 +184,16 @@ pub struct ShellOutcome {
 /// The circuit breaker is read first: while it is open the call answers
 /// quiet before reading stdin. After the call, the outcome is counted.
 pub fn run(input: ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -> ShellOutcome {
+    run_with_roles(input, stdin, stdout, &|_, _| false)
+}
+
+/// Runs the hook with the host's live Identity role resolution.
+pub fn run_with_roles(
+    input: ShellInput<'_>,
+    stdin: &mut dyn Read,
+    stdout: &mut dyn Write,
+    holder: &dyn Fn(&Binding, &str) -> bool,
+) -> ShellOutcome {
     let paths = Paths::new(input.fgos_dir);
     let breaker = catch_unwind(AssertUnwindSafe(|| {
         Breaker::load(&paths, &input.hook.hook.breaker)
@@ -195,12 +205,10 @@ pub fn run(input: ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) 
     {
         return quiet(Quiet::BreakerOpen);
     }
-    let outcome =
-        catch_unwind(AssertUnwindSafe(|| drive(&input, stdin, stdout))).unwrap_or_else(|_| {
-            ShellOutcome {
-                panicked: true,
-                ..ShellOutcome::default()
-            }
+    let outcome = catch_unwind(AssertUnwindSafe(|| drive(&input, stdin, stdout, holder)))
+        .unwrap_or_else(|_| ShellOutcome {
+            panicked: true,
+            ..ShellOutcome::default()
         });
     if let Some(breaker) = breaker {
         let _ = catch_unwind(AssertUnwindSafe(|| {
@@ -217,7 +225,12 @@ fn quiet(reason: Quiet) -> ShellOutcome {
     }
 }
 
-fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -> ShellOutcome {
+fn drive(
+    input: &ShellInput<'_>,
+    stdin: &mut dyn Read,
+    stdout: &mut dyn Write,
+    holder: &dyn Fn(&Binding, &str) -> bool,
+) -> ShellOutcome {
     let cap = input.hook.hook.max_read_bytes;
     let mut payload = Vec::new();
     if stdin
@@ -263,7 +276,7 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
     };
     let now = (input.clock)();
     let held = record.hold(wait, now, input.limits, |state, ids| {
-        let begun = begin(
+        let begun = begin_with_roles(
             state,
             &call,
             now,
@@ -271,6 +284,7 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
             input.hook,
             input.tested,
             ids,
+            holder,
         );
         let sizes = match &begun {
             Begun::Claimed(claimed) => claimed_sizes(state, claimed),

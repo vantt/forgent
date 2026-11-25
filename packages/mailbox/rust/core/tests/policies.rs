@@ -279,12 +279,36 @@ fn a_full_queue_refuses_the_newest_message_and_keeps_the_old_ones_one_sender_can
         .collect();
     assert_eq!(kept, oldest);
 
-    // A new process at b does not inherit the old queue.
+    // A new process at b does not inherit the old fixed-address queue.
     pair.take_over("b", "codex", t(2));
     assert_eq!(
         code(&pair.try_send(plain("late", B_NAME, "m"), t(2))),
         "recorded"
     );
+
+    // Role backlog is different: rotating cannot reset either queue cap
+    // before the successor's first drain reroutes its pending messages.
+    for (cap, share, expected) in [(1, 2, "queue-full"), (2, 1, "sender-share-full")] {
+        let mut pair = Pair::new(t(0));
+        pair.limits.queue.cap = cap;
+        pair.limits.queue.per_sender = share;
+        let request = |to| {
+            let mut req = plain("a", B_NAME, "m");
+            req.to = fgos_mailbox_core::Recipient::Role {
+                role: "head:supervisor-main".into(),
+                key: key(to),
+            };
+            req
+        };
+        assert_eq!(code(&pair.try_send(request("b"), t(1))), "recorded");
+        pair.add_head("c", t(2));
+        assert_eq!(code(&pair.try_send(request("c"), t(2))), expected);
+        assert_eq!(
+            pair.state.messages().count(),
+            1,
+            "the oldest role mail is never evicted"
+        );
+    }
 }
 
 #[test]
@@ -387,6 +411,44 @@ fn a_sender_key_longer_than_the_header_bound_is_refused_before_any_other_check_a
     );
     let at_bound = pair.try_send(plain(&"s".repeat(bound), B_NAME, "hi"), t(2));
     assert_eq!(code(&at_bound), "recorded");
+}
+
+// Admission owns the role alphabet/size invariant; no earlier test covers
+// role text from a direct core caller rather than Identity's host adapter.
+#[test]
+fn role_admission_bounds_kind_and_name_without_json_escaping() {
+    let bound = Pair::new(t(0)).limits.frame.max_header_chars as usize;
+    let at_bound = format!("head:{}", "a".repeat(bound - 5));
+    for (role, accepted) in [
+        ("head:supervisor-main".to_owned(), true),
+        ("lead:PROBE".to_owned(), true),
+        ("work:probe-run".to_owned(), true),
+        (at_bound.clone(), true),
+        (format!("{at_bound}a"), false),
+        (String::new(), false),
+        ("head".into(), false),
+        (":name".into(), false),
+        ("head:".into(), false),
+        ("head:a:b".into(), false),
+        ("head:a\"b".into(), false),
+        ("head:a\\b".into(), false),
+        ("head:a\nb".into(), false),
+        ("head:a\0b".into(), false),
+        ("head:é".into(), false),
+    ] {
+        let mut pair = Pair::new(t(0));
+        let mut req = plain("a", B_NAME, "hi");
+        req.to = fgos_mailbox_core::Recipient::Role {
+            role: role.clone(),
+            key: key("b"),
+        };
+        let outcome = pair.try_send(req, t(1));
+        assert_eq!(outcome.is_ok(), accepted, "{role:?}: {outcome:?}");
+        assert_eq!(pair.state.messages().count(), usize::from(accepted));
+        if !accepted {
+            assert_eq!(code(&outcome), "unknown-name");
+        }
+    }
 }
 
 #[test]

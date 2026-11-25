@@ -207,9 +207,32 @@ impl MailboxState {
         limits: &Limits,
     ) -> Result<Admitted, Refusal> {
         check_sender_key(&req.from, limits)?;
+        let role = match &req.to {
+            Recipient::Role { role, .. } => {
+                // Identity owns role resolution; admission only accepts its bounded
+                // kind:name alphabet so no JSON escaping can inflate a header.
+                let valid = role.split_once(':').is_some_and(|(kind, name)| {
+                    !kind.is_empty()
+                        && kind.bytes().all(|b| b.is_ascii_lowercase())
+                        && !name.is_empty()
+                        && name
+                            .bytes()
+                            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-'))
+                });
+                if !valid || role.len() > limits.frame.max_header_chars as usize {
+                    return Err(Refusal::Alias(crate::delivery::AliasRefusal::Unknown {
+                        candidates: Vec::new(),
+                    }));
+                }
+                Some(role.as_str())
+            }
+            _ => None,
+        };
         let recipient = match &req.to {
             Recipient::Name(query) => self.resolve_skipping(query, &req.dead_keys)?,
-            Recipient::Key(key) => self.resolve_key(key, &req.dead_keys)?,
+            Recipient::Key(key) | Recipient::Role { key, .. } => {
+                self.resolve_key(key, &req.dead_keys)?
+            }
             Recipient::Refused(refusal) => return Err(Refusal::Alias(refusal.clone())),
         };
         check_not_self(&req.from, &recipient.key)?;
@@ -224,8 +247,8 @@ impl MailboxState {
             .map_or(0, |h| h.depth.saturating_add(1));
         check_depth(depth, limits)?;
         self.check_loop(account, &recipient.key, now, limits)?;
-        self.check_queue(&recipient.key, recipient.generation, limits)?;
-        self.check_share(account, &recipient.key, recipient.generation, limits)?;
+        self.check_queue(&recipient.key, recipient.generation, role, limits)?;
+        self.check_share(account, &recipient.key, recipient.generation, role, limits)?;
         Ok(Admitted {
             to: recipient.key.clone(),
             to_name: recipient.name.clone(),
@@ -388,17 +411,23 @@ impl MailboxState {
         Ok(())
     }
 
-    /// Check 10: pending mail to the recipient's current generation.
+    /// Check 10: pending mail to this generation, including the role's
+    /// backlog still addressed to a predecessor. Rotation cannot reset caps.
     pub(crate) fn check_queue(
         &self,
         to: &WriterKey,
         generation: Generation,
+        role: Option<&str>,
         limits: &Limits,
     ) -> Result<(), Refusal> {
         let queued = self
             .messages
             .iter()
-            .filter(|h| &h.to == to && h.to_generation == generation && pending(h))
+            .filter(|h| {
+                pending(h)
+                    && ((&h.to == to && h.to_generation == generation)
+                        || role.is_some_and(|r| h.to_role.as_deref() == Some(r)))
+            })
             .count();
         if queued >= limits.queue.cap as usize {
             return Err(Refusal::QueueFull {
@@ -414,12 +443,17 @@ impl MailboxState {
         account: &Account,
         to: &WriterKey,
         generation: Generation,
+        role: Option<&str>,
         limits: &Limits,
     ) -> Result<(), Refusal> {
         let held = self
             .messages
             .iter()
-            .filter(|h| &h.to == to && h.to_generation == generation && pending(h))
+            .filter(|h| {
+                pending(h)
+                    && ((&h.to == to && h.to_generation == generation)
+                        || role.is_some_and(|r| h.to_role.as_deref() == Some(r)))
+            })
             .filter(|h| self.header_is_account(h, account))
             .count();
         if held >= limits.queue.per_sender as usize {

@@ -10,7 +10,7 @@
 //! Every snapshot struct denies unknown fields, so an older core can never
 //! read a newer snapshot and silently drop what it does not know (and so
 //! reset a cap that is never reset). Deserializing a `MailboxState` refuses
-//! any version but the current one; the store may read [`SnapshotVersion`]
+//! unreadable versions; the store may read [`SnapshotVersion`]
 //! first to tell a newer snapshot (never used, never overwritten) from an
 //! older one.
 use crate::ack::AckWatch;
@@ -23,15 +23,17 @@ use crate::registry::Binding;
 use crate::time::Timestamp;
 use crate::wake::{Exchange, ExchangeKey, WakeLifetimeKey};
 use serde::de::Error as _;
-use serde::{Deserialize, Deserializer, Serialize};
+use serde::ser::SerializeStruct;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::collections::{BTreeMap, VecDeque};
 
-/// The version of the snapshot shape this core reads and writes.
-pub const SNAPSHOT_SCHEMA_VERSION: u32 = 2;
+/// The newest snapshot shape this core reads and writes.
+pub const SNAPSHOT_SCHEMA_VERSION: u32 = 3;
 
-/// The oldest version this core still reads; it is read as the current one
-/// and written back as the current one (version 2 only added the `remote`
-/// section and a header's `origin`, both empty in a version 1 snapshot).
+/// The oldest version this core still reads. Writes use version 2 until
+/// a header carries role intent, then version 3. Version 2 added remote state;
+/// version 3 adds role intent. Legacy headers remain fixed addresses,
+/// because their original role intent cannot be recovered safely.
 const OLDEST_READABLE_VERSION: u32 = 1;
 
 /// The version field alone, read before the whole snapshot.
@@ -72,7 +74,7 @@ impl std::fmt::Display for SnapshotVersionError {
 impl std::error::Error for SnapshotVersionError {}
 
 impl SnapshotVersion {
-    /// Accepts the current version and the one before it.
+    /// Accepts every version with an implemented read migration.
     pub const fn check(&self) -> Result<(), SnapshotVersionError> {
         let found = self.schema_version;
         let supported = SNAPSHOT_SCHEMA_VERSION;
@@ -86,7 +88,7 @@ impl SnapshotVersion {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct MailboxState {
     /// Always [`SNAPSHOT_SCHEMA_VERSION`]: deserialization refuses a newer
@@ -152,6 +154,34 @@ pub struct RemoteRefusal {
     pub id: String,
     /// The refusal's code, as the same-machine mailbox names it.
     pub code: String,
+}
+
+impl Serialize for MailboxState {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let version = if self.messages.iter().any(|header| header.to_role.is_some()) {
+            SNAPSHOT_SCHEMA_VERSION
+        } else {
+            2
+        };
+        let mut state = serializer
+            .serialize_struct("MailboxState", 12 + usize::from(!self.ack_watch.is_empty()))?;
+        state.serialize_field("schema_version", &version)?;
+        state.serialize_field("last_now", &self.last_now)?;
+        state.serialize_field("bindings", &self.bindings)?;
+        state.serialize_field("messages", &self.messages)?;
+        state.serialize_field("notices", &self.notices)?;
+        state.serialize_field("notice_last", &self.notice_last)?;
+        state.serialize_field("counters", &self.counters)?;
+        state.serialize_field("budget", &self.budget)?;
+        state.serialize_field("lifetime", &self.lifetime)?;
+        state.serialize_field("exchanges", &self.exchanges)?;
+        state.serialize_field("wake_lifetime", &self.wake_lifetime)?;
+        state.serialize_field("remote", &self.remote)?;
+        if !self.ack_watch.is_empty() {
+            state.serialize_field("ack_watch", &self.ack_watch)?;
+        }
+        state.end()
+    }
 }
 
 fn current_schema_version<'de, D: Deserializer<'de>>(deserializer: D) -> Result<u32, D::Error> {
