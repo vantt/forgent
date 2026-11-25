@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9e198cd69fcbd06e851707dc32ff5268bfd55451ac7c587ee9e28d06e1431128",
+  "payloadDigest": "ef02487988a6f1d9d1afb780b2afe50029a9360aae458b7647bfb9b712e9e1f7",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -67,7 +67,7 @@
     ".agents/skills/fgos-run/SKILL.md": "04c3ddb332589b9bb5c3bd4ebd30acdb812e2603915a229e07c84e0d3ef919e2",
     ".agents/skills/fgos-secretary/SKILL.md": "9ae8f5fa22733f7da00deb4c7a3d6a22b4c0998492f94692fa9b1bae2daa4992",
     ".agents/skills/fgos-shaping/SKILL.md": "ef03784b3999984acb7901b98e17b69d9f5ae745c686e42c4baa71c9a6cace21",
-    ".agents/skills/fgos-supervisor/SKILL.md": "2cf001c3c1f99d50a3becce7d2885989b46503757ea51466c9080ff8c838cfbb",
+    ".agents/skills/fgos-supervisor/SKILL.md": "5ca0a75ddb67e5d6337ddecbf15bce46f87f004c1671d2938d4b255b51e0ce30",
     ".agents/skills/handoff/SKILL.md": "124ace4391416aa9f713f9f86a0c0f752123fcdd32d9e653855c62947bacf0ee",
     ".agents/skills/instruction-audit/SKILL.md": "0269219bf0ecffddabc89246be5e5a9e9376512bf43a42c1a38535457395dcc5",
     ".agents/skills/instruction-audit/references/lane-prompts.md": "adac8362adbb7eb04c163fbcf3cdb16aa566e61a6f4a6a9351c07d4fc4d08d52",
@@ -259,7 +259,7 @@
     "core/skills/fgos-run/SKILL.md": "7f8a0d3be342c8c6a2a83c832d5751ab6ed309fde1dd2293cc3bf645f18da690",
     "core/skills/fgos-secretary/SKILL.md": "77104f1d694d505a51d30de515b233b7ed7cea0bb51ff09c43efd18716d48063",
     "core/skills/fgos-shaping/SKILL.md": "8c6ded79b27a6a5efdba3cc52f1a89bda3e104a6f6b61affb8432c93328c8e48",
-    "core/skills/fgos-supervisor/SKILL.md": "83c3b7b9fab7e6e97831691126c88e599bcb8292965bf1af95b214ddbfe81bca",
+    "core/skills/fgos-supervisor/SKILL.md": "e293e9de82abbba8c58a62f3bf3f1f3768431bf7ea90f229d56ccef7d3586655",
     "core/skills/handoff/SKILL.md": "343de2c43cdcb3f01106a91c5b26953655450bafe2822d2a90a6e33561694a6a",
     "core/skills/instruction-audit/SKILL.md": "79448c61fd11621ea5dcd6d76f533a715b275378e0c476d982be4f56a8fc55b6",
     "core/skills/instruction-audit/references/lane-prompts.md": "7768d7562c9d45d2c40fb5602ed542c7711df2d31978351c1751f801ac6de112",
