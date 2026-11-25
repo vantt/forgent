@@ -1,7 +1,7 @@
 ---
 id: p-cg4w6nn5l6
 title: Event-store io errors drop the path and the operation, so a CI-only `NotFound` cannot be traced (event store, priority medium)
-status: proposed
+status: done
 priority: P2
 area: event-store
 created: 2026-11-15

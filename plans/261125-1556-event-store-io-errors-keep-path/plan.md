@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Event-store io errors keep the path and the operation in the invocation-fault log"
-status: running
+status: done
 priority: P1
 blockedBy: []
 base: c3e132e943e1d9fb37053e75849141fc6522aea7
@@ -74,6 +74,9 @@ constraint).
 3. `node --test test/report/decision-index.test.mjs` passes, and every `status` assertion on a child run carries the
    child's stderr as its message (read the file: no bare `assert.equal(run(...).status, N)` remains).
 4. `npm test` and `cargo test --workspace` green on the combined tree (phase 3).
+   Outcome (2026-11-25, main `829bb5311`): neither suite is green (npm 24 fail, cargo 8 fail), and no failure is in
+   or reads this plan's files. The lead closed the plan on that evidence; see
+   [the gate report](reports/integration-261125-1703-event-store-io-errors-gate.md).
 5. `docs/platform/event-store/spec.md` has a dated line saying a trigger's error is the code and its detail. No
    `CHANGELOG.md` line: the change adds text to a local diagnostic log and changes no command, config or output
    contract, and `CHANGELOG.md` is held by the running plan `261124-0004-heads-operate-without-owner`.
@@ -97,7 +100,7 @@ constraint).
 |---|---|---|---|---|---|
 | 1 | [Trigger error keeps the detail](phase-01-trigger-error-keeps-detail.md) | - | packages/event-store/rust/src/lifecycle.rs, packages/event-store/rust/tests/lifecycle.rs, packages/git/node-addon/src/event_store.rs, src/event-store/maintenance.mjs, test/event-store/triggers.test.mjs, test/event-store/lifecycle.test.mjs, docs/platform/event-store/spec.md | 1 | done |
 | 2 | [decision-index tests print child stderr](phase-02-decision-index-stderr.md) | - | test/report/decision-index.test.mjs | 1 | done |
-| 3 | [Integration](phase-03-integration.md) | 1, 2 | plans/261125-1556-event-store-io-errors-keep-path/reports/ | 2 | ready |
+| 3 | [Integration](phase-03-integration.md) | 1, 2 | plans/261125-1556-event-store-io-errors-keep-path/reports/ | 2 | done |
 
 Contract check: phases 1 and 2 share wave 1 with disjoint footprints; phase 3 depends on both and sits in wave 2. The
 hot file (the event-store spec) belongs to phase 1 only; `CHANGELOG.md` is left out (acceptance criterion 5). Capability for every phase: `code:implement`

@@ -1,46 +1,41 @@
 # Phase 3 integration gate — event-store-io-errors-keep-path
 
-Tree: worktree at main tip 4871e5b8 (carries phases 1 and 2). Run inside the confined producer sandbox.
-Verdict: **gate NOT green in this run. It is inconclusive, not a proven regression.** Plan status was not touched.
+Verdict: **phase 3 closed.** The full suites ran unconfined on a tree carrying phases 1 and 2. Neither suite is
+green, but no failure is in, or reads, the files this plan changed. Every failure belongs to other work on main.
 
-## `npm test` — did not run
+## Unconfined run (the gate of record)
 
-The Rust host and addon build finished. The suite then aborted before any test ran:
-`EROFS: read-only file system, open '/home/vantt/.local/state/fgos/locks/full-suite.lock'`
-(from `scripts/lib/full-suite-queue.mjs:66` via `src/holder-lock/index.mjs:161`).
-The sandbox mounts `~/.local/state/fgos` read-only, so the full-suite queue lock cannot be taken.
-Pass/fail counts: none. This has to be rerun outside the sandbox.
+Run by the supervisor on main `829bb5311`, release `33f462be`, on 2026-11-25. Phase 1 (`4871e5b8`) and phase 2
+(`c64d20ed`) are ancestors of `829bb5311`. Failing tests and their first error lines:
+`plans/reports/supervisor-261125-1838-npm-test-24-failures-on-main.md`.
 
-## `cargo test --workspace --no-fail-fast`
+- `npm test`: 6675 tests, 6624 pass, 24 fail, 27 skipped. None is in `test/event-store` or `test/report/decision-index`.
+- `cargo test --workspace --no-fail-fast`: 4452 pass, 8 fail. None is in an event-store package.
 
-11 test binaries failed; the rest passed. I did not read the panic text of every failure and did not
-get a total passed count. Failing tests seen:
-- `-p fgos --bin fgos`: 561 passed, 7 failed — all in `wiring::doctor::confinement::tests`
-  (`a_home_owned_by_a_dead_process_is_named_by_the_row_and_removed_only_by_the_fix` and 6 in `copies::`).
-- `-p fgos --test cli_tests`: 114 passed, 1 failed —
-  `the_execution_route_run_unit_op_refuses_an_option_outside_the_contract_and_answers_a_refused_run`
-  (assertion: output should contain "that no dispatch applies").
-- `-p fgos --test internal_lock_routes`: 2 failed — `quiesce_scan_lists_a_process_working_in_the_workspace`,
-  `quiesce_scan_counts_a_process_by_its_own_workspace_and_its_typed_execution_root`.
-- `-p fgos --test supervision_verbs`: 2 failed — `a_confined_head_sends_the_coordination_verbs_through_the_request_socket`,
-  `a_confined_queue_read_and_a_multi_id_handled_go_through_the_request_socket`.
-- `-p fgos-component-authority --test model_checks`: 1 failed —
-  `every_top_level_package_contract_file_and_every_prose_contract_has_exactly_one_row`.
-- `-p fgos-config --test authoring_equivalence`: 1 failed —
-  `standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config`.
-- Further failing binaries (about 5 more) are listed in the full cargo output, which was not kept.
+## Why the red tests do not block this plan
 
-Most failures are in confinement, lock, quiesce and socket tests. That fits sandbox interference
-(read-only state dir, process/socket visibility), but I did not prove that. None of the names seen touches the
-event store or the decision index (the areas phases 1 and 2 changed). A rerun outside the sandbox is needed to confirm.
-The event-store crate's `a_failed_event_store_child_is_recorded_with_the_failure_text...` test passed.
+- **What this plan changed:** phase 1 changed `packages/event-store/rust/src/lifecycle.rs` and its test,
+  `packages/git/node-addon/src/event_store.rs`, `src/event-store/maintenance.mjs`,
+  `test/event-store/triggers.test.mjs`, the event-store spec and the mutation census. Phase 2 changed only
+  `test/report/decision-index.test.mjs`.
+- **What the failing tests touch:** none of the 18 failing test files mentions `event-store`, `event_store`,
+  `maintenance.mjs`, `maintain_event_store` or `decision-index` (checked by grep on 2026-11-25).
+- **Where the cargo failures come from:** seven of the eight follow from the head-permission work.
+  `head-permissions.v1.json` was added by `8c51967e4` and `can-i` was added by `996c0c9f4`. The eighth,
+  `holder-lock` multiprocess round 15, is sensitive to machine load.
+- **Where the npm failures come from:** the supervisor report groups them by owner. They are run-supervisor
+  timeouts, envelope vectors, the assignment allow-list, provider fixtures, workflow guides, packaging and one
+  convention violation.
+- **The behaviour this plan adds is proven:** the event-store lifecycle tests passed (8/8), including
+  `a_trigger_io_failure_names_the_operation_and_the_path`. Each phase also passed its land gate with its named
+  test file.
 
 ## Step 2 — real fault records
 
-I could not read `/home/vantt/projects/forgent/.fgos/logs/invocation-faults.jsonl`: the sandbox denied access to
-that path. No record was checked. Proof available for the new detail is the phase 1 test
-`a_trigger_io_failure_names_the_operation_and_the_path`, which I did not rerun in isolation here.
+No real `event-store-end-trigger` record was read for this report, so the phase 1 test is the proof that the
+log message names the operation and the path. Tracing the live faults is the follow-up row `p-duxnm52lzh`.
 
-## Needed from a non-sandboxed run
-1. `npm test` and `cargo test --workspace` with write access to `~/.local/state/fgos`.
-2. `grep event-store-end-trigger` in the main checkout's `invocation-faults.jsonl` for records after 2026-11-25T10:03Z.
+## Earlier confined attempt (void)
+
+A unit run inside the producer sandbox on `4871e5b8` could not run `npm test`: EROFS on
+`~/.local/state/fgos/locks/full-suite.lock`. That run is superseded by the unconfined run above.
