@@ -70,7 +70,6 @@ impl ComposerState {
     }
 }
 
-
 impl TerminalOutcome {
     /// The receipt's `reason` for an outcome that ends the run early; `None` for a step that went well.
     pub fn receipt_reason(&self) -> Option<String> {
@@ -256,6 +255,7 @@ fn read_result(_dir: &Path, path: &Path) -> Option<(Vec<u8>, SystemTime)> {
 pub struct Profile {
     pub cli: &'static str,
     pub pinned_version: &'static str,
+    pub version_marker: Option<&'static str>,
     pub exit: ExitCommand,
     /// Gap between typing the brief and pressing Enter. A CLI that reads a
     /// quick text-then-Enter as one paste turns the Enter into a newline.
@@ -346,6 +346,10 @@ impl Terminal {
     /// Whether the CLI's input box is empty, so a typed wake never merges with a person's
     /// half-typed text or an unsent draft. Busy panes, dialogs, setups, and screens whose
     /// detected version differs from [`Terminal::pinned_version`] evaluate to [`ComposerState::Unknown`].
+    ///
+    /// # Contract
+    /// The predicate checks the version only when the banner is on screen; a caller must check
+    /// the CLI version itself (the session-level version) and treat a mismatch as Unknown.
     pub fn composer_state(&self, screen: &str, inspection: &Inspection) -> ComposerState {
         if self.classify_blocked(screen).is_some() || self.setup_line(screen).is_some() {
             return ComposerState::Unknown;
@@ -359,9 +363,11 @@ impl Terminal {
         if has_working_tail(&bottom_lines(screen, 6)) {
             return ComposerState::Unknown;
         }
-        if let Some(screen_ver) = extract_screen_version(self.cli(), screen) {
-            if screen_ver != self.profile.pinned_version {
-                return ComposerState::Unknown;
+        if let Some(marker) = self.profile.version_marker {
+            if let Some(screen_ver) = extract_screen_version(marker, screen) {
+                if screen_ver != self.profile.pinned_version {
+                    return ComposerState::Unknown;
+                }
             }
         }
         (self.profile.composer_state)(screen, inspection)

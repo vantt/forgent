@@ -10,6 +10,7 @@ use crate::Inspection;
 pub const PROFILE: Profile = Profile {
     cli: "agy",
     pinned_version: "1.4.2",
+    version_marker: Some("antigravity cli "),
     exit: ExitCommand::Text("/exit"),
     enter_gap_ms: 300,
     submit_by_prompt_door: true,
@@ -67,16 +68,6 @@ fn composer_state(screen: &str, inspection: &Inspection) -> ComposerState {
             return ComposerState::NotEmpty;
         }
         return ComposerState::NotEmpty;
-    } else if sep_indices.len() == 1 {
-        let bot_sep = sep_indices[0];
-        let start = bot_sep.saturating_sub(6);
-        let above: Vec<&str> = (start..bot_sep)
-            .map(|i| lines[i].trim())
-            .filter(|l| !l.is_empty())
-            .collect();
-        if above.iter().any(|l| l.starts_with("line ") || l.contains("line ")) {
-            return ComposerState::NotEmpty;
-        }
     }
     ComposerState::Unknown
 }

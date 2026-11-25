@@ -7,6 +7,7 @@ use crate::Inspection;
 pub const PROFILE: Profile = Profile {
     cli: "pi",
     pinned_version: "1.3.0",
+    version_marker: None,
     exit: ExitCommand::Keys(&["C-d"]),
     enter_gap_ms: 300,
     submit_by_prompt_door: true,

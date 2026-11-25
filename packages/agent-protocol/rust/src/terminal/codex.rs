@@ -8,6 +8,7 @@ use crate::Inspection;
 pub const PROFILE: Profile = Profile {
     cli: "codex",
     pinned_version: "0.163.0",
+    version_marker: Some("codex (v"),
     exit: ExitCommand::Text("/quit"),
     enter_gap_ms: 600,
     submit_by_prompt_door: true,
@@ -44,13 +45,6 @@ fn composer_state(screen: &str, inspection: &Inspection) -> ComposerState {
             }
             return ComposerState::NotEmpty;
         }
-    }
-    // Draft in composer without a prompt line above status footer
-    let bottom = bottom_lines(screen, 6);
-    if bottom.lines().any(|l| {
-        l.contains("line ") || l.contains("{\"contract\":") || l.contains("Write these two files")
-    }) {
-        return ComposerState::NotEmpty;
     }
     ComposerState::Unknown
 }

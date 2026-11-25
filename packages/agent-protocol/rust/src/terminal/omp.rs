@@ -10,6 +10,7 @@ use crate::Inspection;
 pub const PROFILE: Profile = Profile {
     cli: "omp",
     pinned_version: "18.12.1",
+    version_marker: None,
     exit: ExitCommand::Keys(&["C-d"]),
     enter_gap_ms: 300,
     submit_by_prompt_door: true,

@@ -6,6 +6,7 @@ use crate::Inspection;
 pub const PROFILE: Profile = Profile {
     cli: "claude",
     pinned_version: "2.1.302",
+    version_marker: Some("claude code v"),
     exit: ExitCommand::Text("/exit"),
     enter_gap_ms: 300,
     submit_by_prompt_door: false,
@@ -15,42 +16,38 @@ pub const PROFILE: Profile = Profile {
     composer_state,
 };
 
+fn strip_prompt_prefix(line: &str) -> &str {
+    let s = line.trim();
+    s.strip_prefix('❯')
+        .or_else(|| s.strip_prefix('>'))
+        .unwrap_or(s)
+        .trim_start()
+}
+
+fn classify_prompt_line(line: &str) -> ComposerState {
+    if has_paste_chip(line) {
+        return ComposerState::NotEmpty;
+    }
+    let trimmed = strip_prompt_prefix(line).trim();
+    if trimmed.is_empty() {
+        return ComposerState::Empty;
+    }
+    // Screen text alone cannot distinguish the placeholder from an identical draft.
+    if trimmed == "Try \"refactor <filepath>\"" {
+        return ComposerState::Unknown;
+    }
+    ComposerState::NotEmpty
+}
+
 fn composer_state(screen: &str, inspection: &Inspection) -> ComposerState {
     let pt = inspection.prompt_text.trim();
     if !pt.is_empty() {
-        if has_paste_chip(pt) {
-            return ComposerState::NotEmpty;
-        }
-        let cleaned: String = pt
-            .chars()
-            .filter(|c| *c != '❯' && *c != '>' && *c != '\u{a0}')
-            .collect();
-        let trimmed = cleaned.trim();
-        if trimmed.is_empty() {
-            return ComposerState::Empty;
-        }
-        let lower = trimmed.to_lowercase();
-        if lower.starts_with("try \"") || lower.starts_with("try ") {
-            return ComposerState::Empty;
-        }
-        return ComposerState::NotEmpty;
+        return classify_prompt_line(pt);
     }
     let bottom = bottom_lines(screen, 8);
     for line in bottom.lines().rev() {
         if line.contains('❯') || line.trim_start().starts_with('>') {
-            let cleaned: String = line
-                .chars()
-                .filter(|c| *c != '❯' && *c != '>' && *c != '\u{a0}')
-                .collect();
-            let trimmed = cleaned.trim();
-            if trimmed.is_empty() {
-                return ComposerState::Empty;
-            }
-            let lower = trimmed.to_lowercase();
-            if lower.starts_with("try \"") || lower.starts_with("try ") {
-                return ComposerState::Empty;
-            }
-            return ComposerState::NotEmpty;
+            return classify_prompt_line(line);
         }
     }
     ComposerState::Unknown

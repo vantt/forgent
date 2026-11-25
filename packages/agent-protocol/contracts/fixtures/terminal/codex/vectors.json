@@ -807,7 +807,7 @@
         ]
       },
       "expect": {
-        "composerState": "not-empty"
+        "composerState": "unknown"
       }
     },
     {
@@ -823,7 +823,7 @@
         ]
       },
       "expect": {
-        "composerState": "not-empty"
+        "composerState": "unknown"
       }
     },
     {
