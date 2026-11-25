@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "source": "src/run-supervisor/gate-kill-grace.mjs (dispatch keys through the config door); layering recorded from the retired Node module the contract (last at `85760c6f2`)",
+  "source": "src/run-supervisor/gate-kill-grace.mjs (retired; last at `85760c6f2`) (dispatch keys through the config door); layering recorded from the contract",
   "cases": [
     {
       "name": "standard only",
