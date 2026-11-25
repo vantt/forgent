@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Head to head mail from inside the cage: one send, the door picks the path and wakes the recipient, every refusal names its cause"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 footprint:
@@ -36,9 +36,8 @@ footprint:
   - packages/agent-protocol/contracts/fixtures/terminal/**
   - packages/identity/rust/src/directory.rs
   - docs/platform/agent-mailbox/spec.md
-  - CHANGELOG.md
   - test/live/mailbox-heads.live.mjs
-base: 00aac6f56a6d30df40ddf155f4025f2a92784ed3
+base: 333cd72c81eabdab3bfda652dfc9633710e1da02
 source:
   - plans/discussions/ds-h3fvnp6qbt-head-communication-and-requests/DISCUSSION.md
   - p-rchuoa2v3k
@@ -85,8 +84,8 @@ is offered once to its successor.
    outstanding nudge per head and falls back to `turn` on `unknown`; the send answer's `path` field is one of
    `local-pushed`, `local-typed`, `local-next-tool-call`, `remote-recorded` (criteria 5, 6).
 7. `docs/platform/agent-mailbox/spec.md` header, §6.2, §15.2 and §15.8 match main (cross-machine mail built, typed
-   wake built, the shared crate not built), and `CHANGELOG.md` `[Unreleased]` names the change (criterion 7, spec
-   half).
+   wake built, the shared crate not built) (criterion 7, spec half). The `CHANGELOG.md` line is written by the
+   follow-up plan, since the running plan `261125-1631-agent-context-engine` owns that file.
 8. `node --test test/live/mailbox-heads.live.mjs` (live, run by the integration phase) shows each confined persona
    sending to a peer and reading a reply, an idle head of each drained CLI woken within the bound without focus
    change, and one cross-machine send read after a fetch; `npm test` and `cargo test --workspace` green on the
@@ -154,18 +153,18 @@ needed.
 | 3 | [Composer state per CLI](phase-03-composer-state.md) | - | packages/agent-protocol/rust/src/terminal/**, packages/agent-protocol/rust/tests/terminal_vectors.rs, packages/agent-protocol/contracts/fixtures/terminal/** | 1 | ready |
 | 4 | [Mail through the request socket](phase-04-mail-through-socket.md) | 1 | packages/session-host/contracts/head-permissions.v1.json, packages/session-host/rust/src/forwarder.rs, packages/session-host/rust/src/permissions.rs, packages/session-host/rust/tests/forwarder.rs, packages/session-host/rust/tests/permissions.rs, packages/run-supervisor/rust/src/head_client.rs, packages/run-supervisor/rust/src/head_request.rs, apps/fgos/src/wiring/mailbox_root.rs, apps/fgos/src/wiring/mailbox_hook.rs, apps/fgos/src/wiring/mailbox_verbs.rs, apps/fgos/tests/mailbox_routes.rs | 2 | ready |
 | 5 | [The send door wakes the recipient](phase-05-send-door-wakes.md) | 2, 3, 4 | packages/mailbox/rust/store/src/nudge.rs, packages/mailbox/rust/store/src/verbs.rs, packages/mailbox/rust/store/src/adapters/**, packages/mailbox/rust/store/tests/nudge_*.rs, packages/mailbox/rust/core/src/report.rs, packages/mailbox/contracts/adapters.v1.json, packages/mailbox/contracts/frame.v1.txt, packages/session-host/rust/src/pane_io.rs, packages/session-host/rust/tests/typed_wake.rs, packages/identity/rust/src/directory.rs, apps/fgos/src/wiring/mailbox_verbs.rs, apps/fgos/src/wiring/mailbox_verbs/**, apps/fgos/tests/mailbox_routes.rs | 3 | ready |
-| 6 | [Mailbox spec matches main](phase-06-spec.md) | 4, 5 | docs/platform/agent-mailbox/spec.md, CHANGELOG.md | 4 | ready |
+| 6 | [Mailbox spec matches main](phase-06-spec.md) | 4, 5 | docs/platform/agent-mailbox/spec.md | 4 | ready |
 | 7 | [Live probe and integration](phase-07-live-probe-and-integration.md) | 1, 2, 3, 4, 5, 6 | test/live/mailbox-heads.live.mjs, plans/261125-2313-head-communication-agent-to-agent/reports/integration.md | 5 | ready |
 
 Waves: phases 1, 2 and 3 run at once (disjoint: a report, the mailbox record and core, agent-protocol). Phase 4
 waits for the diagnosis. Phase 5 needs the rotation-aware record, the composer predicate and the socket path.
 Phase 6 writes the spec once the shape is landed; phase 7 is the one wiring proof above the lower tests and the
 merge gate. Hot files: `apps/fgos/src/wiring/mailbox_verbs.rs` and `apps/fgos/tests/mailbox_routes.rs` have one
-writer per wave (4, then 5); `CHANGELOG.md` only in phase 6.
+writer per wave (4, then 5).
 
 Cross-plan check: the running plans `261124-2143-head-lifecycle-events` and `261125-1631-agent-context-engine` own
-`apps/fgos/src/wiring/supervision.rs`, `apps/fgos/src/wiring/mod.rs`, `apps/fgos/Cargo.toml`, the skill sources and
-renders and `docs/platform/session-host/spec.md`; this plan writes none of them (the typed wake lives in a submodule
+`apps/fgos/src/wiring/supervision.rs`, `apps/fgos/src/wiring/mod.rs`, `apps/fgos/Cargo.toml`, `CHANGELOG.md`, the skill
+sources and renders and `docs/platform/session-host/spec.md`; this plan writes none of them (the typed wake lives in a submodule
 of `mailbox_verbs.rs`, and `apps/fgos` already depends on session-host, identity and terminal-control).
 
 ## Owner questions

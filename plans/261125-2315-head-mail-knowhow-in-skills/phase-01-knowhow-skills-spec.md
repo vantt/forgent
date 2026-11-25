@@ -16,7 +16,7 @@ Capability: `code:implement`.
 `core/skills/_shared/head-mail.md`, `core/skills/fgos-secretary/SKILL.md`, `core/skills/fgos-supervisor/SKILL.md`,
 `core/skills/fgos-lead/SKILL.md`, `.agents/skills/**`, `plugins/fgOS/skills/**`, `.claude/skills/**` (regenerated,
 never hand-edited), `docs/platform/session-host/spec.md`, `apps/fgos/src/wiring/supervision.rs`,
-`apps/fgos/tests/supervision_verbs.rs`.
+`apps/fgos/tests/supervision_verbs.rs`, `CHANGELOG.md`.
 
 ## Steps
 
@@ -27,6 +27,7 @@ never hand-edited), `docs/platform/session-host/spec.md`, `apps/fgos/src/wiring/
 3. `npm run build:skills`.
 4. Session-host spec: add the base `head` `mailbox inbox` row to the permission section.
 5. `supervision.rs`: make `pane_of` call `Listed::terminal_key()`; keep its refusal code `session-has-no-pane`.
+6. `CHANGELOG.md` `[Unreleased]`: one line for the head-to-head mail change of both plans.
 
 ## Verify
 

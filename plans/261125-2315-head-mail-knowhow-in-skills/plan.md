@@ -18,6 +18,7 @@ footprint:
   - docs/platform/session-host/spec.md
   - apps/fgos/src/wiring/supervision.rs
   - apps/fgos/tests/supervision_verbs.rs
+  - CHANGELOG.md
 source:
   - plans/discussions/ds-h3fvnp6qbt-head-communication-and-requests/DISCUSSION.md
   - plans/261125-2313-head-communication-agent-to-agent/plan.md
@@ -47,7 +48,9 @@ Identity's `Listed::terminal_key()`, so one pane lookup remains (L10).
    only a pointer line per skill.
 2. `npm run build:skills` regenerates the renders with no hand edit; `npm test -- test/setup` green.
 3. `docs/platform/session-host/spec.md` permission section lists the base `head` `mailbox inbox` row.
-4. `rg -n "fn pane_of" apps/fgos/src/wiring/supervision.rs` is gone or a one-line call of `terminal_key()`;
+4. `CHANGELOG.md` `[Unreleased]` has one line: heads mail each other from inside the cage, read their own inbox,
+   get named refusals, idle recipients are woken, and the answer names the path.
+5. `rg -n "fn pane_of" apps/fgos/src/wiring/supervision.rs` is gone or a one-line call of `terminal_key()`;
    `cargo test -p fgos --test supervision_verbs` green.
 
 ## Non-goals
@@ -65,7 +68,7 @@ Anything in plan `261125-2313` (code of the mail door); the owner channel; new g
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Shared know-how, skills, spec and pane lookup](phase-01-knowhow-skills-spec.md) | - | core/skills/_shared/head-mail.md, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/**, docs/platform/session-host/spec.md, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs | 1 | draft |
+| 1 | [Shared know-how, skills, spec and pane lookup](phase-01-knowhow-skills-spec.md) | - | core/skills/_shared/head-mail.md, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/**, docs/platform/session-host/spec.md, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, CHANGELOG.md | 1 | draft |
 
 One phase: the files are small and the renders are a hot generated file set with one writer.
 

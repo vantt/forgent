@@ -12,7 +12,7 @@
 
 ## Footprint
 
-`docs/platform/agent-mailbox/spec.md`, `CHANGELOG.md`.
+`docs/platform/agent-mailbox/spec.md`.
 
 ## Steps
 
@@ -22,8 +22,6 @@
 3. §6.2: add the typed channel row and the `path` values; §15.8: mark the typed nudge built, the shared crate not
    built (simpler alternative taken), question 17 answered by the Identity terminal key.
 4. §17 decision history: one entry for HC-D1 to HC-D5 citing the discussion file.
-5. `CHANGELOG.md` `[Unreleased]`: heads can mail each other from inside the cage, inbox readable, refusals named,
-   idle recipients woken, the answer names the path.
 
 ## Verify
 
