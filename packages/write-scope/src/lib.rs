@@ -663,7 +663,7 @@ mod tests {
             assert_eq!(canonicalize(&once).unwrap(), once, "{raw:?}");
         }
         for bad in [
-            "   ", "./", "//x", "a/..", "..", ":(top)x", ":!x", "./:x", "**.md", "a/***/b",
+            "   ", "./", "//x", "a/..", "a/../b", "..", ":(top)x", ":!x", "./:x", "**.md", "a/***/b",
         ] {
             assert!(canonicalize(bad).is_err(), "{bad:?}");
         }
