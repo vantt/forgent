@@ -22,8 +22,10 @@
 3. §6.2: add the typed channel row and the `path` values; §15.8: mark the typed nudge built, the shared crate not
    built (simpler alternative taken), question 17 answered by the Identity terminal key.
 4. §5.1 and §6.4: mail addressed to a role follows the role's holder as Identity names it ("never offered again"
-   holds only for handle-addressed mail); the record carries `to_role` from snapshot version 3; when Identity cannot
-   name a holder, role mail waits (fails closed) and its record TTL still runs.
+   holds only for handle-addressed mail); the record carries `to_role` from snapshot version 3; mail addressed to the draining
+   head's own current generation is offered without asking Identity; only mail for another key or generation is
+   rerouted through Identity, so an Identity outage delays a reroute but never withholds mail from its addressee; a
+   predecessor that drains before its successor can still be offered role mail once (accepted race).
 5. §17 decision history: one entry for HC-D1 to HC-D5 citing the discussion file.
 
 ## Verify
