@@ -125,7 +125,7 @@ survivor: `scripts/lib/fgos-write-witness.mjs` read back in `runSelectedTests`; 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Skip live runtime directories in the leak check](phase-01-skip-live-runtime-dirs.md) | - | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs | 1 | done |
-| 2 | [Attribute .fgos writes to the test run](phase-02-attribute-fgos-writes-to-the-test-run.md) | 1 | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs, scripts/lib/fgos-write-witness.mjs | 2 | ready |
+| 2 | [Attribute .fgos writes to the test run](phase-02-attribute-fgos-writes-to-the-test-run.md) | 1 | scripts/run-tests.mjs, test/scripts/run-tests.test.mjs, scripts/lib/fgos-write-witness.mjs | 2 | running |
 
 Phase 1: one phase, one wave: one constant, one walk filter and one test file.
 
@@ -140,6 +140,20 @@ listed is left out of the footprint: the land door regenerates it (Risks). Check
 `node scripts/plan-contract-check.mjs` and `fgos resource-check --plan`.
 
 ## Progress
+
+- 2026-11-25 13:30: phase 2 parked on owner question q-4aalqblcof (status stays `running`). Worktree
+  `/home/vantt/projects/forgent-worktrees/261124-1945-run-tests-fgos-leak-check-p02` (branch
+  `run-tests-fgos-leak-check/p02`) holds the uncommitted implementation from unit ticket
+  `c-1448-1795586714512` (claude, unit run `unit-run-1795586714970-56f99249`, outcome `blocked`):
+  the witness module, the reader replacing `LIVE_FGOS_DIRS`, and the AC1-AC3 leak cases, which pass;
+  `rg LIVE_FGOS_DIRS` is empty. Blocker: fail-closed (AC3) fails 7 cases in three files outside the
+  footprint that call `runTests` with a fake spawn that never loads the witness
+  (`test/scripts/full-suite-queue.test.mjs`, `test-select.test.mjs`, `run-test-canary.test.mjs`); the
+  question asks to widen the footprint by them. Step 7 is weak: a whole-store walk around a broad
+  subset run saw 0 `.fgos` changes the witness missed, but the full `npm test` could not run in the
+  unit sandbox (full-suite lock unwritable) and is still owed. The regenerated census is still
+  modified in the worktree: neither the unit nor the lead could restore it (read-only git dir); it
+  must be restored before the next unit. Not reviewed yet: review follows the fix unit.
 
 - 2026-11-25 13:10: owner answered q-zw4htizjz2. Footprint narrowed (census dropped, witness
   at `scripts/lib/fgos-write-witness.mjs`); plan set `ready` for admission.
