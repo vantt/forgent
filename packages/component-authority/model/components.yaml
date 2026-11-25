@@ -334,10 +334,6 @@
   tier: 4
   paths:
     - src/run-supervisor/
-  exceptions:
-    - path: src/run-supervisor/steps/
-      tier: 5
-      reason: per-file layer carried over from the manifest; the directory mixes layers
   owns:
     - attempt supervision and receipts
     - adopt door and cleanup
@@ -796,12 +792,6 @@
   paths:
     - src/runner/execution/
   exceptions:
-    - path: src/runner/execution/seat-ledger.mjs
-      reason: per-file layer carried over from the manifest; the directory mixes layers
-      layer: domain
-    - path: src/runner/execution/seat-resolver.mjs
-      reason: per-file layer carried over from the manifest; the directory mixes layers
-      layer: domain
     - path: src/runner/execution/legacy-seat-read.mjs
       reason: per-file layer carried over from the manifest; the directory mixes layers
       layer: kernel
@@ -1024,9 +1014,7 @@
   meaning: Domain-neutral small collaboration loops (solo, reviewed, panel) and presets.
   layer: domain
   tier: 5
-  paths:
-    - src/runner/execution/loops/
-    - src/runner/execution/patterns/
+  paths: []
   exceptions: []
   owns:
     - collaboration loop definitions and preset configurations
@@ -1034,10 +1022,8 @@
     - unit execution engine
     - work status
   spec: docs/platform/runner/spec.md
-  source:
-    - src/runner/execution/loops/
-    - src/runner/execution/patterns/
-  status: live
+  source: []
+  status: retired
 - id: run-result
   canonical: run-result
   aliases:

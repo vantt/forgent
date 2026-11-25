@@ -73,7 +73,7 @@ CoordinationProtocol or FlowDefinition engine sits between steps and operations.
 
 Agent-led callers supply a bounded Unit or validated inline contract. Current
 inline fields and normalization are implemented by
-`src/runner/dispatch/execution-contract.mjs:180-200,295-340`, rather than left
+`src/runner/dispatch/execution-contract.mjs:180-200,295-340`, rather than left (retired; last at `85760c6f2`)
 as an open schema question. Domain-specific validators must be checked against
 their registered implementation; this extension model does not imply research
 and marketing harnesses already ship.
@@ -115,7 +115,7 @@ Adding an agent-led path must not weaken or reinterpret it. The current Work
 driver resolves the legal normalized operations, preserves their primary default
 and refuses an undeclared request (`src/runner/operation-choice.mjs:733-761`);
 declared Assignment creation independently requires a legal operation and its
-TaskSpec (`src/runner/dispatch/assignment.mjs:328-345`). These are primary
+TaskSpec (`src/runner/dispatch/assignment.mjs:328-345`). These are primary (retired; last at `85760c6f2`)
 compatibility and legality obligations, not a revival of the retired engine.
 
 The exact normalized contract is defined in

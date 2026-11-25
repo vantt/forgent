@@ -56,7 +56,7 @@ import { lexSource } from '../../scripts/lib/js-source-lexer.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 
 const root = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
-const LAYOUT_OWNER = 'src/runner/dispatch/assignment-layout-twin.mjs';
+const LAYOUT_OWNER = 'src/runner/dispatch/assignment-layout.mjs';
 const SCAN_ROOTS = ['src', 'scripts', 'apps', 'bin'];
 const SOURCE_EXT = /\.(?:mjs|cjs|js)$/;
 const SKIP_DIRS = new Set(['node_modules', 'target', 'dist', '.git']);
@@ -80,35 +80,17 @@ const CALLBACK_METHODS = 'forEach|map|flatMap|filter|some|every|find|findLast|re
 // entry is an existing direct reader with a reason it is not a competing tree
 // walker.
 const ALLOWED = new Map([
-  // Unit semantics (latest round, fallback seat, outcome mapping) belong to
-  // the unit owner. It walks one known unit directory's seats and rounds, not
-  // the assignments tree, and its nested shape is the layout's own shape.
-  ['src/runner/execution/unit-run-history.mjs: readSeatDirectory: readdirSync(seatDir)', { count: 1, reason: 'unit owner: rounds of one known seat directory' }],
-  ['src/runner/execution/unit-run-history.mjs: readSeatDirectory: readdirSync(runsDir)', { count: 1, reason: 'unit owner: numbered attempts of one known round' }],
-  // The unit summary writer shares the unit owner's seat/round rules to decide
-  // whether a unit still has an attempt in flight.
-  ['src/runner/execution/unit-summary-twin.mjs: unitHasActiveRun: readdirSync(unitDir)', { count: 1, reason: 'unit owner: seats of one known unit directory' }],
-  ['src/runner/execution/unit-summary-twin.mjs: unitHasActiveRun: readdirSync(seatDir)', { count: 1, reason: 'unit owner: rounds of one known seat directory' }],
-  ['src/runner/execution/unit-summary-twin.mjs: unitHasActiveRun: readdirSync(runsDir)', { count: 1, reason: 'unit owner: attempts of one known round' }],
-  // Assignment-id allocation: lists only immediate children to find ids that
-  // share a newly minted flat id prefix. Nested unit ids never use that prefix.
-  ['src/runner/dispatch/assignment.mjs: createAssignmentId: readdirSync(assignmentsDir)', { count: 1, reason: 'id allocation: top-level names sharing a new flat id prefix' }],
   // Work-driver gate evidence: flat work assignments only (work assignments are
   // never nested); restricted to dispatched attempts of a matching assignment.
   ['src/runner/operation-choice.mjs: findLatestAssignmentRunResult: readdirSync(dispatchedDir)', { count: 1, reason: 'dispatch markers of one known assignment' }],
   ['src/runner/operation-choice.mjs: findLatestAssignmentRunResult: readdirSync(runsDir)', { count: 1, reason: 'attempts of one known assignment, filtered to dispatched markers' }],
-  // Run-attempt admission and command queues of one already-resolved
-  // assignment or run directory; never discovery across assignments.
-  ['src/runner/dispatch/run-admission.mjs: admitRunAttempt: readdirSync(runsDir)', { count: 2, reason: 'attempt numbering and abandoned-staging cleanup of one resolved assignment' }],
-  ['src/run-supervisor/client.mjs: walk: readdirSync(dir)', { count: 1, reason: 'the adopt scan walks the assignments root it was handed and recurses through every level, collecting the attempt directories that are not closed' }],
-  ['src/run-supervisor/client.mjs: walk: readdirSync(child)', { count: 1, reason: 'attempt directories of one resolved runs directory found by that same walk' }],
   // The test runner snapshots every file of the repository's `.fgos` store
   // before and after a suite to report leaked writes. It compares file
   // contents and never interprets assignments or runs.
   ['scripts/record-mailbox-hook-fixtures.mjs: cmdProbe: readdirSync(path.join(runDir, \'calls\'))', { count: 1, reason: "the mailbox fixture recorder's own run directory under the scratch work root, not .fgos/assignments" }],
   ['scripts/record-mailbox-hook-fixtures.mjs: cmdSummarize: readdirSync(calls)', { count: 1, reason: "the mailbox fixture recorder's own run directory under the scratch work root, not .fgos/assignments" }],
   ['scripts/record-mailbox-hook-fixtures.mjs: cmdSummarize: readdirSync(toolDir)', { count: 1, reason: "the mailbox fixture recorder's own run directory under the scratch work root, not .fgos/assignments" }],
-  ['scripts/run-tests.mjs: walk: readdirSync(currentDir)', { count: 1, reason: 'whole-store file snapshot for leak detection, not a run reader' }],
+  ['scripts/run-tests.mjs: directoryHoldsFiles: readdirSync(dir)', { count: 1, reason: 'whole-store file snapshot for leak detection, not a run reader' }],
 ]);
 
 function sourceFiles() {

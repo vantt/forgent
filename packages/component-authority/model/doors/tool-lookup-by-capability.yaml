@@ -13,8 +13,5 @@ allowed:
   - path: packages/execution/rust/src/tools.rs
     count: 1
     reason: the tool probe and the staleness check behind decide, explain and the tool-registry-configured doctor row
-debt:
-  - path: src/runner/dispatch/tool-providers.mjs
-    reason: "twin of tools.rs left in the dead Node Execution closure (the unserved-ability check, the presence probe): no product code imports it since launch runs in the host; same cases as the crate's tests"
-retiredBy: "p-24xw2cwdvo: the Node twin goes with the dead Node Execution closure"
-reason: "the one reader of an executor's for list and the one presence and staleness probe, so doctor and decide cannot disagree about a tool: packages/execution/rust/src/tools.rs is that owner for decide, explain and the doctor row, and src/runner/dispatch/tool-providers.mjs is a dead twin kept as debt until the dead Node closure is deleted"
+debt: []
+reason: "the one reader of an executor's for list and the one presence and staleness probe, so doctor and decide cannot disagree about a tool: packages/execution/rust/src/tools.rs is that owner for decide, explain and the doctor row"

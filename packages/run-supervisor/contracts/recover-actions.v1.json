@@ -1,6 +1,6 @@
 {
   "contract": { "id": "run-supervisor-recover-actions", "version": 1 },
-  "description": "Actions a `fgos dispatch recover` recommendation can carry (src/runner/dispatch/recovery-planner.mjs). `adopt` is the only action: it is the one that changes the run. The door stays CAS-guarded: a recommendation carries snapshotHash + controlEpoch and an actionKey, and applying re-derives legality from the action.",
+  "description": "Actions a `fgos dispatch recover` recommendation can carry (Rust owner packages/run-supervisor/rust/src/adopt.rs; v1 source retired Node module recovery-planner.mjs). `adopt` is the only action: it is the one that changes the run. The door stays CAS-guarded: a recommendation carries snapshotHash + controlEpoch and an actionKey, and applying re-derives legality from the action.",
   "actions": {
     "adopt": {
       "shape": { "type": "adopt", "attemptId": "string" },

@@ -155,7 +155,7 @@ Known gaps against this direction:
   `domain`, `kernel`), the per-file ranks of its one-directional import rule.
   Its `domain` rank does not mean the Domain layer above.
 - Business names have leaked into generic code and must move to Domain: the
-  hardcoded research-fan-out branch in `src/runner/execution/seat-resolver.mjs`,
+  hardcoded research-fan-out branch in `src/runner/execution/seat-resolver.mjs`, (retired; last at `85760c6f2`)
   the code-change and rfc recipes in the generic catalog, and council names in
   error and help text.
 - The decision-question shape checker lives in `src/state/decision-question.mjs`
@@ -163,7 +163,7 @@ Known gaps against this direction:
 - Question batching (point 7) has no code yet.
 - The hard-independent panel arbiter is a small parameter change from
   `preferIndependentOf` to `independentOf` in
-  `src/runner/execution/loops/panel.mjs`. Today independence is a soft
+  `src/runner/execution/loops/panel.mjs`. Today independence is a soft (retired; last at `85760c6f2`)
   preference.
 - The councils moved out of the core workflows into the `domains/council` domain (S5, 2026-11-18).
 - Capability rows, decided by the owner on 2026-11-14 in two steps. First,

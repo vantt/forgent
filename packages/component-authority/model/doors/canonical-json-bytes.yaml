@@ -12,10 +12,6 @@ allowed:
     count: 1
   - path: packages/run-supervisor/rust/src/envelope.rs
     count: 1
-  - path: src/runner/dispatch/effective-execution-contract.mjs
-    count: 1
-  - path: src/run-supervisor/trust-store.mjs
-    count: 1
   - path: scripts/build-rust-distribution.mjs
     count: 1
     reason: producer half of the release-manifest pair kept together with its verifier

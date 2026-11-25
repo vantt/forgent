@@ -91,7 +91,7 @@ Observed code:
 - `src/config/shared-config-file.mjs` (deleted in 38361f01d) says `.fgos/config.json` is a normal
   git-tracked project config file and every worktree checkout carries its own
   copy.
-- `src/runner/dispatch/config.mjs` reads `.fgos/config.json` and merges global
+- `src/runner/dispatch/config.mjs` reads `.fgos/config.json` and merges global (retired; last at `85760c6f2`)
   config with project config winning.
 - Some paths, including setup/doctor/dispatch variants, resolve to main checkout
   using `resolveMainCheckoutRoot`.

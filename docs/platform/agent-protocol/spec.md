@@ -34,7 +34,7 @@ An adapter is a pure state machine for one agent CLI in one launch mode. It read
 
 | Owns | Does not own |
 |---|---|
-| The named results (section 4) | Argv, model or executor choice (Execution Core; `resolveExecutorCommand` in `src/runner/dispatch/transport.mjs` builds argv from the executor configuration) |
+| The named results (section 4) | Argv, model or executor choice (Execution Core; `resolveExecutorCommand` in `src/runner/dispatch/transport.mjs` builds argv from the executor configuration) (retired; last at `85760c6f2`) |
 | Reading the outbox: which `result-<N>.json` is the newest and complete (sections 4, 5.1) | Stdin policy (the gate opens stdin from the envelope's `launch.stdinPolicy`; section 6) |
 | The activity signal the idle timer counts (section 7) | Timeouts, deadlines, retry, fallback (supervisor, controller); judging the work (Run Result Evaluator) |
 | One fixture file of real screen or output tails per CLI and mode | Terminal screens and keys (terminal-control: the supervisor wires `AgentIo` to it) |

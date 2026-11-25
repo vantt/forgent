@@ -85,7 +85,7 @@ is not verified, and every verdict lists the read-only units and says so.
 
 **The `--units` file** is `{ "v": 1, "units": [ { id, claims?, readOnly?, dependsOn?, layer? } ] }`, defined
 field by field in the contract. It is a neutral shape and not the `Unit` file schema, because a real Unit
-treats empty `writes` as read-only (`src/runner/execution/unit.mjs:125`) since dispatch enforces it; this
+treats empty `writes` as read-only (`src/runner/execution/unit.mjs:125`) since dispatch enforces it; this (retired; last at `85760c6f2`)
 component must not read an empty list that way. Unknown fields are refused by name. `layer` is the layer the
 author declared, an integer from 1, optional per unit.
 

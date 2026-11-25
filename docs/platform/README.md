@@ -54,7 +54,7 @@ Component owners, one row per component and subcomponent, sorted by id. <!-- ren
 | `canonical-json` | — | Authority for canonical JSON bytes per RFC 8785. | `docs/platform/component-boundary.md` | `packages/canonical-json/` |
 | `claude-plugin` | — | Claude Code slash-command surface and plugin wrappers. | `docs/platform/claude-plugin/spec.md` | — |
 | `coding-domain` | — | Coding Domain Core, policies, repo scope, footprint, worktree isolation, merge catchup, and code verification doctrine. | `docs/platform/component-boundary.md` | — |
-| `collaboration-patterns` | `execution-core` | Domain-neutral small collaboration loops (solo, reviewed, panel) and presets. | `docs/platform/runner/spec.md` | `src/runner/execution/loops/`, `src/runner/execution/patterns/` |
+| `collaboration-patterns` | `execution-core` | Domain-neutral small collaboration loops (solo, reviewed, panel) and presets. | `docs/platform/runner/spec.md` | `src/runner/execution/loops/`, `src/runner/execution/patterns/` (retired; last at `85760c6f2`) |
 | `component-authority` | — | Defines the single structural model of layers, components, decision kinds, doors, contracts, and file-to-component mappings. | `docs/platform/component-authority/spec.md` | `packages/component-authority/`, `docs/platform/component-authority/` |
 | `config` | — | Configuration authority: project and global config, schema and facade. | `docs/platform/config/spec.md` | `src/config/` |
 | `containment-port` | `process` | OS-neutral process domain per attempt with drivers and containment guarantees. | `docs/platform/process/spec.md` | `packages/process/contracts/` |

@@ -223,9 +223,6 @@
   path: docs/platform/agent-coordination/contracts/assignment-run-runresult.md
   evidence:
     - docs/platform/agent-coordination/contracts/assignment-run-runresult.md
-    - src/runner/dispatch/assignment.mjs
-    - src/runner/dispatch/plan.mjs
-    - src/runner/dispatch/assignment-runner.mjs
   status: live
 - id: agent-protocol/agent-protocol.v1
   canonical: agent-protocol/agent-protocol.v1

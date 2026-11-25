@@ -131,18 +131,9 @@ allowed:
   - path: src/runner/dispatch/assignment-layout.mjs
     count: 1
     reason: "plan 261122-0118 tail: a facade for the session-host callers (head request), removed when they import the door"
-  - path: src/runner/dispatch/config.mjs
-    count: 1
-    reason: "plan 261122-0118 tail: a facade for the session-host callers (head start), removed when they import the door"
   - path: src/runner/dispatch/confinement/authority.mjs
     count: 1
     reason: "plan 261122-0118 tail: a facade for the session rotation, removed when it imports the door"
-  - path: src/runner/execution/unit-run-record.mjs
-    count: 1
-    reason: "plan 261122-0118 tail: a facade for the head request, removed when it imports the door"
-  - path: src/runner/execution/unit-summary.mjs
-    count: 1
-    reason: "plan 261122-0118 tail: a facade for the head request, removed when it imports the door"
   - path: src/runner/execution/bind.mjs
     count: 1
     reason: the Node bind facade (its own row names its callers) reads the runner config error class
@@ -157,10 +148,7 @@ allowed:
     reason: doctor row seat-binding-dry-bind, bridge:S6b
   - path: src/runner/dispatch/runner-config-error.mjs
     count: 1
-    reason: "p-24xw2cwdvo: dead re-export of the runner config error class; only the dead Node closure and tests import it"
-  - path: src/runner/dispatch/session-attempt.mjs
-    count: 1
-    reason: "p-24xw2cwdvo: dead Node session attempt (the host launches head sessions); only tests import it"
+    reason: "S6b: live re-export of the runner config error class for Workflow and domain contract validation"
 debt: []
-retiredBy: S6b for the Workflow callers, S7 for the Work callers; the session-host facades with the tail of plan 261122-0118, the doctor rows with their bridge steps, and the dead Node closure with p-24xw2cwdvo
+retiredBy: S6b for the Workflow callers, S7 for the Work callers; the session-host facades with the tail of plan 261122-0118, the doctor rows with their bridge steps
 reason: "Node above tier 5 reaches Execution only through src/native/execution-door.mjs: host routes over stdin and stdout for long or effectful operations, the addon execution namespace for reads (plan decisions P4, P14). Every importer is named with the step that retires it, so a new Node caller of Execution is a decision, not an accident"

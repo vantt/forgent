@@ -128,8 +128,7 @@ export function scanRunResultStatusAccess(sourceCode, filePath) {
 
 test('structural source scan: no production file in src/** reads .status/.confidence on RunResult directly', () => {
   const allowedOwnerFiles = new Set([
-    // run-result.mjs is the owner of RunResult and defines legacy projections and validators
-    'src/runner/dispatch/run-result.mjs',
+    // Node run-result owner retired; no production exemption remains.
   ]);
 
   const allViolations = [];

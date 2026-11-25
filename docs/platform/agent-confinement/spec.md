@@ -359,7 +359,7 @@ Attestation `prepared` được ghi trước adapter call. Cleanup chạy trong
 `finally`; partial prepare cũng phải cung cấp cleanup handle như quy định ở
 §6.5. Cleanup failure không được biến execution chưa rõ thành thành công, và
 không được che mất execution result đã có. Nếu Authority crash sau khi prepare,
-run record giữ phase cuối cùng và adopt kết thúc attempt còn dở (`sweepAttempts` ở `src/run-supervisor/client.mjs` là cửa duy nhất: đầu mỗi `fgos run`, đầu vòng runner, `fgos doctor --fix`).
+run record giữ phase cuối cùng và adopt kết thúc attempt còn dở (`sweepAttempts` ở `src/run-supervisor/client.mjs` là cửa duy nhất: đầu mỗi `fgos run`, đầu vòng runner, `fgos doctor --fix`). (retired; last at `85760c6f2`)
 
 **Home thuộc về attempt, không thuộc về tiến trình (2026-10-18, thay luật binding 2026-10-15).** Authority không còn `bind`/`markLaunched`/`retain` và marker không còn trường `paneId`, `terminalKey`, `herdrEndpoint`, `herdrSession`, `binderPid`, `binderStartTime`, `boundAt`, `launchedAt`, `retainedAt`; finalizer chỉ chấp nhận `credentialKept` là thay đổi sau prepare, mọi thay đổi khác là `ownership-marker-mismatch`. Pane do terminal-control giữ theo khoá, không liên quan tới việc home còn hay mất. Một lượt chạy herdr-spawn luôn là attempt của run supervisor: yêu cầu không mang `attemptId` bị từ chối với `attempt-required` và file herdr-launch-command không còn nơi ghi. Dispatch ngoài cửa assignment (không có attempt) vẫn ghi marker bản 1 (`pid`) và tự dọn home khi settle; nếu process của nó chết thì không sweep nào phán home đó: `fgos doctor` (`confinement-orphaned-resources-reaped`) nêu tên và chỉ `--fix` tường minh của chủ máy mới dọn (theo pid).
 
@@ -820,12 +820,12 @@ Nguồn duy nhất của grant theo persona là `GRANTS` trong `src/session-host
 
 ## 14. Pointers hiện tại
 
-- `src/runner/dispatch/cli.mjs`: hai seam trước adapter; `runDir` có tại đây.
-- `src/runner/dispatch/transport.mjs`: `resolveExecutorCommand`, adapter registry
+- `src/runner/dispatch/cli.mjs`: hai seam trước adapter; `runDir` có tại đây. (retired; last at `85760c6f2`)
+- `src/runner/dispatch/transport.mjs`: `resolveExecutorCommand`, adapter registry (retired; last at `85760c6f2`)
   và các adapter chỉ-supervised (`registerSupervisedOnlyAdapter`).
-- `src/runner/dispatch/resolve.mjs`: resolve executor và fallback path.
-- `src/runner/dispatch/config.mjs`: validation của shape confinement cũ.
-- `src/runner/dispatch/herdr-round.mjs`: enforcement session/home hiện tại.
+- `src/runner/dispatch/resolve.mjs`: resolve executor và fallback path. (retired; last at `85760c6f2`)
+- `src/runner/dispatch/config.mjs`: validation của shape confinement cũ. (retired; last at `85760c6f2`)
+- `src/runner/dispatch/herdr-round.mjs`: enforcement session/home hiện tại. (retired; last at `85760c6f2`)
 - `src/setup/registrations.mjs`: doctor checks liên quan.
 - `.fgos/config.json`: các invocation bwrap (cli-spawn và herdr-spawn) khai `confinement.backend`; invocation confine có account khai thêm `credentialStore` (§13.1).
 - `docs/platform/runner/contracts/routing-handoff.md`: worktree containment không phải sandbox.

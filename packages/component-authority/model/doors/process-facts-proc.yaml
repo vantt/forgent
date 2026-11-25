@@ -20,8 +20,6 @@ allowed:
     count: 2
   - path: src/runner/dispatch/confinement/drivers/bwrap.mjs
     count: 2
-  - path: src/runner/dispatch/confinement/probes/harness.mjs
-    count: 11
   - path: packages/execution/engine/src/confinement/driver/bwrap.rs
     count: 2
     reason: "Rust twin of drivers/bwrap.mjs: mounts /proc in the sandbox and passes the fd-closer script that lists /proc/$$/fd inside it, bwrap arguments and not reads of process facts"
@@ -58,5 +56,5 @@ allowed:
 debt:
   - path: scripts/lib/mailbox-live-confined.mjs
     reason: frozen V7n measurement module; moves onto the process door when V7n is re-measured (MAIL)
-retiredBy: "p-24xw2cwdvo: the run-supervisor directory and the confinement probes run in Rust; their Node copies are reached only by the dead Node Execution closure and the mailbox live scripts, and go with them"
+retiredBy: "the mailbox lane re-measures its frozen experiment sets (MAIL); the Node confinement driver and runtime-dir stay until that re-measure"
 reason: only fgos-process judges a process; holder-lock reads fdinfo for lock holders, the Git WAL names an open file, and bwrap arguments are not reads of process facts

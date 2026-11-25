@@ -5,9 +5,7 @@ patterns:
   - (?:from\s+|import\(\s*)['"](?:[^'"]*(?:runner/(?:dispatch|execution)|run-supervisor)/|\./(?:dispatch|execution)/)[^'"]*['"]
 allowed:
   - path: src/runner/dispatch/**
-    reason: the Node closure itself; its live files are facades or twins, the rest is dead code (p-24xw2cwdvo)
-  - path: src/runner/execution/**
-    reason: the Node closure itself; its live files are facades, the bind facade or twins, the rest is dead code (p-24xw2cwdvo)
+    reason: the Node closure itself; its live files are facades or twins owned by S6b, S7 or the mailbox lane re-measure
   - path: src/session-host/head-start.mjs
     count: 2
     reason: "S7: the session head start binds through the bind facade and reads the account state overlay from the Node provider capacity module, which has no door yet"
@@ -28,16 +26,16 @@ allowed:
     reason: "S7: the Work runner loop binds each Work item's seat through the bind facade"
   - path: src/workflow/definition.mjs
     count: 2
-    reason: "S6b: the Workflow twins of write-scope, run-timeout and outcome"
+    reason: "S6b: the Workflow twins of run-timeout and outcome"
   - path: domains/coding/harness/enrich-and-validate-contract.mjs
     count: 1
-    reason: names the runner config error class through its dead re-export; moves to the seam with p-24xw2cwdvo
+    reason: "S6b: names the runner config error class through its live re-export"
   - path: scripts/lib/mailbox-live-confined.mjs
     count: 3
-    reason: frozen mailbox live measurement module; reads the Node confinement driver (p-24xw2cwdvo)
+    reason: frozen mailbox live measurement module; reads the Node confinement driver until the mailbox lane re-measures it
   - path: scripts/record-mailbox-hook-fixtures.mjs
     count: 1
-    reason: mailbox fixture recorder; boots a worker session through the Node closure (p-24xw2cwdvo)
+    reason: mailbox fixture recorder; boots a worker session through the Node closure until the mailbox lane re-measures it
 debt: []
-retiredBy: "p-24xw2cwdvo: the dead closure goes, its facades and twins with the session-host tail of plan 261122-0118, S6b and S7"
-reason: src/native/execution-door.mjs is Execution's one Node seam; a Node file outside the old Execution directories that imports into them reaches past it, into facades, twins or dead code. Every such importer is named with the step that removes it, so a new one is a decision, not an accident
+retiredBy: "the mailbox lane re-measures its frozen experiment sets; facades and twins with the session-host tail of plan 261122-0118, S6b and S7"
+reason: src/native/execution-door.mjs is Execution's one Node seam; a Node file outside the old Execution directories that imports into them reaches past it, into facades or twins. Every such importer is named with the step that removes it, so a new one is a decision, not an accident

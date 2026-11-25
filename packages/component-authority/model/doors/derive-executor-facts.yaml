@@ -21,27 +21,15 @@ allowed:
     count: 2
     reason: the addon's execution namespace carries fgos-execution's account inventory and state key (accounts.rs) to Node under their Node names; it derives nothing
 debt:
-  - path: src/runner/dispatch/config-twin.mjs
-    reason: "twin, same vectors as the contract: withDefaultExecutor, validateRunnerConfigShape and validateGeneratedPathsShape stay for Node launch code and the run snapshot"
   - path: src/runner/dispatch/provider-adapter.mjs
-    reason: "twin, same vectors as the contract: familyOf and renderedEffortLevels stay for Node launch code"
+    reason: "twin, same vectors as the contract: familyOf and renderedEffortLevels stay for the mailbox lane's frozen harness reach"
   - path: src/runner/dispatch/provider-capacity.mjs
-    reason: "twin, same vectors as the contract: credentialStoreOf and providerAccountInventory stay for Node launch code and the lease"
-  - path: src/runner/dispatch/mechanism.mjs
-    reason: "twin, same vectors as the contract: decideExecutorDispatchMechanism stays for Node dispatch callers that name an executor"
-  - path: src/runner/dispatch/resolve.mjs
-    reason: "twin, same vectors as the contract: lookupExecutor stays for Node launch code"
-  - path: src/runner/dispatch/confinement/policies.mjs
-    reason: "twin, same vectors as the contract: resolvePostureInvocation stays for Node launch code"
-  - path: src/runner/dispatch/confinement/backend-registry.mjs
-    reason: "twin, same vectors as the contract: loadMachineBackendRegistry stays for Node confinement"
+    reason: "twin, same vectors as the contract: credentialStoreOf and providerAccountInventory stay for the mailbox lane and the session-head start"
   - path: src/runner/dispatch/llm-accounts.mjs
-    reason: "twin, same vectors as the contract: readLlmAccounts and legacyStateKey stay for Node account state"
+    reason: "twin, same vectors as the contract: readLlmAccounts and legacyStateKey stay for the mailbox lane's frozen harness reach"
   - path: src/runner/capability-config.mjs
-    reason: "twin, same vectors as the contract: capabilityConfinementOf stays for Node launch confinement"
-  - path: src/runner/execution/seat-resolver.mjs
-    reason: "twin, same vectors as the contract: effectiveRigorOf stays for the Node workflow seat resolver"
+    reason: "twin, same vectors as the contract: capabilityConfinementOf stays for Node launch confinement until its own retire step"
   - path: src/runner/agent-listing.mjs
     reason: "twin, same vectors as the contract: the agent-type-names-unique row is judged in Rust; listAgents stays only for the vector recorder (scripts/agents-vectors.mjs), its replay test and the npm test judgement of the release source tiers (test/setup/packaged-definitions.test.mjs)"
-retiredBy: "p-24xw2cwdvo: every remaining Node twin is reached only by the dead Node Execution closure and the mailbox live scripts (src/runner/capability-config.mjs keeps product importers, but its capabilityConfinementOf is called only from that closure); they go together"
-reason: the facts about an executor (its family, lookup, confinement, credential store, effort levels, posture, account inventory, config shape) are derived once, in the fgos-execution crate, over executor-model.v1.json and its vectors. launch runs in the host since S6a; each Node definition left is a declared twin proven on the same vectors, kept only until the dead Node Execution closure is deleted
+retiredBy: "the mailbox lane re-measures its frozen experiment sets for the mailbox-reached twins; S7 for the session-head capacity overlay; capability-config and agent-listing with their own retire steps"
+reason: the facts about an executor (its family, lookup, confinement, credential store, effort levels, posture, account inventory, config shape) are derived once, in the fgos-execution crate, over executor-model.v1.json and its vectors. launch runs in the host since S6a; each Node definition left is a declared twin proven on the same vectors

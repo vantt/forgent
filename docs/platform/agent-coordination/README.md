@@ -25,8 +25,8 @@ Carriage note: Current-owner routing and retirement framing
 
 The former coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`. `coordination` is not a current public CLI verb; the actual machine-readable `--help --json` manifest is the CLI inventory.
 
-CollaborationPattern owns Unit collaboration patterns in `src/runner/execution/loops/index.mjs`; Unit execution enters through `packages/execution/engine/src/unit_run/run.rs`. Workflow execution belongs to `src/workflow/runner.mjs` and its Unit execution-core integration.
-The surviving Assignment/Run dispatch chain is also current: Assignment building, DispatchPlan compilation, governed execution and RunResult normalization are owned by `src/runner/dispatch/assignment.mjs`, `plan.mjs`, `assignment-runner.mjs` and `run-result.mjs`.
+CollaborationPattern owns Unit collaboration patterns in `src/runner/execution/loops/index.mjs`; Unit execution enters through `packages/execution/engine/src/unit_run/run.rs`. Workflow execution belongs to `src/workflow/runner.mjs` and its Unit execution-core integration. (retired; last at `85760c6f2`)
+The surviving Assignment/Run dispatch chain is also current: Assignment building, DispatchPlan compilation, governed execution and RunResult normalization are owned by `src/runner/dispatch/assignment.mjs`, `plan.mjs`, `assignment-runner.mjs` and `run-result.mjs`. (retired; last at `85760c6f2`)
 
 Read [the runner spec](../runner/spec.md#spec-runner-vòng-tự-hành) for the current execution contract, then [this area's current-owner map](spec.md). Do not treat CoordinationSession, CoordinationProtocol or FlowDefinition in the preserved documents as current implemented engine entities.
 

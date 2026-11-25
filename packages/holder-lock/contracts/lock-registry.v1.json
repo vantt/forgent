@@ -49,7 +49,7 @@
       "rank": 80,
       "v3Path": "<fgosDir>/locks/reconcile.lock",
       "owner": "4.2",
-      "note": "v1 source: src/runner/dispatch/reconciliation-planner.mjs localLock"
+      "note": "v1 source (retired Node module reconciliation-planner.mjs localLock); Rust owner apps/fgos/src/wiring/dispatch_subs/reconcile.rs"
     },
     {
       "name": "recovery",
@@ -76,7 +76,7 @@
       "rank": 80,
       "v3Path": "<lockRoot>/provider-account/<provider>/<account>.lock",
       "owner": "4.2",
-      "note": "v1 source: src/runner/dispatch/provider-capacity.mjs tryAcquireAccountLock"
+      "note": "v1 source: src/runner/dispatch/provider-capacity.mjs tryAcquireAccountLock (mailbox lane / session-head live twin)"
     },
     {
       "name": "provider-state",
@@ -85,7 +85,7 @@
       "rank": 80,
       "v3Path": "<lockRoot>/provider-state.lock",
       "owner": "4.2",
-      "note": "v1 source: src/runner/dispatch/provider-capacity.mjs state lock"
+      "note": "v1 source: src/runner/dispatch/provider-capacity.mjs state lock (mailbox lane / session-head live twin)"
     },
     {
       "name": "worker-session",
@@ -94,7 +94,7 @@
       "rank": 80,
       "v3Path": "<lockRoot>/worker-session/<id>.lock",
       "owner": "4.2",
-      "note": "serialises bringing one herdr worker session up (src/runner/dispatch/worker-session-boot.mjs); <id> is the session name"
+      "note": "serialises bringing one herdr worker session up (src/runner/dispatch/worker-session-boot.mjs, mailbox lane live twin); <id> is the session name"
     },
     {
       "name": "lane",
@@ -121,7 +121,7 @@
       "rank": 80,
       "v3Path": "<lockRoot>/agent-trust-store.lock",
       "owner": "4.2",
-      "note": "serialises fgOS's seeds of the operator's claude folder-trust store (src/run-supervisor/trust-store.mjs seedTrust), so one seed never drops another's entry"
+      "note": "serialises fgOS's seeds of the operator's claude folder-trust store (Rust owner packages/run-supervisor/rust/src/controller/trust_store.rs seed_trust; v1 source retired Node module trust-store.mjs seedTrust), so one seed never drops another's entry"
     },
     {
       "name": "identity-pins",
