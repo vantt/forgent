@@ -1,6 +1,6 @@
 {
  "version": "agents.v1",
- "about": "Golden vectors of the agent listing: the personas a seat lookup can find and what is wrong with or hidden about them, recorded from the Node listing. A vector is { name, project, install, expect }: project and install map a project-relative path to a file's text, and install is null when the project is its own install. Re-record with node scripts/agents-vectors.mjs.",
+ "about": "Golden vectors of the agent listing: the personas a seat lookup can find and what is wrong with or hidden about them, recorded from the Node listing. A vector is { name, project, install, expect }: project and install map a project-relative path to a file's text, and install is null when the project is its own install. The fixture is maintained by hand and read by the Rust golden test packages/execution/rust/tests/golden_agents.rs.",
  "vectors": [
   {
    "name": "a well-formed definition has no problems and no render warnings",

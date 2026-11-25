@@ -1799,7 +1799,6 @@ export const NAMED_DOOR_DEBT = new Set([
   'process facts: read /proc',
   'resolve the invocation root',
   'run a bounded child and find a program on the search path',
-  'the footprint and write-scope overlap rule',
 ]);
 
 /**
@@ -2145,7 +2144,7 @@ test('door check: a new importer of the Node bind facade fails, each named calle
 
 test('door check: a Node or Rust twin of an executor derivation fails outside its owner, passes as declared debt, and passes in the crate', () => {
   const row = execRow('derive executor facts');
-  assert.match(row.retiredBy, /mailbox lane|S7|capability-config|agent-listing/);
+  assert.match(row.retiredBy, /mailbox lane|S7/);
   for (const d of row.debt) assert.match(d.reason, /^twin, same vectors as the contract/, d.path);
   for (const text of ['export function familyOf() {}\n', 'export const lookupExecutor = () => 1;\n', 'function readLlmAccounts() {}\n', 'function detectHerdrPresent() {}\n']) {
     assert.equal(doorHits(row, 'src/runner/seeded.mjs', text).length, 1, text);

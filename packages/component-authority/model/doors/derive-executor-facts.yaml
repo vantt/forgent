@@ -27,9 +27,5 @@ debt:
     reason: "twin, same vectors as the contract: credentialStoreOf and providerAccountInventory stay for the mailbox lane and the session-head start"
   - path: src/runner/dispatch/llm-accounts.mjs
     reason: "twin, same vectors as the contract: readLlmAccounts and legacyStateKey stay for the mailbox lane's frozen harness reach"
-  - path: src/runner/capability-config.mjs
-    reason: "twin, same vectors as the contract: capabilityConfinementOf stays for Node launch confinement until its own retire step"
-  - path: src/runner/agent-listing.mjs
-    reason: "twin, same vectors as the contract: the agent-type-names-unique row is judged in Rust; listAgents stays only for the vector recorder (scripts/agents-vectors.mjs), its replay test and the npm test judgement of the release source tiers (test/setup/packaged-definitions.test.mjs)"
-retiredBy: "the mailbox lane re-measures its frozen experiment sets for the mailbox-reached twins; S7 for the session-head capacity overlay; capability-config and agent-listing with their own retire steps"
+retiredBy: "the mailbox lane re-measures its frozen experiment sets for the mailbox-reached twins (provider-adapter, llm-accounts, provider-capacity); S7 for the session-head capacity overlay"
 reason: the facts about an executor (its family, lookup, confinement, credential store, effort levels, posture, account inventory, config shape) are derived once, in the fgos-execution crate, over executor-model.v1.json and its vectors. launch runs in the host since S6a; each Node definition left is a declared twin proven on the same vectors

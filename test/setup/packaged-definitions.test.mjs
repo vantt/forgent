@@ -4,6 +4,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import {
@@ -11,7 +12,6 @@ import {
   checkDomainRegistryCompiled,
 } from '../../src/setup/registrations.mjs';
 import { INSTALL_ROOT } from '../../src/runner/agent-definitions.mjs';
-import { listAgents } from '../../src/runner/agent-listing.mjs';
 
 import { checkTaskSpecsResolve } from '../helpers/packaged-definitions.mjs';
 
@@ -33,8 +33,15 @@ test('every packaged domain has a compiled.json that parses and matches its YAML
   assert.match(result.message, /domain registr(y|ies) compiled/);
 });
 
+// The listing is the host's (`fgos agents list`, the Rust reader behind the agent-type-names-unique doctor row); the
+// doctor row itself does not judge the installed release's tiers, so this test does.
 test('agent-type names are unique in every tier of the release source, including its own fgos/agents, and every definition has its shape', () => {
-  const listing = listAgents({ projectRoot: INSTALL_ROOT, installRoot: INSTALL_ROOT });
+  const host = process.env.FGOS_HOST_BIN;
+  assert.ok(host, 'FGOS_HOST_BIN is not set: run this file through node scripts/run-tests.mjs');
+  const run = spawnSync(host, ['agents', 'list', '--json', '--dir', INSTALL_ROOT], { cwd: INSTALL_ROOT, encoding: 'utf8', env: process.env });
+  assert.equal(run.status, 0, run.stdout + run.stderr);
+  const body = JSON.parse(run.stdout);
+  const listing = body.data ?? body;
   assert.ok(listing.agents.length > 0, 'the release ships agent definitions');
   assert.deepEqual(listing.duplicates, []);
   assert.deepEqual(listing.ignored, []);
