@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "44ae4944c4cd165ee2cd9243804eb02213c6f49ca5d387efd6f7dddf64f3c6d6",
+  "payloadDigest": "0f0c3d076536d8e1b079641b4cc2f9ede40f2ac17a933e9f7f89a77aa1cf9426",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1716,7 +1716,8 @@
     "src/workflow/store.mjs": "91fbf26c7db7db2cf7ef52da45716cd6d171709c5ff23c90dfd5f67632332a3e",
     "src/workflow/unit-handoff.mjs": "392a8b552e60644b8367cc3c63686b0652d08fd8e1effe428ec64ed5e83b28b9",
     "src/workflow/units-source.mjs": "0441a2cd2c2cd8ae37d20b6b5bdd0988e919cb6652defe9a9c104a26f6b2dd4e",
-    "scripts/lib/git-one-door-declarations.v1.json": "81255a361023e7f7e7992f3e311f570f815d50626352815b77ded93b5c2f572d"
+    "scripts/lib/git-one-door-declarations.v1.json": "81255a361023e7f7e7992f3e311f570f815d50626352815b77ded93b5c2f572d",
+    "src/runner/dispatch/write-scope.mjs": "03d78f9de5475f92177906c29c7aba66c339550f8171ed216a2dfe9df143bf06"
   },
   "sites": [],
   "classes": [

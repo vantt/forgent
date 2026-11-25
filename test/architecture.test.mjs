@@ -1052,12 +1052,9 @@ test('A4 Work-layer guard catches a dynamic import(), a require() and a re-expor
   }
 });
 
-test('A4 boundary guard: dispatch, execution, the dispatch barrel and src/workflow/** name no domain or Workflow step literal', async () => {
+test('A4 boundary guard: dispatch, execution, the dispatch barrel and src/workflow/** name no domain or Workflow step literal', () => {
   // Domains and step ids are data in domains/*/registry.yaml and domains/*/workflows/*.yaml.
   // Discover them from disk so the guard needs no list of its own to keep in step.
-  // Stage the checkout's native addon so parseYaml can read those files without an activated release.
-  const { ensureGitAddon } = await import('../scripts/lib/git-addon-stage.mjs');
-  ensureGitAddon(process.env, root, true);
   const domainsDir = path.join(root, 'domains');
   const domainNames = fs.readdirSync(domainsDir).filter((d) => fs.statSync(path.join(domainsDir, d)).isDirectory());
   // Work steps are the ones a workflow declares a `phase` for.
@@ -1812,6 +1809,7 @@ export const NAMED_DOOR_DEBT = new Set([
   'process facts: read /proc',
   'resolve the invocation root',
   'run a bounded child and find a program on the search path',
+  'the footprint and write-scope overlap rule',
 ]);
 
 /**
