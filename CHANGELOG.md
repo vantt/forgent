@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Added: a head session sends an fgos argv over its request socket, and one permission table (persona x verb prefix -> allow, ask or deny) decides it; an `ask` files an owner question carrying the exact argv.
+- Added: `fgos can-i <argv>` tells a head what the permission table says about an argv before it sends it.
+- Changed: every persona may raise `coordination-help`, and leads and planners may mail only the supervisor and the secretary.
+- Changed: Miu's tick takes over operations when no supervisor is alive or when a help request is older than `secretary.help.staleMinutes`.
+- Added: `fgos release run [--rollback]` from the supervisor or the secretary applies the project's `release.*` recipe (`checks`, `apply`, `probe`, and `rollback` when the probe fails); a recipe that is not `reversible` asks the owner first.
+- Fixed: the `--dir` the installed `fgos` shell function appends no longer makes the head window refuse a head's own verbs, and a forwarded verb that is refused keeps its domain code.
 - Added: a claude worker started through the standard `claude-cli-bwrap` invocation may now run `cargo`, `node` and `npm test` without an approval prompt.
 - The install-and-doctor how-to now lists every `fgos doctor` row and the fix that repairs it (section 4.7, generated from the doctor registry contract), and a test fails when the how-to and the registry differ; hand-written rows for checks that no longer exist (`bin-discovery-cache`, `config-awareness`, `worktree-setup-configured`, `gate-bypass-configured`, `iron-law-configured`, `runner-coordination-orgPolicy-shape`) are removed.
 

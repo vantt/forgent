@@ -3097,6 +3097,29 @@
       "deprecated": null
     },
     {
+      "name": "release",
+      "invoke": "fgos release run [--rollback]",
+      "description": "Run the project release recipe (`release.*` config) through the head's own run supervisor, from inside a head session only (a session with FGOS_HEAD_REQUEST_SOCKET); outside one it refuses. Answers at once with a ticket id, and the run goes on in the supervisor; read the outcome with `fgos request result`. Granted to the supervisor and, by inheritance, the secretary. `--rollback` runs only the recipe's rollback, refused `no-release-in-flight` unless a release step never ended. Not paginated.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "rollback": {
+            "type": "boolean",
+            "description": "Run only the recipe's rollback (for a release whose step never ended)."
+          }
+        },
+        "required": []
+      },
+      "examples": [
+        "fgos release run",
+        "fgos release run --rollback"
+      ],
+      "touchesState": false,
+      "externalEffect": true,
+      "paginated": false,
+      "deprecated": null
+    },
+    {
       "name": "watcher",
       "invoke": "fgos watcher <tick|tune>",
       "description": "The project watcher (docs/platform/supervision): `tick` runs one pass, served natively by the Rust host under the `watcher` repo lock. `tune` arms or disarms a definition and changes its thresholds or pace within the config bounds. It runs the configured watcher definitions, raises one supervision event per fired row (a duplicate of a still-open row is counted, not raised), sends the notify kinds through the mailbox and wakes the supervisor when a trigger is unhandled. An overrunning tick makes the next one `skipped-busy`, never concurrent.",

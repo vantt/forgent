@@ -396,15 +396,26 @@ pub fn check_call(
             },
         }
     }
-    match unknown_flag(route, call) {
-        Some(message) => Err(CallFault {
+    if let Some(message) = unknown_flag(route, call) {
+        return Err(CallFault {
             class: UNKNOWN_FLAG,
             message,
             sub: served_sub,
             record: true,
-        }),
-        None => Ok(served_sub),
+        });
     }
+    if selector == "release" {
+        // A head's `release run` is answered at its request socket before this point; reaching here means the
+        // caller is no head, and there is no other door for the recipe.
+        return Err(CallFault {
+            class: ARG_PARSE,
+            message: "release run is answered only through a confined head's request socket (the supervisor or the secretary)"
+                .to_owned(),
+            sub: None,
+            record: false,
+        });
+    }
+    Ok(served_sub)
 }
 
 /// The verbs whose Node arm worded a missing or unknown sub-command with `requireSubVerb` (`<verb> requires a
@@ -520,6 +531,39 @@ const CAN_I_FRAME: &str = "can-i";
 /// `fgos can-i <argv...>`: what the head's permission table says about an argv; answered by the supervisor.
 const CAN_I_SELECTOR: &str = "can-i";
 
+/// Takes the host's own global `--dir <path>` out of a window argv when `path` is the project the call is aimed at
+/// (the root found from `cwd`, or the main checkout root of it), as the installed `fgos` shell function appends it
+/// to every command. Any other `--dir` value stays in the argv, where the forwarder refuses it. A dropped `--dir`
+/// never redirects the call: the forwarder always runs the verb at the head's own project root.
+fn drop_own_project_dir(argv: &mut Vec<String>, cwd: &std::path::Path) {
+    use fgos_git::invocation_root::{resolve_invocation_root, RootPolicy, RootRequest};
+    let Some(at) = argv.iter().position(|w| w == "--dir") else {
+        return;
+    };
+    let Some(named) = argv.get(at + 1) else {
+        return;
+    };
+    let Ok(named) = std::fs::canonicalize(named) else {
+        return;
+    };
+    let is_own = [RootPolicy::CallerTree, RootPolicy::MainCheckout]
+        .into_iter()
+        .filter_map(|policy| {
+            resolve_invocation_root(&RootRequest {
+                cwd,
+                dir: None,
+                policy,
+                home: None,
+            })
+            .ok()
+        })
+        .filter_map(|root| std::fs::canonicalize(root.root).ok())
+        .any(|root| root == named);
+    if is_own {
+        argv.drain(at..at + 2);
+    }
+}
+
 /// One window frame: `{argv: [...]}` with the caller's words. `--json` is the window's own (the host verb always
 /// runs with it) and `questions list` is the host's `questions`; `friction record --detail-stdin` is read here
 /// because the host verb runs with no stdin.
@@ -537,6 +581,10 @@ fn window_call<R: std::io::Read>(
         })
         .collect::<Result<Vec<String>, String>>()?;
     argv.retain(|w| w != "--json");
+    drop_own_project_dir(
+        &mut argv,
+        &std::env::current_dir().unwrap_or_else(|_| ".".into()),
+    );
     if argv.first().map(String::as_str) == Some("questions")
         && argv.get(1).map(String::as_str) == Some("list")
     {
@@ -744,6 +792,9 @@ pub(crate) fn confined_head_call_with_reader<R: std::io::Read>(
                     return Err(
                         "bad-args: release run takes no argument besides --rollback".to_owned()
                     );
+                }
+                if let Some(flag) = call.flag_outside(&["rollback"]) {
+                    return Err(format!("bad-args: release run takes no --{flag}"));
                 }
                 if call.flags().flag("rollback").is_some() {
                     args.insert("rollback".to_owned(), json!(true));
@@ -1482,6 +1533,51 @@ mod confined_tests {
             .unwrap();
         assert_eq!(rollback.args, json!({"rollback": true}));
         assert!(call(&["release", "run", "deploy"], true).unwrap().is_err());
+        assert!(call(&["release", "run", "--force"], true).unwrap().is_err());
+    }
+
+    #[test]
+    fn release_is_a_registered_route_that_a_call_outside_a_head_refuses_by_name() {
+        let release = &command_routes()["release"];
+        assert_eq!(release.route_kind, "native");
+        assert_eq!(release.operation_id.as_deref(), Some("release.run"));
+        let words: Vec<OsString> = ["release", "run", "--rollback"]
+            .iter()
+            .map(OsString::from)
+            .collect();
+        let rollback = Call::new(&words);
+        assert!(matches!(decide(release, &rollback), Lane::Native { .. }));
+        let fault = check_call(release, &rollback).unwrap_err();
+        assert!(fault
+            .message
+            .contains("only through a confined head's request socket"));
+        assert!(!fault.record);
+    }
+
+    #[test]
+    fn the_hosts_own_dir_of_this_project_leaves_a_window_argv_and_any_other_dir_stays() {
+        let base = std::env::temp_dir().join(format!("fgos-window-dir-{}", std::process::id()));
+        let project = base.join("project");
+        let sub = project.join("sub");
+        let other = base.join("other");
+        std::fs::create_dir_all(project.join(".fgos")).unwrap();
+        std::fs::create_dir_all(&sub).unwrap();
+        std::fs::create_dir_all(&other).unwrap();
+        let words = |dir: &std::path::Path| -> Vec<String> {
+            ["friction", "record", "--dir", dir.to_str().unwrap(), "--x"]
+                .map(str::to_owned)
+                .to_vec()
+        };
+        let mut own = words(&project);
+        drop_own_project_dir(&mut own, &sub);
+        assert_eq!(own, ["friction", "record", "--x"]);
+        let mut elsewhere = words(&other);
+        drop_own_project_dir(&mut elsewhere, &sub);
+        assert_eq!(elsewhere, words(&other));
+        let mut missing = words(&base.join("nope"));
+        drop_own_project_dir(&mut missing, &sub);
+        assert_eq!(missing, words(&base.join("nope")));
+        std::fs::remove_dir_all(&base).unwrap();
     }
 
     #[test]

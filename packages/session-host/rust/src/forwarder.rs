@@ -95,6 +95,14 @@ fn is_verb_word(word: &str) -> bool {
         && chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
 }
 
+/// The `(code, message)` of `... provider failed: <code>: <message>`, when `<code>` is a verb word.
+fn provider_refusal(text: &str) -> Option<(String, String)> {
+    const MARK: &str = "provider failed: ";
+    let rest = &text[text.rfind(MARK)? + MARK.len()..];
+    let (code, message) = rest.split_once(": ")?;
+    is_verb_word(code).then(|| (code.to_owned(), message.trim().to_owned()))
+}
+
 /// A plain project-relative path (no root, no `..`).
 fn plain_relative(path: &str) -> bool {
     !path.is_empty()
@@ -471,21 +479,37 @@ pub fn read_answer(
         let code = p[open + 2..].strip_suffix(']')?;
         is_verb_word(code).then(|| (code.to_owned(), p[..open].to_owned()))
     });
-    let code = document
+    let doc_code = document
         .as_ref()
         .and_then(|d| d["code"].as_str().or_else(|| d["error"]["code"].as_str()))
         .filter(|c| is_verb_word(c))
-        .map(String::from)
-        .or_else(|| bracketed.as_ref().map(|(c, _)| c.clone()))
-        .unwrap_or_else(|| "host-failed".into());
-    let message = document
+        .map(String::from);
+    let doc_message = document
         .as_ref()
         .and_then(|d| {
             d["message"]
                 .as_str()
                 .or_else(|| d["error"]["message"].as_str())
         })
-        .map(String::from)
+        .map(String::from);
+    // With no code of its own, a refused host verb still carries its domain code inside the wrapper text:
+    // `... provider failed: <code>: <message>`, in the document's message or on stderr.
+    let provider = if doc_code.is_none() && bracketed.is_none() {
+        doc_message
+            .as_deref()
+            .into_iter()
+            .chain(printed.as_deref())
+            .find_map(provider_refusal)
+    } else {
+        None
+    };
+    let code = doc_code
+        .or_else(|| bracketed.as_ref().map(|(c, _)| c.clone()))
+        .or_else(|| provider.as_ref().map(|(c, _)| c.clone()))
+        .unwrap_or_else(|| "host-failed".into());
+    let message = provider
+        .map(|(_, m)| m)
+        .or(doc_message)
         .or_else(|| bracketed.map(|(_, m)| m))
         .or(printed)
         .unwrap_or_else(|| {

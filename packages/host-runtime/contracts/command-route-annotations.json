@@ -13,6 +13,10 @@
     "operation_id": "can-i.decide",
     "owner_path": "apps/fgos"
   },
+  "release": {
+    "operation_id": "release.run",
+    "owner_path": "apps/fgos"
+  },
   "config": {
     "operation_id": "config.read",
     "owner_path": "packages/config/rust",
