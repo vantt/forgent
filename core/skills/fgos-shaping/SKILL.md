@@ -62,6 +62,10 @@ below is shared and lives only here.
   does not land by itself. One discussion took 9 of 83 commits on main in two hours, one per round, and each land
   queues behind the others' lands. Between checkpoints the file stays in the main checkout, where a session resuming
   later reads it; land before you stop.
+- A discussion that reached `settled` is final. To keep talking about a topic whose plan is already `done` or
+  running, open a new discussion with a new id and cite the old one in its §1; never set the settled one back to
+  `open`. The settled copy on main stays as the plan's source, and settling it a second time would start no planner
+  (a plan's `source` already names it), so the follow-up would never become a plan.
 
 ## `DISCUSSION.md` shape
 

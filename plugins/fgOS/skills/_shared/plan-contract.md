@@ -137,6 +137,12 @@ The phase table has exactly these columns (order free):
   does not touch is marked `ready` in the phase table and may start. List the blocked phase
   and its question; do not hold the others.
 - Prior art before design: say what the plan reused and what was missing.
+- A follow-up on a topic whose plan is `done` (a new discussion, a new backlog row) either extends that plan or is a
+  new plan. Extend it only when it keeps the same owner and footprint: set `status: draft`, drop `lead` and reset
+  `base`, keep every finished phase `done` and add the new ones, list the new discussion and rows in `source`, and
+  say in the body why it was extended and what the earlier title meant. Before reopening, check that no plan
+  lists it in `blockedBy` (reopening un-satisfies that wait); if one does, write a new plan instead. Otherwise write a
+  new plan and cite the old one in `source`.
 - Authority map: the validating reviewer rejects a plan whose map is missing or unproven (a row id that
   `fgos authority locate` does not return, a `declare` with no reason, an overlap with no `survivor:`).
   Until documentation H2 admission exists, that review is the independent admission step for each `declare`
