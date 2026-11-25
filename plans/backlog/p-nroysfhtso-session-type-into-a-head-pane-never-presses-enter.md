@@ -18,3 +18,5 @@ Owner, 2026-11-25: every time a head types into another head's pane, the text la
 # Notes
 
 Not yet diagnosed: whether the cause is the `session type` verb never sending Enter, or Enter sent in a form the CLI's input box ignores (for example bracketed paste swallowing the newline). A shaper or debugger proves the cause before a fix is chosen.
+
+Evidence, supervisor 2026-11-25 22:15: a second `fgos session type <head> --text $'\r'` (a bare carriage return, sent alone) submitted the held line in a Claude Code head, so the pane accepts Enter when it arrives outside the pasted text; this points at the newline being swallowed inside the paste rather than at the CLI ignoring Enter. Workaround until fixed: type the text, then type `\r` alone.
