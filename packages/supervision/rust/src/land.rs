@@ -743,6 +743,39 @@ impl Lander<'_> {
                 .map_err(at("fast-forward main"))?;
             return Ok(());
         }
+        if p.git
+            .ancestry(p.repo, &remote_tip, &local_tip)
+            .map_err(from_git)?
+        {
+            let ahead = p
+                .git
+                .commits_between(p.repo, &remote_tip, &local_tip)
+                .map_err(from_git)?;
+            let ours = p
+                .git
+                .main_checkout_scoped_commits(p.repo, &ahead)
+                .map_err(from_git)?;
+            let foreign: Vec<&Oid> = ahead.iter().filter(|c| !ours.contains(c)).collect();
+            if foreign.is_empty() {
+                if !self.push_local(branch, held()?)? {
+                    return Err(refuse(
+                        "land-remote-diverged",
+                        format!("the remote refused to move {tracking}"),
+                    ));
+                }
+                return self.sync_target(branch, held);
+            }
+            let foreign_list: Vec<&str> = foreign.iter().map(|c| c.as_str()).collect();
+            return Err(refuse(
+                "land-target-ahead",
+                format!(
+                    "local {dest} at {} has commits the remote tip {} lacks ({}); push or reset them first",
+                    local_tip.as_str(),
+                    remote_tip.as_str(),
+                    foreign_list.join(", ")
+                ),
+            ));
+        }
         Err(refuse(
             "land-target-ahead",
             format!(

@@ -712,6 +712,86 @@ fn catch_up_alone_fast_forwards_and_refuses_a_local_branch_with_commits_the_remo
 }
 
 #[test]
+fn a_paths_land_finishes_an_unpublished_land_door_commit_without_a_hand_push() {
+    let f = Fixture::new();
+    // Simulate a paths land stopping after scoped_commit:
+    let slot = f
+        .env
+        .driver
+        .acquire_merge_slot(
+            &f.env.repo,
+            &fgos_git::RefName::parse("refs/heads/trunk").unwrap(),
+            30_000,
+        )
+        .unwrap();
+    let baseline = f
+        .env
+        .driver
+        .preflight_commit(&f.env.repo, slot.lend().unwrap(), None)
+        .unwrap();
+    fs::write(f.main.join("a"), "first unpushed commit\n").unwrap();
+    let commit_res = f
+        .env
+        .driver
+        .scoped_commit(
+            &f.env.repo,
+            slot.lend().unwrap(),
+            &baseline,
+            &fgos_git::CommitRequest {
+                writes: vec!["a".into()],
+                message: "first unpushed commit".into(),
+            },
+            "writer-1",
+            "land-orphan-1",
+            &fgos_git::wal::OsFileSystem,
+        )
+        .unwrap();
+    let first_commit = commit_res.oid.unwrap();
+    drop(slot);
+
+    assert_eq!(f.local_tip(), first_commit.as_str());
+    assert_ne!(f.remote_tip(), first_commit.as_str());
+
+    // A second writer's paths land succeeds with no hand push:
+    fs::write(f.main.join("b"), "second landed commit\n").unwrap();
+    let cmd = LandCommand {
+        message: "second landed commit".into(),
+        ..paths(&["b"])
+    };
+    let out = f
+        .land(&cmd, &config(vec![gate("true")]))
+        .unwrap();
+
+    assert_eq!(out.main_sha, f.remote_tip());
+    let log = git(&f.remote, &["log", "--oneline", "refs/heads/trunk"]);
+    assert!(log.contains("first unpushed commit"), "remote log: {log}");
+    assert!(log.contains("second landed commit"), "remote log: {log}");
+}
+
+#[test]
+fn a_by_hand_commit_on_local_main_still_refuses_land_target_ahead_and_is_never_pushed() {
+    let f = Fixture::new();
+    let remote_before = f.remote_tip();
+
+    fs::write(f.main.join("a"), "by-hand commit\n").unwrap();
+    git(&f.main, &["commit", "-qam", "by-hand commit"]);
+    let local = f.local_tip();
+    assert_ne!(local, remote_before);
+
+    fs::write(f.main.join("b"), "second\n").unwrap();
+    let refusal = f
+        .land(&paths(&["b"]), &config(vec![gate("true")]))
+        .unwrap_err();
+
+    assert_eq!(refusal.code, "land-target-ahead", "{refusal}");
+    assert!(
+        refusal.detail.contains(&local),
+        "detail must name foreign commit {local}: {refusal}"
+    );
+    assert_eq!(f.remote_tip(), remote_before);
+}
+
+#[test]
 fn a_paths_land_fast_forwards_to_a_remote_that_moved_first() {
     let f = Fixture::new();
     f.move_remote("moved.txt", "from elsewhere\n");

@@ -1565,4 +1565,123 @@ impl GitDriver {
             .collect::<Result<Vec<_>>>()?;
         page(entries, &bytes, cursor, max)
     }
+    /// All commits reachable from `tip` that are not reachable from `base` (`base..tip`).
+    pub fn commits_between(&self, repo: &RepoHandle, base: &Oid, tip: &Oid) -> Result<Vec<Oid>> {
+        self.require_commit(repo, base)?;
+        self.require_commit(repo, tip)?;
+        let range = format!("{}..{}", base.as_str(), tip.as_str());
+        let bytes = self.checked(repo, &["rev-list", &range, "--"], Policy::Inspect)?;
+        bytes
+            .split(|b| *b == b'\n')
+            .filter(|l| !l.is_empty())
+            .map(|l| oid(repo, l))
+            .collect()
+    }
+    /// For a list of commit oids on the main checkout's branch, returns which of them
+    /// were made by a ScopedCommit chain of the main checkout (from live, retained or
+    /// compacted journal records). Unknown provenance answers "not ours".
+    pub fn main_checkout_scoped_commits(
+        &self,
+        repo: &RepoHandle,
+        commits: &[Oid],
+    ) -> Result<Vec<Oid>> {
+        if commits.is_empty() {
+            return Ok(Vec::new());
+        }
+        let wal = match crate::wal::Wal::open_existing(repo.common_dir(), crate::wal::OsFileSystem) {
+            Ok(w) => w,
+            Err(_) => return Ok(Vec::new()),
+        };
+        let main_root = repo.trusted_main_root();
+        let mut needed: std::collections::HashSet<String> =
+            commits.iter().map(|c| c.as_str().to_owned()).collect();
+        let mut matched: std::collections::HashSet<String> = std::collections::HashSet::new();
+
+        // 1. Live and retained operations
+        let ops_dir = repo.common_dir().join("fgos/git/operations");
+        if let Ok(entries) = std::fs::read_dir(&ops_dir) {
+            for entry in entries.flatten() {
+                if needed.is_empty() {
+                    break;
+                }
+                let file_name = entry.file_name();
+                let id = file_name.to_string_lossy();
+                if id.starts_with('.') || !crate::wal::valid_id(&id) {
+                    continue;
+                }
+                let op_dir = entry.path();
+                let intent_path = op_dir.join("00000000.json");
+                let Ok(intent_bytes) = std::fs::read(&intent_path) else {
+                    continue;
+                };
+                if !intent_bytes.windows(12).any(|w| w == b"ScopedCommit") {
+                    continue;
+                }
+                let Ok(chain) = wal.inspect(&id) else {
+                    continue;
+                };
+                if let crate::wal::OperationKind::ScopedCommit(ref payload) = chain.intent().kind {
+                    let is_main = std::path::Path::new(&payload.worktree) == main_root
+                        || std::fs::canonicalize(&payload.worktree).ok()
+                            == std::fs::canonicalize(main_root).ok();
+                    if is_main {
+                        if let Some(crate::wal::Outcome::Commit {
+                            ref observed,
+                            contract_violation: false,
+                        }) = chain.outcome()
+                        {
+                            if needed.contains(observed) {
+                                matched.insert(observed.clone());
+                                needed.remove(observed);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Compacted ledger records
+        if !needed.is_empty() {
+            let comp_dir = repo.common_dir().join("fgos/git/compacted");
+            if let Ok(entries) = std::fs::read_dir(&comp_dir) {
+                for entry in entries.flatten() {
+                    if needed.is_empty() {
+                        break;
+                    }
+                    let file_name = entry.file_name();
+                    let id = file_name.to_string_lossy();
+                    if id.starts_with('.') || !crate::wal::valid_id(&id) {
+                        continue;
+                    }
+                    let Ok(bytes) = std::fs::read(entry.path()) else {
+                        continue;
+                    };
+                    if !bytes.contains(&b'k') {
+                        continue;
+                    }
+                    let Ok(Some(compact)) = wal.compacted(&id) else {
+                        continue;
+                    };
+                    if compact.reference.is_none() {
+                        if let Ok(crate::wal::Outcome::Commit {
+                            observed,
+                            contract_violation: false,
+                        }) = compact.outcome()
+                        {
+                            if needed.contains(&observed) {
+                                matched.insert(observed.clone());
+                                needed.remove(&observed);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(commits
+            .iter()
+            .filter(|c| matched.contains(c.as_str()))
+            .cloned()
+            .collect())
+    }
 }
