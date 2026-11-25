@@ -178,3 +178,21 @@ findings)`. All listed collisions are between phases in different waves.
 ## 6. Head
 
 Plans commit `884cfb450`; the report commit follows it on `docos/asc-plan-refresh` (sha in the team-lead message).
+
+## 7. Owner decision on question A, from the three plans checked together
+
+The lead ran `fgos resource-check --units` once over all 17 phases of the three plans, with the in-plan edges and the
+owner's three join points (§5 checked each plan alone). Layers are collision-aware:
+
+| order | layers | critical path |
+|---|---|---|
+| ACE, then the gathering, then ASC | 14 | 14 |
+| parallel at the three join points | 12 | 9 |
+| parallel, ACE 2 beside ACE 1 | 11 | 8 |
+
+The 17 phases form one connected group. In parallel the gathering's phase 1 still lands after ASC 8, because both
+write the goldens and `core/instructions/**`. ACE 3 (34 paths, 7 collisions) and the ASC goldens (6 collisions) are
+the main serializers.
+
+The owner chose the sequence (2026-11-25 21:0x): ASC's `blockedBy` now names ACE and the gathering, and question B is
+moot. Question C (whether ACE 2 waits for ACE 1) stays open.

@@ -158,8 +158,8 @@ ACE 1 runs first and alone. After it, this plan, ASC (`261122-1946-agent-start-c
 The gathering plan lists this plan in `blockedBy`: it needs phase 4's write-time check and phase 3's compile door,
 and both plans write `CHANGELOG.md` in their last phase. No phase here waits for ASC or the gathering (no cycle; ACE
 never depends on ASC). The ASC plan's phase table shows how its phases were re-ordered so that every ASC data need on
-ACE 3 passes through ASC 6. The plan-admission limit on running these plans side by side is in the recut report
-(`plans/reports/planner-261125-2038-ace-asc-plan-recut.md`, owner question A).
+ACE 3 passes through ASC 6. The owner chose to run the three plans one after another, this plan then the gathering
+then ASC (2026-11-25 21:0x; recut report `plans/reports/planner-261125-2038-ace-asc-plan-recut.md`, question A).
 
 ### Who moves which text (each piece moves once)
 
@@ -229,8 +229,8 @@ share only `Cargo.toml` and `Cargo.lock` (ACE 3 with ASC 3); the recut report li
   #1); phase 3 updates the release-tree probe that imported `instruction-registry.mjs`.
 - **Parallel admission.** The supervisor admits only whole `ready` plans whose footprint overlaps no `running` plan
   (`packages/supervision/rust/src/portfolio.rs:252-268`). This plan's footprint overlaps ASC's and the gathering's,
-  so the owner's parallel order needs an answer to the recut report's owner question A before the second plan can be
-  admitted.
+  so the owner ordered the plans in sequence (2026-11-25 21:0x): this plan runs first and alone, and the gathering
+  and ASC wait for it through `blockedBy`.
 - **Rollback.** Each phase lands as its own commits through `fgos land`, and each deletes the old path in the same
   commit that adds the new one. Reverting phase 3 restores the Node registry and composer together with
   `repo.json`.

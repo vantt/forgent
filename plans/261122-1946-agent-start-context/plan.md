@@ -6,6 +6,8 @@ priority: P1
 blockedBy:
   - 261122-2108-delete-dead-node-execution-closure
   - 261124-0004-heads-operate-without-owner
+  - 261125-1631-agent-context-engine
+  - 261125-2041-gather-fgos-rules-to-one-owner
 base: 4f44bb780d5e65ac42d6f554d4bbe3731565bf5c
 footprint:
   - plans/261122-1946-agent-start-context/**
@@ -236,8 +238,11 @@ The plan stays `draft`: the owner wants a deep discussion of it before anything 
 | 5 | `261124-0004` | `src/session-host/head-start.mjs`, `test/session-host/head-start.test.mjs`, `.claude/agents/{secretary,supervisor}.md`, `unit_run_host/session_attempt.rs` |
 | 7-11 | phase 5 | (inside this plan) |
 
-`blockedBy` names `261122-2108` and `261124-0004` because phases 5 and 6 cannot start before them; it does not name
-the ACE or gathering plan, since the owner set phase-level waits on those. Two running plans without a frontmatter
+`blockedBy` names `261122-2108` and `261124-0004` because phases 5 and 6 cannot start before them. It also names the
+ACE and gathering plans: the owner chose to run the three plans one after another, ACE then the gathering then ASC
+(2026-11-25 21:0x), because the supervisor admits only whole plans with disjoint footprints and `fgos resource-check`
+over the three plans together gives 12 layers in parallel against 14 in sequence. The phase-level waits in the table
+above stay as the data edges, for when a phase-level admission exists. Two running plans without a frontmatter
 footprint also edit shared files at row level, so a later phase rebases over them: `261114-2051-rust-verb-migration-program`
 phase 11 (`AGENTS.md` legacy-Node paragraph, `docs/reading-map.md` line 144) and the draft
 `261122-2110-coach-agent-and-observe-views` (`core/agents/**`, `routing.rs`, `wiring/mod.rs`; whichever starts second
@@ -304,10 +309,10 @@ and the effective rule set are not this plan's: the ACE plan (`261125-1631`) dec
    `docs/platform/packaging-distribution/spec.md`.
 4. **Running the three plans side by side** (recut report owner question A, 2026-11-25). The supervisor admits only a
    whole `ready` plan whose footprint overlaps no `running` plan (`packages/supervision/rust/src/portfolio.rs:252-268`).
-   This plan's footprint overlaps ACE's and the gathering's, so the owner's parallel order needs a decision on how
-   they are admitted. Still open.
-5. **Shared files of phases that run at the same time** (recut report owner question B). Still open; the plan
-   assumes the recommended "second lander regenerates" rule in "Hot files".
+   This plan's footprint overlaps ACE's and the gathering's. **Resolved (owner, 2026-11-25 21:0x):** the plans run
+   one after another, ACE then the gathering then ASC, through `blockedBy`.
+5. **Shared files of phases that run at the same time** (recut report owner question B). **Moot** after answer 4:
+   no ASC phase runs beside an ACE or gathering phase.
 
 The other product decisions this plan needs are settled in ASC-D1 to ASC-D9 and ACE-D1 to ACE-D6. P10 (the domain
 field on items) belongs to the secretary's item; phase 8 reads the domain wherever the bound item already carries it
@@ -337,11 +342,10 @@ and leaves the fact absent otherwise. No classifier is added here (ASC-D4).
   sheet must hold for them (phase 9 checks it against L8).
 - **Hook rows are opt-in today.** `agent-hooks.v1.json` carries rows only for projects that opted into the mailbox
   (`rowsMailboxOn`). Phase 10 says whether the start-context row joins that set or gets its own opt-in.
-- **Cross-plan order.** Only phase 9 waits for the gathering, which may park on conflict questions; phases 2 to 8, 10
-  and the composer's whole start path do not (owner, 2026-11-25 20:4x). Phase 6 waits for ACE phase 3 only.
-- **Footprint admission.** The plan stays `draft` until the owner discussion and until `261122-2108`, `261124-0004`
-  and the needed ACE phases finish. A ready flip while ACE or the gathering runs fails the plan check with "footprint
-  overlaps another active plan", and the supervisor would not admit it (owner question 4).
+- **Cross-plan order.** The whole plan waits for ACE and the gathering (owner question 4). The gathering may park on
+  conflict questions, which delays this plan as a whole; that is the accepted cost of running in sequence.
+- **Footprint admission.** The plan stays `draft` until `261122-2108`, `261124-0004`, ACE and the gathering are
+  `done`; only then does a ready flip pass the plan check and the supervisor admit it.
 - **Rollback.** Each phase lands as its own commits through `fgos land`. Reverting a phase's commits restores the old
   producer, because each phase deletes its old path in the same commit that adds the new one. Phase 5 is the one
   large revert. Reverting it restores Node `openingText`, `persona.rs` rendering and `project-agents.mjs`, and
