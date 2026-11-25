@@ -1,11 +1,11 @@
 ---
 contract: plan-v1
 title: "Head lifecycle events: the host reports the end of a lead, finished planners and leads are closed, and a waiting lead does not hold a working slot"
-status: draft
+status: ready
 priority: P1
 blockedBy:
   - 261124-0004-heads-operate-without-owner
-base: 74c080010971f8bce13f5867c7d46896d0973df0
+base: bf3025d01676c5f67004a715925f236aca7700ad
 footprint:
   - plans/261124-2143-head-lifecycle-events/**
   - apps/fgos/src/wiring/observe_sources/head_state.rs
@@ -33,7 +33,6 @@ footprint:
   - .agents/skills/**
   - plugins/fgOS/skills/**
   - .claude/skills/**
-  - CHANGELOG.md
   - plans/backlog.md
   - plans/backlog/p-pv7ha3l5ss-head-lifecycle-events-end-of-work-stop-rule-and-lead-slots.md
   - plans/backlog/p-iatzcg2gee-*.md
@@ -131,8 +130,8 @@ a handoff. This plan is the safety net under that rule.
 | 3 | [Close finished planners and leads through one door](phase-03-close-finished-heads.md) | - | packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, core/watcher/definitions/plan-drafted.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/plan-drafted/**, src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs | 1 | ready |
 | 2 | [Host-side end signal for a head](phase-02-host-end-signal.md) | 1, 3 | apps/fgos/src/wiring/observe_sources/head_state.rs, apps/fgos/src/wiring/observe_sources/tests/mod.rs, apps/fgos/observe-kinds.json, core/watcher/definitions/lead-ended.query.json, core/watcher/definitions/session-gone.query.json, core/attention/definitions/head-gone.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/fixtures/definitions/** | 2 | ready |
 | 4 | [A lead waiting outside does not hold a working slot](phase-04-waiting-lead-slot.md) | 3 | packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs | 2 | ready |
-| 5 | [Spec, skill and generated skills](phase-05-spec-and-skill.md) | 2, 3, 4 | docs/platform/supervision/spec.md, docs/platform/observe/spec.md, docs/platform/session-host/spec.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 3 | draft |
-| 6 | [Integration, full gates and closing the rows](phase-06-integration.md) | 1, 2, 3, 4, 5 | CHANGELOG.md, plans/backlog.md, plans/backlog/p-pv7ha3l5ss-head-lifecycle-events-end-of-work-stop-rule-and-lead-slots.md, plans/backlog/p-iatzcg2gee-*.md, plans/backlog/p-6hqvgokerb-*.md, plans/backlog/p-tyowvhthul-*.md, plans/261124-2143-head-lifecycle-events/reports/integration.md | 4 | draft |
+| 5 | [Spec, skill and generated skills](phase-05-spec-and-skill.md) | 2, 3, 4 | docs/platform/supervision/spec.md, docs/platform/observe/spec.md, docs/platform/session-host/spec.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 3 | ready |
+| 6 | [Integration, full gates and closing the rows](phase-06-integration.md) | 1, 2, 3, 4, 5 | plans/backlog.md, plans/backlog/p-pv7ha3l5ss-head-lifecycle-events-end-of-work-stop-rule-and-lead-slots.md, plans/backlog/p-iatzcg2gee-*.md, plans/backlog/p-6hqvgokerb-*.md, plans/backlog/p-tyowvhthul-*.md, plans/261124-2143-head-lifecycle-events/reports/integration.md | 4 | ready |
 
 Phase 3 depends on nothing: closing finished heads does not wait for the diagnosis. Phase 2 follows phase 3
 because both add rows to `packages/supervision/rust/tests/definitions.rs` fixtures through the shared
@@ -145,7 +144,12 @@ backlog belong to phase 6.
 
 Checked: `node scripts/plan-contract-check.mjs --plan plans/261124-2143-head-lifecycle-events` and
 `fgos resource-check --plan plans/261124-2143-head-lifecycle-events` on 2026-11-24: contract check ok; resource
-check accept with 0 findings, the shared files (3 x 2, 3 x 4) sitting in different waves by depends-on. This plan
+check accept with 0 findings, the shared files (3 x 2, 3 x 4) sitting in different waves by depends-on.
+Re-checked 2026-11-25 when the plan was set `ready` (owner approval, supervision event `0622c457271d5acb`):
+plan 0004 is `done`; no code file in the footprint changed since the first base, so `base` moves to the trunk tip
+only to take in 0004's spec and skill edits, which phase 5 now names. `CHANGELOG.md` is left out of the footprint while the running
+plan `261125-1631-agent-context-engine` holds it; phase 6 adds it back once that plan is `done` (as `53d90e0ef` did
+for plan 261125-1558). This plan
 overlaps plan 0004 on `docs/platform/supervision/spec.md`, `docs/platform/session-host/spec.md`,
 `core/skills/fgos-supervisor/SKILL.md` and the generated skill trees; `blockedBy` resolves it.
 
