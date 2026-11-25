@@ -1,0 +1,3 @@
+fgos: --dir changes the project root, the cwd or the environment of the call [argv-not-allowed]
+{"ok":false,"code":"argv-not-allowed","detail":"--dir changes the project root, the cwd or the environment of the call"}
+{"id":"6d8505b3d2d31846","raised":true}
