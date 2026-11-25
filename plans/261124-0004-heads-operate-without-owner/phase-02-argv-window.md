@@ -193,3 +193,10 @@ cd /home/vantt/projects/forgent && fgos run "Implement phase 2 of plan plans/261
 - 2026-11-25 10:18 (supervisor): the owner answered `q-aucsjasc25` with `Applied`. Verified: `~/.fgos/config.yaml`
   changed at 10:14 and carries the `--allowedTools` grant. Phase 2 is unparked: the lead syncs p02 with main and reruns
   the unit on the default `claude-cli-bwrap`.
+- 2026-11-25 10:32 (lead): after the owner applied the global claude worker patch (`3490ee75c`), the unit was rerun on
+  the default `claude-cli-bwrap`: ticket `c-4030-1795576677441`, unit run `unit-run-1795576677937-017b4e0f`, started
+  10:17:57. The window dropped `--sync main` again, which is harmless because the p02 worktree already holds the brief
+  (12 commits behind main, none of them in the phase's paths). The worker is live and progressing: 32 paths changed
+  across every step, the latest at 10:25. It was still `running` after the lead's 12 waits, so phase 2 is parked on this
+  ticket. On wake the lead reads `fgos request result c-4030-1795576677441`, reviews `git diff origin/main...HEAD` of
+  `261124-0004-heads-operate-without-owner/p02` against this brief, and lands it.
