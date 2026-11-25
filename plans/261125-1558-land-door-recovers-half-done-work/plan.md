@@ -22,6 +22,7 @@ footprint:
   - packages/identity/rust/tests/directory.rs
   - docs/platform/git/spec.md
   - docs/platform/identity/spec.md
+  - CHANGELOG.md
 source:
   - plans/discussions/ds-d4d2sp5qg2-land-door-recovers-half-done-work/DISCUSSION.md
   - p-q2dn2cnzlq
