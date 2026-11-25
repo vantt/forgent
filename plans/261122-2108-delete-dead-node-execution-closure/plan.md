@@ -1,9 +1,10 @@
 ---
 contract: plan-v1
 title: "Delete the dead tier-5 Node execution modules and the tests that test them"
-status: draft
+status: running
+lead: head:lead-forgent-261122-2108-delete-554f2
 priority: P1
-base: 15135736078edefd2b5a2117f5cea250811c7b3b
+base: caca9a02bc45ef93b8c20a00d0dbe04e2b0e8bee
 blockedBy:
   - 261118-1341-s6a-execution-tier-rust
   - 261121-2110-component-authority-doors
@@ -335,3 +336,5 @@ order: phase 8 first, then 9, then 2 to 7.
 ## Outstanding questions
 
 None
+
+**Admitted 2026-11-25 by owner order (supervisor):** priority 2, blockers s6a and doors are done; phase 1 (facts) starts. Running plan 261124-0004 still owns `src/runner/dispatch/session-attempt.mjs`: phase 1 checks whether the deletion touches it, and later phases stay off it until 0004 lands. The body's heads-stable waits (note above) get rewritten by the lead's facts pass.

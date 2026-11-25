@@ -1,10 +1,11 @@
 ---
 contract: plan-v1
 title: "Claude worker units may run cargo, node and npm test through the standard claude-cli-bwrap invocation"
-status: draft
+status: running
+lead: head:lead-forgent-261124-2320-claude-f6d5c
 priority: P1
 blockedBy: []
-base: 65e52dee889ff14734e9aadaede457714e574cec
+base: caca9a02bc45ef93b8c20a00d0dbe04e2b0e8bee
 footprint:
   - plans/261124-2320-claude-worker-allowed-tools/**
   - core/config-standard/runner.yaml
@@ -93,6 +94,9 @@ Overlaps with other plans:
   routes clear the overlap, and either is the supervisor's call. One: admit phase 1 by hand and land the changelog
   line after re-reading main. Two: the lead of plan 0004 drops `CHANGELOG.md` from its phase-7 footprint until this
   plan lands.
+
+  **Admitted 2026-11-25 by owner order (supervisor):** route one. The lead runs phase 1 now and lands the
+  `CHANGELOG.md` line after re-reading main; plan 0004 keeps its footprint.
 - `261122-2108-delete-dead-node-execution-closure` (draft, not active) owns `test/runner/dispatch.test.mjs`. It is
   not an active overlap today. Whichever plan lands second rebases on the other's version of that test.
 - `.fgos/config.yaml`, owned by plan 0004 phase 6, is not touched here.
