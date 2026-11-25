@@ -730,6 +730,15 @@ fn a_paths_land_finishes_an_unpublished_land_door_commit_without_a_hand_push() {
         .preflight_commit(&f.env.repo, slot.lend().unwrap(), None)
         .unwrap();
     fs::write(f.main.join("a"), "first unpushed commit\n").unwrap();
+    // Simulate an interrupted land door where compaction was not completed, leaving the chain retained:
+    let fgos_dir = f.main.join(".git/fgos");
+    use std::os::unix::fs::PermissionsExt;
+    fs::create_dir_all(&fgos_dir).unwrap();
+    fs::set_permissions(&fgos_dir, fs::Permissions::from_mode(0o700)).unwrap();
+    let comp_dir = fgos_dir.join("git/compacted");
+    fs::create_dir_all(&comp_dir).unwrap();
+    fs::set_permissions(fgos_dir.join("git"), fs::Permissions::from_mode(0o700)).unwrap();
+    fs::set_permissions(&comp_dir, fs::Permissions::from_mode(0o500)).unwrap();
     let commit_res = f
         .env
         .driver
@@ -747,6 +756,7 @@ fn a_paths_land_finishes_an_unpublished_land_door_commit_without_a_hand_push() {
         )
         .unwrap();
     let first_commit = commit_res.oid.unwrap();
+    fs::set_permissions(&comp_dir, fs::Permissions::from_mode(0o700)).unwrap();
     drop(slot);
 
     assert_eq!(f.local_tip(), first_commit.as_str());
@@ -789,6 +799,128 @@ fn a_by_hand_commit_on_local_main_still_refuses_land_target_ahead_and_is_never_p
         "detail must name foreign commit {local}: {refusal}"
     );
     assert_eq!(f.remote_tip(), remote_before);
+}
+
+#[test]
+fn a_linked_worktree_commit_fast_forwarded_to_main_still_refuses_land_target_ahead() {
+    use std::os::unix::fs::MetadataExt;
+    let f = Fixture::new();
+    let remote_before = f.remote_tip();
+
+    let wt = f.temp.join("linked-wt");
+    git(&f.main, &["worktree", "add", "-qb", "feature", wt.to_str().unwrap()]);
+
+    let m = fs::metadata(&wt).unwrap();
+    let birth = m
+        .created()
+        .unwrap_or(std::time::SystemTime::now())
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    let key = format!("dispatch-cwd--{}-{}-{}.lock", m.dev(), m.ino(), birth);
+    let lease = match fgos_holder_lock::acquire(
+        &fgos_holder_lock::Resource::new("dispatch-cwd", f.main.join(".fgos/locks").join(key)),
+        fgos_holder_lock::Mode::Ex,
+        fgos_holder_lock::Wait::Ms(100),
+        5000,
+    ) {
+        fgos_holder_lock::Acquire::Acquired(h) => h,
+        other => panic!("{other:?}"),
+    };
+    let wt_repo = match f.env.driver.resolve_repo(&wt, &f.main).unwrap() {
+        fgos_git::ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    let baseline = f
+        .env
+        .driver
+        .preflight_commit(
+            &wt_repo,
+            vec![fgos_holder_lock::BorrowedHandle::new(&lease).unwrap()],
+            None,
+        )
+        .unwrap();
+    fs::write(wt.join("c"), "worktree commit\n").unwrap();
+    let commit_res = f
+        .env
+        .driver
+        .scoped_commit(
+            &wt_repo,
+            vec![fgos_holder_lock::BorrowedHandle::new(&lease).unwrap()],
+            &baseline,
+            &fgos_git::CommitRequest {
+                writes: vec!["c".into()],
+                message: "worktree commit".into(),
+            },
+            "writer-wt",
+            "scoped-wt-1",
+            &fgos_git::wal::OsFileSystem,
+        )
+        .unwrap();
+    let wt_commit = commit_res.oid.unwrap();
+    drop(lease);
+
+    git(&f.main, &["merge", "--ff-only", wt_commit.as_str()]);
+    assert_eq!(f.local_tip(), wt_commit.as_str());
+    assert_ne!(f.remote_tip(), wt_commit.as_str());
+
+    fs::write(f.main.join("b"), "second\n").unwrap();
+    let refusal = f
+        .land(&paths(&["b"]), &config(vec![gate("true")]))
+        .unwrap_err();
+
+    assert_eq!(refusal.code, "land-target-ahead", "{refusal}");
+    assert!(
+        refusal.detail.contains(wt_commit.as_str()),
+        "detail must name foreign commit {}: {refusal}",
+        wt_commit.as_str()
+    );
+    assert_eq!(f.remote_tip(), remote_before);
+}
+
+#[test]
+fn a_branch_land_does_not_push_unpushed_commits_without_holding_a_slot() {
+    let f = Fixture::new();
+    let slot = f
+        .env
+        .driver
+        .acquire_merge_slot(
+            &f.env.repo,
+            &fgos_git::RefName::parse("refs/heads/trunk").unwrap(),
+            30_000,
+        )
+        .unwrap();
+    let baseline = f
+        .env
+        .driver
+        .preflight_commit(&f.env.repo, slot.lend().unwrap(), None)
+        .unwrap();
+    fs::write(f.main.join("a"), "unpushed\n").unwrap();
+    let commit_res = f
+        .env
+        .driver
+        .scoped_commit(
+            &f.env.repo,
+            slot.lend().unwrap(),
+            &baseline,
+            &fgos_git::CommitRequest {
+                writes: vec!["a".into()],
+                message: "unpushed".into(),
+            },
+            "writer-1",
+            "land-orphan-1",
+            &fgos_git::wal::OsFileSystem,
+        )
+        .unwrap();
+    let unpushed_commit = commit_res.oid.unwrap();
+    drop(slot);
+
+    f.topic("topic", &[("b", "branch change\n")]);
+    let refusal = f
+        .land(&branch("topic"), &config(vec![gate("true")]))
+        .unwrap_err();
+    assert_eq!(refusal.code, "land-target-ahead", "{refusal}");
+    assert_ne!(f.remote_tip(), unpushed_commit.as_str());
 }
 
 #[test]

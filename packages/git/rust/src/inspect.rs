@@ -1578,8 +1578,8 @@ impl GitDriver {
             .collect()
     }
     /// For a list of commit oids on the main checkout's branch, returns which of them
-    /// were made by a ScopedCommit chain of the main checkout (from live, retained or
-    /// compacted journal records). Unknown provenance answers "not ours".
+    /// were made by a ScopedCommit chain of the main checkout from retained journal records.
+    /// Unknown provenance or compacted history answers "not ours". Stops at the first foreign commit.
     pub fn main_checkout_scoped_commits(
         &self,
         repo: &RepoHandle,
@@ -1592,96 +1592,38 @@ impl GitDriver {
             Ok(w) => w,
             Err(_) => return Ok(Vec::new()),
         };
+        let chains = match wal.retained(100_000) {
+            Ok(c) => c,
+            Err(_) => return Ok(Vec::new()),
+        };
         let main_root = repo.trusted_main_root();
-        let mut needed: std::collections::HashSet<String> =
-            commits.iter().map(|c| c.as_str().to_owned()).collect();
-        let mut matched: std::collections::HashSet<String> = std::collections::HashSet::new();
+        let mut retained_ours: std::collections::HashSet<String> = std::collections::HashSet::new();
 
-        // 1. Live and retained operations
-        let ops_dir = repo.common_dir().join("fgos/git/operations");
-        if let Ok(entries) = std::fs::read_dir(&ops_dir) {
-            for entry in entries.flatten() {
-                if needed.is_empty() {
-                    break;
-                }
-                let file_name = entry.file_name();
-                let id = file_name.to_string_lossy();
-                if id.starts_with('.') || !crate::wal::valid_id(&id) {
-                    continue;
-                }
-                let op_dir = entry.path();
-                let intent_path = op_dir.join("00000000.json");
-                let Ok(intent_bytes) = std::fs::read(&intent_path) else {
-                    continue;
-                };
-                if !intent_bytes.windows(12).any(|w| w == b"ScopedCommit") {
-                    continue;
-                }
-                let Ok(chain) = wal.inspect(&id) else {
-                    continue;
-                };
-                if let crate::wal::OperationKind::ScopedCommit(ref payload) = chain.intent().kind {
-                    let is_main = std::path::Path::new(&payload.worktree) == main_root
-                        || std::fs::canonicalize(&payload.worktree).ok()
-                            == std::fs::canonicalize(main_root).ok();
-                    if is_main {
-                        if let Some(crate::wal::Outcome::Commit {
-                            ref observed,
-                            contract_violation: false,
-                        }) = chain.outcome()
-                        {
-                            if needed.contains(observed) {
-                                matched.insert(observed.clone());
-                                needed.remove(observed);
-                            }
-                        }
+        for chain in chains {
+            if let crate::wal::OperationKind::ScopedCommit(ref payload) = chain.intent().kind {
+                let is_main = std::path::Path::new(&payload.worktree) == main_root
+                    || std::fs::canonicalize(&payload.worktree).ok()
+                        == std::fs::canonicalize(main_root).ok();
+                if is_main {
+                    if let Some(crate::wal::Outcome::Commit {
+                        ref observed,
+                        contract_violation: false,
+                    }) = chain.outcome()
+                    {
+                        retained_ours.insert(observed.clone());
                     }
                 }
             }
         }
 
-        // 2. Compacted ledger records
-        if !needed.is_empty() {
-            let comp_dir = repo.common_dir().join("fgos/git/compacted");
-            if let Ok(entries) = std::fs::read_dir(&comp_dir) {
-                for entry in entries.flatten() {
-                    if needed.is_empty() {
-                        break;
-                    }
-                    let file_name = entry.file_name();
-                    let id = file_name.to_string_lossy();
-                    if id.starts_with('.') || !crate::wal::valid_id(&id) {
-                        continue;
-                    }
-                    let Ok(bytes) = std::fs::read(entry.path()) else {
-                        continue;
-                    };
-                    if !bytes.contains(&b'k') {
-                        continue;
-                    }
-                    let Ok(Some(compact)) = wal.compacted(&id) else {
-                        continue;
-                    };
-                    if compact.reference.is_none() {
-                        if let Ok(crate::wal::Outcome::Commit {
-                            observed,
-                            contract_violation: false,
-                        }) = compact.outcome()
-                        {
-                            if needed.contains(&observed) {
-                                matched.insert(observed.clone());
-                                needed.remove(&observed);
-                            }
-                        }
-                    }
-                }
+        let mut ours = Vec::new();
+        for commit in commits {
+            if retained_ours.contains(commit.as_str()) {
+                ours.push(commit.clone());
+            } else {
+                break;
             }
         }
-
-        Ok(commits
-            .iter()
-            .filter(|c| matched.contains(c.as_str()))
-            .cloned()
-            .collect())
+        Ok(ours)
     }
 }

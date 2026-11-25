@@ -62,3 +62,14 @@ The findings from the live Git journal confirm the plan's Cause section:
 1. `land-477002`: Bare PID writers cannot be proven dead by the identity directory, leaving candidate worktrees trapped.
 2. `b4581336d`: By-hand commits lack ScopedCommit provenance and must continue to be refused by `land-target-ahead`.
 3. `83c313366`: Land-door commits left unpublished due to a crash or interruption before `push_local` must be recognized by `sync_target` via their journaled ScopedCommit provenance and automatically pushed to origin.
+
+---
+
+## Compacted Provenance
+
+Per the plan's Risks section and security analysis:
+- **Compacted chains keep today's refusal**: Compacted `CompactReceipt` entries recorded in `.git/fgos/git/compacted/` do not store the worktree path (`CompactReceipt.reference` is set only for `Sync` and `Land` operations, staying `None` for `ScopedCommit`). Consequently, compacted records cannot prove which checkout (main checkout vs linked worktree) originally produced a commit. If compacted records were treated as our own, a linked-worktree `ScopedCommit` fast-forwarded into local `main` by hand would be classified as ours and published. Therefore, the compacted-ledger inspection path was removed entirely: only a retained `ScopedCommit` chain whose worktree is verified to be the main checkout and whose outcome is a clean `Commit` counts. Everything else, including all compacted history, answers "not ours" and keeps today's `land-target-ahead` refusal.
+- **Journal census**:
+  - Live retained operations in `.git/fgos/git/operations/`: 13,927 total operation directories, of which **0** are currently retained `ScopedCommit` chains (at steady state, subsequent checkout admissions compact finished operations).
+  - Compacted history in `.git/fgos/git/compacted/`: 78,681 total records, of which **1,731** are compacted `ScopedCommit` receipts (`r[0] == "k"`).
+  - When a land-door process terminates or is killed before `push_local`, an orphan commit on local `main` that remains uncompacted in retained operations is recognized and published by `sync_target`. Compacted records consistently retain the `land-target-ahead` refusal.

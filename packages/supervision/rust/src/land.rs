@@ -694,96 +694,116 @@ impl Lander<'_> {
             source: ref_name(&dest)?,
             destination: ref_name(&tracking)?,
         };
-        let receipt = p
-            .git
-            .fetch_refs(p.repo, held()?, p.remote, &[mapping], p.writer, &self.id())
-            .map_err(at("fetch"))?;
-        match receipt.remote {
-            Remote::Acknowledged => {}
-            Remote::Unknown => {
-                return Err(refuse(
-                    "land-remote-outcome-unknown",
-                    "the fetch outcome is unknown",
-                ))
-            }
-            _ => {
-                return Err(refuse(
-                    "land-remote-diverged",
-                    format!("the remote refused to move {tracking}"),
-                ))
-            }
-        }
-        let remote_tip = self.resolve(&tracking)?.ok_or_else(|| {
-            refuse(
-                "land-remote-diverged",
-                format!("{tracking} is absent after fetch"),
-            )
-        })?;
-        let local_tip = self
-            .resolve(&dest)?
-            .ok_or_else(|| refuse("land-target-unknown", format!("local {dest} is absent")))?;
-        if remote_tip == local_tip {
-            return Ok(());
-        }
-        if p.git
-            .ancestry(p.repo, &local_tip, &remote_tip)
-            .map_err(from_git)?
-        {
-            p.git
-                .catch_up_main_checkout(
+        let mut pushed_orphan = false;
+        loop {
+            let receipt = p
+                .git
+                .fetch_refs(
                     p.repo,
                     held()?,
-                    &ref_name(&dest)?,
-                    &local_tip,
-                    &ref_name(&tracking)?,
+                    p.remote,
+                    std::slice::from_ref(&mapping),
                     p.writer,
                     &self.id(),
-                    &wal::OsFileSystem,
                 )
-                .map_err(at("fast-forward main"))?;
-            return Ok(());
-        }
-        if p.git
-            .ancestry(p.repo, &remote_tip, &local_tip)
-            .map_err(from_git)?
-        {
-            let ahead = p
-                .git
-                .commits_between(p.repo, &remote_tip, &local_tip)
-                .map_err(from_git)?;
-            let ours = p
-                .git
-                .main_checkout_scoped_commits(p.repo, &ahead)
-                .map_err(from_git)?;
-            let foreign: Vec<&Oid> = ahead.iter().filter(|c| !ours.contains(c)).collect();
-            if foreign.is_empty() {
-                if !self.push_local(branch, held()?)? {
+                .map_err(at("fetch"))?;
+            match receipt.remote {
+                Remote::Acknowledged => {}
+                Remote::Unknown => {
+                    return Err(refuse(
+                        "land-remote-outcome-unknown",
+                        "the fetch outcome is unknown",
+                    ))
+                }
+                _ => {
                     return Err(refuse(
                         "land-remote-diverged",
                         format!("the remote refused to move {tracking}"),
+                    ))
+                }
+            }
+            let remote_tip = self.resolve(&tracking)?.ok_or_else(|| {
+                refuse(
+                    "land-remote-diverged",
+                    format!("{tracking} is absent after fetch"),
+                )
+            })?;
+            let local_tip = self
+                .resolve(&dest)?
+                .ok_or_else(|| refuse("land-target-unknown", format!("local {dest} is absent")))?;
+            if remote_tip == local_tip {
+                return Ok(());
+            }
+            if p.git
+                .ancestry(p.repo, &local_tip, &remote_tip)
+                .map_err(from_git)?
+            {
+                p.git
+                    .catch_up_main_checkout(
+                        p.repo,
+                        held()?,
+                        &ref_name(&dest)?,
+                        &local_tip,
+                        &ref_name(&tracking)?,
+                        p.writer,
+                        &self.id(),
+                        &wal::OsFileSystem,
+                    )
+                    .map_err(at("fast-forward main"))?;
+                return Ok(());
+            }
+            if p.git
+                .ancestry(p.repo, &remote_tip, &local_tip)
+                .map_err(from_git)?
+            {
+                if !pushed_orphan {
+                    let ahead = p
+                        .git
+                        .commits_between(p.repo, &remote_tip, &local_tip)
+                        .map_err(from_git)?;
+                    let ours = p
+                        .git
+                        .main_checkout_scoped_commits(p.repo, &ahead)
+                        .map_err(from_git)?;
+                    let foreign: Vec<&Oid> = ahead.iter().filter(|c| !ours.contains(c)).collect();
+                    let holds_slot = held()
+                        .map(|h| h.iter().any(|handle| handle.as_ref().name() == "merge-slot"))
+                        .unwrap_or(false);
+                    if foreign.is_empty() && holds_slot {
+                        if !self.push_local(branch, held()?)? {
+                            return Err(refuse(
+                                "land-remote-diverged",
+                                format!("the remote refused to move {tracking}"),
+                            ));
+                        }
+                        pushed_orphan = true;
+                        continue;
+                    }
+                    let unpushed: Vec<&str> = if !foreign.is_empty() {
+                        foreign.iter().map(|c| c.as_str()).collect()
+                    } else {
+                        ahead.iter().map(|c| c.as_str()).collect()
+                    };
+                    return Err(refuse(
+                        "land-target-ahead",
+                        format!(
+                            "local {dest} at {} has commits the remote tip {} lacks ({}); push or reset them first",
+                            local_tip.as_str(),
+                            remote_tip.as_str(),
+                            unpushed.join(", ")
+                        ),
                     ));
                 }
-                return self.sync_target(branch, held);
             }
-            let foreign_list: Vec<&str> = foreign.iter().map(|c| c.as_str()).collect();
             return Err(refuse(
                 "land-target-ahead",
                 format!(
-                    "local {dest} at {} has commits the remote tip {} lacks ({}); push or reset them first",
+                    "local {dest} at {} has commits the remote tip {} lacks; push or reset them first",
                     local_tip.as_str(),
-                    remote_tip.as_str(),
-                    foreign_list.join(", ")
+                    remote_tip.as_str()
                 ),
             ));
         }
-        Err(refuse(
-            "land-target-ahead",
-            format!(
-                "local {dest} at {} has commits the remote tip {} lacks; push or reset them first",
-                local_tip.as_str(),
-                remote_tip.as_str()
-            ),
-        ))
     }
 
     fn changed_paths(&self, before: &Oid, after: &Oid) -> Result<Vec<String>, LandRefusal> {
