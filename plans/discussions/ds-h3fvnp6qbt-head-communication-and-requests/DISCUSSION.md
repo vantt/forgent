@@ -1,7 +1,7 @@
 ---
 id: ds-h3fvnp6qbt
 title: "A head that lacks a power or a door can always speak up"
-status: open
+status: settled
 source:
   - p-nnaksnxtwu
   - p-rchuoa2v3k
@@ -13,7 +13,18 @@ source:
 created: 2026-11-25
 ---
 
-discussion: open
+discussion: settled
+
+## Hand-off {#handoff}
+
+Settled 2026-11-25 23:10 for the **agent-to-agent** part (owner: "thảo luận agent-agent trước"). The owner channel and the missing-grant request of p-nnaksnxtwu are not settled here; they need a new discussion that cites this one (§3 row 12).
+
+- **Outcome:** every head (secretary, supervisor, lead, planner, shaper) reaches a peer head from inside its confinement by sending once; the mailbox send door picks the fastest available path (local record on the same machine, Event Store across machines), wakes an idle recipient (CLI push, else one typed labelled wake line, else next tool call) and answers which path it took or the real cause of a refusal.
+- **Constraints:** HC-D1 to HC-D5; no persona gains power over another (lead and planner recipient limits stay; the only new row is reading one's own inbox); typed text is only the fixed labelled wake line under `agent-mailbox/spec.md` §15.8 rules, never message content; no new channel or component (authority: `agent-mailbox`); one owning proof per behaviour, one live wiring probe.
+- **Non-goals:** the owner channel and grant requests (next discussion); Claude Code `SendMessage` as a rung; a faster cross-machine wake than the Event Store sync; the mailbox head finder beside Identity (p-5igcekysul); latency measurement (p-whvn2fgyep, after this lands).
+- **Acceptance criteria:** (1) the cause of tonight's confined `host-failed` and `lock-unavailable` is proven and fixed; (2) from inside the cage, each persona's `mailbox send` records and its own read returns mail, through the request socket; (3) no forwarded refusal is a bare `host-failed`; (4) mail queued for an old generation is offered once to the successor; (5) an idle recipient of each drained CLI on the same machine is woken within the declared bound without focus change, dialog answer or merge with half-typed input; (6) the send answer names the path taken; (7) one `_shared` know-how file replaces the three skill copies, and `agent-mailbox/spec.md` matches main; (8) a live probe from every confined persona, plus one cross-machine send read after a fetch.
+- **Open points blocking only some parts:** the attach-record release question (spec §15.8, question 17) blocks only task-typed-wake; the root cause found by task-diagnose-confined-mail may reshape task-mail-through-socket.
+- **Tasks:** §7. **Sources:** p-nnaksnxtwu (agent-to-agent part), p-rchuoa2v3k, p-ia2v33b54u, p-bifjfd5rix.
 
 ## Seed
 
@@ -26,7 +37,7 @@ Opened by the secretary (Miu) on the owner's order, 2026-11-25. Owner: Miu and t
 
 ## 1. Trạng thái hiện tại
 
-Round 5 (2026-11-25 23:06, shaper, owner live in chat). Domain: coding (fgOS platform). Authority: `agent-mailbox` owns the channel; no new component.
+Round 6 (2026-11-25 23:10, shaper). **Settled for agent to agent; handed to a planner (see Hand-off).** Round 5 (23:06): Domain: coding (fgOS platform). Authority: `agent-mailbox` owns the channel; no new component.
 
 **Scope now:** agent to agent only (owner, 22:39). The owner channel (ds-cfsfcbknl6) and the missing-grant request are set aside, to be taken up after.
 
@@ -66,6 +77,8 @@ Agents (heads: secretary, supervisor, lead, planner, shaper) must always be able
 | HC-D1 | A channel always exists; what fails is the sender's capability to use all of it. The know-how lives in the door and in refusals, not only in each head's skill. | 2026-11-25 | owner 22:18, held through rounds 3-4 |
 | HC-D2 | Use the fastest channel available for this message first, then step down to the next; the sender learns which channel delivered or why none did. | 2026-11-25 | owner 22:20, held through rounds 3-4 |
 | HC-D3 | Agent to agent, the mailbox carries the message in both scopes: locally on the same machine, through the Event Store across machines (local head always wins). No supervision-event rung. | 2026-11-25 | owner 22:19 (two scopes) and 22:39; scout of `mailbox_remote.rs`; held rounds 3-4 |
+| HC-D4 | The mailbox send door walks the ladder: the head sends once and reads one answer naming the path taken; no head chooses a channel. | 2026-11-25 | owner B 23:05, confirmed 23:10 |
+| HC-D5 | Typing into the recipient's pane is the wake layer only: one fixed labelled wake line under the §15.8 rules, typed by the send door; the message content stays in the mailbox. | 2026-11-25 | owner 22:46, confirmed 23:10 |
 
 ## 5. Q&A log
 
@@ -81,10 +94,11 @@ Agents (heads: secretary, supervisor, lead, planner, shaper) must always be able
 - **2026-11-25 22:46, owner.** "đồng ý" to the typed wake being one labelled line only, the content staying in the mailbox. Shaper decided by analysis, to report: Claude Code `SendMessage` is not a rung (§3 row 4). HC-D1, HC-D2, HC-D3 minted.
 - **2026-11-25 23:04, owner.** "đi thang là sao". Shaper explained with tonight's case: A, the head tries channels itself (Miu stopped after two); B, one `mailbox send` tries them and answers which path it took.
 - **2026-11-25 23:05, owner.** "chọn B". `q-hcnhbtf74z` cancelled with that reason. Shaper drafted §7.
+- **2026-11-25 23:10, owner.** "đồng ý" to the §7 task list and the own-inbox row. HC-D4 and HC-D5 minted (held two rounds). Shaper settled the agent-to-agent part and wrote the hand-off; the owner channel and the grant request go to a new discussion.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Provisional after round 5; HC-D1 to HC-D3 are settled; the typed-wake shape and the send door walking the ladder (owner B, 23:05) are one round old.
+Settled (HC-D1 to HC-D5).
 
 A head sends a message once, through its request socket, to the mailbox send door. The door walks the ladder for it: if the recipient is a live head on this machine the message is recorded locally; otherwise it is signed onto the Event Store for the recipient's machine. On the machine that holds the recipient, the fastest wake its CLI allows is used: Claude Code sessions started to accept get a socket push; any other idle recipient in a terminal gets one typed, labelled wake line under the §15.8 rules; otherwise the message is seen at the recipient's next tool call. The sender's answer always names which path was taken (recorded locally and woken, recorded and waiting for the next tool call, recorded for another machine) or the real cause of a refusal.
 
