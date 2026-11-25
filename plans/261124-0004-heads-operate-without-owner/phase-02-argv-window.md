@@ -186,3 +186,7 @@ cd /home/vantt/projects/forgent && fgos run "Implement phase 2 of plan plans/261
   The owner applies it from the main checkout with
   `fgos config patch --global plans/261124-0004-heads-operate-without-owner/reports/claude-worker-global-patch.yaml --reason "owner q-nt7ptsq2nd: claude-cli-bwrap workers may run cargo, node and npm test"`.
   Phase 2 waits on that apply; then the lead reruns its unit on the default `claude-cli-bwrap` (sync p02 with main first).
+- 2026-11-25 10:05 (lead): acked `q-nt7ptsq2nd`; its answer was already written above by the supervisor. The patch is
+  not applied yet: `fgos config explain runner.executors.claude.invocations` still resolves to the `standard` layer and
+  `~/.fgos/config.yaml` is unchanged since 2026-11-19. Phase 2 is parked on the owner's apply question
+  `q-aucsjasc25`. On `Applied`, the lead syncs p02 with main and reruns the unit on the default `claude-cli-bwrap`.
