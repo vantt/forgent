@@ -1,0 +1,26 @@
+{
+  "unit": {
+    "id": "example-rule",
+    "owner": "core",
+    "kind": "procedure",
+    "mode": "append",
+    "scope": "repo",
+    "specificity": 10,
+    "title": "Example rule",
+    "lifecycle": "live",
+    "valid_from": "2026-11-25",
+    "when": {
+      "role": [
+        "producer"
+      ]
+    },
+    "depends_on": [
+      "missing-rule"
+    ]
+  },
+  "body": "Do the thing.",
+  "state": "missing-rule is not in force",
+  "expect": {
+    "refusal": "rule-dependency-not-in-force"
+  }
+}

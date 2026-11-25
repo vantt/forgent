@@ -1,0 +1,29 @@
+{
+  "set": {
+    "schemaVersion": 1,
+    "whenKeysVersion": 1,
+    "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "rules": [
+      {
+        "id": "example-rule",
+        "owner": "core",
+        "kind": "procedure",
+        "scope": "repo",
+        "specificity": 10,
+        "title": "Example rule",
+        "body": "Do the thing.",
+        "sources": [
+          "core/instructions/example-rule.md"
+        ],
+        "when": {
+          "role": [
+            "producer"
+          ]
+        }
+      }
+    ]
+  },
+  "expect": {
+    "refusal": "rule-set-digest-mismatch"
+  }
+}

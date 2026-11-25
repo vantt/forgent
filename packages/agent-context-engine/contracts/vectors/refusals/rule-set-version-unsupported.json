@@ -1,0 +1,29 @@
+{
+  "set": {
+    "schemaVersion": 2,
+    "whenKeysVersion": 1,
+    "digest": "2c4b37a39bf15bce29213d866a4e16e7586a60c98dee295fb9cc9e60ea9088b8",
+    "rules": [
+      {
+        "id": "example-rule",
+        "owner": "core",
+        "kind": "procedure",
+        "scope": "repo",
+        "specificity": 10,
+        "title": "Example rule",
+        "body": "Do the thing.",
+        "sources": [
+          "core/instructions/example-rule.md"
+        ],
+        "when": {
+          "role": [
+            "producer"
+          ]
+        }
+      }
+    ]
+  },
+  "expect": {
+    "refusal": "rule-set-version-unsupported"
+  }
+}

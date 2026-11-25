@@ -1,0 +1,78 @@
+{
+  "contract": "agent-context-engine-refusals.v1",
+  "categories": "packages/host-runtime/contracts/exit-codes.v1.json",
+  "refusals": [
+    {
+      "code": "rule-when-key-unknown",
+      "category": "validation",
+      "phase": "write",
+      "when": "A when: key is not in when-keys.v1.json."
+    },
+    {
+      "code": "rule-when-value-invalid",
+      "category": "validation",
+      "phase": "write",
+      "when": "A when: value is not allowed by the key's value source."
+    },
+    {
+      "code": "rule-owner-unknown",
+      "category": "validation",
+      "phase": "write",
+      "when": "owner is not a component or domain of the authority model."
+    },
+    {
+      "code": "rule-id-duplicate",
+      "category": "conflict",
+      "phase": "write",
+      "when": "Two units share an id."
+    },
+    {
+      "code": "rule-replacement-incomplete",
+      "category": "validation",
+      "phase": "write",
+      "when": "A replaced rule lacks superseded_by or valid_to, or names a replacement that does not exist."
+    },
+    {
+      "code": "rule-dependency-not-in-force",
+      "category": "precondition",
+      "phase": "write",
+      "when": "A depends_on or refines target is not in force."
+    },
+    {
+      "code": "rule-conflict-in-force",
+      "category": "conflict",
+      "phase": "write",
+      "when": "Two in-force rules are joined by conflicts_with."
+    },
+    {
+      "code": "rule-law-overridden",
+      "category": "conflict",
+      "phase": "write",
+      "when": "A rule of lower authority overrides or forbids a law without sealed supersession evidence."
+    },
+    {
+      "code": "rule-near-duplicate",
+      "category": "conflict",
+      "phase": "write",
+      "when": "The nearest in-force rule scores above the threshold and the new unit declares no relation to it."
+    },
+    {
+      "code": "rule-search-unavailable",
+      "category": "precondition",
+      "phase": "write",
+      "when": "The nearest-rule search cannot run (no worker or embedding model)."
+    },
+    {
+      "code": "rule-set-digest-mismatch",
+      "category": "corrupt",
+      "phase": "read",
+      "when": "A reader recomputed the digest and it differs from the file's."
+    },
+    {
+      "code": "rule-set-version-unsupported",
+      "category": "precondition",
+      "phase": "read",
+      "when": "A reader does not support the file's schemaVersion or whenKeysVersion."
+    }
+  ]
+}
