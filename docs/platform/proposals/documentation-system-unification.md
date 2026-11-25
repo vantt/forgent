@@ -829,6 +829,18 @@ reading the omp/codex block; (B) as a stopgap, drop the untracked
 overwrite each other's registrations); source discussion
 `plans/discussions/ds-nbqco7rcdg-secretary-miu/DISCUSSION.md` (point 4).
 
+Amended 2026-11-25 by owner decisions ACE-D1 and ACE-D2
+([ds-e26zcar63f](../../../plans/discussions/ds-e26zcar63f-agent-context-engine/DISCUSSION.md)).
+ACE is the one store of every rule: it organizes, stores and manages rules and keeps
+them free of duplicates and conflicts, and it does not know which agent starts. The
+task-scoped selection listed above (applicable-rule resolution for a task, mandatory
+versus optional reading, budgets, progressive disclosure, delta expansion and
+inclusion explanations) belongs to Agent Start Context
+([ds-2d55ty37zz](../../../plans/discussions/ds-2d55ty37zz-agent-start-door-and-context-seam/DISCUSSION.md)),
+the one place that sets an agent's context at start. Packaging-distribution writes
+host files from what Agent Start Context returns and selects no rule. The AgentKit
+duplicate above is outside fgOS and is handled in `p-7eb9e65b`.
+
 Suggested subcomponents:
 
 | Subcomponent | Owns |
