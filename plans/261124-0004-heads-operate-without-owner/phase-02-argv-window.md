@@ -190,3 +190,6 @@ cd /home/vantt/projects/forgent && fgos run "Implement phase 2 of plan plans/261
   not applied yet: `fgos config explain runner.executors.claude.invocations` still resolves to the `standard` layer and
   `~/.fgos/config.yaml` is unchanged since 2026-11-19. Phase 2 is parked on the owner's apply question
   `q-aucsjasc25`. On `Applied`, the lead syncs p02 with main and reruns the unit on the default `claude-cli-bwrap`.
+- 2026-11-25 10:18 (supervisor): the owner answered `q-aucsjasc25` with `Applied`. Verified: `~/.fgos/config.yaml`
+  changed at 10:14 and carries the `--allowedTools` grant. Phase 2 is unparked: the lead syncs p02 with main and reruns
+  the unit on the default `claude-cli-bwrap`.
