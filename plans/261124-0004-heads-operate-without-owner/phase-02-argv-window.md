@@ -268,3 +268,15 @@ git -C /home/vantt/projects/forgent-worktrees/261124-0004-heads-operate-without-
   `docs/platform/run-supervisor/spec.md` now says "khung `can-i`", committed as `5fbed1872` on
   `heads-operate-without-owner/p02`; the p02 worktree is clean (71 commits behind main). Next: the schema-derived
   `protectedConfigPaths` fix unit (see 11:40), then re-review and land.
+- 2026-11-25 13:40 (lead): branch `heads-operate-without-owner/p02` at `996c0c9f4` is reviewed and ready to land. Four fix
+  units closed the rest: `d85096203` covers every `x-fgos-sensitivity: command` key, with a schema-coverage test.
+  `bfc3e9e25` decides verb words as the host reads them, so a flag before a sub-verb no longer bypasses a deny row. It
+  also refuses `--repo-root` and pays the `head-request.mjs` debt. `32bde7714` gives one declared host spawn (`run_verb`).
+  `996c0c9f4` uses the host parser, marks `can-i` native and rewords the seam reason. Step 9 is partly met. The
+  `head-request.mjs` allowance is paid. The two node-callers allowances and the bind-facade allowance of `head-start.mjs`
+  (`bind.mjs`, `readAccountStateOverlay`) stay, because no host door exists for them. The owner decided on
+  `q-ulx4nkztpq` that they are tracked in backlog row `p-7vhbq46shs`, so the step 9 `rg` check still finds those lines
+  by decision. Land retries `c-31744-1795588137861`, `c-31898-1795588147953` and `c-32883-1795588685815` were all
+  refused `land-target-ahead`: local `main` holds `972017221` (the run-tests leak plan's docs commit), which origin
+  `c0416313d` lacks. The pending op `land-477002` is gone from `fgos git status`, but the commit is still unpushed.
+  Parked on its push or reset (supervisor recovery).

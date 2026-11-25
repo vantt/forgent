@@ -312,6 +312,11 @@ morning (discussion §1). The planner's own shape choices are written as decisio
   cannot have it until this branch ships). Its 9 paths are uncommitted in the p02 worktree, and no rerun can commit them.
   The fix is under review. On the owner's commit, the lead reviews the branch tip and lands it.
 
+- 2026-11-25 13:40, phase 2: reviewed at `996c0c9f4`, ready to land. Step 9 is partly met; the rest is tracked in
+  `p-7vhbq46shs` (owner `q-ulx4nkztpq`). Parked on `land-target-ahead`: local `main` has the unpushed `972017221`.
+  Details are in `phase-02-argv-window.md`.
+
 ## Outstanding questions
 
-- `q-hwtikojjei` (phase 2): commit the deny-rule fix by hand after rewording one spec line.
+- None open. Phase 2 waits on the push or reset of the unpushed `972017221` on local `main` (supervisor events
+  `ab23214de6047e48`, raised again 13:40).
