@@ -1655,27 +1655,7 @@ const RELEASE_STEP_TIMEOUT: Duration = Duration::from_secs(30 * 60);
 
 /// `YYYY-MM-DDTHH:MM:SS.mmmZ` for now (UTC), the form the ticket files carry.
 fn utc_now_iso() -> String {
-    let now = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default();
-    let (secs, millis) = (now.as_secs() as i64, now.subsec_millis());
-    let (days, rem) = (secs.div_euclid(86_400), secs.rem_euclid(86_400));
-    // Civil date from days since 1970-01-01 (proleptic Gregorian).
-    let z = days + 719_468;
-    let era = z.div_euclid(146_097);
-    let doe = z.rem_euclid(146_097);
-    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
-    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
-    let mp = (5 * doy + 2) / 153;
-    let day = doy - (153 * mp + 2) / 5 + 1;
-    let month = if mp < 10 { mp + 3 } else { mp - 9 };
-    let year = yoe + era * 400 + i64::from(month <= 2);
-    format!(
-        "{year:04}-{month:02}-{day:02}T{:02}:{:02}:{:02}.{millis:03}Z",
-        rem / 3600,
-        rem % 3600 / 60,
-        rem % 60
-    )
+    fgos_host_runtime::civil_time::format_system_time_utc(std::time::SystemTime::now())
 }
 
 /// The real ports of a release run: the host for config and lock reads, git for the trunk tip, a plain process for
@@ -1907,30 +1887,30 @@ impl fgos_session_host::release::ReleasePorts for HostRelease {
     }
 }
 
-/// Writes the ticket whole or not at all: a temp file in the same directory, synced, then moved onto the name
-/// (`exclusive` links it there instead, so an existing ticket is `AlreadyExists` and left alone).
+/// Writes the ticket whole or not at all through the durable-file door (`exclusive` installs without replacing,
+/// so an existing ticket is `AlreadyExists` and left alone).
 fn write_ticket(file: &Path, ticket: &Value, exclusive: bool) -> io::Result<()> {
-    use std::io::Write;
-    let temp = file.with_extension(format!("json.tmp-{}", std::process::id()));
-    let mut out = std::fs::OpenOptions::new()
-        .write(true)
-        .create(true)
-        .truncate(true)
-        .mode_0600()
-        .open(&temp)?;
-    let written = writeln!(out, "{ticket}").and_then(|()| out.sync_all());
-    drop(out);
-    let placed = written.and_then(|()| {
-        if exclusive {
-            std::fs::hard_link(&temp, file)
-        } else {
-            std::fs::rename(&temp, file)
+    let invalid = |why: &str| io::Error::new(io::ErrorKind::InvalidInput, why.to_string());
+    let dir = file
+        .parent()
+        .ok_or_else(|| invalid("ticket path has no parent"))?;
+    let name = file
+        .file_name()
+        .and_then(|n| n.to_str())
+        .ok_or_else(|| invalid("ticket name is not UTF-8"))?;
+    let bytes = format!("{ticket}\n");
+    let placed = if exclusive {
+        fgos_durable_file::install_once_with_mode(dir, name, bytes.as_bytes(), 0o600)
+    } else {
+        fgos_durable_file::replace_durably_with_mode(dir, name, bytes.as_bytes(), 0o600)
+    };
+    match placed {
+        Ok(fgos_durable_file::Installed::AlreadyExists) => {
+            Err(io::Error::from(io::ErrorKind::AlreadyExists))
         }
-    });
-    if exclusive || placed.is_err() {
-        let _ = std::fs::remove_file(&temp);
+        Ok(_) => Ok(()),
+        Err(e) => Err(io::Error::new(e.source.kind(), e.to_string())),
     }
-    placed
 }
 
 /// The release rule's own record under the project root: the trunk commit the last release put in place and the step
@@ -1939,33 +1919,23 @@ fn release_state_file(root: &Path) -> PathBuf {
     root.join(".fgos/runtime/release/state.json")
 }
 
-/// One release at a time across both personas: a kernel `flock` (exclusive, non-blocking, close-on-exec) on
+/// One release at a time across both personas: an exclusive, non-blocking holder lock on
 /// `.fgos/runtime/release/lock`, held by this supervisor for the whole detached run. The kernel drops it when the
-/// supervisor dies, so there is no holder to judge, no stale lock to reclaim and no file that can wedge it.
+/// supervisor dies, so there is no stale lock to reclaim and no file that can wedge it.
 struct ReleaseLock {
-    _file: std::fs::File,
+    _handle: fgos_holder_lock::Handle,
 }
 
 impl ReleaseLock {
     fn take(root: &Path) -> io::Result<Option<ReleaseLock>> {
-        use std::os::fd::AsRawFd;
+        use fgos_holder_lock::{acquire, Acquire, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
         let dir = root.join(".fgos/runtime/release");
         std::fs::create_dir_all(&dir)?;
-        let file = std::fs::OpenOptions::new()
-            .write(true)
-            .create(true)
-            .truncate(false)
-            .mode_0600()
-            .open(dir.join("lock"))?;
-        // SAFETY: flock on a descriptor this function owns; std opens it close-on-exec, so no child inherits it.
-        if unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) } == 0 {
-            return Ok(Some(ReleaseLock { _file: file }));
-        }
-        let e = io::Error::last_os_error();
-        if e.kind() == io::ErrorKind::WouldBlock {
-            Ok(None)
-        } else {
-            Err(e)
+        let resource = Resource::new("release-run", dir.join("lock"));
+        match acquire(&resource, Mode::Ex, Wait::Try, DEFAULT_KILL_WAIT_MS) {
+            Acquire::Acquired(handle) => Ok(Some(ReleaseLock { _handle: handle })),
+            Acquire::Held { .. } | Acquire::Timeout { .. } => Ok(None),
+            Acquire::Unavailable { detail, .. } => Err(io::Error::other(detail)),
         }
     }
 }
