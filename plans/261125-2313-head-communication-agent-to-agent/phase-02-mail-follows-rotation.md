@@ -18,7 +18,8 @@ Mail queued for a head's old generation is offered to its successor exactly once
 `packages/mailbox/rust/core/src/**`, `packages/mailbox/rust/core/tests/**`,
 `packages/mailbox/rust/store/src/record/**`, `packages/mailbox/rust/store/src/hook/**`,
 `packages/mailbox/rust/store/tests/record_*.rs`, `apps/fgos/src/wiring/mailbox_verbs.rs`,
-`apps/fgos/src/wiring/mailbox_hook.rs`, `apps/fgos/tests/mailbox_routes.rs`.
+`apps/fgos/src/wiring/mailbox_hook.rs`, `apps/fgos/tests/mailbox_routes.rs`, `packages/mailbox/rust/store/src/verbs.rs`
+(added 2026-11-26 so `inbox --claim` keeps one door in the store instead of a host copy; phase 5 writes it after).
 
 Corrected 2026-11-26 after a first run proved the record cannot do this alone
 (`reports/phase-02-blocker.md`): the host turns role mail and fixed-handle mail into the same
@@ -52,4 +53,6 @@ role-addressed mail survives a handover and handle-addressed mail does not (case
 
 ## Rollback
 
-Revert the phase commit; queued mail goes back to staying with the old generation.
+The record is written as snapshot version 2 while no header carries a role, so reverting the phase commit is safe
+until the first role-addressed mail is recorded; after that an older release refuses the v3 record (`Newer`), and a
+rollback must first drain or drop role-addressed mail. Queued mail then goes back to staying with the old generation.

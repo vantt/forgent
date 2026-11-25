@@ -47,6 +47,12 @@ Capability: `code:implement`.
    `mailbox_verbs.rs` (no change to `wiring/mod.rs`). Extend `mailbox_routes.rs` with one send whose answer names
    its path.
 
+Phase 3 hand-over notes (landed in `5f6ddd735`): `composer_state` checks the CLI version only while the banner is on
+screen, so the typed gate must check the session's CLI version itself (`adapters/version.rs`) and treat a mismatch as
+`unknown`. Two contrived false-`empty` screens remain in the predicate (a Codex screen with no model status line where a
+draft line contains ` · `; a Claude screen-only draft ending in a lone `❯`); the gate's re-observation right before
+typing is the mitigation, and the live case of phase 7 covers a half-typed composer.
+
 ## Verify
 
 `cargo test -p fgos-session-host --test typed_wake && cargo test -p fgos-mailbox && cargo test -p fgos-identity &&
