@@ -163,6 +163,13 @@ footprint:
   - test/rust-host/fixtures/run-dirs-vectors.json
   - test/suite-baseline.json
   - docs/platform/write-scope/spec.md
+  - docs/platform/agent-mailbox/spec.md
+  - docs/platform/observe/spec.md
+  - docs/platform/agent-coordination/contracts/assignment-run-runresult.md
+  - docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
+  - docs/platform/proposals/documentation-system-unification.md
+  - scripts/check-decision-codes.baseline.json
+  - scripts/executor-model-vectors.mjs
 source:
   - plans/discussions/ds-owool5pjhn-delete-dead-tier-5-node-execution-modules/DISCUSSION.md
   - p-24xw2cwdvo
