@@ -17,7 +17,7 @@ Capability: `code:implement`.
 `src/runner/dispatch/**`, `src/runner/execution/**`, `src/run-supervisor/**`, `packages/component-authority/model/`,
 `test/architecture.test.mjs`, `packages/git/contracts/mutation-census.v1.json`,
 `packages/holder-lock/contracts/lock-registry.v1.json`, `packages/run-supervisor/contracts/recover-actions.v1.json`,
-`scripts/check-decision-citation-drift.baseline.json` (only if it names a deleted file).
+`scripts/check-decision-citation-drift.baseline.json` (only if it names a deleted file). Also the 38 platform docs the doc-health self-check flags once the files are gone (the list is the phase 8 row of `plan.md`), for link-syntax edits only.
 
 ## Steps
 
@@ -36,6 +36,14 @@ Capability: `code:implement`.
 6. Confirm nothing dangles: `git grep -nE '<deleted paths>' -- src bin scripts domains test packages apps core`
    returns no import, and only the history surfaces listed in `plan.md` Non-goals and phase 9's still-pending docs
    name them.
+
+7. Docs that name a deleted file (owner answer to q-5roz2uy3sa, 2026-11-25, option "link-only fix inside phase 8").
+   `node scripts/doc-health.mjs --json --repo-root .` must report no finding. Change link syntax only, never prose:
+   a Markdown link to a deleted file becomes the backticked path; every line that still backticks a deleted path
+   gets the provenance pin `` (retired; last at `85760c6f2`) `` (the main commit just before the deletion; doc-health
+   exempts a line that pins a real commit); a `Related:` header entry that names a deleted file is dropped, or
+   pointed at its Rust owner. No prose rewrite of history docs, and no doc-health rule change. Phase 9 keeps the
+   prose rewrites of its own docs.
 
 ## Verify
 
