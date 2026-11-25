@@ -80,3 +80,10 @@ manual activation (phase 7).
 
 `git revert` the phase's commits; the activation `deny` row comes back with them, and `.fgos/config.yaml` loses the
 recipe.
+
+## Owner answers
+
+- `q-dhhezn67em` (2026-11-25 08:59): forgent's recipe `checks` = the DoD suite,
+  `[[npm, test], [cargo, test, --workspace]]`, not `land.gates` (shell lines with placeholders cannot run as argv).
+  No head can write `.fgos/config.yaml` or patch `release.*`; the owner applies step 3 once with `fgos config patch`
+  from the main checkout. Until then `release run` answers `no-recipe`.
