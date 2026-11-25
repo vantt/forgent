@@ -366,17 +366,6 @@ pub fn check_call(
     call: &Call,
 ) -> Result<Option<String>, CallFault> {
     let selector = route.selector.as_str();
-    if selector == "release" {
-        // A head's `release run` is answered at its request socket before this point; reaching here means the
-        // caller is no head, and there is no other door for the recipe.
-        return Err(CallFault {
-            class: ARG_PARSE,
-            message: "release run works only from a head session (FGOS_HEAD_REQUEST_SOCKET is not set here); the supervisor and secretary heads run it"
-                .to_owned(),
-            sub: None,
-            record: false,
-        });
-    }
     let mut served_sub = None;
     if route.subcommands == Some(true) {
         let (name, available) = NATIVE_SUBCOMMANDS
@@ -407,15 +396,26 @@ pub fn check_call(
             },
         }
     }
-    match unknown_flag(route, call) {
-        Some(message) => Err(CallFault {
+    if let Some(message) = unknown_flag(route, call) {
+        return Err(CallFault {
             class: UNKNOWN_FLAG,
             message,
             sub: served_sub,
             record: true,
-        }),
-        None => Ok(served_sub),
+        });
     }
+    if selector == "release" {
+        // A head's `release run` is answered at its request socket before this point; reaching here means the
+        // caller is no head, and there is no other door for the recipe.
+        return Err(CallFault {
+            class: ARG_PARSE,
+            message: "release run is answered only through a confined head's request socket (the supervisor or the secretary)"
+                .to_owned(),
+            sub: None,
+            record: false,
+        });
+    }
+    Ok(served_sub)
 }
 
 /// The verbs whose Node arm worded a missing or unknown sub-command with `requireSubVerb` (`<verb> requires a
@@ -533,7 +533,8 @@ const CAN_I_SELECTOR: &str = "can-i";
 
 /// Takes the host's own global `--dir <path>` out of a window argv when `path` is the project the call is aimed at
 /// (the root found from `cwd`, or the main checkout root of it), as the installed `fgos` shell function appends it
-/// to every command. Any other `--dir` value stays in the argv, where the forwarder refuses it.
+/// to every command. Any other `--dir` value stays in the argv, where the forwarder refuses it. A dropped `--dir`
+/// never redirects the call: the forwarder always runs the verb at the head's own project root.
 fn drop_own_project_dir(argv: &mut Vec<String>, cwd: &std::path::Path) {
     use fgos_git::invocation_root::{resolve_invocation_root, RootPolicy, RootRequest};
     let Some(at) = argv.iter().position(|w| w == "--dir") else {
@@ -791,6 +792,9 @@ pub(crate) fn confined_head_call_with_reader<R: std::io::Read>(
                     return Err(
                         "bad-args: release run takes no argument besides --rollback".to_owned()
                     );
+                }
+                if let Some(flag) = call.flag_outside(&["rollback"]) {
+                    return Err(format!("bad-args: release run takes no --{flag}"));
                 }
                 if call.flags().flag("rollback").is_some() {
                     args.insert("rollback".to_owned(), json!(true));
@@ -1529,6 +1533,7 @@ mod confined_tests {
             .unwrap();
         assert_eq!(rollback.args, json!({"rollback": true}));
         assert!(call(&["release", "run", "deploy"], true).unwrap().is_err());
+        assert!(call(&["release", "run", "--force"], true).unwrap().is_err());
     }
 
     #[test]
@@ -1543,7 +1548,9 @@ mod confined_tests {
         let rollback = Call::new(&words);
         assert!(matches!(decide(release, &rollback), Lane::Native { .. }));
         let fault = check_call(release, &rollback).unwrap_err();
-        assert!(fault.message.contains("only from a head session"));
+        assert!(fault
+            .message
+            .contains("only through a confined head's request socket"));
         assert!(!fault.record);
     }
 
