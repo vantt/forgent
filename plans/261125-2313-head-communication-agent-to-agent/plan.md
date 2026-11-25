@@ -149,7 +149,7 @@ needed.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Diagnose confined mail](phase-01-diagnose-confined-mail.md) | - | plans/261125-2313-head-communication-agent-to-agent/reports/diagnose-confined-mail.md | 1 | ready |
+| 1 | [Diagnose confined mail](phase-01-diagnose-confined-mail.md) | - | plans/261125-2313-head-communication-agent-to-agent/reports/diagnose-confined-mail.md | 1 | done |
 | 2 | [Queued mail follows a rotation](phase-02-mail-follows-rotation.md) | - | packages/mailbox/rust/core/src/**, packages/mailbox/rust/core/tests/**, packages/mailbox/rust/store/src/record/**, packages/mailbox/rust/store/src/hook/**, packages/mailbox/rust/store/tests/record_*.rs | 1 | ready |
 | 3 | [Composer state per CLI](phase-03-composer-state.md) | - | packages/agent-protocol/rust/src/terminal/**, packages/agent-protocol/rust/tests/terminal_vectors.rs, packages/agent-protocol/contracts/fixtures/terminal/** | 1 | ready |
 | 4 | [Mail through the request socket](phase-04-mail-through-socket.md) | 1 | packages/session-host/contracts/head-permissions.v1.json, packages/session-host/rust/src/forwarder.rs, packages/session-host/rust/src/permissions.rs, packages/session-host/rust/tests/forwarder.rs, packages/session-host/rust/tests/permissions.rs, packages/run-supervisor/rust/src/head_client.rs, packages/run-supervisor/rust/src/head_request.rs, apps/fgos/src/wiring/mailbox_root.rs, apps/fgos/src/wiring/mailbox_hook.rs, apps/fgos/src/wiring/mailbox_verbs.rs, apps/fgos/tests/mailbox_routes.rs | 2 | ready |
