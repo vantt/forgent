@@ -1,14 +1,14 @@
 # @fgos:v1
 # see: fgos config standard
-# @fgos:doc The project's release recipe that `fgos release run` follows: checks, the rollout command, its probe and its rollback. Unset means the project declares no release.
+# @fgos:doc The project's release recipe that `fgos release run` follows: checks, the rollout command, its probe and its rollback.
 release:
-  # @fgos:doc Whether the release can be undone by the rollback command. An irreversible release never applies by itself: the owner is asked with the exact apply command. Default: false.
+  # @fgos:doc Whether the release can be undone by the rollback command; an irreversible release never applies by itself. Default: false.
   reversible: false
-  # @fgos:doc Commands that must all exit 0 before the release applies, each a list of words run with no shell from the project root, in order. Default: [].
+  # @fgos:doc Commands that must all exit 0 before the release applies, each a list of words run with no shell from the project root. Default: [].
   checks: []
-  # @fgos:doc The rollout command, a list of words run with no shell from the project root; null means the project declares no release. Default: null.
+  # @fgos:doc The rollout command, a list of words run with no shell from the project root; null means the project declares no release.
   apply: null
-  # @fgos:doc The command that proves the new release works after apply, a list of words; a non-zero exit runs the rollback. null runs none. Default: null.
+  # @fgos:doc The command that proves the new release works after apply, a list of words; a non-zero exit runs the rollback.
   probe: null
-  # @fgos:doc The command that returns to the previous release, a list of words; required when reversible is true. Default: null.
+  # @fgos:doc The command that returns to the previous release, a list of words; required when reversible is true.
   rollback: null
