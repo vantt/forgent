@@ -64,7 +64,7 @@ The project operates through the owner's two hands, domain-free:
 
 - **The supervisor (left hand):** Looks after every running agent that no lead watches: leads, shapers, planners and any pane or agent started by hand without a lead. Workers of a lead are that lead's. Its rhythm is owned by the keeper (the orchestration skeleton) and is not specified in this section.
 - **The secretary (Miu, right hand):** Holds every power the supervisor holds and keeps it asleep. In peace she talks with the owner, clarifies and orders goals, and reduces load on the owner without meddling in routine operations. When no supervisor is alive or able to act, or a help request waits past the threshold, she runs the operation herself and wakes the machinery until it runs again.
-- **One help channel:** Heads raise `coordination-help` to the supervisor; supervisor raise is granted to secretary, supervisor and lead today; the charter's target is every head. Heads do not talk to Miu directly in peace; owner decisions go through the question store ([questions/spec.md](../questions/spec.md)), and Miu relays them to the owner.
+- **One help channel:** Heads raise `coordination-help` to the supervisor; supervisor raise of the `coordination-help` kind is granted to every head persona (lead, supervisor and secretary also raise the other coordination kinds); the key `secretary.help.staleMinutes` (default 30, minimum 5) is how long a help event may stay unhandled before Miu takes over. Heads do not talk to Miu directly in peace; owner decisions go through the question store ([questions/spec.md](../questions/spec.md)), and Miu relays them to the owner.
 
 ## 2. Shared entities
 

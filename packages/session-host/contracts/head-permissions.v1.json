@@ -20,6 +20,7 @@
         { "prefix": "session answered", "decision": "allow", "policy": "node" },
         { "prefix": "session restore role", "decision": "allow", "policy": "node" },
         { "prefix": "friction record", "decision": "allow" },
+        { "prefix": "supervisor raise", "decision": "allow", "args": { "--kind": ["coordination-help"] } },
         { "prefix": "questions", "decision": "allow", "read": true },
         { "prefix": "questions ask", "decision": "allow", "policy": "node" },
         { "prefix": "questions ack", "decision": "allow", "policy": "node" },

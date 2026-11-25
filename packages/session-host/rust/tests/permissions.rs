@@ -222,6 +222,17 @@ fn the_verbs_each_persona_held_before_are_still_allowed() {
     holds("planner", &head);
     holds("planner", &["land", "request result"]);
     holds("shaper", &["land", "request result"]);
+    // Every persona holds the help channel, inherited from the base head.
+    for persona in [
+        "head",
+        "planner",
+        "shaper",
+        "lead",
+        "supervisor",
+        "secretary",
+    ] {
+        holds(persona, &["supervisor raise"]);
+    }
     holds(
         "lead",
         &[

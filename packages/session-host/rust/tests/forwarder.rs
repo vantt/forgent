@@ -371,6 +371,36 @@ fn a_raise_names_only_the_coordination_event_kinds() {
 }
 
 #[test]
+fn a_planner_or_shaper_raises_only_a_help_event() {
+    for persona in ["planner", "shaper"] {
+        assert!(run(
+            persona,
+            json!([
+                "supervisor",
+                "raise",
+                "--kind",
+                "coordination-help",
+                "--ref",
+                "plan:x",
+                "--reason",
+                "r"
+            ]),
+            Path::new("/p")
+        )
+        .is_ok());
+        for kind in ["coordination-handoff", "coordination-chore", "head-gone"] {
+            let refused = run(
+                persona,
+                json!(["supervisor", "raise", "--kind", kind, "--ref", "plan:x"]),
+                Path::new("/p"),
+            )
+            .unwrap_err();
+            assert!(refused.contains("--kind takes one of"), "{kind}: {refused}");
+        }
+    }
+}
+
+#[test]
 fn a_worktree_is_removed_only_once_delivered_to_main() {
     let ok = run(
         "supervisor",
