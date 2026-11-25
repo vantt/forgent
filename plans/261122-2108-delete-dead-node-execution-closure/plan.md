@@ -343,8 +343,18 @@ order: phase 8 first, then 9, then 2 to 7.
   `test/session-host/head-start.test.mjs` and files phase 9 writes. Wave 2 runs phases 2, 3, 4, 5 and 7; phases
   6 and 9 wait for 0004, and phase 8 must not delete `session-attempt.mjs` or touch 0004's model rows before
   0004 lands.
+- 2026-11-25 (wave 2, `reports/lead-261125-1213-wave-2.md`): the branches of phases 2, 3, 4 and 5 are reviewed and
+  ready; none landed yet. Phase 3 is held by a dirty file in the main checkout (supervisor event
+  `a04e057a52f597ec`). Phases 2, 4 and 5 still cite deleted tests in platform docs outside the footprint, and the
+  doc-health gate fails on them. They are parked on owner question `q-ms5ifcqex6` (widen by 7 files). Phase 2 also
+  has to keep the live worker-grant case that `983e3876d` added to `test/runner/dispatch.test.mjs`. Phase 7's
+  branch is rejected for copying dead code into `test/helpers`; it is redone after 2 to 5 land. Phases 6 and 9
+  still wait for 0004. The gemini quota is spent until about 15:20; use `--provider xai`.
 
 ## Outstanding questions
+
+- `q-ms5ifcqex6`: widen the footprint by 7 files (out-of-footprint doc mentions of deleted tests, the decision-codes
+  baseline, the executor-model vector recorder).
 
 None
 
