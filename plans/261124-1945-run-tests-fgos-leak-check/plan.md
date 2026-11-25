@@ -144,6 +144,20 @@ listed is left out of the footprint: the land door regenerates it (Risks). Check
 
 ## Progress
 
+- 2026-11-25 18:34: step 7 run by the unconfined `lead:SUPERVISOR` session with the four leads held idle (no run-tests,
+  cargo, `node --test` or `fgos run` process). One full `npm test` on release 3beba73a (18:23:41 to 18:34:11) ended
+  exit 1: 6675 tests, 6624 pass, 24 fail, 27 skipped; the failures are outside this plan (backlog p-5d2e1c9a names the
+  umask 002 class, not checked one by one). The witness reported one change, a deleted `.fgos/runtime/dev-host/run-csuu1U`
+  that is in neither whole-store walk, so the walk cannot name its writer (a per-invocation `fgos:dev` directory, pruned
+  during the run). The throwaway walk (before 18:23:32, after 18:34:15) saw 12 added paths under `observe/records` and 5
+  modified files (`cache/questions.json`, `logs/invocation-faults.jsonl`, `runtime/mailbox/mail-taken`,
+  `runtime/watcher/state.json`, `runtime/test-suite-last-run.json`). The first four are written by the live watcher
+  timer, its questions refresh and the mailbox take (the fault log shows one `watcher` and one `questions` entry about
+  every three minutes inside the run, each citing the blocked remote transfer `remote-2197219-1794971807928534033-1`);
+  the last is the runner's own record. No test-made change was seen by the walk and missed by the witness. Caveat for
+  the proof point: "no live head writing" is not "no live writer", because the watcher and mailbox timers keep writing
+  into `.fgos`; a walk compared with the witness on a tree with the timers running will always show them.
+
 - 2026-11-25 18:10: owner answered q-dzh2ojhcvc "You paste the request into it". The supervisor typed the
   owed step 7 (full `npm test` with the witness against a throwaway whole-store walk, no code changes) into
   the unconfined `lead:SUPERVISOR` session (`claude-xonu@fg-server2`), under events `c5f179128332d27b` and
