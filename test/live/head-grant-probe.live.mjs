@@ -194,6 +194,11 @@ export function planForVerb(verb) {
       return {
         args: ['supervisor', 'handled', 'no-such-event-id', '--json'],
       };
+    case 'release run':
+      // The rollback form refuses no-release-in-flight when no release step is in flight, so the probe never applies or rolls back a release (contract: packages/run-supervisor/contracts/head-request.v1.json, verb 'release run').
+      return {
+        args: ['release', 'run', '--rollback', '--json'],
+      };
     case 'supervisor queue':
       return {
         args: ['supervisor', 'queue', '--json'],
