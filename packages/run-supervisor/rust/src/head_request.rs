@@ -1726,21 +1726,6 @@ impl HostRelease {
         }
     }
 
-    /// A read-only child (git): dies with the supervisor that started it.
-    fn command(&self, program: &str, args: &[String]) -> Command {
-        let mut cmd = Command::new(program);
-        cmd.args(args)
-            .env_clear()
-            .envs(self.cfg.env.iter())
-            .current_dir(&self.cfg.cwd);
-        // SAFETY: prctl is async-signal-safe; the child dies with the supervisor that started it.
-        #[cfg(target_os = "linux")]
-        unsafe {
-            cmd.pre_exec(fgos_process::control::arm_parent_death_signal);
-        }
-        cmd
-    }
-
     /// A recipe argv (a check, the apply, the probe, the rollback). It dies with the supervisor, so the release
     /// lock, the runner and every recipe child share one lifetime (`fgctl upgrade` publishes the activation by
     /// temp file and rename, so a killed upgrade leaves the old or the new release, never a half one). Its output
@@ -1809,13 +1794,13 @@ impl fgos_session_host::release::ReleasePorts for HostRelease {
 
     /// The trunk tip is the head commit of the project root.
     fn trunk_tip(&self) -> Result<String, String> {
-        let git = self.command("git", &["rev-parse".to_string(), "HEAD".to_string()]);
-        match run_bounded_command(git, None, self.cfg.verb_timeout, |_| ()) {
-            Ok(BoundedOutcome::Exited(output)) if output.status.success() => {
-                Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
-            }
-            Ok(_) => Err("git rev-parse HEAD did not answer".to_string()),
-            Err(e) => Err(format!("git did not run: {e}")),
+        let (driver, repo) = fgos_git::GitDriver::open_at(&self.cfg.cwd)
+            .map_err(|e| format!("git did not run: {e:?}"))?
+            .ok_or_else(|| "the project root is not a git repository".to_string())?;
+        match driver.resolve_commit_ref(&repo, "HEAD") {
+            Ok(Some(oid)) => Ok(oid.as_str().to_string()),
+            Ok(None) => Err("git HEAD did not answer".to_string()),
+            Err(e) => Err(format!("git did not run: {e:?}")),
         }
     }
 
