@@ -38,9 +38,32 @@ pub enum Planned {
     Ask(Vec<String>),
 }
 
-/// Why an argv is refused: always the contract's `argv-not-allowed`, with the reason.
+/// Why an argv is refused: the contract's `argv-not-allowed`, or `recipient-not-allowed` for a `--to` outside the
+/// values the persona's row allows, with the reason.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Refused(pub String);
+
+/// Opens the reason of a refusal whose code is `recipient-not-allowed`.
+const RECIPIENT_REASON: &str = "recipient-not-allowed: ";
+
+impl Refused {
+    /// The contract's refusal code for this refusal.
+    pub fn code(&self) -> &'static str {
+        if self.0.starts_with(RECIPIENT_REASON) {
+            "recipient-not-allowed"
+        } else {
+            "argv-not-allowed"
+        }
+    }
+}
+
+/// Whether `value` is one of `allowed`: an exact match, or, for an allowed value ending in `*`, any value with that prefix.
+fn value_allowed(allowed: &[String], value: &str) -> bool {
+    allowed.iter().any(|a| match a.strip_suffix('*') {
+        Some(prefix) => value.starts_with(prefix),
+        None => a == value,
+    })
+}
 
 fn refuse<T>(why: impl Into<String>) -> Result<T, Refused> {
     Err(Refused(why.into()))
@@ -358,8 +381,9 @@ pub fn plan(
             }
             for (flag, allowed) in &rule.args {
                 let mut values = flag_values(&words, flag);
-                if values.any(|v| !allowed.iter().any(|a| a == v)) {
-                    return refuse(format!("{flag} takes one of {}", allowed.join(", ")));
+                if values.any(|v| !value_allowed(allowed, v)) {
+                    let lead = if flag == "--to" { RECIPIENT_REASON } else { "" };
+                    return refuse(format!("{lead}{flag} takes one of {}", allowed.join(", ")));
                 }
             }
             if let Some(at) = rule.target_at {

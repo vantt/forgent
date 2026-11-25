@@ -6,7 +6,7 @@
     "ask": "one five-part owner question carrying the exact argv is filed and the reply is `asked` with the question id",
     "deny": "refused with `argv-not-allowed` (or `verb-not-granted` for a policy verb the persona lacks)"
   },
-  "matching": "Rows are { prefix, decision, policy?, read?, args?, append?, refuseFlags? }; `prefix` is the verb words (`session read`). A row matches an argv whose leading words equal the prefix. The longest matching prefix wins; on a tie the strictest decision wins (deny over ask over allow). An argv no row matches is `ask`. A persona inherits the rows and the cage of its `inherits` persona; a row with the same prefix in the child replaces the inherited one. `policy` is `forward` (default), `node` or `native`. `read: true` marks a verb a rotation successor may use before it holds the role (it changes no store and no file). `append` is argv the forwarder adds after the caller's own; `refuseFlags` are flags the caller may not pass. `args` maps a flag to the values it may take; `limits` maps a flag to the largest whole number it may take; `targetAt` is the argv index of a session target (a role, handle or slot key) the forwarder checks. `config patch` takes exactly `<file> [--reason <text>]`: the window reads the file (a plain project-relative path outside `.fgos`, no symlink), refuses it when an edit lies on one branch with a `protectedConfigPaths` path (`*` is any one key), and gives the host a private copy of the bytes it checked.",
+  "matching": "Rows are { prefix, decision, policy?, read?, args?, append?, refuseFlags? }; `prefix` is the verb words (`session read`). A row matches an argv whose leading words equal the prefix. The longest matching prefix wins; on a tie the strictest decision wins (deny over ask over allow). An argv no row matches is `ask`. A persona inherits the rows and the cage of its `inherits` persona; a row with the same prefix in the child replaces the inherited one. `policy` is `forward` (default), `node` or `native`. `read: true` marks a verb a rotation successor may use before it holds the role (it changes no store and no file). `append` is argv the forwarder adds after the caller's own; `refuseFlags` are flags the caller may not pass. `args` maps a flag to the values it may take (an allowed value ending in `*` matches any value with that prefix, an exact value only itself; a `--to` outside its values is refused `recipient-not-allowed`, any other flag `argv-not-allowed`; the lead and planner `mailbox send` row limits `--to`, the one flag the host's `mailbox send` reads for the recipient, to `head:secretary-*` and `head:supervisor-*`); `limits` maps a flag to the largest whole number it may take; `targetAt` is the argv index of a session target (a role, handle or slot key) the forwarder checks. `config patch` takes exactly `<file> [--reason <text>]`: the window reads the file (a plain project-relative path outside `.fgos`, no symlink), refuses it when an edit lies on one branch with a `protectedConfigPaths` path (`*` is any one key), and gives the host a private copy of the bytes it checked.",
   "refusedFlags": ["-C", "--cwd", "--root", "--project", "--env", "--dir", "--repo-root"],
   "protectedConfigPaths": ["runner.confinement", "runner.confinementPolicies", "runner.capabilities.*.confinement", "runner.capabilities.*.verify", "runner.executor", "runner.executors", "invariantChecks", "worktreeSetup", "gateBypass", "secretary.run", "land", "release"],
   "personas": {
@@ -37,6 +37,7 @@
       "peers": false,
       "rules": [
         { "prefix": "supervisor raise", "decision": "allow", "args": { "--kind": ["coordination-help", "coordination-handoff", "coordination-chore"] } },
+        { "prefix": "mailbox send", "decision": "allow", "args": { "--to": ["head:secretary-*", "head:supervisor-*"] } },
         { "prefix": "run", "decision": "allow", "policy": "node" },
         { "prefix": "land", "decision": "allow", "policy": "node" },
         { "prefix": "worktree create", "decision": "allow", "policy": "node" },
@@ -49,6 +50,7 @@
       "mailbox": false,
       "peers": false,
       "rules": [
+        { "prefix": "mailbox send", "decision": "allow", "args": { "--to": ["head:secretary-*", "head:supervisor-*"] } },
         { "prefix": "land", "decision": "allow", "policy": "node" },
         { "prefix": "request result", "decision": "allow", "policy": "node" }
       ]

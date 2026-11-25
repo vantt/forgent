@@ -53,6 +53,45 @@ fn a_json_flag_the_caller_already_passed_is_not_added_twice() {
     );
 }
 
+fn mail(persona: &str, to: &str) -> Result<Planned, fgos_session_host::forwarder::Refused> {
+    plan(
+        persona,
+        &json!(["mailbox", "send", "--to", to, "hello"]),
+        Path::new("/p"),
+        &stage_path(),
+    )
+}
+
+#[test]
+fn a_lead_may_mail_a_supervisor_or_a_secretary_by_prefix() {
+    for to in ["head:supervisor-x", "head:secretary-y"] {
+        assert!(matches!(mail("lead", to), Ok(Planned::Run(_))), "{to}");
+    }
+}
+
+#[test]
+fn mail_to_any_other_head_is_refused_recipient_not_allowed() {
+    for (persona, to) in [("lead", "head:lead-y"), ("planner", "head:planner-z")] {
+        let refused = mail(persona, to).unwrap_err();
+        assert_eq!(refused.code(), "recipient-not-allowed", "{persona} {to}");
+    }
+}
+
+#[test]
+fn an_exact_args_value_still_matches_only_exactly() {
+    let raise = |kind: &str| {
+        plan(
+            "head",
+            &json!(["supervisor", "raise", "--kind", kind]),
+            Path::new("/p"),
+            &stage_path(),
+        )
+    };
+    assert!(matches!(raise("coordination-help"), Ok(Planned::Run(_))));
+    let refused = raise("coordination-help-extra").unwrap_err();
+    assert_eq!(refused.code(), "argv-not-allowed");
+}
+
 #[test]
 fn an_argv_no_row_matches_is_asked_with_the_callers_own_words() {
     let planned = run("planner", json!(["deploy", "production"]), Path::new("/p")).unwrap();
