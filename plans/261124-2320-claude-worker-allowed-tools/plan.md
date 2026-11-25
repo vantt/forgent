@@ -1,10 +1,11 @@
 ---
 contract: plan-v1
 title: "Claude worker units may run cargo, node and npm test through the standard claude-cli-bwrap invocation"
-status: draft
+status: done
+lead: head:lead-forgent-261124-2320-claude-f6d5c
 priority: P1
 blockedBy: []
-base: 65e52dee889ff14734e9aadaede457714e574cec
+base: caca9a02bc45ef93b8c20a00d0dbe04e2b0e8bee
 footprint:
   - plans/261124-2320-claude-worker-allowed-tools/**
   - core/config-standard/runner.yaml
@@ -76,8 +77,30 @@ carries the edited standard is staged and activated.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Grant in the standard invocation, its proof and the changelog line](phase-01-standard-grant.md) | - | core/config-standard/runner.yaml, test/runner/dispatch.test.mjs, CHANGELOG.md | 1 | ready |
-| 2 | [Release and live cargo probe](phase-02-release-and-live-probe.md) | 1 | plans/261124-2320-claude-worker-allowed-tools/reports/live-cargo-probe.md | 2 | draft |
+| 1 | [Grant in the standard invocation, its proof and the changelog line](phase-01-standard-grant.md) | - | core/config-standard/runner.yaml, test/runner/dispatch.test.mjs, CHANGELOG.md | 1 | done |
+| 2 | [Release and live cargo probe](phase-02-release-and-live-probe.md) | 1 | plans/261124-2320-claude-worker-allowed-tools/reports/live-cargo-probe.md | 2 | done |
+
+## Progress
+
+- 2026-11-25: phase 1 `done`, landed on main at `29dd50475`
+  ([report](reports/lead-261125-1111-claude-worker-grant-phase-01.md)). The full `npm test` and
+  `cargo test --workspace` were not run, because the lead's confinement cannot build the addon or the workspace.
+  The owning dispatch test, the land gate and the `fgos-config` crate tests pass.
+- 2026-11-25: phase 2 parked on the owner or the unconfined supervisor. They stage and activate a release from main
+  at or after `29dd50475`, and run the full `npm test` and `cargo test --workspace` there. Then the live cargo probe
+  can run.
+- 2026-11-25: owner answered q-nii67wdhv3 with option 1: the owner opens one unconfined `lead:SUPERVISOR`
+  session. Once `fgos identity resolve lead:SUPERVISOR` finds it, the supervisor sends it the release build, stage
+  and activate from main (>= `29dd50475`), `npm test`, `cargo test --workspace`, and then starts the live cargo
+  probe. At 11:27 no such session was live yet; phase 2 stays parked on it.
+- 2026-11-25 12:36: the owner stopped this plan's lead to free a lead slot. The lead is not to be restarted: phase 2 is
+  held by `head:supervisor-manual`, which also holds `lead:SUPERVISOR` (release tree built, `cargo test --workspace` green
+  with 4390 tests, `npm test` shows 8 failures in files phase 1 did not touch, checked against the earlier state before the
+  release is activated). The supervisor raises a handoff event when the probe report lands; then the plan closes.
+- 2026-11-25 12:45: phase 2 `done` and the plan closed by the supervisor on the manual supervisor's handoff. Release
+  `efa4694e` (from main `e40252044`) is active; the live probe passed ([report](reports/live-cargo-probe.md), landed
+  `444c23c15`). Criterion 4 is met for `cargo test --workspace` (4390 passed) but not for `npm test`: six reds remain in
+  files phase 1 did not touch, already owned by backlog rows p-4nmomwje7j and p-vnsigyw6h7.
 
 Checks made under the table: `node scripts/plan-contract-check.mjs --plan plans/261124-2320-claude-worker-allowed-tools`
 and `fgos resource-check --plan plans/261124-2320-claude-worker-allowed-tools`. The two phases sit in different waves,
@@ -93,6 +116,9 @@ Overlaps with other plans:
   routes clear the overlap, and either is the supervisor's call. One: admit phase 1 by hand and land the changelog
   line after re-reading main. Two: the lead of plan 0004 drops `CHANGELOG.md` from its phase-7 footprint until this
   plan lands.
+
+  **Admitted 2026-11-25 by owner order (supervisor):** route one. The lead runs phase 1 now and lands the
+  `CHANGELOG.md` line after re-reading main; plan 0004 keeps its footprint.
 - `261122-2108-delete-dead-node-execution-closure` (draft, not active) owns `test/runner/dispatch.test.mjs`. It is
   not an active overlap today. Whichever plan lands second rebases on the other's version of that test.
 - `.fgos/config.yaml`, owned by plan 0004 phase 6, is not touched here.

@@ -1,7 +1,7 @@
 ---
 id: p-yoec2tz5nf
 title: "`packages/config/rust/tests/registry_defaults.rs:190` is red: the `@fgos:doc` line of `docLocate.yaml` differs from the schema description (tests, priority high; source: `plans/reports/triage-261124-0200-main-red-triage.md`)"
-status: proposed
+status: done
 priority: P1
 area: tests
 created: 2026-11-24
@@ -17,3 +17,5 @@ The doc line equals the schema description and the `registry_defaults` test pass
 
 # Notes
 
+
+Done 2026-11-25: fixed by `a2a5934ef` (fix(config): docLocate model source doc line matches its schema render); the `@fgos:doc` line and the schema `description` now carry the same sentence.

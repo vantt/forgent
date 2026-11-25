@@ -1,9 +1,10 @@
 ---
 contract: plan-v1
 title: "Delete the dead tier-5 Node execution modules and the tests that test them"
-status: draft
+status: running
+lead: head:lead-forgent-261122-2108-delete-554f2
 priority: P1
-base: 15135736078edefd2b5a2117f5cea250811c7b3b
+base: caca9a02bc45ef93b8c20a00d0dbe04e2b0e8bee
 blockedBy:
   - 261118-1341-s6a-execution-tier-rust
   - 261121-2110-component-authority-doors
@@ -162,6 +163,13 @@ footprint:
   - test/rust-host/fixtures/run-dirs-vectors.json
   - test/suite-baseline.json
   - docs/platform/write-scope/spec.md
+  - docs/platform/agent-mailbox/spec.md
+  - docs/platform/observe/spec.md
+  - docs/platform/agent-coordination/contracts/assignment-run-runresult.md
+  - docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
+  - docs/platform/proposals/documentation-system-unification.md
+  - scripts/check-decision-codes.baseline.json
+  - scripts/executor-model-vectors.mjs
 source:
   - plans/discussions/ds-owool5pjhn-delete-dead-tier-5-node-execution-modules/DISCUSSION.md
   - p-24xw2cwdvo
@@ -258,13 +266,13 @@ to 7 produce both.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Facts: recompute the dead closure and the test dispositions](phase-01-facts.md) | - | plans/261122-2108-delete-dead-node-execution-closure/reports/closure.md | 1 | ready |
-| 2 | [Retire or rewire the dispatch tests](phase-02-tests-runner-dispatch.md) | 1 | test/runner/dispatch-assignment-id-claim-concurrency.helper.mjs, test/runner/dispatch-assignment-id-claim-concurrency.test.mjs, test/runner/dispatch-brief.test.mjs, test/runner/dispatch-config-patterns.test.mjs, test/runner/dispatch-confinement-authority.test.mjs, test/runner/dispatch-confinement-backend-p03.test.mjs, test/runner/dispatch-confinement-blind.test.mjs, test/runner/dispatch-confinement-credential-hygiene.test.mjs, test/runner/dispatch-confinement-machine-private.test.mjs, test/runner/dispatch-confinement-p04.test.mjs, test/runner/dispatch-confinement-p05.test.mjs, test/runner/dispatch-confinement-policies.test.mjs, test/runner/dispatch-confinement-reaper-fence.test.mjs, test/runner/dispatch-execute-effort.test.mjs, test/runner/dispatch-executor-profile.test.mjs, test/runner/dispatch-governance-operability.test.mjs, test/runner/dispatch-governance-provider-denylist.test.mjs, test/runner/dispatch-i08b-remediation.test.mjs, test/runner/dispatch-operability-production-door.test.mjs, test/runner/dispatch-plan-policy.test.mjs, test/runner/dispatch-policy-baseline-snapshot.test.mjs, test/runner/dispatch-production-call-sites.test.mjs, test/runner/dispatch-r9-performance-cache.test.mjs, test/runner/dispatch-run-timeout.test.mjs, test/runner/dispatch-runtime-inspect.test.mjs, test/runner/dispatch-stray-write-attribution.test.mjs, test/runner/dispatch-terminal-slot.test.mjs, test/runner/dispatch-trust-store.test.mjs, test/runner/dispatch-visibility-session.test.mjs, test/runner/dispatch-worker-home.test.mjs, test/runner/dispatch-worker-session-boot.test.mjs, test/runner/dispatch-worker-session.test.mjs, test/runner/dispatch.test.mjs, test/runner/dispatch/**, plans/261122-2108-delete-dead-node-execution-closure/reports/tests-runner-dispatch.md | 2 | draft |
-| 3 | [Retire or rewire the execution tests](phase-03-tests-runner-execution.md) | 1 | test/runner/execution-contract.test.mjs, test/runner/execution/**, plans/261122-2108-delete-dead-node-execution-closure/reports/tests-runner-execution.md | 2 | draft |
-| 4 | [Retire or rewire the assignment, run-result and provider tests](phase-04-tests-runner-assignment-run-provider.md) | 1 | test/runner/assignment-cwd-mutex-concurrency.test.mjs, test/runner/assignment-dispatch.test.mjs, test/runner/assignment-enumerator-guard.test.mjs, test/runner/assignment-layout.test.mjs, test/runner/assignment-normalizer.test.mjs, test/runner/assignment-provenance.test.mjs, test/runner/assignment-runresult.test.mjs, test/runner/assignment.test.mjs, test/runner/run-lock-identity.test.mjs, test/runner/run-outcome.test.mjs, test/runner/run-result-confinement-label.test.mjs, test/runner/run-result-report-complete.test.mjs, test/runner/run-result-source-scan.test.mjs, test/runner/run-result-v2.test.mjs, test/runner/run-result-v3-reader.test.mjs, test/runner/provider-capacity.test.mjs, test/runner/provider-credential-probe.test.mjs, test/runner/provider-credential-renewal.test.mjs, test/runner/provider-per-cli-credential-sources.test.mjs, test/runner/provider-pool-lease.test.mjs, test/runner/provider-quarantine-probe.test.mjs, plans/261122-2108-delete-dead-node-execution-closure/reports/tests-runner-assignment-run-provider.md | 2 | draft |
-| 5 | [Retire or rewire the remaining runner tests](phase-05-tests-runner-rest.md) | 1 | test/runner/agent-definitions.test.mjs, test/runner/agent-result-claim-contract.test.mjs, test/runner/cli-spawn-reconciliation.test.mjs, test/runner/config-seat-binding-layers.test.mjs, test/runner/credential-store.test.mjs, test/runner/custody-successor-admission.test.mjs, test/runner/dead-vocabulary-guard.test.mjs, test/runner/default-executor-merge.test.mjs, test/runner/driver-rununit.test.mjs, test/runner/effective-execution-contract.test.mjs, test/runner/egress-governance.test.mjs, test/runner/evidence-attribution.test.mjs, test/runner/herdr-private-home-trust.test.mjs, test/runner/herdr-spawn-adapter.test.mjs, test/runner/loop.test.mjs, test/runner/merge-quoted-paths.test.mjs, test/runner/operation-choice.test.mjs, test/runner/operation-prompt-templates.test.mjs, test/runner/runner-schema-vocabulary.test.mjs, test/runner/spawn-worker.test.mjs, test/runner/tier-cell.test.mjs, test/runner/tier-fallback-config.test.mjs, test/runner/work-unit-for.test.mjs, plans/261122-2108-delete-dead-node-execution-closure/reports/tests-runner-rest.md | 2 | draft |
+| 1 | [Facts: recompute the dead closure and the test dispositions](phase-01-facts.md) | - | plans/261122-2108-delete-dead-node-execution-closure/reports/closure.md | 1 | done |
+| 2 | [Retire or rewire the dispatch tests](phase-02-tests-runner-dispatch.md) | 1 | test/runner/dispatch-assignment-id-claim-concurrency.helper.mjs, test/runner/dispatch-assignment-id-claim-concurrency.test.mjs, test/runner/dispatch-brief.test.mjs, test/runner/dispatch-config-patterns.test.mjs, test/runner/dispatch-confinement-authority.test.mjs, test/runner/dispatch-confinement-backend-p03.test.mjs, test/runner/dispatch-confinement-blind.test.mjs, test/runner/dispatch-confinement-credential-hygiene.test.mjs, test/runner/dispatch-confinement-machine-private.test.mjs, test/runner/dispatch-confinement-p04.test.mjs, test/runner/dispatch-confinement-p05.test.mjs, test/runner/dispatch-confinement-policies.test.mjs, test/runner/dispatch-confinement-reaper-fence.test.mjs, test/runner/dispatch-execute-effort.test.mjs, test/runner/dispatch-executor-profile.test.mjs, test/runner/dispatch-governance-operability.test.mjs, test/runner/dispatch-governance-provider-denylist.test.mjs, test/runner/dispatch-i08b-remediation.test.mjs, test/runner/dispatch-operability-production-door.test.mjs, test/runner/dispatch-plan-policy.test.mjs, test/runner/dispatch-policy-baseline-snapshot.test.mjs, test/runner/dispatch-production-call-sites.test.mjs, test/runner/dispatch-r9-performance-cache.test.mjs, test/runner/dispatch-run-timeout.test.mjs, test/runner/dispatch-runtime-inspect.test.mjs, test/runner/dispatch-stray-write-attribution.test.mjs, test/runner/dispatch-terminal-slot.test.mjs, test/runner/dispatch-trust-store.test.mjs, test/runner/dispatch-visibility-session.test.mjs, test/runner/dispatch-worker-home.test.mjs, test/runner/dispatch-worker-session-boot.test.mjs, test/runner/dispatch-worker-session.test.mjs, test/runner/dispatch.test.mjs, test/runner/dispatch/**, plans/261122-2108-delete-dead-node-execution-closure/reports/tests-runner-dispatch.md | 2 | done |
+| 3 | [Retire or rewire the execution tests](phase-03-tests-runner-execution.md) | 1 | test/runner/execution-contract.test.mjs, test/runner/execution/**, plans/261122-2108-delete-dead-node-execution-closure/reports/tests-runner-execution.md | 2 | done |
+| 4 | [Retire or rewire the assignment, run-result and provider tests](phase-04-tests-runner-assignment-run-provider.md) | 1 | test/runner/assignment-cwd-mutex-concurrency.test.mjs, test/runner/assignment-dispatch.test.mjs, test/runner/assignment-enumerator-guard.test.mjs, test/runner/assignment-layout.test.mjs, test/runner/assignment-normalizer.test.mjs, test/runner/assignment-provenance.test.mjs, test/runner/assignment-runresult.test.mjs, test/runner/assignment.test.mjs, test/runner/run-lock-identity.test.mjs, test/runner/run-outcome.test.mjs, test/runner/run-result-confinement-label.test.mjs, test/runner/run-result-report-complete.test.mjs, test/runner/run-result-source-scan.test.mjs, test/runner/run-result-v2.test.mjs, test/runner/run-result-v3-reader.test.mjs, test/runner/provider-capacity.test.mjs, test/runner/provider-credential-probe.test.mjs, test/runner/provider-credential-renewal.test.mjs, test/runner/provider-per-cli-credential-sources.test.mjs, test/runner/provider-pool-lease.test.mjs, test/runner/provider-quarantine-probe.test.mjs, plans/261122-2108-delete-dead-node-execution-closure/reports/tests-runner-assignment-run-provider.md | 2 | running |
+| 5 | [Retire or rewire the remaining runner tests](phase-05-tests-runner-rest.md) | 1 | test/runner/agent-definitions.test.mjs, test/runner/agent-result-claim-contract.test.mjs, test/runner/cli-spawn-reconciliation.test.mjs, test/runner/config-seat-binding-layers.test.mjs, test/runner/credential-store.test.mjs, test/runner/custody-successor-admission.test.mjs, test/runner/dead-vocabulary-guard.test.mjs, test/runner/default-executor-merge.test.mjs, test/runner/driver-rununit.test.mjs, test/runner/effective-execution-contract.test.mjs, test/runner/egress-governance.test.mjs, test/runner/evidence-attribution.test.mjs, test/runner/herdr-private-home-trust.test.mjs, test/runner/herdr-spawn-adapter.test.mjs, test/runner/loop.test.mjs, test/runner/merge-quoted-paths.test.mjs, test/runner/operation-choice.test.mjs, test/runner/operation-prompt-templates.test.mjs, test/runner/runner-schema-vocabulary.test.mjs, test/runner/spawn-worker.test.mjs, test/runner/tier-cell.test.mjs, test/runner/tier-fallback-config.test.mjs, test/runner/work-unit-for.test.mjs, plans/261122-2108-delete-dead-node-execution-closure/reports/tests-runner-rest.md | 2 | running |
 | 6 | [Retire or rewire the run-supervisor, golden-recorder, setup and other tests](phase-06-tests-supervisor-setup-misc.md) | 1 | test/run-supervisor/**, test/golden-recorders/**, test/setup/capability-catalog-doctrine.test.mjs, test/setup/gate-kill-grace.test.mjs, test/setup/packaged-definitions.test.mjs, test/setup/seat-binding-dry-bind.test.mjs, test/session-host/head-start.test.mjs, test/seat-binding/client.test.mjs, test/convention/seat-id.test.mjs, test/state/work-size-rigor.test.mjs, test/util/session-identity.test.mjs, test/session-identity/attempt-writer-id.test.mjs, plans/261122-2108-delete-dead-node-execution-closure/reports/tests-supervisor-setup-misc.md | 2 | draft |
-| 7 | [Rewire the workflow tests and the shared helpers](phase-07-tests-workflow-helpers.md) | 1 | test/workflow/**, test/helpers/**, plans/261122-2108-delete-dead-node-execution-closure/reports/tests-workflow-helpers.md | 2 | draft |
+| 7 | [Rewire the workflow tests and the shared helpers](phase-07-tests-workflow-helpers.md) | 1 | test/workflow/**, test/helpers/**, plans/261122-2108-delete-dead-node-execution-closure/reports/tests-workflow-helpers.md | 2 | running |
 | 8 | [Delete the dead source; close the manifest rows; regenerate the census](phase-08-delete-source.md) | 1, 2, 3, 4, 5, 6, 7 | src/runner/dispatch/**, src/runner/execution/**, src/run-supervisor/**, packages/component-authority/model/, test/architecture.test.mjs, packages/git/contracts/mutation-census.v1.json, packages/holder-lock/contracts/lock-registry.v1.json, packages/run-supervisor/contracts/recover-actions.v1.json, scripts/check-decision-citation-drift.baseline.json | 3 | draft |
 | 9 | [Docs, contract notes, comments and skills stop naming deleted files](phase-09-docs-and-notes.md) | 1 | docs/platform/runner/spec.md, docs/platform/runner/contracts/**, docs/platform/runner/architecture/**, docs/platform/runner/subcomponents/**, docs/platform/run-supervisor/spec.md, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/agent-confinement/spec.md, docs/platform/agent-confinement/contracts/**, docs/platform/agent-coordination/spec.md, docs/platform/agent-protocol/spec.md, docs/platform/config/spec.md, docs/platform/seat-binding/spec.md, docs/platform/secrets/spec.md, docs/platform/terminal-control/spec.md, docs/platform/work-state/spec.md, docs/platform/packaging-distribution/spec.md, docs/platform/resource-referee/spec.md, docs/how-to/configure-and-operate-agent-confinement.md, docs/reading-map.md, packages/execution/contracts/**, packages/agent-protocol/contracts/agent-protocol.v1.json, packages/resource-referee/contracts/resource-referee.v1.json, packages/run-supervisor/contracts/controller/**, packages/run-supervisor/contracts/envelope.v3.json, packages/run-supervisor/contracts/unit-state.v1.json, packages/run-supervisor/contracts/worker-env-allowlist.v1.json, apps/fgos/src/wiring/unit_run_host/**, packages/execution/engine/src/confinement/cleanup/probes/mod.rs, packages/execution/rust/src/decide.rs, packages/run-supervisor/rust/src/controller/**, packages/run-supervisor/rust/tests/controller_cwd_lock.rs, packages/run-supervisor/rust/tests/controller_trust_store.rs, core/skills/fgos-run/SKILL.md, core/skills/_shared/capability-catalog.md, core/skills/_shared/capability-matching.md, .agents/skills/**, plugins/fgOS/skills/** | 2 | draft |
 | 11 | [Close the Node-twin debt the deletion leaves (moved from the doors plan)](phase-11-node-twin-debt.md) | 8 | src/runner/dispatch/write-scope.mjs, test/runner/write-scope.test.mjs, test/git/write-scope-parity.test.mjs, test/state/domain-registry-compiled.test.mjs, packages/write-scope/, src/runner/capability-config.mjs, test/runner/capability-config.test.mjs, src/runner/agent-listing.mjs, test/runner/agent-listing.test.mjs, scripts/agents-vectors.mjs, test/helpers/agents-vectors.helper.mjs, test/helpers/executor-model-vectors.helper.mjs, test/setup/packaged-definitions.test.mjs, test/rust-host/fixtures/run-dirs-vectors.json, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, packages/component-authority/model/doors/decide-a-dispatch.yaml, packages/component-authority/model/doors/derive-executor-facts.yaml, packages/component-authority/model/doors/tool-lookup-by-capability.yaml, packages/component-authority/model/doors/list-run-directories.yaml, packages/component-authority/model/doors/footprint-write-scope-overlap-rule.yaml, packages/component-authority/model/doors/global-fgos-directory.yaml, test/architecture.test.mjs, docs/platform/write-scope/spec.md, docs/platform/runner/spec.md, plans/261122-2108-delete-dead-node-execution-closure/reports/node-twin-debt.md | 4 | draft |
@@ -332,6 +340,65 @@ Rollback: the plan only deletes files and rewrites test imports, docs and notes.
 commit, and `git revert <commit>` restores that phase. To restore everything, revert the commits in reverse
 order: phase 8 first, then 9, then 2 to 7.
 
+## Lead log
+
+- 2026-11-25: phase 1 landed (`1e4fa3b19`, `reports/closure.md`, base `a43e451bb`): 89 files, 26 live, 63 dead;
+  125 test importers, none outside a footprint. Since `4dffbaad4`, `src/runner/dispatch/write-scope.mjs` turned
+  dead (doors phase 2a); phase 11 retires it. `261122-0118` left six session-host facades live (closure.md §1);
+  they stay with S7. The heads-stable waits in this body are void: that plan and doors are done. The only live
+  gate is running plan `261124-0004`, which owns `src/runner/dispatch/session-attempt.mjs` (dead per phase 1),
+  `test/session-host/head-start.test.mjs` and files phase 9 writes. Wave 2 runs phases 2, 3, 4, 5 and 7; phases
+  6 and 9 wait for 0004, and phase 8 must not delete `session-attempt.mjs` or touch 0004's model rows before
+  0004 lands.
+- 2026-11-25 (wave 2, `reports/lead-261125-1213-wave-2.md`): the branches of phases 2, 3, 4 and 5 are reviewed and
+  ready; none landed yet. Phase 3 is held by a dirty file in the main checkout (supervisor event
+  `a04e057a52f597ec`). Phases 2, 4 and 5 still cite deleted tests in platform docs outside the footprint, and the
+  doc-health gate fails on them. They are parked on owner question `q-ms5ifcqex6` (widen by 7 files). Phase 2 also
+  has to keep the live worker-grant case that `983e3876d` added to `test/runner/dispatch.test.mjs`. Phase 7's
+  branch is rejected for copying dead code into `test/helpers`; it is redone after 2 to 5 land. Phases 6 and 9
+  still wait for 0004. The gemini quota is spent until about 15:20; use `--provider xai`.
+- 2026-11-25 12:5x: phase 3 landed (`e492a2125`, gates green). Phase 2 was redone on main as branch
+  `delete-dead-node-execution-closure/p02r` (tip `8e8bd9b4a`, worktree `…-p02r`). It makes the same 26
+  deletions, cuts `test/runner/dispatch.test.mjs` down to its committed-config and worker-grant cases, and
+  repoints the in-footprint docs. Its land gate fails only on two out-of-footprint doc lines
+  (`docs/platform/agent-coordination/contracts/assignment-run-runresult.md:303`,
+  `docs/platform/agent-mailbox/spec.md:458`), so it stays parked on `q-ms5ifcqex6`. The old `…-p02` branch and
+  worktree are superseded by `p02r`.
+- 2026-11-25 12:58: owner answered `q-ms5ifcqex6` (widen by the 7 files). Phases 2, 4, 5 and 7 are parked until the
+  supervisor lands the footprint widening; phases 6 and 9 still wait for `261124-0004` (running).
+- 2026-11-25 14:0x: supervisor widened the footprint (`bafa505cc`). Phase 2 landed (`4be288f7e`): branch `p02r`
+  plus a doc repoint of the two out-of-footprint lines, the `dispatch.test.mjs` entries of the decision-codes
+  baseline, and a re-key of four citation-drift baseline entries whose line text changed. Phase 4 was redone as
+  `p04r` (tip `ecadc3b06`; the old `p04` failed to rebase over phase 2's E6 edit in the seat-binding spec, and E6 now
+  names both Rust owners). Phase 5 was redone as `p05r` on top of `p04r` (tip `908a13fa9`, adds the line 38/40
+  repoint and fixes the schema-vocabulary title nit). Phase 7 was redone as `p07r` on top of `p05r` (tips
+  `01911f91d`, `bb43c633b`): workflow tests read `src/holder-lock`, `src/native/execution-door.mjs` and a small
+  unit-control generation fixture; the executor-model vector recorder, its helper and its Node twin are retired
+  (owner: `golden_executor_model.rs`), and `scripts/agents-vectors.mjs` keeps the two small generic helpers it used.
+  The census rows for the recorder were patched in the sandbox, which cannot run `--write-census`; the land's
+  `regenerate` step rewrites the census anyway. `test/helpers/declared-assignment.mjs` and
+  `test/helpers/work-seat-config.mjs` stay: their only users are now three phase-6 files
+  (`test/run-supervisor/fixtures/terminal-controller.mjs`, `test/setup/capability-catalog-doctrine.test.mjs`,
+  `test/state/work-size-rigor.test.mjs`), so **phase 6 deletes both helpers** when it retires or rewires those
+  files. All three branches are reviewed. Landing them is parked: `fgos land` refuses `main-checkout-dirty-overlap`
+  on an uncommitted edit of `docs/platform/architecture-map.md` in the main checkout that is not this plan's
+  (supervisor event `a9c06e5fca1cc395`). Land order: `p04r`, then `p05r`, then `p07r`. Worktrees to remove once
+  delivered: `…-p02`, `…-p04`, `…-p05`, `…-p07` are superseded; removing `…-p02` failed in the lead's sandbox
+  (read-only file system).
+
 ## Outstanding questions
 
+- `q-ms5ifcqex6` (answered by the owner 2026-11-25 12:54, acked): **widen the footprint by these 7 files**:
+  `docs/platform/agent-mailbox/spec.md`, `docs/platform/observe/spec.md`,
+  `docs/platform/agent-coordination/contracts/assignment-run-runresult.md`,
+  `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`,
+  `docs/platform/proposals/documentation-system-unification.md`, `scripts/check-decision-codes.baseline.json`,
+  `scripts/executor-model-vectors.mjs`. Scope of the answer: edit only the lines that name a deleted test (repoint
+  to the owning Rust test) and retire the recorder script; no other footprint change, no src or Rust change there,
+  nothing owned by `261124-0004`. A lead's paths land refuses a footprint change (`footprint-change-refused`), so
+  the supervisor or a planner adds the 7 paths to `footprint:` (supervisor event raised by the lead). Once they
+  are in, phases 2 (`p02r`), 4 and 5 repoint their out-of-footprint mentions and land, then phase 7 is redone.
+
 None
+
+**Admitted 2026-11-25 by owner order (supervisor):** priority 2, blockers s6a and doors are done; phase 1 (facts) starts. Running plan 261124-0004 still owns `src/runner/dispatch/session-attempt.mjs`: phase 1 checks whether the deletion touches it, and later phases stay off it until 0004 lands. The body's heads-stable waits (note above) get rewritten by the lead's facts pass.

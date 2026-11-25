@@ -1,0 +1,78 @@
+# Owner's global config patch for claude workers (answer to q-nt7ptsq2nd, 2026-11-25).
+#
+# Apply from the main checkout, outside any confined head:
+#   fgos config patch --global plans/261124-0004-heads-operate-without-owner/reports/claude-worker-global-patch.yaml \
+#     --reason "owner q-nt7ptsq2nd: claude-cli-bwrap workers may run cargo, node and npm test"
+# Then check:  fgos config check   and   fgos config get runner.executors.claude.invocations
+#
+# Why the whole list: config lists are leaves (docs/platform/config/spec.md rule 5), so a global
+# `invocations` list replaces the standard's list whole. The four claude invocations below are copied
+# verbatim from core/config-standard/runner.yaml of this checkout; the only change is the last two args
+# of claude-cli-bwrap (one comma-joined value, placed last so the variadic flag eats nothing after it).
+# Rollback: fgos config unset --global runner.executors.claude.invocations --reason "..."
+# Note: while this override stands, later edits to the standard's claude invocations do not reach this
+# machine; plan 261124-2320-claude-worker-allowed-tools moves the grant into the standard, after which
+# this override should be unset.
+- set: runner.executors.claude.invocations
+  value:
+    - id: claude-cli
+      via: cli
+      adapter: cli-spawn
+      command: claude
+      args: ["-p", "{prompt}", "--model", "{model}", "--permission-mode", acceptEdits]
+    - id: claude-cli-bwrap
+      via: cli
+      adapter: cli-spawn
+      command: claude
+      args: ["-p", "{prompt}", "--model", "{model}", "--permission-mode", acceptEdits, "--allowedTools", "Bash(cargo:*),Bash(node:*),Bash(npm test:*)"]
+      credentialStore:
+        use: claude
+        homeEnv: CLAUDE_CONFIG_DIR
+        sessionDir: projects
+        files: [".credentials.json"]
+      env:
+        CLAUDE_CODE_FORCE_SESSION_PERSISTENCE: "1"
+      confinement:
+        backend: bwrap
+    - id: claude-herdr-bwrap
+      via: cli
+      adapter: herdr-spawn
+      command: claude
+      args: ["--model", "{model}"]
+      credentialStore:
+        use: claude
+        homeEnv: CLAUDE_CONFIG_DIR
+        sessionDir: projects
+        files: [".credentials.json"]
+      env:
+        CLAUDE_CODE_FORCE_SESSION_PERSISTENCE: "1"
+      confinement:
+        backend: bwrap
+      interactiveMode:
+        exitCommand: "/exit"
+        kind: claude
+        trustStore:
+          kind: claude-json
+    - id: claude-herdr-bypass-bwrap
+      via: cli
+      adapter: herdr-spawn
+      command: claude
+      args: ["--model", "{model}", "--dangerously-skip-permissions"]
+      permissionMode: bypass
+      credentialStore:
+        use: claude
+        homeEnv: CLAUDE_CONFIG_DIR
+        sessionDir: projects
+        files: [".credentials.json"]
+      env:
+        CLAUDE_CODE_FORCE_SESSION_PERSISTENCE: "1"
+      confinement:
+        backend: bwrap
+        privateHome: true
+        isolatedSession: true
+        ownWorktree: true
+      interactiveMode:
+        exitCommand: "/exit"
+        kind: claude
+        trustStore:
+          kind: claude-json

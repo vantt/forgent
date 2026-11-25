@@ -1171,3 +1171,23 @@ test('every row of the registry says what it checks, in one sentence of its own'
     assert.ok(row.description.trim().length > 10, `${row.id} has no description`);
   }
 });
+
+// ─── the install-and-doctor how-to lists the registry's rows. Its catalog (section 4.7) is generated from the
+// registry contract by scripts/render-doctor-howto-tables.mjs, and the hand-written tables above it may name only
+// rows the registry still has, so the how-to cannot lag the doctor again.
+
+test('the how-to lists every doctor row and its registered fix exactly as the registry gives them', async () => {
+  const { HOWTO_PATH, withCatalog, catalogRows } = await import('../../scripts/render-doctor-howto-tables.mjs');
+  const text = fs.readFileSync(HOWTO_PATH, 'utf8');
+  assert.equal(text, withCatalog(text), 'docs/how-to doctor catalog is stale: run node scripts/render-doctor-howto-tables.mjs');
+  assert.deepEqual(catalogRows().map((row) => row.id), registryEntries().rows.map((row) => row.id), 'the catalog and the registry expand to different rows');
+});
+
+test('the how-to names no doctor row the registry lacks in its hand-written tables', async () => {
+  const { HOWTO_PATH, catalogRows } = await import('../../scripts/render-doctor-howto-tables.mjs');
+  const known = new Set(catalogRows().map((row) => row.id));
+  const handWritten = fs.readFileSync(HOWTO_PATH, 'utf8').split('<!-- doctor-catalog:begin -->')[0];
+  const named = [...handWritten.matchAll(/^\| `([A-Za-z0-9-]+)` \|/gm)].map((m) => m[1]);
+  assert.ok(named.length > 40, 'the hand-written tables were not found');
+  assert.deepEqual(named.filter((id) => !known.has(id)), [], 'the how-to names rows the registry no longer has');
+});

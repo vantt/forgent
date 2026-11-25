@@ -34,7 +34,7 @@ runner:
           via: cli
           adapter: cli-spawn
           command: claude
-          args: ["-p", "{prompt}", "--model", "{model}", "--permission-mode", acceptEdits]
+          args: ["-p", "{prompt}", "--model", "{model}", "--permission-mode", acceptEdits, "--allowedTools", "Bash(cargo:*),Bash(node:*),Bash(npm test:*)"]
           credentialStore:
             use: claude
             homeEnv: CLAUDE_CONFIG_DIR

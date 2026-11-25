@@ -147,3 +147,6 @@ owner via `fgos questions ask`. Mark the event handled once resolved.
 ## Reports
 
 At most 10 lines. Put the full report in a file named with `fgos convention path --kind report`.
+Do not land a wake report on main. Main takes a commit only for a decision, a plan status change or a backlog row; a
+report per wake made main take a commit every two to three minutes and starved other heads' lands. Record what you
+learned that will repeat as a backlog row, never only in a report.

@@ -372,10 +372,7 @@ watcher:
     # @fgos:why [3199073] watcher tune: actions.session-idle=none
     session-idle: none
 # @fgos:doc The project supervisor head and its lead pool.
-supervisor:
-  # @fgos:doc Most leads the supervisor runs at once; it equals the default lane count and is not derived at read time. In leads. Minimum: 1. Default: 4.
-  # @fgos:why [2250466] too slow delivery
-  maxLeads: 3
+supervisor: {}
 # @fgos:doc When a long-running head session is rotated into a fresh one, and what the successor rereads.
 sessionRotation:
   # @fgos:doc Per-persona overrides of soft and hard, and the portfolio paths its successor rereads, by bare persona name.

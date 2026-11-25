@@ -25,7 +25,7 @@
   spec: docs/platform/component-authority/spec.md
   source:
     - packages/component-authority/
-  status: designed
+  status: live
 - id: packaging-distribution
   canonical: packaging-distribution
   aliases:

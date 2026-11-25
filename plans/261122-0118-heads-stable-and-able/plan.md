@@ -686,6 +686,10 @@ the five-part form, with the proposal written in the phase file, and lists the `
   checkout, applies the patch items, keeping the owner's uncommitted edits, lands them and replies with the commit. The
   items are in `config-patch-items.yaml` in this directory (phase 3 gate, phase 4 pin; phase 9 added when chosen).
 
+- **q-ddj673fmju, the three leftovers of the done plan (one red cargo test, six CHANGELOG lines, Miu's probe):
+  answered B** (owner via the secretary, 2026-11-24 01:19): the owner does them on the host. No plan or
+  backlog row is opened for them.
+
 ## Risks and rollback
 
 - **Overlap with s6a and work-data-model** (above): the plan cannot be admitted until both are resolved; nothing

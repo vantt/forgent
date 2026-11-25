@@ -957,6 +957,12 @@ test('the leak check ignores live runtime directories other sessions write but s
       // Simulate live activity in the excluded runtime directories
       fs.writeFileSync(path.join(fgosDir, 'runtime', 'land', 'land-1-2-3.log.partial'), 'landing in progress\n');
       fs.writeFileSync(path.join(fgosDir, 'runtime', 'mailbox', 'mail-taken'), 'taken\n');
+      fs.mkdirSync(path.join(fgosDir, 'runtime', 'watcher'), { recursive: true });
+      fs.writeFileSync(path.join(fgosDir, 'runtime', 'watcher', 'state.json'), '{"tick":1}');
+      fs.mkdirSync(path.join(fgosDir, 'assignments', 'unit-run-1'), { recursive: true });
+      fs.writeFileSync(path.join(fgosDir, 'assignments', 'unit-run-1', 'closed.json'), '{}');
+      fs.mkdirSync(path.join(fgosDir, 'locks'), { recursive: true });
+      fs.writeFileSync(path.join(fgosDir, 'locks', 'dispatch.lock'), 'held\n');
       fs.writeFileSync(path.join(fgosDir, 'observe', 'records', 'event.json'), '{"event":1}');
       fs.writeFileSync(path.join(fgosDir, 'logs', 'invocation-faults.jsonl'), '{"fault":1}\n');
       fs.writeFileSync(path.join(fgosDir, 'cache', 'state.json'), '{"refreshed":true}');
@@ -974,15 +980,15 @@ test('the leak check ignores live runtime directories other sessions write but s
     cwd: base,
     log: () => {},
     spawn: () => {
-      fs.mkdirSync(path.join(fgosDir, 'runtime', 'other'), { recursive: true });
-      fs.writeFileSync(path.join(fgosDir, 'runtime', 'other', 'leak.json'), '{}');
+      fs.mkdirSync(path.join(fgosDir, 'other'), { recursive: true });
+      fs.writeFileSync(path.join(fgosDir, 'other', 'leak.json'), '{}');
       return { status: 0 };
     },
   });
 
   assert.equal(leaked.status, 1);
   assert.equal(leaked.fgosDiff.leaked, true);
-  assert.deepEqual(leaked.fgosDiff.added, [path.join('runtime', 'other', 'leak.json')]);
+  assert.deepEqual(leaked.fgosDiff.added, [path.join('other', 'leak.json')]);
 
   fs.rmSync(base, { recursive: true, force: true });
 });

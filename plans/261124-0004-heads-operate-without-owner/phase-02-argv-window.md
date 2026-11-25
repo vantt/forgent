@@ -85,6 +85,24 @@ permission bypass) through `fgos run --override`, so `cargo` and `node` run insi
 allows only that one rerun; it forbids any change to confinement policies, project executor args, git write grants for
 workers, other phases or the plan's scope. Phase 2 is unparked.
 
+## Owner answer q-3svd4ttdn7 (2026-11-25 10:59)
+
+Option "Commit by hand". The 32 finished but uncommitted paths in worktree
+`261124-0004-heads-operate-without-owner-p02` are committed outside any head, on branch
+`heads-operate-without-owner/p02` only. The answer allows that one commit of exactly those paths and forbids pushing,
+landing on main or touching other files; the lead then reviews and lands the branch through `fgos land`. Done:
+commit `8c51967e4` "feat(session-host): one argv window and one permission table in Rust for head requests", tree clean.
+
+## Owner answer q-ulx4nkztpq (2026-11-25 10:59)
+
+Option "Follow-up item". Phase 2 lands as is and is marked done with step 9 recorded as partly met. One new backlog
+item takes the leftovers: the execution engine's `session.verbs` writes and gate
+(`packages/execution/engine/src/transport_round/session_attempt.rs`, `tests/transport_round.rs`), the
+`bin/fgos.mjs` "unknown verb" answer for `fgos can-i` outside a head, and the 4 door-row allowance lines step 9 could
+not pay (head-start's seam import; `bind` and `readAccountStateOverlay` with no door; head-request's three imports
+without a seam-row entry). The answer forbids editing the engine files or `bin/fgos.mjs` inside this plan. The lead
+writes only its plan directory, so the backlog row is raised to the supervisor.
+
 ## Decisions taken in this phase (planner's, within PC-D6 and PC-D11)
 
 - **Where the table lives:** `packages/session-host/contracts/head-permissions.v1.json`, compiled into the crate
@@ -179,3 +197,86 @@ the same commits. Rebuild the addon.
 ```bash
 cd /home/vantt/projects/forgent && fgos run "Implement phase 2 of plan plans/261124-0004-heads-operate-without-owner from its brief plans/261124-0004-heads-operate-without-owner/phase-02-argv-window.md and plans/261124-0004-heads-operate-without-owner/plan.md (merged into this worktree by --sync). The worktree holds a half-done, uncommitted start (permissions.rs, forwarder.rs, the contract, head_request.rs edits); review it against the brief, keep what is right and finish steps 1-9. Run the phase's Verify commands and rg pass checks and make them green. Write only inside the listed paths." --provider claude --capability execute --plan plans/261124-0004-heads-operate-without-owner --phase 2 --sync main --worktree /home/vantt/projects/forgent-worktrees/261124-0004-heads-operate-without-owner-p02 --writes "packages/session-host/rust/src/lib.rs,packages/session-host/rust/src/permissions.rs,packages/session-host/rust/src/forwarder.rs,packages/session-host/rust/tests/permissions.rs,packages/session-host/rust/tests/forwarder.rs,packages/session-host/rust/Cargo.toml,packages/session-host/contracts/head-permissions.v1.json,packages/git/node-addon/src/session_host.rs,packages/git/node-addon/src/lib.rs,packages/git/node-addon/Cargo.toml,src/native/door.mjs,Cargo.lock,src/session-host/head-grants.mjs,src/session-host/head-start.mjs,src/session-host/head-request.mjs,src/session-host/head-request-client.mjs,packages/run-supervisor/contracts/head-request.v1.json,packages/run-supervisor/contracts/envelope.v3.json,packages/run-supervisor/rust/src/head_request.rs,packages/run-supervisor/rust/tests/head_request.rs,src/cli/command-registry.mjs,packages/host-runtime/contracts/command-manifest.json,packages/host-runtime/contracts/command-routes.json,packages/host-runtime/contracts/command-route-annotations.json,apps/fgos/src/routing.rs,src/runner/dispatch/session-attempt.mjs,apps/fgos/src/wiring/unit_run_host/session_attempt.rs,apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs,test/session-host/head-grants.test.mjs,test/session-host/head-request.test.mjs,test/session-host/head-start.test.mjs,test/live/head-grant-probe.live.mjs,docs/platform/run-supervisor/spec.md,packages/component-authority/model/doors/execution-s-node-seam.yaml,packages/component-authority/model/doors/the-node-bind-facade-has-only-its-named-callers.yaml,packages/component-authority/model/doors/node-callers-reach-execution-only-through-its-seam-never-into-the-node-execution-closure.yaml" --override '{"executor":"claude","invocation":"claude-herdr-bypass-bwrap"}' --timeout 3h --json
 ```
+
+- 2026-11-25 10:15 (supervisor): the owner answered `q-nt7ptsq2nd` with the global config patch for claude workers.
+  The exact patch is `reports/claude-worker-global-patch.yaml` (all four claude invocations copied from the
+  standard, since lists are leaves; only `claude-cli-bwrap` gains `--allowedTools "Bash(cargo:*),Bash(node:*),Bash(npm test:*)"`).
+  The owner applies it from the main checkout with
+  `fgos config patch --global plans/261124-0004-heads-operate-without-owner/reports/claude-worker-global-patch.yaml --reason "owner q-nt7ptsq2nd: claude-cli-bwrap workers may run cargo, node and npm test"`.
+  Phase 2 waits on that apply; then the lead reruns its unit on the default `claude-cli-bwrap` (sync p02 with main first).
+- 2026-11-25 10:05 (lead): acked `q-nt7ptsq2nd`; its answer was already written above by the supervisor. The patch is
+  not applied yet: `fgos config explain runner.executors.claude.invocations` still resolves to the `standard` layer and
+  `~/.fgos/config.yaml` is unchanged since 2026-11-19. Phase 2 is parked on the owner's apply question
+  `q-aucsjasc25`. On `Applied`, the lead syncs p02 with main and reruns the unit on the default `claude-cli-bwrap`.
+- 2026-11-25 10:18 (supervisor): the owner answered `q-aucsjasc25` with `Applied`. Verified: `~/.fgos/config.yaml`
+  changed at 10:14 and carries the `--allowedTools` grant. Phase 2 is unparked: the lead syncs p02 with main and reruns
+  the unit on the default `claude-cli-bwrap`.
+- 2026-11-25 10:32 (lead): after the owner applied the global claude worker patch (`3490ee75c`), the unit was rerun on
+  the default `claude-cli-bwrap`: ticket `c-4030-1795576677441`, unit run `unit-run-1795576677937-017b4e0f`, started
+  10:17:57. The window dropped `--sync main` again, which is harmless because the p02 worktree already holds the brief
+  (12 commits behind main, none of them in the phase's paths). The worker is live and progressing: 32 paths changed
+  across every step, the latest at 10:25. It was still `running` after the lead's 12 waits, so phase 2 is parked on this
+  ticket. On wake the lead reads `fgos request result c-4030-1795576677441`, reviews `git diff origin/main...HEAD` of
+  `261124-0004-heads-operate-without-owner/p02` against this brief, and lands it.
+- 2026-11-25 10:55 (lead): ticket `c-4030-1795576677441` settled at 10:39 as `execution-failure`,
+  `commit-failed:git-error`. The producer (claude, sonnet, 21.6 min) passed. It reports steps 1-8 done, green
+  `cargo test -p fgos-session-host` and `-p fgos-run-supervisor`, clippy clean, and the three session-host node tests green.
+  Its work is uncommitted in the p02 worktree: 32 paths, all inside `--writes`, none outside.
+  What the lead found about the commit:
+  - The native scoped commit (operation `77035353-68e4-41c3-8049-dabd4d24013f`) ran `git commit`; git refused it and the
+    door rolled the index back (p02 reflog `reset: moving to HEAD` at 10:39:40). The WAL keeps only the cause
+    `commit-rejected`. That is the cause the driver gives (`checkout_commit_failure`, `packages/git/rust/src/driver.rs`)
+    when git fails and the pre-commit replay does not report `hook-refused`. Git's stderr reached neither the unit record
+    nor the WAL, so the exact git message is lost. The doc-health check of the staged
+    `docs/platform/run-supervisor/spec.md` remains a suspect; the lead cannot run it inside its sandbox (it needs a cargo build).
+  - Separately, the runner could never have committed the whole phase. The commit baseline listed 9 paths that were
+    already dirty before the round (the earlier half-done start: `permissions.rs`, `forwarder.rs`, both tests,
+    `lib.rs`, `Cargo.toml`, the contract, `head_request.rs` and its test), and the scoped commit excludes baseline-dirty
+    paths (`scoped_commit.rs`, `excluded`). Every rerun in this worktree now has all 32 paths as baseline-dirty and would
+    commit nothing.
+  Worker's open items: the step 9 `rg` pass check still finds 4 allowance lines (head-start's seam import; `bind` and
+  `readAccountStateOverlay` have no door; head-request's three imports need a seam-row entry). It also says
+  `packages/execution/engine/src/transport_round/session_attempt.rs` with `tests/transport_round.rs` and `bin/fgos.mjs`
+  (`can-i` outside a head) need edits outside the plan footprint, and that the `CHANGELOG.md` line belongs to phase 7.
+  The commit by hand, from outside any confined head:
+  `git -C /home/vantt/projects/forgent-worktrees/261124-0004-heads-operate-without-owner-p02 add -- Cargo.lock apps/fgos/src/routing.rs apps/fgos/src/wiring/unit_run_host/session_attempt.rs apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs docs/platform/run-supervisor/spec.md packages/git/node-addon/Cargo.toml packages/git/node-addon/src/lib.rs packages/host-runtime/contracts/command-manifest.json packages/host-runtime/contracts/command-routes.json packages/run-supervisor/contracts/envelope.v3.json packages/run-supervisor/contracts/head-request.v1.json packages/run-supervisor/rust/src/head_request.rs packages/run-supervisor/rust/tests/head_request.rs packages/session-host/rust/Cargo.toml packages/session-host/rust/src/lib.rs src/cli/command-registry.mjs src/native/door.mjs src/runner/dispatch/session-attempt.mjs src/session-host/head-grants.mjs src/session-host/head-request-client.mjs src/session-host/head-request.mjs src/session-host/head-start.mjs test/live/head-grant-probe.live.mjs test/session-host/head-grants.test.mjs test/session-host/head-request.test.mjs test/session-host/head-start.test.mjs packages/git/node-addon/src/session_host.rs packages/session-host/contracts/head-permissions.v1.json packages/session-host/rust/src/forwarder.rs packages/session-host/rust/src/permissions.rs packages/session-host/rust/tests/forwarder.rs packages/session-host/rust/tests/permissions.rs  && git -C /home/vantt/projects/forgent-worktrees/261124-0004-heads-operate-without-owner-p02 commit -m "feat(session-host): one argv window and one permission table in Rust for head requests"`
+- 2026-11-25 11:45 (lead): fix unit `c-29218-1795579848109` (unit run `unit-run-1795579848585-91460c18`) passed on its
+  fallback round (`producer/1-fb1`, claude sonnet, 8 min) and closed the reviewer's holes: `--dir` refused,
+  `protectedConfigPaths` as real key paths compared by segment, `config patch <file> [--reason]` with a private copy.
+  The runner's commit failed again (`commit-failed:git-error`), and this time git's error was kept: the pre-commit
+  doc check refused `docs/platform/run-supervisor/spec.md:377` with "`fgos can-i` is not a verb of the command
+  listing". The listing is the ACTIVE release's `fgos --help --json`, which cannot have `can-i` until this branch
+  ships, so this was also the lost cause of the first commit failure. 9 paths are uncommitted and baseline-dirty, so a
+  rerun would commit nothing. Asked the owner `q-hwtikojjei`. Its recommended option, run from outside any head:
+
+```bash
+sed -i '377s/`fgos can-i` hỏi cùng hàm đó/khung `can-i` hỏi cùng hàm đó/' /home/vantt/projects/forgent-worktrees/261124-0004-heads-operate-without-owner-p02/docs/platform/run-supervisor/spec.md
+git -C /home/vantt/projects/forgent-worktrees/261124-0004-heads-operate-without-owner-p02 add -- Cargo.lock docs/platform/run-supervisor/spec.md packages/run-supervisor/contracts/head-request.v1.json packages/run-supervisor/rust/src/head_request.rs packages/session-host/contracts/head-permissions.v1.json packages/session-host/rust/Cargo.toml packages/session-host/rust/src/forwarder.rs packages/session-host/rust/src/permissions.rs packages/session-host/rust/tests/forwarder.rs && git -C /home/vantt/projects/forgent-worktrees/261124-0004-heads-operate-without-owner-p02 commit -m "fix(session-host): close the argv window's deny-rule holes for --dir, real protected config paths and the patch file"
+```
+- 2026-11-25 11:40 (lead): review of the uncommitted fix (both crates' tests green). Closed: `--dir` and the other
+  root flags in both forms, segment comparison through `fgos_yaml_doc::path::parse_path`, the `config patch` shape and
+  private copy, the `supervisor raise --kind` and `--delivered-to main` limits, and the value checks (the host owns
+  `--text` 4096, `watcher tune --set` and `metrics prune --settled`). One blocking gap, verified by the lead in
+  `core/config-schema/`: `protectedConfigPaths` misses keys marked `x-fgos-sensitivity: command` with scope `both`
+  (`worktreeSetup.commands`, `invariantChecks.commands`, `runner.capabilities.*.verify`, `runner.executor`), so a
+  supervisor's `config patch` could plant shell the host runs outside the sandbox. Next, after the owner's commit
+  (`q-hwtikojjei`): one more fix unit in p02, which commits normally from a clean baseline. It derives the guard from the
+  schema's `x-fgos-sensitivity: command` marker (one source) or adds those four paths. It also points the contract prose
+  in `head-request.v1.json` at the table instead of copying the list (`runner.confinementPolicies` is missing there),
+  removes the stage file only on a successful `create_new`, and opens intermediate path components with no-follow.
+- 2026-11-25 12:58 (lead): the owner answered `q-hwtikojjei` "Reword and commit by hand" and did it: line 377 of
+  `docs/platform/run-supervisor/spec.md` now says "khung `can-i`", committed as `5fbed1872` on
+  `heads-operate-without-owner/p02`; the p02 worktree is clean (71 commits behind main). Next: the schema-derived
+  `protectedConfigPaths` fix unit (see 11:40), then re-review and land.
+- 2026-11-25 13:40 (lead): branch `heads-operate-without-owner/p02` at `996c0c9f4` is reviewed and ready to land. Four fix
+  units closed the rest: `d85096203` covers every `x-fgos-sensitivity: command` key, with a schema-coverage test.
+  `bfc3e9e25` decides verb words as the host reads them, so a flag before a sub-verb no longer bypasses a deny row. It
+  also refuses `--repo-root` and pays the `head-request.mjs` debt. `32bde7714` gives one declared host spawn (`run_verb`).
+  `996c0c9f4` uses the host parser, marks `can-i` native and rewords the seam reason. Step 9 is partly met. The
+  `head-request.mjs` allowance is paid. The two node-callers allowances and the bind-facade allowance of `head-start.mjs`
+  (`bind.mjs`, `readAccountStateOverlay`) stay, because no host door exists for them. The owner decided on
+  `q-ulx4nkztpq` that they are tracked in backlog row `p-7vhbq46shs`, so the step 9 `rg` check still finds those lines
+  by decision. Land retries `c-31744-1795588137861`, `c-31898-1795588147953` and `c-32883-1795588685815` were all
+  refused `land-target-ahead`: local `main` holds `972017221` (the run-tests leak plan's docs commit), which origin
+  `c0416313d` lacks. The pending op `land-477002` is gone from `fgos git status`, but the commit is still unpushed.
+  Parked on its push or reset (supervisor recovery).

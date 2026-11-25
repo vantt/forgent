@@ -1,6 +1,6 @@
 ---
 contract: plan-v1
-title: "Orchestration skeleton: a code keeper that admits, starts and wakes players from domain scheduling records, one raise door for every entry, and one harness for plans"
+title: "Orchestration skeleton, keeper: admission in code, scheduling records from domain sources, question recipients, resource claims, the sleep record and periodic review"
 status: draft
 priority: P1
 blockedBy:
@@ -8,6 +8,7 @@ blockedBy:
   - 261120-0625-work-data-model
   - 261121-2109-component-authority
   - 261121-2110-component-authority-doors
+  - 261124-2143-head-lifecycle-events
 footprint:
   - plans/261122-0056-orchestration-skeleton/**
   - packages/supervision/contracts/scheduling-record.v1.json
@@ -18,7 +19,6 @@ footprint:
   - packages/supervision/rust/src/watcher.rs
   - packages/supervision/rust/src/keeper.rs
   - packages/supervision/rust/src/sources.rs
-  - packages/supervision/rust/src/discussion_source.rs
   - packages/supervision/rust/src/lib.rs
   - packages/supervision/rust/tests/wake.rs
   - packages/supervision/rust/tests/portfolio.rs
@@ -26,7 +26,6 @@ footprint:
   - packages/supervision/rust/tests/definitions.rs
   - packages/supervision/rust/tests/keeper.rs
   - packages/supervision/rust/tests/sources.rs
-  - packages/supervision/rust/tests/discussion_source.rs
   - packages/questions/contracts/questions-input.v1.json
   - packages/questions/contracts/question-event-payloads.v1.json
   - packages/questions/contracts/refusals.v1.json
@@ -41,83 +40,32 @@ footprint:
   - packages/resource-referee/rust/src/catalog.rs
   - packages/resource-referee/rust/src/facts.rs
   - packages/resource-referee/rust/tests/referee.rs
-  - packages/execution/rust/src/tools.rs
-  - packages/execution/rust/src/bind.rs
-  - packages/execution/rust/src/executor_model.rs
-  - packages/execution/rust/src/executor_config.rs
-  - packages/execution/rust/src/unit/**
-  - packages/execution/rust/src/loops/**
-  - packages/execution/rust/src/run_request/**
-  - packages/execution/contracts/executor-model.v1.json
-  - packages/execution/contracts/bind.v1.json
-  - packages/execution/rust/tests/tool_job.rs
-  - packages/execution/rust/tests/run_request_case.rs
-  - packages/distribution/contracts/doctor-registry.v1.json
   - packages/host-runtime/contracts/command-manifest.json
-  - packages/host-runtime/contracts/command-routes.json
-  - packages/host-runtime/contracts/command-route-annotations.json
   - apps/fgos/src/wiring/supervision.rs
-  - apps/fgos/src/wiring/questions.rs
   - apps/fgos/src/wiring/resource_check.rs
-  - apps/fgos/src/wiring/scheduling.rs
-  - apps/fgos/src/wiring/mod.rs
-  - apps/fgos/src/routing.rs
-  - apps/fgos/src/cli_projector.rs
-  - apps/fgos/tests/scheduling_records.rs
-  - apps/fgos-gateway/src/gateway.rs
-  - apps/fgos-gateway/src/webhook.rs
-  - apps/fgos-gateway/src/lib.rs
   - core/config-standard/watcher.yaml
-  - core/config-standard/gateway.yaml
   - core/config-schema/watcher.schema.yaml
-  - core/config-schema/gateway.schema.yaml
   - core/watcher/definitions/review-due.query.json
-  - core/watcher/definitions/discussion-settled.query.json
   - core/watcher/briefs/periodic-review.md
   - core/skills/fgos-supervisor/SKILL.md
-  - core/skills/fgos-lead/SKILL.md
-  - core/skills/_shared/plan-contract.md
-  - scripts/plan-contract-check.mjs
-  - test/scripts/plan-contract-check.test.mjs
-  - src/portfolio/plan-contract.mjs
-  - test/portfolio/plan-contract.test.mjs
-  - src/workflow/propose.mjs
-  - src/workflow/propose-validate.mjs
-  - src/workflow/propose-frame.mjs
-  - src/workflow/case-frame.mjs
   - src/workflow/records.mjs
   - src/workflow/case-verbs.mjs
-  - test/workflow/propose.test.mjs
-  - test/workflow/propose-frame.test.mjs
   - test/workflow/records.test.mjs
-  - docs/platform/supervision/spec.md
-  - docs/platform/questions/spec.md
-  - docs/platform/workflow/spec.md
-  - docs/platform/resource-referee/spec.md
-  - docs/platform/runner/spec.md
-  - docs/platform/runner/contracts/routing-handoff.md
-  - docs/platform/session-host/spec.md
   - src/session-host/head-stop.mjs
-  - src/session-host/head-start.mjs
   - src/session-host/head-list.mjs
   - src/session-host/head-request.mjs
   - src/session-rotation/handoff-store.mjs
   - src/session-rotation/rotate.mjs
   - src/cli/command-registry.mjs
   - bin/fgos.mjs
-  - src/runner/dispatch/confinement/authority-twin.mjs
-  - src/runner/dispatch/provider-capacity.mjs
-  - packages/execution/engine/src/transport_round/session_attempt.rs
-  - packages/execution/engine/tests/transport_round.rs
-  - apps/fgos/src/wiring/unit_run_host/session_attempt.rs
-  - apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs
-  - apps/fgos/tests/sleeping_lead_worktree.rs
-  - core/config-standard/runner.yaml
-  - core/config-schema/runner.schema.yaml
   - test/session-host/head-stop.test.mjs
-  - test/session-host/head-start.test.mjs
   - test/session-host/head-list.test.mjs
   - test/session-rotation/handoff-store.test.mjs
+  - docs/platform/supervision/spec.md
+  - docs/platform/questions/spec.md
+  - docs/platform/workflow/spec.md
+  - docs/platform/resource-referee/spec.md
+  - docs/platform/session-host/spec.md
   - CHANGELOG.md
   - .agents/skills/**
   - plugins/fgOS/skills/**
@@ -128,143 +76,130 @@ source:
   - plans/discussions/ds-6psli4i4xl-workspace-ownership-survey-for-sleeping-leads/DISCUSSION.md
   - p-7pjiqfoj7v
   - p-radq263tbx
-  - p-f367pplkhu
 created: 2026-11-22
 ---
 
-# Orchestration skeleton
+# Orchestration skeleton: the keeper
 
 Answers the settled discussion `ds-yb4uz2p6hz-orchestration-skeleton` (owner approved §6 on 2026-11-21, round 42).
 Every choice below cites the decision it honors (SR-D6 to SR-D10, OS-D1 to OS-D21 in that discussion's §4). No
 locked decision is reopened here. Amended 2026-11-23 by the settled discussion
-`ds-6psli4i4xl-workspace-ownership-survey-for-sleeping-leads` (D1 to D3 in its §4, owner: an amendment, not a new
-plan): phases 5 and 6 changed, phases 16 and 17 added.
+`ds-6psli4i4xl-workspace-ownership-survey-for-sleeping-leads` (D1 to D3 in its §4): phase 5 changed, phase 16 added.
+
+**Split on 2026-11-25** (owner-approved supervisor order, delivered to the planner head
+`head:planner-orchestration-skeleton`). The plan was not rewritten; its phases were divided. This plan keeps
+the keeper phases 1, 3, 4, 5, 9, 10 and 16, plus a new integration phase 18. Phases 2, 6, 7, 8, 11, 12, 13, 14, 15
+and 17 moved unchanged, with their ids, to plan
+[`261125-1125-orchestration-skeleton-players`](../261125-1125-orchestration-skeleton-players/plan.md), which is
+`blockedBy` this plan. Phase 5 stays here because it gives the keeper its plan source. Without that source the
+keeper cannot see a running plan whose lead is idle.
 
 ## Outcome
 
-fgOS keeps its own rhythm without a person watching (product priority 2, OS-D3):
+fgOS gets a keeper in code that decides who acts next and when, within caps, from records that domains project
+(product priority 2, OS-D3, OS-D4, OS-D7):
 
-- Only the watcher timer and outside signals start activity. Every entry (timer row, signed webhook, CLI wake,
-  an outside party's answer) goes through the one raise door (`packages/supervision/rust/src/queue.rs`) and
-  becomes an event first (OS-D8).
-- A **keeper** written in code, grown out of the wake door (`packages/supervision/rust/src/wake.rs`) inside
-  Supervision, decides one thing: who acts next and when, within caps (OS-D4, OS-D7). It admits ready plans and
-  starts their leads in code with `maxLeads` and the lane pool enforced (T1). It reads the scheduling records that
-  domains project (`{ item, step, waitingOn?, needs?, outcome? }`, OS-D9 to OS-D12), starts or wakes the player a
-  record `needs` through the doors that already exist (Session Host, Identity, `bind()` and `fgos run`), raises one
-  event when an `until` passes, and raises "needs judgement" when its rules run out. The supervisor LLM is called
-  only for that judgement; its decision comes back as an event.
-- Sleep ends a session by default; a head talking with a person may sit in its pane up to a configured limit
-  (OS-D18). A handoff between steps closes one record and opens the next (OS-D19).
-- A lead that sleeps until a time loses nothing: its worktree and unlanded changes survive through the checkout door's
-  refusals, the woken lead finds its worktree from plan and `git worktree list` (D1), the sleep state lives only in
-  the Session Host's head record `placement.json` with one read-only view `fgos session list` (D2), and the woken lead
-  resumes its kept transcript after a light sleep on the same provider, else starts fresh with the `sleep` handoff
-  (D3).
-- Questions is the one door for asking any person: it gains a recipient `to` (owner, a `role`, or a `party`), an
-  outbound notifier port, and verified answers that come back through the raise door (OS-D16).
-- A tool that declares a job invocation is a player through `fgos run` itself (OS-D15). Heavy machine resources are
-  claims judged by the resource referee (OS-D14).
+- Admission and caps move from the supervisor skill into the wake door
+  (`packages/supervision/rust/src/wake.rs`). The door admits ready plans and starts their leads with `maxLeads` and
+  the lane pool enforced, and every admit, hold and refusal carries a reason code (T1).
+- A **keeper** grows out of the wake door inside Supervision. It reads the scheduling records that domains project
+  (`{ item, step, waitingOn?, needs?, outcome? }`, OS-D9 to OS-D12) from registered sources: running plans and
+  open workflow-case activities. It starts or wakes the player a record `needs` through the doors that already
+  exist (Session Host, Identity, `bind()` and `fgos run`), and it asks the resource referee before any start. It
+  raises one event when an `until` passes, and it raises "needs judgement" when its rules run out (missing need,
+  round cap, orphan record). The supervisor LLM is called only for that judgement.
+- Questions becomes the one door for asking any person. It gains a recipient `to` (owner, a `role`, or a `party`), an
+  outbound notifier port, and a verified external-answer use case (OS-D16). The signed route that carries an outside
+  answer in is phase 2 of the players plan.
+- Heavy machine resources are claims of a new referee space `resource` (OS-D14).
+- The sleep state of a head lives in its Session Host head record. `session stop --reason sleep` writes it together
+  with a `sleep` handoff, and `fgos session list` shows live and sleeping agents (D2 of `ds-6psli4i4xl`). A running
+  plan whose lead sleeps projects `waitingOn.until` from that record.
 - A read-only periodic review Unit runs every `watcher.reviewIntervalSec` and turns findings into events (OS-D17).
-- A plan, whoever wrote it, needs only the general contract; `wave` becomes optional and computable; fgOS checks a
-  foreign plan's contract when it takes it over and names the broken rule (`p-f367pplkhu`). The lead maps each phase
-  into workflow cases through `fgos workflow propose`, the approved frame carries the intended outcome and the
-  non-goals next to its counters, and a lead can no longer run a writing phase outside a case: one harness (OS-D21).
-- Scheduling records are readable as JSON from the CLI and the gateway (OS-D20 ports 2 and 3).
 
 ## Acceptance criteria
 
-Each maps to the discussion's hand-off criteria; the owning proof is named in the phase file.
+Each criterion names the owning proof given in its phase file.
 
-1. Admission and caps are enforced by code; every admit, hold and refusal carries a reason code. A ready plan over
-   `maxLeads` is refused with a reason code: `cargo test -p fgos-supervision --test wake` (phase 1).
-2. One case with two parallel open steps yields two scheduling records and two started players; an `until` that
-   passes raises exactly one event across repeated ticks; an orphan record raises "needs judgement" and is not closed
-   by the keeper: `cargo test -p fgos-supervision --test keeper` and `--test sources` (phases 4, 5).
-3. A multi-phase plan runs every phase through a guide case; a lead's writing `fgos run` without `--case` is refused
-   with a reason code; a foreign plan that breaks the contract is refused by `fgos workflow propose` with the broken
-   rule named: `node --test test/workflow/propose.test.mjs`, `cargo test -p fgos-execution --test run_request_case`
-   (phases 13, 14).
-4. A question to an outside `party` receives a signed answer through the raise door and becomes
-   `questions.answered`; a wrong signature or a wrong answerer is refused: `cargo test -p fgos-questions --test
-   recipients` and the webhook test of phase 2.
-5. A Unit whose `capability` binds to a tool with a job invocation runs and settles through `fgos run`; `fgos run
-   --provider` with a lookup-only tool is still refused: `cargo test -p fgos-execution --test tool_job` (phase 11).
-6. A `review-due` row starts one read-only Unit and its findings become events: `cargo test -p fgos-supervision
-   --test watcher` (phase 9).
-7. `npm test` and `cargo test --workspace` are green on the combined tree (phase 15).
-8. A lead slept with an unlanded change survives a land and a cleanup and finds the change in the same worktree on
-   waking; a light sleep resumes, a heavy one and a refused resume get the handoff; `fgos session list` shows a
-   sleeping head: `cargo test -p fgos --test sleeping_lead_worktree` (phase 6), `node --test
-   test/session-host/head-start.test.mjs` (phase 17), `node --test test/session-host/head-list.test.mjs` (phase 16).
+1. Admission and caps are enforced by code, and every admit, hold and refusal carries a reason code. A ready plan
+   over `maxLeads` is refused with a reason code: `cargo test -p fgos-supervision --test wake` (phase 1).
+2. One case with two parallel open steps yields two scheduling records and two started players. An `until` that
+   passes raises exactly one event across repeated ticks. An orphan record raises "needs judgement" and the keeper
+   does not close it. A running plan yields one lead record, and a sleeping lead's `wakeAt` becomes its `until`:
+   `cargo test -p fgos-supervision --test keeper --test sources`, `node --test test/workflow/records.test.mjs`
+   (phases 4, 5).
+3. A question can be addressed to the owner, a `role` or a `party`. A verified external answer is accepted, and a
+   wrong signature or a wrong answerer is refused: `cargo test -p fgos-questions --test recipients` (phase 3).
+4. A `resource` claim over a held slot is refused, and a free slot is accepted:
+   `cargo test -p fgos-resource-referee --test referee` (phase 10).
+5. `session stop --reason sleep` writes the sleep fields and a `sleep` handoff, and `fgos session list` shows a
+   sleeping head: `node --test test/session-host/head-stop.test.mjs test/session-host/head-list.test.mjs`
+   (phase 16).
+6. A `review-due` row starts one read-only Unit, and its findings become events:
+   `cargo test -p fgos-supervision --test watcher --test definitions` (phase 9).
+7. `npm test` and `cargo test --workspace` are green on the combined tree (phase 18).
 
 ## Non-goals
 
-- Session placement port for an outside UI (OS-D20 port 4; later, only when a real UI needs to host sessions).
-- The adapter of any specific webhook source or outbound channel (GitHub, Multica, email, portal); the first source is
-  chosen later (OS-D8). This plan ships the signed route, the port, and the owner mailbox adapter only.
+- Everything in the players plan: the signed webhook route and wake reasons, the keeper's sleep and wake decisions,
+  handoff records, the records read port, tool players, the general plan contract with optional `wave`, the
+  takeover check and frame intent, the lead's one harness, and the wake resume.
+- Session placement port for an outside UI (OS-D20 port 4).
+- The adapter of any specific webhook source or outbound channel. This plan ships the notifier port and the owner
+  mailbox adapter only (OS-D8).
 - Merging Questions with the Workflow gate and `fgos ask` in code (belongs to `component-authority`, OS-D16).
-- Retiring the Work step FSM (coding cutover plan, N12). No Work projector is built: Work is frozen as read-only
-  history by plan `261120-0625-work-data-model`, so it has no open steps for the keeper to drive (see "Decided here").
+- Retiring the Work step FSM (N12). No Work projector is built (see "Decided here").
 - Architecture Advisory Panel T0 (postponed, `q-kjat6xjwfv`).
-- `bin/fgos-runner.mjs --watch` and `POST /v1/runner/tick`: they retire with S7 of plan
-  `261118-1341-s6a-execution-tier-rust` (OS-D7); nothing here is built on them, and neither becomes an entry.
+- `bin/fgos-runner.mjs --watch` and `POST /v1/runner/tick`, which retire with S7 of plan
+  `261118-1341-s6a-execution-tier-rust` (OS-D7).
 - Inherited tasks T2 to T5 (`p-2wb2lfgky3`, `p-r3qqgwtcai`, `p-sdwybf7yre`, `p-lkzx3oygy4`) keep their own rows.
 
 ## Decided here
 
-The discussion left five points open, each blocking part of the plan. OS-D12 and OS-D19 were confirmed by the owner
-(Owner questions); the planner decided the rest from the evidence.
+The planner decided the discussion's open points from the evidence. OS-D12 and OS-D19 were confirmed by the owner
+(see Owner questions). Points that only the players plan uses are recorded there.
 
 | Point | Decision | Why |
 |---|---|---|
-| Sleep limit for a head talking with a person (OS-D18) | `watcher.conversationSleepMaxSec`, default 43200 (12 hours), in `core/config-standard/watcher.yaml` | The owner's answers come back after a night (round 42 at 23:36, resumed next morning); 12 hours keeps a conversation across one night. Longer keeps a pane on an old release (the reason OS-D18 defaults to ending sessions). The key sits with the other no-LLM rhythm keys. |
-| `wave` in plan-v1 (OS-D21) | Optional. When a phase row has no wave, the check computes it: one more than the highest wave among its dependencies, then pushed later while it overlaps an earlier row of the same wave, in table order. When present it is checked as today. | A plan from another system knows its dependencies and footprints, not fgOS waves; the wave is derivable, so requiring it rejects valid foreign plans. Plans that write waves keep today's check. |
-| Frame lacks intended outcome and non-goals (OS-D21, workflow spec §2.2) | `propose` copies the plan's Outcome and Non-goals sections into the frame as `intent: { outcome, nonGoals }` next to the counters; they enter the frame's approval digest and the approval question. | The spec already names them as frame parts; the plan sections already exist under the contract. Copying is one read, no new authority. |
-| Where the loop cap lives (OS-D13) | Inside `needs`: `needs.maxRounds`, declared by the domain from its frame; the keeper counts its own starts for (`item`, `step`) and raises "needs judgement" at the cap. | OS-D11 fixes three record items; the cap is a limit on how often the keeper may start the player of a need, so it belongs to `needs`, not a fourth item. |
-| How domains hand records to the keeper | A source port in Supervision with registered sources listed as data in `watcher.schedulingSources` (same pattern as `watcher.definitions`). Plans are a native Rust source over the existing portfolio reader; workflow cases are a source verb `fgos workflow records --json` over the existing case projection. Questions are not a record source: they answer `waitingOn: person`. | Keeps the keeper domain-agnostic (SR-D8) and reuses each domain's existing read door; no second parser of the case ledger (design principle 1). |
-| Machine resources (OS-D14) | A new claim space `resource` in the referee, compared by equality; a resource with capacity N is N named slots (`gpu#1`..`gpu#N`). | The referee compares and never acts; equality over named slots fits its existing rule set with no new comparison kind. |
-| Work projector | Not built. | Work is frozen history (work-data-model); its ~273 open items are triaged under `p-jxwb7vi6a3`. |
-| Where the sleeping-lead amendment goes (ds-6psli4i4xl hand-off (a) to (f)) | Phase 6 keeps the keeper side; the Session Host side is phase 16 (sleep fields, `sleep` handoff, `fgos session list`) and the wake resume is phase 17. | The hand-off names files in three layers (keeper in Rust, Session Host in Node, the head launch in the execution engine); one phase would exceed the one-to-two-day size and share no file boundary. Phase 6 depends on both, so the run order the hand-off implies holds. |
-| Which `until` a sleep writes | The earliest `waitingOn.until` of the head's records; a head waiting only on a person or an event gets the conversation limit. Plan and phase are passed when the record names them, else absent. | The discussion fixes where `wakeAt` is stored (D2), not where it comes from; the keeper already holds the records. Phase stays informative because D1 makes plan and git the truth for the worktree. Labeled assumption, not an owner question: it changes no outcome the owner set. |
-| How a CLI is told to resume | `credentialStore.resumeArgs` in the executor config (`core/config-standard/runner.yaml`), next to `sessionDir`; an executor without it never resumes. | The resume is per CLI (Codex rollouts are not read today, discussion §5 15:56), and the executor config already declares where each CLI keeps its session. |
-| Component declaration before code | The plan's "New things" table below is the plan-time declaration. Phase 15 records each row through `fgos authority declare` when that verb exists on main; otherwise the table stays the record for the sweep of plan `261121-2110-component-authority-doors`. | The `declare` door is itself still a draft plan; blocking on it would stall this plan behind five other plans. |
+| Where the loop cap lives (OS-D13) | Inside `needs`: `needs.maxRounds`, declared by the domain from its frame. The keeper counts its own starts for (`item`, `step`) and raises "needs judgement" at the cap. | OS-D11 fixes three record items. The cap limits how often the keeper may start the player of a need, so it belongs to `needs`, not to a fourth item. |
+| How domains hand records to the keeper | A source port in Supervision, with registered sources listed as data in `watcher.schedulingSources` (the same pattern as `watcher.definitions`). Plans are a native Rust source over the existing portfolio reader. Workflow cases are a source verb `fgos workflow records --json` over the existing case projection. Questions are not a record source: they answer `waitingOn: person`. | This keeps the keeper domain-agnostic (SR-D8) and reuses each domain's existing read door, with no second parser of the case ledger (design principle 1). |
+| Machine resources (OS-D14) | A new claim space `resource` in the referee, compared by equality. A resource with capacity N is N named slots (`gpu#1`..`gpu#N`). | The referee compares and never acts. Equality over named slots fits its existing rule set with no new comparison kind. |
+| Work projector | Not built. | Work is frozen history (work-data-model). Its ~273 open items are triaged under `p-jxwb7vi6a3`. |
+| Split boundary (2026-11-25) | The keeper plan holds the phases that make the keeper see and start players (1, 4, 5), the doors it calls (3, 10), the sleep record its plan source reads (16), and the review that reads its output (9). | Phase 5 needs phases 4, 10 and 16. Phase 9 reviews what phases 4 and 5 produce. Every phase of the players plan consumes one of these, so the players plan can be `blockedBy` this one without a cycle. |
+| Phase 9 depends on phases 4 and 5 (2026-11-25) | Phase 9 depends on 1, 4 and 5 (before the split: 1 only), and it runs in wave 4. | Its fixed brief reviews "oldest open records" and "open needs-judgement events", which exist only after phases 4 and 5. It also shares `watcher.yaml`, its schema and `wiring/supervision.rs` with phase 5, so the two cannot share a wave. The records read port (`fgos supervisor records --json`) is phase 8 of the players plan. Until it lands, the brief reads the keeper's decision events from the event stream. |
+| Order against `261124-2143-head-lifecycle-events` (2026-11-25) | The whole plan is `blockedBy` 2143, not only phase 16. | The owner ordered phase 16 after 2143 because both write `src/session-host/head-stop.mjs`. 2143 also writes `wake.rs`, `portfolio.rs`, `supervisor.rs`, `wiring/supervision.rs`, `tests/wake.rs`, `tests/watcher.rs`, `tests/definitions.rs` and the supervisor skill, which are phases 1, 4, 5 and 9. If only phase 16 were held, the cross-plan overlap rule would make 2143 wait for this plan once it is `ready` while phase 16 waits for 2143, a deadlock. Only phases 3 and 10 lose a head start, and both are small. Owner confirmed this order on 2026-11-25 13:15 (option A of three: 2143 first, keeper second; the keeper first and a merge of 2143 into this plan were declined). |
+| Component declaration before code | The "Authority map" table below is the plan-time declaration. Phase 18 records each row through `fgos authority declare` when that verb exists on main. | The `declare` door shipped with `261121-2110-component-authority-doors`, so phase 18 checks it and uses it. |
 
-## New things (authority map)
+## Authority map
 
-| New thing | Owner component | Note |
+The plan was created before 2026-11-24, so the mechanical rule does not apply. The model rows are named anyway,
+for phase 18's declarations.
+
+| New thing | Model row | Note |
 |---|---|---|
-| Keeper (`keeper.rs`), decision kind "who acts next and when, within caps" | Supervision | grows from the wake door (OS-D7); no new component |
-| Scheduling record contract `scheduling-record.v1.json` | Supervision | read by the keeper; written by domain sources |
-| Source port and `watcher.schedulingSources` | Supervision | data registration, like `watcher.definitions` |
-| `fgos workflow records --json` | Workflow | a projection over the existing case projection |
-| Signed webhook route | Gateway | calls only the raise door (OS-D8) |
-| Question recipient `to`, notifier port, verified external answer | Questions | the one door for asking any person (OS-D16) |
-| Claim space `resource` | Resource referee | no second referee (OS-D14) |
-| Tool job invocation | Execution (`bind()`, `fgos run`) | no second execution door (OS-D15) |
-| `review-due` definition, `fgos.review.done` record | Supervision (watcher) | periodic review (OS-D17) |
-| `fgos supervisor records --json`, `GET /v1/scheduling-records` | Supervision, Gateway | portfolio read (OS-D20 port 2) |
-| Sleep fields of the head record, `session stop --reason sleep`, `fgos session list` | Session Host | D2; Identity's directory unchanged |
-| Wake resume of a kept transcript, `credentialStore.resumeArgs` | Session Host (choice), Execution engine (launch) | D3 |
+| Admission and caps in the wake door, keeper (`keeper.rs`), decision kind "who acts next and when, within caps" | `supervision` | Grows from the wake door (OS-D7). No new component. |
+| Scheduling record contract `scheduling-record.v1.json` | `supervision` | Read by the keeper and written by domain sources. |
+| Source port and `watcher.schedulingSources` | `supervision`, `config` | Registered as data, like `watcher.definitions`. |
+| `fgos workflow records --json` | `workflow` | A projection over the existing case projection. |
+| Question recipient `to`, notifier port, verified external answer | `questions` | The one door for asking any person (OS-D16). |
+| Claim space `resource` | `resource-referee` | No second referee (OS-D14). |
+| `review-due` definition, `fgos.review.done` record | `supervision` | Periodic review (OS-D17), the watcher's definitions. |
+| Sleep fields of the head record, `session stop --reason sleep`, `fgos session list` | `session-host`, `session-rotation` | D2. Identity's directory is unchanged. |
 
 ## Prior art (reused, and what was missing)
 
 - Reused: the wake door and its ports (`Drain`, `Identity`, `StartSession`, `StopSession`, `Activity`), its capacity
-  close rule (`CAPACITY_KINDS`) and `admissible()` in `portfolio.rs`; the raise door `queue.rs`; `run_wake` already
-  takes a trigger and ref (the wiring hardcodes `"manual"`, `apps/fgos/src/wiring/supervision.rs:1940`); watcher
-  definitions and their age conditions; `fgos run --case --activity` (case admission already exists in the run door);
-  `fgos workflow propose` and `src/workflow/propose-frame.mjs`; the case projection `src/workflow/case-projection.mjs`;
-  the referee's claim spaces; `kind: tool` executors and their invocation list (`packages/execution/rust/src/tools.rs`);
-  `supervisor.maxLeads` already in `core/config-standard/supervisor.yaml`.
-- Reused for the sleeping lead (ds-6psli4i4xl §6): the checkout door's refusals (`worktree-dirty-preserved`,
-  `worktree-delivery-unproven`), the lead skill's worktree name `<plan dir name>-p<NN>`, `stopHeadSession` (already
-  writes `retiredAt` and `retiredReason`), `writeHandoff`, the stop trace's measured fraction, `seatSessionDir` and
-  `keepSessionBeforeRemoval` (the transcript is already kept per launch). Missing: sleep fields and `wakeAt`, a
-  `sleep` handoff reason, a view of sleeping heads, and any resume of a kept transcript.
+  close rule (`CAPACITY_KINDS`) and `admissible()` in `portfolio.rs`; the raise door `queue.rs`; `run_wake`, which
+  already takes a trigger and a ref; watcher definitions and their age conditions; `fgos run --case --activity`
+  (case admission already exists in the run door); the case projection `src/workflow/case-projection.mjs`; the
+  referee's claim spaces; `supervisor.maxLeads`, already in `core/config-standard/supervisor.yaml`.
+- Reused for the sleep record (ds-6psli4i4xl §6): `stopHeadSession`, which already writes `retiredAt` and
+  `retiredReason`; `writeHandoff`; the stop trace's measured fraction.
 - Missing: admission in code (the supervisor skill admits today, and `maxLeads` falls back to a hardcoded 4 in the
-  wiring, `supervision.rs:1965`); any scheduling record; wake reasons; a webhook route; question recipients; a resource
-  claim space; tool job invocations; the review definition; the plan-contract check at takeover; frame intent; a
-  refusal for a lead's writing run outside a case.
+  wiring); any scheduling record; question recipients; a resource claim space; the review definition; sleep fields
+  and a view of sleeping heads.
+- Line numbers from 2026-11-22 are not repeated here, because the code has moved since. Each phase re-reads its
+  inputs at its own base.
 
 ## Phases
 
@@ -273,105 +208,51 @@ The discussion left five points open, each blocking part of the plan. OS-D12 and
 | 1 | [Admission in code](phase-01-admission-in-code.md) | - | packages/supervision/rust/src/wake.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/tests/wake.rs, packages/supervision/rust/tests/portfolio.rs, apps/fgos/src/wiring/supervision.rs, core/skills/fgos-supervisor/SKILL.md | 1 | ready |
 | 3 | [Question recipients, notifier port, verified answers](phase-03-question-recipients.md) | - | packages/questions/contracts/questions-input.v1.json, packages/questions/contracts/question-event-payloads.v1.json, packages/questions/contracts/refusals.v1.json, packages/questions/rust/src/shape.rs, packages/questions/rust/src/record.rs, packages/questions/rust/src/usecase.rs, packages/questions/rust/src/notifier.rs, packages/questions/rust/src/lib.rs, packages/questions/rust/tests/store_usecases.rs, packages/questions/rust/tests/recipients.rs | 1 | ready |
 | 10 | [Resource claim space in the referee](phase-10-resource-claims.md) | - | packages/resource-referee/contracts/resource-referee.v1.json, packages/resource-referee/rust/src/catalog.rs, packages/resource-referee/rust/src/facts.rs, packages/resource-referee/rust/tests/referee.rs, apps/fgos/src/wiring/resource_check.rs | 1 | ready |
-| 11 | [Tool as a player through fgos run](phase-11-tool-player.md) | - | packages/execution/rust/src/tools.rs, packages/execution/rust/src/bind.rs, packages/execution/rust/src/executor_model.rs, packages/execution/rust/src/executor_config.rs, packages/execution/rust/src/unit/, packages/execution/rust/src/loops/, packages/execution/contracts/executor-model.v1.json, packages/execution/contracts/bind.v1.json, packages/execution/rust/tests/tool_job.rs | 1 | ready |
-| 12 | [General plan contract, wave optional](phase-12-plan-contract-wave.md) | - | core/skills/_shared/plan-contract.md, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs | 1 | ready |
 | 16 | [Sleep record in the head record; view of live and sleeping agents](phase-16-sleep-record-and-agents-view.md) | - | src/session-host/head-stop.mjs, src/session-host/head-list.mjs, src/session-host/head-request.mjs, src/session-rotation/handoff-store.mjs, src/session-rotation/rotate.mjs, src/cli/command-registry.mjs, bin/fgos.mjs, packages/host-runtime/contracts/command-manifest.json, test/session-host/head-stop.test.mjs, test/session-host/head-list.test.mjs, test/session-rotation/handoff-store.test.mjs | 1 | ready |
-| 2 | [Signal entry: wake reasons and the signed webhook route](phase-02-signal-entry.md) | 1, 3 | apps/fgos/src/wiring/supervision.rs, apps/fgos/src/wiring/questions.rs, apps/fgos-gateway/src/gateway.rs, apps/fgos-gateway/src/webhook.rs, apps/fgos-gateway/src/lib.rs, core/config-standard/gateway.yaml, core/config-schema/gateway.schema.yaml, packages/distribution/contracts/doctor-registry.v1.json, packages/host-runtime/contracts/command-manifest.json | 2 | ready |
 | 4 | [Scheduling record contract and keeper core](phase-04-keeper-core.md) | 1 | packages/supervision/contracts/scheduling-record.v1.json, packages/supervision/contracts/event-streams.v1.json, packages/supervision/rust/src/keeper.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/keeper.rs | 2 | ready |
-| 17 | [Wake resumes the kept transcript or opens fresh with the handoff](phase-17-wake-resume.md) | 16 | src/session-host/head-start.mjs, src/runner/dispatch/confinement/authority-twin.mjs, src/runner/dispatch/provider-capacity.mjs, packages/execution/engine/src/transport_round/session_attempt.rs, packages/execution/engine/tests/transport_round.rs, apps/fgos/src/wiring/unit_run_host/session_attempt.rs, apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs, core/config-standard/runner.yaml, core/config-schema/runner.schema.yaml, test/session-host/head-start.test.mjs | 2 | ready |
-| 13 | [Contract check at takeover; frame intent](phase-13-takeover-check-frame-intent.md) | 12 | src/portfolio/plan-contract.mjs, scripts/plan-contract-check.mjs, src/workflow/propose.mjs, src/workflow/propose-validate.mjs, src/workflow/propose-frame.mjs, src/workflow/case-frame.mjs, test/workflow/propose.test.mjs, test/workflow/propose-frame.test.mjs, test/portfolio/plan-contract.test.mjs | 2 | ready |
-| 9 | [Periodic review](phase-09-periodic-review.md) | 1 | core/watcher/definitions/review-due.query.json, core/watcher/briefs/periodic-review.md, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, packages/supervision/rust/src/watcher.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/definitions.rs, apps/fgos/src/wiring/supervision.rs | 3 | ready |
-| 14 | [Lead runs phases inside cases; one harness](phase-14-lead-in-case.md) | 13 | packages/execution/rust/src/run_request/, packages/execution/rust/tests/run_request_case.rs, core/skills/fgos-lead/SKILL.md | 3 | ready |
-| 5 | [Record sources and need resolution](phase-05-sources-and-needs.md) | 4, 10, 16 | packages/supervision/rust/src/sources.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/sources.rs, apps/fgos/src/wiring/supervision.rs, src/workflow/records.mjs, src/workflow/case-verbs.mjs, test/workflow/records.test.mjs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml | 4 | ready |
-| 6 | [Sleep and wake of players](phase-06-sleep-and-wake.md) | 5, 16, 17 | packages/supervision/rust/src/keeper.rs, packages/supervision/rust/tests/keeper.rs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, apps/fgos/src/wiring/supervision.rs, core/skills/fgos-lead/SKILL.md, apps/fgos/tests/sleeping_lead_worktree.rs | 5 | ready |
-| 8 | [Scheduling records read port and command port](phase-08-records-read-port.md) | 5, 2 | apps/fgos/src/wiring/scheduling.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/routing.rs, apps/fgos/src/cli_projector.rs, apps/fgos/tests/scheduling_records.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, apps/fgos-gateway/src/gateway.rs | 5 | ready |
-| 7 | [Handoff as close one record, open the next](phase-07-handoff-records.md) | 5, 6 | packages/supervision/rust/src/sources.rs, packages/supervision/rust/src/discussion_source.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/tests/sources.rs, packages/supervision/rust/tests/discussion_source.rs, core/watcher/definitions/discussion-settled.query.json, core/skills/fgos-supervisor/SKILL.md, apps/fgos/src/wiring/supervision.rs | 6 | ready |
-| 15 | [Integration](phase-15-integration.md) | 2, 3, 7, 8, 9, 11, 14 | docs/platform/supervision/spec.md, docs/platform/questions/spec.md, docs/platform/workflow/spec.md, docs/platform/resource-referee/spec.md, docs/platform/runner/spec.md, docs/platform/runner/contracts/routing-handoff.md, docs/platform/session-host/spec.md, CHANGELOG.md, .agents/skills/, plugins/fgOS/skills/, .claude/skills/, plans/261122-0056-orchestration-skeleton/ | 7 | ready |
+| 5 | [Record sources and need resolution](phase-05-sources-and-needs.md) | 4, 10, 16 | packages/supervision/rust/src/sources.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/sources.rs, apps/fgos/src/wiring/supervision.rs, src/workflow/records.mjs, src/workflow/case-verbs.mjs, test/workflow/records.test.mjs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml | 3 | ready |
+| 9 | [Periodic review](phase-09-periodic-review.md) | 1, 4, 5 | core/watcher/definitions/review-due.query.json, core/watcher/briefs/periodic-review.md, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, packages/supervision/rust/src/watcher.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/definitions.rs, apps/fgos/src/wiring/supervision.rs | 4 | ready |
+| 18 | [Integration](phase-18-integration.md) | 1, 3, 4, 5, 9, 10, 16 | docs/platform/supervision/spec.md, docs/platform/questions/spec.md, docs/platform/workflow/spec.md, docs/platform/resource-referee/spec.md, docs/platform/session-host/spec.md, CHANGELOG.md, .agents/skills/, plugins/fgOS/skills/, .claude/skills/, plans/261122-0056-orchestration-skeleton/ | 5 | ready |
 
-Phase ids follow the discussion's task order (T1, T7.1 to T7.7); waves, not ids, give the run order.
+Phase ids are the original ids (the discussion's task order T1, T7.1 to T7.7). Waves, not ids, give the run order.
+Phase 18 is new with the split, because each plan needs its own integration phase.
 
-Door check: `fgos resource-check --units` on the draft table answered `accept (15 units, 0 findings)`. After the
-2026-11-23 amendment `fgos resource-check --plan` answered `accept (17 units, 0 findings)`; its shared-path lines
-are all pairs in different waves. Every shared
-path sits in different waves. Hot files and their single writer per wave: `apps/fgos/src/wiring/supervision.rs`
-(waves 1, 2, 3, 4, 5, 6: phases 1, 2, 9, 5, 6, 7), `core/config-standard/watcher.yaml` and its schema (waves 3, 4, 5:
-phases 9, 5, 6), `apps/fgos-gateway/src/gateway.rs` and `command-manifest.json` (waves 2, 5: phases 2, 8),
-`packages/supervision/rust/src/lib.rs` (waves 2, 4), `command-manifest.json` also in wave 1 (phase 16),
-`core/skills/fgos-lead/SKILL.md` (waves 3, 5: phases 14, 6), `src/session-host/head-start.mjs` (wave 2, phase 17
-only). The 2026-11-23 amendment adds phases 16 (wave 1) and 17 (wave 2) and moves no existing phase's wave. Generated skill surfaces (`.agents/skills/`,
-`plugins/fgOS/skills/`, `.claude/skills/`) are regenerated once, by `npm run build:skills` in phase 15; phases edit
-only skill sources. Specs and `CHANGELOG.md` are written only in phase 15.
+Hot files and their single writer per wave: `apps/fgos/src/wiring/supervision.rs` (waves 1, 3, 4: phases 1, 5, 9),
+`core/config-standard/watcher.yaml` and its schema (waves 3, 4: phases 5, 9), `packages/supervision/rust/src/lib.rs`
+(waves 2, 3: phases 4, 5), `packages/supervision/rust/src/wake.rs` (waves 1, 2: phases 1, 4),
+`packages/supervision/rust/src/portfolio.rs` (waves 1, 3: phases 1, 5). Generated skill surfaces are regenerated
+once, by `npm run build:skills` in phase 18. Phases edit only skill sources. Specs and `CHANGELOG.md` are written
+only in phase 18.
 
-No phase waits on an owner question: the owner confirmed OS-D12 and OS-D19 as final on 2026-11-22
-(`q-e2bpqz65c2`). The whole plan still waits on `blockedBy`. The first two (`261118-1341-s6a-execution-tier-rust`,
-`261120-0625-work-data-model`) are done. On 2026-11-22 the `ready` flip was refused for footprint overlap with three
-active plans, now added to `blockedBy`: `261122-1950-owner-communication-standard` (the Questions crate and contracts,
-`wiring/questions.rs`, the questions spec), `261122-0118-heads-stable-and-able` (`wiring/supervision.rs`, routing, the
-plan-contract check, the supervisor and lead skills, the supervision spec) and `261121-2109-component-authority` (the
-runner and workflow specs). These paths are each plan's core files, so narrowing the footprint would not clear the
-overlap. The plan turns `ready` once all three are done; reordering them is a priority call for the secretary.
+Every `blockedBy` entry but `261124-2143-head-lifecycle-events` is done. The plan stays `draft` until 2143 is done,
+then turns `ready` after the contract check passes at a fresh `base`.
 
 ## Owner questions
 
-**Owner order 2026-11-23 08:23 (via the secretary, recorded by head:supervisor-forgent):** component-authority-doors
-has priority. This plan may start alongside it only if their files and footprints do not collide; when a lead slot, account
-or other resource is short it yields until doors is done, then resumes. At 08:23 both conditions held it back: both
-footprints name `packages/host-runtime/contracts/command-manifest.json`, `command-routes.json` and
-`command-route-annotations.json`, and all four lead slots were live (`maxLeads` 4). It stays `draft` and is admitted when
-doors is done or the collision and the slot shortage both clear.
+None is open. Recorded answers and orders:
 
-**Paused for doors (owner 2026-11-23 08:15, recorded by lead:SUPERVISOR):** the owner ordered component-authority-doors
-to run before this plan. Both write the shared CLI routing files (`apps/fgos/src/routing.rs`, `cli_projector.rs`,
-`wiring/mod.rs`, `apps/fgos-gateway/src/gateway.rs`, `command-manifest.json`, `command-routes.json`). Its lead was
-stopped at 08:15 before any phase landed; `blockedBy` now names doors and the plan is `draft` (the contract check refuses a `ready` plan that overlaps an active one); set it `ready` when doors is done. Worktrees p01, p03,
-p10, p11 and p12 stay for the resumed lead; rebase them on main when this plan restarts.
-
-- `q-e2bpqz65c2` (answered by the owner directly in the planner session, 2026-11-22: "chốt cả hai như em khuyến
-  nghị"): OS-D12 (one scheduling record per open step, keyed by `item`, `step`) and OS-D19 (handoff closes one record
-  and opens the next) are final. The planner head cannot write `questions answer`, so it closed the question with
-  the owner's words as the reason.
-- `q-yoxcjqa46z` (answered by the owner via the secretary, 2026-11-22 22:12): run this plan after the three land.
-  `blockedBy` stays as written; the supervisor admits it once `261122-0118-heads-stable-and-able`,
-  `261122-1950-owner-communication-standard` and `261121-2109-component-authority` are done. No other plan's order or
-  scope changes.
-- Owner orders 2026-11-22 23:20 and 23:25 (via the secretary, recorded by head:supervisor-forgent): component-authority
-  goes first, then its doors plan; this plan runs beside them only where it does not collide. It shares
-  `docs/platform/workflow/spec.md` and `docs/platform/runner/spec.md` with component-authority and many host files with
-  the doors plan, so it still waits for component-authority. `261122-1950-owner-communication-standard` is low
-  priority and blocks nothing, so it left `blockedBy`; admission alone keeps their shared files apart.
-- Owner orders 2026-11-22 23:16 to 00:06 (via the secretary, supervisor brief): heads-stable blocks nobody, so
-  `261122-0118-heads-stable-and-able` left `blockedBy`. Component-authority's only remaining work is phase 5 (the
-  generated holder table in `docs/platform/governance.md` and the other ownership views). Its file list shares
-  `docs/platform/workflow/spec.md` with this plan's footprint (phase 15 writes it), so the footprints are not
-  disjoint and `261121-2109-component-authority` stays in `blockedBy`. The plan stays `draft` until component-authority
-  is done. `261121-2110-component-authority-doors` stays behind component-authority.
-- 2026-11-23: `261121-2109-component-authority` is done (commit `c52ffa192`, every phase done), so every
-  `blockedBy` entry is done and the plan is `ready`.
-- `q-7wfzidusod` (answered by the owner, 2026-11-23 07:45): this plan runs first, then
-  `261122-1950-owner-communication-standard`. The supervisor admitted this plan at `c92bdd283` and holds
-  owner-communication until this plan is done.
+- **2026-11-25, split (owner-approved supervisor order):** split this plan into the keeper plan and the players plan.
+  Order phase 16 after `261124-2143-head-lifecycle-events`, and check phase 9 against phase 5. The resulting choices
+  are under "Decided here".
+- `q-e2bpqz65c2` (owner, 2026-11-22: "chốt cả hai như em khuyến nghị"): OS-D12 (one scheduling record per open step,
+  keyed by `item`, `step`) and OS-D19 (handoff closes one record and opens the next) are final.
+- `q-yoxcjqa46z`, `q-7wfzidusod` and the owner orders of 2026-11-22 and 2026-11-23 (via the secretary): this plan runs
+  after component-authority and component-authority-doors, which are both done, and before
+  `261122-1950-owner-communication-standard`. The supervisor admitted it at `c92bdd283` and paused it at 08:15 on
+  2026-11-23 for doors, before any phase landed.
+- Worktrees: only `261122-0056-orchestration-skeleton-p12` (branch `orchestration-skeleton/p12`, commit `66c320a1d`
+  "compute optional phase waves in contract checks", not on main) is left. Phase 12 now belongs to the players plan,
+  whose lead adopts or re-creates that branch under its own worktree name.
 
 ## Risks and rollback
 
-- A slept lead's work is lost if any remover skips the checkout door. Proof point for validating: phase 6's
-  `sleeping_lead_worktree` drives a real land and cleanup against a slept lead's dirty and undelivered worktree. The
-  two other kept-worktree lists (workflow, runner) are separate backlog rows (`p-kyen4k2k7z`, `p-fdkdy26tba`), not
-  fixed here.
-- A resume replays a transcript the new account cannot accept (signed thinking blocks, discussion §3 row 9,
-  unverified). Phase 17 never assumes the replay: a refused resume falls back to the handoff in the same start, and its
-  owning test uses a refusing fake CLI. Proof point for validating: one real resume of a Claude head across two
-  accounts of the same pool, recorded as evidence, not as a gate.
-
-- The keeper starts players in code: a wrong rule could start too many sessions. Proof point: phase 1 and phase 4
-  owning tests drive every cap with fakes before any wiring; `maxLeads` and the lane pool are checked before each
-  start, and an unknown identity or activity never counts as free (the wake door's existing rule).
-- Admission moves out of the supervisor skill: during the change both could admit. Phase 1 changes the skill in the
-  same commit as the code; the supervisor keeps only judgement.
-- The webhook route is an outside entry: unsigned or replayed deliveries must not raise. Phase 2's owning test sends a
-  bad signature and a replayed delivery id and gets refusals; the payload is stored as untrusted data and never
-  interpreted as a command.
-- A lead's writing run outside a case is refused (phase 14): any plan still run by an old lead release would stall.
-  Phase 14 lands after phase 13, so `propose` can map every phase; the refusal names the case door to use.
-- Rollback: each phase lands as its own commit through the land door; revert that commit. The plan as a whole reverts
-  by reverting its phase commits in reverse wave order; no data migration is involved (records are projections,
-  recomputed on every tick).
+- The keeper starts players in code, so a wrong rule could start too many sessions. Proof point: the owning tests
+  of phases 1 and 4 drive every cap with fakes before any wiring. `maxLeads` and the lane pool are checked before
+  each start, and an unknown identity or activity never counts as free (the wake door's existing rule).
+- Admission moves out of the supervisor skill, and during the change both could admit. Phase 1 changes the skill in
+  the same commit as the code, and the supervisor keeps only judgement.
+- This plan and 2143 both change admission and the wake door. Phase 1 re-reads `wake.rs` and `portfolio.rs` after
+  2143 lands and builds on 2143's lead-slot rule; it never restores the old rule.
+- Rollback: each phase lands as its own commit through the land door. Revert that commit. The plan as a whole
+  reverts by reverting its phase commits in reverse wave order. No data migration is involved: records are
+  projections, recomputed on every tick.

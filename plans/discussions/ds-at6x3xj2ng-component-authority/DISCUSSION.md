@@ -41,6 +41,8 @@ open owner questions: none (Q1-Q5 answered or replaced; ids in §Q1-§Q5)
 
 ## 1. Trạng thái hiện tại
 
+2026-11-25 13:50 kiểm đóng (chủ dự án hỏi "component này đã xong và đóng chưa"): **Phạm vi của discussion này đã giao xong.** Plan `261121-2109-component-authority` và `261121-2110-component-authority-doors` đều `done`; backlog `p-esa3lau6kd`, `p-7nja6ilwkr` đều `done`; spec `docs/platform/component-authority/spec.md` ghi `Implementation: Implemented`; `fgos authority locate` chạy thật; `fgos authority render --check` không lệch. **Một chỗ lệch trạng thái:** hàng `component-authority` trong `packages/component-authority/model/components.yaml` vẫn ghi `status: designed`, phải là `live`. Phiên shaper bị confinement chặn ghi file mô hình (read-only), nên việc sửa giao cho thư ký: `fgos authority declare --kind component --update --row '{"id":"component-authority","status":"live"}'`. Các mã còn mở (`p-adv35azsca`/`ds-zfqskcns7j`, `p-peokivdmox`, `p-gikx34d7bh`, `p-ibsx7yqgzw`) là việc tiếp theo mở sau, không phải phần dang dở của discussion này.
+
 2026-11-21 21:10 round 11: **Settled.** Chủ dự án duyệt §6 (CA-D5); hand-off cho planner ở đầu file. Chốt: cấm twin khi port (CA-D2); thành phần mới `component-authority` quản quyền sở hữu, có `locate`/`declare`, quản chỉ mục contract (CA-D3); tầng kiến trúc gộp vào một mô hình cấu trúc (CA-D4); RUL và bản ghi quyết định ngoài mô hình (tạm chốt). Không còn câu hỏi mở với chủ dự án. Ngoài phạm vi: mã RUL trùng nghĩa (T8), nhờ secretary tạo backlog row.
 
 ## 2. Mục tiêu & đề bài

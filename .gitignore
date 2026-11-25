@@ -116,3 +116,6 @@ packages/host-runtime/contracts/*.tmp-*
 /dist/
 /restore_github.cjs
 /test-results/
+
+# Supervisor wake reports are local records; they are not landed on main (the supervisor skill says so)
+/plans/reports/*supervisor-wake*.md
