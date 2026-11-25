@@ -291,6 +291,12 @@ morning (discussion §1). The planner's own shape choices are written as decisio
   `q-qzcq5xti2k`, see `phase-02-argv-window.md`); the lead is idle on that verified wait, so it is left live, not
   replaced. Phases 3, 6 and 7 wait behind phase 2.
 
+- 2026-11-25 09:39, phase 2 parked again on owner question `q-nt7ptsq2nd`: the pinned rerun (`q-owq4jhwng7`)
+  could not be made, because the request window forwards `run` without `--override` (and without `--timeout`,
+  `--sync`, `--plan`, `--phase`); ticket `c-1632-1795574308428` ran on the default `claude-cli-bwrap` and came back
+  `blocked` with no change. The recommended option is the owner running the pinned command written in
+  `phase-02-argv-window.md` (Lead notes). Phases 3, 6 and 7 wait behind phase 2.
+
 ## Outstanding questions
 
-None
+- `q-nt7ptsq2nd` (phase 2): how the pinned rerun is made, given the window drops `--override`.
