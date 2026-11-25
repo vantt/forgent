@@ -1,0 +1,23 @@
+{
+  "unit": {
+    "id": "example-rule",
+    "owner": "core",
+    "kind": "procedure",
+    "mode": "append",
+    "scope": "repo",
+    "specificity": 10,
+    "title": "Example rule",
+    "lifecycle": "live",
+    "valid_from": "2026-11-25",
+    "when": {
+      "role": [
+        "producer"
+      ]
+    }
+  },
+  "body": "Do the thing.",
+  "state": "a second unit with id example-rule exists",
+  "expect": {
+    "refusal": "rule-id-duplicate"
+  }
+}

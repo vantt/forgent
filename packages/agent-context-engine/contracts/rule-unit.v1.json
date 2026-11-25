@@ -1,0 +1,43 @@
+{
+  "contract": "agent-context-engine-rule-unit.v1",
+  "description": "Frontmatter of one rule unit (a Markdown file in core/instructions/, components/<c>/instructions/ or domains/<d>/instructions/). The body is the Markdown after the frontmatter. The pkm pack file declares the same type, roles and edges.",
+  "pkm": {
+    "type": "rule",
+    "roles": {
+      "id": { "field": "id", "id_scope": "vault" },
+      "lifecycle": { "field": "lifecycle", "classes": ["draft", "rejected", "live", "deprecated", "replaced", "retracted"] },
+      "valid_from": { "field": "valid_from" },
+      "valid_to": { "field": "valid_to" },
+      "replaced_by": { "field": "superseded_by" }
+    },
+    "edges": ["refines", "depends_on", "conflicts_with", "related"]
+  },
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "owner", "kind", "mode", "scope", "specificity", "title", "lifecycle"],
+    "properties": {
+      "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "Unique across all three roots." },
+      "owner": { "type": "string", "description": "A component or domain id of the component authority model (OwnerRegistry)." },
+      "kind": { "enum": ["law", "boundary", "procedure", "host-adapter", "preference"] },
+      "mode": { "enum": ["append", "refine", "override", "forbid"] },
+      "scope": { "enum": ["repo", "platform", "component", "domain", "workspace", "project", "command", "skill", "host", "session"] },
+      "specificity": { "type": "integer", "minimum": 0, "description": "Defaults from scope: repo/platform 10, component 20, domain 30, workspace/project 40, command 50, skill 60, session 70, host 80." },
+      "title": { "type": "string", "minLength": 1 },
+      "description": { "type": "string" },
+      "lifecycle": { "enum": ["draft", "rejected", "live", "deprecated", "replaced", "retracted"] },
+      "valid_from": { "type": "string", "format": "date" },
+      "valid_to": { "type": "string", "format": "date", "description": "Required when lifecycle is replaced." },
+      "superseded_by": { "type": "string", "description": "Id of the replacement rule; required with valid_to when lifecycle is replaced." },
+      "refines": { "type": "array", "items": { "type": "string" } },
+      "depends_on": { "type": "array", "items": { "type": "string" } },
+      "conflicts_with": { "type": "array", "items": { "type": "string" } },
+      "related": { "type": "array", "items": { "type": "string" } },
+      "when": {
+        "type": "object",
+        "description": "Keys from when-keys.v1.json; each value is a list of allowed values (any-of). Empty or absent means always.",
+        "additionalProperties": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+      }
+    }
+  }
+}

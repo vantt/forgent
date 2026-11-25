@@ -1,0 +1,26 @@
+{
+  "unit": {
+    "id": "example-rule",
+    "owner": "core",
+    "kind": "preference",
+    "mode": "override",
+    "scope": "session",
+    "specificity": 70,
+    "title": "Example rule",
+    "lifecycle": "live",
+    "valid_from": "2026-11-25",
+    "when": {
+      "role": [
+        "producer"
+      ]
+    },
+    "refines": [
+      "platform-operating-laws"
+    ]
+  },
+  "body": "Do the thing.",
+  "state": "platform-operating-laws is a law with no sealed supersession evidence",
+  "expect": {
+    "refusal": "rule-law-overridden"
+  }
+}
