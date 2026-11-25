@@ -13,6 +13,10 @@ const anchors = [
     command: 'fgos convention name|path --json',
     required: ['paths placed in briefs', 'parallel agents MUST choose distinct slugs'],
   },
+  {
+    command: 'Land on main only what another session must rely on later',
+    required: ['a settled decision', 'a plan status change', 'never a wake or progress report', 'a discussion round'],
+  },
 ];
 
 for (const anchor of anchors) {

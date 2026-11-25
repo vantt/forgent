@@ -95,6 +95,14 @@ Use `fgos worktree remove --discard-ignored`, or `git -C "$W"` after asserting `
 Never chain a destructive step after `cd` with `;` or `&&` from a failed create; the main checkout holds the active release and run history.
 If the main checkout lost ignored paths, follow `docs/how-to/recover-main-checkout-after-ignored-files-wipe.md`.
 
+## Writes to main
+
+Land on main only what another session must rely on later: code, a settled decision, a plan status change (draft, ready, running, done) or a backlog row; never a wake or progress report, a "waiting" or "parked" note, a discussion round, a review note or an owner answer the question store already holds.
+Every commit on main passes the land door's merge slot and gate, so each one makes every other head's land wait or rerun; on 2026-11-25 main took about 21 commits an hour, 88% of them not code, and lands starved.
+Put the rest where it already lives: the event store (`fgos supervisor raise`, `fgos questions`), or a local file that stays untracked (wake reports are in `.gitignore`).
+When a record must reach main, land it once at a checkpoint (a phase `done`, a discussion settled or paused), not once per step.
+Never leave an edit uncommitted in the main checkout while you wait: land it or restore it, because a dirty tracked file there refuses other heads' lands.
+
 ## Legacy-Node CLI Ownership Boundary
 
 Rust `fgos` is the standard door for every verb. `bin/fgos.mjs` is the
