@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "The land door finishes or recovers its own half-done work"
-status: running
+status: done
 lead: head:lead-forgent-261125-1558-land-d-ea1cc
 base: a5e9f9b40052194d625012f4d2c24cf21a2189ec
 priority: P1
@@ -119,7 +119,7 @@ for session writers Identity knows; this plan closes the pid case it missed.
 | 4 | [Integrate, docs and changelog](phase-04-integrate-docs-changelog.md) | 1, 2, 3 | packages/git/rust/tests/land_push_catch_up.rs, docs/platform/git/spec.md, docs/platform/identity/spec.md | 2 | done |
 
 Phase 4 gate: [reports/lead-261125-2019-full-gate.md](reports/lead-261125-2019-full-gate.md); no failure in this
-plan's files. Plan stays `running` only for the two `CHANGELOG.md` lines, owed until plan 261124-0004 is done.
+plan's files. The two `CHANGELOG.md` `[Unreleased]` lines landed in 724b30d47 after plan 261124-0004 was done.
 
 Each phase dispatches with capability `code:implement`. Phases 1-3 have disjoint footprints and run at once;
 phase 3 takes `writer_is_dead` as the parameter it already is, so its fixtures inject the proof and do not wait

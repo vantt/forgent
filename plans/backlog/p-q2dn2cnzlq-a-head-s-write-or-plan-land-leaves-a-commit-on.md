@@ -1,7 +1,7 @@
 ---
 id: p-q2dn2cnzlq
 title: "A head's write or plan land leaves a commit on local main that is never pushed, and every later land is refused `land-target-ahead` (git, priority high; source: owner via Miu, 2026-11-21; hit twice in one day)"
-status: proposed
+status: done
 priority: P1
 area: git
 created: 2026-11-21

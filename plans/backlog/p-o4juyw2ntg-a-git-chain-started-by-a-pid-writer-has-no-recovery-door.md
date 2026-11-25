@@ -1,7 +1,7 @@
 ---
 id: p-o4juyw2ntg
 title: "A Git chain started by a pid writer with no session id has no recovery door once that pid dies (git, priority high; source: lead:OPC, 2026-11-22 12:40)"
-status: proposed
+status: done
 priority: P1
 area: git
 created: 2026-11-22
