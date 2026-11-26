@@ -17,6 +17,7 @@
   },
   "body": "Do the thing.",
   "state": "embedding model file absent",
+  "deferred": "the write-time nearest-rule search is not run by the crate's check",
   "expect": {
     "refusal": "rule-search-unavailable"
   }

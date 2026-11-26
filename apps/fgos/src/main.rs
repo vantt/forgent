@@ -263,6 +263,14 @@ fn main() {
                 .collect();
             std::process::exit(wiring::execution_routes::main(&rest));
         }
+        // `context-engine <op> --protocol 1`: the rule units checked and compiled (see `wiring::context_engine`).
+        if args.get(2).is_some_and(|a| a == "context-engine") {
+            let rest: Vec<String> = args[3..]
+                .iter()
+                .map(|a| a.to_string_lossy().into_owned())
+                .collect();
+            std::process::exit(wiring::context_engine::main(&rest));
+        }
         // The run supervisor's routes: supervise, gate, adopt, attempt-step, head-request.
         let rest: Vec<String> = args[2..]
             .iter()

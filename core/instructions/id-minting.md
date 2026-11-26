@@ -4,10 +4,11 @@ kind: procedure
 owner: core
 scope: repo
 mode: append
-appliesTo: ["*"]
 specificity: 10
 title: Id Minting
 description: Every id that travels between machines comes from fgos identity mint, never counted or invented by hand
+lifecycle: live
+valid_from: 2026-10-22
 ---
 
 # Id Minting

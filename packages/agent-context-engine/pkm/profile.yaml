@@ -1,0 +1,13 @@
+profile: ace-rules
+format: 1
+vault:
+  packs: [ace]
+  pack_files: [ace.yaml]
+  # The host keeps the index view under the project's own .fgos, which is inside this vault; pkm refuses that for
+  # `writes: none`. ACE declares no proposals directory, so pkm writes no note here either way.
+  writes: proposals
+  include: ["core/instructions/**", "components/*/instructions/**", "domains/*/instructions/**"]
+  types:
+    - {path: "core/instructions/**", type: rule}
+    - {path: "components/*/instructions/**", type: rule}
+    - {path: "domains/*/instructions/**", type: rule}

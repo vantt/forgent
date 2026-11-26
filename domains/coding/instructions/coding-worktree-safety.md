@@ -4,10 +4,11 @@ kind: boundary
 owner: coding
 scope: domain
 mode: append
-appliesTo: ["*"]
 specificity: 30
 title: Coding Worktree Safety Boundaries
 description: Worktree and git safety boundaries for coding-domain agents
+lifecycle: live
+valid_from: 2026-09-14
 ---
 
 # Coding Worktree Safety Boundaries

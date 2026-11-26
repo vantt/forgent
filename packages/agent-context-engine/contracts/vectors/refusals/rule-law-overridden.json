@@ -15,11 +15,28 @@
       ]
     },
     "refines": [
-      "platform-operating-laws"
+      "[[platform-operating-laws]]"
     ]
   },
   "body": "Do the thing.",
   "state": "platform-operating-laws is a law with no sealed supersession evidence",
+  "others": [
+    {
+      "unit": {
+        "id": "platform-operating-laws",
+        "owner": "core",
+        "kind": "law",
+        "mode": "append",
+        "scope": "repo",
+        "specificity": 10,
+        "title": "Platform operating laws",
+        "lifecycle": "live",
+        "valid_from": "2026-11-25",
+        "when": {}
+      },
+      "body": "Do the thing."
+    }
+  ],
   "expect": {
     "refusal": "rule-law-overridden"
   }

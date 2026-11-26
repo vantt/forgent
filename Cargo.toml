@@ -38,6 +38,7 @@ members = [
     "packages/supervision/rust",
     "packages/questions/rust",
     "packages/documentation/rust",
+    "packages/agent-context-engine/rust",
 ]
 exclude = [
     "herdr-dashboard",

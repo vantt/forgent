@@ -159,7 +159,7 @@ The ordering and cycle code in the repository today, and what this plan does wit
 | `connectedComponents`, `criticalPath`, `detectCycles`, `computeSchedule`, `longestChain` | `src/state/graph-metrics.mjs` | Exports survive as the Work adapter surface (plan decision 18); bodies call this package in the door plan. `longestChain` is deleted so one critical-path rule remains |
 | `findDepCycle`, `findUnifiedCycle`, `buildUnifiedEdges` | `src/state/dep-graph.mjs` | The edge builder stays Work's; the cycle search is not replaced in these plans |
 | Unit dependency cycle | `src/report/capability-plan-lint.mjs:400` | Moves with plan-lint in the door plan |
-| Kahn ordering | `src/setup/instruction-composition.mjs:428` | Not a target; recorded follow-up |
+| Kahn ordering | `packages/agent-context-engine/rust/src/compose.rs` (rule composer, Kahn order) | Not a target of the graph component; recorded follow-up |
 | `dependencyOrder` | `src/workflow/steps.mjs:12` | Not a target; recorded follow-up |
 | Event ordering | `packages/event-store/rust/src/order.rs` | Not a target; event store stability comes first |
 

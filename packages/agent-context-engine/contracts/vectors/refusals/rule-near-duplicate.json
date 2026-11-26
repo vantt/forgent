@@ -17,6 +17,7 @@
   },
   "body": "Do the thing.",
   "state": "the nearest in-force rule example-rule scores 0.95 (threshold 0.93)",
+  "deferred": "the write-time nearest-rule search is not run by the crate's check",
   "expect": {
     "refusal": "rule-near-duplicate"
   }

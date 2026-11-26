@@ -45,6 +45,7 @@ Area rows from the model: one row per area listing its top-level components. Spe
 | --- | --- | --- | --- |
 | `(cross-area)` | `canonical-json`, `coding-domain`, `domain-components`, `domain-registry-loader`, `durable-file`, `group-thinking`, `host-surface`, `platform-foundations`, `work-driver` | Authority for canonical JSON bytes per RFC 8785.; Coding Domain Core, policies, repo scope, footprint, worktree isolation, merge catchup, and code verification doctrine.; Domain-specific behavior, workflows, skills, task specs, and doctrine.; General runtime definition registry and config loader for domains, workflows, and declarations.; Authority for how records reach disk durably: temp file, fsync, atomic install.; Versioned group-thinking protocol pack definitions and skill for structured multi-agent deliberation.; CLI entrypoints, top-level verbs, argument parsing, and command execution.; Core platform utilities, foundation laws L1-L10, and cross-cutting helpers.; Ready-work selection, Stage Operation choice, cross-flow routing, park/halt and recovery around Work execution; invokes lifecycle verbs and dispatch surfaces without owning domain workflow semantics. | `docs/platform/component-boundary.md`, `docs/platform/README.md`, `docs/platform/platform-foundations.md` |
 | `agent-confinement` | `agent-confinement` | Single authority for agent isolation, container boundaries, and sandboxing. | `docs/platform/agent-confinement/spec.md` |
+| `agent-context-engine` | `agent-context-engine` | One checked store of every fgOS rule: the rule schema, the when: key registry, composition and write-time checks; it hands the start-context component one effective rule set with a digest. | `docs/platform/agent-context-engine/spec.md` |
 | `agent-coordination` | `agent-coordination`, `agent-coordination-engine`, `team-cognition-engine` | Agent coordination area portal; former coordination engine retired, execution uses runner/Workflow.; Authority for CoordinationSession manifest/events, actor bounds, session recovery, and synthesis boundary.; Typed deliberation interpretation, aggregation-method semantics, and cognitive outcomes. | `docs/platform/agent-coordination/spec.md` |
 | `agent-mailbox` | `agent-mailbox` | Placing a message from one agent session into context of the right live head. | `docs/platform/agent-mailbox/spec.md` |
 | `agent-protocol` | `agent-protocol` | Pure per-CLI adapters (claude, codex, agy, pi, omp) translating CLI output to status. | `docs/platform/agent-protocol/spec.md` |
@@ -111,6 +112,10 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | agent confinement enforcement | `agent-confinement` | `docs/platform/agent-confinement/spec.md` |
 | bwrap isolation driver | `agent-confinement` | `docs/platform/agent-confinement/spec.md` |
 | private home hiding | `agent-confinement` | `docs/platform/agent-confinement/spec.md` |
+| rule unit schema and states | `agent-context-engine` | `docs/platform/agent-context-engine/spec.md` |
+| when: key registry | `agent-context-engine` | `docs/platform/agent-context-engine/spec.md` |
+| composition of rules and the effective set with its digest | `agent-context-engine` | `docs/platform/agent-context-engine/spec.md` |
+| write-time checks of a rule | `agent-context-engine` | `docs/platform/agent-context-engine/spec.md` |
 | coordination area navigation and historical evidence | `agent-coordination` | `docs/platform/agent-coordination/spec.md` |
 | CoordinationSession manifest/events | `agent-coordination-engine` | `docs/platform/agent-coordination/spec.md` |
 | Assignment membership | `agent-coordination-engine` | `docs/platform/agent-coordination/spec.md` |

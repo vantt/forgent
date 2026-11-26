@@ -1,0 +1,43 @@
+{
+  "unit": {
+    "id": "late-override",
+    "owner": "core",
+    "kind": "preference",
+    "mode": "override",
+    "scope": "repo",
+    "specificity": 10,
+    "title": "Late override",
+    "lifecycle": "live",
+    "valid_from": "2026-11-25",
+    "when": {
+      "role": [
+        "producer"
+      ]
+    },
+    "refines": [
+      "[[base-preference]]"
+    ]
+  },
+  "body": "Do the thing.",
+  "state": "base-preference is a preference of the same scope: an override at equal scope has no ordered winner",
+  "others": [
+    {
+      "unit": {
+        "id": "base-preference",
+        "owner": "core",
+        "kind": "preference",
+        "mode": "append",
+        "scope": "repo",
+        "specificity": 10,
+        "title": "Base preference",
+        "lifecycle": "live",
+        "valid_from": "2026-11-25",
+        "when": {}
+      },
+      "body": "Do the thing."
+    }
+  ],
+  "expect": {
+    "refusal": "rule-composition-invalid"
+  }
+}

@@ -582,18 +582,21 @@ export function assembleSkills(
 /**
  * Renders this checkout's skill surfaces (`.agents/skills`, `.claude/skills`,
  * `plugins/fgOS/skills`) and instruction projections from their sources. The
- * owned names and the instruction projection are computed first, so any
- * refusal leaves the tree untouched; only then does it write.
+ * owned names, the skill targets and the instruction projection are checked
+ * first, so any refusal leaves the skill surfaces untouched; only then does it
+ * write.
  */
 export function renderSkillSurfaces(root) {
   const owned = ownedSkillNames(root);
-  computeInstructionProjection(root);
   const agentsSkillsRoot = path.join(root, '.agents', 'skills');
   assertTargetsWritable(owned, {
     agentsSkills: agentsSkillsRoot,
     claudeSkills: path.join(root, '.claude', 'skills'),
     pluginSkills: path.join(root, 'plugins', 'fgOS', 'skills'),
   });
+  // The compile writes only derived state under .fgos (the compiled set and the index view), so it runs after
+  // every check that can refuse a skill target and before the first skill write.
+  computeInstructionProjection(root);
   const assembled = assembleSkills(root);
   const written = generateAllSkillWrappers(agentsSkillsRoot, path.join(root, '.claude', 'skills'), { owned });
   const mirrored = mirrorDevSkillsIntoPlugin(agentsSkillsRoot, path.join(root, 'plugins', 'fgOS', 'skills'), owned);

@@ -1,0 +1,29 @@
+ace:
+  description: Rule units of the Agent Context Engine.
+  node_types:
+    rule:
+      description: One fgOS rule unit.
+      roles: {id: id, id_scope: vault, lifecycle: lifecycle, valid_from: valid_from, valid_to: valid_to, replaced_by: superseded_by}
+      lifecycle_classes: {draft: [draft], rejected: [rejected], live: [live], deprecated: [deprecated], replaced: [replaced], retracted: [retracted]}
+      fields:
+        id: {type: text}
+        owner: {type: text}
+        kind: {type: text}
+        mode: {type: text}
+        scope: {type: text}
+        specificity: {type: number}
+        title: {type: text}
+        description: {type: text}
+        refines: {link_to: [rule], list: true}
+        depends_on: {link_to: [rule], list: true}
+        conflicts_with: {link_to: [rule], list: true}
+        superseded_by: {link_to: [rule]}
+  edges:
+    refines: {inverse: refined_by, domain: [rule], range: [same]}
+    refined_by: {inverse: refines, domain: [rule], range: [same]}
+    depends_on: {inverse: required_by, domain: [rule], range: [same]}
+    required_by: {inverse: depends_on, domain: [rule], range: [same]}
+    conflicts_with: {symmetric: true, inverse: conflicts_with, domain: [rule], range: [same]}
+    superseded_by: {override: true, inverse: supersedes, group: lifecycle, domain: [rule], range: [same], cardinality: one}
+    supersedes: {override: true, inverse: superseded_by, group: lifecycle, domain: [rule], range: [same]}
+  lifecycle_types: [rule]
