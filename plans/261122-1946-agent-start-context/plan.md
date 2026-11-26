@@ -8,6 +8,7 @@ blockedBy:
   - 261124-0004-heads-operate-without-owner
   - 261125-1631-agent-context-engine
   - 261125-2041-gather-fgos-rules-to-one-owner
+  - 261126-1851-ace-when-keys-v2
 base: 4f44bb780d5e65ac42d6f554d4bbe3731565bf5c
 footprint:
   - plans/261122-1946-agent-start-context/**
