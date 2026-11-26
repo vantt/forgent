@@ -476,7 +476,10 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
         ),
         ("report.path.local-pushed", &["local-pushed"][..]),
         ("report.path.local-typed", &["local-typed"][..]),
-        ("report.path.local-next-tool-call", &["local-next-tool-call"][..]),
+        (
+            "report.path.local-next-tool-call",
+            &["local-next-tool-call"][..],
+        ),
         ("report.path.remote-recorded", &["remote-recorded"][..]),
         ("report.nudge.sent", &["nudged"][..]),
         ("report.nudge.pending", &["still unread"][..]),
