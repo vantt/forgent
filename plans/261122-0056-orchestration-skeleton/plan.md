@@ -22,6 +22,8 @@ footprint:
   - packages/supervision/rust/src/lib.rs
   - packages/supervision/rust/tests/wake.rs
   - packages/supervision/rust/tests/portfolio.rs
+  - scripts/plan-contract-check.mjs
+  - test/scripts/plan-contract-check.test.mjs
   - packages/supervision/rust/tests/watcher.rs
   - packages/supervision/rust/tests/definitions.rs
   - packages/supervision/rust/tests/keeper.rs

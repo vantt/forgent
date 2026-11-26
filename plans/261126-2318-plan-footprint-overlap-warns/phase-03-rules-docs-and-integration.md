@@ -2,7 +2,7 @@
 
 ## Inputs
 
-- `plan.md` (all of it), the landed results of phases 1 and 2, and plan
+- `plan.md` (all of it), the landed results of phases 1 and 2 (run by Keeper's lead, plan `261122-0056-orchestration-skeleton`), and plan
   `plans/261126-2324-changelog-fragments-and-skill-surface-regeneration/` (must be `done` before this phase starts;
   its `changelog.d/README.md` and `reports/land-regenerate-skill-surfaces.md` say what the land-side half built).
 - Discussion `plans/discussions/ds-yf3vnbidi6-plan-footprint-overlap/DISCUSSION.md` §4 (D1) and §6.

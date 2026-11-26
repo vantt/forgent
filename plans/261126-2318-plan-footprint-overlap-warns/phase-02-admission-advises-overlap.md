@@ -1,5 +1,9 @@
 # Phase 2: admission no longer holds on overlap; the read view lists it as advice
 
+Run by the lead of plan `261122-0056-orchestration-skeleton` (Keeper) as one of its own phases, by owner answer B
+to `q-kyzictpkf6`. Phases 1 and 2 change the two doors together: land them as one change, or back to back with no
+release in between. Keeper's footprint covers every file below.
+
 ## Inputs
 
 - `plan.md`: Outcome, "Admission advice shape", acceptance criterion 2.

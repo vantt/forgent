@@ -7,13 +7,6 @@ blockedBy: []
 base: 43460a291440cc08dea2d814a5aeeb146b9f7e24
 footprint:
   - plans/261126-2318-plan-footprint-overlap-warns/**
-  - scripts/plan-contract-check.mjs
-  - test/scripts/plan-contract-check.test.mjs
-  - packages/supervision/rust/src/portfolio.rs
-  - packages/supervision/rust/src/supervisor.rs
-  - packages/supervision/rust/src/wake.rs
-  - packages/supervision/rust/tests/portfolio.rs
-  - packages/supervision/rust/tests/wake.rs
   - changelog.d/261126-2318-plans-that-share-a-path-both-run.md
   - AGENTS.md
   - core/skills/_shared/plan-contract.md
@@ -46,11 +39,15 @@ is plan `261126-2324-changelog-fragments-and-skill-surface-regeneration`, which 
 `ready`. This plan writes the rules and docs for both halves (phase 3), so that phase waits until the sibling is
 `done`.
 
-**Why this plan is `draft`.** Its phase 2 edits `portfolio.rs`, `wake.rs` and `supervisor.rs` (and their tests),
-which the running plan `261122-0056-orchestration-skeleton` also edits; its phase 3 edits `AGENTS.md` and
-`core/skills/**`, which the running plan `261125-2041-gather-fgos-rules-to-one-owner` holds. Today's contract check
-refuses `ready` on that overlap, which is the very rule this plan removes. The constraint that both doors change
-together (L10) keeps phase 1 from going alone. How to unblock it is owner question `q-kyzictpkf6`.
+**Who carries the two doors (owner answer B to `q-kyzictpkf6`, 2026-11-26 23:40).** Phases 1 and 2 edit the
+same supervision files the running plan `261122-0056-orchestration-skeleton` (Keeper) edits, and today's contract
+check refused this plan `ready` on that overlap, the very rule it removes. The owner chose that Keeper's lead
+carries phases 1 and 2 as Keeper phases: Keeper's footprint was widened by `scripts/plan-contract-check.mjs` and
+`test/scripts/plan-contract-check.test.mjs`, and Keeper's lead runs `phase-01-contract-check-warns.md` and
+`phase-02-admission-advises-overlap.md` from this directory (both together, as one change of both doors). This plan
+keeps phase 3. It stays `draft` until Keeper's phase-1 change is on main; from then the contract check only warns,
+and a planner sets it `ready` with the remaining overlaps (Keeper's spec and skill, gather-rules' `AGENTS.md` and
+`core/skills/**`) reported as warnings.
 
 ### Facts (prior art, reused and missing)
 
@@ -118,24 +115,25 @@ together (L10) keeps phase 1 from going alone. How to unblock it is owner questi
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Contract check warns on cross-plan overlap](phase-01-contract-check-warns.md) | - | scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs | 1 | draft |
-| 2 | [Admission no longer holds on overlap](phase-02-admission-advises-overlap.md) | - | packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/portfolio.rs, packages/supervision/rust/tests/wake.rs | 1 | draft |
-| 3 | [Rules, docs and integration](phase-03-rules-docs-and-integration.md) | 1, 2 | AGENTS.md, core/skills/_shared/plan-contract.md, core/skills/fgos-supervisor/SKILL.md, docs/platform/supervision/spec.md, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/**, .fgos/instructions/effective/rules.json, changelog.d/261126-2318-plans-that-share-a-path-both-run.md, plans/261126-2318-plan-footprint-overlap-warns/reports/** | 2 | draft |
+| 1 | [Contract check warns on cross-plan overlap (carried by Keeper)](phase-01-contract-check-warns.md) | - | scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs | 1 | withdrawn |
+| 2 | [Admission no longer holds on overlap (carried by Keeper)](phase-02-admission-advises-overlap.md) | - | packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/portfolio.rs, packages/supervision/rust/tests/wake.rs | 1 | withdrawn |
+| 3 | [Rules, docs and integration](phase-03-rules-docs-and-integration.md) | - | AGENTS.md, core/skills/_shared/plan-contract.md, core/skills/fgos-supervisor/SKILL.md, docs/platform/supervision/spec.md, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/**, .fgos/instructions/effective/rules.json, changelog.d/261126-2318-plans-that-share-a-path-both-run.md, plans/261126-2318-plan-footprint-overlap-warns/reports/** | 2 | draft |
 
-Phases 1 and 2 own disjoint files and run at once; they land together as one change of both doors. Phase 3 writes
-the rules after the behaviour exists and after plan `261126-2324-changelog-fragments-and-skill-surface-regeneration`
-is `done`, so no rule lands ahead of its code. Phases 1 and 2 are `code:implement`, phase 3 is `code:implement` then
-`code:test` for the integration gate; each is reviewed (`code:review`) before it lands.
+Phases 1 and 2 are `withdrawn` here because Keeper's lead runs them (owner answer B); their phase files stay here
+as the brief, and their proofs are the acceptance criteria 1 to 3 above. Phase 3 starts only when both are on main
+and plan `261126-2324-changelog-fragments-and-skill-surface-regeneration` is `done`, so no rule lands ahead of its
+code. Phase 3 is `code:implement` then `code:test` for the integration gate, reviewed (`code:review`) before it
+lands.
 
 Checked: `node scripts/plan-contract-check.mjs --plan` on this directory passes as `draft`; at `ready` it reports the
-overlaps named above. `fgos resource-check --plan`: waves 1: 1, 2; 2: 3; no collisions.
+overlaps named above. `fgos resource-check --plan`: no collisions.
 
 ## Owner questions
 
-- `q-kyzictpkf6`: The plan that makes plan overlap a warning is itself refused by that overlap rule; how do we
-  unblock it? (B: Keeper's lead carries phases 1 and 2, recommended; A: wait for Keeper and gather-rules to finish.)
-  Under B, phases 1 and 2 move to Keeper and this plan keeps phase 3; under A, this plan goes `ready` unchanged
-  once both running plans are `done`.
+- `q-kyzictpkf6` (answered B in chat, 2026-11-26 23:40): The plan that makes plan overlap a warning is itself
+  refused by that overlap rule; how do we unblock it? Keeper's lead carries phases 1 and 2. The answer is recorded
+  in the store by the owner or the secretary (`fgos questions answer q-kyzictpkf6 --option "B. Keeper's lead
+  carries phases 1 and 2"`); a planner session may not.
 
 ## Risks and rollback
 
@@ -145,5 +143,5 @@ overlaps named above. `fgos resource-check --plan`: waves 1: 1, 2; 2: 3; no coll
 - **More land conflicts on hand-written source once plans overlap.** Measured before the block: 3 in about 70
   merges, each solved by one sync merge (discussion §3 row 3). The lead's answer to `land-conflict-aborted` stays
   rebase and land again.
-- **Rollback:** revert phase 3, then phases 1 and 2 together (reverting only one door leaves the two doors
+- **Rollback:** revert phase 3, then Keeper's commits for phases 1 and 2 together (reverting only one door leaves the two doors
   disagreeing). Reverting 2 restores `held-footprint-overlap` and its tests.
