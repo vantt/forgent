@@ -1,13 +1,13 @@
 ---
 id: ds-3in4yb5thk
 title: "Backlog-to-ready pipeline: an independent, domain-agnostic workflow that brings portfolio backlog rows to a ready plan just in time"
-status: open
+status: paused
 source:
   - p-xz3rns7o52
 created: 2026-11-26
 ---
 
-discussion: open
+discussion: paused
 
 ## Seed
 
@@ -18,6 +18,12 @@ Opened by the supervisor on the owner order of 2026-11-26 11:16, relayed by the 
 - **Open:** whether the delivery commitment can sit on a backlog row before any plan exists; how "just in time" is timed; which Work stages (`docs/platform/work-state/spec.md` #12, #21, #26) are reused versus moved.
 
 ## 1. Trạng thái hiện tại
+
+**Paused 2026-11-26 18:1x (owner tired).** Resume: `fgos session start shaper --name backlog-to-ready-pipeline`, then read this §1 and §4.
+- **Settled:** D1-D8 (§4): exit is the lifecycle table, not a planner; chaining by `kind`, existing mapping reused; stages inside an initiative, `kind` only between initiatives; ranking without a score; goals as `kind: goal` initiatives; one pull slot for goal-less rows; the stored inclusive `ceiling`; learn from history before reorganising.
+- **Settled in direction (§3 row 23):** three terms, Stage (per workflow, maps to a shared `phase`), Step (inside a stage), Status (maps to the fixed categories of decision 0027); fgOS manages no boards.
+- **Next, in order:** (1) rename to the right level (today's lifecycle `steps` are stages); (2) choose lifecycle part or guide part (D-ADR0070) as the one source of routes, after learning why the guide was added (D8); (3) put Retrospective on the stage axis (no `retrospective` phase today); (4) pull triggers and N (§3 row 4); (5) output `kind` when one item gives rise to others (§3 row 11).
+- **Pending outside:** ds-ipvis4jkpc must record that D7 replaces its D5/D6 `delivery` boolean (relayed to the supervisor as coordination-help); ds-ubqlutna6r A6(6) board definition superseded by row 23. The head's request socket was down from about 17:15; the owner landed rounds 14-18 by hand (00435bde1).
 
 Rounds 15-18 (2026-11-26 17:33-18:0x; written late because the head's request socket was down from about 17:15). Owner asked for a plainer statement of status, stage and step, corrected that stages differ per domain/workflow and steps sit inside a stage, asked whether today's workflow is 180 degrees away, and dropped board columns. Result (§3 row 23): the shape already exists in `domains/coding/workflows/feature.yaml`; the shaper's YAML redesign is withdrawn; fgOS does not manage boards and only exposes stage (+phase) and status (+category) for outside boards to map. Three gaps remain for the lifecycle table: names one level off, the same path described twice in one file, Retrospective on the wrong axis. L9 (§3 row 21) and L10 (§3 row 22) are superseded by row 23 where they differ.
 
@@ -145,6 +151,8 @@ A backlog row is where an owner request lands, and today it stays there until a 
 - 2026-11-26 17:39 — Owner: "em đi hơi quá rồi, workflow hiện tại chắc khác 180 độ hay nó đã là hình dạng giống vậy rồi?" Read `domains/coding/workflows/feature.yaml` in full; the shape exists; the YAML redesign is withdrawn (§3 row 23).
 - 2026-11-26 17:4x — Owner: drop columns; fgOS does not manage boards, a board maps itself to fgOS. Then: "workflow hiện nay không có board đúng không" — confirmed none exists.
 - 2026-11-26 17:15-18:0x — The head's request socket was refused, then missing; lands failed (`request-socket-unavailable`). The main checkout was restored to HEAD and the rounds were kept in the scratchpad; the owner landed them by hand.
+
+- 2026-11-26 18:1x — Owner: tired, pausing; asked for the resume command. Discussion set to `paused`.
 
 ## 6. Thiết kế đã chốt {#design}
 
