@@ -855,6 +855,17 @@ The existing instruction registry/composition code is the seed of this engine.
 Its current location under `src/setup/` reflects the implemented projection path,
 not the final semantic owner.
 
+Amended 2026-11-26 (phase of the engine's crate landing). The sentence above is
+settled: the registry and composer moved out of `src/setup/` into the engine's own
+crate and the Node copies are deleted. Of the subcomponents in the table, only the
+Instruction Composer stays in the Agent Context Engine, together with the rule
+store and the `when:` key registry. The Effective Decision Reducer, Reading Plan
+Compiler, Context Budgeter and Context Explainability, that is selection, budgets,
+reading plans and progressive disclosure, belong to the agent start context
+component. Packaging-distribution keeps writing host files, the projection ledger
+and block markers. Authority record: the 2026-11-26 entry in
+`docs/platform/packaging-distribution/spec.md#lịch-sử-quyết-định`.
+
 #### 4.7.3. Components and surfaces that consume these authorities
 
 | Existing component/surface | Correct responsibility |

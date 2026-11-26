@@ -36,12 +36,15 @@ Rendering is downstream. The hard contract is composition semantics: order, auth
 | Concern | Owner |
 | --- | --- |
 | Meaning of a rule or instruction | Owning platform/component/domain |
-| Composition engine and registry shape (kind order, override, conflict, rule selection and budgets) | Agent Context Engine (RUL102, `docs/platform/packaging-distribution/spec.md#lịch-sử-quyết-định`); the code still lives in `src/setup/instruction-registry.mjs` and `src/setup/instruction-composition.mjs` as the engine's seed until its first budget/tiering slice moves it |
-| Source discovery and install, render adapters, projection ledger, stale checks, projection health and repair | Packaging-distribution |
+| Rule store, composition (kind order, authority, specificity, override, refine, law protection, conflict and dependency checks) and the `when:` key registry | Agent Context Engine (`docs/platform/agent-context-engine/spec.md`; decision in `docs/platform/packaging-distribution/spec.md#lịch-sử-quyết-định`, 2026-11-26) |
+| Selecting rules for a start, budgets and reading plans | Agent start context |
+| Source discovery and install, writing host files, block markers, projection ledger, stale checks, projection health and repair | Packaging-distribution |
 | Host-specific file syntax | Host adapter |
 | Runtime execution behavior after instructions are read | Owning runtime/workflow component |
 
-Packaging-distribution does not decide whether a component's rule is wise, nor how rules compose. It discovers and installs registered instruction sources, asks the Agent Context Engine for each host's effective set, and renders, records and repairs the projections.
+Dependency order: the Agent Context Engine knows no agent and no host file; agent start context reads the engine's one checked effective set; packaging-distribution delivers what selection returns. Packaging-distribution does not decide whether a component's rule is wise, nor how rules compose, nor which rules a start receives, and it no longer holds a registry or a composer. It discovers and installs registered instruction sources, asks the engine's door for the compiled effective set, and renders, records and repairs the projections.
+
+Sections 4 to 9 below (source-of-truth rule, instruction unit, rule force, composition order, override and conflict rules, effective instruction set) are the semantics the Agent Context Engine carries over from the composer that lived in packaging-distribution; the engine now owns them, and its own spec and contracts are the place they change. Sections 10 to 12 (projection targets, doctor and fix obligations, ledger fit) stay with packaging-distribution.
 
 ## 3. Target Shape
 
