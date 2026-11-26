@@ -1,0 +1,1 @@
+- Fixed: `fgctl upgrade`, `init` and `repair` no longer refuse with `git-wal-unreadable` ("incomplete or corrupt operation scan") on a repository whose Git journal holds more than 100,000 entries; their activation gate now reads the journal with the same bound as every other door (1,000,000).

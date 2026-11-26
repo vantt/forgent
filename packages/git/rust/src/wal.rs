@@ -14,7 +14,7 @@ const MAX_RECORDS: usize = 16;
 /// How many operation directories plus compaction ledger entries one journal
 /// scan reads before it stops and reports an incomplete scan. It exists so a
 /// runaway journal still fails closed instead of being read without limit.
-pub(crate) const WAL_SCAN_BOUND: usize = 1_000_000;
+pub const WAL_SCAN_BOUND: usize = 1_000_000;
 /// Ledger entry count at which the capacity warning is raised: an early
 /// signal well below the scan bound, not the bound itself.
 const LEDGER_WARN_ENTRIES: usize = 100_000;

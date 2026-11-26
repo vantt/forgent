@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a3c74932b55b641a021ae3db2a9ad70a1706d670ba8b2df1261eed26b43749f4",
+  "payloadDigest": "4a1ec00d4115be31c29bb92c3a917d7b405bc40fec17907ee055543d15ce7f66",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "c21eb0cee94b12942586ccbe5a8fa0504d39b1380d96265e07ae12c27f987119",
@@ -420,7 +420,7 @@
     "packages/distribution/rust/src/extract.rs": "101e822a4d17774deba3585f7afd3a6718f847e6e2a392c980fa3dfd85b843a6",
     "packages/distribution/rust/src/fetch.rs": "0de7abcd5b6057fcc4632637e34c0aafcde121ebbb9dc878682b68bb9c984573",
     "packages/distribution/rust/src/fgctl_refresh.rs": "36fd15b0c6159e9b9541fbadb2ea5a05f61c9ced1364216e6cbce45170aa4c5a",
-    "packages/distribution/rust/src/git_gate.rs": "afb1b3426e71ce77c7d2483527f43a701c86a7aed073d69cf4374a84f70563f6",
+    "packages/distribution/rust/src/git_gate.rs": "e175402205c9e7efa4ef8058f9cf55bcbe84ded4fd77b685ccf1bc6cc9020d6a",
     "packages/distribution/rust/src/init.rs": "efbabc2a02a3380912b1e00cbaa8fcda47e537ffa395edee6c56a06c77e94e0a",
     "packages/distribution/rust/src/launcher.rs": "2f8aee81e01eab8ae7ae01953e8c8c032aa6320eac137aab54a6d3f822f5100c",
     "packages/distribution/rust/src/launcher.sh": "d4657c0876d13351a5fc50158e5846ce040c4dd9a089b9cc8575751fbe6b8760",
@@ -833,7 +833,7 @@
     "packages/git/rust/src/sequence.rs": "00ab99823a85eae69ed8acf06d1da968b016cb5ae40464394adf2aa78d015295",
     "packages/git/rust/src/store_admission.rs": "6211f3a0c1b53d032f74f1ebc497adbd009e7175a9750a9fcf6d59203478a9fb",
     "packages/git/rust/src/sync.rs": "da25d739b6649f27183aba7c4875457e1aedcbfbe6aac028712c6d040c73e925",
-    "packages/git/rust/src/wal.rs": "283b35a5e4931eac95bc1d57d96506a6138a7da98dccd800f97a53948fd8b7ae",
+    "packages/git/rust/src/wal.rs": "0cf45efdf01024a667e9ceeae9d42ae735adea59e04b319f9998a979eb215a94",
     "packages/git/rust/src/walk_changes.rs": "2d077c0e39807d5748c57a26f6be351d737cc43d8091f5c4ee2165e83f16cd61",
     "packages/git/rust/src/windows_fs.rs": "0be369dee01836c18fe3c601bf53ab37a68d2b682c2781c4b68fb1a337a0a7f3",
     "packages/git/rust/src/worktree.rs": "38c7594efb9f304ed5f98d1250f9dd65ced766514aaddd9f692a331ec55b9b37",
