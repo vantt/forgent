@@ -1,6 +1,6 @@
 //! compose: validate, select, place, contribute, budget, record.
 
-use crate::ports::{ContributorError, Ports, ValueType};
+use crate::ports::{ContributorError, Ports};
 use crate::request::{Refusal, RefusalCode, StartRequest};
 use std::collections::BTreeMap;
 use std::time::Duration;
@@ -95,9 +95,8 @@ fn validate(request: &StartRequest, ports: &Ports<'_>) -> Result<(), Refusal> {
         let allowed = ports.facts.allowed(key);
         let ok = match (value_type, allowed) {
             (_, Some(values)) => values.iter().any(|allowed| allowed == value),
-            (ValueType::String, None) => !value.is_empty(),
-            // An enum whose source answers no list cannot admit any value.
-            (ValueType::Enum, None) => false,
+            // A live source with no list leaves the value unchecked, as the agent context engine treats it.
+            (_, None) => !value.is_empty(),
         };
         if !ok {
             return Err(Refusal::new(

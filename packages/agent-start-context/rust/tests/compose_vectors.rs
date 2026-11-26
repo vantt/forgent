@@ -1,9 +1,10 @@
 //! compose against the golden vectors of contracts/vectors/, the agent context engine's when-keys registry and its
 //! effective-set vector, through test adapters of the four ports. Production adapters are the host's.
 
+use fgos_agent_context_engine::when_keys::ValueSource;
 use fgos_agent_start_context::{
-    compose, Contributor, ContributorError, ContributorRow, DropReason, FactRegistry, Ports,
-    RecordSink, Rule, RuleSet, StartRecord, StartRequest, ValueType,
+    compose, AceFacts, AceRules, Contributor, ContributorError, ContributorRow, DropReason, Ports,
+    RecordSink, Rule, RuleSet, StartRecord, StartRequest,
 };
 use serde_json::Value;
 use std::cell::RefCell;
@@ -15,101 +16,40 @@ fn repo() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..")
 }
 
-fn json(rel: &str) -> Value {
-    serde_json::from_str(&std::fs::read_to_string(repo().join(rel)).unwrap()).unwrap()
-}
 
-/// ACE's registry: value types and static values from when-keys.v2.json, live values from the vector.
-struct Registry {
-    types: BTreeMap<String, ValueType>,
-    values: BTreeMap<String, Vec<String>>,
-}
+/// The live values of a vector, as the host's ValueSource would answer them.
+struct Live(BTreeMap<String, Vec<String>>);
 
-impl Registry {
-    fn new(live: &Value) -> Registry {
-        let keys = json("packages/agent-context-engine/contracts/when-keys.v2.json");
-        let mut types = BTreeMap::new();
-        let mut values = BTreeMap::new();
-        for key in keys["keys"].as_array().unwrap() {
-            let name = key["key"].as_str().unwrap().to_owned();
-            let value_type = match key["valueType"].as_str().unwrap() {
-                "enum" => ValueType::Enum,
-                _ => ValueType::String,
-            };
-            types.insert(name.clone(), value_type);
-            if key["valueSource"]["type"] == "static" {
-                let list = key["valueSource"]["values"].as_array().unwrap();
-                values.insert(
-                    name,
-                    list.iter()
-                        .map(|v| v.as_str().unwrap().to_owned())
-                        .collect(),
-                );
-            }
-        }
-        for (name, list) in live.as_object().unwrap() {
-            values.insert(
-                name.clone(),
-                list.as_array()
-                    .unwrap()
-                    .iter()
-                    .map(|v| v.as_str().unwrap().to_owned())
-                    .collect(),
-            );
-        }
-        Registry { types, values }
+impl Live {
+    fn new(live: &Value) -> Live {
+        Live(
+            live.as_object()
+                .unwrap()
+                .iter()
+                .map(|(k, v)| {
+                    (
+                        k.clone(),
+                        v.as_array()
+                            .unwrap()
+                            .iter()
+                            .map(|x| x.as_str().unwrap().to_owned())
+                            .collect(),
+                    )
+                })
+                .collect(),
+        )
     }
 }
 
-impl FactRegistry for Registry {
-    fn value_type(&self, key: &str) -> Option<ValueType> {
-        self.types.get(key).copied()
-    }
-    fn allowed(&self, key: &str) -> Option<Vec<String>> {
-        self.values.get(key).cloned()
+impl ValueSource for Live {
+    fn values(&self, key: &str) -> Option<Vec<String>> {
+        self.0.get(key).cloned()
     }
 }
 
 struct Rules {
     digest: String,
     rules: Vec<Rule>,
-}
-
-impl Rules {
-    fn from_effective_set(set: &Value) -> Rules {
-        let rules = set["rules"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .map(|r| Rule {
-                id: r["id"].as_str().unwrap().to_owned(),
-                owner: r["owner"].as_str().unwrap().to_owned(),
-                kind: r["kind"].as_str().unwrap().to_owned(),
-                body: r["body"].as_str().unwrap_or_default().to_owned(),
-                when: r["when"]
-                    .as_object()
-                    .map(|m| {
-                        m.iter()
-                            .map(|(k, v)| {
-                                (
-                                    k.clone(),
-                                    v.as_array()
-                                        .unwrap()
-                                        .iter()
-                                        .map(|x| x.as_str().unwrap().to_owned())
-                                        .collect(),
-                                )
-                            })
-                            .collect()
-                    })
-                    .unwrap_or_default(),
-            })
-            .collect();
-        Rules {
-            digest: set["digest"].as_str().unwrap().to_owned(),
-            rules,
-        }
-    }
 }
 
 impl RuleSet for Rules {
@@ -157,26 +97,24 @@ fn every_golden_vector_gets_its_expected_context_or_refusal() {
     let mut ran = 0;
     for (name, vector) in vectors() {
         let expect = &vector["expect"];
-        // A rule set that does not verify is refused by the agent context engine's reader, wired in a later phase.
-        if expect["refusal"] == "start-rule-set-invalid" {
-            continue;
-        }
-        let rule_set = match &vector["ruleSet"] {
-            Value::String(rel) => json(rel),
-            inline => inline.clone(),
+        let rule_set_bytes = match &vector["ruleSet"] {
+            Value::String(rel) => std::fs::read(repo().join(rel)).unwrap(),
+            inline => serde_json::to_vec(inline).unwrap(),
         };
-        let rules = Rules::from_effective_set(&rule_set);
-        let registry = Registry::new(&vector["liveValues"]);
+        let live = Live::new(&vector["liveValues"]);
+        let facts = AceFacts::new(&live);
         let records = Records::default();
-        let ports = Ports {
-            rules: &rules,
-            facts: &registry,
-            record: &records,
-            contributors: Vec::new(),
-            budget_bytes: None,
-        };
-        let answer = StartRequest::from_json(&vector["request"])
-            .and_then(|request| compose(&request, &ports));
+        let answer = AceRules::read(&rule_set_bytes).and_then(|rules| {
+            let ports = Ports {
+                rules: &rules,
+                facts: &facts,
+                record: &records,
+                contributors: Vec::new(),
+                budget_bytes: None,
+            };
+            StartRequest::from_json(&vector["request"])
+                .and_then(|request| compose(&request, &ports))
+        });
         match expect["refusal"].as_str() {
             Some(code) => {
                 let refusal = answer.expect_err(&format!("{name}: expected the refusal {code}"));
@@ -225,7 +163,7 @@ fn every_golden_vector_gets_its_expected_context_or_refusal() {
         }
         ran += 1;
     }
-    assert!(ran >= 8, "every vector but the rule-set one ran ({ran})");
+    assert_eq!(ran, 9, "every vector ran");
 }
 
 fn rule(id: &str, kind: &str, body: &str) -> Rule {
@@ -283,7 +221,8 @@ fn blocks_come_in_rule_then_payload_then_contributor_order_and_the_budget_drops_
             rule("proc-c", "procedure", "PROCEDURE-C"),
         ],
     };
-    let registry = Registry::new(&live());
+    let live_values = Live::new(&live());
+    let registry = AceFacts::new(&live_values);
     let records = Records::default();
     let live_ctx = Fixed(Ok(Some("LIVE".into())));
     let request = head_request();
@@ -351,7 +290,8 @@ fn a_contributor_that_fails_or_times_out_is_left_out_and_recorded_and_the_start_
         digest: "d".repeat(64),
         rules: vec![rule("law-a", "law", "LAW")],
     };
-    let registry = Registry::new(&live());
+    let live_values = Live::new(&live());
+    let registry = AceFacts::new(&live_values);
     let records = Records::default();
     let broken = Fixed(Err(ContributorError::Failed("socket closed".into())));
     let slow = Fixed(Err(ContributorError::Timeout));
@@ -409,7 +349,8 @@ fn the_task_and_question_payloads_keep_the_words_a_head_receives_today() {
         digest: "d".repeat(64),
         rules: Vec::new(),
     };
-    let registry = Registry::new(&live());
+    let live_values = Live::new(&live());
+    let registry = AceFacts::new(&live_values);
     let records = Records::default();
     let ports = Ports {
         rules: &rules,

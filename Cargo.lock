@@ -591,6 +591,7 @@ dependencies = [
 name = "fgos-agent-start-context"
 version = "0.2.0"
 dependencies = [
+ "fgos-agent-context-engine",
  "serde",
  "serde_json",
 ]
