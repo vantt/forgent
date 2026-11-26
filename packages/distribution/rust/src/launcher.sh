@@ -4,7 +4,7 @@ _fgos_rec=.fgos/installation/activation.json
 _fgos_dir=$PWD
 _fgos_nearest_git=
 _fgos_using_project=
-while [ ! -f "$_fgos_dir/$_fgos_rec" ]; do
+while [ ! -f "$_fgos_dir/.fgos/installation/activation.json" ]; do
   if [ -z "$_fgos_nearest_git" ] && { [ -e "$_fgos_dir/.git" ] || [ -L "$_fgos_dir/.git" ]; }; then
     _fgos_nearest_git="$_fgos_dir/.git"
   fi
