@@ -223,6 +223,19 @@ fit the disk):
 
 `reports/start-token-table.md` has the before and after of each start.
 
+Baseline evidence (2026-11-27 06:00, fg-server): each failing file was rerun on `f68937f41`, the main of the start
+of this work, before either plan's later lands. Every failure is already there:
+- `terminal-cutover` 8 failures and `terminal-crash-matrix` 1 (herdr pane timeouts);
+- `fgctl-upgrade` 19 and `fgctl-init-download-sources` 4 (main now: 9 and 2);
+- `provider-per-cli-credential-sources` 2;
+- `guide-schema` 2;
+- the same two `fgos-run-supervisor` head-request tests.
+
+`case-close` passes on main when run alone (three runs out of three), so its failure in the full suite is a timing
+race under load. No failure is introduced by these plans. The suites are therefore green except for failures that
+predate the plans and lie outside their footprints. Each phase's own rule was to fix nothing outside its footprint,
+so they are left to their owners.
+
 ### Progress (fg-server, 2026-11-27)
 
 Started on the owner's instruction of 2026-11-27 00:0x ("hoàn tất ... 261122-1946-agent-start-context"), which is taken
