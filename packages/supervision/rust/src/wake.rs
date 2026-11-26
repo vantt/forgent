@@ -210,7 +210,11 @@ pub fn run_keeper(ports: &keeper::Ports, now: i64) -> Result<Vec<Decision>, Stri
             if matches!(d.action, Action::Start | Action::Wake) {
                 let need = records
                     .iter()
-                    .find(|r| r.record.item == d.item && r.record.step == d.step)
+                    .find(|r| {
+                        r.record.outcome.is_none()
+                            && r.record.item == d.item
+                            && r.record.step == d.step
+                    })
                     .and_then(|r| r.record.needs.as_ref())
                     .ok_or("keeper-needs-missing")?;
                 match d.action {
@@ -425,10 +429,29 @@ pub fn wake(context: &impl WakeContext, settings: &Settings, trigger: Trigger) -
         .keeper_ports()
         .map(|keeper| run_keeper(keeper, ports.clock.now()))
         .transpose();
-    let outcome = match keeper_result {
-        Ok(_) => decide(ports, settings, needs_judgement),
-        Err(code) => WakeOutcome::StartFailed(code),
-    };
+    let keeper_error = keeper_result.err();
+    if let (Some(code), Some(keeper)) = (&keeper_error, context.keeper_ports()) {
+        let failure = Decision {
+            item: "keeper".into(),
+            step: trigger.subject.into(),
+            action: Action::Raise {
+                event: "needs-judgement".into(),
+                id: format!("keeper-failed:{}:{code}", trigger.subject),
+            },
+            reason: format!("keeper-failed:{code}"),
+        };
+        let already_recorded = keeper.history.read().is_ok_and(|past| {
+            past.iter()
+                .rev()
+                .find(|d| d.item == failure.item && d.step == failure.step)
+                == Some(&failure)
+        });
+        // Even a broken raise/history port must not bypass judgement of the existing queue.
+        if !already_recorded && keeper.raise.raise(&failure, ports.clock.now()).is_ok() {
+            let _ = keeper.history.record(&failure);
+        }
+    }
+    let outcome = decide(ports, settings, needs_judgement || keeper_error.is_some());
     ports.telemetry.emit(&WakeSpan {
         name: "fgos.supervisor.wake",
         subject: trigger.subject.to_owned(),
@@ -436,7 +459,7 @@ pub fn wake(context: &impl WakeContext, settings: &Settings, trigger: Trigger) -
         outcome: outcome.as_str(),
         error: match &outcome {
             WakeOutcome::StartFailed(code) => code.clone(),
-            _ => String::new(),
+            _ => keeper_error.unwrap_or_default(),
         },
     });
     outcome

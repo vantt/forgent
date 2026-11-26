@@ -252,18 +252,32 @@ pub fn decide(records: &[Input], now: i64, past: &[Decision], caps: &Caps) -> Ve
             } else {
                 (judgement("needs-missing"), "needs-missing".into())
             };
-        decisions.push(Decision {
+        let decision = Decision {
             item: r.item.clone(),
             step: r.step.clone(),
             action,
             reason,
-        });
+        };
+        // Starts consume rounds; unchanged open holds, alarms and live-player delivery do not
+        // need another event or effect until this step's recorded decision changes.
+        if decision.action != Action::Start
+            && past
+                .iter()
+                .rev()
+                .find(|d| d.item == r.item && d.step == r.step)
+                == Some(&decision)
+        {
+            continue;
+        }
+        decisions.push(decision);
     }
     decisions
 }
 
 /// The adapter in the next phase reads registered sources and resolves needs through their doors.
 /// Called after admission, so the caps snapshot must include that wake's admissions.
+/// An adapter must report a just-started player as `Live` or `Unknown`, never `NotLive`,
+/// including while its Identity registration is still pending, to prevent duplicate starts.
 pub trait Snapshot {
     fn read(&self) -> Result<(Vec<Input>, Caps), String>;
 }
@@ -271,6 +285,7 @@ pub trait Snapshot {
 /// Full keeper history, not just unhandled queue events: handled expiry events still deduplicate,
 /// and every start attempt for an item/step still counts toward the domain's round cap.
 pub trait History {
+    /// Decisions in append order (oldest first), so the last decision per step is authoritative.
     fn read(&self) -> Result<Vec<Decision>, String>;
     fn record(&self, decision: &Decision) -> Result<(), String>;
 }

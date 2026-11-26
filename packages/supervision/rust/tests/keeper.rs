@@ -68,14 +68,41 @@ fn two_parallel_steps_of_one_item_start_independently_and_duplicate_projections_
 
 #[test]
 fn expiry_raises_once_across_three_ticks_from_history_and_never_clears_the_wait() {
-    // A queue's handled flag is not history; expiry remains deduplicated after handling.
+    // History deduplicates unchanged open decisions, including effects, not only expiry alarms.
     let record = wait(Some("1970-01-01T00:01:39Z"));
     let original = record.record.clone();
-    let mut past = Vec::new();
+    let mut missing = input("missing");
+    missing.record.needs = None;
+    let mut orphan = input("orphan");
+    orphan.item_closed = true;
+    let mut capped = input("capped");
+    capped.record.needs.as_mut().unwrap().max_rounds = Some(0);
+    let mut held = input("held");
+    held.actor = ActorState::Unknown;
+    let mut live = input("live");
+    live.actor = ActorState::Live;
+    let mut f = Fake {
+        records: vec![record.clone(), missing, orphan, capped, held, live],
+        ..Fake::default()
+    };
     for tick in 100..103 {
-        let decisions = keeper::decide(std::slice::from_ref(&record), tick, &past, &caps(10));
+        let decisions = wake::run_keeper(&f.ports(), tick).unwrap();
         if tick == 100 {
-            assert_eq!(decisions.len(), 1);
+            assert_eq!(decisions.len(), 6);
+            assert_eq!(
+                decisions
+                    .iter()
+                    .map(|d| d.reason.as_str())
+                    .collect::<Vec<_>>(),
+                [
+                    "until-expired",
+                    "needs-missing",
+                    "orphan-record",
+                    "round-cap",
+                    "identity-unknown",
+                    "actor-live"
+                ]
+            );
             assert_eq!(
                 decisions[0].action,
                 Action::Raise {
@@ -86,15 +113,34 @@ fn expiry_raises_once_across_three_ticks_from_history_and_never_clears_the_wait(
         } else {
             assert!(decisions.is_empty());
         }
-        past.extend(decisions);
     }
-    assert_eq!(record.record, original);
+    assert_eq!(f.past.borrow().len(), 6, "no repeated history appends");
+    assert_eq!(f.events.borrow().len(), 4, "no repeated raises");
+    assert_eq!(
+        f.calls
+            .borrow()
+            .iter()
+            .filter(|c| *c == "wake-player")
+            .count(),
+        1
+    );
+    assert_eq!(f.records[0].record, original);
     let changed = wait(Some("1970-01-01T00:01:40Z"));
     assert_eq!(
-        decide(&[changed], &past).len(),
+        decide(&[changed], &f.past.borrow()).len(),
         1,
         "a new deadline is a new alarm"
     );
+    // A different latest decision re-arms an open hold/wake/judgement, but expiry stays once-only.
+    let mut intervening = f.past.borrow()[4].clone();
+    intervening.reason = "resource-held".into();
+    f.past.borrow_mut().push(intervening);
+    assert_eq!(
+        wake::run_keeper(&f.ports(), 103).unwrap()[0].reason,
+        "identity-unknown"
+    );
+    f.records[4].record.outcome = Some(keeper::Outcome::Done);
+    assert!(wake::run_keeper(&f.ports(), 104).unwrap().is_empty());
 }
 
 #[test]
@@ -213,7 +259,7 @@ fn live_players_wake_without_a_start_slot_and_unknown_identity_never_means_free(
 
 #[test]
 fn record_contract_fixtures_parse_and_unknown_fields_are_refused_by_name() {
-    // Shared fixtures also run through a JSON Schema validator; this owns Rust decoder parity.
+    // These shared contract fixtures exercise the Rust decoder, not a JSON Schema validator.
     let contract: Value =
         serde_json::from_str(include_str!("../../contracts/scheduling-record.v1.json")).unwrap();
     for value in contract["examples"].as_array().unwrap() {
@@ -517,12 +563,17 @@ fn the_queue_adapter_encodes_logical_ids_stably_without_colliding_domain_keys() 
 fn the_wake_door_admits_then_runs_keeper_ports_and_only_then_considers_supervisor_judgement() {
     // One boundary proof: rules above own individual scheduling cases; here verify the composition.
     let start = input("start");
+    let mut closed = start.clone();
+    closed.record.outcome = Some(keeper::Outcome::Done);
+    closed.record.needs = None;
+    let mut duplicate = start.clone();
+    duplicate.record.needs.as_mut().unwrap().reference = "wrong-player".into();
     let mut live = input("live");
     live.actor = ActorState::Live;
     let mut judge = input("judge");
     judge.record.needs = None;
     let f = Fake {
-        records: vec![start, live, judge],
+        records: vec![closed, start, duplicate, live, judge],
         ..Fake::default()
     };
     let admission = wake::Ports {

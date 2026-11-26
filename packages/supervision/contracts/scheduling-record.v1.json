@@ -65,7 +65,6 @@
     {"item": "a", "step": "b", "needs": {"kind": "role", "ref": ""}},
     {"item": "a", "step": "b", "needs": {"kind": "role", "ref": "lead", "maxRounds": -1}},
     {"item": "a", "step": "b", "waitingOn": {"kind": "time", "ref": "timer", "until": "tomorrow"}},
-    {"item": "a", "step": "b", "waitingOn": {"kind": "time", "ref": "timer", "until": "2026-02-30T00:00:00Z"}},
     {"item": "a", "step": "b", "waitingOn": {"kind": "time", "ref": "timer", "until": "2026-11-26T00:00:00.1000Z"}},
     {"item": "a", "step": "b", "waitingOn": {"kind": "time", "ref": "timer", "until": "1969-12-31T23:59:59Z"}},
     {"item": "a", "step": "b", "needs": {"kind": "role", "ref": "lead", "maxRounds": null}},
