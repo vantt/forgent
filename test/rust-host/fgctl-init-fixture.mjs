@@ -135,6 +135,22 @@ export function useReleaseFixture() {
   });
 }
 
+/**
+ * Copies a tree as init wrote it. `fs.cpSync` gives every directory it makes the umask's default mode, so a 0700
+ * directory the Git WAL trusts comes back 0775 under umask 002 and a 0500 hooks directory loses its mode; each
+ * directory's mode is copied after the files.
+ */
+function copyTreeKeepingModes(from, to) {
+  fs.cpSync(from, to, { recursive: true, preserveTimestamps: true, verbatimSymlinks: true });
+  const walk = (src, dst) => {
+    const stat = fs.lstatSync(src);
+    if (!stat.isDirectory()) return;
+    for (const entry of fs.readdirSync(src)) walk(path.join(src, entry), path.join(dst, entry));
+    fs.chmodSync(dst, stat.mode & 0o7777);
+  };
+  walk(from, to);
+}
+
 // What a shared initialized workspace keeps a copy of.
 const savedNames = (ws) => (ws.home ? ['proj', 'state', 'home'] : ['proj', 'state']);
 
@@ -163,13 +179,13 @@ export function useInitializedWorkspace(releaseDir, { tag = 'initialized', ownHo
     const res = runFgctl(['init', '--from', releaseDir()], { cwd: ws.proj, stateHome: ws.state, env: ws.home ? { HOME: ws.home } : {} });
     assert.equal(res.status, 0, `fgctl init of the shared workspace must succeed: ${res.stderr}`);
     for (const name of savedNames(ws)) {
-      fs.cpSync(path.join(ws.root, name), path.join(saved, name), { recursive: true, preserveTimestamps: true, verbatimSymlinks: true });
+      copyTreeKeepingModes(path.join(ws.root, name), path.join(saved, name));
     }
   });
   ws.restore = () => {
     for (const name of savedNames(ws)) {
       removeStateHome(path.join(ws.root, name));
-      fs.cpSync(path.join(saved, name), path.join(ws.root, name), { recursive: true, preserveTimestamps: true, verbatimSymlinks: true });
+      copyTreeKeepingModes(path.join(saved, name), path.join(ws.root, name));
     }
     return ws;
   };
