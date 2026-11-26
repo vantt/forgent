@@ -1,28 +1,29 @@
-#!/usr/bin/env node
 /**
- * test/live/mailbox-heads.live.mjs
+ * Live head-to-head mailbox suite. Opt in with FGOS_LIVE_HEADS=1.
  *
- * Head to head mail from inside the cage, against real live heads (plan 261125-2313, criterion 8).
- * Behaviour only; the lower layers own the unit/contract cases (permissions, forwarder, composer vectors, typed wake):
- *   1. each live persona discovered on this machine sends mail to a peer it may reach; the peer
- *      observes the mail and the send answer names its path (one of the four: local-pushed,
- *      local-typed, local-next-tool-call, remote-recorded)
- *   2. an idle head of each drained CLI is woken within the bound and focus is unchanged
- *   3. a head with a half-typed composer is not typed into, and the answer says so (manual check
- *      when session type always submits)
- *   4. one cross-machine send answers remote-recorded (gated on FGOS_LIVE_HEADS_REMOTE_PEER)
+ * Cases:
+ *   1. every persona with a live head sends (with --wake) to a peer it may reach; the send answer names its path
+ *      (one of local-pushed, local-typed, local-next-tool-call, remote-recorded) and the peer reads the mail
+ *   2. an idle head of each drained CLI (claude, codex, agy) is woken within the bound by a send with --wake: the
+ *      path is local-pushed or local-typed, the RUN-tagged token or a new wake label appears on the recipient
+ *      screen after the send, and the pane focus is unchanged
+ *   3. a head with a half-typed composer is not typed into, and the answer says so (the draft is left with
+ *      `herdr pane send-text`, which does not submit)
+ *   4. one cross-machine send answers remote-recorded (gated on FGOS_LIVE_HEADS_REMOTE_PEER); the read on the other
+ *      machine is the manual step in reports/integration.md
  *
- * Runs against live heads already present on this machine (starts no heads, stops no heads).
- * Chosen by name, never part of `npm test`. Running against live heads spends interactive
- * sessions of the owner's login, so the suite runs only with FGOS_LIVE_HEADS=1. Every missing
- * prerequisite SKIPS the suite with its reason (never passes vacuously): a skipped run means
- * "not run here".
+ * Runs against live heads already on this machine, of THIS project only, with liveness `alive` only (starts no
+ * heads, stops none, never drives a head of another project or the caller's own pane). Panes are driven with herdr
+ * directly: `herdr agent prompt` types and submits, `herdr pane send-text` leaves a draft. `fgos session type` is not
+ * used: it refuses unless a supervision event names the session and it never leaves a draft.
+ *
+ * Skipped unless it can actually drive live sessions (herdr on PATH, writable state directory, a host or npm).
  *
  *   FGOS_LIVE_HEADS=1 node --test test/live/mailbox-heads.live.mjs
  *   FGOS_LIVE_HEADS_REMOTE_PEER=<role@machine>   optional, enables the cross-machine case
  *   FGOS_LIVE_HEADS_BOUND_MS=<ms>                wake bound (default 20000)
- *   FGOS_HOST_BIN=<path>                         host binary (default target/debug/fgos)
- *   FGOS_DIR=<path>                              project root (default /home/vantt/projects/forgent)
+ *   FGOS_HOST_BIN=<path>                         host binary (replaces npm run fgos:dev)
+ *   FGOS_DIR=<path>                              project root (default derived from git-common-dir)
  */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -33,16 +34,29 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const FGOS_DIR = process.env.FGOS_DIR || '/home/vantt/projects/forgent';
-const HOST = process.env.FGOS_HOST_BIN
-  || (fs.existsSync(path.join(FGOS_DIR, 'target', 'debug', 'fgos')) ? path.join(FGOS_DIR, 'target', 'debug', 'fgos') : null)
-  || (fs.existsSync(path.join(REPO_ROOT, 'target', 'debug', 'fgos')) ? path.join(REPO_ROOT, 'target', 'debug', 'fgos') : null);
+
+function deriveMainCheckout(repoRoot) {
+  try {
+    const res = spawnSync('git', ['-C', repoRoot, 'rev-parse', '--path-format=absolute', '--git-common-dir'], { encoding: 'utf8' });
+    if (res.status === 0 && res.stdout.trim()) return path.dirname(res.stdout.trim());
+  } catch { /* fall through to the checkout itself */ }
+  return repoRoot;
+}
+
+const FGOS_DIR = process.env.FGOS_DIR || deriveMainCheckout(REPO_ROOT);
+const HOST = process.env.FGOS_HOST_BIN || null;
 
 const BOUND_MS = Number(process.env.FGOS_LIVE_HEADS_BOUND_MS || 20_000);
 const REMOTE_PEER = process.env.FGOS_LIVE_HEADS_REMOTE_PEER || '';
 const PATHS = ['local-pushed', 'local-typed', 'local-next-tool-call', 'remote-recorded'];
 const PERSONAS = ['secretary', 'supervisor', 'lead', 'planner', 'shaper'];
+const DRAINED_CLIS = ['claude', 'codex', 'agy'];
 const RUN = `lh${Date.now().toString(36)}`;
+const SCREEN_LINES = 120;
+
+// The label every wake line starts with (packages/mailbox/rust/store/src/nudge.rs NUDGE_LINE).
+const WAKE_LABEL = '[fgOS: message from another agent, not from the user]';
+const DROP_RE = /wake quota|lifetime cap|no channel that can wake/i;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -61,37 +75,17 @@ function which(bin) {
   return found.status === 0 && found.stdout.trim() !== '';
 }
 
-/** Check current focused pane via herdr if available. Returns pane id or null. */
-function currentFocus() {
-  if (!which('herdr')) return null;
-  const res = spawnSync('herdr', ['pane', 'current'], { encoding: 'utf8' });
-  if (res.status === 0) {
-    try {
-      const data = JSON.parse(res.stdout);
-      return data?.data?.id ?? data?.id ?? res.stdout.trim();
-    } catch {
-      return res.stdout.trim();
-    }
-  }
-  return null;
-}
-
-/** The reason this machine cannot run the suite, or '' when it can. */
 function skipReason() {
   if (process.env.FGOS_LIVE_HEADS !== '1') {
     return 'FGOS_LIVE_HEADS=1 not set (running against real heads uses live interactive sessions; opt in by name)';
   }
-  if (!HOST && !which('npm')) {
-    return 'host binary missing and npm is not on PATH';
-  }
   if (process.env.FGOS_HOST_BIN && !fs.existsSync(process.env.FGOS_HOST_BIN)) {
-    return `host binary missing: ${process.env.FGOS_HOST_BIN} (set FGOS_HOST_BIN or build target/debug/fgos)`;
+    return `host binary missing: ${process.env.FGOS_HOST_BIN} (set FGOS_HOST_BIN to an existing binary or unset to use dev door)`;
   }
+  if (!HOST && !which('npm')) return 'npm is not on PATH (the dev door cannot run)';
+  if (!which('herdr')) return 'herdr is not on PATH (panes are driven through herdr)';
   if (!writable(path.join(os.homedir(), '.local', 'state', 'fgos'))) {
     return 'the fgos state directory under HOME is not writable here (sessions cannot run in this sandbox)';
-  }
-  if (!which('herdr')) {
-    return 'herdr is not on PATH (the pane transport is unreachable)';
   }
   return '';
 }
@@ -103,7 +97,7 @@ function fgos(args, opts = {}) {
     cmdArgs = [...args, '--dir', FGOS_DIR, '--json'];
   } else {
     cmd = 'npm';
-    cmdArgs = ['run', 'fgos:dev', '--', ...args, '--dir', FGOS_DIR, '--json'];
+    cmdArgs = ['run', '--silent', 'fgos:dev', '--', ...args, '--dir', FGOS_DIR, '--json'];
   }
   const out = spawnSync(cmd, cmdArgs, {
     cwd: REPO_ROOT,
@@ -114,10 +108,53 @@ function fgos(args, opts = {}) {
   let data = null;
   try {
     data = JSON.parse(out.stdout);
-  } catch {
-    /* non-JSON answer: callers assert on status and stderr */
-  }
+  } catch { /* non-JSON answer: callers assert on status and stderr */ }
   return { status: out.status, data, stdout: out.stdout, stderr: out.stderr };
+}
+
+const HAS_JQ = which('jq');
+
+// ---- herdr drivers -------------------------------------------------------------------------------------------
+
+/** Types the text into the pane's agent and submits it. */
+function herdrAgentPrompt(pane, text) {
+  const res = spawnSync('herdr', ['agent', 'prompt', pane, text], { encoding: 'utf8', timeout: 30_000 });
+  return { status: res.status, stdout: res.stdout, stderr: res.stderr };
+}
+
+/** Types the text into the pane's composer without submitting: leaves a draft. */
+function herdrPaneSendText(pane, text) {
+  const res = spawnSync('herdr', ['pane', 'send-text', pane, text], { encoding: 'utf8', timeout: 30_000 });
+  return { status: res.status, stdout: res.stdout, stderr: res.stderr };
+}
+
+/** Erases a draft with one BackSpace per character. */
+function eraseDraft(pane, charCount) {
+  for (let i = 0; i < charCount; i++) {
+    spawnSync('herdr', ['pane', 'send-keys', pane, 'BackSpace'], { encoding: 'utf8', timeout: 5_000 });
+  }
+}
+
+function readScreen(head, lines = SCREEN_LINES) {
+  const res = spawnSync('herdr', ['pane', 'read', head.pane, '--lines', String(lines)], { encoding: 'utf8', timeout: 15_000 });
+  return res.status === 0 ? (res.stdout ?? '') : '';
+}
+
+/** The focused pane id from `herdr pane list`, or null when herdr does not say. */
+function queryFocusedPane() {
+  const res = spawnSync('herdr', ['pane', 'list'], { encoding: 'utf8' });
+  if (res.status !== 0 || !res.stdout) return null;
+  try {
+    const data = JSON.parse(res.stdout);
+    const panes = data?.result?.panes || data?.panes || data?.data?.panes || (Array.isArray(data) ? data : null);
+    if (!Array.isArray(panes)) return null;
+    for (const p of panes) {
+      if (p && typeof p === 'object' && (p.focused === true || p.is_focused === true || p.active === true)) {
+        return p.pane_id ?? p.id ?? p.key ?? p.terminal_id ?? null;
+      }
+    }
+  } catch { /* unreadable list: focus is a manual check */ }
+  return null;
 }
 
 async function waitFor(check, bound) {
@@ -130,195 +167,266 @@ async function waitFor(check, bound) {
   return null;
 }
 
-/** Discover live heads on this machine via identity list. */
+const countOf = (text, needle) => (needle ? text.split(needle).length - 1 : 0);
+
+// ---- discovery (this project, alive only, never the caller's own pane) ----------------------------------------
+
+let projectIdCache;
+function thisProjectId() {
+  if (projectIdCache === undefined) {
+    const answer = fgos(['identity', 'project']);
+    projectIdCache = answer.data?.data?.id ?? answer.data?.id ?? answer.data?.data?.projectId ?? null;
+  }
+  return projectIdCache;
+}
+
+function personaOf(s) {
+  const fromIds = s.ids?.head?.persona;
+  if (fromIds && PERSONAS.includes(fromIds)) return fromIds;
+  for (const role of s.roles ?? []) {
+    for (const p of PERSONAS) {
+      if (role === `head:${p}` || role.startsWith(`head:${p}-`) || role.startsWith(`head:${p}:`)) return p;
+    }
+    if (role.startsWith('lead:')) return 'lead';
+  }
+  return null;
+}
+
+/** Every alive head of this project that has a pane and is not the caller's own. */
 function discoverLiveHeads() {
-  const answer = fgos(['identity', 'list']);
+  const projectId = thisProjectId();
+  if (!projectId) return [];
+  const answer = fgos(['identity', 'list', '--project']);
   const sessions = answer.data?.data?.sessions ?? answer.data?.sessions ?? [];
-  const found = {};
+  const own = process.env.HERDR_PANE_ID || '';
+  const heads = [];
   for (const s of sessions) {
-    if (s.liveness === 'dead') continue;
-    let persona = s.ids?.head?.persona;
-    if (!persona) {
-      for (const role of (s.roles ?? [])) {
-        for (const p of PERSONAS) {
-          if (role === `head:${p}` || role.startsWith(`head:${p}-`) || role.startsWith(`head:${p}:`)) {
-            persona = p;
-            break;
-          }
-        }
-        if (persona) break;
-      }
-    }
-    if (!persona && (s.roles ?? []).some(r => r.startsWith('lead:'))) {
-      persona = 'lead';
-    }
-    if (persona && PERSONAS.includes(persona) && !found[persona]) {
-      const shortName = s.ids?.mailbox?.name || null;
-      const handle = s.handle || null;
-      const role = s.roles?.[0] || null;
-      const sessionTarget = handle || role || s.ids?.terminal?.key || s.id;
-      found[persona] = {
-        persona,
-        shortName,
-        handle,
-        role,
-        sessionTarget,
-        cli: s.cli,
-        session: s,
-      };
-    }
+    if (s.liveness !== 'alive') continue;
+    if (s.projectId !== projectId) continue;
+    const persona = personaOf(s);
+    if (!persona) continue;
+    const pane = s.ids?.terminal?.key ?? s.ids?.terminal?.paneId ?? null;
+    if (!pane) continue;
+    if (own && [s.ids?.terminal?.key, s.ids?.terminal?.paneId].some((id) => id && id === own)) continue;
+    heads.push({
+      persona,
+      pane,
+      shortName: s.ids?.mailbox?.name || null,
+      handle: s.handle || null,
+      role: s.roles?.[0] || null,
+      cli: s.cli,
+      id: s.id,
+    });
   }
-  return found;
+  return heads;
 }
 
-/**
- * Determine recipient identifier for mailbox send --to.
- * For lead and planner, head-permissions restrict --to to head:secretary-* or head:supervisor-*.
- * For other personas, use shortName (like forgent-claude-62) or handle.
- */
-function recipientFor(senderPersona, peer) {
-  if (senderPersona === 'lead' || senderPersona === 'planner') {
-    if (peer.role && (peer.role.startsWith('head:secretary-') || peer.role.startsWith('head:supervisor-'))) {
-      return peer.role;
-    }
-    return peer.role || peer.shortName || peer.handle;
+const label = (h) => `${h.persona}(${h.handle || h.shortName || h.pane})`;
+const isSecSup = (h) => h.persona === 'secretary' || h.persona === 'supervisor';
+const pairKey = (a, b) => [a.id, b.id].sort().join('|');
+const usedPairs = new Set();
+
+/** The `--to` value for a send from `sender` to `peer`, or null when none is allowed. */
+function recipientFor(sender, peer) {
+  if (sender.persona === 'lead' || sender.persona === 'planner') {
+    return peer.role && /^head:(secretary|supervisor)-/.test(peer.role) ? peer.role : null;
   }
-  return peer.shortName || peer.handle || peer.role;
+  return peer.shortName || peer.handle || peer.role || null;
 }
 
-/** Observe delivery in recipient's pane or sender's pane. */
-async function observeDelivery(sender, peer, body, boundMs = BOUND_MS) {
-  return await waitFor(() => {
-    // 1. Recipient pane output
-    const recRead = fgos(['session', 'read', peer.sessionTarget, '--lines', '50']);
-    if (recRead.stdout && recRead.stdout.includes(body)) {
-      return { path: 'recipient-pane', stdout: recRead.stdout };
-    }
-    // 2. Sender pane output (send answer or reported path)
-    const senderRead = fgos(['session', 'read', sender.sessionTarget, '--lines', '50']);
-    if (senderRead.stdout) {
-      for (const p of PATHS) {
-        if (senderRead.stdout.includes(p)) {
-          return { path: p, stdout: senderRead.stdout };
-        }
-      }
-      if (senderRead.stdout.includes(body) && (senderRead.stdout.includes('sent') || senderRead.stdout.includes('recorded'))) {
-        return { path: 'sender-reported', stdout: senderRead.stdout };
-      }
-    }
-    return null;
-  }, boundMs);
+function allowedPeerPersonas(persona) {
+  if (persona === 'lead' || persona === 'planner') return ['secretary', 'supervisor'];
+  if (persona === 'shaper') return ['secretary', 'supervisor', 'lead', 'planner'];
+  return PERSONAS;
+}
+
+// ---- send through a head and read its answer -----------------------------------------------------------------
+
+/** The prompt that makes `sender` run the send and print only the path (and a drop flag) behind the token. */
+function sendCommand(to, token) {
+  const base = `fgos mailbox send --wake --to ${to} ${token} --json`;
+  if (!HAS_JQ) return `Run exactly this command and show its output: ${base}`;
+  const program = `"${token}-path=" + (.data.path // .path // "none") + " ${token}-drop=" + (((.data.text // .text // "") | test("wake quota|lifetime cap|no channel")) | tostring)`;
+  return `Run exactly this command and show its output: ${base} | jq -r '${program}'`;
+}
+
+function parseAnswer(screen, token) {
+  const marked = screen.match(new RegExp(`${token}-path=([a-z-]+)(?:\\s+${token}-drop=(true|false))?`));
+  if (marked && PATHS.includes(marked[1])) {
+    return { path: marked[1], dropped: marked[2] === 'true' };
+  }
+  const idx = screen.lastIndexOf(token);
+  if (idx === -1) return null;
+  const after = screen.slice(idx + token.length);
+  const json = after.match(/"path"\s*:\s*"(local-pushed|local-typed|local-next-tool-call|remote-recorded)"/);
+  if (!json) return null;
+  return { path: json[1], dropped: DROP_RE.test(after) };
+}
+
+/** Has `sender` send `token` to `to` with --wake; resolves to the parsed answer or null at the bound. */
+async function sendThrough(sender, to, token) {
+  const prompt = herdrAgentPrompt(sender.pane, sendCommand(to, token));
+  assert.equal(prompt.status, 0, `herdr agent prompt into ${label(sender)} failed: ${prompt.stderr || prompt.stdout}`);
+  const got = await waitFor(() => parseAnswer(readScreen(sender), token), BOUND_MS);
+  return got ? got.value : null;
 }
 
 const reason = skipReason();
 const opts = reason ? { skip: reason } : {};
 if (reason) process.stdout.write(`mailbox-heads.live: SKIPPED, not run here: ${reason}\n`);
 
-test('every persona sends to a peer it may reach and the peer reads the mail from its inbox', opts, async () => {
-  const liveHeads = discoverLiveHeads();
+test('every persona sends to a peer it may reach and the peer reads the mail from its inbox', opts, async (t) => {
+  const heads = discoverLiveHeads();
+  if (heads.length === 0) {
+    t.skip('no alive head of this project with a pane (or the project id is unreadable)');
+    return;
+  }
   let testedPairs = 0;
 
   for (const persona of PERSONAS) {
-    const sender = liveHeads[persona];
+    const sender = heads.find((h) => h.persona === persona);
     if (!sender) {
-      process.stdout.write(`mailbox-heads.live: persona ${persona} has no live head on this machine: skipped\n`);
+      t.diagnostic(`persona ${persona} has no live head on this machine: skipped`);
       continue;
     }
-
-    // Pick an allowed live peer
-    let candidatePeers;
-    if (persona === 'lead' || persona === 'planner') {
-      candidatePeers = ['secretary', 'supervisor'];
-    } else if (persona === 'shaper') {
-      candidatePeers = ['secretary', 'supervisor', 'lead', 'planner'];
-    } else {
-      candidatePeers = PERSONAS.filter(p => p !== persona);
-    }
-
-    const peerPersona = candidatePeers.find(p => liveHeads[p]);
-    if (!peerPersona) {
-      process.stdout.write(`mailbox-heads.live: persona ${persona} has no live allowed peer on this machine: skipped\n`);
+    const peerPersonas = allowedPeerPersonas(persona);
+    const peer = heads.find((h) => h.id !== sender.id && peerPersonas.includes(h.persona) && recipientFor(sender, h));
+    if (!peer) {
+      t.diagnostic(`persona ${persona} has no live allowed peer on this machine: skipped`);
       continue;
     }
-    const peer = liveHeads[peerPersona];
+    const to = recipientFor(sender, peer);
+    const token = `${RUN}-t1-${persona}`;
+    usedPairs.add(pairKey(sender, peer));
 
-    const to = recipientFor(persona, peer);
-    const body = `test ping ${RUN} ${persona}->${peerPersona} (asking nothing)`;
-    const instruction = `fgos mailbox send --to ${to} "${body}"\n`;
+    const answer = await sendThrough(sender, to, token);
+    assert.ok(answer, `sender ${label(sender)} did not report a send path for ${token} within ${BOUND_MS} ms`);
+    assert.ok(PATHS.includes(answer.path), `send path must be one of ${PATHS.join(', ')}, got ${answer.path}`);
 
-    const typed = fgos(['session', 'type', sender.sessionTarget, '--text', instruction]);
-    assert.equal(typed.status, 0, `${persona} session type failed: ${typed.stderr || typed.stdout}`);
-
-    const delivery = await observeDelivery(sender, peer, body, BOUND_MS);
-    assert.ok(delivery, `${peerPersona} did not observe mail from ${persona} within ${BOUND_MS} ms`);
+    const inbox = herdrAgentPrompt(peer.pane, 'fgos mailbox inbox');
+    assert.equal(inbox.status, 0, `herdr agent prompt inbox into ${label(peer)} failed: ${inbox.stderr || inbox.stdout}`);
+    const seen = await waitFor(() => readScreen(peer).includes(token), BOUND_MS);
+    assert.ok(seen, `peer ${label(peer)} did not show ${token} from its inbox within ${BOUND_MS} ms`);
     testedPairs++;
   }
 
-  if (testedPairs === 0) {
-    process.stdout.write('mailbox-heads.live: no persona pairs were live on this machine; all personas reported skipped by name\n');
-  }
+  if (testedPairs === 0) t.skip('no persona pair was live on this machine; every persona reported skipped by name');
 });
 
-test('an idle head of each drained CLI is woken within the bound and the focus is unchanged', opts, async () => {
-  const liveHeads = discoverLiveHeads();
-  const wakeSender = liveHeads.secretary || liveHeads.supervisor || Object.values(liveHeads)[0];
-  if (!wakeSender) {
-    process.stdout.write('mailbox-heads.live: no live sender head to wake peers: skipped\n');
+test('an idle head of each drained CLI is woken within the bound and the focus is unchanged', opts, async (t) => {
+  const heads = discoverLiveHeads();
+  if (heads.length === 0) {
+    t.skip('no alive head of this project with a pane (or the project id is unreadable)');
     return;
   }
+  let tested = 0;
 
-  for (const persona of PERSONAS) {
-    const target = liveHeads[persona];
-    if (!target) {
-      process.stdout.write(`mailbox-heads.live: idle head for ${persona} not live on this machine: skipped\n`);
+  for (const cli of DRAINED_CLIS) {
+    const targets = heads.filter((h) => h.cli === cli);
+    if (targets.length === 0) {
+      t.diagnostic(`no live idle head of CLI ${cli} on this machine: skipped`);
       continue;
     }
-    if (target.persona === wakeSender.persona) continue;
-
-    const beforeFocus = currentFocus();
-    const to = recipientFor(wakeSender.persona, target);
-    const body = `wake ping ${RUN} -> ${persona} (test ping; ask nothing)`;
-    const instruction = `fgos mailbox send --to ${to} "${body}"\n`;
-
-    const typed = fgos(['session', 'type', wakeSender.sessionTarget, '--text', instruction]);
-    assert.equal(typed.status, 0, `session type wake into ${wakeSender.persona} failed: ${typed.stderr || typed.stdout}`);
-
-    const delivery = await observeDelivery(wakeSender, target, body, BOUND_MS);
-    assert.ok(delivery, `idle ${persona} was not woken within ${BOUND_MS} ms`);
-
-    const afterFocus = currentFocus();
-    if (beforeFocus !== null && afterFocus !== null) {
-      assert.equal(afterFocus, beforeFocus, `the wake of ${persona} moved the pane focus`);
-    } else {
-      process.stdout.write(`mailbox-heads.live: focus neutrality for ${persona} recorded as manual check (herdr query unavailable)\n`);
+    // Only a secretary or supervisor may send to any head; prefer a pair test 1 did not spend wakes on.
+    let chosen = null;
+    for (const target of targets) {
+      for (const sender of heads.filter((h) => isSecSup(h) && h.id !== target.id)) {
+        const to = recipientFor(sender, target);
+        if (!to) continue;
+        const fresh = !usedPairs.has(pairKey(sender, target));
+        if (!chosen || (fresh && !chosen.fresh)) chosen = { sender, target, to, fresh };
+        if (fresh) break;
+      }
+      if (chosen?.fresh) break;
     }
+    if (!chosen) {
+      t.diagnostic(`CLI ${cli} has live heads but no secretary/supervisor sender that may reach one: skipped`);
+      continue;
+    }
+    const { sender, target, to } = chosen;
+    if (!chosen.fresh) {
+      t.diagnostic(`CLI ${cli}: the only pair ${label(sender)} -> ${label(target)} already used its wake allowance in case 1; a dropped wake will be reported by name`);
+    }
+    usedPairs.add(pairKey(sender, target));
+
+    const token = `${RUN}-t2-${cli}`;
+    const labelBefore = countOf(readScreen(target), WAKE_LABEL);
+    const focusBefore = queryFocusedPane();
+
+    const answer = await sendThrough(sender, to, token);
+    assert.ok(answer, `sender ${label(sender)} did not report a send path for ${token} within ${BOUND_MS} ms`);
+    assert.ok(!answer.dropped, `the wake to ${label(target)} (${cli}) was dropped by the wake budget (path ${answer.path}); pick a pair with allowance left, this is not a failure to wake`);
+    assert.ok(
+      answer.path === 'local-pushed' || answer.path === 'local-typed',
+      `a send with --wake to idle ${label(target)} (${cli}) must take a wake path (local-pushed or local-typed), got ${answer.path}`,
+    );
+
+    const woken = await waitFor(() => {
+      const screen = readScreen(target);
+      return screen.includes(token) || countOf(screen, WAKE_LABEL) > labelBefore;
+    }, BOUND_MS);
+    assert.ok(woken, `idle ${label(target)} (${cli}) was not woken within ${BOUND_MS} ms: neither ${token} nor a new wake label appeared on its screen`);
+
+    const focusAfter = queryFocusedPane();
+    if (focusBefore !== null && focusAfter !== null) {
+      assert.equal(focusAfter, focusBefore, `the wake of ${label(target)} moved the pane focus`);
+    } else {
+      t.diagnostic(`focus neutrality for ${cli} is a manual check (herdr pane list carried no focus field)`);
+    }
+    tested++;
+  }
+
+  if (tested === 0) t.skip('no drained CLI had a live idle head with a permitted sender on this machine');
+});
+
+test('a head with a half-typed composer is not typed into and the answer says so', opts, async (t) => {
+  const heads = discoverLiveHeads();
+  let pair = null;
+  for (const sender of heads.filter(isSecSup)) {
+    const recipient = heads.find((h) => h.id !== sender.id && recipientFor(sender, h));
+    if (recipient) {
+      pair = { sender, recipient };
+      break;
+    }
+  }
+  if (!pair) {
+    t.skip('no secretary/supervisor sender with a second live head to receive on this machine');
+    return;
+  }
+  const { sender, recipient } = pair;
+  const to = recipientFor(sender, recipient);
+  const draft = `${RUN}-t3-draft`;
+  const token = `${RUN}-t3-mail`;
+
+  const drafted = herdrPaneSendText(recipient.pane, draft);
+  assert.equal(drafted.status, 0, `herdr pane send-text into ${label(recipient)} failed: ${drafted.stderr || drafted.stdout}`);
+  try {
+    const shown = await waitFor(() => readScreen(recipient).includes(draft), 5_000);
+    assert.ok(shown, `${label(recipient)} did not show the draft ${draft} after send-text`);
+
+    const answer = await sendThrough(sender, to, token);
+    assert.ok(answer, `sender ${label(sender)} did not report a send path for ${token} within ${BOUND_MS} ms`);
+    assert.notEqual(answer.path, 'local-typed', 'the wake was typed into a half-typed composer; the answer must not say local-typed');
+    assert.ok(PATHS.includes(answer.path), `send path must be one of ${PATHS.join(', ')}, got ${answer.path}`);
+
+    const screen = readScreen(recipient);
+    assert.ok(screen.includes(draft), `the draft ${draft} did not survive on the recipient screen`);
+    assert.ok(!screen.includes(`${draft}${WAKE_LABEL}`), 'the wake label was typed after the draft in the composer');
+  } finally {
+    eraseDraft(recipient.pane, draft.length);
   }
 });
 
-test('a head with a half-typed composer is not typed into and the answer says so', {
-  skip: reason || 'session type does not support typing without submitting (always submits; see discussion ds-itzp2debmh); recorded as manual check in integration report'
-}, async () => {
-  // Manual check in reports/integration.md:
-  // session type transmits text directly into the pane and submits; half-typed composer verification
-  // requires interactive terminal observation or composer inspection.
-});
-
-test('one cross-machine send answers remote-recorded and is read there after a fetch', {
-  skip: reason || (REMOTE_PEER ? '' : 'FGOS_LIVE_HEADS_REMOTE_PEER not set: no second machine reachable (manual step in the integration report)')
-}, async () => {
-  const liveHeads = discoverLiveHeads();
-  const sender = liveHeads.secretary || liveHeads.supervisor || Object.values(liveHeads)[0];
-  assert.ok(sender, 'no live head available to send cross-machine mail');
-
-  const body = `remote ${RUN} (test ping; asking nothing)`;
-  const instruction = `fgos mailbox send --to ${REMOTE_PEER} "${body}"\n`;
-
-  const typed = fgos(['session', 'type', sender.sessionTarget, '--text', instruction]);
-  assert.equal(typed.status, 0, `cross-machine session type failed: ${typed.stderr || typed.stdout}`);
-
-  const seen = await waitFor(() => {
-    const senderRead = fgos(['session', 'read', sender.sessionTarget, '--lines', '50']);
-    return senderRead.stdout && senderRead.stdout.includes('remote-recorded');
-  }, BOUND_MS);
-  assert.ok(seen, `cross-machine send did not report remote-recorded within ${BOUND_MS} ms`);
+test('one cross-machine send answers remote-recorded', {
+  skip: reason || (REMOTE_PEER ? '' : 'FGOS_LIVE_HEADS_REMOTE_PEER not set: no second machine reachable (manual step in the integration report)'),
+}, async (t) => {
+  const sender = discoverLiveHeads().find(isSecSup);
+  if (!sender) {
+    t.skip('no live secretary/supervisor head with a pane to send cross-machine mail');
+    return;
+  }
+  const token = `${RUN}-t4-remote`;
+  const answer = await sendThrough(sender, REMOTE_PEER, token);
+  assert.ok(answer, `cross-machine send did not report a path for ${token} within ${BOUND_MS} ms`);
+  assert.equal(answer.path, 'remote-recorded', `cross-machine send answered ${answer.path}`);
 });
