@@ -475,11 +475,7 @@ fn an_unreadable_or_invalid_closed_file_is_no_signal() {
 
 #[test]
 fn a_live_pane_with_a_dead_supervisor_reads_supervisor_gone_with_the_placement_instant() {
-    let records = head_records_facts(
-        FakeOwners::with_supervisor(Liveness::Live, false),
-        "",
-        None,
-    );
+    let records = head_records_facts(FakeOwners::with_supervisor(Liveness::Live, false), "", None);
     assert_eq!(records.len(), 1);
     assert_eq!(records[0].subject.id, "head:planner-x");
     assert_eq!(
@@ -494,11 +490,7 @@ fn a_live_pane_with_a_dead_supervisor_reads_supervisor_gone_with_the_placement_i
 
 #[test]
 fn a_live_pane_with_a_live_supervisor_reads_live() {
-    let records = head_records_facts(
-        FakeOwners::with_supervisor(Liveness::Live, true),
-        "",
-        None,
-    );
+    let records = head_records_facts(FakeOwners::with_supervisor(Liveness::Live, true), "", None);
     assert_eq!(records.len(), 1);
     assert_eq!(attr(&records[0], "fgos.head.state"), Some("live"));
     assert_ne!(records[0].ts, "2026-11-18T06:58:44.815Z");
