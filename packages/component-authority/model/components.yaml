@@ -1954,3 +1954,31 @@
     - packages/agent-context-engine/contracts/
     - packages/agent-context-engine/rust/
   status: designed
+- id: agent-start-context
+  canonical: agent-start-context
+  aliases:
+    - ngữ cảnh khởi động agent
+    - start-context
+    - start-text composer
+  meaning: "The one composer of the text every fgOS-started agent receives: it fills start facts from live data, selects the agent context engine's rules by when:, places payloads and contributor blocks, applies the delivery budget and writes one record per start."
+  layer: infra
+  tier: 3
+  paths:
+    - packages/agent-start-context/
+    - docs/platform/agent-start-context/
+  exceptions: []
+  owns:
+    - selection of rules for a start
+    - start facts and their live values
+    - payload and contributor placement
+    - per-delivery byte budget
+    - the per-start record
+  mustNotOwn:
+    - "rule storage and the when: key registry"
+    - spawning a session or delivering text to it
+    - writing host files and the projection ledger
+  spec: docs/platform/agent-start-context/spec.md
+  source:
+    - packages/agent-start-context/contracts/
+    - packages/agent-start-context/rust/
+  status: designed

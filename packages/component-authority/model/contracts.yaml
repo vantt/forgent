@@ -1799,3 +1799,47 @@
   path: packages/agent-context-engine/contracts/refusals.v1.json
   evidence: []
   status: live
+- id: agent-start-context/start-request.v1
+  canonical: agent-start-context/start-request.v1
+  aliases: []
+  meaning: Machine-readable contract file start-request.v1.json owned under packages/agent-start-context/contracts/.
+  provider: agent-start-context
+  consumers:
+    - host-surface
+    - packaging-distribution
+    - session-host
+  path: packages/agent-start-context/contracts/start-request.v1.json
+  evidence: []
+  status: live
+- id: agent-start-context/start-context.v1
+  canonical: agent-start-context/start-context.v1
+  aliases: []
+  meaning: Machine-readable contract file start-context.v1.json owned under packages/agent-start-context/contracts/.
+  provider: agent-start-context
+  consumers:
+    - host-surface
+    - packaging-distribution
+    - session-host
+  path: packages/agent-start-context/contracts/start-context.v1.json
+  evidence: []
+  status: live
+- id: agent-start-context/start-contributors.v1
+  canonical: agent-start-context/start-contributors.v1
+  aliases: []
+  meaning: Machine-readable contract file start-contributors.v1.json owned under packages/agent-start-context/contracts/.
+  provider: agent-start-context
+  consumers:
+    - host-surface
+  path: packages/agent-start-context/contracts/start-contributors.v1.json
+  evidence: []
+  status: live
+- id: agent-start-context/refusals.v1
+  canonical: agent-start-context/refusals.v1
+  aliases: []
+  meaning: Machine-readable contract file refusals.v1.json owned under packages/agent-start-context/contracts/.
+  provider: agent-start-context
+  consumers:
+    - host-surface
+  path: packages/agent-start-context/contracts/refusals.v1.json
+  evidence: []
+  status: live
