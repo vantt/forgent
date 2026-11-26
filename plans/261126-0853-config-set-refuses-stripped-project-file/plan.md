@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "A config write refuses to create a project config file that the checkout's Git index tracks but its working copy lacks"
-status: running
+status: done
 lead: head:lead-forgent-261126-0853-config-c5c37
 priority: P1
 blockedBy: []
@@ -144,7 +144,7 @@ the addon and gateway build and design principle 2. Rejected: a redirect to the 
 |---|---|---|---|---|---|
 | 1 | [Config refuses a stripped project file](phase-01-config-refuses-stripped-project-file.md) | - | packages/config/rust/src/write.rs, packages/config/rust/src/provider.rs, packages/config/rust/src/provider/unix_verbs.rs, packages/config/rust/src/repair.rs, packages/config/rust/src/relocate.rs, packages/config/rust/tests/, packages/config/contracts/failure-codes.v1.json, packages/config/contracts/fixtures/write.v1.json, apps/fgos/src/wiring/init.rs, docs/platform/config/spec.md | 1 | done |
 | 2 | [Name the owning commit proofs](phase-02-name-commit-proofs.md) | - | plans/261126-0853-config-set-refuses-stripped-project-file/reports/commit-proofs.md, packages/git/rust/tests/scoped_commit_sync.rs, packages/git/rust/tests/land_push_catch_up.rs, test/e2e/root-file-guard-hook.test.mjs | 1 | done |
-| 3 | [Integration](phase-03-integration.md) | 1, 2 | plans/261126-0853-config-set-refuses-stripped-project-file/reports/integration.md | 2 | ready |
+| 3 | [Integration](phase-03-integration.md) | 1, 2 | plans/261126-0853-config-set-refuses-stripped-project-file/reports/integration.md | 2 | done |
 
 Contract check: phases 1 and 2 are in wave 1 with disjoint footprints. Phase 3 depends on both and is in wave 2.
 The hot files (the config spec, the failure-code registry) belong to phase 1 only; `CHANGELOG.md` is left out (acceptance criterion 3). Capabilities:
