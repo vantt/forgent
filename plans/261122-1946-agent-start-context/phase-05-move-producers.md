@@ -87,3 +87,31 @@ See the phase table in `plan.md`, row 5.
 
 Revert the phase's commits. They restore the Node opening, the `persona.rs` rendering, `project-agents.mjs` and the
 `opening` field of `launch-session` together.
+
+## Result (2026-11-27, fg-server)
+
+Done, with three deviations from the steps above.
+
+1. **Step 1: no separate worker golden files.** Worker text already had owning proofs: the persona block in the host's
+   `section_tests` (`apps/fgos/src/wiring/unit_run_host/persona.rs`, the seven cases that owned the Node renderer),
+   and the rest of a prompt and brief in the execution vectors (`packages/execution/engine/tests/assignment.rs`).
+   A second copy as golden files would be a second proof of the same behaviour (design principle 8).
+2. **Step 3: `launch-session` keeps its `opening` field.** The Node head start asks the door for the opening
+   (`src/util/start-context.mjs`) and passes the text it gets back. So the request shape moved to the caller, and the
+   execution route is unchanged.
+3. **Step 5: the claim instructions are still rendered twice in code.** The worker already reads them once: the
+   brief strips the prompt's copy before writing its own. Reusing the prompt's block would change the brief contract
+   and its vectors, and a prompt without a run directory has no block to reuse. Recorded as backlog row
+   `p-menbgsmgoc`.
+
+Other changes:
+- The door row is the architecture proof of step 8. The generic "every door row holds" check runs it, so there is no
+  second test.
+- Agent files needed a fact the phase did not name: `domain`, so that the host's lookup also searches that domain's
+  `agents/` layer.
+- Their frontmatter is written by a new `fgos_yaml_doc::write_frontmatter`, which the frontmatter-fence door now
+  names.
+
+The live proof point (`session start planner` against the planner golden) is carried to phase 11, the integration
+gate.
+

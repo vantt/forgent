@@ -309,19 +309,25 @@ fn failure_line(persona: &str, message: &str) -> String {
 }
 
 /// What the host finds for a persona: pinned text wins over any file; a persona no layer defines is not found; a
-/// definition that cannot be read or rendered is one visible failure line. The fields are read the way the persona
-/// block shows them; the block itself is rendered by the start-context composer.
+/// definition that cannot be read or rendered is one visible failure line. `domain` adds that domain's `agents/`
+/// layer. The fields are read the way the persona block and the agent file show them; both are rendered by the
+/// start-context composer.
 pub fn persona_lookup(
     persona: &str,
     pinned_text: Option<&str>,
     project: &Path,
     install: &Path,
+    domain: Option<&str>,
 ) -> PersonaLookup {
-    let text = match pinned_text {
-        Some(text) => text.to_string(),
-        None => match resolve_agent_definition(persona, project, install, None) {
+    let scope = domain.map(|d| json!({ "owningDomain": d }));
+    let (text, source) = match pinned_text {
+        Some(text) => (text.to_string(), String::new()),
+        None => match resolve_agent_definition(persona, project, install, scope.as_ref()) {
             Ok(Lookup::Found(found)) => match found["text"].as_str() {
-                Some(text) => text.to_string(),
+                Some(text) => (
+                    text.to_string(),
+                    found["source"].as_str().unwrap_or_default().to_string(),
+                ),
                 None => return PersonaLookup::NotFound,
             },
             Ok(Lookup::NotFound(_)) => return PersonaLookup::NotFound,
@@ -353,6 +359,9 @@ pub fn persona_lookup(
         can_decide: text_list(section("decision_boundary").and_then(|b| b.get("can_decide"))),
         must_escalate: text_list(section("decision_boundary").and_then(|b| b.get("must_escalate"))),
         on_wake: scalar_text(data.get("on_wake")),
+        role: scalar_text(data.get("role")),
+        tools: text_list(data.get("tool-scope")),
+        source,
     })
 }
 
@@ -365,7 +374,7 @@ pub fn persona_section(
 ) -> Vec<String> {
     fgos_agent_start_context::persona_section(
         persona,
-        &persona_lookup(persona, pinned_text, project, install),
+        &persona_lookup(persona, pinned_text, project, install, None),
     )
 }
 

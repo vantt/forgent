@@ -1,6 +1,7 @@
 //! The owning proof of start text: compose every recorded head opening and compare it, byte for byte, with the
 //! golden captured from the producers it replaced (packages/agent-start-context/goldens/, NOTES.md names the allowed
-//! changes). Rules come from the head rule units, personas from core/agents; fact validation is the vector tests'.
+//! changes), and every recorded agent file. Rules come from the head rule units, personas from core/agents and
+//! domains/*/agents; fact validation is the vector tests'.
 
 use fgos_agent_start_context::{
     compose, FactRegistry, PersonaFields, PersonaLookup, Personas, Ports, RecordSink, Rule,
@@ -8,7 +9,6 @@ use fgos_agent_start_context::{
 };
 use fgos_yaml_doc::Profile;
 use serde_json::{json, Value};
-use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 fn repo() -> PathBuf {
@@ -105,15 +105,32 @@ impl RecordSink for NoRecord {
     }
 }
 
-/// The persona definitions of core/agents, read the way the host reads them.
-struct CorePersonas;
-impl Personas for CorePersonas {
+/// The persona definitions of core/agents and domains/*/agents, read the way the host reads them.
+struct RepoPersonas;
+
+fn definition_path(persona: &str) -> Option<String> {
+    let file = format!("{persona}.yaml");
+    let core = format!("core/agents/{file}");
+    if repo().join(&core).exists() {
+        return Some(core);
+    }
+    let mut domains: Vec<_> = std::fs::read_dir(repo().join("domains"))
+        .unwrap()
+        .map(|e| e.unwrap().file_name().to_string_lossy().into_owned())
+        .collect();
+    domains.sort();
+    domains
+        .into_iter()
+        .map(|d| format!("domains/{d}/agents/{file}"))
+        .find(|rel| repo().join(rel).exists())
+}
+
+impl Personas for RepoPersonas {
     fn lookup(&self, persona: &str) -> PersonaLookup {
-        let path = repo().join(format!("core/agents/{persona}.yaml"));
-        if !path.exists() {
+        let Some(source) = definition_path(persona) else {
             return PersonaLookup::NotFound;
-        }
-        let d = yaml(&path);
+        };
+        let d = yaml(&repo().join(&source));
         PersonaLookup::Found(PersonaFields {
             description: text(d.get("description")),
             voice: text(d.pointer("/persona/voice")),
@@ -123,16 +140,22 @@ impl Personas for CorePersonas {
             can_decide: list(d.pointer("/decision_boundary/can_decide")),
             must_escalate: list(d.pointer("/decision_boundary/must_escalate")),
             on_wake: text(d.get("on_wake")),
+            role: text(d.get("role")),
+            tools: list(d.get("tool-scope")),
+            source,
         })
     }
+}
+
+fn cases() -> Value {
+    let goldens = repo().join("packages/agent-start-context/goldens");
+    serde_json::from_str(&std::fs::read_to_string(goldens.join("cases.json")).unwrap()).unwrap()
 }
 
 #[test]
 fn every_head_opening_golden_is_composed_byte_for_byte() {
     let goldens = repo().join("packages/agent-start-context/goldens");
-    let cases: Value =
-        serde_json::from_str(&std::fs::read_to_string(goldens.join("cases.json")).unwrap())
-            .unwrap();
+    let cases = cases();
     let rules = HeadRules::read();
     let mut checked = 0;
     for case in cases["cases"]
@@ -162,7 +185,7 @@ fn every_head_opening_golden_is_composed_byte_for_byte() {
             rules: &rules,
             facts: &AnyFacts,
             record: &NoRecord,
-            personas: Some(&CorePersonas),
+            personas: Some(&RepoPersonas),
             contributors: Vec::new(),
             budget_bytes: None,
         };
@@ -173,5 +196,60 @@ fn every_head_opening_golden_is_composed_byte_for_byte() {
         checked += 1;
     }
     assert_eq!(checked, 20, "every recorded head opening");
-    let _ = BTreeMap::<String, String>::new();
+}
+
+#[test]
+fn every_agent_file_golden_is_composed_byte_for_byte_with_no_rule_in_it() {
+    let goldens = repo().join("packages/agent-start-context/goldens");
+    let rules = HeadRules::read();
+    let mut checked = 0;
+    for case in cases()["cases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|c| c["delivery"] == "agent-file")
+    {
+        let request = StartRequest::from_json(&json!({
+            "facts": {"persona": case["persona"], "project": "forgent"},
+            "payloads": [],
+            "delivery": "agent-file"
+        }))
+        .unwrap();
+        let ports = Ports {
+            rules: &rules,
+            facts: &AnyFacts,
+            record: &NoRecord,
+            personas: Some(&RepoPersonas),
+            contributors: Vec::new(),
+            budget_bytes: None,
+        };
+        let composed = compose(&request, &ports).unwrap();
+        assert!(composed.matched.is_empty(), "an agent file carries no rule");
+        let id = case["id"].as_str().unwrap();
+        let golden = std::fs::read_to_string(goldens.join(format!("agent-file/{id}.md"))).unwrap();
+        assert_eq!(composed.text(), golden, "{id}");
+        checked += 1;
+    }
+    assert_eq!(checked, 18, "every recorded agent file");
+}
+
+#[test]
+fn an_agent_file_for_a_persona_no_definition_names_is_refused() {
+    let rules = HeadRules::read();
+    let request = StartRequest::from_json(&json!({
+        "facts": {"persona": "no-such-persona", "project": "forgent"},
+        "payloads": [],
+        "delivery": "agent-file"
+    }))
+    .unwrap();
+    let ports = Ports {
+        rules: &rules,
+        facts: &AnyFacts,
+        record: &NoRecord,
+        personas: Some(&RepoPersonas),
+        contributors: Vec::new(),
+        budget_bytes: None,
+    };
+    let refusal = compose(&request, &ports).unwrap_err();
+    assert_eq!(refusal.code.as_str(), "start-fact-value-invalid");
 }

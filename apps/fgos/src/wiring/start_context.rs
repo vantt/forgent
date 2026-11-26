@@ -19,7 +19,7 @@ use std::path::PathBuf;
 
 use fgos_agent_start_context::{
     compose, AceFacts, AceRules, PersonaLookup, Personas, Ports, RecordSink, Refusal, StartContext,
-    StartRecord, StartRequest,
+    StartKind, StartRecord, StartRequest,
 };
 use fgos_host_runtime::cli_args::{parse_args, FlagScalar, FlagValue};
 use fgos_observe::record::store::{new_record_id, RecordDoor};
@@ -140,10 +140,18 @@ pub fn run(args: &[String], input: &str) -> (i32, Value) {
         root: root.clone(),
         start: request.start_kind().map(|k| k.as_str()).unwrap_or(""),
     };
-    let install = crate::active_payload_root().unwrap_or_else(|_| root.clone());
+    // An agent file projects the definitions of the tree it is written into, so its personas resolve from the root
+    // alone (`scripts/project-agents.mjs`); every other start reads the active payload's definitions under the
+    // project's own.
+    let install = if request.start_kind() == Some(StartKind::AgentFile) {
+        root.clone()
+    } else {
+        crate::active_payload_root().unwrap_or_else(|_| root.clone())
+    };
     let personas = HostPersonas {
         project: root.clone(),
         install,
+        domain: request.facts.get("domain").cloned(),
     };
     let ports = Ports {
         rules: &rules,
@@ -263,10 +271,18 @@ impl RecordSink for ObserveSink {
 struct HostPersonas {
     project: PathBuf,
     install: PathBuf,
+    /// The start's `domain` fact: its `agents/` layer is searched too.
+    domain: Option<String>,
 }
 
 impl Personas for HostPersonas {
     fn lookup(&self, persona: &str) -> PersonaLookup {
-        super::unit_run_host::persona::persona_lookup(persona, None, &self.project, &self.install)
+        super::unit_run_host::persona::persona_lookup(
+            persona,
+            None,
+            &self.project,
+            &self.install,
+            self.domain.as_deref(),
+        )
     }
 }

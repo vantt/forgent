@@ -46,6 +46,23 @@ pub fn emit(value: &Value, profile: Profile, file: &str) -> Result<Vec<u8>, Refu
     })
 }
 
+/// A frontmatter block for the mapping `meta`, then `body`: `emit`'s text between two `---` fences, so the block
+/// parses back to `meta` or the call refuses. The Rust writer of a frontmatter block (the Node one is
+/// `src/util/yaml.mjs` `writeFrontmatter`, over the same `emit`).
+pub fn write_frontmatter(
+    meta: Vec<(String, Value)>,
+    body: &str,
+    file: &str,
+) -> Result<String, Refusal> {
+    guard(|| {
+        let emitted = emit(&Value::Map(meta), Profile::Tool, file)?;
+        Ok(format!(
+            "---\n{}---\n{body}",
+            String::from_utf8_lossy(&emitted)
+        ))
+    })
+}
+
 impl Document {
     /// The document after every edit.
     pub fn to_bytes(&self) -> Vec<u8> {

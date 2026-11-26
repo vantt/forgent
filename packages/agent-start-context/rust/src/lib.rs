@@ -7,6 +7,7 @@
 //! the host wires.
 
 mod ace;
+mod agent_file;
 mod compose;
 mod head;
 mod persona;
@@ -14,6 +15,7 @@ mod ports;
 mod request;
 
 pub use ace::{AceFacts, AceRules};
+pub use agent_file::agent_file;
 pub use compose::{compose, Block, DropReason, Dropped, StartContext, StartRecord};
 pub use persona::{persona_section, PersonaFields, PersonaLookup};
 pub use ports::{

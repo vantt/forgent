@@ -13,6 +13,12 @@ pub struct PersonaFields {
     pub must_escalate: Vec<String>,
     /// The `on_wake` text a head runs after its start ritual; empty for none.
     pub on_wake: String,
+    /// The definition's `role`, the heading of its agent file.
+    pub role: String,
+    /// The definition's `tool-scope`: the tools its agent file grants.
+    pub tools: Vec<String>,
+    /// The definition's path relative to its root, named in its agent file; empty for pinned text.
+    pub source: String,
 }
 
 /// What the host found for a persona name.

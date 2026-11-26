@@ -152,12 +152,13 @@ fn validate(request: &StartRequest, ports: &Ports<'_>) -> Result<(), Refusal> {
 pub fn compose(request: &StartRequest, ports: &Ports<'_>) -> Result<StartContext, Refusal> {
     validate(request, ports)?;
 
-    let (mut candidates, mut matched) = if request.delivery == crate::request::Delivery::Opening
-        && request.start_kind() == Some(crate::request::StartKind::Head)
-    {
-        crate::head::opening(request, ports)
-    } else {
-        generic(request, ports)
+    use crate::request::{Delivery, StartKind};
+    let (mut candidates, mut matched) = match (request.delivery, request.start_kind()) {
+        (Delivery::Opening, Some(StartKind::Head)) => crate::head::opening(request, ports),
+        (Delivery::AgentFile, Some(StartKind::AgentFile)) => {
+            crate::agent_file::layout(request, ports)?
+        }
+        _ => generic(request, ports),
     };
 
     let mut dropped = Vec::new();
