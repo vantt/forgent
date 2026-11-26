@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "A config write refuses to create a project config file that the checkout's Git index tracks but its working copy lacks"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 base: 2dc4d5ec6cbfe3224cee18b7c476087207e83879
@@ -17,7 +17,6 @@ footprint:
   - packages/config/contracts/fixtures/write.v1.json
   - apps/fgos/src/wiring/init.rs
   - docs/platform/config/spec.md
-  - CHANGELOG.md
   - packages/git/rust/tests/scoped_commit_sync.rs
   - packages/git/rust/tests/land_push_catch_up.rs
   - test/e2e/root-file-guard-hook.test.mjs
@@ -109,8 +108,11 @@ the addon and gateway build and design principle 2. Rejected: a redirect to the 
    create the file as today.
 3. `packages/config/contracts/failure-codes.v1.json` lists `config-project-file-stripped` (sections `6, 14`), and
    the contract tests that pin that list (`packages/config/rust/tests/fixture_shape.rs`, `failure_matrix.rs`)
-   pass. `docs/platform/config/spec.md` section 6 states the rule and section 14 has its row. `CHANGELOG.md`
-   `[Unreleased]` has one `Fixed:` line.
+   pass. `docs/platform/config/spec.md` section 6 states the rule and section 14 has its row. The `CHANGELOG.md`
+   `[Unreleased]` line is not written here: `CHANGELOG.md` is in the footprint of the running, parked plan
+   `261125-1631-agent-context-engine`, and a `ready` plan may not overlap it. The line (text in phase 1, step 12)
+   is carried by plan `261126-0856-launcher-runs-owning-release-in-linked-worktree`, which already owns
+   `CHANGELOG.md` and goes `ready` later.
 4. `plans/261126-0853-config-set-refuses-stripped-project-file/reports/` holds a short report naming, for each of
    the three D4 guards (store-path rule in scoped commit, pre-commit `.fgos` guards, land restore of `.fgos`), the
    test that owns it, with path and test name. Any guard without one is extended in its owning test file, never
@@ -139,12 +141,12 @@ the addon and gateway build and design principle 2. Rejected: a redirect to the 
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Config refuses a stripped project file](phase-01-config-refuses-stripped-project-file.md) | - | packages/config/rust/src/write.rs, packages/config/rust/src/provider.rs, packages/config/rust/src/provider/unix_verbs.rs, packages/config/rust/src/repair.rs, packages/config/rust/src/relocate.rs, packages/config/rust/tests/, packages/config/contracts/failure-codes.v1.json, packages/config/contracts/fixtures/write.v1.json, apps/fgos/src/wiring/init.rs, docs/platform/config/spec.md, CHANGELOG.md | 1 | ready |
+| 1 | [Config refuses a stripped project file](phase-01-config-refuses-stripped-project-file.md) | - | packages/config/rust/src/write.rs, packages/config/rust/src/provider.rs, packages/config/rust/src/provider/unix_verbs.rs, packages/config/rust/src/repair.rs, packages/config/rust/src/relocate.rs, packages/config/rust/tests/, packages/config/contracts/failure-codes.v1.json, packages/config/contracts/fixtures/write.v1.json, apps/fgos/src/wiring/init.rs, docs/platform/config/spec.md | 1 | ready |
 | 2 | [Name the owning commit proofs](phase-02-name-commit-proofs.md) | - | plans/261126-0853-config-set-refuses-stripped-project-file/reports/commit-proofs.md, packages/git/rust/tests/scoped_commit_sync.rs, packages/git/rust/tests/land_push_catch_up.rs, test/e2e/root-file-guard-hook.test.mjs | 1 | ready |
 | 3 | [Integration](phase-03-integration.md) | 1, 2 | plans/261126-0853-config-set-refuses-stripped-project-file/reports/integration.md | 2 | ready |
 
 Contract check: phases 1 and 2 are in wave 1 with disjoint footprints. Phase 3 depends on both and is in wave 2.
-The hot files (`CHANGELOG.md`, the config spec, the failure-code registry) belong to phase 1 only. Capabilities:
+The hot files (the config spec, the failure-code registry) belong to phase 1 only; `CHANGELOG.md` is left out (acceptance criterion 3). Capabilities:
 phase 1 `code:implement`, phase 2 `code:test`, phase 3 `code:test`. Impact analysis: `fgos dispatch decide --for
 impact-analysis` reports GitNexus `tool.missing` (degraded), so blast radius is not machine-confirmed. The
 callers of `commit_observed`, `WriteRequest` and `init` were listed by `rg` (Facts above), and phase 1 re-runs that
