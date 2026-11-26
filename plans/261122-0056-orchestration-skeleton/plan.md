@@ -24,6 +24,7 @@ footprint:
   - packages/supervision/rust/tests/portfolio.rs
   - scripts/plan-contract-check.mjs
   - test/scripts/plan-contract-check.test.mjs
+  - test/skills/fgos-supervisor-idle-lead.test.mjs
   - packages/supervision/rust/tests/watcher.rs
   - packages/supervision/rust/tests/definitions.rs
   - packages/supervision/rust/tests/keeper.rs
@@ -222,7 +223,7 @@ for phase 18's declarations.
 | 9 | [Periodic review](phase-09-periodic-review.md) | 1, 4, 5 | core/watcher/definitions/review-due.query.json, core/watcher/briefs/periodic-review.md, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, packages/supervision/rust/src/watcher.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/definitions.rs, apps/fgos/src/wiring/supervision.rs | 4 | done |
 | 19 | [Contract check warns on cross-plan overlap](../261126-2318-plan-footprint-overlap-warns/phase-01-contract-check-warns.md) | 5 | scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs | 4 | done |
 | 20 | [Admission advises overlap instead of holding](../261126-2318-plan-footprint-overlap-warns/phase-02-admission-advises-overlap.md) | 5 | packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/portfolio.rs, packages/supervision/rust/tests/wake.rs | 4 | done |
-| 18 | [Integration](phase-18-integration.md) | 1, 3, 4, 5, 9, 10, 16, 19, 20 | docs/platform/supervision/spec.md, docs/platform/questions/spec.md, docs/platform/workflow/spec.md, docs/platform/resource-referee/spec.md, docs/platform/session-host/spec.md, .agents/skills/, plugins/fgOS/skills/, .claude/skills/, plans/261122-0056-orchestration-skeleton/ | 5 | ready |
+| 18 | [Integration](phase-18-integration.md) | 1, 3, 4, 5, 9, 10, 16, 19, 20 | docs/platform/supervision/spec.md, docs/platform/questions/spec.md, docs/platform/workflow/spec.md, docs/platform/resource-referee/spec.md, docs/platform/session-host/spec.md, .agents/skills/, plugins/fgOS/skills/, .claude/skills/, test/skills/fgos-supervisor-idle-lead.test.mjs, plans/261122-0056-orchestration-skeleton/ | 5 | ready |
 
 Phase ids are the original ids (the discussion's task order T1, T7.1 to T7.7). Waves, not ids, give the run order.
 Phase 18 is new with the split, because each plan needs its own integration phase.
@@ -242,6 +243,8 @@ Owner order 2026-11-26: `CHANGELOG.md` and `packages/host-runtime/contracts/comm
 Lead decision 2026-11-26 22:50: phase 5 also writes `bin/fgos.mjs`, `src/cli/command-registry.mjs` and `command-manifest.json` to register and route `fgos workflow records --json` (step 3). All three are already in the plan footprint and phase 16, their other writer, is done, so no phase in the same or a later wave overlaps.
 
 Owner order 2026-11-26 23:5x: `CHANGELOG.md` and `packages/host-runtime/contracts/command-manifest.json` leave this plan's footprint again, because the next plans in the owner's order (shaper-worktree, backlog-index-generated, session-type-submits-enter, and the CHANGELOG writers after them) cannot be admitted while this plan holds them. Phase 5 therefore does not edit `command-manifest.json`: it registers `fgos workflow records` only in `bin/fgos.mjs` and `src/cli/command-registry.mjs`, and the manifest regeneration is left to the next plan that holds the manifest (named in phase 5's report). Phase 18 writes its `[Unreleased]` lines as a `changelog.d/` fragment once plan 261126-2324 has landed that door, or hands them to the supervisor for a post-done land, never into `CHANGELOG.md` directly.
+
+Supervisor 2026-11-27 03:0x: `test/skills/fgos-supervisor-idle-lead.test.mjs` joins the footprint (phase 18) so the lead can fix this plan's own regression: phase 1 rewrote `core/skills/fgos-supervisor/SKILL.md` and two skill-text tests in that file went red (acceptance criterion 7). No other active plan holds the file.
 
 Owner order 2026-11-26 23:40 (answer B to q-kyzictpkf6): phases 19 and 20 are phases 1 and 2 of plan `261126-2318-plan-footprint-overlap-warns`, run by this lead after phase 5 (which also writes `portfolio.rs`). They change the contract check and admission together, so they run on one branch and land as one change. Phase 9 shares no file with them and runs in the same wave.
 
