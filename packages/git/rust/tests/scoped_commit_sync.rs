@@ -2104,3 +2104,56 @@ fn recovery_from_the_main_checkouts_port_takes_the_linked_checkouts_custody_and_
         "{error:?}"
     );
 }
+
+#[test]
+fn scoped_commit_drops_store_paths_and_ignores_absent_skip_worktree_paths() {
+    let f = Fixture::new();
+    let baseline_tree = git(&f.tree, &["rev-parse", "HEAD"]);
+
+    fs::write(f.tree.join("sparse"), "clean\n").unwrap();
+    git(&f.tree, &["add", "sparse"]);
+    git(&f.tree, &["commit", "-qm", "add sparse path"]);
+    git(&f.tree, &["update-index", "--skip-worktree", "sparse"]);
+    fs::remove_file(f.tree.join("sparse")).unwrap();
+
+    let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
+    fs::write(f.tree.join("product.txt"), "product code\n").unwrap();
+    fs::create_dir_all(f.tree.join(".fgos")).unwrap();
+    fs::write(f.tree.join(".fgos/config.yaml"), "fresh config\n").unwrap();
+
+    let request = CommitRequest {
+        writes: vec!["**".into()],
+        message: "commit product work\n".into(),
+    };
+    let result = f
+        .driver
+        .scoped_commit(
+            &f.repo,
+            f.held(),
+            &baseline,
+            &request,
+            "fixture",
+            "store-and-skip-drop",
+            &wal::OsFileSystem,
+        )
+        .unwrap();
+
+    assert_eq!(result.status, ResultCode::Committed);
+    assert_eq!(result.files, vec!["product.txt"]);
+    let head = git(&f.tree, &["rev-parse", "HEAD"]);
+    assert_ne!(head, baseline_tree);
+    assert_eq!(
+        git(&f.tree, &["ls-tree", "--name-only", "HEAD", ".fgos"]),
+        ""
+    );
+    assert_eq!(
+        git(&f.tree, &["show", "HEAD:product.txt"]),
+        "product code"
+    );
+    assert!(!f.tree.join("sparse").exists());
+    assert_eq!(
+        fs::read_to_string(f.tree.join(".fgos/config.yaml")).unwrap(),
+        "fresh config\n"
+    );
+}
+
