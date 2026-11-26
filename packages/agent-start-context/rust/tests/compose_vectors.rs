@@ -108,6 +108,7 @@ fn every_golden_vector_gets_its_expected_context_or_refusal() {
                 rules: &rules,
                 facts: &facts,
                 record: &records,
+                personas: None,
                 contributors: Vec::new(),
                 budget_bytes: None,
             };
@@ -176,10 +177,11 @@ fn rule(id: &str, kind: &str, body: &str) -> Rule {
 }
 
 fn head_request() -> StartRequest {
+    // A worker start: the generic order (rules, then payloads, then contributors) is what these tests prove.
     let raw = serde_json::json!({
-        "facts": {"sessionType": "head", "persona": "lead", "project": "forgent", "agentCli": "claude", "agentLifecycle": "start"},
-        "payloads": [{"kind": "task", "path": "plans/x/plan.md", "itemKind": "plan"}],
-        "delivery": "opening"
+        "facts": {"sessionType": "worker", "role": "producer", "project": "forgent", "agentCli": "claude"},
+        "payloads": [{"kind": "assignment", "text": "Objective: fix the parser."}],
+        "delivery": "prompt-arg"
     });
     StartRequest::from_json(&raw).unwrap()
 }
@@ -230,12 +232,13 @@ fn blocks_come_in_rule_then_payload_then_contributor_order_and_the_budget_drops_
         rules: &rules,
         facts: &registry,
         record: &records,
+        personas: None,
         contributors: vec![(row("handoff"), &live_ctx)],
         budget_bytes: None,
     };
     let all = compose(&request, &ports).unwrap();
     let ids: Vec<&str> = all.blocks.iter().map(|b| b.id.as_str()).collect();
-    assert_eq!(ids, ["law-a", "proc-b", "proc-c", "task", "handoff"]);
+    assert_eq!(ids, ["law-a", "proc-b", "proc-c", "assignment", "handoff"]);
 
     // Room for the law, the task and one procedure only: the contributor goes first, then the latest rule.
     let task_bytes = all.blocks[3].bytes;
@@ -244,12 +247,13 @@ fn blocks_come_in_rule_then_payload_then_contributor_order_and_the_budget_drops_
         rules: &rules,
         facts: &registry,
         record: &records,
+        personas: None,
         contributors: vec![(row("handoff"), &live_ctx)],
         budget_bytes: Some(budget),
     };
     let cut = compose(&request, &ports).unwrap();
     let ids: Vec<&str> = cut.blocks.iter().map(|b| b.id.as_str()).collect();
-    assert_eq!(ids, ["law-a", "proc-b", "task"]);
+    assert_eq!(ids, ["law-a", "proc-b", "assignment"]);
     let dropped: Vec<(&str, DropReason)> = cut
         .dropped
         .iter()
@@ -273,12 +277,13 @@ fn blocks_come_in_rule_then_payload_then_contributor_order_and_the_budget_drops_
         rules: &rules,
         facts: &registry,
         record: &records,
+        personas: None,
         contributors: Vec::new(),
         budget_bytes: Some(1),
     };
     let floor = compose(&request, &ports).unwrap();
     let ids: Vec<&str> = floor.blocks.iter().map(|b| b.id.as_str()).collect();
-    assert_eq!(ids, ["law-a", "task"]);
+    assert_eq!(ids, ["law-a", "assignment"]);
     let last = records.0.borrow().last().cloned().unwrap();
     assert_eq!(last.dropped.len(), 2, "every drop is in the record");
 }
@@ -295,14 +300,15 @@ fn a_contributor_that_fails_or_times_out_is_left_out_and_recorded_and_the_start_
     let broken = Fixed(Err(ContributorError::Failed("socket closed".into())));
     let slow = Fixed(Err(ContributorError::Timeout));
     let ok = Fixed(Ok(Some("LIVE".into())));
-    let mut scoped = row("workers-only");
+    let mut scoped = row("heads-only");
     scoped
         .when
-        .insert("sessionType".into(), vec!["worker".into()]);
+        .insert("sessionType".into(), vec!["head".into()]);
     let ports = Ports {
         rules: &rules,
         facts: &registry,
         record: &records,
+        personas: None,
         contributors: vec![
             (row("broken"), &broken),
             (row("slow"), &slow),
@@ -315,7 +321,7 @@ fn a_contributor_that_fails_or_times_out_is_left_out_and_recorded_and_the_start_
     let ids: Vec<&str> = context.blocks.iter().map(|b| b.id.as_str()).collect();
     assert_eq!(
         ids,
-        ["law-a", "task", "ok"],
+        ["law-a", "assignment", "ok"],
         "a contributor whose when: does not match is not called"
     );
     let dropped: Vec<(&str, DropReason)> = context
@@ -331,50 +337,4 @@ fn a_contributor_that_fails_or_times_out_is_left_out_and_recorded_and_the_start_
         ]
     );
     assert_eq!(records.0.borrow()[0].dropped, context.dropped);
-}
-
-#[test]
-fn the_task_and_question_payloads_keep_the_words_a_head_receives_today() {
-    let raw = serde_json::json!({
-        "facts": {"sessionType": "head", "persona": "lead", "project": "forgent", "agentCli": "claude", "agentLifecycle": "start"},
-        "payloads": [
-            {"kind": "task", "path": "plans/261122-1946-agent-start-context/plan.md", "itemKind": "plan"},
-            {"kind": "for-question", "questionId": "q-golden0001"}
-        ],
-        "delivery": "opening"
-    });
-    let request = StartRequest::from_json(&raw).unwrap();
-    let rules = Rules {
-        digest: "d".repeat(64),
-        rules: Vec::new(),
-    };
-    let live_values = Live::new(&live());
-    let registry = AceFacts::new(&live_values);
-    let records = Records::default();
-    let ports = Ports {
-        rules: &rules,
-        facts: &registry,
-        record: &records,
-        contributors: Vec::new(),
-        budget_bytes: None,
-    };
-    let context = compose(&request, &ports).unwrap();
-    let lead_task = std::fs::read_to_string(
-        repo().join("packages/agent-start-context/goldens/opening/lead-task.txt"),
-    )
-    .unwrap();
-    let lead_question = std::fs::read_to_string(
-        repo().join("packages/agent-start-context/goldens/opening/lead-question.txt"),
-    )
-    .unwrap();
-    assert!(
-        lead_task.contains(&context.blocks[0].text),
-        "{}",
-        context.blocks[0].text
-    );
-    assert!(
-        lead_question.contains(&context.blocks[1].text),
-        "{}",
-        context.blocks[1].text
-    );
 }

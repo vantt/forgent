@@ -120,8 +120,7 @@
           "type": "object",
           "additionalProperties": false,
           "required": [
-            "kind",
-            "text"
+            "kind"
           ],
           "properties": {
             "kind": {
@@ -130,7 +129,42 @@
             "text": {
               "type": "string",
               "minLength": 1,
-              "description": "The rotation handoff for a successor head; its one channel."
+              "description": "The handoff text itself (its one channel once the rotation contributor joins)."
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Repo-relative path of the handoff file, named in a successor head's start ritual."
+            }
+          },
+          "anyOf": [
+            {
+              "required": [
+                "path"
+              ]
+            },
+            {
+              "required": [
+                "text"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "name"
+          ],
+          "properties": {
+            "kind": {
+              "const": "session"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The head's own session name; its role is head:<persona>-<name>."
             }
           }
         },

@@ -1,6 +1,7 @@
 //! The four ports. Each has one adapter today, wired by the host; tests use their own under tests/.
 
 use crate::compose::StartRecord;
+use crate::persona::PersonaLookup;
 use std::collections::BTreeMap;
 use std::time::Duration;
 
@@ -61,6 +62,11 @@ pub trait Contributor {
     ) -> Result<Option<String>, ContributorError>;
 }
 
+/// The host's persona definitions: what it finds for a name (its agent-definition layers, pinned text first).
+pub trait Personas {
+    fn lookup(&self, persona: &str) -> PersonaLookup;
+}
+
 /// A contributor's registration (contracts/start-contributors.v1.json).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ContributorRow {
@@ -76,6 +82,8 @@ pub struct Ports<'a> {
     pub rules: &'a dyn RuleSet,
     pub facts: &'a dyn FactRegistry,
     pub record: &'a dyn RecordSink,
+    /// The persona definitions; a start with a `persona` fact and no port renders no persona block.
+    pub personas: Option<&'a dyn Personas>,
     /// Registered contributors in registration order.
     pub contributors: Vec<(ContributorRow, &'a dyn Contributor)>,
     /// The byte budget of the request's delivery; None for no budget.

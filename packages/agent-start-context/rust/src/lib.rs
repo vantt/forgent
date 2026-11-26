@@ -8,14 +8,17 @@
 
 mod ace;
 mod compose;
+mod head;
+mod persona;
 mod ports;
 mod request;
 
 pub use ace::{AceFacts, AceRules};
 pub use compose::{compose, Block, DropReason, Dropped, StartContext, StartRecord};
+pub use persona::{persona_section, PersonaFields, PersonaLookup};
 pub use ports::{
-    Contributor, ContributorError, ContributorRow, FactRegistry, Ports, RecordSink, Rule, RuleSet,
-    ValueType,
+    Contributor, ContributorError, ContributorRow, FactRegistry, Personas, Ports, RecordSink, Rule,
+    RuleSet, ValueType,
 };
 pub use request::{Delivery, ItemKind, Payload, Refusal, RefusalCode, StartKind, StartRequest};
 

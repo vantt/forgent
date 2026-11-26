@@ -50,6 +50,17 @@ pub struct StartContext {
     pub dropped: Vec<Dropped>,
 }
 
+impl StartContext {
+    /// The text the agent receives: the blocks in order, a blank line between two blocks.
+    pub fn text(&self) -> String {
+        self.blocks
+            .iter()
+            .map(|b| b.text.as_str())
+            .collect::<Vec<_>>()
+            .join("\n\n")
+    }
+}
+
 /// The per-start record handed to the record sink.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StartRecord {
@@ -63,18 +74,21 @@ pub struct StartRecord {
 }
 
 /// A candidate block with what the budget needs to know about it.
-struct Candidate {
-    block: Block,
+pub(crate) struct Candidate {
+    pub(crate) block: Block,
     /// Payloads and laws are never dropped.
-    required: bool,
+    pub(crate) required: bool,
 }
 
-fn matches(when: &BTreeMap<String, Vec<String>>, facts: &BTreeMap<String, String>) -> bool {
+pub(crate) fn matches(
+    when: &BTreeMap<String, Vec<String>>,
+    facts: &BTreeMap<String, String>,
+) -> bool {
     when.iter()
         .all(|(key, allowed)| facts.get(key).is_some_and(|value| allowed.contains(value)))
 }
 
-fn block(id: &str, source: String, text: String) -> Block {
+pub(crate) fn block(id: &str, source: String, text: String) -> Block {
     let bytes = text.len();
     Block {
         id: id.to_owned(),
@@ -138,31 +152,13 @@ fn validate(request: &StartRequest, ports: &Ports<'_>) -> Result<(), Refusal> {
 pub fn compose(request: &StartRequest, ports: &Ports<'_>) -> Result<StartContext, Refusal> {
     validate(request, ports)?;
 
-    let mut candidates = Vec::new();
-    let mut matched = Vec::new();
-    for rule in ports.rules.rules() {
-        if matches(&rule.when, &request.facts) {
-            matched.push(rule.id.clone());
-            candidates.push(Candidate {
-                block: block(&rule.id, format!("rule:{}", rule.id), rule.body.clone()),
-                required: rule.kind == "law",
-            });
-        }
-    }
-    let mut seen = BTreeMap::<&str, usize>::new();
-    for payload in &request.payloads {
-        let n = seen.entry(payload.kind()).or_insert(0);
-        *n += 1;
-        let id = if *n == 1 {
-            payload.kind().to_owned()
-        } else {
-            format!("{}-{}", payload.kind(), n)
-        };
-        candidates.push(Candidate {
-            block: block(&id, format!("payload:{}", payload.kind()), payload.text()),
-            required: true,
-        });
-    }
+    let (mut candidates, mut matched) = if request.delivery == crate::request::Delivery::Opening
+        && request.start_kind() == Some(crate::request::StartKind::Head)
+    {
+        crate::head::opening(request, ports)
+    } else {
+        generic(request, ports)
+    };
 
     let mut dropped = Vec::new();
     for (row, contributor) in &ports.contributors {
@@ -228,4 +224,34 @@ pub fn compose(request: &StartRequest, ports: &Ports<'_>) -> Result<StartContext
         record: record_id,
         dropped,
     })
+}
+
+/// Every start but a head's opening: the matching rules in the set's order, then the payloads in request order.
+fn generic(request: &StartRequest, ports: &Ports<'_>) -> (Vec<Candidate>, Vec<String>) {
+    let mut candidates = Vec::new();
+    let mut matched = Vec::new();
+    for rule in ports.rules.rules() {
+        if matches(&rule.when, &request.facts) {
+            matched.push(rule.id.clone());
+            candidates.push(Candidate {
+                block: block(&rule.id, format!("rule:{}", rule.id), rule.body.clone()),
+                required: rule.kind == "law",
+            });
+        }
+    }
+    let mut seen = BTreeMap::<&str, usize>::new();
+    for payload in &request.payloads {
+        let n = seen.entry(payload.kind()).or_insert(0);
+        *n += 1;
+        let id = if *n == 1 {
+            payload.kind().to_owned()
+        } else {
+            format!("{}-{}", payload.kind(), n)
+        };
+        candidates.push(Candidate {
+            block: block(&id, format!("payload:{}", payload.kind()), payload.text()),
+            required: true,
+        });
+    }
+    (candidates, matched)
 }

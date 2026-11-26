@@ -45,7 +45,11 @@ pub fn persona_section(persona: &str, lookup: &PersonaLookup) -> Vec<String> {
     if !fields.description.is_empty() {
         lines.push(format!("Description: {}", fields.description));
     }
-    for (value, label) in [(&fields.voice, "Voice"), (&fields.style, "Style"), (&fields.archetype, "Archetype")] {
+    for (value, label) in [
+        (&fields.voice, "Voice"),
+        (&fields.style, "Style"),
+        (&fields.archetype, "Archetype"),
+    ] {
         if !value.is_empty() {
             lines.push(format!("{label}: {value}"));
         }
@@ -55,7 +59,10 @@ pub fn persona_section(persona: &str, lookup: &PersonaLookup) -> Vec<String> {
     }
     lines.push(String::new());
     lines.push("## Decision Boundaries".into());
-    for (items, label) in [(&fields.can_decide, "Can decide:"), (&fields.must_escalate, "Must escalate:")] {
+    for (items, label) in [
+        (&fields.can_decide, "Can decide:"),
+        (&fields.must_escalate, "Must escalate:"),
+    ] {
         if !items.is_empty() {
             lines.push(label.into());
             lines.extend(items.iter().map(|item| format!("- {item}")));
