@@ -1,0 +1,20 @@
+{
+  "stage": "plan",
+  "ref": "plan:261125-1631-agent-context-engine",
+  "headline": "Approve one id for the two new component declarations (agent-context-engine and agent-start-context)?",
+  "blocks": "ACE phase 3 and ASC phase 3: both run fgos authority declare --kind component, which needs an answered owner question as --approved-by.",
+  "parts": {
+    "what": "Plans agent-context-engine and agent-start-context each declare one new component in the authority model. The declare door refuses a new component without an answered owner question naming it. The two decisions (ACE-D3 and ASC-D1) were settled in chat and relayed as an event, but neither is a question in the store.",
+    "cause": "Checked fgos authority declare --help and the planner report Q1: --approved-by takes the id of an answered question; a supervisor event id or a chat answer does not count.",
+    "options": [
+      {"label": "One question for both", "does": "This one question, once answered, is the approval id for both declarations.", "gain": "One answer unlocks both plans.", "harm": "The id names two components, so a later reader must read both plans to see the scope.", "cost": "One owner answer, no code.", "recommended": true},
+      {"label": "Two separate questions", "does": "Ask one question per component and answer each.", "gain": "Each approval names exactly one component.", "harm": "A second owner round-trip for the same decision.", "cost": "Two owner answers."},
+      {"label": "Add a waiver to the declare door", "does": "Let the door accept a decided-in-chat marker instead of a question id.", "gain": "No question needed in future.", "harm": "Widens the door; the repo rules say to make contracts tighter, not larger.", "cost": "A door change in Rust plus its tests and a decision."}
+    ],
+    "recommendation": "One question for both. It costs one answer and changes no code. The owner already chose this option in chat on 2026-11-25; the answer here only records it in the store.",
+    "scope": {
+      "allows": "The two declarations only: component agent-context-engine and component agent-start-context.",
+      "forbids": "Any other new component, decision kind or door, and any change to the declare door itself."
+    }
+  }
+}
