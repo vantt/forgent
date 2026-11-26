@@ -94,57 +94,57 @@ Còn tạm, chưa chốt: mô hình bốn thành phần (chủ nói chỉ là g�
 - 2026-11-26 13:50 +07, shaper, round 9: Proposed three angles to add to the model, all provisional. (1) **Who holds the information:** the owner holds intent, taste and the order between goals; the agent holds the facts. Ask only for information only the owner has; a fact the agent can gather is never a question. (2) **Precedent:** a class of question the owner has answered the same way several times is a recorded direction, applied without asking (40 footprint widens, 30/30 the same answer). (3) **Cost of waiting against cost of being wrong:** once an action is made reversible, being wrong costs one revert, while waiting cost 193 hours in seven days; reversible actions do not wait. On Miu: the channel depends on Miu being active, and backlog p-dgs2lsfudr already records her 15-minute tick stopping for hours. Proposed: the channel must not depend on Miu's tick. The records sit where the work lives, and the digest is pulled when the owner returns. Miu's liveness is its own item, outside this discussion. On the hands class (scout of `packages/session-host/contracts/head-permissions.v1.json`): the supervisor row now allows `git recover`, `worktree remove --delivered-to main` and `config patch`; `release activate` is denied to every head by design; full `npm test` and `cargo test --workspace` are not `fgos` verbs, so no head can run them. Also, `core/skills/fgos-lead/SKILL.md:80` still tells a lead to "ask the owner to run `fgos git recover`", although the supervisor holds that grant, which explains q-bvvdct5edg (2026-11-26).
 - 2026-11-26 14:15 +07, owner (chat, round 10): (a) Cost of waiting against cost of being wrong is the innovative angle. An agent can handle larger and more complex work than a person. Splitting work into many small steps, each careful to cause no disturbance, creates countless extra steps spent only on keeping things stable. An agent needs one big step: inside it things may be messy, but when it ends the work is done. What it needs is an isolated environment and one strict step before it starts that seals the current state, so the work can be reversed if the result is not as wanted. (b) "Who holds the information" is hard to understand. (c) Precedent: unclear whether the observer and friction system records friction and other events continuously and periodically turns them into improvements and new rules. That is where precedent should live, not in each agent's memory.
 - 2026-11-26 14:25 +07, shaper, round 10: (a) Adopted as the concrete meaning of "safe and reversible" in WA-D2: isolate, seal the state before, take one big step, then a strict final check; reverse to the seal on failure. Limits raised in chat: the seal must cover state outside the worktree (event store, config, release activation, remote), or the step must not touch it before land; and the final check carries all the weight, so it must be strict. Plan shape (step granularity) belongs to ds-que32ftgg6 and was passed on through coordination event 83040765c1c5a4d6. (b) Restated: "where does the answer live? If in the machine (code, logs, state, docs), look it up; ask only when it lives in the owner's head (what he wants, what matters more)". (c) Scout: friction has 785 records but almost none since 2026-09-11 (zero until 2026-11-17, about 33 in November). The coach (p-kmavlfevvu, plan 261122-2110, draft) is the only planned synthesis and does not read owner-question answers. Nothing in the supervisor or secretary skills synthesises friction periodically. Precedent is moved out of this discussion: coordination event 83040765c1c5a4d6 asks to add owner-question answers to the coach's inputs.
+- 2026-11-26 14:28 +07, owner (chat, round 11): (a) Agrees with "cost of waiting against cost of being wrong", but as a mindset used while deciding, not a large technical expectation. Use it when the infrastructure at decision time allows; the real risk is forgetting the angle. (b) Of course everything must live in the machine, and there is a plan for project-wide goals and milestones. The real problem is elsewhere: sometimes the goal or intent lives in the owner's head, so when an agent notices that a different motive or intent is at play, it must actively clarify it.
+- 2026-11-26 14:40 +07, shaper, round 11: (a) Accepted. The isolate-seal-big-step recipe of round 10 is withdrawn as a requirement and kept only as an example of how to make a step reversible. The angle goes into the short decision checklist every agent runs (the shared rule), so it cannot be forgotten, with no new mechanism. (b) Accepted, and the shaper admits it treated "goal unclear" as passive (ask when the goal is missing). The owner means active detection. Signals found in the evidence: the owner picks an option other than the recommendation, or answers with free text (the five overrides; q-kjat6xjwfv "Not now"); a new owner order points a different way from the written goal (the component-authority release order); the agent's recommendation keeps being overridden in one class. On such a signal the agent asks once, briefly, "what intent is behind this?", in conversation or a discussion rather than as an A/B question, and records the answer as a direction. The same pattern ran in this discussion: the owner had to correct the scope, the trust placed in his model, and the communication framing before the shaper surfaced them.
+- 2026-11-26 15:05 +07, shaper, round 12: Correction relayed by the ds-que32ftgg6 shaper (owner, 14:52, verified in ds-que32ftgg6 §3 row 13). Rounds 10 and 11 framed "one big step" too loosely, and the hand-off to ds-que32ftgg6 framed it as a plan-shape rule; the owner says that is wrong. His explanation: (1) Splitting a plan into the smallest pieces that can run in parallel is always right. (2) Splitting into step-by-step releases that each keep the running system stable and compatible is a human-speed habit: work a person needs 7 days for becomes 7 releases, each carrying throwaway compatibility and stability work. An agent doing the same work in about 2 hours may instead take one big step, with temporary disruption inside it, done when it ends. Condition: before starting, it works out a real reverse path (seal the state first, including state outside the worktree), never "just do it". It is a lens for choosing (cost of waiting against cost of being wrong), not a rule that forces. §6 checklist item 4 carries this text.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Bản nháp vòng 5, chưa chốt. Một luật dùng chung thay cho đoạn § Approved frame trong `core/skills/_shared/decision-question.md`. Mọi skill có chỗ bảo agent hỏi thì trỏ về luật này, không viết lại.
+Bản nháp vòng 12, chưa chốt; phần đã chốt là WA-D1 đến WA-D5 (§4). Đây là một luật dùng chung, thay cho đoạn § Approved frame trong `core/skills/_shared/decision-question.md`. Mọi skill có chỗ bảo agent hỏi thì trỏ về luật này, không viết lại.
 
-### Mô hình bốn thành phần (chủ, vòng 5)
+### Nguyên tắc (WA-D2)
 
-| Thành phần | Nghĩa |
+Chủ chỉ trả lời câu hỏi đặt hoặc đổi hướng đi. Một việc actionable thì không bao giờ hỏi dạng "nguy hiểm, có làm không". Agent tìm cách làm an toàn và đảo ngược được, làm, rồi báo. Chỉ hỏi khi không còn cách nào khác, và khi đó hỏi về cách làm.
+
+### Bảng kiểm trước khi đề xuất hay hỏi (mọi agent)
+
+1. **Mục tiêu.** Việc này phục vụ mục tiêu hay milestone nào? Đọc bộ mục tiêu của project khi nó có (ds-3in4yb5thk). **Chủ động dò ý định khác:** chủ chọn khác phương án đề xuất hoặc trả lời bằng chữ tự do; một lệnh mới của chủ đi hướng khác với mục tiêu đã ghi; đề xuất của agent bị bác nhiều lần trong cùng một loại việc. Gặp tín hiệu nào thì hỏi một lần, thật ngắn, "ý định đằng sau là gì", trong trò chuyện hoặc discussion, rồi ghi lại thành hướng đi.
+2. **Hướng đi (phép thử con đường).** Liệt kê các cách tới mục tiêu. Thứ tự nào nhanh nhất? Mảnh nào quản lý hoặc mở khoá các mảnh khác thì lên trước. Nợ đã biết thì ghi vào chính thứ sẽ theo dõi nó. Đối chiếu thứ tự ưu tiên sản phẩm (Ship Faster > Release con người > DoD > Polish sau DoD).
+3. **Hệ quả.** Hướng đã chọn có lệch không? Lệch là khác outcome hoặc acceptance đã duyệt, hại một mục tiêu đang chạy khác hay một project khác, vượt một ràng buộc đứng (ranh giới tin cậy), hoặc đi chệch thứ tự hay thời hạn chủ đã đặt. Không được tự suy ra ý định cao hơn để vượt qua mục tiêu đã ghi (WA-D5).
+4. **Giá phải chờ so với giá làm sai (một góc nhìn, không phải luật ép).** Có đường quay lui thật thì không chờ. Chia plan thành các mảnh nhỏ nhất chạy song song được luôn đúng. Còn chia thành nhiều đợt release, mỗi đợt giữ hệ thống ổn định và tương thích, là thói quen theo tốc độ người: 7 ngày người làm thành 7 đợt, mỗi đợt kèm việc tương thích làm xong rồi bỏ. Agent làm cùng việc đó trong khoảng 2 giờ thì có thể đi một bước lớn, rối tạm bên trong, xong là xong. Điều kiện: trước khi bắt đầu phải tính ra một đường quay lui thật (niêm phong hiện trạng, kể cả những gì ngoài worktree), không bao giờ "cứ làm". Dùng góc nhìn này khi hạ tầng lúc đó cho phép. Nó nằm trong bảng kiểm này để không bị quên.
+5. **Câu trả lời ở đâu.** Nằm trong máy (code, log, trạng thái, tài liệu, bộ mục tiêu) thì tự tra. Chỉ hỏi khi nó nằm trong đầu chủ: chủ muốn gì, cái gì quan trọng hơn.
+6. **Hỏi** chỉ khi có hệ quả mà không hướng nào tránh được, hoặc khi ý định chưa rõ (mục 1). Nêu con đường tốt nhất và độ lệch của nó; dùng mẫu năm phần; gom bộ; chỉ park phần bị chặn, phần khác chạy tiếp.
+7. **Báo.** Quyết định tự làm được ghi tại nơi việc diễn ra (commit, bảng phase, nhật ký discussion). Miu gom lại theo plan và file khi chủ quay lại; một mẫu lặp thì đưa lên thành câu hỏi về hướng đi. Không xây kênh mới.
+
+### Không phải câu hỏi cho chủ
+
+- **Thiếu tay:** head bị nhốt không chạy được một bước host. Chuyển sang supervisor nếu supervisor có quyền (`git recover`, `worktree remove --delivered-to main`, `config patch`). Kích hoạt release vẫn là của chủ, theo thiết kế. Full `npm test` và `cargo test --workspace` hiện không head nào chạy được: đó là lỗ hạ tầng, không phải câu hỏi.
+- **Tiền lệ:** biến chuỗi câu trả lời giống nhau của chủ thành luật là việc của coach (p-kmavlfevvu), không phải việc mỗi agent tự nhớ.
+
+### Mẫu nhanh (từ 163 câu thật)
+
+| Không hỏi: tìm cách, làm, báo | Hỏi chủ |
 |---|---|
-| **Mục tiêu** | Kết quả đã thống nhất, cùng chất lượng đã thống nhất (gồm cả các ràng buộc chủ đã đặt: luật, ranh giới tin cậy). |
-| **Hướng đi** | Các cách hành động khác nhau để đạt *cùng* mục tiêu đó. Hướng đi thông minh là hướng đạt mục tiêu với chất lượng đã thống nhất mà chi phí rẻ hơn; trong bối cảnh này chi phí chủ yếu là thời gian. |
-| **Hành động** | Chủ thể của câu hỏi: việc sắp làm. Nó là một trong các hướng đi. |
-| **Hệ quả** | Chỉ gọi là hệ quả khi kết quả của hành động **lệch khỏi mục tiêu**: kết quả khác, hoặc chất lượng thấp hơn mức đã thống nhất. |
-
-**Luật.** Tín hiệu duy nhất để hỏi chủ là: hành động sẽ sinh ra hệ quả (lệch mục tiêu), **và** không có hướng đi nào khác đạt mục tiêu mà tránh được độ lệch đó. Chọn giữa các hướng đi không phải câu hỏi: agent tự chọn hướng nhanh nhất mà vẫn giữ chất lượng đã thống nhất, làm, rồi báo.
-
-**Phép thử con đường** (vòng 4) là cách agent tìm ra các hướng đi trước khi kết luận là có hệ quả:
-1. Hành động này phục vụ mục tiêu nào?
-2. Thứ tự nào tới mục tiêu đó nhanh nhất? Mảnh nào quản lý hoặc mở khoá các mảnh khác thì lên trước. Nợ đã biết thì ghi vào chính thứ sẽ theo dõi nó, không chặn đường. Đối chiếu thứ tự ưu tiên sản phẩm: Ship Faster > Release con người > DoD > Polish sau DoD.
-3. Rủi ro của một hướng đi không phải là hệ quả. Rủi ro là việc cần làm cho an toàn và đảo ngược được (sao lưu, dry-run, làm phần an toàn trước, giữ dữ liệu). Chưa chắc kết quả có lệch không thì đi đo hoặc thử với chi phí thấp, không hỏi.
-4. Chỉ khi mọi hướng đều lệch mục tiêu mới hỏi. Khi hỏi thì nêu độ lệch ("hướng tốt nhất em thấy là X; nó lệch mục tiêu ở chỗ Y, vì …"), không hỏi "có làm không".
-
-**Câu hỏi về mục tiêu** là một loại khác: khi mục tiêu hoặc chất lượng đã thống nhất chưa rõ, hoặc khi việc đang làm đề xuất đặt mục tiêu mới. Khi đó hỏi để làm rõ hoặc đặt mục tiêu, thường trong một discussion, không phải một câu A/B.
-
-### Áp vào bằng chứng
-
-| Nhóm trong kho | Hướng đi hay hệ quả | Kết luận |
-|---|---|---|
-| Mở footprint (40) | Hướng đi: thêm vài file để đạt đúng acceptance của plan | Không hỏi |
-| Dọn dẹp (18), phục hồi git/ops (20), xin xác nhận điều đã chốt (4) | Hướng đi có rủi ro: làm cho an toàn rồi làm | Không hỏi |
-| Ba câu component-authority (q-lnjt5zzbfq, q-aanvfxaopa, q-trgzaa34ua) | **Lệch thật** so với kết quả đã duyệt. Outcome của plan 261121-2110 ghi "every door `debt` entry is gone … the door guard allows debt on no other row"; acceptance 6 của plan 261124-1433 đòi full `npm test` và `cargo test --workspace`. Chọn "nợ có tên" hay "đóng trên test tập trung" là đổi mục tiêu đã duyệt. | **Hỏi là đúng.** Chỗ cần sửa là cách hỏi (đưa sẵn con đường, chỉ park phần bị chặn) và lúc lập plan (tách mục tiêu lõi khỏi mục tiêu dọn dẹp), không phải bỏ câu hỏi. |
-| Đổi tổ chức (10), luật mới (5), đổi chức năng lớn (2) | Đặt hoặc đổi mục tiêu hay ràng buộc | Câu hỏi về mục tiêu, thường bàn trong discussion |
-| Nới ranh giới tin cậy thường trực (q-nt7ptsq2nd, q-okdzvolti3) | Ranh giới tin cậy là một phần chất lượng đã thống nhất; nới nó là lệch | Hỏi, trừ khi có hướng khác không cần nới |
-| Thiếu tay (~45) | Không phải câu hỏi: agent bị nhốt không chạy được bước host | Đi đường việc đặc quyền (§3 row 10) |
+| Mở footprint để đạt acceptance của chính plan (40 câu, 30/30 chọn đề xuất) | Đổi một outcome hay acceptance đã duyệt, kể cả nhận nợ thay vì làm đủ (ba câu component-authority) |
+| Dọn những thứ đã có trên main hoặc tái tạo được | Đổi tổ chức hay chủ sở hữu; luật mới; đổi chức năng lớn (thường bàn trong discussion) |
+| Phục hồi qua cửa có sẵn | Nới một ranh giới tin cậy thường trực (q-nt7ptsq2nd) |
+| Xin xác nhận lại điều đã chốt (dẫn D-ID) | Các phương án hoà thật và phụ thuộc ý chủ |
+| Đánh đổi kỹ thuật đã có phương án rõ | Ý định chưa rõ: tín hiệu ở mục 1 |
 
 ```mermaid
 flowchart TD
-  A[Hành động sắp làm] --> G{Mục tiêu và chất lượng<br/>đã thống nhất có rõ không?}
-  G -- không --> QG[Câu hỏi về mục tiêu:<br/>làm rõ hoặc đặt, trong discussion]
-  G -- có --> P[Phép thử con đường:<br/>liệt kê các hướng đi,<br/>chọn hướng nhanh nhất giữ chất lượng]
-  P --> C{Kết quả có lệch<br/>mục tiêu không?}
-  C -- chưa chắc --> M[Đo hoặc thử rẻ, rồi xét lại]
-  M --> C
-  C -- không --> R{Có rủi ro?}
-  R -- có --> SAFE[Làm cho an toàn và đảo ngược được]
-  R -- không --> DO
-  SAFE --> DO[Làm, ghi lại, báo chủ]
+  A[Hành động sắp làm] --> I{Có tín hiệu<br/>ý định khác?}
+  I -- có --> CI[Hỏi ngắn ý định, ghi thành hướng đi]
+  I -- không --> P[Phép thử con đường:<br/>chọn hướng nhanh nhất]
+  CI --> P
+  P --> C{Lệch mục tiêu đã duyệt,<br/>mục tiêu khác, ràng buộc, thời hạn?}
+  C -- chưa chắc --> L[Tra trong máy hoặc thử rẻ]
+  L --> C
+  C -- không --> R[Tính đường quay lui, làm,<br/>ghi tại chỗ, Miu gom báo]
   C -- có --> ALT{Có hướng khác<br/>không lệch?}
   ALT -- có --> P
-  ALT -- không, vì thiếu quyền chạy --> H[Đường việc đặc quyền]
-  ALT -- không --> ASK[Hỏi chủ: nêu độ lệch,<br/>năm phần, gom bộ, chỉ park phần bị chặn]
+  ALT -- thiếu tay --> H[Supervisor, hoặc ghi lỗ hạ tầng]
+  ALT -- không --> ASK[Hỏi chủ: con đường + độ lệch,<br/>năm phần, gom bộ, park phần bị chặn]
 ```
 
 ## 7. Danh mục hạng mục / task {#tasks}
