@@ -5,15 +5,10 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { replaceDurably } from '../native/door.mjs';
-import { discoverInstructionSources } from './instruction-registry.mjs';
-import {
-  composeInstructionSet,
-  EFFECTIVE_INSTRUCTIONS_DIR,
-  effectiveSetRelativePath,
-  serializeEffectiveInstructionSet,
-  PORTABLE_HOST,
-} from './instruction-composition.mjs';
+import { spawnSync } from 'node:child_process';
+
+import { canonicalJson, replaceDurably } from '../native/door.mjs';
+import { resolveHostBin } from '../util/host-bin.mjs';
 
 export const INSTRUCTION_PROJECTION_SCHEMA_VERSION = 1;
 export const PROJECTION_LEDGER_RELATIVE_PATH = '.fgos/installation/projections/ledger.json';
@@ -21,7 +16,14 @@ export const PORTABLE_AGENTS_DESTINATION = 'AGENTS.md';
 export const PORTABLE_AGENTS_ADAPTER = 'portable-agents-md';
 export const MANAGED_BLOCK_START = '<!-- fgos:instruction-projection:start -->';
 export const MANAGED_BLOCK_END = '<!-- fgos:instruction-projection:end -->';
-const EFFECTIVE_SET_KEY_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+export const PORTABLE_HOST = '*';
+export const EFFECTIVE_RULES_RELATIVE_PATH = '.fgos/instructions/effective/rules.json';
+const PROJECTION_KEY = 'repo';
+const EFFECTIVE_RULES_SCHEMA_VERSION = 1;
+const CONTEXT_ENGINE_PREFIX = '\u001eFGOS-CONTEXT-ENGINE ';
+const CONTEXT_ENGINE_PROTOCOL = 1;
+const CONTEXT_ENGINE_TIMEOUT_MS = 60_000;
+const RULE_KINDS = ['law', 'boundary', 'procedure', 'preference', 'host-adapter'];
 
 export class InstructionProjectionError extends Error {
   constructor(message, { code = 'INSTRUCTION_PROJECTION_ERROR', filePath, cause } = {}) {
@@ -83,23 +85,95 @@ function projectionId(targetKey, host, destinationPath) {
   return `instruction:${targetKey}:${host}:${destinationPath}`;
 }
 
-function safeEffectiveSetRelativePath(effectiveSet) {
-  const unsafePath = effectiveSetRelativePath(effectiveSet.target);
-  if (!EFFECTIVE_SET_KEY_PATTERN.test(effectiveSet.key)) {
-    throw new InstructionProjectionError('Effective instruction set key must be a portable file stem', {
-      code: 'UNSAFE_PROJECTION_PATH',
-      filePath: unsafePath,
-    });
+function invalidRuleSet(message) {
+  return new InstructionProjectionError(`Compiled rule set is invalid: ${message}`, {
+    code: 'INVALID_RULE_SET',
+    filePath: EFFECTIVE_RULES_RELATIVE_PATH,
+  });
+}
+
+/** Reads the compiled set through its schema (effective-rules.v1): shape, versions, then the digest. */
+export function readEffectiveRules(text) {
+  let set;
+  try {
+    set = JSON.parse(text);
+  } catch (err) {
+    throw Object.assign(invalidRuleSet('not valid JSON'), { cause: err });
   }
-  const relativePath = safeRelativePath(unsafePath, 'Effective instruction set path');
-  const prefix = `${EFFECTIVE_INSTRUCTIONS_DIR}/`;
-  if (!relativePath.startsWith(prefix) || relativePath.slice(prefix.length).includes('/')) {
-    throw new InstructionProjectionError('Effective instruction set path must stay inside the effective instructions directory', {
-      code: 'UNSAFE_PROJECTION_PATH',
-      filePath: unsafePath,
-    });
+  if (!set || typeof set !== 'object' || Array.isArray(set)) throw invalidRuleSet('not an object');
+  if (set.schemaVersion !== EFFECTIVE_RULES_SCHEMA_VERSION) throw invalidRuleSet(`schemaVersion ${JSON.stringify(set.schemaVersion)} is not ${EFFECTIVE_RULES_SCHEMA_VERSION}`);
+  if (!Number.isInteger(set.whenKeysVersion)) throw invalidRuleSet('whenKeysVersion is not an integer');
+  if (typeof set.digest !== 'string' || !/^[0-9a-f]{64}$/.test(set.digest)) throw invalidRuleSet('digest is not 64 hex characters');
+  if (!Array.isArray(set.rules)) throw invalidRuleSet('rules is not an array');
+  for (const rule of set.rules) {
+    const id = typeof rule?.id === 'string' ? rule.id : '(no id)';
+    if (!rule || typeof rule !== 'object') throw invalidRuleSet('a rule is not an object');
+    for (const field of ['id', 'owner', 'kind', 'scope', 'body']) {
+      if (typeof rule[field] !== 'string') throw invalidRuleSet(`rule ${id}: ${field} is not a string`);
+    }
+    if (!RULE_KINDS.includes(rule.kind)) throw invalidRuleSet(`rule ${id}: kind ${JSON.stringify(rule.kind)} is unknown`);
+    if (!Number.isInteger(rule.specificity)) throw invalidRuleSet(`rule ${id}: specificity is not an integer`);
+    if (rule.title !== undefined && typeof rule.title !== 'string') throw invalidRuleSet(`rule ${id}: title is not a string`);
+    if (!Array.isArray(rule.sources) || rule.sources.length === 0 || rule.sources.some((source) => typeof source !== 'string')) {
+      throw invalidRuleSet(`rule ${id}: sources is not a non-empty list of strings`);
+    }
+    if (!rule.when || typeof rule.when !== 'object' || Array.isArray(rule.when)
+      || Object.values(rule.when).some((values) => !Array.isArray(values) || values.some((value) => typeof value !== 'string'))) {
+      throw invalidRuleSet(`rule ${id}: when is not a mapping of keys to lists of strings`);
+    }
   }
-  return relativePath;
+  const digest = crypto.createHash('sha256').update(canonicalJson(set.rules)).digest('hex');
+  if (digest !== set.digest) throw invalidRuleSet('its digest does not match its rules');
+  return set;
+}
+
+function contextEngineError(code, message, extra = {}) {
+  return Object.assign(new InstructionProjectionError(message, { code }), extra);
+}
+
+/**
+ * Compiles the project's rule units through the host (`fgos internal context-engine compile`), which checks them
+ * and writes `.fgos/instructions/effective/rules.json`. The host is `FGOS_HOST_BIN` or the activated release; with
+ * neither there is no composer to run and the refusal names that.
+ */
+function compileRuleSet(projectRoot) {
+  const hostBin = resolveHostBin(projectRoot);
+  if (!hostBin) {
+    throw contextEngineError(
+      'CONTEXT_ENGINE_HOST_UNAVAILABLE',
+      'No fgos host binary found to compile the rule units (set FGOS_HOST_BIN or activate a release)',
+    );
+  }
+  const run = spawnSync(hostBin, ['internal', 'context-engine', 'compile', '--protocol', String(CONTEXT_ENGINE_PROTOCOL)], {
+    input: `${JSON.stringify({ root: path.resolve(projectRoot) })}\n`,
+    encoding: 'utf8',
+    maxBuffer: 16 * 1024 * 1024,
+    timeout: CONTEXT_ENGINE_TIMEOUT_MS,
+    killSignal: 'SIGKILL',
+    windowsHide: true,
+  });
+  if (run.error) {
+    throw contextEngineError('CONTEXT_ENGINE_HOST_FAILED', `The fgos host at ${hostBin} could not run the context engine: ${run.error.message}`);
+  }
+  const answerLine = (run.stdout ?? '').split('\n').find((line) => line.startsWith(CONTEXT_ENGINE_PREFIX));
+  let line;
+  try {
+    line = JSON.parse(answerLine.slice(CONTEXT_ENGINE_PREFIX.length));
+  } catch {
+    throw contextEngineError(
+      'CONTEXT_ENGINE_HOST_FAILED',
+      `The fgos host at ${hostBin} gave no context-engine answer (exit ${run.status}): ${String(run.stderr ?? '').trim().slice(0, 300) || 'no output'}; it may predate the context-engine door`,
+    );
+  }
+  if (line.error) {
+    throw contextEngineError('CONTEXT_ENGINE_HOST_FAILED', `The context engine failed (${line.error.code}): ${line.error.message}`);
+  }
+  const result = line.result ?? {};
+  if (result.ok !== true) {
+    const refusals = Array.isArray(result.refusals) ? result.refusals : [];
+    const detail = refusals.map((refusal) => `${refusal.code}${refusal.source ? ` in ${refusal.source}` : ''}: ${refusal.message}`).join('; ');
+    throw contextEngineError('CONTEXT_ENGINE_REFUSED', `The rule units are refused: ${detail || 'no detail given'}`, { refusals });
+  }
 }
 
 function assertNoManagedMarkerLiterals(projectionContent, filePath) {
@@ -130,24 +204,33 @@ function renderRule(rule) {
     `- id: \`${rule.id}\``,
     `- source: \`${rule.sources.join('`, `')}\``,
   ];
-  if (rule.description) lines.push(`- description: ${rule.description}`);
-  const body = String(rule.effectiveText ?? '').trim();
+  const body = String(rule.body ?? '').trim();
   if (body) lines.push('', body, '');
   else lines.push('');
   return lines.join('\n');
 }
 
+// INTERIM selection. The repo projection renders the rules that apply to the whole repository: scope `repo` or
+// `platform` and no `when:` restriction (a restricted rule applies to some audience only; a `component` or
+// `domain` rule applies inside its own root). This reproduces the repo target of the earlier composer; a later
+// plan replaces it with selection by `when:` and deletes this filter.
+const REPO_WIDE_SCOPES = new Set(['repo', 'platform']);
+
+function rulesWithoutRestriction(effectiveSet) {
+  return effectiveSet.rules.filter((rule) => REPO_WIDE_SCOPES.has(rule.scope) && Object.keys(rule.when).length === 0);
+}
+
 export function renderPortableAgentsProjection(effectiveSet) {
-  const grouped = groupRulesByKind(effectiveSet.rules);
+  const grouped = groupRulesByKind(rulesWithoutRestriction(effectiveSet));
   const lines = [
     MANAGED_BLOCK_START,
     '<!-- generated by fgos instruction projection; edit canonical instruction sources, not this block -->',
-    `<!-- effective-set: ${effectiveSetRelativePath(effectiveSet.target)}; key=${effectiveSet.key}; host=${effectiveSet.host} -->`,
+    `<!-- effective-set: ${EFFECTIVE_RULES_RELATIVE_PATH}; key=${PROJECTION_KEY}; host=${PORTABLE_HOST} -->`,
     '',
     '## fgOS Effective Instructions',
     '',
   ];
-  for (const kind of ['law', 'boundary', 'procedure', 'preference', 'host-adapter']) {
+  for (const kind of RULE_KINDS) {
     const rules = grouped.get(kind) ?? [];
     if (rules.length === 0) continue;
     lines.push(`### ${kind}`, '');
@@ -238,7 +321,6 @@ function upsertLedgerEntry(ledger, entry) {
 }
 
 export function computeInstructionProjection(projectRoot, options = {}) {
-  const target = options.target ?? 'repo';
   const host = options.host ?? PORTABLE_HOST;
   if (host !== PORTABLE_HOST) {
     throw new InstructionProjectionError(`Unsupported instruction projection host "${host}"`, {
@@ -246,19 +328,19 @@ export function computeInstructionProjection(projectRoot, options = {}) {
     });
   }
   const destinationPath = options.destinationPath ?? PORTABLE_AGENTS_DESTINATION;
-  const units = discoverInstructionSources(projectRoot, options.registryOptions ?? {});
-  const effectiveSet = composeInstructionSet(units, { target, host });
-  const effectiveSetContent = serializeEffectiveInstructionSet(effectiveSet);
-  const projectionContent = renderPortableAgentsProjection(effectiveSet);
   const destinationRelativePath = safeRelativePath(destinationPath, 'Instruction projection destination path');
-  const effectiveSetRelative = safeEffectiveSetRelativePath(effectiveSet);
+  assertNoSymlinkPath(projectRoot, EFFECTIVE_RULES_RELATIVE_PATH, 'Effective instruction set path');
+  compileRuleSet(projectRoot);
+  const effectiveSetContent = fs.readFileSync(path.join(projectRoot, EFFECTIVE_RULES_RELATIVE_PATH), 'utf8');
+  const effectiveSet = readEffectiveRules(effectiveSetContent);
+  const projectionContent = renderPortableAgentsProjection(effectiveSet);
   assertNoManagedMarkerLiterals(projectionContent, destinationRelativePath);
   const ledgerEntry = Object.freeze({
-    id: projectionId(effectiveSet.key, host, destinationRelativePath),
+    id: projectionId(PROJECTION_KEY, host, destinationRelativePath),
     kind: 'instruction-projection',
     runtime: 'local-fgos',
-    source: effectiveSetRelative,
-    effectiveSetDigest: sha256(effectiveSetContent),
+    source: EFFECTIVE_RULES_RELATIVE_PATH,
+    effectiveSetDigest: `sha256:${effectiveSet.digest}`,
     renderAdapter: PORTABLE_AGENTS_ADAPTER,
     destinationPath: destinationRelativePath,
     ownership: 'managed-block',
@@ -267,7 +349,7 @@ export function computeInstructionProjection(projectRoot, options = {}) {
   });
   return Object.freeze({
     effectiveSet,
-    effectiveSetRelativePath: effectiveSetRelative,
+    effectiveSetRelativePath: EFFECTIVE_RULES_RELATIVE_PATH,
     effectiveSetContent,
     projectionContent,
     destinationRelativePath,
@@ -278,24 +360,14 @@ export function computeInstructionProjection(projectRoot, options = {}) {
 
 export function inspectInstructionProjection(projectRoot, options = {}) {
   const computed = computeInstructionProjection(projectRoot, options);
-  const effectivePath = path.join(projectRoot, computed.effectiveSetRelativePath);
   const destinationPath = path.join(projectRoot, computed.destinationRelativePath);
   const ledgerPath = path.join(projectRoot, computed.ledgerRelativePath);
   const problems = [];
-  let hasEffectiveSet = false;
   let hasManagedBlock = false;
   let hasLedgerEntry = false;
 
-  assertNoSymlinkPath(projectRoot, computed.effectiveSetRelativePath, 'Effective instruction set path');
   assertNoSymlinkPath(projectRoot, computed.destinationRelativePath, 'Instruction projection destination path');
   assertNoSymlinkPath(projectRoot, computed.ledgerRelativePath, 'Projection ledger path');
-
-  if (fs.existsSync(effectivePath)) {
-    hasEffectiveSet = true;
-    if (fs.readFileSync(effectivePath, 'utf8') !== computed.effectiveSetContent) {
-      problems.push(`${computed.effectiveSetRelativePath} stale`);
-    }
-  }
 
   if (!fs.existsSync(destinationPath)) {
     hasManagedBlock = false;
@@ -317,11 +389,10 @@ export function inspectInstructionProjection(projectRoot, options = {}) {
     }
   }
 
-  const materialized = hasEffectiveSet || hasManagedBlock || hasLedgerEntry;
-  if (hasLedgerEntry || hasEffectiveSet) {
-    if (!hasEffectiveSet) problems.push(`${computed.effectiveSetRelativePath} missing`);
+  // The compiled set is rebuilt from the rule units by every compute, so it never counts as materialized state.
+  const materialized = hasManagedBlock || hasLedgerEntry;
+  if (hasLedgerEntry) {
     if (!hasManagedBlock) problems.push(`${computed.destinationRelativePath} missing managed instruction block`);
-    if (!hasLedgerEntry) problems.push(`${computed.ledgerRelativePath} missing entry ${computed.ledgerEntry.id}`);
   }
 
   return Object.freeze({ passed: problems.length === 0, problems, materialized, computed });
@@ -329,10 +400,8 @@ export function inspectInstructionProjection(projectRoot, options = {}) {
 
 export function materializeInstructionProjection(projectRoot, options = {}) {
   const computed = computeInstructionProjection(projectRoot, options);
-  const effectivePath = path.join(projectRoot, computed.effectiveSetRelativePath);
   const destinationPath = path.join(projectRoot, computed.destinationRelativePath);
   const ledgerPath = path.join(projectRoot, computed.ledgerRelativePath);
-  assertNoSymlinkPath(projectRoot, computed.effectiveSetRelativePath, 'Effective instruction set path');
   assertNoSymlinkPath(projectRoot, computed.destinationRelativePath, 'Instruction projection destination path');
   assertNoSymlinkPath(projectRoot, computed.ledgerRelativePath, 'Projection ledger path');
 
@@ -350,8 +419,6 @@ export function materializeInstructionProjection(projectRoot, options = {}) {
     }
     changed = true;
   };
-
-  writeIfChanged(effectivePath, computed.effectiveSetContent);
 
   const existingDestination = fs.existsSync(destinationPath) ? fs.readFileSync(destinationPath, 'utf8') : '';
   const nextDestination = spliceManagedProjection(existingDestination, computed.projectionContent, destinationPath);

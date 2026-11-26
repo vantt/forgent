@@ -81,7 +81,6 @@ test('the staged legacy-node payload carries the YAML door, loads nothing but th
     const probe = [
       "const door = await import(process.argv[1] + '/src/util/yaml.mjs');",
       "await import(process.argv[1] + '/src/workflow/loader.mjs');",
-      "await import(process.argv[1] + '/src/setup/instruction-registry.mjs');",
       "process.stdout.write(JSON.stringify(door.parseYaml('a: [1, 2]\\n')));",
     ].join('\n');
     const res = spawnSync(process.execPath, ['--input-type=module', '-e', probe, pathToFileURL(legacyNodeDir).href], {

@@ -618,10 +618,19 @@ function assertForeignSkillUntouched(skillsRoot) {
   }
 }
 
+// The rule type's pack files the host door reads from the project it compiles.
+function writePackFiles(root) {
+  const pack = 'packages/agent-context-engine/pkm';
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+  fs.mkdirSync(path.join(root, pack), { recursive: true });
+  for (const file of ['profile.yaml', 'ace.yaml']) fs.copyFileSync(path.join(repoRoot, pack, file), path.join(root, pack, file));
+}
+
 function writeInstruction(root, id = 'sample-law') {
   const dir = path.join(root, 'core', 'instructions');
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, `${id}.md`), `---\nid: ${id}\nkind: law\ntitle: Sample\ndescription: d\n---\n\n# Sample\nText.\n`);
+  writePackFiles(root);
+  fs.writeFileSync(path.join(dir, `${id}.md`), `---\nid: ${id}\nkind: law\nowner: core\nscope: repo\nmode: append\nspecificity: 10\ntitle: Sample\nlifecycle: live\nvalid_from: 2026-10-17\n---\n\n# Sample\nText.\n`);
 }
 
 function snapshotTree(root) {
@@ -655,9 +664,10 @@ test('a refused instruction projection leaves every skill surface untouched', ()
   writeSkill(path.join(root, 'core', 'skills'), 'fgos-own', SAMPLE_FRONTMATTER, '# own\n');
   fs.mkdirSync(path.join(root, 'core', 'instructions'), { recursive: true });
   fs.writeFileSync(path.join(root, 'core', 'instructions', 'broken.md'), '---\nkind: law\n---\n\n# no id\n');
+  writePackFiles(root);
   const before = snapshotTree(root);
 
-  assert.throws(() => renderSkillSurfaces(root), /id/i);
+  assert.throws(() => renderSkillSurfaces(root), (err) => err.code === 'CONTEXT_ENGINE_REFUSED' && /broken\.md/.test(err.message));
 
   assert.deepEqual(snapshotTree(root), before);
 });
