@@ -1,6 +1,6 @@
 ---
 id: p-os3gedpq4x
-title: Plans that share a path must not block each other from starting: each plan works on its own branch and meets the conflict at land; only phases of one plan that share a path wait for each other (plan contract, priority high; source: owner via Miu, 2026-11-26 22:5x, restated 23:0x)
+title: Plans that share a path block each other from starting, even when the shared file is written only in a late phase or is generated; decide how shared paths should be handled (plan contract, priority high; source: owner via Miu, 2026-11-26 22:5x, restated 23:0x)
 status: proposed
 priority: P1
 area: plan-contract
@@ -13,7 +13,7 @@ The plan contract refuses `ready` while another `ready` or `running` plan shares
 footprints. So a plan holds every path of every phase from the day it starts until it is done, and a file written once
 at the end, such as `CHANGELOG.md`, blocks everyone from the first day.
 
-The owner's point, which corrects the first wording of this row: every plan works on its own branch and worktree, so
+The owner's view, to be tested in the discussion and not yet settled: every plan works on its own branch and worktree, so
 two plans touching the same file cannot step on each other while they work. The cost of a shared path shows up at
 land, as a merge or rebase, and not at admission. The only real reason to wait is inside one plan: two phases of the
 same plan that share a path must not run in parallel.
@@ -35,7 +35,19 @@ Seen on 2026-11-26 (evidence, not the only case):
   one day, to let other plans run. Each change needed an owner order and a hand edit of the frontmatter and the phase
   rows, because the door that widens or narrows a running plan does not exist (`p-lfsc4czpgh`).
 
-# Done when
+# Options to decide in the discussion
+
+- **P1, drop the cross-plan block entirely** (the owner's view): plans run on their own branches, the conflict is met
+  at land, only phases of one plan that share a path wait for each other.
+- **P2, drop the block for generated and append-only files, and make it advice for hand-written source**, with each
+  phase refreshing its base from main when it starts, so a conflict shows at the start of a phase and not at land.
+  Miu leans to P2, on reasoning only.
+- Measure first: how often and at what cost did a land conflict on hand-written source files cost rework in the
+  land history. Without that number the choice is a guess.
+- Read the earlier converged discussion `ds-izwfo6f267-parallel-decomposition-footprint-avoidance` (open, from
+  2026-08-05) and `ds-mzyircswox-widen-a-running-plan-footprint` (paused) first, and say what is reused.
+
+# Done when (the option chosen in the discussion fixes the exact wording)
 
 - Two plans whose footprints overlap are both admitted and run on their own branches. The overlap is reported to the
   supervisor as advice (which plan lands first, which will meet the conflict), never as a refusal of `ready`.
