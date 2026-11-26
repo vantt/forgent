@@ -1,5 +1,6 @@
 //! The wake door and the supervisor verbs over fake ports, one behaviour per test.
 use fgos_supervision::{
+    keeper::{self, Action, Caps, Decision, History, Input, Need, Players, Raise, Snapshot},
     portfolio::{head_name, read_plan, supervisor_name, Plan},
     queue::{QueueError, RaisedEvent},
     supervisor::{self, Asker, Askers},
@@ -980,6 +981,117 @@ fn a_ready_plan_with_an_invalid_footprint_goes_to_judgement() {
 #[test]
 fn admission_fact_errors_preserve_judgement_events_even_after_a_lead_started() {
     // Static config/Identity tests cannot observe a refusal on a later admission iteration.
+    struct BrokenKeeper<'a> {
+        fake: &'a Fake,
+        failure: &'static str,
+        raised: RefCell<Vec<Decision>>,
+    }
+    impl Snapshot for BrokenKeeper<'_> {
+        fn read(&self) -> Result<(Vec<Input>, Caps), String> {
+            if self.failure == "source" {
+                return Err("source-failed".into());
+            }
+            Ok((
+                vec![Input {
+                    record: serde_json::from_value(serde_json::json!({"item": "a", "step": "b"}))
+                        .unwrap(),
+                    item_closed: false,
+                    actor: keeper::ActorState::Unknown,
+                }],
+                Caps {
+                    starts: 0,
+                    held: Default::default(),
+                },
+            ))
+        }
+    }
+    impl History for BrokenKeeper<'_> {
+        fn read(&self) -> Result<Vec<Decision>, String> {
+            Ok(vec![])
+        }
+        fn record(&self, _: &Decision) -> Result<(), String> {
+            Ok(())
+        }
+    }
+    impl Players for BrokenKeeper<'_> {
+        fn start(&self, _: &Decision, _: &Need) -> Result<(), String> {
+            panic!("no player")
+        }
+        fn wake(&self, _: &Decision, _: &Need) -> Result<(), String> {
+            panic!("no player")
+        }
+    }
+    impl Raise for BrokenKeeper<'_> {
+        fn raise(&self, decision: &Decision, _: i64) -> Result<(), String> {
+            self.raised.borrow_mut().push(decision.clone());
+            if decision.item != "keeper" || self.failure == "all-raises" {
+                return Err("raise-failed".into());
+            }
+            let Action::Raise { event: kind, .. } = &decision.action else {
+                panic!("not a raise")
+            };
+            self.fake
+                .events
+                .borrow_mut()
+                .push(event("keeper-error", kind, &decision.item));
+            Ok(())
+        }
+    }
+    // Keeper source/raise failures must fall through too, even if reporting the failure fails.
+    for failure in ["source", "raise", "all-raises"] {
+        let f = admission_fixture(2, 2);
+        let admission = f.ports();
+        let broken = BrokenKeeper {
+            fake: &f,
+            failure,
+            raised: RefCell::new(vec![]),
+        };
+        let ports = fgos_supervision::wake::ScheduledPorts {
+            admission: &admission,
+            keeper: keeper::Ports {
+                snapshot: &broken,
+                history: &broken,
+                players: &broken,
+                raise: &broken,
+            },
+        };
+        assert_eq!(
+            wake(
+                &ports,
+                &SETTINGS,
+                Trigger {
+                    trigger: "tick",
+                    subject: "r1"
+                }
+            ),
+            WakeOutcome::Started
+        );
+        assert_eq!(f.admitted.borrow().len(), 2);
+        assert_eq!(f.started.borrow().last().unwrap().0, "supervisor");
+        assert!(
+            f.handled.borrow().is_empty(),
+            "capacity event stays open for judgement"
+        );
+        let raised = broken.raised.borrow();
+        let last = raised.last().unwrap();
+        assert!(matches!(&last.action, Action::Raise { event, .. } if event == "needs-judgement"));
+        assert_eq!(
+            last.reason,
+            if failure == "source" {
+                "keeper-failed:source-failed"
+            } else {
+                "keeper-failed:raise-failed"
+            }
+        );
+        assert_eq!(
+            f.spans.borrow().last().unwrap().error,
+            if failure == "source" {
+                "source-failed"
+            } else {
+                "raise-failed"
+            }
+        );
+    }
     for kind in [
         "plan-done",
         "question-answered",
