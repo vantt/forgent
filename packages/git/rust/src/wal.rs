@@ -11,6 +11,13 @@ use std::path::{Path, PathBuf};
 
 const MAX_RECORD: u64 = 64 * 1024;
 const MAX_RECORDS: usize = 16;
+/// How many operation directories plus compaction ledger entries one journal
+/// scan reads before it stops and reports an incomplete scan. It exists so a
+/// runaway journal still fails closed instead of being read without limit.
+pub(crate) const WAL_SCAN_BOUND: usize = 1_000_000;
+/// Ledger entry count at which the capacity warning is raised: an early
+/// signal well below the scan bound, not the bound itself.
+const LEDGER_WARN_ENTRIES: usize = 100_000;
 pub type WalResult<T> = Result<T, WalError>;
 #[derive(Debug)]
 pub enum WalError {
@@ -2009,7 +2016,7 @@ impl<F: FileSystem> Wal<F> {
     /// Seven-day orphan retention is housekeeping, never effect attribution.
     /// Referenced and malformed evidence is never aged out.
     fn prune_restore_orphans(&self, dir: &Directory) -> WalResult<()> {
-        let retained = self.retained(100_000)?;
+        let retained = self.retained(WAL_SCAN_BOUND)?;
         let mut referenced = std::collections::BTreeSet::new();
         for chain in &retained {
             if let OperationKind::Restore(p) = &chain.intent().kind {
@@ -2122,7 +2129,7 @@ impl<F: FileSystem> Wal<F> {
         Ok(true)
     }
     pub(crate) fn release_restore_snapshots(&self, digests: &[String]) -> WalResult<()> {
-        let retained = self.retained(100_000)?;
+        let retained = self.retained(WAL_SCAN_BOUND)?;
         let dir = self
             .common
             .child("fgos", false, &self.fs)?
@@ -3307,7 +3314,7 @@ impl<F: FileSystem> Wal<F> {
     /// Call only under repo-config authority. ConfigChange provenance chains
     /// remain retained, so sequence allocation and provenance share WAL truth.
     pub(crate) fn next_config_sequence(&self) -> WalResult<u64> {
-        self.retained(100_000)?
+        self.retained(WAL_SCAN_BOUND)?
             .iter()
             .filter_map(Chain::config_sequence)
             .max()
@@ -3428,8 +3435,8 @@ impl<F: FileSystem> Wal<F> {
                 if ledger {
                     result.ledger_bytes += bytes;
                     result.ledger_entries += 1;
-                    result.ledger_capacity_warning =
-                        result.ledger_entries >= 100_000 || result.ledger_bytes >= 64 * 1024 * 1024;
+                    result.ledger_capacity_warning = result.ledger_entries >= LEDGER_WARN_ENTRIES
+                        || result.ledger_bytes >= 64 * 1024 * 1024;
                 } else {
                     result.retained_bytes += bytes;
                     // A compacted leftover reports no modification time, so it never counts as retained.
@@ -3967,6 +3974,20 @@ mod tests {
             other => refused.push(format!("a scan over both directories: {other:?}")),
         }
         assert!(refused.is_empty(), "{refused:#?}");
+    }
+
+    #[test]
+    fn scan_is_incomplete_once_operations_pass_the_bound_and_complete_under_the_scan_bound() {
+        const SMALL_BOUND: usize = 3;
+        let t = Temp::new();
+        let wal = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
+        for i in 0..=SMALL_BOUND {
+            attempted(&wal, &format!("op-{i}"));
+        }
+        assert!(!wal.scan(SMALL_BOUND).unwrap().complete);
+        let scan = wal.scan(WAL_SCAN_BOUND).unwrap();
+        assert!(scan.complete);
+        assert_eq!(scan.entries.len(), SMALL_BOUND + 1);
     }
 
     #[test]

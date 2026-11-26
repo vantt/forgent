@@ -2760,7 +2760,7 @@ impl Inspect for GitDriver {
             }
             Err(e) => return Err(failure(format!("git-wal-unreadable: {e}"))),
         };
-        let scan = wal.scan(100_000)?;
+        let scan = wal.scan(crate::wal::WAL_SCAN_BOUND)?;
         if !scan.complete || scan.entries.iter().any(|e| e.error.is_some()) {
             return Err(failure("git-wal-unreadable"));
         }

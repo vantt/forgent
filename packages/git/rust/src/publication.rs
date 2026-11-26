@@ -253,7 +253,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
     fn admit_pending(&self, repo: &RepoHandle, wal: &Wal<&F>, id: &str) -> Result<()> {
         self.warnings.take();
         let mut terminal = Vec::new();
-        for chain in wal.retained(100_000).map_err(|e| {
+        for chain in wal.retained(crate::wal::WAL_SCAN_BOUND).map_err(|e| {
             let mut error = OperationError::from(e);
             error.cause = format!("publication-backlog-unreadable: {}", error.cause);
             error
@@ -780,7 +780,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
     pub fn recover_own_transfers(&self, repo: &RepoHandle) -> Result<Vec<String>> {
         let wal = self.wal(repo)?;
         let mut settled = Vec::new();
-        for chain in wal.retained(100_000)? {
+        for chain in wal.retained(crate::wal::WAL_SCAN_BOUND)? {
             let transfer = matches!(
                 chain.intent().kind,
                 wal::OperationKind::RemoteFetch { .. } | wal::OperationKind::RemotePush { .. }
@@ -807,7 +807,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
         // have not reached TargetAttempt; it never reissues an old CAS.
         self.admit_pending(repo, &wal, "")?;
         let mut pending = Vec::new();
-        for chain in wal.retained(100_000)? {
+        for chain in wal.retained(crate::wal::WAL_SCAN_BOUND)? {
             if chain.intent().kind != wal::OperationKind::PublicationCas
                 || chain.intent().resource_set != vec![self.authority.reference.as_str().to_owned()]
             {
@@ -1342,7 +1342,7 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
         let prepared = self.append_after_ref_durable(repo, &wal, &chain, Phase::Prepared, &pin)?;
         let receipt = self.attempt(repo, &wal, &prepared)?;
         if matches!(receipt.attribution, Attribution::ThisInvocationWonCas) {
-            for pending in wal.active(100_000).unwrap_or_default() {
+            for pending in wal.active(crate::wal::WAL_SCAN_BOUND).unwrap_or_default() {
                 if pending.intent().kind == wal::OperationKind::PublicationCas
                     && pending.intent().resource_set == i.resource_set
                     && pending.last().operation_id != id

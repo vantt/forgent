@@ -1417,7 +1417,7 @@ impl GitDriver {
         {
             return Err(recovery("worktree-admin-backlink-changed"));
         }
-        let scan = wal.scan(100_000)?;
+        let scan = wal.scan(crate::wal::WAL_SCAN_BOUND)?;
         if !scan.complete || scan.entries.iter().any(|entry| entry.error.is_some()) {
             return Err(recovery("git-wal-unreadable"));
         }

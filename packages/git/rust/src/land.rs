@@ -526,7 +526,7 @@ impl GitDriver {
             wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))?;
         // The live destination slot proves no previous session can still publish.
         // Close only this authority's pre-attempt chains; candidate evidence remains.
-        for prior in wal.active(100_000)? {
+        for prior in wal.active(crate::wal::WAL_SCAN_BOUND)? {
             if prior.last().operation_id != id
                 && prior.intent().authority_binding == land_binding
                 && matches!(&prior.intent().kind, OperationKind::Land(p) if p.request.destination == req.destination)

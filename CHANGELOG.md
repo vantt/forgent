@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fixed: the Git journal scan bound rises from 100,000 to 1,000,000 entries, so a long-lived journal no longer makes `fgos events sync`, `fgos questions ask` and `fgos mailbox send` refuse with `git-wal-unreadable`.
 - Added: `fgos git recover --confirm-writer-dead <writer-id>` lets the owner settle the unfinished Git operation of a writer that Identity no longer holds, so a forgotten writer no longer blocks every event-store write; it is refused for a caller under an agent CLI, for the caller's own writer and for a writer still alive.
 - Fixed: The land door no longer needs a hand push after a land dies between its commit and its push; the next land holding the merge slot publishes the commits it made itself and still refuses any foreign commit.
 - Added: `fgos git recover` settles a dead pid writer's pending chains and frees its candidates; a live pid is never treated as dead.

@@ -104,7 +104,7 @@ fn admission_with_land<F: wal::FileSystem>(
     // One read: `active` fails closed on a corrupt or truncated chain, on the bound, on a
     // stray entry and on a pre-intent artifact.
     for chain in wal
-        .active(100_000)
+        .active(crate::wal::WAL_SCAN_BOUND)
         .map_err(|_| recovery("git-wal-unreadable"))?
     {
         let exempt = if let Some((binding, driver, repo)) = land_binding {

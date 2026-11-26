@@ -1593,7 +1593,7 @@ impl GitDriver {
             Ok(w) => w,
             Err(_) => return Ok(Vec::new()),
         };
-        let chains = match wal.retained(100_000) {
+        let chains = match wal.retained(crate::wal::WAL_SCAN_BOUND) {
             Ok(c) => c,
             Err(_) => return Ok(Vec::new()),
         };

@@ -187,7 +187,7 @@ impl GitDriver {
             wal::canonical_digest(&("hooksConfig", hooks_request))
         }?;
         for chain in wal
-            .active(100_000)
+            .active(crate::wal::WAL_SCAN_BOUND)
             .map_err(|_| recovery("git-wal-unreadable"))?
         {
             if let OperationKind::ConfigChange(change) = &chain.intent().kind {
@@ -723,7 +723,7 @@ impl GitDriver {
             }
             Err(e) => return Err(e.into()),
         };
-        let scan = wal.scan(100_000)?;
+        let scan = wal.scan(crate::wal::WAL_SCAN_BOUND)?;
         if !scan.complete || scan.entries.iter().any(|e| e.error.is_some()) {
             return Err(recovery("git-wal-unreadable"));
         }

@@ -12,9 +12,6 @@ use serde::Serialize;
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 
-/// How many journal entries one read looks at.
-const SCAN_BOUND: usize = 100_000;
-
 /// The kinds of operation `recover` settles; anything else is left to its own door.
 const RECOVERABLE_KINDS: [&str; 3] = ["Land", "ScopedCommit", "RemoteTransfer"];
 
@@ -107,7 +104,7 @@ pub fn journal_facts(repo: &RepoHandle) -> Result<JournalFacts, FactError> {
         Err(error) => return Err(plain(error)),
     }
     let journal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(plain)?;
-    let scan = journal.scan(SCAN_BOUND).map_err(plain)?;
+    let scan = journal.scan(crate::wal::WAL_SCAN_BOUND).map_err(plain)?;
     Ok(JournalFacts {
         initialized: true,
         complete: scan.complete,
@@ -176,7 +173,7 @@ pub fn worktree_recovery_facts(
         Ok(_) => {
             let journal =
                 Wal::open_existing(repo.common_dir(), wal::OsFileSystem).map_err(plain)?;
-            for chain in journal.active(SCAN_BOUND).map_err(plain)? {
+            for chain in journal.active(crate::wal::WAL_SCAN_BOUND).map_err(plain)? {
                 if matches!(
                     chain.intent().kind,
                     wal::OperationKind::WorktreeCreate { .. }
@@ -345,7 +342,7 @@ fn merge_head(driver: &GitDriver, repo: &RepoHandle) -> Option<String> {
 /// The operations the journal has not finished, as the driver lists them. A repository nothing was ever
 /// journalled in has no journal to list; any other listing failure is the caller's to see.
 fn pending(driver: &GitDriver, repo: &RepoHandle) -> Result<Vec<Value>, FactError> {
-    match driver.list_pending(repo, SCAN_BOUND) {
+    match driver.list_pending(repo, crate::wal::WAL_SCAN_BOUND) {
         Ok(listing) => Ok(listing["operations"]
             .as_array()
             .cloned()
@@ -401,7 +398,7 @@ pub fn read_git_status(state_root: &Path, cwd: &Path) -> GitStatus {
             .collect()
     });
     let retained_land = driver
-        .list_retained_land(&repo, SCAN_BOUND)
+        .list_retained_land(&repo, crate::wal::WAL_SCAN_BOUND)
         .map(|listing| RetainedLand {
             candidates: listing["candidates"].clone(),
             complete: listing["complete"].clone(),
@@ -575,7 +572,7 @@ fn free_retained_land(
     writer_is_dead: &dyn Fn(&str) -> bool,
     kept: &mut Vec<Kept>,
 ) -> Result<Vec<String>, FactError> {
-    let listing = driver.list_retained_land(repo, SCAN_BOUND)?;
+    let listing = driver.list_retained_land(repo, crate::wal::WAL_SCAN_BOUND)?;
     let mut freed = Vec::new();
     for candidate in listing["candidates"].as_array().into_iter().flatten() {
         let id = candidate["operationId"].as_str().unwrap_or_default();
