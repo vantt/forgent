@@ -12,11 +12,19 @@ use std::path::Path;
 
 pub const GATE_KILL_GRACE_KEY: &str = "dispatch.gateKillGraceMs";
 pub const CANCEL_WAIT_KEY: &str = "dispatch.cancelWaitMs";
+pub const SUPERVISOR_SCOPE_MEMORY_MAX_KEY: &str = "runner.supervisorScope.memoryMax";
 
 /// A `dispatch` key's value and the layer that set it (`project`, `global` or `standard`).
 #[derive(Debug, Clone, PartialEq)]
 pub struct Setting {
     pub value: u64,
+    pub source: String,
+}
+
+/// A string key's value and the layer that set it (`project`, `global` or `standard`).
+#[derive(Debug, Clone, PartialEq)]
+pub struct StringSetting {
+    pub value: String,
     pub source: String,
 }
 
@@ -118,4 +126,45 @@ pub fn read_gate_kill_grace_ms(project_root: Option<&Path>) -> Result<u64, Confi
 /// `dispatch.cancelWaitMs` of the project at `project_root`.
 pub fn read_cancel_wait_ms(project_root: Option<&Path>) -> Result<u64, ConfigReadError> {
     Ok(resolve_cancel_wait(&read_dispatch_config(project_root, None)?)?.value)
+}
+
+/// The memory cap for the supervisor scope and where it came from.
+pub fn resolve_supervisor_scope_memory_max(
+    snapshot: &Snapshot,
+) -> Result<StringSetting, ConfigReadError> {
+    let missing = || {
+        ConfigReadError(format!(
+            "the config door returned no value for {SUPERVISOR_SCOPE_MEMORY_MAX_KEY}"
+        ))
+    };
+    let layer = snapshot
+        .origins
+        .iter()
+        .find(|origin| {
+            matches!(
+                origin.path.as_slice(),
+                [Segment::Key(a), Segment::Key(b), Segment::Key(c)]
+                    if a == "runner" && b == "supervisorScope" && c == "memoryMax"
+            )
+        })
+        .map(|origin| origin.provenance.layer)
+        .ok_or_else(missing)?;
+    let value = snapshot
+        .value
+        .get("runner")
+        .and_then(|r| r.get("supervisorScope"))
+        .and_then(|s| s.get("memoryMax"))
+        .and_then(Value::as_str)
+        .ok_or_else(missing)?;
+    Ok(StringSetting {
+        value: value.to_string(),
+        source: layer.to_string(),
+    })
+}
+
+/// `runner.supervisorScope.memoryMax` of the project at `project_root`.
+pub fn read_supervisor_scope_memory_max(
+    project_root: Option<&Path>,
+) -> Result<String, ConfigReadError> {
+    Ok(resolve_supervisor_scope_memory_max(&read_dispatch_config(project_root, None)?)?.value)
 }

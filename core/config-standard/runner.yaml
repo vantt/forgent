@@ -612,6 +612,10 @@ runner:
     maxRoots: 4
     # @fgos:doc Most leaf work items running at once under one root. Minimum: 1. Default: 4.
     maxLeavesPerRoot: 4
+  # @fgos:doc Settings of the transient systemd user scope wrapping each run supervisor.
+  supervisorScope:
+    # @fgos:doc Memory cap for the run supervisor's systemd scope in systemd size syntax (e.g. 8G); empty means no cap. Default: 8G.
+    memoryMax: "8G"
   # @fgos:doc Runner-wide confinement setting.
   confinement:
     # @fgos:doc When true every capability must declare its own confinement. Default: false.

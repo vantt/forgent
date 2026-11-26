@@ -596,6 +596,7 @@ fn under_custody_the_callers_lease_is_lent_to_the_supervisor_which_survives_a_bo
 #[test]
 fn a_supervisor_that_binds_is_seen_bound_one_that_exits_is_seen_exited_and_a_failed_start_removes_the_secrets(
 ) {
+    use fgos_run_supervisor::controller::scope::FailureDomain;
     use std::os::unix::fs::PermissionsExt;
     let dir = scratch("supervisor");
     let run_dir = dir.join("run");
@@ -607,8 +608,12 @@ fn a_supervisor_that_binds_is_seen_bound_one_that_exits_is_seen_exited_and_a_fai
     std::fs::write(&side, "{}").unwrap();
     let envelope = json!({"runDir": run_dir.to_str().unwrap(), "hostBin": script.to_str().unwrap(), "sideFile": side.to_str().unwrap()});
     let step_env = Map::new();
+    let pinned_domain = FailureDomain::Inherited {
+        reason: "pinned-test".to_string(),
+    };
     std::fs::write(run_dir.join("mode"), "bind").unwrap();
-    let mut started = start_supervisor(&envelope, &[], &step_env, &Map::new()).unwrap();
+    let mut started =
+        start_supervisor_in(&envelope, &[], &step_env, &Map::new(), &pinned_domain, None).unwrap();
     assert!(started.hands_over_locks);
     assert_eq!(
         wait_for_binding(&run_dir, &mut started.child, 5000),
@@ -617,7 +622,8 @@ fn a_supervisor_that_binds_is_seen_bound_one_that_exits_is_seen_exited_and_a_fai
     let _ = started.child.wait();
     std::fs::remove_file(run_dir.join("supervisor-binding.json")).unwrap();
     std::fs::write(run_dir.join("mode"), "exit").unwrap();
-    let mut gone = start_supervisor(&envelope, &[], &step_env, &Map::new()).unwrap();
+    let mut gone =
+        start_supervisor_in(&envelope, &[], &step_env, &Map::new(), &pinned_domain, None).unwrap();
     assert_eq!(
         wait_for_binding(&run_dir, &mut gone.child, 5000),
         Binding::Exited {
@@ -626,7 +632,9 @@ fn a_supervisor_that_binds_is_seen_bound_one_that_exits_is_seen_exited_and_a_fai
         }
     );
     let missing = json!({"runDir": run_dir.to_str().unwrap(), "hostBin": dir.join("nope").to_str().unwrap(), "sideFile": side.to_str().unwrap()});
-    assert!(start_supervisor(&missing, &[], &step_env, &Map::new()).is_err());
+    assert!(
+        start_supervisor_in(&missing, &[], &step_env, &Map::new(), &pinned_domain, None).is_err()
+    );
     assert!(!side.exists(), "secrets with no reader do not stay on disk");
 }
 
@@ -657,4 +665,106 @@ fn a_result_that_never_comes_is_judged_by_the_adopt_door_and_read_once_more() {
         &|_| unreachable!(),
     );
     assert_eq!(found, Some(json!({"outcome": "ok"})));
+}
+
+#[test]
+fn launch_path_builds_scoped_and_plain_commands_and_binding_carries_failure_domain() {
+    use fgos_run_supervisor::controller::scope::FailureDomain;
+
+    let dir = scratch("scope-launch");
+    let run_dir = dir.join("run");
+    std::fs::create_dir_all(&run_dir).unwrap();
+    let envelope = json!({
+        "attemptId": "att-scope-1",
+        "runDir": run_dir.to_str().unwrap(),
+        "digest": "sha256-abc",
+        "hostBin": "/bin/fgos",
+        "cwd": "/w",
+    });
+
+    // 1. Wiring: a scope domain launches the absolute systemd-run it carries, wrapping the supervisor argv,
+    // with the probed runtime directory in the child environment. The argv shapes are owned by scope.rs.
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let fake = dir.join("systemd-run");
+        std::fs::write(
+            &fake,
+            "#!/bin/sh\n{ echo \"$0\"; for a in \"$@\"; do echo \"$a\"; done; echo \"XDG=$XDG_RUNTIME_DIR\"; echo \"PATH=$PATH\"; } > argv.txt\n",
+        )
+        .unwrap();
+        std::fs::set_permissions(&fake, std::fs::Permissions::from_mode(0o755)).unwrap();
+        let scope_domain = FailureDomain::SystemdScope {
+            unit: "fgos-run-att-scope-1".into(),
+            systemd_run_dir: dir.clone(),
+            runtime_dir: "/probed/runtime".into(),
+        };
+        let mut started = start_supervisor_in(
+            &envelope,
+            &[],
+            &Map::new(),
+            &Map::new(),
+            &scope_domain,
+            None,
+        )
+        .unwrap();
+        let _ = started.child.wait();
+        let recorded = std::fs::read_to_string(run_dir.join("argv.txt")).unwrap();
+        let lines: Vec<&str> = recorded.lines().collect();
+        let env_path = run_dir.join("envelope.json").to_string_lossy().to_string();
+        assert_eq!(lines[0], fake.to_str().unwrap());
+        let supervisor_argv = [
+            "/bin/fgos",
+            "internal",
+            "supervise",
+            "--envelope",
+            env_path.as_str(),
+            "--protocol",
+            "1",
+        ];
+        assert_eq!(
+            &lines[lines.len() - 2 - supervisor_argv.len()..lines.len() - 2],
+            supervisor_argv
+        );
+        assert_eq!(lines[lines.len() - 2], "XDG=/probed/runtime");
+        assert!(lines[lines.len() - 1].starts_with(&format!("PATH={}:", dir.display())));
+    }
+
+    // 4. Real binding write carries failureDomain (exercise write_supervisor_binding)
+    let me = fgos_process::facts::self_identity().unwrap();
+    let gate = me.clone();
+    let declared = json!({ "domainKind": "linux-gate", "domainId": "dom-1" });
+    let fd_val = json!({ "kind": "systemd-scope", "unit": "fgos-run-att-scope-1" });
+    fgos_run_supervisor::supervise::write_supervisor_binding(
+        &run_dir, &envelope, &me, &gate, &declared, &fd_val, true,
+    )
+    .unwrap();
+    let binding_file = run_dir.join("supervisor-binding.json");
+    assert!(binding_file.exists());
+    let binding_content: Value =
+        serde_json::from_str(&std::fs::read_to_string(&binding_file).unwrap()).unwrap();
+    assert_eq!(binding_content["failureDomain"], fd_val);
+
+    // 5. Unrecorded fallback for unparsable/missing failure domain
+    use fgos_run_supervisor::supervise::resolve_failure_domain;
+    assert_eq!(
+        resolve_failure_domain(None),
+        json!({ "kind": "inherited", "reason": "unrecorded" })
+    );
+    assert_eq!(
+        resolve_failure_domain(Some("not-json")),
+        json!({ "kind": "inherited", "reason": "unrecorded" })
+    );
+    assert_eq!(
+        resolve_failure_domain(Some("{\"kind\":\"inherited\",\"reason\":\"not-linux\"}")),
+        json!({ "kind": "inherited", "reason": "not-linux" })
+    );
+    assert_eq!(
+        resolve_failure_domain(Some("{\"kind\":\"systemd-scope\",\"unit\":\"u\"}")),
+        json!({ "kind": "systemd-scope", "unit": "u" })
+    );
+    assert_eq!(
+        resolve_failure_domain(Some("{\"kind\":\"bogus\"}")),
+        json!({ "kind": "inherited", "reason": "unrecorded" })
+    );
 }
