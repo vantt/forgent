@@ -24,3 +24,21 @@ The `routing::tests::git_refuses_an_unknown_flag_in_the_node_cli_text` failure y
 
 ## Read for phase 6
 None of the failing files is in this plan's footprint. Steps 1 and 4 (the full gates) are done; step 2 (the live check with a throwaway lead) is not: a throwaway lead was started on a draft plan name (`forgent-261125-2315-head-mail`) and its agent killed, but `watcher tick` answered `skipped-busy (active)` for several minutes because the Event Store was sealing a week of backlog after an old Git transfer was recovered, so no `lead-ended` event could be observed yet.
+
+## Step 2 live check, result (lead:SUPERVISOR, 2026-11-26 13:55)
+
+Procedure run: `fgos session start lead --name forgent-261125-2315-head-mail` (a name that matches a draft plan; the grant check refuses a made-up name and a name matching no open plan), its `claude` agent (pid 606158) stopped with SIGTERM at 12:53, then ticks. The first `watcher tick` calls answered `skipped-busy (active)`: the systemd timer `fgos-watcher-e9756c48.timer` runs one tick about every minute (each runs close to a minute while the Event Store seals its backlog), so a hand-run tick usually lands inside a running one. The timer's own ticks did the detection.
+
+Observed, by the supervisor's 13:05 wake (`plans/reports/supervisor-261126-1305-wake-drain.md`): two events for `head:lead-forgent-261125-2315-head-mail`: `session-gone` (de22318f1204ac5c) and `head-gone` (e1291fc9a0de19b9). **No `lead-ended` event was raised** in about 60 minutes of ticks. The supervisor handled both events and did not restart (the plan is a draft blocked by two running plans). A later `fgos session stop` for the throwaway lead answered `stopped: false, reason: not-live`: no live session held the role any more, so nothing was left to stop.
+
+So for a lead whose agent is killed from outside, the watcher raises the gone pair, not `lead-ended`. If the phase's criterion is `lead-ended` for this case, it does not hold in the live system: either the criterion names the other case (an attempt that closed without a stop, f4f3ef219) or the projection does not cover a SIGTERM of the agent. The lead of this plan decides which; the evidence is the two event ids above.
+
+## Correction to the step 2 result above (lead:SUPERVISOR, 2026-11-26 14:00)
+
+The live check ran against the activated release `sha256:33f462be` (activated 2026-11-25T11:42Z), which predates this plan's phase 2 (`0463c0385`). That release projects an ended lead only from a retired record, so "no `lead-ended`" says nothing about the code of this plan. Do not read it as a failed criterion. The observation that stands: the killed lead's agent produced `session-gone` and `head-gone` under the old release. The check has to be rerun once a release built from main at or after `0463c0385` is staged and activated; nobody has started that release yet, and `fgos release run` is held back while `npm test` is red on main (19 failures that already existed before this plan).
+
+## Step 2 live check rerun on the new release (lead:SUPERVISOR, 2026-11-26 14:23)
+
+Release built from main `6c574f762` (artifact `sha256:daaf4d836c966f836e7215704e373982e5efc0f887987811a715627b26c4f094`), staged with `fgctl stage` and activated in this project with `fgctl upgrade --from` at 14:19 (the previous release `33f462be` is kept for `fgctl repair`; `fgctl verify` answers `verified daaf4d836c96`). `fgctl upgrade` exits 2 because three doctor checks need the owner: `tool-registry-configured` (one tool missing), `work-step-vocabulary` (open item tsk-5db at the step "clarify") and `provider-capacity-state` (quota quarantine); these describe the machine's data, not this release.
+
+Rerun: `fgos session start lead --name forgent-261125-2315-head-mail` (generation 2) at 14:20:41 under the new release, its `claude` agent (pid 439951) stopped with SIGTERM at 14:21:18. The attempt directory then held `closed.json` written by the supervisor with no `retiredAt` (the case phase 2 projects as ended). The timer's watcher tick raised **`lead-ended` for `head:lead-forgent-261125-2315-head-mail` (event 3545235acd502d84) at 14:21**, so the live criterion of phase 6 step 2 holds. The throwaway lead needs no stop (its session is already gone).

@@ -474,6 +474,13 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
             "message.too-large-for-channel",
             &["{{count}}", "fgos mailbox inbox --claim"][..],
         ),
+        ("report.path.local-pushed", &["local-pushed"][..]),
+        ("report.path.local-typed", &["local-typed"][..]),
+        (
+            "report.path.local-next-tool-call",
+            &["local-next-tool-call"][..],
+        ),
+        ("report.path.remote-recorded", &["remote-recorded"][..]),
         ("report.nudge.sent", &["nudged"][..]),
         ("report.nudge.pending", &["still unread"][..]),
         ("report.nudge.refused", &["{{why}}", "next tool call"][..]),

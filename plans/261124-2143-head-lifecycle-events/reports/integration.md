@@ -53,5 +53,8 @@ Reading: the check ran the old code, so it neither proves nor disproves acceptan
   `session-gone.query.json` has no `ended` case. The observed pair (gone events, no `lead-ended`) is the pre-plan
   behaviour, and with phase 2 the same lead would project `ended`, raise `lead-ended`, and not raise `session-gone`.
 
-To finish step 2: rerun the same check after a release built from main at or after `0463c0385` is staged and
-activated (activation is not this plan's step and is not done by a lead).
+Rerun on the new release (lead:SUPERVISOR, 2026-11-26 14:19-14:23): release built from main `6c574f762`
+(artifact `sha256:daaf4d836c96…`, `fgctl verify` ok) activated at 14:19; throwaway lead generation 2 started 14:20:41,
+its agent SIGTERM'd 14:21:18; the attempt held `closed.json` with no `retiredAt`, and the timer's watcher tick raised
+**`lead-ended` (event `3545235acd502d84`) at 14:21**. Step 2 holds live: acceptance 2 and 3 are shown on the running
+system. Details in `reports/lead-supervisor-gates-261126-1340.md`, last section.
