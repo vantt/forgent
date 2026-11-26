@@ -35,3 +35,23 @@ No failing file is in this plan's footprint, so acceptance 7 is met in the sense
 - Step 2 (live lead-ended check with a throwaway lead) is still open; the supervisor runs it once the watcher tick is free (the last attempt got `skipped-busy`).
 - Step 3 (CHANGELOG line) is parked while plan 261125-1631-agent-context-engine holds `CHANGELOG.md`.
 - Step 4 is done: `p-iatzcg2gee`, `p-6hqvgokerb`, `p-tyowvhthul` and `p-pv7ha3l5ss` are `done` in `plans/backlog/` and `plans/backlog.md`, each with a closing note naming its owning proof.
+
+## Step 2 live check (run by lead:SUPERVISOR, 2026-11-26 12:53-13:55)
+
+Result as run: the throwaway lead `head:lead-forgent-261125-2315-head-mail`, agent SIGTERM'd at 12:53, raised
+`session-gone` (`de22318f1204ac5c`) and `head-gone` (`e1291fc9a0de19b9`) and no `lead-ended` in about 60 minutes
+(`reports/lead-supervisor-gates-261126-1340.md`, section "Step 2 live check").
+
+Reading: the check ran the old code, so it neither proves nor disproves acceptance 2 and 3.
+
+- The killed agent's attempt was closed by its run supervisor: `.fgos/assignments/head-lead-forgent-261125-2315-head-mail-1/runs/01/closed.json`
+  (`at` 2026-11-26T05:54:19Z, `closedBy: supervisor`), and the placement has no `retiredAt`. That is exactly the case
+  phase 2 projects as `ended`; the criterion names it, and a SIGTERM of the agent does reach it.
+- The watcher timer runs the activated release (`.fgos/installation/activation.json`: artifact
+  `sha256:33f462be…`, activated 2026-11-25T11:42Z), which predates phase 2 (`0463c0385`, 2026-11-26). Its
+  `core/watcher/definitions/lead-ended.query.json` still reads `fgos.head.state eq retired`, and its
+  `session-gone.query.json` has no `ended` case. The observed pair (gone events, no `lead-ended`) is the pre-plan
+  behaviour, and with phase 2 the same lead would project `ended`, raise `lead-ended`, and not raise `session-gone`.
+
+To finish step 2: rerun the same check after a release built from main at or after `0463c0385` is staged and
+activated (activation is not this plan's step and is not done by a lead).
