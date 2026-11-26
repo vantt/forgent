@@ -15,7 +15,7 @@
       ]
     },
     "depends_on": [
-      "missing-rule"
+      "[[missing-rule]]"
     ]
   },
   "body": "Do the thing.",

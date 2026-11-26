@@ -1,42 +1,175 @@
 {
   "contract": "agent-context-engine-rule-unit.v1",
-  "description": "Frontmatter of one rule unit (a Markdown file in core/instructions/, components/<c>/instructions/ or domains/<d>/instructions/). The body is the Markdown after the frontmatter. The pkm pack file declares the same type, roles and edges.",
+  "description": "Frontmatter of one rule unit (a Markdown file in core/instructions/, components/<c>/instructions/ or domains/<d>/instructions/). The body is the Markdown after the frontmatter. The pkm pack file declares the same type, roles and edges. File stem equals id (a link [[x]] resolves by file stem, not by the id field). Edge fields hold wikilinks \"[[id]]\": pkm makes an edge only from that form, and a bare id is invisible to it. owner equals the owner of the root the file sits in (core, the component or the domain).",
   "pkm": {
     "type": "rule",
     "roles": {
-      "id": { "field": "id", "id_scope": "vault" },
-      "lifecycle": { "field": "lifecycle", "classes": ["draft", "rejected", "live", "deprecated", "replaced", "retracted"] },
-      "valid_from": { "field": "valid_from" },
-      "valid_to": { "field": "valid_to" },
-      "replaced_by": { "field": "superseded_by" }
+      "id": {
+        "field": "id",
+        "id_scope": "vault"
+      },
+      "lifecycle": {
+        "field": "lifecycle",
+        "classes": [
+          "draft",
+          "rejected",
+          "live",
+          "deprecated",
+          "replaced",
+          "retracted"
+        ]
+      },
+      "valid_from": {
+        "field": "valid_from"
+      },
+      "valid_to": {
+        "field": "valid_to"
+      },
+      "replaced_by": {
+        "field": "superseded_by"
+      }
     },
-    "edges": ["refines", "depends_on", "conflicts_with", "related"]
+    "edges": [
+      "refines",
+      "depends_on",
+      "conflicts_with",
+      "related"
+    ]
   },
   "schema": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "owner", "kind", "mode", "scope", "specificity", "title", "lifecycle"],
+    "required": [
+      "id",
+      "owner",
+      "kind",
+      "mode",
+      "scope",
+      "specificity",
+      "title",
+      "lifecycle",
+      "valid_from"
+    ],
     "properties": {
-      "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "Unique across all three roots." },
-      "owner": { "type": "string", "description": "A component or domain id of the component authority model (OwnerRegistry)." },
-      "kind": { "enum": ["law", "boundary", "procedure", "host-adapter", "preference"] },
-      "mode": { "enum": ["append", "refine", "override", "forbid"] },
-      "scope": { "enum": ["repo", "platform", "component", "domain", "workspace", "project", "command", "skill", "host", "session"] },
-      "specificity": { "type": "integer", "minimum": 0, "description": "Defaults from scope: repo/platform 10, component 20, domain 30, workspace/project 40, command 50, skill 60, session 70, host 80." },
-      "title": { "type": "string", "minLength": 1 },
-      "description": { "type": "string" },
-      "lifecycle": { "enum": ["draft", "rejected", "live", "deprecated", "replaced", "retracted"] },
-      "valid_from": { "type": "string", "format": "date" },
-      "valid_to": { "type": "string", "format": "date", "description": "Required when lifecycle is replaced." },
-      "superseded_by": { "type": "string", "description": "Id of the replacement rule; required with valid_to when lifecycle is replaced." },
-      "refines": { "type": "array", "items": { "type": "string" } },
-      "depends_on": { "type": "array", "items": { "type": "string" } },
-      "conflicts_with": { "type": "array", "items": { "type": "string" } },
-      "related": { "type": "array", "items": { "type": "string" } },
+      "id": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+        "description": "Unique across all three roots; equals the file stem."
+      },
+      "owner": {
+        "type": "string",
+        "description": "A component or domain id of the component authority model (OwnerRegistry)."
+      },
+      "kind": {
+        "enum": [
+          "law",
+          "boundary",
+          "procedure",
+          "host-adapter",
+          "preference"
+        ]
+      },
+      "mode": {
+        "enum": [
+          "append",
+          "refine",
+          "override",
+          "forbid"
+        ]
+      },
+      "scope": {
+        "enum": [
+          "repo",
+          "platform",
+          "component",
+          "domain",
+          "workspace",
+          "project",
+          "command",
+          "skill",
+          "host",
+          "session"
+        ]
+      },
+      "specificity": {
+        "type": "integer",
+        "minimum": 0,
+        "description": "Defaults from scope: repo/platform 10, component 20, domain 30, workspace/project 40, command 50, skill 60, session 70, host 80."
+      },
+      "title": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": {
+        "type": "string"
+      },
+      "lifecycle": {
+        "enum": [
+          "draft",
+          "rejected",
+          "live",
+          "deprecated",
+          "replaced",
+          "retracted"
+        ]
+      },
+      "valid_from": {
+        "type": "string",
+        "format": "date",
+        "description": "Required: pkm drops a rule without it from the set in force without a word."
+      },
+      "valid_to": {
+        "type": "string",
+        "format": "date",
+        "description": "Only with lifecycle replaced, and required there: pkm ends any non-rejected rule whose valid_to has passed, whatever its lifecycle."
+      },
+      "superseded_by": {
+        "type": "string",
+        "pattern": "^\\[\\[[a-z0-9]+(-[a-z0-9]+)*\\]\\]$",
+        "description": "Wikilink to the replacement rule, \"[[id]]\"; only with lifecycle replaced, and required there with valid_to."
+      },
+      "refines": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "pattern": "^\\[\\[[a-z0-9]+(-[a-z0-9]+)*\\]\\]$"
+        },
+        "description": "Wikilinks \"[[id]]\" of rules."
+      },
+      "depends_on": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "pattern": "^\\[\\[[a-z0-9]+(-[a-z0-9]+)*\\]\\]$"
+        },
+        "description": "Wikilinks \"[[id]]\" of rules."
+      },
+      "conflicts_with": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "pattern": "^\\[\\[[a-z0-9]+(-[a-z0-9]+)*\\]\\]$"
+        },
+        "description": "Wikilinks \"[[id]]\" of rules."
+      },
+      "related": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "pattern": "^\\[\\[[a-z0-9]+(-[a-z0-9]+)*\\]\\]$"
+        },
+        "description": "Wikilinks \"[[id]]\" of rules."
+      },
       "when": {
         "type": "object",
-        "description": "Keys from when-keys.v1.json; each value is a list of allowed values (any-of). Empty or absent means always.",
-        "additionalProperties": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+        "description": "Keys from when-keys.v1.json; each value is a list of allowed values (any-of), at least one. Empty or absent means always.",
+        "additionalProperties": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
       }
     }
   }

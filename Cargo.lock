@@ -565,6 +565,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-agent-context-engine"
+version = "0.2.0"
+dependencies = [
+ "fgos-canonical-json",
+ "fgos-yaml-doc",
+ "pkm-core",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+]
+
+[[package]]
 name = "fgos-agent-protocol"
 version = "0.2.0"
 dependencies = [

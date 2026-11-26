@@ -16,7 +16,29 @@
     }
   },
   "body": "Do the thing.",
-  "state": "a second unit with id example-rule exists",
+  "state": "a second unit with id example-rule exists in domains/coding/instructions/",
+  "others": [
+    {
+      "unit": {
+        "id": "example-rule",
+        "owner": "coding",
+        "kind": "procedure",
+        "mode": "append",
+        "scope": "domain",
+        "specificity": 30,
+        "title": "Example rule",
+        "lifecycle": "live",
+        "valid_from": "2026-11-25",
+        "when": {
+          "role": [
+            "producer"
+          ]
+        }
+      },
+      "body": "Do the thing.",
+      "source": "domains/coding/instructions/example-rule.md"
+    }
+  ],
   "expect": {
     "refusal": "rule-id-duplicate"
   }

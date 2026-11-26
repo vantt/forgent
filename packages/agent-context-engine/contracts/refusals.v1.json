@@ -73,6 +73,24 @@
       "category": "precondition",
       "phase": "read",
       "when": "A reader does not support the file's schemaVersion or whenKeysVersion."
+    },
+    {
+      "code": "rule-unit-invalid",
+      "category": "validation",
+      "phase": "write",
+      "when": "A unit file does not match rule-unit.v1: an unknown key, a missing required field (valid_from included), a bare id where a wikilink is required, valid_to or superseded_by on a rule that is not replaced, a file stem that differs from the id, an owner that differs from the root's, or no readable frontmatter."
+    },
+    {
+      "code": "rule-composition-invalid",
+      "category": "conflict",
+      "phase": "write",
+      "when": "The rules in force cannot be composed: an illegal override or replacement, an incompatible ordering or dependency cycle, or a boundary of another owner."
+    },
+    {
+      "code": "rule-set-malformed",
+      "category": "corrupt",
+      "phase": "read",
+      "when": "A reader finds the set file is not valid JSON or does not match effective-rules.v1."
     }
   ]
 }

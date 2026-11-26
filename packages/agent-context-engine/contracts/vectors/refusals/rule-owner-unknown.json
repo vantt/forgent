@@ -4,7 +4,7 @@
     "owner": "no-such-owner",
     "kind": "procedure",
     "mode": "append",
-    "scope": "repo",
+    "scope": "component",
     "specificity": 10,
     "title": "Example rule",
     "lifecycle": "live",
@@ -16,7 +16,8 @@
     }
   },
   "body": "Do the thing.",
-  "state": "",
+  "source": "components/no-such-owner/instructions/example-rule.md",
+  "state": "no-such-owner is neither a component nor a domain of the authority model; the file sits under components/no-such-owner/instructions/",
   "expect": {
     "refusal": "rule-owner-unknown"
   }

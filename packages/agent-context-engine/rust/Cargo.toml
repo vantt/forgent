@@ -1,0 +1,24 @@
+[package]
+name = "fgos-agent-context-engine"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Rule units: the schema, the when: key registry, composition, the compiled effective set with its digest, and the pkm store that checks them."
+
+[features]
+# The store adapter (index, in force, validate) is the only code that links pkm. A reader of the compiled set builds
+# with `--no-default-features` and links neither pkm nor the YAML reader.
+default = ["store"]
+store = ["dep:pkm-core", "dep:fgos-yaml-doc"]
+
+[dependencies]
+fgos-canonical-json = { path = "../../canonical-json/rust" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+# pkm is linked as a library, at the tag and with the features fgos-documentation links.
+pkm-core = { git = "https://github.com/vantt/pkm", tag = "v0.7.0", features = ["search"], optional = true }
+fgos-yaml-doc = { path = "../../yaml-doc/rust", optional = true }
+
+[dev-dependencies]
+tempfile = "3"
