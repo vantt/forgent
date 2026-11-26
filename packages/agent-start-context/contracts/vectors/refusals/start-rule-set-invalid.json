@@ -1,0 +1,42 @@
+{
+  "description": "The rule set's digest does not match its rules.",
+  "ruleSet": {
+    "schemaVersion": 1,
+    "whenKeysVersion": 2,
+    "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "rules": []
+  },
+  "liveValues": {
+    "role": [
+      "producer",
+      "reviewer"
+    ],
+    "persona": [
+      "lead",
+      "shaper"
+    ],
+    "project": [
+      "forgent"
+    ],
+    "agentCli": [
+      "claude",
+      "codex"
+    ],
+    "domain": [
+      "coding"
+    ]
+  },
+  "request": {
+    "facts": {
+      "sessionType": "worker",
+      "role": "producer",
+      "project": "forgent",
+      "agentCli": "claude"
+    },
+    "payloads": [],
+    "delivery": "prompt-arg"
+  },
+  "expect": {
+    "refusal": "start-rule-set-invalid"
+  }
+}

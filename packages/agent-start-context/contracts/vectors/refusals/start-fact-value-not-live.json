@@ -1,0 +1,37 @@
+{
+  "description": "role values are read live; tester is not among them now.",
+  "ruleSet": "packages/agent-context-engine/contracts/vectors/effective-set.json",
+  "liveValues": {
+    "role": [
+      "producer",
+      "reviewer"
+    ],
+    "persona": [
+      "lead",
+      "shaper"
+    ],
+    "project": [
+      "forgent"
+    ],
+    "agentCli": [
+      "claude",
+      "codex"
+    ],
+    "domain": [
+      "coding"
+    ]
+  },
+  "request": {
+    "facts": {
+      "sessionType": "worker",
+      "role": "tester",
+      "project": "forgent",
+      "agentCli": "claude"
+    },
+    "payloads": [],
+    "delivery": "prompt-arg"
+  },
+  "expect": {
+    "refusal": "start-fact-value-invalid"
+  }
+}

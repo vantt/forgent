@@ -1,0 +1,38 @@
+{
+  "description": "kind was a key of the first draft; registry version 2 has no such key.",
+  "ruleSet": "packages/agent-context-engine/contracts/vectors/effective-set.json",
+  "liveValues": {
+    "role": [
+      "producer",
+      "reviewer"
+    ],
+    "persona": [
+      "lead",
+      "shaper"
+    ],
+    "project": [
+      "forgent"
+    ],
+    "agentCli": [
+      "claude",
+      "codex"
+    ],
+    "domain": [
+      "coding"
+    ]
+  },
+  "request": {
+    "facts": {
+      "sessionType": "worker",
+      "role": "producer",
+      "project": "forgent",
+      "agentCli": "claude",
+      "kind": "worker"
+    },
+    "payloads": [],
+    "delivery": "prompt-arg"
+  },
+  "expect": {
+    "refusal": "start-fact-unknown"
+  }
+}

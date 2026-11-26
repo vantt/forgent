@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fgos.invalid/agent-start-context/start-request.v1.json",
+  "title": "compose StartRequest v1",
+  "description": "The one argument of compose (docs/platform/agent-start-context/spec.md section 5). Fact keys and value types are the agent context engine's registry, packages/agent-context-engine/contracts/when-keys.v2.json; this file never repeats the key list. A key outside that registry is refused start-fact-unknown, a wrong type or a value its live source does not allow now start-fact-value-invalid. The start kind is derived, not sent: the sessionType fact when present (head, worker, hand-opened); otherwise agent-file when a persona fact is present, setup when it is not. requiredFacts lists the keys each start kind must supply; a missing one is refused start-fact-missing.",
+  "x-whenKeys": "packages/agent-context-engine/contracts/when-keys.v2.json",
+  "x-requiredFacts": {
+    "head": [
+      "sessionType",
+      "persona",
+      "project",
+      "agentCli",
+      "agentLifecycle"
+    ],
+    "worker": [
+      "sessionType",
+      "role",
+      "project",
+      "agentCli"
+    ],
+    "hand-opened": [
+      "sessionType",
+      "project",
+      "agentCli"
+    ],
+    "agent-file": [
+      "persona",
+      "project"
+    ],
+    "setup": [
+      "project"
+    ]
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "facts",
+    "payloads",
+    "delivery"
+  ],
+  "properties": {
+    "facts": {
+      "type": "object",
+      "description": "Fact key to value. Keys from when-keys.v2.json; a value is a string (enum or string value type).",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-zA-Z][a-zA-Z0-9]*$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "payloads": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/payload"
+      },
+      "description": "Content owned by its producer; compose places it and never rewrites it."
+    },
+    "delivery": {
+      "enum": [
+        "opening",
+        "prompt-arg",
+        "agent-file",
+        "hook-context"
+      ],
+      "description": "How the text reaches the agent: typed into a pane, a headless prompt argument, a .claude/agents or AGENTS.md file, a SessionStart hook's context. Owned by Agent Protocol."
+    }
+  },
+  "$defs": {
+    "payload": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "text"
+          ],
+          "properties": {
+            "kind": {
+              "const": "assignment"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Execution's rendered assignment block (objective, write scope, result claim)."
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path",
+            "itemKind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "task"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Repo-relative path of the head's bound item (plan, discussion, backlog row)."
+            },
+            "itemKind": {
+              "enum": [
+                "plan",
+                "discussion",
+                "backlog",
+                "question"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "text"
+          ],
+          "properties": {
+            "kind": {
+              "const": "handoff"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The rotation handoff for a successor head; its one channel."
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "questionId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "for-question"
+            },
+            "questionId": {
+              "type": "string",
+              "pattern": "^q-[0-9a-z]+$"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

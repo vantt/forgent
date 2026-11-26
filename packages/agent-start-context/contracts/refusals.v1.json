@@ -1,0 +1,39 @@
+{
+  "contract": "agent-start-context-refusals.v1",
+  "categories": "packages/host-runtime/contracts/exit-codes.v1.json",
+  "refusals": [
+    {
+      "code": "start-fact-unknown",
+      "category": "validation",
+      "when": "A fact key is not in the agent context engine's when-keys registry."
+    },
+    {
+      "code": "start-fact-value-invalid",
+      "category": "validation",
+      "when": "A fact value has the wrong type, or is not among the values its live source allows now."
+    },
+    {
+      "code": "start-fact-missing",
+      "category": "validation",
+      "when": "A key the derived start kind requires (x-requiredFacts of start-request.v1.json) is absent.",
+      "carries": [
+        "missing"
+      ]
+    },
+    {
+      "code": "start-payload-invalid",
+      "category": "validation",
+      "when": "A payload is not one of assignment, task, handoff, for-question, or does not match its variant."
+    },
+    {
+      "code": "start-rule-set-invalid",
+      "category": "precondition",
+      "when": "The effective rule set is missing, has an unsupported schemaVersion or whenKeysVersion, or its digest does not match its rules. Bad rules themselves are refused by the agent context engine when written."
+    },
+    {
+      "code": "start-delivery-unsupported",
+      "category": "validation",
+      "when": "The delivery is not one of opening, prompt-arg, agent-file, hook-context, or the agent CLI named by agentCli cannot take it."
+    }
+  ]
+}

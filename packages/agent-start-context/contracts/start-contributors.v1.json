@@ -1,0 +1,47 @@
+{
+  "contract": "agent-start-context-contributors.v1",
+  "description": "Registered live contributors (the live door, ASC-D6). Each row names a component's Contributor adapter, the when: it applies under (keys from when-keys.v2.json), its owner, a byte budget and a timeout. A contributor that fails or times out is left out and listed in dropped[] (fail open). Empty until the rotation handoff joins (plan 261122-1946 phase 7).",
+  "rowSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "when",
+      "owner",
+      "budgetBytes",
+      "timeoutMs"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      },
+      "when": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "description": "Fact key to allowed values (any-of); several keys all must match; empty means always."
+      },
+      "owner": {
+        "type": "string",
+        "minLength": 1,
+        "description": "A component of the authority model."
+      },
+      "budgetBytes": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "timeoutMs": {
+        "type": "integer",
+        "minimum": 1
+      }
+    }
+  },
+  "contributors": []
+}
