@@ -9,7 +9,7 @@ created: 2026-11-26
 
 # Why
 
-authority declare --kind component refuses without --approved-by naming an answered owner question. A decision settled in a discussion (a D-ID) has no question to name, so q-5sog3pzmqn re-asked the owner for ACE-D3 and ASC-D1, already settled.
+authority declare --kind component refuses without --approved-by naming an answered owner question. A decision settled in a discussion (a D-ID) has no question to name, so q-5sog3pzmqn re-asked the owner for two already-settled decisions: the Agent Context Engine becoming its own component, and the Agent Start Context composer being its own tier-3 crate.
 
 # Done when
 
