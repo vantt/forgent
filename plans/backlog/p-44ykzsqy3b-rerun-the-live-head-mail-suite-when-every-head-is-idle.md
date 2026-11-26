@@ -1,7 +1,7 @@
 ---
 id: p-44ykzsqy3b
 title: Rerun the live head-mail suite when every head is idle, so the cases the four runs of 2026-11-26 could not reach get proven
-status: proposed
+status: dropped
 priority: P2
 area: communication
 created: 2026-11-26
@@ -18,3 +18,5 @@ At a quiet time, with an idle claude, codex and agy head of each persona (and a 
 # Notes
 
 Closes the rest of p-rchuoa2v3k, p-ia2v33b54u and p-bifjfd5rix. Proposed by the lead of plan 261125-2313 at the owner's request (owner chose to record the live criterion as not run to completion); landed by the unconfined supervisor session. The run types commands into the owner's live heads, so run it when the owner is away and the heads are idle.
+
+Dropped: the same item is row p-6rkfzc5n6i, which the plan cites and the backlog index carries; this row was written in parallel by mistake.
