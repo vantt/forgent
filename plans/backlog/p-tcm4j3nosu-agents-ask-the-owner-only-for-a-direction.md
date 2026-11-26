@@ -12,7 +12,7 @@ created: 2026-11-27
 Heads stall for hours, overnight included, on questions they could decide. In seven days the store took 163 owner
 questions; the owner picked the recommended option 89 of 94 times, and the waits added up to 193 hours. The rule that
 made them ask defines the approved frame as "which files may change", so every one-file footprint widen became an
-owner question. Settled in `plans/discussions/ds-jxoz3h2qgk-when-to-ask/DISCUSSION.md` (WA-D1 to WA-D8).
+owner question. Settled in `plans/discussions/ds-jxoz3h2qgk-when-to-ask/DISCUSSION.md`, decisions in its §4.
 
 # Plan
 
