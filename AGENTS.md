@@ -174,6 +174,25 @@ Platform laws L1-L10 are locked in `docs/platform/platform-foundations.md#luật
 
 Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack`. Laws in `docs/platform/platform-foundations.md` are fixed until their named review threshold is hit. Changing one supersedes its decision ID — never edit it in place.
 
+#### Product priority order
+
+- id: `product-priority-order`
+- source: `core/instructions/product-priority-order.md`
+
+# Product priority order
+
+Source: D-ADR0030, docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm.
+
+1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.
+2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp; mỗi câu theo mẫu câu hỏi quyết định (`core/skills/_shared/decision-question.md`). Tự quyết trong khung đã duyệt (phạm vi + ngân sách ghi lúc duyệt); sắp vượt khung thì dừng và hỏi theo mẫu. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.
+   Khi phân tích của chính agent đã chọn rõ một phương án, hãy quyết và báo cáo, không hỏi lại. Chỉ hỏi khi các phương án thật sự ngang nhau hoặc phụ thuộc vào ý định của người dùng.
+3. **DoD** — reproducibly verifiable result + evidence-linked documentation.
+4. **Polish Sau DoD** — hoàn thiện sau ngưỡng, không mở scope.
+
+Tốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** (fgOS không loại trừ khi tự dogfood) — không phải tốc độ tự thân team fgOS build một tính năng của chính fgOS. Đừng chọn phương án rẻ để fgOS tự triển khai nếu nó làm project dùng fgOS chậm hơn.
+
+Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm's "Lịch sử quyết định" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4).
+
 #### RUL104 — tốt hơn, không to hơn
 
 - id: `rul104-better-not-bigger`
@@ -434,11 +453,11 @@ check exists it is named, otherwise the reviewer checks it.
 
 # Dispatch Decide Door
 
-For routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment.
+For routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`).
 
 **Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it delegates to `bind()` and refuses the call when the answer comes back as anything other than `in-process`.
 
-The hook is the decide for each Agent/Task call: it runs `decide --for <subagent type> --needs-soul --has-live-task-access` for every call, and an unregistered name answers `in-process` under `--needs-soul`. A fan-out of Task calls therefore needs no further decide round trip and no purpose check of its own.
+For your own Agent/Task call, the hook is that decide; an explicit `decide --needs-soul` beforehand is allowed, never required: it runs `decide --for <subagent type> --needs-soul --has-live-task-access` for every call, and an unregistered name answers `in-process` under `--needs-soul`. A fan-out of Task calls therefore needs no further decide round trip and no purpose check of its own.
 
 Decide once per dispatch, immediately before execution, never during planning. A batch entry that re-confirms the mechanism inside the same dispatch is that dispatch's own bind check, not a second decide.
 
@@ -455,7 +474,7 @@ Three possible `mechanism` results, each needing a different response:
 
 - **`"unavailable"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.
 - **`"in-process"`** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.
-- **`"out-of-process"`** — run `fgos run "<prompt>" --provider <executorId> --capability <purpose> [--writes <paths> --worktree <linked-worktree>]` (or `fgos run --unit <file>`), passing the same capability `decide` was asked for (left out, it defaults to the writing capability `execute`). `--provider` takes agent executors only: when the decided executor is a `kind: "tool"` executor, `fgos run` refuses it, so call that tool directly instead. Never run the resolved command yourself through Bash: `fgos run` binds, runs and settles the Unit and records its provenance under `.fgos/assignments/<unitRunId>/`, so there is nothing to log by hand. With `--writes` the runner commits only those paths after a passing round; with `--json` read the result at `data.results[-1].runResult.agentClaim.summary` and `data.results[-1].commit`.
+- **`"out-of-process"`** — run `fgos run "<prompt>" --provider <executorId> --capability <purpose> [--writes <paths> --worktree <linked-worktree>]` (or `fgos run --unit <file>`), passing the same capability `decide` was asked for (the run door's defaults: `run-door-contract`). `--provider` takes agent executors only: when the decided executor is a `kind: "tool"` executor, `fgos run` refuses it, so call that tool directly instead. Never run the resolved command yourself through Bash: `fgos run` binds, runs and settles the Unit and records its provenance under `.fgos/assignments/<unitRunId>/`, so there is nothing to log by hand. With `--json` read the result at `data.results[-1].runResult.agentClaim.summary` and `data.results[-1].commit`.
 
 Every result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is configured for that name or job, and the answer came from the default.
 
@@ -468,7 +487,7 @@ A skill that dispatches should not re-derive any of this: it calls the doors abo
 
 # Domain Doctrine Read
 
-Once the domain resolves, read `domains/<domain>/AGENTS.md` (e.g. `domains/coding/AGENTS.md` when domain is `coding`) to load domain-specific standing doctrine before the first round, and before handing off to driving or loading the resolved stage skill; it states what the domain treats as settled, its constraints and its exits. When the domain is unknown, ask the person one line; never assume one.
+Once the domain resolves, read `domains/<domain>/AGENTS.md` (e.g. `domains/coding/AGENTS.md` when domain is `coding`) to load domain-specific standing doctrine before the first round, and before handing off to driving or loading the resolved stage skill; it states what the domain treats as settled, its constraints and its exits. An unknown domain is settled by `fgos-clarifying` first (`core/skills/fgos-clarifying/SKILL.md`).
 
 #### Driver Discipline
 
@@ -612,11 +631,11 @@ cài đặt/setup/doctor story. Before any change is done, check:
 
 **Two doors, one runUnit — the preferred path for new work.** One task: `fgos run "<prompt>" [--provider <id>] [--writes <paths> --worktree <path>]` builds a Unit from the prompt (read-only without `--writes`; `--writes` needs a linked worktree; `--provider` is a soft preference, not a pin). Planned work: `fgos workflow start <preset>|--units <file>`, one step per Unit. Both bind through `bind()`; the runner commits only the Unit's declared `writes` after a passing round, and the worker never runs `git add`/`git commit`. These two doors are the only ones that execute work; `fgos dispatch` keeps only the lower-level reads (`decide`, `inspect`, `reconcile`, `probe-account`).
 
-Without `--writes` the Unit is read-only and runs sandboxed. `--writes` needs a linked worktree and is refused from the main checkout before anything runs. `--provider` is a soft preference that `bind()` tries first and fails over from; `--capability` defaults to `execute`. Work already written as a Unit file runs as `fgos run --unit <file>`.
+Without `--writes` the Unit runs sandboxed; `--writes` is refused from the main checkout before anything runs. Why and when to name `--provider`: `capability-routing-rules`. `--capability` defaults to `execute`. Work already written as a Unit file runs as `fgos run --unit <file>`.
 
 The worker edits files and stops, never running `git add`/`git commit`. After a passing round the runner commits only paths inside the Unit's `writes` (subject from the first line of the worker's `summary`); a path the worker needs outside that scope goes in `needsWrites`, not on disk.
 
-When herdr is present the worker runs in a watched pane, so a person can follow it live; otherwise the call blocks until the Unit settles. Run a long call backgrounded (`run_in_background: true`) and wait for the harness's own completion notification — do NOT use `ScheduleWakeup` or polling.
+herdr is the default transport when present: the worker runs in a watched pane, so a person can follow it live; otherwise the call blocks until the Unit settles. Run a long call backgrounded (`run_in_background: true`) and wait for the harness's own completion notification — do NOT use `ScheduleWakeup` or polling.
 
 That wait rule is for a `fgos run` call, which blocks until the Unit settles. `fgos workflow start` returns at once with the `workflowRunId` and a `detached` block (`pid`, `logPath`, `statusCommand`) while the run continues in a detached process: its output is never the result, so poll `fgos workflow status <workflowRunId>` until the run is `completed`, `failed` or parked at a gate. `answer` and `resume` return the same way; pass `--foreground` only when the caller must wait in place.
 

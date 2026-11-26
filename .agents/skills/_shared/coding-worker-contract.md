@@ -93,7 +93,7 @@ cover that case instead.
 2. **Verify is a real shell command, run before you claim done.** The
    item's own `verify` command is the only thing that decides whether the
    work is complete; a claim is never evidence: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
-   What to run: Rule: coding-verification-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json). Run it once, near the end,
+   What to run: rule `coding-verification-discipline` (`domains/coding/instructions/coding-verification-discipline.md`). Run it once, near the end,
    when you believe the work is actually done — never as a per-edit habit.
    Run it yourself; if it fails, fix the root cause and rerun the exact
    command. Never weaken it, swap in an easier check, or report `[DONE]` on

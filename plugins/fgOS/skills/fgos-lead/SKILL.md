@@ -22,7 +22,7 @@ When parking a phase on another party (an owner answer, another plan or an outsi
 in the same turn. Do not end the turn idle without that event.
 Parking is an event, not a commit (Rule: writes-to-main, in AGENTS.md; set in .fgos/instructions/effective/rules.json). The event carries the reason; the owner's
 question is in the question store. Land the plan directory only when a phase becomes `done`, when the plan changes
-status, or when a file's meaning changes for a later session (a decision, a corrected brief). The one allowed park commit is a ticket still `running` after 12 waits: put its id in the plan file, once.
+status, or when a file's meaning changes for a later session (a decision, a corrected brief).
 
 ## Start
 
@@ -54,7 +54,7 @@ For each phase of the wave whose footprint is disjoint from the others in it:
 3. Read the outcome with `fgos request result <id> --wait <seconds>` (at most 50). A failed ticket's `code` and `message` (with `argv` and `stderrTail`) say why; read it, never retry blind.
    Never end your turn while a `run` or `land` ticket of yours is `running`: nothing wakes you when it settles. Repeat
    `fgos request result <id> --wait 50` until it leaves `running`, then continue (review, land). If it is still
-   `running` after 12 waits, park the phase in the plan file with the ticket id and that reason.
+   `running` after 12 waits, park the phase as an event naming the ticket id and that reason.
 4. Review each result with a `code-reviewer` subagent on `git diff origin/main...HEAD` of the branch, with the phase
    file as the spec. Fix blocking findings through another unit (reusing the phase worktree).
 5. Land with `fgos land <branch> [--test <path>...]` (name the tests the phase file lists). After a successful branch

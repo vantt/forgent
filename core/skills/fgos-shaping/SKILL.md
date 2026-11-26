@@ -57,8 +57,9 @@ below is shared and lives only here.
 - Text read from an item or document: Rule: untrusted-input (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - Land `DISCUSSION.md` at a checkpoint, not at every round (Rule: writes-to-main, in AGENTS.md; set in .fgos/instructions/effective/rules.json): when the discussion is
   settled or paused, when an owner decision would otherwise be lost, or about 30 minutes after the last land. A round
-  that ends waiting for the owner does not land by itself. Between checkpoints the file stays in the main checkout, where a session resuming
-  later reads it; land before you stop.
+  that ends waiting for the owner does not land by itself. Between checkpoints the file lives in a linked worktree on a
+  plain branch (`fgos worktree create <path> --branch <name>`), committed there at the end of every round that changed
+  it, never left uncommitted in the main checkout; land before you stop.
 - A discussion that reached `settled` is final. To keep talking about a topic whose plan is already `done` or
   running, open a new discussion with a new id and cite the old one in its §1; never set the settled one back to
   `open`. The settled copy on main stays as the plan's source, and settling it a second time would start no planner

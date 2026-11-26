@@ -21,6 +21,7 @@ The frame is the scope (which files/contracts may change) and the budget
 (lines of src, test, docs and evidence; days) written once when the owner
 approves the work. A child item shares its parent's frame.
 
+- The frame may be narrowed afterwards, never widened; a wider frame is a new proposal and a question.
 - Inside the frame decide and report; about to leave it, stop and ask in this template: Rule: decision-question-template, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 - Mess inside the frame: Rule: rul11-tum-lum (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
   Consolidating by building a new tool or engine is a decision question.

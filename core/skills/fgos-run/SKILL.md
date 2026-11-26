@@ -53,10 +53,8 @@ When the user asks to run a plan, a phase ("run phase 2"), or a phase range ("ru
    fgos workflow start --units <file> [--foreground]
    ```
    `--units` takes a YAML or JSON list of Units, one step per Unit, ordered by each Unit's `dependsOn`.
-   `start` returns at once with the `workflowRunId` and a `detached` block; the run continues in a
-   detached process. Read progress with `fgos workflow status <workflowRunId>` (or pass `--foreground`
-   to wait in place); `fgos workflow answer` and `fgos workflow resume` return the same way. Do not treat
-   the output of `start`, `answer` or `resume` as the final state.
+   `start`, `answer` and `resume` return at once with a detached run; read progress with
+   `fgos workflow status <workflowRunId>` (Rule: run-door-contract, in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 3. Each Unit runs via `fgos run` in its own isolated worktree; the runner commits the Unit's declared `writes` on that worktree's branch and merges nothing (`fgos workflow status` lists `writeBranches`). `fgos workflow start --plan` no longer exists; [`fgos-cook`](../fgos-cook/SKILL.md) owns whole-plan execution on a case; this mode is for running one phase or a bounded wave as it stands.
 
 ---
@@ -79,8 +77,7 @@ When a workflow step declares a human gate (`gate: { kind: "human" }`) or when a
 
 - **G2 Non-Infrastructure:** Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json). Only an ad-hoc Unit may carry a soft `prefer`.
 - **Runner Commits, Worker Does Not:** A writing Unit's brief lists its write scope. Rule: run-door-contract (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
-- **G7 Herdr Default:** All out-of-process unit runs default to spawning in a watched `herdr` terminal pane when herdr is available, falling back to `cli` when headless.
-- **Fail-Closed Mutating Gate:** Every file mutation runs strictly inside an isolated linked git worktree matching the Unit run specification.
+- **G7 Herdr Default** and the **Fail-Closed Mutating Gate** (writes only in a linked worktree): Rule: run-door-contract, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 - **Honest Outcomes:** Reviewer findings are tracked as `findings`, not execution failures, and fix rounds are bounded by the collaboration pattern.
 
 ---

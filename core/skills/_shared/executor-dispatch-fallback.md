@@ -131,8 +131,7 @@ consumer used to read a hand-run command's own output:
 <EXECUTOR_ID> - out-of-process - <provider> - <model>
 ```
 
-There is nothing to log by hand: the run's provenance (Unit, binding,
-round results, commit) is already under `.fgos/assignments/<unitRunId>/`.
+Provenance: Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 
 An error from this call (a refusal before the run, a failed bind, or a
 timeout) means fall straight to Step C. Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).

@@ -34,7 +34,7 @@ to the case: the Git component's land operation is not ready, so there is no saf
 way to integrate parallel writing branches. Capability, pattern and rigor per slice
 kind come from the versioned slice table (`domains/coding/slice-kinds.yaml`)
 through `fgos workflow propose`: you may raise a slice's rigor with a reason, never
-lower it. You never set a provider, model or tier.
+lower it. Never a provider, model or tier: Rule: capability-routing-rules, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 
 ## Route
 
@@ -94,7 +94,7 @@ lower it. You never set a provider, model or tier.
 - Retry a refused dispatch unchanged (Rule: driver-discipline, in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - Call a door for a case nested in your worker's own Unit, or let a confined
   worker dispatch a writer: workers ask you.
-- Invent a rigor-to-tier rule, pin an executor, or write a persona file.
+- Invent a rigor-to-tier rule, pin an executor (Rule: capability-routing-rules, in AGENTS.md; set in .fgos/instructions/effective/rules.json), or write a persona file.
 - Compute the frame, the slice kinds or the commands yourself: `propose` owns them,
   and a proposal it refuses is fixed at its cause, not worked around.
 
@@ -118,5 +118,4 @@ lower it. You never set a provider, model or tier.
   stay authoritative; `bind()` alone picks who runs a slice.
 - Claim only what you re-ran or read: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - Do not touch Work items: the old Work-item path is `/fgOS:deliver`.
-- The approved frame may be narrowed, never widened (`../_shared/decision-question.md`); a
-  widened frame is a new proposal and a question.
+- The approved frame: `../_shared/decision-question.md`.
