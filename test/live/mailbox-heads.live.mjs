@@ -18,6 +18,10 @@
  * directly: `herdr agent prompt` types and submits, `herdr pane send-text` leaves a draft. `fgos session type` is not
  * used: it refuses unless a supervision event names the session and it never leaves a draft.
  *
+ * Panes are addressed by `ids.terminal.paneId` (the id herdr itself knows, from HERDR_PANE_ID), never by
+ * `ids.terminal.key`: the key is the run supervisor slot key (cmd_...), which only terminal-control resolves to a
+ * pane; herdr answers agent_not_found / pane_not_found for it. The host typed wake resolves the key itself.
+ *
  * Skipped unless it can actually drive live sessions (herdr on PATH, writable state directory, a host or npm).
  *
  *   FGOS_LIVE_HEADS=1 node --test test/live/mailbox-heads.live.mjs
@@ -140,12 +144,12 @@ function herdrPaneSendText(pane, text) {
 }
 
 /** Erases a draft: Backspace keys in chunked send-keys calls; throws when herdr refuses. */
-function eraseDraft(pane, charCount) {
+function eraseDraft(pane, charCount, who = '') {
   const CHUNK = 64;
   for (let left = charCount; left > 0; left -= CHUNK) {
     const keys = Array(Math.min(CHUNK, left)).fill('Backspace');
     const res = spawnSync('herdr', ['pane', 'send-keys', pane, ...keys], { encoding: 'utf8', timeout: 15_000 });
-    if (res.status !== 0) throw new Error(`herdr pane send-keys Backspace into ${pane} failed: ${res.stderr || res.stdout}`);
+    if (res.status !== 0) throw new Error(`herdr pane send-keys Backspace into pane ${pane}${who ? ` (${who})` : ''} failed: ${res.stderr || res.stdout}`);
   }
 }
 
@@ -223,7 +227,7 @@ function personaOf(s) {
 }
 
 /** Every alive head of this project that has a pane and is not the caller's own. */
-function discoverLiveHeads() {
+function discoverLiveHeads(t) {
   const projectId = thisProjectId();
   if (!projectId) return [];
   const answer = fgos(['identity', 'list', '--project'], { cwd: FGOS_DIR });
@@ -235,9 +239,12 @@ function discoverLiveHeads() {
     if (s.projectId !== projectId) continue;
     const persona = personaOf(s);
     if (!persona) continue;
-    const pane = s.ids?.terminal?.key ?? s.ids?.terminal?.paneId ?? null;
-    if (!pane) continue;
-    if (own && [s.ids?.terminal?.key, s.ids?.terminal?.paneId].some((id) => id && id === own)) continue;
+    const pane = s.ids?.terminal?.paneId ?? null;
+    if (!pane) {
+      t?.diagnostic(`${persona}(${s.handle || s.ids?.mailbox?.name || s.id}) has no herdr pane id: skipped by name`);
+      continue;
+    }
+    if (own && pane === own) continue;
     heads.push({
       persona,
       pane,
@@ -298,7 +305,7 @@ function parseAnswer(screen, token) {
 /** Has `sender` send `token` to `to` with --wake; resolves to the parsed answer or null at the bound. */
 async function sendThrough(sender, to, token) {
   const prompt = herdrAgentPrompt(sender.pane, sendCommand(to, token));
-  assert.equal(prompt.status, 0, `herdr agent prompt into ${label(sender)} failed: ${prompt.stderr || prompt.stdout}`);
+  assert.equal(prompt.status, 0, `herdr agent prompt into pane ${sender.pane} (${label(sender)}) failed: ${prompt.stderr || prompt.stdout}`);
   const got = await waitFor(() => parseAnswer(readScreen(sender), token), BOUND_MS);
   return got ? got.value : null;
 }
@@ -308,7 +315,7 @@ const opts = reason ? { skip: reason } : {};
 if (reason) process.stdout.write(`mailbox-heads.live: SKIPPED, not run here: ${reason}\n`);
 
 test('every persona sends to a peer it may reach and the peer reads the mail from its inbox', opts, async (t) => {
-  const heads = discoverLiveHeads();
+  const heads = discoverLiveHeads(t);
   if (heads.length === 0) {
     t.skip('no alive head of this project with a pane (or the project id is unreadable)');
     return;
@@ -343,7 +350,7 @@ test('every persona sends to a peer it may reach and the peer reads the mail fro
       }, BOUND_MS);
     }
     const inbox = herdrAgentPrompt(peer.pane, 'fgos mailbox inbox');
-    assert.equal(inbox.status, 0, `herdr agent prompt inbox into ${label(peer)} failed: ${inbox.stderr || inbox.stdout}`);
+    assert.equal(inbox.status, 0, `herdr agent prompt inbox into pane ${peer.pane} (${label(peer)}) failed: ${inbox.stderr || inbox.stdout}`);
     const seen = await waitFor(() => readScreen(peer).includes(token), BOUND_MS);
     assert.ok(seen, `peer ${label(peer)} did not show ${token} from its inbox within ${BOUND_MS} ms`);
     testedPairs++;
@@ -353,7 +360,7 @@ test('every persona sends to a peer it may reach and the peer reads the mail fro
 });
 
 test('an idle head of each drained CLI is woken within the bound and the focus is unchanged', opts, async (t) => {
-  const heads = discoverLiveHeads();
+  const heads = discoverLiveHeads(t);
   if (heads.length === 0) {
     t.skip('no alive head of this project with a pane (or the project id is unreadable)');
     return;
@@ -424,7 +431,7 @@ test('an idle head of each drained CLI is woken within the bound and the focus i
 });
 
 test('a head with a half-typed composer is not typed into and the answer says so', opts, async (t) => {
-  const heads = discoverLiveHeads();
+  const heads = discoverLiveHeads(t);
   let pair = null;
   for (const sender of heads.filter(isSecSup)) {
     const recipient = heads.find((h) => h.id !== sender.id && recipientFor(sender, h));
@@ -452,7 +459,7 @@ test('a head with a half-typed composer is not typed into and the answer says so
   const token = `${RUN}-t3-mail`;
 
   const drafted = herdrPaneSendText(recipient.pane, draft);
-  assert.equal(drafted.status, 0, `herdr pane send-text into ${label(recipient)} failed: ${drafted.stderr || drafted.stdout}`);
+  assert.equal(drafted.status, 0, `herdr pane send-text into pane ${recipient.pane} (${label(recipient)}) failed: ${drafted.stderr || drafted.stdout}`);
   try {
     const shown = await waitFor(() => readScreen(recipient).includes(draft), 5_000);
     assert.ok(shown, `${label(recipient)} did not show the draft ${draft} after send-text`);
@@ -475,9 +482,9 @@ test('a head with a half-typed composer is not typed into and the answer says so
     assert.ok(screen.includes(draft), `the draft ${draft} did not survive on the recipient screen`);
     assert.ok(!screen.includes(`${draft}${WAKE_LABEL}`), 'the wake label was typed after the draft in the composer');
   } finally {
-    eraseDraft(recipient.pane, draft.length);
+    eraseDraft(recipient.pane, draft.length, label(recipient));
     if (readScreen(recipient).includes(draft)) {
-      throw new Error(`the draft ${draft} is still in the composer of pane ${recipient.pane}; erase it by hand`);
+      throw new Error(`the draft ${draft} is still in the composer of pane ${recipient.pane} (${label(recipient)}); erase it by hand`);
     }
   }
 });
@@ -485,7 +492,7 @@ test('a head with a half-typed composer is not typed into and the answer says so
 test('one cross-machine send answers remote-recorded', {
   skip: reason || (REMOTE_PEER ? '' : 'FGOS_LIVE_HEADS_REMOTE_PEER not set: no second machine reachable (manual step in the integration report)'),
 }, async (t) => {
-  const sender = discoverLiveHeads().find(isSecSup);
+  const sender = discoverLiveHeads(t).find(isSecSup);
   if (!sender) {
     t.skip('no live secretary/supervisor head with a pane to send cross-machine mail');
     return;

@@ -57,7 +57,7 @@ The supervisor ran the initial draft unconfined against the real host and measur
 
 1. **`mailbox send` flags and invocation model**: `mailbox send` takes `--to`, `--wake`, `--reply-to`, `--need-ack`, `--reply-by` (`apps/fgos/src/wiring/mailbox_verbs.rs`); it has no `--from` or `--body`. An earlier version of this report said there was no `--wake`; that was wrong. The body is a positional argument. Without `--wake` no wake is attempted and the path is always `local-next-tool-call`, so every send in the suite passes `--wake`. The sender is whoever runs the verb, so the suite cannot send as another head from outside: it has the sender's agent run the command in its own cage.
 2. **Panes are driven with herdr directly**: `fgos session type` refuses unless a supervision event names the session and it never leaves a draft. The suite uses `herdr agent prompt <pane>` (types and submits), `herdr pane send-text <pane>` (leaves a draft, no submit) and `herdr pane read`. The sender is prompted to print only `<token>-path=<path>` (via `jq` when present, else the JSON `path` field is matched), so the agent's prose cannot match. `session focus` does not exist: focus neutrality is compared through `herdr pane list`, and recorded as a manual check when it carries no focus field.
-3. **Discovery is project-scoped and alive-only**: heads come from `fgos identity list --project`; only sessions whose `projectId` equals this checkout's project id and whose `liveness` is `alive` count, the caller's own pane (`HERDR_PANE_ID`) is excluded, and the pane is `ids.terminal.key` else `ids.terminal.paneId`. The suite starts and stops no heads, never drives another project's head, and reports a persona or CLI without a live head as skipped by name.
+3. **Discovery is project-scoped and alive-only**: heads come from `fgos identity list --project`; only sessions whose `projectId` equals this checkout's project id and whose `liveness` is `alive` count, the caller's own pane (`HERDR_PANE_ID`) is excluded, and the pane is `ids.terminal.paneId` (never the slot key; see "Live run 1"); a head without a paneId is skipped by name. The suite starts and stops no heads, never drives another project's head, and reports a persona or CLI without a live head as skipped by name.
 3a. **Wake cases are not vacuous**: the idle-wake case requires path `local-pushed` or `local-typed`; a dropped wake (exchange quota, lifetime cap, no channel; budgeted per sender/recipient pair) fails naming the drop, and the case prefers pairs the first case did not use. The wake label is identical for every mail, so the case counts label occurrences on the recipient screen before the send and passes only on the RUN-tagged token appearing on the target screen (a count rise alone never passes). Idle heads are grouped by CLI (claude, codex, agy) and each CLI with no live head is named.
 4. **`mailbox send --to` takes short names or handles**: `--to` accepts a session short name (e.g. `forgent-claude-62`) or a handle/role alias, not a persona name; unknown-name answers list candidate sessions. For `lead` and `planner`, `head-permissions.v1.json` restricts `--to` to `head:secretary-*` or `head:supervisor-*`, which the suite respects.
 5. **Calls run with `--dir /home/vantt/projects/forgent`**: Every `fgos` call runs through the host binary or dev door with `--dir /home/vantt/projects/forgent` (e.g. `npm run fgos:dev -- <verb> ... --dir /home/vantt/projects/forgent`) because a linked worktree has no `.fgos` directory.
@@ -68,6 +68,20 @@ In addition:
 - **Calls and discovery**: identity calls run with cwd set to the project root; `lead`/`planner` senders pick any `head:secretary-*` / `head:supervisor-*` role of a peer.
 - **Cross-machine case**: asserts only that the answer is `remote-recorded`; the read on the other machine is the manual step below.
 - **Live result status**: The suite rewrite is complete; the live execution result against real heads is pending the supervisor's unconfined run.
+
+## Live run 1
+
+Run on p07c `ed17c8a59` against release `daaf4d83`: 3 fail, 1 skipped, 0 pass. Cause: the suite addressed herdr by the
+supervisor slot key (`ids.terminal.key`, `cmd_...`) instead of the herdr pane id (`ids.terminal.paneId`, e.g. `w6:p2BE`),
+so every first herdr call failed with `agent_not_found` / `pane_not_found`. This is a suite defect, not a wake-path
+defect: the host typed wake resolves the slot key through terminal-control (proof:
+`packages/terminal-control/rust/tests/core_failures.rs` `send_and_read_reach_the_pane_of_the_key`). Fixed in this
+commit: every direct herdr call uses the paneId, a head without one is skipped by name, and every herdr failure message
+names the pane id and the head label. Rerun pending the supervisor.
+
+What the suite drives: the live heads of this project. It starts no heads (session start hands back the live holder of a
+role) and sends labelled test pings that ask nothing. Test 3 leaves a draft in one live head composer and then erases it,
+failing loudly if the erase does not take.
 
 ## Cross-machine: manual step
 
