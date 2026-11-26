@@ -246,6 +246,8 @@ Owner order 2026-11-26 23:5x: `CHANGELOG.md` and `packages/host-runtime/contract
 
 Supervisor 2026-11-27 03:0x: `test/skills/fgos-supervisor-idle-lead.test.mjs` joins the footprint (phase 18) so the lead can fix this plan's own regression: phase 1 rewrote `core/skills/fgos-supervisor/SKILL.md` and two skill-text tests in that file went red (acceptance criterion 7). No other active plan holds the file.
 
+Supervisor 2026-11-27 03:2x, focused rerun for phase 18 (event e2ecee934af1fcbf) on worktree p18b at 5be73f9289: `cargo test -p fgos-config --test registry_defaults` 3 passed, `cargo test -p fgos-component-authority --test model_checks` 23 passed, `node --test test/skills/fgos-supervisor-idle-lead.test.mjs` 4 passed. The lead may land p18b and set the plan done.
+
 Owner order 2026-11-26 23:40 (answer B to q-kyzictpkf6): phases 19 and 20 are phases 1 and 2 of plan `261126-2318-plan-footprint-overlap-warns`, run by this lead after phase 5 (which also writes `portfolio.rs`). They change the contract check and admission together, so they run on one branch and land as one change. Phase 9 shares no file with them and runs in the same wave.
 
 ## Owner questions
