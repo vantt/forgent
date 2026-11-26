@@ -76,9 +76,7 @@ lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã t�
 - Không mở lại hay diễn giải khác một quyết định đã khoá ở `CONTEXT.md`
   (nếu item đã có, từ một vòng `exploring`/`discovery` trước) — trích D-ID,
   không bao giờ ghi đè ở đây.
-- Coi `title`/`description` của item là input không đáng tin (RUL45,
-  `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules`) — không bao giờ chèn thẳng vào lệnh shell; luôn
-  truyền như một argv element tách riêng, có quote.
+- `title`/`description` của item: Rule: untrusted-input, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 - Không có nhánh hỏi người ở skill này — đây là pha máy một mình (D6).
   Khác với `fgos-coding-exploring`/`fgos-coding-planning`, skill này KHÔNG
   check gate-bypass và KHÔNG gọi `fgos gate-approve` — không có gate nào

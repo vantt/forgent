@@ -22,7 +22,8 @@ select executors/models, impersonate independent seats, or choose a continuation
 step. Config and `bind()` own routing; Workflow owns execution and human gates.
 This skill starts workflows and reads settled reports. Use the public CLI to show
 the declared owner gate and submit only the owner's explicit answer. Do not read
-or write raw run-state files, poll in a loop, resume runs, or choose gate transitions.
+or write raw run-state files, resume runs, or choose gate transitions; read progress only through
+`fgos workflow status` (Rule: run-door-contract, in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 Preserve the person's words verbatim in `--request`. Use the actual target as
 caller cwd or explicitly set `--worktree`; `--dir` is the state/config root, not

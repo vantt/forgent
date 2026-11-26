@@ -24,7 +24,7 @@ Instead of declaring ambiguous runtime heuristics, an agent inspects user intent
 
 - **Canonical Capability:** Each unit declares exactly one canonical capability (e.g. `code:implement`, `code:review`, `advise`, `execute`) derived directly from the task's required behavior.
 - **Unit Boundaries:** A unit defines clear `objective`, inputs (`reads`), outputs (`writes`), and acceptance criteria.
-- **G2 Constraint (No Infrastructure Pinning):** Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json). Plans and non-ad-hoc Units never pin; only an ad-hoc Unit may carry a soft `prefer`.
+- **G2 Constraint (No Infrastructure Pinning):** Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - **Invoking Runner:** Execution is driven through `fgos-run` and the Workflow runner, running each declared unit through its lifecycle.
 
 ## Default inline and the five dispatch reasons
@@ -36,7 +36,7 @@ Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effectiv
 Work outside any plan or Workflow that goes to another agent as one prompt and one result needs no workflow, plan or new capability. It runs as the one-liner, `fgos run "<prompt>"`, with `--writes <paths> --worktree <linked-worktree>` when it changes files. Several related tasks go in a units file, `fgos workflow start --units <file>`. The calling agent answers Q1 itself, in two decisions:
 
 1. **Does the work change files?** Yes: name a writing capability (`execute` for general work; `code:implement`/`code:refactor` for code, `docs:write` for documents) with `--capability`, and list the paths it may change in `--writes` with a linked `--worktree`. No: leave out `--writes`.
-2. **Does a specific provider matter?** Only for one of the five reasons of capability-routing-rules (a stronger or cheaper model, provider diversity, isolation, parallelism). If so, name that executor in `--provider` (an ad-hoc Unit's `prefer` in a units file), a soft preference (Rule: capability-routing-rules, in AGENTS.md; set in .fgos/instructions/effective/rules.json); otherwise leave it out.
+2. **Does a specific provider matter?** Only for one of the five reasons. If so, name that executor in `--provider` (an ad-hoc Unit's `prefer` in a units file), a soft preference (Rule: capability-routing-rules, in AGENTS.md; set in .fgos/instructions/effective/rules.json); otherwise leave it out.
 
 Rule: run-door-contract (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 

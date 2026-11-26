@@ -74,8 +74,7 @@ the hand-off block are required.
    discussion stands, what just settled, what is open.
 2. **Mục tiêu & đề bài** — one continuous paragraph, the whole picture.
 3. **Vấn đề rõ / chưa rõ** — a living table edited in place, never append-only.
-4. **Quyết định đã chốt** — an append-only D-ID table. Mint ids through
-   `fgos identity mint` where the repo requires it.
+4. **Quyết định đã chốt** — an append-only D-ID table. Ids: Rule: id-minting, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 5. **Q&A log** — append-only, timestamped, never edited afterwards.
 6. **Thiết kế đã chốt** `{#design}` — regenerated in full: a coherent synthesis
    as if for a stranger, plus a Mermaid diagram when there is real structure.
