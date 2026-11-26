@@ -964,11 +964,12 @@ fn spawn_supervisor(
             .map(std::ffi::OsString::from)
             .or_else(|| std::env::var_os("PATH"))
             .unwrap_or_default();
-        let paths =
-            std::iter::once(systemd_run_dir.clone()).chain(std::env::split_paths(&inherited));
-        if let Ok(joined) = std::env::join_paths(paths) {
-            command.env("PATH", joined);
+        let mut path = systemd_run_dir.clone().into_os_string();
+        if !inherited.is_empty() {
+            path.push(":");
+            path.push(&inherited);
         }
+        command.env("PATH", path);
     }
     #[cfg(unix)]
     {

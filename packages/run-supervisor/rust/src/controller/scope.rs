@@ -136,36 +136,8 @@ pub fn probe_user_manager() -> Option<PathBuf> {
 
 /// Check if `systemd-run` is on PATH and resolve its absolute path.
 pub fn resolve_systemd_run_path() -> Option<PathBuf> {
-    if let Ok(path_var) = std::env::var("PATH") {
-        for dir in std::env::split_paths(&path_var) {
-            let candidate = dir.join("systemd-run");
-            #[cfg(unix)]
-            {
-                use std::os::unix::fs::PermissionsExt;
-                if candidate.is_file() {
-                    if let Ok(meta) = candidate.metadata() {
-                        if meta.permissions().mode() & 0o111 != 0 {
-                            let abs = if candidate.is_absolute() {
-                                candidate
-                            } else if let Ok(cwd) = std::env::current_dir() {
-                                cwd.join(candidate)
-                            } else {
-                                candidate
-                            };
-                            return Some(abs);
-                        }
-                    }
-                }
-            }
-            #[cfg(not(unix))]
-            {
-                if candidate.is_file() {
-                    return Some(candidate);
-                }
-            }
-        }
-    }
-    None
+    let path_var = std::env::var("PATH").ok()?;
+    fgos_process::spawn::resolve_program("systemd-run", &path_var, "", false)
 }
 
 /// Decide the failure domain for one launch.
