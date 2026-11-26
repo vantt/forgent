@@ -884,12 +884,22 @@ impl wake::StopSession for HostStop {
             .stdin(Stdio::null())
             .output()
             .map_err(|e| format!("session-stop-unavailable: {e}"))?;
+        let answer =
+            serde_json::from_str::<Value>(String::from_utf8_lossy(&out.stdout).trim()).ok();
         if out.status.success() {
-            return Ok(());
+            // A stop the host declined (a lead with no run supervisor, a role nobody holds) still exits 0: only
+            // `stopped: true` means the head ended.
+            let data = answer.as_ref().map(|v| &v["data"]);
+            return match data.and_then(|d| d["stopped"].as_bool()) {
+                Some(true) => Ok(()),
+                Some(false) => Err(data
+                    .and_then(|d| d["reason"].as_str())
+                    .unwrap_or("not-stopped")
+                    .to_owned()),
+                None => Err("session-stop-unreadable".to_owned()),
+            };
         }
-        let line = String::from_utf8_lossy(&out.stdout);
-        Err(serde_json::from_str::<Value>(line.trim())
-            .ok()
+        Err(answer
             .and_then(|v| v["code"].as_str().map(str::to_owned))
             .unwrap_or_else(|| format!("session-stop-exit-{}", out.status.code().unwrap_or(-1))))
     }

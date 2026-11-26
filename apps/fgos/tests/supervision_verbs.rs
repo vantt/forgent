@@ -47,7 +47,15 @@ fn digest(bytes: &[u8]) -> String {
 const RECORDING_ENTRY: &str = r#"
 import fs from 'node:fs';
 fs.appendFileSync(process.env.SUPERVISION_CALLS, JSON.stringify(process.argv.slice(2)) + '\n');
-process.stdout.write('{"started":true}\n');
+const args = process.argv.slice(2);
+if (args[0] === 'session' && args[1] === 'stop') {
+  // The host's answer to a stop; a test writes `stop-answer.json` beside the log to have the stop declined.
+  const file = process.env.SUPERVISION_CALLS.replace(/calls\.log$/, 'stop-answer.json');
+  const data = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : { stopped: true };
+  process.stdout.write(JSON.stringify({ data }) + '\n');
+} else {
+  process.stdout.write('{"started":true}\n');
+}
 "#;
 
 fn release(root: &Path) {
@@ -353,47 +361,6 @@ fn wake_with_no_live_supervisor_and_an_unhandled_event_starts_one_through_sessio
     assert_eq!(scene.payload_calls(), vec![start.clone(), start]);
 }
 
-#[test]
-fn a_wake_reads_the_activity_of_a_finished_lead_and_leaves_a_busy_one_while_it_still_starts_the_supervisor(
-) {
-    let scene = Scene::new("finished-lead", WATCHER_CONFIG);
-    let project = scene.project();
-    let plan = project.join(format!("plans/{PLAN}/plan.md"));
-    let text = fs::read_to_string(&plan).unwrap();
-    fs::write(
-        &plan,
-        text.replace(
-            "status: ready\n",
-            "status: done\nlead: head:lead-demo-fin\n",
-        ),
-    )
-    .unwrap();
-    git(&project, &["add", "-f", "."]);
-    git(&project, &["commit", "-q", "-m", "finish plan"]);
-    git(&project, &["push", "-q", "origin", "main"]);
-    register_session(&scene, "head:lead-demo-fin", "finished-lead-session");
-    // A request ticket still running: the lead is mid-turn whatever its pane says.
-    let tickets = project.join(".fgos/runtime/head-tickets/lead-demo-fin");
-    fs::create_dir_all(&tickets).unwrap();
-    fs::write(tickets.join("a.json"), r#"{"state":"running"}"#).unwrap();
-
-    let report = first_tick(&scene);
-    assert_eq!(report["wakes"], 1, "{report}");
-    let calls = scene.payload_calls();
-    assert_eq!(
-        calls,
-        vec![serde_json::json!([
-            "session",
-            "start",
-            "supervisor",
-            "--name",
-            "demo",
-            "--json"
-        ])],
-        "the busy lead is not stopped and the supervisor is still started"
-    );
-}
-
 /// A fake herdr (the run-supervisor crate's stand-in CLI, answering from files) whose one allocated slot `key` reads as
 /// an idle agent; the returned listener is the fake server's socket and stays open while the test runs.
 struct IdleHerdr {
@@ -469,7 +436,24 @@ fn idle_herdr(scene: &Scene, key: &str) -> IdleHerdr {
 
 #[test]
 fn a_wake_stops_an_idle_finished_lead_through_the_real_adapter_and_session_stop_names_its_role() {
+    // The host answers a declined stop with exit 0 and `stopped: false`: the span records the refusal, not a stop.
+    for (answer, outcome, error) in [
+        (None, "stopped-finished", ""),
+        (
+            Some(r#"{"stopped":false,"reason":"no-supervisor"}"#),
+            "stop-failed",
+            "no-supervisor",
+        ),
+    ] {
+        a_finished_lead_is_woken_over(answer, outcome, error);
+    }
+}
+
+fn a_finished_lead_is_woken_over(answer: Option<&str>, outcome: &str, error: &str) {
     let scene = Scene::new("idle-lead", WATCHER_CONFIG);
+    if let Some(answer) = answer {
+        fs::write(scene.root.join("stop-answer.json"), answer).unwrap();
+    }
     let project = scene.project();
     let plan = project.join(format!("plans/{PLAN}/plan.md"));
     let body = fs::read_to_string(&plan).unwrap();
@@ -498,6 +482,34 @@ fn a_wake_stops_an_idle_finished_lead_through_the_real_adapter_and_session_stop_
         "the idle finished lead is stopped by its role: {}",
         text(&out)
     );
+    // The span of the stop names the lead and carries the host's reason when the stop was declined.
+    let records = observe_records(&project.join(".fgos/observe"));
+    let span = records
+        .iter()
+        .find(|r| r.contains("\"lead:S1\""))
+        .unwrap_or_else(|| panic!("no span names the lead: {records:?}"));
+    assert!(span.contains(&format!("\"{outcome}\"")), "{span}");
+    assert!(span.contains(&format!("\"{error}\"")), "{span}");
+}
+
+/// The text of every record file under the observe directory.
+fn observe_records(dir: &Path) -> Vec<String> {
+    let mut found = Vec::new();
+    let mut pending = vec![dir.to_path_buf()];
+    while let Some(next) = pending.pop() {
+        let Ok(entries) = fs::read_dir(&next) else {
+            continue;
+        };
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                pending.push(path);
+            } else if let Ok(body) = fs::read_to_string(&path) {
+                found.extend(body.lines().map(str::to_owned));
+            }
+        }
+    }
+    found
 }
 
 #[test]

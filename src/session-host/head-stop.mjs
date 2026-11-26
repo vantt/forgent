@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { requestCancel } from '../run-supervisor/cancel-registry.mjs';
 import { createSessionHost } from './client.mjs';
-import { headRoleOf, identityHolder, lineageDirOf, readHeadPlacement, slotKeyOf, writeHeadPlacement } from './head-start.mjs';
+import { headRoleOf, identityHolder, lineageDirOf, readHeadPlacement, writeHeadPlacement } from './head-start.mjs';
 
 export class HeadStopError extends Error {
   constructor(code, message) {
@@ -65,18 +65,15 @@ export async function stopHeadSession({ persona, name, role: shortRole = null, p
   // A lead is ended only through its own run supervisor; a plain pane close is refused while an agent is the pane's
   // foreground (session-host spec section 8.2), so a lead with no lineage run directory is reported, not pane-closed.
   if (shortRole !== null && !record?.runDir) return { stopped: false, reason: 'no-supervisor' };
-  const placement = record?.placement ?? (slotKeyOf(holder.record) ? { host: 'terminal', key: slotKeyOf(holder.record) } : null);
-  if (!placement) return { stopped: false, reason: 'no-placement' };
+  const placement = record.placement;
 
-  if (record) {
-    const retiredAt = (ports.now?.() ?? new Date()).toISOString();
-    writeHeadPlacement(dir, { ...record, retiredAt, ...(reason ? { retiredReason: String(reason).slice(0, 200) } : {}) });
-  }
+  const retiredAt = (ports.now?.() ?? new Date()).toISOString();
+  writeHeadPlacement(dir, { ...record, retiredAt, ...(reason ? { retiredReason: String(reason).slice(0, 200) } : {}) });
   // The stamp is put back only while nothing was asked of the head: once its stop request is written the head may end at
   // any moment, so the stamp stays and the error names the unfinished stop.
   let requested = false;
   try {
-    if (record?.runDir) {
+    if (record.runDir) {
       const end = ports.end ?? ((runDir) => requestCancel(runDir, 'session-stop'));
       if (!end(record.runDir)) throw new HeadStopError('stop-not-ended', `${role} could not be asked to stop: no stop request could be written for ${record.runDir}`);
       requested = true;
@@ -93,7 +90,7 @@ export async function stopHeadSession({ persona, name, role: shortRole = null, p
       throw new HeadStopError('retire-refused', `${role} could not be closed: ${answer.code ?? answer.result}${answer.detail ? ` (${answer.detail})` : ''}`);
     }
   } catch (err) {
-    if (record && !requested) writeHeadPlacement(dir, record);
+    if (!requested) writeHeadPlacement(dir, record);
     throw err;
   }
   return { stopped: true };

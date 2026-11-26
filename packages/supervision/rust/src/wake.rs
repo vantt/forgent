@@ -251,10 +251,17 @@ fn close_finished(ports: &Ports, trigger: Trigger) {
     let (Ok(plans), Ok(done)) = (ports.portfolio.plans(), ports.portfolio.done_dirs()) else {
         return;
     };
+    let is_done = |plan: &Plan| plan.status == "done" || done.contains(&plan.dir);
+    // A lane session that moved on to another plan keeps its role: a role that leads any plan not yet done is not finished.
+    let still_leading: Vec<&String> = plans
+        .iter()
+        .filter(|p| !is_done(p))
+        .filter_map(|p| p.lead.as_ref())
+        .collect();
     let mut targets: Vec<(String, String, String)> = Vec::new();
     for plan in &plans {
-        if plan.status == "done" || done.contains(&plan.dir) {
-            if let Some(role) = &plan.lead {
+        if is_done(plan) {
+            if let Some(role) = plan.lead.as_ref().filter(|r| !still_leading.contains(r)) {
                 if let Some((persona, name)) = lead_target(role) {
                     targets.push((role.clone(), persona.to_owned(), name.to_owned()));
                 }

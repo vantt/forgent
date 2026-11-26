@@ -481,6 +481,8 @@ fn closing_fixture() -> (Fake, String) {
         finished("done-a", "done", Some("head:lead-alpha"), None),
         finished("done-b", "done", Some("lead:S1"), None),
         finished("done-c", "done", Some("head:lead-busy"), None),
+        // The same lane role leads a done plan and a working one: the session moved on, so it is not stopped.
+        finished("done-d", "done", Some("lead:WORKING"), None),
         finished("working", "running", Some("lead:WORKING"), None),
     ];
     *f.live_roles.borrow_mut() = vec![
@@ -498,7 +500,8 @@ fn closing_fixture() -> (Fake, String) {
 }
 
 #[test]
-fn one_wake_stops_the_idle_heads_of_landed_and_done_work_and_leaves_a_busy_one() {
+fn one_wake_stops_the_idle_heads_of_landed_and_done_work_and_leaves_a_busy_one_and_a_lead_of_another_plan(
+) {
     let (f, planner) = closing_fixture();
     assert_eq!(f.wake(), WakeOutcome::NothingUnhandled);
     assert_eq!(
