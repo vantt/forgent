@@ -1,13 +1,37 @@
 ---
 id: ds-mzyircswox
 title: "A door to widen a running plan's footprint"
-status: open
+status: settled
 source:
   - p-lfsc4czpgh
 created: 2026-11-26
 ---
 
-discussion: open
+discussion: settled
+
+## Hand-off
+
+- **Outcome:** a running plan widens its own footprint mid-run through one verb, inside the frame the owner approved, with no owner question and no supervisor hand edit. The verb writes the frontmatter list and the phase row together, and a contract check keeps the two copies from drifting. A planner can start for a plan that has no discussion.
+- **Constraints:**
+  - The footprint still bounds `run --writes` and the branch diff of `land`.
+  - PS-24 is amended, not dropped. A lead changes its own footprint only through the widen verb, and every other lead footprint change stays `footprint-change-refused` (D1).
+  - The widen names the acceptance criterion it serves. A widening the lead cannot tie to an approved criterion is a scope change and goes to the owner as a five-part question (D1).
+  - Overlap with another active plan is reported as a warning naming that plan, never refused (plan contract §5 for running plans). Ordering the two plans is out of scope (D2).
+  - The supervision spec's decision history records the PS-24 amendment (L5 question 6).
+- **Non-goals:**
+  - Automatic ordering or rebase when a widened path overlaps another plan. That is its own backlog item, handed to the secretary (D2).
+  - Deriving the frontmatter from the phase table (one physical copy). Two copies are kept, and a check holds them equal (D3).
+  - Any widening of the lead's grant: it still writes only its plan directory.
+- **Acceptance criteria:**
+  1. A lead whose unit is refused `write-outside-footprint` runs the widen verb for its own plan and phase with the path and the acceptance criterion it serves. `plan.md` lands with the path in both the frontmatter list and the phase row, and the same `run --writes` is then accepted. One test owns this end to end.
+  2. The supervisor can run the same verb for any running plan.
+  3. A lead changing its own footprint any other way (a plain paths land of `plan.md`) is still refused `footprint-change-refused`. A lead widening another plan is refused.
+  4. A widened path that overlaps another active plan's footprint lands, and the result names the overlapping plan.
+  5. `plan-contract-check` fails a plan whose phase-table footprint has a path the frontmatter list does not cover. A run over today's plans reports any existing drift instead of hiding it.
+  6. `fgos session start planner <plan-dir>` starts for a live plan with no discussion. An unknown key still refuses `discussion-not-found`.
+  7. The supervision spec states the amended PS-24 and the widen door, and the plan contract states the drift rule.
+- **Open, blocking only parts:** none. Planner decides the verb's name and which component owns it (`fgos authority locate` returned `supervision/plan-vocabulary.v1` and `session-host/head-permissions.v1` as nearest rows; no row owns "plan footprint edit", so the planner either places it under supervision or records a `fgos authority declare`).
+- **Sources:** p-lfsc4czpgh; owner decisions in this chat (§5, 2026-11-26 12:41 +07); evidence questions q-xcuwpxa4kn, q-4qtu54bnxz, q-myvzcbz3sx, q-vqyxe5oi6j, q-ep6wknrzop.
 
 ## Seed
 
@@ -19,90 +43,100 @@ Opened by the secretary (Miu) on the owner order relayed by lead:SUPERVISOR, goa
 
 ## 1. Trạng thái hiện tại
 
-Round 1 (2026-11-26, shaper). Scouted the doors that read a footprint and the grants that write plan files (§3 rows 1-6). Proposed a shape (§6): a `plan widen` verb that writes the frontmatter list and the phase row in one commit, and a contract-check rule that fails a phase path the frontmatter does not cover. Both are provisional. Nothing is minted as a D-ID yet.
-
-Still open:
-- **Who may call the widen door** (§3 row 7): only the supervisor, which keeps PS-24 as it is, or the lead too when it presents an answered owner question for its own plan, which amends PS-24. This changes an owner decision, so it is parked as an owner question: **q-ee2f2g3aoj**.
-- Whether "a planner starts for a plan with no discussion" stays in this item or becomes its own row (§3 row 8). Proposed: keep it as a second, independent task.
-
-Operational note, not part of this design: both answers named in the seed (q-myvzcbz3sx, q-vqyxe5oi6j, answered "widen" at 01:44Z) are not on main yet. No commit to either plan.md after 01:03Z. Until the door exists they need a hand edit of **both** copies (frontmatter and phase row) by the supervisor.
+Settled 2026-11-26 (round 2). The owner challenged the round-1 question q-ee2f2g3aoj ("who may call the widen door") with "is this question even needed?". Root cause: the footprint does two jobs. Collision avoidance between parallel plans is mechanical. A scope bound is what the owner approves, but the owner approves outcome and acceptance criteria, not a file list. A missing file needed for an approved criterion is a planner estimation error inside the approved frame. All five widen questions on record were answered "widen", one of them by lead:SUPERVISOR inside the frame. The owner agreed: a plan widens itself inside the frame (D1). q-ee2f2g3aoj is cancelled as superseded. The owner also moved automatic ordering on overlap (a footprint changed mid-run that hits another plan) to its own backlog item (D2), handed to the secretary. The drift check (D3) and the planner fallback (D4) held unchanged across both rounds. No owner question is open.
 
 ## 2. Mục tiêu & đề bài
 
-A running plan is bounded by its footprint: the run door refuses a `--writes` path outside it, and the land door refuses a branch diff outside it. Leads routinely discover mid-phase that one or two files outside the footprint are needed. The owner answers "widen" quickly, but nothing turns that answer into a footprint change. The lead may not edit its own footprint (PS-24, `footprint-change-refused`). A planner cannot start for a plan with no source discussion (`discussion-not-found`). The supervisor ends up hand-editing `plan.md`, and since the footprint is written twice (the frontmatter `footprint:` list and the phase table's footprint column) and only the frontmatter is read by the doors, a half edit still refuses the unit. On 2026-11-25 this parked the owner's bottleneck phase about 40 minutes (p-lfsc4czpgh). Today two more plans sit on answered widen questions. The goal is one door that turns an answered owner question into a correct, landed footprint change. It writes both copies together and is checked so that they cannot drift. The supervisor (and possibly the lead) can call it with no planner in the loop. A second goal is that a planner can start for a plan that has no discussion, for re-planning work beyond a footprint change.
+A running plan is bounded by its footprint: the run door refuses a `--writes` path outside it, and the land door refuses a branch diff outside it. Leads routinely discover mid-phase that one or two files outside the footprint are needed to meet a criterion the owner already approved. Today that becomes an owner question. All five on record were answered "widen". Then a hand edit follows, because the lead may not edit its own footprint (PS-24) and a planner cannot start for a plan with no discussion. The footprint is written twice (frontmatter list and phase-table column) and only the frontmatter is read by the doors, so a half edit still refuses the unit. On 2026-11-25 this parked the owner's bottleneck phase about 40 minutes. The goal is that a plan widens its own footprint mid-run through one verb, within the approved frame, writing both copies in one commit with a check that keeps them equal. The owner is involved only when a widening goes beyond the approved acceptance criteria. Ordering two plans whose footprints come to overlap is a separate coordination capability. A planner can also start for a plan with no discussion, for re-planning beyond a footprint change.
 
 ## 3. Vấn đề rõ / chưa rõ
 
 | # | Vấn đề | Trạng thái | Ghi chú |
 |---|---|---|---|
 | 1 | Which copy do the doors read | **Rõ** | Only frontmatter. `footprintOf` in `src/session-host/head-plan.mjs:110` feeds `run --writes` (`head-request.mjs:384`), branch land and lead paths land (`head-request.mjs:292,304`). Supervision spec: "The commit-time footprint check reads only the frontmatter footprint" (`docs/platform/supervision/spec.md:224`). |
-| 2 | Is the phase-table copy checked against the frontmatter | **Rõ: no** | `scripts/plan-contract-check.mjs` checks phase rows only for emptiness, readability and same-wave overlap (lines 146-167), and frontmatter only for presence and readability (288-299). Nothing checks phase paths ⊆ frontmatter. That is exactly the drift that refused the unit on 2026-11-25. |
-| 3 | Who may write plan files today | **Rõ** | `packages/session-host/contracts/head-permissions.v1.json`: supervisor and secretary write `plans`; planner writes `plans`; lead writes only `plans/<its dir>`, and the land door refuses a lead paths land that changes its own `footprint` (`footprint-change-refused`, PS-24, `docs/platform/supervision/spec.md:152,221`). So the supervisor can already do the edit by hand. What is missing is a door that does it correctly. |
-| 4 | Why a planner cannot start | **Rõ** | `src/session-host/head-plan.mjs:186-203`: planner and shaper resolve only a discussion directory; no fallback to a plan directory → `discussion-not-found`. |
-| 5 | Cross-plan overlap when widening a running plan | **Rõ** | Plan contract §5: for a `running` plan, overlap with another active plan is a warning, not an error (`core/skills/_shared/plan-contract.md:131-133`). Both of today's widenings overlap another plan (`bin/fgos.mjs` hot file; `apps/fgos/src/routing.rs` also in 261125-1631). The door should report the overlap, not refuse it. The owner's answer already accepted it. |
-| 6 | Owning authority | **Rõ (partly)** | `fgos authority locate` returns `supervision/plan-vocabulary.v1` and `session-host/head-permissions.v1` as the closest rows; no row owns "plan footprint edit" by name. The planner decides whether the verb is placed under supervision (portfolio + land already live there) or needs a `fgos authority declare`. |
-| 7 | **Who may call the widen door** | **CHƯA RÕ: owner question q-ee2f2g3aoj** | (a) supervisor only, PS-24 unchanged. Every widening still goes lead → question → supervisor wake → edit. (b) The lead too, but only with `--approved-by <q-id>` naming an answered question whose `ref` is its own plan. The hop disappears; PS-24 is amended (an unapproved self-widening stays refused). |
-| 8 | Planner for a plan without discussion: in scope here? | **Provisional: in scope, separate task** | The seed outcome names it. With the widen door it is no longer on the critical path for footprint changes, but re-planning a running plan (new phase, changed acceptance) still needs it. Proposed: `session start planner <plan-dir>` resolves a live plan when no discussion matches. |
-| 9 | One source vs. two checked copies | **Provisional: two copies, checked** | Full single source means deriving frontmatter from the phase table in three readers (Node `head-plan.mjs`, Rust `packages/supervision/rust/src/portfolio.rs`, `plan-contract-check.mjs` cross-plan scan). A contract rule "every phase path is covered by the frontmatter" plus a verb that writes both gives the same protection at the land door with no reader change. Hold for one more round before minting. |
-| 10 | How the verb proves owner approval | **Provisional** | Requires `--approved-by <q-id>`: the question is `answered` and its `ref` names this plan. The free-text "Scope of the answer" is not parsed; the q-id and the paths go into the commit message so the widening stays traceable. |
+| 2 | Is the phase-table copy checked against the frontmatter | **Rõ: no** | `scripts/plan-contract-check.mjs` checks phase rows only for emptiness, readability and same-wave overlap (146-167), frontmatter only for presence and readability (288-299). → D3. |
+| 3 | Who may write plan files today | **Rõ** | `packages/session-host/contracts/head-permissions.v1.json`: supervisor, secretary and planner write `plans`; lead writes only `plans/<its dir>`; a lead paths land changing its own `footprint` is `footprint-change-refused` (PS-24, `docs/platform/supervision/spec.md:152,221`). |
+| 4 | Why a planner cannot start | **Rõ** | `src/session-host/head-plan.mjs:186-203`: planner resolves only a discussion directory → `discussion-not-found`. → D4. |
+| 5 | Cross-plan overlap when widening a running plan | **Rõ** | Plan contract §5: overlap for a `running` plan is a warning (`core/skills/_shared/plan-contract.md:131-133`). The widen reports it; ordering is D2's separate item. |
+| 6 | Owning authority | **Rõ (planner places it)** | Nearest rows: `supervision/plan-vocabulary.v1`, `session-host/head-permissions.v1`; no row owns "plan footprint edit". |
+| 7 | Does a widening need the owner | **Rõ → D1** | No, inside the approved frame. Evidence: q-4qtu54bnxz answered by lead:SUPERVISOR "inside the approved frame"; q-xcuwpxa4kn, q-myvzcbz3sx, q-vqyxe5oi6j, q-ep6wknrzop all answered with the recommended "widen". The "no" options only degraded an approved criterion (land partial plus follow-up, or a workaround missing the criterion as written). |
+| 8 | Planner for a plan without discussion | **Rõ → D4** | Held unchanged across rounds 1 and 2. |
+| 9 | One source vs. two checked copies | **Rõ → D3** | Held unchanged across rounds 1 and 2. |
+| 10 | How the widen proves it is inside the frame | **Rõ (follows D1)** | Names the acceptance criterion it serves. Round 1's `--approved-by <q-id>` is dropped with q-ee2f2g3aoj. |
+| 11 | Ordering when a mid-run footprint change overlaps another plan | **Rõ → D2, out of scope** | Separate backlog item via the secretary. |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Tóm tắt | Nguồn / rationale |
 |---|---|---|
-
-(None yet: rows 8-10 of §3 are provisional and wait one more round; row 7 waits on q-ee2f2g3aoj.)
+| D1 | A running plan widens its own footprint mid-run inside the approved frame, with no owner question: the lead (or the supervisor) calls one widen verb naming the path, the phase and the acceptance criterion it serves. PS-24 is amended so that this verb is the only way a lead changes its own footprint. A widening not tied to an approved criterion is a scope change and goes to the owner. | Owner decision in chat, 2026-11-26 12:41 +07, after the root-cause round (§5); supersedes q-ee2f2g3aoj. Product priority 2 (decide inside the approved frame). |
+| D2 | Automatic ordering when a footprint changed mid-run overlaps another active plan (the widened phase waits for the other plan to land that part, then rebases) is its own backlog item, not this one. Here the overlap is only reported. | Owner, 2026-11-26 12:41 +07: "ghi nhận ý vào backlog … ý là footprint cần đổi giữa chừng". Handed to head:secretary-miu (shaper does not write the backlog). |
+| D3 | Keep the two footprint copies; the widen verb writes both, and `plan-contract-check` fails a phase-table path the frontmatter does not cover. | Rounds 1-2; same protection at the land door with no change to the three frontmatter readers (Node, Rust portfolio, contract check). |
+| D4 | `session start planner <plan-dir>` falls back to a live plan directory when no discussion matches. | Rounds 1-2; re-planning a running plan beyond a footprint change still needs a planner. |
 
 ## 5. Q&A log
 
-- 2026-11-26 08:55 +07, shaper: Round 1 scout. Evidence in §3 rows 1-6. Proposed shape in §6. Parked q-ee2f2g3aoj (who may call the widen door) because option (b) amends the owner decision PS-24.
+- 2026-11-26 08:55 +07, shaper: Round 1 scout. Evidence in §3 rows 1-6. Proposed shape. Parked q-ee2f2g3aoj (who may call the widen door) because one option amended PS-24.
+- 2026-11-26 ~10:00 +07, owner: "có nên hỏi câu này không, cần đi lại root-cause tại sao hỏi nó … nếu anh trả lời không cho widen thì chuyện gì xảy ra, lead ngưng toàn dự án à?"
+- 2026-11-26 ~10:05 +07, shaper: Root cause. The footprint mixes collision avoidance (mechanical) with scope (the owner approves acceptance, not files). Five widen questions on record, none answered "no", one answered by lead:SUPERVISOR inside the frame. A "no" does not stop the project; it degrades one phase's approved criterion. Proposed: self-widen inside the frame, system-ordered on overlap, owner only for scope beyond acceptance; cancel q-ee2f2g3aoj.
+- 2026-11-26 12:41 +07, owner: "đồng ý." Then: put the overlap-ordering idea in the backlog as its own capability; "ý là footprint cần đổi giữa chừng". → D1, D2. q-ee2f2g3aoj cancelled as superseded. D3 and D4 minted (held across both rounds).
 
 ## 6. Thiết kế đã chốt {#design}
 
-*Draft. Provisional until §4 holds D-IDs.*
+**Problem.** A plan's footprint is the planner's estimate of the files needed to meet acceptance criteria the owner approved. Leads find mid-run that the estimate missed a file. That is an estimation error inside the approved frame, not a scope change, yet today it costs an owner question, a supervisor wake and a hand edit of two copies.
 
-**Widen door.** A new verb (working name `fgos plan widen <plan-dir> --phase <id> --path <p>... --approved-by <q-id>`):
+**Widen verb (D1, D3).** One verb, callable by the plan's own lead (through its request socket) and by the supervisor:
 
-1. Reads `plans/<dir>/plan.md` from the trunk tip; refuses unless the plan is `running` (or `ready`).
-2. Checks `--approved-by`: the question exists, is `answered`, and its `ref` is `plan:<dir>` (any `#phase-…` suffix). Otherwise it refuses by name.
-3. Adds each path to the named phase's footprint cell **and** to the frontmatter `footprint:` list (no duplicates; a path already covered is a no-op).
-4. Runs the plan contract check on the result; reports cross-plan overlaps as warnings (contract §5 for running plans).
-5. Lands only `plans/<dir>/plan.md` through the existing paths land, with a message naming the q-id and the paths.
+1. Input: the plan, the phase id, one or more paths, and the acceptance criterion the paths serve.
+2. Reads `plan.md` from the trunk tip; refuses unless the plan is `running` or `ready`. A lead may name only its own plan.
+3. Adds each path to that phase's footprint cell and to the frontmatter `footprint:` list (a path already covered is a no-op).
+4. Runs the plan contract check on the result. An overlap with another active plan is a warning that names the plan, not a refusal.
+5. Lands only `plans/<dir>/plan.md` through the existing paths land; the commit message names the paths, the phase and the criterion.
 
-Caller: the supervisor (grant already writes `plans`). The lead too, if q-ee2f2g3aoj answers (b). The land door's `footprint-change-refused` then passes a lead commit only when it comes through this door with a valid approval.
+The land door's `footprint-change-refused` stays for every lead footprint change that does not come through this verb.
 
-**Drift check.** `plan-contract-check.mjs` gains one rule: every phase-table footprint path must be covered by the frontmatter `footprint:` (same `entryWithin` rule the run door uses). A hand edit of only one copy then fails at land, not at the next unit.
+**Scope boundary (D1).** If the lead cannot name an approved acceptance criterion that needs the path, the change is a scope change: the lead asks the owner in the five-part form, as today.
 
-**Planner without discussion.** `resolveDiscussion` for persona `planner` falls back to a live plan directory (unique prefix, same rule as lead) when no discussion matches.
+**Drift check (D3).** `plan-contract-check.mjs` fails a plan whose phase-table footprint has a path not covered by the frontmatter list, using the same coverage rule as the run door. A hand edit of one copy then fails at land.
+
+**Planner fallback (D4).** For persona `planner`, the discussion resolver falls back to a live plan directory (same unique-prefix rule as lead) when no discussion matches.
+
+**Out of scope (D2).** Ordering two plans whose footprints come to overlap after a mid-run change is a separate backlog item.
 
 ```mermaid
 flowchart LR
-  L[lead hits write-outside-footprint] --> Q[fgos questions ask ref=plan:dir]
-  Q --> O[owner answers widen]
-  O --> W{who calls plan widen}
-  W -->|a: supervisor| S[supervisor wake → plan widen]
-  W -->|b: lead with --approved-by| PW[plan widen]
-  S --> PW
-  PW --> C[contract check: phase paths ⊆ frontmatter]
-  C --> LD[paths land plan.md]
-  LD --> R[run door accepts the widened path]
+  R[unit refused write-outside-footprint] --> J{path serves an approved criterion?}
+  J -->|yes| W[widen verb: lead or supervisor]
+  J -->|no: scope change| Q[five-part owner question]
+  W --> B[write phase row + frontmatter]
+  B --> C[contract check: phase paths covered by frontmatter; overlap = warning]
+  C --> L[paths land plan.md]
+  L --> A[run --writes accepted]
+  C -. overlap with another plan .-> X[ordering: separate backlog item]
 ```
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
 ### Widen verb {#task-widen-verb}
-- Goal: one verb turns an answered owner question into a landed footprint change, both copies written.
-- §6: "Widen door".
-- D-IDs: none yet (q-ee2f2g3aoj decides the caller set).
-- Siblings: independent of the planner task; depends on the drift check only for its own verify.
-- Draft verify: one test where a path outside the footprint is refused by the run door, `plan widen` with an answered question runs, and the same `--writes` is accepted. Plus refusals for an unanswered question and for a question whose ref is another plan.
+- Goal: a running plan widens its own footprint mid-run in one call, both copies written and landed.
+- §6: "Widen verb", "Scope boundary".
+- D-IDs: D1, D3.
+- Siblings: uses the drift check in its own verify; independent of the planner fallback.
+- Draft verify: one end-to-end test: refused `--writes`, widen by the lead with a criterion, same `--writes` accepted. Refusals: a lead naming another plan; a lead paths land of `plan.md` changing the footprint (still `footprint-change-refused`). An overlap case lands and names the other plan.
 
 ### Drift check {#task-drift-check}
 - Goal: a phase path not covered by the frontmatter fails `plan-contract-check`.
 - §6: "Drift check".
-- Draft verify: `node --test` case in the contract-check suite with a phase row wider than the frontmatter → error. Then `node scripts/plan-contract-check.mjs --all` runs on today's plans (existing drift is reported, not hidden).
+- D-IDs: D3.
+- Draft verify: a contract-check test with a phase row wider than the frontmatter → error; `node scripts/plan-contract-check.mjs --all` run on today's plans, existing drift reported.
 
 ### Planner for a plan without discussion {#task-planner-plan-fallback}
 - Goal: `session start planner <plan-dir>` starts for a live plan with no discussion.
-- §6: "Planner without discussion".
-- Draft verify: extend `test/session-host/head-plan.test.mjs`: a plan dir with no discussion resolves for planner; an unknown key still refuses `discussion-not-found`.
+- §6: "Planner fallback".
+- D-IDs: D4.
+- Draft verify: extend `test/session-host/head-plan.test.mjs`: plan dir without discussion resolves for planner; unknown key still `discussion-not-found`.
+
+### Spec and contract text {#task-spec-text}
+- Goal: supervision spec records the amended PS-24 and the widen door in its decision history; plan contract §4/§5 states the drift rule and the self-widen rule.
+- D-IDs: D1, D3.
+- Draft verify: `node scripts/plan-contract-check.mjs --all` and the docs checks in `npm test`.
