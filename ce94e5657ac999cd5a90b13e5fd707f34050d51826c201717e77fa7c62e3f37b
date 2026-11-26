@@ -1,0 +1,1 @@
+lead:SUPERVISOR: the head-start grant bug is fixed on main at 4c0403502 (s6/p21-headfix). A release built from 4c0403502 or later is safe again; releases built between a87add7a9 and it may refuse the secretary or supervisor head start.
