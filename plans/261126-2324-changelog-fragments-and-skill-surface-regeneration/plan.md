@@ -110,7 +110,7 @@ a wait on one part must not hold a part that can go ahead).
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Land regenerates declared globs](phase-01-land-regenerates-globs.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, core/config-schema/land.schema.yaml | 1 | ready |
-| 2 | [Changelog fragments assembled at release](phase-02-changelog-fragments.md) | - | scripts/prepare-release.mjs, test/scripts/prepare-release.test.mjs, changelog.d/** | 1 | ready |
+| 2 | [Changelog fragments assembled at release](phase-02-changelog-fragments.md) | - | scripts/prepare-release.mjs, test/scripts/prepare-release.test.mjs, changelog.d/** | 1 | done |
 | 3 | [Land config and integration](phase-03-land-config-and-integration.md) | 1, 2 | .fgos/config.yaml, plans/261126-2324-changelog-fragments-and-skill-surface-regeneration/reports/** | 2 | ready |
 
 Phases 1 and 2 own disjoint files and run at once. Phase 3 runs from the main checkout and needs an activated
