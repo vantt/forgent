@@ -1,8 +1,8 @@
 # Scope-wrap proof (phase 1, step 1)
 
-Status: **not yet run**. The check must run in an unconfined shell on fg-server2.
+Status: **PASS** (run unconfined by lead:SUPERVISOR, 2026-11-27 00:27). Exec-wrap design stays.
 
-## Why it is not run yet
+## Why the lead could not run it
 
 On 2026-11-27 the lead tried it from its confined shell. `systemctl --user` and `systemd-run --user` both failed with
 `Failed to connect to user scope bus via local transport: No data available`, even with
@@ -30,4 +30,13 @@ Fail: phase 1 switches to the fallback through a fix unit; names and the binding
 
 ## Result
 
-(to be filled with the pasted output)
+**PASS.** lead:SUPERVISOR ran the check unconfined on fg-server2 at 2026-11-27 00:27 (+07):
+
+```text
+RESULT=PASS lock held by child in scope
+fd3=/tmp/tmp.RUtt9eYhlr
+cgroup=0::/user.slice/user-1000.slice/user@1000.service/app.slice/fgos-run-proof-2788851.scope
+```
+
+The fd and its lock survive `setsid systemd-run --user --scope`, and the child sits in its own scope. Phase 1 keeps
+the exec-wrap design; the D3 fallback is not needed. Question `q-j7zgwtgyyu` was cancelled by its asker.
