@@ -35,6 +35,24 @@ struct World {
     /// What the supervisor looks like to the stop door: `None` is no live supervisor.
     supervisor_idle: RefCell<Option<bool>>,
     stops: RefCell<u32>,
+    reviews: RefCell<u32>,
+    review_fails: RefCell<bool>,
+    reviews_done: RefCell<Vec<String>>,
+}
+
+impl fgos_supervision::watcher::Review for World {
+    fn run(&self) -> Result<String, String> {
+        *self.reviews.borrow_mut() += 1;
+        if *self.review_fails.borrow() {
+            Err("failed Unit".into())
+        } else {
+            Ok("unit-review-1".into())
+        }
+    }
+    fn done(&self, id: &str) -> Result<(), String> {
+        self.reviews_done.borrow_mut().push(id.into());
+        Ok(())
+    }
 }
 
 impl Clock for World {
@@ -128,6 +146,10 @@ impl TickLock for World {
     }
 }
 impl EventSink for World {
+    fn review_handled(&self, id: &str) -> Result<(), QueueError> {
+        self.handled.borrow_mut().push(id.into());
+        Ok(())
+    }
     fn raise(&self, event: RaisedEvent) -> Result<Raised, QueueError> {
         let mut all = self.raised.borrow_mut();
         if all.contains_key(&event.id) {
@@ -182,6 +204,7 @@ fn run(
         fetch: w,
         definitions: w,
         wake: w,
+        review: w,
         notifier: notifier.unwrap_or(w),
         portfolio: w,
         questions: w,
@@ -554,6 +577,39 @@ fn an_edge_between_an_idle_tick_and_the_next_full_tick_is_raised_with_no_lookbac
     let runs = w.runs.borrow();
     let (_, since) = runs.iter().find(|(d, _)| d == &[DEF.to_owned()]).unwrap();
     assert_eq!(*since, Some(1000));
+}
+
+// Existing action proofs cover wakes and notifications, not the review's settle/retry watermark.
+#[test]
+fn a_failed_review_retries_the_duplicate_row_and_only_success_records_done_without_waking_the_supervisor(
+) {
+    let w = World::default();
+    w.rows
+        .borrow_mut()
+        .push(row("review-due", "periodic-review", "epoch"));
+    w.pace_rows.borrow_mut().push(row("active", "x", "t"));
+    let mut s = settings(Action::WakeSupervisor);
+    s.actions.insert("review-due".into(), Action::StartReview);
+    *w.review_fails.borrow_mut() = true;
+    at(&w, 1000);
+    let failed = run(&w, None, &s);
+    assert_eq!((failed.raised, failed.errors, failed.wakes), (1, 1, 0));
+    assert!(w.reviews_done.borrow().is_empty());
+    assert!(w.handled.borrow().is_empty());
+    *w.review_fails.borrow_mut() = false;
+    at(&w, 1060);
+    let settled = run(&w, None, &s);
+    assert_eq!(
+        (settled.duplicate, settled.errors, settled.wakes),
+        (1, 0, 0)
+    );
+    assert_eq!(*w.reviews.borrow(), 2);
+    assert_eq!(*w.reviews_done.borrow(), ["unit-review-1"]);
+    assert_eq!(w.handled.borrow().len(), 1);
+    w.rows.borrow_mut().clear(); // The fresh done watermark removes the level row.
+    at(&w, 1120);
+    assert_eq!(run(&w, None, &s).wakes, 0);
+    assert_eq!(*w.reviews.borrow(), 2);
 }
 
 fn stuck_world() -> (World, Settings) {

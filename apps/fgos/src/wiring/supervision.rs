@@ -458,6 +458,7 @@ fn config_strings(root: &Path, key: &str) -> Vec<String> {
 fn action_of(word: &str) -> Option<watcher::Action> {
     match word {
         "wake-supervisor" => Some(watcher::Action::WakeSupervisor),
+        "start-review" => Some(watcher::Action::StartReview),
         "notify" => Some(watcher::Action::Notify),
         "none" => Some(watcher::Action::None),
         _ => None,
@@ -1278,7 +1279,8 @@ impl watcher::Fetch for FetchTrunk {
     }
 }
 
-/// The detection definitions: `<host> metrics query --def <path>... --since <instant> --json`, mapped to rows.
+/// Detection uses Observe's query door in process, with the review watermark projection added
+/// to the ordinary host environment.
 struct QueryDefinitions {
     root: PathBuf,
     payload_root: PayloadRoot,
@@ -1303,27 +1305,28 @@ impl QueryDefinitions {
 impl QueryDefinitions {
     /// The answer of one `metrics query --def` call over `defs`, as the verb's JSON.
     fn answer(&self, defs: &[String], since: Option<i64>) -> Result<Value, String> {
-        let mut command = Command::new(host_binary());
-        command.args(["metrics", "query", "--json"]);
+        let mut args = Vec::new();
         for def in defs {
             let path = self
                 .resolve(def)
                 .ok_or_else(|| format!("{def} does not exist"))?;
-            command.arg("--def").arg(path);
+            args.extend(["--def".into(), path.to_string_lossy().into_owned()]);
         }
         if let Some(since) = since {
-            command.arg("--since").arg(iso_of(since));
+            args.extend(["--since".into(), iso_of(since)]);
         }
-        let out = command
-            .current_dir(&self.root)
-            .stdin(Stdio::null())
-            .output()
-            .map_err(|e| e.to_string())?;
-        if !out.status.success() {
-            return Err(String::from_utf8_lossy(&out.stderr).trim().to_owned());
-        }
-        let answer: Value = serde_json::from_slice(&out.stdout).map_err(|e| e.to_string())?;
-        Ok(answer.get("data").cloned().unwrap_or(answer))
+        fgos_observe::metrics_cli::query::dispatch_query(
+            &fgos_observe::ObserveRequest {
+                operation: "observe.metrics".into(),
+                sub: "query".into(),
+                args,
+                root: self.root.clone(),
+                stdin: None,
+            },
+            &ReviewEnvironment {
+                payload_root: self.payload_root,
+            },
+        )
     }
 }
 
@@ -1618,6 +1621,7 @@ struct KeeperHistorySnapshot {
     decisions: Vec<keeper::Decision>,
     cover: BTreeMap<String, u64>,
     starts: BTreeMap<keeper::Key, u64>,
+    latest_event: Option<String>,
 }
 impl KeeperHistory {
     fn snapshot(&self) -> Result<KeeperHistorySnapshot, String> {
@@ -1683,6 +1687,11 @@ impl KeeperHistory {
         Ok(KeeperHistorySnapshot {
             decisions,
             starts,
+            latest_event: result
+                .sequence
+                .iter()
+                .max_by_key(|e| fgos_host_runtime::civil_time::parse_rfc3339_millis(&e.ts))
+                .map(|e| e.ts.clone()),
             cover: result.cursor.cover.into_iter().collect(),
         })
     }
@@ -2202,6 +2211,185 @@ impl keeper::Snapshot for KeeperSnapshot<'_> {
     }
 }
 
+/// Local query environment: no new global Observe source or config defaults. The review
+/// snapshot is measured afresh only when a definition requests its kind.
+struct ReviewEnvironment {
+    payload_root: PayloadRoot,
+}
+impl fgos_observe::metrics_cli::RecordEnvironment for ReviewEnvironment {
+    fn embedded_declarations(&self) -> Vec<fgos_observe::record::registry::EmbeddedDeclaration> {
+        let mut declarations = super::observe_declarations::embedded_declarations();
+        declarations.push(watcher::REVIEW_DECLARATION);
+        declarations
+    }
+    fn payload_root(&self) -> Option<PathBuf> {
+        (self.payload_root)().ok()
+    }
+    fn record_sources(&self) -> Vec<Box<dyn fgos_observe::RecordSource>> {
+        let mut sources = super::observe_query::HostRecordEnvironment {
+            payload_root: self.payload_root,
+        }
+        .record_sources();
+        sources.push(Box::new(ReviewSource));
+        sources
+    }
+    fn config_number(&self, root: &Path, key: &str) -> Result<Option<f64>, String> {
+        super::observe_query::HostRecordEnvironment {
+            payload_root: self.payload_root,
+        }
+        .config_number(root, key)
+    }
+}
+
+struct ReviewSource;
+impl fgos_observe::RecordSource for ReviewSource {
+    fn source_id(&self) -> &'static str {
+        "supervision-review"
+    }
+    fn kinds(&self) -> &[&str] {
+        &["fgos.review.state"]
+    }
+    fn records(
+        &self,
+        root: &Path,
+        _: &fgos_observe::Window,
+    ) -> Result<Vec<Record>, fgos_observe::SourceError> {
+        let read = || -> Result<Vec<Record>, String> {
+            use fgos_questions::store::{fold, LogOpener, State};
+            let last = fgos_observe::record::store::RecordStoreSource
+                .records(root, &fgos_observe::Window::default())
+                .map_err(|e| e.to_string())?
+                .into_iter()
+                .filter(|r| r.kind == "fgos.review.done")
+                .max_by_key(|r| fgos_host_runtime::civil_time::parse_rfc3339_millis(&r.ts));
+            let (plans, refusals) = HostPortfolio {
+                root: root.to_path_buf(),
+            }
+            .read_with_refusals()?;
+            if !refusals.is_empty() {
+                return Err("review-portfolio-incomplete".into());
+            }
+            let open_plan = plans
+                .iter()
+                .any(|p| !matches!(p.status.as_str(), "done" | "withdrawn"));
+            let open_question = match super::questions::HostLogOpener::reader()
+                .open(root)
+                .map_err(|e| e.to_string())?
+            {
+                Some(log) => fold(&log.read().map_err(|e| e.to_string())?)
+                    .questions()
+                    .any(|q| q.state == State::Open),
+                None => false,
+            };
+            let history = KeeperHistory {
+                root: root.to_path_buf(),
+            }
+            .snapshot()?;
+            let last_ts = last.as_ref().map(|r| r.ts.as_str());
+            let new_event = history.latest_event.as_deref().is_some_and(|ts| {
+                fgos_host_runtime::civil_time::parse_rfc3339_millis(ts)
+                    > last_ts.and_then(fgos_host_runtime::civil_time::parse_rfc3339_millis)
+            });
+            Ok(vec![watcher::review_state_record(
+                last_ts,
+                open_plan || open_question,
+                new_event,
+            )])
+        };
+        read().map_err(|message| fgos_observe::SourceError::ReadFailed {
+            source_id: "supervision-review",
+            message,
+        })
+    }
+}
+
+struct HostReview {
+    root: PathBuf,
+    payload_root: PayloadRoot,
+    host: PathBuf,
+}
+impl watcher::Review for HostReview {
+    fn run(&self) -> Result<String, String> {
+        let definitions = QueryDefinitions {
+            root: self.root.clone(),
+            payload_root: self.payload_root,
+        };
+        let path = definitions
+            .resolve(watcher::REVIEW_BRIEF)
+            .ok_or("review-brief-missing")?;
+        let brief = std::fs::read_to_string(path).map_err(|e| e.to_string())?;
+        let output = Command::new(&self.host)
+            .args(watcher::review_run_args(&brief))
+            .current_dir(&self.root)
+            .stdin(Stdio::null())
+            .output()
+            .map_err(|e| e.to_string())?;
+        if !output.status.success() {
+            return Err(format!("review-run-failed: {}", output.status));
+        }
+        let answer: Value = serde_json::from_slice(&output.stdout).map_err(|e| e.to_string())?;
+        let data = answer.get("data").unwrap_or(&answer);
+        if data["outcome"] != "pass" {
+            return Err("review-unit-not-done".into());
+        }
+        let id = data["unitRunId"]
+            .as_str()
+            .filter(|id| !id.is_empty())
+            .ok_or("review-unit-run-id-missing")?;
+        let report = data["results"]
+            .as_array()
+            .and_then(|results| results.last())
+            .and_then(|result| result["runResult"]["agentClaim"]["summary"].as_str())
+            .filter(|text| !text.trim().is_empty())
+            .ok_or("review-report-missing")?;
+        // The reviewer authors the report in its allowed result artifact. Publishing that
+        // text here preserves a read-only Unit: it never receives a repository write grant.
+        let slug = format!("periodic-review-{id}");
+        let destination = fgos_convention::convention_path(
+            &fgos_convention::NameInput {
+                kind: "report",
+                artifact_type: Some("review"),
+                slug: &slug,
+                at: None,
+                now_millis: now_secs() * 1000,
+                local_offset_seconds: 0,
+            },
+            None,
+        )
+        .map_err(|e| e.to_string())?;
+        let path = self.root.join(destination.path);
+        let parent = path.parent().ok_or("review-report-parent-missing")?;
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        fgos_durable_file::replace_durably(
+            parent,
+            path.file_name()
+                .and_then(|s| s.to_str())
+                .ok_or("review-report-name-invalid")?,
+            report.as_bytes(),
+        )
+        .map_err(|e| e.to_string())?;
+        Ok(id.to_owned())
+    }
+    fn done(&self, unit_run_id: &str) -> Result<(), String> {
+        let mut declarations = super::observe_declarations::embedded_declarations();
+        declarations.push(watcher::REVIEW_DECLARATION);
+        let door = RecordDoor::new(self.root.clone(), declarations, (self.payload_root)().ok());
+        let record = span_record(
+            "fgos.review.done",
+            SubjectRef {
+                kind: "run".into(),
+                id: unit_run_id.into(),
+            },
+            vec![("fgos.review.unitRunId", unit_run_id.into())],
+            vec![],
+        );
+        match door.write(record) {
+            fgos_observe::record::store::WriteOutcome::Written => Ok(()),
+            other => Err(format!("review-done-write-failed: {other:?}")),
+        }
+    }
+}
+
 fn run_tick(
     root: &Path,
     payload_root: PayloadRoot,
@@ -2238,10 +2426,16 @@ fn run_tick(
     let lock = WatcherLock {
         root: root.to_path_buf(),
     };
+    let review = HostReview {
+        root: root.to_path_buf(),
+        payload_root,
+        host: host_binary(),
+    };
     let ports = watcher::Ports {
         fetch: &fetch,
         definitions: &definitions,
         wake: &wake_adapter,
+        review: &review,
         notifier: &notifier,
         portfolio: &portfolio,
         questions: &questions,
@@ -2994,6 +3188,97 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         dir
+    }
+
+    // The watcher owns retry semantics; this boundary proof owns the real run-door argv,
+    // settlement parsing and the done record's persisted unit id.
+    #[cfg(unix)]
+    #[test]
+    fn the_review_action_calls_an_independent_read_only_run_and_records_its_settled_unit_id() {
+        use fgos_observe::RecordSource;
+        use std::os::unix::fs::PermissionsExt;
+        use watcher::Review;
+        fn no_payload() -> Result<PathBuf, String> {
+            Err("no payload".into())
+        }
+        let root = scratch_root("periodic-review");
+        let brief = root.join(watcher::REVIEW_BRIEF);
+        std::fs::create_dir_all(brief.parent().unwrap()).unwrap();
+        std::fs::write(&brief, "fixed independent review brief").unwrap();
+        let host = root.join("run-door");
+        let result = json!({"data": {"outcome": "pass", "unitRunId": "review-unit-1",
+            "results": [{"runResult": {"agentClaim": {"summary": "# Review\nNo actionable findings."}}}]}});
+        std::fs::write(
+            &host,
+            format!("#!/bin/sh\nprintf '%s\\0' \"$@\" > run-args\nprintf '%s' '{result}'\n"),
+        )
+        .unwrap();
+        std::fs::set_permissions(&host, std::fs::Permissions::from_mode(0o755)).unwrap();
+        let review = HostReview {
+            root: root.clone(),
+            payload_root: no_payload,
+            host: host.clone(),
+        };
+        let id = review.run().unwrap();
+        let args = std::fs::read(root.join("run-args")).unwrap();
+        let args: Vec<&str> = std::str::from_utf8(&args)
+            .unwrap()
+            .split('\0')
+            .filter(|a| !a.is_empty())
+            .collect();
+        assert_eq!(
+            args,
+            [
+                "run",
+                "fixed independent review brief",
+                "--capability",
+                "review",
+                "--json"
+            ]
+        );
+        assert_eq!(
+            action_of("start-review"),
+            Some(watcher::Action::StartReview)
+        );
+        let reports: Vec<_> = std::fs::read_dir(root.join("plans/reports"))
+            .unwrap()
+            .map(|entry| entry.unwrap().path())
+            .collect();
+        assert_eq!(reports.len(), 1);
+        let relative = reports[0]
+            .strip_prefix(&root)
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_owned();
+        assert!(fgos_convention::check_paths(&[relative])
+            .unwrap()
+            .violations
+            .is_empty());
+        assert_eq!(
+            std::fs::read_to_string(&reports[0]).unwrap(),
+            "# Review\nNo actionable findings."
+        );
+        review.done(&id).unwrap();
+        let records = fgos_observe::record::store::RecordStoreSource
+            .records(&root, &fgos_observe::Window::default())
+            .unwrap();
+        let done: Vec<_> = records
+            .iter()
+            .filter(|r| r.kind == "fgos.review.done")
+            .collect();
+        assert_eq!(done.len(), 1);
+        assert_eq!(done[0].subject.id, "review-unit-1");
+        assert_eq!(done[0].attrs["fgos.review.unitRunId"], AttrValue::Str(id));
+        // A successful process alone is not successful settlement, nor is a missing run id.
+        for answer in [
+            r#"{"outcome":"fail","unitRunId":"bad"}"#,
+            r#"{"outcome":"pass"}"#,
+            r#"{"outcome":"pass","unitRunId":"without-report"}"#,
+        ] {
+            std::fs::write(&host, format!("#!/bin/sh\nprintf '%s' '{answer}'\n")).unwrap();
+            assert!(review.run().is_err());
+        }
     }
 
     fn with_placement(root: &Path, lineage: &str) {
