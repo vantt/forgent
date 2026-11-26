@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Agent Context Engine: one checked store of every fgOS rule, built on pkm, handing ASC one effective set with a digest"
-status: running
+status: done
 lead: head:lead-forgent-261125-1631-agent-15de9
 priority: P1
 blockedBy:
@@ -140,7 +140,7 @@ Read with `git log -S` on `discoverInstructionSources`, `evaluateInstructionComp
 | 2 | [pkm fit probe](phase-02-pkm-fit-probe.md) | - | plans/261125-1631-agent-context-engine/reports/pkm-fit.md | 1 | done |
 | 3 | [The crate on pkm, the compile door, registration; the Node registry moves out](phase-03-crate-store-and-registry-move.md) | 1, 2 | packages/agent-context-engine/rust/**, packages/agent-context-engine/pkm/**, Cargo.toml, Cargo.lock, apps/fgos/Cargo.toml, apps/fgos/src/wiring/context_engine.rs, apps/fgos/src/wiring/context_engine/**, apps/fgos/src/wiring/mod.rs, apps/fgos/src/routing.rs, apps/fgos/tests/context_engine.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/component-authority/model/**, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/reading-map.md, docs/platform/packaging-distribution/spec.md, docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md, docs/platform/proposals/documentation-system-unification.md, src/setup/instruction-registry.mjs, src/setup/instruction-composition.mjs, src/setup/instruction-projections.mjs, src/setup/skill-wrappers.mjs, test/setup/instruction-*.test.mjs, test/rust-host/release-tree.test.mjs, test/suite-baseline.json, packages/git/contracts/mutation-census.v1.json, .fgos/instructions/effective/**, core/instructions/**, components/*/instructions/**, domains/*/instructions/** | 3 | done |
 | 4 | [Refuse a bad rule when it is written](phase-04-write-time-check.md) | 3 | packages/agent-context-engine/rust/src/check/**, packages/agent-context-engine/rust/tests/check*.rs, apps/fgos/src/wiring/context_engine/**, apps/fgos/tests/context_engine.rs, .githooks/pre-commit | 4 | done |
-| 6 | [Integration gate, changelog](phase-06-integration.md) | 1, 2, 3, 4 | CHANGELOG.md, plans/261125-1631-agent-context-engine/reports/** | 5 | draft |
+| 6 | [Integration gate, changelog](phase-06-integration.md) | 1, 2, 3, 4 | CHANGELOG.md, plans/261125-1631-agent-context-engine/reports/** | 5 | done |
 
 Progress (lead on fg-server, 2026-11-26). Phases 1 to 4 are done and landed on main: phase 1 `6d7933abd`, phase 2 `d5fd432f9`,
 phase 3 `b05001289`, phase 4 `b66397a8f`. Phase 6 is running. The note that parked phases 3 to 6 and the note that parked
