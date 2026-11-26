@@ -72,6 +72,14 @@ queued: it sees it at its next tool call.
 queued: it sees it at its next tool call or when its turn ends.
 [report.turn.no-stop]
 queued: it sees it at its next tool call. This CLI takes no mail when its turn ends, so an idle session sees it only when it next runs a tool.
+[report.path.local-pushed]
+path: local-pushed (the local push channel accepted the wake).
+[report.path.local-typed]
+path: local-typed (the labelled wake was typed into the idle session).
+[report.path.local-next-tool-call]
+path: local-next-tool-call (no new wake was sent; mail waits for its next tool call).
+[report.path.remote-recorded]
+path: remote-recorded (recorded for another machine; no local wake was sent).
 [report.nudge.sent]
 Its idle session was nudged to read it now.
 [report.nudge.pending]

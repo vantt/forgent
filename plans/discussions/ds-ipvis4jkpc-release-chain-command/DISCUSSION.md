@@ -1,13 +1,24 @@
 ---
 id: ds-ipvis4jkpc
 title: "One command that drives the owner's release sequence of plans to done"
-status: open
+status: paused
 source:
   - p-755psfxpmh
 created: 2026-11-26
 ---
 
-discussion: open
+discussion: paused
+
+## Hand-off
+
+**Content settled by the owner 2026-11-26 12:2x; planner held by owner order ("chốt settled, khoan giao cho planner").** The marker stays `paused` on purpose: a landed `settled` raises `discussion-settled` and the supervisor starts a planner at once (supervision spec l.137, `packages/supervision/rust/src/discussion_source.rs` `marker_of`), and there is no hold. To hand off, change the frontmatter `status` and this marker to `settled` and land; nothing else in this file needs to change.
+
+- **Outcome:** the owner's release order of plans is state on the trunk and the supervisor drives it to done in order, without being asked, across head rotation: a `delivery` flag beside `status`, order in `blockedBy` + `priority`, admission only of flagged `ready` plans that the `resource-referee` accepts and the capacity gate allows. Works for any project using fgOS.
+- **Constraints:** every conflict between plans is judged by `resource-referee` through one shared function (D3, D4); no overlap or order rule outside it; `ready` means quality only (D5); a step ends at `done` on main (D1); concurrency follows measured machine capacity, never a fixed count (D13); no new component (row 10); plan frontmatter stays owned by the plan contract.
+- **Non-goals:** a sequence file; a cross-plan `layer` (D8); pkm in conflict judgement; a fixed run cap or `maxLeads: 2` (D13); the backlog-to-ready pipeline (D10, separate topic); designing the capacity gate (backlog p-tyowvhthul).
+- **Acceptance criteria:** (1) a `ready` plan without `delivery` is never admitted; (2) a flagged `draft` gets a planner/validator started; (3) a flagged `ready` plan is admitted only when the referee verdict over the portfolio accepts it, and a reject names its finding (cycle, dangling `blockedBy`, collision, empty footprint); (4) planners and `scripts/plan-contract-check.mjs` reach the same verdict through the same function; (5) `plan-contract.md` tells planners to run the portfolio check before `ready`; (6) the plans of p-755psfxpmh carry `delivery` and `blockedBy` in the owner's order; (7) `npm test` and `cargo test --workspace` green.
+- **Open points blocking only part:** task-run-cap waits on backlog p-tyowvhthul (capacity gate); row 15 (interface to the backlog-to-ready pipeline) is decided by that topic and blocks nothing here.
+- **Source ids:** p-755psfxpmh; D1-D13 in §4; tasks in §7.
 
 ## Seed
 
@@ -16,6 +27,8 @@ Opened by the secretary (Miu) on the owner order relayed by lead:SUPERVISOR, goa
 - **Outcome:** a command or standing order that drives the owner's release sequence of plans to done, in order, without waiting to be asked, and survives head rotation. Settle what the command is, who runs it and where the order is kept.
 
 ## 1. Trạng thái hiện tại
+
+Settled in content 2026-11-26 12:2x (D1-D13); planner held by the owner, marker `paused` until the owner says hand off (see Hand-off).
 
 Round 1 (2026-11-26, shaper head `release-chain-command`). Domain: supervision (fgOS platform; no `domains/supervision/AGENTS.md` exists, so the supervision spec is the doctrine read).
 
@@ -39,16 +52,16 @@ The owner gave a release sequence of plans (backlog p-755psfxpmh): two plans in 
 
 | # | Point | State | Evidence / note |
 |---|-------|-------|-----------------|
-| 1 | Where the order is kept | Leaning: plan frontmatter `blockedBy` (+ `priority`) | Supervisor already admits by `blockedBy` + priority (supervision spec l.73, l.131). Durable on trunk, survives rotation, no new door (L10). A separate "sequence file" would be a second authority over admission order. |
+| 1 | Where the order is kept | Settled — D11 | Order between plans is `blockedBy` (+ `priority` as tie-break) in plan frontmatter on the trunk; intent is the `delivery` flag (D5). No sequence file (it would be a second authority over admission). Survives rotation. |
 | 2 | `ready` (quality) vs queued (delivery) | Settled — D5, D6 | **Quality:** `draft → ready` means only that the plan is complete and passes the plan contract check; setting it starts nothing. **Delivery:** a `delivery` flag in plan frontmatter, beside `status`, records that the owner wants the plan delivered; it may be set on a `draft` (the owner's sequence holds five drafts: 261125-1557, 261125-1556, 261122-0056, 261125-1558, 261124-1853). Order stays in `blockedBy` (+ `priority`); the flag carries only intent. A new status value was rejected: it cannot mark a draft, and every status reader would change. **Drafts flagged for delivery:** the supervisor starts a planner/validator for them early so they are `ready` when their turn comes. **Admission:** flagged AND `ready` AND referee accepts (D3, D4: blockers done, no collision) AND a lead slot free (D2). Exact key name and values are the planner's (plan contract owns frontmatter). Prior art: GitHub merge queue / auto-merge, Kubernetes Job `spec.suspend`, Kanban commitment point, Airflow `dags_are_paused_at_creation` all keep ready from starting work without an explicit commitment. |
 | 3 | Backlog items with no plan (and no discussion) | Split out — new topic (D10) | p-l54vuzupa5, p-6sd4fslxv7, p-vyzy7isj3z, p-oq4hnkqyai have not even a discussion. Owner 11:16: the path backlog item → clarify (on intake: rewrite a terse request so it is explicit, classify it) → triage against the managed goals (goal priority) → discover (agent collects facts into the discussion) → exploring only when discover is incomplete → planning → `ready`, must run by itself and **just in time**: not so early that the codebase drifts under the plan, early enough that a `ready` plan is waiting when its turn in the delivery queue comes. Work already has most stages (domain workflows `domains/<domain>/workflows/*.yaml`, phases clarify/discover/plan/execute, `fgos triage`, the `intent` score; `docs/platform/work-state/spec.md` #12, #21, #26), but it runs only for Work items, not for portfolio backlog rows, and it leans to coding (default domain `coding`; `fgos ready` reads stage `executing`; `delivered` means "code in the main tree"). Owner wants it extracted from Work into an independent, domain-agnostic workflow. This is a topic of its own; this discussion only fixes the interface (§3 row 15). |
-| 4 | Two full test suites at most | Settled — D2 (q-wwsaazcrbz) | Held by `supervisor.maxLeads: 2` in project config (`.fgos/config.yaml`); default `4` in `core/config-standard/supervisor.yaml` is unchanged. No suite counter is built; one lead runs at most one full suite at a time. |
+| 4 | How many things run at once | Settled — D13 (supersedes D2) | Owner 12:18: no fixed count. The number of running threads, heads and workers together, follows the machine's measured capacity; a fixed number leaves the machine idle when it could work and lets too much start at once at other times. Scout: `supervisor.maxLeads` is soft (only reported, `supervisor.rs:190`; obeyed from skill prose); lanes are hard but a fixed `workerSlots.ceiling`; a load guard (loadavg / free memory) was proposed on 2026-11-18 (`7655f4f3e`, Q2 option a) and never built; backlog **p-tyowvhthul** already asks to raise the lane count from measured capacity (provider seats, memory, free disk); OOM and full-disk incidents: p-6htu2ae64o, q-pmhxzsfpr7. `/proc` reads have one door: `packages/process/rust/src/platform/linux.rs` (doors model `process-facts-proc.yaml`). This discussion only fixes the interface: admission (and seat start) ask one capacity gate; its inputs, thresholds and counting of heads are p-tyowvhthul's. Until it lands, no config value changes (`maxLeads` stays at its default; D2's `maxLeads: 2` is not applied). |
 | 5 | What "released" means | Settled — D1 (q-anofq5k6pf) | A step ends when its plan is `done` on main; no staged/activated release is required between steps (releases stay stopped under q-cmio6uyrqz without blocking the chain). |
-| 6 | Who runs it | Leaning: the supervisor, as today | The supervisor already admits on wake; the order needs no new runner once it is state. The secretary's role shrinks to writing the edges when the owner gives an order. |
+| 6 | Who runs it | Settled — D12 | The supervisor, on each wake, as today: admission per D6 through the referee (D3, D4). No new runner. |
 | 7 | Who writes the order (delivery flag, `blockedBy`) | Settled — D7 | Both the secretary and the supervisor; both already land portfolio files with `land --paths`. |
 | 8 | Current state of the sequence | Clear | Step 1 done (261124-0004 done, 261125-1558 land-door done). head-lifecycle-events 261124-2143 running. delete-dead-node 261122-2108 done. |
 | 9 | `fgos supervisor plans` from this head | Friction | Refused `ref-invalid: case:head-window-c-1143-…` from inside this shaper head; read frontmatter directly instead. |
-| 10 | Component authority | Partly run | `fgos authority locate "resolve conflicts between plans competing for shared resources"` ranks `supervision` first; the conflict verdict itself is owned by `resource-referee` (`docs/platform/resource-referee/spec.md` §1: callers must stop hard-coding "may these units run together"). Re-run once rows 11-13 hold. |
+| 10 | Component authority | Settled — no new component | `fgos authority locate` answers are noisy (durable-file, work-driver…); owners by spec instead: plan frontmatter incl. `delivery` = plan contract (`core/skills/_shared/plan-contract.md`, supervision spec l.73); admission and the portfolio→units function = `supervision` (owns the portfolio reader, spec l.45); the verdict = `resource-referee`; the `fgos resource-check` door = its wiring `apps/fgos/src/wiring/resource_check.rs`. No `fgos authority declare` needed. |
 | 11 | Plan-vs-plan conflicts go through resource-referee | Settled — D3 (owner directive) | Supervisor admission today bypasses the referee (`portfolio.rs:256`). Target: the portfolio is fed to the referee as units, one per plan: `claims` = footprint as `path` claims, `dependsOn` = `blockedBy`, and the verdict decides admission. The referee floor then gives for free: `cycle` in `blockedBy`, `dangling-edge` for a `blockedBy` naming no plan, `footprint-empty` refused by name instead of skipped, collisions between plans. |
 | 12 | Referee `layer` across plans | Settled — D8: not used | `layer` is the referee's name for a declared wave: `fgos resource-check --plan` turns each phase into a unit whose `layer` is its `wave` column (`apps/fgos/src/wiring/resource_check.rs:458-479`), and the referee checks that a phase's wave is later than its dependencies and that colliding phases are not in one wave. Across plans no one declares a wave: order is `blockedBy`, and the `graph` package derives the layers. No `layer` field goes into plan frontmatter. |
 | 14 | Planners told to use the referee, within and across plans | Settled in direction (D3, owner 10:06); wording open | Target: plan-contract.md tells every planner to (a) run `fgos resource-check --plan` on its own phases (exists), and (b) check its plan against the other active plans through the referee before setting `ready` (missing: one door per D4 — a shared portfolio-to-units function behind a new `fgos resource-check` mode, the same function the supervisor's admission calls); `scripts/plan-contract-check.mjs` (pre-land) calls the referee instead of write-scope + hand wave rules. Edits to plan-contract.md, the check and skills are planner/implementation work; this discussion only fixes the requirement. |
@@ -68,7 +81,10 @@ The owner gave a release sequence of plans (backlog p-755psfxpmh): two plans in 
 | D8 | No `layer` across plans: order between plans is `blockedBy`, and the referee's `graph` derives layers; `layer` stays the per-plan wave. | 2026-11-26 | Owner asked what layer is for (11:16); scout of `resource_check.rs:458-479`; row 12 |
 | D9 | The two-lead cap stays `supervisor.maxLeads` (D2); the referee's `max-layer-width` is not used for it. | 2026-11-26 | Follows from D8; row 13 |
 | D10 | The backlog-to-ready pipeline (clarify, goal triage, discover, optional exploring, planning, just-in-time) is a separate topic, extracted from Work as a domain-agnostic workflow; this discussion keeps only the interface (row 15). | 2026-11-26 | Owner 11:16; RUL11 (work outside this discussion's frame becomes its own item) |
-| D2 | The "two full test suites at most" cap is held by `supervisor.maxLeads: 2` in the project config, not by a new suite counter. | 2026-11-26 | Proposed round 1; owner answer to q-wwsaazcrbz ("Set maxLeads to 2 in project config") |
+| D11 | The order between plans is held in plan frontmatter: `blockedBy`, with `priority` as tie-break; intent is the `delivery` flag. No separate sequence file. | 2026-11-26 | Leaning since round 1 (row 1), unchanged through D3-D10; owner agreed 12:12 |
+| D12 | The supervisor drives the chain on each wake through admission (D6); no new runner. | 2026-11-26 | Leaning since round 1 (row 6); owner agreed 12:12 |
+| D13 | Supersedes D2. Concurrency is not a fixed number: what runs at once (heads and workers together) follows the machine's measured capacity. Admission and seat start ask one capacity gate; designing it is backlog p-tyowvhthul. Until then no cap config is changed. | 2026-11-26 | Owner 12:18 ("số luồng chạy … phải được tính trên năng lực thực tế của máy, ép số kiểu này thì lúc rảnh không ai làm, lúc tự nhiên bật quá trời"); scout row 4 |
+| D2 | **Superseded by D13.** The "two full test suites at most" cap is held by `supervisor.maxLeads: 2` in the project config, not by a new suite counter. | 2026-11-26 | Proposed round 1; owner answer to q-wwsaazcrbz ("Set maxLeads to 2 in project config") |
 
 ## 5. Q&A log
 
@@ -83,25 +99,54 @@ The owner gave a release sequence of plans (backlog p-755psfxpmh): two plans in 
 - 2026-11-26 11:02 — Owner: what does the world do with a ready but unqueued item? Shaper: Kanban commitment point, Scrum sprint planning, GitHub merge queue / auto-merge, SAFe release train, Kubernetes `suspend`/Kueue, Airflow paused-at-creation — ready never starts work without an explicit commitment, and the commitment is a flag beside the state.
 - 2026-11-26 11:05 — Owner: "chọn A, dùng cờ delivery" → D5, D6. Q3 answered in chat; cancelled in the store with that reason.
 - 2026-11-26 11:16 — Owner: row 7 both secretary and supervisor (→ D7); asked what `layer` is for (→ D8, D9 after explanation); row 3 needs deeper thought: backlog rows have no discussion yet; extract the clarify/triage/discover/plan logic from Work into an independent domain-agnostic workflow, goal-driven triage, discover before planning, exploring only when discover is incomplete, run just in time so plans do not go stale. Shaper: that is its own topic (D10); raised a coordination hand-off for the secretary to open it; row 15 holds the interface.
+- 2026-11-26 12:2x — Owner: "chốt settled, khoan giao cho planner". Hand-off block written; marker kept `paused` because a landed `settled` starts a planner immediately and nothing can hold it.
+- 2026-11-26 12:18 — Owner rejected fixed caps (A, B and C alike): run count must follow real machine capacity, heads and workers together → D13 supersedes D2; the gate is backlog p-tyowvhthul; task-run-cap now depends on it.
+- 2026-11-26 12:12 — Owner agreed to close rows 1, 6, 10, regenerate §6, fill §7 and settle, but asked whether `maxLeads` is a suggestion or hard, and whether the cap belongs on lanes rather than leads. Scout found D2's premise weak (row 4); row 4 reopened, D2 under review. Rows 1, 6 → D11, D12; row 10 closed (no new component).
 
 ## 6. Thiết kế đã chốt {#design}
 
-Not settled yet. Working sketch (round 1):
+**What it is.** No new engine. The owner's release order is state in the plans themselves, and the supervisor's existing admission drives it.
+
+- **Two axes on a plan (D5).** `status` is quality and lifecycle: `draft → ready` means only that the plan is complete and passes the plan contract check; setting it starts nothing. A separate `delivery` flag in plan frontmatter records that the owner wants the plan delivered; it may be set on a `draft`.
+- **Order (D11).** `blockedBy` between plans, `priority` as tie-break. No sequence file, no cross-plan `layer` (D8); the referee's `graph` derives the layers.
+- **Who writes the order (D7).** The secretary or the supervisor, on an owner order: set `delivery`, write `blockedBy`, land with `land --paths`.
+- **Admission (D6, D12).** On each wake the supervisor admits a plan when: it carries `delivery`, it is `ready`, the referee verdict over the portfolio accepts it (blockers `done` on main per D1, no footprint collision with running plans, no cycle, no dangling wait, no empty footprint), and the capacity gate reports headroom (D13; designed under p-tyowvhthul). A flagged `draft` gets a planner/validator started early so it is `ready` when its turn comes. A `ready` plan without the flag never starts.
+- **One door for conflicts (D3, D4).** One shared function in `supervision` maps the portfolio to referee units (`claims` = footprint as `path` claims, `dependsOn` = `blockedBy`) and returns the `resource-referee` verdict. Supervisor admission calls it in-process; planners reach it through a new `fgos resource-check` mode before setting `ready`; `scripts/plan-contract-check.mjs` calls the referee too. No overlap or order rule lives outside the referee; a gap is closed by extending the referee. pkm is not involved.
+- **Planner rule (D3, row 14).** `plan-contract.md` tells every planner to run the referee on its own phases (exists) and on its plan against the portfolio (new).
+- **Out of scope (D10).** Producing `ready` plans from backlog rows just in time (clarify, goal triage, discover, planning) is a separate topic; this design consumes its output (row 15).
 
 ```mermaid
 flowchart LR
-  O[Owner order] --> S[Secretary writes blockedBy edges into plan frontmatter]
-  S --> T[(Trunk: plan.md status / priority / blockedBy)]
-  T --> F{delivery flag set?}
-  F -- no --> W[Waits; never admitted]
-  F -- yes --> V{Plan draft?}
-  V -- yes --> P[Supervisor starts planner/validator early to make it ready]
-  V -- ready --> R[resource-referee verdict over the portfolio: claims = footprints, dependsOn = blockedBy, layer = release step]
-  R -- accept --> A[Supervisor admits, starts lead]
-  R -- reject --> X[Finding named: cycle / dangling-edge / collision / footprint-empty]
-  A --> D[Plan done] --> T
+  O[Owner order] --> W[Secretary or supervisor: set delivery flag, write blockedBy]
+  W --> T[(Trunk: plan.md status / delivery / blockedBy / priority / footprint)]
+  T --> F{delivery set?}
+  F -- no --> X[Never admitted]
+  F -- yes --> V{status}
+  V -- draft --> P[Supervisor starts planner/validator early]
+  P --> T
+  V -- ready --> R[Shared function: portfolio to units, resource-referee verdict]
+  R -- reject --> N[Named finding: cycle, dangling wait, collision, empty footprint]
+  R -- accept --> C{Capacity gate: headroom? D13}
+  C -- yes --> A[Start lead] --> D[Plan done on main] --> T
+  PL[Planner before ready] --> R
 ```
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Not filled until the shape in §3 rows 1, 2 and 4 holds.
+### Delivery flag in the plan contract {#task-delivery-flag}
+Goal: plan frontmatter gains an optional `delivery` flag beside `status`, settable on `draft`; `ready` documented as quality only. Owner: plan contract + check. D5, D6, D11. Siblings: needed by admission and seed tasks. Verify: `node scripts/plan-contract-check.mjs --all` passes; a plan with a malformed flag fails by name.
+
+### Portfolio verdict through the referee, one door {#task-portfolio-referee}
+Goal: one function in `supervision` maps the portfolio to referee units and returns the verdict; a new `fgos resource-check` mode exposes it to planners. D3, D4, D8. Siblings: admission and plan-check tasks call it. Verify: `cargo test -p fgos-supervision` and `cargo test -p fgos` cases for cycle, dangling `blockedBy`, cross-plan collision, empty footprint.
+
+### Admission uses the verdict and the delivery flag {#task-admission}
+Goal: replace the hand-written rule in `admissible()` (`packages/supervision/rust/src/portfolio.rs:256`) with: flagged AND `ready` AND referee accept AND run cap; start a planner/validator for a flagged `draft`; update supervision spec flow "Wake to admission" and the supervisor skill. D6, D12. Depends on the two tasks above and on row 4. Verify: `cargo test -p fgos-supervision` (wake/admission tests), `fgos supervisor plans` shows unflagged ready plans as not admissible.
+
+### Plan contract check and planner rule use the referee {#task-plan-check}
+Goal: `scripts/plan-contract-check.mjs` judges same-wave and cross-plan overlap through the referee instead of write-scope plus hand rules; `core/skills/_shared/plan-contract.md` tells planners to run the portfolio mode before `ready`. D3, row 14. Depends on task-portfolio-referee. Verify: `npm test` (plan-contract check suite), `npm run build:skills`.
+
+### Capacity gate at admission {#task-run-cap}
+Goal: admission asks one capacity gate (measured machine capacity, heads and workers counted) instead of a fixed `maxLeads`. D13. The gate itself is designed under backlog p-tyowvhthul; this task only wires admission to it. Depends on p-tyowvhthul and task-admission. Verify: the owning admission test admits while the gate reports headroom and holds when it does not.
+
+### Seed the current release order {#task-seed-order}
+Goal: set `delivery` and `blockedBy` on the plans of backlog p-755psfxpmh in the owner's order (D7). Depends on task-delivery-flag. Verify: plan-contract check passes; `fgos supervisor plans` lists them in the order.

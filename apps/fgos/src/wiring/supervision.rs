@@ -949,6 +949,26 @@ impl supervisor::Askers for StoreAskers {
     }
 }
 
+/// Open owner questions, read from the owner-question store; an unreadable store has none.
+struct StoreOpenQuestions {
+    root: PathBuf,
+}
+
+impl supervisor::OpenQuestions for StoreOpenQuestions {
+    fn has_open(&self, reference: &str) -> bool {
+        use fgos_questions::store::{fold, LogOpener, State};
+        let Ok(Some(log)) = super::questions::HostLogOpener::reader().open(&self.root) else {
+            return false;
+        };
+        let Ok(events) = log.read() else {
+            return false;
+        };
+        fold(&events)
+            .questions()
+            .any(|q| q.state == State::Open && q.asked.origin.value == reference)
+    }
+}
+
 fn open_queue(root: &Path) -> Result<Queue, CategorisedRefusal> {
     let clone = super::event_store_clone::open(root)
         .map_err(|f| refused(f.reason, f.detail))?
@@ -2078,6 +2098,9 @@ pub fn answer(
                     )
                 },
                 max_leads,
+                &StoreOpenQuestions {
+                    root: root.to_path_buf(),
+                },
             );
             let unreadable_count = unreadable.len();
             let unreadable = shown_unreadable(unreadable);

@@ -524,9 +524,8 @@ fn plans_lists_the_trunk_portfolio_with_what_the_supervisor_may_start() {
     assert_eq!(view["maxLeads"], 4);
 }
 
-#[test]
-fn a_running_plan_whose_named_lead_role_is_held_by_a_live_non_head_session_reports_lead_live() {
-    let scene = Scene::new("plans-lead", WATCHER_CONFIG);
+/// Takes the demo plan (`running`, lead `lead:S6A`) and registers a live session holding that role.
+fn take_plan_with_live_lead(scene: &Scene) {
     let project = scene.project();
     let plan = project.join(format!("plans/{PLAN}/plan.md"));
     let text = fs::read_to_string(&plan).unwrap();
@@ -560,9 +559,56 @@ fn a_running_plan_whose_named_lead_role_is_held_by_a_live_non_head_session_repor
     );
     fgos_identity::directory::register(&state, entry, false, &fgos_process::facts::judge_here)
         .unwrap();
+}
+
+#[test]
+fn a_running_plan_whose_named_lead_role_is_held_by_a_live_non_head_session_reports_lead_live() {
+    let scene = Scene::new("plans-lead", WATCHER_CONFIG);
+    take_plan_with_live_lead(&scene);
     let view = scene.data(&["supervisor", "plans", "--json"]);
     assert_eq!(view["plans"][0]["leadLive"], true, "{view}");
     assert_eq!(view["leadsLive"], 1, "{view}");
+    assert_eq!(view["leadsWaiting"], 0, "{view}");
+}
+
+const PHASE_QUESTION: &str = r#"{"stage":"planning","headline":"Which store do we use?","blocks":"phase 1","parts":{"what":"choose a store","cause":"two stores exist","options":[{"label":"A","does":"d","gain":"g","harm":"h","cost":"c","recommended":true},{"label":"B","does":"d","gain":"g","harm":"h","cost":"c"}],"recommendation":"A","scope":{"allows":"A for this plan","forbids":"changing other plans"}}}"#;
+
+#[test]
+fn a_live_lead_whose_only_open_phase_has_an_open_question_in_the_store_is_counted_waiting() {
+    let scene = Scene::new("plans-waiting", WATCHER_CONFIG);
+    take_plan_with_live_lead(&scene);
+    fs::write(
+        scene
+            .project()
+            .join(format!("plans/{PLAN}/phase-01-one.md")),
+        "# one\n",
+    )
+    .unwrap();
+    let mut ask = scene.command(&[
+        "questions",
+        "ask",
+        "--ref",
+        &format!("plan:{PLAN}#phase-01"),
+        "--input",
+        "-",
+    ]);
+    let mut child = ask
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(PHASE_QUESTION.as_bytes())
+        .unwrap();
+    let out = child.wait_with_output().unwrap();
+    assert!(out.status.success(), "ask: {}", text(&out));
+    let view = scene.data(&["supervisor", "plans", "--json"]);
+    assert_eq!(view["leadsWaiting"], 1, "{view}");
+    assert_eq!(view["leadsLive"], 0, "{view}");
 }
 
 #[test]

@@ -35,6 +35,23 @@
       "version": "18.12.6"
     }
   ],
+  "typedNudges": {
+    "claude": {
+      "channel": "typed",
+      "versions": ["2.1.302"],
+      "source": "packages/agent-protocol/contracts/fixtures/terminal/claude/: composer vectors; typed only through session-host's idle, empty and dialog-free gate"
+    },
+    "codex": {
+      "channel": "typed",
+      "versions": ["0.163.0"],
+      "source": "packages/agent-protocol/contracts/fixtures/terminal/codex/: composer vectors; raw text and Enter, never the prompt door"
+    },
+    "agy": {
+      "channel": "typed",
+      "versions": ["1.4.2"],
+      "source": "packages/agent-protocol/contracts/fixtures/terminal/agy/: composer vectors; this channel does not enable the deferred agy hooks"
+    }
+  },
   "hookFacts": {
     "claude": {
       "measuredOn": {

@@ -40,7 +40,9 @@ A wake is one turn: never end it before your done step (`fgos supervisor done`).
 ## Admit ready plans
 
 `fgos supervisor plans --json` returns `plans` (each with `dir`, `status`, `priority`, `admissible`, `headName` and, for
-a running plan, `leadLive` or `leadUnnamed`) plus `leadsLive` and `maxLeads`. Rows come in start order. Take the rows with
+a running plan, `leadLive` or `leadUnnamed`) plus `leadsLive`, `leadsWaiting` and `maxLeads`. `leadsLive` already
+leaves out a live lead whose plan waits on open owner questions (those count in `leadsWaiting` and hold no slot), so
+the test below is unchanged. Rows come in start order. Take the rows with
 `admissible: true` in listing order while `leadsLive` < `maxLeads` (admissible already excludes a footprint overlap
 with a running plan) and `fgos slots --json` shows `lanes.free` above zero (null means no ceiling is armed: no limit,
 not zero). For each:
@@ -61,6 +63,10 @@ plan directory, then restart the lead (`fgos session start lead --name <headName
 table and `fgos request result`), park the plan with a reason in its phase table, or ask the owner. Only the supervisor
 stops a lead (`fgos session stop lead --name <headName> --reason "<why>"`); a lead never does.
 
+Event `lead-ended` (the host read the lead's attempt as retired or ended): read the plan's phase table and the lead's
+result (`fgos request result` of any ticket the plan names), record what you found in the plan, then mark the event
+handled. Do not free the lane by hand: the wake close step does.
+
 On every wake, read `fgos supervisor plans --json` and the phase tables of all running plans, not only plans named by
 an event. An empty queue and `leadLive: true` prove neither progress nor a real wait. For a live lead with unfinished
 phases and no recorded progress, use `fgos session read head:lead-<headName>` and `fgos request result <ticket id>` for
@@ -79,7 +85,8 @@ progress. If it is idle again at the next wake without a verified ongoing wait, 
 stop-then-start rule below, even without a fresh watcher row.
 
 A live lead that makes no progress is replaced, never left alone. For `plan-no-progress` naming a plan with
-`leadLive: true`, the lead is alive but idle (a live idle lead raises no `lead-ended`, and `fgos session start` only
+`leadLive: true`, the lead is alive but idle (a live idle lead raises no `lead-ended`; a lead whose attempt has closed
+does, and `fgos session start` only
 fronts the live holder, so a bare start changes nothing): run `fgos session stop lead --name <headName> --reason "idle
 with unfinished phases"`, then `fgos session start lead --name <headName>`. The new lead resumes from the phase table.
 A plan whose phases are all `done` is closed instead (Done plans). `already-live`, from a wake or a start, is never the
@@ -88,7 +95,7 @@ whole answer to `plan-no-progress`.
 ## Done plans
 
 Close a `done` plan with one board line (plan program board rules in AGENTS.md) and a backlog update, landed with
-`fgos land --paths` (write `plans/backlog.md` with `fgos session write plans/backlog.md < new`; it is a read-only file grant). `fgos session stop lead --name <headName> --reason "plan done"` if its lead is still live.
+`fgos land --paths` (write `plans/backlog.md` with `fgos session write plans/backlog.md < new`; it is a read-only file grant). The wake close step already stops an idle lead of a `done` plan, under either role shape (`head:lead-*` or `lead:<LANE>`); it leaves a busy or unknown lead and a lane session that still leads another plan. Stop by hand only what it left: a lead that was busy at the wake (`fgos session stop lead --name <headName> --reason "plan done"`). A lead started by hand has no run supervisor, so `session stop --role lead:<LANE>` answers `no-supervisor` (the wake records `stop-failed`); close that one by hand.
 
 ## Release
 
@@ -110,7 +117,7 @@ the recipe is project data (`release.*` config), and the window runs it. Read th
 
 Event `discussion-settled`: start the one planner with `fgos session start planner --name <headName of the discussion>`,
 unless a plan's `source` already names the discussion or that planner is live (a second starter writes a second
-plan). Stop the planner with `fgos session stop planner --name <name> --reason "plan ready"` once its plan is `ready`.
+plan). The wake close step stops that planner, when idle, once its plan has landed as `draft` or `ready`; stop it by hand only if the step left it (it was busy at the wake).
 
 ## Answered owner question
 

@@ -18,6 +18,8 @@
 //! write-then-finish function, and finishes only after a successful flush;
 //! the presenter then prints nothing more for it (with `--json`, only the
 //! envelope, without the text).
+mod typed_wake;
+
 use super::mailbox_body;
 use super::mailbox_config::project_mailbox;
 use super::mailbox_identity::{
@@ -642,12 +644,15 @@ pub(crate) fn version_sources(max_read_bytes: u64) -> VersionSources {
 }
 
 /// The host's nudge, run with the program the version gate read.
-pub(crate) fn system_nudge(versions: &VersionSources) -> SystemNudge {
-    SystemNudge {
-        codex_program: versions.codex_program.clone(),
-        timeout: std::time::Duration::from_secs(5),
-        claude_sessions: versions.claude_sessions.clone(),
-        max_read_bytes: versions.max_read_bytes,
+pub(crate) fn system_nudge(versions: &VersionSources) -> typed_wake::HostNudge {
+    typed_wake::HostNudge {
+        push: SystemNudge {
+            codex_program: versions.codex_program.clone(),
+            timeout: std::time::Duration::from_secs(5),
+            claude_sessions: versions.claude_sessions.clone(),
+            max_read_bytes: versions.max_read_bytes,
+        },
+        versions: versions.clone(),
     }
 }
 
@@ -667,8 +672,21 @@ fn remote_answer(
     json: bool,
     warning: Option<String>,
 ) -> MailboxAnswer {
+    let text = if recorded {
+        format!(
+            "{text}\n{}",
+            fgos_mailbox_core::NudgeReport::path_sentence("remote-recorded")
+        )
+    } else {
+        text
+    };
+    let mut data =
+        json!({ "ok": recorded, "recorded": recorded, "crossMachine": true, "text": text });
+    if recorded {
+        data["path"] = json!("remote-recorded");
+    }
     MailboxAnswer {
-        data: json!({ "ok": recorded, "recorded": recorded, "crossMachine": true, "text": text }),
+        data,
         text,
         json,
         exit: if recorded {
@@ -794,6 +812,11 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
             let nudge = system_nudge(&versions);
             let mut sent =
                 verbs::send(&record, req, wait, now(), &loaded.limits, &versions, &nudge);
+            if let Some(path) = sent.path {
+                sent.text.push('\n');
+                sent.text
+                    .push_str(&fgos_mailbox_core::NudgeReport::path_sentence(path));
+            }
             if let (true, Some((role, handle))) = (sent.recorded, role_holder) {
                 sent.text = format!(
                     "{}\n{}",
@@ -803,6 +826,9 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
             }
             let mut data =
                 json!({ "ok": sent.recorded, "recorded": sent.recorded, "text": sent.text });
+            if let Some(path) = sent.path {
+                data["path"] = json!(path);
+            }
             if let Some(candidates) = candidates {
                 data["candidates"] = candidates;
             }

@@ -27,7 +27,8 @@ pub trait Nudge {
 /// The host's nudge: Codex through `codex queue`, run without a shell, and
 /// Claude Code through its own session socket. The Codex program is the one
 /// the version gate read (`VersionSources::codex_program`), so the version
-/// checked is the binary run.
+/// checked is the binary run. Typed signals are handled by the host's Nudge
+/// adapter; this terminal-free transport refuses them with `no-pane`.
 #[derive(Debug, Clone)]
 pub struct SystemNudge {
     pub codex_program: PathBuf,
@@ -46,6 +47,7 @@ impl Nudge for SystemNudge {
         match channel {
             NudgeChannel::CodexQueue => self.codex_queue(key, head),
             NudgeChannel::ClaudeSocket => self.claude_socket(head),
+            NudgeChannel::Typed => Err("no-pane".into()),
         }
     }
 }
