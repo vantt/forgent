@@ -19,7 +19,7 @@ Opened by the supervisor on the owner order relayed by the secretary (Miu), 2026
 
 ## 1. Trạng thái hiện tại
 
-Vòng 4, 2026-11-26 10:50 +07. Phép thử con đường (bước 0 ở §6) là phần chính của luật; chủ tán thành 10:46. Phần dưới là trạng thái vòng 2.
+Vòng 5, 2026-11-26 11:05 +07. Chủ đưa ra mô hình bốn thành phần: mục tiêu, hướng đi, hành động, hệ quả. Chỉ hỏi khi hành động sinh hệ quả (lệch mục tiêu) mà không có hướng đi nào tránh được. Chọn giữa các hướng đi thì agent tự làm. §6 đã viết lại quanh mô hình này; phép thử con đường là cách tìm hướng đi. Còn hai điểm cần chủ xác nhận: tầng mục tiêu nào được tính, và câu hỏi về mục tiêu. Phần dưới là trạng thái vòng 2.
 
 Chủ đã nêu nguyên tắc (§5, 10:15). Chủ chỉ trả lời câu hỏi **hướng đi**: thay đổi rất lớn về chức năng, về cách tổ chức, hoặc lập một bộ luật mới. Câu hỏi về **tác vụ actionable** phải được biến thành việc tìm cách làm an toàn và đảo ngược được; có cách thì làm rồi báo, chỉ hỏi khi không còn đường nào khác. Phạm vi là mọi câu hỏi, không chỉ các câu trong seed.
 
@@ -73,54 +73,60 @@ Heads stall for hours, overnight included, on questions they could have decided.
 
 - 2026-11-26 10:46 +07, owner (chat): Praised the path test ("phép thử về con đường"); had it been applied before this exchange, the exchange would not have been needed.
 - 2026-11-26 10:50 +07, shaper, round 4: Self-check: the shaper did not apply the path test either. q-otq7dwgory (round 1) could have been derived from the goal "agents ask only when truly needed" plus priority 2, without asking. The path test is now step 0 of §6.
+- 2026-11-26 10:53 +07, owner (chat, round 5): Bối cảnh có bốn thành phần: mục tiêu đang có (kết quả), hướng đi (các cách khác nhau để đạt mục tiêu), hành động sắp diễn ra (chủ thể của câu hỏi), hệ quả. Chỉ gọi là hệ quả (hậu quả) khi kết quả của hành động dẫn tới khác mục tiêu đang có. Hành động có thể là một trong các hướng đi. Tín hiệu quan trọng của một câu hỏi là hành động sinh ra hệ quả (lệch mục tiêu). Hướng đi là cách thông minh để tới mục tiêu với chất lượng đã thống nhất mà chi phí rẻ hơn, trong bối cảnh này chính là thời gian nhanh hơn.
+- 2026-11-26 11:05 +07, shaper, round 5: Regenerated §6 around the four-part model. What follows from the model: choosing between directions is never an owner question; a risk is not a consequence but work to make safe; uncertainty about deviation is resolved by cheap measurement, not by asking; a phase acceptance is the planner's chosen direction, not the owner's goal. The model itself answers the governor-correctness question from round 3: a red core falls below the agreed quality (a deviation), while named debt around it is a direction. Two refinements proposed in chat: which goal level counts, and what happens when the goal itself is unclear.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Bản nháp vòng 2, chưa chốt. Một luật dùng chung thay cho đoạn § Approved frame trong `core/skills/_shared/decision-question.md`; mọi skill có chỗ bảo agent hỏi thì trỏ về luật này, không viết lại.
+Bản nháp vòng 5, chưa chốt. Một luật dùng chung thay cho đoạn § Approved frame trong `core/skills/_shared/decision-question.md`. Mọi skill có chỗ bảo agent hỏi thì trỏ về luật này, không viết lại.
 
-**Nguyên tắc.** Chủ chỉ trả lời câu hỏi đặt hướng đi. Một câu về tác vụ không bao giờ được hỏi dạng "nguy hiểm, có làm không"; agent đổi nó thành câu "làm thế nào để an toàn và đảo ngược được", tự tìm cách, làm, rồi báo. Chỉ hỏi khi đã tìm mà không có cách nào, và khi hỏi thì hỏi về cách, không hỏi về có làm hay không.
+### Mô hình bốn thành phần (chủ, vòng 5)
 
-**Bước 0, bắt buộc trước mọi đề xuất hay câu hỏi: phép thử con đường** (vòng 4, chủ tán thành 10:46). Sạch là đích cuối; cách tới đích tốt nhất quan trọng hơn.
-1. Việc này phục vụ đích cuối nào?
-2. Thứ tự nào tới đích đó tốt nhất? Mảnh nào quản lý hoặc mở khoá các mảnh khác thì lên trước. Nợ đã biết thì ghi vào chính thứ sẽ theo dõi nó, không chặn đường. Đối chiếu với thứ tự ưu tiên sản phẩm (Ship Faster > Release con người > DoD > Polish sau DoD).
-3. Chỉ khi không suy ra được con đường từ đích, thứ tự ưu tiên và vai trò của mảnh đó thì mới hỏi chủ. Khi hỏi thì nói "con đường tốt nhất em thấy là X, vì …".
+| Thành phần | Nghĩa |
+|---|---|
+| **Mục tiêu** | Kết quả đã thống nhất, cùng chất lượng đã thống nhất (gồm cả các ràng buộc chủ đã đặt: luật, ranh giới tin cậy). |
+| **Hướng đi** | Các cách hành động khác nhau để đạt *cùng* mục tiêu đó. Hướng đi thông minh là hướng đạt mục tiêu với chất lượng đã thống nhất mà chi phí rẻ hơn; trong bối cảnh này chi phí chủ yếu là thời gian. |
+| **Hành động** | Chủ thể của câu hỏi: việc sắp làm. Nó là một trong các hướng đi. |
+| **Hệ quả** | Chỉ gọi là hệ quả khi kết quả của hành động **lệch khỏi mục tiêu**: kết quả khác, hoặc chất lượng thấp hơn mức đã thống nhất. |
 
-Ví dụ: ba lần chủ chọn khác đề xuất trên component-authority (q-lnjt5zzbfq, q-aanvfxaopa, q-trgzaa34ua) đều tự giải được bằng bước 0. Bộ quản lên trước để quản mọi thứ mới; nợ cũ ghi vào sổ của chính nó.
+**Luật.** Tín hiệu duy nhất để hỏi chủ là: hành động sẽ sinh ra hệ quả (lệch mục tiêu), **và** không có hướng đi nào khác đạt mục tiêu mà tránh được độ lệch đó. Chọn giữa các hướng đi không phải câu hỏi: agent tự chọn hướng nhanh nhất mà vẫn giữ chất lượng đã thống nhất, làm, rồi báo.
 
-### Mẫu HỎI chủ (hướng đi)
+**Phép thử con đường** (vòng 4) là cách agent tìm ra các hướng đi trước khi kết luận là có hệ quả:
+1. Hành động này phục vụ mục tiêu nào?
+2. Thứ tự nào tới mục tiêu đó nhanh nhất? Mảnh nào quản lý hoặc mở khoá các mảnh khác thì lên trước. Nợ đã biết thì ghi vào chính thứ sẽ theo dõi nó, không chặn đường. Đối chiếu thứ tự ưu tiên sản phẩm: Ship Faster > Release con người > DoD > Polish sau DoD.
+3. Rủi ro của một hướng đi không phải là hệ quả. Rủi ro là việc cần làm cho an toàn và đảo ngược được (sao lưu, dry-run, làm phần an toàn trước, giữ dữ liệu). Chưa chắc kết quả có lệch không thì đi đo hoặc thử với chi phí thấp, không hỏi.
+4. Chỉ khi mọi hướng đều lệch mục tiêu mới hỏi. Khi hỏi thì nêu độ lệch ("hướng tốt nhất em thấy là X; nó lệch mục tiêu ở chỗ Y, vì …"), không hỏi "có làm không".
 
-| # | Loại | Dấu hiệu nhận ra | Ví dụ trong kho |
-|---|---|---|---|
-| H1 | Đổi tổ chức hoặc chủ sở hữu | thêm, gộp hoặc xoá một component; đổi ai sở hữu việc gì; đổi kênh chính giữa các head | q-7wd766tu4p, q-ng4ojyph5r, q-ee2f2g3aoj |
-| H2 | Luật hoặc chính sách mới | một quy tắc sẽ áp cho mọi agent, mọi plan hay mọi lần gọi; đổi một luật khoá hoặc một quyết định chủ đã chốt | q-djyjckiygr, q-nfgvjge6zg, q-otq7dwgory |
-| H3 | Đổi chức năng lớn | hành vi người dùng thấy đổi hẳn, hoặc mở hay đóng một hướng sản phẩm | q-6yhs63ru4i, q-kml4ipaweg |
-| H4 | Hạ tiêu chí nghiệm thu mà bước 0 không giải được | đóng việc mà bỏ hoặc nới một acceptance, khi đích và thứ tự ưu tiên không chỉ ra con đường | Ba câu component-authority (q-trgzaa34ua, q-lnjt5zzbfq, q-aanvfxaopa) lẽ ra bước 0 đã giải được, nên không còn là ví dụ của H4. Còn mở: có được hạ chuẩn tính đúng của chính bộ quản không (§5 vòng 3). |
-| H5 | Nới ranh giới tin cậy thường trực | grant toàn cục, sandbox đọc hoặc ghi rộng hơn mà vẫn giữ lại về sau, credential | q-nt7ptsq2nd (chủ chọn khác đề xuất), q-okdzvolti3 |
-| H6 | Hoà thật, phụ thuộc ý chủ | các phương án ngang nhau sau phân tích, và chọn cái nào là chuyện ý muốn chứ không phải kỹ thuật | q-t6xfzdl3eu |
+**Câu hỏi về mục tiêu** là một loại khác: khi mục tiêu hoặc chất lượng đã thống nhất chưa rõ, hoặc khi việc đang làm đề xuất đặt mục tiêu mới. Khi đó hỏi để làm rõ hoặc đặt mục tiêu, thường trong một discussion, không phải một câu A/B.
 
-### Mẫu KHÔNG HỎI (actionable: tìm cách, làm, báo)
+### Áp vào bằng chứng
 
-| # | Loại | Cách an toàn mặc định | Ví dụ, số lượng |
-|---|---|---|---|
-| K1 | Mở footprint để đạt acceptance của chính plan | thêm đúng những đường dẫn cần; trùng plan khác thì báo supervisor điều phối; ghi vào commit | 40 câu, 30/30 chọn đề xuất (q-myvzcbz3sx, q-vqyxe5oi6j, q-qzchcwl7ya) |
-| K2 | Dọn dẹp | chỉ xoá thứ đã có trên main hoặc tái tạo được (branch đã merge, worktree đã land, build output, run trùng); thứ có thể mất việc thì giữ lại và ghi thành item | 18 câu (q-pkvxdfpg3n, q-ubi34e6xd3) |
-| K3 | Phục hồi hoặc vận hành theo cửa có sẵn | chạy đúng cửa mà lỗi chỉ tên (`fgos git recover`, …); ghi lại ref và trạng thái trước để quay lui | 20 câu (q-bvvdct5edg) |
-| K4 | Xin xác nhận lại điều đã chốt | dẫn D-ID hoặc câu trả lời đã có rồi làm; nếu một cửa đòi q-id thì đó là lỗi của cửa, ghi thành item | 4 câu (q-5sog3pzmqn) |
-| K5 | Đánh đổi kỹ thuật có phương án rõ | chọn phương án phân tích đã chọn; ghi lý do; làm sao cho đảo được (nhánh, cờ cấu hình) | resource-or-cost, priority theo phụ thuộc kỹ thuật, product-behaviour nhỏ |
-| K6 | Rủi ro mà cần quyết, dạng "có làm không" | đổi thành "làm sao an toàn": sao lưu, dry-run, làm phần an toàn trước, giữ dữ liệu; disk đầy thì xoá thứ tái tạo được trước | q-pmhxzsfpr7 |
-
-### Lớp thứ ba: THIẾU TAY (không phải câu hỏi)
-
-Head bị nhốt không chạy được bước host (full suite, activate release, xoá worktree, patch config, git recover). Đây là nhờ chạy hộ, không phải quyết định. Theo nguyên tắc "tìm cách", việc này phải đi qua đường dành cho việc đặc quyền, không đi qua kho câu hỏi của chủ. Chi tiết đang mở ở §3 row 10.
+| Nhóm trong kho | Hướng đi hay hệ quả | Kết luận |
+|---|---|---|
+| Mở footprint (40) | Hướng đi: thêm vài file để đạt đúng acceptance của plan | Không hỏi |
+| Dọn dẹp (18), phục hồi git/ops (20), xin xác nhận điều đã chốt (4) | Hướng đi có rủi ro: làm cho an toàn rồi làm | Không hỏi |
+| Ba câu component-authority (q-lnjt5zzbfq, q-aanvfxaopa, q-trgzaa34ua) | Mục tiêu của chủ: bộ quản được release và đang chạy, quản mọi thứ mới, nhớ nợ cũ. "Ghi nợ có tên" là một hướng đi tới mục tiêu đó, không lệch. Acceptance của từng phase là hướng đi do planner chọn, không phải mục tiêu của chủ. | Không hỏi |
+| q-trgzaa34ua, phần full suite chưa chạy | Nếu 50 lỗi `cargo test` là đỏ thật trong chính bộ quản thì chất lượng thấp hơn mức đã thống nhất, tức là lệch | Tìm hướng để kiểm trước (chạy full suite ở nơi chạy được). Chỉ hỏi khi không có hướng nào. |
+| Đổi tổ chức (10), luật mới (5), đổi chức năng lớn (2) | Đặt hoặc đổi mục tiêu hay ràng buộc | Câu hỏi về mục tiêu, thường bàn trong discussion |
+| Nới ranh giới tin cậy thường trực (q-nt7ptsq2nd, q-okdzvolti3) | Ranh giới tin cậy là một phần chất lượng đã thống nhất; nới nó là lệch | Hỏi, trừ khi có hướng khác không cần nới |
+| Thiếu tay (~45) | Không phải câu hỏi: agent bị nhốt không chạy được bước host | Đi đường việc đặc quyền (§3 row 10) |
 
 ```mermaid
 flowchart TD
-  N[Agent gặp một lựa chọn] --> D{Đặt hướng đi?<br/>H1 tổ chức · H2 luật mới · H3 chức năng lớn<br/>H4 hạ acceptance · H5 nới tin cậy · H6 hoà theo ý chủ}
-  D -- có --> ASK[Hỏi chủ: năm phần, gom bộ,<br/>chỉ park phần bị chặn]
-  D -- không --> S{Có cách an toàn và<br/>đảo ngược được?}
-  S -- có --> DO[Làm theo cách đó, ghi lại, báo chủ]
-  S -- không, vì thiếu quyền chạy --> H[Đường việc đặc quyền<br/>không phải câu hỏi chủ]
-  S -- không, đã tìm hết --> ASK2[Hỏi chủ về CÁCH làm,<br/>không hỏi có làm hay không]
+  A[Hành động sắp làm] --> G{Mục tiêu và chất lượng<br/>đã thống nhất có rõ không?}
+  G -- không --> QG[Câu hỏi về mục tiêu:<br/>làm rõ hoặc đặt, trong discussion]
+  G -- có --> P[Phép thử con đường:<br/>liệt kê các hướng đi,<br/>chọn hướng nhanh nhất giữ chất lượng]
+  P --> C{Kết quả có lệch<br/>mục tiêu không?}
+  C -- chưa chắc --> M[Đo hoặc thử rẻ, rồi xét lại]
+  M --> C
+  C -- không --> R{Có rủi ro?}
+  R -- có --> SAFE[Làm cho an toàn và đảo ngược được]
+  R -- không --> DO
+  SAFE --> DO[Làm, ghi lại, báo chủ]
+  C -- có --> ALT{Có hướng khác<br/>không lệch?}
+  ALT -- có --> P
+  ALT -- không, vì thiếu quyền chạy --> H[Đường việc đặc quyền]
+  ALT -- không --> ASK[Hỏi chủ: nêu độ lệch,<br/>năm phần, gom bộ, chỉ park phần bị chặn]
 ```
 
 ## 7. Danh mục hạng mục / task {#tasks}
