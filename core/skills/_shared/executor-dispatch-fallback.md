@@ -289,8 +289,9 @@ scarcity signal needs the full denominator, not just the misses.
   has since been retired in full, tsk-6ar). This
   fragment stays in place as the ready-made pattern for the next real cross-provider
   consumer. Step A's `in-process`/`out-of-process` branching (`decide`,
-  tsk-3ik-1) is proven by `src/runner/dispatch.mjs`'s own unit tests, and
-  Step B's run by `fgos run`'s (`src/runner/execution/run.mjs`).
+  tsk-3ik-1) is proven by the decide door's own tests, and Step B's run by `fgos run`'s
+  (`packages/execution/engine/src/unit_run/`; the retired Node `src/runner/dispatch.mjs` and
+  `src/runner/execution/run.mjs` held them before).
 - `docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0026-native-first-dispatch-doctrine-launcherroottaskcapacity`
   — Native-First Dispatch Doctrine, Step A's own governing rules 1/2/4,
   applied internally by `decide` now (tsk-3ik-1) rather than by hand.

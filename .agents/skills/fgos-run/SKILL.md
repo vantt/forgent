@@ -76,7 +76,7 @@ When a workflow step declares a human gate (`gate: { kind: "human" }`) or when a
 
 ## 3. Execution Invariants
 
-- **G2 Non-Infrastructure:** Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json). Only an ad-hoc Unit may carry a soft `prefer`.
+- **G2 Non-Infrastructure:** Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json), its ad-hoc `prefer` exception included.
 - **Runner Commits, Worker Does Not:** A writing Unit's brief lists its write scope. Rule: run-door-contract (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - **G7 Herdr Default** and the **Fail-Closed Mutating Gate** (writes only in a linked worktree): Rule: run-door-contract, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 - **Honest Outcomes:** Reviewer findings are tracked as `findings`, not execution failures, and fix rounds are bounded by the collaboration pattern.

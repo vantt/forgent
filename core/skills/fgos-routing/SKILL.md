@@ -175,8 +175,7 @@ dynamically via `getDomain`/`skillForStep` from
 domain in the first place is a separate concern this skill does not
 touch.
 
-Once the domain resolves, load its doctrine `domains/<domain>/AGENTS.md` before handing off to driving or loading
-the resolved stage skill. Rule: domain-doctrine-read (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
+Domain doctrine: Rule: domain-doctrine-read (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 That path is relative to the running fgOS payload, never the project's working
 directory: a project's own `domains/` folder is not read for doctrine. The
 `legacy-node-payload-present` row of `fgos doctor` prints the payload entry

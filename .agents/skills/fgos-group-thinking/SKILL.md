@@ -166,7 +166,7 @@ or name the same catalog pattern, else the door refuses `selector-conflict`.
 
 ## Invariants and Safety
 
-- **Single Authority:** `src/workflow/runner.mjs` is the sequencer; `src/runner/execution/bind.mjs` is the binding authority; `src/runner/execution/run.mjs` is the unit execution door.
+- **Single Authority:** `src/workflow/runner.mjs` is the sequencer; `src/runner/execution/bind.mjs` is the binding authority; `packages/execution/engine/src/unit_run/` is the unit execution door (`fgos run`).
 - **Inputs & Visibility:** Step inputs and pane isolation enforce visibility boundaries (e.g. blind proposals in `delphi` round 1, silent generation in `nominal-group`).
 - **No Protocol IDs:** Patterns and routes identify workflows and patterns strictly by their canonical names (`delphi`, `nominal-group`, `group-cognition`, `rfc`, etc.).
 ## The gate, and why it holds
