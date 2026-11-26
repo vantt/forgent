@@ -25,6 +25,7 @@ footprint:
   - packages/distribution/rust/src/timer.rs
   - packages/distribution/contracts/doctor-registry.v1.json
   - apps/fgos/src/wiring/doctor/run_supervisor.rs
+  - apps/fgos/src/wiring/doctor/mod.rs
 source:
   - plans/discussions/ds-rig5dsai5l-head-run-own-failure-domain/DISCUSSION.md
   - p-6htu2ae64o
@@ -104,8 +105,10 @@ in head liveness.
 |---|---|---|---|---|---|
 | 1 | [Scope per run supervisor](phase-01-scope-per-run-supervisor.md) | - | packages/run-supervisor/rust/src/controller/launch.rs, packages/run-supervisor/rust/src/controller/scope.rs, packages/run-supervisor/rust/src/controller/mod.rs, packages/run-supervisor/rust/src/controller/config.rs, packages/run-supervisor/rust/src/supervise.rs, packages/run-supervisor/rust/tests/controller_launch.rs, packages/run-supervisor/contracts/supervisor-binding.v1.json, core/config-standard/runner.yaml, core/config-schema/runner.schema.yaml, docs/platform/run-supervisor/spec.md | 1 | done |
 | 2 | [Head state judges the supervisor](phase-02-head-state-judges-supervisor.md) | - | apps/fgos/src/wiring/observe_sources/head_state.rs, apps/fgos/src/wiring/observe_sources/tests/mod.rs, core/watcher/definitions/session-gone.query.json, docs/platform/observe/spec.md | 1 | done |
-| 3 | [Watcher unit and doctor row](phase-03-watcher-unit-and-doctor-row.md) | 1 | packages/distribution/rust/src/timer.rs, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/run_supervisor.rs | 2 | ready |
+| 3 | [Watcher unit and doctor row](phase-03-watcher-unit-and-doctor-row.md) | 1 | packages/distribution/rust/src/timer.rs, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/run_supervisor.rs, apps/fgos/src/wiring/doctor/mod.rs | 2 | ready |
 | 4 | [Integration and live check](phase-04-integration-and-live-check.md) | 1, 2, 3 | plans/261127-0016-head-run-own-failure-domain/reports/** | 3 | ready |
+
+lead:SUPERVISOR order 2026-11-27 02:4x (owner channel, typed to the lead): `apps/fgos/src/wiring/doctor/mod.rs` joins the footprint (phase 3) and phase 3 lands now. The supervisor wrote the footprint line because that order had not reached main. The two doctor docs files named in q-a5qeyr5g62 were not part of the order.
 
 Hot files: `core/config-standard/runner.yaml` and `core/config-schema/runner.schema.yaml` (phase 1 only);
 `packages/distribution/contracts/doctor-registry.v1.json` (phase 3 only). Generated surfaces: none touched.
