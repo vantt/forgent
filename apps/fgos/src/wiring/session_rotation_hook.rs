@@ -1350,9 +1350,9 @@ mod tests {
     }
 
     #[test]
-    fn a_session_opened_by_hand_is_composed_without_refusal_and_prints_nothing_when_no_rule_is_scoped_to_it() {
+    fn a_session_opened_by_hand_is_composed_without_refusal_and_prints_nothing_when_no_rule_is_scoped_to_it(
+    ) {
         let fgos_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../.fgos");
         assert_eq!(hand_opened_start(&fgos_dir), Ok(None));
     }
-
 }
