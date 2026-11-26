@@ -104,7 +104,8 @@ fn recover_as_owner(f: &Fixture, extra: &[&str]) -> Answer {
     let out = f.temp.join("owner.out");
     let rc = f.temp.join("owner.rc");
     let _ = fs::remove_file(&rc);
-    let script = r#"( sleep 1; "$@" > "$OUT" 2>&1; echo $? > "$RC" ) < /dev/null > /dev/null 2>&1 &"#;
+    let script =
+        r#"( sleep 1; "$@" > "$OUT" 2>&1; echo $? > "$RC" ) < /dev/null > /dev/null 2>&1 &"#;
     let mut shell = Command::new("sh");
     as_own_writer(&mut shell, f)
         .arg("-c")
@@ -179,7 +180,9 @@ fn a_caller_under_an_agent_cli_cannot_confirm_a_writer_dead() {
     let refused = recover_under_agent(&f, &[CONFIRM, DEAD_WRITER]);
     assert_ne!(refused.code, 0, "{}", refused.text);
     assert!(
-        refused.text.contains("only the owner confirms a dead writer"),
+        refused
+            .text
+            .contains("only the owner confirms a dead writer"),
         "{}",
         refused.text
     );
@@ -194,9 +197,5 @@ fn nobody_confirms_the_callers_own_writer_dead() {
 
     let refused = recover_as_owner(&f, &[CONFIRM, OWN_WRITER]);
     assert_ne!(refused.code, 0, "{}", refused.text);
-    assert!(
-        refused.text.contains("own writer"),
-        "{}",
-        refused.text
-    );
+    assert!(refused.text.contains("own writer"), "{}", refused.text);
 }

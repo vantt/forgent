@@ -4,9 +4,9 @@
 //! writer recovers. A checkout the Git door refuses is the caller's usage error, as for every verb that acts on the
 //! main checkout.
 use crate::routing::Call;
-use fgos_host_runtime::cli_args::{FlagScalar, FlagValue};
 use fgos_git::incidents::{read_git_status, recover_git_operations};
 use fgos_git::invocation_root::{resolve_invocation_root, RootPolicy, RootRequest};
+use fgos_host_runtime::cli_args::{FlagScalar, FlagValue};
 use fgos_host_runtime::{
     CategorisedRefusal, ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome,
     OperationId, OperationProvider, OperationRequest, ProviderDescriptor, ProviderError,
@@ -208,13 +208,17 @@ fn confirmed_dead_writers(
             return Err("--confirm-writer-dead requires a writer id".to_owned());
         }
         if id == own {
-            return Err(format!("{id} is this caller's own writer; never confirm a live writer dead"));
+            return Err(format!(
+                "{id} is this caller's own writer; never confirm a live writer dead"
+            ));
         }
         let held_alive = held.iter().any(|session| &session.id == id);
         let pid_alive = id.bytes().all(|b| b.is_ascii_digit())
             && !fgos_identity::directory::session_proven_dead(state_root, id, judge);
         if held_alive || pid_alive {
-            return Err(format!("{id} is not dead: Identity holds it alive; never confirm a live writer dead"));
+            return Err(format!(
+                "{id} is not dead: Identity holds it alive; never confirm a live writer dead"
+            ));
         }
     }
     Ok(request.confirm_dead.clone())
@@ -262,13 +266,11 @@ fn answer(request: &GitRequest) -> Result<Answer, ProviderError> {
                 }
             };
             let proof = writer_is_dead(&state_root);
-            let recovered = recover_git_operations(
-                &state_root,
-                &root,
-                &|_| own.clone(),
-                &|writer| proof(writer) || confirmed.iter().any(|id| id == writer),
-            )
-            .map_err(|error| ProviderError::ProviderFailed(error.cause().to_owned()))?;
+            let recovered =
+                recover_git_operations(&state_root, &root, &|_| own.clone(), &|writer| {
+                    proof(writer) || confirmed.iter().any(|id| id == writer)
+                })
+                .map_err(|error| ProviderError::ProviderFailed(error.cause().to_owned()))?;
             serde_json::to_value(recovered)
         }
     };
