@@ -24,7 +24,6 @@ approves the work. A child item shares its parent's frame.
 - The frame may be narrowed afterwards, never widened; a wider frame is a new proposal and a question.
 - Inside the frame decide and report; about to leave it, stop and ask in this template: Rule: decision-question-template, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 - Mess inside the frame: Rule: rul11-tum-lum (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
-  Consolidating by building a new tool or engine is a decision question.
 - Done means done inside the frame. A gate that cannot be met inside it is
   a decision question; never edit outside the frame to unblock it.
 - Progress is behavior passing its declared check, not a pile of evidence.

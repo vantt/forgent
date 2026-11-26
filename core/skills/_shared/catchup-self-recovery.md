@@ -44,7 +44,7 @@ One per block reason. Read `<id>`'s merge target from the envelope's `target` fi
 ### Playbook: verify-fail-post-merge
 
 - **Signal**: `{picked: <id>, approve: {blocked, reason: "verify-fail-post-merge"}}` — the post-merge verify genuinely ran and failed (`timedOut` is absent or `false`); the merge was rolled back and the target is unchanged.
-- **What the machine tries**: Walk `docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md`'s steps directly, in this same session:
+- **What the machine tries**: Walk `docs/knowledge/how-to-diagnose-an-fgos-approve-blocked-by-verify-fail-post/diagnose-a-verify-fail-post-merge-block-on-approve.md`'s steps directly, in this same session:
   1. Read `approve`'s own `output` field from the response (the full test-suite output, not just the recorded `verify` command) and identify exactly which test(s) failed.
   2. Check whether the failing test's file is inside the item's own diff (`fgos review <id>` or branch's changed files) — a failure in a file the item never touched is the first signal it's unrelated noise.
   3. Re-run the failing test file alone a few times (`node --test path/to/the-failing.test.mjs`) — reproduces deterministically (a genuine pre-existing bug) or only fails under full-suite run (load-induced flake).

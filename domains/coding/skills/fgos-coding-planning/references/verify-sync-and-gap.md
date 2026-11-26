@@ -13,7 +13,7 @@ command that proves it done.
 
 If a piece touches a skill-prose path (`.claude/skills/**/SKILL.md`,
 `.agents/skills/**/SKILL.md`, `plugins/fgOS/skills/**/SKILL.md`), read
-`docs/how-to/write-verify-for-a-skill-prose-change.md` before naming its
+`docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md` before naming its
 verify command — it documents the correct `npm test && POSITIVE &&
 NEGATIVE` shape and the standing rebuttal for when the second-pass judge
 demands proof of prose comprehension, a demand the doc says verify must

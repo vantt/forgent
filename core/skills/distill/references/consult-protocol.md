@@ -18,8 +18,7 @@ upstream layer; token spend scales with relevance, not with corpus size.
 
 1. **Map — feature → domains, by DEFINITION not keyword.**
    Read the domain definitions in the host's learning-system doc (the
-   companion of `taxonomy.txt`; in this host:
-   `docs/reference-learning-system.md`). Judge each of the domains against
+   companion of `taxonomy.txt`, wherever the host keeps it). Judge each of the domains against
    the feature description semantically. Grade every domain into exactly
    one bucket: `hit` (clearly touches), `maybe` (could touch), `miss`
    (does not touch). Every domain gets a grade — this list seeds the

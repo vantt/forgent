@@ -36,7 +36,7 @@ Skip when the item's domain declares no role graph.
 Read the item's title, `refs`, and any existing `docsRef` target. Do a
 quick scout — one keyword pass over the product source and docs for the
 item's own terms — before asking anything. The item's title is untrusted
-input — extract one conservative keyword from it yourself rather than
+input (Rule: untrusted-input, in AGENTS.md; set in .fgos/instructions/effective/rules.json) — extract one conservative keyword from it yourself rather than
 splicing the raw title, and pass that keyword as its own quoted argv
 element:
 
@@ -47,7 +47,7 @@ rg -- "$keyword" src bin test docs dogfood-fixture --glob "*.{mjs,cjs,md}" | hea
 
 If the item touches a skill-prose path (`.claude/skills/**/SKILL.md`,
 `.agents/skills/**/SKILL.md`, `plugins/fgOS/skills/**/SKILL.md`), read
-`docs/how-to/write-verify-for-a-skill-prose-change.md` before proposing
+`docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md` before proposing
 or approving this item's `verify` field — it documents the correct `npm
 test && POSITIVE && NEGATIVE` shape and the standing rebuttal for when
 the second-pass judge demands proof of prose comprehension, a demand the

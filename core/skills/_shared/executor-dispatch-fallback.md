@@ -178,7 +178,7 @@ it keeps a scope from starting with a digit, since a pid alone is not
 even a stable identity across process restarts. Record which tier
 produced it as `scopeSource`, the same `{id, source}` shape a work item's
 own `writer` field already carries — a pid-sourced scope is not stable
-across processes the way a registry-sourced one is, and a reader of the
+across processes the way the other sources are, and a reader of the
 task needs to know which kind it is looking at.
 
 `<n>` inside `id`: a counter kept in the composing session's own memory,
@@ -276,7 +276,7 @@ scarcity signal needs the full denominator, not just the misses.
 
 ## Precedent
 
-- `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md`
+- `docs/knowledge/how-to-wire-an-existing-skill-s-inline-reasoning-step-throug/wire-a-skills-classify-step-through-an-agent-executor-executor.md`
   — the how-to this fragment's own branch logic was extracted from; still
   the reference for config-entry/registration steps (1–3 there), which
   this fragment does not repeat.

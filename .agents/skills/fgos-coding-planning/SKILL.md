@@ -100,7 +100,7 @@ escape hatch): `references/approach-and-shape.md`.
 
 For each new decision, function, module, verb or contract the approach
 introduces, run `fgos authority locate "<one sentence>"` and write the plan's
-**Authority map** (`../../../core/skills/_shared/plan-contract.md` §3): the
+**Authority map** (`../_shared/plan-contract.md` §3): the
 model row that owns it, or `declare: <kind> <id>` when none does, and
 `survivor: <id>; retired: <path>` where it overlaps something that exists.
 Where the project has no model, `locate` answers `authority: inactive`: record
@@ -116,8 +116,8 @@ mechanics: `references/approach-and-shape.md`.
 ### Step 4: Decide the split, if any
 Some items are one honest piece; others need to become several
 independently workable ones. Each independently executable piece described in `plan.md` (whether pass-through or split child) must specify its canonical dispatch capability, per the shared cluster this planner specializes:
-`../../../core/skills/_shared/planning-capability-awareness.md` (rule) and
-`../../../core/skills/_shared/capability-catalog.md` (vocabulary) — for coding implementation execution, use `code:implement`; a piece that is independently reviewable, testable, or debuggable in its own right uses `code:review`/`code:test`/`code:debug` instead. Capability boundaries serve as a decomposition signal (units needing different capabilities should be split), not a forced over-splitting rule. Never pin executor, provider, or model names in `plan.md` — execution-time `decide` is the sole authority for dispatch selection. If a split is right, write each piece's spec
+`../_shared/planning-capability-awareness.md` (rule) and
+`../_shared/capability-catalog.md` (vocabulary) — for coding implementation execution, use `code:implement`; a piece that is independently reviewable, testable, or debuggable in its own right uses `code:review`/`code:test`/`code:debug` instead. Capability boundaries serve as a decomposition signal (units needing different capabilities should be split), not a forced over-splitting rule. Never pin executor, provider, or model names in `plan.md` — execution-time `decide` is the sole authority for dispatch selection. If a split is right, write each piece's spec
 into `plan.md` as a validated JSON array and **create nothing** — no work
 item exists until `fgos-coding-validating` materializes them at the
 single gate. For a split root item, sync a still-placeholder `verify`
@@ -148,7 +148,7 @@ A planner started on `discussion-settled` has no claimed item and no `docs/histo
 item steps (bootstrap, `Mode:` lane, split specs, verify sync) and:
 
 1. Read the settled discussion (`plans/discussions/<dir>/`) or the shaping report its marker names.
-2. Write `plans/<dir>/plan.md` and its phase files per `../../../core/skills/_shared/plan-contract.md`; take `<dir>`
+2. Write `plans/<dir>/plan.md` and its phase files per `../_shared/plan-contract.md`; take `<dir>`
    from `fgos convention path --kind plan`. Before the phase table, run `fgos authority locate` for each new
    thing and write the Authority map (Step 2); `authority: inactive` where the project has no model.
 3. Run `node scripts/plan-contract-check.mjs --plan plans/<dir>` and fix every error.

@@ -16,4 +16,4 @@ when:
 
 # Packaging Distribution Verification
 
-Packaging-distribution components must verify release manifests, installation bindings, and repository runtime layouts before mutation. Docs-only changes may use doc and render checks instead of runtime test suites.
+Packaging-distribution components must verify release manifests, installation bindings, and repository runtime layouts before mutation. Docs-only changes may use doc and render checks instead of runtime test suites for their own verification; the definition of done's full suites still run at the integration gate.

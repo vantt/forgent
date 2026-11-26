@@ -74,8 +74,7 @@ help queue has nothing past the threshold; then the supervisor owns the queue ag
    read-only, so you can send but peers cannot SendMessage you back. Another machine, a non-Claude agent, or mail
    that must be signed or kept: `fgos mailbox send --to <role or handle>` (for example `--to lead:OPC`). Replies and
    mail sent to you arrive through the mailbox hook.
-4. **Order.** Order the topics by the product priority in AGENTS.md (Ship Faster, Release con nguoi, DoD, Polish Sau
-   DoD). A real tie goes to the owner as a question.
+4. **Order.** Order the topics by the product priority (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json). A real tie goes to the owner as a question.
 
 A release the supervisor started and did not come back from is the secretary's to undo. You cannot read the
 supervisor's ticket (`request result` reads only your own role's tickets), so judge it from what you can see: the

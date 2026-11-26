@@ -12,7 +12,7 @@ created: 2026-11-27
 The owner settles a plan and walks away; on return the plan is stalled on foreseeable questions. Of 163 owner
 questions (2026-11-19 to 2026-11-26), about 140 came after a plan existed: 40 footprint widens, about 45 "hands"
 requests, 18 cleanups, 8 acceptance deviations. Settled in
-`plans/discussions/ds-que32ftgg6-ready-plan-runs-unattended/DISCUSSION.md` (D1-D5, U1-U7).
+`plans/discussions/ds-que32ftgg6-ready-plan-runs-unattended/DISCUSSION.md` (its decisions and tasks).
 
 # Plan
 
