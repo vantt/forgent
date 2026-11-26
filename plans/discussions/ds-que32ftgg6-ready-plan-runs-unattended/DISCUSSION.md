@@ -1,12 +1,14 @@
 ---
 id: ds-que32ftgg6
 title: "A ready plan runs unattended: what `ready` must guarantee so the owner can walk away"
-status: paused
+status: settled
 source: []
 created: 2026-11-26
 ---
 
-discussion: paused
+discussion: settled
+
+> **Released (owner, 2026-11-27 01:55).** The owner changed the exit: this discussion is planned now on its own, not held for the lifecycle table. The plan tightens what `ready` must guarantee and keeps out of the lifecycle-table vocabulary (status, stage, step), which ds-3in4yb5thk still settles.
 
 ## Hand-off (2026-11-26 17:52 +07)
 
@@ -174,6 +176,7 @@ The owner settles a discussion, a planner writes the plan, the plan goes `ready`
 
 - 2026-11-26 17:52 +07, owner (chat), round 19: chose exit A: put this discussion on the lifecycle table with ds-3in4yb5thk, not on a planner. Shaper: hand-off block written; marker `paused` because `settled` starts a planner automatically; §7 filled.
 - 2026-11-26 18:40 +07, owner via shaper head `when-key-rename` (chat): the ACE label part (§6 key table, D2, D3) is split into ds-k435vz65l2, settled there and handed to a planner; everything else stays here and this discussion stays `paused`. Edited by that shaper on the owner's explicit permission: hand-off split note, non-goals, open points, §6 label section, D2 and D3 forward notes.
+- 2026-11-27 01:55 +07, owner (chat to lead:SUPERVISOR): added this discussion to the goal and chose to plan it now, apart from the lifecycle table. → settled.
 
 ## 6. Thiết kế đã chốt {#design}
 

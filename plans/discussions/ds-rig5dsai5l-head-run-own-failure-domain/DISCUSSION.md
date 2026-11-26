@@ -23,8 +23,8 @@ discussion: settled
     today and the supervisor binding records `failureDomain: {kind: "inherited", reason}`; otherwise
     `{kind: "systemd-scope", unit}` (D4).
   - One new config key for the scope's memory cap in `core/config-standard` + `core/config-schema` (runner
-    section). Default empty (no cap) until owner question `q-gg7if2fal2` is answered; its answer only sets the
-    default value (D5).
+    section). Default `8G` per scope (owner, `q-gg7if2fal2`, 2026-11-27); a project may set it empty to disable
+    the cap (D5).
   - The dead-supervisor signal goes through the existing head-state observe source and the existing
     `session-gone` watcher definition; no new event kind outside that door (D6).
   - Recovery reuses existing doors: pane retire + adopt for the old attempt, `fgos session start` (next
@@ -53,8 +53,7 @@ discussion: settled
      supervisor (and, separately, `systemctl --user stop` of the watcher service) leaves the other head's request
      socket answering; the killed one shows up as an event on the next tick and `fgos session stop` ends it.
   5. `npm test` and `cargo test --workspace` green; doctor row and CHANGELOG line present.
-- **Open points that block only part:** `q-gg7if2fal2` (default cap value) blocks only one default in
-  `core/config-standard`; everything else proceeds with no cap.
+- **Open points that block only part:** none; `q-gg7if2fal2` answered (default cap 8G per scope).
 - **Source:** backlog `p-6htu2ae64o`; evidence §2; prior art `plans/261118-1045-project-supervisor/reports/spike-timer-head-start.md` (commit
   `a27331b109`).
 - authority: component `run-supervisor` (`fgos authority locate`, top match); no new component or decision kind.
@@ -62,9 +61,9 @@ discussion: settled
 ## 1. Trạng thái hiện tại
 
 2026-11-27 00:45: **settled** in one round on the owner's order (first in order, owner offline, decide inside the
-frame). All four open points of §2 are decided from code and prior evidence (D1-D8). One product choice is parked,
-non-blocking: `q-gg7if2fal2` (default memory cap per scope; recommended 8G, ships with no cap until answered).
-Next: the supervisor starts a planner on this file.
+frame). All four open points of §2 are decided from code and prior evidence (D1-D8).
+2026-11-27 01:56: the owner answered `q-gg7if2fal2`: default memory cap 8G per scope (D5). Nothing is open.
+Plan `261127-0016-head-run-own-failure-domain` is running; its lead takes the 8G default from D5.
 
 ## 2. Mục tiêu & đề bài
 
@@ -86,7 +85,7 @@ Open points for the shaper (all decided in §4): the failure-domain boundary (on
 | Why supervisors sit in the watcher cgroup | Clear: `spawn_supervisor` only `setsid`s (`controller/launch.rs:864`); a cgroup is inherited from the starter. The spike of 2026-11-18 recorded it and chose `KillMode=process` over a scope for simplicity (`plans/261118-1045-project-supervisor/reports/spike-timer-head-start.md` lines 18, 45) | D1 |
 | Why one kill took everything | Clear: a systemd service's default `OOMPolicy=stop` stops the whole unit when the kernel OOM-kills one of its processes; every supervisor was in that unit | D3 |
 | Boundary | Decided: one scope per supervised attempt | D2 |
-| Memory cap default | Open, non-blocking: `q-gg7if2fal2` | D5 |
+| Memory cap default | Decided by owner: 8G per scope (`q-gg7if2fal2`) | D5 |
 | Event on supervisor death | Decided: head-state source judges the supervisor too | D6 |
 | Socket back | Decided: no re-attach; stop + next generation | D7 |
 | `KillMode=process` | Decided conditionally on a facts check | D8 |
@@ -102,7 +101,7 @@ All rows decided by analysis in one round under the owner's order to decide from
 | D2 | Boundary = one transient systemd user scope per supervised attempt (per run supervisor), made at the one spawn door. A head has one attempt per generation, so this is per head; a run is per run. A lead's workers launched from inside its sandbox cannot reach the bus and so stay in the lead's scope: per-lead at worst, never shared with the watcher or another head. Rejected: one scope per lead (needs a second door in head start), per head via the watcher (misses heads started by hand) | analysis | design principle 1; agent-confinement spec runtimeDir mask |
 | D3 | Each scope carries `OOMPolicy=stop` explicitly: a kernel OOM kill inside a scope ends that scope only, which is the confinement wanted; the old shared-unit failure was exactly this policy applied to one shared unit. Mechanism: exec-wrap with `systemd-run --user --scope --collect`, keeping `setsid` and the fd handover; fallback attach-by-pid if the live proof fails (the spike already showed `systemd-run --user --scope` keeps a head alive past unit exit, trial 7) | analysis | spike report line 43; systemd OOMPolicy |
 | D4 | No reachable user manager: launch as today and record `failureDomain: inherited` with a reason in the supervisor binding; never silent | analysis | design principle 5; AGENTS.md install gate (never assume platform) |
-| D5 | One config key for the scope's `MemoryMax` in `core/config-standard`/`core/config-schema`; ships empty (today's behaviour). The default value is the owner's: `q-gg7if2fal2` | analysis (key); owner (value, pending) | AGENTS.md install gate |
+| D5 | One config key for the scope's `MemoryMax` in `core/config-standard`/`core/config-schema`; default `8G` per scope, so one runaway head or run is OOM-killed inside its own scope before it pressures the machine; empty disables the cap | analysis (key); owner (value, 2026-11-27) | AGENTS.md install gate; `q-gg7if2fal2` |
 | D6 | Event: `head_state.rs` today reads only the pane (`HostHeadFacts::alive`, line 49), so a head with a dead supervisor reads `live` and nothing fires. It also judges the supervisor identity recorded in `supervisor-binding.json` and reports a distinct state (planner names it) with the placement's instant; `core/watcher/definitions/session-gone.query.json` matches it. Reuses the observe source and definition of plan `261124-2143` | analysis | code; L10 |
 | D7 | Recovery: no new supervisor is attached to a running agent (run-supervisor spec §9 keeps the agent running and adopt settles it; re-adoption would be a new mechanism). `stopHeadSession` (`src/session-host/head-stop.mjs:127-133`) today waits for a close only the dead supervisor could write; with the supervisor judged dead it retires the pane, settles the attempt through adopt, writes `retiredAt`. The next generation starts through `fgos session start` with the last handoff; the live conversation is not kept (files and handoff are) | analysis | spec §8-§9; code |
 | D8 | `KillMode=process` (and nothing else in the unit) exists to keep started heads alive; once supervisors live in their own scopes it is not needed on systemd. Retire it in the same change if the facts phase finds nothing else the tick leaves running; launchd's `AbandonProcessGroup` stays (no scopes there) | analysis | L10; timer.rs |
@@ -115,6 +114,7 @@ All rows decided by analysis in one round under the owner's order to decide from
 - 2026-11-27 00:4x — shaper: scouted `spawn_supervisor`, `render_systemd`, the 2026-11-18 spike report,
   `head_state.rs`, `head-stop.mjs`, run-supervisor spec §8-§9, agent-confinement runtimeDir mask; decided D1-D8;
   asked `q-gg7if2fal2` (default cap, non-blocking); settled.
+- 2026-11-27 01:56 — owner answered `q-gg7if2fal2`: "8G cap per scope". Written into D5 and the hand-off; acked.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -124,7 +124,7 @@ OOM kill of any process there makes systemd stop the whole unit (`OOMPolicy=stop
 with it. Nothing notices, because head liveness is read from the pane only.
 
 After the change, the one spawn door of the run supervisor asks the user's systemd manager for a transient scope
-per attempt and execs the supervisor inside it, with `OOMPolicy=stop` and an optional `MemoryMax`. Each head and
+per attempt and execs the supervisor inside it, with `OOMPolicy=stop` and a `MemoryMax` (8G by default). Each head and
 each run is then its own cgroup: an OOM kill or a stop ends only that scope. Where no user manager is reachable the
 spawn goes on as today and the binding says so. The head-state source also checks the supervisor recorded in the
 binding; a head whose pane lives without its supervisor becomes a `session-gone` event, and `session stop` ends it
@@ -134,7 +134,7 @@ by retiring the pane and settling through adopt, after which the supervisor star
 flowchart LR
   W[watcher tick<br/>fgos-watcher.service] -->|session start| L[spawn_supervisor]
   H[head / fgos run] -->|fgos run| L
-  L -->|user manager reachable| S1[scope fgos-run-&lt;attempt&gt;<br/>OOMPolicy=stop, MemoryMax?]
+  L -->|user manager reachable| S1[scope fgos-run-&lt;attempt&gt;<br/>OOMPolicy=stop, MemoryMax 8G]
   L -->|not reachable| S0[inherit parent cgroup<br/>binding: inherited + reason]
   S1 --> SUP[internal supervise<br/>request socket] --> G[gate / agent]
   HS[head_state source] -->|pane live, supervisor dead| E[session-gone event]
