@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5ee7ebd115a5d5b279b06dd8a8310b3987ebcae2d140c9f992e28474a7cb3a57",
+  "payloadDigest": "e20446d9cb9645408e8f93805b4e984b6b0c87abc0dc1f77d2087b95a8055ca0",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "dc14ff69bc4b144893fa6988de4df6b6180ab255ef8751fd1615ad93472b9e71",
     ".agents/skills/_shared/capability-matching.md": "93cd382994e2201e4aa8ec7816d740f6da634a0ee69d6911800a848ed5de1d8b",
@@ -958,7 +958,7 @@
     "packages/mailbox/rust/core/tests/common/support.rs": "fa0a4c02f6c5fef41f47a35c5f2396cce78be891ad62e2aac93c5180bf4d7575",
     "packages/mailbox/rust/core/tests/counters.rs": "daa2aca6c7dacd211d1b79fb56ae32bedb6a1e87e54bfca71728b4f5c8cc6f9a",
     "packages/mailbox/rust/core/tests/delivery.rs": "465e1ac6c56d9ffc7a7e8dd11c5640e4447da11e705fbc18eda56a4e32481e0c",
-    "packages/mailbox/rust/core/tests/frame.rs": "002aa37d1186006b0b5df3a867baeb252df9a854bc8dcd06714c0030fa705362",
+    "packages/mailbox/rust/core/tests/frame.rs": "f1eb938c3eff51dcf93cb7b816b988a9d42dc6b225fd06b5c5afba8add78aa8f",
     "packages/mailbox/rust/core/tests/limits_contract.rs": "85a9f8e01abae9b6bb2bcceb3d03e095d253afa58effe35a4001ef7201e35f7c",
     "packages/mailbox/rust/core/tests/names.rs": "1ce8a6015120619ea350e751623b3dc050f471bba417612e9dc9554538bf1058",
     "packages/mailbox/rust/core/tests/policies.rs": "e757750c637d53a4ad063919ad1e7363b8b2cf77f42d174a81094c280ae23d03",
