@@ -19,6 +19,8 @@ Opened by the supervisor on the owner order of 2026-11-26 11:16, relayed by the 
 
 ## 1. Trạng thái hiện tại
 
+Round 3 (2026-11-26 14:0x). Owner: do not make the pipeline complicated; organise things so that the output of one workflow becomes the input of another, which is why the owner kept the field `kind` on an initiative (ds-ubqlutna6r, 2026-11-25 21:3x: the workflow is derived from `kind`, `workflowFor[kind]` else `defaultWorkflow`, pinned on leaving Init; settled as A8, built by plan `261125-2137-domain-agnostic-item-component`, draft). Leaning **L5** replaces L1-L4 as the frame (§3 row 11): there is no pipeline engine and no pipeline-specific state. Each workflow takes an input of a known kind and gives an output that carries a `kind`; `workflowFor[kind]` names the workflow that consumes it. "Backlog to ready" is only the chain this yields. The commitment rule (L2-L4) shrinks to one rule at every link: an output starts its consumer only when it is committed for delivery and a slot is free; this one rule covers both a settled discussion waiting for a planner and a `ready` plan waiting for a lead. Waiting on the owner's confirmation of L5 in chat.
+
 Round 2 (2026-11-26 13:44). Owner: hold the hand-off to a planner (13:36), and a settled discussion that the owner does not yet want planned needs the same queue/delivery mechanism as a plan (13:44). Today the supervisor starts a planner on every `discussion-settled` event, with no check of intent (`core/skills/fgos-supervisor/SKILL.md` "Settled discussion"). This falls inside this topic, because the planner step is a pipeline step. Leaning **L4** (§3 row 10): `settled` means quality only, like `ready` for a plan; a planner starts only when the discussion is committed for delivery and its pull slot (L3) is free. One `delivery` key with one meaning on row, discussion and plan, inherited down the `source` chain; it may also sit on a discussion directly, because 42 of 88 discussions cite no backlog row. This discussion stays `open`; nothing is handed to a planner.
 
 Round 1 (2026-11-26 11:40, shaper head `backlog-to-ready-pipeline`). Domain: supervision/work, which is fgOS platform work. There is no `domains/supervision/AGENTS.md`, so the supervision, work-state and workflow specs are the doctrine read. The pipeline itself must stay domain-free: a step that needs domain knowledge calls the domain's own skill, found through `domains/<domain>/AGENTS.md`.
@@ -49,6 +51,7 @@ A backlog row is where an owner request lands, and today it stays there until a 
 | 7 | Which Work stages are reused and which are moved | Open | L10 says that moving the logic means moving every consumer and deleting the old path in the same change. Before choosing, find out whether Work items with stages `discovery`/`planning` are still used in the projects that run fgOS (mission #1, AGENTS.md "Ranh giới sứ mệnh"). Not scouted yet. |
 | 8 | Who drives the pipeline | Leaning: the supervisor | The supervisor already starts planners and leads (supervision spec §5), and D7 of ds-ipvis4jkpc lets both hands write the order. Clarify on intake stays with the secretary, who already takes every owner request. Open: whether discover runs as a short `fgos run` unit or as a shaper head. |
 | 10 | A settled discussion the owner does not want planned yet | Leaning L4 (owner 13:44) | Today `discussion-settled` starts the one planner unconditionally (`core/skills/fgos-supervisor/SKILL.md` "Settled discussion"; supervision spec §5). Same split as ds-ipvis4jkpc D5/D6: `settled` = the discussion is complete (quality); `delivery` = the owner wants it delivered (commitment). Leaning: the supervisor starts a planner only when the discussion's effective `delivery` is set (its own flag, or a flag on a `source` row) and a pull slot is free (L3); otherwise it waits settled. One key, one meaning on all three levels, inherited downward, so no second mechanism (L10). 42 of 88 discussions have `source: []`, so a flag on the row alone cannot cover them. Open: what happens to the 41 already-settled discussions at rollout (those with a plan are unaffected; the rest wait unflagged unless the owner flags them); whether `discussion: settled` plus the flag is written by the shaper, the secretary or both. |
+| 11 | Chaining: one workflow's output is another workflow's input | Leaning L5 (owner 14:0x) | Prior art, settled: ds-ubqlutna6r A5 (core stages Init → Discover → Clarify (skippable) → Plan → Execute → Retrospective; stages come from the item's workflow), A8 (`kind` from the domain's list selects the workflow, pinned on leaving Init), A4 (Workflow runs a case, takes an opaque caller reference, knows no portfolio; Supervision coordinates). Plan `261125-2137` (draft) builds `kind`, the pin and the derived stage. Missing: a workflow saying what kind its output has, so the next workflow is found from it the same way; and the commitment gate at that hand-off. L5 adds only these two. Rows 2, 3, 4, 8 and 10 become details of L5; row 1 stays as the map of today. Open: whether the link is the output item's own `kind` (a workflow may emit a new initiative) or the artifact type (discussion, plan). |
 | 9 | Component authority | Run, no owner row | `fgos authority locate "take a portfolio backlog row through clarify, goal triage, discovery and planning to a ready plan"` returns only weak matches (`portfolio/backlog-item.schema.v1` and others, score ≤ 3). Re-run once L1 holds; a `fgos authority declare` may be needed for the pipeline. |
 
 ## 4. Quyết định đã chốt
@@ -65,9 +68,22 @@ None yet. L1-L3 in §1 are leanings and become D-IDs only after they hold for an
 - 2026-11-26 13:36 — Owner: "khoan đưa cho planner nhé". The discussion stays `open`; no settled marker, no planner.
 - 2026-11-26 13:44 — Owner: a discussion already settled but not yet wanted by a planner needs a queue/delivery mechanism like a plan. Scouted the supervisor's settled-discussion step (unconditional planner start) and counted discussions: 88, 41 settled, 42 with no source row. Added §3 row 10 and leaning L4.
 
+- 2026-11-26 14:0x — Owner: "chổ pipeline này đừng làm phức tạp, hãy tổ chức làm sao để một workflow output, trở thành input của một workflow khác là được, đó là lý do mà lần trước, một initiative anh muốn giữ lại field kind." Scouted ds-ubqlutna6r (A4, A5, A8, Q&A 2026-11-25 21:3x) and plan 261125-2137 (draft; `workflowFor`/`defaultWorkflow` from `domains/<domain>/registry.yaml`). Reframed as L5 (§3 row 11); L1-L4 kept as details under it.
+
 ## 6. Thiết kế đã chốt {#design}
 
-Not settled yet. Working sketch (round 1):
+Not settled yet. Working sketch (round 3, L5): each box is one workflow; each arrow is an output whose `kind` picks the next workflow through `workflowFor[kind]`, crossing the one commitment gate (delivery set and a slot free).
+
+```mermaid
+flowchart LR
+  I[Initiative, kind K] -->|workflowFor K| W1[Workflow A: discover / clarify]
+  W1 -->|output kind K2| G1{committed + slot free?}
+  G1 -->|workflowFor K2| W2[Workflow B: plan]
+  W2 -->|output kind K3| G2{committed + slot free?}
+  G2 -->|workflowFor K3| W3[Workflow C: deliver]
+```
+
+Earlier sketch (round 1, superseded as a frame by L5):
 
 ```mermaid
 flowchart LR
