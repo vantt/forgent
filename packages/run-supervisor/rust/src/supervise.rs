@@ -802,21 +802,65 @@ fn bind(
     bind_record(envelope, run_dir, locks, &record, &spawned.root, kernel)
 }
 
-/// Resolve the failure domain recorded in the environment or fallback to inherited.
-pub fn read_current_failure_domain() -> Value {
-    if let Ok(val) = std::env::var("FGOS_FAILURE_DOMAIN") {
-        if let Ok(parsed) = serde_json::from_str::<Value>(&val) {
+/// Resolve the failure domain from a raw JSON string or fallback to unrecorded.
+pub fn resolve_failure_domain(raw: Option<&str>) -> Value {
+    if let Some(val) = raw {
+        if let Ok(parsed) = serde_json::from_str::<Value>(val) {
             return parsed;
         }
     }
-    #[cfg(target_os = "linux")]
-    {
-        json!({ "kind": "inherited", "reason": "no-user-manager" })
-    }
-    #[cfg(not(target_os = "linux"))]
-    {
-        json!({ "kind": "inherited", "reason": "not-linux" })
-    }
+    json!({ "kind": "inherited", "reason": "unrecorded" })
+}
+
+/// Resolve the failure domain recorded in the environment or fallback to unrecorded.
+pub fn read_current_failure_domain() -> Value {
+    let val = std::env::var("FGOS_FAILURE_DOMAIN").ok();
+    resolve_failure_domain(val.as_deref())
+}
+
+/// Build the supervisor binding object.
+pub fn build_supervisor_binding(
+    envelope: &Value,
+    me: &facts::ProcTuple,
+    gate: &facts::ProcTuple,
+    declared: &Value,
+    failure_domain: &Value,
+    kernel: bool,
+) -> Value {
+    json!({
+        "v": 1,
+        "attemptId": envelope["attemptId"],
+        "envelopeDigest": envelope["digest"],
+        "supervisor": me.to_record().to_json(),
+        "gate": gate.to_record().to_json(),
+        "domain": {"kind": declared["domainKind"], "id": declared["domainId"]},
+        "failureDomain": failure_domain,
+        "guarantee": {
+            "containment": if kernel { "kernel" } else { "best-effort" },
+            "lock": "kernel",
+        },
+        "boundAt": iso_utc_now(),
+    })
+}
+
+/// Publish `supervisor-binding.json` once to `run_dir`.
+pub fn write_supervisor_binding(
+    run_dir: &Path,
+    envelope: &Value,
+    me: &facts::ProcTuple,
+    gate: &facts::ProcTuple,
+    declared: &Value,
+    failure_domain: &Value,
+    kernel: bool,
+) -> Result<(), String> {
+    let binding = build_supervisor_binding(envelope, me, gate, declared, failure_domain, kernel);
+    publish_once(
+        run_dir,
+        "supervisor-binding.json",
+        &serde_json::to_vec(&binding).map_err(|e| e.to_string())?,
+    )
+    .map(|_| ())
+    .map_err(|e| format!("supervisor-binding.json: {e}"))
 }
 
 /// [`bind`] for a domain the caller already knows: record it on the lock, then publish the binding.
@@ -838,27 +882,15 @@ fn bind_record(
     let declared = fgos_holder_lock::predecessor::domain_json(record);
     let me = facts::self_identity().ok_or("the supervisor's own identity is unreadable")?;
     let failure_domain = read_current_failure_domain();
-    let binding = json!({
-        "v": 1,
-        "attemptId": envelope["attemptId"],
-        "envelopeDigest": envelope["digest"],
-        "supervisor": me.to_record().to_json(),
-        "gate": gate.to_record().to_json(),
-        "domain": {"kind": declared["domainKind"], "id": declared["domainId"]},
-        "failureDomain": failure_domain,
-        "guarantee": {
-            "containment": if kernel { "kernel" } else { "best-effort" },
-            "lock": "kernel",
-        },
-        "boundAt": iso_utc_now(),
-    });
-    publish_once(
+    write_supervisor_binding(
         run_dir,
-        "supervisor-binding.json",
-        &serde_json::to_vec(&binding).map_err(|e| e.to_string())?,
+        envelope,
+        &me,
+        gate,
+        &declared,
+        &failure_domain,
+        kernel,
     )
-    .map_err(|e| format!("supervisor-binding.json: {e}"))?;
-    Ok(())
 }
 
 /// `true` when the gate said HELLO; `false` when it left first or took too long.

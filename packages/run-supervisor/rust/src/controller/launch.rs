@@ -585,6 +585,7 @@ pub struct LaunchSettings {
     pub gate_kill_grace_ms: u64,
     pub kill_wait_ms: u64,
     pub lanes: LaneSettings,
+    pub supervisor_scope_memory_max: Option<String>,
 }
 
 pub fn read_launch_settings(project_root: &Path) -> Result<LaunchSettings, ConfigReadError> {
@@ -595,6 +596,8 @@ pub fn read_launch_settings(project_root: &Path) -> Result<LaunchSettings, Confi
         .value
         .get("workerSlots")
         .ok_or_else(|| missing("workerSlots"))?;
+    let raw_memory_max = super::config::resolve_supervisor_scope_memory_max(&snapshot)?.value;
+    let validated_memory_max = super::scope::validate_memory_max(&raw_memory_max).map(str::to_string);
     Ok(LaunchSettings {
         gate_kill_grace_ms: super::config::resolve_gate_kill_grace(&snapshot)?.value,
         kill_wait_ms: DEFAULT_KILL_WAIT_MS,
@@ -605,6 +608,7 @@ pub fn read_launch_settings(project_root: &Path) -> Result<LaunchSettings, Confi
                 .and_then(Value::as_u64)
                 .ok_or_else(|| missing("workerSlots.laneWaitSec"))?,
         },
+        supervisor_scope_memory_max: validated_memory_max,
     })
 }
 
@@ -816,10 +820,20 @@ pub fn start_supervisor(
     handover: &[&fs::File],
     step_env: &Map<String, Value>,
     extra_env: &Map<String, Value>,
+    failure_domain: &super::scope::FailureDomain,
+    memory_max: Option<&str>,
 ) -> io::Result<StartedSupervisor> {
     let run_dir = PathBuf::from(envelope["runDir"].as_str().unwrap_or_default());
     let side_file = envelope["sideFile"].as_str().map(PathBuf::from);
-    let result = spawn_supervisor(envelope, &run_dir, handover, step_env, extra_env);
+    let result = spawn_supervisor(
+        envelope,
+        &run_dir,
+        handover,
+        step_env,
+        extra_env,
+        failure_domain,
+        memory_max,
+    );
     if result.is_err() {
         if let Some(side) = side_file {
             let _ = fs::remove_file(side);
@@ -849,7 +863,11 @@ pub fn build_supervisor_command(
     ];
     match failure_domain {
         super::scope::FailureDomain::SystemdScope { unit } => {
+            let systemd_run_bin = super::scope::resolve_systemd_run_path()
+                .map(|p| p.to_string_lossy().to_string())
+                .unwrap_or_else(|| "/usr/bin/systemd-run".to_string());
             let scope_cmd = super::scope::build_scope_command(
+                &systemd_run_bin,
                 unit,
                 memory_max,
                 &supervisor_argv,
@@ -872,6 +890,8 @@ fn spawn_supervisor(
     handover: &[&fs::File],
     step_env: &Map<String, Value>,
     extra_env: &Map<String, Value>,
+    failure_domain: &super::scope::FailureDomain,
+    memory_max: Option<&str>,
 ) -> io::Result<StartedSupervisor> {
     let mut log_options = fs::OpenOptions::new();
     log_options.create(true).append(true);
@@ -883,35 +903,20 @@ fn spawn_supervisor(
     let log = log_options.open(run_dir.join("supervisor.log"))?;
 
     #[cfg(unix)]
-    let (mut command, failure_domain) = {
-        let attempt_id = envelope["attemptId"].as_str().unwrap_or_default();
-        let failure_domain = super::scope::decide_failure_domain(attempt_id);
-        let project_root = envelope["cwd"].as_str().map(Path::new);
-        let memory_max = super::config::read_supervisor_scope_memory_max(project_root)
-            .ok()
-            .filter(|m| !m.is_empty());
-        let cmd = build_supervisor_command(
-            envelope,
-            run_dir,
-            &failure_domain,
-            memory_max.as_deref(),
-        );
-        (cmd, failure_domain)
-    };
+    let mut command = build_supervisor_command(
+        envelope,
+        run_dir,
+        failure_domain,
+        memory_max,
+    );
 
     #[cfg(windows)]
-    let (mut command, failure_domain) = {
-        let failure_domain = super::scope::FailureDomain::Inherited {
-            reason: "not-linux".to_string(),
-        };
-        let cmd = build_supervisor_command(
-            envelope,
-            run_dir,
-            &failure_domain,
-            None,
-        );
-        (cmd, failure_domain)
-    };
+    let mut command = build_supervisor_command(
+        envelope,
+        run_dir,
+        failure_domain,
+        None,
+    );
 
     command
         .current_dir(run_dir)
@@ -924,7 +929,7 @@ fn spawn_supervisor(
             command.env(name, value);
         }
     }
-    let fd_json = serde_json::to_string(&failure_domain).unwrap_or_default();
+    let fd_json = serde_json::to_string(failure_domain).unwrap_or_default();
     command.env("FGOS_FAILURE_DOMAIN", fd_json);
     #[cfg(unix)]
     if matches!(failure_domain, super::scope::FailureDomain::SystemdScope { .. }) {

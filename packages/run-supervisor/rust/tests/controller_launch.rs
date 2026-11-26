@@ -596,6 +596,7 @@ fn under_custody_the_callers_lease_is_lent_to_the_supervisor_which_survives_a_bo
 #[test]
 fn a_supervisor_that_binds_is_seen_bound_one_that_exits_is_seen_exited_and_a_failed_start_removes_the_secrets(
 ) {
+    use fgos_run_supervisor::controller::scope::FailureDomain;
     use std::os::unix::fs::PermissionsExt;
     let dir = scratch("supervisor");
     let run_dir = dir.join("run");
@@ -607,8 +608,12 @@ fn a_supervisor_that_binds_is_seen_bound_one_that_exits_is_seen_exited_and_a_fai
     std::fs::write(&side, "{}").unwrap();
     let envelope = json!({"runDir": run_dir.to_str().unwrap(), "hostBin": script.to_str().unwrap(), "sideFile": side.to_str().unwrap()});
     let step_env = Map::new();
+    let pinned_domain = FailureDomain::Inherited {
+        reason: "pinned-test".to_string(),
+    };
     std::fs::write(run_dir.join("mode"), "bind").unwrap();
-    let mut started = start_supervisor(&envelope, &[], &step_env, &Map::new()).unwrap();
+    let mut started =
+        start_supervisor(&envelope, &[], &step_env, &Map::new(), &pinned_domain, None).unwrap();
     assert!(started.hands_over_locks);
     assert_eq!(
         wait_for_binding(&run_dir, &mut started.child, 5000),
@@ -617,7 +622,8 @@ fn a_supervisor_that_binds_is_seen_bound_one_that_exits_is_seen_exited_and_a_fai
     let _ = started.child.wait();
     std::fs::remove_file(run_dir.join("supervisor-binding.json")).unwrap();
     std::fs::write(run_dir.join("mode"), "exit").unwrap();
-    let mut gone = start_supervisor(&envelope, &[], &step_env, &Map::new()).unwrap();
+    let mut gone =
+        start_supervisor(&envelope, &[], &step_env, &Map::new(), &pinned_domain, None).unwrap();
     assert_eq!(
         wait_for_binding(&run_dir, &mut gone.child, 5000),
         Binding::Exited {
@@ -626,7 +632,7 @@ fn a_supervisor_that_binds_is_seen_bound_one_that_exits_is_seen_exited_and_a_fai
         }
     );
     let missing = json!({"runDir": run_dir.to_str().unwrap(), "hostBin": dir.join("nope").to_str().unwrap(), "sideFile": side.to_str().unwrap()});
-    assert!(start_supervisor(&missing, &[], &step_env, &Map::new()).is_err());
+    assert!(start_supervisor(&missing, &[], &step_env, &Map::new(), &pinned_domain, None).is_err());
     assert!(!side.exists(), "secrets with no reader do not stay on disk");
 }
 
@@ -660,188 +666,163 @@ fn a_result_that_never_comes_is_judged_by_the_adopt_door_and_read_once_more() {
 }
 
 #[test]
-fn scope_wrapped_command_builds_with_and_without_memory_max() {
-    use fgos_run_supervisor::controller::scope::{build_scope_command, FailureDomain};
+fn launch_path_builds_scoped_and_plain_commands_and_binding_carries_failure_domain() {
+    use fgos_run_supervisor::controller::scope::FailureDomain;
 
+    let dir = scratch("scope-launch");
+    let run_dir = dir.join("run");
+    std::fs::create_dir_all(&run_dir).unwrap();
     let envelope = json!({
         "attemptId": "att-scope-1",
+        "digest": "sha256-abc",
         "hostBin": "/bin/fgos",
         "cwd": "/w",
     });
-    let run_dir = Path::new("/r/run");
 
-    // Scope without MemoryMax
-    let domain = FailureDomain::SystemdScope {
+    // 1. Scope without cap
+    let scope_domain = FailureDomain::SystemdScope {
         unit: "fgos-run-att-scope-1".into(),
     };
-    let cmd = build_supervisor_command(&envelope, run_dir, &domain, None);
+    let cmd = build_supervisor_command(&envelope, &run_dir, &scope_domain, None);
     let prog = cmd.get_program().to_string_lossy().to_string();
+    assert!(
+        prog.ends_with("systemd-run") && prog.starts_with('/'),
+        "program must be absolute path to systemd-run: {prog}"
+    );
     let args: Vec<String> = cmd
         .get_args()
         .map(|a| a.to_string_lossy().to_string())
         .collect();
-    assert_eq!(prog, "systemd-run");
+    let env_path = run_dir.join("envelope.json").to_string_lossy().to_string();
     assert_eq!(
         args,
         vec![
-            "--user",
-            "--scope",
-            "--collect",
-            "--unit=fgos-run-att-scope-1",
-            "-p",
-            "OOMPolicy=stop",
-            "--",
-            "/bin/fgos",
-            "internal",
-            "supervise",
-            "--envelope",
-            "/r/run/envelope.json",
-            "--protocol",
-            "1"
+            "--user".to_string(),
+            "--scope".to_string(),
+            "--collect".to_string(),
+            "--unit=fgos-run-att-scope-1".to_string(),
+            "-p".to_string(),
+            "OOMPolicy=stop".to_string(),
+            "--".to_string(),
+            "/bin/fgos".to_string(),
+            "internal".to_string(),
+            "supervise".to_string(),
+            "--envelope".to_string(),
+            env_path.clone(),
+            "--protocol".to_string(),
+            "1".to_string(),
         ]
     );
 
-    // Scope with MemoryMax
-    let cmd_cap = build_supervisor_command(&envelope, run_dir, &domain, Some("8G"));
+    // 2. Scope with MemoryMax cap
+    let cmd_cap = build_supervisor_command(&envelope, &run_dir, &scope_domain, Some("8G"));
     let prog_cap = cmd_cap.get_program().to_string_lossy().to_string();
+    assert!(prog_cap.ends_with("systemd-run") && prog_cap.starts_with('/'));
     let args_cap: Vec<String> = cmd_cap
         .get_args()
         .map(|a| a.to_string_lossy().to_string())
         .collect();
-    assert_eq!(prog_cap, "systemd-run");
     assert_eq!(
         args_cap,
         vec![
-            "--user",
-            "--scope",
-            "--collect",
-            "--unit=fgos-run-att-scope-1",
-            "-p",
-            "OOMPolicy=stop",
-            "-p",
-            "MemoryMax=8G",
-            "--",
-            "/bin/fgos",
-            "internal",
-            "supervise",
-            "--envelope",
-            "/r/run/envelope.json",
-            "--protocol",
-            "1"
+            "--user".to_string(),
+            "--scope".to_string(),
+            "--collect".to_string(),
+            "--unit=fgos-run-att-scope-1".to_string(),
+            "-p".to_string(),
+            "OOMPolicy=stop".to_string(),
+            "-p".to_string(),
+            "MemoryMax=8G".to_string(),
+            "--".to_string(),
+            "/bin/fgos".to_string(),
+            "internal".to_string(),
+            "supervise".to_string(),
+            "--envelope".to_string(),
+            env_path.clone(),
+            "--protocol".to_string(),
+            "1".to_string(),
         ]
     );
 
-    // Pure scope command builder directly
-    let base_args = vec!["/bin/fgos".into(), "internal".into(), "supervise".into()];
-    assert_eq!(
-        build_scope_command("fgos-run-test", Some("4G"), &base_args),
-        vec![
-            "systemd-run",
-            "--user",
-            "--scope",
-            "--collect",
-            "--unit=fgos-run-test",
-            "-p",
-            "OOMPolicy=stop",
-            "-p",
-            "MemoryMax=4G",
-            "--",
-            "/bin/fgos",
-            "internal",
-            "supervise"
-        ]
-    );
-}
-
-#[test]
-fn plain_command_and_inherited_reason_when_no_manager_is_reachable() {
-    use fgos_run_supervisor::controller::scope::{
-        decide_failure_domain_with, FailureDomain,
+    // 3. Plain command built for Inherited domain
+    let inh_domain = FailureDomain::Inherited {
+        reason: "no-user-manager".into(),
     };
-
-    let envelope = json!({
-        "attemptId": "att-plain-1",
-        "hostBin": "/bin/fgos",
-        "cwd": "/w",
-    });
-    let run_dir = Path::new("/r/run");
-
-    // Probes: not linux
-    let domain_not_linux = decide_failure_domain_with("att-plain-1", false, true, true);
-    assert_eq!(
-        domain_not_linux,
-        FailureDomain::Inherited {
-            reason: "not-linux".to_string()
-        }
-    );
-
-    // Probes: linux, no user manager
-    let domain_no_mgr = decide_failure_domain_with("att-plain-1", true, false, true);
-    assert_eq!(
-        domain_no_mgr,
-        FailureDomain::Inherited {
-            reason: "no-user-manager".to_string()
-        }
-    );
-
-    // Probes: linux, user manager reachable, but no systemd-run on PATH
-    let domain_no_cmd = decide_failure_domain_with("att-plain-1", true, true, false);
-    assert_eq!(
-        domain_no_cmd,
-        FailureDomain::Inherited {
-            reason: "no-systemd-run".to_string()
-        }
-    );
-
-    // Plain command built for Inherited domain
-    let cmd = build_supervisor_command(&envelope, run_dir, &domain_no_mgr, Some("8G"));
-    let prog = cmd.get_program().to_string_lossy().to_string();
-    let args: Vec<String> = cmd
+    let cmd_plain = build_supervisor_command(&envelope, &run_dir, &inh_domain, Some("8G"));
+    let prog_plain = cmd_plain.get_program().to_string_lossy().to_string();
+    assert_eq!(prog_plain, "/bin/fgos");
+    let args_plain: Vec<String> = cmd_plain
         .get_args()
         .map(|a| a.to_string_lossy().to_string())
         .collect();
-    assert_eq!(prog, "/bin/fgos");
     assert_eq!(
-        args,
+        args_plain,
         vec![
-            "internal",
-            "supervise",
-            "--envelope",
-            "/r/run/envelope.json",
-            "--protocol",
-            "1"
+            "internal".to_string(),
+            "supervise".to_string(),
+            "--envelope".to_string(),
+            env_path,
+            "--protocol".to_string(),
+            "1".to_string(),
         ]
+    );
+
+    // 4. Real binding write carries failureDomain (exercise write_supervisor_binding)
+    let me = fgos_process::facts::self_identity().unwrap();
+    let gate = me.clone();
+    let declared = json!({ "domainKind": "linux-gate", "domainId": "dom-1" });
+    let fd_val = json!({ "kind": "systemd-scope", "unit": "fgos-run-att-scope-1" });
+    fgos_run_supervisor::supervise::write_supervisor_binding(
+        &run_dir,
+        &envelope,
+        &me,
+        &gate,
+        &declared,
+        &fd_val,
+        true,
+    )
+    .unwrap();
+    let binding_file = run_dir.join("supervisor-binding.json");
+    assert!(binding_file.exists());
+    let binding_content: Value =
+        serde_json::from_str(&std::fs::read_to_string(&binding_file).unwrap()).unwrap();
+    assert_eq!(binding_content["failureDomain"], fd_val);
+
+    // 5. Unrecorded fallback for unparsable/missing failure domain
+    use fgos_run_supervisor::supervise::resolve_failure_domain;
+    assert_eq!(
+        resolve_failure_domain(None),
+        json!({ "kind": "inherited", "reason": "unrecorded" })
+    );
+    assert_eq!(
+        resolve_failure_domain(Some("not-json")),
+        json!({ "kind": "inherited", "reason": "unrecorded" })
+    );
+    assert_eq!(
+        resolve_failure_domain(Some("{\"kind\":\"inherited\",\"reason\":\"not-linux\"}")),
+        json!({ "kind": "inherited", "reason": "not-linux" })
     );
 }
 
 #[test]
-fn supervisor_binding_carries_failure_domain_field() {
-    use fgos_run_supervisor::supervise::read_current_failure_domain;
+fn read_launch_settings_reads_and_validates_memory_max() {
+    let dir = scratch("launch-settings-cfg");
+    let project = dir.join("project");
+    std::fs::create_dir_all(project.join(".fgos")).unwrap();
+    std::fs::write(
+        project.join(".fgos/config.yaml"),
+        "# @fgos:v1\nrunner:\n  supervisorScope:\n    memoryMax: 8G\n",
+    )
+    .unwrap();
+    let settings = read_launch_settings(&project).unwrap();
+    assert_eq!(settings.supervisor_scope_memory_max.as_deref(), Some("8G"));
 
-    // Test with FGOS_FAILURE_DOMAIN set to systemd-scope
-    std::env::set_var(
-        "FGOS_FAILURE_DOMAIN",
-        json!({"kind": "systemd-scope", "unit": "fgos-run-test-1"}).to_string(),
-    );
-    let fd = read_current_failure_domain();
-    assert_eq!(
-        fd,
-        json!({"kind": "systemd-scope", "unit": "fgos-run-test-1"})
-    );
-
-    // Test with FGOS_FAILURE_DOMAIN set to inherited
-    std::env::set_var(
-        "FGOS_FAILURE_DOMAIN",
-        json!({"kind": "inherited", "reason": "no-user-manager"}).to_string(),
-    );
-    let fd_inh = read_current_failure_domain();
-    assert_eq!(
-        fd_inh,
-        json!({"kind": "inherited", "reason": "no-user-manager"})
-    );
-
-    std::env::remove_var("FGOS_FAILURE_DOMAIN");
-    let fd_fallback = read_current_failure_domain();
-    assert_eq!(fd_fallback["kind"], "inherited");
-    assert!(fd_fallback["reason"].is_string());
+    // Empty memoryMax is None
+    std::fs::write(
+        project.join(".fgos/config.yaml"),
+        "# @fgos:v1\nrunner:\n  supervisorScope:\n    memoryMax: \"\"\n",
+    )
+    .unwrap();
+    let settings_empty = read_launch_settings(&project).unwrap();
+    assert_eq!(settings_empty.supervisor_scope_memory_max, None);
 }

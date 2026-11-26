@@ -184,6 +184,7 @@ properties:
       memoryMax:
         description: "Memory cap for the run supervisor's systemd scope in systemd size syntax (e.g. 8G); empty means no cap."
         type: string
+        pattern: "^$|^([0-9]+[KMGTkmgt]?|infinity)$"
   confinementPolicies:
     $comment: "justification: a policy decides what a confined session may do on this machine, so only the machine's own file defines one; a project could otherwise define a weak policy and require it"
     x-fgos-scope: global-only
