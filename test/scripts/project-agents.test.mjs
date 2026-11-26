@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { projectAgentMarkdown, AgentDefinitionError, findAgentYamlFiles, resolveAgentFiles, projectAll } from '../../scripts/project-agents.mjs';
+import { checkAgentDefinition, AgentDefinitionError, findAgentYamlFiles, resolveAgentFiles, projectAll } from '../../scripts/project-agents.mjs';
 import { readFrontmatter } from '../../src/util/yaml.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -43,74 +43,39 @@ tool-scope:
   - Bash
 `;
 
-test('tool-scope maps exactly into the generated tools: frontmatter -- no silent add, no silent drop (D1)', () => {
-  const markdown = projectAgentMarkdown('test-agent', VALID_YAML);
-  assert.equal(readFrontmatter(markdown).meta.tools, 'Read, Grep, Bash');
-});
-
-test('a description holding a colon and a space reads back unchanged: the writer quotes where YAML needs it', () => {
-  const description = 'Council task posture: assumption testing.';
-  const markdown = projectAgentMarkdown('test-agent', VALID_YAML.replace('description: A test agent.', `description: "${description}"`));
-  assert.deepEqual(readFrontmatter(markdown).meta, { name: 'test-agent', description, tools: 'Read, Grep, Bash' });
-});
-
-test('a persona rigor names no model: the projected agent carries no model line and inherits the session\'s', () => {
-  for (const rigor of ['low', 'standard', 'high', 'critical']) {
-    const markdown = projectAgentMarkdown('test-agent', VALID_YAML.replace('rigor: low', `rigor: ${rigor}`));
-    assert.equal(markdown.split('\n').some((line) => line.startsWith('model:')), false, rigor);
-  }
-});
-
-// skills (tsk-397 D20): optional eligibility field --
-// projects through unfiltered when present, is entirely absent from the
-// frontmatter when the source yaml never declares it.
-test('skills, when declared, project into the frontmatter as a list in declared order', () => {
-  const withSkills = VALID_YAML + '\nskills:\n  - fgos-coding-implement\n  - fgos-coding-validating\n';
-  const markdown = projectAgentMarkdown('test-agent', withSkills);
-  assert.deepEqual(readFrontmatter(markdown).meta.skills, ['fgos-coding-implement', 'fgos-coding-validating']);
-});
-
-test('skills is absent from the frontmatter when the source yaml never declares it (backward compatible)', () => {
-  const markdown = projectAgentMarkdown('test-agent', VALID_YAML);
-  assert.equal(markdown.includes('skills:'), false);
-});
+// What an agent file says (tools, quoted descriptions, skills, no model line) is owned by the composer's goldens
+// (packages/agent-start-context/rust/tests/goldens.rs); these cases own the checks a definition passes first.
 
 test('a skills list containing a non-string entry is refused, not silently coerced', () => {
   const badSkills = VALID_YAML + '\nskills:\n  - fgos-coding-implement\n  - 42\n';
-  assert.throws(() => projectAgentMarkdown('test-agent', badSkills), AgentDefinitionError);
-});
-
-test('projection is idempotent -- identical source produces byte-identical output across two runs', () => {
-  const first = projectAgentMarkdown('test-agent', VALID_YAML);
-  const second = projectAgentMarkdown('test-agent', VALID_YAML);
-  assert.equal(first, second);
+  assert.throws(() => checkAgentDefinition('test-agent', badSkills), AgentDefinitionError);
 });
 
 test('a platform name in the source yaml is refused, not silently projected', () => {
   const withPlatformName = VALID_YAML.replace('A test agent.', 'A Claude-specific test agent.');
-  assert.throws(() => projectAgentMarkdown('test-agent', withPlatformName), AgentDefinitionError);
+  assert.throws(() => checkAgentDefinition('test-agent', withPlatformName), AgentDefinitionError);
 });
 
 test('each forbidden platform name (claude/codex/anthropic) is refused, case-insensitively', () => {
   for (const name of ['Claude', 'CODEX', 'anthropic']) {
     const withPlatformName = VALID_YAML.replace('Tester', `${name}-flavored tester`);
-    assert.throws(() => projectAgentMarkdown('test-agent', withPlatformName), AgentDefinitionError);
+    assert.throws(() => checkAgentDefinition('test-agent', withPlatformName), AgentDefinitionError);
   }
 });
 
 test('a missing required field is refused, not silently defaulted', () => {
   const missingRole = VALID_YAML.replace('role: Test Role\n', '');
-  assert.throws(() => projectAgentMarkdown('test-agent', missingRole), AgentDefinitionError);
+  assert.throws(() => checkAgentDefinition('test-agent', missingRole), AgentDefinitionError);
 });
 
 test('an empty tool-scope is refused -- an agent-type with no declared tools is a config error, not an implicit deny-all', () => {
   const emptyToolScope = VALID_YAML.replace('tool-scope:\n  - Read\n  - Grep\n  - Bash\n', 'tool-scope: []\n');
-  assert.throws(() => projectAgentMarkdown('test-agent', emptyToolScope), AgentDefinitionError);
+  assert.throws(() => checkAgentDefinition('test-agent', emptyToolScope), AgentDefinitionError);
 });
 
 test('an unrecognized rigor is refused rather than silently falling through to undefined', () => {
   const badRigor = VALID_YAML.replace('rigor: low', 'rigor: extreme');
-  assert.throws(() => projectAgentMarkdown('test-agent', badRigor), AgentDefinitionError);
+  assert.throws(() => checkAgentDefinition('test-agent', badRigor), AgentDefinitionError);
 });
 
 // --- readRunnerModels: real integration coverage (tsk-5tm, D9) -- this
@@ -215,16 +180,15 @@ test('an existing target without the generated stamp is refused by name and the 
   }
 });
 
-test('the real core personas project byte-identically, and a second run over its own output is accepted', () => {
+test('the real personas project through the start-context door as their golden agent files, and a second run over its own output is accepted', () => {
   const root = path.resolve(import.meta.dirname, '..', '..');
   const targetDir = path.join(mkTempDir(), 'out');
   try {
     const files = resolveAgentFiles(findAgentYamlFiles(root), root);
     projectAll(files, { repoRoot: root, targetDir });
-    for (const stem of ['council-assumptions', 'council-feedback-loops', 'council-ship-maintain', 'fgos-placeholder']) {
-      const source = path.join(root, 'core', 'agents', `${stem}.yaml`);
-      const expected = projectAgentMarkdown(stem, fs.readFileSync(source, 'utf8'), path.join('core', 'agents', `${stem}.yaml`));
-      assert.equal(fs.readFileSync(path.join(targetDir, `${stem}.md`), 'utf8'), expected, stem);
+    const goldens = path.join(root, 'packages', 'agent-start-context', 'goldens', 'agent-file');
+    for (const name of fs.readdirSync(goldens)) {
+      assert.equal(fs.readFileSync(path.join(targetDir, name), 'utf8'), fs.readFileSync(path.join(goldens, name), 'utf8'), name);
     }
     assert.doesNotThrow(() => projectAll(files, { repoRoot: root, targetDir }));
   } finally {

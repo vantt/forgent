@@ -15,7 +15,8 @@ use fgos_yaml_doc::guard::guard;
 use fgos_yaml_doc::merge::{merge, NoRules};
 use fgos_yaml_doc::path::{format_path, parse_path};
 use fgos_yaml_doc::{
-    emit, parse, prescan, rule, CommentLoss, Document, Profile, Refusal, Segment, Value,
+    emit, parse, prescan, rule, write_frontmatter, CommentLoss, Document, Profile, Refusal,
+    Segment, Value,
 };
 
 const MARKER: &str = "SECRET-VALUE-7731";
@@ -99,6 +100,7 @@ const SURFACE: &[(&str, Seal)] = &[
     ("document::span_of", Total),
     ("document::to_json", Guarded),
     ("edit::emit", Guarded),
+    ("edit::write_frontmatter", Guarded),
     ("edit::to_bytes", Total),
     ("edit::set", Guarded),
     ("edit::remove", Guarded),
@@ -419,6 +421,9 @@ fn edit_all(doc: &mut Document, refusals: &mut usize) {
     let value = doc.value().clone();
     note(merge(&[&value, &value], &NoRules).map(|_| ()));
     note(emit(&value, doc.profile(), "seal.yaml").map(|_| ()));
+    note(
+        write_frontmatter(vec![("meta".into(), value.clone())], "body\n", "seal.yaml").map(|_| ()),
+    );
     // What an edit left behind must still parse: the invariant the edit code checks itself.
     parse(&doc.to_bytes(), doc.profile(), "seal.yaml")
         .unwrap_or_else(|e| panic!("an edit left a document that does not parse: {e}"));

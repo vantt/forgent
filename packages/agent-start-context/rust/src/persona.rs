@@ -13,6 +13,12 @@ pub struct PersonaFields {
     pub must_escalate: Vec<String>,
     /// The `on_wake` text a head runs after its start ritual; empty for none.
     pub on_wake: String,
+    /// The definition's `role`, the heading of its agent file.
+    pub role: String,
+    /// The definition's `tool-scope`: the tools its agent file grants.
+    pub tools: Vec<String>,
+    /// The definition's path relative to its root, named in its agent file; empty for pinned text.
+    pub source: String,
 }
 
 /// What the host found for a persona name.
@@ -45,7 +51,11 @@ pub fn persona_section(persona: &str, lookup: &PersonaLookup) -> Vec<String> {
     if !fields.description.is_empty() {
         lines.push(format!("Description: {}", fields.description));
     }
-    for (value, label) in [(&fields.voice, "Voice"), (&fields.style, "Style"), (&fields.archetype, "Archetype")] {
+    for (value, label) in [
+        (&fields.voice, "Voice"),
+        (&fields.style, "Style"),
+        (&fields.archetype, "Archetype"),
+    ] {
         if !value.is_empty() {
             lines.push(format!("{label}: {value}"));
         }
@@ -55,7 +65,10 @@ pub fn persona_section(persona: &str, lookup: &PersonaLookup) -> Vec<String> {
     }
     lines.push(String::new());
     lines.push("## Decision Boundaries".into());
-    for (items, label) in [(&fields.can_decide, "Can decide:"), (&fields.must_escalate, "Must escalate:")] {
+    for (items, label) in [
+        (&fields.can_decide, "Can decide:"),
+        (&fields.must_escalate, "Must escalate:"),
+    ] {
         if !items.is_empty() {
             lines.push(label.into());
             lines.extend(items.iter().map(|item| format!("- {item}")));

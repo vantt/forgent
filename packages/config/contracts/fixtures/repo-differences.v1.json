@@ -493,6 +493,13 @@
   ],
   [
    "secretary"
+  ],
+  [
+   "runner",
+   "supervisorScope"
+  ],
+  [
+   "startContext"
   ]
  ]
 }

@@ -68,3 +68,15 @@ line in a unit is an ordinary rule edit that ACE's write-time check validates (A
 ## Rollback
 
 Revert the commit. The units lose their `when:` lines, and AGENTS.md carries every rule again.
+
+## Parked (2026-11-27, fg-server): owner question `q-uitfal4vok`
+
+Worker prompts get only the persona block from the composer, and no rules. `PromptPort` carries no worker facts,
+and ASC-D1 keeps it unchanged. So a rule cut from AGENTS.md here would no longer reach any worker. The question
+offers three ways on:
+- workers compose rules too (amends ASC-D1);
+- the rules workers need stay standing (recommended);
+- defer this phase.
+
+Phases 8 and 10 go on meanwhile.
+

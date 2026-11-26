@@ -140,3 +140,44 @@ fn the_door_refuses_a_value_the_live_source_does_not_allow_and_writes_no_record(
     assert!(records(&root).is_empty());
     let _ = fs::remove_dir_all(&root);
 }
+
+#[test]
+fn the_door_gives_a_rotation_successor_its_lineage_handoff_through_the_registered_contributor() {
+    let root = project("handoff");
+    fs::create_dir_all(root.join("core/agents")).unwrap();
+    fs::copy(
+        repo_root().join("core/agents/lead.yaml"),
+        root.join("core/agents/lead.yaml"),
+    )
+    .unwrap();
+    let lineage = root.join(".fgos/runtime/session-rotation/lead-alpha");
+    fs::create_dir_all(&lineage).unwrap();
+    fs::write(
+        lineage.join("261127-0500-abcd1234.md"),
+        "# Handoff\nwhere it stood\n",
+    )
+    .unwrap();
+    fs::write(
+        lineage.join("latest.json"),
+        "{\"file\":\"261127-0500-abcd1234.md\",\"session\":\"s\",\"rotate\":\"soft\",\"writtenAt\":\"2026-11-27T00:00:00.000Z\"}\n",
+    )
+    .unwrap();
+    let (code, answer) = compose(
+        &root,
+        &json!({
+            "facts": {"sessionType": "head", "persona": "lead", "project": "demo", "agentCli": "claude", "agentLifecycle": "rotate"},
+            "payloads": [{"kind": "session", "name": "alpha"}],
+            "delivery": "opening"
+        }),
+    );
+    assert_eq!(code, 0, "{answer}");
+    let handoff: Vec<&Value> = answer["result"]["blocks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|b| b["source"] == "contributor:rotation-handoff")
+        .collect();
+    assert_eq!(handoff.len(), 1, "{answer}");
+    assert_eq!(handoff[0]["text"], "# Handoff\nwhere it stood\n");
+    let _ = fs::remove_dir_all(&root);
+}

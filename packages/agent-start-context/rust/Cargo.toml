@@ -10,3 +10,5 @@ description = "Agent Start Context: the one composer of the text every fgOS-star
 fgos-agent-context-engine = { path = "../../agent-context-engine/rust", default-features = false }
 serde = { workspace = true }
 serde_json = { workspace = true }
+# The emitter of an agent file's frontmatter (pure: no I/O). The golden test also reads definitions with it.
+fgos-yaml-doc = { path = "../../yaml-doc/rust" }

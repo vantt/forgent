@@ -771,6 +771,9 @@
     - path: src/util/host-bin.mjs
       reason: per-file layer carried over from the manifest; the directory mixes layers
       layer: infra
+    - path: src/util/start-context.mjs
+      reason: a client of the host binary's start-context door, through host-bin
+      layer: infra
   owns:
     - pure foundation utilities
     - common path and text helpers

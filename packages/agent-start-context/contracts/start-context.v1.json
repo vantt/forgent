@@ -31,8 +31,8 @@
           },
           "source": {
             "type": "string",
-            "pattern": "^(rule|payload|contributor):[a-z0-9][a-z0-9-]*$",
-            "description": "rule:<rule id>, payload:<payload kind> or contributor:<contributor id>."
+            "pattern": "^(rule|payload|contributor|persona):[a-z0-9][a-z0-9-]*$",
+            "description": "rule:<rule id>, payload:<payload kind>, contributor:<contributor id> or persona:<persona id>."
           },
           "text": {
             "type": "string"

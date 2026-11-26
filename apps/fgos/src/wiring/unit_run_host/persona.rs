@@ -7,6 +7,7 @@
 //! under the running payload, then the core tier (the project's own when it carries that folder, the payload's
 //! otherwise). The tier folders are read by the agents listing's one reader. The first layer that holds the name wins; an unknown name names every directory searched.
 
+use fgos_agent_start_context::{PersonaFields, PersonaLookup};
 use std::path::{Path, PathBuf};
 
 use crate::wiring::agents::tiers_of;
@@ -273,7 +274,11 @@ pub fn check_agent_definition(name: &str, project: &Path, install: &Path) -> Res
 fn scalar_text(value: Option<&Value>) -> String {
     match value {
         Some(Value::String(s)) => s.trim().to_string(),
-        Some(Value::Number(n)) => n.to_string(),
+        // As JavaScript's String() prints it: a whole number has no fraction (`1e3` is `1000`).
+        Some(Value::Number(n)) => match n.as_f64() {
+            Some(f) if n.is_f64() && f.fract() == 0.0 && f.abs() < 1e15 => format!("{}", f as i64),
+            _ => n.to_string(),
+        },
         Some(Value::Bool(b)) => b.to_string(),
         _ => String::new(),
     }
@@ -303,97 +308,220 @@ fn failure_line(persona: &str, message: &str) -> String {
     }
 }
 
-/// `renderPersonaSection(personaRef, { pinnedText, projectRoot, installRoot })`
-/// (`src/runner/agent-definitions.mjs:295`): the persona section of a prompt, as lines. Pinned text wins over any
-/// file; a persona no layer defines renders as the bare section; a definition that cannot be read renders one
-/// visible failure line.
+/// What the host finds for a persona: pinned text wins over any file; a persona no layer defines is not found; a
+/// definition that cannot be read or rendered is one visible failure line. `domain` adds that domain's `agents/`
+/// layer. The fields are read the way the persona block and the agent file show them; both are rendered by the
+/// start-context composer.
+pub fn persona_lookup(
+    persona: &str,
+    pinned_text: Option<&str>,
+    project: &Path,
+    install: &Path,
+    domain: Option<&str>,
+) -> PersonaLookup {
+    let scope = domain.map(|d| json!({ "owningDomain": d }));
+    let (text, source) = match pinned_text {
+        Some(text) => (text.to_string(), String::new()),
+        None => match resolve_agent_definition(persona, project, install, scope.as_ref()) {
+            Ok(Lookup::Found(found)) => match found["text"].as_str() {
+                Some(text) => (
+                    text.to_string(),
+                    found["source"].as_str().unwrap_or_default().to_string(),
+                ),
+                None => return PersonaLookup::NotFound,
+            },
+            Ok(Lookup::NotFound(_)) => return PersonaLookup::NotFound,
+            Err(error) => return PersonaLookup::Failed(failure_line(persona, &error.message)),
+        },
+    };
+    let read = fgos_execution::agents::read_definition(text.as_bytes(), &format!("{persona}.yaml"));
+    if let Some(error) = &read.error {
+        return PersonaLookup::Failed(failure_line(persona, error));
+    }
+    let data = read.data.unwrap_or_default();
+    if let Some(problem) = fgos_execution::agents::non_text_values(&data)
+        .into_iter()
+        .next()
+    {
+        return PersonaLookup::Failed(format!(
+            "Persona \"{persona}\" cannot be rendered: {problem}"
+        ));
+    }
+    let data: serde_json::Map<String, Value> =
+        data.iter().map(|(k, v)| (k.clone(), v.to_json())).collect();
+    let section = |key: &str| data.get(key).filter(|v| v.is_object());
+    PersonaLookup::Found(PersonaFields {
+        description: scalar_text(data.get("description")),
+        voice: scalar_text(section("persona").and_then(|p| p.get("voice"))),
+        style: scalar_text(section("persona").and_then(|p| p.get("style"))),
+        archetype: scalar_text(section("persona").and_then(|p| p.get("archetype"))),
+        skills: text_list(data.get("skills")),
+        can_decide: text_list(section("decision_boundary").and_then(|b| b.get("can_decide"))),
+        must_escalate: text_list(section("decision_boundary").and_then(|b| b.get("must_escalate"))),
+        on_wake: scalar_text(data.get("on_wake")),
+        role: scalar_text(data.get("role")),
+        tools: text_list(data.get("tool-scope")),
+        source,
+    })
+}
+
+/// The persona section of a worker prompt, as lines, rendered by the start-context composer.
 pub fn persona_section(
     persona: &str,
     pinned_text: Option<&str>,
     project: &Path,
     install: &Path,
 ) -> Vec<String> {
-    let mut failure: Option<String> = None;
-    let mut content: Option<Value> = None;
-    let text = match pinned_text {
-        Some(text) => Some(text.to_string()),
-        None => match resolve_agent_definition(persona, project, install, None) {
-            Ok(Lookup::Found(found)) => found["text"].as_str().map(str::to_string),
-            Ok(Lookup::NotFound(_)) => None,
-            Err(error) => {
-                failure = Some(failure_line(persona, &error.message));
-                None
-            }
-        },
-    };
-    if let Some(text) = text {
-        let read =
-            fgos_execution::agents::read_definition(text.as_bytes(), &format!("{persona}.yaml"));
-        match &read.error {
-            Some(error) => failure = Some(failure_line(persona, error)),
-            None => {
-                let data = read.data.unwrap_or_default();
-                match fgos_execution::agents::non_text_values(&data)
-                    .into_iter()
-                    .next()
-                {
-                    Some(problem) => {
-                        failure = Some(format!(
-                            "Persona \"{persona}\" cannot be rendered: {problem}"
-                        ))
-                    }
-                    None => {
-                        content = Some(Value::Object(
-                            data.iter().map(|(k, v)| (k.clone(), v.to_json())).collect(),
-                        ))
-                    }
-                }
-            }
+    fgos_agent_start_context::persona_section(
+        persona,
+        &persona_lookup(persona, pinned_text, project, install, None),
+    )
+}
+
+#[cfg(test)]
+mod section_tests {
+    //! The persona block a head and a worker share: what the host finds and reads (`persona_lookup`) and what the
+    //! composer renders from it. The words of whole openings are owned by the composer's goldens.
+    use super::*;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    static N: AtomicUsize = AtomicUsize::new(0);
+
+    fn section(files: &[(&str, &str)], persona: &str, pinned: Option<&str>) -> String {
+        let root = std::env::temp_dir().join(format!(
+            "fgos-persona-{}-{}",
+            std::process::id(),
+            N.fetch_add(1, Ordering::SeqCst)
+        ));
+        let _ = std::fs::remove_dir_all(&root);
+        for (rel, text) in files {
+            let path = root.join(rel);
+            std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+            std::fs::write(path, text).unwrap();
+        }
+        std::fs::create_dir_all(&root).unwrap();
+        let out = persona_section(persona, pinned, &root, &root).join("\n");
+        let _ = std::fs::remove_dir_all(&root);
+        out
+    }
+
+    #[test]
+    fn a_persona_file_is_read_with_the_yaml_parser_block_scalars_in_full_comments_stripped_lists_rendered(
+    ) {
+        let text = "name: critic\ndescription: >\n  Blunt reviewer who\n  reads the whole diff.\npersona:\n  voice: plain # inline comment\n  archetype: 1e3\ndecision_boundary:\n  can_decide:\n    - wording\n  must_escalate: [scope, budget]\n";
+        let s = section(&[("core/agents/critic.yaml", text)], "critic", None);
+        assert!(
+            s.lines()
+                .any(|l| l == "Description: Blunt reviewer who reads the whole diff."),
+            "{s}"
+        );
+        assert!(s.lines().any(|l| l == "Voice: plain"), "{s}");
+        assert!(s.lines().any(|l| l == "Archetype: 1000"), "{s}");
+        assert!(
+            s.contains("Can decide:\n- wording\nMust escalate:\n- scope\n- budget"),
+            "{s}"
+        );
+    }
+
+    #[test]
+    fn a_persona_file_that_is_not_valid_yaml_renders_one_could_not_parse_line_and_no_half_read_fields(
+    ) {
+        let s = section(&[("core/agents/critic.yaml", "name: critic\ndescription: Blunt reviewer\npersona:\n  voice: direct: no hedging\n  style: short\n")], "critic", None);
+        assert!(
+            s.lines().any(
+                |l| l.starts_with("Persona \"critic\" could not be parsed: ")
+                    && l.contains("line 4")
+            ),
+            "{s}"
+        );
+        for field in ["Voice:", "Style:", "Description:", "Decision Boundaries"] {
+            assert!(!s.contains(field), "{s}");
         }
     }
-    let mut lines: Vec<String> = vec![
-        String::new(),
-        "# Persona".into(),
-        format!("You are acting under the resolved persona \"{persona}\". Let this persona"),
-        "shape tone, emphasis, and judgment calls for this assignment, without".into(),
-        "overriding the Role, Objective, or Constraints stated elsewhere in this prompt.".into(),
-    ];
-    if let Some(failure) = failure {
-        lines.push(failure);
+
+    #[test]
+    fn pinned_text_that_is_a_mapping_where_text_belongs_renders_one_visible_line() {
+        let pinned = "name: critic\ndescription: Blunt reviewer\npersona:\n  voice: calm\ndecision_boundary:\n  must_escalate:\n    - Escalate when: budget exceeded\n    - plain item\n";
+        let s = section(&[], "critic", Some(pinned));
+        assert!(s.lines().any(|l| l.starts_with("Persona \"critic\" cannot be rendered: decision_boundary.must_escalate[0] is a mapping")), "{s}");
+        assert!(
+            !s.contains("Voice:") && !s.contains("Must escalate:"),
+            "{s}"
+        );
     }
-    let Some(data) = content else {
-        return lines;
-    };
-    let section = |key: &str| data.get(key).filter(|v| v.is_object());
-    let description = scalar_text(data.get("description"));
-    if !description.is_empty() {
-        lines.push(format!("Description: {description}"));
+
+    #[test]
+    fn an_unpinned_persona_that_lives_only_in_the_workspace_tier_renders_its_text() {
+        let s = section(
+            &[(
+                "fgos/agents/critic.yaml",
+                "name: critic\ndescription: Workspace critic\npersona:\n  voice: calm\n",
+            )],
+            "critic",
+            None,
+        );
+        assert!(
+            s.lines().any(|l| l == "Description: Workspace critic"),
+            "{s}"
+        );
+        assert!(s.lines().any(|l| l == "Voice: calm"), "{s}");
     }
-    for (key, label) in [
-        ("voice", "Voice"),
-        ("style", "Style"),
-        ("archetype", "Archetype"),
-    ] {
-        let value = scalar_text(section("persona").and_then(|p| p.get(key)));
-        if !value.is_empty() {
-            lines.push(format!("{label}: {value}"));
-        }
+
+    #[test]
+    fn a_persona_that_names_a_model_taste_renders_one_failure_line() {
+        let s = section(
+            &[(
+                "core/agents/critic.yaml",
+                "name: critic\ndescription: Blunt\ntier: strong\n",
+            )],
+            "critic",
+            None,
+        );
+        assert!(
+            s.lines().any(|l| l.starts_with(
+                "Persona \"critic\" cannot be rendered: persona-model-taste-not-allowed: \"tier\""
+            )),
+            "{s}"
+        );
+        assert!(!s.lines().any(|l| l.starts_with("Description:")), "{s}");
     }
-    let skills = text_list(data.get("skills"));
-    if !skills.is_empty() {
-        lines.push(format!("Skills to load: {}", skills.join(", ")));
+
+    #[test]
+    fn a_persona_found_in_no_tier_keeps_the_bare_persona_section() {
+        let s = section(
+            &[("core/agents/other.yaml", "name: other\ndescription: x\n")],
+            "critic",
+            None,
+        );
+        assert!(s.lines().any(|l| l == "# Persona"), "{s}");
+        assert!(
+            !s.contains("could not be parsed")
+                && !s.contains("cannot be rendered")
+                && !s.contains("Description:"),
+            "{s}"
+        );
     }
-    lines.push(String::new());
-    lines.push("## Decision Boundaries".into());
-    for (key, label) in [
-        ("can_decide", "Can decide:"),
-        ("must_escalate", "Must escalate:"),
-    ] {
-        let items = text_list(section("decision_boundary").and_then(|b| b.get(key)));
-        if !items.is_empty() {
-            lines.push(label.into());
-            lines.extend(items.iter().map(|item| format!("- {item}")));
-        }
+
+    #[test]
+    fn a_persona_that_declares_skills_renders_one_skills_line_and_none_without() {
+        let with = section(
+            &[(
+                "core/agents/critic.yaml",
+                "name: critic\ndescription: x\nskills:\n  - fgos-secretary\n  - handoff\n",
+            )],
+            "critic",
+            None,
+        );
+        assert!(
+            with.lines()
+                .any(|l| l == "Skills to load: fgos-secretary, handoff"),
+            "{with}"
+        );
+        let without = section(
+            &[("core/agents/critic.yaml", "name: critic\ndescription: x\n")],
+            "critic",
+            None,
+        );
+        assert!(!without.contains("Skills to load"), "{without}");
     }
-    lines
 }

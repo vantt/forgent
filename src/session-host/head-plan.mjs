@@ -158,7 +158,13 @@ export async function planOfHead(projectRoot, persona, name, ports = {}) {
   }
   if (live.length === 0) throw new HeadPlanError('plan-not-found', `no plan that is not done or withdrawn starts with ${JSON.stringify(dirPrefix)} at the trunk tip`);
   if (live.length > 1) throw new HeadPlanError('plan-ambiguous', `${live.length} plans start with ${JSON.stringify(dirPrefix)}: ${live.map((p) => p.dir).join(', ')}`);
-  return { dir: live[0].dir, footprint: footprintOf(live[0].text, live[0].dir) };
+  const domain = domainOf(readFrontmatter(live[0].text, `plans/${live[0].dir}/plan.md`).meta);
+  return { dir: live[0].dir, footprint: footprintOf(live[0].text, live[0].dir), ...(domain ? { domain } : {}) };
+}
+
+/** The `domain` an item's frontmatter names, decided at intake; never guessed. */
+function domainOf(meta) {
+  return typeof meta?.domain === 'string' && meta.domain.trim() ? meta.domain.trim() : null;
 }
 
 // ---- the task of a head: a plan for a lead, a discussion for a planner or shaper ------------------------
@@ -184,7 +190,7 @@ function defaultListDiscussionDirs(projectRoot, root) {
  * The discussion a `planner-*` or `shaper-*` head belongs to: `{ kind: 'discussion', dir, path }`, the path relative to the
  * project. The name is the feature directory or a prefix of it, with the project handle prefix and `-` optional in front.
  * A directory spelled exactly wins over longer ones that merely start with it; none is `discussion-not-found`, more than
- * one `task-ambiguous`. `ports` (for a test): `handle`, `listDiscussionDirs(projectRoot, root) -> dir[]`.
+ * one `task-ambiguous`. `ports` (for a test): `handle`, `listDiscussionDirs(projectRoot, root) -> dir[]`, `readDiscussion(projectRoot, file) -> text | null`.
  */
 export function discussionOfHead(projectRoot, persona, name, ports = {}) {
   if (!DISCUSSION_PERSONAS.has(persona)) throw new HeadPlanError('discussion-not-found', `persona ${JSON.stringify(persona)} owns no discussion (planner and shaper do)`);
@@ -202,7 +208,14 @@ export function discussionOfHead(projectRoot, persona, name, ports = {}) {
   const hits = exact.length > 0 ? exact : found;
   if (hits.length === 0) throw new HeadPlanError('discussion-not-found', `no discussion directory starts with ${JSON.stringify(key)} under ${DISCUSSION_ROOT}`);
   if (hits.length > 1) throw new HeadPlanError('task-ambiguous', `${hits.length} discussions start with ${JSON.stringify(key)}: ${hits.map((h) => `${DISCUSSION_ROOT}/${h.dir}`).join(', ')}`);
-  return { kind: 'discussion', dir: hits[0].dir, path: `${DISCUSSION_ROOT}/${hits[0].dir}/${DISCUSSION_FILE}` };
+  const file = `${DISCUSSION_ROOT}/${hits[0].dir}/${DISCUSSION_FILE}`;
+  const text = (ports.readDiscussion ?? defaultReadDiscussion)(projectRoot, file);
+  const domain = text === null ? null : domainOf(readFrontmatter(text, file).meta);
+  return { kind: 'discussion', dir: hits[0].dir, path: file, ...(domain ? { domain } : {}) };
+}
+
+function defaultReadDiscussion(projectRoot, file) {
+  try { return fs.readFileSync(path.join(projectRoot, file), 'utf8'); } catch { return null; }
 }
 
 /**
@@ -213,7 +226,7 @@ export function discussionOfHead(projectRoot, persona, name, ports = {}) {
 export async function taskOfHead(projectRoot, persona, name, ports = {}) {
   if (persona === 'lead') {
     const plan = await (ports.planOfHead ?? planOfHead)(projectRoot, persona, name, ports);
-    return { kind: 'plan', dir: plan.dir, path: `${PLANS_DIR}/${plan.dir}/plan.md`, footprint: plan.footprint };
+    return { kind: 'plan', dir: plan.dir, path: `${PLANS_DIR}/${plan.dir}/plan.md`, footprint: plan.footprint, ...(plan.domain ? { domain: plan.domain } : {}) };
   }
   if (DISCUSSION_PERSONAS.has(persona)) return discussionOfHead(projectRoot, persona, name, ports);
   return null;

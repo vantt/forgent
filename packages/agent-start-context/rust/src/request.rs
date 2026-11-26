@@ -52,8 +52,13 @@ pub enum Payload {
     Assignment { text: String },
     /// A head's bound item.
     Task { path: String, item_kind: ItemKind },
-    /// The rotation handoff for a successor head.
-    Handoff { text: String },
+    /// The rotation handoff for a successor head: its path, its text, or both.
+    Handoff {
+        path: Option<String>,
+        text: Option<String>,
+    },
+    /// The head's own session name (`head:<persona>-<name>` is its role).
+    Session { name: String },
     /// The question a head continues.
     ForQuestion { question_id: String },
 }
@@ -64,6 +69,7 @@ impl Payload {
             Payload::Assignment { .. } => "assignment",
             Payload::Task { .. } => "task",
             Payload::Handoff { .. } => "handoff",
+            Payload::Session { .. } => "session",
             Payload::ForQuestion { .. } => "for-question",
         }
     }
@@ -72,7 +78,9 @@ impl Payload {
     /// words a head receives today (packages/agent-start-context/goldens/).
     pub fn text(&self) -> String {
         match self {
-            Payload::Assignment { text } | Payload::Handoff { text } => text.clone(),
+            Payload::Assignment { text } => text.clone(),
+            Payload::Handoff { text, .. } => text.clone().unwrap_or_default(),
+            Payload::Session { name } => format!("You are the long-lived head session \"{name}\"."),
             Payload::Task { path, .. } => format!("# Task\nYour task is {path}."),
             Payload::ForQuestion { question_id } => format!(
                 "You continue question {question_id}: write its answer back to its origin, then `fgos questions ack {question_id}` (or `cancel`)."
@@ -113,9 +121,18 @@ impl Payload {
                 })
             }
             "handoff" => {
-                only(&["kind", "text"])?;
-                Ok(Payload::Handoff {
-                    text: field("text")?,
+                only(&["kind", "path", "text"])?;
+                let path = field("path").ok();
+                let text = field("text").ok();
+                if path.is_none() && text.is_none() {
+                    return Err(invalid("payload handoff needs a path or a text"));
+                }
+                Ok(Payload::Handoff { path, text })
+            }
+            "session" => {
+                only(&["kind", "name"])?;
+                Ok(Payload::Session {
+                    name: field("name")?,
                 })
             }
             "task" => {
@@ -151,7 +168,7 @@ impl Payload {
                 Ok(Payload::ForQuestion { question_id })
             }
             other => Err(invalid(&format!(
-                "{other} is not a payload kind (assignment, task, handoff, for-question)"
+                "{other} is not a payload kind (assignment, task, handoff, session, for-question)"
             ))),
         }
     }

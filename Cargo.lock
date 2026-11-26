@@ -593,6 +593,7 @@ name = "fgos-agent-start-context"
 version = "0.2.0"
 dependencies = [
  "fgos-agent-context-engine",
+ "fgos-yaml-doc",
  "serde",
  "serde_json",
 ]
@@ -999,6 +1000,7 @@ name = "fgos-session-host"
 version = "0.2.0"
 dependencies = [
  "fgos-agent-protocol",
+ "fgos-agent-start-context",
  "fgos-host-runtime",
  "fgos-terminal-control",
  "fgos-yaml-doc",

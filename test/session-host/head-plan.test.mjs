@@ -108,7 +108,7 @@ test('an unbound discussion name is not found, a prefix of two is ambiguous, an 
   assert.equal(discussionOfHead(root, 'planner', 'fan', ports).dir, 'ds-cccccccccc-fan');
 });
 
-test('taskOfHead binds a lead to its plan, a planner to its discussion, and a secretary or supervisor to nothing', async (t) => {
+test('taskOfHead binds a lead to its plan, a planner to its discussion, and a secretary or supervisor to nothing; the item\'s domain comes along only when its frontmatter names one', async (t) => {
   const root = repoWith(t, { '261118-1045-p': ['running', ['src/a/**']] });
   fs.mkdirSync(path.join(root, 'plans', 'discussions', 'ds-aaaaaaaaaa-feat'), { recursive: true });
   fs.writeFileSync(path.join(root, 'plans', 'discussions', 'ds-aaaaaaaaaa-feat', 'DISCUSSION.md'), '# d\n');
@@ -118,4 +118,14 @@ test('taskOfHead binds a lead to its plan, a planner to its discussion, and a se
   assert.equal(await taskOfHead(root, 'secretary', 'miu', ports), null);
   assert.equal(await taskOfHead(root, 'supervisor', 'sv', ports), null);
   await assert.rejects(taskOfHead(root, 'lead', 'proj-999', ports), { code: 'plan-not-found' });
+
+  const withDomain = repoWith(t, { '261118-1200-q': ['running', ['src/q/**']] });
+  const planFile = path.join(withDomain, 'plans', '261118-1200-q', 'plan.md');
+  fs.writeFileSync(planFile, fs.readFileSync(planFile, 'utf8').replace('status: running\n', 'status: running\ndomain: coding\n'));
+  execFileSync('git', ['-C', withDomain, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qam', 'domain']);
+  assert.equal((await taskOfHead(withDomain, 'lead', 'proj-261118-1200', ports)).domain, 'coding');
+  fs.mkdirSync(path.join(withDomain, 'plans', 'discussions', 'ds-bbbbbbbbbb-topic'), { recursive: true });
+  fs.writeFileSync(path.join(withDomain, 'plans', 'discussions', 'ds-bbbbbbbbbb-topic', 'DISCUSSION.md'), '---\nid: ds-bbbbbbbbbb\ndomain: marketing\n---\n# d\n');
+  assert.equal((await taskOfHead(withDomain, 'shaper', 'topic', ports)).domain, 'marketing');
+  assert.equal('domain' in (await taskOfHead(root, 'planner', 'feat', ports)), false);
 });

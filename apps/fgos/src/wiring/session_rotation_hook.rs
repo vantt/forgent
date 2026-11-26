@@ -3,10 +3,11 @@
 //!
 //! The hook only measures, decides and asks. Identity moves roles and the rotation executor rotates; the hook
 //! reaches them through the head request socket of its own supervisor (`session answered` for a successor's first
-//! answer, `session rotate` for a full context). It does nothing unless `FGOS_HEAD_ROLE` is set (the role is never
+//! answer, `session rotate` for a full context). A head session is one with `FGOS_HEAD_ROLE` set (the role is never
 //! parsed: the persona and name come from `FGOS_HEAD_PERSONA` and `FGOS_HEAD_NAME`, declared by the session start
-//! door), never blocks, prints nothing to the conversation except the session start's one `additionalContext`
-//! object, and ends with status 0 on every path. A failure leaves one line on stderr, which Claude Code does not
+//! door). In any other session only the session start acts: it prints what the start-context composer selects for a
+//! session opened by hand. The hook never blocks, prints nothing to the conversation except the session start's one
+//! `additionalContext` object, and ends with status 0 on every path. A failure leaves one line on stderr, which Claude Code does not
 //! show the model. Files read: `packages/session-host/contracts/rotation-files.v1.json`.
 use super::mailbox_config::effective_config;
 use super::mailbox_identity::state_root;
@@ -16,7 +17,7 @@ use fgos_run_supervisor::head_client::{
 };
 use fgos_session_host::rotation::decide::{decide, AtRest, RotationConfig};
 use fgos_session_host::rotation::handoff::{
-    awaits_answer, lineage_dir, read_latest, rotation_id_of, session_start_context, CONTEXT_LIMIT,
+    awaits_answer, lineage_dir, read_latest, rotation_id_of,
 };
 use fgos_session_host::rotation::measure::{measure, Source, Sources, FRESH_WAIT};
 use serde_json::{json, Value};
@@ -331,43 +332,73 @@ fn answer(head: &Head, lineage: &Path, payload: &Value, ports: &Ports) -> Result
         .map_err(|e| StopError::from_client(e, "session answered"))
 }
 
-/// A session start: the latest handoff of the lineage as the one `additionalContext` object, or nothing.
+/// A session start: when a rotation waits for this session's first answer, the instruction to give it as the one
+/// `additionalContext` object; otherwise nothing. The handoff itself reaches the successor once, in its opening,
+/// through the start-context composer's handoff contributor.
 fn session_start(head: &Head, fgos_dir: &Path) -> Result<Option<String>, String> {
     let lineage = lineage_dir(fgos_dir, &head.persona, &head.name).map_err(|e| e.to_string())?;
-    let Some(latest) = read_latest(&lineage).map_err(|e| e.to_string())? else {
-        return Ok(None);
-    };
-    let mut context = session_start_context(&latest, fgos_dir.parent());
-    let should_append = match head.gen {
+    let awaiting = match head.gen {
         Some(gen) => awaits_answer(&lineage, gen).map_err(|e| e.to_string())?,
         None => false,
     };
-    if should_append {
-        let root = fgos_dir.parent().unwrap_or(Path::new(""));
-        let bin = project_shim_path(root);
-        let instruction = format!(
-            "A rotation is waiting for this session's first answer; right after the start ritual's one line, in this same turn, answer by running printf '%s' '{{\"last_assistant_message\":\"<that line, with no quote characters>\"}}' | \"{}\" hook session-rotation --event stop ; use the installed path, not the fgos shell function; role-gated verbs wait until the role moves.",
-            bin.display()
-        );
-        let sep = if context.is_empty() || context.ends_with("\n\n") {
-            ""
-        } else if context.ends_with('\n') {
-            "\n"
-        } else {
-            "\n\n"
-        };
-        let addition = format!("{sep}{instruction}");
-        if context.chars().count() + addition.chars().count() > CONTEXT_LIMIT {
-            let room = CONTEXT_LIMIT.saturating_sub(addition.chars().count());
-            let mut trimmed: String = context.chars().take(room).collect();
-            trimmed.push_str(&addition);
-            context = trimmed;
-        } else {
-            context.push_str(&addition);
-        }
+    if !awaiting {
+        return Ok(None);
+    }
+    let root = fgos_dir.parent().unwrap_or(Path::new(""));
+    let instruction = format!(
+        "A rotation is waiting for this session's first answer; right after the start ritual's one line, in this same turn, answer by running printf '%s' '{{\"last_assistant_message\":\"<that line, with no quote characters>\"}}' | \"{}\" hook session-rotation --event stop ; use the installed path, not the fgos shell function; role-gated verbs wait until the role moves.",
+        project_shim_path(root).display()
+    );
+    Ok(Some(
+        json!({ "hookSpecificOutput": { "hookEventName": "SessionStart", "additionalContext": instruction } })
+            .to_string(),
+    ))
+}
+
+/// A session opened by hand (no head identity): its start composed by the start-context composer as a hand-opened
+/// Claude session of the project, under the configured entry persona, as the one `additionalContext` object; nothing
+/// when no block is selected. A refusal or an unreadable config is an error for stderr; it never blocks the session.
+fn hand_opened_start(fgos_dir: &Path) -> Result<Option<String>, String> {
+    let root = fgos_dir
+        .parent()
+        .ok_or("the .fgos directory has no project")?;
+    let config = effective_config(fgos_dir).map_err(|e| e.detail())?;
+    let persona = config
+        .pointer("/startContext/entryPersona")
+        .and_then(Value::as_str)
+        .ok_or("startContext.entryPersona is not set")?;
+    let project = std::fs::read(fgos_dir.join("project.json"))
+        .ok()
+        .and_then(|bytes| serde_json::from_slice::<Value>(&bytes).ok())
+        .and_then(|v| v["handle"].as_str().map(str::to_owned))
+        .or_else(|| root.file_name().map(|n| n.to_string_lossy().into_owned()))
+        .ok_or("the project has no name")?;
+    let request = json!({
+        "facts": {"sessionType": "hand-opened", "agentCli": "claude", "project": project, "persona": persona},
+        "payloads": [],
+        "delivery": "hook-context"
+    });
+    let args: Vec<String> = ["compose", "--protocol", "1", "--root"]
+        .iter()
+        .map(|s| s.to_string())
+        .chain([root.to_string_lossy().into_owned()])
+        .collect();
+    let (_, answer) = super::start_context::run(&args, &request.to_string());
+    if let Some(refused) = answer.get("refusal").or_else(|| answer.get("error")) {
+        return Err(format!("the start context is refused: {refused}"));
+    }
+    let text = answer["result"]["blocks"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|b| b["text"].as_str())
+        .collect::<Vec<_>>()
+        .join("\n\n");
+    if text.is_empty() {
+        return Ok(None);
     }
     Ok(Some(
-        json!({ "hookSpecificOutput": { "hookEventName": "SessionStart", "additionalContext": context } })
+        json!({ "hookSpecificOutput": { "hookEventName": "SessionStart", "additionalContext": text } })
             .to_string(),
     ))
 }
@@ -670,15 +701,24 @@ fn run(args: &[OsString]) {
         }
         return;
     }
-    let Some(head) = head_from_env(&|key| std::env::var(key).ok()) else {
-        return;
-    };
+    let head = head_from_env(&|key| std::env::var(key).ok());
     let fail = |why: String| eprintln!("fgos hook session-rotation: {why}");
     let Ok(cwd) = std::env::current_dir() else {
         return;
     };
-    let Some(fgos_dir) = fgos_dir_of(std::env::var_os("CLAUDE_PROJECT_DIR").as_deref(), &cwd)
-    else {
+    let fgos_dir = fgos_dir_of(std::env::var_os("CLAUDE_PROJECT_DIR").as_deref(), &cwd);
+    let Some(head) = head else {
+        // A session opened by hand: no head identity, so it gets what the composer selects for its facts.
+        if let (Event::SessionStart, Some(fgos_dir)) = (event, fgos_dir) {
+            match hand_opened_start(&fgos_dir) {
+                Ok(Some(out)) => println!("{out}"),
+                Ok(None) => {}
+                Err(why) => fail(why),
+            }
+        }
+        return;
+    };
+    let Some(fgos_dir) = fgos_dir else {
         return fail("the project has no .fgos directory".into());
     };
     match event {
@@ -1030,84 +1070,40 @@ mod tests {
     }
 
     #[test]
-    fn the_session_start_prints_the_one_additional_context_object_of_the_latest_handoff_and_nothing_without_one(
-    ) {
-        let (fgos_dir, lineage) = fgos("start");
-        assert_eq!(session_start(&head(None), &fgos_dir).unwrap(), None);
-        std::fs::write(lineage.join("261118-1000-abc12345.md"), "handoff text\n").unwrap();
-        std::fs::write(
-            lineage.join("latest.json"),
-            r#"{"file":"261118-1000-abc12345.md"}"#,
-        )
-        .unwrap();
-        let out: Value =
-            serde_json::from_str(&session_start(&head(None), &fgos_dir).unwrap().unwrap()).unwrap();
-        assert_eq!(
-            out,
-            json!({ "hookSpecificOutput": { "hookEventName": "SessionStart", "additionalContext": "handoff text\n" } })
-        );
-    }
-
-    #[test]
-    fn session_start_appends_rotation_answer_instruction_when_awaiting_answer_and_leaves_context_unchanged_when_answered(
+    fn the_session_start_prints_only_the_answer_instruction_while_a_rotation_awaits_it_and_never_the_handoff(
     ) {
         let (fgos_dir, lineage) = fgos("start-instruction");
-        let project_root = fgos_dir.parent().unwrap();
-        let expected_bin = project_shim_path(project_root);
+        let expected_bin = project_shim_path(fgos_dir.parent().unwrap());
         assert!(expected_bin.is_absolute());
-
         std::fs::write(lineage.join("261118-1000-abc12345.md"), "handoff text\n").unwrap();
         std::fs::write(
             lineage.join("latest.json"),
             r#"{"file":"261118-1000-abc12345.md"}"#,
         )
         .unwrap();
+        assert_eq!(
+            session_start(&head(None), &fgos_dir).unwrap(),
+            None,
+            "no rotation generation"
+        );
         std::fs::write(
             lineage.join("rotation.json"),
             r#"{"id":"0123456789abcdef","gen":2}"#,
         )
         .unwrap();
-
         let head = head(Some(2));
         let out: Value =
             serde_json::from_str(&session_start(&head, &fgos_dir).unwrap().unwrap()).unwrap();
-        let context = out["hookSpecificOutput"]["additionalContext"]
-            .as_str()
-            .unwrap();
-
         let expected_instruction = format!(
             "A rotation is waiting for this session's first answer; right after the start ritual's one line, in this same turn, answer by running printf '%s' '{{\"last_assistant_message\":\"<that line, with no quote characters>\"}}' | \"{}\" hook session-rotation --event stop ; use the installed path, not the fgos shell function; role-gated verbs wait until the role moves.",
             expected_bin.display()
         );
-        assert!(
-            context.ends_with(&expected_instruction),
-            "context should end with instruction carrying absolute installed path: {context}"
+        assert_eq!(
+            out,
+            json!({ "hookSpecificOutput": { "hookEventName": "SessionStart", "additionalContext": expected_instruction } })
         );
-        assert!(context.starts_with("handoff text\n"));
-
-        // When answered.json exists for that generation, context is unchanged
         std::fs::write(lineage.join("answered.json"), r#"{"gen":2}"#).unwrap();
-        let out_answered: Value =
-            serde_json::from_str(&session_start(&head, &fgos_dir).unwrap().unwrap()).unwrap();
-        let context_answered = out_answered["hookSpecificOutput"]["additionalContext"]
-            .as_str()
-            .unwrap();
-        assert_eq!(context_answered, "handoff text\n");
-
-        // When handoff is long, instruction survives and context remains within CONTEXT_LIMIT
-        std::fs::remove_file(lineage.join("answered.json")).unwrap();
-        let huge_handoff = format!("# Handoff\n\n{}\n", "x".repeat(CONTEXT_LIMIT + 500));
-        std::fs::write(lineage.join("261118-1000-abc12345.md"), &huge_handoff).unwrap();
-        let out_long: Value =
-            serde_json::from_str(&session_start(&head, &fgos_dir).unwrap().unwrap()).unwrap();
-        let context_long = out_long["hookSpecificOutput"]["additionalContext"]
-            .as_str()
-            .unwrap();
-        assert!(
-            context_long.ends_with(&expected_instruction),
-            "instruction must survive when handoff is long"
-        );
-        assert!(context_long.chars().count() <= CONTEXT_LIMIT);
+        assert_eq!(session_start(&head, &fgos_dir).unwrap(), None, "answered");
     }
 
     #[test]
@@ -1351,5 +1347,12 @@ mod tests {
         let text = std::fs::read_to_string(&expected_sidecar).unwrap();
         let records: Vec<&str> = text.lines().filter(|l| !l.trim().is_empty()).collect();
         assert_eq!(records.len(), 1);
+    }
+
+    #[test]
+    fn a_session_opened_by_hand_is_composed_without_refusal_and_prints_nothing_when_no_rule_is_scoped_to_it(
+    ) {
+        let fgos_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../.fgos");
+        assert_eq!(hand_opened_start(&fgos_dir), Ok(None));
     }
 }

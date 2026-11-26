@@ -7,15 +7,20 @@
 //! the host wires.
 
 mod ace;
+mod agent_file;
 mod compose;
+mod head;
+mod persona;
 mod ports;
 mod request;
 
 pub use ace::{AceFacts, AceRules};
+pub use agent_file::agent_file;
 pub use compose::{compose, Block, DropReason, Dropped, StartContext, StartRecord};
+pub use persona::{persona_section, PersonaFields, PersonaLookup};
 pub use ports::{
-    Contributor, ContributorError, ContributorRow, FactRegistry, Ports, RecordSink, Rule, RuleSet,
-    ValueType,
+    registered_contributors, Contributor, ContributorError, ContributorRow, FactRegistry, Personas,
+    Ports, RecordSink, Rule, RuleSet, ValueType,
 };
 pub use request::{Delivery, ItemKind, Payload, Refusal, RefusalCode, StartKind, StartRequest};
 

@@ -1,6 +1,7 @@
 //! The four ports. Each has one adapter today, wired by the host; tests use their own under tests/.
 
 use crate::compose::StartRecord;
+use crate::persona::PersonaLookup;
 use std::collections::BTreeMap;
 use std::time::Duration;
 
@@ -61,6 +62,11 @@ pub trait Contributor {
     ) -> Result<Option<String>, ContributorError>;
 }
 
+/// The host's persona definitions: what it finds for a name (its agent-definition layers, pinned text first).
+pub trait Personas {
+    fn lookup(&self, persona: &str) -> PersonaLookup;
+}
+
 /// A contributor's registration (contracts/start-contributors.v1.json).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ContributorRow {
@@ -71,11 +77,48 @@ pub struct ContributorRow {
     pub timeout_ms: u64,
 }
 
+/// The registered contributors in registration order: the rows of `contracts/start-contributors.v1.json`, embedded
+/// at build time. A row that does not read is left out; the contract test fails on it.
+pub fn registered_contributors() -> Vec<ContributorRow> {
+    let doc: serde_json::Value =
+        serde_json::from_str(include_str!("../../contracts/start-contributors.v1.json"))
+            .unwrap_or_default();
+    doc["contributors"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(contributor_row)
+        .collect()
+}
+
+fn contributor_row(row: &serde_json::Value) -> Option<ContributorRow> {
+    let when = row["when"]
+        .as_object()?
+        .iter()
+        .map(|(key, values)| {
+            let values = values
+                .as_array()?
+                .iter()
+                .map(|v| v.as_str().map(str::to_owned));
+            Some((key.clone(), values.collect::<Option<Vec<_>>>()?))
+        })
+        .collect::<Option<BTreeMap<_, _>>>()?;
+    Some(ContributorRow {
+        id: row["id"].as_str()?.to_owned(),
+        when,
+        owner: row["owner"].as_str()?.to_owned(),
+        budget_bytes: usize::try_from(row["budgetBytes"].as_u64()?).ok()?,
+        timeout_ms: row["timeoutMs"].as_u64()?,
+    })
+}
+
 /// Everything compose reads, wired by the host.
 pub struct Ports<'a> {
     pub rules: &'a dyn RuleSet,
     pub facts: &'a dyn FactRegistry,
     pub record: &'a dyn RecordSink,
+    /// The persona definitions; a start with a `persona` fact and no port renders no persona block.
+    pub personas: Option<&'a dyn Personas>,
     /// Registered contributors in registration order.
     pub contributors: Vec<(ContributorRow, &'a dyn Contributor)>,
     /// The byte budget of the request's delivery; None for no budget.

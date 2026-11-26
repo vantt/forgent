@@ -1,5 +1,5 @@
 {
-  "base": "e9138e2deb2b28c38859621b2da6d801d3370fc2",
+  "base": "ecc52ee399172af4ac1baeb894b49fce92f77fc3",
   "cases": [
     {
       "id": "secretary-plain",
@@ -22,7 +22,8 @@
       "persona": "secretary",
       "name": "golden",
       "handoff": {
-        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md"
+        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md",
+        "text": "Rotation id: 0123456789abcdef\n\n# Handoff\n\nState as the previous session left it: the golden fixture of a rotation successor's handoff."
       }
     },
     {
@@ -53,7 +54,8 @@
       "persona": "supervisor",
       "name": "golden",
       "handoff": {
-        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md"
+        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md",
+        "text": "Rotation id: 0123456789abcdef\n\n# Handoff\n\nState as the previous session left it: the golden fixture of a rotation successor's handoff."
       }
     },
     {
@@ -79,12 +81,23 @@
       }
     },
     {
+      "id": "shaper-task-coding",
+      "delivery": "opening",
+      "persona": "shaper",
+      "name": "golden",
+      "task": {
+        "path": "plans/261122-1946-agent-start-context/plan.md"
+      },
+      "domain": "coding"
+    },
+    {
       "id": "shaper-handoff",
       "delivery": "opening",
       "persona": "shaper",
       "name": "golden",
       "handoff": {
-        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md"
+        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md",
+        "text": "Rotation id: 0123456789abcdef\n\n# Handoff\n\nState as the previous session left it: the golden fixture of a rotation successor's handoff."
       }
     },
     {
@@ -115,7 +128,8 @@
       "persona": "planner",
       "name": "golden",
       "handoff": {
-        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md"
+        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md",
+        "text": "Rotation id: 0123456789abcdef\n\n# Handoff\n\nState as the previous session left it: the golden fixture of a rotation successor's handoff."
       }
     },
     {
@@ -146,7 +160,8 @@
       "persona": "lead",
       "name": "golden",
       "handoff": {
-        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md"
+        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md",
+        "text": "Rotation id: 0123456789abcdef\n\n# Handoff\n\nState as the previous session left it: the golden fixture of a rotation successor's handoff."
       }
     },
     {
