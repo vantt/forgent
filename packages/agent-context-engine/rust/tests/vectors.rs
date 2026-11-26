@@ -5,7 +5,9 @@ use std::collections::BTreeSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use fgos_agent_context_engine::check::{check, OwnerList};
+use fgos_agent_context_engine::check::{
+    check, check_nearest, NearestHit, NearestRules, OwnerList, SearchUnavailable,
+};
 use fgos_agent_context_engine::refusal::{Refusal, RefusalCode};
 use fgos_agent_context_engine::rule::{Lifecycle, RuleFile};
 use fgos_agent_context_engine::set::{digest_of, EffectiveSet};
@@ -106,6 +108,41 @@ fn refusals_of(vector: &Value) -> Vec<Refusal> {
     }
 }
 
+/// The search port answering what the vector's `nearest` says: hits with scores, or that the search cannot run.
+struct VectorSearch(Value);
+
+impl NearestRules for VectorSearch {
+    fn nearest(&self, _: &RuleFile) -> Result<Vec<NearestHit>, SearchUnavailable> {
+        if let Some(why) = self.0.get("unavailable").and_then(Value::as_str) {
+            return Err(SearchUnavailable(why.to_string()));
+        }
+        Ok(self.0["hits"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|h| NearestHit {
+                id: h["id"].as_str().unwrap().to_string(),
+                score: h["score"].as_f64().unwrap() as f32,
+            })
+            .collect())
+    }
+}
+
+/// The refusals of the nearest-rule check of the vector's own unit, the first of its corpus.
+fn nearest_refusals_of(vector: &Value) -> Vec<Refusal> {
+    let corpus = corpus_of(vector).expect("the vector reads");
+    let search = VectorSearch(vector["nearest"].clone());
+    let threshold = vector["nearest"]["threshold"].as_f64().unwrap() as f32;
+    check_nearest(
+        &[&corpus[0]],
+        &corpus,
+        &in_force(&corpus),
+        threshold,
+        &search,
+    )
+    .refusals
+}
+
 #[test]
 fn the_refusal_codes_categories_and_phases_are_those_of_the_contract() {
     let doc = json(&contracts().join("refusals.v1.json"));
@@ -172,15 +209,9 @@ fn every_refusal_of_the_contract_has_a_vector_that_raises_it() {
                 expected,
                 "{name}"
             );
-        } else if v.get("deferred").is_some() {
-            // The write-time nearest-rule search is not part of this crate's check; the vector only names the code.
-            assert!(
-                matches!(
-                    expected,
-                    RefusalCode::NearDuplicate | RefusalCode::SearchUnavailable
-                ),
-                "{name}"
-            );
+        } else if v.get("nearest").is_some() {
+            let found: Vec<RefusalCode> = nearest_refusals_of(&v).iter().map(|r| r.code).collect();
+            assert_eq!(found, [expected], "{name}");
         } else {
             let found: Vec<RefusalCode> = refusals_of(&v).iter().map(|r| r.code).collect();
             assert!(found.contains(&expected), "{name}: raised {found:?}");

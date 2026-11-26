@@ -5,6 +5,7 @@
 
 use std::fs;
 use std::io::Write;
+use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -69,8 +70,15 @@ fn temp_project() -> PathBuf {
 
 /// One door call: the exit code and the answer line behind the prefix.
 fn door(op: &str, request: &Value) -> (i32, Value) {
+    door_with(op, &[], &[], request)
+}
+
+/// A door call with more arguments and environment variables.
+fn door_with(op: &str, extra: &[&str], env: &[(&str, &Path)], request: &Value) -> (i32, Value) {
     let mut child = Command::new(env!("CARGO_BIN_EXE_fgos"))
         .args(["internal", "context-engine", op, "--protocol", "1"])
+        .args(extra)
+        .envs(env.iter().copied())
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -154,5 +162,55 @@ fn a_protocol_other_than_one_and_an_unknown_op_are_refused_by_name() {
     assert_eq!(out.status.code(), Some(3));
     let (code, answer) = door("nonsense", &request(&project));
     assert_eq!(code, 2);
+    assert_eq!(answer["error"]["code"], json!("usage"));
+}
+
+#[test]
+fn check_with_paths_searches_those_units_and_is_refused_by_name_without_the_embedding_model() {
+    let project = temp_project();
+    let mut vector = vector("valid-unit.json");
+    write_unit(&project, &vector, "core/instructions/example-rule.md");
+    vector["unit"]["id"] = json!("example-rule-copy");
+    write_unit(&project, &vector, "core/instructions/example-rule-copy.md");
+    // A machine state folder with no model in it, so the answer does not depend on the machine running the test.
+    let state = project.join("machine-state");
+    fs::create_dir_all(&state).unwrap();
+    fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+    let env = [("FGOS_STATE_HOME", state.as_path())];
+
+    let (code, answer) = door_with(
+        "check",
+        &["--paths", "core/instructions/example-rule-copy.md"],
+        &env,
+        &request(&project),
+    );
+
+    assert_eq!(code, 1, "{answer}");
+    let refusals = answer["result"]["refusals"].as_array().unwrap();
+    assert_eq!(refusals.len(), 1, "{answer}");
+    assert_eq!(refusals[0]["code"], json!("rule-search-unavailable"));
+    assert!(
+        refusals[0]["message"]
+            .as_str()
+            .unwrap()
+            .contains("doc-locate-model-fetch"),
+        "{answer}"
+    );
+
+    // An empty list names no unit: only the structural check runs, and it needs no model.
+    let (code, answer) = door_with("check", &["--paths", ""], &env, &request(&project));
+    assert_eq!(code, 0, "{answer}");
+    assert_eq!(answer["result"]["advisories"], json!([]));
+
+    // compile never searches.
+    let (code, answer) = door_with("compile", &[], &env, &request(&project));
+    assert_eq!(code, 0, "{answer}");
+}
+
+#[test]
+fn paths_belongs_to_check_only() {
+    let project = temp_project();
+    let (code, answer) = door_with("compile", &["--paths", "x"], &[], &request(&project));
+    assert_eq!(code, 2, "{answer}");
     assert_eq!(answer["error"]["code"], json!("usage"));
 }

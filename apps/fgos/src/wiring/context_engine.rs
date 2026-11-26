@@ -8,10 +8,16 @@
 //!
 //! Ops:
 //!
-//! * `check`: reads the three rule roots, indexes them in pkm and checks them. Result `{ ok, refusals, rules }`;
-//!   exit 1 when `ok` is false.
-//! * `compile`: `check`, and when it is clean, writes the compiled set to `.fgos/instructions/effective/rules.json`.
-//!   Result `{ ok, refusals, rules, digest?, path? }`; exit 1, and nothing written, when `ok` is false.
+//! * `check [--paths <unit paths>]`: reads the three rule roots, indexes them in pkm and checks them, then asks pkm's
+//!   semantic search for the rule nearest to each unit (`rule-near-duplicate`, or `rule-search-unavailable` without
+//!   the embedding model; never skipped). `--paths` names the units to search, repository paths separated by
+//!   newlines, as one value (the flag parser takes one value per flag; an empty value names none): the pre-commit
+//!   hook passes the staged units. Without it every unit is searched. Result `{ ok, refusals, advisories, rules }`,
+//!   where `advisories` are candidates below the refusal threshold and never fail the check; exit 1 when `ok` is
+//!   false.
+//! * `compile`: the structural check (no semantic search, so no model), and when it is clean, writes the compiled
+//!   set to `.fgos/instructions/effective/rules.json`. Result `{ ok, refusals, rules, digest?, path? }`; exit 1, and
+//!   nothing written, when `ok` is false.
 //!
 //! The pkm index at `.fgos/runtime/context-engine/rules.db` is a view of the unit files and is rebuilt when stale.
 
@@ -22,8 +28,11 @@ use std::ffi::OsString;
 use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
 
+use fgos_agent_context_engine::check::Advisory;
 use fgos_agent_context_engine::refusal::Refusal;
-use fgos_agent_context_engine::store::{check_repository, compile_repository, StorePaths};
+use fgos_agent_context_engine::store::{
+    check_repository, compile_repository, EmbedderChoice, Nearest, SearchPaths, StorePaths,
+};
 use fgos_host_runtime::civil_time::format_system_time_utc;
 use fgos_host_runtime::cli_args::{parse_args, FlagScalar, FlagValue};
 use serde_json::{json, Value};
@@ -52,6 +61,7 @@ const PROFILE: &str = "packages/agent-context-engine/pkm/profile.yaml";
 const COMPILED: &str = "instructions/effective";
 const COMPILED_FILE: &str = "rules.json";
 const INDEX: &str = "runtime/context-engine/rules.db";
+const SEARCH_INDEX: &str = "runtime/context-engine/search.db";
 
 /// Run the route with the args after `context-engine`; returns the exit code.
 pub fn main(args: &[String]) -> i32 {
@@ -82,7 +92,11 @@ pub fn run(args: &[String], mut input: Box<dyn BufRead>) -> (i32, Value) {
             EXIT_USAGE,
         );
     }
-    if let Some((name, _)) = parsed.flags.iter().find(|(name, _)| name != "protocol") {
+    if let Some((name, _)) = parsed
+        .flags
+        .iter()
+        .find(|(name, _)| name != "protocol" && !(name == "paths" && op == "check"))
+    {
         return error(
             op,
             "usage",
@@ -90,6 +104,24 @@ pub fn run(args: &[String], mut input: Box<dyn BufRead>) -> (i32, Value) {
             EXIT_USAGE,
         );
     }
+    let paths = match parsed.flag("paths") {
+        None => None,
+        Some(FlagValue::One(FlagScalar::Str(list))) => Some(
+            list.lines()
+                .map(str::trim)
+                .filter(|path| !path.is_empty())
+                .map(str::to_string)
+                .collect::<Vec<_>>(),
+        ),
+        Some(_) => {
+            return error(
+                op,
+                "usage",
+                "--paths needs a value: unit paths separated by newlines",
+                EXIT_USAGE,
+            )
+        }
+    };
     let protocol = match parsed.flag("protocol") {
         None => None,
         Some(FlagValue::One(FlagScalar::Str(value))) => Some(value.as_str()),
@@ -123,7 +155,7 @@ pub fn run(args: &[String], mut input: Box<dyn BufRead>) -> (i32, Value) {
         Ok(read) => read,
         Err(message) => return invalid(op, &message),
     };
-    match judge(op == "compile", &root, &as_of) {
+    match judge(op == "compile", &root, &as_of, paths.as_deref()) {
         Ok(result) => {
             let ok = result["ok"] == json!(true);
             (
@@ -209,7 +241,8 @@ fn profile_of(root: &Path) -> Result<PathBuf, String> {
 }
 
 /// Checks the project's rule units and, when `write` is set and the check is clean, writes the compiled set.
-fn judge(write: bool, root: &Path, as_of: &str) -> Result<Value, String> {
+/// `units` are the paths the nearest-rule search looks at; `None` is every unit.
+fn judge(write: bool, root: &Path, as_of: &str, units: Option<&[String]>) -> Result<Value, String> {
     let root = std::fs::canonicalize(root).map_err(|error| {
         format!(
             "{}: the project root cannot be read: {error}",
@@ -228,12 +261,24 @@ fn judge(write: bool, root: &Path, as_of: &str) -> Result<Value, String> {
         repo_root: root.clone(),
         graph_db: index,
         profile: profile_of(&root)?,
+        search: SearchPaths {
+            db: fgos.join(SEARCH_INDEX),
+            model_dir: fgos_distribution::store::machine_model_root(),
+            embedder: EmbedderChoice::Model,
+        },
     };
     if !write {
-        return Ok(match check_repository(&paths, as_of, &owners, &live) {
-            Ok((corpus, _, refusals)) => report(&refusals, corpus.len(), None),
-            Err(refusals) => report(&refusals, 0, None),
-        });
+        let scope = units.map_or(Nearest::All, Nearest::Units);
+        return Ok(
+            match check_repository(&paths, as_of, &owners, &live, scope) {
+                Ok(checked) => {
+                    let mut result = report(&checked.refusals, checked.corpus.len(), None);
+                    result["advisories"] = advisories_json(&checked.advisories);
+                    result
+                }
+                Err(refusals) => report(&refusals, 0, None),
+            },
+        );
     }
     match compile_repository(&paths, as_of, &owners, &live) {
         Err(refusals) => Ok(report(&refusals, 0, None)),
@@ -255,6 +300,22 @@ fn judge(write: bool, root: &Path, as_of: &str) -> Result<Value, String> {
             ))
         }
     }
+}
+
+fn advisories_json(advisories: &[Advisory]) -> Value {
+    Value::Array(
+        advisories
+            .iter()
+            .map(|a| {
+                json!({
+                    "id": a.id,
+                    "source": a.source,
+                    "nearest": a.nearest,
+                    "score": (f64::from(a.score) * 1000.0).round() / 1000.0,
+                })
+            })
+            .collect(),
+    )
 }
 
 fn report(refusals: &[Refusal], rules: usize, written: Option<(&str, &Path)>) -> Value {

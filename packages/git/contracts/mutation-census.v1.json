@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "4c9ae0158a3ae2a82e0322196ce23085ee0d566ff207b6cefb6d288a0214ee18",
+  "payloadDigest": "7cb04d4879687c1a07cdbfc8dfa841c45ed1966734bf1f5848f38ae7cd1a5458",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "dc14ff69bc4b144893fa6988de4df6b6180ab255ef8751fd1615ad93472b9e71",
     ".agents/skills/_shared/capability-matching.md": "93cd382994e2201e4aa8ec7816d740f6da634a0ee69d6911800a848ed5de1d8b",
@@ -73,7 +73,7 @@
     ".agents/skills/instruction-audit/references/lane-prompts.md": "adac8362adbb7eb04c163fbcf3cdb16aa566e61a6f4a6a9351c07d4fc4d08d52",
     ".agents/skills/instruction-audit/references/report-template.md": "9d3b7abfd876d88e8a6a7e1820ea6a2aaf02472a75a69603921344fa0db699d6",
     ".agents/skills/instruction-audit/scripts/instruction-audit.mjs": "d634de90f1b9835d00d13c059c2a439c18b4aa6fbd3a97fcc4763435845df490",
-    ".githooks/pre-commit": "c749424d68535cd1239d7f9b9e8a0ead70b203e31548ab390ed7f6d4cb13689b",
+    ".githooks/pre-commit": "f259171ed2cc535353bad0e78330710866ea23f2afabc06b007280db4b822246",
     "apps/fgctl/build.rs": "316b3d73c7472689532b7ffc164b15fe73f097e1c3e5f53545bc6283ac1c8183",
     "apps/fgctl/src/help.rs": "0db8f6f2eb8f0f4be4fd86f92bfa011eaf866704f6f75a264094e58da48f97fd",
     "apps/fgctl/src/main.rs": "fd34140a0bfb75f15f617ca4dad811bc49136970f7b15cd4f6b608e9fb759921",
@@ -102,7 +102,7 @@
     "apps/fgos/src/wiring/agents.rs": "d40cd43facea6c5d1e5a7b3363b8e69567f3ad7aa33b628eb269c935a88f06e4",
     "apps/fgos/src/wiring/attempt_step.rs": "5dade9079e7e99ca3f9bc2cf18d226583f96be2bf6cc590398ac93fded4b141f",
     "apps/fgos/src/wiring/authority.rs": "fe78cca0f4e455a4a3d32c9024f6b35fa67cb4f392b9cc774c70226aeb8ba679",
-    "apps/fgos/src/wiring/context_engine.rs": "0cf054ba474d640e4a73e26ad96b976006701157f5e4912bcd0cec1ec3c369c5",
+    "apps/fgos/src/wiring/context_engine.rs": "f44d8118b440e9794019186aa91927116475dd9477b7172605bf14cc5127e7fa",
     "apps/fgos/src/wiring/context_engine/owners.rs": "970a69ee25e8c343c929a930e0e45d71a7e4d71b32efb2356e79d3ddc6d5cd4f",
     "apps/fgos/src/wiring/context_engine/values.rs": "30e8ac17a731ee7e93fc50791ec59d70ec011d9fbed5ab34e14f0acf60245ad7",
     "apps/fgos/src/wiring/dispatch_decide.rs": "ec4cb3297b19bf0bc17e23a8c81b8a3a08bc12938ad3290ac58e42ceba8023d8",
@@ -202,7 +202,7 @@
     "apps/fgos/tests/attention_definitions.rs": "81db902eb0d8bf5515f7574bcf4b13f61db680dc0d569f4db55b4271e4df9a54",
     "apps/fgos/tests/authority.rs": "00cbf011cb50775ca81a79a7fc82bf900547acab89c95149d947387c5f5e915a",
     "apps/fgos/tests/cli_tests.rs": "8b7c32078e828bb11e095e98b62bd65ecef6d4590e1ce6d8b1ec8eb5240ef988",
-    "apps/fgos/tests/context_engine.rs": "d2901a12c435a5e88b8ca7926a783bfb96b0eca3b4965b61546e4b4aea5b79f4",
+    "apps/fgos/tests/context_engine.rs": "92d4941d9b51765adb27dc13aa115938dfb67eb4d29b28a621198f1694ae9e7e",
     "apps/fgos/tests/doc_locate.rs": "96f6b44203e68a196cddac862580f335317265d316b111625c9736e8dbdeacc1",
     "apps/fgos/tests/driving_definitions.rs": "fa31e9456150a2e8038d54916be5b2373b434cb3521a2d97afb02219815c20a5",
     "apps/fgos/tests/git_recover_confirm_dead.rs": "baecaec991cbaa1833c279f0f1ed6f1e17423c2198eea6e171285f14f51662c6",
@@ -307,22 +307,22 @@
     "herdr-dashboard/src/ports.rs": "db6dfc823d3697b6f35fd8632fba6ea0b8c5e256d4bdd38487fa87a935faa179",
     "herdr-dashboard/src/ui.rs": "c112cef4793c0be65d8e48143e8575df8954436c972f7f3aec185cf222460b64",
     "herdr-dashboard/tests/render_smoke.rs": "068febb6148d9a441f9cd98cc7983b403a0232942866d932efb1336aec6c5d6b",
-    "packages/agent-context-engine/rust/src/check.rs": "d7aeda646dde0cb7ddd8ba0182b028fbcc60a9813d8aa3c573ca73be8c626172",
+    "packages/agent-context-engine/rust/src/check.rs": "8ff866e96dde1b7d26bb5cac3b931c6a3cb089109bb0d8426fff4a6c251b2d23",
     "packages/agent-context-engine/rust/src/compose.rs": "eeea9d3fcf4cb114d78976d4de533d00fee67be99fc70c18a9f89af89fe7f732",
     "packages/agent-context-engine/rust/src/lib.rs": "e3876222d7fcc8fc33088ca463da14ab26ea03377b3ddb0009ac43d5f7a46cf5",
     "packages/agent-context-engine/rust/src/refusal.rs": "fbd04031b8c42a717046c63f68763e739791aa605798b2ca4185649797dde938",
-    "packages/agent-context-engine/rust/src/rule.rs": "b375d3302d342286cc7e49675fae75b74954056ffe2b86a5a9135ce57bc58a0f",
+    "packages/agent-context-engine/rust/src/rule.rs": "ee0f0bf018cf657b0d10cd3114839983abbf8c10deeddfdb2c7e0ce3eb63b1ca",
     "packages/agent-context-engine/rust/src/set.rs": "22cd0b57510c458cc1cbdf4cb7d12cba73076b78998ea7d8ea28247852ed52fb",
-    "packages/agent-context-engine/rust/src/store.rs": "679b54effe835a420de49616312a429f1d48d9dda4e97fbb36e40a57ee744274",
+    "packages/agent-context-engine/rust/src/store.rs": "e9d8e045453a86859d1b01f553683af640a55c75e33ae5f3406b74479cb61e21",
     "packages/agent-context-engine/rust/src/when_keys.rs": "fb7ecd3f5b8ec0c1ffd34aa3217c591a21cc9cfba71276c56c8f411c3b61bf22",
-    "packages/agent-context-engine/rust/tests/check.rs": "0045fb1ab495f82c314601f4f013a2b75dd535a37af664949d05f213b8e1d8df",
-    "packages/agent-context-engine/rust/tests/common/mod.rs": "da6529783a28c6921dd8b8622f92589405e2c2da2ab87d4f87ab8da84fa4b883",
+    "packages/agent-context-engine/rust/tests/check.rs": "80213a88b1ba1e0f390a79eae06211bb13411292c01f48a8341deddf1e2fc78c",
+    "packages/agent-context-engine/rust/tests/common/mod.rs": "84d1b7d619deabbd6c9575b1b29e90c5b9547050f13aff97c2068e55ce9cc8d2",
     "packages/agent-context-engine/rust/tests/compose.rs": "d6ad2d4d94431fea5c95e8c1f523977cf9126c99c32181899680831c9063b356",
-    "packages/agent-context-engine/rust/tests/repository_units.rs": "a9722094247757e3084402474467a55980b8b6607d410ec5edcadab711a2af89",
-    "packages/agent-context-engine/rust/tests/rule_unit.rs": "7c49fd659eb7d92b10f14600bf39006bda02f6de15df7fefd3d64b352e2ea079",
+    "packages/agent-context-engine/rust/tests/repository_units.rs": "30c3da5a7b9141d649fd4f9e6cdfd2875de3be348e20ee246ffc9591dbaf8160",
+    "packages/agent-context-engine/rust/tests/rule_unit.rs": "69729dfd4c0aaff218d9b9ad20fec5222dfb1eaa895395a832d79a011cbd2bff",
     "packages/agent-context-engine/rust/tests/set.rs": "a743072349ad5db947c054835f250011c06d368ad891faa95c0df4ef4b69ba24",
-    "packages/agent-context-engine/rust/tests/store.rs": "4a94b9b14d3c608ba5e3c8ae4babb31c821a9fd1d213019a35239449d18564be",
-    "packages/agent-context-engine/rust/tests/vectors.rs": "534f2e5c8a05bd528ce8b8f55247d8cf270ab29e5ad967929974140949c3a24b",
+    "packages/agent-context-engine/rust/tests/store.rs": "8e34b6eeb48cbc7e762c15cc7b7eb2ece0b27219775af28725a1389425a98bfe",
+    "packages/agent-context-engine/rust/tests/vectors.rs": "3208ed84d44ea0b1f47c0c34a00545a418ad4324cae1c3841dc9b32afec7b558",
     "packages/agent-protocol/rust/src/direct/mod.rs": "61da681e846eabbee4794b24e9103f527ac6bcc0a25d01335c87ecb34753f37f",
     "packages/agent-protocol/rust/src/lib.rs": "dd9d8764d9af4b9a503c2f1c5768b5b32829062d060767a64d19fff9faa21077",
     "packages/agent-protocol/rust/src/outcome.rs": "65ce7057bb4e1670a1db4891a8d1a5a131424b3bbbcafe2f595f04069853ec93",
@@ -1830,7 +1830,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:658"
+        ".githooks/pre-commit:724"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1890,7 +1890,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:666"
+        ".githooks/pre-commit:732"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1904,7 +1904,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:666"
+        ".githooks/pre-commit:732"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1918,7 +1918,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:705"
+        ".githooks/pre-commit:777"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1932,7 +1932,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:705"
+        ".githooks/pre-commit:777"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1946,7 +1946,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:705"
+        ".githooks/pre-commit:777"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2002,7 +2002,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:645"
+        ".githooks/pre-commit:711"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2016,7 +2016,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:651"
+        ".githooks/pre-commit:717"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2030,7 +2030,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:651"
+        ".githooks/pre-commit:717"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2044,7 +2044,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:651"
+        ".githooks/pre-commit:717"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2058,7 +2058,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:651"
+        ".githooks/pre-commit:717"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2118,7 +2118,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:686"
+        ".githooks/pre-commit:752"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2182,7 +2182,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:692"
+        ".githooks/pre-commit:758"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2191,12 +2191,33 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 649,
+      "line": 661,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:770"
+        ".githooks/pre-commit:764"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "diff"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 683,
+      "spawn": "hostStdout -> .githooks/pre-commit:115",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 715,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:842"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2205,14 +2226,14 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 713,
+      "line": 785,
       "spawn": "mainLockVerdict -> .githooks/pre-commit:172",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 740,
+      "line": 812,
       "spawn": "identityData -> .githooks/pre-commit:121",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

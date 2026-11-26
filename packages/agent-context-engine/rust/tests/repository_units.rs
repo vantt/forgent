@@ -4,7 +4,9 @@
 use std::path::Path;
 
 use fgos_agent_context_engine::check::OwnerList;
-use fgos_agent_context_engine::store::{check_repository, read_corpus, StorePaths};
+use fgos_agent_context_engine::store::{
+    check_repository, read_corpus, EmbedderChoice, Nearest, SearchPaths, StorePaths,
+};
 use fgos_agent_context_engine::when_keys::NoLiveValues;
 use tempfile::TempDir;
 
@@ -53,9 +55,14 @@ fn the_repositorys_own_rule_units_pass_every_check_of_the_crate_and_compose_with
         repo_root: root.clone(),
         graph_db: db_dir.path().join("rules.db"),
         profile: Path::new(env!("CARGO_MANIFEST_DIR")).join("../pkm/profile.yaml"),
+        search: SearchPaths {
+            db: db_dir.path().join("search.db"),
+            model_dir: db_dir.path().join("models"),
+            embedder: EmbedderChoice::Model,
+        },
     };
-    let (_, in_force, refusals) =
-        check_repository(&paths, "2026-11-26", &owners, &NoLiveValues).unwrap();
-    assert_eq!(refusals, []);
-    assert_eq!(in_force.len(), expected);
+    let checked =
+        check_repository(&paths, "2026-11-26", &owners, &NoLiveValues, Nearest::Skip).unwrap();
+    assert_eq!(checked.refusals, []);
+    assert_eq!(checked.in_force.len(), expected);
 }

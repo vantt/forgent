@@ -273,6 +273,22 @@ fn a_superseded_by_that_is_not_a_wikilink_is_refused() {
 }
 
 #[test]
+fn a_rule_is_replaced_by_exactly_one_rule() {
+    let front = with(json!({
+        "lifecycle": "replaced",
+        "superseded_by": ["[[one-rule]]", "[[two-rule]]"],
+        "valid_to": "2027-01-01"
+    }));
+    let refusal = RuleFile::read(&front, "b", SOURCE).unwrap_err();
+    assert_eq!(refusal.code, RefusalCode::UnitInvalid);
+    assert!(
+        refusal.message.contains("exactly one"),
+        "{}",
+        refusal.message
+    );
+}
+
+#[test]
 fn dates_must_be_real_calendar_days() {
     for bad in [
         "2026-13-01",
