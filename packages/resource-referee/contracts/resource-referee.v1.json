@@ -16,7 +16,8 @@
   "claimSpaces": [
     { "space": "path", "comparison": "write-scope", "meaning": "a repo-relative path or glob, compared by the write-scope may-overlap rule" },
     { "space": "ref", "comparison": "equality", "meaning": "a git ref name, compared as an exact string" },
-    { "space": "port", "comparison": "equality", "meaning": "a network port as a decimal string, compared as an exact string" }
+    { "space": "port", "comparison": "equality", "meaning": "a network port as a decimal string, compared as an exact string" },
+    { "space": "resource", "comparison": "equality", "meaning": "a named machine resource slot, such as gpu#1; a resource with capacity N is declared as N slots" }
   ],
   "claimSpaceRules": [
     "A claim is { space, ref }. `space` must be listed above; an unknown space is refused by name (`claim-space-unknown`), so a misspelt space can never pass as 'no collision'.",

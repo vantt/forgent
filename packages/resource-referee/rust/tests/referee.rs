@@ -22,6 +22,30 @@ fn refusal(f: &Value, ruleset: Value) -> (&'static str, String) {
     (r.code, r.field)
 }
 
+// The referee consumes collisions, not claims comparisons; the door owns equality proofs.
+#[test]
+fn every_registered_claim_space_is_accepted_and_resource_exclusions_use_the_existing_floor() {
+    let contract: Value = serde_json::from_str(include_str!(
+        "../../contracts/resource-referee.v1.json"
+    ))
+    .unwrap();
+    for space in contract["claimSpaces"].as_array().unwrap() {
+        let claim = json!({"space": space["space"], "ref": "gpu#1"});
+        let mut f = facts(json!([
+            {"id": "running", "claims": [claim], "layer": 1},
+            {"id": "candidate", "claims": [claim], "layer": 1}
+        ]));
+        assert_eq!(run(&f, json!([])).verdict, VerdictKind::Accept);
+        f["exclusions"] = json!([
+            {"a": "running", "b": "candidate", "shared": ["gpu#1"]}
+        ]);
+        let v = run(&f, json!([]));
+        assert_eq!(v.verdict, VerdictKind::Reject);
+        assert_eq!(codes(&v), ["exclusion-in-one-layer"]);
+        assert_eq!(v.findings[0].evidence["shared"], json!(["gpu#1"]));
+    }
+}
+
 #[test]
 fn no_cycles_reports_the_canonical_cycle_of_each_component() {
     let mut f = facts(json!([{ "id": "a", "readOnly": true }, { "id": "b", "readOnly": true }]));
@@ -70,12 +94,13 @@ fn claims_declared_flags_per_item_limits_and_still_evaluates_the_rest() {
     let f = facts(json!([
         { "id": "many", "claims": many },
         { "id": "long", "claims": [path(&"x".repeat(1025))] },
+        { "id": "long-resource", "claims": [{ "space": "resource", "ref": "x".repeat(1025) }] },
         { "id": "rest" }
     ]));
     let v = run(&f, json!([]));
     assert_eq!(
         codes(&v),
-        ["claims-over-limit", "claims-over-limit", "claims-missing"]
+        ["claims-over-limit", "claims-over-limit", "claims-over-limit", "claims-missing"]
     );
     assert_eq!(v.findings[0].evidence["limit"], "claims-per-node");
     assert_eq!(v.findings[1].evidence["limit"], "entry-bytes");
