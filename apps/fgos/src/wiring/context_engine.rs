@@ -24,7 +24,7 @@ use std::path::{Path, PathBuf};
 
 use fgos_agent_context_engine::refusal::Refusal;
 use fgos_agent_context_engine::store::{check_repository, compile_repository, StorePaths};
-use fgos_host_runtime::civil_time::civil_from_days;
+use fgos_host_runtime::civil_time::format_system_time_utc;
 use fgos_host_runtime::cli_args::{parse_args, FlagScalar, FlagValue};
 use serde_json::{json, Value};
 
@@ -170,12 +170,10 @@ fn read_request(request: &Value) -> Result<(PathBuf, String), String> {
 
 /// Today's date in UTC, `YYYY-MM-DD`.
 fn today() -> String {
-    let seconds = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map(|elapsed| elapsed.as_secs())
-        .unwrap_or(0);
-    let (year, month, day) = civil_from_days(i64::try_from(seconds / 86_400).unwrap_or(0));
-    format!("{year:04}-{month:02}-{day:02}")
+    format_system_time_utc(std::time::SystemTime::now())
+        .chars()
+        .take(10)
+        .collect()
 }
 
 fn refusal_json(refusal: &Refusal) -> Value {
