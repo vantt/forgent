@@ -2054,6 +2054,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // only role, and it never reclaims a person's claim).
     case 'workflow': {
       const sub = positional[0];
+      if (sub === 'records') {
+        const { workflowRecords } = await import('../src/workflow/case-verbs.mjs');
+        return workflowRecords({ repoRoot: flags.dir });
+      }
       // start, answer and resume return at once with the run id and where to read progress, handing the
       // advancing to a detached process; --foreground keeps it in this process. The arg parser hands
       // `--foreground <id>` the id as the flag's value.
