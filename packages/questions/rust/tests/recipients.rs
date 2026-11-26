@@ -27,7 +27,7 @@ fn logical_roles_and_parties_are_recorded_but_display_names_and_malformed_addres
     let who = Fixed(Ok(head("m-1/a", "head:coder-x")));
     let q = wired(&log, &who, &checkout);
     for to in [
-        json!({"kind": "role", "ref": "approver"}),
+        json!({"kind": "role", "ref": "work:approver"}),
         json!({"kind": "role", "ref": "head:reviewer-x"}),
         json!({"kind": "role", "ref": "lead:MAIL"}),
         json!({"kind": "party", "ref": "customer:account-42"}),
@@ -44,6 +44,8 @@ fn logical_roles_and_parties_are_recorded_but_display_names_and_malformed_addres
         json!("Alice Smith"),
         json!(null),
         json!({"kind": "person", "ref": "Alice"}),
+        json!({"kind": "role", "ref": "alice"}),
+        json!({"kind": "role", "ref": "approver"}),
         json!({"kind": "role", "ref": "Alice Smith"}),
         json!({"kind": "role", "ref": "head:Bad Name"}),
         json!({"kind": "role", "ref": "unknown:role"}),
@@ -74,7 +76,7 @@ fn the_owner_mailbox_keeps_legacy_asks_and_unknown_channels_stay_open_and_visibl
     assert_eq!(delivered.channel, "owner-mailbox");
     assert_eq!(delivered.reference, owner.value);
     for to in [
-        json!({"kind":"role", "ref":"approver"}),
+        json!({"kind":"role", "ref":"work:approver"}),
         json!({"kind":"party", "ref":"customer:42"}),
     ] {
         let mut value = input("plan:p");
@@ -148,7 +150,7 @@ fn an_attested_role_or_party_answer_is_untrusted_data_with_its_channel_and_exact
     let q = wired(&log, &who, &checkout);
     for to in [
         recipient("party", "customer:42"),
-        recipient("role", "approver"),
+        recipient("role", "work:approver"),
     ] {
         let mut value = input("plan:p");
         value["to"] = serde_json::to_value(&to).unwrap();
@@ -194,7 +196,7 @@ fn mismatched_answerers_owner_questions_closed_questions_and_bad_content_never_a
     let id = q.ask(&value).unwrap().value;
     for wrong in [
         recipient("party", "customer:43"),
-        recipient("role", "approver"),
+        recipient("role", "work:approver"),
     ] {
         assert_eq!(
             q.answer_external(&id, &wrong, &content(), "portal")

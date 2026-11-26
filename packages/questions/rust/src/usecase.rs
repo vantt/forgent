@@ -306,12 +306,6 @@ impl Questions<'_> {
             option.filter(|s| !s.is_empty()),
             text.filter(|s| !s.is_empty()),
         );
-        if option.is_none() && text.is_none() {
-            return Err(Refusal::incomplete(
-                "an answer needs --option, --text or both",
-                vec!["option|text".into()],
-            ));
-        }
         let fold = self.read()?;
         let question = fold.get(id).ok_or_else(|| unknown(id))?;
         match question.state {

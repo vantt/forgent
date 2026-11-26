@@ -5,7 +5,7 @@
   "description": "The payload of each type declared in question-event-streams.v1.json. The store writes these payloads and the fold reads them; nothing else writes them. Timestamps are ISO-8601 UTC instants.",
   "$defs": {
     "recipient": {
-      "description": "Logical addresses, not person names. Qualified role aliases follow Identity; human-workflow roles such as approver are lower-case slugs.",
+      "description": "Logical addresses, not person names. Role aliases follow Identity and require a lead:, work: or head: prefix.",
       "type": "object",
       "additionalProperties": false,
       "required": ["kind", "ref"],
@@ -16,7 +16,7 @@
       "allOf": [
         {
           "if": { "properties": { "kind": { "const": "role" } } },
-          "then": { "properties": { "ref": { "pattern": "^([a-z][a-z0-9-]*|lead:[A-Z][A-Z0-9-]{0,15}|work:[a-z][a-z0-9-]{0,29}|head:[a-z][a-z0-9-]{0,96})$" } } },
+          "then": { "properties": { "ref": { "pattern": "^(lead:[A-Z][A-Z0-9-]{0,15}|work:[a-z][a-z0-9-]{0,29}|head:[a-z][a-z0-9-]{0,96})$" } } },
           "else": { "properties": { "ref": { "pattern": "^[a-z][a-z0-9-]*:[A-Za-z0-9._-]+$" } } }
         }
       ]

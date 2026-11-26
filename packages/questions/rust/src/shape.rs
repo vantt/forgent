@@ -347,11 +347,7 @@ pub fn recipient(value: &Value) -> Result<Recipient, Refusal> {
     };
     let valid = match &recipient {
         Recipient::Role { reference } => {
-            if reference.contains(':') {
-                fgos_identity::directory::role_problem(reference).is_none()
-            } else {
-                slug(reference)
-            }
+            fgos_identity::directory::role_problem(reference).is_none()
         }
         Recipient::Party { reference } => reference.split_once(':').is_some_and(|(scheme, id)| {
             slug(scheme)
