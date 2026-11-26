@@ -5,6 +5,8 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+# The rotation handoff is a start-context contributor (the crate's Contributor port).
+fgos-agent-start-context = { path = "../../agent-start-context/rust" }
 fgos-agent-protocol = { path = "../../agent-protocol/rust" }
 fgos-terminal-control = { path = "../../terminal-control/rust" }
 serde = { workspace = true }

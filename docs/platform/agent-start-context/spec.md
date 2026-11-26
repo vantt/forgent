@@ -98,7 +98,12 @@ Each port has one adapter today, wired by the host. The crate itself does no I/O
   from its source on every call (ACE's `ValueSource`), never hard-coded.
 - **`RecordSink`**: appends the per-start record through Observe's record door.
 - **`Contributor`**: the live door. A component implements `contribute(facts) -> Option<Block>` and registers it in
-  `start-contributors.v1.json` with its `when:`, owner, byte budget and timeout.
+  `start-contributors.v1.json` with its `when:`, owner, byte budget and timeout. The host builds one adapter per
+  registered row for each start, from what the request carries; a row the host has no adapter for fails the start as
+  a host defect. The one row today is `rotation-handoff` (owner session-host): a head whose `agentLifecycle` is
+  `rotate` gets the latest handoff of its lineage (persona and session name) as the last block of its opening. Its
+  budget is 40000 bytes: the handoff is already cut to 10000 characters, and that is the most 10000 characters can
+  take in UTF-8.
 
 ## 5. The contract
 

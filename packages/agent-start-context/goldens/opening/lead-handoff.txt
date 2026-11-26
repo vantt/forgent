@@ -22,9 +22,15 @@ Must escalate:
 You are the long-lived head session "golden" (role head:lead-golden).
 
 # Start ritual
-1. Read the latest handoff of this session first: .fgos/runtime/session-rotation/golden/handoff-0001.md. It describes state as it was; verify it against the repo before acting.
+1. Read the latest handoff of this session first: it is the last section of this text (its file is .fgos/runtime/session-rotation/golden/handoff-0001.md). It describes state as it was; verify it against the repo before acting.
 2. Read the portfolio: `fgos questions` for the owner questions still open, and plans/backlog.md for the work in flight.
 3. Say in one line which pending question you resumed, or that none is pending, then continue; the ritual is not a finished turn.
 
 # On wake
 Do not end this turn after the start ritual. Continue in this same turn: run the fgos-lead procedure from its Start step, resume tickets with `fgos request result`, run the next wave, land it, and end with a phase set `done` in the plan file landed by `fgos land --paths`, or a park raised as an event with `fgos supervisor raise` (never a commit). A wake is one turn; never end it before one of those.
+
+Rotation id: 0123456789abcdef
+
+# Handoff
+
+State as the previous session left it: the golden fixture of a rotation successor's handoff.

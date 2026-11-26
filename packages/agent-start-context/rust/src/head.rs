@@ -2,7 +2,8 @@
 //!
 //! Sections, each a block, joined by a blank line: the persona, the session line, the task (only when a task is bound
 //! and a first-step rule matched), the start ritual (its first line says whether a handoff exists; the rest is the
-//! `head-start-ritual` rule), any other matching rule, the question a head continues, and the persona's `on_wake`.
+//! `head-start-ritual` rule), any other matching rule, the question a head continues, and the persona's `on_wake`. A
+//! rotation successor's handoff text comes after them, from the registered handoff contributor.
 //! The layout slots are rule ids: `head-start-ritual` and `head-first-step-<persona>`.
 
 use crate::compose::{block, matches, Candidate};
@@ -74,7 +75,7 @@ pub(crate) fn opening(request: &StartRequest, ports: &Ports<'_>) -> (Vec<Candida
     if let Some(ritual) = rules.iter().find(|r| r.id == RITUAL) {
         matched.push(ritual.id.clone());
         let first = match &handoff {
-            Some(path) => format!("1. Read the latest handoff of this session first: {path}. It describes state as it was; verify it against the repo before acting."),
+            Some(path) => format!("1. Read the latest handoff of this session first: it is the last section of this text (its file is {path}). It describes state as it was; verify it against the repo before acting."),
             None => "1. There is no earlier handoff for this session; start from the portfolio.".to_owned(),
         };
         out.push(required(block(

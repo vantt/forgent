@@ -338,3 +338,23 @@ fn a_contributor_that_fails_or_times_out_is_left_out_and_recorded_and_the_start_
     );
     assert_eq!(records.0.borrow()[0].dropped, context.dropped);
 }
+
+#[test]
+fn every_contributor_row_the_contract_registers_is_read_in_registration_order() {
+    let contract: serde_json::Value =
+        serde_json::from_str(include_str!("../../contracts/start-contributors.v1.json")).unwrap();
+    let ids: Vec<String> = contract["contributors"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|row| row["id"].as_str().unwrap().to_owned())
+        .collect();
+    let read: Vec<String> = fgos_agent_start_context::registered_contributors()
+        .into_iter()
+        .map(|row| row.id)
+        .collect();
+    assert_eq!(
+        read, ids,
+        "a row that does not read is left out of every start"
+    );
+}

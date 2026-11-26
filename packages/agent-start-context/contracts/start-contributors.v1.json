@@ -1,6 +1,6 @@
 {
   "contract": "agent-start-context-contributors.v1",
-  "description": "Registered live contributors (the live door). Each row names a component's Contributor adapter, the when: it applies under (keys from when-keys.v2.json), its owner, a byte budget and a timeout. A contributor that fails or times out is left out and listed in dropped[] (fail open). Empty until the rotation handoff joins (plan 261122-1946 phase 7).",
+  "description": "Registered live contributors (the live door). Each row names a component's Contributor adapter, the when: it applies under (keys from when-keys.v2.json), its owner, a byte budget and a timeout. A contributor that fails or times out is left out and listed in dropped[] (fail open). The host wires one adapter per row id; a row without an adapter is a host defect.",
   "rowSchema": {
     "type": "object",
     "additionalProperties": false,
@@ -43,5 +43,20 @@
       }
     }
   },
-  "contributors": []
+  "contributors": [
+    {
+      "id": "rotation-handoff",
+      "when": {
+        "sessionType": [
+          "head"
+        ],
+        "agentLifecycle": [
+          "rotate"
+        ]
+      },
+      "owner": "session-host",
+      "budgetBytes": 40000,
+      "timeoutMs": 2000
+    }
+  ]
 }

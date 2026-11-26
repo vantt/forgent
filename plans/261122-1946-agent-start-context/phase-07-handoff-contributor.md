@@ -40,3 +40,24 @@ pointer to the file (`openingText`, `src/session-host/head-start.mjs:122-124`, u
 ## Rollback
 
 Revert the commit. The SessionStart handoff text comes back with it.
+
+## Result (2026-11-27, fg-server)
+
+Done. `HandoffContributor` (`packages/session-host/rust/src/rotation/contributor.rs`) answers the latest handoff of
+the lineage for a head whose `agentLifecycle` is `rotate`. Two choices differ from the steps above:
+
+- The row's `when:` is `{sessionType: [head], agentLifecycle: [rotate]}`, because `kind` became `sessionType` in
+  when-keys v2.
+- Its budget is 40000 bytes, not 10000. The handoff is already cut to 10000 characters, and a Vietnamese handoff
+  under that cut can exceed 10000 bytes, which would drop it.
+
+The host door builds one adapter per registered row for each start, and closes over the session name from the
+request's `session` payload, because the port passes facts only. The crate reads the rows from the embedded contract
+(`registered_contributors`).
+
+The SessionStart hook now prints only the "answer the rotation" instruction while a rotation waits for it, and never
+the handoff. The ritual's first line points to the opening's last section and keeps the file path as a fallback.
+
+The failed-contributor case keeps its owner in `compose_vectors.rs` (a failure and a timeout are left out and listed
+in `dropped`). The door's wiring proof is in `apps/fgos/tests/start_context.rs`.
+

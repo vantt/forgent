@@ -30,3 +30,6 @@ Any other difference is a regression. A golden regenerated for one of these thre
 
 - 2026-11-27: the four `lead` openings, because `core/agents/lead.yaml`'s `on_wake` changed in `ecc52ee39` (a park is
   raised as an event, never a commit). Captured again from today's producers before any producer moved.
+- 2026-11-27: the five `<persona>-handoff` openings, for change 3. The handoff text (the fixture in `cases.json`) is now
+  the last section of the opening, from the `rotation-handoff` contributor. The ritual's first line says so and keeps
+  the file path, and the SessionStart hook no longer prints the handoff.

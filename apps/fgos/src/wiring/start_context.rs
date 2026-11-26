@@ -10,7 +10,7 @@
 //! The adapters: the rule set is the project's `.fgos/instructions/effective/rules.json`, read through the agent
 //! context engine's reader; the fact registry is the engine's when-keys with the host's live values (the same
 //! `LiveValues` the engine's door uses); each call writes one `fgos.start.context` record through Observe's record
-//! door. No contributor is registered yet and no delivery has a budget yet.
+//! door; each registered contributor row gets its adapter here ([`adapter`]). No delivery has a budget yet.
 
 use std::collections::BTreeMap;
 use std::ffi::OsString;
@@ -18,12 +18,14 @@ use std::io::{Read, Write};
 use std::path::PathBuf;
 
 use fgos_agent_start_context::{
-    compose, AceFacts, AceRules, PersonaLookup, Personas, Ports, RecordSink, Refusal, StartContext,
-    StartKind, StartRecord, StartRequest,
+    compose, registered_contributors, AceFacts, AceRules, Contributor, Payload, PersonaLookup,
+    Personas, Ports, RecordSink, Refusal, StartContext, StartKind, StartRecord, StartRequest,
 };
 use fgos_host_runtime::cli_args::{parse_args, FlagScalar, FlagValue};
 use fgos_observe::record::store::{new_record_id, RecordDoor};
 use fgos_observe::record::types::{AttrValue, Basis, Origin, Record, SubjectRef, RECORD_VERSION};
+use fgos_session_host::rotation::contributor::{HandoffContributor, HANDOFF_CONTRIBUTOR};
+use fgos_session_host::rotation::handoff::lineage_dir;
 use serde_json::{json, Value};
 
 use super::context_engine::values::LiveValues;
@@ -153,12 +155,24 @@ pub fn run(args: &[String], input: &str) -> (i32, Value) {
         install,
         domain: request.facts.get("domain").cloned(),
     };
+    let rows = registered_contributors();
+    let mut adapters: Vec<Option<Box<dyn Contributor>>> = Vec::with_capacity(rows.len());
+    for row in &rows {
+        match adapter(&row.id, &request, &root) {
+            Ok(found) => adapters.push(found),
+            Err(message) => return error(op, "contributor-unwired", &message, EXIT_FAILED),
+        }
+    }
     let ports = Ports {
         rules: &rules,
         facts: &facts,
         record: &sink,
         personas: Some(&personas),
-        contributors: Vec::new(),
+        contributors: rows
+            .iter()
+            .zip(&adapters)
+            .filter_map(|(row, found)| found.as_deref().map(|a| (row.clone(), a)))
+            .collect(),
         budget_bytes: None,
     };
     match compose(&request, &ports) {
@@ -167,6 +181,37 @@ pub fn run(args: &[String], input: &str) -> (i32, Value) {
             json!({ "v": 1, "protocol": PROTOCOL, "op": "compose", "result": context_json(&context) }),
         ),
         Err(refusal) => refused(&refusal),
+    }
+}
+
+/// The adapter of one registered contributor row for this start, or None when the start lacks what the adapter
+/// reads (a handoff needs the head's persona and session name). A row with no adapter in this host is a defect.
+fn adapter(
+    id: &str,
+    request: &StartRequest,
+    root: &std::path::Path,
+) -> Result<Option<Box<dyn Contributor>>, String> {
+    match id {
+        HANDOFF_CONTRIBUTOR => {
+            let name = request.payloads.iter().find_map(|p| match p {
+                Payload::Session { name } => Some(name.clone()),
+                _ => None,
+            });
+            let (Some(persona), Some(name)) = (request.facts.get("persona"), name) else {
+                return Ok(None);
+            };
+            Ok(lineage_dir(&fgos_dir(root), persona, &name)
+                .ok()
+                .map(|lineage| {
+                    Box::new(HandoffContributor {
+                        lineage,
+                        project_root: Some(root.to_path_buf()),
+                    }) as Box<dyn Contributor>
+                }))
+        }
+        other => Err(format!(
+            "the contributor row {other:?} has no adapter in this host"
+        )),
     }
 }
 

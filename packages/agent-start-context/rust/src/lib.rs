@@ -19,8 +19,8 @@ pub use agent_file::agent_file;
 pub use compose::{compose, Block, DropReason, Dropped, StartContext, StartRecord};
 pub use persona::{persona_section, PersonaFields, PersonaLookup};
 pub use ports::{
-    Contributor, ContributorError, ContributorRow, FactRegistry, Personas, Ports, RecordSink, Rule,
-    RuleSet, ValueType,
+    registered_contributors, Contributor, ContributorError, ContributorRow, FactRegistry, Personas,
+    Ports, RecordSink, Rule, RuleSet, ValueType,
 };
 pub use request::{Delivery, ItemKind, Payload, Refusal, RefusalCode, StartKind, StartRequest};
 

@@ -77,6 +77,41 @@ pub struct ContributorRow {
     pub timeout_ms: u64,
 }
 
+/// The registered contributors in registration order: the rows of `contracts/start-contributors.v1.json`, embedded
+/// at build time. A row that does not read is left out; the contract test fails on it.
+pub fn registered_contributors() -> Vec<ContributorRow> {
+    let doc: serde_json::Value =
+        serde_json::from_str(include_str!("../../contracts/start-contributors.v1.json"))
+            .unwrap_or_default();
+    doc["contributors"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(contributor_row)
+        .collect()
+}
+
+fn contributor_row(row: &serde_json::Value) -> Option<ContributorRow> {
+    let when = row["when"]
+        .as_object()?
+        .iter()
+        .map(|(key, values)| {
+            let values = values
+                .as_array()?
+                .iter()
+                .map(|v| v.as_str().map(str::to_owned));
+            Some((key.clone(), values.collect::<Option<Vec<_>>>()?))
+        })
+        .collect::<Option<BTreeMap<_, _>>>()?;
+    Some(ContributorRow {
+        id: row["id"].as_str()?.to_owned(),
+        when,
+        owner: row["owner"].as_str()?.to_owned(),
+        budget_bytes: usize::try_from(row["budgetBytes"].as_u64()?).ok()?,
+        timeout_ms: row["timeoutMs"].as_u64()?,
+    })
+}
+
 /// Everything compose reads, wired by the host.
 pub struct Ports<'a> {
     pub rules: &'a dyn RuleSet,

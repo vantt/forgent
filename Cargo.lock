@@ -1000,6 +1000,7 @@ name = "fgos-session-host"
 version = "0.2.0"
 dependencies = [
  "fgos-agent-protocol",
+ "fgos-agent-start-context",
  "fgos-host-runtime",
  "fgos-terminal-control",
  "fgos-yaml-doc",

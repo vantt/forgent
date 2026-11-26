@@ -16,7 +16,7 @@ use fgos_run_supervisor::head_client::{
 };
 use fgos_session_host::rotation::decide::{decide, AtRest, RotationConfig};
 use fgos_session_host::rotation::handoff::{
-    awaits_answer, lineage_dir, read_latest, rotation_id_of, session_start_context, CONTEXT_LIMIT,
+    awaits_answer, lineage_dir, read_latest, rotation_id_of,
 };
 use fgos_session_host::rotation::measure::{measure, Source, Sources, FRESH_WAIT};
 use serde_json::{json, Value};
@@ -331,43 +331,25 @@ fn answer(head: &Head, lineage: &Path, payload: &Value, ports: &Ports) -> Result
         .map_err(|e| StopError::from_client(e, "session answered"))
 }
 
-/// A session start: the latest handoff of the lineage as the one `additionalContext` object, or nothing.
+/// A session start: when a rotation waits for this session's first answer, the instruction to give it as the one
+/// `additionalContext` object; otherwise nothing. The handoff itself reaches the successor once, in its opening,
+/// through the start-context composer's handoff contributor.
 fn session_start(head: &Head, fgos_dir: &Path) -> Result<Option<String>, String> {
     let lineage = lineage_dir(fgos_dir, &head.persona, &head.name).map_err(|e| e.to_string())?;
-    let Some(latest) = read_latest(&lineage).map_err(|e| e.to_string())? else {
-        return Ok(None);
-    };
-    let mut context = session_start_context(&latest, fgos_dir.parent());
-    let should_append = match head.gen {
+    let awaiting = match head.gen {
         Some(gen) => awaits_answer(&lineage, gen).map_err(|e| e.to_string())?,
         None => false,
     };
-    if should_append {
-        let root = fgos_dir.parent().unwrap_or(Path::new(""));
-        let bin = project_shim_path(root);
-        let instruction = format!(
-            "A rotation is waiting for this session's first answer; right after the start ritual's one line, in this same turn, answer by running printf '%s' '{{\"last_assistant_message\":\"<that line, with no quote characters>\"}}' | \"{}\" hook session-rotation --event stop ; use the installed path, not the fgos shell function; role-gated verbs wait until the role moves.",
-            bin.display()
-        );
-        let sep = if context.is_empty() || context.ends_with("\n\n") {
-            ""
-        } else if context.ends_with('\n') {
-            "\n"
-        } else {
-            "\n\n"
-        };
-        let addition = format!("{sep}{instruction}");
-        if context.chars().count() + addition.chars().count() > CONTEXT_LIMIT {
-            let room = CONTEXT_LIMIT.saturating_sub(addition.chars().count());
-            let mut trimmed: String = context.chars().take(room).collect();
-            trimmed.push_str(&addition);
-            context = trimmed;
-        } else {
-            context.push_str(&addition);
-        }
+    if !awaiting {
+        return Ok(None);
     }
+    let root = fgos_dir.parent().unwrap_or(Path::new(""));
+    let instruction = format!(
+        "A rotation is waiting for this session's first answer; right after the start ritual's one line, in this same turn, answer by running printf '%s' '{{\"last_assistant_message\":\"<that line, with no quote characters>\"}}' | \"{}\" hook session-rotation --event stop ; use the installed path, not the fgos shell function; role-gated verbs wait until the role moves.",
+        project_shim_path(root).display()
+    );
     Ok(Some(
-        json!({ "hookSpecificOutput": { "hookEventName": "SessionStart", "additionalContext": context } })
+        json!({ "hookSpecificOutput": { "hookEventName": "SessionStart", "additionalContext": instruction } })
             .to_string(),
     ))
 }
@@ -1030,84 +1012,40 @@ mod tests {
     }
 
     #[test]
-    fn the_session_start_prints_the_one_additional_context_object_of_the_latest_handoff_and_nothing_without_one(
-    ) {
-        let (fgos_dir, lineage) = fgos("start");
-        assert_eq!(session_start(&head(None), &fgos_dir).unwrap(), None);
-        std::fs::write(lineage.join("261118-1000-abc12345.md"), "handoff text\n").unwrap();
-        std::fs::write(
-            lineage.join("latest.json"),
-            r#"{"file":"261118-1000-abc12345.md"}"#,
-        )
-        .unwrap();
-        let out: Value =
-            serde_json::from_str(&session_start(&head(None), &fgos_dir).unwrap().unwrap()).unwrap();
-        assert_eq!(
-            out,
-            json!({ "hookSpecificOutput": { "hookEventName": "SessionStart", "additionalContext": "handoff text\n" } })
-        );
-    }
-
-    #[test]
-    fn session_start_appends_rotation_answer_instruction_when_awaiting_answer_and_leaves_context_unchanged_when_answered(
+    fn the_session_start_prints_only_the_answer_instruction_while_a_rotation_awaits_it_and_never_the_handoff(
     ) {
         let (fgos_dir, lineage) = fgos("start-instruction");
-        let project_root = fgos_dir.parent().unwrap();
-        let expected_bin = project_shim_path(project_root);
+        let expected_bin = project_shim_path(fgos_dir.parent().unwrap());
         assert!(expected_bin.is_absolute());
-
         std::fs::write(lineage.join("261118-1000-abc12345.md"), "handoff text\n").unwrap();
         std::fs::write(
             lineage.join("latest.json"),
             r#"{"file":"261118-1000-abc12345.md"}"#,
         )
         .unwrap();
+        assert_eq!(
+            session_start(&head(None), &fgos_dir).unwrap(),
+            None,
+            "no rotation generation"
+        );
         std::fs::write(
             lineage.join("rotation.json"),
             r#"{"id":"0123456789abcdef","gen":2}"#,
         )
         .unwrap();
-
         let head = head(Some(2));
         let out: Value =
             serde_json::from_str(&session_start(&head, &fgos_dir).unwrap().unwrap()).unwrap();
-        let context = out["hookSpecificOutput"]["additionalContext"]
-            .as_str()
-            .unwrap();
-
         let expected_instruction = format!(
             "A rotation is waiting for this session's first answer; right after the start ritual's one line, in this same turn, answer by running printf '%s' '{{\"last_assistant_message\":\"<that line, with no quote characters>\"}}' | \"{}\" hook session-rotation --event stop ; use the installed path, not the fgos shell function; role-gated verbs wait until the role moves.",
             expected_bin.display()
         );
-        assert!(
-            context.ends_with(&expected_instruction),
-            "context should end with instruction carrying absolute installed path: {context}"
+        assert_eq!(
+            out,
+            json!({ "hookSpecificOutput": { "hookEventName": "SessionStart", "additionalContext": expected_instruction } })
         );
-        assert!(context.starts_with("handoff text\n"));
-
-        // When answered.json exists for that generation, context is unchanged
         std::fs::write(lineage.join("answered.json"), r#"{"gen":2}"#).unwrap();
-        let out_answered: Value =
-            serde_json::from_str(&session_start(&head, &fgos_dir).unwrap().unwrap()).unwrap();
-        let context_answered = out_answered["hookSpecificOutput"]["additionalContext"]
-            .as_str()
-            .unwrap();
-        assert_eq!(context_answered, "handoff text\n");
-
-        // When handoff is long, instruction survives and context remains within CONTEXT_LIMIT
-        std::fs::remove_file(lineage.join("answered.json")).unwrap();
-        let huge_handoff = format!("# Handoff\n\n{}\n", "x".repeat(CONTEXT_LIMIT + 500));
-        std::fs::write(lineage.join("261118-1000-abc12345.md"), &huge_handoff).unwrap();
-        let out_long: Value =
-            serde_json::from_str(&session_start(&head, &fgos_dir).unwrap().unwrap()).unwrap();
-        let context_long = out_long["hookSpecificOutput"]["additionalContext"]
-            .as_str()
-            .unwrap();
-        assert!(
-            context_long.ends_with(&expected_instruction),
-            "instruction must survive when handoff is long"
-        );
-        assert!(context_long.chars().count() <= CONTEXT_LIMIT);
+        assert_eq!(session_start(&head, &fgos_dir).unwrap(), None, "answered");
     }
 
     #[test]

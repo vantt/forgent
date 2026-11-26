@@ -4,8 +4,9 @@
 //! domains/*/agents; fact validation is the vector tests'.
 
 use fgos_agent_start_context::{
-    compose, FactRegistry, PersonaFields, PersonaLookup, Personas, Ports, RecordSink, Rule,
-    RuleSet, StartRecord, StartRequest, ValueType,
+    compose, registered_contributors, Contributor, ContributorError, FactRegistry, PersonaFields,
+    PersonaLookup, Personas, Ports, RecordSink, Rule, RuleSet, StartRecord, StartRequest,
+    ValueType,
 };
 use fgos_yaml_doc::Profile;
 use serde_json::{json, Value};
@@ -98,6 +99,18 @@ impl FactRegistry for AnyFacts {
     }
 }
 
+/// The handoff a rotation successor's lineage holds, or none.
+struct FixedHandoff(Option<String>);
+impl Contributor for FixedHandoff {
+    fn contribute(
+        &self,
+        _facts: &std::collections::BTreeMap<String, String>,
+        _timeout: std::time::Duration,
+    ) -> Result<Option<String>, ContributorError> {
+        Ok(self.0.clone())
+    }
+}
+
 struct NoRecord;
 impl RecordSink for NoRecord {
     fn append(&self, _record: &StartRecord) -> String {
@@ -169,24 +182,31 @@ fn every_head_opening_golden_is_composed_byte_for_byte() {
         if let Some(task) = case.get("task") {
             payloads.push(json!({"kind": "task", "path": task["path"], "itemKind": "plan"}));
         }
-        if let Some(handoff) = case.get("handoff") {
+        let handoff = case.get("handoff");
+        if let Some(handoff) = handoff {
             payloads.push(json!({"kind": "handoff", "path": handoff["path"]}));
         }
+        let lifecycle = if handoff.is_some() { "rotate" } else { "start" };
         if let Some(q) = case.get("forQuestion") {
             payloads.push(json!({"kind": "for-question", "questionId": q}));
         }
         let request = StartRequest::from_json(&json!({
-            "facts": {"sessionType": "head", "persona": persona, "project": "forgent", "agentCli": "claude", "agentLifecycle": "start"},
+            "facts": {"sessionType": "head", "persona": persona, "project": "forgent", "agentCli": "claude", "agentLifecycle": lifecycle},
             "payloads": payloads,
             "delivery": "opening"
         }))
         .unwrap();
+        // The registered handoff row, fed the case's fixture text: what the session-host adapter reads from the lineage.
+        let fixture = FixedHandoff(handoff.and_then(|h| h["text"].as_str()).map(str::to_owned));
         let ports = Ports {
             rules: &rules,
             facts: &AnyFacts,
             record: &NoRecord,
             personas: Some(&RepoPersonas),
-            contributors: Vec::new(),
+            contributors: registered_contributors()
+                .into_iter()
+                .map(|row| (row, &fixture as &dyn Contributor))
+                .collect(),
             budget_bytes: None,
         };
         let composed = compose(&request, &ports).unwrap().text() + "\n";
