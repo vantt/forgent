@@ -38,7 +38,8 @@ pub enum WakeOutcome {
 
 /// The independent review runs through Execution; only a settled successful Unit is recorded.
 pub trait Review {
-    fn run(&self) -> Result<String, String>;
+    fn start(&self) -> Result<(), String>;
+    fn settled(&self) -> Result<Option<String>, String>;
     fn done(&self, unit_run_id: &str) -> Result<(), String>;
 }
 
@@ -53,39 +54,12 @@ pub fn review_run_args(brief: &str) -> Vec<String> {
         .collect()
 }
 
-/// Finding requests cross the read-only Unit boundary as data, never as commands. The host
-/// delivers each through `supervisor raise`, whose kind stays fixed to coordination-help.
-#[derive(Debug, Clone, serde::Deserialize, PartialEq, Eq)]
-#[serde(deny_unknown_fields)]
-pub struct ReviewFinding {
-    #[serde(rename = "ref")]
-    pub subject: String,
-    pub reason: String,
-}
-
-pub fn review_findings(report: &str) -> Result<Vec<ReviewFinding>, String> {
-    let marker = "```fgos-review-findings\n";
-    let (_, body) = report.split_once(marker).ok_or("review-findings-missing")?;
-    if body.contains(marker) { return Err("review-findings-duplicated".into()); }
-    let (body, _) = body.split_once("```").ok_or("review-findings-unclosed")?;
-    let findings: Vec<ReviewFinding> = serde_json::from_str(body).map_err(|e| format!("review-findings-invalid: {e}"))?;
-    let mut unique = std::collections::BTreeSet::new();
-    for finding in &findings {
-        let code = finding.reason.split_once(':').map(|(code, _)| code).unwrap_or("");
-        if finding.subject.trim().is_empty() || code.is_empty()
-            || !code.bytes().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-')
-            || !unique.insert((&finding.subject, &finding.reason)) {
-            return Err("review-finding-invalid-or-duplicated".into());
-        }
-    }
-    Ok(findings)
-}
-
 /// Epoch seconds of the last tick and of the last full one.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct State {
     pub last_tick: Option<i64>,
     pub last_full_tick: Option<i64>,
+    pub review_started: Option<i64>,
 }
 
 /// Fetch the trunk's remote-tracking ref.
@@ -308,7 +282,31 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
         }
     };
     let now = ports.clock.now();
-    let state = ports.state.load().unwrap_or_default();
+    let mut state = ports.state.load().unwrap_or_default();
+    let mut settled_this_tick = false;
+    match ports.review.settled() {
+        Ok(Some(unit_run_id)) => {
+            settled_this_tick = true;
+            if let Err(e) = ports.review.done(&unit_run_id) {
+                r.errors += 1;
+                r.problems.push(format!("review-done: {e}"));
+            } else {
+                if let Ok(unhandled) = ports.queue.unhandled() {
+                    for e in unhandled {
+                        if action(settings, &e.kind) == Action::StartReview {
+                            let _ = ports.queue.review_handled(&e.id);
+                        }
+                    }
+                }
+                state.review_started = None;
+            }
+        }
+        Ok(None) => {}
+        Err(e) => {
+            r.errors += 1;
+            r.problems.push(format!("review-settle: {e}"));
+        }
+    }
     if ports.questions.refresh().is_err() {
         r.errors += 1;
     }
@@ -408,17 +406,33 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
         match ports.queue.raise(event.clone()) {
             Ok(Raised::New) => {
                 r.raised += 1;
-                if run_action(ports, settings, &event, &mut r)
-                    && wake_with.as_ref().is_none_or(|w| event.ts < w.ts)
+                if run_action(
+                    ports,
+                    settings,
+                    &event,
+                    &mut r,
+                    &mut state,
+                    settled_this_tick,
+                    now,
+                ) && wake_with.as_ref().is_none_or(|w| event.ts < w.ts)
                 {
                     wake_with = Some(event);
                 }
             }
             Ok(Raised::Duplicate) => {
                 r.duplicate += 1;
-                // A failed review has no done record. Its level row must retry, unlike edge actions.
+                // A failed review has no done record. Its level row must retry, unlike edge actions,
+                // once any in-flight attempt has expired.
                 if action(settings, &event.kind) == Action::StartReview {
-                    run_action(ports, settings, &event, &mut r);
+                    run_action(
+                        ports,
+                        settings,
+                        &event,
+                        &mut r,
+                        &mut state,
+                        settled_this_tick,
+                        now,
+                    );
                 }
             }
             Err(_) => r.errors += 1,
@@ -471,6 +485,7 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
         State {
             last_tick: Some(now),
             last_full_tick: Some(now),
+            review_started: state.review_started,
         },
     );
     emit(ports, &r, counts);
@@ -478,22 +493,33 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
 }
 
 /// Runs the non-wake actions; returns true when the event routes to a wake.
-fn run_action(ports: &Ports, settings: &Settings, event: &RaisedEvent, r: &mut TickReport) -> bool {
+fn run_action(
+    ports: &Ports,
+    settings: &Settings,
+    event: &RaisedEvent,
+    r: &mut TickReport,
+    state: &mut State,
+    settled_this_tick: bool,
+    now: i64,
+) -> bool {
     match action(settings, &event.kind) {
         Action::WakeSupervisor => return true,
         Action::StartReview => {
-            let result = ports.review.run().and_then(|id| {
-                // Close the trigger before the watermark: our own handled event is not new work
-                // after this review on an otherwise quiet project.
-                ports
-                    .queue
-                    .review_handled(&event.id)
-                    .map_err(|e| e.to_string())?;
-                ports.review.done(&id)
-            });
-            if let Err(error) = result {
-                r.errors += 1;
-                r.problems.push(format!("start-review: {error}"));
+            let in_flight = state
+                .review_started
+                .is_some_and(|start| now - start < settings.idle_interval_sec);
+            if settled_this_tick {
+                let _ = ports.queue.review_handled(&event.id);
+            } else if !in_flight {
+                match ports.review.start() {
+                    Ok(()) => {
+                        state.review_started = Some(now);
+                    }
+                    Err(error) => {
+                        r.errors += 1;
+                        r.problems.push(format!("start-review: {error}"));
+                    }
+                }
             }
         }
         Action::Notify => match ports.notifier.notify(event) {

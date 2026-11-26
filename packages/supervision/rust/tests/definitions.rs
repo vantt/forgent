@@ -514,7 +514,10 @@ fn review_due_obeys_its_success_watermark_and_skips_only_a_quiet_closed_project(
             );
             assert!(rows(&longer).is_empty(), "the interval is config-owned");
             let unset = answer(&root, "review-due", now, None, &environment(&[]));
-            assert_eq!(unset["unmeasured"], "config-unset: watcher.reviewIntervalSec");
+            assert_eq!(
+                unset["unmeasured"],
+                "config-unset: watcher.reviewIntervalSec"
+            );
         }
     }
 }

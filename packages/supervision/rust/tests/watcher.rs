@@ -37,16 +37,25 @@ struct World {
     stops: RefCell<u32>,
     reviews: RefCell<u32>,
     review_fails: RefCell<bool>,
+    review_settled: RefCell<bool>,
     reviews_done: RefCell<Vec<String>>,
 }
 
 impl fgos_supervision::watcher::Review for World {
-    fn run(&self) -> Result<String, String> {
+    fn start(&self) -> Result<(), String> {
         *self.reviews.borrow_mut() += 1;
         if *self.review_fails.borrow() {
             Err("failed Unit".into())
         } else {
-            Ok("unit-review-1".into())
+            Ok(())
+        }
+    }
+    fn settled(&self) -> Result<Option<String>, String> {
+        if *self.review_settled.borrow() {
+            *self.review_settled.borrow_mut() = false;
+            Ok(Some("unit-review-1".into()))
+        } else {
+            Ok(None)
         }
     }
     fn done(&self, id: &str) -> Result<(), String> {
@@ -581,8 +590,7 @@ fn an_edge_between_an_idle_tick_and_the_next_full_tick_is_raised_with_no_lookbac
 
 // Existing action proofs cover wakes and notifications, not the review's settle/retry watermark.
 #[test]
-fn a_failed_review_retries_the_duplicate_row_and_only_success_records_done_without_waking_the_supervisor(
-) {
+fn review_starts_at_once_second_tick_in_flight_starts_nothing_and_done_is_recorded_after_settle() {
     let w = World::default();
     w.rows
         .borrow_mut()
@@ -590,25 +598,90 @@ fn a_failed_review_retries_the_duplicate_row_and_only_success_records_done_witho
     w.pace_rows.borrow_mut().push(row("active", "x", "t"));
     let mut s = settings(Action::WakeSupervisor);
     s.actions.insert("review-due".into(), Action::StartReview);
-    *w.review_fails.borrow_mut() = true;
+
+    // 1. First tick: start returns at once, in-flight marker is set.
     at(&w, 1000);
-    let failed = run(&w, None, &s);
-    assert_eq!((failed.raised, failed.errors, failed.wakes), (1, 1, 0));
+    let first = run(&w, None, &s);
+    assert_eq!((first.raised, first.errors, first.wakes), (1, 0, 0));
+    assert_eq!(*w.reviews.borrow(), 1);
     assert!(w.reviews_done.borrow().is_empty());
     assert!(w.handled.borrow().is_empty());
-    *w.review_fails.borrow_mut() = false;
+
+    // 2. Second tick while in flight (younger than bound): starts nothing.
     at(&w, 1060);
+    let in_flight = run(&w, None, &s);
+    assert_eq!(
+        (in_flight.duplicate, in_flight.errors, in_flight.wakes),
+        (1, 0, 0)
+    );
+    assert_eq!(*w.reviews.borrow(), 1, "in flight review starts nothing");
+    assert!(w.reviews_done.borrow().is_empty());
+
+    // 3. Unit settles: third tick records done and closes trigger.
+    *w.review_settled.borrow_mut() = true;
+    at(&w, 1120);
     let settled = run(&w, None, &s);
     assert_eq!(
         (settled.duplicate, settled.errors, settled.wakes),
         (1, 0, 0)
     );
-    assert_eq!(*w.reviews.borrow(), 2);
+    assert_eq!(*w.reviews.borrow(), 1);
     assert_eq!(*w.reviews_done.borrow(), ["unit-review-1"]);
     assert_eq!(w.handled.borrow().len(), 1);
-    w.rows.borrow_mut().clear(); // The fresh done watermark removes the level row.
-    at(&w, 1120);
+
+    // 4. Later tick once quiet: starts nothing.
+    w.rows.borrow_mut().clear();
+    at(&w, 1180);
     assert_eq!(run(&w, None, &s).wakes, 0);
+    assert_eq!(*w.reviews.borrow(), 1);
+}
+
+#[test]
+fn a_failing_or_stale_review_retries_after_the_in_flight_bound() {
+    let w = World::default();
+    w.rows
+        .borrow_mut()
+        .push(row("review-due", "periodic-review", "epoch"));
+    w.pace_rows.borrow_mut().push(row("active", "x", "t"));
+    let mut s = settings(Action::WakeSupervisor);
+    s.actions.insert("review-due".into(), Action::StartReview);
+
+    at(&w, 1000);
+    run(&w, None, &s);
+    assert_eq!(*w.reviews.borrow(), 1);
+
+    // Still within idle interval bound (600s in test settings): starts nothing
+    at(&w, 1500);
+    run(&w, None, &s);
+    assert_eq!(*w.reviews.borrow(), 1);
+
+    // Past the bound (1000 + 600 = 1600): retries!
+    at(&w, 1601);
+    let retried = run(&w, None, &s);
+    assert_eq!((retried.duplicate, retried.errors), (1, 0));
+    assert_eq!(*w.reviews.borrow(), 2);
+}
+
+#[test]
+fn a_failed_start_counts_an_error_and_retries_next_tick() {
+    let w = World::default();
+    w.rows
+        .borrow_mut()
+        .push(row("review-due", "periodic-review", "epoch"));
+    w.pace_rows.borrow_mut().push(row("active", "x", "t"));
+    let mut s = settings(Action::WakeSupervisor);
+    s.actions.insert("review-due".into(), Action::StartReview);
+
+    *w.review_fails.borrow_mut() = true;
+    at(&w, 1000);
+    let failed = run(&w, None, &s);
+    assert_eq!((failed.raised, failed.errors, failed.wakes), (1, 1, 0));
+    assert_eq!(*w.reviews.borrow(), 1);
+
+    *w.review_fails.borrow_mut() = false;
+    at(&w, 1060);
+    let ok = run(&w, None, &s);
+    assert_eq!((ok.duplicate, ok.errors, ok.wakes), (1, 0, 0));
     assert_eq!(*w.reviews.borrow(), 2);
 }
 
