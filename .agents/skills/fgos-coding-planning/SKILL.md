@@ -68,10 +68,9 @@ A wake is one turn: never end it before your done step (the plan landed with `fg
 - End by handing off to `fgos-coding-validating`. Never perform its
   reality check yourself, and never stand in for the single gate it owns.
 - Commit `plan.md` (and `CONTEXT.md` if not already committed) to the
-  item's `fgw/<id>` branch before this session (or a later one) calls
-  `fgos discover` — that call releases the claim once the item reaches
-  `executing`, and an uncommitted `plan.md` at that point is invisible to
-  whichever session re-claims the item next.
+  item's `fgw/<id>` branch before validating's `fgos plan` call fires the
+  `planning`→`executing` edge: an uncommitted `plan.md` at that point is
+  invisible to whichever session works the item next.
 - **Multi-role team harness: this skill has no `advise` interaction of
   its own.** Step 6's hand-back to `fgos-coding-exploring` is a skill
   DISPATCH, not a park — that skill's own already-wired Socratic step

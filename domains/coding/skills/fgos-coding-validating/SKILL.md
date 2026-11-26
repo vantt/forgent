@@ -76,11 +76,11 @@ fabricates a pass to keep the item moving.
   open item in plan.md. If that feels wrong for a given item, the answer
   is to ask, never to argue the floor down.
 - Before this session (or a later one) calls `fgos plan` — the call that
-  actually fires the `planning`→`executing` edge and releases the claim
-  back to `todo` — confirm CONTEXT.md/plan.md are already committed to
+  actually fires the `planning`→`executing` edge (the claim stays held
+  across it) — confirm CONTEXT.md/plan.md are already committed to
   the item's `fgw/<id>` branch. A READY verdict on an uncommitted plan
   hands off to an edge whose own artifacts are invisible to whichever
-  session re-claims the item next.
+  session works the item next.
 - In direct compatibility mode, this session IS that later session, right here: once the Gate below
   approves, fire `fgos plan` yourself, passing the split decision
   plan.md's own Step 4 already locked as an explicit `--verdict` — never
@@ -109,10 +109,9 @@ Also check the plan's **Authority map** (`../_shared/plan-contract.md`
 `fgos authority locate "<new thing>"` for each row and confirm the map names
 the row that owns it, or a `declare: <kind> <id>` with its reason, and a
 `survivor:` for every overlap. A missing or unproven map is a FAIL here: reject
-and return the plan to `fgos-coding-planning`. Until documentation H2 admission
-exists, this review is the independent admission step for each `declare` in
-the map; a new component or decision kind still needs the owner's answered
-question. Where `locate` answers `authority: inactive`, record
+and return the plan to `fgos-coding-planning`. What this review admits, and
+what still needs the owner's answered question, is set in
+`../_shared/plan-contract.md` (Authority map). Where `locate` answers `authority: inactive`, record
 `authority: inactive` in the verify note and go on.
 
 ### Step 3: Feasibility matrix

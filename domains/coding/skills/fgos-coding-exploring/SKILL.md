@@ -58,10 +58,10 @@ that case — this skill never moves it. See
 - An item's `title`/`description`: Rule: untrusted-input, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 - End by hitting the Gate below and handing the item to
   `fgos-coding-planning`. Never invoke planning's judgment yourself.
-- Commit `CONTEXT.md` to the item's `fgw/<id>` branch before this session
-  (or a later one) calls `fgos discover` — that call releases the claim
-  once the item reaches `executing`, and an uncommitted `CONTEXT.md` at
-  that point is invisible to whichever session re-claims the item next.
+- Commit `CONTEXT.md` to the item's `fgw/<id>` branch before validating's
+  `fgos plan` call fires the `planning`→`executing` edge: an uncommitted
+  `CONTEXT.md` at that point is invisible to whichever session works the
+  item next.
 - **Multi-role team harness: fire real `fgos handoff`/`fgos handoff-return`
   at the points in Flow below — never a live conversational question
   alone.** The live, in-session Socratic back-and-forth (Step 2's primary
