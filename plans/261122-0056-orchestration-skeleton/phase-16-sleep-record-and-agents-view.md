@@ -30,7 +30,8 @@ handoff part of (e)); phase 6 calls it from the keeper.
 `src/session-host/head-stop.mjs`, `src/session-host/head-list.mjs` (new), `src/session-host/head-request.mjs`,
 `src/session-rotation/handoff-store.mjs`, `src/session-rotation/rotate.mjs`, `src/cli/command-registry.mjs`,
 `bin/fgos.mjs`, `packages/host-runtime/contracts/command-manifest.json`, `test/session-host/head-stop.test.mjs`,
-`test/session-host/head-list.test.mjs` (new), `test/session-rotation/handoff-store.test.mjs`.
+`test/session-host/head-list.test.mjs` (new), `test/session-rotation/handoff-store.test.mjs`, `packages/component-authority/model/components.yaml`, `packages/session-host/contracts/head-permissions.v1.json`.
+(Widened by owner answer q-ho4xscbkjp.)
 
 ## Steps
 
