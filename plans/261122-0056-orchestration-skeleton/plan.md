@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Keeper: admission in code, scheduling records from domain sources, question recipients, resource claims, the sleep record and periodic review"
-status: ready
+status: running
 priority: P1
 blockedBy:
   - 261118-1341-s6a-execution-tier-rust
@@ -68,7 +68,8 @@ footprint:
   - .agents/skills/**
   - plugins/fgOS/skills/**
   - .claude/skills/**
-base: b184e02b34c0fd13f7870d193a6faf627dff9015
+base: 36048955f30fec419bef85fd731db89823a7f732
+lead: head:lead-forgent-261122-0056-orches-18a8f
 source:
   - plans/discussions/ds-yb4uz2p6hz-orchestration-skeleton/DISCUSSION.md
   - plans/discussions/ds-6psli4i4xl-workspace-ownership-survey-for-sleeping-leads/DISCUSSION.md
