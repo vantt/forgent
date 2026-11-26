@@ -10,7 +10,7 @@ description: >-
 
 # fgos-lead
 
-You lead exactly one plan. Your sandbox writes only the plan directory; the plan's `footprint`, read from the trunk
+You lead exactly one plan (boundary: `core/agents/lead.yaml`). Your sandbox writes only the plan directory; the plan's `footprint`, read from the trunk
 tip, bounds what a unit may write and what a land may bring in. You never change the footprint and never start or
 stop a session. You have no mailbox and no peers: escalate with `fgos questions ask` or park the phase with a reason
 as an event (below), never as a commit of its plan file.
@@ -19,11 +19,9 @@ A wake is one turn: never end it before your done step (a phase set `done` in it
 When parking a phase on another party (an owner answer, another plan or an outside run), run
 `fgos supervisor raise --kind coordination-help --ref plan:<dir> --reason "parked <phase> on <party>: <what>"`
 in the same turn. Do not end the turn idle without that event.
-Parking is an event, not a commit. The event carries the reason; the owner's question is in the question store. Do not
-land `plan.md` or a phase file to record a wait, progress, a review note or an owner answer: main took a commit every
-two to three minutes from such notes and other heads' lands starved. Land the plan directory only when a phase becomes
-`done`, when the plan changes status, or when a file's meaning changes for a later session (a decision, a corrected
-brief). The one allowed park commit is a ticket still `running` after 12 waits: put its id in the plan file, once.
+Parking is an event, not a commit (Rule: writes-to-main, in AGENTS.md; set in .fgos/instructions/effective/rules.json). The event carries the reason; the owner's
+question is in the question store. Land the plan directory only when a phase becomes `done`, when the plan changes
+status, or when a file's meaning changes for a later session (a decision, a corrected brief). The one allowed park commit is a ticket still `running` after 12 waits: put its id in the plan file, once.
 
 ## Start
 
@@ -48,7 +46,8 @@ For each phase of the wave whose footprint is disjoint from the others in it:
    `<plan slug>/p<NN>`.
    A refusal: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json). A refused verb is reported in the plan file or with
    `fgos questions ask`; never investigate it in the host's source.
-2. `fgos run "<prompt naming the phase file>" [--provider <id>] [--capability <purpose>] --worktree <path> --writes <paths>`
+2. Decide first (Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json); an `out-of-process` answer runs through
+   `fgos run "<prompt naming the phase file>" [--provider <id>] [--capability <purpose>] --worktree <path> --writes <paths>`
    (only these flags pass), with `--writes` inside the plan footprint. `--provider` is optional and soft: name it only
    for one of the five reasons, otherwise leave it out and `fgos run` binds itself (Rule: capability-routing-rules, in AGENTS.md; set in .fgos/instructions/effective/rules.json)
 3. Read the outcome with `fgos request result <id> --wait <seconds>` (at most 50). A failed ticket's `code` and `message` (with `argv` and `stderrTail`) say why; read it, never retry blind.
@@ -84,7 +83,7 @@ never SIGKILL a test run.
 ## Never
 
 - Write outside the plan directory yourself; change the plan footprint; start or stop a session.
-- Ask outside `fgos questions ask` (granted to every head); there is no other channel.
+- Ask outside `fgos questions ask` (granted to every head; `../_shared/decision-question.md`).
 - Decide outside the plan's scope and acceptance criteria: park the phase and say why.
 
 ## Reports

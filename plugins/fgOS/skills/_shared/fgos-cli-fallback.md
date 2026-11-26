@@ -6,7 +6,8 @@ guaranteed project-relative path to a workspace installation shim or
 `bin/fgos.mjs` — an installed plugin's files run from a copied cache
 location, not from a checkout, so this resolves the real binary (tier 0's
 workspace installation shim first, then a dev checkout's `bin/fgos.mjs`)
-or falls back to a global install before giving up. Every CLI-wrapper skill under `plugins/fgOS/skills/` points here
+or falls back to a global install before giving up. The `node bin/fgos.mjs` and global-install branches are
+unsupported for the process, lock and identity verbs (Rule: legacy-node-cli-boundary, in AGENTS.md; set in .fgos/instructions/effective/rules.json). Every CLI-wrapper skill under `plugins/fgOS/skills/` points here
 instead of repeating this block; substitute `<verb-cmd>` with the exact
 `fgos` subcommand and its own flags (including that call's own `--dir`
 value) this call needs — e.g. `list --json --dir

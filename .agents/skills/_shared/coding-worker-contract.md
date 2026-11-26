@@ -73,17 +73,10 @@ these five rules:
    cites from upstream bee): printing your work and then just stopping,
    with neither token anywhere in the output, is not a valid end state —
    your caller has nothing mechanical to read.
-5. **Reuse before you add; retire what you replace.** Before writing a new
-   function, helper, module or mechanism, search the repository for one
-   that already does the job: `rg` its likely name and the primitive it
-   touches (for example `/proc/`, `renameSync`, a `.fgos` path resolver, a
-   pid-liveness check). Reuse or extend what you find; if it sits in a
-   layer you may not import, import the shared module the guard names, or
-   report `[BLOCKED]` — never copy the code. If your work replaces an
-   existing mechanism, move every consumer inside your boundary and delete
-   the old path in the same change; any consumer outside your boundary goes
-   into your report, not a silent second copy. In your report, name what
-   you searched for and what you reused, extended or replaced.
+5. **Reuse before you add; retire what you replace:** Rule: design-principles, in AGENTS.md; set in .fgos/instructions/effective/rules.json (principles 1-2).
+   For a worker: a shared module you may not import is `[BLOCKED]`, never a copy; a consumer outside your
+   boundary goes into your report, not a silent second copy; and the report names what you searched for and
+   what you reused, extended or replaced.
 
 ### Layer 2 — CODING-SPECIFIC (lifecycle-bearing units only: work + child-work)
 

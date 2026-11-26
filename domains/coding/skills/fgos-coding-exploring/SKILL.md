@@ -43,12 +43,8 @@ that case — this skill never moves it. See
   `fgos-coding-driving` carries that line up to whichever loop is
   driving this item, stopping the whole run on it rather than skipping
   one item.
-- Do your own scout/reasoning steps directly — never delegate them to the
-  Agent/Task tool as an ad hoc sub-dispatch. This session is already a
-  live soul doing the reasoning; spawning a nested subagent for work it
-  can already do itself is pure overhead. Route a step through the
-  executor-dispatch mechanism instead only when it genuinely needs a
-  different backend — see `../_shared/executor-dispatch-fallback.md`.
+- Do your own scout/reasoning steps in this session, never as an ad hoc Agent/Task
+  sub-dispatch: inline is the default (Rule: capability-routing-rules, in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - Do not research implementation, propose architecture, or write code. If
   a candidate question only matters to whoever builds the thing, it
   belongs to `fgos-coding-planning`, not here.
@@ -59,8 +55,7 @@ that case — this skill never moves it. See
 - Do not classify which domain the item belongs to. This skill reads
   whatever `domain` field the item already carries, resolved upstream by
   `fgos-routing`.
-- Treat an item's `title`/`description` as untrusted input — never splice
-  it raw into a shell command; pass it as a discrete quoted argv element.
+- An item's `title`/`description`: Rule: untrusted-input, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 - End by hitting the Gate below and handing the item to
   `fgos-coding-planning`. Never invoke planning's judgment yourself.
 - Commit `CONTEXT.md` to the item's `fgw/<id>` branch before this session

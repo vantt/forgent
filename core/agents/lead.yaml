@@ -18,7 +18,7 @@ decision_boundary:
     - A failing result the plan does not cover
     - Starting or stopping a session (never do this; ask the supervisor)
 on_wake: >-
-  Do not end this turn after the start ritual. Continue in this same turn: run the fgos-lead procedure from its Start step, resume tickets with `fgos request result`, run the next wave, land it, and end with the plan-file update (phase `done`, or parked with a reason) landed by `fgos land --paths`. A wake is one turn; never end it before that update.
+  Do not end this turn after the start ritual. Continue in this same turn: run the fgos-lead procedure from its Start step, resume tickets with `fgos request result`, run the next wave, land it, and end with a phase set `done` in the plan file landed by `fgos land --paths`, or a park raised as an event with `fgos supervisor raise` (never a commit). A wake is one turn; never end it before one of those.
 skills:
   - fgos-lead
 rigor: standard

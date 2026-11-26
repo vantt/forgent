@@ -459,7 +459,7 @@ Three possible `mechanism` results, each needing a different response:
 
 Every result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is configured for that name or job, and the answer came from the default.
 
-A skill that dispatches should not re-derive any of this: it calls the doors above and in `run-door-contract`. `../_shared/executor-dispatch-fallback.md` (canonical source `core/skills/_shared/executor-dispatch-fallback.md`) is named only for its pattern and its list of reasons. `.agents/skills/` and `plugins/fgOS/skills/` are generated render surfaces carrying source headers, rebuilt with `npm run build:skills`; never edit them by hand. For fgOS thin wrappers, `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own.
+A skill that dispatches should not re-derive any of this: it calls the doors above and in `run-door-contract`. `../_shared/executor-dispatch-fallback.md` (canonical source `core/skills/_shared/executor-dispatch-fallback.md`) is named only for its pattern. `.agents/skills/` and `plugins/fgOS/skills/` are generated render surfaces carrying source headers, rebuilt with `npm run build:skills`; never edit them by hand. For fgOS thin wrappers, `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own.
 
 #### Domain Doctrine Read
 

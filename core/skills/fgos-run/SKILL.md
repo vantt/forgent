@@ -87,11 +87,10 @@ When a workflow step declares a human gate (`gate: { kind: "human" }`) or when a
 
 ## 4. Reviewing a Change That Touches Tests
 
-Every behaviour has one owning proof: Rule: design-principles (in AGENTS.md; set in .fgos/instructions/effective/rules.json). (principle 8). Whoever reviews a Unit's result, or accepts a lead's report, checks these four lines and returns a finding for each one that fails; a report that adds tests without reasons, or deletes a mechanism without a retired list, is not accepted:
+Every behaviour has one owning proof: Rule: design-principles (in AGENTS.md; set in .fgos/instructions/effective/rules.json). (principle 8). Whoever reviews a Unit's result, or accepts a lead's report, checks these three lines and returns a finding for each one that fails; a report that adds tests without reasons, or deletes a mechanism without a retired list, is not accepted:
 
-1. **Every new test file:** why not the existing file for this module? Only a new module or a new boundary gets a new file.
-2. **Every new test:** its title names the behaviour in plain words (no task ids), the owning proof was searched for (`rg` the behaviour's words and the symbol), and the report gives the reason no existing test proves it.
-3. **Every deleted or replaced mechanism:** its tests are retired in the same change and listed, each with the test that now owns the behaviour or the statement that the behaviour is gone.
-4. **Every Node test in a Rust-ported area** (git, holder-lock, event-store, run-supervisor, terminal-control): it is the one route proof for its port or a Node-only behaviour, never a copy of a case a Rust test owns.
+1. **Every new test file and every new test** meets principle 8 (where a new file is allowed, what the title names, why no existing test proves it), and the report shows the owning proof was searched for (`rg` the behaviour's words and the symbol).
+2. **Every deleted or replaced mechanism:** its tests are retired in the same change and listed, each with the test that now owns the behaviour or the statement that the behaviour is gone.
+3. **Every Node test in a Rust-ported area** (git, holder-lock, event-store, run-supervisor, terminal-control): it is the one route proof for its port or a Node-only behaviour, never a copy of a case a Rust test owns.
 
 The report quotes the `suite:` lines `npm test` prints: the suite against `test/suite-baseline.json` (files, `test()` calls, wall time), and this change against the merge base (`test()` lines added and removed, new CLI/host spawn sites and how many carry no reason). A new CLI, host or fgctl spawn in a test carries `// boundary: <why a lower layer cannot prove it>` on its line or the one above. A change that adds such spawns, or changes what every CLI call loads, also quotes `node scripts/test-proof-inventory.mjs --cli-cost` run on the base and on the branch.

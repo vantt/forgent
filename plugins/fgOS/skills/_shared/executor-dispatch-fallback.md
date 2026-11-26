@@ -40,7 +40,7 @@ None of these shared fragments is coding-specific.
 
 ## Activation doctrine: Decide before execute
 
-Before executing any independently executable unit (e.g. `code:implement` for coding implementation), select the canonical capability for the job — see `capability-catalog.md` for the registered vocabulary — and call `decide` (`fgos dispatch decide --for <PURPOSE> [--has-live-task-access]`) before proceeding. The returned `mechanism` controls execution: `unavailable` means execute inline directly in this session; `in-process` or `out-of-process` delegates according to the control plane. The resolved provider is not necessarily agent-shaped — a capability may resolve to an MCP/tool provider or another registered adapter instead of an agent executor (`capability-catalog.md`'s "Capability execution guidance"); read the resolved `mechanism`/executor `kind` rather than assuming an Agent/Task hand-off.
+Before executing any independently executable unit (e.g. `code:implement` for coding implementation), select the canonical capability for the job — see `capability-catalog.md` for the registered vocabulary — and ask `decide` once: Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json. The resolved provider is not necessarily agent-shaped — a capability may resolve to an MCP/tool provider or another registered adapter instead of an agent executor (`capability-catalog.md`'s "Capability execution guidance"); read the resolved `mechanism`/executor `kind` rather than assuming an Agent/Task hand-off.
 
 The five valid reasons to configure an executor, and inline as the default:
 Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
@@ -285,15 +285,11 @@ scarcity signal needs the full denominator, not just the misses.
 - No live consumer of this fragment's own Steps A-C remains today (tsk-4ns
   retired the standalone submit-assist skill's own dispatch to
   `submit-assist-classify` — its classify step never had a real reason to
-  dispatch per the "Valid reasons to dispatch" list above: the input was
+  dispatch per the five reasons (Rule: capability-routing-rules, in AGENTS.md; set in .fgos/instructions/effective/rules.json): the input was
   already in the caller's own context, and spawning added latency at the
   exact moment a person is waiting, `AGENTS.md`'s priority #1; that skill
   has since been retired in full, tsk-6ar). This
-  fragment stays in place: six other stage skills
-  (`fgos-coding-validating`/`fgos-coding-implement`/`fgos-fanout`/`fgos-coding-planning`/
-  `fgos-coding-exploring`/`fgos-researching`) cite its "Valid reasons to dispatch"
-  list directly when explaining their own never-delegate-reasoning rule,
-  and it remains the ready-made pattern for the next real cross-provider
+  fragment stays in place as the ready-made pattern for the next real cross-provider
   consumer. Step A's `in-process`/`out-of-process` branching (`decide`,
   tsk-3ik-1) is proven by `src/runner/dispatch.mjs`'s own unit tests, and
   Step B's run by `fgos run`'s (`src/runner/execution/run.mjs`).
