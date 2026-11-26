@@ -17,3 +17,11 @@ requests, 18 cleanups, 8 acceptance deviations. Settled in
 # Plan
 
 `plans/261127-0151-ready-plan-runs-unattended/plan.md`.
+
+# Done when
+
+Plan `plans/261127-0151-ready-plan-runs-unattended/plan.md` is `done`: its acceptance criteria hold.
+
+# Notes
+
+Source: discussion `ds-que32ftgg6`.

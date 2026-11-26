@@ -47,7 +47,9 @@ Seen on 2026-11-26 (evidence, not the only case):
 - Read the earlier converged discussion `ds-izwfo6f267-parallel-decomposition-footprint-avoidance` (open, from
   2026-08-05) and `ds-mzyircswox-widen-a-running-plan-footprint` (paused) first, and say what is reused.
 
-# Done when (the option chosen in the discussion fixes the exact wording)
+# Done when
+
+The option chosen in the discussion fixes the exact wording.
 
 - Two plans whose footprints overlap are both admitted and run on their own branches. The overlap is reported to the
   supervisor as advice (which plan lands first, which will meet the conflict), never as a refusal of `ready`.
