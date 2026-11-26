@@ -19,7 +19,11 @@ HC-D1). Capability: `code:implement`.
 `packages/session-host/rust/src/permissions.rs`, `packages/session-host/rust/tests/forwarder.rs`,
 `packages/session-host/rust/tests/permissions.rs`, `packages/run-supervisor/rust/src/head_client.rs`,
 `packages/run-supervisor/rust/src/head_request.rs`, `apps/fgos/src/wiring/mailbox_root.rs`,
-`apps/fgos/src/wiring/mailbox_hook.rs`, `apps/fgos/src/wiring/mailbox_verbs.rs`, `apps/fgos/tests/mailbox_routes.rs`.
+`apps/fgos/src/wiring/mailbox_hook.rs`, `apps/fgos/src/wiring/mailbox_verbs.rs`, `apps/fgos/tests/mailbox_routes.rs`,
+`apps/fgos/src/routing.rs`.
+
+Owner answer `q-vqyxe5oi6j` (2026-11-26): `apps/fgos/src/routing.rs` joins the footprint only for the mailbox window
+arm (forward `inbox` beside `send`) and its test; no other change to `routing.rs`.
 
 ## Steps
 

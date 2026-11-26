@@ -27,6 +27,8 @@ footprint:
   - packages/supervision/rust/tests/fixtures/definitions/**
   - src/session-host/head-stop.mjs
   - test/session-host/head-stop.test.mjs
+  - bin/fgos.mjs
+  - packages/supervision/rust/observe-kinds.json
   - docs/platform/supervision/spec.md
   - docs/platform/observe/spec.md
   - docs/platform/session-host/spec.md
@@ -128,7 +130,7 @@ a handoff. This plan is the safety net under that rule.
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Diagnose why an ended lead raised no event](phase-01-diagnosis.md) | - | plans/261124-2143-head-lifecycle-events/reports/diagnosis.md | 1 | done |
-| 3 | [Close finished planners and leads through one door](phase-03-close-finished-heads.md) | - | packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, core/watcher/definitions/plan-drafted.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/plan-drafted/**, src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs | 1 | running |
+| 3 | [Close finished planners and leads through one door](phase-03-close-finished-heads.md) | - | packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, core/watcher/definitions/plan-drafted.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/plan-drafted/**, src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs, bin/fgos.mjs, packages/supervision/rust/observe-kinds.json | 1 | running |
 | 2 | [Host-side end signal for a head](phase-02-host-end-signal.md) | 1, 3 | apps/fgos/src/wiring/observe_sources/head_state.rs, apps/fgos/src/wiring/observe_sources/tests/mod.rs, apps/fgos/observe-kinds.json, core/watcher/definitions/lead-ended.query.json, core/watcher/definitions/session-gone.query.json, core/attention/definitions/head-gone.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/fixtures/definitions/** | 2 | ready |
 | 4 | [A lead waiting outside does not hold a working slot](phase-04-waiting-lead-slot.md) | 3 | packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs | 2 | ready |
 | 5 | [Spec, skill and generated skills](phase-05-spec-and-skill.md) | 2, 3, 4 | docs/platform/supervision/spec.md, docs/platform/observe/spec.md, docs/platform/session-host/spec.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 3 | ready |

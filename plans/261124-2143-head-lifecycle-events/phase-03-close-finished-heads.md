@@ -25,6 +25,13 @@ Closes `p-6hqvgokerb` in code.
 - `packages/supervision/rust/tests/fixtures/definitions/plan-drafted/**`
 - `src/session-host/head-stop.mjs`
 - `test/session-host/head-stop.test.mjs`
+- `bin/fgos.mjs`
+- `packages/supervision/rust/observe-kinds.json`
+
+Owner answer `q-myvzcbz3sx` (2026-11-26): widen the footprint by exactly these two paths. `session stop` in
+`bin/fgos.mjs` took only a persona and `--name`, so the adapter's `session stop --role lead:<LANE>` was refused; the
+wake door's two new outcomes `stopped-finished` and `stop-failed` were missing from the outcome vocabulary. No other
+change to `bin/fgos.mjs`.
 
 ## Steps
 
