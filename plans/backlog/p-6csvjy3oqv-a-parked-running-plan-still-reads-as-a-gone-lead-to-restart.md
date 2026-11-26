@@ -22,4 +22,6 @@ reason and who may lift it), read from the plan's own phase table or frontmatter
 One owning test: a running plan with parked phases and no live lead is not offered for restart. Reuse the phase
 table status column (a `parked` status) rather than a new store.
 
+# Notes
+
 Second occurrence: a supervisor wake restarted the same lead again at 2026-11-26 10:05 (+07); the lead ran nothing, asked to be stopped, and was stopped at 10:20.

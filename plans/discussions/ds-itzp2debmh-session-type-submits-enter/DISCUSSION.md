@@ -3,7 +3,9 @@ id: ds-itzp2debmh
 title: "fgos session type submits what it types"
 status: settled
 source:
-  - p-nroysfhtso p-cdsvrsfnui p-lfwmzs6zsr
+  - p-nroysfhtso
+  - p-cdsvrsfnui
+  - p-lfwmzs6zsr
 created: 2026-11-26
 ---
 

@@ -17,3 +17,7 @@ footprint, so that plan could not add one. Evidence: `plans/261126-0853-config-s
 
 One owning test in `packages/git/rust/tests/land.rs` shows that a land clears skip-worktree on tracked `.fgos` files
 and restores them from the target.
+
+# Notes
+
+None.

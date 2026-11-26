@@ -15,7 +15,11 @@ never move by themselves. Work already has clarify, discover, plan and triage st
 path from Work into an independent, domain-agnostic workflow that serves portfolio backlog rows. Source:
 `plans/discussions/ds-ipvis4jkpc-release-chain-command/DISCUSSION.md` §3 row 3, D10.
 
-# Scope
+# Done when
+
+A settled discussion for this topic is handed to a planner.
+
+# Notes
 
 Backlog row → clarify on intake (rewrite a terse request so it is explicit, classify it) → triage against the managed
 goals by goal priority → discover (facts into the discussion) → exploring only when discover is incomplete → planning
@@ -25,7 +29,3 @@ plan waits when its turn in the delivery queue comes.
 Interface: §3 row 15 and D5, D6, D10 of ds-ipvis4jkpc. The pipeline produces a `ready` plan carrying the `delivery`
 flag. Open here: whether the delivery commitment can sit on a backlog row before any plan exists, and how "just in
 time" is timed.
-
-# Done when
-
-A settled discussion for this topic is handed to a planner.
