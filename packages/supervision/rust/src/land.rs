@@ -1520,6 +1520,7 @@ impl Lander<'_> {
         let has_globs = regen.files.iter().any(|f| f.contains('*'));
         if !has_globs {
             for file in &regen.files {
+                Self::refuse_symlinked_components(&candidate.worktree, file, false)?;
                 let full = candidate.worktree.join(file);
                 let meta = match std::fs::symlink_metadata(&full) {
                     Ok(m) => Some(m),
@@ -1589,6 +1590,7 @@ impl Lander<'_> {
             let start = if prefix.is_empty() {
                 candidate.worktree.clone()
             } else {
+                Self::refuse_symlinked_components(&candidate.worktree, prefix, true)?;
                 candidate.worktree.join(prefix)
             };
             Self::walk_worktree_matching(
@@ -1600,6 +1602,7 @@ impl Lander<'_> {
         }
 
         for file in files_to_compare {
+            Self::refuse_symlinked_components(&candidate.worktree, &file, false)?;
             let full = candidate.worktree.join(&file);
             let meta = match std::fs::symlink_metadata(&full) {
                 Ok(m) => Some(m),
@@ -1613,6 +1616,10 @@ impl Lander<'_> {
                         format!("{file}: symlinks cannot be regenerated"),
                     ));
                 }
+            }
+            if meta.as_ref().is_some_and(|m| m.is_dir()) {
+                // A literal directory entry: its files are compared through the walks.
+                continue;
             }
             let now = match meta {
                 Some(_) => match std::fs::read(&full) {
@@ -1749,6 +1756,8 @@ impl Lander<'_> {
         let mut prefixes = BTreeSet::new();
         for pattern in scope {
             if !pattern.contains('*') {
+                // A literal entry also matches everything beneath it, so it is its own walk origin.
+                prefixes.insert(pattern.trim_matches('/').to_string());
                 continue;
             }
             let mut parts = Vec::new();
@@ -1777,6 +1786,43 @@ impl Lander<'_> {
             }
         }
         pruned
+    }
+
+    /// Refuse when a component of `rel` under `root` is a symlink: reads and restores would follow it.
+    /// The final component is checked only when `include_last` (a walk origin); a compared file's
+    /// own symlink state is handled by its caller.
+    fn refuse_symlinked_components(
+        root: &Path,
+        rel: &str,
+        include_last: bool,
+    ) -> Result<(), LandRefusal> {
+        let parts: Vec<&str> = rel.split('/').filter(|s| !s.is_empty()).collect();
+        let upto = if include_last {
+            parts.len()
+        } else {
+            parts.len().saturating_sub(1)
+        };
+        let mut cur = root.to_path_buf();
+        for (i, part) in parts.iter().take(upto).enumerate() {
+            cur.push(part);
+            match std::fs::symlink_metadata(&cur) {
+                Ok(m) if m.file_type().is_symlink() => {
+                    return Err(refuse(
+                        "land-regenerate-failed",
+                        format!("{}: symlinks cannot be regenerated", parts[..=i].join("/")),
+                    ))
+                }
+                Ok(_) => {}
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+                Err(e) => {
+                    return Err(refuse(
+                        "land-regenerate-failed",
+                        format!("{}: {e}", parts[..=i].join("/")),
+                    ))
+                }
+            }
+        }
+        Ok(())
     }
 
     fn segment_matches(pat: &str, val: &str) -> bool {
@@ -1811,6 +1857,14 @@ impl Lander<'_> {
         }
         for pattern in scope {
             let pat_parts: Vec<&str> = pattern.split('/').filter(|s| !s.is_empty()).collect();
+            if !pattern.contains('*') {
+                // A literal entry matches its whole subtree: intersect when either is a prefix.
+                let shared = dir_parts.len().min(pat_parts.len());
+                if dir_parts[..shared] == pat_parts[..shared] {
+                    return true;
+                }
+                continue;
+            }
             let mut matches = true;
             for (i, dir_part) in dir_parts.iter().enumerate() {
                 if i >= pat_parts.len() {
@@ -1866,6 +1920,9 @@ impl Lander<'_> {
                     }
                 }
             }
+            return Ok(());
+        }
+        if !meta.is_dir() {
             return Ok(());
         }
 

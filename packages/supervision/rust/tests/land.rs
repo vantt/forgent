@@ -2202,3 +2202,57 @@ fn branch_land_worktree_listing_failure_is_reported_without_failing_land() {
     );
     assert!(!removed_called.get());
 }
+
+#[test]
+fn a_literal_declared_directory_is_compared_beneath_it_next_to_a_glob_entry() {
+    let f = Fixture::new();
+    f.topic(
+        "topic",
+        &[("gen/a/b.txt", "topic-b\n"), ("src.txt", "src\n")],
+    );
+    f.move_remote("trunk-only.txt", "trunk\n");
+
+    let cfg = LandConfig {
+        gates: vec![gate("true")],
+        regenerate: Some(Regenerate {
+            run: "mkdir -p gen/a && echo regenerated > gen/a/b.txt && echo fresh > gen/a/new.txt"
+                .into(),
+            files: vec!["gen".into(), "x/**".into()],
+            when: Vec::new(),
+        }),
+    };
+    let out = f.land(&branch("topic"), &cfg).unwrap();
+    assert_eq!(out.main_sha, f.remote_tip());
+    assert_eq!(
+        fs::read_to_string(f.main.join("gen/a/b.txt")).unwrap(),
+        "regenerated\n"
+    );
+    assert_eq!(
+        fs::read_to_string(f.main.join("gen/a/new.txt")).unwrap(),
+        "fresh\n"
+    );
+}
+
+#[test]
+fn a_symlinked_directory_under_a_walk_origin_refuses_naming_the_path() {
+    let f = Fixture::new();
+    f.topic("topic", &[("src.txt", "src\n")]);
+    f.move_remote("trunk-only.txt", "trunk\n");
+
+    let cfg = LandConfig {
+        gates: vec![gate("true")],
+        regenerate: Some(Regenerate {
+            run: "mkdir -p ../real-gen && echo x > ../real-gen/a.txt && ln -s ../real-gen gen"
+                .into(),
+            files: vec!["gen/*.txt".into()],
+            when: Vec::new(),
+        }),
+    };
+    let refusal = f.land(&branch("topic"), &cfg).unwrap_err();
+    assert_eq!(refusal.code, "land-regenerate-failed");
+    assert!(
+        refusal.detail.contains("gen"),
+        "must name the symlinked path: {}",
+        refusal.detail
+    );
+}
