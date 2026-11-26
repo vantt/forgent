@@ -26,7 +26,11 @@
    head's own current generation is offered without asking Identity; only mail for another key or generation is
    rerouted through Identity, so an Identity outage delays a reroute but never withholds mail from its addressee; a
    predecessor that drains before its successor can still be offered role mail once (accepted race).
-5. §17 decision history: one entry for HC-D1 to HC-D5 citing the discussion file.
+5. Refusals of a forwarded host verb (phase 4, landed da6d7c42e): a head sees the host verb's own refusal code; a bare
+   `host-failed` means the host printed nothing and names its exit or signal; output with no readable code is
+   `host-output-unreadable`. `mailbox inbox` from a confined head goes through the request socket and reads only the
+   caller's own mail. Say this where the spec describes confined mail.
+6. §17 decision history: one entry for HC-D1 to HC-D5 citing the discussion file.
 
 ## Verify
 
