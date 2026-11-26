@@ -1,7 +1,8 @@
 ---
 contract: plan-v1
 title: "Gather every fgOS rule to one owner in the Agent Context Engine and resolve the 14 measured conflicts"
-status: draft
+status: running
+lead: lead:ace
 priority: P1
 blockedBy:
   - 261125-1631-agent-context-engine
