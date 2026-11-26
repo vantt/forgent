@@ -1,9 +1,10 @@
-//! The wake door: the one place that decides whether to start the project's supervisor. It starts
-//! a head only when none is live, leaves a live one alone, and never reads unknown identity as
-//! not-live. Every call records one `fgos.supervisor.wake` span.
+//! The wake door admits ready plans within caps, then starts the project's supervisor only for
+//! events that still need judgement. Unknown Identity never means free. Every call and each
+//! admission decision records an `fgos.supervisor.wake` span.
 use crate::{
-    portfolio::{admissible, head_name, supervisor_name, Plan},
+    portfolio::{admission_hold, collisions, head_name, order, supervisor_name, Plan},
     queue::{Queue, QueueError, RaisedEvent},
+    supervisor::{lead_counts, OpenQuestions},
 };
 
 /// The event kinds that only mean "capacity changed": they matter only when a plan can start.
@@ -43,9 +44,12 @@ pub enum Holder {
 }
 pub trait Identity {
     fn holder(&self, role: &str) -> Holder;
+    /// All lead head roles in this project, including holders whose liveness is unknown.
+    /// A directory that cannot be read refuses rather than reporting no leads.
+    fn lead_roles(&self, project_id: &str) -> Result<Vec<String>, String>;
 }
 
-/// Starts a session. The adapter runs `<host> session start supervisor --name <name>` with the
+/// Starts a session. The adapter runs `<host> session start <persona> --name <name>` with the
 /// environment a timer start needs. `Err` carries the host's code.
 pub trait StartSession {
     fn start(&self, persona: &str, name: &str) -> Result<(), String>;
@@ -70,8 +74,22 @@ pub trait StopSession {
 
 /// The plans the supervisor could start, over the portfolio reader.
 pub trait Portfolio {
-    fn plans(&self) -> Result<Vec<Plan>, String>;
-    fn done_dirs(&self) -> Result<Vec<String>, String>;
+    /// One trunk snapshot: readable plans and refused ready-plan directories requiring judgement.
+    fn read(&self) -> Result<(Vec<Plan>, Vec<String>), String>;
+}
+
+/// Admission's config and machine lane snapshot, read only through their owning doors.
+#[derive(Debug, Clone, Copy)]
+pub struct Capacity {
+    pub max_leads: usize,
+    pub free_lanes: usize,
+}
+
+pub trait Admission {
+    fn capacity(&self) -> Result<Capacity, String>;
+    /// Publish running status and the lead role through the existing paths land door. A stale
+    /// plan or failed publication refuses; the wake never starts a lead before this succeeds.
+    fn admit(&self, plan: &Plan, role: &str) -> Result<(), String>;
 }
 
 /// The last start attempt and the consecutive failures since the last success.
@@ -98,7 +116,8 @@ pub struct WakeSpan {
     pub subject: String,
     pub trigger: String,
     pub outcome: &'static str,
-    /// The host's code when the outcome is a refusal (`stop-failed`); empty otherwise.
+    /// The refusal code, or admission's reason code (including `start-failed:<host code>`).
+    /// Admission reuses this string attribute so the span stays inside its registered vocabulary.
     pub error: String,
 }
 pub trait Telemetry {
@@ -111,6 +130,8 @@ pub struct Ports<'a> {
     pub start: &'a dyn StartSession,
     pub stop: &'a dyn StopSession,
     pub portfolio: &'a dyn Portfolio,
+    pub admission: &'a dyn Admission,
+    pub questions: &'a dyn OpenQuestions,
     pub queue: &'a dyn Drain,
     pub log: &'a dyn WakeLog,
     pub clock: &'a dyn Clock,
@@ -244,11 +265,8 @@ pub fn is_short_lead_role(role: &str) -> bool {
 /// landed (`draft` or `ready`), and the lead of a `done` plan. Only a live head of this project
 /// that is `Idle` is stopped; `Busy`, `Unknown` and a failed stop leave it for the next wake. Never
 /// blocks the start decision.
-fn close_finished(ports: &Ports, trigger: Trigger) {
+fn close_finished(ports: &Ports, trigger: Trigger, plans: &[Plan], done: &[String]) {
     let Some(project) = ports.project.project() else {
-        return;
-    };
-    let (Ok(plans), Ok(done)) = (ports.portfolio.plans(), ports.portfolio.done_dirs()) else {
         return;
     };
     let is_done = |plan: &Plan| plan.status == "done" || done.contains(&plan.dir);
@@ -259,7 +277,7 @@ fn close_finished(ports: &Ports, trigger: Trigger) {
         .filter_map(|p| p.lead.as_ref())
         .collect();
     let mut targets: Vec<(String, String, String)> = Vec::new();
-    for plan in &plans {
+    for plan in plans {
         if is_done(plan) {
             if let Some(role) = plan.lead.as_ref().filter(|r| !still_leading.contains(r)) {
                 if let Some((persona, name)) = lead_target(role) {
@@ -304,19 +322,148 @@ fn close_finished(ports: &Ports, trigger: Trigger) {
 
 /// Start the supervisor if there is work for it and none is live.
 pub fn wake(ports: &Ports, settings: &Settings, trigger: Trigger) -> WakeOutcome {
-    close_finished(ports, trigger);
-    let outcome = decide(ports, settings);
+    let needs_judgement = match ports.portfolio.read() {
+        Ok((plans, refused)) => {
+            let done: Vec<String> = plans
+                .iter()
+                .filter(|p| p.status == "done")
+                .map(|p| p.dir.clone())
+                .collect();
+            close_finished(ports, trigger, &plans, &done);
+            admit_ready(ports, trigger, plans, &done, !refused.is_empty())
+        }
+        Err(_) => true,
+    };
+    let outcome = decide(ports, settings, needs_judgement);
     ports.telemetry.emit(&WakeSpan {
         name: "fgos.supervisor.wake",
         subject: trigger.subject.to_owned(),
         trigger: trigger.trigger.to_owned(),
         outcome: outcome.as_str(),
-        error: String::new(),
+        error: match &outcome {
+            WakeOutcome::StartFailed(code) => code.clone(),
+            _ => String::new(),
+        },
     });
     outcome
 }
 
-fn decide(ports: &Ports, s: &Settings) -> WakeOutcome {
+/// Admit in portfolio order before considering an LLM wake. Holds are final capacity decisions;
+/// an unreadable or unclassifiable plan and a failed side effect leave the event for judgement.
+fn admit_ready(
+    ports: &Ports,
+    trigger: Trigger,
+    mut plans: Vec<Plan>,
+    done: &[String],
+    mut judgement: bool,
+) -> bool {
+    let Some(project) = ports.project.project() else {
+        return false;
+    };
+    order(&mut plans);
+    let mut reserved_roles = Vec::new();
+    let mut reserved_lanes = 0;
+    for i in 0..plans.len() {
+        if plans[i].status != "ready" {
+            continue;
+        }
+        let name = head_name(&project.handle, &plans[i].dir);
+        let role = format!("head:lead-{name}");
+        // Publication can wait on the land door. Re-read machine facts before every admission,
+        // retaining this wake's reservations until the newly started heads acquire Identity roles.
+        let facts = ports.admission.capacity().and_then(|capacity| {
+            ports
+                .identity
+                .lead_roles(&project.id)
+                .map(|roles| (capacity, roles))
+        });
+        let (capacity, roles) = match facts {
+            Ok(facts) => facts,
+            Err(code) => {
+                ports.telemetry.emit(&WakeSpan {
+                    name: "fgos.supervisor.wake",
+                    subject: format!("plan:{}", plans[i].dir),
+                    trigger: trigger.trigger.to_owned(),
+                    outcome: "nothing-admissible",
+                    error: code,
+                });
+                judgement = true;
+                break;
+            }
+        };
+        let (leads, _) = lead_counts(
+            &plans,
+            &roles,
+            &project.id,
+            &|role| {
+                if reserved_roles.iter().any(|r| r == role) {
+                    Holder::Unknown
+                } else {
+                    ports.identity.holder(role)
+                }
+            },
+            ports.questions,
+        );
+        let mut outcome = "nothing-admissible";
+        let mut publication_failed = false;
+        let reason = if let Some(reason) = admission_hold(&plans[i], &plans, done) {
+            if reason != "held-blocked" && reason != "held-footprint-overlap" {
+                judgement = true;
+            }
+            reason.to_owned()
+        } else if leads >= capacity.max_leads {
+            "held-max-leads".to_owned()
+        } else if capacity.free_lanes <= reserved_lanes {
+            "held-no-lane".to_owned()
+        } else if collisions(&plans, &project.handle)
+            .iter()
+            .any(|(a, b)| a == &plans[i].dir || b == &plans[i].dir)
+            || ports.identity.holder(&role) != Holder::NotLive
+        {
+            judgement = true;
+            "lead-role-unavailable".to_owned()
+        } else {
+            match ports.admission.admit(&plans[i], &role) {
+                Err(code) => {
+                    judgement = true;
+                    publication_failed = true;
+                    format!("publish-failed:{code}")
+                }
+                Ok(()) => {
+                    // Reserve the footprint and both budgets even if the host refuses the start.
+                    plans[i].status = "running".to_owned();
+                    plans[i].lead = Some(role.clone());
+                    reserved_roles.push(role);
+                    reserved_lanes += 1;
+                    match ports.start.start("lead", &name) {
+                        Ok(()) => {
+                            outcome = "started";
+                            "admitted".to_owned()
+                        }
+                        Err(code) => {
+                            judgement = true;
+                            outcome = "start-failed";
+                            format!("start-failed:{code}")
+                        }
+                    }
+                }
+            }
+        };
+        ports.telemetry.emit(&WakeSpan {
+            name: "fgos.supervisor.wake",
+            subject: format!("plan:{}", plans[i].dir),
+            trigger: trigger.trigger.to_owned(),
+            outcome,
+            error: reason,
+        });
+        if publication_failed {
+            break;
+        }
+    }
+    judgement
+}
+
+fn decide(ports: &Ports, s: &Settings, needs_judgement: bool) -> WakeOutcome {
     let Some(project) = ports.project.project() else {
         return WakeOutcome::ProjectIdMissing;
     };
@@ -327,17 +474,21 @@ fn decide(ports: &Ports, s: &Settings) -> WakeOutcome {
     if unhandled.is_empty() {
         return WakeOutcome::NothingUnhandled;
     }
-    if unhandled
-        .iter()
-        .all(|e| CAPACITY_KINDS.contains(&e.kind.as_str()))
-        && nothing_admissible(ports)
-    {
-        let ids: Vec<String> = unhandled.iter().map(|e| e.id.clone()).collect();
-        // A failed close only means the next tick looks again.
-        if let Err(e) = ports.queue.mark_handled(&ids, "watcher") {
-            return WakeOutcome::StartFailed(e.code.to_owned());
+    if !needs_judgement {
+        let ids: Vec<String> = unhandled
+            .iter()
+            .filter(|e| CAPACITY_KINDS.contains(&e.kind.as_str()) || e.kind == "plan-became-ready")
+            .map(|e| e.id.clone())
+            .collect();
+        if !ids.is_empty() {
+            // A failed close only means the next tick looks again.
+            if let Err(e) = ports.queue.mark_handled(&ids, "watcher") {
+                return WakeOutcome::StartFailed(e.code.to_owned());
+            }
+            if ids.len() == unhandled.len() {
+                return WakeOutcome::NothingAdmissible;
+            }
         }
-        return WakeOutcome::NothingAdmissible;
     }
     match ports.identity.holder(&supervisor_role(&project.handle)) {
         Holder::Live { project_id } if project_id == project.id => return WakeOutcome::AlreadyLive,
@@ -378,13 +529,5 @@ fn decide(ports: &Ports, s: &Settings) -> WakeOutcome {
             let _ = ports.log.save(failed(state.failures + 1));
             WakeOutcome::StartFailed(code)
         }
-    }
-}
-
-fn nothing_admissible(ports: &Ports) -> bool {
-    match (ports.portfolio.plans(), ports.portfolio.done_dirs()) {
-        (Ok(plans), Ok(done)) => admissible(&plans, &done).is_empty(),
-        // An unreadable portfolio is never read as "nothing to do".
-        _ => false,
     }
 }

@@ -340,25 +340,43 @@ fn the_queue_lists_the_raised_event_and_done_refuses_until_it_is_handled() {
 #[test]
 fn wake_with_no_live_supervisor_and_an_unhandled_event_starts_one_through_session_start() {
     let scene = Scene::new("wake", WATCHER_CONFIG);
-    // Nothing raised yet: nothing to wake for.
+    // Admission runs even without an event; only the supervisor has nothing to wake for.
     let idle = scene.data(&["supervisor", "wake", "--json"]);
     assert_eq!(idle["outcome"], "nothing-unhandled", "{idle}");
+    let lead = serde_json::json!([
+        "session",
+        "start",
+        "lead",
+        "--name",
+        "demo-260101-0000-demo",
+        "--json"
+    ]);
+    assert_eq!(scene.payload_calls(), vec![lead.clone()]);
+    let admitted = git(
+        &scene.root.join("remote.git"),
+        &["show", &format!("main:plans/{PLAN}/plan.md")],
+    );
+    assert!(admitted.contains("status: running\n"), "{admitted}");
+    assert!(
+        admitted.contains("lead: head:lead-demo-260101-0000-demo\n"),
+        "{admitted}"
+    );
 
-    // A tick that leaves an event unhandled wakes the supervisor itself, once.
+    // A tick that leaves a judgement event unhandled starts the supervisor, not another lead.
     let report = first_tick(&scene);
     assert_eq!(report["wakes"], 1, "{report}");
     let start = serde_json::json!(["session", "start", "supervisor", "--name", "demo", "--json"]);
-    assert_eq!(scene.payload_calls(), vec![start.clone()]);
+    assert_eq!(scene.payload_calls(), vec![lead.clone(), start.clone()]);
     // A wake inside the start window leaves that start alone.
     let again = scene.data(&["supervisor", "wake", "--json"]);
     assert_eq!(again["outcome"], "starting", "{again}");
-    assert_eq!(scene.payload_calls().len(), 1);
+    assert_eq!(scene.payload_calls(), vec![lead.clone(), start.clone()]);
 
     // With the last start long past and no live supervisor, the wake door starts one.
     fs::remove_file(scene.project().join(".fgos/runtime/supervision/wake.json")).unwrap();
     let woke = scene.data(&["supervisor", "wake", "--json"]);
     assert_eq!(woke["outcome"], "started", "{woke}");
-    assert_eq!(scene.payload_calls(), vec![start.clone(), start]);
+    assert_eq!(scene.payload_calls(), vec![lead, start.clone(), start]);
 }
 
 /// A fake herdr (the run-supervisor crate's stand-in CLI, answering from files) whose one allocated slot `key` reads as
