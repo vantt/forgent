@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Gather every fgOS rule to one owner in the Agent Context Engine and resolve the 14 measured conflicts"
-status: running
+status: done
 lead: head:lead-forgent-261125-2041-gather-52cd9
 priority: P1
 blockedBy:
@@ -90,8 +90,8 @@ only this plan and ASC 9, not the rest of ASC.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Gather every fgOS rule to one owner](phase-01-gather-rules.md) | - | core/instructions/**, components/*/instructions/**, domains/*/instructions/**, .fgos/instructions/effective/**, AGENTS.md, core/skills/**, core/agents/**, core/prompt-templates/**, domains/coding/skills/**, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/**, .claude/agents/**, packages/agent-start-context/goldens/**, test/docs/**, plans/261125-2041-gather-fgos-rules-to-one-owner/reports/** | 1 | running |
-| 2 | [Integration gate, changelog](phase-02-integration.md) | 1 | CHANGELOG.md | 2 | draft |
+| 1 | [Gather every fgOS rule to one owner](phase-01-gather-rules.md) | - | core/instructions/**, components/*/instructions/**, domains/*/instructions/**, .fgos/instructions/effective/**, AGENTS.md, core/skills/**, core/agents/**, core/prompt-templates/**, domains/coding/skills/**, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/**, .claude/agents/**, packages/agent-start-context/goldens/**, test/docs/**, plans/261125-2041-gather-fgos-rules-to-one-owner/reports/** | 1 | done |
+| 2 | [Integration gate, changelog](phase-02-integration.md) | 1 | CHANGELOG.md | 2 | done |
 
 Ticket `c-2271-1795691361563` (gemini, worktree `261125-2041-gather-fgos-rules-to-one-owner-p01`, branch
 `gather-fgos-rules-to-one-owner/p01`) was started by the fg-server2 lead before it saw the progress below; it duplicates
@@ -110,6 +110,31 @@ machine; resume at batch U2 after merging main. Owner questions filed in the sto
 `q-ipifo7ty53` (conflict C6), `q-3oqocuhfht` (order with the communication standard plan). Decided by the lead on the plan's
 own recommendation: owner question 2 below (single-location skill rules stay), and criterion 2 reads "owner unit or owner
 persona file" because a persona description is read at start without opening a file.
+
+### Done (fg-server, 2026-11-27)
+
+Phase 1 landed in eight gathering rounds (`gather-rules/p01` through `p01r8`); each round fixed what the previous
+independent check found. Criterion 1: the sixth independent rerun
+(`reports/research-261127-0500-gather-rules-rerun-6.md`) found no duplicate cluster outside pointers, no broken
+`Rule:` pointer (119 pointers, 17 ids, each in `rules.json` and AGENTS.md) and no missing path. Its one remaining
+item, stale claim-release wording in three coding skills, was fixed in round 7. Criteria 2 and 3: the move table
+`reports/gather-table.md` and the commit bodies. C2 and C6 were answered by the owner (option A for both), and the
+parked asking-a-person rules were gathered into `product-priority-order`. Criterion 4: `fgos internal context-engine
+check` passes; `test/docs` and `test/setup` pass. Round 8 merged the RUL11 and RUL104 anchor tests' duplicate body
+into one test, without weakening either.
+
+Criterion 5 (phase 2), the full gate on main at `a7ec1ef7d`, run with debuginfo off to fit the disk: npm test and
+`cargo test --workspace` are not fully green, and no failure touches the gathered rules.
+- One failure came from the start-context plan's Observe declaration list. It is fixed in the same commit that
+  closes this plan.
+- The rest were already on main before this plan:
+  - herdr pane timeouts (`test/run-supervisor/terminal-cutover.test.mjs`, `terminal-crash-matrix.test.mjs`);
+  - `fgctl` upgrade and init (`test/rust-host/fgctl-upgrade.test.mjs`, `fgctl-init-download-sources.test.mjs`);
+  - bwrap credential provisioning (`test/runner/provider-per-cli-credential-sources.test.mjs`);
+  - the workflow guide schema (`test/workflow/guide-schema.test.mjs`);
+  - a concurrent-prune race (`test/workflow/case-close.test.mjs`);
+  - two `fgos-run-supervisor` head-request tests that depend on the machine.
+- The changelog line is under `## [Unreleased]`.
 
 ### Waits on other plans
 
