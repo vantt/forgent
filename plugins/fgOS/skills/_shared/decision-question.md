@@ -43,7 +43,8 @@ Write each part as a heading or as a label followed by ":" (`**Cause:** ...`).
 - Give the cost in numbers (lines, days, paths).
 - Say what happens if the owner does not answer yet.
 
-Owner questions are asked only with `fgos questions ask`, which checks the measurable rules (one-line headline of at
+A session's own questions to the owner are asked only with `fgos questions ask` (a Work item parked with
+`fgos ask <id>` is that item's gate, a different door), which checks the measurable rules (one-line headline of at
 most 120 characters, 2-4 options with a recommended one, scope allows/forbids, what it blocks). This guide holds the
 rules a program cannot measure.
 

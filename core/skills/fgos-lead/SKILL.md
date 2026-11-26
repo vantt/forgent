@@ -47,8 +47,8 @@ For each phase of the wave whose footprint is disjoint from the others in it:
    `fgos questions ask`; never investigate it in the host's source.
 2. Decide first (Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json); an `out-of-process` answer runs through
    `fgos run "<prompt naming the phase file>" [--provider <id>] [--capability <purpose>] --worktree <path> --writes <paths>`
-   (only these flags pass), with `--writes` inside the plan footprint. `--provider` is optional and soft: name it only
-   for one of the five reasons, otherwise leave it out and `fgos run` binds itself (Rule: capability-routing-rules, in AGENTS.md; set in .fgos/instructions/effective/rules.json)
+   (only these flags pass), with `--writes` inside the plan footprint and `--provider` naming the executor `decide`
+   answered.
 3. Read the outcome with `fgos request result <id> --wait <seconds>` (at most 50). A failed ticket's `code` and `message` (with `argv` and `stderrTail`) say why; read it, never retry blind.
    Never end your turn while a `run` or `land` ticket of yours is `running`: nothing wakes you when it settles. Repeat
    `fgos request result <id> --wait 50` until it leaves `running`, then continue (review, land). If it is still

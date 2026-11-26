@@ -55,7 +55,7 @@ lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã t�
   gói lại thành "blocked" chung chung (tsk-1c6 D2/D4). Category duy nhất
   đủ điều kiện hôm nay là `lock-timeout`
   (`EventLogError('lock-timeout')`, exit code `7`, khoá chia sẻ của
-  `.fgos/events.jsonl`), báo bằng chính dòng của nó:
+  event log), báo bằng chính dòng của nó:
 
   ```text
   stop-reason: lock-timeout

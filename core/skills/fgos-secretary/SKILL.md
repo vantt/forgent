@@ -122,7 +122,7 @@ Local verbs, run in your own sandbox without the socket (the host routes only th
 
 ## Friction
 
-Friction you meet or an owner reports (a workaround, conflicting rules, a missing tool, a wrong doc, a wait) is recorded per `_shared/friction-capture.md`; recording never stops the request in hand.
+Friction you meet or an owner reports (a workaround, conflicting rules, a missing tool, a wrong doc, a wait) is recorded per `../_shared/friction-capture.md`; recording never stops the request in hand.
 
 ## Reports
 
