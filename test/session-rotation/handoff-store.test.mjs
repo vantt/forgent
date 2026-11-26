@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { ensureGitAddon } from '../helpers/git-addon.mjs';
-import { fenced, readLatestHandoff, redactText, writeHandoff, VERIFY_LINE } from '../../src/session-rotation/handoff-store.mjs';
+import { HANDOFF_REASONS, fenced, readLatestHandoff, redactText, writeHandoff, VERIFY_LINE } from '../../src/session-rotation/handoff-store.mjs';
 import { ROTATION_REASONS } from '../../src/session-rotation/rotate.mjs';
 
 ensureGitAddon();
@@ -33,6 +33,21 @@ test('a hard or manual handoff carries the last assistant message and the pendin
     assert.match(latest.text, new RegExp(`^- rotation: ${rotate}$`, 'm'), rotate);
     assert.equal(latest.rotate, rotate, 'latest.json records the real kind');
   }
+});
+
+// Sleep is a new handoff kind, not a successor-launching rotation; the old rotation contract stays unchanged.
+test('sleep is accepted as a handoff reason and names the plan, phase and wake time without launching a rotation', () => {
+  assert.ok(HANDOFF_REASONS.includes('sleep'));
+  assert.ok(!ROTATION_REASONS.includes('sleep'));
+  const d = fgosDir();
+  writeHandoff({ fgosDir: d, ...base, rotate: 'sleep', plan: 'plans/example', phase: '02', wakeAt: '2026-11-27T01:00:00Z' });
+  const latest = readLatestHandoff({ fgosDir: d, persona: 'miu', name: 'main' });
+  assert.equal(latest.rotate, 'sleep');
+  assert.match(latest.text, /- rotation: sleep\n/);
+  assert.match(latest.text, /- plan: plans\/example\n/);
+  assert.match(latest.text, /- phase: 02\n/);
+  assert.match(latest.text, /- wake at: 2026-11-27T01:00:00Z\n/);
+  assert.throws(() => writeHandoff({ fgosDir: d, ...base, rotate: 'unknown' }), { code: 'bad-reason' });
 });
 
 test('an existing handoff file is never overwritten', () => {

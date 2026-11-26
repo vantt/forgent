@@ -35,11 +35,12 @@ import { requestHeadRestoreRole } from '../session-host/head-request-client.mjs'
 import { readLastAssistantMessage } from '../session-host/client.mjs';
 import { seatSessionDir } from '../runner/dispatch/confinement/authority.mjs';
 import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
-import { redactText, writeHandoff } from './handoff-store.mjs';
+import { HANDOFF_REASONS, redactText, writeHandoff } from './handoff-store.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { providerCapacityStatePaths, quarantineProviderAccount } from '../runner/dispatch/provider-capacity.mjs';
 
-export const ROTATION_REASONS = Object.freeze(['soft', 'hard', 'manual']);
+// Sleep writes a handoff but stops the head; it must never launch a rotation successor.
+export const ROTATION_REASONS = Object.freeze(HANDOFF_REASONS.filter((reason) => reason !== 'sleep'));
 /** The reason of a stop that measured below soft: nothing is rotated, the stop is only recorded. */
 export const NO_ROTATION_REASON = 'none';
 export const STOP_TRACE_FILE = 'stop-trace.jsonl';
@@ -218,6 +219,21 @@ export function recordStopTrace(dir, line) {
       replaceDurably(dir, STOP_TRACE_FILE, `${kept.join('\n')}\n`, FILE_MODE);
     }
   } catch { /* the trace is best effort; the rotation itself never depends on it */ }
+}
+
+/** The newest measured fraction in append order, ignoring unmeasured or torn trace lines. Reads only. */
+export function latestContextFraction(dir) {
+  let text;
+  try { text = fs.readFileSync(path.join(dir, STOP_TRACE_FILE), 'utf8'); } catch (err) {
+    if (err.code === 'ENOENT') return null;
+    throw err;
+  }
+  for (const line of text.split('\n').reverse()) {
+    let fraction;
+    try { ({ fraction } = JSON.parse(line)); } catch { continue; }
+    if (typeof fraction === 'number' && Number.isFinite(fraction) && fraction >= 0) return fraction;
+  }
+  return null;
 }
 
 // ---- the successor's answer ------------------------------------------------------------------------

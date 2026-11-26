@@ -253,7 +253,7 @@ function requireField(value, message) {
 }
 
 // Codes of a malformed head or rotation argument: refused as validation, never as a failed start.
-const HEAD_ARGUMENT_CODES = new Set(['bad-persona', 'bad-name', 'bad-project-root', 'bad-generation', 'bad-args', 'bad-role', 'bad-reason', 'bad-stop-facts', 'path-invalid', 'request-too-large']);
+const HEAD_ARGUMENT_CODES = new Set(['bad-persona', 'bad-name', 'bad-project-root', 'bad-generation', 'bad-args', 'bad-role', 'bad-reason', 'bad-stop-facts', 'wake-at-invalid', 'path-invalid', 'request-too-large']);
 
 // The sub-verb of `verb`, checked against the registry's `subcommands`: the one list of what the verb accepts.
 function requireSubVerb(verb, positional) {
@@ -3236,6 +3236,15 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           throw new StoreError(HEAD_ARGUMENT_CODES.has(err.code) ? 'validation' : 'precondition', `${err.code ?? 'head-refused'}: ${err.message}`);
         }
       }
+      if (sub === 'list') {
+        const { listHeadSessions } = await import('../src/session-host/head-request.mjs');
+        try {
+          // Invocation root is already resolved read-only; Git Inspect initializes its state journal even for reads.
+          return await listHeadSessions({ projectRoot: () => path.dirname(dir) });
+        } catch (err) {
+          throw new StoreError('precondition', `${err.code ?? 'head-refused'}: ${err.message}`);
+        }
+      }
       const byRole = sub === 'stop' && flags.role !== undefined;
       if (byRole && (positional[1] !== undefined || flags.name !== undefined)) throw new StoreError('validation', 'session stop --role <lead:LANE> takes no persona and no --name');
       const persona = byRole ? undefined : requireField(positional[1], `session ${sub} requires a persona: fgos session ${sub} <persona> --name <name>`);
@@ -3250,10 +3259,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const { assertHeadArgs } = await import('../src/session-host/head-start.mjs');
         const reason = optionalField(flags.reason, 'session stop --reason requires a non-empty value (omit --reason entirely to skip it)');
         const stopRoot = resolveGitRoots(process.cwd()).worktreeRoot;
+        const sleep = { wakeAt: flags['wake-at'] ?? null, plan: flags.plan ?? null, phase: flags.phase ?? null };
         try {
-          if (byRole) return await stopHeadSession({ role: flags.role, projectRoot: stopRoot, reason });
+          if (byRole) return await stopHeadSession({ role: flags.role, projectRoot: stopRoot, reason, ...sleep });
           assertHeadArgs({ persona, name, projectRoot: stopRoot });
-          return await stopHeadSession({ persona, name, projectRoot: stopRoot, reason });
+          return await stopHeadSession({ persona, name, projectRoot: stopRoot, reason, ...sleep });
         } catch (err) {
           throw new StoreError(HEAD_ARGUMENT_CODES.has(err.code) ? 'validation' : 'precondition', `${err.code ?? 'head-refused'}: ${err.message}`);
         }

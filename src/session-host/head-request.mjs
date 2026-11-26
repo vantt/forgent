@@ -16,9 +16,10 @@ import { fileURLToPath } from 'node:url';
 import { CONFINED_MARKER_ENV, readConfig } from '../config/facade.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
 import { headPersonas } from './head-grants.mjs';
-import { HEAD_ANSWERED_VERB, HEAD_LAND_VERB, HEAD_METRICS_RECORD_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_START_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_WORKTREE_CREATE_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
+import { HEAD_ANSWERED_VERB, HEAD_LAND_VERB, HEAD_METRICS_RECORD_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_START_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_WORKTREE_CREATE_VERB, HEAD_FGOS_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHead, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
 import { assertHeadArgs, headRoleOf, startHeadSession } from './head-start.mjs';
 import { HeadPlanError, isPlanHeadName, planOfHead } from './head-plan.mjs';
+import { listHeads } from './head-list.mjs';
 import { stopHeadSession } from './head-stop.mjs';
 import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
 import { judge, observe, selfRecord } from '../native/process-identity.mjs';
@@ -58,6 +59,12 @@ export async function rotateHead({ persona, name, reason, stopFacts, projectRoot
     return request({ persona, name, reason, ...(stopFacts ? { stopFacts } : {}) }, { socketPath: env[HEAD_REQUEST_SOCKET_ENV] });
   }
   return requestRotation({ persona, name, reason, stopFacts, projectRoot: rootOf(projectRoot) }, ports);
+}
+
+/** A confined read uses the existing argv request window; its permission stays the host's decision. */
+export async function listHeadSessions({ projectRoot } = {}, { env = process.env, ports = {}, request = requestHead } = {}) {
+  if (confined(env)) return request(HEAD_FGOS_VERB, { argv: ['session', 'list', '--json'] }, { socketPath: env[HEAD_REQUEST_SOCKET_ENV] });
+  return listHeads({ projectRoot: rootOf(projectRoot) }, ports);
 }
 
 // ---- the payload entry the supervisor's route child runs ------------------------------------------
@@ -530,7 +537,7 @@ function askerAnswered({ envelope, projectRoot, role, ports }) {
 }
 
 async function stopVerb({ args, envelope, projectRoot, ports }) {
-  exactKeys(args, ['persona', 'name', 'reason']);
+  exactKeys(args, ['persona', 'name', 'reason', 'wakeAt', 'plan', 'phase']);
   if (args.reason !== undefined && (typeof args.reason !== 'string' || args.reason.length > 200)) throw badArgs('reason must be a string of at most 200 characters');
   assertHeadArgs({ persona: args.persona, name: args.name, projectRoot });
   const role = headRoleOf(args.persona, args.name);
@@ -548,7 +555,7 @@ async function stopVerb({ args, envelope, projectRoot, ports }) {
   }
   const allowed = coordinator || role === envelope.session.role || planHead() || askerAnswered({ envelope, projectRoot, role, ports });
   if (!allowed) throw roleErr(`${role} is not a lead or planner of this project, the asker of an answered question, or this session's own role`);
-  return stopHeadSession({ persona: args.persona, name: args.name, projectRoot, reason: args.reason ?? null }, ports.stop ?? {});
+  return stopHeadSession({ persona: args.persona, name: args.name, projectRoot, reason: args.reason ?? null, wakeAt: args.wakeAt ?? null, plan: args.plan ?? null, phase: args.phase ?? null }, ports.stop ?? {});
 }
 
 // -- coordination verbs: raise, tune, read and type on site, record and prune evidence
