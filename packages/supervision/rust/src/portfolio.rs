@@ -266,33 +266,46 @@ pub fn footprint_problem(plan: &Plan) -> Option<&'static str> {
         .then_some("footprint-entry-invalid")
 }
 
+/// A ready plan's overlaps with running plans, naming the ready plan's shared entries.
+/// Uncomparable footprints yield no advice; overlap never holds admission.
+pub fn running_overlaps(plan: &Plan, plans: &[Plan]) -> Vec<(String, Vec<String>)> {
+    if plan.status != "ready" || footprint_problem(plan).is_some() {
+        return Vec::new();
+    }
+    plans
+        .iter()
+        .filter(|r| r.status == "running" && footprint_problem(r).is_none())
+        .filter_map(|r| {
+            let items = [plan, r].map(|p| fgos_write_scope::Item {
+                id: p.dir.clone(),
+                scopes: p.footprint.clone(),
+            });
+            fgos_write_scope::colliding_pairs(&items)
+                .pairs
+                .into_iter()
+                .next()
+                .map(|pair| (pair.b, pair.shared))
+        })
+        .collect()
+}
+
 /// Plans a supervisor may start now, in input order: status `ready`, every `blockedBy` plan in
-/// `done_dirs`, a footprint that can be compared, and no footprint overlap with a `running` plan.
-/// A plan with an empty or invalid footprint is not admissible and affects no other plan; a running
-/// plan whose footprint cannot be compared holds back nobody.
+/// `done_dirs`, and a footprint that can be compared. Overlaps are advice only; a plan with an
+/// empty or invalid footprint is not admissible.
 pub fn admissible<'a>(plans: &'a [Plan], done_dirs: &[String]) -> Vec<&'a Plan> {
     plans
         .iter()
-        .filter(|p| p.status == "ready" && admission_hold(p, plans, done_dirs).is_none())
+        .filter(|p| p.status == "ready" && admission_hold(p, done_dirs).is_none())
         .collect()
 }
 
 /// The admission classifier shared by the read view and the wake door. An invalid footprint
-/// needs judgement; dependency and overlap holds are ordinary capacity decisions.
-pub fn admission_hold(plan: &Plan, plans: &[Plan], done_dirs: &[String]) -> Option<&'static str> {
+/// needs judgement; an unmet dependency holds admission, but footprint overlap does not.
+pub fn admission_hold(plan: &Plan, done_dirs: &[String]) -> Option<&'static str> {
     if !plan.blocked_by.iter().all(|b| done_dirs.contains(b)) {
         return Some("held-blocked");
     }
-    if let Some(problem) = footprint_problem(plan) {
-        return Some(problem);
-    }
-    plans
-        .iter()
-        .any(|r| {
-            r.status == "running"
-                && fgos_write_scope::scopes_overlap(&plan.footprint, &r.footprint).unwrap_or(false)
-        })
-        .then_some("held-footprint-overlap")
+    footprint_problem(plan)
 }
 
 /// Edit only admission frontmatter through the YAML document door, preserving the phase table,

@@ -524,7 +524,9 @@ fn a_running_plan_naming_no_lead_is_held_and_never_a_restart_candidate() {
     let view = supervisor::plans(&plans, &[], HANDLE, "p1", &holders, 4, &NoQuestions);
     assert_eq!(view.rows[0].lead_live, None);
     assert!(view.rows[0].lead_unnamed && !view.rows[0].admissible);
-    assert_eq!(view.to_json()["plans"][0]["leadUnnamed"], true);
+    let json = view.to_json();
+    assert_eq!(json["plans"][0]["leadUnnamed"], true);
+    assert!(json["plans"][0].get("overlaps").is_none());
 }
 
 #[test]
@@ -939,12 +941,19 @@ fn a_failed_publication_never_starts_a_lead() {
 }
 
 #[test]
-fn a_new_admission_holds_overlapping_ready_plans_in_the_same_wake() {
+fn two_overlapping_ready_plans_are_both_admitted_in_one_wake() {
     let mut f = admission_fixture(2, 2);
     f.plans[0].footprint = f.plans[1].footprint.clone();
-    f.wake();
-    assert_eq!(f.admitted.borrow().len(), 1);
-    assert_eq!(decisions(&f)[1].1, "held-footprint-overlap");
+    assert_eq!(f.wake(), WakeOutcome::NothingAdmissible);
+    assert_eq!(f.admitted.borrow().len(), 2);
+    assert_eq!(
+        decisions(&f),
+        vec![
+            ("plan:alpha".into(), "admitted".into()),
+            ("plan:beta".into(), "admitted".into()),
+        ]
+    );
+    assert_eq!(f.started.borrow().len(), 2);
 }
 
 #[test]
