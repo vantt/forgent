@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "A running plan widens its own footprint through one verb, inside the approved acceptance criteria"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 base: 052dd60b2e19cea913cad5217909d8414a3334ee
