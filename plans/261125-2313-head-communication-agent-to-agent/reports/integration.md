@@ -83,6 +83,17 @@ What the suite drives: the live heads of this project. It starts no heads (sessi
 role) and sends labelled test pings that ask nothing. Test 3 leaves a draft in one live head composer and then erases it,
 failing loudly if the erase does not take.
 
+## Live run 2
+
+Run on p07c `40f9a526c` against release `daaf4d83` (unconfined): 3 fail, 1 skipped. The herdr address fix is confirmed
+(no `agent_not_found`). The failures were suite defects: (1) the fixed 20 s read window on a live LLM head, which ran the
+typed send but minutes later because it was mid-turn; (2) an erase key herdr did not apply (`Backspace` exited 0 but the
+draft stayed; the owner erased it by hand). Both fixed in this commit: every sender is waited to idle
+(`FGOS_LIVE_HEADS_IDLE_MS`, default 300000) and then given `FGOS_LIVE_HEADS_SEND_MS` (default 180000) to report its
+path, while `FGOS_LIVE_HEADS_BOUND_MS` stays the wake bound of test 2 from the moment the sender reported; the erase
+tries `ctrl+u`, then `end`+`backspace`, `Backspace`, `BSpace`, records the working form, and fails loudly if none works;
+test 3 drafts only into an idle, non-focused, non-secretary head. Rerun pending the supervisor.
+
 ## Cross-machine: manual step
 
 No second machine is reachable. Manual: on machine A run `fgos mailbox send --to <head@B> --wake x`; expect path
