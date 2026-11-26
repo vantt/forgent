@@ -33,7 +33,7 @@ and sessions a person opens by hand. They converge on two engine entry ops and o
 spawning already has one door. The text such an agent receives at start had no owner: persona, ritual, on-wake and
 opening text were built in about twelve places, in Node and in Rust.
 
-Agent Start Context (ASC) is that owner (ASC-D1). Every start, whatever its trigger, calls one function:
+Agent Start Context (ASC) is that owner. Every start, whatever its trigger, calls one function:
 
 ```text
 compose(StartRequest { facts, payloads, delivery }) -> StartContext | Refusal
@@ -41,11 +41,11 @@ compose(StartRequest { facts, payloads, delivery }) -> StartContext | Refusal
 
 It returns ordered text blocks and writes one record of what it chose and what each block cost.
 
-Scope is fgOS-owned text only (ASC-D2). The AgentKit, GitNexus and MDView blocks and AgentKit's `.claude/rules` are
+Scope is fgOS-owned text only. The AgentKit, GitNexus and MDView blocks and AgentKit's `.claude/rules` are
 external and are never read, selected or rewritten here.
 
-ASC and the Agent Context Engine (ACE) are two components joined by one contract (ACE-D1). The dependency order is
-ACE ← ASC ← packaging-distribution (ACE-D2):
+ASC and the Agent Context Engine (ACE) are two components joined by one contract. The dependency order is
+ACE ← ASC ← packaging-distribution:
 
 - ACE stores every rule unit, checks it when it is written, owns the `when:` key registry
   ([when-keys.v2.json](../../../packages/agent-context-engine/contracts/when-keys.v2.json)) and compiles one checked
@@ -53,7 +53,7 @@ ACE ← ASC ← packaging-distribution (ACE-D2):
   ([effective-rules.v1.json](../../../packages/agent-context-engine/contracts/effective-rules.v1.json),
   file `.fgos/instructions/effective/rules.json`).
 - ASC reads that one set, verifies its digest and version, fills fact values from live data, matches each rule's
-  `when:` against them, adds payloads and contributor blocks, and orders the result (ACE-D5, ASC-D8, ASC-D9). ASC is
+  `when:` against them, adds payloads and contributor blocks, and orders the result. ASC is
   the only selector. It never reads rule files, never needs pkm or an embedding model, and never edits rule text.
 - packaging-distribution writes files at setup (the AGENTS.md block, `.claude/agents`) by calling `compose` with the
   standing facts and the `agent-file` delivery, and writes only the blocks it gets back.
@@ -84,7 +84,7 @@ text is ASC.
 | Engine `PromptPort` host adapter (`run-unit`, every worker trigger) | `sessionType: worker`, `role`, `project`, `agentCli`, and `domain`, `workflow`, `stage`, `workType` when the unit carries them | `prompt-arg` or `opening` |
 | Agent-file projection (`.claude/agents`) | `persona`, `project` | `agent-file` |
 | Setup projection (the AGENTS.md block) | `project` (the standing facts only) | `agent-file` |
-| SessionStart hook for hand-opened sessions (ASC-D3) | `sessionType: hand-opened`, `agentCli`, `project`, and `persona`, defaulting to the project's entry persona | `hook-context` |
+| SessionStart hook for hand-opened sessions | `sessionType: hand-opened`, `agentCli`, `project`, and `persona`, defaulting to the project's entry persona | `hook-context` |
 
 `start-request.v1.json` states, per start kind, which keys a caller must supply (`requiredFacts`).
 
@@ -162,18 +162,18 @@ and passes it as a payload. An architecture test (`test/architecture.test.mjs`) 
 
 ## 10. Lịch sử quyết định
 
-| Id | Decision | Date | Source |
+| Topic | Decision | Date | Source |
 |---|---|---|---|
-| ASC-D1 | One owning component, Agent Start Context (a tier-3 Rust crate), owns the text every fgOS-started agent receives at start; spawning and delivery keep their owners (run supervisor, Agent Protocol); the engine's `PromptPort` stays and its host side becomes an adapter of the crate. | 2026-11-22 | [discussion](../../../plans/discussions/ds-2d55ty37zz-agent-start-door-and-context-seam/DISCUSSION.md), owner 18:23 |
-| ASC-D2 | Scope is fgOS-owned text only; the MDView, AgentKit and GitNexus blocks are external and not touched. | 2026-11-22 | same discussion, owner 17:15 |
-| ASC-D3 | Sessions opened by hand go through the composer by a SessionStart hook (claude, codex, agy); with no role they get the project's entry persona. | 2026-11-22 | same discussion, owner 17:45 |
-| ASC-D4 | The decision component for fixed-option judgments and the entry-persona UX flow are separate items. | 2026-11-22 | same discussion, owner 17:30 and 17:50 |
-| ASC-D5 | The contract is `compose(StartRequest{facts, payloads, delivery}) -> StartContext \| Refusal`, every argument typed by a v1 schema; payloads are a closed union; delivery is an enum; refusals are named. | 2026-11-22 | same discussion, owner 19:37 and 19:50 |
-| ASC-D6 | Two doors in: static rules selected by `when:` facts, and live context from registered contributors with a budget and a timeout that fail open; one matcher for setup and start. | 2026-11-22 | same discussion, owner 19:50 |
-| ASC-D7 | Slice order: delete the dead Node mirror first, then spec and crate with every producer moved at once and the one-producer test, then doctrine by facts and the handoff as a contributor, then the AGENTS.md cut and the hand-opened hook. | 2026-11-22 | same discussion, owner 19:50 |
-| ASC-D8 | Static rules come from the Agent Context Engine, the one rule store; ASC is the only selector and the setup step (`fgctl init`, `fgos doctor --fix`) writes AGENTS.md through `compose`. | 2026-11-25 | [ACE discussion](../../../plans/discussions/ds-e26zcar63f-agent-context-engine/DISCUSSION.md), owner 15:51 |
-| ASC-D9 | Amends ASC-D5: the fact key registry belongs to the Agent Context Engine; ASC fills values from live data, matches, and reads one checked effective rule set with a digest. | 2026-11-25 | ACE discussion, owner 16:35 |
+| One owner of start text | One owning component, Agent Start Context (a tier-3 Rust crate), owns the text every fgOS-started agent receives at start; spawning and delivery keep their owners (run supervisor, Agent Protocol); the engine's `PromptPort` stays and its host side becomes an adapter of the crate. | 2026-11-22 | [discussion](../../../plans/discussions/ds-2d55ty37zz-agent-start-door-and-context-seam/DISCUSSION.md), owner 18:23 |
+| fgOS-owned text only | Scope is fgOS-owned text only; the MDView, AgentKit and GitNexus blocks are external and not touched. | 2026-11-22 | same discussion, owner 17:15 |
+| Hand-opened sessions through a SessionStart hook | Sessions opened by hand go through the composer by a SessionStart hook (claude, codex, agy); with no role they get the project's entry persona. | 2026-11-22 | same discussion, owner 17:45 |
+| Two topics leave this design | The decision component for fixed-option judgments and the entry-persona UX flow are separate items. | 2026-11-22 | same discussion, owner 17:30 and 17:50 |
+| The compose contract | The contract is `compose(StartRequest{facts, payloads, delivery}) -> StartContext \| Refusal`, every argument typed by a v1 schema; payloads are a closed union; delivery is an enum; refusals are named. | 2026-11-22 | same discussion, owner 19:37 and 19:50 |
+| Two doors in: static rules and live contributors | Two doors in: static rules selected by `when:` facts, and live context from registered contributors with a budget and a timeout that fail open; one matcher for setup and start. | 2026-11-22 | same discussion, owner 19:50 |
+| Slice order | Slice order: delete the dead Node mirror first, then spec and crate with every producer moved at once and the one-producer test, then doctrine by facts and the handoff as a contributor, then the AGENTS.md cut and the hand-opened hook. | 2026-11-22 | same discussion, owner 19:50 |
+| Rules from the agent context engine; ASC the only selector | Static rules come from the Agent Context Engine, the one rule store; ASC is the only selector and the setup step (`fgctl init`, `fgos doctor --fix`) writes AGENTS.md through `compose`. | 2026-11-25 | [ACE discussion](../../../plans/discussions/ds-e26zcar63f-agent-context-engine/DISCUSSION.md), owner 15:51 |
+| The key registry belongs to the agent context engine | Amends the compose contract: the fact key registry belongs to the Agent Context Engine; ASC fills values from live data, matches, and reads one checked effective rule set with a digest. | 2026-11-25 | ACE discussion, owner 16:35 |
 
 The owner approval of 2026-11-22 that called ASC "the first slice of ACE"
 ([owner-approval-ace-boundary.md](../../../plans/261122-1946-agent-start-context/reports/owner-approval-ace-boundary.md))
-is superseded by ACE-D1 (ACE and ASC are two components joined by a contract) and kept as a record.
+is superseded by the 2026-11-25 decision that ACE and ASC are two components joined by a contract and kept as a record.
