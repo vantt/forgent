@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c22acacccdccc1d0fd277a5cd9f74408d95ac16c5330a4c0c9a4c910492065ef",
+  "payloadDigest": "ae057264194af7646673ef5f4f305d115cb59c56a1b023a9581722fa1ff9395b",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "dc14ff69bc4b144893fa6988de4df6b6180ab255ef8751fd1615ad93472b9e71",
     ".agents/skills/_shared/capability-matching.md": "93cd382994e2201e4aa8ec7816d740f6da634a0ee69d6911800a848ed5de1d8b",
@@ -1470,7 +1470,7 @@
     "scripts/ort-static.mjs": "306426ce23822f5187c447fd07f30fc150181e7c1539b7f5a38d5d6645b0d4b2",
     "scripts/package-release-assets.mjs": "60efb629a7ebfe1143445557c55abfa4b3269286a0498754a28dddb662a70fd0",
     "scripts/plan-contract-check.mjs": "33abf82f5116a12959c17e1d7bdfc779b013a7bd018eb707eb890496cc1a51d8",
-    "scripts/prepare-release.mjs": "0bd2e6e7514ba4de781ad480889a8f701729a1d4b9d80d5f5af7b2f1de1160aa",
+    "scripts/prepare-release.mjs": "9bfc454f0a5c90f4ad121c107fbe16f16d7e60a5f03e7c1b35641ce3bc561c69",
     "scripts/previous-release-tag.mjs": "d79809904f630061da723099f65817f18367462d1d9d64982426c58eb05d6a0f",
     "scripts/probe-storytelling-material.mjs": "b2991c1c14879193953d901e9122a9e511136a91907949643b7f1af008590df4",
     "scripts/project-agents.mjs": "eea69eb0e5017c1e1ad44079b061192f10c1734668ad7cfb4a8591a9318c47f0",

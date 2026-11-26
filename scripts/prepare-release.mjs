@@ -153,7 +153,45 @@ function pluginManifestFiles(root) {
     .filter((filePath) => fs.existsSync(filePath));
 }
 
-export function updateChangelogText(text, tag, date) {
+export const VALID_CHANGELOG_BULLET_PREFIX_RE = /^- (Added|Changed|Deprecated|Removed|Fixed|Security):(?:\s|$)/;
+
+export function assertValidChangelogFragment(content, name = 'fragment') {
+  if (!String(content || '').trim()) {
+    throw new Error(`Changelog fragment is empty: ${name}`);
+  }
+  const firstNonBlank = String(content || '').split('\n').find((line) => line.trim().length > 0);
+  if (!firstNonBlank || !VALID_CHANGELOG_BULLET_PREFIX_RE.test(firstNonBlank.trim())) {
+    throw new Error(
+      `Changelog fragment ${name} must start with a Keep a Changelog bullet (- Added:, - Changed:, - Deprecated:, - Removed:, - Fixed:, - Security:)`,
+    );
+  }
+}
+
+export function readChangelogFragments(repoRoot) {
+  const dir = path.join(repoRoot, 'changelog.d');
+  if (!fs.existsSync(dir)) return [];
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  const files = entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.md') && entry.name.toLowerCase() !== 'readme.md')
+    .map((entry) => entry.name)
+    .sort();
+
+  const fragments = [];
+  for (const name of files) {
+    const filePath = path.join(dir, name);
+    const relPath = path.relative(repoRoot, filePath);
+    const content = fs.readFileSync(filePath, 'utf8');
+    assertValidChangelogFragment(content, relPath);
+    fragments.push({
+      file: relPath,
+      filePath,
+      content,
+    });
+  }
+  return fragments;
+}
+
+export function updateChangelogText(text, tag, date, fragments = []) {
   assertIsoDate(date);
 
   const unreleasedHeading = '## [Unreleased]';
@@ -166,7 +204,17 @@ export function updateChangelogText(text, tag, date) {
   const nextReleaseMatch = /\n## \[[^\]]+\]/.exec(text.slice(afterHeading));
   const nextReleaseOffset = nextReleaseMatch ? afterHeading + nextReleaseMatch.index : text.length;
   const unreleasedBody = text.slice(afterHeading, nextReleaseOffset).trim();
-  if (!unreleasedBody) {
+
+  const fragmentBodies = [];
+  for (const frag of fragments || []) {
+    const isObj = frag && typeof frag === 'object';
+    const content = isObj ? (frag.content ?? frag.body ?? '') : String(frag || '');
+    const name = isObj && frag.file ? frag.file : 'fragment';
+    assertValidChangelogFragment(content, name);
+    fragmentBodies.push(content.trim());
+  }
+
+  if (!unreleasedBody && fragmentBodies.length === 0) {
     throw new Error('CHANGELOG.md has no Unreleased entries to move into the release heading');
   }
 
@@ -176,7 +224,8 @@ export function updateChangelogText(text, tag, date) {
 
   const before = text.slice(0, afterHeading);
   const after = text.slice(nextReleaseOffset).replace(/^\n+/, '\n');
-  return `${before}\n\n## [${tag}] - ${date}\n\n${unreleasedBody}\n${after}`;
+  const releaseBody = [unreleasedBody, ...fragmentBodies].filter(Boolean).join('\n');
+  return `${before}\n\n## [${tag}] - ${date}\n\n${releaseBody}\n${after}`;
 }
 
 function readText(filePath) {
@@ -217,6 +266,8 @@ export function prepareRelease({
     assertCleanGitStatus(root, read);
   }
 
+  const fragments = readChangelogFragments(root);
+
   const packagePath = path.join(root, 'package.json');
   const packageLockPath = path.join(root, 'package-lock.json');
   const changelogPath = path.join(root, 'CHANGELOG.md');
@@ -224,7 +275,7 @@ export function prepareRelease({
   const updates = [
     [packagePath, updatePackageJsonText(readText(packagePath), baseVersion)],
     [packageLockPath, updatePackageLockText(readText(packageLockPath), baseVersion)],
-    [changelogPath, updateChangelogText(readText(changelogPath), tag, date)],
+    [changelogPath, updateChangelogText(readText(changelogPath), tag, date, fragments)],
   ];
 
   for (const { filePath, next } of rustVersionUpdates(root, baseVersion)) {
@@ -233,10 +284,17 @@ export function prepareRelease({
   for (const filePath of pluginManifestFiles(root)) {
     updates.push([filePath, updatePluginManifestText(readText(filePath), baseVersion)]);
   }
+  for (const frag of fragments) {
+    updates.push([frag.filePath, null]);
+  }
 
   if (!dryRun) {
     for (const [filePath, nextText] of updates) {
-      writeText(filePath, nextText);
+      if (nextText === null) {
+        fs.rmSync(filePath, { force: true });
+      } else {
+        writeText(filePath, nextText);
+      }
     }
   }
 
@@ -290,6 +348,7 @@ function printHelp() {
 
 Updates package.json, package-lock.json, CHANGELOG.md, the Rust crate versions
 (Cargo.toml, the Cargo.lock files) and every plugins/*/.claude-plugin/plugin.json for a release.
+Assembles fragments from changelog.d/ into CHANGELOG.md and deletes them.
 The script refuses a dirty working tree unless --skip-clean-check is passed.
 It never creates or pushes the git tag; it prints the exact commands to run next.`);
 }
