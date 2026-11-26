@@ -1,8 +1,8 @@
-# Phase 3: land regenerates declared globs
+# Phase 1: land regenerates declared globs
 
 ## Inputs
 
-- `plan.md`: Outcome, Facts "Land regeneration", acceptance criterion 5, risk "build:skills writes more".
+- `plan.md`: Outcome, Facts "Land regeneration", acceptance criterion 1, risk "build:skills writes more".
 - `packages/supervision/rust/src/land.rs`: the conflict exemption (`:1215-1257`) and `regenerate` (`:1491-1540`).
 - `packages/supervision/rust/tests/land.rs`: `a_conflicting_census_lands_regenerated` (`:321`),
   `a_conflict_outside_the_declared_files_refuses_before_any_candidate_is_prepared` (`:349`),
@@ -28,9 +28,9 @@
    today (a file new after the run is removed from the worktree; a file the run deleted is written back). Read the
    tree through the existing land Git ports; add no new Git door. Keep exact-path entries on today's path so the
    census behaviour does not change.
-4. Measure, and write the answer into this plan's `reports/` as `land-regenerate-skill-surfaces.md`: on a clean
+4. Measure, and write the answer to `plans/261126-2324-changelog-fragments-and-skill-surface-regeneration/reports/land-regenerate-skill-surfaces.md`: on a clean
    checkout run `npm run build:skills` twice and list every file it rewrites. Name which of them are pure output
-   (safe to declare) and which are hand-written with a generated block (`AGENTS.md`: never declare). Phase 6 uses
+   (safe to declare) and which are hand-written with a generated block (`AGENTS.md`: never declare). Phase 3 uses
    this list for the config.
 5. Tests, in `tests/land.rs`: "two branches that change a file under a declared glob land one after the other,
    the second regenerated" (declared `gen/**`, a run command that rewrites it deterministically); extend the
