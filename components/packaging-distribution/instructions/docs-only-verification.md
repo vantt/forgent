@@ -9,6 +9,9 @@ title: Packaging Distribution Verification
 description: Verification procedure for packaging-distribution component and docs-only changes
 lifecycle: live
 valid_from: 2026-09-14
+when:
+  domain:
+    - coding
 ---
 
 # Packaging Distribution Verification

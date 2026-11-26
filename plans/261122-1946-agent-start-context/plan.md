@@ -1,7 +1,8 @@
 ---
 contract: plan-v1
 title: "Agent Start Context: one composer for the text every fgOS-started agent receives"
-status: draft
+status: running
+lead: session:fg-server-claude-2026-11-27
 priority: P1
 blockedBy:
   - 261122-2108-delete-dead-node-execution-closure
@@ -179,10 +180,10 @@ Prior art, read in the discussion and checked again on `2c27d499a` (refresh repo
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 2 | [Area spec and v1 contracts](phase-02-spec-and-contracts.md) | - | docs/platform/agent-start-context/**, packages/agent-start-context/contracts/** | 1 | draft |
-| 4 | [Golden openings and before-bytes from today's code](phase-04-golden-openings.md) | - | packages/agent-start-context/goldens/**, plans/261122-1946-agent-start-context/reports/before-bytes.md | 1 | draft |
-| 3 | [The pure composer crate and its ports](phase-03-crate-and-host-door.md) | 2 | packages/agent-start-context/rust/**, Cargo.toml, Cargo.lock | 2 | draft |
-| 6 | [Join ACE: host door, rule set and fact values, registration, projection through `compose`](phase-06-when-facts-one-matcher.md) | 3 | packages/agent-start-context/rust/**, Cargo.lock, apps/fgos/Cargo.toml, apps/fgos/src/wiring/start_context.rs, apps/fgos/src/wiring/start_context/**, apps/fgos/src/wiring/mod.rs, apps/fgos/src/wiring/observe_declarations.rs, apps/fgos/src/routing.rs, apps/fgos/tests/start_context.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/component-authority/model/**, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/reading-map.md, src/setup/instruction-projections.mjs, test/setup/instruction-projections.test.mjs | 3 | draft |
+| 2 | [Area spec and v1 contracts](phase-02-spec-and-contracts.md) | - | docs/platform/agent-start-context/**, packages/agent-start-context/contracts/** | 1 | done |
+| 4 | [Golden openings and before-bytes from today's code](phase-04-golden-openings.md) | - | packages/agent-start-context/goldens/**, plans/261122-1946-agent-start-context/reports/before-bytes.md | 1 | done |
+| 3 | [The pure composer crate and its ports](phase-03-crate-and-host-door.md) | 2 | packages/agent-start-context/rust/**, Cargo.toml, Cargo.lock | 2 | done |
+| 6 | [Join ACE: host door, rule set and fact values, registration, projection through `compose`](phase-06-when-facts-one-matcher.md) | 3 | packages/agent-start-context/rust/**, Cargo.lock, apps/fgos/Cargo.toml, apps/fgos/src/wiring/start_context.rs, apps/fgos/src/wiring/start_context/**, apps/fgos/src/wiring/mod.rs, apps/fgos/src/wiring/observe_declarations.rs, apps/fgos/src/routing.rs, apps/fgos/tests/start_context.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/component-authority/model/**, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/reading-map.md, src/setup/instruction-projections.mjs, test/setup/instruction-projections.test.mjs | 3 | done |
 | 5 | [Every start-text producer moves to the composer](phase-05-move-producers.md) | 4, 6 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, src/native/execution-door.mjs, test/native/execution-door.test.mjs, src/runner/agent-definitions.mjs, test/runner/agent-definitions.test.mjs, scripts/project-agents.mjs, .claude/agents/**, core/instructions/**, .fgos/instructions/effective/**, packages/execution/contracts/execution-routes/**, packages/execution/engine/src/assignment/**, packages/execution/engine/src/transport_round/session_attempt.rs, packages/execution/engine/tests/**, apps/fgos/src/wiring/execution_routes.rs, apps/fgos/src/wiring/unit_run_host/**, test/architecture.test.mjs, packages/component-authority/model/doors/**, docs/platform/component-boundary.md, packages/agent-start-context/goldens/**, packages/agent-start-context/rust/tests/** | 4 | draft |
 | 7 | [The rotation handoff is the first contributor](phase-07-handoff-contributor.md) | 5 | packages/session-host/rust/src/rotation/**, packages/session-host/rust/tests/**, apps/fgos/src/wiring/session_rotation_hook.rs, apps/fgos/src/wiring/start_context/**, packages/agent-start-context/contracts/start-contributors.v1.json, src/session-rotation/rotate.mjs, src/session-rotation/handoff-store.mjs, test/session-rotation/rotate.test.mjs, packages/agent-start-context/goldens/** | 5 | draft |
 | 9 | [AGENTS.md cut to the standing sheet (L8)](phase-09-agents-md-cut.md) | 5, 6 | AGENTS.md, core/instructions/**, components/*/instructions/**, domains/*/instructions/**, .fgos/instructions/effective/**, test/docs/** | 5 | draft |
@@ -193,6 +194,26 @@ Prior art, read in the discussion and checked again on `2c27d499a` (refresh repo
 The old phase 1 (delete the dead Node dispatch mirror) is removed: plan `261122-2108-delete-dead-node-execution-closure`
 does it (criterion 2). Phase ids keep their numbers so links from the discussion and reports stay valid. All phases
 are `draft`: none is admitted until the owner's deep discussion of this plan (team-lead, 2026-11-25).
+
+### Progress (fg-server, 2026-11-27)
+
+Started on the owner's instruction of 2026-11-27 00:0x ("hoàn tất ... 261122-1946-agent-start-context"), which is taken
+as the go-ahead the note above waited for. Phases 2, 3, 4 and 6 are `done` on branch `agent-start-context/p02`:
+the spec and v1 contracts with vectors; the pure crate with its ports, its two adapters onto the agent context engine
+and its vector tests; the goldens of today's head openings and agent files with `before-bytes.md`; the host door
+`fgos internal start-context compose`, the `fgos.start.context` Observe record, the component and contract rows, and
+the setup projection selecting through the door. Phase 6 also edited three units outside its listed footprint
+(`domains/coding/instructions/coding-worktree-safety.md`, `coding-verification-discipline.md` and
+`components/packaging-distribution/instructions/docs-only-verification.md`): each now says `when: {domain: [coding]}`,
+so selection by `when:` needs no scope filter and the AGENTS.md block stays byte-identical.
+
+Phase 5 has one design point the phase file does not cover: today's head opening interleaves text that depends on
+which payloads are present (the first ritual line differs with and without a handoff; a persona's first step shows
+only when a task is bound; the task section precedes the ritual). The composer therefore owns a head-opening layout,
+with the ritual and first steps as rule units; the persona block renderer is already in the crate
+(`src/persona.rs`). After this land the activated release must carry the door, because `npm run build:skills` now
+asks it for the setup selection.
+
 
 Phase 6 now runs before phase 5 (ids kept): phase 6 is the one place ASC joins ACE phase 3, so the producers move
 onto a composer that already reads ACE's rules. Phase 8 runs after phase 7 because both update the goldens.

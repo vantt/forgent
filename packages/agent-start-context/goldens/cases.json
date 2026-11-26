@@ -1,0 +1,268 @@
+{
+  "base": "e9138e2deb2b28c38859621b2da6d801d3370fc2",
+  "cases": [
+    {
+      "id": "secretary-plain",
+      "delivery": "opening",
+      "persona": "secretary",
+      "name": "golden"
+    },
+    {
+      "id": "secretary-task",
+      "delivery": "opening",
+      "persona": "secretary",
+      "name": "golden",
+      "task": {
+        "path": "plans/261122-1946-agent-start-context/plan.md"
+      }
+    },
+    {
+      "id": "secretary-handoff",
+      "delivery": "opening",
+      "persona": "secretary",
+      "name": "golden",
+      "handoff": {
+        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md"
+      }
+    },
+    {
+      "id": "secretary-question",
+      "delivery": "opening",
+      "persona": "secretary",
+      "name": "golden",
+      "forQuestion": "q-golden0001"
+    },
+    {
+      "id": "supervisor-plain",
+      "delivery": "opening",
+      "persona": "supervisor",
+      "name": "golden"
+    },
+    {
+      "id": "supervisor-task",
+      "delivery": "opening",
+      "persona": "supervisor",
+      "name": "golden",
+      "task": {
+        "path": "plans/261122-1946-agent-start-context/plan.md"
+      }
+    },
+    {
+      "id": "supervisor-handoff",
+      "delivery": "opening",
+      "persona": "supervisor",
+      "name": "golden",
+      "handoff": {
+        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md"
+      }
+    },
+    {
+      "id": "supervisor-question",
+      "delivery": "opening",
+      "persona": "supervisor",
+      "name": "golden",
+      "forQuestion": "q-golden0001"
+    },
+    {
+      "id": "shaper-plain",
+      "delivery": "opening",
+      "persona": "shaper",
+      "name": "golden"
+    },
+    {
+      "id": "shaper-task",
+      "delivery": "opening",
+      "persona": "shaper",
+      "name": "golden",
+      "task": {
+        "path": "plans/261122-1946-agent-start-context/plan.md"
+      }
+    },
+    {
+      "id": "shaper-handoff",
+      "delivery": "opening",
+      "persona": "shaper",
+      "name": "golden",
+      "handoff": {
+        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md"
+      }
+    },
+    {
+      "id": "shaper-question",
+      "delivery": "opening",
+      "persona": "shaper",
+      "name": "golden",
+      "forQuestion": "q-golden0001"
+    },
+    {
+      "id": "planner-plain",
+      "delivery": "opening",
+      "persona": "planner",
+      "name": "golden"
+    },
+    {
+      "id": "planner-task",
+      "delivery": "opening",
+      "persona": "planner",
+      "name": "golden",
+      "task": {
+        "path": "plans/261122-1946-agent-start-context/plan.md"
+      }
+    },
+    {
+      "id": "planner-handoff",
+      "delivery": "opening",
+      "persona": "planner",
+      "name": "golden",
+      "handoff": {
+        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md"
+      }
+    },
+    {
+      "id": "planner-question",
+      "delivery": "opening",
+      "persona": "planner",
+      "name": "golden",
+      "forQuestion": "q-golden0001"
+    },
+    {
+      "id": "lead-plain",
+      "delivery": "opening",
+      "persona": "lead",
+      "name": "golden"
+    },
+    {
+      "id": "lead-task",
+      "delivery": "opening",
+      "persona": "lead",
+      "name": "golden",
+      "task": {
+        "path": "plans/261122-1946-agent-start-context/plan.md"
+      }
+    },
+    {
+      "id": "lead-handoff",
+      "delivery": "opening",
+      "persona": "lead",
+      "name": "golden",
+      "handoff": {
+        "path": ".fgos/runtime/session-rotation/golden/handoff-0001.md"
+      }
+    },
+    {
+      "id": "lead-question",
+      "delivery": "opening",
+      "persona": "lead",
+      "name": "golden",
+      "forQuestion": "q-golden0001"
+    },
+    {
+      "id": "buyer-channel-skeptic",
+      "delivery": "agent-file",
+      "persona": "buyer-channel-skeptic",
+      "source": "domains/marketing/agents/buyer-channel-skeptic.yaml"
+    },
+    {
+      "id": "offer-pricing-critic",
+      "delivery": "agent-file",
+      "persona": "offer-pricing-critic",
+      "source": "domains/marketing/agents/offer-pricing-critic.yaml"
+    },
+    {
+      "id": "solo-capacity-checker",
+      "delivery": "agent-file",
+      "persona": "solo-capacity-checker",
+      "source": "domains/marketing/agents/solo-capacity-checker.yaml"
+    },
+    {
+      "id": "value-chain-strategist",
+      "delivery": "agent-file",
+      "persona": "value-chain-strategist",
+      "source": "domains/marketing/agents/value-chain-strategist.yaml"
+    },
+    {
+      "id": "code-reviewer",
+      "delivery": "agent-file",
+      "persona": "code-reviewer",
+      "source": "core/agents/code-reviewer.yaml"
+    },
+    {
+      "id": "council-assumptions",
+      "delivery": "agent-file",
+      "persona": "council-assumptions",
+      "source": "core/agents/council-assumptions.yaml"
+    },
+    {
+      "id": "council-feedback-loops",
+      "delivery": "agent-file",
+      "persona": "council-feedback-loops",
+      "source": "core/agents/council-feedback-loops.yaml"
+    },
+    {
+      "id": "council-ship-maintain",
+      "delivery": "agent-file",
+      "persona": "council-ship-maintain",
+      "source": "core/agents/council-ship-maintain.yaml"
+    },
+    {
+      "id": "debugger",
+      "delivery": "agent-file",
+      "persona": "debugger",
+      "source": "core/agents/debugger.yaml"
+    },
+    {
+      "id": "docs-manager",
+      "delivery": "agent-file",
+      "persona": "docs-manager",
+      "source": "core/agents/docs-manager.yaml"
+    },
+    {
+      "id": "fgos-placeholder",
+      "delivery": "agent-file",
+      "persona": "fgos-placeholder",
+      "source": "core/agents/fgos-placeholder.yaml"
+    },
+    {
+      "id": "fullstack-developer",
+      "delivery": "agent-file",
+      "persona": "fullstack-developer",
+      "source": "core/agents/fullstack-developer.yaml"
+    },
+    {
+      "id": "lead",
+      "delivery": "agent-file",
+      "persona": "lead",
+      "source": "core/agents/lead.yaml"
+    },
+    {
+      "id": "planner",
+      "delivery": "agent-file",
+      "persona": "planner",
+      "source": "core/agents/planner.yaml"
+    },
+    {
+      "id": "researcher",
+      "delivery": "agent-file",
+      "persona": "researcher",
+      "source": "core/agents/researcher.yaml"
+    },
+    {
+      "id": "secretary",
+      "delivery": "agent-file",
+      "persona": "secretary",
+      "source": "core/agents/secretary.yaml"
+    },
+    {
+      "id": "shaper",
+      "delivery": "agent-file",
+      "persona": "shaper",
+      "source": "core/agents/shaper.yaml"
+    },
+    {
+      "id": "supervisor",
+      "delivery": "agent-file",
+      "persona": "supervisor",
+      "source": "core/agents/supervisor.yaml"
+    }
+  ]
+}

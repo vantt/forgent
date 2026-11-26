@@ -526,6 +526,7 @@ version = "0.2.0"
 dependencies = [
  "fgos-agent-context-engine",
  "fgos-agent-protocol",
+ "fgos-agent-start-context",
  "fgos-canonical-json",
  "fgos-checkout",
  "fgos-component-authority",
@@ -584,6 +585,15 @@ name = "fgos-agent-protocol"
 version = "0.2.0"
 dependencies = [
  "fgos-durable-file",
+ "serde_json",
+]
+
+[[package]]
+name = "fgos-agent-start-context"
+version = "0.2.0"
+dependencies = [
+ "fgos-agent-context-engine",
+ "serde",
  "serde_json",
 ]
 

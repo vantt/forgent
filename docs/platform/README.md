@@ -52,6 +52,7 @@ Component owners, one row per component and subcomponent, sorted by id. <!-- ren
 | `agent-coordination-engine` | — | Authority for CoordinationSession manifest/events, actor bounds, session recovery, and synthesis boundary. | `docs/platform/agent-coordination/spec.md` | — |
 | `agent-mailbox` | — | Placing a message from one agent session into context of the right live head. | `docs/platform/agent-mailbox/spec.md` | `packages/mailbox/` |
 | `agent-protocol` | — | Pure per-CLI adapters (claude, codex, agy, pi, omp) translating CLI output to status. | `docs/platform/agent-protocol/spec.md` | `packages/agent-protocol/` |
+| `agent-start-context` | — | The one composer of the text every fgOS-started agent receives: it fills start facts from live data, selects the agent context engine's rules by when:, places payloads and contributor blocks, applies the delivery budget and writes one record per start. | `docs/platform/agent-start-context/spec.md` | `packages/agent-start-context/`, `docs/platform/agent-start-context/` |
 | `canonical-json` | — | Authority for canonical JSON bytes per RFC 8785. | `docs/platform/component-boundary.md` | `packages/canonical-json/` |
 | `claude-plugin` | — | Claude Code slash-command surface and plugin wrappers. | `docs/platform/claude-plugin/spec.md` | — |
 | `coding-domain` | — | Coding Domain Core, policies, repo scope, footprint, worktree isolation, merge catchup, and code verification doctrine. | `docs/platform/component-boundary.md` | — |

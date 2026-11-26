@@ -9,6 +9,9 @@ title: Coding Worktree Safety Boundaries
 description: Worktree and git safety boundaries for coding-domain agents
 lifecycle: live
 valid_from: 2026-09-14
+when:
+  domain:
+    - coding
 ---
 
 # Coding Worktree Safety Boundaries

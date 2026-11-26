@@ -1,0 +1,42 @@
+{
+  "description": "note is not a payload variant.",
+  "ruleSet": "packages/agent-context-engine/contracts/vectors/effective-set.json",
+  "liveValues": {
+    "role": [
+      "producer",
+      "reviewer"
+    ],
+    "persona": [
+      "lead",
+      "shaper"
+    ],
+    "project": [
+      "forgent"
+    ],
+    "agentCli": [
+      "claude",
+      "codex"
+    ],
+    "domain": [
+      "coding"
+    ]
+  },
+  "request": {
+    "facts": {
+      "sessionType": "worker",
+      "role": "producer",
+      "project": "forgent",
+      "agentCli": "claude"
+    },
+    "payloads": [
+      {
+        "kind": "note",
+        "text": "hello"
+      }
+    ],
+    "delivery": "prompt-arg"
+  },
+  "expect": {
+    "refusal": "start-payload-invalid"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "description": "A worker start matches the rule whose when: is sessionType worker; the assignment payload follows the rule block.",
+  "ruleSet": "packages/agent-context-engine/contracts/vectors/effective-set.json",
+  "liveValues": {
+    "role": [
+      "producer",
+      "reviewer"
+    ],
+    "persona": [
+      "lead",
+      "shaper"
+    ],
+    "project": [
+      "forgent"
+    ],
+    "agentCli": [
+      "claude",
+      "codex"
+    ],
+    "domain": [
+      "coding"
+    ]
+  },
+  "request": {
+    "facts": {
+      "sessionType": "worker",
+      "role": "producer",
+      "project": "forgent",
+      "agentCli": "claude"
+    },
+    "payloads": [
+      {
+        "kind": "assignment",
+        "text": "Objective: fix the parser.\nWrites: src/parse.mjs"
+      }
+    ],
+    "delivery": "prompt-arg"
+  },
+  "expect": {
+    "matched": [
+      "example-rule"
+    ],
+    "blockSources": [
+      "rule:example-rule",
+      "payload:assignment"
+    ],
+    "ruleSetDigest": "b844cd8b4d335f5c78075333f5e3080a568435eec502adfa2c6d8893a1d931d5",
+    "dropped": []
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "contract": "observe-kinds.v1",
+  "subjectKinds": ["session"],
+  "attrs": {
+    "fgos.start.context.delivery": { "type": "string", "values": ["opening", "prompt-arg", "agent-file", "hook-context"] },
+    "fgos.start.context.start": { "type": "string", "values": ["head", "worker", "hand-opened", "agent-file", "setup"] },
+    "fgos.start.context.facts": { "type": "string" },
+    "fgos.start.context.ruleset": { "type": "string" },
+    "fgos.start.context.matched": { "type": "string" },
+    "fgos.start.context.blocks": { "type": "string" },
+    "fgos.start.context.dropped": { "type": "string" }
+  },
+  "measures": {
+    "fgos.start.context.bytes": { "unit": "By", "aggs": ["sum", "max", "avg"] },
+    "fgos.start.context.block_count": { "unit": "1", "aggs": ["sum", "max", "avg"] },
+    "fgos.start.context.dropped_count": { "unit": "1", "aggs": ["sum", "max"] }
+  },
+  "kinds": {
+    "fgos.start.context": {
+      "subjects": ["session"],
+      "attrs": ["fgos.start.context.delivery", "fgos.start.context.start", "fgos.start.context.facts", "fgos.start.context.ruleset", "fgos.start.context.matched", "fgos.start.context.blocks", "fgos.start.context.dropped"],
+      "measures": ["fgos.start.context.bytes", "fgos.start.context.block_count", "fgos.start.context.dropped_count"]
+    }
+  }
+}

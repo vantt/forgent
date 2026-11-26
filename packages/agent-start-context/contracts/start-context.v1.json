@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fgos.invalid/agent-start-context/start-context.v1.json",
+  "title": "compose StartContext v1",
+  "description": "The answer of compose: blocks in the order the agent receives them, the rule ids matched, the digest of the effective rule set used, the id of the per-start record, and the blocks left out with their reason.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "blocks",
+    "matched",
+    "ruleSetDigest",
+    "record",
+    "dropped"
+  ],
+  "properties": {
+    "blocks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "source",
+          "text",
+          "bytes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "pattern": "^(rule|payload|contributor):[a-z0-9][a-z0-9-]*$",
+            "description": "rule:<rule id>, payload:<payload kind> or contributor:<contributor id>."
+          },
+          "text": {
+            "type": "string"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "UTF-8 byte length of text."
+          }
+        }
+      }
+    },
+    "matched": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Ids of the rules whose when: matched the facts."
+    },
+    "ruleSetDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "record": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Id of the Observe start-context record written for this call."
+    },
+    "dropped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "enum": [
+              "over-budget",
+              "contributor-failed",
+              "contributor-timeout"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

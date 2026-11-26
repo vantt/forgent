@@ -1,0 +1,37 @@
+{
+  "description": "email is not a delivery.",
+  "ruleSet": "packages/agent-context-engine/contracts/vectors/effective-set.json",
+  "liveValues": {
+    "role": [
+      "producer",
+      "reviewer"
+    ],
+    "persona": [
+      "lead",
+      "shaper"
+    ],
+    "project": [
+      "forgent"
+    ],
+    "agentCli": [
+      "claude",
+      "codex"
+    ],
+    "domain": [
+      "coding"
+    ]
+  },
+  "request": {
+    "facts": {
+      "sessionType": "worker",
+      "role": "producer",
+      "project": "forgent",
+      "agentCli": "claude"
+    },
+    "payloads": [],
+    "delivery": "email"
+  },
+  "expect": {
+    "refusal": "start-delivery-unsupported"
+  }
+}

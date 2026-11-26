@@ -263,6 +263,14 @@ fn main() {
                 .collect();
             std::process::exit(wiring::execution_routes::main(&rest));
         }
+        // `start-context compose --protocol 1`: the start text of an agent (see `wiring::start_context`).
+        if args.get(2).is_some_and(|a| a == "start-context") {
+            let rest: Vec<String> = args[3..]
+                .iter()
+                .map(|a| a.to_string_lossy().into_owned())
+                .collect();
+            std::process::exit(wiring::start_context::main(&rest));
+        }
         // `context-engine <op> --protocol 1`: the rule units checked and compiled (see `wiring::context_engine`).
         if args.get(2).is_some_and(|a| a == "context-engine") {
             let rest: Vec<String> = args[3..]

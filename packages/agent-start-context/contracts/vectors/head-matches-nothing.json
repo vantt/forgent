@@ -1,0 +1,49 @@
+{
+  "description": "A head start matches no worker rule; only its task payload is placed.",
+  "ruleSet": "packages/agent-context-engine/contracts/vectors/effective-set.json",
+  "liveValues": {
+    "role": [
+      "producer",
+      "reviewer"
+    ],
+    "persona": [
+      "lead",
+      "shaper"
+    ],
+    "project": [
+      "forgent"
+    ],
+    "agentCli": [
+      "claude",
+      "codex"
+    ],
+    "domain": [
+      "coding"
+    ]
+  },
+  "request": {
+    "facts": {
+      "sessionType": "head",
+      "persona": "lead",
+      "project": "forgent",
+      "agentCli": "claude",
+      "agentLifecycle": "start"
+    },
+    "payloads": [
+      {
+        "kind": "task",
+        "path": "plans/261122-1946-agent-start-context/plan.md",
+        "itemKind": "plan"
+      }
+    ],
+    "delivery": "opening"
+  },
+  "expect": {
+    "matched": [],
+    "blockSources": [
+      "payload:task"
+    ],
+    "ruleSetDigest": "b844cd8b4d335f5c78075333f5e3080a568435eec502adfa2c6d8893a1d931d5",
+    "dropped": []
+  }
+}

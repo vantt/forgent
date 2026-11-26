@@ -49,6 +49,7 @@ Area rows from the model: one row per area listing its top-level components. Spe
 | `agent-coordination` | `agent-coordination`, `agent-coordination-engine`, `team-cognition-engine` | Agent coordination area portal; former coordination engine retired, execution uses runner/Workflow.; Authority for CoordinationSession manifest/events, actor bounds, session recovery, and synthesis boundary.; Typed deliberation interpretation, aggregation-method semantics, and cognitive outcomes. | `docs/platform/agent-coordination/spec.md` |
 | `agent-mailbox` | `agent-mailbox` | Placing a message from one agent session into context of the right live head. | `docs/platform/agent-mailbox/spec.md` |
 | `agent-protocol` | `agent-protocol` | Pure per-CLI adapters (claude, codex, agy, pi, omp) translating CLI output to status. | `docs/platform/agent-protocol/spec.md` |
+| `agent-start-context` | `agent-start-context` | The one composer of the text every fgOS-started agent receives: it fills start facts from live data, selects the agent context engine's rules by when:, places payloads and contributor blocks, applies the delivery budget and writes one record per start. | `docs/platform/agent-start-context/spec.md` |
 | `claude-plugin` | `claude-plugin` | Claude Code slash-command surface and plugin wrappers. | `docs/platform/claude-plugin/spec.md` |
 | `component-authority` | `component-authority` | Defines the single structural model of layers, components, decision kinds, doors, contracts, and file-to-component mappings. | `docs/platform/component-authority/spec.md` |
 | `config` | `config` | Configuration authority: project and global config, schema and facade. | `docs/platform/config/spec.md` |
@@ -126,6 +127,11 @@ Ownership rows across every area: each thing a component declares it owns, with 
 | optional protocol/dynamic planning consumption | `agent-coordination-engine` | `docs/platform/agent-coordination/spec.md` |
 | agent mailbox delivery and head registration | `agent-mailbox` | `docs/platform/agent-mailbox/spec.md` |
 | agent CLI output parsing and protocol status mapping | `agent-protocol` | `docs/platform/agent-protocol/spec.md` |
+| selection of rules for a start | `agent-start-context` | `docs/platform/agent-start-context/spec.md` |
+| start facts and their live values | `agent-start-context` | `docs/platform/agent-start-context/spec.md` |
+| payload and contributor placement | `agent-start-context` | `docs/platform/agent-start-context/spec.md` |
+| per-delivery byte budget | `agent-start-context` | `docs/platform/agent-start-context/spec.md` |
+| the per-start record | `agent-start-context` | `docs/platform/agent-start-context/spec.md` |
 | RFC 8785 canonical JSON serialization | `canonical-json` | `docs/platform/component-boundary.md` |
 | claude code slash-command surface | `claude-plugin` | `docs/platform/claude-plugin/spec.md` |
 | coding domain policies, worktree isolation doctrine, merge/catchup, code verification doctrine | `coding-domain` | `docs/platform/component-boundary.md` |
