@@ -142,14 +142,22 @@ Read with `git log -S` on `discoverInstructionSources`, `evaluateInstructionComp
 | 4 | [Refuse a bad rule when it is written](phase-04-write-time-check.md) | 3 | packages/agent-context-engine/rust/src/check/**, packages/agent-context-engine/rust/tests/check*.rs, apps/fgos/src/wiring/context_engine/**, apps/fgos/tests/context_engine.rs, .githooks/pre-commit | 4 | done |
 | 6 | [Integration gate, changelog](phase-06-integration.md) | 1, 2, 3, 4 | CHANGELOG.md, plans/261125-1631-agent-context-engine/reports/** | 5 | draft |
 
-Phases 3-6 are parked on this machine (supervisor, 2026-11-26 08:58): the owner's goal of 2026-11-26, relayed by
-lead:SUPERVISOR, leaves ACE to the other machine, and the local lead's login expired, so it was stopped. No lead
-here restarts this plan until the owner or the secretary orders it; phase 3 would also overlap 261125-2313 on
-`apps/fgos/src/routing.rs`.
+Progress (lead on fg-server, 2026-11-26). Phases 1 to 4 are done and landed on main: phase 1 `6d7933abd`, phase 2 `d5fd432f9`,
+phase 3 `b05001289`, phase 4 `b66397a8f`. Phase 6 is running. The note that parked phases 3 to 6 and the note that parked
+phase 1 were written on fg-server2 when the owner moved ACE to fg-server (owner, 2026-11-26): they no longer hold. Phase 1
+ran on fg-server and its branch is landed. While running, a lead may land a change outside the footprint only where a
+gate demands it (for example the generated mutation census, the suite baseline, `package.json` `files`, the graph and
+mailbox specs' dead references); each such file is named in the phase's report.
 
-Phase 1 is parked (owner, 2026-11-25 22:58): another machine does it; the lead waits for that land on main, then marks
-phase 1 done; phase 2 does not wait for that land (next paragraph). The duplicate local run's branch `agent-context-engine/p01` is not landed
-(cleanup is owner question `q-ubi34e6xd3`).
+Measured notes that change what a later session should read in the phase files:
+- Phase 4: the nearest-rule check queries by the unit's note already in the tree, not by raw text (a text query is rescored
+  and is no longer a cosine, so the 0.93 threshold would not apply). A hit at or above 0.93 refuses; candidates between
+  0.84 and 0.93 in the top 3 are printed as advice and never refuse, because the phase 2 probe found paraphrase
+  detection is a recall aid (1 of 7 verified pairs at 0.93). The pair used as the must-refuse fixture is the probe's pair
+  6b (0.948), not a pair of cluster 1. Its score against the real embedding model was not re-measured: the model is not on
+  fg-server.
+- Phase 4: the pre-commit hook fails closed when the activated release has no `context-engine` door, so a machine whose
+  activated release predates this change cannot commit a rule unit until a newer release is activated.
 
 Phase 5 left this plan for `261125-2041` (owner, 2026-11-25 20:4x). Phase 2 runs beside phase 1 (owner, 2026-11-25
 21:4x, recut question C): the two share no file, and the probe maps the rule shape of ACE-D1 and ACE-D5 onto pkm, so
@@ -217,8 +225,8 @@ share only `Cargo.toml` and `Cargo.lock` (ACE 3 with ASC 3); the recut report li
    component` needs `--approved-by` with an answered owner question. ACE-D3 was settled in chat. One question that
    records ACE-D3 and ASC-D1 lets both declarations run. Detail in
    `plans/reports/planner-261125-1631-agent-context-engine-plan.md` Q1. Asked in the question store as
-   `q-5sog3pzmqn` (2026-11-25); phase 3 passes that id to `--approved-by` once it is answered.
-2. **Nearest-rule check without the embedding model** (phase 4). Detail in the same report, Q4. Still open.
+   `q-5sog3pzmqn` (2026-11-25). Answered by the owner on 2026-11-26 14:56: "Approve both as planned". Phase 3 passed that id to `--approved-by`.
+2. **Nearest-rule check without the embedding model** (phase 4). Detail in the same report, Q4. Decided by the lead on the plan's own recommendation, 2026-11-26, and not objected to by the owner: refuse with `rule-search-unavailable` and name the fix `doc-locate-model-fetch`; never skip silently. Built in phase 4.
 3. Answered: the gathering became its own plan (old Q5, owner 2026-11-25 20:4x). The old questions on the order with
    `261122-1950` (Q2) and the scope of "every rule" (Q3) moved to plan `261125-2041` with the phase they govern.
 

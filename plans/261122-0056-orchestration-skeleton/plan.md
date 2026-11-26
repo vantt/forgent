@@ -68,6 +68,12 @@ footprint:
   - .agents/skills/**
   - plugins/fgOS/skills/**
   - .claude/skills/**
+  - apps/fgos/tests/supervision_verbs.rs
+  - packages/questions/contracts/question-event-streams.v1.json
+  - packages/questions/rust/src/store.rs
+  - apps/fgos/src/wiring/questions.rs
+  - packages/component-authority/model/components.yaml
+  - packages/session-host/contracts/head-permissions.v1.json
 base: 36048955f30fec419bef85fd731db89823a7f732
 lead: head:lead-forgent-261122-0056-orches-18a8f
 source:
@@ -204,10 +210,10 @@ for phase 18's declarations.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Admission in code](phase-01-admission-in-code.md) | - | packages/supervision/rust/src/wake.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/tests/wake.rs, packages/supervision/rust/tests/portfolio.rs, apps/fgos/src/wiring/supervision.rs, core/skills/fgos-supervisor/SKILL.md | 1 | ready |
-| 3 | [Question recipients, notifier port, verified answers](phase-03-question-recipients.md) | - | packages/questions/contracts/questions-input.v1.json, packages/questions/contracts/question-event-payloads.v1.json, packages/questions/contracts/refusals.v1.json, packages/questions/rust/src/shape.rs, packages/questions/rust/src/record.rs, packages/questions/rust/src/usecase.rs, packages/questions/rust/src/notifier.rs, packages/questions/rust/src/lib.rs, packages/questions/rust/tests/store_usecases.rs, packages/questions/rust/tests/recipients.rs | 1 | ready |
+| 1 | [Admission in code](phase-01-admission-in-code.md) | - | packages/supervision/rust/src/wake.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/tests/wake.rs, packages/supervision/rust/tests/portfolio.rs, apps/fgos/src/wiring/supervision.rs, core/skills/fgos-supervisor/SKILL.md, apps/fgos/tests/supervision_verbs.rs | 1 | ready |
+| 3 | [Question recipients, notifier port, verified answers](phase-03-question-recipients.md) | - | packages/questions/contracts/questions-input.v1.json, packages/questions/contracts/question-event-payloads.v1.json, packages/questions/contracts/refusals.v1.json, packages/questions/rust/src/shape.rs, packages/questions/rust/src/record.rs, packages/questions/rust/src/usecase.rs, packages/questions/rust/src/notifier.rs, packages/questions/rust/src/lib.rs, packages/questions/rust/tests/store_usecases.rs, packages/questions/rust/tests/recipients.rs, packages/questions/contracts/question-event-streams.v1.json, packages/questions/rust/src/store.rs, apps/fgos/src/wiring/questions.rs | 1 | ready |
 | 10 | [Resource claim space in the referee](phase-10-resource-claims.md) | - | packages/resource-referee/contracts/resource-referee.v1.json, packages/resource-referee/rust/src/catalog.rs, packages/resource-referee/rust/src/facts.rs, packages/resource-referee/rust/tests/referee.rs, apps/fgos/src/wiring/resource_check.rs | 1 | done |
-| 16 | [Sleep record in the head record; view of live and sleeping agents](phase-16-sleep-record-and-agents-view.md) | - | src/session-host/head-stop.mjs, src/session-host/head-list.mjs, src/session-host/head-request.mjs, src/session-rotation/handoff-store.mjs, src/session-rotation/rotate.mjs, src/cli/command-registry.mjs, bin/fgos.mjs, test/session-host/head-stop.test.mjs, test/session-host/head-list.test.mjs, test/session-rotation/handoff-store.test.mjs | 1 | ready |
+| 16 | [Sleep record in the head record; view of live and sleeping agents](phase-16-sleep-record-and-agents-view.md) | - | src/session-host/head-stop.mjs, src/session-host/head-list.mjs, src/session-host/head-request.mjs, src/session-rotation/handoff-store.mjs, src/session-rotation/rotate.mjs, src/cli/command-registry.mjs, bin/fgos.mjs, test/session-host/head-stop.test.mjs, test/session-host/head-list.test.mjs, test/session-rotation/handoff-store.test.mjs, packages/component-authority/model/components.yaml, packages/session-host/contracts/head-permissions.v1.json | 1 | ready |
 | 4 | [Scheduling record contract and keeper core](phase-04-keeper-core.md) | 1 | packages/supervision/contracts/scheduling-record.v1.json, packages/supervision/contracts/event-streams.v1.json, packages/supervision/rust/src/keeper.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/keeper.rs | 2 | ready |
 | 5 | [Record sources and need resolution](phase-05-sources-and-needs.md) | 4, 10, 16 | packages/supervision/rust/src/sources.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/sources.rs, apps/fgos/src/wiring/supervision.rs, src/workflow/records.mjs, src/workflow/case-verbs.mjs, test/workflow/records.test.mjs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml | 3 | ready |
 | 9 | [Periodic review](phase-09-periodic-review.md) | 1, 4, 5 | core/watcher/definitions/review-due.query.json, core/watcher/briefs/periodic-review.md, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, packages/supervision/rust/src/watcher.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/definitions.rs, apps/fgos/src/wiring/supervision.rs | 4 | ready |
@@ -257,3 +263,5 @@ None is open. Recorded answers and orders:
 - Rollback: each phase lands as its own commit through the land door. Revert that commit. The plan as a whole
   reverts by reverting its phase commits in reverse wave order. No data migration is involved: records are
   projections, recomputed on every tick.
+
+Footprint widened on the owner answers of 2026-11-26 (inside the approved frame; footprint is coordination): phase 1 by `supervision_verbs.rs` (q-hx2zjzqsxz), phase 3 by the question event-stream contract, `store.rs` and `wiring/questions.rs` (q-lg7eqpld4j), phase 16 by `components.yaml` and `head-permissions.v1.json` (q-ho4xscbkjp).

@@ -19,7 +19,8 @@ LLM), OS-D5 (every decision has a reason code), OS-D7 (grow from the wake door).
 `packages/supervision/rust/src/wake.rs`, `packages/supervision/rust/src/portfolio.rs`,
 `packages/supervision/rust/src/supervisor.rs`, `packages/supervision/rust/tests/wake.rs`,
 `packages/supervision/rust/tests/portfolio.rs`, `apps/fgos/src/wiring/supervision.rs`,
-`core/skills/fgos-supervisor/SKILL.md`.
+`core/skills/fgos-supervisor/SKILL.md`, `apps/fgos/tests/supervision_verbs.rs`.
+(Widened by owner answer q-hx2zjzqsxz.)
 
 ## Steps
 

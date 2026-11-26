@@ -16,7 +16,8 @@ door and are verified), OS-D20 port 1.
 `packages/questions/contracts/refusals.v1.json`, `packages/questions/rust/src/shape.rs`,
 `packages/questions/rust/src/record.rs`, `packages/questions/rust/src/usecase.rs`,
 `packages/questions/rust/src/notifier.rs` (new), `packages/questions/rust/src/lib.rs`,
-`packages/questions/rust/tests/store_usecases.rs`, `packages/questions/rust/tests/recipients.rs` (new).
+`packages/questions/rust/tests/store_usecases.rs`, `packages/questions/rust/tests/recipients.rs` (new), `packages/questions/contracts/question-event-streams.v1.json`, `packages/questions/rust/src/store.rs`, `apps/fgos/src/wiring/questions.rs`.
+(Widened by owner answer q-lg7eqpld4j.)
 
 ## Steps
 
