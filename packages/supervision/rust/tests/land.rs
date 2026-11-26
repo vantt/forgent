@@ -360,13 +360,17 @@ fn two_branches_that_change_a_file_under_a_declared_glob_land_one_after_the_othe
     );
     f.topic(
         "two",
-        &[("gen/data.txt", "two-gen\n"), ("src-two.txt", "two\n")],
+        &[
+            ("gen/data.txt", "two-gen\n"),
+            ("gen/obsolete.txt", "obsolete\n"),
+            ("src-two.txt", "two\n"),
+        ],
     );
 
     let cfg = LandConfig {
         gates: vec![gate("true")],
         regenerate: Some(Regenerate {
-            run: "mkdir -p gen && cat src-*.txt > gen/data.txt".into(),
+            run: "mkdir -p gen && rm -f gen/obsolete.txt && cat src-*.txt > gen/data.txt".into(),
             files: vec!["gen/**".into()],
             when: Vec::new(),
         }),
@@ -388,6 +392,129 @@ fn two_branches_that_change_a_file_under_a_declared_glob_land_one_after_the_othe
     assert_eq!(
         fs::read_to_string(f.main.join("src-two.txt")).unwrap(),
         "two\n"
+    );
+    assert!(
+        !f.main.join("gen/obsolete.txt").exists(),
+        "a tracked glob match the command deletes stays deleted in the landed commit"
+    );
+    let tree = git(&f.main, &["ls-tree", "-r", "--name-only", &out2.main_sha]);
+    assert!(
+        !tree.lines().any(|l| l == "gen/obsolete.txt"),
+        "deleted file must not exist in landed commit tree"
+    );
+}
+
+#[test]
+fn regeneration_ignores_unrelated_non_utf8_tracked_filename() {
+    use std::os::unix::ffi::OsStrExt;
+    let f = Fixture::new();
+    let non_utf8_name = std::ffi::OsStr::from_bytes(b"unrelated-\xff.txt");
+    fs::write(f.other.join(non_utf8_name), "unrelated\n").unwrap();
+    let o = Command::new("git")
+        .arg("-C")
+        .arg(&f.other)
+        .arg("add")
+        .arg(non_utf8_name)
+        .output()
+        .unwrap();
+    assert!(o.status.success());
+    git(&f.other, &["commit", "-qm", "add non-utf8 on trunk"]);
+    git(&f.other, &["push", "-q", "origin", "trunk"]);
+    git(&f.main, &["pull", "-q", "--ff-only", "origin", "trunk"]);
+
+    f.topic(
+        "topic",
+        &[("census.txt", "topic-census\n"), ("src.txt", "topic-src\n")],
+    );
+    f.move_remote("census.txt", "trunk-census\n");
+
+    let cfg = LandConfig {
+        gates: vec![gate("true")],
+        regenerate: Some(Regenerate {
+            run: "cp src.txt census.txt".into(),
+            files: vec!["census.txt".into(), "gen/**".into()],
+            when: Vec::new(),
+        }),
+    };
+    let out = f.land(&branch("topic"), &cfg).unwrap();
+    assert_eq!(out.main_sha, f.remote_tip());
+    assert_eq!(
+        fs::read_to_string(f.main.join("census.txt")).unwrap(),
+        "topic-src\n"
+    );
+}
+
+#[test]
+fn matching_symlink_on_disk_refuses_and_referent_is_untouched() {
+    let f = Fixture::new();
+    f.move_remote("outside.txt", "original-target\n");
+    git(&f.main, &["pull", "-q", "--ff-only", "origin", "trunk"]);
+
+    f.topic(
+        "topic",
+        &[("census.txt", "topic-census\n"), ("src.txt", "src\n")],
+    );
+    f.move_remote("census.txt", "trunk-census\n");
+
+    let cfg = LandConfig {
+        gates: vec![gate("true")],
+        regenerate: Some(Regenerate {
+            run: "mkdir -p gen && ln -sf ../outside.txt gen/symlink.txt".into(),
+            files: vec!["census.txt".into(), "gen/**".into()],
+            when: Vec::new(),
+        }),
+    };
+
+    let refusal = f.land(&branch("topic"), &cfg).unwrap_err();
+    assert_eq!(refusal.code, "land-regenerate-failed");
+    assert!(
+        refusal.detail.contains("gen/symlink.txt"),
+        "must name the offending symlink path: {}",
+        refusal.detail
+    );
+    assert_eq!(
+        fs::read_to_string(f.other.join("outside.txt")).unwrap(),
+        "original-target\n",
+        "referent of the symlink must be untouched"
+    );
+}
+
+#[test]
+fn matching_tracked_symlink_refuses_and_referent_is_untouched() {
+    use std::os::unix::fs::symlink;
+    let f = Fixture::new();
+    f.move_remote("outside.txt", "original-target\n");
+    git(&f.main, &["pull", "-q", "--ff-only", "origin", "trunk"]);
+
+    git(&f.main, &["checkout", "-qb", "topic"]);
+    fs::create_dir_all(f.main.join("gen")).unwrap();
+    symlink("../outside.txt", f.main.join("gen/symlink.txt")).unwrap();
+    git(&f.main, &["add", "gen/symlink.txt"]);
+    git(&f.main, &["commit", "-qm", "topic with symlink"]);
+    git(&f.main, &["checkout", "-q", "trunk"]);
+
+    f.move_remote("src.txt", "trunk-src\n");
+
+    let cfg = LandConfig {
+        gates: vec![gate("true")],
+        regenerate: Some(Regenerate {
+            run: "true".into(),
+            files: vec!["gen/**".into()],
+            when: Vec::new(),
+        }),
+    };
+
+    let refusal = f.land(&branch("topic"), &cfg).unwrap_err();
+    assert_eq!(refusal.code, "land-regenerate-failed");
+    assert!(
+        refusal.detail.contains("gen/symlink.txt"),
+        "must name the offending symlink path: {}",
+        refusal.detail
+    );
+    assert_eq!(
+        fs::read_to_string(f.other.join("outside.txt")).unwrap(),
+        "original-target\n",
+        "referent must remain untouched"
     );
 }
 

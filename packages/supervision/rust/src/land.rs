@@ -1520,18 +1520,40 @@ impl Lander<'_> {
         let has_globs = regen.files.iter().any(|f| f.contains('*'));
         if !has_globs {
             for file in &regen.files {
-                let now = match std::fs::read(candidate.worktree.join(file)) {
-                    Ok(bytes) => Some(bytes),
+                let full = candidate.worktree.join(file);
+                let meta = match std::fs::symlink_metadata(&full) {
+                    Ok(m) => Some(m),
                     Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
                     Err(e) => return Err(refuse("land-regenerate-failed", format!("{file}: {e}"))),
+                };
+                if let Some(m) = &meta {
+                    if m.file_type().is_symlink() {
+                        return Err(refuse(
+                            "land-regenerate-failed",
+                            format!("{file}: symlinks cannot be regenerated"),
+                        ));
+                    }
+                }
+                let now = match meta {
+                    Some(_) => match std::fs::read(&full) {
+                        Ok(bytes) => Some(bytes),
+                        Err(e) => {
+                            return Err(refuse("land-regenerate-failed", format!("{file}: {e}")))
+                        }
+                    },
+                    None => None,
                 };
                 let committed = self.blob_at(&candidate.candidate, file)?;
                 if now != committed {
                     differs = true;
                     // Leave the candidate as committed so a later publish sees a clean tree.
-                    let full = candidate.worktree.join(file);
                     let restored = match &committed {
-                        Some(bytes) => std::fs::write(&full, bytes),
+                        Some(bytes) => {
+                            if let Some(parent) = full.parent() {
+                                let _ = std::fs::create_dir_all(parent);
+                            }
+                            std::fs::write(&full, bytes)
+                        }
                         None => std::fs::remove_file(&full).or_else(|e| {
                             if e.kind() == std::io::ErrorKind::NotFound {
                                 Ok(())
@@ -1562,24 +1584,47 @@ impl Lander<'_> {
             &self.regen_files,
             &mut files_to_compare,
         )?;
-        Self::walk_worktree_matching(
-            &candidate.worktree,
-            &candidate.worktree,
-            &self.regen_files,
-            &mut files_to_compare,
-        )?;
+        let prefixes = Self::literal_dir_prefixes(&self.regen_files);
+        for prefix in &prefixes {
+            let start = if prefix.is_empty() {
+                candidate.worktree.clone()
+            } else {
+                candidate.worktree.join(prefix)
+            };
+            Self::walk_worktree_matching(
+                &candidate.worktree,
+                &start,
+                &self.regen_files,
+                &mut files_to_compare,
+            )?;
+        }
 
         for file in files_to_compare {
-            let now = match std::fs::read(candidate.worktree.join(&file)) {
-                Ok(bytes) => Some(bytes),
+            let full = candidate.worktree.join(&file);
+            let meta = match std::fs::symlink_metadata(&full) {
+                Ok(m) => Some(m),
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
                 Err(e) => return Err(refuse("land-regenerate-failed", format!("{file}: {e}"))),
+            };
+            if let Some(m) = &meta {
+                if m.file_type().is_symlink() {
+                    return Err(refuse(
+                        "land-regenerate-failed",
+                        format!("{file}: symlinks cannot be regenerated"),
+                    ));
+                }
+            }
+            let now = match meta {
+                Some(_) => match std::fs::read(&full) {
+                    Ok(bytes) => Some(bytes),
+                    Err(e) => return Err(refuse("land-regenerate-failed", format!("{file}: {e}"))),
+                },
+                None => None,
             };
             let committed = self.blob_at(&candidate.candidate, &file)?;
             if now != committed {
                 differs = true;
                 // Leave the candidate as committed so a later publish sees a clean tree.
-                let full = candidate.worktree.join(&file);
                 let restored = match &committed {
                     Some(bytes) => {
                         if let Some(parent) = full.parent() {
@@ -1633,13 +1678,13 @@ impl Lander<'_> {
             fgos_git::ObjectFormat::Sha256 => 32,
         };
         let root_oid = oid_of(repo, &tree_hex)?;
-        self.walk_tree_matching(&root_oid, "", hash_len, scope, out)
+        self.walk_tree_matching(&root_oid, b"", hash_len, scope, out)
     }
 
     fn walk_tree_matching(
         &self,
         tree_oid: &Oid,
-        prefix: &str,
+        prefix: &[u8],
         hash_len: usize,
         scope: &[String],
         out: &mut BTreeSet<String>,
@@ -1663,28 +1708,128 @@ impl Lander<'_> {
             }
             let mode = &rest[..space];
             let name_bytes = &rest[space + 1..nul];
-            let name = std::str::from_utf8(name_bytes).map_err(|_| bad("bad tree name"))?;
             let id = hex(&rest[nul + 1..nul + 1 + hash_len]);
             rest = &rest[nul + 1 + hash_len..];
 
-            let full_path = if prefix.is_empty() {
-                name.to_string()
-            } else {
-                format!("{prefix}/{name}")
-            };
+            let mut full_path_bytes = Vec::with_capacity(prefix.len() + 1 + name_bytes.len());
+            if !prefix.is_empty() {
+                full_path_bytes.extend_from_slice(prefix);
+                full_path_bytes.push(b'/');
+            }
+            full_path_bytes.extend_from_slice(name_bytes);
 
             if mode == b"40000" {
-                let sub_oid = oid_of(self.ports.repo, &id)?;
-                self.walk_tree_matching(&sub_oid, &full_path, hash_len, scope, out)?;
+                if let Ok(dir_str) = std::str::from_utf8(&full_path_bytes) {
+                    if Self::can_dir_intersect(dir_str, scope) {
+                        let sub_oid = oid_of(self.ports.repo, &id)?;
+                        self.walk_tree_matching(&sub_oid, &full_path_bytes, hash_len, scope, out)?;
+                    }
+                }
             } else {
-                let matched = fgos_write_scope::matches(full_path.as_bytes(), scope)
+                let Ok(full_path_str) = std::str::from_utf8(&full_path_bytes) else {
+                    continue;
+                };
+                let matched = fgos_write_scope::matches(full_path_str.as_bytes(), scope)
                     .map_err(|e| refuse("land-regenerate-failed", e.to_string()))?;
                 if matched {
-                    out.insert(full_path);
+                    if mode == b"120000" {
+                        return Err(refuse(
+                            "land-regenerate-failed",
+                            format!("{full_path_str}: symlinks cannot be regenerated"),
+                        ));
+                    }
+                    out.insert(full_path_str.to_string());
                 }
             }
         }
         Ok(())
+    }
+
+    fn literal_dir_prefixes(scope: &[String]) -> BTreeSet<String> {
+        let mut prefixes = BTreeSet::new();
+        for pattern in scope {
+            if !pattern.contains('*') {
+                continue;
+            }
+            let mut parts = Vec::new();
+            for part in pattern.split('/') {
+                if part.contains('*') {
+                    break;
+                }
+                parts.push(part);
+            }
+            let prefix = parts.join("/");
+            prefixes.insert(prefix);
+        }
+        if prefixes.is_empty() || prefixes.contains("") {
+            let mut root = BTreeSet::new();
+            root.insert(String::new());
+            return root;
+        }
+        let list: Vec<String> = prefixes.into_iter().collect();
+        let mut pruned = BTreeSet::new();
+        for p in &list {
+            let has_ancestor = list.iter().any(|other| {
+                other != p && (other.is_empty() || p.starts_with(&format!("{other}/")))
+            });
+            if !has_ancestor {
+                pruned.insert(p.clone());
+            }
+        }
+        pruned
+    }
+
+    fn segment_matches(pat: &str, val: &str) -> bool {
+        let (p, v) = (pat.as_bytes(), val.as_bytes());
+        let (mut i, mut j, mut star, mut retry) = (0, 0, None, 0);
+        while j < v.len() {
+            if i < p.len() && p[i] == b'*' {
+                star = Some(i);
+                i += 1;
+                retry = j;
+            } else if i < p.len() && p[i] == v[j] {
+                i += 1;
+                j += 1;
+            } else if let Some(s) = star {
+                retry += 1;
+                j = retry;
+                i = s + 1;
+            } else {
+                return false;
+            }
+        }
+        while i < p.len() && p[i] == b'*' {
+            i += 1;
+        }
+        i == p.len()
+    }
+
+    fn can_dir_intersect(rel_dir: &str, scope: &[String]) -> bool {
+        let dir_parts: Vec<&str> = rel_dir.split('/').filter(|s| !s.is_empty()).collect();
+        if dir_parts.is_empty() {
+            return true;
+        }
+        for pattern in scope {
+            let pat_parts: Vec<&str> = pattern.split('/').filter(|s| !s.is_empty()).collect();
+            let mut matches = true;
+            for (i, dir_part) in dir_parts.iter().enumerate() {
+                if i >= pat_parts.len() {
+                    matches = false;
+                    break;
+                }
+                if pat_parts[i] == "**" {
+                    return true;
+                }
+                if !Self::segment_matches(pat_parts[i], dir_part) {
+                    matches = false;
+                    break;
+                }
+            }
+            if matches {
+                return true;
+            }
+        }
+        false
     }
 
     fn walk_worktree_matching(
@@ -1693,6 +1838,37 @@ impl Lander<'_> {
         scope: &[String],
         out: &mut BTreeSet<String>,
     ) -> Result<(), LandRefusal> {
+        let meta = match std::fs::symlink_metadata(current) {
+            Ok(m) => m,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+            Err(e) => {
+                return Err(refuse(
+                    "land-regenerate-failed",
+                    format!("{}: {e}", current.display()),
+                ))
+            }
+        };
+        if meta.file_type().is_symlink() {
+            if let Ok(rel) = current.strip_prefix(root) {
+                let rel_str = rel
+                    .components()
+                    .map(|c| c.as_os_str().to_str())
+                    .collect::<Option<Vec<_>>>()
+                    .map(|parts| parts.join("/"));
+                if let Some(rel_str) = rel_str {
+                    let matched = fgos_write_scope::matches(rel_str.as_bytes(), scope)
+                        .map_err(|e| refuse("land-regenerate-failed", e.to_string()))?;
+                    if matched {
+                        return Err(refuse(
+                            "land-regenerate-failed",
+                            format!("{rel_str}: symlinks cannot be regenerated"),
+                        ));
+                    }
+                }
+            }
+            return Ok(());
+        }
+
         let entries = match std::fs::read_dir(current) {
             Ok(entries) => entries,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
@@ -1718,20 +1894,36 @@ impl Lander<'_> {
             let file_type = entry.file_type().map_err(|e| {
                 refuse("land-regenerate-failed", format!("{}: {e}", path.display()))
             })?;
+            let Ok(rel) = path.strip_prefix(root) else {
+                continue;
+            };
+            let rel_str = rel
+                .components()
+                .map(|c| c.as_os_str().to_str())
+                .collect::<Option<Vec<_>>>()
+                .map(|parts| parts.join("/"));
+            let Some(rel_str) = rel_str else {
+                continue;
+            };
+
             if file_type.is_dir() {
-                Self::walk_worktree_matching(root, &path, scope, out)?;
-            } else if file_type.is_file() || file_type.is_symlink() {
-                if let Ok(rel) = path.strip_prefix(root) {
-                    let rel_str = rel
-                        .components()
-                        .map(|c| c.as_os_str().to_string_lossy())
-                        .collect::<Vec<_>>()
-                        .join("/");
-                    let matched = fgos_write_scope::matches(rel_str.as_bytes(), scope)
-                        .map_err(|e| refuse("land-regenerate-failed", e.to_string()))?;
-                    if matched {
-                        out.insert(rel_str);
-                    }
+                if Self::can_dir_intersect(&rel_str, scope) {
+                    Self::walk_worktree_matching(root, &path, scope, out)?;
+                }
+            } else if file_type.is_symlink() {
+                let matched = fgos_write_scope::matches(rel_str.as_bytes(), scope)
+                    .map_err(|e| refuse("land-regenerate-failed", e.to_string()))?;
+                if matched {
+                    return Err(refuse(
+                        "land-regenerate-failed",
+                        format!("{rel_str}: symlinks cannot be regenerated"),
+                    ));
+                }
+            } else if file_type.is_file() {
+                let matched = fgos_write_scope::matches(rel_str.as_bytes(), scope)
+                    .map_err(|e| refuse("land-regenerate-failed", e.to_string()))?;
+                if matched {
+                    out.insert(rel_str);
                 }
             }
         }
