@@ -1,13 +1,15 @@
 ---
 id: ds-mzyircswox
 title: "A door to widen a running plan's footprint"
-status: settled
+status: paused
 source:
   - p-lfsc4czpgh
 created: 2026-11-26
 ---
 
-discussion: settled
+discussion: paused
+
+> **Closed without a planner (owner, 2026-11-26).** The owner closed this discussion and chose not to hand it to a planner: too much work and resource for now. The design below stays as the record. To resume, the owner reopens it by name; nothing here is queued.
 
 ## Hand-off
 
@@ -43,7 +45,7 @@ Opened by the secretary (Miu) on the owner order relayed by lead:SUPERVISOR, goa
 
 ## 1. Trạng thái hiện tại
 
-Settled 2026-11-26 (round 2). The owner challenged the round-1 question q-ee2f2g3aoj ("who may call the widen door") with "is this question even needed?". Root cause: the footprint does two jobs. Collision avoidance between parallel plans is mechanical. A scope bound is what the owner approves, but the owner approves outcome and acceptance criteria, not a file list. A missing file needed for an approved criterion is a planner estimation error inside the approved frame. All five widen questions on record were answered "widen", one of them by lead:SUPERVISOR inside the frame. The owner agreed: a plan widens itself inside the frame (D1). q-ee2f2g3aoj is cancelled as superseded. The owner also moved automatic ordering on overlap (a footprint changed mid-run that hits another plan) to its own backlog item (D2), handed to the secretary. The drift check (D3) and the planner fallback (D4) held unchanged across both rounds. No owner question is open.
+Closed by the owner on 2026-11-26, not handed to a planner (too much work and resource for now). The design reached a settled shape in round 2 (D1-D4, §6, §7) and stays as the record for whenever the owner reopens it. No owner question is open; q-ee2f2g3aoj was cancelled as superseded. The overlap-ordering idea (D2) went to the secretary as its own backlog row request. Until this is built, a widen still goes through an owner answer and a supervisor hand edit of both footprint copies, as on 2026-11-26 08:51 (dece50514).
 
 ## 2. Mục tiêu & đề bài
 
@@ -80,6 +82,7 @@ A running plan is bounded by its footprint: the run door refuses a `--writes` pa
 - 2026-11-26 ~10:00 +07, owner: "có nên hỏi câu này không, cần đi lại root-cause tại sao hỏi nó … nếu anh trả lời không cho widen thì chuyện gì xảy ra, lead ngưng toàn dự án à?"
 - 2026-11-26 ~10:05 +07, shaper: Root cause. The footprint mixes collision avoidance (mechanical) with scope (the owner approves acceptance, not files). Five widen questions on record, none answered "no", one answered by lead:SUPERVISOR inside the frame. A "no" does not stop the project; it degrades one phase's approved criterion. Proposed: self-widen inside the frame, system-ordered on overlap, owner only for scope beyond acceptance; cancel q-ee2f2g3aoj.
 - 2026-11-26 12:41 +07, owner: "đồng ý." Then: put the overlap-ordering idea in the backlog as its own capability; "ý là footprint cần đổi giữa chừng". → D1, D2. q-ee2f2g3aoj cancelled as superseded. D3 and D4 minted (held across both rounds).
+- 2026-11-26 ~12:50 +07, owner: "khoan giao cho planner", then "dọn dẹp ở đây rồi đóng discussion. không giao vì quá nhiều việc tốn resource". → closed as paused, no planner.
 
 ## 6. Thiết kế đã chốt {#design}
 
