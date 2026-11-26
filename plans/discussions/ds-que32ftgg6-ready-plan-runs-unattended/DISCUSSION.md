@@ -47,6 +47,10 @@ Round 4 (13:55): the standing rule's draft U1-U6 is in §6 for the owner to read
 
 Round 5 (14:05): owner direction, no hardcoding. §6 now places the rule as ACE rule units selected by `workflow`/`stage`/`domain` (core unit for the guarantee, coding unit for footprint tracing), with doors, executors and wiring sets read from data. Open: §3 rows 10, 11, 12.
 
+Round 6 (14:35): owner accepted U5 as written; D1 minted for the three sources of pre-decided answers. Next: scout §3 rows 10, 11, 12.
+
+Round 7 (14:52): owner clarified plan splitting (§3 row 13): parallel split always; staged compatibility releases are optional, and one big step with a computed reverse path is allowed when the agent's whole change takes hours. Draft U7 in §6.
+
 ## 2. Mục tiêu & đề bài
 
 The owner settles a discussion, a planner writes the plan, the plan goes `ready`, and the owner walks away believing every foreseeable question is answered. On return he finds the plan stalled on questions he calls silly, or never started at all. Of 163 owner questions from 2026-11-19 to 2026-11-26, about 140 were asked after a plan existed, and the large classes were foreseeable at planning time: 40 footprint widens, about 45 "hands" requests from confined heads, 18 cleanups, and 8 acceptance deviations from outcomes that bundled the core with the cleanup. Three plans produced 66 of them. The goal is that `ready` means "can run to `done` without the owner": every foreseeable question is answered when the plan is approved, so the only questions left at run time are genuine deviations that the four-part ask rule of ds-jxoz3h2qgk-when-to-ask lets through. This discussion defines what `ready` guarantees and how that is checked. It does not own the flow to `ready` (ds-3in4yb5thk-backlog-to-ready-pipeline), the run-time ask rule (ds-jxoz3h2qgk-when-to-ask), or the door that widens a running plan's footprint (ds-mzyircswox-widen-a-running-plan-footprint).
@@ -67,13 +71,16 @@ The owner settles a discussion, a planner writes the plan, the plan goes `ready`
 | 10 | Where the wiring set of a new verb or route comes from | **Leaning (round 5)** | Not a list in a rule or a doc (owner: no hardcoding). Read it from the component authority model's door rows, which already own doors; the coding rule unit says "trace through the model". Scout (round 5): door rows (`packages/component-authority/model/doors/*.yaml`) name the paths that own each door job, e.g. `verb-manifest-projection` allows `src/cli/command-registry.mjs` and `scripts/export-command-selectors.mjs`; `parse-cli-arguments` and `decide-the-lane-of-an-invocation` exist too. So the set is derivable as "the doors a new verb passes through, and each door's owning paths", but no row says which doors a new verb passes through. Open: where that "a verb passes these doors" fact lives (a field on the door rows, or the host-runtime spec). |
 | 11 | Does `fgos release run` cover the full gate on the integrated tree | **Chưa rõ, scout next** | Supervisor `release run` is `allow`; the recipe's checks were set to the DoD suite (q-dhhezn67em). Need to confirm it runs on the integrated plan tree, not only on main after landing. |
 | 12 | **Placement: rule units via ACE/ASC, not hardcoded** | **Leaning (owner direction, round 5)** | Owner 13:50: the orchestrator pushes an item into a workflow, and the workflow must know its own rule set, possibly through ASC and ACE. §6 now splits the rule into a domain-free core unit, a coding domain unit, and data (permission table, release recipe, authority model). Open: the exact `workflow` / `stage` values, which depend on how ds-3in4yb5thk names the planning workflow's stages. |
+| 13 | **Two ways to split a plan; the second is a mindset choice** | **Leaning (owner, round 7)** | Owner 14:52 corrected the round 6 framing (there is no tension with parallel phases). (1) Split a plan into the smallest pieces that can run in parallel: always right, unchanged (`plan-contract.md` §4). (2) Splitting into step-by-step releases that each keep the running system stable and compatible is a human-era habit: work a person needs 7 days for becomes 7 releases, each carrying temporary compatibility and stability work that is removed after the last one. An agent does the same work in about 2 hours, so it may instead take one big step: temporary disruption inside it, done when it ends. Condition: before starting, it works out a real reverse path (seal the state first, including state outside the worktree), never "just do it". This is a decision lens (cost of waiting vs cost of being wrong), not a mandate: the planner chooses per plan. Fits L10 and RUL104 (move every caller and delete the old path in the same change). Lands as U7 in the core rule unit (§6). |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Tóm tắt | Nguồn / rationale |
 |---|---|---|
 
-(None yet. L1-L6 are one round old.)
+| D1 | Pre-decided answers come from three sources. (1) The owner marks each acceptance criterion `core` or `debt-ok` when the discussion settles. (2) The standing rule for repeating classes is process law, recorded with no owner approval. (3) Anything plan-specific beyond that rule asks the owner once, batched, before `ready`. The owner settles only plan-specific matters. | Owner chat 13:41 (§5 round 3), held unchanged through rounds 4 and 5; q-ypgj7zverd cancelled with this answer. |
+
+U5's list (§6) was accepted by the owner in round 6; it becomes a D-ID after one more round without change.
 
 ## 5. Q&A log
 
@@ -86,6 +93,14 @@ The owner settles a discussion, a planner writes the plan, the plan goes `ready`
 - 2026-11-26 13:55 +07, shaper, round 4: owner asked for the standing rule's draft. Wrote U1-U6 in §6. Scout: the supervisor row of `head-permissions.v1.json` already allows `release run`, `git recover`, `worktree remove --delivered-to` and `config patch`, so the routine hands classes have a door; U2 routes them there. Two gaps opened (§3 rows 10, 11).
 
 - 2026-11-26 13:50 +07, owner (chat), round 5: the system must not hardcode; the orchestrator pushes an item to a workflow, and the workflow needs to know its related rule set (may need to work with ASC and ACE). Shaper: read `docs/platform/agent-context-engine/spec.md` (rule units in three roots, `when:` keys incl. `workflow`, `stage`, `domain`, `persona`, `role`; ASC selects per start). Re-placed §6: the guarantee becomes a domain-free core rule unit, footprint tracing a coding domain unit, and the doors, executors and wiring sets stay data (permission table, release recipe, authority model). The check enforces shape only. §3 rows 10 and 12.
+
+- 2026-11-26 14:35 +07, owner (chat), round 6: "ok U5": accepts the five beyond-the-rule classes as written, including the U4 default (an unmarked criterion counts as `core`). Asked to have the three scout points (§3 rows 10, 11, 12) explained. Shaper: minted D1 for §3 row 8 (stable since round 3).
+
+- 2026-11-26 14:40 +07, shaper, round 6: received by mail the hand-off of ds-jxoz3h2qgk round 10 (owner view on plan shape: one big sealed step). Verified against that discussion's §5 lines 95-96. Recorded as §3 row 13, open.
+
+- 2026-11-26 14:52 +07, owner (chat), round 7: the round 6 framing was wrong. Splitting into the smallest parallel pieces is always right. What the agent era changes is the other kind of split: step-by-step releases that keep the running system stable and compatible (7 human days = 7 releases, much throwaway compatibility work). An agent finishing in hours can take one big step with temporary disruption, but only after computing a reverse path, never blindly. "Cost of waiting vs cost of being wrong" is a lens for choosing, not a rule that forces. Shaper: restated as §3 row 13 and U7 in §6.
+
+- 2026-11-26 15:00 +07, owner (chat), round 7: asked to find every place that mentions this idea and add the detailed explanation, "không thì sai bét". Shaper: correction to the 14:40 entry above, which called the hand-off "one big sealed step" as a plan-shape rule; that framing is wrong, see §3 row 13 and U7 in §6, which now carry the owner's full explanation. Other mentions: ds-jxoz3h2qgk §5 rounds 10 and 11 (owned by its shaper, file being edited by that head); the explanation was sent to that shaper by mail to add.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -136,6 +151,14 @@ A lead asks for these through `supervisor raise --kind coordination-help` naming
 - a plan-specific fallback ("if X, do Y") the plan wants pre-approved.
 
 Everything else in U1-U4 is decided by the agent and reported, never asked.
+
+**U7. Choose how to split with "cost of waiting vs cost of being wrong" (a lens, not a mandate).** Owner explanation, 2026-11-26 14:52, kept in full so it is not misread:
+
+- There are two different ways to split a plan. **(1) Split into the smallest pieces that can run in parallel.** This is always right and does not change (`plan-contract.md` §4: phases, waves, an integration phase).
+- **(2) Split into step-by-step releases that keep the running system stable and compatible.** This is a habit from human-speed work and often does not fit when an agent is far faster than a person. Example: work A takes a person 7 days and an agent about 2 hours. A person plans the 7 days as 7 releases, and each release carries a pile of work only to stay stable and compatible with the old system part by part (shims, twins, staged migrations, temporary guards). All of it is thrown away when the 7 days end. An agent that finishes in hours should not plan that way. It can do the whole change in **one big step**: there may be temporary disruption inside the step, but when the step ends the work is done.
+- **The condition:** before starting, the agent works out a real path to reverse. It never "just does it". The reverse path covers the state the step touches, inside the worktree and outside it (event store, config, release activation, remote), or the step does not touch outside state before it lands; and the closing check is strict, because it carries the weight.
+- **Where it comes from:** the owner drew it from the angle "cost of waiting vs cost of being wrong" that the agents raised in ds-jxoz3h2qgk, and from the evidence that 193 hours went to waiting, much of it on side work of this kind.
+- **It is a lens, not a rule that forces.** It is one consideration when choosing; the owner said so explicitly (ds-jxoz3h2qgk §5 round 11, 14:28: "a mindset used while deciding, not a large technical expectation"). Where the cost of being wrong is high and no reliable reverse path exists, staged releases stay a valid choice. The plan says which split it chose and why.
 
 **U6. What the check enforces.** For a plan going `ready`, `plan-contract-check.mjs` fails when: the "Unattended run" section is missing; a host step has no argv or no executor; an acceptance criterion has no `core` / `debt-ok` mark; a U5 item is listed with no answered `q-` id. Completeness of the U1 trace stays the validator's judgment.
 
