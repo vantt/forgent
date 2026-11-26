@@ -106,7 +106,8 @@ mod tests {
                 "fgos-host-sources",
                 "fgos-questions",
                 "fgos-supervision",
-                "fgos-documentation"
+                "fgos-documentation",
+                "fgos-agent-start-context"
             ]
         );
     }

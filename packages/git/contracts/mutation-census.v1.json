@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c18b855749b16ca9f698cea180b896b9a2b27aa05bd2b063ad5aa47a1280134e",
+  "payloadDigest": "0bf87b27021ecc8eaaa18dd07682f684b8f2399e5204479a979c36f9285decc0",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -159,7 +159,7 @@
     "apps/fgos/src/wiring/migrate.rs": "5bed496533803f5363816d62adcf6b6134a468a70ad63f0daedfd671a0cd4212",
     "apps/fgos/src/wiring/mod.rs": "446541ee28a4a3faacf06a5d1d6aa03b27a30f4e730eb9a4fe7661cb3235f0ed",
     "apps/fgos/src/wiring/observe_declarations.rs": "84b6ce26227fd00df947e212acff92362900b34ad95a9ed0e8fcf2fbb20b36d4",
-    "apps/fgos/src/wiring/observe_query.rs": "f43037b9a987bb9902534275c5842559b03240900e528262adff3115165230d5",
+    "apps/fgos/src/wiring/observe_query.rs": "eb392c50c8617ac5e7451b94b21ba76f33151511819b188d0ecc17d89d1f738f",
     "apps/fgos/src/wiring/observe_sources/head_state.rs": "baca1bd783f125a29917b5ec63277f5899177912d60754353d7e36fddd80bfcd",
     "apps/fgos/src/wiring/observe_sources/mod.rs": "d5fb81609b375af587eed807d6c81ff70565fbc7ca8cdea1f6a22f3f3149afc1",
     "apps/fgos/src/wiring/observe_sources/plan_history.rs": "38cec91849c282960311c3f851e99ec50608ff253de753a798c3af79d03fb185",
