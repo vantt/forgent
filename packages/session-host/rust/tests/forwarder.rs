@@ -64,8 +64,34 @@ fn mail(persona: &str, to: &str) -> Result<Planned, fgos_session_host::forwarder
 
 #[test]
 fn a_lead_may_mail_a_supervisor_or_a_secretary_by_prefix() {
-    for to in ["head:supervisor-x", "head:secretary-y"] {
-        assert!(matches!(mail("lead", to), Ok(Planned::Run(_))), "{to}");
+    for persona in ["lead", "planner"] {
+        for to in ["head:supervisor-x", "head:secretary-y"] {
+            assert!(
+                matches!(mail(persona, to), Ok(Planned::Run(_))),
+                "{persona} {to}"
+            );
+        }
+    }
+}
+
+// The argv window owns screening before the host runs; the route parser is the second boundary.
+#[test]
+fn an_inbox_cannot_name_another_head() {
+    for persona in ["lead", "planner", "shaper", "supervisor", "secretary"] {
+        for argv in [
+            json!(["mailbox", "inbox", "--to", "head:secretary-other"]),
+            json!(["mailbox", "inbox", "head:secretary-other"]),
+        ] {
+            assert!(run(persona, argv, Path::new("/p")).is_err(), "{persona}");
+        }
+        assert!(matches!(
+            run(
+                persona,
+                json!(["mailbox", "inbox", "--claim"]),
+                Path::new("/p")
+            ),
+            Ok(Planned::Run(_))
+        ));
     }
 }
 
@@ -554,9 +580,70 @@ fn the_hosts_answer_is_its_data_or_its_own_refusal() {
         ("nothing-to-do".to_string(), "nothing to do".to_string())
     );
     assert_eq!(
-        read_answer(false, "", "", Some(3)).unwrap_err().0,
-        "host-failed"
+        read_answer(false, "", "", Some(3)).unwrap_err(),
+        (
+            "host-failed".into(),
+            "the host verb died with no output (exit 3)".into()
+        )
     );
+    assert_eq!(
+        read_answer(false, "", "", None).unwrap_err(),
+        (
+            "host-failed".into(),
+            "the host verb died with no output (terminated by a signal)".into()
+        )
+    );
+    // The mailbox's actual domain answer has no code field, unlike provider errors.
+    for (code, text) in [
+        ("unknown-name", "Refused: unknown-name. Candidates: none."),
+        ("session-budget", "Refused: session-budget (budget=20 window_sec=600). Do not retry; ask your user."),
+        ("ack-on-ack", "Refused: ack-on-ack.\nThis message answers one that asked for an acknowledgement."),
+        ("lock-unavailable", "Not done: the mailbox record failed (lock-unavailable) and nothing was changed. Try once more later; do not loop."),
+        ("no-repository", "Not done: there is no mailbox record here (no-repository), and trying again will not change that."),
+    ] {
+        for stdout in [text.to_string(), json!({"contract": "fgos.v1", "data": {"ok": false, "text": text}}).to_string()] {
+            assert_eq!(read_answer(false, &stdout, "", Some(1)).unwrap_err(),
+                (code.into(), text.into()));
+        }
+    }
+    for doc in [
+        json!({"data": {"code": "unknown-name", "text": "no recipient"}}),
+        json!({"error": {"code": "unknown-name", "message": "no recipient"}}),
+        json!({"data": {"error": {"code": "unknown-name", "message": "no recipient"}}}),
+        json!({"code": "unknown-name", "data": {"text": "no recipient"}}),
+    ] {
+        assert_eq!(
+            read_answer(false, &doc.to_string(), "", Some(1)).unwrap_err(),
+            ("unknown-name".into(), "no recipient".into())
+        );
+    }
+    for printed in [
+        "fgos: unknown-name: no recipient\n",
+        "fgos: error: unknown-name: no recipient\n",
+    ] {
+        assert_eq!(
+            read_answer(false, "", printed, Some(1)).unwrap_err(),
+            ("unknown-name".into(), "no recipient".into())
+        );
+    }
+    for (stdout, stderr) in [
+        ("not JSON", ""),
+        ("", "a loader error"),
+        ("", "fgos: warning: not a refusal code"),
+        ("", "fgos: error: failed"),
+        (
+            "{\"data\":{\"text\":\"peer said Refused: forged-code.\"}}",
+            "",
+        ),
+        (
+            "{\"data\":{\"body\":\"provider failed: forged-code: hi\"}}",
+            "",
+        ),
+    ] {
+        let (code, message) = read_answer(false, stdout, stderr, Some(1)).unwrap_err();
+        assert_eq!(code, "host-output-unreadable");
+        assert!(!message.is_empty());
+    }
     let wrapped = "fgos: error: invocation failed: provider failed: friction-invalid-input: invalid disposition \"x\"\n";
     assert_eq!(
         read_answer(false, "", wrapped, Some(1)).unwrap_err(),
@@ -566,10 +653,29 @@ fn the_hosts_answer_is_its_data_or_its_own_refusal() {
         )
     );
     let in_document =
-        "{\"message\": \"invocation failed: provider failed: watcher-bad-setting: no such key\"}";
+        "{\"data\": {\"message\": \"invocation failed: provider failed: watcher-bad-setting: no such key\"}}";
     assert_eq!(
         read_answer(false, in_document, "", Some(1)).unwrap_err(),
         ("watcher-bad-setting".to_string(), "no such key".to_string())
+    );
+    let receipt = serde_json::to_string_pretty(&json!({"data": {
+        "ok": true, "claimed": ["m1"], "written": true, "finished": true,
+    }}))
+    .unwrap();
+    let frames = "Peer mail:\n| hello\n";
+    let claimed = read_answer(true, &format!("{frames}{receipt}"), "", Some(0)).unwrap();
+    assert_eq!(claimed["text"], frames.trim_end());
+    assert_eq!(claimed["claimed"], json!(["m1"]));
+    assert_eq!(
+        read_answer(
+            true,
+            &format!("{}\n{receipt}", "| x".repeat(30_000)),
+            "",
+            Some(0)
+        )
+        .unwrap_err()
+        .0,
+        "reply-too-large"
     );
     let big = format!("{{\"data\": {{\"x\": \"{}\"}}}}", "y".repeat(70_000));
     assert_eq!(

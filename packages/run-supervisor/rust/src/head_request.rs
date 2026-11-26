@@ -1489,7 +1489,7 @@ fn can_i(cfg: &Config, args: &Value) -> Outcome {
 /// `ask` files one owner question carrying it (refused `asked`, the question id in the detail), anything else is
 /// refused `argv-not-allowed` with the reason.
 fn forward(cfg: &Config, request: &Request) -> Outcome {
-    use fgos_session_host::forwarder::{plan, Planned, Refused};
+    use fgos_session_host::forwarder::{plan, Planned};
     let Some(argv) = argv_args(&request.args) else {
         return bad_argv_args();
     };
@@ -1530,8 +1530,50 @@ fn forward(cfg: &Config, request: &Request) -> Outcome {
 /// Runs the host `fgos` with `words` (no shell, the project root as cwd, the step environment), inside the verb
 /// timeout and in its own process group, and reads its answer: its `data`, or its own refusal.
 fn forward_exec(cfg: &Config, request: &Request, words: &[String]) -> Outcome {
+    // Mail runs outside the cage, but belongs to the protected envelope's caller. Its runtime CLI id comes from
+    // Identity's bound session, never request args or the confined process's environment.
+    let mail_caller = if words.first().map(String::as_str) == Some("mailbox") {
+        let root = cfg
+            .env
+            .get("FGOS_STATE_ROOT")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| fgos_holder_lock::state_root::state_root().0);
+        let holder = match fgos_identity::directory::resolve(
+            &root,
+            &cfg.role,
+            &judge_here,
+            None,
+            &fgos_identity::directory::NoTerminal,
+        ) {
+            Ok(holder) => holder,
+            Err(why) => {
+                return Outcome::RouteRefused {
+                    code: why.reason.to_string(),
+                    message: Some(why.detail),
+                }
+            }
+        };
+        match holder
+            .ids
+            .and_then(|ids| ids.cli_session)
+            .map(|cli| cli.id)
+            .filter(|id| !id.is_empty())
+        {
+            Some(id) => Some(id),
+            None => {
+                return Outcome::RouteRefused {
+                    code: "caller-unknown".into(),
+                    message: Some(
+                        "the envelope's head has no bound CLI session for its mailbox".into(),
+                    ),
+                }
+            }
+        }
+    } else {
+        None
+    };
     let words: Vec<OsString> = words.iter().map(OsString::from).collect();
-    let output = match run_verb(cfg, request, &words, None) {
+    let output = match run_verb(cfg, request, &words, None, mail_caller.as_deref()) {
         Ok(BoundedOutcome::Exited(output)) => output,
         Ok(BoundedOutcome::TimedOut { .. }) => return refused("verb-timeout"),
         Err(e) => {
@@ -1618,7 +1660,7 @@ fn file_question(cfg: &Config, request: &Request, input: Value) -> Result<String
         cfg.run_dir.clone().into_os_string(),
     ];
     let body = json!({"v": 1, "verb": "questions ask", "args": {"input": input}}).to_string();
-    let output = match run_verb(cfg, request, &words, Some(body.as_bytes())) {
+    let output = match run_verb(cfg, request, &words, Some(body.as_bytes()), None) {
         Ok(BoundedOutcome::Exited(output)) => output,
         Ok(BoundedOutcome::TimedOut { .. }) => return Err(refused("verb-timeout")),
         Err(e) => {
@@ -1690,7 +1732,7 @@ impl HostRelease {
     /// The `data` of the one envelope a host verb prints with `--json` (pretty-printed over many lines).
     fn host_json(&self, words: &[&str]) -> Result<Value, String> {
         let words: Vec<OsString> = words.iter().map(OsString::from).collect();
-        match run_verb(&self.cfg, &self.request, &words, None) {
+        match run_verb(&self.cfg, &self.request, &words, None, None) {
             Ok(BoundedOutcome::Exited(output)) if output.status.success() => {
                 fgos_session_host::release::envelope_data(&String::from_utf8_lossy(&output.stdout))
             }
@@ -2076,6 +2118,7 @@ fn run_verb(
     request: &Request,
     words: &[OsString],
     body: Option<&[u8]>,
+    mail_caller: Option<&str>,
 ) -> io::Result<BoundedOutcome> {
     let host = match cfg.request_host_bin.as_ref().map(|read| read()) {
         Some(Ok(host)) => host,
@@ -2094,6 +2137,15 @@ fn run_verb(
         .env_clear()
         .envs(cfg.env.iter())
         .current_dir(&cfg.cwd);
+    if let Some(caller) = mail_caller {
+        for name in ENV_ORDER {
+            cmd.env_remove(name);
+        }
+        cmd.env("FGOS_SESSION_ID", caller)
+            .env_remove("FGOS_HEAD_REQUEST_SOCKET")
+            .env_remove("FGOS_CONFINED")
+            .env_remove("CLAUDE_PROJECT_DIR");
+    }
     // SAFETY: prctl is async-signal-safe; the child dies with the supervisor that started it.
     #[cfg(target_os = "linux")]
     unsafe {
@@ -2118,7 +2170,7 @@ fn route_request(cfg: &Config, request: &Request) -> Outcome {
         cfg.run_dir.clone().into_os_string(),
     ];
     let body = json!({"id": request.id, "verb": request.verb, "args": request.args}).to_string();
-    let output = match run_verb(cfg, request, &words, Some(body.as_bytes())) {
+    let output = match run_verb(cfg, request, &words, Some(body.as_bytes()), None) {
         Ok(BoundedOutcome::Exited(output)) => output,
         Ok(BoundedOutcome::TimedOut { .. }) => return refused("verb-timeout"),
         Err(e) => return failed(format!("the route did not run: {e}")),

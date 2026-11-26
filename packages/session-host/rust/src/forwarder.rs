@@ -321,6 +321,16 @@ fn screen(
             words[0]
         ));
     }
+    if words[0] == "mailbox" && words.get(1).map(String::as_str) == Some("inbox") {
+        if words[2..]
+            .iter()
+            .any(|word| !matches!(word.as_str(), "--claim" | "--json"))
+        {
+            return refuse(
+                "mailbox inbox takes only --claim and --json; its caller is the envelope's head",
+            );
+        }
+    }
     let patch = if words[0] == "config" && words.get(1).map(String::as_str) == Some("patch") {
         Some(check_config_patch(&words, root)?)
     } else {
@@ -442,9 +452,22 @@ pub fn read_answer(
     exit: Option<i32>,
 ) -> Result<Value, (String, String)> {
     let whole = stdout.trim();
+    // `inbox --claim --json` streams its frames before finishing the claim, then prints the JSON receipt. Keep
+    // that ordering: read the trailing document rather than buffering or finishing mail before its output write.
+    let trailing = whole.match_indices('\n').rev().find_map(|(at, _)| {
+        let suffix = whole[at + 1..].trim();
+        suffix
+            .starts_with('{')
+            .then(|| serde_json::from_str::<Value>(suffix).ok())
+            .flatten()
+            .filter(Value::is_object)
+            .map(|doc| (doc, &whole[..at + 1]))
+    });
+    let prefix = trailing.as_ref().map_or("", |(_, prefix)| *prefix);
     let document = serde_json::from_str::<Value>(whole)
         .ok()
         .filter(Value::is_object)
+        .or_else(|| trailing.map(|(doc, _)| doc))
         .or_else(|| {
             whole.lines().rev().find_map(|line| {
                 serde_json::from_str::<Value>(line.trim())
@@ -459,7 +482,10 @@ pub fn read_answer(
                 "the host verb printed no JSON document".into(),
             )),
             Some(doc) => {
-                let data = doc.get("data").cloned().unwrap_or(doc);
+                let mut data = doc.get("data").cloned().unwrap_or(doc);
+                if !prefix.is_empty() && data["claimed"].is_array() && data.is_object() {
+                    data["text"] = Value::String(prefix.trim_end().to_owned());
+                }
                 let size = data.to_string().len();
                 if size > ANSWER_MAX_BYTES {
                     Err(("reply-too-large".into(), format!("the host verb answered {size} bytes, over the {ANSWER_MAX_BYTES} one reply carries")))
@@ -479,44 +505,90 @@ pub fn read_answer(
         let code = p[open + 2..].strip_suffix(']')?;
         is_verb_word(code).then(|| (code.to_owned(), p[..open].to_owned()))
     });
+    let data = document.as_ref().map(|doc| doc.get("data").unwrap_or(doc));
     let doc_code = document
         .as_ref()
-        .and_then(|d| d["code"].as_str().or_else(|| d["error"]["code"].as_str()))
+        .into_iter()
+        .chain(data)
+        .find_map(|d| d["code"].as_str().or_else(|| d["error"]["code"].as_str()))
         .filter(|c| is_verb_word(c))
         .map(String::from);
     let doc_message = document
         .as_ref()
-        .and_then(|d| {
+        .into_iter()
+        .chain(data)
+        .find_map(|d| {
             d["message"]
                 .as_str()
                 .or_else(|| d["error"]["message"].as_str())
+                .or_else(|| d["text"].as_str())
         })
         .map(String::from);
-    // With no code of its own, a refused host verb still carries its domain code inside the wrapper text:
-    // `... provider failed: <code>: <message>`, in the document's message or on stderr.
+    // Legacy mailbox answers print the frame contract, without a code field. Recognize only its fixed leading
+    // refusal forms, never a code-shaped word in arbitrary peer content or explanatory text.
+    let domain = |text: &str| {
+        let code = text
+            .strip_prefix("Refused: ")
+            .and_then(|rest| rest.split(['.', ' ', '\n']).next())
+            .or_else(|| {
+                text.strip_prefix("Not done: the mailbox record failed (")
+                    .and_then(|rest| rest.split_once(')').map(|(code, _)| code))
+            })
+            .or_else(|| {
+                text.strip_prefix("Not done: there is no mailbox record here (")
+                    .and_then(|rest| rest.split_once(')').map(|(code, _)| code))
+            });
+        code.filter(|code| is_verb_word(code))
+            .map(|code| (code.to_owned(), text.to_owned()))
+    };
     let provider = if doc_code.is_none() && bracketed.is_none() {
         doc_message
             .as_deref()
             .into_iter()
             .chain(printed.as_deref())
-            .find_map(provider_refusal)
+            .chain(document.is_none().then_some(whole))
+            .find_map(|text| {
+                provider_refusal(text).or_else(|| domain(text)).or_else(|| {
+                    printed.as_deref().filter(|p| *p == text).and_then(|p| {
+                        let p = p.strip_prefix("error: ").unwrap_or(p);
+                        let (code, message) = p.split_once(": ")?;
+                        (is_verb_word(code) && !matches!(code, "error" | "warning" | "mailbox"))
+                            .then(|| (code.to_owned(), message.to_owned()))
+                    })
+                })
+            })
     } else {
         None
     };
     let code = doc_code
         .or_else(|| bracketed.as_ref().map(|(c, _)| c.clone()))
         .or_else(|| provider.as_ref().map(|(c, _)| c.clone()))
-        .unwrap_or_else(|| "host-failed".into());
+        .unwrap_or_else(|| {
+            if whole.is_empty() && stderr.trim().is_empty() {
+                "host-failed".into()
+            } else {
+                "host-output-unreadable".into()
+            }
+        });
     let message = provider
         .map(|(_, m)| m)
         .or(doc_message)
         .or_else(|| bracketed.map(|(_, m)| m))
         .or(printed)
         .unwrap_or_else(|| {
-            format!(
-                "the host verb ended with exit {}",
-                exit.map_or("by a signal".into(), |c| c.to_string())
-            )
+            let ended = exit.map_or("terminated by a signal".into(), |c| format!("exit {c}"));
+            if whole.is_empty() && stderr.trim().is_empty() {
+                format!("the host verb died with no output ({ended})")
+            } else {
+                format!(
+                    "the host verb ended with unrecognized output ({ended}): {}",
+                    if whole.is_empty() {
+                        stderr.trim()
+                    } else {
+                        whole
+                    }
+                )
+            }
         });
     Err((code, message))
 }
