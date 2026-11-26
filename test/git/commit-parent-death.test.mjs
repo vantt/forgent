@@ -75,7 +75,7 @@ for (const mode of ['commit', 'sync']) for (const rejected of [false,true]) {
         const recover = (writer) => loadNativeAddon(loader).recoverGitOperations(config.stateRoot, linked, writer);
         const kept = recover('doctor');
         assert.deepEqual(kept.recovered, []);
-        assert.match(kept.message, /death \(commit-authority-mismatch; only its writer .* can recover it\)/);
+        assert.match(kept.message, /death \(commit-authority-mismatch; only its writer .* can recover it[,)]/);
         const closed = recover(fromMain.writer);
         assert.deepEqual(closed.recovered, ['death'], closed.message);
         assert.match(closed.message, /recovered interrupted Git operations: death/);
