@@ -1894,9 +1894,9 @@ impl KeeperPlayers<'_> {
     /// Reuse the process door: the one-shot wake must not wait for a whole Unit run.
     #[cfg(unix)]
     fn start_run(&self, args: &[String]) -> Result<(), String> {
-        let argv = std::iter::once(self.host.as_os_str().to_owned())
-            .chain(args.iter().map(std::ffi::OsString::from))
-            .collect::<Vec<_>>();
+        let exe = std::env::current_exe().map_err(|e| e.to_string())?;
+        let mut argv = vec![exe.into_os_string()];
+        argv.extend(args.iter().map(std::ffi::OsString::from));
         let logs = self.root.join(".fgos/runtime/keeper");
         std::fs::create_dir_all(&logs).map_err(|e| e.to_string())?;
         fgos_process::mapped::spawn_detached(
@@ -2044,6 +2044,23 @@ impl sources::Resolver for KeeperPlayers<'_> {
         Ok(None)
     }
 }
+fn capability_run_args(decision: &keeper::Decision, capability: &str) -> Vec<String> {
+    vec![
+        "run".into(),
+        format!(
+            "Perform activity {} of case {} using its approved frame and activity binding.",
+            decision.step, decision.item
+        ),
+        "--case".into(),
+        decision.item.clone(),
+        "--activity".into(),
+        decision.step.clone(),
+        "--capability".into(),
+        capability.into(),
+        "--json".into(),
+    ]
+}
+
 impl keeper::Players for KeeperPlayers<'_> {
     fn start(&self, decision: &keeper::Decision, need: &keeper::Need) -> Result<(), String> {
         // Snapshot supplied referee facts before the keeper chose Start. Only the keeper
@@ -2062,20 +2079,9 @@ impl keeper::Players for KeeperPlayers<'_> {
                     &name,
                 )
             }
-            keeper::NeedKind::Capability => self.start_run(&[
-                "run".into(),
-                format!(
-                    "Perform activity {} of case {} using its approved frame and activity binding.",
-                    decision.step, decision.item
-                ),
-                "--case".into(),
-                decision.item.clone(),
-                "--activity".into(),
-                decision.step.clone(),
-                "--capability".into(),
-                need.reference.clone(),
-                "--json".into(),
-            ]),
+            keeper::NeedKind::Capability => {
+                self.start_run(&capability_run_args(decision, &need.reference))
+            }
         }
     }
     fn wake(&self, decision: &keeper::Decision, need: &keeper::Need) -> Result<(), String> {
@@ -3002,6 +3008,29 @@ mod tests {
         wake::Activity::Idle
     }
 
+    // Invoked only as a detached child of the wiring proof below. Its release file
+    // makes waiting for completion observable without running a real Unit.
+    #[cfg(unix)]
+    #[test]
+    #[ignore = "detached subprocess fixture"]
+    fn keeper_detached_run_fixture() {
+        use std::io::Write;
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        while !Path::new("release").exists() {
+            assert!(std::time::Instant::now() < deadline, "fixture not released");
+            std::thread::sleep(std::time::Duration::from_millis(10));
+        }
+        writeln!(
+            std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open("ended")
+                .unwrap(),
+            "done"
+        )
+        .unwrap();
+    }
+
     #[cfg(unix)]
     #[test]
     fn keeper_source_facts_reach_the_host_doors_without_restarting_a_pending_head() {
@@ -3010,7 +3039,7 @@ mod tests {
         use std::os::unix::fs::PermissionsExt;
         let root = scratch_root("keeper-doors");
         let host = root.join("host.mjs");
-        std::fs::write(&host, "#!/usr/bin/env node\nimport fs from 'node:fs'; fs.appendFileSync('calls.jsonl', JSON.stringify(process.argv.slice(2))+'\\n'); if (process.argv[2] === 'run') { const timer = setInterval(() => { if (fs.existsSync('release')) { clearInterval(timer); fs.appendFileSync('ended', 'done\\n'); } }, 10); setTimeout(() => clearInterval(timer), 5000).unref(); }\n").unwrap();
+        std::fs::write(&host, "#!/usr/bin/env node\nimport fs from 'node:fs'; fs.appendFileSync('calls.jsonl', JSON.stringify(process.argv.slice(2))+'\\n');\n").unwrap();
         std::fs::set_permissions(&host, std::fs::Permissions::from_mode(0o755)).unwrap();
         let started = RefCell::new(BTreeSet::from(["head:lead-pending".into()]));
         let players = KeeperPlayers {
@@ -3081,9 +3110,22 @@ mod tests {
             },
         );
         let before = std::time::Instant::now();
-        for (decision, record) in decisions.iter().zip(&records) {
+        let run_args = decisions
+            .iter()
+            .zip(&records)
+            .map(|(decision, record)| {
+                capability_run_args(decision, &record.needs.as_ref().unwrap().reference)
+            })
+            .collect::<Vec<_>>();
+        // current_exe is the test harness here: run a waiting fixture through the
+        // same detached door, not the synchronous command's injected executable.
+        for _ in &decisions {
             players
-                .start(decision, record.needs.as_ref().unwrap())
+                .start_run(&[
+                    "--ignored".into(),
+                    "--exact".into(),
+                    "wiring::supervision::tests::keeper_detached_run_fixture".into(),
+                ])
                 .unwrap();
         }
         std::fs::write(root.join("release"), "").unwrap();
@@ -3119,9 +3161,9 @@ mod tests {
             .lines()
             .map(|line| serde_json::from_str::<Vec<String>>(line).unwrap())
             .collect::<Vec<_>>();
-        assert_eq!(calls.len(), 3);
+        assert_eq!(calls.len(), 1);
         for step in ["left", "right"] {
-            let call = calls
+            let call = run_args
                 .iter()
                 .find(|call| call.windows(2).any(|args| args == ["--activity", step]))
                 .unwrap();
@@ -3129,8 +3171,8 @@ mod tests {
             assert!(call.windows(2).any(|args| args == ["--case", "case-one"]));
             assert!(call.windows(2).any(|args| args == ["--activity", step]));
         }
-        assert_eq!(calls[2][0..2], ["mailbox", "send"]);
-        assert!(calls[2].iter().any(|a| a == "--wake"));
+        assert_eq!(calls[0][0..2], ["mailbox", "send"]);
+        assert!(calls[0].iter().any(|a| a == "--wake"));
         // The production snapshot implements the existing keeper seam, not a second scheduler.
         let _: &dyn Snapshot = &KeeperSnapshot {
             root,
