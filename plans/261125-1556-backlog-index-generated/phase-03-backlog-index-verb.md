@@ -15,17 +15,20 @@ index from the start.
 - `plans/261125-1556-backlog-index-generated/plan.md` (Decisions 2 and 4; Authority map row `declare: door
   render-the-backlog-index`).
 - Phase 1's `portfolio::render_backlog_index` and its `RenderOutcome` in `apps/fgos/src/wiring/portfolio.rs`.
-- The sibling verb to copy the shape from: `fgos decision-index` (find its wiring with
-  `rg -n '"decision-index"' apps/fgos/src`), and how a native verb is registered: `apps/fgos/src/routing.rs`,
-  `apps/fgos/src/cli_projector.rs`, `apps/fgos/src/wiring/mod.rs`.
+- How a native verb with no subcommand is registered, copied from `fgos resource-check`:
+  `apps/fgos/src/wiring/resource_check.rs` (`OPERATION_ID`, `DESCRIPTOR`, the provider), `apps/fgos/src/main.rs`
+  (the descriptor list and the provider list), `apps/fgos/src/cli_projector.rs` (the request projection by
+  operation id), `apps/fgos/src/wiring/mod.rs`, and its selector row in
+  `packages/host-runtime/contracts/command-route-annotations.json`.
+- `fgos decision-index` (a Node verb, `src/report/decision-index.mjs`) only for the output and help shape.
 - `apps/fgos/src/wiring/migrate.rs` (where it writes the backlog index) and `apps/fgos/tests/migrate_portfolio.rs`.
 - `packages/component-authority/model/doors/*.yaml` for the door row shape; `fgos authority declare --help`.
 - `.fgos/config.yaml` `land.regenerate` (it rebuilds `command-routes.json` and `command-manifest.json`).
 
 ## Files it may write (footprint)
 
-`apps/fgos/src/wiring/backlog_index.rs` (new), `apps/fgos/src/wiring/mod.rs`, `apps/fgos/src/routing.rs`,
-`apps/fgos/src/cli_projector.rs`, `apps/fgos/src/wiring/migrate.rs`, `apps/fgos/tests/backlog_index.rs` (new),
+`apps/fgos/src/wiring/backlog_index.rs` (new), `apps/fgos/src/wiring/mod.rs`, `apps/fgos/src/main.rs`,
+`apps/fgos/src/cli_projector.rs`, `packages/host-runtime/contracts/command-route-annotations.json` (one selector row), `apps/fgos/src/wiring/migrate.rs`, `apps/fgos/tests/backlog_index.rs` (new),
 `apps/fgos/tests/migrate_portfolio.rs`, `packages/host-runtime/contracts/command-routes.json` and
 `packages/host-runtime/contracts/command-manifest.json` (regenerated only),
 `packages/component-authority/model/doors/render-the-backlog-index.yaml` (written by `fgos authority declare`).
@@ -39,8 +42,9 @@ index from the start.
    Git door whether `plans/backlog.md` is tracked, calls `portfolio::render_backlog_index`, prints
    `written|unchanged plans/backlog.md` plus any skipped files; a tracked index exits non-zero with
    `backlog-index-tracked` and the `git rm --cached plans/backlog.md` fix; a project with no `plans/backlog/` says so
-   and exits 0. Help text names the effect (writes one ignored file) like `decision-index` does. Register it in
-   `routing.rs`, `cli_projector.rs` and `mod.rs`; regenerate the contracts with `node scripts/export-command-selectors.mjs`.
+   and exits 0. Help text names the effect (writes one ignored file) like `decision-index` does. Register it as
+   `resource-check` is (`main.rs`, `cli_projector.rs`, `mod.rs`, one selector row in
+   `command-route-annotations.json`); regenerate the contracts with `node scripts/export-command-selectors.mjs`.
 3. `fgos migrate portfolio` keeps writing the index through `render_backlog_index` (drop any private write path it
    has) and writes `plans/.gitignore` holding `/backlog.md` when the line is missing, idempotently (a second run
    changes nothing). Extend its owning test in `migrate_portfolio.rs`.
