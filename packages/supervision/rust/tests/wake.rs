@@ -348,17 +348,78 @@ fn a_running_plan_reads_its_named_leads_liveness_in_this_project() {
         running("gamma", Some("lead:OTHER")),
         plan("delta", "ready"),
     ];
-    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &holders, 4);
+    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &holders, 4, &NoQuestions);
     assert_eq!((view.leads_live, view.max_leads), (1, 4));
     let live: Vec<_> = view.rows.iter().map(|r| r.lead_live).collect();
     assert_eq!(live, [Some(true), Some(false), Some(false), None]);
     assert!(view.rows.iter().all(|r| !r.lead_unnamed));
 }
 
+struct NoQuestions;
+impl supervisor::OpenQuestions for NoQuestions {
+    fn has_open(&self, _: &str) -> bool {
+        false
+    }
+}
+
+struct OpenRefs(&'static [&'static str]);
+impl supervisor::OpenQuestions for OpenRefs {
+    fn has_open(&self, reference: &str) -> bool {
+        self.0.contains(&reference)
+    }
+}
+
+fn two_phase_running(dir: &str, lead: &str, second: &str) -> Plan {
+    let text = format!(
+        "---\ntitle: {dir}\nstatus: running\npriority: P2\ncreated: 2026-11-01\nlead: {lead}\nfootprint:\n  - {dir}/\n---\n\n| ID | Title | DependsOn | Footprint | Wave | Status |\n|---|---|---|---|---|---|\n| 1 | t | - | `{dir}/` | 1 | done |\n| 2 | t | 1 | `{dir}/` | 2 | {second} |\n"
+    );
+    read_plan(dir, &text).unwrap()
+}
+
+fn live_here(_: &str) -> Holder {
+    Holder::Live {
+        project_id: "p1".into(),
+    }
+}
+
+#[test]
+fn a_live_lead_whose_every_open_phase_has_an_open_owner_question_holds_no_slot() {
+    let plans = vec![
+        two_phase_running("alpha", "lead:A", "todo"),
+        two_phase_running("beta", "lead:B", "todo"),
+    ];
+    let asked = OpenRefs(&["plan:alpha#phase-02", "plan:beta"]);
+    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &live_here, 1, &asked);
+    assert_eq!((view.leads_live, view.leads_waiting), (0, 2));
+    assert_eq!(view.to_json()["leadsWaiting"], 2);
+
+    let answered = OpenRefs(&["plan:alpha#phase-02"]);
+    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &live_here, 1, &answered);
+    assert_eq!((view.leads_live, view.leads_waiting), (1, 1));
+
+    let none = supervisor::plans(&plans, &[], HANDLE, "p1", &live_here, 1, &NoQuestions);
+    assert_eq!((none.leads_live, none.leads_waiting), (2, 0));
+}
+
+#[test]
+fn a_plan_with_a_not_done_phase_lacking_an_open_question_does_not_wait() {
+    let plans = vec![running("alpha", Some("lead:A"))];
+    let view = supervisor::plans(
+        &plans,
+        &[],
+        HANDLE,
+        "p1",
+        &live_here,
+        4,
+        &OpenRefs(&["plan:alpha#phase-02"]),
+    );
+    assert_eq!((view.leads_live, view.leads_waiting), (1, 0));
+}
+
 #[test]
 fn a_running_plan_naming_no_lead_is_held_and_never_a_restart_candidate() {
     let plans = vec![running("alpha", None)];
-    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &holders, 4);
+    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &holders, 4, &NoQuestions);
     assert_eq!(view.rows[0].lead_live, None);
     assert!(view.rows[0].lead_unnamed && !view.rows[0].admissible);
     assert_eq!(view.to_json()["plans"][0]["leadUnnamed"], true);
