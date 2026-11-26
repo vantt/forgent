@@ -25,7 +25,7 @@ Use the 11-key set at the end of `plans/discussions/ds-que32ftgg6-ready-plan-run
 - Who the agent is: `persona` (the charter), `role` (narrowed to the part in a workflow step), `sessionType` (head, worker; half of today's start `kind`, replacing the earlier `agentRole`), `agentFamily` (the model family: claude, openai, gemini), `agentCli` (claude-code, codex, pi, omp, agy; replaces `cli`).
 - When in the agent's life: `agentLifecycle` (setup, start, hook, ...; the other half of today's `kind`).
 
-The same item also renames the free-text `role:` line in `core/agents/*.yaml` to something like `summary`. Every caller moves in the same change and the old names are deleted (L10, RUL104). Source of this correction: supervisor event e3ed5bd4d7c27190 from the shaper of ds-que32ftgg6.
+The same item also renames the free-text `role:` line in `core/agents/*.yaml` to something like `summary`. Every caller moves in the same change and the old names are deleted (the platform rule that a change moves every caller and deletes the old path in the same change, and the rule that an audit makes what exists better, not bigger). Source of this correction: supervisor event e3ed5bd4d7c27190 from the shaper of ds-que32ftgg6.
 
 # Done when
 
