@@ -103,7 +103,7 @@ Every consuming facade must explicitly define the following hook values:
 ## 3. Core Operating Invariants
 
 1. **Replay and Status Authority:** Session status is derived strictly from the append-only event log and definition snapshot. The driver never maintains private, uncommitted state.
-2. **Deterministic Preconditions:** The harness refuses an inadmissible proposal with a named code; the driver re-observes instead of retrying blind.
+2. **Deterministic Preconditions:** The harness refuses an inadmissible proposal with a named code; the driver re-observes (Rule: driver-discipline, in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 3. **Driver Identity Continuity:** The driver identity established at session creation stays the same on all follow-up actions.
-4. **Independent Proof:** Dispatched workers perform task execution. The driver independently verifies evidence before certifying any result.
+4. **Independent Proof:** Dispatched workers perform task execution. Rule: driver-discipline, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 5. **Explicit Close:** Sessions remain active until the driver explicitly closes them after quorum and prerequisite checks pass.

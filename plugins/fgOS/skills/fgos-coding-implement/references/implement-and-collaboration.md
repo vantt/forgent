@@ -8,15 +8,11 @@ The full detail behind SKILL.md's Step 2.
 Run `fgos dispatch decide` first, per SKILL.md's Hard rule, and branch on
 its answer:
 
-- **`unavailable`** — do your own Implement work directly: reading
-  files, writing the real change, running the Iron Law classify
-  yourself — never spin up an ad hoc Agent/Task sub-dispatch for it. This
-  session is already a live, same-provider soul; doing that would be the
-  same "soul re-deriving what a live soul already knows" waste a blind
-  cli-spawn produces elsewhere — pure overhead, not a transparency
-  question.
-- **`in-process`** — same as `unavailable`, optionally via the returned
-  `agentType`.
+What each answer means: Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json. Here:
+
+- **`unavailable`** — do your own Implement work in this session: reading files, writing the real change, running
+  the Iron Law classify yourself; inline is the default (Rule: capability-routing-rules, in AGENTS.md; set in .fgos/instructions/effective/rules.json).
+- **`in-process`** — pass the returned `agentType` to your Agent/Task tool for the Implement step.
 - **`out-of-process`** — run the Implement step as a writing Unit
   instead of writing the change yourself:
   `fgos run "<prompt>" --provider <executorId> --capability code:implement --writes <item paths> --worktree <item worktree> --json`.
@@ -42,13 +38,8 @@ its answer:
   otherwise. Call `fgos return` bare afterwards; it re-runs verify on the
   runner's commit.
 
-Either way, before editing a symbol yourself, apply `CLAUDE.md`'s
-impact-analysis capability gate rather than assuming GitNexus is on this
-machine: `fgos dispatch decide --for impact-analysis --json` decides
-whether the MUST-run-impact rule is Full (`mechanism: "in-process"` —
-run it), Degraded (`mechanism: "unavailable"` or `stale: true` —
-proceed, but say the blast radius is unconfirmed), or Inactive
-(`configured: false` — proceed without it).
+Either way, before editing a symbol yourself, apply the impact-analysis capability gate rather than assuming
+GitNexus is on this machine (Rule: impact-analysis-capability-gate, in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 ## When reality disagrees with what the item assumed
 

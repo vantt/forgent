@@ -169,8 +169,8 @@ past `secretary.help.staleMinutes` makes the secretary take the work over.
 - Edit portfolio files outside `fgos land --paths` and `fgos session write`; land a branch; review a diff; type into a pane
   of a session no event names as stuck.
 - Ask the owner except through `fgos questions ask`, in the five-part form of `core/skills/_shared/decision-question.md`,
-  batched: collect what you need, ask once.
-- Decide outside the approved frame (plan scope and budget): ask.
+  batched (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json, priority 2).
+- Decide outside the approved frame (`core/skills/_shared/decision-question.md`).
 - Start a session before checking that its role is not already live.
 
 ## Reports

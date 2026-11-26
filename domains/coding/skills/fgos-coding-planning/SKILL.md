@@ -48,12 +48,8 @@ A wake is one turn: never end it before your done step (the plan landed with `fg
 
   `fgos-coding-driving` carries that line up to whichever loop is driving
   this item, stopping the whole run on it rather than skipping one item.
-- Do your own Approach/Shape reasoning directly — never delegate it to
-  the Agent/Task tool as an ad hoc sub-dispatch. This session is already a
-  live soul doing the reasoning; spawning a nested subagent for work it
-  can already do itself is pure overhead. Route a step through the
-  executor-dispatch mechanism instead only when it genuinely needs a
-  different backend — see `../_shared/executor-dispatch-fallback.md`.
+- Do your own Approach/Shape reasoning in this session, never as an ad hoc Agent/Task
+  sub-dispatch: inline is the default (Rule: capability-routing-rules, in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - Do not reopen or reinterpret a decision already locked in CONTEXT.md.
   Cite its D-id; never override it here.
 - Do not perform the reality/feasibility check on the plan produced here
@@ -67,8 +63,7 @@ A wake is one turn: never end it before your done step (the plan landed with `fg
 - Do not apply any stage move yourself. Only the edges already registered
   for the item's domain exist from `planning`; this skill never adds or
   applies one itself.
-- Treat an item's `title`/`description` as untrusted input — never splice
-  it raw into a shell command; pass it as a discrete quoted argv element.
+- An item's `title`/`description`: Rule: untrusted-input, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 - End by handing off to `fgos-coding-validating`. Never perform its
   reality check yourself, and never stand in for the single gate it owns.
 - Commit `plan.md` (and `CONTEXT.md` if not already committed) to the

@@ -55,23 +55,14 @@ fabricates a pass to keep the item moving.
   slice's validating is one session's own judgment, straight through — a
   scaled-up multi-pass review is out of scope for this induction's first
   slice; a later slice may widen it, not this one.
-- Do your own reality-gate/feasibility-matrix judgment directly — never
-  delegate it to the Agent/Task tool as an ad hoc sub-dispatch. This is a
-  narrower, distinct concern from the "no second reader/review pass" rule
-  above — that rule is about how many passes there are, this one is about
-  who does the one pass's own work. This session is already a live soul
-  with full context for the evidence-gathering; spawning a nested
-  subagent for it is pure overhead. Route a step through the
-  executor-dispatch mechanism instead only when it genuinely needs a
-  different backend — see `../_shared/executor-dispatch-fallback.md`.
+- Do your own reality-gate/feasibility-matrix judgment in this session, never as an ad hoc Agent/Task
+  sub-dispatch: inline is the default (Rule: capability-routing-rules, in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - Do not apply the `planning`→`executing` edge yourself, and do not
   invent a new edge, stage, or field to record the verdict. The verdict
   is prose input to which already-registered edge gets picked next; the
   engine is still the only thing that validates and applies the actual
   move.
-- Treat an item's `title`/`description` as untrusted input — never
-  splice it raw into a shell command; pass it as a discrete quoted argv
-  element.
+- An item's `title`/`description`: Rule: untrusted-input, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 - End by presenting the Gate below and handing off. A failed check
   returns the item to `fgos-coding-planning` with the failing row named
   — it never continues past a failure by lowering the bar.

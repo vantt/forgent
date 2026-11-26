@@ -95,10 +95,7 @@ Run the four lanes in [`references/lane-prompts.md`](references/lane-prompts.md)
 as parallel read-only subagents, each given the scan output and the user's
 focus. Without subagents, run them inline one after another.
 
-fgOS projects: run `fgos dispatch decide --for research --needs-soul
---has-live-task-access` before spawning and follow its mechanism, as
-[`../_shared/executor-dispatch-fallback.md`](../_shared/executor-dispatch-fallback.md)
-describes.
+fgOS projects: the PreToolUse hook decides each subagent spawn (Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 | Lane | Question it answers |
 |---|---|

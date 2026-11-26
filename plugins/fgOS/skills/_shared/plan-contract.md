@@ -136,7 +136,7 @@ The phase table has exactly these columns (order free):
 - A plan blocked by an owner question stays `draft` as a whole, but every phase the answer
   does not touch is marked `ready` in the phase table and may start. List the blocked phase
   and its question; do not hold the others.
-- Prior art before design: say what the plan reused and what was missing.
+- Prior art before design: Rule: before-touching-code, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 - A follow-up on a topic whose plan is `done` (a new discussion, a new backlog row) either extends that plan or is a
   new plan. Extend it only when it keeps the same owner and footprint: set `status: draft`, drop `lead` and reset
   `base`, keep every finished phase `done` and add the new ones, list the new discussion and rows in `source`, and

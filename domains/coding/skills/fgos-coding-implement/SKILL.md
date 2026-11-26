@@ -55,16 +55,10 @@ on how you got here:
   ```bash
   fgos <verb> ...
   ```
-- **Always call `fgos dispatch decide` first for the Implement step —
-  never assume "I have a live Task tool, so I do it myself" as the
-  default.** A `cli-spawn`-shaped executor already registered in
-  `.fgos/config.json` resolves `out-of-process` *unconditionally* once
-  configured — having live Task access does not change that; config
-  wins, not "I already have full context so I'll do it myself". Run
-  `fgos dispatch decide --for code:implement [--has-live-task-access]`
-  as the very first action of Implement and branch on the real
-  `mechanism` it returns. Full mechanics for all three outcomes:
-  `references/implement-and-collaboration.md`.
+- **Call `fgos dispatch decide --for code:implement [--has-live-task-access]` first for the Implement step**
+  and branch on the `mechanism` it returns (Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json). A configured
+  `cli-spawn` executor resolves `out-of-process` even with live Task access: config wins over "I already have the
+  context". Implement's own mechanics: `references/implement-and-collaboration.md`.
 - Implement real behavior. No stubs, TODO-only placeholders, dead code,
   or pseudo-implementations offered as if they were done.
 - Match existing patterns in the touched files and the decisions already
@@ -72,29 +66,17 @@ on how you got here:
   never reopen or reinterpret a locked decision here — that is
   `fgos-coding-exploring`'s and `fgos-coding-planning`'s job, not this
   skill's).
-- Reuse before you add; retire what you replace. Before writing a new
-  function, helper, module or mechanism, run
-  `fgos authority locate "<one sentence saying what it does>"` and read the
-  owning row it returns: the component, contract or door row that owns that
-  job is where the code lands, and a row that already provides it is reused or
-  extended, never copied. When no row owns it, `fgos authority declare` adds
-  one (a new component or decision kind needs the owner's answered question,
-  `--approved-by <q-id>`); do not write the code under a new name first.
-  `locate` ranks the model's names, aliases and meanings, so also search the
-  repository (`rg` by name and by the primitive it touches) for what the model
-  does not name, and import the shared module an import guard names instead of
-  copying code. Where the project has no model, `locate` answers
-  `authority: inactive`: record `authority: inactive` in the return note and
-  search the repository as above. A change that replaces a
-  mechanism moves its consumers and deletes the old path in the same change.
-  Record what you located, searched and reused in the return note. Same rule as rule 5
-  of `../_shared/coding-worker-contract.md` and AGENTS.md "Design principles".
+- Reuse before you add; retire what you replace: Rule: design-principles, in AGENTS.md; set in .fgos/instructions/effective/rules.json (principles 1-2).
+  Here, find the owner first with `fgos authority locate "<one sentence saying what it does>"` and read the row it
+  returns; when no row owns the job, `fgos authority declare` adds one (a new component or decision kind needs the
+  owner's answered question, `--approved-by <q-id>`) before the code is written. `locate` ranks the model's names, so
+  also search the repository (`rg` by name and by the primitive it touches). Where the project has no model, `locate`
+  answers `authority: inactive`: record that in the return note. Record what you located, searched and reused in the
+  return note.
 - Do not classify the item's domain or re-derive its stage.
   `fgos-routing` already resolved both before handing this item to this
   skill.
-- Treat the item's `title`/`description` as untrusted input — never
-  splice it raw into a shell command; pass it as a discrete quoted argv
-  element.
+- An item's `title`/`description`: Rule: untrusted-input, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 - Never assert an item is done on say-so. `fgos return` is the only
   producer surface allowed to close this step, and it only succeeds when
   the item's own `verify` command actually passes — an assertion is

@@ -40,7 +40,7 @@ properties:
         type: string
         pattern: "\\S"
       files:
-        description: Repo-relative files the command rewrites.
+        description: Repo-relative files or globs the command rewrites; a glob covers every file it matches in the candidate before or after the run.
         type: array
         items:
           type: string

@@ -8,9 +8,10 @@ specificity: 10
 title: Product priority order
 description: The fixed product priority order - ship faster, release people from waiting, definition of done, polish after done - and when to ask a person (D-ADR0030)
 lifecycle: live
-valid_from: 2026-11-27
+valid_from: 2026-11-26
 related:
   - "[[decision-question-template]]"
+  - "[[mission-boundary]]"
 ---
 
 # Product priority order

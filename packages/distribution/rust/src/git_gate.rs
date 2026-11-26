@@ -1,7 +1,7 @@
 //! Git C5 admission owned by the activation controller, never a candidate.
 use crate::init::{ActivationLockGuard, InitError};
 use crate::manifest::ReleaseManifest;
-use fgos_git::wal::{OsFileSystem, Wal};
+use fgos_git::wal::{OsFileSystem, Wal, WAL_SCAN_BOUND};
 use fgos_git::GitDriver;
 use fgos_holder_lock::origin::{is_script_runtime, FGOS_BINARIES};
 use std::path::{Path, PathBuf};
@@ -22,7 +22,7 @@ pub fn check_wal(common: &Path, supports_wal: bool) -> Result<(), InitError> {
     let wal =
         Wal::open_existing(common, OsFileSystem).map_err(|e| refusal("git-wal-unreadable", e))?;
     let scan = wal
-        .scan(100_000)
+        .scan(WAL_SCAN_BOUND)
         .map_err(|e| refusal("git-wal-unreadable", e))?;
     if !scan.complete || scan.entries.iter().any(|e| e.error.is_some()) {
         return Err(refusal(

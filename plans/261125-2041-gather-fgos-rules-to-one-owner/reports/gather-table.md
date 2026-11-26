@@ -288,3 +288,24 @@ Persona files, prompt templates (`core/prompt-templates/**`) and `.claude/agents
   unit `product-priority-order` (text unchanged); the copies of clusters 12, 13, 14 and 19 point to it or to
   `decision-question.md`. C7: kept both, scoped: one question per turn in a live shaping conversation; a formal owner
   question goes to the question store, batched.
+- **Second round (2026-11-27, after the independent rerun `research-261126-2255-gather-rules-rerun.md`).** The rerun
+  found copies outside pointers in clusters 1, 3, 4, 6, 11, 16, 19, 20 and 23, the coding-domain copies the first table
+  did not list (untrusted input in six coding skills, the never-delegate rule in four, the impact-analysis postures in
+  four references, design principles 1-2 in two), and five conflicts: C2 left in the cook skill, C4 (the lead never
+  decided), C11 drift (the fallback fragment no longer holds the reasons), `in-process` read as `unavailable` in the
+  coding implement reference, and the lead persona's on-wake text landing a park note. All are now pointers or settled
+  (the lead persona follows the skill: parking is an event). Kept on purpose: `product-priority-order` and
+  `definition-of-done` are law text moved verbatim, so their overlap with the decision-question template and principle 8
+  stays; the template unit's frame sentence is pinned by its anchor test; `rul104` restates principle 1 in its locked
+  wording; the precedence sentence stays in both head personas (cluster 22, read without opening a file).
+- **Third round (2026-11-27, after the second rerun `research-261127-0300-gather-rules-rerun-2.md`).** The
+  `product-priority-order` unit was out of the set in force: its `valid_from` named the local date (2026-11-27) while
+  the compile judges in UTC (2026-11-26), so main's AGENTS.md lost the priority law at the land of 2026-11-27 00:3x. It
+  is back (`valid_from: 2026-11-26`). Conflicts settled: X1 and X2 (the shared shaping text keeps the discussion in a
+  linked worktree, committed each round, landed at a checkpoint, as the coding overlay already did, so the main
+  checkout never holds an uncommitted edit), X3 (the lead parks a long-running ticket as an event, no park commit),
+  X4 (the hook is the decide for one's own Agent/Task call), X5 (instruction-audit no longer decides `--for research`).
+  The frame's "narrowed, never widened" clause now lives in `decision-question.md`, which the cook and coding copies
+  cite. Remaining copies of clusters 3 and 14, the cook pin lines, the coordination driver, the supervisor, the coding
+  return and loop references, the domain-doctrine unit's last sentence and the delete-guard sentence are pointers.
+  Kept: skill `description` frontmatter (the skill listing needs it) and the persona `must_escalate` frame lines.
