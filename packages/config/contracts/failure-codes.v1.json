@@ -27,6 +27,12 @@
       "meaning": "A confined session called a write door."
     },
     {
+      "id": "config-project-file-stripped",
+      "origin": "spec",
+      "section": "6, 14",
+      "meaning": "The checkout's Git index tracks the project config file but its working copy lacks it; a write would create a file that hides the tracked one."
+    },
+    {
       "id": "config-path-symlink",
       "origin": "spec",
       "section": "9, 14",

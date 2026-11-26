@@ -278,6 +278,8 @@ pub fn copy(
             reason: REASON.into(),
             acknowledge_comment_loss: false,
             lock_wait_ms: wait,
+            // Relocate writes machine files, never the project file.
+            project_file_tracked: false,
         };
         commit_observed(ctx, &write, writer, |_| Ok(()))?;
     }

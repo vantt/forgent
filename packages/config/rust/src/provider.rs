@@ -61,7 +61,11 @@ pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
     "refresh-docs",
 ];
 /// Appended to a refusal that has a way out: the refusal id or YAML rule it answers, and the hint.
-const HINTS: [(&str, &str); 3] = [
+const HINTS: [(&str, &str); 4] = [
+    (
+        "config-project-file-stripped",
+        "\nthis checkout's Git index tracks .fgos/config.yaml but its working copy lacks it: run the write in the main checkout named above, or restore the file with `git checkout -- .fgos/config.yaml`",
+    ),
     (
         "config-machine-check-required",
         "\nconfirm that no release on this machine reads accounts or the gateway token from ~/.fgos/config.json, then pass --machine-checked",
@@ -187,14 +191,24 @@ fn refuse(reason: &'static str, detail: impl Into<String>) -> Refusal {
     }
 }
 
+fn answers(id: &str, r: &crate::ConfigRefusal) -> bool {
+    r.code == id || r.yaml.as_ref().is_some_and(|y| y.rule == id)
+}
+
+/// The hint of the way out a refusal names (the text `refused` appends), or none. For the in-process
+/// callers that word a refusal themselves yet owe the owner the same remedy.
+pub fn refusal_hint(refusal: &crate::ConfigRefusal) -> Option<&'static str> {
+    HINTS
+        .iter()
+        .find(|(id, _)| answers(id, refusal))
+        .map(|(_, hint)| *hint)
+}
+
 /// Every refusal of the error, one line each (id, file, path, position; never a value), then the
 /// hint of each way out it names.
 fn refused(error: impl Into<SnapshotError>) -> Refusal {
     match error.into() {
         SnapshotError::Refused(list) => {
-            let answers = |id: &str, r: &crate::ConfigRefusal| {
-                r.code == id || r.yaml.as_ref().is_some_and(|y| y.rule == id)
-            };
             let hints = HINTS
                 .iter()
                 .filter(|(id, _)| list.iter().any(|r| answers(id, r)));
@@ -240,6 +254,39 @@ pub fn roots(root: &Path) -> Result<SnapshotRequest, Refusal> {
         global_dir,
         class,
     })
+}
+
+/// Whether the Git index of the checkout at `project_root` tracks `.fgos/config.yaml` or the legacy
+/// `.fgos/config.json` (a skip-worktree path is still listed). `false` outside a repository. A write
+/// passes it as `WriteRequest::project_file_tracked`: the Config core has no Git edge, this is the one
+/// place the fact enters. The listed paths are relative to the repository top level, so the project
+/// root's own path under that top level prefixes the two names (a project in a subdirectory).
+pub fn project_file_tracked(project_root: &Path) -> Result<bool, Refusal> {
+    let git = |e: OperationError| refuse("git-read-failed", e.cause);
+    let Some((driver, repo)) = GitDriver::open_at(project_root).map_err(git)? else {
+        return Ok(false);
+    };
+    let top = repo.work_tree().and_then(|t| std::fs::canonicalize(t).ok());
+    let base = std::fs::canonicalize(project_root).unwrap_or_else(|_| project_root.to_path_buf());
+    let prefix = match top.as_deref().map(|t| base.strip_prefix(t)) {
+        Some(Ok(rel)) => rel.to_path_buf(),
+        _ => std::path::PathBuf::new(),
+    };
+    let names: Vec<Vec<u8>> = [".fgos/config.yaml", ".fgos/config.json"]
+        .iter()
+        .map(|n| prefix.join(n).to_string_lossy().into_owned().into_bytes())
+        .collect();
+    let mut cursor = None;
+    loop {
+        let page = driver.tracked_paths(&repo, cursor, 4096).map_err(git)?;
+        if page.entries.iter().any(|p| names.contains(p)) {
+            return Ok(true);
+        }
+        cursor = page.next_cursor;
+        if cursor.is_none() {
+            return Ok(false);
+        }
+    }
 }
 
 fn optional_path(path: &Option<String>) -> Result<Vec<Segment>, Refusal> {

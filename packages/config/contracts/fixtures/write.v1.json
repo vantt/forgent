@@ -608,6 +608,30 @@
    }
   },
   {
+   "id": "write-refuses-to-create-a-tracked-but-stripped-project-file",
+   "why": "the index tracks the project file and the working copy lacks it: creating it would hide the tracked one",
+   "input": {
+    "files": {},
+    "edits": [
+     {
+      "set": "limits.count",
+      "value": 9
+     }
+    ],
+    "reason": "dogfood repo, lighter gates.",
+    "writer": {
+     "session": "vantt"
+    },
+    "expected": "absent",
+    "projectFileTracked": true
+   },
+   "expect": {
+    "code": "config-project-file-stripped",
+    "no_lock": true,
+    "no_dir": true
+   }
+  },
+  {
    "id": "write-confined-session-touches-nothing",
    "why": "acceptance 14: no file, no directory, no lock",
    "input": {

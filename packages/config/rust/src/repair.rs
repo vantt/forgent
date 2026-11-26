@@ -343,6 +343,8 @@ pub fn fix_with_roots(
         reason: String::new(),
         acknowledge_comment_loss: acknowledge,
         lock_wait_ms: LOCK_WAIT_MS,
+        // Repair edits only a file a check found, so it never creates a project file.
+        project_file_tracked: false,
     };
     fix(ctx, request, writer, ids, acknowledge)
 }

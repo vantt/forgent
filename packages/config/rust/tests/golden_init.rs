@@ -47,7 +47,7 @@ fn a_new_file_holds_the_header_and_no_key() {
         (SourceKind::Project, "project/.fgos/config.yaml", 0o644),
         (SourceKind::Global, "home/.fgos/config.yaml", 0o600),
     ] {
-        let done = init(&r, target, &locks, WAIT_MS).unwrap();
+        let done = init(&r, target, &locks, WAIT_MS, false).unwrap();
         let bytes = fs::read(dir.join(file)).unwrap();
         assert!(done.created, "{file}");
         assert_eq!(done.revision.len(), 64, "{file}");
@@ -73,8 +73,8 @@ fn an_existing_file_is_kept_whether_yaml_or_legacy_json() {
     let dir = common::temp("init", "existing");
     let r = roots(&dir, SessionClass::Unconfined);
     let locks = dir.join("locks");
-    let first = init(&r, SourceKind::Project, &locks, WAIT_MS).unwrap();
-    let again = init(&r, SourceKind::Project, &locks, WAIT_MS).unwrap();
+    let first = init(&r, SourceKind::Project, &locks, WAIT_MS, false).unwrap();
+    let again = init(&r, SourceKind::Project, &locks, WAIT_MS, false).unwrap();
     assert!(first.created && !again.created);
     assert_eq!((first.file, again.file), ("config.yaml", "config.yaml"));
     assert_eq!(again.revision, first.revision);
@@ -82,7 +82,7 @@ fn an_existing_file_is_kept_whether_yaml_or_legacy_json() {
     let fgos = r.project_root.join(".fgos");
     fs::remove_file(fgos.join("config.yaml")).unwrap();
     fs::write(fgos.join("config.json"), "{\"runner\":{}}").unwrap();
-    let legacy = init(&r, SourceKind::Project, &locks, WAIT_MS).unwrap();
+    let legacy = init(&r, SourceKind::Project, &locks, WAIT_MS, false).unwrap();
     assert!(!legacy.created);
     assert_eq!(
         legacy.file, "config.json",
@@ -96,7 +96,7 @@ fn an_existing_file_is_kept_whether_yaml_or_legacy_json() {
     // A tombstone is no source, so the scope has no file and init creates one.
     fs::write(fgos.join("config.json"), TOMBSTONE).unwrap();
     assert!(
-        init(&r, SourceKind::Project, &locks, WAIT_MS)
+        init(&r, SourceKind::Project, &locks, WAIT_MS, false)
             .unwrap()
             .created
     );
@@ -111,7 +111,7 @@ fn racing_creators_make_exactly_one_file() {
         let threads: Vec<_> = (0..6)
             .map(|_| {
                 s.spawn(|| {
-                    init(&r, SourceKind::Global, &locks, 10_000)
+                    init(&r, SourceKind::Global, &locks, 10_000, false)
                         .unwrap()
                         .created
                 })
@@ -131,18 +131,18 @@ fn a_confined_session_an_accounts_target_and_a_symlinked_directory_are_refused()
     let dir = common::temp("init", "refused");
     let locks = dir.join("locks");
     let confined = roots(&dir, SessionClass::Confined);
-    let refused = init(&confined, SourceKind::Project, &locks, WAIT_MS).unwrap_err();
+    let refused = init(&confined, SourceKind::Project, &locks, WAIT_MS, false).unwrap_err();
     assert_eq!(code(refused), "config-write-confined");
     assert!(!confined.project_root.join(".fgos").exists());
 
     let r = roots(&dir, SessionClass::Unconfined);
-    let refused = init(&r, SourceKind::Accounts, &locks, WAIT_MS).unwrap_err();
+    let refused = init(&r, SourceKind::Accounts, &locks, WAIT_MS, false).unwrap_err();
     assert_eq!(code(refused), "config-key-out-of-scope");
 
     let elsewhere = dir.join("elsewhere");
     fs::create_dir_all(&elsewhere).unwrap();
     symlink(&elsewhere, r.project_root.join(".fgos")).unwrap();
-    let refused = init(&r, SourceKind::Project, &locks, WAIT_MS).unwrap_err();
+    let refused = init(&r, SourceKind::Project, &locks, WAIT_MS, false).unwrap_err();
     assert_eq!(code(refused), "config-path-symlink");
     assert!(fs::read_dir(&elsewhere).unwrap().next().is_none());
 }

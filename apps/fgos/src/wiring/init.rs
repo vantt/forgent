@@ -374,7 +374,10 @@ mod config_files {
         let text = |error: SnapshotError| match error {
             SnapshotError::Refused(all) => all
                 .iter()
-                .map(crate::wiring::doctor::config_refusal_text)
+                .map(|r| {
+                    crate::wiring::doctor::config_refusal_text(r)
+                        + fgos_config::provider::refusal_hint(r).unwrap_or_default()
+                })
                 .collect::<Vec<_>>()
                 .join("; "),
             SnapshotError::Io(io) => format!("config-io ({:?})", io.kind()),
@@ -384,21 +387,21 @@ mod config_files {
         }
         let global_dir = fgos_config::machine::global_dir(env_lookup)
             .ok_or_else(|| "config-io (HomeUnset)".to_owned())?;
-        let project_root = std::fs::canonicalize(root)
-            .map_err(|_| "config-request-invalid (projectRoot)".to_owned())?;
-        let roots = fgos_config::snapshot::SnapshotRequest {
-            trusted_root: project_root.clone(),
-            project_root,
-            global_dir,
-            class: fgos_config::session::session_class(env_lookup),
-        };
+        let mut roots = fgos_config::provider::roots(root)
+            .map_err(|refusal| format!("{} ({})", refusal.reason, refusal.detail))?;
+        roots.global_dir = global_dir;
         let lock_root = fgos_holder_lock::state_root::lock_root();
         let made = |target| -> Result<Value, String> {
+            let project_file_absent = !roots.project_root.join(".fgos/config.yaml").exists();
+            let tracked = target == SourceKind::Project
+                && project_file_absent
+                && fgos_config::provider::project_file_tracked(&roots.project_root)
+                    .map_err(|refusal| format!("{} ({})", refusal.reason, refusal.detail))?;
             let InitResult {
                 created,
                 file,
                 revision,
-            } = init(&roots, target, &lock_root, LOCK_WAIT_MS).map_err(text)?;
+            } = init(&roots, target, &lock_root, LOCK_WAIT_MS, tracked).map_err(text)?;
             Ok(json!({ "created": created, "file": file, "revision": revision }))
         };
         let project = made(SourceKind::Project)?;
