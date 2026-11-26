@@ -18,3 +18,5 @@ A shaped discussion states when the supervisor starts the coach, which observe v
 # Notes
 
 Related: `p-wb6rkwpjsg` and discussion `ds-cfsfcbknl6` (the communication standard and its friction-recording duty). Seed: that discussion, its decision 13.
+
+Added 2026-11-26 (supervisor, from coordination event 83040765c1c5a4d6, owner round 10 of ds-jxoz3h2qgk-when-to-ask): precedent belongs to this learning loop, not to each agent's memory. The coach also reads owner-question answers as precedents: when the owner keeps answering one class of question the same way, that pattern becomes a rule automatically. Evidence: in 163 owner questions the owner picked the recommended option 89 of 94 times, 30 of 30 for footprint widens (`plans/discussions/ds-jxoz3h2qgk-when-to-ask/evidence-question-classification.md`). Also in scope: friction capture has nearly stopped (785 records in total, none from 2026-09-11 to 2026-11-17, about 33 in November), and nothing in the supervisor or secretary skills periodically turns friction into proposals; the coach is the only planned synthesis.
