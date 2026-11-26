@@ -2141,7 +2141,12 @@ fn run_verb(
         for name in ENV_ORDER {
             cmd.env_remove(name);
         }
-        cmd.env("FGOS_SESSION_ID", caller)
+        let launcher = fgos_identity::launcher_env(caller, None)
+            .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
+        for name in launcher.unset {
+            cmd.env_remove(name);
+        }
+        cmd.envs(launcher.set)
             .env_remove("FGOS_HEAD_REQUEST_SOCKET")
             .env_remove("FGOS_CONFINED")
             .env_remove("CLAUDE_PROJECT_DIR");
