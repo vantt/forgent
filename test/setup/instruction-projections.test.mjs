@@ -111,7 +111,7 @@ test('materializeInstructionProjection leaves out a rule that carries a when res
   assert.match(agents, /id: `projection-law`/);
   assert.doesNotMatch(agents, /worker-rule/);
   const compiled = readEffectiveRules(fs.readFileSync(path.join(root, EFFECTIVE_RULES_RELATIVE_PATH), 'utf8'));
-  assert.deepEqual(compiled.rules.map((rule) => rule.id).sort(), ['worker-rule', 'projection-law']);
+  assert.deepEqual(compiled.rules.map((rule) => rule.id).sort(), ['projection-law', 'worker-rule']);
 });
 
 test('computeInstructionProjection names the missing host when no fgos host binary resolves', () => {
