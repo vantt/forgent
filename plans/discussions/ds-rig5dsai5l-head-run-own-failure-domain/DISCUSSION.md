@@ -1,3 +1,12 @@
+---
+id: ds-rig5dsai5l
+title: "A head's run supervisor in its own failure domain"
+status: settled
+source:
+  - p-6htu2ae64o
+created: 2026-11-27
+---
+
 discussion: settled
 
 # A head's run supervisor in its own failure domain
