@@ -47,6 +47,7 @@ Component owners, one row per component and subcomponent, sorted by id. <!-- ren
 | --- | --- | --- | --- | --- |
 | `admission` | `documentation` | Defines how a change that opens or moves documentation authority is admitted. | `docs/platform/documentation/subcomponents/admission/spec.md` | `docs/platform/documentation/subcomponents/admission/` |
 | `agent-confinement` | — | Single authority for agent isolation, container boundaries, and sandboxing. | `docs/platform/agent-confinement/spec.md` | `docs/platform/agent-confinement/` |
+| `agent-context-engine` | — | One checked store of every fgOS rule: the rule schema, the when: key registry, composition and write-time checks; it hands the start-context component one effective rule set with a digest. | `docs/platform/agent-context-engine/spec.md` | `packages/agent-context-engine/`, `docs/platform/agent-context-engine/` |
 | `agent-coordination` | — | Agent coordination area portal; former coordination engine retired, execution uses runner/Workflow. | `docs/platform/agent-coordination/spec.md` | — |
 | `agent-coordination-engine` | — | Authority for CoordinationSession manifest/events, actor bounds, session recovery, and synthesis boundary. | `docs/platform/agent-coordination/spec.md` | — |
 | `agent-mailbox` | — | Placing a message from one agent session into context of the right live head. | `docs/platform/agent-mailbox/spec.md` | `packages/mailbox/` |

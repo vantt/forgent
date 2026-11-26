@@ -1924,3 +1924,29 @@
   source:
     - docs/platform/work-state/
   status: live
+- id: agent-context-engine
+  canonical: agent-context-engine
+  aliases:
+    - bộ máy ngữ cảnh agent
+    - agent-rule-store
+    - rule-store
+  meaning: "One checked store of every fgOS rule: the rule schema, the when: key registry, composition and write-time checks; it hands the start-context component one effective rule set with a digest."
+  layer: infra
+  tier: 3
+  paths:
+    - packages/agent-context-engine/
+    - docs/platform/agent-context-engine/
+  exceptions: []
+  owns:
+    - rule unit schema and states
+    - "when: key registry"
+    - composition of rules and the effective set with its digest
+    - write-time checks of a rule
+  mustNotOwn:
+    - selection of rules for a start
+    - writing host files and the projection ledger
+  spec: docs/platform/agent-context-engine/spec.md
+  source:
+    - packages/agent-context-engine/contracts/
+    - packages/agent-context-engine/rust/
+  status: designed

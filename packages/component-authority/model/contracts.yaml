@@ -1758,3 +1758,44 @@
   evidence: []
   status: planned
   reason: proposal §7 Group-Thinking -> ACE/TCE and skill -> host edges; no dedicated live contract file yet
+- id: agent-context-engine/rule-unit.v1
+  canonical: agent-context-engine/rule-unit.v1
+  aliases: []
+  meaning: Machine-readable contract file rule-unit.v1.json owned under packages/agent-context-engine/contracts/.
+  provider: agent-context-engine
+  consumers:
+    - host-surface
+  path: packages/agent-context-engine/contracts/rule-unit.v1.json
+  evidence: []
+  status: live
+- id: agent-context-engine/when-keys.v1
+  canonical: agent-context-engine/when-keys.v1
+  aliases: []
+  meaning: Machine-readable contract file when-keys.v1.json owned under packages/agent-context-engine/contracts/.
+  provider: agent-context-engine
+  consumers:
+    - host-surface
+  path: packages/agent-context-engine/contracts/when-keys.v1.json
+  evidence: []
+  status: live
+- id: agent-context-engine/effective-rules.v1
+  canonical: agent-context-engine/effective-rules.v1
+  aliases: []
+  meaning: Machine-readable contract file effective-rules.v1.json owned under packages/agent-context-engine/contracts/.
+  provider: agent-context-engine
+  consumers:
+    - host-surface
+    - packaging-distribution
+  path: packages/agent-context-engine/contracts/effective-rules.v1.json
+  evidence: []
+  status: live
+- id: agent-context-engine/refusals.v1
+  canonical: agent-context-engine/refusals.v1
+  aliases: []
+  meaning: Machine-readable contract file refusals.v1.json owned under packages/agent-context-engine/contracts/.
+  provider: agent-context-engine
+  consumers:
+    - host-surface
+  path: packages/agent-context-engine/contracts/refusals.v1.json
+  evidence: []
+  status: live
