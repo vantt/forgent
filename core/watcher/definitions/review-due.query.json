@@ -1,0 +1,20 @@
+{
+  "name": "review-due",
+  "requires": ["fgos.review.state"],
+  "window": "own",
+  "params": {"interval": {"configKey": "watcher.reviewIntervalSec"}},
+  "query": {
+    "kind": ["fgos.review.state"],
+    "by": ["subject.id"],
+    "agg": ["max:ts", "age:ts"],
+    "having": [
+      {"lhs": {"agg": {"agg": "age:ts"}}, "op": "ge", "rhs": {"param": "interval"}},
+      {"lhs": {"latest": {"measure": "fgos.review.pending"}}, "op": "gt", "rhs": {"const": 0}}
+    ]
+  },
+  "row": {
+    "kind": "review-due",
+    "reason": "periodic-review-due: the independent review interval has elapsed with open work or new events",
+    "nextCommand": "fgos supervisor queue --json"
+  }
+}
