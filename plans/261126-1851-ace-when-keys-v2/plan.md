@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Agent context engine: when-key registry v2 (workType, sessionType, agentFamily, agentCli, agentLifecycle; kind and cli removed)"
-status: running
+status: done
 lead: lead:ace
 priority: P1
 blockedBy: []
@@ -121,7 +121,7 @@ crate.
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Registry v2 and every reader](phase-01-registry-v2-and-readers.md) | - | packages/agent-context-engine/contracts/**, packages/agent-context-engine/rust/**, packages/agent-protocol/rust/src/direct/mod.rs, apps/fgos/Cargo.toml, Cargo.lock, apps/fgos/src/wiring/context_engine/values.rs, packages/component-authority/model/contracts.yaml, docs/platform/architecture-map.md, docs/platform/agent-context-engine/spec.md, .fgos/instructions/effective/rules.json, packages/git/contracts/mutation-census.v1.json, CHANGELOG.md | 1 | done |
-| 2 | [Integration and full gates](phase-02-integration.md) | 1 | plans/261126-1851-ace-when-keys-v2/reports/** | 2 | draft |
+| 2 | [Integration and full gates](phase-02-integration.md) | 1 | plans/261126-1851-ace-when-keys-v2/reports/** | 2 | done |
 
 Why one code phase: the v1 file, its contract row, the spec link, the committed effective set and the mutation census
 all change together; any split leaves a tree where the authority model, a doc link, the set reader or the census test

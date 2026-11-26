@@ -103,15 +103,15 @@ test('renderPortableAgentsProjection renders only the repo-wide rules that carry
 test('materializeInstructionProjection leaves out a rule that carries a when restriction', () => {
   const root = mkTempDir('fgos-instruction-projection-when-');
   projectionLaw(root);
-  writeRule(root, 'producer-rule', { kind: 'procedure', title: 'Producer Rule', when: 'when:\n  role: [producer]' }, '# Producer\nOnly producers.');
+  writeRule(root, 'worker-rule', { kind: 'procedure', title: 'Worker Rule', when: 'when:\n  sessionType: [worker]' }, '# Worker\nOnly worker sessions.');
 
   materializeInstructionProjection(root);
 
   const agents = fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8');
   assert.match(agents, /id: `projection-law`/);
-  assert.doesNotMatch(agents, /producer-rule/);
+  assert.doesNotMatch(agents, /worker-rule/);
   const compiled = readEffectiveRules(fs.readFileSync(path.join(root, EFFECTIVE_RULES_RELATIVE_PATH), 'utf8'));
-  assert.deepEqual(compiled.rules.map((rule) => rule.id).sort(), ['producer-rule', 'projection-law']);
+  assert.deepEqual(compiled.rules.map((rule) => rule.id).sort(), ['projection-law', 'worker-rule']);
 });
 
 test('computeInstructionProjection names the missing host when no fgos host binary resolves', () => {
