@@ -19,6 +19,9 @@
             { "field": "fgos.head.state", "op": "eq", "value": "gone" }
           ],
           [
+            { "field": "fgos.head.state", "op": "eq", "value": "supervisor-gone" }
+          ],
+          [
             { "field": "fgos.head.state", "op": "eq", "value": "ended" },
             { "field": "fgos.head.role", "op": "prefix", "value": "head:shaper-" }
           ],

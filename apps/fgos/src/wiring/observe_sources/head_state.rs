@@ -4,6 +4,10 @@
 //! - Session Host `alive(placement)`, which answers `live`, `gone` or `unknown`;
 //! - Identity's role directory, which says whether the head's `head:<persona>-<name>` role is held by a live session.
 //!
+//! When Session Host reports `live` but the run supervisor recorded in `supervisor-binding.json` is judged dead
+//! (by pid + start identity) and neither `closed.json` nor `receipt.json` exists, the state is `supervisor-gone` with
+//! the placement's `startedAt`.
+//!
 //! The state is Session Host's answer, copied: `unknown` is never turned into `gone`. Identity's view travels as the
 //! separate attr `fgos.head.identity`, so a pane that answers `unknown` while the role is held alive stays visible as
 //! exactly that. The role string itself (`head:<persona>-<name>`, `lead:<LANE>`) travels as `fgos.head.role`.
@@ -12,8 +16,8 @@
 //! `closed.json` (read, never written here) with a valid `at`, and the placement has no valid `retiredAt`. The record
 //! `ts` is that `at` and Session Host is not asked. A rotated head has a new `runDir`, so the old file never reaches it.
 //!
-//! A `gone` record carries the placement's `startedAt` as its `ts`, so the head-gone event keeps one id while the
-//! head stays gone (the definition reads its own 30-day window); every other state is stamped with the tick.
+//! A `gone` or `supervisor-gone` record carries the placement's `startedAt` as its `ts`, so the event keeps one id
+//! while the condition holds (the definition reads its own 30-day window); every other state is stamped with the tick.
 //!
 //! `retired` is the signal that a head or lead ended on purpose: its owner (the project supervisor, for a lead) adds
 //! `retiredAt` (an RFC 3339 instant) to the head's `placement.json`. A placement carrying a valid `retiredAt` answers
@@ -32,13 +36,20 @@ use std::path::{Path, PathBuf};
 
 const SOURCE_ID: &str = "head-state";
 
-/// What the source asks of the outside world: the one question to Session Host and the one read of Identity.
+/// What the source asks of the outside world: the one question to Session Host, the one read of Identity,
+/// and the liveness check of the run supervisor.
 pub trait HeadFacts: Send + Sync {
     /// Session Host `alive` for a placement; `run_dir` is the head's own attempt directory (it names the terminal
     /// endpoint the head was placed on).
     fn alive(&self, placement: &Placement, run_dir: &Path) -> Liveness;
     /// Role alias → Identity liveness (`alive`, `unknown`, `remote`) of the session holding it.
     fn identity_roles(&self) -> BTreeMap<String, &'static str>;
+    /// Whether the supervisor recorded in `<run_dir>/supervisor-binding.json` is alive.
+    ///
+    /// Answers `true` when there is no binding or when `run_dir` holds `closed.json` or `receipt.json` (the supervisor
+    /// publishes them only at the end of its run).
+    /// When a binding exists, judges the recorded supervisor process by identity (pid + start identity).
+    fn supervisor_alive(&self, run_dir: &Path) -> bool;
 }
 
 /// The real owners: the terminal host of the head's own endpoint and this machine's Identity directory.
@@ -77,6 +88,26 @@ impl HeadFacts for HostHeadFacts {
             }
         }
         roles
+    }
+
+    fn supervisor_alive(&self, run_dir: &Path) -> bool {
+        if run_dir.as_os_str().is_empty()
+            || run_dir.join("closed.json").exists()
+            || run_dir.join("receipt.json").exists()
+        {
+            return true;
+        }
+        let Ok(bytes) = std::fs::read(run_dir.join("supervisor-binding.json")) else {
+            return true;
+        };
+        let Ok(binding) = serde_json::from_slice::<Value>(&bytes) else {
+            return true;
+        };
+        let Some(supervisor) = binding.get("supervisor") else {
+            return true;
+        };
+        let record = fgos_process::facts::Record::from_json(supervisor);
+        fgos_process::facts::judge_here(&record) != fgos_process::facts::Verdict::Dead
     }
 }
 
@@ -204,12 +235,18 @@ impl RecordSource for HeadStateSource {
                     (Some(at), _) => ("retired", at),
                     (None, Some(at)) => ("ended", at),
                     (None, None) => {
-                        let state = state_name(self.facts.alive(&head.placement, &head.run_dir));
+                        let pane_liveness = self.facts.alive(&head.placement, &head.run_dir);
+                        let state = match pane_liveness {
+                            Liveness::Live if !self.facts.supervisor_alive(&head.run_dir) => {
+                                "supervisor-gone"
+                            }
+                            other => state_name(other),
+                        };
                         // A gone head is one incident for as long as it stays gone: its instant is the placement
                         // it belongs to, not the tick that noticed, so the event id the watcher derives from it
                         // (`kind|subject|ts`) is the same on every tick and a handled incident is not raised again.
                         let at = match (state, head.started_at) {
-                            ("gone", Some(placed)) => placed,
+                            ("gone" | "supervisor-gone", Some(placed)) => placed,
                             _ => ts.clone(),
                         };
                         (state, at)

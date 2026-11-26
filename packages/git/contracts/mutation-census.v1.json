@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "4a1ec00d4115be31c29bb92c3a917d7b405bc40fec17907ee055543d15ce7f66",
+  "payloadDigest": "852282c4f05b62698dfe43e8dbdad1aa3ea101aac14e737eda399a9bc1f9181c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "c21eb0cee94b12942586ccbe5a8fa0504d39b1380d96265e07ae12c27f987119",
@@ -160,11 +160,11 @@
     "apps/fgos/src/wiring/mod.rs": "dea3c40563dab4c8a268e8c7f824d5d39da19f35376c7ae566b86d03ea01cde0",
     "apps/fgos/src/wiring/observe_declarations.rs": "e44eacbc656da1d7cb61d6419887a0660f8f93cf0641fb22f42ea72744457a97",
     "apps/fgos/src/wiring/observe_query.rs": "f43037b9a987bb9902534275c5842559b03240900e528262adff3115165230d5",
-    "apps/fgos/src/wiring/observe_sources/head_state.rs": "dcf774683253d9c6f9c8c41b672ccdf19938923a50d692f1f2cd6f1d21b121fe",
+    "apps/fgos/src/wiring/observe_sources/head_state.rs": "baca1bd783f125a29917b5ec63277f5899177912d60754353d7e36fddd80bfcd",
     "apps/fgos/src/wiring/observe_sources/mod.rs": "d5fb81609b375af587eed807d6c81ff70565fbc7ca8cdea1f6a22f3f3149afc1",
     "apps/fgos/src/wiring/observe_sources/plan_history.rs": "38cec91849c282960311c3f851e99ec50608ff253de753a798c3af79d03fb185",
     "apps/fgos/src/wiring/observe_sources/plan_text.rs": "a71317e73180193a53d3e7f9b4b19ad18aef8c989a6e8981ba41108e1b1438c3",
-    "apps/fgos/src/wiring/observe_sources/tests/mod.rs": "ce5431a7596ec642c47fa7ca734b379e5795e3104fb29e367980ae1777e11717",
+    "apps/fgos/src/wiring/observe_sources/tests/mod.rs": "7fb9baf3992643d600cbb3da45a26fce791382495697a7479693eaa5237a7f5e",
     "apps/fgos/src/wiring/portfolio.rs": "88ba305153fbbf06ab274be0a10852f2ccde62f47522adac4c4a29935ae273aa",
     "apps/fgos/src/wiring/questions.rs": "2f32997782ae88e901d6d27bc9b0ab948eb14e53eb3e0a559c388d1610a9e71f",
     "apps/fgos/src/wiring/questions_hook.rs": "0e843ad2efe12a28b9d166918804bd956a4f870a52f055f7936ba2c54db65862",

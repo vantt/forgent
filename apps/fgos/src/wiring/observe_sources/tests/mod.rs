@@ -1,7 +1,7 @@
 //! Proofs of the head and plan sources: plan transitions from a fixture repository through the Git door, and head
 //! state from a fake owner pair (the real Session Host needs a terminal).
 
-use super::head_state::{HeadFacts, HeadStateSource};
+use super::head_state::{HeadFacts, HeadStateSource, HostHeadFacts};
 use super::plan_history::PlanHistorySource;
 use fgos_observe::record::types::{AttrValue, Record};
 use fgos_observe::{RecordSource, Window};
@@ -310,6 +310,23 @@ fn the_board_log_lines_naming_an_existing_plan_dir_are_activity() {
 
 struct FakeOwners {
     answer: Liveness,
+    supervisor_alive: bool,
+}
+
+impl FakeOwners {
+    fn new(answer: Liveness) -> Self {
+        Self {
+            answer,
+            supervisor_alive: true,
+        }
+    }
+
+    fn with_supervisor(answer: Liveness, supervisor_alive: bool) -> Self {
+        Self {
+            answer,
+            supervisor_alive,
+        }
+    }
 }
 
 impl HeadFacts for FakeOwners {
@@ -318,6 +335,9 @@ impl HeadFacts for FakeOwners {
     }
     fn identity_roles(&self) -> BTreeMap<String, &'static str> {
         BTreeMap::from([("head:planner-x".to_owned(), "alive")])
+    }
+    fn supervisor_alive(&self, _: &Path) -> bool {
+        self.supervisor_alive
     }
 }
 
@@ -332,6 +352,10 @@ fn head_records_with(answer: Liveness, extra: &str) -> Vec<Record> {
 
 /// As `head_records_with`, with the head's own run directory holding `closed` as its `closed.json` (when given).
 fn head_records_run(answer: Liveness, extra: &str, closed: Option<&str>) -> Vec<Record> {
+    head_records_facts(FakeOwners::new(answer), extra, closed)
+}
+
+fn head_records_facts(facts: FakeOwners, extra: &str, closed: Option<&str>) -> Vec<Record> {
     let root = scratch("head");
     let lineage = root.join(".fgos/runtime/session-rotation/planner-x");
     std::fs::create_dir_all(&lineage).unwrap();
@@ -348,7 +372,7 @@ fn head_records_run(answer: Liveness, extra: &str, closed: Option<&str>) -> Vec<
         ),
     )
     .unwrap();
-    let records = HeadStateSource::with_facts(Box::new(FakeOwners { answer }))
+    let records = HeadStateSource::with_facts(Box::new(facts))
         .records(&root, &all_time())
         .unwrap();
     let _ = std::fs::remove_dir_all(&root);
@@ -405,11 +429,9 @@ fn a_placement_with_retired_at_is_retired_at_that_instant_and_an_invalid_one_is_
 #[test]
 fn a_project_that_never_started_a_head_has_no_head_records() {
     let root = scratch("nohead");
-    let records = HeadStateSource::with_facts(Box::new(FakeOwners {
-        answer: Liveness::Live,
-    }))
-    .records(&root, &all_time())
-    .unwrap();
+    let records = HeadStateSource::with_facts(Box::new(FakeOwners::new(Liveness::Live)))
+        .records(&root, &all_time())
+        .unwrap();
     assert!(records.is_empty());
     let _ = std::fs::remove_dir_all(&root);
 }
@@ -449,4 +471,87 @@ fn an_unreadable_or_invalid_closed_file_is_no_signal() {
         let records = head_records_run(Liveness::Live, "", Some(text));
         assert_eq!(attr(&records[0], "fgos.head.state"), Some("live"), "{text}");
     }
+}
+
+#[test]
+fn a_live_pane_with_a_dead_supervisor_reads_supervisor_gone_with_the_placement_instant() {
+    let records = head_records_facts(FakeOwners::with_supervisor(Liveness::Live, false), "", None);
+    assert_eq!(records.len(), 1);
+    assert_eq!(records[0].subject.id, "head:planner-x");
+    assert_eq!(
+        attr(&records[0], "fgos.head.state"),
+        Some("supervisor-gone")
+    );
+    assert_eq!(records[0].ts, "2026-11-18T06:58:44.815Z");
+    assert_eq!(attr(&records[0], "fgos.head.role"), Some("head:planner-x"));
+    assert_eq!(attr(&records[0], "fgos.head.identity"), Some("alive"));
+    assert_eq!(attr(&records[0], "fgos.head.persona"), Some("planner"));
+}
+
+#[test]
+fn a_live_pane_with_a_live_supervisor_reads_live() {
+    let records = head_records_facts(FakeOwners::with_supervisor(Liveness::Live, true), "", None);
+    assert_eq!(records.len(), 1);
+    assert_eq!(attr(&records[0], "fgos.head.state"), Some("live"));
+    assert_ne!(records[0].ts, "2026-11-18T06:58:44.815Z");
+}
+
+#[test]
+fn a_gone_pane_reads_gone_regardless_of_supervisor() {
+    for sup_alive in [true, false] {
+        let records = head_records_facts(
+            FakeOwners::with_supervisor(Liveness::Gone, sup_alive),
+            "",
+            None,
+        );
+        assert_eq!(records.len(), 1);
+        assert_eq!(attr(&records[0], "fgos.head.state"), Some("gone"));
+        assert_eq!(records[0].ts, "2026-11-18T06:58:44.815Z");
+    }
+}
+
+#[test]
+fn host_head_facts_supervisor_alive_checks_process_identity_and_completion_markers() {
+    let run_dir = scratch("supervisor-alive");
+    let binding_path = run_dir.join("supervisor-binding.json");
+    let receipt_path = run_dir.join("receipt.json");
+    let closed_path = run_dir.join("closed.json");
+
+    let me = fgos_process::facts::self_identity().expect("this process has an identity here");
+    let live_record = me.to_record();
+    let mut dead_record = live_record.clone();
+    dead_record.start_time = Some(format!(
+        "{}-dead",
+        dead_record.start_time.as_deref().unwrap_or("0")
+    ));
+
+    // A temp run dir with a binding whose supervisor record is this test process answers true.
+    let live_binding = serde_json::json!({
+        "supervisor": live_record.to_json(),
+    });
+    std::fs::write(&binding_path, live_binding.to_string()).unwrap();
+    assert!(HostHeadFacts.supervisor_alive(&run_dir));
+
+    // A binding naming a dead process answers false.
+    let dead_binding = serde_json::json!({
+        "supervisor": dead_record.to_json(),
+    });
+    std::fs::write(&binding_path, dead_binding.to_string()).unwrap();
+    assert!(!HostHeadFacts.supervisor_alive(&run_dir));
+
+    // The same dead binding plus receipt.json answers true.
+    std::fs::write(&receipt_path, "{}").unwrap();
+    assert!(HostHeadFacts.supervisor_alive(&run_dir));
+    std::fs::remove_file(&receipt_path).unwrap();
+
+    // Plus closed.json answers true.
+    std::fs::write(&closed_path, "{}").unwrap();
+    assert!(HostHeadFacts.supervisor_alive(&run_dir));
+    std::fs::remove_file(&closed_path).unwrap();
+
+    // No binding answers true.
+    std::fs::remove_file(&binding_path).unwrap();
+    assert!(HostHeadFacts.supervisor_alive(&run_dir));
+
+    let _ = std::fs::remove_dir_all(&run_dir);
 }
