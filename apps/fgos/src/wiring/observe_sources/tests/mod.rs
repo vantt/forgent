@@ -1,7 +1,7 @@
 //! Proofs of the head and plan sources: plan transitions from a fixture repository through the Git door, and head
 //! state from a fake owner pair (the real Session Host needs a terminal).
 
-use super::head_state::{HeadFacts, HeadStateSource};
+use super::head_state::{HeadFacts, HeadStateSource, HostHeadFacts};
 use super::plan_history::PlanHistorySource;
 use fgos_observe::record::types::{AttrValue, Record};
 use fgos_observe::{RecordSource, Window};
@@ -516,4 +516,50 @@ fn a_gone_pane_reads_gone_regardless_of_supervisor() {
         assert_eq!(attr(&records[0], "fgos.head.state"), Some("gone"));
         assert_eq!(records[0].ts, "2026-11-18T06:58:44.815Z");
     }
+}
+
+#[test]
+fn host_head_facts_supervisor_alive_checks_process_identity_and_completion_markers() {
+    let run_dir = scratch("supervisor-alive");
+    let binding_path = run_dir.join("supervisor-binding.json");
+    let receipt_path = run_dir.join("receipt.json");
+    let closed_path = run_dir.join("closed.json");
+
+    let me = fgos_process::facts::self_identity().expect("this process has an identity here");
+    let live_record = me.to_record();
+    let mut dead_record = live_record.clone();
+    dead_record.start_time = Some(format!(
+        "{}-dead",
+        dead_record.start_time.as_deref().unwrap_or("0")
+    ));
+
+    // A temp run dir with a binding whose supervisor record is this test process answers true.
+    let live_binding = serde_json::json!({
+        "supervisor": live_record.to_json(),
+    });
+    std::fs::write(&binding_path, live_binding.to_string()).unwrap();
+    assert!(HostHeadFacts.supervisor_alive(&run_dir));
+
+    // A binding naming a dead process answers false.
+    let dead_binding = serde_json::json!({
+        "supervisor": dead_record.to_json(),
+    });
+    std::fs::write(&binding_path, dead_binding.to_string()).unwrap();
+    assert!(!HostHeadFacts.supervisor_alive(&run_dir));
+
+    // The same dead binding plus receipt.json answers true.
+    std::fs::write(&receipt_path, "{}").unwrap();
+    assert!(HostHeadFacts.supervisor_alive(&run_dir));
+    std::fs::remove_file(&receipt_path).unwrap();
+
+    // Plus closed.json answers true.
+    std::fs::write(&closed_path, "{}").unwrap();
+    assert!(HostHeadFacts.supervisor_alive(&run_dir));
+    std::fs::remove_file(&closed_path).unwrap();
+
+    // No binding answers true.
+    std::fs::remove_file(&binding_path).unwrap();
+    assert!(HostHeadFacts.supervisor_alive(&run_dir));
+
+    let _ = std::fs::remove_dir_all(&run_dir);
 }

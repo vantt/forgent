@@ -5,7 +5,8 @@
 //! - Identity's role directory, which says whether the head's `head:<persona>-<name>` role is held by a live session.
 //!
 //! When Session Host reports `live` but the run supervisor recorded in `supervisor-binding.json` is judged dead
-//! (by pid + start identity), the state is `supervisor-gone` with the placement's `startedAt`.
+//! (by pid + start identity) and neither `closed.json` nor `receipt.json` exists, the state is `supervisor-gone` with
+//! the placement's `startedAt`.
 //!
 //! The state is Session Host's answer, copied: `unknown` is never turned into `gone`. Identity's view travels as the
 //! separate attr `fgos.head.identity`, so a pane that answers `unknown` while the role is held alive stays visible as
@@ -45,7 +46,8 @@ pub trait HeadFacts: Send + Sync {
     fn identity_roles(&self) -> BTreeMap<String, &'static str>;
     /// Whether the supervisor recorded in `<run_dir>/supervisor-binding.json` is alive.
     ///
-    /// Answers `true` when there is no binding or when `run_dir` holds `closed.json` (keeping today's behaviour).
+    /// Answers `true` when there is no binding or when `run_dir` holds `closed.json` or `receipt.json` (the supervisor
+    /// publishes them only at the end of its run).
     /// When a binding exists, judges the recorded supervisor process by identity (pid + start identity).
     fn supervisor_alive(&self, run_dir: &Path) -> bool;
 }
@@ -89,7 +91,10 @@ impl HeadFacts for HostHeadFacts {
     }
 
     fn supervisor_alive(&self, run_dir: &Path) -> bool {
-        if run_dir.as_os_str().is_empty() || run_dir.join("closed.json").exists() {
+        if run_dir.as_os_str().is_empty()
+            || run_dir.join("closed.json").exists()
+            || run_dir.join("receipt.json").exists()
+        {
             return true;
         }
         let Ok(bytes) = std::fs::read(run_dir.join("supervisor-binding.json")) else {
