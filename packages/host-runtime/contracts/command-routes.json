@@ -770,7 +770,8 @@
       "recover": [
         "dir",
         "json",
-        "help"
+        "help",
+        "confirm-writer-dead"
       ],
       "status": [
         "dir",

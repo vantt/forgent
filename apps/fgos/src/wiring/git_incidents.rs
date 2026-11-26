@@ -6,6 +6,7 @@
 use crate::routing::Call;
 use fgos_git::incidents::{read_git_status, recover_git_operations};
 use fgos_git::invocation_root::{resolve_invocation_root, RootPolicy, RootRequest};
+use fgos_host_runtime::cli_args::{FlagScalar, FlagValue};
 use fgos_host_runtime::{
     CategorisedRefusal, ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome,
     OperationId, OperationProvider, OperationRequest, ProviderDescriptor, ProviderError,
@@ -67,6 +68,9 @@ pub fn open_wal(
 pub const STATUS_OPERATION_ID: &str = "git.status";
 pub const RECOVER_OPERATION_ID: &str = "git.recover";
 
+/// The repeatable `recover` option by which the owner names a writer they know is dead.
+const CONFIRM_DEAD_FLAG: &str = "confirm-writer-dead";
+
 /// The sub-commands `fgos git` serves.
 pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["status", "recover"];
 
@@ -117,6 +121,8 @@ pub struct GitRequest {
     pub cwd: PathBuf,
     pub dir: Option<String>,
     pub home: Option<PathBuf>,
+    /// The writer ids the owner named with `--confirm-writer-dead` (an empty id is a bare use of the option).
+    pub confirm_dead: Vec<String>,
 }
 
 impl GitRequest {
@@ -141,6 +147,20 @@ pub fn project_git_request(args: &[OsString]) -> GitRequest {
         cwd: std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")),
         dir: call.named_dir(),
         home: fgos_config::machine::home_dir(|key| std::env::var(key).ok()),
+        confirm_dead: confirmed_writers(&call),
+    }
+}
+
+/// The writer ids `--confirm-writer-dead` names, each use in order; a bare use reads as the empty id.
+fn confirmed_writers(call: &Call) -> Vec<String> {
+    let id = |scalar: &FlagScalar| match scalar {
+        FlagScalar::Str(text) => text.clone(),
+        FlagScalar::Bool => String::new(),
+    };
+    match call.flags().flag(CONFIRM_DEAD_FLAG) {
+        None => Vec::new(),
+        Some(FlagValue::One(one)) => vec![id(one)],
+        Some(FlagValue::Many(all)) => all.iter().map(id).collect(),
     }
 }
 
@@ -161,6 +181,47 @@ pub(crate) fn writer_is_dead(state_root: &std::path::Path) -> impl Fn(&str) -> b
             &fgos_process::facts::judge_here,
         )
     }
+}
+
+/// The writers the owner confirmed dead, or the refusal that says why the confirmation is not taken. Only the owner
+/// confirms: a caller with an agent CLI among its process ancestors never does. A confirmation never names the
+/// caller's own writer or a writer Identity still holds alive (a session row not proven dead, a live bare pid).
+fn confirmed_dead_writers(
+    request: &GitRequest,
+    state_root: &std::path::Path,
+    own: &str,
+    tree: &dyn fgos_identity::ProcessTree,
+    pid: u32,
+) -> Result<Vec<String>, String> {
+    if request.confirm_dead.is_empty() {
+        return Ok(Vec::new());
+    }
+    if fgos_identity::resolve::agent_in_ancestry(tree, Some(pid)).is_some() {
+        return Err("only the owner confirms a dead writer: an agent CLI is among this caller's process ancestors".to_owned());
+    }
+    let judge = &fgos_process::facts::judge_here;
+    let held = fgos_identity::directory::list(state_root, None, false, judge, None)
+        .map(|listed| listed.sessions)
+        .unwrap_or_default();
+    for id in &request.confirm_dead {
+        if id.is_empty() {
+            return Err("--confirm-writer-dead requires a writer id".to_owned());
+        }
+        if id == own {
+            return Err(format!(
+                "{id} is this caller's own writer; never confirm a live writer dead"
+            ));
+        }
+        let held_alive = held.iter().any(|session| &session.id == id);
+        let pid_alive = id.bytes().all(|b| b.is_ascii_digit())
+            && !fgos_identity::directory::session_proven_dead(state_root, id, judge);
+        if held_alive || pid_alive {
+            return Err(format!(
+                "{id} is not dead: Identity holds it alive; never confirm a live writer dead"
+            ));
+        }
+    }
+    Ok(request.confirm_dead.clone())
 }
 
 /// What a request answers: the data of the envelope, the caller's refusal, or a failure of the verb itself.
@@ -188,13 +249,28 @@ fn answer(request: &GitRequest) -> Result<Answer, ProviderError> {
     let data = match request.operation {
         GitOperation::Status => serde_json::to_value(read_git_status(&state_root, &root)),
         GitOperation::Recover => {
-            let recovered = recover_git_operations(
+            let own = own_writer();
+            let confirmed = match confirmed_dead_writers(
+                request,
                 &state_root,
-                &root,
-                &|_| own_writer(),
-                &writer_is_dead(&state_root),
-            )
-            .map_err(|error| ProviderError::ProviderFailed(error.cause().to_owned()))?;
+                &own,
+                fgos_identity::os_process_tree().as_ref(),
+                std::process::id(),
+            ) {
+                Ok(confirmed) => confirmed,
+                Err(message) => {
+                    return Ok(Answer::Refused(CategorisedRefusal::new(
+                        "validation",
+                        message,
+                    )))
+                }
+            };
+            let proof = writer_is_dead(&state_root);
+            let recovered =
+                recover_git_operations(&state_root, &root, &|_| own.clone(), &|writer| {
+                    proof(writer) || confirmed.iter().any(|id| id == writer)
+                })
+                .map_err(|error| ProviderError::ProviderFailed(error.cause().to_owned()))?;
             serde_json::to_value(recovered)
         }
     };
@@ -257,6 +333,16 @@ mod tests {
         let recover = project_git_request(&os(&["git", "--dir", "/work/repo", "recover"]));
         assert_eq!(recover.operation_id(), RECOVER_OPERATION_ID);
         assert_eq!(recover.dir.as_deref(), Some("/work/repo"));
+        assert!(recover.confirm_dead.is_empty());
+        let confirming = project_git_request(&os(&[
+            "git",
+            "recover",
+            "--confirm-writer-dead",
+            "w-1",
+            "--confirm-writer-dead",
+            "w-2",
+        ]));
+        assert_eq!(confirming.confirm_dead, ["w-1", "w-2"]);
     }
 
     #[test]
@@ -269,6 +355,7 @@ mod tests {
             cwd: dir.clone(),
             dir: None,
             home: None,
+            confirm_dead: Vec::new(),
         };
         let outcome = answer(&request);
         std::fs::remove_dir_all(&dir).unwrap();

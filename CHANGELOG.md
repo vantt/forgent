@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Added: `fgos git recover --confirm-writer-dead <writer-id>` lets the owner settle the unfinished Git operation of a writer that Identity no longer holds, so a forgotten writer no longer blocks every event-store write; it is refused for a caller under an agent CLI, for the caller's own writer and for a writer still alive.
 - Fixed: The land door no longer needs a hand push after a land dies between its commit and its push; the next land holding the merge slot publishes the commits it made itself and still refuses any foreign commit.
 - Added: `fgos git recover` settles a dead pid writer's pending chains and frees its candidates; a live pid is never treated as dead.
 - Added: a head session sends an fgos argv over its request socket, and one permission table (persona x verb prefix -> allow, ask or deny) decides it; an `ask` files an owner question carrying the exact argv.
