@@ -1,10 +1,11 @@
 ---
 contract: plan-v1
 title: "Changelog entries become fragments assembled at release, and the land door regenerates the generated skill surfaces"
-status: ready
+status: running
+lead: head:lead-forgent-261126-2324-change-786c2
 priority: P1
 blockedBy: []
-base: 550f77f6566f14275aa832b56b1a6b7fa23679ca
+base: f9a90776d43af441688e7fd852542281ed6fe800
 footprint:
   - plans/261126-2324-changelog-fragments-and-skill-surface-regeneration/**
   - packages/supervision/rust/src/land.rs
