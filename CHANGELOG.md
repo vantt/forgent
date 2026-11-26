@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Added: the host now reports the end of a head. A head whose run directory holds `closed.json` and that `session stop` never retired shows as `ended` in `fgos.head.state`, and `lead-ended` fires on `retired` or `ended`, so the supervisor learns that a lead finished or died even if nobody raised it.
+- Added: the supervisor's wake closes finished heads through one door. It stops an idle planner once its plan lands as `draft` or `ready` (new `plan-drafted` watcher row) and an idle lead once its plan is `done`, whether the role is `head:lead-*` or `lead:<LANE>`. `fgos session stop --role` now accepts a lead's short `lead:<LANE>` role.
+- Changed: a live lead whose every open phase has an open owner question (`plan:<dir>#phase-NN` or `plan:<dir>`) holds no working slot. `fgos supervisor plans` counts it in `leadsWaiting`, not `leadsLive`, so a ready plan is admitted while that lead waits.
 - Fixed: the Git journal scan bound rises from 100,000 to 1,000,000 entries, so a long-lived journal no longer makes `fgos events sync`, `fgos questions ask` and `fgos mailbox send` refuse with `git-wal-unreadable`.
 - Added: `fgos git recover --confirm-writer-dead <writer-id>` lets the owner settle the unfinished Git operation of a writer that Identity no longer holds, so a forgotten writer no longer blocks every event-store write; it is refused for a caller under an agent CLI, for the caller's own writer and for a writer still alive.
 - Fixed: The land door no longer needs a hand push after a land dies between its commit and its push; the next land holding the merge slot publishes the commits it made itself and still refuses any foreign commit.
