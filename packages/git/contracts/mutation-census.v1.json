@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ff3d6b687cafdda1e891a65699d2260baa76a958b14381d9351ad5dd05bd1a14",
+  "payloadDigest": "e26d8a55248995a86535bdc9f5ee8e58ef097e1896f4a7af2ed0be85603e72ba",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "dc14ff69bc4b144893fa6988de4df6b6180ab255ef8751fd1615ad93472b9e71",
     ".agents/skills/_shared/capability-matching.md": "93cd382994e2201e4aa8ec7816d740f6da634a0ee69d6911800a848ed5de1d8b",
@@ -832,7 +832,7 @@
     "packages/git/rust/tests/repository_config.rs": "d20621f088ddba0c695dc5124d40ffebc75ae5ae7e2c53687f9651d1b4c98ca8",
     "packages/git/rust/tests/repository_facts.rs": "14863c1ebc66318a0666e9ac5a6054f7bc58f52f94bf6480cf92519479534ec9",
     "packages/git/rust/tests/safe_restore.rs": "1feea151480ec385cd5a8b07ffad47b07d434733b3d95d9f26ef8dc17addc75f",
-    "packages/git/rust/tests/scoped_commit_sync.rs": "57ca34278fc57d93037d53946097be5d1619f2a2c4b1b75549662985215de174",
+    "packages/git/rust/tests/scoped_commit_sync.rs": "be659c2fe87bf04e44a18d063868c6f413dc1bc046b5a2eef18546061c10eced",
     "packages/git/rust/tests/sequence.rs": "3f9aad5eeb68d0f633d68f79d0a09aadba1b26f7208226587e78cdfd0c2488b4",
     "packages/git/rust/tests/ssh_transport.rs": "8a2cb55b09c231da46ff5bb90a9ae2b7066ee3859f9568fe2f22c97f1da680c4",
     "packages/git/rust/tests/support/land.rs": "46bec8c0928eb4b53d6db71204661638b626b6dfe199d39f4890444c1b14ac07",
