@@ -156,9 +156,14 @@ impl Fixture {
     fn topic(&self, name: &str, files: &[(&str, &str)]) {
         git(&self.main, &["checkout", "-qb", name]);
         for (path, text) in files {
-            fs::write(self.main.join(path), text).unwrap();
+            let full = self.main.join(path);
+            if let Some(parent) = full.parent() {
+                let _ = fs::create_dir_all(parent);
+            }
+            fs::write(&full, text).unwrap();
+            git(&self.main, &["add", path]);
         }
-        git(&self.main, &["commit", "-qam", name]);
+        git(&self.main, &["commit", "-qm", name]);
         git(&self.main, &["checkout", "-q", "trunk"]);
     }
 
@@ -346,18 +351,82 @@ fn a_conflicting_census_lands_regenerated() {
 }
 
 #[test]
+fn two_branches_that_change_a_file_under_a_declared_glob_land_one_after_the_other_the_second_regenerated(
+) {
+    let f = Fixture::new();
+    f.topic(
+        "one",
+        &[("gen/data.txt", "one-gen\n"), ("src-one.txt", "one\n")],
+    );
+    f.topic(
+        "two",
+        &[("gen/data.txt", "two-gen\n"), ("src-two.txt", "two\n")],
+    );
+
+    let cfg = LandConfig {
+        gates: vec![gate("true")],
+        regenerate: Some(Regenerate {
+            run: "mkdir -p gen && cat src-*.txt > gen/data.txt".into(),
+            files: vec!["gen/**".into()],
+            when: Vec::new(),
+        }),
+    };
+
+    let out1 = f.land(&branch("one"), &cfg).unwrap();
+    assert_eq!(out1.main_sha, f.remote_tip());
+    assert_eq!(
+        fs::read_to_string(f.main.join("gen/data.txt")).unwrap(),
+        "one\n"
+    );
+
+    let out2 = f.land(&branch("two"), &cfg).unwrap();
+    assert_eq!(out2.main_sha, f.remote_tip());
+    assert_eq!(
+        fs::read_to_string(f.main.join("gen/data.txt")).unwrap(),
+        "one\ntwo\n"
+    );
+    assert_eq!(
+        fs::read_to_string(f.main.join("src-two.txt")).unwrap(),
+        "two\n"
+    );
+}
+
+#[test]
 fn a_conflict_outside_the_declared_files_refuses_before_any_candidate_is_prepared() {
     let f = Fixture::new();
     f.topic("topic", &[("a", "topic\n")]);
     f.move_remote("a", "trunk\n");
     let before = f.remote_tip();
-    let refusal = f
-        .land(&branch("topic"), &config(vec![gate("true")]))
-        .unwrap_err();
+    let cfg = LandConfig {
+        gates: vec![gate("true")],
+        regenerate: Some(Regenerate {
+            run: "echo gen > gen/out.txt".into(),
+            files: vec!["gen/**".into()],
+            when: Vec::new(),
+        }),
+    };
+    let refusal = f.land(&branch("topic"), &cfg).unwrap_err();
     assert_eq!(refusal.code, "land-conflict-aborted");
     assert!(refusal.detail.contains('a'));
     assert_eq!(git(&f.main, &["worktree", "list"]).lines().count(), 1);
     assert_eq!(f.remote_tip(), before);
+}
+
+#[test]
+fn invalid_regenerate_glob_refuses_naming_entry() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "topic\n")]);
+    let cfg = LandConfig {
+        gates: vec![gate("true")],
+        regenerate: Some(Regenerate {
+            run: "true".into(),
+            files: vec!["/abs/path".into()],
+            when: Vec::new(),
+        }),
+    };
+    let refusal = f.land(&branch("topic"), &cfg).unwrap_err();
+    assert_eq!(refusal.code, "land-regenerate-failed");
+    assert!(refusal.detail.contains("/abs/path"));
 }
 
 #[test]

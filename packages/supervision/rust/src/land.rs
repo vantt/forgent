@@ -320,9 +320,25 @@ pub fn land(
             "land.gates is empty; configure at least one gate",
         ));
     }
+    let regen_files = if let Some(regen) = &config.regenerate {
+        fgos_write_scope::canonicalize_all(&regen.files)
+            .map_err(|e| refuse("land-regenerate-failed", e.to_string()))?
+    } else {
+        Vec::new()
+    };
     match (&command.branch, &command.paths) {
-        (Some(branch), None) => Lander { ports, config }.land_branch(command, branch),
-        (None, Some(paths)) => Lander { ports, config }.land_paths(command, paths),
+        (Some(branch), None) => Lander {
+            ports,
+            config,
+            regen_files,
+        }
+        .land_branch(command, branch),
+        (None, Some(paths)) => Lander {
+            ports,
+            config,
+            regen_files,
+        }
+        .land_paths(command, paths),
         _ => Err(refuse(
             "land-request-invalid",
             "give exactly one of a branch or a set of paths",
@@ -396,6 +412,7 @@ pub fn catch_up(command: &LandCommand, ports: &LandPorts<'_>) -> Result<(), Land
     let lander = Lander {
         ports,
         config: &config,
+        regen_files: Vec::new(),
     };
     let target = lander.checked_out_target(command)?;
     let slot = ports
@@ -520,6 +537,7 @@ fn with_status_done(bytes: &[u8]) -> Option<Vec<u8>> {
 struct Lander<'a> {
     ports: &'a LandPorts<'a>,
     config: &'a LandConfig,
+    regen_files: Vec<String>,
 }
 
 fn oid_of(repo: &RepoHandle, text: &str) -> Result<Oid, LandRefusal> {
@@ -1212,13 +1230,6 @@ impl Lander<'_> {
         let target = self
             .resolve(&dest)?
             .ok_or_else(|| refuse("land-target-unknown", format!("{dest} is absent")))?;
-        let regen_files: Vec<String> = self
-            .config
-            .regenerate
-            .as_ref()
-            .map(|r| r.files.clone())
-            .unwrap_or_default();
-
         // The footprint judges what the branch itself carries (merge base to source). A regenerated
         // file is exempt only through the regeneration this land performs, never as a branch edit.
         if let Some(footprint) = &command.footprint {
@@ -1241,19 +1252,16 @@ impl Lander<'_> {
             .merge_tree(p.repo, &target, &source)
             .map_err(from_git)?;
         let conflicted: Vec<String> = merged.conflicted_paths.iter().map(|b| lossy(b)).collect();
-        let undeclared: Vec<&String> = conflicted
-            .iter()
-            .filter(|c| !regen_files.contains(c))
-            .collect();
+        let mut undeclared = Vec::new();
+        for c in &conflicted {
+            let matched = fgos_write_scope::matches(c.as_bytes(), &self.regen_files)
+                .map_err(|e| refuse("land-regenerate-failed", e.to_string()))?;
+            if !matched {
+                undeclared.push(c.as_str());
+            }
+        }
         if !undeclared.is_empty() {
-            return Err(refuse(
-                "land-conflict-aborted",
-                undeclared
-                    .iter()
-                    .map(|s| s.as_str())
-                    .collect::<Vec<_>>()
-                    .join(", "),
-            ));
+            return Err(refuse("land-conflict-aborted", undeclared.join(", ")));
         }
         let mut files = Vec::new();
         for path in &conflicted {
@@ -1508,19 +1516,77 @@ impl Lander<'_> {
         )?;
         let mut regenerated = Vec::new();
         let mut differs = false;
+
+        let has_globs = regen.files.iter().any(|f| f.contains('*'));
+        if !has_globs {
+            for file in &regen.files {
+                let now = match std::fs::read(candidate.worktree.join(file)) {
+                    Ok(bytes) => Some(bytes),
+                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+                    Err(e) => return Err(refuse("land-regenerate-failed", format!("{file}: {e}"))),
+                };
+                let committed = self.blob_at(&candidate.candidate, file)?;
+                if now != committed {
+                    differs = true;
+                    // Leave the candidate as committed so a later publish sees a clean tree.
+                    let full = candidate.worktree.join(file);
+                    let restored = match &committed {
+                        Some(bytes) => std::fs::write(&full, bytes),
+                        None => std::fs::remove_file(&full).or_else(|e| {
+                            if e.kind() == std::io::ErrorKind::NotFound {
+                                Ok(())
+                            } else {
+                                Err(e)
+                            }
+                        }),
+                    };
+                    restored
+                        .map_err(|e| refuse("land-regenerate-failed", format!("{file}: {e}")))?;
+                }
+                regenerated.push(LandFile {
+                    path: file.clone(),
+                    bytes: now,
+                });
+            }
+            return Ok(differs.then_some(regenerated));
+        }
+
+        let mut files_to_compare = BTreeSet::new();
         for file in &regen.files {
-            let now = match std::fs::read(candidate.worktree.join(file)) {
+            if !file.contains('*') {
+                files_to_compare.insert(file.clone());
+            }
+        }
+        self.candidate_tracked_paths_matching(
+            &candidate.candidate,
+            &self.regen_files,
+            &mut files_to_compare,
+        )?;
+        Self::walk_worktree_matching(
+            &candidate.worktree,
+            &candidate.worktree,
+            &self.regen_files,
+            &mut files_to_compare,
+        )?;
+
+        for file in files_to_compare {
+            let now = match std::fs::read(candidate.worktree.join(&file)) {
                 Ok(bytes) => Some(bytes),
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
                 Err(e) => return Err(refuse("land-regenerate-failed", format!("{file}: {e}"))),
             };
-            let committed = self.blob_at(&candidate.candidate, file)?;
+            let committed = self.blob_at(&candidate.candidate, &file)?;
             if now != committed {
                 differs = true;
                 // Leave the candidate as committed so a later publish sees a clean tree.
-                let full = candidate.worktree.join(file);
+                let full = candidate.worktree.join(&file);
                 let restored = match &committed {
-                    Some(bytes) => std::fs::write(&full, bytes),
+                    Some(bytes) => {
+                        if let Some(parent) = full.parent() {
+                            let _ = std::fs::create_dir_all(parent);
+                        }
+                        std::fs::write(&full, bytes)
+                    }
                     None => std::fs::remove_file(&full).or_else(|e| {
                         if e.kind() == std::io::ErrorKind::NotFound {
                             Ok(())
@@ -1532,11 +1598,144 @@ impl Lander<'_> {
                 restored.map_err(|e| refuse("land-regenerate-failed", format!("{file}: {e}")))?;
             }
             regenerated.push(LandFile {
-                path: file.clone(),
+                path: file,
                 bytes: now,
             });
         }
         Ok(differs.then_some(regenerated))
+    }
+
+    fn candidate_tracked_paths_matching(
+        &self,
+        candidate_commit: &str,
+        scope: &[String],
+        out: &mut BTreeSet<String>,
+    ) -> Result<(), LandRefusal> {
+        let repo = self.ports.repo;
+        let bad = |what: &str| {
+            refuse(
+                "land-object-unreadable",
+                format!("{candidate_commit}: {what}"),
+            )
+        };
+        let Some((_, commit_bytes)) = self.object(&oid_of(repo, candidate_commit)?)? else {
+            return Err(bad("commit missing"));
+        };
+        let tree_hex = commit_bytes
+            .split(|b| *b == b'\n')
+            .next()
+            .and_then(|l| l.strip_prefix(b"tree "))
+            .and_then(|h| std::str::from_utf8(h).ok())
+            .ok_or_else(|| bad("commit has no tree"))?
+            .to_string();
+        let hash_len = match repo.object_format() {
+            fgos_git::ObjectFormat::Sha1 => 20,
+            fgos_git::ObjectFormat::Sha256 => 32,
+        };
+        let root_oid = oid_of(repo, &tree_hex)?;
+        self.walk_tree_matching(&root_oid, "", hash_len, scope, out)
+    }
+
+    fn walk_tree_matching(
+        &self,
+        tree_oid: &Oid,
+        prefix: &str,
+        hash_len: usize,
+        scope: &[String],
+        out: &mut BTreeSet<String>,
+    ) -> Result<(), LandRefusal> {
+        let bad = |what: &str| refuse("land-object-unreadable", what);
+        let Some((_, tree)) = self.object(tree_oid)? else {
+            return Err(bad("tree missing"));
+        };
+        let mut rest = tree.as_slice();
+        while !rest.is_empty() {
+            let space = rest
+                .iter()
+                .position(|b| *b == b' ')
+                .ok_or_else(|| bad("bad tree"))?;
+            let nul = rest
+                .iter()
+                .position(|b| *b == 0)
+                .ok_or_else(|| bad("bad tree"))?;
+            if nul < space || rest.len() < nul + 1 + hash_len {
+                return Err(bad("bad tree"));
+            }
+            let mode = &rest[..space];
+            let name_bytes = &rest[space + 1..nul];
+            let name = std::str::from_utf8(name_bytes).map_err(|_| bad("bad tree name"))?;
+            let id = hex(&rest[nul + 1..nul + 1 + hash_len]);
+            rest = &rest[nul + 1 + hash_len..];
+
+            let full_path = if prefix.is_empty() {
+                name.to_string()
+            } else {
+                format!("{prefix}/{name}")
+            };
+
+            if mode == b"40000" {
+                let sub_oid = oid_of(self.ports.repo, &id)?;
+                self.walk_tree_matching(&sub_oid, &full_path, hash_len, scope, out)?;
+            } else {
+                let matched = fgos_write_scope::matches(full_path.as_bytes(), scope)
+                    .map_err(|e| refuse("land-regenerate-failed", e.to_string()))?;
+                if matched {
+                    out.insert(full_path);
+                }
+            }
+        }
+        Ok(())
+    }
+
+    fn walk_worktree_matching(
+        root: &Path,
+        current: &Path,
+        scope: &[String],
+        out: &mut BTreeSet<String>,
+    ) -> Result<(), LandRefusal> {
+        let entries = match std::fs::read_dir(current) {
+            Ok(entries) => entries,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+            Err(e) => {
+                return Err(refuse(
+                    "land-regenerate-failed",
+                    format!("{}: {e}", current.display()),
+                ))
+            }
+        };
+        for entry in entries {
+            let entry = entry.map_err(|e| {
+                refuse(
+                    "land-regenerate-failed",
+                    format!("{}: {e}", current.display()),
+                )
+            })?;
+            let name = entry.file_name();
+            if name == ".git" {
+                continue;
+            }
+            let path = entry.path();
+            let file_type = entry.file_type().map_err(|e| {
+                refuse("land-regenerate-failed", format!("{}: {e}", path.display()))
+            })?;
+            if file_type.is_dir() {
+                Self::walk_worktree_matching(root, &path, scope, out)?;
+            } else if file_type.is_file() || file_type.is_symlink() {
+                if let Ok(rel) = path.strip_prefix(root) {
+                    let rel_str = rel
+                        .components()
+                        .map(|c| c.as_os_str().to_string_lossy())
+                        .collect::<Vec<_>>()
+                        .join("/");
+                    let matched = fgos_write_scope::matches(rel_str.as_bytes(), scope)
+                        .map_err(|e| refuse("land-regenerate-failed", e.to_string()))?;
+                    if matched {
+                        out.insert(rel_str);
+                    }
+                }
+            }
+        }
+        Ok(())
     }
 
     /// Push the session's candidate to the remote target branch from inside the live session;
