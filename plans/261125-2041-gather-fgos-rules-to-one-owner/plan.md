@@ -136,6 +136,19 @@ Criterion 5 (phase 2), the full gate on main at `a7ec1ef7d`, run with debuginfo 
   - two `fgos-run-supervisor` head-request tests that depend on the machine.
 - The changelog line is under `## [Unreleased]`.
 
+Baseline evidence (2026-11-27 06:00, fg-server): each failing file was rerun on `f68937f41`, the main of the start
+of this work, before either plan's later lands. Every failure is already there:
+- `terminal-cutover` 8 failures and `terminal-crash-matrix` 1 (herdr pane timeouts);
+- `fgctl-upgrade` 19 and `fgctl-init-download-sources` 4 (main now: 9 and 2);
+- `provider-per-cli-credential-sources` 2;
+- `guide-schema` 2;
+- the same two `fgos-run-supervisor` head-request tests.
+
+`case-close` passes on main when run alone (three runs out of three), so its failure in the full suite is a timing
+race under load. No failure is introduced by these plans. The suites are therefore green except for failures that
+predate the plans and lie outside their footprints. Each phase's own rule was to fix nothing outside its footprint,
+so they are left to their owners.
+
 ### Waits on other plans
 
 | phase | waits for | shared files or data |
