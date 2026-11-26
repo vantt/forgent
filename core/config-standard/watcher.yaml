@@ -14,7 +14,7 @@ watcher:
   reviewIntervalSec: 86400
   # @fgos:doc How many tick intervals may pass without a tick before the watcher counts as overdue. In ticks. Minimum: 1. Maximum: 100. Default: 3.
   overdueFactor: 3
-  # @fgos:doc Scheduling record sources read by the keeper. A failed source is reported and skipped.
+  # @fgos:doc Scheduling record sources read by the keeper. A failed source is reported and skipped. Default: ["plans","workflow-cases"].
   schedulingSources: [plans, workflow-cases]
   # @fgos:doc Files or directories of detection definitions, release- or repo-relative, each passed as one definition path; a project may add its own.
   definitions:
