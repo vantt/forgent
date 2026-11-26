@@ -1,0 +1,6 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc What a session opened by hand receives at its start from the start-context composer.
+startContext:
+  # @fgos:doc The persona a session opened by hand is composed as, so rules scoped to that persona reach it. Default: secretary.
+  entryPersona: secretary

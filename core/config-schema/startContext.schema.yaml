@@ -1,0 +1,11 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:startContext:v1
+$comment: "owner: agent-start-context"
+description: "What a session opened by hand receives at its start from the start-context composer."
+type: object
+properties:
+  entryPersona:
+    description: The persona a session opened by hand is composed as, so rules scoped to that persona reach it.
+    type: string
+    pattern: "^[a-z][a-z0-9-]{0,63}$"
+    x-fgos-scope: both

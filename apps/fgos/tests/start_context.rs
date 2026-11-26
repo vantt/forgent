@@ -152,7 +152,11 @@ fn the_door_gives_a_rotation_successor_its_lineage_handoff_through_the_registere
     .unwrap();
     let lineage = root.join(".fgos/runtime/session-rotation/lead-alpha");
     fs::create_dir_all(&lineage).unwrap();
-    fs::write(lineage.join("261127-0500-abcd1234.md"), "# Handoff\nwhere it stood\n").unwrap();
+    fs::write(
+        lineage.join("261127-0500-abcd1234.md"),
+        "# Handoff\nwhere it stood\n",
+    )
+    .unwrap();
     fs::write(
         lineage.join("latest.json"),
         "{\"file\":\"261127-0500-abcd1234.md\",\"session\":\"s\",\"rotate\":\"soft\",\"writtenAt\":\"2026-11-27T00:00:00.000Z\"}\n",
