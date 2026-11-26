@@ -3,8 +3,9 @@ contract: plan-v1
 title: "The backlog index is generated from the row files and never committed: a row lands as one file, the land door renders plans/backlog.md locally, and the head write grant on the index is retired"
 status: draft
 priority: P1
-blockedBy: []
-base: 161b3a3af465e55433fcaef996750eddb2ceddf4
+blockedBy:
+  - 261126-2324-changelog-fragments-and-skill-surface-regeneration
+base: 5466f387d67f8dbc7c95c15a441814a6d42e15e3
 footprint:
   - plans/261125-1556-backlog-index-generated/**
   - apps/fgos/src/wiring/portfolio.rs
@@ -13,7 +14,7 @@ footprint:
   - apps/fgos/src/wiring/migrate.rs
   - apps/fgos/src/wiring/backlog_index.rs
   - apps/fgos/src/wiring/mod.rs
-  - apps/fgos/src/routing.rs
+  - apps/fgos/src/main.rs
   - apps/fgos/src/cli_projector.rs
   - apps/fgos/tests/portfolio_check.rs
   - apps/fgos/tests/session_write_publish.rs
@@ -21,6 +22,7 @@ footprint:
   - apps/fgos/tests/backlog_index.rs
   - packages/supervision/rust/src/land.rs
   - packages/supervision/rust/tests/land.rs
+  - packages/host-runtime/contracts/command-route-annotations.json
   - packages/host-runtime/contracts/command-routes.json
   - packages/host-runtime/contracts/command-manifest.json
   - packages/portfolio/index-generator.mjs
@@ -45,7 +47,7 @@ footprint:
   - docs/platform/session-host/spec.md
   - docs/platform/agent-confinement/spec.md
   - docs/decisions/index.md
-  - CHANGELOG.md
+  - changelog.d/*-backlog-index-generated.md
 source:
   - plans/discussions/ds-6z4rfn6kv5-backlog-index-generated/DISCUSSION.md
   - p-o4iniqvitl
@@ -55,8 +57,27 @@ created: 2026-11-25
 # The backlog index is generated, never committed
 
 Mode: standard. Source: the settled discussion `plans/discussions/ds-6z4rfn6kv5-backlog-index-generated/DISCUSSION.md`
-and its row `p-o4iniqvitl` (owner choice A, 2026-11-25, confirmed to the secretary). First of the five ordered plans:
-it lowers writes to main for the others.
+and its row `p-o4iniqvitl` (owner choice A, 2026-11-25, confirmed to the secretary). Owner order (2026-11-26):
+fourth, after footprint-overlap-warns, changelog-fragments and shaper-worktree.
+
+**Refreshed 2026-11-26 against main `5466f387d`** (504 commits after the first base `161b3a3af`). Every symbol, test
+name and path below was re-checked on that tree. What changed: the new verb is wired like the native verb
+`resource-check` (descriptor in `main.rs`, request projection in `cli_projector.rs`, selector in
+`command-route-annotations.json`); `decision-index` is a Node verb and only its output shape is copied. The changelog
+entry is a fragment under `changelog.d/` (plan `261126-2324`, which also edits the land door, so this plan waits on
+it in `blockedBy`). `CHANGELOG.md` and `routing.rs` left the footprint.
+
+**Ready waits on the overlap rule, not on a question.** On today's main the contract check refuses `ready` for this
+plan on overlaps with two running plans: `261122-0056-orchestration-skeleton` (Keeper: `supervision.rs`, the
+supervisor skill, the supervision and session-host specs, `head-permissions.v1.json`, `permissions.rs`, the generated
+skill surfaces) and `261125-2041-gather-fgos-rules-to-one-owner` (`core/skills/**`, `.agents/skills/**`). Neither
+footprint can shrink here, and waiting in `blockedBy` on two long plans would hold this one for days. The owner
+already chose (answer B to `q-kyzictpkf6`) that overlap becomes a warning: Keeper phase 19 changes the check. So this
+plan stays `draft` until Keeper phase 19 is on main, and a planner then sets the plan and its phases `ready` with the
+overlaps reported as warnings, exactly as plan `261126-2318` does. `shaper-worktree` (`261125-1557`, ahead in the
+owner order) shares the grant contract rows, `permissions.rs`, `main.rs`, `mod.rs`, the command manifest and
+`head-start.test.mjs`; under that rule both run and the second to land merges at the land door, so it is not in
+`blockedBy`.
 
 ## Prior art (what exists, what is missing)
 
@@ -156,7 +177,7 @@ touches `plans/`, and `fgos backlog-index` renders it on demand.
 | Render the backlog index into the main checkout from the working tree (`render_backlog_index` in portfolio.rs) | `supervision` (owns "portfolio status and plan lane pool") | survivor: `generate_backlog_index` (apps/fgos/src/wiring/portfolio.rs); retired: `generate_backlog_index_for_commit`, `CommitIndexError`, `check_index` drift, `packages/portfolio/index-generator.mjs` |
 | The land door renders the index after a land instead of committing it (`BacklogPort.index` reshaped) | `supervision` | survivor: `BacklogPort` in packages/supervision/rust/src/land.rs; retired: the index write in `close_cited_items` and code `land-backlog-index-failed` |
 | Row write publishes one file (`refresh_backlog_index` becomes item validation only) | `session-host` | survivor: the item checks in apps/fgos/src/wiring/session_write_publish.rs; retired: its index generation and write |
-| Verb `fgos backlog-index` | declare: door render-the-backlog-index | No model row owns an on-demand render of the portfolio index; it is the one entry for a render when nothing landed, beside `fgos decision-index`. Phase 3 writes `packages/component-authority/model/doors/render-the-backlog-index.yaml` with `fgos authority declare --kind door` |
+| Verb `fgos backlog-index` | declare: door render-the-backlog-index | No model row owns an on-demand render of the portfolio index (`fgos authority locate` returns only the backlog-item schema contract on 2026-11-26); it is the one entry for a render when nothing landed, beside `fgos decision-index`. Phase 3 writes `packages/component-authority/model/doors/render-the-backlog-index.yaml` with `fgos authority declare --kind door` |
 | Secretary and supervisor grants without `plans/backlog.md` | `session-host` | survivor: head-permissions.v1.json grant rows; retired: the `plans/backlog.md` write entry from row p-dw3h5wscns |
 | Decision amending D-ADR0082 points 1 and 5 (index generated, not committed) | `supervision` (holder of portfolio decisions: D-ADR0082 lives in docs/platform/runner/decisions/h-36d872fbb0e5.md) | id from `fgos identity mint d-adr` in phase 4 |
 
@@ -166,13 +187,13 @@ touches `plans/`, and `fgos backlog-index` renders it on demand.
 |---|---|---|---|---|---|
 | 1 | [Stop committing the index](phase-01-stop-committing-the-index.md) | - | apps/fgos/src/wiring/portfolio.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/src/wiring/session_write_publish.rs, apps/fgos/src/wiring/migrate.rs, apps/fgos/tests/portfolio_check.rs, apps/fgos/tests/session_write_publish.rs, packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs | 1 | draft |
 | 2 | [Retire the hand-edit path and the Node twin](phase-02-retire-hand-edit-path.md) | - | src/session-host/head-grants.mjs, packages/session-host/contracts/head-permissions.v1.json, packages/session-host/rust/tests/permissions.rs, test/session-host/head-grants.test.mjs, test/session-host/head-start.test.mjs, packages/portfolio/index-generator.mjs, packages/portfolio/portfolio-check.mjs, test/portfolio/portfolio-check.test.mjs, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/fgos-secretary/**, .agents/skills/fgos-supervisor/**, plugins/fgOS/skills/fgos-secretary/**, plugins/fgOS/skills/fgos-supervisor/** | 1 | draft |
-| 3 | [The backlog-index verb and the migrate ignore entry](phase-03-backlog-index-verb.md) | 1 | apps/fgos/src/wiring/backlog_index.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/routing.rs, apps/fgos/src/cli_projector.rs, apps/fgos/src/wiring/migrate.rs, apps/fgos/tests/backlog_index.rs, apps/fgos/tests/migrate_portfolio.rs, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-manifest.json, packages/component-authority/model/doors/render-the-backlog-index.yaml | 2 | draft |
-| 4 | [Untrack the index, record the decision, integrate](phase-04-untrack-record-integrate.md) | 1, 2, 3 | plans/.gitignore, plans/backlog.md, docs/platform/runner/decisions/h-36d872fbb0e5.md, docs/platform/supervision/spec.md, docs/platform/session-host/spec.md, docs/platform/agent-confinement/spec.md, docs/decisions/index.md, CHANGELOG.md | 3 | draft |
+| 3 | [The backlog-index verb and the migrate ignore entry](phase-03-backlog-index-verb.md) | 1 | apps/fgos/src/wiring/backlog_index.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/main.rs, apps/fgos/src/cli_projector.rs, apps/fgos/src/wiring/migrate.rs, apps/fgos/tests/backlog_index.rs, apps/fgos/tests/migrate_portfolio.rs, packages/host-runtime/contracts/command-route-annotations.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-manifest.json, packages/component-authority/model/doors/render-the-backlog-index.yaml | 2 | draft |
+| 4 | [Untrack the index, record the decision, integrate](phase-04-untrack-record-integrate.md) | 1, 2, 3 | plans/.gitignore, plans/backlog.md, docs/platform/runner/decisions/h-36d872fbb0e5.md, docs/platform/supervision/spec.md, docs/platform/session-host/spec.md, docs/platform/agent-confinement/spec.md, docs/decisions/index.md, changelog.d/*-backlog-index-generated.md | 3 | draft |
 
 Hot files: `command-routes.json` and `command-manifest.json` are regenerated by `land.regenerate`
 (`node scripts/export-command-selectors.mjs`), only in phase 3. The generated skill surfaces are rebuilt by
 `npm run build:skills`, only in phase 2. `docs/decisions/index.md` is regenerated by `fgos decision-index`, only in
-phase 4. `CHANGELOG.md` is written only in phase 4.
+phase 4. The changelog fragment is written only in phase 4.
 
 Checked with `node scripts/plan-contract-check.mjs --plan plans/261125-1556-backlog-index-generated` and
 `fgos resource-check --plan plans/261125-1556-backlog-index-generated`: phases 1 and 2 share no path; phase 3 waits on
@@ -182,7 +203,7 @@ drops a field, phase 3 adds the ignore entry) is serialised by that dependency; 
 ## Owner questions
 
 None. The owner chose option A and confirmed the plan on 2026-11-25; the evidence settles the rest (Decisions taken
-here).
+here). The `ready` flip waits on Keeper phase 19 (see the refresh note at the top), which the owner already decided.
 
 ## Risks and rollback
 

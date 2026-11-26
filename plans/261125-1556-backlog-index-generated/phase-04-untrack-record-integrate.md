@@ -19,14 +19,14 @@ the code now does, and the full gate runs on the combined tree.
 - `docs/platform/session-host/spec.md` (the sentence about the secretary's granted file `plans/backlog.md`).
 - `docs/platform/agent-confinement/spec.md` line about the supervisor's write directories (`plans` and
   `plans/backlog.md`).
-- `CHANGELOG.md` `## [Unreleased]`.
+- `changelog.d/README.md` (the fragment scheme from plan `261126-2324`, in `blockedBy`).
 
 ## Files it may write (footprint)
 
 `plans/.gitignore` (new), `plans/backlog.md` (removed from the Git index only),
 `docs/platform/runner/decisions/h-36d872fbb0e5.md`, `docs/platform/supervision/spec.md`,
 `docs/platform/session-host/spec.md`, `docs/platform/agent-confinement/spec.md`, `docs/decisions/index.md`
-(regenerated), `CHANGELOG.md`.
+(regenerated), one fragment `changelog.d/<yymmdd-hhmm>-backlog-index-generated.md`.
 
 ## Steps
 
@@ -41,7 +41,7 @@ the code now does, and the full gate runs on the combined tree.
 4. Specs: supervision spec section 5 gains one sentence on the render after a land (`backlogIndexNote`, never a
    refusal) and section 8 one line pointing at the new decision; session-host and agent-confinement specs drop
    `plans/backlog.md` from the secretary and supervisor grants.
-5. `CHANGELOG.md` `## [Unreleased]`: `plans/backlog.md` is no longer committed; it is rendered by `fgos land` and
+5. Changelog fragment `changelog.d/<yymmdd-hhmm>-backlog-index-generated.md` (never `CHANGELOG.md`), one `- Changed:` bullet: `plans/backlog.md` is no longer committed; it is rendered by `fgos land` and
    `fgos backlog-index`; projects that track it untrack it with `git rm --cached plans/backlog.md`; heads can no longer
    write it.
 6. Full gate on the combined tree.

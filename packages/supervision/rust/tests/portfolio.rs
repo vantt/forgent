@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use fgos_supervision::portfolio::{
     admissible, admitted_text, collisions, footprint_problem, head_name, name_tag, order,
-    read_plan, supervisor_name, Plan,
+    read_plan, running_overlaps, supervisor_name, Plan,
 };
 
 fn plan(
@@ -76,7 +76,7 @@ fn a_plan_blocked_by_a_plan_that_is_not_done_is_not_admissible() {
 }
 
 #[test]
-fn a_plan_whose_footprint_overlaps_a_running_plan_is_not_admissible() {
+fn a_plan_whose_footprint_overlaps_a_running_plan_is_admissible_and_its_row_lists_the_overlap() {
     let plans = vec![
         plan("run", "running", "P1", "2026-11-01", &[], &["src/a/**"]),
         plan(
@@ -93,7 +93,33 @@ fn a_plan_whose_footprint_overlaps_a_running_plan_is_not_admissible() {
         .iter()
         .map(|p| p.dir.as_str())
         .collect();
-    assert_eq!(dirs, ["free"]);
+    assert_eq!(dirs, ["hit", "free"]);
+
+    use fgos_supervision::{supervisor, wake::Holder};
+    struct NoQuestions;
+    impl supervisor::OpenQuestions for NoQuestions {
+        fn has_open(&self, _: &str) -> bool {
+            false
+        }
+    }
+    let view = supervisor::plans(
+        &plans,
+        &[],
+        "project",
+        "p1",
+        &|_| Holder::NotLive,
+        2,
+        &NoQuestions,
+    );
+    let json = view.to_json();
+    assert_eq!(json["plans"][1]["admissible"], true);
+    assert_eq!(
+        json["plans"][1]["overlaps"],
+        serde_json::json!([{"plan": "run", "paths": ["src/a/inner.mjs"]}])
+    );
+    for i in [0, 2] {
+        assert!(json["plans"][i].get("overlaps").is_none());
+    }
 }
 
 #[test]
@@ -213,7 +239,7 @@ fn verdict(a: &[&str], b: &[&str]) -> Verdict {
         return Verdict::Refused;
     }
     let plans = vec![theirs, mine];
-    if admissible(&plans, &[]).is_empty() {
+    if !running_overlaps(&plans[1], &plans).is_empty() {
         Verdict::Overlap
     } else {
         Verdict::Disjoint
@@ -276,6 +302,7 @@ fn a_plan_with_a_malformed_footprint_entry_is_not_admissible_and_names_its_reaso
         Some("footprint-entry-invalid")
     );
     assert_eq!(footprint_problem(&plans[1]), None);
+    assert!(running_overlaps(&plans[0], &plans).is_empty());
     let dirs: Vec<&str> = admissible(&plans, &[])
         .iter()
         .map(|p| p.dir.as_str())
@@ -290,6 +317,7 @@ fn a_plan_with_an_empty_footprint_is_not_admissible_and_names_its_reason() {
         plan("free", "ready", "P1", "2026-11-02", &[], &["src/b/"]),
     ];
     assert_eq!(footprint_problem(&plans[0]), Some("footprint-empty"));
+    assert!(running_overlaps(&plans[0], &plans).is_empty());
     let dirs: Vec<&str> = admissible(&plans, &[])
         .iter()
         .map(|p| p.dir.as_str())
@@ -298,12 +326,22 @@ fn a_plan_with_an_empty_footprint_is_not_admissible_and_names_its_reason() {
 }
 
 #[test]
-fn a_running_plan_with_a_malformed_footprint_holds_back_no_other_plan() {
-    let plans = vec![
-        plan("run", "running", "P1", "2026-11-01", &[], &["/abs"]),
-        plan("free", "ready", "P1", "2026-11-02", &[], &["src/b/"]),
+fn only_comparable_running_plans_contribute_overlap_advice() {
+    // The JSON wiring test covers one pair; this owns status filtering and incomparable peers.
+    let mut plans = vec![
+        plan("peer", "running", "P1", "2026-11-01", &[], &["src/**"]),
+        plan("mine", "ready", "P1", "2026-11-02", &[], &["src/b/"]),
     ];
-    assert_eq!(admissible(&plans, &[]).len(), 1);
+    for status in ["ready", "draft", "done", "withdrawn"] {
+        plans[0].status = status.into();
+        assert!(running_overlaps(&plans[1], &plans).is_empty(), "{status}");
+    }
+    plans[0].status = "running".into();
+    for footprint in [vec![], vec!["src/**".into(), "/abs".into()]] {
+        plans[0].footprint = footprint;
+        assert_eq!(admissible(&plans, &[]).len(), 1);
+        assert!(running_overlaps(&plans[1], &plans).is_empty());
+    }
 }
 
 // ---- the honest phase-table reader ---------------------------------------------------------------

@@ -3,7 +3,8 @@ contract: plan-v1
 title: "The watcher counts the commits main takes by kind and raises an event when notes outrun code"
 status: draft
 priority: P1
-blockedBy: []
+blockedBy:
+  - 261126-2318-plan-footprint-overlap-warns
 footprint:
   - packages/observe/rust/src/query/model.rs
   - packages/observe/rust/src/query/exec.rs
@@ -23,7 +24,7 @@ footprint:
   - docs/platform/supervision/spec.md
   - CHANGELOG.md
   - plans/261125-1558-watcher-counts-main-commits-by-kind/
-base: ebd19c364eb46cedcbb3837d44bd9a905d6250c0
+base: d7dcc2ed220a7ede21548b71cc4df4d49e472d12
 source:
   - plans/discussions/ds-asrjk5u7hv-watcher-counts-main-commits-by-kind/DISCUSSION.md
   - p-huydgzc2wv
@@ -74,9 +75,9 @@ improvement the row puts out of scope.
 - Reducing the number of note commits (p-rjzck3f7mg) or gating lands on it (p-427ymxp33q).
 - A new store, cache or event kind registry. The event takes the watcher's default action
   (`wake-supervisor`), and no `watcher.actions` entry is added.
-- Waiting for, or touching, the keeper plan `261122-0056-orchestration-skeleton`. Its footprint
-  (`packages/supervision/rust/src/*.rs`) is disjoint from this plan's, and its future keeper can
-  read this event as one "needs judgement" source.
+- Changing anything the keeper plan `261122-0056-orchestration-skeleton` builds. Its footprint is
+  no longer disjoint from this plan's (see "Why `draft`" under Phases), but this plan edits only
+  the lines named in its phases; the keeper can read this event as one "needs judgement" source.
 - A sliding 60-minute window. The count is per UTC clock hour (see Decisions).
 
 ## Decisions taken in this plan
@@ -155,6 +156,19 @@ plans, only the program board, git component, yaml slice C, harden gate door, do
 rust verb migration, the 2108 deletion and the heads-operate plans list `CHANGELOG.md`. This plan
 adds one line under `## [Unreleased]`. `node scripts/plan-contract-check.mjs` judges that
 overlap.
+
+Why `draft`: on 2026-11-26 `base` was reset to main and every fact above re-checked there (the
+files and doors still exist; `rows_of`/`rows_from` moved to about lines 1405-1460 of
+`supervision.rs`). The contract check refuses `ready` for footprint overlap with two running
+plans: `261122-0056-orchestration-skeleton` holds `apps/fgos/src/wiring/supervision.rs`,
+`core/config-standard/watcher.yaml`, `core/config-schema/watcher.schema.yaml`,
+`packages/supervision/rust/tests/definitions.rs` and `docs/platform/supervision/spec.md`, and
+`261125-2041-gather-fgos-rules-to-one-owner` holds `CHANGELOG.md`. The plan waits on
+`261126-2318-plan-footprint-overlap-warns`, which turns that overlap into a warning. When 2318 is
+`done` (or both running plans are), rerun `node scripts/plan-contract-check.mjs --plan
+plans/261125-1558-watcher-counts-main-commits-by-kind` and land `plan.md` with `status: ready`;
+no new decision is needed. If `changelog.d/` (plan `261126-2324`) is on main by then, phase 4's
+changelog line becomes a `changelog.d` fragment and `CHANGELOG.md` leaves the footprint.
 
 Execution: phases 1 to 3 run as parallel cases, each in its own worktree. Phase 4 continues
 on their merged tree. Each phase uses capability `code:implement`; phase 5 uses `code:test`.

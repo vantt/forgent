@@ -22,6 +22,8 @@ footprint:
   - packages/supervision/rust/src/lib.rs
   - packages/supervision/rust/tests/wake.rs
   - packages/supervision/rust/tests/portfolio.rs
+  - scripts/plan-contract-check.mjs
+  - test/scripts/plan-contract-check.test.mjs
   - packages/supervision/rust/tests/watcher.rs
   - packages/supervision/rust/tests/definitions.rs
   - packages/supervision/rust/tests/keeper.rs
@@ -74,6 +76,7 @@ footprint:
   - apps/fgos/src/wiring/questions.rs
   - packages/component-authority/model/components.yaml
   - packages/session-host/contracts/head-permissions.v1.json
+  - packages/session-host/rust/tests/permissions.rs
 base: 36048955f30fec419bef85fd731db89823a7f732
 lead: head:lead-forgent-261122-0056-orches-18a8f
 source:
@@ -213,11 +216,13 @@ for phase 18's declarations.
 | 1 | [Admission in code](phase-01-admission-in-code.md) | - | packages/supervision/rust/src/wake.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/tests/wake.rs, packages/supervision/rust/tests/portfolio.rs, apps/fgos/src/wiring/supervision.rs, core/skills/fgos-supervisor/SKILL.md, apps/fgos/tests/supervision_verbs.rs | 1 | done |
 | 3 | [Question recipients, notifier port, verified answers](phase-03-question-recipients.md) | - | packages/questions/contracts/questions-input.v1.json, packages/questions/contracts/question-event-payloads.v1.json, packages/questions/contracts/refusals.v1.json, packages/questions/rust/src/shape.rs, packages/questions/rust/src/record.rs, packages/questions/rust/src/usecase.rs, packages/questions/rust/src/notifier.rs, packages/questions/rust/src/lib.rs, packages/questions/rust/tests/store_usecases.rs, packages/questions/rust/tests/recipients.rs, packages/questions/contracts/question-event-streams.v1.json, packages/questions/rust/src/store.rs, apps/fgos/src/wiring/questions.rs | 1 | done |
 | 10 | [Resource claim space in the referee](phase-10-resource-claims.md) | - | packages/resource-referee/contracts/resource-referee.v1.json, packages/resource-referee/rust/src/catalog.rs, packages/resource-referee/rust/src/facts.rs, packages/resource-referee/rust/tests/referee.rs, apps/fgos/src/wiring/resource_check.rs | 1 | done |
-| 16 | [Sleep record in the head record; view of live and sleeping agents](phase-16-sleep-record-and-agents-view.md) | - | src/session-host/head-stop.mjs, src/session-host/head-list.mjs, src/session-host/head-request.mjs, src/session-rotation/handoff-store.mjs, src/session-rotation/rotate.mjs, src/cli/command-registry.mjs, bin/fgos.mjs, test/session-host/head-stop.test.mjs, test/session-host/head-list.test.mjs, test/session-rotation/handoff-store.test.mjs, packages/component-authority/model/components.yaml, packages/session-host/contracts/head-permissions.v1.json | 1 | ready |
+| 16 | [Sleep record in the head record; view of live and sleeping agents](phase-16-sleep-record-and-agents-view.md) | - | src/session-host/head-stop.mjs, src/session-host/head-list.mjs, src/session-host/head-request.mjs, src/session-rotation/handoff-store.mjs, src/session-rotation/rotate.mjs, src/cli/command-registry.mjs, bin/fgos.mjs, test/session-host/head-stop.test.mjs, test/session-host/head-list.test.mjs, test/session-rotation/handoff-store.test.mjs, packages/component-authority/model/components.yaml, packages/session-host/contracts/head-permissions.v1.json, packages/host-runtime/contracts/command-manifest.json, packages/session-host/rust/tests/permissions.rs | 1 | done |
 | 4 | [Scheduling record contract and keeper core](phase-04-keeper-core.md) | 1 | packages/supervision/contracts/scheduling-record.v1.json, packages/supervision/contracts/event-streams.v1.json, packages/supervision/rust/src/keeper.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/keeper.rs | 2 | done |
-| 5 | [Record sources and need resolution](phase-05-sources-and-needs.md) | 4, 10, 16 | packages/supervision/rust/src/sources.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/sources.rs, apps/fgos/src/wiring/supervision.rs, src/workflow/records.mjs, src/workflow/case-verbs.mjs, test/workflow/records.test.mjs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml | 3 | ready |
+| 5 | [Record sources and need resolution](phase-05-sources-and-needs.md) | 4, 10, 16 | packages/supervision/rust/src/sources.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/sources.rs, apps/fgos/src/wiring/supervision.rs, src/workflow/records.mjs, src/workflow/case-verbs.mjs, test/workflow/records.test.mjs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, bin/fgos.mjs, src/cli/command-registry.mjs | 3 | done |
 | 9 | [Periodic review](phase-09-periodic-review.md) | 1, 4, 5 | core/watcher/definitions/review-due.query.json, core/watcher/briefs/periodic-review.md, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, packages/supervision/rust/src/watcher.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/definitions.rs, apps/fgos/src/wiring/supervision.rs | 4 | ready |
-| 18 | [Integration](phase-18-integration.md) | 1, 3, 4, 5, 9, 10, 16 | docs/platform/supervision/spec.md, docs/platform/questions/spec.md, docs/platform/workflow/spec.md, docs/platform/resource-referee/spec.md, docs/platform/session-host/spec.md, .agents/skills/, plugins/fgOS/skills/, .claude/skills/, plans/261122-0056-orchestration-skeleton/ | 5 | ready |
+| 19 | [Contract check warns on cross-plan overlap](../261126-2318-plan-footprint-overlap-warns/phase-01-contract-check-warns.md) | 5 | scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs | 4 | ready |
+| 20 | [Admission advises overlap instead of holding](../261126-2318-plan-footprint-overlap-warns/phase-02-admission-advises-overlap.md) | 5 | packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/portfolio.rs, packages/supervision/rust/tests/wake.rs | 4 | ready |
+| 18 | [Integration](phase-18-integration.md) | 1, 3, 4, 5, 9, 10, 16, 19, 20 | docs/platform/supervision/spec.md, docs/platform/questions/spec.md, docs/platform/workflow/spec.md, docs/platform/resource-referee/spec.md, docs/platform/session-host/spec.md, .agents/skills/, plugins/fgOS/skills/, .claude/skills/, plans/261122-0056-orchestration-skeleton/ | 5 | ready |
 
 Phase ids are the original ids (the discussion's task order T1, T7.1 to T7.7). Waves, not ids, give the run order.
 Phase 18 is new with the split, because each plan needs its own integration phase.
@@ -232,7 +237,13 @@ only in phase 18.
 Every `blockedBy` entry but `261124-2143-head-lifecycle-events` is done. The plan stays `draft` until 2143 is done,
 then turns `ready` after the contract check passes at a fresh `base`.
 
-Owner order 2026-11-26: `CHANGELOG.md` and `packages/host-runtime/contracts/command-manifest.json` left this plan's footprint so it can run while plan 261125-1631 (other machine) holds them. Phase 16's manifest regeneration and phase 18's `CHANGELOG.md` lines are done once those paths are free: a footprint change then, through the supervisor, never widened by the lead alone.
+Owner order 2026-11-26: `CHANGELOG.md` and `packages/host-runtime/contracts/command-manifest.json` left this plan's footprint so it could run while plan 261125-1631 (other machine) held them. Plan 261125-1631 is done, so both paths are free. Owner order 2026-11-26 22:2x: they return to the footprint, `command-manifest.json` in phase 16 (manifest regeneration) and `CHANGELOG.md` in phase 18 (the `[Unreleased]` lines). The owner decided this without a question.
+
+Lead decision 2026-11-26 22:50: phase 5 also writes `bin/fgos.mjs`, `src/cli/command-registry.mjs` and `command-manifest.json` to register and route `fgos workflow records --json` (step 3). All three are already in the plan footprint and phase 16, their other writer, is done, so no phase in the same or a later wave overlaps.
+
+Owner order 2026-11-26 23:5x: `CHANGELOG.md` and `packages/host-runtime/contracts/command-manifest.json` leave this plan's footprint again, because the next plans in the owner's order (shaper-worktree, backlog-index-generated, session-type-submits-enter, and the CHANGELOG writers after them) cannot be admitted while this plan holds them. Phase 5 therefore does not edit `command-manifest.json`: it registers `fgos workflow records` only in `bin/fgos.mjs` and `src/cli/command-registry.mjs`, and the manifest regeneration is left to the next plan that holds the manifest (named in phase 5's report). Phase 18 writes its `[Unreleased]` lines as a `changelog.d/` fragment once plan 261126-2324 has landed that door, or hands them to the supervisor for a post-done land, never into `CHANGELOG.md` directly.
+
+Owner order 2026-11-26 23:40 (answer B to q-kyzictpkf6): phases 19 and 20 are phases 1 and 2 of plan `261126-2318-plan-footprint-overlap-warns`, run by this lead after phase 5 (which also writes `portfolio.rs`). They change the contract check and admission together, so they run on one branch and land as one change. Phase 9 shares no file with them and runs in the same wave.
 
 ## Owner questions
 
@@ -264,4 +275,4 @@ None is open. Recorded answers and orders:
   reverts by reverting its phase commits in reverse wave order. No data migration is involved: records are
   projections, recomputed on every tick.
 
-Footprint widened on the owner answers of 2026-11-26 (inside the approved frame; footprint is coordination): phase 1 by `supervision_verbs.rs` (q-hx2zjzqsxz), phase 3 by the question event-stream contract, `store.rs` and `wiring/questions.rs` (q-lg7eqpld4j), phase 16 by `components.yaml` and `head-permissions.v1.json` (q-ho4xscbkjp).
+Footprint widened on the owner answers of 2026-11-26 (inside the approved frame; footprint is coordination): phase 1 by `supervision_verbs.rs` (q-hx2zjzqsxz), phase 3 by the question event-stream contract, `store.rs` and `wiring/questions.rs` (q-lg7eqpld4j), phase 16 by `components.yaml` and `head-permissions.v1.json` (q-ho4xscbkjp). Phase 16 widened again by `packages/session-host/rust/tests/permissions.rs`, the Rust test that pins the read-only verbs (q-cweu3uo4bw, answered by the owner in the lead's chat on 2026-11-26 22:20: "add permissions.rs to the footprint").

@@ -8,6 +8,7 @@ pub mod land;
 pub mod notify;
 pub mod portfolio;
 pub mod queue;
+pub mod sources;
 pub mod supervisor;
 pub mod wake;
 pub mod watcher;

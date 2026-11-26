@@ -2708,8 +2708,8 @@ export const COMMAND_REGISTRY = [
   },
   withSubcommands({
     name: 'session',
-    invoke: 'fgos session <start|rotate|stop|write|read|type>',
-    description: 'Agent head sessions: "read" shows the last lines of a session\'s screen and "type" types into a stuck session\'s pane (both served natively by the Rust host); "start" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; "rotate" asks for its replacement by a successor that reads a redacted handoff; "stop" ends a head on purpose; "write" replaces a file of a confined head\'s grant (the secretary\'s backlog items) through its supervisor. From inside a confined head all six go through its request socket.',
+    invoke: 'fgos session <start|rotate|stop|list|write|read|type>',
+    description: 'Agent head sessions: "read" shows the last lines of a session\'s screen and "type" types into a stuck session\'s pane (both served natively by the Rust host); "start" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; "rotate" asks for its replacement by a successor that reads a redacted handoff; "stop" ends a head on purpose; "write" replaces a file of a confined head\'s grant (the secretary\'s backlog items) through its supervisor. "list" reads live, sleeping and retired heads without writing. From inside a confined head these verbs go through its request socket.',
     subcommands: {
       start: {
         description: 'Start head:<persona>-<name> as a confined supervised session, or front the live holder of that role.',
@@ -2746,12 +2746,20 @@ export const COMMAND_REGISTRY = [
             persona: { type: 'string', description: 'Positional: the agent persona of the head.' },
             name: { type: 'string', description: 'The name of the head.' },
             role: { type: 'string', description: 'A lead\'s short role (lead:<LANE>) to stop instead of a persona and --name; the lead is ended through its own run supervisor.' },
-            reason: { type: 'string', description: 'Why it is stopped (at most 200 characters), kept on the lineage.' },
+            reason: { type: 'string', description: 'Why it is stopped (at most 200 characters), kept on the lineage. sleep requires --wake-at and writes a handoff before stopping.' },
+            'wake-at': { type: 'string', description: 'RFC 3339 wake time, required with --reason sleep and refused otherwise.' },
+            plan: { type: 'string', description: 'Optional project-relative plans directory named in the sleep record and handoff.' },
+            phase: { type: 'string', description: 'Optional two-digit phase (NN) named in the sleep record and handoff.' },
           },
           positional: ['persona'],
           required: [],
         },
         examples: ['fgos session stop shaper --name <slug> --reason "answer received"', 'fgos session stop --role lead:<LANE> --reason "plan done"'],
+      },
+      list: {
+        description: 'Read-only: join Identity live holders with Session Host placements; a live holder wins over sleeping or retired state.',
+        parameters: { type: 'object', properties: {}, positional: [], required: [] },
+        examples: ['fgos session list --json'],
       },
       write: {
         description: 'From inside a confined head: replace a granted file with the content on stdin. The head\'s supervisor checks the path (project-relative, named exactly by the grant, a regular file with no symbolic link on the way) and writes it atomically outside the sandbox, where the file is read-only. Refused write-base-stale, writing nothing, when the file differs from the copy named by --base after the supervisor\'s catch-up (re-read it and redo the edit). The protection against newer rows holds when --base is the blob id of the copy that was edited; without --base only a move during the catch-up is caught. Answers {path, bytes}.',
@@ -3118,9 +3126,14 @@ export const COMMAND_REGISTRY = [
   },
   withSubcommands({
     name: 'workflow',
-    invoke: 'fgos workflow <start|status|answer|resume|close|prune|gate|propose|operations> [id]',
+    invoke: 'fgos workflow <start|status|records|answer|resume|close|prune|gate|propose|operations> [id]',
     description: 'Door for planned work: a registered Workflow preset or a file of several Units run as steps (DAG ordering, human review gates; merging stays at the approve door). One task with no planning takes the other door, `fgos run "<prompt>"`. start/answer/resume advance in a detached process by default; read progress with "status", which also shows the case: milestones, routes, frame left, open gates. A guide with its own activities opens a conductor case with no process: the agent reads "status" and proposes through the doors.',
     subcommands: {
+      records: {
+        description: 'Project scheduling records from open workflow-case activities, with capability needs, question waits and settled outcomes. Read-only.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos workflow records --json'],
+      },
       start: {
         description: 'Start a run from exactly one of: a registered Workflow id (a preset such as delphi or group-cognition) or --units <file> (one step per Unit). Returns the run id at once and advances it in a detached process unless --foreground.',
         parameters: {

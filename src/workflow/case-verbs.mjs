@@ -7,8 +7,9 @@
 // round file, then tries `advance` once; whoever holds `advance` next appends `gate.answer`.
 
 import path from 'node:path';
+import fs from 'node:fs';
 
-import { RunnerConfigError, runDirOf, currentDispatchDepth } from '../native/execution-door.mjs';
+import { RunnerConfigError, runDirOf, runsRoot, isCaseId, currentDispatchDepth } from '../native/execution-door.mjs';
 import { appendWorkflowEvent, projectWorkflowState, readWorkflowEvents } from './store.mjs';
 import {
   acquireAdvanceLock,
@@ -20,6 +21,7 @@ import {
 } from './case-lock.mjs';
 import { drainCaseInbox, recordGateAnswerRound } from './case-runtime.mjs';
 import { gateOfStep, readCaseProjection } from './case-projection.mjs';
+import { recordsOfCase } from './records.mjs';
 import { CONFINED_WRITE_CODE, confinedWriteRefusal, confinedWriteText } from './case-admission-port.mjs';
 import { DEFAULT_PRUNE_DAYS, closeCaseUnderHold, pruneFinishedCases } from './case-close.mjs';
 import { detachedResult, openCaseOnLedger, prepareWorkflowRun, refundIfNotOpened, spawnDetachedAdvance } from './case-start.mjs';
@@ -171,6 +173,28 @@ export function statusWorkflow(workflowRunId, options = {}) {
     advance = { ...rest, running: projection.liveReservations.length > 0, pid: null };
   }
   return { ...state, seatProviders: seatProviders(state), advance, case: caseBlock(projection), bindingsJudgment: judgeBindings(mainRoot, workflowRunId) };
+}
+
+/** Read-only source verb. Reuse the case read door; a broken ledger never becomes an empty case. */
+export function workflowRecords(options = {}) {
+  const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : resolveGitRoots(options.cwd ?? process.cwd(), { allowNoRepository: true }).mainCheckoutRoot;
+  let entries;
+  try { entries = fs.readdirSync(runsRoot(mainRoot), { withFileTypes: true }); }
+  catch (error) { if (error.code === 'ENOENT') return { records: [], closedItems: [] }; throw error; }
+  const records = [];
+  const closedItems = [];
+  for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+    if (!entry.isDirectory() || !isCaseId(entry.name)) continue;
+    const read = readCaseProjection(mainRoot, entry.name, { retryTail: true });
+    if (read.events.length === 0) throw new RunnerConfigError(`case-ledger-missing: ${entry.name}`);
+    if (read.projection.caseId !== entry.name || !read.projection.guide) throw new RunnerConfigError(`case-ledger-invalid: ${entry.name}`);
+    if (!read.projection.open || read.state.status === 'completed') closedItems.push(entry.name);
+    else {
+      try { records.push(...recordsOfCase(read)); }
+      catch (error) { throw new RunnerConfigError(error.message); }
+    }
+  }
+  return { records, closedItems };
 }
 
 /** Keep the answer as a round (a file made once), with the digest of what the gate shows. */

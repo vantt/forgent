@@ -14,7 +14,7 @@ Capability: `code:implement`.
 - `core/skills/fgos-shaping/SKILL.md`, `core/agents/shaper.yaml`
 - generated: `.agents/skills/fgos-shaping/SKILL.md`, `plugins/fgOS/skills/fgos-shaping/SKILL.md`, `.claude/agents/shaper.md`
 - `docs/platform/session-host/spec.md`, `docs/platform/supervision/spec.md`
-- `CHANGELOG.md`
+- `changelog.d/261125-1557-shaper-runs-in-own-worktree.md` (new)
 
 ## Steps
 
@@ -27,7 +27,9 @@ Capability: `code:implement`.
 4. Specs: session-host spec gains the `workdir` launch field, the shaper worktree at start and rotation, and the
    `session save` row in the verb table; supervision spec says a lead lands a plan branch and a shaper lands its own
    discussion branch. Add a dated line to each spec's decision history citing ds-xb6hplcn2m.
-5. `CHANGELOG.md` `## [Unreleased]`: one line for the shaper worktree and `fgos session save`.
+5. Changelog: one fragment `changelog.d/261125-1557-shaper-runs-in-own-worktree.md` for the shaper worktree and
+   `fgos session save`, in the fragment shape plan 261126-2324 phase 2 defines. If that phase is not on main yet,
+   wait for it; do not edit `CHANGELOG.md`.
 
 ## Verify
 

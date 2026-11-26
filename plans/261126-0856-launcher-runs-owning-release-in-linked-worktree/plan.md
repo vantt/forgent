@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Plain fgos inside a linked worktree runs the owning project's release"
-status: running
+status: done
 lead: head:lead-forgent-261126-0856-launch-b7cbc
 priority: P2
 blockedBy: []
@@ -105,9 +105,9 @@ report:
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Launcher in a linked worktree](phase-01-launcher-in-linked-worktree.md) | - | packages/distribution/rust/src/launcher.rs, packages/distribution/rust/src/launcher.sh, packages/distribution/rust/src/launcher-cmd.txt, packages/distribution/rust/tests/goldens/launcher-digests.json | 1 | done |
-| 2 | [Integration](phase-02-integration.md) | 1 | plans/261126-0856-launcher-runs-owning-release-in-linked-worktree/reports/integration.md | 2 | ready |
+| 2 | [Integration](phase-02-integration.md) | 1 | plans/261126-0856-launcher-runs-owning-release-in-linked-worktree/reports/integration.md | 2 | done |
 
-Phase 1 landed on main as 95f5c01e5 (land ticket `c-37819-1795694710721`).
+Phase 1 landed on main as 95f5c01e5 (land ticket `c-37819-1795694710721`). Phase 2: [integration report](reports/integration.md); the three post-done lines wait for the supervisor's line land.
 
 Contract check: one implementation phase, and the integration phase in a later wave. No hot file is in the
 footprint. Capability: phase 1 `code:implement`, phase 2 `code:test`.

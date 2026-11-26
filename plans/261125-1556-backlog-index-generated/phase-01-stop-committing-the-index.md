@@ -24,6 +24,8 @@ checkout after the land instead, as a note-only side effect. The commit-scoped g
   `packages/supervision/rust/tests/land.rs::landing_a_plan_that_turns_done_commits_its_cited_items_as_done_and_the_regenerated_index`
   and `a_plan_turning_done_whose_cited_items_are_all_done_still_commits_the_regenerated_index`;
   `apps/fgos/tests/portfolio_check.rs` (the index-missing and index-drift case near line 672).
+- Plan `261126-2324` (in `blockedBy`) changes the land door's regeneration code in the same file (`land.regenerate`
+  globs); this phase starts from main after it lands and keeps its behaviour.
 - `docs/platform/supervision/spec.md` section 5 "Lead to land" for the door's note-not-refusal style.
 
 ## Files it may write (footprint)

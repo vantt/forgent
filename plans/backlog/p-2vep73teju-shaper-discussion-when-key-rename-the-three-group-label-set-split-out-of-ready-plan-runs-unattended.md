@@ -1,7 +1,7 @@
 ---
 id: p-2vep73teju
 title: "Shaper discussion `when-key-rename`: the three-group label set (workType, sessionType, agentFamily, agentCli, agentLifecycle) split out of ds-que32ftgg6 so a planner can run on it (agent-context-engine, priority high; source: owner via Miu, 2026-11-26 18:2x)"
-status: proposed
+status: done
 priority: P1
 area: core
 created: 2026-11-26

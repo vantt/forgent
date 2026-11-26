@@ -79,6 +79,8 @@ created: 2026-11-22
 
 # Agent Start Context
 
+> **Runs on the fg-server machine (owner order, 2026-11-26).** This plan is worked only on fg-server. No agent on fg-server2 or any other machine starts, restarts, admits, closes or lands work for it; on fg-server2 a `plan-no-progress`, `head-gone` or `leadLive: false` for it is expected and is marked handled with no action.
+
 ## Outcome
 
 Every agent fgOS starts gets its persona and opening text from one composer, the tier-3 Rust crate **Agent Start

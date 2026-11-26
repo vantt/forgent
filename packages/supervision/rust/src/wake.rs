@@ -523,8 +523,8 @@ fn admit_ready(
         );
         let mut outcome = "nothing-admissible";
         let mut publication_failed = false;
-        let reason = if let Some(reason) = admission_hold(&plans[i], &plans, done) {
-            if reason != "held-blocked" && reason != "held-footprint-overlap" {
+        let reason = if let Some(reason) = admission_hold(&plans[i], done) {
+            if reason != "held-blocked" {
                 judgement = true;
             }
             reason.to_owned()

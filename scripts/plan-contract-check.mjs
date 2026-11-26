@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // plan-contract-check.mjs -- the mechanical check of the plan contract
 // (core/skills/_shared/plan-contract.md). It reads plan frontmatter only through the
-// YAML door (src/util/yaml.mjs) and never edits a plan.
+// YAML door (src/util/yaml.mjs) and never edits a plan. Cross-plan footprint
+// overlaps are warnings only; same-wave overlaps inside one plan remain errors.
 //
 //   node scripts/plan-contract-check.mjs --plan plans/<dir>... one or more plans; any error exits 1
 //   node scripts/plan-contract-check.mjs --all [--root plans] every plan; plans without the
@@ -316,11 +317,11 @@ export function checkAll(root) {
   return { results, overlaps: activeOverlaps(results) };
 }
 
-/** Pairs of ready or running contract plans whose footprints overlap (a truncated scan throws). */
+/** Warning pairs of ready or running contract plans, with shared entries of `a` (an incomplete scan throws). */
 export function activeOverlaps(results) {
   const active = results.filter((r) => !r.legacy && ['ready', 'running'].includes(r.meta.status) && strings(r.meta.footprint ?? []) && r.meta.footprint?.length);
   return collisions(active.map((r, n) => ({ id: String(n), footprint: r.meta.footprint })))
-    .map(({ a, b }) => [path.basename(active[Number(a)].dir), path.basename(active[Number(b)].dir)]);
+    .map(({ a, b, shared }) => ({ a: path.basename(active[Number(a)].dir), b: path.basename(active[Number(b)].dir), shared }));
 }
 
 function parseArgs(argv) {
@@ -358,14 +359,10 @@ export function main(argv, out = console.log) {
         const r = checkPlanDir(dir, { plansRoot: flags.root ? path.resolve(flags.root) : undefined });
         const errors = r.legacy ? r.errors.map((e) => `legacy plan: ${e}`) : [...r.errors];
         const warnings = [...(r.warnings ?? [])];
-        const others = r.legacy ? [] : activeOverlaps([r, ...siblings(dir, flags.root)]).filter((pair) => pair.includes(path.basename(dir)));
-        for (const [a, b] of others) {
-          const msg = `footprint overlaps another active plan: ${a} and ${b}`;
-          if (r.meta?.status === 'running') {
-            warnings.push(msg);
-          } else {
-            errors.push(msg);
-          }
+        // The checked plan is first, so each touching pair's shared entries belong to it.
+        const others = r.legacy ? [] : activeOverlaps([r, ...siblings(dir, flags.root)]).filter(({ a }) => a === path.basename(dir));
+        for (const { b, shared } of others) {
+          warnings.push(`footprint overlaps another active plan ${b} on ${shared.join(', ')}`);
         }
         for (const e of errors) out(`ERROR ${path.basename(dir)}: ${e}`);
         for (const w of warnings) out(`WARN ${path.basename(dir)}: ${w}`);
@@ -380,7 +377,7 @@ export function main(argv, out = console.log) {
     const failing = marked.filter((r) => r.errors.length);
     for (const r of failing) for (const e of r.errors) out(`ERROR ${path.basename(r.dir)}: ${e}`);
     for (const r of marked) for (const w of r.warnings ?? []) out(`WARN ${path.basename(r.dir)}: ${w}`);
-    for (const [a, b] of clashes) out(`ERROR active plans ${a} and ${b} have overlapping footprints`);
+    for (const { a, b, shared } of clashes) out(`WARN active plans ${a} and ${b} share ${shared.join(', ')}`);
     const failingLegacy = legacy.filter((r) => r.legacyErrors?.length);
     for (const r of failingLegacy) for (const e of r.legacyErrors) out(`ERROR ${path.basename(r.dir)}: ${e}`);
     const byStatus = {};
@@ -390,7 +387,7 @@ export function main(argv, out = console.log) {
     }
     const broken = legacy.filter((r) => r.unparseable).length;
     out(`plans ${results.length}: under contract ${marked.length} (failing ${failing.length}), legacy ${legacy.length}${failingLegacy.length ? ` (failing ${failingLegacy.length})` : ''} (${broken} with frontmatter that is not valid YAML; ${failingLegacy.length ? 'would migrate to' : 'by status'} ${Object.entries(byStatus).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'})`);
-    return failing.length || clashes.length || failingLegacy.length ? 1 : 0;
+    return failing.length || failingLegacy.length ? 1 : 0;
   } catch (e) {
     out(`plan-contract-check: ${e.message}`);
     return 2;

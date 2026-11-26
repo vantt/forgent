@@ -17,12 +17,14 @@ drift check go away.
   `["plans", "plans/backlog.md", "plans/backlog/*"]` (secretary and supervisor).
 - `src/session-host/head-grants.mjs` (comments or constants naming `plans/backlog.md`).
 - Owning tests: `test/session-host/head-grants.test.mjs:14`, `test/session-host/head-start.test.mjs:377`,
-  `packages/session-host/rust/tests/permissions.rs:175`.
+  `packages/session-host/rust/tests/permissions.rs:196` (the `coordinator` grant list).
 - `packages/portfolio/index-generator.mjs`, `packages/portfolio/portfolio-check.mjs` (its import of
   `generateBacklogIndex` and the index drift part), `test/portfolio/portfolio-check.test.mjs` (the
   `generateBacklogIndex` cases near lines 204 and 303, the stale-index case near 511).
-- `core/skills/fgos-secretary/SKILL.md` lines about adding a row to `plans/backlog.md` (around 54 to 60), and
-  `core/skills/fgos-supervisor/SKILL.md` line 91 (`fgos session write plans/backlog.md`).
+- `core/skills/fgos-secretary/SKILL.md`, the step that adds a row to `plans/backlog.md` (copy the index, `git
+  hash-object`, `session write plans/backlog.md --base`), and `core/skills/fgos-supervisor/SKILL.md`, the sentence
+  "write `plans/backlog.md` with `fgos session write plans/backlog.md < new`; it is a read-only file grant".
+  Line numbers moved since the first draft; find them with `rg -n 'plans/backlog\.md'`.
 
 ## Files it may write (footprint)
 
@@ -32,7 +34,8 @@ drift check go away.
 `packages/portfolio/portfolio-check.mjs`, `test/portfolio/portfolio-check.test.mjs`,
 `core/skills/fgos-secretary/SKILL.md`, `core/skills/fgos-supervisor/SKILL.md`, and the generated copies under
 `.agents/skills/fgos-secretary/`, `.agents/skills/fgos-supervisor/`, `plugins/fgOS/skills/fgos-secretary/`,
-`plugins/fgOS/skills/fgos-supervisor/` (rebuilt, never hand-edited).
+`plugins/fgOS/skills/fgos-supervisor/` (rebuilt, never hand-edited; after plan `261126-2324` the land door also
+regenerates them, so a conflict there is rebuilt at land).
 
 ## Steps
 

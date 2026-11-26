@@ -24,10 +24,11 @@ use fgos_supervision::land::{land, BacklogPort, LandCommand, LandPorts, ShellRun
 use fgos_supervision::notify::MailboxNotifier;
 use fgos_supervision::portfolio::{self, Plan};
 use fgos_supervision::queue::{Queue, QueueError, Raised, RaisedEvent};
-use fgos_supervision::{supervisor, wake, watcher};
+use fgos_supervision::{keeper, sources, supervisor, wake, watcher};
 use serde_json::{json, Value};
 use std::borrow::Cow;
-use std::collections::BTreeMap;
+use std::cell::{Cell, RefCell};
+use std::collections::{BTreeMap, BTreeSet};
 use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
@@ -252,6 +253,7 @@ fn valid_definition(name: &str) -> bool {
 const UNTUNABLE: &[&str] = &[
     "enabled",
     "definitions",
+    "schedulingSources",
     "defaultAction",
     "actions",
     "notifyTo",
@@ -792,12 +794,18 @@ impl wake::Admission for HostAdmission {
 }
 
 /// Starts a head with the host's own verb: `<host> session start <persona> --name <name> --json`.
-struct HostStart {
+struct HostStart<'a> {
     root: PathBuf,
+    started: &'a RefCell<BTreeSet<String>>,
 }
 
-impl wake::StartSession for HostStart {
+impl wake::StartSession for HostStart<'_> {
     fn start(&self, persona: &str, name: &str) -> Result<(), String> {
+        // Reserve before the attempt: even a failed door may have launched before it lost its reply.
+        // Admission and the keeper must not try the same head twice during this wake.
+        self.started
+            .borrow_mut()
+            .insert(format!("head:{persona}-{name}"));
         let out = Command::new(host_binary())
             .args(["session", "start", persona, "--name", name, "--json"])
             .current_dir(&self.root)
@@ -1494,7 +1502,7 @@ impl watcher::Wake for WakeInProcess {
     }
 
     fn stop_stuck(&self, subject: &str) -> watcher::StopOutcome {
-        let outcome = with_wake_ports(&self.root, self.payload_root, |ports| {
+        let outcome = with_wake_ports(&self.root, self.payload_root, |ports, _| {
             wake::stop_stuck(
                 ports,
                 wake::Trigger {
@@ -1519,9 +1527,33 @@ fn run_wake(
     trigger: &str,
     subject: &str,
 ) -> Result<wake::WakeOutcome, CategorisedRefusal> {
-    with_wake_ports(root, payload_root, |ports| {
+    let queue = open_queue(root)?;
+    let history = KeeperHistory {
+        root: root.to_path_buf(),
+    };
+    with_wake_ports(root, payload_root, |ports, started| {
+        let players = KeeperPlayers {
+            root: root.to_path_buf(),
+            started,
+            host: host_binary(),
+            lead_claims: Cell::new(0),
+            starts: BTreeMap::new(),
+        };
+        let snapshot = KeeperSnapshot {
+            root: root.to_path_buf(),
+            history: &history,
+            started,
+        };
         wake::wake(
-            ports,
+            &wake::ScheduledPorts {
+                admission: ports,
+                keeper: keeper::Ports {
+                    snapshot: &snapshot,
+                    history: &history,
+                    players: &players,
+                    raise: &queue,
+                },
+            },
             &wake_settings(root),
             wake::Trigger { trigger, subject },
         )
@@ -1532,14 +1564,16 @@ fn run_wake(
 fn with_wake_ports<T>(
     root: &Path,
     payload_root: PayloadRoot,
-    run: impl FnOnce(&wake::Ports) -> T,
+    run: impl FnOnce(&wake::Ports, &RefCell<BTreeSet<String>>) -> T,
 ) -> Result<T, CategorisedRefusal> {
     let queue = open_queue(root)?;
     let project = HostProject {
         root: root.to_path_buf(),
     };
+    let started = RefCell::new(BTreeSet::new());
     let start = HostStart {
         root: root.to_path_buf(),
+        started: &started,
     };
     let stop = HostStop {
         root: root.to_path_buf(),
@@ -1573,7 +1607,599 @@ fn with_wake_ports<T>(
         clock: &Clock,
         telemetry: &telemetry,
     };
-    Ok(run(&ports))
+    Ok(run(&ports, &started))
+}
+
+// Scheduling source and need adapters. Domain reads stay behind the source and component doors.
+struct KeeperHistory {
+    root: PathBuf,
+}
+struct KeeperHistorySnapshot {
+    decisions: Vec<keeper::Decision>,
+    cover: BTreeMap<String, u64>,
+    starts: BTreeMap<keeper::Key, u64>,
+}
+impl KeeperHistory {
+    fn snapshot(&self) -> Result<KeeperHistorySnapshot, String> {
+        use fgos_event_store::{
+            cursor::Cursor,
+            identity::StoreIdentity,
+            layout::StreamId,
+            read::{read, ReadRequest},
+        };
+        let clone = super::event_store_clone::open(&self.root)
+            .map_err(|e| e.detail)?
+            .ok_or("event-store-no-repository")?;
+        let origin = if clone.layout.store().exists() {
+            StoreIdentity::open(&clone.layout, &clone.machine)
+                .map_err(|e| e.to_string())?
+                .store_id
+        } else {
+            String::new()
+        };
+        let (driver, repo) = GitDriver::open_at(&self.root)
+            .map_err(|e| e.cause)?
+            .ok_or("not-a-repository")?;
+        let stream = StreamId::parse("project").map_err(|e| e.to_string())?;
+        let result = read(
+            &driver,
+            &repo,
+            ReadRequest {
+                machine: &clone.machine,
+                layout: &clone.layout,
+                origin: &origin,
+                streams: &[stream],
+                cursor: &Cursor::default(),
+                folded: &[],
+                project: true,
+            },
+        )
+        .map_err(|e| e.to_string())?;
+        if !result.skipped_mirrors.is_empty()
+            || !result.deferred.is_empty()
+            || !result.missing.is_empty()
+        {
+            return Err("keeper-history-incomplete".into());
+        }
+        let mut decisions = vec![];
+        let mut starts = BTreeMap::new();
+        for event in result
+            .sequence
+            .iter()
+            .filter(|e| e.event_type.starts_with("supervision.keeper-"))
+        {
+            let decision: keeper::Decision =
+                serde_json::from_value(event.payload.clone()).map_err(|e| e.to_string())?;
+            if decision.action == keeper::Action::Start {
+                let at = fgos_identity::text::iso_utc_secs(&event.ts)
+                    .ok_or("keeper-start-time-invalid")?;
+                starts
+                    .entry((decision.item.clone(), decision.step.clone()))
+                    .and_modify(|last: &mut u64| *last = (*last).max(at))
+                    .or_insert(at);
+            }
+            decisions.push(decision);
+        }
+        Ok(KeeperHistorySnapshot {
+            decisions,
+            starts,
+            cover: result.cursor.cover.into_iter().collect(),
+        })
+    }
+}
+impl keeper::History for KeeperHistory {
+    fn read(&self) -> Result<Vec<keeper::Decision>, String> {
+        self.snapshot().map(|s| s.decisions)
+    }
+    fn record(&self, decision: &keeper::Decision) -> Result<(), String> {
+        use fgos_event_store::{
+            append::{append, AppendRequest, EventInput},
+            layout::StreamId,
+            registry::Registry,
+        };
+        let clone = super::event_store_clone::open(&self.root)
+            .map_err(|e| e.detail)?
+            .ok_or("event-store-no-repository")?;
+        let stream = StreamId::parse("project").map_err(|e| e.to_string())?;
+        let registry = Registry::shipped().map_err(|e| e.to_string())?;
+        for _ in 0..8 {
+            let cover = self.snapshot()?.cover;
+            let events = [EventInput {
+                event_type: decision.event_type().into(),
+                schema_version: 1,
+                payload: serde_json::to_value(decision).map_err(|e| e.to_string())?,
+                ts: iso_of(now_secs()),
+            }];
+            match append(
+                &clone.layout,
+                &registry,
+                AppendRequest {
+                    stream: &stream,
+                    events: &events,
+                    cursor: &cover,
+                    writer: &writer(),
+                    machine: &clone.machine,
+                    held_ranks: &[],
+                },
+            ) {
+                Ok(_) => return Ok(()),
+                Err(e) if e.code == fgos_event_store::errors::ErrorCode::StaleCursor => continue,
+                Err(e) => return Err(e.to_string()),
+            }
+        }
+        Err("keeper-history-stale".into())
+    }
+}
+
+struct KeeperPlayers<'a> {
+    root: PathBuf,
+    started: &'a RefCell<BTreeSet<String>>,
+    host: PathBuf,
+    // Snapshot-local claims keep two absent leads from both taking the last lead slot.
+    lead_claims: Cell<usize>,
+    starts: BTreeMap<keeper::Key, u64>,
+}
+
+fn head_target(role: &str) -> Option<(&str, &str)> {
+    let lineage = role.strip_prefix("head:")?;
+    if lineage.contains(['/', '\\']) {
+        return None;
+    }
+    let (persona, name) = lineage.split_once('-')?;
+    (!name.is_empty() && !name.contains('/') && !name.contains("..")).then_some((persona, name))
+}
+
+impl sources::Heads for KeeperPlayers<'_> {
+    fn state(&self, role: &str) -> keeper::ActorState {
+        if self.started.borrow().contains(role) {
+            return keeper::ActorState::Unknown;
+        }
+        match wake::Identity::holder(
+            &HostIdentity {
+                root: self.root.clone(),
+            },
+            role,
+        ) {
+            wake::Holder::Live { project_id } => {
+                let ours = wake::Project::project(&HostProject {
+                    root: self.root.clone(),
+                });
+                if ours.is_some_and(|p| p.id == project_id) {
+                    keeper::ActorState::Live
+                } else {
+                    keeper::ActorState::Unknown
+                }
+            }
+            wake::Holder::Unknown => keeper::ActorState::Unknown,
+            wake::Holder::NotLive => {
+                let Some((persona, name)) = head_target(role) else {
+                    return keeper::ActorState::Unknown;
+                };
+                let file = self
+                    .root
+                    .join(".fgos/runtime/session-rotation")
+                    .join(format!("{persona}-{name}"))
+                    .join("placement.json");
+                match std::fs::read(&file) {
+                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                        keeper::ActorState::NotLive
+                    }
+                    Err(_) => keeper::ActorState::Unknown,
+                    Ok(bytes) => {
+                        let Ok(p) = serde_json::from_slice::<Value>(&bytes) else {
+                            return keeper::ActorState::Unknown;
+                        };
+                        if p["retiredAt"].is_string()
+                            || p["retiredReason"] == "sleep"
+                            || p["runDir"]
+                                .as_str()
+                                .is_some_and(|dir| Path::new(dir).join("closed.json").exists())
+                        {
+                            keeper::ActorState::NotLive
+                        } else {
+                            keeper::ActorState::Unknown
+                        } // launched, registration still pending
+                    }
+                }
+            }
+        }
+    }
+    fn sleep_until(&self, role: &str) -> Option<String> {
+        let (persona, name) = head_target(role)?;
+        let p = read_json(
+            &self
+                .root
+                .join(".fgos/runtime/session-rotation")
+                .join(format!("{persona}-{name}"))
+                .join("placement.json"),
+        )?;
+        (p["retiredReason"] == "sleep")
+            .then(|| p["wakeAt"].as_str().map(str::to_owned))
+            .flatten()
+    }
+}
+
+impl KeeperPlayers<'_> {
+    fn claim_lead_slot(&self, occupied: usize, max: usize) -> Option<String> {
+        if occupied.saturating_add(self.lead_claims.get()) >= max {
+            Some("lead-cap".into())
+        } else {
+            self.lead_claims.set(self.lead_claims.get() + 1);
+            None
+        }
+    }
+
+    fn actor(&self, reference: &str) -> Result<Option<fgos_identity::directory::Listed>, String> {
+        let (state, _) = fgos_holder_lock::state_root();
+        match fgos_identity::directory::resolve(
+            &state,
+            reference,
+            &fgos_process::facts::judge_here,
+            None,
+            &fgos_identity::directory::NoTerminal,
+        ) {
+            Ok(holder) => Ok(Some(holder)),
+            Err(e) if e.reason == "not-found" => Ok(None),
+            Err(e) => Err(e.reason.into()),
+        }
+    }
+    fn successor(&self, reference: &str) -> Option<(String, String)> {
+        if let Some((persona, name)) = head_target(reference) {
+            return Some((persona.into(), name.into()));
+        }
+        // Ask Identity for retained identifiers, then require its actual liveness proof.
+        // The conservative lookup alone never permits a successor.
+        let (state, _) = fgos_holder_lock::state_root();
+        let holder = fgos_identity::directory::resolve(
+            &state,
+            reference,
+            &|_| fgos_process::facts::Verdict::Unknown,
+            None,
+            &fgos_identity::directory::NoTerminal,
+        )
+        .ok()?;
+        if !fgos_identity::directory::session_proven_dead(
+            &state,
+            &holder.id,
+            &fgos_process::facts::judge_here,
+        ) {
+            return None;
+        }
+        let project = wake::Project::project(&HostProject {
+            root: self.root.clone(),
+        })?;
+        if holder.project_id.as_deref() != Some(project.id.as_str()) {
+            return None;
+        }
+        let head = holder.ids?.head?;
+        Some((head.persona, head.name))
+    }
+    fn command(&self, args: &[String]) -> Result<(), String> {
+        let output = Command::new(&self.host)
+            .args(args)
+            .current_dir(&self.root)
+            .stdin(Stdio::null())
+            .output()
+            .map_err(|e| e.to_string())?;
+        if output.status.success() {
+            Ok(())
+        } else {
+            Err(format!(
+                "keeper-door-exit-{}: {}",
+                output.status.code().unwrap_or(-1),
+                String::from_utf8_lossy(&output.stderr).trim()
+            ))
+        }
+    }
+    /// Reuse the process door: the one-shot wake must not wait for a whole Unit run.
+    #[cfg(unix)]
+    fn start_run(&self, args: &[String]) -> Result<(), String> {
+        let exe = std::env::current_exe().map_err(|e| e.to_string())?;
+        let mut argv = vec![exe.into_os_string()];
+        argv.extend(args.iter().map(std::ffi::OsString::from));
+        let logs = self.root.join(".fgos/runtime/keeper");
+        std::fs::create_dir_all(&logs).map_err(|e| e.to_string())?;
+        fgos_process::mapped::spawn_detached(
+            &argv,
+            &self.root,
+            &[],
+            &[],
+            Some(&logs.join("runs.log")),
+        )
+        .map(|_| ())
+        .map_err(|e| e.to_string())
+    }
+    #[cfg(not(unix))]
+    fn start_run(&self, _: &[String]) -> Result<(), String> {
+        Err("keeper-detached-start-unsupported".into())
+    }
+    /// Candidate worker-lane claims and the current held slots, judged by the existing referee.
+    /// The run door still acquires its lane atomically; this read is not a reservation.
+    fn resource_hold(&self) -> Result<Option<String>, String> {
+        let ceiling = required_capacity(&self.root, "workerSlots.ceiling")?;
+        let lanes = fgos_run_supervisor::lanes::snapshot(
+            &fgos_holder_lock::state_root::lock_root(),
+            ceiling as u64,
+        );
+        let slot = lanes
+            .seats
+            .iter()
+            .find(|s| !s.held)
+            .or_else(|| lanes.seats.first())
+            .ok_or("lane-snapshot-empty")?;
+        let claim = json!({"space": "resource", "ref": format!("lane#{}", slot.k)});
+        let mut nodes = vec![json!({"id": "candidate", "claims": [claim], "layer": 1})];
+        let mut exclusions = vec![];
+        for seat in lanes.seats.iter().filter(|s| s.held) {
+            let id = format!("held-{}", seat.k);
+            nodes.push(json!({"id": id, "claims": [{"space": "resource", "ref": format!("lane#{}", seat.k)}], "layer": 1}));
+            if seat.k == slot.k {
+                exclusions.push(json!({"a": "candidate", "b": id, "shared": [claim]}));
+            }
+        }
+        let verdict = fgos_resource_referee::evaluate(&json!({"nodes": nodes, "graph": {"cycles": [], "dangling": []}, "exclusions": exclusions}), &json!({"rules": []}), None).map_err(|e| e.to_string())?;
+        Ok(
+            (verdict.verdict == fgos_resource_referee::VerdictKind::Reject)
+                .then(|| "resource-held".into()),
+        )
+    }
+}
+impl sources::Resolver for KeeperPlayers<'_> {
+    fn actor(&self, record: &keeper::Record) -> keeper::ActorState {
+        use sources::Heads;
+        let Some(need) = &record.needs else {
+            return keeper::ActorState::NotLive;
+        };
+        match need.kind {
+            keeper::NeedKind::Role => self.state(&need.reference),
+            keeper::NeedKind::Capability => {
+                let settings = wake_settings(&self.root);
+                sources::capability_actor(
+                    record,
+                    self.starts.get(&record.key()).copied(),
+                    now_secs().max(0) as u64,
+                    settings
+                        .active_interval_sec
+                        .saturating_mul(settings.overdue_factor)
+                        .max(0) as u64,
+                )
+            }
+            keeper::NeedKind::Actor => match self.actor(&need.reference) {
+                Ok(Some(holder)) => {
+                    let ours = wake::Project::project(&HostProject {
+                        root: self.root.clone(),
+                    });
+                    if holder.liveness == fgos_identity::Liveness::Alive
+                        && ours.is_some_and(|p| Some(p.id) == holder.project_id)
+                    {
+                        keeper::ActorState::Live
+                    } else {
+                        keeper::ActorState::Unknown
+                    }
+                }
+                Ok(None) => self
+                    .successor(&need.reference)
+                    .map(|(persona, name)| self.state(&format!("head:{persona}-{name}")))
+                    .unwrap_or(keeper::ActorState::Unknown),
+                _ => keeper::ActorState::Unknown,
+            },
+        }
+    }
+    fn answered(&self, question: &str) -> bool {
+        use fgos_questions::store::{fold, LogOpener, State};
+        let Ok(Some(log)) = super::questions::HostLogOpener::reader().open(&self.root) else {
+            return false;
+        };
+        let Ok(events) = log.read() else {
+            return false;
+        };
+        fold(&events)
+            .get(question)
+            .is_some_and(|q| matches!(q.state, State::Answered | State::Acked))
+    }
+    fn start_hold(&self, record: &keeper::Record) -> Result<Option<String>, String> {
+        if let Some(reason) = self.resource_hold()? {
+            return Ok(Some(reason));
+        }
+        let lead = record.needs.as_ref().is_some_and(|n| match n.kind {
+            keeper::NeedKind::Role => {
+                head_target(&n.reference).is_some_and(|(persona, _)| persona == "lead")
+            }
+            keeper::NeedKind::Actor => self
+                .successor(&n.reference)
+                .is_some_and(|(persona, _)| persona == "lead"),
+            keeper::NeedKind::Capability => false,
+        });
+        if lead {
+            let max = required_capacity(&self.root, "supervisor.maxLeads")?;
+            let project = wake::Project::project(&HostProject {
+                root: self.root.clone(),
+            })
+            .ok_or("project-id-missing")?;
+            let plans = HostPortfolio {
+                root: self.root.clone(),
+            }
+            .read()?;
+            let identity = HostIdentity {
+                root: self.root.clone(),
+            };
+            let roles = wake::Identity::lead_roles(&identity, &project.id)?;
+            let counts = supervisor::lead_counts(
+                &plans,
+                &roles,
+                &project.id,
+                &|role| {
+                    if self.started.borrow().contains(role) {
+                        wake::Holder::Unknown
+                    } else {
+                        wake::Identity::holder(&identity, role)
+                    }
+                },
+                &StoreOpenQuestions {
+                    root: self.root.clone(),
+                },
+            );
+            return Ok(self.claim_lead_slot(counts.0, max));
+        }
+        Ok(None)
+    }
+}
+fn capability_run_args(decision: &keeper::Decision, capability: &str) -> Vec<String> {
+    vec![
+        "run".into(),
+        format!(
+            "Perform activity {} of case {} using its approved frame and activity binding.",
+            decision.step, decision.item
+        ),
+        "--case".into(),
+        decision.item.clone(),
+        "--activity".into(),
+        decision.step.clone(),
+        "--capability".into(),
+        capability.into(),
+        "--json".into(),
+    ]
+}
+
+impl keeper::Players for KeeperPlayers<'_> {
+    fn start(&self, decision: &keeper::Decision, need: &keeper::Need) -> Result<(), String> {
+        // Snapshot supplied referee facts before the keeper chose Start. Only the keeper
+        // decides a hold; the run door still acquires the actual lane atomically.
+        match need.kind {
+            keeper::NeedKind::Role | keeper::NeedKind::Actor => {
+                let (persona, name) = self
+                    .successor(&need.reference)
+                    .ok_or("keeper-successor-unknown")?;
+                wake::StartSession::start(
+                    &HostStart {
+                        root: self.root.clone(),
+                        started: self.started,
+                    },
+                    &persona,
+                    &name,
+                )
+            }
+            keeper::NeedKind::Capability => {
+                self.start_run(&capability_run_args(decision, &need.reference))
+            }
+        }
+    }
+    fn wake(&self, decision: &keeper::Decision, need: &keeper::Need) -> Result<(), String> {
+        let target =
+            if need.kind == keeper::NeedKind::Actor && self.actor(&need.reference)?.is_none() {
+                let (persona, name) = self
+                    .successor(&need.reference)
+                    .ok_or("keeper-successor-unknown")?;
+                format!("head:{persona}-{name}")
+            } else {
+                need.reference.clone()
+            };
+        self.command(&[
+            "mailbox".into(),
+            "send".into(),
+            format!(
+                "keeper: {}:{} is actionable; read its source before acting.",
+                decision.item, decision.step
+            ),
+            "--to".into(),
+            target,
+            "--wake".into(),
+            "--json".into(),
+        ])
+    }
+}
+
+struct KeeperSnapshot<'a> {
+    root: PathBuf,
+    history: &'a KeeperHistory,
+    started: &'a RefCell<BTreeSet<String>>,
+}
+impl keeper::Snapshot for KeeperSnapshot<'_> {
+    fn read(&self) -> Result<(Vec<keeper::Input>, keeper::Caps), String> {
+        use keeper::History;
+        let past = self.history.snapshot()?;
+        let players = KeeperPlayers {
+            root: self.root.clone(),
+            started: self.started,
+            host: host_binary(),
+            lead_claims: Cell::new(0),
+            starts: past.starts,
+        };
+        let plans = HostPortfolio {
+            root: self.root.clone(),
+        }
+        .read();
+        let plan_source = plans.as_ref().ok().map(|plans| sources::Plans {
+            plans,
+            heads: &players,
+        });
+        let names = config_strings(&self.root, "watcher.schedulingSources");
+        let cases = if names.iter().any(|n| n == "workflow-cases") {
+            (|| {
+                // No case root means no records. Reuse Execution's path door and avoid a
+                // Node process on projects that have never opened a case; unreadable is not empty.
+                let runs = fgos_execution::case_paths::runs_root(&self.root.join(".fgos"));
+                match std::fs::symlink_metadata(runs) {
+                    Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                        return Ok(sources::WorkflowCases {
+                            records: vec![],
+                            closed_items: vec![],
+                        })
+                    }
+                    Err(e) => return Err(sources::SourceError(e.to_string())),
+                    Ok(_) => {}
+                }
+                let out = Command::new(host_binary())
+                    .args(["workflow", "records", "--json"])
+                    .current_dir(&self.root)
+                    .stdin(Stdio::null())
+                    .output()
+                    .map_err(|e| sources::SourceError(e.to_string()))?;
+                if !out.status.success() {
+                    return Err(sources::SourceError("workflow-records-failed".into()));
+                }
+                let answer: Value = serde_json::from_slice(&out.stdout)
+                    .map_err(|e| sources::SourceError(e.to_string()))?;
+                serde_json::from_value::<sources::WorkflowCases>(
+                    answer.get("data").cloned().unwrap_or(answer),
+                )
+                .map_err(|e| sources::SourceError(e.to_string()))
+            })()
+        } else {
+            Err(sources::SourceError("not-configured".into()))
+        };
+        let registered = names
+            .iter()
+            .map(|name| {
+                let source: Result<&dyn sources::Source, sources::SourceError> = match name.as_str()
+                {
+                    "plans" => plan_source
+                        .as_ref()
+                        .map(|s| s as &dyn sources::Source)
+                        .ok_or_else(|| sources::SourceError("plans-unavailable".into())),
+                    "workflow-cases" => cases
+                        .as_ref()
+                        .map(|s| s as &dyn sources::Source)
+                        .map_err(Clone::clone),
+                    _ => Err(sources::SourceError("source-unknown".into())),
+                };
+                (name.as_str(), source)
+            })
+            .collect::<Vec<_>>();
+        let capacity = wake::Admission::capacity(&HostAdmission {
+            root: self.root.clone(),
+        })?;
+        let remaining = capacity
+            .free_lanes
+            .saturating_sub(self.started.borrow().len());
+        let result = sources::collect_records(&registered, &players, remaining)?;
+        for decision in
+            sources::source_status_decisions(&names, &result.unavailable, &past.decisions)
+        {
+            self.history.record(&decision)?;
+        }
+        Ok((result.inputs, result.caps))
+    }
 }
 
 fn run_tick(
@@ -2380,6 +3006,181 @@ mod tests {
 
     fn idle_pane(_: &fgos_session_host::Placement, _: &Path) -> wake::Activity {
         wake::Activity::Idle
+    }
+
+    // Invoked only as a detached child of the wiring proof below. Its release file
+    // makes waiting for completion observable without running a real Unit.
+    #[cfg(unix)]
+    #[test]
+    #[ignore = "detached subprocess fixture"]
+    fn keeper_detached_run_fixture() {
+        use std::io::Write;
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        while !Path::new("release").exists() {
+            assert!(std::time::Instant::now() < deadline, "fixture not released");
+            std::thread::sleep(std::time::Duration::from_millis(10));
+        }
+        writeln!(
+            std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open("ended")
+                .unwrap(),
+            "done"
+        )
+        .unwrap();
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn keeper_source_facts_reach_the_host_doors_without_restarting_a_pending_head() {
+        use keeper::{Players, Snapshot};
+        use sources::{Heads, Source};
+        use std::os::unix::fs::PermissionsExt;
+        let root = scratch_root("keeper-doors");
+        let host = root.join("host.mjs");
+        std::fs::write(&host, "#!/usr/bin/env node\nimport fs from 'node:fs'; fs.appendFileSync('calls.jsonl', JSON.stringify(process.argv.slice(2))+'\\n');\n").unwrap();
+        std::fs::set_permissions(&host, std::fs::Permissions::from_mode(0o755)).unwrap();
+        let started = RefCell::new(BTreeSet::from(["head:lead-pending".into()]));
+        let players = KeeperPlayers {
+            root: root.clone(),
+            started: &started,
+            host,
+            lead_claims: Cell::new(0),
+            starts: BTreeMap::new(),
+        };
+        assert_eq!(
+            players.state("head:lead-pending"),
+            keeper::ActorState::Unknown
+        );
+        let pending_actor = keeper::Record {
+            item: "case-pending".into(),
+            step: "lead".into(),
+            needs: Some(keeper::Need {
+                kind: keeper::NeedKind::Actor,
+                reference: "head:lead-pending".into(),
+                max_rounds: None,
+            }),
+            waiting_on: None,
+            outcome: None,
+        };
+        assert_eq!(
+            sources::Resolver::actor(&players, &pending_actor),
+            keeper::ActorState::Unknown
+        );
+        // Admission's occupied slots and this snapshot's candidate claims share the same cap.
+        assert_eq!(players.claim_lead_slot(3, 4), None);
+        assert_eq!(players.claim_lead_slot(3, 4).as_deref(), Some("lead-cap"));
+        players.lead_claims.set(0);
+        assert_eq!(players.claim_lead_slot(4, 4).as_deref(), Some("lead-cap"));
+        assert_eq!(players.lead_claims.get(), 0);
+        assert!(head_target("head:../lead-escape").is_none());
+        let dir = root.join(".fgos/runtime/session-rotation/lead-sleeping");
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(
+            dir.join("placement.json"),
+            r#"{"retiredReason":"sleep","wakeAt":"2026-12-01T09:00:00Z"}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            players.sleep_until("head:lead-sleeping").as_deref(),
+            Some("2026-12-01T09:00:00Z")
+        );
+        let source: sources::WorkflowCases = serde_json::from_value(json!({"records": [
+            {"item": "case-one", "step": "left", "needs": {"kind": "capability", "ref": "review"}},
+            {"item": "case-one", "step": "right", "needs": {"kind": "capability", "ref": "advise"}}
+        ], "closedItems": []}))
+        .unwrap();
+        let records = source.records().unwrap();
+        let inputs = records
+            .iter()
+            .map(|record| keeper::Input {
+                record: record.clone(),
+                actor: keeper::ActorState::NotLive,
+                item_closed: false,
+            })
+            .collect::<Vec<_>>();
+        let decisions = keeper::decide(
+            &inputs,
+            100,
+            &[],
+            &keeper::Caps {
+                starts: 2,
+                held: BTreeMap::new(),
+            },
+        );
+        let before = std::time::Instant::now();
+        let run_args = decisions
+            .iter()
+            .zip(&records)
+            .map(|(decision, record)| {
+                capability_run_args(decision, &record.needs.as_ref().unwrap().reference)
+            })
+            .collect::<Vec<_>>();
+        // current_exe is the test harness here: run a waiting fixture through the
+        // same detached door, not the synchronous command's injected executable.
+        for _ in &decisions {
+            players
+                .start_run(&[
+                    "--ignored".into(),
+                    "--exact".into(),
+                    "wiring::supervision::tests::keeper_detached_run_fixture".into(),
+                ])
+                .unwrap();
+        }
+        std::fs::write(root.join("release"), "").unwrap();
+        assert!(
+            before.elapsed() < std::time::Duration::from_secs(2),
+            "starts waited for Unit completion"
+        );
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        while std::fs::read_to_string(root.join("ended"))
+            .unwrap_or_default()
+            .lines()
+            .count()
+            < 2
+        {
+            assert!(
+                std::time::Instant::now() < deadline,
+                "detached runs did not finish"
+            );
+            std::thread::sleep(std::time::Duration::from_millis(10));
+        }
+        players
+            .wake(
+                &decisions[0],
+                &keeper::Need {
+                    kind: keeper::NeedKind::Actor,
+                    reference: "head:lead-pending".into(),
+                    max_rounds: None,
+                },
+            )
+            .unwrap();
+        let calls = std::fs::read_to_string(root.join("calls.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str::<Vec<String>>(line).unwrap())
+            .collect::<Vec<_>>();
+        assert_eq!(calls.len(), 1);
+        for step in ["left", "right"] {
+            let call = run_args
+                .iter()
+                .find(|call| call.windows(2).any(|args| args == ["--activity", step]))
+                .unwrap();
+            assert_eq!(call[0], "run");
+            assert!(call.windows(2).any(|args| args == ["--case", "case-one"]));
+            assert!(call.windows(2).any(|args| args == ["--activity", step]));
+        }
+        assert_eq!(calls[0][0..2], ["mailbox", "send"]);
+        assert!(calls[0].iter().any(|a| a == "--wake"));
+        // The production snapshot implements the existing keeper seam, not a second scheduler.
+        let _: &dyn Snapshot = &KeeperSnapshot {
+            root,
+            history: &KeeperHistory {
+                root: PathBuf::new(),
+            },
+            started: &started,
+        };
     }
 
     #[test]

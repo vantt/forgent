@@ -1,7 +1,7 @@
 ---
 id: p-mfllw32ynj
 title: "Data-loss risk: `fgos config set --dir <linked worktree>` writes a fresh project config over the tracked one, hidden from `git status` (config, priority high; source: `plans/261117-1435-solo-driving-trial/reports/measures-template.md` (phase 1 baseline))"
-status: proposed
+status: done
 priority: P1
 area: config
 created: 2026-11-17

@@ -4,8 +4,6 @@ title: "fgos session type submits what it types, or refuses by name"
 status: draft
 priority: P1
 blockedBy:
-  - 261125-2313-head-communication-agent-to-agent
-  - 261124-2143-head-lifecycle-events
   - 261125-2315-head-mail-knowhow-in-skills
 footprint:
   - plans/261126-0853-session-type-submits-enter/**
@@ -21,7 +19,7 @@ footprint:
   - plugins/fgOS/skills/**
   - .claude/skills/**
   - CHANGELOG.md
-base: 2dc4d5ec6cbfe3224cee18b7c476087207e83879
+base: 0966deba26b26ed4717fe9e4dab0813933699ff3
 source:
   - plans/discussions/ds-itzp2debmh-session-type-submits-enter/DISCUSSION.md
   - p-nroysfhtso
@@ -55,12 +53,14 @@ and answers `held` (D5).
 2. One wiring proof in `apps/fgos/tests/supervision_verbs.rs`: the verb's JSON carries `submitted: true` or the
    refusal cause, and never `typed: true`. Command: `cargo test -p fgos --test supervision_verbs`.
 3. `--no-enter` answers `held` and goes through `TerminalCore::type_text`; its existing test
-   `type_text_sends_text_exactly_once_via_pane_send_text` stays as that path's proof.
+   `type_text_sends_text_exactly_once_via_pane_send_text`
+   (`packages/terminal-control/rust/tests/herdr_driver_fake.rs`) stays as that path's proof.
 4. Live check on a real Claude Code head: `fgos session type` with a check line starts a turn with no second
    `\r`. The quoted screen before and after, and the answer to O1 (does `pane send-text` replace or append to a
    draft), are in `reports/live-check.md`.
 5. `npm test` and `cargo test --workspace` green; `CHANGELOG.md` `[Unreleased]` names `submitted` and
-   `--no-enter`; the supervisor skill's wake step carries no "type `\r` alone" workaround and reads the answer.
+   `--no-enter`; the supervisor skill's wake step (line 81) and on-site steps (lines 139-153) read the answer and never tell
+   the supervisor to type a bare `\r` (on main `5466f387d` the skill carries no such line yet; keep it that way).
 
 ## Non-goals
 
@@ -74,11 +74,14 @@ and answers `held` (D5).
 
 Reused: `Adapter::deliver_brief` and `Profile` (`packages/agent-protocol/rust/src/terminal/mod.rs`) for the per-CLI
 submit, gap, separate `Enter`, prompt door and confirm loop; `composer_state` (plan `261125-2313` phase 3); the
-session-host `PaneIo` gate-and-type call that plan `261125-2313` phase 5 adds for the typed wake (D3); the verb's
+session-host gate-and-type call `PaneIo::typed_wake(cli, version, line) -> TypedWake` that plan `261125-2313`
+phase 5 landed in `pane_io.rs` for the typed wake (D3); the verb's
 existing open-event gate in `type_into_session` (`apps/fgos/src/wiring/supervision.rs`); the shared pane lookup
-`Listed::terminal_key()` that plan `261125-2315` moves `supervision.rs` onto. Missing: that call refuses only
-`busy`, `composer-not-empty`, `dialog-open`, `unknown`, `no-pane`, and it submits text plus `Enter` without the
-prompt door. This plan adds the profile submit and the missing causes to the same call, not a second one.
+`Listed::terminal_key()` that plan `261125-2315` moves `supervision.rs` onto. Missing: that call answers only
+`Typed` or `Refused` with `busy`, `composer-not-empty`, `dialog-open`, `unknown` (no adapter, or a CLI version
+other than the adapter's `pinned_version()`) or an observe cause such as `no-pane`; it types text, waits a fixed
+300 ms and sends `Enter`, never the profile's `enter_gap_ms` or prompt door, and confirms nothing after.
+`foreground-not-agent` exists only on `PaneIo::send_typed` (`SendFailure::ForegroundNotAgent`), to reuse. This plan adds the profile submit and the missing causes to the same call, not a second one.
 
 Pinned assumption (not an owner question, D2 with D3 and the typed-wake non-goal): the one call takes a submit
 mode. The typed wake keeps its focus-neutral text plus `Enter`; `session type` uses the profile's submit
@@ -100,7 +103,16 @@ If phase 5 lands already submitting by profile, phase 1 only adds the missing ca
 | 2 | [The verb submits and answers by name](phase-02-verb-submits-and-answers.md) | 1 | apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, docs/platform/supervision/spec.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/**, CHANGELOG.md | 2 | ready |
 | 3 | [Live check and integration](phase-03-live-check-and-integration.md) | 1, 2 | plans/261126-0853-session-type-submits-enter/reports/live-check.md | 3 | ready |
 
-Why `draft`: the footprint overlaps plans `261125-2313` (`pane_io.rs`, `typed_wake.rs`) and `261124-2143` (`supervision.rs`, the supervisor skill, the supervision spec), which this plan waits for by `blockedBy`, and plan `261125-1631` (the generated `command-manifest.json` and `src/cli/command-registry.mjs`). The plan contract refuses `ready` while a `ready` or `running` plan shares a path, so the plan flips to `ready` once those three are `done` (or `261125-1631` has landed its manifest phase and narrowed its footprint). That flip needs no new decision: rerun `node scripts/plan-contract-check.mjs --plan plans/261126-0853-session-type-submits-enter` and land `plan.md` alone with `status: ready`.
+Why `draft`: it waits on `261125-2315-head-mail-knowhow-in-skills`, which moves `supervision.rs` `pane_of` onto
+`Listed::terminal_key()` first (2315 is itself `draft` behind `261126-2318-plan-footprint-overlap-warns`). Its first
+blockers `261125-2313` and `261124-2143` are `done`. `base` was reset to main on 2026-11-26 and the facts above
+re-checked there. The footprint also overlaps the running plans `261122-0056-orchestration-skeleton`
+(`supervision.rs`, `supervision_verbs.rs`, the supervision spec, the supervisor skill, the skill renders) and
+`261125-2041-gather-fgos-rules-to-one-owner` (`core/skills/**` renders, `CHANGELOG.md`); once 2318 is `done` that
+overlap is a warning. The flip to `ready` needs no new decision: when 2315 is `done`, rerun
+`node scripts/plan-contract-check.mjs --plan plans/261126-0853-session-type-submits-enter` and land `plan.md` with
+`status: ready`. If `changelog.d/` (plan `261126-2324`) is on main by then, phase 2 step 8 writes a `changelog.d`
+fragment instead and `CHANGELOG.md` leaves the footprint.
 
 Layers stay serial: the session-host call (phase 1) lands before the supervision wiring above it (phase 2). The
 hot files (CHANGELOG, generated manifest, skill renders) belong to phase 2 alone. Each phase is `code:implement`

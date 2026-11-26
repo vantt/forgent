@@ -14,6 +14,7 @@ import {
   updatePackageJsonText,
   updatePackageLockText,
   prepareRelease,
+  readChangelogFragments,
 } from '../../scripts/prepare-release.mjs';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 
@@ -191,5 +192,103 @@ test('prepareRelease refuses a repository whose status shows an untracked file',
   assert.throws(
     () => prepareRelease({ repoRoot: root, version: 'v0.2.0', date: '2026-09-18', dryRun: true }),
     /Refusing to prepare a release with a dirty working tree/,
+  );
+});
+
+test('the release section holds the Unreleased lines then each changelog fragment in name order, and the fragments are deleted', () => {
+  // Case 1: two fragments plus a README plus an existing Unreleased line
+  const root = tmpRepo();
+  const changelogDir = path.join(root, 'changelog.d');
+  fs.mkdirSync(changelogDir, { recursive: true });
+  fs.writeFileSync(path.join(changelogDir, 'README.md'), '# Changelog fragments\n\nDocumentation only, never assembled.\n');
+  fs.writeFileSync(path.join(changelogDir, '261126-1000-alpha.md'), '- Added: first fragment feature.\n');
+  fs.writeFileSync(path.join(changelogDir, '261126-1100-beta.md'), '- Fixed: second fragment fix.\n');
+
+  const result = prepareRelease({
+    repoRoot: root,
+    version: 'v0.2.0',
+    date: '2026-09-18',
+    skipCleanCheck: true,
+  });
+
+  const changelog = fs.readFileSync(path.join(root, 'CHANGELOG.md'), 'utf8');
+  assert.match(
+    changelog,
+    /## \[Unreleased\]\n\n## \[v0\.2\.0\] - 2026-09-18\n\n### Added\n\n- Something new\.\n- Added: first fragment feature\.\n- Fixed: second fragment fix\.\n\n## \[v0\.1\.0\]/,
+  );
+  assert.ok(!changelog.includes('never assembled'), 'README.md content is not assembled into CHANGELOG.md');
+
+  assert.equal(fs.existsSync(path.join(changelogDir, '261126-1000-alpha.md')), false, 'first fragment was deleted');
+  assert.equal(fs.existsSync(path.join(changelogDir, '261126-1100-beta.md')), false, 'second fragment was deleted');
+  assert.equal(fs.existsSync(path.join(changelogDir, 'README.md')), true, 'README.md was preserved');
+
+  assert.ok(result.changedFiles.includes(path.join('changelog.d', '261126-1000-alpha.md')));
+  assert.ok(result.changedFiles.includes(path.join('changelog.d', '261126-1100-beta.md')));
+  assert.ok(!result.changedFiles.includes(path.join('changelog.d', 'README.md')));
+
+  // Case 2: --dry-run leaves every fragment
+  const rootDry = tmpRepo();
+  const changelogDirDry = path.join(rootDry, 'changelog.d');
+  fs.mkdirSync(changelogDirDry, { recursive: true });
+  fs.writeFileSync(path.join(changelogDirDry, 'README.md'), '# Changelog fragments\n');
+  fs.writeFileSync(path.join(changelogDirDry, '261126-1000-alpha.md'), '- Added: alpha feature.\n');
+  fs.writeFileSync(path.join(changelogDirDry, '261126-1100-beta.md'), '- Fixed: beta fix.\n');
+  const changelogBefore = fs.readFileSync(path.join(rootDry, 'CHANGELOG.md'), 'utf8');
+
+  const dryResult = prepareRelease({
+    repoRoot: rootDry,
+    version: 'v0.2.0',
+    date: '2026-09-18',
+    skipCleanCheck: true,
+    dryRun: true,
+  });
+
+  assert.equal(dryResult.dryRun, true);
+  assert.equal(fs.existsSync(path.join(changelogDirDry, '261126-1000-alpha.md')), true, 'alpha fragment preserved in dry-run');
+  assert.equal(fs.existsSync(path.join(changelogDirDry, '261126-1100-beta.md')), true, 'beta fragment preserved in dry-run');
+  assert.equal(fs.existsSync(path.join(changelogDirDry, 'README.md')), true, 'README preserved in dry-run');
+  assert.equal(fs.readFileSync(path.join(rootDry, 'CHANGELOG.md'), 'utf8'), changelogBefore, 'CHANGELOG.md unmodified in dry-run');
+
+  // Case 3: fragments alone (empty Unreleased) release
+  const rootAlone = tmpRepo();
+  fs.writeFileSync(
+    path.join(rootAlone, 'CHANGELOG.md'),
+    '# Changelog\n\n## [Unreleased]\n\n## [v0.1.0] - 2026-01-01\n\n### Added\n\n- Bootstrap.\n',
+  );
+  const changelogDirAlone = path.join(rootAlone, 'changelog.d');
+  fs.mkdirSync(changelogDirAlone, { recursive: true });
+  fs.writeFileSync(path.join(changelogDirAlone, '261126-1000-alone.md'), '- Added: stand-alone fragment.\n');
+
+  prepareRelease({
+    repoRoot: rootAlone,
+    version: 'v0.2.0',
+    date: '2026-09-18',
+    skipCleanCheck: true,
+  });
+
+  const changelogAlone = fs.readFileSync(path.join(rootAlone, 'CHANGELOG.md'), 'utf8');
+  assert.match(
+    changelogAlone,
+    /## \[Unreleased\]\n\n## \[v0\.2\.0\] - 2026-09-18\n\n- Added: stand-alone fragment\.\n\n## \[v0\.1\.0\]/,
+  );
+  assert.equal(fs.existsSync(path.join(changelogDirAlone, '261126-1000-alone.md')), false, 'alone fragment was deleted');
+
+  // Case 4: a malformed fragment refuses by name
+  const rootEmpty = tmpRepo();
+  const dirEmpty = path.join(rootEmpty, 'changelog.d');
+  fs.mkdirSync(dirEmpty, { recursive: true });
+  fs.writeFileSync(path.join(dirEmpty, '261126-1000-empty.md'), '   \n\n  ');
+  assert.throws(
+    () => prepareRelease({ repoRoot: rootEmpty, version: 'v0.2.0', date: '2026-09-18', skipCleanCheck: true }),
+    /261126-1000-empty\.md/,
+  );
+
+  const rootInvalid = tmpRepo();
+  const dirInvalid = path.join(rootInvalid, 'changelog.d');
+  fs.mkdirSync(dirInvalid, { recursive: true });
+  fs.writeFileSync(path.join(dirInvalid, '261126-1000-invalid.md'), 'Not a valid bullet\n');
+  assert.throws(
+    () => prepareRelease({ repoRoot: rootInvalid, version: 'v0.2.0', date: '2026-09-18', skipCleanCheck: true }),
+    /261126-1000-invalid\.md/,
   );
 });

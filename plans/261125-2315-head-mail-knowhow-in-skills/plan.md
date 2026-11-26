@@ -4,8 +4,8 @@ title: "Heads learn mail from one shared file: send once with --wake, read the a
 status: draft
 priority: P2
 blockedBy:
-  - 261125-2313-head-communication-agent-to-agent
-  - 261124-2143-head-lifecycle-events
+  - 261126-2318-plan-footprint-overlap-warns
+base: 5466f387d67f8dbc7c95c15a441814a6d42e15e3
 footprint:
   - plans/261125-2315-head-mail-knowhow-in-skills/**
   - core/skills/_shared/head-mail.md
@@ -30,8 +30,15 @@ created: 2026-11-25
 
 The skill half of discussion task `task-knowhow-and-spec` (HC-D1: the know-how lives in the door and its answers,
 and heads read it from one place). Split from `261125-2313-head-communication-agent-to-agent` only because every
-file here belongs to the running plan `261124-2143-head-lifecycle-events` until it lands. Stays `draft` until both
-blockers are `done`; then the supervisor (or a planner) resets `base`, re-runs the check and sets `ready`.
+file here belongs to the running plan `261124-2143-head-lifecycle-events` until it lands. Its first blockers (`261125-2313`,
+`261124-2143`) are `done`. On 2026-11-26 `base` was reset to main `5466f387d` and the facts below re-checked
+there, but the plan stays `draft`: the contract check refuses it for footprint overlap with the running plans
+`261122-0056-orchestration-skeleton` (`supervision.rs`, `supervision_verbs.rs`, the supervisor skill, the
+session-host spec, the skill renders) and `261125-2041-gather-fgos-rules-to-one-owner` (`core/skills/**`,
+`CHANGELOG.md`). It waits on `261126-2318-plan-footprint-overlap-warns`, which turns that overlap into a
+warning; when 2318 is `done` (or both running plans are), re-run the check and set `ready`. If `changelog.d/`
+(plan `261126-2324`) is on main by then, criterion 4 becomes a `changelog.d` fragment and `CHANGELOG.md` leaves
+the footprint.
 
 ## Outcome
 
