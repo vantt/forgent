@@ -615,7 +615,9 @@ mod tests {
             inside.status
         );
         assert!(
-            stderr.contains("fgos cannot resolve a linked worktree's main checkout safely with cmd builtins"),
+            stderr.contains(
+                "fgos cannot resolve a linked worktree's main checkout safely with cmd builtins"
+            ),
             "stderr {stderr}"
         );
         assert!(
@@ -631,7 +633,9 @@ mod tests {
             "stderr {stderr_sub}"
         );
         assert!(
-            stderr_sub.contains("fgos cannot resolve a linked worktree's main checkout safely with cmd builtins"),
+            stderr_sub.contains(
+                "fgos cannot resolve a linked worktree's main checkout safely with cmd builtins"
+            ),
             "stderr {stderr_sub}"
         );
         assert!(
@@ -649,7 +653,8 @@ mod tests {
         std::fs::create_dir_all(normal_repo.join(".git")).unwrap();
         let normal_outside = run(&["doctor"], &normal_repo);
         assert_eq!(normal_outside.status.code(), Some(127));
-        assert!(String::from_utf8_lossy(&normal_outside.stderr).contains("no .fgos\\installation found"));
+        assert!(String::from_utf8_lossy(&normal_outside.stderr)
+            .contains("no .fgos\\installation found"));
     }
 
     #[cfg(unix)]
