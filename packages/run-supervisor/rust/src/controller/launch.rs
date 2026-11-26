@@ -585,7 +585,6 @@ pub struct LaunchSettings {
     pub gate_kill_grace_ms: u64,
     pub kill_wait_ms: u64,
     pub lanes: LaneSettings,
-    pub supervisor_scope_memory_max: Option<String>,
 }
 
 pub fn read_launch_settings(project_root: &Path) -> Result<LaunchSettings, ConfigReadError> {
@@ -596,9 +595,6 @@ pub fn read_launch_settings(project_root: &Path) -> Result<LaunchSettings, Confi
         .value
         .get("workerSlots")
         .ok_or_else(|| missing("workerSlots"))?;
-    let raw_memory_max = super::config::resolve_supervisor_scope_memory_max(&snapshot)?.value;
-    let validated_memory_max =
-        super::scope::validate_memory_max(&raw_memory_max).map(str::to_string);
     Ok(LaunchSettings {
         gate_kill_grace_ms: super::config::resolve_gate_kill_grace(&snapshot)?.value,
         kill_wait_ms: DEFAULT_KILL_WAIT_MS,
@@ -609,7 +605,6 @@ pub fn read_launch_settings(project_root: &Path) -> Result<LaunchSettings, Confi
                 .and_then(Value::as_u64)
                 .ok_or_else(|| missing("workerSlots.laneWaitSec"))?,
         },
-        supervisor_scope_memory_max: validated_memory_max,
     })
 }
 
@@ -821,6 +816,45 @@ pub fn start_supervisor(
     handover: &[&fs::File],
     step_env: &Map<String, Value>,
     extra_env: &Map<String, Value>,
+) -> io::Result<StartedSupervisor> {
+    let attempt_id = envelope["attemptId"].as_str().unwrap_or_default();
+    let failure_domain = super::scope::decide_failure_domain(attempt_id);
+    let memory_max = match failure_domain {
+        super::scope::FailureDomain::SystemdScope { .. } => {
+            read_scope_memory_max(envelope["cwd"].as_str().map(Path::new))
+        }
+        super::scope::FailureDomain::Inherited { .. } => None,
+    };
+    start_supervisor_in(
+        envelope,
+        handover,
+        step_env,
+        extra_env,
+        &failure_domain,
+        memory_max.as_deref(),
+    )
+}
+
+/// `runner.supervisorScope.memoryMax` for one launch; a read error or an invalid value is reported on stderr
+/// and the scope then carries no cap.
+fn read_scope_memory_max(project_root: Option<&Path>) -> Option<String> {
+    match super::config::read_supervisor_scope_memory_max(project_root) {
+        Ok(raw) => super::scope::validate_memory_max(&raw).map(str::to_string),
+        Err(error) => {
+            eprintln!(
+                "warning: cannot read runner.supervisorScope.memoryMax ({error}), starting the scope without a cap"
+            );
+            None
+        }
+    }
+}
+
+/// [`start_supervisor`] with the failure domain and the memory cap decided by the caller.
+pub fn start_supervisor_in(
+    envelope: &Value,
+    handover: &[&fs::File],
+    step_env: &Map<String, Value>,
+    extra_env: &Map<String, Value>,
     failure_domain: &super::scope::FailureDomain,
     memory_max: Option<&str>,
 ) -> io::Result<StartedSupervisor> {
@@ -863,12 +897,11 @@ pub fn build_supervisor_command(
         protocol_str,
     ];
     match failure_domain {
-        super::scope::FailureDomain::SystemdScope { unit } => {
-            let systemd_run_bin = super::scope::resolve_systemd_run_path()
-                .map(|p| p.to_string_lossy().to_string())
-                .unwrap_or_else(|| "/usr/bin/systemd-run".to_string());
+        super::scope::FailureDomain::SystemdScope {
+            unit, systemd_run, ..
+        } => {
             let scope_cmd = super::scope::build_scope_command(
-                &systemd_run_bin,
+                &systemd_run.to_string_lossy(),
                 unit,
                 memory_max,
                 &supervisor_argv,
@@ -903,11 +936,7 @@ fn spawn_supervisor(
     }
     let log = log_options.open(run_dir.join("supervisor.log"))?;
 
-    #[cfg(unix)]
     let mut command = build_supervisor_command(envelope, run_dir, failure_domain, memory_max);
-
-    #[cfg(windows)]
-    let mut command = build_supervisor_command(envelope, run_dir, failure_domain, None);
 
     command
         .current_dir(run_dir)
@@ -922,17 +951,8 @@ fn spawn_supervisor(
     }
     let fd_json = serde_json::to_string(failure_domain).unwrap_or_default();
     command.env("FGOS_FAILURE_DOMAIN", fd_json);
-    #[cfg(unix)]
-    if matches!(
-        failure_domain,
-        super::scope::FailureDomain::SystemdScope { .. }
-    ) {
-        if let Ok(runtime_dir) = std::env::var("XDG_RUNTIME_DIR") {
-            command.env("XDG_RUNTIME_DIR", runtime_dir);
-        }
-        if let Ok(bus) = std::env::var("DBUS_SESSION_BUS_ADDRESS") {
-            command.env("DBUS_SESSION_BUS_ADDRESS", bus);
-        }
+    if let super::scope::FailureDomain::SystemdScope { runtime_dir, .. } = failure_domain {
+        command.env("XDG_RUNTIME_DIR", runtime_dir);
     }
     #[cfg(unix)]
     {

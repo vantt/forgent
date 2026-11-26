@@ -12,8 +12,16 @@ use std::path::PathBuf;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind")]
 pub enum FailureDomain {
+    /// `systemd_run` is the absolute executable the probe resolved and `runtime_dir` the user runtime directory
+    /// the probe connected through; neither is part of the recorded binding shape `{kind, unit}`.
     #[serde(rename = "systemd-scope")]
-    SystemdScope { unit: String },
+    SystemdScope {
+        unit: String,
+        #[serde(skip)]
+        systemd_run: PathBuf,
+        #[serde(skip)]
+        runtime_dir: PathBuf,
+    },
     #[serde(rename = "inherited")]
     Inherited { reason: String },
 }
@@ -21,7 +29,7 @@ pub enum FailureDomain {
 impl FailureDomain {
     pub fn unit(&self) -> Option<&str> {
         match self {
-            FailureDomain::SystemdScope { unit } => Some(unit),
+            FailureDomain::SystemdScope { unit, .. } => Some(unit),
             FailureDomain::Inherited { .. } => None,
         }
     }
@@ -58,30 +66,33 @@ pub fn scope_unit_name(attempt_id: &str) -> String {
     format!("fgos-run-{}", sanitize_unit_name(attempt_id))
 }
 
-/// Decide the failure domain given explicit environmental probe flags.
+/// Decide the failure domain given explicit probe results: the runtime directory a user manager answered
+/// through, and the absolute `systemd-run` path.
 pub fn decide_failure_domain_with(
     attempt_id: &str,
     is_linux: bool,
-    user_manager_reachable: bool,
-    systemd_run_on_path: bool,
+    user_manager_runtime_dir: Option<PathBuf>,
+    systemd_run: Option<PathBuf>,
 ) -> FailureDomain {
     if !is_linux {
         return FailureDomain::Inherited {
             reason: "not-linux".to_string(),
         };
     }
-    if !user_manager_reachable {
+    let Some(runtime_dir) = user_manager_runtime_dir else {
         return FailureDomain::Inherited {
             reason: "no-user-manager".to_string(),
         };
-    }
-    if !systemd_run_on_path {
+    };
+    let Some(systemd_run) = systemd_run else {
         return FailureDomain::Inherited {
             reason: "no-systemd-run".to_string(),
         };
-    }
+    };
     FailureDomain::SystemdScope {
         unit: scope_unit_name(attempt_id),
+        systemd_run,
+        runtime_dir,
     }
 }
 
@@ -106,26 +117,20 @@ pub fn resolve_runtime_dir() -> Option<PathBuf> {
         })
 }
 
-/// Check if a user manager is reachable on this machine by connecting to the Unix domain socket.
-/// Linux only: connects to `<runtime dir>/systemd/private`, else `<runtime dir>/bus`.
-/// Any error -> false.
+/// Probe for a reachable user manager by connecting to the Unix domain socket `<runtime dir>/systemd/private`,
+/// else `<runtime dir>/bus`; returns the runtime directory it connected through. Any error -> None.
 #[cfg(unix)]
-pub fn is_user_manager_reachable() -> bool {
-    let Some(runtime_dir) = resolve_runtime_dir() else {
-        return false;
-    };
+pub fn probe_user_manager() -> Option<PathBuf> {
+    let runtime_dir = resolve_runtime_dir()?;
     use std::os::unix::net::UnixStream;
-    let private = runtime_dir.join("systemd/private");
-    if UnixStream::connect(&private).is_ok() {
-        return true;
-    }
-    let bus = runtime_dir.join("bus");
-    UnixStream::connect(&bus).is_ok()
+    let reachable = UnixStream::connect(runtime_dir.join("systemd/private")).is_ok()
+        || UnixStream::connect(runtime_dir.join("bus")).is_ok();
+    reachable.then_some(runtime_dir)
 }
 
 #[cfg(not(unix))]
-pub fn is_user_manager_reachable() -> bool {
-    false
+pub fn probe_user_manager() -> Option<PathBuf> {
+    None
 }
 
 /// Check if `systemd-run` is on PATH and resolve its absolute path.
@@ -169,17 +174,17 @@ pub fn decide_failure_domain(attempt_id: &str) -> FailureDomain {
         decide_failure_domain_with(
             attempt_id,
             true,
-            is_user_manager_reachable(),
-            resolve_systemd_run_path().is_some(),
+            probe_user_manager(),
+            resolve_systemd_run_path(),
         )
     }
     #[cfg(not(target_os = "linux"))]
     {
-        decide_failure_domain_with(attempt_id, false, false, false)
+        decide_failure_domain_with(attempt_id, false, None, None)
     }
 }
 
-/// Validate `memoryMax` against systemd size syntax: digits with optional K/M/G/T suffix, or "infinity".
+/// Validate `memoryMax` against systemd size syntax: digits with an optional uppercase K/M/G/T suffix, or "infinity".
 /// Empty string means no cap (`None`).
 /// An invalid value emits a warning on stderr and returns `None`.
 pub fn validate_memory_max(raw: &str) -> Option<&str> {
@@ -190,23 +195,14 @@ pub fn validate_memory_max(raw: &str) -> Option<&str> {
     if s == "infinity" {
         return Some("infinity");
     }
-    let (digits, has_suffix) = match s.chars().last() {
-        Some(c) if c.is_ascii_alphabetic() => {
-            let upper = c.to_ascii_uppercase();
-            if upper == 'K' || upper == 'M' || upper == 'G' || upper == 'T' {
-                (&s[..s.len() - c.len_utf8()], true)
-            } else {
-                eprintln!("warning: invalid runner.supervisorScope.memoryMax '{s}' (unrecognized size suffix), ignoring");
-                return None;
-            }
-        }
-        _ => (s, false),
+    let digits = match s.chars().last() {
+        Some(c @ ('K' | 'M' | 'G' | 'T')) => &s[..s.len() - c.len_utf8()],
+        _ => s,
     };
-    let _ = has_suffix;
     if !digits.is_empty() && digits.chars().all(|c| c.is_ascii_digit()) {
         Some(s)
     } else {
-        eprintln!("warning: invalid runner.supervisorScope.memoryMax '{s}' (not digits), ignoring");
+        eprintln!("warning: invalid runner.supervisorScope.memoryMax '{s}' (expected digits with an optional uppercase K, M, G or T suffix, or infinity), ignoring");
         None
     }
 }
@@ -255,29 +251,39 @@ mod tests {
 
     #[test]
     fn failure_domain_decision_reflects_rules() {
+        let dir = || Some(PathBuf::from("/run/user/1000"));
+        let run = || Some(PathBuf::from("/usr/bin/systemd-run"));
         assert_eq!(
-            decide_failure_domain_with("att-1", false, true, true),
+            decide_failure_domain_with("att-1", false, dir(), run()),
             FailureDomain::Inherited {
                 reason: "not-linux".to_string()
             }
         );
         assert_eq!(
-            decide_failure_domain_with("att-1", true, false, true),
+            decide_failure_domain_with("att-1", true, None, run()),
             FailureDomain::Inherited {
                 reason: "no-user-manager".to_string()
             }
         );
         assert_eq!(
-            decide_failure_domain_with("att-1", true, true, false),
+            decide_failure_domain_with("att-1", true, dir(), None),
             FailureDomain::Inherited {
                 reason: "no-systemd-run".to_string()
             }
         );
         assert_eq!(
-            decide_failure_domain_with("att-1", true, true, true),
+            decide_failure_domain_with("att-1", true, dir(), run()),
             FailureDomain::SystemdScope {
-                unit: "fgos-run-att-1".to_string()
+                unit: "fgos-run-att-1".to_string(),
+                systemd_run: PathBuf::from("/usr/bin/systemd-run"),
+                runtime_dir: PathBuf::from("/run/user/1000"),
             }
+        );
+        let scoped =
+            serde_json::to_value(decide_failure_domain_with("att-1", true, dir(), run())).unwrap();
+        assert_eq!(
+            scoped,
+            serde_json::json!({ "kind": "systemd-scope", "unit": "fgos-run-att-1" })
         );
     }
 
@@ -286,7 +292,10 @@ mod tests {
         assert_eq!(validate_memory_max(""), None);
         assert_eq!(validate_memory_max("   "), None);
         assert_eq!(validate_memory_max("8G"), Some("8G"));
-        assert_eq!(validate_memory_max("8g"), Some("8g"));
+        assert_eq!(validate_memory_max("8g"), None);
+        assert_eq!(validate_memory_max("8m"), None);
+        assert_eq!(validate_memory_max("Infinity"), None);
+        assert_eq!(validate_memory_max("G"), None);
         assert_eq!(validate_memory_max("1024M"), Some("1024M"));
         assert_eq!(validate_memory_max("500"), Some("500"));
         assert_eq!(validate_memory_max("infinity"), Some("infinity"));

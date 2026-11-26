@@ -804,9 +804,11 @@ fn bind(
 
 /// Resolve the failure domain from a raw JSON string or fallback to unrecorded.
 pub fn resolve_failure_domain(raw: Option<&str>) -> Value {
-    if let Some(val) = raw {
-        if let Ok(parsed) = serde_json::from_str::<Value>(val) {
-            return parsed;
+    let parsed = raw
+        .and_then(|val| serde_json::from_str::<crate::controller::scope::FailureDomain>(val).ok());
+    if let Some(domain) = parsed {
+        if let Ok(value) = serde_json::to_value(domain) {
+            return value;
         }
     }
     json!({ "kind": "inherited", "reason": "unrecorded" })
