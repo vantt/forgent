@@ -9,6 +9,12 @@ import os from 'node:os';
 import path from 'node:path';
 import { lineageDirOf, readHeadPlacement, writeHeadPlacement } from '../../src/session-host/head-start.mjs';
 import { stopHeadSession } from '../../src/session-host/head-stop.mjs';
+import { readLatestHandoff } from '../../src/session-rotation/handoff-store.mjs';
+import { recordStopTrace } from '../../src/session-rotation/rotate.mjs';
+import { runHeadRequest } from '../../src/session-host/head-request.mjs';
+import { ensureGitAddon } from '../helpers/git-addon.mjs';
+
+ensureGitAddon();
 
 function lineage(t, placement = { host: 'terminal', key: 'head-lead-x-1', groupKey: 'g1' }) {
   const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-head-stop-'));
@@ -114,6 +120,92 @@ test('a short-role lead whose Identity record names a head lineage ends through 
   assert.deepEqual(answer, { stopped: true });
   assert.deepEqual(order, ['end:/run/2']);
   assert.equal(readHeadPlacement(dir).retiredAt, '2026-11-19T01:02:03.000Z');
+});
+
+// Sleep extends the stop effect; these cases belong here, not in a second CLI scenario suite.
+test('a sleep stamps every sleep field and writes its handoff before asking the supervisor to stop', async (t) => {
+  const { projectRoot, dir } = lineage(t);
+  recordStopTrace(dir, { fraction: 0.2 });
+  recordStopTrace(dir, { fraction: 0.45 });
+  recordStopTrace(dir, { fraction: null });
+  fs.appendFileSync(path.join(dir, 'stop-trace.jsonl'), '{torn');
+  const wakeAt = '2026-11-27T01:00:00+07:00';
+  const plan = 'plans/example';
+  const identity = () => ({ live: true, record: { ids: { cliSession: { id: 'cli123456' } } } });
+  await stopHeadSession({ persona: 'lead', name: 'x', projectRoot, reason: 'sleep', wakeAt, plan, phase: '02' }, {
+    host: hostOf(), identity, closed: () => true, now: () => new Date('2026-11-26T12:00:00Z'),
+    end: () => {
+      assert.deepEqual(Object.fromEntries(['wakeAt', 'plan', 'phase', 'contextFraction', 'cliSessionId', 'retiredReason'].map((k) => [k, readHeadPlacement(dir)[k]])), {
+        wakeAt, plan, phase: '02', contextFraction: 0.45, cliSessionId: 'cli123456', retiredReason: 'sleep',
+      });
+      const latest = readLatestHandoff({ fgosDir: path.join(projectRoot, '.fgos'), persona: 'lead', name: 'x' });
+      assert.equal(latest.rotate, 'sleep');
+      assert.match(latest.text, /- plan: plans\/example/);
+      assert.match(latest.text, /- phase: 02/);
+      assert.ok(latest.text.includes(wakeAt));
+      assert.equal(fs.readdirSync(dir).filter((f) => f.endsWith('.md')).length, 1);
+      return true;
+    },
+  });
+});
+
+test('a sleep without measured context or CLI binding stores nulls and can resolve a short-role lineage', async (t) => {
+  const { projectRoot, dir } = lineage(t);
+  await stopHeadSession({ role: 'lead:LANE', projectRoot, reason: 'sleep', wakeAt: '2026-11-27T01:00:00Z' }, {
+    host: hostOf(), ...endedHead(), identity: () => ({ live: true, record: { ids: { head: { persona: 'lead', name: 'x', gen: 2 } } } }),
+  });
+  const record = readHeadPlacement(dir);
+  assert.deepEqual([record.contextFraction, record.cliSessionId, record.plan, record.phase], [null, null, null, null]);
+  assert.equal(readLatestHandoff({ fgosDir: path.join(projectRoot, '.fgos'), persona: 'lead', name: 'x' }).rotate, 'sleep');
+});
+
+test('a failed sleep handoff restores the exact placement and never asks the head to stop', async (t) => {
+  const { projectRoot, dir } = lineage(t);
+  const file = path.join(dir, 'placement.json');
+  const before = fs.readFileSync(file, 'utf8');
+  // A real unwritable handoff target: installation cannot turn a directory into an immutable markdown file.
+  fs.mkdirSync(path.join(dir, '261126-1200-headlead.md'));
+  const host = hostOf();
+  await assert.rejects(stopHeadSession({ persona: 'lead', name: 'x', projectRoot, reason: 'sleep', wakeAt: '2026-11-27T01:00:00Z' }, {
+    host, identity: () => ({ live: true }), now: () => new Date('2026-11-26T12:00:00Z'),
+    end: () => assert.fail('a refused handoff must not stop the head'),
+  }), { code: 'handoff-not-written' });
+  assert.equal(fs.readFileSync(file, 'utf8'), before);
+  assert.equal(fs.existsSync(path.join(dir, 'latest.json')), false);
+  assert.deepEqual(host.closes, []);
+});
+
+test('sleep requires an RFC 3339 wake time and wake-at is refused for every other stop reason before any write', async (t) => {
+  const { projectRoot, dir } = lineage(t);
+  const before = fs.readFileSync(path.join(dir, 'placement.json'), 'utf8');
+  const invalid = [undefined, '', true, 'tomorrow', '2026-11-27', '2026-11-27T01:00:00', '2026-02-30T01:00:00Z', '2026-11-27T24:00:00Z', '2026-11-27T01:00:00+24:00'];
+  for (const wakeAt of invalid) {
+    await assert.rejects(stopHeadSession({ persona: 'lead', name: 'x', projectRoot, reason: 'sleep', wakeAt }), { code: 'wake-at-invalid' });
+  }
+  for (const reason of [null, 'manual']) {
+    await assert.rejects(stopHeadSession({ persona: 'lead', name: 'x', projectRoot, reason, wakeAt: '2026-11-27T01:00:00Z' }), { code: 'wake-at-invalid' });
+    for (const extra of [{ plan: 'plans/example' }, { phase: '02' }]) {
+      await assert.rejects(stopHeadSession({ persona: 'lead', name: 'x', projectRoot, reason, ...extra }, {
+        identity: () => assert.fail('sleep-only flags must be refused before looking up a holder'),
+      }), { code: 'bad-args' });
+    }
+  }
+  for (const extra of [{ plan: 'plans/../elsewhere' }, { plan: true }, { phase: 'two' }, { phase: 2 }]) {
+    await assert.rejects(stopHeadSession({ persona: 'lead', name: 'x', projectRoot, reason: 'sleep', wakeAt: '2026-11-27T01:00:00Z', ...extra }), { code: 'bad-args' });
+  }
+  assert.equal(fs.readFileSync(path.join(dir, 'placement.json'), 'utf8'), before);
+});
+
+test('the confined stop payload carries sleep arguments through its existing authorization branch', async (t) => {
+  const { projectRoot, dir } = lineage(t);
+  const runDir = path.join(projectRoot, 'request-run');
+  fs.mkdirSync(runDir);
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: projectRoot, session: { role: 'head:lead-x', persona: 'lead', name: 'x' } }));
+  const response = await runHeadRequest({ runDir, request: { verb: 'session stop', args: { persona: 'lead', name: 'x', reason: 'sleep', wakeAt: '2026-11-27T01:00:00Z', plan: 'plans/example', phase: '02' } } }, {
+    stop: { host: hostOf(), ...endedHead(), identity: () => ({ live: true }) },
+  });
+  assert.deepEqual(response, { exit: 0, line: { result: 'done', data: { stopped: true } } });
+  assert.equal(readHeadPlacement(dir).phase, '02');
 });
 
 test('a short role nobody holds stops nothing, and a role that is not a lead short role is refused', async (t) => {

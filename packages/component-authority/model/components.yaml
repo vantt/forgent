@@ -427,6 +427,10 @@
       reason: per-file layer carried over from the manifest; the directory mixes layers
       layer: use-case
       tier: 5
+    - path: src/session-host/head-list.mjs
+      reason: read-only head listing is a use case joining Identity sessions with lineage placements through head-start
+      layer: use-case
+      tier: 5
     - path: src/session-host/head-stop.mjs
       reason: per-file layer carried over from the manifest; the directory mixes layers
       layer: use-case

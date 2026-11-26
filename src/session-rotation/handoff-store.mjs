@@ -6,6 +6,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { installOnce, replaceDurably } from '../native/door.mjs';
 
+export const HANDOFF_REASONS = Object.freeze(['soft', 'hard', 'manual', 'sleep']);
+
 const FILE_MODE = 0o600;
 const NAME_RE = /^[a-z0-9][a-z0-9-]*$/;
 const FILE_RE = /^\d{6}-\d{4}-[A-Za-z0-9]{1,8}\.md$/;
@@ -66,10 +68,13 @@ export function escapeSingleLine(text) {
 export function buildHandoff({
   persona, name, sessionId, rotate, portfolio = [], delta = '',
   lastAssistantMessage = null, pendingQuestion = null,
-  sessionCrons = [], backgroundTasks = [],
+  sessionCrons = [], backgroundTasks = [], plan = null, phase = null, wakeAt = null,
 }) {
-  const lines = [VERIFY_LINE, '', `# Handoff: ${persona}-${name}`, '', `- session: ${sessionId}`, `- rotation: ${rotate}`, '', '## Portfolio files to reread', ''];
-  lines.push(...(portfolio.length > 0 ? portfolio.map((p) => `- ${p}`) : ['- (none listed)']), '', '## Delta since the last handoff', '', delta.trim() || '(none recorded)', '');
+  const lines = [VERIFY_LINE, '', `# Handoff: ${persona}-${name}`, '', `- session: ${sessionId}`, `- rotation: ${rotate}`, ''];
+  if (rotate === 'sleep') {
+    lines.push(`- plan: ${escapeSingleLine(plan ?? '(none)')}`, `- phase: ${escapeSingleLine(phase ?? '(none)')}`, `- wake at: ${escapeSingleLine(wakeAt)}`, '');
+  }
+  lines.push('## Portfolio files to reread', '', ...(portfolio.length > 0 ? portfolio.map((p) => `- ${p}`) : ['- (none listed)']), '', '## Delta since the last handoff', '', delta.trim() || '(none recorded)', '');
   if (sessionCrons.length > 0) {
     lines.push('## Crons to recreate', '');
     for (const cron of sessionCrons) {
@@ -101,6 +106,7 @@ export function buildHandoff({
  * `keep`. Returns `{ file, path }`.
  */
 export function writeHandoff({ fgosDir, persona, name, sessionId, rotate, keep, now = new Date(), ...content }) {
+  if (!HANDOFF_REASONS.includes(rotate)) throw Object.assign(new TypeError(`handoff store: unknown reason ${JSON.stringify(rotate)}`), { code: 'bad-reason' });
   const dir = dirOf(fgosDir, persona, name);
   const sid8 = String(sessionId).replace(/[^A-Za-z0-9]/g, '').slice(0, 8);
   if (!sid8) throw new TypeError('handoff store: sessionId has no usable characters');

@@ -17,6 +17,7 @@
       "rules": [
         { "prefix": "session bind session", "decision": "allow", "policy": "native" },
         { "prefix": "session rotate", "decision": "allow", "policy": "node" },
+        { "prefix": "session list", "decision": "allow", "read": true },
         { "prefix": "session answered", "decision": "allow", "policy": "node" },
         { "prefix": "session restore role", "decision": "allow", "policy": "node" },
         { "prefix": "friction record", "decision": "allow" },

@@ -147,13 +147,15 @@ fn the_strictest_decision_wins_a_tie() {
 
 #[test]
 fn only_the_read_rows_may_be_used_before_a_rotation_successor_holds_the_role() {
-    let read = decide("planner", &argv("questions")).unwrap().rule.unwrap();
-    assert!(read.read);
+    for line in ["questions", "session list"] {
+        let read = decide("planner", &argv(line)).unwrap().rule.unwrap();
+        assert!(read.read, "{line}");
+    }
     for line in ["friction record", "land", "supervisor raise"] {
         let rule = decide("lead", &argv(line)).unwrap().rule.unwrap();
         assert!(!rule.read, "{line}");
     }
-    let readers: Vec<String> = [
+    let readers: std::collections::BTreeSet<String> = [
         "head",
         "lead",
         "planner",
@@ -169,9 +171,12 @@ fn only_the_read_rows_may_be_used_before_a_rotation_successor_holds_the_role() {
             .is_some_and(|rule| rule.read)
     })
     .collect();
-    assert!(
-        readers.iter().all(|verb| verb == "questions"),
-        "{readers:?}"
+    assert_eq!(
+        readers,
+        ["questions", "session list"]
+            .map(String::from)
+            .into_iter()
+            .collect()
     );
 }
 

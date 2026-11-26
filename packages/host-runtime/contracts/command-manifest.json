@@ -5719,8 +5719,8 @@
     },
     {
       "name": "session",
-      "invoke": "fgos session <start|rotate|stop|write|read|type>",
-      "description": "Agent head sessions: \"read\" shows the last lines of a session's screen and \"type\" types into a stuck session's pane (both served natively by the Rust host); \"start\" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; \"rotate\" asks for its replacement by a successor that reads a redacted handoff; \"stop\" ends a head on purpose; \"write\" replaces a file of a confined head's grant (the secretary's backlog items) through its supervisor. From inside a confined head all six go through its request socket.",
+      "invoke": "fgos session <start|rotate|stop|list|write|read|type>",
+      "description": "Agent head sessions: \"read\" shows the last lines of a session's screen and \"type\" types into a stuck session's pane (both served natively by the Rust host); \"start\" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; \"rotate\" asks for its replacement by a successor that reads a redacted handoff; \"stop\" ends a head on purpose; \"write\" replaces a file of a confined head's grant (the secretary's backlog items) through its supervisor. \"list\" reads live, sleeping and retired heads without writing. From inside a confined head these verbs go through its request socket.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -5731,6 +5731,7 @@
               "start",
               "rotate",
               "stop",
+              "list",
               "write",
               "read",
               "type"
@@ -5827,7 +5828,19 @@
               },
               "reason": {
                 "type": "string",
-                "description": "Why it is stopped (at most 200 characters), kept on the lineage."
+                "description": "Why it is stopped (at most 200 characters), kept on the lineage. sleep requires --wake-at and writes a handoff before stopping."
+              },
+              "wake-at": {
+                "type": "string",
+                "description": "RFC 3339 wake time, required with --reason sleep and refused otherwise."
+              },
+              "plan": {
+                "type": "string",
+                "description": "Optional project-relative plans directory named in the sleep record and handoff."
+              },
+              "phase": {
+                "type": "string",
+                "description": "Optional two-digit phase (NN) named in the sleep record and handoff."
               }
             },
             "positional": [
@@ -5838,6 +5851,18 @@
           "examples": [
             "fgos session stop shaper --name <slug> --reason \"answer received\"",
             "fgos session stop --role lead:<LANE> --reason \"plan done\""
+          ]
+        },
+        "list": {
+          "description": "Read-only: join Identity live holders with Session Host placements; a live holder wins over sleeping or retired state.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "positional": [],
+            "required": []
+          },
+          "examples": [
+            "fgos session list --json"
           ]
         },
         "write": {
