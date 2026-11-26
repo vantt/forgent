@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "A ready plan runs to done without the owner: the standing rule as rule units, an Unattended run section the contract check enforces, and a full-gate door the lead calls"
-status: draft
+status: ready
 priority: P1
 blockedBy:
   - 261126-2318-plan-footprint-overlap-warns
