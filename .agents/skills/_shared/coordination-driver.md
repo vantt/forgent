@@ -33,7 +33,7 @@ Derive state only from the runtime's inspection doors:
 
 Which activity next, by which route, is the driver's judgment. The guide gives direction: its routes are `should` (the default, deviate with a reason), `may-instead` (an allowed alternative) and `unlisted` (anything else, allowed with a recorded reason unless the guide closes the decision point to listed routes). Mechanical rules (entry milestones, consent bound to the approved artifact, disjoint writes, the approved frame, the seat-launch ceiling) belong to the harness: it admits or refuses by name when the Unit is dispatched.
 - A refusal is an answer: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
-- Never ask a person to choose a route the guide already permits.
+- Never ask a person to choose a route the guide already permits (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json, priority 2).
 
 ### Step 3: Dispatch (always name the case)
 
@@ -50,7 +50,7 @@ Case boundaries (what the harness cannot do for you):
 - Edits you make in your own session (Edit, Write, a subagent) are outside the ledger; the case does not see them. The approve door still guards landing.
 - Close a conductor case with `fgos workflow close <caseId>` when its closure milestones hold and no consent gate is parked. A Playbook case closes itself when it completes with a pass; a failed, blocked or parked case stays open.
 
-Ask a person only when the case cannot go on without them: a consent gate the guide marks human, an ambiguity about the request itself, a frame that must be widened, or repeated refusals across distinct approaches. Put the questions together and use the decision-question template (`decision-question.md`); work that does not depend on the answer keeps going.
+Ask a person only when the case cannot go on without them: a consent gate the guide marks human, an ambiguity about the request itself, a frame that must be widened, or repeated refusals across distinct approaches. How to ask: Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json (priority 2), in the template of `decision-question.md`.
 
 ### Step 4: Verify Evidence
 
@@ -69,7 +69,7 @@ Based on dispositions and evidence outcomes:
 - **Revise:** Authorize and dispatch revision operations within the declared adaptation bounds.
 - **Recheck:** an accepted finding is discharged only by an independent recheck: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - **Retry / Reopen:** `fgos workflow resume` reruns a step that failed on infrastructure (execution-failure, not-started; no settled seat verdict) once per call, as a fresh admitted Unit run (a writing unit in its recorded worktree and branch). Verdicts (findings, refusals, out-of-scope writes) are terminal: resume refuses them by name, `nothing-to-resume: step <id> ended <outcome>`. An answer never reopens a step. No automatic retry beyond the Execution Core's one lost-brief retry.
-- **Ask Human:** Only for the triggers listed in Step 3. A harness refusal is not one of them. Ask in the decision-question template (`decision-question.md`; batching per AGENTS.md priority #2) and never stall work that does not depend on the answer.
+- **Ask Human:** Only for the triggers listed in Step 3. A harness refusal is not one of them. How to ask: Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json (priority 2).
 
 ### Step 7: Explicit Close or Continue
 

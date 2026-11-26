@@ -113,7 +113,7 @@ remained, and why. No reopen graph, driver, conditional step, or automatic speci
 
 Investigate before asking for facts the repository can answer. Carry nonblocking
 user-exclusive gaps as named defaults into the packet. Ask immediately only when
-safe reasoning would otherwise invent the owner's obligations. A short reply is
+safe reasoning would otherwise invent the owner's obligations (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json, priority 2). A short reply is
 not necessarily a decision: distinguish clarify, challenge, new context, alternative,
 composition, explicit decision, and deferral by meaning rather than tone.
 

@@ -40,8 +40,9 @@ below is shared and lives only here.
 - Never lock a point into a D-ID from a single answer. A D-ID is minted only
   once a point has held stable across more than one round without revision.
   Changing one's mind mid-discussion is expected here.
-- One question per turn. A question with real choices uses the five-part form;
-  never stack several questions in one message.
+- In the live conversation, one question per turn: a question with real choices uses the five-part form;
+  never stack several questions in one message. A formal owner question is different: it goes to the
+  question store, batched with the others (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json, priority 2; below).
 - "Not sure" (`chưa chắc`): offer a default with its reversal trigger and
   record it as provisional in §3, never as settled.
 - Never force convergence with a structured-choice tool. Ask in open

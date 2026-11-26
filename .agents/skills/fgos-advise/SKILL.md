@@ -49,7 +49,7 @@ does not govern the delegated architecture route, which keeps the hook table of
 2. **Pick the request kind** (A-G plus the two overlays) and take its route from
    the reference table. Pick the narrower, gate-free route when two fit. Check
    the row's "Do NOT use when" before launching.
-3. **Ask only when one of these four holds**, batching them in one message:
+3. **Ask only when one of these four holds**, batched (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json, priority 2):
    the subject is absent; a review (kind B) has no readable artifact; kind A was
    named but the options are neither supplied nor discoverable (if options can
    be generated, use kind C instead of asking); the only ambiguity is advice

@@ -281,3 +281,10 @@ Persona files, prompt templates (`core/prompt-templates/**`) and `.claude/agents
   engine opens its search with `SearchScope::Profile`. With it the check runs in about 5 s; every unit of this plan
   passes (26 rules, 0 refusals, highest score 0.921). scratch-artifacts scored 0.930 against coding-worktree-safety;
   both were read, they are distinct, and the relation is declared `related`.
+- **Owner answers (2026-11-27 00:0x, in the lead's session).** C2: option A, inline everywhere; the cook door runs
+  the slice inline and fanout reports an `unavailable` id once as work the caller runs inline. C6: option A, an item
+  with `workflowRunId` follows its run, an item without one is a legacy item routed by `workflowStep`. Parked items
+  (owner question 1): gather now, the other plan later edits one unit. The Product priority order section is the
+  unit `product-priority-order` (text unchanged); the copies of clusters 12, 13, 14 and 19 point to it or to
+  `decision-question.md`. C7: kept both, scoped: one question per turn in a live shaping conversation; a formal owner
+  question goes to the question store, batched.

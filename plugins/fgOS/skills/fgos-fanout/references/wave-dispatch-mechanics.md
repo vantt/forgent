@@ -60,7 +60,7 @@ This single call re-confirms each candidate's mechanism and runs each out-of-pro
 - `lane-pool-full`: that seat waited up to `workerSlots.laneWaitSec` for a free lane and got none. Report it for its own id and move on; after repeated refusals across waves, STOP and hand back to the caller.
 - `fired`: one entry per out-of-process candidate that was picked, run and returned (or blocked); read each item's real state in Step 5, never the entry alone.
 - `mechanismChanged`: candidates whose mechanism resolved to `in-process`. Add to `firing` for native Agent dispatch in Step 4.
-- `unavailable`: candidates with no registered executor. Report back as needing a person and add to `dispatchUnavailable`.
+- `unavailable`: candidates with no registered executor. Report each back once, as work the caller runs inline, and add it to `dispatchUnavailable`.
 - `deferred`: candidates the call did not fire. Retain in `ready` for the next batch.
 
 ### Handling orphaned claims (background process failure)

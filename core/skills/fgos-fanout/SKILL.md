@@ -79,7 +79,7 @@ own judgment.
   `node src/runner/fanout-batch.mjs "<ids>" --has-live-task-access`
   (`references/wave-dispatch-mechanics.md` Step 3), which picks, runs and
   returns the item itself — never hand-run the resolved command. Only a `mechanism: "unavailable"` result means no executor
-  is registered, and reports that id back to the caller as needing a person.
+  is registered: report that id back to the caller once, as work the caller runs inline (Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - **Announce every dispatch before firing it.** Print one line per
   candidate, the same shape every dispatch path in the repo uses for
   observability parity:

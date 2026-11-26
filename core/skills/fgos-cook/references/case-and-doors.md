@@ -67,7 +67,7 @@ a question for the owner. Do not work around it by running writes outside the ca
 ## 5. Dispatch a slice
 
 First `fgos dispatch decide --for <capability>` (the answer tells you whether
-anything serves it; `unavailable` is a blocker to ask about). Then run the slice's
+anything serves it; `unavailable` means you run the slice inline in this session: Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json). Then run the slice's
 printed `fgos run` line, replacing the case slot with the `caseId`. It always names
 the case. The shape of such a line, for reading and for the rare change you must make
 to one with a reason:
