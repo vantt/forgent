@@ -552,6 +552,20 @@ fn a_lead_is_recognised_by_either_role_form_and_a_non_lead_head_is_never_one() {
         );
         assert_eq!(rows(&ended).len(), counted, "{role} retired");
 
+        let closed = project(
+            &format!("{name}-ended"),
+            &[head_line("h1", "2026-11-18T11:00:00Z", "h1", "ended", role)],
+            true,
+        );
+        let closed_rows = answer(
+            &closed,
+            "lead-ended",
+            "2026-11-18T12:00:00Z",
+            None,
+            &environment(&[]),
+        );
+        assert_eq!(rows(&closed_rows).len(), counted, "{role} ended");
+
         let live = project(
             &format!("{name}-live"),
             &[

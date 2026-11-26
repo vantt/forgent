@@ -10,8 +10,11 @@
     "where": [
       {
         "field": "fgos.head.state",
-        "op": "eq",
-        "value": "retired"
+        "op": "in",
+        "value": [
+          "retired",
+          "ended"
+        ]
       },
       {
         "any": [
@@ -41,7 +44,7 @@
   },
   "row": {
     "kind": "lead-ended",
-    "reason": "a lead retired",
+    "reason": "a lead ended",
     "nextCommand": "fgos supervisor plans"
   }
 }

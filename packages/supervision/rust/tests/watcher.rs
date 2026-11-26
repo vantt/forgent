@@ -279,6 +279,29 @@ fn a_late_commit_inside_the_lookback_is_asked_for() {
 }
 
 #[test]
+fn an_ended_lead_over_an_empty_queue_records_one_lead_ended_event_and_the_next_tick_nothing_new() {
+    let w = World::default();
+    at(&w, 1000);
+    w.rows.borrow_mut().push(row(
+        "lead-ended",
+        "head:lead-ops",
+        "2026-11-18T02:30:00.000Z",
+    ));
+    let s = settings(Action::None);
+    assert!(w.raised.borrow().is_empty());
+    let first = run(&w, None, &s);
+    assert_eq!((first.raised, first.duplicate), (1, 0));
+    assert_eq!(w.raised.borrow().len(), 1);
+    assert!(w.raised.borrow().values().all(|e| e.kind == "lead-ended"));
+    // An open event keeps the supervisor busy, so the next tick runs the definitions again.
+    w.pace_rows.borrow_mut().push(row("active", "x", "t"));
+    at(&w, 1060);
+    let second = run(&w, None, &s);
+    assert_eq!((second.raised, second.duplicate), (0, 1));
+    assert_eq!(w.raised.borrow().len(), 1);
+}
+
+#[test]
 fn a_missing_state_raises_rows_in_the_window_once_and_the_next_tick_nothing_new() {
     let w = World::default();
     at(&w, 5000);

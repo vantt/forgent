@@ -1,7 +1,7 @@
 {
   "contract": "observe-kinds.v1",
   "attrs": {
-    "fgos.head.state": { "type": "string", "values": ["live", "gone", "unknown", "retired"] },
+    "fgos.head.state": { "type": "string", "values": ["live", "gone", "unknown", "retired", "ended"] },
     "fgos.head.identity": { "type": "string", "values": ["alive", "unknown", "remote", "absent"] },
     "fgos.head.role": { "type": "string" },
     "fgos.head.persona": { "type": "string" },

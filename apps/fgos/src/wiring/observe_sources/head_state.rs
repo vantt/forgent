@@ -8,6 +8,10 @@
 //! separate attr `fgos.head.identity`, so a pane that answers `unknown` while the role is held alive stays visible as
 //! exactly that. The role string itself (`head:<persona>-<name>`, `lead:<LANE>`) travels as `fgos.head.role`.
 //!
+//! `ended` is the safety net for a head whose attempt closed without a stop: its `runDir` holds the run supervisor's
+//! `closed.json` (read, never written here) with a valid `at`, and the placement has no valid `retiredAt`. The record
+//! `ts` is that `at` and Session Host is not asked. A rotated head has a new `runDir`, so the old file never reaches it.
+//!
 //! A `gone` record carries the placement's `startedAt` as its `ts`, so the head-gone event keeps one id while the
 //! head stays gone (the definition reads its own 30-day window); every other state is stamped with the tick.
 //!
@@ -127,6 +131,17 @@ struct Head {
     started_at: Option<String>,
 }
 
+/// The instant the head's attempt closed: `closed.json` in its `runDir` with a valid `at`. Read from disk on every
+/// call; an absent, unreadable or malformed file is no signal.
+fn closed_at(run_dir: &Path) -> Option<String> {
+    if run_dir.as_os_str().is_empty() {
+        return None;
+    }
+    let bytes = std::fs::read(run_dir.join("closed.json")).ok()?;
+    let value: Value = serde_json::from_slice(&bytes).ok()?;
+    instant_of(&value["at"])
+}
+
 /// An RFC 3339 instant of the placement file, normalized to UTC, or `None` when absent or not a valid instant.
 fn instant_of(value: &Value) -> Option<String> {
     value
@@ -185,9 +200,10 @@ impl RecordSource for HeadStateSource {
         Ok(heads
             .into_iter()
             .map(|head| {
-                let (state, ts) = match head.retired_at {
-                    Some(at) => ("retired", at),
-                    None => {
+                let (state, ts) = match (head.retired_at, closed_at(&head.run_dir)) {
+                    (Some(at), _) => ("retired", at),
+                    (None, Some(at)) => ("ended", at),
+                    (None, None) => {
                         let state = state_name(self.facts.alive(&head.placement, &head.run_dir));
                         // A gone head is one incident for as long as it stays gone: its instant is the placement
                         // it belongs to, not the tick that noticed, so the event id the watcher derives from it
