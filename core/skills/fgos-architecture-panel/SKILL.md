@@ -31,9 +31,8 @@ worker cwd. With the read-only safety prerequisite satisfied:
 fgos workflow start architecture-advisory --request "<verbatim CASE>" --dir <repoRoot> --worktree <targetRoot>
 ```
 
-The start result identifies a run, not completed advice. Read the complete settled
-reports supplied by the workflow/operator; never infer success from launch metadata,
-chat memory, an absent report, or a one-line summary. Missing evidence stays a gap.
+The start result identifies a run, not completed advice (Rule: driver-discipline, in AGENTS.md; set in .fgos/instructions/effective/rules.json)
+Read the complete settled reports supplied by the workflow/operator. Missing evidence stays a gap.
 Do not open workflow event logs, unit state files, or a parallel status store.
 
 ## Read-only safety prerequisite
@@ -113,7 +112,7 @@ remained, and why. No reopen graph, driver, conditional step, or automatic speci
 
 Investigate before asking for facts the repository can answer. Carry nonblocking
 user-exclusive gaps as named defaults into the packet. Ask immediately only when
-safe reasoning would otherwise invent the owner's obligations. A short reply is
+safe reasoning would otherwise invent the owner's obligations (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json, priority 2). A short reply is
 not necessarily a decision: distinguish clarify, challenge, new context, alternative,
 composition, explicit decision, and deferral by meaning rather than tone.
 

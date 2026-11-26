@@ -16,16 +16,16 @@ normally do beyond editing code is switched off by the brief, not left to its de
 
 1. **Run non-interactively.** Invoke the skill in its automatic mode; the skill's own documentation
    names the flag. A worker has no person to answer a question; a stage that would ask must take its
-   documented default and keep going.
+   documented default and keep going. A brief that lacks a field the work needs is not a stage question:
+   report it blocked, naming the field (`coding-worker-contract.md`, rule 3).
 2. **Write only the declared `writes`.** The Unit's `writes` paths are the whole write surface. Do
    not create plan files, a plan directory, a report, a journal entry or any scratch file inside the
    worktree; keep working notes in the final answer instead.
 3. **No plan-status edits.** Do not tick checkboxes or change status fields in any plan or phase file,
    even one the slice came from. fgOS records progress; the worker only edits the declared files.
 4. **No journal.** Skip the skill's journal step entirely.
-5. **No git.** Never run `git add`, `git commit`, `git push`, branch or worktree commands. When the
-   skill reaches a step that asks before committing, answer no. The runner commits only the declared
-   `writes` after a passing round.
+5. **No git.** Rule: run-door-contract (in AGENTS.md; set in .fgos/instructions/effective/rules.json). Beyond that rule, never run `git push`, branch or worktree
+   commands either; when the skill reaches a step that asks before committing, answer no.
 6. **Review is fgOS's job.** Skip the skill's own review, test-report and finalize phases beyond
    running the checks the slice names; the independent review fgOS dispatches is the review. Report
    the result of the checks you ran, and anything you could not run, in the final answer.
@@ -33,7 +33,7 @@ normally do beyond editing code is switched off by the brief, not left to its de
 ## What the Lead still does
 
 Choosing the executor (`fgos dispatch decide`), running the Unit (`fgos run`), verifying the result
-independently and landing it. A worker's own claim of success is evidence to check, never proof. Do
+independently and landing it (Rule: driver-discipline, in AGENTS.md; set in .fgos/instructions/effective/rules.json) Do
 not use this fragment for a checker or panel role: those are chosen on independence alone and are
 never asked for skills.
 

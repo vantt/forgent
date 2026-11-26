@@ -120,7 +120,7 @@ history), then `seal <name> --domains <new-domain>`.
 When the human names a theme to đào sâu ("how do the references solve X?"),
 follow `references/deep-dive-protocol.md`: assemble from matrix + indexes
 (free) → reuse existing inventory reports → targeted reads of cited `Where:`
-files only — never re-scan a source. Output
+files only (no re-scan; Hard gates & red flags). Output
 `docs/distillery/deep-dives/<topic>.md`, Bottom Line first, and it MUST end
 with a synthesis: a combined best-of design fitted to the host project, not
 just a comparison.
@@ -161,6 +161,8 @@ structured markdown.
   chosen feature is a separate job (e.g. the `xia` skill when available).
 - Do not build search infrastructure for the learning area; the grep recipe
   in extract-rules.md is the supported lookup path.
+- Never re-scan a whole source in deep-dive or consult mode; descend only to
+  the cited `Where:` files an entry earns.
 
 Extraction complete and sealed. Report what was learned (new/changed/removed
 features, matrix updates, proposed candidates) in work language, then hand

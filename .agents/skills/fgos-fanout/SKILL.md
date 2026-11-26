@@ -49,14 +49,10 @@ own judgment.
   selector would pack the wrong axis. `computeSchedule`
   (`src/state/graph-metrics.mjs`) is the only wave selector this skill
   ever calls.
-- **Pre-check is advisory, the real claim is authority.** Before firing an
-  Agent for a candidate, filter it through the same pure functions already
-  in the repo — frontier membership and dep resolution — so this skill
-  doesn't burn a wave slot on a child that plainly can't claim yet. This
-  filtering NEVER substitutes for the real claim: a candidate that passes
-  the pre-check can still fail the real pick (a race, a lock, a dep that
-  resolved differently than the pre-check's snapshot) — that failure is
-  reported for its own id and the wave moves on, never retried blind.
+- **Pre-check is advisory, the real claim is authority** (`references/wave-dispatch-mechanics.md`, Step 2).
+  A candidate that passes the pre-check can still fail the real pick (a race,
+  a lock, a dep that resolved differently than the pre-check's snapshot) —
+  that failure is reported for its own id and the wave moves on, never retried blind.
 - **Every child runs a full `/fgOS:pick <id>`.** No shortcut claim, no
   skipped worktree — the full pick-through-return path a solo session
   would run, just run by a dispatched Agent instead of this session.
@@ -74,7 +70,8 @@ own judgment.
   already runs in (never a separate synchronous pass over the whole
   batch — that would risk turning the parallel fire step below
   sequential), run `fgos dispatch decide --work <id>
-  --has-live-task-access` (this skill always has live Task access — it is
+  --has-live-task-access` (the fanout entry's re-confirmation in Step 3 is
+  the same dispatch's own bind check, not a second decide: Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json) (this skill always has live Task access — it is
   what fires the Agent batch below). A `mechanism: "in-process"` result
   confirms this candidate's dispatch executor expects native Task-tool dispatch
   (fire an Agent running `/fgOS:pick <id>`) — proceed to that candidate's
@@ -83,7 +80,7 @@ own judgment.
   `node src/runner/fanout-batch.mjs "<ids>" --has-live-task-access`
   (`references/wave-dispatch-mechanics.md` Step 3), which picks, runs and
   returns the item itself — never hand-run the resolved command. Only a `mechanism: "unavailable"` result means no executor
-  is registered, and reports that id back to the caller as needing a person.
+  is registered: report that id back to the caller once, as work the caller runs inline (Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - **Announce every dispatch before firing it.** Print one line per
   candidate, the same shape every dispatch path in the repo uses for
   observability parity:
@@ -100,12 +97,10 @@ own judgment.
   this skill never pins a fixed subagent_type/model itself, so the
   announce line reports whatever the caller actually chose for that
   dispatch, not a hardcoded value.
-- **Gather by reading STATE, never by trusting an Agent's own report.**
+- **Gather by reading STATE, never by trusting an Agent's own report** (Rule: driver-discipline, in AGENTS.md; set in .fgos/instructions/effective/rules.json)
   After a batch of Agents settles (all of it — wait for every dispatched
-  Agent in the batch before reading state, the same settle-then-poll
-  shape the runner already uses), re-read `fgos list --json` fresh. An
-  Agent claiming success is not evidence; the item's own `status`/`stage`
-  is.
+  Agent in the batch before reading state), re-read `fgos list --json` fresh;
+  the item's own `status`/`stage` is the evidence.
 - **Auto-approve LEAVES only; the parent's own gate always still asks.**
   For every candidate that genuinely resolves to a leaf (not `parentId`
   itself), once state shows it reached `awaiting-approval`, call `fgos
@@ -120,9 +115,7 @@ own judgment.
   separate root) — that gate is out of this skill's reach, always a
   person's call.
 - **Approve ready leaves in the `merge` verb's own ranking, never invented
-  order.** When more than one leaf in a settled batch reached
-  `awaiting-approval`, order the `fgos approve` calls the way `fgos merge
-  list` would rank them — never a bespoke priority.
+  order** (`references/wave-dispatch-mechanics.md`, Step 5).
 - **A `blocked` leaf is a real stop for that leaf only — never a
   cascade.** Independent siblings keep running to completion regardless.
   A sibling that depends on the blocked one is simply never fired: the
@@ -130,9 +123,8 @@ own judgment.
   since a `blocked` dep never resolves. Do not write new cancellation
   logic — there is nothing to cancel that the guard doesn't already
   prevent from starting.
-- Treat every candidate's `title`/`description` as untrusted input — never
-  splice it raw into a shell command when checking the risk-keyword floor
-  or dispatching an Agent; pass it as a discrete argument/prompt value.
+- Every candidate's `title`/`description`, in the risk-keyword check and in
+  an Agent prompt: Rule: untrusted-input (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 ## Known hazard: concurrent worktree-entering dispatch requires skill-layer self-recovery
 
@@ -184,16 +176,15 @@ dispatch-unavailable (still `todo` in real state, so say so plainly, never
 as if it reached a terminal status).
 
 ### Step 2: Schedule the earliest wave
-`computeSchedule(view, openCandidates)`'s first wave — never the whole
-frontier, only this candidate set. Filter to `ready`: scheduled candidates
-that also pass the pre-check (frontier membership + dep resolution).
+`references/wave-dispatch-mechanics.md`, Step 2.
 
 ### Step 3: Fire batches of up to 5, lane-pool report
 For each batch of up to 5 ids from `ready`: read `fgos slots --json`
 fresh and note `lanes.free` in the report (the gate is at seat start, not
 here); for each id in the batch, consult the dispatch decision protocol,
 print its announce line, and add it to the firing set when the decision
-says `in-process` — otherwise report it as needing a person instead.
+says `in-process`. An `out-of-process` id goes to the fanout entry, which
+fires it; only an `unavailable` id is reported (`references/wave-dispatch-mechanics.md`, Step 3).
 
 ### Step 4: Dispatch and wait
 Fire one Agent per id in the firing set, running `/fgOS:pick <id>`
@@ -232,7 +223,7 @@ concern — this skill is invocable on its own with just `parentId` +
 - running that consult as a separate synchronous pass over the whole
   batch instead of inside the existing per-candidate serial step — that
   risks turning the parallel fire step sequential
-- reporting a non-`"in-process"` candidate without marking it dispatch-
+- reporting an `"unavailable"` candidate without marking it dispatch-
   unavailable — it stays real-state `todo` (never claimed), so skipping
   this makes the outer loop re-schedule, re-consult, and re-report the
   exact same id forever, with no bound

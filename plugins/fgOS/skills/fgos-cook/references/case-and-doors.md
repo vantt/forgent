@@ -68,7 +68,7 @@ a question for the owner. Do not work around it by running writes outside the ca
 ## 5. Dispatch a slice
 
 First `fgos dispatch decide --for <capability>` (the answer tells you whether
-anything serves it; `unavailable` is a blocker to ask about). Then run the slice's
+anything serves it; `unavailable` means you run the slice inline in this session: Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json). Then run the slice's
 printed `fgos run` line, replacing the case slot with the `caseId`. It always names
 the case. The shape of such a line, for reading and for the rare change you must make
 to one with a reason:
@@ -115,7 +115,7 @@ and why.
 
 A refused dispatch prints a code and a condition (`entry-milestone-unmet`,
 `writes-overlap`, `frame-exhausted`, `seat-launch-ceiling`, `consent-missing` ...).
-Re-read `status`, change the proposal or stop; do not repeat it.
+Re-read `status`, change the proposal or stop: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 ## 6. Verify it yourself
 
@@ -130,10 +130,9 @@ Record `slice, activity, run id, outcome, what you re-ran, result` in the notebo
 
 ## 7. Findings and adaptation
 
-For each finding: accepted (dispatch `fix-verify-red` or a fix slice, then an
-independent recheck by another slice or the next reviewed round), rejected (reason
-in the notebook), deferred (only outside the approved scope). A finding is never
-discharged by your word alone. Bounds per slice: the pattern's rounds, then one fix
+Every finding gets a disposition and an accepted one an independent recheck: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
+Here the fix is `fix-verify-red` or a fix slice, the recheck another slice or the next reviewed round, a rejection
+gets its reason in the notebook, and deferral is only outside the approved scope. Bounds per slice: the pattern's rounds, then one fix
 slice, one read-only diagnosis (`code:debug`), one rigor raise; then park a question.
 
 ## 8. Questions

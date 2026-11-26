@@ -3,8 +3,8 @@ name: fgos-supervisor
 user-invocable: false
 description: >-
   Procedure of the project supervisor, one stateless wake: look after every running agent that no lead watches (leads,
-  shapers, planners, and any agent started without a lead), drain the supervision event queue and help requests, admit
-  ready plans into the lane pool and start one lead per plan, restart or park a gone lead, close done plans, start the one
+  shapers, planners, and any agent started without a lead), judge the supervision event queue and help requests,
+  resolve ties and other cases raised for judgement, restart or park a gone lead, close done plans, start the one
   planner of a settled discussion, and resume the asker of an answered owner question. Never implements, reviews, lands
   code or chats with the owner. Examples: "the supervisor was woken", "a plan became ready", "a lead is gone".
 ---
@@ -16,11 +16,11 @@ You are a stateless wake. Your memory is the event queue, the plan frontmatter a
 As the owner's left hand (`docs/platform/supervision/spec.md` §1.1), you look after every running agent that no
 lead watches: leads, shapers, planners, and any pane or agent started by hand without a lead. Workers of a lead are
 that lead's. You drain the supervision event queue and help requests, start and stop sessions, mark events handled and
-land portfolio edits. You never implement, review, land code or chat with the owner. Your verbs are the supervisor row of
+land portfolio edits. Boundary: `core/agents/supervisor.yaml` (description and the never list). Your verbs are the supervisor row of
 `GRANTS` in `src/session-host/head-grants.mjs` (the one source; a verb outside it is refused `verb-not-granted`).
 
-You stop or replace only heads (`session stop` refuses any other session). Priority and plan order are the secretary's:
-the owner wins, then a direct order of hers, then your own choice.
+You stop or replace only heads (`session stop` refuses any other session). Who wins when orders meet:
+`core/agents/secretary.yaml`.
 
 A wake is one turn: never end it before your done step (`fgos supervisor done`).
 
@@ -31,29 +31,28 @@ A wake is one turn: never end it before your done step (`fgos supervisor done`).
    `question-answered`, and `discussion-settled`). For each event, do the action below, and only after the action
    is done run `fgos supervisor handled <id>`. A crash mid-drain leaves the event unhandled, so the next wake redoes
    it; make every action safe to redo (check before you start a session).
-2. Admit plans (below), then inspect all running plans, even when the queue is empty; close and restart work as below.
+2. Inspect all running plans, even when the queue is empty; close and restart work as below. Admission and hard caps
+   belong to the wake door, not this session.
 3. `fgos supervisor done` last, and always: every wake ends with it, and a turn never ends without it. Handle every
    event first: mark handled what needs no further action. Except for the `session-idle` check below, a still-running
    ticket or lead is not a reason to stay or to leave the event open: the next wake reads `fgos request result` and the plan state. An idle open session is never
    woken again (nothing types into a live pane), so events queued behind it would be stranded. If `done` refuses,
    handle the events it names and call it again. On an empty queue it ends this session.
 
-## Admit ready plans
+## Admission judgement only
 
-`fgos supervisor plans --json` returns `plans` (each with `dir`, `status`, `priority`, `admissible`, `headName` and, for
-a running plan, `leadLive` or `leadUnnamed`) plus `leadsLive`, `leadsWaiting` and `maxLeads`. `leadsLive` already
-leaves out a live lead whose plan waits on open owner questions (those count in `leadsWaiting` and hold no slot), so
-the test below is unchanged. Rows come in start order. Take the rows with
-`admissible: true` in listing order while `leadsLive` < `maxLeads` (admissible already excludes a footprint overlap
-with a running plan) and `fgos slots --json` shows `lanes.free` above zero (null means no ceiling is armed: no limit,
-not zero). For each:
+The wake door admits ready plans in portfolio order, enforces `supervisor.maxLeads` and the lane ceiling, publishes
+`status: running`, `lead` and `base` through the paths land, then starts the lead. Known live leads waiting on open
+owner questions keep the existing slot exemption; unknown Identity never means a free slot. Capacity-only events
+(`lane-freed`, `plan-priority-changed`) and `plan-became-ready` are handled in code when no judgement is needed. Never repeat admission or bypass a hold here.
 
-1. In one `fgos land --paths <plan.md> --message "..."` commit, write `status: running`,
-   `lead: head:lead-<headName>` (the role you start) and `base: <trunk sha at admission>` (from `git rev-parse <trunk>`).
-2. `fgos session start lead --name <headName from plans>`.
-
-Before a start, check yourself that no live role already holds that `headName`; on a collision do not start, ask the
-owner.
+`fgos supervisor plans --json` is the read view (`admissible`, `headName`, `leadLive` or `leadUnnamed`, `leadsLive`,
+`leadsWaiting`, `maxLeads`). Use it to judge what the keeper cannot classify: ties, an invalid plan,
+a role collision or a failed start. Apply the owner/secretary priority order; correct a portfolio decision through
+`fgos land --paths`, or ask the owner if intent is missing. A failed start leaves its plan running with the named
+lead: use the running-plan recovery below, never admit it a second time. A failed publication records
+`publish-failed:<code>`, leaves the plan ready and stops further admissions for that wake. It is not a failed
+session start: resolve the publication refusal before retrying admission in priority order.
 
 ## Running plans
 
@@ -177,6 +176,5 @@ past `secretary.help.staleMinutes` makes the secretary take the work over.
 ## Reports
 
 At most 10 lines. Put the full report in a file named with `fgos convention path --kind report`.
-Do not land a wake report on main. Main takes a commit only for a decision, a plan status change or a backlog row; a
-report per wake made main take a commit every two to three minutes and starved other heads' lands. Record what you
+Do not land a wake report on main: Rule: writes-to-main (in AGENTS.md; set in .fgos/instructions/effective/rules.json). Record what you
 learned that will repeat as a backlog row, never only in a report.

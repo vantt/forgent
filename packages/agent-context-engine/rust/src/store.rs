@@ -7,7 +7,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use pkm_core::search::{SearchOptions, StateKind, WorkerChoice};
+use pkm_core::search::{SearchOptions, SearchScope, StateKind, WorkerChoice};
 use pkm_core::service::{installed, Session, SessionConfig};
 use pkm_core::{index, validate};
 use serde_json::{json, Map, Value};
@@ -256,6 +256,8 @@ impl RuleIndex {
                 worker: WorkerChoice::Thread,
                 worker_idle: Duration::ZERO,
                 embedder: paths.search.embedder,
+                // Only the rule roots of the profile are embedded, not every Markdown file of the repository.
+                scope: SearchScope::Profile,
                 ..SearchOptions::default()
             };
             Session::open(cfg)

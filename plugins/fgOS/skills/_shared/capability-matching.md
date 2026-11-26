@@ -15,7 +15,7 @@ Every task prompt passes through three sequential questions. An agent must never
 
 | Step | Question | Essence | Doctrine |
 |---|---|---|---|
-| **Q0** | Need dispatch, or execute inline? | Activation | **Default inline.** An unconfigured capability returns `mechanism: unavailable` from `decide` and executes inline. Five valid reasons justify configuring an executor. |
+| **Q0** | Need dispatch, or execute inline? | Activation | **Default inline.** Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json). |
 | **Q1** | What kind of work is this? | Steering | Agent reads intent, determines required task capability (`domain:verb` or canonical generic), writes Unit blocks, and routes to `fgos-run` or Workflow runner. |
 | **Q2** | Which executor, tier, or persona? | Binding | Evaluated via `fgos dispatch decide --for <capability>` immediately before execution. The control plane directs execution; capability selection never resolves infrastructure. |
 
@@ -25,35 +25,27 @@ Instead of declaring ambiguous runtime heuristics, an agent inspects user intent
 
 - **Canonical Capability:** Each unit declares exactly one canonical capability (e.g. `code:implement`, `code:review`, `advise`, `execute`) derived directly from the task's required behavior.
 - **Unit Boundaries:** A unit defines clear `objective`, inputs (`reads`), outputs (`writes`), and acceptance criteria.
-- **G2 Constraint (No Infrastructure Pinning):** Units and plans must never pin infrastructure (`executor`, `provider`, `model`, `tier`, `invocation`, `prefer`, `overrides`). Infrastructure binding is exclusively resolved at execution time via Dispatch.
+- **G2 Constraint (No Infrastructure Pinning):** Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json). Plans and non-ad-hoc Units never pin; only an ad-hoc Unit may carry a soft `prefer`.
 - **Invoking Runner:** Execution is driven through `fgos-run` and the Workflow runner, running each declared unit through its lifecycle.
 
 ## Default inline and the five dispatch reasons
 
-Executing inline within the current session is the platform default: when no executor is configured for a capability, `decide` answers `unavailable` and the unit executes inline in the live session.
-
-Five valid reasons justify configuring an executor for a capability in project configuration (or passing an ad-hoc refinement):
-
-1. **Cheaper model:** A lightweight tier is sufficient for a well-bounded, routine task.
-2. **Stronger model:** The unit's required rigor exceeds the current session's model capability.
-3. **Different provider:** Provider diversity, credential isolation, or quota management mandates another engine (e.g. Gemini, OpenAI, Claude).
-4. **Confinement & isolation:** Hard filesystem sandboxing, read-only guarantees, or clean worktree isolation is required.
-5. **Parallel execution:** Running independent units concurrently to shorten wall-clock time (Ship Faster, priority #1 in `AGENTS.md`).
-
-An agent never decides the mechanism itself (`AGENTS.md`): it queries `decide --for <capability>` once before execution. When `decide` returns `unavailable`, the unit executes inline.
+Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json). The mechanism is never chosen here: Rule: dispatch-decide-door (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 ## Ad-hoc one-shot delegation
 
 Work outside any plan or Workflow that goes to another agent as one prompt and one result needs no workflow, plan or new capability. It runs as the one-liner, `fgos run "<prompt>"`: one Unit through `bind()`, read-only and sandboxed unless `--writes <paths> --worktree <linked-worktree>` names what it may change (the runner commits only those paths, the worker never commits); `--capability` defaults to `execute`. Several related tasks go in a units file, `fgos workflow start --units <file>`. The calling agent answers Q1 itself, in two decisions:
 
 1. **Does the work change files?** Yes: name a writing capability (`execute` for general work; `code:implement`/`code:refactor` for code, `docs:write` for documents) with `--capability`, and list the paths it may change in `--writes` with a linked `--worktree`; a path the worker finds it needs outside that list comes back in `needsWrites`, never on disk. No: leave out `--writes`; the Unit binds the read-only posture, runs sandboxed and leases the provider account, whichever provider runs it.
-2. **Does a specific provider matter?** Only for one of the five reasons above (a stronger or cheaper model, provider diversity, isolation, parallelism). If so, name that executor in `--provider` (an ad-hoc Unit's `prefer` in a units file): a soft preference that `bind()` tries first and fails over from, never a pin. Otherwise leave it out and `bind()` takes the capability's pool. Presets and plans never name one; only a human `--override` pins.
+2. **Does a specific provider matter?** Only for one of the five reasons of capability-routing-rules (a stronger or cheaper model, provider diversity, isolation, parallelism). If so, name that executor in `--provider` (an ad-hoc Unit's `prefer` in a units file): a soft preference that `bind()` tries first and fails over from, never a pin. Otherwise leave it out and `bind()` takes the capability's pool. Presets and plans never name one; only a human `--override` pins.
+
+Rule: run-door-contract (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 An agent executor declares no `for`: it can do any kind of work, so the dispatch, not the executor, carries the capability.
 
 ## Architectural boundaries
 
 - **Unit vs. Workflow:** A capability selects an executor or tool for one independent execution unit. A Workflow (or CollaborationPattern) coordinates multi-actor, multi-step collaboration across units.
-- **No infrastructure pinning in plans:** Plans declare canonical capability names only. Never pin an executor, provider, model, or tier in a plan.
-- **No double decide:** `decide` is called once per unit immediately before execution (`decide-before-execute`), never during planning and execution.
-- **No Work entity conversion:** A capability is a routing signal, never a Work item, lifecycle stage, or flow step.
+- **No infrastructure pinning in plans:** Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
+- **No double decide (`decide-before-execute`):** Rule: dispatch-decide-door (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
+- **No Work entity conversion:** Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json).

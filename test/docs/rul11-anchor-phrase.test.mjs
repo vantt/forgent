@@ -15,6 +15,7 @@ import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const AGENTS_MD = path.join(REPO_ROOT, 'AGENTS.md');
+const OWNER_UNIT = path.join(REPO_ROOT, 'core/instructions/rul11-tum-lum.md');
 const PLATFORM_FOUNDATIONS_SPEC = path.join(REPO_ROOT, 'docs', 'platform', 'platform-foundations.md');
 
 const ANCHOR_PHRASE = 'khong phai no nang ma no tum lum';
@@ -49,4 +50,11 @@ test('AGENTS.md carries the decision-question template law and points at its sha
   assert.ok(agents.includes('Every question asking the owner to choose a direction carries five parts'), 'AGENTS.md must carry the decision-question law (projected from core/instructions/decision-question.md)');
   assert.ok(agents.includes('core/skills/_shared/decision-question.md'), 'the law must point at the full template');
   assert.ok(agents.includes('Inside the approved frame (scope + budget set at approval) decide and report'), 'the law must carry the approved-frame stop point');
+});
+
+test('the RUL11 anchor phrase is owned by its rule unit, alone on a line, and rendered into AGENTS.md from it', () => {
+  const unitLines = fs.readFileSync(OWNER_UNIT, 'utf8').split('\n');
+  assert.ok(unitLines.some((line) => line.trim() === ANCHOR_PHRASE), `the owner unit must carry "${ANCHOR_PHRASE}" on its own line`);
+  const block = fs.readFileSync(AGENTS_MD, 'utf8').split('<!-- fgos:instruction-projection:start -->')[1] ?? '';
+  assert.ok(block.split('\n').some((line) => line.trim() === ANCHOR_PHRASE), 'the phrase must reach AGENTS.md through the projection block');
 });

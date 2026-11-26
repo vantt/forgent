@@ -27,7 +27,7 @@ Slug: kebab-case, stable forever. Cross-reference format: `<source>:<slug>`.
 - Feature deleted or moved upstream → add `Status:` line + keep the entry
   (its learning value survives; the destination may become a new source —
   drop it into intake.md).
-- NEVER rename a slug. To restructure, add the new entry and mark the old one
+- Slugs are never renamed (`../SKILL.md`, Hard gates & red flags): add the new entry and mark the old one
   `Status: superseded-by-<new-slug>`.
 
 ## New-domain discovery (concept fits no existing taxonomy domain)
@@ -76,8 +76,7 @@ Slug: kebab-case, stable forever. Cross-reference format: `<source>:<slug>`.
 1. Grep the comparison matrix first — each canonical row IS the related-set.
 2. `grep -rn <term> docs/distillery/` for slugs/keywords.
 3. Read only the matched entries (~200 tokens each). Never re-read whole
-   indexes; never build a vector/SQL index for this (decision 2026-07-13 —
-   escalation thresholds live in the host's design doc if present).
+   indexes; no search index is built (`../SKILL.md`, Hard gates & red flags).
 
 ## Matrix rules
 

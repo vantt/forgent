@@ -21,11 +21,14 @@ function section(text, heading) {
   return next < 0 ? rest : rest.slice(0, next);
 }
 
-test('AGENTS.md Dispatch teaches both doors of one runUnit as the preferred path', () => {
-  const dispatch = section(read('AGENTS.md'), '## Dispatch');
-  assert.ok(dispatch.includes('fgos run "<prompt>"'), 'one-liner door missing');
-  assert.ok(dispatch.includes('fgos workflow start <preset>|--units <file>'), 'planned-work door missing');
-  assert.match(dispatch, /runner commits/i);
+test('the run-door-contract unit teaches both doors of one runUnit as the preferred path, rendered into AGENTS.md', () => {
+  const unit = read('core/instructions/run-door-contract.md');
+  const agents = read('AGENTS.md');
+  for (const text of [unit, agents]) {
+    assert.ok(text.includes('fgos run "<prompt>"'), 'one-liner door missing');
+    assert.ok(text.includes('fgos workflow start <preset>|--units <file>'), 'planned-work door missing');
+    assert.match(text, /runner commits/i);
+  }
 });
 
 for (const surface of ['core/skills', '.agents/skills', 'plugins/fgOS/skills']) {

@@ -17,10 +17,10 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 sha2 = { workspace = true }
 # pkm is linked as a library, at the tag and with the features fgos-documentation links.
-pkm-core = { git = "https://github.com/vantt/pkm", tag = "v0.7.0", features = ["search"], optional = true }
+pkm-core = { git = "https://github.com/vantt/pkm", tag = "v0.7.1", features = ["search"], optional = true }
 fgos-yaml-doc = { path = "../../yaml-doc/rust", optional = true }
 
 [dev-dependencies]
 # pkm's deterministic embedder, so the search tests need no 130 MB model; production always selects the real one.
-pkm-core = { git = "https://github.com/vantt/pkm", tag = "v0.7.0", features = ["search", "test-embedder"] }
+pkm-core = { git = "https://github.com/vantt/pkm", tag = "v0.7.1", features = ["search", "test-embedder"] }
 tempfile = "3"

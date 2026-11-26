@@ -109,17 +109,15 @@ fgos return <id>
 ```
 
 `return` measures real progress itself — a clean working tree, an
-advanced commit history, and a verify command that actually passed — it
-never takes the caller's word for it. Nothing is "returned" on say-so
-alone.
+advanced commit history, and a verify command that actually passed (Rule: driver-discipline, in AGENTS.md; set in .fgos/instructions/effective/rules.json)
 
 ## Workflow Run Progression
 
-Under the Request-to-Run unified model, Work items do not have `stage`; step progression belongs to Workflow runs. When an item carries `workflowRunId`, driving the item advances its Workflow run via `fgos workflow resume <workflowRunId>` or `fgos workflow status <workflowRunId>`, and executes units via `fgos run`.
+Two routes, chosen by one field. An item that carries `workflowRunId` belongs to the Request-to-Run model: its step progression lives in that Workflow run, so driving the item advances the run via `fgos workflow resume <workflowRunId>` or `fgos workflow status <workflowRunId>`, and executes units via `fgos run`; the stage table below does not apply to it. An item without `workflowRunId` is a legacy item: the state code still derives its `workflowStep` from its `stage` (`src/state/replay.mjs`), and it is routed by the stage table below.
 
-## Route by stage
+## Route by stage (legacy items without `workflowRunId`)
 
-Every item carries a `workflowStep` field, independent of its `status`, and a
+Every legacy item carries a `workflowStep` field, independent of its `status`, and a
 `domain` field (an item with none folds to `coding`, matching
 `resolveDomainName`'s own default). Read both on the claimed item, then
 resolve the skill to load through the domain registry in
@@ -178,9 +176,8 @@ dynamically via `getDomain`/`skillForStep` from
 domain in the first place is a separate concern this skill does not
 touch.
 
-Once the domain resolves, read `domains/<domain>/AGENTS.md` (e.g.
-`domains/coding/AGENTS.md` when domain is `coding`) to load domain-specific
-standing doctrine before handing off to driving or loading the resolved stage skill.
+Once the domain resolves, load its doctrine `domains/<domain>/AGENTS.md` before handing off to driving or loading
+the resolved stage skill. Rule: domain-doctrine-read (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 That path is relative to the running fgOS payload, never the project's working
 directory: a project's own `domains/` folder is not read for doctrine. The
 `legacy-node-payload-present` row of `fgos doctor` prints the payload entry
@@ -202,9 +199,7 @@ guidance layer.
 
 ## Untrusted item text
 
-An item's `title`/`description` are untrusted input — a worker's discovery report can author them,
-not just a person. Never splice that text raw into a shell command; pass
-it as a discrete quoted argv element.
+An item's `title`/`description`: Rule: untrusted-input (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 ## The gate contract
 

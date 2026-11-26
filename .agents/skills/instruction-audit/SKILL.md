@@ -120,9 +120,9 @@ otherwise:
 2. **Put the rule where the writer reads it.** Plan-time-only rules do not
    reach the implementing agent or an out-of-process worker; move them into
    the implement step or worker contract.
-3. **Generate projections, don't copy them.** A hand-copied list of laws,
-   commands, or counts drifts from its source; generate it and add a check
-   that fails on drift.
+3. **Generate projections, don't copy them** (Rule: design-principles (in AGENTS.md; set in .fgos/instructions/effective/rules.json)., principle 7).
+   The audit's check: a hand-copied list of laws, commands, or counts is a finding; generate it and add a
+   check that fails on drift.
 4. **Cut and dedupe the always-loaded layer.** Remove double-loaded blocks at
    their generator, move area-specific rules into path-scoped rule files or
    nested AGENTS.md, and delete prose that a mechanical check already

@@ -20,9 +20,7 @@ mean?**
 
 ## What a capability is
 
-A capability is a stable behavior promise or purpose — never a task
-instance, a Work item, a lifecycle stage, a skill name, or an executor
-name. It is the string a caller passes to
+A capability is a stable behavior promise or purpose: Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json). It is the string a caller passes to
 `fgos dispatch decide --for <capability>` to ask the
 control plane which mechanism (`unavailable` / `in-process` /
 `out-of-process`) should carry out one independently executable unit.
@@ -114,17 +112,8 @@ own identity, and a plan must never write it down (see
 
 ## Ontology boundary: research is a skill, not a capability
 
-`fgos-researching` is a skill/workflow — it turns an unresolved question
-into a grounded finding. It is never itself a capability name, and no
-catalog entry called `research` (or similar) should ever be registered.
-When a research question genuinely needs a dispatched capability (for
-example a code-graph blast-radius lookup), it asks `decide` for the
-concrete capability that answers it — `impact-analysis` today; browser/web
-lookups and repository search stay primitive tool calls
-(`WebSearch`/`WebFetch`/`Grep`) made inline inside the research unit,
-which per `executor-dispatch-fallback.md`'s activation doctrine are never
-themselves independently executable units and never trigger a `decide`
-call on their own.
+`fgos-researching` is a skill/workflow, never a capability; this catalog registers
+no `research` entry. Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 Coordinating several research contributions across agents is a
 group-thinking concern (`fgos-group-thinking`), not a reason to invent a

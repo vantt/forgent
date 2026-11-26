@@ -57,8 +57,8 @@ lower it. You never set a provider, model or tier.
    (`../_shared/decision-question.md`), together with every ambiguity of the plan,
    in one batched message. A slice that must wait for the owner (data, migrations,
    anything irreversible) is in that question, never dispatched. Inside the
-   approved frame you decide and report; you ask again only for the triggers in the
-   hook table.
+   approved frame you decide and report (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json, priority 2);
+   you ask again only for the triggers in the hook table.
    After the owner approves, run the printed commands in order and exactly as
    printed (worktree and branch names, `--base`, the frame, `--inherit` when it
    continues a closed case, then the slices and the final gate). What each line
@@ -117,8 +117,7 @@ lower it. You never set a provider, model or tier.
 
 - This is coordination, not an execution engine. Guide, admission and the two doors
   stay authoritative; `bind()` alone picks who runs a slice.
-- Never claim a slice is verified because a worker or a checker said so; claim only
-  what you re-ran or read.
+- Claim only what you re-ran or read: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - Do not touch Work items: the old Work-item path is `/fgOS:deliver`.
-- The frame is the owner's once approved: you may narrow it, never widen it. A
+- The approved frame may be narrowed, never widened (`../_shared/decision-question.md`); a
   widened frame is a new proposal and a question.

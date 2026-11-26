@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const AGENTS_MD = path.join(REPO_ROOT, 'AGENTS.md');
+const OWNER_UNIT = path.join(REPO_ROOT, 'core/instructions/rul104-better-not-bigger.md');
 const PLATFORM_FOUNDATIONS_SPEC = path.join(REPO_ROOT, 'docs', 'platform', 'platform-foundations.md');
 
 const ANCHOR_PHRASE = 'tốt hơn, không to hơn';
@@ -27,4 +28,11 @@ test('the RUL104 line in the platform-foundations Business Rules matches the loc
   const match = spec.match(/^- \*\*RUL104 \(tốt hơn, không to hơn\)\.\*\* (.+)$/m);
   assert.ok(match, 'Business Rules must have a "- **RUL104 (tốt hơn, không to hơn).**" line');
   assert.equal(match[1], RUL104_LAW, 'RUL104 text must match the locked wording exactly -- edit test/docs/rul104-law.txt and the spec together if the law changes');
+});
+
+test('the RUL104 anchor phrase is owned by its rule unit, alone on a line, and rendered into AGENTS.md from it', () => {
+  const unitLines = fs.readFileSync(OWNER_UNIT, 'utf8').split('\n');
+  assert.ok(unitLines.some((line) => line.trim() === ANCHOR_PHRASE), `the owner unit must carry "${ANCHOR_PHRASE}" on its own line`);
+  const block = fs.readFileSync(AGENTS_MD, 'utf8').split('<!-- fgos:instruction-projection:start -->')[1] ?? '';
+  assert.ok(block.split('\n').some((line) => line.trim() === ANCHOR_PHRASE), 'the phrase must reach AGENTS.md through the projection block');
 });
