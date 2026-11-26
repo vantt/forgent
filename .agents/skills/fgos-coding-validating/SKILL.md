@@ -110,10 +110,9 @@ Also check the plan's **Authority map** (`../_shared/plan-contract.md`
 `fgos authority locate "<new thing>"` for each row and confirm the map names
 the row that owns it, or a `declare: <kind> <id>` with its reason, and a
 `survivor:` for every overlap. A missing or unproven map is a FAIL here: reject
-and return the plan to `fgos-coding-planning`. Until documentation H2 admission
-exists, this review is the independent admission step for each `declare` in
-the map; a new component or decision kind still needs the owner's answered
-question. Where `locate` answers `authority: inactive`, record
+and return the plan to `fgos-coding-planning`. What this review admits, and
+what still needs the owner's answered question, is set in
+`../_shared/plan-contract.md` (Authority map). Where `locate` answers `authority: inactive`, record
 `authority: inactive` in the verify note and go on.
 
 ### Step 3: Feasibility matrix

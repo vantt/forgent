@@ -155,7 +155,7 @@ for any other malformed response, never dispatch a partial task:
 
 | Field | Shape | Why required |
 |---|---|---|
-| `id` | `<scope>#p<n>` (D8: the `p` stays literal — renaming the concept never changes this shape) | Reference id (see below) so a parent can match a returned digest back to the task that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (D4 stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs:24`) — structurally, not by convention, so a task id can never be mistaken for a real work item. |
+| `id` | `<scope>#p<n>` (the `p` stays literal — renaming the concept never changes this shape) | Reference id (see below) so a parent can match a returned digest back to the task that asked for it when several are in flight at once — never a lifecycle id: no claim, no reserve, no cap, no merge (the lifecycle stays exactly as gated as it always was). The `#` makes this id permanently invalid against `work.mjs`'s `ID_PATTERN` (`src/state/work.mjs`) — structurally, not by convention, so a task id can never be mistaken for a real work item. |
 | goal | one sentence | The one thing a worker cannot infer from the files it's handed |
 | inputs | concrete paths to read | "read exactly these; nothing else will be provided" — never "look around the repo" |
 | boundary | what must not be touched/written | Equivalent to symphony's `forbidden_paths` |

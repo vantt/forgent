@@ -83,12 +83,9 @@ fgos run "<slice objective, with the plan phase and locked decisions it rests on
 ```
 
 Changing the degree: the door inherits the activity's `unit`. Pass `--pattern`,
-`--params` or repeatable `--param` only to change the degree for this dispatch.
-A params request in a case and an explicit swap away from the activity's pattern
-require `--reason` (`request-reason-required` otherwise); standalone params do not.
-An identical explicit selector is not automatically a swap. Read the result's pin
-for the effective pattern, loop, params and the request reason: it shows what ran
-and why.
+`--params` or repeatable `--param` only to change the degree for this dispatch;
+when that needs `--reason` and what the result's pin records are set once in
+`../../fgos-run/SKILL.md` (step 2).
 
 - A writing slice names the case worktree and a `--verify` command. `implement-item`
   inherits `reviewed`; `fix-verify-red` declares no unit, so it can run `solo`.
