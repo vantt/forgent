@@ -95,6 +95,8 @@ Ticket `c-2271-1795691361563` (gemini, worktree `261125-2041-gather-fgos-rules-t
 `gather-fgos-rules-to-one-owner/p01`) was started by the fg-server2 lead before it saw the progress below; it duplicates
 phase 1 and is not to be landed. The phase continues on `gather-rules/p01` once the owner lifts the pause; the
 duplicate's run is to be stopped and its worktree discarded by the supervisor.
+The fg-server2 lead ended at 18:21 (event `lead-ended`); it is not restarted while the owner pause holds. The duplicate
+run was still live at 18:30; its stop and discard wait on owner question `q-42sigq3of6`.
 
 ### Progress (lead on fg-server, 2026-11-26)
 
