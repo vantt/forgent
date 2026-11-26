@@ -12,15 +12,17 @@ discussion: paused
 
 **Content settled (D1-D5); state `paused` on purpose.** Owner chose exit A (round 19): this discussion is not handed to a planner. It joins the one table of open backlog rows and discussions about the work lifecycle, as ds-3in4yb5thk does, and plans are ordered there together with what they depend on. `settled` would raise `discussion-settled`, which starts a planner (`fgos-supervisor` SKILL, "Event discussion-settled"), so the marker stays `paused` until that table orders it; then a session sets `settled`.
 
+**Split (2026-11-26 18:40 +07, owner):** the ACE part of this discussion, the `when:` label keys of §6 (D2, D3), moved to `plans/discussions/ds-k435vz65l2-when-key-rename/DISCUSSION.md` (settled, handed to a planner so ACE can go fast). Everything else stays here, still `paused`, including renaming the Work item field `kind` and the persona file field `role:`.
+
 - **Outcome:** a plan at `ready` runs to `done` without the owner. Every foreseeable question is answered before `ready`: by the standing rule (D4, U1-U7), by the owner's `core` / `debt-ok` marks at discussion settle (D1), or by one batched owner question for what goes beyond the rule (U5). The full gate runs before land through a door the lead may call (D5).
 - **Constraints:** no hardcoding: the rule lives in rule units selected by the `when:` keys of D2-D3 (domain, workType, role, persona, ...), with doors, executors and file sets read from data (permission table, project config, prior-art commits, drift checks). No new mechanism beyond the D5 door (RUL104). Every caller of a renamed field moves in the same change (L10).
-- **Non-goals:** the run-time ask rule (ds-jxoz3h2qgk); the widen door for a running plan (ds-mzyircswox); `delivery` and admission (ds-ipvis4jkpc); the backlog-to-ready flow (ds-3in4yb5thk); renaming the `when:` keys and the Work `kind` (its own backlog item, supervisor events 4341c62c0c7871ab and e3ed5bd4d7c27190); building ACE.
+- **Non-goals:** the run-time ask rule (ds-jxoz3h2qgk); the widen door for a running plan (ds-mzyircswox); `delivery` and admission (ds-ipvis4jkpc); the backlog-to-ready flow (ds-3in4yb5thk); renaming ACE's `when:` keys (moved to ds-k435vz65l2); building ACE. Renaming the Work item field `kind` and the persona file field `role:` stays here, not yet designed (§6, end).
 - **Acceptance criteria:**
   1. A core rule unit carries U2-U7 and a coding domain unit carries U1, placed per §6; `core/skills/_shared/plan-contract.md` points at them instead of restating them.
   2. `node scripts/plan-contract-check.mjs --plan <dir>` refuses `ready` for a plan without the "Unattended run" section, with a host step lacking argv or executor, with an unmarked acceptance criterion, or with a U5 item lacking an answered `q-` id; each case has a fixture.
   3. A confined lead runs the D5 door on a worktree and gets the project's `release.checks` results; a failing check reports red and changes nothing on main.
   4. Replay: the three evidence plans (261122-0118, 261121-2110, 261120-0625), re-checked against the new contract, show each foreseeable class of their owner questions (footprint, hands, cleanup, acceptance deviation) caught before `ready`; the replay report lists what is still not caught.
-- **Open points that block only some parts:** selecting rules by `workType` / `role` needs the key rename item and ACE's read path; until then the units land in today's format and reach every agent. U1's run-time widening needs ds-mzyircswox's door.
+- **Open points that block only some parts:** selecting rules by `workType` / `role` needs the key registry v2 of ds-k435vz65l2 and ACE's read path; until then the units land in today's format and reach every agent. U1's run-time widening needs ds-mzyircswox's door.
 - **Sources:** ds-jxoz3h2qgk (evidence-question-classification.md, §5 rounds 7, 10, 11), ds-ipvis4jkpc, ds-3in4yb5thk, ds-mzyircswox.
 
 ## Seed
@@ -119,8 +121,8 @@ The owner settles a discussion, a planner writes the plan, the plan goes `ready`
 |---|---|---|
 
 | D1 | Pre-decided answers come from three sources. (1) The owner marks each acceptance criterion `core` or `debt-ok` when the discussion settles. (2) The standing rule for repeating classes is process law, recorded with no owner approval. (3) Anything plan-specific beyond that rule asks the owner once, batched, before `ready`. The owner settles only plan-specific matters. | Owner chat 13:41 (§5 round 3), held unchanged through rounds 4 and 5; q-ypgj7zverd cancelled with this answer. |
-| D2 | Naming for the rename item (§3 row 15): the kind of work is `workType` (ACE `when:` key and the Work item / initiative field); the moment in an agent's life is `agentLifecycle`, a key with many values (`setup`, `hook`, session start, ...). Both replace today's overloaded `kind`. | Owner 16:40 (proposed) and 16:5x "chốt workType và agentLifecycle". Carried to the rename backlog item; not designed here. |
-| D3 | Meanings and names for the rename item: **persona** = who the agent is (its charter, one of `core/agents/*.yaml`); **role** = the part it plays in one workflow step (producer, reviewer, implementer, researcher), only that meaning; a seat address (`head:<persona>-<name>`, `lead:MAIL`) is an instance name, never a rule key; **sessionType** (`head`, `worker`) = the form of the session, replacing the proposed `agentRole`; **agentFamily** + **agentCli** = a pair: the model family (claude, openai, gemini) and the agent CLI that runs it (claude-code, codex, pi, omp, agy); e.g. claude/claude-code, openai/codex, openai/pi, gemini/agy. `agentCli` replaces ACE's `cli`; executor and invocation stay a third, lower level. | Owner 17:00 (`agentFamily`), 17:05 ("có đồng ý" to §3 rows 16-17), 17:14 (family/cli is a pair; pi and omp are CLIs, not families). |
+| D2 | Naming for the rename item (§3 row 15): the kind of work is `workType` (ACE `when:` key and the Work item / initiative field); the moment in an agent's life is `agentLifecycle`, a key with many values (`setup`, `hook`, session start, ...). Both replace today's overloaded `kind`. | Owner 16:40 (proposed) and 16:5x "chốt workType và agentLifecycle". Carried to the rename backlog item; not designed here. Carried forward in ds-k435vz65l2 (2026-11-26). |
+| D3 | Meanings and names for the rename item: **persona** = who the agent is (its charter, one of `core/agents/*.yaml`); **role** = the part it plays in one workflow step (producer, reviewer, implementer, researcher), only that meaning; a seat address (`head:<persona>-<name>`, `lead:MAIL`) is an instance name, never a rule key; **sessionType** (`head`, `worker`) = the form of the session, replacing the proposed `agentRole`; **agentFamily** + **agentCli** = a pair: the model family (claude, openai, gemini) and the agent CLI that runs it (claude-code, codex, pi, omp, agy); e.g. claude/claude-code, openai/codex, openai/pi, gemini/agy. `agentCli` replaces ACE's `cli`; executor and invocation stay a third, lower level. | Owner 17:00 (`agentFamily`), 17:05 ("có đồng ý" to §3 rows 16-17), 17:14 (family/cli is a pair; pi and omp are CLIs, not families). Carried forward in ds-k435vz65l2 (2026-11-26). |
 | D4 | The standing rule U1-U7 of §6 is process law for every plan: U1 footprint traced by rule (prior-art commit plus drift checks; references of changed symbols; generated files regenerated); U2 every host step names an `fgos` argv and an executor the permission table allows, run by the supervisor at a lead's request, a `deny` or doorless step keeps the plan from `ready`; U3 fixed cleanup (lead lists, supervisor removes through the delivered door); U4 `core` / `debt-ok` on every criterion, unmarked = `core`, debt recorded by the lead and opened as a backlog row by the secretary; U5 the five beyond-the-rule classes ask the owner once before `ready`; U6 the contract check enforces shape only; U7 the split lens. Placement as rule units per D3 and §6. | Owner: U5 at 14:35, U7 explained 14:52, U1-U4 and U6 at 17:3x ("đồng ý cả U1, U2, U3, U4, U6"). U3 and U4 corrected for grants before approval. |
 | D5 | The full gate of a plan runs before it lands, through one door that runs the project's `release.checks` (data in the project config, not hardcoded) on a named worktree, unconfined, with no release step. The lead may call it (a `lead` row in `head-permissions.v1.json`), so a plan's integration phase needs no owner and no supervisor. `release run` is unchanged. | Owner 17:43 "chọn B, cho lead quyền chạy" (§3 row 11). |
 
@@ -171,6 +173,7 @@ The owner settles a discussion, a planner writes the plan, the plan goes `ready`
 - 2026-11-26 17:43 +07, owner (chat), round 18: chose B for the full gate (run the project's checks on the plan's worktree before land) and granted it to the lead. Shaper: D5; U2 table and §7 updated.
 
 - 2026-11-26 17:52 +07, owner (chat), round 19: chose exit A: put this discussion on the lifecycle table with ds-3in4yb5thk, not on a planner. Shaper: hand-off block written; marker `paused` because `settled` starts a planner automatically; §7 filled.
+- 2026-11-26 18:40 +07, owner via shaper head `when-key-rename` (chat): the ACE label part (§6 key table, D2, D3) is split into ds-k435vz65l2, settled there and handed to a planner; everything else stays here and this discussion stays `paused`. Edited by that shaper on the owner's explicit permission: hand-off split note, non-goals, open points, §6 label section, D2 and D3 forward notes.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -248,25 +251,11 @@ flowchart LR
   RUN --> DONE[done]
 ```
 
-### Hình dạng mới của bộ nhãn `when:` (D2, D3; input for the rename item, not built here)
+### Hình dạng mới của bộ nhãn `when:` (moved)
 
-Three groups, one question each. Names in the left column are the new names; the right column says what they replace.
+The key set (three groups: what the work is, who the agent is, when in its life), its values and value sources are settled in `plans/discussions/ds-k435vz65l2-when-key-rename/DISCUSSION.md` (its D1-D4 and §6), which supersedes the key table that stood here. Refinements made there: `setup` and `hook` are ASC deliveries, not `agentLifecycle` values; `sessionType` gains `hand-opened`; `agentLifecycle` starts with `start` and `rotate`; `agentCli` values are the agent-protocol adapter ids (`claude`, not `claude-code`).
 
-| Group | Key | Values (examples) | Replaces |
-|---|---|---|---|
-| **What the work is** | `domain` | coding, marketing, council | unchanged |
-| | `workType` | bug, chore, design, docs, feature, task (from `domains/<d>/registry.yaml`) | new key; the Work item / initiative field `kind` |
-| | `workflow` | feature, bugfix, content-publish | unchanged; optional |
-| | `stage` | a step of the workflow | unchanged; unused by default (§3 row 14) |
-| | `project` | project id | unchanged |
-| **Who the agent is** | `persona` | shaper, lead, planner, supervisor, code-reviewer | unchanged name, meaning fixed: the charter |
-| | `role` | producer, reviewer, implementer, researcher | unchanged name, narrowed: part in a workflow step only |
-| | `sessionType` | head, worker | half of today's `kind` |
-| | `agentFamily` | claude, openai, gemini (the model family) | new key; matches the runner's `modelPolicies` keys |
-| | `agentCli` | claude-code, codex, pi, omp, agy (the agent CLI) | `cli` |
-| **When in the agent's life** | `agentLifecycle` | setup, start, hook, ... (many values; the item lists them) | the other half of today's `kind` |
-
-Outside ACE, the same item renames: the Work item / initiative `kind` to `workType`, and the free-text `role:` line in `core/agents/*.yaml` (neither meaning) to something like `summary`. Every caller moves in the same change and the old names are deleted (L10, RUL104).
+Still here, not designed yet: renaming the Work item / initiative field `kind` to `workType`, and the free-text `role:` line in `core/agents/*.yaml` and `domains/*/agents/*.yaml` (neither a persona nor a workflow role). ds-k435vz65l2 §3 rows 3 and 8 hold the scout for both: the Work field is stored in the append-only event log and printed in `--json` envelopes; the persona field's only reader is `scripts/project-agents.mjs`, which prints it as the heading, so `title` fits better than `summary`. Every caller moves in the same change and the old names are deleted (L10, RUL104).
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
