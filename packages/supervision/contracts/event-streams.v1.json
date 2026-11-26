@@ -9,6 +9,34 @@
       "sealOnWrite": false
     },
     {
+      "type": "supervision.keeper-start",
+      "domain": "supervision",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "supervision.keeper-wake",
+      "domain": "supervision",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "supervision.keeper-raise",
+      "domain": "supervision",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "supervision.keeper-hold",
+      "domain": "supervision",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
       "type": "supervision.event-handled",
       "domain": "supervision",
       "schemaVersion": 1,

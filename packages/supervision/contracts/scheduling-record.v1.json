@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "scheduling-record.v1.json",
+  "title": "Domain scheduling record",
+  "description": "One record per domain item and step. Outcome closes it; absent waitingOn and outcome it is actionable. IDs belong to the domain, not the keeper.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["item", "step"],
+  "properties": {
+    "item": {"type": "string", "minLength": 1},
+    "step": {"type": "string", "minLength": 1},
+    "waitingOn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": {"enum": ["actor", "time", "event", "person"]},
+        "ref": {"type": "string", "minLength": 1},
+        "until": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(19[7-9][0-9]|[2-9][0-9]{3})-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{3})?Z$",
+          "description": "UTC instant at or after the Unix epoch, with optional millisecond precision. Expiry raises an event; it never clears the wait."
+        }
+      }
+    },
+    "needs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": {"enum": ["role", "actor", "capability"]},
+        "ref": {"type": "string", "minLength": 1},
+        "maxRounds": {"type": "integer", "minimum": 0, "maximum": 4294967295}
+      }
+    },
+    "outcome": {"enum": ["done", "withdrawn", "wontfix", "cancelled"]}
+  },
+  "examples": [
+    {"item": "case:a", "step": "colour", "needs": {"kind": "capability", "ref": "edit", "maxRounds": 3}},
+    {"item": "case:a", "step": "sound", "needs": {"kind": "actor", "ref": "editor"}},
+    {"item": "order:a", "step": "approve", "waitingOn": {"kind": "person", "ref": "q-a", "until": "2026-11-26T00:00:00.001Z"}},
+    {"item": "plan:a", "step": "lead", "needs": {"kind": "role", "ref": "lead"}},
+    {"item": "order:a", "step": "payment", "waitingOn": {"kind": "event", "ref": "paid"}},
+    {"item": "order:a", "step": "delay", "waitingOn": {"kind": "time", "ref": "timer"}},
+    {"item": "order:a", "step": "worker", "waitingOn": {"kind": "actor", "ref": "editor"}},
+    {"item": "order:a", "step": "judge"},
+    {"item": "order:a", "step": "finish", "outcome": "done"},
+    {"item": "order:a", "step": "finish", "outcome": "withdrawn"},
+    {"item": "order:a", "step": "finish", "outcome": "wontfix"},
+    {"item": "order:a", "step": "finish", "outcome": "cancelled"}
+  ],
+  "x-invalidExamples": [
+    {"item": "a", "step": "b", "surprise": true},
+    {"item": "a", "step": "b", "needs": {"kind": "role", "ref": "lead", "surprise": true}},
+    {"item": "a", "step": "b", "waitingOn": {"kind": "time", "ref": "timer", "surprise": true}},
+    {"item": "a"},
+    {"item": "", "step": "b"},
+    {"item": "a", "step": ""},
+    {"item": "a", "step": "b", "needs": null},
+    {"item": "a", "step": "b", "waitingOn": null},
+    {"item": "a", "step": "b", "outcome": null},
+    {"item": "a", "step": "b", "outcome": "open"},
+    {"item": "a", "step": "b", "needs": {"kind": "person", "ref": "lead"}},
+    {"item": "a", "step": "b", "needs": {"kind": "role", "ref": ""}},
+    {"item": "a", "step": "b", "needs": {"kind": "role", "ref": "lead", "maxRounds": -1}},
+    {"item": "a", "step": "b", "waitingOn": {"kind": "time", "ref": "timer", "until": "tomorrow"}},
+    {"item": "a", "step": "b", "waitingOn": {"kind": "time", "ref": "timer", "until": "2026-02-30T00:00:00Z"}},
+    {"item": "a", "step": "b", "waitingOn": {"kind": "time", "ref": "timer", "until": "2026-11-26T00:00:00.1000Z"}},
+    {"item": "a", "step": "b", "waitingOn": {"kind": "time", "ref": "timer", "until": "1969-12-31T23:59:59Z"}},
+    {"item": "a", "step": "b", "needs": {"kind": "role", "ref": "lead", "maxRounds": null}},
+    {"item": "a", "step": "b", "waitingOn": {"kind": "time", "ref": "timer", "until": null}}
+  ]
+}

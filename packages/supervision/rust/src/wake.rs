@@ -2,6 +2,7 @@
 //! events that still need judgement. Unknown Identity never means free. Every call and each
 //! admission decision records an `fgos.supervisor.wake` span.
 use crate::{
+    keeper::{self, Action, Decision, Raise},
     portfolio::{admission_hold, collisions, head_name, order, supervisor_name, Plan},
     queue::{Queue, QueueError, RaisedEvent},
     supervisor::{lead_counts, OpenQuestions},
@@ -136,6 +137,91 @@ pub struct Ports<'a> {
     pub log: &'a dyn WakeLog,
     pub clock: &'a dyn Clock,
     pub telemetry: &'a dyn Telemetry,
+}
+
+/// The wake door's composition seam. Existing callers supply admission ports alone; the source
+/// adapters supply `ScheduledPorts` to run the keeper through the same door, after admission.
+pub trait WakeContext {
+    fn admission_ports(&self) -> &Ports<'_>;
+    fn keeper_ports(&self) -> Option<&crate::keeper::Ports<'_>> {
+        None
+    }
+}
+impl WakeContext for Ports<'_> {
+    fn admission_ports(&self) -> &Ports<'_> {
+        self
+    }
+}
+
+pub struct ScheduledPorts<'a> {
+    pub admission: &'a Ports<'a>,
+    pub keeper: crate::keeper::Ports<'a>,
+}
+impl WakeContext for ScheduledPorts<'_> {
+    fn admission_ports(&self) -> &Ports<'_> {
+        self.admission
+    }
+    fn keeper_ports(&self) -> Option<&crate::keeper::Ports<'_>> {
+        Some(&self.keeper)
+    }
+}
+
+impl Raise for Queue {
+    fn raise(&self, decision: &Decision, now: i64) -> Result<(), String> {
+        let Action::Raise { event, id } = &decision.action else {
+            return Err("keeper-not-a-raise".into());
+        };
+        let seconds = u64::try_from(now).map_err(|_| "keeper-invalid-now")?;
+        Queue::raise(
+            self,
+            RaisedEvent {
+                // Keep domain IDs containing ':' distinct even when their logical display keys match.
+                id: crate::watcher::event_id(
+                    "keeper",
+                    &serde_json::to_string(&(&decision.item, &decision.step))
+                        .map_err(|e| e.to_string())?,
+                    id,
+                ),
+                kind: event.clone(),
+                subject: format!("{}:{}", decision.item, decision.step),
+                ts: fgos_identity::text::iso_utc(seconds, 0),
+                reason: decision.reason.clone(),
+                next_command: String::new(),
+            },
+        )
+        .map(|_| ())
+        .map_err(|e| format!("{}: {}", e.code, e.detail))
+    }
+}
+
+/// Execute the pure keeper's decisions through the wake door's ports. Any unreadable history,
+/// failed raise, failed journal write or failed player effect refuses rather than guessing
+/// capacity or losing an alarm.
+pub fn run_keeper(ports: &keeper::Ports, now: i64) -> Result<Vec<Decision>, String> {
+    let (records, caps) = ports.snapshot.read()?;
+    let past = ports.history.read()?;
+    let decisions = keeper::decide(&records, now, &past, &caps);
+    for d in &decisions {
+        if matches!(d.action, Action::Raise { .. }) {
+            ports.raise.raise(d, now)?;
+            ports.history.record(d)?;
+        } else {
+            ports.history.record(d)?;
+            if matches!(d.action, Action::Start | Action::Wake) {
+                let need = records
+                    .iter()
+                    .find(|r| r.record.item == d.item && r.record.step == d.step)
+                    .and_then(|r| r.record.needs.as_ref())
+                    .ok_or("keeper-needs-missing")?;
+                match d.action {
+                    Action::Start => ports.players.start(d, need)?,
+                    Action::Wake => ports.players.wake(d, need)?,
+                    _ => unreachable!(),
+                }
+            }
+        }
+    }
+    Ok(decisions)
 }
 
 /// The wake settings, from `watcher.*` config.
@@ -321,7 +407,8 @@ fn close_finished(ports: &Ports, trigger: Trigger, plans: &[Plan], done: &[Strin
 }
 
 /// Start the supervisor if there is work for it and none is live.
-pub fn wake(ports: &Ports, settings: &Settings, trigger: Trigger) -> WakeOutcome {
+pub fn wake(context: &impl WakeContext, settings: &Settings, trigger: Trigger) -> WakeOutcome {
+    let ports = context.admission_ports();
     let needs_judgement = match ports.portfolio.read() {
         Ok((plans, refused)) => {
             let done: Vec<String> = plans
@@ -334,7 +421,14 @@ pub fn wake(ports: &Ports, settings: &Settings, trigger: Trigger) -> WakeOutcome
         }
         Err(_) => true,
     };
-    let outcome = decide(ports, settings, needs_judgement);
+    let keeper_result = context
+        .keeper_ports()
+        .map(|keeper| run_keeper(keeper, ports.clock.now()))
+        .transpose();
+    let outcome = match keeper_result {
+        Ok(_) => decide(ports, settings, needs_judgement),
+        Err(code) => WakeOutcome::StartFailed(code),
+    };
     ports.telemetry.emit(&WakeSpan {
         name: "fgos.supervisor.wake",
         subject: trigger.subject.to_owned(),

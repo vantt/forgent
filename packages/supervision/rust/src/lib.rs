@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 pub mod discussion_source;
+pub mod keeper;
 pub mod land;
 pub mod notify;
 pub mod portfolio;
