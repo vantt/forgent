@@ -5809,7 +5809,7 @@
           ]
         },
         "stop": {
-          "description": "End the live head of a persona-name through its own supervisor and retire its pane; answers {stopped: true}, or {stopped: false, reason: \"not-live\"} when no live session holds the role. From inside a confined head the request route decides who may stop which head.",
+          "description": "End the live head of a persona-name through its own supervisor and retire its pane; answers {stopped: true}, or {stopped: false, reason: \"not-live\"} when no live session holds the role. From inside a confined head the request route decides who may stop which head. `--role lead:<LANE>` stops a lead by its short role instead of a persona and --name.",
           "parameters": {
             "type": "object",
             "properties": {
@@ -5821,6 +5821,10 @@
                 "type": "string",
                 "description": "The name of the head."
               },
+              "role": {
+                "type": "string",
+                "description": "A lead's short role (lead:<LANE>) to stop instead of a persona and --name; the lead is ended through its own run supervisor."
+              },
               "reason": {
                 "type": "string",
                 "description": "Why it is stopped (at most 200 characters), kept on the lineage."
@@ -5829,13 +5833,11 @@
             "positional": [
               "persona"
             ],
-            "required": [
-              "persona",
-              "name"
-            ]
+            "required": []
           },
           "examples": [
-            "fgos session stop shaper --name <slug> --reason \"answer received\""
+            "fgos session stop shaper --name <slug> --reason \"answer received\"",
+            "fgos session stop --role lead:<LANE> --reason \"plan done\""
           ]
         },
         "write": {
