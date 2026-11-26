@@ -28,3 +28,14 @@ Each failure's cause is proven and fixed in production code or its fixture (neve
 # Notes
 
 Note section added by head:supervisor-forgent on 2026-11-24 so the backlog index check passes; no content change.
+
+## Update 2026-11-27 (lead:SUPERVISOR, fg-server2)
+
+An unconfined `npm test` on a clean worktree of main at `1657a5b31c` (log `.fgos/runtime/tmp/keeper-final-gate/npm-test.log` on fg-server2) failed 15 tests in 5 files. This row now blocks every release on fg-server2 (owner question q-apqmci34ry): release check `npm test` fails, so changelog-fragments phase 3 and the plans behind it wait.
+
+- `test/run-supervisor/terminal-cutover.test.mjs` (8) and `test/run-supervisor/terminal-crash-matrix.test.mjs` (1): 60 s timeouts (pane agent trust prompt, provider limit screen, invocations[] executor, codex writer id, brief result path). Already red at `535ba499d8` on 2026-11-26 21:20.
+- `test/runner/provider-per-cli-credential-sources.test.mjs` (2): store provisioning per CLI. Red at `535ba499d8` too.
+- `test/workflow/guide-schema.test.mjs` (2): the `playbook` vs `guide` mismatch named above, still red.
+- `test/skills/fgos-supervisor-idle-lead.test.mjs` (2): fixed by Keeper `5be73f9289` after this run.
+
+The coloured exit code, domain-registry, terminal-groups, convention and case-close failures above did not appear in this run.
