@@ -46,13 +46,29 @@ fn a_row_of_the_child_replaces_the_inherited_row_of_the_same_prefix() {
 }
 
 #[test]
-fn a_lead_and_a_planner_hold_mailbox_send_and_a_planner_may_mail_a_supervisor() {
-    for persona in ["lead", "planner"] {
+fn every_persona_may_send_mail_and_read_its_own_inbox_without_a_rotation_read_exemption() {
+    for persona in ["lead", "planner", "shaper", "supervisor", "secretary"] {
         assert_eq!(
             decision(persona, "mailbox send --to head:supervisor-x hello"),
             Decision::Allow,
             "{persona}"
         );
+    }
+    for persona in [
+        "head",
+        "lead",
+        "planner",
+        "shaper",
+        "supervisor",
+        "secretary",
+    ] {
+        for line in ["mailbox inbox", "mailbox inbox --claim"] {
+            let verdict = decide(persona, &argv(line)).unwrap();
+            assert_eq!(verdict.decision, Decision::Allow, "{persona} {line}");
+            let rule = verdict.rule.unwrap();
+            assert_eq!(rule.policy, Policy::Forward);
+            assert!(!rule.read, "inbox --claim changes the record");
+        }
     }
     let verdict = decide(
         "planner",

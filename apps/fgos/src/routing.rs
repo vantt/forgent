@@ -657,7 +657,7 @@ pub(crate) fn confined_head_call_with_reader<R: std::io::Read>(
         }
         ("git", Some("recover")) | ("dispatch", Some("probe-account")) => head_socket,
         // A head's mail goes through its window so the table limits the recipient of a lead or planner.
-        ("mailbox", Some("send")) => head_socket,
+        ("mailbox", Some("send" | "inbox")) => head_socket,
         // Only the delivered-to form is a row of the table; any other `worktree remove` keeps its local route.
         ("worktree", Some("remove")) => head_socket && call.flags().flag("delivered-to").is_some(),
         _ => false,
@@ -1283,18 +1283,23 @@ mod confined_tests {
     }
 
     #[test]
-    fn a_head_mailbox_send_goes_through_the_window_and_a_confined_worker_keeps_its_local_route() {
-        let send = ["mailbox", "send", "--to", "head:supervisor-x", "hello"];
-        let os: Vec<OsString> = send.iter().map(OsString::from).collect();
-        let call = confined(&send).expect("a head's send is a window call");
-        assert_eq!(
-            call.expect("a valid call"),
-            ConfinedCall {
-                verb: FGOS_FRAME,
-                args: json!({"argv": send})
-            }
-        );
-        assert!(confined_head_call_with_reader(&os, false, &mut std::io::empty()).is_none());
+    fn a_heads_mail_goes_through_the_window_and_a_confined_worker_keeps_its_local_route() {
+        for argv in [
+            vec!["mailbox", "send", "--to", "head:supervisor-x", "hello"],
+            vec!["mailbox", "inbox"],
+            vec!["mailbox", "inbox", "--claim"],
+        ] {
+            let os: Vec<OsString> = argv.iter().map(OsString::from).collect();
+            let call = confined(&argv).expect("a head's mail is a window call");
+            assert_eq!(
+                call.expect("a valid call"),
+                ConfinedCall {
+                    verb: FGOS_FRAME,
+                    args: json!({"argv": argv})
+                }
+            );
+            assert!(confined_head_call_with_reader(&os, false, &mut std::io::empty()).is_none());
+        }
     }
 
     #[test]

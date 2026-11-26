@@ -3790,3 +3790,162 @@ fn a_rotation_keeps_a_young_body_that_another_clone_of_the_machine_sent_and_igno
         assert_eq!(remote_body(&cross, &sha256_hex(gone)), None, "{gone}");
     }
 }
+
+/// A real request listener and real host child, with identity taken from the protected envelope.
+struct MailHost {
+    socket: PathBuf,
+    stop: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    pump: Option<std::thread::JoinHandle<()>>,
+}
+
+impl MailHost {
+    fn start(scene: &Scene, root: &Path) -> Self {
+        use fgos_identity::directory::{CliSessionIds, Entry, Ids};
+        use fgos_run_supervisor::head_request::HeadRequests;
+        use fgos_run_supervisor::route::WritePublisher;
+        use std::sync::{
+            atomic::{AtomicBool, Ordering},
+            Arc,
+        };
+        let role = "head:supervisor-mail-test";
+        let info = identity_of(root, "FGOS_SESSION_ID", "att-mail-host");
+        let mut entry = Entry::new(
+            info.id,
+            info.handle,
+            "claude".into(),
+            None,
+            None,
+            vec![role.into()],
+            fgos_identity::current::os_record(std::process::id()),
+        );
+        entry.ids = Some(Ids {
+            cli_session: Some(CliSessionIds {
+                source: "CLAUDE_CODE_SESSION_ID".into(),
+                id: WRITER.into(),
+                name: None,
+                name_source: None,
+                socket: None,
+                pid: None,
+                start_time: None,
+            }),
+            ..Ids::default()
+        });
+        fgos_identity::directory::register(root, entry, false, &fgos_process::facts::judge_here)
+            .unwrap();
+        let socket = scene.root.join("mail.sock");
+        let envelope = serde_json::json!({
+            "cwd": scene.main(), "hostBin": fgos_bin(), "identity": {"writerId": "att-mail-host"},
+            "session": {"role": role, "persona": "supervisor", "requestSocketPath": socket},
+            "steps": [{"env": {"HOME": scene.home(), "PATH": std::env::var_os("PATH").unwrap_or_default(),
+                "FGOS_STATE_ROOT": root, "FGOS_SESSION_ID": "att-mail-host"}}],
+        });
+        let publisher = WritePublisher {
+            catch_up: Arc::new(|_, _| unreachable!("no session write")),
+            path_clean: Arc::new(|_, _| unreachable!("no session write")),
+            path_oid: Arc::new(|_, _| unreachable!("no session write")),
+            publish: Arc::new(|_, _, _, _| unreachable!("no session write")),
+        };
+        let (_, server) = HeadRequests::from_envelope(&envelope, &scene.root, root, &publisher)
+            .unwrap()
+            .unwrap();
+        let listener = std::os::unix::net::UnixListener::bind(&socket).unwrap();
+        listener.set_nonblocking(true).unwrap();
+        let stop = Arc::new(AtomicBool::new(false));
+        let flag = stop.clone();
+        let pump = std::thread::spawn(move || {
+            while !flag.load(Ordering::SeqCst) {
+                server.poll(&listener);
+                std::thread::sleep(std::time::Duration::from_millis(5));
+            }
+        });
+        Self {
+            socket,
+            stop,
+            pump: Some(pump),
+        }
+    }
+
+    fn confined(&self, scene: &Scene, args: &[&str]) -> Output {
+        // Exercise the confined routing door, not the confinement driver's policy (owned by its own suite).
+        // A local mailbox call cannot locate a record with this project-dir; only the host's protected cwd works.
+        scene
+            .command(&scene.main(), Some("att-forged-caller"))
+            .args(args)
+            .env("FGOS_CONFINED", "1")
+            .env("FGOS_HEAD_REQUEST_SOCKET", &self.socket)
+            .env("CLAUDE_PROJECT_DIR", scene.root.join("outside"))
+            .env("CLAUDE_CODE_SESSION_ID", "another-head")
+            .stdin(Stdio::null())
+            .output()
+            .unwrap()
+    }
+}
+
+impl Drop for MailHost {
+    fn drop(&mut self) {
+        self.stop.store(true, std::sync::atomic::Ordering::SeqCst);
+        self.pump.take().unwrap().join().unwrap();
+    }
+}
+
+// Existing local-route cases do not cross a socket or isolate the caller's project and identity from the host's.
+#[test]
+fn a_confined_send_is_recorded_by_the_host_with_the_envelope_callers_identity() {
+    const PEER: &str = "00000000-0000-4000-8000-0000000000bb";
+    let (scene, root) = scene_with_head("socket-send");
+    let _peer = CodexHead::start(&scene, PEER);
+    let to = name_of_key(&scene, PEER);
+    let host = MailHost::start(&scene, &root);
+    let out = host.confined(
+        &scene,
+        &[
+            "mailbox",
+            "send",
+            "--to",
+            &to,
+            "through the socket",
+            "--json",
+        ],
+    );
+    assert!(out.status.success(), "{out:?}");
+    let data: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(data["recorded"], true, "{data}");
+    let snapshot: serde_json::Value = serde_json::from_slice(
+        &fs::read(scene.mailbox_dir().join("record/snapshot.json")).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(snapshot["messages"][0]["from"], WRITER);
+    let claimed = scene.run(
+        &scene.main(),
+        Some(PEER),
+        &["mailbox", "inbox", "--claim"],
+        b"",
+    );
+    assert!(claimed.status.success(), "{claimed:?}");
+    assert!(
+        String::from_utf8_lossy(&claimed.stdout).contains("| through the socket"),
+        "{claimed:?}"
+    );
+    let refused = host.confined(
+        &scene,
+        &["mailbox", "send", "--to", "nobody", "hi", "--json"],
+    );
+    assert!(!refused.status.success());
+    let data: serde_json::Value = serde_json::from_slice(&refused.stdout).unwrap();
+    assert_eq!(data["code"], "unknown-name", "{refused:?}");
+}
+
+#[test]
+fn a_confined_inbox_claim_reads_only_the_envelope_callers_mail_through_the_socket() {
+    let (scene, root) = scene_with_head("socket-inbox");
+    let sent = send_to(&scene, &scene.head_name(), false);
+    assert!(sent.status.success(), "{sent:?}");
+    let host = MailHost::start(&scene, &root);
+    let out = host.confined(&scene, &["mailbox", "inbox", "--claim", "--json"]);
+    assert!(out.status.success(), "{out:?}");
+    let data: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    let text = data["text"].as_str().unwrap();
+    assert!(text.contains("| hi"), "{data}");
+    assert_eq!(data["claimed"], serde_json::json!([recorded_id(&sent)]));
+    assert_eq!(scene.message_states(), vec!["offered"]);
+}
