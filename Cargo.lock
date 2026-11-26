@@ -588,6 +588,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-agent-start-context"
+version = "0.2.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "fgos-canonical-json"
 version = "0.2.0"
 dependencies = [

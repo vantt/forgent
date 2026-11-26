@@ -1,0 +1,10 @@
+[package]
+name = "fgos-agent-start-context"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Agent Start Context: the one composer of the text every fgOS-started agent receives (compose: facts, payloads, delivery -> ordered blocks or a named refusal). Pure: no I/O; the host wires the ports."
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }

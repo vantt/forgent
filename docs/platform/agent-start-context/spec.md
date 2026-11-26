@@ -142,8 +142,11 @@ broken component cannot stop every start.
 
 Each delivery has a byte budget. Rule blocks come in ACE's composition order (kind order, then scope breadth, then
 specificity, then authority, then source path, then id). ASC then places payloads and contributor blocks after the
-rules they serve. Optional blocks beyond the budget are dropped lowest priority first, and every dropped block is
-listed in the answer and the record, so growth shows as numbers rather than silent bloat.
+rules they serve: the matching rules first, then the payloads in request order, then the contributor blocks in
+registration order. Payloads and rules of kind `law` are required; other rules and contributor blocks are optional.
+Optional blocks beyond the budget are dropped lowest priority first, contributors before rules and later before
+earlier, and every dropped block is listed in the answer and the record, so growth shows as numbers rather than
+silent bloat. A contributor's own block larger than its registered `budgetBytes` is dropped the same way.
 
 ## 8. The per-start record
 
