@@ -35,9 +35,11 @@ const refuses = (raw, pattern) => assert.throws(() => validateWorkflow(raw), (er
 });
 
 const REGISTERED = [...discoverWorkflows({ packageRoot: ROOT }).values()];
+// The coding workflows are written in guide form; every other registered workflow is a playbook step form.
+const GUIDE_FORM = new Set(['coding/feature', 'coding/bugfix']);
 
 test('every registered workflow carries a guide model', () => {
-  assert.equal(REGISTERED.length, 9);
+  assert.equal(REGISTERED.length, 10);
   for (const wf of REGISTERED) {
     assert.ok(wf.guide, wf.id);
     assert.equal(wf.guide.id, wf.id);
@@ -46,7 +48,7 @@ test('every registered workflow carries a guide model', () => {
 });
 
 test('a playbook step form becomes one activity per step in step order, dependsOn as entry milestones', () => {
-  for (const wf of REGISTERED.filter((w) => w.id !== 'coding/feature')) {
+  for (const wf of REGISTERED.filter((w) => !GUIDE_FORM.has(w.id))) {
     const guide = wf.guide;
     assert.equal(guide.kind, 'playbook', wf.id);
     assert.deepEqual(guide.activities.map((a) => a.id), wf.steps.map((s) => s.id), wf.id);
