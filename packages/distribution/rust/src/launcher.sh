@@ -1,9 +1,10 @@
 #!/bin/sh
 # fgos-project-launcher v1: runs the release the nearest enclosing project activated, from this machine's release store only.
+_fgos_rec=.fgos/installation/activation.json
 _fgos_dir=$PWD
 _fgos_nearest_git=
 _fgos_using_project=
-while [ ! -f "$_fgos_dir/.fgos/installation/activation.json" ]; do
+while [ ! -f "$_fgos_dir/$_fgos_rec" ]; do
   if [ -z "$_fgos_nearest_git" ] && { [ -e "$_fgos_dir/.git" ] || [ -L "$_fgos_dir/.git" ]; }; then
     _fgos_nearest_git="$_fgos_dir/.git"
   fi
@@ -20,8 +21,8 @@ _fgos_refuse() {
   echo "fgos: refusing $_fgos_target: $_fgos_reason -- fgos runs only a release fgctl installed on this machine -- run 'fgctl init' in the project to activate one, then 'fgctl verify'" >&2
   exit 126
 }
-if [ -f "$_fgos_dir/.fgos/installation/activation.json" ]; then
-  _fgos_act="${_fgos_dir%/}/.fgos/installation/activation.json"
+if [ -f "$_fgos_dir/$_fgos_rec" ]; then
+  _fgos_act="${_fgos_dir%/}/$_fgos_rec"
 else
   if [ -z "$_fgos_nearest_git" ]; then
     echo "fgos: no .fgos/installation found above $PWD -- run 'fgctl init' in the project" >&2
@@ -93,7 +94,7 @@ else
   if [ ! -O "$_fgos_main" ]; then
     _fgos_refuse "$_fgos_main" "main checkout is not owned by the calling user"
   fi
-  _fgos_act="$_fgos_main/.fgos/installation/activation.json"
+  _fgos_act="${_fgos_main%/}/$_fgos_rec"
   if [ ! -f "$_fgos_act" ]; then
     _fgos_refuse "$_fgos_act" "no activation found in main checkout"
   fi
