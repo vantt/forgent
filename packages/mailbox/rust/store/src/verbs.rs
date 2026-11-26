@@ -248,12 +248,7 @@ fn nudge_target(
 /// What the delivery report says of the recipient's CLI version.
 fn version_clause(outcome: &SendOutcome, versions: &VersionSources) -> VersionClause {
     match recipient_version(&outcome.to_cli, &outcome.to_head, versions) {
-        Some(v)
-            if TestedClis::embedded().lists_version(outcome.to_cli.as_str(), &v)
-                || TestedClis::embedded()
-                    .nudge_channels_for(outcome.to_cli.as_str(), &v)
-                    .contains(&crate::adapters::NudgeChannel::Typed) =>
-        {
+        Some(v) if TestedClis::embedded().lists_version(outcome.to_cli.as_str(), &v) => {
             VersionClause::Tested
         }
         Some(v) => VersionClause::Untested(v),

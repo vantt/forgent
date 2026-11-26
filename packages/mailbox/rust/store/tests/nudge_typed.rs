@@ -138,6 +138,11 @@ fn sends_name_the_actual_local_path_and_a_typed_wake_is_not_repeated_while_unrea
                 .contains(&format!("could not be nudged ({cause})")));
         }
         if expected_path == "local-typed" {
+            // A typed-wake recording does not prove the hook at this version.
+            assert!(!TestedClis::embedded().lists_version("codex", version));
+            assert!(sent.text.contains(&format!(
+                "Its CLI version {version} is not one this mailbox was tested against; the hook still delivers, but nothing beyond that is verified."
+            )));
             let second = send(
                 &record,
                 request("second message"),
