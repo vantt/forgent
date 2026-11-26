@@ -38,9 +38,26 @@ pub enum WakeOutcome {
 
 /// The independent review runs through Execution; only a settled successful Unit is recorded.
 pub trait Review {
-    fn start(&self) -> Result<(), String>;
-    fn settled(&self) -> Result<Option<String>, String>;
-    fn done(&self, unit_run_id: &str) -> Result<(), String>;
+    /// Starts one review run; `started_at` (epoch seconds) names the run's own log.
+    fn start(&self, started_at: i64) -> Result<(), String>;
+    /// Reads only the run started at `started_at`. `expired` means the in-flight bound has
+    /// passed: a run with no answer by then is `Failed`, and its leftovers are removed.
+    fn settled(&self, started_at: i64, expired: bool) -> Result<ReviewSettlement, String>;
+    /// Records the review as done, then removes the run's log; a repeat is a success.
+    fn done(&self, started_at: i64, unit_run_id: &str) -> Result<(), String>;
+    /// Seconds a started review may stay in flight; never shorter than the run's own timeout.
+    fn in_flight_bound_sec(&self) -> i64;
+}
+
+/// What reading one started review found.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ReviewSettlement {
+    /// No answer yet and still inside the bound.
+    Running,
+    /// The run ended without a usable answer; start afresh.
+    Failed,
+    /// The run passed and its report is stored; carries the unit run id.
+    Settled(String),
 }
 
 pub const REVIEW_BRIEF: &str = "core/watcher/briefs/periodic-review.md";
@@ -284,27 +301,31 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
     let now = ports.clock.now();
     let mut state = ports.state.load().unwrap_or_default();
     let mut settled_this_tick = false;
-    match ports.review.settled() {
-        Ok(Some(unit_run_id)) => {
-            settled_this_tick = true;
-            if let Err(e) = ports.review.done(&unit_run_id) {
-                r.errors += 1;
-                r.problems.push(format!("review-done: {e}"));
-            } else {
-                if let Ok(unhandled) = ports.queue.unhandled() {
-                    for e in unhandled {
-                        if action(settings, &e.kind) == Action::StartReview {
-                            let _ = ports.queue.review_handled(&e.id);
+    if let Some(started) = state.review_started {
+        let expired = now - started >= ports.review.in_flight_bound_sec();
+        match ports.review.settled(started, expired) {
+            Ok(ReviewSettlement::Settled(unit_run_id)) => {
+                settled_this_tick = true;
+                if let Err(e) = ports.review.done(started, &unit_run_id) {
+                    r.errors += 1;
+                    r.problems.push(format!("review-done: {e}"));
+                } else {
+                    if let Ok(unhandled) = ports.queue.unhandled() {
+                        for e in unhandled {
+                            if action(settings, &e.kind) == Action::StartReview {
+                                let _ = ports.queue.review_handled(&e.id);
+                            }
                         }
                     }
+                    state.review_started = None;
                 }
-                state.review_started = None;
             }
-        }
-        Ok(None) => {}
-        Err(e) => {
-            r.errors += 1;
-            r.problems.push(format!("review-settle: {e}"));
+            Ok(ReviewSettlement::Failed) => state.review_started = None,
+            Ok(ReviewSettlement::Running) => {}
+            Err(e) => {
+                r.errors += 1;
+                r.problems.push(format!("review-settle: {e}"));
+            }
         }
     }
     if ports.questions.refresh().is_err() {
@@ -507,11 +528,11 @@ fn run_action(
         Action::StartReview => {
             let in_flight = state
                 .review_started
-                .is_some_and(|start| now - start < settings.idle_interval_sec);
+                .is_some_and(|start| now - start < ports.review.in_flight_bound_sec());
             if settled_this_tick {
                 let _ = ports.queue.review_handled(&event.id);
             } else if !in_flight {
-                match ports.review.start() {
+                match ports.review.start(now) {
                     Ok(()) => {
                         state.review_started = Some(now);
                     }

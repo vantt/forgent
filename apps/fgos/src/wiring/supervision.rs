@@ -2280,6 +2280,21 @@ fn review_state_from_portfolio_and_events(
     watcher::review_state_record(last_done, open_plan || open_questions, new_event)
 }
 
+/// One warning line naming every plan the review could not read, or `None` when all were read.
+fn refused_plans_warning(refusals: &[Value]) -> Option<String> {
+    let named: Vec<String> = refusals
+        .iter()
+        .map(|r| {
+            format!(
+                "{} ({})",
+                r["dir"].as_str().unwrap_or("?"),
+                r["code"].as_str().unwrap_or("?")
+            )
+        })
+        .collect();
+    (!named.is_empty()).then(|| format!("review-source: plans refused: {}", named.join(", ")))
+}
+
 struct ReviewSource;
 impl fgos_observe::RecordSource for ReviewSource {
     fn source_id(&self) -> &'static str {
@@ -2301,10 +2316,13 @@ impl fgos_observe::RecordSource for ReviewSource {
                 .into_iter()
                 .filter(|r| r.kind == "fgos.review.done")
                 .max_by_key(|r| fgos_host_runtime::civil_time::parse_rfc3339_millis(&r.ts));
-            let (plans, _refusals) = HostPortfolio {
+            let (plans, refusals) = HostPortfolio {
                 root: root.to_path_buf(),
             }
             .read_with_refusals()?;
+            if let Some(warning) = refused_plans_warning(&refusals) {
+                eprintln!("{warning}");
+            }
             let open_question = match super::questions::HostLogOpener::reader()
                 .open(root)
                 .map_err(|e| e.to_string())?
@@ -2339,32 +2357,48 @@ struct HostReview {
 }
 
 impl HostReview {
+    fn log_path(&self, started_at: i64) -> PathBuf {
+        self.root
+            .join(format!(".fgos/runtime/watcher/review-{started_at}.log"))
+    }
+
     #[cfg(unix)]
-    fn start_run(&self, args: &[String]) -> Result<(), String> {
+    fn start_run(&self, args: &[String], log: &Path) -> Result<(), String> {
         let exe = std::env::current_exe().map_err(|e| e.to_string())?;
         let mut argv = vec![exe.into_os_string()];
         argv.extend(args.iter().map(std::ffi::OsString::from));
-        let logs = self.root.join(".fgos/runtime/watcher");
-        std::fs::create_dir_all(&logs).map_err(|e| e.to_string())?;
-        fgos_process::mapped::spawn_detached(
-            &argv,
-            &self.root,
-            &[],
-            &[],
-            Some(&logs.join("review.log")),
-        )
-        .map(|_| ())
-        .map_err(|e| e.to_string())
+        let parent = log.parent().ok_or("review-log-parent-missing")?;
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        fgos_process::mapped::spawn_detached(&argv, &self.root, &[], &[], Some(log))
+            .map(|_| ())
+            .map_err(|e| e.to_string())
     }
 
     #[cfg(not(unix))]
-    fn start_run(&self, _: &[String]) -> Result<(), String> {
+    fn start_run(&self, _: &[String], _: &Path) -> Result<(), String> {
         Err("review-detached-start-unsupported".into())
     }
 }
 
+/// The JSON object `fgos run --json` printed: the last log line that parses as an object
+/// carrying an outcome. Stderr lines around it are ignored.
+fn run_answer(log: &str) -> Option<Value> {
+    log.lines().rev().find_map(|line| {
+        let value = serde_json::from_str::<Value>(line.trim()).ok()?;
+        let data = value.get("data").unwrap_or(&value);
+        (data.is_object() && data.get("outcome").is_some()).then(|| data.clone())
+    })
+}
+
 impl watcher::Review for HostReview {
-    fn start(&self) -> Result<(), String> {
+    fn in_flight_bound_sec(&self) -> i64 {
+        let idle = config_int(&self.root, "watcher.idleIntervalSec", 900);
+        let run_timeout = config_int(&self.root, "runner.timeoutMs", 900_000) / 1000;
+        let ticks = idle * config_int(&self.root, "watcher.overdueFactor", 3);
+        run_timeout.max(ticks) + idle
+    }
+
+    fn start(&self, started_at: i64) -> Result<(), String> {
         let definitions = QueryDefinitions {
             root: self.root.clone(),
             payload_root: self.payload_root,
@@ -2373,36 +2407,40 @@ impl watcher::Review for HostReview {
             .resolve(watcher::REVIEW_BRIEF)
             .ok_or("review-brief-missing")?;
         let brief = std::fs::read_to_string(path).map_err(|e| e.to_string())?;
-        self.start_run(&watcher::review_run_args(&brief))
+        self.start_run(&watcher::review_run_args(&brief), &self.log_path(started_at))
     }
 
-    fn settled(&self) -> Result<Option<String>, String> {
-        let log_path = self.root.join(".fgos/runtime/watcher/review.log");
-        if !log_path.exists() {
-            return Ok(None);
-        }
-        let bytes = match std::fs::read(&log_path) {
-            Ok(b) if !b.is_empty() => b,
-            _ => return Ok(None),
-        };
-        let Ok(answer) = serde_json::from_slice::<Value>(&bytes) else {
-            return Ok(None);
-        };
-        let data = answer.get("data").unwrap_or(&answer);
-        if data["outcome"] != "pass" {
+    fn settled(
+        &self,
+        started_at: i64,
+        expired: bool,
+    ) -> Result<watcher::ReviewSettlement, String> {
+        use watcher::ReviewSettlement::{Failed, Running, Settled};
+        let log_path = self.log_path(started_at);
+        let failed = || {
             let _ = std::fs::remove_file(&log_path);
-            return Ok(None);
+            Ok(Failed)
+        };
+        let text = std::fs::read(&log_path)
+            .map(|bytes| String::from_utf8_lossy(&bytes).into_owned())
+            .unwrap_or_default();
+        let Some(data) = run_answer(&text) else {
+            return if expired { failed() } else { Ok(Running) };
+        };
+        if data["outcome"] != "pass" {
+            return failed();
         }
-        let id = data["unitRunId"]
-            .as_str()
-            .filter(|id| !id.is_empty())
-            .ok_or("review-unit-run-id-missing")?;
-        let report = data["results"]
+        let Some(id) = data["unitRunId"].as_str().filter(|id| !id.is_empty()) else {
+            return failed();
+        };
+        let Some(report) = data["results"]
             .as_array()
             .and_then(|results| results.last())
             .and_then(|result| result["runResult"]["agentClaim"]["summary"].as_str())
             .filter(|text| !text.trim().is_empty())
-            .ok_or("review-report-missing")?;
+        else {
+            return failed();
+        };
         let slug = format!("periodic-review-{id}");
         let now = now_secs();
         let destination = fgos_convention::convention_path(
@@ -2428,11 +2466,10 @@ impl watcher::Review for HostReview {
             report.as_bytes(),
         )
         .map_err(|e| e.to_string())?;
-        let _ = std::fs::remove_file(&log_path);
-        Ok(Some(id.to_owned()))
+        Ok(Settled(id.to_owned()))
     }
 
-    fn done(&self, unit_run_id: &str) -> Result<(), String> {
+    fn done(&self, started_at: i64, unit_run_id: &str) -> Result<(), String> {
         let mut declarations = super::observe_declarations::embedded_declarations();
         declarations.push(watcher::REVIEW_DECLARATION);
         let door = RecordDoor::new(self.root.clone(), declarations, (self.payload_root)().ok());
@@ -2445,8 +2482,12 @@ impl watcher::Review for HostReview {
             vec![("fgos.review.unitRunId", unit_run_id.into())],
             vec![],
         );
+        use fgos_observe::record::store::WriteOutcome::{Duplicate, Written};
         match door.write(record) {
-            fgos_observe::record::store::WriteOutcome::Written => Ok(()),
+            Written | Duplicate => {
+                let _ = std::fs::remove_file(self.log_path(started_at));
+                Ok(())
+            }
             other => Err(format!("review-done-write-failed: {other:?}")),
         }
     }
@@ -3284,17 +3325,29 @@ mod tests {
             Some(watcher::Action::StartReview)
         );
         // Before settle, settled() is None
-        assert_eq!(review.settled().unwrap(), None);
+        use watcher::ReviewSettlement::{Failed, Running, Settled};
+        assert_eq!(review.settled(1000, false).unwrap(), Running);
+        assert_eq!(
+            review.settled(1000, true).unwrap(),
+            Failed,
+            "a run with no log past the bound failed"
+        );
 
-        // Simulate settled review output in review.log:
+        // Simulate settled review output in the run's own log, with stderr lines around it:
         let log_dir = root.join(".fgos/runtime/watcher");
         std::fs::create_dir_all(&log_dir).unwrap();
         let result = json!({"data": {"outcome": "pass", "unitRunId": "review-unit-1",
             "results": [{"runResult": {"agentClaim": {"summary": "# Review\nNo actionable findings."}}}]}});
-        std::fs::write(log_dir.join("review.log"), result.to_string()).unwrap();
+        let own_log = log_dir.join("review-1000.log");
+        std::fs::write(&own_log, format!("warning: slow\n{result}\ntrailing stderr\n")).unwrap();
+        // Another start's log never settles this one.
+        std::fs::write(log_dir.join("review-2000.log"), "stderr only\n").unwrap();
 
-        let id = review.settled().unwrap().expect("settled unit id");
+        let Settled(id) = review.settled(1000, false).unwrap() else {
+            panic!("the log's JSON object settles the run");
+        };
         assert_eq!(id, "review-unit-1");
+        assert!(own_log.exists(), "the log stays until done is recorded");
 
         let reports: Vec<_> = std::fs::read_dir(root.join("plans/reports"))
             .unwrap()
@@ -3315,7 +3368,9 @@ mod tests {
             std::fs::read_to_string(&reports[0]).unwrap(),
             "# Review\nNo actionable findings."
         );
-        review.done(&id).unwrap();
+        review.done(1000, &id).unwrap();
+        assert!(!own_log.exists(), "done removes the run's log");
+        review.done(1000, &id).unwrap();
         let records = fgos_observe::record::store::RecordStoreSource
             .records(&root, &fgos_observe::Window::default())
             .unwrap();
@@ -3323,7 +3378,7 @@ mod tests {
             .iter()
             .filter(|r| r.kind == "fgos.review.done")
             .collect();
-        assert_eq!(done.len(), 1);
+        assert!(!done.is_empty());
         assert_eq!(done[0].subject.id, "review-unit-1");
         assert_eq!(done[0].attrs["fgos.review.unitRunId"], AttrValue::Str(id));
 
@@ -3333,9 +3388,17 @@ mod tests {
             r#"{"outcome":"pass"}"#,
             r#"{"outcome":"pass","unitRunId":"without-report"}"#,
         ] {
-            std::fs::write(log_dir.join("review.log"), answer).unwrap();
-            assert_eq!(review.settled().unwrap(), None);
+            std::fs::write(&own_log, format!("noise\n{answer}\n")).unwrap();
+            assert_eq!(review.settled(1000, false).unwrap(), Failed);
+            assert!(!own_log.exists(), "a failed review removes its log");
         }
+
+        // A crash with no JSON stays running inside the bound and fails past it.
+        std::fs::write(&own_log, "thread panicked\n").unwrap();
+        assert_eq!(review.settled(1000, false).unwrap(), Running);
+        assert!(own_log.exists());
+        assert_eq!(review.settled(1000, true).unwrap(), Failed);
+        assert!(!own_log.exists());
     }
 
     #[test]
@@ -3343,30 +3406,34 @@ mod tests {
         let last_done = Some("2026-11-16T12:00:00.000Z");
 
         // 1. Open plan makes review pending
-        let open_plans = vec![Plan {
-            dir: "p1".into(),
-            status: "ready".into(),
-            title: "P1".into(),
-            priority: "P1".into(),
-        }];
+        fn plan(dir: &str, status: &str) -> Plan {
+            Plan {
+                dir: dir.into(),
+                title: dir.to_uppercase(),
+                status: status.into(),
+                priority: "P1".into(),
+                created: "2026-11-01".into(),
+                blocked_by: vec![],
+                footprint: vec![],
+                source: vec![],
+                lead: None,
+                phases: vec![],
+            }
+        }
+        let open_plans = vec![plan("p1", "ready")];
         let r1 = review_state_from_portfolio_and_events(last_done, &open_plans, false, None);
         assert_eq!(r1.measures["fgos.review.pending"], 1.into());
 
         // 2. Only done/withdrawn plans, but open question makes review pending
-        let done_plans = vec![
-            Plan {
-                dir: "p1".into(),
-                status: "done".into(),
-                title: "P1".into(),
-                priority: "P1".into(),
-            },
-            Plan {
-                dir: "p2".into(),
-                status: "withdrawn".into(),
-                title: "P2".into(),
-                priority: "P2".into(),
-            },
+        let done_plans = vec![plan("p1", "done"), plan("p2", "withdrawn")];
+
+        // A refused plan is named in one warning line, never dropped silently.
+        let refused = vec![
+            json!({"dir": "broken-plan", "code": "plan-not-utf8", "detail": "plan.md is not UTF-8"}),
         ];
+        let warning = refused_plans_warning(&refused).expect("a warning for the refused plan");
+        assert!(warning.contains("broken-plan") && warning.contains("plan-not-utf8"));
+        assert_eq!(refused_plans_warning(&[]), None);
         let r2 = review_state_from_portfolio_and_events(last_done, &done_plans, true, None);
         assert_eq!(r2.measures["fgos.review.pending"], 1.into());
 

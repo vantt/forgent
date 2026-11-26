@@ -4,7 +4,7 @@ use fgos_supervision::{
     queue::{QueueError, Raised, RaisedEvent},
     watcher::{
         event_id, tick, Action, Clock, Definitions, EventSink, Fetch, Mode, Outcome, Portfolio,
-        Ports, QuestionsView, Row, Settings, Span, State, StopOutcome, Telemetry, TickLock,
+        Ports, QuestionsView, ReviewSettlement, Row, Settings, Span, State, StopOutcome, Telemetry, TickLock,
         TickState, Wake, WakeOutcome,
     },
 };
@@ -39,28 +39,48 @@ struct World {
     review_fails: RefCell<bool>,
     review_settled: RefCell<bool>,
     reviews_done: RefCell<Vec<String>>,
+    /// The start instants the review port was given, in order.
+    review_starts: RefCell<Vec<i64>>,
+    /// The review answer ended without a usable result: the next read says `Failed`.
+    review_failed: RefCell<bool>,
+    /// How many `done` calls fail before one succeeds.
+    review_done_failures: RefCell<u32>,
 }
 
+/// The in-flight bound the fake review port reports, in seconds.
+const REVIEW_BOUND: i64 = 600;
+
 impl fgos_supervision::watcher::Review for World {
-    fn start(&self) -> Result<(), String> {
+    fn start(&self, started_at: i64) -> Result<(), String> {
         *self.reviews.borrow_mut() += 1;
+        self.review_starts.borrow_mut().push(started_at);
         if *self.review_fails.borrow() {
             Err("failed Unit".into())
         } else {
             Ok(())
         }
     }
-    fn settled(&self) -> Result<Option<String>, String> {
+    fn settled(&self, _started_at: i64, expired: bool) -> Result<ReviewSettlement, String> {
         if *self.review_settled.borrow() {
-            *self.review_settled.borrow_mut() = false;
-            Ok(Some("unit-review-1".into()))
+            // A settled answer stays readable until done is recorded.
+            Ok(ReviewSettlement::Settled("unit-review-1".into()))
+        } else if std::mem::take(&mut *self.review_failed.borrow_mut()) || expired {
+            Ok(ReviewSettlement::Failed)
         } else {
-            Ok(None)
+            Ok(ReviewSettlement::Running)
         }
     }
-    fn done(&self, id: &str) -> Result<(), String> {
+    fn done(&self, _started_at: i64, id: &str) -> Result<(), String> {
+        if *self.review_done_failures.borrow() > 0 {
+            *self.review_done_failures.borrow_mut() -= 1;
+            return Err("record write failed".into());
+        }
+        *self.review_settled.borrow_mut() = false;
         self.reviews_done.borrow_mut().push(id.into());
         Ok(())
+    }
+    fn in_flight_bound_sec(&self) -> i64 {
+        REVIEW_BOUND
     }
 }
 
@@ -300,6 +320,7 @@ fn a_late_commit_inside_the_lookback_is_asked_for() {
     *w.state.borrow_mut() = Some(State {
         last_tick: Some(1600),
         last_full_tick: Some(1000),
+        review_started: None,
     });
     at(&w, 1700);
     w.rows.borrow_mut().push(row("plan-ready", "p1", "t-old"));
@@ -422,6 +443,7 @@ fn an_idle_tick_runs_no_definition_and_an_active_one_fetches_and_runs_them() {
     *w.state.borrow_mut() = Some(State {
         last_tick: Some(1000),
         last_full_tick: Some(1000),
+        review_started: None,
     });
     at(&w, 1100);
     let idle = run(&w, None, &settings(Action::None));
@@ -443,6 +465,7 @@ fn every_tick_holding_the_lock_refreshes_questions_once_and_a_busy_one_does_not(
     *w.state.borrow_mut() = Some(State {
         last_tick: Some(1000),
         last_full_tick: Some(1000),
+        review_started: None,
     });
     at(&w, 1100);
     run(&w, None, &settings(Action::None)); // idle
@@ -468,6 +491,7 @@ fn a_runner_failure_leaves_last_tick_unchanged_and_the_next_tick_raises_the_even
     let before = State {
         last_tick: Some(1000),
         last_full_tick: Some(1000),
+        review_started: None,
     };
     *w.state.borrow_mut() = Some(before);
     at(&w, 2000);
@@ -572,6 +596,7 @@ fn an_edge_between_an_idle_tick_and_the_next_full_tick_is_raised_with_no_lookbac
     *w.state.borrow_mut() = Some(State {
         last_tick: Some(1000),
         last_full_tick: Some(1000),
+        review_started: None,
     });
     let mut s = settings(Action::None);
     s.lookback_sec = 0;
@@ -683,6 +708,55 @@ fn a_failed_start_counts_an_error_and_retries_next_tick() {
     let ok = run(&w, None, &s);
     assert_eq!((ok.duplicate, ok.errors, ok.wakes), (1, 0, 0));
     assert_eq!(*w.reviews.borrow(), 2);
+}
+
+fn review_due_world() -> (World, Settings) {
+    let w = World::default();
+    w.rows
+        .borrow_mut()
+        .push(row("review-due", "periodic-review", "epoch"));
+    w.pace_rows.borrow_mut().push(row("active", "x", "t"));
+    let mut s = settings(Action::WakeSupervisor);
+    s.actions.insert("review-due".into(), Action::StartReview);
+    (w, s)
+}
+
+#[test]
+fn a_review_that_ended_without_a_usable_answer_clears_the_marker_and_starts_afresh() {
+    let (w, s) = review_due_world();
+    at(&w, 1000);
+    run(&w, None, &s);
+    assert_eq!(*w.review_starts.borrow(), [1000], "the start names its instant");
+
+    // The run crashed with no answer, inside the bound: the next tick starts a new one.
+    *w.review_failed.borrow_mut() = true;
+    at(&w, 1060);
+    let afresh = run(&w, None, &s);
+    assert_eq!(afresh.errors, 0);
+    assert_eq!(*w.review_starts.borrow(), [1000, 1060]);
+    assert!(w.reviews_done.borrow().is_empty());
+}
+
+#[test]
+fn a_failed_done_keeps_the_review_settled_and_is_retried_on_the_next_tick() {
+    let (w, s) = review_due_world();
+    at(&w, 1000);
+    run(&w, None, &s);
+
+    *w.review_settled.borrow_mut() = true;
+    *w.review_done_failures.borrow_mut() = 1;
+    at(&w, 1060);
+    let failed = run(&w, None, &s);
+    assert_eq!(failed.errors, 1);
+    assert!(failed.problems.iter().any(|p| p.starts_with("review-done")));
+    assert!(w.reviews_done.borrow().is_empty());
+    assert!(w.handled.borrow().is_empty(), "the trigger stays open");
+
+    at(&w, 1120);
+    let retried = run(&w, None, &s);
+    assert_eq!(retried.errors, 0);
+    assert_eq!(*w.reviews_done.borrow(), ["unit-review-1"]);
+    assert_eq!(*w.reviews.borrow(), 1, "no second start while retrying done");
 }
 
 fn stuck_world() -> (World, Settings) {
