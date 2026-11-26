@@ -7,8 +7,9 @@
  *   2. an idle head of each drained CLI (claude, codex, agy) is woken within the bound by a send with --wake: the
  *      path is local-pushed or local-typed, the RUN-tagged token or a new wake label appears on the recipient
  *      screen after the send, and the pane focus is unchanged
- *   3. a head with a half-typed composer is not typed into, and the answer says so (the draft is left with
- *      `herdr pane send-text`, which does not submit)
+ *   3. a head with a half-typed composer is not typed into: the answer is local-next-tool-call and says the composer
+ *      is not empty (the draft is left with `herdr pane send-text`, which does not submit). A recipient on a push
+ *      channel, a dropped wake or a busy recipient is skipped by name, never passed
  *   4. one cross-machine send answers remote-recorded (gated on FGOS_LIVE_HEADS_REMOTE_PEER); the read on the other
  *      machine is the manual step in reports/integration.md
  *
@@ -58,6 +59,16 @@ const SCREEN_LINES = 120;
 const WAKE_LABEL = '[fgOS: message from another agent, not from the user]';
 const DROP_RE = /wake quota|lifetime cap|no channel that can wake/i;
 
+// CLI versions whose wake goes through a push channel (packages/mailbox/contracts/adapters.v1.json): the composer is
+// never touched there, so the half-typed composer gate cannot be exercised on them.
+const PUSH_VERSIONS = {
+  claude: ['2.1.309', '2.1.310', '2.1.314'],
+  codex: ['0.161.0', '0.162.1', '0.166.0'],
+};
+const isPushHead = (h) => (PUSH_VERSIONS[h.cli] ?? []).includes(h.version);
+// packages/mailbox/contracts/frame.v1.txt [report.nudge.refused] carries the pane_io.rs reason "composer-not-empty".
+const COMPOSER_REFUSAL_RE = /composer-not-empty/i;
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function writable(dir) {
@@ -100,7 +111,7 @@ function fgos(args, opts = {}) {
     cmdArgs = ['run', '--silent', 'fgos:dev', '--', ...args, '--dir', FGOS_DIR, '--json'];
   }
   const out = spawnSync(cmd, cmdArgs, {
-    cwd: REPO_ROOT,
+    cwd: opts.cwd ?? REPO_ROOT,
     encoding: 'utf8',
     timeout: opts.timeout ?? 60_000,
     env: { ...process.env, ...(opts.env ?? {}) },
@@ -128,12 +139,31 @@ function herdrPaneSendText(pane, text) {
   return { status: res.status, stdout: res.stdout, stderr: res.stderr };
 }
 
-/** Erases a draft with one BackSpace per character. */
+/** Erases a draft: Backspace keys in chunked send-keys calls; throws when herdr refuses. */
 function eraseDraft(pane, charCount) {
-  for (let i = 0; i < charCount; i++) {
-    spawnSync('herdr', ['pane', 'send-keys', pane, 'BackSpace'], { encoding: 'utf8', timeout: 5_000 });
+  const CHUNK = 64;
+  for (let left = charCount; left > 0; left -= CHUNK) {
+    const keys = Array(Math.min(CHUNK, left)).fill('Backspace');
+    const res = spawnSync('herdr', ['pane', 'send-keys', pane, ...keys], { encoding: 'utf8', timeout: 15_000 });
+    if (res.status !== 0) throw new Error(`herdr pane send-keys Backspace into ${pane} failed: ${res.stderr || res.stdout}`);
   }
 }
+
+/** The agent state herdr reports for the pane ('idle', 'done', 'busy', ...) or null when the shape is unknown. */
+function herdrAgentState(pane) {
+  const res = spawnSync('herdr', ['agent', 'get', pane], { encoding: 'utf8', timeout: 15_000 });
+  if (res.status !== 0 || !res.stdout) return null;
+  try {
+    const d = JSON.parse(res.stdout);
+    const node = d?.result?.agent ?? d?.agent ?? d?.result ?? d?.data ?? d;
+    const st = node?.state ?? node?.status ?? node?.agent_state ?? null;
+    return typeof st === 'string' ? st.toLowerCase() : null;
+  } catch {
+    const m = res.stdout.match(/\b(idle|done|busy|working|blocked)\b/i);
+    return m ? m[1].toLowerCase() : null;
+  }
+}
+const isIdleState = (st) => st === 'idle' || st === 'done';
 
 function readScreen(head, lines = SCREEN_LINES) {
   const res = spawnSync('herdr', ['pane', 'read', head.pane, '--lines', String(lines)], { encoding: 'utf8', timeout: 15_000 });
@@ -174,7 +204,7 @@ const countOf = (text, needle) => (needle ? text.split(needle).length - 1 : 0);
 let projectIdCache;
 function thisProjectId() {
   if (projectIdCache === undefined) {
-    const answer = fgos(['identity', 'project']);
+    const answer = fgos(['identity', 'project'], { cwd: FGOS_DIR });
     projectIdCache = answer.data?.data?.id ?? answer.data?.id ?? answer.data?.data?.projectId ?? null;
   }
   return projectIdCache;
@@ -196,7 +226,7 @@ function personaOf(s) {
 function discoverLiveHeads() {
   const projectId = thisProjectId();
   if (!projectId) return [];
-  const answer = fgos(['identity', 'list', '--project']);
+  const answer = fgos(['identity', 'list', '--project'], { cwd: FGOS_DIR });
   const sessions = answer.data?.data?.sessions ?? answer.data?.sessions ?? [];
   const own = process.env.HERDR_PANE_ID || '';
   const heads = [];
@@ -215,6 +245,8 @@ function discoverLiveHeads() {
       handle: s.handle || null,
       role: s.roles?.[0] || null,
       cli: s.cli,
+      version: s.cliVersion ?? s.version ?? s.ids?.cli?.version ?? null,
+      roles: s.roles ?? [],
       id: s.id,
     });
   }
@@ -229,7 +261,7 @@ const usedPairs = new Set();
 /** The `--to` value for a send from `sender` to `peer`, or null when none is allowed. */
 function recipientFor(sender, peer) {
   if (sender.persona === 'lead' || sender.persona === 'planner') {
-    return peer.role && /^head:(secretary|supervisor)-/.test(peer.role) ? peer.role : null;
+    return peer.roles.find((r) => /^head:(secretary|supervisor)-/.test(r)) ?? null;
   }
   return peer.shortName || peer.handle || peer.role || null;
 }
@@ -246,21 +278,21 @@ function allowedPeerPersonas(persona) {
 function sendCommand(to, token) {
   const base = `fgos mailbox send --wake --to ${to} ${token} --json`;
   if (!HAS_JQ) return `Run exactly this command and show its output: ${base}`;
-  const program = `"${token}-path=" + (.data.path // .path // "none") + " ${token}-drop=" + (((.data.text // .text // "") | test("wake quota|lifetime cap|no channel")) | tostring)`;
+  const program = `"${token}-path=" + (.data.path // .path // "none") + " ${token}-drop=" + (((.data.text // .text // "") | test("wake quota|lifetime cap|no channel")) | tostring) + " ${token}-composer=" + (((.data.text // .text // "") | test("composer-not-empty")) | tostring)`;
   return `Run exactly this command and show its output: ${base} | jq -r '${program}'`;
 }
 
 function parseAnswer(screen, token) {
-  const marked = screen.match(new RegExp(`${token}-path=([a-z-]+)(?:\\s+${token}-drop=(true|false))?`));
+  const marked = screen.match(new RegExp(`${token}-path=([a-z-]+)(?:\\s+${token}-drop=(true|false))?(?:\\s+${token}-composer=(true|false))?`));
   if (marked && PATHS.includes(marked[1])) {
-    return { path: marked[1], dropped: marked[2] === 'true' };
+    return { path: marked[1], dropped: marked[2] === 'true', composerRefused: marked[3] === 'true', text: '' };
   }
   const idx = screen.lastIndexOf(token);
   if (idx === -1) return null;
   const after = screen.slice(idx + token.length);
   const json = after.match(/"path"\s*:\s*"(local-pushed|local-typed|local-next-tool-call|remote-recorded)"/);
   if (!json) return null;
-  return { path: json[1], dropped: DROP_RE.test(after) };
+  return { path: json[1], dropped: DROP_RE.test(after), composerRefused: COMPOSER_REFUSAL_RE.test(after), text: after };
 }
 
 /** Has `sender` send `token` to `to` with --wake; resolves to the parsed answer or null at the bound. */
@@ -303,6 +335,13 @@ test('every persona sends to a peer it may reach and the peer reads the mail fro
     assert.ok(answer, `sender ${label(sender)} did not report a send path for ${token} within ${BOUND_MS} ms`);
     assert.ok(PATHS.includes(answer.path), `send path must be one of ${PATHS.join(', ')}, got ${answer.path}`);
 
+    // A --wake send may leave the peer busy reading; wait for idle, or accept the token already on its screen.
+    if (!readScreen(peer).includes(token)) {
+      await waitFor(() => {
+        const st = herdrAgentState(peer.pane);
+        return st === null || isIdleState(st);
+      }, BOUND_MS);
+    }
     const inbox = herdrAgentPrompt(peer.pane, 'fgos mailbox inbox');
     assert.equal(inbox.status, 0, `herdr agent prompt inbox into ${label(peer)} failed: ${inbox.stderr || inbox.stdout}`);
     const seen = await waitFor(() => readScreen(peer).includes(token), BOUND_MS);
@@ -349,6 +388,12 @@ test('an idle head of each drained CLI is woken within the bound and the focus i
     }
     usedPairs.add(pairKey(sender, target));
 
+    const targetState = herdrAgentState(target.pane);
+    if (targetState !== null && !isIdleState(targetState)) {
+      t.diagnostic(`CLI ${cli}: ${label(target)} is ${targetState}, not idle: skipped by name`);
+      continue;
+    }
+
     const token = `${RUN}-t2-${cli}`;
     const labelBefore = countOf(readScreen(target), WAKE_LABEL);
     const focusBefore = queryFocusedPane();
@@ -361,11 +406,10 @@ test('an idle head of each drained CLI is woken within the bound and the focus i
       `a send with --wake to idle ${label(target)} (${cli}) must take a wake path (local-pushed or local-typed), got ${answer.path}`,
     );
 
-    const woken = await waitFor(() => {
-      const screen = readScreen(target);
-      return screen.includes(token) || countOf(screen, WAKE_LABEL) > labelBefore;
-    }, BOUND_MS);
-    assert.ok(woken, `idle ${label(target)} (${cli}) was not woken within ${BOUND_MS} ms: neither ${token} nor a new wake label appeared on its screen`);
+    // The wake label is identical for every mail, so a label count rise alone can be another sender's wake: pass only
+    // when the woken head shows the RUN token (it ran its inbox claim) after the sender reported its path.
+    const woken = await waitFor(() => readScreen(target).includes(token), BOUND_MS);
+    assert.ok(woken, `idle ${label(target)} (${cli}) was not woken within ${BOUND_MS} ms: ${token} did not appear on its screen (wake labels before/now: ${labelBefore}/${countOf(readScreen(target), WAKE_LABEL)})`);
 
     const focusAfter = queryFocusedPane();
     if (focusBefore !== null && focusAfter !== null) {
@@ -395,6 +439,15 @@ test('a head with a half-typed composer is not typed into and the answer says so
   }
   const { sender, recipient } = pair;
   const to = recipientFor(sender, recipient);
+  if (isPushHead(recipient)) {
+    t.skip(`recipient ${label(recipient)} (${recipient.cli} ${recipient.version}) uses a push channel: the composer is never touched, so the composer gate is not exercised`);
+    return;
+  }
+  const recState = herdrAgentState(recipient.pane);
+  if (recState !== null && !isIdleState(recState)) {
+    t.skip(`recipient ${label(recipient)} is ${recState}, not idle: a busy refusal would mask the composer gate`);
+    return;
+  }
   const draft = `${RUN}-t3-draft`;
   const token = `${RUN}-t3-mail`;
 
@@ -407,13 +460,25 @@ test('a head with a half-typed composer is not typed into and the answer says so
     const answer = await sendThrough(sender, to, token);
     assert.ok(answer, `sender ${label(sender)} did not report a send path for ${token} within ${BOUND_MS} ms`);
     assert.notEqual(answer.path, 'local-typed', 'the wake was typed into a half-typed composer; the answer must not say local-typed');
-    assert.ok(PATHS.includes(answer.path), `send path must be one of ${PATHS.join(', ')}, got ${answer.path}`);
+    if (answer.path === 'local-pushed') {
+      t.skip(`${label(recipient)} answered local-pushed: a push channel never touches the composer, so the composer gate is not exercised`);
+      return;
+    }
+    if (answer.dropped) {
+      t.skip(`the wake to ${label(recipient)} was dropped by the wake budget: the composer gate is not exercised`);
+      return;
+    }
+    assert.equal(answer.path, 'local-next-tool-call', `a half-typed composer must answer local-next-tool-call, got ${answer.path}`);
+    assert.ok(answer.composerRefused, 'the send answer must say the nudge was refused because the composer is not empty (composer-not-empty); a busy or other refusal does not exercise the composer gate');
 
     const screen = readScreen(recipient);
     assert.ok(screen.includes(draft), `the draft ${draft} did not survive on the recipient screen`);
     assert.ok(!screen.includes(`${draft}${WAKE_LABEL}`), 'the wake label was typed after the draft in the composer');
   } finally {
     eraseDraft(recipient.pane, draft.length);
+    if (readScreen(recipient).includes(draft)) {
+      throw new Error(`the draft ${draft} is still in the composer of pane ${recipient.pane}; erase it by hand`);
+    }
   }
 });
 
