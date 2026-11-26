@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Keeper: admission in code, scheduling records from domain sources, question recipients, resource claims, the sleep record and periodic review"
-status: running
+status: done
 priority: P1
 blockedBy:
   - 261118-1341-s6a-execution-tier-rust
@@ -223,7 +223,7 @@ for phase 18's declarations.
 | 9 | [Periodic review](phase-09-periodic-review.md) | 1, 4, 5 | core/watcher/definitions/review-due.query.json, core/watcher/briefs/periodic-review.md, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, packages/supervision/rust/src/watcher.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/definitions.rs, apps/fgos/src/wiring/supervision.rs | 4 | done |
 | 19 | [Contract check warns on cross-plan overlap](../261126-2318-plan-footprint-overlap-warns/phase-01-contract-check-warns.md) | 5 | scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs | 4 | done |
 | 20 | [Admission advises overlap instead of holding](../261126-2318-plan-footprint-overlap-warns/phase-02-admission-advises-overlap.md) | 5 | packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/portfolio.rs, packages/supervision/rust/tests/wake.rs | 4 | done |
-| 18 | [Integration](phase-18-integration.md) | 1, 3, 4, 5, 9, 10, 16, 19, 20 | docs/platform/supervision/spec.md, docs/platform/questions/spec.md, docs/platform/workflow/spec.md, docs/platform/resource-referee/spec.md, docs/platform/session-host/spec.md, .agents/skills/, plugins/fgOS/skills/, .claude/skills/, test/skills/fgos-supervisor-idle-lead.test.mjs, plans/261122-0056-orchestration-skeleton/ | 5 | ready |
+| 18 | [Integration](phase-18-integration.md) | 1, 3, 4, 5, 9, 10, 16, 19, 20 | docs/platform/supervision/spec.md, docs/platform/questions/spec.md, docs/platform/workflow/spec.md, docs/platform/resource-referee/spec.md, docs/platform/session-host/spec.md, .agents/skills/, plugins/fgOS/skills/, .claude/skills/, test/skills/fgos-supervisor-idle-lead.test.mjs, plans/261122-0056-orchestration-skeleton/ | 5 | done |
 
 Phase ids are the original ids (the discussion's task order T1, T7.1 to T7.7). Waves, not ids, give the run order.
 Phase 18 is new with the split, because each plan needs its own integration phase.
@@ -247,6 +247,8 @@ Owner order 2026-11-26 23:5x: `CHANGELOG.md` and `packages/host-runtime/contract
 Supervisor 2026-11-27 03:0x: `test/skills/fgos-supervisor-idle-lead.test.mjs` joins the footprint (phase 18) so the lead can fix this plan's own regression: phase 1 rewrote `core/skills/fgos-supervisor/SKILL.md` and two skill-text tests in that file went red (acceptance criterion 7). No other active plan holds the file.
 
 Supervisor 2026-11-27 03:2x, focused rerun for phase 18 (event e2ecee934af1fcbf) on worktree p18b at 5be73f9289: `cargo test -p fgos-config --test registry_defaults` 3 passed, `cargo test -p fgos-component-authority --test model_checks` 23 passed, `node --test test/skills/fgos-supervisor-idle-lead.test.mjs` 4 passed. The lead may land p18b and set the plan done.
+
+Lead 2026-11-27 03:1x: phase 18 done. Branch p18 landed `1657a5b31c` (specs) and the fix branch p18b landed `9c81731f8e` (watcher doc default, skill-text tests re-anchored). The plan is done. The changelog fragment, the command-manifest regeneration and the leftover worktrees are handed to the supervisor in [the closing report](reports/lead-261127-0310-keeper-plan-done.md).
 
 Owner order 2026-11-26 23:40 (answer B to q-kyzictpkf6): phases 19 and 20 are phases 1 and 2 of plan `261126-2318-plan-footprint-overlap-warns`, run by this lead after phase 5 (which also writes `portfolio.rs`). They change the contract check and admission together, so they run on one branch and land as one change. Phase 9 shares no file with them and runs in the same wave.
 

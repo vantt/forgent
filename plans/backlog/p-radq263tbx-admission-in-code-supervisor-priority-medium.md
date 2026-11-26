@@ -1,7 +1,7 @@
 ---
 id: p-radq263tbx
 title: "Admission in code (supervisor, priority medium; source: supervisor-review §7 T1)"
-status: proposed
+status: done
 priority: P2
 area: supervisor
 created: 2026-11-21
