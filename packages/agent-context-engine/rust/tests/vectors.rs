@@ -158,27 +158,41 @@ fn the_refusal_codes_categories_and_phases_are_those_of_the_contract() {
 
 #[test]
 fn the_when_key_registry_is_the_contract_with_its_version() {
-    let doc = json(&contracts().join("when-keys.v1.json"));
+    let doc = json(&contracts().join("when-keys.v2.json"));
     let keys = registry();
     assert_eq!(u64::from(keys.version), doc["version"].as_u64().unwrap());
+    assert_eq!(keys.version, 2);
     let names: Vec<&str> = keys.keys.iter().map(|k| k.key.as_str()).collect();
     assert_eq!(
         names,
-        ["kind", "cli", "project", "persona", "role", "domain", "workflow", "stage"]
+        [
+            "domain",
+            "workType",
+            "workflow",
+            "stage",
+            "project",
+            "persona",
+            "role",
+            "sessionType",
+            "agentFamily",
+            "agentCli",
+            "agentLifecycle"
+        ]
     );
+    let fixed = |key: &str, values: &[&str]| {
+        assert_eq!(
+            keys.get(key).unwrap().source,
+            KeySource::Static(values.iter().map(|v| v.to_string()).collect()),
+            "{key}"
+        );
+    };
+    fixed("sessionType", &["head", "worker", "hand-opened"]);
+    fixed("agentFamily", &["claude", "openai", "gemini"]);
+    fixed("agentLifecycle", &["start", "rotate"]);
     assert_eq!(
-        keys.get("kind").unwrap().source,
-        KeySource::Static(vec![
-            "head".into(),
-            "worker".into(),
-            "setup".into(),
-            "hook".into()
-        ])
+        keys.get("agentCli").unwrap().source,
+        KeySource::Live("agent-protocol adapters".into())
     );
-    assert!(matches!(
-        keys.get("cli").unwrap().source,
-        KeySource::Live(_)
-    ));
 }
 
 #[test]

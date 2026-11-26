@@ -10,8 +10,8 @@
     "lifecycle": "live",
     "valid_from": "2026-11-25",
     "when": {
-      "kind": [
-        "spaceship"
+      "agentLifecycle": [
+        "setup"
       ]
     }
   },

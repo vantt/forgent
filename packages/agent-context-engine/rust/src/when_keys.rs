@@ -1,4 +1,4 @@
-//! The registry of `when:` keys (`contracts/when-keys.v1.json`) and the check of a unit's `when:` against it. ACE owns
+//! The registry of `when:` keys (`contracts/when-keys.v2.json`) and the check of a unit's `when:` against it. ACE owns
 //! the keys; the values of a live key come from the caller through [`ValueSource`], and ACE never owns that data.
 
 use std::sync::OnceLock;
@@ -8,7 +8,7 @@ use serde_json::Value;
 use crate::refusal::{Refusal, RefusalCode};
 use crate::rule::When;
 
-const REGISTRY: &str = include_str!("../../contracts/when-keys.v1.json");
+const REGISTRY: &str = include_str!("../../contracts/when-keys.v2.json");
 
 /// Where the allowed values of a key come from.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -62,16 +62,16 @@ fn text(v: &Value, field: &str) -> String {
 }
 
 fn parse(raw: &str) -> WhenKeys {
-    let doc: Value = serde_json::from_str(raw).expect("when-keys.v1.json is valid JSON");
+    let doc: Value = serde_json::from_str(raw).expect("when-keys.v2.json is valid JSON");
     let version = doc
         .get("version")
         .and_then(Value::as_u64)
         .and_then(|v| u32::try_from(v).ok())
-        .expect("when-keys.v1.json carries a version");
+        .expect("when-keys.v2.json carries a version");
     let keys = doc
         .get("keys")
         .and_then(Value::as_array)
-        .expect("when-keys.v1.json lists keys")
+        .expect("when-keys.v2.json lists keys")
         .iter()
         .map(|k| {
             let source = k.get("valueSource").expect("a key names its value source");

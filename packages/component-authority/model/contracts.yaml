@@ -1768,14 +1768,14 @@
   path: packages/agent-context-engine/contracts/rule-unit.v1.json
   evidence: []
   status: live
-- id: agent-context-engine/when-keys.v1
-  canonical: agent-context-engine/when-keys.v1
+- id: agent-context-engine/when-keys.v2
+  canonical: agent-context-engine/when-keys.v2
   aliases: []
-  meaning: Machine-readable contract file when-keys.v1.json owned under packages/agent-context-engine/contracts/.
+  meaning: Machine-readable contract file when-keys.v2.json owned under packages/agent-context-engine/contracts/.
   provider: agent-context-engine
   consumers:
     - host-surface
-  path: packages/agent-context-engine/contracts/when-keys.v1.json
+  path: packages/agent-context-engine/contracts/when-keys.v2.json
   evidence: []
   status: live
 - id: agent-context-engine/effective-rules.v1

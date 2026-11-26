@@ -6,7 +6,7 @@
       "code": "rule-when-key-unknown",
       "category": "validation",
       "phase": "write",
-      "when": "A when: key is not in when-keys.v1.json."
+      "when": "A when: key is not in when-keys.v2.json."
     },
     {
       "code": "rule-when-value-invalid",
