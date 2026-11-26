@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Keeper: admission in code, scheduling records from domain sources, question recipients, resource claims, the sleep record and periodic review"
-status: draft
+status: running
 priority: P1
 blockedBy:
   - 261118-1341-s6a-execution-tier-rust
@@ -40,7 +40,6 @@ footprint:
   - packages/resource-referee/rust/src/catalog.rs
   - packages/resource-referee/rust/src/facts.rs
   - packages/resource-referee/rust/tests/referee.rs
-  - packages/host-runtime/contracts/command-manifest.json
   - apps/fgos/src/wiring/supervision.rs
   - apps/fgos/src/wiring/resource_check.rs
   - core/config-standard/watcher.yaml
@@ -66,11 +65,11 @@ footprint:
   - docs/platform/workflow/spec.md
   - docs/platform/resource-referee/spec.md
   - docs/platform/session-host/spec.md
-  - CHANGELOG.md
   - .agents/skills/**
   - plugins/fgOS/skills/**
   - .claude/skills/**
-base: b1c7cb9b5df175c59bd2670c20c6bfe283341646
+base: 36048955f30fec419bef85fd731db89823a7f732
+lead: head:lead-forgent-261122-0056-orches-18a8f
 source:
   - plans/discussions/ds-yb4uz2p6hz-orchestration-skeleton/DISCUSSION.md
   - plans/discussions/ds-6psli4i4xl-workspace-ownership-survey-for-sleeping-leads/DISCUSSION.md
@@ -208,11 +207,11 @@ for phase 18's declarations.
 | 1 | [Admission in code](phase-01-admission-in-code.md) | - | packages/supervision/rust/src/wake.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/tests/wake.rs, packages/supervision/rust/tests/portfolio.rs, apps/fgos/src/wiring/supervision.rs, core/skills/fgos-supervisor/SKILL.md | 1 | ready |
 | 3 | [Question recipients, notifier port, verified answers](phase-03-question-recipients.md) | - | packages/questions/contracts/questions-input.v1.json, packages/questions/contracts/question-event-payloads.v1.json, packages/questions/contracts/refusals.v1.json, packages/questions/rust/src/shape.rs, packages/questions/rust/src/record.rs, packages/questions/rust/src/usecase.rs, packages/questions/rust/src/notifier.rs, packages/questions/rust/src/lib.rs, packages/questions/rust/tests/store_usecases.rs, packages/questions/rust/tests/recipients.rs | 1 | ready |
 | 10 | [Resource claim space in the referee](phase-10-resource-claims.md) | - | packages/resource-referee/contracts/resource-referee.v1.json, packages/resource-referee/rust/src/catalog.rs, packages/resource-referee/rust/src/facts.rs, packages/resource-referee/rust/tests/referee.rs, apps/fgos/src/wiring/resource_check.rs | 1 | ready |
-| 16 | [Sleep record in the head record; view of live and sleeping agents](phase-16-sleep-record-and-agents-view.md) | - | src/session-host/head-stop.mjs, src/session-host/head-list.mjs, src/session-host/head-request.mjs, src/session-rotation/handoff-store.mjs, src/session-rotation/rotate.mjs, src/cli/command-registry.mjs, bin/fgos.mjs, packages/host-runtime/contracts/command-manifest.json, test/session-host/head-stop.test.mjs, test/session-host/head-list.test.mjs, test/session-rotation/handoff-store.test.mjs | 1 | ready |
+| 16 | [Sleep record in the head record; view of live and sleeping agents](phase-16-sleep-record-and-agents-view.md) | - | src/session-host/head-stop.mjs, src/session-host/head-list.mjs, src/session-host/head-request.mjs, src/session-rotation/handoff-store.mjs, src/session-rotation/rotate.mjs, src/cli/command-registry.mjs, bin/fgos.mjs, test/session-host/head-stop.test.mjs, test/session-host/head-list.test.mjs, test/session-rotation/handoff-store.test.mjs | 1 | ready |
 | 4 | [Scheduling record contract and keeper core](phase-04-keeper-core.md) | 1 | packages/supervision/contracts/scheduling-record.v1.json, packages/supervision/contracts/event-streams.v1.json, packages/supervision/rust/src/keeper.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/keeper.rs | 2 | ready |
 | 5 | [Record sources and need resolution](phase-05-sources-and-needs.md) | 4, 10, 16 | packages/supervision/rust/src/sources.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/sources.rs, apps/fgos/src/wiring/supervision.rs, src/workflow/records.mjs, src/workflow/case-verbs.mjs, test/workflow/records.test.mjs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml | 3 | ready |
 | 9 | [Periodic review](phase-09-periodic-review.md) | 1, 4, 5 | core/watcher/definitions/review-due.query.json, core/watcher/briefs/periodic-review.md, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, packages/supervision/rust/src/watcher.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/definitions.rs, apps/fgos/src/wiring/supervision.rs | 4 | ready |
-| 18 | [Integration](phase-18-integration.md) | 1, 3, 4, 5, 9, 10, 16 | docs/platform/supervision/spec.md, docs/platform/questions/spec.md, docs/platform/workflow/spec.md, docs/platform/resource-referee/spec.md, docs/platform/session-host/spec.md, CHANGELOG.md, .agents/skills/, plugins/fgOS/skills/, .claude/skills/, plans/261122-0056-orchestration-skeleton/ | 5 | ready |
+| 18 | [Integration](phase-18-integration.md) | 1, 3, 4, 5, 9, 10, 16 | docs/platform/supervision/spec.md, docs/platform/questions/spec.md, docs/platform/workflow/spec.md, docs/platform/resource-referee/spec.md, docs/platform/session-host/spec.md, .agents/skills/, plugins/fgOS/skills/, .claude/skills/, plans/261122-0056-orchestration-skeleton/ | 5 | ready |
 
 Phase ids are the original ids (the discussion's task order T1, T7.1 to T7.7). Waves, not ids, give the run order.
 Phase 18 is new with the split, because each plan needs its own integration phase.
@@ -226,6 +225,8 @@ only in phase 18.
 
 Every `blockedBy` entry but `261124-2143-head-lifecycle-events` is done. The plan stays `draft` until 2143 is done,
 then turns `ready` after the contract check passes at a fresh `base`.
+
+Owner order 2026-11-26: `CHANGELOG.md` and `packages/host-runtime/contracts/command-manifest.json` left this plan's footprint so it can run while plan 261125-1631 (other machine) holds them. Phase 16's manifest regeneration and phase 18's `CHANGELOG.md` lines are done once those paths are free: a footprint change then, through the supervisor, never widened by the lead alone.
 
 ## Owner questions
 
