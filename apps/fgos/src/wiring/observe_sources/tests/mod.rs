@@ -327,13 +327,24 @@ fn head_records(answer: Liveness) -> Vec<Record> {
 
 /// One placement as `session start` writes it, with `extra` JSON members appended (e.g. `,"retiredAt":"..."`).
 fn head_records_with(answer: Liveness, extra: &str) -> Vec<Record> {
+    head_records_run(answer, extra, None)
+}
+
+/// As `head_records_with`, with the head's own run directory holding `closed` as its `closed.json` (when given).
+fn head_records_run(answer: Liveness, extra: &str, closed: Option<&str>) -> Vec<Record> {
     let root = scratch("head");
     let lineage = root.join(".fgos/runtime/session-rotation/planner-x");
     std::fs::create_dir_all(&lineage).unwrap();
+    let run_dir = root.join("run-dir");
+    std::fs::create_dir_all(&run_dir).unwrap();
+    if let Some(text) = closed {
+        std::fs::write(run_dir.join("closed.json"), text).unwrap();
+    }
     std::fs::write(
         lineage.join("placement.json"),
         format!(
-            r#"{{"role":"head:planner-x","gen":2,"placement":{{"host":"terminal","key":"cmd_1_abc"}},"runDir":"/nowhere","persona":"planner","startedAt":"2026-11-18T06:58:44.815Z"{extra}}}"#
+            r#"{{"role":"head:planner-x","gen":2,"placement":{{"host":"terminal","key":"cmd_1_abc"}},"runDir":"{}","persona":"planner","startedAt":"2026-11-18T06:58:44.815Z"{extra}}}"#,
+            run_dir.display()
         ),
     )
     .unwrap();
@@ -401,4 +412,41 @@ fn a_project_that_never_started_a_head_has_no_head_records() {
     .unwrap();
     assert!(records.is_empty());
     let _ = std::fs::remove_dir_all(&root);
+}
+
+const CLOSED: &str = r#"{"v":1,"attemptId":"a1","closedBy":"supervisor","steps":[],"at":"2026-11-18T09:30:00+07:00"}"#;
+
+#[test]
+fn a_head_whose_attempt_closed_without_a_stop_is_ended_at_the_close_instant() {
+    // The host says live, yet the closed attempt wins and the host is not consulted.
+    let ended = head_records_run(Liveness::Live, "", Some(CLOSED));
+    assert_eq!(attr(&ended[0], "fgos.head.state"), Some("ended"));
+    assert_eq!(ended[0].ts, "2026-11-18T02:30:00.000Z");
+    assert_eq!(attr(&ended[0], "fgos.head.role"), Some("head:planner-x"));
+}
+
+#[test]
+fn a_retired_at_beats_a_closed_attempt() {
+    let records = head_records_run(
+        Liveness::Live,
+        r#","retiredAt":"2026-11-18T08:00:00+07:00""#,
+        Some(CLOSED),
+    );
+    assert_eq!(attr(&records[0], "fgos.head.state"), Some("retired"));
+    assert_eq!(records[0].ts, "2026-11-18T01:00:00.000Z");
+}
+
+#[test]
+fn a_rotated_head_with_a_new_run_dir_and_no_closed_file_is_not_ended() {
+    // The rotated head's run directory holds no `closed.json`; only the old attempt's directory did.
+    let records = head_records_run(Liveness::Live, "", None);
+    assert_eq!(attr(&records[0], "fgos.head.state"), Some("live"));
+}
+
+#[test]
+fn an_unreadable_or_invalid_closed_file_is_no_signal() {
+    for text in ["not json", r#"{"v":1}"#, r#"{"at":"yesterday"}"#] {
+        let records = head_records_run(Liveness::Live, "", Some(text));
+        assert_eq!(attr(&records[0], "fgos.head.state"), Some("live"), "{text}");
+    }
 }
