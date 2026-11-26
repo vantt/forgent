@@ -96,37 +96,20 @@ export function slotKeyOf(record) {
 }
 
 /** The opening a head session is typed: its persona section, the skills line the persona carries, and the start ritual. */
-async function defaultOpening({ persona, name, projectRoot, pinned, handoff, forQuestion = null, task = null }) {
-  const { renderPersonaSection, renderOnWake } = await import('../runner/agent-definitions.mjs');
-  return openingText({ persona, name, personaLines: renderPersonaSection(persona, { projectRoot, pinnedText: pinned.text }), handoff, forQuestion, task, onWake: renderOnWake(persona, { projectRoot, pinnedText: pinned.text }) });
+/** The opening a head receives, composed by the start-context composer (the one producer of start text). */
+async function defaultOpening({ projectRoot, request }) {
+  const { composeStart, startText } = await import('../util/start-context.mjs');
+  return startText(composeStart(projectRoot, request));
 }
 
-const FIRST_STEPS = {
-  lead: 'Read the phase table, check which wave or phase is next, create its worktree, and run it to done.',
-  planner: 'Read the discussion, write plans/<dir>/plan.md and its phase files per the plan contract, run node scripts/plan-contract-check.mjs, and land via fgos land --paths.',
-  shaper: 'Read domains/<domain>/AGENTS.md, conduct the design discussion, and maintain DISCUSSION.md.',
-};
-
-/** The task a head is bound to as the opening states it: `{ path, firstStep }`, or null for a persona with no task. */
-export const taskBriefOf = (persona, task) => (task && FIRST_STEPS[persona] ? { path: task.path, firstStep: FIRST_STEPS[persona] } : null);
-
-/** Pure: the opening text from its parts, so a test reads the exact words a head is given. `task` is `{ path, firstStep }`. */
-export function openingText({ persona, name, personaLines, handoff = null, forQuestion = null, onWake = null, task = null }) {
-  return [
-    ...personaLines,
-    '',
-    `You are the long-lived head session "${name}" (role ${headRoleOf(persona, name)}).`,
-    '',
-    ...(task ? ['# Task', `Your task is ${task.path}.`, task.firstStep, ''] : []),
-    '# Start ritual',
-    handoff
-      ? `1. Read the latest handoff of this session first: ${handoff.path}. It describes state as it was; verify it against the repo before acting.`
-      : '1. There is no earlier handoff for this session; start from the portfolio.',
-    '2. Read the portfolio: `fgos questions` for the owner questions still open, and plans/backlog.md for the work in flight.',
-    '3. Say in one line which pending question you resumed, or that none is pending, then continue; the ritual is not a finished turn.',
-    ...(forQuestion ? ['', `You continue question ${forQuestion}: write its answer back to its origin, then \`fgos questions ack ${forQuestion}\` (or \`cancel\`).`] : []),
-    ...(onWake ? ['', '# On wake', onWake] : []),
-  ].join('\n');
+/** The start request of a head: who it is, the CLI it runs on, and what it starts with. */
+export function headStartRequest({ persona, name, projectRoot, cli, handoff = null, forQuestion = null, task = null }) {
+  const facts = { sessionType: 'head', persona, project: path.basename(path.resolve(projectRoot)), agentCli: cli, agentLifecycle: handoff ? 'rotate' : 'start' };
+  const payloads = [{ kind: 'session', name }];
+  if (task?.path) payloads.push({ kind: 'task', path: task.path, itemKind: task.kind === 'plan' ? 'plan' : 'discussion' });
+  if (handoff?.path) payloads.push({ kind: 'handoff', path: handoff.path });
+  if (forQuestion) payloads.push({ kind: 'for-question', questionId: forQuestion });
+  return { facts, payloads, delivery: 'opening' };
 }
 
 /**
@@ -350,9 +333,10 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
   } catch (err) { throw new HeadStartError(persona === 'lead' ? 'grant-invalid' : (err.code ?? 'task-not-found'), err.message); }
   const pinned = await (ports.pin ?? defaultPin)({ persona, projectRoot });
   const handoff = await (ports.handoff ?? defaultHandoff)({ persona, name, projectRoot });
-  const text = await (ports.opening ?? defaultOpening)({ persona, name, projectRoot, pinned, handoff, forQuestion, task: taskBriefOf(persona, task) });
   const runnerConfig = await (ports.runnerConfig ?? defaultRunnerConfig)(projectRoot);
   const binding = await (ports.bind ?? bindHeadSeat)({ persona, key, runnerConfig, runtimeDir: ports.runtimeDir });
+  const startRequest = headStartRequest({ persona, name, projectRoot, cli: binding.cli ?? 'claude', handoff, forQuestion, task });
+  const text = await (ports.opening ?? defaultOpening)({ projectRoot, request: startRequest, pinned });
   const launchRunnerConfig = withHeadSettings(runnerConfig, binding);
 
   const request = {

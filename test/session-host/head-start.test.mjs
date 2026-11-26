@@ -11,7 +11,7 @@ import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import { readRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
-import { bindHeadSeat, headKeyOf, taskBriefOf, headRoleOf, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, openingText, personasHeadsFirst, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
+import { bindHeadSeat, headKeyOf, headRoleOf, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, personasHeadsFirst, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
 import { grantOf } from '../../src/session-host/head-grants.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { headOf } from '../../src/native/execution-door.mjs';
@@ -43,7 +43,8 @@ function fakes({ live = false, record = null, fronted = 'fronted', launchFails =
     identity: () => (live ? { live, record } : { live }),
     pin: ({ persona }) => ({ name: persona, text: PERSONA_TEXT }),
     handoff: () => null,
-    opening: ({ persona, name, pinned, handoff, task }) => openingText({ persona, name, personaLines: ['# Persona', `Description: ${pinned.text.split('\n')[1].slice('description: '.length)}`], handoff, task }),
+    // The composer owns the words (packages/agent-start-context/rust/tests/goldens.rs); a head start owns the request.
+    opening: ({ request }) => JSON.stringify(request),
     runnerConfig: () => ({ marker: 'config' }),
     bind: ({ key }) => ({ executor: 'alpha', key }),
     launch: (request) => {
@@ -239,15 +240,17 @@ test('this repository\'s runner configuration pins every coordinating persona to
   }
 });
 
-test('the session launches with its role, its grant and the opening verbatim as the full persona text with the start ritual', async () => {
+test('the session launches with its role, its grant and the opening composed from its head start request', async () => {
   const projectRoot = scratch();
   const { calls, ports } = fakes();
   const out = await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, ports);
   assert.equal(out.already, false);
   const request = calls.launch[0];
-  assert.match(request.opening, /Description: Plans the work in small verified steps\./);
-  assert.match(request.opening, /# Start ritual/);
-  assert.match(request.opening, /which pending question you resumed/);
+  const start = JSON.parse(request.opening);
+  assert.equal(start.delivery, 'opening');
+  assert.equal(start.facts.sessionType, 'head');
+  assert.equal(start.facts.persona, 'planner');
+  assert.deepEqual(start.payloads[0], { kind: 'session', name: 'probe' });
   assert.equal(request.role, 'head:planner-probe');
   assert.deepEqual(request.grant, grantOf('head:planner-probe'));
   assert.deepEqual(request.grant.writes, ['plans']);
@@ -535,33 +538,18 @@ test('a persona with no definition is refused persona-not-found and the known pe
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 
-test('a wakeable head persona opening ends by telling it to continue in the same turn up to its done step; secretary and shaper carry none', async () => {
-  const { renderOnWake, renderPersonaSection } = await import('../../src/runner/agent-definitions.mjs');
-  const done = { supervisor: 'fgos supervisor done', lead: 'fgos land --paths', planner: 'fgos land --paths' };
-  for (const [persona, step] of Object.entries(done)) {
-    const text = openingText({ persona, name: 'x', personaLines: renderPersonaSection(persona, { projectRoot: process.cwd() }), onWake: renderOnWake(persona, { projectRoot: process.cwd() }) });
-    const tail = text.slice(text.indexOf('# On wake'));
-    assert.match(tail, /same turn/, persona);
-    assert.ok(tail.includes(step), `${persona} names ${step}`);
-    assert.match(text, /then continue/);
-  }
-  for (const persona of ['secretary', 'shaper']) {
-    assert.equal(renderOnWake(persona, { projectRoot: process.cwd() }), null, persona);
-  }
-});
-
-test('a planner and a shaper head open with the path of their discussion and the first step, a lead with its plan', async () => {
+test('a planner and a shaper head start with their discussion as the task, a lead with its plan', async () => {
   const projectRoot = scratch();
   const { calls, ports } = fakes();
   await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, ports);
   await startHeadSession({ persona: 'shaper', name: 'probe', projectRoot }, ports);
-  const [planner, shaper] = calls.launch.map((r) => r.opening);
-  assert.match(planner, /# Task\nYour task is plans\/discussions\/ds-aaaaaaaaaa-probe\/DISCUSSION\.md\.\nRead the discussion, write plans\/<dir>\/plan\.md .*plan-contract-check.* fgos land --paths\./);
-  assert.match(shaper, /# Task\nYour task is plans\/discussions\/ds-aaaaaaaaaa-probe\/DISCUSSION\.md\.\nRead domains\/<domain>\/AGENTS\.md/);
+  const task = (r) => JSON.parse(r.opening).payloads.find((p) => p.kind === 'task');
+  const [planner, shaper] = calls.launch.map(task);
+  assert.deepEqual(planner, { kind: 'task', path: 'plans/discussions/ds-aaaaaaaaaa-probe/DISCUSSION.md', itemKind: 'discussion' });
+  assert.deepEqual(shaper, { kind: 'task', path: 'plans/discussions/ds-aaaaaaaaaa-probe/DISCUSSION.md', itemKind: 'discussion' });
   const planOfHead = () => ({ dir: '261118-1045-project-supervisor', footprint: [] });
   await startHeadSession({ persona: 'lead', name: 'sv-p09', projectRoot }, { ...ports, planOfHead });
-  assert.match(calls.launch[2].opening, /# Task\nYour task is plans\/261118-1045-project-supervisor\/plan\.md\.\nRead the phase table, check which wave or phase is next/);
-  assert.equal(taskBriefOf('secretary', { path: 'x' }), null, 'a persona without a task gets no task section');
+  assert.deepEqual(task(calls.launch[2]), { kind: 'task', path: 'plans/261118-1045-project-supervisor/plan.md', itemKind: 'plan' });
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 

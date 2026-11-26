@@ -18,8 +18,8 @@ use std::io::{Read, Write};
 use std::path::PathBuf;
 
 use fgos_agent_start_context::{
-    compose, AceFacts, AceRules, Ports, RecordSink, Refusal, StartContext, StartRecord,
-    StartRequest,
+    compose, AceFacts, AceRules, PersonaLookup, Personas, Ports, RecordSink, Refusal, StartContext,
+    StartRecord, StartRequest,
 };
 use fgos_host_runtime::cli_args::{parse_args, FlagScalar, FlagValue};
 use fgos_observe::record::store::{new_record_id, RecordDoor};
@@ -140,10 +140,16 @@ pub fn run(args: &[String], input: &str) -> (i32, Value) {
         root: root.clone(),
         start: request.start_kind().map(|k| k.as_str()).unwrap_or(""),
     };
+    let install = crate::active_payload_root().unwrap_or_else(|_| root.clone());
+    let personas = HostPersonas {
+        project: root.clone(),
+        install,
+    };
     let ports = Ports {
         rules: &rules,
         facts: &facts,
         record: &sink,
+        personas: Some(&personas),
         contributors: Vec::new(),
         budget_bytes: None,
     };
@@ -250,5 +256,17 @@ impl RecordSink for ObserveSink {
         )
         .write(observed);
         id
+    }
+}
+
+/// The persona definitions of the project and the payload, through the host's one lookup.
+struct HostPersonas {
+    project: PathBuf,
+    install: PathBuf,
+}
+
+impl Personas for HostPersonas {
+    fn lookup(&self, persona: &str) -> PersonaLookup {
+        super::unit_run_host::persona::persona_lookup(persona, None, &self.project, &self.install)
     }
 }

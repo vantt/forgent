@@ -15,7 +15,7 @@ import path from 'node:path';
 import { HeadRequestError, MAX_FRAME_BYTES, MAX_REQUEST_BYTES, requestHead, requestHeadCanI, requestHeadFgos, requestHeadStart, requestHeadWrite } from '../../src/session-host/head-request-client.mjs';
 import { rotateHead, runHeadRequest, runStopSelf, runTicket, startHead } from '../../src/session-host/head-request.mjs';
 import { parseArgs } from '../../src/cli/parse-args.mjs';
-import { lineageDirOf, openingText, writeHeadPlacement } from '../../src/session-host/head-start.mjs';
+import { lineageDirOf, writeHeadPlacement } from '../../src/session-host/head-start.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from '../../src/session-host/head-grants.mjs';
 
@@ -747,14 +747,11 @@ test('session start passes forQuestion down to the opening, and the opening carr
   const ports = {
     taskOfHead: async () => ({ kind: 'discussion', dir: 'ds-aaaaaaaaaa-q', path: 'plans/discussions/ds-aaaaaaaaaa-q/DISCUSSION.md' }),
     pin: async () => ({ name: 'planner', text: '' }), handoff: async () => null, runnerConfig: async () => ({}), bind: async () => ({ cli: 'x' }),
-    opening: async (ask) => { seen.push(ask.forQuestion); return 'opening'; },
+    opening: async ({ request }) => { seen.push(request.payloads.find((p) => p.kind === 'for-question')?.questionId); return 'opening'; },
     launch: async () => ({ placement: { host: 'terminal', key: 'k' }, runDir: '/r' }), identity: () => ({ live: false }), host: {},
   };
   await startHead({ persona: 'planner', name: 'q', forQuestion: 'q-42', projectRoot: project }, { env: {}, ports });
   assert.deepEqual(seen, ['q-42']);
-  const text = openingText({ persona: 'planner', name: 'q', personaLines: ['P'], forQuestion: 'q-42' });
-  assert.match(text, /You continue question q-42: write its answer back to its origin, then `fgos questions ack q-42` \(or `cancel`\)\./);
-  assert.doesNotMatch(openingText({ persona: 'planner', name: 'q', personaLines: ['P'] }), /You continue question/);
   await assert.rejects(startHead({ persona: 'planner', name: 'q', forQuestion: 'bad id!', projectRoot: project }, { env: {}, ports }), (err) => err.code === 'bad-question');
 });
 

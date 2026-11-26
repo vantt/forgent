@@ -9,6 +9,7 @@ import { spawnSync } from 'node:child_process';
 
 import { canonicalJson, replaceDurably } from '../native/door.mjs';
 import { resolveHostBin } from '../util/host-bin.mjs';
+import { composeStart } from '../util/start-context.mjs';
 
 export const INSTRUCTION_PROJECTION_SCHEMA_VERSION = 1;
 export const PROJECTION_LEDGER_RELATIVE_PATH = '.fgos/installation/projections/ledger.json';
@@ -23,8 +24,6 @@ const EFFECTIVE_RULES_SCHEMA_VERSION = 1;
 const CONTEXT_ENGINE_PREFIX = '\u001eFGOS-CONTEXT-ENGINE ';
 const CONTEXT_ENGINE_PROTOCOL = 1;
 const CONTEXT_ENGINE_TIMEOUT_MS = 60_000;
-const START_CONTEXT_PREFIX = '\u001eFGOS-START-CONTEXT ';
-const START_CONTEXT_PROTOCOL = 1;
 const RULE_KINDS = ['law', 'boundary', 'procedure', 'preference', 'host-adapter'];
 
 export class InstructionProjectionError extends Error {
@@ -200,20 +199,12 @@ function compileRuleSet(projectRoot) {
  */
 function selectRulesForSetup(projectRoot, effectiveSet) {
   const request = { facts: { project: path.basename(path.resolve(projectRoot)) }, payloads: [], delivery: 'agent-file' };
-  const line = runHostRoute(
-    projectRoot,
-    ['internal', 'start-context', 'compose', '--protocol', String(START_CONTEXT_PROTOCOL), '--root', path.resolve(projectRoot)],
-    `${JSON.stringify(request)}\n`,
-    START_CONTEXT_PREFIX,
-    'compose the setup start',
-  );
-  if (line.error) {
-    throw contextEngineError('START_CONTEXT_FAILED', `The start-context composer failed (${line.error.code}): ${line.error.message}`);
+  let context;
+  try {
+    context = composeStart(projectRoot, request);
+  } catch (err) {
+    throw contextEngineError(err.code ?? 'START_CONTEXT_FAILED', err.message, err.refusal ? { refusal: err.refusal } : {});
   }
-  if (line.refusal) {
-    throw contextEngineError('START_CONTEXT_REFUSED', `The setup start is refused: ${line.refusal.code}: ${line.refusal.message}`, { refusal: line.refusal });
-  }
-  const context = line.result ?? {};
   if (context.ruleSetDigest !== effectiveSet.digest) {
     throw contextEngineError('START_CONTEXT_REFUSED', `The composer read rule set ${context.ruleSetDigest}, not the compiled ${effectiveSet.digest}`);
   }
