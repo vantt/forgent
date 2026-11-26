@@ -20,6 +20,6 @@ The write door runs the checks that own the written path (for docs/backlog.md, t
 Migrated from the legacy backlog table. Original status: proposed.
 
 Recurred 2026-11-26 through the other portfolio door: the supervisor's `fgos land --paths` of
-`plans/backlog/p-qu6inz54uz-...md` (a32ae981c) ran no gates (`gatesRun: []`) and cited RUL11 with no gloss, so the
+`plans/backlog/p-qu6inz54uz-...md` (a32ae981c) ran no gates (`gatesRun: []`) and cited a rule id with no gloss, so the
 citation-drift gate turned red for every branch land until 29059c9a8 glossed it. The fix should cover both doors
 (`session write` and `land --paths`) for the paths a content check owns.
