@@ -1843,3 +1843,13 @@
   path: packages/agent-start-context/contracts/refusals.v1.json
   evidence: []
   status: live
+- id: supervision/scheduling-record.v1
+  canonical: supervision/scheduling-record.v1
+  aliases: []
+  meaning: "Scheduling record a domain source hands the keeper: item, step, waitingOn, needs, outcome."
+  provider: supervision
+  consumers:
+    - workflow
+  path: packages/supervision/contracts/scheduling-record.v1.json
+  evidence: []
+  status: live
