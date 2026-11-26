@@ -120,13 +120,22 @@ crate.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Registry v2 and every reader](phase-01-registry-v2-and-readers.md) | - | packages/agent-context-engine/contracts/**, packages/agent-context-engine/rust/**, packages/agent-protocol/rust/src/direct/mod.rs, apps/fgos/Cargo.toml, Cargo.lock, apps/fgos/src/wiring/context_engine/values.rs, packages/component-authority/model/contracts.yaml, docs/platform/architecture-map.md, docs/platform/agent-context-engine/spec.md, .fgos/instructions/effective/rules.json, packages/git/contracts/mutation-census.v1.json, CHANGELOG.md | 1 | draft |
+| 1 | [Registry v2 and every reader](phase-01-registry-v2-and-readers.md) | - | packages/agent-context-engine/contracts/**, packages/agent-context-engine/rust/**, packages/agent-protocol/rust/src/direct/mod.rs, apps/fgos/Cargo.toml, Cargo.lock, apps/fgos/src/wiring/context_engine/values.rs, packages/component-authority/model/contracts.yaml, docs/platform/architecture-map.md, docs/platform/agent-context-engine/spec.md, .fgos/instructions/effective/rules.json, packages/git/contracts/mutation-census.v1.json, CHANGELOG.md | 1 | done |
 | 2 | [Integration and full gates](phase-02-integration.md) | 1 | plans/261126-1851-ace-when-keys-v2/reports/** | 2 | draft |
 
 Why one code phase: the v1 file, its contract row, the spec link, the committed effective set and the mutation census
 all change together; any split leaves a tree where the authority model, a doc link, the set reader or the census test
 fails, which breaks the rule that the gate holds on a tree with only some phases. The whole phase is under a day of
 work.
+
+## Progress (lead on fg-server, 2026-11-26)
+
+Phase 1 is done and landed on main as `37c57401e`: registry v2, every reader, the vectors, the host's live value reader, the
+agent-protocol adapter list, the authority row and rendered view, the spec row and the changelog line; the committed
+effective set records `whenKeysVersion: 2`. Verified on the branch: crate tests 112 and 86 (without pkm), agent-protocol 22,
+host reader 4, door 5, rustfmt clean, `authority render --check` clean, no `when-keys.v1` left. Phase 2 (full gates) is running.
+One red test on main is not this plan's: `every_top_level_package_contract_file_and_every_prose_contract_has_exactly_one_row`
+fails on `packages/supervision/contracts/scheduling-record.v1.json` having no authority row (added by another lane on 2026-11-26).
 
 ## Owner questions
 
