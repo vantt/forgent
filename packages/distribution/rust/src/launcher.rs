@@ -580,6 +580,78 @@ mod tests {
         assert!(String::from_utf8_lossy(&outside.stderr).contains("no .fgos\\installation found"));
     }
 
+    #[cfg(windows)]
+    #[test]
+    fn the_cmd_launcher_refuses_a_linked_worktree_by_name() {
+        use std::process::Command;
+        let sb = Sandbox::new("cmd-wt");
+        let launcher = sb.bin.join("fgos.cmd");
+        write_launcher(&launcher, true).unwrap();
+        let state = sb.root.join("state");
+
+        let wt = sb.root.join("wt");
+        let wt_sub = wt.join("src").join("deep");
+        std::fs::create_dir_all(&wt_sub).unwrap();
+        let git_file = wt.join(".git");
+        std::fs::write(&git_file, "gitdir: C:\\somewhere\\worktrees\\wt1\r\n").unwrap();
+
+        let run = |args: &[&str], cwd: &Path| {
+            let mut command = Command::new("cmd.exe");
+            command
+                .args(["/d", "/c"])
+                .arg(&launcher)
+                .args(args)
+                .current_dir(cwd);
+            command.env("FGOS_STATE_ROOT", &state);
+            command.output().unwrap()
+        };
+
+        let inside = run(&["doctor"], &wt);
+        assert_eq!(inside.status.code(), Some(126));
+        let stderr = String::from_utf8_lossy(&inside.stderr);
+        assert!(
+            stderr.contains(&format!("fgos: refusing {}", git_file.display())),
+            "status {:?}, stderr {stderr}",
+            inside.status
+        );
+        assert!(
+            stderr.contains("fgos cannot resolve a linked worktree's main checkout safely with cmd builtins"),
+            "stderr {stderr}"
+        );
+        assert!(
+            stderr.contains("run fgos from the main checkout"),
+            "stderr {stderr}"
+        );
+
+        let inside_sub = run(&["doctor"], &wt_sub);
+        assert_eq!(inside_sub.status.code(), Some(126));
+        let stderr_sub = String::from_utf8_lossy(&inside_sub.stderr);
+        assert!(
+            stderr_sub.contains(&format!("fgos: refusing {}", git_file.display())),
+            "stderr {stderr_sub}"
+        );
+        assert!(
+            stderr_sub.contains("fgos cannot resolve a linked worktree's main checkout safely with cmd builtins"),
+            "stderr {stderr_sub}"
+        );
+        assert!(
+            stderr_sub.contains("run fgos from the main checkout"),
+            "stderr {stderr_sub}"
+        );
+
+        let elsewhere = sb.root.join("elsewhere");
+        std::fs::create_dir_all(&elsewhere).unwrap();
+        let outside = run(&["doctor"], &elsewhere);
+        assert_eq!(outside.status.code(), Some(127));
+        assert!(String::from_utf8_lossy(&outside.stderr).contains("no .fgos\\installation found"));
+
+        let normal_repo = sb.root.join("normal_repo");
+        std::fs::create_dir_all(normal_repo.join(".git")).unwrap();
+        let normal_outside = run(&["doctor"], &normal_repo);
+        assert_eq!(normal_outside.status.code(), Some(127));
+        assert!(String::from_utf8_lossy(&normal_outside.stderr).contains("no .fgos\\installation found"));
+    }
+
     #[cfg(unix)]
     mod script {
         use super::*;
@@ -1067,6 +1139,17 @@ mod tests {
                 out_sym.stderr.contains("gitdir is a symlink"),
                 "{}",
                 out_sym.stderr
+            );
+
+            // 6. empty .git file refused as missing gitdir
+            std::fs::write(wt.join(".git"), "").unwrap();
+            let out_empty = run(&launcher, &["doctor"], &wt, &env);
+            assert_eq!(out_empty.status, 126);
+            assert!(!out_empty.stdout.contains("release-a"));
+            assert!(
+                out_empty.stderr.contains("missing gitdir"),
+                "{}",
+                out_empty.stderr
             );
         }
     }

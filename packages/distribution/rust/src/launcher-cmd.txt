@@ -2,8 +2,10 @@
 rem fgos-project-launcher v1: runs the release the nearest enclosing project activated, from this machine's release store only.
 setlocal EnableExtensions DisableDelayedExpansion
 set "dir=%CD%"
+set "NEAREST_GIT="
 :loop
 if exist "%dir%\.fgos\installation\activation.json" goto found
+if not defined NEAREST_GIT if exist "%dir%\.git" set "NEAREST_GIT=%dir%\.git"
 for %%I in ("%dir%\..") do set "parent=%%~fI"
 if /i "%parent%"=="%dir%" goto none
 set "dir=%parent%"
@@ -56,6 +58,10 @@ exit /b %errorlevel%
 :refuse
 >&2 echo fgos: refusing !ACTIVATION!: !WHY! -- fgos runs only a release fgctl installed on this machine -- run 'fgctl init' in the project to activate one, then 'fgctl verify'
 exit /b 126
+:refuse_worktree
+>&2 echo fgos: refusing %NEAREST_GIT%: fgos cannot resolve a linked worktree's main checkout safely with cmd builtins -- run fgos from the main checkout
+exit /b 126
 :none
+if defined NEAREST_GIT if exist "%NEAREST_GIT%" if not exist "%NEAREST_GIT%\" goto refuse_worktree
 echo fgos: no .fgos\installation found above %CD% -- run "fgctl init" in the project 1>&2
 exit /b 127

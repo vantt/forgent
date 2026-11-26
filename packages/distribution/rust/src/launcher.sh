@@ -34,8 +34,11 @@ else
     echo "fgos: no .fgos/installation found above $PWD -- run 'fgctl init' in the project" >&2
     exit 127
   fi
+  if [ ! -r "$_fgos_nearest_git" ]; then
+    _fgos_refuse "$_fgos_nearest_git" "it is not readable"
+  fi
   _fgos_git_line=
-  { IFS= read -r _fgos_git_line || [ -n "$_fgos_git_line" ]; } < "$_fgos_nearest_git" || _fgos_refuse "$_fgos_nearest_git" "it is not readable"
+  IFS= read -r _fgos_git_line < "$_fgos_nearest_git" || :
   case $_fgos_git_line in
     "gitdir: "*) _fgos_gitdir=${_fgos_git_line#gitdir: } ;;
     *) _fgos_refuse "$_fgos_nearest_git" "missing gitdir" ;;
