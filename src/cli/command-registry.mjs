@@ -2739,18 +2739,19 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos session rotate secretary --name miu'],
       },
       stop: {
-        description: 'End the live head of a persona-name through its own supervisor and retire its pane; answers {stopped: true}, or {stopped: false, reason: "not-live"} when no live session holds the role. From inside a confined head the request route decides who may stop which head.',
+        description: 'End the live head of a persona-name through its own supervisor and retire its pane; answers {stopped: true}, or {stopped: false, reason: "not-live"} when no live session holds the role. From inside a confined head the request route decides who may stop which head. `--role lead:<LANE>` stops a lead by its short role instead of a persona and --name.',
         parameters: {
           type: 'object',
           properties: {
             persona: { type: 'string', description: 'Positional: the agent persona of the head.' },
             name: { type: 'string', description: 'The name of the head.' },
+            role: { type: 'string', description: 'A lead\'s short role (lead:<LANE>) to stop instead of a persona and --name; the lead is ended through its own run supervisor.' },
             reason: { type: 'string', description: 'Why it is stopped (at most 200 characters), kept on the lineage.' },
           },
           positional: ['persona'],
-          required: ['persona', 'name'],
+          required: [],
         },
-        examples: ['fgos session stop shaper --name <slug> --reason "answer received"'],
+        examples: ['fgos session stop shaper --name <slug> --reason "answer received"', 'fgos session stop --role lead:<LANE> --reason "plan done"'],
       },
       write: {
         description: 'From inside a confined head: replace a granted file with the content on stdin. The head\'s supervisor checks the path (project-relative, named exactly by the grant, a regular file with no symbolic link on the way) and writes it atomically outside the sandbox, where the file is read-only. Refused write-base-stale, writing nothing, when the file differs from the copy named by --base after the supervisor\'s catch-up (re-read it and redo the edit). The protection against newer rows holds when --base is the blob id of the copy that was edited; without --base only a move during the catch-up is caught. Answers {path, bytes}.',

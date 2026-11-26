@@ -651,13 +651,34 @@ fn role_holders() -> Result<Vec<fgos_identity::directory::Listed>, ()> {
         .map_err(|_| ())
 }
 
-struct HostIdentity;
+/// The session holding `role`, preferring the holder in the project at `root`: a role is not unique across the machine,
+/// so the first holder found is not necessarily this project's.
+fn role_holder(root: &Path, role: &str) -> Result<Option<fgos_identity::directory::Listed>, ()> {
+    let sessions = role_holders()?;
+    let (state, _) = fgos_holder_lock::state_root();
+    let ours = fgos_identity::project_info(&state, root).ok().map(|i| i.id);
+    let mut first = None;
+    for s in sessions
+        .into_iter()
+        .filter(|s| s.roles.iter().any(|r| r == role))
+    {
+        if ours.is_some() && s.project_id == ours {
+            return Ok(Some(s));
+        }
+        first.get_or_insert(s);
+    }
+    Ok(first)
+}
+
+struct HostIdentity {
+    root: PathBuf,
+}
 impl wake::Identity for HostIdentity {
     fn holder(&self, role: &str) -> wake::Holder {
-        let Ok(sessions) = role_holders() else {
+        let Ok(found) = role_holder(&self.root, role) else {
             return wake::Holder::Unknown;
         };
-        match sessions.iter().find(|s| s.roles.iter().any(|r| r == role)) {
+        match found.as_ref() {
             None => wake::Holder::NotLive,
             Some(s) if matches!(s.liveness, fgos_identity::Liveness::Unknown) => {
                 wake::Holder::Unknown
@@ -735,6 +756,11 @@ fn pane_activity(pane_live: bool, agent_status: Option<&str>) -> wake::Activity 
     }
 }
 
+/// `Some` when the lineage's request tickets decide its activity (`Busy`, or `Unknown` when unreadable).
+fn lineage_tickets(root: &Path, lineage: &str) -> Option<wake::Activity> {
+    tickets_activity(&root.join(".fgos/runtime/head-tickets").join(lineage))
+}
+
 /// A head's activity from its lineage under `root`: tickets first, then its placement, then `pane` (the terminal
 /// host's view of that placement).
 fn head_activity(
@@ -742,10 +768,8 @@ fn head_activity(
     lineage: &str,
     pane: impl FnOnce(&fgos_session_host::Placement, &Path) -> wake::Activity,
 ) -> wake::Activity {
-    match tickets_activity(&root.join(".fgos/runtime/head-tickets").join(lineage)) {
-        Some(wake::Activity::Busy) => return wake::Activity::Busy,
-        Some(other) => return other,
-        None => {}
+    if let Some(running) = lineage_tickets(root, lineage) {
+        return running;
     }
     let file = root
         .join(".fgos/runtime/session-rotation")
@@ -784,24 +808,98 @@ fn host_pane_activity(placement: &fgos_session_host::Placement, run_dir: &Path) 
     pane_activity(live, seen.activity.as_ref().map(|a| a.state.as_str()))
 }
 
+/// A lead started by hand holds a short role (`lead:<LANE>`) and has no head lineage; the wake door names it by that
+/// role, in the place of a head name.
+fn is_short_role(name: &str) -> bool {
+    wake::is_short_lead_role(name)
+}
+
+/// The argv of `session stop` for a head, or for the lead that holds the short role `name`.
+fn stop_argv<'a>(persona: &'a str, name: &'a str) -> Vec<&'a str> {
+    if is_short_role(name) {
+        vec!["session", "stop", "--role", name, "--json"]
+    } else {
+        vec!["session", "stop", persona, "--name", name, "--json"]
+    }
+}
+
+/// The activity of the lead holding the short `role`: the pane of the terminal slot its Identity record names. When the
+/// record names a head lineage, that lineage's running request tickets count as they do for a head, and its run directory
+/// is where the terminal endpoint is read from. A role nobody holds, or a holder with no slot, is `Unknown`, never `Idle`.
+fn short_role_activity(
+    root: &Path,
+    role: &str,
+    pane: impl FnOnce(&fgos_session_host::Placement, &Path) -> wake::Activity,
+) -> wake::Activity {
+    let Ok(Some(holder)) = role_holder(root, role) else {
+        return wake::Activity::Unknown;
+    };
+    let lineage = holder
+        .ids
+        .as_ref()
+        .and_then(|ids| ids.head.as_ref())
+        .map(|h| format!("{}-{}", h.persona, h.name));
+    if let Some(running) = lineage.as_deref().and_then(|l| lineage_tickets(root, l)) {
+        return running;
+    }
+    let key = holder
+        .ids
+        .as_ref()
+        .and_then(|ids| ids.terminal.as_ref())
+        .and_then(|t| t.key.clone());
+    let Some(key) = key else {
+        return wake::Activity::Unknown;
+    };
+    let run_dir = lineage
+        .as_deref()
+        .and_then(|l| {
+            let file = root
+                .join(".fgos/runtime/session-rotation")
+                .join(l)
+                .join("placement.json");
+            let value = serde_json::from_slice::<Value>(&std::fs::read(file).ok()?).ok()?;
+            value["runDir"].as_str().map(PathBuf::from)
+        })
+        .unwrap_or_else(|| root.to_path_buf());
+    match serde_json::from_value::<fgos_session_host::Placement>(
+        json!({"host": "terminal", "key": key}),
+    ) {
+        Ok(placement) => pane(&placement, &run_dir),
+        Err(_) => wake::Activity::Unknown,
+    }
+}
+
 impl wake::StopSession for HostStop {
     fn activity(&self, persona: &str, name: &str) -> wake::Activity {
+        if is_short_role(name) {
+            return short_role_activity(&self.root, name, host_pane_activity);
+        }
         head_activity(&self.root, &format!("{persona}-{name}"), host_pane_activity)
     }
 
     fn stop(&self, persona: &str, name: &str) -> Result<(), String> {
         let out = Command::new(host_binary())
-            .args(["session", "stop", persona, "--name", name, "--json"])
+            .args(stop_argv(persona, name))
             .current_dir(&self.root)
             .stdin(Stdio::null())
             .output()
             .map_err(|e| format!("session-stop-unavailable: {e}"))?;
+        let answer =
+            serde_json::from_str::<Value>(String::from_utf8_lossy(&out.stdout).trim()).ok();
         if out.status.success() {
-            return Ok(());
+            // A stop the host declined (a lead with no run supervisor, a role nobody holds) still exits 0: only
+            // `stopped: true` means the head ended.
+            let data = answer.as_ref().map(|v| &v["data"]);
+            return match data.and_then(|d| d["stopped"].as_bool()) {
+                Some(true) => Ok(()),
+                Some(false) => Err(data
+                    .and_then(|d| d["reason"].as_str())
+                    .unwrap_or("not-stopped")
+                    .to_owned()),
+                None => Err("session-stop-unreadable".to_owned()),
+            };
         }
-        let line = String::from_utf8_lossy(&out.stdout);
-        Err(serde_json::from_str::<Value>(line.trim())
-            .ok()
+        Err(answer
             .and_then(|v| v["code"].as_str().map(str::to_owned))
             .unwrap_or_else(|| format!("session-stop-exit-{}", out.status.code().unwrap_or(-1))))
     }
@@ -948,6 +1046,7 @@ impl wake::Telemetry for HostTelemetry {
             vec![
                 ("fgos.supervisor.trigger", span.trigger.clone()),
                 ("fgos.supervisor.outcome", span.outcome.to_owned()),
+                ("fgos.supervisor.error", span.error.clone()),
             ],
             Vec::new(),
         );
@@ -1336,7 +1435,9 @@ fn with_wake_ports<T>(
     };
     let ports = wake::Ports {
         project: &project,
-        identity: &HostIdentity,
+        identity: &HostIdentity {
+            root: root.to_path_buf(),
+        },
         start: &start,
         stop: &stop,
         portfolio: &portfolio,
@@ -1968,7 +2069,14 @@ pub fn answer(
                 &HostPortfolio::done(&plans),
                 &project.handle,
                 &project.id,
-                &|role| wake::Identity::holder(&HostIdentity, role),
+                &|role| {
+                    wake::Identity::holder(
+                        &HostIdentity {
+                            root: root.to_path_buf(),
+                        },
+                        role,
+                    )
+                },
                 max_leads,
             );
             let unreadable_count = unreadable.len();
@@ -2179,6 +2287,28 @@ mod tests {
             head_activity(&root, "supervisor-x", idle_pane),
             wake::Activity::Unknown
         );
+    }
+
+    #[test]
+    fn a_short_role_lead_is_stopped_by_role_and_a_head_lead_by_persona_and_name() {
+        assert_eq!(
+            stop_argv("lead", "lead:S1"),
+            ["session", "stop", "--role", "lead:S1", "--json"]
+        );
+        assert_eq!(
+            stop_argv("lead", "demo-x"),
+            ["session", "stop", "lead", "--name", "demo-x", "--json"]
+        );
+    }
+
+    #[test]
+    fn a_short_role_nobody_holds_is_unknown_never_idle() {
+        let activity = short_role_activity(
+            Path::new("/nonexistent-root"),
+            "lead:NOBODY-HOLDS-THIS",
+            |_, _| wake::Activity::Idle,
+        );
+        assert_eq!(activity, wake::Activity::Unknown);
     }
 
     #[test]

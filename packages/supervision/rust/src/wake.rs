@@ -2,7 +2,7 @@
 //! a head only when none is live, leaves a live one alone, and never reads unknown identity as
 //! not-live. Every call records one `fgos.supervisor.wake` span.
 use crate::{
-    portfolio::{admissible, supervisor_name, Plan},
+    portfolio::{admissible, head_name, supervisor_name, Plan},
     queue::{Queue, QueueError, RaisedEvent},
 };
 
@@ -98,6 +98,8 @@ pub struct WakeSpan {
     pub subject: String,
     pub trigger: String,
     pub outcome: &'static str,
+    /// The host's code when the outcome is a refusal (`stop-failed`); empty otherwise.
+    pub error: String,
 }
 pub trait Telemetry {
     fn emit(&self, span: &WakeSpan);
@@ -204,18 +206,112 @@ pub fn stop_stuck(ports: &Ports, trigger: Trigger) -> StuckOutcome {
         subject: trigger.subject.to_owned(),
         trigger: trigger.trigger.to_owned(),
         outcome: "stopped-stuck",
+        error: String::new(),
     });
     StuckOutcome::Stopped
 }
 
+/// The discussion directory a plan's `source` entry names (`plans/discussions/<dir>/...`).
+fn discussion_dir(source: &str) -> Option<&str> {
+    let mut parts = source.split('/');
+    parts.by_ref().find(|p| *p == "discussions")?;
+    parts.next().filter(|d| !d.is_empty())
+}
+
+/// The persona and name a finished lead is stopped under: a `head:lead-<name>` role is the head
+/// `lead` `<name>`; a short `lead:<LANE>` role has no head name, so the role itself is the name
+/// (the host's `session stop` resolves it through Identity).
+fn lead_target(role: &str) -> Option<(&str, &str)> {
+    match role.strip_prefix("head:lead-") {
+        Some(name) if !name.is_empty() => Some(("lead", name)),
+        _ if is_short_lead_role(role) => Some(("lead", role)),
+        _ => None,
+    }
+}
+
+/// A hand-started lead's short role: `lead:` and 1-64 of `[A-Za-z0-9_-]`. The host's `session stop` accepts the same
+/// pattern (`SHORT_LEAD_ROLE` in `src/session-host/head-stop.mjs`).
+pub fn is_short_lead_role(role: &str) -> bool {
+    role.strip_prefix("lead:").is_some_and(|lane| {
+        (1..=64).contains(&lane.len())
+            && lane
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
+    })
+}
+
+/// Stop the planners and leads whose work is finished: the planner of a discussion whose plan has
+/// landed (`draft` or `ready`), and the lead of a `done` plan. Only a live head of this project
+/// that is `Idle` is stopped; `Busy`, `Unknown` and a failed stop leave it for the next wake. Never
+/// blocks the start decision.
+fn close_finished(ports: &Ports, trigger: Trigger) {
+    let Some(project) = ports.project.project() else {
+        return;
+    };
+    let (Ok(plans), Ok(done)) = (ports.portfolio.plans(), ports.portfolio.done_dirs()) else {
+        return;
+    };
+    let is_done = |plan: &Plan| plan.status == "done" || done.contains(&plan.dir);
+    // A lane session that moved on to another plan keeps its role: a role that leads any plan not yet done is not finished.
+    let still_leading: Vec<&String> = plans
+        .iter()
+        .filter(|p| !is_done(p))
+        .filter_map(|p| p.lead.as_ref())
+        .collect();
+    let mut targets: Vec<(String, String, String)> = Vec::new();
+    for plan in &plans {
+        if is_done(plan) {
+            if let Some(role) = plan.lead.as_ref().filter(|r| !still_leading.contains(r)) {
+                if let Some((persona, name)) = lead_target(role) {
+                    targets.push((role.clone(), persona.to_owned(), name.to_owned()));
+                }
+            }
+        }
+        if plan.status == "draft" || plan.status == "ready" {
+            for dir in plan.source.iter().filter_map(|s| discussion_dir(s)) {
+                let name = head_name(&project.handle, dir);
+                targets.push((format!("head:planner-{name}"), "planner".to_owned(), name));
+            }
+        }
+    }
+    let mut seen: Vec<String> = Vec::new();
+    for (role, persona, name) in targets {
+        if seen.contains(&role) {
+            continue;
+        }
+        seen.push(role.clone());
+        match ports.identity.holder(&role) {
+            Holder::Live { project_id } if project_id == project.id => {}
+            _ => continue,
+        }
+        if ports.stop.activity(&persona, &name) != Activity::Idle {
+            continue;
+        }
+        // The span names the stopped head, not the trigger row; a refusal is recorded with its code.
+        let (outcome, error) = match ports.stop.stop(&persona, &name) {
+            Ok(()) => ("stopped-finished", String::new()),
+            Err(code) => ("stop-failed", code),
+        };
+        ports.telemetry.emit(&WakeSpan {
+            name: "fgos.supervisor.wake",
+            subject: role,
+            trigger: trigger.trigger.to_owned(),
+            outcome,
+            error,
+        });
+    }
+}
+
 /// Start the supervisor if there is work for it and none is live.
 pub fn wake(ports: &Ports, settings: &Settings, trigger: Trigger) -> WakeOutcome {
+    close_finished(ports, trigger);
     let outcome = decide(ports, settings);
     ports.telemetry.emit(&WakeSpan {
         name: "fgos.supervisor.wake",
         subject: trigger.subject.to_owned(),
         trigger: trigger.trigger.to_owned(),
         outcome: outcome.as_str(),
+        error: String::new(),
     });
     outcome
 }

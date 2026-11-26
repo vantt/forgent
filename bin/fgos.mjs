@@ -3236,8 +3236,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           throw new StoreError(HEAD_ARGUMENT_CODES.has(err.code) ? 'validation' : 'precondition', `${err.code ?? 'head-refused'}: ${err.message}`);
         }
       }
-      const persona = requireField(positional[1], `session ${sub} requires a persona: fgos session ${sub} <persona> --name <name>`);
-      const name = requireField(flags.name, `session ${sub} requires --name <name>`);
+      const byRole = sub === 'stop' && flags.role !== undefined;
+      if (byRole && (positional[1] !== undefined || flags.name !== undefined)) throw new StoreError('validation', 'session stop --role <lead:LANE> takes no persona and no --name');
+      const persona = byRole ? undefined : requireField(positional[1], `session ${sub} requires a persona: fgos session ${sub} <persona> --name <name>`);
+      const name = byRole ? undefined : requireField(flags.name, `session ${sub} requires --name <name>`);
       const { startHead, rotateHead } = await import('../src/session-host/head-request.mjs');
       const { resolveGitRoots } = await import('../src/git/inspect.mjs');
       if (sub === 'stop') {
@@ -3249,6 +3251,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const reason = optionalField(flags.reason, 'session stop --reason requires a non-empty value (omit --reason entirely to skip it)');
         const stopRoot = resolveGitRoots(process.cwd()).worktreeRoot;
         try {
+          if (byRole) return await stopHeadSession({ role: flags.role, projectRoot: stopRoot, reason });
           assertHeadArgs({ persona, name, projectRoot: stopRoot });
           return await stopHeadSession({ persona, name, projectRoot: stopRoot, reason });
         } catch (err) {

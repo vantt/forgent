@@ -6,9 +6,10 @@
     "fgos.watcher.outcome": { "type": "string", "values": ["noop", "woke-supervisor", "notified", "error", "skipped-busy"] },
     "fgos.watcher.problem": { "type": "string" },
     "fgos.supervisor.trigger": { "type": "string" },
+    "fgos.supervisor.error": { "type": "string" },
     "fgos.supervisor.outcome": {
       "type": "string",
-      "values": ["started", "already-live", "starting", "nothing-unhandled", "nothing-admissible", "identity-unknown", "role-held-other-project", "project-id-missing", "start-failed", "backoff", "stopped-stuck"]
+      "values": ["started", "already-live", "starting", "nothing-unhandled", "nothing-admissible", "identity-unknown", "role-held-other-project", "project-id-missing", "start-failed", "backoff", "stopped-stuck", "stopped-finished", "stop-failed"]
     },
     "fgos.discussion.from": { "type": "string" },
     "fgos.discussion.to": { "type": "string" },
@@ -44,7 +45,7 @@
     },
     "fgos.supervisor.wake": {
       "subjects": ["session", "event"],
-      "attrs": ["fgos.supervisor.trigger", "fgos.supervisor.outcome"],
+      "attrs": ["fgos.supervisor.trigger", "fgos.supervisor.outcome", "fgos.supervisor.error"],
       "measures": []
     },
     "fgos.discussion.status": {
