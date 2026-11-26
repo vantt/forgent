@@ -1,10 +1,11 @@
 ---
 contract: plan-v1
 title: "Plain fgos inside a linked worktree runs the owning project's release"
-status: ready
+status: running
+lead: head:lead-forgent-261126-0856-launch-b7cbc
 priority: P2
 blockedBy: []
-base: f9d9468c90132d5cea37e556da4322cbfefae453
+base: 9820dbb74cbb4084f07d78203e5b9ae95363b82b
 footprint:
   - plans/261126-0856-launcher-runs-owning-release-in-linked-worktree/**
   - packages/distribution/rust/src/launcher.rs
