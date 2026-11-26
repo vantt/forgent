@@ -904,7 +904,7 @@ pub fn build_supervisor_command(
                 memory_max,
                 &supervisor_argv,
             );
-            let mut cmd = Command::new(&scope_cmd[0]);
+            let mut cmd = Command::new("systemd-run");
             cmd.args(&scope_cmd[1..]);
             cmd
         }
