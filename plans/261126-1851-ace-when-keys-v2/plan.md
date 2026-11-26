@@ -1,7 +1,8 @@
 ---
 contract: plan-v1
 title: "Agent context engine: when-key registry v2 (workType, sessionType, agentFamily, agentCli, agentLifecycle; kind and cli removed)"
-status: draft
+status: running
+lead: lead:ace
 priority: P1
 blockedBy: []
 base: 678d7096e56f6994e2a25e0f1f05d2f6ec91111c
