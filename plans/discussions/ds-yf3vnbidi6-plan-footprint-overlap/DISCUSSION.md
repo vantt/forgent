@@ -1,13 +1,47 @@
 ---
 id: ds-yf3vnbidi6
 title: "Plans that share a path: block, warn or let them meet at land"
-status: open
+status: settled
 source:
   - p-os3gedpq4x
 created: 2026-11-26
 ---
 
-discussion: open
+discussion: settled
+
+## Hand-off
+
+- **Outcome:** two plans whose footprints overlap are both admitted and run on their own branches; the overlap is
+  reported as a warning, never a refusal. Conflicts are met once, at land. `CHANGELOG.md` can no longer conflict,
+  because each change writes its own file under `changelog.d/` and the release assembles them.
+- **Constraints:**
+  - Two unfinished phases of one plan that share a path still cannot share a wave (existing check, unchanged).
+  - The footprint still bounds what a unit may write and what a branch may land (`write-outside-footprint`,
+    `land-outside-footprint`, PS-24).
+  - Both blocks change together (L10): the contract check at `ready` and the admission hold
+    `held-footprint-overlap` (`packages/supervision/rust/src/portfolio.rs`). The old refusal path is deleted, not kept
+    behind a switch.
+  - Must not depend on `p-lfsc4czpgh`. Plans `261125-2041` and `261125-1631` are not touched.
+  - User-visible: a `CHANGELOG` entry (as a fragment, the new way) and the `AGENTS.md` rule.
+- **Non-goals:** regenerating declared files during a lead's refresh merge (`p-avjhx3gxas`); automatic ordering of
+  overlapping plans (`ds-mzyircswox` D2); the widening door; rewriting released sections of `CHANGELOG.md`.
+- **Acceptance criteria:**
+  1. Two `ready` plans whose footprints overlap both pass `plan-contract-check`. The output warns, naming both plans
+     and the shared paths.
+  2. A `ready` plan whose footprint overlaps a `running` plan is admitted by the wake door. The supervisor's
+     admission view lists the overlap as advice. `held-footprint-overlap` no longer exists.
+  3. Two unfinished phases of one plan that share a path in the same wave are still refused (existing test kept).
+  4. A change records its changelog entry as one file under `changelog.d/`. The release step assembles every
+     fragment into the new version section of `CHANGELOG.md` and deletes the fragments; one test owns this. Existing
+     `## [Unreleased]` lines are released with the next version.
+  5. Two branches that each add a fragment and each touch a skill source land one after the other with no
+     `land-conflict-aborted`: the generated skill surfaces are in `land.regenerate`.
+  6. `AGENTS.md`, `core/skills/_shared/plan-contract.md` §5 and `docs/platform/supervision/spec.md` state the new
+     rules; the supervision spec's decision history records the change.
+  7. `npm test` and `cargo test --workspace` green.
+- **Open, blocking only parts:** none. The planner picks the fragment file name scheme and where in the release
+  recipe the assembly runs.
+- **Sources:** p-os3gedpq4x; q-gk3bt22wng (owner answer, 2026-11-26); owner chat 2026-11-26 23:05-23:11.
 
 ## Seed (from the secretary, 2026-11-26)
 
@@ -44,6 +78,8 @@ not run in parallel. `CHANGELOG.md`, written last, should not block anyone from 
 
 ## 1. Trạng thái hiện tại
 
+Settled 2026-11-26: the owner answered q-gk3bt22wng with A (D1). Ready for a planner; see the hand-off at the top. History of the rounds below.
+
 Round 1 (2026-11-26 23:xx, shaper): scouting is done (§3). The measurement backs the owner's view. Over 353 merges on
 main since the contract began (2026-11-17), 38 had a conflict. 37 of those were on the generated mutation census,
 19 were on plan files, 2 on `CHANGELOG.md`, and only 3 on hand-written source, all on 2026-11-18/19. Two blocks
@@ -76,15 +112,14 @@ two phases of one plan that share a path out of the same wave.
 | 5 | Same-plan phases that share a path | **Clear: already enforced** | `plan-contract-check.mjs:157-167` errors when two unfinished phases share a wave and their footprints overlap. Nothing to build. |
 | 6 | Counter-point 3 (fixed base) | **Clear: mostly moot** | `plan.base` records the commit the plan was written against. A phase worktree is created fresh per phase and can `fgos run --sync <trunk>` (`fgos-lead` SKILL step 1), and the lead's answer to `land-conflict-aborted` is to rebase onto the trunk tip and land again. |
 | 7 | Counter-point 2 (semantic conflict that merges cleanly) | **Clear: covered at land** | The land door runs `land.gates` on the merged candidate tree, not on the branch alone. A plan's last phase re-runs the full gate on the combined tree (plan contract §4, "Integration"). A clean merge that breaks behaviour fails there. |
-| 8 | Which option replaces the blocks | **Agreed in chat, awaiting the store answer → q-gk3bt22wng** | Owner chat 2026-11-26 23:11: A, warn instead of block. q-o6qqdubbue superseded. |
-| 9 | CHANGELOG: union merge or one file per change | **Agreed in chat → q-gk3bt22wng** | Union merges silently: a line can land under an already released version (rc.9 to rc.12 in four days), an edited line is kept twice, entries drift between sub-sections. Fragments (`changelog.d/<id>.md`, assembled at release; changesets, towncrier, reno) cannot conflict by construction. 91 commits touched CHANGELOG.md since 2026-11-17. No prior art in the repo (`git log -S'changelog.d'` empty). |
+| 8 | Which option replaces the blocks | **Clear → D1** | Owner chat 2026-11-26 23:11: A, warn instead of block. q-o6qqdubbue superseded. |
+| 9 | CHANGELOG: union merge or one file per change | **Clear → D1** | Union merges silently: a line can land under an already released version (rc.9 to rc.12 in four days), an edited line is kept twice, entries drift between sub-sections. Fragments (`changelog.d/<id>.md`, assembled at release; changesets, towncrier, reno) cannot conflict by construction. 91 commits touched CHANGELOG.md since 2026-11-17. No prior art in the repo (`git log -S'changelog.d'` empty). |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Tóm tắt | Nguồn / rationale |
 |---|---|---|
-
-None yet. Row 8 waits on the owner.
+| D1 | Overlap between plans is a warning at `ready` and at admission, never a refusal; conflicts are met at land. In the same change, each change writes its changelog entry as one file under `changelog.d/`, assembled at release, and the generated skill surfaces join `land.regenerate`. The same-plan wave rule and the footprint write bound stay. | Owner in chat 2026-11-26 23:11 ("đồng ý A, dùng file nhỏ"), then q-gk3bt22wng answered "A. Warn only, changelog fragments". Evidence §3 rows 1-7 and 9. |
 
 ## 5. Q&A log
 
@@ -102,10 +137,12 @@ None yet. Row 8 waits on the owner.
   fragments, generated files regenerated after merge). Proposed: A, with changelog fragments instead of union.
 - 2026-11-26 23:09 +07, owner: "với changelog cách nào đúng hơn". Shaper: fragments; union hides errors (§3 row 9).
 - 2026-11-26 23:11 +07, owner: "đồng ý A, dùng file nhỏ, hỏi lại đi". q-o6qqdubbue superseded by q-gk3bt22wng.
+- 2026-11-26 23:1x +07, owner answered q-gk3bt22wng: "A. Warn only, changelog fragments". D1 minted (held across the
+  chat round and the store answer). Discussion settled.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Agreed by the owner in chat, to be recorded through q-gk3bt22wng (option A):
+Settled as D1:
 
 - **Admission and `ready`:** an overlap between plans never refuses. The contract check reports it as a warning
   naming the other plan and the shared paths. The admission hold `held-footprint-overlap` is removed; the supervisor's
@@ -136,5 +173,15 @@ flowchart LR
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Filled once q-gk3bt22wng is answered. Under option A it is a single entry, because the two doors and the land-door
-gaps must change together (L10).
+### Warn instead of block, changelog fragments {#task-warn-not-block}
+
+- **Goal:** acceptance criteria 1-7 of the hand-off.
+- **§6 excerpt:** both cross-plan blocks become warnings; `changelog.d/` fragments assembled at release; skill
+  surfaces regenerated at land; same-plan wave rule and footprint write bound unchanged.
+- **D-IDs:** D1.
+- **Siblings:** `p-avjhx3gxas` (refresh-merge regeneration, separate), `p-lfsc4czpgh` (widening, paused, not a
+  dependency).
+- **Draft verify:** `node scripts/run-tests.mjs test/scripts/plan-contract-check.test.mjs` and
+  `cargo test -p fgos-supervision` (portfolio and wake tests), then `npm test` and `cargo test --workspace`.
+
+One entry: the two doors and the land-side changes land together (L10).
