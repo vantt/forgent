@@ -19,6 +19,8 @@ Opened by the supervisor on the owner order of 2026-11-26 11:16, relayed by the 
 
 ## 1. Trạng thái hiện tại
 
+Round 2 (2026-11-26 13:44). Owner: hold the hand-off to a planner (13:36), and a settled discussion that the owner does not yet want planned needs the same queue/delivery mechanism as a plan (13:44). Today the supervisor starts a planner on every `discussion-settled` event, with no check of intent (`core/skills/fgos-supervisor/SKILL.md` "Settled discussion"). This falls inside this topic, because the planner step is a pipeline step. Leaning **L4** (§3 row 10): `settled` means quality only, like `ready` for a plan; a planner starts only when the discussion is committed for delivery and its pull slot (L3) is free. One `delivery` key with one meaning on row, discussion and plan, inherited down the `source` chain; it may also sit on a discussion directly, because 42 of 88 discussions cite no backlog row. This discussion stays `open`; nothing is handed to a planner.
+
 Round 1 (2026-11-26 11:40, shaper head `backlog-to-ready-pipeline`). Domain: supervision/work, which is fgOS platform work. There is no `domains/supervision/AGENTS.md`, so the supervision, work-state and workflow specs are the doctrine read. The pipeline itself must stay domain-free: a step that needs domain knowledge calls the domain's own skill, found through `domains/<domain>/AGENTS.md`.
 
 What the scout found (§3 row 1 has the full map): every step the owner named already exists somewhere, but split across two worlds that do not meet. Work has discovery, exploring and planning stages, triage, `goalTier` and the `intent` score, but they act only on Work items in the Event Store, and they lean to coding. The portfolio (backlog rows, discussions and plans on the trunk) has the later half working by itself: a settled discussion starts a planner, and a `ready` plan with the `delivery` flag is admitted. Nothing moves a `proposed` row forward by itself, and that is the real gap. Today 356 rows are `proposed` and 308 of them are cited by no discussion or plan. So the pipeline cannot work through every row. It must pick the next rows, and that pick is where goal triage and "just in time" meet.
@@ -46,6 +48,7 @@ A backlog row is where an owner request lands, and today it stays there until a 
 | 6 | Discover versus exploring | Clear in direction | Discover: an agent alone collects facts into the discussion (§3 and the evidence), with no owner. When it ends with points that need owner intent or a real tie, the row goes to exploring: a shaper with the owner. This is the Work rule (`clear` skips exploring) moved onto the discussion. Open: whether a small, clear row may skip the discussion and go straight to a planner (short-form discussion, fgos-shaping "Short form"). |
 | 7 | Which Work stages are reused and which are moved | Open | L10 says that moving the logic means moving every consumer and deleting the old path in the same change. Before choosing, find out whether Work items with stages `discovery`/`planning` are still used in the projects that run fgOS (mission #1, AGENTS.md "Ranh giới sứ mệnh"). Not scouted yet. |
 | 8 | Who drives the pipeline | Leaning: the supervisor | The supervisor already starts planners and leads (supervision spec §5), and D7 of ds-ipvis4jkpc lets both hands write the order. Clarify on intake stays with the secretary, who already takes every owner request. Open: whether discover runs as a short `fgos run` unit or as a shaper head. |
+| 10 | A settled discussion the owner does not want planned yet | Leaning L4 (owner 13:44) | Today `discussion-settled` starts the one planner unconditionally (`core/skills/fgos-supervisor/SKILL.md` "Settled discussion"; supervision spec §5). Same split as ds-ipvis4jkpc D5/D6: `settled` = the discussion is complete (quality); `delivery` = the owner wants it delivered (commitment). Leaning: the supervisor starts a planner only when the discussion's effective `delivery` is set (its own flag, or a flag on a `source` row) and a pull slot is free (L3); otherwise it waits settled. One key, one meaning on all three levels, inherited downward, so no second mechanism (L10). 42 of 88 discussions have `source: []`, so a flag on the row alone cannot cover them. Open: what happens to the 41 already-settled discussions at rollout (those with a plan are unaffected; the rest wait unflagged unless the owner flags them); whether `discussion: settled` plus the flag is written by the shaper, the secretary or both. |
 | 9 | Component authority | Run, no owner row | `fgos authority locate "take a portfolio backlog row through clarify, goal triage, discovery and planning to a ready plan"` returns only weak matches (`portfolio/backlog-item.schema.v1` and others, score ≤ 3). Re-run once L1 holds; a `fgos authority declare` may be needed for the pipeline. |
 
 ## 4. Quyết định đã chốt
@@ -59,6 +62,9 @@ None yet. L1-L3 in §1 are leanings and become D-IDs only after they hold for an
 
 - 2026-11-26 11:40 — Round 1 opened by shaper head `backlog-to-ready-pipeline`. Read p-xz3rns7o52, ds-ipvis4jkpc in full, work-state spec §5 and §9 (triage, ready), supervision spec §1-§5, workflow spec §1-§2, `domains/coding/workflows/feature.yaml`, the backlog-item schema, the secretary skill and the when-to-ask discussion §6. Counted 356 `proposed` rows, 308 cited by nothing. Wrote the map (§3 row 1) and leanings L1-L3. Parked Q1 q-pvl344blv5 (what the managed goals are; recommended: a small owner-ordered goal list in the portfolio that each row cites).
 
+- 2026-11-26 13:36 — Owner: "khoan đưa cho planner nhé". The discussion stays `open`; no settled marker, no planner.
+- 2026-11-26 13:44 — Owner: a discussion already settled but not yet wanted by a planner needs a queue/delivery mechanism like a plan. Scouted the supervisor's settled-discussion step (unconditional planner start) and counted discussions: 88, 41 settled, 42 with no source row. Added §3 row 10 and leaning L4.
+
 ## 6. Thiết kế đã chốt {#design}
 
 Not settled yet. Working sketch (round 1):
@@ -71,7 +77,9 @@ flowchart LR
   T -- pulled just in time --> D[Discover: agent collects facts into DISCUSSION.md]
   D -- facts enough --> S[Discussion settled]
   D -- owner intent needed --> E[Exploring: shaper with owner] --> S
-  S --> P[Planner: plan draft to ready, inherits delivery + blockedBy from row]
+  S --> G{delivery set on discussion or source row, and pull slot free?}
+  G -- no --> H[Waits settled; no planner]
+  G -- yes --> P[Planner: plan draft to ready, inherits delivery + blockedBy from row]
   P --> Q[(Ready + delivery: release-chain admission, ds-ipvis4jkpc)]
   Q -. slot frees .-> T
 ```
