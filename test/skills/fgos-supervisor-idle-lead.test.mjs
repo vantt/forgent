@@ -10,15 +10,15 @@ const skill = fs.readFileSync(path.resolve(here, '../../core/skills/fgos-supervi
 const flat = skill.replace(/\s+/g, ' ');
 
 // These rules are skill text; the existing replacement proof does not cover admission or the first idle check.
-test('admission lands status, lead role and trunk base together before starting the lead', () => {
-  const section = flat.slice(flat.indexOf('## Admit ready plans'), flat.indexOf('## Running plans'));
-  const admission = section.slice(section.indexOf('1.'), section.indexOf('2.'));
-  assert.match(admission, /In one `fgos land --paths <plan\.md> --message "\.\.\."` commit/);
-  assert.equal((admission.match(/fgos land/g) ?? []).length, 1);
-  assert.match(admission, /`status: running`/);
-  assert.match(admission, /`lead: head:lead-<headName>` \(the role you start\)/);
-  assert.match(admission, /`base: <trunk sha at admission>` \(from `git rev-parse <trunk>`\)/);
-  assert.match(section.slice(section.indexOf('2.')), /fgos session start lead --name <headName from plans>/);
+// Publishing status, lead role and base before the lead starts is owned in code by
+// `ready_plans_are_published_then_started_in_order_under_the_cap_without_a_supervisor`
+// (packages/supervision/rust/tests/wake.rs); the skill keeps judgement only.
+test('the skill leaves admission and caps to the wake door and keeps judgement only', () => {
+  const section = flat.slice(flat.indexOf('## Admission judgement only'), flat.indexOf('## Running plans'));
+  assert.ok(section.length > 0, 'the admission judgement section is missing');
+  assert.match(section, /The wake door admits ready plans in portfolio order, enforces `supervisor\.maxLeads` and the lane ceiling/);
+  assert.match(section, /publishes `status: running`, `lead` and `base` through the paths land, then starts the lead/);
+  assert.match(section, /Never repeat admission or bypass a hold here/);
 });
 
 test('session-idle types a wait check into the live lead and closes only on an answer or progress', () => {
@@ -35,8 +35,8 @@ test('session-idle types a wait check into the live lead and closes only on an a
 
 // The first-idle and replacement proofs require an event; neither covers an empty queue after deduplication.
 test('each wake checks running plans even without an event and raises a head-scoped help event before typing', () => {
-  const wake = flat.slice(flat.indexOf('## One wake'), flat.indexOf('## Admit ready plans'));
-  assert.match(wake, /inspect all running plans, even when the queue is empty/);
+  const wake = flat.slice(flat.indexOf('## One wake'), flat.indexOf('## Admission judgement only'));
+  assert.match(wake, /inspect all running plans, even when the queue is empty/i);
   const rule = flat.slice(flat.indexOf('On every wake, read'), flat.indexOf('For `session-idle` naming a live lead'));
   assert.ok(rule.length > 0, 'the no-event idle check is missing');
   assert.match(rule, /fgos supervisor plans --json/);
