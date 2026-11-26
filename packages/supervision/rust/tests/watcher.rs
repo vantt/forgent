@@ -4,8 +4,8 @@ use fgos_supervision::{
     queue::{QueueError, Raised, RaisedEvent},
     watcher::{
         event_id, tick, Action, Clock, Definitions, EventSink, Fetch, Mode, Outcome, Portfolio,
-        Ports, QuestionsView, ReviewSettlement, Row, Settings, Span, State, StopOutcome, Telemetry, TickLock,
-        TickState, Wake, WakeOutcome,
+        Ports, QuestionsView, ReviewSettlement, Row, Settings, Span, State, StopOutcome, Telemetry,
+        TickLock, TickState, Wake, WakeOutcome,
     },
 };
 use std::{any::Any, cell::RefCell, collections::BTreeMap};
@@ -726,7 +726,11 @@ fn a_review_that_ended_without_a_usable_answer_clears_the_marker_and_starts_afre
     let (w, s) = review_due_world();
     at(&w, 1000);
     run(&w, None, &s);
-    assert_eq!(*w.review_starts.borrow(), [1000], "the start names its instant");
+    assert_eq!(
+        *w.review_starts.borrow(),
+        [1000],
+        "the start names its instant"
+    );
 
     // The run crashed with no answer, inside the bound: the next tick starts a new one.
     *w.review_failed.borrow_mut() = true;
@@ -756,7 +760,11 @@ fn a_failed_done_keeps_the_review_settled_and_is_retried_on_the_next_tick() {
     let retried = run(&w, None, &s);
     assert_eq!(retried.errors, 0);
     assert_eq!(*w.reviews_done.borrow(), ["unit-review-1"]);
-    assert_eq!(*w.reviews.borrow(), 1, "no second start while retrying done");
+    assert_eq!(
+        *w.reviews.borrow(),
+        1,
+        "no second start while retrying done"
+    );
 }
 
 fn stuck_world() -> (World, Settings) {

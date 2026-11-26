@@ -2407,14 +2407,13 @@ impl watcher::Review for HostReview {
             .resolve(watcher::REVIEW_BRIEF)
             .ok_or("review-brief-missing")?;
         let brief = std::fs::read_to_string(path).map_err(|e| e.to_string())?;
-        self.start_run(&watcher::review_run_args(&brief), &self.log_path(started_at))
+        self.start_run(
+            &watcher::review_run_args(&brief),
+            &self.log_path(started_at),
+        )
     }
 
-    fn settled(
-        &self,
-        started_at: i64,
-        expired: bool,
-    ) -> Result<watcher::ReviewSettlement, String> {
+    fn settled(&self, started_at: i64, expired: bool) -> Result<watcher::ReviewSettlement, String> {
         use watcher::ReviewSettlement::{Failed, Running, Settled};
         let log_path = self.log_path(started_at);
         let failed = || {
@@ -3339,7 +3338,11 @@ mod tests {
         let result = json!({"data": {"outcome": "pass", "unitRunId": "review-unit-1",
             "results": [{"runResult": {"agentClaim": {"summary": "# Review\nNo actionable findings."}}}]}});
         let own_log = log_dir.join("review-1000.log");
-        std::fs::write(&own_log, format!("warning: slow\n{result}\ntrailing stderr\n")).unwrap();
+        std::fs::write(
+            &own_log,
+            format!("warning: slow\n{result}\ntrailing stderr\n"),
+        )
+        .unwrap();
         // Another start's log never settles this one.
         std::fs::write(log_dir.join("review-2000.log"), "stderr only\n").unwrap();
 
