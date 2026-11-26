@@ -17,4 +17,4 @@ When a running plan's footprint changes mid-run and a new path overlaps another 
 
 # Notes
 
-Explicitly out of scope of discussion ds-mzyircswox (its D2), which only reports the overlap; that discussion is closed without a planner (paused, owner 2026-11-26 ~12:50) and is not reopened by this row. Source: `plans/discussions/ds-mzyircswox-widen-a-running-plan-footprint/DISCUSSION.md` section 4. Related: p-lfsc4czpgh, p-na4eou4xn7 (widen decided by the system, not asked of the owner). Relayed by the shaper; the secretary has not read the owner's words directly.
+Explicitly out of scope of discussion ds-mzyircswox (its D2), which only reports the overlap; that discussion is closed without a planner (paused, owner 2026-11-26 ~12:50) and is not reopened by this row. Source: `plans/discussions/ds-mzyircswox-widen-a-running-plan-footprint/DISCUSSION.md` section 4. Related: p-lfsc4czpgh. Relayed by the shaper; the secretary has not read the owner's words directly.
