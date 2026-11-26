@@ -20,7 +20,8 @@ person` points at a question), OS-D21 (phases run in guide cases).
 `packages/supervision/rust/src/sources.rs` (new), `packages/supervision/rust/src/lib.rs`,
 `packages/supervision/rust/src/portfolio.rs`, `packages/supervision/rust/tests/sources.rs` (new),
 `apps/fgos/src/wiring/supervision.rs`, `src/workflow/records.mjs` (new), `src/workflow/case-verbs.mjs`,
-`test/workflow/records.test.mjs` (new), `core/config-standard/watcher.yaml`, `core/config-schema/watcher.schema.yaml`.
+`test/workflow/records.test.mjs` (new), `core/config-standard/watcher.yaml`, `core/config-schema/watcher.schema.yaml`, `bin/fgos.mjs`, `src/cli/command-registry.mjs`,
+`packages/host-runtime/contracts/command-manifest.json` (registration and route of `fgos workflow records`).
 
 ## Steps
 
