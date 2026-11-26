@@ -1,10 +1,11 @@
 ---
 contract: plan-v1
 title: "A config write refuses to create a project config file that the checkout's Git index tracks but its working copy lacks"
-status: ready
+status: running
+lead: head:lead-forgent-261126-0853-config-c5c37
 priority: P1
 blockedBy: []
-base: 2dc4d5ec6cbfe3224cee18b7c476087207e83879
+base: 628d1ee213273f873f695af4e0d9657f9f6c5730
 footprint:
   - plans/261126-0853-config-set-refuses-stripped-project-file/**
   - packages/config/rust/src/write.rs
