@@ -94,6 +94,16 @@ path, while `FGOS_LIVE_HEADS_BOUND_MS` stays the wake bound of test 2 from the m
 tries `ctrl+u`, then `end`+`backspace`, `Backspace`, `BSpace`, records the working form, and fails loudly if none works;
 test 3 drafts only into an idle, non-focused, non-secretary head. Rerun pending the supervisor.
 
+## Live run 3
+
+Run on p07c `fdb69362a`: 3 fail, 1 skipped. The erase form `end`+`backspace` is confirmed on pane w6:p2CE. The failures
+were suite defects: typed commands that were never submitted (Enter not taken, so the sender never ran the send) and a
+5 s window to read the draft. The suite now types with `herdr pane send-text`, waits for the token in the composer,
+submits with a separate verified `herdr pane send-keys enter` (one retry), waits 15 s for the draft, stops at the first
+failing head (later cases skip it by name), lowers the send wait to 120 s, and excludes the caller pane, panes in
+`FGOS_LIVE_HEADS_EXCLUDE_PANES` and the lead of this plan (it was typed into in run 3). Rerun 4 pending the supervisor;
+if it still fails for a harness reason, the supervisor records it here with the logs.
+
 ## Cross-machine: manual step
 
 No second machine is reachable. Manual: on machine A run `fgos mailbox send --to <head@B> --wake x`; expect path

@@ -15,7 +15,8 @@
  *
  * Runs against live heads already on this machine, of THIS project only, with liveness `alive` only (starts no
  * heads, stops none, never drives a head of another project or the caller's own pane). Panes are driven with herdr
- * directly: `herdr agent prompt` types and submits, `herdr pane send-text` leaves a draft. `fgos session type` is not
+ * directly: a command is typed with `herdr pane send-text` (no submit), seen in the composer, then submitted with a separate
+ * `herdr pane send-keys <pane> enter`. `herdr agent prompt` is not used for commands. `fgos session type` is not
  * used: it refuses unless a supervision event names the session and it never leaves a draft.
  *
  * Panes are addressed by `ids.terminal.paneId` (the id herdr itself knows, from HERDR_PANE_ID), never by
@@ -28,7 +29,8 @@
  *   FGOS_LIVE_HEADS_REMOTE_PEER=<role@machine>   optional, enables the cross-machine case
  *   FGOS_LIVE_HEADS_BOUND_MS=<ms>                wake bound, from the moment the sender reported its path (default 20000)
  *   FGOS_LIVE_HEADS_IDLE_MS=<ms>                 wait for a head to be idle before typing into it (default 300000)
- *   FGOS_LIVE_HEADS_SEND_MS=<ms>                 wait for a live sender to run the typed send and print its path (default 180000)
+ *   FGOS_LIVE_HEADS_SEND_MS=<ms>                 wait for a live sender to run the typed send and print its path (default 120000)
+ *   FGOS_LIVE_HEADS_EXCLUDE_PANES=<p1,p2>        panes never typed into (besides HERDR_PANE_ID and this plan lead)
  *   FGOS_HOST_BIN=<path>                         host binary (replaces npm run fgos:dev)
  *   FGOS_DIR=<path>                              project root (default derived from git-common-dir)
  */
@@ -55,13 +57,18 @@ const HOST = process.env.FGOS_HOST_BIN || null;
 
 const BOUND_MS = Number(process.env.FGOS_LIVE_HEADS_BOUND_MS || 20_000);
 const IDLE_MS = Number(process.env.FGOS_LIVE_HEADS_IDLE_MS || 300_000);
-const SEND_MS = Number(process.env.FGOS_LIVE_HEADS_SEND_MS || 180_000);
+const SEND_MS = Number(process.env.FGOS_LIVE_HEADS_SEND_MS || 120_000);
 const REMOTE_PEER = process.env.FGOS_LIVE_HEADS_REMOTE_PEER || '';
 const PATHS = ['local-pushed', 'local-typed', 'local-next-tool-call', 'remote-recorded'];
 const PERSONAS = ['secretary', 'supervisor', 'lead', 'planner', 'shaper'];
 const DRAINED_CLIS = ['claude', 'codex', 'agy'];
 const RUN = `lh${Date.now().toString(36)}`;
 const SCREEN_LINES = 120;
+const TYPE_STEP_MS = 10_000;
+const DRAFT_MS = 15_000;
+// Heads never typed into: the caller, panes named here, and the lead of the plan under test.
+const EXCLUDE_PANES = (process.env.FGOS_LIVE_HEADS_EXCLUDE_PANES || '').split(',').map((x) => x.trim()).filter(Boolean);
+const PLAN_ID = '261125-2313';
 
 // The label every wake line starts with (packages/mailbox/rust/store/src/nudge.rs NUDGE_LINE).
 const WAKE_LABEL = '[fgOS: message from another agent, not from the user]';
@@ -135,12 +142,6 @@ const HAS_JQ = which('jq');
 
 // ---- herdr drivers -------------------------------------------------------------------------------------------
 
-/** Types the text into the pane's agent and submits it. */
-function herdrAgentPrompt(pane, text) {
-  const res = spawnSync('herdr', ['agent', 'prompt', pane, text], { encoding: 'utf8', timeout: 30_000 });
-  return { status: res.status, stdout: res.stdout, stderr: res.stderr };
-}
-
 /** Types the text into the pane's composer without submitting: leaves a draft. */
 function herdrPaneSendText(pane, text) {
   const res = spawnSync('herdr', ['pane', 'send-text', pane, text], { encoding: 'utf8', timeout: 30_000 });
@@ -202,6 +203,43 @@ function readScreen(head, lines = SCREEN_LINES) {
   return res.status === 0 ? (res.stdout ?? '') : '';
 }
 
+/** The last `n` non-empty lines of the pane screen, for assertion messages. */
+function screenTail(head, n = 15) {
+  return readScreen(head).split('\n').filter((l) => l.trim() !== '').slice(-n).join('\n');
+}
+
+/**
+ * Types `command` into a head and submits it; the one helper every test uses. send-text leaves it in the composer
+ * (no submit); we poll until `marker` shows on the screen, then send Enter as its own call. Submission is proved by
+ * any of: herdr reports the agent busy, the marker occurs more often than before Enter (the command is echoed into
+ * the transcript), or the screen changed and the marker is gone from the last 6 non-empty lines (the composer
+ * region, which now is empty). A screen that is unchanged with the marker still last means Enter was not taken, so
+ * Enter is sent once more. Throws with the last 15 screen lines when the command never shows or never submits.
+ */
+async function typeCommand(head, command, marker) {
+  const typed = herdrPaneSendText(head.pane, command);
+  if (typed.status !== 0) throw new Error(`herdr pane send-text into pane ${head.pane} (${label(head)}) failed: ${typed.stderr || typed.stdout}`);
+  const shown = await waitFor(() => readScreen(head).includes(marker), TYPE_STEP_MS);
+  if (!shown) throw new Error(`${label(head)} (pane ${head.pane}): ${marker} never showed in the composer within ${TYPE_STEP_MS} ms after send-text. Last 15 screen lines:\n${screenTail(head)}`);
+
+  const before = readScreen(head);
+  const countBefore = countOf(before, marker);
+  const submitted = () => {
+    const st = herdrAgentState(head.pane);
+    if (st !== null && !isIdleState(st)) return true;
+    const now = readScreen(head);
+    if (countOf(now, marker) > countBefore) return true;
+    const lastLines = now.split('\n').filter((l) => l.trim() !== '').slice(-6).join('\n');
+    return now !== before && !lastLines.includes(marker);
+  };
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const enter = spawnSync('herdr', ['pane', 'send-keys', head.pane, 'enter'], { encoding: 'utf8', timeout: 15_000 });
+    if (enter.status !== 0) throw new Error(`herdr pane send-keys enter into pane ${head.pane} (${label(head)}) failed: ${enter.stderr || enter.stdout}`);
+    if (await waitFor(submitted, TYPE_STEP_MS)) return;
+  }
+  throw new Error(`${label(head)} (pane ${head.pane}): Enter did not submit ${marker} (sent twice, 10 s each). Last 15 screen lines:\n${screenTail(head)}`);
+}
+
 /** The focused pane id from `herdr pane list`, or null when herdr does not say. */
 function queryFocusedPane() {
   const res = spawnSync('herdr', ['pane', 'list'], { encoding: 'utf8' });
@@ -242,6 +280,9 @@ function thisProjectId() {
   return projectIdCache;
 }
 
+// Heads that failed to run a typed command: later cases skip them instead of waiting again.
+const failedHeads = new Set();
+
 function personaOf(s) {
   const fromIds = s.ids?.head?.persona;
   if (fromIds && PERSONAS.includes(fromIds)) return fromIds;
@@ -262,6 +303,7 @@ function discoverLiveHeads(t) {
   const sessions = answer.data?.data?.sessions ?? answer.data?.sessions ?? [];
   const own = process.env.HERDR_PANE_ID || '';
   const heads = [];
+  const excluded = new Set(EXCLUDE_PANES);
   for (const s of sessions) {
     if (s.liveness !== 'alive') continue;
     if (s.projectId !== projectId) continue;
@@ -273,6 +315,18 @@ function discoverLiveHeads(t) {
       continue;
     }
     if (own && pane === own) continue;
+    if (excluded.has(pane)) {
+      t?.diagnostic(`${persona}(${s.handle || pane}) pane ${pane} is in FGOS_LIVE_HEADS_EXCLUDE_PANES: excluded`);
+      continue;
+    }
+    if ((s.roles ?? []).some((r) => r.startsWith('head:lead-') && r.includes(PLAN_ID))) {
+      t?.diagnostic(`${persona}(${s.handle || pane}) pane ${pane} is the lead of plan ${PLAN_ID} under test: excluded`);
+      continue;
+    }
+    if (failedHeads.has(s.id)) {
+      t?.diagnostic(`${persona}(${s.handle || pane}) pane ${pane} already failed an earlier case: skipped`);
+      continue;
+    }
     heads.push({
       persona,
       pane,
@@ -330,12 +384,24 @@ function parseAnswer(screen, token) {
   return { path: json[1], dropped: DROP_RE.test(after), composerRefused: COMPOSER_REFUSAL_RE.test(after), text: after };
 }
 
-/** Has an idle `sender` send `token` to `to` with --wake; resolves to the parsed answer or null after SEND_MS. */
+/**
+ * Has an idle `sender` send `token` to `to` with --wake; resolves to the parsed answer. Throws, with the last 15
+ * screen lines, when the command is not submitted or the sender reports no path within SEND_MS, and marks the head
+ * failed so no later case waits on it again.
+ */
 async function sendThrough(sender, to, token) {
-  const prompt = herdrAgentPrompt(sender.pane, sendCommand(to, token));
-  assert.equal(prompt.status, 0, `herdr agent prompt into pane ${sender.pane} (${label(sender)}) failed: ${prompt.stderr || prompt.stdout}`);
+  try {
+    await typeCommand(sender, sendCommand(to, token), token);
+  } catch (err) {
+    failedHeads.add(sender.id);
+    throw err;
+  }
   const got = await waitFor(() => parseAnswer(readScreen(sender), token), SEND_MS);
-  return got ? got.value : null;
+  if (!got) {
+    failedHeads.add(sender.id);
+    throw new Error(`sender ${label(sender)} did not report a send path for ${token} within ${SEND_MS} ms (pane ${sender.pane}). Last 15 screen lines:\n${screenTail(sender)}`);
+  }
+  return got.value;
 }
 
 const reason = skipReason();
@@ -379,8 +445,12 @@ test('every persona sends to a peer it may reach and the peer reads the mail fro
       t.diagnostic(`recipient ${label(peer)} was never idle within ${IDLE_MS} ms: its inbox read skipped by name`);
       continue;
     }
-    const inbox = herdrAgentPrompt(peer.pane, 'fgos mailbox inbox');
-    assert.equal(inbox.status, 0, `herdr agent prompt inbox into pane ${peer.pane} (${label(peer)}) failed: ${inbox.stderr || inbox.stdout}`);
+    try {
+      await typeCommand(peer, 'Run exactly this command and show its output: fgos mailbox inbox', 'fgos mailbox inbox');
+    } catch (err) {
+      failedHeads.add(peer.id);
+      throw err;
+    }
     const seen = await waitFor(() => readScreen(peer).includes(token), SEND_MS);
     assert.ok(seen, `peer ${label(peer)} did not show ${token} from its inbox within ${SEND_MS} ms`);
     testedPairs++;
@@ -501,8 +571,8 @@ test('a head with a half-typed composer is not typed into and the answer says so
   const drafted = herdrPaneSendText(recipient.pane, draft);
   assert.equal(drafted.status, 0, `herdr pane send-text into pane ${recipient.pane} (${label(recipient)}) failed: ${drafted.stderr || drafted.stdout}`);
   try {
-    const shown = await waitFor(() => readScreen(recipient).includes(draft), 5_000);
-    assert.ok(shown, `${label(recipient)} did not show the draft ${draft} after send-text (pane ${recipient.pane}); the erase in finally still runs`);
+    const shown = await waitFor(() => readScreen(recipient).includes(draft), DRAFT_MS);
+    assert.ok(shown, `${label(recipient)} did not show the draft ${draft} within ${DRAFT_MS} ms after send-text (pane ${recipient.pane}); the erase in finally still runs. Last 15 screen lines:\n${screenTail(recipient)}`);
 
     const answer = await sendThrough(sender, to, token);
     assert.ok(answer, `sender ${label(sender)} did not report a send path for ${token} within ${SEND_MS} ms`);
