@@ -54,8 +54,6 @@ created: 2026-11-25
 
 # Agent Context Engine
 
-> **Runs on the fg-server machine (owner order, 2026-11-26).** This plan is worked only on fg-server (lead `lead:RULE` there). No agent on fg-server2 or any other machine starts, restarts, admits, closes or lands work for it; on fg-server2 a `plan-no-progress`, `head-gone` or `leadLive: false` for it is expected and is marked handled with no action.
-
 ## Outcome
 
 ACE becomes its own component (ACE-D3): the one store of every fgOS rule, with one owner per rule, no duplicate and
