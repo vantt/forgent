@@ -43,6 +43,7 @@ footprint:
   - plans/backlog/p-iatzcg2gee-*.md
   - plans/backlog/p-6hqvgokerb-*.md
   - plans/backlog/p-tyowvhthul-*.md
+  - CHANGELOG.md
 source:
   - plans/discussions/ds-f3x53nlibp-head-lifecycle-events/DISCUSSION.md
   - p-pv7ha3l5ss
