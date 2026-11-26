@@ -14,7 +14,7 @@ import path from 'node:path';
 import * as cleanup from '../cleanup.mjs';
 import { cleanupConfinementResource, writeOwnershipMarker, ensurePrivateDir, writeAttemptHomeRecord } from '../cleanup.mjs';
 import { copyCredentialFiles, credentialWriteBackTarget, loginLifeProblem } from '../../provider-credential-renewal.mjs';
-import { commandCli, credentialStoreOf, expandCredentialHome } from '../../provider-capacity.mjs';
+import { commandCli, credentialStoreOf, expandCredentialHome, providerCapacityForInvocation } from '../../provider-capacity.mjs';
 import { DEFAULT_SEAT_TIMEOUT_MS, resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
 import { MAILBOX_RECORD_RESOURCE, PEER_SESSIONS_RESOURCE } from '../workspace-paths.mjs';
@@ -59,7 +59,8 @@ function copyHomeFiles(privateHomeTarget, sourceHome, files) {
 function provisionSelectedCredential(privateHomeTarget, request) {
   const store = request?.invocation?.credentialStore;
   if (!store) return false;
-  const capacity = request?.providerCapacity;
+  // The lease may not know the CLI yet: the store this invocation declares picks the account's login for it.
+  const capacity = providerCapacityForInvocation(request?.providerCapacity, request?.invocation);
   const source = capacity?.credentialSource;
   if (!source) {
     // An account that keeps one login per CLI and declares none for the CLI being launched has nothing
@@ -100,7 +101,7 @@ function provisionSelectedCredential(privateHomeTarget, request) {
  * names and paths, never a credential value.
  */
 function credentialWriteBackOf(request) {
-  const capacity = request?.providerCapacity;
+  const capacity = providerCapacityForInvocation(request?.providerCapacity, request?.invocation);
   if (!capacity?.credentialWriteBack) return null;
   return credentialWriteBackTarget({
     provider: capacity.provider,

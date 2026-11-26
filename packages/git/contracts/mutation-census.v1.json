@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "0379832fb1d3e729cb599b3d9845f2613bce832c396dee595120b4444233af8e",
+  "payloadDigest": "d0cc15635fe7d9e47dae651ba1125b0c3c60e2d7df75359db7db4b8b79b0b995",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -1589,7 +1589,7 @@
     "src/runner/dispatch/confinement/attestation-store.mjs": "25aeaef901e6c331ec84de3f4e072224d3f14c77775ba46fe6b91348ad795805",
     "src/runner/dispatch/confinement/authority.mjs": "72b3025220a42f16ccb7934a43c4b8cef168550e5276392929d64e0353cec9d2",
     "src/runner/dispatch/confinement/cleanup.mjs": "96e1e27216ec732c984ea0050b64b526c03531c8ca3eccb530794602b87e4a8e",
-    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "2cd390e40b714b447b8460d9f226585240a2476eb4a931f1558071dd6558e7ed",
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "46afd21fd021c16f213548e04149572a4b6dfe36753989c429f7513731938baf",
     "src/runner/dispatch/confinement/resources.mjs": "499d4c37a26ccca0d487f4a448d57c1473b32a459be3ae42d04933d4fcb1273e",
     "src/runner/dispatch/confinement/workspace-paths.mjs": "f3c30359bcf3d327a3d538de6b4f7ae0dcf460980a55ab679cbb9b9b098a29db",
     "src/runner/dispatch/llm-accounts.mjs": "cdece5d6e5a9301ddf2437c3e6bc54815a01e59855af2d4fa5d17d0cd0cd6392",
