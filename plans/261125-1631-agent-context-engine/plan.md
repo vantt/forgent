@@ -142,6 +142,11 @@ Read with `git log -S` on `discoverInstructionSources`, `evaluateInstructionComp
 | 4 | [Refuse a bad rule when it is written](phase-04-write-time-check.md) | 3 | packages/agent-context-engine/rust/src/check/**, packages/agent-context-engine/rust/tests/check*.rs, apps/fgos/src/wiring/context_engine/**, apps/fgos/tests/context_engine.rs, .githooks/pre-commit | 4 | draft |
 | 6 | [Integration gate, changelog](phase-06-integration.md) | 1, 2, 3, 4 | CHANGELOG.md, plans/261125-1631-agent-context-engine/reports/** | 5 | draft |
 
+Phases 3-6 are parked on this machine (supervisor, 2026-11-26 08:58): the owner's goal of 2026-11-26, relayed by
+lead:SUPERVISOR, leaves ACE to the other machine, and the local lead's login expired, so it was stopped. No lead
+here restarts this plan until the owner or the secretary orders it; phase 3 would also overlap 261125-2313 on
+`apps/fgos/src/routing.rs`.
+
 Phase 1 is parked (owner, 2026-11-25 22:58): another machine does it; the lead waits for that land on main, then marks
 phase 1 done; phase 2 does not wait for that land (next paragraph). The duplicate local run's branch `agent-context-engine/p01` is not landed
 (cleanup is owner question `q-ubi34e6xd3`).
