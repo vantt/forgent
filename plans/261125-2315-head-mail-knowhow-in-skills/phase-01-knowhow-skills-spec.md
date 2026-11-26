@@ -7,7 +7,7 @@ Capability: `code:implement`.
 - Landed plan `plans/261125-2313-head-communication-agent-to-agent/` (its `reports/integration.md` and the send
   answer values in `packages/mailbox/contracts/frame.v1.txt`).
 - `core/skills/fgos-secretary/SKILL.md` (mail lines near 32, 76, 122), `core/skills/fgos-supervisor/SKILL.md` (line
-  near 153), `core/skills/fgos-lead/SKILL.md` (line 15 "You have no mailbox").
+  near 159), `core/skills/fgos-lead/SKILL.md` (line 15 "You have no mailbox").
 - `core/skills/_shared/` for fragment style; `docs/platform/session-host/spec.md` permission section.
 - `apps/fgos/src/wiring/supervision.rs` `pane_of`; `packages/identity/rust/src/directory.rs` `terminal_key()`.
 
