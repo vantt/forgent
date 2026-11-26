@@ -1,0 +1,110 @@
+# Integration report: phase 7
+
+Tree: worktree tip `a09777829` (phases 1-6 landed). The gate below ran in a sandbox with a read-only HOME; the live runs ran unconfined on fg-server2.
+Nothing below is claimed green unless it says so.
+
+## Gate
+
+### `npm test`: NOT RUN (blocked by the sandbox)
+
+`node scripts/run-tests.mjs` compiled the workspace, then died acquiring the full-suite queue lock:
+`EROFS: read-only file system, open '/home/vantt/.local/state/fgos/locks/full-suite.lock'`
+(`src/holder-lock/index.mjs:161`). No Node test ran. It must be re-run on a machine with a writable HOME.
+
+### `cargo test --workspace --no-fail-fast`: RED, 14 test binaries failing, none in this plan's footprint
+
+Every failure traces to the sandbox (read-only FS, git floor probe, PID namespace) or to another plan's files.
+
+| Binary | Failing test(s) | Cause | In footprint? |
+|---|---|---|---|
+| `fgos` bin | 7 `wiring::doctor::confinement::tests::*` | confinement/home checks in the sandbox | no |
+| `fgos --test cli_tests` | `the_execution_route_run_unit_op_refuses_an_option_outside_the_contract_and_answers_a_refused_run` | execution route message (`objective`) | no |
+| `fgos --test internal_lock_routes` | 2 `quiesce_scan_*` | "scan runs inside a PID namespace that hides the host's processes" | no |
+| `fgos --test migrate_portfolio` | `in_a_git_checkout_an_untracked_file_is_never_rewritten` | `git-floor-probe-failed: Read-only file system` | no |
+| `fgos-component-authority --test model_checks` | `every_top_level_package_contract_file_and_every_prose_contract_has_exactly_one_row` | `packages/agent-context-engine/contracts/effective-rules.v1.json` has no row (agent-context-engine plan; the supervisor's "head-permissions row" red is not what fails here, `head-permissions.v1.json` raised no complaint) | no |
+| `fgos-distribution --lib` | 5 (`source_payload`, `release_rows`, `tests::the_commit_is_...`) | git in the sandbox | no |
+| `fgos-execution-engine --test confinement_cleanup` | 3 | confinement/PID namespace | no |
+| `fgos-execution-engine --test planning` | `run_admission_fences_retries_and_materializes_the_attempt_directory_atomically` | sandbox | no |
+| `fgos-holder-lock --lib` | `status::tests::a_holder_that_is_not_a_fgos_process_is_a_problem_and_a_free_file_is_not` | sandbox | no |
+| `fgos-holder-lock --test borrow_io` | `released_lock_is_free_while_a_sibling_thread_forks_children` | fork/timing under load (the supervisor's load-only interrupt red) | no |
+| `fgos-observe --lib` | 2 (`sources::repo`, `claude_transcripts`) | git/worktree in the sandbox | no |
+| `fgos-run-supervisor --test head_request` | 3 `release_run_*` / `an_irreversible_recipe_*` | `git-floor-probe-failed ... Read-only file system` (release verbs, not head mail) | test file not in footprint (only `src/head_request.rs` is); cause is the sandbox |
+| `fgos-work-state --lib` | 2 (`work_source`, `event_reader`) | not examined further | no |
+
+I did not re-run the failures on a clean tree, so "sandbox cause" is read from each assertion text, not proven by a passing re-run.
+
+### This plan's own tests: GREEN
+
+`cargo test -p fgos-session-host -p fgos-mailbox -p fgos-mailbox-core -p fgos-identity`: every result line `ok`, 0 failed
+(covers permissions, forwarder, typed_wake, record_snapshot, nudge_typed, identity directory).
+Also green in the workspace run: `fgos --test mailbox_routes` (54 passed), `fgos-agent-protocol --test terminal_vectors` (13 passed).
+
+## Suite rewrite after the first unconfined run
+
+The supervisor ran the initial draft unconfined against the real host and measured facts that required rewriting `test/live/mailbox-heads.live.mjs`:
+
+1. **`mailbox send` flags and invocation model**: `mailbox send` takes `--to`, `--wake`, `--reply-to`, `--need-ack`, `--reply-by` (`apps/fgos/src/wiring/mailbox_verbs.rs`); it has no `--from` or `--body`. An earlier version of this report said there was no `--wake`; that was wrong. The body is a positional argument. Without `--wake` no wake is attempted and the path is always `local-next-tool-call`, so every send in the suite passes `--wake`. The sender is whoever runs the verb, so the suite cannot send as another head from outside: it has the sender's agent run the command in its own cage.
+2. **Panes are driven with herdr directly**: `fgos session type` refuses unless a supervision event names the session and it never leaves a draft. The suite types a command with `herdr pane send-text <pane>` (no submit), sees it in the composer, then submits with a separate verified `herdr pane send-keys <pane> enter`; drafts use `send-text` alone; screens are read with `herdr pane read`. The sender is prompted to print only `<token>-path=<path>` (via `jq` when present, else the JSON `path` field is matched), so the agent's prose cannot match. `session focus` does not exist: focus neutrality is compared through `herdr pane list`, and recorded as a manual check when it carries no focus field.
+3. **Discovery is project-scoped and alive-only**: heads come from `fgos identity list --project`; only sessions whose `projectId` equals this checkout's project id and whose `liveness` is `alive` count, the caller's own pane (`HERDR_PANE_ID`) is excluded, and the pane is `ids.terminal.paneId` (never the slot key; see run 1 below); a head without a paneId is skipped by name. The suite starts and stops no heads, never drives another project's head, and reports a persona or CLI without a live head as skipped by name.
+3a. **Wake cases are not vacuous**: the idle-wake case requires path `local-pushed` or `local-typed`; a dropped wake (exchange quota, lifetime cap, no channel; budgeted per sender/recipient pair) fails naming the drop, and the case prefers pairs the first case did not use. The wake label is identical for every mail, so the case counts label occurrences on the recipient screen before the send and passes only on the RUN-tagged token appearing on the target screen (a count rise alone never passes). Idle heads are grouped by CLI (claude, codex, agy) and each CLI with no live head is named.
+4. **`mailbox send --to` takes short names or handles**: `--to` accepts a session short name (e.g. `forgent-claude-62`) or a handle/role alias, not a persona name; unknown-name answers list candidate sessions. For `lead` and `planner`, `head-permissions.v1.json` restricts `--to` to `head:secretary-*` or `head:supervisor-*`, which the suite respects.
+5. **Calls run with `--dir /home/vantt/projects/forgent`**: Every `fgos` call runs through the host binary or dev door with `--dir /home/vantt/projects/forgent` (e.g. `npm run fgos:dev -- <verb> ... --dir /home/vantt/projects/forgent`) because a linked worktree has no `.fgos` directory.
+
+In addition:
+- **Half-typed composer check**: now automated. A RUN-tagged draft is left with `herdr pane send-text`, a send with `--wake` follows, and the answer must be `local-next-tool-call` carrying the composer-not-empty refusal (`packages/mailbox/contracts/frame.v1.txt` `[report.nudge.refused]`, reason from `pane_io.rs`); the draft must still be on screen. The case is skipped by name, never passed, when the recipient uses a push channel (answer `local-pushed`, or a CLI version that is a push row), the wake was dropped (no channel, exchange quota, lifetime cap) or the recipient is busy. The draft is erased afterwards with `herdr pane send-keys` (key form `end`+`backspace`, proven in run 3) and the case fails loudly naming the pane if the draft is still on screen.
+- **Idle-wake case**: passes only when the RUN token appears on the target screen (a wake label count rise alone can be another sender's wake); a target that is not idle (`herdr agent get`) is skipped by name.
+- **Calls and discovery**: identity calls run with cwd set to the project root; `lead`/`planner` senders pick any `head:secretary-*` / `head:supervisor-*` role of a peer.
+- **Cross-machine case**: asserts only that the answer is `remote-recorded`; the read on the other machine is the manual step below.
+
+## Live criterion 8: NOT RUN TO COMPLETION
+
+The owner chose to close phase 7 on the evidence below (option A). Acceptance criterion 8 is recorded as **not run to
+completion on a machine whose heads were working**, not as passed. No live case passed in any run.
+
+The suite ran four times, unconfined, on fg-server2 against the live heads of this project, by the supervisor. Logs are
+outside the repository, in the worktrees directory: `/home/vantt/projects/forgent-worktrees/p07c-live-run-1.log` to
+`p07c-live-run-4.log`.
+
+| Run | Suite commit | Result | Cause of each failure |
+|---|---|---|---|
+| 1 | `ed17c8a59` | 0 pass, 3 fail, 1 skip | The suite addressed herdr by the supervisor slot key (`cmd_...`) instead of the herdr pane id: `agent_not_found` / `pane_not_found`. Suite defect. |
+| 2 | `40f9a526c` | 0 pass, 3 fail, 1 skip | A 20 s read window on heads that were mid-turn; the `Backspace` erase key did not take, so the draft in pane w6:p2CE stayed (the owner erased it by hand). Suite defects. |
+| 3 | `fdb69362a` | 0 pass, 3 fail, 1 skip | Typed commands into busy heads were never submitted (no send path within 180 s); the draft did not show within 5 s. Suite defects plus busy heads. |
+| 4 | `aed018c1d` | 0 pass, 2 fail, 2 skip | Supervisor and secretary senders were busy with their own work and did not report a send path within 120 s; the half-typed case found no idle recipient. |
+
+### What the runs proved
+
+- **The herdr address fix.** From run 2 on, no `agent_not_found` / `pane_not_found`: panes addressed by
+  `ids.terminal.paneId` are reached.
+- **A real confined send between two heads.** In run 4 the supervisor head (claude-4ql2) ran the typed
+  `fgos mailbox send --wake` to the secretary head (claude-7dxw); the secretary's screen shows the mail delivered with
+  id `64c246c04da96593`, body `lhmwxgkqdw-t1-supervisor`, framed with the "from another agent, not from the user"
+  label. The owner reports the send answered `path=local-next-tool-call`; that answer line is not in the captured log
+  (the sender's screen tail at the timeout shows it still busy), so it rests on the owner's observation.
+- **The draft erase works.** Run 3 erased the test draft in pane w6:p2CE with the key form `end`+`backspace`.
+
+### What the runs did not prove
+
+- **The four send paths.** Only `local-next-tool-call` was observed (above). `local-pushed`, `local-typed` and
+  `remote-recorded` were never seen live.
+- **The wake bound per persona and per CLI.** No sender reported its path within the window in any run, so no wake was
+  timed; no persona case and no idle-wake case passed. Codex and agy heads were not exercised at all.
+- **The half-typed composer gate.** Run 4 skipped it: no idle, non-focused recipient with a permitted sender was on
+  the machine. Runs 2 and 3 failed before the send. The gate is proven only by the lower tests (`typed_wake`,
+  `nudge_typed`, composer vectors).
+- **The remote case.** No second machine was reachable (`FGOS_LIVE_HEADS_REMOTE_PEER` not set); skipped in every run.
+  The manual step (send from A to a head on B, expect `remote-recorded`, read on B after a fetch) was not done.
+- **`npm test` on a writable HOME.** Not run (see Gate).
+
+Why: every head on the machine was working on its own task during the runs, so typed commands waited behind their
+turns and no idle recipient existed. A rerun when every head is idle is proposed as a backlog row to the supervisor.
+
+## Backlog rows
+
+| Row | Can close? | Evidence |
+|---|---|---|
+| `p-rchuoa2v3k` | Lower half only | Confined send and read proven by `permissions`, `forwarder`, `mailbox_routes` (green) and one live send to the secretary (run 4); the live persona-by-persona send and read did not complete. |
+| `p-ia2v33b54u` | No | `typed_wake`, `nudge_typed` and composer vectors green; no live wake was timed and the half-typed case never ran. |
+| `p-bifjfd5rix` | No | Cross-machine covered only at the `mailbox_routes` layer; the live remote case was not run. |
+
+The supervisor decides on each row; the rerun row carries what is left.

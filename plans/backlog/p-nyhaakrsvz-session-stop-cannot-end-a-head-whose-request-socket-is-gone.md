@@ -18,3 +18,5 @@ created: 2026-11-25
 # Notes
 
 Evidence: `plans/261124-0004-heads-operate-without-owner/reports/integration.md`, section "Gaps between the permission table and real use", gap 2. Same report notes the sibling gap `p-o4juyw2ntg` (`git recover` is `allow` but settles a chain only for its own writer).
+
+Seen again 2026-11-26 on head:shaper-ready-plan-runs-unattended (pane w6:p2CH, generation 1, request socket lost): `fgos session stop shaper --name ready-plan-runs-unattended --reason done` run by the owner, and the same stop run by the secretary twice, each ended `stop-not-ended: did not end within 30000 ms of its stop request`, and the head stayed `alive`. So the gap is not only the supervisor's caller: any caller is refused to end such a head. A restart ordered by the owner (rotate is refused role-mismatch for a non-self head) was blocked by it. Root cause of the lost socket: p-tep6reiuef.

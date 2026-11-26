@@ -16,7 +16,7 @@
       },
       "whenKeysVersion": {
         "type": "integer",
-        "description": "version of when-keys.v1.json the set was checked against"
+        "description": "version of when-keys.v2.json the set was checked against"
       },
       "digest": {
         "type": "string",

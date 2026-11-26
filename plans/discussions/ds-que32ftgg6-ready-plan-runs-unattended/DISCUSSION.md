@@ -1,12 +1,29 @@
 ---
 id: ds-que32ftgg6
 title: "A ready plan runs unattended: what `ready` must guarantee so the owner can walk away"
-status: open
+status: paused
 source: []
 created: 2026-11-26
 ---
 
-discussion: open
+discussion: paused
+
+## Hand-off (2026-11-26 17:52 +07)
+
+**Content settled (D1-D5); state `paused` on purpose.** Owner chose exit A (round 19): this discussion is not handed to a planner. It joins the one table of open backlog rows and discussions about the work lifecycle, as ds-3in4yb5thk does, and plans are ordered there together with what they depend on. `settled` would raise `discussion-settled`, which starts a planner (`fgos-supervisor` SKILL, "Event discussion-settled"), so the marker stays `paused` until that table orders it; then a session sets `settled`.
+
+**Split (2026-11-26 18:40 +07, owner):** the ACE part of this discussion, the `when:` label keys of §6 (D2, D3), moved to `plans/discussions/ds-k435vz65l2-when-key-rename/DISCUSSION.md` (settled, handed to a planner so ACE can go fast). Everything else stays here, still `paused`, including renaming the Work item field `kind` and the persona file field `role:`.
+
+- **Outcome:** a plan at `ready` runs to `done` without the owner. Every foreseeable question is answered before `ready`: by the standing rule (D4, U1-U7), by the owner's `core` / `debt-ok` marks at discussion settle (D1), or by one batched owner question for what goes beyond the rule (U5). The full gate runs before land through a door the lead may call (D5).
+- **Constraints:** no hardcoding: the rule lives in rule units selected by the `when:` keys of D2-D3 (domain, workType, role, persona, ...), with doors, executors and file sets read from data (permission table, project config, prior-art commits, drift checks). No new mechanism beyond the D5 door (RUL104). Every caller of a renamed field moves in the same change (L10).
+- **Non-goals:** the run-time ask rule (ds-jxoz3h2qgk); the widen door for a running plan (ds-mzyircswox); `delivery` and admission (ds-ipvis4jkpc); the backlog-to-ready flow (ds-3in4yb5thk); renaming ACE's `when:` keys (moved to ds-k435vz65l2); building ACE. Renaming the Work item field `kind` and the persona file field `role:` stays here, not yet designed (§6, end).
+- **Acceptance criteria:**
+  1. A core rule unit carries U2-U7 and a coding domain unit carries U1, placed per §6; `core/skills/_shared/plan-contract.md` points at them instead of restating them.
+  2. `node scripts/plan-contract-check.mjs --plan <dir>` refuses `ready` for a plan without the "Unattended run" section, with a host step lacking argv or executor, with an unmarked acceptance criterion, or with a U5 item lacking an answered `q-` id; each case has a fixture.
+  3. A confined lead runs the D5 door on a worktree and gets the project's `release.checks` results; a failing check reports red and changes nothing on main.
+  4. Replay: the three evidence plans (261122-0118, 261121-2110, 261120-0625), re-checked against the new contract, show each foreseeable class of their owner questions (footprint, hands, cleanup, acceptance deviation) caught before `ready`; the replay report lists what is still not caught.
+- **Open points that block only some parts:** selecting rules by `workType` / `role` needs the key registry v2 of ds-k435vz65l2 and ACE's read path; until then the units land in today's format and reach every agent. U1's run-time widening needs ds-mzyircswox's door.
+- **Sources:** ds-jxoz3h2qgk (evidence-question-classification.md, §5 rounds 7, 10, 11), ds-ipvis4jkpc, ds-3in4yb5thk, ds-mzyircswox.
 
 ## Seed
 
@@ -65,6 +82,12 @@ Round 13 (17:05): D3 settles persona, role, `sessionType`, `agentFamily`. The fu
 
 Rounds 14-16 (17:14-17:3x): `agentFamily` (model family) and `agentCli` (agent program) are a pair; `agentCli` is kept only for rules about CLI-specific tools, hooks or permissions (§3 rows 17-18). The new key set has 11 keys in three groups (end of §6).
 
+Round 17 (17:3x): the owner approved U1-U4 and U6; with U5 and U7 earlier, the standing rule is D4. Still open: who runs the full gate and when (§3 row 11), and where this discussion goes when settled (the owner said not to a planner yet).
+
+Round 18 (17:43): D5, the full gate runs before land through a new door the lead may call. Open: where this discussion goes when settled.
+
+Round 19 (17:52): content settled (D1-D5), §7 filled, marker `paused` to wait for the lifecycle table (owner exit A). To resume: read the hand-off block at the top.
+
 ## 2. Mục tiêu & đề bài
 
 The owner settles a discussion, a planner writes the plan, the plan goes `ready`, and the owner walks away believing every foreseeable question is answered. On return he finds the plan stalled on questions he calls silly, or never started at all. Of 163 owner questions from 2026-11-19 to 2026-11-26, about 140 were asked after a plan existed, and the large classes were foreseeable at planning time: 40 footprint widens, about 45 "hands" requests from confined heads, 18 cleanups, and 8 acceptance deviations from outcomes that bundled the core with the cleanup. Three plans produced 66 of them. The goal is that `ready` means "can run to `done` without the owner": every foreseeable question is answered when the plan is approved, so the only questions left at run time are genuine deviations that the four-part ask rule of ds-jxoz3h2qgk-when-to-ask lets through. This discussion defines what `ready` guarantees and how that is checked. It does not own the flow to `ready` (ds-3in4yb5thk-backlog-to-ready-pipeline), the run-time ask rule (ds-jxoz3h2qgk-when-to-ask), or the door that widens a running plan's footprint (ds-mzyircswox-widen-a-running-plan-footprint).
@@ -83,7 +106,7 @@ The owner settles a discussion, a planner writes the plan, the plan goes `ready`
 | 8 | Who approves the pre-decided answers, and when | **Rõ (owner, chat 13:41), D-ID next round** | Three sources. (1) The owner decides the core / `debt-ok` split of acceptance when the discussion settles. (2) The standing rule for the repeating classes (cleanup through the safe door, host steps run by the supervisor through the permission table, `debt-ok` becoming a named backlog row) is recorded as process law in the plan contract and skills; the owner does not approve it separately. (3) Anything plan-specific a planner wants beyond that rule asks the owner once, batched, before `ready`. Owner: "cái anh phải chốt là những vấn đề riêng của plan thôi". q-ypgj7zverd cancelled with this answer. |
 | 9 | Mechanical check or reviewer judgment | Leaning | Structural parts (the section exists, every host step names an argv and executor, every criterion is marked `core` or `debt-ok`) go into `plan-contract-check.mjs`, so `ready` refuses without them. Completeness of the footprint trace stays the validator's judgment, helped by the wiring list of row 2. |
 | 10 | Where the wiring set of a new verb or route comes from | **Leaning L10 (scout, round 8)** | No list is needed, in a rule or in the model. Door rows own one job each (e.g. `verb-manifest-projection`), but no row says which doors a new verb passes. The repo already holds the answer twice. (a) Prior art: the last commit that added the same kind of entry point lists its files, e.g. `799f40349` (new verb: `apps/fgos/src/routing.rs`, `cli_projector.rs`, `wiring/mod.rs`, `wiring/<x>.rs`, `command-manifest.json`, `command-routes.json`, `command-route-annotations.json`, `src/cli/command-registry.mjs`, Cargo files), `b98c5d788` (verb on an existing crate), `31dcaab69` (head-request verb: `head-request.v1.json`, `head-grants.mjs`, `head-request.mjs`). AGENTS.md already requires this prior-art step (`git log -S`). (b) The drift checks that fail on missing wiring (`scripts/export-command-selectors.mjs --check`, `test/rust-host/command-routes.test.mjs`, the flag-drift test) name what is missing. So the coding rule unit says: copy the file set of the nearest earlier commit that added the same kind of entry point, then add what the drift checks name. No new mechanism (RUL104). |
-| 11 | Who runs the full gate on a plan's integrated tree | **Clear (scout, round 8); leaning L11** | No door does it today. `fgos release run` runs the recipe's `checks` (`npm test`, `cargo test --workspace`, owner q-dhhezn67em) "from the project root" (`.fgos/config.yaml` `release.checks`), i.e. on main after landing, then `fgctl upgrade`, the probe, and `fgctl repair` on failure. The land door's `land.gates` do run unconfined on the merge candidate, but only focused tests (`{tests}`), cargo fmt, the one-door scan, the selector check and the plan check. Unit sandboxes cannot run the full suites (the hands evidence). Options: (A) acceptance "full gate green" is met after the plan's lands by the supervisor's `release run`, whose checks are the full suites; a red run applies nothing, and the reverse path is reverting the plan's lands (fits U7: one step, then a strict check). (B) a new door that runs the release `checks` on a named worktree before landing. Leaning A: it uses existing doors and adds nothing (RUL104); its cost is that a red full gate is found on main, where it blocks other lands until reverted. B only if that cost shows up in practice. |
+| 11 | Who runs the full gate on a plan's integrated tree | **Settled D5 (owner round 18)** | No door does it today: `fgos release run` runs `release.checks` (`npm test`, `cargo test --workspace`) on main after landing and then applies `fgctl upgrade`, tying every plan to a release (against ds-ipvis4jkpc D1: a step ends at plan done on main); `land.gates` run only focused checks; unit sandboxes cannot run the full suites (about 15 hands questions). Options were A (land, then `release run`: no new code, but a red main blocks every head until reverted, and each plan becomes a release), B (one door that runs the project's `release.checks` on a named worktree before landing), C (full suites as a land gate: every land, even docs, gets slow). Owner chose B and granted it to the lead. Makes the existing contract rule (integration phase re-runs the full gate on the combined tree, `plan-contract.md` §4) executable. |
 | 12 | **Placement: rule units via ACE/ASC, keyed by what the work is** | **Leaning (owner round 9)** | Owner 16:07: rules must be told apart by `domain` and work `kind`, maybe `workflow`, not necessarily down to `stage`; each domain has common rules, and each kind of work in it has its own. Shaper agrees and drops `stage` as the main key. Two axes: **what the work is** (`domain` -> `domain` + kind -> optionally `workflow`), which decides the content; and **who reads it** (`role`/`persona`: planner, validator, lead), which keeps a planning rule away from a worker. `stage` is used only where a rule really changes inside one workflow, which none of this discussion's rules needs. Layers for this discussion: core (every domain and kind): U2-U7 for planner, validator, lead; `domain: coding`, every kind: U1's reference tracing; `domain: coding` + kind `feature` (a new entry point): the wiring set from prior-art commits. Scout found two gaps: (a) ACE's `when:` key `kind` already means the start kind (`head`, `worker`, `setup`, `hook`; `packages/agent-context-engine/contracts/when-keys.v1.json`), not the work kind (`domains/coding/registry.yaml` `classification.kind`: bug, chore, design, docs, feature, task), so work kind needs its own key, a change in ACE's key registry; (b) `workflowFor` in the coding registry is empty, so every kind resolves to the `feature` workflow (`resolveWorkflow`, `src/state/domain-registry.mjs:207`), and keying by `workflow` alone cannot tell kinds apart today. Both are ACE / domain-registry matters, recorded here as inputs, not designed here. |
 | 13 | **Two ways to split a plan; the second is a mindset choice** | **Leaning (owner, round 7)** | Owner 14:52 corrected the round 6 framing (there is no tension with parallel phases). (1) Split a plan into the smallest pieces that can run in parallel: always right, unchanged (`plan-contract.md` §4). (2) Splitting into step-by-step releases that each keep the running system stable and compatible is a human-era habit: work a person needs 7 days for becomes 7 releases, each carrying temporary compatibility and stability work that is removed after the last one. An agent does the same work in about 2 hours, so it may instead take one big step: temporary disruption inside it, done when it ends. Condition: before starting, it works out a real reverse path (seal the state first, including state outside the worktree), never "just do it". This is a decision lens (cost of waiting vs cost of being wrong), not a mandate: the planner chooses per plan. Fits L10 and RUL104 (move every caller and delete the old path in the same change). Lands as U7 in the core rule unit (§6). |
 | 14 | Do rules change by stage in other domains | **Clear (scout, round 10)** | Yes, where a stage crosses a boundary: into an external or irreversible act (publish, send, pay, sign) or to a different actor (author vs reviewer vs approver). Evidence: `domains/marketing/workflows/content-publish.yaml` binds such rules to its steps as data: `must: consent-before-publish` (guard `human-consent` on `copy-approved`), `publish-writes-isolated` (guard `write-scope-isolation`), a `persona: brand-guardian` on the draft step, a human `gate` on the approval step. So a stage-bound rule mostly lives in the workflow definition, as a guard the engine enforces, not as prose in ACE. ACE's `stage` key already exists (`when-keys.v1.json`), so readiness costs nothing: keep the key, do not key by stage by default, use it only for prose guidance that changes at such a boundary and cannot be a workflow guard. |
@@ -98,10 +121,12 @@ The owner settles a discussion, a planner writes the plan, the plan goes `ready`
 |---|---|---|
 
 | D1 | Pre-decided answers come from three sources. (1) The owner marks each acceptance criterion `core` or `debt-ok` when the discussion settles. (2) The standing rule for repeating classes is process law, recorded with no owner approval. (3) Anything plan-specific beyond that rule asks the owner once, batched, before `ready`. The owner settles only plan-specific matters. | Owner chat 13:41 (§5 round 3), held unchanged through rounds 4 and 5; q-ypgj7zverd cancelled with this answer. |
-| D2 | Naming for the rename item (§3 row 15): the kind of work is `workType` (ACE `when:` key and the Work item / initiative field); the moment in an agent's life is `agentLifecycle`, a key with many values (`setup`, `hook`, session start, ...). Both replace today's overloaded `kind`. | Owner 16:40 (proposed) and 16:5x "chốt workType và agentLifecycle". Carried to the rename backlog item; not designed here. |
-| D3 | Meanings and names for the rename item: **persona** = who the agent is (its charter, one of `core/agents/*.yaml`); **role** = the part it plays in one workflow step (producer, reviewer, implementer, researcher), only that meaning; a seat address (`head:<persona>-<name>`, `lead:MAIL`) is an instance name, never a rule key; **sessionType** (`head`, `worker`) = the form of the session, replacing the proposed `agentRole`; **agentFamily** + **agentCli** = a pair: the model family (claude, openai, gemini) and the agent CLI that runs it (claude-code, codex, pi, omp, agy); e.g. claude/claude-code, openai/codex, openai/pi, gemini/agy. `agentCli` replaces ACE's `cli`; executor and invocation stay a third, lower level. | Owner 17:00 (`agentFamily`), 17:05 ("có đồng ý" to §3 rows 16-17), 17:14 (family/cli is a pair; pi and omp are CLIs, not families). |
+| D2 | Naming for the rename item (§3 row 15): the kind of work is `workType` (ACE `when:` key and the Work item / initiative field); the moment in an agent's life is `agentLifecycle`, a key with many values (`setup`, `hook`, session start, ...). Both replace today's overloaded `kind`. | Owner 16:40 (proposed) and 16:5x "chốt workType và agentLifecycle". Carried to the rename backlog item; not designed here. Carried forward in ds-k435vz65l2 (2026-11-26). |
+| D3 | Meanings and names for the rename item: **persona** = who the agent is (its charter, one of `core/agents/*.yaml`); **role** = the part it plays in one workflow step (producer, reviewer, implementer, researcher), only that meaning; a seat address (`head:<persona>-<name>`, `lead:MAIL`) is an instance name, never a rule key; **sessionType** (`head`, `worker`) = the form of the session, replacing the proposed `agentRole`; **agentFamily** + **agentCli** = a pair: the model family (claude, openai, gemini) and the agent CLI that runs it (claude-code, codex, pi, omp, agy); e.g. claude/claude-code, openai/codex, openai/pi, gemini/agy. `agentCli` replaces ACE's `cli`; executor and invocation stay a third, lower level. | Owner 17:00 (`agentFamily`), 17:05 ("có đồng ý" to §3 rows 16-17), 17:14 (family/cli is a pair; pi and omp are CLIs, not families). Carried forward in ds-k435vz65l2 (2026-11-26). |
+| D4 | The standing rule U1-U7 of §6 is process law for every plan: U1 footprint traced by rule (prior-art commit plus drift checks; references of changed symbols; generated files regenerated); U2 every host step names an `fgos` argv and an executor the permission table allows, run by the supervisor at a lead's request, a `deny` or doorless step keeps the plan from `ready`; U3 fixed cleanup (lead lists, supervisor removes through the delivered door); U4 `core` / `debt-ok` on every criterion, unmarked = `core`, debt recorded by the lead and opened as a backlog row by the secretary; U5 the five beyond-the-rule classes ask the owner once before `ready`; U6 the contract check enforces shape only; U7 the split lens. Placement as rule units per D3 and §6. | Owner: U5 at 14:35, U7 explained 14:52, U1-U4 and U6 at 17:3x ("đồng ý cả U1, U2, U3, U4, U6"). U3 and U4 corrected for grants before approval. |
+| D5 | The full gate of a plan runs before it lands, through one door that runs the project's `release.checks` (data in the project config, not hardcoded) on a named worktree, unconfined, with no release step. The lead may call it (a `lead` row in `head-permissions.v1.json`), so a plan's integration phase needs no owner and no supervisor. `release run` is unchanged. | Owner 17:43 "chọn B, cho lead quyền chạy" (§3 row 11). |
 
-U5's list (§6) was accepted by the owner in round 6; it becomes a D-ID after one more round without change.
+
 
 ## 5. Q&A log
 
@@ -143,9 +168,16 @@ U5's list (§6) was accepted by the owner in round 6; it becomes a D-ID after on
 
 - 2026-11-26 17:3x +07, owner (chat), round 16: agrees: keep `agentCli` as proposed in §3 row 18 (only for rules naming a CLI-specific tool, hook or permission model; ability keys only if CLI rules start repeating).
 
+- 2026-11-26 17:3x +07, owner (chat), round 17: agreed U1, U2, U3, U4, U6 as presented. Before presenting, the shaper corrected two grant errors in the draft: U3 (the lead cannot remove worktrees; it lists them and the supervisor removes them) and U4 (no head writes the backlog; the lead records the debt and the secretary opens the row). D4 minted for U1-U7.
+
+- 2026-11-26 17:43 +07, owner (chat), round 18: chose B for the full gate (run the project's checks on the plan's worktree before land) and granted it to the lead. Shaper: D5; U2 table and §7 updated.
+
+- 2026-11-26 17:52 +07, owner (chat), round 19: chose exit A: put this discussion on the lifecycle table with ds-3in4yb5thk, not on a planner. Shaper: hand-off block written; marker `paused` because `settled` starts a planner automatically; §7 filled.
+- 2026-11-26 18:40 +07, owner via shaper head `when-key-rename` (chat): the ACE label part (§6 key table, D2, D3) is split into ds-k435vz65l2, settled there and handed to a planner; everything else stays here and this discussion stays `paused`. Edited by that shaper on the owner's explicit permission: hand-off split note, non-goals, open points, §6 label section, D2 and D3 forward notes.
+
 ## 6. Thiết kế đã chốt {#design}
 
-Draft, round 5 (2026-11-26 14:05 +07), for the owner to read; not settled, no D-ID. It is the standing rule of §3 row 8 source 2: written once as process law, no per-plan approval.
+Settled as D4 (round 17, 2026-11-26), placement per D3. It is the standing rule of §3 row 8 source 2: written once as process law, no per-plan approval.
 
 ### Nơi luật sống: rule units, không hardcode (owner, round 5)
 
@@ -174,16 +206,17 @@ At run time, widening by a file that serves the plan's own acceptance is a direc
 
 | Step | Door | Executor |
 |---|---|---|
-| full gate on the integrated tree; release stage and activate | `fgos release run` (the project's recipe in `.fgos/config.yaml`) | supervisor |
+| full gate on the integrated tree, before land | the new full-gate door (D5), running the project's `release.checks` on the plan's worktree | lead |
+| release stage and activate | `fgos release run` (the project's recipe in `.fgos/config.yaml`) | supervisor |
 | stuck land on main | `fgos git recover` | supervisor |
 | remove a delivered worktree | `fgos worktree remove --delivered-to <ref>` | supervisor |
 | config change already decided | `fgos config patch <file>` (protected paths refused) | supervisor |
 
-A lead asks for these through `supervisor raise --kind coordination-help` naming the plan's listed argv, never through an owner question. A step whose argv the table answers `deny`, or that no door can run, makes the plan not `ready`. `release run` runs these checks on main after the plan lands, not on the plan branch; the full gate is met there and reversed by reverting the plan's lands (§3 row 11, leaning A).
+A lead asks for these through `supervisor raise --kind coordination-help` naming the plan's listed argv, never through an owner question. A step whose argv the table answers `deny`, or that no door can run, makes the plan not `ready`. The full gate runs before land through the D5 door, called by the lead (§3 row 11).
 
-**U3. Cleanup is fixed, not invented.** The land door removes a landed branch's worktree. The lead's closing step removes superseded worktrees whose tip is on main or on the branch that replaced them (through U2's delivered door), deletes merged branches, stops its own duplicate runs, and lists unmerged branches and dirty worktrees in its closing report without deleting them. No plan restates this; a plan states only cleanup that differs.
+**U3. Cleanup is fixed, not invented.** The land door removes a landed branch's worktree. At close, the lead lists its superseded worktrees (tip on main or on the branch that replaced them), its merged branches and its own duplicate runs; the supervisor removes them through `fgos worktree remove --delivered-to`, which refuses undelivered work (the lead holds only `worktree create`; removal is a supervisor row in `head-permissions.v1.json`). Unmerged branches and dirty worktrees go into the closing report and are deleted by nobody. No plan restates this; a plan states only cleanup that differs.
 
-**U4. Every acceptance criterion is `core` or `debt-ok`.** The mark comes from the settled discussion, where the owner decides it (source 1). A `debt-ok` criterion that cannot be met inside the plan's frame becomes a named backlog row (`fgos identity mint backlog`), cited in the plan, and the plan still reaches `done`. A `core` criterion that cannot be met is a real deviation and goes to the run-time ask rule of ds-jxoz3h2qgk. A criterion the discussion left unmarked counts as `core`.
+**U4. Every acceptance criterion is `core` or `debt-ok`.** The mark comes from the settled discussion, where the owner decides it (D1 source 1). A criterion the discussion left unmarked counts as `core`. A `debt-ok` criterion that cannot be met inside the plan's frame does not stop the plan: the lead records the remainder as named debt in its closing report in the plan directory and asks the secretary to open the backlog row (no head writes `plans/backlog.md`; q-nudu6zlusf), and the plan still reaches `done`. A `core` criterion that cannot be met is a real deviation and goes to the run-time ask rule of ds-jxoz3h2qgk.
 
 **U5. Beyond the rule asks once, before `ready`.** A planner that needs any of these puts them in one batched owner question before `ready`, and only the phases they touch wait:
 - debt on a `core` criterion, or narrowing a `core` criterion;
@@ -218,26 +251,32 @@ flowchart LR
   RUN --> DONE[done]
 ```
 
-### Hình dạng mới của bộ nhãn `when:` (D2, D3; input for the rename item, not built here)
+### Hình dạng mới của bộ nhãn `when:` (moved)
 
-Three groups, one question each. Names in the left column are the new names; the right column says what they replace.
+The key set (three groups: what the work is, who the agent is, when in its life), its values and value sources are settled in `plans/discussions/ds-k435vz65l2-when-key-rename/DISCUSSION.md` (its D1-D4 and §6), which supersedes the key table that stood here. Refinements made there: `setup` and `hook` are ASC deliveries, not `agentLifecycle` values; `sessionType` gains `hand-opened`; `agentLifecycle` starts with `start` and `rotate`; `agentCli` values are the agent-protocol adapter ids (`claude`, not `claude-code`).
 
-| Group | Key | Values (examples) | Replaces |
-|---|---|---|---|
-| **What the work is** | `domain` | coding, marketing, council | unchanged |
-| | `workType` | bug, chore, design, docs, feature, task (from `domains/<d>/registry.yaml`) | new key; the Work item / initiative field `kind` |
-| | `workflow` | feature, bugfix, content-publish | unchanged; optional |
-| | `stage` | a step of the workflow | unchanged; unused by default (§3 row 14) |
-| | `project` | project id | unchanged |
-| **Who the agent is** | `persona` | shaper, lead, planner, supervisor, code-reviewer | unchanged name, meaning fixed: the charter |
-| | `role` | producer, reviewer, implementer, researcher | unchanged name, narrowed: part in a workflow step only |
-| | `sessionType` | head, worker | half of today's `kind` |
-| | `agentFamily` | claude, openai, gemini (the model family) | new key; matches the runner's `modelPolicies` keys |
-| | `agentCli` | claude-code, codex, pi, omp, agy (the agent CLI) | `cli` |
-| **When in the agent's life** | `agentLifecycle` | setup, start, hook, ... (many values; the item lists them) | the other half of today's `kind` |
-
-Outside ACE, the same item renames: the Work item / initiative `kind` to `workType`, and the free-text `role:` line in `core/agents/*.yaml` (neither meaning) to something like `summary`. Every caller moves in the same change and the old names are deleted (L10, RUL104).
+Still here, not designed yet: renaming the Work item / initiative field `kind` to `workType`, and the free-text `role:` line in `core/agents/*.yaml` and `domains/*/agents/*.yaml` (neither a persona nor a workflow role). ds-k435vz65l2 §3 rows 3 and 8 hold the scout for both: the Work field is stored in the append-only event log and printed in `--json` envelopes; the persona field's only reader is `scripts/project-agents.mjs`, which prints it as the heading, so `title` fits better than `summary`. Every caller moves in the same change and the old names are deleted (L10, RUL104).
 
 ## 7. Danh mục hạng mục / task {#tasks}
+
+### Rule units for the standing rule {#task-rule-units}
+- Goal: write U2-U7 as one core rule unit and U1 as one coding domain unit (`domains/coding/instructions/`), `when:` per §6; repoint `plan-contract.md`, `fgos-coding-planning` and `fgos-coding-validating` at them.
+- §6: U1-U7, placement table. D-IDs: D3, D4.
+- Draft verify: the instruction projection shows both units; `rg` finds no restated copy of U1-U7 in skills.
+- Sibling: the key rename item (selection by `workType`/`role`).
+
+### Contract section and check {#task-contract-check}
+- Goal: add the "Unattended run" section to the plan contract and its shape checks (U6) to `scripts/plan-contract-check.mjs`.
+- D-IDs: D4 (U2, U4, U5, U6).
+- Draft verify: `node scripts/plan-contract-check.mjs --plan <fixture>` fails each missing part and passes a complete fixture.
+
+### Replay on the evidence plans {#task-replay}
+- Goal: re-check plans 261122-0118, 261121-2110 and 261120-0625 against the new contract and report which question classes are caught before `ready`.
+- Draft verify: the replay report under the plan's `reports/`.
+
+### Full-gate door {#task-full-gate-door}
+- Goal: one door that runs the project's `release.checks` on a named worktree, unconfined, without any release step, callable by the lead through the head permission window (D5). Reuses the command runner of `release run`; adds a `lead` row to `packages/session-host/contracts/head-permissions.v1.json`.
+- Draft verify: a lead in a confined head runs the door on a worktree and gets the checks' exit codes; the same call with a failing check reports red without touching main.
+- Sibling: U2 (the door is the executor of the full-gate host step).
 
 Filled once §3 settles.

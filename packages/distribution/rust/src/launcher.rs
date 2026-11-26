@@ -21,6 +21,10 @@
 //! and never overwrites the latter. The marker text never changes: an older launcher must still read as ours so
 //! the fix replaces it. The bodies are the bytes the earlier Node module wrote
 //! (`tests/goldens/launcher-digests.json`).
+//!
+//! Inside a linked worktree (where `.fgos` is absent and `.git` is a file), the launcher resolves the main
+//! checkout through `gitdir` and `commondir`, requires it to be owned by the calling user and not a symlink, and
+//! runs that project's activated release.
 
 use std::io;
 use std::path::{Path, PathBuf};
@@ -576,6 +580,83 @@ mod tests {
         assert!(String::from_utf8_lossy(&outside.stderr).contains("no .fgos\\installation found"));
     }
 
+    #[cfg(windows)]
+    #[test]
+    fn the_cmd_launcher_refuses_a_linked_worktree_by_name() {
+        use std::process::Command;
+        let sb = Sandbox::new("cmd-wt");
+        let launcher = sb.bin.join("fgos.cmd");
+        write_launcher(&launcher, true).unwrap();
+        let state = sb.root.join("state");
+
+        let wt = sb.root.join("wt");
+        let wt_sub = wt.join("src").join("deep");
+        std::fs::create_dir_all(&wt_sub).unwrap();
+        let git_file = wt.join(".git");
+        std::fs::write(&git_file, "gitdir: C:\\somewhere\\worktrees\\wt1\r\n").unwrap();
+
+        let run = |args: &[&str], cwd: &Path| {
+            let mut command = Command::new("cmd.exe");
+            command
+                .args(["/d", "/c"])
+                .arg(&launcher)
+                .args(args)
+                .current_dir(cwd);
+            command.env("FGOS_STATE_ROOT", &state);
+            command.output().unwrap()
+        };
+
+        let inside = run(&["doctor"], &wt);
+        assert_eq!(inside.status.code(), Some(126));
+        let stderr = String::from_utf8_lossy(&inside.stderr);
+        assert!(
+            stderr.contains(&format!("fgos: refusing {}", git_file.display())),
+            "status {:?}, stderr {stderr}",
+            inside.status
+        );
+        assert!(
+            stderr.contains(
+                "fgos cannot resolve a linked worktree's main checkout safely with cmd builtins"
+            ),
+            "stderr {stderr}"
+        );
+        assert!(
+            stderr.contains("run fgos from the main checkout"),
+            "stderr {stderr}"
+        );
+
+        let inside_sub = run(&["doctor"], &wt_sub);
+        assert_eq!(inside_sub.status.code(), Some(126));
+        let stderr_sub = String::from_utf8_lossy(&inside_sub.stderr);
+        assert!(
+            stderr_sub.contains(&format!("fgos: refusing {}", git_file.display())),
+            "stderr {stderr_sub}"
+        );
+        assert!(
+            stderr_sub.contains(
+                "fgos cannot resolve a linked worktree's main checkout safely with cmd builtins"
+            ),
+            "stderr {stderr_sub}"
+        );
+        assert!(
+            stderr_sub.contains("run fgos from the main checkout"),
+            "stderr {stderr_sub}"
+        );
+
+        let elsewhere = sb.root.join("elsewhere");
+        std::fs::create_dir_all(&elsewhere).unwrap();
+        let outside = run(&["doctor"], &elsewhere);
+        assert_eq!(outside.status.code(), Some(127));
+        assert!(String::from_utf8_lossy(&outside.stderr).contains("no .fgos\\installation found"));
+
+        let normal_repo = sb.root.join("normal_repo");
+        std::fs::create_dir_all(normal_repo.join(".git")).unwrap();
+        let normal_outside = run(&["doctor"], &normal_repo);
+        assert_eq!(normal_outside.status.code(), Some(127));
+        assert!(String::from_utf8_lossy(&normal_outside.stderr)
+            .contains("no .fgos\\installation found"));
+    }
+
     #[cfg(unix)]
     mod script {
         use super::*;
@@ -912,6 +993,168 @@ mod tests {
                     && result.stderr.contains("fgctl init"),
                 "{}",
                 result.stderr
+            );
+        }
+
+        #[test]
+        fn from_a_linked_worktree_outside_the_main_checkout_the_launcher_runs_the_main_checkouts_store_release_and_names_the_project_on_stderr(
+        ) {
+            let sb = Sandbox::new("linked-wt");
+            let launcher = launcher(&sb);
+            let state = sb.root.join("state");
+            put_release(&state, DIGEST_A, "release-a");
+            let main = sb.root.join("main");
+            put_activation(&main, &[("status", "ready"), ("artifactDigest", DIGEST_A)]);
+            let main_git = main.join(".git");
+            let wt_gitdir = main_git.join("worktrees").join("wt1");
+            std::fs::create_dir_all(&wt_gitdir).unwrap();
+            std::fs::write(wt_gitdir.join("commondir"), "../..\n").unwrap();
+
+            let wt = sb.root.join("wt");
+            let wt_sub = wt.join("src").join("deep");
+            std::fs::create_dir_all(&wt_sub).unwrap();
+            std::fs::write(
+                wt.join(".git"),
+                format!("gitdir: {}\n", wt_gitdir.display()),
+            )
+            .unwrap();
+
+            let env = [("FGOS_STATE_ROOT", state.to_str().unwrap())];
+            let out_root = run(&launcher, &["doctor"], &wt, &env);
+            assert_eq!(out_root.status, 0, "stderr: {}", out_root.stderr);
+            assert!(out_root.stdout.starts_with("release-a args=doctor "));
+            assert!(
+                out_root
+                    .stderr
+                    .contains(&format!("fgos: using project {}", main.display())),
+                "expected main in stderr: {}",
+                out_root.stderr
+            );
+
+            let out_sub = run(&launcher, &["version"], &wt_sub, &env);
+            assert_eq!(out_sub.status, 0, "stderr: {}", out_sub.stderr);
+            assert!(out_sub.stdout.starts_with("release-a args=version "));
+            assert!(
+                out_sub
+                    .stderr
+                    .contains(&format!("fgos: using project {}", main.display())),
+                "expected main in stderr: {}",
+                out_sub.stderr
+            );
+        }
+
+        #[test]
+        fn a_linked_worktree_with_missing_commondir_relative_gitdir_bad_commondir_or_no_activation_is_refused_by_name(
+        ) {
+            let sb = Sandbox::new("wt-refuse");
+            let launcher = launcher(&sb);
+            let state = sb.root.join("state");
+            put_release(&state, DIGEST_A, "release-a");
+            let env = [("FGOS_STATE_ROOT", state.to_str().unwrap())];
+
+            let main = sb.root.join("main");
+            put_activation(&main, &[("status", "ready"), ("artifactDigest", DIGEST_A)]);
+            let main_git = main.join(".git");
+            let wt_gitdir = main_git.join("worktrees").join("wt1");
+            std::fs::create_dir_all(&wt_gitdir).unwrap();
+            std::fs::write(wt_gitdir.join("commondir"), "../..\n").unwrap();
+
+            let wt = sb.root.join("wt");
+            std::fs::create_dir_all(&wt).unwrap();
+            std::fs::write(
+                wt.join(".git"),
+                format!("gitdir: {}\n", wt_gitdir.display()),
+            )
+            .unwrap();
+
+            // 1. missing commondir
+            std::fs::remove_file(wt_gitdir.join("commondir")).unwrap();
+            let out_nocd = run(&launcher, &["doctor"], &wt, &env);
+            assert_eq!(out_nocd.status, 126);
+            assert!(!out_nocd.stdout.contains("release-a"));
+            assert!(
+                out_nocd.stderr.contains("missing commondir"),
+                "{}",
+                out_nocd.stderr
+            );
+
+            // 2. a relative gitdir
+            std::fs::write(wt_gitdir.join("commondir"), "../..\n").unwrap();
+            std::fs::write(wt.join(".git"), "gitdir: relative/gitdir/path\n").unwrap();
+            let out_rel = run(&launcher, &["doctor"], &wt, &env);
+            assert_eq!(out_rel.status, 126);
+            assert!(!out_rel.stdout.contains("release-a"));
+            assert!(
+                out_rel.stderr.contains("gitdir is relative"),
+                "{}",
+                out_rel.stderr
+            );
+
+            // 3. common dir not named .git
+            std::fs::write(
+                wt.join(".git"),
+                format!("gitdir: {}\n", wt_gitdir.display()),
+            )
+            .unwrap();
+            std::fs::write(wt_gitdir.join("commondir"), "../../not-named-dot-git\n").unwrap();
+            let out_badcd = run(&launcher, &["doctor"], &wt, &env);
+            assert_eq!(out_badcd.status, 126);
+            assert!(!out_badcd.stdout.contains("release-a"));
+            assert!(
+                out_badcd.stderr.contains("common dir is not named .git"),
+                "{}",
+                out_badcd.stderr
+            );
+
+            // 4. no activation in main checkout
+            let main_noact = sb.root.join("main_noact");
+            let wt_noact_gitdir = main_noact.join(".git").join("worktrees").join("wt1");
+            std::fs::create_dir_all(&wt_noact_gitdir).unwrap();
+            std::fs::write(wt_noact_gitdir.join("commondir"), "../..\n").unwrap();
+            let wt_noact = sb.root.join("wt_noact");
+            std::fs::create_dir_all(&wt_noact).unwrap();
+            std::fs::write(
+                wt_noact.join(".git"),
+                format!("gitdir: {}\n", wt_noact_gitdir.display()),
+            )
+            .unwrap();
+            let out_noact = run(&launcher, &["doctor"], &wt_noact, &env);
+            assert_eq!(out_noact.status, 126);
+            assert!(!out_noact.stdout.contains("release-a"));
+            assert!(
+                out_noact
+                    .stderr
+                    .contains("no activation found in main checkout"),
+                "{}",
+                out_noact.stderr
+            );
+
+            // 5. symlink gitdir
+            let symlink_gitdir = sb.root.join("symlink_gitdir");
+            std::os::unix::fs::symlink(&wt_gitdir, &symlink_gitdir).unwrap();
+            std::fs::write(
+                wt.join(".git"),
+                format!("gitdir: {}\n", symlink_gitdir.display()),
+            )
+            .unwrap();
+            let out_sym = run(&launcher, &["doctor"], &wt, &env);
+            assert_eq!(out_sym.status, 126);
+            assert!(!out_sym.stdout.contains("release-a"));
+            assert!(
+                out_sym.stderr.contains("gitdir is a symlink"),
+                "{}",
+                out_sym.stderr
+            );
+
+            // 6. empty .git file refused as missing gitdir
+            std::fs::write(wt.join(".git"), "").unwrap();
+            let out_empty = run(&launcher, &["doctor"], &wt, &env);
+            assert_eq!(out_empty.status, 126);
+            assert!(!out_empty.stdout.contains("release-a"));
+            assert!(
+                out_empty.stderr.contains("missing gitdir"),
+                "{}",
+                out_empty.stderr
             );
         }
     }

@@ -3,7 +3,11 @@
 //! write and after every read of the stream.
 
 use crate::caller::{Caller, CallerSource};
-use crate::record::{Acked, Answered, Asked, Asker, Cancelled, ACKED, ANSWERED, ASKED, CANCELLED};
+use crate::notifier::{Notifier, OwnerMailbox};
+use crate::record::{
+    Acked, AnswerPayload, Answered, Asked, Asker, Cancelled, DeliveryPending, Recipient, ACKED,
+    ANSWERED, ASKED, CANCELLED, DELIVERY_PENDING,
+};
 use crate::refcheck;
 use crate::refusal::Refusal;
 use crate::shape;
@@ -99,6 +103,29 @@ fn not_asker(id: &str) -> Refusal {
     )
 }
 
+fn check_answer(
+    question: &Question,
+    option: Option<&str>,
+    text: Option<&str>,
+) -> Result<(), Refusal> {
+    if option.is_none() && text.is_none() {
+        return Err(Refusal::incomplete(
+            "an answer needs option, text or both",
+            vec!["option|text".into()],
+        ));
+    }
+    if let Some(label) = option {
+        let options = &question.asked.parts.options;
+        if !options.is_empty() && !options.iter().any(|o| o.label == label) {
+            return Err(Refusal::unclear(
+                "option",
+                "must be the label of one of the options",
+            ));
+        }
+    }
+    Ok(())
+}
+
 fn io_refusal(detail: impl Into<String>) -> Refusal {
     Refusal::new("event-store-io", detail)
 }
@@ -157,6 +184,16 @@ impl Questions<'_> {
     /// Checks the input and the ref, fills the asker, mints the id and appends `questions.asked`; with
     /// `supersedes`, cancels the old question with reason `superseded:<new id>`. Returns the new id.
     pub fn ask(&self, input: &Value) -> Result<Done<String>, Refusal> {
+        self.ask_with_notifier(input, &OwnerMailbox)
+    }
+
+    /// Uses the registered outbound channel adapter. Delivery failures never undo
+    /// or fail a durable ask: the pending record and warning expose them instead.
+    pub fn ask_with_notifier(
+        &self,
+        input: &Value,
+        notifier: &dyn Notifier,
+    ) -> Result<Done<String>, Refusal> {
         platform()?;
         let caller = self.caller.caller()?;
         let checked = shape::check(input)?;
@@ -174,31 +211,46 @@ impl Questions<'_> {
         let id = random(RandomKind::Question)
             .map_err(|e| io_refusal(format!("minting a question id: {e}")))?;
         let now = iso_utc_now();
-        self.append(
-            ASKED,
-            &Asked {
-                id: id.clone(),
-                asked_at: now.clone(),
-                asker: Asker {
-                    session_id: caller.session_id.clone(),
-                    handle: caller.handle.clone(),
-                    roles: caller.roles.clone(),
-                    persona: caller.persona.clone(),
-                    pane: caller.pane.clone(),
-                    machine: caller.machine.clone(),
-                },
-                stage: checked.stage,
-                origin,
-                headline: checked.headline,
-                blocks: checked.blocks,
-                parts: checked.parts,
-                migrated: checked.migrated,
-                supersedes: checked.supersedes.clone(),
+        let asked = Asked {
+            id: id.clone(),
+            to: checked.to,
+            asked_at: now.clone(),
+            asker: Asker {
+                session_id: caller.session_id.clone(),
+                handle: caller.handle.clone(),
+                roles: caller.roles.clone(),
+                persona: caller.persona.clone(),
+                pane: caller.pane.clone(),
+                machine: caller.machine.clone(),
             },
-        )?;
+            stage: checked.stage,
+            origin,
+            headline: checked.headline,
+            blocks: checked.blocks,
+            parts: checked.parts,
+            migrated: checked.migrated,
+            supersedes: checked.supersedes.clone(),
+        };
+        self.append(ASKED, &asked)?;
+        let mut earlier = notifier.deliver(&asked).err().map(|refusal| {
+            let pending = DeliveryPending {
+                id: id.clone(),
+                reason: refusal.code.clone(),
+                at: now.clone(),
+            };
+            match self.append(DELIVERY_PENDING, &pending) {
+                Ok(()) => format!(
+                    "{id} delivery pending: {}: {}",
+                    refusal.code, refusal.detail
+                ),
+                Err(error) => format!(
+                    "{id} delivery pending: {}; pending record not written: {error}",
+                    refusal.code
+                ),
+            }
+        });
         // The new question is written; a refused cancel leaves the old one open and is reported, not
         // failed, so a retry does not ask twice.
-        let mut earlier = None;
         if let Some(old) = checked.supersedes {
             let cancel = self.append(
                 CANCELLED,
@@ -210,10 +262,14 @@ impl Questions<'_> {
                 },
             );
             if let Err(refusal) = cancel {
-                earlier = Some(format!(
+                let warning = format!(
                     "{old} is still open, its cancel was refused: {}: {}; run cancel on it",
                     refusal.code, refusal.detail
-                ));
+                );
+                earlier = Some(match earlier {
+                    Some(delivery) => format!("{delivery}; {warning}"),
+                    None => warning,
+                });
             }
         }
         self.finish_with(id, earlier)
@@ -250,12 +306,6 @@ impl Questions<'_> {
             option.filter(|s| !s.is_empty()),
             text.filter(|s| !s.is_empty()),
         );
-        if option.is_none() && text.is_none() {
-            return Err(Refusal::incomplete(
-                "an answer needs --option, --text or both",
-                vec!["option|text".into()],
-            ));
-        }
         let fold = self.read()?;
         let question = fold.get(id).ok_or_else(|| unknown(id))?;
         match question.state {
@@ -268,15 +318,7 @@ impl Questions<'_> {
             }
             State::Cancelled => return Err(not_open(id, "answer", question.state)),
         }
-        if let Some(label) = option {
-            let options = &question.asked.parts.options;
-            if !options.is_empty() && !options.iter().any(|o| o.label == label) {
-                return Err(Refusal::unclear(
-                    "option",
-                    "must be the label of one of the options",
-                ));
-            }
-        }
+        check_answer(question, option, text)?;
         self.append(
             ANSWERED,
             &Answered {
@@ -286,6 +328,57 @@ impl Questions<'_> {
                 by: OWNER.to_owned(),
                 via: source.map(str::to_owned),
                 answered_at: iso_utc_now(),
+                answerer: None,
+                channel: None,
+                untrusted: false,
+            },
+        )?;
+        self.finish(())
+    }
+
+    /// Accepts an attestation from a trusted channel adapter, not raw webhook
+    /// identity claims. Signature checking is the gateway adapter's responsibility.
+    /// Content stays untrusted even when the answerer's identity was verified.
+    pub fn answer_external(
+        &self,
+        id: &str,
+        answerer: &Recipient,
+        payload: &AnswerPayload,
+        channel: &str,
+    ) -> Result<Done<()>, Refusal> {
+        platform()?;
+        let fold = self.read()?;
+        let question = fold.get(id).ok_or_else(|| unknown(id))?;
+        if question.state != State::Open {
+            return Err(not_open(id, "answer_external", question.state));
+        }
+        if question.asked.to.as_ref() != Some(answerer) {
+            return Err(Refusal::new(
+                "answerer-mismatch",
+                "the channel's attested answerer is not this question's recipient",
+            ));
+        }
+        if channel.trim().is_empty() {
+            return Err(Refusal::incomplete(
+                "an external answer needs a channel",
+                vec!["channel".into()],
+            ));
+        }
+        let option = payload.option.as_deref().filter(|s| !s.is_empty());
+        let text = payload.text.as_deref().filter(|s| !s.is_empty());
+        check_answer(question, option, text)?;
+        self.append(
+            ANSWERED,
+            &Answered {
+                id: id.to_owned(),
+                option: option.map(str::to_owned),
+                text: text.map(str::to_owned),
+                by: answerer.reference().to_owned(),
+                via: None,
+                answered_at: iso_utc_now(),
+                answerer: Some(answerer.clone()),
+                channel: Some(channel.to_owned()),
+                untrusted: true,
             },
         )?;
         self.finish(())
@@ -348,7 +441,10 @@ impl Questions<'_> {
     pub fn list(&self, which: Which) -> Result<Done<Listing>, Refusal> {
         platform()?;
         let fold = self.read()?;
-        let needs_you = fold.questions().filter(|q| q.state == State::Open).count();
+        let needs_you = fold
+            .questions()
+            .filter(|q| q.state == State::Open && q.asked.to.is_none())
+            .count();
         let questions = fold
             .questions()
             .filter(|q| match which {

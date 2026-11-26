@@ -201,6 +201,23 @@ pub fn read_plan(dir: &str, text: &str) -> Result<Plan, PlanRefusal> {
     })
 }
 
+/// A refused plan needs admission judgement only when its frontmatter identifies it as ready.
+/// Old, ended and unreadable documents carry no evidence of admission duty.
+pub fn refused_ready_plan(text: &str) -> bool {
+    let Some((front, _)) = split_frontmatter(text) else {
+        return false;
+    };
+    let Ok(doc) = parse(front.as_bytes(), Profile::Tool, "plan.md") else {
+        return false;
+    };
+    let Value::Map(entries) = doc.value() else {
+        return false;
+    };
+    entries.iter().any(|(key, value)| {
+        key == "status" && matches!(value, Value::Str(status) if status == "ready")
+    })
+}
+
 /// The text between the opening `---` line and the next `---` line, and what follows.
 fn split_frontmatter(text: &str) -> Option<(&str, &str)> {
     let text = text.strip_prefix('\u{FEFF}').unwrap_or(text);
@@ -256,16 +273,49 @@ pub fn footprint_problem(plan: &Plan) -> Option<&'static str> {
 pub fn admissible<'a>(plans: &'a [Plan], done_dirs: &[String]) -> Vec<&'a Plan> {
     plans
         .iter()
-        .filter(|p| p.status == "ready")
-        .filter(|p| p.blocked_by.iter().all(|b| done_dirs.contains(b)))
-        .filter(|p| footprint_problem(p).is_none())
-        .filter(|p| {
-            !plans.iter().any(|r| {
-                r.status == "running"
-                    && fgos_write_scope::scopes_overlap(&p.footprint, &r.footprint).unwrap_or(false)
-            })
-        })
+        .filter(|p| p.status == "ready" && admission_hold(p, plans, done_dirs).is_none())
         .collect()
+}
+
+/// The admission classifier shared by the read view and the wake door. An invalid footprint
+/// needs judgement; dependency and overlap holds are ordinary capacity decisions.
+pub fn admission_hold(plan: &Plan, plans: &[Plan], done_dirs: &[String]) -> Option<&'static str> {
+    if !plan.blocked_by.iter().all(|b| done_dirs.contains(b)) {
+        return Some("held-blocked");
+    }
+    if let Some(problem) = footprint_problem(plan) {
+        return Some(problem);
+    }
+    plans
+        .iter()
+        .any(|r| {
+            r.status == "running"
+                && fgos_write_scope::scopes_overlap(&plan.footprint, &r.footprint).unwrap_or(false)
+        })
+        .then_some("held-footprint-overlap")
+}
+
+/// Edit only admission frontmatter through the YAML document door, preserving the phase table,
+/// notes and all other fields. The adapter publishes these bytes through the paths land door.
+pub fn admitted_text(text: &str, role: &str, base: &str) -> Result<String, String> {
+    let (front, _) = split_frontmatter(text).ok_or("plan-frontmatter-missing")?;
+    let mut doc = parse(front.as_bytes(), Profile::Tool, "plan.md").map_err(|e| e.to_string())?;
+    for (key, value) in [("status", "running"), ("lead", role), ("base", base)] {
+        doc.set(
+            &[fgos_yaml_doc::Segment::Key(key.to_owned())],
+            Value::Str(value.to_owned()),
+            fgos_yaml_doc::CommentLoss::Refuse,
+        )
+        .map_err(|e| e.to_string())?;
+    }
+    let start = text.find('\n').ok_or("plan-frontmatter-missing")? + 1;
+    let edited = String::from_utf8(doc.to_bytes()).map_err(|e| e.to_string())?;
+    Ok(format!(
+        "{}{}{}",
+        &text[..start],
+        edited,
+        &text[start + front.len()..]
+    ))
 }
 
 fn cut(text: &str, max: usize) -> &str {

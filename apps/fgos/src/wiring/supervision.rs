@@ -430,6 +430,17 @@ fn config_int(root: &Path, key: &str, default: i64) -> i64 {
         .unwrap_or(default)
 }
 
+/// Admission ceilings have defaults only in the config standard. Missing or malformed values
+/// refuse instead of silently disabling a cap or registering another default here.
+fn required_capacity(root: &Path, key: &str) -> Result<usize, String> {
+    effective_value(root, key)
+        .map_err(|_| format!("config-unreadable:{key}"))?
+        .and_then(|v| v.as_u64())
+        .and_then(|n| usize::try_from(n).ok())
+        .filter(|n| *n > 0)
+        .ok_or_else(|| format!("config-invalid:{key}"))
+}
+
 fn config_strings(root: &Path, key: &str) -> Vec<String> {
     config_value(root, key)
         .and_then(|v| v.as_array().cloned())
@@ -573,9 +584,10 @@ impl HostPortfolio {
             };
             match portfolio::read_plan(dir, &text) {
                 Ok(plan) => plans.push(plan),
-                Err(why) => {
-                    refused.push(json!({"dir": dir, "code": why.code(), "detail": why.to_string()}))
-                }
+                Err(why) => refused.push(json!({
+                    "dir": dir, "code": why.code(), "detail": why.to_string(),
+                    "needsJudgement": portfolio::refused_ready_plan(&text)
+                })),
             }
         }
         portfolio::order(&mut plans);
@@ -618,11 +630,15 @@ impl watcher::Portfolio for HostPortfolio {
 }
 
 impl wake::Portfolio for HostPortfolio {
-    fn plans(&self) -> Result<Vec<Plan>, String> {
-        self.read()
-    }
-    fn done_dirs(&self) -> Result<Vec<String>, String> {
-        Ok(Self::done(&self.read()?))
+    fn read(&self) -> Result<(Vec<Plan>, Vec<String>), String> {
+        self.read_with_refusals().map(|(plans, refused)| {
+            let ready_refusals = refused
+                .iter()
+                .filter(|r| r["needsJudgement"] == true)
+                .filter_map(|r| r["dir"].as_str().map(str::to_owned))
+                .collect();
+            (plans, ready_refusals)
+        })
     }
 }
 
@@ -687,6 +703,91 @@ impl wake::Identity for HostIdentity {
                 project_id: s.project_id.clone().unwrap_or_default(),
             },
         }
+    }
+    fn lead_roles(&self, project_id: &str) -> Result<Vec<String>, String> {
+        let sessions = role_holders().map_err(|_| "identity-unreadable".to_owned())?;
+        Ok(sessions
+            .into_iter()
+            .filter(|s| s.project_id.as_deref() == Some(project_id))
+            .flat_map(|s| s.roles.into_iter().filter(|r| r.starts_with("head:lead-")))
+            .collect())
+    }
+}
+
+struct HostAdmission {
+    root: PathBuf,
+}
+
+impl wake::Admission for HostAdmission {
+    fn capacity(&self) -> Result<wake::Capacity, String> {
+        let max_leads = required_capacity(&self.root, "supervisor.maxLeads")?;
+        let ceiling = required_capacity(&self.root, "workerSlots.ceiling")?;
+        let lanes = fgos_run_supervisor::lanes::snapshot(
+            &fgos_holder_lock::state_root::lock_root(),
+            ceiling as u64,
+        );
+        Ok(wake::Capacity {
+            max_leads,
+            free_lanes: usize::try_from(lanes.free).map_err(|_| "lane-count-invalid".to_owned())?,
+        })
+    }
+
+    fn admit(&self, plan: &Plan, role: &str) -> Result<(), String> {
+        let main = fgos_git::main_checkout_root(&self.root)
+            .map_err(|_| "land-root-unreadable".to_owned())?
+            .ok_or("land-root-not-a-repository")?;
+        let path = format!("plans/{}/plan.md", plan.dir);
+        let publisher = super::session_write_publish::publisher();
+        let actor = writer();
+        (publisher.catch_up)(&main, &actor).map_err(|e| match e {
+            fgos_run_supervisor::route::CatchUpRefusal::BranchAhead(_) => {
+                "write-branch-ahead".to_owned()
+            }
+            fgos_run_supervisor::route::CatchUpRefusal::Busy { code, .. } => code,
+            fgos_run_supervisor::route::CatchUpRefusal::Refused(why) => why.code,
+        })?;
+        if !(publisher.path_clean)(&main, &path).map_err(|e| e.code)? {
+            return Err("admission-path-dirty".to_owned());
+        }
+        // A git tree may name symlinks; never follow one into a different directory at write time.
+        for part in [
+            main.join("plans"),
+            main.join("plans").join(&plan.dir),
+            main.join(&path),
+        ] {
+            if std::fs::symlink_metadata(part)
+                .map_err(|_| "admission-path-unreadable")?
+                .file_type()
+                .is_symlink()
+            {
+                return Err("admission-path-symlink".to_owned());
+            }
+        }
+        let file = main.join(&path);
+        let original = std::fs::read_to_string(&file).map_err(|_| "admission-path-unreadable")?;
+        if portfolio::read_plan(&plan.dir, &original).map_err(|e| e.code())? != *plan {
+            return Err("admission-plan-stale".to_owned());
+        }
+        let (driver, repo) = GitDriver::open_at(&main)
+            .map_err(|_| "land-git-unavailable")?
+            .ok_or("land-root-not-a-repository")?;
+        let base = trunk_tip(&driver, &repo)?;
+        let edited = portfolio::admitted_text(&original, role, base.as_str())?;
+        let dir = file.parent().ok_or("admission-path-unreadable")?;
+        fgos_durable_file::replace_durably(dir, "plan.md", edited.as_bytes())
+            .map_err(|_| "admission-write-failed")?;
+        // This publisher composes Supervision's existing paths land (catch-up, gate, commit, push).
+        // A refusal never starts a session; undo only our still-uncommitted bytes on the normal path.
+        if let Err(why) = (publisher.publish)(&main, &path, "keeper", &actor) {
+            if (publisher.path_clean)(&main, &path).is_ok_and(|clean| !clean)
+                && std::fs::read_to_string(&file).is_ok_and(|text| text == edited)
+            {
+                fgos_durable_file::replace_durably(dir, "plan.md", original.as_bytes())
+                    .map_err(|_| format!("{}:admission-restore-failed", why.code))?;
+            }
+            return Err(why.code);
+        }
+        Ok(())
     }
 }
 
@@ -1461,6 +1562,12 @@ fn with_wake_ports<T>(
         start: &start,
         stop: &stop,
         portfolio: &portfolio,
+        admission: &HostAdmission {
+            root: root.to_path_buf(),
+        },
+        questions: &StoreOpenQuestions {
+            root: root.to_path_buf(),
+        },
         queue: &queue,
         log: &log,
         clock: &Clock,
@@ -2082,8 +2189,8 @@ pub fn answer(
                     "no project id yet; run `fgos identity project --init`",
                 )
             })?;
-            let max_leads =
-                usize::try_from(config_int(root, "supervisor.maxLeads", 4)).unwrap_or(4);
+            let max_leads = required_capacity(root, "supervisor.maxLeads")
+                .map_err(|e| refused("supervisor-config-invalid", e))?;
             let view = supervisor::plans(
                 &plans,
                 &HostPortfolio::done(&plans),

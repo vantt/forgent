@@ -104,10 +104,10 @@ report:
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Launcher in a linked worktree](phase-01-launcher-in-linked-worktree.md) | - | packages/distribution/rust/src/launcher.rs, packages/distribution/rust/src/launcher.sh, packages/distribution/rust/src/launcher-cmd.txt, packages/distribution/rust/tests/goldens/launcher-digests.json | 1 | running |
+| 1 | [Launcher in a linked worktree](phase-01-launcher-in-linked-worktree.md) | - | packages/distribution/rust/src/launcher.rs, packages/distribution/rust/src/launcher.sh, packages/distribution/rust/src/launcher-cmd.txt, packages/distribution/rust/tests/goldens/launcher-digests.json | 1 | done |
 | 2 | [Integration](phase-02-integration.md) | 1 | plans/261126-0856-launcher-runs-owning-release-in-linked-worktree/reports/integration.md | 2 | ready |
 
-Phase 1 run: ticket `c-1594-1795683208377` (gemini, worktree `forgent-worktrees/261126-0856-launcher-runs-owning-release-in-linked-worktree-p01`) was still running after 12 waits; resume with `fgos request result c-1594-1795683208377`.
+Phase 1 landed on main as 95f5c01e5 (land ticket `c-37819-1795694710721`).
 
 Contract check: one implementation phase, and the integration phase in a later wave. No hot file is in the
 footprint. Capability: phase 1 `code:implement`, phase 2 `code:test`.

@@ -2,8 +2,25 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://fgos.invalid/questions/question-event-payloads.v1.json",
   "title": "Question event payloads v1",
-  "description": "The payload of each type declared in question-event-streams.v1.json. The store writes these four payloads and the fold reads them; nothing else writes them. Timestamps are ISO-8601 UTC instants.",
+  "description": "The payload of each type declared in question-event-streams.v1.json. The store writes these payloads and the fold reads them; nothing else writes them. Timestamps are ISO-8601 UTC instants.",
   "$defs": {
+    "recipient": {
+      "description": "Logical addresses, not person names. Role aliases follow Identity and require a lead:, work: or head: prefix.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": { "enum": ["role", "party"] },
+        "ref": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "role" } } },
+          "then": { "properties": { "ref": { "pattern": "^(lead:[A-Z][A-Z0-9-]{0,15}|work:[a-z][a-z0-9-]{0,29}|head:[a-z][a-z0-9-]{0,96})$" } } },
+          "else": { "properties": { "ref": { "pattern": "^[a-z][a-z0-9-]*:[A-Za-z0-9._-]+$" } } }
+        }
+      ]
+    },
     "questionId": { "type": "string", "pattern": "^q-[a-z0-9]+$" },
     "instant": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$" },
     "text": { "type": "string", "minLength": 1 },
@@ -73,6 +90,7 @@
       "properties": {
         "id": { "$ref": "#/$defs/questionId" },
         "askedAt": { "$ref": "#/$defs/instant" },
+        "to": { "$ref": "#/$defs/recipient" },
         "asker": { "$ref": "#/$defs/asker" },
         "stage": { "$ref": "#/$defs/text" },
         "ref": { "$ref": "#/$defs/ref" },
@@ -89,13 +107,17 @@
       "additionalProperties": false,
       "required": ["id", "by", "answeredAt"],
       "anyOf": [{ "required": ["option"] }, { "required": ["text"] }],
+      "dependentRequired": { "channel": ["answerer", "untrusted"], "answerer": ["channel", "untrusted"] },
       "properties": {
         "id": { "$ref": "#/$defs/questionId" },
         "option": { "$ref": "#/$defs/text" },
         "text": { "$ref": "#/$defs/text" },
         "by": { "$ref": "#/$defs/text" },
         "via": { "$ref": "#/$defs/text" },
-        "answeredAt": { "$ref": "#/$defs/instant" }
+        "answeredAt": { "$ref": "#/$defs/instant" },
+        "answerer": { "$ref": "#/$defs/recipient" },
+        "channel": { "$ref": "#/$defs/text", "description": "Trusted channel adapter attesting the answerer; payload content remains untrusted." },
+        "untrusted": { "const": true }
       }
     },
     {
@@ -106,6 +128,17 @@
       "properties": {
         "id": { "$ref": "#/$defs/questionId" },
         "by": { "$ref": "#/$defs/text" },
+        "at": { "$ref": "#/$defs/instant" }
+      }
+    },
+    {
+      "title": "questions.delivery-pending",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "reason", "at"],
+      "properties": {
+        "id": { "$ref": "#/$defs/questionId" },
+        "reason": { "$ref": "#/$defs/text" },
         "at": { "$ref": "#/$defs/instant" }
       }
     },

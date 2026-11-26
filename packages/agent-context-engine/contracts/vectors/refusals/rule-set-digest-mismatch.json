@@ -1,7 +1,7 @@
 {
   "set": {
     "schemaVersion": 1,
-    "whenKeysVersion": 1,
+    "whenKeysVersion": 2,
     "digest": "0000000000000000000000000000000000000000000000000000000000000000",
     "rules": [
       {

@@ -697,4 +697,25 @@ fn a_step_failing_after_the_write_is_a_warning_so_a_retry_never_asks_twice() {
         .contains(&format!("{old} is still open")));
     let q = wired(&log, &who, &checkout);
     assert_eq!(q.show(&old).unwrap().value.state, State::Open);
+
+    // Delivery and its pending record are also post-write steps: a store failure
+    // cannot turn a durable recipient ask into a failure that callers retry.
+    let log = Faulty {
+        inner: MemLog::default(),
+        reads_ok: std::cell::Cell::new(usize::MAX),
+        refuse_type: "questions.delivery-pending",
+    };
+    let mut value = input("plan:p");
+    value["to"] = json!({"kind": "party", "ref": "customer:42"});
+    let done = wired(&log, &who, &checkout).ask(&value).unwrap();
+    assert!(done.warning.unwrap().contains("pending record not written"));
+    assert_eq!(log.inner.events.borrow().len(), 1);
+    assert_eq!(
+        wired(&log, &who, &checkout)
+            .show(&done.value)
+            .unwrap()
+            .value
+            .state,
+        State::Open
+    );
 }

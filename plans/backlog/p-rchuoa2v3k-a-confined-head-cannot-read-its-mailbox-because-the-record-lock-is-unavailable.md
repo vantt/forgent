@@ -1,7 +1,7 @@
 ---
 id: p-rchuoa2v3k
 title: "A confined head's mailbox read fails with lock-unavailable, so mail sent to a lead is never read by it (session-host, mailbox; source: the heads-operate lead, 2026-11-25)"
-status: proposed
+status: done
 priority: P2
 area: session-host
 created: 2026-11-25

@@ -1,12 +1,13 @@
 //! The wake door and the supervisor verbs over fake ports, one behaviour per test.
 use fgos_supervision::{
+    keeper::{self, Action, Caps, Decision, History, Input, Need, Players, Raise, Snapshot},
     portfolio::{head_name, read_plan, supervisor_name, Plan},
     queue::{QueueError, RaisedEvent},
     supervisor::{self, Asker, Askers},
     wake::{
-        stop_stuck, wake, Activity, Clock, Drain, Holder, Identity, Portfolio, Ports, Project,
-        ProjectInfo, Settings, StartSession, StopSession, StuckOutcome, Telemetry, Trigger,
-        WakeLog, WakeOutcome, WakeSpan, WakeState,
+        stop_stuck, wake, Activity, Admission, Capacity, Clock, Drain, Holder, Identity, Portfolio,
+        Ports, Project, ProjectInfo, Settings, StartSession, StopSession, StuckOutcome, Telemetry,
+        Trigger, WakeLog, WakeOutcome, WakeSpan, WakeState,
     },
 };
 use std::cell::{Cell, RefCell};
@@ -18,11 +19,26 @@ struct Fake {
     project: Option<ProjectInfo>,
     holder: RefCell<Option<Holder>>,
     holder_roles: RefCell<Vec<String>>,
+    unknown_roles: Vec<String>,
+    identity_error: Option<String>,
+    later_identity_error: Option<String>,
+    portfolio_reads: Cell<usize>,
     plans_unreadable: bool,
+    plan_unclassified: bool,
     mark_error: Cell<Option<&'static str>>,
     events: RefCell<Vec<RaisedEvent>>,
     handled: RefCell<Vec<(String, String)>>,
     plans: Vec<Plan>,
+    capacity: Option<Capacity>,
+    later_capacity: Option<Capacity>,
+    capacity_reads: Cell<usize>,
+    capacity_error: Option<String>,
+    later_capacity_error: Option<String>,
+    publication_attempts: Cell<usize>,
+    admission_error: Option<String>,
+    admitted: RefCell<Vec<(String, String)>>,
+    published: RefCell<Vec<Plan>>,
+    questions: Vec<String>,
     started: RefCell<Vec<(String, String)>>,
     start_error: RefCell<Option<String>>,
     activity: Cell<Option<Activity>>,
@@ -61,6 +77,8 @@ impl Fake {
             start: self,
             stop: self,
             portfolio: self,
+            admission: self,
+            questions: self,
             queue: self,
             log: self,
             clock: self,
@@ -102,6 +120,9 @@ impl Project for Fake {
 impl Identity for Fake {
     fn holder(&self, role: &str) -> Holder {
         self.holder_roles.borrow_mut().push(role.into());
+        if self.unknown_roles.iter().any(|r| r == role) {
+            return Holder::Unknown;
+        }
         if self.live_roles.borrow().iter().any(|r| r == role) {
             return Holder::Live {
                 project_id: "p1".into(),
@@ -109,9 +130,83 @@ impl Identity for Fake {
         }
         self.holder.borrow().clone().unwrap()
     }
+    fn lead_roles(&self, _: &str) -> Result<Vec<String>, String> {
+        let error = if self.capacity_reads.get() > 1 {
+            self.later_identity_error
+                .as_ref()
+                .or(self.identity_error.as_ref())
+        } else {
+            self.identity_error.as_ref()
+        };
+        if let Some(code) = error {
+            return Err(code.clone());
+        }
+        Ok(self
+            .live_roles
+            .borrow()
+            .iter()
+            .chain(&self.unknown_roles)
+            .filter(|r| r.starts_with("head:lead-"))
+            .cloned()
+            .collect())
+    }
+}
+impl supervisor::OpenQuestions for Fake {
+    fn has_open(&self, reference: &str) -> bool {
+        self.questions.iter().any(|r| r == reference)
+    }
+}
+impl Admission for Fake {
+    fn capacity(&self) -> Result<Capacity, String> {
+        let reads = self.capacity_reads.get();
+        self.capacity_reads.set(reads + 1);
+        let error = if reads > 0 {
+            self.later_capacity_error
+                .as_ref()
+                .or(self.capacity_error.as_ref())
+        } else {
+            self.capacity_error.as_ref()
+        };
+        if let Some(code) = error {
+            return Err(code.clone());
+        }
+        let capacity = if reads > 0 {
+            self.later_capacity.or(self.capacity)
+        } else {
+            self.capacity
+        };
+        Ok(capacity.unwrap_or(Capacity {
+            max_leads: 4,
+            free_lanes: 4,
+        }))
+    }
+    fn admit(&self, plan: &Plan, role: &str) -> Result<(), String> {
+        self.publication_attempts
+            .set(self.publication_attempts.get() + 1);
+        if let Some(code) = &self.admission_error {
+            return Err(code.clone());
+        }
+        self.admitted
+            .borrow_mut()
+            .push((plan.dir.clone(), role.to_owned()));
+        let mut published = plan.clone();
+        published.status = "running".to_owned();
+        published.lead = Some(role.to_owned());
+        self.published.borrow_mut().push(published);
+        Ok(())
+    }
 }
 impl StartSession for Fake {
     fn start(&self, persona: &str, name: &str) -> Result<(), String> {
+        if persona == "lead" {
+            assert!(
+                self.admitted
+                    .borrow()
+                    .iter()
+                    .any(|(_, role)| role == &format!("head:lead-{name}")),
+                "publish must precede start"
+            );
+        }
         self.started
             .borrow_mut()
             .push((persona.into(), name.into()));
@@ -134,14 +229,17 @@ impl StopSession for Fake {
     }
 }
 impl Portfolio for Fake {
-    fn plans(&self) -> Result<Vec<Plan>, String> {
+    fn read(&self) -> Result<(Vec<Plan>, Vec<String>), String> {
+        self.portfolio_reads.set(self.portfolio_reads.get() + 1);
         if self.plans_unreadable {
             return Err("plans-unreadable".into());
         }
-        Ok(self.plans.clone())
-    }
-    fn done_dirs(&self) -> Result<Vec<String>, String> {
-        Ok(Vec::new())
+        let refused = if self.plan_unclassified {
+            vec!["unclassified-ready".into()]
+        } else {
+            Vec::new()
+        };
+        Ok((self.plans.clone(), refused))
     }
 }
 impl Drain for Fake {
@@ -217,11 +315,15 @@ fn an_unreadable_portfolio_is_never_read_as_nothing_admissible() {
 }
 
 #[test]
-fn capacity_events_mixed_with_other_events_start_and_are_not_marked_handled() {
+fn capacity_events_mixed_with_other_events_leave_judgement_to_the_supervisor() {
     let f = Fake::new().with_event("lane-freed").with_event("plan-done");
     assert_eq!(f.wake(), WakeOutcome::Started);
-    assert_eq!(f.events.borrow().len(), 2);
-    assert!(f.handled.borrow().is_empty());
+    assert_eq!(f.events.borrow().len(), 1);
+    assert_eq!(f.events.borrow()[0].kind, "plan-done");
+    assert_eq!(
+        *f.handled.borrow(),
+        vec![("0000000000000000".into(), "watcher".into())]
+    );
 }
 
 #[test]
@@ -649,4 +751,407 @@ fn a_short_lead_role_is_one_to_sixty_four_safe_characters() {
     assert!(!is_short_lead_role("lead:"));
     assert!(!is_short_lead_role("lead:a b"));
     assert!(!is_short_lead_role("lead:a;b"));
+}
+
+fn admission_fixture(max_leads: usize, free_lanes: usize) -> Fake {
+    let mut f = Fake::new().with_event("plan-became-ready");
+    f.capacity = Some(Capacity {
+        max_leads,
+        free_lanes,
+    });
+    // Reverse input order: the door, not the adapter, must order admissions.
+    f.plans = vec![plan("beta", "ready"), plan("alpha", "ready")];
+    f
+}
+
+fn decisions(f: &Fake) -> Vec<(String, String)> {
+    f.spans
+        .borrow()
+        .iter()
+        .filter(|s| s.subject.starts_with("plan:"))
+        .map(|s| (s.subject.clone(), s.error.clone()))
+        .collect()
+}
+
+// No existing proof exercises admission: it previously belonged to the LLM skill.
+#[test]
+fn ready_plans_are_published_then_started_in_order_under_the_cap_without_a_supervisor() {
+    let f = admission_fixture(2, 2);
+    assert_eq!(f.wake(), WakeOutcome::NothingAdmissible);
+    assert_eq!(
+        *f.started.borrow(),
+        vec![
+            ("lead".to_owned(), head_name(HANDLE, "alpha")),
+            ("lead".to_owned(), head_name(HANDLE, "beta")),
+        ]
+    );
+    assert_eq!(
+        decisions(&f),
+        vec![
+            ("plan:alpha".into(), "admitted".into()),
+            ("plan:beta".into(), "admitted".into()),
+        ]
+    );
+    assert!(f.events.borrow().is_empty());
+}
+
+#[test]
+fn a_ready_plan_over_the_live_lead_cap_is_held_with_a_reason() {
+    let mut f = admission_fixture(1, 2);
+    f.plans.push(running("working", Some("head:lead-working")));
+    f.live_roles.borrow_mut().push("head:lead-working".into());
+    assert_eq!(f.wake(), WakeOutcome::NothingAdmissible);
+    assert!(f.admitted.borrow().is_empty());
+    assert!(decisions(&f)
+        .iter()
+        .all(|(_, reason)| reason == "held-max-leads"));
+}
+
+#[test]
+fn no_free_lane_holds_ready_plans_without_starting_the_supervisor() {
+    let f = admission_fixture(2, 0);
+    assert_eq!(f.wake(), WakeOutcome::NothingAdmissible);
+    assert!(f.started.borrow().is_empty());
+    assert!(decisions(&f)
+        .iter()
+        .all(|(_, reason)| reason == "held-no-lane"));
+}
+
+#[test]
+fn admissions_reserve_a_lane_before_the_new_lead_can_take_its_worker_seat() {
+    let f = admission_fixture(2, 1);
+    f.wake();
+    assert_eq!(f.admitted.borrow().len(), 1);
+    assert_eq!(decisions(&f)[1].1, "held-no-lane");
+}
+
+#[test]
+fn an_unknown_lead_identity_holds_a_slot_even_with_an_open_owner_question() {
+    for named in [false, true] {
+        let mut f = admission_fixture(1, 2);
+        if named {
+            f.plans.push(running("working", Some("head:lead-working")));
+            f.questions.push("plan:working".into());
+        }
+        f.unknown_roles.push("head:lead-working".into());
+        assert_eq!(f.wake(), WakeOutcome::NothingAdmissible);
+        assert!(f.started.borrow().is_empty());
+        assert!(f.admitted.borrow().is_empty());
+    }
+}
+
+#[test]
+fn admission_uses_identity_leads_not_only_the_ones_named_by_running_plans() {
+    let f = admission_fixture(1, 2);
+    f.live_roles.borrow_mut().push("head:lead-orphan".into());
+    f.wake();
+    assert!(f.started.borrow().is_empty());
+    assert!(f.admitted.borrow().is_empty());
+}
+
+// The static cap cases cannot observe machine facts changing during a paths land.
+#[test]
+fn admission_rechecks_caps_and_lane_availability_after_each_publication() {
+    for (max_leads, free_lanes) in [(1, 2), (2, 0)] {
+        let mut f = admission_fixture(2, 2);
+        f.later_capacity = Some(Capacity {
+            max_leads,
+            free_lanes,
+        });
+        assert_eq!(f.wake(), WakeOutcome::NothingAdmissible);
+        assert_eq!(f.admitted.borrow().len(), 1);
+        assert_eq!(f.started.borrow().len(), 1);
+    }
+}
+
+#[test]
+fn an_unreadable_identity_directory_refuses_admission_without_consuming_the_event() {
+    let mut f = admission_fixture(2, 2);
+    f.identity_error = Some("identity-unreadable".into());
+    assert_eq!(f.wake(), WakeOutcome::Started);
+    assert!(f.admitted.borrow().is_empty());
+    assert_eq!(
+        decisions(&f),
+        vec![("plan:alpha".into(), "identity-unreadable".into())]
+    );
+    assert_eq!(f.events.borrow().len(), 1);
+}
+
+#[test]
+fn admission_preserves_the_live_waiting_leads_slot_exemption() {
+    let mut f = admission_fixture(1, 1);
+    f.plans.push(running("working", Some("lead:WAITING")));
+    f.live_roles.borrow_mut().push("lead:WAITING".into());
+    f.questions.push("plan:working#phase-01".into());
+    f.wake();
+    assert_eq!(f.admitted.borrow().len(), 1);
+    assert_eq!(decisions(&f)[0].1, "admitted");
+    assert_eq!(f.started.borrow().len(), 1);
+}
+
+#[test]
+fn a_failed_lead_start_keeps_its_published_admission_and_records_the_host_code() {
+    let f = admission_fixture(1, 2);
+    *f.start_error.borrow_mut() = Some("host-unavailable".into());
+    f.wake();
+    assert_eq!(f.admitted.borrow().len(), 1);
+    let published = f.published.borrow();
+    assert_eq!(published[0].status, "running");
+    assert_eq!(
+        published[0].lead,
+        Some(format!("head:lead-{}", head_name(HANDLE, "alpha")))
+    );
+    assert_eq!(
+        decisions(&f)[0],
+        ("plan:alpha".into(), "start-failed:host-unavailable".into())
+    );
+    assert_eq!(
+        f.events.borrow().len(),
+        1,
+        "failed admission still needs judgement"
+    );
+}
+
+#[test]
+fn a_failed_publication_never_starts_a_lead() {
+    let mut f = admission_fixture(2, 2);
+    f.admission_error = Some("land-gate-failed".into());
+    f.wake();
+    assert!(f.admitted.borrow().is_empty());
+    assert!(f
+        .started
+        .borrow()
+        .iter()
+        .all(|(persona, _)| persona == "supervisor"));
+    assert_eq!(
+        decisions(&f),
+        vec![(
+            "plan:alpha".into(),
+            "publish-failed:land-gate-failed".into()
+        )]
+    );
+    assert_eq!(
+        f.publication_attempts.get(),
+        1,
+        "lower-priority plans must wait"
+    );
+    assert_eq!(f.events.borrow().len(), 1);
+}
+
+#[test]
+fn a_new_admission_holds_overlapping_ready_plans_in_the_same_wake() {
+    let mut f = admission_fixture(2, 2);
+    f.plans[0].footprint = f.plans[1].footprint.clone();
+    f.wake();
+    assert_eq!(f.admitted.borrow().len(), 1);
+    assert_eq!(decisions(&f)[1].1, "held-footprint-overlap");
+}
+
+#[test]
+fn a_dependency_hold_is_recorded_and_never_needs_an_llm() {
+    let mut f = admission_fixture(2, 2);
+    for p in &mut f.plans {
+        p.blocked_by.push("unfinished".into());
+    }
+    assert_eq!(f.wake(), WakeOutcome::NothingAdmissible);
+    assert!(f.started.borrow().is_empty());
+    assert!(decisions(&f)
+        .iter()
+        .all(|(_, reason)| reason == "held-blocked"));
+}
+
+#[test]
+fn an_unclassifiable_ready_plan_keeps_the_event_for_judgement_without_blocking_readable_plans() {
+    let mut f = admission_fixture(2, 2);
+    f.plan_unclassified = true;
+    assert_eq!(f.wake(), WakeOutcome::Started);
+    assert_eq!(f.admitted.borrow().len(), 2);
+    assert_eq!(f.events.borrow().len(), 1);
+}
+
+#[test]
+fn a_ready_plan_with_an_invalid_footprint_goes_to_judgement() {
+    let mut f = admission_fixture(2, 2);
+    f.plans[0].footprint.clear();
+    assert_eq!(f.wake(), WakeOutcome::Started);
+    assert_eq!(decisions(&f)[1].1, "footprint-empty");
+    assert_eq!(f.admitted.borrow().len(), 1);
+}
+
+#[test]
+fn admission_fact_errors_preserve_judgement_events_even_after_a_lead_started() {
+    // Static config/Identity tests cannot observe a refusal on a later admission iteration.
+    struct BrokenKeeper<'a> {
+        fake: &'a Fake,
+        failure: &'static str,
+        raised: RefCell<Vec<Decision>>,
+    }
+    impl Snapshot for BrokenKeeper<'_> {
+        fn read(&self) -> Result<(Vec<Input>, Caps), String> {
+            if self.failure == "source" {
+                return Err("source-failed".into());
+            }
+            Ok((
+                vec![Input {
+                    record: serde_json::from_value(serde_json::json!({"item": "a", "step": "b"}))
+                        .unwrap(),
+                    item_closed: false,
+                    actor: keeper::ActorState::Unknown,
+                }],
+                Caps {
+                    starts: 0,
+                    held: Default::default(),
+                },
+            ))
+        }
+    }
+    impl History for BrokenKeeper<'_> {
+        fn read(&self) -> Result<Vec<Decision>, String> {
+            Ok(vec![])
+        }
+        fn record(&self, _: &Decision) -> Result<(), String> {
+            Ok(())
+        }
+    }
+    impl Players for BrokenKeeper<'_> {
+        fn start(&self, _: &Decision, _: &Need) -> Result<(), String> {
+            panic!("no player")
+        }
+        fn wake(&self, _: &Decision, _: &Need) -> Result<(), String> {
+            panic!("no player")
+        }
+    }
+    impl Raise for BrokenKeeper<'_> {
+        fn raise(&self, decision: &Decision, _: i64) -> Result<(), String> {
+            self.raised.borrow_mut().push(decision.clone());
+            if decision.item != "keeper" || self.failure == "all-raises" {
+                return Err("raise-failed".into());
+            }
+            let Action::Raise { event: kind, .. } = &decision.action else {
+                panic!("not a raise")
+            };
+            self.fake
+                .events
+                .borrow_mut()
+                .push(event("keeper-error", kind, &decision.item));
+            Ok(())
+        }
+    }
+    // Keeper source/raise failures must fall through too, even if reporting the failure fails.
+    for failure in ["source", "raise", "all-raises"] {
+        let f = admission_fixture(2, 2);
+        let admission = f.ports();
+        let broken = BrokenKeeper {
+            fake: &f,
+            failure,
+            raised: RefCell::new(vec![]),
+        };
+        let ports = fgos_supervision::wake::ScheduledPorts {
+            admission: &admission,
+            keeper: keeper::Ports {
+                snapshot: &broken,
+                history: &broken,
+                players: &broken,
+                raise: &broken,
+            },
+        };
+        assert_eq!(
+            wake(
+                &ports,
+                &SETTINGS,
+                Trigger {
+                    trigger: "tick",
+                    subject: "r1"
+                }
+            ),
+            WakeOutcome::Started
+        );
+        assert_eq!(f.admitted.borrow().len(), 2);
+        assert_eq!(f.started.borrow().last().unwrap().0, "supervisor");
+        assert!(
+            f.handled.borrow().is_empty(),
+            "capacity event stays open for judgement"
+        );
+        let raised = broken.raised.borrow();
+        let last = raised.last().unwrap();
+        assert!(matches!(&last.action, Action::Raise { event, .. } if event == "needs-judgement"));
+        assert_eq!(
+            last.reason,
+            if failure == "source" {
+                "keeper-failed:source-failed"
+            } else {
+                "keeper-failed:raise-failed"
+            }
+        );
+        assert_eq!(
+            f.spans.borrow().last().unwrap().error,
+            if failure == "source" {
+                "source-failed"
+            } else {
+                "raise-failed"
+            }
+        );
+    }
+    for kind in [
+        "plan-done",
+        "question-answered",
+        "lead-ended",
+        "discussion-settled",
+    ] {
+        for after_start in [false, true] {
+            for identity in [false, true] {
+                let mut f = admission_fixture(2, 2).with_event(kind);
+                let error = Some("facts-unreadable".into());
+                match (identity, after_start) {
+                    (false, false) => f.capacity_error = error,
+                    (false, true) => f.later_capacity_error = error,
+                    (true, false) => f.identity_error = error,
+                    (true, true) => f.later_identity_error = error,
+                }
+                assert_eq!(f.wake(), WakeOutcome::Started);
+                assert_eq!(f.admitted.borrow().len(), usize::from(after_start));
+                assert_eq!(f.started.borrow().last().unwrap().0, "supervisor");
+                let decisions = decisions(&f);
+                assert_eq!(
+                    decisions.last().unwrap(),
+                    &(
+                        format!("plan:{}", if after_start { "beta" } else { "alpha" }),
+                        "facts-unreadable".into(),
+                    )
+                );
+                assert_eq!(f.events.borrow().len(), 2);
+            }
+        }
+    }
+}
+
+#[test]
+fn one_portfolio_snapshot_serves_finished_head_closure_and_admission() {
+    // Admission-only tests do not prove that closure shares the same trunk snapshot.
+    let mut f = admission_fixture(3, 2);
+    let mut done = running("finished", Some("head:lead-finished"));
+    done.status = "done".into();
+    f.plans.push(done);
+    f.live_roles.borrow_mut().push("head:lead-finished".into());
+    f.activity.set(Some(Activity::Idle));
+    assert_eq!(f.wake(), WakeOutcome::NothingAdmissible);
+    assert_eq!(f.portfolio_reads.get(), 1);
+    assert_eq!(
+        f.stopped.borrow().as_slice(),
+        &[("lead".into(), "finished".into())]
+    );
+    assert_eq!(f.admitted.borrow().len(), 2);
+}
+
+#[test]
+fn unreadable_admission_config_refuses_instead_of_falling_back_to_a_cap() {
+    let mut f = admission_fixture(2, 2);
+    f.capacity_error = Some("config-invalid:supervisor.maxLeads".into());
+    assert_eq!(f.wake(), WakeOutcome::Started);
+    assert!(f.admitted.borrow().is_empty());
+    assert_eq!(
+        f.spans.borrow()[0].error,
+        "config-invalid:supervisor.maxLeads"
+    );
+    assert_eq!(f.events.borrow().len(), 1);
 }

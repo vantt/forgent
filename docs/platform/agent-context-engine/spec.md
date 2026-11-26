@@ -64,9 +64,15 @@ roles `id` (`id_scope: vault`), `lifecycle`, `valid_from`, `valid_to`, `supersed
 `conflicts_with`, `related`; fgOS fields `owner`, `kind`, `mode`, `scope`, `specificity`, `when`.
 
 `when:` maps a key to a list of allowed values (any-of); several keys all must match; empty or absent means always.
-Keys are the registry [when-keys.v1.json](../../../packages/agent-context-engine/contracts/when-keys.v1.json): `kind`,
-`cli`, `project`, `persona`, `role`, `domain`, `workflow`, `stage`, each with a value type and a live value source
-(decided 2026-11-25: ACE owns the `when:` key registry). Which keys a start supplies is ASC's start request, not here.
+Keys are the registry [when-keys.v2.json](../../../packages/agent-context-engine/contracts/when-keys.v2.json), in three
+groups, each key with a value type and a value source (decided 2026-11-25: ACE owns the `when:` key registry). What the
+work is: `domain`, `workType` (the `classification.kind` of each domain registry), `workflow`, `stage`, `project`. Who
+the agent is: `persona` (its charter; head names are persona values), `role` (its part in one workflow step, from each
+domain registry's `roleGraph`), `sessionType` (`head`, `worker`, `hand-opened`), `agentFamily` (`claude`, `openai`,
+`gemini`), `agentCli` (the agent-protocol adapter ids). When in its life the rules are put together: `agentLifecycle`
+(`start`, `rotate`; hook-event moments join as data when something composes rules at that moment). How the text reaches
+the agent (a file written at setup, a hook's injected output, an opening message, a CLI argument) is ASC's delivery, not
+a key. Which keys a start supplies is ASC's start request, not here.
 
 Decision on the component-scoped unit (`components/packaging-distribution/instructions/verification.md`): there is no
 `component` key. The unit is owned by its component through `owner`, with `scope: component` and an empty `when:`; its
@@ -166,3 +172,4 @@ supported. A reader never re-checks rules; checking is the writer's job.
 | Semantic part of the write-time check is advisory below the threshold | `rule-near-duplicate` refuses at 0.93 and above (pkm's default); between 0.84 and the threshold the top three hits are printed as candidates and never refuse; without the embedding model the check refuses with `rule-search-unavailable` and the model-fetch fix, never skipping silently. The probe found paraphrase recall weak (one of seven pairs at 0.93, four of seven in the top three), so the contract does not promise paraphrase detection. | 2026-11-26 | `plans/261125-1631-agent-context-engine/reports/pkm-fit.md` |
 | Hook gate for rule units | The pre-commit hook checks staged rule units through the host door and fails closed when the host lacks it. | 2026-11-26 | same |
 | RUL102 (composition belongs to ACE, delivery stays in packaging-distribution) | Composition belongs to ACE, delivery stays in packaging-distribution, with a weight guard: the seed moves to its own module when the first budget or tiering slice lands. The own-component decision of 2026-11-25 is that move; a successor decision is recorded when the component is registered. | 2026-10-17 | [packaging-distribution spec](../packaging-distribution/spec.md) |
+| when-key registry v2 | The registry has three groups. `workType`, `sessionType`, `agentFamily`, `agentCli` and `agentLifecycle` are added; `kind` and `cli` are removed (`setup` and `hook` are deliveries, not moments). `role` narrows to the part in a workflow step, from the domain `roleGraph`. `agentCli` values are the agent-protocol adapter ids, `agentFamily` is a static list extended by editing data. A set compiled with registry v1 is refused until recompiled. | 2026-11-26 | [ds-k435vz65l2](../../../plans/discussions/ds-k435vz65l2-when-key-rename/DISCUSSION.md) |
