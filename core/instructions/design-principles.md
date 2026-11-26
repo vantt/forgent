@@ -6,7 +6,7 @@ scope: repo
 mode: append
 specificity: 10
 title: Design Principles
-description: The owner's seven design principles for every change - one door, bottom-up layering, hexagonal drivers, Rust-first foundations, correctness first, KISS/DRY, one authority per decision
+description: The owner's eight design principles for every change - one door, bottom-up layering, hexagonal drivers, Rust-first foundations, correctness first, KISS/DRY, one authority per decision, one proof per behaviour
 lifecycle: live
 valid_from: 2026-10-17
 ---

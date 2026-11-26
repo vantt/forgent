@@ -26,4 +26,4 @@ Platform laws L1-L10 are locked in `docs/platform/platform-foundations.md#luật
 - **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform/platform-foundations.md#l9-thang-hoàn-tất-của-một-việc-run-merge-durable`)
 - **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform/platform-foundations.md#l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa`)
 
-Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack`. Changing any locked law requires superseding its decision ID rather than editing in place.
+Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack`. Laws in `docs/platform/platform-foundations.md` are fixed until their named review threshold is hit. Changing one supersedes its decision ID — never edit it in place.
