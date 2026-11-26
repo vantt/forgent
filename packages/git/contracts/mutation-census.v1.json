@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2456f7606d80a410900a4686255153afbf04373e8474f2c6e0c0c875cb773638",
+  "payloadDigest": "bd34c46e9e4b56eb1b2eae51ad3388b2ef3ebb907a596753e87521df6df19570",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "dc14ff69bc4b144893fa6988de4df6b6180ab255ef8751fd1615ad93472b9e71",
     ".agents/skills/_shared/capability-matching.md": "93cd382994e2201e4aa8ec7816d740f6da634a0ee69d6911800a848ed5de1d8b",
@@ -422,8 +422,8 @@
     "packages/distribution/rust/src/fgctl_refresh.rs": "36fd15b0c6159e9b9541fbadb2ea5a05f61c9ced1364216e6cbce45170aa4c5a",
     "packages/distribution/rust/src/git_gate.rs": "afb1b3426e71ce77c7d2483527f43a701c86a7aed073d69cf4374a84f70563f6",
     "packages/distribution/rust/src/init.rs": "efbabc2a02a3380912b1e00cbaa8fcda47e537ffa395edee6c56a06c77e94e0a",
-    "packages/distribution/rust/src/launcher.rs": "610d309b858eb0dca281daea1329e31fd3fd911292e89df8fb10baf504cf6a58",
-    "packages/distribution/rust/src/launcher.sh": "c669cabae9ce658cca3ab3e91326e96d313a7512d4737e0641519ac5df6acf70",
+    "packages/distribution/rust/src/launcher.rs": "2f8aee81e01eab8ae7ae01953e8c8c032aa6320eac137aab54a6d3f822f5100c",
+    "packages/distribution/rust/src/launcher.sh": "d4657c0876d13351a5fc50158e5846ce040c4dd9a089b9cc8575751fbe6b8760",
     "packages/distribution/rust/src/lib.rs": "3830033b1e2fd083468d50883b27b6f60663b3d16e52168182bfaf7a6961e995",
     "packages/distribution/rust/src/lock.rs": "ee39bccc87c5b34a7799ee886fe3c4b9f59346f22c550c67123efa49f9681f8e",
     "packages/distribution/rust/src/manifest.rs": "7aa7f3d42c3ac708e44cb0bbf4be36c414eaf0b29f0bdafc5bb768901fb46bda",
@@ -2890,14 +2890,21 @@
     },
     {
       "path": "packages/distribution/rust/src/launcher.rs",
-      "line": 540,
+      "line": 544,
       "spawn": "Command::new",
       "binary": "cmd.exe",
       "class": "rust-test"
     },
     {
       "path": "packages/distribution/rust/src/launcher.rs",
-      "line": 601,
+      "line": 599,
+      "spawn": "Command::new",
+      "binary": "cmd.exe",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/distribution/rust/src/launcher.rs",
+      "line": 682,
       "spawn": "Command::new",
       "binary": "? launcher of run",
       "class": "rust-test"
