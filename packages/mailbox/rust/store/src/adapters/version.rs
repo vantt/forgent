@@ -38,8 +38,30 @@ pub fn recipient_version(cli: &Cli, head: &str, sources: &VersionSources) -> Opt
             sources.max_read_bytes,
         ),
         "codex" => codex_installed_version(&sources.codex_program, CODEX_VERSION_TIMEOUT),
+        "agy" => agy_installed_version(),
         _ => None,
     }
+}
+
+/// agy's installed version, bounded like Codex's; an unrecognised output stays unknown.
+fn agy_installed_version() -> Option<String> {
+    let mut command = Command::new("agy");
+    command.arg("--version");
+    let Outcome::Exited(output) =
+        run_bounded_command(command, None, CODEX_VERSION_TIMEOUT, |_| ()).ok()?
+    else {
+        return None;
+    };
+    if !output.status.success() {
+        return None;
+    }
+    let output = String::from_utf8(output.stdout).ok()?;
+    let version = output.trim().strip_prefix("agy ").unwrap_or(output.trim());
+    (version.split('.').count() == 3
+        && version
+            .split('.')
+            .all(|part| !part.is_empty() && part.bytes().all(|b| b.is_ascii_digit())))
+    .then(|| version.to_string())
 }
 
 /// `version` of the session file of the head whose process record is

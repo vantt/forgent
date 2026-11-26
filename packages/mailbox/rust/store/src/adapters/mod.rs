@@ -133,6 +133,8 @@ pub enum NudgeChannel {
     /// (`messagingSocketPath` of its session file), only to a head that
     /// accepts cross-session input.
     ClaudeSocket,
+    /// A labelled, fixed signal typed by the host's gated pane adapter.
+    Typed,
 }
 
 /// Why an adapters contract was refused; names the offending entry.
@@ -157,6 +159,9 @@ struct RawContract {
     #[serde(rename = "source")]
     _source: String,
     tested_against: Vec<RawTested>,
+    /// Independent of hook support: a typed wake does not enable a hook drain.
+    #[serde(default)]
+    typed_nudges: BTreeMap<String, RawNudge>,
     hook_facts: BTreeMap<String, RawFacts>,
     #[serde(rename = "deferred")]
     _deferred: IgnoredAny,
@@ -270,6 +275,7 @@ pub struct TestedClis {
     facts: BTreeMap<String, AdapterFacts>,
     /// The platform each CLI's facts were measured on.
     platforms: BTreeMap<String, String>,
+    typed_nudges: BTreeMap<String, Vec<String>>,
 }
 
 impl TestedClis {
@@ -321,11 +327,24 @@ impl TestedClis {
             .into_iter()
             .map(|t| (t.cli, t.version))
             .collect();
+        let mut typed_nudges = BTreeMap::new();
+        for (cli, nudge) in raw.typed_nudges {
+            if !matches!(cli.as_str(), "claude" | "codex" | "agy")
+                || nudge.channel != "typed"
+                || nudge.versions.is_empty()
+            {
+                return Err(ContractError(format!(
+                    "typedNudges.{cli}: invalid typed channel"
+                )));
+            }
+            typed_nudges.insert(cli, nudge.versions);
+        }
         Ok(Self {
             clis,
             versions,
             facts,
             platforms,
+            typed_nudges,
         })
     }
 
@@ -383,18 +402,42 @@ impl TestedClis {
         self.clis
             .iter()
             .filter(|cli| self.facts_here(cli).is_some_and(|f| f.nudge.is_some()))
+            .chain(
+                self.typed_nudges
+                    .keys()
+                    .filter(|_| std::env::consts::OS == "linux"),
+            )
             .filter_map(|cli| Cli::new(cli).ok())
             .collect()
     }
 
-    /// The nudge channel of `cli` when `version` is one it was measured on.
+    /// The first allowed channel, preferring push to typed at its separately measured version.
     pub fn nudge_for(&self, cli: &str, version: &str) -> Option<NudgeChannel> {
+        self.nudge_channels_for(cli, version).into_iter().next()
+    }
+
+    fn push_for(&self, cli: &str, version: &str) -> Option<NudgeChannel> {
         let nudge = self.facts_here(cli)?.nudge.as_ref()?;
         nudge
             .versions
             .iter()
             .any(|v| v == version)
             .then_some(nudge.channel)
+    }
+
+    /// Push first, then the typed channel at its separately recorded terminal version.
+    /// Typed facts do not enable hooks for a CLI whose hooks remain deferred.
+    pub fn nudge_channels_for(&self, cli: &str, version: &str) -> Vec<NudgeChannel> {
+        let mut channels: Vec<_> = self.push_for(cli, version).into_iter().collect();
+        if std::env::consts::OS == "linux"
+            && self
+                .typed_nudges
+                .get(cli)
+                .is_some_and(|versions| versions.iter().any(|v| v == version))
+        {
+            channels.push(NudgeChannel::Typed);
+        }
+        channels
     }
 
     /// The CLIs whose `Stop` takes mail, by the facts usable on this

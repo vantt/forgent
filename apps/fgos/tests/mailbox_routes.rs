@@ -638,6 +638,7 @@ fn mailbox_send_inbox_and_inbox_claim_print_contract_text_and_exit_by_outcome() 
     );
     assert_eq!(out.status.code(), Some(0), "{out:?}");
     assert!(String::from_utf8_lossy(&out.stdout).starts_with("recorded "));
+    assert!(String::from_utf8_lossy(&out.stdout).contains("path: local-next-tool-call"));
     let listed = scene.run(&main, Some(WRITER), &["mailbox", "inbox"], b"");
     assert!(
         String::from_utf8_lossy(&listed.stdout).contains("state=recorded"),
@@ -2417,7 +2418,9 @@ fn a_send_to_a_session_on_another_machine_appends_one_signed_event_and_reports_r
         String::from_utf8_lossy(&out.stderr)
     );
     assert!(
-        text.starts_with("recorded ") && text.contains("not delivered"),
+        text.starts_with("recorded ")
+            && text.contains("not delivered")
+            && text.contains("path: remote-recorded"),
         "{text}"
     );
     assert_eq!(
