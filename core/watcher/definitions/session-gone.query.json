@@ -14,9 +14,27 @@
     ],
     "where": [
       {
-        "field": "fgos.head.state",
-        "op": "eq",
-        "value": "gone"
+        "any": [
+          [
+            { "field": "fgos.head.state", "op": "eq", "value": "gone" }
+          ],
+          [
+            { "field": "fgos.head.state", "op": "eq", "value": "ended" },
+            { "field": "fgos.head.role", "op": "prefix", "value": "head:shaper-" }
+          ],
+          [
+            { "field": "fgos.head.state", "op": "eq", "value": "ended" },
+            { "field": "fgos.head.role", "op": "prefix", "value": "head:planner-" }
+          ],
+          [
+            { "field": "fgos.head.state", "op": "eq", "value": "ended" },
+            { "field": "fgos.head.role", "op": "prefix", "value": "head:secretary-" }
+          ],
+          [
+            { "field": "fgos.head.state", "op": "eq", "value": "ended" },
+            { "field": "fgos.head.role", "op": "prefix", "value": "head:supervisor-" }
+          ]
+        ]
       }
     ],
     "by": [

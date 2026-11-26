@@ -7,7 +7,29 @@
     "kind": ["fgos.head.state"],
     "latest_per": "subject",
     "where_latest": [
-      { "field": "fgos.head.state", "op": "eq", "value": "gone" }
+      {
+        "any": [
+          [
+            { "field": "fgos.head.state", "op": "eq", "value": "gone" }
+          ],
+          [
+            { "field": "fgos.head.state", "op": "eq", "value": "ended" },
+            { "field": "fgos.head.role", "op": "prefix", "value": "head:shaper-" }
+          ],
+          [
+            { "field": "fgos.head.state", "op": "eq", "value": "ended" },
+            { "field": "fgos.head.role", "op": "prefix", "value": "head:planner-" }
+          ],
+          [
+            { "field": "fgos.head.state", "op": "eq", "value": "ended" },
+            { "field": "fgos.head.role", "op": "prefix", "value": "head:secretary-" }
+          ],
+          [
+            { "field": "fgos.head.state", "op": "eq", "value": "ended" },
+            { "field": "fgos.head.role", "op": "prefix", "value": "head:supervisor-" }
+          ]
+        ]
+      }
     ],
     "by": ["subject.id"],
     "agg": ["count", "max:ts"]

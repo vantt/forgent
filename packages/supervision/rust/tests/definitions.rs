@@ -51,7 +51,9 @@ fn fixtures() -> PathBuf {
 }
 
 fn definition_file(name: &str) -> PathBuf {
-    let dir = if PACE.contains(&name) {
+    let dir = if name == "head-gone" {
+        repo().join("core/attention/definitions")
+    } else if PACE.contains(&name) {
         pace_dir()
     } else if QUESTIONS.contains(&name) {
         questions_dir()
@@ -589,5 +591,45 @@ fn a_lead_is_recognised_by_either_role_form_and_a_non_lead_head_is_never_one() {
             &environment(&[]),
         );
         assert_eq!(rows(&active).len(), counted, "{role} live");
+    }
+}
+
+#[test]
+fn an_ended_head_raises_session_gone_and_head_gone_like_a_gone_one_unless_it_is_a_lead() {
+    // (role, state, rows each definition raises): a lead that ended belongs to lead-ended only.
+    for (role, state, raised) in [
+        ("head:shaper-x", "gone", 1),
+        ("head:shaper-x", "ended", 1),
+        ("head:planner-x", "ended", 1),
+        ("head:secretary-miu", "ended", 1),
+        ("head:supervisor-sv", "ended", 1),
+        ("head:lead-ops", "ended", 0),
+        ("lead:OPS", "ended", 0),
+        ("head:shaper-x", "live", 0),
+    ] {
+        let name = format!("ended-{}-{state}", role.replace(':', "-"));
+        let root = project(
+            &name,
+            &[
+                head_line("h0", "2026-11-18T09:00:00Z", "h1", "live", role),
+                head_line("h1", "2026-11-18T11:00:00Z", "h1", state, role),
+            ],
+            true,
+        );
+        let env = environment(&[("watcher.sessionGoneLimit", 0.0)]);
+        let session_gone = answer(
+            &root,
+            "session-gone",
+            "2026-11-18T12:00:00Z",
+            Some("2026-11-18T10:00:00Z"),
+            &env,
+        );
+        assert_eq!(
+            rows(&session_gone).len(),
+            raised,
+            "{role} {state} session-gone"
+        );
+        let head_gone = answer(&root, "head-gone", "2026-11-18T12:00:00Z", None, &env);
+        assert_eq!(rows(&head_gone).len(), raised, "{role} {state} head-gone");
     }
 }
