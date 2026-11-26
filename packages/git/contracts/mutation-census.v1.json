@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "852282c4f05b62698dfe43e8dbdad1aa3ea101aac14e737eda399a9bc1f9181c",
+  "payloadDigest": "c60e517d458e670004e64ea483135d7670869d87aecd350733f54bb586f61b82",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "c21eb0cee94b12942586ccbe5a8fa0504d39b1380d96265e07ae12c27f987119",
@@ -1295,7 +1295,7 @@
     "packages/session-host/rust/tests/typed_wake.rs": "d132cb90111c3b749ed8af9a6c21369b00f6231aa40baf933566f672e2ebc1c3",
     "packages/supervision/rust/src/discussion_source.rs": "e60efca723c2652fca91250292d424864021ff27ddde298698cbf77ee8b8327f",
     "packages/supervision/rust/src/keeper.rs": "8473d74d5aa91ff50f63b95e0c1b28b69dc12b01588619d06c4ccaef6cce58d3",
-    "packages/supervision/rust/src/land.rs": "e738357b4b4fa3d61c8d75f2793455a9859701f2f18e8c5bdfdaaacca4573b70",
+    "packages/supervision/rust/src/land.rs": "67fd5f1abb0337e45d05e869cb56fd38608c1ccdd37339b1b5eb765282c0df3d",
     "packages/supervision/rust/src/lib.rs": "b4d55ee63b573112e6902280e15daf2d745aa148c24e156a830b4595f88e413c",
     "packages/supervision/rust/src/notify.rs": "2a8ce19013396e3a31c915a903c4762889cc3f902137279e6378c3deb84e8edd",
     "packages/supervision/rust/src/portfolio.rs": "f2bb93ea20ecd422ab6c54eed786033403ea7b1c3328fb71cf27305810cf69ba",
@@ -1307,7 +1307,7 @@
     "packages/supervision/rust/tests/definitions.rs": "c416675ae1fa6d1dafaa61e11378b019f440fcc4b5207c9659c403cf47130af5",
     "packages/supervision/rust/tests/discussion_source.rs": "39e824a0affc36347c8d488b28b9583f30523ff57391d290938b090c62925397",
     "packages/supervision/rust/tests/keeper.rs": "1acdad1f326809793b9a12232a061b3db0cbee0c12f98a309ff33cc0e8a16a1c",
-    "packages/supervision/rust/tests/land.rs": "b7deac12831b6e66290199031616f93da466f8b26d2dc150adedadbbb66e1d92",
+    "packages/supervision/rust/tests/land.rs": "b83abcc781a19f13aa5236c505eff77df96d40af21f55946d4f84ab7070bb8f0",
     "packages/supervision/rust/tests/portfolio.rs": "f24979fbe22036c69ed67e524c47a6d985e0eb4187791995c45a7e12be4086e1",
     "packages/supervision/rust/tests/queue.rs": "65ddc71a204003a4e1a62077f6741728cdcaa96d7ee751e31d78bd420d572698",
     "packages/supervision/rust/tests/sources.rs": "ea50ed4f0a880b14e375f703398a72340af16d28451c97bc60ca364a2ec30c87",
@@ -4269,6 +4269,13 @@
     {
       "path": "packages/supervision/rust/tests/land.rs",
       "line": 33,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/supervision/rust/tests/land.rs",
+      "line": 413,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
