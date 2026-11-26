@@ -24,3 +24,8 @@ Phase 5 must reproduce every golden byte for byte, except:
    SessionStart text).
 
 Any other difference is a regression. A golden regenerated for one of these three names the change here.
+
+## Recaptured
+
+- 2026-11-27: the four `lead` openings, because `core/agents/lead.yaml`'s `on_wake` changed in `ecc52ee39` (a park is
+  raised as an event, never a commit). Captured again from today's producers before any producer moved.
