@@ -18,3 +18,5 @@ When a running plan's footprint changes mid-run and a new path overlaps another 
 # Notes
 
 Explicitly out of scope of discussion ds-mzyircswox, whose settled design only reports the overlap; that discussion is closed without a planner (paused, owner 2026-11-26 ~12:50) and is not reopened by this row. Source: `plans/discussions/ds-mzyircswox-widen-a-running-plan-footprint/DISCUSSION.md` section 4. Related: p-lfsc4czpgh. Relayed by the shaper; the secretary has not read the owner's words directly.
+
+Owner 2026-11-26 16:12: the rule should tell the kinds of file apart. A file that only gains lines (CHANGELOG.md) or is generated from a source (command-manifest.json) does not block the ready flip or a widen; the plan that lands second rebases and regenerates. Only a hot file with logic is ordered or refused. Seen on plan 261122-0056-orchestration-skeleton refused against 261125-1631 on those two paths.
