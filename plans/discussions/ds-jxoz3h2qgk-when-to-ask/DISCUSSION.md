@@ -19,7 +19,7 @@ Opened by the supervisor on the owner order relayed by the secretary (Miu), 2026
 
 ## 1. Trạng thái hiện tại
 
-Vòng 2, 2026-11-26 10:40 +07.
+Vòng 4, 2026-11-26 10:50 +07. Phép thử con đường (bước 0 ở §6) là phần chính của luật; chủ tán thành 10:46. Phần dưới là trạng thái vòng 2.
 
 Chủ đã nêu nguyên tắc (§5, 10:15). Chủ chỉ trả lời câu hỏi **hướng đi**: thay đổi rất lớn về chức năng, về cách tổ chức, hoặc lập một bộ luật mới. Câu hỏi về **tác vụ actionable** phải được biến thành việc tìm cách làm an toàn và đảo ngược được; có cách thì làm rồi báo, chỉ hỏi khi không còn đường nào khác. Phạm vi là mọi câu hỏi, không chỉ các câu trong seed.
 
@@ -64,11 +64,28 @@ Heads stall for hours, overnight included, on questions they could have decided.
 - 2026-11-26 10:15 +07, owner (chat, round 2): Phạm vi không chỉ là các câu trong seed; đây là một nguyên tắc áp cho mọi câu hỏi. Chủ trả lời câu hỏi **quyết định hướng đi**: thay đổi rất lớn về chức năng, về cách tổ chức, hoặc tạo ra một bộ luật mới. Câu hỏi về **tác vụ actionable** không phải "nó nguy hiểm, anh có làm không" (không có tính xây dựng); nó là động lực để tìm cách làm an toàn và đảo ngược được nếu fail. Có cách ổn thì làm rồi báo chủ; chỉ hỏi khi không còn cách nào khác. Việc tiếp theo: dùng agent rẻ lọc toàn bộ câu hỏi trong kho, phân nhóm, và đưa ra mẫu "gặp loại này thì hỏi / không hỏi".
 - 2026-11-26 10:40 +07, shaper, round 2: Cancelled q-otq7dwgory (answered by the principle). Exported 163 questions from the store. Four Haiku agents classified them; the shaper merged the results and drafted the templates in §6. Evidence: evidence-question-classification.md.
 
+- 2026-11-26 10:35 +07, shaper, round 3: Gave the shaper's own position: agree with the principle, with five pushbacks. (1) The line between direction and actionable lies in the consequence, not the topic; proposed test: "does it set or lower a standard that outlives this task?" (2) Reversible means within one step and not reaching outside the repo (fgOS runs on other projects). (3) Decide-and-report drifts unless someone reads the decisions aggregated by plan and file. (4) The 70% figure is the rule applied to itself; the 95% figure and the 5 overrides are the real evidence. (5) Direction questions belong in a discussion, not in a night-time A/B store question (all 15 org/rule questions were settled in chat, then cancelled). Also: "find a way" never means escaping the cage; the hands class needs one structural door.
+- 2026-11-26 10:45 +07, owner (chat): Agrees with point 1. The three acceptance overrides (q-lnjt5zzbfq, q-aanvfxaopa on plan 261121-2110-component-authority-doors; q-trgzaa34ua on plan 261124-1433-authority-declare-update) are all component-authority. Owner direction: component-authority's core must be released first and be done, so that it is there to govern everything that appears afterwards. The bar is lowered temporarily: related things it would need to check are no longer required to be checked first. It only needs to exist, so it governs the new things and at the same time knows and remembers the old unresolved ones; the old ones are then solved one by one. Waiting for the old ones before releasing it would leave every new thing unchecked meanwhile.
+- 2026-11-26 10:50 +07, shaper, round 3: Reading of the owner's answer: the three overrides were not the owner lowering a bar case by case. They were one standing direction ("ship the governor first; it ledgers the old debt") that existed only in the owner's head, so each lead re-derived the opposite recommendation per phase. Proposed refinement of test 1: applying a recorded direction is actionable; only setting or changing a direction is an owner question, asked once and recorded where agents read it. Pushback raised: lower the bar on what the governor manages, never on the governor's own core correctness (q-trgzaa34ua closed with 50 unexplained cargo failures in the full suite).
+
+- 2026-11-26 10:55 +07, owner (chat): "Một hướng đi chưa được ghi ra" is itself a sign of the communication quality between owner and agent; the owner cannot realistically remember which direction to tell the agent. Clean is the goal, the final wish; the best way of reaching it matters more.
+- 2026-11-26 11:00 +07, shaper, round 4: Accepted. The burden cannot be "the owner writes every direction down". The agent must derive the path itself. Evidence that it could have: AGENTS.md product priority already orders Ship Faster (1) above DoD (3) and Polish after DoD (4), and the three leads recommended the polish-first path anyway. The missing piece is a path test the agent runs before recommending: what end goal does this serve, and which order reaches it best? A piece that governs or unlocks others lands first; known debt goes into the thing that will track it. Only when the path cannot be derived from the goal, the priorities and the role of the piece is it an owner question, and then it is asked as "the best path I see is X because …", not "clean now or debt?". The pushback on the governor's own correctness stays open.
+
+- 2026-11-26 10:46 +07, owner (chat): Praised the path test ("phép thử về con đường"); had it been applied before this exchange, the exchange would not have been needed.
+- 2026-11-26 10:50 +07, shaper, round 4: Self-check: the shaper did not apply the path test either. q-otq7dwgory (round 1) could have been derived from the goal "agents ask only when truly needed" plus priority 2, without asking. The path test is now step 0 of §6.
+
 ## 6. Thiết kế đã chốt {#design}
 
 Bản nháp vòng 2, chưa chốt. Một luật dùng chung thay cho đoạn § Approved frame trong `core/skills/_shared/decision-question.md`; mọi skill có chỗ bảo agent hỏi thì trỏ về luật này, không viết lại.
 
 **Nguyên tắc.** Chủ chỉ trả lời câu hỏi đặt hướng đi. Một câu về tác vụ không bao giờ được hỏi dạng "nguy hiểm, có làm không"; agent đổi nó thành câu "làm thế nào để an toàn và đảo ngược được", tự tìm cách, làm, rồi báo. Chỉ hỏi khi đã tìm mà không có cách nào, và khi hỏi thì hỏi về cách, không hỏi về có làm hay không.
+
+**Bước 0, bắt buộc trước mọi đề xuất hay câu hỏi: phép thử con đường** (vòng 4, chủ tán thành 10:46). Sạch là đích cuối; cách tới đích tốt nhất quan trọng hơn.
+1. Việc này phục vụ đích cuối nào?
+2. Thứ tự nào tới đích đó tốt nhất? Mảnh nào quản lý hoặc mở khoá các mảnh khác thì lên trước. Nợ đã biết thì ghi vào chính thứ sẽ theo dõi nó, không chặn đường. Đối chiếu với thứ tự ưu tiên sản phẩm (Ship Faster > Release con người > DoD > Polish sau DoD).
+3. Chỉ khi không suy ra được con đường từ đích, thứ tự ưu tiên và vai trò của mảnh đó thì mới hỏi chủ. Khi hỏi thì nói "con đường tốt nhất em thấy là X, vì …".
+
+Ví dụ: ba lần chủ chọn khác đề xuất trên component-authority (q-lnjt5zzbfq, q-aanvfxaopa, q-trgzaa34ua) đều tự giải được bằng bước 0. Bộ quản lên trước để quản mọi thứ mới; nợ cũ ghi vào sổ của chính nó.
 
 ### Mẫu HỎI chủ (hướng đi)
 
@@ -77,7 +94,7 @@ Bản nháp vòng 2, chưa chốt. Một luật dùng chung thay cho đoạn § 
 | H1 | Đổi tổ chức hoặc chủ sở hữu | thêm, gộp hoặc xoá một component; đổi ai sở hữu việc gì; đổi kênh chính giữa các head | q-7wd766tu4p, q-ng4ojyph5r, q-ee2f2g3aoj |
 | H2 | Luật hoặc chính sách mới | một quy tắc sẽ áp cho mọi agent, mọi plan hay mọi lần gọi; đổi một luật khoá hoặc một quyết định chủ đã chốt | q-djyjckiygr, q-nfgvjge6zg, q-otq7dwgory |
 | H3 | Đổi chức năng lớn | hành vi người dùng thấy đổi hẳn, hoặc mở hay đóng một hướng sản phẩm | q-6yhs63ru4i, q-kml4ipaweg |
-| H4 | Hạ tiêu chí nghiệm thu | đóng việc mà bỏ hoặc nới một acceptance; nhận "nợ có tên" thay vì làm đủ | q-trgzaa34ua, q-lnjt5zzbfq, q-aanvfxaopa (3/5 lần chủ chọn khác đề xuất) |
+| H4 | Hạ tiêu chí nghiệm thu mà bước 0 không giải được | đóng việc mà bỏ hoặc nới một acceptance, khi đích và thứ tự ưu tiên không chỉ ra con đường | Ba câu component-authority (q-trgzaa34ua, q-lnjt5zzbfq, q-aanvfxaopa) lẽ ra bước 0 đã giải được, nên không còn là ví dụ của H4. Còn mở: có được hạ chuẩn tính đúng của chính bộ quản không (§5 vòng 3). |
 | H5 | Nới ranh giới tin cậy thường trực | grant toàn cục, sandbox đọc hoặc ghi rộng hơn mà vẫn giữ lại về sau, credential | q-nt7ptsq2nd (chủ chọn khác đề xuất), q-okdzvolti3 |
 | H6 | Hoà thật, phụ thuộc ý chủ | các phương án ngang nhau sau phân tích, và chọn cái nào là chuyện ý muốn chứ không phải kỹ thuật | q-t6xfzdl3eu |
 
