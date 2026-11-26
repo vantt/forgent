@@ -16,7 +16,6 @@ fn repo() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..")
 }
 
-
 /// The live values of a vector, as the host's ValueSource would answer them.
 struct Live(BTreeMap<String, Vec<String>>);
 

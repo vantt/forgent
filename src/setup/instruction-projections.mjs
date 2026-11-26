@@ -23,6 +23,8 @@ const EFFECTIVE_RULES_SCHEMA_VERSION = 1;
 const CONTEXT_ENGINE_PREFIX = '\u001eFGOS-CONTEXT-ENGINE ';
 const CONTEXT_ENGINE_PROTOCOL = 1;
 const CONTEXT_ENGINE_TIMEOUT_MS = 60_000;
+const START_CONTEXT_PREFIX = '\u001eFGOS-START-CONTEXT ';
+const START_CONTEXT_PROTOCOL = 1;
 const RULE_KINDS = ['law', 'boundary', 'procedure', 'preference', 'host-adapter'];
 
 export class InstructionProjectionError extends Error {
@@ -136,16 +138,17 @@ function contextEngineError(code, message, extra = {}) {
  * and writes `.fgos/instructions/effective/rules.json`. The host is `FGOS_HOST_BIN` or the activated release; with
  * neither there is no composer to run and the refusal names that.
  */
-function compileRuleSet(projectRoot) {
+/** Runs one host route and answers its framed line; the host is `FGOS_HOST_BIN` or the activated release. */
+function runHostRoute(projectRoot, args, input, prefix, what) {
   const hostBin = resolveHostBin(projectRoot);
   if (!hostBin) {
     throw contextEngineError(
       'CONTEXT_ENGINE_HOST_UNAVAILABLE',
-      'No fgos host binary found to compile the rule units (set FGOS_HOST_BIN or activate a release)',
+      `No fgos host binary found to ${what} (set FGOS_HOST_BIN or activate a release)`,
     );
   }
-  const run = spawnSync(hostBin, ['internal', 'context-engine', 'compile', '--protocol', String(CONTEXT_ENGINE_PROTOCOL)], {
-    input: `${JSON.stringify({ root: path.resolve(projectRoot) })}\n`,
+  const run = spawnSync(hostBin, args, {
+    input,
     encoding: 'utf8',
     maxBuffer: 16 * 1024 * 1024,
     timeout: CONTEXT_ENGINE_TIMEOUT_MS,
@@ -153,18 +156,32 @@ function compileRuleSet(projectRoot) {
     windowsHide: true,
   });
   if (run.error) {
-    throw contextEngineError('CONTEXT_ENGINE_HOST_FAILED', `The fgos host at ${hostBin} could not run the context engine: ${run.error.message}`);
+    throw contextEngineError('CONTEXT_ENGINE_HOST_FAILED', `The fgos host at ${hostBin} could not ${what}: ${run.error.message}`);
   }
-  const answerLine = (run.stdout ?? '').split('\n').find((line) => line.startsWith(CONTEXT_ENGINE_PREFIX));
-  let line;
+  const answerLine = (run.stdout ?? '').split('\n').find((line) => line.startsWith(prefix));
   try {
-    line = JSON.parse(answerLine.slice(CONTEXT_ENGINE_PREFIX.length));
+    return JSON.parse(answerLine.slice(prefix.length));
   } catch {
     throw contextEngineError(
       'CONTEXT_ENGINE_HOST_FAILED',
-      `The fgos host at ${hostBin} gave no context-engine answer (exit ${run.status}): ${String(run.stderr ?? '').trim().slice(0, 300) || 'no output'}; it may predate the context-engine door`,
+      `The fgos host at ${hostBin} gave no answer to ${args.slice(0, 3).join(' ')} (exit ${run.status}): ${String(run.stderr ?? '').trim().slice(0, 300) || 'no output'}; it may predate that door`,
     );
   }
+}
+
+/**
+ * Compiles the project's rule units through the host (`fgos internal context-engine compile`), which checks them
+ * and writes `.fgos/instructions/effective/rules.json`. The host is `FGOS_HOST_BIN` or the activated release; with
+ * neither there is no composer to run and the refusal names that.
+ */
+function compileRuleSet(projectRoot) {
+  const line = runHostRoute(
+    projectRoot,
+    ['internal', 'context-engine', 'compile', '--protocol', String(CONTEXT_ENGINE_PROTOCOL)],
+    `${JSON.stringify({ root: path.resolve(projectRoot) })}\n`,
+    CONTEXT_ENGINE_PREFIX,
+    'compile the rule units',
+  );
   if (line.error) {
     throw contextEngineError('CONTEXT_ENGINE_HOST_FAILED', `The context engine failed (${line.error.code}): ${line.error.message}`);
   }
@@ -174,6 +191,33 @@ function compileRuleSet(projectRoot) {
     const detail = refusals.map((refusal) => `${refusal.code}${refusal.source ? ` in ${refusal.source}` : ''}: ${refusal.message}`).join('; ');
     throw contextEngineError('CONTEXT_ENGINE_REFUSED', `The rule units are refused: ${detail || 'no detail given'}`, { refusals });
   }
+}
+
+/**
+ * The rules a setup start receives, chosen by the one selector (`fgos internal start-context compose`) with the
+ * standing facts and the file delivery: the ids of the matched rules. The answer must name the same rule set digest as
+ * the set being rendered, so the block never mixes two sets.
+ */
+function selectRulesForSetup(projectRoot, effectiveSet) {
+  const request = { facts: { project: path.basename(path.resolve(projectRoot)) }, payloads: [], delivery: 'agent-file' };
+  const line = runHostRoute(
+    projectRoot,
+    ['internal', 'start-context', 'compose', '--protocol', String(START_CONTEXT_PROTOCOL), '--root', path.resolve(projectRoot)],
+    `${JSON.stringify(request)}\n`,
+    START_CONTEXT_PREFIX,
+    'compose the setup start',
+  );
+  if (line.error) {
+    throw contextEngineError('START_CONTEXT_FAILED', `The start-context composer failed (${line.error.code}): ${line.error.message}`);
+  }
+  if (line.refusal) {
+    throw contextEngineError('START_CONTEXT_REFUSED', `The setup start is refused: ${line.refusal.code}: ${line.refusal.message}`, { refusal: line.refusal });
+  }
+  const context = line.result ?? {};
+  if (context.ruleSetDigest !== effectiveSet.digest) {
+    throw contextEngineError('START_CONTEXT_REFUSED', `The composer read rule set ${context.ruleSetDigest}, not the compiled ${effectiveSet.digest}`);
+  }
+  return new Set(Array.isArray(context.matched) ? context.matched : []);
 }
 
 function assertNoManagedMarkerLiterals(projectionContent, filePath) {
@@ -210,18 +254,9 @@ function renderRule(rule) {
   return lines.join('\n');
 }
 
-// INTERIM selection. The repo projection renders the rules that apply to the whole repository: scope `repo` or
-// `platform` and no `when:` restriction (a restricted rule applies to some audience only; a `component` or
-// `domain` rule applies inside its own root). This reproduces the repo target of the earlier composer; a later
-// plan replaces it with selection by `when:` and deletes this filter.
-const REPO_WIDE_SCOPES = new Set(['repo', 'platform']);
-
-function rulesWithoutRestriction(effectiveSet) {
-  return effectiveSet.rules.filter((rule) => REPO_WIDE_SCOPES.has(rule.scope) && Object.keys(rule.when).length === 0);
-}
-
-export function renderPortableAgentsProjection(effectiveSet) {
-  const grouped = groupRulesByKind(rulesWithoutRestriction(effectiveSet));
+/** Renders the managed AGENTS.md block from the rules `selected` names (ids), in the set's order, grouped by kind. */
+export function renderPortableAgentsProjection(effectiveSet, selected) {
+  const grouped = groupRulesByKind(effectiveSet.rules.filter((rule) => selected.has(rule.id)));
   const lines = [
     MANAGED_BLOCK_START,
     '<!-- generated by fgos instruction projection; edit canonical instruction sources, not this block -->',
@@ -333,7 +368,7 @@ export function computeInstructionProjection(projectRoot, options = {}) {
   compileRuleSet(projectRoot);
   const effectiveSetContent = fs.readFileSync(path.join(projectRoot, EFFECTIVE_RULES_RELATIVE_PATH), 'utf8');
   const effectiveSet = readEffectiveRules(effectiveSetContent);
-  const projectionContent = renderPortableAgentsProjection(effectiveSet);
+  const projectionContent = renderPortableAgentsProjection(effectiveSet, selectRulesForSetup(projectRoot, effectiveSet));
   assertNoManagedMarkerLiterals(projectionContent, destinationRelativePath);
   const ledgerEntry = Object.freeze({
     id: projectionId(PROJECTION_KEY, host, destinationRelativePath),

@@ -18,3 +18,6 @@ pub use ports::{
     ValueType,
 };
 pub use request::{Delivery, ItemKind, Payload, Refusal, RefusalCode, StartKind, StartRequest};
+
+/// The Observe kind of the per-start record (`fgos.start.context`), embedded so an installed host can declare it.
+pub const OBSERVE_KINDS: &str = include_str!("../observe-kinds.json");

@@ -22,7 +22,7 @@
 //! The pkm index at `.fgos/runtime/context-engine/rules.db` is a view of the unit files and is rebuilt when stale.
 
 mod owners;
-mod values;
+pub(crate) mod values;
 
 use std::ffi::OsString;
 use std::io::{BufRead, BufReader, Write};

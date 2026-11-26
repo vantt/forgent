@@ -22,6 +22,12 @@ const DOCUMENTATION_DECLARATION: EmbeddedDeclaration = EmbeddedDeclaration {
     json: fgos_documentation::OBSERVE_KINDS,
 };
 
+/// The per-start record `fgos.start.context`, declared by `fgos-agent-start-context`.
+const START_CONTEXT_DECLARATION: EmbeddedDeclaration = EmbeddedDeclaration {
+    label: "fgos-agent-start-context",
+    json: fgos_agent_start_context::OBSERVE_KINDS,
+};
+
 /// Every declaration a crate embeds with `include_str!`. Each owner adds its own entry next to its kinds.
 pub fn embedded_declarations() -> Vec<EmbeddedDeclaration> {
     vec![
@@ -33,6 +39,7 @@ pub fn embedded_declarations() -> Vec<EmbeddedDeclaration> {
         QUESTIONS_DECLARATION,
         SUPERVISION_DECLARATION,
         DOCUMENTATION_DECLARATION,
+        START_CONTEXT_DECLARATION,
     ]
 }
 

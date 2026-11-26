@@ -57,13 +57,14 @@ function build() {
       cases.push({ id, delivery: 'opening', persona, name: NAME, ...input });
     }
   }
-  for (const file of findAgentYamlFiles(REPO_ROOT)) {
+  const personaFiles = findAgentYamlFiles(REPO_ROOT);
+  for (const file of personaFiles) {
     const { name } = file;
     const rel = `${file.source}/${file.fileName}`;
     files.set(`agent-file/${name}.md`, projectAgentMarkdown(name, fs.readFileSync(file.filePath, 'utf8'), rel));
     cases.push({ id: name, delivery: 'agent-file', persona: name, source: rel });
   }
-  const base = execFileSync('git', ['-C', REPO_ROOT, 'log', '-1', '--format=%H', '--', 'src/session-host', 'src/runner/agent-definitions.mjs', 'scripts/project-agents.mjs', 'core/agents'], { encoding: 'utf8' }).trim();
+  const base = execFileSync('git', ['-C', REPO_ROOT, 'log', '-1', '--format=%H', '--', 'src/session-host', 'src/runner/agent-definitions.mjs', 'scripts/project-agents.mjs', ...personaFiles.map((file) => `${file.source}/${file.fileName}`)], { encoding: 'utf8' }).trim();
   files.set('cases.json', `${JSON.stringify({ base, cases }, null, 2)}\n`);
   return files;
 }
