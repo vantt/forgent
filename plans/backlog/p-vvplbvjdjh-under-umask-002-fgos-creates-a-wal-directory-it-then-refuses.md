@@ -1,7 +1,7 @@
 ---
 id: p-vvplbvjdjh
 title: "Under umask 002, the fgos directory inside the Git directory is created group-writable and the Git WAL then refuses it (git, priority medium; source: start-context lead, fg-server, 2026-11-27)"
-status: proposed
+status: done
 priority: P2
 area: git
 created: 2026-11-27
@@ -28,3 +28,14 @@ whose mode depends on the umask.
 Every directory fgOS creates under the Git directory's `fgos/`, and the trusted hooks directory, is created with an
 explicit mode, whatever the umask. `test/rust-host/fgctl-upgrade.test.mjs` and
 `test/rust-host/fgctl-init-download-sources.test.mjs` pass under both umask 002 and umask 022.
+
+# Outcome (2026-11-27)
+
+Traced with `strace`: fgOS's own code creates the `fgos` directory with mode 0700. The group-writable directory came
+from the test fixture. `test/rust-host/fgctl-init-fixture.mjs` snapshots and restores an initialized workspace with
+`fs.cpSync`, which gives every directory it makes the umask's default mode. That turned the 0700 WAL directory into
+0775, and the 0500 hooks directory lost its mode the same way.
+
+The fixture now copies each directory's mode after the files. All four `fgctl` init and upgrade test files pass under
+umask 002 (36 tests). No production change was needed.
+
