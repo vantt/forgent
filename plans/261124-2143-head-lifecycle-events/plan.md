@@ -136,7 +136,7 @@ a handoff. This plan is the safety net under that rule.
 | 2 | [Host-side end signal for a head](phase-02-host-end-signal.md) | 1, 3 | apps/fgos/src/wiring/observe_sources/head_state.rs, apps/fgos/src/wiring/observe_sources/tests/mod.rs, apps/fgos/observe-kinds.json, core/watcher/definitions/lead-ended.query.json, core/watcher/definitions/session-gone.query.json, core/attention/definitions/head-gone.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/fixtures/definitions/** | 2 | done |
 | 4 | [A lead waiting outside does not hold a working slot](phase-04-waiting-lead-slot.md) | 3 | packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs | 2 | done |
 | 5 | [Spec, skill and generated skills](phase-05-spec-and-skill.md) | 2, 3, 4 | docs/platform/supervision/spec.md, docs/platform/observe/spec.md, docs/platform/session-host/spec.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 3 | done |
-| 6 | [Integration, full gates and closing the rows](phase-06-integration.md) | 1, 2, 3, 4, 5 | plans/backlog.md, plans/backlog/p-pv7ha3l5ss-head-lifecycle-events-end-of-work-stop-rule-and-lead-slots.md, plans/backlog/p-iatzcg2gee-*.md, plans/backlog/p-6hqvgokerb-*.md, plans/backlog/p-tyowvhthul-*.md, plans/261124-2143-head-lifecycle-events/reports/integration.md | 4 | running |
+| 6 | [Integration, full gates and closing the rows](phase-06-integration.md) | 1, 2, 3, 4, 5 | plans/backlog.md, plans/backlog/p-pv7ha3l5ss-head-lifecycle-events-end-of-work-stop-rule-and-lead-slots.md, plans/backlog/p-iatzcg2gee-*.md, plans/backlog/p-6hqvgokerb-*.md, plans/backlog/p-tyowvhthul-*.md, plans/261124-2143-head-lifecycle-events/reports/integration.md, CHANGELOG.md | 4 | running |
 
 Phase 1 found candidate (a): both leads stayed live and idle, so no `retiredAt` and `lead-ended` matched no row
 (`reports/diagnosis.md`); phase 2 runs as written.
@@ -165,6 +165,8 @@ by the unconfined supervisor session (`reports/lead-supervisor-gates-261126-1340
 `npm test` 19 and `cargo test --workspace` 3 failures, none in this plan's footprint (`reports/integration.md`); the
 four backlog rows are `done`. Phase 6 stays `running` for step 2 (live `lead-ended` check, run by the supervisor once
 the watcher tick is free) and step 3 (`CHANGELOG.md`, held by running plan `261125-1631-agent-context-engine`).
+Step 3: the owner chose "Widen now" (`q-x5fpm4dtvl`, 2026-11-26 08:43): `CHANGELOG.md` joins phase 6's footprint
+for exactly three `[Unreleased]` lines, while `261125-1631` still lists it; that plan rebases over them when it lands.
 
 Phase 3 depends on nothing: closing finished heads does not wait for the diagnosis. Phase 2 follows phase 3
 because both add rows to `packages/supervision/rust/tests/definitions.rs` fixtures through the shared
