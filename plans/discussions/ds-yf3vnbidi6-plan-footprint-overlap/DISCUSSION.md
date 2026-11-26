@@ -50,7 +50,7 @@ main since the contract began (2026-11-17), 38 had a conflict. 37 of those were 
 exist, not one: the contract check at `ready`, and the supervisor's admission hold `held-footprint-overlap`, which
 landed today (`5d01f9a79f`). The rule that phases of one plan sharing a path must not share a wave already exists.
 The land door regenerates three declared generated files, but not `CHANGELOG.md` or the generated skill surfaces.
-I sent the owner one decision question with a recommendation: **q-o6qqdubbue** (§3 row 8). Nothing else is open.
+Round 2 (23:05-23:11): the owner asked whether this reinvents something and what standard multi-branch git practice is. Standard practice is optimistic: work in parallel, meet the conflict in a merge queue (our land door), lock only files that cannot merge, and reorganise hot shared files so they cannot conflict. The owner agreed in chat to option A with one small changelog file per change instead of a union merge. q-o6qqdubbue is superseded by **q-gk3bt22wng**, which records that choice; once it is answered, D1 is minted and the discussion settles.
 
 ## 2. Mục tiêu & đề bài
 
@@ -76,7 +76,8 @@ two phases of one plan that share a path out of the same wave.
 | 5 | Same-plan phases that share a path | **Clear: already enforced** | `plan-contract-check.mjs:157-167` errors when two unfinished phases share a wave and their footprints overlap. Nothing to build. |
 | 6 | Counter-point 3 (fixed base) | **Clear: mostly moot** | `plan.base` records the commit the plan was written against. A phase worktree is created fresh per phase and can `fgos run --sync <trunk>` (`fgos-lead` SKILL step 1), and the lead's answer to `land-conflict-aborted` is to rebase onto the trunk tip and land again. |
 | 7 | Counter-point 2 (semantic conflict that merges cleanly) | **Clear: covered at land** | The land door runs `land.gates` on the merged candidate tree, not on the branch alone. A plan's last phase re-runs the full gate on the combined tree (plan contract §4, "Integration"). A clean merge that breaks behaviour fails there. |
-| 8 | Which option replaces the blocks | **Open → q-o6qqdubbue** | Options A to D below; I recommend A. |
+| 8 | Which option replaces the blocks | **Agreed in chat, awaiting the store answer → q-gk3bt22wng** | Owner chat 2026-11-26 23:11: A, warn instead of block. q-o6qqdubbue superseded. |
+| 9 | CHANGELOG: union merge or one file per change | **Agreed in chat → q-gk3bt22wng** | Union merges silently: a line can land under an already released version (rc.9 to rc.12 in four days), an edited line is kept twice, entries drift between sub-sections. Fragments (`changelog.d/<id>.md`, assembled at release; changesets, towncrier, reno) cannot conflict by construction. 91 commits touched CHANGELOG.md since 2026-11-17. No prior art in the repo (`git log -S'changelog.d'` empty). |
 
 ## 4. Quyết định đã chốt
 
@@ -93,10 +94,18 @@ None yet. Row 8 waits on the owner.
   scope (what the owner approves). From `ds-mzyircswox` D2, "order two overlapping plans automatically" stays out of
   scope. I measured the land history (§3 row 3), found the second block (row 2) and the land door's gaps (row 4).
   Then I asked q-o6qqdubbue with four options.
+- 2026-11-26 23:05 +07, owner: "ủa có phải chúng ta đang chế không và thế giới họ tạo ra worktree làm gì? best practice
+  của git development nhiều luồng là sao?"
+- 2026-11-26 23:07 +07, shaper: yes, the cross-plan block is a home-made pessimistic lock. Standard practice is
+  trunk-based work with short branches, a merge queue that tests the merged tree (our land door is one), locks only
+  for files that cannot merge (binary assets), and hot shared files reorganised so they cannot conflict (changelog
+  fragments, generated files regenerated after merge). Proposed: A, with changelog fragments instead of union.
+- 2026-11-26 23:09 +07, owner: "với changelog cách nào đúng hơn". Shaper: fragments; union hides errors (§3 row 9).
+- 2026-11-26 23:11 +07, owner: "đồng ý A, dùng file nhỏ, hỏi lại đi". q-o6qqdubbue superseded by q-gk3bt22wng.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Not settled yet. The design proposed in q-o6qqdubbue (option A):
+Agreed by the owner in chat, to be recorded through q-gk3bt22wng (option A):
 
 - **Admission and `ready`:** an overlap between plans never refuses. The contract check reports it as a warning
   naming the other plan and the shared paths. The admission hold `held-footprint-overlap` is removed; the supervisor's
@@ -104,8 +113,11 @@ Not settled yet. The design proposed in q-o6qqdubbue (option A):
   real ordering the planner or owner wants, never as a workaround for a shared file.
 - **Inside one plan:** unchanged. Two unfinished phases that share a path cannot share a wave.
 - **Footprint as a write bound:** unchanged (`write-outside-footprint`, `land-outside-footprint`, PS-24).
-- **At land:** the same change closes the two gaps on files many plans write. `CHANGELOG.md` gets a union merge rule,
-  so two appends under `## [Unreleased]` both survive. The generated skill surfaces join `land.regenerate` (rebuilt
+- **Changelog:** a change no longer edits `CHANGELOG.md`. It adds one file under `changelog.d/` (name from the change,
+  one entry with its Keep a Changelog sub-section). The release step assembles the files into the new version section
+  and deletes them, so which release holds an entry is decided at release, never by a merge. The existing
+  `## [Unreleased]` lines stay and are released with the next version. The `AGENTS.md` rule changes with it.
+- **At land:** the generated skill surfaces join `land.regenerate` (rebuilt
   from `core/skills`), so a conflict on them is regenerated, as the census is today. A conflict on hand-written source
   is still `land-conflict-aborted`; the lead rebases and lands again, as it does today.
 - **Out of scope:** regenerating declared files during a lead's refresh merge (`p-avjhx3gxas`), the widening door
@@ -116,7 +128,7 @@ flowchart LR
   P["plan ready"] -->|"overlap: warning only"| A["admitted, own branch"]
   A --> W["phases: same wave never share a path (exists)"]
   W --> L["land door: merge candidate"]
-  L -->|"declared generated file / CHANGELOG"| R["regenerate or union merge"]
+  L -->|"declared generated file"| R["regenerate"]
   L -->|"hand-written conflict"| X["land-conflict-aborted → lead rebases"]
   R --> G["land gates on merged tree"]
   G --> M["main"]
@@ -124,5 +136,5 @@ flowchart LR
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Filled once q-o6qqdubbue is answered. Under option A it is a single entry, because the two doors and the land-door
+Filled once q-gk3bt22wng is answered. Under option A it is a single entry, because the two doors and the land-door
 gaps must change together (L10).
