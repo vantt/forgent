@@ -4,8 +4,8 @@ Capability: `code:implement`
 
 ## Inputs
 
-- `apps/fgos/src/wiring/supervision.rs`: `rows_of` and `rows_from` (about lines 1175-1230) and
-  their unit tests (about line 2210).
+- `apps/fgos/src/wiring/supervision.rs`: `rows_of` and `rows_from` (about lines 1405-1460) and
+  their unit tests (the `rows_of` case near line 3286).
 - `core/watcher/README.md`, the "Row to event" table. Read only here; phase 4 updates it.
 - `packages/observe/rust/src/query/exec.rs`: how a bucketed group appears in the answer row (the
   key that carries the bucket start, under `group` or on the row). Read only.
