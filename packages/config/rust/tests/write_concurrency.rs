@@ -98,6 +98,7 @@ impl Fixture {
             reason: "tune the limit for this repository".into(),
             acknowledge_comment_loss: false,
             lock_wait_ms: wait,
+            project_file_tracked: false,
         }
     }
 

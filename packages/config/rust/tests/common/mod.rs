@@ -173,6 +173,7 @@ pub fn write_request(
         reason: input["reason"].as_str().expect("reason").to_string(),
         acknowledge_comment_loss: input["ack"] == true,
         lock_wait_ms: 2000,
+        project_file_tracked: input["projectFileTracked"] == true,
     };
     (request, file)
 }

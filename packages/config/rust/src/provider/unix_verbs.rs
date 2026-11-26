@@ -84,15 +84,21 @@ fn request(
     reason: &str,
     ack: bool,
 ) -> Result<WriteRequest, Refusal> {
+    let expected = target_revision(roots, kind).map_err(refused)?;
+    // The index is listed only when a project file is about to be created.
+    let project_file_tracked = kind == SourceKind::Project
+        && expected.is_none()
+        && super::project_file_tracked(&roots.project_root)?;
     Ok(WriteRequest {
         roots: roots.clone(),
         lock_root: fgos_holder_lock::state_root::lock_root(),
         target: kind,
-        expected: target_revision(roots, kind).map_err(refused)?,
+        expected,
         edits,
         reason: reason.to_string(),
         acknowledge_comment_loss: ack,
         lock_wait_ms: LOCK_WAIT_MS,
+        project_file_tracked,
     })
 }
 

@@ -61,7 +61,11 @@ pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
     "refresh-docs",
 ];
 /// Appended to a refusal that has a way out: the refusal id or YAML rule it answers, and the hint.
-const HINTS: [(&str, &str); 3] = [
+const HINTS: [(&str, &str); 4] = [
+    (
+        "config-project-file-stripped",
+        "\nthis checkout's Git index tracks .fgos/config.yaml but its working copy lacks it: run the write in the main checkout named above, or restore the file with `git checkout -- .fgos/config.yaml`",
+    ),
     (
         "config-machine-check-required",
         "\nconfirm that no release on this machine reads accounts or the gateway token from ~/.fgos/config.json, then pass --machine-checked",
@@ -240,6 +244,33 @@ pub fn roots(root: &Path) -> Result<SnapshotRequest, Refusal> {
         global_dir,
         class,
     })
+}
+
+/// Whether the Git index of the checkout at `project_root` tracks `.fgos/config.yaml` or the legacy
+/// `.fgos/config.json` (a skip-worktree path is still listed). `false` outside a repository. A write
+/// passes it as `WriteRequest::project_file_tracked`: the Config core has no Git edge, this is the one
+/// place the fact enters. The project file sits at the checkout's top level, so the listed
+/// repository-relative paths are compared as they are.
+pub fn project_file_tracked(project_root: &Path) -> Result<bool, Refusal> {
+    let git = |e: OperationError| refuse("git-read-failed", e.cause);
+    let Some((driver, repo)) = GitDriver::open_at(project_root).map_err(git)? else {
+        return Ok(false);
+    };
+    let mut cursor = None;
+    loop {
+        let page = driver.tracked_paths(&repo, cursor, 4096).map_err(git)?;
+        if page
+            .entries
+            .iter()
+            .any(|p| p == b".fgos/config.yaml" || p == b".fgos/config.json")
+        {
+            return Ok(true);
+        }
+        cursor = page.next_cursor;
+        if cursor.is_none() {
+            return Ok(false);
+        }
+    }
 }
 
 fn optional_path(path: &Option<String>) -> Result<Vec<Segment>, Refusal> {

@@ -394,11 +394,14 @@ mod config_files {
         };
         let lock_root = fgos_holder_lock::state_root::lock_root();
         let made = |target| -> Result<Value, String> {
+            let tracked = target == SourceKind::Project
+                && fgos_config::provider::project_file_tracked(&roots.project_root)
+                    .map_err(|refusal| format!("{} ({})", refusal.reason, refusal.detail))?;
             let InitResult {
                 created,
                 file,
                 revision,
-            } = init(&roots, target, &lock_root, LOCK_WAIT_MS).map_err(text)?;
+            } = init(&roots, target, &lock_root, LOCK_WAIT_MS, tracked).map_err(text)?;
             Ok(json!({ "created": created, "file": file, "revision": revision }))
         };
         let project = made(SourceKind::Project)?;

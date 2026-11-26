@@ -46,6 +46,18 @@ pub struct WriteRequest {
     pub reason: String,
     pub acknowledge_comment_loss: bool,
     pub lock_wait_ms: u64,
+    /// The checkout's Git index tracks `.fgos/config.yaml` or `.fgos/config.json`; supplied by the host
+    /// caller, never computed here (the core has no Git edge).
+    pub project_file_tracked: bool,
+}
+
+/// The refusal of a write that would create a project config file the checkout's index tracks but its
+/// working copy lacks: it names the main checkout, where the write belongs, and nothing else.
+fn stripped(trusted_root: &Path) -> SnapshotError {
+    let mut refusal = ConfigRefusal::new("config-project-file-stripped");
+    refusal.file = Some(trusted_root.display().to_string());
+    refusal.detail_mut().keyword = Some("write-in-main-checkout-or-restore-the-file".into());
+    refusal.into()
 }
 
 /// What `commit_observed` reports before each stage; an error from the observer aborts.
@@ -193,6 +205,9 @@ pub fn commit_observed(
             applied: Vec::new(),
             notices: Vec::new(),
         });
+    }
+    if req.target == SourceKind::Project && seen.is_none() && req.project_file_tracked {
+        return Err(stripped(&req.roots.trusted_root));
     }
     // A write that changes nothing needs no reason: every edit sets what the key inherits already.
     let reason = match all_redundant(ctx, req, seen.as_ref(), at.2) {
@@ -485,12 +500,14 @@ pub struct InitResult {
 /// Creates the file of a project or the global scope holding the header and nothing else, only when
 /// the scope has no file: create-only, under the scope's lock, beneath its root without following a
 /// symlink. An existing `config.yaml` or legacy `config.json` is left alone (a legacy file is
-/// migrated, never shadowed). A confined session is refused.
+/// migrated, never shadowed). A confined session is refused, and so is a project whose index tracks a file
+/// the working copy lacks (`project_file_tracked`).
 pub fn init(
     roots: &SnapshotRequest,
     target: SourceKind,
     lock_root: &Path,
     lock_wait_ms: u64,
+    project_file_tracked: bool,
 ) -> Result<InitResult, SnapshotError> {
     if roots.class == SessionClass::Confined {
         return Err(ConfigRefusal::new("config-write-confined").into());
@@ -502,6 +519,12 @@ pub fn init(
     };
     let (root, dir, name) = place(roots, target)?;
     let mode = if project { 0o755 } else { PRIVATE_DIR_MODE };
+    let max = Profile::StrictConfig.limits().input_bytes;
+    // Refused before the directory or the lock exists, so a stripped checkout is left as it is.
+    if project && project_file_tracked && matches!(select_source(&root, &dir, max)?, Source::Absent)
+    {
+        return Err(stripped(&roots.trusted_root));
+    }
     let held = dir_identity(&root, &dir, mode)?;
     let (lock, fgos_dir) = if project {
         (PROJECT_CONFIG, root.join(&dir))
@@ -509,7 +532,6 @@ pub fn init(
         (GLOBAL_CONFIG, PathBuf::new())
     };
     let _scope = hold(lock, &fgos_dir, lock_root, lock_wait_ms)?;
-    let max = Profile::StrictConfig.limits().input_bytes;
     let existing = |source: Source| match source {
         Source::Yaml(file) => Some((YAML_NAME, file.revision)),
         Source::LegacyJson(file) => Some((JSON_NAME, file.revision)),
@@ -521,6 +543,9 @@ pub fn init(
             file,
             revision,
         });
+    }
+    if project && project_file_tracked {
+        return Err(stripped(&roots.trusted_root));
     }
     if dir_identity(&root, &dir, mode)? != held {
         return Err(conflict("directory-changed"));
