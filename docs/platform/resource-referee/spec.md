@@ -68,6 +68,9 @@ A claim names a space and a reference inside it. The registry in the contract is
 | `path` | write-scope may-overlap | a repo-relative path or glob |
 | `ref` | exact equality | a git ref name |
 | `port` | exact equality | a network port as a decimal string |
+| `resource` | exact equality | a named machine resource slot such as `gpu#1`; a resource with capacity N is declared as N slots (`gpu#1`..`gpu#N`) |
+
+**The `resource` space.** Heavy machine resources are caps judged here through the existing door, not by a second referee. The comparison is exact and case-sensitive over the whole slot name (`gpu#1` collides only with `gpu#1`, not with `gpu#2`, `GPU#1` or `gpu#1/child`). The door also answers one availability question for the keeper: given the combined claims of running players and the claims of one candidate, `free` or `held` with the colliding slot. It is the same evaluation as `--units` with two simultaneous nodes (same parser, collision builder and referee), so there is no second evaluator. Incomplete or malformed facts are an error, never `free`, and the answer judges a snapshot: the caller owns admission serialization.
 
 An unknown space is refused by name (`claim-space-unknown`), so a misspelt space can never pass as "no
 collision". The referee does not compare claims: for `path` the door calls write-scope's colliding-pairs
@@ -243,6 +246,7 @@ rule the plan check, the supervisor and the door need is expressed, and the rest
 | plan decision 17 | An entry that does not canonicalize is reported by unit and entry | section 5 |
 | plan decision 22 | The path rule is lexical and every verdict says so | section 5 |
 | plan decision 31 | A plan with zero phases is a blocking finding in the door, never `accept` | contract `emptyFacts` |
-| phase 1 | The registry holds `path`, `ref` and `port`; the codes, limits and gap list were fixed here | sections 3, 5, 7, 9 |
+| phase 1 | The registry held `path`, `ref` and `port` (now also `resource`, below); the codes, limits and gap list were fixed here | sections 3, 5, 7, 9 |
 | phase 5 | The evaluator takes facts and ruleset as JSON values and imports neither graph nor write-scope types (they are dev-dependencies, used by one wiring test); a refusal is a struct of code, field and index; per-item limits give `claims-over-limit` and the rest is still evaluated; a `problems` entry whose code is not `entry-invalid`, and a `policy` that is not `{ source, sha256 }` strings, are refused; the floor runs in catalog order first, then the chosen non-floor rules in catalog order | sections 4, 5, 6, 7 |
 | phase 5 review | Findings are ordered by check, then by the first node's input position; a refusal quotes at most 1024 bytes of any input-derived name, cut on a character boundary; once any unit declares a layer, a colliding pair with an undeclared end is the blocking `exclusion-layer-undeclared`, so collisions cannot be switched off by omitting layers; evaluation is linear (one id map, no repeated scans); a repeated `dependsOn` entry gives one finding; an exclusion or problem naming an unknown unit is refused as `unknown-node-id` | sections 4, 5, 7 |
+| orchestration skeleton plan, machine resources | A new claim space `resource`, compared by equality; a resource with capacity N is N named slots (`gpu#1`..`gpu#N`). The referee compares and never acts, so equality over named slots fits its rule set with no new comparison kind. Recorded 2026-11-27 | section 3 |

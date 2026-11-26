@@ -13,7 +13,7 @@ Writer type: Human + agent coauthor
 Canonical for: The Workflow contract: guide, case and admission, with its rules, decisions and implementation pointers
 Use this when: Changing how a workflow guide is admitted or how a case runs, or reading the workflow decisions
 Do not use this for: Claims that every settled rule is implemented; consult the implementation pointers and tests
-Last reviewed: 2026-11-08
+Last reviewed: 2026-11-27
 Related:
 - docs/platform/component-boundary.md
 - docs/platform/work-state/contracts/knowledge-registry.md
@@ -363,6 +363,8 @@ Hôm nay `advance` giữ suốt `advanceWorkflowRun` và kiêm "lease sống" c�
 - **RUL-WF-40 (dọn case đã xong: dry run mặc định).** `fgos workflow prune [--older-than <N>d] [--apply]` (mặc định 14 ngày; tuổi sai bị từ chối `invalid-older-than`) và một lần dọn best-effort ở tuổi mặc định sau khi một case đóng hoặc hoàn tất, sau khi nhả hold của nó. Chỉ xoá case đã `case.closed` (hoặc ledger không có event case mà run đã `completed`) quá N ngày, cùng các Unit run mà ledger của nó nêu, theo thứ tự Unit run trước, ledger sau, dưới hold của case. **Giữ** case mở hoặc `failed`, case mà một case mở hoặc một binding gọi tên, và Unit run chưa settle, đang bị controller hay custody giữ, được case khác nêu tên, là link, hoặc ghi dưới case khác (`unit.json` phải gọi tên đúng case); không theo link nào; id lấy từ ledger đi qua `assignmentDir`. **Chỉ xoá khi cả case đi:** Unit run của một case chỉ bị xoá khi chính case đó được xoá; case phải giữ thì giữ mọi Unit run của nó (mỗi run liệt kê `case-kept`, dry run bằng apply), nên ledger được giữ không bao giờ nêu tên một run đã mất. Các lý do giữ cấp case là một bảng có thứ tự `KEEP_REASONS`. **Còn lại, đã chấp nhận (quyết định của lead, Q-6):** nếu một lần xoá hỏng giữa chừng thì để lại một run bị xoá dở; các lần dọn sau giữ nó là `unsettled` hay `unit-record-missing` cho tới khi được xoá tay, và ledger vẫn nêu tên nó. Không có cơ chế sửa (xoá hai pha hay thùng rác là cơ chế mới, không thêm). Unit run của `fgos run` đứng riêng (không case) không bao giờ bị dọn: chỉ được đo.
 
 - **RUL-WF-41 (đổi pattern trong case là route unlisted; vòng phụ thuộc bị từ chối lúc nạp).** Admission của case quyết định việc đổi pattern: nó được admit như route `unlisted` (cần lý do, tính vào số lần lệch, bị từ chối tại điểm `listedRoutesOnly`); catalog pattern không tự từ chối việc đổi. Định nghĩa workflow có step chờ nhau theo vòng (`dependsOn`) bị từ chối lúc nạp và nêu tên các step.
+
+- **RUL-WF-42 (`fgos workflow records --json`: một bản chiếu cho keeper, không đọc ledger lần hai).** Verb đọc-thuần `fgos workflow records [--json]` (`src/workflow/records.mjs`) gấp từ projection case sẵn có (không có máy trạng thái thứ hai) thành bản ghi lịch (scheduling record, `packages/supervision/contracts/scheduling-record.v1.json`, [supervision/spec.md](../supervision/spec.md) 1.2): mỗi activity đang mở của mỗi case đang mở là một bản ghi `{ item: <caseId>, step: <activityId> }`. `needs: { kind: capability }` lấy từ capability của binding activity khi chỉ có một capability (kèm `maxRounds` từ `frame.dispatches` nếu là số nguyên không âm); `waitingOn: { kind: person, ref: <question id> }` khi một cổng đang chờ và có id câu hỏi dạng `q-…` (cổng cũ chỉ có văn xuôi thì bỏ `needs`, không bao giờ dispatch qua cổng đó, để keeper báo cần phán đoán); `waitingOn: { kind: actor }` khi có reservation đang sống; `outcome` khi activity đã xong, bị huỷ hoặc rút. Keeper (nguồn `workflow-cases` của `watcher.schedulingSources`) gọi verb này qua host và kiểm bản ghi theo contract; nguồn lỗi được báo `source-unavailable`. Route manifest host của verb này (`packages/host-runtime/contracts/command-manifest.json`) là việc tái sinh đang chờ, ngoài kế hoạch orchestration-skeleton.
 
 ## 7. Luồng (Behaviors)
 
@@ -817,6 +819,12 @@ Playbook không có cửa merge thứ hai vào trunk: loại step `kind: integra
 - **Quyết định:** Work là lớp surface (view, projection): nơi người tiếp xúc, phản hồi và trung chuyển thông tin giữa người và engine. Workflow và Execution là engine; thứ tự, admission, bản ghi tiến độ, claim, slot và settlement thuộc phía engine. Hai bên nối bằng một contract hoặc adapter, phụ thuộc đi từ Work xuống engine. Thứ tự việc: hoàn tất Workflow trước, rồi mới thiết kế UX của Work, ánh xạ và tuỳ biến được cho mọi loại business workflow.
 - **Chưa quyết:** claim/return, slot, settlement chuyển về đâu; hình dạng contract; cách cắt các import từ runner sang kho Work. Mỗi điều cần record riêng.
 - **Hệ quả cho spec này:** dòng "Work là engine, hoặc Work chỉ là projection" ở mục 1.1 không còn ở cột "Không khoá"; 0049 §1–3 giữ nguyên.
+
+### Kế hoạch orchestration-skeleton (keeper), tích hợp 2026-11-27
+
+- **Nguồn bản ghi từ domain (hàng "How domains hand records to the keeper" của "Decided here"):** keeper không đọc ledger case. Mỗi domain đăng ký một nguồn trong `watcher.schedulingSources` (cùng khuôn với `watcher.definitions`); Plans là nguồn Rust native trên portfolio reader, workflow case là verb `fgos workflow records --json` trên projection case sẵn có (RUL-WF-42). Questions không là nguồn bản ghi mà trả `waitingOn: person`. Lý do: giữ keeper không phụ thuộc domain (domain-agnostic) và dùng lại cửa đọc của từng domain, không có parser thứ hai của ledger case (nguyên tắc thiết kế 1).
+- **Trần vòng lặp (trần lặp nằm ở `needs.maxRounds`):** domain khai từ khung case (`frame.dispatches`); keeper đếm số lần nó tự start cho (`item`, `step`) và nêu "cần phán đoán" khi chạm trần.
+- **Work projector:** không xây (Work là lịch sử đóng băng, work-data-model).
 
 ## 18. Pointers
 

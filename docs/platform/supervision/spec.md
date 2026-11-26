@@ -5,17 +5,17 @@ Document type: BA-grade area specification
 Audience: Owner, maintainer, implementation agent
 Purpose: One authority for coordinating the plans of a project with no person sitting by: a no-LLM watcher on a timer, an LLM supervisor woken through one door, one lead per plan, a lane pool, and one landing door
 Design status: Settled by the owner (shaping report "SETTLED DESIGN", items 1-10) and decided inside that frame by the plan (PS-1..PS-24); owner answer Q1 recorded 2026-11-18
-Implementation: Spec only. No crate, verb, timer unit, config key or doctor row exists yet; every verb below is planned
+Implementation: Live. Crate fgos-supervision, the verbs of section 4, the watcher definitions and the config keys exist; the keeper, scheduling records and the periodic review (section 1.2) landed with the orchestration skeleton keeper plan
 Canonical: Yes for the scope below, from the day the plan lands
 Owner: Supervision component (proposed)
-Source (planned): packages/supervision/rust (crate fgos-supervision), core/watcher/
-Contracts (planned): packages/supervision/contracts/; config keys in core/config-standard/ and core/config-schema/
+Source: packages/supervision/rust (crate fgos-supervision), core/watcher/
+Contracts: packages/supervision/contracts/ (including scheduling-record.v1.json); config keys in core/config-standard/ and core/config-schema/
 Provenance: plans/261118-1045-project-supervisor/plan.md and plans/reports/shaping-261118-1045-supervisor-owner-questions.md (2026-11-18)
 Writer type: Agent draft writer
 Canonical for: The supervision entities, the watcher tick, the supervisor wake and verbs, the lead, the lane pool, the landing use case, their refusals and their trust boundary
 Use this when: Changing how plans are admitted, started, watched, parked or landed without a person
 Do not use this for: Work items or the Work frontier (Work layer), Git mutation primitives (Git), starting a session (Session Host and `fgos session start`), config storage (Config), the owner-question store (Questions), measurement (Observe)
-Last reviewed: 2026-11-18
+Last reviewed: 2026-11-27
 Related:
 - plans/261118-1045-project-supervisor/plan.md
 - docs/platform/questions/spec.md
@@ -29,7 +29,7 @@ Related:
 - docs/platform/packaging-distribution/spec.md
 ```
 
-Planned/live legend: every verb, key, lock, file and crate named below is **planned** until the plan's integration phase lands. The session-verb plan renamed `fgos head ...` (dbd26eae6) to `fgos session start|rotate|write` (PS-16); `fgos session start` and `fgos session rotate` are live (Session Host), `fgos session stop` is planned.
+Status: the verbs, keys, locks, files and crate named below are live unless a line says planned (the `(planned)` marks on entries in section 3 and elsewhere that still read so are historical and are not a gap). The session-verb plan renamed `fgos head ...` (dbd26eae6) to `fgos session start|stop|rotate|write` (PS-16); all are live (Session Host).
 
 ## 1. Overview and boundaries
 
@@ -66,6 +66,20 @@ The project operates through the owner's two hands, domain-free:
 - **The secretary (Miu, right hand):** Holds every power the supervisor holds and keeps it asleep. In peace she talks with the owner, clarifies and orders goals, and reduces load on the owner without meddling in routine operations. When no supervisor is alive or able to act, or a help request waits past the threshold, she runs the operation herself and wakes the machinery until it runs again.
 - **One help channel:** Heads raise `coordination-help` to the supervisor; supervisor raise of the `coordination-help` kind is granted to every head persona (lead, supervisor and secretary also raise the other coordination kinds); the key `secretary.help.staleMinutes` (default 30, minimum 5) is how long a help event may stay unhandled before Miu takes over. Heads do not talk to Miu directly in peace; owner decisions go through the question store ([questions/spec.md](../questions/spec.md)), and Miu relays them to the owner.
 
+### 1.2 Admission, the keeper and the periodic review
+
+Admission lives in code (the wake door and `portfolio.rs`), not in the supervisor skill; the supervisor keeps only judgement. A plan that is not admitted carries one reason code in `supervisor plans`: `held-max-leads` (`leadsLive` reached `maxLeads`), `held-no-lane` (no free lane), `held-blocked` (a `blockedBy` plan is not `done`), a footprint problem (an unreadable or uncomparable footprint), or `publish-failed:<code>` (the `land --paths` commit of `status: running` was refused with that door code). Footprint overlap with a running plan no longer holds admission: the plans read view lists the overlaps as advice for the supervisor (plan `261126-2318-plan-footprint-overlap-warns`, phase 20), and the contract check `scripts/plan-contract-check.mjs` warns on a cross-plan overlap (phase 19); a conflict is met once, at land.
+
+**Keeper** (`keeper.rs`, domain-neutral; wiring in `apps/fgos/src/wiring/supervision.rs`). It decides who acts next and when, within caps, and never acts itself: the wiring executes each decision (start, wake, hold, raise) through the existing doors. The decision function is pure over the scheduling records, the clock and the keeper's own past decisions in the Event Store (`supervision.keeper-*` events). A repeat of an unchanged open decision is not appended again. A keeper error raises one event for judgement, and the supervisor decision step still runs, so a broken keeper never stops admission.
+
+**Scheduling records** (`packages/supervision/contracts/scheduling-record.v1.json`). One record per open step of a domain item, keyed by `item` and `step`: `waitingOn` (`actor`, `time`, `event` or `person`, with an optional `until`; expiry raises, it never clears the wait), `needs` (`role`, `actor` or `capability`, with `maxRounds`, the cap on how often the keeper may start the player of that need) and `outcome` (`done`, `withdrawn`, `wontfix`, `cancelled`), which closes it. Domains own the ids; the keeper reads the records and never edits them.
+
+**Sources.** Records come from the sources listed in `watcher.schedulingSources` (default `plans`, `workflow-cases`), registered as data like `watcher.definitions`. `plans` is a Rust source over the portfolio reader: one `lead` step per running plan, and a sleeping lead's `wakeAt`, read from the Session Host head record, becomes `waitingOn.until`. `workflow-cases` calls `fgos workflow records --json` ([workflow/spec.md](../workflow/spec.md)). A source that fails reports one decision `source-unavailable`, its records are skipped and never guessed, and its next success reports recovery. Questions are not a source: a gate waiting on a person answers `waitingOn: person`.
+
+**Starts.** A capability start runs the run door (`fgos run --case <item> --activity <step>`) detached through the process door, so the tick never waits on it. A player started within the start window reads `Unknown` (never free, never dead), so it is not started twice. The referee's resource claims are checked before any start; a held resource keeps the record waiting (`resource-held`).
+
+**Periodic review.** The definition `review-due` raises when the newest `fgos.review.done` record is older than `watcher.reviewIntervalSec` (default 86400, minimum 3600), unless nothing is open and nothing happened since. Its action `start-review` runs one detached, read-only review Unit (`fgos run --capability review`, no `--writes`) with the fixed brief `core/watcher/briefs/periodic-review.md`; the reviewer reports findings through `supervisor raise` and never fixes. `fgos.review.done` is recorded once, when the Unit settles; a failed Unit records nothing, so the next tick retries.
+
 ## 2. Shared entities
 
 | Entity | Meaning | Owner |
@@ -89,7 +103,7 @@ Head names for lead and planner are at most 32 characters: the project handle cu
 
 ## 4. Commands and routing
 
-All verbs are planned. Flags, defaults and contracts live in `packages/supervision/contracts/` and `core/config-standard/`, not here.
+Flags, defaults and contracts live in `packages/supervision/contracts/` and `core/config-standard/`, not here.
 
 | Verb | Caller | Job |
 |---|---|---|
@@ -101,7 +115,7 @@ All verbs are planned. Flags, defaults and contracts live in `packages/supervisi
 | `fgos supervisor done` | supervisor | Refuses while unhandled events exist; on an empty queue answers done and stops the caller's own session. |
 | `fgos land` | lead (branch), others (`--paths` only) | Land a reviewed phase, or commit exact main-checkout paths. Answers with a ticket. |
 | `fgos request result` | any head | Read a ticket's outcome. |
-| `fgos session start\|stop\|rotate` | supervisor | Start, stop or replace a head (`start` and `rotate` live in Session Host; `stop` planned). |
+| `fgos session start\|stop\|rotate` | supervisor | Start, stop or replace a head (Session Host; `stop` also takes `--reason sleep`, see [session-host/spec.md](../session-host/spec.md) 8.10). |
 | `fgos slots` | any | Lane pool: ceiling, live, free, seats. |
 | `fgos questions ask` | supervisor | The owner channel ([questions/spec.md](../questions/spec.md)). |
 
@@ -239,5 +253,15 @@ Dated 2026-11-18, from [the plan](../../../plans/261118-1045-project-supervisor/
 
 - Head end and close (2026-11-26, plan `261124-2143-head-lifecycle-events`): the host reports a head's end from `closed.json` and `lead-ended` fires on `retired` or `ended`, because a finished lead stayed live and idle and no head raised its end; the wake close step stops idle heads of landed or done work, because a lead never stops itself and the supervisor skipped it. Rules and proofs in section 5.
 - Admission (2026-11-26): a live lead whose plan waits outside holds no lead slot (owner, `q-eoxlvo7i4r`: "a waiting lead does not hold a working slot"). "Waits outside" is read from the open owner-question store (owner answer `q-kikgj6qaiu`), not from the phase table, because since commit `19f91c530` a lead parks by a `coordination-help` event and never lands a park in its plan file. Interim until plan `261122-0056-orchestration-skeleton` phases 6 and 5 replace it.
+
+- Orchestration skeleton keeper plan (`261122-0056-orchestration-skeleton`, integrated 2026-11-27), "Decided here":
+  - Loop cap (where the loop cap lives): the cap is `needs.maxRounds`, declared by the domain from its frame; the keeper counts its own starts for (`item`, `step`) and raises "needs judgement" at the cap. The record contract fixes three items (`waitingOn`, `needs`, `outcome`), so the cap limits how often the keeper may start the player of a need and belongs to `needs`, not to a fourth item.
+  - Handing records to the keeper: a source port in Supervision, with registered sources listed as data in `watcher.schedulingSources` (the `watcher.definitions` pattern). Plans are a native Rust source over the portfolio reader; workflow cases are the source verb `fgos workflow records --json` over the existing case projection; questions are not a record source and answer `waitingOn: person`. This keeps the keeper domain-agnostic and reuses each domain's read door with no second parser of the case ledger (design principle 1).
+  - Work projector: not built. Work is frozen history (work-data-model); its open items are triaged under `p-jxwb7vi6a3`.
+  - Split boundary (2026-11-25): the keeper plan holds the phases that make the keeper see and start players (admission, keeper core, sources and needs), the doors it calls (question recipients, resource claims), the sleep record its plan source reads, and the review that reads its output. Every phase of the players plan consumes one of these, so the players plan can be `blockedBy` this one without a cycle.
+  - Periodic review depends on admission, the keeper core and the sources (2026-11-25): its fixed brief reviews oldest open records and open needs-judgement events, which exist only after those phases, and it shares `watcher.yaml`, its schema and `wiring/supervision.rs` with the sources phase, so the two cannot share a wave. Until the records read port (`fgos supervisor records --json`, players plan) lands, the brief reads the keeper's decision events from the event stream.
+  - Order against `261124-2143-head-lifecycle-events` (2026-11-25): the whole keeper plan waited on 2143, not only the sleep phase, because 2143 also writes `wake.rs`, `portfolio.rs`, `supervisor.rs`, `wiring/supervision.rs`, the watcher tests and the supervisor skill; holding only one phase would have made the cross-plan overlap rule deadlock the two plans. Owner confirmed on 2026-11-25 13:15 (option A of three: 2143 first, the keeper second).
+  - Component declaration before code: the plan's authority map was the plan-time declaration; integration records each row with `fgos authority declare` when the verb returns it missing. Every row lands under an existing component (`supervision`, `config`, `workflow`, `questions`, `resource-referee`, `session-host`, `session-rotation`).
+  - Admission is no longer held by footprint overlap (plan `261126-2318-plan-footprint-overlap-warns`): overlap is advice in the plans read view and a warning in the contract check, because both plans run on their own branches and any conflict is met once, at land, where the land door already merges; the owner chose this (answer B to `q-kyzictpkf6`).
 
 Three deliberate departures from the settled wording, reported to the owner: the landing door serialises through the Git Land port's merge slot instead of a `land` holder-lock (PS-2); the supervisor singleton is an Identity role instead of a holder-lock (PS-8); the supervisor, which the settled design says never lands, lands portfolio edits with `land --paths` only, never code (PS-6, PS-14). Item 4 of the settled design (the plan's footprint as sandbox writes) was amended by Q1 (PS-24).

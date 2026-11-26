@@ -15,7 +15,7 @@ Writer type: Agent draft writer
 Canonical for: The question entity, its states, its Event Store consumer, its verbs, who may answer, ack and cancel, its refusals, its events and its receipt hook
 Use this when: Asking, answering or listing owner questions, or changing how a session learns an answer
 Do not use this for: Workflow gates or `fgos ask` items (Work layer), waking an idle asker (supervisor plan), measuring owner wait (Observe)
-Last reviewed: 2026-11-18
+Last reviewed: 2026-11-27
 Related:
 - plans/discussions/ds-hme6khnird-owner-questions/DISCUSSION.md
 - plans/261118-1159-owner-question-store/plan.md
@@ -71,7 +71,7 @@ copy and receive the answer back); the wake-up of an idle or gone asker (supervi
 ## 3. Store
 
 - The store is the Event Store consumer `questions` (`packages/event-store/contracts/consumers.v1.json`), with the
-  stream contract `packages/questions/contracts/question-event-streams.v1.json`: four types, `domain: questions`,
+  stream contract `packages/questions/contracts/question-event-streams.v1.json`: five types (`asked`, `answered`, `acked`, `cancelled`, `delivery-pending`), `domain: questions`,
   `scope: project`, `schemaVersion: 1`, `sealOnWrite: true`. Each write is sealed at once and leaves at the store's
   next push.
 - The crate holds a port `QuestionLog`; the host wires it to the `StoreLogDoor` adapter Identity already uses. The
@@ -117,18 +117,28 @@ the store.
 **The owner rule guards against mistakes, not attack.** It stops an agent answering in the owner's place by accident. It
 is not a security boundary: a determined local process can still reach the store.
 
+### 5.1 Recipients, the notifier port and verified external answers
+
+This door asks any person, not only the owner (one door for asking any person).
+
+- **Recipient `to`.** `ask --input` and the `questions.asked` payload take an optional `to`. Absent means the owner. Otherwise it is `{ "kind": "role", "ref": "<role>" }`, where the role must pass Identity's role rule (`fgos_identity::directory::role_problem`), or `{ "kind": "party", "ref": "<scheme>:<id>" }` (for example `customer:<account-id>`: a lowercase slug scheme, then an id of letters, digits, `.`, `_` or `-`). A person's name fails both and is refused `recipient-invalid`, by the same rule Identity applies to roles.
+- **Notifier port.** `Notifier::deliver(question) -> Result<DeliveryRef, Refusal>` (`packages/questions/rust/src/notifier.rs`). The one adapter is the owner mailbox, which is the earlier behaviour moved behind the port. A recipient with no registered channel adapter records `questions.delivery-pending` with reason `channel-unavailable`, visible in `fgos questions list`; it never fails the ask.
+- **Verified external answers.** The use case `answer_external(question, answerer, payload, channel)` accepts an answer only when the question is open, its `to` is a `party` or `role`, and the answerer that the channel vouches for equals `to`; otherwise it refuses `answerer-mismatch` or `question-not-open`. An accepted answer appends `questions.answered` with `answerer` and `channel` set and `untrusted: true`: the payload content is data, never instructions. Signature checking belongs to the channel adapter at the gateway; this use case trusts only what the adapter attests. `fgos questions answer` (the owner's path, section 5) is unchanged.
+- **Compatibility with an older release.** The new `to` (on `asked`) and `answerer`, `channel` (on `answered`) fields, and the `delivery-pending` type, arrive with `schemaVersion` still 1, and the payloads deny unknown fields. An older release that reads a stream holding such an event therefore skips that event, as it does for any event it cannot parse, so a question asked to a role or party, or answered externally, does not appear in an older release's list or fold. Upgrade every machine of the project before asking a non-owner.
+
 ## 6. Refusals
 
 Each refusal is a stable code with an exit category from `packages/host-runtime/contracts/exit-codes.v1.json`
 (`packages/questions/contracts/refusals.v1.json`): `asker-unresolved`, `ref-invalid`, `parts-incomplete`,
-`question-unclear` (names the field and the rule), `question-unknown`, `question-already-answered`,
+`question-unclear` (names the field and the rule), `recipient-invalid`, `answerer-mismatch`, `channel-unavailable`
+(delivery, recorded as `delivery-pending`, not raised to the asker), `question-unknown`, `question-already-answered`,
 `question-not-open`, `answer-not-owner`, `not-asker`, and the Event Store refusals the verbs pass through
 (`event-store-unsupported-platform`, `event-store-no-repository`, `event-store-lock-timeout`, `event-store-integrity`,
 `event-store-io`).
 
 ## 7. Events
 
-- The four store events of section 3 are the only writes.
+- The five store events of section 3 are the only writes.
 - **Observe sees them as a record source, not as a second write.** The crate projects the Event Store fold into records
   of the kinds `fgos.question.asked`, `answered`, `acked` and `cancelled`, declared in
   `packages/questions/rust/observe-kinds.json`, with the question id as subject. Attrs carry the asker's session,
@@ -208,3 +218,4 @@ Settled facts recorded while writing the contracts:
   `shaping` on a `discussion:` ref; `migrated`), so each source still holds.
 - Exit categories reuse the existing table; `question-unknown` is `not-found`, `question-already-answered` and
   `question-not-open` are `conflict`, input faults are `validation`, identity and ownership faults are `precondition`.
+- Orchestration skeleton plan (`261122-0056-orchestration-skeleton`, integrated 2026-11-27), one door for asking any person (the owner confirmed one scheduling record per open step and handoff closing one record and opening the next, on `q-e2bpqz65c2`): questions gain the optional recipient `to`, the notifier port and verified external answers (section 5.1). Questions are not a scheduling-record source: a step that waits on a person answers `waitingOn: person` with the question id, and the keeper reads that question's state from this crate; answered means actionable. A new event type under `schemaVersion` 1 means an older release skips events carrying the new fields (section 5.1).
