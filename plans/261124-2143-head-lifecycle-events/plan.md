@@ -132,7 +132,7 @@ a handoff. This plan is the safety net under that rule.
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Diagnose why an ended lead raised no event](phase-01-diagnosis.md) | - | plans/261124-2143-head-lifecycle-events/reports/diagnosis.md | 1 | done |
-| 3 | [Close finished planners and leads through one door](phase-03-close-finished-heads.md) | - | packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, core/watcher/definitions/plan-drafted.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/plan-drafted/**, src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs, bin/fgos.mjs, packages/supervision/rust/observe-kinds.json, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json | 1 | running |
+| 3 | [Close finished planners and leads through one door](phase-03-close-finished-heads.md) | - | packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, core/watcher/definitions/plan-drafted.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/plan-drafted/**, src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs, bin/fgos.mjs, packages/supervision/rust/observe-kinds.json, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json | 1 | done |
 | 2 | [Host-side end signal for a head](phase-02-host-end-signal.md) | 1, 3 | apps/fgos/src/wiring/observe_sources/head_state.rs, apps/fgos/src/wiring/observe_sources/tests/mod.rs, apps/fgos/observe-kinds.json, core/watcher/definitions/lead-ended.query.json, core/watcher/definitions/session-gone.query.json, core/attention/definitions/head-gone.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/fixtures/definitions/** | 2 | ready |
 | 4 | [A lead waiting outside does not hold a working slot](phase-04-waiting-lead-slot.md) | 3 | packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs | 2 | ready |
 | 5 | [Spec, skill and generated skills](phase-05-spec-and-skill.md) | 2, 3, 4 | docs/platform/supervision/spec.md, docs/platform/observe/spec.md, docs/platform/session-host/spec.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 3 | ready |
@@ -141,8 +141,13 @@ a handoff. This plan is the safety net under that rule.
 Phase 1 found candidate (a): both leads stayed live and idle, so no `retiredAt` and `lead-ended` matched no row
 (`reports/diagnosis.md`); phase 2 runs as written.
 
-Phase 3 runs as ticket `c-5758-1795624281293` (unit run `unit-run-1795624281836-ff9fb772`, worktree
-`261124-2143-head-lifecycle-events-p03b`), still running after 12 waits on 2026-11-25.
+Phase 3 landed as `2b18815f1` (branch `head-lifecycle-events/p03d`, 2026-11-26). A short-role lead with no run
+supervisor (started by hand) is not ended: `session stop --role` answers `stopped: false, reason: no-supervisor` and
+the wake door records `stop-failed` with that reason, so such a lead is still closed by the supervisor's procedure. A
+role that still leads a plan not done is never closed. A plan's first landing as `draft` produces
+`fgos.plan.status` `to: draft` (`apps/fgos/src/wiring/observe_sources/plan_history.rs`, `status_transitions`), so
+`plan-drafted` reads it as written. The wake span's `fgos.supervisor.error` attribute was undeclared in
+`packages/supervision/rust/observe-kinds.json`, so every wake span carrying an error was refused; phase 3 declared it.
 
 Phase 3 depends on nothing: closing finished heads does not wait for the diagnosis. Phase 2 follows phase 3
 because both add rows to `packages/supervision/rust/tests/definitions.rs` fixtures through the shared
