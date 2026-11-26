@@ -23,4 +23,4 @@ A shaped decision fixes the new names and how `agentRole` sits beside ACE's exis
 
 # Notes
 
-Source: `plans/discussions/ds-que32ftgg6-ready-plan-runs-unattended/DISCUSSION.md` §3 rows 15 and 17. It crosses ACE, the domain registry and the Work layer, so it is outside that discussion's scope (RUL11). The shaper raised it as a coordination-help event because it cannot write the backlog and could not reach the secretary.
+Source: `plans/discussions/ds-que32ftgg6-ready-plan-runs-unattended/DISCUSSION.md` §3 rows 15 and 17. It crosses ACE, the domain registry and the Work layer, so it is outside that discussion's scope and goes in its own item (RUL11 (mess seen outside the work in hand becomes a separate item)). The shaper raised it as a coordination-help event because it cannot write the backlog and could not reach the secretary.
