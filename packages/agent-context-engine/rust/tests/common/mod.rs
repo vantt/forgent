@@ -71,6 +71,10 @@ impl B {
         self.0.unit.conflicts_with = ids(list);
         self
     }
+    pub fn related(mut self, list: &[&str]) -> B {
+        self.0.unit.related = ids(list);
+        self
+    }
     pub fn when(mut self, key: &str, values: &[&str]) -> B {
         self.0.unit.when.insert(key.to_string(), ids(values));
         self

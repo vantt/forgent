@@ -9,7 +9,8 @@ use fgos_agent_context_engine::check::OwnerList;
 use fgos_agent_context_engine::refusal::RefusalCode;
 use fgos_agent_context_engine::set::EffectiveSet;
 use fgos_agent_context_engine::store::{
-    check_repository, compile_repository, read_corpus, RuleIndex, StorePaths,
+    check_repository, compile_repository, read_corpus, EmbedderChoice, Nearest, RuleIndex,
+    SearchPaths, StorePaths,
 };
 use fgos_agent_context_engine::when_keys::NoLiveValues;
 use tempfile::TempDir;
@@ -71,6 +72,11 @@ impl Repo {
             repo_root: self.root().to_path_buf(),
             graph_db: self.db_dir.path().join("rules.db"),
             profile: Path::new(env!("CARGO_MANIFEST_DIR")).join("../pkm/profile.yaml"),
+            search: SearchPaths {
+                db: self.db_dir.path().join("search.db"),
+                model_dir: self.db_dir.path().join("models"),
+                embedder: EmbedderChoice::Model,
+            },
         }
     }
 
@@ -229,7 +235,7 @@ fn only_lower_case_md_files_outside_dot_names_are_read() {
 // --- the pkm index
 
 fn open(repo: &Repo) -> RuleIndex {
-    RuleIndex::open(&repo.paths()).expect("the index opens")
+    RuleIndex::open(&repo.paths(), false).expect("the index opens")
 }
 
 #[test]
@@ -357,10 +363,16 @@ fn a_clean_repository_checks_clean_and_compiles_to_a_set_a_reader_accepts() {
         "domain-rule",
         "depends_on: [\"[[core-rule]]\"]\nwhen:\n  role: [producer]\n",
     );
-    let (_, ids, refusals) =
-        check_repository(&repo.paths(), "2026-11-26", &owners(), &NoLiveValues).unwrap();
-    assert_eq!(refusals, []);
-    assert_eq!(ids.len(), 2);
+    let checked = check_repository(
+        &repo.paths(),
+        "2026-11-26",
+        &owners(),
+        &NoLiveValues,
+        Nearest::Skip,
+    )
+    .unwrap();
+    assert_eq!(checked.refusals, []);
+    assert_eq!(checked.in_force.len(), 2);
     let set = compile_repository(&repo.paths(), "2026-11-26", &owners(), &NoLiveValues).unwrap();
     let ordered: Vec<&str> = set.rules.iter().map(|r| r.id.as_str()).collect();
     assert_eq!(ordered, ["core-rule", "domain-rule"]);
@@ -372,8 +384,15 @@ fn a_repository_with_conflicting_rules_in_force_is_refused_and_compiles_nothing(
     let repo = Repo::new();
     repo.core("rule-a", "conflicts_with: [\"[[rule-b]]\"]\n");
     repo.core("rule-b", "");
-    let (_, _, refusals) =
-        check_repository(&repo.paths(), "2026-11-26", &owners(), &NoLiveValues).unwrap();
+    let refusals = check_repository(
+        &repo.paths(),
+        "2026-11-26",
+        &owners(),
+        &NoLiveValues,
+        Nearest::Skip,
+    )
+    .unwrap()
+    .refusals;
     assert_eq!(codes(&refusals), [RefusalCode::ConflictInForce]);
     let err =
         compile_repository(&repo.paths(), "2026-11-26", &owners(), &NoLiveValues).unwrap_err();
@@ -384,8 +403,15 @@ fn a_repository_with_conflicting_rules_in_force_is_refused_and_compiles_nothing(
 fn a_dangling_link_is_one_refusal_even_though_the_unit_check_and_pkm_both_see_it() {
     let repo = Repo::new();
     repo.core("dangling-rule", "depends_on: [\"[[no-such-rule]]\"]\n");
-    let (_, _, refusals) =
-        check_repository(&repo.paths(), "2026-11-26", &owners(), &NoLiveValues).unwrap();
+    let refusals = check_repository(
+        &repo.paths(),
+        "2026-11-26",
+        &owners(),
+        &NoLiveValues,
+        Nearest::Skip,
+    )
+    .unwrap()
+    .refusals;
     assert_eq!(codes(&refusals), [RefusalCode::DependencyNotInForce]);
 }
 
@@ -393,8 +419,14 @@ fn a_dangling_link_is_one_refusal_even_though_the_unit_check_and_pkm_both_see_it
 fn an_unreadable_unit_stops_the_check_before_the_index() {
     let repo = Repo::new();
     repo.write("core/instructions/broken.md", "no frontmatter");
-    let refusals =
-        check_repository(&repo.paths(), "2026-11-26", &owners(), &NoLiveValues).unwrap_err();
+    let refusals = check_repository(
+        &repo.paths(),
+        "2026-11-26",
+        &owners(),
+        &NoLiveValues,
+        Nearest::Skip,
+    )
+    .unwrap_err();
     assert_eq!(codes(&refusals), [RefusalCode::UnitInvalid]);
     assert!(!repo.paths().graph_db.exists());
 }
@@ -437,4 +469,157 @@ fn a_long_list_of_rules_in_force_is_never_cut() {
     let in_force = open(&repo).in_force("2026-11-26", &corpus).unwrap();
     assert_eq!(in_force.ids.len(), 45);
     assert_eq!(in_force.accounted, 45);
+}
+
+// --- the nearest-rule search
+
+fn fake(repo: &Repo) -> StorePaths {
+    let mut paths = repo.paths();
+    paths.search.embedder = EmbedderChoice::Fake;
+    paths
+}
+
+fn unit_with_body(id: &str, body: &str, extra: &str) -> String {
+    unit_text(id, "core", "repo", extra).replace(&format!("Body of {id}."), body)
+}
+
+const PIN: &str = "Never pin a provider, model, executor, or tier in a plan; dispatch resolves them when the unit runs.";
+/// The same sentence under another id: pkm's deterministic embedder scores it as a restatement.
+const PIN_RESTATED: &str = PIN;
+/// Two words changed: the deterministic embedder scores it between the advisory floor and the threshold.
+const PIN_CLOSE: &str = "Never pin a provider, model, executor, or tier in a plan; dispatch resolves them when each unit runs.";
+const UNRELATED: &str =
+    "Write the changelog line before you open the pull request and keep it short.";
+
+fn pin_repo(second_body: &str, second_extra: &str) -> Repo {
+    let repo = Repo::new();
+    repo.write(
+        "core/instructions/pin-rule.md",
+        &unit_with_body("pin-rule", PIN, ""),
+    );
+    repo.write(
+        "core/instructions/new-rule.md",
+        &unit_with_body("new-rule", second_body, second_extra),
+    );
+    repo
+}
+
+fn nearest_check(repo: &Repo, scope: Nearest) -> fgos_agent_context_engine::store::Checked {
+    check_repository(&fake(repo), "2026-11-26", &owners(), &NoLiveValues, scope).unwrap()
+}
+
+fn new_unit() -> Vec<String> {
+    vec!["core/instructions/new-rule.md".to_string()]
+}
+
+#[test]
+fn a_restated_rule_is_refused_naming_the_rule_the_nearest_rule_and_its_score() {
+    let repo = pin_repo(PIN_RESTATED, "");
+    let checked = nearest_check(&repo, Nearest::Units(&new_unit()));
+    assert_eq!(codes(&checked.refusals), [RefusalCode::NearDuplicate]);
+    let r = &checked.refusals[0];
+    assert_eq!(r.ids, ["new-rule", "pin-rule"]);
+    assert!(r.message.contains("0.9"), "{}", r.message);
+    assert!(r.message.contains("related"), "{}", r.message);
+}
+
+#[test]
+fn a_declared_relation_to_the_nearest_rule_lets_the_restatement_through() {
+    let repo = pin_repo(PIN_RESTATED, "related: [\"[[pin-rule]]\"]\n");
+    let checked = nearest_check(&repo, Nearest::Units(&new_unit()));
+    assert_eq!(checked.refusals, []);
+}
+
+#[test]
+fn a_distinct_rule_passes_with_no_candidate() {
+    let repo = pin_repo(UNRELATED, "");
+    let checked = nearest_check(&repo, Nearest::Units(&new_unit()));
+    assert_eq!(checked.refusals, []);
+    assert_eq!(checked.advisories, []);
+}
+
+#[test]
+fn a_rule_close_but_under_the_threshold_is_a_printed_candidate_and_not_a_refusal() {
+    let repo = pin_repo(PIN_CLOSE, "");
+    let checked = nearest_check(&repo, Nearest::Units(&new_unit()));
+    assert_eq!(checked.refusals, []);
+    assert_eq!(checked.advisories.len(), 1, "{:?}", checked.advisories);
+    let a = &checked.advisories[0];
+    assert_eq!(
+        (a.id.as_str(), a.nearest.as_str()),
+        ("new-rule", "pin-rule")
+    );
+    assert!((0.84..0.93).contains(&a.score), "{}", a.score);
+}
+
+#[test]
+fn the_named_units_are_searched_and_the_build_searches_them_all() {
+    let repo = pin_repo(PIN_RESTATED, "");
+    let named = nearest_check(
+        &repo,
+        Nearest::Units(&["core/instructions/pin-rule.md".to_string()]),
+    );
+    // pin-rule is the original of the pair, yet it is near new-rule too: the check is symmetric in what it finds,
+    // and only the named unit is judged.
+    assert_eq!(
+        named
+            .refusals
+            .iter()
+            .flat_map(|r| r.source.clone())
+            .collect::<Vec<_>>(),
+        ["core/instructions/pin-rule.md"]
+    );
+    let all = nearest_check(&repo, Nearest::All);
+    assert_eq!(all.refusals.len(), 2, "{:?}", all.refusals);
+    let skipped = nearest_check(&repo, Nearest::Skip);
+    assert_eq!(skipped.refusals, []);
+}
+
+#[test]
+fn a_path_that_is_not_a_unit_of_the_roots_is_refused() {
+    let repo = pin_repo(UNRELATED, "");
+    let checked = nearest_check(&repo, Nearest::Units(&["README.md".to_string()]));
+    assert_eq!(codes(&checked.refusals), [RefusalCode::UnitInvalid]);
+    assert_eq!(checked.refusals[0].source.as_deref(), Some("README.md"));
+}
+
+#[test]
+fn without_the_embedding_model_the_search_is_refused_by_name_never_skipped() {
+    let repo = pin_repo(UNRELATED, "");
+    // The real embedder over an empty model folder: the model is missing.
+    let paths = repo.paths();
+    let refusals = check_repository(
+        &paths,
+        "2026-11-26",
+        &owners(),
+        &NoLiveValues,
+        Nearest::Units(&new_unit()),
+    )
+    .unwrap()
+    .refusals;
+    assert_eq!(codes(&refusals), [RefusalCode::SearchUnavailable]);
+    assert!(
+        refusals[0].message.contains("doc-locate-model-fetch"),
+        "{}",
+        refusals[0].message
+    );
+    // The structural check and the compile need no model.
+    let skipped = check_repository(
+        &paths,
+        "2026-11-26",
+        &owners(),
+        &NoLiveValues,
+        Nearest::Skip,
+    )
+    .unwrap();
+    assert_eq!(skipped.refusals, []);
+}
+
+#[test]
+fn the_profile_declares_the_refusal_threshold() {
+    let profile = Path::new(env!("CARGO_MANIFEST_DIR")).join("../pkm/profile.yaml");
+    assert_eq!(
+        fgos_agent_context_engine::store::refuse_threshold(&profile).unwrap(),
+        0.93
+    );
 }

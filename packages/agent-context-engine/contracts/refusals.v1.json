@@ -54,13 +54,13 @@
       "code": "rule-near-duplicate",
       "category": "conflict",
       "phase": "write",
-      "when": "The nearest in-force rule scores above the threshold and the new unit declares no relation to it."
+      "when": "The nearest in-force rule scores at or above the pack profile's audit.implicit.min (0.93) and neither rule declares a relation to the other (superseded_by, refines, depends_on, conflicts_with, or related meaning checked, distinct). Below the threshold the semantic search never refuses: its best-ranked hits from 0.84 are printed as advisory candidates."
     },
     {
       "code": "rule-search-unavailable",
       "category": "precondition",
       "phase": "write",
-      "when": "The nearest-rule search cannot run (no worker or embedding model)."
+      "when": "The nearest-rule search cannot run (no embedding model or index). The refusal names the doctor fix doc-locate-model-fetch; the check never skips the search silently."
     },
     {
       "code": "rule-set-digest-mismatch",

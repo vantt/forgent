@@ -7,11 +7,12 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
+use pkm_core::search::{SearchOptions, StateKind, WorkerChoice};
 use pkm_core::service::{installed, Session, SessionConfig};
 use pkm_core::{index, validate};
 use serde_json::{json, Map, Value};
 
-use crate::check::{self, OwnerRegistry};
+use crate::check::{self, Advisory, NearestHit, NearestRules, OwnerRegistry, SearchUnavailable};
 use crate::refusal::{Refusal, RefusalCode};
 use crate::rule::RuleFile;
 use crate::set::EffectiveSet;
@@ -19,6 +20,15 @@ use crate::when_keys::ValueSource;
 
 /// How long the first index build may take before the store gives up.
 const BUILD_WAIT: Duration = Duration::from_secs(120);
+
+/// How long the nearest-rule search may take to be ready (first build embeds every rule once).
+const SEARCH_WAIT: Duration = Duration::from_secs(180);
+
+/// Hits asked of the search per unit: enough that dropping the unit itself and rules not in force still leaves the
+/// candidates the check ranks.
+const NEAREST_LIMIT: u64 = 12;
+
+pub use pkm_core::search::EmbedderChoice;
 
 /// A limit large enough that pkm never cuts a list of rules.
 const NO_LIMIT: i64 = 1_000_000;
@@ -31,6 +41,19 @@ pub struct StorePaths {
     pub graph_db: PathBuf,
     /// `packages/agent-context-engine/pkm/profile.yaml`; the pack file sits beside it.
     pub profile: PathBuf,
+    pub search: SearchPaths,
+}
+
+/// Where the nearest-rule search keeps its index and finds its embedding model. Outside the vault's rule roots, like
+/// the graph index.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SearchPaths {
+    /// The pkm search index, a view of the unit files (`.fgos/runtime/context-engine/search.db`).
+    pub db: PathBuf,
+    /// The folder that holds `<model id>@<commit>/`, the one `fgos doc locate` uses.
+    pub model_dir: PathBuf,
+    /// [`EmbedderChoice::Model`] in production; pkm's deterministic embedder in tests.
+    pub embedder: EmbedderChoice,
 }
 
 /// A failure of the machinery, as opposed to a refusal of a rule.
@@ -218,12 +241,27 @@ pub struct RuleIndex {
 impl RuleIndex {
     /// Opens the index and waits for its first build. Every later query rebuilds incrementally first, so the index
     /// is never stale.
-    pub fn open(paths: &StorePaths) -> Result<RuleIndex, StoreError> {
+    ///
+    /// `with_search` also opens pkm's search over the rules, indexed by a worker thread of this process, for
+    /// [`RuleIndex::nearest`]; without it the index answers the graph questions only and no model is touched.
+    pub fn open(paths: &StorePaths, with_search: bool) -> Result<RuleIndex, StoreError> {
         let mut cfg = SessionConfig::new(&paths.repo_root);
         cfg.db = Some(paths.graph_db.clone());
         cfg.profile = Some(paths.profile.clone());
         cfg.refresh_every = Some(0.0);
-        let session = Session::start(cfg, installed(), None);
+        let session = if with_search {
+            cfg.search = SearchOptions {
+                db: Some(paths.search.db.clone()),
+                model_dir: Some(paths.search.model_dir.clone()),
+                worker: WorkerChoice::Thread,
+                worker_idle: Duration::ZERO,
+                embedder: paths.search.embedder,
+                ..SearchOptions::default()
+            };
+            Session::open(cfg)
+        } else {
+            Session::start(cfg, installed(), None)
+        };
         if !session.wait_ready(Some(BUILD_WAIT)) {
             return Err(StoreError("the pkm index did not finish building".into()));
         }
@@ -275,6 +313,77 @@ impl RuleIndex {
         })
     }
 
+    /// The rules nearest in meaning to the unit at `source`, best first, with their cosine scores, as rule ids mapped
+    /// from pkm's tree paths through `corpus`. The unit is asked by its note, not by its text: a text query is
+    /// rescored by the language pack (the best hit comes back as 1.0 and the worst as 0.0), while a note query keeps
+    /// the cosine the profile's threshold was measured in. Needs the index opened with search; waits for the meaning
+    /// index to be ready.
+    pub fn nearest(
+        &self,
+        source: &str,
+        corpus: &[RuleFile],
+    ) -> Result<Vec<NearestHit>, SearchUnavailable> {
+        let unavailable = |why: String| SearchUnavailable(why);
+        let search = self
+            .session
+            .search()
+            .ok_or_else(|| unavailable("the search is not open".into()))?;
+        let end = std::time::Instant::now() + SEARCH_WAIT;
+        loop {
+            let state = search.state();
+            match state.state {
+                StateKind::Ready => break,
+                // pkm's own advice for a missing model names its own installer; the fix here is the doctor's.
+                StateKind::ModelMissing => {
+                    return Err(unavailable(
+                        "the embedding model is missing or incomplete".into(),
+                    ))
+                }
+                StateKind::Broken => {
+                    return Err(unavailable(format!("search is broken: {}", state.action)))
+                }
+                _ if std::time::Instant::now() >= end => {
+                    return Err(unavailable(format!(
+                        "search was still {} after {} s",
+                        state.name(),
+                        SEARCH_WAIT.as_secs()
+                    )))
+                }
+                _ => std::thread::sleep(Duration::from_millis(100)),
+            }
+        }
+        let mut args = Map::new();
+        args.insert("path".into(), json!(source));
+        args.insert("limit".into(), json!(NEAREST_LIMIT));
+        let reply = self
+            .session
+            .query("search", args)
+            .map_err(|e| unavailable(format!("search failed: {e}")))?;
+        if let Some(error) = reply.get("error") {
+            return Err(unavailable(format!("search failed: {error}")));
+        }
+        let by_path: BTreeMap<&str, &str> = corpus
+            .iter()
+            .map(|f| (f.source.as_str(), f.unit.id.as_str()))
+            .collect();
+        let items = reply
+            .get("items")
+            .and_then(Value::as_array)
+            .cloned()
+            .unwrap_or_default();
+        Ok(items
+            .iter()
+            .filter_map(|item| {
+                let id = by_path.get(item.get("id")?.as_str()?)?;
+                let score = item.get("score")?.as_f64()? as f32;
+                Some(NearestHit {
+                    id: (*id).to_string(),
+                    score,
+                })
+            })
+            .collect())
+    }
+
     /// pkm's own graph findings (rules R3, R9, R12, R15, R16 ...) as refusals, with node paths mapped to rule ids.
     pub fn validate(&self, corpus: &[RuleFile]) -> Result<Vec<Refusal>, StoreError> {
         let conn = index::connect(&self.db, true).map_err(|e| StoreError(e.to_string()))?;
@@ -315,16 +424,57 @@ fn store_refusal(error: StoreError) -> Vec<Refusal> {
     )]
 }
 
+/// The cosine at or above which a nearest rule refuses a unit: the pack profile's `audit.implicit.min`, the same
+/// number pkm's own `audit` flags paraphrase pairs by.
+pub fn refuse_threshold(profile: &Path) -> Result<f32, StoreError> {
+    let source = profile.to_string_lossy();
+    let bytes = fs::read(profile).map_err(|e| StoreError(format!("{source}: {e}")))?;
+    let doc = fgos_yaml_doc::parse(&bytes, fgos_yaml_doc::Profile::Tool, &source)
+        .map_err(|e| StoreError(format!("{source}: not valid YAML: rule {}", e.rule)))?;
+    let json = doc
+        .to_json()
+        .map_err(|e| StoreError(format!("{source}: cannot be read: rule {}", e.rule)))?;
+    json.pointer("/audit/implicit/min")
+        .and_then(Value::as_f64)
+        .map(|min| min as f32)
+        .ok_or_else(|| StoreError(format!("{source}: audit.implicit.min is not declared")))
+}
+
+/// Which units the nearest-rule search looks at.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Nearest<'a> {
+    /// None: the structural checks only, no model touched (what `compile` runs).
+    Skip,
+    /// The units at these repository paths (the pre-commit hook: the staged units).
+    Units(&'a [String]),
+    /// Every unit (the build).
+    All,
+}
+
+/// What a check of a repository found.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Checked {
+    pub corpus: Vec<RuleFile>,
+    /// Rule ids in force.
+    pub in_force: BTreeSet<String>,
+    /// Empty when clean.
+    pub refusals: Vec<Refusal>,
+    /// Candidates below the refusal threshold, printed beside the result and never a refusal.
+    pub advisories: Vec<Advisory>,
+}
+
 /// Everything the check finds on a repository: the unit files, pkm's graph findings, the accounting of the set in
-/// force, and the composition. Returns the corpus and the refusals (empty when clean) with the ids in force.
+/// force, the composition, and, for the units `nearest` names, the nearest-rule search.
 pub fn check_repository(
     paths: &StorePaths,
     as_of: &str,
     owners: &dyn OwnerRegistry,
     live: &dyn ValueSource,
-) -> Result<(Vec<RuleFile>, BTreeSet<String>, Vec<Refusal>), Vec<Refusal>> {
+    nearest: Nearest,
+) -> Result<Checked, Vec<Refusal>> {
     let corpus = read_corpus(&paths.repo_root, owners)?;
-    let index = RuleIndex::open(paths).map_err(store_refusal)?;
+    let with_search = nearest != Nearest::Skip;
+    let index = RuleIndex::open(paths, with_search).map_err(store_refusal)?;
     let in_force = index.in_force(as_of, &corpus).map_err(store_refusal)?;
     let mut refusals = check::check(&corpus, &in_force.ids, owners, live);
     // A pkm finding the unit check already made is not repeated.
@@ -346,9 +496,59 @@ pub fn check_repository(
             ),
         ));
     }
+    let mut advisories = Vec::new();
+    if with_search {
+        let changed: Vec<&RuleFile> = match nearest {
+            Nearest::Units(listed) => {
+                for path in listed {
+                    if !corpus.iter().any(|f| &f.source == path) {
+                        refusals.push(unit_invalid(
+                            path,
+                            "the path is not a rule unit of the three unit roots",
+                        ));
+                    }
+                }
+                corpus
+                    .iter()
+                    .filter(|f| listed.contains(&f.source))
+                    .collect()
+            }
+            _ => corpus.iter().collect(),
+        };
+        let threshold = refuse_threshold(&paths.profile).map_err(store_refusal)?;
+        let found = check::check_nearest(
+            &changed,
+            &corpus,
+            &in_force.ids,
+            threshold,
+            &IndexedRules {
+                index: &index,
+                corpus: &corpus,
+            },
+        );
+        refusals.extend(found.refusals);
+        advisories = found.advisories;
+    }
     refusals.sort();
     refusals.dedup();
-    Ok((corpus, in_force.ids, refusals))
+    Ok(Checked {
+        corpus,
+        in_force: in_force.ids,
+        refusals,
+        advisories,
+    })
+}
+
+/// The nearest-rule port over the pkm search of one index.
+struct IndexedRules<'a> {
+    index: &'a RuleIndex,
+    corpus: &'a [RuleFile],
+}
+
+impl NearestRules for IndexedRules<'_> {
+    fn nearest(&self, unit: &RuleFile) -> Result<Vec<NearestHit>, SearchUnavailable> {
+        self.index.nearest(&unit.source, self.corpus)
+    }
 }
 
 /// Checks the repository and, when it is clean, compiles the effective set.
@@ -358,9 +558,9 @@ pub fn compile_repository(
     owners: &dyn OwnerRegistry,
     live: &dyn ValueSource,
 ) -> Result<EffectiveSet, Vec<Refusal>> {
-    let (corpus, in_force, refusals) = check_repository(paths, as_of, owners, live)?;
-    if !refusals.is_empty() {
-        return Err(refusals);
+    let checked = check_repository(paths, as_of, owners, live, Nearest::Skip)?;
+    if !checked.refusals.is_empty() {
+        return Err(checked.refusals);
     }
-    check::compile(&corpus, &in_force, owners, live)
+    check::compile(&checked.corpus, &checked.in_force, owners, live)
 }

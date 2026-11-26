@@ -16,9 +16,38 @@
     }
   },
   "body": "Do the thing.",
-  "state": "the nearest in-force rule example-rule scores 0.95 (threshold 0.93)",
-  "deferred": "the write-time nearest-rule search is not run by the crate's check",
+  "state": "the nearest in-force rule example-rule scores 0.95 against the unit (threshold 0.93: the pack profile's audit.implicit.min) and neither declares a relation to the other",
   "expect": {
     "refusal": "rule-near-duplicate"
+  },
+  "others": [
+    {
+      "unit": {
+        "id": "example-rule",
+        "owner": "core",
+        "kind": "procedure",
+        "mode": "append",
+        "scope": "repo",
+        "specificity": 10,
+        "title": "Example rule",
+        "lifecycle": "live",
+        "valid_from": "2026-11-25",
+        "when": {
+          "role": [
+            "producer"
+          ]
+        }
+      },
+      "body": "Do the thing."
+    }
+  ],
+  "nearest": {
+    "threshold": 0.93,
+    "hits": [
+      {
+        "id": "example-rule",
+        "score": 0.95
+      }
+    ]
   }
 }

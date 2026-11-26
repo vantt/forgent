@@ -520,6 +520,11 @@ impl RuleFile {
         let valid_to = r.date("valid_to")?;
         let superseded_by = match map.get("superseded_by") {
             None => None,
+            Some(Value::Array(_)) => {
+                return Err(r.fail(
+                    "\"superseded_by\" takes exactly one \"[[rule-id]]\" link: a rule is replaced by one rule",
+                ))
+            }
             Some(raw) => Some(r.link("superseded_by", raw)?),
         };
         // pkm ends any non-rejected rule whose valid_to has passed, whatever its lifecycle.

@@ -231,3 +231,205 @@ fn nearest_rule_hits_keep_only_the_rules_in_force() {
         [hit("live-rule", 0.95)]
     );
 }
+
+// --- the nearest-rule check, over a stub of the search port
+
+mod nearest {
+    use std::cell::RefCell;
+
+    use super::*;
+    use fgos_agent_context_engine::check::{
+        check_nearest, NearestHit, NearestOutcome, NearestRules, SearchUnavailable,
+    };
+    use fgos_agent_context_engine::rule::RuleFile;
+
+    /// The threshold of the pack profile (`audit.implicit.min`).
+    const MIN: f32 = 0.93;
+
+    // Pair 6b of the model probe: scored 0.948 by the real embedding model.
+    const OLD_TEXT: &str = "Units and plans must never pin infrastructure (`executor`, `provider`, `model`, `tier` ...)";
+    const NEW_TEXT: &str = "Units, patterns, plans, and driver prompts never pin executors, providers, models, tiers ...";
+
+    struct Stub {
+        answer: Result<Vec<NearestHit>, SearchUnavailable>,
+        asked: RefCell<Vec<String>>,
+    }
+
+    impl NearestRules for Stub {
+        fn nearest(&self, unit: &RuleFile) -> Result<Vec<NearestHit>, SearchUnavailable> {
+            self.asked.borrow_mut().push(unit.unit.id.clone());
+            self.answer.clone()
+        }
+    }
+
+    fn stub(hits: &[(&str, f32)]) -> Stub {
+        Stub {
+            answer: Ok(hits
+                .iter()
+                .map(|(id, score)| NearestHit {
+                    id: (*id).into(),
+                    score: *score,
+                })
+                .collect()),
+            asked: RefCell::default(),
+        }
+    }
+
+    fn run(rules: &[RuleFile], changed: &[&str], port: &Stub) -> NearestOutcome {
+        let changed: Vec<&RuleFile> = rules
+            .iter()
+            .filter(|r| changed.contains(&r.unit.id.as_str()))
+            .collect();
+        check_nearest(&changed, rules, &in_force(rules), MIN, port)
+    }
+
+    #[test]
+    fn a_paraphrase_of_an_in_force_rule_at_the_threshold_is_refused_naming_both_rules_the_score_and_the_fix(
+    ) {
+        let rules = vec![
+            rule("old-rule").body(OLD_TEXT).build(),
+            rule("new-rule").body(NEW_TEXT).build(),
+        ];
+        let port = stub(&[("old-rule", 0.948)]);
+        let out = run(&rules, &["new-rule"], &port);
+        assert_eq!(out.refusals.len(), 1, "{out:?}");
+        let r = &out.refusals[0];
+        assert_eq!(r.code, RefusalCode::NearDuplicate);
+        assert_eq!(r.ids, ["new-rule", "old-rule"]);
+        assert_eq!(r.source.as_deref(), Some("core/instructions/new-rule.md"));
+        for needle in [
+            "0.948",
+            "0.93",
+            "superseded_by",
+            "related",
+            "checked, distinct",
+        ] {
+            assert!(r.message.contains(needle), "{needle}: {}", r.message);
+        }
+        assert_eq!(*port.asked.borrow(), ["new-rule"]);
+    }
+
+    #[test]
+    fn a_distinct_rule_passes_and_a_hit_just_under_the_threshold_never_refuses() {
+        let rules = vec![rule("old-rule").build(), rule("new-rule").build()];
+        let out = run(&rules, &["new-rule"], &stub(&[("old-rule", 0.80)]));
+        assert_eq!(out, NearestOutcome::default());
+        let out = run(&rules, &["new-rule"], &stub(&[("old-rule", 0.929)]));
+        assert_eq!(out.refusals, []);
+    }
+
+    #[test]
+    fn a_hit_between_the_advisory_floor_and_the_threshold_is_printed_and_never_refuses() {
+        let rules = vec![rule("old-rule").build(), rule("new-rule").build()];
+        let out = run(&rules, &["new-rule"], &stub(&[("old-rule", 0.88)]));
+        assert_eq!(out.refusals, []);
+        assert_eq!(out.advisories.len(), 1);
+        let a = &out.advisories[0];
+        assert_eq!(
+            (a.id.as_str(), a.nearest.as_str()),
+            ("new-rule", "old-rule")
+        );
+        assert_eq!(a.score, 0.88);
+        assert_eq!(a.source, "core/instructions/new-rule.md");
+    }
+
+    #[test]
+    fn only_the_top_three_hits_by_rank_are_candidates_and_a_hit_under_the_floor_is_none() {
+        let rules: Vec<RuleFile> = ["u", "a", "b", "c", "d", "e"]
+            .iter()
+            .map(|id| rule(id).build())
+            .collect();
+        let hits = [
+            ("a", 0.90),
+            ("b", 0.89),
+            ("c", 0.88),
+            ("d", 0.87),
+            ("e", 0.50),
+        ];
+        let out = run(&rules, &["u"], &stub(&hits));
+        let named: Vec<&str> = out.advisories.iter().map(|a| a.nearest.as_str()).collect();
+        assert_eq!(named, ["a", "b", "c"]);
+        let out = run(&rules, &["u"], &stub(&[("a", 0.83)]));
+        assert_eq!(out.advisories, []);
+    }
+
+    #[test]
+    fn a_declared_relation_in_either_direction_lets_the_unit_through() {
+        for new in [
+            rule("new-rule").related(&["old-rule"]).build(),
+            rule("new-rule").refines(&["old-rule"]).build(),
+            rule("new-rule").depends(&["old-rule"]).build(),
+            rule("new-rule").conflicts(&["old-rule"]).build(),
+        ] {
+            let rules = vec![rule("old-rule").build(), new];
+            let out = run(&rules, &["new-rule"], &stub(&[("old-rule", 0.99)]));
+            assert_eq!(out, NearestOutcome::default(), "{:?}", rules[1].unit);
+        }
+        // `superseded_by` on the old rule names the new one; `related` on the old rule is read the same way.
+        let rules = vec![
+            rule("old-rule").replaced_by("new-rule").build(),
+            rule("new-rule").build(),
+        ];
+        assert_eq!(
+            run(&rules, &["new-rule"], &stub(&[("old-rule", 0.99)])),
+            NearestOutcome::default()
+        );
+        let rules = vec![
+            rule("old-rule").related(&["new-rule"]).build(),
+            rule("new-rule").build(),
+        ];
+        assert_eq!(
+            run(&rules, &["new-rule"], &stub(&[("old-rule", 0.99)])),
+            NearestOutcome::default()
+        );
+    }
+
+    #[test]
+    fn the_unit_itself_and_rules_not_in_force_are_never_the_nearest_rule() {
+        let rules = vec![
+            rule("draft-rule").lifecycle(Lifecycle::Draft).build(),
+            rule("new-rule").build(),
+            rule("other-rule").build(),
+        ];
+        let hits = [("new-rule", 1.0), ("draft-rule", 0.99)];
+        assert_eq!(
+            run(&rules, &["new-rule"], &stub(&hits)),
+            NearestOutcome::default()
+        );
+    }
+
+    #[test]
+    fn a_unit_not_in_force_is_not_searched_and_nor_is_a_lone_rule() {
+        let rules = vec![
+            rule("draft-rule").lifecycle(Lifecycle::Draft).build(),
+            rule("old-rule").build(),
+        ];
+        let port = stub(&[("old-rule", 0.99)]);
+        assert_eq!(
+            run(&rules, &["draft-rule"], &port),
+            NearestOutcome::default()
+        );
+        let lone = vec![rule("only-rule").build()];
+        assert_eq!(run(&lone, &["only-rule"], &port), NearestOutcome::default());
+        assert!(port.asked.borrow().is_empty());
+    }
+
+    #[test]
+    fn a_search_that_cannot_run_is_one_refusal_naming_the_model_fetch_fix() {
+        let rules = vec![
+            rule("old-rule").build(),
+            rule("new-rule").build(),
+            rule("newer-rule").build(),
+        ];
+        let port = Stub {
+            answer: Err(SearchUnavailable("the model is missing".into())),
+            asked: RefCell::default(),
+        };
+        let out = run(&rules, &["new-rule", "newer-rule"], &port);
+        assert_eq!(out.refusals.len(), 1, "{out:?}");
+        assert_eq!(out.refusals[0].code, RefusalCode::SearchUnavailable);
+        assert!(out.refusals[0].message.contains("doc-locate-model-fetch"));
+        assert!(out.refusals[0].message.contains("the model is missing"));
+        assert_eq!(out.advisories, []);
+    }
+}

@@ -16,9 +16,33 @@
     }
   },
   "body": "Do the thing.",
-  "state": "embedding model file absent",
-  "deferred": "the write-time nearest-rule search is not run by the crate's check",
+  "state": "the embedding model files are absent from the machine model folder, so the nearest-rule search cannot run",
   "expect": {
     "refusal": "rule-search-unavailable"
+  },
+  "others": [
+    {
+      "unit": {
+        "id": "example-rule",
+        "owner": "core",
+        "kind": "procedure",
+        "mode": "append",
+        "scope": "repo",
+        "specificity": 10,
+        "title": "Example rule",
+        "lifecycle": "live",
+        "valid_from": "2026-11-25",
+        "when": {
+          "role": [
+            "producer"
+          ]
+        }
+      },
+      "body": "Do the thing."
+    }
+  ],
+  "nearest": {
+    "threshold": 0.93,
+    "unavailable": "search is model_missing"
   }
 }

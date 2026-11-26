@@ -15,7 +15,7 @@ Writer type: Human + agent coauthor
 Canonical for: Rule units, owners, when: keys, write-time checks, the compiled effective rule set and its digest
 Use this when: Adding or changing a rule unit, a when: key, or the effective set that ASC reads
 Do not use this for: Selecting rules for a start or gathering contributor context (agent start context); writing host files (packaging-distribution)
-Last reviewed: 2026-11-25
+Last reviewed: 2026-11-26
 Related:
 - docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md
 - docs/platform/packaging-distribution/spec.md
@@ -52,7 +52,7 @@ component row and the four contract rows are declared in the authority model whe
 | Port | Does | Adapter |
 |---|---|---|
 | `RuleStore` | index the three roots, list rules in force, validate the graph | pkm (lifecycle classes, effective set, typed edges, rules R12, R14, R15, R16) |
-| `NearestRules` | find the nearest in-force rules to a new unit; write time only | pkm search |
+| `NearestRules` | find the in-force rules nearest in meaning to a unit; write time only | pkm semantic search over the unit's own note (needs the embedding model) |
 | `OwnerRegistry` | say whether an owner is a component or domain | component authority model |
 | `ValueSource` | live allowed values for a `when:` key | supplied by the caller (ASC or host); ACE declares the source, never owns the data |
 
@@ -91,6 +91,10 @@ Every refusal below is raised when a rule is written (pre-commit, `check` verb),
 [refusals.v1.json](../../../packages/agent-context-engine/contracts/refusals.v1.json); each has a vector under
 `contracts/vectors/refusals/`.
 
+Structural refusals are hard and always run, over the whole corpus, in the crate (`check`), so every refusal has one
+owning test there:
+
+- `rule-unit-invalid`: the unit does not read: frontmatter, schema, a `superseded_by` that is not exactly one link.
 - `rule-when-key-unknown`: a `when:` key is not in the registry.
 - `rule-when-value-invalid`: a value is not allowed by the key's value source.
 - `rule-owner-unknown`: the owner is not in the authority model.
@@ -99,9 +103,41 @@ Every refusal below is raised when a rule is written (pre-commit, `check` verb),
 - `rule-dependency-not-in-force`: a `depends_on` or `refines` target is not in force.
 - `rule-conflict-in-force`: two in-force rules are joined by `conflicts_with`.
 - `rule-law-overridden`: a lower authority overrides or forbids a law without sealed supersession evidence.
-- `rule-near-duplicate`: the nearest in-force rule scores above the threshold (pkm default 0.93) and the unit declares
-  no relation to it.
-- `rule-search-unavailable`: the nearest-rule search cannot run; the check does not pass silently.
+
+### 6.1 Nearest-rule check
+
+For each unit it is asked about, the check asks pkm which in-force rules are nearest in meaning to that unit (the
+unit's own note, so the score is the note-to-note cosine the threshold was measured in; a text query is rescored by the
+language pack and does not keep the cosine). The unit itself and rules not in force are dropped from the answer.
+
+- `rule-near-duplicate` refuses the unit when the nearest rule scores at or above the pack profile's
+  `audit.implicit.min` (0.93, pkm's default, declared in `packages/agent-context-engine/pkm/profile.yaml`, not a new
+  config key) and neither rule declares a relation to the other. The message names the unit, the nearest rule with its
+  score, and the fix. A relation is `superseded_by` (written on the old rule), `refines`, `depends_on`,
+  `conflicts_with` (which then fails structurally until one side is retired) or `related`, meaning "checked,
+  distinct"; it may be written on either rule. No new edge type exists for this.
+- Below the threshold the semantic part is advisory. The probe of the embedding model on the real rule corpus found one
+  of seven verified paraphrase pairs at 0.93 and four of seven among the top three hits, so the search is a recall
+  aid there, not a duplicate gate. The top three hits below the threshold that score at least 0.84 are printed as
+  candidates in the same output (`advisories` of the door) and never refuse. A paraphrase that scores under 0.93 and
+  sits outside the top three is not caught; review is the backstop.
+- `rule-search-unavailable` refuses when the search cannot run (no embedding model, no index). The message names the
+  doctor fix `doc-locate-model-fetch`, the row that fetches the model `fgos doc locate` also uses. The check never
+  skips the search silently. `compile` and the structural checks need no model.
+
+`check` takes the units to search: `fgos internal context-engine check --paths <unit paths>` (repository paths, newline
+separated in one value; an empty value names none), so a hook searches only the staged units. Without `--paths` every
+unit is searched, which is what a build does. A unit that is not in force, and a lone rule with nothing to be near, are
+not searched. A `--paths` entry that is not a unit of the three roots is refused as `rule-unit-invalid`.
+
+### 6.2 Pre-commit hook
+
+`.githooks/pre-commit` runs the door once per commit that stages a unit under `core/instructions/`,
+`components/*/instructions/` or `domains/*/instructions/`: structural checks over all units, the nearest-rule search
+over the staged ones (read from the working tree, not the staged blobs). A refusal refuses the commit; advisory
+candidates are printed as warnings. The hook calls the activated host the way its other native calls do. A host that
+does not carry the door, prints no answer, or fails refuses the commit and names the fix (activate a release that
+carries the context-engine door); a rule unit is never committed unchecked.
 
 ## 7. Compile step and digest
 
@@ -127,4 +163,6 @@ supported. A reader never re-checks rules; checking is the writer's job.
 | Conflicts resolved at gathering | The 14 measured conflicts are resolved when the rules are gathered, not one by one now. | 2026-11-25 | same |
 | Checked effective set and key registry | ACE hands ASC one checked effective set with a digest; refuses bad rules when written; owns the `when:` key registry. | 2026-11-25 | same; the start-door decision in [ds-2d55ty37zz](../../../plans/discussions/ds-2d55ty37zz-agent-start-door-and-context-seam/DISCUSSION.md) |
 | pkm as rule-store engine | pkm is the engine of the rule store (typed graph, lifecycle classes, effective set, search); ACE links it directly and keeps its own schema; readers need no pkm. | 2026-11-25 | same |
+| Semantic part of the write-time check is advisory below the threshold | `rule-near-duplicate` refuses at 0.93 and above (pkm's default); between 0.84 and the threshold the top three hits are printed as candidates and never refuse; without the embedding model the check refuses with `rule-search-unavailable` and the model-fetch fix, never skipping silently. The probe found paraphrase recall weak (one of seven pairs at 0.93, four of seven in the top three), so the contract does not promise paraphrase detection. | 2026-11-26 | `plans/261125-1631-agent-context-engine/reports/pkm-fit.md` |
+| Hook gate for rule units | The pre-commit hook checks staged rule units through the host door and fails closed when the host lacks it. | 2026-11-26 | same |
 | RUL102 (composition belongs to ACE, delivery stays in packaging-distribution) | Composition belongs to ACE, delivery stays in packaging-distribution, with a weight guard: the seed moves to its own module when the first budget or tiering slice lands. The own-component decision of 2026-11-25 is that move; a successor decision is recorded when the component is registered. | 2026-10-17 | [packaging-distribution spec](../packaging-distribution/spec.md) |

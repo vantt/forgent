@@ -148,3 +148,130 @@ pub fn keep_in_force(hits: Vec<NearestHit>, in_force: &BTreeSet<String>) -> Vec<
         .filter(|h| in_force.contains(&h.id))
         .collect()
 }
+
+/// The nearest-rule search could not run; the text says why and what to do.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SearchUnavailable(pub String);
+
+/// The port behind the nearest-rule check: the rules nearest in meaning to a unit, best first, each with its cosine
+/// score. The hits may include the unit itself and rules that are not in force; the check drops both.
+pub trait NearestRules {
+    fn nearest(&self, unit: &RuleFile) -> Result<Vec<NearestHit>, SearchUnavailable>;
+}
+
+/// The refusal threshold is the pack profile's `audit.implicit.min`. A hit below it is only a candidate: the probe
+/// of the embedding model found 1 of 7 verified paraphrase pairs at 0.93 and 4 of 7 in the top three, so the
+/// semantic part of the check is a recall aid below the threshold and never refuses there.
+pub const ADVISORY_MIN: f32 = 0.84;
+/// How many of the best-ranked hits below the threshold are offered as candidates.
+pub const ADVISORY_TOP: usize = 3;
+/// The doctor fix that fetches the embedding model the search needs.
+pub const MODEL_FIX: &str = "doc-locate-model-fetch";
+
+/// A rule below the refusal threshold that is close enough to be worth a look. Never a refusal.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Advisory {
+    pub id: String,
+    pub source: String,
+    pub nearest: String,
+    pub score: f32,
+}
+
+/// What the nearest-rule check found: the refusals, and the candidates printed beside them.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct NearestOutcome {
+    pub refusals: Vec<Refusal>,
+    pub advisories: Vec<Advisory>,
+}
+
+fn mentions(unit: &crate::rule::RuleUnit, other: &str) -> bool {
+    [
+        &unit.refines,
+        &unit.depends_on,
+        &unit.conflicts_with,
+        &unit.related,
+    ]
+    .iter()
+    .any(|ids| ids.iter().any(|id| id == other))
+        || unit.superseded_by.as_deref() == Some(other)
+}
+
+/// Whether either rule declares a relation to the other: `superseded_by`, `refines`, `depends_on`, `conflicts_with`
+/// or `related` ("checked, distinct"), written on either side.
+pub fn related_either_way(a: &crate::rule::RuleUnit, b: &crate::rule::RuleUnit) -> bool {
+    mentions(a, &b.id) || mentions(b, &a.id)
+}
+
+/// Asks the search for the rules nearest to each changed unit that is in force. A hit at or above `refuse_min` that
+/// the unit does not relate to refuses the unit; the best-ranked hits below it, down to [`ADVISORY_MIN`], become
+/// advisories. A search that cannot run is one refusal for the whole run, never a silent skip.
+pub fn check_nearest(
+    changed: &[&RuleFile],
+    corpus: &[RuleFile],
+    in_force: &BTreeSet<String>,
+    refuse_min: f32,
+    nearest: &dyn NearestRules,
+) -> NearestOutcome {
+    let by_id: BTreeMap<&str, &RuleFile> = corpus.iter().map(|f| (f.unit.id.as_str(), f)).collect();
+    let mut out = NearestOutcome::default();
+    for file in changed.iter().filter(|f| in_force.contains(&f.unit.id)) {
+        let unit = &file.unit;
+        if !in_force.iter().any(|id| id != &unit.id) {
+            continue; // nothing else is in force: nothing to be near
+        }
+        let hits = match nearest.nearest(file) {
+            Ok(hits) => hits,
+            Err(SearchUnavailable(why)) => {
+                return NearestOutcome {
+                    refusals: vec![Refusal::new(
+                        RefusalCode::SearchUnavailable,
+                        format!(
+                            "the nearest-rule search cannot run ({why}); fix: {MODEL_FIX} (run `fgos doctor --fix {MODEL_FIX}`)"
+                        ),
+                    )
+                    .with_ids([unit.id.as_str()])
+                    .with_source(&file.source)],
+                    advisories: Vec::new(),
+                };
+            }
+        };
+        let hits: Vec<NearestHit> = keep_in_force(hits, in_force)
+            .into_iter()
+            .filter(|h| h.id != unit.id)
+            .filter(|h| {
+                by_id
+                    .get(h.id.as_str())
+                    .is_some_and(|o| !related_either_way(unit, &o.unit))
+            })
+            .collect();
+        let mut ranked = hits.iter().enumerate();
+        if let Some((_, top)) = ranked.find(|(_, h)| h.score >= refuse_min) {
+            out.refusals.push(
+                Refusal::new(
+                    RefusalCode::NearDuplicate,
+                    format!(
+                        "rule \"{}\" restates in-force rule \"{}\" (score {:.3}, threshold {refuse_min:.2}); fix: declare the relation in \"{}\" or in \"{}\": superseded_by (the old rule), refines, depends_on, conflicts_with, or related meaning \"checked, distinct\"",
+                        unit.id, top.id, top.score, unit.id, top.id
+                    ),
+                )
+                .with_ids([unit.id.as_str(), top.id.as_str()])
+                .with_source(&file.source),
+            );
+            continue;
+        }
+        for hit in hits
+            .iter()
+            .take(ADVISORY_TOP)
+            .filter(|h| h.score >= ADVISORY_MIN)
+        {
+            out.advisories.push(Advisory {
+                id: unit.id.clone(),
+                source: file.source.clone(),
+                nearest: hit.id.clone(),
+                score: hit.score,
+            });
+        }
+    }
+    out.refusals.sort();
+    out
+}

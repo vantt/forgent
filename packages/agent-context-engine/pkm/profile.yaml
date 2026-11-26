@@ -11,3 +11,7 @@ vault:
     - {path: "core/instructions/**", type: rule}
     - {path: "components/*/instructions/**", type: rule}
     - {path: "domains/*/instructions/**", type: rule}
+audit:
+  # The cosine at or above which the nearest in-force rule refuses a unit that declares no relation to it
+  # (`rule-near-duplicate`); pkm's own default, read by the write-time check. Below it the search is a recall aid.
+  implicit: {min: 0.93}
