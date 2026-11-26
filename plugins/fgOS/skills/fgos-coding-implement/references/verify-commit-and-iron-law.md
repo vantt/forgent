@@ -17,8 +17,8 @@ rather than inventing a check. On failure, fix the root cause and rerun
 the exact command — never weaken the command or swap in an easier one to
 make it pass. If the failure is a confusing "command not found"/
 wrong-output result rather than a clean test failure or a clean shell
-syntax error, read `docs/how-to/preserve-shell-escapes-when-transcribing-
-a-verify-command.md` — a backslash-escaped backtick lost during an
+syntax error, read
+`docs/knowledge/how-to-preserve-shell-escapes-when-transcribing-a-verify-com/preserve-shell-escapes-when-transcribing-a-verify-command.md` — a backslash-escaped backtick lost during an
 earlier hand-transcription is a common, quiet cause.
 
 ## Step 4: Commit, then check Iron Law evidence
