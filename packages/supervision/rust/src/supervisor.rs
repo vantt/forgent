@@ -1,7 +1,7 @@
 //! The supervisor's read and drain verbs as library functions the host calls: `plans`,
 //! `successor`, `queue`, `handled` and `done`.
 use crate::{
-    portfolio::{admissible, head_name, Plan},
+    portfolio::{admissible, head_name, running_overlaps, Plan},
     queue::{QueueError, RaisedEvent},
     wake::{Drain, Holder},
 };
@@ -13,6 +13,8 @@ pub struct PlanRow {
     pub status: String,
     pub priority: String,
     pub admissible: bool,
+    /// Advice for ready plans: running plan directories and the ready plan's shared entries.
+    pub overlaps: Vec<(String, Vec<String>)>,
     pub head_name: String,
     /// For a `running` plan that names its lead: whether that role is held by a live session of
     /// this project. `false` is what the supervisor restarts; `None` also when Identity cannot say.
@@ -123,6 +125,7 @@ pub fn plans(
                 status: p.status.clone(),
                 priority: p.priority.clone(),
                 admissible: open.iter().any(|a| a.dir == p.dir),
+                overlaps: running_overlaps(p, plans),
                 head_name: name,
                 lead_live,
                 lead_unnamed: running && p.lead.is_none(),
@@ -240,6 +243,13 @@ impl PlansView {
                     "dir": r.dir, "status": r.status, "priority": r.priority,
                     "admissible": r.admissible, "headName": r.head_name,
                 });
+                if !r.overlaps.is_empty() {
+                    v["overlaps"] = r
+                        .overlaps
+                        .iter()
+                        .map(|(plan, paths)| serde_json::json!({"plan": plan, "paths": paths}))
+                        .collect();
+                }
                 if let Some(live) = r.lead_live {
                     v["leadLive"] = live.into();
                 }

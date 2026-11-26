@@ -108,15 +108,6 @@ test('blockedBy must name a plan directory that exists', () => {
   assert.ok(checkPlanDir(path.join(r, 'a')).errors.includes('blockedBy names unknown plan missing-plan'));
 });
 
-test('two ready plans with overlapping footprints are flagged by --all', () => {
-  const r = root({ one: planText({ fm: { footprint: '[src/a/]' } }), two: planText({ fm: { footprint: '[src/a/x.mjs]' } }) });
-  const { overlaps } = checkAll(r);
-  assert.deepEqual(overlaps, [['one', 'two']]);
-  const out = [];
-  assert.equal(main(['--all', '--root', r], (l) => out.push(l)), 1);
-  assert.ok(out.some((l) => l.includes('overlapping footprints')));
-});
-
 test('phases of one wave with overlapping footprints are an error', () => {
   const rows = ['| 1 | a | - | `src/a/` | 1 | ready |', '| 2 | b | - | `src/a/file.mjs` | 1 | ready |'];
   const r = root({ p: planText({ rows }) });
@@ -223,19 +214,30 @@ test('--plan accepts several plan directories and checks each', () => {
   assert.ok(outMixed.some((l) => l.startsWith('ERROR bad:')));
 });
 
-test('cross-plan overlap is an error when ready and a warning when running', () => {
-  const r = root({
-    planReady: planText({ fm: { footprint: '[src/a/]' } }),
-    planRunning: planText({ fm: { status: 'running', lead: 'lead:S6A', footprint: '[src/a/file.mjs]' } }),
-  });
-  const outReady = [];
-  assert.equal(main(['--plan', path.join(r, 'planReady')], (l) => outReady.push(l)), 1);
-  assert.ok(outReady.some((l) => l.startsWith('ERROR planReady:') && l.includes('footprint overlaps another active plan')));
-
-  const outRunning = [];
-  assert.equal(main(['--plan', path.join(r, 'planRunning')], (l) => outRunning.push(l)), 0);
-  assert.ok(outRunning.some((l) => l.startsWith('WARN planRunning:') && l.includes('footprint overlaps another active plan')));
-  assert.ok(outRunning.includes('ok planRunning'));
+// Owns cross-plan reporting and exit codes; write-scope owns matching, and the same-wave test owns phase refusal.
+test('cross-plan overlap is a warning naming the other plan and the shared paths, for ready and running plans alike', () => {
+  for (const statuses of [['ready', 'ready'], ['ready', 'running'], ['running', 'running']]) {
+    const r = root({
+      one: planText({ fm: { status: statuses[0], lead: 'lead:S6A', footprint: '[src/a/, docs/shared.md, src/only-one/]' } }),
+      two: planText({ fm: { status: statuses[1], lead: 'lead:S6B', footprint: '[src/a/file.mjs, docs/shared.md, src/only-two/]' } }),
+    });
+    assert.deepEqual(checkAll(r).overlaps, [{ a: 'one', b: 'two', shared: ['src/a/', 'docs/shared.md'] }]);
+    for (const [checked, other, shared] of [
+      ['one', 'two', 'src/a/, docs/shared.md'],
+      ['two', 'one', 'src/a/file.mjs, docs/shared.md'],
+    ]) {
+      const out = [];
+      assert.equal(main(['--plan', path.join(r, checked)], (l) => out.push(l)), 0);
+      assert.deepEqual(out, [
+        `WARN ${checked}: footprint overlaps another active plan ${other} on ${shared}`,
+        `ok ${checked}`,
+      ]);
+    }
+    const out = [];
+    assert.equal(main(['--all', '--root', r], (l) => out.push(l)), 0);
+    assert.deepEqual(out.filter((l) => l.startsWith('WARN')), ['WARN active plans one and two share src/a/, docs/shared.md']);
+    assert.ok(!out.some((l) => l.startsWith('ERROR')));
+  }
 });
 
 test('a pair scan that stops at its cap is an error, never a clean verdict', () => {
