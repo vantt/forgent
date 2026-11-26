@@ -310,6 +310,23 @@ fn the_board_log_lines_naming_an_existing_plan_dir_are_activity() {
 
 struct FakeOwners {
     answer: Liveness,
+    supervisor_alive: bool,
+}
+
+impl FakeOwners {
+    fn new(answer: Liveness) -> Self {
+        Self {
+            answer,
+            supervisor_alive: true,
+        }
+    }
+
+    fn with_supervisor(answer: Liveness, supervisor_alive: bool) -> Self {
+        Self {
+            answer,
+            supervisor_alive,
+        }
+    }
 }
 
 impl HeadFacts for FakeOwners {
@@ -318,6 +335,9 @@ impl HeadFacts for FakeOwners {
     }
     fn identity_roles(&self) -> BTreeMap<String, &'static str> {
         BTreeMap::from([("head:planner-x".to_owned(), "alive")])
+    }
+    fn supervisor_alive(&self, _: &Path) -> bool {
+        self.supervisor_alive
     }
 }
 
@@ -332,6 +352,10 @@ fn head_records_with(answer: Liveness, extra: &str) -> Vec<Record> {
 
 /// As `head_records_with`, with the head's own run directory holding `closed` as its `closed.json` (when given).
 fn head_records_run(answer: Liveness, extra: &str, closed: Option<&str>) -> Vec<Record> {
+    head_records_facts(FakeOwners::new(answer), extra, closed)
+}
+
+fn head_records_facts(facts: FakeOwners, extra: &str, closed: Option<&str>) -> Vec<Record> {
     let root = scratch("head");
     let lineage = root.join(".fgos/runtime/session-rotation/planner-x");
     std::fs::create_dir_all(&lineage).unwrap();
@@ -348,7 +372,7 @@ fn head_records_run(answer: Liveness, extra: &str, closed: Option<&str>) -> Vec<
         ),
     )
     .unwrap();
-    let records = HeadStateSource::with_facts(Box::new(FakeOwners { answer }))
+    let records = HeadStateSource::with_facts(Box::new(facts))
         .records(&root, &all_time())
         .unwrap();
     let _ = std::fs::remove_dir_all(&root);
@@ -405,11 +429,9 @@ fn a_placement_with_retired_at_is_retired_at_that_instant_and_an_invalid_one_is_
 #[test]
 fn a_project_that_never_started_a_head_has_no_head_records() {
     let root = scratch("nohead");
-    let records = HeadStateSource::with_facts(Box::new(FakeOwners {
-        answer: Liveness::Live,
-    }))
-    .records(&root, &all_time())
-    .unwrap();
+    let records = HeadStateSource::with_facts(Box::new(FakeOwners::new(Liveness::Live)))
+        .records(&root, &all_time())
+        .unwrap();
     assert!(records.is_empty());
     let _ = std::fs::remove_dir_all(&root);
 }
@@ -448,5 +470,50 @@ fn an_unreadable_or_invalid_closed_file_is_no_signal() {
     for text in ["not json", r#"{"v":1}"#, r#"{"at":"yesterday"}"#] {
         let records = head_records_run(Liveness::Live, "", Some(text));
         assert_eq!(attr(&records[0], "fgos.head.state"), Some("live"), "{text}");
+    }
+}
+
+#[test]
+fn a_live_pane_with_a_dead_supervisor_reads_supervisor_gone_with_the_placement_instant() {
+    let records = head_records_facts(
+        FakeOwners::with_supervisor(Liveness::Live, false),
+        "",
+        None,
+    );
+    assert_eq!(records.len(), 1);
+    assert_eq!(records[0].subject.id, "head:planner-x");
+    assert_eq!(
+        attr(&records[0], "fgos.head.state"),
+        Some("supervisor-gone")
+    );
+    assert_eq!(records[0].ts, "2026-11-18T06:58:44.815Z");
+    assert_eq!(attr(&records[0], "fgos.head.role"), Some("head:planner-x"));
+    assert_eq!(attr(&records[0], "fgos.head.identity"), Some("alive"));
+    assert_eq!(attr(&records[0], "fgos.head.persona"), Some("planner"));
+}
+
+#[test]
+fn a_live_pane_with_a_live_supervisor_reads_live() {
+    let records = head_records_facts(
+        FakeOwners::with_supervisor(Liveness::Live, true),
+        "",
+        None,
+    );
+    assert_eq!(records.len(), 1);
+    assert_eq!(attr(&records[0], "fgos.head.state"), Some("live"));
+    assert_ne!(records[0].ts, "2026-11-18T06:58:44.815Z");
+}
+
+#[test]
+fn a_gone_pane_reads_gone_regardless_of_supervisor() {
+    for sup_alive in [true, false] {
+        let records = head_records_facts(
+            FakeOwners::with_supervisor(Liveness::Gone, sup_alive),
+            "",
+            None,
+        );
+        assert_eq!(records.len(), 1);
+        assert_eq!(attr(&records[0], "fgos.head.state"), Some("gone"));
+        assert_eq!(records[0].ts, "2026-11-18T06:58:44.815Z");
     }
 }
