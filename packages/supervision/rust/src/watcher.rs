@@ -305,18 +305,11 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
         let expired = now - started >= ports.review.in_flight_bound_sec();
         match ports.review.settled(started, expired) {
             Ok(ReviewSettlement::Settled(unit_run_id)) => {
-                settled_this_tick = true;
                 if let Err(e) = ports.review.done(started, &unit_run_id) {
                     r.errors += 1;
                     r.problems.push(format!("review-done: {e}"));
                 } else {
-                    if let Ok(unhandled) = ports.queue.unhandled() {
-                        for e in unhandled {
-                            if action(settings, &e.kind) == Action::StartReview {
-                                let _ = ports.queue.review_handled(&e.id);
-                            }
-                        }
-                    }
+                    settled_this_tick = true;
                     state.review_started = None;
                 }
             }
