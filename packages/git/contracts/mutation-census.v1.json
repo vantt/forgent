@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "18f937c2cf84de6b38278415e73eb2f57e4a22c520782921e3ce939032932d98",
+  "payloadDigest": "44283fbf375f6497ba06328700eb4145cee83976255fcc4fb8b62ba033e2ca25",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "dc14ff69bc4b144893fa6988de4df6b6180ab255ef8751fd1615ad93472b9e71",
     ".agents/skills/_shared/capability-matching.md": "93cd382994e2201e4aa8ec7816d740f6da634a0ee69d6911800a848ed5de1d8b",
@@ -132,7 +132,7 @@
     "apps/fgos/src/wiring/events.rs": "472018eb9c3e76867d7e50f388de9248edd6803011972fa1f43eb72bf64a8386",
     "apps/fgos/src/wiring/execution_routes.rs": "c2f7a28c9cae123fa8add7423eb330bc91c73c2d58bd8c15bb50b655acb709cc",
     "apps/fgos/src/wiring/gateway_control.rs": "4d0497382df90574bbe4f65a249d0977bc23e1334c7ad7c83f13351d8ff22ca8",
-    "apps/fgos/src/wiring/git_incidents.rs": "e455ef2680d5a9d69cad3feca5da19f6db79cf283cc7e3bb43c624068df90fab",
+    "apps/fgos/src/wiring/git_incidents.rs": "c48e3906320403b54f3fb17780616ac9d11a0e3320778e8ea81250be4581b3e4",
     "apps/fgos/src/wiring/head_questions.rs": "600d2645a376e2e18b059342368576385652b7bd60d9dfb6053c1c23134640d7",
     "apps/fgos/src/wiring/identity_log.rs": "d7d9dd503ecbd84a5373aa27f6853996e6944aba2940d15e8284cd92c14eef7a",
     "apps/fgos/src/wiring/init.rs": "ad2a58907ec31a23cea8e1205dc45c041b65259c58d36e46e96ff1b64acfb578",
@@ -200,6 +200,7 @@
     "apps/fgos/tests/cli_tests.rs": "8b7c32078e828bb11e095e98b62bd65ecef6d4590e1ce6d8b1ec8eb5240ef988",
     "apps/fgos/tests/doc_locate.rs": "96f6b44203e68a196cddac862580f335317265d316b111625c9736e8dbdeacc1",
     "apps/fgos/tests/driving_definitions.rs": "fa31e9456150a2e8038d54916be5b2373b434cb3521a2d97afb02219815c20a5",
+    "apps/fgos/tests/git_recover_confirm_dead.rs": "8a22600affe45caeeafe6d36c046178c2e8f996b3e565cf3e3f521fa9bf18e4d",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
     "apps/fgos/tests/mailbox_routes.rs": "fa05ebfe1b24ab7b702324c5d9506baef37173f922b273d2237b7c281d8d925c",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
@@ -793,7 +794,7 @@
     "packages/git/node-addon/src/yaml.rs": "e0de6f2e07d5d3e2f90d4ecae7c9900b5dd0e563b77ef7248977ba5e3f4de577",
     "packages/git/node-addon/tests/yaml_parts.rs": "e6d7103f8d30358c7209070c1e662c6872be94b769d4184415e9b79a09d00e97",
     "packages/git/rust/src/driver.rs": "292d47cd86d45f61f2b881fa3ecae7d6294244f5f08e62cabede32eedf2a1b12",
-    "packages/git/rust/src/incidents.rs": "a3c7fe0aedb95e06c8a49a9cb6208062239679dcd29959373c1c1b61656fa778",
+    "packages/git/rust/src/incidents.rs": "39d030ff4203ab4f77e4352c88c974ad09e81d529767e058468078fb86b948b7",
     "packages/git/rust/src/inspect.rs": "bada67b0debee266737139d138be5da3248ae0dd7c5bcf64c109046ecc4acd7f",
     "packages/git/rust/src/invocation_root.rs": "52cf1d8bf29c37fbbafa7acb4b947d0413649d091034b17af96920e570d3ea18",
     "packages/git/rust/src/land.rs": "e4bc86acc3e093e8bf8181d73ef890a0dedaa184325c3f1726e43a310e2109c7",
@@ -2535,6 +2536,13 @@
       "line": 383,
       "spawn": "Command::new",
       "binary": "? program",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/git_recover_confirm_dead.rs",
+      "line": 108,
+      "spawn": "Command::new",
+      "binary": "sh",
       "class": "rust-test"
     },
     {

@@ -467,8 +467,9 @@ fn kept_text(kept: &Kept) -> String {
         if kept.cause == "land-authority-mismatch" && kept.dead {
             format!("; only its writer{writer_clause} can recover an attempted Land")
         } else {
+            let confirm_id = if writer.is_empty() { "<id>" } else { writer };
             format!(
-                "; only its writer{writer_clause} (alive or not provably dead) or, once it is gone, `fgos git recover` can recover it{settled_by}"
+                "; only its writer{writer_clause} (alive or not provably dead) or, once it is gone, `fgos git recover` can recover it{settled_by}, or the owner can confirm it dead with `fgos git recover --confirm-writer-dead {confirm_id}`"
             )
         }
     } else {
@@ -725,8 +726,8 @@ mod tests {
         assert_eq!(
             message,
             "recovered interrupted Git operations: done-1; warning: Git operations kept for recovery: \
-             land-1 (land-authority-mismatch; only its writer w-a (alive or not provably dead) or, once it is gone, `fgos git recover` can recover it); \
-             push-1 (remote-authority-mismatch; only its writer w-b (alive or not provably dead) or, once it is gone, `fgos git recover` can recover it, and the next event sync settles it); \
+             land-1 (land-authority-mismatch; only its writer w-a (alive or not provably dead) or, once it is gone, `fgos git recover` can recover it, or the owner can confirm it dead with `fgos git recover --confirm-writer-dead w-a`); \
+             push-1 (remote-authority-mismatch; only its writer w-b (alive or not provably dead) or, once it is gone, `fgos git recover` can recover it, and the next event sync settles it, or the owner can confirm it dead with `fgos git recover --confirm-writer-dead w-b`); \
              commit-1 (checkout-custody-busy)"
         );
         assert_eq!(
@@ -736,7 +737,7 @@ mod tests {
                 writer: None,
                 dead: false,
             }),
-            "c-1 (commit-authority-mismatch; only its writer (alive or not provably dead) or, once it is gone, `fgos git recover` can recover it)"
+            "c-1 (commit-authority-mismatch; only its writer (alive or not provably dead) or, once it is gone, `fgos git recover` can recover it, or the owner can confirm it dead with `fgos git recover --confirm-writer-dead <id>`)"
         );
     }
 }
