@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Each run supervisor in its own systemd scope, and a head whose supervisor died is raised as session-gone"
-status: draft
+status: ready
 priority: P0
 blockedBy: []
 base: cc5b6ea9a2dd8e694682df95070c3ff681945f42

@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "fgos session stop ends a head whose run supervisor is dead; session-gone wiring proof and changelog"
-status: draft
+status: ready
 priority: P0
 blockedBy:
   - 261127-0016-head-run-own-failure-domain
@@ -64,7 +64,7 @@ Re-attaching a supervisor to a running agent; automatic restart; anything alread
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Stop a head with a dead supervisor](phase-01-stop-dead-supervisor-head.md) | - | src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs, docs/platform/session-host/spec.md, packages/supervision/rust/tests/definitions.rs, changelog.d/261127-0018-dead-supervisor-head-stop.md, plans/261127-0018-dead-supervisor-head-stop/reports/** | 1 | draft |
+| 1 | [Stop a head with a dead supervisor](phase-01-stop-dead-supervisor-head.md) | - | src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs, docs/platform/session-host/spec.md, packages/supervision/rust/tests/definitions.rs, changelog.d/261127-0018-dead-supervisor-head-stop.md, plans/261127-0018-dead-supervisor-head-stop/reports/** | 1 | ready |
 
 ## Owner questions
 
