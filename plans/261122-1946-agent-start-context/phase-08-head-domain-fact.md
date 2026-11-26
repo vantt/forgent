@@ -36,3 +36,17 @@ record of a head started on a work item with `domain: coding` lists the coding-d
 ## Rollback
 
 Revert the commit. The domain fact disappears, and units scoped to a domain stop matching heads.
+
+## Result (2026-11-27, fg-server)
+
+Done. The field is `domain` in the item's frontmatter, the name settled by discussion `ds-ubqlutna6r` (A8, owner
+2026-11-25).
+- `planOfHead` reads it from the `plan.md` it already parses at the trunk tip.
+- `discussionOfHead` reads it from `DISCUSSION.md` (port `readDiscussion`).
+- `taskOfHead` carries it, and `headStartRequest` sets the `domain` fact only when it is present.
+
+No plan or discussion names a domain yet, so today's heads get no domain fact until intake writes one. The owning
+proofs are the `taskOfHead` case in `test/session-host/head-plan.test.mjs` and the `headStartRequest` case in
+`test/session-host/head-start.test.mjs`. The golden `shaper-task-coding` shows change 1, the filled
+`domains/coding/`.
+

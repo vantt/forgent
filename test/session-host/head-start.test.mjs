@@ -11,7 +11,7 @@ import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import { readRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
-import { bindHeadSeat, headKeyOf, headRoleOf, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, personasHeadsFirst, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
+import { bindHeadSeat, headKeyOf, headRoleOf, headStartRequest, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, personasHeadsFirst, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
 import { grantOf } from '../../src/session-host/head-grants.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { headOf } from '../../src/native/execution-door.mjs';
@@ -238,6 +238,13 @@ test('this repository\'s runner configuration pins every coordinating persona to
     assert.deepEqual(list.map((entry) => typeof entry === 'string' ? entry : entry.executor), ['claude'], `${persona} must pin claude only`);
     assert.ok(list.every((entry) => entry.crossProvider !== true), `${persona} must not allow crossing provider`);
   }
+});
+
+test('a head start request carries the bound item\'s domain as a fact, and no domain fact when the item names none', () => {
+  const base = { persona: 'lead', name: 'p', projectRoot: '/tmp/proj', cli: 'claude' };
+  const task = { kind: 'plan', path: 'plans/x/plan.md' };
+  assert.equal(headStartRequest({ ...base, task: { ...task, domain: 'coding' } }).facts.domain, 'coding');
+  assert.equal('domain' in headStartRequest({ ...base, task }).facts, false);
 });
 
 test('the session launches with its role, its grant and the opening composed from its head start request', async () => {

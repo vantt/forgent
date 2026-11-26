@@ -81,6 +81,16 @@
       }
     },
     {
+      "id": "shaper-task-coding",
+      "delivery": "opening",
+      "persona": "shaper",
+      "name": "golden",
+      "task": {
+        "path": "plans/261122-1946-agent-start-context/plan.md"
+      },
+      "domain": "coding"
+    },
+    {
       "id": "shaper-handoff",
       "delivery": "opening",
       "persona": "shaper",

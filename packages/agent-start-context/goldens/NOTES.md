@@ -33,3 +33,5 @@ Any other difference is a regression. A golden regenerated for one of these thre
 - 2026-11-27: the five `<persona>-handoff` openings, for change 3. The handoff text (the fixture in `cases.json`) is now
   the last section of the opening, from the `rotation-handoff` contributor. The ritual's first line says so and keeps
   the file path, and the SessionStart hook no longer prints the handoff.
+- 2026-11-27: `shaper-task-coding`, new, for change 1: the `shaper-task` opening of a shaper whose discussion names
+  `domain: coding`, with `domains/<domain>/` filled in. No other byte differs.

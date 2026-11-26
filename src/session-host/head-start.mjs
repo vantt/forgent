@@ -105,6 +105,8 @@ async function defaultOpening({ projectRoot, request }) {
 /** The start request of a head: who it is, the CLI it runs on, and what it starts with. */
 export function headStartRequest({ persona, name, projectRoot, cli, handoff = null, forQuestion = null, task = null }) {
   const facts = { sessionType: 'head', persona, project: path.basename(path.resolve(projectRoot)), agentCli: cli, agentLifecycle: handoff ? 'rotate' : 'start' };
+  // The bound item's domain, decided at intake; a head with no domain gets no domain fact, never a default.
+  if (task?.domain) facts.domain = task.domain;
   const payloads = [{ kind: 'session', name }];
   if (task?.path) payloads.push({ kind: 'task', path: task.path, itemKind: task.kind === 'plan' ? 'plan' : 'discussion' });
   if (handoff?.path) payloads.push({ kind: 'handoff', path: handoff.path });

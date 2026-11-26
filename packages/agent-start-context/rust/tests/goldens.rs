@@ -190,8 +190,12 @@ fn every_head_opening_golden_is_composed_byte_for_byte() {
         if let Some(q) = case.get("forQuestion") {
             payloads.push(json!({"kind": "for-question", "questionId": q}));
         }
+        let mut facts = json!({"sessionType": "head", "persona": persona, "project": "forgent", "agentCli": "claude", "agentLifecycle": lifecycle});
+        if let Some(domain) = case.get("domain") {
+            facts["domain"] = domain.clone();
+        }
         let request = StartRequest::from_json(&json!({
-            "facts": {"sessionType": "head", "persona": persona, "project": "forgent", "agentCli": "claude", "agentLifecycle": lifecycle},
+            "facts": facts,
             "payloads": payloads,
             "delivery": "opening"
         }))
@@ -215,7 +219,7 @@ fn every_head_opening_golden_is_composed_byte_for_byte() {
         assert_eq!(composed, golden, "{id}");
         checked += 1;
     }
-    assert_eq!(checked, 20, "every recorded head opening");
+    assert_eq!(checked, 21, "every recorded head opening");
 }
 
 #[test]
