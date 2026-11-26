@@ -2146,14 +2146,10 @@ fn scoped_commit_drops_store_paths_and_ignores_absent_skip_worktree_paths() {
         git(&f.tree, &["ls-tree", "--name-only", "HEAD", ".fgos"]),
         ""
     );
-    assert_eq!(
-        git(&f.tree, &["show", "HEAD:product.txt"]),
-        "product code"
-    );
+    assert_eq!(git(&f.tree, &["show", "HEAD:product.txt"]), "product code");
     assert!(!f.tree.join("sparse").exists());
     assert_eq!(
         fs::read_to_string(f.tree.join(".fgos/config.yaml")).unwrap(),
         "fresh config\n"
     );
 }
-
