@@ -100,6 +100,8 @@ If phase 5 lands already submitting by profile, phase 1 only adds the missing ca
 | 2 | [The verb submits and answers by name](phase-02-verb-submits-and-answers.md) | 1 | apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, docs/platform/supervision/spec.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/**, CHANGELOG.md | 2 | ready |
 | 3 | [Live check and integration](phase-03-live-check-and-integration.md) | 1, 2 | plans/261126-0853-session-type-submits-enter/reports/live-check.md | 3 | ready |
 
+Why `draft`: the footprint overlaps plans `261125-2313` (`pane_io.rs`, `typed_wake.rs`) and `261124-2143` (`supervision.rs`, the supervisor skill, the supervision spec), which this plan waits for by `blockedBy`, and plan `261125-1631` (the generated `command-manifest.json` and `src/cli/command-registry.mjs`). The plan contract refuses `ready` while a `ready` or `running` plan shares a path, so the plan flips to `ready` once those three are `done` (or `261125-1631` has landed its manifest phase and narrowed its footprint). That flip needs no new decision: rerun `node scripts/plan-contract-check.mjs --plan plans/261126-0853-session-type-submits-enter` and land `plan.md` alone with `status: ready`.
+
 Layers stay serial: the session-host call (phase 1) lands before the supervision wiring above it (phase 2). The
 hot files (CHANGELOG, generated manifest, skill renders) belong to phase 2 alone. Each phase is `code:implement`
 except phase 3, which is `code:test`.
