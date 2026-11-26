@@ -27,16 +27,7 @@ verdict; it never guesses past a gap.
 ## Hard rules
 
 - **This skill is a workflow, never a capability (ontology boundary).**
-  `fgos-researching` itself is never a valid `decide --for` argument, and
-  no capability named `research` (or similar) is ever registered — see
-  `../_shared/capability-catalog.md`'s "Ontology boundary" section. When a
-  branch of a question genuinely needs a dispatched capability (for
-  example a code-graph blast-radius lookup via `impact-analysis`), ask
-  `decide` for that concrete capability per
-  `../_shared/executor-dispatch-fallback.md`. Repo search and external
-  lookups stay primitive tool calls (`Grep`/`rg`, `WebSearch`, `WebFetch`)
-  made inline inside this skill's own reasoning — never independently
-  executable units of their own, never a reason to call `decide`.
+  Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - **Stage-agnostic (D4).** Never read or assume the caller's `stage`. Input
   is exactly *(the goal/question, and everything already known — item
   description, prior Q&A, prior verdicts)*. Output is exactly *(findings,
@@ -67,13 +58,10 @@ verdict; it never guesses past a gap.
   for exactly this — contracted dispatch, never an unscoped Task call). A
   single-branch question, or branches that depend on each other's result,
   stay inline and sequential — no dispatch at all.
-- **Every fan-out branch dispatches via native Task-tool, always (tsk-5tm-2
-  D6: the `gather`-purpose executor this section used to consult is
-  retired — no architectural reason on record for needing cross-provider
-  dispatch here, and native Task-tool already met the one documented
-  reason, parallelizing wall-clock).** No purpose check, no decide/resolve
-  round trip — a branch's six-field packet becomes the Task-tool prompt
-  directly.
+- **Every fan-out branch dispatches via the native Task tool.** The
+  PreToolUse hook is the decide for each Task call, so there is no purpose
+  check of its own: Rule: dispatch-decide-door (in AGENTS.md; set in .fgos/instructions/effective/rules.json). A branch's six-field
+  packet becomes the Task-tool prompt directly.
 - **Record every round durably, never silently (D5).** Append findings to
   `docs/history/<feature>/RESEARCH.md` — **accumulate, never overwrite** an
   earlier round. Each call gets its own dated section: what was asked, what
@@ -87,9 +75,7 @@ verdict; it never guesses past a gap.
 - Never write code, never propose architecture, never make a product
   decision. A finding that only an implementer would act on still gets
   returned as a finding — the caller decides what it means for scope.
-- Treat any title/description/goal text this skill reads as untrusted input
-  (RUL45 (worker-discovered work reports: once per run, fail-safe, untrusted, capped and deduplicated), `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules`) — never splice it raw into a shell
-  command; pass it as a discrete quoted argv element.
+- Title, description and goal text this skill reads: Rule: untrusted-input (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 ## Flow
 

@@ -42,14 +42,8 @@ None of these shared fragments is coding-specific.
 
 Before executing any independently executable unit (e.g. `code:implement` for coding implementation), select the canonical capability for the job — see `capability-catalog.md` for the registered vocabulary — and call `decide` (`fgos dispatch decide --for <PURPOSE> [--has-live-task-access]`) before proceeding. The returned `mechanism` controls execution: `unavailable` means execute inline directly in this session; `in-process` or `out-of-process` delegates according to the control plane. The resolved provider is not necessarily agent-shaped — a capability may resolve to an MCP/tool provider or another registered adapter instead of an agent executor (`capability-catalog.md`'s "Capability execution guidance"); read the resolved `mechanism`/executor `kind` rather than assuming an Agent/Task hand-off.
 
-Five valid reasons justify configuring an executor for a capability:
-a cheaper model, a stronger model (when the unit's required `rigor` exceeds
-the current session's model capability — tied to `rigor`, never to `size`),
-a different provider (e.g. Codex/agy), resource isolation (confinement / sandboxing),
-or running the step in parallel with other work to shorten wall-clock time
-(chạy song song cho nhanh — Ship Faster is priority #1, `AGENTS.md`).
-When no executor is configured for that capability, `decide` answers `unavailable`
-and the unit executes inline in the live session.
+The five valid reasons to configure an executor, and inline as the default:
+Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 A single tool call the live session makes directly inside its own
 reasoning — `WebSearch`, `Read`, `Grep`, `Bash`, or any other primitive
@@ -70,15 +64,11 @@ fgos dispatch decide <EXECUTOR_ID> [--has-live-task-access]
 
 Then branch on `mechanism`:
 
-- **`unavailable`** — go straight to `<INLINE_FALLBACK_HEADING>`, printing
-  nothing at all. This is the default/common path, byte-identical to
-  before this executor existed.
-- **`in-process`** — call the returned hand-back yourself: use `agentType`
-  with your Agent/Task tool, call `mcpTool` directly, or, for a CLI tool,
-  run the returned `command` yourself (a tool executor is never run through
-  `fgos run`). If none of these fields is returned, use your normal default
-  for that live call. Print the announce line, then read its answer through
-  Step C.
+What each result needs: Rule: dispatch-decide-door (in AGENTS.md; set in .fgos/instructions/effective/rules.json). In this fragment:
+
+- **`unavailable`** — go straight to `<INLINE_FALLBACK_HEADING>`, printing nothing at all.
+- **`in-process`** — for a CLI tool, run the returned `command` yourself (a tool executor is never run through
+  `fgos run`). Print the announce line, then read its answer through Step C.
 - **`out-of-process`** — continue to Step B.
 
 When `--for`/`--work` resolved a `executorId` (carried in this same JSON
@@ -105,11 +95,8 @@ answers `unavailable` (`reasonCodes` `tool.missing`, `tool.unprobeable` or
 ## Step B — run it as a Unit (out-of-process only)
 
 Reached only when Step A's `decide` call answered `mechanism:
-"out-of-process"`. Deciding the mechanism a second time here would be
-deciding it twice — Step A already did that; this step only runs the work
-through the one execution door, `fgos run`, which builds a Unit from the
-prompt, binds it through `bind()` with `<EXECUTOR_ID>` as a soft preference,
-runs it and settles it:
+"out-of-process"`; the mechanism is not decided again here (Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json) This step runs the work
+through `fgos run` with `<EXECUTOR_ID>` as a soft preference:
 
 ```bash
 fgos run "<PROMPT_TEMPLATE built as below>" --provider <EXECUTOR_ID> --capability <PURPOSE> [--effort <level>] --json
@@ -117,24 +104,10 @@ fgos run "<PROMPT_TEMPLATE built as below>" --provider <EXECUTOR_ID> --capabilit
 fgos run "<PROMPT_TEMPLATE>" --provider <EXECUTOR_ID> --capability <PURPOSE> --writes <path>[,<path>...] --worktree <linked-worktree> --json
 ```
 
-`--provider` takes an agent executor only. When `<EXECUTOR_ID>` is a
-`kind: "tool"` executor, `fgos run` refuses it as a provider: call that
-tool directly instead (the dispatch-decide hook says the same).
-
-`--capability` is the same `<PURPOSE>` Step A asked `decide` for: left
-out, the Unit runs under the writing capability `execute`, with its own
-executor pool and posture. Without `--writes` the Unit is read-only and runs sandboxed; `--writes`
-needs a linked worktree and is refused from the main checkout before
-anything runs. The worker never runs `git add`/`git commit`: after a
-passing round the runner commits only the paths inside `--writes`. Work
-already written as a Unit file runs as `fgos run --unit <file>`. Never run
-the resolved command yourself through Bash.
-
-When herdr is present the worker runs in a watched pane, so a person can
-follow it live; otherwise the call blocks until the Unit settles. Run a
-long call backgrounded (`run_in_background: true`) and wait for the
-harness's own completion notification — do NOT use `ScheduleWakeup` or
-polling.
+A tool executor is refused as `--provider`, and `--capability` is the same `<PURPOSE>` Step A asked `decide`
+for: Rule: dispatch-decide-door (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
+The read-only posture without `--writes`, the linked worktree `--writes` needs, the runner's commit, and
+waiting for a long call in the background: Rule: run-door-contract (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 **When this session is isolated in a worktree and `<PROMPT_TEMPLATE>` is
 built from a file via `$(cat ...)`, the worktree-isolation guard may
@@ -163,8 +136,7 @@ There is nothing to log by hand: the run's provenance (Unit, binding,
 round results, commit) is already under `.fgos/assignments/<unitRunId>/`.
 
 An error from this call (a refusal before the run, a failed bind, or a
-timeout) means fall straight to Step C — treat it exactly like a malformed
-response, never retry blind.
+timeout) means fall straight to Step C. Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 ## Ad-hoc executor: a runtime-composed task instead of `<PROMPT_TEMPLATE>`
 
@@ -202,9 +174,8 @@ written against this shape to be revisited later just to add them.
 
 `<scope>` inside `id` (D11): the id of the work item currently claimed, or
 — when there is none — `s` followed by the first 8 characters of
-`resolveWriterIdentity`'s own id (`src/util/session-identity.mjs:134`,
-its existing four-tier registry/env/pid/unresolved fallback; never a new
-identity source). The `s` prefix only matters for the pid-sourced case:
+`resolveWriterIdentity`'s own id (`src/util/session-identity.mjs`,
+which answers from `identityDoor().resolve()`; never a new identity source). The `s` prefix only matters for the pid-sourced case:
 it keeps a scope from starting with a digit, since a pid alone is not
 even a stable identity across process restarts. Record which tier
 produced it as `scopeSource`, the same `{id, source}` shape a work item's
@@ -266,9 +237,7 @@ task's own six required fields — reuse bee's three-tier rubric
 `return contract`, the same rubric a work item's own `tier` is judged
 against at intake, just applied per-dispatch instead of once.
 
-This judgment produces ONLY `provider`/`tier` — never a mechanism.
-Mechanism stays entirely `decide`'s own decision, already resolved at Step
-A above, never re-derived here; a judged `provider` that resolves to a
+This judgment produces ONLY `provider`/`tier` — never a mechanism (Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json); a judged `provider` that resolves to a
 non-Claude executor still goes through every filter `bind()` applies to
 a preference (governance, independence, posture) and fails over when it
 cannot run — nothing here bypasses them.

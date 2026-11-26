@@ -28,11 +28,11 @@ the YAML door (`src/util/yaml.mjs`), never a private parser.
 ## 1. Location
 
 - Plan directory: `plans/<dir>/`, with `<dir>` from `fgos convention path --kind plan`
-  (never built by hand; parallel planners choose distinct slugs).
+  (Rule: convention-paths, in AGENTS.md; set in .fgos/instructions/effective/rules.json)
 - `plans/<dir>/plan.md`: the plan. `plans/<dir>/phase-NN-<name>.md`: one file per phase.
   `plans/<dir>/reports/`: reports, measures, research.
-- The planner writes only inside its plan dir. Source, tests, docs and other plans are
-  read, never edited.
+- Boundary: `core/agents/planner.yaml` (description and decision boundary). Within it, the planner
+  writes only inside its plan dir; source, tests, docs and other plans are read, never edited.
 
 ## 2. Frontmatter of plan.md
 
@@ -103,7 +103,7 @@ The phase table has exactly these columns (order free):
   the one above it starts).
 - **Hot files**: one writer per hot file per wave. A shared file (registry, manifest, index,
   CHANGELOG) goes to one phase or to a final serial phase. Generated files are named as hot
-  files and are regenerated, never hand-merged.
+  files (Rule: design-principles (in AGENTS.md; set in .fgos/instructions/effective/rules.json)., principle 7).
 - **Size**: a phase fits one short leader, about one to two days of work. Larger: split it,
   by file boundary first.
 - **Execution**: each parallel phase runs as its own Workflow case in its own worktree.

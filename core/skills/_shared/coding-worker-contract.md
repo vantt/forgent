@@ -51,7 +51,9 @@ these five rules:
    specific field, file, or piece of context you needed and didn't get) —
    never a vague "insufficient context." This is the same discipline as a
    human new-hire refusing a task with no brief, rather than inventing
-   requirements to look productive.
+   requirements to look productive. A skill stage that would ask a question
+   and has a documented default is a different case: it takes that default
+   (`../_shared/cook-worker-contract.md`, rule 1).
 4. **Report through a fixed token, not free prose.** Whatever you were
    dispatched through, your caller does not parse your prose to learn what
    happened — it reads a fixed, minimal status signal. Two tokens cover
@@ -96,13 +98,14 @@ cover that case instead.
    touch the main working tree, another branch, or another worktree.
 2. **Verify is a real shell command, run before you claim done.** The
    item's own `verify` command is the only thing that decides whether the
-   work is complete — proof, never assertion. Run it once, near the end,
+   work is complete; a claim is never evidence: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
+   What to run: Rule: coding-verification-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json). Run it once, near the end,
    when you believe the work is actually done — never as a per-edit habit.
    Run it yourself; if it fails, fix the root cause and rerun the exact
    command. Never weaken it, swap in an easier check, or report `[DONE]` on
    the strength of your own read of the diff.
-3. **Edit files, then stop — never commit.** Leave your changes in the
-   item's worktree; the runner stages and commits them after you return,
+3. **Edit files, then stop — never commit.** Rule: run-door-contract (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
+   Leave your changes in the item's worktree; the runner commits them after you return,
    with the item id in the message (a fenced JSON Result with a `summary`
    field becomes the commit subject; its `commit` field is filled in by the
    runner, not by you). You have no git write access. Do not merge, push,

@@ -31,9 +31,8 @@ worker cwd. With the read-only safety prerequisite satisfied:
 fgos workflow start architecture-advisory --request "<verbatim CASE>" --dir <repoRoot> --worktree <targetRoot>
 ```
 
-The start result identifies a run, not completed advice. Read the complete settled
-reports supplied by the workflow/operator; never infer success from launch metadata,
-chat memory, an absent report, or a one-line summary. Missing evidence stays a gap.
+The start result identifies a run, not completed advice (Rule: driver-discipline, in AGENTS.md; set in .fgos/instructions/effective/rules.json)
+Read the complete settled reports supplied by the workflow/operator. Missing evidence stays a gap.
 Do not open workflow event logs, unit state files, or a parallel status store.
 
 ## Read-only safety prerequisite

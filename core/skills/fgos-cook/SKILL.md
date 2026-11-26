@@ -116,8 +116,7 @@ lower it. You never set a provider, model or tier.
 
 - This is coordination, not an execution engine. Guide, admission and the two doors
   stay authoritative; `bind()` alone picks who runs a slice.
-- Never claim a slice is verified because a worker or a checker said so; claim only
-  what you re-ran or read.
+- Claim only what you re-ran or read: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - Do not touch Work items: the old Work-item path is `/fgOS:deliver`.
 - The frame is the owner's once approved: you may narrow it, never widen it. A
   widened frame is a new proposal and a question.

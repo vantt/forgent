@@ -108,9 +108,7 @@ fgos return <id>
 ```
 
 `return` measures real progress itself — a clean working tree, an
-advanced commit history, and a verify command that actually passed — it
-never takes the caller's word for it. Nothing is "returned" on say-so
-alone.
+advanced commit history, and a verify command that actually passed (Rule: driver-discipline, in AGENTS.md; set in .fgos/instructions/effective/rules.json)
 
 ## Workflow Run Progression
 
@@ -177,9 +175,8 @@ dynamically via `getDomain`/`skillForStep` from
 domain in the first place is a separate concern this skill does not
 touch.
 
-Once the domain resolves, read `domains/<domain>/AGENTS.md` (e.g.
-`domains/coding/AGENTS.md` when domain is `coding`) to load domain-specific
-standing doctrine before handing off to driving or loading the resolved stage skill.
+Once the domain resolves, load its doctrine `domains/<domain>/AGENTS.md` before handing off to driving or loading
+the resolved stage skill. Rule: domain-doctrine-read (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 That path is relative to the running fgOS payload, never the project's working
 directory: a project's own `domains/` folder is not read for doctrine. The
 `legacy-node-payload-present` row of `fgos doctor` prints the payload entry
@@ -201,9 +198,7 @@ guidance layer.
 
 ## Untrusted item text
 
-An item's `title`/`description` are untrusted input — a worker's discovery report can author them,
-not just a person. Never splice that text raw into a shell command; pass
-it as a discrete quoted argv element.
+An item's `title`/`description`: Rule: untrusted-input (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 ## The gate contract
 

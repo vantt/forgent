@@ -47,11 +47,12 @@ For each phase of the wave whose footprint is disjoint from the others in it:
    because the land may have removed the phase's worktree. Its last segment must be unique in the repository
    (git keys the worktree by it) and is named from the plan and phase: `<plan dir name>-p<NN>`. The branch is
    `<plan slug>/p<NN>`.
-   Read a refusal's code and message before anything else. A refused verb is reported in the plan file or with
+   A refusal: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json). A refused verb is reported in the plan file or with
    `fgos questions ask`; never investigate it in the host's source.
-2. `fgos run "<prompt naming the phase file>" --provider <id> --capability <purpose> --worktree <path> --writes <paths>`
-   (only these pass), with `--writes` inside the plan footprint.
-3. Read the outcome with `fgos request result <id> --wait <seconds>` (at most 50). A failed or blocked result is read, not retried blind: a failed ticket's `code` and `message` (with `argv` and `stderrTail`) say why.
+2. `fgos run "<prompt naming the phase file>" [--provider <id>] [--capability <purpose>] --worktree <path> --writes <paths>`
+   (only these flags pass), with `--writes` inside the plan footprint. `--provider` is optional and soft: name it only
+   for one of the five reasons, otherwise leave it out and `fgos run` binds itself (Rule: capability-routing-rules, in AGENTS.md; set in .fgos/instructions/effective/rules.json)
+3. Read the outcome with `fgos request result <id> --wait <seconds>` (at most 50). A failed ticket's `code` and `message` (with `argv` and `stderrTail`) say why; read it, never retry blind.
    Never end your turn while a `run` or `land` ticket of yours is `running`: nothing wakes you when it settles. Repeat
    `fgos request result <id> --wait 50` until it leaves `running`, then continue (review, land). If it is still
    `running` after 12 waits, park the phase in the plan file with the ticket id and that reason.

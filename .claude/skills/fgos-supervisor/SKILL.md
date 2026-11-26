@@ -3,8 +3,8 @@ name: fgos-supervisor
 user-invocable: false
 description: >-
   Procedure of the project supervisor, one stateless wake: look after every running agent that no lead watches (leads,
-  shapers, planners, and any agent started without a lead), drain the supervision event queue and help requests, admit
-  ready plans into the lane pool and start one lead per plan, restart or park a gone lead, close done plans, start the one
+  shapers, planners, and any agent started without a lead), judge the supervision event queue and help requests,
+  resolve ties and other cases raised for judgement, restart or park a gone lead, close done plans, start the one
   planner of a settled discussion, and resume the asker of an answered owner question. Never implements, reviews, lands
   code or chats with the owner. Examples: "the supervisor was woken", "a plan became ready", "a lead is gone".
 ---

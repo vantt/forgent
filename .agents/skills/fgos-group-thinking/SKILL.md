@@ -85,11 +85,9 @@ fgos workflow start business-discussion
 fgos workflow start architecture-advisory
 ```
 
-`start` returns at once with the `workflowRunId` and a `detached` block (`pid`, `logPath`,
-`statusCommand`); the run continues in a detached process. Never treat the output of `start` as the
-result: poll `fgos workflow status <workflowRunId>` (section 3) until the run is `completed`, `failed`
-or parked at a gate. `answer` and `resume` return the same way (`answer` records the answer first,
-then the advance continues detached). Pass `--foreground` only when the caller must wait in place.
+`start` returns at once with a detached run; poll `fgos workflow status <workflowRunId>` (section 3)
+until it settles, and never treat the output of `start` as the result: Rule: run-door-contract (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
+`answer` records the answer first, then the advance continues detached.
 
 ### Stance options (so Observe can measure agreement)
 
@@ -124,8 +122,8 @@ fgos workflow start group-cognition --request "<question>" --seats "<lens one>|@
   pinned when the run starts, so editing or deleting the file later does not change the run. No
   seat maximum: seats beyond the provider families share one and `start` reports it as
   `seatsPreflight`.
-- Delphi uses the same seats in both rounds. `council-lite` and `architecture-advisory` keep their
-  own seats and refuse `--seats`. `workflow resume` refuses a different `--seats` than the run began with.
+- Delphi uses the same seats in both rounds. Which routes refuse `--seats`:
+  `../fgos-advise/references/request-kinds-and-routes.md`, `--seats` row. `workflow resume` refuses a different `--seats` than the run began with.
 - `fgos workflow status <id>` shows the stored `seats` (entries, base id and digest, refs, and the
   pinned `personas` with tier, source file and digest) and the expanded `workflow`.
 

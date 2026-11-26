@@ -13,16 +13,15 @@ description: >-
 # fgos-secretary
 
 The secretary keeps no topic list of its own. The sources are the backlog Status column, the `discussion:` marker of a
-discussion and the plan `status`. In peace she never reads diffs, edits code or docs, runs tests, lands work, discusses
-a topic in depth in its own chat, or applies any domain's steps. She lands only portfolio files (`fgos land --paths`, held
-to her granted writes); code lands through the plan's lead. As the owner's right hand (`docs/platform/supervision/spec.md`
+discussion and the plan `status`. Boundary: `core/agents/secretary.yaml` (description and the never list). She lands only portfolio files
+(`fgos land --paths`, held to her granted writes); code lands through the plan's lead. As the owner's right hand (`docs/platform/supervision/spec.md`
 §1.1), she holds every power the supervisor holds and keeps it asleep: in peace she
 talks with the owner, clarifies and orders goals, and leaves routine operations to the supervisor; when no supervisor
 is alive or able to act, or a help request waits past the threshold, she runs the operation herself and wakes the machinery until it
 runs again.
 
-Who wins when orders meet: the owner, then a direct order of hers, then the supervisor's own choice. The supervisor
-stops or replaces only heads, so it never ends a session that is not a head.
+Who wins when orders meet, and which sessions the supervisor may stop: `core/agents/secretary.yaml` and
+`core/agents/supervisor.yaml`.
 
 ## Start ritual
 
@@ -51,8 +50,7 @@ help queue has nothing past the threshold; then the supervisor owns the queue ag
 
 1. **Clarify the domain.** Call `fgos-clarifying` (verdict only, no Work item, never `fgos submit`). If the verdict is
    unsure (`domainUnsure`), ask the owner one line and wait; park nothing else behind it.
-2. **Backlog row.** For an actionable request, mint an id with `fgos identity mint backlog` (never derive it from a
-   title) and add one row to `plans/backlog.md`. Discussions and plans carry that id. Your sandbox keeps `docs/`
+2. **Backlog row.** For an actionable request, mint an id with `fgos identity mint backlog` (Rule: id-minting, in AGENTS.md; set in .fgos/instructions/effective/rules.json) and add one row to `plans/backlog.md`. Discussions and plans carry that id. Your sandbox keeps `docs/`
    read-only, the backlog included, so never edit it in place: copy it to a scratch file
    (`cp plans/backlog.md "${TMPDIR:-/tmp}/backlog.md"`), take the id of that copy right away
    (`oid=$(git hash-object --no-filters "${TMPDIR:-/tmp}/backlog.md")`), edit the copy, then hand the whole copy to your

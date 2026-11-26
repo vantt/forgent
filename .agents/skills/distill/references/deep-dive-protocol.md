@@ -22,7 +22,7 @@ between strong sources is exactly where a combined solution beats copying.
 | L2 Targeted read | ONLY the files listed in the chosen entries' `Where:` lines; dispatch cheap subagents for mechanical quote-pulling | bounded by Where |
 | L3 External | web/docs research beyond the sources (xia-style, evidence-labeled) | optional, ask first |
 
-Never re-scan a whole source for a deep-dive; if L0 finds no entries for the
+No re-scan (`../SKILL.md`, Hard gates & red flags); if L0 finds no entries for the
 topic, that is a signal the topic needs a normal extract pass first.
 
 ## Output — `docs/distillery/deep-dives/<topic-slug>.md`

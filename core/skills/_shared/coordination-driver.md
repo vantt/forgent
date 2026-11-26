@@ -31,7 +31,7 @@ Derive state only from the runtime's inspection doors:
 ### Step 2: Choose (the agent judges, the harness enforces)
 
 Which activity next, by which route, is the driver's judgment. The guide gives direction: its routes are `should` (the default, deviate with a reason), `may-instead` (an allowed alternative) and `unlisted` (anything else, allowed with a recorded reason unless the guide closes the decision point to listed routes). Mechanical rules (entry milestones, consent bound to the approved artifact, disjoint writes, the approved frame, the seat-launch ceiling) belong to the harness: it admits or refuses by name when the Unit is dispatched.
-- A refusal is an answer, not a question for the owner. Read its code and condition, re-observe, and change the proposal (another activity, a narrower write scope, wait for the live reservation) or stop. Do not retry the same proposal.
+- A refusal is an answer: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - Never ask a person to choose a route the guide already permits.
 
 ### Step 3: Dispatch (always name the case)
@@ -41,7 +41,7 @@ Dispatch through one of the two doors, and when the work belongs to a case, name
 - `fgos workflow start <workflow>|--units <file>` - planned work, one step per Unit (a Playbook case); `fgos workflow resume` and `fgos workflow answer` continue it. A child run nested under your conductor case: `fgos workflow start ... --case <parentCaseId>` (its frame is charged to the parent first).
 - Parallel work needs no declaration. Dispatch Units with disjoint write scopes; overlapping reservations are refused and a busy case is retryable.
 
-Run `fgos dispatch decide` before any dispatch out of the current turn.
+Run `fgos dispatch decide` before any dispatch out of the current turn: Rule: dispatch-decide-door (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 Case boundaries (what the harness cannot do for you):
 - A Playbook case (of a workflow such as `council-lite`) is advanced only by its own proposer. Never admit into it with `--case`, and a worker running inside a Playbook Unit never calls a door naming that case. Both are refused.
@@ -53,17 +53,12 @@ Ask a person only when the case cannot go on without them: a consent gate the gu
 
 ### Step 4: Verify Evidence
 
-Before accepting any worker contribution or finding, independently inspect the declared output artifact(s):
-- The driver must directly verify the existence, format, and substantive correctness of the produced artifact.
-- Never rely on worker self-narration, conversational claims, or ungrounded status summaries.
-- **Caveat Rule:** A result carrying a caveat (such as non-attributable execution or a recheck-required flag) must **never** be treated as valid acceptance or sign-off evidence. Caveats block session completion and require an uncaveated re-execution.
+Before accepting any worker contribution or finding, independently inspect the declared output artifact(s), and never
+accept a caveated result: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 ### Step 5: Disposition
 
-When an inspection or advisory operation reports findings, the driver must record an explicit disposition for each finding:
-- `accepted`: The finding is valid and requires corrective action or revision.
-- `rejected`: The finding is demonstrated to be invalid or inapplicable, backed by recorded rationale.
-- `deferred`: The finding is valid but explicitly deferred out of current scope, permitted only when allowed by facade disposition criteria.
+Every finding gets an explicit disposition (`accepted`, `rejected`, `deferred`): Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 Dispositions are recorded in the continuity artifact (Step 8).
 
@@ -71,7 +66,7 @@ Dispositions are recorded in the continuity artifact (Step 8).
 
 Based on dispositions and evidence outcomes:
 - **Revise:** Authorize and dispatch revision operations within the declared adaptation bounds.
-- **Recheck:** Every accepted finding requires an independent recheck operation to confirm remediation. A finding is never discharged by driver disposition alone.
+- **Recheck:** an accepted finding is discharged only by an independent recheck: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - **Retry / Reopen:** `fgos workflow resume` reruns a step that failed on infrastructure (execution-failure, not-started; no settled seat verdict) once per call, as a fresh admitted Unit run (a writing unit in its recorded worktree and branch). Verdicts (findings, refusals, out-of-scope writes) are terminal: resume refuses them by name, `nothing-to-resume: step <id> ended <outcome>`. An answer never reopens a step. No automatic retry beyond the Execution Core's one lost-brief retry.
 - **Ask Human:** Only for the triggers listed in Step 3. A harness refusal is not one of them. Ask in the decision-question template (`decision-question.md`; batching per AGENTS.md priority #2) and never stall work that does not depend on the answer.
 

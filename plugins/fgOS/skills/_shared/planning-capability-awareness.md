@@ -44,9 +44,7 @@ decompose a plan into execution units
 An **execution unit** is a piece of work with a clear enough
 objective/boundary/output to be carried out inline or handed to an
 executor. It is not automatically a Work item, a lifecycle stage, or a
-flow step — capability annotation is a planning-time signal, never a
-Work-schema field, and never itself a reason to create, split, or
-transition a Work item.
+flow step: Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 ### Execution units and canonical capabilities
 
@@ -59,11 +57,8 @@ A static harness or lint (`plan-lint`) reads these declared units and verifies t
 - Exactly one canonical capability per independently executable unit,
   spelled exactly as it appears in `capability-catalog.md` (no invented
   names, no paraphrase).
-- Nothing about which provider, model, tier, or executor will carry it
-  out. `prefer`/executor selection is a live-config/execution-time
-  concern (Seat Binding through `decide`), never a plan
-  artifact — a plan that pins an executor has leaked an execution-time
-  decision into a planning-time document.
+- A plan never names which provider, model, tier, or executor will carry it
+  out: Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - A unit whose capability is not settled yet gets flagged as
   unresolved rather than assigned a guessed name — see
   `capability-catalog.md`'s "Registering a new capability" section.

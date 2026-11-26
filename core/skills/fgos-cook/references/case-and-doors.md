@@ -114,7 +114,7 @@ and why.
 
 A refused dispatch prints a code and a condition (`entry-milestone-unmet`,
 `writes-overlap`, `frame-exhausted`, `seat-launch-ceiling`, `consent-missing` ...).
-Re-read `status`, change the proposal or stop; do not repeat it.
+Re-read `status`, change the proposal or stop: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 
 ## 6. Verify it yourself
 
@@ -129,10 +129,9 @@ Record `slice, activity, run id, outcome, what you re-ran, result` in the notebo
 
 ## 7. Findings and adaptation
 
-For each finding: accepted (dispatch `fix-verify-red` or a fix slice, then an
-independent recheck by another slice or the next reviewed round), rejected (reason
-in the notebook), deferred (only outside the approved scope). A finding is never
-discharged by your word alone. Bounds per slice: the pattern's rounds, then one fix
+Every finding gets a disposition and an accepted one an independent recheck: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
+Here the fix is `fix-verify-red` or a fix slice, the recheck another slice or the next reviewed round, a rejection
+gets its reason in the notebook, and deferral is only outside the approved scope. Bounds per slice: the pattern's rounds, then one fix
 slice, one read-only diagnosis (`code:debug`), one rigor raise; then park a question.
 
 ## 8. Questions

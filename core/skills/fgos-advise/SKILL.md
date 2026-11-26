@@ -66,8 +66,8 @@ does not govern the delegated architecture route, which keeps the hook table of
    gates come only from the chosen Workflow or pattern, never from this skill.
    Seat lenses come from the chosen Workflow, or from `--seats` on the four
    bases with generic panels.
-   - **`--seats "<lens one>|@<persona>|<lens three>"`** (optional) only on
-     `group-cognition`, `business-discussion`, `nominal-group` and `delphi`.
+   - **`--seats "<lens one>|@<persona>|<lens three>"`** (optional; the bases
+     that accept it: `references/request-kinds-and-routes.md`, `--seats` row).
      Write 2-4 non-redundant perspectives that the person's own request names or
      plainly implies (default 3; never invent a fourth to fill a quota). A lens
      is a short plain-text analytic concern, 3-160 characters on one line, no
@@ -139,8 +139,8 @@ does not govern the delegated architecture route, which keeps the hook table of
   `--context-ref` documents. Never invent persona names, file paths, standards
   or external facts, and add no new persona files.
 - Never set provider, model, executor, tier, `invocation`, `prefer`, or a
-  persona override (the `@name` seat entry is the one persona input; it is not
-  an override and carries no provider or tier).
+  persona override (Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json). The `@name` seat entry is the one persona input; it is not
+  an override and carries no provider or tier.
 - **Unmet knob** (for example 3 rounds, or a seat count the person insists on
   but `--seats` cannot serve on the chosen route): run the closest registered
   route; state the unmet knob in the pre-launch line and in the result; never
@@ -168,8 +168,7 @@ does not govern the delegated architecture route, which keeps the hook table of
   CollaborationPattern definitions remain authoritative.
 - Never invent workflow semantics, actors, transitions, visibility, grants,
   reopen, aggregation, quorum, or close rules in task prose.
-- Never pin a provider, model, executor, or tier. Dispatch resolves the existing
-  `advise` or coding capability through the Dispatch Control Plane.
+- Never pin a provider, model, executor, or tier: Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - Never claim that a ranking workflow selected a winner or that mediated
   feedback guarantees anonymity or consensus; report only artifacts the real
   run produced.

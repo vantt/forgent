@@ -84,8 +84,8 @@ Shape:
 ## Rules
 
 - Descend to a `Where:` file (upstream layer) only when a specific entry
-  earns it for this design — same discipline as deep-dive L2. Never
-  re-scan a source during a consult.
+  earns it for this design — same discipline as deep-dive L2 (no re-scan:
+  `../SKILL.md`, Hard gates & red flags).
 - Consult is read-only on the learning area. If the walk surfaces a gap
   worth fixing (a concept fitting no domain, a stale deep-dive, an entry
   whose Where broke), report it in Ngoài lưới — fixing it is a separate,

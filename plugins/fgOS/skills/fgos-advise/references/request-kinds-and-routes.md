@@ -93,7 +93,8 @@ Only these four; when more than one applies, batch them in one message.
 4. The only ambiguity is authority: advice or an actual change?
 
 Never ask for: pattern, seat count, seat lenses, rounds, blind, gate,
-attendance, provider, model, executor, tier.
+attendance, provider, model, executor, tier (the last four are never pinned:
+Rule: capability-routing-rules, in AGENTS.md; set in .fgos/instructions/effective/rules.json)
 
 ## Launch inputs
 
