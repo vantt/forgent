@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Changelog entries become fragments assembled at release, and the land door regenerates the generated skill surfaces"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 base: 550f77f6566f14275aa832b56b1a6b7fa23679ca
