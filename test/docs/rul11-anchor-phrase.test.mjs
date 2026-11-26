@@ -52,9 +52,15 @@ test('AGENTS.md carries the decision-question template law and points at its sha
   assert.ok(agents.includes('Inside the approved frame (scope + budget set at approval) decide and report'), 'the law must carry the approved-frame stop point');
 });
 
-test('the RUL11 anchor phrase is owned by its rule unit, alone on a line, and rendered into AGENTS.md from it', () => {
-  const unitLines = fs.readFileSync(OWNER_UNIT, 'utf8').split('\n');
-  assert.ok(unitLines.some((line) => line.trim() === ANCHOR_PHRASE), `the owner unit must carry "${ANCHOR_PHRASE}" on its own line`);
+test('the RUL11 and RUL104 anchor phrases are each owned by their rule unit, alone on a line, and rendered into AGENTS.md from it', () => {
   const block = fs.readFileSync(AGENTS_MD, 'utf8').split('<!-- fgos:instruction-projection:start -->')[1] ?? '';
-  assert.ok(block.split('\n').some((line) => line.trim() === ANCHOR_PHRASE), 'the phrase must reach AGENTS.md through the projection block');
+  const anchors = [
+    [OWNER_UNIT, ANCHOR_PHRASE],
+    [path.join(REPO_ROOT, 'core/instructions/rul104-better-not-bigger.md'), 'tốt hơn, không to hơn'],
+  ];
+  for (const [unit, phrase] of anchors) {
+    const unitLines = fs.readFileSync(unit, 'utf8').split('\n');
+    assert.ok(unitLines.some((line) => line.trim() === phrase), `${path.basename(unit)} must carry "${phrase}" on its own line`);
+    assert.ok(block.split('\n').some((line) => line.trim() === phrase), `"${phrase}" must reach AGENTS.md through the projection block`);
+  }
 });
