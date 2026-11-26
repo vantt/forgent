@@ -18,12 +18,15 @@ pub struct Direct {
     cli: &'static str,
 }
 
+/// The CLI ids that have an adapter: the one list of agent CLIs, read by `adapter_for` and by the `agentCli`
+/// values of the `when:` registry.
+pub const CLIS: [&str; 5] = ["claude", "codex", "agy", "pi", "omp"];
+
 /// The adapter for an envelope's `agentProtocol.cli`. Every CLI's last words are read for a dead login or a
 /// used-up quota (an executor can wrap any program); an unknown name is only reported as `generic`.
 pub fn adapter_for(cli: &str) -> Direct {
-    let known = ["claude", "codex", "agy", "pi", "omp"];
     let wanted = cli.trim().to_ascii_lowercase();
-    match known.iter().find(|name| **name == wanted) {
+    match CLIS.iter().find(|name| **name == wanted) {
         Some(cli) => Direct { cli },
         None => Direct { cli: "generic" },
     }

@@ -56,7 +56,7 @@ fn the_digest_is_over_the_rules_array_only() {
 fn the_digest_does_not_depend_on_key_order_in_the_file() {
     let set = EffectiveSet::new(vec![rule("rule-a")]);
     let reordered = format!(
-        "{{\"rules\":[{{\"when\":{{}},\"sources\":[\"core/instructions/rule-a.md\"],\"body\":\"rule-a body\",\"title\":\"rule-a\",\"specificity\":10,\"scope\":\"repo\",\"kind\":\"procedure\",\"owner\":\"core\",\"id\":\"rule-a\"}}],\"digest\":\"{}\",\"whenKeysVersion\":1,\"schemaVersion\":1}}",
+        "{{\"rules\":[{{\"when\":{{}},\"sources\":[\"core/instructions/rule-a.md\"],\"body\":\"rule-a body\",\"title\":\"rule-a\",\"specificity\":10,\"scope\":\"repo\",\"kind\":\"procedure\",\"owner\":\"core\",\"id\":\"rule-a\"}}],\"digest\":\"{}\",\"whenKeysVersion\":2,\"schemaVersion\":1}}",
         set.digest
     );
     assert_eq!(EffectiveSet::read(reordered.as_bytes()).unwrap(), set);
@@ -74,7 +74,11 @@ fn a_changed_rule_fails_the_digest() {
 
 #[test]
 fn an_unsupported_schema_or_when_keys_version_is_refused_before_the_digest() {
-    for (field, value) in [("schemaVersion", 2), ("whenKeysVersion", 7)] {
+    for (field, value) in [
+        ("schemaVersion", 2),
+        ("whenKeysVersion", 1),
+        ("whenKeysVersion", 7),
+    ] {
         let mut doc = written(&EffectiveSet::new(vec![rule("rule-a")]));
         doc[field] = json!(value);
         doc["digest"] = json!("0".repeat(64));

@@ -30,7 +30,7 @@ struct Live(Vec<&'static str>);
 
 impl ValueSource for Live {
     fn values(&self, key: &str) -> Option<Vec<String>> {
-        (key == "cli").then(|| self.0.iter().map(|s| s.to_string()).collect())
+        (key == "agentCli").then(|| self.0.iter().map(|s| s.to_string()).collect())
     }
 }
 
@@ -155,15 +155,27 @@ fn a_when_key_must_be_in_the_registry() {
 }
 
 #[test]
+fn the_keys_of_the_first_registry_are_refused_as_unknown() {
+    for key in ["kind", "cli"] {
+        let when = rule("x-rule").when(key, &["head"]).build().unit.when;
+        assert_eq!(
+            check_when("x-rule", &when, &NoLiveValues).unwrap_err().code,
+            RefusalCode::WhenKeyUnknown,
+            "{key}"
+        );
+    }
+}
+
+#[test]
 fn a_static_key_accepts_only_its_listed_values_and_an_empty_list_is_refused() {
     let ok = rule("x-rule")
-        .when("kind", &["head", "hook"])
+        .when("sessionType", &["head", "hand-opened"])
         .build()
         .unit
         .when;
     assert!(check_when("x-rule", &ok, &NoLiveValues).is_ok());
     let bad = rule("x-rule")
-        .when("kind", &["head", "spaceship"])
+        .when("sessionType", &["head", "spaceship"])
         .build()
         .unit
         .when;
@@ -171,7 +183,18 @@ fn a_static_key_accepts_only_its_listed_values_and_an_empty_list_is_refused() {
         check_when("x-rule", &bad, &NoLiveValues).unwrap_err().code,
         RefusalCode::WhenValueInvalid
     );
-    let empty = rule("x-rule").when("kind", &[]).build().unit.when;
+    let setup = rule("x-rule")
+        .when("agentLifecycle", &["setup"])
+        .build()
+        .unit
+        .when;
+    assert_eq!(
+        check_when("x-rule", &setup, &NoLiveValues)
+            .unwrap_err()
+            .code,
+        RefusalCode::WhenValueInvalid
+    );
+    let empty = rule("x-rule").when("sessionType", &[]).build().unit.when;
     assert_eq!(
         check_when("x-rule", &empty, &NoLiveValues)
             .unwrap_err()
@@ -183,7 +206,7 @@ fn a_static_key_accepts_only_its_listed_values_and_an_empty_list_is_refused() {
 #[test]
 fn a_live_key_is_checked_against_the_callers_values_and_unchecked_without_them() {
     let when = rule("x-rule")
-        .when("cli", &["claude", "mystery"])
+        .when("agentCli", &["claude", "mystery"])
         .build()
         .unit
         .when;
@@ -191,7 +214,11 @@ fn a_live_key_is_checked_against_the_callers_values_and_unchecked_without_them()
     let r = check_when("x-rule", &when, &Live(vec!["claude", "codex"])).unwrap_err();
     assert_eq!(r.code, RefusalCode::WhenValueInvalid);
     assert!(r.message.contains("mystery"));
-    let ok = rule("x-rule").when("cli", &["claude"]).build().unit.when;
+    let ok = rule("x-rule")
+        .when("agentCli", &["claude"])
+        .build()
+        .unit
+        .when;
     assert!(check_when("x-rule", &ok, &Live(vec!["claude", "codex"])).is_ok());
 }
 
@@ -199,7 +226,7 @@ fn a_live_key_is_checked_against_the_callers_values_and_unchecked_without_them()
 fn several_when_keys_are_all_checked() {
     let when = rule("x-rule")
         .when("role", &["producer"])
-        .when("kind", &["head"])
+        .when("sessionType", &["head"])
         .when("zzz", &["a"])
         .build()
         .unit

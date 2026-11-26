@@ -1,7 +1,7 @@
 {
   "set": {
     "schemaVersion": 1,
-    "whenKeysVersion": 1,
+    "whenKeysVersion": 2,
     "digest": "2c4b37a39bf15bce29213d866a4e16e7586a60c98dee295fb9cc9e60ea9088b8"
   },
   "expect": {
