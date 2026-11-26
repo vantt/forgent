@@ -690,13 +690,13 @@ fn launch_path_builds_scoped_and_plain_commands_and_binding_carries_failure_doma
         let fake = dir.join("systemd-run");
         std::fs::write(
             &fake,
-            "#!/bin/sh\n{ echo \"$0\"; for a in \"$@\"; do echo \"$a\"; done; echo \"XDG=$XDG_RUNTIME_DIR\"; } > argv.txt\n",
+            "#!/bin/sh\n{ echo \"$0\"; for a in \"$@\"; do echo \"$a\"; done; echo \"XDG=$XDG_RUNTIME_DIR\"; echo \"PATH=$PATH\"; } > argv.txt\n",
         )
         .unwrap();
         std::fs::set_permissions(&fake, std::fs::Permissions::from_mode(0o755)).unwrap();
         let scope_domain = FailureDomain::SystemdScope {
             unit: "fgos-run-att-scope-1".into(),
-            systemd_run: fake.clone(),
+            systemd_run_dir: dir.clone(),
             runtime_dir: "/probed/runtime".into(),
         };
         let mut started = start_supervisor_in(
@@ -723,10 +723,11 @@ fn launch_path_builds_scoped_and_plain_commands_and_binding_carries_failure_doma
             "1",
         ];
         assert_eq!(
-            &lines[lines.len() - 1 - supervisor_argv.len()..lines.len() - 1],
+            &lines[lines.len() - 2 - supervisor_argv.len()..lines.len() - 2],
             supervisor_argv
         );
-        assert_eq!(lines[lines.len() - 1], "XDG=/probed/runtime");
+        assert_eq!(lines[lines.len() - 2], "XDG=/probed/runtime");
+        assert!(lines[lines.len() - 1].starts_with(&format!("PATH={}:", dir.display())));
     }
 
     // 4. Real binding write carries failureDomain (exercise write_supervisor_binding)

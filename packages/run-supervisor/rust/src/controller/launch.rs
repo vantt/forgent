@@ -897,11 +897,9 @@ pub fn build_supervisor_command(
         protocol_str,
     ];
     match failure_domain {
-        super::scope::FailureDomain::SystemdScope {
-            unit, systemd_run, ..
-        } => {
+        super::scope::FailureDomain::SystemdScope { unit, .. } => {
             let scope_cmd = super::scope::build_scope_command(
-                &systemd_run.to_string_lossy(),
+                "systemd-run",
                 unit,
                 memory_max,
                 &supervisor_argv,
@@ -951,8 +949,26 @@ fn spawn_supervisor(
     }
     let fd_json = serde_json::to_string(failure_domain).unwrap_or_default();
     command.env("FGOS_FAILURE_DOMAIN", fd_json);
-    if let super::scope::FailureDomain::SystemdScope { runtime_dir, .. } = failure_domain {
+    if let super::scope::FailureDomain::SystemdScope {
+        runtime_dir,
+        systemd_run_dir,
+        ..
+    } = failure_domain
+    {
         command.env("XDG_RUNTIME_DIR", runtime_dir);
+        // The scope command names `systemd-run` literally; the probed directory goes first on the child's
+        // PATH so the lookup lands on the binary the probe found.
+        let inherited = step_env
+            .get("PATH")
+            .and_then(Value::as_str)
+            .map(std::ffi::OsString::from)
+            .or_else(|| std::env::var_os("PATH"))
+            .unwrap_or_default();
+        let paths =
+            std::iter::once(systemd_run_dir.clone()).chain(std::env::split_paths(&inherited));
+        if let Ok(joined) = std::env::join_paths(paths) {
+            command.env("PATH", joined);
+        }
     }
     #[cfg(unix)]
     {

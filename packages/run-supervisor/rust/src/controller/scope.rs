@@ -12,13 +12,13 @@ use std::path::PathBuf;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind")]
 pub enum FailureDomain {
-    /// `systemd_run` is the absolute executable the probe resolved and `runtime_dir` the user runtime directory
-    /// the probe connected through; neither is part of the recorded binding shape `{kind, unit}`.
+    /// `systemd_run_dir` is the directory holding the `systemd-run` the probe found and `runtime_dir` the user
+    /// runtime directory the probe connected through; neither is part of the recorded binding shape `{kind, unit}`.
     #[serde(rename = "systemd-scope")]
     SystemdScope {
         unit: String,
         #[serde(skip)]
-        systemd_run: PathBuf,
+        systemd_run_dir: PathBuf,
         #[serde(skip)]
         runtime_dir: PathBuf,
     },
@@ -89,9 +89,10 @@ pub fn decide_failure_domain_with(
             reason: "no-systemd-run".to_string(),
         };
     };
+    let systemd_run_dir = systemd_run.parent().map(PathBuf::from).unwrap_or_default();
     FailureDomain::SystemdScope {
         unit: scope_unit_name(attempt_id),
-        systemd_run,
+        systemd_run_dir,
         runtime_dir,
     }
 }
@@ -275,7 +276,7 @@ mod tests {
             decide_failure_domain_with("att-1", true, dir(), run()),
             FailureDomain::SystemdScope {
                 unit: "fgos-run-att-1".to_string(),
-                systemd_run: PathBuf::from("/usr/bin/systemd-run"),
+                systemd_run_dir: PathBuf::from("/usr/bin"),
                 runtime_dir: PathBuf::from("/run/user/1000"),
             }
         );
@@ -312,11 +313,11 @@ mod tests {
             "internal".to_string(),
             "supervise".to_string(),
         ];
-        let plain = build_scope_command("/usr/bin/systemd-run", "fgos-run-att-1", None, &base_cmd);
+        let plain = build_scope_command("systemd-run", "fgos-run-att-1", None, &base_cmd);
         assert_eq!(
             plain,
             vec![
-                "/usr/bin/systemd-run",
+                "systemd-run",
                 "--user",
                 "--scope",
                 "--collect",
@@ -330,16 +331,11 @@ mod tests {
             ]
         );
 
-        let with_cap = build_scope_command(
-            "/usr/bin/systemd-run",
-            "fgos-run-att-1",
-            Some("8G"),
-            &base_cmd,
-        );
+        let with_cap = build_scope_command("systemd-run", "fgos-run-att-1", Some("8G"), &base_cmd);
         assert_eq!(
             with_cap,
             vec![
-                "/usr/bin/systemd-run",
+                "systemd-run",
                 "--user",
                 "--scope",
                 "--collect",
@@ -355,12 +351,7 @@ mod tests {
             ]
         );
 
-        let with_empty = build_scope_command(
-            "/usr/bin/systemd-run",
-            "fgos-run-att-1",
-            Some(""),
-            &base_cmd,
-        );
+        let with_empty = build_scope_command("systemd-run", "fgos-run-att-1", Some(""), &base_cmd);
         assert_eq!(with_empty, plain);
     }
 }
