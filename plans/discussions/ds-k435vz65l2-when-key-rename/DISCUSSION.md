@@ -4,7 +4,6 @@ title: "Rename the `when:` label keys of the agent context engine"
 status: settled
 source:
   - p-2vep73teju
-  - ds-que32ftgg6-ready-plan-runs-unattended
 created: 2026-11-26
 ---
 
