@@ -126,3 +126,67 @@ impl ValueSource for LiveValues {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const PERSONA: &str =
+        "name: scribe\nversion: 0.1.0\ndescription: A fixture persona.\nrole: Writer\n";
+    const WORKFLOW: &str =
+        "id: alpha/flow\ntitle: Flow\nsteps:\n  - id: draft\n    title: Draft\n  - id: polish\n    title: Polish\n";
+
+    fn project(name: &str) -> std::path::PathBuf {
+        let root =
+            std::env::temp_dir().join(format!("fgos-live-values-{}-{name}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(root.join("domains/alpha/workflows")).unwrap();
+        std::fs::create_dir_all(root.join("domains/alpha/agents")).unwrap();
+        std::fs::write(root.join("domains/alpha/workflows/flow.yaml"), WORKFLOW).unwrap();
+        std::fs::write(root.join("domains/alpha/agents/scribe.yaml"), PERSONA).unwrap();
+        root
+    }
+
+    /// Each `when:` key with a live source answers the values of the project tree. The crate owns matching and
+    /// refusing a value against a list; only here do the lists come from directories, the runner config, the
+    /// persona tiers and workflow files.
+    #[test]
+    fn every_live_key_answers_the_values_of_the_project_and_a_key_without_a_list_answers_none() {
+        let root = project("live");
+        let values = LiveValues::read(&root).expect("the fixture project reads");
+
+        assert_eq!(values.values("domain"), Some(vec!["alpha".to_string()]));
+        assert_eq!(
+            values.values("workflow"),
+            Some(vec!["alpha/flow".to_string()])
+        );
+        assert_eq!(
+            values.values("stage"),
+            Some(vec!["draft".to_string(), "polish".to_string()])
+        );
+        assert_eq!(values.values("persona"), Some(vec!["scribe".to_string()]));
+        let cli = values.values("cli").expect("cli has a list");
+        assert!(cli.contains(&"claude".to_string()), "{cli:?}");
+        for key in ["project", "role", "kind", "nonsense"] {
+            assert_eq!(values.values(key), None, "{key}");
+        }
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    /// A workflow file that is not YAML is refused with its path, not skipped, so a typo cannot silently shrink
+    /// the `workflow` list.
+    #[test]
+    fn an_unparseable_workflow_file_is_refused_with_its_path() {
+        let root = project("bad");
+        std::fs::write(
+            root.join("domains/alpha/workflows/broken.yaml"),
+            "id: [unclosed\n",
+        )
+        .unwrap();
+
+        let error = LiveValues::read(&root).err().expect("refused");
+
+        assert!(error.contains("broken.yaml"), "{error}");
+        let _ = std::fs::remove_dir_all(&root);
+    }
+}

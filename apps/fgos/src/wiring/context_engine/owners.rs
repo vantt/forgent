@@ -37,3 +37,21 @@ impl OwnerRegistry for ModelOwners {
         self.0.contains(owner)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The owner registry is proven over the real model of this repository, which the crate's own vectors never
+    /// load: they use a fixed in-memory registry, so only here does a component id, a domain id and an unknown id
+    /// meet the model files.
+    #[test]
+    fn the_real_model_names_a_component_and_a_domain_as_owners_and_refuses_an_unknown_one() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let owners = ModelOwners::read(&root).expect("the repository model loads");
+
+        assert!(owners.is_owner("component-authority"));
+        assert!(owners.is_owner("coding"));
+        assert!(!owners.is_owner("no-such-owner"));
+    }
+}

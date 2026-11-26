@@ -36,7 +36,8 @@
     "packages/supervision/contracts",
     "packages/questions/contracts/question-event-streams.v1.json",
     "packages/git/contracts/mutation-census.v1.json",
-    "packages/documentation/third-party"
+    "packages/documentation/third-party",
+    "packages/agent-context-engine/pkm"
   ],
   "scripts": {
     "test": "node scripts/run-tests.mjs",
