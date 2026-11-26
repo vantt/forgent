@@ -91,6 +91,17 @@ only this plan and ASC 9, not the rest of ASC.
 | 1 | [Gather every fgOS rule to one owner](phase-01-gather-rules.md) | - | core/instructions/**, components/*/instructions/**, domains/*/instructions/**, .fgos/instructions/effective/**, AGENTS.md, core/skills/**, core/agents/**, core/prompt-templates/**, domains/coding/skills/**, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/**, .claude/agents/**, packages/agent-start-context/goldens/**, test/docs/**, plans/261125-2041-gather-fgos-rules-to-one-owner/reports/** | 1 | draft |
 | 2 | [Integration gate, changelog](phase-02-integration.md) | 1 | CHANGELOG.md | 2 | draft |
 
+### Progress (lead on fg-server, 2026-11-26)
+
+Started 2026-11-26 after the context engine plan was `done`. Phase 1 is in progress on branch `gather-rules/p01` (not landed):
+the move table `reports/gather-table.md` (31 clusters, 14 conflicts: 12 settled by evidence, one parked, two owner
+questions) and batch U1 (eight new rule units) are committed there; batches U2, U3, P1 to P5 and A are not started.
+**Paused by the owner at 2026-11-26 18:20** to look first at changes to the context engine's `when:` labels made on the other
+machine; resume at batch U2 after merging main. Owner questions filed in the store: `q-ni4vxzxqwa` (conflict C2),
+`q-ipifo7ty53` (conflict C6), `q-3oqocuhfht` (order with the communication standard plan). Decided by the lead on the plan's
+own recommendation: owner question 2 below (single-location skill rules stay), and criterion 2 reads "owner unit or owner
+persona file" because a persona description is read at start without opening a file.
+
 ### Waits on other plans
 
 | phase | waits for | shared files or data |
