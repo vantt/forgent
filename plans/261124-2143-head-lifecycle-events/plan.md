@@ -135,8 +135,8 @@ a handoff. This plan is the safety net under that rule.
 | 3 | [Close finished planners and leads through one door](phase-03-close-finished-heads.md) | - | packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, core/watcher/definitions/plan-drafted.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/plan-drafted/**, src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs, bin/fgos.mjs, packages/supervision/rust/observe-kinds.json, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json | 1 | done |
 | 2 | [Host-side end signal for a head](phase-02-host-end-signal.md) | 1, 3 | apps/fgos/src/wiring/observe_sources/head_state.rs, apps/fgos/src/wiring/observe_sources/tests/mod.rs, apps/fgos/observe-kinds.json, core/watcher/definitions/lead-ended.query.json, core/watcher/definitions/session-gone.query.json, core/attention/definitions/head-gone.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/fixtures/definitions/** | 2 | done |
 | 4 | [A lead waiting outside does not hold a working slot](phase-04-waiting-lead-slot.md) | 3 | packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs | 2 | done |
-| 5 | [Spec, skill and generated skills](phase-05-spec-and-skill.md) | 2, 3, 4 | docs/platform/supervision/spec.md, docs/platform/observe/spec.md, docs/platform/session-host/spec.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 3 | ready |
-| 6 | [Integration, full gates and closing the rows](phase-06-integration.md) | 1, 2, 3, 4, 5 | plans/backlog.md, plans/backlog/p-pv7ha3l5ss-head-lifecycle-events-end-of-work-stop-rule-and-lead-slots.md, plans/backlog/p-iatzcg2gee-*.md, plans/backlog/p-6hqvgokerb-*.md, plans/backlog/p-tyowvhthul-*.md, plans/261124-2143-head-lifecycle-events/reports/integration.md | 4 | ready |
+| 5 | [Spec, skill and generated skills](phase-05-spec-and-skill.md) | 2, 3, 4 | docs/platform/supervision/spec.md, docs/platform/observe/spec.md, docs/platform/session-host/spec.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 3 | done |
+| 6 | [Integration, full gates and closing the rows](phase-06-integration.md) | 1, 2, 3, 4, 5 | plans/backlog.md, plans/backlog/p-pv7ha3l5ss-head-lifecycle-events-end-of-work-stop-rule-and-lead-slots.md, plans/backlog/p-iatzcg2gee-*.md, plans/backlog/p-6hqvgokerb-*.md, plans/backlog/p-tyowvhthul-*.md, plans/261124-2143-head-lifecycle-events/reports/integration.md | 4 | running |
 
 Phase 1 found candidate (a): both leads stayed live and idle, so no `retiredAt` and `lead-ended` matched no row
 (`reports/diagnosis.md`); phase 2 runs as written.
@@ -159,6 +159,11 @@ so those two definitions list the non-lead personas: a new head persona has to b
 Phase 4 landed as `8eeb37fef` (2026-11-26). Owner answer `q-kikgj6qaiu` changed the source of "waits outside" to
 open owner questions per phase (`plan:<dir>#phase-NN` or `plan:<dir>`), read through an `OpenQuestions` port whose
 adapter reads the question store; the corrected brief is `phase-04-waiting-lead-slot.md` (`5cd0d5f91`).
+
+Phase 5 landed as `8afaaba50` (2026-11-26). Phase 6 steps 1 and 4 (full suites, integration report, backlog rows)
+run as ticket `c-20573-1795672214088` in worktree `261124-2143-head-lifecycle-events-p06`, still running after 12
+waits. Step 2 (live check: needs a session start, the supervisor's) and step 3 (`CHANGELOG.md`, held by running plan
+`261125-1631-agent-context-engine`) are parked by supervision events.
 
 Phase 3 depends on nothing: closing finished heads does not wait for the diagnosis. Phase 2 follows phase 3
 because both add rows to `packages/supervision/rust/tests/definitions.rs` fixtures through the shared
