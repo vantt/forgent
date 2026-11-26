@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2db9a45d015d4dd7f6274f97702c6be80f3dd5ba2d86f1ca9c8da05394fb9c0d",
+  "payloadDigest": "5ee7ebd115a5d5b279b06dd8a8310b3987ebcae2d140c9f992e28474a7cb3a57",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "dc14ff69bc4b144893fa6988de4df6b6180ab255ef8751fd1615ad93472b9e71",
     ".agents/skills/_shared/capability-matching.md": "93cd382994e2201e4aa8ec7816d740f6da634a0ee69d6911800a848ed5de1d8b",
@@ -132,7 +132,7 @@
     "apps/fgos/src/wiring/events.rs": "472018eb9c3e76867d7e50f388de9248edd6803011972fa1f43eb72bf64a8386",
     "apps/fgos/src/wiring/execution_routes.rs": "c2f7a28c9cae123fa8add7423eb330bc91c73c2d58bd8c15bb50b655acb709cc",
     "apps/fgos/src/wiring/gateway_control.rs": "4d0497382df90574bbe4f65a249d0977bc23e1334c7ad7c83f13351d8ff22ca8",
-    "apps/fgos/src/wiring/git_incidents.rs": "d06fe58d45a9f63b3c368576e8fff120016b4a61e899d6bdfc3682490485d724",
+    "apps/fgos/src/wiring/git_incidents.rs": "c4ca0ffe2c4c3ea56810afc3126ee3621f2167999a69cf2c4d55db2ab0ae7966",
     "apps/fgos/src/wiring/head_questions.rs": "600d2645a376e2e18b059342368576385652b7bd60d9dfb6053c1c23134640d7",
     "apps/fgos/src/wiring/identity_log.rs": "d7d9dd503ecbd84a5373aa27f6853996e6944aba2940d15e8284cd92c14eef7a",
     "apps/fgos/src/wiring/init.rs": "ad2a58907ec31a23cea8e1205dc45c041b65259c58d36e46e96ff1b64acfb578",
