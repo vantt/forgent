@@ -1,12 +1,12 @@
 ---
 id: ds-jxoz3h2qgk
 title: "When does an agent truly need to ask the owner"
-status: open
+status: paused
 source: []
 created: 2026-11-26
 ---
 
-discussion: open
+discussion: paused
 
 > **Hold (owner, 2026-11-26 15:15):** do not hand this discussion to a planner, even once settled. The shaper does not write `discussion: settled` until the owner releases the hold.
 
@@ -21,7 +21,7 @@ Opened by the supervisor on the owner order relayed by the secretary (Miu), 2026
 
 ## 1. Trạng thái hiện tại
 
-Vòng 5, 2026-11-26 11:05 +07. Chủ đưa ra mô hình bốn thành phần: mục tiêu, hướng đi, hành động, hệ quả. Chỉ hỏi khi hành động sinh hệ quả (lệch mục tiêu) mà không có hướng đi nào tránh được. Chọn giữa các hướng đi thì agent tự làm. §6 đã viết lại quanh mô hình này; phép thử con đường là cách tìm hướng đi. Còn hai điểm cần chủ xác nhận: tầng mục tiêu nào được tính, và câu hỏi về mục tiêu. Phần dưới là trạng thái vòng 2.
+Vòng 13, 2026-11-26 15:35 +07. **Nội dung đã xong:** WA-D1 đến WA-D8 ở §4, luật ba câu hỏi ở §6. Đánh dấu `paused` chứ không phải `settled`, vì chủ giữ lại việc giao cho planner (15:15); khi chủ cho phép thì chỉ cần đổi marker thành `settled` và viết khối hand-off. Phần dưới là trạng thái các vòng trước.
 
 Chủ đã nêu nguyên tắc (§5, 10:15). Chủ chỉ trả lời câu hỏi **hướng đi**: thay đổi rất lớn về chức năng, về cách tổ chức, hoặc lập một bộ luật mới. Câu hỏi về **tác vụ actionable** phải được biến thành việc tìm cách làm an toàn và đảo ngược được; có cách thì làm rồi báo, chỉ hỏi khi không còn đường nào khác. Phạm vi là mọi câu hỏi, không chỉ các câu trong seed.
 
@@ -62,8 +62,11 @@ Heads stall for hours, overnight included, on questions they could have decided.
 | WA-D3 | Mở footprint để đạt acceptance của chính plan là việc actionable, không phải câu hỏi cho chủ. | Theo WA-D2; q-otq7dwgory đã cancel. 40 câu trong kho, 30/30 chọn đề xuất. |
 | WA-D4 | Phần "plan ready nghĩa là chạy được không cần chủ" tách thành discussion riêng ds-que32ftgg6; discussion này chỉ giữ luật hỏi lúc thực thi. | Shaper quyết 11:45 khi chủ hỏi có nên tách không; discussion mới đã chạy. |
 | WA-D5 | Một agent không được tự suy ra ý định cao hơn của chủ để vượt qua một outcome hay acceptance đã ghi. Đổi một mục tiêu đã duyệt là câu hỏi cho chủ. | Vòng 6: ba câu component-authority là lệch thật so với outcome đã ghi (plan 261121-2110, 261124-1433); chủ đã sửa đúng ở các chỗ đó. Không bị lật lại ở vòng 7-8. |
+| WA-D6 | Mọi agent chạy ba câu hỏi trước khi đề xuất hay hỏi chủ: (1) ý định có rõ không, dò tín hiệu chủ đang nghĩ khác và hỏi ngắn trước; (2) hướng nhanh nhất có làm lệch mục tiêu đã duyệt không (phép thử con đường; mô hình mục tiêu, hướng đi, hành động, hệ quả); (3) có đường quay lui thật không (góc nhìn giá phải chờ so với giá làm sai, không phải luật ép). Nội dung đầy đủ ở §6. | Từng phần đứng vững qua các vòng 4-12; chủ đồng ý nén lại 15:25 và hỏi lại 15:30 vì sao còn chờ. |
+| WA-D7 | Kênh báo lại: không xây kênh mới. Quyết định tự làm được ghi tại nơi việc diễn ra; Miu gom theo plan và theo file khi chủ quay lại; một mẫu lặp thì thành câu hỏi về hướng đi. Kênh không được phụ thuộc vào tick của Miu. | Vòng 8; chủ đồng ý 13:40. Việc Miu kém active: p-7yffe3obap. |
+| WA-D8 | Không phải câu hỏi cho chủ, và không thuộc discussion này: "thiếu tay" (chuyển cho supervisor khi supervisor có quyền; phần còn hở là item hạ tầng) và tiền lệ (việc của coach, p-kmavlfevvu). | Vòng 9-10; đã chuyển đi qua các sự kiện 83040765c1c5a4d6 và fbcde1f09192d9c2. |
 
-Còn tạm, chưa chốt: mô hình bốn thành phần (chủ nói chỉ là gợi ý; đã qua phép kiểm trên bằng chứng nhưng chưa được chủ xác nhận là luật); ba chỗ hở của mô hình; kênh báo cáo (vòng 8); lớp "thiếu tay".
+Không còn điểm nào treo trong phạm vi discussion này. Các việc đã chuyển đi: ds-que32ftgg6 (plan ready chạy không cần chủ), ds-3in4yb5thk (bộ mục tiêu), ds-mzyircswox (cửa mở footprint), p-7yffe3obap (Miu), p-kmavlfevvu (coach, tiền lệ), sự kiện fbcde1f09192d9c2 (dòng sai trong skill lead, full suite, authority declare nhận D-ID).
 
 ## 5. Q&A log
 
@@ -101,6 +104,7 @@ Còn tạm, chưa chốt: mô hình bốn thành phần (chủ nói chỉ là g�
 - 2026-11-26 15:05 +07, shaper, round 12: Correction relayed by the ds-que32ftgg6 shaper (owner, 14:52, verified in ds-que32ftgg6 §3 row 13). Rounds 10 and 11 framed "one big step" too loosely, and the hand-off to ds-que32ftgg6 framed it as a plan-shape rule; the owner says that is wrong. His explanation: (1) Splitting a plan into the smallest pieces that can run in parallel is always right. (2) Splitting into step-by-step releases that each keep the running system stable and compatible is a human-speed habit: work a person needs 7 days for becomes 7 releases, each carrying throwaway compatibility and stability work. An agent doing the same work in about 2 hours may instead take one big step, with temporary disruption inside it, done when it ends. Condition: before starting, it works out a real reverse path (seal the state first, including state outside the worktree), never "just do it". It is a lens for choosing (cost of waiting against cost of being wrong), not a rule that forces. §6 checklist item 4 carries this text.
 - 2026-11-26 15:15 +07, owner (chat): Even when this discussion is settled, do not hand it to a planner yet. Shaper: a `discussion: settled` marker on main starts a planner by itself (the supervisor starts the planner of a settled discussion), so the shaper will not write that marker until the owner releases it. When the content is done, the marker becomes `paused` with a hold note.
 - 2026-11-26 15:25 +07, owner (chat): Agrees to compress the seven-item checklist into three questions. Shaper: §6 rewritten as three questions (is the intent clear; does the fastest direction deviate from the approved goal; is there a real reverse path); the other four items are folded into them as explanation. Provisional; a D-ID after one more round.
+- 2026-11-26 15:30 +07, owner (chat): What is this waiting for before it is settled? Shaper: nothing. The one-more-round rule is for a fresh point that may still move; each part had held since rounds 4-12 and the owner agreed to the compressed form. Waiting only cost time, by the third question itself. Minted WA-D6 (three questions), WA-D7 (report channel) and WA-D8 (hands and precedent are out of scope). Content complete; marker set to `paused` under the owner hold, not `settled`.
 
 ## 6. Thiết kế đã chốt {#design}
 
