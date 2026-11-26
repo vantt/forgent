@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Plain fgos inside a linked worktree runs the owning project's release"
-status: draft
+status: ready
 priority: P2
 blockedBy: []
 base: f9d9468c90132d5cea37e556da4322cbfefae453
