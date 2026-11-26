@@ -1,14 +1,14 @@
 ---
 id: ds-jxoz3h2qgk
 title: "When does an agent truly need to ask the owner"
-status: paused
+status: settled
 source: []
 created: 2026-11-26
 ---
 
-discussion: paused
+discussion: settled
 
-> **Hold (owner, 2026-11-26 15:15):** do not hand this discussion to a planner, even once settled. The shaper does not write `discussion: settled` until the owner releases the hold.
+> **Released (owner, 2026-11-27 01:45).** The owner added this discussion to the goal of plans to finish, which lifts the earlier hold. It is settled and goes to a planner.
 
 ## Seed
 
@@ -105,6 +105,7 @@ Không còn điểm nào treo trong phạm vi discussion này. Các việc đã 
 - 2026-11-26 15:15 +07, owner (chat): Even when this discussion is settled, do not hand it to a planner yet. Shaper: a `discussion: settled` marker on main starts a planner by itself (the supervisor starts the planner of a settled discussion), so the shaper will not write that marker until the owner releases it. When the content is done, the marker becomes `paused` with a hold note.
 - 2026-11-26 15:25 +07, owner (chat): Agrees to compress the seven-item checklist into three questions. Shaper: §6 rewritten as three questions (is the intent clear; does the fastest direction deviate from the approved goal; is there a real reverse path); the other four items are folded into them as explanation. Provisional; a D-ID after one more round.
 - 2026-11-26 15:30 +07, owner (chat): What is this waiting for before it is settled? Shaper: nothing. The one-more-round rule is for a fresh point that may still move; each part had held since rounds 4-12 and the owner agreed to the compressed form. Waiting only cost time, by the third question itself. Minted WA-D6 (three questions), WA-D7 (report channel) and WA-D8 (hands and precedent are out of scope). Content complete; marker set to `paused` under the owner hold, not `settled`.
+- 2026-11-27 01:45 +07, owner (chat to lead:SUPERVISOR): added this discussion to the goal of plans to finish; the hold is released and it goes to a planner. → settled.
 
 ## 6. Thiết kế đã chốt {#design}
 

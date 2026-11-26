@@ -1,15 +1,15 @@
 ---
 id: ds-mzyircswox
 title: "A door to widen a running plan's footprint"
-status: paused
+status: settled
 source:
   - p-lfsc4czpgh
 created: 2026-11-26
 ---
 
-discussion: paused
+discussion: settled
 
-> **Closed without a planner (owner, 2026-11-26).** The owner closed this discussion and chose not to hand it to a planner: too much work and resource for now. The design below stays as the record. To resume, the owner reopens it by name; nothing here is queued.
+> **Released (owner, 2026-11-27 01:45).** The owner added this discussion to the goal of plans to finish, which lifts the earlier hold. It is settled and goes to a planner.
 
 ## Hand-off
 
@@ -83,6 +83,7 @@ A running plan is bounded by its footprint: the run door refuses a `--writes` pa
 - 2026-11-26 ~10:05 +07, shaper: Root cause. The footprint mixes collision avoidance (mechanical) with scope (the owner approves acceptance, not files). Five widen questions on record, none answered "no", one answered by lead:SUPERVISOR inside the frame. A "no" does not stop the project; it degrades one phase's approved criterion. Proposed: self-widen inside the frame, system-ordered on overlap, owner only for scope beyond acceptance; cancel q-ee2f2g3aoj.
 - 2026-11-26 12:41 +07, owner: "đồng ý." Then: put the overlap-ordering idea in the backlog as its own capability; "ý là footprint cần đổi giữa chừng". → D1, D2. q-ee2f2g3aoj cancelled as superseded. D3 and D4 minted (held across both rounds).
 - 2026-11-26 ~12:50 +07, owner: "khoan giao cho planner", then "dọn dẹp ở đây rồi đóng discussion. không giao vì quá nhiều việc tốn resource". → closed as paused, no planner.
+- 2026-11-27 01:45 +07, owner (chat to lead:SUPERVISOR): added this discussion to the goal of plans to finish; the hold is released and it goes to a planner. → settled.
 
 ## 6. Thiết kế đã chốt {#design}
 
