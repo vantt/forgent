@@ -9,7 +9,7 @@ created: 2026-11-26
 
 # Why
 
-Discussion ds-que32ftgg6-ready-plan-runs-unattended section 6 ("the new shape of the `when:` label set", decisions D2 and D3) renames the keys: `workType` replaces the Work item `kind`, `sessionType` and `agentLifecycle` split today's `kind`, `agentCli` replaces `cli`, `agentFamily` is new, and the `role:` line of `core/agents/*.yaml` becomes `summary`. The owner wants it done soon, but it sits inside a larger discussion whose rule units (U1 to U7) are not settled. ACE (261125-1631) is done on the other machine, so the key registry `when-keys.v1.json` it fixed is now a shipped contract that the rename changes.
+Discussion ds-que32ftgg6-ready-plan-runs-unattended section 6 ("the new shape of the `when:` label set", its two decisions on the key names and the grouping) renames the keys: `workType` replaces the Work item `kind`, `sessionType` and `agentLifecycle` split today's `kind`, `agentCli` replaces `cli`, `agentFamily` is new, and the `role:` line of `core/agents/*.yaml` becomes `summary`. The owner wants it done soon, but it sits inside a larger discussion whose rule units (U1 to U7) are not settled. ACE (261125-1631) is done on the other machine, so the key registry `when-keys.v1.json` it fixed is now a shipped contract that the rename changes.
 
 # Done when
 
@@ -17,4 +17,4 @@ A separate discussion states the rename on its own: the final key list and value
 
 # Notes
 
-The owner's choice: a new discussion first, the planner runs on it, the old one only points to it. Seed from ds-que32ftgg6 section 6 and decisions D2, D3. L10 and RUL104 apply: every caller moves, the old names are deleted.
+The owner's choice: a new discussion first, the planner runs on it, the old one only points to it. Seed from ds-que32ftgg6 section 6 and its two decisions on the key names and the grouping. The platform rule applies that a change moves every caller and deletes the old names in the same change, and the rule that the result must be better, not bigger.
