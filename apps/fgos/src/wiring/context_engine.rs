@@ -24,6 +24,7 @@ use std::path::{Path, PathBuf};
 
 use fgos_agent_context_engine::refusal::Refusal;
 use fgos_agent_context_engine::store::{check_repository, compile_repository, StorePaths};
+use fgos_host_runtime::civil_time::civil_from_days;
 use fgos_host_runtime::cli_args::{parse_args, FlagScalar, FlagValue};
 use serde_json::{json, Value};
 
@@ -173,24 +174,7 @@ fn today() -> String {
         .duration_since(std::time::UNIX_EPOCH)
         .map(|elapsed| elapsed.as_secs())
         .unwrap_or(0);
-    civil_day(i64::try_from(seconds / 86_400).unwrap_or(0))
-}
-
-/// The proleptic Gregorian date of a day count since 1970-01-01.
-fn civil_day(days: i64) -> String {
-    let shifted = days + 719_468;
-    let era = shifted.div_euclid(146_097);
-    let of_era = shifted.rem_euclid(146_097);
-    let year_of_era = (of_era - of_era / 1_460 + of_era / 36_524 - of_era / 146_096) / 365;
-    let day_of_year = of_era - (365 * year_of_era + year_of_era / 4 - year_of_era / 100);
-    let month_index = (5 * day_of_year + 2) / 153;
-    let day = day_of_year - (153 * month_index + 2) / 5 + 1;
-    let month = if month_index < 10 {
-        month_index + 3
-    } else {
-        month_index - 9
-    };
-    let year = year_of_era + era * 400 + i64::from(month <= 2);
+    let (year, month, day) = civil_from_days(i64::try_from(seconds / 86_400).unwrap_or(0));
     format!("{year:04}-{month:02}-{day:02}")
 }
 
@@ -286,16 +270,4 @@ fn report(refusals: &[Refusal], rules: usize, written: Option<(&str, &Path)>) ->
         result["path"] = json!(path.to_string_lossy());
     }
     result
-}
-
-#[cfg(test)]
-mod tests {
-    use super::civil_day;
-
-    #[test]
-    fn a_day_count_becomes_its_calendar_date() {
-        assert_eq!(civil_day(0), "1970-01-01");
-        assert_eq!(civil_day(11_016), "2000-02-29");
-        assert_eq!(civil_day(20_418), "2025-11-26");
-    }
 }
