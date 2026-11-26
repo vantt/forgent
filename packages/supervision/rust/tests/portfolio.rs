@@ -2,8 +2,8 @@ use std::fs;
 use std::path::PathBuf;
 
 use fgos_supervision::portfolio::{
-    admissible, collisions, footprint_problem, head_name, name_tag, order, read_plan,
-    supervisor_name, Plan,
+    admissible, admitted_text, collisions, footprint_problem, head_name, name_tag, order,
+    read_plan, supervisor_name, Plan,
 };
 
 fn plan(
@@ -26,6 +26,26 @@ fn plan(
         if footprint.is_empty() { " []".to_string() } else { list(footprint) },
     );
     read_plan(dir, &text).expect("fixture plan reads")
+}
+
+// Successful plan parsing does not classify the admission duty of a refused document.
+#[test]
+fn only_refused_ready_plans_need_admission_judgement() {
+    use fgos_supervision::portfolio::refused_ready_plan;
+    for status in ["ready", "done", "withdrawn", "running", "draft", "old"] {
+        for broken in ["priority: invalid", "priority: P1\nfootprint: invalid"] {
+            let text = format!("---\nstatus: {status}\n{broken}\n---\n# No phase table\n");
+            assert!(read_plan("refused", &text).is_err());
+            assert_eq!(refused_ready_plan(&text), status == "ready");
+        }
+    }
+    for text in [
+        "old plan without frontmatter",
+        "---\nstatus: [\n---\n",
+        "---\n- ready\n---\n",
+    ] {
+        assert!(!refused_ready_plan(text));
+    }
 }
 
 #[test]
@@ -396,4 +416,38 @@ fn only_whole_entry_markdown_is_unwrapped_in_a_footprint_cell() {
         plan.phases[0].footprint,
         ["src/[a](b)/x", "src/c/**", "src/[e](f)/g"][..]
     );
+}
+
+// The reader's existing cases do not prove admission's byte edit or publication fields.
+#[test]
+fn admission_edits_only_status_lead_and_base_and_keeps_the_plan_body_and_notes() {
+    for newline in ["\n", "\r\n"] {
+        let body = format!("{HEAD}| 1 | a | - | x/ | 1 | todo |\n\nKeep this body.\n");
+        let original = text_with(
+            "# keep above\nlead: 'old' # keep inline\nbase: old-base\n",
+            &body,
+        )
+        .replace('\n', newline);
+        let edited = admitted_text(&original, "head:lead-project-plan", "abc123").unwrap();
+        let read = read_plan("p", &edited).unwrap();
+        assert_eq!(read.status, "running");
+        assert_eq!(read.lead.as_deref(), Some("head:lead-project-plan"));
+        assert!(edited.contains("base: abc123"));
+        assert!(edited.contains("# keep above"));
+        assert!(edited.contains("# keep inline"));
+        assert!(edited.ends_with(&body.replace('\n', newline)));
+    }
+}
+
+#[test]
+fn admission_adds_missing_lead_and_base_through_the_frontmatter_editor() {
+    let body = format!("{HEAD}| 1 | a | - | x/ | 1 | todo |\n");
+    let original = text_with("", &body);
+    let edited = admitted_text(&original, "head:lead-project-plan", "abc123").unwrap();
+    assert_eq!(
+        read_plan("p", &edited).unwrap().lead.as_deref(),
+        Some("head:lead-project-plan")
+    );
+    assert!(edited.contains("base: abc123"));
+    assert!(edited.ends_with(&body));
 }

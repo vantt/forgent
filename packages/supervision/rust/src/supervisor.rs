@@ -52,6 +52,45 @@ fn waits_on_owner(p: &Plan, open: &dyn OpenQuestions) -> bool {
         })
 }
 
+/// Count distinct lead roles, including Identity roles with no running plan. Only a known live
+/// lead whose every running plan waits on the owner releases its slot; unknown never means free.
+pub fn lead_counts(
+    plans: &[Plan],
+    roles: &[String],
+    project_id: &str,
+    holder: &dyn Fn(&str) -> Holder,
+    questions: &dyn OpenQuestions,
+) -> (usize, usize) {
+    let mut roles = roles.to_vec();
+    roles.extend(
+        plans
+            .iter()
+            .filter(|p| p.status == "running")
+            .filter_map(|p| p.lead.clone()),
+    );
+    roles.sort();
+    roles.dedup();
+    let (mut live, mut waiting) = (0, 0);
+    for role in roles {
+        match holder(&role) {
+            Holder::Live { project_id: id } if id == project_id => {
+                let owned: Vec<_> = plans
+                    .iter()
+                    .filter(|p| p.status == "running" && p.lead.as_ref() == Some(&role))
+                    .collect();
+                if !owned.is_empty() && owned.iter().all(|p| waits_on_owner(p, questions)) {
+                    waiting += 1;
+                } else {
+                    live += 1;
+                }
+            }
+            Holder::Unknown => live += 1,
+            _ => {}
+        }
+    }
+    (live, waiting)
+}
+
 /// The portfolio rows in the order given (the caller orders them), with `holder` answering who
 /// holds a role now and `project_id` this project's id. Lane freedom is not read here; `fgos
 /// slots` owns it.
@@ -65,8 +104,7 @@ pub fn plans(
     questions: &dyn OpenQuestions,
 ) -> PlansView {
     let open = admissible(plans, done_dirs);
-    let mut leads_live = 0;
-    let mut leads_waiting = 0;
+    let (leads_live, leads_waiting) = lead_counts(plans, &[], project_id, holder, questions);
     let rows = plans
         .iter()
         .map(|p| {
@@ -80,13 +118,6 @@ pub fn plans(
                 },
                 _ => None,
             };
-            if lead_live == Some(true) {
-                if waits_on_owner(p, questions) {
-                    leads_waiting += 1;
-                } else {
-                    leads_live += 1;
-                }
-            }
             PlanRow {
                 dir: p.dir.clone(),
                 status: p.status.clone(),
