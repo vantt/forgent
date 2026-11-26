@@ -88,8 +88,12 @@ only this plan and ASC 9, not the rest of ASC.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Gather every fgOS rule to one owner](phase-01-gather-rules.md) | - | core/instructions/**, components/*/instructions/**, domains/*/instructions/**, .fgos/instructions/effective/**, AGENTS.md, core/skills/**, core/agents/**, core/prompt-templates/**, domains/coding/skills/**, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/**, .claude/agents/**, packages/agent-start-context/goldens/**, test/docs/**, plans/261125-2041-gather-fgos-rules-to-one-owner/reports/** | 1 | draft |
+| 1 | [Gather every fgOS rule to one owner](phase-01-gather-rules.md) | - | core/instructions/**, components/*/instructions/**, domains/*/instructions/**, .fgos/instructions/effective/**, AGENTS.md, core/skills/**, core/agents/**, core/prompt-templates/**, domains/coding/skills/**, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/**, .claude/agents/**, packages/agent-start-context/goldens/**, test/docs/**, plans/261125-2041-gather-fgos-rules-to-one-owner/reports/** | 1 | running |
 | 2 | [Integration gate, changelog](phase-02-integration.md) | 1 | CHANGELOG.md | 2 | draft |
+
+Phase 1 runs as ticket `c-2271-1795691361563` (gemini, worktree `261125-2041-gather-fgos-rules-to-one-owner-p01`,
+branch `gather-fgos-rules-to-one-owner/p01`); it was still running after 12 waits. A restarted lead resumes it with
+`fgos request result c-2271-1795691361563`.
 
 ### Progress (lead on fg-server, 2026-11-26)
 
