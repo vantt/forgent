@@ -4,10 +4,11 @@ kind: law
 owner: core
 scope: repo
 mode: append
-appliesTo: ["*"]
 specificity: 10
 title: Decision Question Template
 description: Every question asking the owner to choose a direction carries what is happening, cause, options with cost, recommendation and scope of the answer
+lifecycle: live
+valid_from: 2026-10-08
 ---
 
 # Decision Question Template

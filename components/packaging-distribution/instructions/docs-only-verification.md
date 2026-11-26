@@ -4,10 +4,11 @@ kind: procedure
 owner: packaging-distribution
 scope: component
 mode: append
-appliesTo: ["*"]
 specificity: 20
 title: Packaging Distribution Verification
 description: Verification procedure for packaging-distribution component and docs-only changes
+lifecycle: live
+valid_from: 2026-09-14
 ---
 
 # Packaging Distribution Verification

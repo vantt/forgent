@@ -4,10 +4,11 @@ kind: law
 owner: core
 scope: repo
 mode: append
-appliesTo: ["*"]
 specificity: 10
 title: Platform Operating Laws
 description: Core platform operating laws L1-L10 defining immutable platform invariants
+lifecycle: live
+valid_from: 2026-09-14
 ---
 
 # Platform Operating Laws

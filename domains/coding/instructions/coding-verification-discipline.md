@@ -4,10 +4,11 @@ kind: procedure
 owner: coding
 scope: domain
 mode: append
-appliesTo: ["*"]
 specificity: 30
 title: Coding Verification Discipline
 description: Verification discipline for coding-domain agents — targeted proof per unit, full suite only at declared gates
+lifecycle: live
+valid_from: 2026-09-15
 ---
 
 # Coding Verification Discipline
