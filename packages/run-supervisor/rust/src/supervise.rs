@@ -802,6 +802,23 @@ fn bind(
     bind_record(envelope, run_dir, locks, &record, &spawned.root, kernel)
 }
 
+/// Resolve the failure domain recorded in the environment or fallback to inherited.
+pub fn read_current_failure_domain() -> Value {
+    if let Ok(val) = std::env::var("FGOS_FAILURE_DOMAIN") {
+        if let Ok(parsed) = serde_json::from_str::<Value>(&val) {
+            return parsed;
+        }
+    }
+    #[cfg(target_os = "linux")]
+    {
+        json!({ "kind": "inherited", "reason": "no-user-manager" })
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        json!({ "kind": "inherited", "reason": "not-linux" })
+    }
+}
+
 /// [`bind`] for a domain the caller already knows: record it on the lock, then publish the binding.
 fn bind_record(
     envelope: &Value,
@@ -820,6 +837,7 @@ fn bind_record(
         .map_err(|e| format!("declare_domain on the cwd lease: {e}"))?;
     let declared = fgos_holder_lock::predecessor::domain_json(record);
     let me = facts::self_identity().ok_or("the supervisor's own identity is unreadable")?;
+    let failure_domain = read_current_failure_domain();
     let binding = json!({
         "v": 1,
         "attemptId": envelope["attemptId"],
@@ -827,6 +845,7 @@ fn bind_record(
         "supervisor": me.to_record().to_json(),
         "gate": gate.to_record().to_json(),
         "domain": {"kind": declared["domainKind"], "id": declared["domainId"]},
+        "failureDomain": failure_domain,
         "guarantee": {
             "containment": if kernel { "kernel" } else { "best-effort" },
             "lock": "kernel",

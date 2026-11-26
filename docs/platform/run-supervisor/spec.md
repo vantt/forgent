@@ -109,6 +109,12 @@ No child process starts inside the hot state mutex (`exec-under-hot-lock`): the 
 
 The controller does not settle while a supervisor lives. The controller reads receipts from files; it holds no handle to the supervisor.
 
+### 4.1 Failure domain of a supervised attempt
+
+On Linux, every run supervisor starts detached in its own transient systemd user scope (`fgos-run-<attemptId>`) via `systemd-run --user --scope --collect --unit=fgos-run-<attemptId> -p OOMPolicy=stop [-p MemoryMax=<cap>]`, preserving `setsid` and the descriptor handover (locks as fds 3 and 4). This isolates the attempt in its own cgroup: an OOM kill or unit stop terminates only that scope without affecting the watcher service (`fgos-watcher-<id>.service`), other heads or other runs. Memory is capped only when `runner.supervisorScope.memoryMax` is configured.
+
+Where no user manager is reachable (macOS, Windows, absent `systemd-run` executable, or when launched within a sandbox where `XDG_RUNTIME_DIR/systemd/private` and the user bus are masked), the supervisor starts directly and records `failureDomain: {kind: "inherited", reason}` in `supervisor-binding.json`. When reachable, it records `failureDomain: {kind: "systemd-scope", unit}`. (D1-D5, `plans/discussions/ds-rig5dsai5l-head-run-own-failure-domain/DISCUSSION.md`).
+
 ## 5. Supervisor and gate
 
 **Supervisor sequence.** Set `FD_CLOEXEC` on fd 3 and 4 before any other syscall; read and verify the envelope (digest, `hostBin` equals the running binary, else `host-version-mismatch`); `containment.create`; declare the domain in `attempt.lock.predecessor.json` (and on the cwd lease file) before the domain has a process; start the gate in the domain with fd map `{3 attempt, 4 cwd, 5 GO end}`; publish the binding `{supervisor, gate host tuple, domain, guarantee}`; wait for HELLO (15 s limit); send GO; watch.
@@ -405,6 +411,7 @@ The check for orphaned confinement resources skips attempt homes (marker version
 - **2026-11-18 — Attempt đặt qua cổng Session Host.** Envelope mang `host` thay `mode` (bản ghi cũ vẫn đọc được `mode`, writer không ghi nữa), `release-slot` là `retire` của cổng, I/O pane của supervisor là `PaneIo` của crate cộng phần theo dõi của supervisor; cấp pane là `open` của cổng và launch gate là `launch`, `start` là hợp của hai.
 - **2026-11-18 — Một socket yêu cầu cho mỗi head session.** Head bị nhốt không chạm được socket herdr, nên muốn gọi verb của host thì đi qua một socket do supervisor của chính nó mở và bind ngược vào sandbox (cùng luật với socket GO); supervisor tra role qua Identity, kiểm grant trong envelope, chạy verb ngoài sandbox và ghi một dòng log. Không có daemon mới.
 - **2026-11-18 — Head có `peers` giữ không gian pid của host (chủ dự án quyết 2026-11-18).** Trong `--unshare-pid` pid của peer đọc thành 0 nên Claude Code không kiểm được peer nào còn sống; secretary cần SendMessage tới các phiên khác trên máy. Head có grant `peers` chạy bwrap không `--unshare-pid --as-pid-1`, envelope ghi `linux-pgroup` kèm prefix (chỉ terminal). Dùng lại chế độ gate-không-phải-pid-1 sẵn có (subreaper, quét cây tới rỗng), không cgroup, không `systemd-run`; thêm `PR_SET_PDEATHSIG` cho agent để gate bị giết thẳng vẫn kéo agent theo. Bất biến của head: cây gate nhận nuôi rỗng thì cây đã hết. Worker giữ nguyên namespace.
+- **2026-11-27 — Run supervisor trong systemd user scope riêng (D1-D5).** Mỗi `fgos internal supervise` chạy trong một transient systemd user scope riêng (`fgos-run-<attemptId>`) với `OOMPolicy=stop` và tuỳ chọn `MemoryMax` (`runner.supervisorScope.memoryMax`). Kernel OOM kill hoặc stop một unit chỉ dừng đúng scope đó, không kéo theo watcher unit hoặc các supervisor khác. Khi không chạm được user manager (macOS, Windows, launch trong sandbox bị che `systemd/private` và bus), supervisor kế thừa failure domain và `supervisor-binding.json` ghi `failureDomain: {kind: "inherited", reason}`; ngược lại ghi `{kind: "systemd-scope", unit}`. Chi tiết: `plans/discussions/ds-rig5dsai5l-head-run-own-failure-domain/DISCUSSION.md`.
 
 ## 17. Related files
 

@@ -828,6 +828,44 @@ pub fn start_supervisor(
     result
 }
 
+/// Build the command that executes the supervisor, wrapped in a systemd scope if `failure_domain` is `SystemdScope`.
+pub fn build_supervisor_command(
+    envelope: &Value,
+    run_dir: &Path,
+    failure_domain: &super::scope::FailureDomain,
+    memory_max: Option<&str>,
+) -> Command {
+    let host_bin = envelope["hostBin"].as_str().unwrap_or_default();
+    let envelope_path = run_dir.join("envelope.json");
+    let protocol_str = PROTOCOL.to_string();
+    let supervisor_argv = vec![
+        host_bin.to_string(),
+        "internal".into(),
+        "supervise".into(),
+        "--envelope".into(),
+        envelope_path.to_string_lossy().to_string(),
+        "--protocol".into(),
+        protocol_str,
+    ];
+    match failure_domain {
+        super::scope::FailureDomain::SystemdScope { unit } => {
+            let scope_cmd = super::scope::build_scope_command(
+                unit,
+                memory_max,
+                &supervisor_argv,
+            );
+            let mut cmd = Command::new(&scope_cmd[0]);
+            cmd.args(&scope_cmd[1..]);
+            cmd
+        }
+        super::scope::FailureDomain::Inherited { .. } => {
+            let mut cmd = Command::new(&supervisor_argv[0]);
+            cmd.args(&supervisor_argv[1..]);
+            cmd
+        }
+    }
+}
+
 fn spawn_supervisor(
     envelope: &Value,
     run_dir: &Path,
@@ -843,11 +881,39 @@ fn spawn_supervisor(
         log_options.mode(0o600);
     }
     let log = log_options.open(run_dir.join("supervisor.log"))?;
-    let mut command = Command::new(envelope["hostBin"].as_str().unwrap_or_default());
+
+    #[cfg(unix)]
+    let (mut command, failure_domain) = {
+        let attempt_id = envelope["attemptId"].as_str().unwrap_or_default();
+        let failure_domain = super::scope::decide_failure_domain(attempt_id);
+        let project_root = envelope["cwd"].as_str().map(Path::new);
+        let memory_max = super::config::read_supervisor_scope_memory_max(project_root)
+            .ok()
+            .filter(|m| !m.is_empty());
+        let cmd = build_supervisor_command(
+            envelope,
+            run_dir,
+            &failure_domain,
+            memory_max.as_deref(),
+        );
+        (cmd, failure_domain)
+    };
+
+    #[cfg(windows)]
+    let (mut command, failure_domain) = {
+        let failure_domain = super::scope::FailureDomain::Inherited {
+            reason: "not-linux".to_string(),
+        };
+        let cmd = build_supervisor_command(
+            envelope,
+            run_dir,
+            &failure_domain,
+            None,
+        );
+        (cmd, failure_domain)
+    };
+
     command
-        .args(["internal", "supervise", "--envelope"])
-        .arg(run_dir.join("envelope.json"))
-        .args(["--protocol", &PROTOCOL.to_string()])
         .current_dir(run_dir)
         .env_clear()
         .stdin(Stdio::null())
@@ -856,6 +922,17 @@ fn spawn_supervisor(
     for (name, value) in step_env.iter().chain(extra_env.iter()) {
         if let Some(value) = value.as_str() {
             command.env(name, value);
+        }
+    }
+    let fd_json = serde_json::to_string(&failure_domain).unwrap_or_default();
+    command.env("FGOS_FAILURE_DOMAIN", fd_json);
+    #[cfg(unix)]
+    if matches!(failure_domain, super::scope::FailureDomain::SystemdScope { .. }) {
+        if let Ok(runtime_dir) = std::env::var("XDG_RUNTIME_DIR") {
+            command.env("XDG_RUNTIME_DIR", runtime_dir);
+        }
+        if let Ok(bus) = std::env::var("DBUS_SESSION_BUS_ADDRESS") {
+            command.env("DBUS_SESSION_BUS_ADDRESS", bus);
         }
     }
     #[cfg(unix)]

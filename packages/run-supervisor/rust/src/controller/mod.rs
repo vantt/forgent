@@ -20,6 +20,8 @@ pub mod proof;
 #[cfg(feature = "supervise")]
 pub mod runtime_dir;
 #[cfg(feature = "supervise")]
+pub mod scope;
+#[cfg(feature = "supervise")]
 pub mod sweep;
 #[cfg(feature = "supervise")]
 pub mod trust_store;

@@ -176,6 +176,14 @@ properties:
         x-fgos-merge: tighten
         description: "When true every capability must declare its own confinement."
         type: boolean
+  supervisorScope:
+    description: "Settings of the transient systemd user scope wrapping each run supervisor."
+    type: object
+    additionalProperties: false
+    properties:
+      memoryMax:
+        description: "Memory cap for the run supervisor's systemd scope in systemd size syntax (e.g. 8G); empty means no cap."
+        type: string
   confinementPolicies:
     $comment: "justification: a policy decides what a confined session may do on this machine, so only the machine's own file defines one; a project could otherwise define a weak policy and require it"
     x-fgos-scope: global-only

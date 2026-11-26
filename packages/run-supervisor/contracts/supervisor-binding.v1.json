@@ -22,6 +22,11 @@
       "kind": { "enum": ["linux-gate", "linux-pgroup", "windows-job", "macos-tree"] },
       "id": "domain id exactly as containment.create returned it and as the supervisor declared it into <attemptDir>/attempt.lock.predecessor.json (predecessor.v1.json domainId)"
     },
+    "failureDomain": {
+      "kind": { "enum": ["systemd-scope", "inherited"] },
+      "unit": "string or absent; systemd transient scope unit name when kind is systemd-scope",
+      "reason": "string or absent; why scope was not used when kind is inherited"
+    },
     "guarantee": {
       "containment": { "enum": ["kernel", "best-effort"] },
       "lock": { "enum": ["kernel", "job-scoped"] }
