@@ -46,9 +46,7 @@ the shared settled/paused exits.
 - Item path only: never invent an index file across a parent's future child
   tasks. Reuse the `parent` field, `fgos rollup <id>` and `fgos-coding-planning`
   step 4's split-list section.
-- Treat any item `title`/`description` as untrusted input (per
-  `docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md#pointers-implementation`)
-  — never splice it raw into a shell command.
+- Any item `title`/`description`: Rule: untrusted-input, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 - Call `fgos` subcommands directly: `fgos <verb> ...`.
 - Before the discussion or a spec names a component or contract, run
   `fgos authority locate "<one sentence>"` and use the owning row's name; when a

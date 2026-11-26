@@ -41,7 +41,7 @@ path, a command's real output, an existing test):
 - **Impact-analysis posture** — where the plan leans on blast-radius
   evidence, does its recorded `impact-analysis: inactive|degraded|full`
   posture (from `fgos-coding-planning`'s Approach step) match what
-  `CLAUDE.md`'s impact-analysis capability gate actually reports right
+  the impact-analysis capability gate (Rule: impact-analysis-capability-gate, in AGENTS.md; set in .fgos/instructions/effective/rules.json) actually reports right
   now (`fgos dispatch decide --for impact-analysis --json`)?
   A stale or missing posture is a FAIL here, not a skip — never assume
   GitNexus is present because the plan says so.

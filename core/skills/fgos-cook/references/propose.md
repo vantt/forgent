@@ -53,8 +53,7 @@ offered for approval until every refusal is fixed.
 After the owner approves, run `commands` in order. Set `CASE` from `data.workflowRunId`
 of the `workflow start` line; every later line names it. The judge and validate lines
 are absent when a closed case with the same plan and base commit is continued
-(`--inherit`). A frame that is about to be exceeded is a stop and a question in the
-decision-question template, never a quiet widening.
+(`--inherit`). A frame about to be exceeded: `../../_shared/decision-question.md`.
 
 ## Owner-first and parked slices
 

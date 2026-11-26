@@ -54,10 +54,8 @@ When the user asks to run a plan, a phase ("run phase 2"), or a phase range ("ru
    fgos workflow start --units <file> [--foreground]
    ```
    `--units` takes a YAML or JSON list of Units, one step per Unit, ordered by each Unit's `dependsOn`.
-   `start` returns at once with the `workflowRunId` and a `detached` block; the run continues in a
-   detached process. Read progress with `fgos workflow status <workflowRunId>` (or pass `--foreground`
-   to wait in place); `fgos workflow answer` and `fgos workflow resume` return the same way. Do not treat
-   the output of `start`, `answer` or `resume` as the final state.
+   `start`, `answer` and `resume` return at once with a detached run; read progress with
+   `fgos workflow status <workflowRunId>` (Rule: run-door-contract, in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 3. Each Unit runs via `fgos run` in its own isolated worktree; the runner commits the Unit's declared `writes` on that worktree's branch and merges nothing (`fgos workflow status` lists `writeBranches`). `fgos workflow start --plan` no longer exists; [`fgos-cook`](../fgos-cook/SKILL.md) owns whole-plan execution on a case; this mode is for running one phase or a bounded wave as it stands.
 
 ---
@@ -80,19 +78,17 @@ When a workflow step declares a human gate (`gate: { kind: "human" }`) or when a
 
 - **G2 Non-Infrastructure:** Rule: capability-routing-rules (in AGENTS.md; set in .fgos/instructions/effective/rules.json). Only an ad-hoc Unit may carry a soft `prefer`.
 - **Runner Commits, Worker Does Not:** A writing Unit's brief lists its write scope. Rule: run-door-contract (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
-- **G7 Herdr Default:** All out-of-process unit runs default to spawning in a watched `herdr` terminal pane when herdr is available, falling back to `cli` when headless.
-- **Fail-Closed Mutating Gate:** Every file mutation runs strictly inside an isolated linked git worktree matching the Unit run specification.
+- **G7 Herdr Default** and the **Fail-Closed Mutating Gate** (writes only in a linked worktree): Rule: run-door-contract, in AGENTS.md; set in .fgos/instructions/effective/rules.json.
 - **Honest Outcomes:** Reviewer findings are tracked as `findings`, not execution failures, and fix rounds are bounded by the collaboration pattern.
 
 ---
 
 ## 4. Reviewing a Change That Touches Tests
 
-Every behaviour has one owning proof: Rule: design-principles (in AGENTS.md; set in .fgos/instructions/effective/rules.json). (principle 8). Whoever reviews a Unit's result, or accepts a lead's report, checks these four lines and returns a finding for each one that fails; a report that adds tests without reasons, or deletes a mechanism without a retired list, is not accepted:
+Every behaviour has one owning proof: Rule: design-principles (in AGENTS.md; set in .fgos/instructions/effective/rules.json). (principle 8). Whoever reviews a Unit's result, or accepts a lead's report, checks these three lines and returns a finding for each one that fails; a report that adds tests without reasons, or deletes a mechanism without a retired list, is not accepted:
 
-1. **Every new test file:** why not the existing file for this module? Only a new module or a new boundary gets a new file.
-2. **Every new test:** its title names the behaviour in plain words (no task ids), the owning proof was searched for (`rg` the behaviour's words and the symbol), and the report gives the reason no existing test proves it.
-3. **Every deleted or replaced mechanism:** its tests are retired in the same change and listed, each with the test that now owns the behaviour or the statement that the behaviour is gone.
-4. **Every Node test in a Rust-ported area** (git, holder-lock, event-store, run-supervisor, terminal-control): it is the one route proof for its port or a Node-only behaviour, never a copy of a case a Rust test owns.
+1. **Every new test file and every new test** meets principle 8 (where a new file is allowed, what the title names, why no existing test proves it), and the report shows the owning proof was searched for (`rg` the behaviour's words and the symbol).
+2. **Every deleted or replaced mechanism:** its tests are retired in the same change and listed, each with the test that now owns the behaviour or the statement that the behaviour is gone.
+3. **Every Node test in a Rust-ported area** (git, holder-lock, event-store, run-supervisor, terminal-control): it is the one route proof for its port or a Node-only behaviour, never a copy of a case a Rust test owns.
 
 The report quotes the `suite:` lines `npm test` prints: the suite against `test/suite-baseline.json` (files, `test()` calls, wall time), and this change against the merge base (`test()` lines added and removed, new CLI/host spawn sites and how many carry no reason). A new CLI, host or fgctl spawn in a test carries `// boundary: <why a lower layer cannot prove it>` on its line or the one above. A change that adds such spawns, or changes what every CLI call loads, also quotes `node scripts/test-proof-inventory.mjs --cli-cost` run on the base and on the branch.

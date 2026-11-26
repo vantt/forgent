@@ -64,13 +64,10 @@ A static harness or lint (`plan-lint`) reads these declared units and verifies t
 
 ## What a plan does not do
 
-- It does not decide `unavailable` / `in-process` / `out-of-process` —
-  that is `decide`'s job, asked immediately before the unit executes
-  (`decide-before-execute`, in `executor-dispatch-fallback.md`). Calling
-  `decide` twice for the same unit — once while planning, again right
-  before execution — is not this doctrine; `decide-before-dispatch` is
-  legacy terminology for an already-superseded activation point, not a
-  second gate alongside `decide-before-execute`.
+- It does not decide `unavailable` / `in-process` / `out-of-process`: `decide` is asked once, immediately before
+  the unit executes (`decide-before-execute`; Rule: dispatch-decide-door, in AGENTS.md; set in .fgos/instructions/effective/rules.json). `decide-before-dispatch` is
+  legacy terminology for an already-superseded activation point, not a second gate; `executor-dispatch-fallback.md`
+  keeps the dispatch pattern.
 - It does not turn "needs its own capability" into "must become its own
   Work item, phase, or child." Splitting stays a judgment call; a
   capability boundary is evidence for that judgment, not a rule that

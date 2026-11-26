@@ -18,7 +18,7 @@ Runs while a work item sits at status `retrospective`. The item's story already 
 - No verdict from a score or a hit count: read the candidates and decide.
 - Write and commit first, attest second.
 - No automatic promotion; promotion is a person's `fgos doc promote`.
-- Never splice item titles, descriptions or drafted text raw into shell. Write them to files under `.fgos/runtime/tmp/` and pass files, or `"$(cat <file>)"` where a verb takes only a value.
+- Item titles, descriptions and drafted text: Rule: untrusted-input, in AGENTS.md; set in .fgos/instructions/effective/rules.json. Here, write them to files under `.fgos/runtime/tmp/` and pass the files, or `"$(cat <file>)"` where a verb takes only a value.
 - A closing report (`fgos report`, `kind:'engine'`) is not retrospective evidence; the cleanup gate refuses it.
 
 ## Flow (per item)

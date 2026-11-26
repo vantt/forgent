@@ -15,13 +15,9 @@ run `fgos resource-check --units <file.json>` (or `--plan <dir>`); `fgos graph` 
 or high risk in the map needs a proof point at `fgos-coding-validating`,
 not a guess here.
 
-Before writing a proof point that would lean on blast-radius evidence,
-run `CLAUDE.md`'s impact-analysis capability gate (`fgos dispatch
-decide --for impact-analysis --json`) instead of assuming
-GitNexus is on this machine. Record the resulting posture
-(`impact-analysis: inactive|degraded|full`) in `plan.md` next to that
-proof point — inactive drops the requirement, degraded keeps it but marks
-the evidence weak, full keeps it exactly as before.
+Before writing a proof point that would lean on blast-radius evidence, apply the impact-analysis capability gate
+instead of assuming GitNexus is on this machine (Rule: impact-analysis-capability-gate, in AGENTS.md; set in .fgos/instructions/effective/rules.json). Record the
+resulting posture (`impact-analysis: inactive|degraded|full`) in `plan.md` next to that proof point.
 
 If a named library/precedent surfaces that neither CONTEXT.md nor a
 direct read resolves, dispatch to `fgos-researching` — the rare
@@ -43,8 +39,7 @@ matching the mode; a `tiny` item does not need the same sketch a
 
 Every `plan.md` states its approved frame near the top, in one line each:
 `paths:` (files/contracts it may change) and `budget:` (lines added to src and
-test — deletions are never capped — and days). Leaving the frame is a decision question
-(`../../_shared/decision-question.md`), never a silent overrun.
+test — deletions are never capped — and days). Leaving the frame: `../../_shared/decision-question.md`.
 
 End `plan.md` with a section using this exact heading (nothing appended
 on that line), body `None` when nothing is outstanding, or a real list

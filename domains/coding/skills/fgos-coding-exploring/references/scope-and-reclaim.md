@@ -54,7 +54,7 @@ doc says verify must never be asked to satisfy.
 
 ## Check the impact-analysis capability posture
 
-Query `CLAUDE.md`'s impact-analysis capability gate — the same check
+Query the impact-analysis capability gate (Rule: impact-analysis-capability-gate, in AGENTS.md; set in .fgos/instructions/effective/rules.json) — the same check
 `fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`
 already run — rather than assuming GitNexus is on this machine. This
 session's own gate query here never inherits a wider grant a dispatched
@@ -65,7 +65,7 @@ the tool live and answers the way a dispatch would:
 fgos dispatch decide --for impact-analysis --json
 ```
 
-Fold the result into `CLAUDE.md`'s three-way framing
+Fold the result into the gate's three postures
 (`impact-analysis: inactive|degraded|full`) and record that line in
 CONTEXT.md in Step 3, next to the other scout evidence. This is
 informational only — this skill edits no code and produces no proof
