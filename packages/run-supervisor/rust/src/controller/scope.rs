@@ -346,8 +346,12 @@ mod tests {
             ]
         );
 
-        let with_empty =
-            build_scope_command("/usr/bin/systemd-run", "fgos-run-att-1", Some(""), &base_cmd);
+        let with_empty = build_scope_command(
+            "/usr/bin/systemd-run",
+            "fgos-run-att-1",
+            Some(""),
+            &base_cmd,
+        );
         assert_eq!(with_empty, plain);
     }
 }

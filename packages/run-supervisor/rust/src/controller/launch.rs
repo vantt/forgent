@@ -597,7 +597,8 @@ pub fn read_launch_settings(project_root: &Path) -> Result<LaunchSettings, Confi
         .get("workerSlots")
         .ok_or_else(|| missing("workerSlots"))?;
     let raw_memory_max = super::config::resolve_supervisor_scope_memory_max(&snapshot)?.value;
-    let validated_memory_max = super::scope::validate_memory_max(&raw_memory_max).map(str::to_string);
+    let validated_memory_max =
+        super::scope::validate_memory_max(&raw_memory_max).map(str::to_string);
     Ok(LaunchSettings {
         gate_kill_grace_ms: super::config::resolve_gate_kill_grace(&snapshot)?.value,
         kill_wait_ms: DEFAULT_KILL_WAIT_MS,
@@ -903,20 +904,10 @@ fn spawn_supervisor(
     let log = log_options.open(run_dir.join("supervisor.log"))?;
 
     #[cfg(unix)]
-    let mut command = build_supervisor_command(
-        envelope,
-        run_dir,
-        failure_domain,
-        memory_max,
-    );
+    let mut command = build_supervisor_command(envelope, run_dir, failure_domain, memory_max);
 
     #[cfg(windows)]
-    let mut command = build_supervisor_command(
-        envelope,
-        run_dir,
-        failure_domain,
-        None,
-    );
+    let mut command = build_supervisor_command(envelope, run_dir, failure_domain, None);
 
     command
         .current_dir(run_dir)
@@ -932,7 +923,10 @@ fn spawn_supervisor(
     let fd_json = serde_json::to_string(failure_domain).unwrap_or_default();
     command.env("FGOS_FAILURE_DOMAIN", fd_json);
     #[cfg(unix)]
-    if matches!(failure_domain, super::scope::FailureDomain::SystemdScope { .. }) {
+    if matches!(
+        failure_domain,
+        super::scope::FailureDomain::SystemdScope { .. }
+    ) {
         if let Ok(runtime_dir) = std::env::var("XDG_RUNTIME_DIR") {
             command.env("XDG_RUNTIME_DIR", runtime_dir);
         }

@@ -773,13 +773,7 @@ fn launch_path_builds_scoped_and_plain_commands_and_binding_carries_failure_doma
     let declared = json!({ "domainKind": "linux-gate", "domainId": "dom-1" });
     let fd_val = json!({ "kind": "systemd-scope", "unit": "fgos-run-att-scope-1" });
     fgos_run_supervisor::supervise::write_supervisor_binding(
-        &run_dir,
-        &envelope,
-        &me,
-        &gate,
-        &declared,
-        &fd_val,
-        true,
+        &run_dir, &envelope, &me, &gate, &declared, &fd_val, true,
     )
     .unwrap();
     let binding_file = run_dir.join("supervisor-binding.json");
