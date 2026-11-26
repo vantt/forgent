@@ -22,6 +22,21 @@ fn refusal(f: &Value, ruleset: Value) -> (&'static str, String) {
     (r.code, r.field)
 }
 
+// The referee consumes collisions, not claims comparisons; the door owns equality proofs.
+#[test]
+fn every_registered_claim_space_is_accepted() {
+    let contract: Value =
+        serde_json::from_str(include_str!("../../contracts/resource-referee.v1.json")).unwrap();
+    for space in contract["claimSpaces"].as_array().unwrap() {
+        let claim = json!({"space": space["space"], "ref": "gpu#1"});
+        let f = facts(json!([
+            {"id": "running", "claims": [claim], "layer": 1},
+            {"id": "candidate", "claims": [claim], "layer": 1}
+        ]));
+        assert_eq!(run(&f, json!([])).verdict, VerdictKind::Accept);
+    }
+}
+
 #[test]
 fn no_cycles_reports_the_canonical_cycle_of_each_component() {
     let mut f = facts(json!([{ "id": "a", "readOnly": true }, { "id": "b", "readOnly": true }]));

@@ -6,7 +6,7 @@ use crate::refusal::Refusal;
 use crate::ruleset::{object, only_fields};
 use crate::{MAX_EXCLUSIONS, MAX_ID_BYTES, MAX_NODES, MAX_PROBLEMS};
 
-pub(crate) const SPACES: [&str; 3] = ["path", "ref", "port"];
+pub(crate) const SPACES: [&str; 4] = ["path", "ref", "port", "resource"];
 
 #[derive(Debug, Clone)]
 pub(crate) struct Claim {
