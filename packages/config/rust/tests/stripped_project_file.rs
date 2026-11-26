@@ -148,6 +148,53 @@ fn a_write_never_creates_a_project_file_the_index_tracks_and_the_working_copy_la
     assert_eq!(refusal_code(refused), "config-project-file-stripped");
     assert_eq!(listing(&project), before, "init changed .fgos");
 
+    // A linked worktree of that repository: the refusal names the main checkout, not the worktree.
+    let linked = dir.join("linked");
+    git(
+        &project,
+        &[
+            "worktree",
+            "add",
+            "-q",
+            linked.to_str().unwrap(),
+            "-b",
+            "side",
+        ],
+    );
+    git(
+        &linked,
+        &["update-index", "--skip-worktree", ".fgos/config.yaml"],
+    );
+    fs::remove_file(linked.join(".fgos/config.yaml")).unwrap();
+    let refused = set(&linked).unwrap_err();
+    assert_eq!(refused.reason, "config-project-file-stripped");
+    let main = fs::canonicalize(&project).unwrap();
+    assert!(
+        refused.detail.contains(&format!("file={}", main.display())),
+        "the refusal names the main checkout {}: {}",
+        main.display(),
+        refused.detail
+    );
+    assert!(!linked.join(".fgos/config.yaml").exists());
+
+    // A project rooted in a subdirectory of the repository: its own tracked file counts.
+    let sub_repo = dir.join("sub-repo");
+    let sub_project = sub_repo.join("sub");
+    fs::create_dir_all(sub_project.join(".fgos")).unwrap();
+    git(&sub_repo, &["init", "-q"]);
+    fs::write(sub_project.join(".fgos/config.yaml"), "# tracked\n").unwrap();
+    git(&sub_repo, &["add", "-f", "sub/.fgos/config.yaml"]);
+    git(&sub_repo, &["commit", "-q", "-m", "seed"]);
+    git(
+        &sub_repo,
+        &["update-index", "--skip-worktree", "sub/.fgos/config.yaml"],
+    );
+    fs::remove_file(sub_project.join(".fgos/config.yaml")).unwrap();
+    assert!(project_file_tracked(&sub_project).unwrap());
+    let refused = set(&sub_project).unwrap_err();
+    assert_eq!(refused.reason, "config-project-file-stripped");
+    assert!(!sub_project.join(".fgos/config.yaml").exists());
+
     // The same repository once the path is untracked: the file is created as it always was.
     git(
         &project,
