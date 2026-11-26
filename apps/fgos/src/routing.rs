@@ -1159,7 +1159,7 @@ mod tests {
         );
         assert_eq!(
             text(&["recover", "--dir=/x"]),
-            "unknown flag \"--dir=/x\" for \"fgos git recover\" (write \"--dir <value>\", not \"--name=value\"). It takes no flags besides --dir, --json. See \"fgos git recover --help\"."
+            "unknown flag \"--dir=/x\" for \"fgos git recover\" (write \"--dir <value>\", not \"--name=value\"). Valid flags: --confirm-writer-dead, --dir, --json. See \"fgos git recover --help\"."
         );
     }
 

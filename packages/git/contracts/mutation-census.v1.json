@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5e1aa9514e9b9d9a9cffe65ccfd2c8f775476c86fa95b54af8ecc09468c6422f",
+  "payloadDigest": "2db9a45d015d4dd7f6274f97702c6be80f3dd5ba2d86f1ca9c8da05394fb9c0d",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "dc14ff69bc4b144893fa6988de4df6b6180ab255ef8751fd1615ad93472b9e71",
     ".agents/skills/_shared/capability-matching.md": "93cd382994e2201e4aa8ec7816d740f6da634a0ee69d6911800a848ed5de1d8b",
@@ -98,7 +98,7 @@
     "apps/fgos/src/invocation_doors.rs": "581120c80c83eb774a08077a1d3d9f2e92f7d134aa2e61f862b12397b1d29a0d",
     "apps/fgos/src/legacy_exec.rs": "409d3fd5fc829b7febd7a57b24bf9c6f9bab6c91e1807668cab6bf3d5c1c15c4",
     "apps/fgos/src/main.rs": "ba8953e92a3720bd24783a491be9648e024914d68a6e8a6475ddfe7536e6bb28",
-    "apps/fgos/src/routing.rs": "6196ba8aec7c044cc1bc11518bb7b4229037c5a382e6f77c295c5cd1d2edcb98",
+    "apps/fgos/src/routing.rs": "b76b7fb560eb0119459b19d0087c0bfac5a86e7c239102aae8f9864ae70a9a48",
     "apps/fgos/src/wiring/agents.rs": "d40cd43facea6c5d1e5a7b3363b8e69567f3ad7aa33b628eb269c935a88f06e4",
     "apps/fgos/src/wiring/attempt_step.rs": "5dade9079e7e99ca3f9bc2cf18d226583f96be2bf6cc590398ac93fded4b141f",
     "apps/fgos/src/wiring/authority.rs": "fe78cca0f4e455a4a3d32c9024f6b35fa67cb4f392b9cc774c70226aeb8ba679",
@@ -132,7 +132,7 @@
     "apps/fgos/src/wiring/events.rs": "472018eb9c3e76867d7e50f388de9248edd6803011972fa1f43eb72bf64a8386",
     "apps/fgos/src/wiring/execution_routes.rs": "c2f7a28c9cae123fa8add7423eb330bc91c73c2d58bd8c15bb50b655acb709cc",
     "apps/fgos/src/wiring/gateway_control.rs": "4d0497382df90574bbe4f65a249d0977bc23e1334c7ad7c83f13351d8ff22ca8",
-    "apps/fgos/src/wiring/git_incidents.rs": "7bd9ae3c5b2bf8faaf54399e19f6ae830a9f6eb20707abb08b66d0d851429dc3",
+    "apps/fgos/src/wiring/git_incidents.rs": "d06fe58d45a9f63b3c368576e8fff120016b4a61e899d6bdfc3682490485d724",
     "apps/fgos/src/wiring/head_questions.rs": "600d2645a376e2e18b059342368576385652b7bd60d9dfb6053c1c23134640d7",
     "apps/fgos/src/wiring/identity_log.rs": "d7d9dd503ecbd84a5373aa27f6853996e6944aba2940d15e8284cd92c14eef7a",
     "apps/fgos/src/wiring/init.rs": "ad2a58907ec31a23cea8e1205dc45c041b65259c58d36e46e96ff1b64acfb578",
