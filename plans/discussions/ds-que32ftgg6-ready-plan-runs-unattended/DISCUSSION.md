@@ -45,6 +45,8 @@ Round 3 (13:42): the owner answered Q1 in chat (§3 row 8): the standing rule be
 
 Round 4 (13:55): the standing rule's draft U1-U6 is in §6 for the owner to read. Open: one wiring list for U1 (§3 row 10), and whether `release run` is the full-gate door (§3 row 11).
 
+Round 5 (14:05): owner direction, no hardcoding. §6 now places the rule as ACE rule units selected by `workflow`/`stage`/`domain` (core unit for the guarantee, coding unit for footprint tracing), with doors, executors and wiring sets read from data. Open: §3 rows 10, 11, 12.
+
 ## 2. Mục tiêu & đề bài
 
 The owner settles a discussion, a planner writes the plan, the plan goes `ready`, and the owner walks away believing every foreseeable question is answered. On return he finds the plan stalled on questions he calls silly, or never started at all. Of 163 owner questions from 2026-11-19 to 2026-11-26, about 140 were asked after a plan existed, and the large classes were foreseeable at planning time: 40 footprint widens, about 45 "hands" requests from confined heads, 18 cleanups, and 8 acceptance deviations from outcomes that bundled the core with the cleanup. Three plans produced 66 of them. The goal is that `ready` means "can run to `done` without the owner": every foreseeable question is answered when the plan is approved, so the only questions left at run time are genuine deviations that the four-part ask rule of ds-jxoz3h2qgk-when-to-ask lets through. This discussion defines what `ready` guarantees and how that is checked. It does not own the flow to `ready` (ds-3in4yb5thk-backlog-to-ready-pipeline), the run-time ask rule (ds-jxoz3h2qgk-when-to-ask), or the door that widens a running plan's footprint (ds-mzyircswox-widen-a-running-plan-footprint).
@@ -62,8 +64,9 @@ The owner settles a discussion, a planner writes the plan, the plan goes `ready`
 | 7 | **L6, a `ready` plan that is not started says why** | **Moved out (round 2)** | Owned by ds-ipvis4jkpc-release-chain-command, not here. Its D5 splits `ready` (quality: the plan is complete) from the `delivery` flag (the owner wants it delivered); its acceptance (1) admits no `ready` plan without `delivery`, and (3) makes an admission reject name its finding (cycle, dangling `blockedBy`, collision, empty footprint). The three legacy `ready` plans with no footprint are that discussion's evidence, handed over. This discussion owns only the quality half: what `ready` must guarantee. |
 | 8 | Who approves the pre-decided answers, and when | **Rõ (owner, chat 13:41), D-ID next round** | Three sources. (1) The owner decides the core / `debt-ok` split of acceptance when the discussion settles. (2) The standing rule for the repeating classes (cleanup through the safe door, host steps run by the supervisor through the permission table, `debt-ok` becoming a named backlog row) is recorded as process law in the plan contract and skills; the owner does not approve it separately. (3) Anything plan-specific a planner wants beyond that rule asks the owner once, batched, before `ready`. Owner: "cái anh phải chốt là những vấn đề riêng của plan thôi". q-ypgj7zverd cancelled with this answer. |
 | 9 | Mechanical check or reviewer judgment | Leaning | Structural parts (the section exists, every host step names an argv and executor, every criterion is marked `core` or `debt-ok`) go into `plan-contract-check.mjs`, so `ready` refuses without them. Completeness of the footprint trace stays the validator's judgment, helped by the wiring list of row 2. |
-| 10 | One wiring list for a new verb or route | **Chưa rõ** | U1 needs it; none exists in `docs/how-to` or the host-runtime spec. Options: derive it from the component authority model, or keep one maintained doc. Decide next round. |
+| 10 | Where the wiring set of a new verb or route comes from | **Leaning (round 5)** | Not a list in a rule or a doc (owner: no hardcoding). Read it from the component authority model's door rows, which already own doors; the coding rule unit says "trace through the model". Scout (round 5): door rows (`packages/component-authority/model/doors/*.yaml`) name the paths that own each door job, e.g. `verb-manifest-projection` allows `src/cli/command-registry.mjs` and `scripts/export-command-selectors.mjs`; `parse-cli-arguments` and `decide-the-lane-of-an-invocation` exist too. So the set is derivable as "the doors a new verb passes through, and each door's owning paths", but no row says which doors a new verb passes through. Open: where that "a verb passes these doors" fact lives (a field on the door rows, or the host-runtime spec). |
 | 11 | Does `fgos release run` cover the full gate on the integrated tree | **Chưa rõ, scout next** | Supervisor `release run` is `allow`; the recipe's checks were set to the DoD suite (q-dhhezn67em). Need to confirm it runs on the integrated plan tree, not only on main after landing. |
+| 12 | **Placement: rule units via ACE/ASC, not hardcoded** | **Leaning (owner direction, round 5)** | Owner 13:50: the orchestrator pushes an item into a workflow, and the workflow must know its own rule set, possibly through ASC and ACE. §6 now splits the rule into a domain-free core unit, a coding domain unit, and data (permission table, release recipe, authority model). Open: the exact `workflow` / `stage` values, which depend on how ds-3in4yb5thk names the planning workflow's stages. |
 
 ## 4. Quyết định đã chốt
 
@@ -82,19 +85,35 @@ The owner settles a discussion, a planner writes the plan, the plan goes `ready`
 
 - 2026-11-26 13:55 +07, shaper, round 4: owner asked for the standing rule's draft. Wrote U1-U6 in §6. Scout: the supervisor row of `head-permissions.v1.json` already allows `release run`, `git recover`, `worktree remove --delivered-to` and `config patch`, so the routine hands classes have a door; U2 routes them there. Two gaps opened (§3 rows 10, 11).
 
+- 2026-11-26 13:50 +07, owner (chat), round 5: the system must not hardcode; the orchestrator pushes an item to a workflow, and the workflow needs to know its related rule set (may need to work with ASC and ACE). Shaper: read `docs/platform/agent-context-engine/spec.md` (rule units in three roots, `when:` keys incl. `workflow`, `stage`, `domain`, `persona`, `role`; ASC selects per start). Re-placed §6: the guarantee becomes a domain-free core rule unit, footprint tracing a coding domain unit, and the doors, executors and wiring sets stay data (permission table, release recipe, authority model). The check enforces shape only. §3 rows 10 and 12.
+
 ## 6. Thiết kế đã chốt {#design}
 
-Draft, round 4 (2026-11-26 13:55 +07), for the owner to read; not settled, no D-ID. It is the standing rule of §3 row 8 source 2: written once as process law, no per-plan approval. Where it lands: a new section "Unattended run" in `core/skills/_shared/plan-contract.md` (§3 body and §5 rules), pointed at by `fgos-coding-planning` and `fgos-coding-validating`; `scripts/plan-contract-check.mjs` enforces its shape.
+Draft, round 5 (2026-11-26 14:05 +07), for the owner to read; not settled, no D-ID. It is the standing rule of §3 row 8 source 2: written once as process law, no per-plan approval.
+
+### Nơi luật sống: rule units, không hardcode (owner, round 5)
+
+The orchestrator pushes an item into a workflow; the workflow learns the rules that apply to it from ACE and ASC, never from text copied into a skill or a script. So the standing rule is not written into `plan-contract.md`, a skill or `plan-contract-check.mjs` as fixed prose or fixed lists. It is split by who owns each part (ACE spec §4: rule units in `core/instructions/`, `components/<c>/instructions/`, `domains/<d>/instructions/`, selected by `when:` keys `workflow`, `stage`, `persona`, `role`, `domain`, `project`):
+
+| Part | Owner and place | `when:` | Why there |
+|---|---|---|---|
+| The guarantee itself (U2-U5 below): host steps name a door and executor, acceptance marked `core` / `debt-ok`, the fixed cleanup, beyond-the-rule asks once | core rule unit, domain-free | `stage`: the planning and validating stages; `persona`/`role`: planner, validator; the run-side half (U3, U4 at close) `role`: lead | Every domain's plan needs it; it names no tool and no file. |
+| How a footprint is traced (U1) | domain rule unit, e.g. `domains/coding/instructions/` | `domain: coding`, planning stage | Tracing a verb's wiring is coding knowledge; a marketing plan traces something else. |
+| Which file set a new verb or route brings | data, read from the component authority model's door rows, not a list in a rule | (read by the coding unit) | The model already owns doors and their wiring; a second list would drift (design principle 7). Leaning for §3 row 10. |
+| Which door runs which host step, and who may call it | data: the head permission table and the project's release recipe in `.fgos/config.yaml` | (read at plan time, e.g. `fgos can-i`) | The rule says "name a door and an executor the table allows"; the table and the recipe say which ones. Another project has other doors. |
+| What the check enforces (U6) | the plan contract check, structure only: the section exists, each host step has an argv and executor, each criterion has a mark, each beyond-rule item has an answered `q-` id | n/a | Domain-free shape; it reads no domain list. |
+
+ACE is "Not built (contracts and vectors only)" today. The rule units can land now in the current `core/instructions` / `domains/<d>/instructions` format, which the instruction composition already projects into agent files; ACE takes them over when it lands. `plan-contract.md` then points at the unit instead of restating it (one door).
 
 ### Luật chung: plan `ready` chạy được tới `done` không cần chủ
 
-**U1. Footprint traced, not guessed.** The planner builds the footprint by tracing, not by reading:
+**U1. Footprint traced, not guessed (coding domain unit).** The planner builds the footprint by tracing, not by reading. For coding:
 - a new verb, route, flag or record kind brings its whole wiring set (command registry, Rust routing and `main.rs`, host operation catalog, generated command manifest and its vectors, the flag-drift test, observe kinds, the Node entry where a Node payload still serves it);
 - a changed, moved or deleted symbol or file brings every reference that `rg` and the impact tool return (callers, tests, doc links);
 - a generated file is named as a hot file and regenerated, never hand-edited.
-At run time, widening by a file that serves the plan's own acceptance is a direction, not a question; it goes through ds-mzyircswox's widen door. Gap: the repo keeps no single wiring list today, so U1 needs one source (§3 row 10).
+At run time, widening by a file that serves the plan's own acceptance is a direction, not a question; it goes through ds-mzyircswox's widen door. The wiring set is read from the component authority model's door rows (§3 row 10), not listed in the rule.
 
-**U2. Every host step has a named executor.** Every step that needs more than a unit sandbox is written in the plan as an exact `fgos` argv and the persona that runs it. The routine host steps run through the supervisor's window (`packages/session-host/contracts/head-permissions.v1.json`, supervisor rows `allow` today):
+**U2. Every host step has a named executor.** Every step that needs more than a unit sandbox is written in the plan as an exact `fgos` argv and the persona that runs it. In this project (forgent) the routine host steps resolve, from the permission table `packages/session-host/contracts/head-permissions.v1.json` and the release recipe, to the supervisor's window; the table below is that data read today, not text the rule carries:
 
 | Step | Door | Executor |
 |---|---|---|
@@ -123,7 +142,7 @@ Everything else in U1-U4 is decided by the agent and reported, never asked.
 ```mermaid
 flowchart LR
   D[Discussion settles:<br/>owner marks core / debt-ok] --> P[Planner]
-  L[Standing rule U1-U4:<br/>process law, no approval] --> P
+  L[Rule units from ACE via ASC:<br/>core U2-U5 + domain U1,<br/>selected by workflow/stage/domain] --> P
   P -->|beyond the rule| Q[One batched owner question<br/>U5]
   Q --> P
   P --> C{plan-contract-check<br/>+ validator}
