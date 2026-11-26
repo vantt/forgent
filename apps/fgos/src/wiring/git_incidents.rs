@@ -6,7 +6,7 @@
 use crate::routing::Call;
 use fgos_git::incidents::{read_git_status, recover_git_operations};
 use fgos_git::invocation_root::{resolve_invocation_root, RootPolicy, RootRequest};
-use fgos_host_runtime::cli_args::{FlagScalar, FlagValue};
+use fgos_host_runtime::cli_args::{parse_args_repeating, FlagScalar, FlagValue};
 use fgos_host_runtime::{
     CategorisedRefusal, ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome,
     OperationId, OperationProvider, OperationRequest, ProviderDescriptor, ProviderError,
@@ -147,17 +147,24 @@ pub fn project_git_request(args: &[OsString]) -> GitRequest {
         cwd: std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")),
         dir: call.named_dir(),
         home: fgos_config::machine::home_dir(|key| std::env::var(key).ok()),
-        confirm_dead: confirmed_writers(&call),
+        confirm_dead: confirmed_writers(args),
     }
 }
 
 /// The writer ids `--confirm-writer-dead` names, each use in order; a bare use reads as the empty id.
-fn confirmed_writers(call: &Call) -> Vec<String> {
+fn confirmed_writers(args: &[OsString]) -> Vec<String> {
     let id = |scalar: &FlagScalar| match scalar {
         FlagScalar::Str(text) => text.clone(),
         FlagScalar::Bool => String::new(),
     };
-    match call.flags().flag(CONFIRM_DEAD_FLAG) {
+    let before_separator = args.iter().position(|a| a == "--").unwrap_or(args.len());
+    let flag = format!("--{CONFIRM_DEAD_FLAG}");
+    let parsed = parse_args_repeating(
+        args.get(1..before_separator).unwrap_or_default(),
+        &[flag.as_str()],
+    )
+    .unwrap_or_default();
+    match parsed.flag(CONFIRM_DEAD_FLAG) {
         None => Vec::new(),
         Some(FlagValue::One(one)) => vec![id(one)],
         Some(FlagValue::Many(all)) => all.iter().map(id).collect(),
