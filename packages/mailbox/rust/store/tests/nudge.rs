@@ -152,6 +152,7 @@ fn only_codex_and_claude_have_a_nudge_channel_and_only_on_the_versions_they_were
     assert_eq!(
         tested.nudge_clis(),
         [
+            Cli::new("agy").expect("cli"),
             Cli::new("claude").expect("cli"),
             Cli::new("codex").expect("cli")
         ]

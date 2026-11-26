@@ -25,6 +25,8 @@ pub struct SendAnswer {
     pub text: String,
     /// Whether the message was recorded.
     pub recorded: bool,
+    /// Actual delivery path of a recorded send; absent on refusal.
+    pub path: Option<&'static str>,
 }
 
 /// Records a message, or answers why not: the delivery report of a
@@ -45,23 +47,30 @@ pub fn send(
             Ok(outcome) => {
                 let mut text =
                     delivery_report(&outcome, &version_clause(&outcome, versions), limits);
-                if let Some(report) = nudge_report(&outcome, versions, nudge) {
+                let report = nudge_report(&outcome, versions, nudge);
+                let path = report
+                    .as_ref()
+                    .map_or("local-next-tool-call", NudgeReport::path);
+                if let Some(report) = report {
                     text.push('\n');
                     text.push_str(&nudge_sentence(&report, limits));
                 }
                 SendAnswer {
                     text,
                     recorded: true,
+                    path: Some(path),
                 }
             }
             Err(refusal) => SendAnswer {
                 text: refusal_text(&refusal, limits),
                 recorded: false,
+                path: None,
             },
         },
         Err(error) => SendAnswer {
             text: record_error_text(error.code()),
             recorded: false,
+            path: None,
         },
     }
 }
@@ -218,20 +227,33 @@ fn nudge_target(
     let Some(version) = recipient_version(target.cli, target.head, versions) else {
         return Some(NudgeReport::Refused("version-unreadable".into()));
     };
-    let Some(channel) = TestedClis::embedded().nudge_for(target.cli.as_str(), &version) else {
-        return Some(NudgeReport::Refused("version-not-tested".into()));
-    };
+    let channels = TestedClis::embedded().nudge_channels_for(target.cli.as_str(), &version);
     let head = crate::head::record_of_head_text(target.head);
-    Some(match nudge.nudge(channel, target.key, &head) {
-        Ok(()) => NudgeReport::Sent,
-        Err(why) => NudgeReport::Refused(why),
-    })
+    let mut refused = "version-not-tested".to_string();
+    for channel in channels {
+        match nudge.nudge(channel, target.key, &head) {
+            Ok(()) => {
+                return Some(if channel == crate::adapters::NudgeChannel::Typed {
+                    NudgeReport::Typed
+                } else {
+                    NudgeReport::Sent
+                })
+            }
+            Err(why) => refused = why,
+        }
+    }
+    Some(NudgeReport::Refused(refused))
 }
 
 /// What the delivery report says of the recipient's CLI version.
 fn version_clause(outcome: &SendOutcome, versions: &VersionSources) -> VersionClause {
     match recipient_version(&outcome.to_cli, &outcome.to_head, versions) {
-        Some(v) if TestedClis::embedded().lists_version(outcome.to_cli.as_str(), &v) => {
+        Some(v)
+            if TestedClis::embedded().lists_version(outcome.to_cli.as_str(), &v)
+                || TestedClis::embedded()
+                    .nudge_channels_for(outcome.to_cli.as_str(), &v)
+                    .contains(&crate::adapters::NudgeChannel::Typed) =>
+        {
             VersionClause::Tested
         }
         Some(v) => VersionClause::Untested(v),

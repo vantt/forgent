@@ -79,16 +79,40 @@ pub fn delivery_report(outcome: &SendOutcome, version: &VersionClause, limits: &
 pub enum NudgeReport {
     /// The idle session was nudged.
     Sent,
+    /// The host typed the fixed labelled signal through its safe pane gate.
+    Typed,
     /// An earlier nudge to the head is still unread; none was added.
     Pending,
     /// No nudge went out; `why` is one hyphenated code (`codex-queue-refused`).
     Refused(String),
 }
 
+impl NudgeReport {
+    /// The path actually taken, never inferred from the requested wake.
+    pub fn path(&self) -> &'static str {
+        match self {
+            Self::Sent => "local-pushed",
+            Self::Typed => "local-typed",
+            Self::Pending | Self::Refused(_) => "local-next-tool-call",
+        }
+    }
+
+    /// The closed set of send-path sentences, from the frame contract.
+    pub fn path_sentence(path: &str) -> String {
+        section(match path {
+            "local-pushed" => "report.path.local-pushed",
+            "local-typed" => "report.path.local-typed",
+            "remote-recorded" => "report.path.remote-recorded",
+            _ => "report.path.local-next-tool-call",
+        })
+        .to_string()
+    }
+}
+
 /// The sentence a delivery report adds after a nudge was tried.
 pub fn nudge_sentence(report: &NudgeReport, limits: &Limits) -> String {
     match report {
-        NudgeReport::Sent => section("report.nudge.sent").to_string(),
+        NudgeReport::Sent | NudgeReport::Typed => section("report.nudge.sent").to_string(),
         NudgeReport::Pending => section("report.nudge.pending").to_string(),
         NudgeReport::Refused(why) => fill(
             section("report.nudge.refused"),

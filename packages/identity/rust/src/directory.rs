@@ -402,6 +402,16 @@ fn stale_groups(entry: &Entry, judge: Judge) -> Vec<String> {
 }
 
 impl Listed {
+    /// The terminal driver's slot key, falling back to the recorded pane id.
+    pub fn terminal_key(&self) -> Option<String> {
+        self.ids.as_ref()?.terminal.as_ref().map(|terminal| {
+            terminal
+                .key
+                .clone()
+                .unwrap_or_else(|| terminal.pane_id.clone())
+        })
+    }
+
     fn of(entry: &Entry, verdict: Verdict, judge: Judge) -> Self {
         Self {
             id: entry.id.clone(),
@@ -1870,4 +1880,41 @@ pub fn list(
         sessions.extend(view.list(project_id, &taken));
     }
     Ok(Sessions { sessions, pruned })
+}
+
+#[cfg(test)]
+mod terminal_key_tests {
+    use super::*;
+
+    // Directory resolution tests own identifier matching; this proves the new pane selector only.
+    #[test]
+    fn terminal_key_prefers_the_slot_then_pane_and_never_invents_a_terminal() {
+        let entry = Entry {
+            v: 1,
+            id: "machine/session".into(),
+            handle: "session".into(),
+            cli: "claude".into(),
+            project_id: None,
+            clone: None,
+            registered_at: String::new(),
+            roles: vec![],
+            liveness: None,
+            ids: None,
+        };
+        let mut listed = Listed::of(&entry, Verdict::Unknown, &|_| Verdict::Unknown);
+        assert_eq!(listed.terminal_key(), None);
+        listed.ids = Some(Ids {
+            terminal: Some(TerminalIds {
+                driver: "herdr".into(),
+                key: Some("head-key".into()),
+                pane_id: "pane".into(),
+                tab_id: None,
+                workspace_id: None,
+            }),
+            ..Default::default()
+        });
+        assert_eq!(listed.terminal_key().as_deref(), Some("head-key"));
+        listed.ids.as_mut().unwrap().terminal.as_mut().unwrap().key = None;
+        assert_eq!(listed.terminal_key().as_deref(), Some("pane"));
+    }
 }
