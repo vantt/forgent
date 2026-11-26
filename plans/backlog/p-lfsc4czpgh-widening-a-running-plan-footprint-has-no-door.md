@@ -18,3 +18,5 @@ One verb widens a running plan's footprint from an owner answer, writing the fro
 # Notes
 
 Related: p-dgsxugpdgd (the watcher tick failure that also hid the answered-question events that evening).
+
+Discussion ds-mzyircswox shaped this to a settled design (D1-D4: a running plan widens its own footprint mid-run inside the approved frame through one verb naming the acceptance criterion it serves; both footprint copies are written and checked; a planner can start for a plan without a discussion), but the owner closed it on 2026-11-26 without a planner (too much work and resource for now; marker `discussion: paused`, commit 95afcc9e6). Status stays proposed. Never start a planner for it unless the owner reopens it.
