@@ -133,7 +133,7 @@ a handoff. This plan is the safety net under that rule.
 |---|---|---|---|---|---|
 | 1 | [Diagnose why an ended lead raised no event](phase-01-diagnosis.md) | - | plans/261124-2143-head-lifecycle-events/reports/diagnosis.md | 1 | done |
 | 3 | [Close finished planners and leads through one door](phase-03-close-finished-heads.md) | - | packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, core/watcher/definitions/plan-drafted.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/plan-drafted/**, src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs, bin/fgos.mjs, packages/supervision/rust/observe-kinds.json, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json | 1 | done |
-| 2 | [Host-side end signal for a head](phase-02-host-end-signal.md) | 1, 3 | apps/fgos/src/wiring/observe_sources/head_state.rs, apps/fgos/src/wiring/observe_sources/tests/mod.rs, apps/fgos/observe-kinds.json, core/watcher/definitions/lead-ended.query.json, core/watcher/definitions/session-gone.query.json, core/attention/definitions/head-gone.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/fixtures/definitions/** | 2 | ready |
+| 2 | [Host-side end signal for a head](phase-02-host-end-signal.md) | 1, 3 | apps/fgos/src/wiring/observe_sources/head_state.rs, apps/fgos/src/wiring/observe_sources/tests/mod.rs, apps/fgos/observe-kinds.json, core/watcher/definitions/lead-ended.query.json, core/watcher/definitions/session-gone.query.json, core/attention/definitions/head-gone.query.json, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/fixtures/definitions/** | 2 | done |
 | 4 | [A lead waiting outside does not hold a working slot](phase-04-waiting-lead-slot.md) | 3 | packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs | 2 | ready |
 | 5 | [Spec, skill and generated skills](phase-05-spec-and-skill.md) | 2, 3, 4 | docs/platform/supervision/spec.md, docs/platform/observe/spec.md, docs/platform/session-host/spec.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 3 | ready |
 | 6 | [Integration, full gates and closing the rows](phase-06-integration.md) | 1, 2, 3, 4, 5 | plans/backlog.md, plans/backlog/p-pv7ha3l5ss-head-lifecycle-events-end-of-work-stop-rule-and-lead-slots.md, plans/backlog/p-iatzcg2gee-*.md, plans/backlog/p-6hqvgokerb-*.md, plans/backlog/p-tyowvhthul-*.md, plans/261124-2143-head-lifecycle-events/reports/integration.md | 4 | ready |
@@ -148,6 +148,13 @@ role that still leads a plan not done is never closed. A plan's first landing as
 `fgos.plan.status` `to: draft` (`apps/fgos/src/wiring/observe_sources/plan_history.rs`, `status_transitions`), so
 `plan-drafted` reads it as written. The wake span's `fgos.supervisor.error` attribute was undeclared in
 `packages/supervision/rust/observe-kinds.json`, so every wake span carrying an error was refused; phase 3 declared it.
+
+Phase 2 landed as `0463c0385` (2026-11-26). A head whose `runDir` holds `closed.json` and whose placement has no
+`retiredAt` projects `ended` at the file's instant; `lead-ended` reads `retired` or `ended`. Steps 3 and 4 were
+skipped: the diagnosis ruled out the window drop and the unplaced head. Because the run supervisor writes
+`closed.json` on every attempt end, `session-gone` and `head-gone` now also match `ended` for a shaper, planner,
+secretary or supervisor role, so a dead non-lead head still raises them. The query language has no negated prefix,
+so those two definitions list the non-lead personas: a new head persona has to be added to both.
 
 Phase 3 depends on nothing: closing finished heads does not wait for the diagnosis. Phase 2 follows phase 3
 because both add rows to `packages/supervision/rust/tests/definitions.rs` fixtures through the shared
