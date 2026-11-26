@@ -1,10 +1,10 @@
 ---
 id: capability-routing-rules
 kind: procedure
-owner: runner
-scope: component
+owner: core
+scope: repo
 mode: append
-specificity: 20
+specificity: 10
 title: Capability Routing Rules
 description: Default to inline execution, the five reasons that justify an executor, plans never pin infrastructure (an ad-hoc Unit may prefer softly), a capability is a routing signal, and research is a workflow
 lifecycle: live

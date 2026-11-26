@@ -26,261 +26,7 @@ Tốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** 
 
 Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm's "Lịch sử quyết định" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4).
 
-## Ranh giới sứ mệnh (D-ADR0035, docs/platform/platform-foundations.md#d-adr0035-xác-lập-ranh-giới-sứ-mệnh-fgos-phục-vụ-project-khácbusiness-workflow-không-tự-phát-triển-chính-nó-mặc-định)
-
-fgOS tồn tại để: 
- 1. phát triển các project khác 
- 2. làm nền vận hành các business base workflow 
- 
-fgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên chính source của mình), đừng mặc định coi "sửa fgOS" là mục tiêu chỉ vì đó là việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS (mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project khác ngoài repo này — mission #1/#2 không phải lý thuyết. Chi tiết + bằng chứng: docs/platform/platform-foundations.md's "Lịch sử quyết định" § D-ADR0035 (docs/decisions/*.md corpus đã retired tsk-1lv-4).
-
-
-## Before touching code
-
-Read `docs/reading-map.md`, then the area or subcomponent spec under `docs/platform/` for whatever
-you're about to change. Specs are the state layer — BA-grade, tech-agnostic — read
-the spec before the code.
-
-**Prior art before design.** Before designing a mechanism, find out what already existed
-and why it went away: `git log -S'<symbol>'` / `-G` on the symbol, config key and spec term,
-also under the executor ids and names the thing had before the renames (ids were renamed and
-dormant ones deleted), and read the area spec's "Lịch sử quyết định" and settled-facts
-sections. A plan's facts phase answers "what existed before, and which change removed it,
-and was that intended?" next to its questions about current code. Reuse or extend what is
-found; say in the plan what was reused and what was missing.
-**Convention paths.** For report, plan, and journal names and locations—including paths placed in briefs for other agents—use `fgos convention name|path --json`, never construct them; parallel agents MUST choose distinct slugs, and pre-commit `convention check` warnings do not block commits.
-
-## Definition of done (platform-foundations L5)
-
-A stranger agent with no chat history should be able to answer, for any change:
-
-1. **What to read first?** `docs/reading-map.md`, then the relevant area spec.
-2. **What kind of work is this?** Check it against the area's spec and
-   `plans/backlog.md`; a new product area gets a spec before it gets code.
-3. **What contract does it touch?** `docs/platform/runner/contracts/routing-handoff.md` for
-   agent-to-agent boundaries; the area spec's Shared Entities table for
-   in-process contracts.
-4. **How much risk?** Does it change a locked law in `docs/platform/platform-foundations.md`,
-   or existing covered behavior in the test suite? Either raises the bar.
-5. **What proof means done?** `npm test` (state + cli + runner + e2e suite) and
-   `cargo test --workspace` green. Every behaviour has one owning proof, at the
-   lowest layer that can observe it; a boundary above it gets at most one wiring
-   proof, never a second copy of the cases (design principle 8). Before adding a
-   test, find the behaviour's owning proof and extend it; deleting or replacing a
-   mechanism retires its tests in the same change. Green must come from real
-   behavior: never add an env switch, flag, or test-only code branch that skips
-   checks to make tests pass; fix production code or the fixture instead.
-6. **What learning gets left behind?** A settled decision narrative goes into
-   the area's `spec.md` decision-history section, or `decisions/` where present; a settled fact goes into the exact area or
-   subcomponent `spec.md`. Resolve both through
-   `docs/platform/governance.md#decision-scope-to-holder-table`.
-
-## Scratch artifacts
-
-Keep draft scripts, logs, patches and dumps out of the repository root. Use
-`.fgos/runtime/tmp/`, falling back to `${TMPDIR:-/tmp}/fgos-work/`.
-`.githooks/pre-commit` owns the single root-file allowlist and refuses new root
-files outside it, including linked worktrees. Legitimate root additions require
-an allowlist change in a separate commit, landed on main before the addition.
-The hook runs only when wired via `npm run setup:hooks`; `fgos doctor` checks
-that wiring with `main-checkout-hook-wired`. `MERGE_HEAD` skips the root
-guard, and the `.fgos` deletion and worker guards accept only a staged entry
-equal to the merge parent's where that parent changed it since the merge base;
-no other data-loss guard is skipped.
-
-## Destructive cleanup
-
-Never hand-roll deletion of ignored or untracked files or directories (`git status --ignored | xargs rm`, `git clean -x`, `rm -rf` on a computed list).
-Use `fgos worktree remove --discard-ignored`, or `git -C "$W"` after asserting `$W` is a registered linked worktree (`git worktree list`).
-Never chain a destructive step after `cd` with `;` or `&&` from a failed create; the main checkout holds the active release and run history.
-If the main checkout lost ignored paths, follow `docs/how-to/recover-main-checkout-after-ignored-files-wipe.md`.
-
-## Writes to main
-
-Land on main only what another session must rely on later: code, a settled decision, a plan status change (draft, ready, running, done) or a backlog row; never a wake or progress report, a "waiting" or "parked" note, a discussion round, a review note or an owner answer the question store already holds.
-Every commit on main passes the land door's merge slot and gate, so each one makes every other head's land wait or rerun; on 2026-11-25 main took about 21 commits an hour, 88% of them not code, and lands starved.
-Put the rest where it already lives: the event store (`fgos supervisor raise`, `fgos questions`), or a local file that stays untracked (wake reports are in `.gitignore`).
-When a record must reach main, land it once at a checkpoint (a phase `done`, a discussion settled or paused), not once per step.
-Never leave an edit uncommitted in the main checkout while you wait: land it or restore it, because a dirty tracked file there refuses other heads' lands.
-
-## Legacy-Node CLI Ownership Boundary
-
-Rust `fgos` is the standard door for every verb. `bin/fgos.mjs` is the
-`legacy-node` payload entry, staged whole under a release's
-`components.legacyNode.root` and exec'd by the Rust host at
-`components.legacyNode.entry` — never relocated or renamed in the source tree.
-The host resolves it only through those manifest fields, never PATH, cwd or
-hardcoded locations outside the manifest. Global npm `bin.fgos` and
-`node bin/fgos.mjs` call this entry directly but are unsupported for the
-process, lock and identity verbs: the in-process door loads only the addon of
-the activated release whose payload is running, so from a checkout those verbs
-refuse by name (`process-door-not-shipped`, `lock-driver-unavailable` with
-reason `addon-not-shipped`, `host-missing`). Run working-tree code through
-`npm run fgos:dev -- <verb>` instead. Help is served by the host only: the
-payload renders none, and an exact `--help` or `-h` token reaching it is
-forwarded to the host (exit 4 with a pointer when no host is found). Every state write resolves the writer
-identity through the Rust host (`docs/platform/identity/spec.md`), so these
-channels write only inside an activated project or with `FGOS_HOST_BIN` set to
-a host binary. The git hook is a cold client of the activated host and is
-unaffected.
-
-Plain `fgos` runs the activated release recorded in
-`.fgos/installation/activation.json`, not newly edited `bin/` or `src/` bytes.
-Use `npm run fgos:dev -- <verb> [args]` to run working-tree code through the Rust
-host. It preserves caller cwd via `INIT_CWD`, honors `CARGO_TARGET_DIR`, and
-materializes confined per-invocation artifacts under `.fgos/runtime/dev-host/`,
-removing only its own directory after the child exits unless a process (such
-as a detached run supervisor) still runs from it; a later invocation prunes
-such directories once nothing runs from them. Serialize invocations
-across worktrees only where their Cargo target is actually shared.
-
-`fgos doctor` check `active-release-matches-checkout` compares the owned source
-checkout's working-tree Node payload with its activation; it does not certify
-Rust freshness. Dependencies do not count as drift, but symlink/unsafe manifest
-entries still fail. It skips activation owned by main from a linked worktree
-and the same-checkout dev manifest. To update plain `fgos`, build/stage/activate
-the intended tree, then verify doctor through the installed shim. Old-release
-`fgos setup` can overwrite generated render headers until that release is
-restaged; activation never refreshes itself merely because source was edited.
-
-## Install/setup/doctor gate
-
-`docs/platform/packaging-distribution/history/distribution-vision.md` sets the direction for this repo's own
-cài đặt/setup/doctor story. Before any change is done, check:
-
-- A new config key goes into `core/config-standard` and `core/config-schema`;
-  nothing registers a default anywhere else.
-- A new runtime dependency (a tool it shells out to, a file or directory it
-  expects, a platform capability) needs a row in
-  `packages/distribution/contracts/doctor-registry.v1.json`, judged by its
-  owning crate (a row of a layer still in Node is bridged with its step's
-  label), and a registered fix only when the repair is safe and about
-  readiness.
-- A new runtime state or incident class must be reportable and repairable
-  through its component's own verb, on that component's normal path, never
-  only through doctor. Doctor may carry one read-only pointer row for it
-  ("N open, run <verb>"): it warns, never repairs, and never fails except the
-  cases `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`
-  section 3 names.
-- A rule about the fgOS repo's own files goes into `npm test`, CI, pre-commit
-  or the release check, never into doctor.
-- Never hardcode an assumption about which install level (global vs
-  project) is active — per the vision doc, project config always
-  overwrites global, and fgOS stays aware of both without conflict.
-- If the change touches how fgOS gets installed, upgraded, or diagnosed at
-  all, read `docs/platform/packaging-distribution/vision.md` and `docs/platform/packaging-distribution/spec.md`
-  first — a new module gets a spec/config-registry entry before it gets
-  code, same bar as a new product area (question 2 above).
-- Does this change something a user of fgOS would see? If yes, add a line
-  to `## [Unreleased]` in `CHANGELOG.md`.
-
-## Changing a locked law
-
-Laws in `docs/platform/platform-foundations.md` are fixed until their named review
-threshold is hit. Changing one supersedes its decision ID — never edit it in place.
-
-## RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/platform/platform-foundations.md#d-adr0054-rul11-tùm-lum-không-phải-nặng-gom-trong-phạm-vi-việc-đang-làm-supersede-0036)
-
-Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của
-tình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum trong phạm vi
-việc đang làm, gom lại — gom tới khi hết; quy mô không bao giờ là lý do miễn
-trừ. Tùm lum thấy ngoài phạm vi thì ghi thành item riêng; gom mà phải xây
-công cụ mới là một câu hỏi quyết định. Đích của mọi lần gom
-là một hình dạng duy nhất: ranh giới rõ, contract tường minh, đổi và biến
-hình dễ, không chắp vá.
-
-khong phai no nang ma no tum lum
-
-## RUL104 — tốt hơn, không to hơn (D-ADR0062, supersedes D-ADR0061, docs/platform/platform-foundations.md#d-adr0062-rul104-tốt-hơn-không-to-hơn-thêm-clean-code-và-hexagonal-supersede-0061)
-
-Khi audit, soát lại hay làm cứng phần đã có, mỗi thay đổi phải làm thứ đang
-có tốt hơn: ổn định hơn, nhanh hơn, nhẹ hơn, code đơn giản hơn theo các
-nguyên tắc clean code và kiến trúc hexagonal (ports và adapters) khi áp dụng
-được; API, signature và contract rõ ràng, tường minh, dễ dùng và uyển chuyển
-hơn — trong phạm vi code đang có. Không làm nó to ra: không thêm tính năng,
-lớp hay cơ chế mới; đổi một contract thì chuyển mọi caller và xoá đường cũ
-trong cùng đợt (L10). Một tính năng chỉ được thêm khi thật sự đáng: gom mọi
-ý tưởng thêm vào một mục riêng của báo cáo, mỗi ý ghi lý do (vấn đề thật,
-bằng chứng) và lợi ích, và chỉ làm sau khi owner chọn.
-
-tốt hơn, không to hơn
-
-## Dispatch — routing work to an executor
-
-`fgos run` is the primary door for executing new work in the execution core.
-
-**Two doors, one runUnit — the preferred path for new work.** One task: `fgos run "<prompt>" [--provider <id>] [--writes <paths> --worktree <path>]` builds a Unit from the prompt (read-only without `--writes`; `--writes` needs a linked worktree; `--provider` is a soft preference, not a pin). Planned work: `fgos workflow start <preset>|--units <file>`, one step per Unit. Both bind through `bind()`; the runner commits only the Unit's declared `writes` after a passing round, and the worker never runs `git add`/`git commit`. These two doors are the only ones that execute work; `fgos dispatch` keeps only the lower-level reads (`decide`, `inspect`, `reconcile`, `probe-account`).
-
-For routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment.
-
-**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it delegates to `bind()` and refuses the call when the answer comes back as anything other than `in-process`.
-
-Four ways to call `decide`, for four different situations:
-
-- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).
-- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.
-- `decide --work <id> [--stage <stage>]` — you have a real work item and want it dispatched.
-- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name.
-
-Add `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, never guessed.
-
-Three possible `mechanism` results, each needing a different response:
-
-- **`"unavailable"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.
-- **`"in-process"`** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.
-- **`"out-of-process"`** — run `fgos run "<prompt>" --provider <executorId> --capability <purpose> [--writes <paths> --worktree <linked-worktree>]` (or `fgos run --unit <file>`), passing the same capability `decide` was asked for (left out, it defaults to the writing capability `execute`). `--provider` takes agent executors only: when the decided executor is a `kind: "tool"` executor, `fgos run` refuses it, so call that tool directly instead. Never run the resolved command yourself through Bash: `fgos run` binds, runs and settles the Unit and records its provenance under `.fgos/assignments/<unitRunId>/`, so there is nothing to log by hand. With `--writes` the runner commits only those paths after a passing round; with `--json` read the result at `data.results[-1].runResult.agentClaim.summary` and `data.results[-1].commit`.
-
-Every result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is configured for that name or job, and the answer came from the default.
-A skill that dispatches should not re-derive any of this. Reference `../_shared/executor-dispatch-fallback.md` from the skill; its canonical source is `core/skills/_shared/executor-dispatch-fallback.md`. `.agents/skills/` and `plugins/fgOS/skills/` are generated render surfaces carrying source headers, rebuilt with `npm run build:skills`; never edit them by hand. For fgOS thin wrappers, `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own.
-
-## Starting the fgos gateway — one door, never a raw process
-
-**If a task needs the fgos gateway (REST API + web dashboard, binary `fgos-gateway` built from `apps/fgos-gateway`) running, run `fgos gateway start` — never a hand-rolled `cargo run`/`nohup`/`tmux`/systemd invocation.** (tsk-31v) This is the one place that builds the release binary and spawns it detached, so the process outlives the CLI call. `fgos gateway status` reports real liveness plus an actual `/v1/contract` reachability check; `fgos gateway stop` sends SIGTERM and clears the registry. The gateway's own MCP surface (`search`/`execute`, `apps/fgos-gateway/src/mcp.rs`) is mounted on this SAME process — it cannot bootstrap itself, so starting the gateway is always a `fgos` CLI call, never an MCP tool call.
-
 <!-- mdview:START -->
-## Impact-analysis capability gate
-
-The GitNexus "Always Do" / "Never Do" rules below assume GitNexus is
-present on this machine. Before treating them as binding — and before
-`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`
-decide how much
-impact-analysis evidence a plan's verify/test scope needs — query the
-capability instead of assuming the tool. The answer is the same one a
-dispatch gets, and the tool is probed live on every call:
-
-```bash
-fgos dispatch decide --for impact-analysis --json
-```
-
-- **`configured: false`** — Inactive: skip impact-analysis evidence in
-  verify/test scope; note `impact-analysis: inactive` in the plan/verify
-  note. Not a gap.
-- **`mechanism: "unavailable"` (`reasonCodes` `tool.missing`,
-  `tool.unprobeable` or `tool.unnamed`), or `stale: true`** —
-  Degraded: run every other required check, mark that proof weak, and name
-  the gap plainly (e.g. "GitNexus registered but not present on this
-  machine — blast radius not confirmed", or "GitNexus present but its
-  index is behind the current HEAD — blast radius may be stale"). A
-  present tool only means it is installed, never that its index
-  is fresh or intact (tsk-j7y) — a suspicious zero-result or "not found"
-  answer from an impact-analysis tool is worth a quick grep/rg cross-check
-  before being trusted, regardless of what `fgos dispatch decide` reports.
-- **`mechanism: "in-process"` without `stale`** — Full: the MUST rules below apply exactly
-  as written. A `full` posture still is not a guarantee of complete
-  per-file coverage: a genuinely fresh, non-stale index can still carry
-  zero indexed symbols for one large/complex file (tsk-38h — confirmed on
-  `bin/fgos.mjs`, 5000+ lines, zero indexed `Function` symbols even
-  immediately after a fresh reindex), a distinct mechanism from staleness
-  that the cross-check line above already covers unconditionally.
-
-**Multi-target resolution:** if the active impact-analysis providers tool errors because more than one target/repo is registered and needs disambiguation (e.g. "multiple ... indexed" / "not found"), never guess and never reuse any display string quoted in that error -- it is not guaranteed to be a valid value to pass back in. Instead, look at that same MCP servers own tool list for a listing/discovery tool (name suggests enumeration -- list/search/discover), call it to read back the exact registered identifiers, and match this project by a stable field it reports (an absolute path/scan-root, never a human-readable label) before retrying with that exact identifier (tsk-5nz).
-
-This gate is prose the agent reads, never compiled logic — GitNexus is
-the first registered provider for `impact-analysis`, not the only one
-this gate can ever recognize. The block below regenerates from
-GitNexus's own template on `gitnexus analyze`; edit this gate section
-when the policy changes, never the rules inside the block.
-
 <!-- mdview:START -->
 
 ## Documentation Viewing (MDView)
@@ -494,6 +240,51 @@ Use `fgos worktree remove --discard-ignored`, or `git -C "$W"` after asserting `
 Never chain a destructive step after `cd` with `;` or `&&` from a failed create; the main checkout holds the active release and run history.
 If the main checkout lost ignored paths, follow `docs/how-to/recover-main-checkout-after-ignored-files-wipe.md`.
 
+#### Legacy-Node CLI Ownership Boundary
+
+- id: `legacy-node-cli-boundary`
+- source: `core/instructions/legacy-node-cli-boundary.md`
+
+# Legacy-Node CLI Ownership Boundary
+
+Rust `fgos` is the standard door for every verb. `bin/fgos.mjs` is the
+`legacy-node` payload entry, staged whole under a release's
+`components.legacyNode.root` and exec'd by the Rust host at
+`components.legacyNode.entry` — never relocated or renamed in the source tree.
+The host resolves it only through those manifest fields, never PATH, cwd or
+hardcoded locations outside the manifest. Global npm `bin.fgos` and
+`node bin/fgos.mjs` call this entry directly but are unsupported for the
+process, lock and identity verbs: the in-process door loads only the addon of
+the activated release whose payload is running, so from a checkout those verbs
+refuse by name (`process-door-not-shipped`, `lock-driver-unavailable` with
+reason `addon-not-shipped`, `host-missing`). Run working-tree code through
+`npm run fgos:dev -- <verb>` instead. Help is served by the host only: the
+payload renders none, and an exact `--help` or `-h` token reaching it is
+forwarded to the host (exit 4 with a pointer when no host is found). Every state write resolves the writer
+identity through the Rust host (`docs/platform/identity/spec.md`), so these
+channels write only inside an activated project or with `FGOS_HOST_BIN` set to
+a host binary. The git hook is a cold client of the activated host and is
+unaffected.
+
+Plain `fgos` runs the activated release recorded in
+`.fgos/installation/activation.json`, not newly edited `bin/` or `src/` bytes.
+Use `npm run fgos:dev -- <verb> [args]` to run working-tree code through the Rust
+host. It preserves caller cwd via `INIT_CWD`, honors `CARGO_TARGET_DIR`, and
+materializes confined per-invocation artifacts under `.fgos/runtime/dev-host/`,
+removing only its own directory after the child exits unless a process (such
+as a detached run supervisor) still runs from it; a later invocation prunes
+such directories once nothing runs from them. Serialize invocations
+across worktrees only where their Cargo target is actually shared.
+
+`fgos doctor` check `active-release-matches-checkout` compares the owned source
+checkout's working-tree Node payload with its activation; it does not certify
+Rust freshness. Dependencies do not count as drift, but symlink/unsafe manifest
+entries still fail. It skips activation owned by main from a linked worktree
+and the same-checkout dev manifest. To update plain `fgos`, build/stage/activate
+the intended tree, then verify doctor through the installed shim. Old-release
+`fgos setup` can overwrite generated render headers until that release is
+restaged; activation never refreshes itself merely because source was edited.
+
 #### Scratch Artifacts
 
 - id: `scratch-artifacts`
@@ -557,6 +348,39 @@ sections. A plan's facts phase answers "what existed before, and which change re
 and was that intended?" next to its questions about current code. Reuse or extend what is
 found; say in the plan what was reused and what was missing.
 
+#### Capability Routing Rules
+
+- id: `capability-routing-rules`
+- source: `core/instructions/capability-routing-rules.md`
+
+# Capability Routing Rules
+
+## Default inline and the five dispatch reasons
+
+Executing inline within the current session is the platform default: when no executor is configured for a capability, `decide` answers `unavailable` and the unit executes inline in the live session.
+
+Five valid reasons justify configuring an executor for a capability in project configuration (or passing an ad-hoc refinement):
+
+1. **Cheaper model:** A lightweight tier is sufficient for a well-bounded, routine task.
+2. **Stronger model:** The unit's required rigor exceeds the current session's model capability (tied to `rigor`, never to `size`).
+3. **Different provider:** Provider diversity, credential isolation, or quota management mandates another engine (e.g. Gemini, OpenAI, Claude).
+4. **Confinement & isolation:** Hard filesystem sandboxing, read-only guarantees, or clean worktree isolation is required.
+5. **Parallel execution:** Running independent units concurrently to shorten wall-clock time (Ship Faster, priority #1 in `AGENTS.md`).
+
+## Never pin infrastructure
+
+Plans, patterns, driver prompts and non-ad-hoc Units never pin an executor, provider, model, tier, invocation or override. They declare canonical capability names only; which executor serves a capability is a live-config, execution-time concern that `bind()` resolves through `decide`. A plan that pins an executor has leaked an execution-time decision into a planning-time document.
+
+The one exception is an ad-hoc Unit (the one-liner's `--provider`, `prefer` in a `--units` file): it may carry a soft preference that `bind()` tries first and fails over from, never a pin, and only for one of the five reasons above. Otherwise leave it out and `bind()` takes the capability's pool. Only a human `--override` pins.
+
+## A capability is a routing signal
+
+A capability is a stable behavior promise or purpose — never a task instance, a Work item, a lifecycle stage, a skill name, or an executor name. Capability annotation is a planning-time signal, never a Work-schema field, and never itself a reason to create, split, or transition a Work item.
+
+## Research is a workflow, not a capability
+
+`fgos-researching` is a skill/workflow — it turns an unresolved question into a grounded finding. It is never itself a capability name, never a valid `decide --for` argument, and no catalog entry called `research` (or similar) should ever be registered. When a research question genuinely needs a dispatched capability (for example a code-graph blast-radius lookup), it asks `decide` for the concrete capability that answers it — `impact-analysis` today; browser/web lookups and repository search stay primitive tool calls (`WebSearch`/`WebFetch`/`Grep`) made inline inside the research unit, which per the activation doctrine are never themselves independently executable units and never trigger a `decide` call on their own.
+
 #### Convention Paths
 
 - id: `convention-paths`
@@ -615,6 +439,40 @@ check exists it is named, otherwise the reviewer checks it.
    test names the test that now owns the behaviour, or says the behaviour was
    removed. Reports never count "all N assertion lines kept" as success.
 
+#### Dispatch Decide Door
+
+- id: `dispatch-decide-door`
+- source: `core/instructions/dispatch-decide-door.md`
+
+# Dispatch Decide Door
+
+For routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment.
+
+**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it delegates to `bind()` and refuses the call when the answer comes back as anything other than `in-process`.
+
+The hook is the decide for each Agent/Task call: it runs `decide --for <subagent type> --needs-soul --has-live-task-access` for every call, and an unregistered name answers `in-process` under `--needs-soul`. A fan-out of Task calls therefore needs no further decide round trip and no purpose check of its own.
+
+Decide once per dispatch, immediately before execution, never during planning. A batch entry that re-confirms the mechanism inside the same dispatch is that dispatch's own bind check, not a second decide.
+
+Four ways to call `decide`, for four different situations:
+
+- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).
+- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.
+- `decide --work <id> [--stage <stage>]` — you have a real work item and want it dispatched.
+- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name.
+
+Add `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, never guessed.
+
+Three possible `mechanism` results, each needing a different response:
+
+- **`"unavailable"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.
+- **`"in-process"`** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.
+- **`"out-of-process"`** — run `fgos run "<prompt>" --provider <executorId> --capability <purpose> [--writes <paths> --worktree <linked-worktree>]` (or `fgos run --unit <file>`), passing the same capability `decide` was asked for (left out, it defaults to the writing capability `execute`). `--provider` takes agent executors only: when the decided executor is a `kind: "tool"` executor, `fgos run` refuses it, so call that tool directly instead. Never run the resolved command yourself through Bash: `fgos run` binds, runs and settles the Unit and records its provenance under `.fgos/assignments/<unitRunId>/`, so there is nothing to log by hand. With `--writes` the runner commits only those paths after a passing round; with `--json` read the result at `data.results[-1].runResult.agentClaim.summary` and `data.results[-1].commit`.
+
+Every result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is configured for that name or job, and the answer came from the default.
+
+A skill that dispatches should not re-derive any of this: it calls the doors above and in `run-door-contract`. `../_shared/executor-dispatch-fallback.md` (canonical source `core/skills/_shared/executor-dispatch-fallback.md`) is named only for its pattern and its list of reasons. `.agents/skills/` and `plugins/fgOS/skills/` are generated render surfaces carrying source headers, rebuilt with `npm run build:skills`; never edit them by hand. For fgOS thin wrappers, `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own.
+
 #### Domain Doctrine Read
 
 - id: `domain-doctrine-read`
@@ -624,6 +482,44 @@ check exists it is named, otherwise the reviewer checks it.
 
 Once the domain resolves, read `domains/<domain>/AGENTS.md` (e.g. `domains/coding/AGENTS.md` when domain is `coding`) to load domain-specific standing doctrine before the first round, and before handing off to driving or loading the resolved stage skill; it states what the domain treats as settled, its constraints and its exits. When the domain is unknown, ask the person one line; never assume one.
 
+#### Driver Discipline
+
+- id: `driver-discipline`
+- source: `core/instructions/driver-discipline.md`
+
+# Driver Discipline
+
+## A claim is never evidence
+
+Before accepting any worker contribution or finding, independently inspect the declared output artifact(s):
+- The driver must directly verify the existence, format, and substantive correctness of the produced artifact.
+- Never rely on worker self-narration, conversational claims, or ungrounded status summaries.
+- **Caveat Rule:** A result carrying a caveat (such as non-attributable execution or a recheck-required flag) must **never** be treated as valid acceptance or sign-off evidence. Caveats block session completion and require an uncaveated re-execution.
+
+## Every finding gets a disposition
+
+When an inspection or advisory operation reports findings, the driver must record an explicit disposition for each finding:
+- `accepted`: The finding is valid and requires corrective action or revision.
+- `rejected`: The finding is demonstrated to be invalid or inapplicable, backed by recorded rationale.
+- `deferred`: The finding is valid but explicitly deferred out of current scope, permitted only when allowed by facade disposition criteria.
+
+These three are the generic set. A role-specific skill may define a finer set that applies inside that skill (the architecture panel's accepted, mitigated, answered, invalidated-by-evidence, deferred, unresolved); no mapping between the sets is invented.
+
+Every accepted finding requires an independent recheck operation to confirm remediation. A finding is never discharged by driver disposition alone.
+
+## A refusal is an answer
+
+A refusal is an answer, not a question for the owner. Read its code and condition, re-observe, and change the proposal (another activity, a narrower write scope, wait for the live reservation) or stop. Do not retry the same proposal. An error from a call (a refusal before the run, a failed bind, or a timeout) is read the same way, never retried blind.
+
+#### Gateway Start Door
+
+- id: `gateway-start-door`
+- source: `core/instructions/gateway-start-door.md`
+
+# Starting the fgos gateway — one door, never a raw process
+
+**If a task needs the fgos gateway (REST API + web dashboard, binary `fgos-gateway` built from `apps/fgos-gateway`) running, run `fgos gateway start` — never a hand-rolled `cargo run`/`nohup`/`tmux`/systemd invocation.** This is the one place that builds the release binary and spawns it detached, so the process outlives the CLI call. `fgos gateway status` reports real liveness plus an actual `/v1/contract` reachability check; `fgos gateway stop` sends SIGTERM and clears the registry. The gateway's own MCP surface (`search`/`execute`, `apps/fgos-gateway/src/mcp.rs`) is mounted on this SAME process — it cannot bootstrap itself, so starting the gateway is always a `fgos` CLI call, never an MCP tool call.
+
 #### Id Minting
 
 - id: `id-minting`
@@ -632,6 +528,109 @@ Once the domain resolves, read `domains/<domain>/AGENTS.md` (e.g. `domains/codin
 # Id Minting
 
 Every id that travels between machines (a work item, a backlog row, a `D-ADR####` decision number, a decision file number, an owner question) comes from `fgos identity mint <kind>` (`work`, `backlog`, `d-adr`, `decision-file`, `question`; `--json` for machine output). Never read the highest number and add one, never derive an id from a title. The mint door owns the rule (`docs/platform/identity/spec.md`, section 4a); a `d-adr` or `decision-file` claim needs the network and fails clearly without it, and the format never changes to work around that.
+
+#### Impact-Analysis Capability Gate
+
+- id: `impact-analysis-capability-gate`
+- source: `core/instructions/impact-analysis-capability-gate.md`
+
+## Impact-analysis capability gate
+
+The GitNexus "Always Do" / "Never Do" rules below assume GitNexus is
+present on this machine. Before treating them as binding — and before
+`fgos-coding-planning`/`fgos-coding-validating`/`fgos-coding-implement`
+decide how much
+impact-analysis evidence a plan's verify/test scope needs — query the
+capability instead of assuming the tool. The answer is the same one a
+dispatch gets, and the tool is probed live on every call:
+
+```bash
+fgos dispatch decide --for impact-analysis --json
+```
+
+- **`configured: false`** — Inactive: skip impact-analysis evidence in
+  verify/test scope; note `impact-analysis: inactive` in the plan/verify
+  note. Not a gap.
+- **`mechanism: "unavailable"` (`reasonCodes` `tool.missing`,
+  `tool.unprobeable` or `tool.unnamed`), or `stale: true`** —
+  Degraded: run every other required check, mark that proof weak, and name
+  the gap plainly (e.g. "GitNexus registered but not present on this
+  machine — blast radius not confirmed", or "GitNexus present but its
+  index is behind the current HEAD — blast radius may be stale"). A
+  present tool only means it is installed, never that its index
+  is fresh or intact — a suspicious zero-result or "not found"
+  answer from an impact-analysis tool is worth a quick grep/rg cross-check
+  before being trusted, regardless of what `fgos dispatch decide` reports.
+- **`mechanism: "in-process"` without `stale`** — Full: the MUST rules below apply exactly
+  as written. A `full` posture still is not a guarantee of complete
+  per-file coverage: a genuinely fresh, non-stale index can still carry
+  zero indexed symbols for one large/complex file (confirmed on
+  `bin/fgos.mjs`, 5000+ lines, zero indexed `Function` symbols even
+  immediately after a fresh reindex), a distinct mechanism from staleness
+  that the cross-check line above already covers unconditionally.
+
+**Multi-target resolution:** if the active impact-analysis providers tool errors because more than one target/repo is registered and needs disambiguation (e.g. "multiple ... indexed" / "not found"), never guess and never reuse any display string quoted in that error -- it is not guaranteed to be a valid value to pass back in. Instead, look at that same MCP servers own tool list for a listing/discovery tool (name suggests enumeration -- list/search/discover), call it to read back the exact registered identifiers, and match this project by a stable field it reports (an absolute path/scan-root, never a human-readable label) before retrying with that exact identifier.
+
+This gate is prose the agent reads, never compiled logic — GitNexus is
+the first registered provider for `impact-analysis`, not the only one
+this gate can ever recognize. The block below regenerates from
+GitNexus's own template on `gitnexus analyze`; edit this gate section
+when the policy changes, never the rules inside the block.
+
+#### Install/setup/doctor gate
+
+- id: `install-setup-doctor-gate`
+- source: `core/instructions/install-setup-doctor-gate.md`
+
+# Install/setup/doctor gate
+
+`docs/platform/packaging-distribution/history/distribution-vision.md` sets the direction for this repo's own
+cài đặt/setup/doctor story. Before any change is done, check:
+
+- A new config key goes into `core/config-standard` and `core/config-schema`;
+  nothing registers a default anywhere else.
+- A new runtime dependency (a tool it shells out to, a file or directory it
+  expects, a platform capability) needs a row in
+  `packages/distribution/contracts/doctor-registry.v1.json`, judged by its
+  owning crate (a row of a layer still in Node is bridged with its step's
+  label), and a registered fix only when the repair is safe and about
+  readiness.
+- A new runtime state or incident class must be reportable and repairable
+  through its component's own verb, on that component's normal path, never
+  only through doctor. Doctor may carry one read-only pointer row for it
+  ("N open, run <verb>"): it warns, never repairs, and never fails except the
+  cases `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`
+  section 3 names.
+- A rule about the fgOS repo's own files goes into `npm test`, CI, pre-commit
+  or the release check, never into doctor.
+- Never hardcode an assumption about which install level (global vs
+  project) is active — per the vision doc, project config always
+  overwrites global, and fgOS stays aware of both without conflict.
+- If the change touches how fgOS gets installed, upgraded, or diagnosed at
+  all, read `docs/platform/packaging-distribution/vision.md` and `docs/platform/packaging-distribution/spec.md`
+  first — a new module gets a spec/config-registry entry before it gets
+  code, same bar as a new product area (definition-of-done, question 2).
+- Does this change something a user of fgOS would see? If yes, add a line
+  to `## [Unreleased]` in `CHANGELOG.md`.
+
+#### Run Door Contract
+
+- id: `run-door-contract`
+- source: `core/instructions/run-door-contract.md`
+
+# Run Door Contract
+
+`fgos run` is the primary door for executing new work in the execution core.
+
+**Two doors, one runUnit — the preferred path for new work.** One task: `fgos run "<prompt>" [--provider <id>] [--writes <paths> --worktree <path>]` builds a Unit from the prompt (read-only without `--writes`; `--writes` needs a linked worktree; `--provider` is a soft preference, not a pin). Planned work: `fgos workflow start <preset>|--units <file>`, one step per Unit. Both bind through `bind()`; the runner commits only the Unit's declared `writes` after a passing round, and the worker never runs `git add`/`git commit`. These two doors are the only ones that execute work; `fgos dispatch` keeps only the lower-level reads (`decide`, `inspect`, `reconcile`, `probe-account`).
+
+Without `--writes` the Unit is read-only and runs sandboxed. `--writes` needs a linked worktree and is refused from the main checkout before anything runs. `--provider` is a soft preference that `bind()` tries first and fails over from; `--capability` defaults to `execute`. Work already written as a Unit file runs as `fgos run --unit <file>`.
+
+The worker edits files and stops, never running `git add`/`git commit`. After a passing round the runner commits only paths inside the Unit's `writes` (subject from the first line of the worker's `summary`); a path the worker needs outside that scope goes in `needsWrites`, not on disk.
+
+When herdr is present the worker runs in a watched pane, so a person can follow it live; otherwise the call blocks until the Unit settles. Run a long call backgrounded (`run_in_background: true`) and wait for the harness's own completion notification — do NOT use `ScheduleWakeup` or polling.
+
+That wait rule is for a `fgos run` call, which blocks until the Unit settles. `fgos workflow start` returns at once with the `workflowRunId` and a `detached` block (`pid`, `logPath`, `statusCommand`) while the run continues in a detached process: its output is never the result, so poll `fgos workflow status <workflowRunId>` until the run is `completed`, `failed` or parked at a gate. `answer` and `resume` return the same way; pass `--foreground` only when the caller must wait in place.
 
 <!-- fgos:instruction-projection:end -->
 

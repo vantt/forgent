@@ -1,10 +1,10 @@
 ---
 id: dispatch-decide-door
 kind: procedure
-owner: runner
-scope: component
+owner: core
+scope: repo
 mode: append
-specificity: 20
+specificity: 10
 title: Dispatch Decide Door
 description: Run fgos dispatch decide before every dispatch out of the current turn, never choose the mechanism yourself, and act on each of the three results
 lifecycle: live

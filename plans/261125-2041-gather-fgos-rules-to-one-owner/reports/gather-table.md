@@ -256,3 +256,28 @@ projection block) are not counted.
 
 Persona files, prompt templates (`core/prompt-templates/**`) and `.claude/agents/**` are not edited by any batch.
 `CHANGELOG.md` belongs to the second phase.
+
+## 8. What changed while the batches ran (2026-11-26, fg-server)
+
+- **Owner and root of the repo-wide units.** The AGENTS.md projection renders only `scope: repo` or `platform` units
+  with no `when:` (the interim filter in `src/setup/instruction-projections.mjs`, which ASC phase 6 replaces), and the
+  context engine refuses a component root claiming `scope: repo` and an owner other than its root's. The eight units
+  this table placed under component roots (dispatch-decide-door, run-door-contract, capability-routing-rules,
+  impact-analysis-capability-gate, driver-discipline, gateway-start-door, legacy-node-cli-boundary,
+  install-setup-doctor-gate) therefore sit in `core/instructions/` with `owner: core`, `scope: repo`, so the rendered
+  AGENTS.md keeps carrying them (criterion 2). Moving them to their component roots is ASC phase 9's, after phase 6
+  selects by `when:`.
+- **C4 checked.** `src/session-host/head-request.mjs` `runVerb` accepts a lead's `fgos run` without `provider` (it
+  adds `--provider` only when given), so C4 stays SETTLED: the lead names `--provider` only for one of the five reasons.
+- **Rows that stayed.** Row 21: the shaping intro ("never designs implementation, never applies a stage move") and the
+  plan-contract planner sentence carry more than the persona files say, so each keeps its text after a pointer to the
+  persona. Row 25: the two skills' opening lines (advise chooses the route, group-thinking runs it) stay as each
+  skill's own identity; the `--seats` base list now points to the reference's `--seats` row. Row 24: the "run it once,
+  near the end" clause stays in the worker contract, because coding-verification-discipline does not state it.
+  Row 27: the no-re-scan rule had no owner in the red-flags list; it was added there and the three copies point to it.
+  Cluster 15: `S/_s/decision-question.md:25-27` (outside every batch) now points to rul11-tum-lum.
+- **Near-duplicate check.** The first real run of the nearest-rule search never finished: pkm v0.7.0 indexed the whole
+  repository (7925 notes) instead of the profile's rule roots. pkm 0.7.1 adds `SearchOptions::scope`; the context
+  engine opens its search with `SearchScope::Profile`. With it the check runs in about 5 s; every unit of this plan
+  passes (26 rules, 0 refusals, highest score 0.921). scratch-artifacts scored 0.930 against coding-worktree-safety;
+  both were read, they are distinct, and the relation is declared `related`.

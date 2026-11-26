@@ -1,10 +1,10 @@
 ---
 id: install-setup-doctor-gate
 kind: procedure
-owner: packaging-distribution
-scope: component
+owner: core
+scope: repo
 mode: append
-specificity: 20
+specificity: 10
 title: Install/setup/doctor gate
 description: Before a change is done, check config keys, runtime dependencies, incident reporting, install levels and the changelog against the distribution vision
 lifecycle: live

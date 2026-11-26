@@ -1,10 +1,10 @@
 ---
 id: driver-discipline
 kind: procedure
-owner: workflow
-scope: component
+owner: core
+scope: repo
 mode: append
-specificity: 20
+specificity: 10
 title: Driver Discipline
 description: What a driver checks itself - a worker's claim is never evidence, every finding gets a disposition and an independent recheck, and a refusal is an answer
 lifecycle: live

@@ -1,10 +1,10 @@
 ---
 id: run-door-contract
 kind: procedure
-owner: runner
-scope: component
+owner: core
+scope: repo
 mode: append
-specificity: 20
+specificity: 10
 title: Run Door Contract
 description: The two doors that execute work (fgos run and fgos workflow start) - read-only without writes, writes need a linked worktree, the runner commits and the worker never does, and how to wait for a call
 lifecycle: live

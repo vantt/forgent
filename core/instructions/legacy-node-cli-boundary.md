@@ -1,10 +1,10 @@
 ---
 id: legacy-node-cli-boundary
 kind: boundary
-owner: packaging-distribution
-scope: component
+owner: core
+scope: repo
 mode: append
-specificity: 20
+specificity: 10
 title: Legacy-Node CLI Ownership Boundary
 description: Rust fgos is the standard door; bin/fgos.mjs is the legacy-node payload exec-ed by the host, and working-tree code runs through npm run fgos:dev
 lifecycle: live

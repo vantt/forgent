@@ -1,10 +1,10 @@
 ---
 id: gateway-start-door
 kind: procedure
-owner: fgos-gateway
-scope: component
+owner: core
+scope: repo
 mode: append
-specificity: 20
+specificity: 10
 title: Gateway Start Door
 description: Start the fgos gateway only through fgos gateway start, never a hand-rolled process
 lifecycle: live

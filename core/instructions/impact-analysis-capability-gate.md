@@ -1,10 +1,10 @@
 ---
 id: impact-analysis-capability-gate
 kind: procedure
-owner: runner
-scope: component
+owner: core
+scope: repo
 mode: append
-specificity: 20
+specificity: 10
 title: Impact-Analysis Capability Gate
 description: Query the impact-analysis capability before treating the GitNexus rules as binding - inactive, degraded or full posture, and how to resolve more than one registered target
 lifecycle: live
