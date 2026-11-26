@@ -1,7 +1,7 @@
 ---
 id: p-pv7ha3l5ss
 title: "Head lifecycle events: the host reports the end of a lead, finished planners and leads are closed, and a waiting lead does not hold a working slot (supervisor, priority high; source: owner via Miu, 2026-11-24)"
-status: proposed
+status: done
 priority: P1
 area: supervisor
 created: 2026-11-24
@@ -18,3 +18,7 @@ The plan covers the three rows above, each with its own done condition kept as w
 # Notes
 
 Seeded discussion: `plans/discussions/ds-f3x53nlibp-head-lifecycle-events/DISCUSSION.md`. The three rows stay as the source of detail; they cite this row once the plan exists.
+
+# Closing note
+
+Delivered by plan `261124-2143-head-lifecycle-events`, landed in `2b18815f1`, `0463c0385`, `8eeb37fef` and `8afaaba50`; the three rows carry their own owning proofs. Still pending and tracked in the plan: the live lead-ended check with a throwaway lead (supervisor, when the watcher tick is free) and the `CHANGELOG.md` line (parked while plan `261125-1631-agent-context-engine` holds that file). Full-gate evidence: `plans/261124-2143-head-lifecycle-events/reports/integration.md`.
