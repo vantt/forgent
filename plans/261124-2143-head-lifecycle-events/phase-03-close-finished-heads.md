@@ -27,11 +27,16 @@ Closes `p-6hqvgokerb` in code.
 - `test/session-host/head-stop.test.mjs`
 - `bin/fgos.mjs`
 - `packages/supervision/rust/observe-kinds.json`
+- `src/cli/command-registry.mjs`
 
 Owner answer `q-myvzcbz3sx` (2026-11-26): widen the footprint by exactly these two paths. `session stop` in
 `bin/fgos.mjs` took only a persona and `--name`, so the adapter's `session stop --role lead:<LANE>` was refused; the
 wake door's two new outcomes `stopped-finished` and `stop-failed` were missing from the outcome vocabulary. No other
 change to `bin/fgos.mjs`.
+
+Owner answer `q-qzchcwl7ya` (2026-11-26): `src/cli/command-registry.mjs` joins the footprint only for its `session stop`
+entry (a `role` property, persona and name no longer required, `--role` in description and examples); no other change
+to that file.
 
 ## Steps
 

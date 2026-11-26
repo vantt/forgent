@@ -21,10 +21,14 @@ Capability: `code:implement`.
 
 `packages/mailbox/rust/store/src/nudge.rs`, `packages/mailbox/rust/store/src/verbs.rs`,
 `packages/mailbox/rust/store/src/adapters/**`, `packages/mailbox/rust/store/tests/nudge_*.rs`,
+`packages/mailbox/rust/store/tests/nudge.rs`,
 `packages/mailbox/rust/core/src/report.rs`, `packages/mailbox/contracts/adapters.v1.json`,
 `packages/mailbox/contracts/frame.v1.txt`, `packages/session-host/rust/src/pane_io.rs`,
 `packages/session-host/rust/tests/typed_wake.rs`, `packages/identity/rust/src/directory.rs`,
 `apps/fgos/src/wiring/mailbox_verbs.rs`, `apps/fgos/src/wiring/mailbox_verbs/**`, `apps/fgos/tests/mailbox_routes.rs`.
+
+Owner answer `q-embi4w5hfi` (2026-11-26): `packages/mailbox/rust/store/tests/nudge.rs` joins the footprint only to
+extend the nudge-capability assertion with agy for the typed channel; no other change to that file.
 
 ## Steps
 
