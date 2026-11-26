@@ -28,6 +28,7 @@ Closes `p-6hqvgokerb` in code.
 - `bin/fgos.mjs`
 - `packages/supervision/rust/observe-kinds.json`
 - `src/cli/command-registry.mjs`
+- `packages/host-runtime/contracts/command-manifest.json`
 
 Owner answer `q-myvzcbz3sx` (2026-11-26): widen the footprint by exactly these two paths. `session stop` in
 `bin/fgos.mjs` took only a persona and `--name`, so the adapter's `session stop --role lead:<LANE>` was refused; the
@@ -37,6 +38,10 @@ change to `bin/fgos.mjs`.
 Owner answer `q-qzchcwl7ya` (2026-11-26): `src/cli/command-registry.mjs` joins the footprint only for its `session stop`
 entry (a `role` property, persona and name no longer required, `--role` in description and examples); no other change
 to that file.
+
+Owner answer `q-ep6wknrzop` (2026-11-26): `packages/host-runtime/contracts/command-manifest.json` joins the footprint, changed only
+by regenerating it with `node scripts/export-command-selectors.mjs` (it is the generated projection of the registry change);
+no hand edit, no other generated contract.
 
 ## Steps
 
