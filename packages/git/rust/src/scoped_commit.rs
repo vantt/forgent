@@ -508,7 +508,7 @@ impl GitDriver {
         let resources = checkout_resources(repo)?;
         let legacy = legacy_resource(repo)?;
         let current_binding = binding(handle(scope, repo)?)?;
-        for mut chain in wal.retained(100_000)? {
+        for mut chain in wal.retained(crate::wal::WAL_SCAN_BOUND)? {
             let worktree = match &chain.intent().kind {
                 OperationKind::ScopedCommit(p) => &p.worktree,
                 OperationKind::Sync(p) => &p.worktree,
@@ -685,7 +685,7 @@ impl GitDriver {
         // directory timestamps. A peer at this baseline makes message-only
         // attribution ambiguous; a strictly older baseline does not.
         let mut newest = true;
-        for peer in wal.retained(100_000)? {
+        for peer in wal.retained(crate::wal::WAL_SCAN_BOUND)? {
             let worktree = match &peer.intent().kind {
                 OperationKind::ScopedCommit(p) => &p.worktree,
                 OperationKind::Sync(p) => &p.worktree,
