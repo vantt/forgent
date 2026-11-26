@@ -817,9 +817,58 @@ pub fn start_supervisor(
     step_env: &Map<String, Value>,
     extra_env: &Map<String, Value>,
 ) -> io::Result<StartedSupervisor> {
+    let attempt_id = envelope["attemptId"].as_str().unwrap_or_default();
+    let failure_domain = super::scope::decide_failure_domain(attempt_id);
+    let memory_max = match failure_domain {
+        super::scope::FailureDomain::SystemdScope { .. } => {
+            read_scope_memory_max(envelope["cwd"].as_str().map(Path::new))
+        }
+        super::scope::FailureDomain::Inherited { .. } => None,
+    };
+    start_supervisor_in(
+        envelope,
+        handover,
+        step_env,
+        extra_env,
+        &failure_domain,
+        memory_max.as_deref(),
+    )
+}
+
+/// `runner.supervisorScope.memoryMax` for one launch; a read error or an invalid value is reported on stderr
+/// and the scope then carries no cap.
+fn read_scope_memory_max(project_root: Option<&Path>) -> Option<String> {
+    match super::config::read_supervisor_scope_memory_max(project_root) {
+        Ok(raw) => super::scope::validate_memory_max(&raw).map(str::to_string),
+        Err(error) => {
+            eprintln!(
+                "warning: cannot read runner.supervisorScope.memoryMax ({error}), starting the scope without a cap"
+            );
+            None
+        }
+    }
+}
+
+/// [`start_supervisor`] with the failure domain and the memory cap decided by the caller.
+pub fn start_supervisor_in(
+    envelope: &Value,
+    handover: &[&fs::File],
+    step_env: &Map<String, Value>,
+    extra_env: &Map<String, Value>,
+    failure_domain: &super::scope::FailureDomain,
+    memory_max: Option<&str>,
+) -> io::Result<StartedSupervisor> {
     let run_dir = PathBuf::from(envelope["runDir"].as_str().unwrap_or_default());
     let side_file = envelope["sideFile"].as_str().map(PathBuf::from);
-    let result = spawn_supervisor(envelope, &run_dir, handover, step_env, extra_env);
+    let result = spawn_supervisor(
+        envelope,
+        &run_dir,
+        handover,
+        step_env,
+        extra_env,
+        failure_domain,
+        memory_max,
+    );
     if result.is_err() {
         if let Some(side) = side_file {
             let _ = fs::remove_file(side);
@@ -828,12 +877,53 @@ pub fn start_supervisor(
     result
 }
 
+/// Build the command that executes the supervisor, wrapped in a systemd scope if `failure_domain` is `SystemdScope`.
+pub fn build_supervisor_command(
+    envelope: &Value,
+    run_dir: &Path,
+    failure_domain: &super::scope::FailureDomain,
+    memory_max: Option<&str>,
+) -> Command {
+    let host_bin = envelope["hostBin"].as_str().unwrap_or_default();
+    let envelope_path = run_dir.join("envelope.json");
+    let protocol_str = PROTOCOL.to_string();
+    let supervisor_argv = vec![
+        host_bin.to_string(),
+        "internal".into(),
+        "supervise".into(),
+        "--envelope".into(),
+        envelope_path.to_string_lossy().to_string(),
+        "--protocol".into(),
+        protocol_str,
+    ];
+    match failure_domain {
+        super::scope::FailureDomain::SystemdScope { unit, .. } => {
+            let scope_cmd = super::scope::build_scope_command(
+                "systemd-run",
+                unit,
+                memory_max,
+                &supervisor_argv,
+            );
+            let mut cmd = Command::new("systemd-run");
+            cmd.args(&scope_cmd[1..]);
+            cmd
+        }
+        super::scope::FailureDomain::Inherited { .. } => {
+            let mut cmd = Command::new(&supervisor_argv[0]);
+            cmd.args(&supervisor_argv[1..]);
+            cmd
+        }
+    }
+}
+
 fn spawn_supervisor(
     envelope: &Value,
     run_dir: &Path,
     handover: &[&fs::File],
     step_env: &Map<String, Value>,
     extra_env: &Map<String, Value>,
+    failure_domain: &super::scope::FailureDomain,
+    memory_max: Option<&str>,
 ) -> io::Result<StartedSupervisor> {
     let mut log_options = fs::OpenOptions::new();
     log_options.create(true).append(true);
@@ -843,11 +933,10 @@ fn spawn_supervisor(
         log_options.mode(0o600);
     }
     let log = log_options.open(run_dir.join("supervisor.log"))?;
-    let mut command = Command::new(envelope["hostBin"].as_str().unwrap_or_default());
+
+    let mut command = build_supervisor_command(envelope, run_dir, failure_domain, memory_max);
+
     command
-        .args(["internal", "supervise", "--envelope"])
-        .arg(run_dir.join("envelope.json"))
-        .args(["--protocol", &PROTOCOL.to_string()])
         .current_dir(run_dir)
         .env_clear()
         .stdin(Stdio::null())
@@ -857,6 +946,30 @@ fn spawn_supervisor(
         if let Some(value) = value.as_str() {
             command.env(name, value);
         }
+    }
+    let fd_json = serde_json::to_string(failure_domain).unwrap_or_default();
+    command.env("FGOS_FAILURE_DOMAIN", fd_json);
+    if let super::scope::FailureDomain::SystemdScope {
+        runtime_dir,
+        systemd_run_dir,
+        ..
+    } = failure_domain
+    {
+        command.env("XDG_RUNTIME_DIR", runtime_dir);
+        // The scope command names `systemd-run` literally; the probed directory goes first on the child's
+        // PATH so the lookup lands on the binary the probe found.
+        let inherited = step_env
+            .get("PATH")
+            .and_then(Value::as_str)
+            .map(std::ffi::OsString::from)
+            .or_else(|| std::env::var_os("PATH"))
+            .unwrap_or_default();
+        let mut path = systemd_run_dir.clone().into_os_string();
+        if !inherited.is_empty() {
+            path.push(":");
+            path.push(&inherited);
+        }
+        command.env("PATH", path);
     }
     #[cfg(unix)]
     {

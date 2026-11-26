@@ -1,7 +1,7 @@
 ---
 id: p-7pjiqfoj7v
 title: "Shaper discussion `orchestration-skeleton` (supervisor, priority high; source: `docs/discussions/supervisor-review/DISCUSSION.md` §7 `#task-orchestration-skeleton`, owner agreed 2026-11-19 round 19: the skeleton must stabilize early)"
-status: proposed
+status: done
 priority: P1
 area: supervisor
 created: 2026-11-19

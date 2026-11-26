@@ -25,6 +25,7 @@ footprint:
   - packages/distribution/rust/src/timer.rs
   - packages/distribution/contracts/doctor-registry.v1.json
   - apps/fgos/src/wiring/doctor/run_supervisor.rs
+  - apps/fgos/src/wiring/doctor/mod.rs
 source:
   - plans/discussions/ds-rig5dsai5l-head-run-own-failure-domain/DISCUSSION.md
   - p-6htu2ae64o
@@ -102,16 +103,20 @@ in head liveness.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Scope per run supervisor](phase-01-scope-per-run-supervisor.md) | - | packages/run-supervisor/rust/src/controller/launch.rs, packages/run-supervisor/rust/src/controller/scope.rs, packages/run-supervisor/rust/src/controller/mod.rs, packages/run-supervisor/rust/src/controller/config.rs, packages/run-supervisor/rust/src/supervise.rs, packages/run-supervisor/rust/tests/controller_launch.rs, packages/run-supervisor/contracts/supervisor-binding.v1.json, core/config-standard/runner.yaml, core/config-schema/runner.schema.yaml, docs/platform/run-supervisor/spec.md | 1 | ready |
+| 1 | [Scope per run supervisor](phase-01-scope-per-run-supervisor.md) | - | packages/run-supervisor/rust/src/controller/launch.rs, packages/run-supervisor/rust/src/controller/scope.rs, packages/run-supervisor/rust/src/controller/mod.rs, packages/run-supervisor/rust/src/controller/config.rs, packages/run-supervisor/rust/src/supervise.rs, packages/run-supervisor/rust/tests/controller_launch.rs, packages/run-supervisor/contracts/supervisor-binding.v1.json, core/config-standard/runner.yaml, core/config-schema/runner.schema.yaml, docs/platform/run-supervisor/spec.md | 1 | done |
 | 2 | [Head state judges the supervisor](phase-02-head-state-judges-supervisor.md) | - | apps/fgos/src/wiring/observe_sources/head_state.rs, apps/fgos/src/wiring/observe_sources/tests/mod.rs, core/watcher/definitions/session-gone.query.json, docs/platform/observe/spec.md | 1 | done |
-| 3 | [Watcher unit and doctor row](phase-03-watcher-unit-and-doctor-row.md) | 1 | packages/distribution/rust/src/timer.rs, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/run_supervisor.rs | 2 | ready |
+| 3 | [Watcher unit and doctor row](phase-03-watcher-unit-and-doctor-row.md) | 1 | packages/distribution/rust/src/timer.rs, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/run_supervisor.rs, apps/fgos/src/wiring/doctor/mod.rs | 2 | ready |
 | 4 | [Integration and live check](phase-04-integration-and-live-check.md) | 1, 2, 3 | plans/261127-0016-head-run-own-failure-domain/reports/** | 3 | ready |
+
+Correction (lead:SUPERVISOR, 2026-11-27): there was no owner order. The line "mod.rs added to the footprint; land phase 3 now" was a prompt suggestion in the old pane, and commit 866f5a58b4's subject is wrong. `apps/fgos/src/wiring/doctor/mod.rs` stays in the footprint because it matches the recommended option; phase 3 does not land until the owner answers `q-v3akwmhesr` (it replaces `q-a5qeyr5g62` and adds `packages/config/contracts/fixtures/repo-differences.v1.json`).
 
 Hot files: `core/config-standard/runner.yaml` and `core/config-schema/runner.schema.yaml` (phase 1 only);
 `packages/distribution/contracts/doctor-registry.v1.json` (phase 3 only). Generated surfaces: none touched.
 
 ## Owner questions
 
+- `q-v3akwmhesr` — Widen the footprint by the four doctor-registry files and the config fixture that phase 1 left red
+  (`authoring_equivalence.rs:181`, `runner.supervisorScope` missing from standard-only)? Blocks phase 3's land.
 - `q-gg7if2fal2` — Cap memory per run supervisor's own systemd scope by default? (8G, none, or 4G). Non-blocking:
   phase 1 ships the key with an empty default; the answer changes one default value in
   `core/config-standard/runner.yaml` (phase 1, or a one-line follow-up if phase 1 has landed).

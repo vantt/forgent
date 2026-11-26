@@ -26,6 +26,11 @@ properties:
     minimum: 0
     maximum: 604800
     x-fgos-scope: both
+  reviewIntervalSec:
+    description: Seconds between successful independent read-only reviews. In seconds.
+    type: integer
+    minimum: 3600
+    x-fgos-scope: both
   overdueFactor:
     description: How many tick intervals may pass without a tick before the watcher counts as overdue. In ticks.
     type: integer
@@ -50,7 +55,7 @@ properties:
   defaultAction:
     description: The action for a raised row kind that has no entry in actions.
     type: string
-    enum: [wake-supervisor, notify, none]
+    enum: [wake-supervisor, start-review, notify, none]
     x-fgos-scope: both
   actions:
     description: The action per row kind.
@@ -58,7 +63,7 @@ properties:
     additionalProperties:
       description: The action for this row kind.
       type: string
-      enum: [wake-supervisor, notify, none]
+      enum: [wake-supervisor, start-review, notify, none]
     x-fgos-scope: both
   notifyTo:
     description: The mailbox recipient of notify rows; null counts a notify row in errors as notify-unavailable.

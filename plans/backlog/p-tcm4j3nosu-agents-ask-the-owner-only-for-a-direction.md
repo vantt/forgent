@@ -17,3 +17,11 @@ owner question. Settled in `plans/discussions/ds-jxoz3h2qgk-when-to-ask/DISCUSSI
 # Plan
 
 `plans/261127-0144-when-to-ask-owner-rule/plan.md`.
+
+# Done when
+
+Plan `plans/261127-0144-when-to-ask-owner-rule/plan.md` is `done`: its acceptance criteria hold.
+
+# Notes
+
+Source: discussion `ds-jxoz3h2qgk`.

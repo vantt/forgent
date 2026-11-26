@@ -70,7 +70,10 @@ struct TestEnvironment {
 
 impl RecordEnvironment for TestEnvironment {
     fn embedded_declarations(&self) -> Vec<EmbeddedDeclaration> {
-        vec![fgos_observe::record::store::HEALTH_DECLARATION]
+        vec![
+            fgos_observe::record::store::HEALTH_DECLARATION,
+            fgos_supervision::watcher::REVIEW_DECLARATION,
+        ]
     }
     fn payload_root(&self) -> Option<PathBuf> {
         None
@@ -250,7 +253,7 @@ fn group_of(row: &Value) -> Value {
 }
 
 #[test]
-fn every_definition_in_the_two_directories_has_one_fixture_pair_and_none_is_missing() {
+fn every_shipped_definition_has_a_fixture_pair_or_review_snapshot_proof_and_none_is_missing() {
     for (dir, names) in [
         (definitions_dir(), &RAISED[..]),
         (questions_dir(), &QUESTIONS[..]),
@@ -263,6 +266,9 @@ fn every_definition_in_the_two_directories_has_one_fixture_pair_and_none_is_miss
             .collect();
         found.sort();
         let mut want: Vec<&str> = names.to_vec();
+        if dir == definitions_dir() {
+            want.push("review-due");
+        }
         want.sort_unstable();
         assert_eq!(found, want, "{}", dir.display());
     }
@@ -275,7 +281,11 @@ fn every_definition_in_the_two_directories_has_one_fixture_pair_and_none_is_miss
 
 #[test]
 fn a_raised_definition_carries_its_row_template_and_a_pace_definition_carries_none() {
-    for name in RAISED.iter().chain(QUESTIONS.iter()) {
+    for name in RAISED
+        .iter()
+        .chain(QUESTIONS.iter())
+        .chain(["review-due"].iter())
+    {
         let text = std::fs::read_to_string(definition_file(name)).unwrap();
         let file: Value = serde_json::from_str(&text).unwrap();
         assert_eq!(file["row"]["kind"], *name);
@@ -451,6 +461,64 @@ fn the_failure_limits_come_from_config_and_a_count_at_the_limit_raises_nothing()
             format!("config-unset: {key}"),
             "{name}"
         );
+    }
+}
+
+// This projection has no historical fixture pair: its absence watermark and open-work inputs
+// are tested here through the real query, where the other definitions' fixtures cannot prove it.
+#[test]
+fn review_due_obeys_its_success_watermark_and_skips_only_a_quiet_closed_project() {
+    use fgos_supervision::watcher::review_state_record;
+    let now = "2026-11-18T12:00:00Z";
+    for (name, done, open, event, count) in [
+        ("absent", None, false, false, 1),
+        ("fresh", Some("2026-11-18T11:59:00Z"), true, true, 0),
+        (
+            "old-open-plan",
+            Some("2026-11-16T12:00:00Z"),
+            true,
+            false,
+            1,
+        ),
+        (
+            "old-open-question",
+            Some("2026-11-16T12:00:00Z"),
+            true,
+            false,
+            1,
+        ),
+        ("old-event", Some("2026-11-16T12:00:00Z"), false, true, 1),
+        ("old-quiet", Some("2026-11-16T12:00:00Z"), false, false, 0),
+        ("at-interval", Some("2026-11-17T12:00:00Z"), true, false, 1),
+    ] {
+        let record = review_state_record(done, open, event);
+        let root = project(
+            &format!("review-{name}"),
+            &[serde_json::to_string(&record).unwrap()],
+            true,
+        );
+        let env = environment(&[("watcher.reviewIntervalSec", 86400.0)]);
+        let got = answer(&root, "review-due", now, Some("2026-11-18T11:00:00Z"), &env);
+        assert_eq!(rows(&got).len(), count, "{name}: {got}");
+        if count > 0 {
+            assert_eq!(rows(&got)[0]["group"]["subject.id"], "periodic-review");
+            assert_eq!(row_ts(&rows(&got)[0]), stamp(millis(&record.ts)));
+        }
+        if name == "at-interval" {
+            let longer = answer(
+                &root,
+                "review-due",
+                now,
+                None,
+                &environment(&[("watcher.reviewIntervalSec", 90000.0)]),
+            );
+            assert!(rows(&longer).is_empty(), "the interval is config-owned");
+            let unset = answer(&root, "review-due", now, None, &environment(&[]));
+            assert_eq!(
+                unset["unmeasured"],
+                "config-unset: watcher.reviewIntervalSec"
+            );
+        }
     }
 }
 
