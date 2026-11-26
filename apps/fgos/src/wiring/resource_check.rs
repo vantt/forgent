@@ -731,13 +731,18 @@ fn load(request: &ResourceCheckRequest) -> Result<Loaded, Refused> {
     }
 }
 
+/// The shipped ruleset and its identity, shared by file checks and live admission.
+fn default_policy() -> (Value, Value) {
+    (
+        serde_json::from_str(DEFAULT_POLICY).expect("the shipped policy is valid JSON"),
+        json!({"source": DEFAULT_POLICY_SOURCE, "sha256": format!("{:x}", Sha256::digest(DEFAULT_POLICY.as_bytes()))}),
+    )
+}
+
 /// The ruleset and the identity the verdict echoes: the policy file when given, else the shipped default.
 fn load_policy(request: &ResourceCheckRequest) -> Result<(Value, Value), Refused> {
     match &request.policy {
-        None => Ok((
-            serde_json::from_str(DEFAULT_POLICY).expect("the shipped policy is valid JSON"),
-            json!({"source": DEFAULT_POLICY_SOURCE, "sha256": format!("{:x}", Sha256::digest(DEFAULT_POLICY.as_bytes()))}),
-        )),
+        None => Ok(default_policy()),
         Some(file) => {
             let (parent, leaf) = split_file(file, "--policy")?;
             let (bytes, revision) = read_beneath(&request.cwd.join(parent), &leaf, "policy file")?;
@@ -833,6 +838,7 @@ fn evaluate_units(units: &[Unit], ruleset: &Value, policy: &Value) -> Result<Val
 
 /// Admission answer for claims supplied by the keeper. `slot` is the collision evidence,
 /// qualified by space for equality claims (for example `resource:gpu#1`).
+#[allow(dead_code)] // Used by the phase-5 keeper's resource admission caller.
 #[derive(Debug, PartialEq, Eq)]
 pub enum ClaimAvailability {
     Free,
@@ -843,31 +849,34 @@ pub enum ClaimAvailability {
 /// nodes through the same parser, collision builder and referee used by `--units`.
 /// Empty claims here mean no requested slots; malformed or incomplete facts are errors,
 /// never `Free`. This only judges a snapshot: the caller owns admission serialization.
+#[allow(dead_code)] // Used by the phase-5 keeper's resource admission caller.
 pub fn check_claim_availability(
     running_claims: &[Value],
     candidate_claims: &[Value],
 ) -> Result<ClaimAvailability, String> {
-    let node = |id: &str, claims: &[Value]| {
-        json!({"id": id, "claims": claims, "readOnly": claims.is_empty(), "layer": 1})
-    };
+    let node = |id: &str, claims: &[Value]| json!({"id": id, "claims": claims, "readOnly": claims.is_empty(), "layer": 1});
     let evaluate = || -> Result<ClaimAvailability, Refused> {
         let units = units_of_file(&json!({"v": 1, "units": [
             node("running", running_claims), node("candidate", candidate_claims)
         ]}))?;
-        let ruleset = serde_json::from_str(DEFAULT_POLICY).expect("the shipped policy is valid JSON");
-        let policy = json!({"source": DEFAULT_POLICY_SOURCE,
-            "sha256": format!("{:x}", Sha256::digest(DEFAULT_POLICY.as_bytes()))});
+        let (ruleset, policy) = default_policy();
         let answer = evaluate_units(&units, &ruleset, &policy)?;
         for finding in answer["findings"].as_array().expect("findings are a list") {
             if finding["class"] == "blocking" && finding["code"] != "exclusion-in-one-layer" {
                 return Err(refuse(
                     finding["code"].as_str().expect("a finding has a code"),
-                    "live claims could not be evaluated completely",
+                    format!(
+                        "live claims could not be evaluated completely: units {} evidence {}",
+                        escape_text(&finding["nodes"].to_string()),
+                        escape_text(&finding["evidence"].to_string()),
+                    ),
                 ));
             }
         }
         match answer["collisions"][0]["shared"][0].as_str() {
-            Some(slot) => Ok(ClaimAvailability::Held { slot: slot.to_owned() }),
+            Some(slot) => Ok(ClaimAvailability::Held {
+                slot: slot.to_owned(),
+            }),
             None => Ok(ClaimAvailability::Free),
         }
     };
@@ -1407,9 +1416,14 @@ mod tests {
             let (data, exit) = run(&request).unwrap();
             assert_eq!(exit, if held { reject_exit() } else { 0 });
             assert_eq!(data["verdict"], if held { "reject" } else { "accept" });
-            assert_eq!(data["collisions"], if held {
-                json!([{"a": "a", "b": "b", "shared": ["resource:gpu#1"]}])
-            } else { json!([]) });
+            assert_eq!(
+                data["collisions"],
+                if held {
+                    json!([{"a": "a", "b": "b", "shared": ["resource:gpu#1"]}])
+                } else {
+                    json!([])
+                }
+            );
         }
     }
 
@@ -1418,19 +1432,41 @@ mod tests {
     fn live_claim_admission_uses_the_units_evaluation_and_never_accepts_incomplete_claims() {
         let claim = |slot: &str| json!({"space": "resource", "ref": slot});
         let running = [claim("gpu#1"), claim("gpu#2")];
-        assert_eq!(check_claim_availability(&running, &[claim("gpu#2")]).unwrap(),
-            ClaimAvailability::Held { slot: "resource:gpu#2".into() });
-        assert_eq!(check_claim_availability(&running, &[claim("gpu#3")]).unwrap(),
-            ClaimAvailability::Free);
-        assert_eq!(check_claim_availability(&[], &[claim("gpu#1")]).unwrap(),
-            ClaimAvailability::Free);
-        assert_eq!(check_claim_availability(&running, &[]).unwrap(), ClaimAvailability::Free);
-        assert!(check_claim_availability(&running, &[json!({"space": "resorce", "ref": "gpu#1"})])
-            .unwrap_err().contains("claim-space-unknown"));
-        assert!(check_claim_availability(&running, &[claim(&"x".repeat(1025))])
-            .unwrap_err().contains("claims-over-limit"));
-        assert!(check_claim_availability(&[json!({"space": "path", "ref": "../invalid"})], &[])
-            .unwrap_err().contains("footprint-entry-invalid"));
+        assert_eq!(
+            check_claim_availability(&running, &[claim("gpu#2")]).unwrap(),
+            ClaimAvailability::Held {
+                slot: "resource:gpu#2".into()
+            }
+        );
+        assert_eq!(
+            check_claim_availability(&running, &[claim("gpu#3")]).unwrap(),
+            ClaimAvailability::Free
+        );
+        assert_eq!(
+            check_claim_availability(&[], &[claim("gpu#1")]).unwrap(),
+            ClaimAvailability::Free
+        );
+        assert_eq!(
+            check_claim_availability(&running, &[]).unwrap(),
+            ClaimAvailability::Free
+        );
+        assert!(
+            check_claim_availability(&running, &[json!({"space": "resorce", "ref": "gpu#1"})])
+                .unwrap_err()
+                .contains("claim-space-unknown")
+        );
+        assert!(
+            check_claim_availability(&running, &[claim(&"x".repeat(1025))])
+                .unwrap_err()
+                .contains("claims-over-limit")
+        );
+        let why = check_claim_availability(&[json!({"space": "path", "ref": "../invalid"})], &[])
+            .unwrap_err();
+        assert!(why.contains("footprint-entry-invalid"), "{why}");
+        assert!(
+            why.contains("running") && why.contains("../invalid"),
+            "{why}"
+        );
     }
 
     #[test]
