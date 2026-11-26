@@ -23,7 +23,7 @@ Capability: `code:implement`. Depends on: none. Wave 1.
 `packages/config/rust/src/provider/unix_verbs.rs`, `packages/config/rust/src/repair.rs`,
 `packages/config/rust/src/relocate.rs`, `packages/config/rust/tests/**`,
 `packages/config/contracts/failure-codes.v1.json`, `packages/config/contracts/fixtures/write.v1.json`,
-`apps/fgos/src/wiring/init.rs`, `docs/platform/config/spec.md`, `CHANGELOG.md`.
+`apps/fgos/src/wiring/init.rs`, `docs/platform/config/spec.md`.
 
 ## Steps
 
@@ -76,7 +76,8 @@ Capability: `code:implement`. Depends on: none. Wave 1.
     (a write never creates a project file the index tracks but the working copy lacks; refused with
     `config-project-file-stripped`; nothing redirects to the main checkout). Add the row to the section 14 table.
     Add a dated line to section 18's decision history citing the discussion (D1 to D3).
-12. `CHANGELOG.md` `[Unreleased]`: one line, "Fixed: `fgos config set`, `patch` and `init` no longer create a
+12. Do not edit `CHANGELOG.md` (held by a running plan). The line it should get, which plan
+    `261126-0856-launcher-runs-owning-release-in-linked-worktree` adds, is: "Fixed: `fgos config set`, `patch` and `init` no longer create a
     fresh `.fgos/config.yaml` in a worktree whose tracked config was stripped; they refuse with
     `config-project-file-stripped` and name the main checkout."
 

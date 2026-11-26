@@ -95,6 +95,8 @@ phase 1 `code:implement`, phase 2 `code:test`.
   so, the launcher resolves only an absolute `gitdir` and a common dir that ends in `.git`, and then applies
   RUL17's store-only rule. So the worst case runs a release from this machine's verified store, never a project
   file.
-- **`CHANGELOG.md` is shared** with plan `261126-0853-config-set-refuses-stripped-project-file`. If that plan is
-  still active when this one goes `ready`, add it to `blockedBy` (the cross-plan footprint check will say so).
+- **`CHANGELOG.md` and the distribution spec are also in the footprint of the running plan
+  `261125-1631-agent-context-engine`.** Before flipping this plan to `ready`, rerun
+  `node scripts/plan-contract-check.mjs --plan <this dir>`. If that plan is still active, add it to `blockedBy` or
+  narrow the footprint.
 - **Rollback:** revert phase 1's commit; the launcher returns to today's refusal.

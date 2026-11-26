@@ -31,7 +31,8 @@ Capability: `code:implement`. Depends on: none. Wave 1. Status draft until `q-4x
 5. Tests in the module's test block: a linked worktree case for the chosen branch, and the odd-shape refusals.
    Titles describe the behaviour.
 6. RUL17 in the distribution spec: one dated sentence on the linked-worktree rule. `CHANGELOG.md`
-   `[Unreleased]`: one line.
+   `[Unreleased]`: this plan's line, plus the config refusal line from plan
+   `261126-0853-config-set-refuses-stripped-project-file` phase 1, step 12.
 
 ## Verify
 
