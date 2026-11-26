@@ -1,4 +1,4 @@
-//! The four event payloads of `question-event-payloads.v1.json`. The store writes these and the fold reads
+//! The event payloads of `question-event-payloads.v1.json`. The store writes these and the fold reads
 //! them; nothing else does.
 
 use serde::{Deserialize, Serialize};
@@ -9,6 +9,47 @@ pub const ASKED: &str = "questions.asked";
 pub const ANSWERED: &str = "questions.answered";
 pub const ACKED: &str = "questions.acked";
 pub const CANCELLED: &str = "questions.cancelled";
+pub const DELIVERY_PENDING: &str = "questions.delivery-pending";
+
+/// A logical recipient, never a person's display name. Absence means the owner.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "lowercase", deny_unknown_fields)]
+pub enum Recipient {
+    Role {
+        #[serde(rename = "ref")]
+        reference: String,
+    },
+    Party {
+        #[serde(rename = "ref")]
+        reference: String,
+    },
+}
+
+impl Recipient {
+    pub fn reference(&self) -> &str {
+        match self {
+            Self::Role { reference } | Self::Party { reference } => reference,
+        }
+    }
+}
+
+/// Content supplied by an external channel, not instructions or authority.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AnswerPayload {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub option: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub text: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DeliveryPending {
+    pub id: String,
+    pub reason: String,
+    pub at: String,
+}
 
 /// The Observe kinds and attrs this crate's record source projects (declared to Observe by the host).
 pub const OBSERVE_KINDS: &str = include_str!("../observe-kinds.json");
@@ -74,6 +115,8 @@ pub struct Parts {
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct Asked {
     pub id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub to: Option<Recipient>,
     pub asked_at: String,
     pub asker: Asker,
     pub stage: String,
@@ -99,6 +142,12 @@ pub struct Answered {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub via: Option<String>,
     pub answered_at: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub answerer: Option<Recipient>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub channel: Option<String>,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub untrusted: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

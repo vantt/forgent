@@ -23,6 +23,13 @@
       "sealOnWrite": true
     },
     {
+      "type": "questions.delivery-pending",
+      "domain": "questions",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": true
+    },
+    {
       "type": "questions.cancelled",
       "domain": "questions",
       "schemaVersion": 1,
