@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Agent Start Context: one composer for the text every fgOS-started agent receives"
-status: running
+status: done
 lead: session:fg-server-claude-2026-11-27
 priority: P1
 blockedBy:
@@ -189,11 +189,39 @@ Prior art, read in the discussion and checked again on `2c27d499a` (refresh repo
 | 9 | [AGENTS.md cut to the standing sheet (L8)](phase-09-agents-md-cut.md) | 5, 6 | AGENTS.md, core/instructions/**, components/*/instructions/**, domains/*/instructions/**, .fgos/instructions/effective/**, test/docs/** | 5 | done |
 | 8 | [A head's domain fact comes from its bound item](phase-08-head-domain-fact.md) | 7 | src/session-host/head-plan.mjs, test/session-host/head-plan.test.mjs, src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, packages/agent-start-context/goldens/** | 6 | done |
 | 10 | [SessionStart hook for hand-opened sessions](phase-10-hand-opened-hook.md) | 7 | apps/fgos/src/wiring/session_rotation_hook.rs, apps/fgos/src/wiring/start_context/**, packages/host-runtime/contracts/command-manifest.json, packages/distribution/contracts/agent-hooks.v1.json, packages/distribution/rust/src/agent_hooks.rs, packages/distribution/rust/tests/goldens/agent-hooks-vectors.json, test/setup/agent-hooks.test.mjs, core/config-standard/startContext.yaml, core/config-schema/startContext.schema.yaml | 6 | done |
-| 11 | [Integration gate, token table, changelog](phase-11-integration.md) | 2, 3, 4, 5, 6, 7, 8, 9, 10 | CHANGELOG.md, plans/261122-1946-agent-start-context/reports/** | 7 | draft |
+| 11 | [Integration gate, token table, changelog](phase-11-integration.md) | 2, 3, 4, 5, 6, 7, 8, 9, 10 | CHANGELOG.md, plans/261122-1946-agent-start-context/reports/** | 7 | done |
 
 The old phase 1 (delete the dead Node dispatch mirror) is removed: plan `261122-2108-delete-dead-node-execution-closure`
 does it (criterion 2). Phase ids keep their numbers so links from the discussion and reports stay valid. All phases
 are `draft`: none is admitted until the owner's deep discussion of this plan (team-lead, 2026-11-25).
+
+### Done (fg-server, 2026-11-27)
+
+Every phase is `done`. The deviations are in each phase file's Result section:
+- phase 5: no separate worker golden files; `launch-session` keeps its `opening` field; the claim instructions are
+  still rendered twice in code (backlog `p-menbgsmgoc`);
+- phase 7: the handoff budget is 40,000 bytes;
+- phase 9: option B, which the lead decided and recorded; the owner question was withdrawn;
+- phase 10: Claude only (backlog `p-6tmbvyt2zx`);
+- phase 11: heads were measured through door calls, not live sessions.
+
+Two defects were found and fixed before any release carried them:
+- A start repeated the standing rules AGENTS.md already carries.
+- The phase-5 `rules.json` lacked the head ritual units.
+
+The phase 11 gate (npm test and `cargo test --workspace`, on main plus phases 9 and 11, run with debuginfo off to
+fit the disk):
+- One failure was this plan's own: the hand-opened hook test still expected nothing selected. It now proves the
+  scoped rules arrive.
+- The rest were already on main before these phases, and none touches start context:
+  - herdr pane timeouts (`test/run-supervisor/terminal-cutover.test.mjs`, `terminal-crash-matrix.test.mjs`);
+  - `fgctl` upgrade and init (`test/rust-host/fgctl-upgrade.test.mjs`, `fgctl-init-download-sources.test.mjs`);
+  - bwrap credential provisioning (`test/runner/provider-per-cli-credential-sources.test.mjs`);
+  - the workflow guide schema;
+  - a `case-close` prune race;
+  - two `fgos-run-supervisor` head-request tests.
+
+`reports/start-token-table.md` has the before and after of each start.
 
 ### Progress (fg-server, 2026-11-27)
 
