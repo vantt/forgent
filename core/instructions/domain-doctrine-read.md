@@ -9,6 +9,10 @@ title: Domain Doctrine Read
 description: Read domains/<domain>/AGENTS.md for the domain in play before working in it
 lifecycle: live
 valid_from: 2026-11-26
+when:
+  sessionType:
+    - head
+    - hand-opened
 ---
 
 # Domain Doctrine Read

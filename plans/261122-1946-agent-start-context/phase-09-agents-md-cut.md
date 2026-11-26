@@ -80,3 +80,36 @@ offers three ways on:
 
 Phases 8 and 10 go on meanwhile.
 
+## Result (2026-11-27, fg-server): option B of `q-uitfal4vok`
+
+The lead decided this, because the analysis picked one option clearly (product priority 2), and withdrew the
+question; the owner can still ask for option A. Option B keeps every rule a worker needs standing, so no session loses
+a rule. It changes no contract (ASC-D1 holds), and reverting it is one `when:` line per unit.
+
+L8 verdicts (must the rule hold with no workflow running?):
+- **Standing, no `when:`:**
+  - mission boundary, product priority, the laws index, scratch artifacts, destructive cleanup, id minting, the
+    decision-question rule;
+  - untrusted input, writes to main and convention paths;
+  - the rules a worker needs while it changes code: before touching code, the definition of done, design
+    principles, the install/setup/doctor gate, the legacy-Node boundary, the impact-analysis gate, RUL11 and RUL104.
+- **`when: {sessionType: [head, hand-opened]}`:** dispatch, capability routing, the run door, driver discipline,
+  domain doctrine read, the gateway. These are the rules of a session that dispatches or orchestrates; a worker only
+  edits files.
+
+The phase file's list differs on purpose. Its step 3 also scoped the worker rules (before touching code, the
+definition of done, the install gate, the legacy-Node boundary, the impact gate, RUL11, RUL104). That waits for
+workers to compose rules, which is option A.
+
+Numbers for phase 11:
+- AGENTS.md went from 61,705 to 48,855 bytes (-12,850 bytes), all of it fgOS-owned text.
+- The file is still above Codex's 32 KiB because of the external blocks (GitNexus, AgentKit, the `.claude/rules`
+  copies), which this plan does not touch.
+- A planner head start on this tree matches the six scoped units plus the ritual: 14,005 bytes, record
+  `rnd:cf7d792cf198f2b91438845479432696`.
+- A Codex or agy session opened by hand does not get the six until backlog row `p-6tmbvyt2zx`. Their PreToolUse
+  rows still enforce the dispatch decide door.
+
+The run-door anchor test now asserts the rule in a composed head start instead of in AGENTS.md
+(`test/docs/run-doors-doctrine.test.mjs`).
+

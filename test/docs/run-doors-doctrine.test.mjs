@@ -4,8 +4,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { composeStart, startText } from '../../src/util/start-context.mjs';
 
-// The always-loaded layer and the rendered skills teach the two doors of one
+// A head's start text and the rendered skills teach the two doors of one
 // runUnit: `fgos run "<prompt>"` for one task, `fgos workflow start --units`
 // for planned work. A one-off Unit may carry a soft `prefer`; presets and
 // plans still never pin a provider.
@@ -21,10 +22,15 @@ function section(text, heading) {
   return next < 0 ? rest : rest.slice(0, next);
 }
 
-test('the run-door-contract unit teaches both doors of one runUnit as the preferred path, rendered into AGENTS.md', () => {
+test('the run-door-contract unit teaches both doors of one runUnit as the preferred path, composed into a head start', () => {
   const unit = read('core/instructions/run-door-contract.md');
-  const agents = read('AGENTS.md');
-  for (const text of [unit, agents]) {
+  const head = composeStart(repoRoot, {
+    facts: { sessionType: 'head', persona: 'lead', project: 'forgent', agentCli: 'claude', agentLifecycle: 'start' },
+    payloads: [{ kind: 'session', name: 'anchor' }],
+    delivery: 'opening',
+  });
+  assert.ok(head.matched.includes('run-door-contract'), 'a head start must carry the run door rule');
+  for (const text of [unit, startText(head)]) {
     assert.ok(text.includes('fgos run "<prompt>"'), 'one-liner door missing');
     assert.ok(text.includes('fgos workflow start <preset>|--units <file>'), 'planned-work door missing');
     assert.match(text, /runner commits/i);

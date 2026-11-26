@@ -12,6 +12,10 @@ valid_from: 2026-11-26
 related:
   - "[[run-door-contract]]"
   - "[[capability-routing-rules]]"
+when:
+  sessionType:
+    - head
+    - hand-opened
 ---
 
 # Dispatch Decide Door
