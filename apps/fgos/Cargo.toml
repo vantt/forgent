@@ -40,6 +40,8 @@ fgos-resource-referee = { path = "../../packages/resource-referee/rust" }
 fgos-documentation = { path = "../../packages/documentation/rust" }
 # The YAML door: the skill guard reads a skill file's frontmatter version through it.
 fgos-yaml-doc = { path = "../../packages/yaml-doc/rust" }
+# `fgos internal context-engine`: the rule units checked and compiled (the store links pkm, already linked by the doc door).
+fgos-agent-context-engine = { path = "../../packages/agent-context-engine/rust" }
 tokio = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order", "arbitrary_precision"] }

@@ -233,7 +233,7 @@ fn open(repo: &Repo) -> RuleIndex {
 }
 
 #[test]
-fn the_index_is_a_view_outside_the_tree_and_never_writes_into_the_repository() {
+fn the_index_is_a_view_and_pkm_writes_no_note_into_the_repository() {
     let repo = Repo::new();
     repo.core("core-rule", "");
     repo.domain("coding", "domain-rule", "");

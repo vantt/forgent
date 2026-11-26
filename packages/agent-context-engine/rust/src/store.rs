@@ -1,6 +1,6 @@
 //! The pkm adapter: reads the three rule roots as unit files, indexes them with pkm (the index is a view, rebuilt from
 //! the files whenever they change), asks pkm which rules are in force, and folds pkm's own graph findings into ACE
-//! refusals. pkm never writes into the repository: the profile says `writes: none` and the index lives outside it.
+//! refusals. pkm writes no note into the repository (the profile declares no proposals directory); the only file it writes is the index view at `graph_db`.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
@@ -23,7 +23,7 @@ const BUILD_WAIT: Duration = Duration::from_secs(120);
 /// A limit large enough that pkm never cuts a list of rules.
 const NO_LIMIT: i64 = 1_000_000;
 
-/// Every path the store reads or writes. Only `repo_root` is inside the repository, and pkm never writes there.
+/// Every path the store reads or writes. `repo_root` is the vault; `graph_db` may sit inside it (the host keeps it under `.fgos`), and pkm writes nothing else there.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StorePaths {
     pub repo_root: PathBuf,

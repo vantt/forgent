@@ -524,6 +524,7 @@ dependencies = [
 name = "fgos"
 version = "0.2.0"
 dependencies = [
+ "fgos-agent-context-engine",
  "fgos-canonical-json",
  "fgos-checkout",
  "fgos-component-authority",
