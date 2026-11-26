@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "When to ask the owner: one shared rule (intent, deviation, reverse path) replaces the file-and-budget approved frame"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 footprint:
