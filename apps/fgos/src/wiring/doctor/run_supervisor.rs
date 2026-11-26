@@ -283,7 +283,7 @@ fn systemd_user_scope(domain: &FailureDomain, platform: &str) -> Check {
             pass("a systemd user manager is reachable and systemd-run is on PATH: each run supervisor starts in its own scope")
         }
         FailureDomain::Inherited { reason } => pass(warn(&format!(
-            "no systemd user scope available ({reason}: no reachable user manager or no systemd-run on PATH), so run supervisors share their starter's cgroup and one memory kill can take several down"
+            "no systemd user scope available ({reason}), so run supervisors share their starter's cgroup and one memory kill can take several down"
         ))),
     }
 }
