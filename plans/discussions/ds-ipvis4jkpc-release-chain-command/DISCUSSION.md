@@ -70,6 +70,7 @@ The owner gave a release sequence of plans (backlog p-755psfxpmh): two plans in 
 - 2026-11-26 10:00 — Owner directive in chat: resolve conflicts between plans through `resource-referee`, fully and without limits → D3. Scouted `docs/platform/resource-referee/spec.md`, `packages/supervision/rust/src/portfolio.rs:243-269`, `apps/fgos/src/wiring/resource_check.rs`: admission bypasses the referee today. Added §3 rows 11-13; §6 sketch updated.
 - 2026-11-26 10:06 — Owner: the pre-planning rule must remind planners to use the referee in their planning. Scouted `core/skills/_shared/plan-contract.md` l.1-8, 95-99, 131-134 and `scripts/plan-contract-check.mjs` l.57-69, 157-167: within-plan use is already asked for; cross-plan use and the check itself bypass the referee. Added §3 row 14 under D3.
 - 2026-11-26 10:20 — Owner asked what "a new resource-check flag or the supervisor calls it itself" meant. Shaper explained both callers need the same judgement and proposed one shared function used by both; owner: "đồng ý" → D4.
+- 2026-11-26 10:30 — Owner asked whether pkm should be used here, then answered it: no. The referee already sits on the `graph` package (cycles, layers, exclusion pairs; `docs/platform/graph/spec.md`) and `write-scope`; pkm is the documentation store behind document identity and `fgos authority locate` (`docs/platform/system-overview/spec.md` l.151) and judges no plan conflicts. Non-goal: pkm in plan-conflict judgement.
 
 ## 6. Thiết kế đã chốt {#design}
 
