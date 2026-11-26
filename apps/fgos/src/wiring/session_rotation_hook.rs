@@ -1350,9 +1350,15 @@ mod tests {
     }
 
     #[test]
-    fn a_session_opened_by_hand_is_composed_without_refusal_and_prints_nothing_when_no_rule_is_scoped_to_it(
+    fn a_session_opened_by_hand_gets_the_rules_scoped_to_hand_opened_sessions_as_its_one_additional_context(
     ) {
         let fgos_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../.fgos");
-        assert_eq!(hand_opened_start(&fgos_dir), Ok(None));
+        let out: Value =
+            serde_json::from_str(&hand_opened_start(&fgos_dir).unwrap().unwrap()).unwrap();
+        assert_eq!(out["hookSpecificOutput"]["hookEventName"], "SessionStart");
+        let context = out["hookSpecificOutput"]["additionalContext"]
+            .as_str()
+            .unwrap();
+        assert!(context.contains("# Dispatch Decide Door"), "{context}");
     }
 }

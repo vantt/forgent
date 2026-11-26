@@ -355,39 +355,6 @@ sections. A plan's facts phase answers "what existed before, and which change re
 and was that intended?" next to its questions about current code. Reuse or extend what is
 found; say in the plan what was reused and what was missing.
 
-#### Capability Routing Rules
-
-- id: `capability-routing-rules`
-- source: `core/instructions/capability-routing-rules.md`
-
-# Capability Routing Rules
-
-## Default inline and the five dispatch reasons
-
-Executing inline within the current session is the platform default: when no executor is configured for a capability, `decide` answers `unavailable` and the unit executes inline in the live session.
-
-Five valid reasons justify configuring an executor for a capability in project configuration (or passing an ad-hoc refinement):
-
-1. **Cheaper model:** A lightweight tier is sufficient for a well-bounded, routine task.
-2. **Stronger model:** The unit's required rigor exceeds the current session's model capability (tied to `rigor`, never to `size`).
-3. **Different provider:** Provider diversity, credential isolation, or quota management mandates another engine (e.g. Gemini, OpenAI, Claude).
-4. **Confinement & isolation:** Hard filesystem sandboxing, read-only guarantees, or clean worktree isolation is required.
-5. **Parallel execution:** Running independent units concurrently to shorten wall-clock time (Ship Faster, priority #1 in `AGENTS.md`).
-
-## Never pin infrastructure
-
-Plans, patterns, driver prompts and non-ad-hoc Units never pin an executor, provider, model, tier, invocation or override. They declare canonical capability names only; which executor serves a capability is a live-config, execution-time concern that `bind()` resolves through `decide`. A plan that pins an executor has leaked an execution-time decision into a planning-time document.
-
-The one exception is an ad-hoc Unit (the one-liner's `--provider`, `prefer` in a `--units` file): it may carry a soft preference that `bind()` tries first and fails over from, never a pin, and only for one of the five reasons above. Otherwise leave it out and `bind()` takes the capability's pool. Only a human `--override` pins.
-
-## A capability is a routing signal
-
-A capability is a stable behavior promise or purpose — never a task instance, a Work item, a lifecycle stage, a skill name, or an executor name. Capability annotation is a planning-time signal, never a Work-schema field, and never itself a reason to create, split, or transition a Work item.
-
-## Research is a workflow, not a capability
-
-`fgos-researching` is a skill/workflow — it turns an unresolved question into a grounded finding. It is never itself a capability name, never a valid `decide --for` argument, and no catalog entry called `research` (or similar) should ever be registered. When a research question genuinely needs a dispatched capability (for example a code-graph blast-radius lookup), it asks `decide` for the concrete capability that answers it — `impact-analysis` today; browser/web lookups and repository search stay primitive tool calls (`WebSearch`/`WebFetch`/`Grep`) made inline inside the research unit, which per the activation doctrine are never themselves independently executable units and never trigger a `decide` call on their own.
-
 #### Convention Paths
 
 - id: `convention-paths`
@@ -445,87 +412,6 @@ check exists it is named, otherwise the reviewer checks it.
    owns, and moving or merging proofs are not weakening. A change that retires a
    test names the test that now owns the behaviour, or says the behaviour was
    removed. Reports never count "all N assertion lines kept" as success.
-
-#### Dispatch Decide Door
-
-- id: `dispatch-decide-door`
-- source: `core/instructions/dispatch-decide-door.md`
-
-# Dispatch Decide Door
-
-For routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`).
-
-**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it delegates to `bind()` and refuses the call when the answer comes back as anything other than `in-process`.
-
-For your own Agent/Task call, the hook is that decide; an explicit `decide --needs-soul` beforehand is allowed, never required: it runs `decide --for <subagent type> --needs-soul --has-live-task-access` for every call, and an unregistered name answers `in-process` under `--needs-soul`. A fan-out of Task calls therefore needs no further decide round trip and no purpose check of its own.
-
-Decide once per dispatch, immediately before execution, never during planning. A batch entry that re-confirms the mechanism inside the same dispatch is that dispatch's own bind check, not a second decide.
-
-Four ways to call `decide`, for four different situations:
-
-- `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).
-- `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.
-- `decide --work <id> [--stage <stage>]` — you have a real work item and want it dispatched.
-- `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name.
-
-Add `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, never guessed.
-
-Three possible `mechanism` results, each needing a different response:
-
-- **`"unavailable"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.
-- **`"in-process"`** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.
-- **`"out-of-process"`** — run `fgos run "<prompt>" --provider <executorId> --capability <purpose> [--writes <paths> --worktree <linked-worktree>]` (or `fgos run --unit <file>`), passing the same capability `decide` was asked for (the run door's defaults: `run-door-contract`). Here `--provider` names the executor `decide` answered, not a pin of your own (`capability-routing-rules`). `--provider` takes agent executors only: when the decided executor is a `kind: "tool"` executor, `fgos run` refuses it, so call that tool directly instead. Never run the resolved command yourself through Bash: `fgos run` binds, runs and settles the Unit and records its provenance under `.fgos/assignments/<unitRunId>/`, so there is nothing to log by hand. With `--json` read the result at `data.results[-1].runResult.agentClaim.summary` and `data.results[-1].commit`.
-
-Every result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is configured for that name or job, and the answer came from the default.
-
-A skill that dispatches should not re-derive any of this: it calls the doors above and in `run-door-contract`. `../_shared/executor-dispatch-fallback.md` (canonical source `core/skills/_shared/executor-dispatch-fallback.md`) is named only for its pattern. `.agents/skills/` and `plugins/fgOS/skills/` are generated render surfaces carrying source headers, rebuilt with `npm run build:skills`; never edit them by hand. For fgOS thin wrappers, `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own.
-
-#### Domain Doctrine Read
-
-- id: `domain-doctrine-read`
-- source: `core/instructions/domain-doctrine-read.md`
-
-# Domain Doctrine Read
-
-Once the domain resolves, read `domains/<domain>/AGENTS.md` (e.g. `domains/coding/AGENTS.md` when domain is `coding`) to load domain-specific standing doctrine before the first round, and before handing off to driving or loading the resolved stage skill; it states what the domain treats as settled, its constraints and its exits. An unknown domain is settled by `fgos-clarifying` first (`core/skills/fgos-clarifying/SKILL.md`).
-
-#### Driver Discipline
-
-- id: `driver-discipline`
-- source: `core/instructions/driver-discipline.md`
-
-# Driver Discipline
-
-## A claim is never evidence
-
-Before accepting any worker contribution or finding, independently inspect the declared output artifact(s):
-- The driver must directly verify the existence, format, and substantive correctness of the produced artifact.
-- Never rely on worker self-narration, conversational claims, or ungrounded status summaries.
-- **Caveat Rule:** A result carrying a caveat (such as non-attributable execution or a recheck-required flag) must **never** be treated as valid acceptance or sign-off evidence. Caveats block session completion and require an uncaveated re-execution.
-
-## Every finding gets a disposition
-
-When an inspection or advisory operation reports findings, the driver must record an explicit disposition for each finding:
-- `accepted`: The finding is valid and requires corrective action or revision.
-- `rejected`: The finding is demonstrated to be invalid or inapplicable, backed by recorded rationale.
-- `deferred`: The finding is valid but explicitly deferred out of current scope, permitted only when allowed by facade disposition criteria.
-
-These three are the generic set. A role-specific skill may define a finer set that applies inside that skill (the architecture panel's accepted, mitigated, answered, invalidated-by-evidence, deferred, unresolved); no mapping between the sets is invented.
-
-Every accepted finding requires an independent recheck operation to confirm remediation. A finding is never discharged by driver disposition alone.
-
-## A refusal is an answer
-
-A refusal is an answer, not a question for the owner. Read its code and condition, re-observe, and change the proposal (another activity, a narrower write scope, wait for the live reservation) or stop. Do not retry the same proposal. An error from a call (a refusal before the run, a failed bind, or a timeout) is read the same way, never retried blind.
-
-#### Gateway Start Door
-
-- id: `gateway-start-door`
-- source: `core/instructions/gateway-start-door.md`
-
-# Starting the fgos gateway — one door, never a raw process
-
-**If a task needs the fgos gateway (REST API + web dashboard, binary `fgos-gateway` built from `apps/fgos-gateway`) running, run `fgos gateway start` — never a hand-rolled `cargo run`/`nohup`/`tmux`/systemd invocation.** This is the one place that builds the release binary and spawns it detached, so the process outlives the CLI call. `fgos gateway status` reports real liveness plus an actual `/v1/contract` reachability check; `fgos gateway stop` sends SIGTERM and clears the registry. The gateway's own MCP surface (`search`/`execute`, `apps/fgos-gateway/src/mcp.rs`) is mounted on this SAME process — it cannot bootstrap itself, so starting the gateway is always a `fgos` CLI call, never an MCP tool call.
 
 #### Id Minting
 
@@ -619,25 +505,6 @@ cài đặt/setup/doctor story. Before any change is done, check:
   code, same bar as a new product area (definition-of-done, question 2).
 - Does this change something a user of fgOS would see? If yes, add a line
   to `## [Unreleased]` in `CHANGELOG.md`.
-
-#### Run Door Contract
-
-- id: `run-door-contract`
-- source: `core/instructions/run-door-contract.md`
-
-# Run Door Contract
-
-`fgos run` is the primary door for executing new work in the execution core.
-
-**Two doors, one runUnit — the preferred path for new work.** One task: `fgos run "<prompt>" [--provider <id>] [--writes <paths> --worktree <path>]` builds a Unit from the prompt (read-only without `--writes`; `--writes` needs a linked worktree; `--provider` is a soft preference, not a pin). Planned work: `fgos workflow start <preset>|--units <file>`, one step per Unit. Both bind through `bind()`; the runner commits only the Unit's declared `writes` after a passing round, and the worker never runs `git add`/`git commit`. These two doors are the only ones that execute work; `fgos dispatch` keeps only the lower-level reads (`decide`, `inspect`, `reconcile`, `probe-account`).
-
-Without `--writes` the Unit runs sandboxed; `--writes` is refused from the main checkout before anything runs. Why and when to name `--provider`: `capability-routing-rules`. `--capability` defaults to `execute`. Work already written as a Unit file runs as `fgos run --unit <file>`.
-
-The worker edits files and stops, never running `git add`/`git commit`. After a passing round the runner commits only paths inside the Unit's `writes` (subject from the first line of the worker's `summary`); a path the worker needs outside that scope goes in `needsWrites`, not on disk.
-
-herdr is the default transport when present: the worker runs in a watched pane, so a person can follow it live; otherwise the call blocks until the Unit settles. Run a long call backgrounded (`run_in_background: true`) and wait for the harness's own completion notification — do NOT use `ScheduleWakeup` or polling.
-
-That wait rule is for a `fgos run` call, which blocks until the Unit settles. `fgos workflow start` returns at once with the `workflowRunId` and a `detached` block (`pid`, `logPath`, `statusCommand`) while the run continues in a detached process: its output is never the result, so poll `fgos workflow status <workflowRunId>` until the run is `completed`, `failed` or parked at a gate. `answer` and `resume` return the same way; pass `--foreground` only when the caller must wait in place.
 
 <!-- fgos:instruction-projection:end -->
 

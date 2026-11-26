@@ -9,6 +9,10 @@ title: Gateway Start Door
 description: Start the fgos gateway only through fgos gateway start, never a hand-rolled process
 lifecycle: live
 valid_from: 2026-11-26
+when:
+  sessionType:
+    - head
+    - hand-opened
 ---
 
 # Starting the fgos gateway — one door, never a raw process

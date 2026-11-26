@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "0bf87b27021ecc8eaaa18dd07682f684b8f2399e5204479a979c36f9285decc0",
+  "payloadDigest": "0379832fb1d3e729cb599b3d9845f2613bce832c396dee595120b4444233af8e",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -173,7 +173,7 @@
     "apps/fgos/src/wiring/run.rs": "120b3bb91acae41eb70489cac447336f36e3faa13e29cfb49d222b291e11ba0a",
     "apps/fgos/src/wiring/run_dirs.rs": "41e99631b6d8392dea048f0fc3d9ec53990eb88b710dff1cf3230d5debe817ce",
     "apps/fgos/src/wiring/seat_binding.rs": "15312c9c1d9fea319147a886829a627b73973d2b854a350b68d9b690b4f65158",
-    "apps/fgos/src/wiring/session_rotation_hook.rs": "afb6e429500a224e5d423ded31e8ae5f61f3df6410d487579126f8c510ff750c",
+    "apps/fgos/src/wiring/session_rotation_hook.rs": "0df4229c1c479339e804167c1eab93915034ff52af6bb05723aff2d347c332d9",
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
     "apps/fgos/src/wiring/session_write_publish.rs": "2b88c9e2fa03bcdc92d6a90a3415be2d7fc1bc8abfe4ad742d3230d915ef87de",
     "apps/fgos/src/wiring/start_context.rs": "7a24a7f0b0ce664ed77cb34d75ec5bb2625d31067f09ba249fecdefafc5feaf8",
