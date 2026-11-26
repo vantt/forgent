@@ -6,7 +6,7 @@
 //! rotation successor's handoff text comes after them, from the registered handoff contributor.
 //! The layout slots are rule ids: `head-start-ritual` and `head-first-step-<persona>`.
 
-use crate::compose::{block, matches, Candidate};
+use crate::compose::{block, selects, Candidate};
 use crate::persona::{persona_section, PersonaLookup};
 use crate::ports::Ports;
 use crate::request::{Payload, StartRequest};
@@ -47,7 +47,7 @@ pub(crate) fn opening(request: &StartRequest, ports: &Ports<'_>) -> (Vec<Candida
         .rules
         .rules()
         .iter()
-        .filter(|r| matches(&r.when, &request.facts))
+        .filter(|r| selects(r, request))
         .collect();
     let first_step = rules
         .iter()

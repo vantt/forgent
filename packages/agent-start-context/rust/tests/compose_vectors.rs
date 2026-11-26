@@ -166,13 +166,14 @@ fn every_golden_vector_gets_its_expected_context_or_refusal() {
     assert_eq!(ran, 9, "every vector ran");
 }
 
+/// A rule scoped to worker starts, so the worker start below places it.
 fn rule(id: &str, kind: &str, body: &str) -> Rule {
     Rule {
         id: id.into(),
         owner: "core".into(),
         kind: kind.into(),
         body: body.into(),
-        when: BTreeMap::new(),
+        when: BTreeMap::from([("sessionType".to_owned(), vec!["worker".to_owned()])]),
     }
 }
 
@@ -356,5 +357,43 @@ fn every_contributor_row_the_contract_registers_is_read_in_registration_order() 
     assert_eq!(
         read, ids,
         "a row that does not read is left out of every start"
+    );
+}
+
+#[test]
+fn a_standing_rule_with_no_when_is_placed_only_by_the_setup_projection_never_again_in_a_start() {
+    let standing = Rule {
+        when: BTreeMap::new(),
+        ..rule("standing", "law", "STANDING")
+    };
+    let rules = Rules {
+        digest: "d".repeat(64),
+        rules: vec![standing, rule("scoped", "procedure", "SCOPED")],
+    };
+    let live = Live::new(&live());
+    let facts = AceFacts::new(&live);
+    let records = Records::default();
+    let ports = Ports {
+        rules: &rules,
+        facts: &facts,
+        record: &records,
+        personas: None,
+        contributors: Vec::new(),
+        budget_bytes: None,
+    };
+    let worker = compose(&head_request(), &ports).unwrap();
+    assert_eq!(
+        worker.matched,
+        ["scoped"],
+        "a worker start repeats no AGENTS.md rule"
+    );
+    let setup = StartRequest::from_json(&serde_json::json!({
+        "facts": {"project": "forgent"}, "payloads": [], "delivery": "agent-file"
+    }))
+    .unwrap();
+    assert_eq!(
+        compose(&setup, &ports).unwrap().matched,
+        ["standing"],
+        "the setup projection writes the standing rule"
     );
 }

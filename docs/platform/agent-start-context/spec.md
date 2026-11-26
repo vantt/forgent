@@ -88,6 +88,10 @@ text is ASC.
 
 `start-request.v1.json` states, per start kind, which keys a caller must supply (`requiredFacts`).
 
+A rule with no `when:` is standing: it is in AGENTS.md, which every agent CLI loads. Only the setup projection,
+which writes AGENTS.md, places it; every other start places only the rules whose `when:` its facts match, so a start
+never repeats AGENTS.md (`selects` in `rust/src/compose.rs`).
+
 ## 4. Ports
 
 Each port has one adapter today, wired by the host. The crate itself does no I/O.

@@ -88,6 +88,14 @@ pub(crate) fn matches(
         .all(|(key, allowed)| facts.get(key).is_some_and(|value| allowed.contains(value)))
 }
 
+/// Whether a start places this rule. A rule with no `when:` is standing: it is in AGENTS.md, which every agent CLI
+/// loads, so only the setup projection that writes AGENTS.md places it; every other start places only the rules whose
+/// `when:` its facts match, and never repeats a standing rule.
+pub(crate) fn selects(rule: &crate::ports::Rule, request: &StartRequest) -> bool {
+    let setup = request.start_kind() == Some(crate::request::StartKind::Setup);
+    (setup || !rule.when.is_empty()) && matches(&rule.when, &request.facts)
+}
+
 pub(crate) fn block(id: &str, source: String, text: String) -> Block {
     let bytes = text.len();
     Block {
@@ -232,7 +240,7 @@ fn generic(request: &StartRequest, ports: &Ports<'_>) -> (Vec<Candidate>, Vec<St
     let mut candidates = Vec::new();
     let mut matched = Vec::new();
     for rule in ports.rules.rules() {
-        if matches(&rule.when, &request.facts) {
+        if selects(rule, request) {
             matched.push(rule.id.clone());
             candidates.push(Candidate {
                 block: block(&rule.id, format!("rule:{}", rule.id), rule.body.clone()),
