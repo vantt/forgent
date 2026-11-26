@@ -5,6 +5,7 @@
 
 use std::fs;
 use std::io::Write;
+use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -174,6 +175,7 @@ fn check_with_paths_searches_those_units_and_is_refused_by_name_without_the_embe
     // A machine state folder with no model in it, so the answer does not depend on the machine running the test.
     let state = project.join("machine-state");
     fs::create_dir_all(&state).unwrap();
+    fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
     let env = [("FGOS_STATE_HOME", state.as_path())];
 
     let (code, answer) = door_with(
