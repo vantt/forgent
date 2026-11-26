@@ -1,7 +1,7 @@
 ---
 id: p-bifjfd5rix
 title: "Mail queued for a head's old generation is not moved to its successor after a rotation, so it is never offered (mailbox, priority P2; source: owner confirmation 2026-11-23, reported by forgent-claude-a3)"
-status: proposed
+status: done
 priority: P2
 area: mailbox
 created: 2026-11-23

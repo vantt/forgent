@@ -1,7 +1,7 @@
 ---
 id: p-ia2v33b54u
 title: "The secretary session cannot send mail: fgos mailbox send is refused event-store-unavailable on a read-only file system (agent confinement, priority medium; source: owner via Miu, 2026-11-22 21:30)"
-status: proposed
+status: done
 priority: P2
 area: agent-confinement
 created: 2026-11-22
