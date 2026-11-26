@@ -1,10 +1,11 @@
 ---
 contract: plan-v1
 title: "Each run supervisor in its own systemd scope, and a head whose supervisor died is raised as session-gone"
-status: ready
+status: running
+lead: head:lead-forgent-261127-0016-head-r-5a922
 priority: P0
 blockedBy: []
-base: cc5b6ea9a2dd8e694682df95070c3ff681945f42
+base: b4188a34b023c3dfd159eec5284901a80722fbf6
 footprint:
   - plans/261127-0016-head-run-own-failure-domain/**
   - packages/run-supervisor/rust/src/controller/launch.rs
