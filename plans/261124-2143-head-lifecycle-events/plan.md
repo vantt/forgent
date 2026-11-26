@@ -160,10 +160,11 @@ Phase 4 landed as `8eeb37fef` (2026-11-26). Owner answer `q-kikgj6qaiu` changed 
 open owner questions per phase (`plan:<dir>#phase-NN` or `plan:<dir>`), read through an `OpenQuestions` port whose
 adapter reads the question store; the corrected brief is `phase-04-waiting-lead-slot.md` (`5cd0d5f91`).
 
-Phase 5 landed as `8afaaba50` (2026-11-26). Phase 6 steps 1 and 4 (full suites, integration report, backlog rows)
-run as ticket `c-20573-1795672214088` in worktree `261124-2143-head-lifecycle-events-p06`, still running after 12
-waits. Step 2 (live check: needs a session start, the supervisor's) and step 3 (`CHANGELOG.md`, held by running plan
-`261125-1631-agent-context-engine`) are parked by supervision events.
+Phase 5 landed as `8afaaba50` (2026-11-26). Phase 6 steps 1 and 4 landed as `4ff936e79`: the full gates were run on main `4780cdb2e`
+by the unconfined supervisor session (`reports/lead-supervisor-gates-261126-1340.md`; a unit sandbox cannot run them),
+`npm test` 19 and `cargo test --workspace` 3 failures, none in this plan's footprint (`reports/integration.md`); the
+four backlog rows are `done`. Phase 6 stays `running` for step 2 (live `lead-ended` check, run by the supervisor once
+the watcher tick is free) and step 3 (`CHANGELOG.md`, held by running plan `261125-1631-agent-context-engine`).
 
 Phase 3 depends on nothing: closing finished heads does not wait for the diagnosis. Phase 2 follows phase 3
 because both add rows to `packages/supervision/rust/tests/definitions.rs` fixtures through the shared

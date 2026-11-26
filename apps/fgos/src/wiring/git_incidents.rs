@@ -68,9 +68,6 @@ pub fn open_wal(
 pub const STATUS_OPERATION_ID: &str = "git.status";
 pub const RECOVER_OPERATION_ID: &str = "git.recover";
 
-/// The repeatable `recover` option by which the owner names a writer they know is dead.
-const CONFIRM_DEAD_FLAG: &str = "confirm-writer-dead";
-
 /// The sub-commands `fgos git` serves.
 pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["status", "recover"];
 
@@ -158,13 +155,12 @@ fn confirmed_writers(args: &[OsString]) -> Vec<String> {
         FlagScalar::Bool => String::new(),
     };
     let before_separator = args.iter().position(|a| a == "--").unwrap_or(args.len());
-    let flag = format!("--{CONFIRM_DEAD_FLAG}");
     let parsed = parse_args_repeating(
         args.get(1..before_separator).unwrap_or_default(),
-        &[flag.as_str()],
+        &["--confirm-writer-dead"],
     )
     .unwrap_or_default();
-    match parsed.flag(CONFIRM_DEAD_FLAG) {
+    match parsed.flag("confirm-writer-dead") {
         None => Vec::new(),
         Some(FlagValue::One(one)) => vec![id(one)],
         Some(FlagValue::Many(all)) => all.iter().map(id).collect(),

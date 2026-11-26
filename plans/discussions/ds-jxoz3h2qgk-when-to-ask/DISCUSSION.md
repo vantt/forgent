@@ -55,8 +55,13 @@ Heads stall for hours, overnight included, on questions they could have decided.
 
 | D-ID | Tóm tắt | Nguồn / rationale |
 |---|---|---|
+| WA-D1 | Phạm vi là mọi câu hỏi agent gửi chủ, không chỉ các câu trong seed. | Owner 10:15; giữ nguyên qua các vòng 2-8. |
+| WA-D2 | Chủ chỉ trả lời câu hỏi đặt hoặc đổi hướng đi. Một việc actionable thì không hỏi "nguy hiểm, có làm không"; agent tìm cách làm an toàn và đảo ngược được, làm, rồi báo. Chỉ hỏi khi không còn cách nào khác, và khi hỏi thì hỏi về cách làm. | Owner 10:15; giữ qua các vòng 3-8. Bằng chứng: chủ chọn đúng phương án đề xuất 89/94 lần (evidence file). |
+| WA-D3 | Mở footprint để đạt acceptance của chính plan là việc actionable, không phải câu hỏi cho chủ. | Theo WA-D2; q-otq7dwgory đã cancel. 40 câu trong kho, 30/30 chọn đề xuất. |
+| WA-D4 | Phần "plan ready nghĩa là chạy được không cần chủ" tách thành discussion riêng ds-que32ftgg6; discussion này chỉ giữ luật hỏi lúc thực thi. | Shaper quyết 11:45 khi chủ hỏi có nên tách không; discussion mới đã chạy. |
+| WA-D5 | Một agent không được tự suy ra ý định cao hơn của chủ để vượt qua một outcome hay acceptance đã ghi. Đổi một mục tiêu đã duyệt là câu hỏi cho chủ. | Vòng 6: ba câu component-authority là lệch thật so với outcome đã ghi (plan 261121-2110, 261124-1433); chủ đã sửa đúng ở các chỗ đó. Không bị lật lại ở vòng 7-8. |
 
-(None yet. The owner principle of 10:15 is one round old; the §6 templates wait for one more round before any D-ID.)
+Còn tạm, chưa chốt: mô hình bốn thành phần (chủ nói chỉ là gợi ý; đã qua phép kiểm trên bằng chứng nhưng chưa được chủ xác nhận là luật); ba chỗ hở của mô hình; kênh báo cáo (vòng 8); lớp "thiếu tay".
 
 ## 5. Q&A log
 
@@ -83,6 +88,10 @@ Heads stall for hours, overnight included, on questions they could have decided.
 - 2026-11-26 11:45 +07, shaper, round 7: Decided to split, since the path test gives a clear answer. The execution-time ask rule is close to settled, while plan readiness is just starting and touches planning, the plan contract, the validator and approval; bundled, the ripe part would wait for the unripe one. It does not go into ds-3in4yb5thk either, which owns the flow to `ready`, not what `ready` guarantees. This discussion keeps the execution-time rule. The new topic "a ready plan runs without the owner" was handed to the supervisor as coordination event 40cb311fe7105ff0.
 - 2026-11-26 12:23 +07, owner (chat): Did not understand the "decided, reporting" channel (§3 row 7).
 - 2026-11-26 12:30 +07, shaper, round 8: Explained it with the q-myvzcbz3sx example. Proposed, provisional: no new channel. A self-decision is recorded where the work lives (commit message, the plan's phase table, the discussion log). Miu aggregates those records into her normal report when the owner returns, grouped by plan and by file. A repeated pattern (for example ten widens into the same hot file) is raised as a direction question. A new non-blocking record kind in the question store is rejected, since it would make the system bigger (RUL104).
+- 2026-11-26 13:32 +07, owner (chat): Do not hand this to a planner yet. Asked what is settled so far.
+- 2026-11-26 13:35 +07, shaper: Minted WA-D1 to WA-D5 for the points that have held across rounds (§4). Everything else stays provisional. No hand-off.
+- 2026-11-26 13:40 +07, owner (chat): Asked for other angles to add to the four-part model. Agrees with the report channel, but feels Miu is far less active than the supervisor, although by design they hold equal power. Asked what the hands class is.
+- 2026-11-26 13:50 +07, shaper, round 9: Proposed three angles to add to the model, all provisional. (1) **Who holds the information:** the owner holds intent, taste and the order between goals; the agent holds the facts. Ask only for information only the owner has; a fact the agent can gather is never a question. (2) **Precedent:** a class of question the owner has answered the same way several times is a recorded direction, applied without asking (40 footprint widens, 30/30 the same answer). (3) **Cost of waiting against cost of being wrong:** once an action is made reversible, being wrong costs one revert, while waiting cost 193 hours in seven days; reversible actions do not wait. On Miu: the channel depends on Miu being active, and backlog p-dgs2lsfudr already records her 15-minute tick stopping for hours. Proposed: the channel must not depend on Miu's tick. The records sit where the work lives, and the digest is pulled when the owner returns. Miu's liveness is its own item, outside this discussion. On the hands class (scout of `packages/session-host/contracts/head-permissions.v1.json`): the supervisor row now allows `git recover`, `worktree remove --delivered-to main` and `config patch`; `release activate` is denied to every head by design; full `npm test` and `cargo test --workspace` are not `fgos` verbs, so no head can run them. Also, `core/skills/fgos-lead/SKILL.md:80` still tells a lead to "ask the owner to run `fgos git recover`", although the supervisor holds that grant, which explains q-bvvdct5edg (2026-11-26).
 
 ## 6. Thiết kế đã chốt {#design}
 
