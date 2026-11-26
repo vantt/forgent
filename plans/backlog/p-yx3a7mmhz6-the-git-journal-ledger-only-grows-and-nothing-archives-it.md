@@ -19,4 +19,4 @@ The owner decides how long ledger evidence stays in the scan path, and a door (a
 
 # Notes
 
-Decision needed from the owner: the retention period (for example 30 days in the scan path). Evidence: `fgos git status` (journal retention), the file counts of the ledger directory, `packages/git/rust/src/wal.rs` (`scan`, `WAL_SCAN_BOUND`, `LEDGER_WARN_ENTRIES`). Not caused by plan 261125-1631-agent-context-engine; recorded here because mess outside a plan's scope becomes its own item.
+Decided (owner asked, lead recommended, 2026-11-26): ledger entries older than 30 days move to the archive; the move is reversible and nothing is deleted, so the period can be raised later. Reasons: a replay of a finished operation id happens within minutes to hours, the doctor already warns on retained chains past 7 days, and 90 days would leave about 250,000 entries in the scanned path. Evidence: `fgos git status` (journal retention), the file counts of the ledger directory, `packages/git/rust/src/wal.rs` (`scan`, `WAL_SCAN_BOUND`, `LEDGER_WARN_ENTRIES`). Not caused by plan 261125-1631-agent-context-engine; recorded here because mess outside a plan's scope becomes its own item.
