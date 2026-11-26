@@ -24,8 +24,32 @@ pub struct PlanRow {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PlansView {
     pub rows: Vec<PlanRow>,
+    /// Live leads that count against `max_leads`: a lead whose plan waits outside is not here.
     pub leads_live: usize,
+    /// Live leads of a plan that waits on the owner (see [`OpenQuestions`]); they hold no slot.
+    pub leads_waiting: usize,
     pub max_leads: usize,
+}
+
+/// Whether the owner has an open question with this ref in the question store. A store that
+/// cannot be read answers `false`: nothing is waiting.
+pub trait OpenQuestions {
+    fn has_open(&self, reference: &str) -> bool;
+}
+
+/// A plan waits outside when every phase not yet done has an open owner question, on the phase
+/// (`plan:<dir>#phase-NN`) or on the whole plan (`plan:<dir>`).
+fn waits_on_owner(p: &Plan, open: &dyn OpenQuestions) -> bool {
+    let whole = open.has_open(&format!("plan:{}", p.dir));
+    let mut pending = p.phases.iter().filter(|ph| ph.status != "done").peekable();
+    pending.peek().is_some()
+        && pending.all(|ph| {
+            let n = ph
+                .id
+                .parse::<u32>()
+                .map_or(ph.id.clone(), |n| format!("{n:02}"));
+            whole || open.has_open(&format!("plan:{}#phase-{n}", p.dir))
+        })
 }
 
 /// The portfolio rows in the order given (the caller orders them), with `holder` answering who
@@ -38,9 +62,11 @@ pub fn plans(
     project_id: &str,
     holder: &dyn Fn(&str) -> Holder,
     max_leads: usize,
+    questions: &dyn OpenQuestions,
 ) -> PlansView {
     let open = admissible(plans, done_dirs);
     let mut leads_live = 0;
+    let mut leads_waiting = 0;
     let rows = plans
         .iter()
         .map(|p| {
@@ -55,7 +81,11 @@ pub fn plans(
                 _ => None,
             };
             if lead_live == Some(true) {
-                leads_live += 1;
+                if waits_on_owner(p, questions) {
+                    leads_waiting += 1;
+                } else {
+                    leads_live += 1;
+                }
             }
             PlanRow {
                 dir: p.dir.clone(),
@@ -71,6 +101,7 @@ pub fn plans(
     PlansView {
         rows,
         leads_live,
+        leads_waiting,
         max_leads,
     }
 }
@@ -187,7 +218,7 @@ impl PlansView {
                 v
             })
             .collect();
-        serde_json::json!({"plans": rows, "leadsLive": self.leads_live, "maxLeads": self.max_leads})
+        serde_json::json!({"plans": rows, "leadsLive": self.leads_live, "leadsWaiting": self.leads_waiting, "maxLeads": self.max_leads})
     }
 }
 

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "24cd73e5616311d9bd0bb703eb70d01019a4716ecdb485879cd617c57ee868e6",
+  "payloadDigest": "298ddbd247a4d0a7a8a86c32ca5edc210695987b6b2ea15b3c21d7c797fbd531",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "dc14ff69bc4b144893fa6988de4df6b6180ab255ef8751fd1615ad93472b9e71",
     ".agents/skills/_shared/capability-matching.md": "93cd382994e2201e4aa8ec7816d740f6da634a0ee69d6911800a848ed5de1d8b",
@@ -172,7 +172,7 @@
     "apps/fgos/src/wiring/session_rotation_hook.rs": "bdd86a5ab6baf6be7ead8aa32f64246d7d0452728b8844ef44bea44b7a371a29",
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
     "apps/fgos/src/wiring/session_write_publish.rs": "2b88c9e2fa03bcdc92d6a90a3415be2d7fc1bc8abfe4ad742d3230d915ef87de",
-    "apps/fgos/src/wiring/supervision.rs": "c5e1ae0aaca0cfc575a37e7a2d365d76a70ae983c2548a53a525867a63323ef3",
+    "apps/fgos/src/wiring/supervision.rs": "a8246d1891f05d1d81ead59efdd57a62e7ce86ce3ed26440bb0c6d841a28ce90",
     "apps/fgos/src/wiring/terminal_route.rs": "e29a3ec670db995fbf7a3e00c70ed8bf3870fd772f298a01ebe9e4198096aed0",
     "apps/fgos/src/wiring/terminal_tabs.rs": "a519a4903b296a3f6bfd486f41ea93d1ceb1489c28a4e6dc6dcfe03223ce3130",
     "apps/fgos/src/wiring/uninstall.rs": "1fd8cdeef4360bb32ae0dd1452bdc6cb09c57427d95645c030105a24533dceff",
@@ -210,7 +210,7 @@
     "apps/fgos/tests/questions_hook.rs": "1c206c5633a8ec75345fdcc4debd1efe30f8aa996aa48e00e3963c426061f5a2",
     "apps/fgos/tests/questions_verb.rs": "b0ccc8a1c82bbf81b7ad84eecfdcf4a2e3c350eb297cf6749645b4ee1a3296dd",
     "apps/fgos/tests/session_write_publish.rs": "b4c33aba8cd04c05e1e5e0dd61b36cabe49c0d489ee077dc82b7f867213cd51d",
-    "apps/fgos/tests/supervision_verbs.rs": "200755154622ded40d6a0e702e1da3a15a62dcf22fa5aaba30b1ab349707cf1d",
+    "apps/fgos/tests/supervision_verbs.rs": "a26e2959da1826259e4b07c8ba4ffa1c64b181ea8af28ba32990c772965b3d62",
     "apps/fgos/tests/windows_borrow.rs": "deeb68f3b777b64c076bfd317baac95b11cff6c0bceede7eb3774a3d6d25f7bf",
     "apps/fgos/tests/windows_cwd_lease_owner.rs": "c3e833710c3dfa42f98addbca06e1dd7935470e73880a5ce7bb9622a9991f26a",
     "apps/fgos/tests/windows_doctor_lock_rows.rs": "943ba00e7be5382a532ad47bfa38f6fef888428910e5f70ee18518edeb1eeb63",
@@ -1274,7 +1274,7 @@
     "packages/supervision/rust/src/notify.rs": "2a8ce19013396e3a31c915a903c4762889cc3f902137279e6378c3deb84e8edd",
     "packages/supervision/rust/src/portfolio.rs": "bd94ccb1f568dee5ef2b7a89f85ca75af3b08f13008535b8ab3af6da8afb8f83",
     "packages/supervision/rust/src/queue.rs": "bdf9b9dac6246575bb9a2ae9690050778f055e63b244f7634c895597f85262d1",
-    "packages/supervision/rust/src/supervisor.rs": "dde5f8af422b134edb3322bfd8883f0fb0997e7c590808f012639952c3e2d7c4",
+    "packages/supervision/rust/src/supervisor.rs": "9b64bdc7b4eb291260ce24556332d38871c427beb2773392796a9291b86d023c",
     "packages/supervision/rust/src/wake.rs": "60ef6cb22b935b23ea1a90904e926e6763014e0d75246a11d5aab1fefabbdc04",
     "packages/supervision/rust/src/watcher.rs": "6c9da881261aaa866e5b89465b2a5c80a14997e8fbf6a96d82aa47a69a34fae1",
     "packages/supervision/rust/tests/definitions.rs": "c416675ae1fa6d1dafaa61e11378b019f440fcc4b5207c9659c403cf47130af5",
@@ -1282,7 +1282,7 @@
     "packages/supervision/rust/tests/land.rs": "b7deac12831b6e66290199031616f93da466f8b26d2dc150adedadbbb66e1d92",
     "packages/supervision/rust/tests/portfolio.rs": "df168392ec38214c0e048e1016341ec24725d9c7b81f798798c6fa276681f2f2",
     "packages/supervision/rust/tests/queue.rs": "65ddc71a204003a4e1a62077f6741728cdcaa96d7ee751e31d78bd420d572698",
-    "packages/supervision/rust/tests/wake.rs": "2cd0da601e5db46fe60ba2dee24929ba4fa39739bb4354254fe4a3498a8c4bce",
+    "packages/supervision/rust/tests/wake.rs": "0739dbbbf669cfc680fec7b609fd1aa76fafb78c2bcd311231900b70ea5c2190",
     "packages/supervision/rust/tests/watcher.rs": "a24599c66acf099885deaea1bb025ca69b2a330c6a7045afbfa5bd935eded5cc",
     "packages/terminal-control/rust/src/core.rs": "4126e35d6ffe381a802edf64e8b2afa781eb7a0e02aa7194245d58cc87f89bd5",
     "packages/terminal-control/rust/src/driver/herdr.rs": "8c3df4209429b90138bea12af929cf7456d7f3c7bbbda193dcc585ad7fa9a8eb",
@@ -4178,7 +4178,7 @@
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:1468"
+      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:1488"
     },
     {
       "path": "packages/supervision/rust/tests/discussion_source.rs",
