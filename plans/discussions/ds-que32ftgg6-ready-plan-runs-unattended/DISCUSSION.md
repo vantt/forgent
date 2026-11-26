@@ -61,6 +61,10 @@ Round 11 (16:40): naming settled by the owner as direction: `workType` for the k
 
 Round 12 (16:55): D2 settles `workType` and `agentLifecycle`. Proposed for `agentRole`/`persona`/`role` (§3 row 16): persona = who, role = part in a step, head/worker = `sessionType`. Waiting on the owner.
 
+Round 13 (17:05): D3 settles persona, role, `sessionType`, `agentFamily`. The full new `when:` key set (three groups: what the work is, who the agent is, when in its life) is at the end of §6 and goes to the rename item.
+
+Rounds 14-16 (17:14-17:3x): `agentFamily` (model family) and `agentCli` (agent program) are a pair; `agentCli` is kept only for rules about CLI-specific tools, hooks or permissions (§3 rows 17-18). The new key set has 11 keys in three groups (end of §6).
+
 ## 2. Mục tiêu & đề bài
 
 The owner settles a discussion, a planner writes the plan, the plan goes `ready`, and the owner walks away believing every foreseeable question is answered. On return he finds the plan stalled on questions he calls silly, or never started at all. Of 163 owner questions from 2026-11-19 to 2026-11-26, about 140 were asked after a plan existed, and the large classes were foreseeable at planning time: 40 footprint widens, about 45 "hands" requests from confined heads, 18 cleanups, and 8 acceptance deviations from outcomes that bundled the core with the cleanup. Three plans produced 66 of them. The goal is that `ready` means "can run to `done` without the owner": every foreseeable question is answered when the plan is approved, so the only questions left at run time are genuine deviations that the four-part ask rule of ds-jxoz3h2qgk-when-to-ask lets through. This discussion defines what `ready` guarantees and how that is checked. It does not own the flow to `ready` (ds-3in4yb5thk-backlog-to-ready-pipeline), the run-time ask rule (ds-jxoz3h2qgk-when-to-ask), or the door that widens a running plan's footprint (ds-mzyircswox-widen-a-running-plan-footprint).
@@ -85,7 +89,8 @@ The owner settles a discussion, a planner writes the plan, the plan goes `ready`
 | 14 | Do rules change by stage in other domains | **Clear (scout, round 10)** | Yes, where a stage crosses a boundary: into an external or irreversible act (publish, send, pay, sign) or to a different actor (author vs reviewer vs approver). Evidence: `domains/marketing/workflows/content-publish.yaml` binds such rules to its steps as data: `must: consent-before-publish` (guard `human-consent` on `copy-approved`), `publish-writes-isolated` (guard `write-scope-isolation`), a `persona: brand-guardian` on the draft step, a human `gate` on the approval step. So a stage-bound rule mostly lives in the workflow definition, as a guard the engine enforces, not as prose in ACE. ACE's `stage` key already exists (`when-keys.v1.json`), so readiness costs nothing: keep the key, do not key by stage by default, use it only for prose guidance that changes at such a boundary and cannot be a workflow guard. |
 | 15 | Naming of the `kind` fields | **Owner direction (round 11); its own backlog item** | Owner 16:29 and 16:40. Work kind: `workType` (agreed) for the ACE key and the Work item / initiative field. Today's ACE start `kind` (`head`, `worker`, `setup`, `hook`) mixes two categories and splits into two keys: `agentRole` (`head`, `worker`) and `agentLifecycle` (the moment: `setup`, `hook`, and presumably the session start). `launch` was rejected as unclear. Scout context: `kind` names many different things across the repo (136 contract files; executor, path, event, observation, start kinds), `type` and `job` are taken (pkm `type`, JSON-schema `type`; authority door rows `job:` in 83 files), `task` is a work-kind value and the `tsk-` prefix. Open for that item, not here: how `agentRole` sits beside ACE's existing `role` key (lead, producer, reviewer) and `persona` key, which may already cover it. Crosses ACE, the domain registry and the Work layer (RUL11: outside this scope), so it goes to the secretary as a backlog request. |
 | 16 | `agentRole`, `persona`, `role`: say clearly what each is | **Proposed (round 12), for the owner** | Scout: the three words overlap even inside one file: `core/agents/lead.yaml` has `name: lead`, a free-text `role: Lead session (executes one plan)` and a `persona:` block (voice, style, archetype); ACE's `role` key is "head or unit role (lead, producer, reviewer, ...)", mixing two things. Proposed meanings, one question each: **persona** = who the agent is: its charter (skills, voice, decision boundary, grants base), one of `core/agents/*.yaml` (shaper, lead, planner, supervisor, code-reviewer, ...); a good rule key. **role** = the part it plays in one step of a workflow: producer, reviewer, implementer, researcher (`domains/coding/registry.yaml` `roleGraph`); a good rule key, and only this meaning; the seat address `head:<persona>-<name>` or `lead:MAIL` is an instance name (Identity's "role alias"), never a rule key. **head vs worker** = the form of the session: a long-lived interactive head, or a one-shot worker that runs one unit and ends; a rule key so that worker starts never receive head rules (mailbox, parking questions). It is not a role, so not `agentRole`: proposed name `sessionType` (`head`, `worker`), matching `workType`. Inside `core/agents/*.yaml` the free-text `role:` field would then be renamed too (e.g. `summary`), since it is neither meaning. |
-| 17 | `agentFamily` | **Owner addition (round 12)** | Owner 17:00: add `agentFamily` (claude, codex, agy, ...). Scout: ACE calls it `cli` today ("Agent CLI id (claude, codex, agy, pi, omp)", source "agent-protocol adapters"), and the runner config already says "family" for the same thing (`core/config-standard/runner.yaml`: "the one executor of the claude family"; model tiers "by family then tier"). Keep three levels apart: **agentFamily** = which agent CLI (claude, codex, agy, pi, omp); **executor** = one concrete way to run that family (`claude-cli`, `claude-cli-bwrap`, `claude-herdr-bwrap`); **model** = the model the family uses at a tier. `agentFamily` replaces ACE's `cli` key in the rename item. |
+| 17 | `agentFamily` and `agentCli` | **Settled in D3 (owner 17:14)** | A pair, not one key. Family = the model family: claude, openai, gemini; the runner already keys `modelPolicies` by it (`core/config-standard/runner.yaml`: `claude`, `gemini`). CLI = the agent program: claude-code, codex, pi, omp, agy; some serve one family (claude-code: claude; agy: gemini), others several (pi and omp can run openai and others). ACE's `cli` key becomes `agentCli`; `agentFamily` is new. Below both sit the executor and invocation (`claude-herdr-bypass-bwrap`), which stay config, not rule keys. |
+| 18 | Should rules be keyed by `agentCli` at all | **Settled (owner round 16), part of D3** | Owner 17:2x: unsure; in principle yes, since each CLI has different abilities. Scout: no rule unit carries a `when:` today (`core/instructions/*.md`, `domains/coding/instructions/*.md`, `components/*/instructions/*.md`); CLI differences are handled in code and data: the agent-protocol adapters (`packages/agent-protocol/contracts/agent-protocol.v1.json` matrix: claude, codex, agy, pi, omp) and packaging-distribution's per-CLI file projection. But prose rules already assume one CLI: AGENTS.md's dispatch section speaks of "the Agent/Task tool" and `--has-live-task-access`, which only some CLIs have. Shaper view: yes, keep `agentCli`, for a rule that names a tool, hook or permission model only some CLIs have; model behaviour goes by `agentFamily`; everything else stays CLI-free. Caution: a CLI's abilities change by version, so a rule keyed by CLI name hardcodes "this CLI can do X". If CLI-keyed rules start repeating the same ability across several CLIs, key them by the ability instead, with the CLI-to-ability map as data in the agent-protocol adapters; not before (RUL104). |
 
 ## 4. Quyết định đã chốt
 
@@ -94,6 +99,7 @@ The owner settles a discussion, a planner writes the plan, the plan goes `ready`
 
 | D1 | Pre-decided answers come from three sources. (1) The owner marks each acceptance criterion `core` or `debt-ok` when the discussion settles. (2) The standing rule for repeating classes is process law, recorded with no owner approval. (3) Anything plan-specific beyond that rule asks the owner once, batched, before `ready`. The owner settles only plan-specific matters. | Owner chat 13:41 (§5 round 3), held unchanged through rounds 4 and 5; q-ypgj7zverd cancelled with this answer. |
 | D2 | Naming for the rename item (§3 row 15): the kind of work is `workType` (ACE `when:` key and the Work item / initiative field); the moment in an agent's life is `agentLifecycle`, a key with many values (`setup`, `hook`, session start, ...). Both replace today's overloaded `kind`. | Owner 16:40 (proposed) and 16:5x "chốt workType và agentLifecycle". Carried to the rename backlog item; not designed here. |
+| D3 | Meanings and names for the rename item: **persona** = who the agent is (its charter, one of `core/agents/*.yaml`); **role** = the part it plays in one workflow step (producer, reviewer, implementer, researcher), only that meaning; a seat address (`head:<persona>-<name>`, `lead:MAIL`) is an instance name, never a rule key; **sessionType** (`head`, `worker`) = the form of the session, replacing the proposed `agentRole`; **agentFamily** + **agentCli** = a pair: the model family (claude, openai, gemini) and the agent CLI that runs it (claude-code, codex, pi, omp, agy); e.g. claude/claude-code, openai/codex, openai/pi, gemini/agy. `agentCli` replaces ACE's `cli`; executor and invocation stay a third, lower level. | Owner 17:00 (`agentFamily`), 17:05 ("có đồng ý" to §3 rows 16-17), 17:14 (family/cli is a pair; pi and omp are CLIs, not families). |
 
 U5's list (§6) was accepted by the owner in round 6; it becomes a D-ID after one more round without change.
 
@@ -128,6 +134,14 @@ U5's list (§6) was accepted by the owner in round 6; it becomes a D-ID after on
 - 2026-11-26 16:55 +07, owner (chat), round 12: settled `workType` and `agentLifecycle` (many values); `agentRole`, `persona` and `role` must be explained clearly. Shaper: D2 minted; §3 row 16 proposes persona = who (charter), role = part in a workflow step, head/worker = session form named `sessionType`, and the seat address is an instance name, never a key.
 
 - 2026-11-26 17:00 +07, owner (chat), round 12: add `agentFamily` (claude/codex/agy, ...). Shaper: §3 row 17; it replaces ACE's `cli` key and matches the runner's existing word "family".
+
+- 2026-11-26 17:05 +07, owner (chat), round 13: agreed with §3 rows 16-17 (persona, role, `sessionType`, `agentFamily`) and asked for the full new shape. Shaper: D3 minted; the new key set is written at the end of §6.
+
+- 2026-11-26 17:14 +07, owner (chat), round 14: the three groups are good; `agentFamily` was wrong: pi and omp are not families. It is a pair family/cli: claude/claude-code, openai/codex or openai/pi, gemini/agy. Shaper: split into `agentFamily` and `agentCli`; D3 and §3 row 17 corrected.
+
+- 2026-11-26 17:2x +07, owner (chat), round 15: unsure whether to classify by CLI; in principle yes, since abilities differ. Shaper: §3 row 18, keep `agentCli` for rules that name a CLI-specific tool, hook or permission model; switch to ability keys only if CLI rules start repeating.
+
+- 2026-11-26 17:3x +07, owner (chat), round 16: agrees: keep `agentCli` as proposed in §3 row 18 (only for rules naming a CLI-specific tool, hook or permission model; ability keys only if CLI rules start repeating).
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -203,6 +217,26 @@ flowchart LR
   RUN -->|core deviation only| ASK[Run-time ask rule<br/>ds-jxoz3h2qgk]
   RUN --> DONE[done]
 ```
+
+### Hình dạng mới của bộ nhãn `when:` (D2, D3; input for the rename item, not built here)
+
+Three groups, one question each. Names in the left column are the new names; the right column says what they replace.
+
+| Group | Key | Values (examples) | Replaces |
+|---|---|---|---|
+| **What the work is** | `domain` | coding, marketing, council | unchanged |
+| | `workType` | bug, chore, design, docs, feature, task (from `domains/<d>/registry.yaml`) | new key; the Work item / initiative field `kind` |
+| | `workflow` | feature, bugfix, content-publish | unchanged; optional |
+| | `stage` | a step of the workflow | unchanged; unused by default (§3 row 14) |
+| | `project` | project id | unchanged |
+| **Who the agent is** | `persona` | shaper, lead, planner, supervisor, code-reviewer | unchanged name, meaning fixed: the charter |
+| | `role` | producer, reviewer, implementer, researcher | unchanged name, narrowed: part in a workflow step only |
+| | `sessionType` | head, worker | half of today's `kind` |
+| | `agentFamily` | claude, openai, gemini (the model family) | new key; matches the runner's `modelPolicies` keys |
+| | `agentCli` | claude-code, codex, pi, omp, agy (the agent CLI) | `cli` |
+| **When in the agent's life** | `agentLifecycle` | setup, start, hook, ... (many values; the item lists them) | the other half of today's `kind` |
+
+Outside ACE, the same item renames: the Work item / initiative `kind` to `workType`, and the free-text `role:` line in `core/agents/*.yaml` (neither meaning) to something like `summary`. Every caller moves in the same change and the old names are deleted (L10, RUL104).
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
