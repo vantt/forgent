@@ -1,7 +1,7 @@
 //! The shape check of `ask --input`. Every limit is read from `questions-input.v1.json` (embedded), which is
 //! the rule authority; characters are counted, not bytes. A violation names the field and the rule.
 
-use crate::record::{Parts, QuestionOption, Scope};
+use crate::record::{Parts, QuestionOption, Recipient, Scope};
 use crate::refusal::Refusal;
 use serde_json::Value;
 use std::sync::OnceLock;
@@ -11,6 +11,7 @@ const CONTRACT: &str = include_str!("../../contracts/questions-input.v1.json");
 /// The checked input of `ask`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AskInput {
+    pub to: Option<Recipient>,
     pub stage: String,
     pub reference: String,
     pub headline: String,
@@ -174,6 +175,7 @@ pub fn check(input: &Value) -> Result<AskInput, Refusal> {
         input,
         &[
             "stage",
+            "to",
             "ref",
             "headline",
             "blocks",
@@ -183,6 +185,7 @@ pub fn check(input: &Value) -> Result<AskInput, Refusal> {
         ],
         "",
     )?;
+    let to = input.get("to").map(recipient).transpose()?;
     let mut missing = Vec::new();
     let stage = required(input, "stage", "", &mut missing)?;
     let reference = required(input, "ref", "", &mut missing)?;
@@ -308,6 +311,7 @@ pub fn check(input: &Value) -> Result<AskInput, Refusal> {
         }
     }
     Ok(AskInput {
+        to,
         stage: stage.to_owned(),
         reference: reference.to_owned(),
         headline: headline.to_owned(),
@@ -325,6 +329,46 @@ pub fn check(input: &Value) -> Result<AskInput, Refusal> {
             },
         },
     })
+}
+
+/// Parse a logical address. Identity owns its qualified role aliases; unqualified
+/// human-workflow roles (such as `approver`) are lower-case slugs, not display names.
+pub fn recipient(value: &Value) -> Result<Recipient, Refusal> {
+    let recipient: Recipient = serde_json::from_value(value.clone()).map_err(|_| {
+        Refusal::new(
+            "recipient-invalid",
+            "to must be a role or a scheme-qualified party, not a person's name",
+        )
+    })?;
+    let slug = |s: &str| {
+        s.as_bytes().first().is_some_and(u8::is_ascii_lowercase)
+            && s.bytes()
+                .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+    };
+    let valid = match &recipient {
+        Recipient::Role { reference } => {
+            if reference.contains(':') {
+                fgos_identity::directory::role_problem(reference).is_none()
+            } else {
+                slug(reference)
+            }
+        }
+        Recipient::Party { reference } => reference.split_once(':').is_some_and(|(scheme, id)| {
+            slug(scheme)
+                && !id.is_empty()
+                && id
+                    .bytes()
+                    .all(|b| b.is_ascii_alphanumeric() || b"._-".contains(&b))
+        }),
+    };
+    if valid {
+        Ok(recipient)
+    } else {
+        Err(Refusal::new(
+            "recipient-invalid",
+            "to must identify a logical role or scheme:party-id, never a display name",
+        ))
+    }
 }
 
 /// `q-` and lowercase letters or digits, as `question-event-payloads.v1.json` says.

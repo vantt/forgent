@@ -1,5 +1,5 @@
 //! Owner questions: the store behind `fgos questions`. A question is asked, answered, acknowledged or
-//! cancelled by four events of one Event Store stream; every list is a fold over a read of that stream.
+//! cancelled in one Event Store stream, with delivery tracked separately; every list folds that stream.
 //!
 //! The crate reaches the store only through the [`store::QuestionLog`] port (the host wires it to the
 //! Event Store), the caller only through [`caller::CallerSource`], and writes nothing but the per-machine
@@ -7,6 +7,7 @@
 //! `packages/questions/contracts/`.
 
 pub mod caller;
+pub mod notifier;
 pub mod record;
 pub mod refcheck;
 pub mod refusal;

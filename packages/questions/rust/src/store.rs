@@ -1,6 +1,6 @@
 //! The port to the stream the events travel in, and the fold of a read into one state per question.
 
-use crate::record::{Acked, Answered, Asked, Cancelled, Event};
+use crate::record::{Acked, Answered, Asked, Cancelled, DeliveryPending, Event, DELIVERY_PENDING};
 use crate::refusal::Refusal;
 use serde::Serialize;
 use serde_json::Value;
@@ -41,6 +41,9 @@ pub enum State {
 #[serde(rename_all = "camelCase")]
 pub struct Question {
     pub state: State,
+    /// Delivery is independent of the question's open/answered lifecycle.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub delivery_pending: Option<DeliveryPending>,
     pub asked: Asked,
     /// The answer that counts: the first in the store's order.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -77,6 +80,17 @@ impl Fold {
 pub fn fold(events: &[LoggedEvent]) -> Fold {
     let mut out = Fold::default();
     for event in events {
+        // Delivery metadata is not a lifecycle transition or an Observe kind.
+        if event.event_type == DELIVERY_PENDING {
+            if let Ok(pending) = serde_json::from_value::<DeliveryPending>(event.payload.clone()) {
+                if let Some(question) = out.by_id.get_mut(&pending.id) {
+                    if question.state == State::Open {
+                        question.delivery_pending = Some(pending);
+                    }
+                }
+            }
+            continue;
+        }
         let Some(event) = Event::parse(&event.event_type, &event.payload) else {
             continue;
         };
@@ -88,6 +102,7 @@ pub fn fold(events: &[LoggedEvent]) -> Fold {
                         asked.id.clone(),
                         Question {
                             state: State::Open,
+                            delivery_pending: None,
                             asked: *asked,
                             answer: None,
                             conflicts: Vec::new(),
@@ -104,6 +119,7 @@ pub fn fold(events: &[LoggedEvent]) -> Fold {
                 match question.state {
                     State::Open => {
                         question.state = State::Answered;
+                        question.delivery_pending = None;
                         question.answer = Some(answered);
                     }
                     State::Answered | State::Acked => question.conflicts.push(answered),
@@ -122,6 +138,7 @@ pub fn fold(events: &[LoggedEvent]) -> Fold {
                 if let Some(question) = out.by_id.get_mut(&cancelled.id) {
                     if matches!(question.state, State::Open | State::Answered) {
                         question.state = State::Cancelled;
+                        question.delivery_pending = None;
                         question.cancelled = Some(cancelled);
                     }
                 }

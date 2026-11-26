@@ -7,6 +7,7 @@
   "additionalProperties": false,
   "required": ["stage", "ref", "headline", "blocks", "parts"],
   "properties": {
+    "to": { "$ref": "question-event-payloads.v1.json#/$defs/recipient", "description": "Absent means the owner. Logical role or scheme-qualified party only, never a person's display name." },
     "stage": { "type": "string", "minLength": 1, "maxLength": 60 },
     "ref": {
       "type": "string",

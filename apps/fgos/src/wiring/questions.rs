@@ -371,6 +371,12 @@ fn question_row(question: &Question, now: i64) -> Value {
         "asker": { "handle": asked.asker.handle, "roles": asked.asker.roles },
         "recommended": recommended(question),
     });
+    if let Some(to) = &asked.to {
+        row["to"] = json!(to);
+    }
+    if let Some(pending) = &question.delivery_pending {
+        row["deliveryPending"] = json!(pending);
+    }
     if question.state == State::Open {
         row["answerCommand"] = json!(answer_command(question));
     }
@@ -387,6 +393,15 @@ fn question_line(question: &Question, now: i64) -> String {
         one_line(&asked.blocks),
         age(&asked.asked_at, now),
     );
+    if let Some(to) = &asked.to {
+        line.push_str(&format!("  to: {}", one_line(to.reference())));
+    }
+    if let Some(pending) = &question.delivery_pending {
+        line.push_str(&format!(
+            "  delivery-pending: {}",
+            one_line(&pending.reason)
+        ));
+    }
     if question.state == State::Open {
         line.push_str(&format!("  answer: {}", answer_command(question)));
     } else {
@@ -999,12 +1014,33 @@ mod tests {
         .expect("asked shape");
         Question {
             state: State::Open,
+            delivery_pending: None,
             asked,
             answer: None,
             conflicts: Vec::new(),
             acked: None,
             cancelled: None,
         }
+    }
+
+    // Recipient behavior belongs to the crate tests; this checks only list rendering.
+    #[test]
+    fn list_rows_and_lines_expose_pending_recipient_delivery() {
+        let mut q = question("q-abc", "plan:p", "2026-11-26T00:00:00Z");
+        q.asked.to = Some(fgos_questions::record::Recipient::Party {
+            reference: "customer:42".into(),
+        });
+        q.delivery_pending = Some(fgos_questions::record::DeliveryPending {
+            id: q.asked.id.clone(),
+            reason: "channel-unavailable".into(),
+            at: q.asked.asked_at.clone(),
+        });
+        let row = question_row(&q, 0);
+        assert_eq!(row["to"], json!({"kind": "party", "ref": "customer:42"}));
+        assert_eq!(row["deliveryPending"]["reason"], "channel-unavailable");
+        let line = question_line(&q, 0);
+        assert!(line.contains("to: customer:42"));
+        assert!(line.contains("delivery-pending: channel-unavailable"));
     }
 
     #[test]
