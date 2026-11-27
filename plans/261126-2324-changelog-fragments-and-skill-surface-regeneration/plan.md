@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Changelog entries become fragments assembled at release, and the land door regenerates the generated skill surfaces"
-status: running
+status: done
 lead: head:lead-forgent-261126-2324-change-786c2
 priority: P1
 blockedBy: []
@@ -111,7 +111,7 @@ a wait on one part must not hold a part that can go ahead).
 |---|---|---|---|---|---|
 | 1 | [Land regenerates declared globs](phase-01-land-regenerates-globs.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, core/config-schema/land.schema.yaml | 1 | done |
 | 2 | [Changelog fragments assembled at release](phase-02-changelog-fragments.md) | - | scripts/prepare-release.mjs, test/scripts/prepare-release.test.mjs, changelog.d/** | 1 | done |
-| 3 | [Land config and integration](phase-03-land-config-and-integration.md) | 1, 2 | .fgos/config.yaml, plans/261126-2324-changelog-fragments-and-skill-surface-regeneration/reports/** | 2 | ready |
+| 3 | [Land config and integration](phase-03-land-config-and-integration.md) | 1, 2 | .fgos/config.yaml, plans/261126-2324-changelog-fragments-and-skill-surface-regeneration/reports/** | 2 | done |
 
 Phases 1 and 2 own disjoint files and run at once. Phase 3 runs from the main checkout and needs an activated
 release that carries phase 1. Phase 1 is `code:implement`, phase 2 is `code:implement`, phase 3 is `code:test`;

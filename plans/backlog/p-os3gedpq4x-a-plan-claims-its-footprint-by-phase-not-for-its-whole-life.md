@@ -1,7 +1,7 @@
 ---
 id: p-os3gedpq4x
 title: "Plans that share a path block each other from starting, even when the shared file is written only in a late phase or is generated; decide how shared paths should be handled (plan contract, priority high; source: owner via Miu, 2026-11-26 22:5x, restated 23:0x)"
-status: proposed
+status: done
 priority: P1
 area: plan-contract
 created: 2026-11-26
