@@ -40,6 +40,7 @@ footprint:
   - apps/fgos/src/wiring/session_rotation_hook.rs
   - packages/agent-start-context/goldens/NOTES.md
   - packages/run-supervisor/contracts/envelope.v3.json
+  - packages/execution/rust/src/seat_session.rs
 base: dc49aa88162cbd26bbca308f337b7c1f05387a86
 source:
   - plans/discussions/ds-xb6hplcn2m-shaper-worktree/DISCUSSION.md
