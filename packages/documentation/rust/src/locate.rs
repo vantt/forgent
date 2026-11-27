@@ -2,8 +2,8 @@
 //! beside them list where the corpus files hold each literal term of the draft.
 
 use crate::port::{
-    Answer, LocateError, Locator, MentionScanner, Part, Query, WorkerLauncher, CANDIDATES_MAX,
-    PARTS_MAX, TERMS_MAX, TERM_MIN_CHARS,
+    Answer, IndexKind, LocateError, Locator, MentionScanner, Part, Query, WorkerLauncher,
+    CANDIDATES_MAX, PARTS_MAX, TERMS_MAX, TERM_MIN_CHARS,
 };
 
 /// Answers `query`. The question is checked before anything starts. When no index worker runs, one is started before
@@ -42,7 +42,21 @@ pub fn locate<L: Locator>(
         parts,
         ..query.clone()
     };
-    let mut answer = locator.locate(&query)?;
+    let mut answer = match locator.locate(&query) {
+        Ok(answer) => answer,
+        Err(LocateError::Failed(e)) => {
+            let mut answer = Answer {
+                partial: true,
+                state: IndexKind::Broken,
+                action: None,
+                parts: Vec::new(),
+                group: None,
+            };
+            add_note(&mut answer, format!("the locator failed: {e}"));
+            answer
+        }
+        Err(invalid) => return Err(invalid),
+    };
     for part in &mut answer.parts {
         part.candidates.truncate(CANDIDATES_MAX);
     }
@@ -355,7 +369,7 @@ mod tests {
     }
 
     #[test]
-    fn terms_are_the_backticked_spans_then_exact_strings_deduplicated_and_cut_at_sixteen() {
+    fn terms_are_the_exact_strings_then_the_backticked_spans_deduplicated_and_cut_at_sixteen() {
         let (t, dropped) = terms(
             "`fgos land` and ``a ` b`` and `ab` and ` fgos land ` and `x y z`",
             &["x y z".into(), "A.B (c)".into(), "  ".into()],
@@ -409,6 +423,46 @@ mod tests {
         );
         assert!(answer.parts.is_empty() || answer.parts[0].mentions.is_empty());
         assert_eq!(answer.action, None, "a scan that never ran cannot fail");
+    }
+
+    struct FailingLocator;
+
+    impl Locator for FailingLocator {
+        fn locate(&self, _: &Query) -> Result<Answer, LocateError> {
+            Err(LocateError::Failed("pkm down".into()))
+        }
+        fn state(&self) -> IndexState {
+            IndexState {
+                kind: IndexKind::Broken,
+                action: String::new(),
+            }
+        }
+    }
+
+    #[test]
+    fn a_failed_locator_still_answers_with_the_scan_mentions_and_names_the_failure() {
+        let log = Cell::new(Vec::new());
+        let launcher = FakeLauncher {
+            running: true,
+            fails: false,
+            log: &log,
+        };
+        let q = query(&["a `term` here"]);
+        let answer = locate(
+            || FailingLocator,
+            &launcher,
+            &FoundIn(vec!["docs/x.md"]),
+            &q,
+        )
+        .unwrap();
+        assert!(answer.partial);
+        assert_eq!(answer.state, IndexKind::Broken);
+        assert!(answer.parts[0].candidates.is_empty());
+        assert_eq!(answer.parts[0].mentions[0].term, "term");
+        assert!(answer
+            .action
+            .unwrap()
+            .contains("the locator failed: pkm down"));
     }
 
     #[test]
