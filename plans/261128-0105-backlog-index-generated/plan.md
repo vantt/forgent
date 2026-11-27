@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "The backlog index is generated from the row files at every land that feeds it"
-status: ready
+status: running
 priority: P1
 blockedBy: []
 footprint:
@@ -29,11 +29,13 @@ footprint:
   - changelog.d/261128-0105-backlog-index-generated.md
   - plans/backlog.md
   - plans/261128-0105-backlog-index-generated
-base: 48bbd49188238d92cfce79081f1db4f104f54a79
+base: 562b8c1075bcdbadb25575f65881a281a60713e0
 source:
   - plans/discussions/ds-6z4rfn6kv5-backlog-index-generated/DISCUSSION.md
   - p-o4iniqvitl
 created: 2026-11-28
+lead: head:lead-forgent-261128-0105-backlo-60683
+host: fg-server2-jdp2bv
 ---
 
 # The backlog index is generated from the row files at every land that feeds it
