@@ -2145,11 +2145,58 @@ fn a_branch_land_that_changes_a_plan_status_and_adds_a_row_commits_the_regenerat
         &counter(&f),
     )
     .unwrap();
+    // The plan turns done, so the door closes its two cited items in the merge result too.
     assert_eq!(
         git(&f.main, &["show", &format!("{}:{INDEX}", out.main_sha)]),
-        THREE_ROWS
+        "p-aaaaaaaaaa-first.md done\np-bbbbbbbbbb-second.md done\np-cccccccccc-third.md proposed"
     );
     assert_eq!(changes_outside_runtime(&f), Vec::<String>::new());
+}
+
+#[test]
+fn a_branch_land_whose_only_feeding_change_is_a_plan_turning_done_closes_its_cited_items() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    f.topic("rows", &[(PLAN_PATH, &plan_with_sources("done", &CITED))]);
+    let out = land_with_index_config(
+        &f,
+        &row_branch_command(),
+        &config(vec![gate("true")]),
+        &counter(&f),
+    )
+    .unwrap();
+    let at = |path: &str| git(&f.main, &["show", &format!("{}:{path}", out.main_sha)]);
+    assert_eq!(at(ITEM_A).trim(), item_text(ID_A, "done").trim());
+    assert_eq!(at(ITEM_B).trim(), item_text(ID_B, "done").trim());
+    assert_eq!(
+        at(INDEX),
+        "p-aaaaaaaaaa-first.md done\np-bbbbbbbbbb-second.md done"
+    );
+    assert_eq!(changes_outside_runtime(&f), Vec::<String>::new());
+}
+
+#[test]
+fn a_branch_land_whose_only_feeding_change_is_a_plan_status_edit_regenerates_the_index() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    stale_index_on_trunk(&f);
+    f.topic(
+        "rows",
+        &[(PLAN_PATH, &(plan_with_sources("running", &CITED) + "\nNote.\n"))],
+    );
+    let out = land_with_index_config(
+        &f,
+        &row_branch_command(),
+        &config(vec![gate("true")]),
+        &counter(&f),
+    )
+    .unwrap();
+    let at = |path: &str| git(&f.main, &["show", &format!("{}:{path}", out.main_sha)]);
+    assert_eq!(
+        at(INDEX),
+        "p-aaaaaaaaaa-first.md in-flight\np-bbbbbbbbbb-second.md proposed"
+    );
+    assert_eq!(at(ITEM_A).trim(), item_text(ID_A, "in-flight").trim());
 }
 
 #[test]

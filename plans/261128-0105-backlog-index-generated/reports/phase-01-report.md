@@ -29,3 +29,17 @@
 
 - The disk filled mid-run (an edit failed once with ENOSPC and was redone); I ran `cargo clean` in this worktree to recover space, which removed its build cache.
 - Gates against the real portfolio generator over a branch land (end to end) are not covered here; the land tests use the fixture generator, as the existing backlog cases do.
+
+## Fix round
+
+Changes in `packages/supervision/rust/src/land.rs`:
+
+1. A branch land now closes the cited items of a plan turning done. `close_cited_items` delegates to a new `close_cited_items_in(root, ...)`, so the one item-closing code serves both lands. `candidate_door_files` (replaces `candidate_index`) runs it over the candidate worktree with the merge's changed files as scope, reads the closed items back, then runs the generator over the updated worktree. The items and the index are forced into the merge result. The door's worktree writes are restored before the session is abandoned.
+2. Test for the plan-status-only branch land (running with an edit), asserting the committed index is regenerated.
+3. The `plans/backlog.md` exemptions on the branch side (footprint judge, conflict settling) lapse when the door did not write the index (`candidate_door_files` returned `None`): `judge_unwritten_index` judges the branch's own index edit against the footprint and refuses an index conflict with `land-conflict-aborted`. On the paths side, when the door did not write the index, the scope is spelled out as concrete files without `plans/backlog.md`, so a hand edit is not committed.
+4. `drive`: a re-prepare after abandon that fails with `land-target-changed` returns `Attempt::RemoteMoved(None)`.
+5. `BacklogPort` and `paths_attempt` comments now say the door regenerates the index on every feeding land.
+
+Tests (`packages/supervision/rust/tests/land.rs`): added the plan-turning-done branch land (items closed in the merge result, index shows new state) and the plan-status-edit branch land. The existing "plan status and a row" branch test now expects the closed items in the index, which is the intended behavior. The fixture index already reflects item status, so no fixture change.
+
+Results: `cargo test -p fgos-supervision --test land` 88 passed, 0 failed. The other supervision test targets pass except `keeper::the_queue_adapter_encodes_logical_ids_stably_without_colliding_domain_keys`, which fails with `Read-only file system` in the sandbox (unrelated). `cargo test -p fgos --test portfolio_check` was not run: the command needs the `ORT_LIB_LOCATION` env prefix and the sandbox required approval for it. No test covers the new paths-side exclusion or the lapsed branch-side exemptions (item 3) or the `land-target-changed` re-prepare (item 4).
