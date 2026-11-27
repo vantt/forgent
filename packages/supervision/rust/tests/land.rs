@@ -2182,7 +2182,10 @@ fn a_branch_land_whose_only_feeding_change_is_a_plan_status_edit_regenerates_the
     stale_index_on_trunk(&f);
     f.topic(
         "rows",
-        &[(PLAN_PATH, &(plan_with_sources("running", &CITED) + "\nNote.\n"))],
+        &[(
+            PLAN_PATH,
+            &(plan_with_sources("running", &CITED) + "\nNote.\n"),
+        )],
     );
     let out = land_with_index_config(
         &f,
@@ -2255,11 +2258,15 @@ fn a_paths_land_naming_a_directory_does_not_commit_a_hand_edited_index_the_door_
     fs::write(f.main.join("plans/notes.md"), "notes\n").unwrap();
     land_with_index(&f, &paths(&["plans"])).unwrap();
     assert_eq!(changed_in_head(&f), vec!["plans/notes.md"]);
-    assert_eq!(git(&f.main, &["show", &format!("HEAD:{INDEX}")]), "committed");
+    assert_eq!(
+        git(&f.main, &["show", &format!("HEAD:{INDEX}")]),
+        "committed"
+    );
 }
 
 #[test]
-fn a_branch_land_editing_the_index_outside_its_footprint_is_refused_when_the_door_does_not_write_it() {
+fn a_branch_land_editing_the_index_outside_its_footprint_is_refused_when_the_door_does_not_write_it(
+) {
     let f = Fixture::new();
     f.topic("topic", &[(INDEX, "branch hand edit\n")]);
     let mut cmd = branch("topic");
