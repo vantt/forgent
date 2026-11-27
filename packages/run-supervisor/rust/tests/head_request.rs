@@ -454,10 +454,19 @@ fn only_the_head_request_handover_uses_the_active_payload_and_still_verifies_the
         if route == "attempt-step" {
             cmd.arg("finalize-home");
         }
-        cmd.args(["--protocol", "1", "--run-dir"])
-            .arg(&project)
-            .output()
-            .unwrap()
+        cmd.args(["--protocol", "1", "--run-dir"]).arg(&project);
+        // The host was just copied: a child another test thread forks at that moment can still hold the copy's
+        // write descriptor, and exec then answers ETXTBSY until it closes.
+        let mut tries = 0;
+        loop {
+            match cmd.output() {
+                Err(e) if e.kind() == std::io::ErrorKind::ExecutableFileBusy && tries < 50 => {
+                    tries += 1;
+                    std::thread::sleep(std::time::Duration::from_millis(20));
+                }
+                other => break other.unwrap(),
+            }
+        }
     };
     let request = run("head-request");
     assert!(
