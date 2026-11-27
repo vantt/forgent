@@ -322,55 +322,17 @@ async function widenVerb({ args, envelope, projectRoot, id, ports }) {
   const lead = personaOf(envelope) === 'lead';
   if (!lead) throw roleErr('only a lead widens a plan footprint');
 
-  exactKeys(args, ['plan', 'dir', 'phase', 'path', 'paths', 'criterion', 'argv']);
+  exactKeys(args, ['plan', 'phase', 'path', 'paths', 'criterion']);
 
-  let planArg;
-  let phaseArg;
+  const { plan: planArg, phase: phaseArg, criterion: criterionArg } = args;
   const paths = [];
-  let criterionArg;
-
-  if (args.argv !== undefined) {
-    if (!Array.isArray(args.argv)) throw badArgs('argv must be an array of strings');
-    for (const a of args.argv) {
-      if (typeof a !== 'string') throw badArgs('argv must contain only strings');
-    }
-    const tokens = args.argv[0] === 'supervisor' && args.argv[1] === 'widen' ? args.argv.slice(2) : args.argv;
-    for (let i = 0; i < tokens.length; i++) {
-      const tok = tokens[i];
-      if (tok === '--phase') {
-        const val = tokens[++i];
-        if (val === undefined) throw badArgs('--phase requires a value');
-        phaseArg = val;
-      } else if (tok === '--path') {
-        const val = tokens[++i];
-        if (val === undefined) throw badArgs('--path requires a value');
-        paths.push(val);
-      } else if (tok === '--criterion') {
-        const val = tokens[++i];
-        if (val === undefined) throw badArgs('--criterion requires a value');
-        criterionArg = val;
-      } else if (tok === '--json') {
-        // optional flag
-      } else if (tok.startsWith('--')) {
-        throw badArgs(`unknown flag ${tok}`);
-      } else if (!planArg) {
-        planArg = tok;
-      } else {
-        throw badArgs(`unexpected positional argument ${tok}`);
-      }
-    }
-  } else {
-    planArg = args.plan ?? args.dir;
-    phaseArg = args.phase;
-    if (args.path !== undefined) {
-      if (typeof args.path !== 'string') throw badArgs('path must be a string');
-      paths.push(args.path);
-    }
-    if (args.paths !== undefined) {
-      if (!Array.isArray(args.paths)) throw badArgs('paths must be an array of strings');
-      paths.push(...args.paths);
-    }
-    criterionArg = args.criterion;
+  if (args.path !== undefined) {
+    if (typeof args.path !== 'string') throw badArgs('path must be a string');
+    paths.push(args.path);
+  }
+  if (args.paths !== undefined) {
+    if (!Array.isArray(args.paths)) throw badArgs('paths must be an array of strings');
+    paths.push(...args.paths);
   }
 
   if (planArg === undefined || planArg === null || planArg === '') throw badArgs('plan is required');
@@ -391,7 +353,7 @@ async function widenVerb({ args, envelope, projectRoot, id, ports }) {
 
   if (paths.length === 0) throw badArgs('at least one path is required');
   for (const p of paths) {
-    if (typeof p !== 'string' || p === '') throw badArgs('paths must be non-empty strings');
+    if (!plainEntry(p)) throw badArgs(`invalid path entry ${JSON.stringify(p)}`);
     noDash('path', p);
   }
 
@@ -507,7 +469,7 @@ export function runTicket(file, ports = {}) {
   const ticket = readTicketFile(file);
   if (!ticket || ticket.state !== 'running') return null;
   writeTicket(file, { ...ticket, runner: (ports.selfRecord ?? selfRecord)() });
-  const env = { ...process.env };
+  const env = { ...process.env, ...(ports.env ?? {}) };
   delete env.FGOS_DISPATCH_DEPTH;
   const run = (ports.exec ?? spawnSync)(ticket.hostBin, ticket.argv, { cwd: ticket.cwd, env, encoding: 'utf8', timeout: RUNNER_TIMEOUT_MS, maxBuffer: MAX_REQUEST_BYTES });
   const line = lastJsonLine(run.stdout);
