@@ -20,7 +20,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { buildRustDistribution, nativeAddonLibraryName } from '../../scripts/build-rust-distribution.mjs';
+import { buildRustDistribution, listLegacyNodeSourceFiles, resolveProductionDependencies, nativeAddonLibraryName } from '../../scripts/build-rust-distribution.mjs';
 import { ensureGitAddon } from '../helpers/git-addon.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -52,6 +52,25 @@ function stubCargo() {
 let builtAddon;
 const nativeAddon = () => (builtAddon ??= ensureGitAddon().addon);
 
+let devCheckoutDir;
+function devCheckout() {
+  if (devCheckoutDir) return devCheckoutDir;
+  assert.ok(HOST_BIN && fs.existsSync(HOST_BIN), `set FGOS_HOST_BIN to a host built from this checkout (npm test does): ${HOST_BIN}`);
+  const checkout = path.join(scratch, 'dev-checkout');
+  fs.mkdirSync(checkout, { recursive: true });
+  for (const relative of listLegacyNodeSourceFiles(REPO_ROOT, HOST_BIN)) {
+    const destination = path.join(checkout, relative);
+    fs.mkdirSync(path.dirname(destination), { recursive: true });
+    fs.copyFileSync(path.join(REPO_ROOT, relative), destination);
+  }
+  fs.copyFileSync(path.join(REPO_ROOT, 'Cargo.lock'), path.join(checkout, 'Cargo.lock'));
+  const packageJson = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
+  for (const [name, dir] of resolveProductionDependencies(REPO_ROOT, packageJson)) {
+    fs.cpSync(dir, path.join(checkout, 'node_modules', ...name.split('/')), { recursive: true, dereference: true });
+  }
+  return (devCheckoutDir = checkout);
+}
+
 /** The installed `fgos` of the staged release; it finds its own manifest. */
 function host(args, cwd) {
   const env = { ...process.env };
@@ -64,7 +83,8 @@ function devDoor(args, cwd) {
   assert.ok(HOST_BIN && fs.existsSync(HOST_BIN), `set FGOS_HOST_BIN to a host built from this checkout (npm test does): ${HOST_BIN}`);
   const env = { ...process.env };
   for (const key of ['CLAUDE_CODE_SESSION_ID', 'FGOS_ACTIVE_RELEASE_PATH', 'FGOS_ACTIVE_MANIFEST_PATH', 'FGOS_RUST_HOST_RECURSION_GUARD']) delete env[key];
-  return spawnSync(process.execPath, [path.join(REPO_ROOT, 'scripts/run-rust-dev-host.mjs'), ...args], {
+  const checkout = devCheckout();
+  return spawnSync(process.execPath, [path.join(checkout, 'scripts/run-rust-dev-host.mjs'), ...args], {
     cwd,
     encoding: 'utf8',
     maxBuffer: 64 * 1024 * 1024,
