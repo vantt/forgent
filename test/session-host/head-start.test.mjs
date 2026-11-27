@@ -11,7 +11,7 @@ import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import { readRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
-import { bindHeadSeat, headKeyOf, headRoleOf, headStartRequest, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, personasHeadsFirst, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
+import { bindHeadSeat, defaultEnsureWorktree, headKeyOf, headRoleOf, headStartRequest, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, personasHeadsFirst, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
 import { grantOf } from '../../src/session-host/head-grants.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { headOf } from '../../src/native/execution-door.mjs';
@@ -34,7 +34,7 @@ function scratch() {
 }
 
 function fakes({ live = false, record = null, fronted = 'fronted', launchFails = null } = {}) {
-  const calls = { launch: [], front: [] };
+  const calls = { launch: [], front: [], ensure: [] };
   const host = {
     front: (placement) => { calls.front.push(placement); return fronted === 'fronted' ? { result: 'fronted' } : { result: 'unsupported', code: 'host-unsupported-here' }; },
   };
@@ -43,6 +43,7 @@ function fakes({ live = false, record = null, fronted = 'fronted', launchFails =
     identity: () => (live ? { live, record } : { live }),
     pin: ({ persona }) => ({ name: persona, text: PERSONA_TEXT }),
     handoff: () => null,
+    ensureWorktree: (wanted) => { calls.ensure.push(wanted); return { path: wanted.path }; },
     // The composer owns the words (packages/agent-start-context/rust/tests/goldens.rs); a head start owns the request.
     opening: ({ request }) => JSON.stringify(request),
     runnerConfig: () => ({ marker: 'config' }),
@@ -580,5 +581,32 @@ test('a hand start and an automated start of the same head name type the same op
   await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, { ...ports, launch: record });
   await placeHead({ persona: 'planner', name: 'probe', projectRoot, gen: 2 }, { ...ports, launch: record });
   assert.equal(openings[0], openings[1]);
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+test('a shaper start puts its discussion worktree on discussion/<dir> and launches there; a planner launches with no workdir', async () => {
+  const projectRoot = scratch();
+  const { calls, ports } = fakes();
+  await placeHead({ persona: 'shaper', name: 'probe', projectRoot }, ports);
+  await placeHead({ persona: 'planner', name: 'probe', projectRoot }, ports);
+  const expectedPath = path.join(path.dirname(projectRoot), `${path.basename(projectRoot)}-worktrees`, 'ds-aaaaaaaaaa-probe');
+  assert.deepEqual(calls.ensure, [{ projectRoot, path: expectedPath, branch: 'discussion/ds-aaaaaaaaaa-probe' }]);
+  assert.equal(calls.launch[0].workdir, expectedPath);
+  assert.equal('workdir' in calls.launch[1], false);
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+test('a registered discussion worktree is reused without a create call, and one on another branch is refused shaper-worktree-mismatch', async () => {
+  const { execFileSync } = await import('node:child_process');
+  const projectRoot = scratch();
+  const git = (...args) => execFileSync('git', args, { cwd: projectRoot, stdio: 'pipe' });
+  git('init', '-q', '-b', 'main');
+  git('-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'init');
+  const worktree = path.join(path.dirname(projectRoot), `${path.basename(projectRoot)}-worktrees`, 'ds-aaaaaaaaaa-probe');
+  git('worktree', 'add', '-q', '-b', 'discussion/ds-aaaaaaaaaa-probe', worktree);
+  const reused = await defaultEnsureWorktree({ projectRoot, path: worktree, branch: 'discussion/ds-aaaaaaaaaa-probe' });
+  assert.equal(reused.created, false);
+  await assert.rejects(defaultEnsureWorktree({ projectRoot, path: worktree, branch: 'discussion/other' }), { code: 'shaper-worktree-mismatch' });
+  fs.rmSync(worktree, { recursive: true, force: true });
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });

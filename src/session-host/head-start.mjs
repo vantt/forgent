@@ -15,7 +15,8 @@ import { spawnSync } from 'node:child_process';
 import { replaceDurably } from '../native/door.mjs';
 import { createSessionHost } from './client.mjs';
 import { grantOf, headPersonas } from './head-grants.mjs';
-import { subjectOfDir, taskOfHead } from './head-plan.mjs';
+import { discussionBranchOf, discussionWorktreeOf, subjectOfDir, taskOfHead } from './head-plan.mjs';
+import { inspectEntries, inspectPath } from '../util/git-paths.mjs';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { listAssignmentRuns, loadRunnerConfigForDir } from '../native/execution-door.mjs';
@@ -148,6 +149,34 @@ async function defaultLaunch(request) {
 
 async function defaultRunnerConfig(projectRoot) {
   return loadRunnerConfigForDir(projectRoot);
+}
+
+const realpathOrSelf = (p) => { try { return fs.realpathSync(p); } catch { return path.resolve(p); } };
+
+/**
+ * The worktree of a shaper's discussion: reuses `path` when Git lists it on `branch`, refuses `shaper-worktree-mismatch`
+ * when it is registered on another branch, else asks the host's worktree door to create it on `branch` from the trunk tip.
+ * The worktree list is read through Git Inspect. Returns `{ path, branch, created }`.
+ */
+export async function defaultEnsureWorktree({ projectRoot, path: worktreePath, branch }) {
+  const { createGitInspect, gitPortOptions } = await import('../git/inspect.mjs');
+  const inspect = createGitInspect(gitPortOptions(projectRoot));
+  const want = realpathOrSelf(worktreePath);
+  const row = inspectEntries((page) => inspect.listWorktrees(page)).find((entry) => realpathOrSelf(inspectPath(entry.path)) === want);
+  if (row) {
+    const have = row.branch?.startsWith('refs/heads/') ? row.branch.slice('refs/heads/'.length) : null;
+    if (have !== branch) throw new HeadStartError('shaper-worktree-mismatch', `${worktreePath} is a worktree on ${have ?? 'a detached head'}, not on ${branch}`);
+    return { path: worktreePath, branch, created: false };
+  }
+  const trunk = inspect.resolveTrunk();
+  if (trunk.kind !== 'known') throw new HeadStartError('shaper-worktree-failed', 'the trunk of this project is not known, so the discussion worktree has no base');
+  const { bin } = resolveActiveHostBin();
+  if (!bin) throw new HeadStartError('shaper-worktree-failed', 'no fgos host binary found to create the discussion worktree');
+  const res = spawnSync(bin, ['worktree', 'create', worktreePath, '--branch', branch, '--base', trunk.value, '--json'], { cwd: projectRoot, env: routeEnv(), encoding: 'utf8', timeout: 120_000 });
+  if (res.error || res.status !== 0) {
+    throw new HeadStartError('shaper-worktree-failed', `the worktree ${worktreePath} was not created: ${res.error?.message ?? `${res.stdout ?? ''}${res.stderr ?? ''}`.trim().slice(0, 300)}`);
+  }
+  return { path: worktreePath, branch, created: true };
 }
 
 const ROLE_REFUSAL_CODES = new Set(['head-role-not-bound', 'head-role-held']);
@@ -319,7 +348,7 @@ export function withHeadSettings(runnerConfig, binding) {
  * `gen` is the generation of the lineage (absent: the first unused one); `forQuestion` is the id of an owner question the
  * new head continues (one more opening line); `beside` is the live key of the session whose
  * tab the new one opens next to. `ports` as for `startHeadSession` (`taskOfHead(projectRoot, persona, name) -> { dir, path } | null`, `planOfHead(projectRoot, persona, name) -> { dir }` for a lead, `pin`, `handoff`, `opening`, `runnerConfig`, `bind`,
- * `launch`). Returns `{ role, gen, key, placement, runDir, cli, persona }`; a refusal throws `HeadStartError`.
+ * `launch`, `ensureWorktree({ projectRoot, path, branch }) -> { path }` for a shaper's discussion worktree). Returns `{ role, gen, key, placement, runDir, cli, persona }`; a refusal throws `HeadStartError`.
  */
 export async function placeHead({ persona, name, projectRoot, beside = null, gen = null, forQuestion = null } = {}, ports = {}) {
   assertHeadArgs({ persona, name, projectRoot, gen, forQuestion });
@@ -333,6 +362,13 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
     task = await (ports.taskOfHead ?? ((root, p, n) => taskOfHead(root, p, n, { planOfHead: ports.planOfHead })))(projectRoot, persona, name);
     grant = grantOf(role, persona, { planDir: persona === 'lead' ? task.dir : null });
   } catch (err) { throw new HeadStartError(persona === 'lead' ? 'grant-invalid' : (err.code ?? 'task-not-found'), err.message); }
+  // A shaper works in its own linked worktree on the discussion branch; a rotation successor finds it registered and reuses it.
+  let workdir = null;
+  if (persona === 'shaper') {
+    const wanted = { projectRoot, path: discussionWorktreeOf(projectRoot, task.dir), branch: discussionBranchOf(task.dir) };
+    const ensured = await (ports.ensureWorktree ?? defaultEnsureWorktree)(wanted);
+    workdir = ensured?.path ?? wanted.path;
+  }
   const pinned = await (ports.pin ?? defaultPin)({ persona, projectRoot });
   const handoff = await (ports.handoff ?? defaultHandoff)({ persona, name, projectRoot });
   const runnerConfig = await (ports.runnerConfig ?? defaultRunnerConfig)(projectRoot);
@@ -346,6 +382,7 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
     // The sandbox gives every launch a private writable tmpfs at /tmp (bwrap driver `--tmpfs /tmp`), so /tmp is the head's own scratch, not the shared one.
     env: { TMPDIR: '/tmp', FGOS_HEAD_ROLE: role, FGOS_HEAD_PERSONA: persona, FGOS_HEAD_NAME: name, FGOS_HEAD_GEN: String(generation) },
     projectRoot, beside, display: { role: persona, title: subjectOfHead(persona, name, task) },
+    ...(workdir ? { workdir } : {}),
   };
   let launched;
   try {

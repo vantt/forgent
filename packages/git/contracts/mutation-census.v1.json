@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "31302b3920af850b5a898a4c06b2b00e9204b38b72edc8cada171163f00010c8",
+  "payloadDigest": "c053f379e26e238190dc7c9ab4b491afa49a9d3dd81fe4e0787e5452b32717fb",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -1639,7 +1639,7 @@
     "src/session-host/head-plan.mjs": "bb2ea6fee98451914cc7f235a4885bf853837c6afe2ddf044329c1afb1e47763",
     "src/session-host/head-request-client.mjs": "eab9e61a4ca6e8185f7fb3d40e42ac55151bf8564ee4233a6c7f686fa032e052",
     "src/session-host/head-request.mjs": "8948a633dde0b079002f6461547da2fc9e43915eb502395bad0b3de308c3ee98",
-    "src/session-host/head-start.mjs": "4589d44bbf20ba4e1a7d51b7d45d7fee704f27c1d947935da64d5aa957870168",
+    "src/session-host/head-start.mjs": "95fb1e4df83f948203916739d3904895a2aec4ea354269133c73bfbc5acbcf8b",
     "src/session-host/head-stop.mjs": "6026afa06d3580296dd77697a6ee1d1331851d65322fb6a3cf3bca5c7e42079b",
     "src/session-rotation/handoff-store.mjs": "6d4593a26fa1e1cfe03e8b9fe4fa63533b118aa7c030f96d8a09e9855f691ac9",
     "src/session-rotation/rotate.mjs": "d3ef32980ddd2809f6c92832402dcf21c844dabf49c57570e102605e6ed423b9",
@@ -4898,7 +4898,14 @@
     },
     {
       "path": "src/session-host/head-start.mjs",
-      "line": 76,
+      "line": 77,
+      "spawn": "spawnSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/head-start.mjs",
+      "line": 175,
       "spawn": "spawnSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
