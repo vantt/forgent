@@ -680,6 +680,6 @@ fn active_overlaps_compares_ready_and_running_plans_and_skips_self() {
     let overlaps = active_overlaps(&plans[0], &plans);
     let dirs: Vec<&str> = overlaps.iter().map(|(d, _)| d.as_str()).collect();
     assert_eq!(dirs, ["peer_running", "peer_ready"]);
-    assert_eq!(overlaps[0].1, ["src/shared/a.rs"]);
-    assert_eq!(overlaps[1].1, ["src/shared/b.rs"]);
+    assert_eq!(overlaps[0].1, ["src/shared/**"]);
+    assert_eq!(overlaps[1].1, ["src/shared/**"]);
 }

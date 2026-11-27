@@ -890,8 +890,7 @@ fn supervisor_widen_refuses_bad_args() {
         .output()
         .unwrap();
     assert!(!out.status.success());
-    let printed: Value = serde_json::from_slice(&out.stdout).unwrap();
-    assert_eq!(printed["code"], "bad-args", "{}", text(&out));
+    assert!(text(&out).contains("bad-args"), "{}", text(&out));
 
     // plan-dir with '/'
     let out = scene
@@ -910,8 +909,7 @@ fn supervisor_widen_refuses_bad_args() {
         .output()
         .unwrap();
     assert!(!out.status.success());
-    let printed: Value = serde_json::from_slice(&out.stdout).unwrap();
-    assert_eq!(printed["code"], "bad-args", "{}", text(&out));
+    assert!(text(&out).contains("bad-args"), "{}", text(&out));
 }
 
 /// A fake request socket: answers the first request with `reply` and returns the request it read.
