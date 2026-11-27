@@ -11,15 +11,17 @@ discussion: open
 
 ## 1. Trạng thái hiện tại
 
-Round 3 (2026-11-27 16:13). Three points settled (§4): the gateway's roles and one gateway per machine (D1), the
+Round 4 (2026-11-27 16:30). Three points settled (§4): the gateway's roles and one gateway per machine (D1), the
 no-error rule between the fast copy and the persistent copy (D2), and what is broadcast first: the events of mail,
 work and owner questions (D3).
 
 Open now:
 
-- **Plan and backlog changes** — the owner set them apart for more discussion (§5 16:13). Their truth is a file on
-  origin, not an event; a plan claim is already decided by the first admission push that reaches origin (plan
-  `261127-1535-plan-claim-who-and-where`). Shaper's framing and options in §3 row "Plan and backlog"; asked in chat.
+- **Plan and backlog changes** — provisionally A ("origin `main` moved to commit Z", receivers fetch at once; owner
+  16:20 "tạm A đi"), not settled (§3 row "Plan and backlog").
+- **Event bus framing** — the owner recalls an event bus, the watcher, the keeper and an action queue. Shaper's map
+  and framing in §3 row "Event bus framing": the log exists (Event Store, supervision queue), the push is missing,
+  and the gateway broadcast is that push. Asked in chat.
 - Q2 `{#Q2}` — `q-pke5ht4y5e`: which network the machines share (still parked).
 - Many projects on one gateway: how a project is named across machines (§3).
 - Component split: first cut in §3, not discussed with the owner yet.
@@ -70,7 +72,8 @@ coordination.
 | The gateway's roles | settled, D1 | §4 |
 | What travels ahead of git, and the no-error rule | settled, D2 | §4 |
 | What is broadcast first | settled, D3: events of mail, work and owner questions | §4 |
-| Plan and backlog | open, owner 16:13 "riêng plan/backlog thảo luận tiếp"; asked in chat 16:20 | Their truth is a file on origin (`plan.md`, `plans/backlog.md`), not an event, so D2's same-hash rule does not apply to them as is. A plan claim is already safe: admission writes `status: running` and `host` in one commit that either reaches origin or is undone, first push wins (plan `261127-1535-plan-claim-who-and-where`, D5-D7 of `ds-izibwo45vm`). What the gateway can add is speed: other machines learn of a new `ready` plan, a claim, or a new backlog row sooner, and stop trying a plan already taken. Shaper options: (A) "origin `main` moved to commit Z" notice, receivers fetch at once, content stays git; (B) a typed event per change ("plan X running on M at commit Z"), receivers act on it before fetching, the file on origin stays the truth; (C) the file content itself travels |
+| Plan and backlog | provisional: A (owner 16:20 "tạm A đi", not sure yet); reversal trigger: the event-bus framing below changes the shape, or a receiver needs to act before fetching | Their truth is a file on origin (`plan.md`, `plans/backlog.md`), not an event, so D2's same-hash rule does not apply to them as is. A plan claim is already safe: one commit that reaches origin or is undone, first push wins (plan `261127-1535-plan-claim-who-and-where`). Today another machine learns of the change only at its watcher tick: `watcher.activeIntervalSec` 60 s while it has live work, `idleIntervalSec` 900 s idle (`core/config-standard/watcher.yaml`, not overridden here; fetch at `packages/supervision/rust/src/watcher.rs:366`), plus the supervisor's wake. A: one event per push, "origin `main` moved to commit Z" (optionally with the changed paths, A′), receivers fetch and tick at once, about 1-2 s. B: one typed event per change, receivers act before fetching; safe only when sent after origin accepted Z and carrying Z; costs one event type per kind of change. C (file content travels) rejected by the shaper as a second truth |
+| Event bus framing | shaper proposal, asked in chat 16:30 | Owner 16:20 recalls "event bus" and the watcher, keeper and an action queue. What exists: the **Event Store** is the durable log (per project, crossing machines by git refs); the **supervision event queue** is "raised minus handled" over it (`packages/supervision/rust/src/queue.rs`), the action queue the owner remembers; the **watcher** is a per-project timer that fetches, runs detection definitions and raises events once; the **keeper** is a pure scheduler over scheduling records and its own past decisions; the **mailbox** wakes heads through hooks. Every consumer learns of a change by polling a timer (sync 60 s, watcher 60/900 s); nothing pushes. A bus is a log plus a push fan-out: the log exists, the push is missing. Framing: the gateway's changes broadcast is that push half, and "trunk moved" (A) is one more event on it whose subscriber is the watcher (tick now instead of at the timer); mail and questions events wake their own subscribers. No new store, no new queue |
 | One gateway per machine vs today | observed | Today one gateway serves one project: `run(root)` and `FgosCliGateway { root }` (`gateway.rs:1394-1408`), lock `.fgos/locks/gateway.lock` and logs under that project's `.fgos/`, fixed port 4170 (`gateway.rs:1935`); a second project on the same machine collides on the port. One-per-machine needs a machine-level home (state under `~/.fgos`, not a project's `.fgos`) and a registry of the machine's projects, each request and each broadcast naming its project |
 | Network path between machines | open — **Q2** `q-pke5ht4y5e` | Gateway binds 0.0.0.0:4170; Cloudflare Access support exists; LAN/VPN unknown |
 | Trust between cluster members | observed, reusable | Identity holds confirmed per-machine ssh-ed25519 pins (`fgos identity pins`, e.g. `design-lap-iezwlz` confirmed 2026-10-25); a peer link can authenticate with them |
@@ -99,6 +102,14 @@ coordination.
   further. Minted D1-D3 (roles held from 16:05; D2, D3 proposed 16:10 and agreed 16:13).
 - 2026-11-27 16:20 — Shaper: scouted the plan claim path (plan `261127-1535`, first push to origin wins) and asked the
   owner in chat which of three shapes plan/backlog changes take on the broadcast (§3 row "Plan and backlog").
+- 2026-11-27 16:18 — Owner: "nếu không báo thì chậm 60s?" Shaper: the watcher's tick, 60 s busy and 900 s idle, plus
+  the supervisor's wake; with A about 1-2 s.
+- 2026-11-27 16:19 — Owner: "B khác A là 1 event vs N event". Shaper: yes in count; the real difference is that B
+  lets a receiver act before fetching and costs one event type per kind of change; proposed A′ (one event with the
+  changed paths).
+- 2026-11-27 16:20 — Owner: "tạm A đi, anh cũng chưa rõ ... đang thầm nhớ tới khái niệm event bus. chúng ta đã có
+  watcher, keeper và hình như đang có một dạng action queue". Recorded A as provisional. Shaper scouted the
+  supervision spec and mapped the existing parts (§3 row "Event bus framing").
 
 ## 6. Thiết kế đã chốt {#design}
 
