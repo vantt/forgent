@@ -237,7 +237,7 @@ pub fn add_loose_objects(git: &Path, repo: &Path) -> Result<usize, String> {
     }
 }
 
-/// How long the control commit's detached auto gc gets to reach its hook.
+/// Guard deadline for the control commit's foreground auto gc to reach its hook.
 const CONTROL_DEADLINE: std::time::Duration = std::time::Duration::from_secs(15);
 
 /// The control's `pre-auto-gc` hook writes this marker; the vector's unborrowed
@@ -253,7 +253,8 @@ fn install_gc_marker_hook(control: &Path) -> Result<PathBuf, String> {
     Ok(marker)
 }
 
-/// Poll for the marker until the deadline; the detached auto gc is asynchronous.
+/// Poll for the marker until the deadline; the control gc runs in the foreground, so the
+/// marker exists when the commit returns and the poll is only a guard.
 fn wait_for_gc_marker(marker: &Path) -> Result<(), String> {
     let deadline = Instant::now() + CONTROL_DEADLINE;
     while !marker.exists() {
