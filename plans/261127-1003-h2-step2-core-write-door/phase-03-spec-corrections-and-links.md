@@ -9,7 +9,7 @@ dependencies: []
 
 ## Inputs
 
-- `plan.md` facts F9, F10, F11 and decisions D4, D6.
+- `plan.md` facts F9, F10, F11, F14, F15 and decisions D4, D6, D7–D10; the gap table G1–G9.
 - `docs/platform/documentation/spec.md` (sections 2, 4, 5, 6.1, 8, 10).
 - `docs/platform/documentation/subcomponents/write-door/spec.md` section 11.
 - `docs/platform/documentation/subcomponents/document-identity/spec.md` sections 8.1 step 6 and 8.3.
@@ -47,6 +47,16 @@ document identity 14). Phase 5 writes them once the code has merged.
    wording in place beyond that pointer.
 3. Document identity 8.1 step 6: the writer's decision is recorded on `doc.attest` and `capture.handoff` (D2).
    8.3: the refusal at the creation verbs comes with admission's door checks (D4).
+   Exact mentions (D7–D10), as amendments recorded in section 17, not rewrites of the signed text:
+   - 8.1: after step 5, a step "List exact mentions": the backticked names of the draft and any `--exact` string are
+     scanned literally over the corpus on disk; per term, up to 20 sections, `total` and `truncated`; a section not
+     among the candidates is marked `missedBySearch` and must be read. Step 1 states that translation is required
+     before locate (D10). Step 6 logs mention counts and the `missedBySearch` paths.
+   - 8.1, the closing paragraph: mentions never rank and never decide; "there is no verdict from the score" holds.
+   - 8.2: one bullet under what fgOS builds on pkm: the literal scan is fgOS's own, behind its own port, because an
+     index cannot be complete or current for exact strings; it is not a second search engine and returns no scores.
+   - Section 12: a sub-heading "Known limits of finding" with G1–G8 from the plan, each with the evidence that
+     would close it; link the measurement report and this plan. G9 stays with admission.
 4. Proposal: the section 0 table's H2 row and section 9.2 link to documentation spec section 4. Write "the build
    order and the status of each step live there" in one sentence. Do not copy the steps.
 5. H1 plan section 12.1: one line linking to documentation spec section 4.
@@ -60,10 +70,12 @@ document identity 14). Phase 5 writes them once the code has merged.
 
 ```bash
 rg -n "future area|instruction registry renders" docs/platform/documentation   # no output
+rg -n "Known limits of finding|missedBySearch" docs/platform/documentation/subcomponents/document-identity/spec.md
 node scripts/doc-health.mjs
 ```
 
-Pass: no output from `rg`; doc-health green on `docs/platform/**`, including the dead-reference rule.
+Pass: no output from the first `rg`; the second finds the new step and the limits sub-heading; doc-health green on
+`docs/platform/**`, including the dead-reference rule.
 
 ## Rollback
 
