@@ -2474,7 +2474,7 @@ fn head_write_from_a_process_outside_the_gate_tree_is_refused_and_writes_nothing
 const SAVE_VERB: &str = "session save";
 
 /// A server for a shaper whose cwd is a linked worktree (its `.git` is a file) granted `docs/backlog.md` and the
-/// plain files directly under `plans/discussions/`.
+/// directory `plans/discussions` (the shaper's real grant), at any depth.
 fn save_served(name: &str, publish: &Publish, linked: bool) -> Served {
     let served = serve_config(
         name,
@@ -2489,7 +2489,7 @@ fn save_served(name: &str, publish: &Publish, linked: bool) -> Served {
         |mut cfg| {
             cfg.persona = "shaper".into();
             cfg.role = "head:shaper-x".into();
-            cfg.writes = vec!["docs/backlog.md".into(), "plans/discussions/*".into()];
+            cfg.writes = vec!["docs/backlog.md".into(), "plans/discussions".into()];
             cfg
         },
     );
@@ -2514,16 +2514,16 @@ fn head_save_commits_exactly_the_named_granted_paths_through_the_port_and_replie
     let served = save_served("save-ok", &publish, true);
     let reply = save_request(
         &served,
-        json!({"paths": ["docs/backlog.md", "plans/discussions/a.md"], "message": "docs: save"}),
+        json!({"paths": ["docs/backlog.md", "plans/discussions/topic/DISCUSSION.md"], "message": "docs: save"}),
     );
     assert_eq!(reply["result"], "done", "{reply}");
     assert_eq!(
         reply["data"],
-        json!({"commit": "c0ffee", "paths": ["docs/backlog.md", "plans/discussions/a.md"]})
+        json!({"commit": "c0ffee", "paths": ["docs/backlog.md", "plans/discussions/topic/DISCUSSION.md"]})
     );
     assert_eq!(
         *publish.calls.lock().unwrap(),
-        [r#"save ["docs/backlog.md", "plans/discussions/a.md"] "docs: save""#],
+        [r#"save ["docs/backlog.md", "plans/discussions/topic/DISCUSSION.md"] "docs: save""#],
         "no catch-up, clean check or publish: a save fetches and pushes nothing"
     );
     assert!(!served.dir.join("argv").exists(), "no route child ran");
@@ -2543,7 +2543,7 @@ fn head_save_in_the_main_checkout_is_refused_before_the_grant_is_read_and_commit
 fn head_save_of_a_path_outside_the_grant_is_refused_and_commits_nothing() {
     let publish = Publish::default();
     let served = save_served("save-grant", &publish, true);
-    for path in ["docs/other.md", "plans/discussions/sub/a.md"] {
+    for path in ["docs/other.md", "plans/discussions-x/a.md"] {
         let reply = save_request(
             &served,
             json!({"paths": ["docs/backlog.md", path], "message": "m"}),

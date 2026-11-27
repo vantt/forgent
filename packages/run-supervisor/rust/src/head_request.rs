@@ -792,6 +792,17 @@ fn names_grant(granted: &str, rel: &str) -> bool {
         .is_some_and(|name| !name.contains('/'))
 }
 
+/// Whether `rel` lies inside the grant entry `granted`: the entry itself or beneath it (a directory entry covers every
+/// depth), as the Node head-request door's `inGrant` reads it. `session save` commits by this; `session write` keeps
+/// `names_grant`.
+fn within_grant(granted: &str, rel: &str) -> bool {
+    let entry = granted.trim_end_matches('/');
+    rel == entry
+        || rel
+            .strip_prefix(entry)
+            .is_some_and(|rest| rest.starts_with('/'))
+}
+
 /// Whether a write of `rel` may create the file: it is named by a `/*` grant and by no exact entry, so an exact grant
 /// keeps replacing an existing file only.
 fn may_create(writes: &[String], rel: &str) -> bool {
@@ -1026,7 +1037,7 @@ fn save_paths(cfg: &Config, args: &Value) -> Outcome {
     }
     if let Some(path) = paths
         .iter()
-        .find(|path| !cfg.writes.iter().any(|granted| names_grant(granted, path)))
+        .find(|path| !cfg.writes.iter().any(|granted| within_grant(granted, path)))
     {
         return refuse("path-outside-grant", Some(path.clone()));
     }

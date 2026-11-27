@@ -109,7 +109,7 @@
         "paths": "array of strings, required, non-empty: project-relative paths, each inside an entry of envelope.session.writes",
         "message": "string, required: commit message"
       },
-      "does": "answered by the supervisor itself, no route child: commits exactly the named paths on the checked-out branch of the head's working checkout (the attempt cwd, which must be a linked worktree of the project) through ScopedCommit. The working checkout must not be the main checkout (save-needs-linked-worktree). Every path must lie inside envelope.session.writes (path-outside-grant). When ScopedCommit makes no change it answers save-nothing-to-commit. Main's tip is untouched in every case.",
+      "does": "answered by the supervisor itself, no route child: commits exactly the named paths on the checked-out branch of the head's working checkout (the attempt cwd, which must be a linked worktree of the project) through ScopedCommit. The working checkout must not be the main checkout (save-needs-linked-worktree). Every path must lie inside envelope.session.writes (path-outside-grant): equal to a granted entry or beneath it, so the directory grant plans/discussions covers plans/discussions/<dir>/DISCUSSION.md. The paths are the head's own edits already in the working checkout; only the named paths that changed are committed and any other change stays uncommitted. When none of the named paths has a change relative to HEAD it answers save-nothing-to-commit. Main's tip is untouched in every case.",
       "peer": "the connecting process (SO_PEERCRED pid) must be the attempt's gate or run under it, the check of session bind session and session write (caller-not-under-gate)",
       "data": "{commit, paths}",
       "identity": "held",
