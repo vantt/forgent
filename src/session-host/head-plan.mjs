@@ -174,6 +174,17 @@ const DISCUSSION_ROOT = 'plans/discussions';
 const DISCUSSION_FILE = 'DISCUSSION.md';
 const DISCUSSION_ID_PREFIX = /^ds-[a-z2-7]{10}-/;
 
+/** The branch name of a discussion: `discussion/<dir>`. */
+export function discussionBranchOf(dir) {
+  return `discussion/${dir}`;
+}
+
+/** The linked worktree path of a discussion: `<parent of projectRoot>/<project dir name>-worktrees/<dir>`. */
+export function discussionWorktreeOf(projectRoot, dir) {
+  const resolved = path.resolve(projectRoot);
+  return path.join(path.dirname(resolved), `${path.basename(resolved)}-worktrees`, dir);
+}
+
 /** The topic of a discussion directory: its name without the `ds-<id>-` prefix a migrated discussion carries. */
 function topicOfDiscussionDir(dir) {
   return dir.replace(DISCUSSION_ID_PREFIX, '');

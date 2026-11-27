@@ -18,7 +18,7 @@ import { HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
 import { headPersonas } from './head-grants.mjs';
 import { HEAD_ANSWERED_VERB, HEAD_LAND_VERB, HEAD_METRICS_RECORD_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_START_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_WORKTREE_CREATE_VERB, HEAD_FGOS_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHead, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
 import { assertHeadArgs, headRoleOf, startHeadSession } from './head-start.mjs';
-import { HeadPlanError, isPlanHeadName, planOfHead } from './head-plan.mjs';
+import { HeadPlanError, discussionBranchOf, discussionOfHead, isPlanHeadName, planOfHead } from './head-plan.mjs';
 import { listHeads } from './head-list.mjs';
 import { stopHeadSession } from './head-stop.mjs';
 import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
@@ -170,6 +170,7 @@ const covered = (p, footprint) => {
 };
 
 const planOfCaller = (envelope, projectRoot, ports) => (ports.planOf ?? ((root, persona, name) => planOfHead(root, persona, name, ports.plan ?? {})))(projectRoot, personaOf(envelope), envelope.session.name);
+const discussionOfCaller = (envelope, projectRoot, ports) => (ports.discussionOf ?? ((root, persona, name) => discussionOfHead(root, persona, name, ports.discussion ?? ports.plan ?? {})))(projectRoot, personaOf(envelope), envelope.session.name);
 
 function hostBinOf(envelope) {
   const hostBin = envelope.requestHostBin ?? envelope.hostBin;
@@ -293,13 +294,24 @@ async function landVerb({ args, envelope, projectRoot, id, ports }) {
   for (const p of Array.isArray(paths) ? paths : []) noDash('paths', p);
   const argv = ['land', '--json'];
   const writes = envelope.session.writes ?? [];
-  const lead = personaOf(envelope) === 'lead';
+  const persona = personaOf(envelope);
+  const lead = persona === 'lead';
+  const shaper = persona === 'shaper';
   if (branch !== undefined) {
     if (typeof branch !== 'string' || !REF_PATTERN.test(branch)) throw badArgs('branch must be a branch name');
-    if (!lead) throw Object.assign(new Error('only a lead lands a branch'), { code: 'land-branch-lead-only' });
-    const plan = await planOfCaller(envelope, projectRoot, ports);
-    if (plan.footprint.length === 0) throw Object.assign(new Error(`plan ${plan.dir} has no footprint, so a branch has nothing to be held to`), { code: 'write-outside-footprint' });
-    argv.push('--branch', branch, '--footprint', plan.footprint.join(','));
+    if (!lead && !shaper) throw Object.assign(new Error('only a lead lands a branch'), { code: 'land-branch-lead-only' });
+    if (shaper) {
+      const discussion = await discussionOfCaller(envelope, projectRoot, ports);
+      const ownBranch = discussionBranchOf(discussion.dir);
+      if (branch !== ownBranch) {
+        throw Object.assign(new Error(`branch ${JSON.stringify(branch)} is not this shaper's own discussion branch (${ownBranch})`), { code: 'land-branch-not-own' });
+      }
+      argv.push('--branch', branch, '--footprint', `plans/discussions/${discussion.dir}`);
+    } else {
+      const plan = await planOfCaller(envelope, projectRoot, ports);
+      if (plan.footprint.length === 0) throw Object.assign(new Error(`plan ${plan.dir} has no footprint, so a branch has nothing to be held to`), { code: 'write-outside-footprint' });
+      argv.push('--branch', branch, '--footprint', plan.footprint.join(','));
+    }
   } else {
     if (!isStringArray(paths) || paths.length === 0) throw badArgs('paths must be a non-empty array of strings');
     if (message === undefined) throw badArgs('message is required with paths');
