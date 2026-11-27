@@ -704,7 +704,7 @@ Một private `HOME` không có toolchain. Đo 2026-11-27 trong một phiên b�
 home riêng (invocation có `homeEnv: HOME`, vd. agy) thấy `~/.cargo` và `~/.rustup` trống, nên
 rustup tự đi tải toolchain (`info: syncing channel updates for 1.99.0`) và cargo đứng chờ vô hạn ở
 lời nhắc credential của dependency git riêng tư `pkm` (`git = "https://github.com/vantt/pkm"`
-trong `Cargo.lock`, từ `c7b66be3cf`). Hai unit treo 22-25 phút ngày 2026-11-26/27 (backlog
+trong `Cargo.lock`, thêm bởi `fafdc2d101`, chuyển sang tag v0.7.1 bởi `acb2a6efa7`). Hai unit treo 22-25 phút ngày 2026-11-26/27 (backlog
 `p-ymhj4xcf6x`). Unit giữ `HOME` thật (claude, riêng tư hoá `CLAUDE_CONFIG_DIR` thay vì `HOME`)
 thì thấy `~/.cargo` thật chỉ đọc qua `--ro-bind / /`; unit có home riêng thì không thấy gì. Trước
 mục này không code nào trên cửa sống truyền toolchain vào home của unit.
@@ -722,8 +722,10 @@ một dispatch. Mỗi thư mục chỉ được resolve khi nó tồn tại, là
 machine-private root (§9.3) lẫn mọi confinement root; không qua phép thử đó thì không có mount và
 không có biến. Host không có Rust thì không nhận gì. Đường dẫn được canonicalize qua cửa real-path
 sẵn có rồi `--ro-bind` **trên chính đường dẫn của nó**: bind chỉ đọc tường minh, không chỉ dựa vào
-`--ro-bind / /`, để cache vẫn chỉ đọc dưới một grant ghi được mà đường dẫn chứa nó. Driver
-materialize mount của resource này sau mọi mount ghi được, cùng nhóm với các mount bind-back.
+`--ro-bind / /`, để cache vẫn chỉ đọc dưới một grant ghi được mà đường dẫn chứa nó. Resolver
+xếp các resource toolchain-cache sau mọi mount grant và sau các bind-back của launch-program; driver bwrap
+materialize mount theo đúng thứ tự resolver, nên `--ro-bind` tường minh đứng sau mọi grant ghi được trên
+thư mục cha. Nó không thuộc nhóm bind-back bị che.
 
 Biến đi kèm resource, nên host hay golden vector không có hai thư mục giữ argv và env nguyên từng
 byte: cargo home đặt `CARGO_HOME=<path>`, `CARGO_NET_OFFLINE=true` và `GIT_TERMINAL_PROMPT=0`;
