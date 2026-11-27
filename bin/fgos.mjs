@@ -1417,6 +1417,22 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
     case 'knowledge': {
       const sub = positional[0];
+      // --locate-file: the writer's locate decision, read from a file so no
+      // drafted text is spliced into a shell command; the reducer owns every
+      // payload check.
+      const readLocateFile = (verb, file) => {
+        let text;
+        try {
+          text = fs.readFileSync(path.resolve(file), 'utf8');
+        } catch (error) {
+          throw new StoreError('validation', `knowledge ${verb}: cannot read --locate-file '${file}': ${error.code ?? error.message}`);
+        }
+        try {
+          return JSON.parse(text);
+        } catch (error) {
+          throw new StoreError('validation', `knowledge ${verb}: --locate-file '${file}' is not valid JSON: ${error.message}`);
+        }
+      };
       if (!sub) {
         throw new StoreError('validation', 'knowledge requires a subcommand (status, attest, handoff).');
       }
@@ -1496,7 +1512,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // was actually written -- the fgos-coding-knowledge skill always
         // passes the item id it is retrospecting.
         const match = resolved;
-        attestDocStore(dir, { docId: match.docId, topicId: match.topicId, role: match.role, captureId });
+        const locate = flags['locate-file'] === undefined ? undefined : readLocateFile('attest', requireField(flags['locate-file'], 'knowledge attest requires a path after --locate-file'));
+        attestDocStore(dir, { docId: match.docId, topicId: match.topicId, role: match.role, captureId, locate });
 
         return { attested: true, docId: match.docId, currentPath: match.currentPath, captureId };
       } else if (sub === 'handoff') {
@@ -1510,22 +1527,15 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const claim = requireField(flags.claim, 'knowledge handoff requires --claim');
         const materialFile = requireField(flags['material-file'], 'knowledge handoff requires --material-file');
         const locateFile = requireField(flags['locate-file'], 'knowledge handoff requires --locate-file');
-        const readInput = (file, flag) => {
-          try {
-            return fs.readFileSync(path.resolve(file), 'utf8');
-          } catch (error) {
-            throw new StoreError('validation', `knowledge handoff: cannot read ${flag} '${file}': ${error.code ?? error.message}`);
-          }
-        };
-        const material = readInput(materialFile, '--material-file');
-        let locate;
+        let material;
         try {
-          locate = JSON.parse(readInput(locateFile, '--locate-file'));
+          material = fs.readFileSync(path.resolve(materialFile), 'utf8');
         } catch (error) {
-          if (error instanceof StoreError) throw error;
-          throw new StoreError('validation', `knowledge handoff: --locate-file '${locateFile}' is not valid JSON: ${error.message}`);
+          throw new StoreError('validation', `knowledge handoff: cannot read --material-file '${materialFile}': ${error.code ?? error.message}`);
         }
-        handoffCaptureStore(dir, { captureId, requestId, claim, material, locate });
+        const locate = readLocateFile('handoff', locateFile);
+        const decision = flags.decision === undefined ? undefined : requireField(flags.decision, 'knowledge handoff requires create or no-place after --decision');
+        handoffCaptureStore(dir, { captureId, requestId, claim, material, locate, decision });
         return { handedOff: true, captureId, requestId };
       } else {
         throw new StoreError('validation', `knowledge: unknown subcommand "${sub}".`);

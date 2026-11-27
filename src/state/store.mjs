@@ -2081,12 +2081,12 @@ export function retireDocStore(dir, { docId, topicId, role }) {
   return appendKnowledgeEvent(dir, 'doc.retire', { docId, topicId, role });
 }
 
-export function attestDocStore(dir, { docId, topicId, role, captureId }) {
-  return appendKnowledgeEvent(dir, 'doc.attest', { docId, topicId, role, captureId });
+export function attestDocStore(dir, { docId, topicId, role, captureId, locate }) {
+  return appendKnowledgeEvent(dir, 'doc.attest', { docId, topicId, role, captureId, locate });
 }
 
-export function handoffCaptureStore(dir, { captureId, requestId, claim, material, locate }) {
-  return appendKnowledgeEvent(dir, 'capture.handoff', { captureId, requestId, claim, material, locate });
+export function handoffCaptureStore(dir, { captureId, requestId, claim, material, locate, decision }) {
+  return appendKnowledgeEvent(dir, 'capture.handoff', { captureId, requestId, claim, material, locate, decision });
 }
 
 export function moveDocPathStore(dir, { docId, topicId, role, newPath }) {

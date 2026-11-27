@@ -27,6 +27,7 @@ import {
   retireDocStore,
   attestDocStore,
   handoffCaptureStore,
+  appendKnowledgeEvent,
   moveDocPathStore,
   addWork,
   rebuild,
@@ -923,6 +924,70 @@ test('capture.handoff records the material handed to an existing request item an
       'section and places are kept as given',
     );
     assert.deepEqual(handoffs[1].locate, { query: 'second claim', candidates: [] }, 'an empty candidate list is valid with a query');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+// The writer's locate decision rides the events the registry already holds: grow on
+// doc.attest, create or no-place on capture.handoff. Appended through the store's
+// event door so the reducer, not a wrapper, is what these cases prove.
+test('the writer locate decision is recorded on attest (grow) and handoff (create or no-place), with its mentions checked on both', () => {
+  const tmpDir = initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-knowledge-test-')));
+  try {
+    initStore(tmpDir);
+    registerTopicStore(tmpDir, { topicId: 't1', purposeSlug: 'topic-one' });
+    registerDocStore(tmpDir, { docId: 'd1', topicId: 't1', role: 'guide', currentPath: 'docs/t1/guide.md', docLifecycle: 'active' });
+    addWork(tmpDir, { id: 'request-1', title: 'Admit a claim', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test' });
+    const mentions = [
+      { path: 'docs/t1/other.md', section: 'Reclaim', missedBySearch: true, handling: 'updated' },
+      { path: 'docs/t1/third.md', missedBySearch: false, handling: 'too-common', note: 'the term is a common word' },
+    ];
+    const grow = {
+      query: 'reclaim keeps the branch',
+      candidates: [
+        { path: 'docs/t1/guide.md', section: 'Reclaim' },
+        { path: 'docs/t1/other.md', why_not: 'states deletion only' },
+      ],
+      mentions,
+    };
+
+    // attest without a locate replays as before
+    appendKnowledgeEvent(tmpDir, 'doc.attest', { docId: 'd1', captureId: 'retro-0' });
+    assert.equal(rebuild(tmpDir).attestsByCapture, undefined);
+
+    // a candidate other than the grown document needs why_not
+    assert.throws(
+      () => appendKnowledgeEvent(tmpDir, 'doc.attest', { docId: 'd1', captureId: 'retro-1', locate: { query: 'q', candidates: [{ path: 'docs/t1/other.md' }] } }),
+      /doc\.attest: locate\.candidates\[0\] requires why_not/,
+    );
+    appendKnowledgeEvent(tmpDir, 'doc.attest', { docId: 'd1', captureId: 'retro-1', locate: grow });
+    const [attest] = rebuild(tmpDir).attestsByCapture['retro-1'];
+    assert.equal(attest.decision, 'grow');
+    assert.equal(attest.docId, 'd1');
+    assert.deepEqual(attest.locate, grow, 'candidates and mentions are kept as given');
+
+    const handoff = { captureId: 'retro-2', requestId: 'request-1', claim: 'A claim.', material: 'Text.', locate: { query: 'q', candidates: [] } };
+    appendKnowledgeEvent(tmpDir, 'capture.handoff', handoff);
+    appendKnowledgeEvent(tmpDir, 'capture.handoff', { ...handoff, decision: 'no-place', locate: { query: 'q', candidates: [], mentions } });
+    const handoffs = rebuild(tmpDir).handoffsByCapture['retro-2'];
+    assert.deepEqual(handoffs.map((h) => h.decision), ['create', 'no-place'], 'an event without a decision reads as create');
+    assert.deepEqual(handoffs[1].locate.mentions, mentions);
+    assert.throws(() => appendKnowledgeEvent(tmpDir, 'capture.handoff', { ...handoff, decision: 'grow' }), /decision must be create or no-place/);
+
+    for (const [event, base] of [
+      ['doc.attest', { docId: 'd1', captureId: 'retro-3' }],
+      ['capture.handoff', handoff],
+    ]) {
+      const refuse = (mention, pattern) => assert.throws(
+        () => appendKnowledgeEvent(tmpDir, event, { ...base, locate: { query: 'q', candidates: [], mentions: [mention] } }),
+        pattern,
+        `${event}: ${JSON.stringify(mention)}`,
+      );
+      refuse({ path: 'docs/a.md', missedBySearch: false }, /locate\.mentions\[0\] \(docs\/a\.md\) requires handling/);
+      refuse({ path: 'docs/a.md', missedBySearch: false, handling: 'ignored' }, /\(docs\/a\.md\) requires handling/);
+      refuse({ path: 'docs/a.md', missedBySearch: false, handling: 'too-common' }, /\(docs\/a\.md\) handling too-common requires note/);
+    }
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
