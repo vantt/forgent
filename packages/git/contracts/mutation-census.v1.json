@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "0ce4147652639792ecf9f2830a82bc9c21b6ba4ebd07100034f081019d2a2c18",
+  "payloadDigest": "8d104c80dcd34cfce4419dcd153dba0a3ab9acde911b91f89c7a8cd24ff0acbd",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -461,12 +461,12 @@
     "packages/distribution/rust/tests/pin_drift.rs": "16fde0d240a0c482bd3cce19602b1d9d009b5fa806bcff997949f324ba02dca2",
     "packages/distribution/rust/tests/schema_golden.rs": "5a819124370a21a3dea2590dddd03b7bc8285fc3031f4920025688378d77c2cf",
     "packages/documentation/rust/src/lib.rs": "17f4a20afcb6d3c5e7de0d3d57dea13683a26c0ce203e78cf20904921ec98715",
-    "packages/documentation/rust/src/locate.rs": "29753a06b1d5d3ae7a17a1dd4feca06c6a41458bb17599dd59e6c05dd669b06e",
+    "packages/documentation/rust/src/locate.rs": "050d20b1362b729635e1fc65c2e7a2bf9f8761aa89e631395b207b9c09e9d2fa",
     "packages/documentation/rust/src/pkm.rs": "8f876f9c7cd51a66d6108d3f5af36cb8c2b5fe18b169c72430ef19a07cbc40d3",
     "packages/documentation/rust/src/port.rs": "9a9c030d181c38cbc7ef4a20c7d32cafa4f537566f14bfcb612571033c21772a",
     "packages/documentation/rust/src/profile.rs": "85d6d9777c973b4709871598835fa6fc3281c407c63f2556015f79577f35bf76",
     "packages/documentation/rust/src/scan.rs": "c67181af637265f7a17d1456ea6d315dc833ea7a438d6d02493cf740b95931d1",
-    "packages/documentation/rust/tests/locate.rs": "246bae7e91448855ee4c8a03600bc2f8fc826bb95784205381fc7c57ced92d40",
+    "packages/documentation/rust/tests/locate.rs": "033d49b070b78ff9faf480fbc018186619a05372e6e2b9cf276cdcccd4e675de",
     "packages/documentation/rust/tests/third_party.rs": "88dee76917695e9de0f72e034c38cc74e058c8222735aab9525096a824e87245",
     "packages/durable-file/rust/src/beneath.rs": "8af47b7886b385c5ef18e4fa40bf333d52699b70c414d9ee9d8c189a0ec9c19b",
     "packages/durable-file/rust/src/lib.rs": "4009c760fbc193a281157aee4dad203fc1b53ce04cc557819322ded12c0ce6f3",

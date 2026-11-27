@@ -259,7 +259,8 @@ fn mentions_come_from_the_files_on_disk_even_with_no_index_and_skip_excluded_fol
     assert!(answer.partial);
     let part = &answer.parts[0];
     assert!(part.candidates.is_empty());
-    let land = &part.mentions[0];
+    assert_eq!(part.mentions[0].term, "a.b (c)", "exact strings come first");
+    let land = &part.mentions[1];
     assert_eq!((land.term.as_str(), land.total), ("fgos land", 2));
     let found: Vec<&str> = land.sections.iter().map(|s| s.path.as_str()).collect();
     assert_eq!(
@@ -268,10 +269,37 @@ fn mentions_come_from_the_files_on_disk_even_with_no_index_and_skip_excluded_fol
         "the history folder is excluded"
     );
     assert!(land.sections.iter().all(|s| s.missed_by_search));
-    assert_eq!(part.mentions[1].sections[0].line, 3);
+    assert_eq!(part.mentions[0].sections[0].line, 3);
     let json = serde_json::to_value(&answer).unwrap();
     assert_eq!(
         json["parts"][0]["mentions"][0]["sections"][0]["missedBySearch"],
         true
     );
+}
+
+#[test]
+fn ten_terms_scan_this_repository_docs_within_a_generous_bound() {
+    use fgos_documentation::port::MentionScanner;
+    let docs = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../docs");
+    let terms: Vec<String> = [
+        "fgos land",
+        "fgos worktree",
+        "locate",
+        "L10",
+        "D-ADR0035",
+        "hexagonal",
+        "write door",
+        "fgos doc locate",
+        "mention",
+        "RUL104",
+    ]
+    .iter()
+    .map(|t| (*t).to_owned())
+    .collect();
+    let started = std::time::Instant::now();
+    let found = FsMentionScanner::new(&docs).scan(&terms).unwrap();
+    let took = started.elapsed();
+    eprintln!("ten-term scan over docs/: {took:?}");
+    assert_eq!(found.len(), 10);
+    assert!(took < Duration::from_secs(30), "took {took:?}");
 }
