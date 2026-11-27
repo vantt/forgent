@@ -2312,18 +2312,27 @@ fn registered_linked_worktree(root: &Path, asked: &str) -> Option<PathBuf> {
         return None;
     }
     let asked = asked.canonicalize().ok()?;
-    let output = Command::new("git")
-        .args(["worktree", "list", "--porcelain"])
-        .current_dir(root)
-        .output()
-        .ok()
-        .filter(|output| output.status.success())?;
-    String::from_utf8_lossy(&output.stdout)
-        .lines()
-        .filter_map(|line| line.strip_prefix("worktree "))
-        .skip(1)
-        .any(|listed| Path::new(listed).canonicalize().is_ok_and(|p| p == asked))
-        .then_some(asked)
+    use std::os::unix::ffi::OsStrExt;
+    let (driver, repo) = fgos_git::GitDriver::open_at(root).ok()??;
+    let mut cursor = None;
+    let mut index = 0usize;
+    loop {
+        let page = driver.list_worktrees(&repo, cursor, 4096).ok()?;
+        for fact in &page.entries {
+            // The first entry is the main checkout; only linked worktrees count.
+            let first = index == 0;
+            index += 1;
+            if first {
+                continue;
+            }
+            let listed = PathBuf::from(std::ffi::OsStr::from_bytes(&fact.path));
+            if listed.canonicalize().is_ok_and(|p| p == asked) {
+                return Some(asked);
+            }
+        }
+        cursor = page.next_cursor;
+        cursor.as_ref()?;
+    }
 }
 
 /// [`RELEASE_CHECK_VERB`]: the project's `release.checks` run in the named linked worktree, unconfined, and nothing
