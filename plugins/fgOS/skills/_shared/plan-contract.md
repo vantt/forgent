@@ -76,13 +76,13 @@ Headings (any level) for each, in this order:
    where it has none, `fgos authority locate` answers `authority: inactive`, and the plan records
    `authority: inactive` in place of the table and goes on.
 5. **Phases**: the phase table (section 4).
-5a. **Unattended run**: the section below. The rule itself lives in the units `ready-plan-runs-unattended` and
-   `coding-footprint-tracing` (Rule: both in AGENTS.md; set in .fgos/instructions/effective/rules.json); this
-   contract fixes only the shape.
-6. **Owner questions**: only what the owner alone can answer per `decision-question.md#when-to-ask`. Ask each with `fgos questions ask`
+6. **Unattended run**: the section below. The rule itself lives in the unit `ready-plan-runs-unattended` (Rule: in AGENTS.md;
+   set in .fgos/instructions/effective/rules.json) and the unit `coding-footprint-tracing`
+   (`domains/coding/instructions/coding-footprint-tracing.md`); this contract fixes only the shape.
+7. **Owner questions**: only what the owner alone can answer per `decision-question.md#when-to-ask`. Ask each with `fgos questions ask`
    (five-part form of [decision-question.md](decision-question.md)) and list the `q-` ids here,
    each with its headline. Decide whatever the evidence settles (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json, priority 2).
-7. **Risks and rollback**: failure modes and the single revert path.
+8. **Risks and rollback**: failure modes and the single revert path.
 
 ### Unattended run section
 
