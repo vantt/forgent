@@ -42,6 +42,8 @@ P0 product mechanism, first among the release-path fixes (discussion ds-r2sv5l5v
 - The checkout is an **exact commit checkout**: it carries the tip's own committed `.fgos` bytes
   (`.fgos/project.json`, `.fgos/instructions/effective/rules.json` and every other tracked `.fgos` path), so the
   checks prove exactly the commit the release records.
+- Every check runs with `TMPDIR` set to `<check checkout>/.fgos/runtime/tmp`, a disk-backed directory the run
+  creates, so no check writes to the shared `/tmp` tmpfs and the recipe needs no `env TMPDIR=...` wrapper.
 - `apply`, `probe` and `rollback` keep running from the project root, as today.
 - A checkout that cannot be made refuses the release before any check runs; a checkout that cannot be removed is
   reported and the run's outcome stands.
@@ -72,6 +74,17 @@ The discussion left three points to the planner. Each is settled here from evide
    `checks-failed`, `asked`, `released`) is unchanged and the checkout stays on disk for the supervisor's ordinary
    `worktree remove`.
 
+4. **Where the checks' temporary files go** (lead:SUPERVISOR order, 2026-11-27 14:21: release checks also failed
+   on `/tmp`, a tmpfs with a per-user quota every agent on the machine shares; the local recipe works around it with
+   `env TMPDIR=/var/tmp/fgos-release-checks`). The adapter sets `TMPDIR=<check checkout>/.fgos/runtime/tmp` for each
+   check and creates that directory first. `.fgos/runtime/` is ignored (`.gitignore`), so the directory leaves the
+   checkout clean for the removal check and `worktree remove --discard-ignored` deletes it through the door with
+   the checkout: no hand deletion, no second directory to manage. Rejected: a sibling directory in the worktree
+   root (a second path to remove by hand, outside the door); `/var/tmp` (shared by every user and outlives the run).
+   A tracked file a check rewrites (for example the mutation census that
+   `scripts/build-rust-distribution.mjs --read-checkout-with-addon` writes when its bytes differ) makes the removal
+   refuse `worktree-dirty-preserved`; that is decision 3's reported, non-fatal case.
+
 Also fixed by the shape of the door: a recipe with no `checks` makes no checkout; the checkout is made after the
 merge-slot look and before the first check, and removed right after the last check that ran, before `ask_owner` or
 `apply`. A checkout that cannot be made ends the run with the new code `check-checkout-failed` (nothing ran, nothing
@@ -92,7 +105,8 @@ applied, reported like `checks-failed`).
    `.fgos` bytes, runs each check with that directory, and removes it with `fgos worktree remove <path>
    --delivered-to <tip> --discard-ignored`; the existing release wiring proof in
    `packages/run-supervisor/rust/tests/head_request.rs` (the test whose recipe has `"checks": [["true"]]`) runs
-   through a real checkout and finds it gone afterwards. Command: `cargo test -p fgos-run-supervisor --test
+   through a real checkout, sees its check run with `TMPDIR=<checkout>/.fgos/runtime/tmp`, and finds the checkout
+   gone afterwards. Command: `cargo test -p fgos-run-supervisor --test
    head_request` (a lead:SUPERVISOR job).
 4. `packages/run-supervisor/contracts/head-request.v1.json` (`release run`), `core/config-standard/release.yaml`
    and `core/config-schema/release.schema.yaml` say the checks run in an exact checkout of the trunk tip and list
@@ -108,7 +122,8 @@ applied, reported like `checks-failed`).
 
 - Changing what the recipe runs (`release.checks`, `apply`, `probe`, `rollback` values).
 - Changing how `apply`, `probe` or `rollback` run.
-- The `/tmp` inode limit (its own backlog row if it recurs).
+- The machine's `/tmp` quota itself (the checks no longer use it, decision 4; other users of `/tmp` are their own
+  backlog row if it recurs).
 - A warm build cache for the check checkout (a cold `cargo test --workspace` and `npm install` per release run is
   accepted; see Risks).
 - Any new flag on the `worktree` verb, and any change to worker checkouts other than the Land candidate's call site.
