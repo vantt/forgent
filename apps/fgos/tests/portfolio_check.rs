@@ -112,9 +112,7 @@ notes
 "#;
 
     let res1 = parse_backlog_item(Path::new("bad.md"), text_bad_status);
-    assert!(
-        matches!(res1, Err(PortfolioRefusal::StatusUnknown(m)) if m.contains("in-progress"))
-    );
+    assert!(matches!(res1, Err(PortfolioRefusal::StatusUnknown(m)) if m.contains("in-progress")));
 
     let text_bad_priority = text_bad_status
         .replace("status: in-progress", "status: proposed")
@@ -142,9 +140,7 @@ done
 "#;
 
     let res = parse_backlog_item(Path::new("bad.md"), text_missing_notes);
-    assert!(
-        matches!(res, Err(PortfolioRefusal::BodySectionMissing(m)) if m.contains("Notes"))
-    );
+    assert!(matches!(res, Err(PortfolioRefusal::BodySectionMissing(m)) if m.contains("Notes")));
 }
 
 #[test]
