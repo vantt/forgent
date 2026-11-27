@@ -5,6 +5,7 @@
 // side of the wire is proven in packages/run-supervisor/rust/tests/head_request.rs.
 import '../helpers/process-tmp-root.mjs';
 import { ensureGitAddon } from '../helpers/git-addon.mjs';
+import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
@@ -1001,10 +1002,10 @@ lead: head:lead-proj-${planDir}
   fs.mkdirSync(locks, { recursive: true, mode: 0o700 });
   fs.chmodSync(path.join(root, '.git', 'fgos'), 0o700);
 
-  fs.writeFileSync(path.join(root, '.fgos', 'config.yaml'), '# @fgos:v1\nland:\n  gates:\n    - run: "true"\n');
+  writeRawProjectConfig(root, '# @fgos:v1\nland:\n  gates:\n    - run: "true"\n');
   fs.writeFileSync(
     path.join(root, '.git', 'info', 'exclude'),
-    '.fgos/config.yaml\n.fgos/locks/\n.fgos/runtime/\n.fgos/observe/\n',
+    '.fgos/*.yaml\n.fgos/locks/\n.fgos/runtime/\n.fgos/observe/\n',
   );
 
   fs.mkdirSync(path.join(stateDir, 'fgos'), { recursive: true, mode: 0o700 });
