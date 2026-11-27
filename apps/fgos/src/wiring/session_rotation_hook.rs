@@ -406,12 +406,25 @@ fn hand_opened_start(fgos_dir: &Path) -> Result<Option<String>, String> {
 /// `<project>/.fgos` of the directory the head was started in: Claude Code's project directory when it names a
 /// directory (its hook cwd follows the model's `cd`), else the cwd. That is the `projectRoot` the session start door
 /// recorded the lineage under, which is not always the main checkout (a head started in a linked worktree).
-fn fgos_dir_of(claude_project_dir: Option<&std::ffi::OsStr>, cwd: &Path) -> Option<PathBuf> {
-    let start = claude_project_dir
-        .filter(|d| !d.is_empty())
-        .map(Path::new)
+fn fgos_dir_of(
+    head_project_root: Option<&std::ffi::OsStr>,
+    claude_project_dir: Option<&std::ffi::OsStr>,
+    cwd: &Path,
+) -> Option<PathBuf> {
+    fn named(v: Option<&std::ffi::OsStr>) -> Option<&Path> {
+        v.filter(|d| !d.is_empty())
+            .map(Path::new)
+            .filter(|d| d.is_dir())
+    }
+    // The launch door names the project root the lineage was recorded under; a head in a linked worktree has a
+    // `.fgos` of its own there, so Claude's project directory alone would read the wrong one.
+    if let Some(dir) = named(head_project_root)
+        .map(|d| d.join(".fgos"))
         .filter(|d| d.is_dir())
-        .unwrap_or(cwd);
+    {
+        return Some(dir);
+    }
+    let start = named(claude_project_dir).unwrap_or(cwd);
     Some(start.join(".fgos")).filter(|dir| dir.is_dir())
 }
 
@@ -706,7 +719,11 @@ fn run(args: &[OsString]) {
     let Ok(cwd) = std::env::current_dir() else {
         return;
     };
-    let fgos_dir = fgos_dir_of(std::env::var_os("CLAUDE_PROJECT_DIR").as_deref(), &cwd);
+    let fgos_dir = fgos_dir_of(
+        std::env::var_os("FGOS_HEAD_PROJECT_ROOT").as_deref(),
+        std::env::var_os("CLAUDE_PROJECT_DIR").as_deref(),
+        &cwd,
+    );
     let Some(head) = head else {
         // A session opened by hand: no head identity, so it gets what the composer selects for its facts.
         if let (Event::SessionStart, Some(fgos_dir)) = (event, fgos_dir) {
@@ -881,15 +898,46 @@ mod tests {
         let project = fgos_dir.parent().unwrap();
         let elsewhere = std::env::temp_dir();
         assert_eq!(
-            fgos_dir_of(Some(project.as_os_str()), &elsewhere),
+            fgos_dir_of(None, Some(project.as_os_str()), &elsewhere),
             Some(fgos_dir.clone())
         );
-        assert_eq!(fgos_dir_of(None, project), Some(fgos_dir.clone()));
+        assert_eq!(fgos_dir_of(None, None, project), Some(fgos_dir.clone()));
         assert_eq!(
-            fgos_dir_of(Some(std::ffi::OsStr::new("/no/such/dir")), project),
+            fgos_dir_of(None, Some(std::ffi::OsStr::new("/no/such/dir")), project),
             Some(fgos_dir)
         );
-        assert_eq!(fgos_dir_of(None, &elsewhere.join("srh-no-fgos")), None);
+        assert_eq!(
+            fgos_dir_of(None, None, &elsewhere.join("srh-no-fgos")),
+            None
+        );
+    }
+
+    #[test]
+    fn a_head_in_a_worktree_with_its_own_fgos_resolves_the_project_fgos_from_the_launch_root() {
+        let (fgos_dir, _) = fgos("wt-root");
+        let project = fgos_dir.parent().unwrap();
+        let worktree = project.join("wt-checkout");
+        std::fs::create_dir_all(worktree.join(".fgos")).unwrap();
+        assert_eq!(
+            fgos_dir_of(
+                Some(project.as_os_str()),
+                Some(worktree.as_os_str()),
+                &worktree
+            ),
+            Some(fgos_dir)
+        );
+        assert_eq!(
+            fgos_dir_of(None, Some(worktree.as_os_str()), &worktree),
+            Some(worktree.join(".fgos"))
+        );
+        assert_eq!(
+            fgos_dir_of(
+                Some(std::ffi::OsStr::new("/no/such/dir")),
+                Some(worktree.as_os_str()),
+                &worktree
+            ),
+            Some(worktree.join(".fgos"))
+        );
     }
 
     #[test]
