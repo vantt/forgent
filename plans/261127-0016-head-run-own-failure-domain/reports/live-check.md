@@ -1,7 +1,6 @@
 # Phase 4 — integration and live check
 
-Status: the suites (criterion 5) and the scope, binding and isolation parts of the live check (criterion 4) pass.
-One part of criterion 4 is still open (the head-supervisor raise); see "Open" at the end.
+Status: PASS. The suites (criterion 5) and every part of the live check (criterion 4) pass; see "Result" at the end.
 
 ## Step 1: full suites on the combined tree
 
@@ -42,7 +41,7 @@ Verdict: PASS for scopes, binding and isolation. The raise is to be confirmed af
 
 ## Open
 
-- **Dead-supervisor raise.** The kill in step 3 hit the supervisor of a throwaway `fgos run` unit, not a head's.
+- **Dead-supervisor raise.** Closed by the head-supervisor kill below. The kill in step 3 hit the supervisor of a throwaway `fgos run` unit, not a head's.
   The head-state source judges heads only, from `placement.json` and its `runDir` (`docs/platform/observe/spec.md`,
   `fgos.head.state`). So no `session-gone` with `supervisor-gone` is expected for that kill. Criterion 4 asks for
   the raise of a killed **head** supervisor: start a test head, `kill -9` its supervise pid, and after one tick see
@@ -84,3 +83,23 @@ The probe head is `head:shaper-ds-r2sv5l5vnu`, started under release 05acb89c. I
 - **Fix if (b).** Phase 2's file stamps a `supervisor-gone` record with the instant its binding was written, not
   `startedAt`, so the two incidents get different ids. Then the check is rerun with a fresh probe head. A second
   finding would also need explaining: why a just-started head read `gone` within its first tick.
+
+### Verdict on the head-supervisor kill: PASS (case a)
+
+The store record of `3d256ce12fbb619d` (`supervision.event-raised`, seq 7834) was raised at 2026-11-27T11:31:07.408Z.
+That is 14 minutes after the kill at 11:17:03Z, and it is the only event for the ref, so no earlier `gone` raise
+shares its id and case (b) is ruled out. Its payload `ts` is the placement's `startedAt` (11:16:43.590Z). Of the
+states `session-gone` matches, only `gone` and `supervisor-gone` carry that instant; `ended` carries its
+`closed.json` time. The pane was live at the raise: the head's processes ran until the probe was retired at
+11:32:01Z. So the state was `supervisor-gone`, and acceptance criterion 4 holds.
+
+Notes, not defects of this plan:
+
+- The raise came 14 minutes after the kill, not within the 10 minutes watched. That is one watcher tick plus the
+  tick's own delay. This record does not show whether an earlier tick ran.
+- The event payload does not carry `fgos.head.state`, so a reader cannot tell `gone` from `supervisor-gone`
+  without this deduction. That is a follow-up idea for the owner, not built here (RUL104).
+
+## Result
+
+Acceptance criteria 4 and 5 hold. Phase 4 is done.
