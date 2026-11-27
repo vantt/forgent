@@ -1996,10 +1996,10 @@ fn a_legacy_id_does_not_match_the_file_of_a_longer_id_that_it_prefixes() {
     git(&f.main, &["push", "-q", "origin", "trunk"]);
     let done = plan_with_sources("done", &["wf-foo"]);
     fs::write(f.main.join(PLAN_PATH), &done).unwrap();
-    // A legacy id that names no item is not an item the door closes: the plan lands alone and the
-    // longer id's item is left as it was.
+    // A legacy id that names no item is not an item the door closes: the plan lands with the index
+    // (which now lists the longer id's row) and the longer id's item is left as it was.
     land_with_index(&f, &paths(&[PLAN_PATH])).unwrap();
-    assert_eq!(changed_in_head(&f), vec![PLAN_PATH]);
+    assert_eq!(changed_in_head(&f), vec![PLAN_PATH, INDEX]);
     assert_eq!(
         fs::read_to_string(f.main.join(longer)).unwrap(),
         item_text("wf-foo-bar", "proposed")
@@ -2011,11 +2011,13 @@ fn a_plan_land_that_is_not_a_turn_to_done_touches_no_item() {
     let f = Fixture::new();
     running_plan_with_items(&f);
     let head = |f: &Fixture| git(&f.main, &["show", "--name-only", "--format=", "HEAD"]);
-    // Still running: an edit that is not a transition.
+    // Still running: an edit that is not a transition. The door still asks the generator, with the plan
+    // as the committed file, and no item changes.
     let running = plan_with_sources("running", &CITED) + "\nNote.\n";
     fs::write(f.main.join(PLAN_PATH), running).unwrap();
     land_with_index(&f, &paths(&[PLAN_PATH])).unwrap();
-    assert_eq!(head(&f), PLAN_PATH);
+    assert_eq!(head(&f).trim(), PLAN_PATH);
+    assert_eq!(last_committing(), vec![PLAN_PATH]);
     // Already done at the tip: a later edit of the done plan changes no item.
     fs::write(f.main.join(PLAN_PATH), plan_with_sources("done", &CITED)).unwrap();
     land_with_index(&f, &paths(&[PLAN_PATH])).unwrap();
@@ -2025,10 +2027,171 @@ fn a_plan_land_that_is_not_a_turn_to_done_touches_no_item() {
     let more = plan_with_sources("done", &CITED) + "\nMore.\n";
     fs::write(f.main.join(PLAN_PATH), more).unwrap();
     land_with_index(&f, &paths(&[PLAN_PATH])).unwrap();
-    assert_eq!(head(&f), PLAN_PATH);
+    // No item changes; the index (stale since the reopen) is the one extra file the commit carries.
+    assert_eq!(changed_in_head(&f), vec![PLAN_PATH, INDEX]);
     assert_eq!(
         fs::read_to_string(f.main.join(ITEM_A)).unwrap(),
         item_text(ID_A, "in-flight")
+    );
+    assert_eq!(
+        fs::read_to_string(f.main.join(INDEX)).unwrap(),
+        "p-aaaaaaaaaa-first.md in-flight\np-bbbbbbbbbb-second.md done\n"
+    );
+}
+
+const ITEM_C: &str = "plans/backlog/p-cccccccccc-third.md";
+const DISCUSSION_PATH: &str = "plans/discussions/ds-aaaaaaaaaa-x/DISCUSSION.md";
+const THREE_ROWS: &str =
+    "p-aaaaaaaaaa-first.md in-flight\np-bbbbbbbbbb-second.md proposed\np-cccccccccc-third.md proposed";
+
+/// Leaves the trunk's committed index stale, so a land that regenerates it shows in its commit.
+fn stale_index_on_trunk(f: &Fixture) {
+    fs::write(f.main.join(INDEX), "stale\n").unwrap();
+    git(&f.main, &["commit", "-qam", "stale index"]);
+    git(&f.main, &["push", "-q", "origin", "trunk"]);
+}
+
+#[test]
+fn a_paths_land_of_one_new_row_commits_that_file_and_the_regenerated_index_only() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    fs::write(f.main.join(ITEM_C), item_text(ID_C, "proposed")).unwrap();
+    land_with_index(&f, &paths(&[ITEM_C])).unwrap();
+    assert_eq!(changed_in_head(&f), vec![INDEX, ITEM_C]);
+    assert_eq!(
+        git(&f.main, &["show", &format!("HEAD:{INDEX}")]),
+        THREE_ROWS
+    );
+    assert_eq!(changes_outside_runtime(&f), Vec::<String>::new());
+}
+
+#[test]
+fn a_paths_land_of_a_discussion_commits_the_regenerated_index() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    stale_index_on_trunk(&f);
+    let full = f.main.join(DISCUSSION_PATH);
+    fs::create_dir_all(full.parent().unwrap()).unwrap();
+    fs::write(&full, "---\ntitle: d\n---\n").unwrap();
+    land_with_index(&f, &paths(&[DISCUSSION_PATH])).unwrap();
+    assert_eq!(changed_in_head(&f), vec![INDEX, DISCUSSION_PATH]);
+    assert_eq!(
+        fs::read_to_string(f.main.join(INDEX)).unwrap(),
+        "p-aaaaaaaaaa-first.md in-flight\np-bbbbbbbbbb-second.md proposed\n"
+    );
+}
+
+#[test]
+fn a_paths_land_that_touches_no_index_feeding_path_leaves_the_index_alone() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    stale_index_on_trunk(&f);
+    fs::write(f.main.join("a"), "changed\n").unwrap();
+    land_with_index(&f, &paths(&["a"])).unwrap();
+    assert_eq!(changed_in_head(&f), vec!["a"]);
+    assert_eq!(last_committing(), Vec::<String>::new());
+    assert_eq!(fs::read_to_string(f.main.join(INDEX)).unwrap(), "stale\n");
+}
+
+#[test]
+fn a_paths_land_carrying_a_hand_edited_index_commits_the_generators_bytes() {
+    let two_rows = "p-aaaaaaaaaa-first.md in-flight\np-bbbbbbbbbb-second.md proposed";
+    for scope in [INDEX, "plans"] {
+        let f = Fixture::new();
+        running_plan_with_items(&f);
+        stale_index_on_trunk(&f);
+        fs::write(f.main.join(INDEX), "hand edit\n").unwrap();
+        land_with_index(&f, &paths(&[scope])).unwrap();
+        assert_eq!(
+            git(&f.main, &["show", &format!("HEAD:{INDEX}")]),
+            two_rows,
+            "scope {scope}"
+        );
+        assert_eq!(
+            fs::read_to_string(f.main.join(INDEX)).unwrap().trim(),
+            two_rows,
+            "scope {scope}: the working tree holds the generator's bytes too"
+        );
+    }
+}
+
+fn row_branch_command() -> LandCommand {
+    LandCommand {
+        // The footprint omits the index: the door's index write is not a branch edit.
+        footprint: Some(vec![
+            "plans/260101-0000-demo/**".into(),
+            "plans/backlog/**".into(),
+        ]),
+        ..branch("rows")
+    }
+}
+
+#[test]
+fn a_branch_land_that_changes_a_plan_status_and_adds_a_row_commits_the_regenerated_index() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    stale_index_on_trunk(&f);
+    f.topic(
+        "rows",
+        &[
+            (ITEM_C, &item_text(ID_C, "proposed")),
+            (PLAN_PATH, &plan_with_sources("done", &CITED)),
+        ],
+    );
+    let out = land_with_index_config(
+        &f,
+        &row_branch_command(),
+        &config(vec![gate("true")]),
+        &counter(&f),
+    )
+    .unwrap();
+    assert_eq!(
+        git(&f.main, &["show", &format!("{}:{INDEX}", out.main_sha)]),
+        THREE_ROWS
+    );
+    assert_eq!(changes_outside_runtime(&f), Vec::<String>::new());
+}
+
+#[test]
+fn a_branch_land_replaces_the_index_bytes_the_branch_itself_edited() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    f.topic(
+        "rows",
+        &[
+            (ITEM_C, &item_text(ID_C, "proposed")),
+            (INDEX, "branch hand edit\n"),
+        ],
+    );
+    let out = land_with_index_config(
+        &f,
+        &row_branch_command(),
+        &config(vec![gate("true")]),
+        &counter(&f),
+    )
+    .unwrap();
+    assert_eq!(
+        git(&f.main, &["show", &format!("{}:{INDEX}", out.main_sha)]),
+        THREE_ROWS
+    );
+}
+
+#[test]
+fn a_branch_land_that_touches_no_index_feeding_path_leaves_the_index_alone() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    stale_index_on_trunk(&f);
+    f.topic("rows", &[("src-one.txt", "one\n")]);
+    let out = land_with_index_config(
+        &f,
+        &branch("rows"),
+        &config(vec![gate("true")]),
+        &counter(&f),
+    )
+    .unwrap();
+    assert_eq!(
+        git(&f.main, &["show", &format!("{}:{INDEX}", out.main_sha)]),
+        "stale"
     );
 }
 
