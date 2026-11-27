@@ -11,7 +11,9 @@ import {
   AUTHORITY_MAP_REQUIRED_FROM,
   BACKLOG_SOURCE_REQUIRED_FROM,
   IDENTITY,
+  QUESTIONS,
   STATUSES,
+  UNATTENDED_RUN_REQUIRED_FROM,
   activeOverlaps,
   checkAll,
   checkPlanDir,
@@ -389,6 +391,80 @@ test('the script gets the model from the host verb and opens no model file', () 
   const source = fs.readFileSync(SCRIPT, 'utf8');
   assert.ok(source.includes("invokeHost(['authority', 'model', '--json'])"));
   assert.ok(!/component-authority\/model/.test(source));
+});
+
+// The Unattended-run rule (core/instructions/ready-plan-runs-unattended.md). The question store is answered by a stub
+// at the QUESTIONS seam, as the authority model is at AUTHORITY.
+const GATED = { created: UNATTENDED_RUN_REQUIRED_FROM, source: '["DISCUSSION.md", "p-abcdef2345"]' };
+const ACCEPTANCE = '## Acceptance criteria\n1. [core] a thing\n   continuation line\n2. [debt-ok] another\n';
+const HOST_TABLE = '| step | argv | executor |\n|---|---|---|\n| full gate | fgos release check --worktree <path> | lead |\n';
+const BEYOND_ROW = '| item | question |\n|---|---|\n| a grant | q-abc123 |\n';
+const unattended = ({ host = HOST_TABLE, beyond = 'None.' } = {}) =>
+  `## Unattended run\n\n### Host steps\n${host}\n### Cleanup\nStanding rule.\n\n### Beyond the rule\n${beyond}\n\n### Split\nOne.\n`;
+const readyPlan = ({ acceptance = ACCEPTANCE, section = unattended(), fm = GATED } = {}) => planText({
+  fm: { status: 'ready', ...fm },
+  tail: SECTIONS.replace(/## Acceptance criteria\nx\n/, acceptance) + section,
+});
+const unattendedErrors = (text, states = new Map()) => {
+  const before = QUESTIONS.read;
+  QUESTIONS.read = typeof states === 'function' ? states : () => states;
+  try { return errorsOf(text); } finally { QUESTIONS.read = before; }
+};
+
+test('a complete ready plan with the Unattended run section passes', () => {
+  assert.deepEqual(unattendedErrors(readyPlan()), []);
+  const answered = readyPlan({ section: unattended({ beyond: BEYOND_ROW }) });
+  assert.deepEqual(unattendedErrors(answered, new Map([['q-abc123', 'answered']])), []);
+});
+
+test('a ready plan created before the gate date passes without the section', () => {
+  const old = planText({ fm: { status: 'ready', created: '2026-11-27', source: '["DISCUSSION.md", "p-abcdef2345"]' } });
+  assert.deepEqual(unattendedErrors(old), []);
+});
+
+test('a ready plan on or after the gate date without the Unattended run section is refused', () => {
+  const text = planText({ fm: { status: 'ready', ...GATED } });
+  assert.ok(unattendedErrors(text).includes('missing section: unattended run'));
+});
+
+test('a draft plan is not asked for the Unattended run section', () => {
+  assert.ok(!unattendedErrors(planText({ fm: { status: 'draft', ...GATED } })).includes('missing section: unattended run'));
+});
+
+test('a host step without an argv starting with fgos is refused', () => {
+  const host = '| step | argv | executor |\n|---|---|---|\n| gate | npm test | lead |\n';
+  const errors = unattendedErrors(readyPlan({ section: unattended({ host }) }));
+  assert.ok(errors.some((e) => e.includes('host step "gate" has no argv starting with "fgos "')), errors.join('\n'));
+});
+
+test('a host step without an executor is refused', () => {
+  const host = '| step | argv | executor |\n|---|---|---|\n| gate | fgos release check | |\n';
+  const errors = unattendedErrors(readyPlan({ section: unattended({ host }) }));
+  assert.ok(errors.some((e) => e.includes('host step "gate" has no executor')), errors.join('\n'));
+});
+
+test('an acceptance criterion marked neither core nor debt-ok is refused', () => {
+  const errors = unattendedErrors(readyPlan({ acceptance: '## Acceptance criteria\n1. [core] fine\n2. unmarked one\n' }));
+  assert.equal(errors.filter((e) => e.includes('not marked [core] or [debt-ok]')).length, 1, errors.join('\n'));
+  assert.ok(errors.some((e) => e.includes('unmarked one')));
+});
+
+test('a beyond-the-rule row without a q- id is refused', () => {
+  const beyond = '| item | question |\n|---|---|\n| a grant | none yet |\n';
+  const errors = unattendedErrors(readyPlan({ section: unattended({ beyond }) }));
+  assert.ok(errors.some((e) => e.includes('beyond-the-rule item "a grant" names no q- question id')), errors.join('\n'));
+});
+
+test('a beyond-the-rule row whose question is not answered is refused', () => {
+  const text = readyPlan({ section: unattended({ beyond: BEYOND_ROW }) });
+  assert.ok(unattendedErrors(text, new Map([['q-abc123', 'open']])).some((e) => e.includes('q-abc123') && e.includes('is not answered (open)')));
+  assert.ok(unattendedErrors(text, new Map()).some((e) => e.includes('unknown to the question store')));
+});
+
+test('a beyond-the-rule row fails closed when the question store cannot be read', () => {
+  const text = readyPlan({ section: unattended({ beyond: BEYOND_ROW }) });
+  const errors = unattendedErrors(text, () => { throw new Error('host down'); });
+  assert.ok(errors.some((e) => e.includes('q-abc123') && e.includes('cannot read the question store: host down')), errors.join('\n'));
 });
 
 test('the script statuses equal the plan vocabulary contract', () => {

@@ -16,7 +16,7 @@ import { cutFrontmatter, readFrontmatter } from '../src/util/yaml.mjs';
 import { nativeDoor } from '../src/native/door.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
-import { PLAN_SECTIONS, hasSection } from '../src/portfolio/plan-sections.mjs';
+import { PLAN_SECTIONS, acceptanceCriteriaLines, hasSection, readUnattendedRun } from '../src/portfolio/plan-sections.mjs';
 import { invokeHost } from '../src/util/host-bin.mjs';
 
 // The YAML door and the write-scope package both answer through the native addon; a checkout stages its own.
@@ -27,6 +27,8 @@ export const CONTRACT_MARKER = 'plan-v1';
 export const BACKLOG_SOURCE_REQUIRED_FROM = '2026-11-22';
 // Plans written before the Authority-map rule carry no map; only plans created from this date on must.
 export const AUTHORITY_MAP_REQUIRED_FROM = '2026-11-24';
+/** A plan created on or after this date must carry the Unattended run section to be `ready`. */
+export const UNATTENDED_RUN_REQUIRED_FROM = '2026-11-28';
 // The plan vocabulary has one source, shared with the Rust portfolio reader and the head-name resolver.
 const VOCABULARY = JSON.parse(fs.readFileSync(new URL('../packages/supervision/contracts/plan-vocabulary.v1.json', import.meta.url), 'utf8'));
 export const STATUSES = VOCABULARY.statuses;
@@ -226,7 +228,90 @@ export const AUTHORITY = {
   },
 };
 
-const DECLARE_KINDS = ['component', 'decision-kind', 'door', 'contract'];
+/**
+ * Where the check reads whether an owner question is answered: the host's `fgos questions list --all --json`, one
+ * call per process, as `Map<id, state>`. A test replaces `read`.
+ */
+export const QUESTIONS = {
+  cache: undefined,
+  read() {
+    this.cache ??= new Map((invokeHost(['questions', 'list', '--all', '--json']).questions ?? []).map((q) => [q.id, q.state]));
+    return this.cache;
+  },
+};
+
+const NONE = /^none\.?$/i;
+const ANSWERED_STATES = new Set(['answered', 'acked']);
+const QUESTION_ID = /\bq-[a-z0-9]+\b/i;
+
+/** The table rows (header and separator dropped) of `lines`, plus the non-table prose lines that are not blank. */
+function tableAndProse(lines) {
+  const rows = lines.filter((l) => l.trimStart().startsWith('|')).map(cells);
+  return { rows: rows.slice(2), prose: lines.map((l) => l.trim()).filter((l) => l && !l.startsWith('|')) };
+}
+
+/** Whether the first prose line opens with the word `None.`; text after it explains the answer. */
+const startsWithNone = (prose) => NONE.test((prose[0] ?? '').replace(/[`*]/g, '').split(/\s/)[0]);
+
+/** The list item a criterion line starts, or `null` when the line is not a top-level item. */
+const TOP_LEVEL_ITEM = /^(?:\d+[.)]|[-*+])\s+(.*)$/;
+
+/**
+ * The Unattended-run rule for a `ready` plan (core/instructions/ready-plan-runs-unattended.md): the section exists;
+ * Host steps is `None.` or a table whose rows each name an argv starting with `fgos ` and an executor; every
+ * top-level acceptance criterion starts `[core]` or `[debt-ok]`; Beyond the rule is `None.` or a table whose rows
+ * each name an answered `q-` id. Reads shape only: whether the permission table allows an argv is the validator's.
+ */
+function checkUnattendedRun(body, errors) {
+  const section = readUnattendedRun(body);
+  if (!section) { errors.push('missing section: unattended run'); return; }
+  const { hostSteps, beyondTheRule } = section;
+  if (!hostSteps) {
+    errors.push('unattended run: missing subsection "Host steps" (write `None.` or a table of step, argv, executor)');
+  } else {
+    const { rows, prose } = tableAndProse(hostSteps);
+    if (!rows.length && !startsWithNone(prose)) {
+      errors.push('unattended run: Host steps is neither `None.` nor a table of step, argv, executor');
+    }
+    for (const row of rows) {
+      const step = plain(row[0] ?? '') || '(unnamed step)';
+      if (!/^fgos\s+\S/.test(plain(row[1] ?? ''))) errors.push(`unattended run: host step "${step}" has no argv starting with "fgos "`);
+      if (!plain(row[2] ?? '')) errors.push(`unattended run: host step "${step}" has no executor`);
+    }
+  }
+  const criteria = acceptanceCriteriaLines(body) ?? [];
+  for (const line of criteria) {
+    const item = TOP_LEVEL_ITEM.exec(line);
+    if (item && !/^\[(core|debt-ok)\]/.test(item[1])) {
+      errors.push(`unattended run: acceptance criterion is not marked [core] or [debt-ok]: ${item[1].slice(0, 80)}`);
+    }
+  }
+  if (!beyondTheRule) {
+    errors.push('unattended run: missing subsection "Beyond the rule" (write `None.` or a table of item, question)');
+    return;
+  }
+  const { rows, prose } = tableAndProse(beyondTheRule);
+  // Prose after `None.` explains the answer; only a section with no table must lead with the word.
+  if (!rows.length && !startsWithNone(prose)) {
+    errors.push('unattended run: Beyond the rule is neither `None.` nor a table of item, question');
+  }
+  if (!rows.length) return;
+  let states;
+  const stateOf = (id) => {
+    try { states ??= QUESTIONS.read(); } catch (e) { return { error: e.message }; }
+    return { state: states.get(id) };
+  };
+  for (const row of rows) {
+    const item = plain(row[0] ?? '') || '(unnamed item)';
+    const id = QUESTION_ID.exec(row.slice(1).join(' '))?.[0];
+    if (!id) { errors.push(`unattended run: beyond-the-rule item "${item}" names no q- question id`); continue; }
+    const { state, error } = stateOf(id);
+    if (error) errors.push(`unattended run: beyond-the-rule item "${item}" (${id}): cannot read the question store: ${error}`);
+    else if (!ANSWERED_STATES.has(state)) errors.push(`unattended run: beyond-the-rule item "${item}" (${id}) is not answered (${state ?? 'unknown to the question store'})`);
+  }
+}
+
+const DECLARE_KINDS =['component', 'decision-kind', 'door', 'contract'];
 const DECLARE_LINE = new RegExp(`^declare:\\s*(${DECLARE_KINDS.join('|')})\\s+[A-Za-z0-9][A-Za-z0-9-]*$`);
 
 /** The ids a model row can be named by in an Authority map: component, decision kind and contract ids, door slugs. */
@@ -349,6 +434,7 @@ export function checkPlanDir(dir, { plansRoot = path.dirname(path.resolve(dir)) 
   checkPhaseTable(body, errors, meta.status);
   const mapRequired = typeof meta.created === 'string' && meta.created >= AUTHORITY_MAP_REQUIRED_FROM;
   if ((meta.status === 'draft' || meta.status === 'ready') && mapRequired) checkAuthorityMap(body, errors);
+  if (meta.status === 'ready' && typeof meta.created === 'string' && meta.created >= UNATTENDED_RUN_REQUIRED_FROM) checkUnattendedRun(body, errors);
   const warnings = [];
   if (hostWellFormed && (meta.status === 'ready' || meta.status === 'running')) {
     const warning = hostWarning(meta.host);
