@@ -2595,10 +2595,7 @@ impl Lander<'_> {
             Remote::Rejected => Ok(false),
             _ => Err((
                 ResultCode::RemoteOutcomeUnknown,
-                refuse(
-                    "land-remote-outcome-unknown",
-                    "the push outcome is unknown",
-                ),
+                refuse("land-remote-outcome-unknown", "the push outcome is unknown"),
             )),
         }
     }

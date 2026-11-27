@@ -1592,7 +1592,9 @@ impl GitDriver {
             return;
         }
         // The authority a commit was bound to: the lock file the main checkout held.
-        let main_lock = repo.trusted_main_root().join(".fgos/locks/main-checkout.lock");
+        let main_lock = repo
+            .trusted_main_root()
+            .join(".fgos/locks/main-checkout.lock");
         let (Ok(resources), Ok(key)) = (
             crate::scoped_commit::checkout_resources(repo),
             crate::refs::file_key(&main_lock),

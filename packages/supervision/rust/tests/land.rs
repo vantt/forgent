@@ -1461,7 +1461,10 @@ fn a_paths_land_finishes_a_land_door_commit_whose_journal_was_compacted_by_a_lat
     let out = f.land(&cmd, &config(vec![gate("true")])).unwrap();
     assert_eq!(out.main_sha, f.remote_tip());
     let log = git(&f.remote, &["log", "--oneline", "refs/heads/trunk"]);
-    assert!(log.contains("unpushed a") && log.contains("unpushed b"), "{log}");
+    assert!(
+        log.contains("unpushed a") && log.contains("unpushed b"),
+        "{log}"
+    );
 }
 
 #[test]
