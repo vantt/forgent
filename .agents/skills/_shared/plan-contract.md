@@ -44,7 +44,7 @@ the YAML door (`src/util/yaml.mjs`), never a private parser.
 | `status` | `draft` \| `ready` \| `running` \| `done` \| `withdrawn` | one vocabulary, below |
 | `priority` | `P0`..`P3` | |
 | `blockedBy` | list of plan dir names | each must exist under `plans/`; `[]` when none |
-| `footprint` | list of repo-relative paths or globs | everything the plan may write: code, tests, docs, CHANGELOG, the plan dir. Required when `ready` or `running` |
+| `footprint` | list of repo-relative paths or globs | everything the plan may write: code, tests, docs, changelog.d/<fragment>, the plan dir. Required when `ready` or `running` |
 | `base` | 40-char commit sha | the commit the plan was written against; required when `ready` or `running` |
 | `lead` | Identity role string, e.g. `lead:S6A` or `head:lead-<handle>-<plan>` | the role of the lead that runs the plan; written in the same commit that sets `status: running`. Required when `status: running` (the check fails if a `running` plan lacks it); the supervisor holds a running plan with no `lead` and never restarts it |
 | `source` | list of strings | the DISCUSSION.md path and/or backlog ids the plan answers |
@@ -102,9 +102,9 @@ The phase table has exactly these columns (order free):
 - **Waves**: a phase's wave is later than the wave of everything it depends on. Every phase
   whose dependencies are met starts at once; layers stay serial (a lower layer lands before
   the one above it starts).
-- **Hot files**: one writer per hot file per wave. A shared file (registry, manifest, index,
-  CHANGELOG) goes to one phase or to a final serial phase. Generated files are named as hot
-  files (Rule: design-principles (in AGENTS.md; set in .fgos/instructions/effective/rules.json)., principle 7).
+- **Hot files**: one writer per hot file per wave. A shared file (registry, manifest, index)
+  goes to one phase or to a final serial phase. Generated files declared in `land.regenerate`
+  are rebuilt at land (Rule: design-principles (in AGENTS.md; set in .fgos/instructions/effective/rules.json)., principle 7).
 - **Size**: a phase fits one short leader, about one to two days of work. Larger: split it,
   by file boundary first.
 - **Execution**: each parallel phase runs as its own Workflow case in its own worktree.
@@ -129,10 +129,9 @@ The phase table has exactly these columns (order free):
   the check fails if a `running` plan lacks it).
 - The land door runs the check on every landed plan (`node scripts/plan-contract-check.mjs`);
   a plan that breaks the contract cannot land.
-- Cross-plan footprint overlap: for a plan that is `ready`, overlap with another active plan
-  is an error (resolve by `blockedBy` or by narrowing a footprint); for a plan already `running`,
-  overlap is read as a warning, because admission already decided it and the plan's own leads
-  must keep landing.
+- Cross-plan footprint overlap: overlap with another `ready` or `running` plan is a warning
+  naming the plan and paths, never an error, and conflicts are met at land; `blockedBy` is for
+  a real ordering, never a workaround for a shared file.
 - A plan blocked by an owner question stays `draft` as a whole, but every phase the answer
   does not touch is marked `ready` in the phase table and may start. List the blocked phase
   and its question; do not hold the others.

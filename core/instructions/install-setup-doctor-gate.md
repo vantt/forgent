@@ -41,5 +41,6 @@ cài đặt/setup/doctor story. Before any change is done, check:
   all, read `docs/platform/packaging-distribution/vision.md` and `docs/platform/packaging-distribution/spec.md`
   first — a new module gets a spec/config-registry entry before it gets
   code, same bar as a new product area (definition-of-done, question 2).
-- Does this change something a user of fgOS would see? If yes, add a line
-  to `## [Unreleased]` in `CHANGELOG.md`.
+- Does this change something a user of fgOS would see? If yes, add one file
+  under `changelog.d/` (`changelog.d/README.md` names the scheme); never edit
+  `CHANGELOG.md` directly.

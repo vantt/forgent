@@ -46,8 +46,9 @@ owner questions keep the existing slot exemption; unknown Identity never means a
 (`lane-freed`, `plan-priority-changed`) and `plan-became-ready` are handled in code when no judgement is needed. Never repeat admission or bypass a hold here.
 
 `fgos supervisor plans --json` is the read view (`admissible`, `headName`, `leadLive` or `leadUnnamed`, `leadsLive`,
-`leadsWaiting`, `maxLeads`). Use it to judge what the keeper cannot classify: ties, an invalid plan,
-a role collision or a failed start. Apply the owner/secretary priority order; correct a portfolio decision through
+`leadsWaiting`, `maxLeads`, `overlaps`). The read view lists `overlaps` as advice; the supervisor admits regardless
+and may mention the overlap to the lead of the newly admitted plan. Use it to judge what the keeper cannot classify:
+ties, an invalid plan, a role collision or a failed start. Apply the owner/secretary priority order; correct a portfolio decision through
 `fgos land --paths`, or ask the owner if intent is missing. A failed start leaves its plan running with the named
 lead: use the running-plan recovery below, never admit it a second time. A failed publication records
 `publish-failed:<code>`, leaves the plan ready and stops further admissions for that wake. It is not a failed
