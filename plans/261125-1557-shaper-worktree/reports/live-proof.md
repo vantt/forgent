@@ -189,3 +189,130 @@ Other things this run started in scratch, all stopped:
   which does not exist in a linked worktree. Mailbox, questions, identity register and rotation hooks are all silent
   no-ops in a shaper, so rotation always ends `no-answer`, and the head never binds its CLI session or mailbox.
 - **C (minor, land shape):** a branch land produces a merge commit. Round commits become reachable from main.
+
+## Rerun on af9a5d5b15
+
+Run 2026-11-27 20:56–21:06 (+07). Release `sha256:21c454c9f6cb…` (distribution `/var/tmp/r/fgos-rc-af9a5d5b15`,
+which includes phase 7: the shaper start creates `<project>-worktrees/` and links `.fgos/installation` into the
+worktree). Fresh scratch `/var/tmp/r/shaper-live2/`: origin.git with `refs/fgos/legacy` fetched from the real repo,
+and proj cloned at `47389ff551`. Setup was the same as the first run: `fgctl init --override-pin …`, then
+`event-store-refspec-missing`, then `doctor --fix` + `git fetch`, then re-init (exit 2, the same 6 environmental
+checks), plus a temporary Claude trust entry. Workspace id `cb23c7cc47917fc0`. All fgos calls went through
+`/var/tmp/r/shaper-live2/proj/.fgos/installation/bin/fgos … --dir /var/tmp/r/shaper-live2/proj`.
+`proj-worktrees/` was **not** created by hand.
+
+| Check | Result |
+|---|---|
+| First shaper start on a fresh project | **PASS** |
+| Two rounds saved on the branch; main checkout and main tip unchanged | **PASS** (`544b40b4cb`, `74d387f09b`) |
+| Questions hook and mailbox hook answer inside the shaper | **PASS** |
+| Identity holder of `head:shaper-ds-livetest-shaper2` is the shaper's CLI session | **PASS** |
+| One rotation completes; the successor answers and can save | **FAIL**: `no-answer` again, from a new cause (defect D) |
+| Land from the role holder: one commit on origin main, discussion dir only | **PASS** on first-parent (`0c09937984`, a merge) |
+| Stop and cleanup | **PASS** |
+
+### Step 2: discussion
+`plans/discussions/ds-livetest-shaper2/DISCUSSION.md`, plain commit `d6cab03a8f`, pushed; origin/main = `d6cab03a8f`.
+
+### Step 3: first start, no worktrees dir beforehand
+```
+ls -d /var/tmp/r/shaper-live2/proj-worktrees   -> No such file or directory   (before)
+fgos session start shaper --name ds-livetest-shaper2 --json -> exit 0, role head:shaper-ds-livetest-shaper2,
+     key cmd_1795787903270_29319ff4, pane w6:p2HF, visibility trustSeeded: claude-json
+git worktree list -> /var/tmp/r/shaper-live2/proj-worktrees/ds-livetest-shaper2 d6cab03a8f [discussion/ds-livetest-shaper2]
+<worktree>/.fgos/installation -> /var/tmp/r/shaper-live2/proj/.fgos/installation   (symlink)
+/proc/3619866/cwd (claude) = /var/tmp/r/shaper-live2/proj-worktrees/ds-livetest-shaper2
+```
+Defect A is fixed. A side effect: in the worktree, `git status --short` shows `?? .fgos/installation`. The link is
+untracked and not ignored there. That is harmless for `session save` (it names paths) and for the branch land,
+but anything that requires a clean worktree will count it.
+
+### Step 4: rounds
+The shaper saved both rounds itself during its opening turn:
+`544b40b4cb discussion(ds-livetest-shaper2): round 1, scout and baseline` and
+`74d387f09b discussion(ds-livetest-shaper2): round 2, record round 1 save evidence`.
+Proj main checkout afterwards: HEAD `d6cab03a8f` (unchanged), and `git status --short` = the init baseline
+(` M .fgos/coexistence.json`, `?? .fgos/observe/records/`). PASS.
+
+### Step 5: questions, mailbox, identity (inside the shaper)
+```
+ls -la .fgos/installation/bin/fgos                           -> -rwxr-xr-x … (present)
+echo '{}' | $S hook mailbox --cli claude --event post-tool-use -> exit 0
+echo '{"prompt":"x"}' | $S hook questions --event user-prompt-submit -> exit 0
+fgos questions -> {"needsYou":5,"questions":[],"work":{…5 asks…}}
+fgos identity session -> {"id":"fg-server2-jdp2bv/3c4d654c-c725-43c5-8321-ca18eb69c79e","handle":"claude-25d3@fg-server2"}
+```
+From outside, `fgos identity resolve head:shaper-ds-livetest-shaper2` → id `…/3c4d654c-…` (the Claude CLI session),
+`roles: ["head:shaper-ds-livetest-shaper2"]`, `clone: /var/tmp/r/shaper-live2/proj-worktrees/ds-livetest-shaper2`,
+`ids.cliSession.source CLAUDE_CODE_SESSION_ID`, `ids.mailbox {fgosDir: /var/tmp/r/shaper-live2/proj/.fgos, name: proj-claude-78}`,
+`ids.head {persona: shaper, name: ds-livetest-shaper2, gen: 1}`. So the mailbox hook's `session bind session` ran.
+In run 1 the holder was the attempt's `worker-q6x2`. (`identity session` prints the bound CLI session's handle,
+`claude-25d3`; the role is on that record.)
+Live mailbox delivery: `fgos mailbox send --to head:shaper-ds-livetest-shaper2 "…probe…"` returned
+`recorded 30f60c61ff1a1dd8 for proj-claude-78 … delivered to the current holder of head:shaper-ds-livetest-shaper2`.
+After the shaper's next tool call, its post-tool-use hook injected
+`<mailbox-message … id="30f60c61ff1a1dd8">… probe …</mailbox-message>` and the shaper replied `MAILBOX-PROBE-RECEIVED`. PASS.
+
+### Step 6: rotation
+```
+fgos session rotate shaper --name ds-livetest-shaper2 --json -> {"started":true,"pid":3780848}
+rotation.log:    {"rotated":false,"reason":"no-answer","detail":"no valid answer from head-shaper-ds-livetest-shaper2-2 within 120000 ms"}
+incidents.jsonl: {"event":"rotation-failed","code":"no-answer","successor":"ended","at":"2026-11-27T14:02:45.920Z"}
+successor (gen 2, pane w6:p2HG) supervisor.log:
+  head-request … session save refused role-pending-rotation: … generation 1 still holds the role   (x6)
+  head-request mbx-504 / mbx-849 session bind session done
+  head-request hook-853-1795788149354 session rotate refused role-pending-rotation …
+```
+This time the successor's hooks did run (mailbox bind, the Stop hook). But its Stop hook sent `session rotate` (the
+measuring path) instead of `session answered`.
+
+**Defect D (rotation lineage resolved in the worktree, not the project).** `hook session-rotation` resolves its
+lineage with `fgos_dir_of(CLAUDE_PROJECT_DIR, cwd)` (`apps/fgos/src/wiring/session_rotation_hook.rs` ~409), which
+gives `<worktree>/.fgos`. `fgos session rotate` and the start door write the lineage under the project root:
+`proj/.fgos/runtime/session-rotation/shaper-ds-livetest-shaper2/` holds `placement.json`, `rotation.json` (gen 2
+pending), the handoff `261127-1400-cmd17957.md` and `latest.json`. The hook instead reads and writes
+`<worktree>/.fgos/runtime/session-rotation/shaper-ds-livetest-shaper2/` (only a `stop-trace.jsonl` there:
+`decision below-soft, outcome below-threshold`). So `awaits_answer` finds no `rotation.json` and returns false,
+the successor never answers, and its session-start hook also cannot see the handoff. The code comment states the
+assumption ("not always the main checkout (a head started in a linked worktree)"). For the shaper that assumption
+is wrong: the door records the lineage under the project root, and only the attempt's cwd is the worktree.
+The fix is to resolve the lineage under the project root behind the worktree (for example its git common dir's
+checkout, or the `.fgos/installation` link target's parent), not under `CLAUDE_PROJECT_DIR`.
+The successor's uncommitted round-3 edit was left in the worktree (` M …/DISCUSSION.md`).
+
+### Step 7: land (by gen 1, the role holder)
+```
+fgos land --branch discussion/ds-livetest-shaper2 -> {"ticket":"c-1328-1795788205839","state":"running"}  exit 0
+origin/main: 0c09937984 (parents d6cab03a8f 74d387f09b) "land discussion/ds-livetest-shaper2"
+git rev-list --first-parent --count d6cab03a8f..origin/main -> 1 ; --count (all) -> 3
+git diff --name-only d6cab03a8f origin/main -> plans/discussions/ds-livetest-shaper2/DISCUSSION.md
+proj main checkout HEAD -> 0c09937984 ; status = baseline
+```
+One merge commit on main's first-parent line, touching only the discussion dir. As in run 1, the two round commits
+are reachable from main (defect C stands). The successor's uncommitted edit was not landed.
+
+### Step 8: stop and cleanup
+- `fgos session stop shaper --name ds-livetest-shaper2 --json` -> `stopped: true`; panes w6:p2HF/p2HG gone.
+- **Unexpected: the scratch watcher started heads from the cloned portfolio.** In the ~8 minutes the
+  `fgos-watcher-cb23c7cc` timer ran, it started a periodic-review Unit (`unit-run-1795787867188-9ea5e690`, agy) and a
+  **lead head for a cloned real plan**, `head-lead-forgent-261127-0018-dead-s-6acc8-1` (pane w6:p2HH, confined to the
+  scratch project, origin = scratch bare). The lead ended `cancelled` after I stopped the timers. I sent SIGTERM to the
+  review Unit's supervise, bwrap and gate. origin.git main is still `0c09937984`, so the lead landed nothing. No
+  process with `/var/tmp/r/shaper-live2` on its command line remains. (Two other `agy` processes on the machine run in
+  real `forgent-worktrees/` and are not mine; I left them alone.) Lesson for future live proofs: an `fgctl init` of a
+  clone of this repo installs a watcher that will start leads for the clone's running plans. Disarm the timers right
+  after init.
+- Timers: `systemctl --user stop` + `disable` on `fgos-watcher-cb23c7cc.timer` and `fgos-mailbox-sync-cb23c7cc.timer`
+  (and their services). I deleted exactly `~/.config/systemd/user/fgos-{watcher,mailbox-sync}-cb23c7cc.{timer,service}`,
+  then ran `systemctl --user daemon-reload`. The run-1 unit files for 40f96c35 were already gone when I looked. The
+  real project's `fgos-*-e9756c48` timers are still active and enabled.
+- Removed the Claude trust entries for the two scratch projects from the claude-vantt login home config.
+- The real repo was not touched by this run (HEAD has since moved to `89b9da658e` through other sessions' lands).
+  `/var/tmp/r/shaper-live2/` is kept for inspection.
+
+### Defects after the rerun
+- A: fixed. B: fixed (hooks run and bind in the worktree).
+- **D (open, blocks "rotation in the same worktree completes"):** the rotation hook's lineage dir is under the
+  worktree's `.fgos`, while the door writes it under the project's `.fgos`, so every shaper rotation ends `no-answer`.
+- C (open, minor): a branch land is a merge, so round commits become reachable from main.
+- Minor: `?? .fgos/installation` is untracked in the shaper worktree.
