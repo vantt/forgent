@@ -807,9 +807,17 @@ fn a_confined_launch_reads_the_owners_cargo_and_rustup_caches_read_only_and_runs
     let home = format!("{}/home", fixture.root);
     let found = toolchain(&fixture, json!({}));
     assert_eq!(found.len(), 2, "{found:?}");
-    assert_eq!(found[0].host_target.as_deref(), Some(&*format!("{home}/.cargo")));
-    assert_eq!(found[1].host_target.as_deref(), Some(&*format!("{home}/.rustup")));
-    assert!(found.iter().all(|r| r.delivery == "mount" && r.access == "read"));
+    assert_eq!(
+        found[0].host_target.as_deref(),
+        Some(&*format!("{home}/.cargo"))
+    );
+    assert_eq!(
+        found[1].host_target.as_deref(),
+        Some(&*format!("{home}/.rustup"))
+    );
+    assert!(found
+        .iter()
+        .all(|r| r.delivery == "mount" && r.access == "read"));
     assert_eq!(
         env_of(&found[0]),
         json!({
@@ -818,7 +826,10 @@ fn a_confined_launch_reads_the_owners_cargo_and_rustup_caches_read_only_and_runs
             "GIT_TERMINAL_PROMPT": "0",
         })
     );
-    assert_eq!(env_of(&found[1]), json!({ "RUSTUP_HOME": format!("{home}/.rustup") }));
+    assert_eq!(
+        env_of(&found[1]),
+        json!({ "RUSTUP_HOME": format!("{home}/.rustup") })
+    );
 
     // An absolute CARGO_HOME wins over <home>/.cargo; a relative one is ignored.
     let fixture = Fixture::new(&json!({ "dirs": ["home/.cargo", "elsewhere/cargo"] }));
