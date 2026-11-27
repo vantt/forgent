@@ -342,7 +342,7 @@ to refresh them.
 ### 4.7. Every row and its registered fix
 
 <!-- doctor-catalog:begin -->
-119 rows, in the order the doctor runs them.
+120 rows, in the order the doctor runs them.
 
 | Id | Checks | Fix |
 |---|---|---|
@@ -380,6 +380,7 @@ to refresh them.
 | `lock-borrow-vectors` | a lock description borrowed by a git child never leaks to a background process (fgos internal lock-borrow-vectors) | none registered |
 | `lock-holders` | read-only pointer: foreign lock holders, predecessor domains still running and hot records that need a person are read by fgos lock-status | none registered |
 | `run-supervisor-route` | the host binary serves supervise, gate, adopt and attempt-step at protocol 1 and names the containment driver agents run in and its level (kernel or best-effort) | none registered |
+| `systemd-user-scope` | Linux only, a warning and never a failure: a systemd user manager is reachable and systemd-run is on PATH, so each run supervisor starts in its own scope; otherwise supervisors share their starter's cgroup | none registered |
 | `runtime-socket-dir` | the runtime socket directory exists, is owned by this user and is 0700 | `fgos doctor --fix --only runtime-socket-dir` |
 | `run-attempts-stuck` | read-only pointer: attempts with no closed.json and no lock holder, an attempt whose release was removed named with what to restore; the next fgos run adopts them, or run fgos dispatch recover (a warning, never a failure) | none registered |
 | `session-rotation-orphans` | read-only pointer: pending rotations with a dead executor, resolved on the lineage's next session rotate or session answered (a warning, never a failure) | none registered |
