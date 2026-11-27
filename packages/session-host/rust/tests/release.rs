@@ -1,6 +1,7 @@
 //! Owning proof of the release rule: the order of its steps against a fixture host, with every external call a port.
 
 use std::cell::RefCell;
+use std::path::{Path, PathBuf};
 
 use fgos_session_host::release::{
     envelope_data, merge_slot_hold, release_subtree, run, run_rollback, Outcome, Recipe,
@@ -9,6 +10,7 @@ use fgos_session_host::release::{
 use serde_json::{json, Value};
 
 const TIP: &str = "1bcb5a428aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+const CHECKOUT: &str = "/work/release-check";
 
 struct Fixture {
     recipe: Value,
@@ -31,6 +33,12 @@ struct Fixture {
     asked: RefCell<Vec<String>>,
     reports: RefCell<Vec<String>>,
     logs: RefCell<Vec<String>>,
+    /// Every merge-slot look, checkout made or removed and argv run, in order, with the directory it ran in.
+    events: RefCell<Vec<String>>,
+    /// The check checkout cannot be made.
+    make_fails: bool,
+    /// The check checkout cannot be removed.
+    remove_fails: bool,
 }
 
 impl Fixture {
@@ -49,6 +57,9 @@ impl Fixture {
             asked: RefCell::default(),
             reports: RefCell::default(),
             logs: RefCell::default(),
+            events: RefCell::default(),
+            make_fails: false,
+            remove_fails: false,
         }
     }
 }
@@ -78,14 +89,35 @@ impl ReleasePorts for Fixture {
     fn land_in_progress(&self) -> Result<Option<String>, String> {
         let look = *self.looks.borrow();
         *self.looks.borrow_mut() += 1;
+        self.events.borrow_mut().push("look".into());
         Ok(if look < self.free_looks {
             None
         } else {
             self.land.map(String::from)
         })
     }
-    fn run(&self, argv: &[String]) -> Result<i32, String> {
+    fn make_check_checkout(&self, tip: &str) -> Result<PathBuf, String> {
+        self.events.borrow_mut().push(format!("make {tip}"));
+        if self.make_fails {
+            return Err("no room for a checkout".into());
+        }
+        Ok(PathBuf::from(CHECKOUT))
+    }
+    fn remove_check_checkout(&self, path: &Path, tip: &str) -> Result<(), String> {
+        self.events
+            .borrow_mut()
+            .push(format!("remove {} {tip}", path.display()));
+        if self.remove_fails {
+            return Err("worktree-dirty-preserved".into());
+        }
+        Ok(())
+    }
+    fn run(&self, argv: &[String], dir: Option<&Path>) -> Result<i32, String> {
         let line = argv.join(" ");
+        self.events.borrow_mut().push(format!(
+            "run {line} in {}",
+            dir.map_or("root".to_string(), |dir| dir.display().to_string())
+        ));
         self.ran.borrow_mut().push(line.clone());
         Ok(i32::from(self.failing.contains(&line.as_str())))
     }
@@ -231,6 +263,100 @@ fn the_first_failing_check_refuses_the_release_before_anything_is_applied() {
         }
     );
     assert_eq!(*fixture.ran.borrow(), ["check one", "check two"]);
+}
+
+/// Owns the directory every step runs in. No other test observes the directory an argv ran in or the checkout's
+/// life, so none proves where the checks run: in a checkout of the tip made after the merge-slot look and removed
+/// right after the last check that ran, while apply, probe and rollback run from the project root.
+#[test]
+fn the_checks_run_in_a_checkout_of_the_tip_made_before_them_and_removed_after_them_and_nothing_else_does(
+) {
+    let make = format!("make {TIP}");
+    let remove = format!("remove {CHECKOUT} {TIP}");
+
+    // Every check passes: made after the first look, removed before the second look and the apply.
+    let fixture = Fixture::with(reversible());
+    assert_eq!(run(&fixture), Outcome::Released);
+    assert_eq!(
+        *fixture.events.borrow(),
+        [
+            "look".to_string(),
+            make.clone(),
+            format!("run check one in {CHECKOUT}"),
+            format!("run check two in {CHECKOUT}"),
+            remove.clone(),
+            "look".to_string(),
+            "run fixture-fgctl upgrade in root".to_string(),
+            "run probe in root".to_string(),
+        ]
+    );
+
+    // The first failing check ends the checks; the checkout is still removed.
+    let mut fixture = Fixture::with(reversible());
+    fixture.failing = vec!["check one"];
+    assert_eq!(run(&fixture).code(), "checks-failed");
+    assert_eq!(
+        *fixture.events.borrow(),
+        [
+            "look".to_string(),
+            make.clone(),
+            format!("run check one in {CHECKOUT}"),
+            remove.clone(),
+        ]
+    );
+
+    // A rollback after a failed probe runs from the root too.
+    let mut fixture = Fixture::with(reversible());
+    fixture.failing = vec!["probe"];
+    run(&fixture);
+    assert_eq!(
+        fixture.events.borrow().last().map(String::as_str),
+        Some("run fixture-fgctl repair in root")
+    );
+    let mut fixture = Fixture::with(reversible());
+    *fixture.step.borrow_mut() = Some("applying".into());
+    run_rollback(&fixture);
+    assert_eq!(
+        *fixture.events.borrow(),
+        ["run fixture-fgctl repair in root"]
+    );
+
+    // No checks: no checkout.
+    let mut recipe = reversible();
+    recipe["checks"] = json!([]);
+    let fixture = Fixture::with(recipe);
+    assert_eq!(run(&fixture), Outcome::Released);
+    assert!(fixture
+        .events
+        .borrow()
+        .iter()
+        .all(|event| !event.starts_with("make") && !event.starts_with("remove")));
+
+    // A checkout that cannot be made refuses the release with nothing run.
+    let mut fixture = Fixture::with(reversible());
+    fixture.make_fails = true;
+    let outcome = run(&fixture);
+    assert_eq!(outcome.code(), "check-checkout-failed");
+    assert!(!outcome.is_answer());
+    assert!(fixture.ran.borrow().is_empty());
+    assert_eq!(*fixture.events.borrow(), ["look".to_string(), make]);
+    assert_eq!(fixture.reports.borrow().len(), 1);
+    assert!(fixture.reports.borrow()[0].contains("no room for a checkout"));
+
+    // A checkout that cannot be removed is reported and logged; the outcome stands.
+    let mut fixture = Fixture::with(reversible());
+    fixture.remove_fails = true;
+    assert_eq!(run(&fixture), Outcome::Released);
+    let expected = format!(
+        "the release check checkout at {CHECKOUT} was not removed: worktree-dirty-preserved"
+    );
+    assert!(fixture.reports.borrow().contains(&expected));
+    assert_eq!(*fixture.logs.borrow(), [expected]);
+    let mut fixture = Fixture::with(reversible());
+    fixture.remove_fails = true;
+    fixture.failing = vec!["check two"];
+    assert_eq!(run(&fixture).code(), "checks-failed");
+    assert_eq!(fixture.reports.borrow().len(), 2);
 }
 
 #[test]

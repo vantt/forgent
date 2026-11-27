@@ -1752,12 +1752,26 @@ impl HostRelease {
     /// lock, the runner and every recipe child share one lifetime (`fgctl upgrade` publishes the activation by
     /// temp file and rename, so a killed upgrade leaves the old or the new release, never a half one). Its output
     /// goes to the run's log file, since a pipe whose reader is gone would end the child with SIGPIPE.
+    ///
+    /// With `dir` (a check's checkout) the argv runs there, with no inherited `FGOS_*` variable (a check that needs
+    /// one sets it itself, so it never reads this machine's live state or reaches the supervisor) and with `TMPDIR`
+    /// at `<dir>/.fgos/runtime/tmp`, an ignored disk directory made here, so no check fills the shared `/tmp`.
+    /// Without it the argv runs from the project root with the inherited environment.
     fn recipe_command(
         &self,
         program: &str,
         args: &[String],
+        dir: Option<&Path>,
     ) -> io::Result<(Command, std::fs::File)> {
         use std::os::fd::AsRawFd;
+        let tmp = match dir {
+            Some(dir) => {
+                let tmp = dir.join(".fgos").join("runtime").join("tmp");
+                std::fs::create_dir_all(&tmp)?;
+                Some(tmp)
+            }
+            None => None,
+        };
         let log = std::fs::OpenOptions::new()
             .create(true)
             .append(true)
@@ -1765,10 +1779,19 @@ impl HostRelease {
             .open(&self.log_file)?;
         let fd = log.as_raw_fd();
         let mut cmd = Command::new(program);
-        cmd.args(args)
-            .env_clear()
-            .envs(self.cfg.env.iter())
-            .current_dir(&self.cfg.cwd);
+        cmd.args(args).env_clear();
+        if let Some(tmp) = &tmp {
+            cmd.envs(
+                self.cfg
+                    .env
+                    .iter()
+                    .filter(|(key, _)| !key.starts_with("FGOS_")),
+            )
+            .env("TMPDIR", tmp);
+        } else {
+            cmd.envs(self.cfg.env.iter());
+        }
+        cmd.current_dir(dir.unwrap_or(&self.cfg.cwd));
         // SAFETY: prctl and dup2 are async-signal-safe; dup2 runs after the pipes are set up, so the log replaces
         // them, and the child dies with the supervisor that started it.
         unsafe {
@@ -1862,12 +1885,71 @@ impl fgos_session_host::release::ReleasePorts for HostRelease {
             .map(|report| fgos_session_host::release::merge_slot_hold(&report))
     }
 
-    fn run(&self, argv: &[String]) -> Result<i32, String> {
+    /// A detached checkout of `tip` at `<parent of the project root>/<project name>-worktrees/release-check-<id>`,
+    /// made through the worktree door, then given the tip's committed `.fgos` bytes. A checkout made before a later
+    /// step failed is removed again.
+    fn make_check_checkout(&self, tip: &str) -> Result<PathBuf, String> {
+        let name = self
+            .cfg
+            .cwd
+            .file_name()
+            .ok_or_else(|| "the project root has no directory name".to_string())?
+            .to_string_lossy()
+            .into_owned();
+        let parent = self
+            .cfg
+            .cwd
+            .parent()
+            .ok_or_else(|| "the project root has no parent directory".to_string())?;
+        let path = parent
+            .join(format!("{name}-worktrees"))
+            .join(format!("release-check-{}", self.request.id));
+        let text = path.to_string_lossy().into_owned();
+        self.host_json(&[
+            "worktree", "create", &text, "--detach", "--base", tip, "--json",
+        ])
+        .map_err(|why| format!("fgos worktree create: {why}"))?;
+        let materialized = (|| {
+            let (driver, repo) = fgos_git::GitDriver::open_at(&path)
+                .map_err(|e| format!("git did not run: {e:?}"))?
+                .ok_or_else(|| "the check checkout is not a git repository".to_string())?;
+            driver
+                .materialize_committed_state(&repo, vec![], tip)
+                .map_err(|e| format!("the committed .fgos was not written: {e:?}"))
+        })();
+        if let Err(why) = materialized {
+            if let Err(removed) = self.remove_check_checkout(&path, tip) {
+                self.log(&format!(
+                    "the release check checkout at {} was not removed: {removed}",
+                    path.display()
+                ));
+            }
+            return Err(why);
+        }
+        Ok(path)
+    }
+
+    fn remove_check_checkout(&self, path: &Path, tip: &str) -> Result<(), String> {
+        let text = path.to_string_lossy().into_owned();
+        self.host_json(&[
+            "worktree",
+            "remove",
+            &text,
+            "--delivered-to",
+            tip,
+            "--discard-ignored",
+            "--json",
+        ])
+        .map(|_| ())
+        .map_err(|why| format!("fgos worktree remove: {why}"))
+    }
+
+    fn run(&self, argv: &[String], dir: Option<&Path>) -> Result<i32, String> {
         let Some((program, args)) = argv.split_first() else {
             return Err("an empty argv".to_string());
         };
         let (command, _log) = self
-            .recipe_command(program, args)
+            .recipe_command(program, args, dir)
             .map_err(|e| format!("the run log is not writable: {e}"))?;
         match run_bounded_command(command, None, RELEASE_STEP_TIMEOUT, |_| ()) {
             Ok(BoundedOutcome::Exited(output)) => Ok(output.status.code().unwrap_or(-1)),

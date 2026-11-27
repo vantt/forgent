@@ -863,7 +863,7 @@ fn release_host(recipe: &Value, merge_slot: &str) -> String {
     let config = envelope(&config_data(recipe));
     let locks = envelope(&lock_data(merge_slot));
     format!(
-        "cat >> \"$OUT/questions\"; case \"$1\" in\nconfig) cat <<'EOF'\n{config}\nEOF\n;;\nlock-status) cat <<'EOF'\n{locks}\nEOF\n;;\ninternal) echo '{{\"v\":1,\"protocol\":1,\"result\":\"done\",\"data\":{{\"id\":\"q-report\"}}}}';;\nesac"
+        "cat >> \"$OUT/questions\"; case \"$1\" in\nworktree) case \"$2\" in\ncreate) git -C \"$OUT\" worktree add -q --detach \"$3\" \"$6\" >&2 || exit 1;;\nremove) git -C \"$OUT\" worktree remove --force \"$3\" >&2 || exit 1;;\nesac; echo '{{\"data\":{{\"done\":true}}}}';;\nconfig) cat <<'EOF'\n{config}\nEOF\n;;\nlock-status) cat <<'EOF'\n{locks}\nEOF\n;;\ninternal) echo '{{\"v\":1,\"protocol\":1,\"result\":\"done\",\"data\":{{\"id\":\"q-report\"}}}}';;\nesac"
     )
 }
 
@@ -1101,9 +1101,23 @@ fn one_release_runs_at_a_time_through_a_kernel_lock_the_death_of_its_holder_free
 
 #[test]
 fn release_run_answers_with_a_ticket_and_the_detached_run_rolls_back_on_a_failed_probe() {
-    let recipe = json!({"reversible": true, "checks": [["true"]], "apply": ["touch", "applied"], "probe": ["false"], "rollback": ["touch", "rolled-back"]});
+    // The check records, outside its checkout, where it ran and what it inherited.
+    let check = r#"pwd -P > "$OUT/check-cwd"; printf '%s' "$TMPDIR" > "$OUT/check-tmpdir"; printf '%s' "${FGOS_STATE_ROOT-absent}" > "$OUT/check-state-root""#;
+    let recipe = json!({"reversible": true, "checks": [["sh", "-c", check]], "apply": ["touch", "applied"], "probe": ["false"], "rollback": ["touch", "rolled-back"]});
     let body = release_host(&recipe, "free");
-    let served = serve("release", &body, Ok(true), &[], Duration::from_secs(5));
+    let served = serve_config(
+        "release",
+        &body,
+        Ok(true),
+        Identity::default(),
+        &[],
+        Duration::from_secs(5),
+        |mut cfg| {
+            cfg.env
+                .insert("FGOS_STATE_ROOT".to_string(), "/live/state".to_string());
+            cfg
+        },
+    );
     commit_in(&served.dir);
     let reply = request(
         &served.socket,
@@ -1122,6 +1136,29 @@ fn release_run_answers_with_a_ticket_and_the_detached_run_rolls_back_on_a_failed
     assert_eq!(settled["code"], "rolled-back", "{settled}");
     assert!(served.dir.join("applied").exists());
     assert!(served.dir.join("rolled-back").exists());
+    // The check ran in a checkout beside the project, with its own disk temp directory and without the live state
+    // root the run was started with; the checkout is gone once the checks ended.
+    let name = served.dir.file_name().unwrap().to_string_lossy().into_owned();
+    let worktrees = served.dir.parent().unwrap().join(format!("{name}-worktrees"));
+    let checkout = worktrees.join("release-check-rel1");
+    let ran_in = fs::read_to_string(served.dir.join("check-cwd")).unwrap();
+    assert_eq!(
+        Path::new(ran_in.trim()),
+        fs::canonicalize(served.dir.parent().unwrap())
+            .unwrap()
+            .join(format!("{name}-worktrees"))
+            .join("release-check-rel1")
+    );
+    assert_ne!(Path::new(ran_in.trim()), served.dir);
+    assert_eq!(
+        fs::read_to_string(served.dir.join("check-tmpdir")).unwrap(),
+        checkout.join(".fgos/runtime/tmp").to_string_lossy()
+    );
+    assert_eq!(
+        fs::read_to_string(served.dir.join("check-state-root")).unwrap(),
+        "absent"
+    );
+    assert!(!checkout.exists(), "the check checkout was not removed");
     // The in-flight step is cleared, nothing was recorded as released, the flock is free again, and the run's
     // report was filed (the route answered each question).
     assert_eq!(read_release_state(&served.dir), json!({}));
