@@ -177,6 +177,13 @@ created: 2026-11-20
     let bad_id = text.replace("id: ds-234567abcd", "id: ds-bad_id!");
     let res_bad_id = parse_discussion(Path::new("bad.md"), &bad_id);
     assert!(matches!(res_bad_id, Err(PortfolioRefusal::InvalidId(_))));
+
+    let scalar_source = text.replace("source:\n  - p-rw5iadsp2p", "source: \"p-rw5iadsp2p\"");
+    let res_scalar_source = parse_discussion(Path::new("bad.md"), &scalar_source);
+    assert!(matches!(
+        res_scalar_source,
+        Err(PortfolioRefusal::FrontmatterInvalid(_))
+    ));
 }
 
 #[test]
