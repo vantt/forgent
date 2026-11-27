@@ -64,6 +64,8 @@ pub enum PlanRefusal {
     PriorityUnknown(String),
     #[error("plan-frontmatter-entry-invalid: {0}")]
     FrontmatterEntryInvalid(String),
+    #[error("plan-host-invalid: {0}")]
+    HostInvalid(String),
     #[error("phase-table-missing: {0}")]
     TableMissing(String),
     #[error("phase-table-ambiguous: {0}")]
@@ -86,6 +88,7 @@ impl PlanRefusal {
             PlanRefusal::StatusUnknown(_) => "plan-status-unknown",
             PlanRefusal::PriorityUnknown(_) => "plan-priority-unknown",
             PlanRefusal::FrontmatterEntryInvalid(_) => "plan-frontmatter-entry-invalid",
+            PlanRefusal::HostInvalid(_) => "plan-host-invalid",
             PlanRefusal::TableMissing(_) => "phase-table-missing",
             PlanRefusal::TableAmbiguous(_) => "phase-table-ambiguous",
             PlanRefusal::TableEmpty(_) => "phase-table-empty",
@@ -169,6 +172,9 @@ pub struct Plan {
     /// The Identity role of the lead running the plan (`lead` frontmatter key); `None` when the
     /// plan does not name one.
     pub lead: Option<String>,
+    /// The Identity machine id that runs the plan (`host` frontmatter key); `None` when the plan
+    /// names no machine.
+    pub host: Option<String>,
     pub phases: Vec<Phase>,
 }
 
@@ -212,6 +218,14 @@ pub fn read_plan(dir: &str, text: &str) -> Result<Plan, PlanRefusal> {
             ))),
         }
     };
+    let host = Some(scalar("host")).filter(|h| !h.is_empty());
+    if let Some(h) = &host {
+        if !fgos_identity::machine::valid_machine_id(h) {
+            return Err(PlanRefusal::HostInvalid(format!(
+                "{dir}: host {h:?} is not a machine id"
+            )));
+        }
+    }
     let vocab = vocabulary();
     let status = scalar("status");
     if !vocab.statuses.contains(&status) {
@@ -244,6 +258,7 @@ pub fn read_plan(dir: &str, text: &str) -> Result<Plan, PlanRefusal> {
         footprint,
         source,
         lead: Some(scalar("lead")).filter(|l| !l.is_empty()),
+        host,
         phases,
     })
 }
@@ -378,10 +393,21 @@ pub fn admission_hold(plan: &Plan, done_dirs: &[String]) -> Option<&'static str>
 
 /// Edit only admission frontmatter through the YAML document door, preserving the phase table,
 /// notes and all other fields. The adapter publishes these bytes through the paths land door.
-pub fn admitted_text(text: &str, role: &str, base: &str) -> Result<String, String> {
+/// `machine` is the admitting machine's Identity id, written as `host`.
+pub fn admitted_text(
+    text: &str,
+    role: &str,
+    base: &str,
+    machine: &str,
+) -> Result<String, String> {
     let (front, _) = split_frontmatter(text).ok_or("plan-frontmatter-missing")?;
     let mut doc = parse(front.as_bytes(), Profile::Tool, "plan.md").map_err(|e| e.to_string())?;
-    for (key, value) in [("status", "running"), ("lead", role), ("base", base)] {
+    for (key, value) in [
+        ("status", "running"),
+        ("lead", role),
+        ("base", base),
+        ("host", machine),
+    ] {
         doc.set(
             &[Segment::Key(key.to_owned())],
             Value::Str(value.to_owned()),

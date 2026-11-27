@@ -91,6 +91,15 @@ struct Scene {
 
 impl Scene {
     fn new(tag: &str, config: &str) -> Self {
+        Self::build(tag, config, None)
+    }
+
+    /// A second machine's clone of the same bare remote: its own state root and machine id, no seed commit.
+    fn clone_of(first: &Scene, tag: &str, config: &str) -> Self {
+        Self::build(tag, config, Some(first.root.join("remote.git")))
+    }
+
+    fn build(tag: &str, config: &str, remote: Option<PathBuf>) -> Self {
         static NEXT: AtomicU64 = AtomicU64::new(0);
         let root = std::env::temp_dir().join(format!(
             "fgos-supervision-verbs-{tag}-{}-{}",
@@ -101,23 +110,43 @@ impl Scene {
         fs::create_dir_all(root.join("home")).unwrap();
         fs::create_dir_all(root.join("state")).unwrap();
         let root = fs::canonicalize(root).unwrap();
-        git(
-            &root,
-            &[
-                "init",
-                "-q",
-                "--bare",
-                "--initial-branch=main",
-                "remote.git",
-            ],
-        );
-        git(&root, &["clone", "-q", "remote.git", "project"]);
+        let seeded = remote.is_none();
+        match &remote {
+            None => {
+                git(
+                    &root,
+                    &[
+                        "init",
+                        "-q",
+                        "--bare",
+                        "--initial-branch=main",
+                        "remote.git",
+                    ],
+                );
+                git(&root, &["clone", "-q", "remote.git", "project"]);
+            }
+            Some(url) => {
+                git(&root, &["clone", "-q", url.to_str().unwrap(), "project"]);
+            }
+        }
         let project = root.join("project");
-        git(&project, &["checkout", "-q", "-b", "main"]);
+        if seeded {
+            git(&project, &["checkout", "-q", "-b", "main"]);
+        }
         git(&project, &["config", "fgos.machineid", "m-test"]);
         // The Land port merges in a candidate checkout, which needs an author.
         git(&project, &["config", "user.name", "t"]);
         git(&project, &["config", "user.email", "t@example.invalid"]);
+        if seeded {
+            Self::seed(&project);
+        }
+        Self::fixture(&root, &project, config);
+        release(&root);
+        Self { root }
+    }
+
+    /// The first commit of the shared remote: the plan, a settled discussion and the project id.
+    fn seed(project: &Path) {
         fs::create_dir_all(project.join(format!("plans/{PLAN}"))).unwrap();
         fs::write(
             project.join(format!("plans/{PLAN}/plan.md")),
@@ -142,7 +171,11 @@ impl Scene {
         git(&project, &["add", "-f", "."]);
         git(&project, &["commit", "-q", "-m", "init"]);
         git(&project, &["push", "-q", "-u", "origin", "main"]);
-        git(&project, &["remote", "set-head", "origin", "main"]);
+        git(project, &["remote", "set-head", "origin", "main"]);
+    }
+
+    /// What every clone holds beside the tracked files: fence, state root, machine id, definitions, config.
+    fn fixture(root: &Path, project: &Path, config: &str) {
         // What an initialised project holds before its first append.
         let fence = project.join(".fgos/locks/activation.lock");
         fs::create_dir_all(&fence).unwrap();
@@ -178,8 +211,6 @@ impl Scene {
             "defs/\ncore/\n.fgos/config.yaml\n.fgos/locks/\n.fgos/runtime/\n.fgos/observe/\n",
         )
         .unwrap();
-        release(&root);
-        Self { root }
     }
 
     fn project(&self) -> PathBuf {
@@ -377,6 +408,74 @@ fn wake_with_no_live_supervisor_and_an_unhandled_event_starts_one_through_sessio
     let woke = scene.data(&["supervisor", "wake", "--json"]);
     assert_eq!(woke["outcome"], "started", "{woke}");
     assert_eq!(scene.payload_calls(), vec![lead, start.clone(), start]);
+}
+
+#[test]
+fn two_clones_admitting_one_unpinned_plan_end_with_one_claim_and_the_loser_reads_the_winners_host() {
+    let winner = Scene::new("claim-winner", WATCHER_CONFIG);
+    let loser = Scene::clone_of(&winner, "claim-loser", WATCHER_CONFIG);
+    let machine = |scene: &Scene| {
+        fs::read_to_string(scene.root.join("state/machine-id"))
+            .unwrap()
+            .trim()
+            .to_owned()
+    };
+    let (won, lost) = (machine(&winner), machine(&loser));
+    assert_ne!(won, lost, "the two clones are two machines");
+    let remote = winner.root.join("remote.git");
+    let plan_path = format!("plans/{PLAN}/plan.md");
+    let claims = || {
+        git(&remote, &["log", "--format=%H", "main", "--", &plan_path])
+            .lines()
+            .count()
+    };
+    let before = claims();
+    // The loser's trunk is stale: it still reads the plan as ready when the winner's claim reaches origin.
+    let claim = winner.data(&["supervisor", "wake", "--json"]);
+    let origin_plan = git(&remote, &["show", &format!("main:{plan_path}")]);
+    assert!(origin_plan.contains("status: running\n"), "{claim} {origin_plan}");
+    assert!(origin_plan.contains(&format!("host: {won}\n")), "{origin_plan}");
+    assert_eq!(claims(), before + 1, "the winner's claim is one commit");
+
+    let late = loser.run(&["supervisor", "wake", "--json"]);
+    assert_eq!(
+        claims(),
+        before + 1,
+        "the loser adds no second claim: {}",
+        text(&late)
+    );
+    assert_eq!(
+        git(&remote, &["show", &format!("main:{plan_path}")]),
+        origin_plan,
+        "origin keeps the winner's bytes"
+    );
+    assert!(
+        !origin_plan.contains(&lost),
+        "the loser's machine id never reaches origin"
+    );
+    let loser_project = loser.project();
+    let local_plan = fs::read_to_string(loser_project.join(&plan_path)).unwrap();
+    assert!(
+        !local_plan.contains(&format!("host: {lost}")),
+        "the loser's bytes are restored: {local_plan}"
+    );
+    let origin_tip = git(&remote, &["rev-parse", "main"]);
+    assert_eq!(
+        git(&loser_project, &["rev-parse", "main"]),
+        origin_tip,
+        "the loser's local main equals origin"
+    );
+    let view = loser.data(&["supervisor", "plans", "--json"]);
+    assert_eq!(view["plans"][0]["status"], "running", "{view}");
+    let seen = portfolio_host(&git(&remote, &["show", &format!("main:{plan_path}")]));
+    assert_eq!(seen.as_deref(), Some(won.as_str()));
+}
+
+/// The `host` the plan text names, read through the portfolio reader.
+fn portfolio_host(text: &str) -> Option<String> {
+    fgos_supervision::portfolio::read_plan(PLAN, text)
+        .unwrap()
+        .host
 }
 
 /// A fake herdr (the run-supervisor crate's stand-in CLI, answering from files) whose one allocated slot `key` reads as

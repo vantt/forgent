@@ -803,6 +803,12 @@ impl wake::Identity for HostIdentity {
     }
 }
 
+/// This machine's Identity id from the state root, never a hostname; a missing one refuses admission.
+fn machine_id() -> Result<String, String> {
+    let (state, _) = fgos_holder_lock::state_root();
+    fgos_identity::machine::read(&state).map_err(|_| "machine-id-missing".to_owned())
+}
+
 struct HostAdmission {
     root: PathBuf,
 }
@@ -861,7 +867,8 @@ impl wake::Admission for HostAdmission {
             .map_err(|_| "land-git-unavailable")?
             .ok_or("land-root-not-a-repository")?;
         let base = trunk_tip(&driver, &repo)?;
-        let edited = portfolio::admitted_text(&original, role, base.as_str())?;
+        let machine = machine_id()?;
+        let edited = portfolio::admitted_text(&original, role, base.as_str(), &machine)?;
         let dir = file.parent().ok_or("admission-path-unreadable")?;
         fgos_durable_file::replace_durably(dir, "plan.md", edited.as_bytes())
             .map_err(|_| "admission-write-failed")?;
