@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ef2e945e9fc88094e6dc3ebf442c3e59700b7411e198c115e82d9c3cac60b5cc",
+  "payloadDigest": "190e54c0293b1fcb210499265958988548940793b69237829dc97de2f69aff94",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -211,7 +211,7 @@
     "apps/fgos/tests/mailbox_routes.rs": "6bf3d31b599406a5468327ce04ac5e5ebc170ee1921c7e6a0deed7633d4b0f3f",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
     "apps/fgos/tests/migrate_portfolio.rs": "c79e26fa02b7130fd942874eeac8602dd31384691810e612e34bef08697a845d",
-    "apps/fgos/tests/portfolio_check.rs": "d77e5315b785de6ea51c50990968db534ea82444cd7c6d680c277596d4bc5601",
+    "apps/fgos/tests/portfolio_check.rs": "270eef4e8285bd25bb35a8d896ba973c28a56b6ac9709e4f55c59a36435615e5",
     "apps/fgos/tests/questions_head.rs": "c900b87ac2ed73fa9b2389176897128c6030930924dd07c530b0a50ed7e3f360",
     "apps/fgos/tests/questions_hook.rs": "1c206c5633a8ec75345fdcc4debd1efe30f8aa996aa48e00e3963c426061f5a2",
     "apps/fgos/tests/questions_verb.rs": "b0ccc8a1c82bbf81b7ad84eecfdcf4a2e3c350eb297cf6749645b4ee1a3296dd",
