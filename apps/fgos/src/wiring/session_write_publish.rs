@@ -542,6 +542,9 @@ mod tests {
         )
         .unwrap();
         git(&main, &["init", "-q", "-b", "main"]);
+        // The commit the save runs must not depend on the caller HOME (another test in the same binary replaces HOME for the whole process).
+        git(&main, &["config", "user.name", "t"]);
+        git(&main, &["config", "user.email", "t@example.test"]);
         std::fs::write(main.join("a.md"), "a\n").unwrap();
         std::fs::write(main.join("b.md"), "b\n").unwrap();
         git(&main, &["add", "."]);

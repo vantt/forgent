@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1194240e102b47d5e956989dd6521769ce1dc4ac7f8d0ce4c28a33c59821a79f",
+  "payloadDigest": "9c3cf7dc0601626585e900c6c5e911406601f1323c02d66042f7cf306b7b5ffa",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -175,7 +175,7 @@
     "apps/fgos/src/wiring/seat_binding.rs": "15312c9c1d9fea319147a886829a627b73973d2b854a350b68d9b690b4f65158",
     "apps/fgos/src/wiring/session_rotation_hook.rs": "5f6e5443893776b5db990e10959ab53fa096bda7236c732bdf797bd7149aed7c",
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
-    "apps/fgos/src/wiring/session_write_publish.rs": "8f119f6281e4031530b822865402b3578c05d56db1fc7f97c8b6a512ee0625f4",
+    "apps/fgos/src/wiring/session_write_publish.rs": "84b8a95fd3aa27e14f885eabe56629a978e449ded4c0bf1d6c3e581bf3b2f683",
     "apps/fgos/src/wiring/start_context.rs": "7a24a7f0b0ce664ed77cb34d75ec5bb2625d31067f09ba249fecdefafc5feaf8",
     "apps/fgos/src/wiring/supervision.rs": "e5056aee5ee4889d6b353a74ac9b9c3896ab3fbfad0b7571c2e0f105e2a60630",
     "apps/fgos/src/wiring/terminal_route.rs": "e29a3ec670db995fbf7a3e00c70ed8bf3870fd772f298a01ebe9e4198096aed0",
