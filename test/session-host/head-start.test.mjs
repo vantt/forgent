@@ -610,3 +610,70 @@ test('a registered discussion worktree is reused without a create call, and one 
   fs.rmSync(worktree, { recursive: true, force: true });
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
+
+/** A real git project with one commit, an installation directory, and its discussion worktree path (not yet created). */
+async function gitProject({ installation = true } = {}) {
+  const { execFileSync } = await import('node:child_process');
+  const projectRoot = scratch();
+  const git = (...args) => execFileSync('git', args, { cwd: projectRoot, stdio: 'pipe' });
+  git('init', '-q', '-b', 'main');
+  git('-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'init');
+  if (installation) fs.mkdirSync(path.join(projectRoot, '.fgos', 'installation', 'bin'), { recursive: true });
+  // The worktree door requires the controller's activation fence in the project.
+  const fence = path.join(projectRoot, '.fgos', 'locks', 'activation.lock');
+  fs.mkdirSync(fence, { recursive: true });
+  fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
+  const worktrees = path.join(path.dirname(projectRoot), `${path.basename(projectRoot)}-worktrees`);
+  return { projectRoot, git, worktrees, worktree: path.join(worktrees, 'ds-aaaaaaaaaa-probe'), branch: 'discussion/ds-aaaaaaaaaa-probe' };
+}
+const cleanupProject = (p) => { fs.rmSync(p.worktrees, { recursive: true, force: true }); fs.rmSync(p.projectRoot, { recursive: true, force: true }); };
+
+test('a shaper worktree on a project with no worktrees directory is created through the worktree door, and carries a link to the project installation', async () => {
+  const p = await gitProject();
+  assert.equal(fs.existsSync(p.worktrees), false);
+  const first = await defaultEnsureWorktree({ projectRoot: p.projectRoot, path: p.worktree, branch: p.branch });
+  assert.equal(first.created, true);
+  const link = path.join(p.worktree, '.fgos', 'installation');
+  assert.equal(fs.lstatSync(link).isSymbolicLink(), true);
+  assert.equal(fs.realpathSync(link), fs.realpathSync(path.join(p.projectRoot, '.fgos', 'installation')));
+  assert.deepEqual(fs.readdirSync(p.worktrees), ['ds-aaaaaaaaaa-probe'], 'nothing but the worktree is created in the worktrees directory');
+  const again = await defaultEnsureWorktree({ projectRoot: p.projectRoot, path: p.worktree, branch: p.branch });
+  assert.equal(again.created, false);
+  assert.equal(fs.realpathSync(link), fs.realpathSync(path.join(p.projectRoot, '.fgos', 'installation')));
+  cleanupProject(p);
+});
+
+test('a conflicting .fgos/installation in the shaper worktree is refused shaper-worktree-installation-conflict and left in place', async () => {
+  const p = await gitProject();
+  p.git('worktree', 'add', '-q', '-b', p.branch, p.worktree);
+  const dir = path.join(p.worktree, '.fgos', 'installation');
+  fs.mkdirSync(dir, { recursive: true });
+  await assert.rejects(defaultEnsureWorktree({ projectRoot: p.projectRoot, path: p.worktree, branch: p.branch }), { code: 'shaper-worktree-installation-conflict' });
+  assert.equal(fs.lstatSync(dir).isDirectory(), true);
+  fs.rmSync(dir, { recursive: true });
+  fs.symlinkSync(os.tmpdir(), dir, 'dir');
+  await assert.rejects(defaultEnsureWorktree({ projectRoot: p.projectRoot, path: p.worktree, branch: p.branch }), { code: 'shaper-worktree-installation-conflict' });
+  assert.equal(fs.readlinkSync(dir), os.tmpdir());
+  cleanupProject(p);
+});
+
+test('a registered shaper worktree gets the installation link once and a second placement keeps it', async () => {
+  const p = await gitProject();
+  p.git('worktree', 'add', '-q', '-b', p.branch, p.worktree);
+  const link = path.join(p.worktree, '.fgos', 'installation');
+  await defaultEnsureWorktree({ projectRoot: p.projectRoot, path: p.worktree, branch: p.branch });
+  const inode = fs.lstatSync(link).ino;
+  await defaultEnsureWorktree({ projectRoot: p.projectRoot, path: p.worktree, branch: p.branch });
+  assert.equal(fs.lstatSync(link).isSymbolicLink(), true);
+  assert.equal(fs.lstatSync(link).ino, inode);
+  assert.equal(fs.realpathSync(link), fs.realpathSync(path.join(p.projectRoot, '.fgos', 'installation')));
+  cleanupProject(p);
+});
+
+test('a project without .fgos/installation gets no link in the shaper worktree', async () => {
+  const p = await gitProject({ installation: false });
+  p.git('worktree', 'add', '-q', '-b', p.branch, p.worktree);
+  await defaultEnsureWorktree({ projectRoot: p.projectRoot, path: p.worktree, branch: p.branch });
+  assert.equal(fs.existsSync(path.join(p.worktree, '.fgos', 'installation')), false);
+  cleanupProject(p);
+});
