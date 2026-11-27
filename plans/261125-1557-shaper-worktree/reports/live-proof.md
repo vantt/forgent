@@ -475,3 +475,131 @@ state: it tried `fgos land status` and `fgos land --status`, which were refused 
 - Minor: the successor's `session bind session` was refused `busy` once (`mbx-817`), while it was being refused saves.
 - Setup note: `fgctl init`/`doctor --fix` on a scratch clone still install and immediately start the watcher and
   mailbox-sync timers. Each start was killed within the same second here, but only because of the polling wrapper.
+
+## Rerun on 5a30a00947
+
+Run 2026-11-27 23:42–23:48 (+07). Release `sha256:13476a30040931e48d745aa3aa0d7066b11862a79a6b75a120e1e54ea5f7e091`
+(distribution `/var/tmp/r/fgos-rc-5a30a00947`, built from main `5a30a00947`, which includes the defect E fix
+`381c124466`, landed as `35c609b820`: the head-request handler uses the envelope's `session.projectRoot`). Fresh scratch
+`/var/tmp/r/shaper-live4/`: origin.git cloned bare from the real repo with `refs/fgos/legacy` fetched into it, and proj
+cloned at `512da89724`. Workspace id `adf914b25ba5a1d0`. Every fgos call went through
+`env -u FGOS_STATE_ROOT TMPDIR=/var/tmp/r /var/tmp/r/shaper-live4/proj/.fgos/installation/bin/fgos … --dir /var/tmp/r/shaper-live4/proj`.
+`proj-worktrees/` was not created by hand. The procedure was the same as rerun 3.
+
+| Check | Result |
+|---|---|
+| Scratch timers disarmed before any other step | **PASS** |
+| First shaper start on a fresh project | **PASS** |
+| Two rounds saved on the branch; main checkout and main tip unchanged | **PASS** (`c655837928`, `384d102ee6`) |
+| Questions hook and mailbox hook answer inside the shaper; identity holder is the shaper's CLI session | **PASS** |
+| One rotation completes; the successor answers, takes the role and its save is accepted | **PASS** (`rotated: true` after 22 s; the successor saved round 3 as `37d79df863`) |
+| Gen 1 stop trace and the land ticket are under the project's `.fgos`, not the worktree's | **PASS** (the worktree has no `.fgos/runtime` at all) |
+| Land from the role holder (the successor, gen 2): one commit on origin main, discussion dir only | **PASS** on first-parent (`f1b7d7e31d`, a merge) |
+| Stop and cleanup | **PASS** |
+
+### Setup and the timer safety step
+The first `fgctl init --from /var/tmp/r/fgos-rc-5a30a00947 --override-pin …` wrote the activation and stopped at
+`event-store-refspec-missing`, and it installed no units. `doctor --fix` and the re-init ran under the same polling
+wrapper as rerun 3. `doctor --fix` installed and started `fgos-watcher-adf914b2` and `fgos-mailbox-sync-adf914b2`, and
+the wrapper stopped and disabled both at 23:42:52. The re-init started them again, and the wrapper disarmed them at
+23:43:25. Both times the watcher service was killed in the same second (`Main process exited, code=killed, status=15/TERM`).
+The re-init ended exit 2, "not ready", with 9 environmental checks: the same 8 as rerun 3, plus
+`active-release-matches-checkout`, because the clone (`512da89724`) is not the tree the release was built from.
+Afterwards both scratch timers were `inactive / disabled`, `list-timers` showed only the real project's `e9756c48`
+timers, and no scratch watcher started a head.
+
+### Step 2: discussion
+`plans/discussions/ds-livetest-shaper4/DISCUSSION.md`, plain commit `57e805489c`, pushed; origin/main = `57e805489c`.
+The proj main checkout baseline is ` M .fgos/coexistence.json`, ` M .fgos/config.yaml`, and later `?? .fgos/observe/records/`, as in rerun 3.
+
+### Step 3: first start
+```
+ls -d /var/tmp/r/shaper-live4/proj-worktrees -> No such file or directory   (before)
+fgos session start shaper --name ds-livetest-shaper4 --json -> exit 0, role head:shaper-ds-livetest-shaper4,
+     key cmd_1795797871999_cd2aff18, pane w6:p2HT, visibility trustSeeded: claude-json
+git worktree list -> /var/tmp/r/shaper-live4/proj-worktrees/ds-livetest-shaper4 57e805489c [discussion/ds-livetest-shaper4]
+<worktree>/.fgos/installation -> /var/tmp/r/shaper-live4/proj/.fgos/installation   (symlink)
+envelope.json: cwd = the worktree; session.projectRoot = /var/tmp/r/shaper-live4/proj
+/proc/1154341 (claude): cwd = the worktree; FGOS_HEAD_PROJECT_ROOT=/var/tmp/r/shaper-live4/proj
+```
+PASS. The envelope now carries the project root separately from the cwd.
+
+### Step 4: rounds
+The shaper saved round 1 itself (`c655837928 round 1: seven sections, domain coding, open points listed`). I typed
+round 2, and it saved `384d102ee6 round 2`. Proj main checkout afterwards: HEAD `57e805489c` (unchanged), status =
+the baseline, and `git branch --contains c655837928` → only `discussion/ds-livetest-shaper4`. PASS.
+
+### Step 5: questions, mailbox, identity
+Inside the shaper, all six checks exited 0: `pwd` = the worktree, branch `discussion/ds-livetest-shaper4`; the
+`.fgos/installation/bin/fgos` link target is present; `hook mailbox` and `hook questions` ran silently;
+`fgos questions` → `needsYou: 5`, no owner questions; `fgos identity session` → `fg-server2-jdp2bv/60cd4961-…`.
+From outside, `fgos identity resolve head:shaper-ds-livetest-shaper4` → the same id, handle `claude-bmj7`,
+`clone` = the worktree, `cliSession.source CLAUDE_CODE_SESSION_ID`, `mailbox {fgosDir: /var/tmp/r/shaper-live4/proj/.fgos,
+name: proj-claude-5b}`, `head gen 1`. `fgos mailbox send … "live proof probe 4 …"` → `recorded 42e8736e0a2d5f5c for proj-claude-5b`.
+The shaper's PostToolUse hook delivered it, and the shaper answered `MAILBOX-PROBE-RECEIVED`. PASS.
+
+### Step 6: rotation
+Before the rotation, gen 1's stop trace was already under the project:
+`proj/.fgos/runtime/session-rotation/shaper-ds-livetest-shaper4/stop-trace.jsonl` →
+`{"at":"2026-11-27T16:45:21.964Z","fraction":0.091285,"source":"sidecar","decision":"below-soft","outcome":"below-threshold"}`.
+`<worktree>/.fgos` holds only `cache` and `installation`, and it has no `runtime/` directory at all.
+```
+23:46:26 fgos session rotate shaper --name ds-livetest-shaper4 --json -> {"started":true,"pid":1298637}  exit 0
+23:46:48 rotation.log: {"rotated":true,"key":"cmd_1795797987780_82790f06","gen":2,"oldEnded":true}
+incidents.jsonl: not written (no failure)
+answered.json: {"gen":2,"key":"head-shaper-ds-livetest-shaper4-2","sessionId":"fg-server2-jdp2bv/6dffc067-…",
+                "message":"None pending: no owner question belongs to this discussion. Resuming after the rotation, in round 3.",
+                "answeredAt":"2026-11-27T16:46:44.708Z"}
+placement.json:  gen 2, key cmd_1795797987780_82790f06, runDir …/head-shaper-ds-livetest-shaper4-2/runs/01
+latest.json:     {"file":"261127-1646-cmd17957.md","session":"cmd_1795797871999_cd2aff18","rotate":"manual",…}
+handoff 261127-1646-cmd17957.md line 14: "Rotation id: 7f84e5678fd70227"
+successor (gen 2, pane w6:p2HV) supervisor.log head-request lines:
+  c-448-…  fgos done
+  mbx-472  session bind session done (x2)
+  hook-523-1795798004574  session answered done
+  141f1b4904296f12  session save done
+identity resolve head:shaper-ds-livetest-shaper4 -> id …/6dffc067-…, handle claude-ydqa, alive, paneId w6:p2HV, gen 2
+gen 1 run dir: stop-requested.json, receipt.json, closed.json (ended by the rotation)
+successor claude cwd (/proc/1301134) = /var/tmp/r/shaper-live4/proj-worktrees/ds-livetest-shaper4
+```
+Every rotation file (`placement.json`, the handoff, `latest.json`, the short-lived `rotation.json`, `answered.json`,
+`rotation.log`, `stop-trace.jsonl`) is under `proj/.fgos/runtime/session-rotation/shaper-ds-livetest-shaper4/`. The
+successor's hook read the handoff and pending rotation from there, and the request handler now checks the answer
+against the same place. The role moved, gen 1 was ended, and the successor saved round 3 on its own
+(`37d79df863 round 3: successor after rotation, points 3 and 4 clear`). **Rotation: PASS.** Defects D and E are fixed.
+
+### Step 7: land (by gen 2, the role holder after the rotation)
+```
+fgos land --branch discussion/ds-livetest-shaper4 -> ticket c-738-1795798029008, state done
+ticket file: proj/.fgos/runtime/head-tickets/shaper-ds-livetest-shaper4/c-738-1795798029008.json
+  cwd /var/tmp/r/shaper-live4/proj, argv [land --json --branch discussion/ds-livetest-shaper4 --footprint plans/discussions/ds-livetest-shaper4],
+  result mainSha f1b7d7e31d, landedPaths [plans/discussions/ds-livetest-shaper4/DISCUSSION.md],
+  worktreesKept [{path: <worktree>, code: worktree-live-cwd-preserved}]
+origin/main: f1b7d7e31d (parents 57e805489c 37d79df863) "land discussion/ds-livetest-shaper4"
+git rev-list --first-parent --count 57e805489c..origin/main -> 1 ; --count (all) -> 4
+git diff --name-only 57e805489c origin/main -> plans/discussions/ds-livetest-shaper4/DISCUSSION.md
+proj main checkout HEAD -> f1b7d7e31d (fast-forwarded a few seconds after the land); status = baseline
+```
+One merge commit on main's first-parent line, touching only the discussion dir, landed by the successor. The land
+ticket is under the project's `.fgos`. The three round commits are reachable from main, so defect C stands.
+
+### Step 8: stop and cleanup
+- `fgos session stop shaper --name ds-livetest-shaper4 --json` → `stopped: true`; no herdr pane for the scratch remains.
+  No process has `/var/tmp/r/shaper-live4` in its command line or cwd.
+- Timers: `fgos-watcher-adf914b2` and `fgos-mailbox-sync-adf914b2` (timer and service) were stopped and disabled again.
+  I deleted exactly `~/.config/systemd/user/fgos-{watcher,mailbox-sync}-adf914b2.{timer,service}`, then ran
+  `systemctl --user daemon-reload` and `reset-failed` on the two services. The real project's `fgos-*-e9756c48` timers
+  are still enabled. I left `fgos-watcher-e2b8b5cc` alone because it is not mine.
+- Removed the Claude trust entry for `/var/tmp/r/shaper-live4/proj` from the claude-vantt login home config.
+- This run did not touch the real repo. `/var/tmp/r/shaper-live4/` is kept for inspection.
+
+### Defects after rerun 4
+- A, B, D, E: fixed. A shaper starts on a fresh project, its hooks run in the worktree, and a rotation in the same
+  worktree completes. The successor answers, takes the role, saves, and lands.
+- C (open, minor): a branch land is a merge, so round commits become reachable from main.
+- Minor: `?? .fgos/installation` is untracked in the shaper worktree.
+- Minor: two of gen 1's measuring Stop-hook requests were refused `busy` (`hook-1050-…`, `hook-1147-…`, before the
+  rotation), so `stop-trace.jsonl` holds one line for three stops. That is harmless here, but a busy refusal drops a
+  context measurement that an automatic rotation would rely on.
+- Setup note: `fgctl init`/`doctor --fix` on a scratch clone still install and immediately start the watcher and
+  mailbox-sync timers, so a live proof on a clone needs the polling disarm.
