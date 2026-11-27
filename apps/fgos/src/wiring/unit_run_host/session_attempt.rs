@@ -53,6 +53,7 @@ pub struct SessionRequest {
     pub ceiling_ms: u64,
     pub env: BTreeMap<String, String>,
     pub project_root: PathBuf,
+    pub workdir: Option<PathBuf>,
     pub beside: Option<String>,
     pub display: Option<Value>,
     /// `opts.providerCapacityRuntimeDir`: the account store the lease is taken from (the machine's own when absent).
@@ -89,7 +90,7 @@ fn optional<'v>(request: &'v Value, key: &str) -> Option<&'v Value> {
 impl SessionRequest {
     /// The request as the `launch-session` op receives it; anything outside it is refused by name.
     pub fn from_json(request: &Value) -> Result<Self, String> {
-        const KNOWN: [&str; 12] = [
+        const KNOWN: [&str; 13] = [
             "binding",
             "runnerConfig",
             "key",
@@ -99,6 +100,7 @@ impl SessionRequest {
             "ceilingMs",
             "env",
             "projectRoot",
+            "workdir",
             "beside",
             "display",
             "opts",
@@ -171,6 +173,17 @@ impl SessionRequest {
                 .collect::<Result<_, _>>()?,
             Some(_) => return Err("env must be an object of strings".into()),
         };
+        let workdir = match optional(request, "workdir") {
+            None => None,
+            Some(Value::String(s)) => {
+                let p = PathBuf::from(s);
+                if !p.is_absolute() {
+                    return Err("workdir must be an absolute path".into());
+                }
+                Some(p)
+            }
+            Some(_) => return Err("workdir must be a string or null".into()),
+        };
         let beside = match optional(request, "beside") {
             None => None,
             Some(Value::String(s)) => Some(s.clone()),
@@ -207,10 +220,16 @@ impl SessionRequest {
             ceiling_ms,
             env,
             project_root: PathBuf::from(text(request, "projectRoot")?),
+            workdir,
             beside,
             display,
             runtime_dir,
         })
+    }
+
+    /// The working checkout: `workdir` when present, else `project_root`.
+    pub fn working_checkout(&self) -> &Path {
+        self.workdir.as_deref().unwrap_or(&self.project_root)
     }
 }
 
@@ -350,7 +369,7 @@ impl AttemptDriver for HostSessionDriver<'_> {
             attempt_id: attempt_id.into(),
             unit_run_id: key.into(),
             terminal: true,
-            cwd: self.request.project_root.to_string_lossy().into_owned(),
+            cwd: self.request.working_checkout().to_string_lossy().into_owned(),
             host: Some(host),
             step_env: self.exec.step_env(),
             custody: false,
@@ -490,7 +509,7 @@ impl AttemptDriver for HostSessionDriver<'_> {
             provider_capacity: self.provider_capacity.as_ref(),
             provider_capacity_evidence: self.evidence.as_ref(),
             confinement_requirement: &seat.confinement_requirement,
-            repo_root: root,
+            repo_root: self.request.working_checkout(),
             context_refs: None,
             dispatch_batch_key: Some(&seat.dispatch_batch_key),
             dispatch_batch_size: None,
@@ -581,6 +600,34 @@ impl AttemptDriver for HostSessionDriver<'_> {
     }
 }
 
+/// Validate that `workdir` is a registered linked worktree of `project_root`, not the project root itself.
+fn validate_workdir(workdir: &Path, project_root: &Path) -> Result<(), SessionLaunchError> {
+    let refuse = || {
+        SessionLaunchError::new(
+            "workdir-not-linked",
+            format!(
+                "workdir \"{}\" is not a linked worktree of the project",
+                workdir.display()
+            ),
+        )
+        .with("workdir", json!(workdir.display().to_string()))
+    };
+    let roots = super::machine::git_roots(workdir, false).map_err(|_| refuse())?;
+    let workdir_canonical =
+        std::fs::canonicalize(workdir).unwrap_or_else(|_| workdir.to_path_buf());
+    let workdir_plain = fgos_process::path::plain_path(&workdir_canonical);
+    let project_root_canonical =
+        std::fs::canonicalize(project_root).unwrap_or_else(|_| project_root.to_path_buf());
+    let project_root_plain = fgos_process::path::plain_path(&project_root_canonical);
+    if !roots.is_linked_worktree
+        || roots.worktree_root != workdir_plain
+        || roots.main_checkout_root != project_root_plain
+    {
+        return Err(refuse());
+    }
+    Ok(())
+}
+
 /// `launchSessionAttempt(request)`: start the session attempt of `request.key` on this machine and return once its
 /// supervisor bound it. `route` is the pane route (the project's herdr route when `None`).
 pub fn launch_session(
@@ -588,6 +635,9 @@ pub fn launch_session(
     attempt_host: AttemptHost,
     route: Option<Arc<dyn PaneRoute>>,
 ) -> Result<SessionPlacement, SessionLaunchError> {
+    if let Some(workdir) = &request.workdir {
+        validate_workdir(workdir, &request.project_root)?;
+    }
     let exec = HostExecution::new(attempt_host, &json!({}))
         .map_err(|e| SessionLaunchError::new("error", e))?;
     let now_ms = exec.now_ms().max(0) as u128;
