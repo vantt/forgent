@@ -1,7 +1,7 @@
 //! The supervisor's read and drain verbs as library functions the host calls: `plans`,
 //! `successor`, `queue`, `handled` and `done`.
 use crate::{
-    portfolio::{admissible, head_name, running_overlaps, Plan},
+    portfolio::{admissible, head_name, placement, running_overlaps, Placement, Plan},
     queue::{QueueError, RaisedEvent},
     wake::{Drain, Holder},
 };
@@ -21,6 +21,12 @@ pub struct PlanRow {
     pub lead_live: Option<bool>,
     /// A `running` plan that names no lead: held, never restarted.
     pub lead_unnamed: bool,
+    /// The plan's `host`, when it names one.
+    pub host: Option<String>,
+    /// A `running` plan on another machine: shown, never counted or restarted here.
+    pub running_elsewhere: bool,
+    /// A `running` plan with no `host` whose named lead is not live here: held, never restarted.
+    pub host_unnamed: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -62,7 +68,15 @@ pub fn lead_counts(
     project_id: &str,
     holder: &dyn Fn(&str) -> Holder,
     questions: &dyn OpenQuestions,
+    machine: &str,
 ) -> (usize, usize) {
+    // A plan running on another machine holds no lead slot here.
+    let plans: Vec<Plan> = plans
+        .iter()
+        .filter(|p| !matches!(placement(p, machine), Placement::Elsewhere(_)))
+        .cloned()
+        .collect();
+    let plans = plans.as_slice();
     let mut roles = roles.to_vec();
     roles.extend(
         plans
@@ -104,15 +118,19 @@ pub fn plans(
     holder: &dyn Fn(&str) -> Holder,
     max_leads: usize,
     questions: &dyn OpenQuestions,
+    machine: &str,
 ) -> PlansView {
-    let open = admissible(plans, done_dirs);
-    let (leads_live, leads_waiting) = lead_counts(plans, &[], project_id, holder, questions);
+    let open = admissible(plans, done_dirs, machine);
+    let (leads_live, leads_waiting) =
+        lead_counts(plans, &[], project_id, holder, questions, machine);
     let rows = plans
         .iter()
         .map(|p| {
             let name = head_name(project_handle, &p.dir);
             let running = p.status == "running";
-            let lead_live = match (running, p.lead.as_deref()) {
+            let place = placement(p, machine);
+            let elsewhere = running && matches!(place, Placement::Elsewhere(_));
+            let lead_live = match (running && !elsewhere, p.lead.as_deref()) {
                 (true, Some(role)) => match holder(role) {
                     Holder::Live { project_id: id } => Some(id == project_id),
                     Holder::NotLive => Some(false),
@@ -120,6 +138,9 @@ pub fn plans(
                 },
                 _ => None,
             };
+            // No `host` and the named lead is not live here: held, not restarted.
+            let host_unnamed = running && place == Placement::Unnamed && lead_live == Some(false);
+            let lead_live = lead_live.filter(|_| !host_unnamed);
             PlanRow {
                 dir: p.dir.clone(),
                 status: p.status.clone(),
@@ -128,7 +149,10 @@ pub fn plans(
                 overlaps: running_overlaps(p, plans),
                 head_name: name,
                 lead_live,
-                lead_unnamed: running && p.lead.is_none(),
+                lead_unnamed: running && !elsewhere && p.lead.is_none(),
+                host: p.host.clone(),
+                running_elsewhere: elsewhere,
+                host_unnamed,
             }
         })
         .collect();
@@ -255,6 +279,15 @@ impl PlansView {
                 }
                 if r.lead_unnamed {
                     v["leadUnnamed"] = true.into();
+                }
+                if let Some(host) = &r.host {
+                    v["host"] = host.clone().into();
+                }
+                if r.running_elsewhere {
+                    v["runningElsewhere"] = true.into();
+                }
+                if r.host_unnamed {
+                    v["hostUnnamed"] = true.into();
                 }
                 v
             })

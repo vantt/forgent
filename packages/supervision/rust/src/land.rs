@@ -492,6 +492,15 @@ fn status_in(file: &str, bytes: &[u8]) -> Option<String> {
     string_key_in(file, bytes, "status")
 }
 
+/// Whether `path` is `plans/<name>/plan.md`.
+fn is_plan_file(path: &str) -> bool {
+    let mut parts = path.split('/');
+    matches!(
+        (parts.next(), parts.next(), parts.next(), parts.next()),
+        (Some("plans"), Some(name), Some("plan.md"), None) if !name.is_empty()
+    )
+}
+
 /// The string value of the top-level frontmatter `key` of `file` with these bytes.
 fn string_key_in(file: &str, bytes: &[u8], key: &str) -> Option<String> {
     let entries = frontmatter_entries(file, bytes).ok()?;
@@ -942,13 +951,7 @@ impl Lander<'_> {
     /// compares the `footprint` in the commit with the one at the trunk tip the commit was made on. A deletion,
     /// a difference or a read failure refuses; the caller pushes nothing.
     fn require_footprint_unchanged(&self, tip: &Oid, commit: &Oid) -> Result<(), LandRefusal> {
-        let is_plan = |path: &str| {
-            let mut parts = path.split('/');
-            matches!(
-                (parts.next(), parts.next(), parts.next(), parts.next()),
-                (Some("plans"), Some(name), Some("plan.md"), None) if !name.is_empty()
-            )
-        };
+        let is_plan = is_plan_file;
         let refused = |why: String| refuse("footprint-change-refused", why);
         for file in self
             .changed_paths(tip, commit)?
@@ -980,6 +983,37 @@ impl Lander<'_> {
                         "{file} changes the footprint of its own plan"
                     )))
                 }
+            }
+        }
+        Ok(())
+    }
+
+    /// Any paths land: a `plans/<name>/plan.md` that is `running` at the trunk tip keeps its `host`. The
+    /// admission commit (tip status `ready`) passes. A difference refuses; the caller pushes nothing.
+    fn require_host_unchanged(&self, tip: &Oid, commit: &Oid) -> Result<(), LandRefusal> {
+        for file in self
+            .changed_paths(tip, commit)?
+            .into_iter()
+            .filter(|path| is_plan_file(path))
+        {
+            let refused = |why: String| refuse("host-change-refused", why);
+            let read = |id: &Oid| {
+                self.blob_at(id.as_str(), &file)
+                    .map_err(|e| refused(format!("{file} cannot be read: {}", e.detail)))
+            };
+            let Some(trunk) = read(tip)? else { continue };
+            if status_in(&file, &trunk).as_deref() != Some("running") {
+                continue;
+            }
+            // A deletion is the footprint guard's business, not a host change.
+            let Some(committed) = read(commit)? else {
+                continue;
+            };
+            let host = |bytes: &[u8]| string_key_in(&file, bytes, "host");
+            if host(&committed) != host(&trunk) {
+                return Err(refused(format!(
+                    "{file} changes the host of a running plan"
+                )));
             }
         }
         Ok(())
@@ -2473,8 +2507,15 @@ impl Lander<'_> {
                 ),
             )));
         }
-        if command.footprint.is_some() {
-            if let Err(refusal) = self.require_footprint_unchanged(tip, &commit) {
+        let guards = [
+            command
+                .footprint
+                .is_some()
+                .then(|| self.require_footprint_unchanged(tip, &commit)),
+            Some(self.require_host_unchanged(tip, &commit)),
+        ];
+        for refusal in guards.into_iter().flatten() {
+            if let Err(refusal) = refusal {
                 return Err(unpublished(refuse(
                     &refusal.code,
                     format!(
