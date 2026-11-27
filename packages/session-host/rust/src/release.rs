@@ -4,9 +4,11 @@
 //!
 //! Every external call (the config read, the git and lock reads, the release record, running an argv, the owner
 //! question and the report) is behind [`ReleasePorts`], so the proof drives fixtures; the run supervisor owns the
-//! real adapters. An argv runs with no shell, from the project root.
+//! real adapters. An argv runs with no shell: the checks in a checkout of the trunk tip, every other step from the
+//! project root.
 
 use serde_json::{json, Map, Value};
+use std::path::{Path, PathBuf};
 
 /// A recipe as read from `release.*`.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -167,8 +169,14 @@ pub trait ReleasePorts {
     fn set_step(&self, step: Option<&str>) -> Result<(), String>;
     /// Why a land holds the merge slot (`Some`), or `None` when none does.
     fn land_in_progress(&self) -> Result<Option<String>, String>;
-    /// Runs one argv (no shell, project root) and returns its exit code.
-    fn run(&self, argv: &[String]) -> Result<i32, String>;
+    /// Makes a clean, exact checkout of the commit `tip` outside the project root and returns its path. The checks
+    /// run there. Made once per run, after the merge-slot look and before the first check.
+    fn make_check_checkout(&self, tip: &str) -> Result<PathBuf, String>;
+    /// Removes the checkout `make_check_checkout` made for `tip`. Called once the checks end, however they ended.
+    fn remove_check_checkout(&self, path: &Path, tip: &str) -> Result<(), String>;
+    /// Runs one argv (no shell) and returns its exit code: in `dir` when given (a check's checkout), else from the
+    /// project root.
+    fn run(&self, argv: &[String], dir: Option<&Path>) -> Result<i32, String>;
     /// Files the owner question carrying the exact apply argv; returns its id.
     fn ask_owner(&self, apply: &[String]) -> Result<String, String>;
     /// Writes one report line to the owner (information, not a choice).
@@ -333,6 +341,47 @@ fn mark(ports: &dyn ReleasePorts, marked: &mut bool, step: &str) -> Result<(), O
     })
 }
 
+/// Runs every check in a checkout of `tip` made for them and removed after them. `Some` is the outcome that ends the
+/// run (nothing is made when there are no checks). A removal that fails is reported and logged; the outcome stands.
+fn run_checks(ports: &dyn ReleasePorts, checks: &[Vec<String>], tip: &str) -> Option<Outcome> {
+    if checks.is_empty() {
+        return None;
+    }
+    let checkout = match ports.make_check_checkout(tip) {
+        Ok(path) => path,
+        Err(why) => return Some(failed("check-checkout-failed", why)),
+    };
+    let mut ended = None;
+    for check in checks {
+        match ports.run(check, Some(&checkout)) {
+            Ok(0) => {}
+            Ok(exit) => {
+                ended = Some(Outcome::ChecksFailed {
+                    argv: check.clone(),
+                    exit,
+                });
+                break;
+            }
+            Err(why) => {
+                ended = Some(failed(
+                    "check-not-run",
+                    format!("{}: {why}", line_of(check)),
+                ));
+                break;
+            }
+        }
+    }
+    if let Err(why) = ports.remove_check_checkout(&checkout, tip) {
+        let line = format!(
+            "the release check checkout at {} was not removed: {why}",
+            checkout.display()
+        );
+        ports.report(&line);
+        ports.log(&line);
+    }
+    ended
+}
+
 fn steps(ports: &dyn ReleasePorts, marked: &mut bool) -> Outcome {
     let recipe = match ports.recipe().and_then(|value| Recipe::from_value(&value)) {
         Ok(recipe) => recipe,
@@ -353,17 +402,8 @@ fn steps(ports: &dyn ReleasePorts, marked: &mut bool) -> Outcome {
     if let Err(outcome) = land_check(ports) {
         return outcome;
     }
-    for check in &recipe.checks {
-        match ports.run(check) {
-            Ok(0) => {}
-            Ok(exit) => {
-                return Outcome::ChecksFailed {
-                    argv: check.clone(),
-                    exit,
-                }
-            }
-            Err(why) => return failed("check-not-run", format!("{}: {why}", line_of(check))),
-        }
+    if let Some(outcome) = run_checks(ports, &recipe.checks, &tip) {
+        return outcome;
     }
     if !recipe.reversible {
         return match ports.ask_owner(&apply) {
@@ -377,7 +417,7 @@ fn steps(ports: &dyn ReleasePorts, marked: &mut bool) -> Outcome {
     }
     let rollback = recipe.rollback.clone().unwrap_or_default();
     let undo = |reason: String| -> Outcome {
-        match ports.run(&rollback) {
+        match ports.run(&rollback, None) {
             Ok(0) => Outcome::RolledBack { reason },
             Ok(exit) => failed(
                 "rollback-failed",
@@ -389,7 +429,7 @@ fn steps(ports: &dyn ReleasePorts, marked: &mut bool) -> Outcome {
     if let Err(outcome) = mark(ports, marked, "applying") {
         return outcome;
     }
-    match ports.run(&apply) {
+    match ports.run(&apply, None) {
         Ok(0) => {}
         Ok(exit) => return undo(format!("apply exited {exit}")),
         Err(why) => return undo(format!("apply did not run: {why}")),
@@ -398,7 +438,7 @@ fn steps(ports: &dyn ReleasePorts, marked: &mut bool) -> Outcome {
         if let Err(outcome) = mark(ports, marked, "probing") {
             return outcome;
         }
-        match ports.run(probe) {
+        match ports.run(probe, None) {
             Ok(0) => {}
             Ok(exit) => return undo(format!("probe exited {exit}")),
             Err(why) => return undo(format!("probe did not run: {why}")),
@@ -442,7 +482,7 @@ fn rollback_steps(ports: &dyn ReleasePorts, ran: &mut bool) -> Outcome {
         return Outcome::NoRecipe;
     };
     *ran = true;
-    match ports.run(&rollback) {
+    match ports.run(&rollback, None) {
         Ok(0) => Outcome::RolledBack {
             reason: "rollback requested".into(),
         },
