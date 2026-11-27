@@ -2490,7 +2490,15 @@ impl Lander<'_> {
         // retries from a fresh sync.
         // A push that failed without an answer may have reached the remote: that commit stays, named,
         // for the next land's sync to find on origin or for a person.
-        if !self.push_local(target, held()?)? {
+        // A push the door refused before sending anything left the remote untouched: undo it too.
+        let pushed = match self.push_local_door(target, held()?) {
+            Ok(pushed) => pushed,
+            Err((code, refusal)) if code != ResultCode::RemoteOutcomeUnknown => {
+                return Err(unpublished(refusal));
+            }
+            Err((_, refusal)) => return Err(refusal),
+        };
+        if !pushed {
             let refusal = refuse(
                 "land-paths-push-rejected",
                 format!(
@@ -2553,8 +2561,20 @@ impl Lander<'_> {
 
     /// Push the local target branch itself; `false` when the remote rejected it as non-fast-forward.
     fn push_local(&self, branch: &str, held: Vec<BorrowedHandle<'_>>) -> Result<bool, LandRefusal> {
+        self.push_local_door(branch, held)
+            .map_err(|(_, refusal)| refusal)
+    }
+
+    /// `push_local`, with the Git door's code kept on a refusal so a caller can tell a push refused
+    /// before anything was sent from one whose outcome is unknown.
+    fn push_local_door(
+        &self,
+        branch: &str,
+        held: Vec<BorrowedHandle<'_>>,
+    ) -> Result<bool, (ResultCode, LandRefusal)> {
         let p = self.ports;
-        let name = ref_name(&format!("refs/heads/{branch}"))?;
+        let name = ref_name(&format!("refs/heads/{branch}"))
+            .map_err(|r| (ResultCode::RemoteOutcomeUnknown, r))?;
         let receipt = p
             .git
             .push_refs(
@@ -2568,13 +2588,16 @@ impl Lander<'_> {
                 p.writer,
                 &self.id(),
             )
-            .map_err(from_git)?;
+            .map_err(|e| (e.code, from_git(e)))?;
         match receipt.remote {
             Remote::Acknowledged => Ok(true),
             Remote::Rejected => Ok(false),
-            _ => Err(refuse(
-                "land-remote-outcome-unknown",
-                "the push outcome is unknown",
+            _ => Err((
+                ResultCode::RemoteOutcomeUnknown,
+                refuse(
+                    "land-remote-outcome-unknown",
+                    "the push outcome is unknown",
+                ),
             )),
         }
     }

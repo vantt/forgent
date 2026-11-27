@@ -1577,6 +1577,61 @@ impl GitDriver {
             .map(|l| oid(repo, l))
             .collect()
     }
+    /// Adds the commits of compacted scoped-commit receipts that were taken for this checkout
+    /// (same resource set and directory identity). Any unreadable entry or mismatch adds nothing.
+    fn compacted_commits_of_checkout(
+        &self,
+        repo: &RepoHandle,
+        wal: &crate::wal::Wal<crate::wal::OsFileSystem>,
+        into: &mut std::collections::HashSet<String>,
+    ) {
+        use crate::wal::{Intent, OperationKind, Outcome, Tip};
+        let Ok(root) = crate::scoped_commit::root(repo) else {
+            return;
+        };
+        // The authority a commit was bound to: the lock file its checkout held.
+        let authority_lock = if root == repo.trusted_main_root() {
+            Ok(repo.trusted_main_root().join(".fgos/locks/main-checkout.lock"))
+        } else {
+            crate::refs::custody_lock_path(repo, root)
+        };
+        let (Ok(resources), Ok(key)) = (
+            crate::scoped_commit::checkout_resources(repo),
+            authority_lock.and_then(|lock| crate::refs::file_key(&lock)),
+        ) else {
+            return;
+        };
+        let authority = format!("{}:{}", key.device, key.index);
+        let Ok(entries) = std::fs::read_dir(repo.common_dir().join("fgos/git/compacted")) else {
+            return;
+        };
+        for entry in entries.take(crate::wal::WAL_SCAN_BOUND).flatten() {
+            let Ok(Some(compact)) = wal.compacted(&entry.file_name().to_string_lossy()) else {
+                continue;
+            };
+            let Ok(Outcome::Commit {
+                observed,
+                contract_violation: false,
+            }) = compact.outcome()
+            else {
+                continue;
+            };
+            let intent = Intent::of(
+                wal,
+                repo,
+                "",
+                (OperationKind::PublicationCas, compact.request.clone()),
+                (resources.clone(), authority.clone()),
+                (
+                    Tip::Oid(compact.expected.clone()),
+                    Tip::Oid(compact.next.clone()),
+                ),
+            );
+            if crate::scoped_commit::compact_matches(&compact, &intent, repo).unwrap_or(false) {
+                into.insert(observed);
+            }
+        }
+    }
     /// For a list of commit oids on the main checkout's branch, returns which of them
     /// were made by a ScopedCommit chain of the main checkout from retained journal records.
     /// Unknown provenance or compacted history answers "not ours". Stops at the first foreign commit.
@@ -1616,6 +1671,10 @@ impl GitDriver {
                 }
             }
         }
+
+        // A finished commit's journal is compacted by the next commit's admission; only its ledger
+        // receipt remains, so recognise it there by the checkout it was taken for.
+        self.compacted_commits_of_checkout(repo, &wal, &mut retained_ours);
 
         let mut ours = Vec::new();
         for commit in commits {
