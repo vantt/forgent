@@ -191,10 +191,7 @@ fn refused(code: &str, detail: impl std::fmt::Display) -> CategorisedRefusal {
         | "plan-not-found"
         | "phase-not-found"
         | "criterion-not-found" => CategorisedRefusal::new("not-found", message),
-        "bad-event"
-        | "bad-args"
-        | "footprint-entry-invalid"
-        | "comment-would-be-lost" => {
+        "bad-event" | "bad-args" | "footprint-entry-invalid" | "comment-would-be-lost" => {
             CategorisedRefusal::new("validation", message)
         }
         _ => CategorisedRefusal::unexpected(message),
@@ -462,7 +459,10 @@ fn widen_command(call: &Call) -> Result<WidenCommand, CategorisedRefusal> {
     if paths.is_empty() {
         return Err(refused("bad-args", "at least one --path is required"));
     }
-    let criterion_str = match call.value("criterion").map_err(|e| refused("bad-args", e))? {
+    let criterion_str = match call
+        .value("criterion")
+        .map_err(|e| refused("bad-args", e))?
+    {
         Some(c) if !c.is_empty() => c,
         _ => return Err(refused("bad-args", "--criterion is required")),
     };
@@ -2752,12 +2752,8 @@ fn run_widen(root: &Path, command: &WidenCommand) -> Result<Value, CategorisedRe
         fgos_run_supervisor::route::CatchUpRefusal::BranchAhead(_) => {
             refused("write-branch-ahead", "branch is ahead")
         }
-        fgos_run_supervisor::route::CatchUpRefusal::Busy { code, detail } => {
-            refused(&code, detail)
-        }
-        fgos_run_supervisor::route::CatchUpRefusal::Refused(why) => {
-            refused(&why.code, why.detail)
-        }
+        fgos_run_supervisor::route::CatchUpRefusal::Busy { code, detail } => refused(&code, detail),
+        fgos_run_supervisor::route::CatchUpRefusal::Refused(why) => refused(&why.code, why.detail),
     })?;
     if !(publisher.path_clean)(&main, &path).map_err(|e| refused(&e.code, e.detail))? {
         return Err(refused(
@@ -2795,13 +2791,9 @@ fn run_widen(root: &Path, command: &WidenCommand) -> Result<Value, CategorisedRe
         Err(e) => return Err(refused("admission-path-unreadable", e)),
     };
 
-    let widened = portfolio::widened_text(
-        &original,
-        &command.phase,
-        &command.paths,
-        command.criterion,
-    )
-    .map_err(|why| refused(why.code(), why))?;
+    let widened =
+        portfolio::widened_text(&original, &command.phase, &command.paths, command.criterion)
+            .map_err(|why| refused(why.code(), why))?;
 
     let host = HostPortfolio { root: main.clone() };
     let (all_plans, _) = host
@@ -3431,7 +3423,11 @@ pub fn answer(
                     command.dir,
                     data["added"]
                         .as_array()
-                        .map(|a| a.iter().filter_map(|v| v.as_str()).collect::<Vec<_>>().join(", "))
+                        .map(|a| a
+                            .iter()
+                            .filter_map(|v| v.as_str())
+                            .collect::<Vec<_>>()
+                            .join(", "))
                         .unwrap_or_default(),
                     sha
                 )

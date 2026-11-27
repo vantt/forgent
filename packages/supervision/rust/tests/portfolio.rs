@@ -2,8 +2,8 @@ use std::fs;
 use std::path::PathBuf;
 
 use fgos_supervision::portfolio::{
-    active_overlaps, admissible, admitted_text, collisions, footprint_problem, head_name,
-    name_tag, order, read_plan, running_overlaps, supervisor_name, widened_text, Plan,
+    active_overlaps, admissible, admitted_text, collisions, footprint_problem, head_name, name_tag,
+    order, read_plan, running_overlaps, supervisor_name, widened_text, Plan,
 };
 
 fn plan(
@@ -518,10 +518,7 @@ fn widened_text_keeps_every_other_byte_of_plan_md() {
     let body = format!(
         "# Title\n\nSome introductory notes.\n\n## Acceptance criteria\n\n1. First criterion.\n2. Second criterion.\n\n## Phases\n\n{HEAD}| 1 | a | - | `src/**` | 1 | ready |\n| 2 | b | 1 | `tests/**` | 2 | ready |\n\nSome trailing notes.\n"
     );
-    let original = text_with(
-        "# Frontmatter comment\nfootprint:\n  - src/**\n",
-        &body,
-    );
+    let original = text_with("# Frontmatter comment\nfootprint:\n  - src/**\n", &body);
     let widened = widened_text(&original, "1", &["lib/new_module.rs"], 1).unwrap();
     let edited = widened.text.unwrap();
 
@@ -548,10 +545,7 @@ fn widened_text_refuses_when_comment_inside_footprint_list() {
     let body = format!(
         "## Acceptance criteria\n\n1. Item one.\n\n{HEAD}| 1 | a | - | `src/**` | 1 | ready |\n"
     );
-    let original = text_with(
-        "footprint:\n  # comment inside list\n  - src/**\n",
-        &body,
-    );
+    let original = text_with("footprint:\n  # comment inside list\n  - src/**\n", &body);
     let err = widened_text(&original, "1", &["tests/new.rs"], 1).unwrap_err();
     assert_eq!(err.code(), "comment-would-be-lost");
 }
@@ -642,7 +636,13 @@ fn widened_text_refuses_invalid_footprint_entries() {
     );
     let original = text_with("footprint:\n  - src/**\n", &body);
 
-    for bad in ["-leading-dash", "./-leading-dash", "", "/abs/path", "../escape"] {
+    for bad in [
+        "-leading-dash",
+        "./-leading-dash",
+        "",
+        "/abs/path",
+        "../escape",
+    ] {
         let err = widened_text(&original, "1", &[bad], 1).unwrap_err();
         assert_eq!(err.code(), "footprint-entry-invalid", "{bad}");
     }
@@ -651,7 +651,14 @@ fn widened_text_refuses_invalid_footprint_entries() {
 #[test]
 fn active_overlaps_compares_ready_and_running_plans_and_skips_self() {
     let plans = vec![
-        plan("mine", "running", "P1", "2026-11-01", &[], &["src/shared/**"]),
+        plan(
+            "mine",
+            "running",
+            "P1",
+            "2026-11-01",
+            &[],
+            &["src/shared/**"],
+        ),
         plan(
             "peer_running",
             "running",

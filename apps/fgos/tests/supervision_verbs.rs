@@ -724,7 +724,10 @@ lead: lead:S6A\n\
 | 1 | one | - | `src/**` | 1 | running |\n";
     fs::write(&plan_path, content).unwrap();
     git(&project, &["add", "-f", "."]);
-    git(&project, &["commit", "-q", "-m", "plan running with criteria"]);
+    git(
+        &project,
+        &["commit", "-q", "-m", "plan running with criteria"],
+    );
     git(&project, &["push", "-q", "origin", "main"]);
 
     let data = scene.data(&[

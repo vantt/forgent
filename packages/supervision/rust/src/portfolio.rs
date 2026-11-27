@@ -486,7 +486,10 @@ pub fn widened_text<S: AsRef<str>>(
 
     let mut phase_added: Vec<String> = Vec::new();
     for canon in &canon_paths {
-        if !canon_phase_footprint.iter().any(|existing| existing == canon) {
+        if !canon_phase_footprint
+            .iter()
+            .any(|existing| existing == canon)
+        {
             if !phase_added.contains(canon) {
                 phase_added.push(canon.clone());
             }
@@ -539,8 +542,7 @@ pub fn widened_text<S: AsRef<str>>(
     };
 
     let new_front_text = if frontmatter_changed {
-        String::from_utf8(doc.to_bytes())
-            .map_err(|e| WidenRefusal::RereadFailed(e.to_string()))?
+        String::from_utf8(doc.to_bytes()).map_err(|e| WidenRefusal::RereadFailed(e.to_string()))?
     } else {
         front.to_string()
     };
@@ -554,7 +556,13 @@ pub fn widened_text<S: AsRef<str>>(
         .map(|idx| idx + 1)
         .unwrap_or(3);
     let closing = &text[start + front.len()..start + front.len() + closing_line_len];
-    let full_text = format!("{}{}{}{}", &text[..start], new_front_text, closing, new_body);
+    let full_text = format!(
+        "{}{}{}{}",
+        &text[..start],
+        new_front_text,
+        closing,
+        new_body
+    );
 
     read_phase_table("plan.md", &new_body)
         .map_err(|e| WidenRefusal::RereadFailed(format!("{phase_id}: {e}")))?;
@@ -676,7 +684,12 @@ fn update_phase_cell(
     let mut pipes = Vec::new();
     let mut chars = line.char_indices().peekable();
     while let Some((idx, c)) = chars.next() {
-        if c == '\\' && chars.peek().map(|(_, next_c)| *next_c == '|').unwrap_or(false) {
+        if c == '\\'
+            && chars
+                .peek()
+                .map(|(_, next_c)| *next_c == '|')
+                .unwrap_or(false)
+        {
             chars.next();
         } else if c == '|' {
             pipes.push(idx);
