@@ -36,6 +36,7 @@ footprint:
   - docs/platform/session-host/spec.md
   - docs/platform/supervision/spec.md
   - changelog.d/261125-1557-shaper-runs-in-own-worktree.md
+  - src/cli/command-registry.mjs
 base: dc49aa88162cbd26bbca308f337b7c1f05387a86
 source:
   - plans/discussions/ds-xb6hplcn2m-shaper-worktree/DISCUSSION.md
@@ -166,7 +167,7 @@ to `ready`, drop the `blockedBy`, and land the plan dir. Nothing else in the pla
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Launch a head inside a linked worktree](phase-01-launch-in-worktree.md) | - | apps/fgos/src/wiring/unit_run_host/session_attempt.rs, apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs, packages/execution/contracts/execution-routes/execution-routes.v1.json | 1 | done |
-| 2 | [The session save verb](phase-02-session-save.md) | - | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/route.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, packages/session-host/contracts/head-permissions.v1.json, packages/session-host/rust/src/permissions.rs, packages/session-host/rust/tests/permissions.rs, apps/fgos/src/wiring/session_write_publish.rs, packages/run-supervisor/rust/examples/internal_harness.rs, apps/fgos/tests/questions_head.rs, apps/fgos/tests/mailbox_routes.rs, bin/fgos.mjs, packages/host-runtime/contracts/command-manifest.json, test/cli/session-verb.test.mjs | 1 | ready |
+| 2 | [The session save verb](phase-02-session-save.md) | - | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/route.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, packages/session-host/contracts/head-permissions.v1.json, packages/session-host/rust/src/permissions.rs, packages/session-host/rust/tests/permissions.rs, apps/fgos/src/wiring/session_write_publish.rs, packages/run-supervisor/rust/examples/internal_harness.rs, apps/fgos/tests/questions_head.rs, apps/fgos/tests/mailbox_routes.rs, bin/fgos.mjs, packages/host-runtime/contracts/command-manifest.json, test/cli/session-verb.test.mjs, `src/cli/command-registry.mjs` | 1 | ready |
 | 3 | [A shaper lands its own discussion branch](phase-03-shaper-branch-land.md) | - | src/session-host/head-plan.mjs, src/session-host/head-request.mjs, test/session-host/head-request.test.mjs | 1 | done |
 | 4 | [The shaper start creates its worktree](phase-04-shaper-start-worktree.md) | 1, 3 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs | 2 | done |
 | 5 | [Skill, specs and changelog](phase-05-skill-and-docs.md) | 2, 3, 4 | core/skills/fgos-shaping/SKILL.md, core/agents/shaper.yaml, .agents/skills/fgos-shaping/SKILL.md, plugins/fgOS/skills/fgos-shaping/SKILL.md, .claude/agents/shaper.md, docs/platform/session-host/spec.md, docs/platform/supervision/spec.md, changelog.d/261125-1557-shaper-runs-in-own-worktree.md | 3 | ready |
