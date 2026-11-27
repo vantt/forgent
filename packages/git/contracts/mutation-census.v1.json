@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a4480813f5866d41c73ec774ce3bb57e16b47bf8a6795f1870a3d03203b89813",
+  "payloadDigest": "595229529cd87f2d527af363af933e264da348473bb34f8fe0bb642faeae43b8",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -1448,7 +1448,7 @@
     "scripts/lib/codex-auth-guard.mjs": "e7d0ec136014ece7375a545789734203f6c3840cb64aec76a80ecd9f1af198ee",
     "scripts/lib/dev-host-manifest.mjs": "9928ceb97e807bcb02a7fed73153cf21de09d6cc9b6d56492166cb94e48c44bb",
     "scripts/lib/doc-links.mjs": "a4f2720a80234e2f3d5000877efdf2be95dd7c5ca11eda519f025d65df711cd1",
-    "scripts/lib/fgos-write-witness.mjs": "e3504685ec7c5a7ebc142d4ea3ddc4e9839fcd306825d3d34b00064a9b5fd80d",
+    "scripts/lib/fgos-write-witness.mjs": "550fae7fb5d60089475b390d79d69742307f98103c5ac8eeca43a0a024bc7137",
     "scripts/lib/full-suite-queue.mjs": "da176b9ad8a796ec13ede755dd2c2b12e6e29d5b5b12874ca8e6ae06803e3aba",
     "scripts/lib/git-addon-stage.mjs": "3844d3d8b57fc5c1d5ddd26e051109fb590cf1210639c220f8195508713da977",
     "scripts/lib/git-dir-layout.mjs": "cdc573ff49e7c12af30c284ea84060ff476390b26769a0cb82f63dc357df04eb",

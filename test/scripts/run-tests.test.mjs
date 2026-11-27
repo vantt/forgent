@@ -962,7 +962,7 @@ test('a test process that removes the whole .fgos store fails the run', () => {
   fs.rmSync(base, { recursive: true, force: true });
 });
 
-test('a directory tree a test process creates in .fgos and removes again passes, even when the tree was made with one recursive mkdir', () => {
+test('a directory tree a test process creates in .fgos and removes again passes, even when the tree was made with one recursive mkdir or named by mkdtemp', () => {
   const base = tempBase();
   const fgosDir = path.join(fs.realpathSync(base), '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
@@ -973,6 +973,9 @@ test('a directory tree a test process creates in .fgos and removes again passes,
     `const fgos = ${JSON.stringify(fgosDir)};`,
     "fs.mkdirSync(path.join(fgos, 'a', 'b'), { recursive: true });",
     "fs.rmSync(path.join(fgos, 'a'), { recursive: true });",
+    "const made = fs.mkdtempSync(path.join(fgos, 'run-'));",
+    "fs.writeFileSync(path.join(made, 'f'), 'x');",
+    "fs.rmSync(made, { recursive: true });",
   ].join('\n'));
 
   assert.equal(result.status, 0, logs);
