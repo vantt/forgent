@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "bfd2e80dab7b8e392aa8a5db5be6324b5f0ad26fa2be13b64cb53bc3c15b1565",
+  "payloadDigest": "24f3e88cd15269305c10dfefb837ead4379ffffd97a356f76f3f85c90fdd7773",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -1216,7 +1216,7 @@
     "packages/run-supervisor/rust/src/go_channel.rs": "fdd459ac110097c4e8774499be3ffb859e5a486e2a6bb422dc65b0a6146595d4",
     "packages/run-supervisor/rust/src/go_pipe.rs": "0994684b54f1765799e4198c6e39ea2c8d83660ae1336cdac447ea1acd3681b0",
     "packages/run-supervisor/rust/src/head_client.rs": "ee0ceac9b2af86e221fc8a692bfa9e5a48a20f54e4142dd2ef74b5d53c3da74b",
-    "packages/run-supervisor/rust/src/head_request.rs": "593894cd7a624e736f7df82c83461115a818279e139779b5c1b3dfcd299628c1",
+    "packages/run-supervisor/rust/src/head_request.rs": "84b73426af2489545db5dce913ce1eb7b6739bc435d1cbf9050e9621e51d309e",
     "packages/run-supervisor/rust/src/lanes.rs": "62a5b7bf690639f380813728b6a70053d86623ae35a4acb642235a3d4c004972",
     "packages/run-supervisor/rust/src/lib.rs": "44257e02d2e99620aecb25b1b45824106f481b267b9a328e82d08adab62de269",
     "packages/run-supervisor/rust/src/publish.rs": "008072f32aa305e4f2feabe554455d9f7c680a4cd4aa912514e55ac922257a62",
@@ -1764,16 +1764,7 @@
     "src/workflow/units-source.mjs": "0441a2cd2c2cd8ae37d20b6b5bdd0988e919cb6652defe9a9c104a26f6b2dd4e",
     "scripts/lib/git-one-door-declarations.v1.json": "81255a361023e7f7e7992f3e311f570f815d50626352815b77ded93b5c2f572d"
   },
-  "sites": [
-    {
-      "path": "packages/run-supervisor/rust/src/head_request.rs",
-      "line": 2315,
-      "spawn": "Command::new",
-      "binary": "git",
-      "siteId": "registered_linked_worktree:4bb80f4512858df021303f2cb4a24e8913a14e18865ae5326281df14040b8b7b",
-      "family": "rust"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
@@ -4129,7 +4120,7 @@
     },
     {
       "path": "packages/run-supervisor/rust/src/head_request.rs",
-      "line": 2455,
+      "line": 2464,
       "spawn": "Command::new",
       "binary": "? match cfg.request_host_bin.as_ref().map(|read| read()) { Some(Ok(host)) => host,",
       "siteId": "run_verb:aeba26434cfca4863448bf70db3ec085b1bbfca9377e9ee5cc082405c9d742df",
