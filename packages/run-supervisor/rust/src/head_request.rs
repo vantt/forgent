@@ -2044,7 +2044,7 @@ fn release_state_file(root: &Path) -> PathBuf {
 }
 
 /// One release at a time across both personas: an exclusive, non-blocking holder lock on
-/// `.fgos/runtime/release/lock`, held by this supervisor for the whole detached run. The kernel drops it when the
+/// `.fgos/runtime/release/lock`, held by this supervisor for the whole detached run and released before the run's ticket settles. The kernel drops it when the
 /// supervisor dies, so there is no stale lock to reclaim and no file that can wedge it.
 struct ReleaseLock {
     _handle: fgos_holder_lock::Handle,
@@ -2158,13 +2158,16 @@ fn release_run(cfg: &Arc<Config>, request: &Request) -> Outcome {
         .name("release-run".to_string())
         .spawn(move || {
             use fgos_session_host::release::{run, run_rollback};
-            // Held for the whole run, the secretary's rollback included.
-            let _lock = lock;
+            // Held for the whole run, the secretary's rollback included, and released before the ticket settles:
+            // dropping the handle scans /proc for leftover holders and can be slow on a busy machine, so a reader
+            // that sees the settled ticket must already find the release lock free to start the next release.
+            let lock = lock;
             let outcome = if rollback {
                 run_rollback(&ports)
             } else {
                 run(&ports)
             };
+            drop(lock);
             ticket["state"] = json!(if outcome.is_answer() {
                 "done"
             } else {
