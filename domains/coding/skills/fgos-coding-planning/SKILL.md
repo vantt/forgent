@@ -104,6 +104,10 @@ model row that owns it, or `declare: <kind> <id>` when none does, and
 Where the project has no model, `locate` answers `authority: inactive`: record
 `authority: inactive` in the plan and go on.
 
+**Unattended run** (`../_shared/plan-contract.md` §3): write the section per the units
+`ready-plan-runs-unattended` (Rule: in AGENTS.md; set in .fgos/instructions/effective/rules.json) and
+`coding-footprint-tracing` (`domains/coding/instructions/coding-footprint-tracing.md`); trace the footprint and mark every criterion as they say.
+
 ### Step 3: Shape
 Write (or enrich) `plan.md` scaled to the mode — a direct note for
 `tiny`, a fuller map for `high-risk`. End with the exact `## Outstanding
