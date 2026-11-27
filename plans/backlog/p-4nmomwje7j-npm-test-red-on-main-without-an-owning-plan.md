@@ -1,7 +1,7 @@
 ---
 id: p-4nmomwje7j
 title: "npm test red on main with no owning plan: coloured exit code, workflow guide schema, no-deps domain registry, terminal group title, convention conformance, case-close prune (tests, priority P1; source: owner's unconfined run at 5a5dde6e0, 2026-11-23 23:33)"
-status: proposed
+status: done
 priority: P1
 area: tests
 created: 2026-11-23
