@@ -17,7 +17,8 @@ import { nativeDoor } from '../src/native/door.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
 import { PLAN_SECTIONS, acceptanceCriteriaLines, hasSection, readUnattendedRun } from '../src/portfolio/plan-sections.mjs';
-import { invokeHost } from '../src/util/host-bin.mjs';
+import { execFileSync } from 'node:child_process';
+import { invokeHost, resolveHostBin } from '../src/util/host-bin.mjs';
 
 // The YAML door and the write-scope package both answer through the native addon; a checkout stages its own.
 ensureAddonForScript();
@@ -231,6 +232,13 @@ export const AUTHORITY = {
   },
 };
 
+/** The question rows of the host's raw `questions ... --json` document (`{needsYou, questions: [...]}`, or a bare array). */
+export function questionRowsOf(doc) {
+  const list = Array.isArray(doc) ? doc : (doc?.data?.questions ?? doc?.questions);
+  if (!Array.isArray(list)) throw new Error('the listing has no questions array');
+  return list;
+}
+
 /**
  * Where the check reads whether an owner question is answered: the host's answered listing (`fgos questions list
  * --answered --json`; the full listing is over the host reply limit), plus the acked listing read on its own in case
@@ -241,8 +249,18 @@ export const QUESTIONS = {
   cache: undefined,
   read() {
     if (this.cache === undefined) {
+      // The host answers `questions ... --json` with a raw JSON document ({needsYou, questions: [...]}), not an fgos.v1
+      // envelope, and the read takes seconds from a confined session: call the binary directly with a long timeout.
       const rows = (flag, required) => {
-        try { return invokeHost(['questions', 'list', flag, '--json']).questions ?? []; } catch (err) { if (required) throw err; return []; }
+        try {
+          const hostBin = resolveHostBin();
+          if (!hostBin) throw new Error('Rust host binary unavailable');
+          const out = execFileSync(hostBin, ['questions', 'list', flag, '--json', '--dir', process.cwd()], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024, timeout: 60000 });
+          return questionRowsOf(JSON.parse(out));
+        } catch (err) {
+          if (required) throw new Error(`cannot read the answered owner questions (fgos questions list ${flag} --json): ${err.message}`);
+          return [];
+        }
       };
       try {
         this.cache = { map: new Map([...rows('--acked', false), ...rows('--answered', true)].map((q) => [q.id, q.state])) };

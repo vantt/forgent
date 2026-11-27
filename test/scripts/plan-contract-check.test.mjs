@@ -12,6 +12,7 @@ import {
   BACKLOG_SOURCE_REQUIRED_FROM,
   IDENTITY,
   QUESTIONS,
+  questionRowsOf,
   STATUSES,
   UNATTENDED_RUN_REQUIRED_FROM,
   activeOverlaps,
@@ -410,6 +411,13 @@ const unattendedErrors = (text, states = new Map()) => {
   QUESTIONS.read = typeof states === 'function' ? states : () => states;
   try { return errorsOf(text); } finally { QUESTIONS.read = before; }
 };
+
+test('the question listing is read from the host raw document shape, not an envelope', () => {
+  const raw = { needsYou: 1, questions: [{ id: 'q-abc123', state: 'answered' }, { id: 'q-def456', state: 'acked' }] };
+  assert.deepEqual(questionRowsOf(raw).map((q) => [q.id, q.state]), [['q-abc123', 'answered'], ['q-def456', 'acked']]);
+  assert.equal(questionRowsOf(raw.questions).length, 2);
+  assert.throws(() => questionRowsOf({ needsYou: 0 }), /no questions array/);
+});
 
 test('a complete ready plan with the Unattended run section passes', () => {
   assert.deepEqual(unattendedErrors(readyPlan()), []);
