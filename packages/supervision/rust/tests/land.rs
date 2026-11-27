@@ -2242,6 +2242,42 @@ fn a_branch_land_that_touches_no_index_feeding_path_leaves_the_index_alone() {
     );
 }
 
+#[test]
+fn a_paths_land_naming_a_directory_does_not_commit_a_hand_edited_index_the_door_did_not_write() {
+    // No plans/backlog directory: the door writes nothing, so the index stays the caller's uncommitted bytes.
+    let f = Fixture::new();
+    fs::create_dir_all(f.main.join("plans")).unwrap();
+    fs::write(f.main.join(INDEX), "committed\n").unwrap();
+    git(&f.main, &["add", "."]);
+    git(&f.main, &["commit", "-qm", "index"]);
+    git(&f.main, &["push", "-q", "origin", "trunk"]);
+    fs::write(f.main.join(INDEX), "hand edit\n").unwrap();
+    fs::write(f.main.join("plans/notes.md"), "notes\n").unwrap();
+    land_with_index(&f, &paths(&["plans"])).unwrap();
+    assert_eq!(changed_in_head(&f), vec!["plans/notes.md"]);
+    assert_eq!(git(&f.main, &["show", &format!("HEAD:{INDEX}")]), "committed");
+}
+
+#[test]
+fn a_branch_land_editing_the_index_outside_its_footprint_is_refused_when_the_door_does_not_write_it() {
+    let f = Fixture::new();
+    f.topic("topic", &[(INDEX, "branch hand edit\n")]);
+    let mut cmd = branch("topic");
+    cmd.footprint = Some(vec!["src/**".into()]);
+    let refusal = land_with_index(&f, &cmd).unwrap_err();
+    assert_eq!(refusal.code, "land-outside-footprint");
+}
+
+#[test]
+fn a_conflict_in_the_index_the_door_does_not_regenerate_is_refused_as_an_undeclared_conflict() {
+    let f = Fixture::new();
+    f.topic("topic", &[(INDEX, "topic\n")]);
+    fs::create_dir_all(f.other.join("plans")).unwrap();
+    f.move_remote(INDEX, "trunk\n");
+    let refusal = land_with_index(&f, &branch("topic")).unwrap_err();
+    assert_eq!(refusal.code, "land-conflict-aborted");
+}
+
 fn counter(f: &Fixture) -> impl Fn() -> String + '_ {
     move || format!("idx-{}", f.ids.fetch_add(1, Ordering::Relaxed))
 }

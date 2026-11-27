@@ -2246,8 +2246,8 @@ impl Lander<'_> {
             && !index_written
             && self.matches_any(BACKLOG_INDEX, paths)?
         {
-            writes = match self.concrete_paths(paths, held) {
-                Ok(files) => files.into_iter().filter(|f| f != BACKLOG_INDEX).collect(),
+            writes = match self.concrete_paths_without_index(paths, held) {
+                Ok(files) => files,
                 Err(refusal) => return Err(door.restore_into(refusal)),
             };
         }
@@ -2328,10 +2328,12 @@ impl Lander<'_> {
         // worktree goes back as it was so abandoning the session finds it clean.
         let mut door = DoorWrites::new(&candidate.worktree);
         let out = self.door_files_in(port, candidate, &changed, target, &mut door);
-        match (out, door.restore()) {
-            (Err(refusal), _) => Err(refusal),
-            (Ok(_), Some(note)) => Err(refuse("land-backlog-restore-failed", note)),
-            (Ok(files), None) => Ok(Some(files)),
+        match out {
+            Err(refusal) => Err(door.restore_into(refusal)),
+            Ok(files) => match door.restore() {
+                Some(note) => Err(refuse("land-backlog-restore-failed", note)),
+                None => Ok(Some(files)),
+            },
         }
     }
 
@@ -2449,6 +2451,39 @@ impl Lander<'_> {
         door.put(BACKLOG_INDEX, regenerated.as_bytes())
             .map_err(|e| refuse("land-backlog-index-failed", e))?;
         Ok(Some(BACKLOG_INDEX.to_owned()))
+    }
+
+    /// The scope as concrete files with the index left out: an entry that covers the index (a directory
+    /// prefix or a glob) is replaced by the changed files under it, every other entry stays as named.
+    fn concrete_paths_without_index<'h>(
+        &self,
+        paths: &[String],
+        held: &dyn Fn() -> Held<'h>,
+    ) -> Result<Vec<String>, LandRefusal> {
+        let p = self.ports;
+        let baseline = p
+            .git
+            .preflight_commit(p.repo, held()?, None)
+            .map_err(from_git)?;
+        let mut files: Vec<String> = Vec::new();
+        for entry in paths {
+            let one = std::slice::from_ref(entry);
+            if !entry.contains(['*', '?', '[', '{']) && !self.matches_any(BACKLOG_INDEX, one)? {
+                if !files.contains(entry) {
+                    files.push(entry.clone());
+                }
+                continue;
+            }
+            for (changed, _) in &baseline.dirty {
+                if changed != BACKLOG_INDEX
+                    && !files.contains(changed)
+                    && self.matches_any(changed, one)?
+                {
+                    files.push(changed.clone());
+                }
+            }
+        }
+        Ok(files)
     }
 
     /// The concrete files the caller's `paths` commit: every changed file in the checkout one of them

@@ -43,3 +43,20 @@ Changes in `packages/supervision/rust/src/land.rs`:
 Tests (`packages/supervision/rust/tests/land.rs`): added the plan-turning-done branch land (items closed in the merge result, index shows new state) and the plan-status-edit branch land. The existing "plan status and a row" branch test now expects the closed items in the index, which is the intended behavior. The fixture index already reflects item status, so no fixture change.
 
 Results: `cargo test -p fgos-supervision --test land` 88 passed, 0 failed. The other supervision test targets pass except `keeper::the_queue_adapter_encodes_logical_ids_stably_without_colliding_domain_keys`, which fails with `Read-only file system` in the sandbox (unrelated). `cargo test -p fgos --test portfolio_check` was not run: the command needs the `ORT_LIB_LOCATION` env prefix and the sandbox required approval for it. No test covers the new paths-side exclusion or the lapsed branch-side exemptions (item 3) or the `land-target-changed` re-prepare (item 4).
+
+## Fix round 2
+
+Changes in `packages/supervision/rust/src/land.rs`:
+
+1. Paths side, door does not write the index: the scope is now spelled out by `concrete_paths_without_index`. An entry that covers `plans/backlog.md` (a directory prefix such as `plans`, or a glob) is replaced by the changed files under it, minus the index; every other entry stays as named. Before, only the exact entry was dropped, so `plans` still covered the hand edit.
+2. `candidate_door_files`: when closing items fails, the restore of the candidate worktree goes through `restore_into`, so a restore failure is attached to the returned refusal as its cleanup note instead of being dropped.
+
+Tests (`packages/supervision/rust/tests/land.rs`):
+
+- (a) `a_paths_land_naming_a_directory_does_not_commit_a_hand_edited_index_the_door_did_not_write`: port wired, no `plans/backlog/` dir, caller names `plans`; the hand edit is not committed and `plans/notes.md` is.
+- (b) `a_branch_land_editing_the_index_outside_its_footprint_is_refused_when_the_door_does_not_write_it`: refused `land-outside-footprint`.
+- (c) `a_conflict_in_the_index_the_door_does_not_regenerate_is_refused_as_an_undeclared_conflict`: add/add conflict in `plans/backlog.md`, refused `land-conflict-aborted`.
+- (d) Not added. The target move must happen between `abandon` and the re-prepare inside `drive`, and the fixture has no hook there: gate scripts run after it, and the index port closure runs before abandon (I did not confirm a remote move there is seen as `land-target-changed`). The retry is one match arm.
+- Not run: reverting the fix to confirm test (a) fails without it.
+
+Results: `cargo test -p fgos-supervision --test land` 91 passed, 0 failed.
