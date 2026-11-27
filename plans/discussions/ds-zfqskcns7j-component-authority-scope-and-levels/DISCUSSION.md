@@ -12,13 +12,13 @@ discussion: settled
 ```txt
 HAND-OFF (planner)
 discussion: settled
-source: p-adv35azsca; ds-zfqskcns7j §4 CAS-D1..CAS-D16, §6 #design, §7 #task-layerings-in-model
+source: p-adv35azsca; ds-zfqskcns7j §4 CAS-D1..CAS-D19, §6 #design, §7 #task-layerings-in-model
 outcome: component-authority khai bốn layering (hexagon, stack, orchestration-ring, domain-scope) như dữ liệu có định nghĩa trong mô hình; giá trị nằm trên hàng component (tên trường = id layering, ngoại lệ qua `exceptions`); luật chạy theo ba loại cố định trong code (order-downward, isolation, port-wiring); hết danh sách hạng viết cứng ở layers.yaml, contracts/model.v1.json, rust/src/declare.rs.
 constraints: RUL104 (không bộ thông dịch luật tổng quát, không cơ chế không ai dùng; source chỉ declared và fromPaths, CAS-D12); L10 (gom guard layering viết tay vào layering, xoá tierExceptions, đổi trường layer/tier thì chuyển mọi caller cùng đợt); CAS-D4 năm luật hexagon, callback qua port được phép; design principle 7 (văn bản layering render từ mô hình); spec docs/platform/component-authority/spec.md cập nhật trước code.
 non-goals: bước B (`fgos authority check`) và Q2 (component-authority sở hữu những gì); `paths: []` của ba component Domain; tách hết mọi component trộn vai trò (áp dần, phần chưa tách ghi nợ có tên, CAS-D10).
 acceptance: (1) layers.yaml khai bốn layering đủ trường CAS-D8, mỗi giá trị có meaning; (2) mọi component khai hexagon, stack, orchestration-ring; schema và Rust đọc giá trị từ mô hình (rg LAYER_NAMES|TIER_RANGE không còn danh sách viết cứng); (3) mỗi loại luật có một fixture vi phạm bị bắt; guard A4 Work-layer và 'tầng thấp không import Dispatch' chạy qua layering của chúng; (4) runner khai ngoại lệ hexagon theo path; port khai qua chỉ mục contract; (5) npm test và cargo test --workspace xanh; (6) component-boundary.md §4, architecture-map.md §3, vision.md §6 Known gaps sửa theo từ vựng mới.
 open (chặn phần sau, không chặn task này): Q2 + bước B; `paths: []` của domain-components, coding-domain, group-thinking (§3 hàng 22); `supervision` chỉ map `src/portfolio/`, crate `packages/supervision/` và `packages/portfolio/` không thuộc component nào (Q2).
-also in A: CAS-D13 đổi chỗ T7/T8 (acceptance (7): Work ở T8, Domain ở T7, supervision ở T8, vision.md §6 Known gaps đóng); CAS-D14 nhìn mọi lát cắt (acceptance (8): declare thiếu một layering declared bị từ chối; declare tạo lệch giữa orchestration-ring và stack bị từ chối với thông báo nêu hai lát và cặp component; locate trả đủ bốn lát); CAS-D15 (acceptance (9): `sameAs` khai trên các giá trị trùng chữ và cửa khai từ chối khi hai bên lệch; `orchestration-ring` suy từ `stack` qua `fromLayering`, không thêm trường trên component; T8 tên `T8-delivery`; ngoại lệ path của `work-driver` cho phần chọn việc). CAS-D16 (acceptance (10): `orchestration-ring` khai trên mọi component với giá trị surface, orchestrator, launcher, router, driver, dispatcher, none; cửa khai từ chối một phụ thuộc đi lên giữa các vai). Quyết định sau thắng quyết định trước: CAS-D16 thay phần ring của CAS-D11 và CAS-D15; CAS-D15 thay `T8-work` và CAS-D12.
+also in A: CAS-D13 đổi chỗ T7/T8 (acceptance (7): Work ở T8, Domain ở T7, supervision ở T8, vision.md §6 Known gaps đóng); CAS-D14 nhìn mọi lát cắt (acceptance (8): declare thiếu một layering declared bị từ chối; declare tạo lệch giữa orchestration-ring và stack bị từ chối với thông báo nêu hai lát và cặp component; locate trả đủ bốn lát); CAS-D15 (acceptance (9): `sameAs` khai trên các giá trị trùng chữ và cửa khai từ chối khi hai bên lệch; `orchestration-ring` suy từ `stack` qua `fromLayering`, không thêm trường trên component; T8 tên `T8-delivery`; ngoại lệ path của `work-driver` cho phần chọn việc). CAS-D16 (acceptance (10): `orchestration-ring` khai trên mọi component với giá trị surface, orchestrator, launcher, router, driver, dispatcher, none; cửa khai từ chối một phụ thuộc đi lên giữa các vai). CAS-D17 (acceptance (11): trường `source` không còn trong schema, model và Rust; mọi file dưới `coverage.roots` thuộc đúng một component, 20 thư mục code vô chủ hôm nay có chủ; phép kiểm `stack` bắt một phụ thuộc crate đi lên, `hexagon` bắt một `use` Rust sai hạng, mỗi cái một fixture). Bảng quét nháp §7 `#scan-layerings` là đầu vào cho bước xếp; 11 hàng ⚠ đã được chủ dự án xếp (CAS-D19); hàng còn vướng khi xếp thật gom thành một bộ câu hỏi owner. CAS-D18, CAS-D19 (acceptance (12): `orchestrator` mang nghĩa chọn và trông việc; T4 tên `T4-agent-runtime`; component `retired` không mang giá trị layering; trạng thái live/designed kiểm bằng code; tám hàng theo CAS-D19). For secretary: một backlog row riêng cho `MODEL_DIR` viết cứng (component-authority ở project khác luôn inactive). Quyết định sau thắng quyết định trước: CAS-D16 thay phần ring của CAS-D11 và CAS-D15; CAS-D15 thay `T8-work` và CAS-D12.
 authority: component-authority (row sở hữu mô hình); không cần declare mới.
 ```
 
@@ -34,6 +34,10 @@ open owner questions: chưa đặt vào question store (đang thảo luận tr�
 ```
 
 ## 1. Trạng thái hiện tại
+
+2026-11-27 16:05 bổ sung CAS-D18 (orchestrator chọn và trông việc; `T4-agent-runtime`) và CAS-D19 (xếp 11 hàng vướng; layering chỉ cho live/designed; trạng thái kiểm bằng code). Còn mở cho Q2: component chỉ có tài liệu; `team-cognition-engine`; hàng retired; tên `work-driver` lệch vai; `MODEL_DIR` viết cứng.
+
+2026-11-27 14:55 bổ sung CAS-D17 (gộp `source` vào `paths`; phủ theo `coverage.roots` khai trong mô hình; layering đọc cạnh Rust) và bảng quét nháp 73 component (§7). Còn hỏi: `orchestrator` = chọn việc + trông việc đang chạy; đổi `T4-supervisor` thành `T4-agent-runtime`; 11 hàng ⚠ của bảng quét; component chỉ có tài liệu có nên là component.
 
 2026-11-27 14:05 bổ sung CAS-D16 (`orchestration-ring` dùng tên vai gốc: surface, orchestrator, launcher, router, driver, dispatcher, none); vẫn `settled`. Còn hỏi: đổi `T4-supervisor` thành `T4-run-supervisor`.
 
@@ -99,6 +103,7 @@ Mô hình `packages/component-authority/model/` là nơi duy nhất trả lời 
 | 21 | **`source` gắn với hàng component (round 25, chủ dự án nghi có liên đới component).** Đúng. Sự thật: hàng component đã có trường `exceptions` (84 dòng trên 14 component), mỗi dòng `path` + `layer` + tùy chọn `tier` + `reason` (vd. `host-surface`: `src/cli/exit-codes.mjs` layer kernel, tier 0); test đọc ở `test/architecture.test.mjs:82,103`. Tức là cách (b) của hàng 20 **đã có sẵn**, chỉ chưa dùng cho `runner` (shaper đính chính: 'luật mù bên trong component' chỉ đúng với component chưa khai ngoại lệ). `layers.yaml` `tierExceptions` có trong schema nhưng 0 dòng: một cửa thứ hai bỏ không. Đề xuất: giá trị của layering khai thì nằm trên hàng component, tên trường = id layering (`layer` → `hexagon`, `tier` → `stack`); ngoại lệ dùng chung `exceptions` của component, một dòng mang giá trị cho nhiều layering; xoá `tierExceptions` (L10). `source` chỉ còn ba giá trị: `declared` (trên hàng component + `exceptions`), `fromPaths`, `fromLayering`. | `components.yaml` `exceptions`; `contracts/model.v1.json:29,79`; `layers.yaml` | Chốt CAS-D9 (12:03) |
 | 22 | **Đặt cạnh nhau `stack`, `domain-scope`, orchestration-ring (round 27).** Đếm: mọi component có `tier` đều có `paths` ngoài `domains/`; ba component Domain (`domain-components`, `coding-domain`, `group-thinking`) ở T7 và có `paths: []`, tức file dưới `domains/` không thuộc component nào trong mô hình; `domain-scope` vì vậy suy theo path của file, không theo component. Ring chỉ phủ T5-T7. | `components.yaml` (đếm round 27) | Rõ (sự thật); lỗ `paths: []` của component Domain thuộc Q2 |
 | 23 | **Gộp orchestration-ring với `product-band` (round 28-29).** Chủ dự án: ring 1 gọi 2, 2 gọi 3, 3 gọi 4, không đảo chiều; có vẻ gộp được với `product-band`. Sự thật: chiều **phụ thuộc** đúng một chiều; chiều **gọi lúc chạy** có đảo qua port: Execution Core khai `admission-peer`, Workflow cài (`src/workflow/case-admission-port.mjs`), entry tiêm vào (`src/runner/work-dispatch.mjs:136`), core gọi `admit`/`settle` ngược lên Workflow (`src/native/execution-door.mjs:297`). Đây là callback CAS-D4 cho phép. Nên luật đúng là 'tầng trên không bị tầng dưới phụ thuộc', không phải 'không gọi ngược', và đó chính là luật của `stack` trên T5-T7. Đề xuất: một layering `orchestration-ring`, giá trị strategic, activation, flow, execution (tên tầng sản phẩm Work, Workflow, Execution ở `meaning`), `source: fromLayering stack` (T7 → strategic/activation, T6 → flow, T5 → execution), `rules: []` vì `stack` đã kiểm; Domain không thuộc ring (là nội dung, `domain-scope` giữ). Bỏ tên `product-band`. **Round 30 (12:16):** chủ dự án: gộp thì thiếu values. Shaper dò lại, đính chính hai điểm: (1) thiếu giá trị: Domain (dưới activation, trên flow theo chiều phụ thuộc, vision.md §6), nền T0-T4 và mặt tiền T9 nếu layering phải xếp được mọi component; (2) **suy từ `stack` sai**: `work-driver` (T6) làm 'ready-work selection' (strategic) và 'cross-flow routing' (flow); `supervision` (T8) 'coordinates the plans of a project' (strategic, trên Work). Tức tier không ánh xạ sạch sang ring; `source` phải là `declared` trên component, có luật thứ tự riêng. Đề xuất bảy giá trị: surface, strategic, activation, domain, flow, execution, foundation. **Chủ dự án đồng ý bảy giá trị (12:22)**, hỏi đổi 4 → `domain-usecase`, 5 → `workflow`. Shaper: 5 `workflow` hợp (khớp vision.md §6 và component `workflow`, cùng nghĩa); 4 `domain-usecase` ghép hai chữ đã là giá trị của `hexagon` (`domain`, `use-case`), lặp lỗi 'cùng chữ khác nghĩa'; đề xuất `business-case` (chữ vision.md §6 dùng: 'Business cases live in Domain', 16 lần, 0 lần dạng gạch nối). | file đã dẫn; `components.yaml` `meaning` của `work-driver`, `supervision`; `docs/platform/vision.md` §6 | Chốt CAS-D11 (12:22: giá trị 4 `domain`, 5 `workflow`, tên `orchestration-ring`) |
+| 24 | **Quét xếp nháp 73 component (round 2026-11-27 14:30).** Bảng ở §7 `#scan-layerings`. Phân bố ring: surface 6, orchestrator 1, launcher 2, router 1, driver 1, dispatcher 5, none 57. 11 hàng luật không tự quyết (supervision, runner, work-driver, event-store, identity, platform-foundations, distillery, agent-coordination-engine, team-cognition-engine, run-supervisor, agent-mailbox). 35/73 không có path code trong `paths`. Điểm 1: `paths` (sở hữu, được kiểm; từ manifest Node 2026-07) và `source` (con trỏ cho người đọc, thêm 2026-11-23 commit 9661f3a116) đã thành một nghĩa (`render.rs:88` cộng cả hai khi đếm door); 34 component để crate Rust ở `source` ngoài `paths`; phép kiểm phủ chỉ quét `.mjs` dưới `src/`, `bin/` (`test/architecture.test.mjs:225`); 20/63 thư mục code gốc vô chủ (vd. `apps/fgos`, `packages/host-runtime`, `packages/work-state`); phụ thuộc crate Rust không layering nào kiểm. Lộ thêm: `MODEL_DIR` viết cứng `packages/component-authority/model` (`rust/src/model.rs:15`), project khác luôn `authority: inactive`. | `components.yaml`; `contracts/model.v1.json:53-108`; `rust/src/render.rs:88,147`; `rust/src/declare.rs:604` | Chốt CAS-D17; `MODEL_DIR` là backlog row riêng (mission #1) |
 
 ## 4. Quyết định đã chốt
 
@@ -120,6 +125,9 @@ Mô hình `packages/component-authority/model/` là nơi duy nhất trả lời 
 | CAS-D14 | **Xếp component phải nhìn mọi lát cắt cùng lúc.** (1) `fgos authority declare` khai hay đổi một component phải nêu giá trị cho mọi layering `declared` (`hexagon`, `stack`, `orchestration-ring`; `domain-scope` tự suy); thiếu một lát thì từ chối. (2) Cửa khai kiểm chéo ngay lúc khai: `orchestration-ring` đặt A trên B mà `stack` đặt A dưới B thì từ chối, nói rõ hai lát và cặp component lệch. (3) `fgos authority locate` khi gợi ý chỗ đặt code trả lời đủ bốn lát. | 2026-11-27 | Chủ dự án 12:50 ('khi phân một component vào layering, cần nhìn nhiều lát cắt, đừng nhìn 1'), đồng ý cách làm 12:55 |
 | CAS-D15 | **Layering là các góc nhìn lên cùng một hệ thống; `T8-delivery`; luật `sameAs`; ring suy từ `stack`.** (1) Định nghĩa: một layering là một góc nhìn, bằng ngôn ngữ riêng, lên cùng một hệ thống; mọi layering nhìn cùng một tập component (mỗi layering xếp được mọi component); các góc có thể trùng nhau; nhìn một component qua mọi góc cùng lúc cho thấy vai trò của nó và việc nó có được tổ chức hợp lý hay không (component cần nhiều ngoại lệ hoặc trải nhiều giá trị của một layering là dấu hiệu làm nhiều vai). (2) `stack` T8 tên `T8-delivery` (đưa việc từ lúc được chọn tới lúc giao xong và bền trên main; 'delivery lifecycle' trong repo), thay `T8-work` của CAS-D13. (3) Cùng chữ ở hai layering phải khớp nghĩa tuyệt đối, khai bằng `sameAs` trên giá trị và kiểm ở cửa khai; ngoại lệ duy nhất có khai báo: hạng `domain` của `hexagon` (giữ theo CAS-D3) mang `distinctFrom` tới `stack.T7-domain`, `orchestration-ring.domain`, `domain-scope.domain`. (4) `orchestration-ring` giữ là một góc nhìn bằng ngôn ngữ điều phối; giá trị `surface`, `delivery`, `domain`, `workflow`, `execution` (mỗi cái `sameAs` giá trị `stack` cùng tên) và `foundation` (T0-T4); `source: fromLayering stack`, `rules: []` (stack đã kiểm). Supersede phần giá trị và nguồn của CAS-D11. (5) Thêm lại `fromLayering` vào `source`; supersede CAS-D12. (6) Phần chọn việc của `work-driver` khai ngoại lệ path lên `T8-delivery`. | 2026-11-27 | Chủ dự án 13:00-13:18 ('ok chốt T8-delivery'; 'layering cung cấp một góc nhìn … các góc nhìn khác có thể có cùng việc nhìn'; 'xoay nó để có các góc nhìn khác nhau'; 'nhìn rõ hơn vai trò và sự tổ chức hợp lý của một component'; giữ `domain` 13:03; 'đồng ý, ghi CAS-D15 đi') |
 | CAS-D16 | **`orchestration-ring` quay về ngôn ngữ gốc, dùng tên vai.** Giá trị, trên xuống: `surface` (lớp duy nhất giao tiếp với bên ngoài), `orchestrator` (chọn việc nào chạy tiếp), `launcher` (kích hoạt một việc đã được chọn; được gọi bởi `orchestrator` hoặc `surface`), `router` (chọn domain/workflow theo việc và stage/status của việc), `driver` (workflow lái việc qua các bước để thực thi), `dispatcher` (môi giới một lần chạy), `none` (không mang vai điều phối: nền, doctrine domain, tài liệu). Tên ring gốc (`strategic`, `activation`, `flow`, `execution`) vào `aliases`/`meaning`. `source: declared` (tên khác `stack`, không ánh xạ một-một; không `sameAs`). Luật: phụ thuộc chỉ đi xuống; gọi tắt xuống được phép (`surface → launcher`, `orchestrator` tham vấn thẳng `dispatcher` như bản gốc); kết quả chảy ngược là giá trị trả về hoặc callback qua port, không phải phụ thuộc. Giá trị không có class hay thực thể tương ứng (giữ quyết định 'không cần class Orchestrator…', `concept-relationships.md:95-112`). Supersede phần ring của CAS-D11 và CAS-D15 (giữ phần (1) định nghĩa layering, (2) `T8-delivery`, (3) luật `sameAs` của CAS-D15). Lộ ra: component `work-driver` làm vai orchestrator (ready-work selection) và router, không phải driver; tên lệch vai, ghi vào Q2. | 2026-11-27 | Chủ dự án 13:24 ('cảm giác bị biến đổi rồi'), 13:30 (thứ tự và nghĩa từng vai, Surface), 14:04 ('ok' bộ tên vai) |
+| CAS-D17 | **Một trường sở hữu, phủ cấu hình được, đọc cả cạnh Rust.** (1) Gộp `source` vào `paths`, xoá trường `source` (L10); render 'Source links' đọc từ `paths`; các cặp trỏ cùng crate (`execution-core`/`executor-model`, `process`/`containment-port`, `run-supervisor`/`launch-gate`) tách: cha giữ crate, subcomponent giữ thư mục con sâu hơn. (2) Phép kiểm phủ: mọi file dưới `coverage.roots` trừ `coverage.ignore` thuộc đúng một component (longest prefix), mọi loại file; `coverage.roots`/`ignore` khai trong mô hình (sự thật cấu trúc của project, cạnh `paths`), không ở config runtime; giá trị repo fgOS `[src/, bin/, packages/, apps/, domains/]`. (3) `stack` đọc phụ thuộc crate trong `Cargo.toml`; `hexagon` đọc `use crate::…`/`mod` bằng `lexRust` sẵn có (`scripts/lib/rust-source.mjs`); bộ đọc cạnh theo ngôn ngữ là driver sau một port, bước A làm Node và Rust, ngôn ngữ khác khi có project cần (RUL104). | 2026-11-27 | Chủ dự án 14:40 ('đồng ý gộp paths/source'; roots 'cho phép thay đổi và cấu hình được tùy structure của project'), 14:53 ('ok'); §3 hàng 24 |
+| CAS-D18 | **`orchestrator` chọn việc và trông việc đang chạy; T4 tên `T4-agent-runtime`.** `orchestrator` = chọn việc nào chạy tiếp và trông việc đang chạy tới khi xong (theo dõi, phát hiện kẹt, phục hồi, báo người), như `supervision` làm (`watcher`, `queue`, wake, thay head kẹt); khác với trông một process của `run-supervisor` (deadline, kill, adopt), là thực thi luật chứ không quyết định điều phối. `T4-supervisor` → `T4-agent-runtime` (môi trường chạy một agent: `run-supervisor`, `launch-gate`, `agent-mailbox`); vị trí giữ nguyên vì `execution` (T5) phụ thuộc `run-supervisor`, còn `run-supervisor` chỉ phụ thuộc T0-T3. | 2026-11-27 | Chủ dự án 14:25 ('orchestrator … còn mang tính chất babysit chăm việc'; 'T4 nằm hơi không đúng chỗ'), đồng ý 15:00 |
+| CAS-D19 | **Xếp 11 hàng vướng của bảng quét.** Luật: layering chỉ áp cho component `live` hoặc `designed`; component `retired` không mang giá trị layering (`distillery`, `agent-coordination-engine`). Trạng thái phải kiểm bằng code thật, không tin trường `status` (`agent-mailbox` ghi `designed` nhưng có crate `packages/mailbox/rust/core` và `store` đang chạy: sửa thành `live`). Tám hàng: `supervision` (hexagon use-case; `watcher`, `notify` infra; `queue`, `portfolio` domain; T8-delivery; orchestrator; `paths` sang `packages/supervision/`, `packages/portfolio/`); `runner` (use-case; `anti-loop`, `recovery`, `rigor` domain; `github-adapter`, `worktree` infra; T8-delivery; launcher); `work-driver` (use-case; T6-workflow, phần chọn việc T8-delivery qua ngoại lệ path; router, phần chọn việc orchestrator; tìm file thật trong bảng xếp); `event-store` (kernel; `fsio`, `refs`, `publish`, `sync`, `locks` infra; T3-event; none); `identity` (kernel; `proc_tree`, `machine`, `cli_dirs` infra; T1-identity; none); `platform-foundations` (xếp từng file trong `src/util/`; T0-native; none; ghi một item chia `src/util/` về component chủ, RUL11); `run-supervisor` (infra; T4-agent-runtime; none); `agent-mailbox` (crate `core` domain, `store` adapters/hook/record infra; T4-agent-runtime; none). `team-cognition-engine` không xếp: không có code nào (chỉ có trong mô hình, là consumer của ba contract live); retire hay gộp vào `group-thinking`/`collaboration-patterns` là câu Q2. | 2026-11-27 | Chủ dự án 15:00-16:02 (bàn từng hàng; sửa `agent-mailbox`; 'đồng ý 8 hàng') |
 
 ## 5. Q&A log
 
@@ -173,6 +181,8 @@ Mô hình `packages/component-authority/model/` là nơi duy nhất trả lời 
 - 2026-11-27 12:55 — Chủ dự án: "ủa, sao không thảo luận ở đây luôn cho xong?", rồi "đồng ý, ghi CAS-D14 đi". Shaper thêm CAS-D14; discussion giữ `settled`.
 - 2026-11-27 13:00-13:18 — Bàn tên T8 (`orchestration` hay `delivery`), luật cùng chữ cùng nghĩa, tên hạng `domain` của hexagon (giữ `domain`), có gộp ring vào `stack` không. Chủ dự án: layering là các góc nhìn lên cùng một hệ thống, không cần giá trị riêng; nhiều góc nhìn cho thấy vai trò và sự tổ chức hợp lý của component. "đồng ý, ghi CAS-D15 đi". Shaper ghi CAS-D14 (chưa land được lần trước) và CAS-D15.
 - 2026-11-27 13:24-14:04 — Chủ dự án: "show lại values của orchestration gốc, cảm giác bị biến đổi rồi"; "quay về ngôn ngữ gốc, xếp tên lại … Surface là lớp duy nhất giao tiếp bên ngoài. Orchestrator là strategic (chọn 1 việc), Launcher là kích hoạt 1 việc đã được chọn. Launcher có thể được kích bởi orches hoặc bởi surface. Router là chọn domain/workflow dựa vào việc và stage/status của việc, driver là workflow lái việc để thực thi"; hỏi giá trị và vai khác gì; "ok" bộ tên vai. Shaper ghi CAS-D16.
+- 2026-11-27 14:25-14:53 — Chủ dự án: orchestrator còn có tính chất babysit chăm việc; T4 nằm không đúng chỗ; hỏi bảng xếp bước A; "quét để có thông tin … rồi thảo luận sau"; "bàn điểm 1 trước"; hỏi hexagon cho Rust tính sau là sao, source và paths trước đây khác nhau sao; "đồng ý gộp paths/source … bộ [src/, bin/, packages/, apps/, domains/] nên cho phép thay đổi và cấu hình được tùy structure của project"; "ok". Shaper quét (§3 hàng 24, §7 `#scan-layerings`), ghi CAS-D17.
+- 2026-11-27 15:00-16:02 — Chủ dự án: "đồng ý câu 1 và 2; câu 3 sao bỏ qua không bàn?"; "ủa sao agent-mailbox chưa có, chứ mailbox hiện tại là gì"; "số 7 cũng vậy, team-cognition có giống mailbox không"; "đồng ý 8 hàng". Shaper ghi CAS-D18, CAS-D19.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -225,6 +235,86 @@ flowchart LR
 
 - **Mục tiêu:** component-authority khai bốn layering có định nghĩa, giá trị trên hàng component, luật chạy theo loại cố định trong code (bước A của CAS-D5).
 - **§6:** toàn bộ.
-- **D-ID:** CAS-D1 đến CAS-D16 (CAS-D15 supersede một phần CAS-D11, CAS-D12, CAS-D13; CAS-D16 supersede phần ring của CAS-D11 và CAS-D15).
+- **D-ID:** CAS-D1 đến CAS-D19 (CAS-D15 supersede một phần CAS-D11, CAS-D12, CAS-D13; CAS-D16 supersede phần ring của CAS-D11 và CAS-D15).
 - **Quan hệ:** bước B (`fgos authority check`) và Q2 là việc sau, không thuộc task này; đổi chỗ T7/T8 nằm trong task này (CAS-D13).
 - **Verify nháp:** `node --test test/architecture.test.mjs` và `cargo test -p component-authority` xanh; một fixture vi phạm cho mỗi loại luật bị bắt; `rg -n "LAYER_NAMES|TIER_RANGE" packages/component-authority/rust/src` không còn danh sách viết cứng.
+
+### Bảng quét xếp nháp {#scan-layerings}
+
+Quét 2026-11-27 14:30 từ `components.yaml` (73 hàng). `hexagon` gán theo CAS-D4, `orchestration-ring` theo CAS-D16, `stack` đã đổi chỗ T7/T8 và dùng tên đề xuất `T4-agent-runtime` (chưa chốt). `—` = component không có path code trong `paths`. Đây là nháp làm đầu vào cho bước xếp của bước A, không phải dữ liệu.
+
+| Component | parent | hexagon | stack | orchestration-ring | cần xem |
+|---|---|---|---|---|---|
+| `admission` | documentation | — | T9-surface | none |  |
+| `claude-plugin` |  | — | T9-surface | surface |  |
+| `decision-citation-drift` |  | — | T9-surface | none |  |
+| `doc-checks` | documentation | — | T9-surface | none |  |
+| `document-identity` | documentation | — | T9-surface | none |  |
+| `documentation` |  | — | T9-surface | none |  |
+| `fgos-gateway` |  | — | T9-surface | surface |  |
+| `herdr-web-dashboard` |  | — | T9-surface | surface |  |
+| `host-invocation-routing` |  | — | T9-surface | surface |  |
+| `host-surface` |  | entry | T9-surface | surface |  |
+| `learning-docs-registry` |  | use-case | T9-surface | none |  |
+| `packaging-distribution` |  | use-case | T9-surface | none |  |
+| `ui-spec` |  | — | T9-surface | surface |  |
+| `write-door` | documentation | — | T9-surface | none |  |
+| `supervision` |  | use-case | T8-delivery | orchestrator | paths map src/portfolio/ only; the crates packages/supervision/ and packages/portfolio/ belong to no component |
+| `coding-domain` |  | — | T7-domain | none |  |
+| `distillery` |  | — | T7-domain? | none | porting lifecycle: T7-domain or T8-delivery, launcher or none |
+| `domain-components` |  | — | T7-domain | none |  |
+| `domain-registry-loader` |  | — | T7-domain | none |  |
+| `enduser-docs-authoring` |  | — | T7-domain | none |  |
+| `enduser-docs-index` |  | — | T7-domain | none |  |
+| `group-thinking` |  | — | T7-domain | none |  |
+| `h-02842f76ffd2` | runner | — | T8-delivery | none |  |
+| `h-2e032393add1` | runner | — | T8-delivery | none |  |
+| `h-37aced3896a8` | runner | — | T8-delivery | none |  |
+| `h-6979005beaf7` | runner | — | T8-delivery | none |  |
+| `h-6df5686d0d54` | runner | — | T8-delivery | none |  |
+| `h-ce5b9771a26a` | runner | — | T8-delivery | none |  |
+| `h-d3b49ef7edf5` | runner | — | T8-delivery | none |  |
+| `h-f34e0d170d89` | runner | — | T8-delivery | none |  |
+| `runner` |  | use-case | T8-delivery | launcher | one directory mixes use-case, domain, port and adapter files; ring launcher or dispatcher unclear |
+| `work-state` |  | domain | T8-delivery | launcher |  |
+| `work-driver` |  | — | T6-workflow | router | two roles (orchestrator: ready-work selection; router: cross-flow routing); named driver but is not the driver; owns no code path |
+| `workflow` |  | use-case | T6-workflow | driver |  |
+| `agent-confinement` |  | — | T5-execution | none |  |
+| `agent-coordination` |  | — | T5-execution | none |  |
+| `agent-coordination-engine` |  | — | T5-execution | none | meaning says coordination sessions; area portal says the engine retired |
+| `collaboration-patterns` | execution-core | — | T5-execution | dispatcher |  |
+| `dispatch-transport` |  | infra | T5-execution | dispatcher |  |
+| `execution-core` |  | use-case | T5-execution | dispatcher |  |
+| `executor-model` | execution-core | — | T5-execution | dispatcher |  |
+| `run-result` |  | domain | T5-execution | none |  |
+| `seat-binding` |  | domain | T5-execution | dispatcher |  |
+| `team-cognition-engine` |  | — | T5-execution | none | deliberation aggregation inside a Unit: dispatcher or none |
+| `agent-mailbox` |  | infra | T4-agent-runtime | none | use-case or infra |
+| `launch-gate` | run-supervisor | infra | T4-agent-runtime | none |  |
+| `run-supervisor` |  | infra | T4-agent-runtime | none | babysits one attempt process: none, or part of dispatcher |
+| `agent-context-engine` |  | domain | T3-event | none |  |
+| `agent-protocol` |  | infra | T3-event | none |  |
+| `agent-start-context` |  | use-case | T3-event | none |  |
+| `event-store` |  | kernel | T3-event | none | kernel (fgOS truth, L3) but its git and file drivers are infra: needs path exceptions |
+| `observe` |  | domain | T3-event | none |  |
+| `questions` |  | domain | T3-event | none |  |
+| `session-host` |  | use-case | T3-event | none |  |
+| `git` |  | infra | T2-workspace | none |  |
+| `session-rotation` |  | use-case | T2-workspace | none |  |
+| `terminal-control` |  | infra | T2-workspace | none |  |
+| `component-authority` |  | kernel | T1-identity | none |  |
+| `config` |  | kernel | T1-identity | none |  |
+| `convention` |  | kernel | T1-identity | none |  |
+| `herdr-transport` |  | — | T1-identity | none |  |
+| `holder-lock` |  | infra | T1-identity | none |  |
+| `identity` |  | kernel | T1-identity | none | reads env, /proc and files: kernel or infra |
+| `secrets` |  | infra | T1-identity | none |  |
+| `canonical-json` |  | kernel | T0-native | none |  |
+| `containment-port` | process | — | T0-native | none |  |
+| `durable-file` |  | infra | T0-native | none |  |
+| `graph` |  | kernel | T0-native | none |  |
+| `platform-foundations` |  | kernel | T0-native | none | src/util/ is a grab bag of helpers: rank per file |
+| `process` |  | infra | T0-native | none |  |
+| `resource-referee` |  | kernel | T0-native | none |  |
+| `write-scope` |  | kernel | T0-native | none |  |
+| `yaml-document` |  | kernel | T0-native | none |  |
