@@ -316,3 +316,162 @@ are reachable from main (defect C stands). The successor's uncommitted edit was 
   worktree's `.fgos`, while the door writes it under the project's `.fgos`, so every shaper rotation ends `no-answer`.
 - C (open, minor): a branch land is a merge, so round commits become reachable from main.
 - Minor: `?? .fgos/installation` is untracked in the shaper worktree.
+
+## Rerun on 31b1a9955c
+
+Run 2026-11-27 22:48–22:59 (+07). Release `sha256:f584c232458a…` (distribution `/var/tmp/r/fgos-rc-31b1a9955c`,
+built from main `31b1a9955c`, which includes phase 8: `placeHead` puts `FGOS_HEAD_PROJECT_ROOT` into the launch
+environment and the rotation hook's `fgos_dir_of` prefers it). I confirmed the fix is in the staged host binary
+(the string `FGOS_HEAD_PROJECT_ROOT` sits next to `CLAUDE_PROJECT_DIR` in `<release>/bin/fgos`). Fresh scratch
+`/var/tmp/r/shaper-live3/`: origin.git cloned bare from the real repo with `refs/fgos/legacy` fetched into it, and
+proj cloned at `f652a47531`. Workspace id `1d7db594ae8b5a8e`. Every fgos call went through
+`env -u FGOS_STATE_ROOT TMPDIR=/var/tmp/r /var/tmp/r/shaper-live3/proj/.fgos/installation/bin/fgos … --dir /var/tmp/r/shaper-live3/proj`.
+`proj-worktrees/` was not created by hand.
+
+| Check | Result |
+|---|---|
+| Scratch timers disarmed before any other step | **PASS** (no scratch timer was ever active outside the init call) |
+| First shaper start on a fresh project | **PASS** |
+| Two rounds saved on the branch; main checkout and main tip unchanged | **PASS** (`8cab71be5e`, `e178e90c94`) |
+| Questions hook and mailbox hook answer inside the shaper; identity holder is the shaper's CLI session | **PASS** |
+| One rotation completes; the successor answers and can save | **FAIL**: `no-answer` again. The phase 8 fix works (the successor's Stop hook now finds the pending rotation and sends `session answered`), but the answer is refused by a new cause (defect E) |
+| Land from the role holder: one commit on origin main, discussion dir only | **PASS** on first-parent (`5b0ee4c5cd`, a merge) |
+| Stop and cleanup | **PASS** |
+
+### Setup and the timer safety step
+`fgctl init --from /var/tmp/r/fgos-rc-31b1a9955c --override-pin …` wrote the activation (status ready, digest
+`sha256:f584c232…`) and then stopped at `event-store-refspec-missing`, as before. The first init installed no units.
+I ran every later init-like step (`doctor --fix`, the re-init) under a small wrapper that polls
+`~/.config/systemd/user/fgos-*.timer` every 0.3 s and stops and disables any unit that is not one of the units that
+existed before the run (`fgos-watcher-e9756c48`, `fgos-mailbox-sync-e9756c48`, `fgos-watcher-e2b8b5cc`).
+- `doctor --fix` installed `fgos-watcher-1d7db594` and `fgos-mailbox-sync-1d7db594`. The watcher service started at
+  22:48:51 and was killed by SIGTERM in the same second (journal: `Main process exited, code=killed, status=15/TERM`).
+- The re-init (exit 2, "not ready", 8 checks: executor skills, hooksPath, tool registry, one stale work step,
+  provider quarantine, codex/agy trust, plus the two timer checks I had disarmed) re-enabled both units at 22:49:21,
+  and the wrapper disarmed them in the same second. Both services ended `killed, status=15/TERM`.
+- Afterwards both timers were `inactive / disabled`, `systemctl --user list-timers --all` listed only the real
+  project's `e9756c48` timers, and no process had `/var/tmp/r/shaper-live3` in its command line or cwd.
+  No scratch watcher ever started a head in this run.
+
+### Step 2: discussion
+`plans/discussions/ds-livetest-shaper3/DISCUSSION.md`, plain commit `2d7b4359fc`, pushed; origin/main = `2d7b4359fc`.
+The proj main checkout baseline after init is ` M .fgos/coexistence.json`, ` M .fgos/config.yaml` (a regenerated
+`@fgos:doc` comment), and later `?? .fgos/observe/records/`. All three come from init and the observe recorder, not from the shaper.
+
+### Step 3: first start
+```
+ls -d /var/tmp/r/shaper-live3/proj-worktrees -> No such file or directory   (before)
+fgos session start shaper --name ds-livetest-shaper3 --json -> exit 0, role head:shaper-ds-livetest-shaper3,
+     key cmd_1795794607614_0dc1ab05, pane w6:p2HP, visibility trustSeeded: claude-json, confined
+git worktree list -> /var/tmp/r/shaper-live3/proj-worktrees/ds-livetest-shaper3 2d7b4359fc [discussion/ds-livetest-shaper3]
+<worktree>/.fgos/installation -> /var/tmp/r/shaper-live3/proj/.fgos/installation   (symlink)
+/proc/596915/cwd (claude) = /var/tmp/r/shaper-live3/proj-worktrees/ds-livetest-shaper3
+/proc/596915/environ: FGOS_HEAD_PROJECT_ROOT=/var/tmp/r/shaper-live3/proj
+```
+PASS. The new launch variable is present in the shaper's environment.
+
+### Step 4: rounds
+The shaper saved round 1 itself during its opening turn (`8cab71be5e round 1: orient on portfolio, write the seven
+sections`). I typed round 2, and it saved with `fgos session save … --message "round 2"` → `committed e178e90c94`.
+Proj main checkout afterwards: HEAD `2d7b4359fc` (unchanged), `git status --short` = the baseline above, and
+`git branch --contains 8cab71be5e` → only `discussion/ds-livetest-shaper3`. PASS.
+
+### Step 5: questions, mailbox, identity
+Inside the shaper (all exit 0): `pwd` = the worktree, branch `discussion/ds-livetest-shaper3`;
+`.fgos/installation/bin/fgos` present; `hook mailbox --cli claude --event post-tool-use` and
+`hook questions --event user-prompt-submit` ran silently; `fgos questions` → `needsYou: 5`, `questions: []`, 5 work asks;
+`fgos identity session` → `fg-server2-jdp2bv/ed1e58a1-…`, handle `claude-zbjp@fg-server2`.
+From outside, `fgos identity resolve head:shaper-ds-livetest-shaper3` → the same id, `roles: [head:shaper-ds-livetest-shaper3]`,
+`clone` = the worktree, `ids.cliSession.source CLAUDE_CODE_SESSION_ID`,
+`ids.mailbox {fgosDir: /var/tmp/r/shaper-live3/proj/.fgos, name: proj-claude-59}`, `ids.head {shaper, ds-livetest-shaper3, gen 1}`.
+`fgos mailbox send --to head:shaper-ds-livetest-shaper3 "live proof probe 3 …"` → `recorded 7641def4f267cf43 for proj-claude-59 …
+delivered to the current holder`. The shaper's next PostToolUse hook injected it, and the shaper answered `MAILBOX-PROBE-RECEIVED`. PASS.
+
+### Step 6: rotation
+```
+22:55:02 fgos session rotate shaper --name ds-livetest-shaper3 --json -> {"started":true,"pid":983730}  exit 0
+successor: head-shaper-ds-livetest-shaper3-2, key cmd_1795794903281_e226c020, pane w6:p2HR
+rotation.log:    {"rotated":false,"reason":"no-answer","detail":"no valid answer from head-shaper-ds-livetest-shaper3-2 within 120000 ms"}
+incidents.jsonl: {"at":"2026-11-27T15:57:06.508Z","event":"rotation-failed","role":"head:shaper-ds-livetest-shaper3",
+                  "code":"no-answer","detail":"…","successor":"ended"}
+successor supervisor.log (head-request lines, in order):
+  c-462-…  fgos done
+  mbx-488  session bind session done (x2)
+  hook-606-1795794924506 route no-rotation-pending: head:shaper-ds-livetest-shaper3 has no rotation waiting for head-shaper-ds-livetest-shaper3-2
+  hook-606-1795794924506 session answered refused verb-failed: no-rotation-pending
+  b754e04f63aafe37 … f7e0332faf6c6856, 8b33dcb2a111a1f1  session save refused role-pending-rotation:
+                   shaper-ds-livetest-shaper3 generation 1 still holds the role   (x18)
+  mbx-817  session bind session refused busy
+  hook-819-1795795007521 route no-rotation-pending … ; session answered refused verb-failed: no-rotation-pending
+successor receipt.json: outcome cancelled, gateExit stoppedBy cancel (15:57:05); role holder afterwards: gen 1 (pane w6:p2HP)
+```
+Where the files live:
+- `proj/.fgos/runtime/session-rotation/shaper-ds-livetest-shaper3/` holds `placement.json` (gen 1), the
+  `request-807f6122f4b2.json` while the request ran, the handoff `261127-1555-cmd17957.md` (with
+  `Rotation id: 8f5dc3902c681e32`), `latest.json` (`{"file":"261127-1555-cmd17957.md","rotate":"manual",…}`),
+  `rotation.log` and `incidents.jsonl`. The executor wrote `rotation.json` there and removed it when it gave up,
+  as designed. All of this is under the project root, as required.
+- The hook now reads the same place. The successor's Stop hook sent `session answered` 22 s after the rotation
+  began (`hook-606-…` at 15:55:24). It only does that when `awaits_answer` finds `rotation.json` and it has read the
+  rotation id from the handoff. Neither file exists under the worktree, so the hook resolved `proj/.fgos`. In
+  rerun 2 the same hook sent `session rotate` instead. **The phase 8 fix works for the hook.**
+- `<worktree>/.fgos/runtime/session-rotation/shaper-ds-livetest-shaper3/` still exists. It holds only
+  `stop-trace.jsonl` with three gen 1 lines (22:50:57, 22:54:13, 22:54:45; `below-soft`, `below-threshold`).
+  Those lines are written by the head-request route, not by the hook (see defect E).
+
+**Defect E (the head-request route uses the attempt's cwd as the project root).** In
+`src/session-host/head-request.mjs` (~line 676), the request socket's route sets `const projectRoot = envelope.cwd;`.
+For a shaper, `envelope.cwd` is the worktree (`/var/tmp/r/shaper-live3/proj-worktrees/ds-livetest-shaper3`), while
+`envelope.runDir` is under `proj/.fgos/assignments/…`. So `session answered` calls `markSuccessorAnswered` with
+`projectRoot` = the worktree, `lineageDirOf` points at `<worktree>/.fgos/runtime/session-rotation/…`, there is no
+`rotation.json` there, and the answer is refused `no-rotation-pending` (the successor key matched:
+`successorKey` = `headKeyOf` = `head-shaper-ds-livetest-shaper3-2` = `envelope.unitRunId`). The role never moves,
+the successor's saves are refused `role-pending-rotation`, and the executor ends it at 120 s. The same root sends gen 1's
+measuring `session rotate` requests to `requestRotation` under the worktree, which is why `stop-trace.jsonl` lands
+there, so the real lineage never sees the head's measured context fraction (an automatic, threshold-driven rotation
+would also be judged from the wrong lineage). The land ticket is also kept under the worktree
+(`<worktree>/.fgos/runtime/head-tickets/shaper-ds-livetest-shaper3/c-1413-1795795113155.json`, `cwd` = the worktree).
+The land itself is fine, because git works from a linked worktree. The fix is to give the route the project root
+the attempt was launched for (the same value `placeHead` now puts in `FGOS_HEAD_PROJECT_ROOT`, recorded in the
+envelope, or derived from `runDir`), not `envelope.cwd`. Every verb in that route that reads or writes `.fgos` state
+under `projectRoot` (rotate, answered, head tickets, the plan and discussion lookups, start) is affected for a head
+whose cwd is a worktree.
+The successor's uncommitted round-3 edit was left in the worktree (` M …/DISCUSSION.md`, 8 insertions, 6 deletions).
+Successor cwd and handoff: PASS. Rotation completing: **FAIL**.
+
+### Step 7: land (by gen 1, the role holder)
+```
+fgos land --branch discussion/ds-livetest-shaper3 -> ticket c-1413-1795795113155, state done
+origin/main: 5b0ee4c5cd (parents 2d7b4359fc e178e90c94) "land discussion/ds-livetest-shaper3"
+git rev-list --first-parent --count 2d7b4359fc..origin/main -> 1 ; --count (all) -> 3
+git diff --name-only 2d7b4359fc origin/main -> plans/discussions/ds-livetest-shaper3/DISCUSSION.md
+proj main checkout HEAD -> 5b0ee4c5cd ; status = baseline
+```
+One merge commit on main's first-parent line, touching only the discussion dir. The two round commits are reachable
+from main, so defect C stands. The successor's uncommitted edit was not landed. The shaper could not read its ticket's
+state: it tried `fgos land status` and `fgos land --status`, which were refused (`land-branch-not-own`, which took
+"status" as a branch name, and `bad-args`).
+
+### Step 8: stop and cleanup
+- `fgos session stop shaper --name ds-livetest-shaper3 --json` → `stopped: true`; pane w6:p2HP is gone (w6:p2HR had
+  already closed at 15:57:05). No process has `/var/tmp/r/shaper-live3` in its command line or cwd.
+- Timers: `fgos-watcher-1d7db594` and `fgos-mailbox-sync-1d7db594` (timer and service) were stopped and disabled
+  again. I deleted exactly `~/.config/systemd/user/fgos-{watcher,mailbox-sync}-1d7db594.{timer,service}`, then ran
+  `systemctl --user daemon-reload` and `reset-failed` on the two services. The real project's `fgos-*-e9756c48`
+  timers are still enabled. `fgos-watcher-e2b8b5cc` was there before the run and is not mine; I left it alone.
+- Removed the Claude trust entry for `/var/tmp/r/shaper-live3/proj` from the claude-vantt login home config.
+- The real repo was not touched by this run (its HEAD has since moved to `6b884bc7ff` through other sessions' lands,
+  and its dirty files are the same as at the start). `/var/tmp/r/shaper-live3/` is kept for inspection.
+
+### Defects after rerun 3
+- A: fixed. B: fixed. D: fixed. The rotation hook now resolves the lineage under the project root and the successor sends `session answered`.
+- **E (open, blocks "rotation in the same worktree completes"):** the head-request route takes `projectRoot` from
+  `envelope.cwd` (`src/session-host/head-request.mjs` ~676). For a shaper that is the worktree, so `session answered`
+  is refused `no-rotation-pending` and every shaper rotation still ends `no-answer`. The same root misplaces the
+  stop trace (measured fractions go to the worktree's lineage, which hurts automatic rotation) and the head tickets.
+- C (open, minor): a branch land is a merge, so round commits become reachable from main.
+- Minor: `?? .fgos/installation` is untracked in the shaper worktree.
+- Minor: a head has no obvious way to read its land ticket's state; `fgos land status` is read as a branch name.
+- Minor: the successor's `session bind session` was refused `busy` once (`mbx-817`), while it was being refused saves.
+- Setup note: `fgctl init`/`doctor --fix` on a scratch clone still install and immediately start the watcher and
+  mailbox-sync timers. Each start was killed within the same second here, but only because of the polling wrapper.
