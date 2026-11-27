@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Confined units compile the Rust workspace offline from the owner's read-only cargo and rustup caches"
-status: draft
+status: ready
 priority: P0
 blockedBy: []
 footprint:
