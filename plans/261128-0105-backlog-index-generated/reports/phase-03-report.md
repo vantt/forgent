@@ -14,3 +14,11 @@ Status: DONE_WITH_CONCERNS
 - `rg -n 'session write plans/backlog.md' core docs/platform`: no output.
 - `node scripts/check-decision-citation-drift.mjs`: REFUSED by the sandbox: `git-floor-probe-failed: git-driver-io: Read-only file system (os error 30)` (from `resolveRepo`, `scripts/lib/git-dir-layout.mjs:79`). Not run to completion.
 - `npm run build:skills`: REFUSED ("This command requires approval"); not run. Generated surfaces under `.agents/skills`, `plugins/fgOS/skills`, `.claude/skills` therefore NOT rebuilt; they will carry the old secretary/supervisor text until it is run (the plan says land.regenerate rebuilds them). Nothing hand-edited.
+
+## Fix round
+
+- `docs/platform/session-host/spec.md`: the head-grant paragraph no longer says a granted row file stays read-only in the sandbox. It now says `sandbox_paths_of` folds `plans/backlog/*` into `plans`, the coordinators' `plans` grant makes `plans/` writable from the shell, and `session write` is the published path (exact match or one level `<dir>/*` per `names_grant`). The land commit now includes the regenerated `plans/backlog.md` index.
+- `core/skills/fgos-secretary/SKILL.md` step 2 and `core/skills/fgos-supervisor/SKILL.md`: the row path comes from `fgos convention path --kind backlog-item --id <id> --slug <slug>`; one clause says the row needs backlog item frontmatter or `session write` refuses it `write-item-invalid`.
+- Caveat: could not run `fgos convention path --help` (approval denied). The `--id`/`--slug` flags are inferred from the `{id}-{slug}.md` template and the `--kind report --slug` usage elsewhere; verify them.
+- `.agents/`, `.claude/` and `plugins/` skill copies were not regenerated (not checked or built here).
+- Checks: `rg -n 'session write plans/backlog.md' core docs/platform` is empty; `head-grants.test.mjs` passes (1/1).
