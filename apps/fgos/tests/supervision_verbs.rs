@@ -91,6 +91,15 @@ struct Scene {
 
 impl Scene {
     fn new(tag: &str, config: &str) -> Self {
+        Self::build(tag, config, None)
+    }
+
+    /// A second machine's clone of the same bare remote: its own state root and machine id, no seed commit.
+    fn clone_of(first: &Scene, tag: &str, config: &str) -> Self {
+        Self::build(tag, config, Some(first.root.join("remote.git")))
+    }
+
+    fn build(tag: &str, config: &str, remote: Option<PathBuf>) -> Self {
         static NEXT: AtomicU64 = AtomicU64::new(0);
         let root = std::env::temp_dir().join(format!(
             "fgos-supervision-verbs-{tag}-{}-{}",
@@ -101,23 +110,43 @@ impl Scene {
         fs::create_dir_all(root.join("home")).unwrap();
         fs::create_dir_all(root.join("state")).unwrap();
         let root = fs::canonicalize(root).unwrap();
-        git(
-            &root,
-            &[
-                "init",
-                "-q",
-                "--bare",
-                "--initial-branch=main",
-                "remote.git",
-            ],
-        );
-        git(&root, &["clone", "-q", "remote.git", "project"]);
+        let seeded = remote.is_none();
+        match &remote {
+            None => {
+                git(
+                    &root,
+                    &[
+                        "init",
+                        "-q",
+                        "--bare",
+                        "--initial-branch=main",
+                        "remote.git",
+                    ],
+                );
+                git(&root, &["clone", "-q", "remote.git", "project"]);
+            }
+            Some(url) => {
+                git(&root, &["clone", "-q", url.to_str().unwrap(), "project"]);
+            }
+        }
         let project = root.join("project");
-        git(&project, &["checkout", "-q", "-b", "main"]);
-        git(&project, &["config", "fgos.machineid", "m-test"]);
+        if seeded {
+            git(&project, &["checkout", "-q", "-b", "main"]);
+        }
+        git(&project, &["config", "fgos.machineid", &format!("m-{tag}")]);
         // The Land port merges in a candidate checkout, which needs an author.
         git(&project, &["config", "user.name", "t"]);
         git(&project, &["config", "user.email", "t@example.invalid"]);
+        if seeded {
+            Self::seed(&project);
+        }
+        Self::fixture(&root, &project, config);
+        release(&root);
+        Self { root }
+    }
+
+    /// The first commit of the shared remote: the plan, a settled discussion and the project id.
+    fn seed(project: &Path) {
         fs::create_dir_all(project.join(format!("plans/{PLAN}"))).unwrap();
         fs::write(
             project.join(format!("plans/{PLAN}/plan.md")),
@@ -142,7 +171,11 @@ impl Scene {
         git(&project, &["add", "-f", "."]);
         git(&project, &["commit", "-q", "-m", "init"]);
         git(&project, &["push", "-q", "-u", "origin", "main"]);
-        git(&project, &["remote", "set-head", "origin", "main"]);
+        git(project, &["remote", "set-head", "origin", "main"]);
+    }
+
+    /// What every clone holds beside the tracked files: fence, state root, machine id, definitions, config.
+    fn fixture(root: &Path, project: &Path, config: &str) {
         // What an initialised project holds before its first append.
         let fence = project.join(".fgos/locks/activation.lock");
         fs::create_dir_all(&fence).unwrap();
@@ -178,8 +211,6 @@ impl Scene {
             "defs/\ncore/\n.fgos/config.yaml\n.fgos/locks/\n.fgos/runtime/\n.fgos/observe/\n",
         )
         .unwrap();
-        release(&root);
-        Self { root }
     }
 
     fn project(&self) -> PathBuf {
@@ -377,6 +408,191 @@ fn wake_with_no_live_supervisor_and_an_unhandled_event_starts_one_through_sessio
     let woke = scene.data(&["supervisor", "wake", "--json"]);
     assert_eq!(woke["outcome"], "started", "{woke}");
     assert_eq!(scene.payload_calls(), vec![lead, start.clone(), start]);
+}
+
+/// The `fgos.supervisor.error` values this clone's wake spans recorded (an admission refusal is one of them).
+fn wake_errors(scene: &Scene) -> Vec<String> {
+    let spans = scene.data(&[
+        "metrics",
+        "query",
+        "--kind",
+        "fgos.supervisor.wake",
+        "--by",
+        "fgos.supervisor.error",
+        "--json",
+    ]);
+    spans["rows"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|row| row["group"]["fgos.supervisor.error"].as_str())
+        .map(str::to_owned)
+        .collect()
+}
+
+/// Two machines, each with its own state root, machine id and clone of one bare remote.
+fn two_machines() -> (Scene, Scene, String, String) {
+    let winner = Scene::new("claim-winner", WATCHER_CONFIG);
+    let loser = Scene::clone_of(&winner, "claim-loser", WATCHER_CONFIG);
+    let machine = |scene: &Scene| {
+        fs::read_to_string(scene.root.join("state/machine-id"))
+            .unwrap()
+            .trim()
+            .to_owned()
+    };
+    let (won, lost) = (machine(&winner), machine(&loser));
+    assert_ne!(won, lost, "the two clones are two machines");
+    let git_id = |scene: &Scene| git(&scene.project(), &["config", "fgos.machineid"]);
+    assert_ne!(
+        git_id(&winner),
+        git_id(&loser),
+        "the two clones are two git machines"
+    );
+    (winner, loser, won, lost)
+}
+
+fn claim_count(remote: &Path) -> usize {
+    let plan_path = format!("plans/{PLAN}/plan.md");
+    git(remote, &["log", "--format=%H", "main", "--", &plan_path])
+        .lines()
+        .count()
+}
+
+#[test]
+fn a_clone_with_a_stale_trunk_refuses_the_plan_the_winner_already_claimed() {
+    let (winner, loser, won, lost) = two_machines();
+    let before = claim_count(&winner.root.join("remote.git"));
+    winner.data(&["supervisor", "wake", "--json"]);
+    // The loser's trunk is stale: it still reads the plan as ready when it wakes.
+    loser.data(&["supervisor", "wake", "--json"]);
+    let errors = wake_errors(&loser);
+    assert!(
+        errors
+            .iter()
+            .any(|e| e == "publish-failed:admission-plan-stale"),
+        "{errors:?}"
+    );
+    assert_loser_converged(&winner, &loser, &won, &lost, before);
+}
+
+#[test]
+fn a_clone_whose_push_loses_the_race_undoes_its_claim_and_reads_the_winners_host() {
+    let (winner, loser, won, lost) = two_machines();
+    let before = claim_count(&winner.root.join("remote.git"));
+    // Between the loser's catch-up and its push the winner's whole wake runs and claims the plan on origin.
+    let quote = |s: &std::ffi::OsStr| format!("'{}'", s.to_string_lossy().replace('\'', r"'\''"));
+    let wake = winner.command(&["supervisor", "wake", "--json"]);
+    let envs: Vec<String> = wake
+        .get_envs()
+        .filter_map(|(k, v)| v.map(|v| format!("{}={}", quote(k), quote(v))))
+        .collect();
+    let args: Vec<String> = wake.get_args().map(quote).collect();
+    let script = format!(
+        "#!/bin/sh\ncd {} || exit 0\nenv -i {} {} {} >/dev/null 2>&1\nexit 0\n",
+        quote(wake.get_current_dir().unwrap().as_os_str()),
+        envs.join(" "),
+        quote(wake.get_program()),
+        args.join(" ")
+    );
+    // The land door runs the project's gates after its catch-up and before its push; the loser's gate is that step.
+    let gate = loser.root.join("race-gate.sh");
+    fs::write(&gate, script).unwrap();
+    fs::set_permissions(&gate, fs::Permissions::from_mode(0o755)).unwrap();
+    fs::write(
+        loser.project().join(".fgos/config.yaml"),
+        WATCHER_CONFIG.replace("run: \"true\"", &format!("run: \"{}\"", gate.display())),
+    )
+    .unwrap();
+
+    loser.data(&["supervisor", "wake", "--json"]);
+    let errors = wake_errors(&loser);
+    // Its catch-up found nothing new, so the claim was written and the land door refused it over the dirty file.
+    assert!(
+        errors
+            .iter()
+            .any(|e| e == "publish-failed:main-checkout-dirty-overlap"),
+        "the loser's publish is refused after its catch-up: {errors:?}"
+    );
+    assert_loser_converged(&winner, &loser, &won, &lost, before);
+}
+
+#[test]
+fn a_missing_or_invalid_machine_id_refuses_admission_without_a_lead_or_a_commit() {
+    let scene = Scene::new("no-machine-id", WATCHER_CONFIG);
+    let remote = scene.root.join("remote.git");
+    let tip = git(&remote, &["rev-parse", "main"]);
+    let local = git(&scene.project(), &["rev-parse", "main"]);
+    let id_file = scene.root.join("state/machine-id");
+    for (content, code) in [
+        (None, "publish-failed:machine-id-missing"),
+        (Some("Not A Machine\n"), "publish-failed:machine-id-invalid"),
+    ] {
+        match content {
+            None => fs::remove_file(&id_file).unwrap(),
+            Some(text) => fs::write(&id_file, text).unwrap(),
+        }
+        scene.data(&["supervisor", "wake", "--json"]);
+        let errors = wake_errors(&scene);
+        assert!(errors.iter().any(|e| e == code), "{code}: {errors:?}");
+        assert!(scene.payload_calls().is_empty(), "no lead starts");
+        assert_eq!(
+            git(&remote, &["rev-parse", "main"]),
+            tip,
+            "nothing reaches origin"
+        );
+        assert_eq!(
+            git(&scene.project(), &["rev-parse", "main"]),
+            local,
+            "no local commit"
+        );
+        assert!(git(&scene.project(), &["status", "--porcelain"]).is_empty());
+    }
+}
+
+/// Origin holds exactly the winner's claim, and the loser's checkout has converged on it: the loser's own bytes
+/// are gone, its trunk equals origin, and the portfolio read on the loser's checkout shows the winner's host.
+fn assert_loser_converged(winner: &Scene, loser: &Scene, won: &str, lost: &str, before: usize) {
+    let remote = winner.root.join("remote.git");
+    let plan_path = format!("plans/{PLAN}/plan.md");
+    let origin_plan = git(&remote, &["show", &format!("main:{plan_path}")]);
+    assert!(origin_plan.contains("status: running\n"), "{origin_plan}");
+    assert!(
+        origin_plan.contains(&format!("host: {won}\n")),
+        "{origin_plan}"
+    );
+    assert!(
+        !origin_plan.contains(lost),
+        "the loser's machine id never reaches origin"
+    );
+    assert_eq!(
+        claim_count(&remote),
+        before + 1,
+        "exactly one claim reaches origin"
+    );
+    let loser_project = loser.project();
+    assert_eq!(
+        fs::read_to_string(loser_project.join(&plan_path))
+            .unwrap()
+            .trim_end(),
+        origin_plan.trim_end(),
+        "the loser's plan.md is origin's bytes"
+    );
+    assert_eq!(
+        git(&loser_project, &["rev-parse", "main"]),
+        git(&remote, &["rev-parse", "main"]),
+        "the loser's local main equals origin"
+    );
+    let view = loser.data(&["supervisor", "plans", "--json"]);
+    assert_eq!(view["plans"][0]["status"], "running", "{view}");
+    let seen = portfolio_host(&fs::read_to_string(loser_project.join(&plan_path)).unwrap());
+    assert_eq!(seen.as_deref(), Some(won));
+}
+
+/// The `host` the plan text names, read through the portfolio reader.
+fn portfolio_host(text: &str) -> Option<String> {
+    fgos_supervision::portfolio::read_plan(PLAN, text)
+        .unwrap()
+        .host
 }
 
 /// A fake herdr (the run-supervisor crate's stand-in CLI, answering from files) whose one allocated slot `key` reads as

@@ -803,6 +803,20 @@ impl wake::Identity for HostIdentity {
     }
 }
 
+/// This machine's Identity id from the state root, never a hostname; a missing, invalid or unreadable one refuses
+/// admission, each under its own code.
+fn machine_id() -> Result<String, String> {
+    let (state, _) = fgos_holder_lock::state_root();
+    fgos_identity::machine::read(&state).map_err(|e| {
+        match e {
+            fgos_identity::Error::Missing(_) => "machine-id-missing",
+            fgos_identity::Error::Invalid(_) => "machine-id-invalid",
+            _ => "machine-id-unreadable",
+        }
+        .to_owned()
+    })
+}
+
 struct HostAdmission {
     root: PathBuf,
 }
@@ -861,7 +875,8 @@ impl wake::Admission for HostAdmission {
             .map_err(|_| "land-git-unavailable")?
             .ok_or("land-root-not-a-repository")?;
         let base = trunk_tip(&driver, &repo)?;
-        let edited = portfolio::admitted_text(&original, role, base.as_str())?;
+        let machine = machine_id()?;
+        let edited = portfolio::admitted_text(&original, role, base.as_str(), &machine)?;
         let dir = file.parent().ok_or("admission-path-unreadable")?;
         fgos_durable_file::replace_durably(dir, "plan.md", edited.as_bytes())
             .map_err(|_| "admission-write-failed")?;
@@ -874,6 +889,10 @@ impl wake::Admission for HostAdmission {
                 fgos_durable_file::replace_durably(dir, "plan.md", original.as_bytes())
                     .map_err(|_| format!("{}:admission-restore-failed", why.code))?;
             }
+            // A push that lost the race to another machine's claim leaves this trunk behind origin: pull it now,
+            // so this checkout reads the winner's claim instead of a stale `ready`. Best effort; the next
+            // wake's catch-up retries a failure.
+            let _ = (publisher.catch_up)(&main, &actor);
             return Err(why.code);
         }
         Ok(())

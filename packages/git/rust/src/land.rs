@@ -1406,6 +1406,15 @@ impl GitDriver {
             filesystem
                 .checkpoint("catch-up-before-read-tree")
                 .map_err(failure)?;
+            // A tracked file rewritten with the same bytes is stat-dirty and makes read-tree refuse
+            // "Entry not uptodate"; refresh the index first. A refresh that only reports genuinely
+            // modified entries must not abort: read-tree then decides.
+            self.land_call(
+                repo,
+                &scope,
+                &durable_args(&["update-index", "--refresh"]),
+                &[],
+            )?;
             let out = self.land_call(
                 repo,
                 &scope,

@@ -458,7 +458,7 @@ fn only_whole_entry_markdown_is_unwrapped_in_a_footprint_cell() {
 
 // The reader's existing cases do not prove admission's byte edit or publication fields.
 #[test]
-fn admission_edits_only_status_lead_and_base_and_keeps_the_plan_body_and_notes() {
+fn admission_edits_only_status_lead_base_and_host_and_keeps_the_plan_body_and_notes() {
     for newline in ["\n", "\r\n"] {
         let body = format!("{HEAD}| 1 | a | - | x/ | 1 | todo |\n\nKeep this body.\n");
         let original = text_with(
@@ -466,9 +466,16 @@ fn admission_edits_only_status_lead_and_base_and_keeps_the_plan_body_and_notes()
             &body,
         )
         .replace('\n', newline);
-        let edited = admitted_text(&original, "head:lead-project-plan", "abc123").unwrap();
+        let edited = admitted_text(
+            &original,
+            "head:lead-project-plan",
+            "abc123",
+            "fg-box-abc123",
+        )
+        .unwrap();
         let read = read_plan("p", &edited).unwrap();
         assert_eq!(read.status, "running");
+        assert_eq!(read.host.as_deref(), Some("fg-box-abc123"));
         assert_eq!(read.lead.as_deref(), Some("head:lead-project-plan"));
         assert!(edited.contains("base: abc123"));
         assert!(edited.contains("# keep above"));
@@ -481,13 +488,29 @@ fn admission_edits_only_status_lead_and_base_and_keeps_the_plan_body_and_notes()
 fn admission_adds_missing_lead_and_base_through_the_frontmatter_editor() {
     let body = format!("{HEAD}| 1 | a | - | x/ | 1 | todo |\n");
     let original = text_with("", &body);
-    let edited = admitted_text(&original, "head:lead-project-plan", "abc123").unwrap();
+    let edited = admitted_text(
+        &original,
+        "head:lead-project-plan",
+        "abc123",
+        "fg-box-abc123",
+    )
+    .unwrap();
     assert_eq!(
         read_plan("p", &edited).unwrap().lead.as_deref(),
         Some("head:lead-project-plan")
     );
     assert!(edited.contains("base: abc123"));
     assert!(edited.ends_with(&body));
+}
+
+#[test]
+fn host_frontmatter_is_read_and_a_malformed_machine_id_is_refused() {
+    let body = format!("{HEAD}| 1 | a | - | x/ | 1 | todo |\n");
+    let ok = read_plan("p", &text_with("host: fg-box-abc123\n", &body)).unwrap();
+    assert_eq!(ok.host.as_deref(), Some("fg-box-abc123"));
+    assert_eq!(read_plan("p", &text_with("", &body)).unwrap().host, None);
+    let bad = read_plan("p", &text_with("host: Not A Machine\n", &body)).unwrap_err();
+    assert_eq!(bad.code(), "plan-host-invalid");
 }
 
 #[test]

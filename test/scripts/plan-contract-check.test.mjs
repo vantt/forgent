@@ -10,6 +10,7 @@ import {
   AUTHORITY,
   AUTHORITY_MAP_REQUIRED_FROM,
   BACKLOG_SOURCE_REQUIRED_FROM,
+  IDENTITY,
   STATUSES,
   activeOverlaps,
   checkAll,
@@ -195,6 +196,40 @@ test('a lead role must be an Identity role string, and a running plan without on
   assert.deepEqual([named.errors, named.warnings], [[], []]);
   assert.ok(bare.errors.some((e) => e.includes('a running plan names its lead')));
   assert.deepEqual(bare.warnings, []);
+});
+
+test('host is an optional machine id: malformed is an error, an id Identity does not know is only a warning', () => {
+  const read = IDENTITY.read;
+  try {
+    IDENTITY.reset();
+    IDENTITY.read = () => new Set(['fg-known-abc123']);
+    const r = root({
+      none: planText(),
+      known: planText({ fm: { host: 'fg-known-abc123' } }),
+      unknown: planText({ fm: { host: 'fg-other-xyz789' } }),
+      bad: planText({ fm: { host: 'Not_A_Machine' } }),
+      draft: planText({ fm: { status: 'draft', host: 'fg-other-xyz789' } }),
+    });
+    const of = (name) => checkPlanDir(path.join(r, name), { plansRoot: r });
+    assert.deepEqual([of('none').errors, of('none').warnings], [[], []]);
+    assert.deepEqual([of('known').errors, of('known').warnings], [[], []]);
+    assert.deepEqual(of('unknown').errors, []);
+    assert.ok(of('unknown').warnings.some((w) => w.includes('fg-other-xyz789') && w.includes('Identity knows')));
+    assert.ok(of('bad').errors.some((e) => e.startsWith('host must be an Identity machine id')));
+    assert.deepEqual(of('draft').warnings, []);
+    IDENTITY.reset();
+    let reads = 0;
+    IDENTITY.read = () => {
+      reads += 1;
+      throw new Error('identity unreadable');
+    };
+    const first = of('unknown').warnings;
+    assert.equal(first.length + of('unknown').warnings.length, 1, 'an unreadable Identity warns once and goes on');
+    assert.equal(reads, 1, 'an unreadable Identity is not asked again for each plan');
+  } finally {
+    IDENTITY.read = read;
+    IDENTITY.reset();
+  }
 });
 
 test('--plan accepts several plan directories and checks each', () => {

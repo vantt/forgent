@@ -49,6 +49,50 @@ const TABLE_COLUMNS = VOCABULARY.tableColumns;
 
 // An Identity role: `<kind>:<name>`, e.g. `lead:S6A` or `head:lead-forgent-261119-1142-supervisor-l`.
 const LEAD_ROLE = /^[a-z]+:[A-Za-z0-9][A-Za-z0-9._-]*$/;
+// An Identity machine id; mirrors fgos_identity::machine::valid_machine_id.
+const MACHINE_ID = /^[a-z0-9][a-z0-9-]{1,62}$/;
+
+/**
+ * The machines Identity knows, read through the `fgos identity` verbs and never from state files: this machine's
+ * id (`identity machine`) and every machine whose key it pinned (`identity pins`). One read per run, kept in
+ * `known`, which is `null` once Identity could not answer (never retried per plan; the caller warns once).
+ * A test replaces `read` and calls `reset` around its case.
+ */
+export const IDENTITY = {
+  known: undefined,
+  warned: false,
+  read() {
+    const local = invokeHost(['identity', 'machine', '--json']).id;
+    const pins = invokeHost(['identity', 'pins', '--json']).pins ?? [];
+    return new Set([local, ...pins.map((pin) => pin.machineId)]);
+  },
+  reset() {
+    this.known = undefined;
+    this.warned = false;
+  },
+  /** `true`, `false`, or `'unreadable'`. */
+  knows(host) {
+    if (this.known === undefined) {
+      try {
+        this.known = this.read();
+      } catch {
+        this.known = null;
+      }
+    }
+    return this.known === null ? 'unreadable' : this.known.has(host);
+  },
+};
+
+function hostWarning(host) {
+  const known = IDENTITY.knows(host);
+  if (known === true) return undefined;
+  if (known === 'unreadable') {
+    if (IDENTITY.warned) return undefined;
+    IDENTITY.warned = true;
+    return 'Identity could not be read, so host was not checked against known machines';
+  }
+  return `host ${host} is not a machine Identity knows (not this machine, and no machine whose key it pinned)`;
+}
 // A backlog item id minted by Identity: `p-` plus 10 lowercase base32 characters.
 const BACKLOG_ID = /^p-[a-z2-7]{10}$/;
 
@@ -289,6 +333,8 @@ export function checkPlanDir(dir, { plansRoot = path.dirname(path.resolve(dir)) 
   if (meta.footprint !== undefined && !strings(meta.footprint)) errors.push('footprint must be a list of repo-relative paths or globs');
   if (meta.base !== undefined && !(typeof meta.base === 'string' && /^[0-9a-f]{40}$/.test(meta.base))) errors.push('base must be a full 40-character commit sha');
   if (meta.lead !== undefined && !(typeof meta.lead === 'string' && LEAD_ROLE.test(meta.lead))) errors.push('lead must be an Identity role such as lead:S6A or head:lead-<handle>-<plan>');
+  const hostWellFormed = typeof meta.host === 'string' && MACHINE_ID.test(meta.host);
+  if (meta.host !== undefined && !hostWellFormed) errors.push('host must be an Identity machine id (2-63 characters of a-z, 0-9 and -)');
   if (meta.status === 'ready' || meta.status === 'running') {
     if (!Array.isArray(meta.footprint) || meta.footprint.length === 0) errors.push(`footprint is required when status is ${meta.status}`);
     if (meta.base === undefined) errors.push(`base is required when status is ${meta.status}`);
@@ -304,6 +350,10 @@ export function checkPlanDir(dir, { plansRoot = path.dirname(path.resolve(dir)) 
   const mapRequired = typeof meta.created === 'string' && meta.created >= AUTHORITY_MAP_REQUIRED_FROM;
   if ((meta.status === 'draft' || meta.status === 'ready') && mapRequired) checkAuthorityMap(body, errors);
   const warnings = [];
+  if (hostWellFormed && (meta.status === 'ready' || meta.status === 'running')) {
+    const warning = hostWarning(meta.host);
+    if (warning) warnings.push(warning);
+  }
   return { dir, legacy: false, meta, errors, warnings };
 }
 
