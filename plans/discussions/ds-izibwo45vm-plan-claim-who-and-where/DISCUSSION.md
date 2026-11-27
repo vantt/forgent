@@ -11,8 +11,11 @@ discussion: settled
 
 ## Hand-off to the planner
 
-- **Outcome.** When a plan becomes `running`, origin shows at once which lead runs it and on which machine.
-  - The first machine whose admission push reaches origin owns the plan.
+- **Outcome.** Which machine runs a plan is decided from one record that every machine reads: `host` in `plan.md` on
+  origin.
+  - A plan that names a `host` before it runs is admitted only by that machine.
+  - A plan with no `host` is claimed by the first machine whose admission push reaches origin.
+  - When a plan becomes `running`, origin shows at once which lead runs it and on which machine.
   - No other machine admits it, watches it or restarts its lead.
   - An admission commit either reaches origin or is undone. It never sits on one machine's local main.
 - **Constraints.**
@@ -20,19 +23,21 @@ discussion: settled
   - The machine name comes from Identity (`packages/identity/rust/src/machine.rs`). Nothing reads a hostname.
   - No new lock and no new push mechanism (L10, RUL104). Fix the existing paths land and its orphan push, and add the
     `host` field.
-  - A new config key goes into `core/config-standard` and `core/config-schema` only, scoped `global-only`.
+  - No per-machine config key decides placement. The plan record is the only source (D9).
   - The plan contract (`plan-v1`) accepts `host`, and a CHANGELOG line names the change.
   - Proofs follow design principle 8: extend the owning tests in `packages/supervision/rust/tests/land.rs`, `wake.rs`
     and `apps/fgos/tests/supervision_verbs.rs`.
 - **Non-goals.**
-  - Assigning a machine when a plan goes `ready` (option B), and pinning a plan to a machine (option C). If wanted
-    later, they are separate items.
+  - Forcing every plan to name a machine (option B). An unpinned plan stays claimable by any machine.
+  - Automatic moving of a pinned plan when its machine is down. A person or the secretary changes `host`.
   - Moving or reassigning plans already running.
   - Any change to branch lands of leads.
   - Cleaning up the pending Git operation that blocked the push on 2026-11-27. That belongs to `fgos git recover`.
 - **Acceptance criteria.**
-  1. Admission writes `status: running`, `lead`, `base` and `host: <Identity machine id>` in one commit, and
-     `plan-v1` checks `host`.
+  1. `plan-v1` accepts an optional `host` (an Identity machine id) on `ready` and `running` plans. The contract check
+     warns when the id is unknown to Identity, through the local id or the shared directory. Admission on machine M
+     admits a `ready` plan only when `host` is absent or equal to M, and holds any other as
+     `held-other-machine:<host>`. It writes `status: running`, `lead`, `base` and `host: M` in one commit.
   2. A paths land whose push the Git door refuses before sending anything (for example `resource-recovery-required` or
      `resource-busy`) undoes its local commit and restores the path. A test reproduces the 2026-11-27 shape: commit,
      pre-send refusal, local main equal to origin afterwards.
@@ -44,8 +49,9 @@ discussion: settled
   5. `supervisor plans` and the keeper never start or restart the lead of a running plan whose `host` is another
      machine, and show it as running elsewhere. A running plan with no `host` belongs to this machine only while
      its lead is live here; otherwise it is held as `host-unnamed` and raised, never restarted.
-  6. `supervisor.admitPlans` is a global-only list of plan-directory globs. When it is absent, every plan is
-     admissible. A plan outside it is held as `held-not-this-machine`.
+  6. The planner skill writes `host` when the discussion or the owner names a machine, and leaves it out otherwise.
+     The secretary can set or change `host` on a `ready` plan through its portfolio land. Only admission writes
+     `host` on a `running` plan.
   7. The supervision spec (admission rules, reason codes, shared entities) states 1-6. `npm test` and
      `cargo test --workspace` are green.
 - **Open points that block only some parts.** None.
@@ -54,7 +60,8 @@ discussion: settled
 
 ## 1. Trạng thái hiện tại
 
-Settled on 2026-11-27, round 2.
+Settled on 2026-11-27, round 2. Amended in round 3, before any planner started: the owner moved placement from A to
+C and dropped `admitPlans` (D8, D9 supersede D1, D3).
 
 - Round 1 split the topic into durability (an admission must reach origin) and placement (which machine may admit
   which plan).
@@ -62,6 +69,10 @@ Settled on 2026-11-27, round 2.
   The owner also said the machine name comes from Identity. q-xub4gdaonb was cancelled as answered in chat.
 - The owner pointed out that this session runs on fg-server itself. That let D3 be diagnosed from this machine's
   observe records. It has two holes, both in existing code (D5, D6).
+
+- In round 3 the owner asked how to stop machines from taking each other's plans completely. With A, the intent
+  "plan X is for fg-server" lived only in each machine's own config, which other machines cannot see. Under C it
+  lives in `plan.md` on origin, which every machine reads.
 
 Nothing is open. The next step is a planner.
 
@@ -83,7 +94,8 @@ land of a head's `session write` (`apps/fgos/src/wiring/session_write_publish.rs
 | D2. A later land already pushes such an orphan commit, but only under the merge slot and only if the Git WAL shows a `ScopedCommit` from this main checkout. Otherwise it refuses `land-target-ahead` | observed | `sync_target` (`pushed_orphan`) in `land.rs`; `main_checkout_scoped_commits` in `packages/git/rust/src/inspect.rs`; commit 37e4ee719 |
 | D3. Why ded8d6557 stayed. First hole: at 14:32:22 the admission's push was refused **before anything was sent** with `resource-recovery-required`, because a dead pending Git operation lay on the ref. The land treated that like an unknown outcome and kept the commit. Second hole: at 14:33:07 the next admission's catch-up, which holds the merge slot, did not recognise the commit as its own and refused `write-branch-ahead` | settled → D5, D6 | `fgos.supervisor.wake` records at 07:32:22Z (`publish-failed:resource-recovery-required`) and 07:33:07Z (`publish-failed:write-branch-ahead`) in `.fgos/observe/records/fc4222ff-….jsonl`; the pre-send refusal is in `packages/git/rust/src/refs.rs:168` (dead chain, no live writer). The planner proves exactly why the second hole did not recognise the commit (criterion 3) |
 | D4. Admission never starts a lead on a failed publish, so a stranded admission is a held plan, not a double run on its own machine. The real risk is cross-machine: other machines cannot see the claim, and another machine's supervisor sees no live lead for a running plan | observed | `admit` in `apps/fgos/src/wiring/supervision.rs:824-880`; `leadLive` is read from local holders (supervision spec, line 265) |
-| Which machine may admit which plans | settled → D1, D3 | owner chose A, 2026-11-27 |
+| Which machine may admit which plans | settled → D8, D9 (D1, D3 superseded) | owner chose A, then C in round 3, 2026-11-27 |
+| A per-machine allow-list cannot stop a machine from taking a plan meant for another: each machine sees only its own list, and a missing or drifting list is invisible | observed → D9 | config spec: the global file is per machine, never shared |
 | The machine name | settled → D2 | Identity machine id, for example `fg-server-sqs7es` (`<stateRoot>/machine-id`) |
 | Race: two machines admit one plan at once | settled → D7 | the loser's push is rejected and its commit undone. The retry's fast-forward refuses `main-checkout-dirty-overlap` (`packages/git/rust/src/land.rs:37`), and admit restores its bytes. No last-writer-wins path exists |
 
@@ -91,9 +103,9 @@ land of a head's `session write` (`apps/fgos/src/wiring/session_write_publish.rs
 
 | D-ID | Decision | Date | Source |
 |---|---|---|---|
-| D1 | Placement: any machine may admit a ready plan. The first admission whose push reaches origin claims it. Origin is the only lock | 2026-11-27 | owner chat 15:14 ("chọn A"), recommended in round 1 (q-xub4gdaonb, cancelled as answered in chat) |
+| D1 | **Superseded by D8.** Placement: any machine may admit a ready plan. The first admission whose push reaches origin claims it. Origin is the only lock | 2026-11-27 | owner chat 15:14 ("chọn A"), recommended in round 1 (q-xub4gdaonb, cancelled as answered in chat) |
 | D2 | Admission writes `host: <Identity machine id>`, and `plan-v1` accepts it. Nothing reads a hostname | 2026-11-27 | owner chat ("chúng ta có component identity mà"); `packages/identity/rust/src/machine.rs` |
-| D3 | A machine may narrow what it admits with `supervisor.admitPlans`, a global-only list of plan-directory globs. When the key is absent, every plan is admissible. A plan outside the list is held `held-not-this-machine` | 2026-11-27 | part of option A as asked in q-xub4gdaonb; config spec "project file is not trusted for machine keys" |
+| D3 | **Superseded by D9.** A machine may narrow what it admits with `supervisor.admitPlans`, a global-only list of plan-directory globs. When the key is absent, every plan is admissible. A plan outside the list is held `held-not-this-machine` | 2026-11-27 | part of option A as asked in q-xub4gdaonb; config spec "project file is not trusted for machine keys" |
 | D4 | A running plan with another machine's `host` is never started, watched or restarted here; it shows as running elsewhere. A running plan without `host` is this machine's only while its lead is live here; otherwise it is held `host-unnamed` and raised for judgement | 2026-11-27 | D4 row in §3; same pattern as `leadUnnamed` |
 | D5 | A paths land undoes its local commit when the Git door refuses the push before sending anything. Only an unknown outcome keeps the commit | 2026-11-27 | D3 row in §3, first hole |
 | D6 | A catch-up that finds local main ahead only by this checkout's own land-door commit pushes it through the existing `pushed_orphan` path. The fix goes where recognition failed, not into a new mechanism | 2026-11-27 | D3 row in §3, second hole; L10 |
@@ -111,13 +123,23 @@ land of a head's `session write` (`apps/fgos/src/wiring/session_write_publish.rs
 - 2026-11-27 15:16 (+07): the owner said "chúng ta có component identity mà". The machine name is the Identity
   machine id (D2).
 - 2026-11-27 15:25 (+07): race scouted (D7). Q1 cancelled as answered in chat. Settled.
+- 2026-11-27 15:31 (+07): the owner asked how to stop machines from taking each other's plans completely. The
+  shaper showed that A prevents a double run but not taking a plan meant for another machine, because that intent
+  lived only in per-machine config. It proposed C and dropping `admitPlans`. The owner agreed (D8, D9). No planner had
+  started (no `plan.md` cites ds-izibwo45vm), so the settled file was amended in place.
 
 ## 6. Thiết kế đã chốt {#design}
 
 A plan's claim is its admission commit on origin. A claim that is not on origin does not exist.
 
-**Admission.** The keeper on machine M (its Identity machine id) considers a `ready` plan only if
-`supervisor.admitPlans` on M is absent or matches the plan's directory. Admission then takes four steps:
+**Placement.** `host` in `plan.md` on origin is the one placement record. It holds an Identity machine id.
+
+- On a `ready` plan it is optional and means "only this machine may run it". The planner writes it when a machine is
+  named, and the secretary may set or change it.
+- On a `running` plan it is always present and means "runs on this machine". Admission writes it.
+
+**Admission.** The keeper on machine M (its Identity machine id) considers a `ready` plan only if its `host` is
+absent or equal to M. Any other plan is held as `held-other-machine:<host>`. Admission then takes four steps:
 
 1. Catch up main. If local main is ahead only by M's own earlier land-door commit, push that commit first (D6).
 2. Read `plan.md`. Refuse if it is no longer the plan that was judged (`admission-plan-stale`).
@@ -147,8 +169,8 @@ leaves it alone (D4).
 
 ```mermaid
 flowchart TD
-  R[plan ready] --> F{admitPlans on M allows it?}
-  F -- no --> H1[held-not-this-machine]
+  R[plan ready] --> F{host absent or == M?}
+  F -- no --> H1[held-other-machine]
   F -- yes --> C[catch-up: push own leftover land commit D6]
   C --> W[write status running, lead, base, host=M]
   W --> P{push}
@@ -175,17 +197,20 @@ flowchart TD
 
 ### Host on the plan record {#task-host-field}
 
-- Goal: admission writes `host` from Identity, `plan-v1` accepts it (D2), and the two-clone race test passes (D7).
-- D-IDs: D1, D2, D7. Owner: `admission` (`portfolio.rs` `admitted_text`, `wiring/supervision.rs` `admit`), plus
+- Goal: `plan-v1` accepts `host` on `ready` and `running` plans, and the check warns on an unknown machine id.
+  Admission writes `host` from Identity (D2), and the two-clone race test passes (D7).
+- D-IDs: D2, D7, D8. Owner: `admission` (`portfolio.rs` `admitted_text`, `wiring/supervision.rs` `admit`), plus
   the plan contract check.
 - Siblings: the next task reads `host`.
 - Draft verify: `cargo test -p fgos-supervision` and `node scripts/plan-contract-check.mjs`.
 
 ### Machine-aware admission and watching {#task-machine-aware}
 
-- Goal: `supervisor.admitPlans` (D3) and the three running-plan groups with `host-unnamed` (D4), plus the spec text.
-- D-IDs: D3, D4. Owner: `admission` and keeper wiring, config standard and schema, and
-  `docs/platform/supervision/spec.md`.
+- Goal: admission honours a `ready` plan's `host` (`held-other-machine`, D8, D9). Running plans fall into three
+  groups, with `host-unnamed` for the third (D4). The planner and secretary skills say when to write `host`, and
+  the spec text follows.
+- D-IDs: D4, D8, D9. Owner: `admission` and keeper wiring, `docs/platform/supervision/spec.md`, and the planner and
+  secretary skill sources under `core/skills/`.
 - Siblings: depends on the host-field task.
 - Draft verify: `cargo test -p fgos-supervision --test wake`, `cargo test -p fgos --test supervision_verbs` and
   `npm test`.
