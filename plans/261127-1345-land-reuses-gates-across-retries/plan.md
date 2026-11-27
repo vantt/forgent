@@ -5,7 +5,8 @@ status: running
 lead: session:fg-server-claude-2026-11-27
 priority: P1
 blockedBy: []
-base: 9840cdd1c
+base: 9840cdd1c915e454ce02661f74d9071f3821bd77
+created: 2026-11-27
 footprint:
   - plans/261127-1345-land-reuses-gates-across-retries/**
   - packages/supervision/rust/src/land.rs
