@@ -42,6 +42,7 @@ footprint:
   - packages/run-supervisor/contracts/envelope.v3.json
   - packages/execution/rust/src/seat_session.rs
   - packages/execution/engine/tests/transport_round.rs
+  - packages/execution/contracts/transport-round/session-attempt.v1.json
 base: dc49aa88162cbd26bbca308f337b7c1f05387a86
 source:
   - plans/discussions/ds-xb6hplcn2m-shaper-worktree/DISCUSSION.md
