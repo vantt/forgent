@@ -45,6 +45,7 @@ footprint:
   - plans/backlog/p-ixrbglli5o-the-retrospective-writer-opens-a-new-topic-for.md
   - plans/backlog.md
   - changelog.d/261127-1003-h2-step2-core-write-door.md
+  - test/cli/knowledge-attest-gate.test.mjs
 lead: head:lead-forgent-261127-1003-h2-ste-f47e4
 ---
 
@@ -212,7 +213,7 @@ it. Phase 6 measures the first two that can be measured now.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Attest records the locate result, mentions and the grow decision](phase-01-attest-records-locate-and-decision.md) | - | src/state/knowledge-registry.mjs, bin/fgos.mjs, src/cli/command-registry.mjs, test/state/knowledge-registry.test.mjs, docs/platform/work-state/contracts/knowledge-registry.md, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json | 1 | ready |
+| 1 | [Attest records the locate result, mentions and the grow decision](phase-01-attest-records-locate-and-decision.md) | - | src/state/knowledge-registry.mjs, bin/fgos.mjs, src/cli/command-registry.mjs, test/state/knowledge-registry.test.mjs, docs/platform/work-state/contracts/knowledge-registry.md, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, `test/cli/knowledge-attest-gate.test.mjs` | 1 | ready |
 | 2 | [Pointer rule unit through the context engine](phase-02-pointer-rule-unit.md) | - | core/instructions/documentation-door.md, .fgos/instructions/effective/** | 1 | ready |
 | 3 | [Specs after the context engine, and links to the build order](phase-03-spec-corrections-and-links.md) | - | docs/platform/documentation/spec.md, docs/platform/documentation/subcomponents/write-door/spec.md, docs/platform/documentation/subcomponents/document-identity/spec.md, docs/platform/proposals/documentation-system-unification.md, docs/platform/intent-preservation-ledger.md, docs/reading-map.md, plans/260925-documentation-authority-unification/plan.md | 1 | ready |
 | 7 | [Locate returns exact mentions beside the ranked candidates](phase-07-locate-returns-exact-mentions.md) | - | packages/documentation/rust/src/**, packages/documentation/rust/tests/**, packages/documentation/rust/observe-kinds.json, apps/fgos/src/wiring/doc_locate.rs | 1 | ready |
