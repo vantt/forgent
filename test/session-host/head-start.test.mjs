@@ -619,6 +619,10 @@ async function gitProject({ installation = true } = {}) {
   git('init', '-q', '-b', 'main');
   git('-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'init');
   if (installation) fs.mkdirSync(path.join(projectRoot, '.fgos', 'installation', 'bin'), { recursive: true });
+  // The worktree door requires the controller's activation fence in the project.
+  const fence = path.join(projectRoot, '.fgos', 'locks', 'activation.lock');
+  fs.mkdirSync(fence, { recursive: true });
+  fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({ lock: 'activation', by: 'fgos git', at: 'fixture' }));
   const worktrees = path.join(path.dirname(projectRoot), `${path.basename(projectRoot)}-worktrees`);
   return { projectRoot, git, worktrees, worktree: path.join(worktrees, 'ds-aaaaaaaaaa-probe'), branch: 'discussion/ds-aaaaaaaaaa-probe' };
 }

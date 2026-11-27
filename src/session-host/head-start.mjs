@@ -17,7 +17,7 @@ import { createSessionHost } from './client.mjs';
 import { grantOf, headPersonas } from './head-grants.mjs';
 import { discussionBranchOf, discussionWorktreeOf, subjectOfDir, taskOfHead } from './head-plan.mjs';
 import { inspectEntries, inspectPath } from '../util/git-paths.mjs';
-import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
+import { installationDir, resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { listAssignmentRuns, loadRunnerConfigForDir } from '../native/execution-door.mjs';
 
@@ -170,9 +170,9 @@ export async function defaultEnsureWorktree({ projectRoot, path: worktreePath, b
  * A project without an installation gets no link.
  */
 function linkInstallation(projectRoot, worktreePath) {
-  const target = path.join(projectRoot, '.fgos', 'installation');
+  const target = installationDir(projectRoot);
   if (!fs.existsSync(target)) return;
-  const link = path.join(worktreePath, '.fgos', 'installation');
+  const link = installationDir(worktreePath);
   let existing = null;
   try { existing = fs.lstatSync(link); } catch (err) { if (err.code !== 'ENOENT') throw err; }
   if (existing) {
