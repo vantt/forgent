@@ -369,7 +369,11 @@ impl AttemptDriver for HostSessionDriver<'_> {
             attempt_id: attempt_id.into(),
             unit_run_id: key.into(),
             terminal: true,
-            cwd: self.request.working_checkout().to_string_lossy().into_owned(),
+            cwd: self
+                .request
+                .working_checkout()
+                .to_string_lossy()
+                .into_owned(),
             host: Some(host),
             step_env: self.exec.step_env(),
             custody: false,

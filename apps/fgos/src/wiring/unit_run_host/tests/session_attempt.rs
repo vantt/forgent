@@ -25,7 +25,8 @@ fn a_head_session_is_launched_confined_in_its_pane_and_handed_to_a_supervisor_th
 }
 
 #[test]
-fn a_launch_with_workdir_opens_its_attempt_with_cwd_and_sandbox_root_in_the_worktree_and_fgos_in_the_project_root() {
+fn a_launch_with_workdir_opens_its_attempt_with_cwd_and_sandbox_root_in_the_worktree_and_fgos_in_the_project_root(
+) {
     hermetic(
         module_path!(),
         "a_launch_with_workdir_opens_its_attempt_with_cwd_and_sandbox_root_in_the_worktree_and_fgos_in_the_project_root",
@@ -198,9 +199,7 @@ fn session_launch_workdir() {
     assert_eq!(envelope["attemptId"], placed.attempt_id.as_str());
     assert_eq!(envelope["session"]["role"], "head:shaper-s");
     assert_eq!(envelope["session"]["persona"], "shaper");
-    let bwrap_prefix = envelope["containment"]["bwrapPrefix"]
-        .as_array()
-        .unwrap();
+    let bwrap_prefix = envelope["containment"]["bwrapPrefix"].as_array().unwrap();
     let binds_tree = bwrap_prefix.iter().any(|v| {
         v.as_str()
             .is_some_and(|s| s.contains(tree.to_str().unwrap()))
