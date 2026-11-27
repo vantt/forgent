@@ -394,12 +394,7 @@ pub fn admission_hold(plan: &Plan, done_dirs: &[String]) -> Option<&'static str>
 /// Edit only admission frontmatter through the YAML document door, preserving the phase table,
 /// notes and all other fields. The adapter publishes these bytes through the paths land door.
 /// `machine` is the admitting machine's Identity id, written as `host`.
-pub fn admitted_text(
-    text: &str,
-    role: &str,
-    base: &str,
-    machine: &str,
-) -> Result<String, String> {
+pub fn admitted_text(text: &str, role: &str, base: &str, machine: &str) -> Result<String, String> {
     let (front, _) = split_frontmatter(text).ok_or("plan-frontmatter-missing")?;
     let mut doc = parse(front.as_bytes(), Profile::Tool, "plan.md").map_err(|e| e.to_string())?;
     for (key, value) in [

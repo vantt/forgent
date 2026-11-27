@@ -466,8 +466,13 @@ fn admission_edits_only_status_lead_base_and_host_and_keeps_the_plan_body_and_no
             &body,
         )
         .replace('\n', newline);
-        let edited =
-            admitted_text(&original, "head:lead-project-plan", "abc123", "fg-box-abc123").unwrap();
+        let edited = admitted_text(
+            &original,
+            "head:lead-project-plan",
+            "abc123",
+            "fg-box-abc123",
+        )
+        .unwrap();
         let read = read_plan("p", &edited).unwrap();
         assert_eq!(read.status, "running");
         assert_eq!(read.host.as_deref(), Some("fg-box-abc123"));
@@ -483,8 +488,13 @@ fn admission_edits_only_status_lead_base_and_host_and_keeps_the_plan_body_and_no
 fn admission_adds_missing_lead_and_base_through_the_frontmatter_editor() {
     let body = format!("{HEAD}| 1 | a | - | x/ | 1 | todo |\n");
     let original = text_with("", &body);
-    let edited =
-        admitted_text(&original, "head:lead-project-plan", "abc123", "fg-box-abc123").unwrap();
+    let edited = admitted_text(
+        &original,
+        "head:lead-project-plan",
+        "abc123",
+        "fg-box-abc123",
+    )
+    .unwrap();
     assert_eq!(
         read_plan("p", &edited).unwrap().lead.as_deref(),
         Some("head:lead-project-plan")
