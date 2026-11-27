@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Plans that share a path both run; the overlap is a warning at ready and at admission, never a refusal"
-status: draft
+status: ready
 priority: P0
 blockedBy: []
 base: 43460a291440cc08dea2d814a5aeeb146b9f7e24
@@ -117,7 +117,7 @@ and a planner sets it `ready` with the remaining overlaps (Keeper's spec and ski
 |---|---|---|---|---|---|
 | 1 | [Contract check warns on cross-plan overlap (carried by Keeper)](phase-01-contract-check-warns.md) | - | scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs | 1 | withdrawn |
 | 2 | [Admission no longer holds on overlap (carried by Keeper)](phase-02-admission-advises-overlap.md) | - | packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/portfolio.rs, packages/supervision/rust/tests/wake.rs | 1 | withdrawn |
-| 3 | [Rules, docs and integration](phase-03-rules-docs-and-integration.md) | - | AGENTS.md, core/skills/_shared/plan-contract.md, core/skills/fgos-supervisor/SKILL.md, docs/platform/supervision/spec.md, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/**, .fgos/instructions/effective/rules.json, changelog.d/261126-2318-plans-that-share-a-path-both-run.md, plans/261126-2318-plan-footprint-overlap-warns/reports/** | 2 | draft |
+| 3 | [Rules, docs and integration](phase-03-rules-docs-and-integration.md) | - | AGENTS.md, core/skills/_shared/plan-contract.md, core/skills/fgos-supervisor/SKILL.md, docs/platform/supervision/spec.md, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/**, .fgos/instructions/effective/rules.json, changelog.d/261126-2318-plans-that-share-a-path-both-run.md, plans/261126-2318-plan-footprint-overlap-warns/reports/** | 2 | ready |
 
 Phases 1 and 2 are `withdrawn` here because Keeper's lead runs them (owner answer B); their phase files stay here
 as the brief, and their proofs are the acceptance criteria 1 to 3 above. Phase 3 starts only when both are on main
