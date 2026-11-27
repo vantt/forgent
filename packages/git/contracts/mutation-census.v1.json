@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "64f009953cf6175c1fd21760015fd41284f7d99b77ef49a848582d54c439fd96",
+  "payloadDigest": "bb17642439e5865ccd4301ff2a8a807b0f3e23c16c119c2d31db439c835d8b55",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -173,7 +173,7 @@
     "apps/fgos/src/wiring/run.rs": "120b3bb91acae41eb70489cac447336f36e3faa13e29cfb49d222b291e11ba0a",
     "apps/fgos/src/wiring/run_dirs.rs": "41e99631b6d8392dea048f0fc3d9ec53990eb88b710dff1cf3230d5debe817ce",
     "apps/fgos/src/wiring/seat_binding.rs": "15312c9c1d9fea319147a886829a627b73973d2b854a350b68d9b690b4f65158",
-    "apps/fgos/src/wiring/session_rotation_hook.rs": "0df4229c1c479339e804167c1eab93915034ff52af6bb05723aff2d347c332d9",
+    "apps/fgos/src/wiring/session_rotation_hook.rs": "5f6e5443893776b5db990e10959ab53fa096bda7236c732bdf797bd7149aed7c",
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
     "apps/fgos/src/wiring/session_write_publish.rs": "8f119f6281e4031530b822865402b3578c05d56db1fc7f97c8b6a512ee0625f4",
     "apps/fgos/src/wiring/start_context.rs": "7a24a7f0b0ce664ed77cb34d75ec5bb2625d31067f09ba249fecdefafc5feaf8",
@@ -1639,7 +1639,7 @@
     "src/session-host/head-plan.mjs": "bb2ea6fee98451914cc7f235a4885bf853837c6afe2ddf044329c1afb1e47763",
     "src/session-host/head-request-client.mjs": "eab9e61a4ca6e8185f7fb3d40e42ac55151bf8564ee4233a6c7f686fa032e052",
     "src/session-host/head-request.mjs": "8948a633dde0b079002f6461547da2fc9e43915eb502395bad0b3de308c3ee98",
-    "src/session-host/head-start.mjs": "f2eae822954a6354d127e2c6d37b53b0db4b8865bbe757bcb1ce5426008f6f2f",
+    "src/session-host/head-start.mjs": "5b056e3c80c917ec798916729aea1547f2d08cff4362dc3b6e196548c3fff45d",
     "src/session-host/head-stop.mjs": "6026afa06d3580296dd77697a6ee1d1331851d65322fb6a3cf3bca5c7e42079b",
     "src/session-rotation/handoff-store.mjs": "6d4593a26fa1e1cfe03e8b9fe4fa63533b118aa7c030f96d8a09e9855f691ac9",
     "src/session-rotation/rotate.mjs": "d3ef32980ddd2809f6c92832402dcf21c844dabf49c57570e102605e6ed423b9",

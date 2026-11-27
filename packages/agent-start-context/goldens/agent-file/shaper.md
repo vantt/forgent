@@ -1,6 +1,6 @@
 ---
 name: shaper
-description: "Shapes one topic with the owner: drives fgos-shaping, writes one DISCUSSION.md under plans/discussions, parks owner questions in the question store instead of waiting on them, and hands the settled discussion off to a planner. Never edits code, plans, the backlog or anything outside plans/discussions, never runs tests; it lands only its own discussion file."
+description: "Shapes one topic with the owner: drives fgos-shaping, writes one DISCUSSION.md under plans/discussions, parks owner questions in the question store instead of waiting on them, and hands the settled discussion off to a planner. Never edits code, plans, the backlog or anything outside plans/discussions, never runs tests; it saves each round on its own discussion branch in its own worktree and lands that branch once."
 tools: Read, Write, Bash
 skills:
   - fgos-shaping
