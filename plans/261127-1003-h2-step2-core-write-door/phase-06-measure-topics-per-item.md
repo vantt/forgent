@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Measure topics per retrospective item"
-status: draft
+status: ready
 dependencies: [5]
 ---
 

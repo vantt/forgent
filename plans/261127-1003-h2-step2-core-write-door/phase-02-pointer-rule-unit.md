@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Pointer rule unit through the context engine"
-status: draft
+status: ready
 dependencies: []
 ---
 

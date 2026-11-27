@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Shared write-door procedure; the knowledge skill calls it"
-status: draft
+status: ready
 dependencies: [1, 7]
 ---
 

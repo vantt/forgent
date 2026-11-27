@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Integrate, land, retire the draft plan"
-status: draft
+status: ready
 dependencies: [1, 2, 3, 4, 7]
 ---
 

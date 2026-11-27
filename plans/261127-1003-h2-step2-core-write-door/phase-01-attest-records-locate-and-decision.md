@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Attest records the locate result, mentions and the grow decision"
-status: draft
+status: ready
 dependencies: []
 ---
 

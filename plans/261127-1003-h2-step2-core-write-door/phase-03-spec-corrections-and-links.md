@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Specs after the context engine, and links to the build order"
-status: draft
+status: ready
 dependencies: []
 ---
 

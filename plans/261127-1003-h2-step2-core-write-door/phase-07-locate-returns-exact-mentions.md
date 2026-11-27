@@ -1,7 +1,7 @@
 ---
 phase: 7
 title: "Locate returns exact mentions beside the ranked candidates"
-status: draft
+status: ready
 dependencies: []
 ---
 
