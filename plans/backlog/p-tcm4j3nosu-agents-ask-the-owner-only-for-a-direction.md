@@ -1,7 +1,7 @@
 ---
 id: p-tcm4j3nosu
 title: "Agents ask the owner only for a direction: one shared when-to-ask rule replaces the file-and-budget frame (skills, priority P1; source: discussion ds-jxoz3h2qgk, owner order 2026-11-27 via lead:SUPERVISOR)"
-status: in-flight
+status: done
 priority: P1
 area: skills
 created: 2026-11-27

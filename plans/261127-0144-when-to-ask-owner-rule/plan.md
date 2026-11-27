@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "When to ask the owner: one shared rule (intent, deviation, reverse path) replaces the file-and-budget approved frame"
-status: running
+status: done
 priority: P0
 blockedBy: []
 footprint:
@@ -105,7 +105,7 @@ keeps working, and the places that told an agent to ask the owner for something 
 |---|---|---|---|---|---|
 | 1 | [Write the rule and repoint the askers](phase-01-rule-and-askers.md) | - | core/skills/_shared/decision-question.md, core/instructions/decision-question-template.md, core/skills/_shared/coordination-driver.md, core/skills/_shared/plan-contract.md, core/skills/fgos-lead/SKILL.md, core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-secretary/SKILL.md, domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md, core/agents/secretary.yaml, core/agents/supervisor.yaml, core/agents/shaper.yaml, .claude/agents/secretary.md, .claude/agents/supervisor.md, .claude/agents/shaper.md, docs/platform/questions/spec.md, test/docs/rul11-anchor-phrase.test.mjs, AGENTS.md, .fgos/instructions/effective/**, packages/git/contracts/mutation-census.v1.json, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 1 | done |
 | 2 | [Re-judge the 163 questions against the rule](phase-02-rejudge-evidence.md) | 1 | plans/261127-0144-when-to-ask-owner-rule/reports/rejudge/** | 2 | done |
-| 3 | [Integration: changelog and full gate](phase-03-integration.md) | 1, 2 | CHANGELOG.md, plans/261127-0144-when-to-ask-owner-rule/reports/integration/**, `packages/agent-start-context/goldens/NOTES.md` | 3 | draft |
+| 3 | [Integration: changelog and full gate](phase-03-integration.md) | 1, 2 | CHANGELOG.md, plans/261127-0144-when-to-ask-owner-rule/reports/integration/**, `packages/agent-start-context/goldens/NOTES.md` | 3 | done |
 
 Capabilities: phase 1 `code:implement`, phase 2 `code:review`, phase 3 `code:test`.
 
