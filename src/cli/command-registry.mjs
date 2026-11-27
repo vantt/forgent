@@ -2723,7 +2723,7 @@ export const COMMAND_REGISTRY = [
   },
   withSubcommands({
     name: 'session',
-    invoke: 'fgos session <start|rotate|stop|list|write|read|type>',
+    invoke: 'fgos session <start|rotate|stop|list|write|save|read|type>',
     description: 'Agent head sessions: "read" shows the last lines of a session\'s screen and "type" types into a stuck session\'s pane (both served natively by the Rust host); "start" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; "rotate" asks for its replacement by a successor that reads a redacted handoff; "stop" ends a head on purpose; "write" replaces a file of a confined head\'s grant (the secretary\'s backlog items) through its supervisor. "list" reads live, sleeping and retired heads without writing. From inside a confined head these verbs go through its request socket.',
     subcommands: {
       start: {
@@ -2788,6 +2788,19 @@ export const COMMAND_REGISTRY = [
           required: ['path'],
         },
         examples: ['fgos session write plans/backlog/<id>-<slug>.md < "$TMPDIR/item.md"'],
+      },
+      save: {
+        description: 'From inside a confined shaper: commit exactly the named paths of its own linked worktree on the branch it has checked out. The head\'s supervisor checks that the working checkout is a linked worktree (save-needs-linked-worktree otherwise), that every path lies inside the head\'s write grant (path-outside-grant) and makes one commit as the head\'s writer; nothing is fetched, pushed or merged. Refused save-nothing-to-commit when the paths have no change. Prints committed <sha>.',
+        parameters: {
+          type: 'object',
+          properties: {
+            paths: { type: 'array', items: { type: 'string' }, description: 'Positional: one or more project-relative paths to commit, each inside the head\'s write grant.' },
+            message: { type: 'string', description: 'The commit message.' },
+          },
+          positional: ['paths'],
+          required: ['paths', 'message'],
+        },
+        examples: ['fgos session save plans/discussions/<slug>/DISCUSSION.md --message "docs(discussion): settle the options"'],
       },
       read: {
         description: 'Read-only: the last lines of a session\'s screen. The target is a role, handle or slot key that Identity resolves to one live session, never a raw pane id; the lines are capped by the terminal-control contract.',
