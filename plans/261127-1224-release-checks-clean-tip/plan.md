@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Release checks run on a clean, exact checkout of the trunk tip they release"
-status: draft
+status: ready
 priority: P0
 blockedBy: []
 base: 9077b11189eb9e0056db399809818d4e9c00cb04
