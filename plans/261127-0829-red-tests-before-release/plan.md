@@ -6,6 +6,12 @@ priority: P0
 blockedBy: []
 base: ef582e2304c7bd878c8d483e70eeee6d98fd3390
 footprint:
+  - scripts/run-rust-dev-host.mjs
+  - test/rust-host/help-routes.test.mjs
+  - test/rust-host/dev-host.test.mjs
+  - test/scripts/run-rust-dev-host-staging.test.mjs
+  - test/distribution/native-addon.test.mjs
+  - plans/261127-0829-red-tests-before-release/reports/phase-05/**
   - plans/261127-0829-red-tests-before-release/**
   - src/runner/dispatch/provider-capacity.mjs
   - src/runner/dispatch/provider-credential-renewal.mjs
@@ -96,6 +102,7 @@ owners.
 | 2 | [Per-CLI credential source reds](phase-02-credential-source-reds.md) | 1 | src/runner/dispatch/provider-capacity.mjs, src/runner/dispatch/provider-credential-renewal.mjs, src/runner/dispatch/provider-credential-probe.mjs, src/runner/dispatch/confinement/drivers/bwrap.mjs, src/runner/dispatch/confinement/resources.mjs, test/runner/provider-per-cli-credential-sources.test.mjs, plans/261127-0829-red-tests-before-release/reports/phase-02/** | 2 | done |
 | 3 | [Workflow guide schema reds](phase-03-guide-schema-reds.md) | 1 | src/workflow/guide-schema.mjs, src/workflow/loader.mjs, src/workflow/definition.mjs, domains/coding/workflows/bugfix.yaml, test/workflow/guide-schema.test.mjs, plans/261127-0829-red-tests-before-release/reports/phase-03/** | 2 | done |
 | 4 | [Full release checks on the combined tree](phase-04-full-release-checks.md) | 2, 3 | plans/261127-0829-red-tests-before-release/reports/phase-04/** | 3 | ready |
+| 5 | Dev-host tests leave the real store alone (owner frame: the red that blocks the release; added by lead:SUPERVISOR 2026-11-27 09:35, event 2efcb8636c99ecf9) | 4 | scripts/run-rust-dev-host.mjs, test/rust-host/help-routes.test.mjs, test/rust-host/dev-host.test.mjs, test/scripts/run-rust-dev-host-staging.test.mjs, test/distribution/native-addon.test.mjs, plans/261127-0829-red-tests-before-release/reports/phase-05/** | 4 | ready |
 
 **Progress (2026-11-27):** phase 1 found every listed file and cargo test green at `3798e58647`; phases 2 and 3 closed with no code change ([verdict](reports/phase-01/verdict.md)).
 
