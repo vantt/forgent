@@ -1,7 +1,7 @@
 ---
 id: p-lfsc4czpgh
 title: Widening a running plan's footprint has no door; a planner cannot start for a plan without a discussion, and the footprint lives in two places
-status: proposed
+status: done
 priority: P1
 area: supervision
 created: 2026-11-25
