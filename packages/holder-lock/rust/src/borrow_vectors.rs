@@ -379,6 +379,12 @@ fn vector(name: &str, git: &Path, helper: &HelperExe, dir: &Path) -> VectorResul
                 let control = dir.join("gc-control");
                 init_repo(git, &control)?;
                 config(git, &control, "gc.auto", "1")?;
+                // The control gc must not outlive its commit: callers keep the vectors'
+                // directory and check that no process remains in it. Running it in the
+                // foreground means it has exited when the commit returns; the pre-auto-gc
+                // marker still proves the vector is exercised.
+                config(git, &control, "gc.autoDetach", "false")?;
+                config(git, &control, "maintenance.autoDetach", "false")?;
                 add_loose_objects(git, &control)?;
                 let marker = install_gc_marker_hook(&control)?;
                 let mut unswitched = git_plain(git, &control);
