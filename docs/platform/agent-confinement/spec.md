@@ -698,6 +698,65 @@ chỉ chặn đọc qua mount view của worker bị confine (một agent tươn
 cách user và đọc được mọi thứ user đọc được, xem Secrets §7.3); và không che khỏi chính runner,
 nơi duy nhất cần đọc các file này.
 
+### 9.4 Toolchain cache — cargo và rustup của chủ máy, chỉ đọc
+
+Một private `HOME` không có toolchain. Đo 2026-11-27 trong một phiên bị confine: unit chạy bằng
+home riêng (invocation có `homeEnv: HOME`, vd. agy) thấy `~/.cargo` và `~/.rustup` trống, nên
+rustup tự đi tải toolchain (`info: syncing channel updates for 1.99.0`) và cargo đứng chờ vô hạn ở
+lời nhắc credential của dependency git riêng tư `pkm` (`git = "https://github.com/vantt/pkm"`
+trong `Cargo.lock`, từ `c7b66be3cf`). Hai unit treo 22-25 phút ngày 2026-11-26/27 (backlog
+`p-ymhj4xcf6x`). Unit giữ `HOME` thật (claude, riêng tư hoá `CLAUDE_CONFIG_DIR` thay vì `HOME`)
+thì thấy `~/.cargo` thật chỉ đọc qua `--ro-bind / /`; unit có home riêng thì không thấy gì. Trước
+mục này không code nào trên cửa sống truyền toolchain vào home của unit.
+
+Resolver thêm resource `toolchain-cache` **không cần grant** (cùng loại với `launch-program`): nó
+là dữ kiện của host, không phải thứ ai xin. Hai mục:
+
+- **cargo home**: `$CARGO_HOME` của tiến trình host khi là đường dẫn tuyệt đối, nếu không
+  `<home>/.cargo`.
+- **rustup home**: `$RUSTUP_HOME` của tiến trình host khi là đường dẫn tuyệt đối, nếu không
+  `<home>/.rustup`.
+
+`<home>` là `home_dir` của resolver input, home của user host, không bao giờ là private home của
+một dispatch. Mỗi thư mục chỉ được resolve khi nó tồn tại, là thư mục, và nằm ngoài mọi
+machine-private root (§9.3) lẫn mọi confinement root; không qua phép thử đó thì không có mount và
+không có biến. Host không có Rust thì không nhận gì. Đường dẫn được canonicalize qua cửa real-path
+sẵn có rồi `--ro-bind` **trên chính đường dẫn của nó**: bind chỉ đọc tường minh, không chỉ dựa vào
+`--ro-bind / /`, để cache vẫn chỉ đọc dưới một grant ghi được mà đường dẫn chứa nó. Driver
+materialize mount của resource này sau mọi mount ghi được, cùng nhóm với các mount bind-back.
+
+Biến đi kèm resource, nên host hay golden vector không có hai thư mục giữ argv và env nguyên từng
+byte: cargo home đặt `CARGO_HOME=<path>`, `CARGO_NET_OFFLINE=true` và `GIT_TERMINAL_PROMPT=0`;
+rustup home đặt `RUSTUP_HOME=<path>`. Biến áp cho mọi launch bị confine bất kể `homeEnv`, vì một
+unit giữ `HOME` thật với cargo online và cache chỉ đọc vẫn sẽ đi fetch revision thiếu.
+`CARGO_NET_OFFLINE` và `GIT_TERMINAL_PROMPT` là một phần contract env của worker
+(`packages/run-supervisor/contracts/worker-env-allowlist.v1.json`), như `FGOS_CONFINED`;
+`CARGO_HOME` và `RUSTUP_HOME` đã có trong danh sách đó.
+
+**Đo (2026-11-27, trong một phiên bị confine).** Private `HOME`, với `CARGO_HOME` và `RUSTUP_HOME`
+trỏ vào hai thư mục thật và chỉ đọc, `CARGO_NET_OFFLINE=true`, `GIT_TERMINAL_PROMPT=0`:
+`cargo fetch --locked` thoát 0 trong 0,1 s, và `cargo check -p fgos-agent-context-engine --locked`
+biên dịch `pkm-core v0.7.1 (…pkm?tag=v0.7.1#e4ff89bb)` xong trong 8,9 s. Một cargo home chỉ đọc
+là đủ: lock `.package-cache` và `.global-cache` không cần ghi. Cùng thiết lập với `CARGO_HOME`
+rỗng: thoát 101 sau 0,04 s với `failed to get pkm-core … unable to update
+https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb … you are in the offline mode (--offline)`.
+
+**Thiếu revision trong cache.** Unit thấy đúng lỗi offline của cargo, nêu tên dependency, URL,
+revision và chế độ offline; fgOS không bọc thêm lời nào. Cách khắc phục: người chạy ngoài sandbox
+(chủ máy, hoặc lead:SUPERVISOR) chạy `cargo fetch --locked` trong checkout để làm đầy cache rồi
+chạy lại unit. Một unit tự thêm crate mới vào `Cargo.toml` vì vậy cần lần fetch đó trước: nó không
+tự fetch được, đúng phi mục tiêu "unit không có credential" và "không gì ghi vào cache thật của
+chủ máy".
+
+**Lịch sử quyết định:** 2026-11-27, owner order (P0, product mechanism): confined units compile the
+workspace offline from the owner's read-only cargo/rustup cache; no credentials, no vendoring
+(`ds-wfukp6t6mi`, `p-ymhj4xcf6x`).
+
+**Node twins không mang resource này.** `src/runner/dispatch/confinement/**` là test-only, golden
+vector của chúng dùng đường dẫn cố định không tồn tại nên giữ nguyên từng byte, và plan
+`261124-1853-confinement-to-rust` xoá chúng; cửa sống của cơ chế này là
+`packages/execution/engine/src/confinement/policy/resolver.rs`.
+
 ## 11. Proof và Definition of Done
 
 ### 11.1 Contract tests
@@ -828,4 +887,5 @@ Nguồn duy nhất của grant theo persona là `GRANTS` trong `src/session-host
 - `src/runner/dispatch/herdr-round.mjs`: enforcement session/home hiện tại. (retired; last at `85760c6f2`)
 - `src/setup/registrations.mjs`: doctor checks liên quan.
 - `.fgos/config.json`: các invocation bwrap (cli-spawn và herdr-spawn) khai `confinement.backend`; invocation confine có account khai thêm `credentialStore` (§13.1).
+- `packages/execution/engine/src/confinement/policy/resolver.rs`: resource `toolchain-cache` — cargo home và rustup home của chủ máy, chỉ đọc, kèm `CARGO_HOME`, `RUSTUP_HOME`, `CARGO_NET_OFFLINE`, `GIT_TERMINAL_PROMPT` (§9.4).
 - `docs/platform/runner/contracts/routing-handoff.md`: worktree containment không phải sandbox.
