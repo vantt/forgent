@@ -1,7 +1,7 @@
 ---
 id: p-vspcgis5e3
 title: "Land is slow on a busy trunk: every retry runs every gate again in a candidate that compiles the whole workspace (supervision, priority high; source: owner, 2026-11-27)"
-status: in-flight
+status: done
 priority: P1
 area: supervision
 created: 2026-11-27
