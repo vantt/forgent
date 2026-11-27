@@ -11,23 +11,25 @@ discussion: open
 
 ## 1. Trạng thái hiện tại
 
-Round 1 (2026-11-27, shaper `head:shaper-gateway-cluster`). Nothing is settled yet.
+Round 2 (2026-11-27 16:05). Nothing is minted yet; the owner's role statement below is held as the frame for the next
+rounds.
 
-What round 1 found: the delay the owner feels is the git sync timer, not git itself. Every cross-machine event
-(mail, work, plan claim) rides `refs/fgos/events/<machine-id>` and is seen by another machine only after that
-machine's own fetch timer fires (60 s here, 300 s by default); an empty fetch costs 0.64 s. The gateway has not run on
-fg-server since 2026-10-25 and today has no cross-machine role at all.
+The owner restated the gateway's role (§5, 16:05): it is the **remote entry door** — it takes requests from outside and
+calls the verbs inside (verb relay) — and it now also **talks to other gateways** and acts as a **changes broadcast**:
+a change is pushed to the other machines fast, persistence (git) follows slower, and the two must never produce an
+error. **One gateway per machine**, so serving many projects across many machines is a design concern, not an
+afterthought.
 
-The shaper's lead proposal (not settled): the first slice of the cluster is a **doorbell** — a gateway tells its peers
-"machine ref X moved, fetch now" — so content and truth stay in git and the delay falls to about one fetch.
+This answered Q1 in direction: the change itself travels ahead, not only a doorbell. `q-vgjluy2gzf` is cancelled.
+What is open now:
 
-Open owner questions (parked in the question store):
+- How "never an error" holds when the fast copy and the persistent copy meet (shaper proposal in §3, row "No-error
+  rule"; asked of the owner in chat).
+- What "a change" covers: event-store events only, or also file content such as `plan.md` (§3).
+- Q2 `{#Q2}` — `q-pke5ht4y5e`: which network the machines share (still parked).
+- Today's gateway is per project (one root, fixed port 4170), so one-per-machine needs a project registry (§3).
 
-- Q1 `{#Q1}` — `q-vgjluy2gzf`: what a coordination event may carry ahead of git: doorbell (recommended), the event
-  itself, or a live coordinator.
-- Q2 `{#Q2}` — `q-pke5ht4y5e`: which network the machines share, so gateways can reach each other.
-
-Not blocked by them, next round: the component split (§3, row "Component split"), and the delay measurement.
+Q1 `{#Q1}` — cancelled 2026-11-27 16:05, answered in chat (§5).
 
 Handed off, outside this discussion: restarting today's gateway on fg-server needs an unconfined session (this head is
 confined; `fgos gateway start` refused with `.fgos/locks/gateway.lock: Read-only file system`).
@@ -42,13 +44,21 @@ chồng lấp. ví du: mailbox quá chậm, events đi quá chậm, điều ph�
 phối plan/task được nhịp nhàng hơn (tất nhiên thông tin sự thật vẫn được lưu trữ trên file plan) nhưng có thể dữ liệu
 sẽ đi trước bằng sự kiện điều phối trước."
 
-The whole picture: the fgOS gateway (`apps/fgos-gateway`, one binary serving REST, MCP and the web dashboard) is down
-and has grown as one 2,900-line module; the owner wants it back, split into components that each own one job, and
-turned into the layer that joins machines. Gateways on the owner's machines (fg-server, fg-server2, design-lap) form
-one cluster; through it many projects coordinate across machines without stepping on each other; and its first job is
-speed — coordination signals (mail, events, plan/task placement) reach the other machines in about a second instead of
-a timer period. The truth stays where it is: the plan file and the event store's git refs (L1, L3). The gateway only
-lets a signal arrive before that truth is fetched, so a machine knows to look now.
+Owner, 2026-11-27 16:05 (verbatim): "gateway là cổng vào remote, nó chình là đứa nhận request ngoài và gọi verb
+bên trong, giờ thì nó thêm vai trò trao đổi với gateway khác, mỗi máy nên chỉ cần 1 gateway, nên việc quản nhiều
+project accross nhiều máy là phải cân nhắc khi thiết kế, ngoài việc nó là verb relay, nó giờ sẽ là changes broadcast
+(giúp thay đổi được đẩy nhanh, còn persistent thì sẽ chậm hơn, nhưng ko được phát sinh lỗi)"
+
+The whole picture: the fgOS gateway (`apps/fgos-gateway`) is the remote entry door of a machine. It takes requests
+from outside (REST, MCP, the web dashboard) and relays them to verbs inside. It is down today and has grown as one
+2,900-line module; the owner wants it back and split into components that each own one job. Each machine runs exactly
+one gateway, which serves every fgOS project on that machine. The gateways of the owner's machines (fg-server,
+fg-server2, design-lap) join one cluster and gain a second role besides verb relay: changes broadcast. When something
+changes on one machine (mail, an event, a plan or task being claimed), the change reaches the other machines in about a
+second instead of a timer period, so coordination stays smooth and never overlaps. Persistence keeps its current path
+and is allowed to be slower: the plan file and the event store's git refs stay the truth (L1, L3). The fast copy and
+the persistent copy must never contradict each other or cause an error when they meet. The first use is plan/task
+coordination.
 
 ## 3. Vấn đề rõ / chưa rõ
 
@@ -62,12 +72,16 @@ lets a signal arrive before that truth is fetched, so a machine knows to look no
 | The gateway spans projects; fgOS core acts on one project | observed | commit 27b622317 |
 | How cross-machine data moves today | observed | Event store: events sealed on a cadence into `refs/fgos/events/<machine-id>`, machines push their own ref and fetch the others; "no online coordinator" (owner 2026-10-17) — `docs/platform/event-store/spec.md` sections 1, 12, 14. Remote mail is an event on `project:mailbox` (`remote-recorded`) — `docs/platform/agent-mailbox/spec.md` |
 | Where the delay comes from | observed (cause), not yet measured end to end | `eventStore.sync.intervalSec` is 60 here (owner 2026-11-06: "mail should arrive in about a minute; an empty fetch measured 0.64 s"), default 300; `eventStore.seal.coalesceSec` 30. So a cross-machine hop waits up to seal + one timer period on the sender and one on the receiver. The git work itself is under a second |
-| What a coordination event may carry ahead of git | open — **Q1** `q-vgjluy2gzf` | Shaper proposes a doorbell first (§1); payload-ahead and online coordinator are the alternatives |
+| The gateway's roles | owner-stated 2026-11-27 16:05, held for a second round before a D-ID | (1) remote entry door and verb relay (exists: `FgosCliGateway` spawns `fgos` verbs, `apps/fgos-gateway/src/gateway.rs:361`; `remote_invocation.rs` relays one in-process operation); (2) exchange with other gateways; (3) changes broadcast. Not an online coordinator: no leases or arbitration (event-store spec: no online coordinator, owner 2026-10-17, untouched) |
+| What travels ahead of git | owner-stated: the change itself, not only a doorbell; Q1 `q-vgjluy2gzf` cancelled | §5 16:05 |
+| No-error rule (fast copy vs persistent copy) | shaper proposal, asked in chat 16:10 | Broadcast the **exact acked event bytes** with their event hash, never a second representation. The receiver keeps them in a fast, rebuildable cache keyed by hash; when git brings the sealed event it has the same hash, so the union by hash (event-store spec sections 10-11) folds it once and the cache entry drops. An event whose causal predecessor has not arrived is deferred exactly as the store already defers it (causal closure, section 12). Concurrency stays "provisional, conflict recorded by the consumer" as today. A broadcast lost or never sent costs only speed: the timer sync still delivers. Nothing the broadcast carries is ever written to a ref by the receiver |
+| What "a change" covers | open, asked next | Events (mail, work, questions, plan claim) fit the rule above. A file such as `plan.md` is git content, not an event; the shaper proposes it travels as an event ("plan X claimed by Y at commit Z") while the file itself keeps the git path |
+| One gateway per machine vs today | observed | Today one gateway serves one project: `run(root)` and `FgosCliGateway { root }` (`gateway.rs:1394-1408`), lock `.fgos/locks/gateway.lock` and logs under that project's `.fgos/`, fixed port 4170 (`gateway.rs:1935`); a second project on the same machine collides on the port. One-per-machine needs a machine-level home (state under `~/.fgos`, not a project's `.fgos`) and a registry of the machine's projects, each request and each broadcast naming its project |
 | Network path between machines | open — **Q2** `q-pke5ht4y5e` | Gateway binds 0.0.0.0:4170; Cloudflare Access support exists; LAN/VPN unknown |
 | Trust between cluster members | observed, reusable | Identity holds confirmed per-machine ssh-ed25519 pins (`fgos identity pins`, e.g. `design-lap-iezwlz` confirmed 2026-10-25); a peer link can authenticate with them |
 | Plan placement and admission travel only through git pushes of `plan.md` | observed | `ds-izibwo45vm`, plan `261127-1535-plan-claim-who-and-where`; a gateway signal would run ahead of this, never replace it |
-| Component split | open, next round | Shaper's first cut, to discuss: (1) peer link and membership (who is in the cluster, authenticated by Identity pins); (2) coordination bus (the doorbell and later signals; one message type at first); (3) API surface (REST + MCP, today's routes); (4) dashboard (web bundle). Which of these is a crate vs a module, and which component row owns each, is not decided; `fgos authority locate` to run once the shape holds |
-| Many projects on one gateway | open, next round | The event store and mailbox are per project (per clone); the gateway is per machine. A doorbell names project + machine ref, so one gateway can ring for every project on its machine |
+| Component split | open, next round | Shaper's first cut, to discuss: (1) peer link and membership (who is in the cluster, authenticated by Identity pins); (2) changes broadcast (send and receive the acked events; the fast cache on the receiving side); (5) project registry (which projects this machine serves); (3) entry door and verb relay (REST + MCP, today's routes); (4) dashboard (web bundle). Which of these is a crate vs a module, and which component row owns each, is not decided; `fgos authority locate` to run once the shape holds |
+| Many projects on one gateway | open, next round | The event store and mailbox are per project (per clone); the gateway becomes per machine. Every broadcast and every relayed request names its project; how projects are identified across machines (same repo cloned on several machines vs different repos) is not decided |
 
 ## 4. Quyết định đã chốt
 
@@ -79,6 +93,13 @@ lets a signal arrive before that truth is fetched, so a machine knows to look no
 - 2026-11-27 16:10 — Shaper round 1 scouted the gateway, event store and mailbox specs and the live gateway state
   (findings in §3). Parked Q1 (what may travel ahead of git) and Q2 (network between machines) in the question store.
   Q1 = `q-vgjluy2gzf`, Q2 = `q-pke5ht4y5e`.
+- 2026-11-27 16:05 — Owner (verbatim in §2): the gateway is the remote entry door and verb relay; it now also exchanges
+  with other gateways; one gateway per machine, so many projects across many machines must be designed for; besides
+  verb relay it becomes a changes broadcast, pushing changes fast while persistence follows slower, with no error
+  allowed. Read as: Q1 answered in direction (the change travels, not only a doorbell); Q1 cancelled.
+- 2026-11-27 16:10 — Shaper: confirmed in code that today's gateway is per project (one root, fixed port 4170).
+  Proposed the no-error rule (same bytes, same hash, union by hash, deferral by causal closure) and asked the owner in
+  chat what "a change" covers.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -86,14 +107,17 @@ Nothing settled yet. Working sketch for the next round, not a decision:
 
 ```mermaid
 flowchart LR
-  subgraph M1[machine A]
-    ES1[event store seal/push] -->|ref moved| G1[gateway: coordination bus]
+  X[outside: REST, MCP, dashboard] --> D1
+  subgraph M1[machine A: one gateway]
+    D1[entry door / verb relay] --> V1[fgos verbs of project P]
+    ES1[event store of P: append + ack] -->|acked event bytes + hash| B1[changes broadcast]
   end
-  subgraph M2[machine B]
-    G2[gateway: coordination bus] -->|fetch now| ES2[event store fetch]
+  subgraph M2[machine B: one gateway]
+    B2[changes broadcast] --> C2[fast cache, keyed by hash]
+    ES2[event store of P: fetch, union by hash] --> C2
   end
-  G1 <-->|peer link, Identity pins| G2
-  ES1 -. git remote: content and truth .-> ES2
+  B1 <-->|peer link, Identity pins| B2
+  ES1 -. git: seal, push, fetch - truth, slower .-> ES2
 ```
 
 ## 7. Danh mục hạng mục / task {#tasks}
