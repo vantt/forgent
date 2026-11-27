@@ -33,3 +33,9 @@
   supervisor is asked to commit and land it.
 - A lead cannot merge the trunk into a worktree: `--sync` is dropped by the request door (unit c-35716-1795804977920
   recorded no syncBase), and a sync-only run is refused `bad-args`.
+- 02:50: phase 4 done. Main carries it as p04b (95edb146c4; f835f65466 and 5de79938b2), which meets the phase file:
+  nine steps, no `rg` search left in the knowledge skill, the guide refers to the fragment, generated copies match. The
+  lead's own p04 branch (d71de0627e, 2cf9afa830) is superseded and went to the supervisor for removal. The live proof
+  point (phase 4 step 5) moves to phase 5, because no unit sandbox can run `fgos doc locate`.
+- Phase 3 waits on owner question q-fzcovlnz5u: the plan contract hook refuses any edit to the legacy H1 plan, so
+  criterion 5's fifth link cannot be landed. The edit stays uncommitted in worktree p03x.
