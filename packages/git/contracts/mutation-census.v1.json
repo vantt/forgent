@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "163b8ac1d3786051beb86a53e522895e5251674023c443888d97b687fb296dc0",
+  "payloadDigest": "09e529df0f85cd819390fdeedfff14000c7aba977751d42aea6c0f5ada985bb7",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -322,7 +322,7 @@
     "packages/agent-context-engine/rust/tests/check.rs": "176a43857dc97c3a28a004b2fbc884a31509774d5efa2a1b0204d63cbbd456f9",
     "packages/agent-context-engine/rust/tests/common/mod.rs": "84d1b7d619deabbd6c9575b1b29e90c5b9547050f13aff97c2068e55ce9cc8d2",
     "packages/agent-context-engine/rust/tests/compose.rs": "d6ad2d4d94431fea5c95e8c1f523977cf9126c99c32181899680831c9063b356",
-    "packages/agent-context-engine/rust/tests/repository_units.rs": "30c3da5a7b9141d649fd4f9e6cdfd2875de3be348e20ee246ffc9591dbaf8160",
+    "packages/agent-context-engine/rust/tests/repository_units.rs": "87ca88859faf1ba70e689a9f90720faaac6ad01abab5bccf4633f0c72153e229",
     "packages/agent-context-engine/rust/tests/rule_unit.rs": "69729dfd4c0aaff218d9b9ad20fec5222dfb1eaa895395a832d79a011cbd2bff",
     "packages/agent-context-engine/rust/tests/set.rs": "fd11e03186938a9c6aa43e8ca43de17e5e84566811b82af6b7193ae35510fa66",
     "packages/agent-context-engine/rust/tests/store.rs": "8e34b6eeb48cbc7e762c15cc7b7eb2ece0b27219775af28725a1389425a98bfe",
