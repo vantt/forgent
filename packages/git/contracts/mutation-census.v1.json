@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ac2184cbd94674b71d34f656ebbfc04fdcf83baf748718a7d0a55d4fcd16cbc1",
+  "payloadDigest": "14733f7f44f261bb86cc0650825a16fd9b4804bac20035886c453aa1fdd552b6",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -1483,7 +1483,7 @@
     "scripts/merge-test-shards.mjs": "bd5868bb24fd51a042ddabca60d8a3d5bca12c33b4837e54fb19fbfe10001c77",
     "scripts/ort-static.mjs": "306426ce23822f5187c447fd07f30fc150181e7c1539b7f5a38d5d6645b0d4b2",
     "scripts/package-release-assets.mjs": "60efb629a7ebfe1143445557c55abfa4b3269286a0498754a28dddb662a70fd0",
-    "scripts/plan-contract-check.mjs": "471c1241e80b4dabba42b641c7720d7acfd7c45b7ab811b9724a9c3579263dbb",
+    "scripts/plan-contract-check.mjs": "c0e0d532be8a60858b921ee2b6e44e1de774578d54b77c099e8f635a30071b96",
     "scripts/prepare-release.mjs": "9bfc454f0a5c90f4ad121c107fbe16f16d7e60a5f03e7c1b35641ce3bc561c69",
     "scripts/previous-release-tag.mjs": "d79809904f630061da723099f65817f18367462d1d9d64982426c58eb05d6a0f",
     "scripts/probe-storytelling-material.mjs": "b2991c1c14879193953d901e9122a9e511136a91907949643b7f1af008590df4",
@@ -1565,7 +1565,7 @@
     "src/observe/approve-fault-log.mjs": "af55301c604981f0ec98ffe3d9728d4f894c8f9eb3afa8498ce9d56d70b6c629",
     "src/observe/friction-client.mjs": "5dc0e5ca5a244d5ac4aa3a9657f1bf07ad2fcb369ccdfcd167cb969ed20c5344",
     "src/observe/invocation-fault-log.mjs": "e5ca8dd3056020a429df66e96e6266e04525fffa9ef16e9d08975d3930c4ba75",
-    "src/portfolio/plan-sections.mjs": "b82ac15fb1de756935230f3c973ea136447ba5e425473624a3748953bb95a374",
+    "src/portfolio/plan-sections.mjs": "b1dd414eb28b521d9f57dcb0cf2fa57d0b23b7a57bf63f1ff48e802fa96516a2",
     "src/report/authoritative-match.mjs": "4678762776ac5a748426cee142ab90a474f479374205d3997a5cb92e26277a1c",
     "src/report/capability-plan-lint.mjs": "d0e7415bb9086937024205d2104fbbc0ce075e8e07c646e9448235fa97727ee1",
     "src/report/context-render.mjs": "c93dd1f0336bb92cb02b42b60a837708298f7c92b0c451e97cd324f5329df25c",
@@ -4630,6 +4630,13 @@
         "scripts/git/e3-bench.mjs:459"
       ],
       "class": "sandbox-door"
+    },
+    {
+      "path": "scripts/plan-contract-check.mjs",
+      "line": 258,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
     },
     {
       "path": "scripts/record-mailbox-hook-fixtures.mjs",
