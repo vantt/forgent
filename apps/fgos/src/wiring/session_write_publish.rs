@@ -19,8 +19,8 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use fgos_config::detect::PathDetectors;
 use fgos_git::{
-    GitDriver, HeadFact, Ignored, Inspect, RemoteGrant, RepoHandle, ResolveRepo, Submodules,
-    Untracked,
+    CommitRequest, GitDriver, HeadFact, Ignored, Inspect, RemoteGrant, RepoHandle, ResolveRepo,
+    ResultCode, Submodules, Untracked,
 };
 use fgos_run_supervisor::route::{CatchUpRefusal, PublishRefusal, WritePublisher};
 use fgos_supervision::land::{
@@ -53,6 +53,81 @@ pub fn publisher() -> WritePublisher {
         path_clean: std::sync::Arc::new(path_clean),
         path_oid: std::sync::Arc::new(path_oid),
         publish: std::sync::Arc::new(publish),
+        save: std::sync::Arc::new(save),
+    }
+}
+
+/// Commits exactly `paths` of the linked worktree `checkout` on its checked-out branch with `message`, as `writer`:
+/// one ScopedCommit over the literal paths. Nothing is fetched or pushed and no merge slot is taken. A commit that
+/// changes nothing is refused `save-nothing-to-commit`.
+fn save(
+    checkout: &Path,
+    paths: &[String],
+    message: &str,
+    writer: &str,
+) -> Result<String, PublishRefusal> {
+    let (state, _) = fgos_holder_lock::state_root();
+    save_in(&state, checkout, paths, message, writer)
+}
+
+fn save_in(
+    state: &Path,
+    checkout: &Path,
+    paths: &[String],
+    message: &str,
+    writer: &str,
+) -> Result<String, PublishRefusal> {
+    let driver = GitDriver::new(state).map_err(|e| refusal("save-git-unavailable", e.cause))?;
+    let repo = match driver
+        .resolve_repo(checkout, checkout)
+        .map_err(|e| refusal("save-git-unavailable", e.cause))?
+    {
+        ResolveRepo::Repository(repo) => repo,
+        ResolveRepo::NotARepository => {
+            return Err(refusal(
+                "save-not-a-repository",
+                checkout.display().to_string(),
+            ))
+        }
+    };
+    let custody = fgos_git::acquire_checkout_custody(&repo, checkout)
+        .map_err(|e| refusal("save-custody-unavailable", e.cause))?;
+    let held = || {
+        fgos_holder_lock::BorrowedHandle::new(&custody)
+            .map(|h| vec![h])
+            .map_err(|e| refusal("save-custody-unavailable", format!("{e:?}")))
+    };
+    let mut baseline = driver
+        .preflight_commit(&repo, held()?, None)
+        .map_err(|e| refusal("save-preflight-refused", e.cause))?;
+    // The head edited these files before the save: they are the changes to commit, not dirt that existed before the
+    // work. Every other dirty path stays in the baseline, so it is never selected.
+    baseline.dirty.retain(|(path, _)| !paths.contains(path));
+    let request = CommitRequest {
+        writes: paths.to_vec(),
+        message: message.to_owned(),
+    };
+    let result = driver
+        .scoped_commit(
+            &repo,
+            held()?,
+            &baseline,
+            &request,
+            writer,
+            &operation_id(),
+            &fgos_git::wal::OsFileSystem,
+        )
+        .map_err(|e| refusal("save-commit-refused", e.cause))?;
+    match (result.status, result.oid) {
+        (ResultCode::Unchanged, _) => Err(refusal(
+            "save-nothing-to-commit",
+            format!("{} has no change to commit", paths.join(", ")),
+        )),
+        (ResultCode::Committed, Some(oid)) => Ok(oid.as_str().to_owned()),
+        (status, _) => Err(refusal(
+            "save-commit-refused",
+            format!("the commit answered {status:?}"),
+        )),
     }
 }
 
@@ -424,4 +499,92 @@ fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, 
     land(&command, &config, &ports)
         .map(|landed| landed.main_sha)
         .map_err(|why| refusal(&why.code, why.detail_with_note()))
+}
+
+#[cfg(test)]
+mod tests {
+    //! The owning proof of `session save` on real git: a linked worktree on its own branch, files edited the way a
+    //! head edits them, and the commit the save leaves on that branch.
+    use super::*;
+    use std::process::Command;
+
+    fn git(dir: &Path, args: &[&str]) -> String {
+        let out = Command::new("git")
+            .arg("-C")
+            .arg(dir)
+            .args(["-c", "user.name=t", "-c", "user.email=t@example.test"])
+            .args(args)
+            .output()
+            .expect("git runs");
+        assert!(
+            out.status.success(),
+            "git {args:?}: {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        String::from_utf8(out.stdout).unwrap().trim().to_owned()
+    }
+
+    #[test]
+    fn save_commits_only_the_requested_changed_paths_on_the_worktree_branch_and_never_moves_main() {
+        let root = std::env::temp_dir().join(format!("fgos-save-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        let main = root.join("main");
+        let work = root.join("work");
+        let state = root.join("state");
+        std::fs::create_dir_all(&main).unwrap();
+        fgos_holder_lock::state_root::create_state_root(&state).unwrap();
+        // The controller's activation fence every WAL-writing Git door requires.
+        let fence = main.join(".fgos/locks/activation.lock");
+        std::fs::create_dir_all(&fence).unwrap();
+        std::fs::write(
+            fence.join("TOMBSTONE"),
+            r#"{"lock":"activation","by":"fgos git","at":"fixture"}"#,
+        )
+        .unwrap();
+        git(&main, &["init", "-q", "-b", "main"]);
+        std::fs::write(main.join("a.md"), "a\n").unwrap();
+        std::fs::write(main.join("b.md"), "b\n").unwrap();
+        git(&main, &["add", "."]);
+        git(&main, &["commit", "-q", "-m", "base"]);
+        git(
+            &main,
+            &[
+                "worktree",
+                "add",
+                "-q",
+                "-b",
+                "head/x",
+                work.to_str().unwrap(),
+            ],
+        );
+        let main_tip = git(&main, &["rev-parse", "main"]);
+        let base = git(&work, &["rev-parse", "HEAD"]);
+
+        std::fs::write(work.join("a.md"), "a edited\n").unwrap();
+        std::fs::write(work.join("b.md"), "b edited\n").unwrap();
+        let paths = vec!["a.md".to_owned()];
+        let oid = save_in(&state, &work, &paths, "docs: save a", "head:x").expect("saved");
+
+        assert_eq!(git(&work, &["rev-parse", "head/x"]), oid);
+        assert_eq!(
+            git(&work, &["rev-list", "--count", &format!("{base}..head/x")]),
+            "1"
+        );
+        assert_eq!(
+            git(&work, &["diff", "--name-only", &base, "head/x"]),
+            "a.md"
+        );
+        assert_eq!(git(&work, &["status", "--porcelain"]), "M b.md");
+        assert_eq!(
+            git(&main, &["rev-parse", "main"]),
+            main_tip,
+            "main never moves"
+        );
+
+        let again = save_in(&state, &work, &paths, "docs: save a again", "head:x")
+            .expect_err("nothing left to commit");
+        assert_eq!(again.code, "save-nothing-to-commit");
+        assert_eq!(git(&work, &["rev-parse", "head/x"]), oid);
+        let _ = std::fs::remove_dir_all(&root);
+    }
 }

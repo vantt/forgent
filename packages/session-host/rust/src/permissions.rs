@@ -38,7 +38,7 @@ pub enum Policy {
     Forward,
     /// The policy branch of `fgos internal head-request`.
     Node,
-    /// The run supervisor answers itself (`session bind session`, `session write`).
+    /// The run supervisor answers itself (`session bind session`, `session write`, `session save`).
     Native,
 }
 

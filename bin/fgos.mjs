@@ -3240,6 +3240,18 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           throw new StoreError(HEAD_ARGUMENT_CODES.has(err.code) ? 'validation' : 'precondition', `${err.code ?? 'head-refused'}: ${err.message}`);
         }
       }
+      if (sub === 'save') {
+        // A confined shaper's way to commit its own granted paths on its worktree branch: the supervisor makes the commit.
+        const paths = positional.slice(1);
+        if (paths.length === 0) throw new StoreError('validation', 'session save requires at least one path: fgos session save <path>... --message <text>');
+        const message = requireField(flags.message, 'session save requires --message <text>');
+        const { requestHead } = await import('../src/session-host/head-request-client.mjs');
+        try {
+          return await requestHead('session save', { paths, message });
+        } catch (err) {
+          throw new StoreError(HEAD_ARGUMENT_CODES.has(err.code) ? 'validation' : 'precondition', `${err.code ?? 'head-refused'}: ${err.message}`);
+        }
+      }
       if (sub === 'list') {
         const { listHeadSessions } = await import('../src/session-host/head-request.mjs');
         try {
@@ -3571,8 +3583,8 @@ async function main() {
       } else if (verb === 'workflow' && positional[0] === 'propose' && !flags.json) {
         const { renderProposalText } = await import('../src/workflow/propose.mjs');
         process.stdout.write(renderProposalText(data));
-      } else if (verb === 'session' && positional[0] === 'write' && !flags.json) {
-        // A published write is its commit; a write that was not published threw before here.
+      } else if (verb === 'session' && (positional[0] === 'write' || positional[0] === 'save') && !flags.json) {
+        // A published write or a save is its commit; one that was not made threw before here.
         process.stdout.write(`committed ${data.commit}\n`);
       } else {
         process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
