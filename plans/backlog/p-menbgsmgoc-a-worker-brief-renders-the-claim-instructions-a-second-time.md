@@ -14,3 +14,7 @@ created: 2026-11-27
 # Done when
 
 One call renders the claim instructions per round, the brief's text keeps its current meaning for prompts with and without a run directory, and the brief vectors in `packages/execution/engine/tests/assignment.rs` own the result.
+
+# Notes
+
+Row added in 9ca227365b without this section; the section was added so the backlog index builds.

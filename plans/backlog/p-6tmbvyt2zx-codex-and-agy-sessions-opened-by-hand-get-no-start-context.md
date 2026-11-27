@@ -14,3 +14,7 @@ Phase 10 of plan 261122-1946 gave a Claude Code session opened by hand its compo
 # Done when
 
 The SessionStart output shape of codex and agy is confirmed from their documentation or a live probe. Each CLI gets a SessionStart row that prints the composed hand-opened context in that shape, with `agentCli` set to the CLI. The hook-table golden vectors and `test/setup/agent-hooks.test.mjs` cover the rows.
+
+# Notes
+
+Row added in 8ade321211 without this section; the section was added so the backlog index builds.
