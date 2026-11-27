@@ -10,7 +10,7 @@ properties:
     x-fgos-scope: project-only
   checks:
     $comment: "justification: a head cannot change this key (it is a protected config path); only a landed change or the owner sets it"
-    description: Commands that must all exit 0 before the release applies, each a list of words run with no shell from the project root.
+    description: Commands that must all exit 0 before the release applies, each a list of words run with no shell in a clean checkout of the trunk tip being released (made and removed by the release run), not from the project root, with `TMPDIR` inside that checkout and no inherited `FGOS_*` variable, so a recipe needs no `env TMPDIR=...` or `env -u FGOS_STATE_ROOT` wrapper.
     type: array
     x-fgos-scope: project-only
     x-fgos-sensitivity: command
