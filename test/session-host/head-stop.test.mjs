@@ -35,13 +35,42 @@ const hostOf = (answer = { result: 'retired' }) => {
 test('stopping a live head ends it through its supervisor, retires its pane, stamps retiredAt in the lineage placement and keeps the rest of the record', async (t) => {
   const { projectRoot, dir } = lineage(t);
   const order = [];
+  const waited = [];
   const host = { ...hostOf(), retireAsync: async (placement, how, extra) => { order.push('retire'); return hostOf().retireAsync(placement, how, extra); } };
-  const answer = await stopHeadSession({ persona: 'lead', name: 'x', projectRoot, reason: 'plan done' }, { host, ...endedHead(order), identity: () => ({ live: true }), now: () => new Date('2026-11-19T01:02:03Z') });
+  const answer = await stopHeadSession({ persona: 'lead', name: 'x', projectRoot, reason: 'plan done' }, {
+    host, ...endedHead(order), identity: () => ({ live: true }), now: () => new Date('2026-11-19T01:02:03Z'),
+    supervisorAlive: (runDir) => { order.push(`alive:${runDir}`); return true; },
+    closed: (runDir) => { waited.push(runDir); return true; },
+  });
   assert.deepEqual(answer, { stopped: true });
-  assert.deepEqual(order, ['end:/run/2', 'retire']);
+  // An alive supervisor is asked to stop the head and the attempt's close is awaited, as before.
+  assert.deepEqual(order, ['alive:/run/2', 'end:/run/2', 'retire']);
+  assert.deepEqual(waited, ['/run/2']);
   const record = readHeadPlacement(dir);
   assert.equal(record.retiredAt, '2026-11-19T01:02:03.000Z');
   assert.deepEqual([record.gen, record.runDir, record.retiredReason], [2, '/run/2', 'plan done']);
+});
+
+test('a head whose run supervisor is gone is settled through adopt instead of being asked to stop, and its pane is retired', async (t) => {
+  const { projectRoot, dir } = lineage(t);
+  const order = [];
+  const adopted = [];
+  const host = hostOf();
+  const answer = await stopHeadSession({ persona: 'lead', name: 'x', projectRoot }, {
+    host,
+    identity: () => ({ live: true }),
+    supervisorAlive: (runDir) => { order.push(`alive:${runDir}`); return false; },
+    adopt: async (runDir) => { adopted.push(runDir); order.push(`adopt:${runDir}`); },
+    // A gone supervisor can neither be asked to stop nor close the attempt; either call is the bug this proves absent.
+    end: () => assert.fail('a head whose supervisor is gone is never asked to stop'),
+    closed: () => assert.fail('a head whose supervisor is gone is not waited on'),
+    now: () => new Date('2026-11-19T01:02:03Z'),
+  });
+  assert.deepEqual(answer, { stopped: true });
+  assert.deepEqual(order, ['alive:/run/2', 'adopt:/run/2']);
+  assert.deepEqual(adopted, ['/run/2']);
+  assert.deepEqual(host.closes, [{ key: 'head-lead-x-1', how: 'close', groupKey: 'g1' }]);
+  assert.equal(readHeadPlacement(dir).retiredAt, '2026-11-19T01:02:03.000Z');
 });
 
 test('a group key the placement does not carry falls back to its slot key', async (t) => {

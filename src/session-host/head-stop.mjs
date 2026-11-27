@@ -12,6 +12,7 @@ import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { writeHandoff } from '../session-rotation/handoff-store.mjs';
 import { latestContextFraction } from '../session-rotation/rotate.mjs';
 import { requestCancel } from '../run-supervisor/cancel-registry.mjs';
+import { judge } from '../native/process-identity.mjs';
 import { createSessionHost } from './client.mjs';
 import { headRoleOf, identityHolder, lineageDirOf, readHeadPlacement, writeHeadPlacement } from './head-start.mjs';
 
@@ -43,6 +44,39 @@ function validWakeAt(value) {
 const SHORT_LEAD_ROLE = /^lead:[A-Za-z0-9_-]{1,64}$/;
 
 /**
+ * Whether the run supervisor of the attempt in `runDir` is alive: the same judgement as `supervisor_alive` in
+ * `apps/fgos/src/wiring/observe_sources/head_state.rs`, on the same file. `closed.json` or `receipt.json` is the
+ * supervisor's own end of the run, so the attempt is not waiting on a live supervisor; a missing or unreadable
+ * binding, or a missing supervisor record, proves nothing and counts as alive. Only the process door's `dead`
+ * verdict (pid and start identity, never pid alone) makes it gone.
+ */
+function defaultSupervisorAlive(runDir) {
+  if (fs.existsSync(path.join(runDir, 'closed.json')) || fs.existsSync(path.join(runDir, 'receipt.json'))) return true;
+  let supervisor;
+  try {
+    supervisor = JSON.parse(fs.readFileSync(path.join(runDir, 'supervisor-binding.json'), 'utf8'))?.supervisor;
+  } catch {
+    return true;
+  }
+  if (supervisor === null || typeof supervisor !== 'object') return true;
+  try {
+    return judge(supervisor) !== 'dead';
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Settles the attempt of a head whose run supervisor is gone, through the existing adopt door (`run-supervisor`'s
+ * `sweep-attempts`, which publishes `closed.json` for it). `runDir` is `<fgos>/assignments/<id>/runs/<NN>`, so the
+ * assignments root adopt scans is three levels up.
+ */
+async function defaultAdopt(runDir, projectRoot) {
+  const { executionOp } = await import('../native/execution-door.mjs');
+  await executionOp('sweep-attempts', { assignmentsRoot: path.resolve(runDir, '..', '..', '..') }, { cwd: projectRoot });
+}
+
+/**
  * Stops the live head of `persona` and `name`, or the live lead that holds the short role `role` (`lead:<LANE>`). Returns
  * `{ stopped: true }`, or `{ stopped: false, reason: 'not-live' }` when no live session holds the role (nothing is ended or
  * written). A plain pane close is refused while an agent is the pane's foreground (session-host spec section 8.2), so the
@@ -52,6 +86,10 @@ const SHORT_LEAD_ROLE = /^lead:[A-Za-z0-9_-]{1,64}$/;
  * written (`stop-not-ended`); after a request it stays, and a head that does not end in time (`stop-not-ended`) or a pane
  * that will not close (`retire-refused`) is reported with the stamp kept.
  *
+ * A supervisor judged gone can neither answer a stop request nor close the attempt, so that head is never asked to stop:
+ * its attempt is settled through the existing adopt door (`sweep-attempts` over its assignments root, which publishes
+ * `closed.json`) and its pane retired, and the stamp stays. The next generation starts through `fgos session start`.
+ *
  * A short role is resolved through Identity to its live session, and its lineage (run directory, pane and `retiredAt`
  * stamp) is the head its record names (`ids.head`), ended exactly as a head is. A lead whose record names no lineage with
  * a run directory has no supervisor to ask and its pane is never closed plain: `{ stopped: false, reason: 'no-supervisor' }`,
@@ -60,7 +98,9 @@ const SHORT_LEAD_ROLE = /^lead:[A-Za-z0-9_-]{1,64}$/;
  * `ports` (for a test): `host` (Session Host client: `retireAsync(placement, 'close', { groupKey })`),
  * `identity({ role, projectRoot }) -> { live, record? }`, `now() -> Date`, `groupKeyOf(record) -> string`,
  * `end(runDir) -> boolean` (asks the head's supervisor to stop it), `closed(runDir) -> boolean`, `sleep(ms)`, `waitMs`,
- * `config(projectRoot)` (sessionRotation config) and `writeHandoff(args)` (the existing handoff writer).
+ * `supervisorAlive(runDir) -> boolean` (the attempt's supervisor is not proven dead), `adopt(runDir) -> void` (settles the
+ * attempt of a gone supervisor), `config(projectRoot)` (sessionRotation config) and `writeHandoff(args)` (the existing
+ * handoff writer).
  * A sleep requires wakeAt, stamps its wake/plan/phase/context/CLI binding in that same first write, and writes its
  * handoff before asking for the stop. A handoff failure restores the placement and ends nothing.
  */
@@ -123,14 +163,19 @@ export async function stopHeadSession({ persona, name, role: shortRole = null, p
       }
     }
     if (record.runDir) {
-      const end = ports.end ?? ((runDir) => requestCancel(runDir, 'session-stop'));
-      if (!end(record.runDir)) throw new HeadStopError('stop-not-ended', `${role} could not be asked to stop: no stop request could be written for ${record.runDir}`);
-      requested = true;
-      const closed = ports.closed ?? ((runDir) => fs.existsSync(path.join(runDir, 'closed.json')));
-      const sleep = ports.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
-      const until = Date.now() + (ports.waitMs ?? CLOSE_WAIT_MS);
-      while (!closed(record.runDir) && Date.now() < until) await sleep(POLL_MS);
-      if (!closed(record.runDir)) throw new HeadStopError('stop-not-ended', `${role} did not end within ${ports.waitMs ?? CLOSE_WAIT_MS} ms of its stop request`);
+      if ((ports.supervisorAlive ?? defaultSupervisorAlive)(record.runDir)) {
+        const end = ports.end ?? ((runDir) => requestCancel(runDir, 'session-stop'));
+        if (!end(record.runDir)) throw new HeadStopError('stop-not-ended', `${role} could not be asked to stop: no stop request could be written for ${record.runDir}`);
+        requested = true;
+        const closed = ports.closed ?? ((runDir) => fs.existsSync(path.join(runDir, 'closed.json')));
+        const sleep = ports.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
+        const until = Date.now() + (ports.waitMs ?? CLOSE_WAIT_MS);
+        while (!closed(record.runDir) && Date.now() < until) await sleep(POLL_MS);
+        if (!closed(record.runDir)) throw new HeadStopError('stop-not-ended', `${role} did not end within ${ports.waitMs ?? CLOSE_WAIT_MS} ms of its stop request`);
+      } else {
+        await (ports.adopt ?? ((runDir) => defaultAdopt(runDir, projectRoot)))(record.runDir);
+        requested = true;
+      }
     }
     const host = ports.host ?? createSessionHost();
     const groupKey = (ports.groupKeyOf ?? ((r) => r.placement.groupKey ?? r.placement.key))({ ...record, placement });
