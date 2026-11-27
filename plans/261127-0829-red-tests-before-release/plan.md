@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "P0: fix the red tests on main so the release can run"
-status: draft
+status: ready
 priority: P0
 blockedBy: []
 base: 7490ea7e991afbadc0340ace2854bc2b261218fd
