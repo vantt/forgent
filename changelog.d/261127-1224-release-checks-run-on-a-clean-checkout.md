@@ -1,0 +1,1 @@
+- Changed: `fgos release run` runs recipe checks in a clean, exact checkout of the trunk tip being released with its own temporary directory and without inherited `FGOS_*` variables, so live checkout files or ambient state can no longer fail a release.

@@ -4,7 +4,7 @@
 release:
   # @fgos:doc Whether the release can be undone by the rollback command; an irreversible release never applies by itself. Default: false.
   reversible: false
-  # @fgos:doc Commands that must all exit 0 before the release applies, each a list of words run with no shell from the project root. Default: [].
+  # @fgos:doc Commands that must all exit 0 before the release applies, each a list of words run with no shell in a clean checkout of the trunk tip being released (made and removed by the release run), not from the project root, with `TMPDIR` inside that checkout and no inherited `FGOS_*` variable, so a recipe needs no `env TMPDIR=...` or `env -u FGOS_STATE_ROOT` wrapper. Default: [].
   checks: []
   # @fgos:doc The rollout command, a list of words run with no shell from the project root; null means the project declares no release.
   apply: null
