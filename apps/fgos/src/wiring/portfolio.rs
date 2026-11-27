@@ -789,6 +789,27 @@ pub(super) fn tracked_item_paths(
     Err("the checkout tracks too many paths to read".to_owned())
 }
 
+/// Prefix of the index builder's error when a committed row itself is invalid (a duplicate id, a bad field).
+pub(super) const INDEX_ITEM_INVALID: &str = "item-invalid: ";
+/// Prefix of the index builder's error when the items could not be read.
+pub(super) const INDEX_UNREADABLE: &str = "index-unreadable: ";
+
+/// The backlog index a land commits: the one generator every index write uses, over the items Git
+/// tracks plus the paths being committed, refusing on errors.
+pub(super) fn backlog_index(
+    driver: &fgos_git::GitDriver,
+    repo: &fgos_git::RepoHandle,
+    root: &Path,
+    committing: &[String],
+) -> Result<String, String> {
+    let tracked = tracked_item_paths(driver, repo)
+        .map_err(|cause| format!("write-status-unreadable: {cause}"))?;
+    generate_backlog_index_for_commit(root, &tracked, committing).map_err(|why| match why {
+        CommitIndexError::Unreadable(why) => format!("{INDEX_UNREADABLE}{why}"),
+        CommitIndexError::Invalid(why) => format!("{INDEX_ITEM_INVALID}{why}"),
+    })
+}
+
 /// Generates the markdown index for `plans/backlog.md`.
 pub fn generate_backlog_index(
     items: &[BacklogItem],

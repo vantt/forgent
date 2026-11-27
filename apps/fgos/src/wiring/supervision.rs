@@ -2739,8 +2739,9 @@ fn run_land(root: &Path, command: &LandCommand) -> Result<Value, CategorisedRefu
     let writer = writer();
     let next = || operation_id("land");
     let log_dir = state_dir(&main, "land");
-    let index =
-        |root: &Path, committing: &[String]| backlog_index(&driver, &repo, root, committing);
+    let index = |root: &Path, committing: &[String]| {
+        super::portfolio::backlog_index(&driver, &repo, root, committing)
+    };
     let remove_worktree = |path: &Path, target: &str| -> Result<(), String> {
         let request = super::worktree::WorktreeRequest::Remove {
             cwd: main.clone(),
@@ -2908,24 +2909,6 @@ fn run_widen(root: &Path, command: &WidenCommand) -> Result<Value, CategorisedRe
         "overlaps": overlaps_json,
         "commit": commit.map(Value::String).unwrap_or(Value::Null),
     }))
-}
-
-/// The backlog index a land commits: the one generator every index write uses, over the items Git
-/// tracks plus the paths being committed, refusing on errors.
-fn backlog_index(
-    driver: &GitDriver,
-    repo: &RepoHandle,
-    root: &Path,
-    committing: &[String],
-) -> Result<String, String> {
-    use super::portfolio::{
-        generate_backlog_index_for_commit, tracked_item_paths, CommitIndexError,
-    };
-    let tracked = tracked_item_paths(driver, repo)
-        .map_err(|cause| format!("write-status-unreadable: {cause}"))?;
-    generate_backlog_index_for_commit(root, &tracked, committing).map_err(|why| match why {
-        CommitIndexError::Unreadable(why) | CommitIndexError::Invalid(why) => why,
-    })
 }
 
 /// `land.gates` and `land.regenerate`, read once as the one config value `land`.
