@@ -56,3 +56,31 @@ I ran `systemctl --user stop fgos-watcher-e9756c48.service` while 15 run supervi
 - Every head's supervise pid survived. Before the stop the list was 1264836, 1434631, 1524287, 1524866, 1524901, 1627308, 1627327, 2808636, 2881217, 2928156, 3168132, 3233392, 3606232, 4073802 and 4086090.
 - After the stop it was the same, except that one ordinary unit run ended (1627327) and another started (1634689); both were normal churn.
 - The timer restarted the service by itself, which then showed `activating`. A watcher stop no longer takes any supervisor with it.
+
+## Head-supervisor kill (lead:SUPERVISOR, 2026-11-27 11:17Z): inconclusive
+
+The probe head is `head:shaper-ds-r2sv5l5vnu`, started under release 05acb89c. Its placement is
+`.fgos/runtime/session-rotation/shaper-ds-r2sv5l5vnu/placement.json`: `startedAt` 2026-11-27T11:16:43.590Z, and
+`retiredAt` 11:32:01.533Z, when the probe was stopped. Its `runDir` is
+`.fgos/assignments/head-shaper-ds-r2sv5l5vnu-1/runs/01`, and its binding records supervisor pid 1316887 in
+`fgos-run-cmd_1795778201524_0a309dbb` (`systemd-scope`).
+
+- **What was seen.** `kill -9 1316887` ran at 11:17:03Z. Over 10 minutes no new event appeared. The only
+  `session-gone` for that ref is `3d256ce12fbb619d`, stamped 11:16:43Z, with reason "a session has gone". After the
+  kill, Identity still reads the role as alive, and the head's bwrap, gate and claude processes kept running.
+- **The head keeps running by design.** The run-supervisor spec says a supervisor's death leaves the agent running.
+  Ending the head is the sibling plan's `stopHeadSession` work, and automatic restart is a non-goal. Identity's
+  liveness is the session's liveness, not the supervisor's. Neither is a defect here.
+- **The 11:16:43Z stamp is not a raise time.** A `gone` or `supervisor-gone` record carries the placement's
+  `startedAt` as its `ts` (`apps/fgos/src/wiring/observe_sources/head_state.rs`). The event id is
+  `kind|subject|ts`, so the stamp equals `startedAt` to the millisecond whenever the event was raised. The event can
+  be either of these:
+  - (a) the `supervisor-gone` raise from the first tick after the kill. Then the check passes.
+  - (b) an earlier `gone` raise for the same placement. Then the later `supervisor-gone` record has the same id and
+    the watcher counts it as a duplicate. That would be a defect: `gone` and `supervisor-gone` share one incident id
+    per placement.
+- **What decides it.** The raise time and the `fgos.head.state` attribute of event `3d256ce12fbb619d`, from the event
+  store, which the confined lead cannot read.
+- **Fix if (b).** Phase 2's file stamps a `supervisor-gone` record with the instant its binding was written, not
+  `startedAt`, so the two incidents get different ids. Then the check is rerun with a fresh probe head. A second
+  finding would also need explaining: why a just-started head read `gone` within its first tick.
