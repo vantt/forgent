@@ -1,13 +1,25 @@
 ---
 id: ds-zfqskcns7j
 title: "Component authority: what it covers and whether the model needs a module level"
-status: open
+status: settled
 source:
   - p-adv35azsca
 created: 2026-11-25
 ---
 
-discussion: open
+discussion: settled
+
+```txt
+HAND-OFF (planner)
+discussion: settled
+source: p-adv35azsca; ds-zfqskcns7j §4 CAS-D1..CAS-D12, §6 #design, §7 #task-layerings-in-model
+outcome: component-authority khai bốn layering (hexagon, stack, orchestration-ring, domain-scope) như dữ liệu có định nghĩa trong mô hình; giá trị nằm trên hàng component (tên trường = id layering, ngoại lệ qua `exceptions`); luật chạy theo ba loại cố định trong code (order-downward, isolation, port-wiring); hết danh sách hạng viết cứng ở layers.yaml, contracts/model.v1.json, rust/src/declare.rs.
+constraints: RUL104 (không bộ thông dịch luật tổng quát, không cơ chế không ai dùng; source chỉ declared và fromPaths, CAS-D12); L10 (gom guard layering viết tay vào layering, xoá tierExceptions, đổi trường layer/tier thì chuyển mọi caller cùng đợt); CAS-D4 năm luật hexagon, callback qua port được phép; design principle 7 (văn bản layering render từ mô hình); spec docs/platform/component-authority/spec.md cập nhật trước code.
+non-goals: bước B (`fgos authority check`) và Q2 (component-authority sở hữu những gì); đổi chỗ T7/T8 (đi cùng coding cutover); `paths: []` của ba component Domain; tách hết mọi component trộn vai trò (áp dần, phần chưa tách ghi nợ có tên, CAS-D10).
+acceptance: (1) layers.yaml khai bốn layering đủ trường CAS-D8, mỗi giá trị có meaning; (2) mọi component khai hexagon, stack, orchestration-ring; schema và Rust đọc giá trị từ mô hình (rg LAYER_NAMES|TIER_RANGE không còn danh sách viết cứng); (3) mỗi loại luật có một fixture vi phạm bị bắt; guard A4 Work-layer và 'tầng thấp không import Dispatch' chạy qua layering của chúng; (4) runner khai ngoại lệ hexagon theo path; port khai qua chỉ mục contract; (5) npm test và cargo test --workspace xanh; (6) component-boundary.md §4, architecture-map.md §3, vision.md §6 Known gaps sửa theo từ vựng mới.
+open (chặn phần sau, không chặn task này): Q2 + bước B; `paths: []` của domain-components, coding-domain, group-thinking (§3 hàng 22); T7/T8 (§3 hàng 12, 22).
+authority: component-authority (row sở hữu mô hình); không cần declare mới.
+```
 
 # Component authority: phạm vi, module và các góc nhìn tầng
 
@@ -21,6 +33,8 @@ open owner questions: chưa đặt vào question store (đang thảo luận tr�
 ```
 
 ## 1. Trạng thái hiện tại
+
+2026-11-27 12:30 **settled.** Chủ dự án bỏ `fromLayering` (CAS-D12). Bước A giao planner theo hand-off ở đầu file; Q2, bước B, `paths: []` của component Domain và T7/T8 là việc sau.
 
 2026-11-27 12:25 round 31: chốt CAS-D5 đến CAS-D11 trong phiên này (layering khai trong mô hình; tên `hexagon`, `stack`, `domain-scope`, `orchestration-ring`; giá trị `T<N>-<name>`; trường định nghĩa; `source`; độ mịn `hexagon`). §6 viết lại, §7 nháp một task. Đang hỏi chủ dự án: bỏ `fromLayering` vì không còn layering nào dùng, và cho settle. Mở nhưng không chặn A: Q2 và B; `paths: []` của ba component Domain (§3 hàng 22); đổi chỗ T7/T8 đi cùng coding cutover.
 
@@ -92,6 +106,7 @@ Mô hình `packages/component-authority/model/` là nơi duy nhất trả lời 
 | CAS-D9 | **`source` gắn với hàng component.** `declared`: giá trị đọc từ trường cùng tên layering trên hàng component, ngoại lệ dùng chung trường `exceptions` sẵn có của component (một dòng mang giá trị cho nhiều layering); `fromPaths`: suy từ đường dẫn file; `fromLayering`: suy từ layering khác qua bảng ánh xạ. Xoá `layers.yaml` `tierExceptions` (0 dòng, cửa thứ hai). | 2026-11-27 | Chủ dự án 12:03; §3 hàng 21 |
 | CAS-D10 | **Độ mịn của `hexagon`: mặc định theo component + ngoại lệ theo path** (ưu tiên thư mục, file khi cần), qua `exceptions` của CAS-D9. Port khai tường minh qua chỉ mục contract, không đoán từ tên file. Áp dần: gán lại hạng mặc định theo CAS-D4, khai ngoại lệ trước cho component trộn vai trò (vd. `runner`); component chưa tách ghi thành nợ có tên. | 2026-11-27 | Chủ dự án 11:42; §3 hàng 20 |
 | CAS-D11 | **Layering `orchestration-ring`** gộp `product-band` và bốn decision ring. Giá trị, từ trên xuống theo chiều phụ thuộc: `surface`, `strategic`, `activation`, `domain`, `workflow`, `execution`, `foundation`. `source: declared` (tier không ánh xạ sạch: `work-driver` T6 làm cả strategic và workflow, `supervision` T8 là strategic). Luật `order-downward` trên chiều phụ thuộc; gọi ngược qua port (callback) được phép (CAS-D4). Kiểm chéo với `stack`. Chữ `domain` dùng được vì tên trường phân biệt (`hexagon: domain` khác `orchestration-ring: domain`). | 2026-11-27 | Chủ dự án 12:08 (gộp), 12:16-12:22 (giá trị, `workflow`, `domain`), 12:22 (tên); §3 hàng 15, 23 |
+| CAS-D12 | **Bỏ `fromLayering` khỏi `source`.** Sau CAS-D11 không layering nào suy từ layering khác; `source` chỉ còn `declared` và `fromPaths`; thêm lại khi có layering thật cần (RUL104). Sửa CAS-D9 ở phần này. | 2026-11-27 | Chủ dự án 12:30 ('ok'), hệ quả của CAS-D11 |
 
 ## 5. Q&A log
 
@@ -140,6 +155,7 @@ Mô hình `packages/component-authority/model/` là nơi duy nhất trả lời 
 - 2026-11-27 12:22 — Chủ dự án: "đồng ý, 4 có nên đổi lại là domain-usecase và 5 thành workflow?" (§3 hàng 23).
 - 2026-11-27 12:20 — Chủ dự án: "dùng domain thì sao". Shaper: dùng được vì tên trường = tên layering gỡ gốc lỗi (3 component Domain đang ghi nhầm `layer: domain`).
 - 2026-11-27 12:22 — Chủ dự án: "chổ đặt tên ring thì anh nói là orchestration-ring hoặc là responsibility-ring. anh nghiêng orchestrate". Shaper đồng ý; mint CAS-D6 đến CAS-D11, viết lại §6, nháp §7.
+- 2026-11-27 12:30 — Chủ dự án: "ok" (bỏ `fromLayering`, settle). Shaper mint CAS-D12, settle, giao planner.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -190,6 +206,6 @@ flowchart LR
 
 - **Mục tiêu:** component-authority khai bốn layering có định nghĩa, giá trị trên hàng component, luật chạy theo loại cố định trong code (bước A của CAS-D5).
 - **§6:** toàn bộ.
-- **D-ID:** CAS-D1 đến CAS-D11.
+- **D-ID:** CAS-D1 đến CAS-D12.
 - **Quan hệ:** bước B (`fgos authority check`) và Q2 là việc sau, không thuộc task này; đổi chỗ T7/T8 đi cùng coding cutover.
 - **Verify nháp:** `node --test test/architecture.test.mjs` và `cargo test -p component-authority` xanh; một fixture vi phạm cho mỗi loại luật bị bắt; `rg -n "LAYER_NAMES|TIER_RANGE" packages/component-authority/rust/src` không còn danh sách viết cứng.
