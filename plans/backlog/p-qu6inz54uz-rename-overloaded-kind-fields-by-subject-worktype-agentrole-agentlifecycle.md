@@ -27,14 +27,14 @@ Use the 11-key set at the end of `plans/discussions/ds-que32ftgg6-ready-plan-run
 
 The same item also renames the free-text `role:` line in `core/agents/*.yaml` to something like `summary`. Every caller moves in the same change and the old names are deleted (the platform rule that a change moves every caller and deletes the old path in the same change, and the rule that an audit makes what exists better, not bigger). Source of this correction: supervisor event e3ed5bd4d7c27190 from the shaper of ds-que32ftgg6.
 
-# Owner order 2026-11-27 (ds-3in4yb5thk D11): Work item field now
+# Owner order 2026-11-27 (ds-3in4yb5thk, rename the Work item field now): Work item field now
 
-The owner ordered the Work item field `kind` renamed `workType` now, not later (discussion `ds-3in4yb5thk` D11, owner 11:2x; raised to the supervisor as event 6d6c8d74b70dfd53). This slice is planned and run first, on its own:
+The owner ordered the Work item field `kind` renamed `workType` now, not later (discussion `ds-3in4yb5thk`, the owner's decision to rename the Work item field now, owner 11:2x; raised to the supervisor as event 6d6c8d74b70dfd53). This slice is planned and run first, on its own:
 
 - Only the Work item field (work-state Data Dictionary row 3) and its readers. The word `kind` sits in about 824 files under `src`, `bin` and `packages` with other meanings (executor `kind: tool`, workflow `kind: guide`/`playbook`, settlement kind, event kinds, `classification.kind`); none of those change.
 - Past events in the append-only log carry `kind`, so replay needs a one-time migration (precedent `scripts/migrate-status-proposed-to-awaiting-approval.mjs`, L3).
 - `--json` envelopes change, so the change carries a CHANGELOG line.
-- Scope owner of the label set is `ds-que32ftgg6` (`ds-k435vz65l2` D2); the ACE `when:` key `workType` already shipped in plan `261126-1851-ace-when-keys-v2`.
+- Scope owner of the label set is `ds-que32ftgg6` (`ds-k435vz65l2`, its decision that ds-que32ftgg6 owns the label set); the ACE `when:` key `workType` already shipped in plan `261126-1851-ace-when-keys-v2`.
 
 The rest of this item (the ACE start `kind` split, the `role:` line rename) keeps its earlier status.
 
