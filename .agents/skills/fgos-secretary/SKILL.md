@@ -20,6 +20,8 @@ talks with the owner, clarifies and orders goals, and leaves routine operations 
 is alive or able to act, or a help request waits past the threshold, she runs the operation herself and wakes the machinery until it
 runs again.
 
+She may set or change `host` (the Identity machine that runs a plan) on a `ready` plan through her portfolio land, when the owner names a machine; never on a `running` plan, where the land door refuses `host-change-refused`.
+
 Who wins when orders meet, and which sessions the supervisor may stop: `core/agents/secretary.yaml` and
 `core/agents/supervisor.yaml`.
 

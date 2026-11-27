@@ -610,6 +610,39 @@
         "name": "n",
         "gen": 2
       }
+    },
+    {
+      "env": {
+        "FGOS_HEAD_PERSONA": "p",
+        "FGOS_HEAD_NAME": "n",
+        "FGOS_HEAD_GEN": "2",
+        "FGOS_HEAD_PROJECT_ROOT": "/work/project"
+      },
+      "out": {
+        "persona": "p",
+        "name": "n",
+        "gen": 2,
+        "projectRoot": "/work/project"
+      }
+    },
+    {
+      "env": {
+        "FGOS_HEAD_PERSONA": "p",
+        "FGOS_HEAD_NAME": "n",
+        "FGOS_HEAD_GEN": "2",
+        "FGOS_HEAD_PROJECT_ROOT": "relative/project"
+      },
+      "out": {
+        "persona": "p",
+        "name": "n",
+        "gen": 2
+      }
+    },
+    {
+      "env": {
+        "FGOS_HEAD_PROJECT_ROOT": "/work/project"
+      },
+      "out": {}
     }
   ]
 }

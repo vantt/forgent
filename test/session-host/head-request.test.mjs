@@ -305,6 +305,41 @@ test('a refusal from the route child carries its bounded message to the caller, 
 
 // ---- the confined door for long verbs: tickets, bindings, host verbs, stop, forQuestion ------------------
 
+test('a head working in a linked worktree has its answer and its land ticket recorded under the project it was started in', async (t) => {
+  const project = scratch(t);
+  const worktree = scratch(t);
+  const runDir = scratch(t);
+  fs.mkdirSync(path.join(worktree, '.fgos'), { recursive: true });
+  const role = 'head:shaper-x';
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: worktree, hostBin: '/the/fgos', unitRunId: 'head-shaper-x-2', session: { role, persona: 'shaper', name: 'x', writes: ['plans/p'], requestSocketPath: '/run/s.sock', projectRoot: project } }));
+  const dir = path.join(project, '.fgos', 'runtime', 'session-rotation', 'shaper-x');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'rotation.json'), JSON.stringify({ id: '0123456789abcdef', successorKey: 'head-shaper-x-2', gen: 2 }));
+  const spawned = [];
+  const ports = { planOf: async () => ({ dir: 'p', footprint: ['src/a/**'] }), discussionOf: async () => null, spawnRunner: (call) => { spawned.push(call); return { pid: 4242 }; }, observe: () => null };
+
+  const answered = await runHeadRequest({ runDir, request: { verb: 'session answered', args: { persona: 'shaper', name: 'x', sessionId: 's1', rotationId: '0123456789abcdef', message: 'ready' } } }, ports);
+  assert.deepEqual(answered, { exit: 0, line: { result: 'done', data: { accepted: true, gen: 2 } } });
+  assert.ok(fs.existsSync(path.join(dir, 'answered.json')), 'the answer is in the project');
+  assert.equal(fs.existsSync(path.join(worktree, '.fgos', 'runtime', 'session-rotation')), false, 'nothing is written under the worktree');
+
+  const started = await runHeadRequest({ runDir, request: { id: 't1', verb: 'land', args: { paths: ['plans/p/a.md'], message: 'docs(p): a' } } }, ports);
+  assert.equal(started.line.result, 'done');
+  const ticket = path.join(fgosDirFromRoot(project), 'runtime', 'head-tickets', 'shaper-x', 't1.json');
+  assert.ok(fs.existsSync(ticket), 'the land ticket is under the project');
+  assert.equal(JSON.parse(fs.readFileSync(ticket, 'utf8')).cwd, project);
+  assert.equal(spawned[0].cwd, project);
+  assert.equal(fs.existsSync(path.join(worktree, '.fgos', 'runtime', 'head-tickets')), false, 'no ticket under the worktree');
+});
+
+test('an envelope without a session project root acts on its own cwd', async (t) => {
+  const { ask, project, spawned, ticketFile } = headCase(t);
+  const started = await ask('land', { paths: ['plans/p/a.md'], message: 'docs(p): a' });
+  assert.equal(started.line.result, 'done');
+  assert.ok(fs.existsSync(ticketFile('t1')));
+  assert.equal(spawned[0].cwd, project);
+});
+
 const PLAN = { dir: 'p', footprint: ['src/a/**', 'docs/x.md'] };
 
 /** An attempt directory of a head `persona`-`name` in `project`, and the ports a ticket verb needs (no real runner or git). */

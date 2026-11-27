@@ -46,6 +46,7 @@ the YAML door (`src/util/yaml.mjs`), never a private parser.
 | `blockedBy` | list of plan dir names | each must exist under `plans/`; `[]` when none |
 | `footprint` | list of repo-relative paths or globs | everything the plan may write: code, tests, docs, changelog.d/<fragment>, the plan dir. Required when `ready` or `running` |
 | `base` | 40-char commit sha | the commit the plan was written against; required when `ready` or `running` |
+| `host` | Identity machine id (2-63 of `a-z0-9-`) | optional placement. On `ready`, only that machine may run the plan (another machine holds it `held-other-machine:<host>`); with no `host`, the first machine whose admission push reaches origin claims it. On `running`, written by admission in the same commit as `lead` and `base`; a land that changes `host` on a running plan is refused `host-change-refused`. The check warns, never errors, when Identity does not know the machine |
 | `lead` | Identity role string, e.g. `lead:S6A` or `head:lead-<handle>-<plan>` | the role of the lead that runs the plan; written in the same commit that sets `status: running`. Required when `status: running` (the check fails if a `running` plan lacks it); the supervisor holds a running plan with no `lead` and never restarts it |
 | `source` | list of strings | the DISCUSSION.md path and/or backlog ids the plan answers |
 | `created` | `YYYY-MM-DD` | |
