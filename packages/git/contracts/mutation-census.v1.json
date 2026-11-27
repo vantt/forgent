@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "55afe4ba2bb84eade7f9e90ab6765656176ee502a982c2b85b3a04395e4b93a9",
+  "payloadDigest": "360be21ac421c415c2f248309dbc7e8bd30eaa374a06c5c9c66c96325bfdbaee",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -190,12 +190,12 @@
     "apps/fgos/src/wiring/unit_run_host/mod.rs": "cbc391976d0930b2fce3b4bbed70899cbeef4ce01289bf164f5eee84d756cb16",
     "apps/fgos/src/wiring/unit_run_host/persona.rs": "9fa751e9dda8c9c8adcb006a4489d5061bf9d782c042271fbd1a67b535a26313",
     "apps/fgos/src/wiring/unit_run_host/records.rs": "0292f003ddc6eab3277f39a893777ec1fa73f6a4c5ce2454257e40b9861c13ed",
-    "apps/fgos/src/wiring/unit_run_host/session_attempt.rs": "c725fcac560b8a68cef2e16344f267d26956367eec388bc8ebb7e1fa588a5280",
+    "apps/fgos/src/wiring/unit_run_host/session_attempt.rs": "00e02b530f99023d04dfe9aeefa5cc7db36f7e81ce4824b7ff747e23dea9d34f",
     "apps/fgos/src/wiring/unit_run_host/settlement.rs": "0705eb7756db621bb274a2eb76e62657b259394dda443576b0fcc75bbf6273da",
     "apps/fgos/src/wiring/unit_run_host/terminal.rs": "0c59bb13dd49c59b84c215ef4bd9e27487afd203fbb7f52006d3b1c3ea5c534d",
     "apps/fgos/src/wiring/unit_run_host/tests/mod.rs": "fcc74528ec053f68fcde540a5cf6a51714be160e7b4b599a9d01171275b31f6a",
     "apps/fgos/src/wiring/unit_run_host/tests/run_unit.rs": "6ae520d5bff45b261383fedb310edc5a1aeaff5145d0a1ffb5b0580c3ff3089a",
-    "apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs": "72e28a6a45a9f18a9859c1cec1bfce912bf2853660ec8c840e9bfc367f608901",
+    "apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs": "a55e9b50a7df1eb8acd53c33da1307bcfad1a972b9ac04641928111cb1827c52",
     "apps/fgos/src/wiring/unit_run_host/tests/terminal.rs": "a96c3fc26fad0dcebe2d752cbf05ebe8279c9201f1e3f6c17c863c23da886b12",
     "apps/fgos/src/wiring/unit_run_host/verify.rs": "ee99c7241a85d7a14462c7e7750eeb125e5bf7469786c45732cbbde2bd7955af",
     "apps/fgos/src/wiring/wire_agents.rs": "a434308907a3e7d87c880ebf95a957e1342b77e83ebe1ee0272002335b7a248c",
