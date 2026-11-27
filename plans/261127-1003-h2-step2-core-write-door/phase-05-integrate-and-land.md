@@ -13,12 +13,11 @@ dependencies: [1, 2, 3, 4, 7]
 - `plan.md` acceptance criteria 1–5, 7, 8 and 9.
 - `plans/261113-0124-docos-retrospective-claim-units/plan.md`.
 - `plans/backlog/p-ixrbglli5o-the-retrospective-writer-opens-a-new-topic-for.md` and its row in `plans/backlog.md`.
-- The changelog door in use on `main` at this time: `changelog.d/` if plan `261126-2324` has landed, otherwise
-  `CHANGELOG.md` `## [Unreleased]`.
+- `changelog.d/README.md` (one fragment file per change; the release step assembles them).
 
 ## Footprint
 
-`CHANGELOG.md`, `changelog.d/**`, `plans/261113-0124-docos-retrospective-claim-units/plan.md`,
+`changelog.d/261127-1003-h2-step2-core-write-door.md`, `plans/261113-0124-docos-retrospective-claim-units/plan.md`,
 `plans/backlog/p-ixrbglli5o-the-retrospective-writer-opens-a-new-topic-for.md`, `plans/backlog.md`. After phases
 1–4 and 7 have merged, it also edits these implementation-alignment rows only: the documentation spec header
 "Implementation" line, write-door spec section 12, and document identity section 14 (the retrospective-writer row
@@ -36,7 +35,7 @@ and the locate row's "writer's decision" cell).
      missing; not built: G4 completeness check, G6 identifier kinds).
    - documentation spec header: add step 2.
    - Section 4's plan column for step 2: `done` once landed.
-3. Changelog: one user-visible line. Agents now find the document that carries a claim with `fgos doc locate`
+3. Changelog: one user-visible line in `changelog.d/261127-1003-h2-step2-core-write-door.md`, in the README's form. Agents now find the document that carries a claim with `fgos doc locate`
    before writing; locate also lists every section that names the same terms (`--exact` for more) and flags those
    its search missed; `fgos knowledge attest` records the locate result and how each mention was handled.
 4. Old draft plan: set `status: withdrawn`, with one line saying it is replaced by

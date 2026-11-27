@@ -6,10 +6,7 @@ status: draft
 priority: P2
 blockedBy:
   - 261127-0143-widen-running-plan-footprint
-  - 261127-0144-when-to-ask-owner-rule
-  - 261127-0151-ready-plan-runs-unattended
   - 261127-0016-head-run-own-failure-domain
-  - 261126-2324-changelog-fragments-and-skill-surface-regeneration
 base: c4ff00277dc1b843c6536337ce8d73c998cf3f69
 source:
   - p-ixrbglli5o
@@ -49,8 +46,7 @@ footprint:
   - plans/261113-0124-docos-retrospective-claim-units/plan.md
   - plans/backlog/p-ixrbglli5o-the-retrospective-writer-opens-a-new-topic-for.md
   - plans/backlog.md
-  - CHANGELOG.md
-  - changelog.d/**
+  - changelog.d/261127-1003-h2-step2-core-write-door.md
 ---
 
 # H2 build step 2: the core write door
@@ -222,7 +218,7 @@ it. Phase 6 measures the first two that can be measured now.
 | 3 | [Specs after the context engine, and links to the build order](phase-03-spec-corrections-and-links.md) | - | docs/platform/documentation/spec.md, docs/platform/documentation/subcomponents/write-door/spec.md, docs/platform/documentation/subcomponents/document-identity/spec.md, docs/platform/proposals/documentation-system-unification.md, docs/platform/intent-preservation-ledger.md, docs/reading-map.md, plans/260925-documentation-authority-unification/plan.md | 1 | draft |
 | 7 | [Locate returns exact mentions beside the ranked candidates](phase-07-locate-returns-exact-mentions.md) | - | packages/documentation/rust/src/**, packages/documentation/rust/tests/**, packages/documentation/rust/observe-kinds.json, apps/fgos/src/wiring/doc_locate.rs | 1 | draft |
 | 4 | [Shared write-door procedure; the knowledge skill calls it](phase-04-shared-procedure-and-knowledge-skill.md) | 1, 7 | core/skills/_shared/write-door.md, domains/coding/skills/fgos-coding-knowledge/SKILL.md, .agents/skills/_shared/write-door.md, .agents/skills/fgos-coding-knowledge/SKILL.md, .claude/skills/fgos-coding-knowledge/SKILL.md, plugins/fgOS/skills/_shared/write-door.md, plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md, docs/platform/documentation/operations/how-a-document-is-written.md | 2 | draft |
-| 5 | [Integrate, land, retire the draft plan](phase-05-integrate-and-land.md) | 1, 2, 3, 4, 7 | CHANGELOG.md, changelog.d/**, docs/platform/documentation/spec.md, docs/platform/documentation/subcomponents/write-door/spec.md, docs/platform/documentation/subcomponents/document-identity/spec.md, plans/261113-0124-docos-retrospective-claim-units/plan.md, plans/backlog/p-ixrbglli5o-the-retrospective-writer-opens-a-new-topic-for.md, plans/backlog.md | 3 | draft |
+| 5 | [Integrate, land, retire the draft plan](phase-05-integrate-and-land.md) | 1, 2, 3, 4, 7 | changelog.d/261127-1003-h2-step2-core-write-door.md, docs/platform/documentation/spec.md, docs/platform/documentation/subcomponents/write-door/spec.md, docs/platform/documentation/subcomponents/document-identity/spec.md, plans/261113-0124-docos-retrospective-claim-units/plan.md, plans/backlog/p-ixrbglli5o-the-retrospective-writer-opens-a-new-topic-for.md, plans/backlog.md | 3 | draft |
 | 6 | [Measure topics per retrospective item](phase-06-measure-topics-per-item.md) | 5 | plans/261127-1003-h2-step2-core-write-door/reports/**, docs/platform/documentation/subcomponents/document-identity/spec.md | 4 | draft |
 
 Phases 1, 2, 3 and 7 share no file and run at once; phase 1 owns every `command-registry.mjs` edit, `--exact` on
@@ -232,11 +228,20 @@ it also writes the implementation-alignment rows of the three documentation spec
 (a later wave, so the shared spec files are not written twice at once). Phase 6 needs the landed and activated release, because the
 retrospective loop runs the activated skill.
 
-Footprint check: phases in one wave share no path (checked by reading; `fgos resource-check --plan` runs before
-`ready`). Cross-plan: `.fgos/instructions/effective/**` is written by `261127-0144` and `261127-0151`;
-`src/cli/command-registry.mjs` by `261127-0143` and `261127-0151`; `docs/reading-map.md` by `261127-0016`;
-`changelog.d/**` by `261126-2324`. All five are in `blockedBy`. Hot files: the compiled rule set (phase 2 only),
-the generated skill copies (phase 4 only), the changelog and backlog (phase 5 only).
+Footprint check: phases in one wave share no path (`fgos resource-check --plan` accepts). Cross-plan, only active
+plans count (plan contract section 5), so this plan waits for two running plans:
+- `261127-0143` writes `src/cli/command-registry.mjs` and the exported command contracts (phase 1 here);
+- `261127-0016` writes `docs/reading-map.md` (phase 3 here); it is at its last phase.
+
+Not waited for, on purpose:
+- `261127-0144` and `261127-0151` are `draft`. They also write `.fgos/instructions/effective/**`, the generated
+  skill copies, and (`0151`) `command-registry.mjs`. Whichever of them reaches `ready` after this plan resolves
+  the overlap. The land door regenerates generated skill surfaces when two branches conflict on them.
+- `261126-2324`: the changelog entry is this plan's own fragment, `changelog.d/261127-1003-h2-step2-core-write-door.md`, not
+  `CHANGELOG.md`. Its `changelog.d/**` glob still overlaps lexically until that plan, at its last phase, is done.
+
+Hot files: the compiled rule set (phase 2 only), the generated skill copies (phase 4 only), the backlog (phase 5
+only).
 
 Capability: phases 1, 2, 4 and 7 are `code:implement`; phase 3 is `code:implement` (documentation edit); phase 5 is
 `code:review` plus the land; phase 6 is `code:test` on real items.
@@ -259,7 +264,7 @@ owner's choice of 2026-11-27 (option A: exact mentions in this step, inside loca
   measures it on this repository and records the time in the locate record's duration.
 - **The pointer unit trips the nearest-rule check** against an existing rule: phase 2 reads the advisory candidates
   and declares a relation or rewords; never bypasses the hook.
-- **Generated skill copies drift** if another plan regenerates at the same time: the changelog/skill-surface plan is
-  in `blockedBy`.
+- **Generated skill copies drift** if another plan regenerates at the same time: the land door regenerates
+  generated skill surfaces on a conflict (`261126-2324`), and phase 4's verify reruns `npm run build:skills`.
 - **Rollback:** revert the phase 4 commit and the knowledge skill returns to `rg`; attest's locate field stays
   readable (an optional field, never required). Revert the phase 2 commit and recompile to remove the pointer line.
