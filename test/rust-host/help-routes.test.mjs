@@ -84,6 +84,7 @@ function devDoor(args, cwd) {
   const env = { ...process.env };
   for (const key of ['CLAUDE_CODE_SESSION_ID', 'FGOS_ACTIVE_RELEASE_PATH', 'FGOS_ACTIVE_MANIFEST_PATH', 'FGOS_RUST_HOST_RECURSION_GUARD']) delete env[key];
   const checkout = devCheckout();
+  // boundary: the fgos:dev door is a separate Node process that stages its own host from the checkout it lives in; no in-process call reaches that staging.
   return spawnSync(process.execPath, [path.join(checkout, 'scripts/run-rust-dev-host.mjs'), ...args], {
     cwd,
     encoding: 'utf8',
