@@ -1,18 +1,18 @@
 ---
 id: ds-zfqskcns7j
 title: "Component authority: what it covers and whether the model needs a module level"
-status: paused
+status: open
 source:
   - p-adv35azsca
 created: 2026-11-25
 ---
 
-discussion: paused
+discussion: open
 
 # Component authority: phạm vi, module và các góc nhìn tầng
 
 ```txt
-discussion: paused
+discussion: open
 topic: backlog row p-adv35azsca; nối tiếp ds-at6x3xj2ng (component-authority, settled 2026-11-21)
 shaper: head:shaper-component-authority
 opened: 2026-11-25 (chủ dự án qua thư ký); round 1 ghi 2026-11-25 14:15
@@ -21,6 +21,8 @@ open owner questions: chưa đặt vào question store (đang thảo luận tr�
 ```
 
 ## 1. Trạng thái hiện tại
+
+2026-11-27 11:10 **tiếp tục** (head:shaper-component-authority-scope). Không có câu hỏi nào trong question store. Chủ dự án xác nhận lại hướng Q4 (layering = lát cắt đồng thời, độc lập, luật riêng; A rồi B). Shaper đánh giá lại, đề xuất ba chỉnh sửa (§3 hàng 16); chủ dự án đồng ý 11:19, chốt CAS-D5. Round 17-18: đặt lại tên layering; chủ dự án chốt `domain-scope`, đang hỏi `hexagon` cho `import` và giá trị `T<N>-<name>` cho `stack` (§3 hàng 17). Còn mở sau đó: tên và nguồn của `product` (đề xuất `band`, suy từ tier; §3 hàng 12), ring (§3 hàng 15), Q2.
 
 2026-11-25 15:40 **tạm dừng** (chủ dự án mệt). Đã chốt: CAS-D1 module, CAS-D2 bốn layering, CAS-D3 giữ `domain`, CAS-D4 luật `import` + hai loại port. Tạm chốt: Q4 A trước, B sau (§3 hàng 14). Khi tiếp tục, hỏi theo thứ tự: (1) `product` suy từ `tier` hay trường riêng, và tên mới thay `product` vì mơ hồ (đề xuất `band` nếu suy từ tier, `ring` nếu gộp với decision ring) (§3 hàng 12); (2) ring có phải layering thứ năm hay là cách cắt khác của `product` (§3 hàng 15); (3) Q2 ranh giới sở hữu (gắn với B).
 
@@ -64,6 +66,8 @@ Mô hình `packages/component-authority/model/` là nơi duy nhất trả lời 
 | 13 | **Component-authority có quản được nhiều layering chưa? (chủ dự án nêu là câu quan trọng nhất, round 13, 15:24).** Trả lời: **chưa.** (1) Mỗi hàng component có đúng **một** trường `layer` và **một** trường `tier`; số layering bị đóng cứng ở hai. (2) Danh sách hạng `layer` viết cứng ở **ba nơi**: `layers.yaml` `layers`, enum của `contracts/model.v1.json` (dòng 72, 89) và hằng `LAYER_NAMES` trong `rust/src/declare.rs:28`; dải tier cứng ở `TIER_RANGE` (`declare.rs:32`). Thêm hay đổi một hạng phải sửa cả ba. (3) `rules` trong `layers.yaml` chỉ là **danh sách tên**: Rust không đọc để kiểm, và `test/architecture.test.mjs` không đọc `manifest.rules` (0 lần); phép kiểm của từng luật viết tay trong test Node. Tức là component-authority **giữ dữ liệu, không giữ luật**; thứ thực thi luật nằm ngoài component. (4) `scope` suy từ `paths` ngay trong test; `product` không có; port và adapter không có khái niệm. Hệ quả: mọi quyết định §3 hàng 9-12 hiện chỉ ghi được bằng sửa code ở ba chỗ cộng test, không phải bằng khai báo. | `packages/component-authority/contracts/model.v1.json`; `rust/src/declare.rs:28,32,581-595`; `rust/src/model.rs:160-171`; `test/architecture.test.mjs:71-129` | Rõ (sự thật); hướng xử lý thuộc Q4 |
 | 14 | **Q4 — component-authority quản layering đến đâu (round 14).** A: mô hình khai `layerings` (tên, câu hỏi, hạng theo thứ tự, nguồn dữ liệu: trường riêng, suy từ `tier`, suy từ `paths`, tên luật); schema và Rust đọc hạng từ đó, hết viết cứng ba nơi; phép kiểm vẫn ở `test/architecture.test.mjs` nhưng đọc luật từ mô hình. B: như A, cộng `fgos authority check` giữ mọi phép kiểm trong component, test và land gate gọi nó. C: giữ nguyên. **Chủ dự án (15:30): A trước, B làm bước sau.** B gắn với Q2 (component-authority sở hữu những gì). | §3 hàng 13 | Tạm chốt |
 | 15 | **Trục 'ring' chủ dự án nhớ (round 15).** Bốn decision ring, đặt ở `orchestration-vocabulary-map` 2026-08-27 §4 (nay là bản lịch sử): **Strategic** = Orchestrator (chọn việc nào chạy trong N việc), **Activation** = Launcher (kích hoạt một việc), **Flow** = Router + Driver (định tuyến domain/workflow, lái một việc qua các stage), **Execution** = Dispatcher (môi giới thực thi một lần chạy). 2026-09-02 chủ dự án lo bốn ring chỉ là từ vựng thì code sẽ trôi (`docs/platform/proposals/step-10-coding-domain-adoption.md:750-757`). Trạng thái hiện tại (`docs/platform/agent-coordination/vocabulary/concept-relationships.md:95-112`, Accepted): chủ dự án **chấp nhận ring là mô hình trách nhiệm**, không phải thực thể; không cần class Orchestrator, Launcher, Router, Driver, Dispatcher; chủ cụ thể là Workflow runner (trình tự), Execution Core binding và patterns (chạy Unit), dispatch adapters (lần chạy), Work verbs (vòng đời giao việc). Nhận xét shaper (chưa bàn): ring trả lời 'quyết định này ở phạm vi nào' (N việc, một việc, một luồng, một lần chạy), khác với bốn layering đã có; nó gần `product` (Execution, Workflow, Work) nhưng cắt theo phạm vi quyết định. Ứng viên layering thứ năm hoặc một cách đặt tên khác cho `product`; chưa quyết. | `docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md:524-560`; `concept-relationships.md:95-112` | Mở |
+| 16 | **Đánh giá lại Q4 A và B (round 16, 2026-11-27, chủ dự án yêu cầu).** Chủ dự án: layering là các lát cắt đồng thời, độc lập, mỗi lát có luật riêng chi phối bên trong; nên A và B hợp lý. Shaper đồng ý hướng, chỉ ra năm chỗ cần chỉnh. (1) **Luật không cùng một hình.** `stack` và vị trí của `import` là luật thứ tự ('chỉ phụ thuộc xuống'); `scope` là luật cô lập ('không chạm domain khác'); luật 3-5 của CAS-D4 là luật **quan hệ** (file nào là port, adapter nào cài port nào, chỉ entry ghép), không phải vị trí. Một lược đồ 'hạng theo thứ tự + tên luật' cho mọi layering sẽ không chứa được `import`. (2) **Nguy cơ thành công cụ luật tổng quát** (RUL104): nếu mô hình mô tả luật bằng dữ liệu tự do thì phải viết một bộ thông dịch luật. Đề xuất: **loại luật cố định trong code** (thứ tự xuống, cô lập, nối port), mô hình chỉ khai layering nào dùng loại luật nào; thêm loại luật là một thay đổi code có chủ ý. (3) **Độ mịn khác nhau.** `tier` thực ra gán cho từng file (`manifest.tiers` theo path + `tierExceptions` từng file, `test/architecture.test.mjs:325-344`), hạng `import` gán theo component, `scope` suy từ path. Mỗi layering phải khai độ mịn và dạng ngoại lệ của mình. (4) **Độc lập không tuyệt đối.** Nếu `product` suy từ `tier` (§3 hàng 12) thì nó phụ thuộc `stack`; một layering suy ra phải ghi rõ nguồn. (5) **Đã có luật layering viết tay nằm ngoài ba luật được khai.** Guard A4 (`test/architecture.test.mjs:979-1047`, danh sách regex `WORK_LAYER_MODULES`): Dispatch, Execution, Workflow không chạm tầng Work, tức chính là luật của `product`; guard 'tầng thấp không import Dispatch' (dòng 275) là luật của `stack`. A phải gom chúng vào layering đúng, không để hai cửa (L10, RUL11). Về B: test dài 2692 dòng, phần lớn là guard điểm không thuộc layering (run-door call site, R8 executor adapters, custody, `isReadOnlyMode`); B chỉ nên nhận luật layering. Bộ phân tích import đang ở Node (`scripts/lib/js-source-lexer.mjs`, `rust-source.mjs`); B viết bằng Rust thì phải có bộ đọc import JS phía Rust, đó là chi phí chính của B. | `layers.yaml`; `test/architecture.test.mjs:225-410,979-1047`; `rust/src/declare.rs` | Chốt thành CAS-D5 (11:19) |
+| 17 | **Tên các layering (round 17-18, 2026-11-27).** Chủ dự án: các tên hiện tại đều khó hiểu. Shaper đếm chữ: tên một chữ trùng nhiều (`depth` 1077, `role` 12875, `reach` 822, `dependency` 1373); đề xuất nguyên tắc 'đối tượng + điều được đo' (`code-role`, `component-depth`, `product-band`, `domain-scope`, `decision-ring`, đều 0 lần trùng trừ `domain-scope` 39 lần cùng nghĩa 'domain-scoped capability'). Chủ dự án (11:27): **chốt `domain-scope`** thay `scope`; `import` dễ hiểu hơn `code-role`, gợi ý `hexagon`; với `stack`, tập giá trị đặt dạng `T<N>-<name>`. Nhận xét shaper: ba layering `import`, `stack`, `domain-scope` đều được kiểm qua cạnh import, nên tên `import` không phân biệt được layering này với hai cái kia; luật CAS-D4 là ports & adapters, `hexagon` gọi đúng tên mô hình. Với `T<N>-<name>`: tên tier lộ xung đột §3 hàng 6a (`tierNames` T7 Work, T8 Domain đặt Domain trên Work, ngược `product-band`). | `layers.yaml` `tierNames`; đếm chữ round 17 | `domain-scope` tạm chốt; `hexagon` và `T<N>-<name>` đang hỏi |
 
 ## 4. Quyết định đã chốt
 
@@ -73,6 +77,7 @@ Mô hình `packages/component-authority/model/` là nơi duy nhất trả lời 
 | CAS-D2 | **Bốn layering có tên, tên chung `layering`.** `import`, `stack`, `product`, `scope`; chữ "layer" không đứng một mình mà luôn kèm tên layering. | 2026-11-25 | Chủ dự án round 3-4, giữ qua round 5-14; §3 hàng 9 |
 | CAS-D3 | **Giữ chữ `domain`** cho hạng của layering `import`; không đổi tên. | 2026-11-25 | Chủ dự án round 10, giữ qua round 11-14; §3 hàng 10 |
 | CAS-D4 | **Hình dạng layering `import`.** Năm luật: (1) vị trí entry → use-case → domain → kernel → infra; (2) tầng nội bộ fgOS chỉ import xuống; (3) code không phải infra không import infra, gọi qua port do phía mình khai; (4) infra chỉ import port nó cài; (5) entry là nơi duy nhất ghép port với adapter. Hai loại port: driving (adapter ở entry) và driven (adapter ở infra, hoặc một component nội bộ khác qua callback). Port luôn do bên cần năng lực khai. Theo Cockburn, Martin, Vernon (§3 hàng 11d). | 2026-11-25 | Chủ dự án round 11-12, giữ qua round 13-14; §3 hàng 11e |
+| CAS-D5 | **Component-authority quản layering: A trước, B sau.** Layering là các lát cắt đồng thời, mỗi cái một luật riêng. A: mô hình khai `layerings` (tên, câu hỏi, hạng, độ mịn file/component/path, dạng ngoại lệ, nguồn dữ liệu kể cả suy từ layering khác, loại luật); schema và Rust đọc hạng từ mô hình, hết viết cứng ba nơi. Loại luật cố định trong code (thứ tự xuống, cô lập, nối port); mô hình chỉ khai layering nào dùng loại nào, không có bộ thông dịch luật tổng quát. A gom các guard layering đang viết tay (A4 Work-layer, 'tầng thấp không import Dispatch') vào đúng layering. B (sau): `fgos authority check` giữ phép kiểm, chỉ nhận luật layering, các guard điểm khác ở lại test. | 2026-11-27 | Chủ dự án 2026-11-25 15:30 (A rồi B), xác nhận lại và đồng ý ba chỉnh sửa 2026-11-27 11:19; §3 hàng 14, 16 |
 
 ## 5. Q&A log
 
@@ -101,6 +106,12 @@ Mô hình `packages/component-authority/model/` là nơi duy nhất trả lời 
 - 2026-11-25 15:34 — Chủ dự án: "hơi mệt, chưa trả lời được chỗ này [product]. riêng về chiều, anh nhớ còn một chiều đã từng chốt nó là cái gì mà gọi là ring, liên quan đến router và driver." Shaper tìm thấy bốn decision ring (§3 hàng 15). Discussion tạm dừng.
 - 2026-11-25 15:37 — Chủ dự án: "em nói về product lại cho anh". Shaper giải thích lại các tầng và hai cách (suy từ tier, trường riêng).
 - 2026-11-25 15:39 — Chủ dự án: "chữ product nghe ambiguous quá". Shaper đếm chữ ứng viên, đề xuất `band` (§3 hàng 12).
+- 2026-11-27 11:03 — Chủ dự án: "Q4 là gì". Shaper nhắc lại §3 hàng 13-14.
+- 2026-11-27 11:08 — Chủ dự án: "việc chia layering chắc chắn sẽ có nhiều góc nhìn (lát cắt đồng thời), các layer độc lập nhau và luật chi phối bên trong layer đó. nên A và B là hợp lý, em đánh giá lại xem có bất ổn gì chổ này". Shaper dò `test/architecture.test.mjs` và `layers.yaml`, đánh giá (§3 hàng 16).
+- 2026-11-27 11:19 — Chủ dự án: "đồng ý. như vậy thì bộ này vẫn còn phải bàn tiếp?" Shaper mint CAS-D5; đề xuất chỉ `product` chặn A, ring và Q2 không chặn.
+- 2026-11-27 11:22 — Chủ dự án: "em liệt kê lại các layering giúp anh". Shaper liệt kê bốn layering và ứng viên ring.
+- 2026-11-27 11:24 — Chủ dự án: "thật ra tên của các layering hiện tại đều khó hiểu". Shaper đề xuất nguyên tắc đặt tên (§3 hàng 17).
+- 2026-11-27 11:27 — Chủ dự án: "chốt domain-scope. import còn dễ hiểu hơn code-role, có nên dùng hexagon-layering, chổ stack nên đặt tập giá trị là TN-name".
 
 ## 6. Thiết kế đã chốt {#design}
 
