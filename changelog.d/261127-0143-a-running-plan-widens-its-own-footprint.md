@@ -1,0 +1,1 @@
+- Added: `fgos supervisor widen` lets a lead widen its own plan's footprint for an approved acceptance criterion without waiting for an owner answer or hand edit; the supervisor can use the same verb for any ready or running plan.
