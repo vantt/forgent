@@ -158,3 +158,32 @@ test('knowledge handoff reads the material and locate result from files and reco
   assert.equal(handoff.material, "Drafted text with 'quotes' and $(no shell).\n");
   assert.deepEqual(handoff.locate, locate);
 });
+
+test('knowledge attest --locate-file records a grow decision, and handoff --decision no-place is kept, through the real CLI flags', () => {
+  const { tmpDir, fgosDir } = setupGitRepoWithStore();
+  const fgosBin = path.resolve('bin/fgos.mjs');
+  const run = (...args) => execFileSync(process.execPath, [fgosBin, ...args], { cwd: tmpDir, encoding: 'utf8' });
+  run('topic', 'register', 't1', '--purpose-slug', 'worktree-reclaim');
+  run('doc', 'reserve', 't1', 'guide', 'docs/worktree-reclaim/guide.md');
+  fs.mkdirSync(path.join(tmpDir, 'docs/worktree-reclaim'), { recursive: true });
+  fs.writeFileSync(path.join(tmpDir, 'docs/worktree-reclaim/guide.md'), '# Guide\n', 'utf8');
+  execSync('git add docs/worktree-reclaim/guide.md && git commit -m "add guide"', { cwd: tmpDir, stdio: 'ignore' });
+  const inputs = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-locate-inputs-'));
+  const locateFile = path.join(inputs, 'locate.json');
+  const locate = { query: 'reclaim keeps the branch', candidates: [{ path: 'docs/worktree-reclaim/guide.md' }] };
+  fs.writeFileSync(locateFile, JSON.stringify(locate), 'utf8');
+
+  run('knowledge', 'attest', '--doc-path', 'docs/worktree-reclaim/guide.md', '--capture-id', 'cap-grow', '--locate-file', locateFile);
+  const [attest] = rebuild(fgosDir).attestsByCapture['cap-grow'];
+  assert.equal(attest.decision, 'grow');
+  assert.deepEqual(attest.locate, locate);
+
+  addWork(fgosDir, { id: 'request-1', title: 'Admit a claim', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test' });
+  const materialFile = path.join(inputs, 'material.md');
+  fs.writeFileSync(materialFile, 'Nothing to place.\n', 'utf8');
+  const handoffLocateFile = path.join(inputs, 'handoff-locate.json');
+  fs.writeFileSync(handoffLocateFile, JSON.stringify({ query: 'reclaim keeps the branch', candidates: [{ path: 'docs/worktree-reclaim/guide.md', why_not: 'covers another topic' }] }), 'utf8');
+  run('knowledge', 'handoff', '--capture-id', 'cap-none', '--request', 'request-1', '--claim', 'No place.', '--material-file', materialFile, '--locate-file', handoffLocateFile, '--decision', 'no-place');
+  const [handoff] = rebuild(fgosDir).handoffsByCapture['cap-none'];
+  assert.equal(handoff.decision, 'no-place');
+});
