@@ -11,23 +11,18 @@ discussion: open
 
 ## 1. Trạng thái hiện tại
 
-Round 2 (2026-11-27 16:05). Nothing is minted yet; the owner's role statement below is held as the frame for the next
-rounds.
+Round 3 (2026-11-27 16:13). Three points settled (§4): the gateway's roles and one gateway per machine (D1), the
+no-error rule between the fast copy and the persistent copy (D2), and what is broadcast first: the events of mail,
+work and owner questions (D3).
 
-The owner restated the gateway's role (§5, 16:05): it is the **remote entry door** — it takes requests from outside and
-calls the verbs inside (verb relay) — and it now also **talks to other gateways** and acts as a **changes broadcast**:
-a change is pushed to the other machines fast, persistence (git) follows slower, and the two must never produce an
-error. **One gateway per machine**, so serving many projects across many machines is a design concern, not an
-afterthought.
+Open now:
 
-This answered Q1 in direction: the change itself travels ahead, not only a doorbell. `q-vgjluy2gzf` is cancelled.
-What is open now:
-
-- How "never an error" holds when the fast copy and the persistent copy meet (shaper proposal in §3, row "No-error
-  rule"; asked of the owner in chat).
-- What "a change" covers: event-store events only, or also file content such as `plan.md` (§3).
+- **Plan and backlog changes** — the owner set them apart for more discussion (§5 16:13). Their truth is a file on
+  origin, not an event; a plan claim is already decided by the first admission push that reaches origin (plan
+  `261127-1535-plan-claim-who-and-where`). Shaper's framing and options in §3 row "Plan and backlog"; asked in chat.
 - Q2 `{#Q2}` — `q-pke5ht4y5e`: which network the machines share (still parked).
-- Today's gateway is per project (one root, fixed port 4170), so one-per-machine needs a project registry (§3).
+- Many projects on one gateway: how a project is named across machines (§3).
+- Component split: first cut in §3, not discussed with the owner yet.
 
 Q1 `{#Q1}` — cancelled 2026-11-27 16:05, answered in chat (§5).
 
@@ -72,10 +67,10 @@ coordination.
 | The gateway spans projects; fgOS core acts on one project | observed | commit 27b622317 |
 | How cross-machine data moves today | observed | Event store: events sealed on a cadence into `refs/fgos/events/<machine-id>`, machines push their own ref and fetch the others; "no online coordinator" (owner 2026-10-17) — `docs/platform/event-store/spec.md` sections 1, 12, 14. Remote mail is an event on `project:mailbox` (`remote-recorded`) — `docs/platform/agent-mailbox/spec.md` |
 | Where the delay comes from | observed (cause), not yet measured end to end | `eventStore.sync.intervalSec` is 60 here (owner 2026-11-06: "mail should arrive in about a minute; an empty fetch measured 0.64 s"), default 300; `eventStore.seal.coalesceSec` 30. So a cross-machine hop waits up to seal + one timer period on the sender and one on the receiver. The git work itself is under a second |
-| The gateway's roles | owner-stated 2026-11-27 16:05, held for a second round before a D-ID | (1) remote entry door and verb relay (exists: `FgosCliGateway` spawns `fgos` verbs, `apps/fgos-gateway/src/gateway.rs:361`; `remote_invocation.rs` relays one in-process operation); (2) exchange with other gateways; (3) changes broadcast. Not an online coordinator: no leases or arbitration (event-store spec: no online coordinator, owner 2026-10-17, untouched) |
-| What travels ahead of git | owner-stated: the change itself, not only a doorbell; Q1 `q-vgjluy2gzf` cancelled | §5 16:05 |
-| No-error rule (fast copy vs persistent copy) | shaper proposal, asked in chat 16:10 | Broadcast the **exact acked event bytes** with their event hash, never a second representation. The receiver keeps them in a fast, rebuildable cache keyed by hash; when git brings the sealed event it has the same hash, so the union by hash (event-store spec sections 10-11) folds it once and the cache entry drops. An event whose causal predecessor has not arrived is deferred exactly as the store already defers it (causal closure, section 12). Concurrency stays "provisional, conflict recorded by the consumer" as today. A broadcast lost or never sent costs only speed: the timer sync still delivers. Nothing the broadcast carries is ever written to a ref by the receiver |
-| What "a change" covers | open, asked next | Events (mail, work, questions, plan claim) fit the rule above. A file such as `plan.md` is git content, not an event; the shaper proposes it travels as an event ("plan X claimed by Y at commit Z") while the file itself keeps the git path |
+| The gateway's roles | settled, D1 | §4 |
+| What travels ahead of git, and the no-error rule | settled, D2 | §4 |
+| What is broadcast first | settled, D3: events of mail, work and owner questions | §4 |
+| Plan and backlog | open, owner 16:13 "riêng plan/backlog thảo luận tiếp"; asked in chat 16:20 | Their truth is a file on origin (`plan.md`, `plans/backlog.md`), not an event, so D2's same-hash rule does not apply to them as is. A plan claim is already safe: admission writes `status: running` and `host` in one commit that either reaches origin or is undone, first push wins (plan `261127-1535-plan-claim-who-and-where`, D5-D7 of `ds-izibwo45vm`). What the gateway can add is speed: other machines learn of a new `ready` plan, a claim, or a new backlog row sooner, and stop trying a plan already taken. Shaper options: (A) "origin `main` moved to commit Z" notice, receivers fetch at once, content stays git; (B) a typed event per change ("plan X running on M at commit Z"), receivers act on it before fetching, the file on origin stays the truth; (C) the file content itself travels |
 | One gateway per machine vs today | observed | Today one gateway serves one project: `run(root)` and `FgosCliGateway { root }` (`gateway.rs:1394-1408`), lock `.fgos/locks/gateway.lock` and logs under that project's `.fgos/`, fixed port 4170 (`gateway.rs:1935`); a second project on the same machine collides on the port. One-per-machine needs a machine-level home (state under `~/.fgos`, not a project's `.fgos`) and a registry of the machine's projects, each request and each broadcast naming its project |
 | Network path between machines | open — **Q2** `q-pke5ht4y5e` | Gateway binds 0.0.0.0:4170; Cloudflare Access support exists; LAN/VPN unknown |
 | Trust between cluster members | observed, reusable | Identity holds confirmed per-machine ssh-ed25519 pins (`fgos identity pins`, e.g. `design-lap-iezwlz` confirmed 2026-10-25); a peer link can authenticate with them |
@@ -100,10 +95,23 @@ coordination.
 - 2026-11-27 16:10 — Shaper: confirmed in code that today's gateway is per project (one root, fixed port 4170).
   Proposed the no-error rule (same bytes, same hash, union by hash, deferral by causal closure) and asked the owner in
   chat what "a change" covers.
+- 2026-11-27 16:13 — Owner: agreed to the no-error proposal and to what is broadcast; plan/backlog to be discussed
+  further. Minted D1-D3 (roles held from 16:05; D2, D3 proposed 16:10 and agreed 16:13).
+- 2026-11-27 16:20 — Shaper: scouted the plan claim path (plan `261127-1535`, first push to origin wins) and asked the
+  owner in chat which of three shapes plan/backlog changes take on the broadcast (§3 row "Plan and backlog").
 
 ## 6. Thiết kế đã chốt {#design}
 
-Nothing settled yet. Working sketch for the next round, not a decision:
+Each machine runs one fgOS gateway (D1). It is the machine's remote entry door: requests from outside (REST, MCP, the
+web dashboard) are relayed to the fgOS verbs of the project they name. The gateways of the owner's machines link to
+each other and form a cluster whose job is speed, not authority: when a project appends an event on one machine (mail,
+work, an owner question; D3), that machine's gateway sends the exact acked event bytes and hash to the other gateways.
+A receiving machine keeps them in a fast cache keyed by hash, so its sessions can see and act on the change at once.
+Persistence is unchanged and slower: the event is sealed, pushed to the git remote and fetched by the timer as today,
+and when it arrives it carries the same hash, so the event store folds it once and the cache entry drops (D2). Nothing
+the broadcast carries is ever written to a ref; a lost or late broadcast only falls back to timer speed; there is no
+leader and no lease. Not settled yet: plan and backlog changes, the network between machines (Q2), how projects are
+named across machines, and the component split.
 
 ```mermaid
 flowchart LR
