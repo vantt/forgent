@@ -1,7 +1,7 @@
 ---
 id: p-rjzck3f7mg
 title: "Supervisor wake reports and lead progress notes stop landing on main one commit at a time (supervision; source: owner, 2026-11-25)"
-status: proposed
+status: done
 priority: P1
 area: supervision
 created: 2026-11-25

@@ -1688,6 +1688,80 @@ fn a_lead_paths_land_of_its_plan_file_with_the_footprint_kept_lands() {
     assert_eq!(out.main_sha, f.remote_tip());
 }
 
+/// The plan text with a `host` line (and the given status) added to its frontmatter.
+fn plan_with_host(status: &str, host: Option<&str>) -> String {
+    let text = plan_text(&["src/**"]).replace("status: running", &format!("status: {status}"));
+    match host {
+        Some(h) => text.replace("priority: P2", &format!("priority: P2\nhost: {h}")),
+        None => text,
+    }
+}
+
+fn commit_plan_text(f: &Fixture, text: &str) {
+    fs::create_dir_all(f.main.join("plans/260101-0000-demo")).unwrap();
+    fs::write(f.main.join(PLAN_PATH), text).unwrap();
+    git(&f.main, &["add", "."]);
+    git(&f.main, &["commit", "-qm", "plan"]);
+    git(&f.main, &["push", "-q", "origin", "trunk"]);
+}
+
+#[test]
+fn a_paths_land_that_changes_the_host_of_a_running_plan_refuses_and_undoes_its_commit() {
+    for (before, after) in [(None, "machine-b"), (Some("machine-a"), "machine-b")] {
+        let f = Fixture::new();
+        commit_plan_text(&f, &plan_with_host("running", before));
+        let tip = f.remote_tip();
+        fs::write(
+            f.main.join(PLAN_PATH),
+            plan_with_host("running", Some(after)),
+        )
+        .unwrap();
+        // No footprint is given: the host guard covers every paths land, not only a lead's.
+        let refusal = f
+            .land(&paths(&[PLAN_PATH]), &config(vec![gate("true")]))
+            .unwrap_err();
+        assert_eq!(refusal.code, "host-change-refused", "{refusal}");
+        assert_eq!(f.remote_tip(), tip);
+        assert_eq!(f.local_tip(), tip);
+    }
+}
+
+#[test]
+fn the_admission_commit_that_writes_host_while_turning_a_plan_running_lands() {
+    let f = Fixture::new();
+    commit_plan_text(&f, &plan_with_host("ready", None));
+    fs::write(
+        f.main.join(PLAN_PATH),
+        plan_with_host("running", Some("machine-a")),
+    )
+    .unwrap();
+    let out = f
+        .land(&paths(&[PLAN_PATH]), &config(vec![gate("true")]))
+        .unwrap();
+    assert_eq!(out.main_sha, f.remote_tip());
+}
+
+#[test]
+fn a_paths_land_may_change_the_host_of_a_ready_plan_and_keep_the_host_of_a_running_one() {
+    let f = Fixture::new();
+    commit_plan_text(&f, &plan_with_host("ready", Some("machine-a")));
+    fs::write(
+        f.main.join(PLAN_PATH),
+        plan_with_host("ready", Some("machine-b")),
+    )
+    .unwrap();
+    f.land(&paths(&[PLAN_PATH]), &config(vec![gate("true")]))
+        .unwrap();
+    commit_plan_text(&f, &plan_with_host("running", Some("machine-b")));
+    let mut text = plan_with_host("running", Some("machine-b"));
+    text.push_str("\nA note.\n");
+    fs::write(f.main.join(PLAN_PATH), text).unwrap();
+    let out = f
+        .land(&paths(&[PLAN_PATH]), &config(vec![gate("true")]))
+        .unwrap();
+    assert_eq!(out.main_sha, f.remote_tip());
+}
+
 #[test]
 fn a_paths_land_without_a_footprint_does_not_look_at_plan_files() {
     let f = Fixture::new();

@@ -115,6 +115,12 @@ what still needs the owner's answered question, is set in
 `../_shared/plan-contract.md` (Authority map). Where `locate` answers `authority: inactive`, record
 `authority: inactive` in the verify note and go on.
 
+Also check the plan's **Unattended run** section against the units `ready-plan-runs-unattended`
+(Rule: in AGENTS.md; set in .fgos/instructions/effective/rules.json) and `coding-footprint-tracing`
+(`domains/coding/instructions/coding-footprint-tracing.md`): resolve
+each host-step argv with `fgos can-i` and treat `deny` or no door as not `ready`, and judge whether the
+footprint trace is complete.
+
 ### Step 3: Feasibility matrix
 For every assumption plan.md's risk map flagged medium or higher, write a
 row: assumption / risk / proof required / evidence found / result.
