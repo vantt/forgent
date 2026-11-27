@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7933f2fac16deda29b0eb6ee50ec80fad40cb79b256c62c2bd8a77578503d7eb",
+  "payloadDigest": "64f009953cf6175c1fd21760015fd41284f7d99b77ef49a848582d54c439fd96",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -177,7 +177,7 @@
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
     "apps/fgos/src/wiring/session_write_publish.rs": "8f119f6281e4031530b822865402b3578c05d56db1fc7f97c8b6a512ee0625f4",
     "apps/fgos/src/wiring/start_context.rs": "7a24a7f0b0ce664ed77cb34d75ec5bb2625d31067f09ba249fecdefafc5feaf8",
-    "apps/fgos/src/wiring/supervision.rs": "69390b22f3d94b70e0a92f53812e052e34c8604e68339143d3c6c4df777fafa2",
+    "apps/fgos/src/wiring/supervision.rs": "e5056aee5ee4889d6b353a74ac9b9c3896ab3fbfad0b7571c2e0f105e2a60630",
     "apps/fgos/src/wiring/terminal_route.rs": "e29a3ec670db995fbf7a3e00c70ed8bf3870fd772f298a01ebe9e4198096aed0",
     "apps/fgos/src/wiring/terminal_tabs.rs": "a519a4903b296a3f6bfd486f41ea93d1ceb1489c28a4e6dc6dcfe03223ce3130",
     "apps/fgos/src/wiring/uninstall.rs": "1fd8cdeef4360bb32ae0dd1452bdc6cb09c57427d95645c030105a24533dceff",

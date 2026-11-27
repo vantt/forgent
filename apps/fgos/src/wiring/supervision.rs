@@ -3670,6 +3670,7 @@ mod tests {
                 footprint: vec![],
                 source: vec![],
                 lead: None,
+                host: None,
                 phases: vec![],
             }
         }
