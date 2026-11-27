@@ -1,7 +1,7 @@
 # Phase 4 — integration and live check
 
 Status: the suites (criterion 5) and the scope, binding and isolation parts of the live check (criterion 4) pass.
-Two parts of criterion 4 are still open; see "Open" at the end.
+One part of criterion 4 is still open (the head-supervisor raise); see "Open" at the end.
 
 ## Step 1: full suites on the combined tree
 
@@ -47,5 +47,12 @@ Verdict: PASS for scopes, binding and isolation. The raise is to be confirmed af
   `fgos.head.state`). So no `session-gone` with `supervisor-gone` is expected for that kill. Criterion 4 asks for
   the raise of a killed **head** supervisor: start a test head, `kill -9` its supervise pid, and after one tick see
   `session-gone` with state `supervisor-gone` for that head.
-- **Watcher unit stop.** Criterion 4 also asks that `systemctl --user stop fgos-watcher-<id>.service` leave the
-  other heads' request sockets answering. That step has not run yet.
+- **Watcher unit stop.** Done at 17:31; it passes (below).
+
+## Watcher stop (17:31)
+
+I ran `systemctl --user stop fgos-watcher-e9756c48.service` while 15 run supervisors were live.
+
+- Every head's supervise pid survived. Before the stop the list was 1264836, 1434631, 1524287, 1524866, 1524901, 1627308, 1627327, 2808636, 2881217, 2928156, 3168132, 3233392, 3606232, 4073802 and 4086090.
+- After the stop it was the same, except that one ordinary unit run ended (1627327) and another started (1634689); both were normal churn.
+- The timer restarted the service by itself, which then showed `activating`. A watcher stop no longer takes any supervisor with it.
