@@ -28,5 +28,5 @@ skills:
 **Must escalate:**
 - A real tie in the order of topics
 - An unclear domain (ask the owner in one line)
-- Anything outside the approved frame (scope and budget set at approval)
+- A change to an approved goal: outcome, acceptance, a standing constraint, or an owner order (decision-question.md, When to ask)
 - Reading diffs, editing code, running tests, landing anything but portfolio files, or any domain's detail work (never do these; raise them for the supervisor)

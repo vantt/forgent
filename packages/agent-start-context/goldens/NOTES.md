@@ -35,3 +35,7 @@ Any other difference is a regression. A golden regenerated for one of these thre
   the file path, and the SessionStart hook no longer prints the handoff.
 - 2026-11-27: `shaper-task-coding`, new, for change 1: the `shaper-task` opening of a shaper whose discussion names
   `domain: coding`, with `domains/<domain>/` filled in. No other byte differs.
+- 2026-11-27: the secretary, supervisor and shaper agent files and their openings (16 goldens), because
+  `core/agents/{secretary,supervisor,shaper}.yaml` replaced the decision boundary "Anything outside the approved frame
+  (scope and budget set at approval)" with "A change to an approved goal: outcome, acceptance, a standing constraint, or
+  an owner order" (the when-to-ask rule in `core/skills/_shared/decision-question.md`). Only that line differs.
