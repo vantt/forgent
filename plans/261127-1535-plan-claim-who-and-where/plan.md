@@ -2,11 +2,11 @@
 contract: plan-v1
 title: "Claiming a plan: who runs it, on which machine, recorded on origin at once"
 description: "A plan's host field on origin is the one placement record. Admission on machine M admits only a plan whose host is absent or M, writes host with status running, and never leaves its commit unpushed: a paths land undoes its commit when the push is refused before sending, and a catch-up pushes this checkout's own leftover land commit. Running plans of another machine are never restarted here."
-status: ready
+status: running
 priority: P1
 host: fg-server-sqs7es
 blockedBy: []
-base: 7b5c0f025ee8ccdee3c98a9f9a7ef936c58ebea0
+base: 90a398dc7ccac053e7cb00e6c8f3579994e65b23
 source:
   - plans/discussions/ds-izibwo45vm-plan-claim-who-and-where/DISCUSSION.md
   - p-p5k2htczq3
@@ -39,6 +39,7 @@ footprint:
   - plugins/fgOS/skills/fgos-coding-planning/SKILL.md
   - plugins/fgOS/skills/fgos-secretary/SKILL.md
   - CHANGELOG.md
+lead: head:lead-forgent-261127-1535-plan-c-854fd
 ---
 
 # Claiming a plan: who runs it, on which machine, recorded on origin at once
