@@ -11,7 +11,7 @@ discussion: open
 
 ## 1. Trạng thái hiện tại
 
-Round 12 (2026-11-27 17:45). Three points settled (§4): the gateway's roles and one gateway per machine (D1), the
+Round 13 (2026-11-27 17:42). Three points settled (§4): the gateway's roles and one gateway per machine (D1), the
 no-error rule between the fast copy and the persistent copy (D2), and what is broadcast first: the events of mail,
 work and owner questions (D3).
 
@@ -33,9 +33,7 @@ Open now:
   process) is open, next question.
 - **Machine daemon** — settled: D7 (child process per part), D9 (binary `fgosd`, verb `fgos daemon`), D10 (three
   children: gateway, bus, connector).
-- **Timers per job** — shaper 17:36: keep one unit per job (different periods, switches, failure isolation, doctor
-  rows); the door is what D8 unifies, not the timer; check whether account-probe should be per machine. Asked in chat,
-  not answered yet.
+- **Timers per job** — settled as D11: one OS timer per project per job, account-probe one per machine (to check).
 - **Timers** — design settled as D8 (one managed-unit door, timers stay as the floor). On fg-server the mailbox-sync
   timer is installed but disabled (doctor FAIL) and the watcher has no timer (`watcher.enabled: false`); raised to the
   supervisor (`dd5ea57dfb8b5f53`). Open: where "which machine watches which project" is stated.
@@ -109,7 +107,7 @@ coordination.
 | Gateway risks (assessment) | open | Silent stops (no shutdown log, no supervision); bind 0.0.0.0 with bearer and no TLS, so the peer link needs its own transport auth (Q2); dependency advisories p-7e41b0d3 should be audited before crates are added; `/runner/tick` and the 501 session routes need a keep-or-drop decision |
 | Machine daemon | settled in outline, D7; details open | Owner 17:22 (verbatim): "thiết kế gateway cho tốt để nó sống dai, và nó duy trì sự sống của mcp, rest, và bus. nếu cần có thể đặt lại tên phù hợp hơn, thực chất chỉ có mcp và rest là gateway". Shaper's shape: (1) **Names**: the per-machine process is the machine daemon (working name `fgosd`); "gateway" means only the REST + MCP door it hosts; the bus (D6) is a separate part it hosts. (2) **Two levels of keeping alive**: the OS keeps the daemon alive as a user service (systemd user service with restart, launchd agent with KeepAlive), rendered and checked through the existing `managed timer` door (`packages/distribution/rust/src/timer.rs`, door `packages/component-authority/model/doors/managed-timer.yaml`, already writes per-project systemd/launchd units) extended to a service, not a second mechanism beside it (L10); inside, the daemon supervises its parts (gateway, bus core, bus connector) and restarts one failed part without stopping the others. (3) **Never silent**: every part start, stop, panic and restart is recorded with its reason (today the gateway logs nothing on exit); `status` reports each part; a doctor row for the service (install gate). (4) **What it runs**: the activated release's binary, never a `cargo build` from a checkout (today's `fgos gateway start` builds from the project checkout, `gateway_control.rs:389-401`). (5) **If the daemon is down**: subscribers fall back to their timers (D5), so a dead daemon only slows. Process model settled by D7: one child process per part. Open: the daemon's name; whether the bus's cross-machine connector runs in the bus process or its own child (the gateway is REST + MCP only); the lifecycle verb's new name (`fgos daemon start/stop/status`?) |
 | Timers | observed 17:32; design settled, D8 | Correction: the round-4 note "watcher ticks every 60 s busy, 900 s idle" holds only where `watcher.enabled` is true; on fg-server it is false (`core/config-standard/watcher.yaml:6`, not overridden), so no OS timer runs `fgos watcher tick` there and the keeper runs only when something calls `supervisor wake`. `fgos doctor`: `mailbox-sync-timer` FAIL, unit `fgos-mailbox-sync-e9756c48.timer` installed but disabled, so cross-machine mail waits for a session to run a tool; `account-probe-timer` and `watcher-timer` OK because both are off. Raised `dd5ea57dfb8b5f53`. Design: the `managed timer` door (`packages/distribution/rust/src/timer.rs`) becomes one managed-unit door with two kinds, timer and service, and the daemon's service goes through it (L10); timers stay as the floor and run independently of the daemon (D5), their periods may grow once the bus pushes; doctor checks "installed but not running" for the service as for timers; which machine runs the watcher of which project is stated in one place, tied to the plan `host` rule |
-| Timers per job | proposal, asked in chat 17:36 | Keep one OS unit per job, all through the one managed-unit door (D8): periods differ (mailbox-sync `eventStore.sync.intervalSec`, 60 here; watcher 60 s busy / 900 s idle; account-probe `dispatch.probeAccount.intervalSec`, 0 = off by default), switches differ per machine, one job failing must not stop the others, doctor keeps one row per job. Per machine: one service for `fgosd`; per project at most mailbox-sync and watcher-tick, only where enabled. To check: account-probe probes provider accounts, which belong to the machine, so it may be one timer per machine rather than per project (inferred from its name and doctor text, code not read) |
+| Timers per job | settled, D11 | Keep one OS unit per job, all through the one managed-unit door (D8): periods differ (mailbox-sync `eventStore.sync.intervalSec`, 60 here; watcher 60 s busy / 900 s idle; account-probe `dispatch.probeAccount.intervalSec`, 0 = off by default), switches differ per machine, one job failing must not stop the others, doctor keeps one row per job. Per machine: one service for `fgosd`; per project at most mailbox-sync and watcher-tick, only where enabled. To check: account-probe probes provider accounts, which belong to the machine, so it may be one timer per machine rather than per project (inferred from its name and doctor text, code not read) |
 | Watcher vs keeper | observed | Watcher: per-project OS timer tick, no LLM; fetches the trunk, runs detection definitions, raises attention items once, runs the action per row kind (`watcher.rs`). Keeper: a pure decision function over scheduling records, clock, actor state, caps and its own past decisions; decides start, wake, hold or raise; runs inside `fgos supervisor wake` after admission (`wake.rs:143-164`). Chain: timer, watcher tick, supervisor wake (admission, keeper), supervisor LLM session only for judgement. The watcher is the bus subscriber; the keeper speeds up with it |
 | One gateway per machine vs today | observed | Today one gateway serves one project: `run(root)` and `FgosCliGateway { root }` (`gateway.rs:1394-1408`), lock `.fgos/locks/gateway.lock` and logs under that project's `.fgos/`, fixed port 4170 (`gateway.rs:1935`); a second project on the same machine collides on the port. One-per-machine needs a machine-level home (state under `~/.fgos`, not a project's `.fgos`) and a registry of the machine's projects, each request and each broadcast naming its project |
 | Network path between machines | owner-stated 16:51, not yet a D-ID | Owner: "local network and tailscale". Tailscale runs on fg-server (backend `Running`, MagicDNS name under a `.ts.net` tailnet, 8 peers, 5 online at 16:52). So a peer link can reach other gateways by tailnet name with no public exposure; the LAN is a faster path where both machines share it. Transport auth stays Identity pins (D-pending), independent of the network; whether to stop binding 0.0.0.0 in favour of the tailnet and loopback is a follow-up |
@@ -132,6 +130,7 @@ coordination.
 | D8 | Timers and the daemon service go through one door: the `managed timer` door (`packages/distribution/rust/src/timer.rs`) becomes a managed-unit door with two kinds, timer and service; no systemd or launchd unit is written anywhere else (L10). Timers stay as the floor and run independently of the daemon, so a dead daemon only slows (D5); their periods may grow once the bus pushes, never to zero. Doctor checks "installed but not running" for the service as it does for timers. Which machine runs the watcher of which project is stated in one place, tied to the plan `host` rule (where that place is, is open) | 2026-11-27 | shaper 17:32, owner agreed 17:40 |
 | D9 | Names: the machine daemon's binary is **`fgosd`**; its lifecycle verb is **`fgos daemon start|stop|status`**, which replaces `fgos gateway start|stop|status` (callers moved and the old verb deleted in the same change, L10). "Gateway" names only the REST + MCP child (D7). Neither name is used elsewhere in the repo (checked 17:40) | 2026-11-27 | shaper 17:25 and 17:36, owner chose 17:37 |
 | D10 | `fgosd` supervises three child processes: the **gateway** (REST + MCP), the **bus** (the core of D6, machine-local only: local publishers and subscribers over a local socket) and the **connector** (the cross-machine link to the other machines' `fgosd`, over Tailscale or the LAN, trusted by Identity machine pins). The connector joins its own machine's bus as an ordinary client: it takes the events to send and publishes the copies it receives. The network-facing parts (gateway, connector) are isolated from the local bus, so a network fault never stops local fast wakes | 2026-11-27 | shaper 17:40, owner chose (b) 17:45 |
+| D11 | One OS timer per job, all written through the one managed-unit door (D8): per project a mailbox-sync and a watcher-tick timer, each present only where enabled, each with its own period, switch and doctor row; account-probe becomes one timer per machine, since provider accounts belong to the machine (to check in code before planning). Not one shared timer for all jobs, not one timer per job for the whole machine: either would rebuild a scheduler the OS already has and let one job or project block another. Three projects with everything enabled: at most 2 x 3 + 1 = 7 timers, plus the `fgosd` service | 2026-11-27 | shaper 17:36 and 17:40, owner chose A 17:42 |
 
 ## 5. Q&A log
 
@@ -206,6 +205,11 @@ coordination.
 - 2026-11-27 17:37 — Owner: "1. fgosd và daemon". Minted D9 (binary `fgosd`, verb `fgos daemon`).
 - 2026-11-27 17:40 — Shaper: connector inside the bus process (a) or its own child (b); recommended (b).
 - 2026-11-27 17:45 — Owner: "(b)". Minted D10; §6 updated.
+- 2026-11-27 17:40 — Shaper re-asked the timer question in the five-part form (A one per job, B one shared).
+- 2026-11-27 17:41 — Owner: "3 projects thì 9 timer?" Shaper: only enabled jobs count (fg-server has 1, disabled);
+  with A and a per-machine account-probe at most 7; a timer costs nothing while idle; offered C (one timer per job for
+  the whole machine, walking the project registry) and still recommended A.
+- 2026-11-27 17:42 — Owner: "ok A". Minted D11.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -231,7 +235,7 @@ watcher, which then runs the keeper through `supervisor wake`. The OS timers sta
 daemon (D8), so a dead daemon or a lost bus item only falls back to timer speed. There is no leader and no lease.
 Names: Event Store stays; the supervision queue becomes the attention queue (D4).
 
-Not settled yet: one timer per job (proposed); the component split C, D,
+Not settled yet: the component split C, D,
 E, F1 (owner answers before any `authority declare`); push inside one machine (append notify vs open-log watch); wake
 coalescing per subscriber; whether letters of local mail must survive a restart; who watches which project; plan and
 backlog beyond the provisional signal.
