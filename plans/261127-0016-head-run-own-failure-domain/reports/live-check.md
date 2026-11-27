@@ -1,7 +1,7 @@
 # Phase 4 — integration and live check
 
-Status: the suites are recorded (acceptance criterion 5). The live check (criterion 4, steps 2-5) has not run yet.
-It waits for the supervisor's release from main, which follows plan `261127-0829-red-tests-before-release`.
+Status: the suites (criterion 5) and the scope, binding and isolation parts of the live check (criterion 4) pass.
+Two parts of criterion 4 are still open; see "Open" at the end.
 
 ## Step 1: full suites on the combined tree
 
@@ -21,15 +21,31 @@ pass (`plans/261127-0829-red-tests-before-release/reports/phase-04/rerun-start-c
 failure is the "real red" that the same 0829 report names and owns. No failure touches this plan's files, so
 criterion 5 is met for this plan's change. The suite-wide reds belong to plan 0829.
 
-## Steps 2-5: live check on fg-server2
+## Steps 2-5: live check on fg-server2 (lead:SUPERVISOR, unconfined, 2026-11-27 17:30)
 
-Not run. The release build, stage and activate, two test heads in their own `fgos-run-*.scope`, `kill -9` of one
-supervisor with the `session-gone`/`supervisor-gone` event, and `systemctl --user stop fgos-watcher-<id>.service`
-are run by the supervisor once 0829 closes. A lead never starts or stops a session. Results go below.
+Active release sha256:05acb89c, built from main dc49aa8816 and activated by hand on the owner's order.
 
-| Step | Pass/fail | Evidence |
-|---|---|---|
-| 2 release built, staged, activated | pending | |
-| 3 each supervisor in its own scope, binding `failureDomain` | pending | |
-| 4 `kill -9` one supervisor: other socket answers; `session-gone` with `supervisor-gone` | pending | |
-| 5 watcher unit stopped: both sockets answer | pending | |
+1. **Scopes.** `systemctl --user list-units --type=scope 'fgos-run-*'` lists one transient scope per run supervisor started on the new release. Two examples:
+   - `fgos-run-cmd_1795774904321_e8f97ab1.scope` holds a unit run of 0144.
+   - `fgos-run-cmd_1795775304502_162a0e0b.scope` holds the 1557 lead.
+
+   `/proc/<pid>/cgroup` of each supervise pid ends in its own `app.slice/fgos-run-<attempt>.scope`. None sits under `fgos-watcher-<id>.service`.
+   Supervisors started before the release were launched from the old release and still sit in the launching session's scope. They move to scopes as they restart.
+2. **Binding.** `supervisor-binding.json` `failureDomain` for both examples above is `{"kind":"systemd-scope","unit":"fgos-run-cmd_…"}`.
+3. **Kill one.** Two throwaway read-only `fgos run` units started; their supervisors 1497691 and 1498563 each got their own scope.
+   - `kill -9 1497691`: that supervisor and its scope (`…3087b59f`) are gone.
+   - Supervisor 1498563 and its scope (`…fb8c1e10`) stay active and running.
+   - The live heads (1557 lead, 0144 lead) keep answering, and `fgos session list` still lists the live sessions.
+4. **Dead supervisor raised.** Pending: this waits for the next watcher tick (about 10 minutes). The head-state source then judges the killed supervisor dead, and the session-gone event should name it. lead:SUPERVISOR checks the queue after the tick and appends the result here.
+
+Verdict: PASS for scopes, binding and isolation. The raise is to be confirmed after one watcher tick.
+
+## Open
+
+- **Dead-supervisor raise.** The kill in step 3 hit the supervisor of a throwaway `fgos run` unit, not a head's.
+  The head-state source judges heads only, from `placement.json` and its `runDir` (`docs/platform/observe/spec.md`,
+  `fgos.head.state`). So no `session-gone` with `supervisor-gone` is expected for that kill. Criterion 4 asks for
+  the raise of a killed **head** supervisor: start a test head, `kill -9` its supervise pid, and after one tick see
+  `session-gone` with state `supervisor-gone` for that head.
+- **Watcher unit stop.** Criterion 4 also asks that `systemctl --user stop fgos-watcher-<id>.service` leave the
+  other heads' request sockets answering. That step has not run yet.
