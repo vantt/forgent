@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "09e529df0f85cd819390fdeedfff14000c7aba977751d42aea6c0f5ada985bb7",
+  "payloadDigest": "a7eaff9878fd38e52cb3c8431c5c20b8326d157e4ad70aa0d1228873af5289a2",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -886,7 +886,7 @@
     "packages/herdr-fgos-common/rust/src/lib.rs": "a27bb70798915e8f27a33500b384aea536cc43554bcedba01e67623a5bbe54d1",
     "packages/herdr-fgos-common/rust/src/ports.rs": "45c92b4f8a06e62a79a09655fe9c484a85dc9745049cfea6849245b886f4913f",
     "packages/herdr-fgos-common/rust/src/settings.rs": "2825ad403920455192fe52a64aa976bcc788e6cc907cf38a1df7632102b3eb97",
-    "packages/holder-lock/rust/src/borrow_vectors.rs": "c8bad65a2393d11a5c7ae15f37d18b2dcad08842119a16de62a995b8834b1b68",
+    "packages/holder-lock/rust/src/borrow_vectors.rs": "0ae12497345f24f36ef58605ceeab2f86aaa0390f8a857fc61e0d784c3a89779",
     "packages/holder-lock/rust/src/borrow_windows.rs": "01ddfdb0104217e9a0b5af35540105bb79bf213f644b5fc9e5168de55968f7c8",
     "packages/holder-lock/rust/src/driver/flock.rs": "54226d45ed21342df122a8751b973d832b4ab7d5b3782c383352b64cbb6f54a6",
     "packages/holder-lock/rust/src/driver/mod.rs": "628f731764b307df1430fbc9aa548114260248ab4c113a2cfff5574cfcf0f84f",
@@ -3602,7 +3602,7 @@
     },
     {
       "path": "packages/holder-lock/rust/src/borrow_vectors.rs",
-      "line": 586,
+      "line": 593,
       "spawn": "Command::new",
       "binary": "? git of run",
       "class": "production-sandbox-probe",
