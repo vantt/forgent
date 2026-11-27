@@ -1396,6 +1396,11 @@ fn a_paths_land_whose_push_is_refused_before_sending_undoes_its_commit_and_resto
     assert_eq!(
         f.local_tip(),
         local_before,
+        "the refused push leaves local main where it was"
+    );
+    assert_eq!(
+        f.local_tip(),
+        f.remote_tip(),
         "the refused push leaves local main equal to origin"
     );
     assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "landed\n");

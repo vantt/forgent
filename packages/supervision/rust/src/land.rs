@@ -2574,7 +2574,8 @@ impl Lander<'_> {
     ) -> Result<bool, (ResultCode, LandRefusal)> {
         let p = self.ports;
         let name = ref_name(&format!("refs/heads/{branch}"))
-            .map_err(|r| (ResultCode::RemoteOutcomeUnknown, r))?;
+            // Nothing was sent yet, so this is a pre-send refusal: the caller undoes the commit.
+            .map_err(|r| (ResultCode::Refused, r))?;
         let receipt = p
             .git
             .push_refs(

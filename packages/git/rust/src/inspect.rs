@@ -1586,27 +1586,25 @@ impl GitDriver {
         into: &mut std::collections::HashSet<String>,
     ) {
         use crate::wal::{Intent, OperationKind, Outcome, Tip};
-        let Ok(root) = crate::scoped_commit::root(repo) else {
+        // A receipt carries no worktree, so only the trusted main checkout can claim it.
+        if !matches!(crate::scoped_commit::root(repo), Ok(root) if root == repo.trusted_main_root())
+        {
             return;
-        };
-        // The authority a commit was bound to: the lock file its checkout held.
-        let authority_lock = if root == repo.trusted_main_root() {
-            Ok(repo.trusted_main_root().join(".fgos/locks/main-checkout.lock"))
-        } else {
-            crate::refs::custody_lock_path(repo, root)
-        };
+        }
+        // The authority a commit was bound to: the lock file the main checkout held.
+        let main_lock = repo.trusted_main_root().join(".fgos/locks/main-checkout.lock");
         let (Ok(resources), Ok(key)) = (
             crate::scoped_commit::checkout_resources(repo),
-            authority_lock.and_then(|lock| crate::refs::file_key(&lock)),
+            crate::refs::file_key(&main_lock),
         ) else {
             return;
         };
         let authority = format!("{}:{}", key.device, key.index);
-        let Ok(entries) = std::fs::read_dir(repo.common_dir().join("fgos/git/compacted")) else {
+        let Ok(scan) = wal.scan(crate::wal::WAL_SCAN_BOUND) else {
             return;
         };
-        for entry in entries.take(crate::wal::WAL_SCAN_BOUND).flatten() {
-            let Ok(Some(compact)) = wal.compacted(&entry.file_name().to_string_lossy()) else {
+        for entry in scan.entries {
+            let Ok(Some(compact)) = wal.compacted(&entry.operation_id) else {
                 continue;
             };
             let Ok(Outcome::Commit {
@@ -1633,8 +1631,10 @@ impl GitDriver {
         }
     }
     /// For a list of commit oids on the main checkout's branch, returns which of them
-    /// were made by a ScopedCommit chain of the main checkout from retained journal records.
-    /// Unknown provenance or compacted history answers "not ours". Stops at the first foreign commit.
+    /// were made by a commit-ending operation of the main checkout, from retained journal records
+    /// or compacted ledger receipts. A receipt carries no operation kind, so a compacted
+    /// main-checkout sync commit also counts as this checkout's own. Unknown provenance answers
+    /// "not ours". Stops at the first foreign commit.
     pub fn main_checkout_scoped_commits(
         &self,
         repo: &RepoHandle,
