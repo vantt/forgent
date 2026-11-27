@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Plans that share a path both run; the overlap is a warning at ready and at admission, never a refusal"
-status: running
+status: done
 priority: P0
 blockedBy: []
 base: af9a5d5b15dc1e3ded44db8d187bd49e2652362e
@@ -119,7 +119,7 @@ and a planner sets it `ready` with the remaining overlaps (Keeper's spec and ski
 |---|---|---|---|---|---|
 | 1 | [Contract check warns on cross-plan overlap (carried by Keeper)](phase-01-contract-check-warns.md) | - | scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs | 1 | withdrawn |
 | 2 | [Admission no longer holds on overlap (carried by Keeper)](phase-02-admission-advises-overlap.md) | - | packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/portfolio.rs, packages/supervision/rust/tests/wake.rs | 1 | withdrawn |
-| 3 | [Rules, docs and integration](phase-03-rules-docs-and-integration.md) | - | AGENTS.md, core/skills/_shared/plan-contract.md, core/skills/fgos-supervisor/SKILL.md, docs/platform/supervision/spec.md, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/**, .fgos/instructions/effective/rules.json, changelog.d/261126-2318-plans-that-share-a-path-both-run.md, plans/261126-2318-plan-footprint-overlap-warns/reports/** | 2 | running |
+| 3 | [Rules, docs and integration](phase-03-rules-docs-and-integration.md) | - | AGENTS.md, core/skills/_shared/plan-contract.md, core/skills/fgos-supervisor/SKILL.md, docs/platform/supervision/spec.md, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/**, .fgos/instructions/effective/rules.json, changelog.d/261126-2318-plans-that-share-a-path-both-run.md, plans/261126-2318-plan-footprint-overlap-warns/reports/** | 2 | done |
 
 Phases 1 and 2 are `withdrawn` here because Keeper's lead runs them (owner answer B); their phase files stay here
 as the brief, and their proofs are the acceptance criteria 1 to 3 above. Phase 3 starts only when both are on main
@@ -128,8 +128,8 @@ code. Phase 3 is `code:implement` then `code:test` for the integration gate, rev
 lands.
 
 Phase 3 steps 1-6 landed as `a2ca43c722` (2026-11-27): rules and docs `d8a925ec5e`, effective rules `ae0d3fb43b`,
-spec citation reworded for the citation-drift gate `dbed9692af`. Step 7 (integration on a tree containing
-`a2ca43c722`, `reports/integration.md`) is open; the phase becomes `done` with it.
+spec citation reworded for the citation-drift gate `dbed9692af`. Step 7 integration passed on the combined tree
+`d513bd76e7` (`reports/integration.md`: npm 6561/2, cargo 4757/5, every failure owned outside this plan).
 
 Checked: `node scripts/plan-contract-check.mjs --plan` on this directory passes as `draft`; at `ready` it reports the
 overlaps named above. `fgos resource-check --plan`: no collisions.
