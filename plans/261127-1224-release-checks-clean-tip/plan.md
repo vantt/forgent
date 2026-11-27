@@ -44,6 +44,8 @@ P0 product mechanism, first among the release-path fixes (discussion ds-r2sv5l5v
   checks prove exactly the commit the release records.
 - Every check runs with `TMPDIR` set to `<check checkout>/.fgos/runtime/tmp`, a disk-backed directory the run
   creates, so no check writes to the shared `/tmp` tmpfs and the recipe needs no `env TMPDIR=...` wrapper.
+- Every check runs without any inherited `FGOS_*` variable (`FGOS_STATE_ROOT` above all), so no check reads this
+  machine's live state; the recipe needs no `env -u FGOS_STATE_ROOT` wrapper.
 - `apply`, `probe` and `rollback` keep running from the project root, as today.
 - A checkout that cannot be made refuses the release before any check runs; a checkout that cannot be removed is
   reported and the run's outcome stands.
@@ -84,6 +86,15 @@ The discussion left three points to the planner. Each is settled here from evide
    A tracked file a check rewrites (for example the mutation census that
    `scripts/build-rust-distribution.mjs --read-checkout-with-addon` writes when its bytes differ) makes the removal
    refuse `worktree-dirty-preserved`; that is decision 3's reported, non-fatal case.
+5. **The checks' environment carries no `FGOS_*` variable** (lead:SUPERVISOR order, 2026-11-27 16:21: the release run
+   leaked `FGOS_STATE_ROOT` into the checks and three Rust tests read the machine's real state: context_engine,
+   confinement_policy, holder-lock status; the local recipe works around it with `env -u FGOS_STATE_ROOT`). The
+   adapter removes every inherited variable whose name starts with `FGOS_` from each check's child, then sets
+   `TMPDIR` (decision 4). Chosen over removing `FGOS_STATE_ROOT` alone: the supervisor process also carries
+   `FGOS_CONFINED` and `FGOS_HEAD_REQUEST_SOCKET` (`head_request.rs`), and a check that inherits them reaches the live
+   supervisor, the same leak class; a check that needs an fgOS variable sets it itself, as the test suites do with
+   `FGOS_HOST_BIN`. A check that relied on an inherited one fails the release safe (`checks-failed`, nothing applied).
+   `apply`, `probe` and `rollback` keep the inherited environment.
 
 Also fixed by the shape of the door: a recipe with no `checks` makes no checkout; the checkout is made after the
 merge-slot look and before the first check, and removed right after the last check that ran, before `ask_owner` or
@@ -105,7 +116,8 @@ applied, reported like `checks-failed`).
    `.fgos` bytes, runs each check with that directory, and removes it with `fgos worktree remove <path>
    --delivered-to <tip> --discard-ignored`; the existing release wiring proof in
    `packages/run-supervisor/rust/tests/head_request.rs` (the test whose recipe has `"checks": [["true"]]`) runs
-   through a real checkout, sees its check run with `TMPDIR=<checkout>/.fgos/runtime/tmp`, and finds the checkout
+   through a real checkout, sees its check run with `TMPDIR=<checkout>/.fgos/runtime/tmp` and without the
+   `FGOS_STATE_ROOT` the run was started with, and finds the checkout
    gone afterwards. Command: `cargo test -p fgos-run-supervisor --test
    head_request` (a lead:SUPERVISOR job).
 4. `packages/run-supervisor/contracts/head-request.v1.json` (`release run`), `core/config-standard/release.yaml`

@@ -23,7 +23,8 @@ Capability: `code:implement` for the text, then `code:test` for the gate. Starts
 
 1. `release.yaml` and `release.schema.yaml`, `checks` only: say the commands run with no shell in a clean checkout
    of the trunk tip being released (made and removed by the release run), not from the project root, with `TMPDIR`
-   inside that checkout, so a recipe needs no `env TMPDIR=...` wrapper. Leave
+   inside that checkout and no inherited `FGOS_*` variable, so a recipe needs no `env TMPDIR=...` or
+   `env -u FGOS_STATE_ROOT` wrapper. Leave
    `apply`, `probe`, `rollback` text as is. Do not edit `.fgos/config.yaml` (its doc lines are rendered; the main
    checkout copy also holds the owner's uncommitted edits).
 2. `docs/platform/run-supervisor/spec.md`, "Lịch sử quyết định": one dated entry (2026-11-27), in the section's
@@ -31,7 +32,8 @@ Capability: `code:implement` for the text, then `code:test` for the gate. Starts
    `<project>-worktrees/release-check-<id>`, made and removed through the worktree door; the checkout holds the tip's
    committed `.fgos` through the one Git method that Land's candidate also uses; a refused removal is reported, not
    fatal; `check-checkout-failed` when the checkout cannot be made; checks get `TMPDIR` inside the checkout (the
-   shared `/tmp` tmpfs quota failed release checks); why (four `checks-failed` runs on 2026-11-27 from
+   shared `/tmp` tmpfs quota failed release checks) and no inherited `FGOS_*` variable (a leaked `FGOS_STATE_ROOT`
+   made three Rust tests read the machine's real state); why (four `checks-failed` runs on 2026-11-27 from
    live-checkout causes, backlog p-sqppgb2jhq; owner order P0). Point to the contract entry instead of restating it.
 3. `changelog.d/261127-1224-release-checks-run-on-a-clean-checkout.md`: one `- Changed:` line, user-visible wording.
 4. Integration gate. Hand both commands to lead:SUPERVISOR as one job on the combined tree at the trunk tip:

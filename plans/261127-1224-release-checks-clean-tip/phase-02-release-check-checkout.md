@@ -60,19 +60,20 @@ Capability: `code:implement`, then `code:review`. Starts after phase 1 is on mai
    - `remove_check_checkout`: `host_json(["worktree", "remove", <path>, "--delivered-to", <tip>,
      "--discard-ignored", "--json"])`.
    - `run`: `recipe_command` takes the directory; `current_dir` is it, or `cfg.cwd` for `None`. With a directory
-     (a check), it first creates `<dir>/.fgos/runtime/tmp` and sets `TMPDIR` to it on the child (plan decision 4);
-     with `None` the environment is unchanged.
+     (a check), it removes every inherited `FGOS_*` variable from the child (plan decision 5), creates
+     `<dir>/.fgos/runtime/tmp` and sets `TMPDIR` to it (plan decision 4); with `None` the environment is unchanged.
 6. `tests/head_request.rs`: in `release_host`, add a `worktree)` case that does what the verb does for this test's
    purpose (`create`: `git -C <project> worktree add --detach <path> <base>` and print a done envelope; `remove`:
    `git -C <project> worktree remove --force <path>` and print a done envelope). Extend the existing test whose
    recipe has `"checks": [["true"]]` (no new test): its check becomes an argv that writes a marker relative to its
    directory, then assert the marker landed in a path under `<dir>-worktrees/release-check-<id>`, not in the
    project root, and that the checkout directory is gone after the run. The same check argv also records its
-   `TMPDIR`; assert it is `<checkout>/.fgos/runtime/tmp` (the removal with `--discard-ignored` deletes it; in this
+   `TMPDIR` and whether `FGOS_STATE_ROOT` is set (start the run with it set); assert `TMPDIR` is
+   `<checkout>/.fgos/runtime/tmp` and `FGOS_STATE_ROOT` is absent (the removal with `--discard-ignored` deletes it; in this
    fake host `worktree remove --force` does).
 7. `head-request.v1.json`, `release run`: in `does`, replace "Argv run with no shell, from the project root" with:
    the checks run with no shell in an exact checkout of the trunk tip (made through `fgos worktree create --detach
-   --base <tip>` under `<project>-worktrees/release-check-<id>`, holding the tip's committed `.fgos`, each check with `TMPDIR` set to `<checkout>/.fgos/runtime/tmp`, removed with
+   --base <tip>` under `<project>-worktrees/release-check-<id>`, holding the tip's committed `.fgos`, each check with no inherited `FGOS_*` variable and `TMPDIR` set to `<checkout>/.fgos/runtime/tmp`, removed with
    `fgos worktree remove --delivered-to <tip> --discard-ignored` after the checks, a refused removal reported, not
    fatal); `apply`, `probe` and `rollback` run with no shell from the project root. In `result`, add
    `check-checkout-failed`.
