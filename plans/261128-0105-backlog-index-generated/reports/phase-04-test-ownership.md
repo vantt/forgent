@@ -10,11 +10,11 @@ that owns the same behaviour:
 | JS case | Rust owner | Note |
 |---|---|---|
 | parseBacklogItem parses valid item with all required keys and body sections | `test_parse_backlog_item_valid` | |
-| parseBacklogItem rejects missing required keys | `test_parse_backlog_item_missing_key` | |
-| parseBacklogItem rejects unknown status and priority | `test_parse_backlog_item_invalid_status_and_priority` | |
-| parseBacklogItem rejects missing body section | `test_parse_backlog_item_missing_body_section` | |
-| parseDiscussion parses valid discussion and rejects invalid fields | `test_parse_discussion_valid` | The scalar-`source` rejection had no Rust assertion; ported into this case (`FrontmatterInvalid`). |
-| createBacklogItem and editBacklogItem manage item files on disk | `test_create_and_edit_item` | |
+| parseBacklogItem rejects missing required keys | `test_parse_backlog_item_missing_key` | Asserts the refusal names `'title'`. |
+| parseBacklogItem rejects unknown status and priority | `test_parse_backlog_item_invalid_status_and_priority` | Asserts the refusals name `in-progress` and `P9`. |
+| parseBacklogItem rejects missing body section | `test_parse_backlog_item_missing_body_section` | Asserts the refusal names the `Notes` section. |
+| parseDiscussion parses valid discussion and rejects invalid fields | `test_parse_discussion_valid` | The scalar-`source` rejection had no Rust assertion; ported into this case (`KeyMissing`, message `'source' must be a sequence`); the bad-status branch names `closed`. |
+| createBacklogItem and editBacklogItem manage item files on disk | `test_create_and_edit_item` | Parses the created file back (title, status) and checks the title survives the edit. |
 | generateBacklogIndex compiles markdown table with citing discussions and plans | `test_generate_backlog_index` | |
 | checkPortfolio validates clean portfolio fixture | `test_check_portfolio_clean` | |
 | checkPortfolio detects citation of non-existent item | `test_check_portfolio_unknown_source` | |
