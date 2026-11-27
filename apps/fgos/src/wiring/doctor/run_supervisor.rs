@@ -25,6 +25,7 @@ use fgos_run_supervisor::controller::runtime_dir::{
     ensure_runtime_socket_dir, resolve_runtime_socket_dir, RuntimeDirError, SOCKET_NAME_BYTES,
     SOCKET_PATH_MAX_BYTES,
 };
+use fgos_run_supervisor::controller::scope::{decide_failure_domain, FailureDomain};
 use fgos_run_supervisor::controller::trust_store::{
     default_agy_settings_path, operator_claude_store_path, read_agy_store, read_agy_trust,
     read_codex_trust,
@@ -36,6 +37,7 @@ use std::time::Duration;
 
 pub const ROWS: &[&str] = &[
     "run-supervisor-route",
+    "systemd-user-scope",
     "runtime-socket-dir",
     "run-attempts-stuck",
     "run-supervisor-config",
@@ -265,6 +267,25 @@ fn run_supervisor_route(bin: &Path, platform: &str, env: &[(String, String)]) ->
         ROUTES.join(", "),
         &containment.message[level.len()..]
     ))
+}
+
+// ---- systemd-user-scope ----------------------------------------------------------------------------------
+
+/// Linux only: a user manager answers and `systemd-run` resolves, so each supervisor gets its own scope. The
+/// judgement is the run supervisor's own launch decision, so the row cannot disagree with what a launch does.
+/// It warns and never fails; there is no fix.
+fn systemd_user_scope(domain: &FailureDomain, platform: &str) -> Check {
+    if platform != "linux" {
+        return skipped("skipped: run supervisor scopes are Linux only");
+    }
+    match domain {
+        FailureDomain::SystemdScope { .. } => {
+            pass("a systemd user manager is reachable and systemd-run is on PATH: each run supervisor starts in its own scope")
+        }
+        FailureDomain::Inherited { reason } => pass(warn(&format!(
+            "no systemd user scope available ({reason}), so run supervisors share their starter's cgroup and one memory kill can take several down"
+        ))),
+    }
 }
 
 // ---- runtime-socket-dir ----------------------------------------------------------------------------------
@@ -884,6 +905,10 @@ fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
                     let bin = std::env::current_exe().unwrap_or_default();
                     row(run_supervisor_route(&bin, platform(), &env))
                 }
+                "systemd-user-scope" => row(systemd_user_scope(
+                    &decide_failure_domain("doctor"),
+                    platform(),
+                )),
                 "runtime-socket-dir" => row(runtime_socket_dir(&env, current_uid())),
                 "run-attempts-stuck" => row(run_attempts_stuck(root)),
                 "run-supervisor-config" => row(run_supervisor_config(root, None)),
@@ -979,6 +1004,26 @@ mod tests {
         fn home_dir(&self) -> Option<String> {
             None
         }
+    }
+
+    // ---- systemd-user-scope ----
+
+    #[test]
+    fn user_scope_row_warns_without_a_scope_and_never_fails_or_runs_off_linux() {
+        let scope = FailureDomain::SystemdScope {
+            unit: "fgos-run-x".to_owned(),
+            systemd_run_dir: PathBuf::new(),
+            runtime_dir: PathBuf::new(),
+        };
+        assert_eq!(level(&systemd_user_scope(&scope, "linux")), "ok");
+        let none = FailureDomain::Inherited {
+            reason: "no-user-manager".to_owned(),
+        };
+        let warned = systemd_user_scope(&none, "linux");
+        assert_eq!(level(&warned), "warn");
+        assert!(warned.message.contains("no-user-manager"));
+        assert!(warned.message.contains("share their starter's cgroup"));
+        assert_eq!(level(&systemd_user_scope(&none, "darwin")), "skip");
     }
 
     // ---- containment ----

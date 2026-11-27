@@ -488,6 +488,10 @@
    "personas"
   ],
   [
+   "runner",
+   "supervisorScope"
+  ],
+  [
    "docRegistry",
    "topicMaxDocs"
   ],

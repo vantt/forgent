@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f276ed226214b92ce8250cb371e5336e1390eb027756dbb47f1528afa677e9e5",
+  "payloadDigest": "6b1db55e130a290334cfd1b8b22f317dc49fa3a171e733238eea937dd250307f",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -124,10 +124,10 @@
     "apps/fgos/src/wiring/doctor/holder_lock.rs": "2a6d8f4513a042d4178cad1942782b63b4445ae558b6018dcdc8c93c80dfaff6",
     "apps/fgos/src/wiring/doctor/identity.rs": "d92101d047a7fca05650e1b837a7495e79fbc2613af985b816c26fec2dbd0212",
     "apps/fgos/src/wiring/doctor/mailbox.rs": "44dadd32096ec6059f41f3ec46b1576d24ca272712f9ff5880ba58595bf7cf3b",
-    "apps/fgos/src/wiring/doctor/mod.rs": "7a4006fb32eed3783b58d1f032166b2a8941d1683dfb7da32dad900e54431c48",
+    "apps/fgos/src/wiring/doctor/mod.rs": "f1a1d17c872d3bfcfa6e7dd514a6be540c1792a89e7e7d3b62b2866c6d68f79d",
     "apps/fgos/src/wiring/doctor/observe.rs": "a91f721e558e5378a5bc305c8aaf617b2859fe3234088e66bcc20df06ae0741c",
     "apps/fgos/src/wiring/doctor/packaging.rs": "cc62d9a55a1a9c36fd2c47f2c426c0ec2c300cf6b35898b45c646fac1afea3f4",
-    "apps/fgos/src/wiring/doctor/run_supervisor.rs": "36bcd60f54b9c21d5725e5f01024e2d212ca3477debc8fbb9c6981bc49e075c1",
+    "apps/fgos/src/wiring/doctor/run_supervisor.rs": "aff979d145c3d21520bc561ab9a87cb62ab3ef9d5a524bb8ff952932e5aeeb6e",
     "apps/fgos/src/wiring/doctor/session_host.rs": "70152fa7aa51681994935fb0758432d020c943eedfd90e14e0034003bded80f7",
     "apps/fgos/src/wiring/doctor/supervision.rs": "4581f3dd563da9135dce6c128d407a8d467a4206f1b98d85038fe5fc0e96ed05",
     "apps/fgos/src/wiring/doctor/terminal.rs": "06200867a110f44a92cd97e4e243b6efede5d8734a1fe2d1bb7abca6ab8cd1c9",
@@ -448,7 +448,7 @@
     "packages/distribution/rust/src/store.rs": "1f0a53e0db73ae7bf77b57f1e1fc5e490d2728253901f304a6d7d95c663338ab",
     "packages/distribution/rust/src/suggest.rs": "302d698667662b3544b0761cd53dd87c68594d6f1b1ce52d8b85032627d52182",
     "packages/distribution/rust/src/test_scratch.rs": "7f54aae398aca8c0b0241f22a0155cc0ba9782a91430fba0ceddda0dc19297e3",
-    "packages/distribution/rust/src/timer.rs": "add86c12bc328228ba2c34631e682ec771698da2d489bacc7741fd19aeaa0a61",
+    "packages/distribution/rust/src/timer.rs": "e02facb088047ff65807ef8a4f49b795771737bf95000648ffabe3016a06f861",
     "packages/distribution/rust/src/uninstall.rs": "c33250178e8d5c098b1c23b6fafe8a7a6bdb9eaad3828bd1a5f7f091924701b8",
     "packages/distribution/rust/src/verify.rs": "c6544272383fd524d3aa31b8df7b6303786b5643fd31558808d9870fd310bb0e",
     "packages/distribution/rust/src/workspace.rs": "a93aa05a6eb8c66203c4d6b7cd7799dbabd25d058f3db54bae2512a32e04b336",
@@ -3919,7 +3919,7 @@
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/doctor/run_supervisor.rs:885"
+      "resolvedAt": "apps/fgos/src/wiring/doctor/run_supervisor.rs:906"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",

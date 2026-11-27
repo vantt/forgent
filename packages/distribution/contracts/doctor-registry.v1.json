@@ -108,6 +108,7 @@
       "agent-type-names-unique",
       "provider-capacity-state",
       "run-supervisor-route",
+      "systemd-user-scope",
       "runtime-socket-dir",
       "run-attempts-stuck",
       "session-rotation-orphans",
@@ -372,6 +373,11 @@
     {
       "id": "run-supervisor-route",
       "description": "the host binary serves supervise, gate, adopt and attempt-step at protocol 1 and names the containment driver agents run in and its level (kernel or best-effort)",
+      "owner": "rust:execution"
+    },
+    {
+      "id": "systemd-user-scope",
+      "description": "Linux only, a warning and never a failure: a systemd user manager is reachable and systemd-run is on PATH, so each run supervisor starts in its own scope; otherwise supervisors share their starter's cgroup",
       "owner": "rust:execution"
     },
     {
