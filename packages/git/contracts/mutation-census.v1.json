@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1194240e102b47d5e956989dd6521769ce1dc4ac7f8d0ce4c28a33c59821a79f",
+  "payloadDigest": "14733f7f44f261bb86cc0650825a16fd9b4804bac20035886c453aa1fdd552b6",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -175,9 +175,9 @@
     "apps/fgos/src/wiring/seat_binding.rs": "15312c9c1d9fea319147a886829a627b73973d2b854a350b68d9b690b4f65158",
     "apps/fgos/src/wiring/session_rotation_hook.rs": "5f6e5443893776b5db990e10959ab53fa096bda7236c732bdf797bd7149aed7c",
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
-    "apps/fgos/src/wiring/session_write_publish.rs": "8f119f6281e4031530b822865402b3578c05d56db1fc7f97c8b6a512ee0625f4",
+    "apps/fgos/src/wiring/session_write_publish.rs": "84b8a95fd3aa27e14f885eabe56629a978e449ded4c0bf1d6c3e581bf3b2f683",
     "apps/fgos/src/wiring/start_context.rs": "7a24a7f0b0ce664ed77cb34d75ec5bb2625d31067f09ba249fecdefafc5feaf8",
-    "apps/fgos/src/wiring/supervision.rs": "e5056aee5ee4889d6b353a74ac9b9c3896ab3fbfad0b7571c2e0f105e2a60630",
+    "apps/fgos/src/wiring/supervision.rs": "5f9460df3e7f3bc5fbbf3f6ff139f9c0fcc240ec5cad955e8c7823d4fc1fed29",
     "apps/fgos/src/wiring/terminal_route.rs": "e29a3ec670db995fbf7a3e00c70ed8bf3870fd772f298a01ebe9e4198096aed0",
     "apps/fgos/src/wiring/terminal_tabs.rs": "a519a4903b296a3f6bfd486f41ea93d1ceb1489c28a4e6dc6dcfe03223ce3130",
     "apps/fgos/src/wiring/uninstall.rs": "1fd8cdeef4360bb32ae0dd1452bdc6cb09c57427d95645c030105a24533dceff",
@@ -217,7 +217,7 @@
     "apps/fgos/tests/questions_verb.rs": "b0ccc8a1c82bbf81b7ad84eecfdcf4a2e3c350eb297cf6749645b4ee1a3296dd",
     "apps/fgos/tests/session_write_publish.rs": "b4c33aba8cd04c05e1e5e0dd61b36cabe49c0d489ee077dc82b7f867213cd51d",
     "apps/fgos/tests/start_context.rs": "940d9237fbb964ca7194b8b10fdf318ce2b29ed963fdeb6f6b975d6983940930",
-    "apps/fgos/tests/supervision_verbs.rs": "f3b082210e9236a05c83cb3a9c98975807adc593d9133315b6b5e4264d745307",
+    "apps/fgos/tests/supervision_verbs.rs": "00468524169a0b0a954f5e8988539cd69361197837c1fed227644ca097c65cca",
     "apps/fgos/tests/windows_borrow.rs": "deeb68f3b777b64c076bfd317baac95b11cff6c0bceede7eb3774a3d6d25f7bf",
     "apps/fgos/tests/windows_cwd_lease_owner.rs": "c3e833710c3dfa42f98addbca06e1dd7935470e73880a5ce7bb9622a9991f26a",
     "apps/fgos/tests/windows_doctor_lock_rows.rs": "943ba00e7be5382a532ad47bfa38f6fef888428910e5f70ee18518edeb1eeb63",
@@ -1309,23 +1309,23 @@
     "packages/session-host/rust/tests/typed_wake.rs": "d132cb90111c3b749ed8af9a6c21369b00f6231aa40baf933566f672e2ebc1c3",
     "packages/supervision/rust/src/discussion_source.rs": "e60efca723c2652fca91250292d424864021ff27ddde298698cbf77ee8b8327f",
     "packages/supervision/rust/src/keeper.rs": "8473d74d5aa91ff50f63b95e0c1b28b69dc12b01588619d06c4ccaef6cce58d3",
-    "packages/supervision/rust/src/land.rs": "01b9598414f9e621b18ede7f5f78e8ca0d7a6df29645d3e3c68bbb412fe4c563",
+    "packages/supervision/rust/src/land.rs": "54250496f9c95282eac18e4ada41b31928b0ca8106c2a74cccd281187b739191",
     "packages/supervision/rust/src/lib.rs": "b4d55ee63b573112e6902280e15daf2d745aa148c24e156a830b4595f88e413c",
     "packages/supervision/rust/src/notify.rs": "2a8ce19013396e3a31c915a903c4762889cc3f902137279e6378c3deb84e8edd",
-    "packages/supervision/rust/src/portfolio.rs": "a15a96ae33202b444362dedb16daeb99f30a13ecb1ffeafc4d47878159fd8a30",
+    "packages/supervision/rust/src/portfolio.rs": "7471a2aea7fa091c78925fdb34b8739193d16b68aa4e1bbce75af8e0061b5fad",
     "packages/supervision/rust/src/queue.rs": "bdf9b9dac6246575bb9a2ae9690050778f055e63b244f7634c895597f85262d1",
     "packages/supervision/rust/src/sources.rs": "ec6b2dcf8bac21dcf89b9dbad9d4228e4473d67e25988a541079e4d97b636252",
-    "packages/supervision/rust/src/supervisor.rs": "e97644607821730727117fe331dd3b222e6b6adf4baffc7a5a4aa990b8ac7864",
-    "packages/supervision/rust/src/wake.rs": "6ba5633542f2be43d192e21cdb3377b481d2a71f1df5afcd41cc8984bba23834",
+    "packages/supervision/rust/src/supervisor.rs": "188bbabd60bd28219b9a767ccf7ba96d2341b49e7d2e2c9da63719c7fa44cd60",
+    "packages/supervision/rust/src/wake.rs": "e1eefaf6700a800fec0a6214786211b1c6c9bfb3a2db5b441e07046b0dd0f5b2",
     "packages/supervision/rust/src/watcher.rs": "fca55c5b4b7eff5bbca1f7d829707f53a8fcfd407edd4ca07612ab6aa415f59a",
     "packages/supervision/rust/tests/definitions.rs": "004776564a70fbf130a0be88fe69d7ea97a0c6549e209c1ad8e74e29de3dddb4",
     "packages/supervision/rust/tests/discussion_source.rs": "39e824a0affc36347c8d488b28b9583f30523ff57391d290938b090c62925397",
-    "packages/supervision/rust/tests/keeper.rs": "fc0ad2bde597ab5a70ca17f4511e2955045635133f2d47afb348e5bcdf5749b8",
-    "packages/supervision/rust/tests/land.rs": "ec22948b9b715305b9ad637f3a4ab1af659212109fb1acecf0deeaf84e0eee15",
-    "packages/supervision/rust/tests/portfolio.rs": "7854b420684f508c07b7e82c1dc24e7d2ef97252d7058011e1bf13aa6667ba5e",
+    "packages/supervision/rust/tests/keeper.rs": "bc7359fea3a26518d56906aaaa2df3f5085113f3aa992e157199be2e81650c72",
+    "packages/supervision/rust/tests/land.rs": "863d285e9df934e1792fd9fa6a63b2cbb366a228a5fe11039a70b42ccafbe6c8",
+    "packages/supervision/rust/tests/portfolio.rs": "8ef5293fb8f240f3798fb25ff4cf09b7e1ddf54881460d27b20f8ee23cc6a797",
     "packages/supervision/rust/tests/queue.rs": "65ddc71a204003a4e1a62077f6741728cdcaa96d7ee751e31d78bd420d572698",
     "packages/supervision/rust/tests/sources.rs": "ea50ed4f0a880b14e375f703398a72340af16d28451c97bc60ca364a2ec30c87",
-    "packages/supervision/rust/tests/wake.rs": "5fd37cc971fe5ab358647c1d2c40e343c90ae63677e67a51a0c0987062abef03",
+    "packages/supervision/rust/tests/wake.rs": "667881894bd0edd05e400daf048d218c5c43b01232e570628746bd736184672b",
     "packages/supervision/rust/tests/watcher.rs": "87d97f71e5c283f1df3531955f77603248e6d7337260b6baff72918c11c4ee64",
     "packages/terminal-control/rust/src/core.rs": "4126e35d6ffe381a802edf64e8b2afa781eb7a0e02aa7194245d58cc87f89bd5",
     "packages/terminal-control/rust/src/driver/herdr.rs": "8c3df4209429b90138bea12af929cf7456d7f3c7bbbda193dcc585ad7fa9a8eb",
@@ -1483,7 +1483,7 @@
     "scripts/merge-test-shards.mjs": "bd5868bb24fd51a042ddabca60d8a3d5bca12c33b4837e54fb19fbfe10001c77",
     "scripts/ort-static.mjs": "306426ce23822f5187c447fd07f30fc150181e7c1539b7f5a38d5d6645b0d4b2",
     "scripts/package-release-assets.mjs": "60efb629a7ebfe1143445557c55abfa4b3269286a0498754a28dddb662a70fd0",
-    "scripts/plan-contract-check.mjs": "471c1241e80b4dabba42b641c7720d7acfd7c45b7ab811b9724a9c3579263dbb",
+    "scripts/plan-contract-check.mjs": "c0e0d532be8a60858b921ee2b6e44e1de774578d54b77c099e8f635a30071b96",
     "scripts/prepare-release.mjs": "9bfc454f0a5c90f4ad121c107fbe16f16d7e60a5f03e7c1b35641ce3bc561c69",
     "scripts/previous-release-tag.mjs": "d79809904f630061da723099f65817f18367462d1d9d64982426c58eb05d6a0f",
     "scripts/probe-storytelling-material.mjs": "b2991c1c14879193953d901e9122a9e511136a91907949643b7f1af008590df4",
@@ -1565,7 +1565,7 @@
     "src/observe/approve-fault-log.mjs": "af55301c604981f0ec98ffe3d9728d4f894c8f9eb3afa8498ce9d56d70b6c629",
     "src/observe/friction-client.mjs": "5dc0e5ca5a244d5ac4aa3a9657f1bf07ad2fcb369ccdfcd167cb969ed20c5344",
     "src/observe/invocation-fault-log.mjs": "e5ca8dd3056020a429df66e96e6266e04525fffa9ef16e9d08975d3930c4ba75",
-    "src/portfolio/plan-sections.mjs": "b82ac15fb1de756935230f3c973ea136447ba5e425473624a3748953bb95a374",
+    "src/portfolio/plan-sections.mjs": "b1dd414eb28b521d9f57dcb0cf2fa57d0b23b7a57bf63f1ff48e802fa96516a2",
     "src/report/authoritative-match.mjs": "4678762776ac5a748426cee142ab90a474f479374205d3997a5cb92e26277a1c",
     "src/report/capability-plan-lint.mjs": "d0e7415bb9086937024205d2104fbbc0ce075e8e07c646e9448235fa97727ee1",
     "src/report/context-render.mjs": "c93dd1f0336bb92cb02b42b60a837708298f7c92b0c451e97cd324f5329df25c",
@@ -2423,11 +2423,11 @@
     },
     {
       "path": "apps/fgos/src/wiring/supervision.rs",
-      "line": 1997,
+      "line": 2000,
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2240"
+      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2244"
     },
     {
       "path": "apps/fgos/src/wiring/terminal_tabs.rs",
@@ -3853,7 +3853,7 @@
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2477"
+      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2492"
     },
     {
       "path": "packages/process/rust/src/mapped.rs",
@@ -4286,7 +4286,7 @@
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2616"
+      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2631"
     },
     {
       "path": "packages/supervision/rust/tests/discussion_source.rs",
@@ -4297,7 +4297,7 @@
     },
     {
       "path": "packages/supervision/rust/tests/keeper.rs",
-      "line": 515,
+      "line": 518,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -4630,6 +4630,13 @@
         "scripts/git/e3-bench.mjs:459"
       ],
       "class": "sandbox-door"
+    },
+    {
+      "path": "scripts/plan-contract-check.mjs",
+      "line": 258,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
     },
     {
       "path": "scripts/record-mailbox-hook-fixtures.mjs",

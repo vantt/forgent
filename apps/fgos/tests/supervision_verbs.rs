@@ -524,8 +524,8 @@ fn a_missing_or_invalid_machine_id_refuses_admission_without_a_lead_or_a_commit(
     let local = git(&scene.project(), &["rev-parse", "main"]);
     let id_file = scene.root.join("state/machine-id");
     for (content, code) in [
-        (None, "publish-failed:machine-id-missing"),
-        (Some("Not A Machine\n"), "publish-failed:machine-id-invalid"),
+        (None, "machine-id-missing"),
+        (Some("Not A Machine\n"), "machine-id-invalid"),
     ] {
         match content {
             None => fs::remove_file(&id_file).unwrap(),
@@ -756,6 +756,47 @@ fn plans_lists_the_trunk_portfolio_with_what_the_supervisor_may_start() {
     assert_eq!(plans[0]["status"], "ready");
     assert_eq!(plans[0]["admissible"], true);
     assert_eq!(view["maxLeads"], 4);
+}
+
+#[test]
+fn plans_hold_a_ready_plan_of_another_machine_and_show_its_running_one_as_elsewhere() {
+    let scene = Scene::new("plans-other-machine", WATCHER_CONFIG);
+    let project = scene.project();
+    let plan = project.join(format!("plans/{PLAN}/plan.md"));
+    let text = fs::read_to_string(&plan).unwrap();
+    let other = "fg-other-abc123";
+    fs::write(
+        &plan,
+        text.replace(
+            "status: ready\n",
+            &format!("status: ready\nhost: {other}\n"),
+        ),
+    )
+    .unwrap();
+    git(&project, &["add", "-f", "."]);
+    git(&project, &["commit", "-q", "-m", "pin plan"]);
+    git(&project, &["push", "-q", "origin", "main"]);
+    let view = scene.data(&["supervisor", "plans", "--json"]);
+    assert_eq!(view["plans"][0]["admissible"], false, "{view}");
+    scene.data(&["supervisor", "wake", "--json"]);
+    assert!(wake_errors(&scene)
+        .iter()
+        .any(|e| e == &format!("held-other-machine:{other}")));
+
+    let text = fs::read_to_string(&plan).unwrap();
+    fs::write(
+        &plan,
+        text.replace("status: ready\n", "status: running\nlead: lead:S6A\n"),
+    )
+    .unwrap();
+    git(&project, &["add", "-f", "."]);
+    git(&project, &["commit", "-q", "-m", "take plan"]);
+    git(&project, &["push", "-q", "origin", "main"]);
+    let view = scene.data(&["supervisor", "plans", "--json"]);
+    assert_eq!(view["plans"][0]["runningElsewhere"], true, "{view}");
+    assert_eq!(view["plans"][0]["host"], other, "{view}");
+    assert!(view["plans"][0].get("leadLive").is_none(), "{view}");
+    assert_eq!(view["leadsLive"], 0, "{view}");
 }
 
 /// Takes the demo plan (`running`, lead `lead:S6A`) and registers a live session holding that role.

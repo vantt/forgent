@@ -413,6 +413,17 @@ check exists it is named, otherwise the reviewer checks it.
    test names the test that now owns the behaviour, or says the behaviour was
    removed. Reports never count "all N assertion lines kept" as success.
 
+#### Documentation Write Door
+
+- id: `documentation-door`
+- source: `core/instructions/documentation-door.md`
+
+# Documentation Write Door
+
+**Documentation write door.** Before writing, changing or retiring maintained documentation, follow the
+documentation write door: find the unit that already carries your claim with `fgos doc locate`, grow it, and request
+admission instead of creating a document. The steps are the shared `write-door.md` fragment of the core skills.
+
 #### Id Minting
 
 - id: `id-minting`

@@ -14,3 +14,7 @@ Since plan 261127-1224, release checks run in a fresh `release-check-<id>` check
 # Done when
 
 The release check checkout reuses a `CARGO_TARGET_DIR` and npm cache across release runs, so a cold build no longer pushes a recipe step toward its timeout, with the measured step time recorded.
+
+# Notes
+
+Related: plan `261127-1224-release-checks-clean-tip` (moved release checks into a fresh checkout of the released tip). Release ticket `c-966306-1795794884379` is the measured run.

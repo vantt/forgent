@@ -1,14 +1,14 @@
 ---
 contract: plan-v1
 title: "fgos session stop ends a head whose run supervisor is dead; session-gone wiring proof and changelog"
-status: ready
+status: running
 priority: P0
 blockedBy:
   - 261127-0016-head-run-own-failure-domain
   - 261122-0056-orchestration-skeleton
   - 261126-2324-changelog-fragments-and-skill-surface-regeneration
   - 261125-1557-shaper-worktree
-base: cc5b6ea9a2dd8e694682df95070c3ff681945f42
+base: 936130c13cb166e22439b7f0edf03e1c680f7cbc
 footprint:
   - plans/261127-0018-dead-supervisor-head-stop/**
   - src/session-host/head-stop.mjs
@@ -21,6 +21,8 @@ source:
   - p-6htu2ae64o
   - plans/261127-0016-head-run-own-failure-domain/plan.md
 created: 2026-11-27
+lead: head:lead-forgent-261127-0018-dead-s-6acc8
+host: fg-server2-jdp2bv
 ---
 
 # Session stop ends a head whose supervisor is dead

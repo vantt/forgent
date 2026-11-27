@@ -13,6 +13,8 @@ use fgos_supervision::{
 use std::cell::{Cell, RefCell};
 
 const HANDLE: &str = "forgent";
+/// The machine the fakes run on.
+const M: &str = "m1";
 
 #[derive(Default)]
 struct Fake {
@@ -157,6 +159,9 @@ impl supervisor::OpenQuestions for Fake {
     }
 }
 impl Admission for Fake {
+    fn machine(&self) -> Result<String, String> {
+        Ok(M.to_owned())
+    }
     fn capacity(&self) -> Result<Capacity, String> {
         let reads = self.capacity_reads.get();
         self.capacity_reads.set(reads + 1);
@@ -445,12 +450,12 @@ fn holders(role: &str) -> Holder {
 #[test]
 fn a_running_plan_reads_its_named_leads_liveness_in_this_project() {
     let plans = vec![
-        running("alpha", Some("lead:S1")),
-        running("beta", Some("lead:GONE")),
-        running("gamma", Some("lead:OTHER")),
+        hosted(running("alpha", Some("lead:S1")), Some(M)),
+        hosted(running("beta", Some("lead:GONE")), Some(M)),
+        hosted(running("gamma", Some("lead:OTHER")), Some(M)),
         plan("delta", "ready"),
     ];
-    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &holders, 4, &NoQuestions);
+    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &holders, 4, &NoQuestions, M);
     assert_eq!((view.leads_live, view.max_leads), (1, 4));
     let live: Vec<_> = view.rows.iter().map(|r| r.lead_live).collect();
     assert_eq!(live, [Some(true), Some(false), Some(false), None]);
@@ -491,15 +496,15 @@ fn a_live_lead_whose_every_open_phase_has_an_open_owner_question_holds_no_slot()
         two_phase_running("beta", "lead:B", "todo"),
     ];
     let asked = OpenRefs(&["plan:alpha#phase-02", "plan:beta"]);
-    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &live_here, 1, &asked);
+    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &live_here, 1, &asked, M);
     assert_eq!((view.leads_live, view.leads_waiting), (0, 2));
     assert_eq!(view.to_json()["leadsWaiting"], 2);
 
     let answered = OpenRefs(&["plan:alpha#phase-02"]);
-    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &live_here, 1, &answered);
+    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &live_here, 1, &answered, M);
     assert_eq!((view.leads_live, view.leads_waiting), (1, 1));
 
-    let none = supervisor::plans(&plans, &[], HANDLE, "p1", &live_here, 1, &NoQuestions);
+    let none = supervisor::plans(&plans, &[], HANDLE, "p1", &live_here, 1, &NoQuestions, M);
     assert_eq!((none.leads_live, none.leads_waiting), (2, 0));
 }
 
@@ -514,6 +519,7 @@ fn a_plan_with_a_not_done_phase_lacking_an_open_question_does_not_wait() {
         &live_here,
         4,
         &OpenRefs(&["plan:alpha#phase-02"]),
+        M,
     );
     assert_eq!((view.leads_live, view.leads_waiting), (1, 0));
 }
@@ -521,12 +527,47 @@ fn a_plan_with_a_not_done_phase_lacking_an_open_question_does_not_wait() {
 #[test]
 fn a_running_plan_naming_no_lead_is_held_and_never_a_restart_candidate() {
     let plans = vec![running("alpha", None)];
-    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &holders, 4, &NoQuestions);
+    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &holders, 4, &NoQuestions, M);
     assert_eq!(view.rows[0].lead_live, None);
     assert!(view.rows[0].lead_unnamed && !view.rows[0].admissible);
     let json = view.to_json();
     assert_eq!(json["plans"][0]["leadUnnamed"], true);
     assert!(json["plans"][0].get("overlaps").is_none());
+}
+
+fn hosted(mut p: Plan, host: Option<&str>) -> Plan {
+    p.host = host.map(str::to_owned);
+    p
+}
+
+#[test]
+fn running_plans_split_by_host_into_watched_elsewhere_and_unnamed() {
+    let plans = vec![
+        hosted(running("here", Some("lead:GONE")), Some(M)),
+        hosted(running("away", Some("lead:S1")), Some("m2")),
+        hosted(running("alive", Some("lead:S1")), None),
+        hosted(running("dead", Some("lead:GONE")), None),
+    ];
+    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &holders, 4, &NoQuestions, M);
+    // The plan on another machine holds no slot even though its role reads live here.
+    assert_eq!(view.leads_live, 1);
+    let rows = &view.rows;
+    assert_eq!(
+        (rows[0].lead_live, rows[0].host_unnamed),
+        (Some(false), false)
+    );
+    assert!(rows[1].running_elsewhere && rows[1].lead_live.is_none() && !rows[1].lead_unnamed);
+    assert_eq!(
+        (rows[2].lead_live, rows[2].host_unnamed),
+        (Some(true), false)
+    );
+    assert_eq!((rows[3].lead_live, rows[3].host_unnamed), (None, true));
+    let json = view.to_json();
+    assert_eq!(json["plans"][1]["runningElsewhere"], true);
+    assert_eq!(json["plans"][1]["host"], "m2");
+    assert_eq!(json["plans"][3]["hostUnnamed"], true);
+    assert!(json["plans"][3].get("leadLive").is_none());
+    assert!(json["plans"][0].get("hostUnnamed").is_none());
 }
 
 #[test]
@@ -794,6 +835,26 @@ fn ready_plans_are_published_then_started_in_order_under_the_cap_without_a_super
             ("plan:beta".into(), "admitted".into()),
         ]
     );
+    assert!(f.events.borrow().is_empty());
+}
+
+#[test]
+fn a_ready_plan_naming_another_machine_is_held_without_judgement_and_one_naming_this_machine_is_admitted(
+) {
+    let mut f = admission_fixture(4, 4);
+    f.plans = vec![
+        hosted(plan("alpha", "ready"), Some("m2")),
+        hosted(plan("beta", "ready"), Some(M)),
+    ];
+    assert_eq!(f.wake(), WakeOutcome::NothingAdmissible);
+    assert_eq!(
+        decisions(&f),
+        vec![
+            ("plan:alpha".into(), "held-other-machine:m2".into()),
+            ("plan:beta".into(), "admitted".into()),
+        ]
+    );
+    assert_eq!(f.admitted.borrow().len(), 1);
     assert!(f.events.borrow().is_empty());
 }
 

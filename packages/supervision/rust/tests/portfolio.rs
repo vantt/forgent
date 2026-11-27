@@ -71,8 +71,8 @@ fn a_plan_blocked_by_a_plan_that_is_not_done_is_not_admissible() {
         &["dep"],
         &["src/x/"],
     )];
-    assert!(admissible(&plans, &[]).is_empty());
-    assert_eq!(admissible(&plans, &["dep".to_string()]).len(), 1);
+    assert!(admissible(&plans, &[], "m1").is_empty());
+    assert_eq!(admissible(&plans, &["dep".to_string()], "m1").len(), 1);
 }
 
 #[test]
@@ -89,7 +89,7 @@ fn a_plan_whose_footprint_overlaps_a_running_plan_is_admissible_and_its_row_list
         ),
         plan("free", "ready", "P1", "2026-11-03", &[], &["src/b/"]),
     ];
-    let dirs: Vec<&str> = admissible(&plans, &[])
+    let dirs: Vec<&str> = admissible(&plans, &[], "m1")
         .iter()
         .map(|p| p.dir.as_str())
         .collect();
@@ -110,6 +110,7 @@ fn a_plan_whose_footprint_overlaps_a_running_plan_is_admissible_and_its_row_list
         &|_| Holder::NotLive,
         2,
         &NoQuestions,
+        "m1",
     );
     let json = view.to_json();
     assert_eq!(json["plans"][1]["admissible"], true);
@@ -303,7 +304,7 @@ fn a_plan_with_a_malformed_footprint_entry_is_not_admissible_and_names_its_reaso
     );
     assert_eq!(footprint_problem(&plans[1]), None);
     assert!(running_overlaps(&plans[0], &plans).is_empty());
-    let dirs: Vec<&str> = admissible(&plans, &[])
+    let dirs: Vec<&str> = admissible(&plans, &[], "m1")
         .iter()
         .map(|p| p.dir.as_str())
         .collect();
@@ -318,7 +319,7 @@ fn a_plan_with_an_empty_footprint_is_not_admissible_and_names_its_reason() {
     ];
     assert_eq!(footprint_problem(&plans[0]), Some("footprint-empty"));
     assert!(running_overlaps(&plans[0], &plans).is_empty());
-    let dirs: Vec<&str> = admissible(&plans, &[])
+    let dirs: Vec<&str> = admissible(&plans, &[], "m1")
         .iter()
         .map(|p| p.dir.as_str())
         .collect();
@@ -339,7 +340,7 @@ fn only_comparable_running_plans_contribute_overlap_advice() {
     plans[0].status = "running".into();
     for footprint in [vec![], vec!["src/**".into(), "/abs".into()]] {
         plans[0].footprint = footprint;
-        assert_eq!(admissible(&plans, &[]).len(), 1);
+        assert_eq!(admissible(&plans, &[], "m1").len(), 1);
         assert!(running_overlaps(&plans[1], &plans).is_empty());
     }
 }
