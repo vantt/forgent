@@ -7,13 +7,13 @@ import '../helpers/process-tmp-root.mjs';
 import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { spawn, spawnSync } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { HeadRequestError, MAX_FRAME_BYTES, MAX_REQUEST_BYTES, requestHead, requestHeadCanI, requestHeadFgos, requestHeadStart, requestHeadWrite } from '../../src/session-host/head-request-client.mjs';
-import { rotateHead, runHeadRequest, runStopSelf, runTicket, startHead } from '../../src/session-host/head-request.mjs';
+import { HEAD_SUPERVISOR_WIDEN_VERB, rotateHead, runHeadRequest, runStopSelf, runTicket, startHead } from '../../src/session-host/head-request.mjs';
 import { parseArgs } from '../../src/cli/parse-args.mjs';
 import { lineageDirOf, writeHeadPlacement } from '../../src/session-host/head-start.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
@@ -827,5 +827,200 @@ test('a secretary run that writes needs a linked worktree', async (t) => {
   assert.equal((await ask('run', { prompt: 'x', writes: ['../a.md'], worktree }, 'v3', ports)).line.code, 'bad-args');
   assert.equal((await ask('run', { prompt: 'x', writes: ['docs/a.md'], worktree }, 'v4', ports)).exit, 0);
   assert.deepEqual(ticketArgv(ticketFile('v4')).slice(-5), ['--writes', 'docs/a.md', '--worktree', worktree, '--json']);
+});
+
+// ---- supervisor widen -----------------------------------------------------------------------------
+
+test('a lead supervisor widen answers a ticket at once and records correct argv', async (t) => {
+  const { ask, spawned, ticketFile } = headCase(t);
+  const started = await ask('supervisor widen', {
+    plan: 'p',
+    phase: '1',
+    paths: ['src/b/**', 'docs/b.md'],
+    criterion: 1,
+  }, 'w1');
+  assert.deepEqual(started, { exit: 0, line: { result: 'done', data: { ticket: 'w1', state: 'running' } } });
+  assert.equal(spawned[0].ticketFile, ticketFile('w1'));
+  const written = JSON.parse(fs.readFileSync(ticketFile('w1'), 'utf8'));
+  assert.deepEqual([written.state, written.verb, written.runner], ['running', 'supervisor widen', null]);
+  assert.deepEqual(written.argv, [
+    'supervisor',
+    'widen',
+    'p',
+    '--phase',
+    '1',
+    '--path',
+    'src/b/**',
+    '--path',
+    'docs/b.md',
+    '--criterion',
+    '1',
+    '--json',
+  ]);
+  assert.equal((await ask('request result', { id: 'w1' }, 'r1')).line.data.state, 'running');
+  runTicket(ticketFile('w1'), {
+    selfRecord: () => ({ pid: 1, startTime: 1 }),
+    exec: () => ({ status: 0, stdout: '{"result":"done","data":{"plan":"p","commit":"abc1234"}}\n' }),
+  });
+  const done = (await ask('request result', { id: 'w1' }, 'r2')).line.data;
+  assert.deepEqual([done.state, done.exit, done.result.data.commit], ['done', 0, 'abc1234']);
+});
+
+test('a lead supervisor widen accepts structured or argv form', async (t) => {
+  const { ask, ticketFile } = headCase(t);
+  const started = await ask('supervisor widen', {
+    argv: ['p', '--phase', '2', '--path', 'src/c.mjs', '--criterion', '2'],
+  }, 'w2');
+  assert.equal(started.exit, 0);
+  assert.deepEqual(JSON.parse(fs.readFileSync(ticketFile('w2'), 'utf8')).argv, [
+    'supervisor',
+    'widen',
+    'p',
+    '--phase',
+    '2',
+    '--path',
+    'src/c.mjs',
+    '--criterion',
+    '2',
+    '--json',
+  ]);
+});
+
+test('a lead naming another plan in supervisor widen is refused plan-not-own', async (t) => {
+  const { ask } = headCase(t);
+  const res = await ask('supervisor widen', {
+    plan: 'other-plan',
+    phase: '1',
+    path: 'src/b/new.mjs',
+    criterion: 1,
+  });
+  assert.equal(res.line.code, 'plan-not-own');
+});
+
+test('supervisor widen validates arguments and flags starting with dash', async (t) => {
+  const { ask } = headCase(t);
+  assert.equal((await ask('supervisor widen', { plan: '--p', phase: '1', path: 'src/b/**', criterion: 1 })).line.code, 'bad-args');
+  assert.equal((await ask('supervisor widen', { plan: 'p', phase: '--1', path: 'src/b/**', criterion: 1 })).line.code, 'bad-args');
+  assert.equal((await ask('supervisor widen', { plan: 'p', phase: '1', path: '--src', criterion: 1 })).line.code, 'bad-args');
+  assert.equal((await ask('supervisor widen', { plan: 'p', phase: '1', path: 'src/b/**', criterion: -1 })).line.code, 'bad-args');
+  assert.equal((await ask('supervisor widen', { plan: 'p', phase: '1', path: 'src/b/**', criterion: 0 })).line.code, 'bad-args');
+  assert.equal((await ask('supervisor widen', { plan: 'p', phase: '1', path: 'src/b/**', criterion: 'not-a-number' })).line.code, 'bad-args');
+  assert.equal((await ask('supervisor widen', { plan: 'p', path: 'src/b/**', criterion: 1 })).line.code, 'bad-args');
+  assert.equal((await ask('supervisor widen', { plan: 'p', phase: '1', criterion: 1 })).line.code, 'bad-args');
+  assert.equal((await ask('supervisor widen', { plan: 'p', phase: '1', path: 'src/b/**' })).line.code, 'bad-args');
+  assert.equal((await ask('supervisor widen', { plan: 'p', phase: '1', path: 'src/b/**', criterion: 1, extraKey: 'bad' })).line.code, 'bad-args');
+});
+
+test('supervisor widen called by non-lead is refused role-mismatch', async (t) => {
+  const planner = headCase(t, { persona: 'planner', name: 'proj-p', writes: ['plans'] });
+  const res = await planner.ask('supervisor widen', {
+    plan: 'p',
+    phase: '1',
+    path: 'src/b/**',
+    criterion: 1,
+  });
+  assert.equal(res.line.code, 'role-mismatch');
+});
+
+test('e2e: a lead widens its own running plan footprint and subsequent run --writes passes', async (t) => {
+  const hostBin = process.env.FGOS_HOST_BIN;
+  if (!hostBin || !fs.existsSync(hostBin)) {
+    t.skip('FGOS_HOST_BIN must name a host binary built from this checkout');
+    return;
+  }
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-widen-e2e-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const git = (...args) => execFileSync('git', ['-C', root, '-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { encoding: 'utf8' });
+  git('init', '-q', '-b', 'main');
+
+  const planDir = '261127-0143-test-widen';
+  const planPath = path.join(root, 'plans', planDir, 'plan.md');
+  fs.mkdirSync(path.dirname(planPath), { recursive: true });
+  fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.fgos', 'project.json'), JSON.stringify({ handle: 'proj' }));
+
+  const initialPlan = `---
+contract: plan-v1
+title: Test plan
+status: running
+priority: P0
+footprint:
+  - src/a/**
+created: 2026-11-27
+lead: head:lead-proj-261127-0143-test-widen
+---
+
+# Test plan
+
+## Acceptance criteria
+
+1. Add new feature in src/b/new.mjs
+
+## Phases
+
+| id | title | depends-on | footprint | wave | status |
+|---|---|---|---|---|---|
+| 1 | First phase | - | src/a/** | 1 | running |
+`;
+  fs.writeFileSync(planPath, initialPlan);
+  git('add', '-A');
+  git('commit', '-q', '-m', 'initial plan');
+
+  const runDir = scratch(t);
+  const headRole = `head:lead-proj-${planDir}`;
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({
+    v: 3,
+    cwd: root,
+    hostBin,
+    unitRunId: 'head-widen-1',
+    session: {
+      role: headRole,
+      persona: 'lead',
+      name: `proj-${planDir}`,
+      writes: [`plans/${planDir}`],
+      requestSocketPath: '/run/s.sock',
+    },
+  }));
+
+  const ask = (verb, args, id = 't1', ports = {}) => runHeadRequest({ runDir, requestHostBin: hostBin, request: { id, verb, args } }, ports);
+  const ticketFile = (id) => path.join(fgosDirFromRoot(root), 'runtime', 'head-tickets', `lead-proj-${planDir}`, `${id}.json`);
+
+  // 1. run --writes <p> is refused write-outside-footprint
+  const targetPath = 'src/b/new.mjs';
+  const refused = await ask('run', { prompt: 'implement feature', writes: [targetPath] }, 'r1');
+  assert.equal(refused.line.code, 'write-outside-footprint');
+
+  // 2. supervisor widen <own plan> --phase 1 --path <p> --criterion 1
+  const widenRes = await ask('supervisor widen', {
+    plan: planDir,
+    phase: '1',
+    path: targetPath,
+    criterion: 1,
+  }, 'w1');
+  assert.equal(widenRes.exit, 0);
+  assert.equal(widenRes.line.data.state, 'running');
+
+  // Run the ticket to completion with the real host binary
+  const ticketPath = ticketFile('w1');
+  assert.ok(fs.existsSync(ticketPath));
+  const doneTicket = runTicket(ticketPath);
+  assert.equal(doneTicket.state, 'done');
+  assert.equal(doneTicket.exit, 0);
+
+  // Read result back via request result
+  const resultRes = await ask('request result', { id: 'w1' }, 'res1');
+  assert.equal(resultRes.line.data.state, 'done');
+
+  // 3. plan.md at the trunk tip has <p> in both copies
+  const updatedPlanText = execFileSync('git', ['-C', root, 'show', 'main:plans/' + planDir + '/plan.md'], { encoding: 'utf8' });
+  assert.ok(updatedPlanText.includes(`- ${targetPath}`), 'frontmatter footprint includes path');
+  assert.ok(updatedPlanText.includes(`src/a/**, ${targetPath}`), 'phase row footprint includes path');
+
+  // 4. Same run --writes <p> passes the footprint check
+  const allowed = await ask('run', { prompt: 'implement feature', writes: [targetPath] }, 'r2', {
+    spawnRunner: () => ({ pid: 9999 }),
+  });
+  assert.equal(allowed.exit, 0);
+  assert.equal(allowed.line.data.state, 'running');
 });
 

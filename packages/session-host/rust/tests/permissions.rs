@@ -184,6 +184,7 @@ fn only_the_read_rows_may_be_used_before_a_rotation_successor_holds_the_role() {
 fn the_policy_verbs_are_node_rows_and_the_supervisors_own_are_native() {
     let policy = |persona, line| decide(persona, &argv(line)).unwrap().rule.unwrap().policy;
     assert_eq!(policy("lead", "land"), Policy::Node);
+    assert_eq!(policy("lead", "supervisor widen"), Policy::Node);
     assert_eq!(policy("secretary", "session start"), Policy::Node);
     assert_eq!(policy("supervisor", "session write"), Policy::Native);
     assert_eq!(policy("planner", "session bind session"), Policy::Native);
@@ -278,6 +279,7 @@ fn the_verbs_each_persona_held_before_are_still_allowed() {
             "run",
             "land",
             "worktree create",
+            "supervisor widen",
             "request result",
         ],
     );
@@ -304,6 +306,7 @@ fn the_verbs_each_persona_held_before_are_still_allowed() {
         &[
             "supervisor handled",
             "supervisor done",
+            "supervisor widen",
             "session read",
             "session type",
             "watcher tune",
@@ -437,4 +440,18 @@ fn every_command_sensitive_config_key_is_a_protected_config_path() {
         uncovered.is_empty(),
         "command-sensitive config keys with no protectedConfigPaths entry: {uncovered:#?}"
     );
+}
+
+#[test]
+fn supervisor_widen_is_allowed_to_lead_as_node_and_supervisor_as_forward() {
+    let lead = decide("lead", &argv("supervisor widen")).unwrap();
+    assert_eq!(lead.decision, Decision::Allow);
+    assert_eq!(lead.rule.unwrap().policy, Policy::Node);
+
+    let supervisor = decide("supervisor", &argv("supervisor widen")).unwrap();
+    assert_eq!(supervisor.decision, Decision::Allow);
+    assert_eq!(supervisor.rule.unwrap().policy, Policy::Forward);
+
+    let planner = decide("planner", &argv("supervisor widen")).unwrap();
+    assert_eq!(planner.decision, Decision::Ask);
 }
