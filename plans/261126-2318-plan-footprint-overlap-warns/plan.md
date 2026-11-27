@@ -1,10 +1,11 @@
 ---
 contract: plan-v1
 title: "Plans that share a path both run; the overlap is a warning at ready and at admission, never a refusal"
-status: ready
+status: running
 priority: P0
 blockedBy: []
-base: 43460a291440cc08dea2d814a5aeeb146b9f7e24
+base: af9a5d5b15dc1e3ded44db8d187bd49e2652362e
+lead: head:lead-forgent-261126-2318-plan-f-96ef4
 footprint:
   - plans/261126-2318-plan-footprint-overlap-warns/**
   - changelog.d/261126-2318-plans-that-share-a-path-both-run.md
