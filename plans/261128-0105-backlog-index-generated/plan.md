@@ -29,6 +29,7 @@ footprint:
   - changelog.d/261128-0105-backlog-index-generated.md
   - plans/backlog.md
   - plans/261128-0105-backlog-index-generated
+  - test/session-host/head-start.test.mjs
 base: 562b8c1075bcdbadb25575f65881a281a60713e0
 source:
   - plans/discussions/ds-6z4rfn6kv5-backlog-index-generated/DISCUSSION.md
@@ -134,7 +135,7 @@ lines that tell them to copy and rewrite the whole index) is retired in the same
 | 2 | [Session write publishes rows through the land door](phase-02-session-write-uses-land-door.md) | 1 | apps/fgos/src/wiring/session_write_publish.rs, apps/fgos/tests/session_write_publish.rs | 2 | ready |
 | 3 | [Retire the index grant and the hand-edit doctrine](phase-03-retire-index-grant-and-doctrine.md) | - | packages/session-host/contracts/head-permissions.v1.json, packages/session-host/rust/tests/permissions.rs, test/session-host/head-grants.test.mjs, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, docs/platform/session-host/spec.md, docs/platform/supervision/spec.md, docs/platform/agent-confinement/spec.md | 1 | done |
 | 4 | [Retire the JavaScript portfolio duplicate](phase-04-retire-js-portfolio-duplicate.md) | - | packages/portfolio/index-generator.mjs, packages/portfolio/portfolio-check.mjs, packages/portfolio/item.mjs, packages/portfolio/discussion.mjs, packages/portfolio/vocabulary.mjs, test/portfolio/portfolio-check.test.mjs, apps/fgos/tests/portfolio_check.rs | 1 | done |
-| 5 | [Integration: combined gates, regenerated index, changelog](phase-05-integration.md) | 1, 2, 3, 4 | changelog.d/261128-0105-backlog-index-generated.md, plans/backlog.md, plans/261128-0105-backlog-index-generated | 3 | ready |
+| 5 | [Integration: combined gates, regenerated index, changelog](phase-05-integration.md) | 1, 2, 3, 4 | changelog.d/261128-0105-backlog-index-generated.md, plans/backlog.md, plans/261128-0105-backlog-index-generated, `test/session-host/head-start.test.mjs` | 3 | ready |
 
 Each phase's capability is `code:implement`, except phase 5, which is `code:test`.
 
