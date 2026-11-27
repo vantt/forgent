@@ -1,13 +1,10 @@
 ---
 contract: plan-v1
 title: "A ready plan runs to done without the owner: the standing rule as rule units, an Unattended run section the contract check enforces, and a full-gate door the lead calls"
-status: ready
+status: running
 priority: P0
-blockedBy:
-  - 261126-2318-plan-footprint-overlap-warns
-  - 261127-0143-widen-running-plan-footprint
-  - 261127-0144-when-to-ask-owner-rule
-base: 09a2a89882ec273a1abda2062e0cfe6b044f0a8b
+blockedBy: []
+base: e3757ea290eadc14228263e514e9ca5fae89d603
 footprint:
   - plans/261127-0151-ready-plan-runs-unattended/**
   - core/instructions/ready-plan-runs-unattended.md
@@ -39,6 +36,7 @@ source:
   - plans/discussions/ds-que32ftgg6-ready-plan-runs-unattended/DISCUSSION.md
   - p-u3nndr6vsh
 created: 2026-11-27
+lead: head:lead-forgent-261127-0151-ready-c75c2
 ---
 
 # A ready plan runs to done without the owner
@@ -157,8 +155,7 @@ its wave. Phase 4 is `code:review` (read-only analysis, one report). Phase 5 is 
 **Ordering behind other plans (owner order 2026-11-27).** `scripts/plan-contract-check.mjs` and its test are
 rewritten by plan 261126-2318 (carried by Keeper) and `plan-contract.md`, `fgos-lead`, AGENTS.md and the skill
 projections by plans 261126-2318 and 261127-0144; the head permission table, head-request contract, command
-manifest and registry by plan 261127-0143. This plan is `blockedBy` all three, so no phase starts on a file another
-active plan holds.
+manifest and registry by plan 261127-0143. Owner order 2026-11-27 12:1x: this plan no longer waits on them. The overlap is a warning by the settled overlap design; shared files merge at land, and no phase here needs another plan's result.
 
 Checked: `node scripts/plan-contract-check.mjs --plan plans/261127-0151-ready-plan-runs-unattended` and
 `fgos resource-check --plan plans/261127-0151-ready-plan-runs-unattended`; results in the land commit message.
