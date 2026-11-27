@@ -44,6 +44,7 @@
         { "prefix": "run", "decision": "allow", "policy": "node" },
         { "prefix": "land", "decision": "allow", "policy": "node" },
         { "prefix": "worktree create", "decision": "allow", "policy": "node" },
+        { "prefix": "supervisor widen", "decision": "allow", "policy": "node" },
         { "prefix": "request result", "decision": "allow", "policy": "node" }
       ]
     },
@@ -87,6 +88,7 @@
         { "prefix": "slots", "decision": "allow" },
         { "prefix": "supervisor handled", "decision": "allow" },
         { "prefix": "supervisor done", "decision": "allow", "policy": "node" },
+        { "prefix": "supervisor widen", "decision": "allow" },
         { "prefix": "supervisor raise", "decision": "allow", "args": { "--kind": ["coordination-help", "coordination-handoff", "coordination-chore"] } },
         { "prefix": "supervisor wake", "decision": "allow" },
         { "prefix": "session read", "decision": "allow", "targetAt": 2, "limits": { "--lines": 1000 } },
