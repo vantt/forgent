@@ -32,7 +32,7 @@ Open now:
   "Proposed split"; the split needs owner answers on C, D, E and F before any `authority declare`.
 - D4 (naming) settled; the rename itself is outside this discussion, raised to the supervisor (event
   `ae993b34282b2832`) for its own backlog row.
-- Q2 `{#Q2}` — `q-pke5ht4y5e`: which network the machines share (still parked).
+- Q2 `{#Q2}` — answered in chat 16:51: local network and Tailscale; `q-pke5ht4y5e` cancelled as answered (§3).
 - Many projects on one gateway: how a project is named across machines (§3).
 - Component split: first cut in §3, not discussed with the owner yet.
 
@@ -94,7 +94,7 @@ coordination.
 | Proposed split | proposal (agent, shaper agrees in outline), not discussed with the owner | One binary `fgos-gateway`, a small workspace: **A** entry door + verb relay, REST and MCP together (same port, auth and verb chokepoint); row `fgos-gateway` updated, new door `relay-to-fgos-verbs`; per request a project id instead of `root`. **B** auth as a module and a door `gateway-admits-callers`, not a component. **C** dashboard: hosting only; fold the retired `herdr-web-dashboard` row into `fgos-gateway` (owner answer: changes the area map). **D** machine project registry: a module and door under `fgos-gateway`, home `~/.fgos`; lock, registry and logs move to machine scope (owner answer; holder-lock's lock registry changes; needs the project naming question). **E** peer link + membership: new crate and component `gateway-peers`, trust by Identity pins, new contract `gateway-peer.v1`; `remote_invocation.rs` deleted unless a peer-invocation job is confirmed. **F** changes broadcast: new crate and component, depends on E; the Event Store side (volatile received buffer, notify/watch of appends, fold by hash) stays in `packages/event-store` behind a door the gateway calls; subscribers subscribe through the Event Store, never through the gateway. **G** lifecycle `fgos gateway start/stop/status` stays in `apps/fgos` under `host-surface`, scope changes to machine. New components (E, F) need an answered owner question before `fgos authority declare` |
 | Gateway risks (assessment) | open | Silent stops (no shutdown log, no supervision); bind 0.0.0.0 with bearer and no TLS, so the peer link needs its own transport auth (Q2); dependency advisories p-7e41b0d3 should be audited before crates are added; `/runner/tick` and the 501 session routes need a keep-or-drop decision |
 | One gateway per machine vs today | observed | Today one gateway serves one project: `run(root)` and `FgosCliGateway { root }` (`gateway.rs:1394-1408`), lock `.fgos/locks/gateway.lock` and logs under that project's `.fgos/`, fixed port 4170 (`gateway.rs:1935`); a second project on the same machine collides on the port. One-per-machine needs a machine-level home (state under `~/.fgos`, not a project's `.fgos`) and a registry of the machine's projects, each request and each broadcast naming its project |
-| Network path between machines | open — **Q2** `q-pke5ht4y5e` | Gateway binds 0.0.0.0:4170; Cloudflare Access support exists; LAN/VPN unknown |
+| Network path between machines | owner-stated 16:51, not yet a D-ID | Owner: "local network and tailscale". Tailscale runs on fg-server (backend `Running`, MagicDNS name under a `.ts.net` tailnet, 8 peers, 5 online at 16:52). So a peer link can reach other gateways by tailnet name with no public exposure; the LAN is a faster path where both machines share it. Transport auth stays Identity pins (D-pending), independent of the network; whether to stop binding 0.0.0.0 in favour of the tailnet and loopback is a follow-up |
 | Trust between cluster members | observed, reusable | Identity holds confirmed per-machine ssh-ed25519 pins (`fgos identity pins`, e.g. `design-lap-iezwlz` confirmed 2026-10-25); a peer link can authenticate with them |
 | Plan placement and admission travel only through git pushes of `plan.md` | observed | `ds-izibwo45vm`, plan `261127-1535-plan-claim-who-and-where`; a gateway signal would run ahead of this, never replace it |
 | Component split | open, next round | Shaper's first cut, to discuss: (1) peer link and membership (who is in the cluster, authenticated by Identity pins); (2) changes broadcast (send and receive the acked events; the fast cache on the receiving side); (5) project registry (which projects this machine serves); (3) entry door and verb relay (REST + MCP, today's routes); (4) dashboard (web bundle). Which of these is a crate vs a module, and which component row owns each, is not decided; `fgos authority locate` to run once the shape holds |
@@ -159,6 +159,8 @@ coordination.
   recorded it in §3. Mailbox's two write paths confirmed in code.
 - 2026-11-27 16:50 — Owner: "đúng ý anh, ghi lại đi" on the rule "durable first, the bus carries copies or signals
   safe to lose". Minted D5; §6 regenerated.
+- 2026-11-27 16:51 — Owner answered Q2 in chat: "local network and tailscale". `q-pke5ht4y5e` cancelled as answered
+  in chat. Shaper checked Tailscale is running on fg-server (§3).
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -175,7 +177,7 @@ the bus carries alone is safe to lose; a lost item only falls back to timer spee
 Names: Event Store stays; the supervision queue becomes the attention queue (D4).
 
 Not settled yet: the component split (§3 "Proposed split": C, D, E, F need owner answers), how a project is named
-across machines, the network between machines (Q2), push inside one machine (append notify vs open-log watch), wake
+across machines, push inside one machine (append notify vs open-log watch), wake
 coalescing per subscriber, whether letters of local mail must survive a restart, and plan/backlog beyond the
 provisional signal.
 
