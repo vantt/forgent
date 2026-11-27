@@ -1,1 +1,1 @@
-{"count":3,"firstSeq":55,"kind":"seal","lastSeq":57,"machineId":"fg-server-sqs7es","origin":"b4be6b4b536d5b71195ab878c6ec43e0","scope":"project","sha256":"39d24d38f8cdcbcfe284ac90462c0dbef4e2a83533ab11281c7851e53dc369dc","stream":"project","v":1}
+{"count":1,"firstSeq":12,"kind":"seal","lastSeq":12,"machineId":"fg-server-sqs7es","origin":"b4be6b4b536d5b71195ab878c6ec43e0","scope":"project","sha256":"b9b99c95b0331f0952019228578a2c333f116b3b9dd86a9f80885ec8e46d5e96","stream":"project:questions","v":1}
