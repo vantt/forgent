@@ -153,8 +153,17 @@ pub fn envelope_data(stdout: &str) -> Result<Value, String> {
     }
 }
 
+/// The check checkout both a release run and a checks-only run use: one door for making and removing it.
+pub trait CheckoutPorts {
+    /// Makes a clean, exact checkout of the commit `tip` outside the project root, carrying the tip's committed
+    /// `.fgos` bytes, and returns its path. The checks run there. Made once per run, before the first check.
+    fn make_check_checkout(&self, tip: &str) -> Result<PathBuf, String>;
+    /// Removes the checkout `make_check_checkout` made for `tip`. Called once the checks end, however they ended.
+    fn remove_check_checkout(&self, path: &Path, tip: &str) -> Result<(), String>;
+}
+
 /// The external calls of a release run.
-pub trait ReleasePorts {
+pub trait ReleasePorts: CheckoutPorts {
     /// The `release` subtree of the effective config (`Null` when nothing is set).
     fn recipe(&self) -> Result<Value, String>;
     /// The trunk tip's commit.
@@ -169,11 +178,6 @@ pub trait ReleasePorts {
     fn set_step(&self, step: Option<&str>) -> Result<(), String>;
     /// Why a land holds the merge slot (`Some`), or `None` when none does.
     fn land_in_progress(&self) -> Result<Option<String>, String>;
-    /// Makes a clean, exact checkout of the commit `tip` outside the project root and returns its path. The checks
-    /// run there. Made once per run, after the merge-slot look and before the first check.
-    fn make_check_checkout(&self, tip: &str) -> Result<PathBuf, String>;
-    /// Removes the checkout `make_check_checkout` made for `tip`. Called once the checks end, however they ended.
-    fn remove_check_checkout(&self, path: &Path, tip: &str) -> Result<(), String>;
     /// Runs one argv (no shell) and returns its exit code: in `dir` when given (a check's checkout), else from the
     /// project root.
     fn run(&self, argv: &[String], dir: Option<&Path>) -> Result<i32, String>;
@@ -491,9 +495,12 @@ fn rollback_steps(ports: &dyn ReleasePorts, ran: &mut bool) -> Outcome {
     }
 }
 
-/// The external calls of a checks-only run: reading the recipe and running one argv. Nothing else is reachable from
-/// [`run_checks_in`]: no apply, probe, rollback, merge-slot look, checkout or release record.
-pub trait CheckPorts {
+/// The external calls of a checks-only run: reading the recipe, resolving the worktree's committed tip, the check
+/// checkout (the one `release run` uses) and running one argv. Nothing else is reachable from [`run_checks_in`]: no
+/// apply, probe, rollback, merge-slot look or release record.
+pub trait CheckPorts: CheckoutPorts {
+    /// The commit the worktree's `HEAD` names (uncommitted edits are not part of it).
+    fn head_tip(&self, worktree: &Path) -> Result<String, String>;
     /// The `release` subtree of the effective config (`Null` when nothing is set).
     fn recipe(&self) -> Result<Value, String>;
     /// Runs one argv (no shell) with `dir` as its working directory and returns its exit code.
@@ -512,6 +519,8 @@ pub struct CheckResult {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CheckReport {
     pub green: bool,
+    /// The committed tip the checks ran against (`None` when there were no checks, so nothing was checked out).
+    pub tip: Option<String>,
     pub checks: Vec<CheckResult>,
     pub note: Option<String>,
 }
@@ -530,6 +539,9 @@ impl CheckReport {
             })
             .collect();
         let mut value = json!({"green": self.green, "checks": checks});
+        if let Some(tip) = &self.tip {
+            value["tip"] = json!(tip);
+        }
         if let Some(note) = &self.note {
             value["note"] = json!(note);
         }
@@ -537,8 +549,11 @@ impl CheckReport {
     }
 }
 
-/// The project's `checks`, each argv with no shell and `worktree` as its working directory, all of them run so the
-/// report names every red one. An empty list is green with a note. A recipe that cannot be read is the `Err`.
+/// The project's `checks`, each argv with no shell, run in a check checkout of the worktree's committed `HEAD` (the
+/// checkout `release run` uses, carrying the committed `.fgos`) and removed afterwards however the checks ended.
+/// Edits not committed in `worktree` are not checked. All checks run so the report names every red one. An empty
+/// list is green with a note and makes no checkout. A recipe that cannot be read, a tip that cannot be resolved or a
+/// checkout that cannot be made is the `Err`; a checkout that cannot be removed is named in the report's note.
 pub fn run_checks_in(ports: &dyn CheckPorts, worktree: &Path) -> Result<CheckReport, String> {
     let recipe = ports
         .recipe()
@@ -547,14 +562,21 @@ pub fn run_checks_in(ports: &dyn CheckPorts, worktree: &Path) -> Result<CheckRep
     if recipe.checks.is_empty() {
         return Ok(CheckReport {
             green: true,
+            tip: None,
             checks: vec![],
             note: Some("the project declares no checks".to_string()),
         });
     }
+    let tip = ports
+        .head_tip(worktree)
+        .map_err(|why| format!("check-checkout-failed: {why}"))?;
+    let checkout = ports
+        .make_check_checkout(&tip)
+        .map_err(|why| format!("check-checkout-failed: {why}"))?;
     let checks: Vec<CheckResult> = recipe
         .checks
         .iter()
-        .map(|argv| match ports.run(argv, worktree) {
+        .map(|argv| match ports.run(argv, &checkout) {
             Ok(exit) => CheckResult {
                 argv: argv.clone(),
                 exit: Some(exit),
@@ -567,9 +589,16 @@ pub fn run_checks_in(ports: &dyn CheckPorts, worktree: &Path) -> Result<CheckRep
             },
         })
         .collect();
+    let removal = ports.remove_check_checkout(&checkout, &tip);
     Ok(CheckReport {
         green: checks.iter().all(|check| check.exit == Some(0)),
+        tip: Some(tip),
         checks,
-        note: None,
+        note: removal.err().map(|why| {
+            format!(
+                "the check checkout at {} was not removed: {why}",
+                checkout.display()
+            )
+        }),
     })
 }
