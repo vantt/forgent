@@ -24,7 +24,7 @@ use fgos_git::{
 };
 use fgos_run_supervisor::route::{CatchUpRefusal, PublishRefusal, WritePublisher};
 use fgos_supervision::land::{
-    catch_up, land, Gate, LandCommand, LandConfig, LandPorts, Regenerate, ShellRunner,
+    catch_up, land, BacklogPort, Gate, LandCommand, LandConfig, LandPorts, Regenerate, ShellRunner,
 };
 use serde_json::Value;
 
@@ -405,25 +405,16 @@ fn catch_up_once(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
     })
 }
 
-/// The item contract and the generated backlog index live in the sibling `portfolio` module.
+/// The item contract and the backlog index generator live in the sibling `portfolio` module.
 use super::portfolio;
 
-/// The index every backlog item write keeps current.
-const BACKLOG_INDEX: &str = "plans/backlog.md";
-/// The mode of the regenerated index when it is created: like a file a person writes.
-const INDEX_MODE: u32 = 0o644;
-
 /// Before a backlog item file is committed: it must hold the item frontmatter contract and sit at its convention path
-/// `plans/backlog/<id>-<slug>.md` (`write-item-invalid` otherwise; the request takes back a file it created). Then the
-/// index `plans/backlog.md` is regenerated from the whole portfolio and written atomically, so one commit carries the
-/// item and its index. Returns the index path when its content changed.
-fn refresh_backlog_index(
-    checkout: &Checkout,
-    path: &str,
-) -> Result<Option<String>, PublishRefusal> {
-    let main = checkout.main.as_path();
+/// `plans/backlog/<id>-<slug>.md` (`write-item-invalid` otherwise; the request takes back a file it created), and a
+/// file Git does not track yet takes a minted id. The generated index is not written here: the land door writes and
+/// commits it with the row.
+fn check_backlog_item(checkout: &Checkout, path: &str) -> Result<(), PublishRefusal> {
     let invalid = |detail: String| refusal("write-item-invalid", detail);
-    let text = std::fs::read_to_string(main.join(path))
+    let text = std::fs::read_to_string(checkout.main.join(path))
         .map_err(|e| refusal("write-path-unreadable", format!("{path}: {e}")))?;
     let item = portfolio::parse_backlog_item(Path::new(path), &text)
         .map_err(|e| invalid(e.to_string()))?;
@@ -447,31 +438,28 @@ fn refresh_backlog_index(
             item.id
         )));
     }
-    // The index lists the items Git tracks and the one being committed, never a stray file of the working tree.
-    let index = portfolio::generate_backlog_index_for_commit(main, &tracked, &[path.to_owned()])
-        .map_err(|e| match e {
-            portfolio::CommitIndexError::Unreadable(why) => refusal("write-index-failed", why),
-            portfolio::CommitIndexError::Invalid(why) => invalid(why),
-        })?;
-    let index_path = main.join(BACKLOG_INDEX);
-    if std::fs::read_to_string(&index_path).is_ok_and(|current| current == index) {
-        return Ok(None);
-    }
-    fgos_durable_file::replace_durably_with_mode(
-        &main.join("plans"),
-        "backlog.md",
-        index.as_bytes(),
-        INDEX_MODE,
-    )
-    .map_err(|e| refusal("write-index-failed", format!("{} at {}", e.source, e.step)))?;
-    Ok(Some(BACKLOG_INDEX.to_owned()))
+    Ok(())
 }
 
 /// Lands `path` from the main checkout of `root` for the head holding `role`, written as `writer`. Returns the commit.
 fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, PublishRefusal> {
     let checkout = open(root)?;
+    if portfolio::backlog_item_name(path).is_some() {
+        check_backlog_item(&checkout, path)?;
+    }
     let config = land_config(&checkout.main)?;
     let grant = grant(&checkout)?;
+    // The same generator the land command hands its door: the door writes the index into the row's commit.
+    let index = |root: &Path, committing: &[String]| -> Result<String, String> {
+        let tracked = portfolio::tracked_item_paths(&checkout.driver, &checkout.repo)
+            .map_err(|cause| format!("write-status-unreadable: {cause}"))?;
+        portfolio::generate_backlog_index_for_commit(root, &tracked, committing).map_err(
+            |why| match why {
+                portfolio::CommitIndexError::Unreadable(why)
+                | portfolio::CommitIndexError::Invalid(why) => why,
+            },
+        )
+    };
     let ports = LandPorts {
         git: &checkout.driver,
         repo: &checkout.repo,
@@ -481,18 +469,15 @@ fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, 
         runner: &ShellRunner,
         log_dir: &checkout.main.join(".fgos").join("runtime").join("land"),
         wait_ms: WAIT_MS,
-        backlog_index: None,
+        backlog_index: Some(BacklogPort {
+            classify: &portfolio::classify_backlog_ref,
+            index: &index,
+        }),
         worktree_removal: None,
     };
-    let mut paths = vec![path.to_owned()];
-    if portfolio::backlog_item_name(path).is_some() {
-        if let Some(index) = refresh_backlog_index(&checkout, path)? {
-            paths.push(index);
-        }
-    }
     let command = LandCommand {
         target: Some(checked_out_branch(&checkout)?),
-        paths: Some(paths),
+        paths: Some(vec![path.to_owned()]),
         message: format!("docs({role}): write {path}"),
         ..LandCommand::default()
     };
