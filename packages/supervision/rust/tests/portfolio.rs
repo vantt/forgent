@@ -458,7 +458,7 @@ fn only_whole_entry_markdown_is_unwrapped_in_a_footprint_cell() {
 
 // The reader's existing cases do not prove admission's byte edit or publication fields.
 #[test]
-fn admission_edits_only_status_lead_and_base_and_keeps_the_plan_body_and_notes() {
+fn admission_edits_only_status_lead_base_and_host_and_keeps_the_plan_body_and_notes() {
     for newline in ["\n", "\r\n"] {
         let body = format!("{HEAD}| 1 | a | - | x/ | 1 | todo |\n\nKeep this body.\n");
         let original = text_with(

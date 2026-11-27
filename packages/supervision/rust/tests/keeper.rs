@@ -446,6 +446,7 @@ impl Portfolio for Fake {
                 footprint: vec!["src/a".into()],
                 source: vec![],
                 lead: None,
+                host: None,
                 phases: vec![],
             }],
             vec![],

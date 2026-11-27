@@ -199,9 +199,10 @@ test('a lead role must be an Identity role string, and a running plan without on
 });
 
 test('host is an optional machine id: malformed is an error, an id Identity does not know is only a warning', () => {
-  const read = IDENTITY.knows;
+  const read = IDENTITY.read;
   try {
-    IDENTITY.knows = (host) => host === 'fg-known-abc123';
+    IDENTITY.reset();
+    IDENTITY.read = () => new Set(['fg-known-abc123']);
     const r = root({
       none: planText(),
       known: planText({ fm: { host: 'fg-known-abc123' } }),
@@ -216,11 +217,18 @@ test('host is an optional machine id: malformed is an error, an id Identity does
     assert.ok(of('unknown').warnings.some((w) => w.includes('fg-other-xyz789') && w.includes('Identity knows')));
     assert.ok(of('bad').errors.some((e) => e.startsWith('host must be an Identity machine id')));
     assert.deepEqual(of('draft').warnings, []);
-    IDENTITY.knows = () => 'unreadable';
+    IDENTITY.reset();
+    let reads = 0;
+    IDENTITY.read = () => {
+      reads += 1;
+      throw new Error('identity unreadable');
+    };
     const first = of('unknown').warnings;
     assert.equal(first.length + of('unknown').warnings.length, 1, 'an unreadable Identity warns once and goes on');
+    assert.equal(reads, 1, 'an unreadable Identity is not asked again for each plan');
   } finally {
-    IDENTITY.knows = read;
+    IDENTITY.read = read;
+    IDENTITY.reset();
   }
 });
 

@@ -49,37 +49,49 @@ const TABLE_COLUMNS = VOCABULARY.tableColumns;
 
 // An Identity role: `<kind>:<name>`, e.g. `lead:S6A` or `head:lead-forgent-261119-1142-supervisor-l`.
 const LEAD_ROLE = /^[a-z]+:[A-Za-z0-9][A-Za-z0-9._-]*$/;
-// An Identity machine id: the one rule of `valid_machine_id` in the identity crate.
+// An Identity machine id; mirrors fgos_identity::machine::valid_machine_id.
 const MACHINE_ID = /^[a-z0-9][a-z0-9-]{1,62}$/;
 
 /**
- * Whether Identity knows a machine, read through the `fgos identity` verbs and never from state files: the local
- * machine id, else a machine with a session in the shared directory. `'unreadable'` when Identity cannot answer;
- * the caller warns once for that. A test replaces `knows`.
+ * The machines Identity knows, read through the `fgos identity` verbs and never from state files: this machine's
+ * id (`identity machine`) and every machine whose key it pinned (`identity pins`). One read per run, kept in
+ * `known`, which is `null` once Identity could not answer (never retried per plan; the caller warns once).
+ * A test replaces `read` and calls `reset` around its case.
  */
 export const IDENTITY = {
-  localId: undefined,
+  known: undefined,
+  warned: false,
+  read() {
+    const local = invokeHost(['identity', 'machine', '--json']).id;
+    const pins = invokeHost(['identity', 'pins', '--json']).pins ?? [];
+    return new Set([local, ...pins.map((pin) => pin.machineId)]);
+  },
+  reset() {
+    this.known = undefined;
+    this.warned = false;
+  },
+  /** `true`, `false`, or `'unreadable'`. */
   knows(host) {
-    try {
-      this.localId ??= invokeHost(['identity', 'machine', '--json']).id;
-      if (this.localId === host) return true;
-      return (invokeHost(['identity', 'list', '--machine', host, '--json']).sessions ?? []).length > 0;
-    } catch {
-      return 'unreadable';
+    if (this.known === undefined) {
+      try {
+        this.known = this.read();
+      } catch {
+        this.known = null;
+      }
     }
+    return this.known === null ? 'unreadable' : this.known.has(host);
   },
 };
-let identityUnreadableWarned = false;
 
 function hostWarning(host) {
   const known = IDENTITY.knows(host);
   if (known === true) return undefined;
   if (known === 'unreadable') {
-    if (identityUnreadableWarned) return undefined;
-    identityUnreadableWarned = true;
+    if (IDENTITY.warned) return undefined;
+    IDENTITY.warned = true;
     return 'Identity could not be read, so host was not checked against known machines';
   }
-  return `host ${host} is not a machine Identity knows (not this machine, and none of the shared directory)`;
+  return `host ${host} is not a machine Identity knows (not this machine, and no machine whose key it pinned)`;
 }
 // A backlog item id minted by Identity: `p-` plus 10 lowercase base32 characters.
 const BACKLOG_ID = /^p-[a-z2-7]{10}$/;
