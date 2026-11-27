@@ -76,10 +76,38 @@ Headings (any level) for each, in this order:
    where it has none, `fgos authority locate` answers `authority: inactive`, and the plan records
    `authority: inactive` in place of the table and goes on.
 5. **Phases**: the phase table (section 4).
+5a. **Unattended run**: the section below. The rule itself lives in the units `ready-plan-runs-unattended` and
+   `coding-footprint-tracing` (Rule: both in AGENTS.md; set in .fgos/instructions/effective/rules.json); this
+   contract fixes only the shape.
 6. **Owner questions**: only what the owner alone can answer per `decision-question.md#when-to-ask`. Ask each with `fgos questions ask`
    (five-part form of [decision-question.md](decision-question.md)) and list the `q-` ids here,
    each with its headline. Decide whatever the evidence settles (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json, priority 2).
 7. **Risks and rollback**: failure modes and the single revert path.
+
+### Unattended run section
+
+```markdown
+## Unattended run
+
+### Host steps
+| step | argv | executor |
+|---|---|---|
+| full gate on the integrated tree | fgos release check --worktree <path> | lead |
+
+### Cleanup
+Standing rule.            <- or the cleanup that differs
+
+### Beyond the rule
+None.                     <- or a table | item | question |, one answered q- id per row
+
+### Split
+One sentence: which split was chosen and why.
+```
+
+Host steps is `None.` or a table whose every row has an argv starting with `fgos ` and a non-empty executor
+(a persona name). Every top-level item under Acceptance criteria starts with `[core]` or `[debt-ok]` after its
+number or bullet. Required for a plan going `ready` that was created on or after 2026-11-28; earlier plans are
+not failed.
 
 ## 4. Organize for parallel work
 
