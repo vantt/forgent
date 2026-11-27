@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "24ceecf55a4acb7c16167f6cd1bcb55a493a241e6078da91a843dd1a192c2072",
+  "payloadDigest": "5160a1eae1075f52fe0e1f2b9c9a2f31581b37d3467528cd05f918dd99b7194c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -1451,7 +1451,7 @@
     "scripts/lib/fgos-write-witness.mjs": "550fae7fb5d60089475b390d79d69742307f98103c5ac8eeca43a0a024bc7137",
     "scripts/lib/full-suite-queue.mjs": "da176b9ad8a796ec13ede755dd2c2b12e6e29d5b5b12874ca8e6ae06803e3aba",
     "scripts/lib/git-addon-stage.mjs": "3844d3d8b57fc5c1d5ddd26e051109fb590cf1210639c220f8195508713da977",
-    "scripts/lib/git-dir-layout.mjs": "cdc573ff49e7c12af30c284ea84060ff476390b26769a0cb82f63dc357df04eb",
+    "scripts/lib/git-dir-layout.mjs": "20ca3557d024f47fcf2eec4ce0c7aadc684fa5e234cbcb232265d1352bdd4849",
     "scripts/lib/git-ports.mjs": "2050baedb9873aa02de331465cb110fff9bf942a3666dbaca6438770998d6fc0",
     "scripts/lib/git-spawn-match.mjs": "45403263d2d8bbd51068f6db07866fe3cb15efd6bbf61bccb4a074322dfbceae",
     "scripts/lib/is-main-module.mjs": "e39f98fb73a497be73b7d92f0335d9f0c88eb627a77f2ab964f9c7034f711a45",

@@ -229,3 +229,23 @@ test('a sandbox Git call is judged by every repository path it names, in separat
   assert.deepEqual(sandboxNamedPaths(['--work-tree=../out', 'status'], cwd), [cwd, '/sandbox/out']);
   assert.deepEqual(sandboxNamedPaths(['status'], undefined).length, 0, 'no cwd and no path names nothing');
 });
+
+test('a repository file read whose index moves mid-read restarts and returns one consistent set', async () => {
+  const { repositoryFiles } = await import('../../scripts/lib/git-dir-layout.mjs');
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-stale-cursor-'));
+  let reads = 0;
+  const stale = Object.assign(new Error('inspect-cursor-stale'), { cause: 'inspect-cursor-stale' });
+  const inspect = {
+    resolveRepo: () => ({ notARepository: false, worktreeRoot: root }),
+    trackedPaths: () => {
+      reads += 1;
+      if (reads === 1) throw stale;
+      return { entries: [Buffer.from('a.mjs')], nextCursor: undefined };
+    },
+    status: () => ({ entries: [{ untracked: true, path: Buffer.from('b.mjs') }], nextCursor: undefined }),
+  };
+  assert.deepEqual([...repositoryFiles(root, inspect)].sort(), ['a.mjs', 'b.mjs']);
+  assert.equal(reads, 2);
+  const broken = { ...inspect, trackedPaths: () => { throw new Error('inspect-failed'); } };
+  assert.throws(() => repositoryFiles(root, broken), /inspect-failed/);
+});
