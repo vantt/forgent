@@ -39,3 +39,6 @@ Scope rewritten 2026-11-24 by the DOCOS lead for the owner's decision of that da
 Plan `261113-0124-docos-retrospective-claim-units` is a draft written before that decision and around the old build
 order; it is re-planned for the general door before it can be set ready. The admission subcomponent itself (H2 step 4)
 is out of scope: here the request is only filed and waits.
+
+Plan: [plans/261127-1003-h2-step2-core-write-door/plan.md](../261127-1003-h2-step2-core-write-door/plan.md) replaces the
+draft plan above (withdrawn); its status here becomes done after the plan measurement phase.

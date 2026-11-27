@@ -165,7 +165,7 @@ Condition before it ships: a retrospective item whose knowledge fits no section 
 | Skill and pointer line | planned | write-door phase |
 | Live templates | planned | move and fix headers |
 | Locate step | planned | after document identity's view and verb |
-| Retrospective writer adds evidence to claim units | implemented in the skill: `fgos-coding-knowledge` follows 6.4 (claims, interim ripgrep locate, grow with an evidence line and attest, or hand off to an admission request); the cleanup gate's handoff kind lands with `fgos knowledge handoff` | item `p-ixrbglli5o`: gate kind and handoff verb; `fgos doc locate` replaces the interim search |
+| Retrospective writer adds evidence to claim units | built (step 2): `fgos-coding-knowledge` follows 6.4 on the shared door, finding the unit with `fgos doc locate` (the interim ripgrep search is gone), growing it with an evidence line and attesting, or handing off to an admission request; the cleanup gate accepts the evidence or the handoff | the dedicated skill and live templates are still planned for step 5 |
 
 ## 13. Verification
 
