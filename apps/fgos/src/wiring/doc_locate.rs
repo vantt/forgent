@@ -479,16 +479,17 @@ fn human(answer: &Answer) -> String {
 /// the documents (each once, in order of first appearance).
 fn mention_counts(answer: &Answer) -> (usize, Vec<&str>) {
     let mut total = 0;
+    let mut terms: Vec<&str> = Vec::new();
     let mut missed: Vec<&str> = Vec::new();
-    for at in answer
-        .parts
-        .iter()
-        .flat_map(|p| &p.mentions)
-        .flat_map(|m| &m.sections)
-    {
-        total += 1;
-        if at.missed_by_search && !missed.contains(&at.path.as_str()) {
-            missed.push(&at.path);
+    for m in answer.parts.iter().flat_map(|p| &p.mentions) {
+        if !terms.contains(&m.term.as_str()) {
+            terms.push(&m.term);
+            total += m.total;
+        }
+        for at in &m.sections {
+            if at.missed_by_search && !missed.contains(&at.path.as_str()) {
+                missed.push(&at.path);
+            }
         }
     }
     (total, missed)
@@ -854,7 +855,7 @@ mod tests {
                 }],
                 mentions: vec![Mention {
                     term: "topsecretterm".into(),
-                    total: 3,
+                    total: 30,
                     truncated: false,
                     sections: vec![
                         at("docs/found.md", false),
@@ -866,6 +867,9 @@ mod tests {
             }],
             group: None,
         };
+        let mut answer = answer;
+        let second_part = answer.parts[0].clone();
+        answer.parts.push(second_part);
         let record = locate_record(&query, &answer, Duration::from_millis(1));
         let detail = record.detail.clone().unwrap();
         assert!(!detail.contains("topsecretterm"), "{detail}");
@@ -877,7 +881,8 @@ mod tests {
         assert!(detail.find("top 1").unwrap() < detail.find("missed by").unwrap());
         assert_eq!(
             record.measures["fgos.doc.locate.mentions"].as_u64(),
-            Some(3)
+            Some(30),
+            "a term counts once by its total, even when two parts carry it"
         );
         assert_eq!(
             record.measures["fgos.doc.locate.missed_by_search"].as_u64(),

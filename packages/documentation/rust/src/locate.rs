@@ -46,8 +46,18 @@ pub fn locate<L: Locator>(
     for part in &mut answer.parts {
         part.candidates.truncate(CANDIDATES_MAX);
     }
-    if let Err(e) = attach_mentions(&mut answer, &query, scanner) {
-        add_note(&mut answer, format!("the mention scan failed: {e}"));
+    match attach_mentions(&mut answer, &query, scanner) {
+        Ok(()) => {
+            let no_candidates = answer.parts.iter().all(|p| p.candidates.is_empty());
+            let any_mention = answer.parts.iter().any(|p| !p.mentions.is_empty());
+            if answer.partial && no_candidates && any_mention {
+                add_note(
+                    &mut answer,
+                    "the index is partial, so missed-by-search counts every mention".into(),
+                );
+            }
+        }
+        Err(e) => add_note(&mut answer, format!("the mention scan failed: {e}")),
     }
     if let Some(e) = start_failure {
         add_note(&mut answer, format!("the index worker did not start: {e}"));
@@ -105,13 +115,19 @@ fn backticked(text: &str) -> Vec<String> {
     out
 }
 
-/// The terms of one part: its backticked spans, then each `exact` string not already present; the number cut at
+/// The terms of one part: each `exact` string, then its backticked spans not already present (so the cap never drops
+/// the writer's explicit terms); the number cut at
 /// `TERMS_MAX` is returned beside them.
 fn terms(part: &str, exact: &[String]) -> (Vec<String>, usize) {
-    let mut all = backticked(part);
+    let mut all: Vec<String> = Vec::new();
     for e in exact {
         if !e.trim().is_empty() && !all.contains(e) {
             all.push(e.clone());
+        }
+    }
+    for span in backticked(part) {
+        if !all.contains(&span) {
+            all.push(span);
         }
     }
     let dropped = all.len().saturating_sub(TERMS_MAX);
@@ -344,12 +360,12 @@ mod tests {
             "`fgos land` and ``a ` b`` and `ab` and ` fgos land ` and `x y z`",
             &["x y z".into(), "A.B (c)".into(), "  ".into()],
         );
-        assert_eq!(t, vec!["fgos land", "a ` b", "x y z", "A.B (c)"]);
+        assert_eq!(t, vec!["x y z", "A.B (c)", "fgos land", "a ` b"]);
         assert_eq!(dropped, 0);
         let many: String = (0..20).map(|i| format!("`term{i:02}` ")).collect();
-        let (t, dropped) = terms(&many, &[]);
-        assert_eq!((t.len(), dropped), (TERMS_MAX, 4));
-        assert_eq!(t[0], "term00");
+        let (t, dropped) = terms(&many, &["kept".into()]);
+        assert_eq!((t.len(), dropped), (TERMS_MAX, 5));
+        assert_eq!((t[0].as_str(), t[1].as_str()), ("kept", "term00"));
     }
 
     #[test]

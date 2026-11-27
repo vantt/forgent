@@ -99,7 +99,7 @@ fn scan_file(path: &str, text: &str, found: &mut [Mention]) {
         match fence_of(line) {
             Some((ch, len)) => match fence {
                 None => fence = Some((ch, len)),
-                Some((open, n)) if open == ch && len >= n && line.trim_start().len() == len => {
+                Some((open, n)) if open == ch && len >= n && line.trim().len() == len => {
                     fence = None
                 }
                 _ => {}
@@ -147,7 +147,10 @@ fn fence_of(line: &str) -> Option<(char, usize)> {
     }
     let ch = t.chars().next().filter(|c| *c == '`' || *c == '~')?;
     let len = t.chars().take_while(|c| *c == ch).count();
-    (len >= 3).then_some((ch, len))
+    if len < 3 || (ch == '`' && t[len..].contains('`')) {
+        return None;
+    }
+    Some((ch, len))
 }
 
 /// An ATX heading: its level and title.
@@ -239,6 +242,20 @@ mod tests {
         let t = corpus(&[("a.md", "# Real\n\n```sh\n# comment\nneedle\n```\n")]);
         let m = &scan(&t, &["needle"])[0];
         assert_eq!(m.sections[0].section, vec!["Real"]);
+    }
+
+    #[test]
+    fn a_fence_closed_with_trailing_spaces_ends_so_the_next_heading_is_a_section() {
+        let t = corpus(&[("a.md", "# A\n\n```sh\ncode\n```   \n\n## B\n\nneedle\n")]);
+        let m = &scan(&t, &["needle"])[0];
+        assert_eq!(m.sections[0].section, vec!["A", "B"]);
+    }
+
+    #[test]
+    fn a_backtick_line_with_a_backtick_in_its_info_string_opens_no_fence() {
+        let t = corpus(&[("a.md", "# A\n\n```a`b\n\n## B\n\nneedle\n")]);
+        let m = &scan(&t, &["needle"])[0];
+        assert_eq!(m.sections[0].section, vec!["A", "B"]);
     }
 
     #[test]
