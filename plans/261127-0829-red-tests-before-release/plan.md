@@ -92,10 +92,12 @@ owners.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Prove which reds remain at main](phase-01-prove-reds-at-main.md) | - | plans/261127-0829-red-tests-before-release/reports/phase-01/** | 1 | ready |
-| 2 | [Per-CLI credential source reds](phase-02-credential-source-reds.md) | 1 | src/runner/dispatch/provider-capacity.mjs, src/runner/dispatch/provider-credential-renewal.mjs, src/runner/dispatch/provider-credential-probe.mjs, src/runner/dispatch/confinement/drivers/bwrap.mjs, src/runner/dispatch/confinement/resources.mjs, test/runner/provider-per-cli-credential-sources.test.mjs, plans/261127-0829-red-tests-before-release/reports/phase-02/** | 2 | ready |
-| 3 | [Workflow guide schema reds](phase-03-guide-schema-reds.md) | 1 | src/workflow/guide-schema.mjs, src/workflow/loader.mjs, src/workflow/definition.mjs, domains/coding/workflows/bugfix.yaml, test/workflow/guide-schema.test.mjs, plans/261127-0829-red-tests-before-release/reports/phase-03/** | 2 | ready |
+| 1 | [Prove which reds remain at main](phase-01-prove-reds-at-main.md) | - | plans/261127-0829-red-tests-before-release/reports/phase-01/** | 1 | done |
+| 2 | [Per-CLI credential source reds](phase-02-credential-source-reds.md) | 1 | src/runner/dispatch/provider-capacity.mjs, src/runner/dispatch/provider-credential-renewal.mjs, src/runner/dispatch/provider-credential-probe.mjs, src/runner/dispatch/confinement/drivers/bwrap.mjs, src/runner/dispatch/confinement/resources.mjs, test/runner/provider-per-cli-credential-sources.test.mjs, plans/261127-0829-red-tests-before-release/reports/phase-02/** | 2 | done |
+| 3 | [Workflow guide schema reds](phase-03-guide-schema-reds.md) | 1 | src/workflow/guide-schema.mjs, src/workflow/loader.mjs, src/workflow/definition.mjs, domains/coding/workflows/bugfix.yaml, test/workflow/guide-schema.test.mjs, plans/261127-0829-red-tests-before-release/reports/phase-03/** | 2 | done |
 | 4 | [Full release checks on the combined tree](phase-04-full-release-checks.md) | 2, 3 | plans/261127-0829-red-tests-before-release/reports/phase-04/** | 3 | ready |
+
+**Progress (2026-11-27):** phase 1 found every listed file and cargo test green at `3798e58647`; phases 2 and 3 closed with no code change ([verdict](reports/phase-01/verdict.md)).
 
 Phases 2 and 3 share no file and run in parallel. If phase 1 shows a phase's files green, that phase closes with no
 code change and cites phase 1's log.
