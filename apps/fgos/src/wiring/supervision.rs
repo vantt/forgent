@@ -2844,7 +2844,11 @@ fn run_widen(root: &Path, command: &WidenCommand) -> Result<Value, CategorisedRe
         };
         // Keep run_land publishing route because publish hardcodes its commit message.
         match run_land(&main, &land_cmd) {
-            Ok(data) => data["mainSha"].as_str().map(str::to_owned),
+            Ok(data) => {
+                // Refresh the trunk reader's remote-tracking ref; a refresh failure cannot undo the landed commit.
+                let _ = (publisher.catch_up)(&main, &actor);
+                data["mainSha"].as_str().map(str::to_owned)
+            }
             Err(why) => {
                 if (publisher.path_clean)(&main, &path).is_ok_and(|clean| !clean)
                     && std::fs::read_to_string(&file).is_ok_and(|t| t == *new_text)
