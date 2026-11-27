@@ -375,20 +375,69 @@ fn plan_overlaps(
 /// Plans a supervisor may start now, in input order: status `ready`, every `blockedBy` plan in
 /// `done_dirs`, and a footprint that can be compared. Overlaps are advice only; a plan with an
 /// empty or invalid footprint is not admissible.
-pub fn admissible<'a>(plans: &'a [Plan], done_dirs: &[String]) -> Vec<&'a Plan> {
+pub fn admissible<'a>(plans: &'a [Plan], done_dirs: &[String], machine: &str) -> Vec<&'a Plan> {
     plans
         .iter()
-        .filter(|p| p.status == "ready" && admission_hold(p, done_dirs).is_none())
+        .filter(|p| p.status == "ready" && admission_hold(p, done_dirs, machine).is_none())
         .collect()
 }
 
 /// The admission classifier shared by the read view and the wake door. An invalid footprint
-/// needs judgement; an unmet dependency holds admission, but footprint overlap does not.
-pub fn admission_hold(plan: &Plan, done_dirs: &[String]) -> Option<&'static str> {
-    if !plan.blocked_by.iter().all(|b| done_dirs.contains(b)) {
-        return Some("held-blocked");
+/// needs judgement; an unmet dependency holds admission, but footprint overlap does not. A plan
+/// whose `host` names another machine than `machine` (the admitting machine's Identity id) is
+/// held `held-other-machine:<host>`; that machine admits it.
+pub fn admission_hold(plan: &Plan, done_dirs: &[String], machine: &str) -> Option<String> {
+    if let Some(host) = plan.host.as_deref().filter(|h| *h != machine) {
+        return Some(format!("held-other-machine:{host}"));
     }
-    footprint_problem(plan)
+    if !plan.blocked_by.iter().all(|b| done_dirs.contains(b)) {
+        return Some("held-blocked".to_owned());
+    }
+    footprint_problem(plan).map(str::to_owned)
+}
+
+/// Where a `running` plan is watched from, by its `host`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Placement {
+    /// `host` is this machine: watched, a dead lead restarted.
+    Here,
+    /// `host` is another machine: shown, never counted, started or restarted here.
+    Elsewhere(String),
+    /// No `host`: this machine's only while its lead is live here.
+    Unnamed,
+}
+
+pub fn placement(plan: &Plan, machine: &str) -> Placement {
+    match plan.host.as_deref() {
+        Some(h) if h == machine => Placement::Here,
+        Some(h) => Placement::Elsewhere(h.to_owned()),
+        None => Placement::Unnamed,
+    }
+}
+
+/// The plans the keeper may decide for. A running plan on another machine is dropped. A running
+/// plan with no `host` whose lead is known not live here is kept without its lead, so the keeper
+/// raises it for judgement once instead of restarting it.
+pub fn keeper_plans(plans: &[Plan], machine: &str, not_live: &dyn Fn(&str) -> bool) -> Vec<Plan> {
+    plans
+        .iter()
+        .filter_map(|p| {
+            if p.status != "running" {
+                return Some(p.clone());
+            }
+            match placement(p, machine) {
+                Placement::Here => Some(p.clone()),
+                Placement::Elsewhere(_) => None,
+                Placement::Unnamed => {
+                    let mut p = p.clone();
+                    if p.lead.as_deref().is_some_and(not_live) {
+                        p.lead = None;
+                    }
+                    Some(p)
+                }
+            }
+        })
+        .collect()
 }
 
 /// Edit only admission frontmatter through the YAML document door, preserving the phase table,

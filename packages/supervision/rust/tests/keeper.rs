@@ -454,6 +454,9 @@ impl Portfolio for Fake {
     }
 }
 impl Admission for Fake {
+    fn machine(&self) -> Result<String, String> {
+        Ok("m1".to_owned())
+    }
     fn capacity(&self) -> Result<Capacity, String> {
         Ok(Capacity {
             max_leads: 2,
@@ -641,4 +644,64 @@ fn the_wake_door_admits_then_runs_keeper_ports_and_only_then_considers_superviso
             *d
         );
     }
+}
+
+struct NoHeads;
+impl fgos_supervision::sources::Heads for NoHeads {
+    fn state(&self, _: &str) -> ActorState {
+        ActorState::NotLive
+    }
+    fn sleep_until(&self, _: &str) -> Option<String> {
+        None
+    }
+}
+
+fn dead_lead_plan(dir: &str, host: Option<&str>) -> Plan {
+    let mut plan = fgos_supervision::portfolio::read_plan(
+        dir,
+        &format!("---\ntitle: T\npriority: P1\nstatus: running\nlead: head:lead-{dir}\n---\n| id | title | depends-on | footprint | wave | status |\n|---|---|---|---|---|---|\n| 1 | Build | - | src/x | 1 | ready |\n"),
+    )
+    .unwrap();
+    plan.host = host.map(str::to_owned);
+    plan
+}
+
+#[test]
+fn the_keeper_never_starts_a_plan_running_elsewhere_and_raises_a_dead_unnamed_one_for_judgement() {
+    use fgos_supervision::sources::{Plans, Source};
+    let all = [
+        dead_lead_plan("here", Some("m1")),
+        dead_lead_plan("away", Some("m2")),
+        dead_lead_plan("unnamed", None),
+    ];
+    let watched = fgos_supervision::portfolio::keeper_plans(&all, "m1", &|_| true);
+    let records = Plans {
+        plans: &watched,
+        heads: &NoHeads,
+    }
+    .records()
+    .unwrap();
+    let inputs: Vec<Input> = records
+        .into_iter()
+        .map(|record| Input {
+            record,
+            item_closed: false,
+            actor: ActorState::NotLive,
+        })
+        .collect();
+    let caps = Caps {
+        starts: 5,
+        held: BTreeMap::new(),
+    };
+    let decided: Vec<(String, String)> = keeper::decide(&inputs, 0, &[], &caps)
+        .into_iter()
+        .map(|d| (d.item, d.reason))
+        .collect();
+    assert_eq!(
+        decided,
+        vec![
+            ("here".to_owned(), "actionable".to_owned()),
+            ("unnamed".to_owned(), "needs-missing".to_owned()),
+        ]
+    );
 }
