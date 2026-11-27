@@ -17,6 +17,7 @@ footprint:
   - .claude/skills/**
   - plugins/fgOS/skills/**
   - .fgos/instructions/effective/rules.json
+  - .fgos/instructions/effective/rules.json
 source:
   - plans/discussions/ds-yf3vnbidi6-plan-footprint-overlap/DISCUSSION.md
   - p-os3gedpq4x
