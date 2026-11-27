@@ -476,7 +476,20 @@ fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, 
     };
     land(&command, &config, &ports)
         .map(|landed| landed.main_sha)
-        .map_err(|why| refusal(&why.code, why.detail_with_note()))
+        .map_err(|why| {
+            let detail = why.detail_with_note();
+            // A row the index refuses is the request's own invalid file; any other index failure is a write failure.
+            let code = match why.code.as_str() {
+                "land-backlog-index-failed"
+                    if why.detail.starts_with(portfolio::INDEX_ITEM_INVALID) =>
+                {
+                    "write-item-invalid"
+                }
+                "land-backlog-index-failed" => "write-index-failed",
+                other => other,
+            };
+            refusal(code, detail)
+        })
 }
 
 #[cfg(test)]

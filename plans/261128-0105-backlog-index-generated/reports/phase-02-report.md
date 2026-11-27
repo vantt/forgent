@@ -120,3 +120,20 @@ Unrelated and unaffected: the other five cases in
 `session_write_publish` pass, and all 15 in `portfolio_check` pass, including
 `test_check_portfolio_index_drift` and `test_generate_backlog_index`, which cover
 the builder the row now reuses.
+
+## Fix round 3
+
+Cause: the land door refuses a duplicate-id or otherwise invalid row as `land-backlog-index-failed`, but the
+request layer takes back its created file only for `write-item-invalid` or `write-index-failed`, so the file stayed.
+
+Change (one owned marker, no copied tag lists):
+- `portfolio::backlog_index` prefixes the generator's error with `INDEX_ITEM_INVALID` (`item-invalid: `) for
+  `CommitIndexError::Invalid` and `INDEX_UNREADABLE` (`index-unreadable: `) for `Unreadable` (`pub(super)` consts).
+- `session_write_publish::publish` maps a `land-backlog-index-failed` refusal whose detail starts with
+  `INDEX_ITEM_INVALID` to `write-item-invalid`, any other `land-backlog-index-failed` to `write-index-failed`, keeping
+  the door's detail. Every other refusal keeps its own code. The generator is not called again in `check_backlog_item`;
+  no test expectation changed.
+
+Verification: `cargo fmt --all --check` clean; `cargo check -p fgos --tests` passes (warnings only, none new from
+these files). Tests were not run in this fix round, so `session_write_publish` duplicate-id case is unconfirmed here
+(linking can fail with OrtGetApiBase in this sandbox).
