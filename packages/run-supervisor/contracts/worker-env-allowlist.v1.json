@@ -118,6 +118,14 @@
       "reason": "the confined marker: 1 in an agent that runs under the confinement driver's sandbox. The launch door sets it from the driver's own result (a sandbox prefix exists), never from the caller; the name is listed so the one variable every confined agent sees is a named part of this contract"
     },
     {
+      "name": "GIT_TERMINAL_PROMPT",
+      "reason": "set by the confinement driver with the owner's read-only toolchain cache: a confined cargo or git fails fast instead of waiting on the network or a credential prompt"
+    },
+    {
+      "name": "CARGO_NET_OFFLINE",
+      "reason": "set by the confinement driver with the owner's read-only toolchain cache: a confined cargo or git fails fast instead of waiting on the network or a credential prompt"
+    },
+    {
       "name": "JAVA_HOME",
       "reason": "toolchain home (a path): a seat that builds or tests fails with errors that look unrelated when it moves"
     }

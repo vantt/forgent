@@ -103,6 +103,10 @@ pub struct ResolveInput {
     /// The holder-lock registry's path of the `mailbox` lock for this project's `.fgos`.
     pub mailbox_lock_path: String,
     pub uid: Option<u32>,
+    /// The host process's `CARGO_HOME`; used only when absolute.
+    pub cargo_home: Option<String>,
+    /// The host process's `RUSTUP_HOME`; used only when absolute.
+    pub rustup_home: Option<String>,
 }
 
 fn root_of(context: &ResolveContext) -> Option<&str> {
@@ -427,6 +431,55 @@ fn launch_program_bind_backs(program: Option<&str>, masked: &[String]) -> Vec<St
     }
 }
 
+/// The owner's toolchain cache mounts: the cargo home and the rustup home, each a real existing directory that lies
+/// neither inside a machine-private root nor inside a confinement root. The host's `CARGO_HOME` / `RUSTUP_HOME` wins
+/// when absolute, else `<home>/.cargo` / `<home>/.rustup`. Read-only, so nothing in the sandbox writes the cache; the
+/// cargo mount also forces offline, credential-free fetching so a missing revision fails at once.
+fn toolchain_cache_resources(
+    input: &ResolveInput,
+    machine_private: &[String],
+    confinement_roots: &[String],
+) -> Vec<ResolvedResource> {
+    let cache = |env_value: &Option<String>, fallback: &str| {
+        let declared = env_value
+            .as_deref()
+            .filter(|v| Path::new(v).is_absolute())
+            .map(str::to_string)
+            .unwrap_or_else(|| join(&input.home_dir, fallback));
+        real_dir(&declared).filter(|real| {
+            !machine_private
+                .iter()
+                .chain(confinement_roots)
+                .any(|root| is_inside_root(real, root))
+        })
+    };
+    let mut out = Vec::new();
+    for (name, path) in [
+        ("cargo", cache(&input.cargo_home, ".cargo")),
+        ("rustup", cache(&input.rustup_home, ".rustup")),
+    ] {
+        let Some(path) = path else { continue };
+        let mut res = mount(
+            "toolchain-cache",
+            format!("toolchain-cache:{name}"),
+            &path,
+            "none",
+            "read",
+        );
+        let mut env = BTreeMap::new();
+        if name == "cargo" {
+            env.insert("CARGO_HOME".to_string(), path.clone());
+            env.insert("CARGO_NET_OFFLINE".to_string(), "true".to_string());
+            env.insert("GIT_TERMINAL_PROMPT".to_string(), "0".to_string());
+        } else {
+            env.insert("RUSTUP_HOME".to_string(), path.clone());
+        }
+        res.env = Some(env);
+        out.push(res);
+    }
+    out
+}
+
 fn grant_of<'a>(grants: &'a [Grant], resource: &str) -> Option<&'a Grant> {
     grants.iter().rev().find(|g| g.resource == resource)
 }
@@ -710,6 +763,12 @@ pub fn resolve_confinement_resources(input: &ResolveInput) -> Resolved<Vec<Resol
         bound.host_target = real_or_null(&target);
         resolved.push(bound);
     }
+    // After every grant mount, so a writable grant over a parent cannot make the cache writable.
+    resolved.extend(toolchain_cache_resources(
+        input,
+        &machine_private,
+        &real_confinement_roots,
+    ));
 
     // 7. hostRead: blind — hide the hidden roots, keep the dispatch's own directory
     if input.blind {
