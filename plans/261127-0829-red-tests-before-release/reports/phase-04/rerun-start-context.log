@@ -1,0 +1,194 @@
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.35s
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+   Compiling fgos-node-addon v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/git/node-addon)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.11s
+✔ the run-door-contract unit teaches both doors of one runUnit as the preferred path, composed into a head start (249.742454ms)
+✔ core/skills/fgos-run teaches the one-liner and --units, and lets an ad-hoc Unit prefer (0.923794ms)
+✔ core/skills/_shared/capability-matching ad-hoc delegation runs through the one-liner, provider soft (0.381187ms)
+✔ .agents/skills/fgos-run teaches the one-liner and --units, and lets an ad-hoc Unit prefer (0.675506ms)
+✔ .agents/skills/_shared/capability-matching ad-hoc delegation runs through the one-liner, provider soft (0.554475ms)
+✔ plugins/fgOS/skills/fgos-run teaches the one-liner and --units, and lets an ad-hoc Unit prefer (0.911153ms)
+✔ plugins/fgOS/skills/_shared/capability-matching ad-hoc delegation runs through the one-liner, provider soft (0.368583ms)
+✔ AGENTS.md teaches no removed dispatch door (1.792735ms)
+✔ core/skills teaches no removed dispatch door (11.900801ms)
+✔ core/instructions teaches no removed dispatch door (3.20036ms)
+✔ core/prompt-templates teaches no removed dispatch door (5.146624ms)
+✔ domains teaches no removed dispatch door (10.740984ms)
+✔ .agents/skills teaches no removed dispatch door (301.598055ms)
+✔ plugins/fgOS/skills teaches no removed dispatch door (27.241073ms)
+✔ .claude/skills teaches no removed dispatch door (306.527494ms)
+✔ a skills list containing a non-string entry is refused, not silently coerced (179.718761ms)
+✔ a platform name in the source yaml is refused, not silently projected (0.328198ms)
+✔ each forbidden platform name (claude/codex/anthropic) is refused, case-insensitively (0.471384ms)
+✔ a missing required field is refused, not silently defaulted (0.209828ms)
+✔ an empty tool-scope is refused -- an agent-type with no declared tools is a config error, not an implicit deny-all (0.246917ms)
+✔ an unrecognized rigor is refused rather than silently falling through to undefined (0.230216ms)
+✔ findAgentYamlFiles lists the workspace, domain and core tiers the agent-definitions door reads (D24) (0.751938ms)
+✔ resolveAgentFiles still throws AgentDefinitionError when two sources collide (D33) (0.845585ms)
+✔ a persona declaring a name other than its file stem is refused and cannot reach another agent file (1.423181ms)
+✔ a frontmatter scalar holding a newline is refused with the field and file named, before any write (0.792382ms)
+✔ an existing target without the generated stamp is refused by name and the run writes nothing (1.144373ms)
+✔ the real personas project through the start-context door as their golden agent files, and a second run over its own output is accepted (11019.964504ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11591.100224
+exit=0
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+   Compiling ort-sys v2.0.0-rc.15
+   Compiling ort v2.0.0-rc.15
+   Compiling pkm-embed v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-search v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-core v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling fgos-agent-context-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/agent-context-engine/rust)
+   Compiling pkm-lifecycle v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling fgos-agent-start-context v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/agent-start-context/rust)
+   Compiling fgos-session-host v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/session-host/rust)
+   Compiling fgos-run-supervisor v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/run-supervisor/rust)
+   Compiling fgos-documentation v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/documentation/rust)
+   Compiling fgos-execution v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/execution/rust)
+   Compiling fgos-execution-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/execution/engine)
+   Compiling fgos v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/apps/fgos)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.43s
+     Running unittests src/main.rs (target/debug/deps/fgos-ae1b3e3424bcf018)
+
+running 1 test
+test wiring::session_rotation_hook::tests::a_session_opened_by_hand_gets_the_rules_scoped_to_hand_opened_sessions_as_its_one_additional_context ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 597 filtered out; finished in 0.24s
+
+exit=0

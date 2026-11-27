@@ -1,0 +1,144 @@
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.23s
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.06s
+✔ 1. a controller killed with SIGKILL after the binding: the supervisor briefs the agent, the result settles, the pane closes (5034.02357ms)
+✔ a herdr-spawn seat runs as a terminal attempt: brief typed by the supervisor, pane closed once, settled by the step (5237.180074ms)
+✔ the agent runs as the attempt: its writer id is minted from the attempt, the controller's session ids, pane variables and every name outside the worker allowlist never reach it (5105.110089ms)
+✔ codex gets the attempt writer id as an explicit setting of its argv, the other CLIs inherit the environment (4323.170526ms)
+✔ an agent that never started settles as a failed attempt with a named reason and keeps its pane (14034.875149ms)
+✔ a pane stopped on the provider's own limit screen settles as a provider limit, not as a person to wait for (2984.953519ms)
+✔ an agent stopped on a trust prompt ends as blocked, not as a timeout, and the failure names the screen and the repair (2784.399523ms)
+✔ an executor declared by invocations[] runs the same way as one declared flat (4900.796771ms)
+✔ the brief the pane agent reads names the one result path, the outbox claim (4867.556019ms)
+✔ fgos run with herdr present runs a confined read-only unit in a pane: the gate is inside the sandbox, its own socket is bound in, the agent has a pid namespace of its own (4989.003544ms)
+✔ a launch refused before the handover leaves no attempt home and no pane (1660.886361ms)
+✔ an account declares one login store per CLI, and each CLI reads its own (1.486516ms)
+✔ the lease of a pinned CLI hands over that CLI store, and skips an account with no store for it (183.561863ms)
+✔ provisioning copies the pi store for a pi launch and the codex store for a codex launch of the same account (70.759654ms)
+✔ a launch whose CLI the account declares no store for is refused before the worker starts (19.177809ms)
+✔ a single-source selection serves every store key; an invocation that reads no store gets no login (0.121547ms)
+✔ the store key the invocation declares picks the login store, not the basename of its command (0.731792ms)
+✔ renewal of a per-CLI store keeps its copies in that store directory; the write-back target names it (6.129384ms)
+✔ the unlock probe calls through the store of the CLI the dispatch runs (3.265778ms)
+✔ fgos --help --json through the host is the whole manifest, byte-identical to the generated manifest file (3361.571395ms)
+✔ an unlisted leading option still fails closed in the host (R3), and refused help exits 4 with nothing on stdout (83.226489ms)
+✔ fgos <verb> --help --json through the host returns the manifest entry for every route selector, without running the verb (2727.977701ms)
+✔ help never runs the verb: write and spawn forms, and a help token after a value-taking flag, leave the directory untouched (108.352135ms)
+✔ help accepts the --dir the shell function appends, through the real shell function (283.736457ms)
+✔ a native verb with sub-verbs refuses an unknown sub-verb the same way with or without --help (19.665012ms)
+✔ the direct-node channel hands every help form to the host unchanged, and says where to look when there is none (791.591303ms)
+✔ a host that forwards help back to Node is refused on the second hop, not looped (155.472595ms)
+✔ every registered workflow carries a guide model (0.529686ms)
+✔ a playbook step form becomes one activity per step in step order, dependsOn as entry milestones (0.617224ms)
+✔ the architecture advisory chain keeps its single-parent entry milestones and blind-seat MUST (11.847292ms)
+✔ content-publish states its guide head: milestones, consent bound to the approved copy, an unenforced channel (11.802268ms)
+✔ building a built definition again yields the same guide (1.403712ms)
+✔ a workflow with no head and a units file still load with a derived playbook guide (0.862199ms)
+✔ an explicit guide with its own activities leaves the steps to the Work lifecycle (0.229377ms)
+✔ the coding workflow has both parts: the four lifecycle steps and a guide, compiled and loaded (16.806251ms)
+✔ a MUST naming a guard outside the catalog is refused and pointed at unenforced (0.556295ms)
+✔ a MUST needs a reason and, for a milestone check, an existing milestone (0.211844ms)
+✔ expression fields are refused by name anywhere in the guide (0.257398ms)
+✔ listedRoutesOnly belongs to a decision point only (0.183387ms)
+✔ a frame default sets a rigor floor, never a ceiling, and every count is a count (0.194869ms)
+✔ activities, decisions and the closure may only name milestones that exist (0.277196ms)
+✔ a run records the normalised guide in its start snapshot (287.567297ms)
+ℹ tests 42
+ℹ suites 0
+ℹ pass 42
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 136958.176841
+run-tests: ERROR: test suite leaked unexpected files or modifications into .fgos store:
+  Deleted (1):
+    - .fgos/runtime/dev-host/run-JNio0a
+exit=1
