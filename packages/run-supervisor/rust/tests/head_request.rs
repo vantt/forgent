@@ -1184,6 +1184,13 @@ fn a_planner_mailing_a_head_outside_its_row_is_refused_recipient_not_allowed() {
         Duration::from_secs(5),
         |mut cfg| {
             cfg.persona = "planner".to_string();
+            // Mail belongs to the head's bound CLI session, read from Identity's directory under this state root.
+            let root = state_root("window-mail-identity", true);
+            bind_mail_caller(&root, &cfg.role);
+            cfg.env.insert(
+                "FGOS_STATE_ROOT".to_string(),
+                root.to_string_lossy().into_owned(),
+            );
             cfg
         },
     );
@@ -1320,6 +1327,45 @@ fn state_root(name: &str, machine_id: bool) -> PathBuf {
         fs::write(root.join("machine-id"), "fg-abc234\n").unwrap();
     }
     root
+}
+
+/// Registers a live session (this test process is its head) holding `role`, with a bound CLI session: the mail
+/// caller a head request resolves for a `mailbox` verb.
+fn bind_mail_caller(root: &Path, role: &str) {
+    use fgos_identity::directory::{CliSessionIds, Entry, Ids};
+    let info = fgos_identity::session_for(
+        root,
+        &WriterKey {
+            source: "FGOS_SESSION_ID",
+            value: "att-mail-caller",
+        },
+        None,
+    )
+    .unwrap()
+    .info;
+    let mut entry = Entry::new(
+        info.id,
+        info.handle,
+        "claude".into(),
+        None,
+        None,
+        vec![role.into()],
+        fgos_identity::current::os_record(std::process::id()),
+    );
+    entry.ids = Some(Ids {
+        cli_session: Some(CliSessionIds {
+            source: "CLAUDE_CODE_SESSION_ID".into(),
+            id: "cli-mail-caller".into(),
+            name: None,
+            name_source: None,
+            socket: None,
+            pid: None,
+            start_time: None,
+        }),
+        ..Ids::default()
+    });
+    fgos_identity::directory::register(root, entry, false, &fgos_process::facts::judge_here)
+        .unwrap();
 }
 
 /// Registers the attempt `writer_id` as a live session (this test process is its head) holding `roles`.
