@@ -689,6 +689,60 @@ fn the_remote_moving_once_between_prepare_and_push_lands_on_the_second_try() {
 }
 
 #[test]
+fn a_land_command_builds_into_the_shared_cargo_target_unless_the_caller_names_one() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    let seen = f.temp.join("target-seen");
+    f.land(
+        &branch("topic"),
+        &config(vec![gate(&format!(
+            "printf %s \"$CARGO_TARGET_DIR\" > {}",
+            seen.display()
+        ))]),
+    )
+    .unwrap();
+    let expected = match std::env::var("CARGO_TARGET_DIR") {
+        Ok(own) if !own.is_empty() => own,
+        _ => fs::canonicalize(&f.main)
+            .unwrap()
+            .join(fgos_supervision::land::LAND_CARGO_TARGET)
+            .to_string_lossy()
+            .into_owned(),
+    };
+    assert_eq!(fs::read_to_string(&seen).unwrap(), expected);
+}
+
+#[test]
+fn a_retry_whose_trunk_moved_only_outside_every_gate_reuses_the_gates_it_passed_and_lands() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    // The gate moves the trunk every time it runs, by a path outside its own `when`: only a retry that reuses the
+    // passed gate, instead of running it again, can land.
+    let out = f
+        .land(
+            &branch("topic"),
+            &config(vec![gate_when(&mover(&f, false), &["a"])]),
+        )
+        .unwrap();
+    assert_eq!(out.retries, 1);
+    assert_eq!(out.main_sha, f.remote_tip());
+    assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "incoming\n");
+}
+
+#[test]
+fn a_retry_whose_trunk_moved_a_path_a_gate_names_runs_that_gate_again() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    let refusal = f
+        .land(
+            &branch("topic"),
+            &config(vec![gate_when(&mover(&f, false), &["a", "moved-*"])]),
+        )
+        .unwrap_err();
+    assert_eq!(refusal.code, "land-retries-exhausted");
+}
+
+#[test]
 fn the_remote_moving_every_time_ends_retries_exhausted_with_no_local_land() {
     let f = Fixture::new();
     f.topic("topic", &[("a", "incoming\n")]);

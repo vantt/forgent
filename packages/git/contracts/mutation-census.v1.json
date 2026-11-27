@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "0a00c27d8918acc59967257b10afa3aec13cc42252d9a800964884a4f8366bab",
+  "payloadDigest": "0f9d9eed04575f044c378b988512690a3a281f86056f5b6ddbe9a2a97b10dddd",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -73,7 +73,7 @@
     ".agents/skills/instruction-audit/references/lane-prompts.md": "adac8362adbb7eb04c163fbcf3cdb16aa566e61a6f4a6a9351c07d4fc4d08d52",
     ".agents/skills/instruction-audit/references/report-template.md": "9d3b7abfd876d88e8a6a7e1820ea6a2aaf02472a75a69603921344fa0db699d6",
     ".agents/skills/instruction-audit/scripts/instruction-audit.mjs": "d634de90f1b9835d00d13c059c2a439c18b4aa6fbd3a97fcc4763435845df490",
-    ".githooks/pre-commit": "f259171ed2cc535353bad0e78330710866ea23f2afabc06b007280db4b822246",
+    ".githooks/pre-commit": "2e7a4e49d3238fa10aa76193feede2ea6e6a4ab78850e7f33aae79b4fab40b86",
     "apps/fgctl/build.rs": "316b3d73c7472689532b7ffc164b15fe73f097e1c3e5f53545bc6283ac1c8183",
     "apps/fgctl/src/help.rs": "0db8f6f2eb8f0f4be4fd86f92bfa011eaf866704f6f75a264094e58da48f97fd",
     "apps/fgctl/src/main.rs": "fd34140a0bfb75f15f617ca4dad811bc49136970f7b15cd4f6b608e9fb759921",
@@ -1309,7 +1309,7 @@
     "packages/session-host/rust/tests/typed_wake.rs": "d132cb90111c3b749ed8af9a6c21369b00f6231aa40baf933566f672e2ebc1c3",
     "packages/supervision/rust/src/discussion_source.rs": "e60efca723c2652fca91250292d424864021ff27ddde298698cbf77ee8b8327f",
     "packages/supervision/rust/src/keeper.rs": "8473d74d5aa91ff50f63b95e0c1b28b69dc12b01588619d06c4ccaef6cce58d3",
-    "packages/supervision/rust/src/land.rs": "67fd5f1abb0337e45d05e869cb56fd38608c1ccdd37339b1b5eb765282c0df3d",
+    "packages/supervision/rust/src/land.rs": "e95a9b4ec503c620bef2e1148d3561fe4f7d74be5fa91c5d5e56c673db05415d",
     "packages/supervision/rust/src/lib.rs": "b4d55ee63b573112e6902280e15daf2d745aa148c24e156a830b4595f88e413c",
     "packages/supervision/rust/src/notify.rs": "2a8ce19013396e3a31c915a903c4762889cc3f902137279e6378c3deb84e8edd",
     "packages/supervision/rust/src/portfolio.rs": "66dbb03cc7c04aec35da968e51f3f4b224a0d467b7a992752069ec77da3182e8",
@@ -1321,7 +1321,7 @@
     "packages/supervision/rust/tests/definitions.rs": "004776564a70fbf130a0be88fe69d7ea97a0c6549e209c1ad8e74e29de3dddb4",
     "packages/supervision/rust/tests/discussion_source.rs": "39e824a0affc36347c8d488b28b9583f30523ff57391d290938b090c62925397",
     "packages/supervision/rust/tests/keeper.rs": "1acdad1f326809793b9a12232a061b3db0cbee0c12f98a309ff33cc0e8a16a1c",
-    "packages/supervision/rust/tests/land.rs": "b83abcc781a19f13aa5236c505eff77df96d40af21f55946d4f84ab7070bb8f0",
+    "packages/supervision/rust/tests/land.rs": "42a0fe49b938a6c5aabfa8823611e460563ceb6a6c32f6325ad16d43a2cbbdac",
     "packages/supervision/rust/tests/portfolio.rs": "bfaf2bed047e14402427df5eb86980cfd08640d26beb365685e664637aaad1d1",
     "packages/supervision/rust/tests/queue.rs": "65ddc71a204003a4e1a62077f6741728cdcaa96d7ee751e31d78bd420d572698",
     "packages/supervision/rust/tests/sources.rs": "ea50ed4f0a880b14e375f703398a72340af16d28451c97bc60ca364a2ec30c87",
@@ -1853,7 +1853,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:724"
+        ".githooks/pre-commit:742"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1913,7 +1913,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:732"
+        ".githooks/pre-commit:750"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1927,7 +1927,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:732"
+        ".githooks/pre-commit:750"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1941,7 +1941,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:777"
+        ".githooks/pre-commit:801"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1955,7 +1955,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:777"
+        ".githooks/pre-commit:801"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1969,7 +1969,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:777"
+        ".githooks/pre-commit:801"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2025,7 +2025,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:711"
+        ".githooks/pre-commit:729"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2039,7 +2039,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:717"
+        ".githooks/pre-commit:735"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2053,7 +2053,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:717"
+        ".githooks/pre-commit:735"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2067,7 +2067,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:717"
+        ".githooks/pre-commit:735"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2081,7 +2081,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:717"
+        ".githooks/pre-commit:735"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2141,7 +2141,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:752"
+        ".githooks/pre-commit:770"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2205,7 +2205,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:758"
+        ".githooks/pre-commit:782"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2219,7 +2219,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:764"
+        ".githooks/pre-commit:788"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2235,12 +2235,26 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 715,
+      "line": 717,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:842"
+        ".githooks/pre-commit:776"
+      ],
+      "class": "hook-read-context",
+      "verbs": [
+        "diff"
+      ]
+    },
+    {
+      "path": ".githooks/pre-commit",
+      "line": 733,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "callers": [
+        ".githooks/pre-commit:866"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -2249,14 +2263,14 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 785,
+      "line": 809,
       "spawn": "mainLockVerdict -> .githooks/pre-commit:172",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 812,
+      "line": 836,
       "spawn": "identityData -> .githooks/pre-commit:121",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
@@ -4243,7 +4257,7 @@
     },
     {
       "path": "packages/supervision/rust/src/land.rs",
-      "line": 185,
+      "line": 187,
       "spawn": "Command::new",
       "binary": "sh",
       "siteId": "run:cdc7c50ed5243f3814732be4be5d94a22428f659fdd491986300a2a75894d2dd",
