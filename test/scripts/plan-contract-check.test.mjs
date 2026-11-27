@@ -427,6 +427,17 @@ test('a ready plan on or after the gate date without the Unattended run section 
   assert.ok(unattendedErrors(text).includes('missing section: unattended run'));
 });
 
+test('the Unattended run section is the heading of exactly that name, not a template heading or a fenced example before it', () => {
+  const template = '### The Unattended run section (fixed here)\n\n```markdown\n## Unattended run\n\n### Host steps\nnot a real one\n```\n\n';
+  const text = readyPlan({ section: template + unattended() });
+  assert.deepEqual(unattendedErrors(text), []);
+});
+
+test('a plan whose only Unattended run section sits inside a code fence is refused as missing it', () => {
+  const fenced = '```markdown\n' + unattended() + '```\n';
+  assert.ok(unattendedErrors(readyPlan({ section: fenced })).includes('missing section: unattended run'));
+});
+
 test('a draft plan is not asked for the Unattended run section', () => {
   assert.ok(!unattendedErrors(planText({ fm: { status: 'draft', ...GATED } })).includes('missing section: unattended run'));
 });

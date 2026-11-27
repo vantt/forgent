@@ -223,20 +223,33 @@ function checkPhaseTable(body, errors, status) {
 export const AUTHORITY = {
   cache: undefined,
   read() {
-    this.cache ??= invokeHost(['authority', 'model', '--json']);
-    return this.cache;
+    if (this.cache === undefined) {
+      try { this.cache = { model: invokeHost(['authority', 'model', '--json']) }; } catch (err) { this.cache = { error: err }; }
+    }
+    if (this.cache.error) throw this.cache.error;
+    return this.cache.model;
   },
 };
 
 /**
- * Where the check reads whether an owner question is answered: the host's `fgos questions list --all --json`, one
- * call per process, as `Map<id, state>`. A test replaces `read`.
+ * Where the check reads whether an owner question is answered: the host's answered listing (`fgos questions list
+ * --answered --json`; the full listing is over the host reply limit), plus the acked listing read on its own in case
+ * the answered one leaves it out. One read per process, a failed one included, as `Map<id, state>`; a question the
+ * map lacks counts as unanswered. A test replaces `read`.
  */
 export const QUESTIONS = {
   cache: undefined,
   read() {
-    this.cache ??= new Map((invokeHost(['questions', 'list', '--all', '--json']).questions ?? []).map((q) => [q.id, q.state]));
-    return this.cache;
+    if (this.cache === undefined) {
+      const rows = (flag, required) => {
+        try { return invokeHost(['questions', 'list', flag, '--json']).questions ?? []; } catch (err) { if (required) throw err; return []; }
+      };
+      try {
+        this.cache = { map: new Map([...rows('--acked', false), ...rows('--answered', true)].map((q) => [q.id, q.state])) };
+      } catch (err) { this.cache = { error: err }; }
+    }
+    if (this.cache.error) throw this.cache.error;
+    return this.cache.map;
   },
 };
 
@@ -311,7 +324,7 @@ function checkUnattendedRun(body, errors) {
   }
 }
 
-const DECLARE_KINDS =['component', 'decision-kind', 'door', 'contract'];
+const DECLARE_KINDS = ['component', 'decision-kind', 'door', 'contract'];
 const DECLARE_LINE = new RegExp(`^declare:\\s*(${DECLARE_KINDS.join('|')})\\s+[A-Za-z0-9][A-Za-z0-9-]*$`);
 
 /** The ids a model row can be named by in an Authority map: component, decision kind and contract ids, door slugs. */
