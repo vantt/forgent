@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "cf90ead923ccbaa8ea8fc0c2ec7399db9b7987a2375ce9ec096404cecfd5c461",
+  "payloadDigest": "24ceecf55a4acb7c16167f6cd1bcb55a493a241e6078da91a843dd1a192c2072",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -177,7 +177,7 @@
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
     "apps/fgos/src/wiring/session_write_publish.rs": "2b88c9e2fa03bcdc92d6a90a3415be2d7fc1bc8abfe4ad742d3230d915ef87de",
     "apps/fgos/src/wiring/start_context.rs": "7a24a7f0b0ce664ed77cb34d75ec5bb2625d31067f09ba249fecdefafc5feaf8",
-    "apps/fgos/src/wiring/supervision.rs": "178614cd0b2ab6def692dc7aeb0b98c116d4790255a397470e7595c7261203e6",
+    "apps/fgos/src/wiring/supervision.rs": "1602572881633536f1950b097754ee95a032cc1a6b594e548fce21df1b3c372f",
     "apps/fgos/src/wiring/terminal_route.rs": "e29a3ec670db995fbf7a3e00c70ed8bf3870fd772f298a01ebe9e4198096aed0",
     "apps/fgos/src/wiring/terminal_tabs.rs": "a519a4903b296a3f6bfd486f41ea93d1ceb1489c28a4e6dc6dcfe03223ce3130",
     "apps/fgos/src/wiring/uninstall.rs": "1fd8cdeef4360bb32ae0dd1452bdc6cb09c57427d95645c030105a24533dceff",
@@ -2402,11 +2402,11 @@
     },
     {
       "path": "apps/fgos/src/wiring/supervision.rs",
-      "line": 1966,
+      "line": 1978,
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2209"
+      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2221"
     },
     {
       "path": "apps/fgos/src/wiring/terminal_tabs.rs",
@@ -3832,7 +3832,7 @@
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2446"
+      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2458"
     },
     {
       "path": "packages/process/rust/src/mapped.rs",
@@ -4258,7 +4258,7 @@
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2585"
+      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2597"
     },
     {
       "path": "packages/supervision/rust/tests/discussion_source.rs",
