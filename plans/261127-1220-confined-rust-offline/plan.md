@@ -138,7 +138,7 @@ mechanisms. It adds one resource name and no new kind of mechanism.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Toolchain cache resource in the Rust resolver](phase-01-toolchain-cache-resource.md) | - | packages/execution/engine/src/confinement/policy/resolver.rs, packages/execution/engine/src/confinement/policy/mod.rs, packages/execution/engine/src/confinement/driver/bwrap.rs, packages/execution/engine/tests/confinement_policy.rs, packages/run-supervisor/contracts/worker-env-allowlist.v1.json, `packages/execution/engine/src/confinement/cleanup/probes/ports.rs` | 1 | ready |
+| 1 | [Toolchain cache resource in the Rust resolver](phase-01-toolchain-cache-resource.md) | - | packages/execution/engine/src/confinement/policy/resolver.rs, packages/execution/engine/src/confinement/policy/mod.rs, packages/execution/engine/src/confinement/driver/bwrap.rs, packages/execution/engine/tests/confinement_policy.rs, packages/run-supervisor/contracts/worker-env-allowlist.v1.json, `packages/execution/engine/src/confinement/cleanup/probes/ports.rs` | 1 | done |
 | 2 | [Spec and changelog](phase-02-spec-and-changelog.md) | - | docs/platform/agent-confinement/spec.md, changelog.d/261127-1220-confined-rust-offline.md | 1 | done |
 | 3 | [Integration and live proof](phase-03-integration-and-live-proof.md) | 1, 2 | plans/261127-1220-confined-rust-offline/reports/ | 2 | ready |
 
