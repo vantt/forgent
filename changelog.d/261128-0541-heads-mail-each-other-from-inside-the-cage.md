@@ -1,0 +1,1 @@
+- Changed: heads mail each other from inside the cage, read their own inbox, get named refusals, idle recipients are woken, and the answer names the path.
