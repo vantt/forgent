@@ -15,10 +15,22 @@ import os from 'node:os';
 import path from 'node:path';
 import { HeadRequestError, MAX_FRAME_BYTES, MAX_REQUEST_BYTES, requestHead, requestHeadCanI, requestHeadFgos, requestHeadStart, requestHeadWrite } from '../../src/session-host/head-request-client.mjs';
 import { HEAD_SUPERVISOR_WIDEN_VERB, rotateHead, runHeadRequest, runStopSelf, runTicket, startHead } from '../../src/session-host/head-request.mjs';
+import { discussionBranchOf, discussionWorktreeOf } from '../../src/session-host/head-plan.mjs';
 import { parseArgs } from '../../src/cli/parse-args.mjs';
 import { lineageDirOf, writeHeadPlacement } from '../../src/session-host/head-start.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from '../../src/session-host/head-grants.mjs';
+
+try {
+  if (process.env.FGOS_STATE_ROOT) {
+    fs.accessSync(process.env.FGOS_STATE_ROOT, fs.constants.W_OK);
+  }
+} catch {
+  const scratchState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-state-'));
+  fs.chmodSync(scratchState, 0o700);
+  fs.writeFileSync(path.join(scratchState, 'machine-id'), 'm-test\n', { mode: 0o600 });
+  process.env.FGOS_STATE_ROOT = scratchState;
+}
 
 ensureGitAddon();
 
@@ -587,6 +599,29 @@ test('a branch land from a planner is refused land-branch-lead-only', async (t) 
   assert.equal((await planner.ask('land', { branch: 'task/p-1' })).line.code, 'land-branch-lead-only');
 });
 
+test('discussionBranchOf and discussionWorktreeOf build the discussion checkout names', () => {
+  assert.equal(discussionBranchOf('topic-1'), 'discussion/topic-1');
+  assert.equal(discussionWorktreeOf('/home/u/project', 'topic-1'), '/home/u/project-worktrees/topic-1');
+  assert.equal(discussionWorktreeOf('/home/u/project/', 'topic-1'), '/home/u/project-worktrees/topic-1');
+});
+
+test('a shaper lands its own branch with its discussion footprint', async (t) => {
+  const shaper = headCase(t, { persona: 'shaper', name: 'proj-topic-x', writes: ['plans/discussions/topic-x'] });
+  const ports = { discussionOf: async () => ({ kind: 'discussion', dir: 'topic-x', path: 'plans/discussions/topic-x/DISCUSSION.md' }) };
+  const done = await shaper.ask('land', { branch: 'discussion/topic-x' }, 't1', ports);
+  assert.equal(done.exit, 0);
+  assert.deepEqual(JSON.parse(fs.readFileSync(shaper.ticketFile('t1'), 'utf8')).argv, ['land', '--json', '--branch', 'discussion/topic-x', '--footprint', 'plans/discussions/topic-x']);
+});
+
+test('a shaper branch land of another branch is refused land-branch-not-own', async (t) => {
+  const shaper = headCase(t, { persona: 'shaper', name: 'proj-topic-x', writes: ['plans/discussions/topic-x'] });
+  const ports = { discussionOf: async () => ({ kind: 'discussion', dir: 'topic-x', path: 'plans/discussions/topic-x/DISCUSSION.md' }) };
+  const refused = await shaper.ask('land', { branch: 'discussion/other-topic' }, 't2', ports);
+  assert.equal(refused.line.code, 'land-branch-not-own');
+  assert.match(refused.line.message, /not this shaper's own discussion branch/);
+  assert.equal(shaper.spawned.length, 0);
+});
+
 test('a paths land from a planner inside its grant is accepted', async (t) => {
   const planner = headCase(t, { persona: 'planner', name: 'proj-p', writes: ['plans'] });
   assert.equal((await planner.ask('land', { paths: ['plans/a.md'], message: 'm' })).exit, 0);
@@ -940,6 +975,15 @@ test('e2e: a lead widens its own running plan footprint and subsequent run --wri
   const stateDir = path.join(temp, 'state');
   fs.mkdirSync(homeDir, { recursive: true });
   fs.mkdirSync(stateDir, { recursive: true, mode: 0o700 });
+  fs.mkdirSync(path.join(stateDir, 'fgos'), { recursive: true, mode: 0o700 });
+  fs.writeFileSync(path.join(stateDir, 'machine-id'), 'm-test\n', { mode: 0o600 });
+  fs.writeFileSync(path.join(stateDir, 'fgos', 'machine-id'), 'm-test\n', { mode: 0o600 });
+  const priorStateRoot = process.env.FGOS_STATE_ROOT;
+  process.env.FGOS_STATE_ROOT = path.join(stateDir, 'fgos');
+  t.after(() => {
+    if (priorStateRoot === undefined) delete process.env.FGOS_STATE_ROOT;
+    else process.env.FGOS_STATE_ROOT = priorStateRoot;
+  });
 
   const remote = path.join(temp, 'remote.git');
   execFileSync('git', ['init', '-q', '--bare', '--initial-branch=main', remote]);
@@ -1007,10 +1051,6 @@ lead: head:lead-proj-${planDir}
     path.join(root, '.git', 'info', 'exclude'),
     '.fgos/*.yaml\n.fgos/locks/\n.fgos/runtime/\n.fgos/observe/\n',
   );
-
-  fs.mkdirSync(path.join(stateDir, 'fgos'), { recursive: true, mode: 0o700 });
-  fs.writeFileSync(path.join(stateDir, 'machine-id'), 'm-test\n', { mode: 0o600 });
-  fs.writeFileSync(path.join(stateDir, 'fgos', 'machine-id'), 'm-test\n', { mode: 0o600 });
 
   const hostEnv = {
     ...process.env,
