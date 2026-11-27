@@ -673,7 +673,7 @@ export async function runHeadRequest({ runDir, request, requestHostBin }, ports 
     const envelope = { ...readEnvelope(runDir), requestHostBin };
     const args = request?.args;
     if (args === null || typeof args !== 'object' || Array.isArray(args)) throw badArgs('args must be an object');
-    const projectRoot = envelope.cwd;
+    const projectRoot = typeof envelope.session.projectRoot === 'string' && path.isAbsolute(envelope.session.projectRoot) ? envelope.session.projectRoot : envelope.cwd;
     let data;
     switch (request?.verb) {
       case HEAD_START_VERB:

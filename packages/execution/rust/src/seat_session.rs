@@ -45,7 +45,8 @@ pub fn seat_session_dir(run_dir: &Path, launch_command_id: Option<&str>) -> Opti
 }
 
 /// The head the session is, as its launch environment names it (`FGOS_HEAD_PERSONA`, `FGOS_HEAD_NAME`,
-/// `FGOS_HEAD_GEN`): `{ persona, name, gen }` for the envelope's `session`, whose supervisor records it in the
+/// `FGOS_HEAD_GEN`): `{ persona, name, gen }`, plus `projectRoot` when `FGOS_HEAD_PROJECT_ROOT` is an absolute
+/// path (the project the head was started in, which is not its cwd in a linked worktree), for the envelope's `session`, whose supervisor records it in the
 /// session's Identity entry, or an empty map when the environment does not name all three (a generation is a
 /// whole number of at least 1).
 pub fn head_of(env: &BTreeMap<String, String>) -> Map<String, Value> {
@@ -60,6 +61,12 @@ pub fn head_of(env: &BTreeMap<String, String>) -> Map<String, Value> {
             out.insert("persona".into(), json!(persona));
             out.insert("name".into(), json!(name));
             out.insert("gen".into(), json!(gen as u64));
+            if let Some(root) = env
+                .get("FGOS_HEAD_PROJECT_ROOT")
+                .filter(|v| Path::new(v.as_str()).is_absolute())
+            {
+                out.insert("projectRoot".into(), json!(root));
+            }
             out
         }
         _ => Map::new(),
