@@ -98,7 +98,7 @@ whole answer to `plan-no-progress`.
 ## Done plans
 
 Close a `done` plan with one board line (plan program board rules in AGENTS.md) and a backlog update, landed with
-`fgos land --paths` (write `plans/backlog.md` with `fgos session write plans/backlog.md < new`; it is a read-only file grant). The wake close step already stops an idle lead of a `done` plan, under either role shape (`head:lead-*` or `lead:<LANE>`); it leaves a busy or unknown lead and a lane session that still leads another plan. Stop by hand only what it left: a lead that was busy at the wake (`fgos session stop lead --name <headName> --reason "plan done"`). A lead started by hand has no run supervisor, so `session stop --role lead:<LANE>` answers `no-supervisor` (the wake records `stop-failed`); close that one by hand.
+`fgos land --paths` (write a row with `fgos session write <path> < row.md`, the path from `fgos convention path --kind backlog-item --slug <id>-<slug>`, the row carrying the backlog item frontmatter or refused `write-item-invalid`; the land door regenerates `plans/backlog.md`, never edit the index). The wake close step already stops an idle lead of a `done` plan, under either role shape (`head:lead-*` or `lead:<LANE>`); it leaves a busy or unknown lead and a lane session that still leads another plan. Stop by hand only what it left: a lead that was busy at the wake (`fgos session stop lead --name <headName> --reason "plan done"`). A lead started by hand has no run supervisor, so `session stop --role lead:<LANE>` answers `no-supervisor` (the wake records `stop-failed`); close that one by hand.
 
 ## Release
 

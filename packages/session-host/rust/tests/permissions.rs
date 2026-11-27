@@ -211,9 +211,13 @@ fn only_the_shaper_holds_session_save() {
 #[test]
 fn the_cage_sizes_are_the_grants_the_personas_held_before() {
     let cage = |persona| cage_of(persona).unwrap();
-    let coordinator = ["plans", "plans/backlog.md", "plans/backlog/*"]
-        .map(String::from)
-        .to_vec();
+    let coordinator = ["plans", "plans/backlog/*"].map(String::from).to_vec();
+    for persona in ["secretary", "supervisor"] {
+        assert!(
+            !cage(persona).writes.iter().any(|w| w == "plans/backlog.md"),
+            "{persona} is not granted the generated backlog index"
+        );
+    }
     assert_eq!(
         (
             cage("secretary").writes,
