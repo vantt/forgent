@@ -890,14 +890,8 @@ impl wake::Admission for HostAdmission {
                     .map_err(|_| format!("{}:admission-restore-failed", why.code))?;
             }
             // A push that lost the race to another machine's claim leaves this trunk behind origin: pull it now,
-            // so this checkout reads the winner's claim instead of a stale `ready`. The rewrite above changed the
-            // file's stat, and the checkout refuses to fast-forward over a stat-dirty entry, so refresh the index
-            // first. Best effort; the next wake's catch-up retries a failure.
-            let _ = std::process::Command::new("git")
-                .arg("-C")
-                .arg(&main)
-                .args(["update-index", "-q", "--refresh"])
-                .status();
+            // so this checkout reads the winner's claim instead of a stale `ready`. Best effort; the next
+            // wake's catch-up retries a failure.
             let _ = (publisher.catch_up)(&main, &actor);
             return Err(why.code);
         }
