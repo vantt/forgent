@@ -1923,8 +1923,9 @@ impl HostRelease {
 
 /// The one check checkout both doors use.
 impl fgos_session_host::release::CheckoutPorts for HostRelease {
-    /// A detached checkout of `tip` at `<parent of the project root>/<project name>-worktrees/release-check-<id>`,
-    /// made through the worktree door, then given the tip's committed `.fgos` bytes. A checkout made before a later
+    /// A detached checkout of `tip` at `<parent of the project root>/<project name>-worktrees/release-check-<id>`
+    /// (`release-check-chk-<id>` for the check-only door, so a lead's check and a supervisor's release run that
+    /// share a client-chosen id never share a path), made through the worktree door, then given the tip's committed `.fgos` bytes. A checkout made before a later
     /// step failed is removed again.
     fn make_check_checkout(&self, tip: &str) -> Result<PathBuf, String> {
         let name = self
@@ -1939,9 +1940,14 @@ impl fgos_session_host::release::CheckoutPorts for HostRelease {
             .cwd
             .parent()
             .ok_or_else(|| "the project root has no parent directory".to_string())?;
+        let tag = if self.request.verb == RELEASE_CHECK_VERB {
+            "chk-"
+        } else {
+            ""
+        };
         let path = parent
             .join(format!("{name}-worktrees"))
-            .join(format!("release-check-{}", self.request.id));
+            .join(format!("release-check-{tag}{}", self.request.id));
         let text = path.to_string_lossy().into_owned();
         self.host_json(&[
             "worktree", "create", &text, "--detach", "--base", tip, "--json",

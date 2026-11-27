@@ -62,7 +62,7 @@ For each phase of the wave whose footprint is disjoint from the others in it:
    the land kept (`worktreesKept`) to the supervisor by name (raise an event with `fgos supervisor raise --kind
    coordination-help --ref plan:<dir> --reason "worktree kept: <path> (<refusal code>)"`). Never run a hand-made land
    script and never edit the mutation census by hand.
-   Before the final land, run the full gate with `fgos release check --worktree <path>`. At close, follow the cleanup
+   Before the final land, run the full gate with `fgos release check --worktree <path>`; it checks the worktree's committed tip (the ticket's `result.tip`), so commit first: uncommitted edits are not checked. At close, follow the cleanup
    and debt-recording steps of the unit `ready-plan-runs-unattended` (Rule: in AGENTS.md; set in
    .fgos/instructions/effective/rules.json).
 6. Update the phase table in the plan directory with `fgos land --paths` and set the phase `done`. To park a phase,

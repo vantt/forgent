@@ -1258,6 +1258,23 @@ fn serve_lead(name: &str, recipe: &Value) -> (Served, PathBuf) {
         .unwrap();
     assert!(status.success());
     let worktree = fs::canonicalize(worktree).unwrap();
+    // One commit of its own, so the worktree's tip differs from the main checkout's.
+    let status = std::process::Command::new("git")
+        .args([
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@t",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            "worktree",
+        ])
+        .current_dir(&worktree)
+        .status()
+        .unwrap();
+    assert!(status.success());
     (served, worktree)
 }
 
@@ -1302,20 +1319,28 @@ fn release_check_runs_only_the_checks_in_the_named_worktree_and_a_red_check_is_a
     let checkout = fs::canonicalize(served.dir.parent().unwrap())
         .unwrap()
         .join(format!("{name}-worktrees"))
-        .join("release-check-chk1");
+        .join("release-check-chk-chk1");
     let ran_in = fs::read_to_string(served.dir.join("check-cwd")).unwrap();
     assert_eq!(Path::new(ran_in.trim()), checkout);
     assert_ne!(Path::new(ran_in.trim()), worktree);
     assert!(!checkout.exists(), "the check checkout was not removed");
-    let tip = std::process::Command::new("git")
-        .args(["rev-parse", "HEAD"])
-        .current_dir(&worktree)
-        .output()
-        .unwrap();
+    let head_of = |dir: &Path| {
+        let out = std::process::Command::new("git")
+            .args(["rev-parse", "HEAD"])
+            .current_dir(dir)
+            .output()
+            .unwrap();
+        String::from_utf8(out.stdout).unwrap().trim().to_string()
+    };
     assert_eq!(
         settled["result"]["tip"].as_str(),
-        Some(String::from_utf8(tip.stdout).unwrap().trim()),
+        Some(head_of(&worktree).as_str()),
         "{settled}"
+    );
+    assert_ne!(
+        head_of(&worktree),
+        head_of(&served.dir),
+        "the worktree tip must differ from main's"
     );
     // Nothing of the release itself was reached: no apply, no release record, no lock file, no question.
     assert!(!served.dir.join("applied").exists());

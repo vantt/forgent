@@ -529,6 +529,8 @@ struct CheckFixture {
     make_fails: bool,
     /// The checkout cannot be removed.
     remove_fails: bool,
+    /// The worktree's tip cannot be read.
+    tip_fails: bool,
 }
 
 impl CheckFixture {
@@ -541,6 +543,7 @@ impl CheckFixture {
             events: RefCell::default(),
             make_fails: false,
             remove_fails: false,
+            tip_fails: false,
         }
     }
 }
@@ -569,6 +572,9 @@ impl CheckPorts for CheckFixture {
         self.events
             .borrow_mut()
             .push(format!("tip of {}", worktree.display()));
+        if self.tip_fails {
+            return Err("no tip".into());
+        }
         Ok(TIP.to_string())
     }
     fn recipe(&self) -> Result<Value, String> {
@@ -677,13 +683,21 @@ fn a_checks_only_run_with_no_checks_is_green_with_a_note_and_runs_nothing() {
         assert!(report.checks.is_empty());
         assert!(report.note.unwrap().contains("no checks"));
         assert!(fixture.ran.borrow().is_empty());
+        assert!(
+            !fixture
+                .events
+                .borrow()
+                .iter()
+                .any(|e| e.starts_with("make ")),
+            "no checks must not make a checkout"
+        );
     }
 }
 
 #[test]
 fn a_checks_only_run_never_touches_apply_probe_or_rollback_and_refuses_an_invalid_recipe() {
-    // The port set has no apply, probe, rollback, merge-slot, checkout or record call; the recipe's other steps
-    // are never run.
+    // The port set has no apply, probe, rollback, merge-slot or record call; the recipe's other steps are
+    // never run.
     let fixture = CheckFixture::with(reversible());
     run_checks_in(&fixture, Path::new("/work/wt")).unwrap();
     assert!(fixture
@@ -695,4 +709,11 @@ fn a_checks_only_run_never_touches_apply_probe_or_rollback_and_refuses_an_invali
     let invalid = CheckFixture::with(json!({"reversible": true}));
     let why = run_checks_in(&invalid, Path::new("/work/wt")).unwrap_err();
     assert!(why.starts_with("recipe-invalid"));
+
+    // A tip that cannot be read ends as check-checkout-failed and runs no check.
+    let mut no_tip = CheckFixture::with(reversible());
+    no_tip.tip_fails = true;
+    let why = run_checks_in(&no_tip, Path::new("/work/wt")).unwrap_err();
+    assert!(why.starts_with("check-checkout-failed"), "{why}");
+    assert!(no_tip.ran.borrow().is_empty());
 }
