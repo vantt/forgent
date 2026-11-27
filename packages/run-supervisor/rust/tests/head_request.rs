@@ -1231,6 +1231,172 @@ fn release_run_answers_with_a_ticket_and_the_detached_run_rolls_back_on_a_failed
     assert_eq!(bad["code"], "bad-args", "{bad}");
 }
 
+/// A lead's request socket over a project that is a git repository with one linked worktree beside it.
+fn serve_lead(name: &str, recipe: &Value) -> (Served, PathBuf) {
+    let body = release_host(recipe, "free");
+    let served = serve_config(
+        name,
+        &body,
+        Ok(true),
+        Identity::default(),
+        &[],
+        Duration::from_secs(5),
+        |mut cfg| {
+            cfg.persona = "lead".to_string();
+            cfg.role = "head:lead-x".to_string();
+            cfg
+        },
+    );
+    commit_in(&served.dir);
+    let worktree = PathBuf::from(format!("{}-wt", served.dir.display()));
+    let _ = fs::remove_dir_all(&worktree);
+    let status = std::process::Command::new("git")
+        .args(["worktree", "add", "-q", "--detach"])
+        .arg(&worktree)
+        .current_dir(&served.dir)
+        .status()
+        .unwrap();
+    assert!(status.success());
+    let worktree = fs::canonicalize(worktree).unwrap();
+    (served, worktree)
+}
+
+fn check_request(socket: &Path, id: &str, args: &Value) -> Value {
+    request(
+        socket,
+        &json!({"type": "REQUEST", "id": id, "verb": "release check", "args": args}),
+    )
+}
+
+#[test]
+fn release_check_runs_only_the_checks_in_the_named_worktree_and_a_red_check_is_an_answer() {
+    let recipe = json!({
+        "reversible": false,
+        "checks": [["sh", "-c", "pwd > \"$OUT/check-cwd\""], ["false"]],
+        "apply": ["touch", "applied"]
+    });
+    let (served, worktree) = serve_lead("release-check-run", &recipe);
+    let reply = check_request(
+        &served.socket,
+        "chk1",
+        &json!({"worktree": worktree.to_string_lossy()}),
+    );
+    assert_eq!(reply["result"], "done", "{reply}");
+    assert_eq!(reply["data"], json!({"ticket": "chk1", "state": "running"}));
+    let settled = settled_ticket(
+        &served
+            .dir
+            .join(".fgos/runtime/head-tickets/lead-x/chk1.json"),
+    );
+    // A red check does not fail the ticket: it is the answer, and every check still ran.
+    assert_eq!(settled["state"], "done", "{settled}");
+    assert_eq!(settled["result"]["green"], false, "{settled}");
+    assert_eq!(settled["exit"], 1, "red carries a non-zero exit: {settled}");
+    assert_eq!(
+        settled["result"]["checks"],
+        json!([{"argv": ["sh", "-c", "pwd > \"$OUT/check-cwd\""], "exit": 0}, {"argv": ["false"], "exit": 1}])
+    );
+    let ran_in = fs::read_to_string(served.dir.join("check-cwd")).unwrap();
+    assert_eq!(fs::canonicalize(ran_in.trim()).unwrap(), worktree);
+    // Nothing of the release itself was reached: no apply, no release record, no lock file, no question.
+    assert!(!served.dir.join("applied").exists());
+    assert!(!served.dir.join(".fgos/runtime/release").exists());
+    // The same id is a used ticket.
+    let again = check_request(
+        &served.socket,
+        "chk1",
+        &json!({"worktree": worktree.to_string_lossy()}),
+    );
+    assert_eq!(again["code"], "ticket-used", "{again}");
+    let _ = fs::remove_dir_all(&worktree);
+}
+
+#[test]
+fn release_check_refuses_a_path_that_is_not_a_linked_worktree_of_the_project_and_any_other_argument(
+) {
+    let recipe = json!({"checks": [["true"]]});
+    let (served, worktree) = serve_lead("release-check-refuse", &recipe);
+    let outside = std::env::temp_dir();
+    for (id, path) in [
+        ("main1", served.dir.to_string_lossy().into_owned()),
+        ("out1", outside.to_string_lossy().into_owned()),
+        ("rel1", "relative/path".to_string()),
+        ("gone1", format!("{}/missing", worktree.display())),
+    ] {
+        let reply = check_request(&served.socket, id, &json!({"worktree": path}));
+        assert_eq!(reply["code"], "verb-failed", "{path}: {reply}");
+        assert!(
+            reply.to_string().contains("worktree-not-registered")
+                || reply["detail"]
+                    .to_string()
+                    .contains("worktree-not-registered"),
+            "{path}: {reply}"
+        );
+    }
+    for (id, args) in [
+        (
+            "flag1",
+            json!({"worktree": worktree.to_string_lossy(), "rollback": true}),
+        ),
+        ("none1", json!({})),
+        ("num1", json!({"worktree": 3})),
+    ] {
+        let reply = check_request(&served.socket, id, &args);
+        assert_eq!(reply["code"], "bad-args", "{reply}");
+    }
+    assert!(!served
+        .dir
+        .join(".fgos/runtime/head-tickets/lead-x/main1.json")
+        .exists());
+    let _ = fs::remove_dir_all(&worktree);
+}
+
+#[test]
+fn release_check_is_the_leads_alone_and_every_other_head_is_refused_by_the_table() {
+    for (persona, role, code) in [
+        ("lead", "head:lead-x", "done"),
+        ("supervisor", "head:supervisor-x", "verb-not-granted"),
+        ("secretary", "head:secretary-miu", "verb-not-granted"),
+        ("planner", "head:planner-x", "verb-not-granted"),
+        ("shaper", "head:shaper-x", "verb-not-granted"),
+    ] {
+        let served = serve_config(
+            "release-check-grant",
+            &release_host(&json!({"checks": [["true"]]}), "free"),
+            Ok(true),
+            Identity::default(),
+            &[],
+            Duration::from_secs(5),
+            |mut cfg| {
+                cfg.persona = persona.to_string();
+                cfg.role = role.to_string();
+                cfg
+            },
+        );
+        commit_in(&served.dir);
+        let worktree = PathBuf::from(format!("{}-wt", served.dir.display()));
+        let _ = fs::remove_dir_all(&worktree);
+        assert!(std::process::Command::new("git")
+            .args(["worktree", "add", "-q", "--detach"])
+            .arg(&worktree)
+            .current_dir(&served.dir)
+            .status()
+            .unwrap()
+            .success());
+        let reply = check_request(
+            &served.socket,
+            "g1",
+            &json!({"worktree": fs::canonicalize(&worktree).unwrap().to_string_lossy()}),
+        );
+        if code == "done" {
+            assert_eq!(reply["result"], "done", "{persona}: {reply}");
+        } else {
+            assert_eq!(reply["code"], code, "{persona}: {reply}");
+        }
+        let _ = fs::remove_dir_all(&worktree);
+    }
+}
+
 #[test]
 fn the_window_forwards_an_allowed_argv_asks_for_an_unmatched_one_refuses_a_denied_one_and_answers_can_i(
 ) {
@@ -1392,6 +1558,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "questions answer",
             "questions ask",
             "questions cancel",
+            "release check",
             "release run",
             "request result",
             "run",

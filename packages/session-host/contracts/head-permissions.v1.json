@@ -30,7 +30,8 @@
         { "prefix": "questions answer", "decision": "deny", "policy": "node" },
         { "prefix": "activate", "decision": "deny" },
         { "prefix": "release activate", "decision": "deny" },
-        { "prefix": "release run", "decision": "deny", "policy": "native" }
+        { "prefix": "release run", "decision": "deny", "policy": "native" },
+        { "prefix": "release check", "decision": "deny", "policy": "native" }
       ]
     },
     "lead": {
@@ -45,6 +46,7 @@
         { "prefix": "land", "decision": "allow", "policy": "node" },
         { "prefix": "worktree create", "decision": "allow", "policy": "node" },
         { "prefix": "supervisor widen", "decision": "allow", "policy": "node" },
+        { "prefix": "release check", "decision": "allow", "policy": "native" },
         { "prefix": "request result", "decision": "allow", "policy": "node" }
       ]
     },

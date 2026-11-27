@@ -1405,7 +1405,8 @@
       "dir",
       "json",
       "help",
-      "rollback"
+      "rollback",
+      "worktree"
     ],
     "store": "none"
   },
