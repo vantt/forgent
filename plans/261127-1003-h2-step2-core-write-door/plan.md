@@ -2,10 +2,10 @@
 contract: plan-v1
 title: "H2 build step 2: the core write door (locate, grow with evidence, or hand off to admission), the retrospective writer as its first caller"
 description: "Lift the retrospective writer's locate-grow-handoff steps into one core write-door procedure on fgos doc locate, make locate return exact mentions next to ranked candidates so a writer gets search and literal matching in one call, record the writer's locate, mentions and decision on grow, add the always-loaded pointer seed through the context engine, correct the documentation specs after the context engine landed, record what the door still cannot catch, and measure topics per retrospective item."
-status: ready
+status: running
 priority: P2
 blockedBy: []
-base: ac171967a34e55b8bd937c3b064b8f1254033b2b
+base: b64b2712624ca49a10d468ee4a27b37dec23fdc1
 source:
   - p-ixrbglli5o
   - docs/platform/documentation/spec.md#4-build-order
@@ -45,6 +45,7 @@ footprint:
   - plans/backlog/p-ixrbglli5o-the-retrospective-writer-opens-a-new-topic-for.md
   - plans/backlog.md
   - changelog.d/261127-1003-h2-step2-core-write-door.md
+lead: head:lead-forgent-261127-1003-h2-ste-f47e4
 ---
 
 # H2 build step 2: the core write door
