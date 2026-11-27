@@ -1,8 +1,8 @@
 ---
 contract: plan-v1
 title: "When to ask the owner: one shared rule (intent, deviation, reverse path) replaces the file-and-budget approved frame"
-status: ready
-priority: P1
+status: running
+priority: P0
 blockedBy: []
 footprint:
   - plans/261127-0144-when-to-ask-owner-rule/**
@@ -29,11 +29,12 @@ footprint:
   - plugins/fgOS/skills/**
   - .claude/skills/**
   - CHANGELOG.md
-base: 052dd60b2e19cea913cad5217909d8414a3334ee
+base: b6b8681d2325f431be369175233c45180acef5c3
 source:
   - plans/discussions/ds-jxoz3h2qgk-when-to-ask/DISCUSSION.md
   - p-tcm4j3nosu
 created: 2026-11-27
+lead: head:lead-forgent-261127-0144-when-t-540ce
 ---
 
 # When to ask the owner

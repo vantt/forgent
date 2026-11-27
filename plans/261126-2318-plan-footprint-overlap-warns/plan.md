@@ -2,7 +2,7 @@
 contract: plan-v1
 title: "Plans that share a path both run; the overlap is a warning at ready and at admission, never a refusal"
 status: draft
-priority: P1
+priority: P0
 blockedBy: []
 base: 43460a291440cc08dea2d814a5aeeb146b9f7e24
 footprint:

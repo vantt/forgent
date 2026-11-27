@@ -1,10 +1,10 @@
 ---
 contract: plan-v1
 title: "A running plan widens its own footprint through one verb, inside the approved acceptance criteria"
-status: ready
-priority: P1
+status: running
+priority: P0
 blockedBy: []
-base: 052dd60b2e19cea913cad5217909d8414a3334ee
+base: b6b8681d2325f431be369175233c45180acef5c3
 footprint:
   - plans/261127-0143-widen-running-plan-footprint/**
   - packages/supervision/rust/src/portfolio.rs
@@ -28,6 +28,7 @@ source:
   - plans/discussions/ds-mzyircswox-widen-a-running-plan-footprint/DISCUSSION.md
   - p-lfsc4czpgh
 created: 2026-11-27
+lead: head:lead-forgent-261127-0143-widen-cf3f1
 ---
 
 # A running plan widens its own footprint through one verb
