@@ -78,7 +78,7 @@ system:
 | Horizon | Outcome | Relationship to current work |
 |---|---|---|
 | H1 — Platform authority unification | Platform readers/writers use declared promoted owners and retained root authorities; former maintained specs/architect trees are retired | Atomic cutover complete; remaining verification and closeout stay in plans/260925-documentation-authority-unification/plan.md. H2/H3 remain separate deferred horizons. |
-| H2 — Knowledge and Documentation Engine | Generalize the existing end-user registry into the durable multi-profile authority for documents, claims, decisions, provenance, graph relationships, and read models | Preserved future architecture; maintenance MVP begins after H1 cutover |
+| H2 — Knowledge and Documentation Engine | Generalize the existing end-user registry into the durable multi-profile authority for documents, claims, decisions, provenance, graph relationships, and read models | Preserved future architecture; maintenance MVP begins after H1 cutover. The build order, and the status of each step, live in [documentation spec section 4](../documentation/spec.md#4-build-order) |
 | H3 — Agent Context Engine | Compile instructions, effective decisions, and budgeted task-scoped reading plans from canonical authority | Preserved future architecture; never a blocker for H1 |
 
 The already-implemented `tsk-28x` twelve-phase plan is historical foundation,
@@ -1233,6 +1233,8 @@ Execution plan: `plans/260925-documentation-authority-unification/plan.md`.
 8. Stabilize with the smallest maintenance MVP that prevents recurrence.
 
 ### 9.2. H2 — Knowledge and Documentation Engine (preserved follow-on)
+
+The build order, and the status of each step, live in [documentation spec section 4](../documentation/spec.md#4-build-order); this section keeps the design intent only and copies no step.
 
 1. Generalize the existing registry by profile rather than creating a parallel
    store.

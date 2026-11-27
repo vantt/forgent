@@ -155,7 +155,7 @@ Condition before it ships: a retrospective item whose knowledge fits no section 
 
 ## 11. Open Questions
 
-1. **Where the pointer line lives.** *Decided 2026-11-12:* one new instruction seed, a file named documentation-door.md under core/instructions, holding one sentence; the existing instruction registry renders it into every agent CLI's always-loaded file next to the four seeds already there, and `fgos setup` (retired in 12f8a187a) carries it to every project that uses fgOS. No new mechanism.
+1. **Where the pointer line lives.** *Decided 2026-11-12:* one new instruction seed, a file named documentation-door.md under core/instructions, holding one sentence; it was to be rendered by the existing instruction registry into every agent CLI's always-loaded file, with `fgos setup` (retired in 12f8a187a) carrying it to every project that uses fgOS. *Amended 2026-11-27:* the pointer line is a context-engine rule unit, `core/instructions/documentation-door.md`, written and checked through the [Agent Context Engine](../../../agent-context-engine/spec.md)'s door and compiled into its effective set; there is no separate instruction registry step and no `fgos setup` delivery. No new mechanism (section 15).
 2. **The material-only completion path for item `p-ixrbglli5o`.** *Decided 2026-11-12:* the material goes into the admission request, and the cleanup gate accepts that request as evidence (section 6.4). Rejected: loosening the gate to accept a closing report (the gate excludes engine reports on purpose), and attesting the nearest section without growing it (false evidence).
 
 ## 12. Implementation Alignment
@@ -192,3 +192,4 @@ Condition before it ships: a retrospective item whose knowledge fits no section 
 - 2026-11-12, owner: the pointer line is a fifth instruction seed, documentation-door.md under core/instructions; a retrospective item with material only hands it to an admission request, and the cleanup gate accepts that request as evidence, as a contract change owned by work state.
 - 2026-11-12, owner: spec signed.
 - 2026-11-13: the locate step's three verdicts (`owner-found`, `ambiguous`, `none-above-threshold`) are replaced by the writer's decision after reading (`grow`, `ask`, `create`, `no-place`), matching document identity 8.1 and pkm's locate, which give no verdict from a score.
+- 2026-11-27, planning step 2: the pointer line of section 11 item 1 is a context-engine rule unit compiled into the effective set, not an instruction-registry block and not a setup-delivery step (setup was removed in 12f8a187a); the signed decision's wording stays above with this entry as its amendment.

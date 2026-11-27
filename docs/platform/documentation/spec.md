@@ -51,7 +51,7 @@ Owned outside this area and consumed here:
 | Paths, kinds, cardinality | [Convention](../convention/spec.md) |
 | User-document slots, lifecycle, lineage | [knowledge-registry contract](../work-state/contracts/knowledge-registry.md) (moves here in a later slice) |
 | Decisions | `state.decisions` and the decision index |
-| Bounded agent briefs (H3, Agent Context Engine) | a future area; it reads H2's outputs and never defines their truth |
+| Bounded agent briefs (H3) | [Agent Context Engine](../agent-context-engine/spec.md), built: it holds and checks every fgOS rule and compiles the effective set, and [Agent Start Context](../agent-start-context/spec.md) selects from it. It reads this area's outputs and never defines their truth |
 
 ## 3. How A Write Flows
 
@@ -78,13 +78,17 @@ A writer never changes structure to get past a refusal; structure changes come o
 
 Each step is one phase that ships something checkable on its own. Revised on 2026-11-22: locate goes first, because the retrospective writer can add evidence to the unit that already carries its claim only after finding that unit, and every later writer (admission, write door) uses the same door; doing the writer first would need a grep finder (50% right decisions against pkm's 73%) to be replaced afterwards.
 
-1. **Locate through pkm** (built; landed on main in `efb1f5af3` on 2026-11-24): link `pkm-core` (tag `v0.7.0`: search, `WriteGuard` for read-only, unit-level `in_force` with `amended_by`) into the `fgos` host behind a locate port, with ONNX Runtime linked statically so a release ships no runtime library of its own, run pkm's index worker as a detached process and fetch its model through `fgos doctor --fix`, the `fgos doc locate` door (translation, top 10, log) and the repair verb `fgos doc index status|stop|reset`, doctor rows for the index and the model, and the recall regression set as a repeatable measurement (`fgos doc locate --eval`). What was built, and the measured recall, are in [document identity](subcomponents/document-identity/spec.md) sections 8.2, 14 and 15.
-2. **A core write door, with the retrospective writer as its first caller** (stop 1 of document identity; item `p-ixrbglli5o`): a general write door in the core finds the unit through `fgos doc locate` and adds the evidence to the unit that already carries the claim; the retrospective writer is the first caller of that door, and an always-loaded pointer line points agents at it. Creating a new file files an admission request, which waits for admission's decision. The cleanup gate accepts the evidence or the admission handoff. Cuts the main source of new documents (owner, 2026-11-24).
-3. **doc-checks**: path input, the verb and rule-claim rules, staged reads and the pre-commit gate (item `p-cd2ejz7wa5`); the 6 documents with invalid YAML frontmatter (already quoted in `51f39d252`).
-4. **Admission**: effect checks at the doors, the reviewer run, the frame and its weekly ceiling, refusal texts.
-5. **Write door, rest of it**: the skill and live templates on the core door that step 2 builds (the pointer line ships with step 2).
-6. **Observer**: pkm's structural proposals into fgOS work items; merging the 479 story documents into claim units over time.
-7. **Reading surfaces**: its spec first, then the surfaces.
+The `Plan / status` column is the one place H2's progress is read: a step is done when its plan is done. No entry document repeats the steps.
+
+| # | Step | Plan / status |
+|---|---|---|
+| 1 | **Locate through pkm**: link `pkm-core` (search, `WriteGuard` for read-only, unit-level `in_force` with `amended_by`; the pin is `v0.7.1` today, shared with the [context engine](../agent-context-engine/spec.md)) into the `fgos` host behind a locate port, with ONNX Runtime linked statically so a release ships no runtime library of its own, run pkm's index worker as a detached process and fetch its model through `fgos doctor --fix`, the `fgos doc locate` door (translation, top 10, log) and the repair verb `fgos doc index status\|stop\|reset`, doctor rows for the index and the model, and the recall regression set as a repeatable measurement (`fgos doc locate --eval`) | [plans/261122-2217-docos-pkm-locate-door/plan.md](../../../plans/261122-2217-docos-pkm-locate-door/plan.md) — done. Built at `v0.7.0` and landed on main in `efb1f5af3` on 2026-11-24; what was built and the measured recall are in [document identity](subcomponents/document-identity/spec.md) sections 8.2, 14 and 15 |
+| 2 | **A core write door, with the retrospective writer as its first caller** (stop 1 of document identity; item `p-ixrbglli5o`): a general write door in the core finds the unit through `fgos doc locate` and adds the evidence to the unit that already carries the claim; the retrospective writer is the first caller of that door, and an always-loaded pointer line points agents at it. Creating a new file files an admission request, which waits for admission's decision. The cleanup gate accepts the evidence or the admission handoff. Cuts the main source of new documents (owner, 2026-11-24) | [plans/261127-1003-h2-step2-core-write-door/plan.md](../../../plans/261127-1003-h2-step2-core-write-door/plan.md) — running |
+| 3 | **doc-checks**: path input, the verb and rule-claim rules, staged reads and the pre-commit gate (item `p-cd2ejz7wa5`); the 6 documents with invalid YAML frontmatter (already quoted in `51f39d252`) | no plan yet |
+| 4 | **Admission**: effect checks at the doors, the reviewer run, the frame and its weekly ceiling, refusal texts | no plan yet |
+| 5 | **Write door, rest of it**: the skill and live templates on the core door that step 2 builds (the pointer line ships with step 2) | no plan yet |
+| 6 | **Observer**: pkm's structural proposals into fgOS work items; merging the 479 story documents into claim units over time | no plan yet |
+| 7 | **Reading surfaces**: its spec first, then the surfaces | no plan yet |
 
 ## 5. Objectives Map
 
@@ -94,7 +98,7 @@ The proposal's objectives, and the subcomponent that meets each:
 |---|---|
 | A1 One truth, one owner | document identity (locate), doc-checks (rule-claim rule), admission |
 | A2 No stale guidance | reading surfaces; lifecycle from the registry |
-| A3 Right content in few tokens | H3, outside this area |
+| A3 Right content in few tokens | the [Agent Context Engine](../agent-context-engine/spec.md) and [Agent Start Context](../agent-start-context/spec.md), outside this area |
 | A4 One door, no duplicates | write door, with locate and admission |
 | A5 Traceable, never guessed | write door (ask when ambiguous), reading surfaces (pointers to source) |
 | A6 Two surfaces from one source | reading surfaces; rule 3 below |
@@ -113,7 +117,7 @@ The proposal's objectives, and the subcomponent that meets each:
 
 ### 6.1. Answers to the proposal's open questions
 
-1. **Scope of "rules".** A rule is anything with a stable id and one holder: L1–L10, D-ADR numbers, RUL ids, and the ids of the instruction seeds under core/instructions. An operating practice without an id is not a checkable claim; it gets an id when it needs checking.
+1. **Scope of "rules".** A rule is anything with a stable id and one holder: L1–L10, D-ADR numbers, RUL ids, and the ids of the rule units under `core/instructions`. Rules belong to the [Agent Context Engine](../agent-context-engine/spec.md), which holds and checks them, owns owners, `when:` keys and the compiled effective set; documentation links to a rule and never restates it. An operating practice without an id is not a checkable claim; it gets an id when it needs checking.
 2. **Priority when objectives pull apart.** The product order in `AGENTS.md` applies first. Inside the documentation objectives: truth first (A1, A5, A2), then reach (A4, B6), then economy (A3, A6). B1 and B4 are not traded off; they bound every option.
 
 ### 6.2. One source, against the earlier two-registry decision
@@ -135,7 +139,8 @@ D-tsk28x-8 (2026-08-25) set one engine with two tiers, a human tier that accepts
 | Durable per-claim identity (deferred by the owner, 2026-11-06) | sections carry coordinates; rule claims keyed by (holder, id) | claim ids added later without rewriting documents | a duplicate meaning slips past locate and is found in use |
 | `platform-docs` registry profile, typed graph | path identity from Convention | a graph derived, never stored (tsk-1lv ruling) | a check needs identity beyond sections and rule ids |
 | Skill-name check | none | one listing of skill names across core and domains | a dead skill reference is found that review missed |
-| Agent Context Engine (H3, PF-I007) | none | rule claims and sections keyed so a reducer can select them | H3 opens |
+| Agent Context Engine (H3, PF-I007) | done elsewhere: the [Agent Context Engine](../agent-context-engine/spec.md) holds every fgOS rule and compiles the effective set, and [Agent Start Context](../agent-start-context/spec.md) selects from it; the documents of this area stay the claim holders | — | — |
+| The pkm pin, shared with the context engine | one tag for `packages/documentation/rust` and `packages/agent-context-engine/rust`, `v0.7.1` today | keep it one pin: a raise moves both crates in one change and reruns both regression sets | either crate needs a tag the other cannot take |
 | Embeddings | moved out of deferred on 2026-11-24: build step 1 searches through pkm's hybrid search (BM25 plus `multilingual-e5-small` embeddings), document identity section 8.2 | — | — |
 | Migration tooling retirement (proposal 9.2 step 5) | done in `159971615` | — | — |
 
@@ -164,3 +169,4 @@ D-tsk28x-8 (2026-08-25) set one engine with two tiers, a human tier that accepts
 - 2026-11-22, coordinator, while planning step 1: the pkm pin moves from `v0.5.0` to `v0.7.0` (tag commit `d488fe09`) before any fgOS code linked pkm, so the move cost no migration; step 1 uses none of the tag's breaking changes (document identity, section 17).
 - 2026-11-24: step 1 is built and landed on main (`efb1f5af3`) on pkm `v0.7.0`. Its recall gate passes on the pinned 2026-11-12 corpus (document identity, section 15).
 - 2026-11-24, owner: step 2 builds a general write door in the core, not a writer-specific path; the retrospective writer is its first caller, an always-loaded pointer line points agents at the door, and creating a new file files an admission request that waits for admission's decision.
+- 2026-11-27, planning step 2 (source: [plans/261127-1003-h2-step2-core-write-door/plan.md](../../../plans/261127-1003-h2-step2-core-write-door/plan.md)): the core door is a shared procedure on the existing verbs, not a new verb; the writer's decision is recorded on the registry events it already writes, and a claim whose carrier sits outside the registry is recorded as a decision naming that carrier; the pointer line is a context-engine rule unit rather than an instruction-registry block; and rules belong to the context engine while this area keeps claims in documents (6.1).
