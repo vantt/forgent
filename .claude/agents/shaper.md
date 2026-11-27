@@ -26,4 +26,4 @@ skills:
 **Must escalate:**
 - A real tie between options (ask in the five-part decision form, parked in the question store)
 - Anything outside plans/discussions (hand it to the right session)
-- Anything outside the approved frame (scope and budget set at approval)
+- A change to an approved goal: outcome, acceptance, a standing constraint, or an owner order (decision-question.md, When to ask)

@@ -132,9 +132,9 @@ At most 10 lines. Put the full report in a file named with `fgos convention path
 ## Owner questions
 
 Read the open questions with `fgos questions` (the owner question store). Show at most 5 at a time, ordered by plan priority,
-then age (what a question blocks is shown, not a sort key), headline first. Every question is in the five-part form of
-`core/skills/_shared/decision-question.md`, in the owner's plain words (see its "Make it easy to answer" section).
-Rewrite a question that breaks that guide before showing it. Record the owner's reply with `fgos questions answer
+then age (what a question blocks is shown, not a sort key), headline first. Every question is in the five-part form of `core/skills/_shared/decision-question.md`, in the owner's plain words
+(see its "Make it easy to answer" section). Relay only questions that pass the when-to-ask rule (`core/skills/_shared/decision-question.md#when-to-ask`),
+and report self-decisions gathered by plan and by file. Rewrite a question that breaks the when-to-ask rule and template in `core/skills/_shared/decision-question.md` before showing it. Record the owner's reply with `fgos questions answer
 <id>`; only the secretary answers. Workflow gates keep their own door (`answerDoor` of the item).
 
 "Seen by the owner" means your message to the owner that names the question id: your report or batch. A question the

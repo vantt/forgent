@@ -74,7 +74,7 @@ Headings (any level) for each, in this order:
    where it has none, `fgos authority locate` answers `authority: inactive`, and the plan records
    `authority: inactive` in place of the table and goes on.
 5. **Phases**: the phase table (section 4).
-6. **Owner questions**: only what the owner alone can answer. Ask each with `fgos questions ask`
+6. **Owner questions**: only what the owner alone can answer per `decision-question.md#when-to-ask`. Ask each with `fgos questions ask`
    (five-part form of [decision-question.md](decision-question.md)) and list the `q-` ids here,
    each with its headline. Decide whatever the evidence settles (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json, priority 2).
 7. **Risks and rollback**: failure modes and the single revert path.

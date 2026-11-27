@@ -49,7 +49,7 @@ test('AGENTS.md carries the decision-question template law and points at its sha
   const agents = fs.readFileSync(AGENTS_MD, 'utf8');
   assert.ok(agents.includes('Every question asking the owner to choose a direction carries five parts'), 'AGENTS.md must carry the decision-question law (projected from core/instructions/decision-question.md)');
   assert.ok(agents.includes('core/skills/_shared/decision-question.md'), 'the law must point at the full template');
-  assert.ok(agents.includes('Inside the approved frame (scope + budget set at approval) decide and report'), 'the law must carry the approved-frame stop point');
+  assert.ok(agents.includes('Ask the owner only to set or change a direction.'), 'the law must carry the when-to-ask stop point');
 });
 
 test('the RUL11 and RUL104 anchor phrases are each owned by their rule unit, alone on a line, and rendered into AGENTS.md from it', () => {

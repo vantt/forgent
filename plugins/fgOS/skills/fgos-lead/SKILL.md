@@ -75,16 +75,16 @@ never SIGKILL a test run.
 | Code | Do |
 |---|---|
 | `land-gate-missing` | the project has no `land.gates`: ask the owner with `fgos questions ask` |
-| `land-outside-footprint` | the branch changed a path outside the footprint: fix the branch or ask |
+| `land-outside-footprint` | the branch changed a path outside the footprint: fix the branch; if the path is needed to meet the plan's acceptance, raise a footprint widen for the supervisor (`fgos supervisor raise`), never the owner |
 | `land-conflict-aborted` | rebase onto the trunk tip, resolve, land again |
-| `land-recovery-required` | ask the owner to run `fgos git recover` |
+| `land-recovery-required` | raise it for the supervisor, which holds `fgos git recover` |
 | `footprint-change-refused` | your paths land touched the plan's `footprint`: remove that change |
 
 ## Never
 
 - Anything `core/agents/lead.yaml` puts outside the lead; change the plan footprint.
 - Ask outside `fgos questions ask` (granted to every head; `../_shared/decision-question.md`).
-- Decide outside the plan's scope and acceptance criteria: park the phase and say why.
+- Change the plan's approved outcome or acceptance yourself: that is an owner question (`../_shared/decision-question.md#when-to-ask`); widening its files to meet them is not.
 
 ## Reports
 
