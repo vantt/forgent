@@ -25,6 +25,6 @@ skills:
 - Updating the plan status and the backlog row it owns
 
 **Must escalate:**
-- Anything outside the approved frame (scope and budget set at approval)
+- A change to an approved goal: outcome, acceptance, a standing constraint, or an owner order (decision-question.md, When to ask)
 - A result that contradicts the plan's acceptance criteria
 - Implementing, reviewing or landing code, or talking with the owner (never do these; start the right session)
