@@ -215,16 +215,16 @@ Settled in [DISCUSSION.md](../../../plans/discussions/ds-hme6khnird-owner-questi
 Settled in [DISCUSSION.md](../../../plans/discussions/ds-jxoz3h2qgk-when-to-ask/DISCUSSION.md) section 4; planned in
 [plan.md](../../../plans/261127-0144-when-to-ask-owner-rule/plan.md).
 
-| Id | Decision | Where it lands |
-|---|---|---|
-| WA-D1 | Scope is every question an agent sends the owner, not just the seed questions | `core/skills/_shared/decision-question.md#when-to-ask` |
-| WA-D2 | The owner answers only questions that set or change a direction; an actionable task finds a safe, reversible way, does it, and reports | `core/skills/_shared/decision-question.md#when-to-ask` |
-| WA-D3 | Widening a plan footprint to meet the plan's own acceptance is actionable, not an owner question | `core/skills/_shared/decision-question.md#when-to-ask` |
-| WA-D4 | "A ready plan runs without the owner" split into discussion ds-que32ftgg6; this discussion keeps the execution-time rule | handed off |
-| WA-D5 | An agent never derives a higher owner intent to override a written outcome or acceptance; changing an approved goal is an owner question | `core/skills/_shared/decision-question.md#when-to-ask` |
-| WA-D6 | Every agent runs three questions before proposing or asking (intent clear, fastest direction does not deviate from approved goal, real reverse path) | `core/skills/_shared/decision-question.md#when-to-ask` |
-| WA-D7 | No new report channel; self-decisions are recorded where the work lives, secretary gathers them by plan and file; the channel must not depend on the secretary's tick | `core/skills/_shared/decision-question.md#when-to-ask` |
-| WA-D8 | Missing hands (raise for supervisor when granted, otherwise infrastructure gap) and precedent (coach) are not owner questions | handed off |
+| Decision | Where it lands |
+|---|---|
+| Scope is every question an agent sends the owner, not just the seed questions | `core/skills/_shared/decision-question.md#when-to-ask` |
+| The owner answers only questions that set or change a direction; an actionable task finds a safe, reversible way, does it, and reports | `core/skills/_shared/decision-question.md#when-to-ask` |
+| Widening a plan footprint to meet the plan's own acceptance is actionable, not an owner question | `core/skills/_shared/decision-question.md#when-to-ask` |
+| "A ready plan runs without the owner" split into discussion ds-que32ftgg6; this discussion keeps the execution-time rule | handed off |
+| An agent never derives a higher owner intent to override a written outcome or acceptance; changing an approved goal is an owner question | `core/skills/_shared/decision-question.md#when-to-ask` |
+| Every agent runs three questions before proposing or asking (intent clear, fastest direction does not deviate from approved goal, real reverse path) | `core/skills/_shared/decision-question.md#when-to-ask` |
+| No new report channel; self-decisions are recorded where the work lives, secretary gathers them by plan and file; the channel must not depend on the secretary's tick | `core/skills/_shared/decision-question.md#when-to-ask` |
+| Missing hands (raise for supervisor when granted, otherwise infrastructure gap) and precedent (coach) are not owner questions | handed off |
 
 Settled facts recorded while writing the contracts:
 
