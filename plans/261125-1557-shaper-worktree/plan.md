@@ -37,6 +37,7 @@ footprint:
   - docs/platform/supervision/spec.md
   - changelog.d/261125-1557-shaper-runs-in-own-worktree.md
   - src/cli/command-registry.mjs
+  - apps/fgos/src/wiring/session_rotation_hook.rs
 base: dc49aa88162cbd26bbca308f337b7c1f05387a86
 source:
   - plans/discussions/ds-xb6hplcn2m-shaper-worktree/DISCUSSION.md
