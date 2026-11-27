@@ -171,7 +171,18 @@ to `ready`, drop the `blockedBy`, and land the plan dir. Nothing else in the pla
 | 3 | [A shaper lands its own discussion branch](phase-03-shaper-branch-land.md) | - | src/session-host/head-plan.mjs, src/session-host/head-request.mjs, test/session-host/head-request.test.mjs | 1 | done |
 | 4 | [The shaper start creates its worktree](phase-04-shaper-start-worktree.md) | 1, 3 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs | 2 | done |
 | 5 | [Skill, specs and changelog](phase-05-skill-and-docs.md) | 2, 3, 4 | core/skills/fgos-shaping/SKILL.md, core/agents/shaper.yaml, .agents/skills/fgos-shaping/SKILL.md, plugins/fgOS/skills/fgos-shaping/SKILL.md, .claude/agents/shaper.md, docs/platform/session-host/spec.md, docs/platform/supervision/spec.md, changelog.d/261125-1557-shaper-runs-in-own-worktree.md | 3 | done |
-| 6 | [Integration and live proof](phase-06-integration.md) | 1, 2, 3, 4, 5 | plans/261125-1557-shaper-worktree/reports | 4 | ready |
+| 7 | [The shaper worktree works on a fresh project and runs its hooks](phase-07-shaper-worktree-live-fixes.md) | 4 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs | 4 | ready |
+| 6 | [Integration and live proof](phase-06-integration.md) | 1, 2, 3, 4, 5, 7 | plans/261125-1557-shaper-worktree/reports | 5 | ready |
+
+Phase 7 was opened on 2026-11-27 by the phase 6 live proof (`reports/live-proof.md`): defect A (a fresh project has no
+`<project>-worktrees/`, so the first shaper start fails) and defect B (the project hooks look for
+`${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos`, absent in a linked worktree, so mailbox, questions, identity and
+rotation hooks are silent and rotation ends `no-answer`). Both are fixed in the shaper start (phase 4 files). Rejected
+for B: changing the hook prefix in every installed project's settings (outside this plan, every install) and linking
+the installation in the worktree door's provisioning (it would turn hooks on in every unit worker's worktree). Finding C
+(a branch land is a merge, so round commits are reachable from main) is not a blocker: criterion 6 counts main's
+first-parent line, which gained one commit, and the land shape is a non-goal; the `land --help` wording is reported
+to the supervisor as a separate item. Phase 6 runs again after phase 7.
 
 Hot files: `apps/fgos/src/wiring/session_write_publish.rs`, `bin/fgos.mjs` and the command manifest belong to
 phase 2 alone; the generated skill and agent copies belong to phase 5 alone and are regenerated with
