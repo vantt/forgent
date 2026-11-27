@@ -1165,8 +1165,17 @@ fn release_run_answers_with_a_ticket_and_the_detached_run_rolls_back_on_a_failed
     assert!(served.dir.join("rolled-back").exists());
     // The check ran in a checkout beside the project, with its own disk temp directory and without the live state
     // root the run was started with; the checkout is gone once the checks ended.
-    let name = served.dir.file_name().unwrap().to_string_lossy().into_owned();
-    let worktrees = served.dir.parent().unwrap().join(format!("{name}-worktrees"));
+    let name = served
+        .dir
+        .file_name()
+        .unwrap()
+        .to_string_lossy()
+        .into_owned();
+    let worktrees = served
+        .dir
+        .parent()
+        .unwrap()
+        .join(format!("{name}-worktrees"));
     let checkout = worktrees.join("release-check-rel1");
     let ran_in = fs::read_to_string(served.dir.join("check-cwd")).unwrap();
     assert_eq!(
