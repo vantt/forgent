@@ -51,7 +51,7 @@ help queue has nothing past the threshold; then the supervisor owns the queue ag
 
 1. **Clarify the domain.** Call `fgos-clarifying` (verdict only, no Work item, never `fgos submit`). If the verdict is
    unsure (`domainUnsure`), ask the owner one line and wait; park nothing else behind it.
-2. **Backlog row.** For an actionable request, mint an id with `fgos identity mint backlog` (Rule: id-minting, in AGENTS.md; set in .fgos/instructions/effective/rules.json) and write one row file at the path `fgos convention path --kind backlog-item --id <id> --slug <slug>` prints, with
+2. **Backlog row.** For an actionable request, mint an id with `fgos identity mint backlog` (Rule: id-minting, in AGENTS.md; set in .fgos/instructions/effective/rules.json) and write one row file at the path `fgos convention path --kind backlog-item --slug <id>-<slug>` prints, with
    `fgos session write <that path> < row.md` (the row carries the backlog item frontmatter; a file missing a required key is refused `write-item-invalid`) (a new file, so there is nothing to copy or hash). Discussions and plans carry that id.
    The land door regenerates `plans/backlog.md` in the same commit; never edit the index. On `write-busy` (a live Git operation of the host held the checkout through the host's own retries; nothing was written), wait a little and write again unchanged. `plans/` and `plans/discussions/` stay writable directly.
 3. **Route.**

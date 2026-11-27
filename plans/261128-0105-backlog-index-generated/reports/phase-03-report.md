@@ -22,3 +22,4 @@ Status: DONE_WITH_CONCERNS
 - Caveat: could not run `fgos convention path --help` (approval denied). The `--id`/`--slug` flags are inferred from the `{id}-{slug}.md` template and the `--kind report --slug` usage elsewhere; verify them.
 - `.agents/`, `.claude/` and `plugins/` skill copies were not regenerated (not checked or built here).
 - Checks: `rg -n 'session write plans/backlog.md' core docs/platform` is empty; `head-grants.test.mjs` passes (1/1).
+- Correction: `--id` is not a valid flag of `fgos convention path` (`unknown flag "--id"`); both skills now cite `fgos convention path --kind backlog-item --slug <id>-<slug>`, verified to print `plans/backlog/p-abcdefghij-test-row.md`. This supersedes the caveat above.
