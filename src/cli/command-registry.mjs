@@ -1592,8 +1592,8 @@ export const COMMAND_REGISTRY = [
   }),
   withSubcommands({
     name: 'supervisor',
-    invoke: 'fgos supervisor <wake|plans|queue|handled|raise|done>',
-    description: 'The plan supervisor\'s verbs, served natively by the Rust host. `wake` starts the supervisor head when an event is unhandled and none is live (answers nothing-unhandled, starting or started); `plans` lists the ready plans of the trunk tip; `queue` lists the unhandled supervision events; `handled` marks events handled; `raise` puts a coordination event on the queue; `done` ends the supervisor\'s run and refuses while an event is unhandled. From inside a confined head `queue`, `plans`, `handled`, `raise` and `done` (and `fgos slots`) go through its request socket.',
+    invoke: 'fgos supervisor <wake|plans|queue|handled|raise|done|widen>',
+    description: 'The plan supervisor\'s verbs, served natively by the Rust host. `wake` starts the supervisor head when an event is unhandled and none is live (answers nothing-unhandled, starting or started); `plans` lists the ready plans of the trunk tip; `queue` lists the unhandled supervision events; `handled` marks events handled; `raise` puts a coordination event on the queue; `done` ends the supervisor\'s run and refuses while an event is unhandled; `widen` widens a running or ready plan\'s footprint inside its approved acceptance criteria. From inside a confined head `queue`, `plans`, `handled`, `raise` and `done` (and `fgos slots`) go through its request socket.',
     subcommands: {
       wake: { description: 'Start the supervisor head when an event is unhandled and no supervisor is live; records the wake.', parameters: { type: 'object', properties: {}, required: [] }, examples: ['fgos supervisor wake'] },
       plans: { description: 'Read-only: the plans of the trunk tip with their status, from each plan.md.', parameters: { type: 'object', properties: {}, required: [] }, examples: ['fgos supervisor plans --json'] },
@@ -1614,8 +1614,23 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos supervisor raise --kind coordination-handoff --ref plans/261119-1731-x --reason "ready for a lead" --next "fgos supervisor plans"'],
       },
       done: { description: 'End the supervisor\'s run: refuses while an event is unhandled.', parameters: { type: 'object', properties: {}, required: [] }, examples: ['fgos supervisor done'] },
+      widen: {
+        description: 'Widen a plan\'s footprint by one or more paths, for a numbered acceptance criterion.',
+        parameters: {
+          type: 'object',
+          properties: {
+            plan: { type: 'string', description: 'Positional: the plan directory name.' },
+            phase: { type: 'string', description: 'The phase id to widen.' },
+            path: { type: 'string', description: 'The repo-relative path to add to the footprint (repeatable).' },
+            criterion: { type: 'integer', description: 'The 1-based number of the acceptance criterion this widening serves.' },
+          },
+          positional: ['plan'],
+          required: ['plan', 'phase', 'path', 'criterion'],
+        },
+        examples: ['fgos supervisor widen 261127-0143-widen-running-plan-footprint --phase 1 --path src/foo.rs --criterion 2'],
+      },
     },
-    examples: ['fgos supervisor queue', 'fgos supervisor handled <id>', 'fgos supervisor done'],
+    examples: ['fgos supervisor queue', 'fgos supervisor handled <id>', 'fgos supervisor done', 'fgos supervisor widen 261127-0143-widen-running-plan-footprint --phase 1 --path src/foo.rs --criterion 2'],
     touchesState: true,
     store: 'open',
     mutatesStore: ['wake', 'handled', 'raise'],

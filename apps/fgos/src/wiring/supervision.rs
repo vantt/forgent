@@ -45,7 +45,9 @@ pub const SLOTS_OPERATION_ID: &str = "slots.read";
 /// The sub-commands `fgos watcher` serves.
 pub const WATCHER_SUBCOMMANDS: &[&str] = &["tick", "tune"];
 /// The sub-commands `fgos supervisor` serves.
-pub const SUPERVISOR_SUBCOMMANDS: &[&str] = &["wake", "plans", "queue", "handled", "raise", "done"];
+pub const SUPERVISOR_SUBCOMMANDS: &[&str] = &[
+    "wake", "plans", "queue", "handled", "raise", "done", "widen",
+];
 /// The sub-commands of `fgos session` the host serves itself; `start`, `rotate`, `stop` and `write` stay in the payload.
 pub const SESSION_SUBCOMMANDS: &[&str] = &["read", "type"];
 
@@ -114,11 +116,21 @@ pub enum Verb {
     Handled { ids: Vec<String> },
     Raise(RaiseCommand),
     Done,
+    Widen(WidenCommand),
     Land(LandCommand),
     Slots,
     Tune(TuneCommand),
     SessionRead { target: String, lines: u32 },
     SessionType { target: String, text: String },
+}
+
+/// `supervisor widen`: widen a running or ready plan's footprint.
+#[derive(Debug, Clone)]
+pub struct WidenCommand {
+    pub dir: String,
+    pub phase: String,
+    pub paths: Vec<String>,
+    pub criterion: u32,
 }
 
 /// `supervisor raise`: one coordination event for the queue.
@@ -148,6 +160,7 @@ impl SupervisionRequest {
             | Verb::Handled { .. }
             | Verb::Raise(_)
             | Verb::Tune(_)
+            | Verb::Widen(_)
             | Verb::SessionType { .. } => SUPERVISOR_WRITE_OPERATION_ID,
             Verb::Plans | Verb::Queue | Verb::Done | Verb::SessionRead { .. } => {
                 SUPERVISOR_READ_OPERATION_ID
@@ -166,11 +179,20 @@ fn validation(message: impl Into<String>) -> CategorisedRefusal {
 fn refused(code: &str, detail: impl std::fmt::Display) -> CategorisedRefusal {
     let message = format!("{detail} [{code}]");
     match code {
-        "events-unhandled" | "land-gate-missing" | "target-not-stuck" => {
-            CategorisedRefusal::new("precondition", message)
+        "events-unhandled"
+        | "land-gate-missing"
+        | "target-not-stuck"
+        | "plan-not-widenable"
+        | "write-branch-ahead"
+        | "admission-path-dirty" => CategorisedRefusal::new("precondition", message),
+        "event-unknown"
+        | "session-not-found"
+        | "plan-not-found"
+        | "phase-not-found"
+        | "criterion-not-found" => CategorisedRefusal::new("not-found", message),
+        "bad-event" | "bad-args" | "footprint-entry-invalid" => {
+            CategorisedRefusal::new("validation", message)
         }
-        "event-unknown" | "session-not-found" => CategorisedRefusal::new("not-found", message),
-        "bad-event" => CategorisedRefusal::new("validation", message),
         _ => CategorisedRefusal::unexpected(message),
     }
 }
@@ -212,6 +234,7 @@ pub fn project_request(
             Some("plans") => Verb::Plans,
             Some("queue") => Verb::Queue,
             Some("done") => Verb::Done,
+            Some("widen") => Verb::Widen(widen_command(&call)?),
             Some("handled") => {
                 let ids = call.arguments();
                 if ids.is_empty() {
@@ -406,6 +429,47 @@ fn land_command(call: &Call) -> Result<LandCommand, CategorisedRefusal> {
         footprint: (!footprint.is_empty()).then_some(footprint),
         target: call.value("target").map_err(validation)?,
         squash: call.switch("squash").map_err(validation)?,
+    })
+}
+
+fn widen_command(call: &Call) -> Result<WidenCommand, CategorisedRefusal> {
+    if let Some(flag) = call.flag_outside(&["phase", "path", "criterion", "json"]) {
+        return Err(refused("bad-args", format!("unknown flag --{flag}")));
+    }
+    let args = call.arguments();
+    if args.len() != 1 || args[0].is_empty() {
+        return Err(refused(
+            "bad-args",
+            "supervisor widen takes exactly one <plan-dir> positional",
+        ));
+    }
+    let dir = args[0].clone();
+    let phase = match call.value("phase").map_err(|e| refused("bad-args", e))? {
+        Some(p) if !p.is_empty() => p,
+        _ => return Err(refused("bad-args", "--phase is required")),
+    };
+    let paths = list_of(call, "path").map_err(|e| refused("bad-args", e.message))?;
+    if paths.is_empty() {
+        return Err(refused("bad-args", "at least one --path is required"));
+    }
+    let criterion_str = match call.value("criterion").map_err(|e| refused("bad-args", e))? {
+        Some(c) if !c.is_empty() => c,
+        _ => return Err(refused("bad-args", "--criterion is required")),
+    };
+    let criterion = criterion_str.parse::<u32>().map_err(|_| {
+        refused(
+            "bad-args",
+            format!("--criterion must be a positive integer, got {criterion_str}"),
+        )
+    })?;
+    if criterion == 0 {
+        return Err(refused("bad-args", "--criterion must be at least 1"));
+    }
+    Ok(WidenCommand {
+        dir,
+        phase,
+        paths,
+        criterion,
     })
 }
 
@@ -2666,6 +2730,141 @@ fn run_land(root: &Path, command: &LandCommand) -> Result<Value, CategorisedRefu
     Ok(outcome_json)
 }
 
+fn run_widen(root: &Path, command: &WidenCommand) -> Result<Value, CategorisedRefusal> {
+    let main = fgos_git::main_checkout_root(root)
+        .map_err(|e| refused("land-root-unreadable", e.cause))?
+        .ok_or_else(|| refused("land-root-not-a-repository", root.display()))?;
+    let path = format!("plans/{}/plan.md", command.dir);
+    let (driver, repo) = match GitDriver::open_at(&main)
+        .map_err(|e| refused("land-git-unavailable", e.cause))?
+    {
+        Some((driver, repo)) => (driver, repo),
+        None => return Err(refused("land-root-not-a-repository", main.display())),
+    };
+    let tip = trunk_tip(&driver, &repo).map_err(|e| refused("land-git-unavailable", e))?;
+    let path_bytes = path.as_bytes().to_vec();
+    let reads = driver
+        .read_paths_at(&repo, &tip, &[path_bytes], 1024 * 1024)
+        .map_err(|e| refused("land-git-unavailable", e.cause))?;
+    let original = match reads.into_iter().next().map(|r| r.value) {
+        Some(PathValue::Blob(bytes)) => String::from_utf8(bytes)
+            .map_err(|_| refused("plan-not-utf8", "plan.md is not UTF-8"))?,
+        _ => {
+            return Err(refused(
+                "plan-not-found",
+                format!("{}: plan.md not found at trunk tip", command.dir),
+            ))
+        }
+    };
+
+    let widened = portfolio::widened_text(
+        &original,
+        &command.phase,
+        &command.paths,
+        command.criterion,
+    )
+    .map_err(|why| refused(why.code(), why))?;
+
+    let portfolio = HostPortfolio { root: main.clone() };
+    let (all_plans, _) = portfolio
+        .read_with_refusals()
+        .map_err(|e| refused("portfolio-unreadable", e))?;
+
+    let candidate_text = widened.text.as_deref().unwrap_or(&original);
+    let candidate_plan = portfolio::read_plan(&command.dir, candidate_text)
+        .map_err(|why| refused(why.code(), why))?;
+    let overlaps = portfolio::active_overlaps(&candidate_plan, &all_plans);
+    let overlaps_json = overlaps
+        .into_iter()
+        .map(|(p, paths)| json!({ "plan": p, "paths": paths }))
+        .collect::<Vec<_>>();
+
+    let commit = if let Some(new_text) = &widened.text {
+        let publisher = super::session_write_publish::publisher();
+        let actor = writer();
+        (publisher.catch_up)(&main, &actor).map_err(|e| match e {
+            fgos_run_supervisor::route::CatchUpRefusal::BranchAhead(_) => {
+                refused("write-branch-ahead", "branch is ahead")
+            }
+            fgos_run_supervisor::route::CatchUpRefusal::Busy { code, detail } => {
+                refused(&code, detail)
+            }
+            fgos_run_supervisor::route::CatchUpRefusal::Refused(why) => {
+                refused(&why.code, why.detail)
+            }
+        })?;
+        if !(publisher.path_clean)(&main, &path).map_err(|e| refused(&e.code, e.detail))? {
+            return Err(refused(
+                "admission-path-dirty",
+                format!("{path} is dirty in main checkout"),
+            ));
+        }
+        for part in [
+            main.join("plans"),
+            main.join("plans").join(&command.dir),
+            main.join(&path),
+        ] {
+            if std::fs::symlink_metadata(part)
+                .map_err(|e| refused("admission-path-unreadable", e))?
+                .file_type()
+                .is_symlink()
+            {
+                return Err(refused(
+                    "admission-path-symlink",
+                    format!("{path} involves a symlink"),
+                ));
+            }
+        }
+        let file = main.join(&path);
+        let dir = file
+            .parent()
+            .ok_or_else(|| refused("admission-path-unreadable", "no parent dir"))?;
+        fgos_durable_file::replace_durably(dir, "plan.md", new_text.as_bytes())
+            .map_err(|e| refused("admission-write-failed", e.to_string()))?;
+
+        let message = format!(
+            "plan({}): widen phase {} footprint by {} for criterion {}: {}",
+            command.dir,
+            command.phase,
+            widened.added.join(", "),
+            command.criterion,
+            widened.criterion_text
+        );
+        let land_cmd = LandCommand {
+            target: None,
+            paths: Some(vec![path.clone()]),
+            message,
+            ..LandCommand::default()
+        };
+        match run_land(&main, &land_cmd) {
+            Ok(data) => data["mainSha"].as_str().map(str::to_owned),
+            Err(why) => {
+                if (publisher.path_clean)(&main, &path).is_ok_and(|clean| !clean)
+                    && std::fs::read_to_string(&file).is_ok_and(|t| t == *new_text)
+                {
+                    fgos_durable_file::replace_durably(dir, "plan.md", original.as_bytes())
+                        .map_err(|e| {
+                            refused("admission-restore-failed", format!("{}: {e}", why.message))
+                        })?;
+                }
+                return Err(why);
+            }
+        }
+    } else {
+        None
+    };
+
+    Ok(json!({
+        "plan": command.dir,
+        "phase": command.phase,
+        "criterion": command.criterion,
+        "added": widened.added,
+        "unchanged": widened.unchanged,
+        "overlaps": overlaps_json,
+        "commit": commit.map(Value::String).unwrap_or(Value::Null),
+    }))
+}
+
 /// The backlog index a land commits: the one generator every index write uses, over the items Git
 /// tracks plus the paths being committed, refusing on errors.
 fn backlog_index(
@@ -3219,6 +3418,23 @@ pub fn answer(
         Verb::Land(command) => {
             let data = run_land(root, command)?;
             let text = format!("landed {}", data["mainSha"].as_str().unwrap_or(""));
+            Ok(done(data, text))
+        }
+        Verb::Widen(command) => {
+            let data = run_widen(root, command)?;
+            let text = if let Some(sha) = data["commit"].as_str() {
+                format!(
+                    "widened {}: {} added (commit {})",
+                    command.dir,
+                    data["added"]
+                        .as_array()
+                        .map(|a| a.iter().filter_map(|v| v.as_str()).collect::<Vec<_>>().join(", "))
+                        .unwrap_or_default(),
+                    sha
+                )
+            } else {
+                format!("unchanged {}", command.dir)
+            };
             Ok(done(data, text))
         }
         Verb::Slots => {
