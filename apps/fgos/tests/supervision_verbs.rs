@@ -694,6 +694,227 @@ fn slots_answers_the_lane_view_of_the_standard_pool_of_four() {
     assert!(lanes["seats"].is_array(), "{view}");
 }
 
+#[test]
+fn supervisor_widen_lands_both_copies_on_a_running_plan() {
+    let scene = Scene::new("widen-running", WATCHER_CONFIG);
+    let project = scene.project();
+    let plan_path = project.join(format!("plans/{PLAN}/plan.md"));
+    let content = "---\n\
+contract: plan-v1\n\
+title: demo\n\
+status: running\n\
+priority: P2\n\
+footprint:\n\
+  - src/**\n\
+created: 2026-01-01\n\
+lead: lead:S6A\n\
+---\n\
+\n\
+# Demo\n\
+\n\
+## Acceptance criteria\n\
+\n\
+1. First criterion.\n\
+2. The supervisor runs fgos supervisor widen for any running plan: apps/fgos/tests/supervision_verbs.rs.\n\
+\n\
+## Phases\n\
+\n\
+| id | title | dependson | footprint | wave | status |\n\
+|---|---|---|---|---|---|\n\
+| 1 | one | - | `src/**` | 1 | running |\n";
+    fs::write(&plan_path, content).unwrap();
+    git(&project, &["add", "-f", "."]);
+    git(
+        &project,
+        &["commit", "-q", "-m", "plan running with criteria"],
+    );
+    git(&project, &["push", "-q", "origin", "main"]);
+
+    let data = scene.data(&[
+        "supervisor",
+        "widen",
+        PLAN,
+        "--phase",
+        "1",
+        "--path",
+        "tests/new_path.rs",
+        "--criterion",
+        "2",
+        "--json",
+    ]);
+
+    assert_eq!(data["plan"], PLAN, "{data}");
+    assert_eq!(data["phase"], "1", "{data}");
+    assert_eq!(data["criterion"], 2, "{data}");
+    assert_eq!(
+        data["added"],
+        serde_json::json!(["tests/new_path.rs"]),
+        "{data}"
+    );
+    assert_eq!(data["unchanged"], serde_json::json!([]), "{data}");
+    assert_eq!(data["overlaps"], serde_json::json!([]), "{data}");
+    assert!(data["commit"].is_string(), "{data}");
+
+    let commit_sha = data["commit"].as_str().unwrap();
+    let remote_tip = git(
+        &scene.root.join("remote.git"),
+        &["rev-parse", "refs/heads/main"],
+    );
+    assert_eq!(commit_sha, remote_tip);
+
+    let committed_plan = git(&project, &["show", "main:plans/260101-0000-demo/plan.md"]);
+    assert!(
+        committed_plan.contains("- tests/new_path.rs"),
+        "frontmatter footprint must contain tests/new_path.rs: {committed_plan}"
+    );
+    assert!(
+        committed_plan.contains("`src/**`, `tests/new_path.rs`"),
+        "phase table row must contain tests/new_path.rs: {committed_plan}"
+    );
+
+    let last_msg = git(&project, &["log", "-1", "--pretty=%B"]);
+    assert!(
+        last_msg.starts_with(
+            "plan(260101-0000-demo): widen phase 1 footprint by tests/new_path.rs for criterion 2:"
+        ),
+        "commit message must match format: {last_msg}"
+    );
+}
+
+#[test]
+fn supervisor_widen_into_another_active_plans_footprint_lands_and_reports_overlaps() {
+    let scene = Scene::new("widen-overlap", WATCHER_CONFIG);
+    let project = scene.project();
+    let plan_path = project.join(format!("plans/{PLAN}/plan.md"));
+    let content = "---\n\
+contract: plan-v1\n\
+title: demo\n\
+status: running\n\
+priority: P2\n\
+footprint:\n\
+  - src/**\n\
+created: 2026-01-01\n\
+lead: lead:S6A\n\
+---\n\
+\n\
+# Demo\n\
+\n\
+## Acceptance criteria\n\
+\n\
+1. First criterion.\n\
+2. Criterion two.\n\
+\n\
+## Phases\n\
+\n\
+| id | title | dependson | footprint | wave | status |\n\
+|---|---|---|---|---|---|\n\
+| 1 | one | - | `src/**` | 1 | running |\n";
+    fs::write(&plan_path, content).unwrap();
+
+    let peer_dir = "260101-0001-peer";
+    fs::create_dir_all(project.join(format!("plans/{peer_dir}"))).unwrap();
+    let peer_content = "---\n\
+contract: plan-v1\n\
+title: peer\n\
+status: running\n\
+priority: P2\n\
+footprint:\n\
+  - shared/**\n\
+created: 2026-01-01\n\
+lead: lead:S6B\n\
+---\n\
+\n\
+# Peer\n\
+\n\
+| id | title | dependson | footprint | wave | status |\n\
+|---|---|---|---|---|---|\n\
+| 1 | peer-one | - | `shared/**` | 1 | running |\n";
+    fs::write(
+        project.join(format!("plans/{peer_dir}/plan.md")),
+        peer_content,
+    )
+    .unwrap();
+
+    git(&project, &["add", "-f", "."]);
+    git(&project, &["commit", "-q", "-m", "add peer running plan"]);
+    git(&project, &["push", "-q", "origin", "main"]);
+
+    let data = scene.data(&[
+        "supervisor",
+        "widen",
+        PLAN,
+        "--phase",
+        "1",
+        "--path",
+        "shared/file.rs",
+        "--criterion",
+        "2",
+        "--json",
+    ]);
+
+    assert!(data["commit"].is_string(), "{data}");
+    assert_eq!(
+        data["added"],
+        serde_json::json!(["shared/file.rs"]),
+        "{data}"
+    );
+    assert_eq!(
+        data["overlaps"],
+        serde_json::json!([
+            {
+                "plan": peer_dir,
+                "paths": ["shared/file.rs"]
+            }
+        ]),
+        "{data}"
+    );
+
+    let committed_plan = git(&project, &["show", "main:plans/260101-0000-demo/plan.md"]);
+    assert!(committed_plan.contains("- shared/file.rs"));
+    assert!(committed_plan.contains("`src/**`, `shared/file.rs`"));
+}
+
+#[test]
+fn supervisor_widen_refuses_bad_args() {
+    let scene = Scene::new("widen-bad-args", WATCHER_CONFIG);
+
+    // Missing --criterion
+    let out = scene
+        .command(&[
+            "supervisor",
+            "widen",
+            PLAN,
+            "--phase",
+            "1",
+            "--path",
+            "src/a.rs",
+            "--json",
+        ])
+        .output()
+        .unwrap();
+    assert!(!out.status.success());
+    assert!(text(&out).contains("bad-args"), "{}", text(&out));
+
+    // plan-dir with '/'
+    let out = scene
+        .command(&[
+            "supervisor",
+            "widen",
+            "nested/dir",
+            "--phase",
+            "1",
+            "--path",
+            "src/a.rs",
+            "--criterion",
+            "1",
+            "--json",
+        ])
+        .output()
+        .unwrap();
+    assert!(!out.status.success());
+    assert!(text(&out).contains("bad-args"), "{}", text(&out));
+}
+
 /// A fake request socket: answers the first request with `reply` and returns the request it read.
 fn fake_socket(path: &Path, reply: Value) -> std::thread::JoinHandle<Value> {
     let listener = UnixListener::bind(path).unwrap();

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "595229529cd87f2d527af363af933e264da348473bb34f8fe0bb642faeae43b8",
+  "payloadDigest": "a3b01c7cf4b22b80ffde5301c54c5933ddf14896c522ff7554e35b8c2c295be7",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -177,7 +177,7 @@
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
     "apps/fgos/src/wiring/session_write_publish.rs": "2b88c9e2fa03bcdc92d6a90a3415be2d7fc1bc8abfe4ad742d3230d915ef87de",
     "apps/fgos/src/wiring/start_context.rs": "7a24a7f0b0ce664ed77cb34d75ec5bb2625d31067f09ba249fecdefafc5feaf8",
-    "apps/fgos/src/wiring/supervision.rs": "53d6e59575e0e5ccf942f0cb6d53d12b213cae5bbeef16829a6bd4a488ec7300",
+    "apps/fgos/src/wiring/supervision.rs": "178614cd0b2ab6def692dc7aeb0b98c116d4790255a397470e7595c7261203e6",
     "apps/fgos/src/wiring/terminal_route.rs": "e29a3ec670db995fbf7a3e00c70ed8bf3870fd772f298a01ebe9e4198096aed0",
     "apps/fgos/src/wiring/terminal_tabs.rs": "a519a4903b296a3f6bfd486f41ea93d1ceb1489c28a4e6dc6dcfe03223ce3130",
     "apps/fgos/src/wiring/uninstall.rs": "1fd8cdeef4360bb32ae0dd1452bdc6cb09c57427d95645c030105a24533dceff",
@@ -217,7 +217,7 @@
     "apps/fgos/tests/questions_verb.rs": "b0ccc8a1c82bbf81b7ad84eecfdcf4a2e3c350eb297cf6749645b4ee1a3296dd",
     "apps/fgos/tests/session_write_publish.rs": "b4c33aba8cd04c05e1e5e0dd61b36cabe49c0d489ee077dc82b7f867213cd51d",
     "apps/fgos/tests/start_context.rs": "940d9237fbb964ca7194b8b10fdf318ce2b29ed963fdeb6f6b975d6983940930",
-    "apps/fgos/tests/supervision_verbs.rs": "75cc73e694516f9ab599be86b23df08f0ea428df8ad45dcbcb9640b822bedf14",
+    "apps/fgos/tests/supervision_verbs.rs": "00e2f4fe784e4ee515741f6da49fa367dba42ff416232e1009cac0e0b7c1e2c7",
     "apps/fgos/tests/windows_borrow.rs": "deeb68f3b777b64c076bfd317baac95b11cff6c0bceede7eb3774a3d6d25f7bf",
     "apps/fgos/tests/windows_cwd_lease_owner.rs": "c3e833710c3dfa42f98addbca06e1dd7935470e73880a5ce7bb9622a9991f26a",
     "apps/fgos/tests/windows_doctor_lock_rows.rs": "943ba00e7be5382a532ad47bfa38f6fef888428910e5f70ee18518edeb1eeb63",
@@ -1312,7 +1312,7 @@
     "packages/supervision/rust/src/land.rs": "67fd5f1abb0337e45d05e869cb56fd38608c1ccdd37339b1b5eb765282c0df3d",
     "packages/supervision/rust/src/lib.rs": "b4d55ee63b573112e6902280e15daf2d745aa148c24e156a830b4595f88e413c",
     "packages/supervision/rust/src/notify.rs": "2a8ce19013396e3a31c915a903c4762889cc3f902137279e6378c3deb84e8edd",
-    "packages/supervision/rust/src/portfolio.rs": "f2bb93ea20ecd422ab6c54eed786033403ea7b1c3328fb71cf27305810cf69ba",
+    "packages/supervision/rust/src/portfolio.rs": "66dbb03cc7c04aec35da968e51f3f4b224a0d467b7a992752069ec77da3182e8",
     "packages/supervision/rust/src/queue.rs": "bdf9b9dac6246575bb9a2ae9690050778f055e63b244f7634c895597f85262d1",
     "packages/supervision/rust/src/sources.rs": "ec6b2dcf8bac21dcf89b9dbad9d4228e4473d67e25988a541079e4d97b636252",
     "packages/supervision/rust/src/supervisor.rs": "e97644607821730727117fe331dd3b222e6b6adf4baffc7a5a4aa990b8ac7864",
@@ -1322,7 +1322,7 @@
     "packages/supervision/rust/tests/discussion_source.rs": "39e824a0affc36347c8d488b28b9583f30523ff57391d290938b090c62925397",
     "packages/supervision/rust/tests/keeper.rs": "1acdad1f326809793b9a12232a061b3db0cbee0c12f98a309ff33cc0e8a16a1c",
     "packages/supervision/rust/tests/land.rs": "b83abcc781a19f13aa5236c505eff77df96d40af21f55946d4f84ab7070bb8f0",
-    "packages/supervision/rust/tests/portfolio.rs": "f24979fbe22036c69ed67e524c47a6d985e0eb4187791995c45a7e12be4086e1",
+    "packages/supervision/rust/tests/portfolio.rs": "bfaf2bed047e14402427df5eb86980cfd08640d26beb365685e664637aaad1d1",
     "packages/supervision/rust/tests/queue.rs": "65ddc71a204003a4e1a62077f6741728cdcaa96d7ee751e31d78bd420d572698",
     "packages/supervision/rust/tests/sources.rs": "ea50ed4f0a880b14e375f703398a72340af16d28451c97bc60ca364a2ec30c87",
     "packages/supervision/rust/tests/wake.rs": "5fd37cc971fe5ab358647c1d2c40e343c90ae63677e67a51a0c0987062abef03",
@@ -1508,7 +1508,7 @@
     "scripts/verify-fanout-overlap.mjs": "b74a0ac9f350c5d62a47f3e3bf0896e9d142e5cbba15284527383d1b529ea435",
     "scripts/write-test-marker.mjs": "c5c41aa3db2be343347cfc148fafe62b262833b42a732f312c4c6e799f330fb2",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
-    "src/cli/command-registry.mjs": "5bff6c897392afc6234b53dd7017efe8a010b1acf55ea5bdc05261892ed8c34e",
+    "src/cli/command-registry.mjs": "81fd529534764f8ac96e79edbf2c2bcdb079b84841ccfebd8ecceeb6c33b1077",
     "src/cli/exit-codes.mjs": "55a68e5a0b03a38adced7ddc9bcfb60964db94b3b868e2c854b6a6a78fdb4964",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
@@ -2402,11 +2402,11 @@
     },
     {
       "path": "apps/fgos/src/wiring/supervision.rs",
-      "line": 1892,
+      "line": 1966,
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2135"
+      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2209"
     },
     {
       "path": "apps/fgos/src/wiring/terminal_tabs.rs",
@@ -3832,7 +3832,7 @@
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2372"
+      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2446"
     },
     {
       "path": "packages/process/rust/src/mapped.rs",
@@ -4258,7 +4258,7 @@
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2511"
+      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:2585"
     },
     {
       "path": "packages/supervision/rust/tests/discussion_source.rs",
