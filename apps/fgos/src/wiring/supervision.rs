@@ -231,11 +231,22 @@ pub fn project_request(
                 reason: named_value(&call, "reason")?,
                 next: call.value("next").map_err(validation)?.unwrap_or_default(),
             }),
+            // `widen` reads its three flags beside its sub-word, so the arm names every flag it takes; the shadow
+            // is the `&Call` its readers take. `widen_command` keeps the refusals and every code they carry.
+            Some("widen") => {
+                let call = &call;
+                Verb::Widen(widen_command(
+                    call,
+                    call.value("phase").map_err(|e| refused("bad-args", e))?,
+                    list_of(call, "path").map_err(|e| refused("bad-args", e.message))?,
+                    call.value("criterion")
+                        .map_err(|e| refused("bad-args", e))?,
+                )?)
+            }
             Some("wake") => Verb::Wake,
             Some("plans") => Verb::Plans,
             Some("queue") => Verb::Queue,
             Some("done") => Verb::Done,
-            Some("widen") => Verb::Widen(widen_command(&call)?),
             Some("handled") => {
                 let ids = call.arguments();
                 if ids.is_empty() {
@@ -433,7 +444,12 @@ fn land_command(call: &Call) -> Result<LandCommand, CategorisedRefusal> {
     })
 }
 
-fn widen_command(call: &Call) -> Result<WidenCommand, CategorisedRefusal> {
+fn widen_command(
+    call: &Call,
+    phase: Option<String>,
+    paths: Vec<String>,
+    criterion: Option<String>,
+) -> Result<WidenCommand, CategorisedRefusal> {
     if let Some(flag) = call.flag_outside(&["phase", "path", "criterion", "json"]) {
         return Err(refused("bad-args", format!("unknown flag --{flag}")));
     }
@@ -451,18 +467,14 @@ fn widen_command(call: &Call) -> Result<WidenCommand, CategorisedRefusal> {
             format!("<plan-dir> must be a single path segment, got {dir}"),
         ));
     }
-    let phase = match call.value("phase").map_err(|e| refused("bad-args", e))? {
+    let phase = match phase {
         Some(p) if !p.is_empty() => p,
         _ => return Err(refused("bad-args", "--phase is required")),
     };
-    let paths = list_of(call, "path").map_err(|e| refused("bad-args", e.message))?;
     if paths.is_empty() {
         return Err(refused("bad-args", "at least one --path is required"));
     }
-    let criterion_str = match call
-        .value("criterion")
-        .map_err(|e| refused("bad-args", e))?
-    {
+    let criterion_str = match criterion {
         Some(c) if !c.is_empty() => c,
         _ => return Err(refused("bad-args", "--criterion is required")),
     };
