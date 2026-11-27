@@ -449,16 +449,9 @@ fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, 
     }
     let config = land_config(&checkout.main)?;
     let grant = grant(&checkout)?;
-    // The same generator the land command hands its door: the door writes the index into the row's commit.
-    let index = |root: &Path, committing: &[String]| -> Result<String, String> {
-        let tracked = portfolio::tracked_item_paths(&checkout.driver, &checkout.repo)
-            .map_err(|cause| format!("write-status-unreadable: {cause}"))?;
-        portfolio::generate_backlog_index_for_commit(root, &tracked, committing).map_err(
-            |why| match why {
-                portfolio::CommitIndexError::Unreadable(why)
-                | portfolio::CommitIndexError::Invalid(why) => why,
-            },
-        )
+    // The land command's own builder: the door writes the index into the row's commit.
+    let index = |root: &Path, committing: &[String]| {
+        super::supervision::backlog_index(&checkout.driver, &checkout.repo, root, committing)
     };
     let ports = LandPorts {
         git: &checkout.driver,

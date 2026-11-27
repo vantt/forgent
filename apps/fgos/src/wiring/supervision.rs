@@ -2912,7 +2912,7 @@ fn run_widen(root: &Path, command: &WidenCommand) -> Result<Value, CategorisedRe
 
 /// The backlog index a land commits: the one generator every index write uses, over the items Git
 /// tracks plus the paths being committed, refusing on errors.
-fn backlog_index(
+pub(super) fn backlog_index(
     driver: &GitDriver,
     repo: &RepoHandle,
     root: &Path,

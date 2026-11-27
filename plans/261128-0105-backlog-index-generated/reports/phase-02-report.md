@@ -30,3 +30,15 @@ body. Follow-up: make `backlog_index` `pub(super)` in `supervision.rs` and call 
 - `cargo test -p fgos --test session_write_publish`: does not link here (`ort-sys` link error, no `ORT_LIB_LOCATION`), so
   the tests were not run. The behaviour is unproven by execution.
 - `rg -n "generate_backlog_index\b" apps/fgos/src/wiring/session_write_publish.rs` returns nothing.
+
+## Fix round
+- `backlog_index` in `apps/fgos/src/wiring/supervision.rs` is now `pub(super)`; `publish` in
+  `apps/fgos/src/wiring/session_write_publish.rs` calls it and the duplicated closure is gone. The host has one builder
+  of the `BacklogPort` index.
+- `rg -n "generate_backlog_index" apps/fgos/src/wiring/session_write_publish.rs` returns nothing.
+- `apps/fgos/tests/session_write_publish.rs` compiles `session_write_publish.rs` by path and cannot compile
+  `supervision.rs` (it pulls in the whole host), so it declares a small `supervision` module with the same body as the
+  host's builder. Production has one builder; the test has a stand-in. Cleaner follow-up: move the builder into
+  `wiring/portfolio.rs` (already compiled by the test), which is outside this unit's write scope.
+- `cargo check -p fgos --tests` passes; `cargo fmt --all --check` passes. Tests were not run (the `ort-sys` link error
+  from the first round still applies).

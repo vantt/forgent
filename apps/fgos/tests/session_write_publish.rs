@@ -8,6 +8,28 @@
 #[allow(dead_code)]
 #[path = "../src/wiring/portfolio.rs"]
 mod portfolio;
+/// Stands in for `wiring/supervision.rs`, which owns the land command's index builder but cannot be compiled into this
+/// test (it pulls in the whole host). The body is the same one the host runs.
+mod supervision {
+    use super::portfolio::{
+        generate_backlog_index_for_commit, tracked_item_paths, CommitIndexError,
+    };
+    use fgos_git::{GitDriver, RepoHandle};
+    use std::path::Path;
+
+    pub(super) fn backlog_index(
+        driver: &GitDriver,
+        repo: &RepoHandle,
+        root: &Path,
+        committing: &[String],
+    ) -> Result<String, String> {
+        let tracked = tracked_item_paths(driver, repo)
+            .map_err(|cause| format!("write-status-unreadable: {cause}"))?;
+        generate_backlog_index_for_commit(root, &tracked, committing).map_err(|why| match why {
+            CommitIndexError::Unreadable(why) | CommitIndexError::Invalid(why) => why,
+        })
+    }
+}
 #[path = "../src/wiring/session_write_publish.rs"]
 mod session_write_publish;
 
