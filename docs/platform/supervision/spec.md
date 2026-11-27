@@ -123,7 +123,7 @@ Flags, defaults and contracts live in `packages/supervision/contracts/` and `cor
 
 A confined caller reaches every socket verb through one host rule: the host hands a confined (`FGOS_CONFINED=1`) call of a verb named in the head-request contract to the Node payload, whose one arm sends it through the head request (PS-20). Long verbs answer with a ticket because request verbs are bounded to 60 s and served one at a time.
 
-Personas and grants: shaper gains writes `plans/discussions` and verb `land`; secretary, planner, supervisor and lead gain `land`. Only a lead lands a branch; every other persona lands `--paths` only, and only inside its grant writes. The lead's grant also holds `worktree create`.
+Personas and grants: shaper gains writes `plans/discussions` and verb `land`; secretary, planner, supervisor and lead gain `land`. A lead lands a plan branch and a shaper lands its own discussion branch `discussion/<dir>` (`land-branch-not-own` for any other branch); every other persona lands `--paths` only, and only inside its grant writes. The lead's grant also holds `worktree create`.
 
 ### 4.1 Coordination powers of the secretary and the supervisor
 
@@ -245,6 +245,7 @@ Dated 2026-11-18, from [the plan](../../../plans/261118-1045-project-supervisor/
 - PS-12: lane count is held machine-scope lane locks taken by a top-level worker seat; a head and a nested dispatch take none; the Work-item slot count is retired (L10).
 - PS-13: the watcher timer fires at the active interval and a tick with no `watcher-active` row exits early until the idle interval passes; `watcher.enabled` is global-only.
 - PS-14: shaper gains writes `plans/discussions` and verb `land`; secretary, planner, supervisor and lead gain `land`; only a lead lands a branch.
+- 2026-11-27 — Amends PS-14 (discussion ds-xb6hplcn2m): a shaper also lands a branch, but only its own `discussion/<dir>`, from its own worktree after saving rounds with `session save`; every other persona still lands `--paths` only.
 - PS-15: the discussion source reads the `discussion: <state>` marker from the trunk's git history and emits `fgos.discussion.status` on each flip.
 - PS-16: verb names follow the session-verb plan (`session start|stop|rotate`), not `head ...`.
 - PS-17: the lead's grant holds request verb `worktree create`, since `fgos run --writes` needs a linked worktree.

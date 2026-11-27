@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ed66534d06922496d5729e49d59ff42040699de57c3ff406227cb59a339a1262",
+  "payloadDigest": "2fa8f000872820f5b8f068a9e66ec18d6f33f742117594c7bb857f3ac1495f3c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -66,7 +66,7 @@
     ".agents/skills/fgos-routing/SKILL.md": "6f4bd58fdea449a2b07f06868eef340108d9b4921700643ddb69078089360e17",
     ".agents/skills/fgos-run/SKILL.md": "12bebd841afda89f9f63fd774c05c49ef63bd2aa1216f3ffa6597a399fbd9fd0",
     ".agents/skills/fgos-secretary/SKILL.md": "2eb9d4bcd4ae24c2677dba34a680c594181264cd547c69ed174d4a98008d4722",
-    ".agents/skills/fgos-shaping/SKILL.md": "344379f096dc7f0cdeb4a89e6c388d19a37d8f7f0346092302f7e75c6d397e92",
+    ".agents/skills/fgos-shaping/SKILL.md": "4f7cd714d1441498871f3a31eca1dd20b5e329efaf0be089dd85da167b323600",
     ".agents/skills/fgos-supervisor/SKILL.md": "d4289693950b9eda9c91f2cfad79e7c2efab1ea248aee05d7a4ce2b2c1600787",
     ".agents/skills/handoff/SKILL.md": "124ace4391416aa9f713f9f86a0c0f752123fcdd32d9e653855c62947bacf0ee",
     ".agents/skills/instruction-audit/SKILL.md": "2c8ba60e43c05eed60cb270ace1ffa114fbd872dc0dd500a6b606a10d33ad43b",
@@ -266,7 +266,7 @@
     "core/skills/fgos-routing/SKILL.md": "45374f9ac15c9198783f22790352718d620f7182f04e5ca94055eda995989142",
     "core/skills/fgos-run/SKILL.md": "e7476dd52fa1bfdeafe318794a086f78e3e3928317847d02d4832fb60b60febe",
     "core/skills/fgos-secretary/SKILL.md": "bf672fac2ef4a2218c2fc7d4ac868a5cb1fcdcaf3f7956b52104f0f2def63f4e",
-    "core/skills/fgos-shaping/SKILL.md": "1ef2fcf934ca38fa2def662196bba61e7aa9091e176f368eb97198fd748d5006",
+    "core/skills/fgos-shaping/SKILL.md": "3b8b3ff7071adba736170da8c5bf8a38d07da601953f2698f931d449b4363690",
     "core/skills/fgos-supervisor/SKILL.md": "fbcabed7b22f2b50af1bc8447e7471e3535f2d4734a4f84e992944a623dd83a6",
     "core/skills/handoff/SKILL.md": "343de2c43cdcb3f01106a91c5b26953655450bafe2822d2a90a6e33561694a6a",
     "core/skills/instruction-audit/SKILL.md": "345626a156e701f24d0d2361ff71148529fa3d7df03be29045327d9d11fef856",
