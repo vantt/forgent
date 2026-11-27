@@ -38,6 +38,7 @@ footprint:
   - changelog.d/261125-1557-shaper-runs-in-own-worktree.md
   - src/cli/command-registry.mjs
   - apps/fgos/src/wiring/session_rotation_hook.rs
+  - packages/agent-start-context/goldens/NOTES.md
 base: dc49aa88162cbd26bbca308f337b7c1f05387a86
 source:
   - plans/discussions/ds-xb6hplcn2m-shaper-worktree/DISCUSSION.md
@@ -173,7 +174,7 @@ to `ready`, drop the `blockedBy`, and land the plan dir. Nothing else in the pla
 | 4 | [The shaper start creates its worktree](phase-04-shaper-start-worktree.md) | 1, 3 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs | 2 | done |
 | 5 | [Skill, specs and changelog](phase-05-skill-and-docs.md) | 2, 3, 4 | core/skills/fgos-shaping/SKILL.md, core/agents/shaper.yaml, .agents/skills/fgos-shaping/SKILL.md, plugins/fgOS/skills/fgos-shaping/SKILL.md, .claude/agents/shaper.md, docs/platform/session-host/spec.md, docs/platform/supervision/spec.md, changelog.d/261125-1557-shaper-runs-in-own-worktree.md | 3 | done |
 | 7 | [The shaper worktree works on a fresh project and runs its hooks](phase-07-shaper-worktree-live-fixes.md) | 4 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs | 4 | done |
-| 8 | [The rotation hook finds the head's lineage from a worktree](phase-08-rotation-hook-project-root.md) | 7 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, apps/fgos/src/wiring/session_rotation_hook.rs | 5 | ready |
+| 8 | [The rotation hook finds the head's lineage from a worktree](phase-08-rotation-hook-project-root.md) | 7 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, apps/fgos/src/wiring/session_rotation_hook.rs, `packages/agent-start-context/goldens/NOTES.md` | 5 | ready |
 | 6 | [Integration and live proof](phase-06-integration.md) | 1, 2, 3, 4, 5, 7, 8 | plans/261125-1557-shaper-worktree/reports | 6 | ready |
 
 Phase 7 was opened on 2026-11-27 by the phase 6 live proof (`reports/live-proof.md`): defect A (a fresh project has no
