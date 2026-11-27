@@ -54,6 +54,9 @@ discussion: settled
      `host` on a `running` plan.
   7. The supervision spec (admission rules, reason codes, shared entities) states 1-6. `npm test` and
      `cargo test --workspace` are green.
+- **Placement of this plan.** The owner pins it to fg-server: the plan's frontmatter carries
+  `host: fg-server-sqs7es` (owner chat 2026-11-27 15:35, "giao cho máy này làm luôn"). Until the plan's own `host`
+  rule is implemented, fg-server's keeper admits it and no other machine should.
 - **Open points that block only some parts.** None.
 - **Sources.** p-p5k2htczq3; owner chat 2026-11-27; observe record `fgos.supervisor.wake` at 07:32:22Z and 07:33:07Z
   (`.fgos/observe/records/fc4222ff-0936-4c7a-a78e-68d49e6badce.jsonl`).
@@ -127,6 +130,8 @@ land of a head's `session write` (`apps/fgos/src/wiring/session_write_publish.rs
   shaper showed that A prevents a double run but not taking a plan meant for another machine, because that intent
   lived only in per-machine config. It proposed C and dropping `admitPlans`. The owner agreed (D8, D9). No planner had
   started (no `plan.md` cites ds-izibwo45vm), so the settled file was amended in place.
+- 2026-11-27 15:35 (+07): the owner asked to start the planner and to pin the plan to this machine (fg-server,
+  `fg-server-sqs7es`). Written into the hand-off and raised to the supervisor.
 
 ## 6. Thiết kế đã chốt {#design}
 
