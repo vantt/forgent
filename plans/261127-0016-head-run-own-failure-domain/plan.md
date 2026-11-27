@@ -108,15 +108,18 @@ in head liveness.
 | 3 | [Watcher unit and doctor row](phase-03-watcher-unit-and-doctor-row.md) | 1 | packages/distribution/rust/src/timer.rs, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/run_supervisor.rs, apps/fgos/src/wiring/doctor/mod.rs | 2 | ready |
 | 4 | [Integration and live check](phase-04-integration-and-live-check.md) | 1, 2, 3 | plans/261127-0016-head-run-own-failure-domain/reports/** | 3 | ready |
 
-Correction (lead:SUPERVISOR, 2026-11-27): there was no owner order. The line "mod.rs added to the footprint; land phase 3 now" was a prompt suggestion in the old pane, and commit 866f5a58b4's subject is wrong. `apps/fgos/src/wiring/doctor/mod.rs` stays in the footprint because it matches the recommended option; phase 3 does not land until the owner answers `q-v3akwmhesr` (it replaces `q-a5qeyr5g62` and adds `packages/config/contracts/fixtures/repo-differences.v1.json`).
+Correction (lead:SUPERVISOR, 2026-11-27): there was no owner order. The line "mod.rs added to the footprint; land phase 3 now" was a prompt suggestion in the old pane, and commit 866f5a58b4's subject is wrong. `apps/fgos/src/wiring/doctor/mod.rs` stays in the footprint because it matches the recommended option; the owner answered `q-v3akwmhesr` on 2026-11-27 (add all five paths); phase 3 lands once the footprint carries them.
 
 Hot files: `core/config-standard/runner.yaml` and `core/config-schema/runner.schema.yaml` (phase 1 only);
 `packages/distribution/contracts/doctor-registry.v1.json` (phase 3 only). Generated surfaces: none touched.
 
 ## Owner questions
 
-- `q-v3akwmhesr` — Widen the footprint by the four doctor-registry files and the config fixture that phase 1 left red
-  (`authoring_equivalence.rs:181`, `runner.supervisorScope` missing from standard-only)? Blocks phase 3's land.
+- `q-v3akwmhesr` — answered 2026-11-27: add all five paths (`apps/fgos/src/wiring/doctor/mod.rs`,
+  `docs/how-to/install-fgos-in-a-project-and-use-doctor.md`,
+  `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`, `docs/reading-map.md`,
+  `packages/config/contracts/fixtures/repo-differences.v1.json`). Phase 3's brief records the scope; phase 3 lands
+  after the supervisor adds the four new paths to the footprint.
 - `q-gg7if2fal2` — Cap memory per run supervisor's own systemd scope by default? (8G, none, or 4G). Non-blocking:
   phase 1 ships the key with an empty default; the answer changes one default value in
   `core/config-standard/runner.yaml` (phase 1, or a one-line follow-up if phase 1 has landed).
