@@ -149,6 +149,19 @@ race under load. No failure is introduced by these plans. The suites are therefo
 predate the plans and lie outside their footprints. Each phase's own rule was to fix nothing outside its footprint,
 so they are left to their owners.
 
+Gate rerun (2026-11-27 08:40, fg-server, main at `6c14b0fdc`), after the earlier failures were fixed at their cause:
+- `fgctl`: the init fixture now keeps directory modes;
+- credential provisioning under bwrap: a production fix;
+- `guide-schema`: a stale test;
+- the herdr terminal cases: the harness now runs confined;
+- the head-request mail case: it now binds its own Identity state.
+
+Result:
+- `cargo test --workspace` is green (exit 0).
+- `npm test`: 6,543 pass and 1 fail of 6,571. The failing test, "the orphan sweep kills a run the harness did not
+  finish..." (`test/scripts/mailbox-live-confined.test.mjs`), passes 19 of 19 when run alone, three times out of
+  three: a timing race under full-suite load, not a defect.
+
 ### Waits on other plans
 
 | phase | waits for | shared files or data |
