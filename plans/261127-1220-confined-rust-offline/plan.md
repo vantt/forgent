@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Confined units compile the Rust workspace offline from the owner's read-only cargo and rustup caches"
-status: ready
+status: running
 priority: P0
 blockedBy: []
 footprint:
@@ -13,11 +13,12 @@ footprint:
   - packages/run-supervisor/contracts/worker-env-allowlist.v1.json
   - docs/platform/agent-confinement/spec.md
   - changelog.d/261127-1220-confined-rust-offline.md
-base: 9077b11189eb9e0056db399809818d4e9c00cb04
+base: c75f4a30af986655025c6a1004fc744e68c67ec2
 source:
   - plans/discussions/ds-wfukp6t6mi-confined-rust-offline/DISCUSSION.md
   - p-ymhj4xcf6x
 created: 2026-11-27
+lead: head:lead-forgent-261127-1220-confin-c14e8
 ---
 
 # Confined units compile the Rust workspace offline from the owner's read-only cargo and rustup caches
