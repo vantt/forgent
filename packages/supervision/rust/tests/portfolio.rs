@@ -525,10 +525,35 @@ fn widened_text_keeps_every_other_byte_of_plan_md() {
     let widened = widened_text(&original, "1", &["lib/new_module.rs"], 1).unwrap();
     let edited = widened.text.unwrap();
 
-    assert!(edited.contains("# Frontmatter comment"));
-    assert!(edited.contains("Some introductory notes."));
-    assert!(edited.contains("Some trailing notes."));
-    assert!(edited.contains("| 2 | b | 1 | `tests/**` | 2 | ready |"));
+    let expected = format!(
+        "---\ntitle: t\nstatus: ready\npriority: P1\ncreated: 2026-11-01\n# Frontmatter comment\nfootprint:\n  - src/**\n  - lib/new_module.rs\n---\n\n# Title\n\nSome introductory notes.\n\n## Acceptance criteria\n\n1. First criterion.\n2. Second criterion.\n\n## Phases\n\n{HEAD}| 1 | a | - | `src/**`, `lib/new_module.rs` | 1 | ready |\n| 2 | b | 1 | `tests/**` | 2 | ready |\n\nSome trailing notes.\n"
+    );
+    assert_eq!(edited, expected);
+}
+
+#[test]
+fn widened_text_canonicalizes_phase_cell_entries_before_comparing() {
+    let body = format!(
+        "## Acceptance criteria\n\n1. Item one.\n\n{HEAD}| 1 | a | - | `./src/existing.rs` | 1 | ready |\n"
+    );
+    let original = text_with("footprint:\n  - src/**\n", &body);
+    let widened = widened_text(&original, "1", &["src/existing.rs"], 1).unwrap();
+    assert!(widened.text.is_none());
+    assert!(widened.added.is_empty());
+    assert_eq!(widened.unchanged, ["src/existing.rs"]);
+}
+
+#[test]
+fn widened_text_refuses_when_comment_inside_footprint_list() {
+    let body = format!(
+        "## Acceptance criteria\n\n1. Item one.\n\n{HEAD}| 1 | a | - | `src/**` | 1 | ready |\n"
+    );
+    let original = text_with(
+        "footprint:\n  # comment inside list\n  - src/**\n",
+        &body,
+    );
+    let err = widened_text(&original, "1", &["tests/new.rs"], 1).unwrap_err();
+    assert_eq!(err.code(), "comment-would-be-lost");
 }
 
 #[test]
@@ -617,7 +642,7 @@ fn widened_text_refuses_invalid_footprint_entries() {
     );
     let original = text_with("footprint:\n  - src/**\n", &body);
 
-    for bad in ["-leading-dash", "", "/abs/path", "../escape"] {
+    for bad in ["-leading-dash", "./-leading-dash", "", "/abs/path", "../escape"] {
         let err = widened_text(&original, "1", &[bad], 1).unwrap_err();
         assert_eq!(err.code(), "footprint-entry-invalid", "{bad}");
     }

@@ -871,6 +871,49 @@ lead: lead:S6B\n\
     assert!(committed_plan.contains("`src/**`, `shared/file.rs`"));
 }
 
+#[test]
+fn supervisor_widen_refuses_bad_args() {
+    let scene = Scene::new("widen-bad-args", WATCHER_CONFIG);
+
+    // Missing --criterion
+    let out = scene
+        .command(&[
+            "supervisor",
+            "widen",
+            PLAN,
+            "--phase",
+            "1",
+            "--path",
+            "src/a.rs",
+            "--json",
+        ])
+        .output()
+        .unwrap();
+    assert!(!out.status.success());
+    let printed: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(printed["code"], "bad-args", "{}", text(&out));
+
+    // plan-dir with '/'
+    let out = scene
+        .command(&[
+            "supervisor",
+            "widen",
+            "nested/dir",
+            "--phase",
+            "1",
+            "--path",
+            "src/a.rs",
+            "--criterion",
+            "1",
+            "--json",
+        ])
+        .output()
+        .unwrap();
+    assert!(!out.status.success());
+    let printed: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(printed["code"], "bad-args", "{}", text(&out));
+}
+
 /// A fake request socket: answers the first request with `reply` and returns the request it read.
 fn fake_socket(path: &Path, reply: Value) -> std::thread::JoinHandle<Value> {
     let listener = UnixListener::bind(path).unwrap();

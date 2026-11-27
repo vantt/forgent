@@ -183,6 +183,7 @@ fn refused(code: &str, detail: impl std::fmt::Display) -> CategorisedRefusal {
         | "land-gate-missing"
         | "target-not-stuck"
         | "plan-not-widenable"
+        | "plan-reread-failed"
         | "write-branch-ahead"
         | "admission-path-dirty" => CategorisedRefusal::new("precondition", message),
         "event-unknown"
@@ -190,7 +191,10 @@ fn refused(code: &str, detail: impl std::fmt::Display) -> CategorisedRefusal {
         | "plan-not-found"
         | "phase-not-found"
         | "criterion-not-found" => CategorisedRefusal::new("not-found", message),
-        "bad-event" | "bad-args" | "footprint-entry-invalid" => {
+        "bad-event"
+        | "bad-args"
+        | "footprint-entry-invalid"
+        | "comment-would-be-lost" => {
             CategorisedRefusal::new("validation", message)
         }
         _ => CategorisedRefusal::unexpected(message),
@@ -444,6 +448,12 @@ fn widen_command(call: &Call) -> Result<WidenCommand, CategorisedRefusal> {
         ));
     }
     let dir = args[0].clone();
+    if dir.contains('/') || dir == "." || dir == ".." {
+        return Err(refused(
+            "bad-args",
+            format!("<plan-dir> must be a single path segment, got {dir}"),
+        ));
+    }
     let phase = match call.value("phase").map_err(|e| refused("bad-args", e))? {
         Some(p) if !p.is_empty() => p,
         _ => return Err(refused("bad-args", "--phase is required")),
@@ -2735,26 +2745,54 @@ fn run_widen(root: &Path, command: &WidenCommand) -> Result<Value, CategorisedRe
         .map_err(|e| refused("land-root-unreadable", e.cause))?
         .ok_or_else(|| refused("land-root-not-a-repository", root.display()))?;
     let path = format!("plans/{}/plan.md", command.dir);
-    let (driver, repo) = match GitDriver::open_at(&main)
-        .map_err(|e| refused("land-git-unavailable", e.cause))?
-    {
-        Some((driver, repo)) => (driver, repo),
-        None => return Err(refused("land-root-not-a-repository", main.display())),
-    };
-    let tip = trunk_tip(&driver, &repo).map_err(|e| refused("land-git-unavailable", e))?;
-    let path_bytes = path.as_bytes().to_vec();
-    let reads = driver
-        .read_paths_at(&repo, &tip, &[path_bytes], 1024 * 1024)
-        .map_err(|e| refused("land-git-unavailable", e.cause))?;
-    let original = match reads.into_iter().next().map(|r| r.value) {
-        Some(PathValue::Blob(bytes)) => String::from_utf8(bytes)
-            .map_err(|_| refused("plan-not-utf8", "plan.md is not UTF-8"))?,
-        _ => {
+
+    let publisher = super::session_write_publish::publisher();
+    let actor = writer();
+    (publisher.catch_up)(&main, &actor).map_err(|e| match e {
+        fgos_run_supervisor::route::CatchUpRefusal::BranchAhead(_) => {
+            refused("write-branch-ahead", "branch is ahead")
+        }
+        fgos_run_supervisor::route::CatchUpRefusal::Busy { code, detail } => {
+            refused(&code, detail)
+        }
+        fgos_run_supervisor::route::CatchUpRefusal::Refused(why) => {
+            refused(&why.code, why.detail)
+        }
+    })?;
+    if !(publisher.path_clean)(&main, &path).map_err(|e| refused(&e.code, e.detail))? {
+        return Err(refused(
+            "admission-path-dirty",
+            format!("{path} is dirty in main checkout"),
+        ));
+    }
+    for part in [
+        main.join("plans"),
+        main.join("plans").join(&command.dir),
+        main.join(&path),
+    ] {
+        match std::fs::symlink_metadata(part) {
+            Ok(meta) => {
+                if meta.file_type().is_symlink() {
+                    return Err(refused(
+                        "admission-path-symlink",
+                        format!("{path} involves a symlink"),
+                    ));
+                }
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+            Err(e) => return Err(refused("admission-path-unreadable", e)),
+        }
+    }
+    let file = main.join(&path);
+    let original = match std::fs::read_to_string(&file) {
+        Ok(text) => text,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
             return Err(refused(
                 "plan-not-found",
-                format!("{}: plan.md not found at trunk tip", command.dir),
-            ))
+                format!("{}: plan.md not found in main checkout", command.dir),
+            ));
         }
+        Err(e) => return Err(refused("admission-path-unreadable", e)),
     };
 
     let widened = portfolio::widened_text(
@@ -2765,8 +2803,8 @@ fn run_widen(root: &Path, command: &WidenCommand) -> Result<Value, CategorisedRe
     )
     .map_err(|why| refused(why.code(), why))?;
 
-    let portfolio = HostPortfolio { root: main.clone() };
-    let (all_plans, _) = portfolio
+    let host = HostPortfolio { root: main.clone() };
+    let (all_plans, _) = host
         .read_with_refusals()
         .map_err(|e| refused("portfolio-unreadable", e))?;
 
@@ -2780,42 +2818,6 @@ fn run_widen(root: &Path, command: &WidenCommand) -> Result<Value, CategorisedRe
         .collect::<Vec<_>>();
 
     let commit = if let Some(new_text) = &widened.text {
-        let publisher = super::session_write_publish::publisher();
-        let actor = writer();
-        (publisher.catch_up)(&main, &actor).map_err(|e| match e {
-            fgos_run_supervisor::route::CatchUpRefusal::BranchAhead(_) => {
-                refused("write-branch-ahead", "branch is ahead")
-            }
-            fgos_run_supervisor::route::CatchUpRefusal::Busy { code, detail } => {
-                refused(&code, detail)
-            }
-            fgos_run_supervisor::route::CatchUpRefusal::Refused(why) => {
-                refused(&why.code, why.detail)
-            }
-        })?;
-        if !(publisher.path_clean)(&main, &path).map_err(|e| refused(&e.code, e.detail))? {
-            return Err(refused(
-                "admission-path-dirty",
-                format!("{path} is dirty in main checkout"),
-            ));
-        }
-        for part in [
-            main.join("plans"),
-            main.join("plans").join(&command.dir),
-            main.join(&path),
-        ] {
-            if std::fs::symlink_metadata(part)
-                .map_err(|e| refused("admission-path-unreadable", e))?
-                .file_type()
-                .is_symlink()
-            {
-                return Err(refused(
-                    "admission-path-symlink",
-                    format!("{path} involves a symlink"),
-                ));
-            }
-        }
-        let file = main.join(&path);
         let dir = file
             .parent()
             .ok_or_else(|| refused("admission-path-unreadable", "no parent dir"))?;
@@ -2836,6 +2838,7 @@ fn run_widen(root: &Path, command: &WidenCommand) -> Result<Value, CategorisedRe
             message,
             ..LandCommand::default()
         };
+        // Keep run_land publishing route because publish hardcodes its commit message.
         match run_land(&main, &land_cmd) {
             Ok(data) => data["mainSha"].as_str().map(str::to_owned),
             Err(why) => {

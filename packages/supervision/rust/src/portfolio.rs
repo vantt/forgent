@@ -4,7 +4,7 @@
 
 use std::sync::OnceLock;
 
-use fgos_yaml_doc::{parse, CommentLoss, Profile, Segment, Value};
+use fgos_yaml_doc::{parse, CommentLoss, Profile, Refusal, Segment, Value};
 
 const VOCABULARY_JSON: &str = include_str!("../../contracts/plan-vocabulary.v1.json");
 
@@ -111,6 +111,8 @@ pub enum WidenRefusal {
     FootprintEntryInvalid(String),
     #[error("plan-reread-failed: {0}")]
     RereadFailed(String),
+    #[error("{0}")]
+    DocRefusal(Refusal),
 }
 
 impl WidenRefusal {
@@ -123,6 +125,7 @@ impl WidenRefusal {
             WidenRefusal::PhaseNotFound(_) => "phase-not-found",
             WidenRefusal::FootprintEntryInvalid(_) => "footprint-entry-invalid",
             WidenRefusal::RereadFailed(_) => "plan-reread-failed",
+            WidenRefusal::DocRefusal(r) => r.rule,
         }
     }
 }
@@ -380,9 +383,9 @@ pub fn admitted_text(text: &str, role: &str, base: &str) -> Result<String, Strin
     let mut doc = parse(front.as_bytes(), Profile::Tool, "plan.md").map_err(|e| e.to_string())?;
     for (key, value) in [("status", "running"), ("lead", role), ("base", base)] {
         doc.set(
-            &[fgos_yaml_doc::Segment::Key(key.to_owned())],
+            &[Segment::Key(key.to_owned())],
             Value::Str(value.to_owned()),
-            fgos_yaml_doc::CommentLoss::Refuse,
+            CommentLoss::Refuse,
         )
         .map_err(|e| e.to_string())?;
     }
@@ -426,7 +429,7 @@ pub fn widened_text<S: AsRef<str>>(
     let criterion_text = find_acceptance_criterion(body, criterion)?;
 
     let phases = read_phase_table("plan.md", body)
-        .map_err(|e| WidenRefusal::PhaseNotFound(format!("{phase_id}: {e}")))?;
+        .map_err(|e| WidenRefusal::RereadFailed(format!("{phase_id}: {e}")))?;
     let phase = phases
         .iter()
         .find(|p| p.id == phase_id)
@@ -446,6 +449,9 @@ pub fn widened_text<S: AsRef<str>>(
         }
         let canon = fgos_write_scope::canonicalize(p)
             .map_err(|e| WidenRefusal::FootprintEntryInvalid(format!("{p}: {e}")))?;
+        if canon.starts_with('-') || canon.is_empty() {
+            return Err(WidenRefusal::FootprintEntryInvalid(canon));
+        }
         canon_paths.push(canon);
     }
 
@@ -463,17 +469,24 @@ pub fn widened_text<S: AsRef<str>>(
     let mut updated_footprint = current_footprint.clone();
     let mut frontmatter_added: Vec<String> = Vec::new();
     for canon in &canon_paths {
-        let covered =
-            fgos_write_scope::matches(canon.as_bytes(), &updated_footprint).unwrap_or(false);
+        let covered = fgos_write_scope::matches(canon.as_bytes(), &updated_footprint)
+            .map_err(|e| WidenRefusal::FootprintEntryInvalid(e.to_string()))?;
         if !covered {
             updated_footprint.push(canon.clone());
             frontmatter_added.push(canon.clone());
         }
     }
 
+    let mut canon_phase_footprint: Vec<String> = Vec::new();
+    for existing in &phase.footprint {
+        let canon = fgos_write_scope::canonicalize(existing)
+            .map_err(|e| WidenRefusal::FootprintEntryInvalid(format!("{existing}: {e}")))?;
+        canon_phase_footprint.push(canon);
+    }
+
     let mut phase_added: Vec<String> = Vec::new();
     for canon in &canon_paths {
-        if !phase.footprint.iter().any(|existing| existing == canon) {
+        if !canon_phase_footprint.iter().any(|existing| existing == canon) {
             if !phase_added.contains(canon) {
                 phase_added.push(canon.clone());
             }
@@ -512,11 +525,11 @@ pub fn widened_text<S: AsRef<str>>(
                 .collect(),
         );
         doc.set(
-            &[fgos_yaml_doc::Segment::Key("footprint".to_owned())],
+            &[Segment::Key("footprint".to_owned())],
             seq,
-            fgos_yaml_doc::CommentLoss::Refuse,
+            CommentLoss::Refuse,
         )
-        .map_err(|e| WidenRefusal::FrontmatterMissing(e.to_string()))?;
+        .map_err(WidenRefusal::DocRefusal)?;
     }
 
     let (new_body, _) = if phase_cell_changed {
@@ -527,7 +540,7 @@ pub fn widened_text<S: AsRef<str>>(
 
     let new_front_text = if frontmatter_changed {
         String::from_utf8(doc.to_bytes())
-            .map_err(|e| WidenRefusal::FrontmatterMissing(e.to_string()))?
+            .map_err(|e| WidenRefusal::RereadFailed(e.to_string()))?
     } else {
         front.to_string()
     };
@@ -629,7 +642,7 @@ fn update_phase_cell(
     let (i, j) = match tables.as_slice() {
         [one] => *one,
         _ => {
-            return Err(WidenRefusal::PhaseNotFound(format!(
+            return Err(WidenRefusal::RereadFailed(format!(
                 "{phase_id}: table missing or ambiguous"
             )))
         }
@@ -638,11 +651,11 @@ fn update_phase_cell(
     let footprint_col = header
         .iter()
         .position(|h| h == "footprint")
-        .ok_or_else(|| WidenRefusal::PhaseNotFound("column footprint missing".to_owned()))?;
+        .ok_or_else(|| WidenRefusal::RereadFailed("column footprint missing".to_owned()))?;
     let id_col = header
         .iter()
         .position(|h| h == "id")
-        .ok_or_else(|| WidenRefusal::PhaseNotFound("column id missing".to_owned()))?;
+        .ok_or_else(|| WidenRefusal::RereadFailed("column id missing".to_owned()))?;
 
     let mut target_row_idx = None;
     for row_idx in (i + 2)..j {
@@ -671,7 +684,7 @@ fn update_phase_cell(
     }
 
     if pipes.len() <= footprint_col + 1 {
-        return Err(WidenRefusal::PhaseNotFound(format!(
+        return Err(WidenRefusal::RereadFailed(format!(
             "{phase_id}: invalid table row formatting"
         )));
     }
@@ -681,16 +694,19 @@ fn update_phase_cell(
     let cell_raw = &line[cell_start..cell_end];
     let cell_trimmed = cell_raw.trim();
 
+    let backticked_add: Vec<String> = to_add.iter().map(|p| format!("`{p}`")).collect();
+    let add_str = backticked_add.join(", ");
+
     let new_cell = if cell_trimmed.is_empty()
         || cell_trimmed == "-"
         || cell_trimmed == "—"
         || cell_trimmed.eq_ignore_ascii_case("none")
         || cell_trimmed.eq_ignore_ascii_case("n/a")
     {
-        format!(" {} ", to_add.join(", "))
+        format!(" {add_str} ")
     } else {
         let trimmed_end = cell_raw.trim_end();
-        format!("{trimmed_end}, {} ", to_add.join(", "))
+        format!("{trimmed_end}, {add_str} ")
     };
 
     let new_line = format!("{}{}{}", &line[..cell_start], new_cell, &line[cell_end..]);
