@@ -451,7 +451,7 @@ fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, 
     let grant = grant(&checkout)?;
     // The land command's own builder: the door writes the index into the row's commit.
     let index = |root: &Path, committing: &[String]| {
-        super::supervision::backlog_index(&checkout.driver, &checkout.repo, root, committing)
+        portfolio::backlog_index(&checkout.driver, &checkout.repo, root, committing)
     };
     let ports = LandPorts {
         git: &checkout.driver,

@@ -42,3 +42,12 @@ body. Follow-up: make `backlog_index` `pub(super)` in `supervision.rs` and call 
   `wiring/portfolio.rs` (already compiled by the test), which is outside this unit's write scope.
 - `cargo check -p fgos --tests` passes; `cargo fmt --all --check` passes. Tests were not run (the `ort-sys` link error
   from the first round still applies).
+
+## Fix round 2
+- `backlog_index` moved from `apps/fgos/src/wiring/supervision.rs` into `apps/fgos/src/wiring/portfolio.rs` (`pub(super)`,
+  same body, next to `tracked_item_paths`). `supervision.rs` (land command) and `session_write_publish.rs` (`publish`)
+  both call `portfolio::backlog_index`. The repo has one copy of the builder body.
+- The stand-in `supervision` module is deleted from `apps/fgos/tests/session_write_publish.rs`; the test compiles the
+  real builder through the `portfolio.rs` it already includes.
+- `cargo check -p fgos --tests` passes; `cargo fmt --all --check` passes. Tests were not run (the `ort-sys` link error
+  from the first round still applies).
