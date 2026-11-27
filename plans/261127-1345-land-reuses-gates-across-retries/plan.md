@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "A land reuses its gates across retries, builds against a shared Cargo target, and scans the census once"
-status: running
+status: done
 lead: session:fg-server-claude-2026-11-27
 priority: P1
 blockedBy: []
@@ -75,7 +75,7 @@ Measured on fg-server, 2026-11-27, from the land logs and by running each step a
 | 1 | [Gates are reused across a retry the trunk moved outside them](phase-01-reuse-gates-across-retries.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs | 1 | done |
 | 2 | [Land commands build against one shared Cargo target](phase-02-shared-cargo-target.md) | 1 | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs | 2 | done |
 | 4 | [A malformed plan is refused at commit and first at land](phase-04-plan-contract-fails-fast.md) | - | .githooks/pre-commit, test/githooks/plan-contract.test.mjs, .fgos/config.yaml | 1 | done |
-| 3 | [One census scan per land, measurements, docs](phase-03-one-census-scan-and-measure.md) | 2 | .fgos/config.yaml, docs/platform/supervision/spec.md, CHANGELOG.md, plans/261127-1345-land-reuses-gates-across-retries/reports/** | 3 | running |
+| 3 | [One census scan per land, measurements, docs](phase-03-one-census-scan-and-measure.md) | 2 | .fgos/config.yaml, docs/platform/supervision/spec.md, CHANGELOG.md, plans/261127-1345-land-reuses-gates-across-retries/reports/** | 3 | done |
 
 ## Owner questions
 
