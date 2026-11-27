@@ -15,7 +15,7 @@ Runs while a work item sits at status `retrospective`. The item's story already 
 
 ## Hard rules
 
-- Grow is the default. Never `fgos topic register` or `fgos doc reserve` unless a person asked for that slot; a missed lookup is never permission to create.
+- Grow is the default. Never `fgos topic register`, `fgos doc reserve` or `fgos doc register` unless a person asked for that slot; a missed lookup is never permission to create.
 - No verdict from a score or a hit count: read the candidates and decide.
 - Write and commit first, attest second.
 - No automatic promotion; promotion is a person's `fgos doc promote`.

@@ -53,7 +53,10 @@ Pass the file, or `"$(cat <file>)"` where a verb takes only a value.
 7. **ask.** Two candidates fit. Use the decision-question template (`decision-question.md`); resume at grow or create
    with the answer.
 8. **create or no-place.** No candidate carries the claim, or no area fits. Write the request to
-   `.fgos/runtime/tmp/<id>-request.txt` (first line `Admission request: <claim>`, then a line linking the item), then:
+   `.fgos/runtime/tmp/<id>-request.txt` (first line `Admission request: <claim>`, then a line linking the item). Write
+   the claim sentence to `.fgos/runtime/tmp/<id>-claim.txt` and the drafted paragraph to
+   `.fgos/runtime/tmp/<id>-material.md`, through files, never raw on a shell line. Keep the request id `fgos submit`
+   returns for `--request`, then:
    ```bash
    fgos submit "$(cat .fgos/runtime/tmp/<id>-request.txt)"
    fgos knowledge handoff --capture-id <id> --request <requestId> --decision create \
