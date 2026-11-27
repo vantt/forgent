@@ -129,7 +129,9 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
     startController({ env: extraEnv = {}, ...job } = {}) {
       const configDir = path.join(repoDir, '.fgos');
       fs.mkdirSync(configDir, { recursive: true });
-      const executor = job.executor ?? project.executor();
+      // `fgos run` launches a seat only through an invocation a registered backend confines: the agent is the
+      // project's own wrapper, as in a confined run.
+      const executor = job.executor ?? project.executor({ commandName: 'claude', confinement: { backend: 'bwrap' } });
       const timeoutMs = job.timeoutMs ?? 60_000;
       writeProjectConfig(repoDir, {
         runner: {
@@ -150,7 +152,8 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
                 args: executor.args ?? ['{prompt}'],
                 env: executor.env ?? { TERMINAL_AGENT_DIR: agentDir },
                 interactiveMode: executor.interactiveMode ?? { exitCommand: '/exit', kind: 'claude' },
-                ...(executor.confinement ? { confinement: executor.confinement } : {}),
+                confinement: executor.confinement ?? { backend: 'bwrap' },
+                credentialStore: { use: 'agent', homeEnv: 'HOME' },
               }],
             },
           },
@@ -166,7 +169,7 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
         capability: 'docs:write',
         writes: [],
       }));
-      const call = fgosProcess(path.resolve('bin/fgos.mjs'), ['run', '--unit', unitFile, '--dir', repoDir], { ...project.env(), ...extraEnv });
+      const call = fgosProcess(path.resolve('bin/fgos.mjs'), ['run', '--unit', unitFile, '--dir', repoDir], { ...project.env(), HERDR_ENV: '1', ...extraEnv });
       const child = spawn(call.command, call.args, { cwd: repoDir, env: call.env, stdio: ['ignore', 'pipe', 'pipe'] });
       let stdout = '';
       let stderr = '';
@@ -289,8 +292,9 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
     writeResult(briefText, { status = 'done', summary = 'terminal mode test finished.' } = {}) {
       const resultPath = /(\S*outbox\/result-1\.json)/.exec(briefText)?.[1];
       if (!resultPath) throw new Error(`the brief names no result path:\n${briefText}`);
-      fs.writeFileSync(path.join(repoDir, 'terminal-worker-output.txt'), 'terminal worker mutation\n');
       fs.mkdirSync(path.dirname(resultPath), { recursive: true });
+      // The unit is read-only: its evidence is the report beside the claim, never a change in the repository.
+      fs.writeFileSync(path.join(path.dirname(resultPath), 'report-1.md'), 'The terminal mode test ran and finished.\n');
       fs.writeFileSync(`${resultPath}.tmp`, JSON.stringify({ status, summary }));
       fs.renameSync(`${resultPath}.tmp`, resultPath);
       return resultPath;

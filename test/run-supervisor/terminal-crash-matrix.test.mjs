@@ -10,7 +10,7 @@ import { createTerminalProject, noHost, readJson, waitUntil } from './support/te
 
 const projects = [];
 after(() => { for (const project of projects) project.stop(); });
-const newProject = async (name) => { const project = await createTerminalProject({ name }); projects.push(project); return project; };
+const newProject = async (name) => { const project = await createTerminalProject({ name, confined: true }); projects.push(project); return project; };
 
 const file = (...parts) => path.join(...parts);
 

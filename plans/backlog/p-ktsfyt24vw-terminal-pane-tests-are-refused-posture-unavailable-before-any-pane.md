@@ -30,3 +30,28 @@ a credential store, `HERDR_ENV`.
 The pane-lifecycle cases reach their pane again. Either the harness's controller executor is built the way a passing
 confined run is, or the posture rule for these launches is settled and the harness follows it. Both files then pass
 on a machine with herdr's fake and bwrap.
+
+# Progress (2026-11-27, fg-server)
+
+Found and landed: `fgos run` launches a seat only through an invocation a registered bwrap backend confines. The
+controller's executor therefore now has the shape of a passing confined run:
+- the project's own wrapper command;
+- `confinement: {backend: bwrap}`;
+- a credential store;
+- `HERDR_ENV`;
+- a confined project.
+
+A read-only unit's evidence is the report beside its claim, so the fixture writes `report-1.md` and no longer changes
+the repository. Results:
+- `terminal-crash-matrix` passes (1 of 1);
+- `terminal-cutover` went from 2 to 4 of 10 passing;
+- `terminal-fallback`, `cancel-registry`, `crash-matrix-adopt-resume` and `run-brief-not-delivered` are unchanged
+  and pass.
+
+Left, each needing its case redesigned for confinement:
+- Two cases read the agent's notes (`agent-env.json`) after the run settles, but a confined agent writes them in its
+  private home, which `finalize-home` removes at settlement. They must read them while the run is live, as the
+  confined case does.
+- Three cases (never started, limit screen, trust prompt) now fail on their own assertions about the run's exit.
+- One case (`invocations[]` declared flat) still waits for the brief.
+
