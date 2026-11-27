@@ -1,0 +1,1 @@
+- Added: agents find the document that carries a claim with `fgos doc locate` before writing; locate also lists every section that names the same terms (`--exact` adds more) and flags those its search missed, and `fgos knowledge attest` records the locate result and how each mention was handled.
