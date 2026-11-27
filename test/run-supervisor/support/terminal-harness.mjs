@@ -131,7 +131,9 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
       fs.mkdirSync(configDir, { recursive: true });
       // `fgos run` launches a seat only through an invocation a registered backend confines: the agent is the
       // project's own wrapper, as in a confined run.
-      const executor = job.executor ?? project.executor({ commandName: 'claude', confinement: { backend: 'bwrap' } });
+      const declared = job.executor ?? project.executor({ commandName: 'claude', confinement: { backend: 'bwrap' } });
+      // An executor declared by invocations[] gives its first invocation's fields, the same ones a flat executor carries.
+      const executor = declared.invocations?.[0] ?? declared;
       const timeoutMs = job.timeoutMs ?? 60_000;
       writeProjectConfig(repoDir, {
         runner: {
