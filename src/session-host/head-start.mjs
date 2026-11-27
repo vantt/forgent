@@ -159,6 +159,31 @@ const realpathOrSelf = (p) => { try { return fs.realpathSync(p); } catch { retur
  * The worktree list is read through Git Inspect. Returns `{ path, branch, created }`.
  */
 export async function defaultEnsureWorktree({ projectRoot, path: worktreePath, branch }) {
+  const ensured = await ensureDiscussionWorktree({ projectRoot, path: worktreePath, branch });
+  linkInstallation(projectRoot, worktreePath);
+  return ensured;
+}
+
+/**
+ * Makes `<worktree>/.fgos/installation` a link to the project's, so the project hooks (which run `${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos`)
+ * answer from inside the worktree. A link to the same target is kept; anything else there is refused `shaper-worktree-installation-conflict`.
+ * A project without an installation gets no link.
+ */
+function linkInstallation(projectRoot, worktreePath) {
+  const target = path.join(projectRoot, '.fgos', 'installation');
+  if (!fs.existsSync(target)) return;
+  const link = path.join(worktreePath, '.fgos', 'installation');
+  let existing = null;
+  try { existing = fs.lstatSync(link); } catch (err) { if (err.code !== 'ENOENT') throw err; }
+  if (existing) {
+    if (existing.isSymbolicLink() && realpathOrSelf(link) === realpathOrSelf(target)) return;
+    throw new HeadStartError('shaper-worktree-installation-conflict', `${link} exists and is not a link to ${target}; it was not replaced`);
+  }
+  fs.mkdirSync(path.dirname(link), { recursive: true });
+  fs.symlinkSync(target, link, 'dir');
+}
+
+async function ensureDiscussionWorktree({ projectRoot, path: worktreePath, branch }) {
   const { createGitInspect, gitPortOptions } = await import('../git/inspect.mjs');
   const inspect = createGitInspect(gitPortOptions(projectRoot));
   const want = realpathOrSelf(worktreePath);
@@ -172,6 +197,8 @@ export async function defaultEnsureWorktree({ projectRoot, path: worktreePath, b
   if (trunk.kind !== 'known') throw new HeadStartError('shaper-worktree-failed', 'the trunk of this project is not known, so the discussion worktree has no base');
   const { bin } = resolveActiveHostBin();
   if (!bin) throw new HeadStartError('shaper-worktree-failed', 'no fgos host binary found to create the discussion worktree');
+  // The worktree door canonicalizes the destination's parent, so it must exist; only that directory is made here.
+  fs.mkdirSync(path.dirname(worktreePath), { recursive: true });
   const res = spawnSync(bin, ['worktree', 'create', worktreePath, '--branch', branch, '--base', trunk.value, '--json'], { cwd: projectRoot, env: routeEnv(), encoding: 'utf8', timeout: 120_000 });
   if (res.error || res.status !== 0) {
     throw new HeadStartError('shaper-worktree-failed', `the worktree ${worktreePath} was not created: ${res.error?.message ?? `${res.stdout ?? ''}${res.stderr ?? ''}`.trim().slice(0, 300)}`);
