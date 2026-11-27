@@ -4,8 +4,8 @@ use std::cell::RefCell;
 use std::path::{Path, PathBuf};
 
 use fgos_session_host::release::{
-    envelope_data, merge_slot_hold, release_subtree, run, run_rollback, Outcome, Recipe,
-    ReleasePorts,
+    envelope_data, merge_slot_hold, release_subtree, run, run_checks_in, run_rollback, CheckPorts,
+    Outcome, Recipe, ReleasePorts,
 };
 use serde_json::{json, Value};
 
@@ -510,4 +510,107 @@ fn a_pretty_printed_envelope_is_one_value_and_a_one_line_scrap_is_not_an_answer(
     assert_eq!(envelope_data(pretty).unwrap(), json!({"path": "release"}));
     assert!(envelope_data("  \"data\": {}\n}\n").is_err());
     assert!(envelope_data("{\"contract\": \"fgos.v1\"}").is_err());
+}
+
+struct CheckFixture {
+    recipe: Value,
+    /// Argv lines that exit non-zero.
+    failing: Vec<&'static str>,
+    /// Argv lines that cannot be started at all.
+    unrunnable: Vec<&'static str>,
+    /// Every argv run, with the directory it ran in: the only call besides the recipe read this port set has.
+    ran: RefCell<Vec<(String, PathBuf)>>,
+}
+
+impl CheckFixture {
+    fn with(recipe: Value) -> CheckFixture {
+        CheckFixture {
+            recipe,
+            failing: vec![],
+            unrunnable: vec![],
+            ran: RefCell::default(),
+        }
+    }
+}
+
+impl CheckPorts for CheckFixture {
+    fn recipe(&self) -> Result<Value, String> {
+        Ok(self.recipe.clone())
+    }
+    fn run(&self, argv: &[String], dir: &Path) -> Result<i32, String> {
+        let line = argv.join(" ");
+        self.ran
+            .borrow_mut()
+            .push((line.clone(), dir.to_path_buf()));
+        if self.unrunnable.contains(&line.as_str()) {
+            return Err("no such program".into());
+        }
+        Ok(i32::from(self.failing.contains(&line.as_str())))
+    }
+}
+
+#[test]
+fn a_checks_only_run_is_green_when_every_check_exits_zero_and_runs_them_in_the_worktree() {
+    let fixture = CheckFixture::with(reversible());
+    let report = run_checks_in(&fixture, Path::new("/work/lead-wt")).unwrap();
+    assert!(report.green);
+    assert_eq!(report.note, None);
+    assert_eq!(
+        *fixture.ran.borrow(),
+        [
+            ("check one".to_string(), PathBuf::from("/work/lead-wt")),
+            ("check two".to_string(), PathBuf::from("/work/lead-wt")),
+        ]
+    );
+    assert_eq!(
+        report.to_value()["checks"],
+        json!([{"argv": ["check", "one"], "exit": 0}, {"argv": ["check", "two"], "exit": 0}])
+    );
+}
+
+#[test]
+fn a_checks_only_run_is_red_and_still_reports_every_check_when_one_fails_or_cannot_run() {
+    let mut fixture = CheckFixture::with(reversible());
+    fixture.failing = vec!["check one"];
+    let report = run_checks_in(&fixture, Path::new("/work/wt")).unwrap();
+    assert!(!report.green);
+    assert_eq!(fixture.ran.borrow().len(), 2);
+    assert_eq!(report.checks[0].exit, Some(1));
+    assert_eq!(report.checks[1].exit, Some(0));
+
+    let mut fixture = CheckFixture::with(reversible());
+    fixture.unrunnable = vec!["check two"];
+    let report = run_checks_in(&fixture, Path::new("/work/wt")).unwrap();
+    assert!(!report.green);
+    assert_eq!(report.checks[1].exit, None);
+    assert_eq!(report.checks[1].error.as_deref(), Some("no such program"));
+}
+
+#[test]
+fn a_checks_only_run_with_no_checks_is_green_with_a_note_and_runs_nothing() {
+    for recipe in [Value::Null, json!({}), json!({"apply": ["x"]})] {
+        let fixture = CheckFixture::with(recipe);
+        let report = run_checks_in(&fixture, Path::new("/work/wt")).unwrap();
+        assert!(report.green);
+        assert!(report.checks.is_empty());
+        assert!(report.note.unwrap().contains("no checks"));
+        assert!(fixture.ran.borrow().is_empty());
+    }
+}
+
+#[test]
+fn a_checks_only_run_never_touches_apply_probe_or_rollback_and_refuses_an_invalid_recipe() {
+    // The port set has no apply, probe, rollback, merge-slot, checkout or record call; the recipe's other steps
+    // are never run.
+    let fixture = CheckFixture::with(reversible());
+    run_checks_in(&fixture, Path::new("/work/wt")).unwrap();
+    assert!(fixture
+        .ran
+        .borrow()
+        .iter()
+        .all(|(line, _)| line.starts_with("check ")));
+
+    let invalid = CheckFixture::with(json!({"reversible": true}));
+    let why = run_checks_in(&invalid, Path::new("/work/wt")).unwrap_err();
+    assert!(why.starts_with("recipe-invalid"));
 }

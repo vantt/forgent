@@ -1538,16 +1538,17 @@ export const COMMAND_REGISTRY = [
   },
   {
     name: 'release',
-    invoke: 'fgos release run [--rollback]',
-    description: 'Run the project release recipe (`release.*` config) through the head\'s own run supervisor, from inside a head session only (a session with FGOS_HEAD_REQUEST_SOCKET); outside one it refuses. Answers at once with a ticket id, and the run goes on in the supervisor; read the outcome with `fgos request result`. Granted to the supervisor and, by inheritance, the secretary. `--rollback` runs only the recipe\'s rollback, refused `no-release-in-flight` unless a release step never ended. Not paginated.',
+    invoke: 'fgos release <run [--rollback]|check --worktree <path>>',
+    description: 'Run the project release recipe (`release.*` config) through the head\'s own run supervisor, from inside a head session only (a session with FGOS_HEAD_REQUEST_SOCKET); outside one it refuses. Answers at once with a ticket id, and the run goes on in the supervisor; read the outcome with `fgos request result`. `run` is granted to the supervisor and, by inheritance, the secretary; `--rollback` runs only the recipe\'s rollback, refused `no-release-in-flight` unless a release step never ended. `check --worktree <path>` runs only the recipe\'s `checks` in that linked worktree of the project, unconfined, with no release step and nothing changed on main; it is granted to the lead alone, and a red check is an answer, not an error. Not paginated.',
     parameters: {
       type: 'object',
       properties: {
         rollback: { type: 'boolean', description: 'Run only the recipe\'s rollback (for a release whose step never ended).' },
+        worktree: { type: 'string', description: 'For `check`: the absolute path of a linked worktree of this project whose checks run.' },
       },
       required: [],
     },
-    examples: ['fgos release run', 'fgos release run --rollback'],
+    examples: ['fgos release run', 'fgos release run --rollback', 'fgos release check --worktree /path/to/project-worktrees/my-branch'],
     touchesState: false,
     store: 'none',
     externalEffect: true,

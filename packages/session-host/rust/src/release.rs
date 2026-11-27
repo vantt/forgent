@@ -490,3 +490,86 @@ fn rollback_steps(ports: &dyn ReleasePorts, ran: &mut bool) -> Outcome {
         Err(why) => failed("rollback-failed", why),
     }
 }
+
+/// The external calls of a checks-only run: reading the recipe and running one argv. Nothing else is reachable from
+/// [`run_checks_in`]: no apply, probe, rollback, merge-slot look, checkout or release record.
+pub trait CheckPorts {
+    /// The `release` subtree of the effective config (`Null` when nothing is set).
+    fn recipe(&self) -> Result<Value, String>;
+    /// Runs one argv (no shell) with `dir` as its working directory and returns its exit code.
+    fn run(&self, argv: &[String], dir: &Path) -> Result<i32, String>;
+}
+
+/// One check of a checks-only run: its argv and how it ended (`exit` is `None` when it could not be run, with `error`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CheckResult {
+    pub argv: Vec<String>,
+    pub exit: Option<i32>,
+    pub error: Option<String>,
+}
+
+/// What a checks-only run answers: every check with its result, and green only when every one exited 0.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CheckReport {
+    pub green: bool,
+    pub checks: Vec<CheckResult>,
+    pub note: Option<String>,
+}
+
+impl CheckReport {
+    pub fn to_value(&self) -> Value {
+        let checks: Vec<Value> = self
+            .checks
+            .iter()
+            .map(|check| {
+                let mut entry = json!({"argv": check.argv, "exit": check.exit});
+                if let Some(error) = &check.error {
+                    entry["error"] = json!(error);
+                }
+                entry
+            })
+            .collect();
+        let mut value = json!({"green": self.green, "checks": checks});
+        if let Some(note) = &self.note {
+            value["note"] = json!(note);
+        }
+        value
+    }
+}
+
+/// The project's `checks`, each argv with no shell and `worktree` as its working directory, all of them run so the
+/// report names every red one. An empty list is green with a note. A recipe that cannot be read is the `Err`.
+pub fn run_checks_in(ports: &dyn CheckPorts, worktree: &Path) -> Result<CheckReport, String> {
+    let recipe = ports
+        .recipe()
+        .and_then(|value| Recipe::from_value(&value))
+        .map_err(|why| format!("recipe-invalid: {why}"))?;
+    if recipe.checks.is_empty() {
+        return Ok(CheckReport {
+            green: true,
+            checks: vec![],
+            note: Some("the project declares no checks".to_string()),
+        });
+    }
+    let checks: Vec<CheckResult> = recipe
+        .checks
+        .iter()
+        .map(|argv| match ports.run(argv, worktree) {
+            Ok(exit) => CheckResult {
+                argv: argv.clone(),
+                exit: Some(exit),
+                error: None,
+            },
+            Err(why) => CheckResult {
+                argv: argv.clone(),
+                exit: None,
+                error: Some(why),
+            },
+        })
+        .collect();
+    Ok(CheckReport {
+        green: checks.iter().all(|check| check.exit == Some(0)),
+        checks,
+        note: None,
+    })
+}
