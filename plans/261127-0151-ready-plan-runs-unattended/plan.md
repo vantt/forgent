@@ -37,6 +37,7 @@ footprint:
   - changelog.d/261127-0151-a-ready-plan-runs-unattended.md
   - packages/host-runtime/contracts/command-routes.json
   - packages/agent-context-engine/rust/tests/repository_units.rs
+  - packages/holder-lock/rust/src/borrow_vectors.rs
 source:
   - plans/discussions/ds-que32ftgg6-ready-plan-runs-unattended/DISCUSSION.md
   - p-u3nndr6vsh
@@ -152,7 +153,7 @@ One sentence: which split U7 chose and why.
 | 2 | [Contract check refuses ready without the section](phase-02-contract-check.md) | - | scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, src/portfolio/plan-sections.mjs | 1 | done |
 | 3 | [Full-gate door for the lead](phase-03-full-gate-door.md) | - | packages/session-host/rust/src/release.rs, packages/session-host/rust/tests/release.rs, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, packages/session-host/contracts/head-permissions.v1.json, apps/fgos/src/routing.rs, packages/host-runtime/contracts/command-manifest.json, src/cli/command-registry.mjs, docs/platform/run-supervisor/spec.md, `packages/host-runtime/contracts/command-routes.json` | 1 | done |
 | 4 | [Replay on the evidence plans](phase-04-replay.md) | 1, 2 | plans/261127-0151-ready-plan-runs-unattended/reports/replay-evidence-plans.md | 2 | done |
-| 5 | [Changelog and integration](phase-05-integration.md) | 1, 2, 3, 4 | changelog.d/261127-0151-a-ready-plan-runs-unattended.md, plans/261127-0151-ready-plan-runs-unattended/reports/integration.md, `packages/agent-context-engine/rust/tests/repository_units.rs` | 3 | draft |
+| 5 | [Changelog and integration](phase-05-integration.md) | 1, 2, 3, 4 | changelog.d/261127-0151-a-ready-plan-runs-unattended.md, plans/261127-0151-ready-plan-runs-unattended/reports/integration.md, `packages/agent-context-engine/rust/tests/repository_units.rs`, `packages/holder-lock/rust/src/borrow_vectors.rs` | 3 | draft |
 
 Phases 1, 2 and 3 run in parallel (disjoint footprints); each is `code:implement`, reviewed with `code:review` before
 it lands. Phase 1 owns every generated surface (AGENTS.md, effective rules, skill projections) as the one writer in
