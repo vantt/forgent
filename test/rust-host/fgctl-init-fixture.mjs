@@ -91,7 +91,37 @@ export function injectTailFailure(stateHome) {
  * its exit code have their own proofs (the closing_block unit tests and `closing-block.test.mjs`). Every other
  * failure keeps its real status.
  */
+// `fgctl init` runs `fgos doctor --fix`, whose doc-locate-model fix fetches the embedding model into
+// `<stateHome>/models/` when it is missing. Every test's state home is new, so each run downloaded the
+// model from huggingface.co and the files hit the 600 s watchdog whenever the network was slow. The
+// machine's own verified copy is hard-linked in first (a copy when linking fails); the fix still checks
+// every file's size and sha256, so a missing or corrupt seed is fetched as before.
+// The test process's HOME is a temporary directory (process-tmp-root.mjs), so the machine copy is found from
+// the account's home in the password database.
+const MACHINE_MODELS = path.join(os.userInfo().homedir, '.local', 'state', 'fgos', 'models');
+
+function seedModels(stateHome) {
+  if (!stateHome || !fs.existsSync(MACHINE_MODELS)) return;
+  const target = path.join(stateHome, 'models');
+  if (fs.existsSync(target)) return;
+  const link = (from, to) => {
+    for (const entry of fs.readdirSync(from, { withFileTypes: true })) {
+      const src = path.join(from, entry.name);
+      const dst = path.join(to, entry.name);
+      if (entry.isDirectory()) {
+        fs.mkdirSync(dst, { recursive: true });
+        link(src, dst);
+      } else if (entry.isFile()) {
+        try { fs.linkSync(src, dst); } catch { fs.copyFileSync(src, dst); }
+      }
+    }
+  };
+  fs.mkdirSync(target, { recursive: true });
+  link(MACHINE_MODELS, target);
+}
+
 export function runFgctlRaw(args, { cwd, stateHome, env = {} } = {}) {
+  seedModels(stateHome);
   return spawnSync(FGCTL_BIN, args, {
     cwd,
     env: {
