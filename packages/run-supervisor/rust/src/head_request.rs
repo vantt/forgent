@@ -1921,8 +1921,94 @@ impl HostRelease {
     }
 }
 
-/// The checks-only door reads the recipe and runs an argv the same way a release run does, and nothing more.
+/// The one check checkout both doors use.
+impl fgos_session_host::release::CheckoutPorts for HostRelease {
+    /// A detached checkout of `tip` at `<parent of the project root>/<project name>-worktrees/release-check-<id>`
+    /// (`release-check-chk-<id>` for the check-only door, so a lead's check and a supervisor's release run that
+    /// share a client-chosen id never share a path), made through the worktree door, then given the tip's committed `.fgos` bytes. A checkout made before a later
+    /// step failed is removed again.
+    fn make_check_checkout(&self, tip: &str) -> Result<PathBuf, String> {
+        let name = self
+            .cfg
+            .cwd
+            .file_name()
+            .ok_or_else(|| "the project root has no directory name".to_string())?
+            .to_string_lossy()
+            .into_owned();
+        let parent = self
+            .cfg
+            .cwd
+            .parent()
+            .ok_or_else(|| "the project root has no parent directory".to_string())?;
+        let tag = if self.request.verb == RELEASE_CHECK_VERB {
+            "chk-"
+        } else {
+            ""
+        };
+        let path = parent
+            .join(format!("{name}-worktrees"))
+            .join(format!("release-check-{tag}{}", self.request.id));
+        let text = path.to_string_lossy().into_owned();
+        self.host_json(&[
+            "worktree", "create", &text, "--detach", "--base", tip, "--json",
+        ])
+        .map_err(|why| format!("fgos worktree create: {why}"))?;
+        let materialized = (|| {
+            let (driver, repo) = fgos_git::GitDriver::open_at(&path)
+                .map_err(|e| format!("git did not run: {e:?}"))?
+                .ok_or_else(|| "the check checkout is not a git repository".to_string())?;
+            driver
+                .materialize_committed_state(&repo, vec![], tip)
+                .map_err(|e| format!("the committed .fgos was not written: {e:?}"))
+        })();
+        if let Err(why) = materialized {
+            if let Err(removed) = self.remove_check_checkout(&path, tip) {
+                fgos_session_host::release::ReleasePorts::log(
+                    self,
+                    &format!(
+                        "the release check checkout at {} was not removed: {removed}",
+                        path.display()
+                    ),
+                );
+            }
+            return Err(why);
+        }
+        Ok(path)
+    }
+
+    fn remove_check_checkout(&self, path: &Path, tip: &str) -> Result<(), String> {
+        let text = path.to_string_lossy().into_owned();
+        self.host_json(&[
+            "worktree",
+            "remove",
+            &text,
+            "--delivered-to",
+            tip,
+            "--discard-ignored",
+            "--json",
+        ])
+        .map(|_| ())
+        .map_err(|why| format!("fgos worktree remove: {why}"))
+    }
+}
+
+/// The checks-only door resolves the worktree's committed tip, then reads the recipe and runs an argv in the check
+/// checkout the same way a release run does, and nothing more.
 impl fgos_session_host::release::CheckPorts for HostRelease {
+    fn head_tip(&self, worktree: &Path) -> Result<String, String> {
+        use fgos_git::{HeadFact, Inspect};
+        let (driver, repo) = fgos_git::GitDriver::open_at(worktree)
+            .map_err(|e| format!("git did not run: {e:?}"))?
+            .ok_or_else(|| "the worktree is not a git repository".to_string())?;
+        match driver.resolve_head(&repo) {
+            Ok(HeadFact::Attached { commit, .. } | HeadFact::Detached { commit }) => {
+                Ok(commit.as_str().to_string())
+            }
+            Ok(HeadFact::Unborn { .. }) => Err("the worktree has no commit".to_string()),
+            Err(e) => Err(format!("the worktree HEAD was not resolved: {e:?}")),
+        }
+    }
+
     fn recipe(&self) -> Result<Value, String> {
         fgos_session_host::release::ReleasePorts::recipe(self)
     }
@@ -1984,65 +2070,6 @@ impl fgos_session_host::release::ReleasePorts for HostRelease {
     fn land_in_progress(&self) -> Result<Option<String>, String> {
         self.host_json(&["lock-status", "--json"])
             .map(|report| fgos_session_host::release::merge_slot_hold(&report))
-    }
-
-    /// A detached checkout of `tip` at `<parent of the project root>/<project name>-worktrees/release-check-<id>`,
-    /// made through the worktree door, then given the tip's committed `.fgos` bytes. A checkout made before a later
-    /// step failed is removed again.
-    fn make_check_checkout(&self, tip: &str) -> Result<PathBuf, String> {
-        let name = self
-            .cfg
-            .cwd
-            .file_name()
-            .ok_or_else(|| "the project root has no directory name".to_string())?
-            .to_string_lossy()
-            .into_owned();
-        let parent = self
-            .cfg
-            .cwd
-            .parent()
-            .ok_or_else(|| "the project root has no parent directory".to_string())?;
-        let path = parent
-            .join(format!("{name}-worktrees"))
-            .join(format!("release-check-{}", self.request.id));
-        let text = path.to_string_lossy().into_owned();
-        self.host_json(&[
-            "worktree", "create", &text, "--detach", "--base", tip, "--json",
-        ])
-        .map_err(|why| format!("fgos worktree create: {why}"))?;
-        let materialized = (|| {
-            let (driver, repo) = fgos_git::GitDriver::open_at(&path)
-                .map_err(|e| format!("git did not run: {e:?}"))?
-                .ok_or_else(|| "the check checkout is not a git repository".to_string())?;
-            driver
-                .materialize_committed_state(&repo, vec![], tip)
-                .map_err(|e| format!("the committed .fgos was not written: {e:?}"))
-        })();
-        if let Err(why) = materialized {
-            if let Err(removed) = self.remove_check_checkout(&path, tip) {
-                self.log(&format!(
-                    "the release check checkout at {} was not removed: {removed}",
-                    path.display()
-                ));
-            }
-            return Err(why);
-        }
-        Ok(path)
-    }
-
-    fn remove_check_checkout(&self, path: &Path, tip: &str) -> Result<(), String> {
-        let text = path.to_string_lossy().into_owned();
-        self.host_json(&[
-            "worktree",
-            "remove",
-            &text,
-            "--delivered-to",
-            tip,
-            "--discard-ignored",
-            "--json",
-        ])
-        .map(|_| ())
-        .map_err(|why| format!("fgos worktree remove: {why}"))
     }
 
     fn run(&self, argv: &[String], dir: Option<&Path>) -> Result<i32, String> {
@@ -2420,7 +2447,11 @@ fn release_check(cfg: &Arc<Config>, request: &Request) -> Outcome {
                 }
                 Err(why) => {
                     ticket["state"] = json!("failed");
-                    ticket["code"] = json!("recipe-invalid");
+                    ticket["code"] = json!(if why.starts_with("check-checkout-failed") {
+                        "check-checkout-failed"
+                    } else {
+                        "recipe-invalid"
+                    });
                     ticket["message"] = json!(loggable_detail(&why));
                 }
             }

@@ -1258,6 +1258,23 @@ fn serve_lead(name: &str, recipe: &Value) -> (Served, PathBuf) {
         .unwrap();
     assert!(status.success());
     let worktree = fs::canonicalize(worktree).unwrap();
+    // One commit of its own, so the worktree's tip differs from the main checkout's.
+    let status = std::process::Command::new("git")
+        .args([
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@t",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            "worktree",
+        ])
+        .current_dir(&worktree)
+        .status()
+        .unwrap();
+    assert!(status.success());
     (served, worktree)
 }
 
@@ -1296,8 +1313,35 @@ fn release_check_runs_only_the_checks_in_the_named_worktree_and_a_red_check_is_a
         settled["result"]["checks"],
         json!([{"argv": ["sh", "-c", "pwd > \"$OUT/check-cwd\""], "exit": 0}, {"argv": ["false"], "exit": 1}])
     );
+    // The checks ran in the check checkout of the worktree's committed tip, not in the worktree, and the checkout
+    // is gone afterwards; the ticket names the tip it checked.
+    let name = served.dir.file_name().unwrap().to_string_lossy();
+    let checkout = fs::canonicalize(served.dir.parent().unwrap())
+        .unwrap()
+        .join(format!("{name}-worktrees"))
+        .join("release-check-chk-chk1");
     let ran_in = fs::read_to_string(served.dir.join("check-cwd")).unwrap();
-    assert_eq!(fs::canonicalize(ran_in.trim()).unwrap(), worktree);
+    assert_eq!(Path::new(ran_in.trim()), checkout);
+    assert_ne!(Path::new(ran_in.trim()), worktree);
+    assert!(!checkout.exists(), "the check checkout was not removed");
+    let head_of = |dir: &Path| {
+        let out = std::process::Command::new("git")
+            .args(["rev-parse", "HEAD"])
+            .current_dir(dir)
+            .output()
+            .unwrap();
+        String::from_utf8(out.stdout).unwrap().trim().to_string()
+    };
+    assert_eq!(
+        settled["result"]["tip"].as_str(),
+        Some(head_of(&worktree).as_str()),
+        "{settled}"
+    );
+    assert_ne!(
+        head_of(&worktree),
+        head_of(&served.dir),
+        "the worktree tip must differ from main's"
+    );
     // Nothing of the release itself was reached: no apply, no release record, no lock file, no question.
     assert!(!served.dir.join("applied").exists());
     assert!(!served.dir.join(".fgos/runtime/release").exists());

@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 
 use fgos_session_host::release::{
     envelope_data, merge_slot_hold, release_subtree, run, run_checks_in, run_rollback, CheckPorts,
-    Outcome, Recipe, ReleasePorts,
+    CheckoutPorts, Outcome, Recipe, ReleasePorts,
 };
 use serde_json::{json, Value};
 
@@ -67,6 +67,25 @@ impl Fixture {
     }
 }
 
+impl CheckoutPorts for Fixture {
+    fn make_check_checkout(&self, tip: &str) -> Result<PathBuf, String> {
+        self.events.borrow_mut().push(format!("make {tip}"));
+        if self.make_fails {
+            return Err("no room for a checkout".into());
+        }
+        Ok(PathBuf::from(CHECKOUT))
+    }
+    fn remove_check_checkout(&self, path: &Path, tip: &str) -> Result<(), String> {
+        self.events
+            .borrow_mut()
+            .push(format!("remove {} {tip}", path.display()));
+        if self.remove_fails {
+            return Err("worktree-dirty-preserved".into());
+        }
+        Ok(())
+    }
+}
+
 impl ReleasePorts for Fixture {
     fn recipe(&self) -> Result<Value, String> {
         Ok(self.recipe.clone())
@@ -98,22 +117,6 @@ impl ReleasePorts for Fixture {
         } else {
             self.land.map(String::from)
         })
-    }
-    fn make_check_checkout(&self, tip: &str) -> Result<PathBuf, String> {
-        self.events.borrow_mut().push(format!("make {tip}"));
-        if self.make_fails {
-            return Err("no room for a checkout".into());
-        }
-        Ok(PathBuf::from(CHECKOUT))
-    }
-    fn remove_check_checkout(&self, path: &Path, tip: &str) -> Result<(), String> {
-        self.events
-            .borrow_mut()
-            .push(format!("remove {} {tip}", path.display()));
-        if self.remove_fails {
-            return Err("worktree-dirty-preserved".into());
-        }
-        Ok(())
     }
     fn run(&self, argv: &[String], dir: Option<&Path>) -> Result<i32, String> {
         let line = argv.join(" ");
@@ -518,8 +521,16 @@ struct CheckFixture {
     failing: Vec<&'static str>,
     /// Argv lines that cannot be started at all.
     unrunnable: Vec<&'static str>,
-    /// Every argv run, with the directory it ran in: the only call besides the recipe read this port set has.
+    /// Every argv run, with the directory it ran in.
     ran: RefCell<Vec<(String, PathBuf)>>,
+    /// The tip, checkout and removal calls, in order.
+    events: RefCell<Vec<String>>,
+    /// The checkout cannot be made.
+    make_fails: bool,
+    /// The checkout cannot be removed.
+    remove_fails: bool,
+    /// The worktree's tip cannot be read.
+    tip_fails: bool,
 }
 
 impl CheckFixture {
@@ -529,11 +540,43 @@ impl CheckFixture {
             failing: vec![],
             unrunnable: vec![],
             ran: RefCell::default(),
+            events: RefCell::default(),
+            make_fails: false,
+            remove_fails: false,
+            tip_fails: false,
         }
     }
 }
 
+impl CheckoutPorts for CheckFixture {
+    fn make_check_checkout(&self, tip: &str) -> Result<PathBuf, String> {
+        self.events.borrow_mut().push(format!("make {tip}"));
+        if self.make_fails {
+            return Err("no room for a checkout".into());
+        }
+        Ok(PathBuf::from(CHECKOUT))
+    }
+    fn remove_check_checkout(&self, path: &Path, tip: &str) -> Result<(), String> {
+        self.events
+            .borrow_mut()
+            .push(format!("remove {} {tip}", path.display()));
+        if self.remove_fails {
+            return Err("worktree-dirty-preserved".into());
+        }
+        Ok(())
+    }
+}
+
 impl CheckPorts for CheckFixture {
+    fn head_tip(&self, worktree: &Path) -> Result<String, String> {
+        self.events
+            .borrow_mut()
+            .push(format!("tip of {}", worktree.display()));
+        if self.tip_fails {
+            return Err("no tip".into());
+        }
+        Ok(TIP.to_string())
+    }
     fn recipe(&self) -> Result<Value, String> {
         Ok(self.recipe.clone())
     }
@@ -550,22 +593,67 @@ impl CheckPorts for CheckFixture {
 }
 
 #[test]
-fn a_checks_only_run_is_green_when_every_check_exits_zero_and_runs_them_in_the_worktree() {
+fn a_checks_only_run_is_green_when_every_check_exits_zero_and_runs_them_in_a_checkout_of_the_committed_tip(
+) {
     let fixture = CheckFixture::with(reversible());
     let report = run_checks_in(&fixture, Path::new("/work/lead-wt")).unwrap();
     assert!(report.green);
     assert_eq!(report.note, None);
+    assert_eq!(report.tip.as_deref(), Some(TIP));
+    // The checks ran in the made checkout, never in the worktree, and the checkout was removed after them.
     assert_eq!(
         *fixture.ran.borrow(),
         [
-            ("check one".to_string(), PathBuf::from("/work/lead-wt")),
-            ("check two".to_string(), PathBuf::from("/work/lead-wt")),
+            ("check one".to_string(), PathBuf::from(CHECKOUT)),
+            ("check two".to_string(), PathBuf::from(CHECKOUT)),
         ]
     );
     assert_eq!(
-        report.to_value()["checks"],
+        *fixture.events.borrow(),
+        [
+            "tip of /work/lead-wt".to_string(),
+            format!("make {TIP}"),
+            format!("remove {CHECKOUT} {TIP}"),
+        ]
+    );
+    let value = report.to_value();
+    assert_eq!(value["tip"], TIP);
+    assert_eq!(
+        value["checks"],
         json!([{"argv": ["check", "one"], "exit": 0}, {"argv": ["check", "two"], "exit": 0}])
     );
+}
+
+#[test]
+fn a_checks_only_run_removes_its_checkout_when_checks_are_red_or_cannot_run_and_names_a_failed_removal(
+) {
+    let mut fixture = CheckFixture::with(reversible());
+    fixture.failing = vec!["check one"];
+    fixture.unrunnable = vec!["check two"];
+    let report = run_checks_in(&fixture, Path::new("/work/wt")).unwrap();
+    assert!(!report.green);
+    assert_eq!(
+        fixture.events.borrow().last(),
+        Some(&format!("remove {CHECKOUT} {TIP}"))
+    );
+
+    let mut fixture = CheckFixture::with(reversible());
+    fixture.remove_fails = true;
+    let report = run_checks_in(&fixture, Path::new("/work/wt")).unwrap();
+    assert!(report.green);
+    assert_eq!(
+        report.note.as_deref(),
+        Some("the check checkout at /work/release-check was not removed: worktree-dirty-preserved")
+    );
+}
+
+#[test]
+fn a_checks_only_run_whose_checkout_cannot_be_made_is_an_error_that_runs_no_check() {
+    let mut fixture = CheckFixture::with(reversible());
+    fixture.make_fails = true;
+    let why = run_checks_in(&fixture, Path::new("/work/wt")).unwrap_err();
+    assert_eq!(why, "check-checkout-failed: no room for a checkout");
+    assert!(fixture.ran.borrow().is_empty());
 }
 
 #[test]
@@ -595,13 +683,21 @@ fn a_checks_only_run_with_no_checks_is_green_with_a_note_and_runs_nothing() {
         assert!(report.checks.is_empty());
         assert!(report.note.unwrap().contains("no checks"));
         assert!(fixture.ran.borrow().is_empty());
+        assert!(
+            !fixture
+                .events
+                .borrow()
+                .iter()
+                .any(|e| e.starts_with("make ")),
+            "no checks must not make a checkout"
+        );
     }
 }
 
 #[test]
 fn a_checks_only_run_never_touches_apply_probe_or_rollback_and_refuses_an_invalid_recipe() {
-    // The port set has no apply, probe, rollback, merge-slot, checkout or record call; the recipe's other steps
-    // are never run.
+    // The port set has no apply, probe, rollback, merge-slot or record call; the recipe's other steps are
+    // never run.
     let fixture = CheckFixture::with(reversible());
     run_checks_in(&fixture, Path::new("/work/wt")).unwrap();
     assert!(fixture
@@ -613,4 +709,11 @@ fn a_checks_only_run_never_touches_apply_probe_or_rollback_and_refuses_an_invali
     let invalid = CheckFixture::with(json!({"reversible": true}));
     let why = run_checks_in(&invalid, Path::new("/work/wt")).unwrap_err();
     assert!(why.starts_with("recipe-invalid"));
+
+    // A tip that cannot be read ends as check-checkout-failed and runs no check.
+    let mut no_tip = CheckFixture::with(reversible());
+    no_tip.tip_fails = true;
+    let why = run_checks_in(&no_tip, Path::new("/work/wt")).unwrap_err();
+    assert!(why.starts_with("check-checkout-failed"), "{why}");
+    assert!(no_tip.ran.borrow().is_empty());
 }
