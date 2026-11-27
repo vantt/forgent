@@ -11,7 +11,7 @@ discussion: open
 
 ## 1. Trạng thái hiện tại
 
-Round 6 (2026-11-27 16:50). Three points settled (§4): the gateway's roles and one gateway per machine (D1), the
+Round 7 (2026-11-27 16:51). Three points settled (§4): the gateway's roles and one gateway per machine (D1), the
 no-error rule between the fast copy and the persistent copy (D2), and what is broadcast first: the events of mail,
 work and owner questions (D3).
 
@@ -25,10 +25,9 @@ Open now:
   coalesces its wakes. Condition 1 changes where D2's cache lives; D2 not revised yet.
 - **Mailbox may write twice** — local mail in its own snapshot record, remote mail through the Event Store; a
   candidate duplicate, read from the spec only, code not checked yet (§3).
-- **Event Store vs event bus** — owner 16:41: a bus is not durable forever, the Event Store is. Shaper's rule,
-  asked in chat: whatever must survive is appended to the Event Store first; the bus carries only copies of such
-  events or signals that are safe to lose ("main moved", liveness). Condition 1 of the bus assessment is reworded: the
-  received copy is a volatile read-side buffer of the Event Store, never fsynced, gone on restart (§3).
+- **Event Store vs event bus** — settled as D5 (16:50): durable first in the Event Store; the bus (the gateway
+  cluster) carries only copies of such events or signals safe to lose; the received copy is a volatile read-side
+  buffer of the Event Store.
 - **Gateway assessment** (read-only agent, checked against source by the shaper) is in §3 rows "Gateway today" and
   "Proposed split"; the split needs owner answers on C, D, E and F before any `authority declare`.
 - D4 (naming) settled; the rename itself is outside this discussion, raised to the supervisor (event
@@ -89,7 +88,7 @@ coordination.
 | Event bus: shaper's assessment | proposal; owner 16:28 "keep going that way, judge whether it is good" | Strengths: no new store, queue or second truth; A, mail and questions share one mechanism; failure only slows (timers stay as the net); subscribers exist. Three conditions: (1) received events go into an Event Store tier "received, not yet fetched", because watcher, queue and mailbox read only the Event Store; a cache inside the gateway would be invisible to them, and a fetch cannot bring an unsealed event (seal coalesces 30 s). The gateway only carries. (2) Push inside one machine too: today a local append wakes nothing either. Either every writer notifies the gateway, or the gateway watches each project's open logs (no writer change; needs the project registry); shaper leans to watching, unmeasured. (3) Each subscriber coalesces wakes through its own door and keeps the keeper's caps; a watcher tick is a process, a supervisor wake can start an LLM session. Unmeasured: watch vs append-hook cost; the coalescing window |
 | Event Store vs supervision queue | observed, owner asked 16:29 | Not a duplicate write path. The Event Store is a shared write mechanism for events only (append-only facts of any registered consumer: work, porting, identity, mailbox, supervision, questions; `packages/event-store/contracts/consumers.v1.json`); plans and backlog are files, not in it. The supervision queue appends only `supervision.event-raised` and `supervision.event-handled` through the Event Store's `append` on the `project` stream; the queue is "raised minus handled", with no store and no cache of its own (`packages/supervision/rust/src/queue.rs:1-21`). The confusion was the word "event": settled by D4 |
 | Mailbox's own record | observed in code | Two write paths: local mail is a snapshot record written under the `mailbox` mutex (`packages/mailbox/rust/store/src/record/mod.rs`), remote mail is an Event Store event (`apps/fgos/src/wiring/mailbox_remote.rs:787`, `log.append(MESSAGE_SENT, ...)`). Part of the local record is legitimate machine state (live heads, registration, delivery state). Under the bus rule: the wake is a bus signal; whether a letter must survive a restart decides whether it belongs in the Event Store. Open |
-| Event Store vs event bus | proposal, asked in chat 16:45 | Owner 16:41: "eventbus cũng ko phải là loại bền vĩnh viễn, trong khi eventstore ... là sự kiện bền". The two are separate: the Event Store is durable truth (fsync, sealed git objects, kept forever, slow across machines); the bus is a fast transient channel (may lose, empty after restart); the gateway cluster is the bus. Rule: durable first (Event Store append), then the bus may carry a copy; bus-only items must be safe to lose. The received copy is a volatile read-side buffer of the Event Store, not a durable tier |
+| Event Store vs event bus | settled, D5 | Owner 16:41: "eventbus cũng ko phải là loại bền vĩnh viễn, trong khi eventstore ... là sự kiện bền". The two are separate: the Event Store is durable truth (fsync, sealed git objects, kept forever, slow across machines); the bus is a fast transient channel (may lose, empty after restart); the gateway cluster is the bus. Rule: durable first (Event Store append), then the bus may carry a copy; bus-only items must be safe to lose. The received copy is a volatile read-side buffer of the Event Store, not a durable tier |
 | Gateway today (assessment) | observed, agent read checked by the shaper | Product code about 1,420 lines of `gateway.rs` (rest is tests): verb chokepoint `spawn_fgos_verb` (361) and `FgosCliGateway{root}` (413); auth bearer + Cloudflare Access (434-537, `cf_access.rs`); REST under `/v1`: work, questions, reads, sessions (501 stubs, 1140-1161), `/runner/tick` (spawns `fgos-runner`), `/runtime` (only `distribution.build.show`, `remote_invocation.rs`), `/contract` (unauthenticated); MCP `search`/`execute` (`mcp.rs`); embedded web bundle (`apps/fgos-gateway/web`, about 3,000 lines TS). One project per process in six places: cwd root (`main.rs`), `AppState.root` ("multi-project routing ... future work", `gateway.rs:1252`), `/contract` and MCP `search` read the YAML from the root, lock `locks/gateway.lock` and registry `gateway.json` under the project `.fgos` (`apps/fgos/src/wiring/gateway_control.rs:89-96`), logs under the project `.fgos/logs`, release build from the project checkout. Already machine-level: token, port 4170, bind, Cloudflare pair. The web client is already specified to hold more than one gateway, one per machine (`herdr-web-dashboard/spec.md:99`). The 2026-10-25 stop leaves no trace: the gateway logs nothing on shutdown or panic |
 | Authority model today | observed | `fgos-gateway` live, layer entry, `paths: []`; `herdr-web-dashboard` retired yet still the spec's area owner and the only consumer of CTR010; `host-surface` also claims "gateway entrypoints" and "auth"; door `control-the-gateway-process` covers the lifecycle (`gateway_control.rs`); no row for auth, the caller record, `/runtime`, peer link, broadcast or a machine project registry; no decision kind for the gateway; `/runner/tick` conflicts with the row's `mustNotOwn: in-process runner` |
 | Proposed split | proposal (agent, shaper agrees in outline), not discussed with the owner | One binary `fgos-gateway`, a small workspace: **A** entry door + verb relay, REST and MCP together (same port, auth and verb chokepoint); row `fgos-gateway` updated, new door `relay-to-fgos-verbs`; per request a project id instead of `root`. **B** auth as a module and a door `gateway-admits-callers`, not a component. **C** dashboard: hosting only; fold the retired `herdr-web-dashboard` row into `fgos-gateway` (owner answer: changes the area map). **D** machine project registry: a module and door under `fgos-gateway`, home `~/.fgos`; lock, registry and logs move to machine scope (owner answer; holder-lock's lock registry changes; needs the project naming question). **E** peer link + membership: new crate and component `gateway-peers`, trust by Identity pins, new contract `gateway-peer.v1`; `remote_invocation.rs` deleted unless a peer-invocation job is confirmed. **F** changes broadcast: new crate and component, depends on E; the Event Store side (volatile received buffer, notify/watch of appends, fold by hash) stays in `packages/event-store` behind a door the gateway calls; subscribers subscribe through the Event Store, never through the gateway. **G** lifecycle `fgos gateway start/stop/status` stays in `apps/fgos` under `host-surface`, scope changes to machine. New components (E, F) need an answered owner question before `fgos authority declare` |
@@ -109,6 +108,7 @@ coordination.
 | D2 | No-error rule. The broadcast carries the exact acked event bytes with their event hash, never a second representation. The receiver keeps them in a fast, rebuildable cache keyed by hash and never writes them to a ref. When git brings the sealed event it has the same hash and the store's union by hash folds it once; the cache entry then drops. An event whose causal predecessor has not arrived is deferred as the store already defers it. Concurrency stays "provisional, conflict recorded by the consumer". A lost broadcast costs only speed: the timer sync still delivers. (Where the cache lives is reopened by the bus assessment in §3, condition 1) | 2026-11-27 | shaper 16:10, owner agreed 16:13 |
 | D3 | The first things broadcast are event-store events: mail, work and owner questions. Plan and backlog changes are not covered by D3 and are discussed separately | 2026-11-27 | shaper 16:10, owner agreed 16:13 |
 | D4 | Naming: keep the name **Event Store** (already generic: the append-only store of facts of any domain; a rename would touch 843 files, 5,081 mentions, the published `refs/fgos/events/*` refs, the `eventStore` key and the `fgos events` verbs). The supervision "event queue" becomes the **attention queue** and its rows **attention items**, matching `core/attention/`; "event" keeps one meaning. The rename is its own item, outside this discussion | 2026-11-27 | shaper 16:30, owner agreed 16:31 |
+| D5 | The Event Store and the event bus are separate. The Event Store is the durable truth (fsync, sealed git objects, kept forever, slow across machines). The event bus is a fast, transient channel that may lose items and is empty after a restart; the gateway cluster is the bus. Rule: whatever must survive is appended to the Event Store first, and only then may the bus carry a copy; anything carried only by the bus is a signal that is safe to lose (for example "origin `main` moved to commit Z", liveness). The received copy of D2 is a volatile read-side buffer owned by the Event Store (never fsynced, never written to a ref, gone on restart), not a cache inside the gateway; subscribers read it through the Event Store. Refines where D2's cache lives | 2026-11-27 | owner 16:41, shaper 16:45, owner agreed 16:50 |
 
 ## 5. Q&A log
 
@@ -157,33 +157,42 @@ coordination.
 - 2026-11-27 16:50 — Agent report received; the shaper checked its key claims against source (`gateway.rs:1252`,
   `gateway_control.rs:89-96`, `fgos authority model`, `herdr-web-dashboard/spec.md:99`, `gateway.rs:1208`) and
   recorded it in §3. Mailbox's two write paths confirmed in code.
+- 2026-11-27 16:50 — Owner: "đúng ý anh, ghi lại đi" on the rule "durable first, the bus carries copies or signals
+  safe to lose". Minted D5; §6 regenerated.
 
 ## 6. Thiết kế đã chốt {#design}
 
 Each machine runs one fgOS gateway (D1). It is the machine's remote entry door: requests from outside (REST, MCP, the
-web dashboard) are relayed to the fgOS verbs of the project they name. The gateways of the owner's machines link to
-each other and form a cluster whose job is speed, not authority: when a project appends an event on one machine (mail,
-work, an owner question; D3), that machine's gateway sends the exact acked event bytes and hash to the other gateways.
-A receiving machine keeps them in a fast cache keyed by hash, so its sessions can see and act on the change at once.
-Persistence is unchanged and slower: the event is sealed, pushed to the git remote and fetched by the timer as today,
-and when it arrives it carries the same hash, so the event store folds it once and the cache entry drops (D2). Nothing
-the broadcast carries is ever written to a ref; a lost or late broadcast only falls back to timer speed; there is no
-leader and no lease. Not settled yet: plan and backlog changes, the network between machines (Q2), how projects are
-named across machines, and the component split.
+web dashboard) are relayed to the fgOS verbs of the project they name. The gateways of the owner's machines link into
+a cluster that is the **event bus**: a fast, transient channel, not a store (D5). Truth and durability stay in the
+**Event Store** and git: an event is appended and acked there first, and only then may the bus carry a copy of its
+exact bytes and hash to the other machines (D2). The first copies carried are mail, work and owner-question events
+(D3); plan and backlog changes are provisionally one signal, "origin `main` moved to commit Z", that makes receivers
+fetch and tick their watcher at once. On a receiving machine the copy goes into a volatile read-side buffer owned by
+the Event Store, so the existing subscribers (watcher, the attention queue, mailbox, questions) see it at once through
+the Event Store they already read; when git brings the sealed event it has the same hash and is folded once. Anything
+the bus carries alone is safe to lose; a lost item only falls back to timer speed. There is no leader and no lease.
+Names: Event Store stays; the supervision queue becomes the attention queue (D4).
+
+Not settled yet: the component split (§3 "Proposed split": C, D, E, F need owner answers), how a project is named
+across machines, the network between machines (Q2), push inside one machine (append notify vs open-log watch), wake
+coalescing per subscriber, whether letters of local mail must survive a restart, and plan/backlog beyond the
+provisional signal.
 
 ```mermaid
 flowchart LR
   X[outside: REST, MCP, dashboard] --> D1
   subgraph M1[machine A: one gateway]
     D1[entry door / verb relay] --> V1[fgos verbs of project P]
-    ES1[event store of P: append + ack] -->|acked event bytes + hash| B1[changes broadcast]
+    ES1[Event Store of P: append, fsync, ack] -->|copy: event bytes + hash| B1[bus: changes broadcast]
   end
   subgraph M2[machine B: one gateway]
-    B2[changes broadcast] --> C2[fast cache, keyed by hash]
-    ES2[event store of P: fetch, union by hash] --> C2
+    B2[bus: changes broadcast] --> R2[Event Store read-side buffer, volatile]
+    R2 --> S2[subscribers: watcher, attention queue, mailbox, questions]
+    ES2[Event Store of P: fetch, union by hash] --> S2
   end
   B1 <-->|peer link, Identity pins| B2
-  ES1 -. git: seal, push, fetch - truth, slower .-> ES2
+  ES1 -. git: seal, push, fetch - durable truth, slower .-> ES2
 ```
 
 ## 7. Danh mục hạng mục / task {#tasks}
