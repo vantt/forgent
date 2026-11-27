@@ -154,7 +154,7 @@ applied, reported like `checks-failed`).
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [One Git door for a checkout's committed .fgos bytes](phase-01-committed-state-door.md) | - | packages/git/rust/src/land.rs, packages/git/rust/src/worktree.rs, packages/git/rust/tests/land.rs, packages/git/rust/tests/worktree.rs | 1 | done |
-| 2 | [Release checks run in a check checkout: rule, port and host adapter](phase-02-release-check-checkout.md) | 1 | packages/session-host/rust/src/release.rs, packages/session-host/rust/tests/release.rs, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json | 2 | ready |
+| 2 | [Release checks run in a check checkout: rule, port and host adapter](phase-02-release-check-checkout.md) | 1 | packages/session-host/rust/src/release.rs, packages/session-host/rust/tests/release.rs, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json | 2 | done |
 | 3 | [Docs, changelog and integration](phase-03-docs-and-integration.md) | 2 | core/config-standard/release.yaml, core/config-schema/release.schema.yaml, docs/platform/run-supervisor/spec.md, changelog.d/261127-1224-release-checks-run-on-a-clean-checkout.md, plans/261127-1224-release-checks-clean-tip/reports/** | 3 | ready |
 
 Phases 1 and 2 are `code:implement`, each reviewed (`code:review`) before it lands. Phase 3 is `code:implement`
