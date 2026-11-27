@@ -11,6 +11,7 @@ use fgos_documentation::pkm::{
 };
 use fgos_documentation::port::{IndexKind, Query, WorkerLauncher};
 use fgos_documentation::profile;
+use fgos_documentation::scan::FsMentionScanner;
 
 const READY_WAIT: Duration = Duration::from_secs(120);
 
@@ -45,7 +46,12 @@ fn query(text: &str, area: &[&str]) -> Query {
         parts: vec![text.to_owned()],
         area: area.iter().map(|a| (*a).to_owned()).collect(),
         question: Vec::new(),
+        exact: Vec::new(),
     }
+}
+
+fn scanner(p: &LocatePaths) -> FsMentionScanner {
+    FsMentionScanner::new(&p.docs_root)
 }
 
 #[test]
@@ -81,6 +87,7 @@ fn a_ready_index_answers_with_repository_paths_axes_and_the_region_flag() {
     let answer = locate(
         || &locator,
         &NoStart(&p),
+        &scanner(&p),
         &query("the land door rebases and pushes branches to main", &[]),
     )
     .unwrap();
@@ -109,6 +116,7 @@ fn a_ready_index_answers_with_repository_paths_axes_and_the_region_flag() {
     let guessed = locate(
         || &locator,
         &NoStart(&p),
+        &scanner(&p),
         &query("the runner dispatches each unit to an executor", &["git"]),
     )
     .unwrap();
@@ -138,6 +146,7 @@ fn a_ready_index_answers_with_repository_paths_axes_and_the_region_flag() {
     let two = locate(
         || &locator,
         &NoStart(&p),
+        &scanner(&p),
         &Query {
             parts: vec!["worktree remove verb".into(), "land door".into()],
             ..Query::default()
@@ -162,7 +171,7 @@ fn a_ready_index_answers_with_repository_paths_axes_and_the_region_flag() {
             "docs/distillery/",
         ),
     ] {
-        let answer = locate(|| &locator, &NoStart(&p), &query(draft, &[])).unwrap();
+        let answer = locate(|| &locator, &NoStart(&p), &scanner(&p), &query(draft, &[])).unwrap();
         assert!(
             answer.parts[0]
                 .candidates
@@ -199,6 +208,7 @@ fn with_no_worker_and_no_index_the_answer_is_partial_and_empty() {
     let answer = locate(
         || &locator,
         &NoStart(&p),
+        &scanner(&p),
         &query("the runner dispatches each unit", &[]),
     )
     .unwrap();
@@ -209,5 +219,59 @@ fn with_no_worker_and_no_index_the_answer_is_partial_and_empty() {
     assert!(
         action.contains("did not start"),
         "the launcher's refusal is named: {action}"
+    );
+}
+
+#[test]
+fn mentions_come_from_the_files_on_disk_even_with_no_index_and_skip_excluded_folders() {
+    let state = tempfile::tempdir().unwrap();
+    let corpus = tempfile::tempdir().unwrap();
+    let write = |name: &str, body: &str| {
+        let file = corpus.path().join(name);
+        std::fs::create_dir_all(file.parent().unwrap()).unwrap();
+        std::fs::write(file, body).unwrap();
+    };
+    write(
+        "platform/git/spec.md",
+        "# Git\n\n## Land\n\nthe `fgos land` verb\n",
+    );
+    write(
+        "platform/git/history/old.md",
+        "# Old\n\nthe `fgos land` verb\n",
+    );
+    let p = LocatePaths {
+        docs_root: corpus.path().to_path_buf(),
+        ..paths(state.path())
+    };
+    profile::write_if_changed(&p.docs_root, &p.profile).unwrap();
+    let locator = PkmLocator::open(&p, EmbedderChoice::Fake);
+    // A file that lands after the locator opened is still found: the scan reads disk, not the index.
+    write(
+        "platform/runner/spec.md",
+        "# Runner\n\ncalls fgos land; a.b (c)\n",
+    );
+    let ask = Query {
+        parts: vec!["the write door runs `fgos land` first".into()],
+        exact: vec!["a.b (c)".into()],
+        ..Query::default()
+    };
+    let answer = locate(|| &locator, &NoStart(&p), &scanner(&p), &ask).unwrap();
+    assert!(answer.partial);
+    let part = &answer.parts[0];
+    assert!(part.candidates.is_empty());
+    let land = &part.mentions[0];
+    assert_eq!((land.term.as_str(), land.total), ("fgos land", 2));
+    let found: Vec<&str> = land.sections.iter().map(|s| s.path.as_str()).collect();
+    assert_eq!(
+        found,
+        ["docs/platform/git/spec.md", "docs/platform/runner/spec.md"],
+        "the history folder is excluded"
+    );
+    assert!(land.sections.iter().all(|s| s.missed_by_search));
+    assert_eq!(part.mentions[1].sections[0].line, 3);
+    let json = serde_json::to_value(&answer).unwrap();
+    assert_eq!(
+        json["parts"][0]["mentions"][0]["sections"][0]["missedBySearch"],
+        true
     );
 }

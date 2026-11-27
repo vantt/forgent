@@ -10,13 +10,15 @@
   "measures": {
     "fgos.doc.locate.duration": { "unit": "ms", "aggs": ["max", "p50", "avg"] },
     "fgos.doc.locate.parts": { "unit": "1", "aggs": ["sum", "max", "avg"] },
-    "fgos.doc.locate.candidates": { "unit": "1", "aggs": ["sum", "max", "avg"] }
+    "fgos.doc.locate.candidates": { "unit": "1", "aggs": ["sum", "max", "avg"] },
+    "fgos.doc.locate.mentions": { "unit": "1", "aggs": ["sum", "max", "avg"] },
+    "fgos.doc.locate.missed_by_search": { "unit": "1", "aggs": ["sum", "max", "avg"] }
   },
   "kinds": {
     "fgos.doc.locate": {
       "subjects": ["session"],
       "attrs": ["fgos.doc.locate.partial", "fgos.doc.locate.state", "fgos.doc.locate.area", "fgos.doc.locate.question"],
-      "measures": ["fgos.doc.locate.duration", "fgos.doc.locate.parts", "fgos.doc.locate.candidates"]
+      "measures": ["fgos.doc.locate.duration", "fgos.doc.locate.parts", "fgos.doc.locate.candidates", "fgos.doc.locate.mentions", "fgos.doc.locate.missed_by_search"]
     }
   }
 }

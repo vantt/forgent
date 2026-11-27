@@ -460,6 +460,7 @@ fn part(p: &Value) -> Part {
                 candidates: pl["candidates"].as_u64().unwrap_or(0) as usize,
             })
             .collect(),
+        ..Part::default()
     }
 }
 
