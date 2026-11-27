@@ -51,14 +51,9 @@ help queue has nothing past the threshold; then the supervisor owns the queue ag
 
 1. **Clarify the domain.** Call `fgos-clarifying` (verdict only, no Work item, never `fgos submit`). If the verdict is
    unsure (`domainUnsure`), ask the owner one line and wait; park nothing else behind it.
-2. **Backlog row.** For an actionable request, mint an id with `fgos identity mint backlog` (Rule: id-minting, in AGENTS.md; set in .fgos/instructions/effective/rules.json) and add one row to `plans/backlog.md`. Discussions and plans carry that id. Your sandbox keeps `docs/`
-   read-only, the backlog included, so never edit it in place: copy it to a scratch file
-   (`cp plans/backlog.md "${TMPDIR:-/tmp}/backlog.md"`), take the id of that copy right away
-   (`oid=$(git hash-object --no-filters "${TMPDIR:-/tmp}/backlog.md")`), edit the copy, then hand the whole copy to your
-   supervisor with `fgos session write plans/backlog.md --base "$oid" < "${TMPDIR:-/tmp}/backlog.md"`, which replaces the
-   file atomically. `--base` is what protects newer rows: if the file moved
-   since (a pull, another writer), the write is refused `write-base-stale` and writes nothing, so a row the host added
-   since is never lost. On `write-base-stale`, copy the file again, redo the edit on the fresh copy and write again. On `write-busy` (a live Git operation of the host held the checkout through the host's own retries; nothing was written), wait a little and write again unchanged. `plans/` and `plans/discussions/` stay writable directly.
+2. **Backlog row.** For an actionable request, mint an id with `fgos identity mint backlog` (Rule: id-minting, in AGENTS.md; set in .fgos/instructions/effective/rules.json) and write one row file `plans/backlog/<id>-<slug>.md` with
+   `fgos session write plans/backlog/<id>-<slug>.md < row.md` (a new file, so there is nothing to copy or hash). Discussions and plans carry that id.
+   The land door regenerates `plans/backlog.md` in the same commit; never edit the index. On `write-busy` (a live Git operation of the host held the checkout through the host's own retries; nothing was written), wait a little and write again unchanged. `plans/` and `plans/discussions/` stay writable directly.
 3. **Route.**
 
    | State of the topic | Route |

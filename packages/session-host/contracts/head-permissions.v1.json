@@ -73,7 +73,7 @@
     },
     "supervisor": {
       "inherits": "head",
-      "writes": ["plans", "plans/backlog.md", "plans/backlog/*"],
+      "writes": ["plans", "plans/backlog/*"],
       "mailbox": true,
       "peers": true,
       "rules": [
@@ -106,7 +106,7 @@
     },
     "secretary": {
       "inherits": "supervisor",
-      "writes": ["plans", "plans/backlog.md", "plans/backlog/*"],
+      "writes": ["plans", "plans/backlog/*"],
       "mailbox": true,
       "peers": true,
       "rules": [
