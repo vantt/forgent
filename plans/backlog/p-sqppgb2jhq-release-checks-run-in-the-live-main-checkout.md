@@ -1,7 +1,7 @@
 ---
 id: p-sqppgb2jhq
 title: "Release checks run in the live main checkout, not on the commit they release, so concurrent heads and local state turn them red (release, priority P0; source: lead:SUPERVISOR, owner order 2026-11-27)"
-status: proposed
+status: done
 priority: P0
 area: release
 created: 2026-11-27
