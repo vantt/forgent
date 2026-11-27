@@ -113,8 +113,9 @@ function scanLedgers(mainRoot, cache) {
     } catch {
       value = { unreadable: true };
     }
-    // A case another prune removed while this one read it is that prune's, not an unreadable ledger.
-    if (value.unreadable && !lstatOrNull(path.join(root, id))) continue;
+    // A case another prune is removing while this one reads it (its events file or its directory already gone)
+    // is that prune's, not an unreadable ledger.
+    if (value.unreadable && (!lstatOrNull(path.join(root, id)) || (fileStat && !lstatOrNull(eventsFilePath(mainRoot, id))))) continue;
     cache.set(id, { key, value });
     ledgers.set(id, value);
   }
