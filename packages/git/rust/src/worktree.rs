@@ -974,6 +974,92 @@ impl GitDriver {
         }
         Ok(())
     }
+    /// Materialize a registered linked checkout's tracked `.fgos` paths from
+    /// the given commit, clearing their skip-worktree bit and restoring them in
+    /// index and worktree. The main checkout is refused by name.
+    pub fn materialize_committed_state(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        commit: &str,
+    ) -> Result<()> {
+        let path = repo
+            .work_tree()
+            .ok_or_else(|| failure("worktree-identity-refused"))?;
+        if path == repo.trusted_main_root() || repo.git_dir() == repo.common_dir() {
+            return Err(failure("worktree-identity-refused"));
+        }
+        let target = match self.resolve_repo(path, repo.trusted_main_root())? {
+            ResolveRepo::Repository(r) => r,
+            _ => return Err(recovery("worktree-registration-missing")),
+        };
+        if path == repo.trusted_main_root()
+            || target.work_tree.as_deref() != Some(path)
+            || target.common_dir() != repo.common_dir()
+            || target.git_dir() == repo.common_dir()
+            || target.git_dir() != repo.git_dir()
+        {
+            return Err(failure("worktree-identity-refused"));
+        }
+        let scope = self.worktree_scope(repo, held)?;
+        let h = scope
+            .handle("worktree-admin")
+            .or_else(|| scope.handle("merge-slot"))
+            .or_else(|| scope.handle("land-slot"))
+            .ok_or_else(|| failure("worktree-admin-required"))?;
+        let candidate_repo = self.checkout_repository(&target)?;
+        let state = self.checkout_call_borrowed(
+            &candidate_repo,
+            h,
+            &["ls-files", "-z", "--", ".fgos"],
+            &[],
+            false,
+        )?;
+        if !state.success {
+            return Err(state.error("worktree-state-paths-unreadable"));
+        }
+        if !state.stdout.is_empty() {
+            let update = self.checkout_call_borrowed(
+                &candidate_repo,
+                h,
+                &["update-index", "--no-skip-worktree", "-z", "--stdin"],
+                &state.stdout,
+                false,
+            )?;
+            if !update.success {
+                return Err(update.error("worktree-command-failed"));
+            }
+            let restore = self.checkout_call_borrowed(
+                &candidate_repo,
+                h,
+                &[
+                    "--literal-pathspecs",
+                    "restore",
+                    "--source",
+                    commit,
+                    "--staged",
+                    "--worktree",
+                    "--pathspec-from-file=-",
+                    "--pathspec-file-nul",
+                ],
+                &state.stdout,
+                false,
+            )?;
+            if !restore.success {
+                return Err(restore.error("worktree-command-failed"));
+            }
+        }
+        Ok(())
+    }
+    /// Alias for [`Self::materialize_committed_state`].
+    pub fn materialize_worktree_committed_state(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        commit: &str,
+    ) -> Result<()> {
+        self.materialize_committed_state(repo, held, commit)
+    }
     /// Remove a delivered linked worktree. With `IgnoredBytes::Discard` its
     /// ignored bytes are deleted after every other check passed, and the
     /// result says how many; a replayed id discards nothing again.

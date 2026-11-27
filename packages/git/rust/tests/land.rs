@@ -5,12 +5,17 @@ include!("support/signing.rs");
 #[test]
 fn real_merge_evidence_and_same_id_replay() {
     let f = Fixture::new();
+    fs::write(f.main.join(".fgos/project.json"), "{\"tracked\":true}\n").unwrap();
+    git(&f.main, &["add", ".fgos/project.json"]);
+    git(&f.main, &["commit", "-qm", "target tracked fgos"]);
+    let mut request = f.request.clone();
+    request.target = git(&f.main, &["rev-parse", "HEAD"]);
     let mut s = f
         .driver
         .prepare_land(
             &f.repo,
             vec![],
-            &f.request,
+            &request,
             "fixture",
             "merge",
             &wal::OsFileSystem,
@@ -21,7 +26,11 @@ fn real_merge_evidence_and_same_id_replay() {
     let c = s.candidate().unwrap();
     assert_eq!(
         git(&c.worktree, &["show", "-s", "--format=%P"]),
-        format!("{} {}", f.request.target, f.request.source)
+        format!("{} {}", request.target, request.source)
+    );
+    assert_eq!(
+        fs::read_to_string(c.worktree.join(".fgos/project.json")).unwrap(),
+        "{\"tracked\":true}\n"
     );
     let r = f
         .driver
@@ -45,14 +54,14 @@ fn real_merge_evidence_and_same_id_replay() {
     // A raw external ABA does not authorize a second CAS for this identity.
     git(
         &f.main,
-        &["update-ref", "refs/heads/trunk", &f.request.target],
+        &["update-ref", "refs/heads/trunk", &request.target],
     );
     let replay = f
         .driver
         .prepare_land(
             &f.repo,
             vec![],
-            &f.request,
+            &request,
             "fixture",
             "merge",
             &wal::OsFileSystem,
