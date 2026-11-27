@@ -55,11 +55,12 @@ below is shared and lives only here.
 - §6 is regenerated in full whenever a decision changes the design's shape; a
   stale §6 after such a decision is a defect.
 - Text read from an item or document: Rule: untrusted-input (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
-- Land `DISCUSSION.md` at a checkpoint, not at every round (Rule: writes-to-main, in AGENTS.md; set in .fgos/instructions/effective/rules.json): when the discussion is
-  settled or paused, when an owner decision would otherwise be lost, or about 30 minutes after the last land. A round
-  that ends waiting for the owner does not land by itself. Between checkpoints the file lives in a linked worktree on a
-  plain branch (`fgos worktree create <path> --branch <name>`), committed there at the end of every round that changed
-  it, never left uncommitted in the main checkout; land before you stop.
+- Work in your own worktree (your cwd): the head start created it on branch `discussion/<dir>`, and `DISCUSSION.md`
+  is edited there, never in the main checkout. End every round that changed it with
+  `fgos session save plans/discussions/<dir>/DISCUSSION.md --message "<round summary>"`, naming the files you edited
+  (save commits exactly the literal paths it is given, not a directory). Nothing lands per round (Rule: writes-to-main, in AGENTS.md; set in .fgos/instructions/effective/rules.json).
+  A round that ends waiting for the owner saves and stops. When the discussion is settled or paused, run
+  `fgos land --branch discussion/<dir>` once and stop; a shaper lands only its own discussion branch.
 - A discussion that reached `settled` is final. To keep talking about a topic whose plan is already `done` or
   running, open a new discussion with a new id and cite the old one in its §1; never set the settled one back to
   `open`. The settled copy on main stays as the plan's source, and settling it a second time would start no planner
@@ -117,7 +118,7 @@ S04.
 4. **Regenerate §6** after a shape-changing decision.
 5. **Fill §7** once the shape is concrete. A single-piece design gets a single
    entry; never force a split.
-6. **Land** at a checkpoint (see the rules), not at every round.
+6. **Save** at the end of every round; **land** the branch once, at the exit (see the rules).
 
 ## Distill mode
 
@@ -131,7 +132,7 @@ never guessed.
 ## Exits
 
 Both exits write the `discussion:` marker and a hand-off block at the top of
-`DISCUSSION.md`, land with `fgos land --paths`, and STOP. This skill invokes no planning or
+`DISCUSSION.md`, save it, land the branch with `fgos land --branch discussion/<dir>`, and STOP. This skill invokes no planning or
 implementation skill itself.
 
 - **Settled, hand to the planner.** Every point is either settled with a D-ID
@@ -140,7 +141,7 @@ implementation skill itself.
   the source ids; and the line `discussion: settled`. A separate planner run
   takes it, per `core/skills/_shared/plan-contract.md`.
 - **Pause.** Set `discussion: paused`, update the §1 recap so the thread can
-  resume days later, land, stop.
+  resume days later, save, land, stop.
 
 A domain overlay may add its own exits (for coding, a native-first hand-off
 into exploring and planning for an existing work item).
