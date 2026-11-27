@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "P0: fix the red tests on main so the release check can pass"
-status: ready
+status: withdrawn
 priority: P0
 blockedBy: []
 base: 7490ea7e991afbadc0340ace2854bc2b261218fd
@@ -21,6 +21,8 @@ source:
   - q-apqmci34ry
 created: 2026-11-27
 ---
+
+> **Withdrawn (lead:SUPERVISOR, 2026-11-27 08:40).** A second planner wrote this duplicate of `261127-0829-red-tests-before-release`, which runs instead. Its extra finding (phase 2, the dev-host leak into the real store) is handed to 0829 phase 1 as a candidate red to prove.
 
 # P0: fix the red tests on main so the release check can pass
 

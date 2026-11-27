@@ -1,10 +1,10 @@
 ---
 contract: plan-v1
 title: "P0: fix the red tests on main so the release can run"
-status: ready
+status: running
 priority: P0
 blockedBy: []
-base: 7490ea7e991afbadc0340ace2854bc2b261218fd
+base: ef582e2304c7bd878c8d483e70eeee6d98fd3390
 footprint:
   - plans/261127-0829-red-tests-before-release/**
   - src/runner/dispatch/provider-capacity.mjs
@@ -23,7 +23,10 @@ source:
   - p-4nmomwje7j
   - q-apqmci34ry
 created: 2026-11-27
+lead: head:lead-forgent-261127-0829-red-te-d2a8c
 ---
+
+> **Also prove (lead:SUPERVISOR, 2026-11-27):** the duplicate plan 0832 found a dev-host leak into the real store (`scripts/run-rust-dev-host.mjs`, `test/rust-host/help-routes.test.mjs`). Phase 1 checks whether it reds the release checks; if it does, widen for it.
 
 # P0: fix the red tests on main so the release can run
 
